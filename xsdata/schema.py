@@ -6,14 +6,6 @@ from xsdata.builders import Documentation, Element
 from xsdata.enums import Event, Tag
 
 
-def stripns(text: str):
-    try:
-        namespace, text = text.split("}", 1)
-        return text
-    except ValueError:
-        return text
-
-
 class SchemaReader:
     def __init__(self, path: str):
         self.path = path
@@ -53,50 +45,22 @@ class SchemaReader:
         self.element_index += 1
 
     def end_element(self, element):
-        attrs = self.clean_element_attrs(element)
-
-        if "block" in attrs:
+        if "block" in element.attrib:
             raise NotImplementedError("Unsupported element attribute `block`")
-        if "final" in attrs:
+        if "final" in element.attrib:
             raise NotImplementedError("Unsupported element attribute `final`")
 
-        self.push_element(
-            Element(
-                id=attrs.get("id"),
-                name=attrs.get("name"),
-                ref=attrs.get("ref"),
-                type=attrs.get("type"),
-                substitution_group=attrs.get("substitutionGroup"),
-                default_value=attrs.get("default"),
-                fixed_value=attrs.get("fixed"),
-                form=attrs.get("form"),
-                min_occurs=int(attrs.get("minOccurs", 1)),
-                max_occurs=int(attrs.get("maxOccurs", 0)),
-                nillable=attrs.get("nillable", False) == "true",
-                abstract=attrs.get("abstract", False) == "true",
-                nsmap=element.nsmap,
-                prefix=element.prefix,
-                documentation=self.documentations.pop(
-                    self.element_index, None
-                ),
-            )
-        )
+        el = Element.from_element(element)
+        el.documentation = self.documentations.pop(self.element_index, None)
+        self.push_element(Element.from_element(element))
 
     def end_documentation(self, element):
-        attrs = self.clean_element_attrs(element)
-        self.documentations[self.element_index] = Documentation(
-            lang=attrs.get("lang"),
-            source=attrs.get("source"),
-            text=element.text,
-            nsmap=element.nsmap,
-            prefix=element.prefix,
-        )
+        doc = Documentation.from_element(element)
+        doc.text = element.text
+        self.documentations[self.element_index] = doc
 
     def push_element(self, element: Element):
         self.elements[self.element_parent].append(element)
-
-    def clean_element_attrs(self, element):
-        return {stripns(key): value for key, value in element.attrib.items()}
 
 
 if __name__ == "__main__":

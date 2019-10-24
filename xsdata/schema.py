@@ -1,8 +1,12 @@
-from typing import Dict, List
+from dataclasses import asdict
+from pprint import pprint
+from typing import List
 
+import stringcase
 from lxml import etree
 
-from xsdata.builders import Documentation, Element
+from xsdata import builders
+from xsdata.builders import Builder
 from xsdata.enums import Event, Tag
 
 
@@ -13,12 +17,9 @@ class SchemaReader:
         self.methods = {tag.qname: tag for tag in Tag}
         self.element_index = 0
         self.element_parent = Tag.SCHEMA
-        self.elements: Dict[Tag, List] = {
-            tag.value: [] for tag in Tag.element_parents()
-        }
+        self.elements: List[Builder] = []
 
     def parse(self):
-
         context = etree.iterparse(self.path, events=(Event.START, Event.END))
         for event, elem in context:
             tag = self.methods.get(elem.tag)
@@ -28,39 +29,37 @@ class SchemaReader:
                 )
 
             method = getattr(self, "{}_{}".format(event, tag.value), None)
-
-            if event == Event.START and tag in Tag.element_parents():
-                self.start_element_parent(tag)
-
             if method:
                 method(elem)
-            else:
-                print("Skipping event: {} {}".format(event, elem.tag))
+            elif event == Event.START:
+                builder = getattr(builders, stringcase.capitalcase(tag.value))
+                self.elements.append(builder.from_element(elem))
+            elif event == Event.END:
+                element = self.elements.pop()
+                if len(self.elements) == 0:
+                    return element
+                self.assign_to_parent(element)
 
-    def start_element_parent(self, tag: Tag):
-        self.elements[tag] = []
-        self.element_parent = tag
+        return self.elements
 
-    def start_element(self, element):
-        self.element_index += 1
+    def assign_to_parent(self, element):
+        name = stringcase.snakecase(type(element).__name__)
+        parent = self.elements[-1]
 
-    def end_element(self, element):
-        if "block" in element.attrib:
-            raise NotImplementedError("Unsupported element attribute `block`")
-        if "final" in element.attrib:
-            raise NotImplementedError("Unsupported element attribute `final`")
-
-        el = Element.from_element(element)
-        el.documentation = self.documentations.pop(self.element_index, None)
-        self.push_element(Element.from_element(element))
-
-    def end_documentation(self, element):
-        doc = Documentation.from_element(element)
-        doc.text = element.text
-        self.documentations[self.element_index] = doc
-
-    def push_element(self, element: Element):
-        self.elements[self.element_parent].append(element)
+        if hasattr(parent, name):
+            setattr(parent, name, element)
+        else:
+            plural_name = "{}s".format(name)
+            if hasattr(parent, plural_name):
+                children = getattr(parent, plural_name)
+                if type(children) == list:
+                    children.append(element)
+                else:
+                    raise ValueError(
+                        "Property `{}::{}` is not a list".format(
+                            type(parent).__name__, plural_name
+                        )
+                    )
 
 
 if __name__ == "__main__":
@@ -68,3 +67,4 @@ if __name__ == "__main__":
 
     schema = SchemaReader(sys.argv[1])
     result = schema.parse()
+    pprint(asdict(result))

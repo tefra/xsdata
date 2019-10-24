@@ -1,7 +1,7 @@
 from dataclasses import MISSING
 from dataclasses import Field as DataField
-from dataclasses import dataclass, fields
-from typing import List as Array
+from dataclasses import dataclass, field, fields
+from typing import List as ArrayList
 from typing import Optional
 
 import stringcase
@@ -19,6 +19,9 @@ def stripns(text: str):
 def val(field: DataField, attrs: dict):
     name = stringcase.camelcase(field.name)
     if name not in attrs:
+        factory = getattr(field, "default_factory")
+        if factory is not MISSING:
+            return factory()  # mypy: ignore
         return None if field.default is MISSING else field.default
     elif field.type == int or field.type == Optional[int]:
         try:
@@ -33,7 +36,7 @@ def val(field: DataField, attrs: dict):
         return attrs[name]
 
 
-class Base:
+class Builder:
     def __init__(self, *args, **kwargs):
         pass
 
@@ -41,32 +44,38 @@ class Base:
     def from_element(cls, el: etree.Element):
         attrs = {stripns(key): value for key, value in el.attrib.items()}
         data = {field.name: val(field, attrs) for field in fields(cls)}
-        data["nsmap"] = el.nsmap
-        data["prefix"] = el.prefix
+
+        if "nsmap" in data:
+            data["nsmap"] = el.nsmap
+        if "prefix" in data:
+            data["prefix"] = el.prefix
+        if "text" in data:
+            data["text"] = el.text
+
         return cls(**data)
 
 
 @dataclass
-class ElementBase(Base):
+class ElementBuilder(Builder):
     id: Optional[str]
     prefix: str
     nsmap: dict
 
 
 @dataclass
-class Documentation(ElementBase):
+class Documentation(ElementBuilder):
     lang: str
     source: str
     text: str
 
 
 @dataclass
-class Appinfo(ElementBase):
+class Appinfo(ElementBuilder):
     source: Optional[str]
 
 
 @dataclass
-class Annotation(ElementBase):
+class Annotation(ElementBuilder):
     appinfo: Optional[Appinfo]
     documentation: Optional[Documentation]
 
@@ -93,7 +102,7 @@ class List(AnnotationBase):
 @dataclass
 class Union(AnnotationBase):
     member_types: Optional[str]
-    simple_types: Array[SimpleType]
+    simple_types: ArrayList[SimpleType] = field(default_factory=list)
 
 
 @dataclass
@@ -122,24 +131,24 @@ class AttributeGroup(AnnotationBase):
     ref: Optional[str]
 
     any_attribute: Optional[AnyAttribute]
-    attributes: Array[Attribute]
-    attribute_groups: Array["AttributeGroup"]
+    attributes: ArrayList[Attribute] = field(default_factory=list)
+    attribute_groups: ArrayList["AttributeGroup"] = field(default_factory=list)
 
 
 @dataclass
 class All(AnnotationBase):
-    elements: Array["Element"]
+    elements: ArrayList["Element"] = field(default_factory=list)
     max_occurs: int = 1
     min_occurs: int = 1
 
 
 @dataclass
 class Sequence(AnnotationBase):
-    elements: Array["Element"]
-    groups: Array["Group"]
-    choices: Array["Choice"]
-    sequences: Array["Sequence"]
-    anys: Array["Any"]
+    elements: ArrayList["Element"] = field(default_factory=list)
+    groups: ArrayList["Group"] = field(default_factory=list)
+    choices: ArrayList["Choice"] = field(default_factory=list)
+    sequences: ArrayList["Sequence"] = field(default_factory=list)
+    anys: ArrayList["Any"] = field(default_factory=list)
 
     max_occurs: int = 1
     min_occurs: int = 1
@@ -147,10 +156,10 @@ class Sequence(AnnotationBase):
 
 @dataclass
 class Choice(AnnotationBase):
-    elements: Array["Element"]
-    groups: Array["Group"]
-    choices: Array["Choice"]
-    sequences: Array[Sequence]
+    elements: ArrayList["Element"] = field(default_factory=list)
+    groups: ArrayList["Group"] = field(default_factory=list)
+    choices: ArrayList["Choice"] = field(default_factory=list)
+    sequences: ArrayList[Sequence] = field(default_factory=list)
     max_occurs: int = 1
     min_occurs: int = 1
 
@@ -174,67 +183,67 @@ class Extension(AnnotationBase):
     choice: Optional[Choice]
     sequence: Optional[Sequence]
     any_attribute: Optional[AnyAttribute]
-    attributes: Array[Attribute]
-    attribute_groups: Array[AttributeGroup]
+    attributes: ArrayList[Attribute] = field(default_factory=list)
+    attribute_groups: ArrayList[AttributeGroup] = field(default_factory=list)
 
 
 @dataclass
-class Enumeration(Base):
+class Enumeration(Builder):
     value: str
 
 
 @dataclass
-class FractionDigits(Base):
+class FractionDigits(Builder):
     value: int
 
 
 @dataclass
-class Length(Base):
+class Length(Builder):
     value: int
 
 
 @dataclass
-class MaxExclusive(Base):
+class MaxExclusive(Builder):
     value: float
 
 
 @dataclass
-class MaxInclusive(Base):
+class MaxInclusive(Builder):
     value: float
 
 
 @dataclass
-class MaxLength(Base):
+class MaxLength(Builder):
     value: float
 
 
 @dataclass
-class MinExclusive(Base):
+class MinExclusive(Builder):
     value: float
 
 
 @dataclass
-class MinInclusive(Base):
+class MinInclusive(Builder):
     value: float
 
 
 @dataclass
-class MinLength(Base):
+class MinLength(Builder):
     value: float
 
 
 @dataclass
-class Pattern(Base):
+class Pattern(Builder):
     value: str
 
 
 @dataclass
-class TotalDigits(Base):
+class TotalDigits(Builder):
     value: int
 
 
 @dataclass
-class WhiteSpace(Base):
+class WhiteSpace(Builder):
     value: str  # preserve, collapse, replace
 
 
@@ -246,8 +255,6 @@ class Restriction(AnnotationBase):
     choice: Optional[Choice]
     sequence: Optional[Sequence]
     any_attribute: Optional[AnyAttribute]
-    attributes: Array[Attribute]
-    attribute_groups: Array[AttributeGroup]
 
     min_exclusive: Optional[MinExclusive]
     min_inclusive: Optional[MinInclusive]
@@ -260,7 +267,9 @@ class Restriction(AnnotationBase):
     length: Optional[Length]
     whiteSpace: Optional[WhiteSpace]
     pattern: Optional[Pattern]
-    enumerations: Array[Enumeration]
+    enumerations: ArrayList[Enumeration] = field(default_factory=list)
+    attributes: ArrayList[Attribute] = field(default_factory=list)
+    attribute_groups: ArrayList[AttributeGroup] = field(default_factory=list)
 
 
 @dataclass
@@ -277,7 +286,7 @@ class ComplexContent(AnnotationBase):
 
 
 @dataclass
-class ComplexType:
+class ComplexType(AnnotationBase):
     name: Optional[str]
     block: Optional[str]
     final: Optional[str]
@@ -289,8 +298,8 @@ class ComplexType:
     choice: Optional[Choice]
     sequence: Optional[Sequence]
     any_attribute: Optional[AnyAttribute]
-    attributes: Array[Attribute]
-    attribute_groups: Array[AttributeGroup]
+    attributes: ArrayList[Attribute] = field(default_factory=list)
+    attribute_groups: ArrayList[AttributeGroup] = field(default_factory=list)
     abstract: bool = False
     mixed: bool = False
 
@@ -316,7 +325,7 @@ class Unique(AnnotationBase):
 class Key(AnnotationBase):
     name: str
     selector: Optional[Selector]
-    fields: Array[Selector]
+    fields: ArrayList[Selector] = field(default_factory=list)
 
 
 @dataclass
@@ -324,7 +333,7 @@ class Keyref(AnnotationBase):
     name: str
     refer: str
     selector: Optional[Selector]
-    fields: Array[Selector]
+    fields: ArrayList[Selector] = field(default_factory=list)
 
 
 @dataclass
@@ -343,9 +352,9 @@ class Element(AnnotationBase):
     simple_type: Optional[SimpleType]
     complex_type: Optional[ComplexType]
 
-    uniques: Array[Unique]
-    keys: Array[Key]
-    keyrefs: Array[Keyref]
+    uniques: ArrayList[Unique] = field(default_factory=list)
+    keys: ArrayList[Key] = field(default_factory=list)
+    keyrefs: ArrayList[Keyref] = field(default_factory=list)
 
     min_occurs: int = 1
     max_occurs: int = 0
@@ -400,13 +409,13 @@ class Schema(AnnotationBase):
     version: Optional[str]
     xmlns: Optional[str]
 
-    includes: Array[Include]
-    imports: Array[Import]
-    redefineds: Array[Redefined]
-    annotations: Array[Annotation]
-    simpleTypes: Array[SimpleType]
-    complexTypes: Array[ComplexType]
-    groups: Array[Group]
-    attributeGroups: Array[AttributeGroup]
-    elements: Array[Element]
-    attributes: Array[Attribute]
+    includes: ArrayList[Include] = field(default_factory=list)
+    imports: ArrayList[Import] = field(default_factory=list)
+    redefineds: ArrayList[Redefined] = field(default_factory=list)
+    annotations: ArrayList[Annotation] = field(default_factory=list)
+    simpleTypes: ArrayList[SimpleType] = field(default_factory=list)
+    complexTypes: ArrayList[ComplexType] = field(default_factory=list)
+    groups: ArrayList[Group] = field(default_factory=list)
+    attributeGroups: ArrayList[AttributeGroup] = field(default_factory=list)
+    elements: ArrayList[Element] = field(default_factory=list)
+    attributes: ArrayList[Attribute] = field(default_factory=list)

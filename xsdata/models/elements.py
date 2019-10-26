@@ -81,8 +81,8 @@ class Annotation(ElementBuilder):
 
 
 @dataclass
-class AnnotationBase(Annotation):
-    pass
+class AnnotationBase(ElementBuilder):
+    annotation: Optional[Annotation]
 
 
 @dataclass
@@ -413,9 +413,9 @@ class Schema(AnnotationBase):
     imports: ArrayList[Import] = field(default_factory=list)
     redefineds: ArrayList[Redefined] = field(default_factory=list)
     annotations: ArrayList[Annotation] = field(default_factory=list)
-    simpleTypes: ArrayList[SimpleType] = field(default_factory=list)
-    complexTypes: ArrayList[ComplexType] = field(default_factory=list)
+    simple_types: ArrayList[SimpleType] = field(default_factory=list)
+    complex_types: ArrayList[ComplexType] = field(default_factory=list)
     groups: ArrayList[Group] = field(default_factory=list)
-    attributeGroups: ArrayList[AttributeGroup] = field(default_factory=list)
+    attribute_groups: ArrayList[AttributeGroup] = field(default_factory=list)
     elements: ArrayList[Element] = field(default_factory=list)
     attributes: ArrayList[Attribute] = field(default_factory=list)

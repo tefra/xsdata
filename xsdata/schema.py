@@ -5,9 +5,9 @@ from typing import List
 import stringcase
 from lxml import etree
 
-from xsdata import builders
-from xsdata.builders import Builder
-from xsdata.enums import Event, Tag
+from xsdata.models import elements
+from xsdata.models.elements import Builder
+from xsdata.models.enums import Event, Tag
 
 
 class SchemaReader:
@@ -32,7 +32,7 @@ class SchemaReader:
             if method:
                 method(elem)
             elif event == Event.START:
-                builder = getattr(builders, stringcase.capitalcase(tag.value))
+                builder = getattr(elements, stringcase.capitalcase(tag.value))
                 self.elements.append(builder.from_element(elem))
             elif event == Event.END:
                 element = self.elements.pop()
@@ -47,19 +47,25 @@ class SchemaReader:
         parent = self.elements[-1]
 
         if hasattr(parent, name):
-            setattr(parent, name, element)
+            return setattr(parent, name, element)
         else:
             plural_name = "{}s".format(name)
             if hasattr(parent, plural_name):
                 children = getattr(parent, plural_name)
                 if type(children) == list:
-                    children.append(element)
-                else:
-                    raise ValueError(
-                        "Property `{}::{}` is not a list".format(
-                            type(parent).__name__, plural_name
-                        )
+                    return children.append(element)
+
+                raise ValueError(
+                    "Property `{}::{}` is not a list".format(
+                        type(parent).__name__, plural_name
                     )
+                )
+
+        raise ValueError(
+            "Class {} missing attribute `{}`".format(
+                type(parent).__name__, name
+            )
+        )
 
 
 if __name__ == "__main__":

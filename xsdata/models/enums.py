@@ -2,7 +2,7 @@ from enum import Enum
 
 from lxml import etree
 
-from xsdata import XMLSchema
+XMLSchema = "http://www.w3.org/2001/XMLSchema"
 
 
 class Event:
@@ -43,14 +43,19 @@ class Tag(Enum):
     UNIQUE = "unique"
 
     # Restrictions
-    MINLENGTH = "minLength"
+    ENUMERATION = "enumeration"
+    FRACTIONDIGITS = "fractionDigits"
+    LENGTH = "length"
+    MAXEXCLUSIVE = "maxExclusive"
+    MAXINCLUSIVE = "maxInclusive"
     MAXLENGTH = "maxLength"
+    MINEXCLUSIVE = "minExclusive"
+    MININCLUSIVE = "minInclusive"
+    MINLENGTH = "minLength"
     PATTERN = "pattern"
+    TOTALDIGITS = "totalDigits"
+    WHITESPACE = "whiteSpace"
 
     @property
     def qname(self):
         return etree.QName(XMLSchema, self.value)
-
-    @classmethod
-    def element_parents(cls):
-        return [Tag.SCHEMA, Tag.CHOICE, Tag.ALL, Tag.SEQUENCE, Tag.GROUP]

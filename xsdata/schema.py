@@ -4,7 +4,7 @@ import stringcase
 from lxml import etree
 
 from xsdata.models import elements
-from xsdata.models.elements import Builder
+from xsdata.models.elements import BaseModel
 from xsdata.models.enums import Event, Tag
 
 
@@ -15,9 +15,9 @@ class SchemaReader:
         self.methods = {tag.qname: tag for tag in Tag}
         self.element_index = 0
         self.element_parent = Tag.SCHEMA
-        self.elements: List[Builder] = []
+        self.elements: List[BaseModel] = []
 
-    def parse(self):
+    def parse(self) -> BaseModel:
         context = etree.iterparse(self.path, events=(Event.START, Event.END))
         for event, elem in context:
             tag = self.methods.get(elem.tag)
@@ -34,11 +34,10 @@ class SchemaReader:
                 self.elements.append(builder.from_element(elem))
             elif event == Event.END:
                 element = self.elements.pop()
-                if len(self.elements) == 0:
-                    return element
-                self.assign_to_parent(element)
+                if len(self.elements) > 0:
+                    self.assign_to_parent(element)
 
-        return self.elements
+        return element
 
     def assign_to_parent(self, element):
         name = stringcase.snakecase(type(element).__name__)

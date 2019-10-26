@@ -7,6 +7,8 @@ from typing import Optional
 import stringcase
 from lxml import etree
 
+from xsdata.models.enums import XMLSchema
+
 
 def stripns(text: str):
     try:
@@ -36,7 +38,7 @@ def val(field: DataField, attrs: dict):
         return attrs[name]
 
 
-class Builder:
+class BaseModel:
     def __init__(self, *args, **kwargs):
         pass
 
@@ -54,34 +56,45 @@ class Builder:
 
         return cls(**data)
 
+    @classmethod
+    def from_partial(cls, **kwargs):
+
+        if not kwargs.get("prefix") and not kwargs.get("nsmap"):
+
+            kwargs.update({"prefix": "xs", "nsmap": {"xs": XMLSchema}})
+
+        data = {field.name: val(field, kwargs) for field in fields(cls)}
+
+        return cls(**data)
+
 
 @dataclass
-class ElementBuilder(Builder):
+class ElementModel(BaseModel):
     id: Optional[str]
     prefix: str
     nsmap: dict
 
 
 @dataclass
-class Documentation(ElementBuilder):
+class Documentation(ElementModel):
     lang: str
     source: str
     text: str
 
 
 @dataclass
-class Appinfo(ElementBuilder):
+class Appinfo(ElementModel):
     source: Optional[str]
 
 
 @dataclass
-class Annotation(ElementBuilder):
+class Annotation(ElementModel):
     appinfo: Optional[Appinfo]
     documentation: Optional[Documentation]
 
 
 @dataclass
-class AnnotationBase(ElementBuilder):
+class AnnotationBase(ElementModel):
     annotation: Optional[Annotation]
 
 
@@ -109,7 +122,6 @@ class Union(AnnotationBase):
 class AnyAttribute(AnnotationBase):
     namespace: Optional[str]
     process_contents: Optional[str]  # lax | skip | strict
-    annotation: Optional[Annotation]
     simple_type: Optional[SimpleType]
 
 
@@ -129,7 +141,6 @@ class Attribute(AnnotationBase):
 class AttributeGroup(AnnotationBase):
     name: Optional[str]
     ref: Optional[str]
-
     any_attribute: Optional[AnyAttribute]
     attributes: ArrayList[Attribute] = field(default_factory=list)
     attribute_groups: ArrayList["AttributeGroup"] = field(default_factory=list)
@@ -188,62 +199,62 @@ class Extension(AnnotationBase):
 
 
 @dataclass
-class Enumeration(Builder):
+class Enumeration(BaseModel):
     value: str
 
 
 @dataclass
-class FractionDigits(Builder):
+class FractionDigits(BaseModel):
     value: int
 
 
 @dataclass
-class Length(Builder):
+class Length(BaseModel):
     value: int
 
 
 @dataclass
-class MaxExclusive(Builder):
+class MaxExclusive(BaseModel):
     value: float
 
 
 @dataclass
-class MaxInclusive(Builder):
+class MaxInclusive(BaseModel):
     value: float
 
 
 @dataclass
-class MaxLength(Builder):
+class MaxLength(BaseModel):
     value: float
 
 
 @dataclass
-class MinExclusive(Builder):
+class MinExclusive(BaseModel):
     value: float
 
 
 @dataclass
-class MinInclusive(Builder):
+class MinInclusive(BaseModel):
     value: float
 
 
 @dataclass
-class MinLength(Builder):
+class MinLength(BaseModel):
     value: float
 
 
 @dataclass
-class Pattern(Builder):
+class Pattern(BaseModel):
     value: str
 
 
 @dataclass
-class TotalDigits(Builder):
+class TotalDigits(BaseModel):
     value: int
 
 
 @dataclass
-class WhiteSpace(Builder):
+class WhiteSpace(BaseModel):
     value: str  # preserve, collapse, replace
 
 
@@ -255,7 +266,6 @@ class Restriction(AnnotationBase):
     choice: Optional[Choice]
     sequence: Optional[Sequence]
     any_attribute: Optional[AnyAttribute]
-
     min_exclusive: Optional[MinExclusive]
     min_inclusive: Optional[MinInclusive]
     min_length: Optional[MinLength]
@@ -290,7 +300,6 @@ class ComplexType(AnnotationBase):
     name: Optional[str]
     block: Optional[str]
     final: Optional[str]
-
     simple_content: Optional[SimpleContent]
     complex_content: Optional[ComplexContent]
     group: Optional[Group]
@@ -348,10 +357,8 @@ class Element(AnnotationBase):
     form: Optional[str]
     block: Optional[List]
     final: Optional[List]
-
     simple_type: Optional[SimpleType]
     complex_type: Optional[ComplexType]
-
     uniques: ArrayList[Unique] = field(default_factory=list)
     keys: ArrayList[Key] = field(default_factory=list)
     keyrefs: ArrayList[Keyref] = field(default_factory=list)
@@ -408,7 +415,6 @@ class Schema(AnnotationBase):
     target_namespace: Optional[str]
     version: Optional[str]
     xmlns: Optional[str]
-
     includes: ArrayList[Include] = field(default_factory=list)
     imports: ArrayList[Import] = field(default_factory=list)
     redefineds: ArrayList[Redefined] = field(default_factory=list)

@@ -1,1 +1,4 @@
-XMLSchema = "http://www.w3.org/2001/XMLSchema"
+from xsdata.cli import cli
+from xsdata.version import version
+
+__all__ = ["version", "cli"]

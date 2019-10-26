@@ -1,5 +1,3 @@
-from dataclasses import asdict
-from pprint import pprint
 from typing import List
 
 import stringcase
@@ -66,11 +64,3 @@ class SchemaReader:
                 type(parent).__name__, name
             )
         )
-
-
-if __name__ == "__main__":
-    import sys
-
-    schema = SchemaReader(sys.argv[1])
-    result = schema.parse()
-    pprint(asdict(result))

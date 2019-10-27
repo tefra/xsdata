@@ -1,6 +1,6 @@
 import pytest
 
-from tests.utils import ModelTestCase
+from tests.testcases import ModelTestCase
 from xsdata.models.elements import (
     AnnotationBase,
     BaseModel,
@@ -27,14 +27,14 @@ class SimpleTypeTests(ModelTestCase):
     def test_with_restriction(self):
         actual: SimpleType = self.result.simple_types[0]
 
-        expected = SimpleType.from_partial(
+        expected = SimpleType.build(
             name="DeviceType",
-            restriction=Restriction.from_partial(
+            restriction=Restriction.build(
                 base="xs:string",
                 enumerations=[
-                    Enumeration.from_partial(value="mobile"),
-                    Enumeration.from_partial(value="tablet"),
-                    Enumeration.from_partial(value="desktop"),
+                    Enumeration.build(value="mobile"),
+                    Enumeration.build(value="tablet"),
+                    Enumeration.build(value="desktop"),
                 ],
             ),
         )

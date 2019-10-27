@@ -4,8 +4,10 @@ from dataclasses import asdict
 import click
 import click_completion
 
+from xsdata.models.elements import Schema
 from xsdata.schema import SchemaReader
 from xsdata.version import version
+from xsdata.writer import SchemaWriter
 
 click_completion.init(complete_options=True)
 
@@ -23,11 +25,13 @@ def cli(ctx: click.Context):
 def generate(file: str, verbose: bool = False):
 
     reader = SchemaReader(file)
-    result = reader.parse()
+    schema = reader.parse()
     if verbose:
-        click.echo(json.dumps(asdict(result), indent=4))
+        click.echo(json.dumps(asdict(schema), indent=4))
     else:
-        click.echo("I can't write yet :)")
+        assert isinstance(schema, Schema)
+        writer = SchemaWriter(schema, "dataclass")
+        writer.write()
 
 
 if __name__ == "__main__":

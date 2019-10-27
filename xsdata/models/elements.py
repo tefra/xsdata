@@ -1,41 +1,22 @@
+import sys
 from dataclasses import MISSING
-from dataclasses import Field as DataField
+from dataclasses import Field as Attrib
 from dataclasses import dataclass, field, fields
 from typing import List as ArrayList
 from typing import Optional
 
-import stringcase
 from lxml import etree
 
 from xsdata.models.enums import XMLSchema
+from xsdata.utils.text import snake_case
 
 
-def stripns(text: str):
+def stripns(text: str) -> str:
     try:
         namespace, text = text.split("}", 1)
         return text
     except ValueError:
         return text
-
-
-def val(field: DataField, attrs: dict):
-    name = stringcase.camelcase(field.name)
-    if name not in attrs:
-        factory = getattr(field, "default_factory")
-        if factory is not MISSING:
-            return factory()  # mypy: ignore
-        return None if field.default is MISSING else field.default
-    elif field.type == int or field.type == Optional[int]:
-        try:
-            return int(attrs[name])
-        except ValueError:
-            return 0
-    elif field.type == float or field.type == Optional[float]:
-        return float(attrs[name])
-    elif field.type == bool or field.type == Optional[bool]:
-        return attrs[name] == "true"
-    else:
-        return attrs[name]
 
 
 class BaseModel:
@@ -44,8 +25,15 @@ class BaseModel:
 
     @classmethod
     def from_element(cls, el: etree.Element):
-        attrs = {stripns(key): value for key, value in el.attrib.items()}
-        data = {field.name: val(field, attrs) for field in fields(cls)}
+        attrs = {
+            snake_case(stripns(key)): value for key, value in el.attrib.items()
+        }
+        data = {
+            field.name: cls.xsd_value(field, attrs)
+            if field.name in attrs
+            else cls.default_value(field)
+            for field in fields(cls)
+        }
 
         if "nsmap" in data:
             data["nsmap"] = el.nsmap
@@ -57,13 +45,50 @@ class BaseModel:
         return cls(**data)
 
     @classmethod
-    def from_partial(cls, **kwargs):
+    def default_value(cls, field: Attrib):
+        factory = getattr(field, "default_factory")
+        if getattr(field, "default_factory") is not MISSING:
+            return factory()  # mypy: ignore
+        return None if field.default is MISSING else field.default
 
+    @classmethod
+    def xsd_value(cls, field: Attrib, kwargs):
+        name = field.name
+        value = kwargs[name]
+        clazz = field.type
+
+        if name == "max_occurs" and value == "unbounded":
+            return sys.maxsize
+
+        # Optional
+        if hasattr(clazz, "__origin__"):
+            clazz = clazz.__args__[0]
+
+        if clazz == bool:
+            return value == "true"
+        if clazz == str:
+            return str(value)
+        if clazz == int:
+            return int(value)
+        if clazz == float:
+            return float(value)
+
+        # Nothing else is allowed :)
+        raise ValueError(
+            "Failed to cast field::`{}`, value: `{}`".format(name, repr(value))
+        )
+
+    @classmethod
+    def build(cls, **kwargs):
         if not kwargs.get("prefix") and not kwargs.get("nsmap"):
-
             kwargs.update({"prefix": "xs", "nsmap": {"xs": XMLSchema}})
 
-        data = {field.name: val(field, kwargs) for field in fields(cls)}
+        data = {
+            field.name: kwargs[field.name]
+            if field.name in kwargs
+            else cls.default_value(field)
+            for field in fields(cls)
+        }
 
         return cls(**data)
 
@@ -77,9 +102,9 @@ class ElementModel(BaseModel):
 
 @dataclass
 class Documentation(ElementModel):
-    lang: str
-    source: str
-    text: str
+    lang: Optional[str]
+    source: Optional[str]
+    text: Optional[str]
 
 
 @dataclass
@@ -149,7 +174,7 @@ class AttributeGroup(AnnotationBase):
 @dataclass
 class All(AnnotationBase):
     elements: ArrayList["Element"] = field(default_factory=list)
-    max_occurs: int = 1
+    max_occurs: int = 1  # unbounded == no limit
     min_occurs: int = 1
 
 
@@ -160,7 +185,6 @@ class Sequence(AnnotationBase):
     choices: ArrayList["Choice"] = field(default_factory=list)
     sequences: ArrayList["Sequence"] = field(default_factory=list)
     anys: ArrayList["Any"] = field(default_factory=list)
-
     max_occurs: int = 1
     min_occurs: int = 1
 
@@ -199,62 +223,67 @@ class Extension(AnnotationBase):
 
 
 @dataclass
-class Enumeration(BaseModel):
+class RestrictionType(BaseModel):
+    pass
+
+
+@dataclass
+class Enumeration(RestrictionType):
     value: str
 
 
 @dataclass
-class FractionDigits(BaseModel):
+class FractionDigits(RestrictionType):
     value: int
 
 
 @dataclass
-class Length(BaseModel):
+class Length(RestrictionType):
     value: int
 
 
 @dataclass
-class MaxExclusive(BaseModel):
+class MaxExclusive(RestrictionType):
     value: float
 
 
 @dataclass
-class MaxInclusive(BaseModel):
+class MaxInclusive(RestrictionType):
     value: float
 
 
 @dataclass
-class MaxLength(BaseModel):
+class MaxLength(RestrictionType):
     value: float
 
 
 @dataclass
-class MinExclusive(BaseModel):
+class MinExclusive(RestrictionType):
     value: float
 
 
 @dataclass
-class MinInclusive(BaseModel):
+class MinInclusive(RestrictionType):
     value: float
 
 
 @dataclass
-class MinLength(BaseModel):
+class MinLength(RestrictionType):
     value: float
 
 
 @dataclass
-class Pattern(BaseModel):
+class Pattern(RestrictionType):
     value: str
 
 
 @dataclass
-class TotalDigits(BaseModel):
+class TotalDigits(RestrictionType):
     value: int
 
 
 @dataclass
-class WhiteSpace(BaseModel):
+class WhiteSpace(RestrictionType):
     value: str  # preserve, collapse, replace
 
 
@@ -275,7 +304,7 @@ class Restriction(AnnotationBase):
     total_digits: Optional[TotalDigits]
     fraction_digits: Optional[FractionDigits]
     length: Optional[Length]
-    whiteSpace: Optional[WhiteSpace]
+    white_space: Optional[WhiteSpace]
     pattern: Optional[Pattern]
     enumerations: ArrayList[Enumeration] = field(default_factory=list)
     attributes: ArrayList[Attribute] = field(default_factory=list)

@@ -1,11 +1,11 @@
 from typing import List
 
-import stringcase
 from lxml import etree
 
 from xsdata.models import elements
 from xsdata.models.elements import BaseModel
 from xsdata.models.enums import Event, Tag
+from xsdata.utils.text import capitalize, snake_case
 
 
 class SchemaReader:
@@ -30,7 +30,7 @@ class SchemaReader:
             if method:
                 method(elem)
             elif event == Event.START:
-                builder = getattr(elements, stringcase.capitalcase(tag.value))
+                builder = getattr(elements, capitalize(tag.value))
                 self.elements.append(builder.from_element(elem))
             elif event == Event.END:
                 element = self.elements.pop()
@@ -40,7 +40,7 @@ class SchemaReader:
         return element
 
     def assign_to_parent(self, element):
-        name = stringcase.snakecase(type(element).__name__)
+        name = snake_case(type(element).__name__)
         parent = self.elements[-1]
 
         if hasattr(parent, name):
@@ -51,12 +51,6 @@ class SchemaReader:
                 children = getattr(parent, plural_name)
                 if type(children) == list:
                     return children.append(element)
-
-                raise ValueError(
-                    "Property `{}::{}` is not a list".format(
-                        type(parent).__name__, plural_name
-                    )
-                )
 
         raise ValueError(
             "Class {} missing attribute `{}`".format(

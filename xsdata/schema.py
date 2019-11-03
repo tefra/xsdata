@@ -1,23 +1,24 @@
+from dataclasses import dataclass, field
 from typing import List
 
 from lxml import etree
 
 from xsdata.models import elements
-from xsdata.models.elements import BaseModel
+from xsdata.models.elements import BaseModel, Schema
 from xsdata.models.enums import Event, Tag
 from xsdata.utils.text import capitalize, snake_case
 
 
+@dataclass
 class SchemaReader:
-    def __init__(self, path: str):
-        self.path = path
-        self.documentations: dict = {}
-        self.methods = {tag.qname: tag for tag in Tag}
-        self.element_index = 0
-        self.element_parent = Tag.SCHEMA
-        self.elements: List[BaseModel] = []
+    path: str
+    elements: List[BaseModel] = field(default_factory=list)
+    methods: dict = field(init=False)
 
-    def parse(self) -> BaseModel:
+    def __post_init__(self):
+        self.methods = {tag.qname: tag for tag in Tag}
+
+    def parse(self) -> Schema:
         context = etree.iterparse(self.path, events=(Event.START, Event.END))
         for event, elem in context:
             tag = self.methods.get(elem.tag)
@@ -26,16 +27,18 @@ class SchemaReader:
                     "Unsupported tag `{}`".format(elem.tag)
                 )
 
-            method = getattr(self, "{}_{}".format(event, tag.value), None)
-            if method:
-                method(elem)
-            elif event == Event.START:
+            if event == Event.START:
                 builder = getattr(elements, capitalize(tag.value))
-                self.elements.append(builder.from_element(elem))
+                element = builder.from_element(elem)
+                self.elements.append(element)
             elif event == Event.END:
                 element = self.elements.pop()
                 if len(self.elements) > 0:
                     self.assign_to_parent(element)
+
+            method = getattr(self, "{}_{}".format(event, tag.value), None)
+            if method:
+                method(element, elem)
 
         return element
 

@@ -94,32 +94,32 @@ class BaseModel:
 
 
 @dataclass
-class ElementModel(BaseModel):
+class ElementBase(BaseModel):
     id: Optional[str]
     prefix: str
     nsmap: dict
 
 
 @dataclass
-class Documentation(ElementModel):
+class Documentation(ElementBase):
     lang: Optional[str]
     source: Optional[str]
     text: Optional[str]
 
 
 @dataclass
-class Appinfo(ElementModel):
+class Appinfo(ElementBase):
     source: Optional[str]
 
 
 @dataclass
-class Annotation(ElementModel):
+class Annotation(ElementBase):
     appinfo: Optional[Appinfo]
     documentation: Optional[Documentation]
 
 
 @dataclass
-class AnnotationBase(ElementModel):
+class AnnotationBase(ElementBase):
     annotation: Optional[Annotation]
 
 
@@ -437,6 +437,7 @@ class Redefined(AnnotationBase):
 
 @dataclass
 class Schema(AnnotationBase):
+    target: Optional[str]
     attribute_form_default: Optional[str]
     element_form_default: Optional[str]
     block_default: Optional[str]

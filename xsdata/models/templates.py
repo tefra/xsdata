@@ -1,49 +1,36 @@
-from abc import ABC, abstractmethod
-from dataclasses import dataclass
-from typing import Any, List, Optional
-
-
-class TemplateVar(ABC):
-    @abstractmethod
-    def as_dict(self):
-        pass
+from dataclasses import dataclass, fields
+from typing import Any, Dict, List, Optional
 
 
 @dataclass
-class FieldItem(TemplateVar):
+class Property:
+    def as_dict(self):
+        def convert(value):
+            if isinstance(value, Dict):
+                return {k: v for k, v in value.items() if v is not None}
+            elif isinstance(value, list):
+                return [v.as_dict() for v in value]
+            return value
+
+        return {
+            field.name: convert(getattr(self, field.name, None))
+            for field in fields(self)
+            if getattr(self, field.name, None)
+        }
+
+
+@dataclass
+class FieldProperty(Property):
     name: str
     type: str
     metadata: dict
     default: Optional[Any] = None
 
-    def as_dict(self):
-        data = dict(
-            name=self.name,
-            type=self.type,
-            metadata={k: v for k, v in self.metadata.items() if v is not None},
-        )
-
-        if self.default is not None:
-            data["default"] = self.default
-        return data
-
 
 @dataclass
-class ClassItem:
+class ClassProperty(Property):
     name: str
     metadata: dict
-    fields: List[FieldItem]
+    fields: List[FieldProperty]
     help: Optional[str] = None
     extends: Optional[str] = None
-
-    def as_dict(self):
-        data = dict(
-            name=self.name,
-            fields=self.fields,
-            metadata={k: v for k, v in self.metadata.items() if v is not None},
-        )
-        if self.help:
-            data["help"] = self.help
-        if self.extends:
-            data["extends"] = self.extends
-        return data

@@ -1,8 +1,33 @@
 from enum import Enum
+from typing import Optional
 
 from lxml import etree
 
 XMLSchema = "http://www.w3.org/2001/XMLSchema"
+
+
+class XSDType(Enum):
+    STRING = ("xs:string", str)
+    DECIMAL = ("xs:decimal", float)
+    INTEGER = ("xs:integer", int)
+    BOOLEAN = ("xs:boolean", bool)
+    DATE = ("xs:date", str)
+    TIME = ("xs:time", str)
+
+    def __init__(self, xsd_type, py_type):
+        self.xsd_type = xsd_type
+        self.py_type = py_type
+
+    @property
+    def py_name(self):
+        return self.py_type.__name__
+
+    @classmethod
+    def find(cls, xsd_type: str) -> Optional["XSDType"]:
+        for value in XSDType:
+            if value.xsd_type == xsd_type:
+                return value
+        return None
 
 
 class Event:

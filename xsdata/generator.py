@@ -1,9 +1,9 @@
 import copy
+import logging
 from dataclasses import dataclass, field, fields
-from typing import Callable, Dict, Iterator, List
+from typing import Callable, Dict, Iterator, List, Optional, Union
 
 from xsdata.models.elements import (
-    AnnotationBase,
     Attribute,
     ComplexType,
     Element,
@@ -16,11 +16,11 @@ from xsdata.models.templates import ClassProperty, FieldProperty
 from xsdata.utils.element import (
     append_documentation,
     get_extension_base,
-    get_help,
     get_restrictions,
-    get_type,
 )
-from xsdata.utils.text import pascal_case, snake_case
+from xsdata.utils.text import pascal_case, safe_snake, snake_case
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -57,12 +57,16 @@ class CodeGenerator:
     def generate_simple_type(self, obj: SimpleType) -> ClassProperty:
         assert obj.restriction is not None
 
+        name = obj.pascal_name
+
+        assert name is not None
+
         return ClassProperty(
-            name=pascal_case(obj.name),
+            name=name,
             extends=None,
             fields=self.generate_class_fields(obj.restriction),
             metadata=get_restrictions(obj.restriction),
-            help=get_help(obj),
+            help=obj.display_help,
         )
 
     def generate_complex_type(self, obj: ComplexType) -> ClassProperty:
@@ -71,27 +75,39 @@ class CodeGenerator:
             extends=get_extension_base(obj),
             fields=self.generate_class_fields(obj),
             metadata=dict(),
-            help=get_help(obj),
+            help=obj.display_help,
         )
 
     def generate_element(self, obj: Element):
-        if obj.complex_type:
+        name = obj.pascal_name
+
+        if not name:
+            raise NotImplementedError(
+                "Failed to detect name for element: {}".format(obj)
+            )
+
+        if obj.complex_type is not None:
             _fields = self.generate_class_fields(obj.complex_type)
             _extends = get_extension_base(obj.complex_type)
-        elif obj.simple_type:
+        elif obj.simple_type is not None:
             _fields = self.generate_class_fields(obj.simple_type)
             _extends = None
+        elif obj.type is not None:
+            _fields = []
+            _extends = obj.display_type
         else:
             raise NotImplementedError(
-                "Class property from element without complex or simple type"
+                "Failed to generate class property from element {}".format(
+                    obj.name
+                )
             )
 
         return ClassProperty(
-            name=pascal_case(obj.name),
+            name=name,
             extends=_extends,
             fields=_fields,
             metadata=dict(),
-            help=get_help(obj),
+            help=obj.display_help,
         )
 
     def generate_class_fields(self, obj: ElementBase) -> List[FieldProperty]:
@@ -111,25 +127,38 @@ class CodeGenerator:
                 for v in value:
                     if isinstance(v, ElementBase):
                         result.extend(self.generate_class_fields(v))
-        return result
+        return list(filter(None, result))
 
-    def generate_class_field(self, obj: AnnotationBase) -> FieldProperty:
-        name = getattr(obj, "name", None)
+    def generate_class_field(
+        self, obj: Union[Attribute, Element, Restriction]
+    ) -> Optional[FieldProperty]:
+        name = obj.raw_name
+
+        if not name:
+            logger.warning("Failed to detect name for element: {}".format(obj))
+            return None
+
         metadata = get_restrictions(obj)
         metadata.update(
-            dict(name=name, type=obj.__class__.__name__, help=get_help(obj))
+            dict(name=name, type=obj.__class__.__name__, help=obj.display_help)
         )
+        display_type = obj.display_type
 
-        type_ = get_type(obj)
-        if not type_ and isinstance(obj, Element) and obj.complex_type:
+        if not display_type and isinstance(obj, Element) and obj.complex_type:
             self.recover_complex_type(obj)
-            type_ = get_type(obj)
+            display_type = obj.display_type
+
+        if not display_type:
+            logger.warning(
+                "Failed to detect type for element: {}".format(name)
+            )
+            return None
 
         return FieldProperty(
-            name=snake_case(name) if name else "value",
+            name=safe_snake(name),
             default=getattr(obj, "default", None),
             metadata=metadata,
-            type=type_ or "str",
+            type=display_type,
         )
 
     def recover_complex_type(self, obj: Element):

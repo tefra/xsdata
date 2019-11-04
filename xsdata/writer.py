@@ -43,7 +43,7 @@ class CodeWriter:
             fp.write(self.template("module").render(output=output))
 
     def render(self, obj: ClassProperty) -> str:
-        return self.template("class").render(obj.as_dict())
+        return self.template("class").render(obj=obj)
 
     @staticmethod
     def black_code(string: str) -> str:
@@ -64,5 +64,7 @@ class CodeWriter:
         for obj in objects:
             index[obj.name] = obj
             deps[obj.name] = {attr.type for attr in obj.fields}
+            if obj.extends:
+                deps[obj.name].add(obj.extends)
 
         return [index[name] for name in toposort_flatten(deps) if name in deps]

@@ -7,7 +7,6 @@ from xsdata.models.elements import (
     Annotation,
     AnnotationBase,
     Any,
-    Attribute,
     Choice,
     ComplexType,
     Documentation,
@@ -19,41 +18,6 @@ from xsdata.models.elements import (
     Sequence,
 )
 from xsdata.utils import text
-
-XSD_TYPES = {
-    "xs:string": "str",
-    "xs:decimal": "float",
-    "xs:integer": "int",
-    "xs:boolean": "bool",
-    "xs:date": "str",
-    "xs:time": "str",
-}
-
-
-def get_help(obj: AnnotationBase) -> Optional[str]:
-    try:
-        return obj.annotation.documentation.text  # type: ignore
-    except AttributeError:
-        return None
-
-
-def get_type(obj: ElementBase) -> Optional[str]:
-    type_var = None
-    if isinstance(obj, Restriction):
-        type_var = obj.base
-    elif isinstance(obj, Attribute):
-        try:
-            type_var = obj.simple_type.restriction.base  # type: ignore
-        except AttributeError:
-            pass
-
-    if type_var is None:
-        type_var = getattr(obj, "type", None)
-
-    if type_var:
-        type_var = XSD_TYPES.get(type_var) or text.pascal_case(type_var)
-
-    return type_var
 
 
 def get_restrictions(obj: ElementBase) -> Dict[str, Anything]:

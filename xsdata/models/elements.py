@@ -9,6 +9,7 @@ from typing import Optional
 from lxml import etree
 
 from xsdata.models.enums import XMLSchema
+from xsdata.models.mixins import SignatureField
 from xsdata.utils.text import snake_case
 
 
@@ -123,13 +124,25 @@ class Annotation(ElementBase):
 class AnnotationBase(ElementBase):
     annotation: Optional[Annotation]
 
+    @property
+    def display_help(self) -> Optional[str]:
+        return (
+            self.annotation.documentation.text
+            if self.annotation and self.annotation.documentation
+            else None
+        )
+
 
 @dataclass
-class SimpleType(AnnotationBase):
+class SimpleType(AnnotationBase, SignatureField):
     name: Optional[str]
     restriction: Optional["Restriction"]
     list: Optional["List"]
     union: Optional["Union"]
+
+    @property
+    def raw_type(self) -> Optional[str]:
+        return self.restriction.raw_type if self.restriction else None
 
 
 @dataclass
@@ -152,7 +165,7 @@ class AnyAttribute(AnnotationBase):
 
 
 @dataclass
-class Attribute(AnnotationBase):
+class Attribute(AnnotationBase, SignatureField):
     default: Optional[str]
     fixed: Optional[str]
     form: Optional[str]  # qualified | unqualified
@@ -161,6 +174,12 @@ class Attribute(AnnotationBase):
     type: Optional[str]
     simple_type: Optional[SimpleType]
     use: Optional[str] = "optional"  # optional | prohibited | required
+
+    @property
+    def raw_type(self) -> Optional[str]:
+        if self.simple_type:
+            return self.simple_type.raw_type
+        return self.type or self.ref
 
 
 @dataclass
@@ -224,7 +243,7 @@ class Extension(AnnotationBase):
 
 
 @dataclass
-class RestrictionType(BaseModel):
+class RestrictionType(AnnotationBase):
     pass
 
 
@@ -289,7 +308,7 @@ class WhiteSpace(RestrictionType):
 
 
 @dataclass
-class Restriction(AnnotationBase):
+class Restriction(AnnotationBase, SignatureField):
     base: str
     group: Optional[Group]
     all: Optional[All]
@@ -310,6 +329,14 @@ class Restriction(AnnotationBase):
     enumerations: ArrayList[Enumeration] = field(default_factory=list)
     attributes: ArrayList[Attribute] = field(default_factory=list)
     attribute_groups: ArrayList[AttributeGroup] = field(default_factory=list)
+
+    @property
+    def raw_type(self) -> Optional[str]:
+        return self.base
+
+    @property
+    def raw_name(self) -> Optional[str]:
+        return "value"
 
 
 @dataclass
@@ -376,7 +403,7 @@ class Keyref(AnnotationBase):
 
 
 @dataclass
-class Element(AnnotationBase):
+class Element(AnnotationBase, SignatureField):
     id: Optional[str]
     name: str
     ref: Optional[str]
@@ -396,6 +423,10 @@ class Element(AnnotationBase):
     max_occurs: int = 1
     nillable: bool = False
     abstract: bool = False
+
+    @property
+    def raw_type(self) -> Optional[str]:
+        return self.type or self.ref
 
 
 @dataclass

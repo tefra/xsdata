@@ -1,36 +1,19 @@
-from dataclasses import dataclass, fields
-from typing import Any, Dict, List, Optional
+from dataclasses import dataclass, field
+from typing import Any, List, Optional
 
 
 @dataclass
-class Property:
-    def as_dict(self):
-        def convert(value):
-            if isinstance(value, Dict):
-                return {k: v for k, v in value.items() if v is not None}
-            elif isinstance(value, list):
-                return [v.as_dict() for v in value]
-            return value
-
-        return {
-            field.name: convert(getattr(self, field.name, None))
-            for field in fields(self)
-            if getattr(self, field.name, None)
-        }
-
-
-@dataclass
-class FieldProperty(Property):
+class FieldProperty:
     name: str
     type: str
     metadata: dict
-    default: Optional[Any] = None
+    default: Optional[Any] = field(default=None)
 
 
 @dataclass
-class ClassProperty(Property):
+class ClassProperty:
     name: str
     metadata: dict
-    fields: List[FieldProperty]
-    help: Optional[str] = None
-    extends: Optional[str] = None
+    help: Optional[str] = field(default=None)
+    extends: Optional[str] = field(default=None)
+    fields: List[FieldProperty] = field(default_factory=list)

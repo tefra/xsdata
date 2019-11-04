@@ -1,6 +1,10 @@
 from typing import List, Optional
 
 
+def strip_prefix(string: str, sep: str = ":") -> str:
+    return string.split(sep)[-1]
+
+
 def capitalize(string: Optional[str]) -> str:
     if string is None:
         return ""
@@ -19,6 +23,50 @@ def pascal_case(string: Optional[str]) -> str:
             if part is not None
         ]
     )
+
+
+SAFE_KEYWORDS = {
+    word: "{}_value".format(word)
+    for word in [
+        "and",
+        "except",
+        "lambda",
+        "with",
+        "as",
+        "finally",
+        "nonlocal",
+        "while",
+        "assert",
+        "false",
+        "None",
+        "yield",
+        "break",
+        "for",
+        "not",
+        "class",
+        "from",
+        "or",
+        "continue",
+        "global",
+        "pass",
+        "def",
+        "if",
+        "raise",
+        "del",
+        "import",
+        "return",
+        "elif",
+        "in",
+        "True",
+        "else",
+        "is",
+        "try",
+    ]
+}
+
+
+def safe_snake(string: str) -> str:
+    return SAFE_KEYWORDS.get(string, snake_case(string))
 
 
 def snake_case(string: Optional[str]) -> str:

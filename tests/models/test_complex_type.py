@@ -71,7 +71,9 @@ class ComplexTypeTests(ModelTestCase):
                             simple_type=SimpleType.build(
                                 restriction=Restriction.build(
                                     base="xs:string",
-                                    pattern=Pattern("[A-Z][A-Z][A-Z]"),
+                                    pattern=Pattern.build(
+                                        value="[A-Z][A-Z][A-Z]"
+                                    ),
                                 )
                             ),
                         )
@@ -99,7 +101,8 @@ class ComplexTypeTests(ModelTestCase):
                             use="required",
                             simple_type=SimpleType.build(
                                 restriction=Restriction.build(
-                                    base="xs:string", min_length=MinLength(1)
+                                    base="xs:string",
+                                    min_length=MinLength.build(value=1),
                                 )
                             ),
                         )

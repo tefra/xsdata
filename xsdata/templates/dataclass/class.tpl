@@ -1,12 +1,12 @@
 @dataclass
-class {{ name }}:
-    {{'"""{}"""'.format(help) if help }}
-{%- if fields|length == 0 %}
+class {{ obj.name }}{{"({})".format(obj.extends) if obj.extends }}:
+    {{'"""{}"""'.format(obj.help) if obj.help }}
+{%- if obj.fields|length == 0 %}
     pass
 {% endif -%}
-{% for field in fields %}
+{% for field in obj.fields %}
     {{ field.name }}: {{ field.type }} = field(
-        {{- "default={}".format(repr(field.default)) if field.default is defined }}
+        {{- "default={},".format(field.default) }}
         metadata={{ field.metadata }}
     )
 {%- endfor %}

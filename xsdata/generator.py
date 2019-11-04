@@ -1,5 +1,6 @@
+import copy
 from dataclasses import dataclass, field, fields
-from typing import Iterator, List
+from typing import Callable, Dict, Iterator, List
 
 from xsdata.models.elements import (
     AnnotationBase,
@@ -25,41 +26,70 @@ from xsdata.utils.text import pascal_case, snake_case
 @dataclass
 class CodeGenerator:
     INNER_COMPLEX_TYPE_GENERATED = "Inner ComplexType name auto generated"
-
     schema: Schema
     recovered: int = field(default=0, init=False)
+    queue: List[ElementBase] = field(default_factory=list, init=False)
+    generators: Dict[type, Callable] = field(default_factory=dict, init=False)
 
     def generate(self):
         classes = []
-        classes.extend(self.generate_simple_types())
-        classes.extend(self.generate_complex_types())
+        classes.extend(self.generate_elements(self.schema.simple_types))
+        classes.extend(self.generate_elements(self.schema.complex_types))
+        classes.extend(self.generate_elements(self.schema.elements))
         return classes
 
-    def generate_simple_types(self) -> Iterator[ClassProperty]:
-        for item in self.schema.simple_types:
-            yield self.generate_simple_type(item)
+    def resolve_generator(self, obj: ElementBase) -> Callable:
+        clazz = type(obj)
+        if clazz not in self.generators:
+            method = "generate_{}".format(snake_case(clazz.__name__))
+            self.generators[clazz] = getattr(self, method)
+        return self.generators[clazz]
 
-    def generate_simple_type(self, simple_type: SimpleType) -> ClassProperty:
-        assert simple_type.restriction is not None
+    def generate_elements(
+        self, elements: List[ElementBase]
+    ) -> Iterator[ClassProperty]:
+        self.queue = copy.deepcopy(elements)
+        while len(self.queue):
+            obj = self.queue.pop()
+            generator = self.resolve_generator(obj)
+            yield generator(obj)
+
+    def generate_simple_type(self, obj: SimpleType) -> ClassProperty:
+        assert obj.restriction is not None
 
         return ClassProperty(
-            name=pascal_case(simple_type.name),
+            name=pascal_case(obj.name),
             extends=None,
-            fields=self.generate_class_fields(simple_type.restriction),
-            metadata=get_restrictions(simple_type.restriction),
-            help=get_help(simple_type),
+            fields=self.generate_class_fields(obj.restriction),
+            metadata=get_restrictions(obj.restriction),
+            help=get_help(obj),
         )
-
-    def generate_complex_types(self) -> Iterator[ClassProperty]:
-        while len(self.schema.complex_types):
-            complex_type = self.schema.complex_types.pop()
-            yield self.generate_complex_type(complex_type)
 
     def generate_complex_type(self, obj: ComplexType) -> ClassProperty:
         return ClassProperty(
             name=pascal_case(obj.name),
             extends=get_extension_base(obj),
             fields=self.generate_class_fields(obj),
+            metadata=dict(),
+            help=get_help(obj),
+        )
+
+    def generate_element(self, obj: Element):
+        if obj.complex_type:
+            _fields = self.generate_class_fields(obj.complex_type)
+            _extends = get_extension_base(obj.complex_type)
+        elif obj.simple_type:
+            _fields = self.generate_class_fields(obj.simple_type)
+            _extends = None
+        else:
+            raise NotImplementedError(
+                "Class property from element without complex or simple type"
+            )
+
+        return ClassProperty(
+            name=pascal_case(obj.name),
+            extends=_extends,
+            fields=_fields,
             metadata=dict(),
             help=get_help(obj),
         )
@@ -110,5 +140,5 @@ class CodeGenerator:
         append_documentation(
             obj.complex_type, self.INNER_COMPLEX_TYPE_GENERATED
         )
-        self.schema.complex_types.insert(0, obj.complex_type)
+        self.queue.insert(0, obj.complex_type)
         obj.complex_type = None

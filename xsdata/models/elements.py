@@ -1,3 +1,4 @@
+import re
 import sys
 from dataclasses import MISSING
 from dataclasses import Field as Attrib
@@ -39,8 +40,8 @@ class BaseModel:
             data["nsmap"] = el.nsmap
         if "prefix" in data:
             data["prefix"] = el.prefix
-        if "text" in data:
-            data["text"] = el.text
+        if "text" in data and el.text:
+            data["text"] = re.sub(r"\s+", " ", el.text).strip()
 
         return cls(**data)
 
@@ -174,7 +175,7 @@ class AttributeGroup(AnnotationBase):
 @dataclass
 class All(AnnotationBase):
     elements: ArrayList["Element"] = field(default_factory=list)
-    max_occurs: int = 1  # unbounded == no limit
+    max_occurs: int = 1
     min_occurs: int = 1
 
 
@@ -391,10 +392,8 @@ class Element(AnnotationBase):
     uniques: ArrayList[Unique] = field(default_factory=list)
     keys: ArrayList[Key] = field(default_factory=list)
     keyrefs: ArrayList[Keyref] = field(default_factory=list)
-
     min_occurs: int = 1
-    max_occurs: int = 0
-
+    max_occurs: int = 1
     nillable: bool = False
     abstract: bool = False
 

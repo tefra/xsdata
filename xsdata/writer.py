@@ -7,7 +7,7 @@ import black
 from jinja2 import Environment, FileSystemLoader, Template
 from toposort import toposort_flatten
 
-from xsdata.models.templates import ClassProperty
+from xsdata.models.templates import Class
 
 template_dir = os.path.join(
     os.path.dirname(os.path.abspath(__file__)), "templates"
@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 @dataclass
 class CodeWriter:
 
-    properties: List[ClassProperty]
+    properties: List[Class]
     theme: str
     target: str
     module: str
@@ -42,7 +42,7 @@ class CodeWriter:
         with open(file_path, "w") as fp:
             fp.write(self.template("module").render(output=output))
 
-    def render(self, obj: ClassProperty) -> str:
+    def render(self, obj: Class) -> str:
         return self.template("class").render(obj=obj)
 
     @staticmethod
@@ -57,13 +57,13 @@ class CodeWriter:
             return string
 
     @staticmethod
-    def sort_class_vars(objects: List[ClassProperty]) -> List[ClassProperty]:
+    def sort_class_vars(objects: List[Class]) -> List[Class]:
         index = {}
         deps = {}
 
         for obj in objects:
             index[obj.name] = obj
-            deps[obj.name] = {attr.type for attr in obj.fields}
+            deps[obj.name] = {attr.type for attr in obj.attrs}
             if obj.extends:
                 deps[obj.name].add(obj.extends)
 

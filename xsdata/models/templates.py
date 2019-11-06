@@ -3,17 +3,17 @@ from typing import Any, List, Optional
 
 
 @dataclass
-class FieldProperty:
+class Attr:
     name: str
     type: str
-    metadata: dict
+    metadata: dict = field(default_factory=dict)
     default: Optional[Any] = field(default=None)
 
 
 @dataclass
-class ClassProperty:
+class Class:
     name: str
-    metadata: dict
+    metadata: dict = field(default_factory=dict)
     help: Optional[str] = field(default=None)
     extends: Optional[str] = field(default=None)
-    fields: List[FieldProperty] = field(default_factory=list)
+    attrs: List[Attr] = field(default_factory=list)

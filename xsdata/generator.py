@@ -1,7 +1,7 @@
 import copy
 import logging
-from dataclasses import dataclass, field, fields
-from typing import Callable, Dict, Iterator, List, Optional, Union
+from dataclasses import dataclass, field
+from typing import Callable, Dict, List, Optional, Union
 
 from xsdata.models.elements import (
     Attribute,
@@ -12,15 +12,13 @@ from xsdata.models.elements import (
     Schema,
     SimpleType,
 )
-from xsdata.models.templates import ClassProperty, FieldProperty
-from xsdata.utils.element import (
-    append_documentation,
-    get_extension_base,
-    get_restrictions,
-)
+from xsdata.models.templates import Attr, Class
+from xsdata.utils.element import append_documentation
 from xsdata.utils.text import pascal_case, safe_snake, snake_case
 
 logger = logging.getLogger(__name__)
+
+BaseElement = Union[List[Element], List[ComplexType], List[SimpleType]]
 
 
 @dataclass
@@ -29,88 +27,89 @@ class CodeGenerator:
     schema: Schema
     recovered: int = field(default=0, init=False)
     queue: List[ElementBase] = field(default_factory=list, init=False)
+    deck: List[Class] = field(default_factory=list, init=False)
     generators: Dict[type, Callable] = field(default_factory=dict, init=False)
 
-    def generate(self):
-        classes = []
-        classes.extend(self.generate_elements(self.schema.simple_types))
-        classes.extend(self.generate_elements(self.schema.complex_types))
-        classes.extend(self.generate_elements(self.schema.elements))
-        return classes
+    def generate(self) -> List[Class]:
+        """Generate class properties from schema elements and simple/complex
+        types."""
+        self.generate_elements(self.schema.simple_types)
+        self.generate_elements(self.schema.complex_types)
+        self.generate_elements(self.schema.elements)
+
+        return self.deck
 
     def resolve_generator(self, obj: ElementBase) -> Callable:
+        """Resolve and cache generator method from object type."""
         clazz = type(obj)
         if clazz not in self.generators:
             method = "generate_{}".format(snake_case(clazz.__name__))
             self.generators[clazz] = getattr(self, method)
         return self.generators[clazz]
 
-    def generate_elements(
-        self, elements: List[ElementBase]
-    ) -> Iterator[ClassProperty]:
-        self.queue = copy.deepcopy(elements)
+    def generate_elements(self, items: BaseElement):
+        """Clone and the list of elements and start processing it, use a queue
+        because the list can grow for inner types without a standard
+        reference."""
+        self.queue = copy.deepcopy(list(items))
         while len(self.queue):
             obj = self.queue.pop()
             generator = self.resolve_generator(obj)
-            yield generator(obj)
+            self.deck.append(generator(obj))
 
-    def generate_simple_type(self, obj: SimpleType) -> ClassProperty:
+    def generate_simple_type(self, obj: SimpleType) -> Class:
+        """
+        Generate a class property from a SimpleType element.
+
+        Todo:
+            * Add support for Union(s)
+            * Add support for List(s)
+            * Merge all class property generators
+        """
         assert obj.restriction is not None
 
-        name = obj.pascal_name
-
-        assert name is not None
-
-        return ClassProperty(
-            name=name,
-            extends=None,
-            fields=self.generate_class_fields(obj.restriction),
-            metadata=get_restrictions(obj.restriction),
+        return Class(
+            name=obj.pascal_name,
+            attrs=self.generate_class_fields(obj.restriction),
+            metadata=obj.restriction.get_restrictions(),
             help=obj.display_help,
         )
 
-    def generate_complex_type(self, obj: ComplexType) -> ClassProperty:
-        return ClassProperty(
-            name=pascal_case(obj.name),
-            extends=get_extension_base(obj),
-            fields=self.generate_class_fields(obj),
-            metadata=dict(),
+    def generate_complex_type(self, obj: ComplexType) -> Class:
+        """
+        Generate a class property from a ComplexType element.
+
+        Todo:
+            * Merge all class property generators
+        """
+        return Class(
+            name=obj.pascal_name,
+            extends=obj.extends,
+            attrs=self.generate_class_fields(obj),
             help=obj.display_help,
         )
 
     def generate_element(self, obj: Element):
-        name = obj.pascal_name
+        """
+        Generate a class property from an Element element.
 
-        if not name:
-            raise NotImplementedError(
-                "Failed to detect name for element: {}".format(obj)
-            )
+        Todo:
+            * Merge all class property generators
+        """
+        attributes: List[Attr] = []
+        if obj.complex_type:
+            attributes = self.generate_class_fields(obj.complex_type)
+        elif obj.simple_type:
+            attributes = self.generate_class_fields(obj.simple_type)
 
-        if obj.complex_type is not None:
-            _fields = self.generate_class_fields(obj.complex_type)
-            _extends = get_extension_base(obj.complex_type)
-        elif obj.simple_type is not None:
-            _fields = self.generate_class_fields(obj.simple_type)
-            _extends = None
-        elif obj.type is not None:
-            _fields = []
-            _extends = obj.display_type
-        else:
-            raise NotImplementedError(
-                "Failed to generate class property from element {}".format(
-                    obj.name
-                )
-            )
-
-        return ClassProperty(
-            name=name,
-            extends=_extends,
-            fields=_fields,
-            metadata=dict(),
+        return Class(
+            name=obj.pascal_name,
+            extends=obj.extends,
+            attrs=attributes,
             help=obj.display_help,
         )
 
-    def generate_class_fields(self, obj: ElementBase) -> List[FieldProperty]:
+    def generate_class_fields(self, obj: ElementBase) -> List[Attr]:
         result = []
         if (
             isinstance(obj, Attribute)
@@ -118,27 +117,18 @@ class CodeGenerator:
             or isinstance(obj, Restriction)
         ):
             result.append(self.generate_class_field(obj))
-        elif isinstance(obj, ElementBase):
-            for f in fields(obj):
-                value = getattr(obj, f.name)
-                if not isinstance(value, list):
-                    value = [value]
+        else:
+            for child in obj.children():
+                result.extend(self.generate_class_fields(child))
 
-                for v in value:
-                    if isinstance(v, ElementBase):
-                        result.extend(self.generate_class_fields(v))
         return list(filter(None, result))
 
     def generate_class_field(
         self, obj: Union[Attribute, Element, Restriction]
-    ) -> Optional[FieldProperty]:
+    ) -> Optional[Attr]:
         name = obj.raw_name
 
-        if not name:
-            logger.warning("Failed to detect name for element: {}".format(obj))
-            return None
-
-        metadata = get_restrictions(obj)
+        metadata = obj.get_restrictions()
         metadata.update(
             dict(name=name, type=obj.__class__.__name__, help=obj.display_help)
         )
@@ -154,7 +144,7 @@ class CodeGenerator:
             )
             return None
 
-        return FieldProperty(
+        return Attr(
             name=safe_snake(name),
             default=getattr(obj, "default", None),
             metadata=metadata,

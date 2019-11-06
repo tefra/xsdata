@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Optional
+from typing import Any, Dict, Optional
 
 from xsdata.models.enums import XSDType
 from xsdata.utils.text import pascal_case, safe_snake, strip_prefix
@@ -26,20 +26,15 @@ class TypedField(ABC):
 
 class NamedField:
     @property
-    def pascal_name(self) -> Optional[str]:
-        raw_name = self.raw_name
-        return pascal_case(raw_name) if raw_name else None
+    def pascal_name(self) -> str:
+        return pascal_case(self.raw_name)
 
     @property
-    def snake_name(self) -> Optional[str]:
-        raw_name = self.raw_name
-        if raw_name is None:
-            return raw_name
-
-        return safe_snake(raw_name)
+    def snake_name(self) -> str:
+        return safe_snake(self.raw_name)
 
     @property
-    def raw_name(self) -> Optional[str]:
+    def raw_name(self) -> str:
         name = getattr(self, "name")
         if name:
             return name
@@ -48,8 +43,35 @@ class NamedField:
         if name:
             return strip_prefix(name)
 
-        return None
+        raise NotImplementedError("Element has no name: {}".format(self))
 
 
 class SignatureField(TypedField, NamedField, ABC):
     pass
+
+
+class RestrictedField(ABC):
+    @abstractmethod
+    def get_restrictions(self) -> Dict[str, Any]:
+        pass
+
+
+class OccurrencesMixin(RestrictedField):
+    def get_restrictions(self) -> Dict[str, Any]:
+        return dict(
+            min_occurs=getattr(self, "min_occurs"),
+            max_occurs=getattr(self, "min_occurs"),
+        )
+
+
+class ExtendsMixin(ABC):
+    @property
+    @abstractmethod
+    def extends(self) -> Optional[str]:
+        pass
+
+
+class ExtendsNone(ExtendsMixin):
+    @property
+    def extends(self) -> Optional[str]:
+        pass

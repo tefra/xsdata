@@ -3,14 +3,23 @@ import sys
 from dataclasses import MISSING
 from dataclasses import Field as Attrib
 from dataclasses import dataclass, field, fields
+from typing import Any as Anything
+from typing import Dict
 from typing import List as ArrayList
 from typing import Optional
 
 from lxml import etree
 
 from xsdata.models.enums import XMLSchema
-from xsdata.models.mixins import SignatureField
-from xsdata.utils.text import snake_case
+from xsdata.models.mixins import (
+    ExtendsMixin,
+    ExtendsNone,
+    NamedField,
+    OccurrencesMixin,
+    RestrictedField,
+    SignatureField,
+)
+from xsdata.utils.text import pascal_case, snake_case
 
 
 def stripns(text: str) -> str:
@@ -101,6 +110,19 @@ class ElementBase(BaseModel):
     prefix: str
     nsmap: dict
 
+    def children(self):
+        for attribute in fields(self):
+            value = getattr(self, attribute.name)
+            if (
+                isinstance(value, list)
+                and len(value)
+                and isinstance(value[0], ElementBase)
+            ):
+                for v in value:
+                    yield v
+            elif isinstance(value, ElementBase):
+                yield value
+
 
 @dataclass
 class Documentation(ElementBase):
@@ -134,7 +156,7 @@ class AnnotationBase(ElementBase):
 
 
 @dataclass
-class SimpleType(AnnotationBase, SignatureField):
+class SimpleType(AnnotationBase, SignatureField, ExtendsNone):
     name: Optional[str]
     restriction: Optional["Restriction"]
     list: Optional["List"]
@@ -165,7 +187,7 @@ class AnyAttribute(AnnotationBase):
 
 
 @dataclass
-class Attribute(AnnotationBase, SignatureField):
+class Attribute(AnnotationBase, SignatureField, RestrictedField):
     default: Optional[str]
     fixed: Optional[str]
     form: Optional[str]  # qualified | unqualified
@@ -181,6 +203,9 @@ class Attribute(AnnotationBase, SignatureField):
             return self.simple_type.raw_type
         return self.type or self.ref
 
+    def get_restrictions(self) -> Dict[str, Anything]:
+        return {}
+
 
 @dataclass
 class AttributeGroup(AnnotationBase):
@@ -192,14 +217,14 @@ class AttributeGroup(AnnotationBase):
 
 
 @dataclass
-class All(AnnotationBase):
+class All(AnnotationBase, OccurrencesMixin):
     elements: ArrayList["Element"] = field(default_factory=list)
     max_occurs: int = 1
     min_occurs: int = 1
 
 
 @dataclass
-class Sequence(AnnotationBase):
+class Sequence(AnnotationBase, OccurrencesMixin):
     elements: ArrayList["Element"] = field(default_factory=list)
     groups: ArrayList["Group"] = field(default_factory=list)
     choices: ArrayList["Choice"] = field(default_factory=list)
@@ -210,7 +235,7 @@ class Sequence(AnnotationBase):
 
 
 @dataclass
-class Choice(AnnotationBase):
+class Choice(AnnotationBase, OccurrencesMixin):
     elements: ArrayList["Element"] = field(default_factory=list)
     groups: ArrayList["Group"] = field(default_factory=list)
     choices: ArrayList["Choice"] = field(default_factory=list)
@@ -220,7 +245,7 @@ class Choice(AnnotationBase):
 
 
 @dataclass
-class Group(AnnotationBase):
+class Group(AnnotationBase, OccurrencesMixin):
     name: Optional[str]
     ref: Optional[str]
     max_occurs: int = 1
@@ -308,7 +333,7 @@ class WhiteSpace(RestrictionType):
 
 
 @dataclass
-class Restriction(AnnotationBase, SignatureField):
+class Restriction(RestrictedField, AnnotationBase, SignatureField):
     base: str
     group: Optional[Group]
     all: Optional[All]
@@ -335,8 +360,29 @@ class Restriction(AnnotationBase, SignatureField):
         return self.base
 
     @property
-    def raw_name(self) -> Optional[str]:
+    def raw_name(self) -> str:
         return "value"
+
+    def get_restrictions(self) -> Dict[str, Anything]:
+        lookup = [
+            "min_exclusive",
+            "min_inclusive",
+            "min_length",
+            "max_exclusive",
+            "max_inclusive",
+            "max_length",
+            "total_digits",
+            "fraction_digits",
+            "length",
+            "white_space",
+            "pattern",
+            "enumerations",
+        ]
+        return {
+            key: getattr(self, key).value
+            for key in lookup
+            if isinstance(getattr(self, key), RestrictionType)
+        }
 
 
 @dataclass
@@ -353,7 +399,7 @@ class ComplexContent(AnnotationBase):
 
 
 @dataclass
-class ComplexType(AnnotationBase):
+class ComplexType(AnnotationBase, NamedField, ExtendsMixin):
     name: Optional[str]
     block: Optional[str]
     final: Optional[str]
@@ -368,6 +414,16 @@ class ComplexType(AnnotationBase):
     attribute_groups: ArrayList[AttributeGroup] = field(default_factory=list)
     abstract: bool = False
     mixed: bool = False
+
+    @property
+    def extends(self) -> Optional[str]:
+        return (
+            pascal_case(self.complex_content.extension.base)
+            if self.complex_content
+            and self.complex_content.extension
+            and self.complex_content.extension.base
+            else None
+        )
 
 
 @dataclass
@@ -403,7 +459,7 @@ class Keyref(AnnotationBase):
 
 
 @dataclass
-class Element(AnnotationBase, SignatureField):
+class Element(AnnotationBase, SignatureField, OccurrencesMixin, ExtendsMixin):
     id: Optional[str]
     name: str
     ref: Optional[str]
@@ -428,9 +484,17 @@ class Element(AnnotationBase, SignatureField):
     def raw_type(self) -> Optional[str]:
         return self.type or self.ref
 
+    @property
+    def extends(self) -> Optional[str]:
+        if self.complex_type:
+            return self.complex_type.extends
+        elif self.type:
+            return self.display_type
+        return None
+
 
 @dataclass
-class Any(AnnotationBase):
+class Any(AnnotationBase, OccurrencesMixin):
     namespace: Optional[str]
     process_contents: Optional[str]  # lax | skip | strict
     annotation: Optional[Annotation]

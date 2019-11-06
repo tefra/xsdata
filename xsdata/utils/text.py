@@ -89,4 +89,4 @@ def snake_case(string: Optional[str]) -> str:
             was_upper = False
             if result and result[-1] != "_":
                 result.append("_")
-    return "".join(result)
+    return "".join(result).strip("_")

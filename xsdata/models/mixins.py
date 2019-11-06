@@ -35,11 +35,11 @@ class NamedField:
 
     @property
     def raw_name(self) -> str:
-        name = getattr(self, "name")
+        name = getattr(self, "name", None)
         if name:
             return name
 
-        name = getattr(self, "ref")
+        name = getattr(self, "ref", None)
         if name:
             return strip_prefix(name)
 
@@ -56,11 +56,11 @@ class RestrictedField(ABC):
         pass
 
 
-class OccurrencesMixin(RestrictedField):
+class OccurrencesMixin:
     def get_restrictions(self) -> Dict[str, Any]:
         return dict(
             min_occurs=getattr(self, "min_occurs"),
-            max_occurs=getattr(self, "min_occurs"),
+            max_occurs=getattr(self, "max_occurs"),
         )
 
 
@@ -74,4 +74,4 @@ class ExtendsMixin(ABC):
 class ExtendsNone(ExtendsMixin):
     @property
     def extends(self) -> Optional[str]:
-        pass
+        return None

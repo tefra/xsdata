@@ -3,34 +3,6 @@ from typing import List
 
 
 @dataclass
-class ProviderReservationInfoType1:
-    """Inner ComplexType name auto generated"""
-
-    pass
-
-
-@dataclass
-class ProviderReservationInfoType12:
-    """Inner ComplexType name auto generated"""
-
-    pass
-
-
-@dataclass
-class ProviderReservationInfoType2:
-    """Inner ComplexType name auto generated"""
-
-    pass
-
-
-@dataclass
-class ProviderReservationInfoType3:
-    """Inner ComplexType name auto generated"""
-
-    pass
-
-
-@dataclass
 class AirBaseReq(CommonBaseReq):
     """Context for Requests and Responses"""
 
@@ -41,7 +13,7 @@ class AirBaseReq(CommonBaseReq):
 class AirExchangeEligibilityReq(CommonBaseReq):
     """Request to determine if the fares in an itinerary are exchangeable"""
 
-    provider_reservation_info: ProviderReservationInfoType3 = field(
+    provider_reservation_info: "ProviderReservationInfo" = field(
         default=None,
         metadata={
             "required": True,
@@ -58,6 +30,11 @@ class AirExchangeEligibilityReq(CommonBaseReq):
             "help": 'Type choices are "Detail" or "Summary" Default will be Summary',
         },
     )
+
+    @dataclass
+    class ProviderReservationInfo:
+
+        pass
 
 
 @dataclass
@@ -608,6 +585,108 @@ class AirFareDisplayRsp(CommonBaseRsp):
 
 
 @dataclass
+class AirFareRulesReq(CommonBaseReq):
+    """Request to display the full text fare rules."""
+
+    air_fare_rules_modifier: AirFareRulesModifier = field(
+        default=None,
+        metadata={
+            "name": "AirFareRulesModifier",
+            "type": "Element",
+            "help": "Provider: 1G,1V.",
+        },
+    )
+    fare_rules_filter_category: List["FareRulesFilterCategory"] = field(
+        default_factory=list,
+        metadata={
+            "min_occurs": 0,
+            "max_occurs": 16,
+            "name": "FareRulesFilterCategory",
+            "type": "Element",
+            "help": "Structured Fare Rules Filter if requested will return rules for requested categories in the response. Applicable for providers 1G, 1V.",
+        },
+    )
+    air_reservation_selector: "AirReservationSelector" = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "AirReservationSelector",
+            "type": "Element",
+            "help": "Provider: 1G,1V,1P,1J,ACH-Parameters to use for a fare rule lookup associated with an Air Reservation Locator Code",
+        },
+    )
+    fare_rule_lookup: FareRuleLookup = field(
+        default=None,
+        metadata={
+            "name": "FareRuleLookup",
+            "type": "Element",
+            "help": "Used to look up fare rules based on the origin, destination, and carrier of the air segment, the fare basis code and the provider code. Providers: 1P, 1J.",
+        },
+    )
+    fare_rule_key: List[FareRuleKey] = field(
+        default_factory=list,
+        metadata={
+            "min_occurs": 1,
+            "max_occurs": 999,
+            "name": "FareRuleKey",
+            "type": "Element",
+            "help": "Used to look up fare rules based on a fare rule key. Providers: 1G, 1V, 1P, 1J, ACH.",
+        },
+    )
+    air_fare_display_rule_key: AirFareDisplayRuleKey = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "AirFareDisplayRuleKey",
+            "type": "Element",
+            "help": "Provider: 1G,1V,1P,1J.",
+        },
+    )
+    fare_rule_type: TypeFareRuleType = field(
+        default=long,
+        metadata={
+            "name": "FareRuleType",
+            "type": "Attribute",
+            "help": "Provider: 1G,1V,1P,1J,ACH.",
+        },
+    )
+
+    @dataclass
+    class AirReservationSelector:
+
+        fare_info_ref: List[FareInfoRef] = field(
+            default_factory=list,
+            metadata={
+                "min_occurs": 0,
+                "max_occurs": 999,
+                "name": "FareInfoRef",
+                "type": "Element",
+            },
+        )
+        air_reservation_locator_code: TypeLocatorCode = field(
+            default=None,
+            metadata={
+                "required": True,
+                "name": "AirReservationLocatorCode",
+                "type": "Attribute",
+                "help": "The Air Reservation locator code which is an unique identifier for the reservation",
+            },
+        )
+
+    @dataclass
+    class FareRulesFilterCategory:
+
+        fare_info_ref: str = field(
+            default=None,
+            metadata={
+                "name": "FareInfoRef",
+                "type": "Attribute",
+                "help": "Key reference for multiple fare rule",
+            },
+        )
+
+
+@dataclass
 class AirFareRulesRsp(CommonBaseRsp):
     """Response to an AirFareRuleReq."""
 
@@ -651,6 +730,45 @@ class AirMerchandisingDetailsReq(CommonBaseReq):
             "type": "Element",
         },
     )
+
+
+@dataclass
+class AirMerchandisingDetailsRsp(CommonBaseRsp):
+    """Response for retrieved brand details and optional services included in them"""
+
+    optional_services: OptionalServices = field(
+        default=None, metadata={"name": "OptionalServices", "type": "Element"}
+    )
+    brand: List[Brand] = field(
+        default_factory=list,
+        metadata={
+            "min_occurs": 0,
+            "max_occurs": 99,
+            "name": "Brand",
+            "type": "Element",
+        },
+    )
+    unassociated_booking_code_list: "UnassociatedBookingCodeList" = field(
+        default=None,
+        metadata={
+            "name": "UnassociatedBookingCodeList",
+            "type": "Element",
+            "help": "Lists classes of service by segment sent in the request which are not associated to a brand.",
+        },
+    )
+
+    @dataclass
+    class UnassociatedBookingCodeList:
+
+        applicable_segment: List[TypeApplicableSegment] = field(
+            default_factory=list,
+            metadata={
+                "min_occurs": 0,
+                "max_occurs": 99,
+                "name": "ApplicableSegment",
+                "type": "Element",
+            },
+        )
 
 
 @dataclass
@@ -733,6 +851,92 @@ class AirMerchandisingOfferAvailabilityRsp(CommonBaseRsp):
 
 
 @dataclass
+class AirPrePayReq(CommonBaseReq):
+    """Flight Pass Request."""
+
+    list_search: "ListSearch" = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "ListSearch",
+            "type": "Element",
+            "help": "Provider: ACH.",
+        },
+    )
+    pre_pay_retrieve: "PrePayRetrieve" = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "PrePayRetrieve",
+            "type": "Element",
+            "help": "Provider: ACH.",
+        },
+    )
+
+    @dataclass
+    class PrePayRetrieve:
+
+        id: TypeCardNumber = field(
+            default=None,
+            metadata={
+                "required": True,
+                "name": "Id",
+                "type": "Attribute",
+                "help": "Pre pay id to retrieved,example flight pass number",
+            },
+        )
+        type: str = field(
+            default=None,
+            metadata={
+                "name": "Type",
+                "type": "Attribute",
+                "help": "Pre pay id type,example 'FlightPass'",
+            },
+        )
+
+    @dataclass
+    class ListSearch:
+
+        person_name_search: PersonNameSearch = field(
+            default=None,
+            metadata={
+                "required": True,
+                "name": "PersonNameSearch",
+                "type": "Element",
+                "help": "Customer name detail for searching flight pass content.",
+            },
+        )
+        loyalty_card: List[LoyaltyCard] = field(
+            default_factory=list,
+            metadata={
+                "min_occurs": 1,
+                "max_occurs": 999,
+                "name": "LoyaltyCard",
+                "type": "Element",
+                "help": "Customer loyalty card for searching flight pass content.",
+            },
+        )
+        start_from_result: TypeStartFromResult = field(
+            default=None,
+            metadata={
+                "required": True,
+                "name": "StartFromResult",
+                "type": "Attribute",
+                "help": "Start index of the section of flight pass numbers that is being requested.",
+            },
+        )
+        max_results: TypeMaxResults = field(
+            default=None,
+            metadata={
+                "required": True,
+                "name": "MaxResults",
+                "type": "Attribute",
+                "help": "Max Number of Flight Passes being requested for.",
+            },
+        )
+
+
+@dataclass
 class AirPrePayRsp(CommonBaseRsp):
     """Flight Pass Response."""
 
@@ -769,25 +973,6 @@ class AirPrePayRsp(CommonBaseRsp):
             "type": "Attribute",
             "help": "Provider: ACH-Indicates start index of the next flight Passes",
         },
-    )
-
-
-@dataclass
-class AirPricingInfoRefType13:
-    """Inner ComplexType name auto generated"""
-
-    booking_traveler_ref: List[BookingTravelerRef] = field(
-        default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 9,
-            "name": "BookingTravelerRef",
-            "type": "Element",
-        },
-    )
-    key: TypeRef = field(
-        default=None,
-        metadata={"required": True, "name": "Key", "type": "Attribute"},
     )
 
 
@@ -833,7 +1018,7 @@ class AirRefundQuoteReq(CommonBaseReq):
             "help": "Provider: ACH.",
         },
     )
-    provider_reservation_info: List[ProviderReservationInfoType12] = field(
+    provider_reservation_info: List["ProviderReservationInfo"] = field(
         default_factory=list,
         metadata={
             "min_occurs": 0,
@@ -851,6 +1036,11 @@ class AirRefundQuoteReq(CommonBaseReq):
             "help": "Provider: ACH.",
         },
     )
+
+    @dataclass
+    class ProviderReservationInfo:
+
+        pass
 
 
 @dataclass
@@ -978,30 +1168,6 @@ class AirRepriceRsp(CommonBaseRsp):
             "max_occurs": 999,
             "name": "FareRule",
             "type": "Element",
-        },
-    )
-
-
-@dataclass
-class AirReservationSelectorType11:
-    """Inner ComplexType name auto generated"""
-
-    fare_info_ref: List[FareInfoRef] = field(
-        default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 999,
-            "name": "FareInfoRef",
-            "type": "Element",
-        },
-    )
-    air_reservation_locator_code: TypeLocatorCode = field(
-        default=None,
-        metadata={
-            "required": True,
-            "name": "AirReservationLocatorCode",
-            "type": "Attribute",
-            "help": "The Air Reservation locator code which is an unique identifier for the reservation",
         },
     )
 
@@ -1261,7 +1427,7 @@ class BaseAirExchangeMultiQuoteReq(CommonBaseCoreReq):
             "type": "Element",
         },
     )
-    provider_reservation_info: ProviderReservationInfoType1 = field(
+    provider_reservation_info: "ProviderReservationInfo" = field(
         default=None,
         metadata={
             "name": "ProviderReservationInfo",
@@ -1290,6 +1456,11 @@ class BaseAirExchangeMultiQuoteReq(CommonBaseCoreReq):
         default=None, metadata={"name": "OverridePCC", "type": "Element"}
     )
 
+    @dataclass
+    class ProviderReservationInfo:
+
+        pass
+
 
 @dataclass
 class BaseAirExchangeQuoteReq(CommonBaseCoreReq):
@@ -1303,7 +1474,7 @@ class BaseAirExchangeQuoteReq(CommonBaseCoreReq):
             "type": "Element",
         },
     )
-    provider_reservation_info: ProviderReservationInfoType2 = field(
+    provider_reservation_info: "ProviderReservationInfo" = field(
         default=None,
         metadata={
             "name": "ProviderReservationInfo",
@@ -1373,6 +1544,11 @@ class BaseAirExchangeQuoteReq(CommonBaseCoreReq):
             "help": "Provider: ACH.",
         },
     )
+
+    @dataclass
+    class ProviderReservationInfo:
+
+        pass
 
 
 @dataclass
@@ -1602,29 +1778,6 @@ class BrandList:
 
 
 @dataclass
-class DetailRetrieveType6:
-    """Inner ComplexType name auto generated"""
-
-    provider_reservation_detail: ProviderReservationDetail = field(
-        default=None,
-        metadata={
-            "name": "ProviderReservationDetail",
-            "type": "Element",
-            "help": "Provider reservation locator to be specified for display operation, if mentioned along woth the EMD number then synchronization of that EMD is performed considering the same to be associated with the mentioned PNR.",
-        },
-    )
-    emdnumber: TypeEmdnumber = field(
-        default=None,
-        metadata={
-            "required": True,
-            "name": "EMDNumber",
-            "type": "Element",
-            "help": "EMD number to be specified for display operation. If mentioned along with provider reservation detail then synchronization of that EMD is performed considering the same to be associated with the mentioned PNR.",
-        },
-    )
-
-
-@dataclass
 class EmdissuanceReq(CommonBaseReq):
     """Electronic Miscellaneous Document issuance request.Supported providers are 1V/1G/1P/1J"""
 
@@ -1715,6 +1868,64 @@ class EmdissuanceRsp(CommonBaseRsp):
 
 
 @dataclass
+class EmdretrieveReq(CommonBaseReq):
+    """Electronic Miscellaneous Document retrieve request.Supported providers are 1G/1V/1P/1J"""
+
+    list_retrieve: "ListRetrieve" = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "ListRetrieve",
+            "type": "Element",
+            "help": "Provider: 1G/1V/1P/1J-Information required for retrieval of list of EMDs",
+        },
+    )
+    detail_retrieve: "DetailRetrieve" = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "DetailRetrieve",
+            "type": "Element",
+            "help": "Provider: 1G/1V/1P/1J-Information required for a detailed EMD retrieve",
+        },
+    )
+
+    @dataclass
+    class DetailRetrieve:
+
+        provider_reservation_detail: ProviderReservationDetail = field(
+            default=None,
+            metadata={
+                "name": "ProviderReservationDetail",
+                "type": "Element",
+                "help": "Provider reservation locator to be specified for display operation, if mentioned along woth the EMD number then synchronization of that EMD is performed considering the same to be associated with the mentioned PNR.",
+            },
+        )
+        emdnumber: TypeEmdnumber = field(
+            default=None,
+            metadata={
+                "required": True,
+                "name": "EMDNumber",
+                "type": "Element",
+                "help": "EMD number to be specified for display operation. If mentioned along with provider reservation detail then synchronization of that EMD is performed considering the same to be associated with the mentioned PNR.",
+            },
+        )
+
+    @dataclass
+    class ListRetrieve:
+
+        provider_reservation_detail: ProviderReservationDetail = field(
+            default=None,
+            metadata={
+                "required": True,
+                "name": "ProviderReservationDetail",
+                "type": "Element",
+                "help": "Provider reservation details to be provided to fetch list of EMDs associated with it.",
+            },
+        )
+
+
+@dataclass
 class EmdretrieveRsp(CommonBaseRsp):
     """Electronic Miscellaneous Document list and detail retrieve response.Supported providers are 1G/1V/1P/1J"""
 
@@ -1735,20 +1946,6 @@ class EmdretrieveRsp(CommonBaseRsp):
             "name": "EMDSummaryInfo",
             "type": "Element",
             "help": "Provider: 1G/1V/1P/1J.",
-        },
-    )
-
-
-@dataclass
-class FareRulesFilterCategoryType10:
-    """Inner ComplexType name auto generated"""
-
-    fare_info_ref: str = field(
-        default=None,
-        metadata={
-            "name": "FareInfoRef",
-            "type": "Attribute",
-            "help": "Key reference for multiple fare rule",
         },
     )
 
@@ -1825,21 +2022,6 @@ class FlightInformationRsp(CommonBaseRsp):
 
 
 @dataclass
-class FlightTimeTableListType9:
-    """Inner ComplexType name auto generated"""
-
-    flight_time_detail: List[FlightTimeDetail] = field(
-        default_factory=list,
-        metadata={
-            "min_occurs": 1,
-            "max_occurs": 999,
-            "name": "FlightTimeDetail",
-            "type": "Element",
-        },
-    )
-
-
-@dataclass
 class FlightTimeTableReq(CommonBaseSearchReq):
     """Request for Flight Time Table."""
 
@@ -1855,84 +2037,30 @@ class FlightTimeTableReq(CommonBaseSearchReq):
 
 
 @dataclass
-class ListRetrieveType5:
-    """Inner ComplexType name auto generated"""
+class FlightTimeTableRsp(CommonBaseSearchRsp):
+    """Response for Flight Time Table."""
 
-    provider_reservation_detail: ProviderReservationDetail = field(
+    flight_time_table_list: "FlightTimeTableList" = field(
         default=None,
         metadata={
-            "required": True,
-            "name": "ProviderReservationDetail",
+            "name": "FlightTimeTableList",
             "type": "Element",
-            "help": "Provider reservation details to be provided to fetch list of EMDs associated with it.",
+            "help": "Provider: 1G,1V.",
         },
     )
 
+    @dataclass
+    class FlightTimeTableList:
 
-@dataclass
-class ListSearchType7:
-    """Inner ComplexType name auto generated"""
-
-    person_name_search: PersonNameSearch = field(
-        default=None,
-        metadata={
-            "required": True,
-            "name": "PersonNameSearch",
-            "type": "Element",
-            "help": "Customer name detail for searching flight pass content.",
-        },
-    )
-    loyalty_card: List[LoyaltyCard] = field(
-        default_factory=list,
-        metadata={
-            "min_occurs": 1,
-            "max_occurs": 999,
-            "name": "LoyaltyCard",
-            "type": "Element",
-            "help": "Customer loyalty card for searching flight pass content.",
-        },
-    )
-    start_from_result: TypeStartFromResult = field(
-        default=None,
-        metadata={
-            "required": True,
-            "name": "StartFromResult",
-            "type": "Attribute",
-            "help": "Start index of the section of flight pass numbers that is being requested.",
-        },
-    )
-    max_results: TypeMaxResults = field(
-        default=None,
-        metadata={
-            "required": True,
-            "name": "MaxResults",
-            "type": "Attribute",
-            "help": "Max Number of Flight Passes being requested for.",
-        },
-    )
-
-
-@dataclass
-class PrePayRetrieveType8:
-    """Inner ComplexType name auto generated"""
-
-    id: TypeCardNumber = field(
-        default=None,
-        metadata={
-            "required": True,
-            "name": "Id",
-            "type": "Attribute",
-            "help": "Pre pay id to retrieved,example flight pass number",
-        },
-    )
-    type: str = field(
-        default=None,
-        metadata={
-            "name": "Type",
-            "type": "Attribute",
-            "help": "Pre pay id type,example 'FlightPass'",
-        },
-    )
+        flight_time_detail: List[FlightTimeDetail] = field(
+            default_factory=list,
+            metadata={
+                "min_occurs": 1,
+                "max_occurs": 999,
+                "name": "FlightTimeDetail",
+                "type": "Element",
+            },
+        )
 
 
 @dataclass
@@ -2198,21 +2326,6 @@ class SeatMapRsp(CommonBaseRsp):
 
 
 @dataclass
-class UnassociatedBookingCodeListType4:
-    """Inner ComplexType name auto generated"""
-
-    applicable_segment: List[TypeApplicableSegment] = field(
-        default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 99,
-            "name": "ApplicableSegment",
-            "type": "Element",
-        },
-    )
-
-
-@dataclass
 class AirExchangeMultiQuoteReq(BaseAirExchangeMultiQuoteReq):
     """Request multiple quotes for the exchange of an itinerary. 1P transactions only"""
 
@@ -2263,124 +2376,6 @@ class AirExchangeQuoteReq(BaseAirExchangeQuoteReq):
     """Request to quote the exchange of an itinerary"""
 
     pass
-
-
-@dataclass
-class AirFareRulesReq(CommonBaseReq):
-    """Request to display the full text fare rules."""
-
-    air_fare_rules_modifier: AirFareRulesModifier = field(
-        default=None,
-        metadata={
-            "name": "AirFareRulesModifier",
-            "type": "Element",
-            "help": "Provider: 1G,1V.",
-        },
-    )
-    fare_rules_filter_category: List[FareRulesFilterCategoryType10] = field(
-        default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 16,
-            "name": "FareRulesFilterCategory",
-            "type": "Element",
-            "help": "Structured Fare Rules Filter if requested will return rules for requested categories in the response. Applicable for providers 1G, 1V.",
-        },
-    )
-    air_reservation_selector: AirReservationSelectorType11 = field(
-        default=None,
-        metadata={
-            "required": True,
-            "name": "AirReservationSelector",
-            "type": "Element",
-            "help": "Provider: 1G,1V,1P,1J,ACH-Parameters to use for a fare rule lookup associated with an Air Reservation Locator Code",
-        },
-    )
-    fare_rule_lookup: FareRuleLookup = field(
-        default=None,
-        metadata={
-            "name": "FareRuleLookup",
-            "type": "Element",
-            "help": "Used to look up fare rules based on the origin, destination, and carrier of the air segment, the fare basis code and the provider code. Providers: 1P, 1J.",
-        },
-    )
-    fare_rule_key: List[FareRuleKey] = field(
-        default_factory=list,
-        metadata={
-            "min_occurs": 1,
-            "max_occurs": 999,
-            "name": "FareRuleKey",
-            "type": "Element",
-            "help": "Used to look up fare rules based on a fare rule key. Providers: 1G, 1V, 1P, 1J, ACH.",
-        },
-    )
-    air_fare_display_rule_key: AirFareDisplayRuleKey = field(
-        default=None,
-        metadata={
-            "required": True,
-            "name": "AirFareDisplayRuleKey",
-            "type": "Element",
-            "help": "Provider: 1G,1V,1P,1J.",
-        },
-    )
-    fare_rule_type: TypeFareRuleType = field(
-        default=long,
-        metadata={
-            "name": "FareRuleType",
-            "type": "Attribute",
-            "help": "Provider: 1G,1V,1P,1J,ACH.",
-        },
-    )
-
-
-@dataclass
-class AirMerchandisingDetailsRsp(CommonBaseRsp):
-    """Response for retrieved brand details and optional services included in them"""
-
-    optional_services: OptionalServices = field(
-        default=None, metadata={"name": "OptionalServices", "type": "Element"}
-    )
-    brand: List[Brand] = field(
-        default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 99,
-            "name": "Brand",
-            "type": "Element",
-        },
-    )
-    unassociated_booking_code_list: UnassociatedBookingCodeListType4 = field(
-        default=None,
-        metadata={
-            "name": "UnassociatedBookingCodeList",
-            "type": "Element",
-            "help": "Lists classes of service by segment sent in the request which are not associated to a brand.",
-        },
-    )
-
-
-@dataclass
-class AirPrePayReq(CommonBaseReq):
-    """Flight Pass Request."""
-
-    list_search: ListSearchType7 = field(
-        default=None,
-        metadata={
-            "required": True,
-            "name": "ListSearch",
-            "type": "Element",
-            "help": "Provider: ACH.",
-        },
-    )
-    pre_pay_retrieve: PrePayRetrieveType8 = field(
-        default=None,
-        metadata={
-            "required": True,
-            "name": "PrePayRetrieve",
-            "type": "Element",
-            "help": "Provider: ACH.",
-        },
-    )
 
 
 @dataclass
@@ -2538,7 +2533,7 @@ class AirTicketingReq(AirBaseReq):
             "help": "Provider: 1G,1V,1P,1J.",
         },
     )
-    air_pricing_info_ref: List[AirPricingInfoRefType13] = field(
+    air_pricing_info_ref: List["AirPricingInfoRef"] = field(
         default_factory=list,
         metadata={
             "min_occurs": 0,
@@ -2631,6 +2626,23 @@ class AirTicketingReq(AirBaseReq):
         },
     )
 
+    @dataclass
+    class AirPricingInfoRef:
+
+        booking_traveler_ref: List[BookingTravelerRef] = field(
+            default_factory=list,
+            metadata={
+                "min_occurs": 0,
+                "max_occurs": 9,
+                "name": "BookingTravelerRef",
+                "type": "Element",
+            },
+        )
+        key: TypeRef = field(
+            default=None,
+            metadata={"required": True, "name": "Key", "type": "Attribute"},
+        )
+
 
 @dataclass
 class AirUpsellSearchReq(AirBaseReq):
@@ -2701,44 +2713,6 @@ class BaseAirSearchReq(CommonBaseCoreSearchReq):
             "max_occurs": 999,
             "name": "SearchSpecificAirSegment",
             "type": "Element",
-        },
-    )
-
-
-@dataclass
-class EmdretrieveReq(CommonBaseReq):
-    """Electronic Miscellaneous Document retrieve request.Supported providers are 1G/1V/1P/1J"""
-
-    list_retrieve: ListRetrieveType5 = field(
-        default=None,
-        metadata={
-            "required": True,
-            "name": "ListRetrieve",
-            "type": "Element",
-            "help": "Provider: 1G/1V/1P/1J-Information required for retrieval of list of EMDs",
-        },
-    )
-    detail_retrieve: DetailRetrieveType6 = field(
-        default=None,
-        metadata={
-            "required": True,
-            "name": "DetailRetrieve",
-            "type": "Element",
-            "help": "Provider: 1G/1V/1P/1J-Information required for a detailed EMD retrieve",
-        },
-    )
-
-
-@dataclass
-class FlightTimeTableRsp(CommonBaseSearchRsp):
-    """Response for Flight Time Table."""
-
-    flight_time_table_list: FlightTimeTableListType9 = field(
-        default=None,
-        metadata={
-            "name": "FlightTimeTableList",
-            "type": "Element",
-            "help": "Provider: 1G,1V.",
         },
     )
 

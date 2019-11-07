@@ -13,8 +13,7 @@ from xsdata.models.elements import (
     SimpleType,
 )
 from xsdata.models.templates import Attr, Class
-from xsdata.utils.element import append_documentation
-from xsdata.utils.text import pascal_case, safe_snake
+from xsdata.utils.text import safe_snake
 
 logger = logging.getLogger(__name__)
 
@@ -30,6 +29,7 @@ class CodeGenerator:
     recovered: int = field(default=0, init=False)
     queue: List[BaseElement] = field(default_factory=list, init=False)
     deck: List[Class] = field(default_factory=list, init=False)
+    deque: List[Class] = field(default_factory=list, init=False)
 
     def generate(self) -> List[Class]:
         """Generate class properties from schema elements and simple/complex
@@ -47,8 +47,12 @@ class CodeGenerator:
         self.queue = copy.deepcopy(list(items))
         while len(self.queue):
             obj = self.queue.pop()
-            card = self.generate_element(obj)
-            self.deck.append(card)
+            item = self.generate_element(obj)
+
+            if getattr(obj, "inner", False):
+                self.deck[-1].inner.append(item)
+            else:
+                self.deck.append(item)
 
     def generate_element(self, obj: BaseElement) -> Class:
         return Class(
@@ -75,11 +79,8 @@ class CodeGenerator:
         return list(filter(None, result))
 
     def generate_class_field(self, obj: AttributeElement) -> Optional[Attr]:
+        queued = self.queue_inner_element(obj)
         display_type = obj.display_type
-        if not display_type and isinstance(obj, Element) and obj.complex_type:
-            self.recover_complex_type(obj)
-            return self.generate_class_field(obj)
-
         if not display_type:
             logger.warning("Failed to detect type for element: {}".format(obj))
             return None
@@ -95,15 +96,13 @@ class CodeGenerator:
             default=getattr(obj, "default", None),
             metadata=metadata,
             type=display_type,
+            forward_ref=queued,
         )
 
-    def recover_complex_type(self, obj: Element):
-        assert obj.complex_type is not None
-        self.recovered += 1
-        obj.type = "{}Type{}".format(pascal_case(obj.name), self.recovered)
-        obj.complex_type.name = obj.type
-        append_documentation(
-            obj.complex_type, self.INNER_COMPLEX_TYPE_GENERATED
-        )
-        self.queue.insert(0, obj.complex_type)
-        obj.complex_type = None
+    def queue_inner_element(self, obj: AttributeElement):
+        if isinstance(obj, Element):
+            if not obj.raw_type and obj.complex_type:
+                obj.complex_type.name = obj.type = obj.name
+                setattr(obj.complex_type, "inner", True)
+                self.queue.append(obj.complex_type)
+                return True

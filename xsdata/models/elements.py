@@ -13,7 +13,6 @@ from lxml import etree
 from xsdata.models.enums import XMLSchema
 from xsdata.models.mixins import (
     ExtendsMixin,
-    ExtendsNone,
     NamedField,
     OccurrencesMixin,
     RestrictedField,
@@ -156,7 +155,7 @@ class AnnotationBase(ElementBase):
 
 
 @dataclass
-class SimpleType(AnnotationBase, SignatureField, ExtendsNone):
+class SimpleType(AnnotationBase, SignatureField, ExtendsMixin):
     name: Optional[str]
     restriction: Optional["Restriction"]
     list: Optional["List"]
@@ -165,6 +164,10 @@ class SimpleType(AnnotationBase, SignatureField, ExtendsNone):
     @property
     def raw_type(self) -> Optional[str]:
         return self.restriction.raw_type if self.restriction else None
+
+    @property
+    def extends(self) -> Optional[str]:
+        return None
 
 
 @dataclass

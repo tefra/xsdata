@@ -5138,312 +5138,6 @@ class ValueSearchCriteriaType:
 
 
 @dataclass
-class AirlineDistributionDetailsType16:
-    """Inner ComplexType name auto generated"""
-
-    requested_segment_ref: OriginAndDestinationRequestType = field(
-        default=None,
-        metadata={
-            "required": True,
-            "name": "requestedSegmentRef",
-            "type": "Element",
-            "help": "Indicates reference of the requested segment",
-        },
-    )
-    flight_info: TravelFlightInformationType = field(
-        default=None,
-        metadata={
-            "name": "flightInfo",
-            "type": "Element",
-            "help": "Specify Flight options.",
-        },
-    )
-
-
-@dataclass
-class BucketsType4:
-    """Inner ComplexType name auto generated"""
-
-    bucket_info: BucketInformationType = field(
-        default=None,
-        metadata={
-            "required": True,
-            "name": "bucketInfo",
-            "type": "Element",
-            "help": "Bucket information: name, priority, weight",
-        },
-    )
-    bucket_details: List[BucketDetailsType] = field(
-        default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 15,
-            "name": "bucketDetails",
-            "type": "Element",
-            "help": "Bucket details",
-        },
-    )
-
-
-@dataclass
-class CombinationFareFamiliesType7:
-    """Inner ComplexType name auto generated"""
-
-    item_ffcnumber: ItemNumberType = field(
-        default=None,
-        metadata={
-            "required": True,
-            "name": "itemFFCNumber",
-            "type": "Element",
-            "help": "Specification of the item number",
-        },
-    )
-    nb_of_units: NumberOfUnitsType80154S = field(
-        default=None,
-        metadata={
-            "name": "nbOfUnits",
-            "type": "Element",
-            "help": "Number of units.",
-        },
-    )
-    reference_info: List[ReferenceInfoType] = field(
-        default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 6,
-            "name": "referenceInfo",
-            "type": "Element",
-            "help": "Requested segment reference",
-        },
-    )
-
-
-@dataclass
-class FareFamilySegmentType10:
-    """Inner ComplexType name auto generated"""
-
-    reference_info: ReferenceInfoType = field(
-        default=None,
-        metadata={
-            "required": True,
-            "name": "referenceInfo",
-            "type": "Element",
-            "help": "Requested segment reference",
-        },
-    )
-    family_criteria: FareFamilyCriteriaType = field(
-        default=None,
-        metadata={
-            "name": "familyCriteria",
-            "type": "Element",
-            "help": "Description of fare family criteria.",
-        },
-    )
-
-
-@dataclass
-class FareFamilySegmentType17:
-    """Inner ComplexType name auto generated"""
-
-    reference_info: ReferenceInfoType = field(
-        default=None,
-        metadata={
-            "required": True,
-            "name": "referenceInfo",
-            "type": "Element",
-            "help": "Requested segment reference",
-        },
-    )
-    family_criteria: FareFamilyCriteriaType = field(
-        default=None,
-        metadata={
-            "name": "familyCriteria",
-            "type": "Element",
-            "help": "Description of fare family criteria.",
-        },
-    )
-
-
-@dataclass
-class FareOptionsType3:
-    """Inner ComplexType name auto generated"""
-
-    pricing_tick_info: PricingTicketingDetailsType = field(
-        default=None,
-        metadata={
-            "required": True,
-            "name": "pricingTickInfo",
-            "type": "Element",
-            "help": "Pricing and ticketing details.",
-        },
-    )
-    corporate: CorporateIdentificationType = field(
-        default=None,
-        metadata={
-            "name": "corporate",
-            "type": "Element",
-            "help": "Corporate name/number used to target fares",
-        },
-    )
-    ticketing_price_scheme: TicketingPriceSchemeType = field(
-        default=None,
-        metadata={
-            "name": "ticketingPriceScheme",
-            "type": "Element",
-            "help": "Ticketing price scheme.",
-        },
-    )
-    fee_id_description: CodedAttributeType197696S = field(
-        default=None,
-        metadata={
-            "name": "feeIdDescription",
-            "type": "Element",
-            "help": "PSR number",
-        },
-    )
-    conversion_rate: ConversionRateType = field(
-        default=None,
-        metadata={
-            "name": "conversionRate",
-            "type": "Element",
-            "help": "Used to force the currency of pricing",
-        },
-    )
-    form_of_payment: FormOfPaymentTypeI = field(
-        default=None,
-        metadata={
-            "name": "formOfPayment",
-            "type": "Element",
-            "help": "Form of payment information.",
-        },
-    )
-    frequent_traveller_info: FrequentTravellerIdentificationCodeType177150S = field(
-        default=None,
-        metadata={
-            "name": "frequentTravellerInfo",
-            "type": "Element",
-            "help": "Frequent traveller information",
-        },
-    )
-    monetary_cabin_info: MonetaryAndCabinInformationType = field(
-        default=None,
-        metadata={
-            "name": "monetaryCabinInfo",
-            "type": "Element",
-            "help": "Monetary and cabin information.",
-        },
-    )
-
-
-@dataclass
-class FeeDescriptionGrpType20:
-    """Inner ComplexType name auto generated"""
-
-    item_number_info: ItemNumberType80866S = field(
-        default=None,
-        metadata={
-            "required": True,
-            "name": "itemNumberInfo",
-            "type": "Element",
-            "help": "Specification of the item number",
-        },
-    )
-    service_attributes_info: AttributeType61377S = field(
-        default=None,
-        metadata={
-            "name": "serviceAttributesInfo",
-            "type": "Element",
-            "help": "Attributes (SSR code EMD, RFIC, SSIM)",
-        },
-    )
-    service_description_info: SpecialRequirementsDetailsType = field(
-        default=None,
-        metadata={
-            "name": "serviceDescriptionInfo",
-            "type": "Element",
-            "help": "Other service information (service description, ...)",
-        },
-    )
-
-
-@dataclass
-class FlightDetailsType18:
-    """Inner ComplexType name auto generated"""
-
-    flight_information: TravelProductType = field(
-        default=None,
-        metadata={
-            "required": True,
-            "name": "flightInformation",
-            "type": "Element",
-            "help": "Specification of details on the flight and posting availability",
-        },
-    )
-    avl_info: List[FlightProductInformationType] = field(
-        default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 6,
-            "name": "avlInfo",
-            "type": "Element",
-            "help": "returns booking class and availability context",
-        },
-    )
-    technical_stop: List[DateAndTimeInformationType] = field(
-        default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 5,
-            "name": "technicalStop",
-            "type": "Element",
-            "help": "Details on Flight date, time and location of technical stop or change of gauge",
-        },
-    )
-    commercial_agreement: CommercialAgreementsType78540S = field(
-        default=None,
-        metadata={
-            "name": "commercialAgreement",
-            "type": "Element",
-            "help": "Code Share Agreement description for current flight.",
-        },
-    )
-    add_info: HeaderInformationTypeI = field(
-        default=None,
-        metadata={
-            "name": "addInfo",
-            "type": "Element",
-            "help": "Additional Info about flight, such as Reference number, and several options",
-        },
-    )
-    terminal_equipment_details: List[AdditionalProductDetailsTypeI] = field(
-        default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 2,
-            "name": "terminalEquipmentDetails",
-            "type": "Element",
-            "help": "Terminal, Equipment and EFT Details. If a Total EFT of the Travel Solution is requested then we will have 2 occurrences of the terminalEquipmentDetails attached to the first leg flightInformation: the 1st occurence will give the EFT of the leg, the 2nd occurrence will give the total EFT of the Travel Solution.",
-        },
-    )
-    reservation_info: PassengerItineraryInformationType = field(
-        default=None,
-        metadata={
-            "name": "reservationInfo",
-            "type": "Element",
-            "help": "PNR flight reservation info",
-        },
-    )
-    price_to_beat: MonetaryInformationType = field(
-        default=None,
-        metadata={
-            "name": "priceToBeat",
-            "type": "Element",
-            "help": "Indicates Price to beat",
-        },
-    )
-
-
-@dataclass
 class FoprepresentationType:
 
     form_of_payment_details: FormOfPaymentTypeI = field(
@@ -5466,214 +5160,6 @@ class FoprepresentationType:
 
 
 @dataclass
-class IncidentalStopInfoType19:
-    """Inner ComplexType name auto generated"""
-
-    date_time_info: DateAndTimeInformationTypeI = field(
-        default=None,
-        metadata={
-            "required": True,
-            "name": "dateTimeInfo",
-            "type": "Element",
-            "help": "Incidental stop date/time information",
-        },
-    )
-
-
-@dataclass
-class PsgDetailsInfoType1:
-    """Inner ComplexType name auto generated"""
-
-    discount_ptc: FareInformationTypeI = field(
-        default=None,
-        metadata={
-            "required": True,
-            "name": "discountPtc",
-            "type": "Element",
-            "help": "PTC/Discount Code age",
-        },
-    )
-    flequent_flyer_details: FrequentTravellerIdentificationCodeType = field(
-        default=None,
-        metadata={
-            "name": "flequentFlyerDetails",
-            "type": "Element",
-            "help": "Tier level information",
-        },
-    )
-
-
-@dataclass
-class TicketRequestedSegmentsType14:
-    """Inner ComplexType name auto generated"""
-
-    action_identification: ActionIdentificationType = field(
-        default=None,
-        metadata={
-            "required": True,
-            "name": "actionIdentification",
-            "type": "Element",
-            "help": "Action identification.",
-        },
-    )
-    connect_point_details: ConnectionTypeI = field(
-        default=None,
-        metadata={
-            "name": "connectPointDetails",
-            "type": "Element",
-            "help": "Connected cities in changed ticket requested segment.",
-        },
-    )
-
-
-@dataclass
-class FeeDetailsType15:
-    """Inner ComplexType name auto generated"""
-
-    fee_info: SpecificDataInformationType = field(
-        default=None,
-        metadata={
-            "required": True,
-            "name": "feeInfo",
-            "type": "Element",
-            "help": "Fee information",
-        },
-    )
-    associated_amounts: MonetaryInformationTypeI = field(
-        default=None,
-        metadata={
-            "name": "associatedAmounts",
-            "type": "Element",
-            "help": "Associated amounts : amounts to take into account to calculate fee.",
-        },
-    )
-    fee_description_grp: FeeDescriptionGrpType20 = field(
-        default=None,
-        metadata={
-            "name": "feeDescriptionGrp",
-            "type": "Element",
-            "help": "Fee description",
-        },
-    )
-
-
-@dataclass
-class FlightInfoPnrType13:
-    """Inner ComplexType name auto generated"""
-
-    travel_response_details: TravelProductInformationTypeI = field(
-        default=None,
-        metadata={
-            "required": True,
-            "name": "travelResponseDetails",
-            "type": "Element",
-            "help": "Travel Response Details: - Board/Off aiports - Flight number - Part of the journey - Day difference between Board and off - Departure/Arrival dates - Departure/Arrival times",
-        },
-    )
-    time_table_date: StructuredPeriodInformationType = field(
-        default=None,
-        metadata={
-            "name": "timeTableDate",
-            "type": "Element",
-            "help": "Time Table Effective/Discontinue dates and frequency of operating Travel Solution",
-        },
-    )
-    terminal_equipment_details: List[AdditionalProductDetailsTypeI] = field(
-        default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 2,
-            "name": "terminalEquipmentDetails",
-            "type": "Element",
-            "help": "Terminal, Equipment and EFT Details. If a Total EFT of the Travel Solution is requested then we will have 2 occurrences of the terminalEquipmentDetails attached to the first leg travelResponseDetails: the 1st occurrence will give the EFT of the leg, the 2nd occurrence will give the total EFT of the Travel Solution.",
-        },
-    )
-    codeshare_data: CommercialAgreementsType = field(
-        default=None,
-        metadata={
-            "name": "codeshareData",
-            "type": "Element",
-            "help": "Codeshare data",
-        },
-    )
-    disclosure: FreeTextInformationType = field(
-        default=None,
-        metadata={
-            "name": "disclosure",
-            "type": "Element",
-            "help": "Disclosure message from an operating carrier.",
-        },
-    )
-    stop_details: RoutingInformationTypeI = field(
-        default=None,
-        metadata={
-            "name": "stopDetails",
-            "type": "Element",
-            "help": "Stops Details",
-        },
-    )
-    traffic_restriction_data: TrafficRestrictionTypeI = field(
-        default=None,
-        metadata={
-            "name": "trafficRestrictionData",
-            "type": "Element",
-            "help": "Traffic restriction information",
-        },
-    )
-    reservation_info: PassengerItineraryInformationType = field(
-        default=None,
-        metadata={
-            "name": "reservationInfo",
-            "type": "Element",
-            "help": "PNR flight reservation info",
-        },
-    )
-    incidental_stop_info: List[IncidentalStopInfoType19] = field(
-        default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 8,
-            "name": "incidentalStopInfo",
-            "type": "Element",
-            "help": "Incidental stop information.",
-        },
-    )
-
-
-@dataclass
-class GroupOfFlightsType12:
-    """Inner ComplexType name auto generated"""
-
-    prop_flight_gr_detail: ProposedSegmentType = field(
-        default=None,
-        metadata={
-            "required": True,
-            "name": "propFlightGrDetail",
-            "type": "Element",
-            "help": "To indicate parameters for proposed flight group.",
-        },
-    )
-    price_to_beat: MonetaryInformationType = field(
-        default=None,
-        metadata={
-            "name": "priceToBeat",
-            "type": "Element",
-            "help": "Indicates Price to beat",
-        },
-    )
-    flight_details: List[FlightDetailsType18] = field(
-        default_factory=list,
-        metadata={
-            "min_occurs": 1,
-            "max_occurs": 4,
-            "name": "flightDetails",
-            "type": "Element",
-            "help": "list of flight per proposed segment",
-        },
-    )
-
-
-@dataclass
 class GroupPassengerDetailsType:
     """Contain passenger information"""
 
@@ -5686,7 +5172,7 @@ class GroupPassengerDetailsType:
             "help": "Trigger",
         },
     )
-    psg_details_info: List[PsgDetailsInfoType1] = field(
+    psg_details_info: List["PsgDetailsInfo"] = field(
         default_factory=list,
         metadata={
             "min_occurs": 0,
@@ -5697,306 +5183,26 @@ class GroupPassengerDetailsType:
         },
     )
 
+    @dataclass
+    class PsgDetailsInfo:
 
-@dataclass
-class OfficeIdDetailsType9:
-    """Inner ComplexType name auto generated"""
-
-    office_id_information: UserIdentificationType = field(
-        default=None,
-        metadata={
-            "required": True,
-            "name": "officeIdInformation",
-            "type": "Element",
-            "help": "Office Id Information",
-        },
-    )
-    nb_of_units: NumberOfUnitsType80154S = field(
-        default=None,
-        metadata={
-            "name": "nbOfUnits",
-            "type": "Element",
-            "help": "Number of units.",
-        },
-    )
-    uid_option: CodedAttributeType78500S = field(
-        default=None,
-        metadata={
-            "name": "uidOption",
-            "type": "Element",
-            "help": "UID option",
-        },
-    )
-    pricing_tick_info: PricingTicketingDetailsType = field(
-        default=None,
-        metadata={
-            "name": "pricingTickInfo",
-            "type": "Element",
-            "help": "Pricing and ticketing details.",
-        },
-    )
-    corporate_fare_info: CorporateFareInformationType = field(
-        default=None,
-        metadata={
-            "name": "corporateFareInfo",
-            "type": "Element",
-            "help": "Corporate fare information",
-        },
-    )
-    travel_flight_info: TravelFlightInformationType = field(
-        default=None,
-        metadata={
-            "name": "travelFlightInfo",
-            "type": "Element",
-            "help": "Details of a Flight : Direct, Non stop...",
-        },
-    )
-    airline_distribution_details: List[
-        AirlineDistributionDetailsType16
-    ] = field(
-        default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 6,
-            "name": "airlineDistributionDetails",
-            "type": "Element",
-            "help": "Details of airline distribution at requested segment level",
-        },
-    )
-
-
-@dataclass
-class OtherPossibleCriteriaType11:
-    """Inner ComplexType name auto generated"""
-
-    logical_link: BooleanExpressionRuleType = field(
-        default=None,
-        metadata={
-            "required": True,
-            "name": "logicalLink",
-            "type": "Element",
-            "help": "Logical link with other criteria.",
-        },
-    )
-    family_criteria: FareFamilyCriteriaType = field(
-        default=None,
-        metadata={
-            "name": "familyCriteria",
-            "type": "Element",
-            "help": "Description of fare family criteria.",
-        },
-    )
-    fare_family_segment: List[FareFamilySegmentType17] = field(
-        default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 6,
-            "name": "fareFamilySegment",
-            "type": "Element",
-            "help": "Fare family requested segment details.",
-        },
-    )
-
-
-@dataclass
-class TicketChangeInfoType6:
-    """Inner ComplexType name auto generated"""
-
-    ticket_number_details: TicketNumberTypeI = field(
-        default=None,
-        metadata={
-            "required": True,
-            "name": "ticketNumberDetails",
-            "type": "Element",
-            "help": "Ticket nb details.",
-        },
-    )
-    ticket_requested_segments: List[TicketRequestedSegmentsType14] = field(
-        default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 6,
-            "name": "ticketRequestedSegments",
-            "type": "Element",
-            "help": "Changed ticket requested segments.",
-        },
-    )
-
-
-@dataclass
-class FareFamiliesType2:
-    """Inner ComplexType name auto generated"""
-
-    family_information: FareFamilyType80157S = field(
-        default=None,
-        metadata={
-            "required": True,
-            "name": "familyInformation",
-            "type": "Element",
-            "help": "Segment used to target Commercial Fare Family.",
-        },
-    )
-    family_criteria: FareFamilyCriteriaType = field(
-        default=None,
-        metadata={
-            "name": "familyCriteria",
-            "type": "Element",
-            "help": "Description of Fare Family Criteria.",
-        },
-    )
-    fare_family_segment: List[FareFamilySegmentType10] = field(
-        default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 6,
-            "name": "fareFamilySegment",
-            "type": "Element",
-            "help": "Fare family requested segment details.",
-        },
-    )
-    other_possible_criteria: List[OtherPossibleCriteriaType11] = field(
-        default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 20,
-            "name": "otherPossibleCriteria",
-            "type": "Element",
-            "help": "Description of other possible fare family criteria.",
-        },
-    )
-
-
-@dataclass
-class FeeOptionType8:
-    """Inner ComplexType name auto generated"""
-
-    fee_type_info: SelectionDetailsType = field(
-        default=None,
-        metadata={
-            "required": True,
-            "name": "feeTypeInfo",
-            "type": "Element",
-            "help": "Nature of the fee (OB,OC,..)",
-        },
-    )
-    rate_tax: MonetaryInformationType80162S = field(
-        default=None,
-        metadata={
-            "name": "rateTax",
-            "type": "Element",
-            "help": "Associated rate tax.",
-        },
-    )
-    fee_details: List[FeeDetailsType15] = field(
-        default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 99,
-            "name": "feeDetails",
-            "type": "Element",
-            "help": "Details for each fee.",
-        },
-    )
-
-
-@dataclass
-class ItineraryType5:
-    """Inner ComplexType name auto generated"""
-
-    requested_segment_ref: OriginAndDestinationRequestType = field(
-        default=None,
-        metadata={
-            "required": True,
-            "name": "requestedSegmentRef",
-            "type": "Element",
-            "help": "Indicates reference of the requested segment",
-        },
-    )
-    departure_localization: DepartureLocationType = field(
-        default=None,
-        metadata={
-            "name": "departureLocalization",
-            "type": "Element",
-            "help": "Specification of the requested departure point",
-        },
-    )
-    arrival_localization: ArrivalLocalizationType = field(
-        default=None,
-        metadata={
-            "name": "arrivalLocalization",
-            "type": "Element",
-            "help": "Specification of the requested arrival point",
-        },
-    )
-    time_details: DateAndTimeInformationType181295S = field(
-        default=None,
-        metadata={
-            "name": "timeDetails",
-            "type": "Element",
-            "help": "Details on requested date and time plus range of date trip duration",
-        },
-    )
-    flight_info: TravelFlightInformationType165053S = field(
-        default=None,
-        metadata={
-            "name": "flightInfo",
-            "type": "Element",
-            "help": "Specify Flight options.",
-        },
-    )
-    family_information: FareFamilyType = field(
-        default=None,
-        metadata={
-            "name": "familyInformation",
-            "type": "Element",
-            "help": "Segment used to target Commercial Fare Family at requested segment level",
-        },
-    )
-    value_search: List[ValueSearchCriteriaType] = field(
-        default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 99,
-            "name": "valueSearch",
-            "type": "Element",
-        },
-    )
-    group_of_flights: List[GroupOfFlightsType12] = field(
-        default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 6,
-            "name": "groupOfFlights",
-            "type": "Element",
-            "help": "list of proposed segments per requested segment",
-        },
-    )
-    flight_info_pnr: List[FlightInfoPnrType13] = field(
-        default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 4,
-            "name": "flightInfoPNR",
-            "type": "Element",
-            "help": "Info concerning the flights booked in the PNR",
-        },
-    )
-    requested_segment_action: ActionIdentificationType = field(
-        default=None,
-        metadata={
-            "name": "requestedSegmentAction",
-            "type": "Element",
-            "help": "Action identification for the requested segment",
-        },
-    )
-    attributes: CodedAttributeType = field(
-        default=None,
-        metadata={
-            "name": "attributes",
-            "type": "Element",
-            "help": "Coded attributes",
-        },
-    )
+        discount_ptc: FareInformationTypeI = field(
+            default=None,
+            metadata={
+                "required": True,
+                "name": "discountPtc",
+                "type": "Element",
+                "help": "PTC/Discount Code age",
+            },
+        )
+        flequent_flyer_details: FrequentTravellerIdentificationCodeType = field(
+            default=None,
+            metadata={
+                "name": "flequentFlyerDetails",
+                "type": "Element",
+                "help": "Tier level information",
+            },
+        )
 
 
 @dataclass
@@ -6067,7 +5273,7 @@ class FareMasterPricerTravelBoardSearch:
             "help": "Passenger info group (9 ADT + 9 IN)",
         },
     )
-    fare_families: List[FareFamiliesType2] = field(
+    fare_families: List["FareFamilies"] = field(
         default_factory=list,
         metadata={
             "min_occurs": 0,
@@ -6077,7 +5283,7 @@ class FareMasterPricerTravelBoardSearch:
             "help": "Fare families.",
         },
     )
-    fare_options: FareOptionsType3 = field(
+    fare_options: "FareOptions" = field(
         default=None,
         metadata={
             "name": "fareOptions",
@@ -6120,7 +5326,7 @@ class FareMasterPricerTravelBoardSearch:
             "type": "Element",
         },
     )
-    buckets: List[BucketsType4] = field(
+    buckets: List["Buckets"] = field(
         default_factory=list,
         metadata={
             "min_occurs": 0,
@@ -6130,7 +5336,7 @@ class FareMasterPricerTravelBoardSearch:
             "help": "Buckets",
         },
     )
-    itinerary: List[ItineraryType5] = field(
+    itinerary: List["Itinerary"] = field(
         default_factory=list,
         metadata={
             "min_occurs": 0,
@@ -6140,7 +5346,7 @@ class FareMasterPricerTravelBoardSearch:
             "help": "Itinerary",
         },
     )
-    ticket_change_info: TicketChangeInfoType6 = field(
+    ticket_change_info: "TicketChangeInfo" = field(
         default=None,
         metadata={
             "name": "ticketChangeInfo",
@@ -6148,7 +5354,7 @@ class FareMasterPricerTravelBoardSearch:
             "help": "Changed ticket information.",
         },
     )
-    combination_fare_families: List[CombinationFareFamiliesType7] = field(
+    combination_fare_families: List["CombinationFareFamilies"] = field(
         default_factory=list,
         metadata={
             "min_occurs": 0,
@@ -6158,7 +5364,7 @@ class FareMasterPricerTravelBoardSearch:
             "help": "Specify fare family combinations",
         },
     )
-    fee_option: List[FeeOptionType8] = field(
+    fee_option: List["FeeOption"] = field(
         default_factory=list,
         metadata={
             "min_occurs": 0,
@@ -6168,7 +5374,7 @@ class FareMasterPricerTravelBoardSearch:
             "help": "Fee option group.",
         },
     )
-    office_id_details: List[OfficeIdDetailsType9] = field(
+    office_id_details: List["OfficeIdDetails"] = field(
         default_factory=list,
         metadata={
             "min_occurs": 0,
@@ -6178,3 +5384,761 @@ class FareMasterPricerTravelBoardSearch:
             "help": "List of Office Id Details",
         },
     )
+
+    @dataclass
+    class OfficeIdDetails:
+
+        office_id_information: UserIdentificationType = field(
+            default=None,
+            metadata={
+                "required": True,
+                "name": "officeIdInformation",
+                "type": "Element",
+                "help": "Office Id Information",
+            },
+        )
+        nb_of_units: NumberOfUnitsType80154S = field(
+            default=None,
+            metadata={
+                "name": "nbOfUnits",
+                "type": "Element",
+                "help": "Number of units.",
+            },
+        )
+        uid_option: CodedAttributeType78500S = field(
+            default=None,
+            metadata={
+                "name": "uidOption",
+                "type": "Element",
+                "help": "UID option",
+            },
+        )
+        pricing_tick_info: PricingTicketingDetailsType = field(
+            default=None,
+            metadata={
+                "name": "pricingTickInfo",
+                "type": "Element",
+                "help": "Pricing and ticketing details.",
+            },
+        )
+        corporate_fare_info: CorporateFareInformationType = field(
+            default=None,
+            metadata={
+                "name": "corporateFareInfo",
+                "type": "Element",
+                "help": "Corporate fare information",
+            },
+        )
+        travel_flight_info: TravelFlightInformationType = field(
+            default=None,
+            metadata={
+                "name": "travelFlightInfo",
+                "type": "Element",
+                "help": "Details of a Flight : Direct, Non stop...",
+            },
+        )
+        airline_distribution_details: List[
+            "AirlineDistributionDetails"
+        ] = field(
+            default_factory=list,
+            metadata={
+                "min_occurs": 0,
+                "max_occurs": 6,
+                "name": "airlineDistributionDetails",
+                "type": "Element",
+                "help": "Details of airline distribution at requested segment level",
+            },
+        )
+
+    @dataclass
+    class AirlineDistributionDetails:
+
+        requested_segment_ref: OriginAndDestinationRequestType = field(
+            default=None,
+            metadata={
+                "required": True,
+                "name": "requestedSegmentRef",
+                "type": "Element",
+                "help": "Indicates reference of the requested segment",
+            },
+        )
+        flight_info: TravelFlightInformationType = field(
+            default=None,
+            metadata={
+                "name": "flightInfo",
+                "type": "Element",
+                "help": "Specify Flight options.",
+            },
+        )
+
+    @dataclass
+    class FeeOption:
+
+        fee_type_info: SelectionDetailsType = field(
+            default=None,
+            metadata={
+                "required": True,
+                "name": "feeTypeInfo",
+                "type": "Element",
+                "help": "Nature of the fee (OB,OC,..)",
+            },
+        )
+        rate_tax: MonetaryInformationType80162S = field(
+            default=None,
+            metadata={
+                "name": "rateTax",
+                "type": "Element",
+                "help": "Associated rate tax.",
+            },
+        )
+        fee_details: List["FeeDetails"] = field(
+            default_factory=list,
+            metadata={
+                "min_occurs": 0,
+                "max_occurs": 99,
+                "name": "feeDetails",
+                "type": "Element",
+                "help": "Details for each fee.",
+            },
+        )
+
+    @dataclass
+    class FeeDetails:
+
+        fee_info: SpecificDataInformationType = field(
+            default=None,
+            metadata={
+                "required": True,
+                "name": "feeInfo",
+                "type": "Element",
+                "help": "Fee information",
+            },
+        )
+        associated_amounts: MonetaryInformationTypeI = field(
+            default=None,
+            metadata={
+                "name": "associatedAmounts",
+                "type": "Element",
+                "help": "Associated amounts : amounts to take into account to calculate fee.",
+            },
+        )
+        fee_description_grp: "FeeDescriptionGrp" = field(
+            default=None,
+            metadata={
+                "name": "feeDescriptionGrp",
+                "type": "Element",
+                "help": "Fee description",
+            },
+        )
+
+    @dataclass
+    class FeeDescriptionGrp:
+
+        item_number_info: ItemNumberType80866S = field(
+            default=None,
+            metadata={
+                "required": True,
+                "name": "itemNumberInfo",
+                "type": "Element",
+                "help": "Specification of the item number",
+            },
+        )
+        service_attributes_info: AttributeType61377S = field(
+            default=None,
+            metadata={
+                "name": "serviceAttributesInfo",
+                "type": "Element",
+                "help": "Attributes (SSR code EMD, RFIC, SSIM)",
+            },
+        )
+        service_description_info: SpecialRequirementsDetailsType = field(
+            default=None,
+            metadata={
+                "name": "serviceDescriptionInfo",
+                "type": "Element",
+                "help": "Other service information (service description, ...)",
+            },
+        )
+
+    @dataclass
+    class CombinationFareFamilies:
+
+        item_ffcnumber: ItemNumberType = field(
+            default=None,
+            metadata={
+                "required": True,
+                "name": "itemFFCNumber",
+                "type": "Element",
+                "help": "Specification of the item number",
+            },
+        )
+        nb_of_units: NumberOfUnitsType80154S = field(
+            default=None,
+            metadata={
+                "name": "nbOfUnits",
+                "type": "Element",
+                "help": "Number of units.",
+            },
+        )
+        reference_info: List[ReferenceInfoType] = field(
+            default_factory=list,
+            metadata={
+                "min_occurs": 0,
+                "max_occurs": 6,
+                "name": "referenceInfo",
+                "type": "Element",
+                "help": "Requested segment reference",
+            },
+        )
+
+    @dataclass
+    class TicketChangeInfo:
+
+        ticket_number_details: TicketNumberTypeI = field(
+            default=None,
+            metadata={
+                "required": True,
+                "name": "ticketNumberDetails",
+                "type": "Element",
+                "help": "Ticket nb details.",
+            },
+        )
+        ticket_requested_segments: List["TicketRequestedSegments"] = field(
+            default_factory=list,
+            metadata={
+                "min_occurs": 0,
+                "max_occurs": 6,
+                "name": "ticketRequestedSegments",
+                "type": "Element",
+                "help": "Changed ticket requested segments.",
+            },
+        )
+
+    @dataclass
+    class TicketRequestedSegments:
+
+        action_identification: ActionIdentificationType = field(
+            default=None,
+            metadata={
+                "required": True,
+                "name": "actionIdentification",
+                "type": "Element",
+                "help": "Action identification.",
+            },
+        )
+        connect_point_details: ConnectionTypeI = field(
+            default=None,
+            metadata={
+                "name": "connectPointDetails",
+                "type": "Element",
+                "help": "Connected cities in changed ticket requested segment.",
+            },
+        )
+
+    @dataclass
+    class Itinerary:
+
+        requested_segment_ref: OriginAndDestinationRequestType = field(
+            default=None,
+            metadata={
+                "required": True,
+                "name": "requestedSegmentRef",
+                "type": "Element",
+                "help": "Indicates reference of the requested segment",
+            },
+        )
+        departure_localization: DepartureLocationType = field(
+            default=None,
+            metadata={
+                "name": "departureLocalization",
+                "type": "Element",
+                "help": "Specification of the requested departure point",
+            },
+        )
+        arrival_localization: ArrivalLocalizationType = field(
+            default=None,
+            metadata={
+                "name": "arrivalLocalization",
+                "type": "Element",
+                "help": "Specification of the requested arrival point",
+            },
+        )
+        time_details: DateAndTimeInformationType181295S = field(
+            default=None,
+            metadata={
+                "name": "timeDetails",
+                "type": "Element",
+                "help": "Details on requested date and time plus range of date trip duration",
+            },
+        )
+        flight_info: TravelFlightInformationType165053S = field(
+            default=None,
+            metadata={
+                "name": "flightInfo",
+                "type": "Element",
+                "help": "Specify Flight options.",
+            },
+        )
+        family_information: FareFamilyType = field(
+            default=None,
+            metadata={
+                "name": "familyInformation",
+                "type": "Element",
+                "help": "Segment used to target Commercial Fare Family at requested segment level",
+            },
+        )
+        value_search: List[ValueSearchCriteriaType] = field(
+            default_factory=list,
+            metadata={
+                "min_occurs": 0,
+                "max_occurs": 99,
+                "name": "valueSearch",
+                "type": "Element",
+            },
+        )
+        group_of_flights: List["GroupOfFlights"] = field(
+            default_factory=list,
+            metadata={
+                "min_occurs": 0,
+                "max_occurs": 6,
+                "name": "groupOfFlights",
+                "type": "Element",
+                "help": "list of proposed segments per requested segment",
+            },
+        )
+        flight_info_pnr: List["FlightInfoPnr"] = field(
+            default_factory=list,
+            metadata={
+                "min_occurs": 0,
+                "max_occurs": 4,
+                "name": "flightInfoPNR",
+                "type": "Element",
+                "help": "Info concerning the flights booked in the PNR",
+            },
+        )
+        requested_segment_action: ActionIdentificationType = field(
+            default=None,
+            metadata={
+                "name": "requestedSegmentAction",
+                "type": "Element",
+                "help": "Action identification for the requested segment",
+            },
+        )
+        attributes: CodedAttributeType = field(
+            default=None,
+            metadata={
+                "name": "attributes",
+                "type": "Element",
+                "help": "Coded attributes",
+            },
+        )
+
+    @dataclass
+    class FlightInfoPnr:
+
+        travel_response_details: TravelProductInformationTypeI = field(
+            default=None,
+            metadata={
+                "required": True,
+                "name": "travelResponseDetails",
+                "type": "Element",
+                "help": "Travel Response Details: - Board/Off aiports - Flight number - Part of the journey - Day difference between Board and off - Departure/Arrival dates - Departure/Arrival times",
+            },
+        )
+        time_table_date: StructuredPeriodInformationType = field(
+            default=None,
+            metadata={
+                "name": "timeTableDate",
+                "type": "Element",
+                "help": "Time Table Effective/Discontinue dates and frequency of operating Travel Solution",
+            },
+        )
+        terminal_equipment_details: List[
+            AdditionalProductDetailsTypeI
+        ] = field(
+            default_factory=list,
+            metadata={
+                "min_occurs": 0,
+                "max_occurs": 2,
+                "name": "terminalEquipmentDetails",
+                "type": "Element",
+                "help": "Terminal, Equipment and EFT Details. If a Total EFT of the Travel Solution is requested then we will have 2 occurrences of the terminalEquipmentDetails attached to the first leg travelResponseDetails: the 1st occurrence will give the EFT of the leg, the 2nd occurrence will give the total EFT of the Travel Solution.",
+            },
+        )
+        codeshare_data: CommercialAgreementsType = field(
+            default=None,
+            metadata={
+                "name": "codeshareData",
+                "type": "Element",
+                "help": "Codeshare data",
+            },
+        )
+        disclosure: FreeTextInformationType = field(
+            default=None,
+            metadata={
+                "name": "disclosure",
+                "type": "Element",
+                "help": "Disclosure message from an operating carrier.",
+            },
+        )
+        stop_details: RoutingInformationTypeI = field(
+            default=None,
+            metadata={
+                "name": "stopDetails",
+                "type": "Element",
+                "help": "Stops Details",
+            },
+        )
+        traffic_restriction_data: TrafficRestrictionTypeI = field(
+            default=None,
+            metadata={
+                "name": "trafficRestrictionData",
+                "type": "Element",
+                "help": "Traffic restriction information",
+            },
+        )
+        reservation_info: PassengerItineraryInformationType = field(
+            default=None,
+            metadata={
+                "name": "reservationInfo",
+                "type": "Element",
+                "help": "PNR flight reservation info",
+            },
+        )
+        incidental_stop_info: List["IncidentalStopInfo"] = field(
+            default_factory=list,
+            metadata={
+                "min_occurs": 0,
+                "max_occurs": 8,
+                "name": "incidentalStopInfo",
+                "type": "Element",
+                "help": "Incidental stop information.",
+            },
+        )
+
+    @dataclass
+    class IncidentalStopInfo:
+
+        date_time_info: DateAndTimeInformationTypeI = field(
+            default=None,
+            metadata={
+                "required": True,
+                "name": "dateTimeInfo",
+                "type": "Element",
+                "help": "Incidental stop date/time information",
+            },
+        )
+
+    @dataclass
+    class GroupOfFlights:
+
+        prop_flight_gr_detail: ProposedSegmentType = field(
+            default=None,
+            metadata={
+                "required": True,
+                "name": "propFlightGrDetail",
+                "type": "Element",
+                "help": "To indicate parameters for proposed flight group.",
+            },
+        )
+        price_to_beat: MonetaryInformationType = field(
+            default=None,
+            metadata={
+                "name": "priceToBeat",
+                "type": "Element",
+                "help": "Indicates Price to beat",
+            },
+        )
+        flight_details: List["FlightDetails"] = field(
+            default_factory=list,
+            metadata={
+                "min_occurs": 1,
+                "max_occurs": 4,
+                "name": "flightDetails",
+                "type": "Element",
+                "help": "list of flight per proposed segment",
+            },
+        )
+
+    @dataclass
+    class FlightDetails:
+
+        flight_information: TravelProductType = field(
+            default=None,
+            metadata={
+                "required": True,
+                "name": "flightInformation",
+                "type": "Element",
+                "help": "Specification of details on the flight and posting availability",
+            },
+        )
+        avl_info: List[FlightProductInformationType] = field(
+            default_factory=list,
+            metadata={
+                "min_occurs": 0,
+                "max_occurs": 6,
+                "name": "avlInfo",
+                "type": "Element",
+                "help": "returns booking class and availability context",
+            },
+        )
+        technical_stop: List[DateAndTimeInformationType] = field(
+            default_factory=list,
+            metadata={
+                "min_occurs": 0,
+                "max_occurs": 5,
+                "name": "technicalStop",
+                "type": "Element",
+                "help": "Details on Flight date, time and location of technical stop or change of gauge",
+            },
+        )
+        commercial_agreement: CommercialAgreementsType78540S = field(
+            default=None,
+            metadata={
+                "name": "commercialAgreement",
+                "type": "Element",
+                "help": "Code Share Agreement description for current flight.",
+            },
+        )
+        add_info: HeaderInformationTypeI = field(
+            default=None,
+            metadata={
+                "name": "addInfo",
+                "type": "Element",
+                "help": "Additional Info about flight, such as Reference number, and several options",
+            },
+        )
+        terminal_equipment_details: List[
+            AdditionalProductDetailsTypeI
+        ] = field(
+            default_factory=list,
+            metadata={
+                "min_occurs": 0,
+                "max_occurs": 2,
+                "name": "terminalEquipmentDetails",
+                "type": "Element",
+                "help": "Terminal, Equipment and EFT Details. If a Total EFT of the Travel Solution is requested then we will have 2 occurrences of the terminalEquipmentDetails attached to the first leg flightInformation: the 1st occurence will give the EFT of the leg, the 2nd occurrence will give the total EFT of the Travel Solution.",
+            },
+        )
+        reservation_info: PassengerItineraryInformationType = field(
+            default=None,
+            metadata={
+                "name": "reservationInfo",
+                "type": "Element",
+                "help": "PNR flight reservation info",
+            },
+        )
+        price_to_beat: MonetaryInformationType = field(
+            default=None,
+            metadata={
+                "name": "priceToBeat",
+                "type": "Element",
+                "help": "Indicates Price to beat",
+            },
+        )
+
+    @dataclass
+    class Buckets:
+
+        bucket_info: BucketInformationType = field(
+            default=None,
+            metadata={
+                "required": True,
+                "name": "bucketInfo",
+                "type": "Element",
+                "help": "Bucket information: name, priority, weight",
+            },
+        )
+        bucket_details: List[BucketDetailsType] = field(
+            default_factory=list,
+            metadata={
+                "min_occurs": 0,
+                "max_occurs": 15,
+                "name": "bucketDetails",
+                "type": "Element",
+                "help": "Bucket details",
+            },
+        )
+
+    @dataclass
+    class FareOptions:
+
+        pricing_tick_info: PricingTicketingDetailsType = field(
+            default=None,
+            metadata={
+                "required": True,
+                "name": "pricingTickInfo",
+                "type": "Element",
+                "help": "Pricing and ticketing details.",
+            },
+        )
+        corporate: CorporateIdentificationType = field(
+            default=None,
+            metadata={
+                "name": "corporate",
+                "type": "Element",
+                "help": "Corporate name/number used to target fares",
+            },
+        )
+        ticketing_price_scheme: TicketingPriceSchemeType = field(
+            default=None,
+            metadata={
+                "name": "ticketingPriceScheme",
+                "type": "Element",
+                "help": "Ticketing price scheme.",
+            },
+        )
+        fee_id_description: CodedAttributeType197696S = field(
+            default=None,
+            metadata={
+                "name": "feeIdDescription",
+                "type": "Element",
+                "help": "PSR number",
+            },
+        )
+        conversion_rate: ConversionRateType = field(
+            default=None,
+            metadata={
+                "name": "conversionRate",
+                "type": "Element",
+                "help": "Used to force the currency of pricing",
+            },
+        )
+        form_of_payment: FormOfPaymentTypeI = field(
+            default=None,
+            metadata={
+                "name": "formOfPayment",
+                "type": "Element",
+                "help": "Form of payment information.",
+            },
+        )
+        frequent_traveller_info: FrequentTravellerIdentificationCodeType177150S = field(
+            default=None,
+            metadata={
+                "name": "frequentTravellerInfo",
+                "type": "Element",
+                "help": "Frequent traveller information",
+            },
+        )
+        monetary_cabin_info: MonetaryAndCabinInformationType = field(
+            default=None,
+            metadata={
+                "name": "monetaryCabinInfo",
+                "type": "Element",
+                "help": "Monetary and cabin information.",
+            },
+        )
+
+    @dataclass
+    class FareFamilies:
+
+        family_information: FareFamilyType80157S = field(
+            default=None,
+            metadata={
+                "required": True,
+                "name": "familyInformation",
+                "type": "Element",
+                "help": "Segment used to target Commercial Fare Family.",
+            },
+        )
+        family_criteria: FareFamilyCriteriaType = field(
+            default=None,
+            metadata={
+                "name": "familyCriteria",
+                "type": "Element",
+                "help": "Description of Fare Family Criteria.",
+            },
+        )
+        fare_family_segment: List["FareFamilySegment"] = field(
+            default_factory=list,
+            metadata={
+                "min_occurs": 0,
+                "max_occurs": 6,
+                "name": "fareFamilySegment",
+                "type": "Element",
+                "help": "Fare family requested segment details.",
+            },
+        )
+        other_possible_criteria: List["OtherPossibleCriteria"] = field(
+            default_factory=list,
+            metadata={
+                "min_occurs": 0,
+                "max_occurs": 20,
+                "name": "otherPossibleCriteria",
+                "type": "Element",
+                "help": "Description of other possible fare family criteria.",
+            },
+        )
+
+    @dataclass
+    class OtherPossibleCriteria:
+
+        logical_link: BooleanExpressionRuleType = field(
+            default=None,
+            metadata={
+                "required": True,
+                "name": "logicalLink",
+                "type": "Element",
+                "help": "Logical link with other criteria.",
+            },
+        )
+        family_criteria: FareFamilyCriteriaType = field(
+            default=None,
+            metadata={
+                "name": "familyCriteria",
+                "type": "Element",
+                "help": "Description of fare family criteria.",
+            },
+        )
+        fare_family_segment: List["FareFamilySegment"] = field(
+            default_factory=list,
+            metadata={
+                "min_occurs": 0,
+                "max_occurs": 6,
+                "name": "fareFamilySegment",
+                "type": "Element",
+                "help": "Fare family requested segment details.",
+            },
+        )
+
+    @dataclass
+    class FareFamilySegment:
+
+        reference_info: ReferenceInfoType = field(
+            default=None,
+            metadata={
+                "required": True,
+                "name": "referenceInfo",
+                "type": "Element",
+                "help": "Requested segment reference",
+            },
+        )
+        family_criteria: FareFamilyCriteriaType = field(
+            default=None,
+            metadata={
+                "name": "familyCriteria",
+                "type": "Element",
+                "help": "Description of fare family criteria.",
+            },
+        )
+
+    @dataclass
+    class FareFamilySegment:
+
+        reference_info: ReferenceInfoType = field(
+            default=None,
+            metadata={
+                "required": True,
+                "name": "referenceInfo",
+                "type": "Element",
+                "help": "Requested segment reference",
+            },
+        )
+        family_criteria: FareFamilyCriteriaType = field(
+            default=None,
+            metadata={
+                "name": "familyCriteria",
+                "type": "Element",
+                "help": "Description of fare family criteria.",
+            },
+        )

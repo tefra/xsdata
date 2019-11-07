@@ -6,6 +6,7 @@ from typing import Any, List, Optional
 class Attr:
     name: str
     type: str
+    forward_ref: bool = field(default=False)
     metadata: dict = field(default_factory=dict)
     default: Optional[Any] = field(default=None)
 
@@ -25,3 +26,4 @@ class Class:
     help: Optional[str] = field(default=None)
     extends: Optional[str] = field(default=None)
     attrs: List[Attr] = field(default_factory=list)
+    inner: List["Class"] = field(default_factory=list)

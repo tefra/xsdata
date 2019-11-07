@@ -9,6 +9,14 @@ class Attr:
     metadata: dict = field(default_factory=dict)
     default: Optional[Any] = field(default=None)
 
+    def __post_init__(self):
+        if self.metadata.get("help") is None:
+            del self.metadata["help"]
+
+    @property
+    def is_list(self):
+        return "min_occurs" in self.metadata and "max_occurs" in self.metadata
+
 
 @dataclass
 class Class:

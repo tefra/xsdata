@@ -1,4 +1,5 @@
 from dataclasses import dataclass, field
+from typing import List
 
 
 @dataclass
@@ -43,8 +44,7 @@ class AirExchangeEligibilityReq(CommonBaseReq):
     provider_reservation_info: ProviderReservationInfoType3 = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "ProviderReservationInfo",
             "type": "Element",
             "help": "Provider:1P - Represents a valid Provider Reservation/PNR whose itinerary is to be exchanged",
@@ -66,11 +66,9 @@ class AirExchangeEligibilityRsp(CommonBaseRsp):
     exchange_eligibility_info: ExchangeEligibilityInfo = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "ExchangeEligibilityInfo",
             "type": "Element",
-            "help": None,
         },
     )
 
@@ -78,18 +76,17 @@ class AirExchangeEligibilityRsp(CommonBaseRsp):
 @dataclass
 class AirExchangeQuoteRsp(CommonBaseRsp):
 
-    ticket_number: TicketNumber = field(
-        default=None,
+    ticket_number: List[TicketNumber] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 999,
             "name": "TicketNumber",
             "type": "Element",
-            "help": None,
         },
     )
-    air_pricing_solution: AirPricingSolution = field(
-        default=None,
+    air_pricing_solution: List[AirPricingSolution] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 1,
             "max_occurs": 999,
@@ -100,16 +97,10 @@ class AirExchangeQuoteRsp(CommonBaseRsp):
     )
     air_exchange_bundle_total: AirExchangeBundleTotal = field(
         default=None,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
-            "name": "AirExchangeBundleTotal",
-            "type": "Element",
-            "help": None,
-        },
+        metadata={"name": "AirExchangeBundleTotal", "type": "Element"},
     )
-    air_exchange_bundle: AirExchangeBundle = field(
-        default=None,
+    air_exchange_bundle: List[AirExchangeBundle] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 999,
@@ -118,8 +109,8 @@ class AirExchangeQuoteRsp(CommonBaseRsp):
             "help": "Bundle exchange, pricing, and penalty information. Providers ACH/1G/1V/1P",
         },
     )
-    host_token: HostToken = field(
-        default=None,
+    host_token: List[HostToken] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 999,
@@ -131,15 +122,13 @@ class AirExchangeQuoteRsp(CommonBaseRsp):
     optional_services: OptionalServices = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "OptionalServices",
             "type": "Element",
             "help": "Provider: ACH.",
         },
     )
-    fare_rule: FareRule = field(
-        default=None,
+    fare_rule: List[FareRule] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 999,
@@ -157,25 +146,23 @@ class AirExchangeReq(CommonBaseReq):
     air_reservation_locator_code: AirReservationLocatorCode = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "AirReservationLocatorCode",
             "type": "Element",
             "help": "Identifies the PNR locator code. Providers ACH/1G/1V/1P",
         },
     )
-    ticket_number: TicketNumber = field(
-        default=None,
+    ticket_number: List[TicketNumber] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 999,
             "name": "TicketNumber",
             "type": "Element",
-            "help": None,
         },
     )
-    specific_seat_assignment: SpecificSeatAssignment = field(
-        default=None,
+    specific_seat_assignment: List[SpecificSeatAssignment] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 999,
@@ -184,8 +171,8 @@ class AirExchangeReq(CommonBaseReq):
             "help": "Identifies the standard seat. Providers ACH/1G/1V/1P",
         },
     )
-    air_pricing_solution: AirPricingSolution = field(
-        default=None,
+    air_pricing_solution: List[AirPricingSolution] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 1,
             "max_occurs": 999,
@@ -197,8 +184,6 @@ class AirExchangeReq(CommonBaseReq):
     air_exchange_modifiers: AirExchangeModifiers = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "AirExchangeModifiers",
             "type": "Element",
             "help": "Provider: ACH.",
@@ -207,15 +192,13 @@ class AirExchangeReq(CommonBaseReq):
     air_exchange_bundle_total: AirExchangeBundleTotal = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "AirExchangeBundleTotal",
             "type": "Element",
             "help": "Provider: 1G/1V/1P/1S/1A.",
         },
     )
-    air_exchange_bundle: AirExchangeBundle = field(
-        default=None,
+    air_exchange_bundle: List[AirExchangeBundle] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 999,
@@ -224,8 +207,8 @@ class AirExchangeReq(CommonBaseReq):
             "help": "Bundle exchange, pricing, and penalty information. Providers ACH/1G/1V/1P.",
         },
     )
-    host_token: HostToken = field(
-        default=None,
+    host_token: List[HostToken] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 999,
@@ -237,8 +220,6 @@ class AirExchangeReq(CommonBaseReq):
     optional_services: OptionalServices = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "OptionalServices",
             "type": "Element",
             "help": "Provider: ACH.",
@@ -247,8 +228,6 @@ class AirExchangeReq(CommonBaseReq):
     form_of_payment: FormOfPayment = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "FormOfPayment",
             "type": "Element",
             "help": "Form of Payment for any additional collection charges for the Exchange. For ACH, most carriers will only allow refund amounts to the original form of payment. Providers ACH/1G/1V/1P",
@@ -257,15 +236,13 @@ class AirExchangeReq(CommonBaseReq):
     form_of_payment_ref: FormOfPaymentRef = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "FormOfPaymentRef",
             "type": "Element",
             "help": "Provider: ACH-Universal Record reference to Form of Payment for any Additional Collection charges or Refund due for the itinerary exchange",
         },
     )
-    ssrinfo: Ssrinfo = field(
-        default=None,
+    ssrinfo: List[Ssrinfo] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 999,
@@ -277,8 +254,6 @@ class AirExchangeReq(CommonBaseReq):
     add_svc: AddSvc = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "AddSvc",
             "type": "Element",
             "help": "1P - Add SVC segments to collect additional fee",
@@ -297,18 +272,17 @@ class AirExchangeReq(CommonBaseReq):
 @dataclass
 class AirExchangeRsp(CommonBaseRsp):
 
-    ticket_number: TicketNumber = field(
-        default=None,
+    ticket_number: List[TicketNumber] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 999,
             "name": "TicketNumber",
             "type": "Element",
-            "help": None,
         },
     )
-    booking_traveler: BookingTraveler = field(
-        default=None,
+    booking_traveler: List[BookingTraveler] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 999,
@@ -320,15 +294,13 @@ class AirExchangeRsp(CommonBaseRsp):
     air_reservation: TypeAirReservationWithFop = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "AirReservation",
             "type": "Element",
             "help": "Provider: ACH.",
         },
     )
-    exchange_failure_info: TypeTicketFailureInfo = field(
-        default=None,
+    exchange_failure_info: List[TypeTicketFailureInfo] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 999,
@@ -346,8 +318,7 @@ class AirExchangeTicketingReq(CommonBaseReq):
     air_reservation_locator_code: AirReservationLocatorCode = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "AirReservationLocatorCode",
             "type": "Element",
             "help": "Identifies the PNR to ticket. Providers 1G, 1V, 1P.",
@@ -356,15 +327,14 @@ class AirExchangeTicketingReq(CommonBaseReq):
     ticket_number: TicketNumber = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "TicketNumber",
             "type": "Element",
             "help": "Ticket number to reissue. Providers 1G, 1V, 1P.",
         },
     )
-    ticketing_modifiers_ref: TypeTicketingModifiersRef = field(
-        default=None,
+    ticketing_modifiers_ref: List[TypeTicketingModifiersRef] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 999,
@@ -374,17 +344,10 @@ class AirExchangeTicketingReq(CommonBaseReq):
         },
     )
     waiver_code: WaiverCode = field(
-        default=None,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
-            "name": "WaiverCode",
-            "type": "Element",
-            "help": None,
-        },
+        default=None, metadata={"name": "WaiverCode", "type": "Element"}
     )
-    detailed_billing_information: DetailedBillingInformation = field(
-        default=None,
+    detailed_billing_information: List[DetailedBillingInformation] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 999,
@@ -393,8 +356,8 @@ class AirExchangeTicketingReq(CommonBaseReq):
             "help": "Providers 1G, 1V, 1P.",
         },
     )
-    air_ticketing_modifiers: AirTicketingModifiers = field(
-        default=None,
+    air_ticketing_modifiers: List[AirTicketingModifiers] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 999,
@@ -427,19 +390,11 @@ class AirExchangeTicketingRsp(CommonBaseRsp):
 
     air_solution_changed_info: AirSolutionChangedInfo = field(
         default=None,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
-            "name": "AirSolutionChangedInfo",
-            "type": "Element",
-            "help": None,
-        },
+        metadata={"name": "AirSolutionChangedInfo", "type": "Element"},
     )
     etr: Etr = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "ETR",
             "type": "Element",
             "help": "Provider 1G, 1V, 1P.",
@@ -448,8 +403,6 @@ class AirExchangeTicketingRsp(CommonBaseRsp):
     ticket_failure_info: TicketFailureInfo = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "TicketFailureInfo",
             "type": "Element",
             "help": "Provider 1G, 1V, 1P.",
@@ -458,8 +411,6 @@ class AirExchangeTicketingRsp(CommonBaseRsp):
     detailed_billing_information: DetailedBillingInformation = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "DetailedBillingInformation",
             "type": "Element",
             "help": "Providers 1G, 1V, 1P.",
@@ -471,8 +422,8 @@ class AirExchangeTicketingRsp(CommonBaseRsp):
 class AirFareDisplayReq(CommonBaseReq):
     """Request to display a tariff for based on origin, destination, and other options"""
 
-    fare_type: FareType = field(
-        default=None,
+    fare_type: List[FareType] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 5,
@@ -481,8 +432,8 @@ class AirFareDisplayReq(CommonBaseReq):
             "help": "Provider: 1G,1V,1P,1J.",
         },
     )
-    passenger_type: TypePassengerType = field(
-        default=None,
+    passenger_type: List[TypePassengerType] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 999,
@@ -491,8 +442,8 @@ class AirFareDisplayReq(CommonBaseReq):
             "help": "Provider: 1G,1V,1P,1J.",
         },
     )
-    booking_code: BookingCode = field(
-        default=None,
+    booking_code: List[BookingCode] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 5,
@@ -504,8 +455,6 @@ class AirFareDisplayReq(CommonBaseReq):
     include_addl_booking_code_info: IncludeAddlBookingCodeInfo = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "IncludeAddlBookingCodeInfo",
             "type": "Element",
             "help": "Provider: 1G,1V,1P,1J.",
@@ -514,15 +463,13 @@ class AirFareDisplayReq(CommonBaseReq):
     fare_basis: FareBasis = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "FareBasis",
             "type": "Element",
             "help": "Provider: 1G,1V,1P,1J.",
         },
     )
-    carrier: Carrier = field(
-        default=None,
+    carrier: List[Carrier] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 10,
@@ -531,8 +478,8 @@ class AirFareDisplayReq(CommonBaseReq):
             "help": "Provider: 1G,1V,1P,1J.",
         },
     )
-    account_code: AccountCode = field(
-        default=None,
+    account_code: List[AccountCode] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 5,
@@ -544,8 +491,6 @@ class AirFareDisplayReq(CommonBaseReq):
     contract_code: ContractCode = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "ContractCode",
             "type": "Element",
             "help": "Provider: 1G,1V.",
@@ -554,15 +499,13 @@ class AirFareDisplayReq(CommonBaseReq):
     air_fare_display_modifiers: AirFareDisplayModifiers = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "AirFareDisplayModifiers",
             "type": "Element",
             "help": "Provider: 1G,1V,1P,1J.",
         },
     )
-    point_of_sale: PointOfSale = field(
-        default=None,
+    point_of_sale: List[PointOfSale] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 5,
@@ -574,8 +517,6 @@ class AirFareDisplayReq(CommonBaseReq):
     air_fare_display_rule_key: AirFareDisplayRuleKey = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "AirFareDisplayRuleKey",
             "type": "Element",
             "help": "Provider: 1G,1V,1P,1J.",
@@ -584,6 +525,7 @@ class AirFareDisplayReq(CommonBaseReq):
     origin: TypeIatacode = field(
         default=None,
         metadata={
+            "required": True,
             "name": "Origin",
             "type": "Attribute",
             "help": "Provider: 1G,1V,1P,1J.",
@@ -592,6 +534,7 @@ class AirFareDisplayReq(CommonBaseReq):
     destination: TypeIatacode = field(
         default=None,
         metadata={
+            "required": True,
             "name": "Destination",
             "type": "Attribute",
             "help": "Provider: 1G,1V,1P,1J.",
@@ -600,6 +543,7 @@ class AirFareDisplayReq(CommonBaseReq):
     provider_code: TypeProviderCode = field(
         default=None,
         metadata={
+            "required": True,
             "name": "ProviderCode",
             "type": "Attribute",
             "help": "Provider: 1G,1V,1P,1J.",
@@ -651,8 +595,8 @@ class AirFareDisplayReq(CommonBaseReq):
 class AirFareDisplayRsp(CommonBaseRsp):
     """Response to an AirFareDisplayReq"""
 
-    fare_display: FareDisplay = field(
-        default=None,
+    fare_display: List[FareDisplay] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 999,
@@ -667,8 +611,8 @@ class AirFareDisplayRsp(CommonBaseRsp):
 class AirFareRulesRsp(CommonBaseRsp):
     """Response to an AirFareRuleReq."""
 
-    fare_rule: FareRule = field(
-        default=None,
+    fare_rule: List[FareRule] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 999,
@@ -686,31 +630,25 @@ class AirMerchandisingDetailsReq(CommonBaseReq):
     merchandising_details: MerchandisingDetails = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "MerchandisingDetails",
             "type": "Element",
-            "help": None,
         },
     )
     optional_service_modifiers: OptionalServiceModifiers = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "OptionalServiceModifiers",
             "type": "Element",
-            "help": None,
         },
     )
     merchandising_availability_details: MerchandisingAvailabilityDetails = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "MerchandisingAvailabilityDetails",
             "type": "Element",
-            "help": None,
         },
     )
 
@@ -722,8 +660,6 @@ class AirMerchandisingOfferAvailabilityReq(CommonBaseReq):
     agency_sell_info: AgencySellInfo = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "AgencySellInfo",
             "type": "Element",
             "help": "Provider: 1G,1V,1P,1J,ACH.",
@@ -732,15 +668,13 @@ class AirMerchandisingOfferAvailabilityReq(CommonBaseReq):
     air_solution: AirSolution = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "AirSolution",
             "type": "Element",
             "help": "Provider: 1G,1V,1P,1J,ACH.",
         },
     )
-    host_reservation: HostReservation = field(
-        default=None,
+    host_reservation: List[HostReservation] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 999,
@@ -749,8 +683,8 @@ class AirMerchandisingOfferAvailabilityReq(CommonBaseReq):
             "help": "Provider: 1G,1V,1P,1J,ACH.",
         },
     )
-    offer_availability_modifiers: OfferAvailabilityModifiers = field(
-        default=None,
+    offer_availability_modifiers: List[OfferAvailabilityModifiers] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 999,
@@ -762,8 +696,6 @@ class AirMerchandisingOfferAvailabilityReq(CommonBaseReq):
     merchandising_pricing_modifiers: MerchandisingPricingModifiers = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "MerchandisingPricingModifiers",
             "type": "Element",
             "help": "Used to provide additional pricing modifiers. Provider:ACH.",
@@ -778,8 +710,7 @@ class AirMerchandisingOfferAvailabilityRsp(CommonBaseRsp):
     air_solution: AirSolution = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "AirSolution",
             "type": "Element",
             "help": "Provider: 1G,1V,1P,1J,ACH.",
@@ -788,32 +719,16 @@ class AirMerchandisingOfferAvailabilityRsp(CommonBaseRsp):
     remark: Remark = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "Remark",
             "type": "Element",
             "help": "Provider: 1G,1V,1P,1J,ACH.",
         },
     )
     optional_services: OptionalServices = field(
-        default=None,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
-            "name": "OptionalServices",
-            "type": "Element",
-            "help": None,
-        },
+        default=None, metadata={"name": "OptionalServices", "type": "Element"}
     )
     embargo_list: EmbargoList = field(
-        default=None,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
-            "name": "EmbargoList",
-            "type": "Element",
-            "help": None,
-        },
+        default=None, metadata={"name": "EmbargoList", "type": "Element"}
     )
 
 
@@ -821,8 +736,8 @@ class AirMerchandisingOfferAvailabilityRsp(CommonBaseRsp):
 class AirPrePayRsp(CommonBaseRsp):
     """Flight Pass Response."""
 
-    pre_pay_profile_info: PrePayProfileInfo = field(
-        default=None,
+    pre_pay_profile_info: List[PrePayProfileInfo] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 1,
             "max_occurs": 999,
@@ -861,19 +776,18 @@ class AirPrePayRsp(CommonBaseRsp):
 class AirPricingInfoRefType13:
     """Inner ComplexType name auto generated"""
 
-    booking_traveler_ref: BookingTravelerRef = field(
-        default=None,
+    booking_traveler_ref: List[BookingTravelerRef] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 9,
             "name": "BookingTravelerRef",
             "type": "Element",
-            "help": None,
         },
     )
     key: TypeRef = field(
         default=None,
-        metadata={"name": "Key", "type": "Attribute", "help": None},
+        metadata={"required": True, "name": "Key", "type": "Attribute"},
     )
 
 
@@ -881,8 +795,8 @@ class AirPricingInfoRefType13:
 class AirRefundQuoteReq(CommonBaseReq):
     """Request to quote a refund for an itinerary"""
 
-    ticket_number: TicketNumber = field(
-        default=None,
+    ticket_number: List[TicketNumber] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 999,
@@ -891,8 +805,8 @@ class AirRefundQuoteReq(CommonBaseReq):
             "help": "Provider: ACH.",
         },
     )
-    tcrnumber: TypeTcrnumber = field(
-        default=None,
+    tcrnumber: List[TypeTcrnumber] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 999,
@@ -904,15 +818,13 @@ class AirRefundQuoteReq(CommonBaseReq):
     air_refund_modifiers: AirRefundModifiers = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "AirRefundModifiers",
             "type": "Element",
             "help": "Provider: ACH.",
         },
     )
-    host_token: HostToken = field(
-        default=None,
+    host_token: List[HostToken] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 999,
@@ -921,8 +833,8 @@ class AirRefundQuoteReq(CommonBaseReq):
             "help": "Provider: ACH.",
         },
     )
-    provider_reservation_info: ProviderReservationInfoType12 = field(
-        default=None,
+    provider_reservation_info: List[ProviderReservationInfoType12] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 999,
@@ -944,18 +856,17 @@ class AirRefundQuoteReq(CommonBaseReq):
 @dataclass
 class AirRefundQuoteRsp(CommonBaseRsp):
 
-    air_refund_bundle: AirRefundBundle = field(
-        default=None,
+    air_refund_bundle: List[AirRefundBundle] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 999,
             "name": "AirRefundBundle",
             "type": "Element",
-            "help": None,
         },
     )
-    tcrrefund_bundle: TcrrefundBundle = field(
-        default=None,
+    tcrrefund_bundle: List[TcrrefundBundle] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 999,
@@ -970,8 +881,8 @@ class AirRefundQuoteRsp(CommonBaseRsp):
 class AirRefundReq(CommonBaseReq):
     """Request to refund an itinerary for the amount previously quoted"""
 
-    air_refund_bundle: AirRefundBundle = field(
-        default=None,
+    air_refund_bundle: List[AirRefundBundle] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 999,
@@ -980,8 +891,8 @@ class AirRefundReq(CommonBaseReq):
             "help": "Provider: ACH.",
         },
     )
-    tcrrefund_bundle: TcrrefundBundle = field(
-        default=None,
+    tcrrefund_bundle: List[TcrrefundBundle] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 999,
@@ -992,16 +903,10 @@ class AirRefundReq(CommonBaseReq):
     )
     air_refund_modifiers: AirRefundModifiers = field(
         default=None,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
-            "name": "AirRefundModifiers",
-            "type": "Element",
-            "help": None,
-        },
+        metadata={"name": "AirRefundModifiers", "type": "Element"},
     )
-    commission: Commission = field(
-        default=None,
+    commission: List[Commission] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 9,
@@ -1013,8 +918,6 @@ class AirRefundReq(CommonBaseReq):
     form_of_payment: FormOfPayment = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "FormOfPayment",
             "type": "Element",
             "help": "Provider: ACH-Form of Payment for any Additional Collection charges for the Refund.",
@@ -1025,8 +928,8 @@ class AirRefundReq(CommonBaseReq):
 @dataclass
 class AirRefundRsp(CommonBaseRsp):
 
-    etr: Etr = field(
-        default=None,
+    etr: List[Etr] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 999,
@@ -1035,8 +938,8 @@ class AirRefundRsp(CommonBaseRsp):
             "help": "Provider: ACH.",
         },
     )
-    tcr: Tcr = field(
-        default=None,
+    tcr: List[Tcr] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 999,
@@ -1045,8 +948,8 @@ class AirRefundRsp(CommonBaseRsp):
             "help": "Provider: ACH.",
         },
     )
-    refund_failure_info: TypeTicketFailureInfo = field(
-        default=None,
+    refund_failure_info: List[TypeTicketFailureInfo] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 999,
@@ -1063,21 +966,18 @@ class AirRepriceRsp(CommonBaseRsp):
     air_pricing_solution: AirPricingSolution = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "AirPricingSolution",
             "type": "Element",
-            "help": None,
         },
     )
-    fare_rule: FareRule = field(
-        default=None,
+    fare_rule: List[FareRule] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 999,
             "name": "FareRule",
             "type": "Element",
-            "help": None,
         },
     )
 
@@ -1086,19 +986,19 @@ class AirRepriceRsp(CommonBaseRsp):
 class AirReservationSelectorType11:
     """Inner ComplexType name auto generated"""
 
-    fare_info_ref: FareInfoRef = field(
-        default=None,
+    fare_info_ref: List[FareInfoRef] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 999,
             "name": "FareInfoRef",
             "type": "Element",
-            "help": None,
         },
     )
     air_reservation_locator_code: TypeLocatorCode = field(
         default=None,
         metadata={
+            "required": True,
             "name": "AirReservationLocatorCode",
             "type": "Attribute",
             "help": "The Air Reservation locator code which is an unique identifier for the reservation",
@@ -1113,15 +1013,13 @@ class AirRetrieveDocumentReq(CommonBaseReq):
     air_reservation_locator_code: AirReservationLocatorCode = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "AirReservationLocatorCode",
             "type": "Element",
             "help": "Provider: 1G,1V,1P,1J.",
         },
     )
-    ticket_number: TicketNumber = field(
-        default=None,
+    ticket_number: List[TicketNumber] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 999,
@@ -1130,8 +1028,8 @@ class AirRetrieveDocumentReq(CommonBaseReq):
             "help": "Provider: 1G,1V,1P,1J.",
         },
     )
-    tcrnumber: TypeTcrnumber = field(
-        default=None,
+    tcrnumber: List[TypeTcrnumber] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 999,
@@ -1169,8 +1067,8 @@ class AirRetrieveDocumentReq(CommonBaseReq):
 @dataclass
 class AirRetrieveDocumentRsp(CommonBaseRsp):
 
-    etr: Etr = field(
-        default=None,
+    etr: List[Etr] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 999,
@@ -1179,8 +1077,8 @@ class AirRetrieveDocumentRsp(CommonBaseRsp):
             "help": "Provider: 1G,1V,1P,1J.",
         },
     )
-    mco: Mco = field(
-        default=None,
+    mco: List[Mco] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 999,
@@ -1189,8 +1087,8 @@ class AirRetrieveDocumentRsp(CommonBaseRsp):
             "help": "Provider: 1G,1V,1P,1J.",
         },
     )
-    tcr: Tcr = field(
-        default=None,
+    tcr: List[Tcr] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 999,
@@ -1199,8 +1097,8 @@ class AirRetrieveDocumentRsp(CommonBaseRsp):
             "help": "Provider: 1G,1V,1P,1J.",
         },
     )
-    document_failure_info: TypeFailureInfo = field(
-        default=None,
+    document_failure_info: List[TypeFailureInfo] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 999,
@@ -1209,8 +1107,8 @@ class AirRetrieveDocumentRsp(CommonBaseRsp):
             "help": "Provider: 1G,1V,1P,1J-Will be optionally returned if there are duplicate ticket numbers.",
         },
     )
-    service_fee_info: ServiceFeeInfo = field(
-        default=None,
+    service_fee_info: List[ServiceFeeInfo] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 99,
@@ -1235,16 +1133,10 @@ class AirTicketingRsp(CommonBaseRsp):
 
     air_solution_changed_info: AirSolutionChangedInfo = field(
         default=None,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
-            "name": "AirSolutionChangedInfo",
-            "type": "Element",
-            "help": None,
-        },
+        metadata={"name": "AirSolutionChangedInfo", "type": "Element"},
     )
-    etr: Etr = field(
-        default=None,
+    etr: List[Etr] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 999,
@@ -1253,8 +1145,8 @@ class AirTicketingRsp(CommonBaseRsp):
             "help": "Provider: 1G,1V,1P,1J.",
         },
     )
-    ticket_failure_info: TicketFailureInfo = field(
-        default=None,
+    ticket_failure_info: List[TicketFailureInfo] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 999,
@@ -1263,8 +1155,8 @@ class AirTicketingRsp(CommonBaseRsp):
             "help": "Provider: 1G,1V,1P,1J.",
         },
     )
-    detailed_billing_information: DetailedBillingInformation = field(
-        default=None,
+    detailed_billing_information: List[DetailedBillingInformation] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 999,
@@ -1282,15 +1174,13 @@ class AirVoidDocumentReq(CommonBaseReq):
     air_reservation_locator_code: AirReservationLocatorCode = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "AirReservationLocatorCode",
             "type": "Element",
             "help": "Provider: 1G,1V.",
         },
     )
-    void_document_info: VoidDocumentInfo = field(
-        default=None,
+    void_document_info: List[VoidDocumentInfo] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 999,
@@ -1337,8 +1227,8 @@ class AirVoidDocumentReq(CommonBaseReq):
 class AirVoidDocumentRsp(CommonBaseRsp):
     """Result of void ticket request. Includes ticket number of voided tickets and air segments with updated status."""
 
-    etr: Etr = field(
-        default=None,
+    etr: List[Etr] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 999,
@@ -1347,8 +1237,8 @@ class AirVoidDocumentRsp(CommonBaseRsp):
             "help": "Provider: 1G,1V.",
         },
     )
-    void_result_info: VoidResultInfo = field(
-        default=None,
+    void_result_info: List[VoidResultInfo] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 1,
             "max_occurs": 999,
@@ -1362,113 +1252,84 @@ class AirVoidDocumentRsp(CommonBaseRsp):
 @dataclass
 class BaseAirExchangeMultiQuoteReq(CommonBaseCoreReq):
 
-    ticket_number: TicketNumber = field(
-        default=None,
+    ticket_number: List[TicketNumber] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 999,
             "name": "TicketNumber",
             "type": "Element",
-            "help": None,
         },
     )
     provider_reservation_info: ProviderReservationInfoType1 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "ProviderReservationInfo",
             "type": "Element",
             "help": "Provider: 1P - Represents a valid Provider Reservation/PNR whose itinerary is to be exchanged",
         },
     )
-    air_pricing_solution: AirPricingSolution = field(
-        default=None,
+    air_pricing_solution: List[AirPricingSolution] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 2,
             "name": "AirPricingSolution",
             "type": "Element",
-            "help": None,
         },
     )
     repricing_modifiers: RepricingModifiers = field(
         default=None,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
-            "name": "RepricingModifiers",
-            "type": "Element",
-            "help": None,
-        },
+        metadata={"name": "RepricingModifiers", "type": "Element"},
     )
     original_itinerary_details: OriginalItineraryDetails = field(
         default=None,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
-            "name": "OriginalItineraryDetails",
-            "type": "Element",
-            "help": None,
-        },
+        metadata={"name": "OriginalItineraryDetails", "type": "Element"},
     )
     override_pcc: OverridePcc = field(
-        default=None,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
-            "name": "OverridePCC",
-            "type": "Element",
-            "help": None,
-        },
+        default=None, metadata={"name": "OverridePCC", "type": "Element"}
     )
 
 
 @dataclass
 class BaseAirExchangeQuoteReq(CommonBaseCoreReq):
 
-    ticket_number: TicketNumber = field(
-        default=None,
+    ticket_number: List[TicketNumber] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 999,
             "name": "TicketNumber",
             "type": "Element",
-            "help": None,
         },
     )
     provider_reservation_info: ProviderReservationInfoType2 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "ProviderReservationInfo",
             "type": "Element",
             "help": "Provider: 1G/1V/1P/ACH - Represents a valid Provider Reservation/PNR whose itinerary is to be exchanged",
         },
     )
-    air_pricing_solution: AirPricingSolution = field(
-        default=None,
+    air_pricing_solution: List[AirPricingSolution] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 2,
             "name": "AirPricingSolution",
             "type": "Element",
-            "help": None,
         },
     )
     air_exchange_modifiers: AirExchangeModifiers = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "AirExchangeModifiers",
             "type": "Element",
             "help": "Provider: ACH.",
         },
     )
-    host_token: HostToken = field(
-        default=None,
+    host_token: List[HostToken] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 999,
@@ -1480,15 +1341,13 @@ class BaseAirExchangeQuoteReq(CommonBaseCoreReq):
     optional_services: OptionalServices = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "OptionalServices",
             "type": "Element",
             "help": "Provider: ACH.",
         },
     )
-    form_of_payment: FormOfPayment = field(
-        default=None,
+    form_of_payment: List[FormOfPayment] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 999,
@@ -1499,34 +1358,13 @@ class BaseAirExchangeQuoteReq(CommonBaseCoreReq):
     )
     repricing_modifiers: RepricingModifiers = field(
         default=None,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
-            "name": "RepricingModifiers",
-            "type": "Element",
-            "help": None,
-        },
+        metadata={"name": "RepricingModifiers", "type": "Element"},
     )
     original_itinerary_details: OriginalItineraryDetails = field(
         default=None,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
-            "name": "OriginalItineraryDetails",
-            "type": "Element",
-            "help": None,
-        },
+        metadata={"name": "OriginalItineraryDetails", "type": "Element"},
     )
-    pcc: Pcc = field(
-        default=None,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
-            "name": "PCC",
-            "type": "Element",
-            "help": None,
-        },
-    )
+    pcc: Pcc = field(default=None, metadata={"name": "PCC", "type": "Element"})
     fare_rule_type: TypeFareRuleType = field(
         default=none,
         metadata={
@@ -1543,8 +1381,7 @@ class BaseAirPriceReq(CommonBaseCoreReq):
     air_itinerary: AirItinerary = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "AirItinerary",
             "type": "Element",
             "help": "Provider: 1G,1V,1P,1J,ACH.",
@@ -1553,15 +1390,13 @@ class BaseAirPriceReq(CommonBaseCoreReq):
     air_pricing_modifiers: AirPricingModifiers = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "AirPricingModifiers",
             "type": "Element",
             "help": "Provider: 1G,1V,1P,1J,ACH.",
         },
     )
-    search_passenger: SearchPassenger = field(
-        default=None,
+    search_passenger: List[SearchPassenger] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 1,
             "max_occurs": 18,
@@ -1570,8 +1405,8 @@ class BaseAirPriceReq(CommonBaseCoreReq):
             "help": "Provider: 1G,1V,1P,1J,ACH-Maxinumber of passenger increased in to 18 to support 9 INF passenger along with 9 ADT,CHD,INS passenger",
         },
     )
-    air_pricing_command: AirPricingCommand = field(
-        default=None,
+    air_pricing_command: List[AirPricingCommand] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 1,
             "max_occurs": 16,
@@ -1583,8 +1418,6 @@ class BaseAirPriceReq(CommonBaseCoreReq):
     air_reservation_locator_code: AirReservationLocatorCode = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "AirReservationLocatorCode",
             "type": "Element",
             "help": "Provider: ACH,1P,1J",
@@ -1593,15 +1426,13 @@ class BaseAirPriceReq(CommonBaseCoreReq):
     optional_services: OptionalServices = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "OptionalServices",
             "type": "Element",
             "help": "Provider: ACH.",
         },
     )
-    form_of_payment: FormOfPayment = field(
-        default=None,
+    form_of_payment: List[FormOfPayment] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 999,
@@ -1610,18 +1441,9 @@ class BaseAirPriceReq(CommonBaseCoreReq):
             "help": "Provider: 1G,1V,1P,1J,ACH.",
         },
     )
-    pcc: Pcc = field(
-        default=None,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
-            "name": "PCC",
-            "type": "Element",
-            "help": None,
-        },
-    )
-    ssr: Ssr = field(
-        default=None,
+    pcc: Pcc = field(default=None, metadata={"name": "PCC", "type": "Element"})
+    ssr: List[Ssr] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 99,
@@ -1710,15 +1532,14 @@ class BaseAirPriceRsp(CommonBaseRsp):
     air_itinerary: AirItinerary = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "AirItinerary",
             "type": "Element",
             "help": "Provider: 1G,1V,1P,1J,ACH.",
         },
     )
-    air_price_result: AirPriceResult = field(
-        default=None,
+    air_price_result: List[AirPriceResult] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 1,
             "max_occurs": 16,
@@ -1734,92 +1555,48 @@ class BaseAvailabilitySearchRsp(CommonBaseSearchRsp):
     """Availability Search response"""
 
     flight_details_list: FlightDetailsList = field(
-        default=None,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
-            "name": "FlightDetailsList",
-            "type": "Element",
-            "help": None,
-        },
+        default=None, metadata={"name": "FlightDetailsList", "type": "Element"}
     )
     air_segment_list: AirSegmentList = field(
-        default=None,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
-            "name": "AirSegmentList",
-            "type": "Element",
-            "help": None,
-        },
+        default=None, metadata={"name": "AirSegmentList", "type": "Element"}
     )
     fare_info_list: FareInfoList = field(
-        default=None,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
-            "name": "FareInfoList",
-            "type": "Element",
-            "help": None,
-        },
+        default=None, metadata={"name": "FareInfoList", "type": "Element"}
     )
     fare_remark_list: FareRemarkList = field(
-        default=None,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
-            "name": "FareRemarkList",
-            "type": "Element",
-            "help": None,
-        },
+        default=None, metadata={"name": "FareRemarkList", "type": "Element"}
     )
-    air_itinerary_solution: AirItinerarySolution = field(
-        default=None,
+    air_itinerary_solution: List[AirItinerarySolution] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 999,
             "name": "AirItinerarySolution",
             "type": "Element",
-            "help": None,
         },
     )
     host_token_list: HostTokenList = field(
-        default=None,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
-            "name": "HostTokenList",
-            "type": "Element",
-            "help": None,
-        },
+        default=None, metadata={"name": "HostTokenList", "type": "Element"}
     )
     apisrequirements_list: ApisrequirementsList = field(
         default=None,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
-            "name": "APISRequirementsList",
-            "type": "Element",
-            "help": None,
-        },
+        metadata={"name": "APISRequirementsList", "type": "Element"},
     )
     distance_units: TypeDistance = field(
-        default=None,
-        metadata={"name": "DistanceUnits", "type": "Attribute", "help": None},
+        default=None, metadata={"name": "DistanceUnits", "type": "Attribute"}
     )
 
 
 @dataclass
 class BrandList:
 
-    brand: Brand = field(
-        default=None,
+    brand: List[Brand] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 99,
             "name": "Brand",
             "type": "Element",
-            "help": None,
         },
     )
 
@@ -1831,8 +1608,6 @@ class DetailRetrieveType6:
     provider_reservation_detail: ProviderReservationDetail = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "ProviderReservationDetail",
             "type": "Element",
             "help": "Provider reservation locator to be specified for display operation, if mentioned along woth the EMD number then synchronization of that EMD is performed considering the same to be associated with the mentioned PNR.",
@@ -1841,8 +1616,7 @@ class DetailRetrieveType6:
     emdnumber: TypeEmdnumber = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "EMDNumber",
             "type": "Element",
             "help": "EMD number to be specified for display operation. If mentioned along with provider reservation detail then synchronization of that EMD is performed considering the same to be associated with the mentioned PNR.",
@@ -1857,8 +1631,7 @@ class EmdissuanceReq(CommonBaseReq):
     provider_reservation_detail: ProviderReservationDetail = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "ProviderReservationDetail",
             "type": "Element",
             "help": "PNR information for which EMD is going to be issued.",
@@ -1867,8 +1640,6 @@ class EmdissuanceReq(CommonBaseReq):
     ticket_number: TicketNumber = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "TicketNumber",
             "type": "Element",
             "help": "Ticket number for which EMD is going to be issued.Required for EMD-A issuance.",
@@ -1877,8 +1648,6 @@ class EmdissuanceReq(CommonBaseReq):
     issuance_modifiers: IssuanceModifiers = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "IssuanceModifiers",
             "type": "Element",
             "help": "General modifiers related to EMD issuance.",
@@ -1887,8 +1656,6 @@ class EmdissuanceReq(CommonBaseReq):
     selection_modifiers: SelectionModifiers = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "SelectionModifiers",
             "type": "Element",
             "help": "Modifiers related to selection of services during EMD issuance.",
@@ -1897,6 +1664,7 @@ class EmdissuanceReq(CommonBaseReq):
     universal_record_locator_code: TypeLocatorCode = field(
         default=None,
         metadata={
+            "required": True,
             "name": "UniversalRecordLocatorCode",
             "type": "Attribute",
             "help": "Represents a valid Universal Record locator code.",
@@ -1924,8 +1692,8 @@ class EmdissuanceReq(CommonBaseReq):
 class EmdissuanceRsp(CommonBaseRsp):
     """Electronic Miscellaneous Document issuance response.Supported providers are 1V/1G/1P/1J"""
 
-    emdsummary_info: EmdsummaryInfo = field(
-        default=None,
+    emdsummary_info: List[EmdsummaryInfo] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 999,
@@ -1934,8 +1702,8 @@ class EmdissuanceRsp(CommonBaseRsp):
             "help": "List of EMDSummaryInfo elements to show minimal information in issuance response. Appears for ShowDetails=false in the request.This is the default behaviour.",
         },
     )
-    emdinfo: Emdinfo = field(
-        default=None,
+    emdinfo: List[Emdinfo] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 999,
@@ -1953,15 +1721,14 @@ class EmdretrieveRsp(CommonBaseRsp):
     emdinfo: Emdinfo = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "EMDInfo",
             "type": "Element",
             "help": "Provider: 1G/1V/1P/1J.",
         },
     )
-    emdsummary_info: EmdsummaryInfo = field(
-        default=None,
+    emdsummary_info: List[EmdsummaryInfo] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 1,
             "max_occurs": 999,
@@ -1990,8 +1757,8 @@ class FareRulesFilterCategoryType10:
 class FlightDetailsReq(CommonBaseReq):
     """Request for the Flight Details of segments."""
 
-    air_segment: AirSegment = field(
-        default=None,
+    air_segment: List[AirSegment] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 1,
             "max_occurs": 999,
@@ -2005,8 +1772,8 @@ class FlightDetailsReq(CommonBaseReq):
 @dataclass
 class FlightDetailsRsp(CommonBaseRsp):
 
-    air_segment: AirSegment = field(
-        default=None,
+    air_segment: List[AirSegment] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 1,
             "max_occurs": 999,
@@ -2015,14 +1782,13 @@ class FlightDetailsRsp(CommonBaseRsp):
             "help": "Provider: 1G,1V,1P,1J.",
         },
     )
-    co2_emissions: Co2Emissions = field(
-        default=None,
+    co2_emissions: List[Co2Emissions] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 99,
             "name": "CO2Emissions",
             "type": "Element",
-            "help": None,
         },
     )
 
@@ -2031,8 +1797,8 @@ class FlightDetailsRsp(CommonBaseRsp):
 class FlightInformationReq(CommonBaseReq):
     """Request for the Flight Info of segments."""
 
-    flight_info_criteria: FlightInfoCriteria = field(
-        default=None,
+    flight_info_criteria: List[FlightInfoCriteria] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 1,
             "max_occurs": 999,
@@ -2046,8 +1812,8 @@ class FlightInformationReq(CommonBaseReq):
 @dataclass
 class FlightInformationRsp(CommonBaseRsp):
 
-    flight_info: FlightInfo = field(
-        default=None,
+    flight_info: List[FlightInfo] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 1,
             "max_occurs": 999,
@@ -2062,14 +1828,13 @@ class FlightInformationRsp(CommonBaseRsp):
 class FlightTimeTableListType9:
     """Inner ComplexType name auto generated"""
 
-    flight_time_detail: FlightTimeDetail = field(
-        default=None,
+    flight_time_detail: List[FlightTimeDetail] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 1,
             "max_occurs": 999,
             "name": "FlightTimeDetail",
             "type": "Element",
-            "help": None,
         },
     )
 
@@ -2081,8 +1846,7 @@ class FlightTimeTableReq(CommonBaseSearchReq):
     flight_time_table_criteria: FlightTimeTableCriteria = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "FlightTimeTableCriteria",
             "type": "Element",
             "help": "Provider: 1G,1V.",
@@ -2097,8 +1861,7 @@ class ListRetrieveType5:
     provider_reservation_detail: ProviderReservationDetail = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "ProviderReservationDetail",
             "type": "Element",
             "help": "Provider reservation details to be provided to fetch list of EMDs associated with it.",
@@ -2113,15 +1876,14 @@ class ListSearchType7:
     person_name_search: PersonNameSearch = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "PersonNameSearch",
             "type": "Element",
             "help": "Customer name detail for searching flight pass content.",
         },
     )
-    loyalty_card: LoyaltyCard = field(
-        default=None,
+    loyalty_card: List[LoyaltyCard] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 1,
             "max_occurs": 999,
@@ -2133,6 +1895,7 @@ class ListSearchType7:
     start_from_result: TypeStartFromResult = field(
         default=None,
         metadata={
+            "required": True,
             "name": "StartFromResult",
             "type": "Attribute",
             "help": "Start index of the section of flight pass numbers that is being requested.",
@@ -2141,6 +1904,7 @@ class ListSearchType7:
     max_results: TypeMaxResults = field(
         default=None,
         metadata={
+            "required": True,
             "name": "MaxResults",
             "type": "Attribute",
             "help": "Max Number of Flight Passes being requested for.",
@@ -2155,6 +1919,7 @@ class PrePayRetrieveType8:
     id: TypeCardNumber = field(
         default=None,
         metadata={
+            "required": True,
             "name": "Id",
             "type": "Attribute",
             "help": "Pre pay id to retrieved,example flight pass number",
@@ -2177,6 +1942,7 @@ class RetrieveLowFareSearchReq(CommonBaseReq):
     search_id: TypeLowFareSearchId = field(
         default=None,
         metadata={
+            "required": True,
             "name": "SearchId",
             "type": "Attribute",
             "help": "Provider: 1G,1V,1P,1J,ACH-SearchID to be used for Asynchronous LowFareSearch Request",
@@ -2185,6 +1951,7 @@ class RetrieveLowFareSearchReq(CommonBaseReq):
     provider_code: TypeProviderCode = field(
         default=None,
         metadata={
+            "required": True,
             "name": "ProviderCode",
             "type": "Attribute",
             "help": "Provider: 1G,1V,1P,1J,ACH-Provider code of a specific host",
@@ -2198,6 +1965,7 @@ class SearchSpecificAirSegment:
     departure_time: str = field(
         default=None,
         metadata={
+            "required": True,
             "name": "DepartureTime",
             "type": "Attribute",
             "help": "The date and time at which this entity departs. This does not include time zone information since it can be derived from the origin location.",
@@ -2206,6 +1974,7 @@ class SearchSpecificAirSegment:
     carrier: TypeCarrier = field(
         default=None,
         metadata={
+            "required": True,
             "name": "Carrier",
             "type": "Attribute",
             "help": "The carrier that is marketing this segment",
@@ -2214,6 +1983,7 @@ class SearchSpecificAirSegment:
     flight_number: TypeFlightNumber = field(
         default=None,
         metadata={
+            "required": True,
             "name": "FlightNumber",
             "type": "Attribute",
             "help": "The flight number under which the marketing carrier is marketing this flight",
@@ -2222,6 +1992,7 @@ class SearchSpecificAirSegment:
     origin: TypeIatacode = field(
         default=None,
         metadata={
+            "required": True,
             "name": "Origin",
             "type": "Attribute",
             "help": "The IATA location code for this origination of this entity.",
@@ -2230,6 +2001,7 @@ class SearchSpecificAirSegment:
     destination: TypeIatacode = field(
         default=None,
         metadata={
+            "required": True,
             "name": "Destination",
             "type": "Attribute",
             "help": "The IATA location code for this destination of this entity.",
@@ -2252,15 +2024,13 @@ class SeatMapReq(CommonBaseReq):
     agency_sell_info: AgencySellInfo = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "AgencySellInfo",
             "type": "Element",
             "help": "Provider: ACH-Required if the user requesting the seat map is not the same agent authenticated in the request.",
         },
     )
-    air_segment: AirSegment = field(
-        default=None,
+    air_segment: List[AirSegment] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 99,
@@ -2269,8 +2039,8 @@ class SeatMapReq(CommonBaseReq):
             "help": "Provider: 1G,1V,1P,1J,ACH,MCH.",
         },
     )
-    host_token: HostToken = field(
-        default=None,
+    host_token: List[HostToken] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 99,
@@ -2279,8 +2049,8 @@ class SeatMapReq(CommonBaseReq):
             "help": "Provider: ACH-Required if the carrier has multiple adapters.",
         },
     )
-    search_traveler: SearchTraveler = field(
-        default=None,
+    search_traveler: List[SearchTraveler] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 999,
@@ -2292,8 +2062,6 @@ class SeatMapReq(CommonBaseReq):
     host_reservation: HostReservation = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "HostReservation",
             "type": "Element",
             "help": "Provider: ACH,MCH-Required when seat price is requested.",
@@ -2302,8 +2070,6 @@ class SeatMapReq(CommonBaseReq):
     merchandising_pricing_modifiers: MerchandisingPricingModifiers = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "MerchandisingPricingModifiers",
             "type": "Element",
             "help": "Used to provide additional pricing options. Provider:ACH.",
@@ -2312,6 +2078,7 @@ class SeatMapReq(CommonBaseReq):
     return_seat_pricing: bool = field(
         default=None,
         metadata={
+            "required": True,
             "name": "ReturnSeatPricing",
             "type": "Attribute",
             "help": "Provider: 1G,1V,1P,1J,ACH-When set to true the price of the seat will be returned if it exists.",
@@ -2330,8 +2097,8 @@ class SeatMapReq(CommonBaseReq):
 @dataclass
 class SeatMapRsp(CommonBaseRsp):
 
-    host_token: HostToken = field(
-        default=None,
+    host_token: List[HostToken] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 99,
@@ -2343,15 +2110,13 @@ class SeatMapRsp(CommonBaseRsp):
     cabin_class: CabinClass = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "CabinClass",
             "type": "Element",
             "help": "Provider: 1G,1V,1P,1J,ACH,MCH.",
         },
     )
-    air_segment: AirSegment = field(
-        default=None,
+    air_segment: List[AirSegment] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 99,
@@ -2360,8 +2125,8 @@ class SeatMapRsp(CommonBaseRsp):
             "help": "Provider: ACH,MCH.",
         },
     )
-    search_traveler: SearchTraveler = field(
-        default=None,
+    search_traveler: List[SearchTraveler] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 999,
@@ -2373,8 +2138,6 @@ class SeatMapRsp(CommonBaseRsp):
     optional_services: OptionalServices = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "OptionalServices",
             "type": "Element",
             "help": "A wrapper for all the information regarding each of the Optional Services. Provider: 1G,1V,1P,1J,ACH.",
@@ -2383,25 +2146,22 @@ class SeatMapRsp(CommonBaseRsp):
     remark: Remark = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "Remark",
             "type": "Element",
             "help": "Provider: 1G,1V,1P,1J,ACH,MCH.",
         },
     )
-    rows: Rows = field(
-        default=None,
+    rows: List[Rows] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 99,
             "name": "Rows",
             "type": "Element",
-            "help": None,
         },
     )
-    payment_restriction: PaymentRestriction = field(
-        default=None,
+    payment_restriction: List[PaymentRestriction] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 999,
@@ -2410,21 +2170,18 @@ class SeatMapRsp(CommonBaseRsp):
             "help": "Provider: MCH-Information regarding valid payment types, if restrictions apply(supplier specific)",
         },
     )
-    seat_information: SeatInformation = field(
-        default=None,
+    seat_information: List[SeatInformation] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 999,
             "name": "SeatInformation",
             "type": "Element",
-            "help": None,
         },
     )
     copyright: str = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "Copyright",
             "type": "Element",
             "help": "Copyright text applicable for some seat content. Providers: 1G, 1V, 1P, 1J,ACH",
@@ -2444,14 +2201,13 @@ class SeatMapRsp(CommonBaseRsp):
 class UnassociatedBookingCodeListType4:
     """Inner ComplexType name auto generated"""
 
-    applicable_segment: TypeApplicableSegment = field(
-        default=None,
+    applicable_segment: List[TypeApplicableSegment] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 99,
             "name": "ApplicableSegment",
             "type": "Element",
-            "help": None,
         },
     )
 
@@ -2473,34 +2229,31 @@ class AirExchangeMultiQuoteReq(BaseAirExchangeMultiQuoteReq):
 @dataclass
 class AirExchangeMultiQuoteRsp(CommonBaseRsp):
 
-    air_segment_list: AirSegmentList = field(
-        default=None,
+    air_segment_list: List[AirSegmentList] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 999,
             "name": "AirSegmentList",
             "type": "Element",
-            "help": None,
         },
     )
-    brand_list: BrandList = field(
-        default=None,
+    brand_list: List[BrandList] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 999,
             "name": "BrandList",
             "type": "Element",
-            "help": None,
         },
     )
-    air_exchange_mulit_quote_list: AirExchangeMulitQuoteList = field(
-        default=None,
+    air_exchange_mulit_quote_list: List[AirExchangeMulitQuoteList] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 999,
             "name": "AirExchangeMulitQuoteList",
             "type": "Element",
-            "help": None,
         },
     )
 
@@ -2519,15 +2272,13 @@ class AirFareRulesReq(CommonBaseReq):
     air_fare_rules_modifier: AirFareRulesModifier = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "AirFareRulesModifier",
             "type": "Element",
             "help": "Provider: 1G,1V.",
         },
     )
-    fare_rules_filter_category: FareRulesFilterCategoryType10 = field(
-        default=None,
+    fare_rules_filter_category: List[FareRulesFilterCategoryType10] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 16,
@@ -2539,8 +2290,7 @@ class AirFareRulesReq(CommonBaseReq):
     air_reservation_selector: AirReservationSelectorType11 = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "AirReservationSelector",
             "type": "Element",
             "help": "Provider: 1G,1V,1P,1J,ACH-Parameters to use for a fare rule lookup associated with an Air Reservation Locator Code",
@@ -2549,15 +2299,13 @@ class AirFareRulesReq(CommonBaseReq):
     fare_rule_lookup: FareRuleLookup = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "FareRuleLookup",
             "type": "Element",
             "help": "Used to look up fare rules based on the origin, destination, and carrier of the air segment, the fare basis code and the provider code. Providers: 1P, 1J.",
         },
     )
-    fare_rule_key: FareRuleKey = field(
-        default=None,
+    fare_rule_key: List[FareRuleKey] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 1,
             "max_occurs": 999,
@@ -2569,8 +2317,7 @@ class AirFareRulesReq(CommonBaseReq):
     air_fare_display_rule_key: AirFareDisplayRuleKey = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "AirFareDisplayRuleKey",
             "type": "Element",
             "help": "Provider: 1G,1V,1P,1J.",
@@ -2591,30 +2338,20 @@ class AirMerchandisingDetailsRsp(CommonBaseRsp):
     """Response for retrieved brand details and optional services included in them"""
 
     optional_services: OptionalServices = field(
-        default=None,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
-            "name": "OptionalServices",
-            "type": "Element",
-            "help": None,
-        },
+        default=None, metadata={"name": "OptionalServices", "type": "Element"}
     )
-    brand: Brand = field(
-        default=None,
+    brand: List[Brand] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 99,
             "name": "Brand",
             "type": "Element",
-            "help": None,
         },
     )
     unassociated_booking_code_list: UnassociatedBookingCodeListType4 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "UnassociatedBookingCodeList",
             "type": "Element",
             "help": "Lists classes of service by segment sent in the request which are not associated to a brand.",
@@ -2629,8 +2366,7 @@ class AirPrePayReq(CommonBaseReq):
     list_search: ListSearchType7 = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "ListSearch",
             "type": "Element",
             "help": "Provider: ACH.",
@@ -2639,8 +2375,7 @@ class AirPrePayReq(CommonBaseReq):
     pre_pay_retrieve: PrePayRetrieveType8 = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "PrePayRetrieve",
             "type": "Element",
             "help": "Provider: ACH.",
@@ -2667,35 +2402,22 @@ class AirRepriceReq(AirBaseReq):
 
     air_reservation_locator_code: AirReservationLocatorCode = field(
         default=None,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
-            "name": "AirReservationLocatorCode",
-            "type": "Element",
-            "help": None,
-        },
+        metadata={"name": "AirReservationLocatorCode", "type": "Element"},
     )
     air_pricing_solution: AirPricingSolution = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "AirPricingSolution",
             "type": "Element",
-            "help": None,
         },
     )
     fare_rule_type: TypeFareRuleType = field(
-        default=none,
-        metadata={"name": "FareRuleType", "type": "Attribute", "help": None},
+        default=none, metadata={"name": "FareRuleType", "type": "Attribute"}
     )
     ignore_availability: bool = field(
         default=false,
-        metadata={
-            "name": "IgnoreAvailability",
-            "type": "Attribute",
-            "help": None,
-        },
+        metadata={"name": "IgnoreAvailability", "type": "Attribute"},
     )
 
 
@@ -2705,52 +2427,31 @@ class AirSearchReq(CommonBaseSearchReq):
 
     point_of_commencement: PointOfCommencement = field(
         default=None,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
-            "name": "PointOfCommencement",
-            "type": "Element",
-            "help": None,
-        },
+        metadata={"name": "PointOfCommencement", "type": "Element"},
     )
     air_search_modifiers: AirSearchModifiers = field(
         default=None,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
-            "name": "AirSearchModifiers",
-            "type": "Element",
-            "help": None,
-        },
+        metadata={"name": "AirSearchModifiers", "type": "Element"},
     )
     journey_data: JourneyData = field(
-        default=None,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
-            "name": "JourneyData",
-            "type": "Element",
-            "help": None,
-        },
+        default=None, metadata={"name": "JourneyData", "type": "Element"}
     )
-    search_air_leg: SearchAirLeg = field(
-        default=None,
+    search_air_leg: List[SearchAirLeg] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 1,
             "max_occurs": 16,
             "name": "SearchAirLeg",
             "type": "Element",
-            "help": None,
         },
     )
-    search_specific_air_segment: SearchSpecificAirSegment = field(
-        default=None,
+    search_specific_air_segment: List[SearchSpecificAirSegment] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 1,
             "max_occurs": 999,
             "name": "SearchSpecificAirSegment",
             "type": "Element",
-            "help": None,
         },
     )
 
@@ -2760,144 +2461,67 @@ class AirSearchRsp(BaseAvailabilitySearchRsp):
     """Base Response for Air Search"""
 
     fare_note_list: FareNoteList = field(
-        default=None,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
-            "name": "FareNoteList",
-            "type": "Element",
-            "help": None,
-        },
+        default=None, metadata={"name": "FareNoteList", "type": "Element"}
     )
     expert_solution_list: ExpertSolutionList = field(
         default=None,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
-            "name": "ExpertSolutionList",
-            "type": "Element",
-            "help": None,
-        },
+        metadata={"name": "ExpertSolutionList", "type": "Element"},
     )
     route_list: RouteList = field(
-        default=None,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
-            "name": "RouteList",
-            "type": "Element",
-            "help": None,
-        },
+        default=None, metadata={"name": "RouteList", "type": "Element"}
     )
     alternate_route_list: AlternateRouteList = field(
         default=None,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
-            "name": "AlternateRouteList",
-            "type": "Element",
-            "help": None,
-        },
+        metadata={"name": "AlternateRouteList", "type": "Element"},
     )
     alternate_location_distance_list: AlternateLocationDistanceList = field(
         default=None,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
-            "name": "AlternateLocationDistanceList",
-            "type": "Element",
-            "help": None,
-        },
+        metadata={"name": "AlternateLocationDistanceList", "type": "Element"},
     )
-    fare_info_message: FareInfoMessage = field(
-        default=None,
+    fare_info_message: List[FareInfoMessage] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 99,
             "name": "FareInfoMessage",
             "type": "Element",
-            "help": None,
         },
     )
     rail_segment_list: RailSegmentList = field(
-        default=None,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
-            "name": "RailSegmentList",
-            "type": "Element",
-            "help": None,
-        },
+        default=None, metadata={"name": "RailSegmentList", "type": "Element"}
     )
     rail_journey_list: RailJourneyList = field(
-        default=None,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
-            "name": "RailJourneyList",
-            "type": "Element",
-            "help": None,
-        },
+        default=None, metadata={"name": "RailJourneyList", "type": "Element"}
     )
     rail_fare_note_list: RailFareNoteList = field(
-        default=None,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
-            "name": "RailFareNoteList",
-            "type": "Element",
-            "help": None,
-        },
+        default=None, metadata={"name": "RailFareNoteList", "type": "Element"}
     )
     rail_fare_idlist: RailFareIdlist = field(
-        default=None,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
-            "name": "RailFareIDList",
-            "type": "Element",
-            "help": None,
-        },
+        default=None, metadata={"name": "RailFareIDList", "type": "Element"}
     )
     rail_fare_list: RailFareList = field(
-        default=None,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
-            "name": "RailFareList",
-            "type": "Element",
-            "help": None,
-        },
+        default=None, metadata={"name": "RailFareList", "type": "Element"}
     )
-    rail_pricing_solution: RailPricingSolution = field(
-        default=None,
+    rail_pricing_solution: List[RailPricingSolution] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 999,
             "name": "RailPricingSolution",
             "type": "Element",
-            "help": None,
         },
     )
-    air_pricing_solution: AirPricingSolution = field(
-        default=None,
+    air_pricing_solution: List[AirPricingSolution] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 999,
             "name": "AirPricingSolution",
             "type": "Element",
-            "help": None,
         },
     )
     air_price_point_list: AirPricePointList = field(
-        default=None,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
-            "name": "AirPricePointList",
-            "type": "Element",
-            "help": None,
-        },
+        default=None, metadata={"name": "AirPricePointList", "type": "Element"}
     )
 
 
@@ -2908,15 +2532,14 @@ class AirTicketingReq(AirBaseReq):
     air_reservation_locator_code: AirReservationLocatorCode = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "AirReservationLocatorCode",
             "type": "Element",
             "help": "Provider: 1G,1V,1P,1J.",
         },
     )
-    air_pricing_info_ref: AirPricingInfoRefType13 = field(
-        default=None,
+    air_pricing_info_ref: List[AirPricingInfoRefType13] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 999,
@@ -2925,8 +2548,8 @@ class AirTicketingReq(AirBaseReq):
             "help": "Provider: 1G,1V,1P,1J-Indicates air pricing infos to be ticketed.",
         },
     )
-    ticketing_modifiers_ref: TypeTicketingModifiersRef = field(
-        default=None,
+    ticketing_modifiers_ref: List[TypeTicketingModifiersRef] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 999,
@@ -2936,27 +2559,19 @@ class AirTicketingReq(AirBaseReq):
         },
     )
     waiver_code: WaiverCode = field(
-        default=None,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
-            "name": "WaiverCode",
-            "type": "Element",
-            "help": None,
-        },
+        default=None, metadata={"name": "WaiverCode", "type": "Element"}
     )
-    commission: Commission = field(
-        default=None,
+    commission: List[Commission] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 18,
             "name": "Commission",
             "type": "Element",
-            "help": None,
         },
     )
-    detailed_billing_information: DetailedBillingInformation = field(
-        default=None,
+    detailed_billing_information: List[DetailedBillingInformation] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 999,
@@ -2968,15 +2583,13 @@ class AirTicketingReq(AirBaseReq):
     fax_details_information: FaxDetailsInformation = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "FaxDetailsInformation",
             "type": "Element",
             "help": "Provider: 1V.",
         },
     )
-    air_ticketing_modifiers: AirTicketingModifiers = field(
-        default=None,
+    air_ticketing_modifiers: List[AirTicketingModifiers] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 999,
@@ -2985,8 +2598,10 @@ class AirTicketingReq(AirBaseReq):
             "help": "Provider: 1G,1V,1P,1J.",
         },
     )
-    air_segment_ticketing_modifiers: AirSegmentTicketingModifiers = field(
-        default=None,
+    air_segment_ticketing_modifiers: List[
+        AirSegmentTicketingModifiers
+    ] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 999,
@@ -2997,11 +2612,7 @@ class AirTicketingReq(AirBaseReq):
     )
     return_info_on_fail: bool = field(
         default=true,
-        metadata={
-            "name": "ReturnInfoOnFail",
-            "type": "Attribute",
-            "help": None,
-        },
+        metadata={"name": "ReturnInfoOnFail", "type": "Attribute"},
     )
     bulk_ticket: bool = field(
         default=false,
@@ -3028,15 +2639,14 @@ class AirUpsellSearchReq(AirBaseReq):
     air_itinerary: AirItinerary = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "AirItinerary",
             "type": "Element",
             "help": "Provider: 1G,1V,1P,1J,ACH-AirItinerary of the pricing request.",
         },
     )
-    air_price_result: AirPriceResult = field(
-        default=None,
+    air_price_result: List[AirPriceResult] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 1,
             "max_occurs": 16,
@@ -3066,52 +2676,31 @@ class BaseAirSearchReq(CommonBaseCoreSearchReq):
 
     air_search_modifiers: AirSearchModifiers = field(
         default=None,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
-            "name": "AirSearchModifiers",
-            "type": "Element",
-            "help": None,
-        },
+        metadata={"name": "AirSearchModifiers", "type": "Element"},
     )
     split_ticketing_search: SplitTicketingSearch = field(
         default=None,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
-            "name": "SplitTicketingSearch",
-            "type": "Element",
-            "help": None,
-        },
+        metadata={"name": "SplitTicketingSearch", "type": "Element"},
     )
     journey_data: JourneyData = field(
-        default=None,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
-            "name": "JourneyData",
-            "type": "Element",
-            "help": None,
-        },
+        default=None, metadata={"name": "JourneyData", "type": "Element"}
     )
-    search_air_leg: SearchAirLeg = field(
-        default=None,
+    search_air_leg: List[SearchAirLeg] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 1,
             "max_occurs": 9,
             "name": "SearchAirLeg",
             "type": "Element",
-            "help": None,
         },
     )
-    search_specific_air_segment: SearchSpecificAirSegment = field(
-        default=None,
+    search_specific_air_segment: List[SearchSpecificAirSegment] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 1,
             "max_occurs": 999,
             "name": "SearchSpecificAirSegment",
             "type": "Element",
-            "help": None,
         },
     )
 
@@ -3123,8 +2712,7 @@ class EmdretrieveReq(CommonBaseReq):
     list_retrieve: ListRetrieveType5 = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "ListRetrieve",
             "type": "Element",
             "help": "Provider: 1G/1V/1P/1J-Information required for retrieval of list of EMDs",
@@ -3133,8 +2721,7 @@ class EmdretrieveReq(CommonBaseReq):
     detail_retrieve: DetailRetrieveType6 = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "DetailRetrieve",
             "type": "Element",
             "help": "Provider: 1G/1V/1P/1J-Information required for a detailed EMD retrieve",
@@ -3149,8 +2736,6 @@ class FlightTimeTableRsp(CommonBaseSearchRsp):
     flight_time_table_list: FlightTimeTableListType9 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "FlightTimeTableList",
             "type": "Element",
             "help": "Provider: 1G,1V.",
@@ -3162,8 +2747,8 @@ class FlightTimeTableRsp(CommonBaseSearchRsp):
 class AvailabilitySearchReq(AirSearchReq):
     """Availability Search request."""
 
-    search_passenger: SearchPassenger = field(
-        default=None,
+    search_passenger: List[SearchPassenger] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 18,
@@ -3172,8 +2757,8 @@ class AvailabilitySearchReq(AirSearchReq):
             "help": "Provider: 1G,1V,1P,1J,ACH-Maxinumber of passenger increased in to 18 to support 9 INF passenger along with 9 ADT,CHD,INS passenger",
         },
     )
-    point_of_sale: PointOfSale = field(
-        default=None,
+    point_of_sale: List[PointOfSale] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 5,
@@ -3212,8 +2797,8 @@ class AvailabilitySearchReq(AirSearchReq):
 class BaseLowFareSearchReq(BaseAirSearchReq):
     """Base Low Fare Search Request"""
 
-    search_passenger: SearchPassenger = field(
-        default=None,
+    search_passenger: List[SearchPassenger] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 1,
             "max_occurs": 18,
@@ -3225,8 +2810,6 @@ class BaseLowFareSearchReq(BaseAirSearchReq):
     air_pricing_modifiers: AirPricingModifiers = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "AirPricingModifiers",
             "type": "Element",
             "help": "Provider: 1G,1V,1P,1J,ACH.",
@@ -3235,8 +2818,6 @@ class BaseLowFareSearchReq(BaseAirSearchReq):
     enumeration: Enumeration = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "Enumeration",
             "type": "Element",
             "help": "Provider: 1G,1V,1P,1J,ACH.",
@@ -3245,8 +2826,6 @@ class BaseLowFareSearchReq(BaseAirSearchReq):
     air_exchange_modifiers: AirExchangeModifiers = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "AirExchangeModifiers",
             "type": "Element",
             "help": "Provider: ACH.",
@@ -3255,35 +2834,18 @@ class BaseLowFareSearchReq(BaseAirSearchReq):
     flex_explore_modifiers: FlexExploreModifiers = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "FlexExploreModifiers",
             "type": "Element",
             "help": "This is the container for a set of modifiers which allow the user to perform a special kind of low fare search, depicted as flex explore, based on different parameters like Area, Zone, Country, State, Specific locations, Distance around the actual destination of the itinerary. Applicable for providers 1G,1V,1P.",
         },
     )
-    pcc: Pcc = field(
-        default=None,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
-            "name": "PCC",
-            "type": "Element",
-            "help": None,
-        },
-    )
+    pcc: Pcc = field(default=None, metadata={"name": "PCC", "type": "Element"})
     fare_rules_filter_category: FareRulesFilterCategory = field(
         default=None,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
-            "name": "FareRulesFilterCategory",
-            "type": "Element",
-            "help": None,
-        },
+        metadata={"name": "FareRulesFilterCategory", "type": "Element"},
     )
-    form_of_payment: FormOfPayment = field(
-        default=None,
+    form_of_payment: List[FormOfPayment] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 99,
@@ -3410,29 +2972,24 @@ class BaseLowFareSearchReq(BaseAirSearchReq):
 class LowFareSearchAsynchRsp(AirSearchRsp):
     """Asynchronous Low Fare Search Response contains only the 1st Provider response unless time out occurs."""
 
-    async_provider_specific_response: AsyncProviderSpecificResponse = field(
-        default=None,
+    async_provider_specific_response: List[
+        AsyncProviderSpecificResponse
+    ] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 999,
             "name": "AsyncProviderSpecificResponse",
             "type": "Element",
-            "help": None,
         },
     )
     brand_list: BrandList = field(
-        default=None,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
-            "name": "BrandList",
-            "type": "Element",
-            "help": None,
-        },
+        default=None, metadata={"name": "BrandList", "type": "Element"}
     )
     search_id: TypeLowFareSearchId = field(
         default=None,
         metadata={
+            "required": True,
             "name": "SearchId",
             "type": "Attribute",
             "help": "Provider: 1G,1V,1P,1J,ACH-Indicates the Search Id of the LFS search",
@@ -3453,18 +3010,12 @@ class LowFareSearchRsp(AirSearchRsp):
     """Low Fare Search Response"""
 
     brand_list: BrandList = field(
-        default=None,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
-            "name": "BrandList",
-            "type": "Element",
-            "help": None,
-        },
+        default=None, metadata={"name": "BrandList", "type": "Element"}
     )
     currency_type: TypeCurrency = field(
         default=None,
         metadata={
+            "required": True,
             "name": "CurrencyType",
             "type": "Attribute",
             "help": "Provider: 1G,1V,1P,1J,ACH.",
@@ -3476,8 +3027,10 @@ class LowFareSearchRsp(AirSearchRsp):
 class RetrieveLowFareSearchRsp(AirSearchRsp):
     """Low Fare Search Asynchronous Result response."""
 
-    async_provider_specific_response: AsyncProviderSpecificResponse = field(
-        default=None,
+    async_provider_specific_response: List[
+        AsyncProviderSpecificResponse
+    ] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 999,
@@ -3487,14 +3040,7 @@ class RetrieveLowFareSearchRsp(AirSearchRsp):
         },
     )
     brand_list: BrandList = field(
-        default=None,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
-            "name": "BrandList",
-            "type": "Element",
-            "help": None,
-        },
+        default=None, metadata={"name": "BrandList", "type": "Element"}
     )
     currency_type: TypeCurrency = field(
         default=None,
@@ -3527,8 +3073,6 @@ class LowFareSearchAsynchReq(BaseLowFareSearchReq):
     air_search_asynch_modifiers: AirSearchAsynchModifiers = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "AirSearchAsynchModifiers",
             "type": "Element",
             "help": "Provider: 1G,1V,1P,1J,ACH.",

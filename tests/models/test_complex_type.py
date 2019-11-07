@@ -1,7 +1,5 @@
 import sys
 
-import pytest
-
 from tests.testcases import ModelTestCase
 from xsdata.models.elements import (
     AnnotationBase,
@@ -83,10 +81,6 @@ class ComplexTypeTests(ModelTestCase):
         )
         self.assertEqual(expected, actual)
 
-    @pytest.mark.skip(reason="Missing sample")
-    def test_with_simple_content_restriction(self):
-        pass
-
     def test_with_complex_content_extension(self):
         actual: ComplexType = self.result.complex_types[2]
 
@@ -111,7 +105,3 @@ class ComplexTypeTests(ModelTestCase):
             ),
         )
         self.assertEqual(expected, actual)
-
-    @pytest.mark.skip(reason="Missing sample")
-    def test_with_complex_content_restriction(self):
-        pass

@@ -69,9 +69,3 @@ class ExtendsMixin(ABC):
     @abstractmethod
     def extends(self) -> Optional[str]:
         pass
-
-
-class ExtendsNone(ExtendsMixin):
-    @property
-    def extends(self) -> Optional[str]:
-        return None

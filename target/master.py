@@ -1,4 +1,5 @@
 from dataclasses import dataclass, field
+from typing import List
 
 
 @dataclass
@@ -18,7 +19,6 @@ class AlphaNumericStringLength0To1:
             "max_length": 1.0,
             "name": "value",
             "type": "Restriction",
-            "help": None,
         },
     )
 
@@ -34,7 +34,6 @@ class AlphaNumericStringLength0To18:
             "max_length": 18.0,
             "name": "value",
             "type": "Restriction",
-            "help": None,
         },
     )
 
@@ -50,7 +49,6 @@ class AlphaNumericStringLength0To3:
             "max_length": 3.0,
             "name": "value",
             "type": "Restriction",
-            "help": None,
         },
     )
 
@@ -66,7 +64,6 @@ class AlphaNumericStringLength1To1:
             "max_length": 1.0,
             "name": "value",
             "type": "Restriction",
-            "help": None,
         },
     )
 
@@ -82,7 +79,6 @@ class AlphaNumericStringLength1To10:
             "max_length": 10.0,
             "name": "value",
             "type": "Restriction",
-            "help": None,
         },
     )
 
@@ -98,7 +94,6 @@ class AlphaNumericStringLength1To12:
             "max_length": 12.0,
             "name": "value",
             "type": "Restriction",
-            "help": None,
         },
     )
 
@@ -114,7 +109,6 @@ class AlphaNumericStringLength1To18:
             "max_length": 18.0,
             "name": "value",
             "type": "Restriction",
-            "help": None,
         },
     )
 
@@ -130,7 +124,6 @@ class AlphaNumericStringLength1To2:
             "max_length": 2.0,
             "name": "value",
             "type": "Restriction",
-            "help": None,
         },
     )
 
@@ -146,7 +139,6 @@ class AlphaNumericStringLength1To20:
             "max_length": 20.0,
             "name": "value",
             "type": "Restriction",
-            "help": None,
         },
     )
 
@@ -162,7 +154,6 @@ class AlphaNumericStringLength1To25:
             "max_length": 25.0,
             "name": "value",
             "type": "Restriction",
-            "help": None,
         },
     )
 
@@ -178,7 +169,6 @@ class AlphaNumericStringLength1To250:
             "max_length": 250.0,
             "name": "value",
             "type": "Restriction",
-            "help": None,
         },
     )
 
@@ -194,7 +184,6 @@ class AlphaNumericStringLength1To256:
             "max_length": 256.0,
             "name": "value",
             "type": "Restriction",
-            "help": None,
         },
     )
 
@@ -210,7 +199,6 @@ class AlphaNumericStringLength1To28:
             "max_length": 28.0,
             "name": "value",
             "type": "Restriction",
-            "help": None,
         },
     )
 
@@ -226,7 +214,6 @@ class AlphaNumericStringLength1To3:
             "max_length": 3.0,
             "name": "value",
             "type": "Restriction",
-            "help": None,
         },
     )
 
@@ -242,7 +229,6 @@ class AlphaNumericStringLength1To30:
             "max_length": 30.0,
             "name": "value",
             "type": "Restriction",
-            "help": None,
         },
     )
 
@@ -258,7 +244,6 @@ class AlphaNumericStringLength1To35:
             "max_length": 35.0,
             "name": "value",
             "type": "Restriction",
-            "help": None,
         },
     )
 
@@ -274,7 +259,6 @@ class AlphaNumericStringLength1To4:
             "max_length": 4.0,
             "name": "value",
             "type": "Restriction",
-            "help": None,
         },
     )
 
@@ -290,7 +274,6 @@ class AlphaNumericStringLength1To5:
             "max_length": 5.0,
             "name": "value",
             "type": "Restriction",
-            "help": None,
         },
     )
 
@@ -306,7 +289,6 @@ class AlphaNumericStringLength1To50:
             "max_length": 50.0,
             "name": "value",
             "type": "Restriction",
-            "help": None,
         },
     )
 
@@ -322,7 +304,6 @@ class AlphaNumericStringLength1To6:
             "max_length": 6.0,
             "name": "value",
             "type": "Restriction",
-            "help": None,
         },
     )
 
@@ -338,7 +319,6 @@ class AlphaNumericStringLength1To7:
             "max_length": 7.0,
             "name": "value",
             "type": "Restriction",
-            "help": None,
         },
     )
 
@@ -354,7 +334,6 @@ class AlphaNumericStringLength1To70:
             "max_length": 70.0,
             "name": "value",
             "type": "Restriction",
-            "help": None,
         },
     )
 
@@ -370,7 +349,6 @@ class AlphaNumericStringLength1To8:
             "max_length": 8.0,
             "name": "value",
             "type": "Restriction",
-            "help": None,
         },
     )
 
@@ -386,7 +364,6 @@ class AlphaNumericStringLength1To9:
             "max_length": 9.0,
             "name": "value",
             "type": "Restriction",
-            "help": None,
         },
     )
 
@@ -402,7 +379,6 @@ class AlphaNumericStringLength2To3:
             "max_length": 3.0,
             "name": "value",
             "type": "Restriction",
-            "help": None,
         },
     )
 
@@ -418,7 +394,6 @@ class AlphaNumericStringLength3To5:
             "max_length": 5.0,
             "name": "value",
             "type": "Restriction",
-            "help": None,
         },
     )
 
@@ -434,7 +409,6 @@ class AlphaNumericStringLength6To6:
             "max_length": 6.0,
             "name": "value",
             "type": "Restriction",
-            "help": None,
         },
     )
 
@@ -450,7 +424,6 @@ class AlphaStringLength0To1:
             "max_length": 1.0,
             "name": "value",
             "type": "Restriction",
-            "help": None,
         },
     )
 
@@ -466,7 +439,6 @@ class AlphaStringLength1To1:
             "max_length": 1.0,
             "name": "value",
             "type": "Restriction",
-            "help": None,
         },
     )
 
@@ -482,7 +454,6 @@ class AlphaStringLength1To2:
             "max_length": 2.0,
             "name": "value",
             "type": "Restriction",
-            "help": None,
         },
     )
 
@@ -498,7 +469,6 @@ class AlphaStringLength1To3:
             "max_length": 3.0,
             "name": "value",
             "type": "Restriction",
-            "help": None,
         },
     )
 
@@ -514,7 +484,6 @@ class AlphaStringLength3To3:
             "max_length": 3.0,
             "name": "value",
             "type": "Restriction",
-            "help": None,
         },
     )
 
@@ -530,7 +499,6 @@ class AlphaStringLength3To5:
             "max_length": 5.0,
             "name": "value",
             "type": "Restriction",
-            "help": None,
         },
     )
 
@@ -545,7 +513,6 @@ class AmaEdicodesetTypeLength1:
             "pattern": "[0-9A-Z]",
             "name": "value",
             "type": "Restriction",
-            "help": None,
         },
     )
 
@@ -560,7 +527,6 @@ class AmaEdicodesetTypeLength1to3:
             "pattern": "[0-9A-Z]{1,3}",
             "name": "value",
             "type": "Restriction",
-            "help": None,
         },
     )
 
@@ -575,7 +541,6 @@ class DateDdmmyy:
             "pattern": "(0[1-9]|[1-2][0-9]|3[0-1])(0[1-9]|1[0-2])[0-9]{2}",
             "name": "value",
             "type": "Restriction",
-            "help": None,
         },
     )
 
@@ -590,7 +555,6 @@ class DateYyyymmdd:
             "pattern": "[0-9]{4}(0[1-9]|1[0-2])(0[1-9]|[1-2][0-9]|3[0-1])",
             "name": "value",
             "type": "Restriction",
-            "help": None,
         },
     )
 
@@ -600,8 +564,7 @@ class NumericDecimalLength1To12:
     """Format limitations: n..12"""
 
     value: float = field(
-        default=None,
-        metadata={"name": "value", "type": "Restriction", "help": None},
+        default=None, metadata={"name": "value", "type": "Restriction"}
     )
 
 
@@ -610,8 +573,7 @@ class NumericDecimalLength1To18:
     """Format limitations: n..18"""
 
     value: float = field(
-        default=None,
-        metadata={"name": "value", "type": "Restriction", "help": None},
+        default=None, metadata={"name": "value", "type": "Restriction"}
     )
 
 
@@ -625,7 +587,6 @@ class NumericIntegerLength0To3:
             "pattern": "-?[0-9]{0,3}",
             "name": "value",
             "type": "Restriction",
-            "help": None,
         },
     )
 
@@ -640,7 +601,6 @@ class NumericIntegerLength0To35:
             "pattern": "-?[0-9]{0,35}",
             "name": "value",
             "type": "Restriction",
-            "help": None,
         },
     )
 
@@ -655,7 +615,6 @@ class NumericIntegerLength1To1:
             "pattern": "-?[0-9]{1,1}",
             "name": "value",
             "type": "Restriction",
-            "help": None,
         },
     )
 
@@ -670,7 +629,6 @@ class NumericIntegerLength1To15:
             "pattern": "-?[0-9]{1,15}",
             "name": "value",
             "type": "Restriction",
-            "help": None,
         },
     )
 
@@ -685,7 +643,6 @@ class NumericIntegerLength1To18:
             "pattern": "-?[0-9]{1,18}",
             "name": "value",
             "type": "Restriction",
-            "help": None,
         },
     )
 
@@ -700,7 +657,6 @@ class NumericIntegerLength1To2:
             "pattern": "-?[0-9]{1,2}",
             "name": "value",
             "type": "Restriction",
-            "help": None,
         },
     )
 
@@ -715,7 +671,6 @@ class NumericIntegerLength1To3:
             "pattern": "-?[0-9]{1,3}",
             "name": "value",
             "type": "Restriction",
-            "help": None,
         },
     )
 
@@ -730,7 +685,6 @@ class NumericIntegerLength1To4:
             "pattern": "-?[0-9]{1,4}",
             "name": "value",
             "type": "Restriction",
-            "help": None,
         },
     )
 
@@ -745,7 +699,6 @@ class NumericIntegerLength1To6:
             "pattern": "-?[0-9]{1,6}",
             "name": "value",
             "type": "Restriction",
-            "help": None,
         },
     )
 
@@ -760,7 +713,6 @@ class NumericIntegerLength1To8:
             "pattern": "-?[0-9]{1,8}",
             "name": "value",
             "type": "Restriction",
-            "help": None,
         },
     )
 
@@ -775,7 +727,6 @@ class NumericIntegerLength1To9:
             "pattern": "-?[0-9]{1,9}",
             "name": "value",
             "type": "Restriction",
-            "help": None,
         },
     )
 
@@ -790,7 +741,6 @@ class NumericIntegerLength4To4:
             "pattern": "-?[0-9]{4,4}",
             "name": "value",
             "type": "Restriction",
-            "help": None,
         },
     )
 
@@ -805,7 +755,6 @@ class Time24Hhmm:
             "pattern": "([0-1][0-9]|2[0-3])[0-5][0-9]",
             "name": "value",
             "type": "Restriction",
-            "help": None,
         },
     )
 
@@ -816,8 +765,6 @@ class AdditionalProductDetailsType:
     equipment_type: AlphaNumericStringLength1To3 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "equipmentType",
             "type": "Element",
             "help": "Type of aircraft",
@@ -826,8 +773,6 @@ class AdditionalProductDetailsType:
     operating_day: AlphaNumericStringLength1To7 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "operatingDay",
             "type": "Element",
             "help": "Day number of the week",
@@ -836,15 +781,13 @@ class AdditionalProductDetailsType:
     tech_stop_number: NumericIntegerLength1To2 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "techStopNumber",
             "type": "Element",
             "help": "Number of stops made in a journey if different from 0",
         },
     )
-    location_id: AlphaStringLength3To5 = field(
-        default=None,
+    location_id: List[AlphaStringLength3To5] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 3,
@@ -862,8 +805,6 @@ class AdditionalProductTypeI:
     equipment: AlphaNumericStringLength1To3 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "equipment",
             "type": "Element",
             "help": "Equipment type",
@@ -872,8 +813,6 @@ class AdditionalProductTypeI:
     duration: NumericIntegerLength1To6 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "duration",
             "type": "Element",
             "help": "Elaps flying time of the leg",
@@ -882,8 +821,6 @@ class AdditionalProductTypeI:
     complexing_flight_indicator: AlphaNumericStringLength1To1 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "complexingFlightIndicator",
             "type": "Element",
             "help": "COG indicator",
@@ -897,8 +834,6 @@ class AgentIdentificationType:
     arc_number: AlphaNumericStringLength1To12 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "arcNumber",
             "type": "Element",
             "help": "Contains ARC number",
@@ -907,8 +842,6 @@ class AgentIdentificationType:
     ersp_number: AlphaNumericStringLength1To12 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "erspNumber",
             "type": "Element",
             "help": "ERSP number of the Office or Customer",
@@ -917,8 +850,6 @@ class AgentIdentificationType:
     iata_number: AlphaNumericStringLength1To12 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "iataNumber",
             "type": "Element",
             "help": "IATA Number",
@@ -932,8 +863,6 @@ class ArithmeticEvaluationType:
     code_operator: AlphaNumericStringLength1To3 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "codeOperator",
             "type": "Element",
             "help": "Boolean operator",
@@ -947,8 +876,6 @@ class ArrivalLocationDetailsType:
     distance: NumericIntegerLength1To3 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "distance",
             "type": "Element",
             "help": "For Radius: This is the length of the requested radius around the location of destination.",
@@ -957,8 +884,6 @@ class ArrivalLocationDetailsType:
     distance_unit: AlphaNumericStringLength0To3 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "distanceUnit",
             "type": "Element",
             "help": "Distance unit qualifier for radius",
@@ -967,8 +892,6 @@ class ArrivalLocationDetailsType:
     location_id: AlphaStringLength3To5 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "locationId",
             "type": "Element",
             "help": "ATA/IATA airport/city code of arrival In case of SP request from a PNR, this field is empty.",
@@ -977,8 +900,6 @@ class ArrivalLocationDetailsType:
     airport_city_qualifier: AlphaStringLength1To1 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "airportCityQualifier",
             "type": "Element",
             "help": "Request from no PNR A = consider the locationID specified as an airport (used only when ambiguous) C = consider the locationId as a city (used only when ambiguous) A and C are not used in case of a request from PNR Request from a PNR with Radius option: O = radius applies to the origin of the PNR segments D = radius applies to the destination of the PNR segments",
@@ -987,8 +908,6 @@ class ArrivalLocationDetailsType:
     latitude: AlphaNumericStringLength6To6 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "latitude",
             "type": "Element",
             "help": "Latitude in degrees (decimal format) with hemisphere N=north S=south",
@@ -997,8 +916,6 @@ class ArrivalLocationDetailsType:
     longitude: AlphaNumericStringLength6To6 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "longitude",
             "type": "Element",
             "help": "Longitude in degrees (decimal format) with hemisphere E=east, W=west",
@@ -1012,8 +929,6 @@ class ArrivalLocationDetailsType120834C:
     distance: NumericIntegerLength1To3 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "distance",
             "type": "Element",
             "help": "For Radius: This is the length of the requested radius around the location of origin.",
@@ -1022,8 +937,6 @@ class ArrivalLocationDetailsType120834C:
     distance_unit: AlphaNumericStringLength1To3 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "distanceUnit",
             "type": "Element",
             "help": "Distance unit qualifier for radius",
@@ -1032,8 +945,6 @@ class ArrivalLocationDetailsType120834C:
     location_id: AlphaStringLength3To5 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "locationId",
             "type": "Element",
             "help": "ATA/IATA airport/city code of arrival In case of SP request from a PNR, this field is empty.",
@@ -1042,8 +953,6 @@ class ArrivalLocationDetailsType120834C:
     airport_city_qualifier: AlphaStringLength1To1 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "airportCityQualifier",
             "type": "Element",
             "help": "Request from no PNR A = consider the locationID specified as an airport (used only when ambiguous) C = consider the locationId as a city (used only when ambiguous) A and C are not used in case of a request from PNR Request from a PNR with Radius option: O = radius applies to the origin of the PNR segments D = radius applies to the destination of the PNR segments",
@@ -1052,8 +961,6 @@ class ArrivalLocationDetailsType120834C:
     latitude: AlphaNumericStringLength6To6 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "latitude",
             "type": "Element",
             "help": "Latitude in degrees (decimal format) with hemisphere N=north S=south",
@@ -1062,8 +969,6 @@ class ArrivalLocationDetailsType120834C:
     longitude: AlphaNumericStringLength6To6 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "longitude",
             "type": "Element",
             "help": "Longitude in degrees (decimal format) with hemisphere E=east, W=west",
@@ -1077,15 +982,13 @@ class AttributeDetailsType:
     requested_sgt: AlphaNumericStringLength1To3 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "requestedSgt",
             "type": "Element",
             "help": "Reference of the requested segment",
         },
     )
-    value: AlphaNumericStringLength1To20 = field(
-        default=None,
+    value: List[AlphaNumericStringLength1To20] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 50,
@@ -1103,8 +1006,7 @@ class AttributeInformationType:
     option: AlphaNumericStringLength1To3 = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "option",
             "type": "Element",
             "help": "Code of options",
@@ -1113,8 +1015,6 @@ class AttributeInformationType:
     option_information: AlphaNumericStringLength1To35 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "optionInformation",
             "type": "Element",
             "help": "Mandatory when alternate date option is used (ALT), must be set to plus (P) or minus (M) a number of days around the original PNR segment dates. E.g.: M1 (for minus 1 day) or P100 (for plus 100 days)",
@@ -1129,8 +1029,7 @@ class AttributeInformationType97181C:
     attribute_type: AlphaNumericStringLength1To25 = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "attributeType",
             "type": "Element",
             "help": "Attribute type",
@@ -1139,8 +1038,6 @@ class AttributeInformationType97181C:
     attribute_description: AlphaNumericStringLength1To256 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "attributeDescription",
             "type": "Element",
             "help": "Attribute description",
@@ -1153,29 +1050,15 @@ class BucketInformationType:
 
     number: AlphaNumericStringLength1To3 = field(
         default=None,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
-            "name": "number",
-            "type": "Element",
-            "help": "Number",
-        },
+        metadata={"name": "number", "type": "Element", "help": "Number"},
     )
     name: AlphaNumericStringLength1To20 = field(
         default=None,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
-            "name": "name",
-            "type": "Element",
-            "help": "Name",
-        },
+        metadata={"name": "name", "type": "Element", "help": "Name"},
     )
     completion: AmaEdicodesetTypeLength1to3 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "completion",
             "type": "Element",
             "help": "Completion",
@@ -1183,19 +1066,11 @@ class BucketInformationType:
     )
     mode: AlphaNumericStringLength1To3 = field(
         default=None,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
-            "name": "mode",
-            "type": "Element",
-            "help": "Mode",
-        },
+        metadata={"name": "mode", "type": "Element", "help": "Mode"},
     )
     value_ref: AlphaNumericStringLength1To3 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "valueRef",
             "type": "Element",
             "help": "Value reference",
@@ -1203,19 +1078,11 @@ class BucketInformationType:
     )
     weight: NumericIntegerLength1To4 = field(
         default=None,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
-            "name": "weight",
-            "type": "Element",
-            "help": "Weight",
-        },
+        metadata={"name": "weight", "type": "Element", "help": "Weight"},
     )
     count: NumericIntegerLength1To6 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "count",
             "type": "Element",
             "help": "Number of solutions in the bucket",
@@ -1224,8 +1091,6 @@ class BucketInformationType:
     attribute_count: NumericIntegerLength1To6 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "attributeCount",
             "type": "Element",
             "help": "Number of solutions per attribute",
@@ -1240,8 +1105,7 @@ class CabinClassDesignationType:
     cabin_designator: AlphaNumericStringLength1To1 = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "cabinDesignator",
             "type": "Element",
             "help": "Cabin designator.",
@@ -1255,15 +1119,13 @@ class CabinIdentificationType:
     cabin_qualifier: AlphaNumericStringLength1To2 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "cabinQualifier",
             "type": "Element",
             "help": "Cabin qualifier. For Star Pricer,MD stands for Mandatory Cabin qualifier. For other products no qualifier stands for Mandatory Cabin.",
         },
     )
-    cabin: AlphaStringLength0To1 = field(
-        default=None,
+    cabin: List[AlphaStringLength0To1] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 1,
             "max_occurs": 3,
@@ -1280,15 +1142,13 @@ class CabinIdentificationType233500C:
     cabin_qualifier: AlphaNumericStringLength1To2 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "cabinQualifier",
             "type": "Element",
             "help": "Cabin qualifier. For Star Pricer,MD stands for Mandatory Cabin qualifier. For other products no qualifier stands for Mandatory Cabin.",
         },
     )
-    cabin: AlphaStringLength0To1 = field(
-        default=None,
+    cabin: List[AlphaStringLength0To1] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 5,
@@ -1305,8 +1165,7 @@ class CabinProductDetailsType:
     rbd: AlphaStringLength1To1 = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "rbd",
             "type": "Element",
             "help": "Reservation booking designator - RBD",
@@ -1315,8 +1174,6 @@ class CabinProductDetailsType:
     booking_modifier: AmaEdicodesetTypeLength1 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "bookingModifier",
             "type": "Element",
             "help": "Reservation Booking Modifier",
@@ -1325,8 +1182,6 @@ class CabinProductDetailsType:
     cabin: AlphaStringLength1To1 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "cabin",
             "type": "Element",
             "help": "Indicates the cabin related to the Booking code",
@@ -1335,8 +1190,6 @@ class CabinProductDetailsType:
     avl_status: AmaEdicodesetTypeLength1to3 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "avlStatus",
             "type": "Element",
             "help": "Availibility status : posting level",
@@ -1351,8 +1204,7 @@ class CodedAttributeInformationType:
     attribute_type: AlphaNumericStringLength1To5 = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "attributeType",
             "type": "Element",
             "help": "Attribute type identification",
@@ -1361,8 +1213,6 @@ class CodedAttributeInformationType:
     attribute_description: AlphaNumericStringLength1To20 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "attributeDescription",
             "type": "Element",
             "help": "Attribute Description",
@@ -1377,15 +1227,14 @@ class CodedAttributeInformationType120742C:
     name: AlphaNumericStringLength1To5 = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "name",
             "type": "Element",
             "help": "Name.",
         },
     )
-    value: AlphaNumericStringLength1To20 = field(
-        default=None,
+    value: List[AlphaNumericStringLength1To20] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 10,
@@ -1402,16 +1251,10 @@ class CodedAttributeInformationType139508C:
 
     type: AlphaNumericStringLength1To5 = field(
         default=None,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
-            "name": "type",
-            "type": "Element",
-            "help": "Attribute type",
-        },
+        metadata={"name": "type", "type": "Element", "help": "Attribute type"},
     )
-    value: AlphaNumericStringLength1To20 = field(
-        default=None,
+    value: List[AlphaNumericStringLength1To20] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 10,
@@ -1429,18 +1272,14 @@ class CodedAttributeInformationType247828C:
     attribute_type: AlphaNumericStringLength1To5 = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "attributeType",
             "type": "Element",
-            "help": None,
         },
     )
     attribute_description: AlphaNumericStringLength1To10 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "attributeDescription",
             "type": "Element",
             "help": "Attribute description",
@@ -1455,8 +1294,7 @@ class CodedAttributeInformationType254574C:
     attribute_type: AlphaNumericStringLength1To5 = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "attributeType",
             "type": "Element",
             "help": "Attribute type",
@@ -1465,8 +1303,6 @@ class CodedAttributeInformationType254574C:
     attribute_description: AlphaNumericStringLength1To50 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "attributeDescription",
             "type": "Element",
             "help": "Attribute description",
@@ -1481,8 +1317,7 @@ class CodedAttributeInformationType275401C:
     fee_type: AlphaNumericStringLength1To5 = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "feeType",
             "type": "Element",
             "help": "Type of fee/reduction",
@@ -1491,8 +1326,7 @@ class CodedAttributeInformationType275401C:
     fee_id_number: AlphaNumericStringLength1To50 = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "feeIdNumber",
             "type": "Element",
             "help": "Fee Id Number",
@@ -1506,15 +1340,14 @@ class CompanyIdentificationType120719C:
     carrier_qualifier: AlphaNumericStringLength0To1 = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "carrierQualifier",
             "type": "Element",
             "help": "Item description identification.",
         },
     )
-    carrier_id: AlphaNumericStringLength2To3 = field(
-        default=None,
+    carrier_id: List[AlphaNumericStringLength2To3] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 1,
             "max_occurs": 99,
@@ -1531,8 +1364,7 @@ class CompanyIdentificationType195544C:
     marketing_carrier: AlphaNumericStringLength2To3 = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "marketingCarrier",
             "type": "Element",
             "help": "Marketing carrier",
@@ -1541,8 +1373,6 @@ class CompanyIdentificationType195544C:
     operating_carrier: AlphaNumericStringLength2To3 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "operatingCarrier",
             "type": "Element",
             "help": "Operating carrier",
@@ -1556,15 +1386,14 @@ class CompanyIdentificationType275415C:
     carrier_qualifier: AlphaNumericStringLength0To1 = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "carrierQualifier",
             "type": "Element",
             "help": "Item description identification.",
         },
     )
-    carrier_id: AlphaNumericStringLength2To3 = field(
-        default=None,
+    carrier_id: List[AlphaNumericStringLength2To3] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 1,
             "max_occurs": 999,
@@ -1582,8 +1411,7 @@ class CompanyIdentificationTypeI:
     marketing_company: AlphaNumericStringLength2To3 = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "marketingCompany",
             "type": "Element",
             "help": "Carrier code",
@@ -1598,8 +1426,7 @@ class CompanyRoleIdentificationType:
     transport_stage_qualifier: AlphaStringLength1To1 = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "transportStageQualifier",
             "type": "Element",
             "help": "Codeshare qualifier",
@@ -1608,8 +1435,6 @@ class CompanyRoleIdentificationType:
     airline_designator: AlphaNumericStringLength2To3 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "airlineDesignator",
             "type": "Element",
             "help": "company identification",
@@ -1618,8 +1443,6 @@ class CompanyRoleIdentificationType:
     flight_number: NumericIntegerLength1To4 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "flightNumber",
             "type": "Element",
             "help": "flight number",
@@ -1628,8 +1451,6 @@ class CompanyRoleIdentificationType:
     operational_suffix: AlphaStringLength1To1 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "operationalSuffix",
             "type": "Element",
             "help": "suffix",
@@ -1644,8 +1465,6 @@ class CompanyRoleIdentificationType120761C:
     code_share_type: AlphaStringLength1To1 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "codeShareType",
             "type": "Element",
             "help": "Type of code share agreement.",
@@ -1654,8 +1473,6 @@ class CompanyRoleIdentificationType120761C:
     airline_designator: AlphaNumericStringLength2To3 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "airlineDesignator",
             "type": "Element",
             "help": "company identification",
@@ -1664,8 +1481,6 @@ class CompanyRoleIdentificationType120761C:
     flight_number: NumericIntegerLength1To4 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "flightNumber",
             "type": "Element",
             "help": "flight number",
@@ -1679,8 +1494,7 @@ class ConnectPointDetailsType:
     exclusion_identifier: AlphaStringLength0To1 = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "exclusionIdentifier",
             "type": "Element",
             "help": "Exclusion identification",
@@ -1689,8 +1503,7 @@ class ConnectPointDetailsType:
     location_id: AlphaStringLength3To5 = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "locationId",
             "type": "Element",
             "help": "Place or Location identification",
@@ -1699,8 +1512,6 @@ class ConnectPointDetailsType:
     airport_city_qualifier: AlphaStringLength1To1 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "airportCityQualifier",
             "type": "Element",
             "help": "Airport/city qualifier",
@@ -1714,8 +1525,7 @@ class ConnectPointDetailsType195492C:
     inclusion_identifier: AlphaNumericStringLength0To1 = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "inclusionIdentifier",
             "type": "Element",
             "help": "Inclusion identification",
@@ -1724,8 +1534,7 @@ class ConnectPointDetailsType195492C:
     location_id: AlphaStringLength3To5 = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "locationId",
             "type": "Element",
             "help": "Place or Location identification",
@@ -1734,8 +1543,6 @@ class ConnectPointDetailsType195492C:
     airport_city_qualifier: AlphaStringLength1To1 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "airportCityQualifier",
             "type": "Element",
             "help": "Airport/city qualifier",
@@ -1750,8 +1557,7 @@ class ConnectionDetailsTypeI:
     location: AlphaNumericStringLength1To3 = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "location",
             "type": "Element",
             "help": "Location",
@@ -1766,42 +1572,21 @@ class ConsumerReferenceIdentificationTypeI:
     reference_qualifier: AlphaNumericStringLength1To3 = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "referenceQualifier",
             "type": "Element",
-            "help": None,
         },
     )
     reference_number: AlphaNumericStringLength1To35 = field(
-        default=None,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
-            "name": "referenceNumber",
-            "type": "Element",
-            "help": None,
-        },
+        default=None, metadata={"name": "referenceNumber", "type": "Element"}
     )
     reference_party_name: AlphaNumericStringLength1To35 = field(
         default=None,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
-            "name": "referencePartyName",
-            "type": "Element",
-            "help": None,
-        },
+        metadata={"name": "referencePartyName", "type": "Element"},
     )
     traveller_reference_nbr: AlphaNumericStringLength1To10 = field(
         default=None,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
-            "name": "travellerReferenceNbr",
-            "type": "Element",
-            "help": None,
-        },
+        metadata={"name": "travellerReferenceNbr", "type": "Element"},
     )
 
 
@@ -1811,8 +1596,6 @@ class ConversionRateDetailsType:
     conversion_type: AlphaNumericStringLength1To3 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "conversionType",
             "type": "Element",
             "help": "Conversion type",
@@ -1821,8 +1604,7 @@ class ConversionRateDetailsType:
     currency: AlphaStringLength1To3 = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "currency",
             "type": "Element",
             "help": "Currency",
@@ -1836,15 +1618,13 @@ class CorporateFareIdentifiersType:
     fare_qualifier: AlphaNumericStringLength1To3 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "fareQualifier",
             "type": "Element",
             "help": "Indicates the type of corporate fares requested",
         },
     )
-    identify_number: AlphaNumericStringLength1To35 = field(
-        default=None,
+    identify_number: List[AlphaNumericStringLength1To35] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 20,
@@ -1862,15 +1642,14 @@ class CorporateIdentityType:
     corporate_qualifier: AlphaNumericStringLength0To3 = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "corporateQualifier",
             "type": "Element",
             "help": "Indicates if 1A corporate (RC) or Unifare corporate (RW) requested.",
         },
     )
-    identity: AlphaNumericStringLength1To20 = field(
-        default=None,
+    identity: List[AlphaNumericStringLength1To20] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 1,
             "max_occurs": 9,
@@ -1886,33 +1665,18 @@ class CriteriaiDetaislType:
     """Criteria details : weights/parameters list"""
 
     type: AlphaNumericStringLength1To3 = field(
-        default=None,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
-            "name": "type",
-            "type": "Element",
-            "help": None,
-        },
+        default=None, metadata={"name": "type", "type": "Element"}
     )
     value: AlphaNumericStringLength1To18 = field(
-        default=None,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
-            "name": "value",
-            "type": "Element",
-            "help": None,
-        },
+        default=None, metadata={"name": "value", "type": "Element"}
     )
-    attribute: AlphaNumericStringLength1To9 = field(
-        default=None,
+    attribute: List[AlphaNumericStringLength1To9] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 99,
             "name": "attribute",
             "type": "Element",
-            "help": None,
         },
     )
 
@@ -1924,8 +1688,6 @@ class DataInformationType:
     indicator: AlphaNumericStringLength1To3 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "indicator",
             "type": "Element",
             "help": "Ancillary services options",
@@ -1940,8 +1702,7 @@ class DataTypeInformationType:
     sub_type: AlphaNumericStringLength1To3 = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "subType",
             "type": "Element",
             "help": "Carrier fee code",
@@ -1950,8 +1711,6 @@ class DataTypeInformationType:
     option: AlphaNumericStringLength1To3 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "option",
             "type": "Element",
             "help": "Status (automated, manually added, exempted). Default is automated",
@@ -1966,8 +1725,6 @@ class DateAndTimeDetailsType:
     flexibility_qualifier: AlphaNumericStringLength1To3 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "flexibilityQualifier",
             "type": "Element",
             "help": "Trip Duration type(Plus,Minus,Combined)",
@@ -1976,8 +1733,6 @@ class DateAndTimeDetailsType:
     trip_interval: NumericIntegerLength1To6 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "tripInterval",
             "type": "Element",
             "help": "Number of days added or/and retrieved to the trip duration",
@@ -1986,8 +1741,6 @@ class DateAndTimeDetailsType:
     trip_duration: NumericIntegerLength1To4 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "tripDuration",
             "type": "Element",
             "help": "Period between date of departure and date of arrival",
@@ -2001,8 +1754,6 @@ class DateAndTimeDetailsType120762C:
     date_qualifier: AlphaNumericStringLength1To3 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "dateQualifier",
             "type": "Element",
             "help": "Date time period qualifier",
@@ -2010,19 +1761,11 @@ class DateAndTimeDetailsType120762C:
     )
     date: DateDdmmyy = field(
         default=None,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
-            "name": "date",
-            "type": "Element",
-            "help": "First Date",
-        },
+        metadata={"name": "date", "type": "Element", "help": "First Date"},
     )
     first_time: Time24Hhmm = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "firstTime",
             "type": "Element",
             "help": "First Time",
@@ -2031,8 +1774,6 @@ class DateAndTimeDetailsType120762C:
     equipement_type: AlphaNumericStringLength1To3 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "equipementType",
             "type": "Element",
             "help": "Movement type.",
@@ -2041,8 +1782,6 @@ class DateAndTimeDetailsType120762C:
     location_id: AlphaNumericStringLength3To5 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "locationId",
             "type": "Element",
             "help": "Place/location identification.",
@@ -2057,8 +1796,6 @@ class DateAndTimeDetailsType254619C:
     range_qualifier: AlphaNumericStringLength1To3 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "rangeQualifier",
             "type": "Element",
             "help": "To identify type of range (Plus,Minus or combined)",
@@ -2067,8 +1804,6 @@ class DateAndTimeDetailsType254619C:
     day_interval: NumericIntegerLength1To6 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "dayInterval",
             "type": "Element",
             "help": "Range of dates : Number of Days preceding or/and Following the request departure date",
@@ -2077,8 +1812,6 @@ class DateAndTimeDetailsType254619C:
     time_atdestination: Time24Hhmm = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "timeAtdestination",
             "type": "Element",
             "help": "Time at destination (local)",
@@ -2093,8 +1826,6 @@ class DateAndTimeDetailsTypeI:
     time_qualifier: AlphaNumericStringLength1To3 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "timeQualifier",
             "type": "Element",
             "help": "Toidentify type of time Arrival/Departure",
@@ -2102,29 +1833,15 @@ class DateAndTimeDetailsTypeI:
     )
     date: DateDdmmyy = field(
         default=None,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
-            "name": "date",
-            "type": "Element",
-            "help": "Date",
-        },
+        metadata={"name": "date", "type": "Element", "help": "Date"},
     )
     time: Time24Hhmm = field(
         default=None,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
-            "name": "time",
-            "type": "Element",
-            "help": "Time",
-        },
+        metadata={"name": "time", "type": "Element", "help": "Time"},
     )
     time_window: AlphaNumericStringLength1To3 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "timeWindow",
             "type": "Element",
             "help": "Time window size in hours",
@@ -2138,8 +1855,6 @@ class DateAndTimeDetailsTypeI120740C:
     qualifier: AlphaNumericStringLength1To3 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "qualifier",
             "type": "Element",
             "help": "Date time period qualifier",
@@ -2147,53 +1862,21 @@ class DateAndTimeDetailsTypeI120740C:
     )
     date: DateDdmmyy = field(
         default=None,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
-            "name": "date",
-            "type": "Element",
-            "help": "First Date",
-        },
+        metadata={"name": "date", "type": "Element", "help": "First Date"},
     )
     time: Time24Hhmm = field(
         default=None,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
-            "name": "time",
-            "type": "Element",
-            "help": "First Time",
-        },
+        metadata={"name": "time", "type": "Element", "help": "First Time"},
     )
     qualifier2: AlphaNumericStringLength1To3 = field(
         default=None,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
-            "name": "qualifier2",
-            "type": "Element",
-            "help": ".",
-        },
+        metadata={"name": "qualifier2", "type": "Element", "help": "."},
     )
     reserved1: AlphaNumericStringLength1To3 = field(
-        default=None,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
-            "name": "reserved1",
-            "type": "Element",
-            "help": None,
-        },
+        default=None, metadata={"name": "reserved1", "type": "Element"}
     )
     reserved2: AlphaNumericStringLength3To5 = field(
-        default=None,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
-            "name": "reserved2",
-            "type": "Element",
-            "help": None,
-        },
+        default=None, metadata={"name": "reserved2", "type": "Element"}
     )
 
 
@@ -2204,8 +1887,7 @@ class DateTimePeriodDetailsTypeI:
     qualifier: AlphaNumericStringLength1To3 = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "qualifier",
             "type": "Element",
             "help": "Qualifier",
@@ -2213,13 +1895,7 @@ class DateTimePeriodDetailsTypeI:
     )
     value: AlphaNumericStringLength1To35 = field(
         default=None,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
-            "name": "value",
-            "type": "Element",
-            "help": "Value",
-        },
+        metadata={"name": "value", "type": "Element", "help": "Value"},
     )
 
 
@@ -2228,39 +1904,19 @@ class FareDetailsType:
 
     qualifier: AmaEdicodesetTypeLength1to3 = field(
         default=None,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
-            "name": "qualifier",
-            "type": "Element",
-            "help": "Qualifier",
-        },
+        metadata={"name": "qualifier", "type": "Element", "help": "Qualifier"},
     )
     rate: NumericIntegerLength1To8 = field(
         default=None,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
-            "name": "rate",
-            "type": "Element",
-            "help": "Rate",
-        },
+        metadata={"name": "rate", "type": "Element", "help": "Rate"},
     )
     country: AlphaNumericStringLength1To3 = field(
         default=None,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
-            "name": "country",
-            "type": "Element",
-            "help": "Country",
-        },
+        metadata={"name": "country", "type": "Element", "help": "Country"},
     )
     fare_category: AmaEdicodesetTypeLength1to3 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "fareCategory",
             "type": "Element",
             "help": "Fare Category",
@@ -2275,8 +1931,7 @@ class FareFamilyDetailsType:
     commercial_family: AlphaNumericStringLength1To10 = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "commercialFamily",
             "type": "Element",
             "help": "Commercial fare Family Short name",
@@ -2291,8 +1946,6 @@ class FareInformationTypeI:
     value_qualifier: AlphaNumericStringLength1To3 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "valueQualifier",
             "type": "Element",
             "help": "PTC (Full Codeset List described in ATPCo Documentation B11109 Appendix A)",
@@ -2300,13 +1953,7 @@ class FareInformationTypeI:
     )
     value: NumericIntegerLength1To15 = field(
         default=None,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
-            "name": "value",
-            "type": "Element",
-            "help": "age",
-        },
+        metadata={"name": "value", "type": "Element", "help": "age"},
     )
 
 
@@ -2316,15 +1963,13 @@ class FareProductDetailsType:
     fare_basis: AlphaNumericStringLength0To18 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "fareBasis",
             "type": "Element",
             "help": "Fare basis code",
         },
     )
-    fare_type: AlphaNumericStringLength0To3 = field(
-        default=None,
+    fare_type: List[AlphaNumericStringLength0To3] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 3,
@@ -2339,8 +1984,8 @@ class FareProductDetailsType:
 class FareQualifierInformationType:
     """To specify multiple qualifier for fare selections."""
 
-    fare_family_qual: AlphaNumericStringLength0To3 = field(
-        default=None,
+    fare_family_qual: List[AlphaNumericStringLength0To3] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 1,
             "max_occurs": 9,
@@ -2357,8 +2002,6 @@ class FareTypeGroupingInformationType:
     pricing_group: AlphaNumericStringLength1To35 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "pricingGroup",
             "type": "Element",
             "help": "Pricing Group",
@@ -2373,8 +2016,7 @@ class FormOfPaymentDetailsTypeI:
     type: AlphaNumericStringLength1To3 = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "type",
             "type": "Element",
             "help": "Form of payment identification",
@@ -2383,8 +2025,6 @@ class FormOfPaymentDetailsTypeI:
     charged_amount: NumericDecimalLength1To12 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "chargedAmount",
             "type": "Element",
             "help": "amount to be charged on this form",
@@ -2393,8 +2033,6 @@ class FormOfPaymentDetailsTypeI:
     credit_card_number: AlphaNumericStringLength1To20 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "creditCardNumber",
             "type": "Element",
             "help": "Reference number",
@@ -2408,8 +2046,7 @@ class FreeTextDetailsType:
     text_subject_qualifier: AlphaNumericStringLength1To3 = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "textSubjectQualifier",
             "type": "Element",
             "help": "Qualifier of the free text. Always literal in our usage.",
@@ -2418,8 +2055,6 @@ class FreeTextDetailsType:
     information_type: AlphaNumericStringLength1To4 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "informationType",
             "type": "Element",
             "help": "Type of the free text. Always 7 for our usage.",
@@ -2428,8 +2063,7 @@ class FreeTextDetailsType:
     source: AlphaNumericStringLength1To3 = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "source",
             "type": "Element",
             "help": "Source of the information.",
@@ -2438,8 +2072,7 @@ class FreeTextDetailsType:
     encoding: AlphaNumericStringLength1To3 = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "encoding",
             "type": "Element",
             "help": "Encoding method used.",
@@ -2454,15 +2087,14 @@ class FrequencyType:
     qualifier: AlphaNumericStringLength1To3 = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "qualifier",
             "type": "Element",
             "help": "Indicate if the sequence number represents days of the week or days of the month.",
         },
     )
-    value: NumericIntegerLength1To1 = field(
-        default=None,
+    value: List[NumericIntegerLength1To1] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 7,
@@ -2479,28 +2111,17 @@ class FrequentTravellerIdentificationType:
     carrier: AlphaNumericStringLength1To35 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "carrier",
             "type": "Element",
             "help": "Carrier where the FQTV is registered.",
         },
     )
     number: AlphaNumericStringLength1To28 = field(
-        default=None,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
-            "name": "number",
-            "type": "Element",
-            "help": None,
-        },
+        default=None, metadata={"name": "number", "type": "Element"}
     )
     customer_reference: AlphaNumericStringLength1To10 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "customerReference",
             "type": "Element",
             "help": "Specifies which traveller in the TIF segment the frequent traveller number applies (same as 9944 in TIF).",
@@ -2509,8 +2130,6 @@ class FrequentTravellerIdentificationType:
     status: AlphaNumericStringLength1To3 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "status",
             "type": "Element",
             "help": "status code: 'OK' if the frequent flyer card has been validated",
@@ -2519,8 +2138,6 @@ class FrequentTravellerIdentificationType:
     tier_level: AlphaNumericStringLength1To35 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "tierLevel",
             "type": "Element",
             "help": "To specify a Tier linked to the FQTV",
@@ -2529,8 +2146,6 @@ class FrequentTravellerIdentificationType:
     priority_code: AlphaNumericStringLength1To12 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "priorityCode",
             "type": "Element",
             "help": "For example : priority code",
@@ -2539,8 +2154,6 @@ class FrequentTravellerIdentificationType:
     tier_description: AlphaNumericStringLength1To35 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "tierDescription",
             "type": "Element",
             "help": "For example : Level description",
@@ -2549,28 +2162,17 @@ class FrequentTravellerIdentificationType:
     company_code: AlphaNumericStringLength1To35 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "companyCode",
             "type": "Element",
             "help": "For example : Company code of alliance",
         },
     )
     customer_value: NumericIntegerLength1To4 = field(
-        default=None,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
-            "name": "customerValue",
-            "type": "Element",
-            "help": None,
-        },
+        default=None, metadata={"name": "customerValue", "type": "Element"}
     )
     type: AlphaNumericStringLength1To3 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "type",
             "type": "Element",
             "help": "To specify the product/account number qualifier. (e.g. 2=Corporate Frequent Flyer).",
@@ -2585,8 +2187,7 @@ class FrequentTravellerIdentificationType249074C:
     carrier: AlphaNumericStringLength1To3 = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "carrier",
             "type": "Element",
             "help": "carrier",
@@ -2595,8 +2196,6 @@ class FrequentTravellerIdentificationType249074C:
     number: AlphaNumericStringLength1To25 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "number",
             "type": "Element",
             "help": "Frequent traveller number",
@@ -2605,8 +2204,6 @@ class FrequentTravellerIdentificationType249074C:
     customer_reference: AlphaNumericStringLength1To10 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "customerReference",
             "type": "Element",
             "help": "Customer reference",
@@ -2615,8 +2212,6 @@ class FrequentTravellerIdentificationType249074C:
     tier_level: AlphaNumericStringLength1To35 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "tierLevel",
             "type": "Element",
             "help": "Tier level",
@@ -2625,8 +2220,6 @@ class FrequentTravellerIdentificationType249074C:
     priority_code: AlphaNumericStringLength1To12 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "priorityCode",
             "type": "Element",
             "help": "Priority code",
@@ -2635,8 +2228,6 @@ class FrequentTravellerIdentificationType249074C:
     tier_description: AlphaNumericStringLength1To35 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "tierDescription",
             "type": "Element",
             "help": "Tier description",
@@ -2645,8 +2236,6 @@ class FrequentTravellerIdentificationType249074C:
     type: AlphaNumericStringLength1To3 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "type",
             "type": "Element",
             "help": "To specify the product/account number qualifier. (e.g. 2=Corporate Frequent Flyer).",
@@ -2661,8 +2250,6 @@ class ItemNumberIdentificationType:
     number: AlphaNumericStringLength1To4 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "number",
             "type": "Element",
             "help": "Fare family combination number",
@@ -2670,29 +2257,15 @@ class ItemNumberIdentificationType:
     )
     type: AlphaNumericStringLength1To3 = field(
         default=None,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
-            "name": "type",
-            "type": "Element",
-            "help": "Type",
-        },
+        metadata={"name": "type", "type": "Element", "help": "Type"},
     )
     qualifier: AlphaNumericStringLength1To3 = field(
         default=None,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
-            "name": "qualifier",
-            "type": "Element",
-            "help": "Qualifier",
-        },
+        metadata={"name": "qualifier", "type": "Element", "help": "Qualifier"},
     )
     responsible_agency: AlphaNumericStringLength1To3 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "responsibleAgency",
             "type": "Element",
             "help": "Responsible agency",
@@ -2707,8 +2280,7 @@ class ItineraryDetailsType:
     airport_city_qualifier: AlphaStringLength1To1 = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "airportCityQualifier",
             "type": "Element",
             "help": "Airport/City Qualifier: the passenger wants to depart/arrive from/to the same airport or city in the specified requested segment",
@@ -2717,8 +2289,7 @@ class ItineraryDetailsType:
     segment_number: NumericIntegerLength1To3 = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "segmentNumber",
             "type": "Element",
             "help": "Requested segment number",
@@ -2732,8 +2303,7 @@ class LocationDetailsTypeI:
     location_id: AlphaStringLength3To5 = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "locationId",
             "type": "Element",
             "help": "Place or Location identification",
@@ -2742,8 +2312,6 @@ class LocationDetailsTypeI:
     country: AlphaNumericStringLength1To3 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "country",
             "type": "Element",
             "help": "Country, coded",
@@ -2757,8 +2325,7 @@ class LocationIdentificationDetailsType:
     location_id: AlphaStringLength3To5 = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "locationId",
             "type": "Element",
             "help": "3 characters ATA/IATA airport/city code",
@@ -2767,8 +2334,6 @@ class LocationIdentificationDetailsType:
     airport_city_qualifier: AlphaStringLength1To1 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "airportCityQualifier",
             "type": "Element",
             "help": "Airport/city qualifier: the requested point is an airport when ambiguity exists (e.g. HOU)",
@@ -2777,8 +2342,6 @@ class LocationIdentificationDetailsType:
     terminal: AlphaNumericStringLength1To5 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "terminal",
             "type": "Element",
             "help": "Terminal information",
@@ -2793,8 +2356,7 @@ class LocationTypeI:
     true_location_id: AlphaStringLength3To3 = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "trueLocationId",
             "type": "Element",
             "help": "Departure or Arrival IATA airport code",
@@ -2809,8 +2371,6 @@ class MileageTimeDetailsTypeI:
     elapsed_ground_time: NumericIntegerLength1To4 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "elapsedGroundTime",
             "type": "Element",
             "help": "Ground Time in minutes at Board point (connection with incoming flight)",
@@ -2824,8 +2384,6 @@ class MonetaryAndCabinInformationDetailsType:
     amount_type: AlphaNumericStringLength0To3 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "amountType",
             "type": "Element",
             "help": "Amount qualifier.",
@@ -2834,8 +2392,7 @@ class MonetaryAndCabinInformationDetailsType:
     amount: NumericDecimalLength1To18 = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "amount",
             "type": "Element",
             "help": "Amount",
@@ -2844,8 +2401,6 @@ class MonetaryAndCabinInformationDetailsType:
     currency: AlphaNumericStringLength1To3 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "currency",
             "type": "Element",
             "help": "ISO currency code",
@@ -2854,15 +2409,13 @@ class MonetaryAndCabinInformationDetailsType:
     location_id: AlphaStringLength3To5 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "locationId",
             "type": "Element",
             "help": "Airport/city code",
         },
     )
-    cabin_class_designator: AlphaStringLength1To1 = field(
-        default=None,
+    cabin_class_designator: List[AlphaStringLength1To1] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 9,
@@ -2879,8 +2432,6 @@ class MonetaryInformationDetailsTypeI:
     qualifier: AlphaNumericStringLength1To3 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "qualifier",
             "type": "Element",
             "help": "Monetary amount type qualifier, coded",
@@ -2889,8 +2440,7 @@ class MonetaryInformationDetailsTypeI:
     amount: NumericIntegerLength1To18 = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "amount",
             "type": "Element",
             "help": "Allowance or charge number",
@@ -2899,8 +2449,6 @@ class MonetaryInformationDetailsTypeI:
     currency: AlphaNumericStringLength1To3 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "currency",
             "type": "Element",
             "help": "Currency, coded",
@@ -2914,8 +2462,6 @@ class MonetaryInformationDetailsTypeI194597C:
     qualifier: AlphaNumericStringLength1To3 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "qualifier",
             "type": "Element",
             "help": "Monetary amount type qualifier, coded",
@@ -2924,8 +2470,7 @@ class MonetaryInformationDetailsTypeI194597C:
     amount: NumericIntegerLength1To18 = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "amount",
             "type": "Element",
             "help": "Allowance or charge number",
@@ -2934,8 +2479,6 @@ class MonetaryInformationDetailsTypeI194597C:
     currency: AlphaNumericStringLength1To3 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "currency",
             "type": "Element",
             "help": "Currency, coded",
@@ -2944,8 +2487,6 @@ class MonetaryInformationDetailsTypeI194597C:
     location_id: AlphaStringLength3To3 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "locationId",
             "type": "Element",
             "help": "Place or Location identification",
@@ -2960,8 +2501,7 @@ class MonetaryInformationDetailsTypeI65140C:
     type_qualifier: AlphaNumericStringLength1To3 = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "typeQualifier",
             "type": "Element",
             "help": "Qualifier",
@@ -2969,23 +2509,11 @@ class MonetaryInformationDetailsTypeI65140C:
     )
     amount: AlphaNumericStringLength1To12 = field(
         default=None,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
-            "name": "amount",
-            "type": "Element",
-            "help": "Amount",
-        },
+        metadata={"name": "amount", "type": "Element", "help": "Amount"},
     )
     currency: AlphaNumericStringLength1To3 = field(
         default=None,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
-            "name": "currency",
-            "type": "Element",
-            "help": "Currency",
-        },
+        metadata={"name": "currency", "type": "Element", "help": "Currency"},
     )
 
 
@@ -2996,8 +2524,7 @@ class MonetaryInformationDetailsTypeI65141C:
     type_qualifier: AlphaNumericStringLength1To3 = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "typeQualifier",
             "type": "Element",
             "help": "Qualifier",
@@ -3005,33 +2532,15 @@ class MonetaryInformationDetailsTypeI65141C:
     )
     amount: AlphaNumericStringLength1To12 = field(
         default=None,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
-            "name": "amount",
-            "type": "Element",
-            "help": "Amount",
-        },
+        metadata={"name": "amount", "type": "Element", "help": "Amount"},
     )
     currency: AlphaNumericStringLength1To3 = field(
         default=None,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
-            "name": "currency",
-            "type": "Element",
-            "help": "Currency",
-        },
+        metadata={"name": "currency", "type": "Element", "help": "Currency"},
     )
     location: AlphaNumericStringLength1To3 = field(
         default=None,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
-            "name": "location",
-            "type": "Element",
-            "help": "Location",
-        },
+        metadata={"name": "location", "type": "Element", "help": "Location"},
     )
 
 
@@ -3042,8 +2551,7 @@ class MultiCityOptionType:
     location_id: AlphaStringLength3To5 = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "locationId",
             "type": "Element",
             "help": "ATA/IATA airport/city code of arrival multi city option enable to define until 20 airports/cities",
@@ -3052,8 +2560,6 @@ class MultiCityOptionType:
     airport_city_qualifier: AlphaStringLength1To1 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "airportCityQualifier",
             "type": "Element",
             "help": "Requested arrival point is an airport or a city (default is city and used only when ambiguity)",
@@ -3068,8 +2574,6 @@ class MultipleIdentificationNumbersTypeI:
     corporate_number_identifier: AlphaNumericStringLength1To12 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "corporateNumberIdentifier",
             "type": "Element",
             "help": "Corporate number or ALL.",
@@ -3078,8 +2582,6 @@ class MultipleIdentificationNumbersTypeI:
     corporate_name: AlphaNumericStringLength1To20 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "corporateName",
             "type": "Element",
             "help": "Corporate name.",
@@ -3093,8 +2595,6 @@ class NumberOfUnitDetailsType:
     number_of_units: NumericIntegerLength1To4 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "numberOfUnits",
             "type": "Element",
             "help": "Number of Units",
@@ -3103,8 +2603,7 @@ class NumberOfUnitDetailsType:
     type_of_unit: AlphaNumericStringLength1To3 = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "typeOfUnit",
             "type": "Element",
             "help": "Number of unit qualifier",
@@ -3118,8 +2617,7 @@ class NumberOfUnitDetailsType270113C:
     number_of_units: NumericIntegerLength1To6 = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "numberOfUnits",
             "type": "Element",
             "help": "Number of Units",
@@ -3128,8 +2626,7 @@ class NumberOfUnitDetailsType270113C:
     type_of_unit: AlphaNumericStringLength1To3 = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "typeOfUnit",
             "type": "Element",
             "help": "Number of unit qualifier",
@@ -3143,8 +2640,7 @@ class NumberOfUnitDetailsTypeI:
     number_of_units: NumericIntegerLength1To3 = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "numberOfUnits",
             "type": "Element",
             "help": "Number of Units",
@@ -3153,8 +2649,7 @@ class NumberOfUnitDetailsTypeI:
     type_of_unit: AlphaNumericStringLength1To3 = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "typeOfUnit",
             "type": "Element",
             "help": "Number of unit qualifier",
@@ -3169,8 +2664,6 @@ class OriginatorIdentificationDetailsTypeI:
     office_name: NumericIntegerLength1To9 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "officeName",
             "type": "Element",
             "help": "Office Name.",
@@ -3179,8 +2672,6 @@ class OriginatorIdentificationDetailsTypeI:
     agent_signin: AlphaNumericStringLength1To9 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "agentSignin",
             "type": "Element",
             "help": "Agent Sign In .",
@@ -3189,8 +2680,6 @@ class OriginatorIdentificationDetailsTypeI:
     confidential_office: AlphaNumericStringLength1To9 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "confidentialOffice",
             "type": "Element",
             "help": "Confidential Office Name.",
@@ -3199,8 +2688,6 @@ class OriginatorIdentificationDetailsTypeI:
     other_office: AlphaNumericStringLength1To9 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "otherOffice",
             "type": "Element",
             "help": "Other Office Name",
@@ -3215,8 +2702,6 @@ class PnrsegmentReferenceType:
     pnr_segment_tattoo: NumericIntegerLength0To35 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "pnrSegmentTattoo",
             "type": "Element",
             "help": "For a request from PNR: this is the reference number of a PNR air segment. In case a range of PNR segments is specified (eg. segments 2-5), then it is the 1st of the range, the last being in ARR.",
@@ -3224,13 +2709,7 @@ class PnrsegmentReferenceType:
     )
     pnr_segment_qualifier: AlphaStringLength1To1 = field(
         default=None,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
-            "name": "pnrSegmentQualifier",
-            "type": "Element",
-            "help": None,
-        },
+        metadata={"name": "pnrSegmentQualifier", "type": "Element"},
     )
 
 
@@ -3238,8 +2717,8 @@ class PnrsegmentReferenceType:
 class PricingTicketingInformationType:
     """To specify indicators related to pricing and ticketing."""
 
-    price_type: AlphaNumericStringLength0To3 = field(
-        default=None,
+    price_type: List[AlphaNumericStringLength0To3] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 1,
             "max_occurs": 50,
@@ -3257,22 +2736,14 @@ class ProductDateTimeType:
     date: DateDdmmyy = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "date",
             "type": "Element",
             "help": ".",
         },
     )
     time: Time24Hhmm = field(
-        default=None,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
-            "name": "time",
-            "type": "Element",
-            "help": ".",
-        },
+        default=None, metadata={"name": "time", "type": "Element", "help": "."}
     )
 
 
@@ -3282,8 +2753,7 @@ class ProductDateTimeType195546C:
     date_of_departure: DateDdmmyy = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "dateOfDeparture",
             "type": "Element",
             "help": "Departure date",
@@ -3292,8 +2762,6 @@ class ProductDateTimeType195546C:
     time_of_departure: Time24Hhmm = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "timeOfDeparture",
             "type": "Element",
             "help": "Departure time",
@@ -3302,8 +2770,6 @@ class ProductDateTimeType195546C:
     date_of_arrival: DateDdmmyy = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "dateOfArrival",
             "type": "Element",
             "help": "Arrival date",
@@ -3312,8 +2778,6 @@ class ProductDateTimeType195546C:
     time_of_arrival: Time24Hhmm = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "timeOfArrival",
             "type": "Element",
             "help": "Arrival time",
@@ -3322,8 +2786,6 @@ class ProductDateTimeType195546C:
     date_variation: NumericIntegerLength1To1 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "dateVariation",
             "type": "Element",
             "help": "Arrival date compared to departure date, only if different from 0",
@@ -3338,8 +2800,6 @@ class ProductDateTimeTypeI:
     departure_date: DateYyyymmdd = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "departureDate",
             "type": "Element",
             "help": "Departure date in YYYYMMDD format",
@@ -3348,8 +2808,6 @@ class ProductDateTimeTypeI:
     departure_time: Time24Hhmm = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "departureTime",
             "type": "Element",
             "help": "Departure time",
@@ -3358,8 +2816,6 @@ class ProductDateTimeTypeI:
     arrival_date: DateYyyymmdd = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "arrivalDate",
             "type": "Element",
             "help": "Arrival date",
@@ -3368,8 +2824,6 @@ class ProductDateTimeTypeI:
     arrival_time: Time24Hhmm = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "arrivalTime",
             "type": "Element",
             "help": "Arrival time",
@@ -3378,8 +2832,6 @@ class ProductDateTimeTypeI:
     date_variation: NumericIntegerLength1To1 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "dateVariation",
             "type": "Element",
             "help": "Day difference between Departure date of the leg and date of reference (Departure or Arrival date specified in the SDI)",
@@ -3394,8 +2846,7 @@ class ProductDateTimeTypeI194583C:
     date: DateDdmmyy = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "date",
             "type": "Element",
             "help": "Ticketing Purchase Date",
@@ -3404,8 +2855,6 @@ class ProductDateTimeTypeI194583C:
     other_date: DateDdmmyy = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "otherDate",
             "type": "Element",
             "help": "Ticketing purchase date",
@@ -3419,8 +2868,7 @@ class ProductDateTimeTypeI194598C:
     date: DateDdmmyy = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "date",
             "type": "Element",
             "help": "First date",
@@ -3429,8 +2877,6 @@ class ProductDateTimeTypeI194598C:
     rtc_date: DateDdmmyy = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "rtcDate",
             "type": "Element",
             "help": "Half round trip combination.",
@@ -3445,8 +2891,6 @@ class ProductFacilitiesType:
     last_seat_available: AlphaStringLength1To1 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "lastSeatAvailable",
             "type": "Element",
             "help": "Yes-No indicator whether Last Seat Available",
@@ -3455,8 +2899,6 @@ class ProductFacilitiesType:
     level_of_access: AlphaNumericStringLength1To3 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "levelOfAccess",
             "type": "Element",
             "help": "Level of access",
@@ -3465,8 +2907,6 @@ class ProductFacilitiesType:
     electronic_ticketing: AlphaStringLength1To1 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "electronicTicketing",
             "type": "Element",
             "help": "Yes-No indicator whether electronic ticketing",
@@ -3475,8 +2915,6 @@ class ProductFacilitiesType:
     operational_suffix: AlphaStringLength1To1 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "operationalSuffix",
             "type": "Element",
             "help": "Product identification suffix",
@@ -3485,15 +2923,13 @@ class ProductFacilitiesType:
     product_detail_qualifier: AlphaNumericStringLength1To3 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "productDetailQualifier",
             "type": "Element",
             "help": "Define whether a flight has been polled or not",
         },
     )
-    flight_characteristic: AlphaNumericStringLength1To3 = field(
-        default=None,
+    flight_characteristic: List[AlphaNumericStringLength1To3] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 9,
@@ -3511,8 +2947,7 @@ class ProductIdentificationDetailsTypeI:
     flight_number: NumericIntegerLength1To4 = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "flightNumber",
             "type": "Element",
             "help": "Flight number",
@@ -3521,8 +2956,6 @@ class ProductIdentificationDetailsTypeI:
     operational_suffix: AlphaStringLength1To1 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "operationalSuffix",
             "type": "Element",
             "help": "Flight suffix",
@@ -3536,42 +2969,21 @@ class ProductIdentificationDetailsTypeI50878C:
 
     flight_number: AlphaNumericStringLength1To5 = field(
         default=None,
-        metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
-            "name": "flightNumber",
-            "type": "Element",
-            "help": None,
-        },
+        metadata={"required": True, "name": "flightNumber", "type": "Element"},
     )
     booking_class: AlphaNumericStringLength1To2 = field(
-        default=None,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
-            "name": "bookingClass",
-            "type": "Element",
-            "help": None,
-        },
+        default=None, metadata={"name": "bookingClass", "type": "Element"}
     )
     operational_suffix: AlphaNumericStringLength1To3 = field(
-        default=None,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
-            "name": "operationalSuffix",
-            "type": "Element",
-            "help": None,
-        },
+        default=None, metadata={"name": "operationalSuffix", "type": "Element"}
     )
-    modifier: AlphaNumericStringLength1To7 = field(
-        default=None,
+    modifier: List[AlphaNumericStringLength1To7] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 3,
             "name": "modifier",
             "type": "Element",
-            "help": None,
         },
     )
 
@@ -3582,13 +2994,7 @@ class ProductLocationDetailsTypeI:
 
     station: AlphaStringLength3To3 = field(
         default=None,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
-            "name": "station",
-            "type": "Element",
-            "help": "airport",
-        },
+        metadata={"name": "station", "type": "Element", "help": "airport"},
     )
 
 
@@ -3598,19 +3004,11 @@ class ProductTypeDetailsType:
 
     sequence_number: AlphaNumericStringLength1To6 = field(
         default=None,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
-            "name": "sequenceNumber",
-            "type": "Element",
-            "help": ".",
-        },
+        metadata={"name": "sequenceNumber", "type": "Element", "help": "."},
     )
     availability_context: AlphaNumericStringLength1To6 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "availabilityContext",
             "type": "Element",
             "help": "PNR availability context",
@@ -3621,8 +3019,8 @@ class ProductTypeDetailsType:
 @dataclass
 class ProductTypeDetailsType120801C:
 
-    flight_type: AlphaNumericStringLength1To2 = field(
-        default=None,
+    flight_type: List[AlphaNumericStringLength1To2] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 9,
@@ -3637,8 +3035,8 @@ class ProductTypeDetailsType120801C:
 class ProductTypeDetailsType205137C:
     """To specify additional characteristics of a product or service."""
 
-    avl: AlphaNumericStringLength1To6 = field(
-        default=None,
+    avl: List[AlphaNumericStringLength1To6] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 1,
             "max_occurs": 9,
@@ -3653,8 +3051,8 @@ class ProductTypeDetailsType205137C:
 class ProductTypeDetailsTypeI:
     """To specify additional characteristics of a product or service."""
 
-    flight_indicator: AlphaStringLength1To3 = field(
-        default=None,
+    flight_indicator: List[AlphaStringLength1To3] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 1,
             "max_occurs": 5,
@@ -3671,8 +3069,6 @@ class ProposedSegmentDetailsType:
     ref: AlphaNumericStringLength1To6 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "ref",
             "type": "Element",
             "help": "Flight proposal reference",
@@ -3681,8 +3077,6 @@ class ProposedSegmentDetailsType:
     unit_qualifier: AlphaNumericStringLength1To3 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "unitQualifier",
             "type": "Element",
             "help": "Elapse Flying Time",
@@ -3697,8 +3091,6 @@ class ReferencingDetailsType:
     ref_qualifier: AlphaNumericStringLength1To3 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "refQualifier",
             "type": "Element",
             "help": "Segment reference qualifier",
@@ -3707,8 +3099,7 @@ class ReferencingDetailsType:
     ref_number: NumericIntegerLength0To3 = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "refNumber",
             "type": "Element",
             "help": "Flight or flight group reference",
@@ -3723,8 +3114,6 @@ class SegmentRepetitionControlDetailsTypeI:
     quantity: NumericIntegerLength1To15 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "quantity",
             "type": "Element",
             "help": "traveller number",
@@ -3739,8 +3128,7 @@ class SelectionDetailsInformationType:
     type: AlphaNumericStringLength1To3 = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "type",
             "type": "Element",
             "help": "Carrier fee type",
@@ -3749,8 +3137,6 @@ class SelectionDetailsInformationType:
     option_information: AlphaNumericStringLength1To3 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "optionInformation",
             "type": "Element",
             "help": "Carrier fee status",
@@ -3764,23 +3150,10 @@ class SelectionDetailsInformationTypeI:
 
     option: AlphaNumericStringLength1To3 = field(
         default=None,
-        metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
-            "name": "option",
-            "type": "Element",
-            "help": None,
-        },
+        metadata={"required": True, "name": "option", "type": "Element"},
     )
     option_information: AlphaNumericStringLength1To35 = field(
-        default=None,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
-            "name": "optionInformation",
-            "type": "Element",
-            "help": None,
-        },
+        default=None, metadata={"name": "optionInformation", "type": "Element"}
     )
 
 
@@ -3788,8 +3161,8 @@ class SelectionDetailsInformationTypeI:
 class SpecialRequirementsDataDetailsType:
     """Special requirements data details"""
 
-    seat_characteristics: AlphaNumericStringLength1To2 = field(
-        default=None,
+    seat_characteristics: List[AlphaNumericStringLength1To2] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 5,
@@ -3806,8 +3179,7 @@ class SpecialRequirementsTypeDetailsType:
     service_classification: AlphaNumericStringLength1To4 = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "serviceClassification",
             "type": "Element",
             "help": "To specify the Service Classification of the Service Requirement.",
@@ -3816,8 +3188,6 @@ class SpecialRequirementsTypeDetailsType:
     service_status: AlphaNumericStringLength1To3 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "serviceStatus",
             "type": "Element",
             "help": "Status",
@@ -3826,8 +3196,6 @@ class SpecialRequirementsTypeDetailsType:
     service_number_of_instances: NumericIntegerLength1To15 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "serviceNumberOfInstances",
             "type": "Element",
             "help": "To specify the number of items involved",
@@ -3836,8 +3204,6 @@ class SpecialRequirementsTypeDetailsType:
     service_marketing_carrier: AlphaNumericStringLength1To3 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "serviceMarketingCarrier",
             "type": "Element",
             "help": "To specify to which marketing carrier the service applies",
@@ -3846,8 +3212,6 @@ class SpecialRequirementsTypeDetailsType:
     service_group: AlphaNumericStringLength1To3 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "serviceGroup",
             "type": "Element",
             "help": "Specify the Service group",
@@ -3856,15 +3220,13 @@ class SpecialRequirementsTypeDetailsType:
     service_sub_group: AlphaNumericStringLength1To3 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "serviceSubGroup",
             "type": "Element",
             "help": "Specify the Service Sub-Group",
         },
     )
-    service_free_text: AlphaNumericStringLength1To70 = field(
-        default=None,
+    service_free_text: List[AlphaNumericStringLength1To70] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 99,
@@ -3882,8 +3244,6 @@ class StationInformationTypeI:
     terminal: AlphaNumericStringLength1To3 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "terminal",
             "type": "Element",
             "help": "Departure terminal",
@@ -3898,8 +3258,6 @@ class StructuredDateTimeType:
     year: NumericIntegerLength4To4 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "year",
             "type": "Element",
             "help": "Year number. The format is a little long for short term usage but it can be reduced by implementation if required.",
@@ -3908,8 +3266,6 @@ class StructuredDateTimeType:
     month: NumericIntegerLength1To2 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "month",
             "type": "Element",
             "help": "Month number in the year ( begins to 1 )",
@@ -3918,8 +3274,6 @@ class StructuredDateTimeType:
     day: NumericIntegerLength1To2 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "day",
             "type": "Element",
             "help": "Day number in the month ( begins to 1 )",
@@ -3933,8 +3287,6 @@ class TaxDetailsTypeI:
     rate: AlphaNumericStringLength1To18 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "rate",
             "type": "Element",
             "help": "Duty/tax/fee rate",
@@ -3943,8 +3295,6 @@ class TaxDetailsTypeI:
     country: AlphaNumericStringLength1To3 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "country",
             "type": "Element",
             "help": "Country, coded",
@@ -3953,8 +3303,6 @@ class TaxDetailsTypeI:
     currency: AlphaNumericStringLength1To3 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "currency",
             "type": "Element",
             "help": "Currency, coded",
@@ -3963,8 +3311,6 @@ class TaxDetailsTypeI:
     type: AlphaNumericStringLength1To3 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "type",
             "type": "Element",
             "help": "Duty/Tax fee type, coded",
@@ -3973,8 +3319,6 @@ class TaxDetailsTypeI:
     amount_qualifier: AlphaNumericStringLength1To3 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "amountQualifier",
             "type": "Element",
             "help": "Amount type qualifier, coded",
@@ -3987,14 +3331,7 @@ class TicketNumberDetailsTypeI:
     """To specify a ticket number, type of ticket, and related information."""
 
     number: AlphaNumericStringLength1To35 = field(
-        default=None,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
-            "name": "number",
-            "type": "Element",
-            "help": None,
-        },
+        default=None, metadata={"name": "number", "type": "Element"}
     )
 
 
@@ -4005,8 +3342,7 @@ class TicketingPriceSchemeType:
     reference_number: AlphaNumericStringLength1To35 = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "referenceNumber",
             "type": "Element",
             "help": "PSR (Price Scheme Reference): unique reference of the price scheme as a 8 digit number.",
@@ -4015,8 +3351,6 @@ class TicketingPriceSchemeType:
     name: AlphaNumericStringLength1To35 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "name",
             "type": "Element",
             "help": "Price Scheme Name",
@@ -4025,8 +3359,6 @@ class TicketingPriceSchemeType:
     status: AlphaNumericStringLength1To3 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "status",
             "type": "Element",
             "help": "Price Scheme Status. Is the price scheme valid for service fee calculation ?",
@@ -4035,8 +3367,6 @@ class TicketingPriceSchemeType:
     description: AlphaNumericStringLength1To250 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "description",
             "type": "Element",
             "help": "free flow description of the price scheme",
@@ -4051,8 +3381,6 @@ class TrafficRestrictionDetailsTypeI:
     code: AlphaNumericStringLength1To3 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "code",
             "type": "Element",
             "help": "Traffic Restriction code",
@@ -4066,8 +3394,7 @@ class TravellerDetailsType:
     ref: NumericIntegerLength1To3 = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "ref",
             "type": "Element",
             "help": "Direct reference of passenger assigned by requesting system.",
@@ -4076,8 +3403,6 @@ class TravellerDetailsType:
     infant_indicator: NumericIntegerLength1To1 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "infantIndicator",
             "type": "Element",
             "help": "Traveller is an infant",
@@ -4091,8 +3416,6 @@ class UniqueIdDescriptionType:
     passenger_fee_ref_qualif: AlphaNumericStringLength1To3 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "passengerFeeRefQualif",
             "type": "Element",
             "help": "Reference qualifier.",
@@ -4107,22 +3430,14 @@ class ActionIdentificationType:
     action_request_code: AlphaNumericStringLength1To3 = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "actionRequestCode",
             "type": "Element",
             "help": "Action request code",
         },
     )
     product_details: ProductIdentificationDetailsTypeI50878C = field(
-        default=None,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
-            "name": "productDetails",
-            "type": "Element",
-            "help": None,
-        },
+        default=None, metadata={"name": "productDetails", "type": "Element"}
     )
 
 
@@ -4133,8 +3448,6 @@ class AdditionalProductDetailsTypeI:
     leg_details: AdditionalProductTypeI = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "legDetails",
             "type": "Element",
             "help": "Flight details",
@@ -4143,8 +3456,6 @@ class AdditionalProductDetailsTypeI:
     departure_station_info: StationInformationTypeI = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "departureStationInfo",
             "type": "Element",
             "help": "Departure station",
@@ -4152,19 +3463,11 @@ class AdditionalProductDetailsTypeI:
     )
     arrival_station_info: StationInformationTypeI = field(
         default=None,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
-            "name": "arrivalStationInfo",
-            "type": "Element",
-            "help": None,
-        },
+        metadata={"name": "arrivalStationInfo", "type": "Element"},
     )
     mileage_time_details: MileageTimeDetailsTypeI = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "mileageTimeDetails",
             "type": "Element",
             "help": "Ground Time Details when connection",
@@ -4179,15 +3482,13 @@ class ArrivalLocalizationType:
     arrival_point_details: ArrivalLocationDetailsType = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "arrivalPointDetails",
             "type": "Element",
             "help": "Details on the location of the arrival point",
         },
     )
-    arrival_multi_city: MultiCityOptionType = field(
-        default=None,
+    arrival_multi_city: List[MultiCityOptionType] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 20,
@@ -4196,8 +3497,8 @@ class ArrivalLocalizationType:
             "help": "Arrival multi city option",
         },
     )
-    attribute_details: CodedAttributeInformationType139508C = field(
-        default=None,
+    attribute_details: List[CodedAttributeInformationType139508C] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 20,
@@ -4212,8 +3513,8 @@ class ArrivalLocalizationType:
 class AttributeType:
     """Used to have tag value without code list for tag"""
 
-    selection_details: AttributeInformationType = field(
-        default=None,
+    selection_details: List[AttributeInformationType] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 1,
             "max_occurs": 10,
@@ -4231,15 +3532,13 @@ class AttributeType61377S:
     attribute_qualifier: AlphaNumericStringLength1To3 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "attributeQualifier",
             "type": "Element",
             "help": "Criteria Set Type",
         },
     )
-    attribute_details: AttributeInformationType97181C = field(
-        default=None,
+    attribute_details: List[AttributeInformationType97181C] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 1,
             "max_occurs": 99,
@@ -4257,8 +3556,7 @@ class BooleanExpressionRuleType:
     boolean_expression: ArithmeticEvaluationType = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "booleanExpression",
             "type": "Element",
             "help": "Boolean expression associated to the decision rule.",
@@ -4271,26 +3569,18 @@ class BucketDetailsType:
 
     code: AlphaNumericStringLength1To3 = field(
         default=None,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
-            "name": "code",
-            "type": "Element",
-            "help": "Code",
-        },
+        metadata={"name": "code", "type": "Element", "help": "Code"},
     )
     type: AlphaNumericStringLength1To3 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "type",
             "type": "Element",
             "help": "Option or distribution",
         },
     )
-    attribute: AttributeDetailsType = field(
-        default=None,
+    attribute: List[AttributeDetailsType] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 10,
@@ -4305,8 +3595,8 @@ class BucketDetailsType:
 class CodedAttributeType:
     """Used to have tag value without code list for tag"""
 
-    attribute_details: CodedAttributeInformationType254574C = field(
-        default=None,
+    attribute_details: List[CodedAttributeInformationType254574C] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 1,
             "max_occurs": 9,
@@ -4321,8 +3611,8 @@ class CodedAttributeType:
 class CodedAttributeType197696S:
     """Used to have tag value without code list for tag"""
 
-    fee_id: CodedAttributeInformationType275401C = field(
-        default=None,
+    fee_id: List[CodedAttributeInformationType275401C] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 20,
@@ -4337,8 +3627,8 @@ class CodedAttributeType197696S:
 class CodedAttributeType78500S:
     """Used to have tag value without code list for tag"""
 
-    attribute_details: CodedAttributeInformationType = field(
-        default=None,
+    attribute_details: List[CodedAttributeInformationType] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 1,
             "max_occurs": 20,
@@ -4356,15 +3646,14 @@ class CommercialAgreementsType:
     codeshare_details: CompanyRoleIdentificationType = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "codeshareDetails",
             "type": "Element",
             "help": "Codeshare Details",
         },
     )
-    other_codeshare_details: CompanyRoleIdentificationType = field(
-        default=None,
+    other_codeshare_details: List[CompanyRoleIdentificationType] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 8,
@@ -4382,15 +3671,15 @@ class CommercialAgreementsType78540S:
     codeshare_details: CompanyRoleIdentificationType120761C = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "codeshareDetails",
             "type": "Element",
             "help": "Codeshare Details",
         },
     )
-    other_codeshare_details: CompanyRoleIdentificationType120761C = field(
-        default=None,
+    other_codeshare_details: List[
+        CompanyRoleIdentificationType120761C
+    ] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 9,
@@ -4405,8 +3694,8 @@ class CommercialAgreementsType78540S:
 class ConnectionTypeI:
     """To specify connection city and airline designator."""
 
-    connection_details: ConnectionDetailsTypeI = field(
-        default=None,
+    connection_details: List[ConnectionDetailsTypeI] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 1,
             "max_occurs": 17,
@@ -4421,8 +3710,8 @@ class ConnectionTypeI:
 class ConsumerReferenceInformationType:
     """To specify consumer reference information."""
 
-    customer_references: ConsumerReferenceIdentificationTypeI = field(
-        default=None,
+    customer_references: List[ConsumerReferenceIdentificationTypeI] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 1,
             "max_occurs": 20,
@@ -4437,8 +3726,8 @@ class ConsumerReferenceInformationType:
 class ConversionRateType:
     """To specify conversion rate details"""
 
-    conversion_rate_detail: ConversionRateDetailsType = field(
-        default=None,
+    conversion_rate_detail: List[ConversionRateDetailsType] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 1,
             "max_occurs": 2,
@@ -4456,8 +3745,6 @@ class CorporateFareInformationType:
     corporate_fare_identifiers: CorporateFareIdentifiersType = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "corporateFareIdentifiers",
             "type": "Element",
             "help": "Corporate fare identifiers",
@@ -4469,8 +3756,8 @@ class CorporateFareInformationType:
 class CorporateIdentificationType:
     """To specify corporate number(s) or name(s)"""
 
-    corporate_id: CorporateIdentityType = field(
-        default=None,
+    corporate_id: List[CorporateIdentityType] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 20,
@@ -4485,8 +3772,8 @@ class CorporateIdentificationType:
 class DateAndTimeInformationType:
     """not the standard only used in fare quote message"""
 
-    stop_details: DateAndTimeDetailsType120762C = field(
-        default=None,
+    stop_details: List[DateAndTimeDetailsType120762C] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 1,
             "max_occurs": 2,
@@ -4504,8 +3791,7 @@ class DateAndTimeInformationType181295S:
     first_date_time_detail: DateAndTimeDetailsTypeI = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "firstDateTimeDetail",
             "type": "Element",
             "help": "Details on date and Time",
@@ -4514,8 +3800,6 @@ class DateAndTimeInformationType181295S:
     range_of_date: DateAndTimeDetailsType254619C = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "rangeOfDate",
             "type": "Element",
             "help": "Details of the Requested Range of Dates",
@@ -4524,8 +3808,6 @@ class DateAndTimeInformationType181295S:
     trip_details: DateAndTimeDetailsType = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "tripDetails",
             "type": "Element",
             "help": "Details of the trip duration",
@@ -4537,8 +3819,8 @@ class DateAndTimeInformationType181295S:
 class DateAndTimeInformationTypeI:
     """To convey information regarding estimated or actual dates and times of operational events"""
 
-    date_time_details: DateAndTimeDetailsTypeI120740C = field(
-        default=None,
+    date_time_details: List[DateAndTimeDetailsTypeI120740C] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 2,
@@ -4556,15 +3838,13 @@ class DepartureLocationType:
     departure_point: ArrivalLocationDetailsType120834C = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "departurePoint",
             "type": "Element",
             "help": "Details on localization of the departure point",
         },
     )
-    dep_multi_city: MultiCityOptionType = field(
-        default=None,
+    dep_multi_city: List[MultiCityOptionType] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 20,
@@ -4576,15 +3856,13 @@ class DepartureLocationType:
     first_pnr_segment_ref: PnrsegmentReferenceType = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "firstPnrSegmentRef",
             "type": "Element",
             "help": "To specify a series or a range of PNR segments",
         },
     )
-    attribute_details: CodedAttributeInformationType139508C = field(
-        default=None,
+    attribute_details: List[CodedAttributeInformationType139508C] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 20,
@@ -4599,8 +3877,8 @@ class DepartureLocationType:
 class FareFamilyCriteriaType:
     """Fare family criteria"""
 
-    carrier_id: AlphaNumericStringLength1To3 = field(
-        default=None,
+    carrier_id: List[AlphaNumericStringLength1To3] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 20,
@@ -4609,8 +3887,8 @@ class FareFamilyCriteriaType:
             "help": "Fare publishing carrier.",
         },
     )
-    rdb: AlphaStringLength1To2 = field(
-        default=None,
+    rdb: List[AlphaStringLength1To2] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 20,
@@ -4622,15 +3900,13 @@ class FareFamilyCriteriaType:
     fare_family_info: FareQualifierInformationType = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "fareFamilyInfo",
             "type": "Element",
             "help": "Fare family info.",
         },
     )
-    fare_product_detail: FareProductDetailsType = field(
-        default=None,
+    fare_product_detail: List[FareProductDetailsType] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 20,
@@ -4639,8 +3915,8 @@ class FareFamilyCriteriaType:
             "help": "Fare product detail.",
         },
     )
-    corporate_info: MultipleIdentificationNumbersTypeI = field(
-        default=None,
+    corporate_info: List[MultipleIdentificationNumbersTypeI] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 20,
@@ -4649,8 +3925,8 @@ class FareFamilyCriteriaType:
             "help": "Corporate information.",
         },
     )
-    cabin_product: CabinClassDesignationType = field(
-        default=None,
+    cabin_product: List[CabinClassDesignationType] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 6,
@@ -4662,15 +3938,13 @@ class FareFamilyCriteriaType:
     cabin_processing_identifier: AlphaNumericStringLength1To3 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "cabinProcessingIdentifier",
             "type": "Element",
             "help": "Cabin processing option.",
         },
     )
-    date_time_details: ProductDateTimeTypeI194583C = field(
-        default=None,
+    date_time_details: List[ProductDateTimeTypeI194583C] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 20,
@@ -4679,8 +3953,8 @@ class FareFamilyCriteriaType:
             "help": "Product date or time.",
         },
     )
-    other_criteria: CodedAttributeInformationType120742C = field(
-        default=None,
+    other_criteria: List[CodedAttributeInformationType120742C] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 20,
@@ -4695,8 +3969,8 @@ class FareFamilyCriteriaType:
 class FareFamilyType:
     """NEW FARE SEACH"""
 
-    commercial_family_details: FareFamilyDetailsType = field(
-        default=None,
+    commercial_family_details: List[FareFamilyDetailsType] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 20,
@@ -4714,8 +3988,6 @@ class FareFamilyType80157S:
     ref_number: NumericIntegerLength1To3 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "refNumber",
             "type": "Element",
             "help": "Fare Family Reference Number",
@@ -4724,8 +3996,6 @@ class FareFamilyType80157S:
     fare_familyname: AlphaNumericStringLength1To10 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "fareFamilyname",
             "type": "Element",
             "help": "Fare Family Short Name",
@@ -4734,15 +4004,13 @@ class FareFamilyType80157S:
     hierarchy: NumericIntegerLength1To4 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "hierarchy",
             "type": "Element",
             "help": "HIERARCHICAL ORDER WITHIN FARE FAMILY",
         },
     )
-    commercial_family_details: FareFamilyDetailsType = field(
-        default=None,
+    commercial_family_details: List[FareFamilyDetailsType] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 20,
@@ -4759,8 +4027,6 @@ class FareInformationType:
     value_qualifier: AmaEdicodesetTypeLength1to3 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "valueQualifier",
             "type": "Element",
             "help": "Value Qualifier",
@@ -4768,19 +4034,11 @@ class FareInformationType:
     )
     value: NumericIntegerLength1To15 = field(
         default=None,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
-            "name": "value",
-            "type": "Element",
-            "help": "Value",
-        },
+        metadata={"name": "value", "type": "Element", "help": "Value"},
     )
     fare_details: FareDetailsType = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "fareDetails",
             "type": "Element",
             "help": "Fare Details",
@@ -4789,8 +4047,6 @@ class FareInformationType:
     identity_number: AlphaNumericStringLength1To35 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "identityNumber",
             "type": "Element",
             "help": "Identity Number",
@@ -4799,8 +4055,6 @@ class FareInformationType:
     fare_type_grouping: FareTypeGroupingInformationType = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "fareTypeGrouping",
             "type": "Element",
             "help": "Fare Type Grouping",
@@ -4809,8 +4063,6 @@ class FareInformationType:
     rate_category: AlphaNumericStringLength1To35 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "rateCategory",
             "type": "Element",
             "help": "Rate Category",
@@ -4822,8 +4074,8 @@ class FareInformationType:
 class FlightProductInformationType:
     """To specify flight product information details"""
 
-    cabin_product: CabinProductDetailsType = field(
-        default=None,
+    cabin_product: List[CabinProductDetailsType] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 26,
@@ -4835,8 +4087,6 @@ class FlightProductInformationType:
     context_details: ProductTypeDetailsType205137C = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "contextDetails",
             "type": "Element",
             "help": "To specify additional characteristics.",
@@ -4848,8 +4098,8 @@ class FlightProductInformationType:
 class FormOfPaymentTypeI:
     """To convey details describing the form of payment."""
 
-    form_of_payment_details: FormOfPaymentDetailsTypeI = field(
-        default=None,
+    form_of_payment_details: List[FormOfPaymentDetailsTypeI] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 9,
@@ -4867,8 +4117,7 @@ class FreeTextInformationType:
     free_text_details: FreeTextDetailsType = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "freeTextDetails",
             "type": "Element",
             "help": "Details for the free text message",
@@ -4877,8 +4126,7 @@ class FreeTextInformationType:
     free_text: AlphaNumericStringLength1To70 = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "freeText",
             "type": "Element",
             "help": "Free text corresponding to the DEI 127 data.",
@@ -4890,8 +4138,10 @@ class FreeTextInformationType:
 class FrequentTravellerIdentificationCodeType:
     """To specify frequent traveler information"""
 
-    frequent_traveller_details: FrequentTravellerIdentificationType = field(
-        default=None,
+    frequent_traveller_details: List[
+        FrequentTravellerIdentificationType
+    ] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 1,
             "max_occurs": 99,
@@ -4906,8 +4156,10 @@ class FrequentTravellerIdentificationCodeType:
 class FrequentTravellerIdentificationCodeType177150S:
     """To specify frequent traveler information."""
 
-    frequent_traveller_details: FrequentTravellerIdentificationType249074C = field(
-        default=None,
+    frequent_traveller_details: List[
+        FrequentTravellerIdentificationType249074C
+    ] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 1,
             "max_occurs": 99,
@@ -4922,8 +4174,8 @@ class FrequentTravellerIdentificationCodeType177150S:
 class HeaderInformationTypeI:
     """To specify header information applicable to the entire message."""
 
-    status: AlphaNumericStringLength1To3 = field(
-        default=None,
+    status: List[AlphaNumericStringLength1To3] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 2,
@@ -4935,8 +4187,6 @@ class HeaderInformationTypeI:
     date_time_period_details: DateTimePeriodDetailsTypeI = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "dateTimePeriodDetails",
             "type": "Element",
             "help": "Date and Time info",
@@ -4945,15 +4195,13 @@ class HeaderInformationTypeI:
     reference_number: AlphaNumericStringLength1To35 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "referenceNumber",
             "type": "Element",
             "help": "Reference number",
         },
     )
-    product_identification: AlphaNumericStringLength1To35 = field(
-        default=None,
+    product_identification: List[AlphaNumericStringLength1To35] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 2,
@@ -4971,8 +4219,7 @@ class ItemNumberType:
     item_number_id: ItemNumberIdentificationType = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "itemNumberId",
             "type": "Element",
             "help": "Indicates the fare family combination number",
@@ -4987,8 +4234,7 @@ class ItemNumberType80866S:
     item_number_details: ItemNumberIdentificationType = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "itemNumberDetails",
             "type": "Element",
             "help": "Item number details",
@@ -5003,8 +4249,6 @@ class ItemReferencesAndVersionsType:
     passenger_fee_ref_type: AlphaNumericStringLength1To3 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "passengerFeeRefType",
             "type": "Element",
             "help": "Reference Qualifier.",
@@ -5013,8 +4257,6 @@ class ItemReferencesAndVersionsType:
     passenger_fee_ref_number: NumericIntegerLength1To3 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "passengerFeeRefNumber",
             "type": "Element",
             "help": "Reference number.",
@@ -5023,8 +4265,6 @@ class ItemReferencesAndVersionsType:
     other_characteristics: UniqueIdDescriptionType = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "otherCharacteristics",
             "type": "Element",
             "help": "Unique id description.",
@@ -5035,8 +4275,8 @@ class ItemReferencesAndVersionsType:
 @dataclass
 class MonetaryAndCabinInformationType:
 
-    money_and_cabin_info: MonetaryAndCabinInformationDetailsType = field(
-        default=None,
+    money_and_cabin_info: List[MonetaryAndCabinInformationDetailsType] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 99,
@@ -5054,15 +4294,16 @@ class MonetaryInformationType:
     money_info: MonetaryInformationDetailsTypeI = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "moneyInfo",
             "type": "Element",
             "help": "MONEY INFORMATION",
         },
     )
-    additional_money_info: MonetaryInformationDetailsTypeI194597C = field(
-        default=None,
+    additional_money_info: List[
+        MonetaryInformationDetailsTypeI194597C
+    ] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 19,
@@ -5077,8 +4318,8 @@ class MonetaryInformationType:
 class MonetaryInformationType80162S:
     """To convey monetary amounts, rates and percentages."""
 
-    monetary_details: MonetaryInformationDetailsTypeI65140C = field(
-        default=None,
+    monetary_details: List[MonetaryInformationDetailsTypeI65140C] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 1,
             "max_occurs": 20,
@@ -5093,8 +4334,8 @@ class MonetaryInformationType80162S:
 class MonetaryInformationTypeI:
     """To convey monetary amounts, rates and percentages."""
 
-    monetary_details: MonetaryInformationDetailsTypeI65141C = field(
-        default=None,
+    monetary_details: List[MonetaryInformationDetailsTypeI65141C] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 1,
             "max_occurs": 20,
@@ -5109,8 +4350,8 @@ class MonetaryInformationTypeI:
 class NumberOfUnitsType:
     """To specify the number of Units required"""
 
-    unit_number_detail: NumberOfUnitDetailsType270113C = field(
-        default=None,
+    unit_number_detail: List[NumberOfUnitDetailsType270113C] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 1,
             "max_occurs": 20,
@@ -5125,8 +4366,8 @@ class NumberOfUnitsType:
 class NumberOfUnitsType80154S:
     """To specify the number of Units required"""
 
-    unit_number_detail: NumberOfUnitDetailsType = field(
-        default=None,
+    unit_number_detail: List[NumberOfUnitDetailsType] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 1,
             "max_occurs": 20,
@@ -5144,15 +4385,14 @@ class OriginAndDestinationRequestType:
     seg_ref: NumericIntegerLength1To2 = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "segRef",
             "type": "Element",
             "help": "Requested segment number",
         },
     )
-    location_forcing: ItineraryDetailsType = field(
-        default=None,
+    location_forcing: List[ItineraryDetailsType] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 2,
@@ -5169,79 +4409,35 @@ class PassengerItineraryInformationType:
 
     booking: AlphaStringLength1To1 = field(
         default=None,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
-            "name": "booking",
-            "type": "Element",
-            "help": ".",
-        },
+        metadata={"name": "booking", "type": "Element", "help": "."},
     )
     identifier: AlphaNumericStringLength1To1 = field(
         default=None,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
-            "name": "identifier",
-            "type": "Element",
-            "help": ".",
-        },
+        metadata={"name": "identifier", "type": "Element", "help": "."},
     )
     status: AlphaNumericStringLength1To3 = field(
         default=None,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
-            "name": "status",
-            "type": "Element",
-            "help": ".",
-        },
+        metadata={"name": "status", "type": "Element", "help": "."},
     )
     item_number: NumericIntegerLength1To3 = field(
         default=None,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
-            "name": "itemNumber",
-            "type": "Element",
-            "help": ".",
-        },
+        metadata={"name": "itemNumber", "type": "Element", "help": "."},
     )
     date_time_details: ProductDateTimeType = field(
         default=None,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
-            "name": "dateTimeDetails",
-            "type": "Element",
-            "help": ".",
-        },
+        metadata={"name": "dateTimeDetails", "type": "Element", "help": "."},
     )
     designator: AlphaStringLength1To1 = field(
         default=None,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
-            "name": "designator",
-            "type": "Element",
-            "help": ".",
-        },
+        metadata={"name": "designator", "type": "Element", "help": "."},
     )
     movement_type: AlphaNumericStringLength1To3 = field(
         default=None,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
-            "name": "movementType",
-            "type": "Element",
-            "help": ".",
-        },
+        metadata={"name": "movementType", "type": "Element", "help": "."},
     )
     product_type_details: ProductTypeDetailsType = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "productTypeDetails",
             "type": "Element",
             "help": ".",
@@ -5256,8 +4452,6 @@ class PricingTicketingDetailsType:
     pricing_ticketing: PricingTicketingInformationType = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "pricingTicketing",
             "type": "Element",
             "help": "Pricing ticketing Details.",
@@ -5266,8 +4460,6 @@ class PricingTicketingDetailsType:
     ticketing_date: ProductDateTimeTypeI194598C = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "ticketingDate",
             "type": "Element",
             "help": "PRODUCT DATE OR TIME",
@@ -5276,8 +4468,6 @@ class PricingTicketingDetailsType:
     company_id: CompanyIdentificationType = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "companyId",
             "type": "Element",
             "help": "COMPANY IDENTIFICATION",
@@ -5286,8 +4476,6 @@ class PricingTicketingDetailsType:
     selling_point: LocationDetailsTypeI = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "sellingPoint",
             "type": "Element",
             "help": "LOCATION DETAILS",
@@ -5296,8 +4484,6 @@ class PricingTicketingDetailsType:
     ticketing_point: LocationDetailsTypeI = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "ticketingPoint",
             "type": "Element",
             "help": "LOCATION DETAILS",
@@ -5306,8 +4492,6 @@ class PricingTicketingDetailsType:
     journey_origin_point: LocationDetailsTypeI = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "journeyOriginPoint",
             "type": "Element",
             "help": "Used to Target Transborder Fares",
@@ -5316,8 +4500,6 @@ class PricingTicketingDetailsType:
     corporate_id: AgentIdentificationType = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "corporateId",
             "type": "Element",
             "help": "Contains the ARC,IATA and ERSP numbers",
@@ -5329,8 +4511,8 @@ class PricingTicketingDetailsType:
 class ProposedSegmentType:
     """To specify the parameters used for product quality"""
 
-    flight_proposal: ProposedSegmentDetailsType = field(
-        default=None,
+    flight_proposal: List[ProposedSegmentDetailsType] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 1,
             "max_occurs": 9,
@@ -5342,8 +4524,6 @@ class ProposedSegmentType:
     flight_characteristic: AlphaNumericStringLength0To3 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "flightCharacteristic",
             "type": "Element",
             "help": "Flight characteristics.",
@@ -5352,8 +4532,6 @@ class ProposedSegmentType:
     maj_cabin: AlphaStringLength1To1 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "majCabin",
             "type": "Element",
             "help": "Majority cabin",
@@ -5365,8 +4543,8 @@ class ProposedSegmentType:
 class ReferenceInfoType:
     """To provide specific reference identification for a traveller."""
 
-    referencing_detail: ReferencingDetailsType = field(
-        default=None,
+    referencing_detail: List[ReferencingDetailsType] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 9,
@@ -5381,8 +4559,8 @@ class ReferenceInfoType:
 class RoutingInformationTypeI:
     """To provide routing information."""
 
-    routing_details: ProductLocationDetailsTypeI = field(
-        default=None,
+    routing_details: List[ProductLocationDetailsTypeI] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 9,
@@ -5397,8 +4575,10 @@ class RoutingInformationTypeI:
 class SegmentRepetitionControlTypeI:
     """To indicate the number of segment group repetitions."""
 
-    segment_control_details: SegmentRepetitionControlDetailsTypeI = field(
-        default=None,
+    segment_control_details: List[
+        SegmentRepetitionControlDetailsTypeI
+    ] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 9,
@@ -5416,21 +4596,19 @@ class SelectionDetailsType:
     carrier_fee_details: SelectionDetailsInformationType = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "carrierFeeDetails",
             "type": "Element",
             "help": "Carrier fees options",
         },
     )
-    other_selection_details: SelectionDetailsInformationTypeI = field(
-        default=None,
+    other_selection_details: List[SelectionDetailsInformationTypeI] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 98,
             "name": "otherSelectionDetails",
             "type": "Element",
-            "help": None,
         },
     )
 
@@ -5442,15 +4620,14 @@ class SpecialRequirementsDetailsType:
     service_requirements_info: SpecialRequirementsTypeDetailsType = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "serviceRequirementsInfo",
             "type": "Element",
             "help": "To specify the Service Requirement of the customer",
         },
     )
-    seat_details: SpecialRequirementsDataDetailsType = field(
-        default=None,
+    seat_details: List[SpecialRequirementsDataDetailsType] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 999,
@@ -5468,15 +4645,14 @@ class SpecificDataInformationType:
     data_type_information: DataTypeInformationType = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "dataTypeInformation",
             "type": "Element",
             "help": "Carrier fee description",
         },
     )
-    data_information: DataInformationType = field(
-        default=None,
+    data_information: List[DataInformationType] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 99,
@@ -5494,8 +4670,6 @@ class StructuredPeriodInformationType:
     begin_date_time: StructuredDateTimeType = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "beginDateTime",
             "type": "Element",
             "help": "Effective date of period of operation",
@@ -5504,8 +4678,6 @@ class StructuredPeriodInformationType:
     end_date_time: StructuredDateTimeType = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "endDateTime",
             "type": "Element",
             "help": "Discontinue date of period of operation",
@@ -5514,8 +4686,6 @@ class StructuredPeriodInformationType:
     frequency: FrequencyType = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "frequency",
             "type": "Element",
             "help": "It is used with a period to give a restriction for days impacted. It permits for example to indicate on which days, a flight operates.",
@@ -5530,15 +4700,13 @@ class TaxType:
     withhold_tax_surcharge: AlphaNumericStringLength1To3 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "withholdTaxSurcharge",
             "type": "Element",
             "help": "Duty tax fee category, coded",
         },
     )
-    tax_detail: TaxDetailsTypeI = field(
-        default=None,
+    tax_detail: List[TaxDetailsTypeI] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 99,
@@ -5553,14 +4721,13 @@ class TaxType:
 class TicketNumberTypeI:
     """To convey information related to a specific ticket."""
 
-    document_details: TicketNumberDetailsTypeI = field(
-        default=None,
+    document_details: List[TicketNumberDetailsTypeI] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 1,
             "max_occurs": 99,
             "name": "documentDetails",
             "type": "Element",
-            "help": None,
         },
     )
 
@@ -5569,8 +4736,8 @@ class TicketNumberTypeI:
 class TrafficRestrictionTypeI:
     """To convey certain restrictions that apply to a means of transport on all or part of a journey"""
 
-    traffic_restriction_details: TrafficRestrictionDetailsTypeI = field(
-        default=None,
+    traffic_restriction_details: List[TrafficRestrictionDetailsTypeI] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 5,
@@ -5588,15 +4755,13 @@ class TravelFlightInformationType:
     cabin_id: CabinIdentificationType = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "cabinId",
             "type": "Element",
             "help": "Cabin identification",
         },
     )
-    company_identity: CompanyIdentificationType120719C = field(
-        default=None,
+    company_identity: List[CompanyIdentificationType120719C] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 20,
@@ -5608,15 +4773,13 @@ class TravelFlightInformationType:
     flight_detail: ProductTypeDetailsType120801C = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "flightDetail",
             "type": "Element",
             "help": "Type of flight details",
         },
     )
-    inclusion_detail: ConnectPointDetailsType195492C = field(
-        default=None,
+    inclusion_detail: List[ConnectPointDetailsType195492C] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 20,
@@ -5625,8 +4788,8 @@ class TravelFlightInformationType:
             "help": "Details of included connecting points",
         },
     )
-    exclusion_detail: ConnectPointDetailsType = field(
-        default=None,
+    exclusion_detail: List[ConnectPointDetailsType] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 2,
@@ -5635,8 +4798,8 @@ class TravelFlightInformationType:
             "help": "Further connection details",
         },
     )
-    unit_number_detail: NumberOfUnitDetailsTypeI = field(
-        default=None,
+    unit_number_detail: List[NumberOfUnitDetailsTypeI] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 9,
@@ -5654,15 +4817,13 @@ class TravelFlightInformationType165053S:
     cabin_id: CabinIdentificationType233500C = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "cabinId",
             "type": "Element",
             "help": "Cabin identification",
         },
     )
-    company_identity: CompanyIdentificationType120719C = field(
-        default=None,
+    company_identity: List[CompanyIdentificationType120719C] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 20,
@@ -5674,15 +4835,13 @@ class TravelFlightInformationType165053S:
     flight_detail: ProductTypeDetailsType120801C = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "flightDetail",
             "type": "Element",
             "help": "Type of flight details",
         },
     )
-    inclusion_detail: ConnectPointDetailsType195492C = field(
-        default=None,
+    inclusion_detail: List[ConnectPointDetailsType195492C] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 20,
@@ -5691,8 +4850,8 @@ class TravelFlightInformationType165053S:
             "help": "Details of included connect point",
         },
     )
-    exclusion_detail: ConnectPointDetailsType = field(
-        default=None,
+    exclusion_detail: List[ConnectPointDetailsType] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 20,
@@ -5701,8 +4860,8 @@ class TravelFlightInformationType165053S:
             "help": "Further connection details",
         },
     )
-    unit_number_detail: NumberOfUnitDetailsTypeI = field(
-        default=None,
+    unit_number_detail: List[NumberOfUnitDetailsTypeI] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 20,
@@ -5720,15 +4879,13 @@ class TravelFlightInformationType197722S:
     cabin_id: CabinIdentificationType233500C = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "cabinId",
             "type": "Element",
             "help": "Cabin identification",
         },
     )
-    company_identity: CompanyIdentificationType275415C = field(
-        default=None,
+    company_identity: List[CompanyIdentificationType275415C] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 20,
@@ -5740,15 +4897,13 @@ class TravelFlightInformationType197722S:
     flight_detail: ProductTypeDetailsType120801C = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "flightDetail",
             "type": "Element",
             "help": "Type of flight details",
         },
     )
-    inclusion_detail: ConnectPointDetailsType195492C = field(
-        default=None,
+    inclusion_detail: List[ConnectPointDetailsType195492C] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 20,
@@ -5757,8 +4912,8 @@ class TravelFlightInformationType197722S:
             "help": "Details of included connect point",
         },
     )
-    exclusion_detail: ConnectPointDetailsType = field(
-        default=None,
+    exclusion_detail: List[ConnectPointDetailsType] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 20,
@@ -5767,8 +4922,8 @@ class TravelFlightInformationType197722S:
             "help": "Further connection details",
         },
     )
-    unit_number_detail: NumberOfUnitDetailsTypeI = field(
-        default=None,
+    unit_number_detail: List[NumberOfUnitDetailsTypeI] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 20,
@@ -5786,8 +4941,6 @@ class TravelProductInformationTypeI:
     flight_date: ProductDateTimeTypeI = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "flightDate",
             "type": "Element",
             "help": "Flight Date",
@@ -5796,8 +4949,7 @@ class TravelProductInformationTypeI:
     board_point_details: LocationTypeI = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "boardPointDetails",
             "type": "Element",
             "help": "Board point",
@@ -5806,8 +4958,7 @@ class TravelProductInformationTypeI:
     offpoint_details: LocationTypeI = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "offpointDetails",
             "type": "Element",
             "help": "Off point",
@@ -5816,18 +4967,14 @@ class TravelProductInformationTypeI:
     company_details: CompanyIdentificationTypeI = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "companyDetails",
             "type": "Element",
-            "help": None,
         },
     )
     flight_identification: ProductIdentificationDetailsTypeI = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "flightIdentification",
             "type": "Element",
             "help": "Flight identification",
@@ -5836,8 +4983,6 @@ class TravelProductInformationTypeI:
     flight_type_details: ProductTypeDetailsTypeI = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "flightTypeDetails",
             "type": "Element",
             "help": "Identify flight part of the journey",
@@ -5852,15 +4997,14 @@ class TravelProductType:
     product_date_time: ProductDateTimeType195546C = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "productDateTime",
             "type": "Element",
             "help": "Date and time of departure and arrival",
         },
     )
-    location: LocationIdentificationDetailsType = field(
-        default=None,
+    location: List[LocationIdentificationDetailsType] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 1,
             "max_occurs": 2,
@@ -5872,8 +5016,6 @@ class TravelProductType:
     company_id: CompanyIdentificationType195544C = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "companyId",
             "type": "Element",
             "help": "Company identification",
@@ -5882,8 +5024,6 @@ class TravelProductType:
     flight_ortrain_number: AlphaNumericStringLength1To8 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "flightOrtrainNumber",
             "type": "Element",
             "help": "Flight number or trainNumber",
@@ -5892,8 +5032,6 @@ class TravelProductType:
     product_detail: AdditionalProductDetailsType = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "productDetail",
             "type": "Element",
             "help": "Product details",
@@ -5902,15 +5040,13 @@ class TravelProductType:
     add_product_detail: ProductFacilitiesType = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "addProductDetail",
             "type": "Element",
             "help": "Additional product details",
         },
     )
-    attribute_details: CodedAttributeInformationType247828C = field(
-        default=None,
+    attribute_details: List[CodedAttributeInformationType247828C] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 20,
@@ -5925,8 +5061,8 @@ class TravelProductType:
 class TravellerReferenceInformationType:
     """To specify traveller/personal details"""
 
-    ptc: AlphaNumericStringLength1To6 = field(
-        default=None,
+    ptc: List[AlphaNumericStringLength1To6] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 3,
@@ -5935,8 +5071,8 @@ class TravellerReferenceInformationType:
             "help": "Requested passenger type",
         },
     )
-    traveller: TravellerDetailsType = field(
-        default=None,
+    traveller: List[TravellerDetailsType] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 1,
             "max_occurs": 9,
@@ -5954,8 +5090,6 @@ class UserIdentificationType:
     office_identification: OriginatorIdentificationDetailsTypeI = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "officeIdentification",
             "type": "Element",
             "help": "Originator Identification Details",
@@ -5964,8 +5098,6 @@ class UserIdentificationType:
     office_type: AlphaNumericStringLength1To1 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "officeType",
             "type": "Element",
             "help": "Used to specify which kind of info is given in DE 9900.",
@@ -5974,8 +5106,6 @@ class UserIdentificationType:
     office_code: AlphaNumericStringLength1To30 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "officeCode",
             "type": "Element",
             "help": "The code given to an agent by the originating reservation system.",
@@ -5988,43 +5118,21 @@ class ValueSearchCriteriaType:
     """To specify Criteria with list of parameters"""
 
     criteria_name: AlphaNumericStringLength1To50 = field(
-        default=None,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
-            "name": "criteriaName",
-            "type": "Element",
-            "help": None,
-        },
+        default=None, metadata={"name": "criteriaName", "type": "Element"}
     )
     criteria_code: AlphaNumericStringLength1To3 = field(
-        default=None,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
-            "name": "criteriaCode",
-            "type": "Element",
-            "help": None,
-        },
+        default=None, metadata={"name": "criteriaCode", "type": "Element"}
     )
     value: AlphaNumericStringLength1To18 = field(
-        default=None,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
-            "name": "value",
-            "type": "Element",
-            "help": None,
-        },
+        default=None, metadata={"name": "value", "type": "Element"}
     )
-    criteria_details: CriteriaiDetaislType = field(
-        default=None,
+    criteria_details: List[CriteriaiDetaislType] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 10,
             "name": "criteriaDetails",
             "type": "Element",
-            "help": None,
         },
     )
 
@@ -6036,8 +5144,7 @@ class AirlineDistributionDetailsType16:
     requested_segment_ref: OriginAndDestinationRequestType = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "requestedSegmentRef",
             "type": "Element",
             "help": "Indicates reference of the requested segment",
@@ -6046,8 +5153,6 @@ class AirlineDistributionDetailsType16:
     flight_info: TravelFlightInformationType = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "flightInfo",
             "type": "Element",
             "help": "Specify Flight options.",
@@ -6062,15 +5167,14 @@ class BucketsType4:
     bucket_info: BucketInformationType = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "bucketInfo",
             "type": "Element",
             "help": "Bucket information: name, priority, weight",
         },
     )
-    bucket_details: BucketDetailsType = field(
-        default=None,
+    bucket_details: List[BucketDetailsType] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 15,
@@ -6088,8 +5192,7 @@ class CombinationFareFamiliesType7:
     item_ffcnumber: ItemNumberType = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "itemFFCNumber",
             "type": "Element",
             "help": "Specification of the item number",
@@ -6098,15 +5201,13 @@ class CombinationFareFamiliesType7:
     nb_of_units: NumberOfUnitsType80154S = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "nbOfUnits",
             "type": "Element",
             "help": "Number of units.",
         },
     )
-    reference_info: ReferenceInfoType = field(
-        default=None,
+    reference_info: List[ReferenceInfoType] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 6,
@@ -6124,8 +5225,7 @@ class FareFamilySegmentType10:
     reference_info: ReferenceInfoType = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "referenceInfo",
             "type": "Element",
             "help": "Requested segment reference",
@@ -6134,8 +5234,6 @@ class FareFamilySegmentType10:
     family_criteria: FareFamilyCriteriaType = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "familyCriteria",
             "type": "Element",
             "help": "Description of fare family criteria.",
@@ -6150,8 +5248,7 @@ class FareFamilySegmentType17:
     reference_info: ReferenceInfoType = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "referenceInfo",
             "type": "Element",
             "help": "Requested segment reference",
@@ -6160,8 +5257,6 @@ class FareFamilySegmentType17:
     family_criteria: FareFamilyCriteriaType = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "familyCriteria",
             "type": "Element",
             "help": "Description of fare family criteria.",
@@ -6176,8 +5271,7 @@ class FareOptionsType3:
     pricing_tick_info: PricingTicketingDetailsType = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "pricingTickInfo",
             "type": "Element",
             "help": "Pricing and ticketing details.",
@@ -6186,8 +5280,6 @@ class FareOptionsType3:
     corporate: CorporateIdentificationType = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "corporate",
             "type": "Element",
             "help": "Corporate name/number used to target fares",
@@ -6196,8 +5288,6 @@ class FareOptionsType3:
     ticketing_price_scheme: TicketingPriceSchemeType = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "ticketingPriceScheme",
             "type": "Element",
             "help": "Ticketing price scheme.",
@@ -6206,8 +5296,6 @@ class FareOptionsType3:
     fee_id_description: CodedAttributeType197696S = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "feeIdDescription",
             "type": "Element",
             "help": "PSR number",
@@ -6216,8 +5304,6 @@ class FareOptionsType3:
     conversion_rate: ConversionRateType = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "conversionRate",
             "type": "Element",
             "help": "Used to force the currency of pricing",
@@ -6226,8 +5312,6 @@ class FareOptionsType3:
     form_of_payment: FormOfPaymentTypeI = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "formOfPayment",
             "type": "Element",
             "help": "Form of payment information.",
@@ -6236,8 +5320,6 @@ class FareOptionsType3:
     frequent_traveller_info: FrequentTravellerIdentificationCodeType177150S = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "frequentTravellerInfo",
             "type": "Element",
             "help": "Frequent traveller information",
@@ -6246,8 +5328,6 @@ class FareOptionsType3:
     monetary_cabin_info: MonetaryAndCabinInformationType = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "monetaryCabinInfo",
             "type": "Element",
             "help": "Monetary and cabin information.",
@@ -6262,8 +5342,7 @@ class FeeDescriptionGrpType20:
     item_number_info: ItemNumberType80866S = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "itemNumberInfo",
             "type": "Element",
             "help": "Specification of the item number",
@@ -6272,8 +5351,6 @@ class FeeDescriptionGrpType20:
     service_attributes_info: AttributeType61377S = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "serviceAttributesInfo",
             "type": "Element",
             "help": "Attributes (SSR code EMD, RFIC, SSIM)",
@@ -6282,8 +5359,6 @@ class FeeDescriptionGrpType20:
     service_description_info: SpecialRequirementsDetailsType = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "serviceDescriptionInfo",
             "type": "Element",
             "help": "Other service information (service description, ...)",
@@ -6298,15 +5373,14 @@ class FlightDetailsType18:
     flight_information: TravelProductType = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "flightInformation",
             "type": "Element",
             "help": "Specification of details on the flight and posting availability",
         },
     )
-    avl_info: FlightProductInformationType = field(
-        default=None,
+    avl_info: List[FlightProductInformationType] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 6,
@@ -6315,8 +5389,8 @@ class FlightDetailsType18:
             "help": "returns booking class and availability context",
         },
     )
-    technical_stop: DateAndTimeInformationType = field(
-        default=None,
+    technical_stop: List[DateAndTimeInformationType] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 5,
@@ -6328,8 +5402,6 @@ class FlightDetailsType18:
     commercial_agreement: CommercialAgreementsType78540S = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "commercialAgreement",
             "type": "Element",
             "help": "Code Share Agreement description for current flight.",
@@ -6338,15 +5410,13 @@ class FlightDetailsType18:
     add_info: HeaderInformationTypeI = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "addInfo",
             "type": "Element",
             "help": "Additional Info about flight, such as Reference number, and several options",
         },
     )
-    terminal_equipment_details: AdditionalProductDetailsTypeI = field(
-        default=None,
+    terminal_equipment_details: List[AdditionalProductDetailsTypeI] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 2,
@@ -6358,8 +5428,6 @@ class FlightDetailsType18:
     reservation_info: PassengerItineraryInformationType = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "reservationInfo",
             "type": "Element",
             "help": "PNR flight reservation info",
@@ -6368,8 +5436,6 @@ class FlightDetailsType18:
     price_to_beat: MonetaryInformationType = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "priceToBeat",
             "type": "Element",
             "help": "Indicates Price to beat",
@@ -6383,8 +5449,7 @@ class FoprepresentationType:
     form_of_payment_details: FormOfPaymentTypeI = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "formOfPaymentDetails",
             "type": "Element",
             "help": "Form of payment information.",
@@ -6393,8 +5458,6 @@ class FoprepresentationType:
     passenger_fee_reference: ItemReferencesAndVersionsType = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "passengerFeeReference",
             "type": "Element",
             "help": "Fee/Reduction Passenger reference.",
@@ -6409,8 +5472,7 @@ class IncidentalStopInfoType19:
     date_time_info: DateAndTimeInformationTypeI = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "dateTimeInfo",
             "type": "Element",
             "help": "Incidental stop date/time information",
@@ -6425,8 +5487,7 @@ class PsgDetailsInfoType1:
     discount_ptc: FareInformationTypeI = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "discountPtc",
             "type": "Element",
             "help": "PTC/Discount Code age",
@@ -6435,8 +5496,6 @@ class PsgDetailsInfoType1:
     flequent_flyer_details: FrequentTravellerIdentificationCodeType = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "flequentFlyerDetails",
             "type": "Element",
             "help": "Tier level information",
@@ -6451,8 +5510,7 @@ class TicketRequestedSegmentsType14:
     action_identification: ActionIdentificationType = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "actionIdentification",
             "type": "Element",
             "help": "Action identification.",
@@ -6461,8 +5519,6 @@ class TicketRequestedSegmentsType14:
     connect_point_details: ConnectionTypeI = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "connectPointDetails",
             "type": "Element",
             "help": "Connected cities in changed ticket requested segment.",
@@ -6477,8 +5533,7 @@ class FeeDetailsType15:
     fee_info: SpecificDataInformationType = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "feeInfo",
             "type": "Element",
             "help": "Fee information",
@@ -6487,8 +5542,6 @@ class FeeDetailsType15:
     associated_amounts: MonetaryInformationTypeI = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "associatedAmounts",
             "type": "Element",
             "help": "Associated amounts : amounts to take into account to calculate fee.",
@@ -6497,8 +5550,6 @@ class FeeDetailsType15:
     fee_description_grp: FeeDescriptionGrpType20 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "feeDescriptionGrp",
             "type": "Element",
             "help": "Fee description",
@@ -6513,8 +5564,7 @@ class FlightInfoPnrType13:
     travel_response_details: TravelProductInformationTypeI = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "travelResponseDetails",
             "type": "Element",
             "help": "Travel Response Details: - Board/Off aiports - Flight number - Part of the journey - Day difference between Board and off - Departure/Arrival dates - Departure/Arrival times",
@@ -6523,15 +5573,13 @@ class FlightInfoPnrType13:
     time_table_date: StructuredPeriodInformationType = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "timeTableDate",
             "type": "Element",
             "help": "Time Table Effective/Discontinue dates and frequency of operating Travel Solution",
         },
     )
-    terminal_equipment_details: AdditionalProductDetailsTypeI = field(
-        default=None,
+    terminal_equipment_details: List[AdditionalProductDetailsTypeI] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 2,
@@ -6543,8 +5591,6 @@ class FlightInfoPnrType13:
     codeshare_data: CommercialAgreementsType = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "codeshareData",
             "type": "Element",
             "help": "Codeshare data",
@@ -6553,8 +5599,6 @@ class FlightInfoPnrType13:
     disclosure: FreeTextInformationType = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "disclosure",
             "type": "Element",
             "help": "Disclosure message from an operating carrier.",
@@ -6563,8 +5607,6 @@ class FlightInfoPnrType13:
     stop_details: RoutingInformationTypeI = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "stopDetails",
             "type": "Element",
             "help": "Stops Details",
@@ -6573,8 +5615,6 @@ class FlightInfoPnrType13:
     traffic_restriction_data: TrafficRestrictionTypeI = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "trafficRestrictionData",
             "type": "Element",
             "help": "Traffic restriction information",
@@ -6583,15 +5623,13 @@ class FlightInfoPnrType13:
     reservation_info: PassengerItineraryInformationType = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "reservationInfo",
             "type": "Element",
             "help": "PNR flight reservation info",
         },
     )
-    incidental_stop_info: IncidentalStopInfoType19 = field(
-        default=None,
+    incidental_stop_info: List[IncidentalStopInfoType19] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 8,
@@ -6609,8 +5647,7 @@ class GroupOfFlightsType12:
     prop_flight_gr_detail: ProposedSegmentType = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "propFlightGrDetail",
             "type": "Element",
             "help": "To indicate parameters for proposed flight group.",
@@ -6619,15 +5656,13 @@ class GroupOfFlightsType12:
     price_to_beat: MonetaryInformationType = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "priceToBeat",
             "type": "Element",
             "help": "Indicates Price to beat",
         },
     )
-    flight_details: FlightDetailsType18 = field(
-        default=None,
+    flight_details: List[FlightDetailsType18] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 1,
             "max_occurs": 4,
@@ -6645,15 +5680,14 @@ class GroupPassengerDetailsType:
     passenger_reference: SegmentRepetitionControlTypeI = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "passengerReference",
             "type": "Element",
             "help": "Trigger",
         },
     )
-    psg_details_info: PsgDetailsInfoType1 = field(
-        default=None,
+    psg_details_info: List[PsgDetailsInfoType1] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 2,
@@ -6671,8 +5705,7 @@ class OfficeIdDetailsType9:
     office_id_information: UserIdentificationType = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "officeIdInformation",
             "type": "Element",
             "help": "Office Id Information",
@@ -6681,8 +5714,6 @@ class OfficeIdDetailsType9:
     nb_of_units: NumberOfUnitsType80154S = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "nbOfUnits",
             "type": "Element",
             "help": "Number of units.",
@@ -6691,8 +5722,6 @@ class OfficeIdDetailsType9:
     uid_option: CodedAttributeType78500S = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "uidOption",
             "type": "Element",
             "help": "UID option",
@@ -6701,8 +5730,6 @@ class OfficeIdDetailsType9:
     pricing_tick_info: PricingTicketingDetailsType = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "pricingTickInfo",
             "type": "Element",
             "help": "Pricing and ticketing details.",
@@ -6711,8 +5738,6 @@ class OfficeIdDetailsType9:
     corporate_fare_info: CorporateFareInformationType = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "corporateFareInfo",
             "type": "Element",
             "help": "Corporate fare information",
@@ -6721,15 +5746,15 @@ class OfficeIdDetailsType9:
     travel_flight_info: TravelFlightInformationType = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "travelFlightInfo",
             "type": "Element",
             "help": "Details of a Flight : Direct, Non stop...",
         },
     )
-    airline_distribution_details: AirlineDistributionDetailsType16 = field(
-        default=None,
+    airline_distribution_details: List[
+        AirlineDistributionDetailsType16
+    ] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 6,
@@ -6747,8 +5772,7 @@ class OtherPossibleCriteriaType11:
     logical_link: BooleanExpressionRuleType = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "logicalLink",
             "type": "Element",
             "help": "Logical link with other criteria.",
@@ -6757,15 +5781,13 @@ class OtherPossibleCriteriaType11:
     family_criteria: FareFamilyCriteriaType = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "familyCriteria",
             "type": "Element",
             "help": "Description of fare family criteria.",
         },
     )
-    fare_family_segment: FareFamilySegmentType17 = field(
-        default=None,
+    fare_family_segment: List[FareFamilySegmentType17] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 6,
@@ -6783,15 +5805,14 @@ class TicketChangeInfoType6:
     ticket_number_details: TicketNumberTypeI = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "ticketNumberDetails",
             "type": "Element",
             "help": "Ticket nb details.",
         },
     )
-    ticket_requested_segments: TicketRequestedSegmentsType14 = field(
-        default=None,
+    ticket_requested_segments: List[TicketRequestedSegmentsType14] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 6,
@@ -6809,8 +5830,7 @@ class FareFamiliesType2:
     family_information: FareFamilyType80157S = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "familyInformation",
             "type": "Element",
             "help": "Segment used to target Commercial Fare Family.",
@@ -6819,15 +5839,13 @@ class FareFamiliesType2:
     family_criteria: FareFamilyCriteriaType = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "familyCriteria",
             "type": "Element",
             "help": "Description of Fare Family Criteria.",
         },
     )
-    fare_family_segment: FareFamilySegmentType10 = field(
-        default=None,
+    fare_family_segment: List[FareFamilySegmentType10] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 6,
@@ -6836,8 +5854,8 @@ class FareFamiliesType2:
             "help": "Fare family requested segment details.",
         },
     )
-    other_possible_criteria: OtherPossibleCriteriaType11 = field(
-        default=None,
+    other_possible_criteria: List[OtherPossibleCriteriaType11] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 20,
@@ -6855,8 +5873,7 @@ class FeeOptionType8:
     fee_type_info: SelectionDetailsType = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "feeTypeInfo",
             "type": "Element",
             "help": "Nature of the fee (OB,OC,..)",
@@ -6865,15 +5882,13 @@ class FeeOptionType8:
     rate_tax: MonetaryInformationType80162S = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "rateTax",
             "type": "Element",
             "help": "Associated rate tax.",
         },
     )
-    fee_details: FeeDetailsType15 = field(
-        default=None,
+    fee_details: List[FeeDetailsType15] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 99,
@@ -6891,8 +5906,7 @@ class ItineraryType5:
     requested_segment_ref: OriginAndDestinationRequestType = field(
         default=None,
         metadata={
-            "min_occurs": 1,
-            "max_occurs": 1,
+            "required": True,
             "name": "requestedSegmentRef",
             "type": "Element",
             "help": "Indicates reference of the requested segment",
@@ -6901,8 +5915,6 @@ class ItineraryType5:
     departure_localization: DepartureLocationType = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "departureLocalization",
             "type": "Element",
             "help": "Specification of the requested departure point",
@@ -6911,8 +5923,6 @@ class ItineraryType5:
     arrival_localization: ArrivalLocalizationType = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "arrivalLocalization",
             "type": "Element",
             "help": "Specification of the requested arrival point",
@@ -6921,8 +5931,6 @@ class ItineraryType5:
     time_details: DateAndTimeInformationType181295S = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "timeDetails",
             "type": "Element",
             "help": "Details on requested date and time plus range of date trip duration",
@@ -6931,8 +5939,6 @@ class ItineraryType5:
     flight_info: TravelFlightInformationType165053S = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "flightInfo",
             "type": "Element",
             "help": "Specify Flight options.",
@@ -6941,25 +5947,22 @@ class ItineraryType5:
     family_information: FareFamilyType = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "familyInformation",
             "type": "Element",
             "help": "Segment used to target Commercial Fare Family at requested segment level",
         },
     )
-    value_search: ValueSearchCriteriaType = field(
-        default=None,
+    value_search: List[ValueSearchCriteriaType] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 99,
             "name": "valueSearch",
             "type": "Element",
-            "help": None,
         },
     )
-    group_of_flights: GroupOfFlightsType12 = field(
-        default=None,
+    group_of_flights: List[GroupOfFlightsType12] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 6,
@@ -6968,8 +5971,8 @@ class ItineraryType5:
             "help": "list of proposed segments per requested segment",
         },
     )
-    flight_info_pnr: FlightInfoPnrType13 = field(
-        default=None,
+    flight_info_pnr: List[FlightInfoPnrType13] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 4,
@@ -6981,8 +5984,6 @@ class ItineraryType5:
     requested_segment_action: ActionIdentificationType = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "requestedSegmentAction",
             "type": "Element",
             "help": "Action identification for the requested segment",
@@ -6991,8 +5992,6 @@ class ItineraryType5:
     attributes: CodedAttributeType = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "attributes",
             "type": "Element",
             "help": "Coded attributes",
@@ -7007,8 +6006,6 @@ class FareMasterPricerTravelBoardSearch:
     number_of_unit: NumberOfUnitsType = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "numberOfUnit",
             "type": "Element",
             "help": "Number of seats , recommendations.",
@@ -7017,15 +6014,13 @@ class FareMasterPricerTravelBoardSearch:
     global_options: AttributeType = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "globalOptions",
             "type": "Element",
             "help": "Global options",
         },
     )
-    pax_reference: TravellerReferenceInformationType = field(
-        default=None,
+    pax_reference: List[TravellerReferenceInformationType] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 6,
@@ -7037,15 +6032,13 @@ class FareMasterPricerTravelBoardSearch:
     customer_ref: ConsumerReferenceInformationType = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "customerRef",
             "type": "Element",
             "help": "Customer references",
         },
     )
-    form_of_payment_by_passenger: FoprepresentationType = field(
-        default=None,
+    form_of_payment_by_passenger: List[FoprepresentationType] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 60,
@@ -7054,8 +6047,8 @@ class FareMasterPricerTravelBoardSearch:
             "help": "Fee with different payment forms by passenger.",
         },
     )
-    solution_family: FareInformationType = field(
-        default=None,
+    solution_family: List[FareInformationType] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 20,
@@ -7064,8 +6057,8 @@ class FareMasterPricerTravelBoardSearch:
             "help": "Solution Family",
         },
     )
-    passenger_info_grp: GroupPassengerDetailsType = field(
-        default=None,
+    passenger_info_grp: List[GroupPassengerDetailsType] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 9,
@@ -7074,8 +6067,8 @@ class FareMasterPricerTravelBoardSearch:
             "help": "Passenger info group (9 ADT + 9 IN)",
         },
     )
-    fare_families: FareFamiliesType2 = field(
-        default=None,
+    fare_families: List[FareFamiliesType2] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 20,
@@ -7087,8 +6080,6 @@ class FareMasterPricerTravelBoardSearch:
     fare_options: FareOptionsType3 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "fareOptions",
             "type": "Element",
             "help": "Fare options",
@@ -7097,15 +6088,13 @@ class FareMasterPricerTravelBoardSearch:
     price_to_beat: MonetaryInformationType = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "priceToBeat",
             "type": "Element",
             "help": "Indicates Price to beat",
         },
     )
-    tax_info: TaxType = field(
-        default=None,
+    tax_info: List[TaxType] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 9,
@@ -7117,25 +6106,22 @@ class FareMasterPricerTravelBoardSearch:
     travel_flight_info: TravelFlightInformationType197722S = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "travelFlightInfo",
             "type": "Element",
             "help": "Details of a Flight : Direct, Non stop...",
         },
     )
-    value_search: ValueSearchCriteriaType = field(
-        default=None,
+    value_search: List[ValueSearchCriteriaType] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 99,
             "name": "valueSearch",
             "type": "Element",
-            "help": None,
         },
     )
-    buckets: BucketsType4 = field(
-        default=None,
+    buckets: List[BucketsType4] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 10,
@@ -7144,8 +6130,8 @@ class FareMasterPricerTravelBoardSearch:
             "help": "Buckets",
         },
     )
-    itinerary: ItineraryType5 = field(
-        default=None,
+    itinerary: List[ItineraryType5] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 18,
@@ -7157,15 +6143,13 @@ class FareMasterPricerTravelBoardSearch:
     ticket_change_info: TicketChangeInfoType6 = field(
         default=None,
         metadata={
-            "min_occurs": 0,
-            "max_occurs": 1,
             "name": "ticketChangeInfo",
             "type": "Element",
             "help": "Changed ticket information.",
         },
     )
-    combination_fare_families: CombinationFareFamiliesType7 = field(
-        default=None,
+    combination_fare_families: List[CombinationFareFamiliesType7] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 2000,
@@ -7174,8 +6158,8 @@ class FareMasterPricerTravelBoardSearch:
             "help": "Specify fare family combinations",
         },
     )
-    fee_option: FeeOptionType8 = field(
-        default=None,
+    fee_option: List[FeeOptionType8] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 9,
@@ -7184,8 +6168,8 @@ class FareMasterPricerTravelBoardSearch:
             "help": "Fee option group.",
         },
     )
-    office_id_details: OfficeIdDetailsType9 = field(
-        default=None,
+    office_id_details: List[OfficeIdDetailsType9] = field(
+        default_factory=list,
         metadata={
             "min_occurs": 0,
             "max_occurs": 20,

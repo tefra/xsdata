@@ -207,7 +207,10 @@ class Attribute(AnnotationBase, SignatureField, RestrictedField):
         return self.type or self.ref
 
     def get_restrictions(self) -> Dict[str, Anything]:
-        return {}
+        if self.use == "required":
+            return dict(required=True)
+
+        return dict()
 
 
 @dataclass

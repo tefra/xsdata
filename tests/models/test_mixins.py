@@ -7,7 +7,6 @@ from attr import dataclass
 from xsdata.models import elements as el
 from xsdata.models.mixins import (
     ExtendsMixin,
-    ExtendsNone,
     NamedField,
     OccurrencesMixin,
     RestrictedField,
@@ -167,7 +166,11 @@ class RestrictedFieldTests(TestCase):
         self.assertListEqual(expected, subclasses)
 
     def test_attribute_get_restrictions(self):
-        self.assertDictEqual({}, el.Attribute.build().get_restrictions())
+        obj = el.Attribute.build()
+        self.assertDictEqual({}, obj.get_restrictions())
+
+        obj.use = "required"
+        self.assertDictEqual(dict(required=1), obj.get_restrictions())
 
     def test_restriction_get_restrictions(self):
         self.assertDictEqual({}, el.Restriction.build().get_restrictions())
@@ -225,6 +228,16 @@ class OccurrencesMixinTests(TestCase):
             obj = clazz.build(**data)
             self.assertDictEqual(data, obj.get_restrictions())
 
+        data = dict(min_occurs=1, max_occurs=1)
+        for clazz in self.subclasses:
+            obj = clazz.build(**data)
+            self.assertDictEqual(dict(required=True), obj.get_restrictions())
+
+        data = dict(min_occurs=0, max_occurs=1)
+        for clazz in self.subclasses:
+            obj = clazz.build(**data)
+            self.assertDictEqual(dict(), obj.get_restrictions())
+
 
 class ExtendsMixinTests(TestCase):
     def test_subclasses(self):
@@ -232,7 +245,6 @@ class ExtendsMixinTests(TestCase):
         expected = [
             el.ComplexType,
             el.Element,
-            ExtendsNone,
             el.SimpleType,
         ]
         self.assertListEqual(expected, subclasses)
@@ -250,14 +262,20 @@ class ExtendsMixinTests(TestCase):
         obj.complex_content.extension.base = "foo_bar"
         self.assertEqual("FooBar", obj.extends)
 
+    def test_element_extends_property(self):
+        obj = el.Element.build()
+        self.assertIsNone(obj.extends)
 
-class ExtendsNoneTests(TestCase):
-    def test_subclasses(self):
-        subclasses = [c for _, c in get_subclasses(ExtendsNone)]
-        expected = [
-            el.SimpleType,
-        ]
-        self.assertListEqual(expected, subclasses)
+        obj.type = "foo_bar"
+        self.assertEqual("FooBar", obj.extends)
+
+        obj.complex_type = el.ComplexType.build()
+        self.assertIsNone(obj.extends)
+
+        obj.complex_type.complex_content = el.ComplexContent.build(
+            extension=el.Extension.build(base="thug_life")
+        )
+        self.assertEqual("ThugLife", obj.extends)
 
     def test_simple_type_extends_property(self):
         self.assertIsNone(el.SimpleType.build().extends)

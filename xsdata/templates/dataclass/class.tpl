@@ -5,8 +5,8 @@ class {{ obj.name }}{{"({})".format(obj.extends) if obj.extends }}:
     pass
 {% endif -%}
 {% for attr in obj.attrs %}
-    {{ attr.name }}: {{ attr.type }} = field(
-        {{- "default={},".format(attr.default) }}
+    {{ attr.name }}: {{ 'List[{}]'.format(attr.type) if attr.is_list else attr.type }} = field(
+        {{ "default_factory=list" if attr.is_list else "default={}".format(attr.default) }},
         metadata={{ attr.metadata }}
     )
 {%- endfor %}

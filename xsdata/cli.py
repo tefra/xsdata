@@ -4,7 +4,7 @@ import click
 import click_completion
 
 from xsdata.generator import CodeGenerator
-from xsdata.schema import SchemaReader
+from xsdata.parser import SchemaParser
 from xsdata.version import version
 from xsdata.writer import CodeWriter
 
@@ -36,14 +36,25 @@ def generate(file: str, target: str, theme: str, verbose: bool = False):
     )
 
 
+processed = []
+
+
 def process(xsd_path, theme, target, target_adjusted=False):
-    reader = SchemaReader(path=xsd_path)
+
+    if xsd_path in processed:
+        return
+
+    processed.append(xsd_path)
+
+    reader = SchemaParser(path=xsd_path)
     schema = reader.parse()
     module = xsd_path.stem
     if not target_adjusted:
         target = CodeWriter.adjust_target(target, xsd_path, schema)
 
-    for _import in schema.imports:
+    imports = schema.imports + schema.includes
+    CodeWriter.organize_imports(imports)
+    for _import in imports:
         import_xsd_path = xsd_path.parent.joinpath(
             _import.schema_location
         ).resolve()
@@ -56,7 +67,11 @@ def process(xsd_path, theme, target, target_adjusted=False):
 
     classes = CodeGenerator(schema=schema).generate()
     CodeWriter(
-        module=module, classes=classes, theme=theme, target=target
+        module=module,
+        classes=classes,
+        imports=imports,
+        theme=theme,
+        target=target,
     ).write()
 
 

@@ -47,15 +47,32 @@ class CodeGenerator:
             obj = self.queue.pop()
             item = self.generate_element(obj)
 
+            parent = self.deck
             if getattr(obj, "inner", False):
-                self.deck[-1].inner.append(item)
-            else:
-                self.deck.append(item)
+                parent = self.find_parent(self.deck[-1], item).inner
+            parent.append(item)
+
+    def find_parent(self, obj: Class, item: Class):
+
+        for attr in obj.attrs:
+            if attr.type == item.name:
+                return obj
+
+        for inner in obj.inner:
+            res = self.find_parent(inner, item)
+            if res:
+                return res
+
+        return None
 
     def generate_element(self, obj: BaseElement) -> Class:
+
+        if obj.display_base == "CommonBaseReq":
+            pass
+
         return Class(
             name=obj.pascal_name,
-            extends=obj.extends,
+            extends=obj.display_base,
             attrs=self.generate_class_fields(obj, container=True),
             help=obj.display_help,
         )

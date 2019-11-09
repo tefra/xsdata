@@ -6,28 +6,63 @@ from lxml import etree
 XMLSchema = "http://www.w3.org/2001/XMLSchema"
 
 
-class XSDType(Enum):
-    STRING = ("xs:string", str)
-    DECIMAL = ("xs:decimal", float)
-    INTEGER = ("xs:integer", int)
-    BOOLEAN = ("xs:boolean", bool)
-    DATE = ("xs:date", str)
-    TIME = ("xs:time", str)
-
-    def __init__(self, xsd_type, py_type):
-        self.xsd_type = xsd_type
-        self.py_type = py_type
-
-    @property
-    def py_name(self):
-        return self.py_type.__name__
+class XSDType:
+    MAP = {
+        "anyURI": "str",
+        "base64Binary": "str",
+        "boolean": "bool",
+        "byte": "int",
+        "date": "str",
+        "dateTime": "str",
+        "decimal": "float",
+        "derivationControl": "str",
+        "double": "float",
+        "duration": "str",
+        "ENTITIES": "int",
+        "ENTITY": "int",
+        "float": "float",
+        "gDay": "str",
+        "gMonth": "str",
+        "gMonthDay": "str",
+        "gYear": "str",
+        "gYearMonth": "str",
+        "hexBinary": "str",
+        "ID": "str",
+        "IDREF": "str",
+        "IDREFS": "str",
+        "int": "int",
+        "integer": "int",
+        "language": "str",
+        "long": "int",
+        "Name": "str",
+        "NCName": "str",
+        "negativeInteger": "int",
+        "NMTOKEN": "str",
+        "NMTOKENS": "str",
+        "nonNegativeInteger": "int",
+        "nonPositiveInteger": "int",
+        "normalizedString": "str",
+        "NOTATION": "str",
+        "positiveInteger": "int",
+        "QName": "str",
+        "short": "int",
+        "simpleDerivationSet": "str",
+        "string": "str",
+        "time": "str",
+        "token": "str",
+        "unsignedByte": "int",
+        "unsignedInt": "int",
+        "unsignedLong": "int",
+        "unsignedShort": "int",
+    }
 
     @classmethod
-    def find(cls, xsd_type: str) -> Optional["XSDType"]:
-        for value in XSDType:
-            if value.xsd_type == xsd_type:
-                return value
-        return None
+    def map(cls, xsd_type: str) -> Optional[str]:
+        pos = xsd_type.find(":")
+        if pos == -1:
+            return None
+
+        return cls.MAP.get(xsd_type[pos + 1 :])
 
 
 class Event:

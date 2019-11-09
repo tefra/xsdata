@@ -18,7 +18,7 @@ from xsdata.models.mixins import (
     RestrictedField,
     SignatureField,
 )
-from xsdata.utils.text import pascal_case, snake_case
+from xsdata.utils.text import snake_case
 
 
 def stripns(text: str) -> str:
@@ -166,7 +166,7 @@ class SimpleType(AnnotationBase, SignatureField, ExtendsMixin):
         return self.restriction.raw_type if self.restriction else None
 
     @property
-    def extends(self) -> Optional[str]:
+    def raw_base(self) -> Optional[str]:
         return None
 
 
@@ -422,9 +422,9 @@ class ComplexType(AnnotationBase, NamedField, ExtendsMixin):
     mixed: bool = False
 
     @property
-    def extends(self) -> Optional[str]:
+    def raw_base(self) -> Optional[str]:
         return (
-            pascal_case(self.complex_content.extension.base)
+            self.complex_content.extension.base
             if self.complex_content
             and self.complex_content.extension
             and self.complex_content.extension.base
@@ -491,11 +491,11 @@ class Element(AnnotationBase, SignatureField, OccurrencesMixin, ExtendsMixin):
         return self.type or self.ref
 
     @property
-    def extends(self) -> Optional[str]:
+    def raw_base(self) -> Optional[str]:
         if self.complex_type:
-            return self.complex_type.extends
+            return self.complex_type.raw_base
         elif self.type:
-            return self.display_type
+            return self.raw_type
         return None
 
 

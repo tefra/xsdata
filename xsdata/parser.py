@@ -11,7 +11,7 @@ from xsdata.utils.text import capitalize, snake_case
 
 
 @dataclass
-class SchemaReader:
+class SchemaParser:
     path: pathlib.Path
     elements: List[BaseModel] = field(default_factory=list)
     methods: dict = field(init=False)

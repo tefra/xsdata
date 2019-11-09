@@ -81,7 +81,7 @@ class BaseModel:
         if clazz == int:
             return int(value)
         if clazz == float:
-            return float(value)
+            return str(value)
 
         # Nothing else is allowed :)
         raise ValueError(

@@ -1,0 +1,9580 @@
+from dataclasses import dataclass, field
+from typing import List
+
+
+@dataclass
+class BookingTravelerName:
+    """
+    Complete name fields
+    """
+
+    pass
+
+
+@dataclass
+class CustomProfileInformation:
+    """
+    Custom Profile Field Data required for File Finishing
+    """
+
+    pass
+
+
+@dataclass
+class Location:
+    """
+    Used during search to specify an origin or destination location
+    """
+
+    pass
+
+
+@dataclass
+class LoyaltyProgram:
+    pass
+
+
+@dataclass
+class MarketingInformation:
+    """
+    Marketing text or Notices for Suppliers
+    """
+
+    pass
+
+
+@dataclass
+class OperatedBy:
+    """
+    This is the carrier code to support Cross Accrual
+    """
+
+    pass
+
+
+@dataclass
+class OptionalServiceApplicationLimitType:
+    """
+    The optional service application limit
+    """
+
+    pass
+
+
+@dataclass
+class PseudoCityCode:
+    pass
+
+
+@dataclass
+class QueueSelector:
+    """
+    Identifies the Queue with Queue Number , Category and Date Range.
+    """
+
+    pass
+
+
+@dataclass
+class State:
+    """
+    Container to house the state code for an address
+    """
+
+    pass
+
+
+@dataclass
+class TaxDetail:
+    """
+    The tax idetail nformation for a fare quote tax.
+    """
+
+    pass
+
+
+@dataclass
+class TypeAgentInfo:
+    pass
+
+
+@dataclass
+class TypeFreeFormText:
+    """
+    Free form Text
+    """
+
+    pass
+
+
+@dataclass
+class TypePolicyCodesList:
+    pass
+
+
+@dataclass
+class TypeProviderReservationDetail:
+    """
+    Details of a provider reservation locator consisting of provider locator code and provider code. To be used as a request element type while accessing a specific PNR
+    """
+
+    pass
+
+
+@dataclass
+class TypeResponseImageSize:
+    """
+    Allowable images sizes in response
+    """
+
+    pass
+
+
+@dataclass
+class TypeSearchTimeSpec:
+    pass
+
+
+@dataclass
+class AccountCode:
+    """
+    it will be considered a default AccounCode to be sent to all the Providers or Suppliers.
+    """
+
+    code: str = field(
+        default=None, metadata={"name": "Code", "type": "Attribute"}
+    )
+    type: str = field(
+        default=None,
+        metadata={
+            "name": "Type",
+            "type": "Attribute",
+            "help": "An identifier to categorize this account code. For example, FlightPass for AC Flight Pass or RFB for AC corporate Rewards for Business.",
+        },
+    )
+
+
+@dataclass
+class AgentVoucher:
+    """
+    Agent Voucher Form of Payments
+    """
+
+    number: str = field(
+        default=None,
+        metadata={"required": True, "name": "Number", "type": "Attribute"},
+    )
+
+
+@dataclass
+class AirSearchParameters:
+    """
+    Search Parameters
+    """
+
+    no_advance_purchase: bool = field(
+        default=None,
+        metadata={"name": "NoAdvancePurchase", "type": "Attribute"},
+    )
+    refundable_fares: bool = field(
+        default=None, metadata={"name": "RefundableFares", "type": "Attribute"}
+    )
+    non_penalty_fares: bool = field(
+        default=None, metadata={"name": "NonPenaltyFares", "type": "Attribute"}
+    )
+    un_restricted_fares: bool = field(
+        default=None,
+        metadata={"name": "UnRestrictedFares", "type": "Attribute"},
+    )
+
+
+@dataclass
+class Arcpayment:
+    """
+    ARC form of payment.ACH Only
+    """
+
+    arcidentifier: str = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "ARCIdentifier",
+            "type": "Attribute",
+            "help": "Value of the ARC Direct Bill id",
+        },
+    )
+    arcpassword: str = field(
+        default=None,
+        metadata={
+            "name": "ARCPassword",
+            "type": "Attribute",
+            "help": "Value of the ARC Direct Bill id password",
+        },
+    )
+
+
+@dataclass
+class Auxdata:
+    entry: List["Entry"] = field(
+        default_factory=list,
+        metadata={
+            "min_occurs": 1,
+            "max_occurs": 999,
+            "name": "Entry",
+            "type": "Element",
+        },
+    )
+
+    @dataclass
+    class Entry:
+        reason: str = field(
+            default=None,
+            metadata={"required": True, "name": "Reason", "type": "Element"},
+        )
+        description: str = field(
+            default=None,
+            metadata={
+                "required": True,
+                "name": "Description",
+                "type": "Element",
+            },
+        )
+
+
+@dataclass
+class BillingPointOfSaleInfo:
+    """
+    Point of Sale information for Billing
+    """
+
+    origin_application: str = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "OriginApplication",
+            "type": "Attribute",
+            "help": "Name of the Point of Sale application which initiated the Request.This information will be provided as part of the provisioning of the user.",
+        },
+    )
+    cidbnumber: int = field(
+        default=None,
+        metadata={
+            "name": "CIDBNumber",
+            "type": "Attribute",
+            "help": "A 10 Digit customer number generated by CIDB system.",
+        },
+    )
+
+
+@dataclass
+class BookingSource:
+    code: str = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "Code",
+            "type": "Attribute",
+            "help": "Alternate booking source code or number.",
+        },
+    )
+    type: str = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "Type",
+            "type": "Attribute",
+            "help": "Type of booking source sent in the Code attribute. Possible values are “PseudoCityCode”,” ArcNumber”,” IataNumber”, “CustomerId” and “BookingSourceOverrride”. “BookingSourceOverrride” is only applicable in VehicleCreateReservationReq. 1P/1J.",
+        },
+    )
+
+
+@dataclass
+class Bsppayment:
+    """
+    BSP form of payment.ACH Only
+    """
+
+    bspidentifier: str = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "BSPIdentifier",
+            "type": "Attribute",
+            "help": "Value of the BSP Direct Bill id",
+        },
+    )
+    bsppassword: str = field(
+        default=None,
+        metadata={
+            "name": "BSPPassword",
+            "type": "Attribute",
+            "help": "Value of the BSP Direct Bill id password",
+        },
+    )
+
+
+@dataclass
+class CabinClass:
+    """
+    Requests cabin class (First, Business and Economy, etc.) as supported by the provider or supplier.
+    """
+
+    type: str = field(
+        default=None,
+        metadata={"required": True, "name": "Type", "type": "Attribute"},
+    )
+
+
+@dataclass
+class Characteristic:
+    """
+    Identifies the characteristics of the seat with seat type, value and description.
+    """
+
+    seat_type: str = field(
+        default=None,
+        metadata={
+            "name": "SeatType",
+            "type": "Attribute",
+            "help": "Indicates codeset of values such as Seat Type like Place,Position, Smoking Choice, Place Arrangement, Place Direction, Compartment.",
+        },
+    )
+    seat_description: str = field(
+        default=None,
+        metadata={
+            "name": "SeatDescription",
+            "type": "Attribute",
+            "help": "Description of the seat type.",
+        },
+    )
+    seat_value: str = field(
+        default=None,
+        metadata={
+            "name": "SeatValue",
+            "type": "Attribute",
+            "help": "Indicates the value specific to the selected type.",
+        },
+    )
+    seat_value_description: str = field(
+        default=None,
+        metadata={
+            "name": "SeatValueDescription",
+            "type": "Attribute",
+            "help": "Description of the seat value.",
+        },
+    )
+
+
+@dataclass
+class Check:
+    """
+    Check Form of Payment
+    """
+
+    micrnumber: str = field(
+        default=None,
+        metadata={
+            "name": "MICRNumber",
+            "type": "Attribute",
+            "help": "Magnetic Ink Character Reader Number of check.",
+        },
+    )
+    routing_number: str = field(
+        default=None,
+        metadata={
+            "name": "RoutingNumber",
+            "type": "Attribute",
+            "help": "The bank routing number of the check.",
+        },
+    )
+    account_number: str = field(
+        default=None,
+        metadata={
+            "name": "AccountNumber",
+            "type": "Attribute",
+            "help": "The account number of the check",
+        },
+    )
+    check_number: str = field(
+        default=None,
+        metadata={
+            "name": "CheckNumber",
+            "type": "Attribute",
+            "help": "The sequential check number of the check.",
+        },
+    )
+
+
+@dataclass
+class CoordinateLocation(Location):
+    """
+    Specific lat/long location, usually associated with a Distance
+    """
+
+    latitude: Double = field(
+        default=None,
+        metadata={"required": True, "name": "latitude", "type": "Attribute"},
+    )
+    longitude: Double = field(
+        default=None,
+        metadata={"required": True, "name": "longitude", "type": "Attribute"},
+    )
+
+
+@dataclass
+class CorporateDiscountId:
+    """
+    These are zero or more negotiated rate codes
+    """
+
+    negotiated_rate_code: bool = field(
+        default=None,
+        metadata={
+            "name": "NegotiatedRateCode",
+            "type": "Attribute",
+            "help": "When set to true, the data in the CorporateDiscountID is a negotiated rate code. Otherwise, this data is a Corporate Discount ID rate.",
+        },
+    )
+
+
+@dataclass
+class Credentials:
+    """
+    Container to send login id and password on each request
+    """
+
+    user_id: str = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "UserId",
+            "type": "Attribute",
+            "help": "The UserID associated with the entity using this request withing this BranchCode.",
+        },
+    )
+
+
+@dataclass
+class DirectPayment:
+    """
+    Direct Payment Form of Payments
+    """
+
+    text: str = field(
+        default=None, metadata={"name": "Text", "type": "Attribute"}
+    )
+
+
+@dataclass
+class Distance:
+    """
+    Container to encapsulate the a distance value with its unit of measure.
+    """
+
+    units: str = field(
+        default=MI, metadata={"name": "Units", "type": "Attribute"}
+    )
+    value: int = field(
+        default=None,
+        metadata={"required": True, "name": "Value", "type": "Attribute"},
+    )
+    direction: str = field(
+        default=None,
+        metadata={
+            "name": "Direction",
+            "type": "Attribute",
+            "help": "Directions: S, N, E, W, SE, NW, ...",
+        },
+    )
+
+
+@dataclass
+class FormattedTextTextType:
+    """
+    Provides text and indicates whether it is formatted or not.
+    """
+
+    formatted: bool = field(
+        default=None,
+        metadata={
+            "name": "Formatted",
+            "type": "Attribute",
+            "help": "Textual information, which may be formatted as a line of information, or unformatted, as a paragraph of text.",
+        },
+    )
+    text_format: Nmtoken = field(
+        default=None,
+        metadata={
+            "name": "TextFormat",
+            "type": "Attribute",
+            "help": "Indicates the format of text used in the description e.g. unformatted or html.",
+        },
+    )
+
+
+@dataclass
+class IndustryStandardSsr:
+    """
+    Indicates Carrier Supports this industry standard.
+    """
+
+    code: str = field(
+        default=None,
+        metadata={
+            "name": "Code",
+            "type": "Attribute",
+            "help": "This code indicates which Standard of SSR's they support. Sucha as the 'AIRIMP' standard identified by 'IATA.org'",
+        },
+    )
+
+
+@dataclass
+class KeyMapping:
+    """
+    Element for which mapping key sent in the request is different from the mapping key comes in the response.
+    """
+
+    element_name: str = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "ElementName",
+            "type": "Attribute",
+            "help": "Name of the element.",
+        },
+    )
+    original_key: str = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "OriginalKey",
+            "type": "Attribute",
+            "help": "The mapping key which is sent in the request.",
+        },
+    )
+    new_key: str = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "NewKey",
+            "type": "Attribute",
+            "help": "The mapping key that comes in the response.",
+        },
+    )
+
+
+@dataclass
+class LocatorCode:
+    """
+    A locator code that identifies a PNR or searches for one.
+    """
+
+    value: str = field(
+        default=None,
+        metadata={"min_length": "1", "name": "value", "type": "Restriction"},
+    )
+
+
+@dataclass
+class McofeeInfo:
+    """
+    Information related to the PTA/TOD (Prepaid Ticket Advice / Ticket on Departure) related to the MCO
+    """
+
+    fee_applies_to_ind: str = field(
+        default=None,
+        metadata={
+            "name": "FeeAppliesToInd",
+            "type": "Attribute",
+            "help": "Indicates if PTA/TOD fee is for the entire MCO or is per person.",
+        },
+    )
+
+
+@dataclass
+class Mcoremark:
+    """
+    Information related to fare construction, free form text etc. of the MCO
+    """
+
+    additional_rmk: bool = field(
+        default=None,
+        metadata={
+            "name": "AdditionalRmk",
+            "type": "Attribute",
+            "help": "Indicates if the remark is additional remark or not.",
+        },
+    )
+
+
+@dataclass
+class Mcotext(TypeFreeFormText):
+    """
+    All type of free format text messages related to MCO like - Command Text, Agent Entry, MCO Modifiers, Text Message
+    """
+
+    type: str = field(
+        default=None,
+        metadata={
+            "name": "Type",
+            "type": "Attribute",
+            "help": "The type of text. Possible values: Command Text, Agent Entry, MCO Modifiers, Text Message",
+        },
+    )
+
+
+@dataclass
+class MealRequest:
+    """
+    Special meal requests like Vegetarian
+    """
+
+    type: str = field(
+        default=None,
+        metadata={"required": True, "name": "Type", "type": "Attribute"},
+    )
+
+
+@dataclass
+class MediaItem:
+    """
+    Photos and other media urls for the property referenced above.
+    """
+
+    caption: str = field(
+        default=None, metadata={"name": "caption", "type": "Attribute"}
+    )
+    height: NonNegativeInteger = field(
+        default=None, metadata={"name": "height", "type": "Attribute"}
+    )
+    width: NonNegativeInteger = field(
+        default=None, metadata={"name": "width", "type": "Attribute"}
+    )
+    type: str = field(
+        default=None, metadata={"name": "type", "type": "Attribute"}
+    )
+    url: AnyUri = field(
+        default=None, metadata={"name": "url", "type": "Attribute"}
+    )
+    icon: AnyUri = field(
+        default=None, metadata={"name": "icon", "type": "Attribute"}
+    )
+    size_code: TypeResponseImageSize = field(
+        default=None, metadata={"name": "sizeCode", "type": "Attribute"}
+    )
+
+
+@dataclass
+class MetaData:
+    """
+    Extra data to elaborate the parent element. This data is primarily informative and is not persisted.
+    """
+
+    key: str = field(
+        default=None,
+        metadata={"required": True, "name": "Key", "type": "Attribute"},
+    )
+    value: str = field(
+        default=None,
+        metadata={"required": True, "name": "Value", "type": "Attribute"},
+    )
+
+
+@dataclass
+class ModificationType:
+    """
+    The modification types supported
+    """
+
+    value: Nmtoken = field(
+        default=None, metadata={"name": "value", "type": "Restriction"}
+    )
+
+
+@dataclass
+class NameOverride:
+    """
+    To be used if the name is different from booking travelers in the PNR
+    """
+
+    first: str = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "First",
+            "type": "Attribute",
+            "help": "First Name.",
+        },
+    )
+    last: str = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "Last",
+            "type": "Attribute",
+            "help": "Last Name.",
+        },
+    )
+    age: int = field(
+        default=None,
+        metadata={"name": "Age", "type": "Attribute", "help": "Age."},
+    )
+
+
+@dataclass
+class Numeric0to999:
+    """
+    Used for Numeric values, from 0 to 999 inclusive.
+    """
+
+    value: int = field(
+        default=None,
+        metadata={
+            "min_inclusive": "0",
+            "max_inclusive": "999",
+            "name": "value",
+            "type": "Restriction",
+        },
+    )
+
+
+@dataclass
+class OptionalServiceApplicabilityType:
+    """
+    The different levels at which an optional service may be applied
+    """
+
+    value: str = field(
+        default=None, metadata={"name": "value", "type": "Restriction"}
+    )
+
+
+@dataclass
+class OtherGuaranteeInfo:
+    type: str = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "Type",
+            "type": "Attribute",
+            "help": "1) IATA/ARC Number 2) Agency Address 2) Deposit Taken 3) Others",
+        },
+    )
+
+
+@dataclass
+class ProviderReservationDetail(TypeProviderReservationDetail):
+    """
+    common element for mentioning provider reservation locator (PNR) details in request.
+    """
+
+    pass
+
+
+@dataclass
+class RefundRemark:
+    """
+    A textual remark displayed in Refund Quote and Refund response.
+    """
+
+    remark_data: str = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "RemarkData",
+            "type": "Element",
+            "help": "Actual remark data.",
+        },
+    )
+
+
+@dataclass
+class RequiredField:
+    name: str = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "Name",
+            "type": "Attribute",
+            "help": "The name of the required field",
+        },
+    )
+
+
+@dataclass
+class Requisition:
+    """
+    Requisition Form of Payment
+    """
+
+    number: str = field(
+        default=None,
+        metadata={
+            "name": "Number",
+            "type": "Attribute",
+            "help": "Requisition number used for accounting",
+        },
+    )
+    category: str = field(
+        default=None,
+        metadata={
+            "name": "Category",
+            "type": "Attribute",
+            "help": "Classification Category for the requisition payment",
+        },
+    )
+    type: str = field(
+        default=None,
+        metadata={
+            "name": "Type",
+            "type": "Attribute",
+            "help": "Type can be Cash or Credit for category as Government",
+        },
+    )
+
+
+@dataclass
+class ResponseMessage:
+    """
+    A simple textual fare note. Used within several other objects.
+    """
+
+    code: int = field(
+        default=None,
+        metadata={"required": True, "name": "Code", "type": "Attribute"},
+    )
+    type: str = field(
+        default=None,
+        metadata={
+            "name": "Type",
+            "type": "Attribute",
+            "help": "Indicates the type of message (Warning, Error, Info)",
+        },
+    )
+
+
+@dataclass
+class Restriction:
+    """
+    Which activities are supported for a particular element
+    """
+
+    operation: str = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "Operation",
+            "type": "Attribute",
+            "help": "The operation that is restricted",
+        },
+    )
+    reason: str = field(
+        default=None,
+        metadata={
+            "name": "Reason",
+            "type": "Attribute",
+            "help": "The reason it is restricted",
+        },
+    )
+
+
+@dataclass
+class RoleInfo:
+    """
+    Container to specify the role of the agent
+    """
+
+    id: str = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "Id",
+            "type": "Attribute",
+            "help": "Unique identifier of the role.",
+        },
+    )
+    name: str = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "Name",
+            "type": "Attribute",
+            "help": "Agent's role name",
+        },
+    )
+    source: str = field(
+        default=None,
+        metadata={
+            "name": "Source",
+            "type": "Attribute",
+            "help": "Role inheritance level. Needed in the response, not in the request",
+        },
+    )
+    description: str = field(
+        default=None,
+        metadata={
+            "name": "Description",
+            "type": "Attribute",
+            "help": "Description of role",
+        },
+    )
+
+
+@dataclass
+class SearchTicketing:
+    """
+    Search restriction by Agent
+    """
+
+    ticket_status: str = field(
+        default=Both,
+        metadata={
+            "name": "TicketStatus",
+            "type": "Attribute",
+            "help": "Return only PNRs with ticketed, non-ticketed or both",
+        },
+    )
+    reservation_status: str = field(
+        default=Both,
+        metadata={
+            "name": "ReservationStatus",
+            "type": "Attribute",
+            "help": 'Used only if "TicketStatus" set to "No" or "Both". Return only PNRs with specific reservation status or both statuses.',
+        },
+    )
+    ticket_date: str = field(
+        default=None,
+        metadata={
+            "name": "TicketDate",
+            "type": "Attribute",
+            "help": "Identifies when this reservation was ticketed, or when it should be ticketed by (in the event of a TTL)",
+        },
+    )
+
+
+@dataclass
+class SeatAttribute:
+    """
+    Identifies the seat attribute of the service.
+    """
+
+    value: str = field(
+        default=None,
+        metadata={"required": True, "name": "Value", "type": "Attribute"},
+    )
+
+
+@dataclass
+class SellMessage(str):
+    """
+    Sell Message from Vendor. This is applicable in response messages only, any input in request message will be ignored.
+    """
+
+    pass
+
+
+@dataclass
+class SimpleName(str):
+    """
+    Free text name
+    """
+
+    pass
+
+
+@dataclass
+class StockControl:
+    """
+    The Stock Control Numbers related details of the MCO.
+    """
+
+    type: str = field(
+        default=None,
+        metadata={
+            "name": "Type",
+            "type": "Attribute",
+            "help": "Stock control type valid options include: Pending, Failed, Plain Paper, Blank, Suppressed.",
+        },
+    )
+    number: str = field(
+        default=None,
+        metadata={
+            "name": "Number",
+            "type": "Attribute",
+            "help": "Stock control number.",
+        },
+    )
+
+
+@dataclass
+class StringLength1:
+    """
+    Used for Character Strings, length 1.
+    """
+
+    value: str = field(
+        default=None,
+        metadata={"length": 1, "name": "value", "type": "Restriction"},
+    )
+
+
+@dataclass
+class StringLength1to10:
+    """
+    Used for Character Strings, length 1 to 10.
+    """
+
+    value: str = field(
+        default=None,
+        metadata={
+            "min_length": "1",
+            "max_length": "10",
+            "name": "value",
+            "type": "Restriction",
+        },
+    )
+
+
+@dataclass
+class StringLength1to100:
+    """
+    Used for Character Strings, length 1 to 100.
+    """
+
+    value: str = field(
+        default=None,
+        metadata={
+            "min_length": "1",
+            "max_length": "100",
+            "name": "value",
+            "type": "Restriction",
+        },
+    )
+
+
+@dataclass
+class StringLength1to1000:
+    """
+    Used for Character Strings, length 1 to 1000.
+    """
+
+    value: str = field(
+        default=None,
+        metadata={
+            "min_length": "1",
+            "max_length": "1000",
+            "name": "value",
+            "type": "Restriction",
+        },
+    )
+
+
+@dataclass
+class StringLength1to1024:
+    """
+    Used for Character Strings, length 1 to 1024.
+    """
+
+    value: str = field(
+        default=None,
+        metadata={
+            "min_length": "1",
+            "max_length": "1024",
+            "name": "value",
+            "type": "Restriction",
+        },
+    )
+
+
+@dataclass
+class StringLength1to116:
+    """
+    Used for Character Strings, length 1 to 116.
+    """
+
+    value: str = field(
+        default=None,
+        metadata={
+            "min_length": "1",
+            "max_length": "116",
+            "name": "value",
+            "type": "Restriction",
+        },
+    )
+
+
+@dataclass
+class StringLength1to12:
+    """
+    Used for Character Strings, length 1 to 12.
+    """
+
+    value: str = field(
+        default=None,
+        metadata={
+            "min_length": "1",
+            "max_length": "12",
+            "name": "value",
+            "type": "Restriction",
+        },
+    )
+
+
+@dataclass
+class StringLength1to128:
+    """
+    Used for Character Strings, length 1 to 128.
+    """
+
+    value: str = field(
+        default=None,
+        metadata={
+            "min_length": "1",
+            "max_length": "128",
+            "name": "value",
+            "type": "Restriction",
+        },
+    )
+
+
+@dataclass
+class StringLength1to13:
+    """
+    Used for Character Strings, length 1 to 13.
+    """
+
+    value: str = field(
+        default=None,
+        metadata={
+            "min_length": "1",
+            "max_length": "13",
+            "name": "value",
+            "type": "Restriction",
+        },
+    )
+
+
+@dataclass
+class StringLength1to14:
+    """
+    Used for Character Strings, length 1 to 14.
+    """
+
+    value: str = field(
+        default=None,
+        metadata={
+            "min_length": "1",
+            "max_length": "14",
+            "name": "value",
+            "type": "Restriction",
+        },
+    )
+
+
+@dataclass
+class StringLength1to15:
+    """
+    Used for Character Strings, length 1 to 15.
+    """
+
+    value: str = field(
+        default=None,
+        metadata={
+            "min_length": "1",
+            "max_length": "15",
+            "name": "value",
+            "type": "Restriction",
+        },
+    )
+
+
+@dataclass
+class StringLength1to16:
+    """
+    Used for Character Strings, length 1 to 16.
+    """
+
+    value: str = field(
+        default=None,
+        metadata={
+            "min_length": "1",
+            "max_length": "16",
+            "name": "value",
+            "type": "Restriction",
+        },
+    )
+
+
+@dataclass
+class StringLength1to20:
+    """
+    Used for Character Strings, length 1 to 20.
+    """
+
+    value: str = field(
+        default=None,
+        metadata={
+            "min_length": "1",
+            "max_length": "20",
+            "name": "value",
+            "type": "Restriction",
+        },
+    )
+
+
+@dataclass
+class StringLength1to2000:
+    """
+    Used for Character Strings, length 1 to 2000.
+    """
+
+    value: str = field(
+        default=None,
+        metadata={
+            "min_length": "1",
+            "max_length": "2000",
+            "name": "value",
+            "type": "Restriction",
+        },
+    )
+
+
+@dataclass
+class StringLength1to25:
+    """
+    Used for Character Strings, length 1 to 25.
+    """
+
+    value: str = field(
+        default=None,
+        metadata={
+            "min_length": "1",
+            "max_length": "25",
+            "name": "value",
+            "type": "Restriction",
+        },
+    )
+
+
+@dataclass
+class StringLength1to250:
+    """
+    Used for Character Strings, length 1 to 250.
+    """
+
+    value: str = field(
+        default=None,
+        metadata={
+            "min_length": "1",
+            "max_length": "250",
+            "name": "value",
+            "type": "Restriction",
+        },
+    )
+
+
+@dataclass
+class StringLength1to255:
+    """
+    Used for Character Strings, length 1 to 255.
+    """
+
+    value: str = field(
+        default=None,
+        metadata={
+            "min_length": "1",
+            "max_length": "255",
+            "name": "value",
+            "type": "Restriction",
+        },
+    )
+
+
+@dataclass
+class StringLength1to3:
+    """
+    Used for Character Strings, length 1 to 3.
+    """
+
+    value: str = field(
+        default=None,
+        metadata={
+            "min_length": "1",
+            "max_length": "3",
+            "name": "value",
+            "type": "Restriction",
+        },
+    )
+
+
+@dataclass
+class StringLength1to30:
+    """
+    Used for Character Strings, length 1 to 30.
+    """
+
+    value: str = field(
+        default=None,
+        metadata={
+            "min_length": "1",
+            "max_length": "30",
+            "name": "value",
+            "type": "Restriction",
+        },
+    )
+
+
+@dataclass
+class StringLength1to32:
+    """
+    Used for Character Strings, length 1 to 32.
+    """
+
+    value: str = field(
+        default=None,
+        metadata={
+            "min_length": "1",
+            "max_length": "32",
+            "name": "value",
+            "type": "Restriction",
+        },
+    )
+
+
+@dataclass
+class StringLength1to5:
+    """
+    Used for Character Strings, length 1 to 5.
+    """
+
+    value: str = field(
+        default=None,
+        metadata={
+            "min_length": "1",
+            "max_length": "5",
+            "name": "value",
+            "type": "Restriction",
+        },
+    )
+
+
+@dataclass
+class StringLength1to50:
+    """
+    Used for Character Strings, length 1 to 64.
+    """
+
+    value: str = field(
+        default=None,
+        metadata={
+            "min_length": "1",
+            "max_length": "50",
+            "name": "value",
+            "type": "Restriction",
+        },
+    )
+
+
+@dataclass
+class StringLength1to500:
+    """
+    Used for Character Strings, length 1 to 500.
+    """
+
+    value: str = field(
+        default=None,
+        metadata={
+            "min_length": "1",
+            "max_length": "500",
+            "name": "value",
+            "type": "Restriction",
+        },
+    )
+
+
+@dataclass
+class StringLength1to64:
+    """
+    Used for Character Strings, length 1 to 64.
+    """
+
+    value: str = field(
+        default=None,
+        metadata={
+            "min_length": "1",
+            "max_length": "64",
+            "name": "value",
+            "type": "Restriction",
+        },
+    )
+
+
+@dataclass
+class StringLength1to8:
+    """
+    Used for Character Strings, length 1 to 8.
+    """
+
+    value: str = field(
+        default=None,
+        metadata={
+            "min_length": "1",
+            "max_length": "8",
+            "name": "value",
+            "type": "Restriction",
+        },
+    )
+
+
+@dataclass
+class StringLength1to99:
+    """
+    Used for Character Strings, length 1 to 99.
+    """
+
+    value: str = field(
+        default=None,
+        metadata={
+            "min_length": "1",
+            "max_length": "99",
+            "name": "value",
+            "type": "Restriction",
+        },
+    )
+
+
+@dataclass
+class StringLength3:
+    """
+    Used for Character Strings, length 3.
+    """
+
+    value: str = field(
+        default=None,
+        metadata={
+            "min_length": "3",
+            "max_length": "3",
+            "name": "value",
+            "type": "Restriction",
+        },
+    )
+
+
+@dataclass
+class StringLength6to128:
+    """
+    Used for Character Strings, length 6 to 128.
+    """
+
+    value: str = field(
+        default=None,
+        metadata={
+            "min_length": "6",
+            "max_length": "128",
+            "name": "value",
+            "type": "Restriction",
+        },
+    )
+
+
+@dataclass
+class TerminalSessionInfo(str):
+    """
+    Travelport use only. This element contains CDATA information representing existing GDS session data or ACH credentials information of the terminal user
+    """
+
+    pass
+
+
+@dataclass
+class TravelInfo:
+    """
+    Traveler information details like Travel Purpose and Trip Name
+    """
+
+    trip_name: str = field(
+        default=None,
+        metadata={
+            "name": "TripName",
+            "type": "Attribute",
+            "help": "Trip Name",
+        },
+    )
+    travel_purpose: str = field(
+        default=None,
+        metadata={
+            "name": "TravelPurpose",
+            "type": "Attribute",
+            "help": "Purpose of the trip",
+        },
+    )
+
+
+@dataclass
+class TypeAccountId:
+    """
+    Account Identifier
+    """
+
+    value: str = field(
+        default=None,
+        metadata={"max_length": "19", "name": "value", "type": "Restriction"},
+    )
+
+
+@dataclass
+class TypeAdjustmentTarget:
+    value: str = field(
+        default=None, metadata={"name": "value", "type": "Restriction"}
+    )
+
+
+@dataclass
+class TypeAdjustmentType:
+    value: str = field(
+        default=None, metadata={"name": "value", "type": "Restriction"}
+    )
+
+
+@dataclass
+class TypeAgencyId:
+    """
+    Our Agency Identifier
+    """
+
+    value: str = field(
+        default=None,
+        metadata={
+            "min_length": "1",
+            "max_length": "19",
+            "name": "value",
+            "type": "Restriction",
+        },
+    )
+
+
+@dataclass
+class TypeAgencyPayment:
+    """
+    Type for Agency Payment.
+    """
+
+    agency_billing_identifier: str = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "AgencyBillingIdentifier",
+            "type": "Attribute",
+            "help": "Value of the billing id",
+        },
+    )
+    agency_billing_number: str = field(
+        default=None,
+        metadata={
+            "name": "AgencyBillingNumber",
+            "type": "Attribute",
+            "help": "Value of billing number",
+        },
+    )
+    agency_billing_password: str = field(
+        default=None,
+        metadata={
+            "name": "AgencyBillingPassword",
+            "type": "Attribute",
+            "help": "Value of billing password",
+        },
+    )
+
+
+@dataclass
+class TypeAgencyProfileLevel:
+    """
+    Profile levels in the Agency Hierarchy.
+    """
+
+    value: str = field(
+        default=None, metadata={"name": "value", "type": "Restriction"}
+    )
+
+
+@dataclass
+class TypeAgentCode:
+    """
+    The unique identifier of an agent.
+    """
+
+    value: str = field(
+        default=None,
+        metadata={
+            "pattern": "[a-zA-Z0-9\\-_\\.@ ]{1,128}",
+            "name": "value",
+            "type": "Restriction",
+        },
+    )
+
+
+@dataclass
+class TypeAirport:
+    """
+    3 Letter Airport Code
+    """
+
+    value: str = field(
+        default=None,
+        metadata={"length": 3, "name": "value", "type": "Restriction"},
+    )
+
+
+@dataclass
+class TypeBookingTransactionsAllowed:
+    booking_enabled: bool = field(
+        default=None,
+        metadata={
+            "name": "BookingEnabled",
+            "type": "Attribute",
+            "help": "Allow or prohibit booking transaction for the given product type on this Provider/Supplier. Inheritable.",
+        },
+    )
+
+
+@dataclass
+class TypeBranchCode:
+    """
+    Agency Branch Code Identifier
+    """
+
+    value: str = field(
+        default=None,
+        metadata={
+            "min_length": "1",
+            "max_length": "25",
+            "name": "value",
+            "type": "Restriction",
+        },
+    )
+
+
+@dataclass
+class TypeBranchId:
+    """
+    External Agency Branch Identifier
+    """
+
+    value: str = field(
+        default=None,
+        metadata={
+            "min_length": "1",
+            "max_length": "10",
+            "name": "value",
+            "type": "Restriction",
+        },
+    )
+
+
+@dataclass
+class TypeCardMerchantType:
+    """
+    2 letter Credit/Debit Card merchant type
+    """
+
+    value: str = field(
+        default=None,
+        metadata={
+            "min_length": "2",
+            "max_length": "2",
+            "name": "value",
+            "type": "Restriction",
+        },
+    )
+
+
+@dataclass
+class TypeCardNumber:
+    """
+    Loyalty Card number with maximum length as 36.
+    """
+
+    value: str = field(
+        default=None,
+        metadata={
+            "min_length": "1",
+            "max_length": "36",
+            "name": "value",
+            "type": "Restriction",
+        },
+    )
+
+
+@dataclass
+class TypeCarrier:
+    """
+    2 Letter Carrier code
+    """
+
+    value: str = field(
+        default=None,
+        metadata={"length": 2, "name": "value", "type": "Restriction"},
+    )
+
+
+@dataclass
+class TypeCity:
+    """
+    3 Letter City Code
+    """
+
+    value: str = field(
+        default=None,
+        metadata={"length": 3, "name": "value", "type": "Restriction"},
+    )
+
+
+@dataclass
+class TypeClassOfService:
+    """
+    Class of service code (Booking code) usually one letter, rarely two.
+    """
+
+    value: str = field(
+        default=None,
+        metadata={
+            "min_length": "1",
+            "max_length": "2",
+            "name": "value",
+            "type": "Restriction",
+        },
+    )
+
+
+@dataclass
+class TypeCommissionLevel:
+    """
+    ATA/IATA Standard commission level.
+    """
+
+    value: str = field(
+        default=None, metadata={"name": "value", "type": "Restriction"}
+    )
+
+
+@dataclass
+class TypeCommissionModifier:
+    """
+    Optional commission modifier.
+    """
+
+    value: str = field(
+        default=None, metadata={"name": "value", "type": "Restriction"}
+    )
+
+
+@dataclass
+class TypeCommissionType:
+    """
+    Types of possible commission.
+    """
+
+    value: str = field(
+        default=None, metadata={"name": "value", "type": "Restriction"}
+    )
+
+
+@dataclass
+class TypeCountry:
+    """
+    2 Letter Country code
+    """
+
+    value: str = field(
+        default=None,
+        metadata={"length": 2, "name": "value", "type": "Restriction"},
+    )
+
+
+@dataclass
+class TypeCreditCardNumber:
+    """
+    The associated credit/debit card number without spaces or dashes.
+    """
+
+    value: str = field(
+        default=None,
+        metadata={
+            "min_length": "13",
+            "max_length": "128",
+            "name": "value",
+            "type": "Restriction",
+        },
+    )
+
+
+@dataclass
+class TypeCurrency:
+    """
+    3 Letter Currency Code
+    """
+
+    value: str = field(
+        default=None,
+        metadata={"length": 3, "name": "value", "type": "Restriction"},
+    )
+
+
+@dataclass
+class TypeDate:
+    """
+    Date without time zones YYYY-MM-DD
+    """
+
+    value: str = field(
+        default=None,
+        metadata={
+            "pattern": "[^:Z].*",
+            "name": "value",
+            "type": "Restriction",
+        },
+    )
+
+
+@dataclass
+class TypeDateRange:
+    """
+    Specify a range of dates
+    """
+
+    start_date: str = field(
+        default=None,
+        metadata={"required": True, "name": "StartDate", "type": "Attribute"},
+    )
+    end_date: str = field(
+        default=None,
+        metadata={"required": True, "name": "EndDate", "type": "Attribute"},
+    )
+
+
+@dataclass
+class TypeDirection:
+    """
+    Defines the Direction for Incoming or Outgoing
+    """
+
+    value: str = field(
+        default=None, metadata={"name": "value", "type": "Restriction"}
+    )
+
+
+@dataclass
+class TypeDiscountNumber:
+    """
+    A supplier-specific number which may identify a special rate associated with a traveler's organization
+    """
+
+    value: str = field(
+        default=None,
+        metadata={"max_length": "25", "name": "value", "type": "Restriction"},
+    )
+
+
+@dataclass
+class TypeDistance:
+    """
+    2 Letter distance unit code
+    """
+
+    value: str = field(
+        default=None,
+        metadata={"length": 2, "name": "value", "type": "Restriction"},
+    )
+
+
+@dataclass
+class TypeDoorCount:
+    value: str = field(
+        default=None, metadata={"name": "value", "type": "Restriction"}
+    )
+
+
+@dataclass
+class TypeDurationYearInDays:
+    """
+    Value of the Duration in P[NumberOfDays]D format.Ranges Permitted are P001D to P366D .
+    """
+
+    value: Duration = field(
+        default=None,
+        metadata={
+            "min_inclusive": "P1D",
+            "max_inclusive": "P366D",
+            "name": "value",
+            "type": "Restriction",
+        },
+    )
+
+
+@dataclass
+class TypeElement:
+    """
+    Defines the list of available data types for modifications
+    """
+
+    value: str = field(
+        default=None, metadata={"name": "value", "type": "Restriction"}
+    )
+
+
+@dataclass
+class TypeElementStatus:
+    """
+    Values to specify the state of the element. "A" refers to "Add" , "M" refers to "Modified" and "C" refers to error conditions when value provided in "Key" attribute is not retained in response
+    """
+
+    value: str = field(
+        default=None, metadata={"name": "value", "type": "Restriction"}
+    )
+
+
+@dataclass
+class TypeEmailComment:
+    """
+    Mail comment is used to include one line of freeform information.
+    """
+
+    value: str = field(
+        default=None,
+        metadata={"min_length": "1", "name": "value", "type": "Restriction"},
+    )
+
+
+@dataclass
+class TypeEmailType:
+    """
+    An identifier that labels this email address (Personal, Business, Agency, etc)
+    """
+
+    value: str = field(
+        default=None,
+        metadata={
+            "min_length": "1",
+            "max_length": "128",
+            "name": "value",
+            "type": "Restriction",
+        },
+    )
+
+
+@dataclass
+class TypeEndorsement:
+    """
+    Endorsement type.Size can be up to 256 characters
+    """
+
+    value: str = field(
+        default=None,
+        metadata={
+            "min_length": "1",
+            "max_length": "256",
+            "name": "value",
+            "type": "Restriction",
+        },
+    )
+
+
+@dataclass
+class TypeEventType:
+    """
+    The various reservation events (book, cancel, void, etc)
+    """
+
+    value: str = field(
+        default=None, metadata={"name": "value", "type": "Restriction"}
+    )
+
+
+@dataclass
+class TypeExternalReference:
+    """
+    External reference string for Client application to identify the Form of Payment. Element will be a max of 32 hex characters alpha-numeric.
+    """
+
+    value: str = field(
+        default=None,
+        metadata={"max_length": "32", "name": "value", "type": "Restriction"},
+    )
+
+
+@dataclass
+class TypeFareBasisCode:
+    """
+    The fare basis code to be used for pricing.
+    """
+
+    value: str = field(
+        default=None,
+        metadata={"max_length": "20", "name": "value", "type": "Restriction"},
+    )
+
+
+@dataclass
+class TypeFareFamily:
+    """
+    An alpha-numeric string which denotes fare family. Some carriers may return this in lieu of or in addition to the CabinClass.
+    """
+
+    value: str = field(
+        default=None,
+        metadata={
+            "min_length": "0",
+            "max_length": "32",
+            "name": "value",
+            "type": "Restriction",
+        },
+    )
+
+
+@dataclass
+class TypeFarePull:
+    value: str = field(
+        default=None, metadata={"name": "value", "type": "Restriction"}
+    )
+
+
+@dataclass
+class TypeFlightNumber:
+    """
+    flight number type.
+    """
+
+    value: str = field(
+        default=None,
+        metadata={"max_length": "5", "name": "value", "type": "Restriction"},
+    )
+
+
+@dataclass
+class TypeFormOfRefund:
+    value: str = field(
+        default=None, metadata={"name": "value", "type": "Restriction"}
+    )
+
+
+@dataclass
+class TypeFuel:
+    value: str = field(
+        default=None, metadata={"name": "value", "type": "Restriction"}
+    )
+
+
+@dataclass
+class TypeFulfillmentIdtype:
+    """
+    IdentificationType to define how the customer will identify himself when collecting the ticket
+    """
+
+    value: str = field(
+        default=None, metadata={"name": "value", "type": "Restriction"}
+    )
+
+
+@dataclass
+class TypeFulfillmentType:
+    """
+    Defines how the client wishes to receive travel documents, e.g. collect ticket at a kiosk, print in agency.
+    """
+
+    value: str = field(
+        default=None, metadata={"name": "value", "type": "Restriction"}
+    )
+
+
+@dataclass
+class TypeGdsAccountingRemark:
+    """
+    Only below mentioned values are Supported as typeGdsAccountingRemark Fare Canned Ticket Account Other InvoiceLayout ServiceFee AgentSign TourCode (1P) Endorsement (1P) CorporateTrackingId (1P) ItineraryInvoicePerTraveler (1P) ItineraryInvoicePerSurname (1P) DividerCard (1P) NetFare/VC/CAR (1P/1J) MarketCode (1V) BranchLocationOverride (1V) BookingAgentOverride (1V) SellingAgentOverride (1V) ProductTypeOverride (1V) TicketingAgent (1V) Sort (1V) PurchaseOrder (1V) ItineraryWithFare (1V) ItineraryWithoutFare (1V) ItineraryWithAmount (1V)
+    """
+
+    value: str = field(
+        default=None,
+        metadata={"max_length": "30", "name": "value", "type": "Restriction"},
+    )
+
+
+@dataclass
+class TypeGdsRemark:
+    """
+    Only below mentioned values are Supported as typeGdsRemark Alpha Basic Historical Invoice Itinerary Vendor Confidential FOPComment (Currently this is only used by Worldspan and JAL.)
+    """
+
+    value: str = field(
+        default=None,
+        metadata={"max_length": "30", "name": "value", "type": "Restriction"},
+    )
+
+
+@dataclass
+class TypeGender:
+    """
+    The gender of a person. Data is defined in Ref Pub
+    """
+
+    value: str = field(
+        default=None,
+        metadata={
+            "min_length": "1",
+            "max_length": "2",
+            "name": "value",
+            "type": "Restriction",
+        },
+    )
+
+
+@dataclass
+class TypeGeneralText:
+    """
+    Common type for general textual information
+    """
+
+    value: str = field(
+        default=None,
+        metadata={"max_length": "250", "name": "value", "type": "Restriction"},
+    )
+
+
+@dataclass
+class TypeHotelChainCode:
+    """
+    2 Letter Hotel Chain Code
+    """
+
+    value: str = field(
+        default=None,
+        metadata={"length": 2, "name": "value", "type": "Restriction"},
+    )
+
+
+@dataclass
+class TypeHotelCode:
+    """
+    Unique hotel identifier for the channel
+    """
+
+    value: str = field(
+        default=None,
+        metadata={"max_length": "32", "name": "value", "type": "Restriction"},
+    )
+
+
+@dataclass
+class TypeIata:
+    """
+    ARC/IATA code that represents a branch/agency.
+    """
+
+    value: str = field(
+        default=None,
+        metadata={"max_length": "8", "name": "value", "type": "Restriction"},
+    )
+
+
+@dataclass
+class TypeIatacode:
+    """
+    Valid 3 letter IATA city or airport code
+    """
+
+    value: str = field(
+        default=None,
+        metadata={
+            "length": 3,
+            "white_space": "collapse",
+            "name": "value",
+            "type": "Restriction",
+        },
+    )
+
+
+@dataclass
+class TypeImageSize:
+    """
+    C - Colossal
+    """
+
+    value: str = field(
+        default=None, metadata={"name": "value", "type": "Restriction"}
+    )
+
+
+@dataclass
+class TypeIntegerPercentage:
+    """
+    Percentage value
+    """
+
+    value: NonNegativeInteger = field(
+        default=None,
+        metadata={
+            "min_inclusive": "0",
+            "max_inclusive": "100",
+            "name": "value",
+            "type": "Restriction",
+        },
+    )
+
+
+@dataclass
+class TypeInvoiceRecordCategory:
+    """
+    Invoice record type: Invoice, Void, Refund, Manual
+    """
+
+    value: str = field(
+        default=None, metadata={"name": "value", "type": "Restriction"}
+    )
+
+
+@dataclass
+class TypeItineraryCode:
+    value: str = field(
+        default=None, metadata={"name": "value", "type": "Restriction"}
+    )
+
+
+@dataclass
+class TypeItineraryType:
+    value: str = field(
+        default=None, metadata={"name": "value", "type": "Restriction"}
+    )
+
+
+@dataclass
+class TypeLanguage:
+    """
+    2 Letter ISO Language code
+    """
+
+    value: str = field(
+        default=None,
+        metadata={"length": 2, "name": "value", "type": "Restriction"},
+    )
+
+
+@dataclass
+class TypeLicenseCode:
+    """
+    The type of license assigned to an agent.
+    """
+
+    value: str = field(
+        default=None, metadata={"name": "value", "type": "Restriction"}
+    )
+
+
+@dataclass
+class TypeLocatorCode:
+    """
+    A Locator Code that uniquely identifies a Record or searches for one.
+    """
+
+    value: str = field(
+        default=None,
+        metadata={
+            "min_length": "5",
+            "max_length": "8",
+            "name": "value",
+            "type": "Restriction",
+        },
+    )
+
+
+@dataclass
+class TypeMaxResults:
+    """
+    Used to limit the number of results returned, particularly in more general searches that may return a large result set.
+    """
+
+    value: int = field(
+        default=None,
+        metadata={
+            "min_inclusive": "1",
+            "max_inclusive": "200",
+            "name": "value",
+            "type": "Restriction",
+        },
+    )
+
+
+@dataclass
+class TypeMaxResults1to100:
+    """
+    Used to limit the number of results returned, particularly in more general searches that may return a large result set.
+    """
+
+    value: int = field(
+        default=None,
+        metadata={
+            "min_inclusive": "1",
+            "max_inclusive": "100",
+            "name": "value",
+            "type": "Restriction",
+        },
+    )
+
+
+@dataclass
+class TypeMcofeeType:
+    """
+    The available Airline service fee types for an MCO
+    """
+
+    value: str = field(
+        default=None, metadata={"name": "value", "type": "Restriction"}
+    )
+
+
+@dataclass
+class TypeMcostatus:
+    """
+    The available status codes for an MCO
+    """
+
+    value: str = field(
+        default=None, metadata={"name": "value", "type": "Restriction"}
+    )
+
+
+@dataclass
+class TypeMcotype:
+    """
+    The available types for an MCO
+    """
+
+    value: str = field(
+        default=None, metadata={"name": "value", "type": "Restriction"}
+    )
+
+
+@dataclass
+class TypeMerchandisingService:
+    """
+    An identifier that labels this Merchandising Service (Baggage, Nomiles,GroundTransportation etc)
+    """
+
+    value: str = field(
+        default=None,
+        metadata={
+            "min_length": "1",
+            "max_length": "128",
+            "name": "value",
+            "type": "Restriction",
+        },
+    )
+
+
+@dataclass
+class TypeMoney:
+    """
+    A monetary value (valid to req/rsp Currency type) Format : Currency Code + Amount(USD123.10)
+    """
+
+    value: str = field(
+        default=None, metadata={"name": "value", "type": "Restriction"}
+    )
+
+
+@dataclass
+class TypeMoreResults:
+    """
+    Used to browse beyond the maximum number of results specified with the MaxResults parameter. Acts as an offset to skip the specified number of PNRs from the begining of the result set.
+    """
+
+    value: bool = field(
+        default=None, metadata={"name": "value", "type": "Restriction"}
+    )
+
+
+@dataclass
+class TypeNonBlanks:
+    """
+    At least one character data in Next Result Reference
+    """
+
+    value: str = field(
+        default=None,
+        metadata={
+            "min_length": "1",
+            "white_space": "collapse",
+            "name": "value",
+            "type": "Restriction",
+        },
+    )
+
+
+@dataclass
+class TypeOtacode:
+    """
+    Refers to Open Travel Code
+    """
+
+    value: PositiveInteger = field(
+        default=None, metadata={"name": "value", "type": "Restriction"}
+    )
+
+
+@dataclass
+class TypeOtherImageSize:
+    """
+    Other unknown image sizes
+    """
+
+    value: str = field(
+        default=None, metadata={"name": "value", "type": "Restriction"}
+    )
+
+
+@dataclass
+class TypePcc:
+    """
+    2 to 10 Letter Pseudo City Code
+    """
+
+    value: str = field(
+        default=None,
+        metadata={
+            "min_length": "2",
+            "max_length": "10",
+            "name": "value",
+            "type": "Restriction",
+        },
+    )
+
+
+@dataclass
+class TypePercentageWithDecimal:
+    value: str = field(
+        default=None,
+        metadata={
+            "pattern": "([0-9]{1,2}|100)\\.[0-9]{1,2}",
+            "name": "value",
+            "type": "Restriction",
+        },
+    )
+
+
+@dataclass
+class TypePolicy:
+    """
+    Available product types
+    """
+
+    value: str = field(
+        default=None, metadata={"name": "value", "type": "Restriction"}
+    )
+
+
+@dataclass
+class TypePolicyCode:
+    """
+    Type for PolicyCode attribute.
+    """
+
+    value: Int = field(
+        default=None,
+        metadata={
+            "min_inclusive": "1",
+            "max_inclusive": "9999",
+            "name": "value",
+            "type": "Restriction",
+        },
+    )
+
+
+@dataclass
+class TypePolicyReference:
+    """
+    Type for PolicyReference attribute.
+    """
+
+    value: str = field(
+        default=None,
+        metadata={
+            "min_length": "1",
+            "max_length": "20",
+            "name": "value",
+            "type": "Restriction",
+        },
+    )
+
+
+@dataclass
+class TypePriceClassOfService:
+    value: str = field(
+        default=None, metadata={"name": "value", "type": "Restriction"}
+    )
+
+
+@dataclass
+class TypePricingType:
+    value: str = field(
+        default=None, metadata={"name": "value", "type": "Restriction"}
+    )
+
+
+@dataclass
+class TypePriorityCode:
+    value: str = field(
+        default=None,
+        metadata={
+            "pattern": "[a-zA-Z0-9]{1,1}",
+            "name": "value",
+            "type": "Restriction",
+        },
+    )
+
+
+@dataclass
+class TypeProduct:
+    """
+    Available product types
+    """
+
+    value: str = field(
+        default=None, metadata={"name": "value", "type": "Restriction"}
+    )
+
+
+@dataclass
+class TypeProfileApplicability:
+    """
+    The applicability of the profile or profile template value.
+    """
+
+    value: str = field(
+        default=None, metadata={"name": "value", "type": "Restriction"}
+    )
+
+
+@dataclass
+class TypeProfileEntityStatus:
+    """
+    Status of the given profile/entity. Any profile with a status other than Active cannot perform most transactions.
+    """
+
+    value: str = field(
+        default=None, metadata={"name": "value", "type": "Restriction"}
+    )
+
+
+@dataclass
+class TypeProfileEntityStatusWithDelete:
+    """
+    Specify whether the change is to update or delete the field.
+    """
+
+    value: str = field(
+        default=None, metadata={"name": "value", "type": "Restriction"}
+    )
+
+
+@dataclass
+class TypeProfileId:
+    """
+    A type for unique party identifiers of any party role.
+    """
+
+    value: int = field(
+        default=None, metadata={"name": "value", "type": "Restriction"}
+    )
+
+
+@dataclass
+class TypeProfileLevel:
+    """
+    The type of the profile or profile template.
+    """
+
+    value: str = field(
+        default=None, metadata={"name": "value", "type": "Restriction"}
+    )
+
+
+@dataclass
+class TypeProfileLevelWithCredential:
+    """
+    The "profile level" used for association of workflow etc.
+    """
+
+    value: str = field(
+        default=None, metadata={"name": "value", "type": "Restriction"}
+    )
+
+
+@dataclass
+class TypeProfileLevelWithSystem:
+    """
+    The "profile level" used for association of workflow etc.
+    """
+
+    value: str = field(
+        default=None, metadata={"name": "value", "type": "Restriction"}
+    )
+
+
+@dataclass
+class TypeProfileType:
+    """
+    A type for unique party identifiers of any party role.
+    """
+
+    value: str = field(
+        default=None, metadata={"name": "value", "type": "Restriction"}
+    )
+
+
+@dataclass
+class TypeProviderCode:
+    """
+    5 Character Provider Code
+    """
+
+    value: str = field(
+        default=None,
+        metadata={
+            "min_length": "2",
+            "max_length": "5",
+            "name": "value",
+            "type": "Restriction",
+        },
+    )
+
+
+@dataclass
+class TypeProviderLocatorCode:
+    """
+    A Locator Code that uniquely identifies a Provider Reservation or searches for one.
+    """
+
+    value: str = field(
+        default=None,
+        metadata={"max_length": "15", "name": "value", "type": "Restriction"},
+    )
+
+
+@dataclass
+class TypeProviderToken:
+    """
+    List of known hosts with terminal access
+    """
+
+    value: str = field(
+        default=None, metadata={"name": "value", "type": "Restriction"}
+    )
+
+
+@dataclass
+class TypeProvisioningCode:
+    """
+    User defined provisioning identifier.
+    """
+
+    value: str = field(
+        default=None,
+        metadata={
+            "min_length": "1",
+            "max_length": "25",
+            "name": "value",
+            "type": "Restriction",
+        },
+    )
+
+
+@dataclass
+class TypePtc:
+    """
+    Passenger Type Code (ADT, A2B5)
+    """
+
+    value: str = field(
+        default=None,
+        metadata={
+            "min_length": "3",
+            "max_length": "5",
+            "name": "value",
+            "type": "Restriction",
+        },
+    )
+
+
+@dataclass
+class TypePurchaseWindow:
+    """
+    The purchase windows available for merchandising service
+    """
+
+    value: str = field(
+        default=None, metadata={"name": "value", "type": "Restriction"}
+    )
+
+
+@dataclass
+class TypeQueueModifyAction:
+    """
+    Queue action: remove, requeue, move, add, unlock
+    """
+
+    value: str = field(
+        default=None, metadata={"name": "value", "type": "Restriction"}
+    )
+
+
+@dataclass
+class TypeRailCabin:
+    """
+    Rail Cabin class specification .The valid values are Economy,Business,First and Other.
+    """
+
+    value: str = field(
+        default=None,
+        metadata={
+            "min_length": "1",
+            "max_length": "128",
+            "name": "value",
+            "type": "Restriction",
+        },
+    )
+
+
+@dataclass
+class TypeRailClass:
+    """
+    A booking code or fare basis code or fare class.
+    """
+
+    value: str = field(
+        default=None,
+        metadata={
+            "min_length": "1",
+            "max_length": "8",
+            "name": "value",
+            "type": "Restriction",
+        },
+    )
+
+
+@dataclass
+class TypeRailLocationCode:
+    """
+    Valid 3 to 8 alpha numeric String
+    """
+
+    value: str = field(
+        default=None,
+        metadata={
+            "min_length": "3",
+            "max_length": "8",
+            "white_space": "collapse",
+            "name": "value",
+            "type": "Restriction",
+        },
+    )
+
+
+@dataclass
+class TypeRailSearchType:
+    """
+    RailSearchType options are "All Fares" "Fastest" "Lowest Fare" "One Fare Per Class" "Seasons". Supported by NTV/VF only for "All Fares" "Lowest Fare" and "One Fare Per Class". Provider : RCH
+    """
+
+    value: str = field(
+        default=None, metadata={"name": "value", "type": "Restriction"}
+    )
+
+
+@dataclass
+class TypeRateCategory:
+    """
+    The category of the rate (Best, etc)
+    """
+
+    value: str = field(
+        default=None, metadata={"name": "value", "type": "Restriction"}
+    )
+
+
+@dataclass
+class TypeRateCode:
+    """
+    The code of this rate.
+    """
+
+    value: str = field(
+        default=None,
+        metadata={"max_length": "10", "name": "value", "type": "Restriction"},
+    )
+
+
+@dataclass
+class TypeRateDescription:
+    name: str = field(
+        default=None,
+        metadata={
+            "name": "Name",
+            "type": "Attribute",
+            "help": "Optional context name of the text block being returned i.e. Room details",
+        },
+    )
+
+
+@dataclass
+class TypeRateGuarantee:
+    """
+    The guarantee for this rate.
+    """
+
+    value: str = field(
+        default=None, metadata={"name": "value", "type": "Restriction"}
+    )
+
+
+@dataclass
+class TypeRatePlanType:
+    """
+    Represents the rate plan code of room type for specified hotel property.
+    """
+
+    value: str = field(
+        default=None, metadata={"name": "value", "type": "Restriction"}
+    )
+
+
+@dataclass
+class TypeRateTimePeriod:
+    """
+    The period for the rate code (daily, weekly, etc)
+    """
+
+    value: str = field(
+        default=None, metadata={"name": "value", "type": "Restriction"}
+    )
+
+
+@dataclass
+class TypeRecordStatus:
+    """
+    Information on whether the Universal Record is Current, Past , Cancelled or Any status.
+    """
+
+    value: str = field(
+        default=None, metadata={"name": "value", "type": "Restriction"}
+    )
+
+
+@dataclass
+class TypeRef:
+    """
+    Reference type
+    """
+
+    value: str = field(
+        default=None, metadata={"name": "value", "type": "Restriction"}
+    )
+
+
+@dataclass
+class TypeReferencePoint:
+    value: str = field(
+        default=None,
+        metadata={"max_length": "30", "name": "value", "type": "Restriction"},
+    )
+
+
+@dataclass
+class TypeReqSeat:
+    value: str = field(
+        default=None, metadata={"name": "value", "type": "Restriction"}
+    )
+
+
+@dataclass
+class TypeReserveRequirement:
+    """
+    Type of payment required to reserve travel i.e. Hotel Reservation requirement
+    """
+
+    value: str = field(
+        default=None,
+        metadata={"max_length": "20", "name": "value", "type": "Restriction"},
+    )
+
+
+@dataclass
+class TypeResidency:
+    """
+    The passenger residency type.Residence Type can be Employee, National or Resident
+    """
+
+    value: str = field(
+        default=None, metadata={"name": "value", "type": "Restriction"}
+    )
+
+
+@dataclass
+class TypeResultMessage:
+    """
+    Used to identify the results of a requests
+    """
+
+    code: int = field(
+        default=None,
+        metadata={"required": True, "name": "Code", "type": "Attribute"},
+    )
+    type: str = field(
+        default=None,
+        metadata={
+            "name": "Type",
+            "type": "Attribute",
+            "help": "Indicates the type of message (Warning, Error, Info)",
+        },
+    )
+
+
+@dataclass
+class TypeRoleId:
+    """
+    Defines the structure of RoleId values.
+    """
+
+    value: str = field(
+        default=None, metadata={"name": "value", "type": "Restriction"}
+    )
+
+
+@dataclass
+class TypeSeatTypeCode:
+    """
+    Valid 4 letter Seat Type Code
+    """
+
+    value: str = field(
+        default=None,
+        metadata={
+            "length": 4,
+            "white_space": "collapse",
+            "name": "value",
+            "type": "Restriction",
+        },
+    )
+
+
+@dataclass
+class TypeSource:
+    """
+    The source/level at which is item is defined (available through inheritance)
+    """
+
+    value: str = field(
+        default=None, metadata={"name": "value", "type": "Restriction"}
+    )
+
+
+@dataclass
+class TypeSpecificTime:
+    """
+    Specify exact times. System will automatically convert to a range according to agency configuration.
+    """
+
+    time: str = field(
+        default=None,
+        metadata={"required": True, "name": "Time", "type": "Attribute"},
+    )
+
+
+@dataclass
+class TypeSsrcode:
+    """
+    SSR Code, exactly 4 characters (e.g. DEAF, NSST, etc.)
+    """
+
+    value: str = field(
+        default=None,
+        metadata={
+            "min_length": "4",
+            "max_length": "4",
+            "name": "value",
+            "type": "Restriction",
+        },
+    )
+
+
+@dataclass
+class TypeSsrfreeText:
+    """
+    SSR Free Text
+    """
+
+    value: str = field(
+        default=None, metadata={"name": "value", "type": "Restriction"}
+    )
+
+
+@dataclass
+class TypeStartFromResult:
+    """
+    Used to browse beyond the maximum number of results specified with the MaxResults parameter. Acts as an offset to skip the specified number of PNRs from the begining of the result set.
+    """
+
+    value: int = field(
+        default=None,
+        metadata={
+            "min_inclusive": "1",
+            "name": "value",
+            "type": "Restriction",
+        },
+    )
+
+
+@dataclass
+class TypeState:
+    """
+    Defines the State code.
+    """
+
+    value: str = field(
+        default=None,
+        metadata={"max_length": "6", "name": "value", "type": "Restriction"},
+    )
+
+
+@dataclass
+class TypeStatus:
+    """
+    The status of the service fees.
+    """
+
+    value: str = field(
+        default=None, metadata={"name": "value", "type": "Restriction"}
+    )
+
+
+@dataclass
+class TypeStatusCode:
+    """
+    Valid 2 letter Status Code
+    """
+
+    value: str = field(
+        default=None,
+        metadata={
+            "length": 2,
+            "white_space": "collapse",
+            "name": "value",
+            "type": "Restriction",
+        },
+    )
+
+
+@dataclass
+class TypeSubKey:
+    """
+    The attributes and elements in a SubKey.
+    """
+
+    text: List[str] = field(
+        default_factory=list,
+        metadata={
+            "min_occurs": 0,
+            "max_occurs": 999,
+            "name": "Text",
+            "type": "Element",
+            "help": "Information for a sub key.",
+        },
+    )
+    name: str = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "Name",
+            "type": "Attribute",
+            "help": "A subkey to identify the specific information within this keyword",
+        },
+    )
+    description: str = field(
+        default=None,
+        metadata={
+            "name": "Description",
+            "type": "Attribute",
+            "help": "A brief description of a subkey.",
+        },
+    )
+
+
+@dataclass
+class TypeSupplierCode:
+    """
+    1 to 5 Character Supplier code
+    """
+
+    value: str = field(
+        default=None,
+        metadata={
+            "min_length": "1",
+            "max_length": "5",
+            "name": "value",
+            "type": "Restriction",
+        },
+    )
+
+
+@dataclass
+class TypeThirdPartySupplier:
+    """
+    Third Party Content Provider name.
+    """
+
+    value: str = field(
+        default=None,
+        metadata={"max_length": "64", "name": "value", "type": "Restriction"},
+    )
+
+
+@dataclass
+class TypeTicketNumber:
+    """
+    Reference Ticket Number
+    """
+
+    value: str = field(
+        default=None,
+        metadata={"length": 13, "name": "value", "type": "Restriction"},
+    )
+
+
+@dataclass
+class TypeTicketStatus:
+    """
+    Status for the ticket (Ticketed, Voided, etc)
+    """
+
+    value: str = field(
+        default=None,
+        metadata={"length": 1, "name": "value", "type": "Restriction"},
+    )
+
+
+@dataclass
+class TypeTimeRange:
+    """
+    Specify a range of times.
+    """
+
+    earliest_time: str = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "EarliestTime",
+            "type": "Attribute",
+        },
+    )
+    latest_time: str = field(
+        default=None,
+        metadata={"required": True, "name": "LatestTime", "type": "Attribute"},
+    )
+
+
+@dataclass
+class TypeTravelerId:
+    """
+    Traveler Identifier
+    """
+
+    value: str = field(
+        default=None,
+        metadata={"max_length": "19", "name": "value", "type": "Restriction"},
+    )
+
+
+@dataclass
+class TypeTravelerLastName:
+    """
+    Type for Traveler Last Name.
+    """
+
+    value: str = field(
+        default=None,
+        metadata={
+            "min_length": "1",
+            "max_length": "256",
+            "name": "value",
+            "type": "Restriction",
+        },
+    )
+
+
+@dataclass
+class TypeTrinary:
+    """
+    Extension of boolean, that allows for unknown values.
+    """
+
+    value: str = field(
+        default=None, metadata={"name": "value", "type": "Restriction"}
+    )
+
+
+@dataclass
+class TypeTypeCode:
+    """
+    Reference data TypeCode type.
+    """
+
+    value: str = field(
+        default=None,
+        metadata={
+            "min_length": "1",
+            "max_length": "50",
+            "name": "value",
+            "type": "Restriction",
+        },
+    )
+
+
+@dataclass
+class TypeUrversion:
+    """
+    Version of the Universal record. Required with any request to modify the existing Universal record.
+    """
+
+    value: int = field(
+        default=None, metadata={"name": "value", "type": "Restriction"}
+    )
+
+
+@dataclass
+class TypeVehicleCategory:
+    """
+    The category of vehicle
+    """
+
+    value: str = field(
+        default=None, metadata={"name": "value", "type": "Restriction"}
+    )
+
+
+@dataclass
+class TypeVehicleClass:
+    """
+    The class of vehicle
+    """
+
+    value: str = field(
+        default=None, metadata={"name": "value", "type": "Restriction"}
+    )
+
+
+@dataclass
+class TypeVehicleLocation:
+    """
+    The type of location requested, such as resort, city center.
+    """
+
+    value: str = field(
+        default=None, metadata={"name": "value", "type": "Restriction"}
+    )
+
+
+@dataclass
+class TypeVehicleTransmission:
+    value: str = field(
+        default=None, metadata={"name": "value", "type": "Restriction"}
+    )
+
+
+@dataclass
+class TypeVersion:
+    """
+    A sequential version number.
+    """
+
+    value: Int = field(
+        default=None,
+        metadata={
+            "min_inclusive": "0",
+            "name": "value",
+            "type": "Restriction",
+        },
+    )
+
+
+@dataclass
+class TypeVoucherType:
+    value: str = field(
+        default=None, metadata={"name": "value", "type": "Restriction"}
+    )
+
+
+@dataclass
+class TypeWildcard:
+    """
+    Wildcard character is asterisk (*). Wildcard character can be specified at beginning and/or end of string. Wildcard in middle of string is treated as a normal character, not a wildcard. If no wildcard character is provided, one is assumed at end of string.
+    """
+
+    value: str = field(
+        default=None, metadata={"name": "value", "type": "Restriction"}
+    )
+
+
+@dataclass
+class TypeWildcardMax50:
+    """
+    Wildcard character is asterisk (*). Wildcard character can be specified at beginning and/or end of string. Wildcard in middle of string is treated as a normal character, not a wildcard. If no wildcard character is provided, one is assumed at end of string.
+    """
+
+    value: str = field(
+        default=None,
+        metadata={
+            "min_length": "1",
+            "max_length": "50",
+            "name": "value",
+            "type": "Restriction",
+        },
+    )
+
+
+@dataclass
+class UnitedNations:
+    """
+    United Nations Form of Payments
+    """
+
+    number: str = field(
+        default=None,
+        metadata={"required": True, "name": "Number", "type": "Attribute"},
+    )
+
+
+@dataclass
+class UrticketStatus:
+    """
+    Information on whether the Universal Record ticket status is Ticketed, Unticketed , Partially Ticketed or Not Applicable status.
+    """
+
+    value: str = field(
+        default=None, metadata={"name": "value", "type": "Restriction"}
+    )
+
+
+@dataclass
+class AccountingRemark:
+    """
+    An accounting remark container to hold any printable text.
+    """
+
+    remark_data: str = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "RemarkData",
+            "type": "Element",
+            "help": "Actual remarks data.",
+        },
+    )
+    booking_traveler_ref: List[TypeRef] = field(
+        default_factory=list,
+        metadata={
+            "min_occurs": 0,
+            "max_occurs": 999,
+            "name": "BookingTravelerRef",
+            "type": "Element",
+            "help": "Reference to Booking Traveler.",
+        },
+    )
+    key: TypeRef = field(
+        default=None, metadata={"name": "Key", "type": "Attribute"}
+    )
+    category: str = field(
+        default=None,
+        metadata={
+            "name": "Category",
+            "type": "Attribute",
+            "help": "A category to group and organize the various remarks. This is not required, but it is recommended.",
+        },
+    )
+    type_in_gds: TypeGdsAccountingRemark = field(
+        default=None, metadata={"name": "TypeInGds", "type": "Attribute"}
+    )
+    provider_reservation_info_ref: TypeRef = field(
+        default=None,
+        metadata={
+            "name": "ProviderReservationInfoRef",
+            "type": "Attribute",
+            "help": "Provider reservation reference key.",
+        },
+    )
+    provider_code: TypeProviderCode = field(
+        default=None,
+        metadata={
+            "name": "ProviderCode",
+            "type": "Attribute",
+            "help": "Contains the Provider Code of the provider for which this accounting remark is used",
+        },
+    )
+    use_provider_native_mode: bool = field(
+        default=false,
+        metadata={
+            "name": "UseProviderNativeMode",
+            "type": "Attribute",
+            "help": "Will be true when terminal process required, else false",
+        },
+    )
+
+
+@dataclass
+class AddSvc:
+    """
+    1P - Add SVC segments to collect additional fee
+    """
+
+    rfic: str = field(
+        default=None,
+        metadata={
+            "name": "RFIC",
+            "type": "Attribute",
+            "help": "1P - Reason for issuance",
+        },
+    )
+    rfisc: str = field(
+        default=None,
+        metadata={
+            "name": "RFISC",
+            "type": "Attribute",
+            "help": "1P - Resaon for issuance sub-code",
+        },
+    )
+    svc_description: str = field(
+        default=None,
+        metadata={
+            "name": "SvcDescription",
+            "type": "Attribute",
+            "help": "1P - SVC fee description",
+        },
+    )
+    origin: TypeIatacode = field(
+        default=None,
+        metadata={
+            "name": "Origin",
+            "type": "Attribute",
+            "help": "Origin location - Airport code. If this value not provided, the last air segment arrival location is taken as default. 1P only.",
+        },
+    )
+    destination: TypeIatacode = field(
+        default=None,
+        metadata={
+            "name": "Destination",
+            "type": "Attribute",
+            "help": "Destination location - Airport code.",
+        },
+    )
+    start_date: str = field(
+        default=None,
+        metadata={
+            "name": "StartDate",
+            "type": "Attribute",
+            "help": "The start date of the SVC segment. If the value not specified, the default value is set as the date next to the last airsegment arrival date. 1P only",
+        },
+    )
+
+
+@dataclass
+class AddressRestriction:
+    required_field: List[RequiredField] = field(
+        default_factory=list,
+        metadata={
+            "min_occurs": 1,
+            "max_occurs": 999,
+            "name": "RequiredField",
+            "type": "Element",
+        },
+    )
+
+
+@dataclass
+class AgencyPayment(TypeAgencyPayment):
+    """
+    Container for Agency Payment
+    """
+
+    pass
+
+
+@dataclass
+class AgencySellInfo:
+    """
+    Information about the agency selling the reservation
+    """
+
+    iata_code: TypeIata = field(
+        default=None,
+        metadata={
+            "name": "IataCode",
+            "type": "Attribute",
+            "help": "The IATA code that pertains to this Agency and Branch.",
+        },
+    )
+    country: TypeCountry = field(
+        default=None,
+        metadata={
+            "name": "Country",
+            "type": "Attribute",
+            "help": "The country code of the requesting agency.",
+        },
+    )
+    currency_code: TypeCurrency = field(
+        default=None,
+        metadata={
+            "name": "CurrencyCode",
+            "type": "Attribute",
+            "help": "The currency code in which the reservation will be ticketed.",
+        },
+    )
+    provider_code: TypeProviderCode = field(
+        default=None,
+        metadata={
+            "name": "ProviderCode",
+            "type": "Attribute",
+            "help": "The IATA assigned airline/GDS code.",
+        },
+    )
+    pseudo_city_code: TypePcc = field(
+        default=None,
+        metadata={
+            "name": "PseudoCityCode",
+            "type": "Attribute",
+            "help": "The PCC in the host system.",
+        },
+    )
+    city_code: TypeIatacode = field(
+        default=None,
+        metadata={
+            "name": "CityCode",
+            "type": "Attribute",
+            "help": 'IATA code of "home" city or airport.',
+        },
+    )
+
+
+@dataclass
+class AgentAction:
+    """
+    Depending on context, this will represent information about which agent perform different actions.
+    """
+
+    action_type: str = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "ActionType",
+            "type": "Attribute",
+            "help": "The type of action the agent performed.",
+        },
+    )
+    agent_code: str = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "AgentCode",
+            "type": "Attribute",
+            "help": "The AgenctCode who performed the action.",
+        },
+    )
+    branch_code: TypeBranchCode = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "BranchCode",
+            "type": "Attribute",
+            "help": "The BranchCode of the branch (working branch, branchcode used for the request. If nothing specified, branchcode for the agent) who performed the action.",
+        },
+    )
+    agency_code: str = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "AgencyCode",
+            "type": "Attribute",
+            "help": "The AgencyCode of the agent who performed the action.",
+        },
+    )
+    agent_sine: str = field(
+        default=None,
+        metadata={
+            "name": "AgentSine",
+            "type": "Attribute",
+            "help": "The sign in user name of the agent logged into the terminal. PROVIDER SUPPORTED: ACH",
+        },
+    )
+    event_time: DateTime = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "EventTime",
+            "type": "Attribute",
+            "help": "Date and time at which this event took place.",
+        },
+    )
+
+
+@dataclass
+class AgentIdoverride:
+    """
+    Vendor specific agent identifier overrides to be used to access vendor systems.
+    """
+
+    supplier_code: TypeSupplierCode = field(
+        default=None,
+        metadata={
+            "name": "SupplierCode",
+            "type": "Attribute",
+            "help": "Supplier code to determine which vendor this AgentId belongs to.",
+        },
+    )
+    provider_code: TypeProviderCode = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "ProviderCode",
+            "type": "Attribute",
+            "help": "Provider code to route the AgentId to proper provider.",
+        },
+    )
+    agent_id: str = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "AgentID",
+            "type": "Attribute",
+            "help": "The Agent ID for the applicable supplier/vendor",
+        },
+    )
+
+
+@dataclass
+class Airport(Location):
+    """
+    Airport identifier
+    """
+
+    code: TypeIatacode = field(
+        default=None,
+        metadata={"required": True, "name": "Code", "type": "Attribute"},
+    )
+
+
+@dataclass
+class AppliedProfile:
+    """
+    A simple container to specify the profiles that were applied to a reservation.
+    """
+
+    key: TypeRef = field(
+        default=None,
+        metadata={
+            "name": "Key",
+            "type": "Attribute",
+            "help": "Key for update/delete of the element",
+        },
+    )
+    traveler_id: str = field(
+        default=None,
+        metadata={
+            "name": "TravelerID",
+            "type": "Attribute",
+            "help": "The ID of the TravelerProfile that was applied",
+        },
+    )
+    traveler_name: str = field(
+        default=None,
+        metadata={
+            "name": "TravelerName",
+            "type": "Attribute",
+            "help": "The name from the TravelerProfile that was applied",
+        },
+    )
+    account_id: str = field(
+        default=None,
+        metadata={
+            "name": "AccountID",
+            "type": "Attribute",
+            "help": "The ID of the AccountProfile that was applied",
+        },
+    )
+    account_name: str = field(
+        default=None,
+        metadata={
+            "name": "AccountName",
+            "type": "Attribute",
+            "help": "The name from the AccountProfile that was applied",
+        },
+    )
+    immediate_parent_id: str = field(
+        default=None,
+        metadata={
+            "name": "ImmediateParentID",
+            "type": "Attribute",
+            "help": "The ID of the immediate parent that was applied",
+        },
+    )
+    immediate_parent_name: str = field(
+        default=None,
+        metadata={
+            "name": "ImmediateParentName",
+            "type": "Attribute",
+            "help": "The name of the immediate parent that was applied",
+        },
+    )
+
+
+@dataclass
+class BaseAsyncProviderSpecificResponse:
+    """
+    Identifies pending responses from a specific provider using MoreResults attribute
+    """
+
+    provider_code: TypeProviderCode = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "ProviderCode",
+            "type": "Attribute",
+            "help": "Provider code of a specific host",
+        },
+    )
+    more_results: bool = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "MoreResults",
+            "type": "Attribute",
+            "help": "Identifies whether more results are available for specific host or not.",
+        },
+    )
+
+
+@dataclass
+class BookingDates:
+    """
+    Check in and Check out Date information
+    """
+
+    check_in_date: TypeDate = field(
+        default=None, metadata={"name": "CheckInDate", "type": "Attribute"}
+    )
+    check_out_date: TypeDate = field(
+        default=None, metadata={"name": "CheckOutDate", "type": "Attribute"}
+    )
+
+
+@dataclass
+class CardRestriction:
+    required_field: List[RequiredField] = field(
+        default_factory=list,
+        metadata={
+            "min_occurs": 1,
+            "max_occurs": 999,
+            "name": "RequiredField",
+            "type": "Element",
+        },
+    )
+    code: TypeCardMerchantType = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "Code",
+            "type": "Attribute",
+            "help": "2 letter Credit/Debit Card merchant type",
+        },
+    )
+    name: str = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "Name",
+            "type": "Attribute",
+            "help": "Card merchant description",
+        },
+    )
+
+
+@dataclass
+class Carrier:
+    """
+    Carrier identifier
+    """
+
+    code: TypeCarrier = field(
+        default=None,
+        metadata={"required": True, "name": "Code", "type": "Attribute"},
+    )
+
+
+@dataclass
+class Certificate:
+    """
+    Certificate Form of Payment
+    """
+
+    number: str = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "Number",
+            "type": "Attribute",
+            "help": "The Certificate number",
+        },
+    )
+    amount: TypeMoney = field(
+        default=None,
+        metadata={
+            "name": "Amount",
+            "type": "Attribute",
+            "help": "The monetary value of the certificate.",
+        },
+    )
+    discount_amount: TypeMoney = field(
+        default=None,
+        metadata={
+            "name": "DiscountAmount",
+            "type": "Attribute",
+            "help": "The monetary discount amount of this certificate.",
+        },
+    )
+    discount_percentage: int = field(
+        default=None,
+        metadata={
+            "name": "DiscountPercentage",
+            "type": "Attribute",
+            "help": "The percentage discount value of this certificate.",
+        },
+    )
+    not_valid_before: str = field(
+        default=None,
+        metadata={
+            "name": "NotValidBefore",
+            "type": "Attribute",
+            "help": "The date that this certificate becomes valid.",
+        },
+    )
+    not_valid_after: str = field(
+        default=None,
+        metadata={
+            "name": "NotValidAfter",
+            "type": "Attribute",
+            "help": "The date that this certificate expires.",
+        },
+    )
+
+
+@dataclass
+class City(Location):
+    """
+    City identifier
+    """
+
+    code: TypeIatacode = field(
+        default=None,
+        metadata={"required": True, "name": "Code", "type": "Attribute"},
+    )
+
+
+@dataclass
+class CityOrAirport(Location):
+    """
+    This element can be used when it is not known whether the value is an airport or a city code.
+    """
+
+    code: TypeIatacode = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "Code",
+            "type": "Attribute",
+            "help": "The airport or city IATA code.",
+        },
+    )
+    prefer_city: bool = field(
+        default=false,
+        metadata={
+            "name": "PreferCity",
+            "type": "Attribute",
+            "help": "Indicates that the search should prefer city results over airport results.",
+        },
+    )
+
+
+@dataclass
+class Commission:
+    """
+    Identifies the agency commission
+    """
+
+    key: TypeRef = field(
+        default=None, metadata={"name": "Key", "type": "Attribute"}
+    )
+    level: TypeCommissionLevel = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "Level",
+            "type": "Attribute",
+            "help": "The commission percentage level.",
+        },
+    )
+    type: TypeCommissionType = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "Type",
+            "type": "Attribute",
+            "help": "The commission type.",
+        },
+    )
+    modifier: TypeCommissionModifier = field(
+        default=None,
+        metadata={
+            "name": "Modifier",
+            "type": "Attribute",
+            "help": "Optional commission modifier.",
+        },
+    )
+    amount: TypeMoney = field(
+        default=None,
+        metadata={
+            "name": "Amount",
+            "type": "Attribute",
+            "help": "The monetary amount of the commission.",
+        },
+    )
+    value: str = field(
+        default=None,
+        metadata={
+            "name": "Value",
+            "type": "Attribute",
+            "help": "Contains alphanumeric or alpha characters intended as 1G Value Code as applicable by BSP of client.",
+        },
+    )
+    percentage: TypePercentageWithDecimal = field(
+        default=None,
+        metadata={
+            "name": "Percentage",
+            "type": "Attribute",
+            "help": "The percent of the commission.",
+        },
+    )
+    booking_traveler_ref: TypeRef = field(
+        default=None,
+        metadata={
+            "name": "BookingTravelerRef",
+            "type": "Attribute",
+            "help": "A reference to a passenger.",
+        },
+    )
+    commission_override: bool = field(
+        default=false,
+        metadata={
+            "name": "CommissionOverride",
+            "type": "Attribute",
+            "help": "This is enabled to override CAT-35 commission error during air ticketing. PROVIDER SUPPORTED:Worldspan and JAL",
+        },
+    )
+
+
+@dataclass
+class CommissionRemark:
+    """
+    Identifies the agency commision remarks. Specifically used for Worldspan.
+    """
+
+    provider_reservation_level: "ProviderReservationLevel" = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "ProviderReservationLevel",
+            "type": "Element",
+            "help": "Specify commission which is applicable to PNR level.",
+        },
+    )
+    passenger_type_level: List["PassengerTypeLevel"] = field(
+        default_factory=list,
+        metadata={
+            "min_occurs": 1,
+            "max_occurs": 4,
+            "name": "PassengerTypeLevel",
+            "type": "Element",
+            "help": "Specify commission which is applicable to per PTC level.",
+        },
+    )
+    key: TypeRef = field(
+        default=None,
+        metadata={
+            "name": "Key",
+            "type": "Attribute",
+            "help": "Key to be used for internal processing.",
+        },
+    )
+    provider_reservation_info_ref: TypeRef = field(
+        default=None,
+        metadata={
+            "name": "ProviderReservationInfoRef",
+            "type": "Attribute",
+            "help": "Provider reservation reference key.",
+        },
+    )
+    provider_code: TypeProviderCode = field(
+        default=None,
+        metadata={
+            "name": "ProviderCode",
+            "type": "Attribute",
+            "help": "Contains the Provider Code of the provider for which this accounting remark is used",
+        },
+    )
+
+    @dataclass
+    class PassengerTypeLevel:
+        traveler_type: TypePtc = field(
+            default=None,
+            metadata={
+                "required": True,
+                "name": "TravelerType",
+                "type": "Attribute",
+            },
+        )
+
+    @dataclass
+    class ProviderReservationLevel:
+        pass
+
+
+@dataclass
+class ConsolidatorRemark:
+    """
+    Authorization remark for Consolidator access to a PNR . Contains PCC information created by retail agent to allow a consolidator or other Axess users to service their PNR. PROVIDER SUPPORTED: Worldspan and JAL.
+    """
+
+    pseudo_city_code: List[PseudoCityCode] = field(
+        default_factory=list,
+        metadata={
+            "min_occurs": 1,
+            "max_occurs": 5,
+            "name": "PseudoCityCode",
+            "type": "Element",
+        },
+    )
+    key: TypeRef = field(
+        default=None,
+        metadata={
+            "name": "Key",
+            "type": "Attribute",
+            "help": "Key to be used for internal processing.",
+        },
+    )
+    provider_reservation_info_ref: TypeRef = field(
+        default=None,
+        metadata={
+            "name": "ProviderReservationInfoRef",
+            "type": "Attribute",
+            "help": "Provider reservation reference key.",
+        },
+    )
+    provider_code: TypeProviderCode = field(
+        default=None,
+        metadata={
+            "name": "ProviderCode",
+            "type": "Attribute",
+            "help": "Contains the Provider Code of the provider for which this element is used",
+        },
+    )
+
+
+@dataclass
+class ContinuityCheckOverride:
+    key: TypeRef = field(
+        default=None,
+        metadata={
+            "name": "Key",
+            "type": "Attribute",
+            "help": "Will use key to map continuity remark to a particular segment",
+        },
+    )
+
+
+@dataclass
+class CreditCardAuth:
+    """
+    The result of a Credit Auth Request. Will contain all the authorization info and result codes.
+    """
+
+    key: TypeRef = field(
+        default=None, metadata={"name": "Key", "type": "Attribute"}
+    )
+    payment_ref: TypeRef = field(
+        default=None, metadata={"name": "PaymentRef", "type": "Attribute"}
+    )
+    trans_id: str = field(
+        default=None,
+        metadata={
+            "name": "TransId",
+            "type": "Attribute",
+            "help": "The transaction id from the credit processing system",
+        },
+    )
+    number: TypeCreditCardNumber = field(
+        default=None, metadata={"name": "Number", "type": "Attribute"}
+    )
+    amount: TypeMoney = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "Amount",
+            "type": "Attribute",
+            "help": "The amount that was authorized.",
+        },
+    )
+    auth_code: str = field(
+        default=None,
+        metadata={
+            "name": "AuthCode",
+            "type": "Attribute",
+            "help": "The authorization code to confirm card acceptance",
+        },
+    )
+    auth_result_code: str = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "AuthResultCode",
+            "type": "Attribute",
+            "help": "The result code of the authorization command.",
+        },
+    )
+    avsresult_code: str = field(
+        default=None,
+        metadata={
+            "name": "AVSResultCode",
+            "type": "Attribute",
+            "help": "The address verification result code (if AVS was requested)",
+        },
+    )
+    message: str = field(
+        default=None,
+        metadata={
+            "name": "Message",
+            "type": "Attribute",
+            "help": "The message explains the result of the authorization command.",
+        },
+    )
+    provider_reservation_info_ref: TypeRef = field(
+        default=None,
+        metadata={"name": "ProviderReservationInfoRef", "type": "Attribute"},
+    )
+    form_of_payment_ref: TypeRef = field(
+        default=None,
+        metadata={"name": "FormOfPaymentRef", "type": "Attribute"},
+    )
+
+
+@dataclass
+class CustomizedNameData:
+    """
+    Customized Name Data is used to print customized name on the different documents.
+    """
+
+    key: TypeRef = field(
+        default=None, metadata={"name": "Key", "type": "Attribute"}
+    )
+    provider_reservation_info_ref: TypeRef = field(
+        default=None,
+        metadata={"name": "ProviderReservationInfoRef", "type": "Attribute"},
+    )
+
+
+@dataclass
+class DiscountCard:
+    """
+    Rail Discount Card Information
+    """
+
+    key: TypeRef = field(
+        default=None, metadata={"name": "Key", "type": "Attribute"}
+    )
+    code: StringLength1to8 = field(
+        default=None,
+        metadata={"required": True, "name": "Code", "type": "Attribute"},
+    )
+    description: StringLength1to255 = field(
+        default=None, metadata={"name": "Description", "type": "Attribute"}
+    )
+    number: TypeCardNumber = field(
+        default=None, metadata={"name": "Number", "type": "Attribute"}
+    )
+
+
+@dataclass
+class DiscountCardRef:
+    key: TypeRef = field(
+        default=None,
+        metadata={"required": True, "name": "Key", "type": "Attribute"},
+    )
+
+
+@dataclass
+class DriversLicense:
+    """
+    Details of drivers license
+    """
+
+    key: TypeRef = field(
+        default=None, metadata={"name": "Key", "type": "Attribute"}
+    )
+    license_number: str = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "LicenseNumber",
+            "type": "Attribute",
+            "help": "The driving license number of the booking traveler.",
+        },
+    )
+
+
+@dataclass
+class DriversLicenseRef:
+    key: TypeRef = field(
+        default=None,
+        metadata={"required": True, "name": "Key", "type": "Attribute"},
+    )
+
+
+@dataclass
+class EmailNotification:
+    """
+    Send Email Notification to the emails specified in Booking Traveler. Supported Provider : 1G/1V
+    """
+
+    email_ref: List[TypeRef] = field(
+        default_factory=list,
+        metadata={
+            "min_occurs": 0,
+            "max_occurs": 999,
+            "name": "EmailRef",
+            "type": "Element",
+            "help": "Reference to Booking Traveler Email.",
+        },
+    )
+    recipients: str = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "Recipients",
+            "type": "Attribute",
+            "help": "Indicates the recipients of the mail addresses for which the user requires the system to send the itinerary.List of Possible Values: All = Send Email to All addresses Default = Send Email to Primary Booking Traveler Specific = Send Email to specific address Referred in EmailRef.",
+        },
+    )
+
+
+@dataclass
+class Endorsement:
+    """
+    Restrictions or instructions about the fare or ticket
+    """
+
+    value: TypeEndorsement = field(
+        default=None,
+        metadata={"required": True, "name": "Value", "type": "Attribute"},
+    )
+
+
+@dataclass
+class EnettVan:
+    """
+    Container for all eNett Van information.
+    """
+
+    min_percentage: TypeIntegerPercentage = field(
+        default=None,
+        metadata={
+            "name": "MinPercentage",
+            "type": "Attribute",
+            "help": "The minimum percentage that will be applied on the Total price and sent to enett,which will denote the minimum authorized amount approved by eNett.uApi will default this to zero for multi-use Van's.",
+        },
+    )
+    max_percentage: TypeIntegerPercentage = field(
+        default=None,
+        metadata={
+            "name": "MaxPercentage",
+            "type": "Attribute",
+            "help": "The maximum percentage that will be applied on the Total price and sent to enett, which will denote the maximum authorized amount as approved by eNett. This value will be ignored and not used for Multi-Use VAN’s.",
+        },
+    )
+    expiry_days: TypeDurationYearInDays = field(
+        default=None,
+        metadata={
+            "name": "ExpiryDays",
+            "type": "Attribute",
+            "help": "The number of days from the VAN generation date that the VAN will be active for, after which the VAN cannot be used.",
+        },
+    )
+    multi_use: bool = field(
+        default=true,
+        metadata={
+            "name": "MultiUse",
+            "type": "Attribute",
+            "help": "Acceptable values are true or false. If set to true it will denote that the VAN being requested is multi-use else it will indicate a single -use VAN.A Single use VAN can only be debited once while the multiple use VAN's can be debited multiple times subjected to the maximum value it has been authorized for. The default value will be TRUE to indicate a multi-use VAN is being issued.",
+        },
+    )
+
+
+@dataclass
+class ExchangedCoupon:
+    """
+    The coupon numbers that were used in the exchange process to create the MCO.
+    """
+
+    ticket_number: TypeTicketNumber = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "TicketNumber",
+            "type": "Attribute",
+            "help": "The ticket number for which the exchange coupons are present.",
+        },
+    )
+    coupon_number: str = field(
+        default=None,
+        metadata={
+            "name": "CouponNumber",
+            "type": "Attribute",
+            "help": "Coupon numbers that were exchanged specific to this ticket",
+        },
+    )
+
+
+@dataclass
+class FormOfPaymentRef:
+    """
+    A reference to a Form of Payment in the existing UR
+    """
+
+    key: TypeRef = field(
+        default=None,
+        metadata={"required": True, "name": "Key", "type": "Attribute"},
+    )
+
+
+@dataclass
+class GeneralRemark:
+    """
+    A textual remark container to hold any printable text. (max 512 chars)
+    """
+
+    remark_data: str = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "RemarkData",
+            "type": "Element",
+            "help": "Actual remarks data.",
+        },
+    )
+    booking_traveler_ref: List[TypeRef] = field(
+        default_factory=list,
+        metadata={
+            "min_occurs": 0,
+            "max_occurs": 999,
+            "name": "BookingTravelerRef",
+            "type": "Element",
+            "help": "Reference to Booking Traveler.",
+        },
+    )
+    key: TypeRef = field(
+        default=None, metadata={"name": "Key", "type": "Attribute"}
+    )
+    category: str = field(
+        default=None,
+        metadata={
+            "name": "Category",
+            "type": "Attribute",
+            "help": "A category to group and organize the various remarks. This is not required, but it is recommended.",
+        },
+    )
+    type_in_gds: TypeGdsRemark = field(
+        default=None, metadata={"name": "TypeInGds", "type": "Attribute"}
+    )
+    supplier_type: TypeProduct = field(
+        default=None,
+        metadata={
+            "name": "SupplierType",
+            "type": "Attribute",
+            "help": "The type of product this reservation is relative to",
+        },
+    )
+    provider_reservation_info_ref: TypeRef = field(
+        default=None,
+        metadata={
+            "name": "ProviderReservationInfoRef",
+            "type": "Attribute",
+            "help": "Provider reservation reference key.",
+        },
+    )
+    direction: TypeDirection = field(
+        default=None,
+        metadata={
+            "name": "Direction",
+            "type": "Attribute",
+            "help": "Direction Incoming or Outgoing of the GeneralRemark.",
+        },
+    )
+    create_date: DateTime = field(
+        default=None,
+        metadata={
+            "name": "CreateDate",
+            "type": "Attribute",
+            "help": "The date and time that this GeneralRemark was created.",
+        },
+    )
+    use_provider_native_mode: bool = field(
+        default=false,
+        metadata={
+            "name": "UseProviderNativeMode",
+            "type": "Attribute",
+            "help": "Will be true when terminal process required, else false",
+        },
+    )
+
+
+@dataclass
+class GuaranteeType(TypeGeneralText):
+    """
+    A type of guarantee i.e
+    """
+
+    pass
+
+
+@dataclass
+class HostToken:
+    """
+    one or more hosts
+    """
+
+    host: TypeProviderCode = field(
+        default=None,
+        metadata={
+            "name": "Host",
+            "type": "Attribute",
+            "help": "The host associated with this token",
+        },
+    )
+
+
+@dataclass
+class IncludedInBase:
+    """
+    Shows the taxes and fees included in the base fare. (ACH only)
+    """
+
+    amount: TypeMoney = field(
+        default=None,
+        metadata={
+            "name": "Amount",
+            "type": "Attribute",
+            "help": "this attribute shows the amount included in the base fare for the specific fee or tax",
+        },
+    )
+
+
+@dataclass
+class LinkedUniversalRecord:
+    locator_code: TypeLocatorCode = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "LocatorCode",
+            "type": "Attribute",
+            "help": "A Universal Record that need to be linked to the current Universal Record.",
+        },
+    )
+    key: TypeRef = field(
+        default=None, metadata={"name": "Key", "type": "Attribute"}
+    )
+
+
+@dataclass
+class LoyaltyCardRef:
+    key: TypeRef = field(
+        default=None,
+        metadata={"required": True, "name": "Key", "type": "Attribute"},
+    )
+
+
+@dataclass
+class MiscFormOfPayment:
+    """
+    Miscellaneous Form of Payments
+    """
+
+    credit_card_type: str = field(
+        default=None,
+        metadata={
+            "name": "CreditCardType",
+            "type": "Attribute",
+            "help": "The 2 letter credit/ debit card type or code which may not have been issued using the standard bank card types - i.e. an airline issued card",
+        },
+    )
+    credit_card_number: TypeCreditCardNumber = field(
+        default=None,
+        metadata={"name": "CreditCardNumber", "type": "Attribute"},
+    )
+    exp_date: GYearMonth = field(
+        default=None,
+        metadata={
+            "name": "ExpDate",
+            "type": "Attribute",
+            "help": "The Expiration date of this card in YYYY-MM format.",
+        },
+    )
+    text: str = field(
+        default=None,
+        metadata={
+            "name": "Text",
+            "type": "Attribute",
+            "help": "Any free form text which may be associated with the Miscellaneous Form of Payment. This text may be provider or GDS specific",
+        },
+    )
+    category: str = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "Category",
+            "type": "Attribute",
+            "help": 'Allowable values are "Text" "Credit" "CreditCard" "FreeFormCreditCard" "Invoice" "NonRefundable" "MultipleReceivables" "Exchange" "Cash"',
+        },
+    )
+    acceptance_override: bool = field(
+        default=None,
+        metadata={
+            "name": "AcceptanceOverride",
+            "type": "Attribute",
+            "help": "Override airline restriction on the credit card.",
+        },
+    )
+
+
+@dataclass
+class Name:
+    """
+    Complete name fields
+    """
+
+    prefix: str = field(
+        default=None,
+        metadata={
+            "name": "Prefix",
+            "type": "Attribute",
+            "help": "Name prefix. Size can be up to 20 characters",
+        },
+    )
+    first: str = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "First",
+            "type": "Attribute",
+            "help": "First Name. Size can be up to 256 characters",
+        },
+    )
+    middle: str = field(
+        default=None,
+        metadata={
+            "name": "Middle",
+            "type": "Attribute",
+            "help": "Midle name. Size can be up to 256 characters",
+        },
+    )
+    last: str = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "Last",
+            "type": "Attribute",
+            "help": "Last Name. Size can be up to 256 characters",
+        },
+    )
+    suffix: str = field(
+        default=None,
+        metadata={
+            "name": "Suffix",
+            "type": "Attribute",
+            "help": "Name suffix. Size can be up to 256 characters",
+        },
+    )
+    traveler_profile_id: TypeProfileId = field(
+        default=None,
+        metadata={
+            "name": "TravelerProfileId",
+            "type": "Attribute",
+            "help": "Traveler Applied Profile ID.",
+        },
+    )
+
+
+@dataclass
+class NextResultReference:
+    """
+    Container to return/send additional retrieve/request additional search results
+    """
+
+    provider_code: TypeProviderCode = field(
+        default=None,
+        metadata={
+            "name": "ProviderCode",
+            "type": "Attribute",
+            "help": "The code of the Provider (e.g 1G,1S)",
+        },
+    )
+
+
+@dataclass
+class Osi:
+    """
+    Other Service information sent to the carriers during air bookings
+    """
+
+    key: TypeRef = field(
+        default=None, metadata={"name": "Key", "type": "Attribute"}
+    )
+    carrier: TypeCarrier = field(
+        default=None,
+        metadata={"required": True, "name": "Carrier", "type": "Attribute"},
+    )
+    code: str = field(
+        default=None, metadata={"name": "Code", "type": "Attribute"}
+    )
+    text: str = field(
+        default=None,
+        metadata={"required": True, "name": "Text", "type": "Attribute"},
+    )
+    provider_reservation_info_ref: TypeRef = field(
+        default=None,
+        metadata={
+            "name": "ProviderReservationInfoRef",
+            "type": "Attribute",
+            "help": "Provider reservation reference key.",
+        },
+    )
+    provider_code: TypeProviderCode = field(
+        default=None,
+        metadata={
+            "name": "ProviderCode",
+            "type": "Attribute",
+            "help": "Contains the Provider Code of the provider for which this OSI is used",
+        },
+    )
+
+
+@dataclass
+class OverridePcc:
+    """
+    Used to emulate to another PCC or SID. Providers: 1G, 1V, 1P, 1J.
+    """
+
+    provider_code: TypeProviderCode = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "ProviderCode",
+            "type": "Attribute",
+            "help": "The code of the provider (e.g. 1G, 1S)",
+        },
+    )
+    pseudo_city_code: TypePcc = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "PseudoCityCode",
+            "type": "Attribute",
+            "help": "The PCC in the host system.",
+        },
+    )
+
+
+@dataclass
+class OwnershipChange:
+    """
+    Element to change the ownership of the PNR in the UR. PROVIDER SUPPORTED: Worldspan and JAL.
+    """
+
+    owning_pcc: TypeRef = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "OwningPCC",
+            "type": "Attribute",
+            "help": "New owning PCC of the PNR.",
+        },
+    )
+
+
+@dataclass
+class Payment:
+    """
+    Payment information - must be used in conjunction with credit card info
+    """
+
+    key: TypeRef = field(
+        default=None, metadata={"name": "Key", "type": "Attribute"}
+    )
+    type: str = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "Type",
+            "type": "Attribute",
+            "help": "Identifies the type of payment. This can be for an itinerary, a traveler, or a service fee for example.",
+        },
+    )
+    form_of_payment_ref: TypeRef = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "FormOfPaymentRef",
+            "type": "Attribute",
+            "help": "The credit card that is will be used to make this payment.",
+        },
+    )
+    booking_traveler_ref: TypeRef = field(
+        default=None,
+        metadata={
+            "name": "BookingTravelerRef",
+            "type": "Attribute",
+            "help": "If the type represents a per traveler payment, then this will reference the traveler this payment refers to.",
+        },
+    )
+    amount: TypeMoney = field(
+        default=None,
+        metadata={"required": True, "name": "Amount", "type": "Attribute"},
+    )
+    amount_type: StringLength1to32 = field(
+        default=None,
+        metadata={
+            "name": "AmountType",
+            "type": "Attribute",
+            "help": 'This field displays type of payment amount when it is non-monetary. Presently available/supported value is "Flight Pass Credits".',
+        },
+    )
+    approximate_amount: TypeMoney = field(
+        default=None,
+        metadata={
+            "name": "ApproximateAmount",
+            "type": "Attribute",
+            "help": "It stores the converted payment amount in agency's default currency",
+        },
+    )
+    status: str = field(
+        default=None,
+        metadata={
+            "name": "Status",
+            "type": "Attribute",
+            "help": "Status to indicate the business association of the payment element.",
+        },
+    )
+
+
+@dataclass
+class PaymentAdvice:
+    """
+    Contains other form of payment for Cruise Reservations
+    """
+
+    type: str = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "Type",
+            "type": "Attribute",
+            "help": "Other Payment Yype. Possible Values: AGC - Agency Check, AGG - Agency Guarantee, AWC - Award Check, CSH - Cash Equivalent, DBC - Denied Boarding Compensation, MCO - Miscellaneous Charge Order, TOO - Tour Order, TOV - Tour Voucher",
+        },
+    )
+    document_number: str = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "DocumentNumber",
+            "type": "Attribute",
+            "help": "Payment Document Number Examples: 1234567890, R7777",
+        },
+    )
+    issue_date: str = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "IssueDate",
+            "type": "Attribute",
+            "help": "Document Issuance date",
+        },
+    )
+    issue_city: TypeIatacode = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "IssueCity",
+            "type": "Attribute",
+            "help": "City code of document issuance",
+        },
+    )
+    original_fop: str = field(
+        default=None,
+        metadata={
+            "name": "OriginalFOP",
+            "type": "Attribute",
+            "help": "Original form of payment Examples: CHECK 3500",
+        },
+    )
+
+
+@dataclass
+class PaymentRef:
+    key: TypeRef = field(
+        default=None,
+        metadata={"required": True, "name": "Key", "type": "Attribute"},
+    )
+
+
+@dataclass
+class Penalty:
+    """
+    Exchange penalty information
+    """
+
+    cancel_refund: bool = field(
+        default=None, metadata={"name": "CancelRefund", "type": "Attribute"}
+    )
+    non_refundable: bool = field(
+        default=None, metadata={"name": "NonRefundable", "type": "Attribute"}
+    )
+    non_exchangeable: bool = field(
+        default=None, metadata={"name": "NonExchangeable", "type": "Attribute"}
+    )
+    cancelation_penalty: bool = field(
+        default=None,
+        metadata={"name": "CancelationPenalty", "type": "Attribute"},
+    )
+    reissue_penalty: bool = field(
+        default=None, metadata={"name": "ReissuePenalty", "type": "Attribute"}
+    )
+    non_reissue_penalty: bool = field(
+        default=None,
+        metadata={"name": "NonReissuePenalty", "type": "Attribute"},
+    )
+    ticket_refund_penalty: bool = field(
+        default=None,
+        metadata={"name": "TicketRefundPenalty", "type": "Attribute"},
+    )
+    charge_applicable: bool = field(
+        default=None,
+        metadata={"name": "ChargeApplicable", "type": "Attribute"},
+    )
+    charge_portion: bool = field(
+        default=None, metadata={"name": "ChargePortion", "type": "Attribute"}
+    )
+    penalty_amount: TypeMoney = field(
+        default=None, metadata={"name": "PenaltyAmount", "type": "Attribute"}
+    )
+
+
+@dataclass
+class PersonalGeography:
+    """
+    Personal geography details of the associated passenger.
+    """
+
+    country_code: TypeCountry = field(
+        default=None,
+        metadata={
+            "name": "CountryCode",
+            "type": "Element",
+            "help": "Passenger country code.",
+        },
+    )
+    state_province_code: TypeState = field(
+        default=None,
+        metadata={
+            "name": "StateProvinceCode",
+            "type": "Element",
+            "help": "Passenger state/province code.",
+        },
+    )
+    city_code: TypeCity = field(
+        default=None,
+        metadata={
+            "name": "CityCode",
+            "type": "Element",
+            "help": "Passenger city code.",
+        },
+    )
+
+
+@dataclass
+class PointOfCommencement:
+    """
+    Point of Commencement is optional. CityOrAirportCode and date portion of the Time attribute is mandatory.
+    """
+
+    city_or_airport_code: TypeIatacode = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "CityOrAirportCode",
+            "type": "Attribute",
+            "help": "Three digit Airport or City code that would be the Point of Commencement location for the trips/legs mentioned.",
+        },
+    )
+    time: str = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "Time",
+            "type": "Attribute",
+            "help": "Specify a date or date and time",
+        },
+    )
+
+
+@dataclass
+class PointOfSale:
+    """
+    User can use this node to send a specific PCC to access fares allowed only for that PCC. This node gives the capability for fare redistribution at UR level. For fare redistribution at the stored fare level see AirPricingSolution/AirPricingInfo/AirPricingModifiers/PointOfSale.
+    """
+
+    provider_code: TypeProviderCode = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "ProviderCode",
+            "type": "Attribute",
+            "help": "The provider in which the PCC is defined.",
+        },
+    )
+    pseudo_city_code: TypePcc = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "PseudoCityCode",
+            "type": "Attribute",
+            "help": "The PCC in the host system.",
+        },
+    )
+    key: TypeRef = field(
+        default=None, metadata={"name": "Key", "type": "Attribute"}
+    )
+    iata: TypeIata = field(
+        default=None,
+        metadata={
+            "name": "IATA",
+            "type": "Attribute",
+            "help": "Used for rapid reprice. This field is the IATA associated to this Point of Sale PCC. Providers: 1G/1V",
+        },
+    )
+
+
+@dataclass
+class PolicyInformation:
+    """
+    Policy Information required for File Finishing
+    """
+
+    reason_code: "ReasonCode" = field(
+        default=None,
+        metadata={
+            "name": "ReasonCode",
+            "type": "Element",
+            "help": "Reason Code",
+        },
+    )
+    type: TypePolicy = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "Type",
+            "type": "Attribute",
+            "help": "Policy Type - Air, Hotel, Car, Rail, Ticketing",
+        },
+    )
+    out_of_policy: bool = field(
+        default=None,
+        metadata={
+            "name": "OutOfPolicy",
+            "type": "Attribute",
+            "help": "In Policy / Out of Policy Indicator",
+        },
+    )
+    segment_ref: TypeRef = field(
+        default=None, metadata={"name": "SegmentRef", "type": "Attribute"}
+    )
+
+    @dataclass
+    class ReasonCode:
+        out_of_policy: str = field(
+            default=None,
+            metadata={
+                "name": "OutOfPolicy",
+                "type": "Element",
+                "help": "Reason Code - Out of Policy",
+            },
+        )
+        purpose_of_trip: str = field(
+            default=None,
+            metadata={
+                "name": "PurposeOfTrip",
+                "type": "Element",
+                "help": "Reason Code -Purpose of Trip",
+            },
+        )
+        remark: Remark = field(
+            default=None, metadata={"name": "Remark", "type": "Element"}
+        )
+
+
+@dataclass
+class PriceMatchError:
+    error_message: str = field(
+        default=None,
+        metadata={"required": True, "name": "ErrorMessage", "type": "Element"},
+    )
+    vendor_code: TypeSupplierCode = field(
+        default=None,
+        metadata={
+            "name": "VendorCode",
+            "type": "Attribute",
+            "help": "The code of the vendor (e.g. HZ, etc.)",
+        },
+    )
+    hotel_chain: TypeHotelChainCode = field(
+        default=None,
+        metadata={
+            "name": "HotelChain",
+            "type": "Attribute",
+            "help": "2 Letter Hotel Chain Code",
+        },
+    )
+    hotel_code: TypeHotelCode = field(
+        default=None,
+        metadata={
+            "name": "HotelCode",
+            "type": "Attribute",
+            "help": "Unique hotel identifier for the channel.",
+        },
+    )
+    req_base: float = field(
+        default=None,
+        metadata={
+            "name": "ReqBase",
+            "type": "Attribute",
+            "help": "BaseRate in the request.",
+        },
+    )
+    rsp_base: float = field(
+        default=None,
+        metadata={
+            "name": "RspBase",
+            "type": "Attribute",
+            "help": "BaseRate retruned from the supplier.",
+        },
+    )
+    base_diff: float = field(
+        default=None,
+        metadata={
+            "name": "BaseDiff",
+            "type": "Attribute",
+            "help": "BaseRate Difference.",
+        },
+    )
+    req_total: float = field(
+        default=None,
+        metadata={
+            "name": "ReqTotal",
+            "type": "Attribute",
+            "help": "Estimated Total Amount in the request.",
+        },
+    )
+    rsp_total: float = field(
+        default=None,
+        metadata={
+            "name": "RspTotal",
+            "type": "Attribute",
+            "help": "Estimated Total Amount returned from the supplier.",
+        },
+    )
+    total_diff: float = field(
+        default=None,
+        metadata={
+            "name": "TotalDiff",
+            "type": "Attribute",
+            "help": "Estimated Total Amount difference.",
+        },
+    )
+
+
+@dataclass
+class Provider:
+    """
+    Provider identifier
+    """
+
+    code: TypeProviderCode = field(
+        default=None,
+        metadata={"required": True, "name": "Code", "type": "Attribute"},
+    )
+
+
+@dataclass
+class ProviderArnksegment:
+    """
+    Represents host ARNK segments.
+    """
+
+    previous_segment: "PreviousSegment" = field(
+        default=None, metadata={"name": "PreviousSegment", "type": "Element"}
+    )
+    next_segment: "NextSegment" = field(
+        default=None, metadata={"name": "NextSegment", "type": "Element"}
+    )
+    key: TypeRef = field(
+        default=None, metadata={"name": "Key", "type": "Attribute"}
+    )
+    provider_reservation_info_ref: TypeRef = field(
+        default=None,
+        metadata={
+            "name": "ProviderReservationInfoRef",
+            "type": "Attribute",
+            "help": "Provider reservation reference key.",
+        },
+    )
+    provider_segment_order: int = field(
+        default=None,
+        metadata={
+            "name": "ProviderSegmentOrder",
+            "type": "Attribute",
+            "help": "To identify the appropriate travel sequence for Air/Car/Hotel/Rail segments/reservations in the provider reservation.",
+        },
+    )
+
+    @dataclass
+    class NextSegment:
+        air_segment_ref: TypeSegmentRef = field(
+            default=None,
+            metadata={
+                "name": "AirSegmentRef",
+                "type": "Element",
+                "help": "Reference to AirSegment from an Air Reservation.",
+            },
+        )
+        hotel_reservation_ref: TypeNonAirReservationRef = field(
+            default=None,
+            metadata={
+                "name": "HotelReservationRef",
+                "type": "Element",
+                "help": "Specify the locator code of Hotel reservation.",
+            },
+        )
+        vehicle_reservation_ref: TypeNonAirReservationRef = field(
+            default=None,
+            metadata={
+                "name": "VehicleReservationRef",
+                "type": "Element",
+                "help": "Specify the locator code of Vehicle reservation.",
+            },
+        )
+        passive_segment_ref: TypeSegmentRef = field(
+            default=None,
+            metadata={
+                "name": "PassiveSegmentRef",
+                "type": "Element",
+                "help": "Reference to PassiveSegment from a Passive Reservation.",
+            },
+        )
+
+    @dataclass
+    class PreviousSegment:
+        air_segment_ref: TypeSegmentRef = field(
+            default=None,
+            metadata={
+                "name": "AirSegmentRef",
+                "type": "Element",
+                "help": "Reference to AirSegment from an Air Reservation.",
+            },
+        )
+        hotel_reservation_ref: TypeNonAirReservationRef = field(
+            default=None,
+            metadata={
+                "name": "HotelReservationRef",
+                "type": "Element",
+                "help": "Specify the locator code of Hotel reservation.",
+            },
+        )
+        vehicle_reservation_ref: TypeNonAirReservationRef = field(
+            default=None,
+            metadata={
+                "name": "VehicleReservationRef",
+                "type": "Element",
+                "help": "Specify the locator code of Vehicle reservation.",
+            },
+        )
+        passive_segment_ref: TypeSegmentRef = field(
+            default=None,
+            metadata={
+                "name": "PassiveSegmentRef",
+                "type": "Element",
+                "help": "Reference to PassiveSegment from a Passive Reservation.",
+            },
+        )
+
+
+@dataclass
+class ProviderReservationInfoRef:
+    """
+    Container for Provider reservation reference key.
+    """
+
+    key: TypeRef = field(
+        default=None,
+        metadata={"required": True, "name": "Key", "type": "Attribute"},
+    )
+
+
+@dataclass
+class QueuePlace:
+    """
+    Allow queue placement of a PNR at the time of booking to be used for Providers 1G,1V,1P and 1J.
+    """
+
+    pseudo_city_code: TypePcc = field(
+        default=None,
+        metadata={
+            "name": "PseudoCityCode",
+            "type": "Element",
+            "help": "Pseudo City Code",
+        },
+    )
+    queue_selector: List[QueueSelector] = field(
+        default_factory=list,
+        metadata={
+            "min_occurs": 0,
+            "max_occurs": 999,
+            "name": "QueueSelector",
+            "type": "Element",
+            "help": "Identifies the Queue Information to be selected for placing the UR",
+        },
+    )
+
+
+@dataclass
+class RailLocation(Location):
+    """
+    RCH specific location code (a.k.a UCodes) which uniquely identifies a train station.
+    """
+
+    code: TypeRailLocationCode = field(
+        default=None,
+        metadata={"required": True, "name": "Code", "type": "Attribute"},
+    )
+
+
+@dataclass
+class RailSeatAssignment:
+    """
+    Identifies the seat assignment for a passenger on RailSegment.
+    """
+
+    characteristic: List[Characteristic] = field(
+        default_factory=list,
+        metadata={
+            "min_occurs": 0,
+            "max_occurs": 999,
+            "name": "Characteristic",
+            "type": "Element",
+        },
+    )
+    key: TypeRef = field(
+        default=None, metadata={"name": "Key", "type": "Attribute"}
+    )
+    status: TypeStatusCode = field(
+        default=None,
+        metadata={"required": True, "name": "Status", "type": "Attribute"},
+    )
+    seat: str = field(
+        default=None,
+        metadata={"required": True, "name": "Seat", "type": "Attribute"},
+    )
+    rail_segment_ref: TypeRef = field(
+        default=None, metadata={"name": "RailSegmentRef", "type": "Attribute"}
+    )
+    coach_number: str = field(
+        default=None, metadata={"name": "CoachNumber", "type": "Attribute"}
+    )
+
+
+@dataclass
+class ReferencePoint(TypeReferencePoint):
+    pass
+
+
+@dataclass
+class Remark:
+    """
+    A textual remark container to hold any printable text. (max 512 chars)
+    """
+
+    key: TypeRef = field(
+        default=None, metadata={"name": "Key", "type": "Attribute"}
+    )
+
+
+@dataclass
+class RequestKeyMappings:
+    """
+    All the elements for which mapping key sent in the request is different from the mapping key comes in the response.
+    """
+
+    key_mapping: List[KeyMapping] = field(
+        default_factory=list,
+        metadata={
+            "min_occurs": 0,
+            "max_occurs": 999,
+            "name": "KeyMapping",
+            "type": "Element",
+        },
+    )
+
+
+@dataclass
+class ReviewBooking:
+    """
+    Review Booking or Queue Minders is to add the reminders in the Provider Reservation along with the date time and Queue details. On the date time defined in reminders, the message along with the PNR goes to the desired Queue.
+    """
+
+    key: TypeRef = field(
+        default=None,
+        metadata={
+            "name": "Key",
+            "type": "Attribute",
+            "help": "Returned in response. Use it for update of saved review booking.",
+        },
+    )
+    queue: int = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "Queue",
+            "type": "Attribute",
+            "help": "Queue number, Must be numeric and less than 100.",
+        },
+    )
+    queue_category: str = field(
+        default=None,
+        metadata={
+            "name": "QueueCategory",
+            "type": "Attribute",
+            "help": "Queue Category, 2 Character Alpha or Numeric.",
+        },
+    )
+    date_time: DateTime = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "DateTime",
+            "type": "Attribute",
+            "help": "Date and Time to place message on designated Queue, Should be prior to the last segment date in the PNR.",
+        },
+    )
+    pseudo_city_code: TypePcc = field(
+        default=None,
+        metadata={
+            "name": "PseudoCityCode",
+            "type": "Attribute",
+            "help": "Input PCC optional value for placing the PNR into Queue. If not passed, will add as default PNR's Pseudo.",
+        },
+    )
+    provider_code: TypeProviderCode = field(
+        default=None,
+        metadata={
+            "name": "ProviderCode",
+            "type": "Attribute",
+            "help": "The code of the Provider (e.g 1G,1V).",
+        },
+    )
+    provider_reservation_info_ref: TypeRef = field(
+        default=None,
+        metadata={
+            "name": "ProviderReservationInfoRef",
+            "type": "Attribute",
+            "help": "Provider Reservation reference. Returned in the response. Use it for update of saved Review Booking.",
+        },
+    )
+    remarks: str = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "Remarks",
+            "type": "Attribute",
+            "help": "Remark or reminder message. It can be truncated depending on the provider.",
+        },
+    )
+
+
+@dataclass
+class SearchEvent(TypeTimeRange):
+    """
+    Search for various reservation events
+    """
+
+    type: TypeEventType = field(
+        default=None, metadata={"name": "Type", "type": "Attribute"}
+    )
+
+
+@dataclass
+class SeatAssignment:
+    key: TypeRef = field(
+        default=None, metadata={"name": "Key", "type": "Attribute"}
+    )
+    status: TypeStatusCode = field(
+        default=None,
+        metadata={"required": True, "name": "Status", "type": "Attribute"},
+    )
+    seat: str = field(
+        default=None,
+        metadata={"required": True, "name": "Seat", "type": "Attribute"},
+    )
+    seat_type_code: TypeSeatTypeCode = field(
+        default=None,
+        metadata={
+            "name": "SeatTypeCode",
+            "type": "Attribute",
+            "help": "The 4 letter SSR code like SMSW,NSSW,SMST etc.",
+        },
+    )
+    segment_ref: TypeRef = field(
+        default=None, metadata={"name": "SegmentRef", "type": "Attribute"}
+    )
+    flight_details_ref: TypeRef = field(
+        default=None,
+        metadata={"name": "FlightDetailsRef", "type": "Attribute"},
+    )
+    rail_coach_number: str = field(
+        default=None,
+        metadata={
+            "name": "RailCoachNumber",
+            "type": "Attribute",
+            "help": "Coach number for which rail seatmap/coachmap is returned.",
+        },
+    )
+
+
+@dataclass
+class SeatAttributes:
+    """
+    Identifies the seat attribute of the service.
+    """
+
+    seat_attribute: List[SeatAttribute] = field(
+        default_factory=list,
+        metadata={
+            "min_occurs": 0,
+            "max_occurs": 10,
+            "name": "SeatAttribute",
+            "type": "Element",
+        },
+    )
+
+
+@dataclass
+class SegmentRemark:
+    """
+    A textual remark container to hold any printable text. (max 512 chars)
+    """
+
+    key: TypeRef = field(
+        default=None,
+        metadata={"required": True, "name": "Key", "type": "Attribute"},
+    )
+
+
+@dataclass
+class ServiceFeeTaxInfo:
+    """
+    The taxes associated to a particular Service Fee.
+    """
+
+    category: str = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "Category",
+            "type": "Attribute",
+            "help": "The tax category represents a valid IATA tax code.",
+        },
+    )
+    amount: TypeMoney = field(
+        default=None,
+        metadata={"required": True, "name": "Amount", "type": "Attribute"},
+    )
+
+
+@dataclass
+class ServiceInfo:
+    description: List[str] = field(
+        default_factory=list,
+        metadata={
+            "min_occurs": 1,
+            "max_occurs": 999,
+            "name": "Description",
+            "type": "Element",
+            "help": "Description of the Service. Usually used in tandem with one or more media items.",
+        },
+    )
+    media_item: List[MediaItem] = field(
+        default_factory=list,
+        metadata={
+            "min_occurs": 0,
+            "max_occurs": 3,
+            "name": "MediaItem",
+            "type": "Element",
+        },
+    )
+
+
+@dataclass
+class ServiceRuleType:
+    """
+    Contains the rules for applying service rules
+    """
+
+    application_rules: "ApplicationRules" = field(
+        default=None,
+        metadata={
+            "name": "ApplicationRules",
+            "type": "Element",
+            "help": "The rules to apply the rule to the itinerary",
+        },
+    )
+    application_level: "ApplicationLevel" = field(
+        default=None,
+        metadata={
+            "name": "ApplicationLevel",
+            "type": "Element",
+            "help": "Lists the levels where the option is applied in the itinerary. Some options are applied for the entire itinerary, some for entire segments, etc.",
+        },
+    )
+    modify_rules: "ModifyRules" = field(
+        default=None,
+        metadata={
+            "name": "ModifyRules",
+            "type": "Element",
+            "help": "Groups the modification rules for the Option",
+        },
+    )
+    secondary_type_rules: "SecondaryTypeRules" = field(
+        default=None,
+        metadata={
+            "name": "SecondaryTypeRules",
+            "type": "Element",
+            "help": "Lists the supported Secondary Codes for the optional / additional service.",
+        },
+    )
+    remarks: List[FormattedTextTextType] = field(
+        default_factory=list,
+        metadata={
+            "min_occurs": 0,
+            "max_occurs": 99,
+            "name": "Remarks",
+            "type": "Element",
+            "help": "Adds text remarks / rules for the optional / additional service",
+        },
+    )
+    key: TypeRef = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "Key",
+            "type": "Attribute",
+            "help": "Unique ID to identify an optional service rule",
+        },
+    )
+
+    @dataclass
+    class SecondaryTypeRules:
+        secondary_type_rule: List["SecondaryTypeRule"] = field(
+            default_factory=list,
+            metadata={
+                "min_occurs": 1,
+                "max_occurs": 999,
+                "name": "SecondaryTypeRule",
+                "type": "Element",
+                "help": "Lists a single secondary code for the optional / additional service.",
+            },
+        )
+
+    @dataclass
+    class SecondaryTypeRule:
+        application_limit: List[OptionalServiceApplicationLimitType] = field(
+            default_factory=list,
+            metadata={
+                "min_occurs": 0,
+                "max_occurs": 10,
+                "name": "ApplicationLimit",
+                "type": "Element",
+            },
+        )
+        secondary_type: TypeRef = field(
+            default=None,
+            metadata={
+                "required": True,
+                "name": "SecondaryType",
+                "type": "Attribute",
+                "help": "The unique type to associate a secondary type in an optional service",
+            },
+        )
+
+    @dataclass
+    class ModifyRules:
+        modify_rule: List["ModifyRule"] = field(
+            default_factory=list,
+            metadata={
+                "min_occurs": 1,
+                "max_occurs": 999,
+                "name": "ModifyRule",
+                "type": "Element",
+                "help": "Indicates modification rules for the particular modification type.",
+            },
+        )
+        provider_defined_modification_type: str = field(
+            default=None,
+            metadata={
+                "name": "ProviderDefinedModificationType",
+                "type": "Attribute",
+                "help": "Indicates the actual provider defined modification type which is mapped to Other",
+            },
+        )
+
+    @dataclass
+    class ModifyRule:
+        pass
+
+    @dataclass
+    class ApplicationLevel:
+        application_limits: "ApplicationLimits" = field(
+            default=None,
+            metadata={
+                "name": "ApplicationLimits",
+                "type": "Element",
+                "help": "Adds the limits on the number of options that can be selected for a particular type",
+            },
+        )
+        service_data: List[ServiceData] = field(
+            default_factory=list,
+            metadata={
+                "min_occurs": 0,
+                "max_occurs": 999,
+                "name": "ServiceData",
+                "type": "Element",
+            },
+        )
+        provider_defined_applicable_levels: str = field(
+            default=None,
+            metadata={
+                "name": "ProviderDefinedApplicableLevels",
+                "type": "Attribute",
+                "help": "Indicates the actual provider defined ApplicableLevels which is mapped to Other",
+            },
+        )
+
+    @dataclass
+    class ApplicationLimits:
+        application_limit: List[OptionalServiceApplicationLimitType] = field(
+            default_factory=list,
+            metadata={
+                "min_occurs": 1,
+                "max_occurs": 10,
+                "name": "ApplicationLimit",
+                "type": "Element",
+                "help": "The application limits for a particular level",
+            },
+        )
+
+    @dataclass
+    class ApplicationRules:
+        required_for_all_travelers: bool = field(
+            default=None,
+            metadata={
+                "name": "RequiredForAllTravelers",
+                "type": "Attribute",
+                "help": "Indicates if the option needs to be applied to all travelers in the itinerary if selected",
+            },
+        )
+        required_for_all_segments: bool = field(
+            default=None,
+            metadata={
+                "name": "RequiredForAllSegments",
+                "type": "Attribute",
+                "help": "Indicates if the option needs to be applied to all segments in the itinerary if selected",
+            },
+        )
+        required_for_all_segments_in_od: bool = field(
+            default=None,
+            metadata={
+                "name": "RequiredForAllSegmentsInOD",
+                "type": "Attribute",
+                "help": "Indicates if the option needs to be applied to all segments in a origin / destination (connection flights) if selected for one segment in the OD",
+            },
+        )
+        unselected_option_required: bool = field(
+            default=None,
+            metadata={
+                "name": "UnselectedOptionRequired",
+                "type": "Attribute",
+                "help": "If an UnselectedOption is present in the option, then the Unselected option needs to be selected even if the option is not selected when this flag is set to true",
+            },
+        )
+        secondary_option_code_required: bool = field(
+            default=None,
+            metadata={
+                "name": "SecondaryOptionCodeRequired",
+                "type": "Attribute",
+                "help": "If set to true, the secondary option code is required for this option",
+            },
+        )
+
+
+@dataclass
+class ShopInformation:
+    """
+    Shopping Information required for File Finishing
+    """
+
+    search_request: List["SearchRequest"] = field(
+        default_factory=list,
+        metadata={
+            "min_occurs": 0,
+            "max_occurs": 999,
+            "name": "SearchRequest",
+            "type": "Element",
+            "help": "Search parameters that were used in LFS request",
+        },
+    )
+    flights_offered: List["FlightsOffered"] = field(
+        default_factory=list,
+        metadata={
+            "min_occurs": 0,
+            "max_occurs": 999,
+            "name": "FlightsOffered",
+            "type": "Element",
+            "help": "Flights with lowest logical airfare returned as response to LFS request",
+        },
+    )
+    cabin_shopped: str = field(
+        default=None, metadata={"name": "CabinShopped", "type": "Attribute"}
+    )
+    cabin_selected: str = field(
+        default=None, metadata={"name": "CabinSelected", "type": "Attribute"}
+    )
+    lowest_fare_offered: TypeMoney = field(
+        default=None,
+        metadata={"name": "LowestFareOffered", "type": "Attribute"},
+    )
+
+    @dataclass
+    class FlightsOffered:
+        origin: TypeIatacode = field(
+            default=None, metadata={"name": "Origin", "type": "Attribute"}
+        )
+        destination: TypeIatacode = field(
+            default=None, metadata={"name": "Destination", "type": "Attribute"}
+        )
+        departure_time: str = field(
+            default=None,
+            metadata={
+                "name": "DepartureTime",
+                "type": "Attribute",
+                "help": "Date and Time at which this entity departs. This does not include Time Zone information since it can be derived from origin location",
+            },
+        )
+        travel_order: Int = field(
+            default=None, metadata={"name": "TravelOrder", "type": "Attribute"}
+        )
+        carrier: TypeCarrier = field(
+            default=None, metadata={"name": "Carrier", "type": "Attribute"}
+        )
+        flight_number: TypeFlightNumber = field(
+            default=None,
+            metadata={"name": "FlightNumber", "type": "Attribute"},
+        )
+        class_of_service: TypeClassOfService = field(
+            default=None,
+            metadata={"name": "ClassOfService", "type": "Attribute"},
+        )
+        stop_over: bool = field(
+            default=false, metadata={"name": "StopOver", "type": "Attribute"}
+        )
+        connection: bool = field(
+            default=false, metadata={"name": "Connection", "type": "Attribute"}
+        )
+
+    @dataclass
+    class SearchRequest:
+        origin: TypeIatacode = field(
+            default=None, metadata={"name": "Origin", "type": "Attribute"}
+        )
+        destination: TypeIatacode = field(
+            default=None, metadata={"name": "Destination", "type": "Attribute"}
+        )
+        departure_time: str = field(
+            default=None,
+            metadata={
+                "name": "DepartureTime",
+                "type": "Attribute",
+                "help": "Date and Time at which this entity departs. This does not include Time Zone information since it can be derived from origin location",
+            },
+        )
+        class_of_service: TypeClassOfService = field(
+            default=None,
+            metadata={"name": "ClassOfService", "type": "Attribute"},
+        )
+
+
+@dataclass
+class SpecialEquipment:
+    key: TypeRef = field(
+        default=None, metadata={"name": "Key", "type": "Attribute"}
+    )
+    type: str = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "Type",
+            "type": "Attribute",
+            "help": "Special equipment associated with a specific vehicle",
+        },
+    )
+
+
+@dataclass
+class Ssr:
+    """
+    Special serivces like wheel chair, or pet carrier.
+    """
+
+    key: TypeRef = field(
+        default=None, metadata={"name": "Key", "type": "Attribute"}
+    )
+    segment_ref: TypeRef = field(
+        default=None,
+        metadata={
+            "name": "SegmentRef",
+            "type": "Attribute",
+            "help": "Reference to the air segment. May be required for some Types.",
+        },
+    )
+    passive_segment_ref: TypeRef = field(
+        default=None,
+        metadata={
+            "name": "PassiveSegmentRef",
+            "type": "Attribute",
+            "help": "Reference to the passive segment.",
+        },
+    )
+    provider_reservation_info_ref: TypeRef = field(
+        default=None,
+        metadata={
+            "name": "ProviderReservationInfoRef",
+            "type": "Attribute",
+            "help": "Provider reservation reference key.",
+        },
+    )
+    type: TypeSsrcode = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "Type",
+            "type": "Attribute",
+            "help": "Programmatic SSRs use codes recognized by the provider/supplier (example, VGML=vegetarian meal code). Manual SSRs do not have an associated programmatic code.",
+        },
+    )
+    status: str = field(
+        default=None, metadata={"name": "Status", "type": "Attribute"}
+    )
+    free_text: TypeSsrfreeText = field(
+        default=None,
+        metadata={
+            "name": "FreeText",
+            "type": "Attribute",
+            "help": "Certain SSR types will require a free text message. For example MAAS (Meet and assist).",
+        },
+    )
+    carrier: TypeCarrier = field(
+        default=None, metadata={"name": "Carrier", "type": "Attribute"}
+    )
+    carrier_specific_text: str = field(
+        default=None,
+        metadata={
+            "name": "CarrierSpecificText",
+            "type": "Attribute",
+            "help": "Carrier specific information which are not captured in the FreeText field(not present in IATA's standard SSR DOCO format). An example is VISA Expiration Date.",
+        },
+    )
+    description: str = field(
+        default=None, metadata={"name": "Description", "type": "Attribute"}
+    )
+    provider_defined_type: str = field(
+        default=None,
+        metadata={
+            "name": "ProviderDefinedType",
+            "type": "Attribute",
+            "help": "Original Type as sent by the provider",
+        },
+    )
+    ssrrule_ref: TypeRef = field(
+        default=None,
+        metadata={
+            "name": "SSRRuleRef",
+            "type": "Attribute",
+            "help": "UniqueID to associate a rule to the SSR",
+        },
+    )
+    url: AnyUri = field(
+        default=None, metadata={"name": "URL", "type": "Attribute"}
+    )
+    profile_id: str = field(
+        default=None,
+        metadata={
+            "name": "ProfileID",
+            "type": "Attribute",
+            "help": "Key assigned for Secure Flight Document value from the specified profile",
+        },
+    )
+    profile_secure_flight_doc_key: TypeRef = field(
+        default=None,
+        metadata={
+            "name": "ProfileSecureFlightDocKey",
+            "type": "Attribute",
+            "help": "Unique ID of Booking Traveler's Profile that contains the Secure flight Detail",
+        },
+    )
+
+
+@dataclass
+class TicketNumber(StringLength1to13):
+    """
+    The identifying number for the actual ticket
+    """
+
+    pass
+
+
+@dataclass
+class TravelComplianceData:
+    """
+    Travel Compliance and Preferred Supplier information of the traveler specific to a segment.
+    """
+
+    policy_compliance: List["PolicyCompliance"] = field(
+        default_factory=list,
+        metadata={
+            "min_occurs": 0,
+            "max_occurs": 2,
+            "name": "PolicyCompliance",
+            "type": "Element",
+        },
+    )
+    contract_compliance: List["ContractCompliance"] = field(
+        default_factory=list,
+        metadata={
+            "min_occurs": 0,
+            "max_occurs": 2,
+            "name": "ContractCompliance",
+            "type": "Element",
+        },
+    )
+    preferred_supplier: List["PreferredSupplier"] = field(
+        default_factory=list,
+        metadata={
+            "min_occurs": 0,
+            "max_occurs": 999,
+            "name": "PreferredSupplier",
+            "type": "Element",
+        },
+    )
+    key: TypeRef = field(
+        default=None,
+        metadata={
+            "name": "Key",
+            "type": "Attribute",
+            "help": "System generated key, returned back in the response. This can be used to modify or delete a saved TravelComplianceData.",
+        },
+    )
+    air_segment_ref: TypeRef = field(
+        default=None,
+        metadata={
+            "name": "AirSegmentRef",
+            "type": "Attribute",
+            "help": "Refers to Air Segment. Applicable only for Air. Ignored for others.",
+        },
+    )
+    passive_segment_ref: TypeRef = field(
+        default=None,
+        metadata={
+            "name": "PassiveSegmentRef",
+            "type": "Attribute",
+            "help": "Refers to Passive Segment. Applicable only for Passive. Ignored for others.",
+        },
+    )
+    rail_segment_ref: TypeRef = field(
+        default=None,
+        metadata={
+            "name": "RailSegmentRef",
+            "type": "Attribute",
+            "help": "Refers to Rail Segment. Applicable only for Rail. Ignored for others.",
+        },
+    )
+    reservation_locator_ref: TypeLocatorCode = field(
+        default=None,
+        metadata={
+            "name": "ReservationLocatorRef",
+            "type": "Attribute",
+            "help": "This is returned in the response. Any input will be ignored for this attribute. This represents the association of Travel Compliance Data with the uAPI reservation locator code, mainly relevant to Hotel and Vehicle.",
+        },
+    )
+
+    @dataclass
+    class PreferredSupplier:
+        preferred: bool = field(
+            default=None,
+            metadata={
+                "required": True,
+                "name": "Preferred",
+                "type": "Attribute",
+                "help": "Preferred Supplier - 'true', 'false'.",
+            },
+        )
+        profile_type: TypeProfileType = field(
+            default=None,
+            metadata={
+                "required": True,
+                "name": "ProfileType",
+                "type": "Attribute",
+                "help": "Indicate profile type. e.g. if Agency Preferred then pass Agency, if Traveler Preferred then pass Traveler.",
+            },
+        )
+
+    @dataclass
+    class ContractCompliance:
+        in_contract: bool = field(
+            default=None,
+            metadata={
+                "required": True,
+                "name": "InContract",
+                "type": "Attribute",
+                "help": "Contract Compliance Indicator. For In-Contract set to 'true', For Out-Of-Contract set to 'false'.",
+            },
+        )
+        contract_token: StringLength1to128 = field(
+            default=None,
+            metadata={
+                "name": "ContractToken",
+                "type": "Attribute",
+                "help": "Optional text message to set the rule or token for which it's In Contract or Out Of Contract.",
+            },
+        )
+
+    @dataclass
+    class PolicyCompliance:
+        in_policy: bool = field(
+            default=None,
+            metadata={
+                "required": True,
+                "name": "InPolicy",
+                "type": "Attribute",
+                "help": "Policy Compliance Indicator. For In-Policy set to 'true', For Out-Of-Policy set to 'false''.",
+            },
+        )
+        policy_token: StringLength1to128 = field(
+            default=None,
+            metadata={
+                "name": "PolicyToken",
+                "type": "Attribute",
+                "help": "Optional text message to set the rule or token for which it's In Policy or Out Of Policy.",
+            },
+        )
+
+
+@dataclass
+class TravelerInformation:
+    """
+    Traveler Information required for File Finishing
+    """
+
+    emergency_contact: "EmergencyContact" = field(
+        default=None, metadata={"name": "EmergencyContact", "type": "Element"}
+    )
+    home_airport: TypeAirport = field(
+        default=None, metadata={"name": "HomeAirport", "type": "Attribute"}
+    )
+    visa_expiration_date: str = field(
+        default=None,
+        metadata={"name": "VisaExpirationDate", "type": "Attribute"},
+    )
+    booking_traveler_ref: TypeRef = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "BookingTravelerRef",
+            "type": "Attribute",
+            "help": "A reference to a passenger.",
+        },
+    )
+
+    @dataclass
+    class EmergencyContact:
+        phone_number: PhoneNumber = field(
+            default=None, metadata={"name": "PhoneNumber", "type": "Element"}
+        )
+
+
+@dataclass
+class TravelerType:
+    """
+    The 3-char IATA traveler type code
+    """
+
+    code: TypePtc = field(
+        default=None,
+        metadata={"required": True, "name": "Code", "type": "Attribute"},
+    )
+
+
+@dataclass
+class TypeAgencyHierarchyReference:
+    profile_id: TypeProfileId = field(
+        default=None,
+        metadata={"required": True, "name": "ProfileID", "type": "Attribute"},
+    )
+    profile_type: TypeAgencyProfileLevel = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "ProfileType",
+            "type": "Attribute",
+        },
+    )
+
+
+@dataclass
+class TypeErrorInfo:
+    """
+    Container for error data when there is an application error.
+    """
+
+    code: str = field(
+        default=None,
+        metadata={"required": True, "name": "Code", "type": "Element"},
+    )
+    service: str = field(
+        default=None,
+        metadata={"required": True, "name": "Service", "type": "Element"},
+    )
+    type: str = field(
+        default=None,
+        metadata={"required": True, "name": "Type", "type": "Element"},
+    )
+    description: str = field(
+        default=None,
+        metadata={"required": True, "name": "Description", "type": "Element"},
+    )
+    transaction_id: str = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "TransactionId",
+            "type": "Element",
+        },
+    )
+    trace_id: str = field(
+        default=None, metadata={"name": "TraceId", "type": "Element"}
+    )
+    command_history: str = field(
+        default=None, metadata={"name": "CommandHistory", "type": "Element"}
+    )
+    auxdata: Auxdata = field(
+        default=None, metadata={"name": "Auxdata", "type": "Element"}
+    )
+    stack_trace: str = field(
+        default=None, metadata={"name": "StackTrace", "type": "Element"}
+    )
+
+
+@dataclass
+class TypeFormOfPaymentPnrreference:
+    key: TypeRef = field(
+        default=None,
+        metadata={
+            "name": "Key",
+            "type": "Attribute",
+            "help": "Unique ID to identify a ProviderReservationInfo",
+        },
+    )
+    provider_reservation_level: bool = field(
+        default=true,
+        metadata={
+            "name": "ProviderReservationLevel",
+            "type": "Attribute",
+            "help": "It means that the form of payment is applied at ProviderReservation level.",
+        },
+    )
+
+
+@dataclass
+class TypeGeneralReference:
+    key: TypeRef = field(
+        default=None,
+        metadata={"required": True, "name": "Key", "type": "Attribute"},
+    )
+
+
+@dataclass
+class TypeGuaranteeInformation:
+    """
+    Information pertaining to the payment of type Guarantee.
+    """
+
+    type: str = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "Type",
+            "type": "Attribute",
+            "help": "Guarantee only or Deposit",
+        },
+    )
+    agency_type: str = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "AgencyType",
+            "type": "Attribute",
+            "help": "Guarantee to Agency IATA or Guarantee to Another Agency IATA",
+        },
+    )
+    iatanumber: StringLength1to128 = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "IATANumber",
+            "type": "Attribute",
+            "help": "Payment IATA number. (ie. IATA of Agency or Other Agency)",
+        },
+    )
+
+
+@dataclass
+class TypeKeyBasedReference:
+    """
+    Generic type to be used for Key based reference
+    """
+
+    key: TypeRef = field(
+        default=None,
+        metadata={"required": True, "name": "Key", "type": "Attribute"},
+    )
+
+
+@dataclass
+class TypeKeyword:
+    """
+    A complexType for keyword information.
+    """
+
+    sub_key: List[TypeSubKey] = field(
+        default_factory=list,
+        metadata={
+            "min_occurs": 0,
+            "max_occurs": 99,
+            "name": "SubKey",
+            "type": "Element",
+            "help": "A further breakdown of a keyword.",
+        },
+    )
+    text: List[str] = field(
+        default_factory=list,
+        metadata={
+            "min_occurs": 0,
+            "max_occurs": 999,
+            "name": "Text",
+            "type": "Element",
+            "help": "Information for a keyword.",
+        },
+    )
+    name: str = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "Name",
+            "type": "Attribute",
+            "help": "The keyword name.",
+        },
+    )
+    language_code: Language = field(
+        default=None,
+        metadata={
+            "name": "LanguageCode",
+            "type": "Attribute",
+            "help": "ISO 639 two-character language codes are used to retrieve specific information in the requested language. For Rich Content and Branding, language codes ZH-HANT (Chinese Traditional), ZH-HANS (Chinese Simplified), FR-CA (French Canadian) and PT-BR (Portuguese Brazil) can also be used. For RCH, language codes ENGB, ENUS, DEDE, DECH can also be used. Only certain services support this attribute. Providers: ACH, RCH, 1G, 1V, 1P, 1J.",
+        },
+    )
+
+
+@dataclass
+class TypeNonAirReservationRef:
+    locator_code: TypeLocatorCode = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "LocatorCode",
+            "type": "Attribute",
+        },
+    )
+
+
+@dataclass
+class TypeOtasubKey:
+    """
+    The attributes and elements in a SubKey.
+    """
+
+    text: List[str] = field(
+        default_factory=list,
+        metadata={
+            "min_occurs": 0,
+            "max_occurs": 999,
+            "name": "Text",
+            "type": "Element",
+            "help": "Information for a sub key.",
+        },
+    )
+    name: TypeOtacode = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "Name",
+            "type": "Attribute",
+            "help": 'A subkey to identify the special equipment codes. Applicable when Policy/@Name is EQUIP. Uses OTA CODE "EQP". 1P/1J.',
+        },
+    )
+    description: str = field(
+        default=None,
+        metadata={
+            "name": "Description",
+            "type": "Attribute",
+            "help": "A brief description of a subkey.",
+        },
+    )
+
+
+@dataclass
+class TypeProfileRef:
+    """
+    ProfileEntityID and ProfileLevel together identity a profile entity.
+    """
+
+    profile_entity_id: str = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "ProfileEntityID",
+            "type": "Attribute",
+        },
+    )
+    profile_level: TypeProfileLevel = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "ProfileLevel",
+            "type": "Attribute",
+        },
+    )
+
+
+@dataclass
+class TypeRemark:
+    provider_reservation_info_ref: TypeRef = field(
+        default=None,
+        metadata={
+            "name": "ProviderReservationInfoRef",
+            "type": "Attribute",
+            "help": "Provider reservation reference key.",
+        },
+    )
+    provider_code: TypeProviderCode = field(
+        default=None,
+        metadata={
+            "name": "ProviderCode",
+            "type": "Attribute",
+            "help": "Contains the Provider Code of the provider for which this element is used",
+        },
+    )
+
+
+@dataclass
+class TypeRemarkWithTravelerRef:
+    remark_data: str = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "RemarkData",
+            "type": "Element",
+            "help": "Actual remarks data.",
+        },
+    )
+    booking_traveler_ref: List[TypeRef] = field(
+        default_factory=list,
+        metadata={
+            "min_occurs": 0,
+            "max_occurs": 999,
+            "name": "BookingTravelerRef",
+            "type": "Element",
+            "help": "Reference to Booking Traveler.",
+        },
+    )
+    provider_reservation_info_ref: TypeRef = field(
+        default=None,
+        metadata={
+            "name": "ProviderReservationInfoRef",
+            "type": "Attribute",
+            "help": "Provider reservation reference key.",
+        },
+    )
+    provider_code: TypeProviderCode = field(
+        default=None,
+        metadata={
+            "name": "ProviderCode",
+            "type": "Attribute",
+            "help": "Contains the Provider Code of the provider for which this element is used",
+        },
+    )
+
+
+@dataclass
+class TypeSegmentRef:
+    key: TypeRef = field(
+        default=None,
+        metadata={"required": True, "name": "Key", "type": "Attribute"},
+    )
+
+
+@dataclass
+class TypeTax:
+    amount: TypeMoney = field(
+        default=None, metadata={"name": "Amount", "type": "Attribute"}
+    )
+    code: str = field(
+        default=None, metadata={"name": "Code", "type": "Attribute"}
+    )
+
+
+@dataclass
+class TypeTimeSpec:
+    """
+    Specifies times as either specific times, or a time range
+    """
+
+    time_range: TypeTimeRange = field(
+        default=None, metadata={"name": "TimeRange", "type": "Element"}
+    )
+    specific_time: TypeSpecificTime = field(
+        default=None, metadata={"name": "SpecificTime", "type": "Element"}
+    )
+    preferred_time: str = field(
+        default=None,
+        metadata={
+            "name": "PreferredTime",
+            "type": "Attribute",
+            "help": "Specifies a time that would be preferred within the time range specified.",
+        },
+    )
+
+
+@dataclass
+class TypeTransactionsAllowed(TypeBookingTransactionsAllowed):
+    shopping_enabled: bool = field(
+        default=None,
+        metadata={
+            "name": "ShoppingEnabled",
+            "type": "Attribute",
+            "help": "Allow or prohibit shopping transaction for the given product type on this Provider/Supplier. Inheritable.",
+        },
+    )
+    pricing_enabled: bool = field(
+        default=None,
+        metadata={
+            "name": "PricingEnabled",
+            "type": "Attribute",
+            "help": "Allow or prohibit pricing transaction for the given product type on this Provider/Supplier. Inheritable.",
+        },
+    )
+
+
+@dataclass
+class TypeVendorLocation:
+    provider_code: TypeProviderCode = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "ProviderCode",
+            "type": "Attribute",
+            "help": "The code of the provider (e.g. 1G, 1S)",
+        },
+    )
+    vendor_code: TypeSupplierCode = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "VendorCode",
+            "type": "Attribute",
+            "help": "The code of the vendor (e.g. HZ, etc.)",
+        },
+    )
+    preferred_option: bool = field(
+        default=None,
+        metadata={
+            "name": "PreferredOption",
+            "type": "Attribute",
+            "help": "Preferred Option marker for Location.",
+        },
+    )
+    vendor_location_id: str = field(
+        default=None,
+        metadata={
+            "name": "VendorLocationID",
+            "type": "Attribute",
+            "help": "Location identifier",
+        },
+    )
+    key: TypeRef = field(
+        default=None,
+        metadata={
+            "name": "Key",
+            "type": "Attribute",
+            "help": "Key which maps vendor location with vehicles",
+        },
+    )
+    more_rates_token: str = field(
+        default=None,
+        metadata={
+            "name": "MoreRatesToken",
+            "type": "Attribute",
+            "help": "Enter the Token when provided by hotel property, more rates exist. HADS/HSS support only.",
+        },
+    )
+
+
+@dataclass
+class TypeVoucherInformation:
+    """
+    Information pertaining to the payment of a Vehicle Rental.
+    """
+
+    voucher_type: TypeVoucherType = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "VoucherType",
+            "type": "Attribute",
+            "help": "Specifies if the Voucher is for Full Credit or a Group/Day or a Monetary Amount or RegularVoucher.",
+        },
+    )
+    amount: TypeMoney = field(
+        default=None,
+        metadata={
+            "name": "Amount",
+            "type": "Attribute",
+            "help": "Amount associated with the Voucher.",
+        },
+    )
+    confirmation_number: str = field(
+        default=None,
+        metadata={
+            "name": "ConfirmationNumber",
+            "type": "Attribute",
+            "help": "Confirmation from the vendor for the voucher",
+        },
+    )
+    account_name: str = field(
+        default=None,
+        metadata={
+            "name": "AccountName",
+            "type": "Attribute",
+            "help": "Associated account name for the voucher",
+        },
+    )
+    number: StringLength1to16 = field(
+        default=None,
+        metadata={
+            "name": "Number",
+            "type": "Attribute",
+            "help": 'To advise car associates of the voucher number and store in the car segment. It is required when VoucherType selected as "RegularVoucher" for 1P, 1J only.',
+        },
+    )
+
+
+@dataclass
+class Xmlremark:
+    """
+    A remark container to hold an XML document. (max 1024 chars) This will be encoded with xml encoding.
+    """
+
+    key: TypeRef = field(
+        default=None, metadata={"name": "Key", "type": "Attribute"}
+    )
+    category: str = field(
+        default=None,
+        metadata={
+            "name": "Category",
+            "type": "Attribute",
+            "help": "A category to group and organize the various remarks. This is not required, but it is recommended.",
+        },
+    )
+
+
+@dataclass
+class ActionStatus:
+    """
+    Status of the action that will happen or has happened to the air reservation. One Action status for each provider reservation
+    """
+
+    remark: Remark = field(
+        default=None, metadata={"name": "Remark", "type": "Element"}
+    )
+    type: str = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "Type",
+            "type": "Attribute",
+            "help": "Identifies the type of action (if any) to take on this air reservation. Only TTL, TAU, TAX and TAW can be set by the user.",
+        },
+    )
+    ticket_date: str = field(
+        default=None,
+        metadata={
+            "name": "TicketDate",
+            "type": "Attribute",
+            "help": "Identifies when the action type will happen, or has happened according to the type.",
+        },
+    )
+    key: TypeRef = field(
+        default=None,
+        metadata={
+            "name": "Key",
+            "type": "Attribute",
+            "help": "Identifies when the action type will happen, or has happened according to the type.",
+        },
+    )
+    provider_reservation_info_ref: TypeRef = field(
+        default=None,
+        metadata={
+            "name": "ProviderReservationInfoRef",
+            "type": "Attribute",
+            "help": "Provider reservation reference key.",
+        },
+    )
+    queue_category: TypeNonBlanks = field(
+        default=None,
+        metadata={
+            "name": "QueueCategory",
+            "type": "Attribute",
+            "help": "Add Category placement to ticketing queue (required in 1P - default is 00)",
+        },
+    )
+    airport_code: TypeAirport = field(
+        default=None,
+        metadata={
+            "name": "AirportCode",
+            "type": "Attribute",
+            "help": "Used with Time Limit to specify the airport location where the ticket is to be issued.",
+        },
+    )
+    pseudo_city_code: TypePcc = field(
+        default=None,
+        metadata={
+            "name": "PseudoCityCode",
+            "type": "Attribute",
+            "help": "The Branch PCC in the host system where PNR can be queued for ticketing. When used with TAU it will auto queue to Q10. When used with TAW agent performs manual move to Q.",
+        },
+    )
+    account_code: str = field(
+        default=None,
+        metadata={
+            "name": "AccountCode",
+            "type": "Attribute",
+            "help": "Used with TAW. Used to specify a corporate or in house account code to the PNR as part of ticketing arrangement field.",
+        },
+    )
+
+
+@dataclass
+class AgencyInfo:
+    """
+    Tracks the various agent/agency information
+    """
+
+    agent_action: List[AgentAction] = field(
+        default_factory=list,
+        metadata={
+            "min_occurs": 1,
+            "max_occurs": 999,
+            "name": "AgentAction",
+            "type": "Element",
+        },
+    )
+
+
+@dataclass
+class AirSeatAssignment(SeatAssignment):
+    """
+    Identifies the seat assignment for a passenger.
+    """
+
+    pass
+
+
+@dataclass
+class BookingTravelerInformation:
+    """
+    Booking Traveler information tied to invoice
+    """
+
+    name: Name = field(
+        default=None,
+        metadata={"required": True, "name": "Name", "type": "Element"},
+    )
+    booking_traveler_ref: TypeRef = field(
+        default=None,
+        metadata={
+            "name": "BookingTravelerRef",
+            "type": "Attribute",
+            "help": "A reference to a passenger related to a ticket.",
+        },
+    )
+
+
+@dataclass
+class BookingTravelerRef:
+    """
+    Reference Element for Booking Traveler and Loyalty cards
+    """
+
+    loyalty_card_ref: List[LoyaltyCardRef] = field(
+        default_factory=list,
+        metadata={
+            "min_occurs": 0,
+            "max_occurs": 999,
+            "name": "LoyaltyCardRef",
+            "type": "Element",
+        },
+    )
+    drivers_license_ref: DriversLicenseRef = field(
+        default=None, metadata={"name": "DriversLicenseRef", "type": "Element"}
+    )
+    discount_card_ref: List[DiscountCardRef] = field(
+        default_factory=list,
+        metadata={
+            "min_occurs": 0,
+            "max_occurs": 9,
+            "name": "DiscountCardRef",
+            "type": "Element",
+        },
+    )
+    payment_ref: List[PaymentRef] = field(
+        default_factory=list,
+        metadata={
+            "min_occurs": 0,
+            "max_occurs": 3,
+            "name": "PaymentRef",
+            "type": "Element",
+        },
+    )
+    key: TypeRef = field(
+        default=None, metadata={"name": "Key", "type": "Attribute"}
+    )
+
+
+@dataclass
+class CustomerId(TypeRemark):
+    """
+    A provider reservation field used to store customer information. It may be used to identify reservations which will/will not be available for access.
+    """
+
+    key: TypeRef = field(
+        default=None, metadata={"name": "Key", "type": "Attribute"}
+    )
+
+
+@dataclass
+class Email:
+    """
+    Container for an email address with a type specifier (max 128 chars)
+    """
+
+    provider_reservation_info_ref: List[ProviderReservationInfoRef] = field(
+        default_factory=list,
+        metadata={
+            "min_occurs": 0,
+            "max_occurs": 999,
+            "name": "ProviderReservationInfoRef",
+            "type": "Element",
+            "help": "Tagging provider reservation info with Email.",
+        },
+    )
+    key: TypeRef = field(
+        default=None, metadata={"name": "Key", "type": "Attribute"}
+    )
+    type: TypeEmailType = field(
+        default=None, metadata={"name": "Type", "type": "Attribute"}
+    )
+    comment: TypeEmailComment = field(
+        default=None, metadata={"name": "Comment", "type": "Attribute"}
+    )
+    email_id: str = field(
+        default=None,
+        metadata={"required": True, "name": "EmailID", "type": "Attribute"},
+    )
+
+
+@dataclass
+class HostTokenList:
+    """
+    The shared object list of Host Tokens
+    """
+
+    host_token: List[HostToken] = field(
+        default_factory=list,
+        metadata={
+            "min_occurs": 1,
+            "max_occurs": 999,
+            "name": "HostToken",
+            "type": "Element",
+        },
+    )
+
+
+@dataclass
+class Keyword(TypeKeyword):
+    """
+    Detail information of keywords.
+    """
+
+    pass
+
+
+@dataclass
+class NameRemark:
+    """
+    Text that support Name Remarks.
+    """
+
+    remark_data: str = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "RemarkData",
+            "type": "Element",
+            "help": "Actual remarks data.",
+        },
+    )
+    provider_reservation_info_ref: List[ProviderReservationInfoRef] = field(
+        default_factory=list,
+        metadata={
+            "min_occurs": 0,
+            "max_occurs": 999,
+            "name": "ProviderReservationInfoRef",
+            "type": "Element",
+            "help": "Tagging provider reservation info with NameRemark.",
+        },
+    )
+    key: TypeRef = field(
+        default=None, metadata={"name": "Key", "type": "Attribute"}
+    )
+    category: str = field(
+        default=None,
+        metadata={
+            "name": "Category",
+            "type": "Attribute",
+            "help": "A category to group and organize the various remarks. This is not required, but it is recommended.",
+        },
+    )
+
+
+@dataclass
+class PassengerInfo:
+    """
+    Booking Traveler information tied to invoice
+    """
+
+    name: Name = field(
+        default=None, metadata={"name": "Name", "type": "Element"}
+    )
+    booking_traveler_ref: TypeRef = field(
+        default=None,
+        metadata={
+            "name": "BookingTravelerRef",
+            "type": "Attribute",
+            "help": "A reference to a passenger related to a ticket.",
+        },
+    )
+    passenger_type: TypePtc = field(
+        default=None,
+        metadata={
+            "name": "PassengerType",
+            "type": "Attribute",
+            "help": "Passenger Type Code.",
+        },
+    )
+
+
+@dataclass
+class PassiveInfo:
+    """
+    Used by CreateReservationReq for passing in elements normally found post-booking
+    """
+
+    ticket_number: List[str] = field(
+        default_factory=list,
+        metadata={
+            "min_occurs": 0,
+            "max_occurs": 999,
+            "name": "TicketNumber",
+            "type": "Element",
+        },
+    )
+    confirmation_number: List[str] = field(
+        default_factory=list,
+        metadata={
+            "min_occurs": 0,
+            "max_occurs": 999,
+            "name": "ConfirmationNumber",
+            "type": "Element",
+        },
+    )
+    commission: Commission = field(
+        default=None, metadata={"name": "Commission", "type": "Element"}
+    )
+    provider_code: str = field(
+        default=None, metadata={"name": "ProviderCode", "type": "Attribute"}
+    )
+    provider_locator_code: str = field(
+        default=None,
+        metadata={"name": "ProviderLocatorCode", "type": "Attribute"},
+    )
+    supplier_code: str = field(
+        default=None, metadata={"name": "SupplierCode", "type": "Attribute"}
+    )
+    supplier_locator_code: str = field(
+        default=None,
+        metadata={"name": "SupplierLocatorCode", "type": "Attribute"},
+    )
+
+
+@dataclass
+class PaymentRestriction:
+    card_restriction: List[CardRestriction] = field(
+        default_factory=list,
+        metadata={
+            "min_occurs": 1,
+            "max_occurs": 999,
+            "name": "CardRestriction",
+            "type": "Element",
+        },
+    )
+    address_restriction: AddressRestriction = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "AddressRestriction",
+            "type": "Element",
+        },
+    )
+
+
+@dataclass
+class PermittedProviders:
+    provider: Provider = field(
+        default=None,
+        metadata={"required": True, "name": "Provider", "type": "Element"},
+    )
+
+
+@dataclass
+class PhoneNumber:
+    """
+    Consists of type (office, home, fax), location (city code), the country code, the number, and an extension.
+    """
+
+    provider_reservation_info_ref: List[ProviderReservationInfoRef] = field(
+        default_factory=list,
+        metadata={
+            "min_occurs": 0,
+            "max_occurs": 999,
+            "name": "ProviderReservationInfoRef",
+            "type": "Element",
+        },
+    )
+    key: TypeRef = field(
+        default=None, metadata={"name": "Key", "type": "Attribute"}
+    )
+    type: str = field(
+        default=None, metadata={"name": "Type", "type": "Attribute"}
+    )
+    location: str = field(
+        default=None,
+        metadata={
+            "name": "Location",
+            "type": "Attribute",
+            "help": "IATA code for airport or city",
+        },
+    )
+    country_code: str = field(
+        default=None,
+        metadata={
+            "name": "CountryCode",
+            "type": "Attribute",
+            "help": "Hosts/providers will expect this to be international dialing digits",
+        },
+    )
+    area_code: str = field(
+        default=None, metadata={"name": "AreaCode", "type": "Attribute"}
+    )
+    number: str = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "Number",
+            "type": "Attribute",
+            "help": "The local phone number",
+        },
+    )
+    extension: str = field(
+        default=None, metadata={"name": "Extension", "type": "Attribute"}
+    )
+    text: str = field(
+        default=None, metadata={"name": "Text", "type": "Attribute"}
+    )
+
+
+@dataclass
+class Postscript(TypeRemark):
+    """
+    Postscript Notes
+    """
+
+    key: TypeRef = field(
+        default=None, metadata={"name": "Key", "type": "Attribute"}
+    )
+
+
+@dataclass
+class Segment:
+    """
+    The base segment type
+    """
+
+    segment_remark: List[SegmentRemark] = field(
+        default_factory=list,
+        metadata={
+            "min_occurs": 0,
+            "max_occurs": 999,
+            "name": "SegmentRemark",
+            "type": "Element",
+        },
+    )
+    key: TypeRef = field(
+        default=None,
+        metadata={"required": True, "name": "Key", "type": "Attribute"},
+    )
+    status: str = field(
+        default=None,
+        metadata={
+            "name": "Status",
+            "type": "Attribute",
+            "help": "Status of this segment.",
+        },
+    )
+    passive: bool = field(
+        default=None, metadata={"name": "Passive", "type": "Attribute"}
+    )
+    travel_order: int = field(
+        default=None,
+        metadata={
+            "name": "TravelOrder",
+            "type": "Attribute",
+            "help": "To identify the appropriate travel sequence for Air/Car/Hotel segments/reservations based on travel dates. This ordering is applicable across the UR not provider or traveler specific",
+        },
+    )
+    provider_segment_order: int = field(
+        default=None,
+        metadata={
+            "name": "ProviderSegmentOrder",
+            "type": "Attribute",
+            "help": "To identify the appropriate travel sequence for Air/Car/Hotel/Rail segments/reservations in the provider reservation.",
+        },
+    )
+
+
+@dataclass
+class ServiceData:
+    seat_attributes: SeatAttributes = field(
+        default=None, metadata={"name": "SeatAttributes", "type": "Element"}
+    )
+    cabin_class: CabinClass = field(
+        default=None, metadata={"name": "CabinClass", "type": "Element"}
+    )
+    ssrref: List[TypeKeyBasedReference] = field(
+        default_factory=list,
+        metadata={
+            "min_occurs": 0,
+            "max_occurs": 999,
+            "name": "SSRRef",
+            "type": "Element",
+            "help": "References to the related SSRs. At present, only reference to ASVC SSR is supported. Supported providers are 1G/1V/1P/1J",
+        },
+    )
+    data: str = field(
+        default=None,
+        metadata={
+            "name": "Data",
+            "type": "Attribute",
+            "help": "Data that specifies the details of the merchandising offering (e.g. seat number for seat service)",
+        },
+    )
+    air_segment_ref: TypeRef = field(
+        default=None,
+        metadata={
+            "name": "AirSegmentRef",
+            "type": "Attribute",
+            "help": "Reference to a segment if the merchandising offering only pertains to that segment. If no segment reference is present this means this offering is for the whole itinerary.",
+        },
+    )
+    booking_traveler_ref: TypeRef = field(
+        default=None,
+        metadata={
+            "name": "BookingTravelerRef",
+            "type": "Attribute",
+            "help": "Reference to a passenger if the merchandising offering only pertains to that passenger. If no passenger reference is present this means this offering is for all passengers.",
+        },
+    )
+    stop_over: bool = field(
+        default=false,
+        metadata={
+            "name": "StopOver",
+            "type": "Attribute",
+            "help": "Indicates that there is a significant delay between flights (usually 12 hours or more)",
+        },
+    )
+    traveler_type: TypePtc = field(
+        default=None,
+        metadata={
+            "name": "TravelerType",
+            "type": "Attribute",
+            "help": "Passenger Type Code.",
+        },
+    )
+    emdsummary_ref: TypeRef = field(
+        default=None,
+        metadata={
+            "name": "EMDSummaryRef",
+            "type": "Attribute",
+            "help": "Reference to the corresponding EMD issued. Supported providers are 1G/1V/1P/1J",
+        },
+    )
+    emdcoupon_ref: TypeRef = field(
+        default=None,
+        metadata={
+            "name": "EMDCouponRef",
+            "type": "Attribute",
+            "help": "Reference to the corresponding EMD coupon issued. Supported providers are 1G/1V/1P/1J",
+        },
+    )
+
+
+@dataclass
+class Ssrinfo:
+    """
+    Bundle SSR with BookingTraveler reference in order to add SSR post booking
+    """
+
+    ssr: Ssr = field(
+        default=None,
+        metadata={"required": True, "name": "SSR", "type": "Element"},
+    )
+    booking_traveler_ref: List[TypeRef] = field(
+        default_factory=list,
+        metadata={
+            "min_occurs": 0,
+            "max_occurs": 999,
+            "name": "BookingTravelerRef",
+            "type": "Element",
+            "help": "Reference to Booking Traveler.",
+        },
+    )
+
+
+@dataclass
+class SupplierLocator:
+    """
+    Locator code on the host carrier system
+    """
+
+    segment_ref: List[TypeGeneralReference] = field(
+        default_factory=list,
+        metadata={
+            "min_occurs": 0,
+            "max_occurs": 999,
+            "name": "SegmentRef",
+            "type": "Element",
+            "help": "Air/Passive Segment Reference",
+        },
+    )
+    supplier_code: TypeCarrier = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "SupplierCode",
+            "type": "Attribute",
+            "help": "Carrier Code",
+        },
+    )
+    supplier_locator_code: str = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "SupplierLocatorCode",
+            "type": "Attribute",
+            "help": "Carrier reservation locator code",
+        },
+    )
+    provider_reservation_info_ref: TypeRef = field(
+        default=None,
+        metadata={
+            "name": "ProviderReservationInfoRef",
+            "type": "Attribute",
+            "help": "Provider Reservation reference",
+        },
+    )
+    create_date_time: DateTime = field(
+        default=None,
+        metadata={
+            "name": "CreateDateTime",
+            "type": "Attribute",
+            "help": "The Date and Time which the reservation is received from the Vendor as a SupplierLocator creation Date.",
+        },
+    )
+
+
+@dataclass
+class ThirdPartyInformation:
+    """
+    Third party supplier locator information. Specifically applicable for SDK booking.
+    """
+
+    segment_ref: List[TypeGeneralReference] = field(
+        default_factory=list,
+        metadata={
+            "min_occurs": 0,
+            "max_occurs": 999,
+            "name": "SegmentRef",
+            "type": "Element",
+            "help": "Air/Passive Segment Reference",
+        },
+    )
+    third_party_code: str = field(
+        default=None,
+        metadata={
+            "name": "ThirdPartyCode",
+            "type": "Attribute",
+            "help": "Third party supplier code.",
+        },
+    )
+    third_party_locator_code: str = field(
+        default=None,
+        metadata={
+            "name": "ThirdPartyLocatorCode",
+            "type": "Attribute",
+            "help": "Confirmation number for third party supplier.",
+        },
+    )
+    third_party_name: TypeThirdPartySupplier = field(
+        default=None,
+        metadata={
+            "name": "ThirdPartyName",
+            "type": "Attribute",
+            "help": "Third party supplier name.",
+        },
+    )
+    provider_reservation_info_ref: TypeRef = field(
+        default=None,
+        metadata={
+            "name": "ProviderReservationInfoRef",
+            "type": "Attribute",
+            "help": "Provider Reservation reference",
+        },
+    )
+    key: TypeRef = field(
+        default=None,
+        metadata={
+            "name": "Key",
+            "type": "Attribute",
+            "help": "Unique identifier of the third party supplier. Key can be used to modify or delete saved third party information.",
+        },
+    )
+
+
+@dataclass
+class TransactionType:
+    """
+    Configuration for products by type. Inheritable.
+    """
+
+    air: "Air" = field(
+        default=None, metadata={"name": "Air", "type": "Element"}
+    )
+    hotel: TypeTransactionsAllowed = field(
+        default=None, metadata={"name": "Hotel", "type": "Element"}
+    )
+    rail: TypeTransactionsAllowed = field(
+        default=None, metadata={"name": "Rail", "type": "Element"}
+    )
+    vehicle: TypeTransactionsAllowed = field(
+        default=None, metadata={"name": "Vehicle", "type": "Element"}
+    )
+    passive: TypeBookingTransactionsAllowed = field(
+        default=None,
+        metadata={
+            "name": "Passive",
+            "type": "Element",
+            "help": "For true passive segments such as ground, cruise etc",
+        },
+    )
+    background_passive: TypeBookingTransactionsAllowed = field(
+        default=None,
+        metadata={
+            "name": "BackgroundPassive",
+            "type": "Element",
+            "help": "For behind the scenes or background passives Only",
+        },
+    )
+
+    @dataclass
+    class Air(TypeTransactionsAllowed):
+        one_way_shop: bool = field(
+            default=None,
+            metadata={
+                "name": "OneWayShop",
+                "type": "Attribute",
+                "help": "Allows or prohibits one way shopping functionality for the associated provisioning provider configuration",
+            },
+        )
+        flex_explore: bool = field(
+            default=None,
+            metadata={
+                "name": "FlexExplore",
+                "type": "Attribute",
+                "help": "Allows or prohibits flex explore functionality for the associated provisioning provider configuration",
+            },
+        )
+        rapid_reprice_enabled: bool = field(
+            default=None,
+            metadata={
+                "name": "RapidRepriceEnabled",
+                "type": "Attribute",
+                "help": "Allows or prohibits rapid reprice functionality for the associated provisioning provider configuration. Providers: 1G/1V",
+            },
+        )
+        return_upsell_fare: bool = field(
+            default=None,
+            metadata={
+                "name": "ReturnUpsellFare",
+                "type": "Attribute",
+                "help": "When set to “true”, Upsell information will be returned in the shop response. Provider: 1G, 1V, 1P, 1J, ACH",
+            },
+        )
+
+
+@dataclass
+class TypeAgencyHierarchyLongReference(TypeAgencyHierarchyReference):
+    profile_version: Int = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "ProfileVersion",
+            "type": "Attribute",
+        },
+    )
+    profile_name: str = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "ProfileName",
+            "type": "Attribute",
+            "help": "Initially: Agent: Last, First, Branch: BranchCode, Agency: Name. After new profile implementation: Agent: UserName, others levels: Name.",
+        },
+    )
+
+
+@dataclass
+class TypeAssociatedRemark(TypeRemarkWithTravelerRef):
+    """
+    A textual remark container to hold Associated itinerary remarks
+    """
+
+    key: TypeRef = field(
+        default=None, metadata={"name": "Key", "type": "Attribute"}
+    )
+
+
+@dataclass
+class TypeFeeInfo:
+    """
+    A generic type of fee for those charges which are incurred by the passenger, but not necessarily shown on tickets
+    """
+
+    tax_info_ref: List["TaxInfoRef"] = field(
+        default_factory=list,
+        metadata={
+            "min_occurs": 0,
+            "max_occurs": 999,
+            "name": "TaxInfoRef",
+            "type": "Element",
+            "help": "This reference elements will associate relevant taxes to this fee",
+        },
+    )
+    included_in_base: IncludedInBase = field(
+        default=None, metadata={"name": "IncludedInBase", "type": "Element"}
+    )
+    base_amount: TypeMoney = field(
+        default=None, metadata={"name": "BaseAmount", "type": "Attribute"}
+    )
+    description: str = field(
+        default=None, metadata={"name": "Description", "type": "Attribute"}
+    )
+    sub_code: str = field(
+        default=None, metadata={"name": "SubCode", "type": "Attribute"}
+    )
+    key: TypeRef = field(
+        default=None,
+        metadata={"required": True, "name": "Key", "type": "Attribute"},
+    )
+    amount: TypeMoney = field(
+        default=None,
+        metadata={"required": True, "name": "Amount", "type": "Attribute"},
+    )
+    code: str = field(
+        default=None,
+        metadata={"required": True, "name": "Code", "type": "Attribute"},
+    )
+    fee_token: str = field(
+        default=None, metadata={"name": "FeeToken", "type": "Attribute"}
+    )
+    payment_ref: TypeRef = field(
+        default=None,
+        metadata={
+            "name": "PaymentRef",
+            "type": "Attribute",
+            "help": "The reference to the one of the air reservation payments if fee included in charge",
+        },
+    )
+    booking_traveler_ref: TypeRef = field(
+        default=None,
+        metadata={
+            "name": "BookingTravelerRef",
+            "type": "Attribute",
+            "help": "Reference to booking traveler",
+        },
+    )
+    passenger_type_code: TypePtc = field(
+        default=None,
+        metadata={"name": "PassengerTypeCode", "type": "Attribute"},
+    )
+    text: StringLength1to64 = field(
+        default=None,
+        metadata={
+            "name": "Text",
+            "type": "Attribute",
+            "help": "Additional Information returned from Supplier.(ACH only)",
+        },
+    )
+
+    @dataclass
+    class TaxInfoRef:
+        key: TypeRef = field(
+            default=None,
+            metadata={"required": True, "name": "Key", "type": "Attribute"},
+        )
+
+
+@dataclass
+class TypeFlexibleTimeSpec(TypeTimeSpec):
+    """
+    A type which can be used for flexible date/time specification -extends the generic type typeTimeSpec to provide extra options for search.
+    """
+
+    search_extra_days: "SearchExtraDays" = field(
+        default=None,
+        metadata={
+            "name": "SearchExtraDays",
+            "type": "Element",
+            "help": "Options to search for extra days on top of the specified date",
+        },
+    )
+
+    @dataclass
+    class SearchExtraDays:
+        days_before: Int = field(
+            default=None,
+            metadata={
+                "name": "DaysBefore",
+                "type": "Attribute",
+                "help": "Number of days to search before the specified date",
+            },
+        )
+        days_after: Int = field(
+            default=None,
+            metadata={
+                "name": "DaysAfter",
+                "type": "Attribute",
+                "help": "Number of days to search after the specified date",
+            },
+        )
+
+
+@dataclass
+class TypeLocation:
+    airport: Airport = field(
+        default=None, metadata={"name": "Airport", "type": "Element"}
+    )
+    city: City = field(
+        default=None, metadata={"name": "City", "type": "Element"}
+    )
+    city_or_airport: CityOrAirport = field(
+        default=None, metadata={"name": "CityOrAirport", "type": "Element"}
+    )
+
+
+@dataclass
+class TypeOtakeyword:
+    """
+    A complexType for keyword information.
+    """
+
+    sub_key: List[TypeOtasubKey] = field(
+        default_factory=list,
+        metadata={
+            "min_occurs": 0,
+            "max_occurs": 99,
+            "name": "SubKey",
+            "type": "Element",
+            "help": "A further breakdown of a keyword.",
+        },
+    )
+    text: List[str] = field(
+        default_factory=list,
+        metadata={
+            "min_occurs": 0,
+            "max_occurs": 999,
+            "name": "Text",
+            "type": "Element",
+            "help": "Information for a keyword.",
+        },
+    )
+    name: str = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "Name",
+            "type": "Attribute",
+            "help": "The keyword name.",
+        },
+    )
+
+
+@dataclass
+class TypeProviderReservationSpecificInfo:
+    operated_by: List[OperatedBy] = field(
+        default_factory=list,
+        metadata={
+            "min_occurs": 0,
+            "max_occurs": 999,
+            "name": "OperatedBy",
+            "type": "Element",
+            "help": "Cross accrual carrier info",
+        },
+    )
+    provider_reservation_info_ref: ProviderReservationInfoRef = field(
+        default=None,
+        metadata={
+            "name": "ProviderReservationInfoRef",
+            "type": "Element",
+            "help": "Tagging provider reservation info with LoyaltyCard.",
+        },
+    )
+    provider_reservation_level: bool = field(
+        default=None,
+        metadata={
+            "name": "ProviderReservationLevel",
+            "type": "Attribute",
+            "help": "If true means Loyalty card is applied at ProviderReservation level.",
+        },
+    )
+    reservation_level: bool = field(
+        default=None,
+        metadata={
+            "name": "ReservationLevel",
+            "type": "Attribute",
+            "help": "If true means Loyalty card is applied at Universal Record Reservation level e.g. Hotel Reservation, Vehicle Reservation etc.",
+        },
+    )
+
+
+@dataclass
+class TypeSearchLocation:
+    distance: Distance = field(
+        default=None, metadata={"name": "Distance", "type": "Element"}
+    )
+    airport: Airport = field(
+        default=None, metadata={"name": "Airport", "type": "Element"}
+    )
+    city: City = field(
+        default=None, metadata={"name": "City", "type": "Element"}
+    )
+    city_or_airport: CityOrAirport = field(
+        default=None, metadata={"name": "CityOrAirport", "type": "Element"}
+    )
+    coordinate_location: CoordinateLocation = field(
+        default=None,
+        metadata={"name": "CoordinateLocation", "type": "Element"},
+    )
+    rail_location: RailLocation = field(
+        default=None, metadata={"name": "RailLocation", "type": "Element"}
+    )
+
+
+@dataclass
+class TypeStructuredAddress:
+    """
+    A fully structured address
+    """
+
+    state: State = field(
+        default=None,
+        metadata={
+            "name": "State",
+            "type": "Element",
+            "help": "The State or Province of address requested, e.g. CA, Ontario.",
+        },
+    )
+    provider_reservation_info_ref: List[ProviderReservationInfoRef] = field(
+        default_factory=list,
+        metadata={
+            "min_occurs": 0,
+            "max_occurs": 99,
+            "name": "ProviderReservationInfoRef",
+            "type": "Element",
+            "help": "Tagging provider reservation info with Address.",
+        },
+    )
+    key: TypeRef = field(
+        default=None,
+        metadata={
+            "name": "Key",
+            "type": "Attribute",
+            "help": "Key for update/delete of the element",
+        },
+    )
+
+
+@dataclass
+class TypeTaxInfo:
+    tax_detail: List[TaxDetail] = field(
+        default_factory=list,
+        metadata={
+            "min_occurs": 0,
+            "max_occurs": 999,
+            "name": "TaxDetail",
+            "type": "Element",
+        },
+    )
+    included_in_base: IncludedInBase = field(
+        default=None, metadata={"name": "IncludedInBase", "type": "Element"}
+    )
+    key: TypeRef = field(
+        default=None,
+        metadata={
+            "name": "Key",
+            "type": "Attribute",
+            "help": "The tax key represents a valid key of tax",
+        },
+    )
+    category: str = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "Category",
+            "type": "Attribute",
+            "help": "The tax category represents a valid IATA tax code.",
+        },
+    )
+    carrier_defined_category: str = field(
+        default=None,
+        metadata={
+            "name": "CarrierDefinedCategory",
+            "type": "Attribute",
+            "help": 'Optional category, where a carrier has used a non-standard IATA tax category. The tax category will be set to "DU"',
+        },
+    )
+    segment_ref: TypeRef = field(
+        default=None,
+        metadata={
+            "name": "SegmentRef",
+            "type": "Attribute",
+            "help": "The segment to which that tax is relative (if applicable)",
+        },
+    )
+    flight_details_ref: TypeRef = field(
+        default=None,
+        metadata={
+            "name": "FlightDetailsRef",
+            "type": "Attribute",
+            "help": "The flight details that this tax is relative to (if applicable)",
+        },
+    )
+    coupon_ref: TypeRef = field(
+        default=None,
+        metadata={
+            "name": "CouponRef",
+            "type": "Attribute",
+            "help": "The coupon to which that tax is relative (if applicable)",
+        },
+    )
+    tax_exempted: bool = field(
+        default=None,
+        metadata={
+            "name": "TaxExempted",
+            "type": "Attribute",
+            "help": "This indicates whether the tax specified by tax category is exempted.",
+        },
+    )
+    provider_code: TypeProviderCode = field(
+        default=None,
+        metadata={
+            "name": "ProviderCode",
+            "type": "Attribute",
+            "help": "Code of the provider returning this TaxInfo.",
+        },
+    )
+    supplier_code: TypeSupplierCode = field(
+        default=None,
+        metadata={
+            "name": "SupplierCode",
+            "type": "Attribute",
+            "help": "Code of the supplier returning this TaxInfo.",
+        },
+    )
+    text: StringLength1to128 = field(
+        default=None,
+        metadata={
+            "name": "Text",
+            "type": "Attribute",
+            "help": "Additional Information returned from Supplier.(ACH only)",
+        },
+    )
+
+
+@dataclass
+class UnassociatedRemark(TypeRemarkWithTravelerRef):
+    """
+    A textual remark container to hold non-associated itinerary remarks
+    """
+
+    key: TypeRef = field(
+        default=None, metadata={"name": "Key", "type": "Attribute"}
+    )
+
+
+@dataclass
+class VendorLocation(TypeVendorLocation):
+    """
+    Location definition specific to a Vendor in a specific provider (e.g. 1G) system.
+    """
+
+    pass
+
+
+@dataclass
+class AccountInformation:
+    """
+    Account Information required for File Finishing
+    """
+
+    address: TypeStructuredAddress = field(
+        default=None, metadata={"name": "Address", "type": "Element"}
+    )
+    phone_number: List[PhoneNumber] = field(
+        default_factory=list,
+        metadata={
+            "min_occurs": 0,
+            "max_occurs": 999,
+            "name": "PhoneNumber",
+            "type": "Element",
+        },
+    )
+    account_name: str = field(
+        default=None, metadata={"name": "AccountName", "type": "Attribute"}
+    )
+
+
+@dataclass
+class AgencyContactInfo:
+    """
+    Generic agency contact information container. It must contain at least one phone number to be used by an agency
+    """
+
+    phone_number: List[PhoneNumber] = field(
+        default_factory=list,
+        metadata={
+            "min_occurs": 1,
+            "max_occurs": 999,
+            "name": "PhoneNumber",
+            "type": "Element",
+        },
+    )
+    key: TypeRef = field(
+        default=None, metadata={"name": "Key", "type": "Attribute"}
+    )
+
+
+@dataclass
+class AgencyInformation:
+    """
+    Agency Information required for File Finishing
+    """
+
+    address: TypeStructuredAddress = field(
+        default=None, metadata={"name": "Address", "type": "Element"}
+    )
+    email: List[Email] = field(
+        default_factory=list,
+        metadata={
+            "min_occurs": 0,
+            "max_occurs": 999,
+            "name": "Email",
+            "type": "Element",
+        },
+    )
+    phone_number: List[PhoneNumber] = field(
+        default_factory=list,
+        metadata={
+            "min_occurs": 0,
+            "max_occurs": 999,
+            "name": "PhoneNumber",
+            "type": "Element",
+        },
+    )
+
+
+@dataclass
+class AirExchangeInfo:
+    """
+    Provides results of a exchange quote
+    """
+
+    total_penalty_tax_info: "TotalPenaltyTaxInfo" = field(
+        default=None,
+        metadata={"name": "TotalPenaltyTaxInfo", "type": "Element"},
+    )
+    paid_tax: List[TypeTax] = field(
+        default_factory=list,
+        metadata={
+            "min_occurs": 0,
+            "max_occurs": 999,
+            "name": "PaidTax",
+            "type": "Element",
+        },
+    )
+    ticket_fee_info: List["TicketFeeInfo"] = field(
+        default_factory=list,
+        metadata={
+            "min_occurs": 0,
+            "max_occurs": 999,
+            "name": "TicketFeeInfo",
+            "type": "Element",
+            "help": "Used for rapid reprice. Providers: 1G/1V/1P/1S/1A",
+        },
+    )
+    reason: List[str] = field(
+        default_factory=list,
+        metadata={
+            "min_occurs": 0,
+            "max_occurs": 999,
+            "name": "Reason",
+            "type": "Element",
+            "help": "Used for rapid reprice. The reason code or text is returned if the PricingTag is not equal to A, and explains why A was not returned. Providers: 1G/1V/1P/1S/1A",
+        },
+    )
+    fee_info: List[TypeFeeInfo] = field(
+        default_factory=list,
+        metadata={
+            "min_occurs": 0,
+            "max_occurs": 999,
+            "name": "FeeInfo",
+            "type": "Element",
+        },
+    )
+    tax_info: List[TypeTaxInfo] = field(
+        default_factory=list,
+        metadata={
+            "min_occurs": 0,
+            "max_occurs": 999,
+            "name": "TaxInfo",
+            "type": "Element",
+            "help": "Itinerary level taxes",
+        },
+    )
+    exchange_amount: TypeMoney = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "ExchangeAmount",
+            "type": "Attribute",
+        },
+    )
+    base_fare: TypeMoney = field(
+        default=None, metadata={"name": "BaseFare", "type": "Attribute"}
+    )
+    equivalent_base_fare: TypeMoney = field(
+        default=None,
+        metadata={"name": "EquivalentBaseFare", "type": "Attribute"},
+    )
+    taxes: TypeMoney = field(
+        default=None, metadata={"name": "Taxes", "type": "Attribute"}
+    )
+    change_fee: TypeMoney = field(
+        default=None, metadata={"name": "ChangeFee", "type": "Attribute"}
+    )
+    forfeit_amount: TypeMoney = field(
+        default=None, metadata={"name": "ForfeitAmount", "type": "Attribute"}
+    )
+    refundable: bool = field(
+        default=None, metadata={"name": "Refundable", "type": "Attribute"}
+    )
+    exchangeable: bool = field(
+        default=None, metadata={"name": "Exchangeable", "type": "Attribute"}
+    )
+    first_class_upgrade: bool = field(
+        default=None,
+        metadata={"name": "FirstClassUpgrade", "type": "Attribute"},
+    )
+    ticket_by_date: str = field(
+        default=None, metadata={"name": "TicketByDate", "type": "Attribute"}
+    )
+    pricing_tag: str = field(
+        default=None, metadata={"name": "PricingTag", "type": "Attribute"}
+    )
+    equivalent_change_fee: TypeMoney = field(
+        default=None,
+        metadata={"name": "EquivalentChangeFee", "type": "Attribute"},
+    )
+    equivalent_exchange_amount: TypeMoney = field(
+        default=None,
+        metadata={"name": "EquivalentExchangeAmount", "type": "Attribute"},
+    )
+    add_collection: TypeMoney = field(
+        default=None, metadata={"name": "AddCollection", "type": "Attribute"}
+    )
+    residual_value: TypeMoney = field(
+        default=None, metadata={"name": "ResidualValue", "type": "Attribute"}
+    )
+    total_residual_value: TypeMoney = field(
+        default=None,
+        metadata={"name": "TotalResidualValue", "type": "Attribute"},
+    )
+    original_flight_value: TypeMoney = field(
+        default=None,
+        metadata={"name": "OriginalFlightValue", "type": "Attribute"},
+    )
+    flown_segment_value: TypeMoney = field(
+        default=None,
+        metadata={"name": "FlownSegmentValue", "type": "Attribute"},
+    )
+    bulk_ticket_advisory: bool = field(
+        default=None,
+        metadata={"name": "BulkTicketAdvisory", "type": "Attribute"},
+    )
+    fare_pull: TypeFarePull = field(
+        default=None, metadata={"name": "FarePull", "type": "Attribute"}
+    )
+    passenger_type_code: TypePtc = field(
+        default=None,
+        metadata={"name": "PassengerTypeCode", "type": "Attribute"},
+    )
+    passenger_count: int = field(
+        default=None, metadata={"name": "PassengerCount", "type": "Attribute"}
+    )
+    form_of_refund: TypeFormOfRefund = field(
+        default=None,
+        metadata={
+            "name": "FormOfRefund",
+            "type": "Attribute",
+            "help": "How the refund will be issued. Values will be MCO or FormOfPayment",
+        },
+    )
+    refund: TypeMoney = field(
+        default=None,
+        metadata={
+            "name": "Refund",
+            "type": "Attribute",
+            "help": "Total refund amount.",
+        },
+    )
+
+    @dataclass
+    class TicketFeeInfo:
+        base: TypeMoney = field(
+            default=None, metadata={"name": "Base", "type": "Attribute"}
+        )
+        tax: TypeMoney = field(
+            default=None, metadata={"name": "Tax", "type": "Attribute"}
+        )
+        total: TypeMoney = field(
+            default=None, metadata={"name": "Total", "type": "Attribute"}
+        )
+
+    @dataclass
+    class TotalPenaltyTaxInfo:
+        penalty_tax_info: List[TypeTax] = field(
+            default_factory=list,
+            metadata={
+                "min_occurs": 0,
+                "max_occurs": 999,
+                "name": "PenaltyTaxInfo",
+                "type": "Element",
+            },
+        )
+        total_penalty_tax: TypeMoney = field(
+            default=None,
+            metadata={"name": "TotalPenaltyTax", "type": "Attribute"},
+        )
+
+
+@dataclass
+class Apiprovider:
+    transaction_type: TransactionType = field(
+        default=None, metadata={"name": "TransactionType", "type": "Element"}
+    )
+    available_pseudo_city_code: List["AvailablePseudoCityCode"] = field(
+        default_factory=list,
+        metadata={
+            "min_occurs": 0,
+            "max_occurs": 999,
+            "name": "AvailablePseudoCityCode",
+            "type": "Element",
+        },
+    )
+    provider_code: TypeProviderCode = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "ProviderCode",
+            "type": "Attribute",
+            "help": "The Provider Code of the host",
+        },
+    )
+    supplier_code: TypeSupplierCode = field(
+        default=None,
+        metadata={
+            "name": "SupplierCode",
+            "type": "Attribute",
+            "help": "The Supplier Code of the host",
+        },
+    )
+    iatacode: TypeIata = field(
+        default=None,
+        metadata={
+            "name": "IATACode",
+            "type": "Attribute",
+            "help": "Agency IATA or ARC code, used as an ID with airlines.",
+        },
+    )
+
+    @dataclass
+    class AvailablePseudoCityCode:
+        pseudo_city_code: TypePcc = field(
+            default=None,
+            metadata={
+                "name": "PseudoCityCode",
+                "type": "Attribute",
+                "help": "The PseudoCityCode used to connect to the host.",
+            },
+        )
+
+
+@dataclass
+class BaseReservation:
+    accounting_remark: List[AccountingRemark] = field(
+        default_factory=list,
+        metadata={
+            "min_occurs": 0,
+            "max_occurs": 999,
+            "name": "AccountingRemark",
+            "type": "Element",
+        },
+    )
+    general_remark: List[GeneralRemark] = field(
+        default_factory=list,
+        metadata={
+            "min_occurs": 0,
+            "max_occurs": 999,
+            "name": "GeneralRemark",
+            "type": "Element",
+        },
+    )
+    restriction: List[Restriction] = field(
+        default_factory=list,
+        metadata={
+            "min_occurs": 0,
+            "max_occurs": 999,
+            "name": "Restriction",
+            "type": "Element",
+        },
+    )
+    passive_info: PassiveInfo = field(
+        default=None, metadata={"name": "PassiveInfo", "type": "Element"}
+    )
+    locator_code: TypeLocatorCode = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "LocatorCode",
+            "type": "Attribute",
+            "help": "The unique identifier for this reservation. If this is this View Only UR LocatorCode is '999999'.",
+        },
+    )
+    create_date: str = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "CreateDate",
+            "type": "Attribute",
+            "help": "The date and time that this reservation was created.",
+        },
+    )
+    modified_date: str = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "ModifiedDate",
+            "type": "Attribute",
+            "help": "The date and time that this reservation was last modified for any reason.",
+        },
+    )
+    customer_number: str = field(
+        default=None, metadata={"name": "CustomerNumber", "type": "Attribute"}
+    )
+
+
+@dataclass
+class BookingTraveler:
+    """
+    A traveler and all their accompanying data.
+    """
+
+    ssr: List[Ssr] = field(
+        default_factory=list,
+        metadata={
+            "min_occurs": 0,
+            "max_occurs": 999,
+            "name": "SSR",
+            "type": "Element",
+        },
+    )
+    name_remark: List[NameRemark] = field(
+        default_factory=list,
+        metadata={
+            "min_occurs": 0,
+            "max_occurs": 999,
+            "name": "NameRemark",
+            "type": "Element",
+        },
+    )
+    air_seat_assignment: List[AirSeatAssignment] = field(
+        default_factory=list,
+        metadata={
+            "min_occurs": 0,
+            "max_occurs": 999,
+            "name": "AirSeatAssignment",
+            "type": "Element",
+        },
+    )
+    rail_seat_assignment: List[RailSeatAssignment] = field(
+        default_factory=list,
+        metadata={
+            "min_occurs": 0,
+            "max_occurs": 999,
+            "name": "RailSeatAssignment",
+            "type": "Element",
+        },
+    )
+    name_number: str = field(
+        default=None,
+        metadata={
+            "name": "NameNumber",
+            "type": "Attribute",
+            "help": "Host Name Number",
+        },
+    )
+
+
+@dataclass
+class ConnectionPoint(TypeLocation):
+    """
+    A connection point can be eith an IATA airport or cir city code.
+    """
+
+    pass
+
+
+@dataclass
+class DeliveryInfo:
+    """
+    Container to encapsulate all delivery related information
+    """
+
+    shipping_address: "ShippingAddress" = field(
+        default=None, metadata={"name": "ShippingAddress", "type": "Element"}
+    )
+    phone_number: PhoneNumber = field(
+        default=None, metadata={"name": "PhoneNumber", "type": "Element"}
+    )
+    email: Email = field(
+        default=None, metadata={"name": "Email", "type": "Element"}
+    )
+    general_remark: List[GeneralRemark] = field(
+        default_factory=list,
+        metadata={
+            "min_occurs": 0,
+            "max_occurs": 999,
+            "name": "GeneralRemark",
+            "type": "Element",
+        },
+    )
+    provider_reservation_info_ref: List[ProviderReservationInfoRef] = field(
+        default_factory=list,
+        metadata={
+            "min_occurs": 0,
+            "max_occurs": 999,
+            "name": "ProviderReservationInfoRef",
+            "type": "Element",
+            "help": "Tagging provider reservation info with Delivery Info.",
+        },
+    )
+    type: str = field(
+        default=None,
+        metadata={
+            "name": "Type",
+            "type": "Attribute",
+            "help": "An arbitrary identifier to categorize this delivery info",
+        },
+    )
+    signature_required: str = field(
+        default=None,
+        metadata={
+            "name": "SignatureRequired",
+            "type": "Attribute",
+            "help": "Indicates whether a signature shoud be required in order to make the delivery.",
+        },
+    )
+    tracking_number: str = field(
+        default=None,
+        metadata={
+            "name": "TrackingNumber",
+            "type": "Attribute",
+            "help": "The tracking number of the shipping company making the delivery.",
+        },
+    )
+
+    @dataclass
+    class ShippingAddress(TypeStructuredAddress):
+        pass
+
+
+@dataclass
+class InvoiceData:
+    """
+    List of invoices only for 1G/1V
+    """
+
+    booking_traveler_information: List[BookingTravelerInformation] = field(
+        default_factory=list,
+        metadata={
+            "min_occurs": 1,
+            "max_occurs": 9,
+            "name": "BookingTravelerInformation",
+            "type": "Element",
+        },
+    )
+    key: TypeRef = field(
+        default=None, metadata={"name": "Key", "type": "Attribute"}
+    )
+    invoice_number: str = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "InvoiceNumber",
+            "type": "Attribute",
+            "help": "Invoice number",
+        },
+    )
+    issue_date: DateTime = field(
+        default=None,
+        metadata={
+            "name": "IssueDate",
+            "type": "Attribute",
+            "help": "Invoice issue date",
+        },
+    )
+    provider_reservation_info_ref: TypeRef = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "ProviderReservationInfoRef",
+            "type": "Attribute",
+            "help": "Provider reservation reference key.",
+        },
+    )
+
+
+@dataclass
+class InvoiceRemark(TypeAssociatedRemark):
+    air_segment_ref: TypeSegmentRef = field(
+        default=None,
+        metadata={
+            "name": "AirSegmentRef",
+            "type": "Element",
+            "help": "Reference to AirSegment from an Air Reservation.",
+        },
+    )
+    hotel_reservation_ref: TypeNonAirReservationRef = field(
+        default=None,
+        metadata={
+            "name": "HotelReservationRef",
+            "type": "Element",
+            "help": "Specify the locator code of Hotel reservation.",
+        },
+    )
+    vehicle_reservation_ref: TypeNonAirReservationRef = field(
+        default=None,
+        metadata={
+            "name": "VehicleReservationRef",
+            "type": "Element",
+            "help": "Specify the locator code of Vehicle reservation.",
+        },
+    )
+    passive_segment_ref: TypeSegmentRef = field(
+        default=None,
+        metadata={
+            "name": "PassiveSegmentRef",
+            "type": "Element",
+            "help": "Reference to PassiveSegment from a Passive Reservation.",
+        },
+    )
+
+
+@dataclass
+class LocationAddress(TypeStructuredAddress):
+    pass
+
+
+@dataclass
+class LoyaltyCard:
+    """
+    Provider loyalty card information
+    """
+
+    provider_reservation_specific_info: List[
+        TypeProviderReservationSpecificInfo
+    ] = field(
+        default_factory=list,
+        metadata={
+            "min_occurs": 0,
+            "max_occurs": 999,
+            "name": "ProviderReservationSpecificInfo",
+            "type": "Element",
+        },
+    )
+    card_number: TypeCardNumber = field(
+        default=None,
+        metadata={"required": True, "name": "CardNumber", "type": "Attribute"},
+    )
+    status: str = field(
+        default=None, metadata={"name": "Status", "type": "Attribute"}
+    )
+    membership_status: str = field(
+        default=None,
+        metadata={"name": "MembershipStatus", "type": "Attribute"},
+    )
+    free_text: str = field(
+        default=None, metadata={"name": "FreeText", "type": "Attribute"}
+    )
+    supplier_type: TypeProduct = field(
+        default=None, metadata={"name": "SupplierType", "type": "Attribute"}
+    )
+    level: str = field(
+        default=None, metadata={"name": "Level", "type": "Attribute"}
+    )
+    priority_code: TypePriorityCode = field(
+        default=None, metadata={"name": "PriorityCode", "type": "Attribute"}
+    )
+    vendor_location_ref: str = field(
+        default=None,
+        metadata={"name": "VendorLocationRef", "type": "Attribute"},
+    )
+
+
+@dataclass
+class Mcoinformation:
+    passenger_info: List[PassengerInfo] = field(
+        default_factory=list,
+        metadata={
+            "min_occurs": 0,
+            "max_occurs": 999,
+            "name": "PassengerInfo",
+            "type": "Element",
+        },
+    )
+    mconumber: str = field(
+        default=None,
+        metadata={
+            "name": "MCONumber",
+            "type": "Attribute",
+            "help": "The unique MCO number",
+        },
+    )
+    status: str = field(
+        default=None,
+        metadata={
+            "name": "Status",
+            "type": "Attribute",
+            "help": "Current status of the MCO",
+        },
+    )
+    mcotype: str = field(
+        default=None,
+        metadata={
+            "name": "MCOType",
+            "type": "Attribute",
+            "help": "The Type of MCO. Once of Agency Fee, Airline Service Fee, or Residual value from an Exchange.",
+        },
+    )
+
+
+@dataclass
+class McopriceData:
+    tax_info: List[TypeTaxInfo] = field(
+        default_factory=list,
+        metadata={
+            "min_occurs": 0,
+            "max_occurs": 999,
+            "name": "TaxInfo",
+            "type": "Element",
+        },
+    )
+    commission: "Commission" = field(
+        default=None, metadata={"name": "Commission", "type": "Element"}
+    )
+    mcoamount: TypeMoney = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "MCOAmount",
+            "type": "Attribute",
+            "help": "The total value of the MCO including any processing fees.",
+        },
+    )
+    mcoequivalent_fare: TypeMoney = field(
+        default=None,
+        metadata={
+            "name": "MCOEquivalentFare",
+            "type": "Attribute",
+            "help": "Exchange value of the currency actually collected.",
+        },
+    )
+    mcototal_amount: TypeMoney = field(
+        default=None,
+        metadata={
+            "name": "MCOTotalAmount",
+            "type": "Attribute",
+            "help": "The Total amount for the MCO.",
+        },
+    )
+
+    @dataclass
+    class Commission:
+        pass
+
+
+@dataclass
+class ReservationName:
+    """
+    Container to represent reservation name as appears in GDS booking
+    """
+
+    booking_traveler_ref: BookingTravelerRef = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "BookingTravelerRef",
+            "type": "Element",
+        },
+    )
+    name_override: NameOverride = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "NameOverride",
+            "type": "Element",
+            "help": "To be used if the reservation name is other than booking travelers in the PNR",
+        },
+    )
+
+
+@dataclass
+class TravelSegment(Segment):
+    """
+    Generic segment used to provide travel information that was not processed by the system
+    """
+
+    origin: TypeIatacode = field(
+        default=None,
+        metadata={
+            "name": "Origin",
+            "type": "Attribute",
+            "help": "The IATA location code for this origination of this entity.",
+        },
+    )
+    destination: TypeIatacode = field(
+        default=None,
+        metadata={
+            "name": "Destination",
+            "type": "Attribute",
+            "help": "The IATA location code for this destination of this entity.",
+        },
+    )
+    departure_time: str = field(
+        default=None,
+        metadata={
+            "name": "DepartureTime",
+            "type": "Attribute",
+            "help": "The date and time at which this entity departs. This does not include time zone information since it can be derived from the origin location.",
+        },
+    )
+    arrival_time: str = field(
+        default=None, metadata={"name": "ArrivalTime", "type": "Attribute"}
+    )
+
+
+@dataclass
+class TypeAssociatedRemarkWithSegmentRef(TypeAssociatedRemark):
+    """
+    A textual remark container to hold Associated itinerary remarks with segment association
+    """
+
+    segment_ref: TypeRef = field(
+        default=None,
+        metadata={
+            "name": "SegmentRef",
+            "type": "Attribute",
+            "help": "Reference to an Air/Passive Segment",
+        },
+    )
+
+
+@dataclass
+class TypePaymentCard:
+    """
+    Container for all credit and debit card information.
+    """
+
+    phone_number: PhoneNumber = field(
+        default=None, metadata={"name": "PhoneNumber", "type": "Element"}
+    )
+    billing_address: TypeStructuredAddress = field(
+        default=None,
+        metadata={
+            "name": "BillingAddress",
+            "type": "Element",
+            "help": "The address to where the billing statements for this card are sent. Used for address verification purposes.",
+        },
+    )
+    type: TypeCardMerchantType = field(
+        default=None,
+        metadata={
+            "name": "Type",
+            "type": "Attribute",
+            "help": "The 2 letter credit/ debit card type.",
+        },
+    )
+    number: TypeCreditCardNumber = field(
+        default=None, metadata={"name": "Number", "type": "Attribute"}
+    )
+    exp_date: GYearMonth = field(
+        default=None,
+        metadata={
+            "name": "ExpDate",
+            "type": "Attribute",
+            "help": "The Expiration date of this card in YYYY-MM format.",
+        },
+    )
+    name: str = field(
+        default=None,
+        metadata={
+            "name": "Name",
+            "type": "Attribute",
+            "help": "The name as it appears on the card.",
+        },
+    )
+    cvv: str = field(
+        default=None,
+        metadata={
+            "name": "CVV",
+            "type": "Attribute",
+            "help": "Card Verification Code",
+        },
+    )
+    approval_code: str = field(
+        default=None,
+        metadata={
+            "name": "ApprovalCode",
+            "type": "Attribute",
+            "help": "This code is required for an authorization process from the Credit Card company directly,required for some of the CCH carriers.This attribute is also used for EMD retrieve and issuance transactions.",
+        },
+    )
+
+
+@dataclass
+class BookingTravelerInfo:
+    """
+    Container that will allow modifying Universal record data that is not product specific.
+    """
+
+    booking_traveler_name: BookingTravelerName = field(
+        default=None,
+        metadata={"name": "BookingTravelerName", "type": "Element"},
+    )
+    name_remark: NameRemark = field(
+        default=None, metadata={"name": "NameRemark", "type": "Element"}
+    )
+    dob: str = field(
+        default=None,
+        metadata={
+            "name": "DOB",
+            "type": "Element",
+            "help": "Traveler Date of Birth",
+        },
+    )
+    travel_info: TravelInfo = field(
+        default=None, metadata={"name": "TravelInfo", "type": "Element"}
+    )
+    email: Email = field(
+        default=None, metadata={"name": "Email", "type": "Element"}
+    )
+    phone_number: PhoneNumber = field(
+        default=None, metadata={"name": "PhoneNumber", "type": "Element"}
+    )
+    address: TypeStructuredAddress = field(
+        default=None, metadata={"name": "Address", "type": "Element"}
+    )
+    emergency_info: str = field(
+        default=None, metadata={"name": "EmergencyInfo", "type": "Element"}
+    )
+    delivery_info: DeliveryInfo = field(
+        default=None, metadata={"name": "DeliveryInfo", "type": "Element"}
+    )
+    age: int = field(default=None, metadata={"name": "Age", "type": "Element"})
+    customized_name_data: CustomizedNameData = field(
+        default=None,
+        metadata={"name": "CustomizedNameData", "type": "Element"},
+    )
+    applied_profile: AppliedProfile = field(
+        default=None, metadata={"name": "AppliedProfile", "type": "Element"}
+    )
+    key: TypeRef = field(
+        default=None, metadata={"name": "Key", "type": "Attribute"}
+    )
+    traveler_type: TypePtc = field(
+        default=None, metadata={"name": "TravelerType", "type": "Attribute"}
+    )
+    gender: TypeGender = field(
+        default=None, metadata={"name": "Gender", "type": "Attribute"}
+    )
+
+
+@dataclass
+class DebitCard(TypePaymentCard):
+    """
+    Container for all debit card information.
+    """
+
+    issue_number: str = field(
+        default=None,
+        metadata={
+            "name": "IssueNumber",
+            "type": "Attribute",
+            "help": "Verification number for Debit Cards",
+        },
+    )
+
+
+@dataclass
+class FileFinishingInfo:
+    """
+    Misc Data required for File Finishing. This data is transient and not saved in database.
+    """
+
+    shop_information: ShopInformation = field(
+        default=None, metadata={"name": "ShopInformation", "type": "Element"}
+    )
+    policy_information: List[PolicyInformation] = field(
+        default_factory=list,
+        metadata={
+            "min_occurs": 0,
+            "max_occurs": 999,
+            "name": "PolicyInformation",
+            "type": "Element",
+            "help": "Policy Information required for File Finishing. Would repeat per Policy Type",
+        },
+    )
+    account_information: AccountInformation = field(
+        default=None,
+        metadata={"name": "AccountInformation", "type": "Element"},
+    )
+    agency_information: AgencyInformation = field(
+        default=None, metadata={"name": "AgencyInformation", "type": "Element"}
+    )
+    traveler_information: List[TravelerInformation] = field(
+        default_factory=list,
+        metadata={
+            "min_occurs": 0,
+            "max_occurs": 999,
+            "name": "TravelerInformation",
+            "type": "Element",
+        },
+    )
+    custom_profile_information: CustomProfileInformation = field(
+        default=None,
+        metadata={"name": "CustomProfileInformation", "type": "Element"},
+    )
+
+
+@dataclass
+class Group:
+    """
+    Represents a traveler group for Group booking and all their accompanying data. SUPPORTED PROVIDER: Worldspan and JAL.
+    """
+
+    name: "Name" = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "Name",
+            "type": "Element",
+            "help": "Name of the group in group booking.",
+        },
+    )
+    delivery_info: DeliveryInfo = field(
+        default=None, metadata={"name": "DeliveryInfo", "type": "Element"}
+    )
+    phone_number: List[PhoneNumber] = field(
+        default_factory=list,
+        metadata={
+            "min_occurs": 0,
+            "max_occurs": 999,
+            "name": "PhoneNumber",
+            "type": "Element",
+        },
+    )
+    ssrref: List["Ssrref"] = field(
+        default_factory=list,
+        metadata={
+            "min_occurs": 0,
+            "max_occurs": 999,
+            "name": "SSRRef",
+            "type": "Element",
+            "help": "Reference Element for SSR.",
+        },
+    )
+    address: TypeStructuredAddress = field(
+        default=None, metadata={"name": "Address", "type": "Element"}
+    )
+    booking_traveler_ref: List["BookingTravelerRef"] = field(
+        default_factory=list,
+        metadata={
+            "min_occurs": 0,
+            "max_occurs": 999,
+            "name": "BookingTravelerRef",
+            "type": "Element",
+            "help": "Reference Element for Booking Traveler.",
+        },
+    )
+    key: TypeRef = field(
+        default=None, metadata={"name": "Key", "type": "Attribute"}
+    )
+    traveler_type: TypePtc = field(
+        default=None,
+        metadata={
+            "name": "TravelerType",
+            "type": "Attribute",
+            "help": "Defines the type of traveler used for booking which could be a non-defining type (Companion, Web-fare, etc), or a standard type (Adult, Child, etc).",
+        },
+    )
+    group_size: PositiveInteger = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "GroupSize",
+            "type": "Attribute",
+            "help": "Represents size of the group",
+        },
+    )
+
+    @dataclass
+    class BookingTravelerRef:
+        key: TypeRef = field(
+            default=None,
+            metadata={"required": True, "name": "Key", "type": "Attribute"},
+        )
+
+    @dataclass
+    class Ssrref:
+        key: TypeRef = field(
+            default=None,
+            metadata={"required": True, "name": "Key", "type": "Attribute"},
+        )
+
+    @dataclass
+    class Name:
+        pass
+
+
+@dataclass
+class TypeCreditCardType(TypePaymentCard):
+    extended_payment: str = field(
+        default=None,
+        metadata={
+            "name": "ExtendedPayment",
+            "type": "Attribute",
+            "help": "Used for American Express cards.",
+        },
+    )
+    customer_reference: str = field(
+        default=None,
+        metadata={
+            "name": "CustomerReference",
+            "type": "Attribute",
+            "help": "Agencies use this to pass the traveler information to the credit card company.",
+        },
+    )
+    acceptance_override: bool = field(
+        default=None,
+        metadata={
+            "name": "AcceptanceOverride",
+            "type": "Attribute",
+            "help": "Override airline restriction on the credit card.",
+        },
+    )
+    third_party_payment: bool = field(
+        default=false,
+        metadata={
+            "name": "ThirdPartyPayment",
+            "type": "Attribute",
+            "help": "If true, this indicates that the credit card holder is not one of the passengers.",
+        },
+    )
+    bank_name: str = field(
+        default=None,
+        metadata={
+            "name": "BankName",
+            "type": "Attribute",
+            "help": "Issuing bank name for this credit card",
+        },
+    )
+    bank_country_code: TypeCountry = field(
+        default=None,
+        metadata={
+            "name": "BankCountryCode",
+            "type": "Attribute",
+            "help": "ISO Country code associated with the issuing bank",
+        },
+    )
+    bank_state_code: TypeState = field(
+        default=None,
+        metadata={
+            "name": "BankStateCode",
+            "type": "Attribute",
+            "help": "State code associated with the issuing bank.",
+        },
+    )
+    enett: bool = field(
+        default=false,
+        metadata={
+            "name": "Enett",
+            "type": "Attribute",
+            "help": "Acceptable values are true or false. If set to true it will denote that the credit card used has been issued through Enett. For all other credit card payments this value will be set to false.",
+        },
+    )
+
+
+@dataclass
+class TypePassengerType:
+    """
+    Passenger type code with optional age information
+    """
+
+    name: Name = field(
+        default=None,
+        metadata={
+            "name": "Name",
+            "type": "Element",
+            "help": "Optional passenger Name with associated LoyaltyCard may provide benefit when pricing itineraries using Low Cost Carriers. In general, most carriers do not consider passenger LoyalyCard information when initially pricing itineraries.",
+        },
+    )
+    loyalty_card: List[LoyaltyCard] = field(
+        default_factory=list,
+        metadata={
+            "min_occurs": 0,
+            "max_occurs": 999,
+            "name": "LoyaltyCard",
+            "type": "Element",
+        },
+    )
+    discount_card: List[DiscountCard] = field(
+        default_factory=list,
+        metadata={
+            "min_occurs": 0,
+            "max_occurs": 9,
+            "name": "DiscountCard",
+            "type": "Element",
+        },
+    )
+    personal_geography: PersonalGeography = field(
+        default=None,
+        metadata={
+            "name": "PersonalGeography",
+            "type": "Element",
+            "help": "Passenger personal geography detail to be sent to Host for accessing location specific fares",
+        },
+    )
+    code: TypePtc = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "Code",
+            "type": "Attribute",
+            "help": "The 3-char IATA passenger type code",
+        },
+    )
+    age: int = field(
+        default=None, metadata={"name": "Age", "type": "Attribute"}
+    )
+    dob: str = field(
+        default=None,
+        metadata={
+            "name": "DOB",
+            "type": "Attribute",
+            "help": "Passenger Date of Birth",
+        },
+    )
+    gender: TypeGender = field(
+        default=None,
+        metadata={
+            "name": "Gender",
+            "type": "Attribute",
+            "help": "The passenger gender type",
+        },
+    )
+    price_ptconly: bool = field(
+        default=None, metadata={"name": "PricePTCOnly", "type": "Attribute"}
+    )
+    booking_traveler_ref: str = field(
+        default=None,
+        metadata={
+            "name": "BookingTravelerRef",
+            "type": "Attribute",
+            "help": "This value should be set for Multiple Passengers in the request.",
+        },
+    )
+    accompanied_passenger: bool = field(
+        default=false,
+        metadata={
+            "name": "AccompaniedPassenger",
+            "type": "Attribute",
+            "help": "Container to identify accompanied passenger. Set true means this passenger is accompanied",
+        },
+    )
+    residency_type: TypeResidency = field(
+        default=None,
+        metadata={
+            "name": "ResidencyType",
+            "type": "Attribute",
+            "help": "The passenger residence type.",
+        },
+    )
+
+
+@dataclass
+class CreditCard(TypeCreditCardType):
+    """
+    Container for all credit card information.
+    """
+
+    pass
+
+
+@dataclass
+class SearchPassenger(TypePassengerType):
+    """
+    Passenger type with code and optional age information
+    """
+
+    key: TypeRef = field(
+        default=None, metadata={"name": "Key", "type": "Attribute"}
+    )
+
+
+@dataclass
+class FormOfPayment:
+    """
+    A Form of Payment used to purchase all or part of a booking.
+    """
+
+    provider_reservation_info_ref: List[TypeFormOfPaymentPnrreference] = field(
+        default_factory=list,
+        metadata={
+            "min_occurs": 0,
+            "max_occurs": 999,
+            "name": "ProviderReservationInfoRef",
+            "type": "Element",
+        },
+    )
+    segment_ref: List[TypeGeneralReference] = field(
+        default_factory=list,
+        metadata={
+            "min_occurs": 0,
+            "max_occurs": 999,
+            "name": "SegmentRef",
+            "type": "Element",
+        },
+    )
+    bsppayment: Bsppayment = field(
+        default=None, metadata={"name": "BSPPayment", "type": "Element"}
+    )
+    arcpayment: Arcpayment = field(
+        default=None, metadata={"name": "ARCPayment", "type": "Element"}
+    )
+    credit_card: CreditCard = field(
+        default=None, metadata={"name": "CreditCard", "type": "Element"}
+    )
+    debit_card: DebitCard = field(
+        default=None, metadata={"name": "DebitCard", "type": "Element"}
+    )
+    enett_van: EnettVan = field(
+        default=None, metadata={"name": "EnettVan", "type": "Element"}
+    )
+    key: TypeRef = field(
+        default=None, metadata={"name": "Key", "type": "Attribute"}
+    )
+    type: str = field(
+        default=None,
+        metadata={"required": True, "name": "Type", "type": "Attribute"},
+    )
+    fulfillment_type: str = field(
+        default=None,
+        metadata={
+            "name": "FulfillmentType",
+            "type": "Attribute",
+            "help": "Collect booking ticket at a Kiosk, print in agency.",
+        },
+    )
+    fulfillment_location: str = field(
+        default=None,
+        metadata={
+            "name": "FulfillmentLocation",
+            "type": "Attribute",
+            "help": "Information about the location of the printer.",
+        },
+    )
+    fulfillment_idtype: TypeFulfillmentIdtype = field(
+        default=None,
+        metadata={
+            "name": "FulfillmentIDType",
+            "type": "Attribute",
+            "help": "Identification type, e.g. credit card, to define how the customer will identify himself when collecting the ticket",
+        },
+    )
+    fulfillment_idnumber: str = field(
+        default=None,
+        metadata={
+            "name": "FulfillmentIDNumber",
+            "type": "Attribute",
+            "help": "Identification number, e.g. card number, to define how the customer will identify himself when collecting the ticket",
+        },
+    )
+    is_agent_type: bool = field(
+        default=false,
+        metadata={
+            "name": "IsAgentType",
+            "type": "Attribute",
+            "help": "If this is true then FormOfPayment mention in Type is anAgent type FormOfPayment.",
+        },
+    )
+    agent_text: str = field(
+        default=None,
+        metadata={
+            "name": "AgentText",
+            "type": "Attribute",
+            "help": "This is only relevent when IsAgentType is specified as true. Otherwise this will be ignored.",
+        },
+    )
+    reuse_fop: TypeRef = field(
+        default=None,
+        metadata={
+            "name": "ReuseFOP",
+            "type": "Attribute",
+            "help": "Key of the FOP Key to be reused as this Form of Payment.Only Credit and Debit Card will be supported for FOP Reuse.",
+        },
+    )
+    external_reference: TypeExternalReference = field(
+        default=None,
+        metadata={"name": "ExternalReference", "type": "Attribute"},
+    )
+    reusable: bool = field(
+        default=false,
+        metadata={
+            "name": "Reusable",
+            "type": "Attribute",
+            "help": "Indicates whether the form of payment can be reused or not. Currently applicable for Credit and Debit form of payment",
+        },
+    )
+    profile_id: str = field(
+        default=None,
+        metadata={
+            "name": "ProfileID",
+            "type": "Attribute",
+            "help": "The unique ID of the profile that contains the payment details to use.",
+        },
+    )
+    profile_key: TypeRef = field(
+        default=None,
+        metadata={
+            "name": "ProfileKey",
+            "type": "Attribute",
+            "help": "The Key assigned to the payment details value from the specified profile.",
+        },
+    )
+
+
+@dataclass
+class Guarantee:
+    """
+    Guarantee, Deposit or PrePayment
+    """
+
+    credit_card: CreditCard = field(
+        default=None, metadata={"name": "CreditCard", "type": "Element"}
+    )
+    other_guarantee_info: OtherGuaranteeInfo = field(
+        default=None,
+        metadata={"name": "OtherGuaranteeInfo", "type": "Element"},
+    )
+    type: str = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "Type",
+            "type": "Attribute",
+            "help": "Guarantee, Deposit for 1G/1V/1P/1J and PrePayment for 1P/1J only",
+        },
+    )
+    key: TypeRef = field(
+        default=None,
+        metadata={
+            "name": "Key",
+            "type": "Attribute",
+            "help": "Key for update/delete of the element",
+        },
+    )
+    reuse_fop: TypeRef = field(
+        default=None,
+        metadata={
+            "name": "ReuseFOP",
+            "type": "Attribute",
+            "help": "Key of the FOP Key to be reused as this Form of Payment.Only Credit and Debit Card will be supported for FOP Reuse.",
+        },
+    )
+    external_reference: TypeExternalReference = field(
+        default=None,
+        metadata={"name": "ExternalReference", "type": "Attribute"},
+    )
+    reusable: bool = field(
+        default=false,
+        metadata={
+            "name": "Reusable",
+            "type": "Attribute",
+            "help": "Indicates whether the form of payment can be reused or not. Currently applicable for Credit and Debit form of payment",
+        },
+    )
+
+
+@dataclass
+class McoexchangeInfo:
+    """
+    Information related to the exchange tickets available for the MCO
+    """
+
+    form_of_payment: FormOfPayment = field(
+        default=None, metadata={"name": "FormOfPayment", "type": "Element"}
+    )
+    exchanged_coupon: List[ExchangedCoupon] = field(
+        default_factory=list,
+        metadata={
+            "min_occurs": 0,
+            "max_occurs": 4,
+            "name": "ExchangedCoupon",
+            "type": "Element",
+        },
+    )
+    original_ticket_number: TypeTicketNumber = field(
+        default=None,
+        metadata={
+            "name": "OriginalTicketNumber",
+            "type": "Attribute",
+            "help": "Airline form and serial number of the original ticket issued.",
+        },
+    )
+    original_city_code: TypeCity = field(
+        default=None,
+        metadata={
+            "name": "OriginalCityCode",
+            "type": "Attribute",
+            "help": "Location of honoring carrier or operator.",
+        },
+    )
+    original_ticket_date: TypeDate = field(
+        default=None,
+        metadata={
+            "name": "OriginalTicketDate",
+            "type": "Attribute",
+            "help": "Date that the Original ticket was issued.",
+        },
+    )
+    iatacode: TypeIata = field(
+        default=None,
+        metadata={
+            "name": "IATACode",
+            "type": "Attribute",
+            "help": "IATA code of the issuing agency.",
+        },
+    )
+
+
+@dataclass
+class ServiceFeeInfo:
+    """
+    Travel Agency Service Fees (TASF) are charged by the agency through BSP or Airline Reporting Corporation (ARC).
+    """
+
+    form_of_payment: FormOfPayment = field(
+        default=None, metadata={"name": "FormOfPayment", "type": "Element"}
+    )
+    service_fee_tax_info: List[ServiceFeeTaxInfo] = field(
+        default_factory=list,
+        metadata={
+            "min_occurs": 0,
+            "max_occurs": 999,
+            "name": "ServiceFeeTaxInfo",
+            "type": "Element",
+        },
+    )
+    credit_card_auth: CreditCardAuth = field(
+        default=None, metadata={"name": "CreditCardAuth", "type": "Element"}
+    )
+    payment: Payment = field(
+        default=None, metadata={"name": "Payment", "type": "Element"}
+    )
+    status: TypeStatus = field(
+        default=None,
+        metadata={
+            "name": "Status",
+            "type": "Attribute",
+            "help": "Status of the service fee. Possible Values – Issued, ReadyToIssue, IssueLater.",
+        },
+    )
+    description: str = field(
+        default=None,
+        metadata={
+            "name": "Description",
+            "type": "Attribute",
+            "help": "The description of the service fee.",
+        },
+    )
+    key: TypeRef = field(
+        default=None, metadata={"name": "Key", "type": "Attribute"}
+    )
+    confirmation: str = field(
+        default=None,
+        metadata={
+            "name": "Confirmation",
+            "type": "Attribute",
+            "help": "The confirmation number of the service fee in the merchant host system.",
+        },
+    )
+    ticket_number: str = field(
+        default=None,
+        metadata={
+            "name": "TicketNumber",
+            "type": "Attribute",
+            "help": "The ticket that this fee was issued in connection with.",
+        },
+    )
+    booking_traveler_ref: TypeRef = field(
+        default=None,
+        metadata={
+            "name": "BookingTravelerRef",
+            "type": "Attribute",
+            "help": "A reference to a passenger.",
+        },
+    )
+    provider_reservation_info_ref: TypeRef = field(
+        default=None,
+        metadata={
+            "name": "ProviderReservationInfoRef",
+            "type": "Attribute",
+            "help": "A reference to the provider reservation info to which the service is tied.",
+        },
+    )
+    passive_provider_reservation_info_ref: TypeRef = field(
+        default=None,
+        metadata={
+            "name": "PassiveProviderReservationInfoRef",
+            "type": "Attribute",
+            "help": "A reference to the passive provider reservation info to which the service is tied.",
+        },
+    )
+    total_amount: TypeMoney = field(
+        default=None,
+        metadata={
+            "name": "TotalAmount",
+            "type": "Attribute",
+            "help": "The total amount for this Service Fee including base amount and all taxes.",
+        },
+    )
+    base_amount: TypeMoney = field(
+        default=None,
+        metadata={
+            "name": "BaseAmount",
+            "type": "Attribute",
+            "help": "Represents the base price for this entity. This does not include any taxes.",
+        },
+    )
+    taxes: TypeMoney = field(
+        default=None,
+        metadata={
+            "name": "Taxes",
+            "type": "Attribute",
+            "help": "The aggregated amount of all the taxes that are associated with this entity. See the associated Service Fee TaxInfo array for a breakdown of the individual taxes.",
+        },
+    )
+    booking_traveler_name: str = field(
+        default=None,
+        metadata={
+            "name": "BookingTravelerName",
+            "type": "Attribute",
+            "help": "The name of the passenger.",
+        },
+    )
+
+
+@dataclass
+class Mco(Mcoinformation):
+    form_of_payment: List[FormOfPayment] = field(
+        default_factory=list,
+        metadata={
+            "min_occurs": 0,
+            "max_occurs": 999,
+            "name": "FormOfPayment",
+            "type": "Element",
+        },
+    )
+    endorsement: Endorsement = field(
+        default=None, metadata={"name": "Endorsement", "type": "Element"}
+    )
+    mcoexchange_info: McoexchangeInfo = field(
+        default=None, metadata={"name": "MCOExchangeInfo", "type": "Element"}
+    )
+    mcofee_info: McofeeInfo = field(
+        default=None, metadata={"name": "MCOFeeInfo", "type": "Element"}
+    )
+    mcoremark: List[Mcoremark] = field(
+        default_factory=list,
+        metadata={
+            "min_occurs": 0,
+            "max_occurs": 999,
+            "name": "MCORemark",
+            "type": "Element",
+        },
+    )
+    mcoprice_data: McopriceData = field(
+        default=None, metadata={"name": "MCOPriceData", "type": "Element"}
+    )
+    stock_control: List[StockControl] = field(
+        default_factory=list,
+        metadata={
+            "min_occurs": 0,
+            "max_occurs": 999,
+            "name": "StockControl",
+            "type": "Element",
+        },
+    )
+    mcotext: List[Mcotext] = field(
+        default_factory=list,
+        metadata={
+            "min_occurs": 0,
+            "max_occurs": 999,
+            "name": "MCOText",
+            "type": "Element",
+        },
+    )
+    ticket_type: str = field(
+        default=None,
+        metadata={
+            "name": "TicketType",
+            "type": "Attribute",
+            "help": 'Ticket issue indicator. Possible values "Pre-paid ticket advice", "Ticket on departure" and "Other" .',
+        },
+    )
+    ticket_number: str = field(
+        default=None,
+        metadata={
+            "name": "TicketNumber",
+            "type": "Attribute",
+            "help": "The ticket that this MCO was issued in connection with. Could be the ticket that caused the fee, a residual from an exchange, or an airline service fee.",
+        },
+    )
+    mcoissued: bool = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "MCOIssued",
+            "type": "Attribute",
+            "help": "Set to true when the MCO is to be issued and set to false if it is stored for issue at a later time.",
+        },
+    )
+    mcoissue_date: DateTime = field(
+        default=None,
+        metadata={
+            "name": "MCOIssueDate",
+            "type": "Attribute",
+            "help": "Date and time in which the MCO was issued.",
+        },
+    )
+    mcodoc_num: str = field(
+        default=None,
+        metadata={
+            "name": "MCODocNum",
+            "type": "Attribute",
+            "help": "MCO document number.",
+        },
+    )
+    issue_reason_code: str = field(
+        default=None,
+        metadata={
+            "name": "IssueReasonCode",
+            "type": "Attribute",
+            "help": "O - Other, P thru Z - airline specific, 1 thru 9 - market specific",
+        },
+    )
+    plating_carrier: TypeCarrier = field(
+        default=None,
+        metadata={
+            "name": "PlatingCarrier",
+            "type": "Attribute",
+            "help": "The Plating Carrier for this MCO",
+        },
+    )
+    tour_operator: str = field(
+        default=None,
+        metadata={
+            "name": "TourOperator",
+            "type": "Attribute",
+            "help": "Tour Operator - name of honoring carrier or operator.",
+        },
+    )
+    location: str = field(
+        default=None,
+        metadata={
+            "name": "Location",
+            "type": "Attribute",
+            "help": "Location of honoring carrier or operator.",
+        },
+    )
+    tour_code: str = field(
+        default=None,
+        metadata={
+            "name": "TourCode",
+            "type": "Attribute",
+            "help": "The Tour Code of the MCO.",
+        },
+    )
+    provider_code: TypeProviderCode = field(
+        default=None,
+        metadata={
+            "name": "ProviderCode",
+            "type": "Attribute",
+            "help": "Contains the Provider Code of the provider that houses this MCO.",
+        },
+    )
+    provider_locator_code: TypeProviderLocatorCode = field(
+        default=None,
+        metadata={
+            "name": "ProviderLocatorCode",
+            "type": "Attribute",
+            "help": "Contains the Provider Locator Code of the Provider Reservation that houses this MCO.",
+        },
+    )
+    pseudo_city_code: TypePcc = field(
+        default=None,
+        metadata={
+            "name": "PseudoCityCode",
+            "type": "Attribute",
+            "help": "The PCC in the host system.",
+        },
+    )
+    expiry_date: str = field(
+        default=None,
+        metadata={
+            "name": "ExpiryDate",
+            "type": "Attribute",
+            "help": "E-Voucher’s Expiry Date. This expiry date is specific to Rail product",
+        },
+    )

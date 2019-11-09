@@ -2,6 +2,8 @@ from dataclasses import dataclass, field
 from typing import List
 
 
+
+
 @dataclass
 class BookingTravelerName:
     """
@@ -215,7 +217,7 @@ class Arcpayment:
 
 @dataclass
 class Auxdata:
-    entry: List["Entry"] = field(
+    entry: List["Auxdata.Entry"] = field(
         default_factory=list,
         metadata={
             "min_occurs": 1,
@@ -411,11 +413,11 @@ class CoordinateLocation(Location):
     Specific lat/long location, usually associated with a Distance
     """
 
-    latitude: Double = field(
+    latitude: float = field(
         default=None,
         metadata={"required": True, "name": "latitude", "type": "Attribute"},
     )
-    longitude: Double = field(
+    longitude: float = field(
         default=None,
         metadata={"required": True, "name": "longitude", "type": "Attribute"},
     )
@@ -472,7 +474,7 @@ class Distance:
     """
 
     units: str = field(
-        default=MI, metadata={"name": "Units", "type": "Attribute"}
+        default="MI", metadata={"name": "Units", "type": "Attribute"}
     )
     value: int = field(
         default=None,
@@ -502,7 +504,7 @@ class FormattedTextTextType:
             "help": "Textual information, which may be formatted as a line of information, or unformatted, as a paragraph of text.",
         },
     )
-    text_format: Nmtoken = field(
+    text_format: str = field(
         default=None,
         metadata={
             "name": "TextFormat",
@@ -644,19 +646,19 @@ class MediaItem:
     caption: str = field(
         default=None, metadata={"name": "caption", "type": "Attribute"}
     )
-    height: NonNegativeInteger = field(
+    height: int = field(
         default=None, metadata={"name": "height", "type": "Attribute"}
     )
-    width: NonNegativeInteger = field(
+    width: int = field(
         default=None, metadata={"name": "width", "type": "Attribute"}
     )
     type: str = field(
         default=None, metadata={"name": "type", "type": "Attribute"}
     )
-    url: AnyUri = field(
+    url: str = field(
         default=None, metadata={"name": "url", "type": "Attribute"}
     )
-    icon: AnyUri = field(
+    icon: str = field(
         default=None, metadata={"name": "icon", "type": "Attribute"}
     )
     size_code: TypeResponseImageSize = field(
@@ -686,7 +688,7 @@ class ModificationType:
     The modification types supported
     """
 
-    value: Nmtoken = field(
+    value: str = field(
         default=None, metadata={"name": "value", "type": "Restriction"}
     )
 
@@ -927,7 +929,7 @@ class SearchTicketing:
     """
 
     ticket_status: str = field(
-        default=Both,
+        default="Both",
         metadata={
             "name": "TicketStatus",
             "type": "Attribute",
@@ -935,7 +937,7 @@ class SearchTicketing:
         },
     )
     reservation_status: str = field(
-        default=Both,
+        default="Both",
         metadata={
             "name": "ReservationStatus",
             "type": "Attribute",
@@ -1900,7 +1902,7 @@ class TypeDurationYearInDays:
     Value of the Duration in P[NumberOfDays]D format.Ranges Permitted are P001D to P366D .
     """
 
-    value: Duration = field(
+    value: str = field(
         default=None,
         metadata={
             "min_inclusive": "P1D",
@@ -2209,7 +2211,7 @@ class TypeIntegerPercentage:
     Percentage value
     """
 
-    value: NonNegativeInteger = field(
+    value: int = field(
         default=None,
         metadata={
             "min_inclusive": "0",
@@ -2414,7 +2416,7 @@ class TypeOtacode:
     Refers to Open Travel Code
     """
 
-    value: PositiveInteger = field(
+    value: int = field(
         default=None, metadata={"name": "value", "type": "Restriction"}
     )
 
@@ -2476,7 +2478,7 @@ class TypePolicyCode:
     Type for PolicyCode attribute.
     """
 
-    value: Int = field(
+    value: int = field(
         default=None,
         metadata={
             "min_inclusive": "1",
@@ -3293,7 +3295,7 @@ class TypeVersion:
     A sequential version number.
     """
 
-    value: Int = field(
+    value: int = field(
         default=None,
         metadata={
             "min_inclusive": "0",
@@ -3417,7 +3419,7 @@ class AccountingRemark:
         },
     )
     use_provider_native_mode: bool = field(
-        default=false,
+        default="false",
         metadata={
             "name": "UseProviderNativeMode",
             "type": "Attribute",
@@ -3610,7 +3612,7 @@ class AgentAction:
             "help": "The sign in user name of the agent logged into the terminal. PROVIDER SUPPORTED: ACH",
         },
     )
-    event_time: DateTime = field(
+    event_time: str = field(
         default=None,
         metadata={
             "required": True,
@@ -3899,7 +3901,7 @@ class CityOrAirport(Location):
         },
     )
     prefer_city: bool = field(
-        default=false,
+        default="false",
         metadata={
             "name": "PreferCity",
             "type": "Attribute",
@@ -3976,7 +3978,7 @@ class Commission:
         },
     )
     commission_override: bool = field(
-        default=false,
+        default="false",
         metadata={
             "name": "CommissionOverride",
             "type": "Attribute",
@@ -3991,7 +3993,7 @@ class CommissionRemark:
     Identifies the agency commision remarks. Specifically used for Worldspan.
     """
 
-    provider_reservation_level: "ProviderReservationLevel" = field(
+    provider_reservation_level: "CommissionRemark.ProviderReservationLevel" = field(
         default=None,
         metadata={
             "required": True,
@@ -4000,7 +4002,7 @@ class CommissionRemark:
             "help": "Specify commission which is applicable to PNR level.",
         },
     )
-    passenger_type_level: List["PassengerTypeLevel"] = field(
+    passenger_type_level: List["CommissionRemark.PassengerTypeLevel"] = field(
         default_factory=list,
         metadata={
             "min_occurs": 1,
@@ -4321,7 +4323,7 @@ class EnettVan:
         },
     )
     multi_use: bool = field(
-        default=true,
+        default="true",
         metadata={
             "name": "MultiUse",
             "type": "Attribute",
@@ -4430,7 +4432,7 @@ class GeneralRemark:
             "help": "Direction Incoming or Outgoing of the GeneralRemark.",
         },
     )
-    create_date: DateTime = field(
+    create_date: str = field(
         default=None,
         metadata={
             "name": "CreateDate",
@@ -4439,7 +4441,7 @@ class GeneralRemark:
         },
     )
     use_provider_native_mode: bool = field(
-        default=false,
+        default="false",
         metadata={
             "name": "UseProviderNativeMode",
             "type": "Attribute",
@@ -4531,7 +4533,7 @@ class MiscFormOfPayment:
         default=None,
         metadata={"name": "CreditCardNumber", "type": "Attribute"},
     )
-    exp_date: GYearMonth = field(
+    exp_date: str = field(
         default=None,
         metadata={
             "name": "ExpDate",
@@ -4984,64 +4986,6 @@ class PointOfSale:
 
 
 @dataclass
-class PolicyInformation:
-    """
-    Policy Information required for File Finishing
-    """
-
-    reason_code: "ReasonCode" = field(
-        default=None,
-        metadata={
-            "name": "ReasonCode",
-            "type": "Element",
-            "help": "Reason Code",
-        },
-    )
-    type: TypePolicy = field(
-        default=None,
-        metadata={
-            "required": True,
-            "name": "Type",
-            "type": "Attribute",
-            "help": "Policy Type - Air, Hotel, Car, Rail, Ticketing",
-        },
-    )
-    out_of_policy: bool = field(
-        default=None,
-        metadata={
-            "name": "OutOfPolicy",
-            "type": "Attribute",
-            "help": "In Policy / Out of Policy Indicator",
-        },
-    )
-    segment_ref: TypeRef = field(
-        default=None, metadata={"name": "SegmentRef", "type": "Attribute"}
-    )
-
-    @dataclass
-    class ReasonCode:
-        out_of_policy: str = field(
-            default=None,
-            metadata={
-                "name": "OutOfPolicy",
-                "type": "Element",
-                "help": "Reason Code - Out of Policy",
-            },
-        )
-        purpose_of_trip: str = field(
-            default=None,
-            metadata={
-                "name": "PurposeOfTrip",
-                "type": "Element",
-                "help": "Reason Code -Purpose of Trip",
-            },
-        )
-        remark: Remark = field(
-            default=None, metadata={"name": "Remark", "type": "Element"}
-        )
-
-
-@dataclass
 class PriceMatchError:
     error_message: str = field(
         default=None,
@@ -5131,109 +5075,6 @@ class Provider:
         default=None,
         metadata={"required": True, "name": "Code", "type": "Attribute"},
     )
-
-
-@dataclass
-class ProviderArnksegment:
-    """
-    Represents host ARNK segments.
-    """
-
-    previous_segment: "PreviousSegment" = field(
-        default=None, metadata={"name": "PreviousSegment", "type": "Element"}
-    )
-    next_segment: "NextSegment" = field(
-        default=None, metadata={"name": "NextSegment", "type": "Element"}
-    )
-    key: TypeRef = field(
-        default=None, metadata={"name": "Key", "type": "Attribute"}
-    )
-    provider_reservation_info_ref: TypeRef = field(
-        default=None,
-        metadata={
-            "name": "ProviderReservationInfoRef",
-            "type": "Attribute",
-            "help": "Provider reservation reference key.",
-        },
-    )
-    provider_segment_order: int = field(
-        default=None,
-        metadata={
-            "name": "ProviderSegmentOrder",
-            "type": "Attribute",
-            "help": "To identify the appropriate travel sequence for Air/Car/Hotel/Rail segments/reservations in the provider reservation.",
-        },
-    )
-
-    @dataclass
-    class NextSegment:
-        air_segment_ref: TypeSegmentRef = field(
-            default=None,
-            metadata={
-                "name": "AirSegmentRef",
-                "type": "Element",
-                "help": "Reference to AirSegment from an Air Reservation.",
-            },
-        )
-        hotel_reservation_ref: TypeNonAirReservationRef = field(
-            default=None,
-            metadata={
-                "name": "HotelReservationRef",
-                "type": "Element",
-                "help": "Specify the locator code of Hotel reservation.",
-            },
-        )
-        vehicle_reservation_ref: TypeNonAirReservationRef = field(
-            default=None,
-            metadata={
-                "name": "VehicleReservationRef",
-                "type": "Element",
-                "help": "Specify the locator code of Vehicle reservation.",
-            },
-        )
-        passive_segment_ref: TypeSegmentRef = field(
-            default=None,
-            metadata={
-                "name": "PassiveSegmentRef",
-                "type": "Element",
-                "help": "Reference to PassiveSegment from a Passive Reservation.",
-            },
-        )
-
-    @dataclass
-    class PreviousSegment:
-        air_segment_ref: TypeSegmentRef = field(
-            default=None,
-            metadata={
-                "name": "AirSegmentRef",
-                "type": "Element",
-                "help": "Reference to AirSegment from an Air Reservation.",
-            },
-        )
-        hotel_reservation_ref: TypeNonAirReservationRef = field(
-            default=None,
-            metadata={
-                "name": "HotelReservationRef",
-                "type": "Element",
-                "help": "Specify the locator code of Hotel reservation.",
-            },
-        )
-        vehicle_reservation_ref: TypeNonAirReservationRef = field(
-            default=None,
-            metadata={
-                "name": "VehicleReservationRef",
-                "type": "Element",
-                "help": "Specify the locator code of Vehicle reservation.",
-            },
-        )
-        passive_segment_ref: TypeSegmentRef = field(
-            default=None,
-            metadata={
-                "name": "PassiveSegmentRef",
-                "type": "Element",
-                "help": "Reference to PassiveSegment from a Passive Reservation.",
-            },
-        )
 
 
 @dataclass
@@ -5384,7 +5225,7 @@ class ReviewBooking:
             "help": "Queue Category, 2 Character Alpha or Numeric.",
         },
     )
-    date_time: DateTime = field(
+    date_time: str = field(
         default=None,
         metadata={
             "required": True,
@@ -5551,214 +5392,12 @@ class ServiceInfo:
 
 
 @dataclass
-class ServiceRuleType:
-    """
-    Contains the rules for applying service rules
-    """
-
-    application_rules: "ApplicationRules" = field(
-        default=None,
-        metadata={
-            "name": "ApplicationRules",
-            "type": "Element",
-            "help": "The rules to apply the rule to the itinerary",
-        },
-    )
-    application_level: "ApplicationLevel" = field(
-        default=None,
-        metadata={
-            "name": "ApplicationLevel",
-            "type": "Element",
-            "help": "Lists the levels where the option is applied in the itinerary. Some options are applied for the entire itinerary, some for entire segments, etc.",
-        },
-    )
-    modify_rules: "ModifyRules" = field(
-        default=None,
-        metadata={
-            "name": "ModifyRules",
-            "type": "Element",
-            "help": "Groups the modification rules for the Option",
-        },
-    )
-    secondary_type_rules: "SecondaryTypeRules" = field(
-        default=None,
-        metadata={
-            "name": "SecondaryTypeRules",
-            "type": "Element",
-            "help": "Lists the supported Secondary Codes for the optional / additional service.",
-        },
-    )
-    remarks: List[FormattedTextTextType] = field(
-        default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 99,
-            "name": "Remarks",
-            "type": "Element",
-            "help": "Adds text remarks / rules for the optional / additional service",
-        },
-    )
-    key: TypeRef = field(
-        default=None,
-        metadata={
-            "required": True,
-            "name": "Key",
-            "type": "Attribute",
-            "help": "Unique ID to identify an optional service rule",
-        },
-    )
-
-    @dataclass
-    class SecondaryTypeRules:
-        secondary_type_rule: List["SecondaryTypeRule"] = field(
-            default_factory=list,
-            metadata={
-                "min_occurs": 1,
-                "max_occurs": 999,
-                "name": "SecondaryTypeRule",
-                "type": "Element",
-                "help": "Lists a single secondary code for the optional / additional service.",
-            },
-        )
-
-    @dataclass
-    class SecondaryTypeRule:
-        application_limit: List[OptionalServiceApplicationLimitType] = field(
-            default_factory=list,
-            metadata={
-                "min_occurs": 0,
-                "max_occurs": 10,
-                "name": "ApplicationLimit",
-                "type": "Element",
-            },
-        )
-        secondary_type: TypeRef = field(
-            default=None,
-            metadata={
-                "required": True,
-                "name": "SecondaryType",
-                "type": "Attribute",
-                "help": "The unique type to associate a secondary type in an optional service",
-            },
-        )
-
-    @dataclass
-    class ModifyRules:
-        modify_rule: List["ModifyRule"] = field(
-            default_factory=list,
-            metadata={
-                "min_occurs": 1,
-                "max_occurs": 999,
-                "name": "ModifyRule",
-                "type": "Element",
-                "help": "Indicates modification rules for the particular modification type.",
-            },
-        )
-        provider_defined_modification_type: str = field(
-            default=None,
-            metadata={
-                "name": "ProviderDefinedModificationType",
-                "type": "Attribute",
-                "help": "Indicates the actual provider defined modification type which is mapped to Other",
-            },
-        )
-
-    @dataclass
-    class ModifyRule:
-        pass
-
-    @dataclass
-    class ApplicationLevel:
-        application_limits: "ApplicationLimits" = field(
-            default=None,
-            metadata={
-                "name": "ApplicationLimits",
-                "type": "Element",
-                "help": "Adds the limits on the number of options that can be selected for a particular type",
-            },
-        )
-        service_data: List[ServiceData] = field(
-            default_factory=list,
-            metadata={
-                "min_occurs": 0,
-                "max_occurs": 999,
-                "name": "ServiceData",
-                "type": "Element",
-            },
-        )
-        provider_defined_applicable_levels: str = field(
-            default=None,
-            metadata={
-                "name": "ProviderDefinedApplicableLevels",
-                "type": "Attribute",
-                "help": "Indicates the actual provider defined ApplicableLevels which is mapped to Other",
-            },
-        )
-
-    @dataclass
-    class ApplicationLimits:
-        application_limit: List[OptionalServiceApplicationLimitType] = field(
-            default_factory=list,
-            metadata={
-                "min_occurs": 1,
-                "max_occurs": 10,
-                "name": "ApplicationLimit",
-                "type": "Element",
-                "help": "The application limits for a particular level",
-            },
-        )
-
-    @dataclass
-    class ApplicationRules:
-        required_for_all_travelers: bool = field(
-            default=None,
-            metadata={
-                "name": "RequiredForAllTravelers",
-                "type": "Attribute",
-                "help": "Indicates if the option needs to be applied to all travelers in the itinerary if selected",
-            },
-        )
-        required_for_all_segments: bool = field(
-            default=None,
-            metadata={
-                "name": "RequiredForAllSegments",
-                "type": "Attribute",
-                "help": "Indicates if the option needs to be applied to all segments in the itinerary if selected",
-            },
-        )
-        required_for_all_segments_in_od: bool = field(
-            default=None,
-            metadata={
-                "name": "RequiredForAllSegmentsInOD",
-                "type": "Attribute",
-                "help": "Indicates if the option needs to be applied to all segments in a origin / destination (connection flights) if selected for one segment in the OD",
-            },
-        )
-        unselected_option_required: bool = field(
-            default=None,
-            metadata={
-                "name": "UnselectedOptionRequired",
-                "type": "Attribute",
-                "help": "If an UnselectedOption is present in the option, then the Unselected option needs to be selected even if the option is not selected when this flag is set to true",
-            },
-        )
-        secondary_option_code_required: bool = field(
-            default=None,
-            metadata={
-                "name": "SecondaryOptionCodeRequired",
-                "type": "Attribute",
-                "help": "If set to true, the secondary option code is required for this option",
-            },
-        )
-
-
-@dataclass
 class ShopInformation:
     """
     Shopping Information required for File Finishing
     """
 
-    search_request: List["SearchRequest"] = field(
+    search_request: List["ShopInformation.SearchRequest"] = field(
         default_factory=list,
         metadata={
             "min_occurs": 0,
@@ -5768,7 +5407,7 @@ class ShopInformation:
             "help": "Search parameters that were used in LFS request",
         },
     )
-    flights_offered: List["FlightsOffered"] = field(
+    flights_offered: List["ShopInformation.FlightsOffered"] = field(
         default_factory=list,
         metadata={
             "min_occurs": 0,
@@ -5805,7 +5444,7 @@ class ShopInformation:
                 "help": "Date and Time at which this entity departs. This does not include Time Zone information since it can be derived from origin location",
             },
         )
-        travel_order: Int = field(
+        travel_order: int = field(
             default=None, metadata={"name": "TravelOrder", "type": "Attribute"}
         )
         carrier: TypeCarrier = field(
@@ -5820,10 +5459,11 @@ class ShopInformation:
             metadata={"name": "ClassOfService", "type": "Attribute"},
         )
         stop_over: bool = field(
-            default=false, metadata={"name": "StopOver", "type": "Attribute"}
+            default="false", metadata={"name": "StopOver", "type": "Attribute"}
         )
         connection: bool = field(
-            default=false, metadata={"name": "Connection", "type": "Attribute"}
+            default="false",
+            metadata={"name": "Connection", "type": "Attribute"},
         )
 
     @dataclass
@@ -5947,7 +5587,7 @@ class Ssr:
             "help": "UniqueID to associate a rule to the SSR",
         },
     )
-    url: AnyUri = field(
+    url: str = field(
         default=None, metadata={"name": "URL", "type": "Attribute"}
     )
     profile_id: str = field(
@@ -5983,7 +5623,7 @@ class TravelComplianceData:
     Travel Compliance and Preferred Supplier information of the traveler specific to a segment.
     """
 
-    policy_compliance: List["PolicyCompliance"] = field(
+    policy_compliance: List["TravelComplianceData.PolicyCompliance"] = field(
         default_factory=list,
         metadata={
             "min_occurs": 0,
@@ -5992,7 +5632,9 @@ class TravelComplianceData:
             "type": "Element",
         },
     )
-    contract_compliance: List["ContractCompliance"] = field(
+    contract_compliance: List[
+        "TravelComplianceData.ContractCompliance"
+    ] = field(
         default_factory=list,
         metadata={
             "min_occurs": 0,
@@ -6001,7 +5643,7 @@ class TravelComplianceData:
             "type": "Element",
         },
     )
-    preferred_supplier: List["PreferredSupplier"] = field(
+    preferred_supplier: List["TravelComplianceData.PreferredSupplier"] = field(
         default_factory=list,
         metadata={
             "min_occurs": 0,
@@ -6114,39 +5756,6 @@ class TravelComplianceData:
 
 
 @dataclass
-class TravelerInformation:
-    """
-    Traveler Information required for File Finishing
-    """
-
-    emergency_contact: "EmergencyContact" = field(
-        default=None, metadata={"name": "EmergencyContact", "type": "Element"}
-    )
-    home_airport: TypeAirport = field(
-        default=None, metadata={"name": "HomeAirport", "type": "Attribute"}
-    )
-    visa_expiration_date: str = field(
-        default=None,
-        metadata={"name": "VisaExpirationDate", "type": "Attribute"},
-    )
-    booking_traveler_ref: TypeRef = field(
-        default=None,
-        metadata={
-            "required": True,
-            "name": "BookingTravelerRef",
-            "type": "Attribute",
-            "help": "A reference to a passenger.",
-        },
-    )
-
-    @dataclass
-    class EmergencyContact:
-        phone_number: PhoneNumber = field(
-            default=None, metadata={"name": "PhoneNumber", "type": "Element"}
-        )
-
-
-@dataclass
 class TravelerType:
     """
     The 3-char IATA traveler type code
@@ -6229,7 +5838,7 @@ class TypeFormOfPaymentPnrreference:
         },
     )
     provider_reservation_level: bool = field(
-        default=true,
+        default="true",
         metadata={
             "name": "ProviderReservationLevel",
             "type": "Attribute",
@@ -6328,7 +5937,7 @@ class TypeKeyword:
             "help": "The keyword name.",
         },
     )
-    language_code: Language = field(
+    language_code: str = field(
         default=None,
         metadata={
             "name": "LanguageCode",
@@ -7076,6 +6685,64 @@ class PhoneNumber:
 
 
 @dataclass
+class PolicyInformation:
+    """
+    Policy Information required for File Finishing
+    """
+
+    reason_code: "PolicyInformation.ReasonCode" = field(
+        default=None,
+        metadata={
+            "name": "ReasonCode",
+            "type": "Element",
+            "help": "Reason Code",
+        },
+    )
+    type: TypePolicy = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "Type",
+            "type": "Attribute",
+            "help": "Policy Type - Air, Hotel, Car, Rail, Ticketing",
+        },
+    )
+    out_of_policy: bool = field(
+        default=None,
+        metadata={
+            "name": "OutOfPolicy",
+            "type": "Attribute",
+            "help": "In Policy / Out of Policy Indicator",
+        },
+    )
+    segment_ref: TypeRef = field(
+        default=None, metadata={"name": "SegmentRef", "type": "Attribute"}
+    )
+
+    @dataclass
+    class ReasonCode:
+        out_of_policy: str = field(
+            default=None,
+            metadata={
+                "name": "OutOfPolicy",
+                "type": "Element",
+                "help": "Reason Code - Out of Policy",
+            },
+        )
+        purpose_of_trip: str = field(
+            default=None,
+            metadata={
+                "name": "PurposeOfTrip",
+                "type": "Element",
+                "help": "Reason Code -Purpose of Trip",
+            },
+        )
+        remark: Remark = field(
+            default=None, metadata={"name": "Remark", "type": "Element"}
+        )
+
+
+@dataclass
 class Postscript(TypeRemark):
     """
     Postscript Notes
@@ -7084,6 +6751,109 @@ class Postscript(TypeRemark):
     key: TypeRef = field(
         default=None, metadata={"name": "Key", "type": "Attribute"}
     )
+
+
+@dataclass
+class ProviderArnksegment:
+    """
+    Represents host ARNK segments.
+    """
+
+    previous_segment: "ProviderArnksegment.PreviousSegment" = field(
+        default=None, metadata={"name": "PreviousSegment", "type": "Element"}
+    )
+    next_segment: "ProviderArnksegment.NextSegment" = field(
+        default=None, metadata={"name": "NextSegment", "type": "Element"}
+    )
+    key: TypeRef = field(
+        default=None, metadata={"name": "Key", "type": "Attribute"}
+    )
+    provider_reservation_info_ref: TypeRef = field(
+        default=None,
+        metadata={
+            "name": "ProviderReservationInfoRef",
+            "type": "Attribute",
+            "help": "Provider reservation reference key.",
+        },
+    )
+    provider_segment_order: int = field(
+        default=None,
+        metadata={
+            "name": "ProviderSegmentOrder",
+            "type": "Attribute",
+            "help": "To identify the appropriate travel sequence for Air/Car/Hotel/Rail segments/reservations in the provider reservation.",
+        },
+    )
+
+    @dataclass
+    class NextSegment:
+        air_segment_ref: TypeSegmentRef = field(
+            default=None,
+            metadata={
+                "name": "AirSegmentRef",
+                "type": "Element",
+                "help": "Reference to AirSegment from an Air Reservation.",
+            },
+        )
+        hotel_reservation_ref: TypeNonAirReservationRef = field(
+            default=None,
+            metadata={
+                "name": "HotelReservationRef",
+                "type": "Element",
+                "help": "Specify the locator code of Hotel reservation.",
+            },
+        )
+        vehicle_reservation_ref: TypeNonAirReservationRef = field(
+            default=None,
+            metadata={
+                "name": "VehicleReservationRef",
+                "type": "Element",
+                "help": "Specify the locator code of Vehicle reservation.",
+            },
+        )
+        passive_segment_ref: TypeSegmentRef = field(
+            default=None,
+            metadata={
+                "name": "PassiveSegmentRef",
+                "type": "Element",
+                "help": "Reference to PassiveSegment from a Passive Reservation.",
+            },
+        )
+
+    @dataclass
+    class PreviousSegment:
+        air_segment_ref: TypeSegmentRef = field(
+            default=None,
+            metadata={
+                "name": "AirSegmentRef",
+                "type": "Element",
+                "help": "Reference to AirSegment from an Air Reservation.",
+            },
+        )
+        hotel_reservation_ref: TypeNonAirReservationRef = field(
+            default=None,
+            metadata={
+                "name": "HotelReservationRef",
+                "type": "Element",
+                "help": "Specify the locator code of Hotel reservation.",
+            },
+        )
+        vehicle_reservation_ref: TypeNonAirReservationRef = field(
+            default=None,
+            metadata={
+                "name": "VehicleReservationRef",
+                "type": "Element",
+                "help": "Specify the locator code of Vehicle reservation.",
+            },
+        )
+        passive_segment_ref: TypeSegmentRef = field(
+            default=None,
+            metadata={
+                "name": "PassiveSegmentRef",
+                "type": "Element",
+                "help": "Reference to PassiveSegment from a Passive Reservation.",
+            },
+        )
 
 
 @dataclass
@@ -7177,7 +6947,7 @@ class ServiceData:
         },
     )
     stop_over: bool = field(
-        default=false,
+        default="false",
         metadata={
             "name": "StopOver",
             "type": "Attribute",
@@ -7274,7 +7044,7 @@ class SupplierLocator:
             "help": "Provider Reservation reference",
         },
     )
-    create_date_time: DateTime = field(
+    create_date_time: str = field(
         default=None,
         metadata={
             "name": "CreateDateTime",
@@ -7348,7 +7118,7 @@ class TransactionType:
     Configuration for products by type. Inheritable.
     """
 
-    air: "Air" = field(
+    air: "TransactionType.Air" = field(
         default=None, metadata={"name": "Air", "type": "Element"}
     )
     hotel: TypeTransactionsAllowed = field(
@@ -7415,7 +7185,7 @@ class TransactionType:
 
 @dataclass
 class TypeAgencyHierarchyLongReference(TypeAgencyHierarchyReference):
-    profile_version: Int = field(
+    profile_version: int = field(
         default=None,
         metadata={
             "required": True,
@@ -7451,7 +7221,7 @@ class TypeFeeInfo:
     A generic type of fee for those charges which are incurred by the passenger, but not necessarily shown on tickets
     """
 
-    tax_info_ref: List["TaxInfoRef"] = field(
+    tax_info_ref: List["TypeFeeInfo.TaxInfoRef"] = field(
         default_factory=list,
         metadata={
             "min_occurs": 0,
@@ -7531,7 +7301,7 @@ class TypeFlexibleTimeSpec(TypeTimeSpec):
     A type which can be used for flexible date/time specification -extends the generic type typeTimeSpec to provide extra options for search.
     """
 
-    search_extra_days: "SearchExtraDays" = field(
+    search_extra_days: "TypeFlexibleTimeSpec.SearchExtraDays" = field(
         default=None,
         metadata={
             "name": "SearchExtraDays",
@@ -7542,7 +7312,7 @@ class TypeFlexibleTimeSpec(TypeTimeSpec):
 
     @dataclass
     class SearchExtraDays:
-        days_before: Int = field(
+        days_before: int = field(
             default=None,
             metadata={
                 "name": "DaysBefore",
@@ -7550,7 +7320,7 @@ class TypeFlexibleTimeSpec(TypeTimeSpec):
                 "help": "Number of days to search before the specified date",
             },
         )
-        days_after: Int = field(
+        days_after: int = field(
             default=None,
             metadata={
                 "name": "DaysAfter",
@@ -7900,7 +7670,7 @@ class AirExchangeInfo:
     Provides results of a exchange quote
     """
 
-    total_penalty_tax_info: "TotalPenaltyTaxInfo" = field(
+    total_penalty_tax_info: "AirExchangeInfo.TotalPenaltyTaxInfo" = field(
         default=None,
         metadata={"name": "TotalPenaltyTaxInfo", "type": "Element"},
     )
@@ -7913,7 +7683,7 @@ class AirExchangeInfo:
             "type": "Element",
         },
     )
-    ticket_fee_info: List["TicketFeeInfo"] = field(
+    ticket_fee_info: List["AirExchangeInfo.TicketFeeInfo"] = field(
         default_factory=list,
         metadata={
             "min_occurs": 0,
@@ -8083,7 +7853,9 @@ class Apiprovider:
     transaction_type: TransactionType = field(
         default=None, metadata={"name": "TransactionType", "type": "Element"}
     )
-    available_pseudo_city_code: List["AvailablePseudoCityCode"] = field(
+    available_pseudo_city_code: List[
+        "Apiprovider.AvailablePseudoCityCode"
+    ] = field(
         default_factory=list,
         metadata={
             "min_occurs": 0,
@@ -8261,7 +8033,7 @@ class DeliveryInfo:
     Container to encapsulate all delivery related information
     """
 
-    shipping_address: "ShippingAddress" = field(
+    shipping_address: "DeliveryInfo.ShippingAddress" = field(
         default=None, metadata={"name": "ShippingAddress", "type": "Element"}
     )
     phone_number: PhoneNumber = field(
@@ -8346,7 +8118,7 @@ class InvoiceData:
             "help": "Invoice number",
         },
     )
-    issue_date: DateTime = field(
+    issue_date: str = field(
         default=None,
         metadata={
             "name": "IssueDate",
@@ -8500,7 +8272,7 @@ class McopriceData:
             "type": "Element",
         },
     )
-    commission: "Commission" = field(
+    commission: "McopriceData.Commission" = field(
         default=None, metadata={"name": "Commission", "type": "Element"}
     )
     mcoamount: TypeMoney = field(
@@ -8560,6 +8332,216 @@ class ReservationName:
 
 
 @dataclass
+class ServiceRuleType:
+    """
+    Contains the rules for applying service rules
+    """
+
+    application_rules: "ServiceRuleType.ApplicationRules" = field(
+        default=None,
+        metadata={
+            "name": "ApplicationRules",
+            "type": "Element",
+            "help": "The rules to apply the rule to the itinerary",
+        },
+    )
+    application_level: "ServiceRuleType.ApplicationLevel" = field(
+        default=None,
+        metadata={
+            "name": "ApplicationLevel",
+            "type": "Element",
+            "help": "Lists the levels where the option is applied in the itinerary. Some options are applied for the entire itinerary, some for entire segments, etc.",
+        },
+    )
+    modify_rules: "ServiceRuleType.ModifyRules" = field(
+        default=None,
+        metadata={
+            "name": "ModifyRules",
+            "type": "Element",
+            "help": "Groups the modification rules for the Option",
+        },
+    )
+    secondary_type_rules: "ServiceRuleType.SecondaryTypeRules" = field(
+        default=None,
+        metadata={
+            "name": "SecondaryTypeRules",
+            "type": "Element",
+            "help": "Lists the supported Secondary Codes for the optional / additional service.",
+        },
+    )
+    remarks: List[FormattedTextTextType] = field(
+        default_factory=list,
+        metadata={
+            "min_occurs": 0,
+            "max_occurs": 99,
+            "name": "Remarks",
+            "type": "Element",
+            "help": "Adds text remarks / rules for the optional / additional service",
+        },
+    )
+    key: TypeRef = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "Key",
+            "type": "Attribute",
+            "help": "Unique ID to identify an optional service rule",
+        },
+    )
+
+    @dataclass
+    class SecondaryTypeRules:
+        secondary_type_rule: List[
+            "ServiceRuleType.SecondaryTypeRules.SecondaryTypeRule"
+        ] = field(
+            default_factory=list,
+            metadata={
+                "min_occurs": 1,
+                "max_occurs": 999,
+                "name": "SecondaryTypeRule",
+                "type": "Element",
+                "help": "Lists a single secondary code for the optional / additional service.",
+            },
+        )
+
+        @dataclass
+        class SecondaryTypeRule:
+            application_limit: List[
+                OptionalServiceApplicationLimitType
+            ] = field(
+                default_factory=list,
+                metadata={
+                    "min_occurs": 0,
+                    "max_occurs": 10,
+                    "name": "ApplicationLimit",
+                    "type": "Element",
+                },
+            )
+            secondary_type: TypeRef = field(
+                default=None,
+                metadata={
+                    "required": True,
+                    "name": "SecondaryType",
+                    "type": "Attribute",
+                    "help": "The unique type to associate a secondary type in an optional service",
+                },
+            )
+
+    @dataclass
+    class ModifyRules:
+        modify_rule: List[
+            "ServiceRuleType.SecondaryTypeRules.SecondaryTypeRule.ModifyRules.ModifyRule"
+        ] = field(
+            default_factory=list,
+            metadata={
+                "min_occurs": 1,
+                "max_occurs": 999,
+                "name": "ModifyRule",
+                "type": "Element",
+                "help": "Indicates modification rules for the particular modification type.",
+            },
+        )
+        provider_defined_modification_type: str = field(
+            default=None,
+            metadata={
+                "name": "ProviderDefinedModificationType",
+                "type": "Attribute",
+                "help": "Indicates the actual provider defined modification type which is mapped to Other",
+            },
+        )
+
+        @dataclass
+        class ModifyRule:
+            pass
+
+    @dataclass
+    class ApplicationLevel:
+        application_limits: "ServiceRuleType.SecondaryTypeRules.SecondaryTypeRule.ModifyRules.ModifyRule.ApplicationLevel.ApplicationLimits" = field(
+            default=None,
+            metadata={
+                "name": "ApplicationLimits",
+                "type": "Element",
+                "help": "Adds the limits on the number of options that can be selected for a particular type",
+            },
+        )
+        service_data: List[ServiceData] = field(
+            default_factory=list,
+            metadata={
+                "min_occurs": 0,
+                "max_occurs": 999,
+                "name": "ServiceData",
+                "type": "Element",
+            },
+        )
+        provider_defined_applicable_levels: str = field(
+            default=None,
+            metadata={
+                "name": "ProviderDefinedApplicableLevels",
+                "type": "Attribute",
+                "help": "Indicates the actual provider defined ApplicableLevels which is mapped to Other",
+            },
+        )
+
+        @dataclass
+        class ApplicationLimits:
+            application_limit: List[
+                OptionalServiceApplicationLimitType
+            ] = field(
+                default_factory=list,
+                metadata={
+                    "min_occurs": 1,
+                    "max_occurs": 10,
+                    "name": "ApplicationLimit",
+                    "type": "Element",
+                    "help": "The application limits for a particular level",
+                },
+            )
+
+    @dataclass
+    class ApplicationRules:
+        required_for_all_travelers: bool = field(
+            default=None,
+            metadata={
+                "name": "RequiredForAllTravelers",
+                "type": "Attribute",
+                "help": "Indicates if the option needs to be applied to all travelers in the itinerary if selected",
+            },
+        )
+        required_for_all_segments: bool = field(
+            default=None,
+            metadata={
+                "name": "RequiredForAllSegments",
+                "type": "Attribute",
+                "help": "Indicates if the option needs to be applied to all segments in the itinerary if selected",
+            },
+        )
+        required_for_all_segments_in_od: bool = field(
+            default=None,
+            metadata={
+                "name": "RequiredForAllSegmentsInOD",
+                "type": "Attribute",
+                "help": "Indicates if the option needs to be applied to all segments in a origin / destination (connection flights) if selected for one segment in the OD",
+            },
+        )
+        unselected_option_required: bool = field(
+            default=None,
+            metadata={
+                "name": "UnselectedOptionRequired",
+                "type": "Attribute",
+                "help": "If an UnselectedOption is present in the option, then the Unselected option needs to be selected even if the option is not selected when this flag is set to true",
+            },
+        )
+        secondary_option_code_required: bool = field(
+            default=None,
+            metadata={
+                "name": "SecondaryOptionCodeRequired",
+                "type": "Attribute",
+                "help": "If set to true, the secondary option code is required for this option",
+            },
+        )
+
+
+@dataclass
 class TravelSegment(Segment):
     """
     Generic segment used to provide travel information that was not processed by the system
@@ -8592,6 +8574,39 @@ class TravelSegment(Segment):
     arrival_time: str = field(
         default=None, metadata={"name": "ArrivalTime", "type": "Attribute"}
     )
+
+
+@dataclass
+class TravelerInformation:
+    """
+    Traveler Information required for File Finishing
+    """
+
+    emergency_contact: "TravelerInformation.EmergencyContact" = field(
+        default=None, metadata={"name": "EmergencyContact", "type": "Element"}
+    )
+    home_airport: TypeAirport = field(
+        default=None, metadata={"name": "HomeAirport", "type": "Attribute"}
+    )
+    visa_expiration_date: str = field(
+        default=None,
+        metadata={"name": "VisaExpirationDate", "type": "Attribute"},
+    )
+    booking_traveler_ref: TypeRef = field(
+        default=None,
+        metadata={
+            "required": True,
+            "name": "BookingTravelerRef",
+            "type": "Attribute",
+            "help": "A reference to a passenger.",
+        },
+    )
+
+    @dataclass
+    class EmergencyContact:
+        phone_number: PhoneNumber = field(
+            default=None, metadata={"name": "PhoneNumber", "type": "Element"}
+        )
 
 
 @dataclass
@@ -8638,7 +8653,7 @@ class TypePaymentCard:
     number: TypeCreditCardNumber = field(
         default=None, metadata={"name": "Number", "type": "Attribute"}
     )
-    exp_date: GYearMonth = field(
+    exp_date: str = field(
         default=None,
         metadata={
             "name": "ExpDate",
@@ -8793,7 +8808,7 @@ class Group:
     Represents a traveler group for Group booking and all their accompanying data. SUPPORTED PROVIDER: Worldspan and JAL.
     """
 
-    name: "Name" = field(
+    name: "Group.Name" = field(
         default=None,
         metadata={
             "required": True,
@@ -8814,7 +8829,7 @@ class Group:
             "type": "Element",
         },
     )
-    ssrref: List["Ssrref"] = field(
+    ssrref: List["Group.Ssrref"] = field(
         default_factory=list,
         metadata={
             "min_occurs": 0,
@@ -8827,7 +8842,7 @@ class Group:
     address: TypeStructuredAddress = field(
         default=None, metadata={"name": "Address", "type": "Element"}
     )
-    booking_traveler_ref: List["BookingTravelerRef"] = field(
+    booking_traveler_ref: List["Group.BookingTravelerRef"] = field(
         default_factory=list,
         metadata={
             "min_occurs": 0,
@@ -8848,7 +8863,7 @@ class Group:
             "help": "Defines the type of traveler used for booking which could be a non-defining type (Companion, Web-fare, etc), or a standard type (Adult, Child, etc).",
         },
     )
-    group_size: PositiveInteger = field(
+    group_size: int = field(
         default=None,
         metadata={
             "required": True,
@@ -8904,7 +8919,7 @@ class TypeCreditCardType(TypePaymentCard):
         },
     )
     third_party_payment: bool = field(
-        default=false,
+        default="false",
         metadata={
             "name": "ThirdPartyPayment",
             "type": "Attribute",
@@ -8936,7 +8951,7 @@ class TypeCreditCardType(TypePaymentCard):
         },
     )
     enett: bool = field(
-        default=false,
+        default="false",
         metadata={
             "name": "Enett",
             "type": "Attribute",
@@ -9025,7 +9040,7 @@ class TypePassengerType:
         },
     )
     accompanied_passenger: bool = field(
-        default=false,
+        default="false",
         metadata={
             "name": "AccompaniedPassenger",
             "type": "Attribute",
@@ -9141,7 +9156,7 @@ class FormOfPayment:
         },
     )
     is_agent_type: bool = field(
-        default=false,
+        default="false",
         metadata={
             "name": "IsAgentType",
             "type": "Attribute",
@@ -9169,7 +9184,7 @@ class FormOfPayment:
         metadata={"name": "ExternalReference", "type": "Attribute"},
     )
     reusable: bool = field(
-        default=false,
+        default="false",
         metadata={
             "name": "Reusable",
             "type": "Attribute",
@@ -9237,7 +9252,7 @@ class Guarantee:
         metadata={"name": "ExternalReference", "type": "Attribute"},
     )
     reusable: bool = field(
-        default=false,
+        default="false",
         metadata={
             "name": "Reusable",
             "type": "Attribute",
@@ -9490,7 +9505,7 @@ class Mco(Mcoinformation):
             "help": "Set to true when the MCO is to be issued and set to false if it is stored for issue at a later time.",
         },
     )
-    mcoissue_date: DateTime = field(
+    mcoissue_date: str = field(
         default=None,
         metadata={
             "name": "MCOIssueDate",

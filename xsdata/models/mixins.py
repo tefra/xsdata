@@ -12,15 +12,25 @@ class TypedField(ABC):
         if raw_type is None:
             return None
 
-        xsd_type = XSDType.find(raw_type)
-        if xsd_type is not None:
-            return xsd_type.py_name
-
-        return pascal_case(strip_prefix(raw_type))
+        return XSDType.map(raw_type) or pascal_case(strip_prefix(raw_type))
 
     @property
     @abstractmethod
     def raw_type(self) -> Optional[str]:
+        pass
+
+
+class ExtendsMixin(ABC):
+    @property
+    def display_base(self):
+        raw_base = self.raw_base
+        if not raw_base:
+            return None
+        return XSDType.map(raw_base) or pascal_case(strip_prefix(raw_base))
+
+    @property
+    @abstractmethod
+    def raw_base(self) -> Optional[str]:
         pass
 
 
@@ -66,10 +76,3 @@ class OccurrencesMixin:
             return dict()
 
         return dict(min_occurs=min_occurs, max_occurs=max_occurs,)
-
-
-class ExtendsMixin(ABC):
-    @property
-    @abstractmethod
-    def extends(self) -> Optional[str]:
-        pass

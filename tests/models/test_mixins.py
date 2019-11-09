@@ -249,33 +249,37 @@ class ExtendsMixinTests(TestCase):
         ]
         self.assertListEqual(expected, subclasses)
 
-    def test_complex_type_extends_property(self):
+    def test_display_base(self):
+        obj = el.Element.build(type="common:foo_bar")
+        self.assertEqual("FooBar", obj.display_base)
+
+    def test_complex_type_raw_base_property(self):
         obj = el.ComplexType.build()
-        self.assertIsNone(obj.extends)
+        self.assertIsNone(obj.raw_base)
 
         obj.complex_content = el.ComplexContent.build()
-        self.assertIsNone(obj.extends)
+        self.assertIsNone(obj.raw_base)
 
         obj.complex_content.extension = el.Extension.build()
-        self.assertIsNone(obj.extends)
+        self.assertIsNone(obj.raw_base)
 
         obj.complex_content.extension.base = "foo_bar"
-        self.assertEqual("FooBar", obj.extends)
+        self.assertEqual("foo_bar", obj.raw_base)
 
-    def test_element_extends_property(self):
+    def test_element_raw_base_property(self):
         obj = el.Element.build()
-        self.assertIsNone(obj.extends)
+        self.assertIsNone(obj.raw_base)
 
         obj.type = "foo_bar"
-        self.assertEqual("FooBar", obj.extends)
+        self.assertEqual("foo_bar", obj.raw_base)
 
         obj.complex_type = el.ComplexType.build()
-        self.assertIsNone(obj.extends)
+        self.assertIsNone(obj.raw_base)
 
         obj.complex_type.complex_content = el.ComplexContent.build(
             extension=el.Extension.build(base="thug_life")
         )
-        self.assertEqual("ThugLife", obj.extends)
+        self.assertEqual("thug_life", obj.raw_base)
 
-    def test_simple_type_extends_property(self):
-        self.assertIsNone(el.SimpleType.build().extends)
+    def test_simple_type_raw_base_property(self):
+        self.assertIsNone(el.SimpleType.build().raw_base)

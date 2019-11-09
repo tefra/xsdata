@@ -9,7 +9,7 @@ from xsdata.models.elements import (
     Schema,
     SimpleType,
 )
-from xsdata.schema import SchemaReader
+from xsdata.parser import SchemaParser
 
 
 class SimpleTypeTests(ModelTestCase):
@@ -18,7 +18,7 @@ class SimpleTypeTests(ModelTestCase):
     @classmethod
     def setUpClass(cls) -> None:
         xsd = cls.fixture_path("simple_types")
-        reader = SchemaReader(xsd)
+        reader = SchemaParser(xsd)
         cls.result = reader.parse()
 
     def setUp(self) -> None:

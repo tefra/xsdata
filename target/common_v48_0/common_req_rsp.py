@@ -1,6 +1,8 @@
 from dataclasses import dataclass, field
 from typing import List
 
+from .common import *
+
 
 @dataclass
 class BaseRsp:
@@ -134,7 +136,7 @@ class BaseCoreReq:
             "help": "Use to override the default logging level",
         },
     )
-    language_code: Language = field(
+    language_code: str = field(
         default=None,
         metadata={
             "name": "LanguageCode",
@@ -180,7 +182,7 @@ class BaseReq(BaseCoreReq):
         default=None, metadata={"name": "OverridePCC", "type": "Element"}
     )
     retrieve_provider_reservation_details: bool = field(
-        default=false,
+        default="false",
         metadata={
             "name": "RetrieveProviderReservationDetails",
             "type": "Attribute",

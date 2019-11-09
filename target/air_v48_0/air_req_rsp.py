@@ -1,9 +1,13 @@
 from dataclasses import dataclass, field
 from typing import List
 
+from ..common_v48_0.common_req_rsp import *
+from ..rail_v48_0.rail import *
+from .air import *
+
 
 @dataclass
-class AirBaseReq(CommonBaseReq):
+class AirBaseReq(BaseReq):
     """
     Context for Requests and Responses
     """
@@ -12,12 +16,12 @@ class AirBaseReq(CommonBaseReq):
 
 
 @dataclass
-class AirExchangeEligibilityReq(CommonBaseReq):
+class AirExchangeEligibilityReq(BaseReq):
     """
     Request to determine if the fares in an itinerary are exchangeable
     """
 
-    provider_reservation_info: "ProviderReservationInfo" = field(
+    provider_reservation_info: "AirExchangeEligibilityReq.ProviderReservationInfo" = field(
         default=None,
         metadata={
             "required": True,
@@ -41,7 +45,7 @@ class AirExchangeEligibilityReq(CommonBaseReq):
 
 
 @dataclass
-class AirExchangeEligibilityRsp(CommonBaseRsp):
+class AirExchangeEligibilityRsp(BaseRsp):
     exchange_eligibility_info: ExchangeEligibilityInfo = field(
         default=None,
         metadata={
@@ -53,7 +57,7 @@ class AirExchangeEligibilityRsp(CommonBaseRsp):
 
 
 @dataclass
-class AirExchangeQuoteRsp(CommonBaseRsp):
+class AirExchangeQuoteRsp(BaseRsp):
     ticket_number: List[TicketNumber] = field(
         default_factory=list,
         metadata={
@@ -118,7 +122,7 @@ class AirExchangeQuoteRsp(CommonBaseRsp):
 
 
 @dataclass
-class AirExchangeReq(CommonBaseReq):
+class AirExchangeReq(BaseReq):
     """
     Request to exchange an itinerary
     """
@@ -240,7 +244,7 @@ class AirExchangeReq(CommonBaseReq):
         },
     )
     return_reservation: bool = field(
-        default=false,
+        default="false",
         metadata={
             "name": "ReturnReservation",
             "type": "Attribute",
@@ -250,7 +254,7 @@ class AirExchangeReq(CommonBaseReq):
 
 
 @dataclass
-class AirExchangeRsp(CommonBaseRsp):
+class AirExchangeRsp(BaseRsp):
     ticket_number: List[TicketNumber] = field(
         default_factory=list,
         metadata={
@@ -291,7 +295,7 @@ class AirExchangeRsp(CommonBaseRsp):
 
 
 @dataclass
-class AirExchangeTicketingReq(CommonBaseReq):
+class AirExchangeTicketingReq(BaseReq):
     """
     Request to ticket an exchanged itinerary. Providers 1G, 1V, 1P.
     """
@@ -348,7 +352,7 @@ class AirExchangeTicketingReq(CommonBaseReq):
         },
     )
     bulk_ticket: bool = field(
-        default=false,
+        default="false",
         metadata={
             "name": "BulkTicket",
             "type": "Attribute",
@@ -356,7 +360,7 @@ class AirExchangeTicketingReq(CommonBaseReq):
         },
     )
     change_fee_on_ticket: bool = field(
-        default=true,
+        default="true",
         metadata={
             "name": "ChangeFeeOnTicket",
             "type": "Attribute",
@@ -366,7 +370,7 @@ class AirExchangeTicketingReq(CommonBaseReq):
 
 
 @dataclass
-class AirExchangeTicketingRsp(CommonBaseRsp):
+class AirExchangeTicketingRsp(BaseRsp):
     """
     Response to reissue a ticket.
     """
@@ -402,7 +406,7 @@ class AirExchangeTicketingRsp(CommonBaseRsp):
 
 
 @dataclass
-class AirFareDisplayReq(CommonBaseReq):
+class AirFareDisplayReq(BaseReq):
     """
     Request to display a tariff for based on origin, destination, and other options
     """
@@ -567,7 +571,7 @@ class AirFareDisplayReq(CommonBaseReq):
         },
     )
     return_mm: bool = field(
-        default=false,
+        default="false",
         metadata={
             "name": "ReturnMM",
             "type": "Attribute",
@@ -577,7 +581,7 @@ class AirFareDisplayReq(CommonBaseReq):
 
 
 @dataclass
-class AirFareDisplayRsp(CommonBaseRsp):
+class AirFareDisplayRsp(BaseRsp):
     """
     Response to an AirFareDisplayReq
     """
@@ -595,7 +599,7 @@ class AirFareDisplayRsp(CommonBaseRsp):
 
 
 @dataclass
-class AirFareRulesReq(CommonBaseReq):
+class AirFareRulesReq(BaseReq):
     """
     Request to display the full text fare rules.
     """
@@ -608,7 +612,9 @@ class AirFareRulesReq(CommonBaseReq):
             "help": "Provider: 1G,1V.",
         },
     )
-    fare_rules_filter_category: List["FareRulesFilterCategory"] = field(
+    fare_rules_filter_category: List[
+        "AirFareRulesReq.FareRulesFilterCategory"
+    ] = field(
         default_factory=list,
         metadata={
             "min_occurs": 0,
@@ -618,7 +624,7 @@ class AirFareRulesReq(CommonBaseReq):
             "help": "Structured Fare Rules Filter if requested will return rules for requested categories in the response. Applicable for providers 1G, 1V.",
         },
     )
-    air_reservation_selector: "AirReservationSelector" = field(
+    air_reservation_selector: "AirFareRulesReq.AirReservationSelector" = field(
         default=None,
         metadata={
             "required": True,
@@ -655,7 +661,7 @@ class AirFareRulesReq(CommonBaseReq):
         },
     )
     fare_rule_type: TypeFareRuleType = field(
-        default=long,
+        default="long",
         metadata={
             "name": "FareRuleType",
             "type": "Attribute",
@@ -697,7 +703,7 @@ class AirFareRulesReq(CommonBaseReq):
 
 
 @dataclass
-class AirFareRulesRsp(CommonBaseRsp):
+class AirFareRulesRsp(BaseRsp):
     """
     Response to an AirFareRuleReq.
     """
@@ -715,7 +721,7 @@ class AirFareRulesRsp(CommonBaseRsp):
 
 
 @dataclass
-class AirMerchandisingDetailsReq(CommonBaseReq):
+class AirMerchandisingDetailsReq(BaseReq):
     """
     Request to retrieve brand details and optional services included in the brand
     """
@@ -747,7 +753,7 @@ class AirMerchandisingDetailsReq(CommonBaseReq):
 
 
 @dataclass
-class AirMerchandisingDetailsRsp(CommonBaseRsp):
+class AirMerchandisingDetailsRsp(BaseRsp):
     """
     Response for retrieved brand details and optional services included in them
     """
@@ -764,7 +770,7 @@ class AirMerchandisingDetailsRsp(CommonBaseRsp):
             "type": "Element",
         },
     )
-    unassociated_booking_code_list: "UnassociatedBookingCodeList" = field(
+    unassociated_booking_code_list: "AirMerchandisingDetailsRsp.UnassociatedBookingCodeList" = field(
         default=None,
         metadata={
             "name": "UnassociatedBookingCodeList",
@@ -787,7 +793,7 @@ class AirMerchandisingDetailsRsp(CommonBaseRsp):
 
 
 @dataclass
-class AirMerchandisingOfferAvailabilityReq(CommonBaseReq):
+class AirMerchandisingOfferAvailabilityReq(BaseReq):
     """
     Check with the supplier whether or not the reservation or air solution supports any merchandising offerings.
     """
@@ -839,7 +845,7 @@ class AirMerchandisingOfferAvailabilityReq(CommonBaseReq):
 
 
 @dataclass
-class AirMerchandisingOfferAvailabilityRsp(CommonBaseRsp):
+class AirMerchandisingOfferAvailabilityRsp(BaseRsp):
     """
     Contains the merchandising offerings for the given passenger and itinerary.
     """
@@ -870,12 +876,12 @@ class AirMerchandisingOfferAvailabilityRsp(CommonBaseRsp):
 
 
 @dataclass
-class AirPrePayReq(CommonBaseReq):
+class AirPrePayReq(BaseReq):
     """
     Flight Pass Request.
     """
 
-    list_search: "ListSearch" = field(
+    list_search: "AirPrePayReq.ListSearch" = field(
         default=None,
         metadata={
             "required": True,
@@ -884,7 +890,7 @@ class AirPrePayReq(CommonBaseReq):
             "help": "Provider: ACH.",
         },
     )
-    pre_pay_retrieve: "PrePayRetrieve" = field(
+    pre_pay_retrieve: "AirPrePayReq.PrePayRetrieve" = field(
         default=None,
         metadata={
             "required": True,
@@ -956,7 +962,7 @@ class AirPrePayReq(CommonBaseReq):
 
 
 @dataclass
-class AirPrePayRsp(CommonBaseRsp):
+class AirPrePayRsp(BaseRsp):
     """
     Flight Pass Response.
     """
@@ -998,7 +1004,7 @@ class AirPrePayRsp(CommonBaseRsp):
 
 
 @dataclass
-class AirRefundQuoteReq(CommonBaseReq):
+class AirRefundQuoteReq(BaseReq):
     """
     Request to quote a refund for an itinerary
     """
@@ -1041,7 +1047,9 @@ class AirRefundQuoteReq(CommonBaseReq):
             "help": "Provider: ACH.",
         },
     )
-    provider_reservation_info: List["ProviderReservationInfo"] = field(
+    provider_reservation_info: List[
+        "AirRefundQuoteReq.ProviderReservationInfo"
+    ] = field(
         default_factory=list,
         metadata={
             "min_occurs": 0,
@@ -1052,7 +1060,7 @@ class AirRefundQuoteReq(CommonBaseReq):
         },
     )
     ignore: bool = field(
-        default=false,
+        default="false",
         metadata={
             "name": "Ignore",
             "type": "Attribute",
@@ -1066,7 +1074,7 @@ class AirRefundQuoteReq(CommonBaseReq):
 
 
 @dataclass
-class AirRefundQuoteRsp(CommonBaseRsp):
+class AirRefundQuoteRsp(BaseRsp):
     air_refund_bundle: List[AirRefundBundle] = field(
         default_factory=list,
         metadata={
@@ -1089,7 +1097,7 @@ class AirRefundQuoteRsp(CommonBaseRsp):
 
 
 @dataclass
-class AirRefundReq(CommonBaseReq):
+class AirRefundReq(BaseReq):
     """
     Request to refund an itinerary for the amount previously quoted
     """
@@ -1139,7 +1147,7 @@ class AirRefundReq(CommonBaseReq):
 
 
 @dataclass
-class AirRefundRsp(CommonBaseRsp):
+class AirRefundRsp(BaseRsp):
     etr: List[Etr] = field(
         default_factory=list,
         metadata={
@@ -1173,7 +1181,7 @@ class AirRefundRsp(CommonBaseRsp):
 
 
 @dataclass
-class AirRepriceRsp(CommonBaseRsp):
+class AirRepriceRsp(BaseRsp):
     air_pricing_solution: AirPricingSolution = field(
         default=None,
         metadata={
@@ -1194,7 +1202,7 @@ class AirRepriceRsp(CommonBaseRsp):
 
 
 @dataclass
-class AirRetrieveDocumentReq(CommonBaseReq):
+class AirRetrieveDocumentReq(BaseReq):
     """
     Retrieve the post booking information for a PNR. ETRs will be returned for standard carriers. TCRs will be returned for Ticketless carriers. If the locator is send on a standard carrier, all ETRs will be retrieved.
     """
@@ -1254,7 +1262,7 @@ class AirRetrieveDocumentReq(CommonBaseReq):
 
 
 @dataclass
-class AirRetrieveDocumentRsp(CommonBaseRsp):
+class AirRetrieveDocumentRsp(BaseRsp):
     etr: List[Etr] = field(
         default_factory=list,
         metadata={
@@ -1316,7 +1324,7 @@ class AirRetrieveDocumentRsp(CommonBaseRsp):
 
 
 @dataclass
-class AirTicketingRsp(CommonBaseRsp):
+class AirTicketingRsp(BaseRsp):
     """
     Response to ticket a previously stored reservation.
     """
@@ -1358,7 +1366,7 @@ class AirTicketingRsp(CommonBaseRsp):
 
 
 @dataclass
-class AirVoidDocumentReq(CommonBaseReq):
+class AirVoidDocumentReq(BaseReq):
     """
     Request to void all previously issued tickets for the PNR.
     """
@@ -1382,7 +1390,7 @@ class AirVoidDocumentReq(CommonBaseReq):
         },
     )
     show_etr: bool = field(
-        default=false,
+        default="false",
         metadata={
             "name": "ShowETR",
             "type": "Attribute",
@@ -1406,7 +1414,7 @@ class AirVoidDocumentReq(CommonBaseReq):
         },
     )
     validate_spanish_residency: bool = field(
-        default=false,
+        default="false",
         metadata={
             "name": "ValidateSpanishResidency",
             "type": "Attribute",
@@ -1416,7 +1424,7 @@ class AirVoidDocumentReq(CommonBaseReq):
 
 
 @dataclass
-class AirVoidDocumentRsp(CommonBaseRsp):
+class AirVoidDocumentRsp(BaseRsp):
     """
     Result of void ticket request. Includes ticket number of voided tickets and air segments with updated status.
     """
@@ -1444,7 +1452,7 @@ class AirVoidDocumentRsp(CommonBaseRsp):
 
 
 @dataclass
-class BaseAirExchangeMultiQuoteReq(CommonBaseCoreReq):
+class BaseAirExchangeMultiQuoteReq(BaseCoreReq):
     ticket_number: List[TicketNumber] = field(
         default_factory=list,
         metadata={
@@ -1454,7 +1462,7 @@ class BaseAirExchangeMultiQuoteReq(CommonBaseCoreReq):
             "type": "Element",
         },
     )
-    provider_reservation_info: "ProviderReservationInfo" = field(
+    provider_reservation_info: "BaseAirExchangeMultiQuoteReq.ProviderReservationInfo" = field(
         default=None,
         metadata={
             "name": "ProviderReservationInfo",
@@ -1489,7 +1497,7 @@ class BaseAirExchangeMultiQuoteReq(CommonBaseCoreReq):
 
 
 @dataclass
-class BaseAirExchangeQuoteReq(CommonBaseCoreReq):
+class BaseAirExchangeQuoteReq(BaseCoreReq):
     ticket_number: List[TicketNumber] = field(
         default_factory=list,
         metadata={
@@ -1499,7 +1507,7 @@ class BaseAirExchangeQuoteReq(CommonBaseCoreReq):
             "type": "Element",
         },
     )
-    provider_reservation_info: "ProviderReservationInfo" = field(
+    provider_reservation_info: "BaseAirExchangeQuoteReq.ProviderReservationInfo" = field(
         default=None,
         metadata={
             "name": "ProviderReservationInfo",
@@ -1562,7 +1570,7 @@ class BaseAirExchangeQuoteReq(CommonBaseCoreReq):
     )
     pcc: Pcc = field(default=None, metadata={"name": "PCC", "type": "Element"})
     fare_rule_type: TypeFareRuleType = field(
-        default=none,
+        default="none",
         metadata={
             "name": "FareRuleType",
             "type": "Attribute",
@@ -1576,7 +1584,7 @@ class BaseAirExchangeQuoteReq(CommonBaseCoreReq):
 
 
 @dataclass
-class BaseAirPriceReq(CommonBaseCoreReq):
+class BaseAirPriceReq(BaseCoreReq):
     air_itinerary: AirItinerary = field(
         default=None,
         metadata={
@@ -1660,7 +1668,7 @@ class BaseAirPriceReq(CommonBaseCoreReq):
         },
     )
     fare_rule_type: TypeFareRuleType = field(
-        default=none,
+        default="none",
         metadata={
             "name": "FareRuleType",
             "type": "Attribute",
@@ -1684,7 +1692,7 @@ class BaseAirPriceReq(CommonBaseCoreReq):
         },
     )
     check_flight_details: bool = field(
-        default=false,
+        default="false",
         metadata={
             "name": "CheckFlightDetails",
             "type": "Attribute",
@@ -1692,7 +1700,7 @@ class BaseAirPriceReq(CommonBaseCoreReq):
         },
     )
     return_mm: bool = field(
-        default=false,
+        default="false",
         metadata={
             "name": "ReturnMM",
             "type": "Attribute",
@@ -1708,7 +1716,7 @@ class BaseAirPriceReq(CommonBaseCoreReq):
         },
     )
     split_pricing: bool = field(
-        default=false,
+        default="false",
         metadata={
             "name": "SplitPricing",
             "type": "Attribute",
@@ -1716,7 +1724,7 @@ class BaseAirPriceReq(CommonBaseCoreReq):
         },
     )
     ignore_availability: bool = field(
-        default=false,
+        default="false",
         metadata={
             "name": "IgnoreAvailability",
             "type": "Attribute",
@@ -1726,7 +1734,7 @@ class BaseAirPriceReq(CommonBaseCoreReq):
 
 
 @dataclass
-class BaseAirPriceRsp(CommonBaseRsp):
+class BaseAirPriceRsp(BaseRsp):
     air_itinerary: AirItinerary = field(
         default=None,
         metadata={
@@ -1749,7 +1757,7 @@ class BaseAirPriceRsp(CommonBaseRsp):
 
 
 @dataclass
-class BaseAvailabilitySearchRsp(CommonBaseSearchRsp):
+class BaseAvailabilitySearchRsp(BaseSearchRsp):
     """
     Availability Search response
     """
@@ -1801,7 +1809,7 @@ class BrandList:
 
 
 @dataclass
-class EmdissuanceReq(CommonBaseReq):
+class EmdissuanceReq(BaseReq):
     """
     Electronic Miscellaneous Document issuance request.Supported providers are 1V/1G/1P/1J
     """
@@ -1849,7 +1857,7 @@ class EmdissuanceReq(CommonBaseReq):
         },
     )
     show_details: bool = field(
-        default=false,
+        default="false",
         metadata={
             "name": "ShowDetails",
             "type": "Attribute",
@@ -1857,7 +1865,7 @@ class EmdissuanceReq(CommonBaseReq):
         },
     )
     issue_all_open_svc: bool = field(
-        default=false,
+        default="false",
         metadata={
             "name": "IssueAllOpenSVC",
             "type": "Attribute",
@@ -1867,7 +1875,7 @@ class EmdissuanceReq(CommonBaseReq):
 
 
 @dataclass
-class EmdissuanceRsp(CommonBaseRsp):
+class EmdissuanceRsp(BaseRsp):
     """
     Electronic Miscellaneous Document issuance response.Supported providers are 1V/1G/1P/1J
     """
@@ -1895,12 +1903,12 @@ class EmdissuanceRsp(CommonBaseRsp):
 
 
 @dataclass
-class EmdretrieveReq(CommonBaseReq):
+class EmdretrieveReq(BaseReq):
     """
     Electronic Miscellaneous Document retrieve request.Supported providers are 1G/1V/1P/1J
     """
 
-    list_retrieve: "ListRetrieve" = field(
+    list_retrieve: "EmdretrieveReq.ListRetrieve" = field(
         default=None,
         metadata={
             "required": True,
@@ -1909,7 +1917,7 @@ class EmdretrieveReq(CommonBaseReq):
             "help": "Provider: 1G/1V/1P/1J-Information required for retrieval of list of EMDs",
         },
     )
-    detail_retrieve: "DetailRetrieve" = field(
+    detail_retrieve: "EmdretrieveReq.DetailRetrieve" = field(
         default=None,
         metadata={
             "required": True,
@@ -1953,7 +1961,7 @@ class EmdretrieveReq(CommonBaseReq):
 
 
 @dataclass
-class EmdretrieveRsp(CommonBaseRsp):
+class EmdretrieveRsp(BaseRsp):
     """
     Electronic Miscellaneous Document list and detail retrieve response.Supported providers are 1G/1V/1P/1J
     """
@@ -1980,7 +1988,7 @@ class EmdretrieveRsp(CommonBaseRsp):
 
 
 @dataclass
-class FlightDetailsReq(CommonBaseReq):
+class FlightDetailsReq(BaseReq):
     """
     Request for the Flight Details of segments.
     """
@@ -1998,7 +2006,7 @@ class FlightDetailsReq(CommonBaseReq):
 
 
 @dataclass
-class FlightDetailsRsp(CommonBaseRsp):
+class FlightDetailsRsp(BaseRsp):
     air_segment: List[AirSegment] = field(
         default_factory=list,
         metadata={
@@ -2021,7 +2029,7 @@ class FlightDetailsRsp(CommonBaseRsp):
 
 
 @dataclass
-class FlightInformationReq(CommonBaseReq):
+class FlightInformationReq(BaseReq):
     """
     Request for the Flight Info of segments.
     """
@@ -2039,7 +2047,7 @@ class FlightInformationReq(CommonBaseReq):
 
 
 @dataclass
-class FlightInformationRsp(CommonBaseRsp):
+class FlightInformationRsp(BaseRsp):
     flight_info: List[FlightInfo] = field(
         default_factory=list,
         metadata={
@@ -2053,7 +2061,7 @@ class FlightInformationRsp(CommonBaseRsp):
 
 
 @dataclass
-class FlightTimeTableReq(CommonBaseSearchReq):
+class FlightTimeTableReq(BaseSearchReq):
     """
     Request for Flight Time Table.
     """
@@ -2070,12 +2078,12 @@ class FlightTimeTableReq(CommonBaseSearchReq):
 
 
 @dataclass
-class FlightTimeTableRsp(CommonBaseSearchRsp):
+class FlightTimeTableRsp(BaseSearchRsp):
     """
     Response for Flight Time Table.
     """
 
-    flight_time_table_list: "FlightTimeTableList" = field(
+    flight_time_table_list: "FlightTimeTableRsp.FlightTimeTableList" = field(
         default=None,
         metadata={
             "name": "FlightTimeTableList",
@@ -2098,7 +2106,7 @@ class FlightTimeTableRsp(CommonBaseSearchRsp):
 
 
 @dataclass
-class RetrieveLowFareSearchReq(CommonBaseReq):
+class RetrieveLowFareSearchReq(BaseReq):
     """
     Retrieve low fare search responses that were initiated by an asynchronous request.
     """
@@ -2170,7 +2178,7 @@ class SearchSpecificAirSegment:
             "help": "The IATA location code for this destination of this entity.",
         },
     )
-    segment_index: Int = field(
+    segment_index: int = field(
         default=None,
         metadata={
             "name": "SegmentIndex",
@@ -2181,7 +2189,7 @@ class SearchSpecificAirSegment:
 
 
 @dataclass
-class SeatMapReq(CommonBaseReq):
+class SeatMapReq(BaseReq):
     """
     Request a seat map for the give flight information
     """
@@ -2250,7 +2258,7 @@ class SeatMapReq(CommonBaseReq):
         },
     )
     return_branding_info: bool = field(
-        default=false,
+        default="false",
         metadata={
             "name": "ReturnBrandingInfo",
             "type": "Attribute",
@@ -2260,7 +2268,7 @@ class SeatMapReq(CommonBaseReq):
 
 
 @dataclass
-class SeatMapRsp(CommonBaseRsp):
+class SeatMapRsp(BaseRsp):
     host_token: List[HostToken] = field(
         default_factory=list,
         metadata={
@@ -2368,7 +2376,7 @@ class AirExchangeMultiQuoteReq(BaseAirExchangeMultiQuoteReq):
     """
 
     type: str = field(
-        default=Summary,
+        default="Summary",
         metadata={
             "name": "Type",
             "type": "Attribute",
@@ -2378,7 +2386,7 @@ class AirExchangeMultiQuoteReq(BaseAirExchangeMultiQuoteReq):
 
 
 @dataclass
-class AirExchangeMultiQuoteRsp(CommonBaseRsp):
+class AirExchangeMultiQuoteRsp(BaseRsp):
     air_segment_list: List[AirSegmentList] = field(
         default_factory=list,
         metadata={
@@ -2450,16 +2458,16 @@ class AirRepriceReq(AirBaseReq):
         },
     )
     fare_rule_type: TypeFareRuleType = field(
-        default=none, metadata={"name": "FareRuleType", "type": "Attribute"}
+        default="none", metadata={"name": "FareRuleType", "type": "Attribute"}
     )
     ignore_availability: bool = field(
-        default=false,
+        default="false",
         metadata={"name": "IgnoreAvailability", "type": "Attribute"},
     )
 
 
 @dataclass
-class AirSearchReq(CommonBaseSearchReq):
+class AirSearchReq(BaseSearchReq):
     """
     Base Request for Air Search
     """
@@ -2581,7 +2589,7 @@ class AirTicketingReq(AirBaseReq):
             "help": "Provider: 1G,1V,1P,1J.",
         },
     )
-    air_pricing_info_ref: List["AirPricingInfoRef"] = field(
+    air_pricing_info_ref: List["AirTicketingReq.AirPricingInfoRef"] = field(
         default_factory=list,
         metadata={
             "min_occurs": 0,
@@ -2654,11 +2662,11 @@ class AirTicketingReq(AirBaseReq):
         },
     )
     return_info_on_fail: bool = field(
-        default=true,
+        default="true",
         metadata={"name": "ReturnInfoOnFail", "type": "Attribute"},
     )
     bulk_ticket: bool = field(
-        default=false,
+        default="false",
         metadata={
             "name": "BulkTicket",
             "type": "Attribute",
@@ -2666,7 +2674,7 @@ class AirTicketingReq(AirBaseReq):
         },
     )
     validate_spanish_residency: bool = field(
-        default=false,
+        default="false",
         metadata={
             "name": "ValidateSpanishResidency",
             "type": "Attribute",
@@ -2733,7 +2741,7 @@ class AvailabilitySearchRsp(BaseAvailabilitySearchRsp):
 
 
 @dataclass
-class BaseAirSearchReq(CommonBaseCoreSearchReq):
+class BaseAirSearchReq(BaseCoreSearchReq):
     """
     Base Request for Low fare air Search
     """
@@ -2796,7 +2804,7 @@ class AvailabilitySearchReq(AirSearchReq):
         },
     )
     return_brand_indicator: bool = field(
-        default=false,
+        default="false",
         metadata={
             "name": "ReturnBrandIndicator",
             "type": "Attribute",
@@ -2885,7 +2893,7 @@ class BaseLowFareSearchReq(BaseAirSearchReq):
         },
     )
     enable_point_to_point_search: bool = field(
-        default=false,
+        default="false",
         metadata={
             "name": "EnablePointToPointSearch",
             "type": "Attribute",
@@ -2893,7 +2901,7 @@ class BaseLowFareSearchReq(BaseAirSearchReq):
         },
     )
     enable_point_to_point_alternates: bool = field(
-        default=false,
+        default="false",
         metadata={
             "name": "EnablePointToPointAlternates",
             "type": "Attribute",
@@ -2901,7 +2909,7 @@ class BaseLowFareSearchReq(BaseAirSearchReq):
         },
     )
     max_number_of_expert_solutions: int = field(
-        default=0,
+        default="0",
         metadata={
             "name": "MaxNumberOfExpertSolutions",
             "type": "Attribute",
@@ -2909,7 +2917,7 @@ class BaseLowFareSearchReq(BaseAirSearchReq):
         },
     )
     solution_result: bool = field(
-        default=false,
+        default="false",
         metadata={
             "name": "SolutionResult",
             "type": "Attribute",
@@ -2917,7 +2925,7 @@ class BaseLowFareSearchReq(BaseAirSearchReq):
         },
     )
     prefer_complete_itinerary: bool = field(
-        default=true,
+        default="true",
         metadata={
             "name": "PreferCompleteItinerary",
             "type": "Attribute",
@@ -2933,7 +2941,7 @@ class BaseLowFareSearchReq(BaseAirSearchReq):
         },
     )
     return_upsell_fare: bool = field(
-        default=false,
+        default="false",
         metadata={
             "name": "ReturnUpsellFare",
             "type": "Attribute",
@@ -2941,7 +2949,7 @@ class BaseLowFareSearchReq(BaseAirSearchReq):
         },
     )
     include_fare_info_messages: bool = field(
-        default=false,
+        default="false",
         metadata={
             "name": "IncludeFareInfoMessages",
             "type": "Attribute",
@@ -2949,7 +2957,7 @@ class BaseLowFareSearchReq(BaseAirSearchReq):
         },
     )
     return_branded_fares: bool = field(
-        default=true,
+        default="true",
         metadata={
             "name": "ReturnBrandedFares",
             "type": "Attribute",
@@ -2957,7 +2965,7 @@ class BaseLowFareSearchReq(BaseAirSearchReq):
         },
     )
     multi_gdssearch: bool = field(
-        default=false,
+        default="false",
         metadata={
             "name": "MultiGDSSearch",
             "type": "Attribute",
@@ -2965,7 +2973,7 @@ class BaseLowFareSearchReq(BaseAirSearchReq):
         },
     )
     return_mm: bool = field(
-        default=false,
+        default="false",
         metadata={
             "name": "ReturnMM",
             "type": "Attribute",
@@ -2989,7 +2997,7 @@ class BaseLowFareSearchReq(BaseAirSearchReq):
         },
     )
     fare_info_rules: bool = field(
-        default=false,
+        default="false",
         metadata={
             "name": "FareInfoRules",
             "type": "Attribute",

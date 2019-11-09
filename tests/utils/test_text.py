@@ -10,6 +10,7 @@ class TextTests(TestCase):
         self.assertEqual("user_name", snake_case("UserName"))
         self.assertEqual("user_name", snake_case("USER_NAME"))
         self.assertEqual("user_name", snake_case("user_name"))
+        self.assertEqual("common_v48_0", snake_case("common_v48_0"))
         self.assertEqual("user", snake_case("user"))
         self.assertEqual("user", snake_case("User"))
         self.assertEqual("user", snake_case("USER"))

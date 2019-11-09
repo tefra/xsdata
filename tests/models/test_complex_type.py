@@ -17,7 +17,7 @@ from xsdata.models.elements import (
     SimpleContent,
     SimpleType,
 )
-from xsdata.schema import SchemaReader
+from xsdata.parser import SchemaParser
 
 
 class ComplexTypeTests(ModelTestCase):
@@ -26,7 +26,7 @@ class ComplexTypeTests(ModelTestCase):
     @classmethod
     def setUpClass(cls) -> None:
         xsd = cls.fixture_path("complex_types")
-        reader = SchemaReader(xsd)
+        reader = SchemaParser(xsd)
         cls.result = reader.parse()
 
     def setUp(self) -> None:
@@ -96,7 +96,7 @@ class ComplexTypeTests(ModelTestCase):
                             simple_type=SimpleType.build(
                                 restriction=Restriction.build(
                                     base="xs:string",
-                                    min_length=MinLength.build(value=1),
+                                    min_length=MinLength.build(value="1"),
                                 )
                             ),
                         )

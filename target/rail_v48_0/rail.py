@@ -1,6 +1,8 @@
 from dataclasses import dataclass, field
 from typing import List
 
+from ..common_v48_0.common import *
+
 
 @dataclass
 class FareValidity:
@@ -183,7 +185,7 @@ class RailBookingInfo:
         },
     )
     optional_service: bool = field(
-        default=false,
+        default="false",
         metadata={
             "name": "OptionalService",
             "type": "Attribute",
@@ -239,7 +241,7 @@ class RailFareComponent:
     Contains fare and discount information for each passenger type
     """
 
-    discount: List["Discount"] = field(
+    discount: List["RailFareComponent.Discount"] = field(
         default_factory=list,
         metadata={
             "min_occurs": 0,
@@ -377,11 +379,11 @@ class RailJourneyRef:
 
 @dataclass
 class RailLegModifiers:
-    permitted_connection_points: "PermittedConnectionPoints" = field(
+    permitted_connection_points: "RailLegModifiers.PermittedConnectionPoints" = field(
         default=None,
         metadata={"name": "PermittedConnectionPoints", "type": "Element"},
     )
-    prohibited_connection_points: "ProhibitedConnectionPoints" = field(
+    prohibited_connection_points: "RailLegModifiers.ProhibitedConnectionPoints" = field(
         default=None,
         metadata={"name": "ProhibitedConnectionPoints", "type": "Element"},
     )
@@ -431,7 +433,7 @@ class RailPricingModifiers:
         },
     )
     prohibit_non_refundable_fares: bool = field(
-        default=false,
+        default="false",
         metadata={
             "name": "ProhibitNonRefundableFares",
             "type": "Attribute",
@@ -439,7 +441,7 @@ class RailPricingModifiers:
         },
     )
     prohibit_non_exchangeable_fares: bool = field(
-        default=false,
+        default="false",
         metadata={
             "name": "ProhibitNonExchangeableFares",
             "type": "Attribute",
@@ -607,7 +609,7 @@ class TicketAdvisory:
     key: TypeRef = field(
         default=None, metadata={"name": "Key", "type": "Attribute"}
     )
-    language_code: Language = field(
+    language_code: str = field(
         default=None,
         metadata={
             "name": "LanguageCode",
@@ -735,7 +737,7 @@ class Characteristic:
     """
 
     smoking: bool = field(
-        default=false, metadata={"name": "Smoking", "type": "Attribute"}
+        default="false", metadata={"name": "Smoking", "type": "Attribute"}
     )
     class_value: TypeCoachClassType = field(
         default=None, metadata={"name": "Class", "type": "Attribute"}
@@ -888,7 +890,7 @@ class RailFare:
         },
     )
     cross_city_fare: bool = field(
-        default=false,
+        default="false",
         metadata={
             "name": "CrossCityFare",
             "type": "Attribute",
@@ -1017,12 +1019,12 @@ class RailSearchModifiers:
     Controls and switches for the Rail Availability Search request
     """
 
-    preferred_suppliers: "PreferredSuppliers" = field(
+    preferred_suppliers: "RailSearchModifiers.PreferredSuppliers" = field(
         default=None,
         metadata={"name": "PreferredSuppliers", "type": "Element"},
     )
     max_changes: int = field(
-        default=2,
+        default="2",
         metadata={
             "name": "MaxChanges",
             "type": "Attribute",
@@ -1041,7 +1043,7 @@ class RailSearchModifiers:
         default=None, metadata={"name": "Class", "type": "Attribute"}
     )
     max_solutions: int = field(
-        default=300,
+        default="300",
         metadata={
             "name": "MaxSolutions",
             "type": "Attribute",
@@ -1148,7 +1150,7 @@ class RailTicketInfo:
             "help": "Type of traffic.",
         },
     )
-    issued_date: DateTime = field(
+    issued_date: str = field(
         default=None,
         metadata={
             "name": "IssuedDate",
@@ -1289,7 +1291,7 @@ class RailPricingInfo:
 
 
 @dataclass
-class RailSegment(CommonSegment):
+class RailSegment(Segment):
     """
     Rail Segment
     """
@@ -1564,7 +1566,7 @@ class RailJourneyList:
 
 
 @dataclass
-class RailReservation(CommonBaseReservation):
+class RailReservation(BaseReservation):
     """
     The parent container for all Rail booking data
     """

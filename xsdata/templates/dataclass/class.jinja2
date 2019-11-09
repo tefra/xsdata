@@ -1,0 +1,28 @@
+{% set outer = outer|default([]) %}
+{% do outer.append(obj.name) %}
+
+@dataclass
+class {{ obj.name }}{{"({})".format(obj.extends) if obj.extends }}:
+{%- if obj.help %}
+    """
+    {{ obj.help }}
+    """
+{% endif -%}
+{%- if obj.attrs|length == 0 %}
+    pass
+{% endif -%}
+{% for attr in obj.attrs %}
+    {%- set display_type = '"{}.{}"'.format(outer|join('.'), attr.type) if attr.forward_ref else attr.type %}
+    {%- set display_default = '"{}"'.format(attr.default) if attr.default else attr.default %}
+    {{ attr.name }}: {{ 'List[{}]'.format(display_type) if attr.is_list else display_type }} = field(
+        {{ "default_factory=list" if attr.is_list else "default={}".format(display_default) }},
+        metadata={{ attr.metadata }}
+    )
+{%- endfor %}
+{% for inner in obj.inner %}
+    {%- filter indent(4) -%}
+        {%- with obj=inner, outer=outer,  indent=indent -%}
+            {% include "class.jinja2" %}
+        {%- endwith -%}
+    {%- endfilter -%}
+{%- endfor -%}

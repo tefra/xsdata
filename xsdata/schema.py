@@ -1,3 +1,4 @@
+import pathlib
 from dataclasses import dataclass, field
 from typing import List
 
@@ -11,15 +12,19 @@ from xsdata.utils.text import capitalize, snake_case
 
 @dataclass
 class SchemaReader:
-    path: str
+    path: pathlib.Path
     elements: List[BaseModel] = field(default_factory=list)
     methods: dict = field(init=False)
 
     def __post_init__(self):
         self.methods = {tag.qname: tag for tag in Tag}
+        if isinstance(self.path, str):
+            self.path = pathlib.Path(self.path).resolve()
 
     def parse(self) -> Schema:
-        context = etree.iterparse(self.path, events=(Event.START, Event.END))
+        context = etree.iterparse(
+            str(self.path), events=(Event.START, Event.END)
+        )
         for event, elem in context:
             tag = self.methods.get(elem.tag)
             if tag is None:

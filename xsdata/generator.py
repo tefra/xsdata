@@ -24,12 +24,10 @@ AttributeElement = Union[Attribute, Element, Restriction]
 
 @dataclass
 class CodeGenerator:
-    INNER_COMPLEX_TYPE_GENERATED = "Inner ComplexType name auto generated"
     schema: Schema
     recovered: int = field(default=0, init=False)
     queue: List[BaseElement] = field(default_factory=list, init=False)
     deck: List[Class] = field(default_factory=list, init=False)
-    deque: List[Class] = field(default_factory=list, init=False)
 
     def generate(self) -> List[Class]:
         """Generate class properties from schema elements and simple/complex

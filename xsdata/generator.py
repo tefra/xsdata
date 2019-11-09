@@ -16,8 +16,7 @@ from xsdata.utils.text import safe_snake
 
 logger = logging.getLogger(__name__)
 
-BaseElements = Union[List[Element], List[ComplexType], List[SimpleType]]
-BaseElement = Union[Element, ComplexType, SimpleType]
+BaseElement = Union[Attribute, Element, ComplexType, SimpleType]
 AttributeElement = Union[Attribute, Element, Restriction]
 
 
@@ -32,6 +31,7 @@ class CodeGenerator:
         """Generate class properties from schema elements and simple/complex
         types."""
         classes: List[Class] = []
+        classes.extend(map(self.generate_element, self.schema.attributes))
         classes.extend(map(self.generate_element, self.schema.simple_types))
         classes.extend(map(self.generate_element, self.schema.complex_types))
         classes.extend(map(self.generate_element, self.schema.elements))

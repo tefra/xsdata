@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<definitions name="RailService"
+             xmlns="http://schemas.xmlsoap.org/wsdl/"
+             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+             xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+             xmlns:tns="http://www.travelport.com/service/rail_v48_0"
+             xmlns:ns1="http://www.travelport.com/schema/rail_v48_0"
+             targetNamespace="http://www.travelport.com/service/rail_v48_0">
+
+    <import namespace="http://www.travelport.com/service/rail_v48_0" location="RailAbstract.wsdl" />
+
+    <!-- Bindings -->
+    <binding name="RailAvailabilitySearchBinding" type="tns:RailAvailabilitySearchPortType">
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http" />
+        <operation name="service">
+            <soap:operation soapAction="http://localhost:8080/kestrel/RailService"/>
+            <input>
+                <soap:body use="literal" />
+            </input>
+            <output>
+                <soap:body use="literal" />
+            </output>
+            <fault name="ErrorInfoMsg">
+                <soap:fault name="ErrorInfoMsg" use="literal" />
+            </fault>
+        </operation>
+    </binding>
+    <binding name="RailRefundQuoteBinding" type="tns:RailRefundQuotePortType">
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http" />
+        <operation name="service">
+            <soap:operation soapAction="http://localhost:8080/kestrel/RailService"/>
+            <input>
+                <soap:body use="literal" />
+            </input>
+            <output>
+                <soap:body use="literal" />
+            </output>
+            <fault name="ErrorInfoMsg">
+                <soap:fault name="ErrorInfoMsg" use="literal" />
+            </fault>
+        </operation>
+    </binding>
+    <binding name="RailRefundBinding" type="tns:RailRefundPortType">
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http" />
+        <operation name="service">
+            <soap:operation soapAction="http://localhost:8080/kestrel/RailService"/>
+            <input>
+                <soap:body use="literal" />
+            </input>
+            <output>
+                <soap:body use="literal" />
+            </output>
+            <fault name="ErrorInfoMsg">
+                <soap:fault name="ErrorInfoMsg" use="literal" />
+            </fault>
+        </operation>
+    </binding>
+    <binding name="RailExchangeQuoteBinding" type="tns:RailExchangeQuotePortType">
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http" />
+        <operation name="service">
+            <soap:operation soapAction="http://localhost:8080/kestrel/RailService"/>
+            <input>
+                <soap:body use="literal" />
+            </input>
+            <output>
+                <soap:body use="literal" />
+            </output>
+            <fault name="ErrorInfoMsg">
+                <soap:fault name="ErrorInfoMsg" use="literal" />
+            </fault>
+        </operation>
+    </binding>
+    <binding name="RailExchangeCreateReservationBinding" type="tns:RailExchangeCreateReservationPortType">
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http" />
+        <operation name="service">
+            <soap:operation soapAction="http://localhost:8080/kestrel/RailService"/>
+            <input>
+                <soap:body use="literal" />
+            </input>
+            <output>
+                <soap:body use="literal" />
+            </output>
+            <fault name="ErrorInfoMsg">
+                <soap:fault name="ErrorInfoMsg" use="literal" />
+            </fault>
+        </operation>
+    </binding>
+    <binding name="RailSeatMapBinding" type="tns:RailSeatMapPortType">
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http" />
+        <operation name="service">
+            <soap:operation soapAction="http://localhost:8080/kestrel/RailService"/>
+            <input>
+                <soap:body use="literal" />
+            </input>
+            <output>
+                <soap:body use="literal" />
+            </output>
+            <fault name="ErrorInfoMsg">
+                <soap:fault name="ErrorInfoMsg" use="literal" />
+            </fault>
+        </operation>
+    </binding>
+
+    <!-- Services -->
+    <service name="RailService">
+        <port name="RailAvailabilitySearchPort"
+              binding="tns:RailAvailabilitySearchBinding">
+            <soap:address
+                 location="http://localhost:8080/kestrel/RailService" />
+        </port>
+        <port name="RailRefundQuotePort"
+              binding="tns:RailRefundQuoteBinding">
+            <soap:address
+                 location="http://localhost:8080/kestrel/RailService" />
+        </port>
+        <port name="RailRefundPort"
+              binding="tns:RailRefundBinding">
+            <soap:address
+                 location="http://localhost:8080/kestrel/RailService" />
+        </port>
+        <port name="RailExchangeQuotePort"
+              binding="tns:RailExchangeQuoteBinding">
+            <soap:address
+                 location="http://localhost:8080/kestrel/RailService" />
+        </port>
+        <port name="RailExchangeCreateReservationPort"
+        	  binding="tns:RailExchangeCreateReservationBinding">
+            <soap:address 
+            	 location="http://localhost:8080/kestrel/RailService" />
+        </port>
+        <port name="RailSeatMapPort"
+              binding="tns:RailSeatMapBinding">
+            <soap:address
+                 location="http://localhost:8080/kestrel/RailService" />
+        </port>
+    </service>
+</definitions>

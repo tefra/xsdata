@@ -2,21 +2,24 @@ from dataclasses import dataclass, field
 from typing import List
 
 
+
+
 @dataclass
 class CompanyIdentificationType:
-
     pass
 
 
 @dataclass
 class AlphaNumericStringLength0To1:
-    """Format limitations: an..1"""
+    """
+    Format limitations: an..1
+    """
 
     value: str = field(
         default=None,
         metadata={
-            "min_length": 0.0,
-            "max_length": 1.0,
+            "min_length": "0",
+            "max_length": "1",
             "name": "value",
             "type": "Restriction",
         },
@@ -25,13 +28,15 @@ class AlphaNumericStringLength0To1:
 
 @dataclass
 class AlphaNumericStringLength0To18:
-    """Format limitations: an..18"""
+    """
+    Format limitations: an..18
+    """
 
     value: str = field(
         default=None,
         metadata={
-            "min_length": 0.0,
-            "max_length": 18.0,
+            "min_length": "0",
+            "max_length": "18",
             "name": "value",
             "type": "Restriction",
         },
@@ -40,13 +45,15 @@ class AlphaNumericStringLength0To18:
 
 @dataclass
 class AlphaNumericStringLength0To3:
-    """Format limitations: an..3"""
+    """
+    Format limitations: an..3
+    """
 
     value: str = field(
         default=None,
         metadata={
-            "min_length": 0.0,
-            "max_length": 3.0,
+            "min_length": "0",
+            "max_length": "3",
             "name": "value",
             "type": "Restriction",
         },
@@ -55,13 +62,15 @@ class AlphaNumericStringLength0To3:
 
 @dataclass
 class AlphaNumericStringLength1To1:
-    """Format limitations: an1"""
+    """
+    Format limitations: an1
+    """
 
     value: str = field(
         default=None,
         metadata={
-            "min_length": 1.0,
-            "max_length": 1.0,
+            "min_length": "1",
+            "max_length": "1",
             "name": "value",
             "type": "Restriction",
         },
@@ -70,13 +79,15 @@ class AlphaNumericStringLength1To1:
 
 @dataclass
 class AlphaNumericStringLength1To10:
-    """Format limitations: an..10"""
+    """
+    Format limitations: an..10
+    """
 
     value: str = field(
         default=None,
         metadata={
-            "min_length": 1.0,
-            "max_length": 10.0,
+            "min_length": "1",
+            "max_length": "10",
             "name": "value",
             "type": "Restriction",
         },
@@ -85,13 +96,15 @@ class AlphaNumericStringLength1To10:
 
 @dataclass
 class AlphaNumericStringLength1To12:
-    """Format limitations: an..12"""
+    """
+    Format limitations: an..12
+    """
 
     value: str = field(
         default=None,
         metadata={
-            "min_length": 1.0,
-            "max_length": 12.0,
+            "min_length": "1",
+            "max_length": "12",
             "name": "value",
             "type": "Restriction",
         },
@@ -100,13 +113,15 @@ class AlphaNumericStringLength1To12:
 
 @dataclass
 class AlphaNumericStringLength1To18:
-    """Format limitations: an..18"""
+    """
+    Format limitations: an..18
+    """
 
     value: str = field(
         default=None,
         metadata={
-            "min_length": 1.0,
-            "max_length": 18.0,
+            "min_length": "1",
+            "max_length": "18",
             "name": "value",
             "type": "Restriction",
         },
@@ -115,13 +130,15 @@ class AlphaNumericStringLength1To18:
 
 @dataclass
 class AlphaNumericStringLength1To2:
-    """Format limitations: an..2"""
+    """
+    Format limitations: an..2
+    """
 
     value: str = field(
         default=None,
         metadata={
-            "min_length": 1.0,
-            "max_length": 2.0,
+            "min_length": "1",
+            "max_length": "2",
             "name": "value",
             "type": "Restriction",
         },
@@ -130,13 +147,15 @@ class AlphaNumericStringLength1To2:
 
 @dataclass
 class AlphaNumericStringLength1To20:
-    """Format limitations: an..20"""
+    """
+    Format limitations: an..20
+    """
 
     value: str = field(
         default=None,
         metadata={
-            "min_length": 1.0,
-            "max_length": 20.0,
+            "min_length": "1",
+            "max_length": "20",
             "name": "value",
             "type": "Restriction",
         },
@@ -145,13 +164,15 @@ class AlphaNumericStringLength1To20:
 
 @dataclass
 class AlphaNumericStringLength1To25:
-    """Format limitations: an..25"""
+    """
+    Format limitations: an..25
+    """
 
     value: str = field(
         default=None,
         metadata={
-            "min_length": 1.0,
-            "max_length": 25.0,
+            "min_length": "1",
+            "max_length": "25",
             "name": "value",
             "type": "Restriction",
         },
@@ -160,13 +181,15 @@ class AlphaNumericStringLength1To25:
 
 @dataclass
 class AlphaNumericStringLength1To250:
-    """Format limitations: an..250"""
+    """
+    Format limitations: an..250
+    """
 
     value: str = field(
         default=None,
         metadata={
-            "min_length": 1.0,
-            "max_length": 250.0,
+            "min_length": "1",
+            "max_length": "250",
             "name": "value",
             "type": "Restriction",
         },
@@ -175,13 +198,15 @@ class AlphaNumericStringLength1To250:
 
 @dataclass
 class AlphaNumericStringLength1To256:
-    """Format limitations: an..256"""
+    """
+    Format limitations: an..256
+    """
 
     value: str = field(
         default=None,
         metadata={
-            "min_length": 1.0,
-            "max_length": 256.0,
+            "min_length": "1",
+            "max_length": "256",
             "name": "value",
             "type": "Restriction",
         },
@@ -190,13 +215,15 @@ class AlphaNumericStringLength1To256:
 
 @dataclass
 class AlphaNumericStringLength1To28:
-    """Format limitations: an..28"""
+    """
+    Format limitations: an..28
+    """
 
     value: str = field(
         default=None,
         metadata={
-            "min_length": 1.0,
-            "max_length": 28.0,
+            "min_length": "1",
+            "max_length": "28",
             "name": "value",
             "type": "Restriction",
         },
@@ -205,13 +232,15 @@ class AlphaNumericStringLength1To28:
 
 @dataclass
 class AlphaNumericStringLength1To3:
-    """Format limitations: an..3"""
+    """
+    Format limitations: an..3
+    """
 
     value: str = field(
         default=None,
         metadata={
-            "min_length": 1.0,
-            "max_length": 3.0,
+            "min_length": "1",
+            "max_length": "3",
             "name": "value",
             "type": "Restriction",
         },
@@ -220,13 +249,15 @@ class AlphaNumericStringLength1To3:
 
 @dataclass
 class AlphaNumericStringLength1To30:
-    """Format limitations: an..30"""
+    """
+    Format limitations: an..30
+    """
 
     value: str = field(
         default=None,
         metadata={
-            "min_length": 1.0,
-            "max_length": 30.0,
+            "min_length": "1",
+            "max_length": "30",
             "name": "value",
             "type": "Restriction",
         },
@@ -235,13 +266,15 @@ class AlphaNumericStringLength1To30:
 
 @dataclass
 class AlphaNumericStringLength1To35:
-    """Format limitations: an..35"""
+    """
+    Format limitations: an..35
+    """
 
     value: str = field(
         default=None,
         metadata={
-            "min_length": 1.0,
-            "max_length": 35.0,
+            "min_length": "1",
+            "max_length": "35",
             "name": "value",
             "type": "Restriction",
         },
@@ -250,13 +283,15 @@ class AlphaNumericStringLength1To35:
 
 @dataclass
 class AlphaNumericStringLength1To4:
-    """Format limitations: an..4"""
+    """
+    Format limitations: an..4
+    """
 
     value: str = field(
         default=None,
         metadata={
-            "min_length": 1.0,
-            "max_length": 4.0,
+            "min_length": "1",
+            "max_length": "4",
             "name": "value",
             "type": "Restriction",
         },
@@ -265,13 +300,15 @@ class AlphaNumericStringLength1To4:
 
 @dataclass
 class AlphaNumericStringLength1To5:
-    """Format limitations: an..5"""
+    """
+    Format limitations: an..5
+    """
 
     value: str = field(
         default=None,
         metadata={
-            "min_length": 1.0,
-            "max_length": 5.0,
+            "min_length": "1",
+            "max_length": "5",
             "name": "value",
             "type": "Restriction",
         },
@@ -280,13 +317,15 @@ class AlphaNumericStringLength1To5:
 
 @dataclass
 class AlphaNumericStringLength1To50:
-    """Format limitations: an..50"""
+    """
+    Format limitations: an..50
+    """
 
     value: str = field(
         default=None,
         metadata={
-            "min_length": 1.0,
-            "max_length": 50.0,
+            "min_length": "1",
+            "max_length": "50",
             "name": "value",
             "type": "Restriction",
         },
@@ -295,13 +334,15 @@ class AlphaNumericStringLength1To50:
 
 @dataclass
 class AlphaNumericStringLength1To6:
-    """Format limitations: an..6"""
+    """
+    Format limitations: an..6
+    """
 
     value: str = field(
         default=None,
         metadata={
-            "min_length": 1.0,
-            "max_length": 6.0,
+            "min_length": "1",
+            "max_length": "6",
             "name": "value",
             "type": "Restriction",
         },
@@ -310,13 +351,15 @@ class AlphaNumericStringLength1To6:
 
 @dataclass
 class AlphaNumericStringLength1To7:
-    """Format limitations: an..7"""
+    """
+    Format limitations: an..7
+    """
 
     value: str = field(
         default=None,
         metadata={
-            "min_length": 1.0,
-            "max_length": 7.0,
+            "min_length": "1",
+            "max_length": "7",
             "name": "value",
             "type": "Restriction",
         },
@@ -325,13 +368,15 @@ class AlphaNumericStringLength1To7:
 
 @dataclass
 class AlphaNumericStringLength1To70:
-    """Format limitations: an..70"""
+    """
+    Format limitations: an..70
+    """
 
     value: str = field(
         default=None,
         metadata={
-            "min_length": 1.0,
-            "max_length": 70.0,
+            "min_length": "1",
+            "max_length": "70",
             "name": "value",
             "type": "Restriction",
         },
@@ -340,13 +385,15 @@ class AlphaNumericStringLength1To70:
 
 @dataclass
 class AlphaNumericStringLength1To8:
-    """Format limitations: an..8"""
+    """
+    Format limitations: an..8
+    """
 
     value: str = field(
         default=None,
         metadata={
-            "min_length": 1.0,
-            "max_length": 8.0,
+            "min_length": "1",
+            "max_length": "8",
             "name": "value",
             "type": "Restriction",
         },
@@ -355,13 +402,15 @@ class AlphaNumericStringLength1To8:
 
 @dataclass
 class AlphaNumericStringLength1To9:
-    """Format limitations: an..9"""
+    """
+    Format limitations: an..9
+    """
 
     value: str = field(
         default=None,
         metadata={
-            "min_length": 1.0,
-            "max_length": 9.0,
+            "min_length": "1",
+            "max_length": "9",
             "name": "value",
             "type": "Restriction",
         },
@@ -370,13 +419,15 @@ class AlphaNumericStringLength1To9:
 
 @dataclass
 class AlphaNumericStringLength2To3:
-    """Format limitations: an2..3"""
+    """
+    Format limitations: an2..3
+    """
 
     value: str = field(
         default=None,
         metadata={
-            "min_length": 2.0,
-            "max_length": 3.0,
+            "min_length": "2",
+            "max_length": "3",
             "name": "value",
             "type": "Restriction",
         },
@@ -385,13 +436,15 @@ class AlphaNumericStringLength2To3:
 
 @dataclass
 class AlphaNumericStringLength3To5:
-    """Format limitations: an3..5"""
+    """
+    Format limitations: an3..5
+    """
 
     value: str = field(
         default=None,
         metadata={
-            "min_length": 3.0,
-            "max_length": 5.0,
+            "min_length": "3",
+            "max_length": "5",
             "name": "value",
             "type": "Restriction",
         },
@@ -400,13 +453,15 @@ class AlphaNumericStringLength3To5:
 
 @dataclass
 class AlphaNumericStringLength6To6:
-    """Format limitations: an6"""
+    """
+    Format limitations: an6
+    """
 
     value: str = field(
         default=None,
         metadata={
-            "min_length": 6.0,
-            "max_length": 6.0,
+            "min_length": "6",
+            "max_length": "6",
             "name": "value",
             "type": "Restriction",
         },
@@ -415,13 +470,15 @@ class AlphaNumericStringLength6To6:
 
 @dataclass
 class AlphaStringLength0To1:
-    """Format limitations: a..1"""
+    """
+    Format limitations: a..1
+    """
 
     value: str = field(
         default=None,
         metadata={
-            "min_length": 0.0,
-            "max_length": 1.0,
+            "min_length": "0",
+            "max_length": "1",
             "name": "value",
             "type": "Restriction",
         },
@@ -430,13 +487,15 @@ class AlphaStringLength0To1:
 
 @dataclass
 class AlphaStringLength1To1:
-    """Format limitations: a1"""
+    """
+    Format limitations: a1
+    """
 
     value: str = field(
         default=None,
         metadata={
-            "min_length": 1.0,
-            "max_length": 1.0,
+            "min_length": "1",
+            "max_length": "1",
             "name": "value",
             "type": "Restriction",
         },
@@ -445,13 +504,15 @@ class AlphaStringLength1To1:
 
 @dataclass
 class AlphaStringLength1To2:
-    """Format limitations: a..2"""
+    """
+    Format limitations: a..2
+    """
 
     value: str = field(
         default=None,
         metadata={
-            "min_length": 1.0,
-            "max_length": 2.0,
+            "min_length": "1",
+            "max_length": "2",
             "name": "value",
             "type": "Restriction",
         },
@@ -460,13 +521,15 @@ class AlphaStringLength1To2:
 
 @dataclass
 class AlphaStringLength1To3:
-    """Format limitations: a..3"""
+    """
+    Format limitations: a..3
+    """
 
     value: str = field(
         default=None,
         metadata={
-            "min_length": 1.0,
-            "max_length": 3.0,
+            "min_length": "1",
+            "max_length": "3",
             "name": "value",
             "type": "Restriction",
         },
@@ -475,13 +538,15 @@ class AlphaStringLength1To3:
 
 @dataclass
 class AlphaStringLength3To3:
-    """Format limitations: a3"""
+    """
+    Format limitations: a3
+    """
 
     value: str = field(
         default=None,
         metadata={
-            "min_length": 3.0,
-            "max_length": 3.0,
+            "min_length": "3",
+            "max_length": "3",
             "name": "value",
             "type": "Restriction",
         },
@@ -490,13 +555,15 @@ class AlphaStringLength3To3:
 
 @dataclass
 class AlphaStringLength3To5:
-    """Format limitations: a3..5"""
+    """
+    Format limitations: a3..5
+    """
 
     value: str = field(
         default=None,
         metadata={
-            "min_length": 3.0,
-            "max_length": 5.0,
+            "min_length": "3",
+            "max_length": "5",
             "name": "value",
             "type": "Restriction",
         },
@@ -505,7 +572,9 @@ class AlphaStringLength3To5:
 
 @dataclass
 class AmaEdicodesetTypeLength1:
-    """Used for codes in the AMADEUS code tables. Code Length is one alphanumeric character."""
+    """
+    Used for codes in the AMADEUS code tables. Code Length is one alphanumeric character.
+    """
 
     value: str = field(
         default=None,
@@ -519,7 +588,9 @@ class AmaEdicodesetTypeLength1:
 
 @dataclass
 class AmaEdicodesetTypeLength1to3:
-    """Used for codes in the AMADEUS code tables. Code Length is three alphanumeric characters."""
+    """
+    Used for codes in the AMADEUS code tables. Code Length is three alphanumeric characters.
+    """
 
     value: str = field(
         default=None,
@@ -533,7 +604,9 @@ class AmaEdicodesetTypeLength1to3:
 
 @dataclass
 class DateDdmmyy:
-    """Date format: DDMMYY"""
+    """
+    Date format: DDMMYY
+    """
 
     value: str = field(
         default=None,
@@ -547,7 +620,9 @@ class DateDdmmyy:
 
 @dataclass
 class DateYyyymmdd:
-    """Date format: YYYYMMDD"""
+    """
+    Date format: YYYYMMDD
+    """
 
     value: str = field(
         default=None,
@@ -561,7 +636,9 @@ class DateYyyymmdd:
 
 @dataclass
 class NumericDecimalLength1To12:
-    """Format limitations: n..12"""
+    """
+    Format limitations: n..12
+    """
 
     value: float = field(
         default=None, metadata={"name": "value", "type": "Restriction"}
@@ -570,7 +647,9 @@ class NumericDecimalLength1To12:
 
 @dataclass
 class NumericDecimalLength1To18:
-    """Format limitations: n..18"""
+    """
+    Format limitations: n..18
+    """
 
     value: float = field(
         default=None, metadata={"name": "value", "type": "Restriction"}
@@ -579,7 +658,9 @@ class NumericDecimalLength1To18:
 
 @dataclass
 class NumericIntegerLength0To3:
-    """Format limitations: n..3"""
+    """
+    Format limitations: n..3
+    """
 
     value: int = field(
         default=None,
@@ -593,7 +674,9 @@ class NumericIntegerLength0To3:
 
 @dataclass
 class NumericIntegerLength0To35:
-    """Format limitations: n..35"""
+    """
+    Format limitations: n..35
+    """
 
     value: int = field(
         default=None,
@@ -607,7 +690,9 @@ class NumericIntegerLength0To35:
 
 @dataclass
 class NumericIntegerLength1To1:
-    """Format limitations: n1"""
+    """
+    Format limitations: n1
+    """
 
     value: int = field(
         default=None,
@@ -621,7 +706,9 @@ class NumericIntegerLength1To1:
 
 @dataclass
 class NumericIntegerLength1To15:
-    """Format limitations: n..15"""
+    """
+    Format limitations: n..15
+    """
 
     value: int = field(
         default=None,
@@ -635,7 +722,9 @@ class NumericIntegerLength1To15:
 
 @dataclass
 class NumericIntegerLength1To18:
-    """Format limitations: n..18"""
+    """
+    Format limitations: n..18
+    """
 
     value: int = field(
         default=None,
@@ -649,7 +738,9 @@ class NumericIntegerLength1To18:
 
 @dataclass
 class NumericIntegerLength1To2:
-    """Format limitations: n..2"""
+    """
+    Format limitations: n..2
+    """
 
     value: int = field(
         default=None,
@@ -663,7 +754,9 @@ class NumericIntegerLength1To2:
 
 @dataclass
 class NumericIntegerLength1To3:
-    """Format limitations: n..3"""
+    """
+    Format limitations: n..3
+    """
 
     value: int = field(
         default=None,
@@ -677,7 +770,9 @@ class NumericIntegerLength1To3:
 
 @dataclass
 class NumericIntegerLength1To4:
-    """Format limitations: n..4"""
+    """
+    Format limitations: n..4
+    """
 
     value: int = field(
         default=None,
@@ -691,7 +786,9 @@ class NumericIntegerLength1To4:
 
 @dataclass
 class NumericIntegerLength1To6:
-    """Format limitations: n..6"""
+    """
+    Format limitations: n..6
+    """
 
     value: int = field(
         default=None,
@@ -705,7 +802,9 @@ class NumericIntegerLength1To6:
 
 @dataclass
 class NumericIntegerLength1To8:
-    """Format limitations: n..8"""
+    """
+    Format limitations: n..8
+    """
 
     value: int = field(
         default=None,
@@ -719,7 +818,9 @@ class NumericIntegerLength1To8:
 
 @dataclass
 class NumericIntegerLength1To9:
-    """Format limitations: n..9"""
+    """
+    Format limitations: n..9
+    """
 
     value: int = field(
         default=None,
@@ -733,7 +834,9 @@ class NumericIntegerLength1To9:
 
 @dataclass
 class NumericIntegerLength4To4:
-    """Format limitations: n4"""
+    """
+    Format limitations: n4
+    """
 
     value: int = field(
         default=None,
@@ -747,7 +850,9 @@ class NumericIntegerLength4To4:
 
 @dataclass
 class Time24Hhmm:
-    """Time format: 24H. All digits are mandatory . Example: from 0000 to 2359"""
+    """
+    Time format: 24H. All digits are mandatory . Example: from 0000 to 2359
+    """
 
     value: str = field(
         default=None,
@@ -761,7 +866,6 @@ class Time24Hhmm:
 
 @dataclass
 class AdditionalProductDetailsType:
-
     equipment_type: AlphaNumericStringLength1To3 = field(
         default=None,
         metadata={
@@ -800,7 +904,9 @@ class AdditionalProductDetailsType:
 
 @dataclass
 class AdditionalProductTypeI:
-    """Additional details describing a specific means of transport."""
+    """
+    Additional details describing a specific means of transport.
+    """
 
     equipment: AlphaNumericStringLength1To3 = field(
         default=None,
@@ -830,7 +936,6 @@ class AdditionalProductTypeI:
 
 @dataclass
 class AgentIdentificationType:
-
     arc_number: AlphaNumericStringLength1To12 = field(
         default=None,
         metadata={
@@ -859,7 +964,6 @@ class AgentIdentificationType:
 
 @dataclass
 class ArithmeticEvaluationType:
-
     code_operator: AlphaNumericStringLength1To3 = field(
         default=None,
         metadata={
@@ -872,7 +976,6 @@ class ArithmeticEvaluationType:
 
 @dataclass
 class ArrivalLocationDetailsType:
-
     distance: NumericIntegerLength1To3 = field(
         default=None,
         metadata={
@@ -925,7 +1028,6 @@ class ArrivalLocationDetailsType:
 
 @dataclass
 class ArrivalLocationDetailsType120834C:
-
     distance: NumericIntegerLength1To3 = field(
         default=None,
         metadata={
@@ -978,7 +1080,6 @@ class ArrivalLocationDetailsType120834C:
 
 @dataclass
 class AttributeDetailsType:
-
     requested_sgt: AlphaNumericStringLength1To3 = field(
         default=None,
         metadata={
@@ -1001,7 +1102,9 @@ class AttributeDetailsType:
 
 @dataclass
 class AttributeInformationType:
-    """To identify the type of attribute and the attribute"""
+    """
+    To identify the type of attribute and the attribute
+    """
 
     option: AlphaNumericStringLength1To3 = field(
         default=None,
@@ -1024,7 +1127,9 @@ class AttributeInformationType:
 
 @dataclass
 class AttributeInformationType97181C:
-    """To identify the type of attribute and the attribute"""
+    """
+    To identify the type of attribute and the attribute
+    """
 
     attribute_type: AlphaNumericStringLength1To25 = field(
         default=None,
@@ -1047,7 +1152,6 @@ class AttributeInformationType97181C:
 
 @dataclass
 class BucketInformationType:
-
     number: AlphaNumericStringLength1To3 = field(
         default=None,
         metadata={"name": "number", "type": "Element", "help": "Number"},
@@ -1100,7 +1204,9 @@ class BucketInformationType:
 
 @dataclass
 class CabinClassDesignationType:
-    """Cabin class designation"""
+    """
+    Cabin class designation
+    """
 
     cabin_designator: AlphaNumericStringLength1To1 = field(
         default=None,
@@ -1115,7 +1221,6 @@ class CabinClassDesignationType:
 
 @dataclass
 class CabinIdentificationType:
-
     cabin_qualifier: AlphaNumericStringLength1To2 = field(
         default=None,
         metadata={
@@ -1138,7 +1243,6 @@ class CabinIdentificationType:
 
 @dataclass
 class CabinIdentificationType233500C:
-
     cabin_qualifier: AlphaNumericStringLength1To2 = field(
         default=None,
         metadata={
@@ -1161,7 +1265,6 @@ class CabinIdentificationType233500C:
 
 @dataclass
 class CabinProductDetailsType:
-
     rbd: AlphaStringLength1To1 = field(
         default=None,
         metadata={
@@ -1199,7 +1302,9 @@ class CabinProductDetailsType:
 
 @dataclass
 class CodedAttributeInformationType:
-    """Attribute information"""
+    """
+    Attribute information
+    """
 
     attribute_type: AlphaNumericStringLength1To5 = field(
         default=None,
@@ -1222,7 +1327,9 @@ class CodedAttributeInformationType:
 
 @dataclass
 class CodedAttributeInformationType120742C:
-    """Convey coded key and corresponding value"""
+    """
+    Convey coded key and corresponding value
+    """
 
     name: AlphaNumericStringLength1To5 = field(
         default=None,
@@ -1247,7 +1354,9 @@ class CodedAttributeInformationType120742C:
 
 @dataclass
 class CodedAttributeInformationType139508C:
-    """Convey coded key and corresponding value"""
+    """
+    Convey coded key and corresponding value
+    """
 
     type: AlphaNumericStringLength1To5 = field(
         default=None,
@@ -1267,7 +1376,9 @@ class CodedAttributeInformationType139508C:
 
 @dataclass
 class CodedAttributeInformationType247828C:
-    """Convey coded key and corresponding value"""
+    """
+    Convey coded key and corresponding value
+    """
 
     attribute_type: AlphaNumericStringLength1To5 = field(
         default=None,
@@ -1289,7 +1400,9 @@ class CodedAttributeInformationType247828C:
 
 @dataclass
 class CodedAttributeInformationType254574C:
-    """Convey coded key and corresponding value"""
+    """
+    Convey coded key and corresponding value
+    """
 
     attribute_type: AlphaNumericStringLength1To5 = field(
         default=None,
@@ -1312,7 +1425,9 @@ class CodedAttributeInformationType254574C:
 
 @dataclass
 class CodedAttributeInformationType275401C:
-    """Convey coded key and corresponding value"""
+    """
+    Convey coded key and corresponding value
+    """
 
     fee_type: AlphaNumericStringLength1To5 = field(
         default=None,
@@ -1336,7 +1451,6 @@ class CodedAttributeInformationType275401C:
 
 @dataclass
 class CompanyIdentificationType120719C:
-
     carrier_qualifier: AlphaNumericStringLength0To1 = field(
         default=None,
         metadata={
@@ -1360,7 +1474,6 @@ class CompanyIdentificationType120719C:
 
 @dataclass
 class CompanyIdentificationType195544C:
-
     marketing_carrier: AlphaNumericStringLength2To3 = field(
         default=None,
         metadata={
@@ -1382,7 +1495,6 @@ class CompanyIdentificationType195544C:
 
 @dataclass
 class CompanyIdentificationType275415C:
-
     carrier_qualifier: AlphaNumericStringLength0To1 = field(
         default=None,
         metadata={
@@ -1406,7 +1518,9 @@ class CompanyIdentificationType275415C:
 
 @dataclass
 class CompanyIdentificationTypeI:
-    """Code or name to identify a company and any associated companies."""
+    """
+    Code or name to identify a company and any associated companies.
+    """
 
     marketing_company: AlphaNumericStringLength2To3 = field(
         default=None,
@@ -1421,7 +1535,9 @@ class CompanyIdentificationTypeI:
 
 @dataclass
 class CompanyRoleIdentificationType:
-    """To indicate commercial agreements related to the service being provided."""
+    """
+    To indicate commercial agreements related to the service being provided.
+    """
 
     transport_stage_qualifier: AlphaStringLength1To1 = field(
         default=None,
@@ -1460,7 +1576,9 @@ class CompanyRoleIdentificationType:
 
 @dataclass
 class CompanyRoleIdentificationType120761C:
-    """To indicate commercial agreements related to the service being provided."""
+    """
+    To indicate commercial agreements related to the service being provided.
+    """
 
     code_share_type: AlphaStringLength1To1 = field(
         default=None,
@@ -1490,7 +1608,6 @@ class CompanyRoleIdentificationType120761C:
 
 @dataclass
 class ConnectPointDetailsType:
-
     exclusion_identifier: AlphaStringLength0To1 = field(
         default=None,
         metadata={
@@ -1521,7 +1638,6 @@ class ConnectPointDetailsType:
 
 @dataclass
 class ConnectPointDetailsType195492C:
-
     inclusion_identifier: AlphaNumericStringLength0To1 = field(
         default=None,
         metadata={
@@ -1552,7 +1668,9 @@ class ConnectPointDetailsType195492C:
 
 @dataclass
 class ConnectionDetailsTypeI:
-    """To specify the location, product supplier and time for a connection with the next means of transport."""
+    """
+    To specify the location, product supplier and time for a connection with the next means of transport.
+    """
 
     location: AlphaNumericStringLength1To3 = field(
         default=None,
@@ -1567,7 +1685,9 @@ class ConnectionDetailsTypeI:
 
 @dataclass
 class ConsumerReferenceIdentificationTypeI:
-    """Identification of consumer references by type, company, number and reference to a traveller."""
+    """
+    Identification of consumer references by type, company, number and reference to a traveller.
+    """
 
     reference_qualifier: AlphaNumericStringLength1To3 = field(
         default=None,
@@ -1592,7 +1712,6 @@ class ConsumerReferenceIdentificationTypeI:
 
 @dataclass
 class ConversionRateDetailsType:
-
     conversion_type: AlphaNumericStringLength1To3 = field(
         default=None,
         metadata={
@@ -1614,7 +1733,6 @@ class ConversionRateDetailsType:
 
 @dataclass
 class CorporateFareIdentifiersType:
-
     fare_qualifier: AlphaNumericStringLength1To3 = field(
         default=None,
         metadata={
@@ -1637,7 +1755,9 @@ class CorporateFareIdentifiersType:
 
 @dataclass
 class CorporateIdentityType:
-    """Corporate fare types indicated in PTK are detailed"""
+    """
+    Corporate fare types indicated in PTK are detailed
+    """
 
     corporate_qualifier: AlphaNumericStringLength0To3 = field(
         default=None,
@@ -1662,7 +1782,9 @@ class CorporateIdentityType:
 
 @dataclass
 class CriteriaiDetaislType:
-    """Criteria details : weights/parameters list"""
+    """
+    Criteria details : weights/parameters list
+    """
 
     type: AlphaNumericStringLength1To3 = field(
         default=None, metadata={"name": "type", "type": "Element"}
@@ -1683,7 +1805,9 @@ class CriteriaiDetaislType:
 
 @dataclass
 class DataInformationType:
-    """To identify specific data and a quantity related to the data."""
+    """
+    To identify specific data and a quantity related to the data.
+    """
 
     indicator: AlphaNumericStringLength1To3 = field(
         default=None,
@@ -1697,7 +1821,9 @@ class DataInformationType:
 
 @dataclass
 class DataTypeInformationType:
-    """To identify the type of data to be sent and to qualify the data when required."""
+    """
+    To identify the type of data to be sent and to qualify the data when required.
+    """
 
     sub_type: AlphaNumericStringLength1To3 = field(
         default=None,
@@ -1720,7 +1846,9 @@ class DataTypeInformationType:
 
 @dataclass
 class DateAndTimeDetailsType:
-    """DATE AND TIME DETAILS"""
+    """
+    DATE AND TIME DETAILS
+    """
 
     flexibility_qualifier: AlphaNumericStringLength1To3 = field(
         default=None,
@@ -1750,7 +1878,6 @@ class DateAndTimeDetailsType:
 
 @dataclass
 class DateAndTimeDetailsType120762C:
-
     date_qualifier: AlphaNumericStringLength1To3 = field(
         default=None,
         metadata={
@@ -1791,7 +1918,9 @@ class DateAndTimeDetailsType120762C:
 
 @dataclass
 class DateAndTimeDetailsType254619C:
-    """DATE AND TIME DETAILS"""
+    """
+    DATE AND TIME DETAILS
+    """
 
     range_qualifier: AlphaNumericStringLength1To3 = field(
         default=None,
@@ -1821,7 +1950,9 @@ class DateAndTimeDetailsType254619C:
 
 @dataclass
 class DateAndTimeDetailsTypeI:
-    """DATE AND TIME DETAILS"""
+    """
+    DATE AND TIME DETAILS
+    """
 
     time_qualifier: AlphaNumericStringLength1To3 = field(
         default=None,
@@ -1851,7 +1982,6 @@ class DateAndTimeDetailsTypeI:
 
 @dataclass
 class DateAndTimeDetailsTypeI120740C:
-
     qualifier: AlphaNumericStringLength1To3 = field(
         default=None,
         metadata={
@@ -1882,7 +2012,9 @@ class DateAndTimeDetailsTypeI120740C:
 
 @dataclass
 class DateTimePeriodDetailsTypeI:
-    """To indicate period of applicability."""
+    """
+    To indicate period of applicability.
+    """
 
     qualifier: AlphaNumericStringLength1To3 = field(
         default=None,
@@ -1901,7 +2033,6 @@ class DateTimePeriodDetailsTypeI:
 
 @dataclass
 class FareDetailsType:
-
     qualifier: AmaEdicodesetTypeLength1to3 = field(
         default=None,
         metadata={"name": "qualifier", "type": "Element", "help": "Qualifier"},
@@ -1926,7 +2057,9 @@ class FareDetailsType:
 
 @dataclass
 class FareFamilyDetailsType:
-    """NEW FARE SEARCH"""
+    """
+    NEW FARE SEARCH
+    """
 
     commercial_family: AlphaNumericStringLength1To10 = field(
         default=None,
@@ -1941,7 +2074,9 @@ class FareFamilyDetailsType:
 
 @dataclass
 class FareInformationTypeI:
-    """To specify fare details."""
+    """
+    To specify fare details.
+    """
 
     value_qualifier: AlphaNumericStringLength1To3 = field(
         default=None,
@@ -1959,7 +2094,6 @@ class FareInformationTypeI:
 
 @dataclass
 class FareProductDetailsType:
-
     fare_basis: AlphaNumericStringLength0To18 = field(
         default=None,
         metadata={
@@ -1982,7 +2116,9 @@ class FareProductDetailsType:
 
 @dataclass
 class FareQualifierInformationType:
-    """To specify multiple qualifier for fare selections."""
+    """
+    To specify multiple qualifier for fare selections.
+    """
 
     fare_family_qual: List[AlphaNumericStringLength0To3] = field(
         default_factory=list,
@@ -1998,7 +2134,6 @@ class FareQualifierInformationType:
 
 @dataclass
 class FareTypeGroupingInformationType:
-
     pricing_group: AlphaNumericStringLength1To35 = field(
         default=None,
         metadata={
@@ -2011,7 +2146,9 @@ class FareTypeGroupingInformationType:
 
 @dataclass
 class FormOfPaymentDetailsTypeI:
-    """To specify the form of payment type, amounts, approval codes, and other related information."""
+    """
+    To specify the form of payment type, amounts, approval codes, and other related information.
+    """
 
     type: AlphaNumericStringLength1To3 = field(
         default=None,
@@ -2042,7 +2179,6 @@ class FormOfPaymentDetailsTypeI:
 
 @dataclass
 class FreeTextDetailsType:
-
     text_subject_qualifier: AlphaNumericStringLength1To3 = field(
         default=None,
         metadata={
@@ -2082,7 +2218,9 @@ class FreeTextDetailsType:
 
 @dataclass
 class FrequencyType:
-    """Give the days of the week involved for a period"""
+    """
+    Give the days of the week involved for a period
+    """
 
     qualifier: AlphaNumericStringLength1To3 = field(
         default=None,
@@ -2107,7 +2245,6 @@ class FrequencyType:
 
 @dataclass
 class FrequentTravellerIdentificationType:
-
     carrier: AlphaNumericStringLength1To35 = field(
         default=None,
         metadata={
@@ -2182,7 +2319,9 @@ class FrequentTravellerIdentificationType:
 
 @dataclass
 class FrequentTravellerIdentificationType249074C:
-    """Identification of the frequent traveller number by company code with the capability to reference a specific traveller."""
+    """
+    Identification of the frequent traveller number by company code with the capability to reference a specific traveller.
+    """
 
     carrier: AlphaNumericStringLength1To3 = field(
         default=None,
@@ -2245,7 +2384,9 @@ class FrequentTravellerIdentificationType249074C:
 
 @dataclass
 class ItemNumberIdentificationType:
-    """Goods identification for a specified source"""
+    """
+    Goods identification for a specified source
+    """
 
     number: AlphaNumericStringLength1To4 = field(
         default=None,
@@ -2275,7 +2416,9 @@ class ItemNumberIdentificationType:
 
 @dataclass
 class ItineraryDetailsType:
-    """Forces arrival or departure to/from the same city or airport option"""
+    """
+    Forces arrival or departure to/from the same city or airport option
+    """
 
     airport_city_qualifier: AlphaStringLength1To1 = field(
         default=None,
@@ -2299,7 +2442,6 @@ class ItineraryDetailsType:
 
 @dataclass
 class LocationDetailsTypeI:
-
     location_id: AlphaStringLength3To5 = field(
         default=None,
         metadata={
@@ -2321,7 +2463,6 @@ class LocationDetailsTypeI:
 
 @dataclass
 class LocationIdentificationDetailsType:
-
     location_id: AlphaStringLength3To5 = field(
         default=None,
         metadata={
@@ -2351,7 +2492,9 @@ class LocationIdentificationDetailsType:
 
 @dataclass
 class LocationTypeI:
-    """To identify a location by code or name."""
+    """
+    To identify a location by code or name.
+    """
 
     true_location_id: AlphaStringLength3To3 = field(
         default=None,
@@ -2366,7 +2509,9 @@ class LocationTypeI:
 
 @dataclass
 class MileageTimeDetailsTypeI:
-    """Information about the distance/duration of a trip."""
+    """
+    Information about the distance/duration of a trip.
+    """
 
     elapsed_ground_time: NumericIntegerLength1To4 = field(
         default=None,
@@ -2380,7 +2525,6 @@ class MileageTimeDetailsTypeI:
 
 @dataclass
 class MonetaryAndCabinInformationDetailsType:
-
     amount_type: AlphaNumericStringLength0To3 = field(
         default=None,
         metadata={
@@ -2428,7 +2572,6 @@ class MonetaryAndCabinInformationDetailsType:
 
 @dataclass
 class MonetaryInformationDetailsTypeI:
-
     qualifier: AlphaNumericStringLength1To3 = field(
         default=None,
         metadata={
@@ -2458,7 +2601,6 @@ class MonetaryInformationDetailsTypeI:
 
 @dataclass
 class MonetaryInformationDetailsTypeI194597C:
-
     qualifier: AlphaNumericStringLength1To3 = field(
         default=None,
         metadata={
@@ -2496,7 +2638,9 @@ class MonetaryInformationDetailsTypeI194597C:
 
 @dataclass
 class MonetaryInformationDetailsTypeI65140C:
-    """To specify the type of monetary amount, the amount, and the currency code."""
+    """
+    To specify the type of monetary amount, the amount, and the currency code.
+    """
 
     type_qualifier: AlphaNumericStringLength1To3 = field(
         default=None,
@@ -2519,7 +2663,9 @@ class MonetaryInformationDetailsTypeI65140C:
 
 @dataclass
 class MonetaryInformationDetailsTypeI65141C:
-    """To specify the type of monetary amount, the amount, and the currency code."""
+    """
+    To specify the type of monetary amount, the amount, and the currency code.
+    """
 
     type_qualifier: AlphaNumericStringLength1To3 = field(
         default=None,
@@ -2546,7 +2692,9 @@ class MonetaryInformationDetailsTypeI65141C:
 
 @dataclass
 class MultiCityOptionType:
-    """List of requested arrival points"""
+    """
+    List of requested arrival points
+    """
 
     location_id: AlphaStringLength3To5 = field(
         default=None,
@@ -2569,7 +2717,9 @@ class MultiCityOptionType:
 
 @dataclass
 class MultipleIdentificationNumbersTypeI:
-    """To specify more than one identification number."""
+    """
+    To specify more than one identification number.
+    """
 
     corporate_number_identifier: AlphaNumericStringLength1To12 = field(
         default=None,
@@ -2591,7 +2741,6 @@ class MultipleIdentificationNumbersTypeI:
 
 @dataclass
 class NumberOfUnitDetailsType:
-
     number_of_units: NumericIntegerLength1To4 = field(
         default=None,
         metadata={
@@ -2613,7 +2762,6 @@ class NumberOfUnitDetailsType:
 
 @dataclass
 class NumberOfUnitDetailsType270113C:
-
     number_of_units: NumericIntegerLength1To6 = field(
         default=None,
         metadata={
@@ -2636,7 +2784,6 @@ class NumberOfUnitDetailsType270113C:
 
 @dataclass
 class NumberOfUnitDetailsTypeI:
-
     number_of_units: NumericIntegerLength1To3 = field(
         default=None,
         metadata={
@@ -2659,7 +2806,9 @@ class NumberOfUnitDetailsTypeI:
 
 @dataclass
 class OriginatorIdentificationDetailsTypeI:
-    """To identify a user"""
+    """
+    To identify a user
+    """
 
     office_name: NumericIntegerLength1To9 = field(
         default=None,
@@ -2697,7 +2846,9 @@ class OriginatorIdentificationDetailsTypeI:
 
 @dataclass
 class PnrsegmentReferenceType:
-    """Reference to PNR segment"""
+    """
+    Reference to PNR segment
+    """
 
     pnr_segment_tattoo: NumericIntegerLength0To35 = field(
         default=None,
@@ -2715,7 +2866,9 @@ class PnrsegmentReferenceType:
 
 @dataclass
 class PricingTicketingInformationType:
-    """To specify indicators related to pricing and ticketing."""
+    """
+    To specify indicators related to pricing and ticketing.
+    """
 
     price_type: List[AlphaNumericStringLength0To3] = field(
         default_factory=list,
@@ -2731,7 +2884,9 @@ class PricingTicketingInformationType:
 
 @dataclass
 class ProductDateTimeType:
-    """Product date or time"""
+    """
+    Product date or time
+    """
 
     date: DateDdmmyy = field(
         default=None,
@@ -2749,7 +2904,6 @@ class ProductDateTimeType:
 
 @dataclass
 class ProductDateTimeType195546C:
-
     date_of_departure: DateDdmmyy = field(
         default=None,
         metadata={
@@ -2795,7 +2949,9 @@ class ProductDateTimeType195546C:
 
 @dataclass
 class ProductDateTimeTypeI:
-    """To specify the dates and times associated with a product."""
+    """
+    To specify the dates and times associated with a product.
+    """
 
     departure_date: DateYyyymmdd = field(
         default=None,
@@ -2841,7 +2997,9 @@ class ProductDateTimeTypeI:
 
 @dataclass
 class ProductDateTimeTypeI194583C:
-    """To specify the dates and times associated with a product."""
+    """
+    To specify the dates and times associated with a product.
+    """
 
     date: DateDdmmyy = field(
         default=None,
@@ -2864,7 +3022,6 @@ class ProductDateTimeTypeI194583C:
 
 @dataclass
 class ProductDateTimeTypeI194598C:
-
     date: DateDdmmyy = field(
         default=None,
         metadata={
@@ -2886,7 +3043,9 @@ class ProductDateTimeTypeI194598C:
 
 @dataclass
 class ProductFacilitiesType:
-    """Level of access"""
+    """
+    Level of access
+    """
 
     last_seat_available: AlphaStringLength1To1 = field(
         default=None,
@@ -2942,7 +3101,9 @@ class ProductFacilitiesType:
 
 @dataclass
 class ProductIdentificationDetailsTypeI:
-    """Code, number or name to identify a specific product or service."""
+    """
+    Code, number or name to identify a specific product or service.
+    """
 
     flight_number: NumericIntegerLength1To4 = field(
         default=None,
@@ -2965,7 +3126,9 @@ class ProductIdentificationDetailsTypeI:
 
 @dataclass
 class ProductIdentificationDetailsTypeI50878C:
-    """Code, number or name to identify a specific product or service."""
+    """
+    Code, number or name to identify a specific product or service.
+    """
 
     flight_number: AlphaNumericStringLength1To5 = field(
         default=None,
@@ -2990,7 +3153,9 @@ class ProductIdentificationDetailsTypeI50878C:
 
 @dataclass
 class ProductLocationDetailsTypeI:
-    """To indicate a location and the type of location."""
+    """
+    To indicate a location and the type of location.
+    """
 
     station: AlphaStringLength3To3 = field(
         default=None,
@@ -3000,7 +3165,9 @@ class ProductLocationDetailsTypeI:
 
 @dataclass
 class ProductTypeDetailsType:
-    """Product type details"""
+    """
+    Product type details
+    """
 
     sequence_number: AlphaNumericStringLength1To6 = field(
         default=None,
@@ -3018,7 +3185,6 @@ class ProductTypeDetailsType:
 
 @dataclass
 class ProductTypeDetailsType120801C:
-
     flight_type: List[AlphaNumericStringLength1To2] = field(
         default_factory=list,
         metadata={
@@ -3033,7 +3199,9 @@ class ProductTypeDetailsType120801C:
 
 @dataclass
 class ProductTypeDetailsType205137C:
-    """To specify additional characteristics of a product or service."""
+    """
+    To specify additional characteristics of a product or service.
+    """
 
     avl: List[AlphaNumericStringLength1To6] = field(
         default_factory=list,
@@ -3049,7 +3217,9 @@ class ProductTypeDetailsType205137C:
 
 @dataclass
 class ProductTypeDetailsTypeI:
-    """To specify additional characteristics of a product or service."""
+    """
+    To specify additional characteristics of a product or service.
+    """
 
     flight_indicator: List[AlphaStringLength1To3] = field(
         default_factory=list,
@@ -3065,7 +3235,6 @@ class ProductTypeDetailsTypeI:
 
 @dataclass
 class ProposedSegmentDetailsType:
-
     ref: AlphaNumericStringLength1To6 = field(
         default=None,
         metadata={
@@ -3086,7 +3255,9 @@ class ProposedSegmentDetailsType:
 
 @dataclass
 class ReferencingDetailsType:
-    """Referencing details"""
+    """
+    Referencing details
+    """
 
     ref_qualifier: AlphaNumericStringLength1To3 = field(
         default=None,
@@ -3109,7 +3280,9 @@ class ReferencingDetailsType:
 
 @dataclass
 class SegmentRepetitionControlDetailsTypeI:
-    """Information about the number of selection segments to be processed."""
+    """
+    Information about the number of selection segments to be processed.
+    """
 
     quantity: NumericIntegerLength1To15 = field(
         default=None,
@@ -3123,7 +3296,9 @@ class SegmentRepetitionControlDetailsTypeI:
 
 @dataclass
 class SelectionDetailsInformationType:
-    """To specify a selected option and associated information."""
+    """
+    To specify a selected option and associated information.
+    """
 
     type: AlphaNumericStringLength1To3 = field(
         default=None,
@@ -3146,7 +3321,9 @@ class SelectionDetailsInformationType:
 
 @dataclass
 class SelectionDetailsInformationTypeI:
-    """To specify a selected option and associated information."""
+    """
+    To specify a selected option and associated information.
+    """
 
     option: AlphaNumericStringLength1To3 = field(
         default=None,
@@ -3159,7 +3336,9 @@ class SelectionDetailsInformationTypeI:
 
 @dataclass
 class SpecialRequirementsDataDetailsType:
-    """Special requirements data details"""
+    """
+    Special requirements data details
+    """
 
     seat_characteristics: List[AlphaNumericStringLength1To2] = field(
         default_factory=list,
@@ -3175,7 +3354,6 @@ class SpecialRequirementsDataDetailsType:
 
 @dataclass
 class SpecialRequirementsTypeDetailsType:
-
     service_classification: AlphaNumericStringLength1To4 = field(
         default=None,
         metadata={
@@ -3239,7 +3417,9 @@ class SpecialRequirementsTypeDetailsType:
 
 @dataclass
 class StationInformationTypeI:
-    """To specify departure/arrival information concerning a means of transport."""
+    """
+    To specify departure/arrival information concerning a means of transport.
+    """
 
     terminal: AlphaNumericStringLength1To3 = field(
         default=None,
@@ -3253,7 +3433,9 @@ class StationInformationTypeI:
 
 @dataclass
 class StructuredDateTimeType:
-    """Store date and time in a structured way"""
+    """
+    Store date and time in a structured way
+    """
 
     year: NumericIntegerLength4To4 = field(
         default=None,
@@ -3283,7 +3465,6 @@ class StructuredDateTimeType:
 
 @dataclass
 class TaxDetailsTypeI:
-
     rate: AlphaNumericStringLength1To18 = field(
         default=None,
         metadata={
@@ -3328,7 +3509,9 @@ class TaxDetailsTypeI:
 
 @dataclass
 class TicketNumberDetailsTypeI:
-    """To specify a ticket number, type of ticket, and related information."""
+    """
+    To specify a ticket number, type of ticket, and related information.
+    """
 
     number: AlphaNumericStringLength1To35 = field(
         default=None, metadata={"name": "number", "type": "Element"}
@@ -3337,7 +3520,9 @@ class TicketNumberDetailsTypeI:
 
 @dataclass
 class TicketingPriceSchemeType:
-    """Price Scheme Information"""
+    """
+    Price Scheme Information
+    """
 
     reference_number: AlphaNumericStringLength1To35 = field(
         default=None,
@@ -3376,7 +3561,9 @@ class TicketingPriceSchemeType:
 
 @dataclass
 class TrafficRestrictionDetailsTypeI:
-    """Coded or free text details which restrict a means of transport."""
+    """
+    Coded or free text details which restrict a means of transport.
+    """
 
     code: AlphaNumericStringLength1To3 = field(
         default=None,
@@ -3390,7 +3577,6 @@ class TrafficRestrictionDetailsTypeI:
 
 @dataclass
 class TravellerDetailsType:
-
     ref: NumericIntegerLength1To3 = field(
         default=None,
         metadata={
@@ -3412,7 +3598,6 @@ class TravellerDetailsType:
 
 @dataclass
 class UniqueIdDescriptionType:
-
     passenger_fee_ref_qualif: AlphaNumericStringLength1To3 = field(
         default=None,
         metadata={
@@ -3425,7 +3610,9 @@ class UniqueIdDescriptionType:
 
 @dataclass
 class ActionIdentificationType:
-    """To provide details of action required or taken, the flights to which this action refers, and reasons for action taken."""
+    """
+    To provide details of action required or taken, the flights to which this action refers, and reasons for action taken.
+    """
 
     action_request_code: AlphaNumericStringLength1To3 = field(
         default=None,
@@ -3443,7 +3630,9 @@ class ActionIdentificationType:
 
 @dataclass
 class AdditionalProductDetailsTypeI:
-    """To convey additional information concerning an airline flight."""
+    """
+    To convey additional information concerning an airline flight.
+    """
 
     leg_details: AdditionalProductTypeI = field(
         default=None,
@@ -3477,7 +3666,9 @@ class AdditionalProductDetailsTypeI:
 
 @dataclass
 class ArrivalLocalizationType:
-    """To convey information of the requested arrival location"""
+    """
+    To convey information of the requested arrival location
+    """
 
     arrival_point_details: ArrivalLocationDetailsType = field(
         default=None,
@@ -3511,7 +3702,9 @@ class ArrivalLocalizationType:
 
 @dataclass
 class AttributeType:
-    """Used to have tag value without code list for tag"""
+    """
+    Used to have tag value without code list for tag
+    """
 
     selection_details: List[AttributeInformationType] = field(
         default_factory=list,
@@ -3527,7 +3720,9 @@ class AttributeType:
 
 @dataclass
 class AttributeType61377S:
-    """Used to have tag value without code list for tag"""
+    """
+    Used to have tag value without code list for tag
+    """
 
     attribute_qualifier: AlphaNumericStringLength1To3 = field(
         default=None,
@@ -3551,7 +3746,9 @@ class AttributeType61377S:
 
 @dataclass
 class BooleanExpressionRuleType:
-    """To perform boolean operations"""
+    """
+    To perform boolean operations
+    """
 
     boolean_expression: ArithmeticEvaluationType = field(
         default=None,
@@ -3566,7 +3763,6 @@ class BooleanExpressionRuleType:
 
 @dataclass
 class BucketDetailsType:
-
     code: AlphaNumericStringLength1To3 = field(
         default=None,
         metadata={"name": "code", "type": "Element", "help": "Code"},
@@ -3593,7 +3789,9 @@ class BucketDetailsType:
 
 @dataclass
 class CodedAttributeType:
-    """Used to have tag value without code list for tag"""
+    """
+    Used to have tag value without code list for tag
+    """
 
     attribute_details: List[CodedAttributeInformationType254574C] = field(
         default_factory=list,
@@ -3609,7 +3807,9 @@ class CodedAttributeType:
 
 @dataclass
 class CodedAttributeType197696S:
-    """Used to have tag value without code list for tag"""
+    """
+    Used to have tag value without code list for tag
+    """
 
     fee_id: List[CodedAttributeInformationType275401C] = field(
         default_factory=list,
@@ -3625,7 +3825,9 @@ class CodedAttributeType197696S:
 
 @dataclass
 class CodedAttributeType78500S:
-    """Used to have tag value without code list for tag"""
+    """
+    Used to have tag value without code list for tag
+    """
 
     attribute_details: List[CodedAttributeInformationType] = field(
         default_factory=list,
@@ -3641,7 +3843,9 @@ class CodedAttributeType78500S:
 
 @dataclass
 class CommercialAgreementsType:
-    """To specify commercial agreements between two or more companies related to joint, shared, lease operations etc."""
+    """
+    To specify commercial agreements between two or more companies related to joint, shared, lease operations etc.
+    """
 
     codeshare_details: CompanyRoleIdentificationType = field(
         default=None,
@@ -3666,7 +3870,9 @@ class CommercialAgreementsType:
 
 @dataclass
 class CommercialAgreementsType78540S:
-    """To specify commercial agreements between two or more companies related to joint, shared, lease operations etc."""
+    """
+    To specify commercial agreements between two or more companies related to joint, shared, lease operations etc.
+    """
 
     codeshare_details: CompanyRoleIdentificationType120761C = field(
         default=None,
@@ -3692,7 +3898,9 @@ class CommercialAgreementsType78540S:
 
 @dataclass
 class ConnectionTypeI:
-    """To specify connection city and airline designator."""
+    """
+    To specify connection city and airline designator.
+    """
 
     connection_details: List[ConnectionDetailsTypeI] = field(
         default_factory=list,
@@ -3708,7 +3916,9 @@ class ConnectionTypeI:
 
 @dataclass
 class ConsumerReferenceInformationType:
-    """To specify consumer reference information."""
+    """
+    To specify consumer reference information.
+    """
 
     customer_references: List[ConsumerReferenceIdentificationTypeI] = field(
         default_factory=list,
@@ -3724,7 +3934,9 @@ class ConsumerReferenceInformationType:
 
 @dataclass
 class ConversionRateType:
-    """To specify conversion rate details"""
+    """
+    To specify conversion rate details
+    """
 
     conversion_rate_detail: List[ConversionRateDetailsType] = field(
         default_factory=list,
@@ -3740,7 +3952,9 @@ class ConversionRateType:
 
 @dataclass
 class CorporateFareInformationType:
-    """To specify corporate fare information"""
+    """
+    To specify corporate fare information
+    """
 
     corporate_fare_identifiers: CorporateFareIdentifiersType = field(
         default=None,
@@ -3754,7 +3968,9 @@ class CorporateFareInformationType:
 
 @dataclass
 class CorporateIdentificationType:
-    """To specify corporate number(s) or name(s)"""
+    """
+    To specify corporate number(s) or name(s)
+    """
 
     corporate_id: List[CorporateIdentityType] = field(
         default_factory=list,
@@ -3770,7 +3986,9 @@ class CorporateIdentificationType:
 
 @dataclass
 class DateAndTimeInformationType:
-    """not the standard only used in fare quote message"""
+    """
+    not the standard only used in fare quote message
+    """
 
     stop_details: List[DateAndTimeDetailsType120762C] = field(
         default_factory=list,
@@ -3786,7 +4004,9 @@ class DateAndTimeInformationType:
 
 @dataclass
 class DateAndTimeInformationType181295S:
-    """Target estimated or actual dates and times"""
+    """
+    Target estimated or actual dates and times
+    """
 
     first_date_time_detail: DateAndTimeDetailsTypeI = field(
         default=None,
@@ -3817,7 +4037,9 @@ class DateAndTimeInformationType181295S:
 
 @dataclass
 class DateAndTimeInformationTypeI:
-    """To convey information regarding estimated or actual dates and times of operational events"""
+    """
+    To convey information regarding estimated or actual dates and times of operational events
+    """
 
     date_time_details: List[DateAndTimeDetailsTypeI120740C] = field(
         default_factory=list,
@@ -3833,7 +4055,9 @@ class DateAndTimeInformationTypeI:
 
 @dataclass
 class DepartureLocationType:
-    """To convey information of requested departure"""
+    """
+    To convey information of requested departure
+    """
 
     departure_point: ArrivalLocationDetailsType120834C = field(
         default=None,
@@ -3875,7 +4099,9 @@ class DepartureLocationType:
 
 @dataclass
 class FareFamilyCriteriaType:
-    """Fare family criteria"""
+    """
+    Fare family criteria
+    """
 
     carrier_id: List[AlphaNumericStringLength1To3] = field(
         default_factory=list,
@@ -3967,7 +4193,9 @@ class FareFamilyCriteriaType:
 
 @dataclass
 class FareFamilyType:
-    """NEW FARE SEACH"""
+    """
+    NEW FARE SEACH
+    """
 
     commercial_family_details: List[FareFamilyDetailsType] = field(
         default_factory=list,
@@ -3983,7 +4211,9 @@ class FareFamilyType:
 
 @dataclass
 class FareFamilyType80157S:
-    """NEW FARE SEACH"""
+    """
+    NEW FARE SEACH
+    """
 
     ref_number: NumericIntegerLength1To3 = field(
         default=None,
@@ -4023,7 +4253,6 @@ class FareFamilyType80157S:
 
 @dataclass
 class FareInformationType:
-
     value_qualifier: AmaEdicodesetTypeLength1to3 = field(
         default=None,
         metadata={
@@ -4072,7 +4301,9 @@ class FareInformationType:
 
 @dataclass
 class FlightProductInformationType:
-    """To specify flight product information details"""
+    """
+    To specify flight product information details
+    """
 
     cabin_product: List[CabinProductDetailsType] = field(
         default_factory=list,
@@ -4096,7 +4327,9 @@ class FlightProductInformationType:
 
 @dataclass
 class FormOfPaymentTypeI:
-    """To convey details describing the form of payment."""
+    """
+    To convey details describing the form of payment.
+    """
 
     form_of_payment_details: List[FormOfPaymentDetailsTypeI] = field(
         default_factory=list,
@@ -4112,7 +4345,9 @@ class FormOfPaymentTypeI:
 
 @dataclass
 class FreeTextInformationType:
-    """This segment is used to convey the free text"""
+    """
+    This segment is used to convey the free text
+    """
 
     free_text_details: FreeTextDetailsType = field(
         default=None,
@@ -4136,7 +4371,9 @@ class FreeTextInformationType:
 
 @dataclass
 class FrequentTravellerIdentificationCodeType:
-    """To specify frequent traveler information"""
+    """
+    To specify frequent traveler information
+    """
 
     frequent_traveller_details: List[
         FrequentTravellerIdentificationType
@@ -4154,7 +4391,9 @@ class FrequentTravellerIdentificationCodeType:
 
 @dataclass
 class FrequentTravellerIdentificationCodeType177150S:
-    """To specify frequent traveler information."""
+    """
+    To specify frequent traveler information.
+    """
 
     frequent_traveller_details: List[
         FrequentTravellerIdentificationType249074C
@@ -4172,7 +4411,9 @@ class FrequentTravellerIdentificationCodeType177150S:
 
 @dataclass
 class HeaderInformationTypeI:
-    """To specify header information applicable to the entire message."""
+    """
+    To specify header information applicable to the entire message.
+    """
 
     status: List[AlphaNumericStringLength1To3] = field(
         default_factory=list,
@@ -4214,7 +4455,9 @@ class HeaderInformationTypeI:
 
 @dataclass
 class ItemNumberType:
-    """To specify an item number"""
+    """
+    To specify an item number
+    """
 
     item_number_id: ItemNumberIdentificationType = field(
         default=None,
@@ -4229,7 +4472,9 @@ class ItemNumberType:
 
 @dataclass
 class ItemNumberType80866S:
-    """To specify an item number"""
+    """
+    To specify an item number
+    """
 
     item_number_details: ItemNumberIdentificationType = field(
         default=None,
@@ -4244,7 +4489,9 @@ class ItemNumberType80866S:
 
 @dataclass
 class ItemReferencesAndVersionsType:
-    """Exchange and link unique identifiers"""
+    """
+    Exchange and link unique identifiers
+    """
 
     passenger_fee_ref_type: AlphaNumericStringLength1To3 = field(
         default=None,
@@ -4274,7 +4521,6 @@ class ItemReferencesAndVersionsType:
 
 @dataclass
 class MonetaryAndCabinInformationType:
-
     money_and_cabin_info: List[MonetaryAndCabinInformationDetailsType] = field(
         default_factory=list,
         metadata={
@@ -4289,7 +4535,9 @@ class MonetaryAndCabinInformationType:
 
 @dataclass
 class MonetaryInformationType:
-    """To specify monetary information details"""
+    """
+    To specify monetary information details
+    """
 
     money_info: MonetaryInformationDetailsTypeI = field(
         default=None,
@@ -4316,7 +4564,9 @@ class MonetaryInformationType:
 
 @dataclass
 class MonetaryInformationType80162S:
-    """To convey monetary amounts, rates and percentages."""
+    """
+    To convey monetary amounts, rates and percentages.
+    """
 
     monetary_details: List[MonetaryInformationDetailsTypeI65140C] = field(
         default_factory=list,
@@ -4332,7 +4582,9 @@ class MonetaryInformationType80162S:
 
 @dataclass
 class MonetaryInformationTypeI:
-    """To convey monetary amounts, rates and percentages."""
+    """
+    To convey monetary amounts, rates and percentages.
+    """
 
     monetary_details: List[MonetaryInformationDetailsTypeI65141C] = field(
         default_factory=list,
@@ -4348,7 +4600,9 @@ class MonetaryInformationTypeI:
 
 @dataclass
 class NumberOfUnitsType:
-    """To specify the number of Units required"""
+    """
+    To specify the number of Units required
+    """
 
     unit_number_detail: List[NumberOfUnitDetailsType270113C] = field(
         default_factory=list,
@@ -4364,7 +4618,9 @@ class NumberOfUnitsType:
 
 @dataclass
 class NumberOfUnitsType80154S:
-    """To specify the number of Units required"""
+    """
+    To specify the number of Units required
+    """
 
     unit_number_detail: List[NumberOfUnitDetailsType] = field(
         default_factory=list,
@@ -4380,7 +4636,9 @@ class NumberOfUnitsType80154S:
 
 @dataclass
 class OriginAndDestinationRequestType:
-    """To convey information regarding Requested Segments"""
+    """
+    To convey information regarding Requested Segments
+    """
 
     seg_ref: NumericIntegerLength1To2 = field(
         default=None,
@@ -4405,7 +4663,9 @@ class OriginAndDestinationRequestType:
 
 @dataclass
 class PassengerItineraryInformationType:
-    """Contains PNR travel (Reservation Booking code, Booking status). Only present in case with-PNR."""
+    """
+    Contains PNR travel (Reservation Booking code, Booking status). Only present in case with-PNR.
+    """
 
     booking: AlphaStringLength1To1 = field(
         default=None,
@@ -4447,7 +4707,9 @@ class PassengerItineraryInformationType:
 
 @dataclass
 class PricingTicketingDetailsType:
-    """To specify pricing/ticketing details"""
+    """
+    To specify pricing/ticketing details
+    """
 
     pricing_ticketing: PricingTicketingInformationType = field(
         default=None,
@@ -4509,7 +4771,9 @@ class PricingTicketingDetailsType:
 
 @dataclass
 class ProposedSegmentType:
-    """To specify the parameters used for product quality"""
+    """
+    To specify the parameters used for product quality
+    """
 
     flight_proposal: List[ProposedSegmentDetailsType] = field(
         default_factory=list,
@@ -4541,7 +4805,9 @@ class ProposedSegmentType:
 
 @dataclass
 class ReferenceInfoType:
-    """To provide specific reference identification for a traveller."""
+    """
+    To provide specific reference identification for a traveller.
+    """
 
     referencing_detail: List[ReferencingDetailsType] = field(
         default_factory=list,
@@ -4557,7 +4823,9 @@ class ReferenceInfoType:
 
 @dataclass
 class RoutingInformationTypeI:
-    """To provide routing information."""
+    """
+    To provide routing information.
+    """
 
     routing_details: List[ProductLocationDetailsTypeI] = field(
         default_factory=list,
@@ -4573,7 +4841,9 @@ class RoutingInformationTypeI:
 
 @dataclass
 class SegmentRepetitionControlTypeI:
-    """To indicate the number of segment group repetitions."""
+    """
+    To indicate the number of segment group repetitions.
+    """
 
     segment_control_details: List[
         SegmentRepetitionControlDetailsTypeI
@@ -4591,7 +4861,9 @@ class SegmentRepetitionControlTypeI:
 
 @dataclass
 class SelectionDetailsType:
-    """To specify the details for making a selection."""
+    """
+    To specify the details for making a selection.
+    """
 
     carrier_fee_details: SelectionDetailsInformationType = field(
         default=None,
@@ -4615,7 +4887,9 @@ class SelectionDetailsType:
 
 @dataclass
 class SpecialRequirementsDetailsType:
-    """To specify special requests or service s information relating to a traveller"""
+    """
+    To specify special requests or service s information relating to a traveller
+    """
 
     service_requirements_info: SpecialRequirementsTypeDetailsType = field(
         default=None,
@@ -4640,7 +4914,9 @@ class SpecialRequirementsDetailsType:
 
 @dataclass
 class SpecificDataInformationType:
-    """To specify miscellaneous data by first identifying the type of data to be sent and then the actual data."""
+    """
+    To specify miscellaneous data by first identifying the type of data to be sent and then the actual data.
+    """
 
     data_type_information: DataTypeInformationType = field(
         default=None,
@@ -4665,7 +4941,9 @@ class SpecificDataInformationType:
 
 @dataclass
 class StructuredPeriodInformationType:
-    """This segment is designed to convey period in a structured way."""
+    """
+    This segment is designed to convey period in a structured way.
+    """
 
     begin_date_time: StructuredDateTimeType = field(
         default=None,
@@ -4695,7 +4973,9 @@ class StructuredPeriodInformationType:
 
 @dataclass
 class TaxType:
-    """To specify details realting to tax(es)"""
+    """
+    To specify details realting to tax(es)
+    """
 
     withhold_tax_surcharge: AlphaNumericStringLength1To3 = field(
         default=None,
@@ -4719,7 +4999,9 @@ class TaxType:
 
 @dataclass
 class TicketNumberTypeI:
-    """To convey information related to a specific ticket."""
+    """
+    To convey information related to a specific ticket.
+    """
 
     document_details: List[TicketNumberDetailsTypeI] = field(
         default_factory=list,
@@ -4734,7 +5016,9 @@ class TicketNumberTypeI:
 
 @dataclass
 class TrafficRestrictionTypeI:
-    """To convey certain restrictions that apply to a means of transport on all or part of a journey"""
+    """
+    To convey certain restrictions that apply to a means of transport on all or part of a journey
+    """
 
     traffic_restriction_details: List[TrafficRestrictionDetailsTypeI] = field(
         default_factory=list,
@@ -4750,7 +5034,9 @@ class TrafficRestrictionTypeI:
 
 @dataclass
 class TravelFlightInformationType:
-    """Information about flight options"""
+    """
+    Information about flight options
+    """
 
     cabin_id: CabinIdentificationType = field(
         default=None,
@@ -4812,7 +5098,9 @@ class TravelFlightInformationType:
 
 @dataclass
 class TravelFlightInformationType165053S:
-    """Information about flight options"""
+    """
+    Information about flight options
+    """
 
     cabin_id: CabinIdentificationType233500C = field(
         default=None,
@@ -4874,7 +5162,9 @@ class TravelFlightInformationType165053S:
 
 @dataclass
 class TravelFlightInformationType197722S:
-    """Information about flight options"""
+    """
+    Information about flight options
+    """
 
     cabin_id: CabinIdentificationType233500C = field(
         default=None,
@@ -4936,7 +5226,9 @@ class TravelFlightInformationType197722S:
 
 @dataclass
 class TravelProductInformationTypeI:
-    """To specify details related to a product."""
+    """
+    To specify details related to a product.
+    """
 
     flight_date: ProductDateTimeTypeI = field(
         default=None,
@@ -4992,7 +5284,9 @@ class TravelProductInformationTypeI:
 
 @dataclass
 class TravelProductType:
-    """Contains flight travel (date, time, flight number,...) and posting avaibility information"""
+    """
+    Contains flight travel (date, time, flight number,...) and posting avaibility information
+    """
 
     product_date_time: ProductDateTimeType195546C = field(
         default=None,
@@ -5059,7 +5353,9 @@ class TravelProductType:
 
 @dataclass
 class TravellerReferenceInformationType:
-    """To specify traveller/personal details"""
+    """
+    To specify traveller/personal details
+    """
 
     ptc: List[AlphaNumericStringLength1To6] = field(
         default_factory=list,
@@ -5085,7 +5381,9 @@ class TravellerReferenceInformationType:
 
 @dataclass
 class UserIdentificationType:
-    """User Identification"""
+    """
+    User Identification
+    """
 
     office_identification: OriginatorIdentificationDetailsTypeI = field(
         default=None,
@@ -5115,7 +5413,9 @@ class UserIdentificationType:
 
 @dataclass
 class ValueSearchCriteriaType:
-    """To specify Criteria with list of parameters"""
+    """
+    To specify Criteria with list of parameters
+    """
 
     criteria_name: AlphaNumericStringLength1To50 = field(
         default=None, metadata={"name": "criteriaName", "type": "Element"}
@@ -5139,7 +5439,6 @@ class ValueSearchCriteriaType:
 
 @dataclass
 class FoprepresentationType:
-
     form_of_payment_details: FormOfPaymentTypeI = field(
         default=None,
         metadata={
@@ -5161,7 +5460,9 @@ class FoprepresentationType:
 
 @dataclass
 class GroupPassengerDetailsType:
-    """Contain passenger information"""
+    """
+    Contain passenger information
+    """
 
     passenger_reference: SegmentRepetitionControlTypeI = field(
         default=None,
@@ -5172,7 +5473,7 @@ class GroupPassengerDetailsType:
             "help": "Trigger",
         },
     )
-    psg_details_info: List["PsgDetailsInfo"] = field(
+    psg_details_info: List["GroupPassengerDetailsType.PsgDetailsInfo"] = field(
         default_factory=list,
         metadata={
             "min_occurs": 0,
@@ -5185,7 +5486,6 @@ class GroupPassengerDetailsType:
 
     @dataclass
     class PsgDetailsInfo:
-
         discount_ptc: FareInformationTypeI = field(
             default=None,
             metadata={
@@ -5207,7 +5507,9 @@ class GroupPassengerDetailsType:
 
 @dataclass
 class FareMasterPricerTravelBoardSearch:
-    """Master Pricer Travel Board Search Flex pricer Flex pricer."""
+    """
+    Master Pricer Travel Board Search Flex pricer Flex pricer.
+    """
 
     number_of_unit: NumberOfUnitsType = field(
         default=None,
@@ -5273,7 +5575,9 @@ class FareMasterPricerTravelBoardSearch:
             "help": "Passenger info group (9 ADT + 9 IN)",
         },
     )
-    fare_families: List["FareFamilies"] = field(
+    fare_families: List[
+        "FareMasterPricerTravelBoardSearch.FareFamilies"
+    ] = field(
         default_factory=list,
         metadata={
             "min_occurs": 0,
@@ -5283,7 +5587,7 @@ class FareMasterPricerTravelBoardSearch:
             "help": "Fare families.",
         },
     )
-    fare_options: "FareOptions" = field(
+    fare_options: "FareMasterPricerTravelBoardSearch.FareOptions" = field(
         default=None,
         metadata={
             "name": "fareOptions",
@@ -5326,7 +5630,7 @@ class FareMasterPricerTravelBoardSearch:
             "type": "Element",
         },
     )
-    buckets: List["Buckets"] = field(
+    buckets: List["FareMasterPricerTravelBoardSearch.Buckets"] = field(
         default_factory=list,
         metadata={
             "min_occurs": 0,
@@ -5336,7 +5640,7 @@ class FareMasterPricerTravelBoardSearch:
             "help": "Buckets",
         },
     )
-    itinerary: List["Itinerary"] = field(
+    itinerary: List["FareMasterPricerTravelBoardSearch.Itinerary"] = field(
         default_factory=list,
         metadata={
             "min_occurs": 0,
@@ -5346,7 +5650,7 @@ class FareMasterPricerTravelBoardSearch:
             "help": "Itinerary",
         },
     )
-    ticket_change_info: "TicketChangeInfo" = field(
+    ticket_change_info: "FareMasterPricerTravelBoardSearch.TicketChangeInfo" = field(
         default=None,
         metadata={
             "name": "ticketChangeInfo",
@@ -5354,7 +5658,9 @@ class FareMasterPricerTravelBoardSearch:
             "help": "Changed ticket information.",
         },
     )
-    combination_fare_families: List["CombinationFareFamilies"] = field(
+    combination_fare_families: List[
+        "FareMasterPricerTravelBoardSearch.CombinationFareFamilies"
+    ] = field(
         default_factory=list,
         metadata={
             "min_occurs": 0,
@@ -5364,7 +5670,7 @@ class FareMasterPricerTravelBoardSearch:
             "help": "Specify fare family combinations",
         },
     )
-    fee_option: List["FeeOption"] = field(
+    fee_option: List["FareMasterPricerTravelBoardSearch.FeeOption"] = field(
         default_factory=list,
         metadata={
             "min_occurs": 0,
@@ -5374,7 +5680,9 @@ class FareMasterPricerTravelBoardSearch:
             "help": "Fee option group.",
         },
     )
-    office_id_details: List["OfficeIdDetails"] = field(
+    office_id_details: List[
+        "FareMasterPricerTravelBoardSearch.OfficeIdDetails"
+    ] = field(
         default_factory=list,
         metadata={
             "min_occurs": 0,
@@ -5386,583 +5694,123 @@ class FareMasterPricerTravelBoardSearch:
     )
 
     @dataclass
-    class OfficeIdDetails:
-
-        office_id_information: UserIdentificationType = field(
+    class FareFamilies:
+        family_information: FareFamilyType80157S = field(
             default=None,
             metadata={
                 "required": True,
-                "name": "officeIdInformation",
-                "type": "Element",
-                "help": "Office Id Information",
-            },
-        )
-        nb_of_units: NumberOfUnitsType80154S = field(
-            default=None,
-            metadata={
-                "name": "nbOfUnits",
-                "type": "Element",
-                "help": "Number of units.",
-            },
-        )
-        uid_option: CodedAttributeType78500S = field(
-            default=None,
-            metadata={
-                "name": "uidOption",
-                "type": "Element",
-                "help": "UID option",
-            },
-        )
-        pricing_tick_info: PricingTicketingDetailsType = field(
-            default=None,
-            metadata={
-                "name": "pricingTickInfo",
-                "type": "Element",
-                "help": "Pricing and ticketing details.",
-            },
-        )
-        corporate_fare_info: CorporateFareInformationType = field(
-            default=None,
-            metadata={
-                "name": "corporateFareInfo",
-                "type": "Element",
-                "help": "Corporate fare information",
-            },
-        )
-        travel_flight_info: TravelFlightInformationType = field(
-            default=None,
-            metadata={
-                "name": "travelFlightInfo",
-                "type": "Element",
-                "help": "Details of a Flight : Direct, Non stop...",
-            },
-        )
-        airline_distribution_details: List[
-            "AirlineDistributionDetails"
-        ] = field(
-            default_factory=list,
-            metadata={
-                "min_occurs": 0,
-                "max_occurs": 6,
-                "name": "airlineDistributionDetails",
-                "type": "Element",
-                "help": "Details of airline distribution at requested segment level",
-            },
-        )
-
-    @dataclass
-    class AirlineDistributionDetails:
-
-        requested_segment_ref: OriginAndDestinationRequestType = field(
-            default=None,
-            metadata={
-                "required": True,
-                "name": "requestedSegmentRef",
-                "type": "Element",
-                "help": "Indicates reference of the requested segment",
-            },
-        )
-        flight_info: TravelFlightInformationType = field(
-            default=None,
-            metadata={
-                "name": "flightInfo",
-                "type": "Element",
-                "help": "Specify Flight options.",
-            },
-        )
-
-    @dataclass
-    class FeeOption:
-
-        fee_type_info: SelectionDetailsType = field(
-            default=None,
-            metadata={
-                "required": True,
-                "name": "feeTypeInfo",
-                "type": "Element",
-                "help": "Nature of the fee (OB,OC,..)",
-            },
-        )
-        rate_tax: MonetaryInformationType80162S = field(
-            default=None,
-            metadata={
-                "name": "rateTax",
-                "type": "Element",
-                "help": "Associated rate tax.",
-            },
-        )
-        fee_details: List["FeeDetails"] = field(
-            default_factory=list,
-            metadata={
-                "min_occurs": 0,
-                "max_occurs": 99,
-                "name": "feeDetails",
-                "type": "Element",
-                "help": "Details for each fee.",
-            },
-        )
-
-    @dataclass
-    class FeeDetails:
-
-        fee_info: SpecificDataInformationType = field(
-            default=None,
-            metadata={
-                "required": True,
-                "name": "feeInfo",
-                "type": "Element",
-                "help": "Fee information",
-            },
-        )
-        associated_amounts: MonetaryInformationTypeI = field(
-            default=None,
-            metadata={
-                "name": "associatedAmounts",
-                "type": "Element",
-                "help": "Associated amounts : amounts to take into account to calculate fee.",
-            },
-        )
-        fee_description_grp: "FeeDescriptionGrp" = field(
-            default=None,
-            metadata={
-                "name": "feeDescriptionGrp",
-                "type": "Element",
-                "help": "Fee description",
-            },
-        )
-
-    @dataclass
-    class FeeDescriptionGrp:
-
-        item_number_info: ItemNumberType80866S = field(
-            default=None,
-            metadata={
-                "required": True,
-                "name": "itemNumberInfo",
-                "type": "Element",
-                "help": "Specification of the item number",
-            },
-        )
-        service_attributes_info: AttributeType61377S = field(
-            default=None,
-            metadata={
-                "name": "serviceAttributesInfo",
-                "type": "Element",
-                "help": "Attributes (SSR code EMD, RFIC, SSIM)",
-            },
-        )
-        service_description_info: SpecialRequirementsDetailsType = field(
-            default=None,
-            metadata={
-                "name": "serviceDescriptionInfo",
-                "type": "Element",
-                "help": "Other service information (service description, ...)",
-            },
-        )
-
-    @dataclass
-    class CombinationFareFamilies:
-
-        item_ffcnumber: ItemNumberType = field(
-            default=None,
-            metadata={
-                "required": True,
-                "name": "itemFFCNumber",
-                "type": "Element",
-                "help": "Specification of the item number",
-            },
-        )
-        nb_of_units: NumberOfUnitsType80154S = field(
-            default=None,
-            metadata={
-                "name": "nbOfUnits",
-                "type": "Element",
-                "help": "Number of units.",
-            },
-        )
-        reference_info: List[ReferenceInfoType] = field(
-            default_factory=list,
-            metadata={
-                "min_occurs": 0,
-                "max_occurs": 6,
-                "name": "referenceInfo",
-                "type": "Element",
-                "help": "Requested segment reference",
-            },
-        )
-
-    @dataclass
-    class TicketChangeInfo:
-
-        ticket_number_details: TicketNumberTypeI = field(
-            default=None,
-            metadata={
-                "required": True,
-                "name": "ticketNumberDetails",
-                "type": "Element",
-                "help": "Ticket nb details.",
-            },
-        )
-        ticket_requested_segments: List["TicketRequestedSegments"] = field(
-            default_factory=list,
-            metadata={
-                "min_occurs": 0,
-                "max_occurs": 6,
-                "name": "ticketRequestedSegments",
-                "type": "Element",
-                "help": "Changed ticket requested segments.",
-            },
-        )
-
-    @dataclass
-    class TicketRequestedSegments:
-
-        action_identification: ActionIdentificationType = field(
-            default=None,
-            metadata={
-                "required": True,
-                "name": "actionIdentification",
-                "type": "Element",
-                "help": "Action identification.",
-            },
-        )
-        connect_point_details: ConnectionTypeI = field(
-            default=None,
-            metadata={
-                "name": "connectPointDetails",
-                "type": "Element",
-                "help": "Connected cities in changed ticket requested segment.",
-            },
-        )
-
-    @dataclass
-    class Itinerary:
-
-        requested_segment_ref: OriginAndDestinationRequestType = field(
-            default=None,
-            metadata={
-                "required": True,
-                "name": "requestedSegmentRef",
-                "type": "Element",
-                "help": "Indicates reference of the requested segment",
-            },
-        )
-        departure_localization: DepartureLocationType = field(
-            default=None,
-            metadata={
-                "name": "departureLocalization",
-                "type": "Element",
-                "help": "Specification of the requested departure point",
-            },
-        )
-        arrival_localization: ArrivalLocalizationType = field(
-            default=None,
-            metadata={
-                "name": "arrivalLocalization",
-                "type": "Element",
-                "help": "Specification of the requested arrival point",
-            },
-        )
-        time_details: DateAndTimeInformationType181295S = field(
-            default=None,
-            metadata={
-                "name": "timeDetails",
-                "type": "Element",
-                "help": "Details on requested date and time plus range of date trip duration",
-            },
-        )
-        flight_info: TravelFlightInformationType165053S = field(
-            default=None,
-            metadata={
-                "name": "flightInfo",
-                "type": "Element",
-                "help": "Specify Flight options.",
-            },
-        )
-        family_information: FareFamilyType = field(
-            default=None,
-            metadata={
                 "name": "familyInformation",
                 "type": "Element",
-                "help": "Segment used to target Commercial Fare Family at requested segment level",
+                "help": "Segment used to target Commercial Fare Family.",
             },
         )
-        value_search: List[ValueSearchCriteriaType] = field(
-            default_factory=list,
-            metadata={
-                "min_occurs": 0,
-                "max_occurs": 99,
-                "name": "valueSearch",
-                "type": "Element",
-            },
-        )
-        group_of_flights: List["GroupOfFlights"] = field(
-            default_factory=list,
-            metadata={
-                "min_occurs": 0,
-                "max_occurs": 6,
-                "name": "groupOfFlights",
-                "type": "Element",
-                "help": "list of proposed segments per requested segment",
-            },
-        )
-        flight_info_pnr: List["FlightInfoPnr"] = field(
-            default_factory=list,
-            metadata={
-                "min_occurs": 0,
-                "max_occurs": 4,
-                "name": "flightInfoPNR",
-                "type": "Element",
-                "help": "Info concerning the flights booked in the PNR",
-            },
-        )
-        requested_segment_action: ActionIdentificationType = field(
+        family_criteria: FareFamilyCriteriaType = field(
             default=None,
             metadata={
-                "name": "requestedSegmentAction",
+                "name": "familyCriteria",
                 "type": "Element",
-                "help": "Action identification for the requested segment",
+                "help": "Description of Fare Family Criteria.",
             },
         )
-        attributes: CodedAttributeType = field(
-            default=None,
-            metadata={
-                "name": "attributes",
-                "type": "Element",
-                "help": "Coded attributes",
-            },
-        )
-
-    @dataclass
-    class FlightInfoPnr:
-
-        travel_response_details: TravelProductInformationTypeI = field(
-            default=None,
-            metadata={
-                "required": True,
-                "name": "travelResponseDetails",
-                "type": "Element",
-                "help": "Travel Response Details: - Board/Off aiports - Flight number - Part of the journey - Day difference between Board and off - Departure/Arrival dates - Departure/Arrival times",
-            },
-        )
-        time_table_date: StructuredPeriodInformationType = field(
-            default=None,
-            metadata={
-                "name": "timeTableDate",
-                "type": "Element",
-                "help": "Time Table Effective/Discontinue dates and frequency of operating Travel Solution",
-            },
-        )
-        terminal_equipment_details: List[
-            AdditionalProductDetailsTypeI
+        fare_family_segment: List[
+            "FareMasterPricerTravelBoardSearch.FareFamilies.FareFamilySegment"
         ] = field(
             default_factory=list,
             metadata={
                 "min_occurs": 0,
-                "max_occurs": 2,
-                "name": "terminalEquipmentDetails",
-                "type": "Element",
-                "help": "Terminal, Equipment and EFT Details. If a Total EFT of the Travel Solution is requested then we will have 2 occurrences of the terminalEquipmentDetails attached to the first leg travelResponseDetails: the 1st occurrence will give the EFT of the leg, the 2nd occurrence will give the total EFT of the Travel Solution.",
-            },
-        )
-        codeshare_data: CommercialAgreementsType = field(
-            default=None,
-            metadata={
-                "name": "codeshareData",
-                "type": "Element",
-                "help": "Codeshare data",
-            },
-        )
-        disclosure: FreeTextInformationType = field(
-            default=None,
-            metadata={
-                "name": "disclosure",
-                "type": "Element",
-                "help": "Disclosure message from an operating carrier.",
-            },
-        )
-        stop_details: RoutingInformationTypeI = field(
-            default=None,
-            metadata={
-                "name": "stopDetails",
-                "type": "Element",
-                "help": "Stops Details",
-            },
-        )
-        traffic_restriction_data: TrafficRestrictionTypeI = field(
-            default=None,
-            metadata={
-                "name": "trafficRestrictionData",
-                "type": "Element",
-                "help": "Traffic restriction information",
-            },
-        )
-        reservation_info: PassengerItineraryInformationType = field(
-            default=None,
-            metadata={
-                "name": "reservationInfo",
-                "type": "Element",
-                "help": "PNR flight reservation info",
-            },
-        )
-        incidental_stop_info: List["IncidentalStopInfo"] = field(
-            default_factory=list,
-            metadata={
-                "min_occurs": 0,
-                "max_occurs": 8,
-                "name": "incidentalStopInfo",
-                "type": "Element",
-                "help": "Incidental stop information.",
-            },
-        )
-
-    @dataclass
-    class IncidentalStopInfo:
-
-        date_time_info: DateAndTimeInformationTypeI = field(
-            default=None,
-            metadata={
-                "required": True,
-                "name": "dateTimeInfo",
-                "type": "Element",
-                "help": "Incidental stop date/time information",
-            },
-        )
-
-    @dataclass
-    class GroupOfFlights:
-
-        prop_flight_gr_detail: ProposedSegmentType = field(
-            default=None,
-            metadata={
-                "required": True,
-                "name": "propFlightGrDetail",
-                "type": "Element",
-                "help": "To indicate parameters for proposed flight group.",
-            },
-        )
-        price_to_beat: MonetaryInformationType = field(
-            default=None,
-            metadata={
-                "name": "priceToBeat",
-                "type": "Element",
-                "help": "Indicates Price to beat",
-            },
-        )
-        flight_details: List["FlightDetails"] = field(
-            default_factory=list,
-            metadata={
-                "min_occurs": 1,
-                "max_occurs": 4,
-                "name": "flightDetails",
-                "type": "Element",
-                "help": "list of flight per proposed segment",
-            },
-        )
-
-    @dataclass
-    class FlightDetails:
-
-        flight_information: TravelProductType = field(
-            default=None,
-            metadata={
-                "required": True,
-                "name": "flightInformation",
-                "type": "Element",
-                "help": "Specification of details on the flight and posting availability",
-            },
-        )
-        avl_info: List[FlightProductInformationType] = field(
-            default_factory=list,
-            metadata={
-                "min_occurs": 0,
                 "max_occurs": 6,
-                "name": "avlInfo",
+                "name": "fareFamilySegment",
                 "type": "Element",
-                "help": "returns booking class and availability context",
+                "help": "Fare family requested segment details.",
             },
         )
-        technical_stop: List[DateAndTimeInformationType] = field(
-            default_factory=list,
-            metadata={
-                "min_occurs": 0,
-                "max_occurs": 5,
-                "name": "technicalStop",
-                "type": "Element",
-                "help": "Details on Flight date, time and location of technical stop or change of gauge",
-            },
-        )
-        commercial_agreement: CommercialAgreementsType78540S = field(
-            default=None,
-            metadata={
-                "name": "commercialAgreement",
-                "type": "Element",
-                "help": "Code Share Agreement description for current flight.",
-            },
-        )
-        add_info: HeaderInformationTypeI = field(
-            default=None,
-            metadata={
-                "name": "addInfo",
-                "type": "Element",
-                "help": "Additional Info about flight, such as Reference number, and several options",
-            },
-        )
-        terminal_equipment_details: List[
-            AdditionalProductDetailsTypeI
+        other_possible_criteria: List[
+            "FareMasterPricerTravelBoardSearch.FareFamilies.OtherPossibleCriteria"
         ] = field(
             default_factory=list,
             metadata={
                 "min_occurs": 0,
-                "max_occurs": 2,
-                "name": "terminalEquipmentDetails",
+                "max_occurs": 20,
+                "name": "otherPossibleCriteria",
                 "type": "Element",
-                "help": "Terminal, Equipment and EFT Details. If a Total EFT of the Travel Solution is requested then we will have 2 occurrences of the terminalEquipmentDetails attached to the first leg flightInformation: the 1st occurence will give the EFT of the leg, the 2nd occurrence will give the total EFT of the Travel Solution.",
-            },
-        )
-        reservation_info: PassengerItineraryInformationType = field(
-            default=None,
-            metadata={
-                "name": "reservationInfo",
-                "type": "Element",
-                "help": "PNR flight reservation info",
-            },
-        )
-        price_to_beat: MonetaryInformationType = field(
-            default=None,
-            metadata={
-                "name": "priceToBeat",
-                "type": "Element",
-                "help": "Indicates Price to beat",
+                "help": "Description of other possible fare family criteria.",
             },
         )
 
-    @dataclass
-    class Buckets:
+        @dataclass
+        class FareFamilySegment:
+            reference_info: ReferenceInfoType = field(
+                default=None,
+                metadata={
+                    "required": True,
+                    "name": "referenceInfo",
+                    "type": "Element",
+                    "help": "Requested segment reference",
+                },
+            )
+            family_criteria: FareFamilyCriteriaType = field(
+                default=None,
+                metadata={
+                    "name": "familyCriteria",
+                    "type": "Element",
+                    "help": "Description of fare family criteria.",
+                },
+            )
 
-        bucket_info: BucketInformationType = field(
-            default=None,
-            metadata={
-                "required": True,
-                "name": "bucketInfo",
-                "type": "Element",
-                "help": "Bucket information: name, priority, weight",
-            },
-        )
-        bucket_details: List[BucketDetailsType] = field(
-            default_factory=list,
-            metadata={
-                "min_occurs": 0,
-                "max_occurs": 15,
-                "name": "bucketDetails",
-                "type": "Element",
-                "help": "Bucket details",
-            },
-        )
+        @dataclass
+        class OtherPossibleCriteria:
+            logical_link: BooleanExpressionRuleType = field(
+                default=None,
+                metadata={
+                    "required": True,
+                    "name": "logicalLink",
+                    "type": "Element",
+                    "help": "Logical link with other criteria.",
+                },
+            )
+            family_criteria: FareFamilyCriteriaType = field(
+                default=None,
+                metadata={
+                    "name": "familyCriteria",
+                    "type": "Element",
+                    "help": "Description of fare family criteria.",
+                },
+            )
+            fare_family_segment: List[
+                "FareMasterPricerTravelBoardSearch.FareFamilies.OtherPossibleCriteria.FareFamilySegment"
+            ] = field(
+                default_factory=list,
+                metadata={
+                    "min_occurs": 0,
+                    "max_occurs": 6,
+                    "name": "fareFamilySegment",
+                    "type": "Element",
+                    "help": "Fare family requested segment details.",
+                },
+            )
+
+            @dataclass
+            class FareFamilySegment:
+                reference_info: ReferenceInfoType = field(
+                    default=None,
+                    metadata={
+                        "required": True,
+                        "name": "referenceInfo",
+                        "type": "Element",
+                        "help": "Requested segment reference",
+                    },
+                )
+                family_criteria: FareFamilyCriteriaType = field(
+                    default=None,
+                    metadata={
+                        "name": "familyCriteria",
+                        "type": "Element",
+                        "help": "Description of fare family criteria.",
+                    },
+                )
 
     @dataclass
     class FareOptions:
-
         pricing_tick_info: PricingTicketingDetailsType = field(
             default=None,
             metadata={
@@ -6030,115 +5878,574 @@ class FareMasterPricerTravelBoardSearch:
         )
 
     @dataclass
-    class FareFamilies:
-
-        family_information: FareFamilyType80157S = field(
+    class Buckets:
+        bucket_info: BucketInformationType = field(
             default=None,
             metadata={
                 "required": True,
+                "name": "bucketInfo",
+                "type": "Element",
+                "help": "Bucket information: name, priority, weight",
+            },
+        )
+        bucket_details: List[BucketDetailsType] = field(
+            default_factory=list,
+            metadata={
+                "min_occurs": 0,
+                "max_occurs": 15,
+                "name": "bucketDetails",
+                "type": "Element",
+                "help": "Bucket details",
+            },
+        )
+
+    @dataclass
+    class Itinerary:
+        requested_segment_ref: OriginAndDestinationRequestType = field(
+            default=None,
+            metadata={
+                "required": True,
+                "name": "requestedSegmentRef",
+                "type": "Element",
+                "help": "Indicates reference of the requested segment",
+            },
+        )
+        departure_localization: DepartureLocationType = field(
+            default=None,
+            metadata={
+                "name": "departureLocalization",
+                "type": "Element",
+                "help": "Specification of the requested departure point",
+            },
+        )
+        arrival_localization: ArrivalLocalizationType = field(
+            default=None,
+            metadata={
+                "name": "arrivalLocalization",
+                "type": "Element",
+                "help": "Specification of the requested arrival point",
+            },
+        )
+        time_details: DateAndTimeInformationType181295S = field(
+            default=None,
+            metadata={
+                "name": "timeDetails",
+                "type": "Element",
+                "help": "Details on requested date and time plus range of date trip duration",
+            },
+        )
+        flight_info: TravelFlightInformationType165053S = field(
+            default=None,
+            metadata={
+                "name": "flightInfo",
+                "type": "Element",
+                "help": "Specify Flight options.",
+            },
+        )
+        family_information: FareFamilyType = field(
+            default=None,
+            metadata={
                 "name": "familyInformation",
                 "type": "Element",
-                "help": "Segment used to target Commercial Fare Family.",
+                "help": "Segment used to target Commercial Fare Family at requested segment level",
             },
         )
-        family_criteria: FareFamilyCriteriaType = field(
-            default=None,
+        value_search: List[ValueSearchCriteriaType] = field(
+            default_factory=list,
             metadata={
-                "name": "familyCriteria",
+                "min_occurs": 0,
+                "max_occurs": 99,
+                "name": "valueSearch",
                 "type": "Element",
-                "help": "Description of Fare Family Criteria.",
             },
         )
-        fare_family_segment: List["FareFamilySegment"] = field(
+        group_of_flights: List[
+            "FareMasterPricerTravelBoardSearch.Itinerary.GroupOfFlights"
+        ] = field(
             default_factory=list,
             metadata={
                 "min_occurs": 0,
                 "max_occurs": 6,
-                "name": "fareFamilySegment",
+                "name": "groupOfFlights",
                 "type": "Element",
-                "help": "Fare family requested segment details.",
+                "help": "list of proposed segments per requested segment",
             },
         )
-        other_possible_criteria: List["OtherPossibleCriteria"] = field(
+        flight_info_pnr: List[
+            "FareMasterPricerTravelBoardSearch.Itinerary.FlightInfoPnr"
+        ] = field(
             default_factory=list,
             metadata={
                 "min_occurs": 0,
-                "max_occurs": 20,
-                "name": "otherPossibleCriteria",
+                "max_occurs": 4,
+                "name": "flightInfoPNR",
                 "type": "Element",
-                "help": "Description of other possible fare family criteria.",
+                "help": "Info concerning the flights booked in the PNR",
+            },
+        )
+        requested_segment_action: ActionIdentificationType = field(
+            default=None,
+            metadata={
+                "name": "requestedSegmentAction",
+                "type": "Element",
+                "help": "Action identification for the requested segment",
+            },
+        )
+        attributes: CodedAttributeType = field(
+            default=None,
+            metadata={
+                "name": "attributes",
+                "type": "Element",
+                "help": "Coded attributes",
             },
         )
 
-    @dataclass
-    class OtherPossibleCriteria:
+        @dataclass
+        class GroupOfFlights:
+            prop_flight_gr_detail: ProposedSegmentType = field(
+                default=None,
+                metadata={
+                    "required": True,
+                    "name": "propFlightGrDetail",
+                    "type": "Element",
+                    "help": "To indicate parameters for proposed flight group.",
+                },
+            )
+            price_to_beat: MonetaryInformationType = field(
+                default=None,
+                metadata={
+                    "name": "priceToBeat",
+                    "type": "Element",
+                    "help": "Indicates Price to beat",
+                },
+            )
+            flight_details: List[
+                "FareMasterPricerTravelBoardSearch.Itinerary.GroupOfFlights.FlightDetails"
+            ] = field(
+                default_factory=list,
+                metadata={
+                    "min_occurs": 1,
+                    "max_occurs": 4,
+                    "name": "flightDetails",
+                    "type": "Element",
+                    "help": "list of flight per proposed segment",
+                },
+            )
 
-        logical_link: BooleanExpressionRuleType = field(
+            @dataclass
+            class FlightDetails:
+                flight_information: TravelProductType = field(
+                    default=None,
+                    metadata={
+                        "required": True,
+                        "name": "flightInformation",
+                        "type": "Element",
+                        "help": "Specification of details on the flight and posting availability",
+                    },
+                )
+                avl_info: List[FlightProductInformationType] = field(
+                    default_factory=list,
+                    metadata={
+                        "min_occurs": 0,
+                        "max_occurs": 6,
+                        "name": "avlInfo",
+                        "type": "Element",
+                        "help": "returns booking class and availability context",
+                    },
+                )
+                technical_stop: List[DateAndTimeInformationType] = field(
+                    default_factory=list,
+                    metadata={
+                        "min_occurs": 0,
+                        "max_occurs": 5,
+                        "name": "technicalStop",
+                        "type": "Element",
+                        "help": "Details on Flight date, time and location of technical stop or change of gauge",
+                    },
+                )
+                commercial_agreement: CommercialAgreementsType78540S = field(
+                    default=None,
+                    metadata={
+                        "name": "commercialAgreement",
+                        "type": "Element",
+                        "help": "Code Share Agreement description for current flight.",
+                    },
+                )
+                add_info: HeaderInformationTypeI = field(
+                    default=None,
+                    metadata={
+                        "name": "addInfo",
+                        "type": "Element",
+                        "help": "Additional Info about flight, such as Reference number, and several options",
+                    },
+                )
+                terminal_equipment_details: List[
+                    AdditionalProductDetailsTypeI
+                ] = field(
+                    default_factory=list,
+                    metadata={
+                        "min_occurs": 0,
+                        "max_occurs": 2,
+                        "name": "terminalEquipmentDetails",
+                        "type": "Element",
+                        "help": "Terminal, Equipment and EFT Details. If a Total EFT of the Travel Solution is requested then we will have 2 occurrences of the terminalEquipmentDetails attached to the first leg flightInformation: the 1st occurence will give the EFT of the leg, the 2nd occurrence will give the total EFT of the Travel Solution.",
+                    },
+                )
+                reservation_info: PassengerItineraryInformationType = field(
+                    default=None,
+                    metadata={
+                        "name": "reservationInfo",
+                        "type": "Element",
+                        "help": "PNR flight reservation info",
+                    },
+                )
+                price_to_beat: MonetaryInformationType = field(
+                    default=None,
+                    metadata={
+                        "name": "priceToBeat",
+                        "type": "Element",
+                        "help": "Indicates Price to beat",
+                    },
+                )
+
+        @dataclass
+        class FlightInfoPnr:
+            travel_response_details: TravelProductInformationTypeI = field(
+                default=None,
+                metadata={
+                    "required": True,
+                    "name": "travelResponseDetails",
+                    "type": "Element",
+                    "help": "Travel Response Details: - Board/Off aiports - Flight number - Part of the journey - Day difference between Board and off - Departure/Arrival dates - Departure/Arrival times",
+                },
+            )
+            time_table_date: StructuredPeriodInformationType = field(
+                default=None,
+                metadata={
+                    "name": "timeTableDate",
+                    "type": "Element",
+                    "help": "Time Table Effective/Discontinue dates and frequency of operating Travel Solution",
+                },
+            )
+            terminal_equipment_details: List[
+                AdditionalProductDetailsTypeI
+            ] = field(
+                default_factory=list,
+                metadata={
+                    "min_occurs": 0,
+                    "max_occurs": 2,
+                    "name": "terminalEquipmentDetails",
+                    "type": "Element",
+                    "help": "Terminal, Equipment and EFT Details. If a Total EFT of the Travel Solution is requested then we will have 2 occurrences of the terminalEquipmentDetails attached to the first leg travelResponseDetails: the 1st occurrence will give the EFT of the leg, the 2nd occurrence will give the total EFT of the Travel Solution.",
+                },
+            )
+            codeshare_data: CommercialAgreementsType = field(
+                default=None,
+                metadata={
+                    "name": "codeshareData",
+                    "type": "Element",
+                    "help": "Codeshare data",
+                },
+            )
+            disclosure: FreeTextInformationType = field(
+                default=None,
+                metadata={
+                    "name": "disclosure",
+                    "type": "Element",
+                    "help": "Disclosure message from an operating carrier.",
+                },
+            )
+            stop_details: RoutingInformationTypeI = field(
+                default=None,
+                metadata={
+                    "name": "stopDetails",
+                    "type": "Element",
+                    "help": "Stops Details",
+                },
+            )
+            traffic_restriction_data: TrafficRestrictionTypeI = field(
+                default=None,
+                metadata={
+                    "name": "trafficRestrictionData",
+                    "type": "Element",
+                    "help": "Traffic restriction information",
+                },
+            )
+            reservation_info: PassengerItineraryInformationType = field(
+                default=None,
+                metadata={
+                    "name": "reservationInfo",
+                    "type": "Element",
+                    "help": "PNR flight reservation info",
+                },
+            )
+            incidental_stop_info: List[
+                "FareMasterPricerTravelBoardSearch.Itinerary.FlightInfoPnr.IncidentalStopInfo"
+            ] = field(
+                default_factory=list,
+                metadata={
+                    "min_occurs": 0,
+                    "max_occurs": 8,
+                    "name": "incidentalStopInfo",
+                    "type": "Element",
+                    "help": "Incidental stop information.",
+                },
+            )
+
+            @dataclass
+            class IncidentalStopInfo:
+                date_time_info: DateAndTimeInformationTypeI = field(
+                    default=None,
+                    metadata={
+                        "required": True,
+                        "name": "dateTimeInfo",
+                        "type": "Element",
+                        "help": "Incidental stop date/time information",
+                    },
+                )
+
+    @dataclass
+    class TicketChangeInfo:
+        ticket_number_details: TicketNumberTypeI = field(
             default=None,
             metadata={
                 "required": True,
-                "name": "logicalLink",
+                "name": "ticketNumberDetails",
                 "type": "Element",
-                "help": "Logical link with other criteria.",
+                "help": "Ticket nb details.",
             },
         )
-        family_criteria: FareFamilyCriteriaType = field(
-            default=None,
-            metadata={
-                "name": "familyCriteria",
-                "type": "Element",
-                "help": "Description of fare family criteria.",
-            },
-        )
-        fare_family_segment: List["FareFamilySegment"] = field(
+        ticket_requested_segments: List[
+            "FareMasterPricerTravelBoardSearch.TicketChangeInfo.TicketRequestedSegments"
+        ] = field(
             default_factory=list,
             metadata={
                 "min_occurs": 0,
                 "max_occurs": 6,
-                "name": "fareFamilySegment",
+                "name": "ticketRequestedSegments",
                 "type": "Element",
-                "help": "Fare family requested segment details.",
+                "help": "Changed ticket requested segments.",
             },
         )
 
-    @dataclass
-    class FareFamilySegment:
+        @dataclass
+        class TicketRequestedSegments:
+            action_identification: ActionIdentificationType = field(
+                default=None,
+                metadata={
+                    "required": True,
+                    "name": "actionIdentification",
+                    "type": "Element",
+                    "help": "Action identification.",
+                },
+            )
+            connect_point_details: ConnectionTypeI = field(
+                default=None,
+                metadata={
+                    "name": "connectPointDetails",
+                    "type": "Element",
+                    "help": "Connected cities in changed ticket requested segment.",
+                },
+            )
 
-        reference_info: ReferenceInfoType = field(
+    @dataclass
+    class CombinationFareFamilies:
+        item_ffcnumber: ItemNumberType = field(
             default=None,
             metadata={
                 "required": True,
+                "name": "itemFFCNumber",
+                "type": "Element",
+                "help": "Specification of the item number",
+            },
+        )
+        nb_of_units: NumberOfUnitsType80154S = field(
+            default=None,
+            metadata={
+                "name": "nbOfUnits",
+                "type": "Element",
+                "help": "Number of units.",
+            },
+        )
+        reference_info: List[ReferenceInfoType] = field(
+            default_factory=list,
+            metadata={
+                "min_occurs": 0,
+                "max_occurs": 6,
                 "name": "referenceInfo",
                 "type": "Element",
                 "help": "Requested segment reference",
             },
         )
-        family_criteria: FareFamilyCriteriaType = field(
-            default=None,
-            metadata={
-                "name": "familyCriteria",
-                "type": "Element",
-                "help": "Description of fare family criteria.",
-            },
-        )
 
     @dataclass
-    class FareFamilySegment:
-
-        reference_info: ReferenceInfoType = field(
+    class FeeOption:
+        fee_type_info: SelectionDetailsType = field(
             default=None,
             metadata={
                 "required": True,
-                "name": "referenceInfo",
+                "name": "feeTypeInfo",
                 "type": "Element",
-                "help": "Requested segment reference",
+                "help": "Nature of the fee (OB,OC,..)",
             },
         )
-        family_criteria: FareFamilyCriteriaType = field(
+        rate_tax: MonetaryInformationType80162S = field(
             default=None,
             metadata={
-                "name": "familyCriteria",
+                "name": "rateTax",
                 "type": "Element",
-                "help": "Description of fare family criteria.",
+                "help": "Associated rate tax.",
             },
         )
+        fee_details: List[
+            "FareMasterPricerTravelBoardSearch.FeeOption.FeeDetails"
+        ] = field(
+            default_factory=list,
+            metadata={
+                "min_occurs": 0,
+                "max_occurs": 99,
+                "name": "feeDetails",
+                "type": "Element",
+                "help": "Details for each fee.",
+            },
+        )
+
+        @dataclass
+        class FeeDetails:
+            fee_info: SpecificDataInformationType = field(
+                default=None,
+                metadata={
+                    "required": True,
+                    "name": "feeInfo",
+                    "type": "Element",
+                    "help": "Fee information",
+                },
+            )
+            associated_amounts: MonetaryInformationTypeI = field(
+                default=None,
+                metadata={
+                    "name": "associatedAmounts",
+                    "type": "Element",
+                    "help": "Associated amounts : amounts to take into account to calculate fee.",
+                },
+            )
+            fee_description_grp: "FareMasterPricerTravelBoardSearch.FeeOption.FeeDetails.FeeDescriptionGrp" = field(
+                default=None,
+                metadata={
+                    "name": "feeDescriptionGrp",
+                    "type": "Element",
+                    "help": "Fee description",
+                },
+            )
+
+            @dataclass
+            class FeeDescriptionGrp:
+                item_number_info: ItemNumberType80866S = field(
+                    default=None,
+                    metadata={
+                        "required": True,
+                        "name": "itemNumberInfo",
+                        "type": "Element",
+                        "help": "Specification of the item number",
+                    },
+                )
+                service_attributes_info: AttributeType61377S = field(
+                    default=None,
+                    metadata={
+                        "name": "serviceAttributesInfo",
+                        "type": "Element",
+                        "help": "Attributes (SSR code EMD, RFIC, SSIM)",
+                    },
+                )
+                service_description_info: SpecialRequirementsDetailsType = field(
+                    default=None,
+                    metadata={
+                        "name": "serviceDescriptionInfo",
+                        "type": "Element",
+                        "help": "Other service information (service description, ...)",
+                    },
+                )
+
+    @dataclass
+    class OfficeIdDetails:
+        office_id_information: UserIdentificationType = field(
+            default=None,
+            metadata={
+                "required": True,
+                "name": "officeIdInformation",
+                "type": "Element",
+                "help": "Office Id Information",
+            },
+        )
+        nb_of_units: NumberOfUnitsType80154S = field(
+            default=None,
+            metadata={
+                "name": "nbOfUnits",
+                "type": "Element",
+                "help": "Number of units.",
+            },
+        )
+        uid_option: CodedAttributeType78500S = field(
+            default=None,
+            metadata={
+                "name": "uidOption",
+                "type": "Element",
+                "help": "UID option",
+            },
+        )
+        pricing_tick_info: PricingTicketingDetailsType = field(
+            default=None,
+            metadata={
+                "name": "pricingTickInfo",
+                "type": "Element",
+                "help": "Pricing and ticketing details.",
+            },
+        )
+        corporate_fare_info: CorporateFareInformationType = field(
+            default=None,
+            metadata={
+                "name": "corporateFareInfo",
+                "type": "Element",
+                "help": "Corporate fare information",
+            },
+        )
+        travel_flight_info: TravelFlightInformationType = field(
+            default=None,
+            metadata={
+                "name": "travelFlightInfo",
+                "type": "Element",
+                "help": "Details of a Flight : Direct, Non stop...",
+            },
+        )
+        airline_distribution_details: List[
+            "FareMasterPricerTravelBoardSearch.OfficeIdDetails.AirlineDistributionDetails"
+        ] = field(
+            default_factory=list,
+            metadata={
+                "min_occurs": 0,
+                "max_occurs": 6,
+                "name": "airlineDistributionDetails",
+                "type": "Element",
+                "help": "Details of airline distribution at requested segment level",
+            },
+        )
+
+        @dataclass
+        class AirlineDistributionDetails:
+            requested_segment_ref: OriginAndDestinationRequestType = field(
+                default=None,
+                metadata={
+                    "required": True,
+                    "name": "requestedSegmentRef",
+                    "type": "Element",
+                    "help": "Indicates reference of the requested segment",
+                },
+            )
+            flight_info: TravelFlightInformationType = field(
+                default=None,
+                metadata={
+                    "name": "flightInfo",
+                    "type": "Element",
+                    "help": "Specify Flight options.",
+                },
+            )

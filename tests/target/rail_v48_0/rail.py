@@ -392,7 +392,7 @@ class RailLegModifiers:
     )
 
     @dataclass
-    class ProhibitedConnectionPoints:
+    class PermittedConnectionPoints:
         connection_point: List[ConnectionPoint] = field(
             default_factory=list,
             metadata={
@@ -404,7 +404,7 @@ class RailLegModifiers:
         )
 
     @dataclass
-    class PermittedConnectionPoints:
+    class ProhibitedConnectionPoints:
         connection_point: List[ConnectionPoint] = field(
             default_factory=list,
             metadata={

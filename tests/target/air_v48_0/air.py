@@ -945,17 +945,6 @@ class BrandModifiers:
     )
 
     @dataclass
-    class BasicDetailsOnly:
-        return_basic_details: bool = field(
-            default=None,
-            metadata={
-                "required": True,
-                "name": "ReturnBasicDetails",
-                "type": "Attribute",
-            },
-        )
-
-    @dataclass
     class FareFamilyDisplay:
         modifier_type: str = field(
             default=None,
@@ -964,6 +953,17 @@ class BrandModifiers:
                 "name": "ModifierType",
                 "type": "Attribute",
                 "help": '"FareFamily" returns the lowest branded fares in a fare family. "MaintainBookingCode" attempts to return the lowest branded fare in a fare family display based on the permitted booking code. Any brand that does not have a fare for the permitted booking code will then have the lowest fare returned. "LowestFareInBrand" returns the lowest fare within each branded fare in a fare family display.',
+            },
+        )
+
+    @dataclass
+    class BasicDetailsOnly:
+        return_basic_details: bool = field(
+            default=None,
+            metadata={
+                "required": True,
+                "name": "ReturnBasicDetails",
+                "type": "Attribute",
             },
         )
 
@@ -3875,6 +3875,23 @@ class RailCoachDetails:
 
 
 @dataclass
+class RefundAccessCode:
+    """
+    For some vendors a code/password is required to avail any amount retained during refund.User can define their own password too This attribute will be used to show/accept this code.
+    """
+
+    value: str = field(
+        default=None,
+        metadata={
+            "min_length": "1",
+            "max_length": "32",
+            "name": "value",
+            "type": "Restriction",
+        },
+    )
+
+
+@dataclass
 class Restriction:
     """
     Fare Reference associated with the BookingRules
@@ -3904,16 +3921,6 @@ class Restriction:
     )
 
     @dataclass
-    class RestrictionPassengerTypes:
-        max_nbr_travelers: str = field(
-            default=None,
-            metadata={"name": "MaxNbrTravelers", "type": "Attribute"},
-        )
-        total_nbr_ptc: str = field(
-            default=None, metadata={"name": "TotalNbrPTC", "type": "Attribute"}
-        )
-
-    @dataclass
     class DaysOfWeekRestriction:
         restriction_exists_ind: bool = field(
             default=None,
@@ -3925,6 +3932,16 @@ class Restriction:
         include_exclude_use_ind: bool = field(
             default=None,
             metadata={"name": "IncludeExcludeUseInd", "type": "Attribute"},
+        )
+
+    @dataclass
+    class RestrictionPassengerTypes:
+        max_nbr_travelers: str = field(
+            default=None,
+            metadata={"name": "MaxNbrTravelers", "type": "Attribute"},
+        )
+        total_nbr_ptc: str = field(
+            default=None, metadata={"name": "TotalNbrPTC", "type": "Attribute"}
         )
 
 
@@ -4206,14 +4223,14 @@ class SpecificTimeTable:
     )
 
     @dataclass
-    class FlightDestination:
+    class FlightOrigin:
         airport: Airport = field(
             default=None,
             metadata={"required": True, "name": "Airport", "type": "Element"},
         )
 
     @dataclass
-    class FlightOrigin:
+    class FlightDestination:
         airport: Airport = field(
             default=None,
             metadata={"required": True, "name": "Airport", "type": "Element"},
@@ -6357,7 +6374,7 @@ class ChargesRules:
     )
 
     @dataclass
-    class VoluntaryRefunds:
+    class VoluntaryChanges:
         penalty: Penalty = field(
             default=None, metadata={"name": "Penalty", "type": "Element"}
         )
@@ -6367,7 +6384,7 @@ class ChargesRules:
         )
 
     @dataclass
-    class VoluntaryChanges:
+    class VoluntaryRefunds:
         penalty: Penalty = field(
             default=None, metadata={"name": "Penalty", "type": "Element"}
         )
@@ -8096,31 +8113,7 @@ class SolutionGroup:
     )
 
     @dataclass
-    class ProhibitedPointOfSales:
-        point_of_sale: List[PointOfSale] = field(
-            default_factory=list,
-            metadata={
-                "min_occurs": 1,
-                "max_occurs": 999,
-                "name": "PointOfSale",
-                "type": "Element",
-            },
-        )
-
-    @dataclass
-    class PermittedPointOfSales:
-        point_of_sale: List[PointOfSale] = field(
-            default_factory=list,
-            metadata={
-                "min_occurs": 1,
-                "max_occurs": 999,
-                "name": "PointOfSale",
-                "type": "Element",
-            },
-        )
-
-    @dataclass
-    class ProhibitedAccountCodes:
+    class PermittedAccountCodes:
         account_code: List[AccountCode] = field(
             default_factory=list,
             metadata={
@@ -8144,13 +8137,37 @@ class SolutionGroup:
         )
 
     @dataclass
-    class PermittedAccountCodes:
+    class ProhibitedAccountCodes:
         account_code: List[AccountCode] = field(
             default_factory=list,
             metadata={
                 "min_occurs": 1,
                 "max_occurs": 999,
                 "name": "AccountCode",
+                "type": "Element",
+            },
+        )
+
+    @dataclass
+    class PermittedPointOfSales:
+        point_of_sale: List[PointOfSale] = field(
+            default_factory=list,
+            metadata={
+                "min_occurs": 1,
+                "max_occurs": 999,
+                "name": "PointOfSale",
+                "type": "Element",
+            },
+        )
+
+    @dataclass
+    class ProhibitedPointOfSales:
+        point_of_sale: List[PointOfSale] = field(
+            default_factory=list,
+            metadata={
+                "min_occurs": 1,
+                "max_occurs": 999,
+                "name": "PointOfSale",
                 "type": "Element",
             },
         )
@@ -9093,19 +9110,43 @@ class AirLegModifiers:
     )
 
     @dataclass
-    class DisfavoredAlliances:
-        alliance: List[Alliance] = field(
+    class PermittedConnectionPoints:
+        connection_point: List[ConnectionPoint] = field(
             default_factory=list,
             metadata={
                 "min_occurs": 1,
                 "max_occurs": 999,
-                "name": "Alliance",
+                "name": "ConnectionPoint",
                 "type": "Element",
             },
         )
 
     @dataclass
-    class ProhibitedBookingCodes:
+    class ProhibitedConnectionPoints:
+        connection_point: List[ConnectionPoint] = field(
+            default_factory=list,
+            metadata={
+                "min_occurs": 1,
+                "max_occurs": 999,
+                "name": "ConnectionPoint",
+                "type": "Element",
+            },
+        )
+
+    @dataclass
+    class PreferredConnectionPoints:
+        connection_point: List[ConnectionPoint] = field(
+            default_factory=list,
+            metadata={
+                "min_occurs": 1,
+                "max_occurs": 99,
+                "name": "ConnectionPoint",
+                "type": "Element",
+            },
+        )
+
+    @dataclass
+    class PermittedBookingCodes:
         booking_code: List[BookingCode] = field(
             default_factory=list,
             metadata={
@@ -9129,7 +9170,7 @@ class AirLegModifiers:
         )
 
     @dataclass
-    class PermittedBookingCodes:
+    class ProhibitedBookingCodes:
         booking_code: List[BookingCode] = field(
             default_factory=list,
             metadata={
@@ -9141,37 +9182,13 @@ class AirLegModifiers:
         )
 
     @dataclass
-    class PreferredConnectionPoints:
-        connection_point: List[ConnectionPoint] = field(
-            default_factory=list,
-            metadata={
-                "min_occurs": 1,
-                "max_occurs": 99,
-                "name": "ConnectionPoint",
-                "type": "Element",
-            },
-        )
-
-    @dataclass
-    class ProhibitedConnectionPoints:
-        connection_point: List[ConnectionPoint] = field(
+    class DisfavoredAlliances:
+        alliance: List[Alliance] = field(
             default_factory=list,
             metadata={
                 "min_occurs": 1,
                 "max_occurs": 999,
-                "name": "ConnectionPoint",
-                "type": "Element",
-            },
-        )
-
-    @dataclass
-    class PermittedConnectionPoints:
-        connection_point: List[ConnectionPoint] = field(
-            default_factory=list,
-            metadata={
-                "min_occurs": 1,
-                "max_occurs": 999,
-                "name": "ConnectionPoint",
+                "name": "Alliance",
                 "type": "Element",
             },
         )
@@ -9416,25 +9433,13 @@ class AirPricingModifiers:
     )
 
     @dataclass
-    class PromoCodes:
-        promo_code: List[PromoCode] = field(
+    class ProhibitedRuleCategories:
+        fare_rule_category: List[FareRuleCategory] = field(
             default_factory=list,
             metadata={
                 "min_occurs": 1,
                 "max_occurs": 999,
-                "name": "PromoCode",
-                "type": "Element",
-            },
-        )
-
-    @dataclass
-    class ContractCodes:
-        contract_code: List[ContractCode] = field(
-            default_factory=list,
-            metadata={
-                "min_occurs": 1,
-                "max_occurs": 999,
-                "name": "ContractCode",
+                "name": "FareRuleCategory",
                 "type": "Element",
             },
         )
@@ -9453,13 +9458,25 @@ class AirPricingModifiers:
         )
 
     @dataclass
-    class ProhibitedRuleCategories:
-        fare_rule_category: List[FareRuleCategory] = field(
+    class ContractCodes:
+        contract_code: List[ContractCode] = field(
             default_factory=list,
             metadata={
                 "min_occurs": 1,
                 "max_occurs": 999,
-                "name": "FareRuleCategory",
+                "name": "ContractCode",
+                "type": "Element",
+            },
+        )
+
+    @dataclass
+    class PromoCodes:
+        promo_code: List[PromoCode] = field(
+            default_factory=list,
+            metadata={
+                "min_occurs": 1,
+                "max_occurs": 999,
+                "name": "PromoCode",
                 "type": "Element",
             },
         )
@@ -9703,61 +9720,13 @@ class AirSearchModifiers:
     )
 
     @dataclass
-    class ProhibitedBookingCodes:
-        booking_code: List[BookingCode] = field(
+    class DisfavoredProviders:
+        provider: List[Provider] = field(
             default_factory=list,
             metadata={
                 "min_occurs": 1,
                 "max_occurs": 999,
-                "name": "BookingCode",
-                "type": "Element",
-            },
-        )
-
-    @dataclass
-    class PermittedBookingCodes:
-        booking_code: List[BookingCode] = field(
-            default_factory=list,
-            metadata={
-                "min_occurs": 1,
-                "max_occurs": 999,
-                "name": "BookingCode",
-                "type": "Element",
-            },
-        )
-
-    @dataclass
-    class DisfavoredAlliances:
-        alliance: List[Alliance] = field(
-            default_factory=list,
-            metadata={
-                "min_occurs": 1,
-                "max_occurs": 999,
-                "name": "Alliance",
-                "type": "Element",
-            },
-        )
-
-    @dataclass
-    class PreferredAlliances:
-        alliance: List[Alliance] = field(
-            default_factory=list,
-            metadata={
-                "min_occurs": 1,
-                "max_occurs": 999,
-                "name": "Alliance",
-                "type": "Element",
-            },
-        )
-
-    @dataclass
-    class DisfavoredCarriers:
-        carrier: List[Carrier] = field(
-            default_factory=list,
-            metadata={
-                "min_occurs": 1,
-                "max_occurs": 999,
-                "name": "Carrier",
+                "name": "Provider",
                 "type": "Element",
             },
         )
@@ -9775,13 +9744,61 @@ class AirSearchModifiers:
         )
 
     @dataclass
-    class DisfavoredProviders:
-        provider: List[Provider] = field(
+    class DisfavoredCarriers:
+        carrier: List[Carrier] = field(
             default_factory=list,
             metadata={
                 "min_occurs": 1,
                 "max_occurs": 999,
-                "name": "Provider",
+                "name": "Carrier",
+                "type": "Element",
+            },
+        )
+
+    @dataclass
+    class PreferredAlliances:
+        alliance: List[Alliance] = field(
+            default_factory=list,
+            metadata={
+                "min_occurs": 1,
+                "max_occurs": 999,
+                "name": "Alliance",
+                "type": "Element",
+            },
+        )
+
+    @dataclass
+    class DisfavoredAlliances:
+        alliance: List[Alliance] = field(
+            default_factory=list,
+            metadata={
+                "min_occurs": 1,
+                "max_occurs": 999,
+                "name": "Alliance",
+                "type": "Element",
+            },
+        )
+
+    @dataclass
+    class PermittedBookingCodes:
+        booking_code: List[BookingCode] = field(
+            default_factory=list,
+            metadata={
+                "min_occurs": 1,
+                "max_occurs": 999,
+                "name": "BookingCode",
+                "type": "Element",
+            },
+        )
+
+    @dataclass
+    class ProhibitedBookingCodes:
+        booking_code: List[BookingCode] = field(
+            default_factory=list,
+            metadata={
+                "min_occurs": 1,
+                "max_occurs": 999,
+                "name": "BookingCode",
                 "type": "Element",
             },
         )

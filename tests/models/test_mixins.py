@@ -243,6 +243,7 @@ class ExtendsMixinTests(TestCase):
     def test_subclasses(self):
         subclasses = [c for _, c in get_subclasses(ExtendsMixin)]
         expected = [
+            el.Attribute,
             el.ComplexType,
             el.Element,
             el.SimpleType,
@@ -252,6 +253,10 @@ class ExtendsMixinTests(TestCase):
     def test_display_base(self):
         obj = el.Element.build(type="common:foo_bar")
         self.assertEqual("FooBar", obj.display_base)
+
+    def test_attribute_raw_base_property(self):
+        obj = el.Attribute.build()
+        self.assertIsNone(obj.raw_base)
 
     def test_complex_type_raw_base_property(self):
         obj = el.ComplexType.build()

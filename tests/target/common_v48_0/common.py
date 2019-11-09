@@ -4038,6 +4038,10 @@ class CommissionRemark:
     )
 
     @dataclass
+    class ProviderReservationLevel:
+        pass
+
+    @dataclass
     class PassengerTypeLevel:
         traveler_type: TypePtc = field(
             default=None,
@@ -4047,10 +4051,6 @@ class CommissionRemark:
                 "type": "Attribute",
             },
         )
-
-    @dataclass
-    class ProviderReservationLevel:
-        pass
 
 
 @dataclass
@@ -5429,6 +5429,27 @@ class ShopInformation:
     )
 
     @dataclass
+    class SearchRequest:
+        origin: TypeIatacode = field(
+            default=None, metadata={"name": "Origin", "type": "Attribute"}
+        )
+        destination: TypeIatacode = field(
+            default=None, metadata={"name": "Destination", "type": "Attribute"}
+        )
+        departure_time: str = field(
+            default=None,
+            metadata={
+                "name": "DepartureTime",
+                "type": "Attribute",
+                "help": "Date and Time at which this entity departs. This does not include Time Zone information since it can be derived from origin location",
+            },
+        )
+        class_of_service: TypeClassOfService = field(
+            default=None,
+            metadata={"name": "ClassOfService", "type": "Attribute"},
+        )
+
+    @dataclass
     class FlightsOffered:
         origin: TypeIatacode = field(
             default=None, metadata={"name": "Origin", "type": "Attribute"}
@@ -5464,27 +5485,6 @@ class ShopInformation:
         connection: bool = field(
             default="false",
             metadata={"name": "Connection", "type": "Attribute"},
-        )
-
-    @dataclass
-    class SearchRequest:
-        origin: TypeIatacode = field(
-            default=None, metadata={"name": "Origin", "type": "Attribute"}
-        )
-        destination: TypeIatacode = field(
-            default=None, metadata={"name": "Destination", "type": "Attribute"}
-        )
-        departure_time: str = field(
-            default=None,
-            metadata={
-                "name": "DepartureTime",
-                "type": "Attribute",
-                "help": "Date and Time at which this entity departs. This does not include Time Zone information since it can be derived from origin location",
-            },
-        )
-        class_of_service: TypeClassOfService = field(
-            default=None,
-            metadata={"name": "ClassOfService", "type": "Attribute"},
         )
 
 
@@ -5694,23 +5694,22 @@ class TravelComplianceData:
     )
 
     @dataclass
-    class PreferredSupplier:
-        preferred: bool = field(
+    class PolicyCompliance:
+        in_policy: bool = field(
             default=None,
             metadata={
                 "required": True,
-                "name": "Preferred",
+                "name": "InPolicy",
                 "type": "Attribute",
-                "help": "Preferred Supplier - 'true', 'false'.",
+                "help": "Policy Compliance Indicator. For In-Policy set to 'true', For Out-Of-Policy set to 'false''.",
             },
         )
-        profile_type: TypeProfileType = field(
+        policy_token: StringLength1to128 = field(
             default=None,
             metadata={
-                "required": True,
-                "name": "ProfileType",
+                "name": "PolicyToken",
                 "type": "Attribute",
-                "help": "Indicate profile type. e.g. if Agency Preferred then pass Agency, if Traveler Preferred then pass Traveler.",
+                "help": "Optional text message to set the rule or token for which it's In Policy or Out Of Policy.",
             },
         )
 
@@ -5735,22 +5734,23 @@ class TravelComplianceData:
         )
 
     @dataclass
-    class PolicyCompliance:
-        in_policy: bool = field(
+    class PreferredSupplier:
+        preferred: bool = field(
             default=None,
             metadata={
                 "required": True,
-                "name": "InPolicy",
+                "name": "Preferred",
                 "type": "Attribute",
-                "help": "Policy Compliance Indicator. For In-Policy set to 'true', For Out-Of-Policy set to 'false''.",
+                "help": "Preferred Supplier - 'true', 'false'.",
             },
         )
-        policy_token: StringLength1to128 = field(
+        profile_type: TypeProfileType = field(
             default=None,
             metadata={
-                "name": "PolicyToken",
+                "required": True,
+                "name": "ProfileType",
                 "type": "Attribute",
-                "help": "Optional text message to set the rule or token for which it's In Policy or Out Of Policy.",
+                "help": "Indicate profile type. e.g. if Agency Preferred then pass Agency, if Traveler Preferred then pass Traveler.",
             },
         )
 
@@ -6786,7 +6786,7 @@ class ProviderArnksegment:
     )
 
     @dataclass
-    class NextSegment:
+    class PreviousSegment:
         air_segment_ref: TypeSegmentRef = field(
             default=None,
             metadata={
@@ -6821,7 +6821,7 @@ class ProviderArnksegment:
         )
 
     @dataclass
-    class PreviousSegment:
+    class NextSegment:
         air_segment_ref: TypeSegmentRef = field(
             default=None,
             metadata={
@@ -7820,18 +7820,6 @@ class AirExchangeInfo:
     )
 
     @dataclass
-    class TicketFeeInfo:
-        base: TypeMoney = field(
-            default=None, metadata={"name": "Base", "type": "Attribute"}
-        )
-        tax: TypeMoney = field(
-            default=None, metadata={"name": "Tax", "type": "Attribute"}
-        )
-        total: TypeMoney = field(
-            default=None, metadata={"name": "Total", "type": "Attribute"}
-        )
-
-    @dataclass
     class TotalPenaltyTaxInfo:
         penalty_tax_info: List[TypeTax] = field(
             default_factory=list,
@@ -7845,6 +7833,18 @@ class AirExchangeInfo:
         total_penalty_tax: TypeMoney = field(
             default=None,
             metadata={"name": "TotalPenaltyTax", "type": "Attribute"},
+        )
+
+    @dataclass
+    class TicketFeeInfo:
+        base: TypeMoney = field(
+            default=None, metadata={"name": "Base", "type": "Attribute"}
+        )
+        tax: TypeMoney = field(
+            default=None, metadata={"name": "Tax", "type": "Attribute"}
+        )
+        total: TypeMoney = field(
+            default=None, metadata={"name": "Total", "type": "Attribute"}
         )
 
 
@@ -8390,114 +8390,6 @@ class ServiceRuleType:
     )
 
     @dataclass
-    class SecondaryTypeRules:
-        secondary_type_rule: List[
-            "ServiceRuleType.SecondaryTypeRules.SecondaryTypeRule"
-        ] = field(
-            default_factory=list,
-            metadata={
-                "min_occurs": 1,
-                "max_occurs": 999,
-                "name": "SecondaryTypeRule",
-                "type": "Element",
-                "help": "Lists a single secondary code for the optional / additional service.",
-            },
-        )
-
-        @dataclass
-        class SecondaryTypeRule:
-            application_limit: List[
-                OptionalServiceApplicationLimitType
-            ] = field(
-                default_factory=list,
-                metadata={
-                    "min_occurs": 0,
-                    "max_occurs": 10,
-                    "name": "ApplicationLimit",
-                    "type": "Element",
-                },
-            )
-            secondary_type: TypeRef = field(
-                default=None,
-                metadata={
-                    "required": True,
-                    "name": "SecondaryType",
-                    "type": "Attribute",
-                    "help": "The unique type to associate a secondary type in an optional service",
-                },
-            )
-
-    @dataclass
-    class ModifyRules:
-        modify_rule: List[
-            "ServiceRuleType.SecondaryTypeRules.SecondaryTypeRule.ModifyRules.ModifyRule"
-        ] = field(
-            default_factory=list,
-            metadata={
-                "min_occurs": 1,
-                "max_occurs": 999,
-                "name": "ModifyRule",
-                "type": "Element",
-                "help": "Indicates modification rules for the particular modification type.",
-            },
-        )
-        provider_defined_modification_type: str = field(
-            default=None,
-            metadata={
-                "name": "ProviderDefinedModificationType",
-                "type": "Attribute",
-                "help": "Indicates the actual provider defined modification type which is mapped to Other",
-            },
-        )
-
-        @dataclass
-        class ModifyRule:
-            pass
-
-    @dataclass
-    class ApplicationLevel:
-        application_limits: "ServiceRuleType.SecondaryTypeRules.SecondaryTypeRule.ModifyRules.ModifyRule.ApplicationLevel.ApplicationLimits" = field(
-            default=None,
-            metadata={
-                "name": "ApplicationLimits",
-                "type": "Element",
-                "help": "Adds the limits on the number of options that can be selected for a particular type",
-            },
-        )
-        service_data: List[ServiceData] = field(
-            default_factory=list,
-            metadata={
-                "min_occurs": 0,
-                "max_occurs": 999,
-                "name": "ServiceData",
-                "type": "Element",
-            },
-        )
-        provider_defined_applicable_levels: str = field(
-            default=None,
-            metadata={
-                "name": "ProviderDefinedApplicableLevels",
-                "type": "Attribute",
-                "help": "Indicates the actual provider defined ApplicableLevels which is mapped to Other",
-            },
-        )
-
-        @dataclass
-        class ApplicationLimits:
-            application_limit: List[
-                OptionalServiceApplicationLimitType
-            ] = field(
-                default_factory=list,
-                metadata={
-                    "min_occurs": 1,
-                    "max_occurs": 10,
-                    "name": "ApplicationLimit",
-                    "type": "Element",
-                    "help": "The application limits for a particular level",
-                },
-            )
-
-    @dataclass
     class ApplicationRules:
         required_for_all_travelers: bool = field(
             default=None,
@@ -8539,6 +8431,112 @@ class ServiceRuleType:
                 "help": "If set to true, the secondary option code is required for this option",
             },
         )
+
+    @dataclass
+    class ApplicationLevel:
+        application_limits: "ServiceRuleType.ApplicationLevel.ApplicationLimits" = field(
+            default=None,
+            metadata={
+                "name": "ApplicationLimits",
+                "type": "Element",
+                "help": "Adds the limits on the number of options that can be selected for a particular type",
+            },
+        )
+        service_data: List[ServiceData] = field(
+            default_factory=list,
+            metadata={
+                "min_occurs": 0,
+                "max_occurs": 999,
+                "name": "ServiceData",
+                "type": "Element",
+            },
+        )
+        provider_defined_applicable_levels: str = field(
+            default=None,
+            metadata={
+                "name": "ProviderDefinedApplicableLevels",
+                "type": "Attribute",
+                "help": "Indicates the actual provider defined ApplicableLevels which is mapped to Other",
+            },
+        )
+
+        @dataclass
+        class ApplicationLimits:
+            application_limit: List[
+                OptionalServiceApplicationLimitType
+            ] = field(
+                default_factory=list,
+                metadata={
+                    "min_occurs": 1,
+                    "max_occurs": 10,
+                    "name": "ApplicationLimit",
+                    "type": "Element",
+                    "help": "The application limits for a particular level",
+                },
+            )
+
+    @dataclass
+    class ModifyRules:
+        modify_rule: List["ServiceRuleType.ModifyRules.ModifyRule"] = field(
+            default_factory=list,
+            metadata={
+                "min_occurs": 1,
+                "max_occurs": 999,
+                "name": "ModifyRule",
+                "type": "Element",
+                "help": "Indicates modification rules for the particular modification type.",
+            },
+        )
+        provider_defined_modification_type: str = field(
+            default=None,
+            metadata={
+                "name": "ProviderDefinedModificationType",
+                "type": "Attribute",
+                "help": "Indicates the actual provider defined modification type which is mapped to Other",
+            },
+        )
+
+        @dataclass
+        class ModifyRule:
+            pass
+
+    @dataclass
+    class SecondaryTypeRules:
+        secondary_type_rule: List[
+            "ServiceRuleType.SecondaryTypeRules.SecondaryTypeRule"
+        ] = field(
+            default_factory=list,
+            metadata={
+                "min_occurs": 1,
+                "max_occurs": 999,
+                "name": "SecondaryTypeRule",
+                "type": "Element",
+                "help": "Lists a single secondary code for the optional / additional service.",
+            },
+        )
+
+        @dataclass
+        class SecondaryTypeRule:
+            application_limit: List[
+                OptionalServiceApplicationLimitType
+            ] = field(
+                default_factory=list,
+                metadata={
+                    "min_occurs": 0,
+                    "max_occurs": 10,
+                    "name": "ApplicationLimit",
+                    "type": "Element",
+                },
+            )
+            secondary_type: TypeRef = field(
+                default=None,
+                metadata={
+                    "required": True,
+                    "name": "SecondaryType",
+                    "type": "Attribute",
+                    "help": "The unique type to associate a secondary type in an optional service",
+                },
+            )
 
 
 @dataclass
@@ -8874,11 +8872,8 @@ class Group:
     )
 
     @dataclass
-    class BookingTravelerRef:
-        key: TypeRef = field(
-            default=None,
-            metadata={"required": True, "name": "Key", "type": "Attribute"},
-        )
+    class Name:
+        pass
 
     @dataclass
     class Ssrref:
@@ -8888,8 +8883,11 @@ class Group:
         )
 
     @dataclass
-    class Name:
-        pass
+    class BookingTravelerRef:
+        key: TypeRef = field(
+            default=None,
+            metadata={"required": True, "name": "Key", "type": "Attribute"},
+        )
 
 
 @dataclass

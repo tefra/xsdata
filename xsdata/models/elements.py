@@ -190,7 +190,7 @@ class AnyAttribute(AnnotationBase):
 
 
 @dataclass
-class Attribute(AnnotationBase, SignatureField, RestrictedField):
+class Attribute(AnnotationBase, SignatureField, RestrictedField, ExtendsMixin):
     default: Optional[str]
     fixed: Optional[str]
     form: Optional[str]  # qualified | unqualified
@@ -211,6 +211,10 @@ class Attribute(AnnotationBase, SignatureField, RestrictedField):
             return dict(required=True)
 
         return dict()
+
+    @property
+    def raw_base(self) -> Optional[str]:
+        return None
 
 
 @dataclass

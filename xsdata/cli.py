@@ -1,4 +1,5 @@
-import pathlib
+from pathlib import Path
+from typing import List
 
 import click
 import click_completion
@@ -30,13 +31,13 @@ def cli(ctx: click.Context):
 @click.option("--verbose", is_flag=True, help="Pretty print result")
 def generate(file: str, target: str, theme: str, verbose: bool = False):
     process(
-        xsd_path=pathlib.Path(file).resolve(),
+        xsd_path=Path(file).resolve(),
         theme=theme,
-        target=pathlib.Path(target).resolve(),
+        target=Path(target).resolve(),
     )
 
 
-processed = []
+processed: List[Path] = []
 
 
 def process(xsd_path, theme, target, target_adjusted=False):

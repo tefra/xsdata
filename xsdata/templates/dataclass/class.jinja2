@@ -1,5 +1,4 @@
-{% set outer = outer|default([]) %}
-{% do outer.append(obj.name) %}
+{% set outer = outer|default([obj.name]) %}
 
 @dataclass
 class {{ obj.name }}{{"({})".format(obj.extends) if obj.extends }}:
@@ -21,7 +20,7 @@ class {{ obj.name }}{{"({})".format(obj.extends) if obj.extends }}:
 {%- endfor %}
 {% for inner in obj.inner %}
     {%- filter indent(4) -%}
-        {%- with obj=inner, outer=outer,  indent=indent -%}
+        {%- with obj=inner, outer=outer + [inner.name],  indent=indent -%}
             {% include "class.jinja2" %}
         {%- endwith -%}
     {%- endfilter -%}

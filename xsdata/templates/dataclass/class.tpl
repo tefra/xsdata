@@ -1,7 +1,11 @@
 {% set indent = indent|default(4) %}
 @dataclass
 class {{ obj.name }}{{"({})".format(obj.extends) if obj.extends }}:
-    {{'"""{}"""'.format(obj.help) if obj.help }}
+{%- if obj.help %}
+    """
+    {{ obj.help }}
+    """
+{% endif -%}
 {%- if obj.attrs|length == 0 %}
     pass
 {% endif -%}

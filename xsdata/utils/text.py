@@ -66,7 +66,8 @@ SAFE_KEYWORDS = {
 
 
 def safe_snake(string: str) -> str:
-    return SAFE_KEYWORDS.get(string, snake_case(string))
+    snake = snake_case(string)
+    return SAFE_KEYWORDS.get(snake, snake)
 
 
 def snake_case(string: Optional[str]) -> str:

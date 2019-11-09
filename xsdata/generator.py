@@ -1,7 +1,6 @@
-import copy
 import logging
 from dataclasses import dataclass, field
-from typing import List, Optional, Union
+from typing import Iterator, List, Union
 
 from xsdata.models.elements import (
     Attribute,
@@ -32,69 +31,32 @@ class CodeGenerator:
     def generate(self) -> List[Class]:
         """Generate class properties from schema elements and simple/complex
         types."""
-        self.generate_elements(self.schema.simple_types)
-        self.generate_elements(self.schema.complex_types)
-        self.generate_elements(self.schema.elements)
-
-        return self.deck
-
-    def generate_elements(self, items: BaseElements):
-        """Clone and the list of elements and start processing it, use a queue
-        because the list can grow for inner types without a standard
-        reference."""
-        self.queue = copy.deepcopy(list(items))
-        while len(self.queue):
-            obj = self.queue.pop()
-            item = self.generate_element(obj)
-
-            parent = self.deck
-            if getattr(obj, "inner", False):
-                parent = self.find_parent(self.deck[-1], item).inner
-            parent.append(item)
-
-    def find_parent(self, obj: Class, item: Class):
-
-        for attr in obj.attrs:
-            if attr.type == item.name:
-                return obj
-
-        for inner in obj.inner:
-            res = self.find_parent(inner, item)
-            if res:
-                return res
-
-        return None
+        classes: List[Class] = []
+        classes.extend(map(self.generate_element, self.schema.simple_types))
+        classes.extend(map(self.generate_element, self.schema.complex_types))
+        classes.extend(map(self.generate_element, self.schema.elements))
+        return classes
 
     def generate_element(self, obj: BaseElement) -> Class:
-
-        if obj.display_base == "CommonBaseReq":
-            pass
-
-        return Class(
+        item = Class(
             name=obj.pascal_name,
             extends=obj.display_base,
-            attrs=self.generate_class_fields(obj, container=True),
             help=obj.display_help,
         )
+        for child in self.field_children(obj):
+            self.generate_class_field(item, child)
 
-    def generate_class_fields(
-        self, obj: ElementBase, container=False
-    ) -> List[Attr]:
-        result = []
-        if not container and (
-            isinstance(obj, Attribute)
-            or isinstance(obj, Element)
-            or isinstance(obj, Restriction)
-        ):
-            result.append(self.generate_class_field(obj))
-        else:
-            for child in obj.children():
-                result.extend(self.generate_class_fields(child))
+        return item
 
-        return list(filter(None, result))
+    def field_children(self, obj: ElementBase) -> Iterator[AttributeElement]:
+        for child in obj.children():
+            if isinstance(child, (Attribute, Element, Restriction)):
+                yield child
+            elif isinstance(child, ElementBase):
+                yield from self.field_children(child)
 
-    def generate_class_field(self, obj: AttributeElement) -> Optional[Attr]:
-        queued = self.queue_inner_element(obj)
+    def generate_class_field(self, item: Class, obj: AttributeElement):
+        queued = self.queue_inner_element(item, obj)
         display_type = obj.display_type
         if not display_type:
             logger.warning("Failed to detect type for element: {}".format(obj))
@@ -106,18 +68,19 @@ class CodeGenerator:
             dict(name=name, type=type(obj).__name__, help=obj.display_help)
         )
 
-        return Attr(
-            name=safe_snake(name),
-            default=getattr(obj, "default", None),
-            metadata=metadata,
-            type=display_type,
-            forward_ref=queued,
+        item.attrs.append(
+            Attr(
+                name=safe_snake(name),
+                default=getattr(obj, "default", None),
+                metadata=metadata,
+                type=display_type,
+                forward_ref=queued,
+            )
         )
 
-    def queue_inner_element(self, obj: AttributeElement):
+    def queue_inner_element(self, item: Class, obj: AttributeElement):
         if isinstance(obj, Element):
             if not obj.raw_type and obj.complex_type:
                 obj.complex_type.name = obj.type = obj.name
-                setattr(obj.complex_type, "inner", True)
-                self.queue.append(obj.complex_type)
+                item.inner.append(self.generate_element(obj.complex_type))
                 return True

@@ -670,6 +670,17 @@ class AirFareRulesReq(BaseReq):
     )
 
     @dataclass
+    class FareRulesFilterCategory:
+        fare_info_ref: str = field(
+            default=None,
+            metadata={
+                "name": "FareInfoRef",
+                "type": "Attribute",
+                "help": "Key reference for multiple fare rule",
+            },
+        )
+
+    @dataclass
     class AirReservationSelector:
         fare_info_ref: List[FareInfoRef] = field(
             default_factory=list,
@@ -687,17 +698,6 @@ class AirFareRulesReq(BaseReq):
                 "name": "AirReservationLocatorCode",
                 "type": "Attribute",
                 "help": "The Air Reservation locator code which is an unique identifier for the reservation",
-            },
-        )
-
-    @dataclass
-    class FareRulesFilterCategory:
-        fare_info_ref: str = field(
-            default=None,
-            metadata={
-                "name": "FareInfoRef",
-                "type": "Attribute",
-                "help": "Key reference for multiple fare rule",
             },
         )
 
@@ -901,26 +901,6 @@ class AirPrePayReq(BaseReq):
     )
 
     @dataclass
-    class PrePayRetrieve:
-        id: TypeCardNumber = field(
-            default=None,
-            metadata={
-                "required": True,
-                "name": "Id",
-                "type": "Attribute",
-                "help": "Pre pay id to retrieved,example flight pass number",
-            },
-        )
-        type: str = field(
-            default=None,
-            metadata={
-                "name": "Type",
-                "type": "Attribute",
-                "help": "Pre pay id type,example 'FlightPass'",
-            },
-        )
-
-    @dataclass
     class ListSearch:
         person_name_search: PersonNameSearch = field(
             default=None,
@@ -957,6 +937,26 @@ class AirPrePayReq(BaseReq):
                 "name": "MaxResults",
                 "type": "Attribute",
                 "help": "Max Number of Flight Passes being requested for.",
+            },
+        )
+
+    @dataclass
+    class PrePayRetrieve:
+        id: TypeCardNumber = field(
+            default=None,
+            metadata={
+                "required": True,
+                "name": "Id",
+                "type": "Attribute",
+                "help": "Pre pay id to retrieved,example flight pass number",
+            },
+        )
+        type: str = field(
+            default=None,
+            metadata={
+                "name": "Type",
+                "type": "Attribute",
+                "help": "Pre pay id type,example 'FlightPass'",
             },
         )
 
@@ -1928,6 +1928,18 @@ class EmdretrieveReq(BaseReq):
     )
 
     @dataclass
+    class ListRetrieve:
+        provider_reservation_detail: ProviderReservationDetail = field(
+            default=None,
+            metadata={
+                "required": True,
+                "name": "ProviderReservationDetail",
+                "type": "Element",
+                "help": "Provider reservation details to be provided to fetch list of EMDs associated with it.",
+            },
+        )
+
+    @dataclass
     class DetailRetrieve:
         provider_reservation_detail: ProviderReservationDetail = field(
             default=None,
@@ -1944,18 +1956,6 @@ class EmdretrieveReq(BaseReq):
                 "name": "EMDNumber",
                 "type": "Element",
                 "help": "EMD number to be specified for display operation. If mentioned along with provider reservation detail then synchronization of that EMD is performed considering the same to be associated with the mentioned PNR.",
-            },
-        )
-
-    @dataclass
-    class ListRetrieve:
-        provider_reservation_detail: ProviderReservationDetail = field(
-            default=None,
-            metadata={
-                "required": True,
-                "name": "ProviderReservationDetail",
-                "type": "Element",
-                "help": "Provider reservation details to be provided to fetch list of EMDs associated with it.",
             },
         )
 

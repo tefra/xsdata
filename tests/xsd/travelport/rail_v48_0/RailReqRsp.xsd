@@ -1,0 +1,282 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns="http://www.travelport.com/schema/rail_v48_0" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:common="http://www.travelport.com/schema/common_v48_0" xmlns:univ="http://www.travelport.com/schema/universal_v48_0" targetNamespace="http://www.travelport.com/schema/rail_v48_0" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:annotation>
+		<xs:documentation>(c) Travelport GDS 2008 All rights reserved. Proprietary Information of Travelport GDS.</xs:documentation>
+	</xs:annotation>
+	<xs:import namespace="http://www.travelport.com/schema/common_v48_0" schemaLocation="../common_v48_0/CommonReqRsp.xsd"/>
+	<xs:import namespace="http://www.travelport.com/schema/universal_v48_0" schemaLocation="../universal_v48_0/UniversalRecord.xsd"/>
+	<xs:include schemaLocation="Rail.xsd"/>
+	<xs:element name="RailAvailabilitySearchReq">
+		<xs:annotation>
+			<xs:documentation>Queries the host for availability.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="common:BaseReq">
+					<xs:sequence>
+						<xs:element ref="SearchRailLeg" maxOccurs="9"/>
+						<xs:element ref="common:SearchPassenger" maxOccurs="18">
+							<xs:annotation>
+								<xs:documentation> Maxinumber of passenger increased in to 18 to support 9 INF passenger along with 9 ADT,CHD,INS 						passenger</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element ref="RailSearchModifiers" minOccurs="0"/>
+						<xs:element ref="RailPricingModifiers" minOccurs="0"/>
+						<xs:element ref="common:HostTokenList" minOccurs="0"/>
+					</xs:sequence>
+					<xs:attribute name="ResponseType" type="typeResponseType" use="optional">
+						<xs:annotation>
+							<xs:documentation>Indicates the type of information to be returned in RailShopAPIResponse.  Values are “Schedules” or “Availability” or “Fares”.  If not sent, “Fares” will be mapped if the request is for a specific rail segments, otherwise “Availability” will be mapped.”</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="RailAvailabilitySearchRsp">
+		<xs:annotation>
+			<xs:documentation>Returns the result of an availability search on host.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="common:BaseRsp">
+					<xs:sequence>
+						<xs:element ref="RailSegmentList" minOccurs="0"/>
+						<xs:element ref="RailJourneyList" minOccurs="0"/>
+						<xs:element ref="RailPricingSolution" minOccurs="0" maxOccurs="999"/>
+						<xs:element ref="RailFareNoteList" minOccurs="0"/>
+						<xs:element ref="RailFareIDList" minOccurs="0"/>
+						<xs:element ref="RailFareList" minOccurs="0"/>
+						<xs:element ref="common:HostTokenList" minOccurs="0"/>
+					</xs:sequence>
+					<xs:attribute name="ResponseType" type="typeResponseType" use="optional">
+						<xs:annotation>
+							<xs:documentation>Indicates the type of information returned in RailShopAPIResponse(Schedules/Availability).</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="RailRefundQuoteReq">
+		<xs:annotation>
+			<xs:documentation>Request to quote a refund for an itinerary</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="common:BaseReq">
+					<xs:attribute name="LocatorCode" type="common:typeLocatorCode" use="required">
+						<xs:annotation>
+							<xs:documentation>The unique identifier for this rail reservation</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="RailRefundQuoteRsp">
+		<xs:annotation>
+			<xs:documentation>Returns rail refund information.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="common:BaseRsp">
+					<xs:sequence>
+						<xs:element ref="RailRefundInfo" minOccurs="1" maxOccurs="999"/>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="RailRefundReq">
+		<xs:annotation>
+			<xs:documentation>Request to cancel the booking</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="common:BaseReq">
+					<xs:sequence>
+						<xs:element ref="common:ContinuityCheckOverride" minOccurs="0" maxOccurs="1">
+							<xs:annotation>
+								<xs:documentation>This element will be used if user wants to override segment continuity check.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element ref="common:FormOfPayment" minOccurs="0"/>
+					</xs:sequence>
+					<xs:attribute name="LocatorCode" type="common:typeLocatorCode" use="required">
+						<xs:annotation>
+							<xs:documentation>The unique identifier for this rail reservation</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+					<xs:attribute name="RefundOption" use="optional">
+						<xs:annotation>
+							<xs:documentation>Customers choice to select the refund amount or retain as EVoucher for future use.</xs:documentation>
+						</xs:annotation>
+						<xs:simpleType>
+							<xs:restriction base="xs:string">
+								<xs:enumeration value="Retain"/>
+								<xs:enumeration value="Refund"/>
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:attribute>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="RailRefundRsp">
+		<xs:annotation>
+			<xs:documentation>Returns rail cancel information.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="common:BaseRsp">
+					<xs:sequence>
+						<xs:element ref="common:Payment" minOccurs="0"/>
+						<xs:element ref="common:MCO" minOccurs="0"/>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="RailExchangeQuoteReq">
+		<xs:annotation>
+			<xs:documentation>Queries the host for availability.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="common:BaseReq">
+					<xs:sequence>
+						<xs:element ref="SearchRailLeg" maxOccurs="9"/>
+						<xs:element ref="RailSearchModifiers" minOccurs="0"/>
+						<xs:element ref="common:SearchPassenger" minOccurs="0" maxOccurs="18">
+							<xs:annotation>
+								<xs:documentation> Maxinumber of passenger increased in to 18 to support 9 INF passenger along with 9 ADT,CHD,INS 					passenger</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element ref="common:HostTokenList" minOccurs="0"/>
+						<xs:element ref="RailPricingSolution" minOccurs="0" maxOccurs="1"/>
+						<xs:element ref="RailFareNoteList" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>List of RailFareNote(s) that is referenced by key in RailFare.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+					<xs:attribute name="LocatorCode" type="common:typeLocatorCode" use="required">
+						<xs:annotation>
+							<xs:documentation>The unique identifier for this rail reservation</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+					<xs:attribute name="ResponseType" type="typeResponseType" use="optional">
+						<xs:annotation>
+							<xs:documentation>Indicates the type of information to be returned in RailShopModifyAPIResponse.  Values are “Schedules” or “Availability” or “Fares”.  If not sent, “Fares” will be mapped if the request is for a specific rail segments, otherwise “Availability” will be mapped. Provider Supported RCH.</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="RailExchangeQuoteRsp">
+		<xs:annotation>
+			<xs:documentation>Returns the result of an availability search on host.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="common:BaseRsp">
+					<xs:sequence>
+						<xs:element ref="RailSegmentList" minOccurs="0"/>
+						<xs:element ref="RailJourneyList" minOccurs="0"/>
+						<xs:element ref="RailExchangeSolution" minOccurs="0" maxOccurs="999"/>
+						<xs:element ref="RailFareNoteList" minOccurs="0"/>
+						<xs:element ref="RailFareIDList" minOccurs="0"/>
+						<xs:element ref="RailFareList" minOccurs="0"/>
+						<xs:element ref="common:HostTokenList" minOccurs="0"/>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="RailSeatMapReq">
+		<xs:annotation>
+			<xs:documentation>Request a rail seat map/coach map.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="common:BaseReq">
+					<xs:sequence>
+						<xs:element ref="RailInfo"/>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="RailSeatMapRsp">
+		<xs:annotation>
+			<xs:documentation>Returns rail seat map/coach map.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="common:BaseRsp">
+					<xs:sequence>
+						<xs:element ref="Coach" minOccurs="0" maxOccurs="999"/>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="RailExchangeReq">
+		<xs:annotation>
+			<xs:documentation>Creates a rail exchange reservation request with the host.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="common:BaseCreateWithFormOfPaymentReq">
+					<xs:sequence>
+						<xs:element ref="RailExchangeSolution" minOccurs="0" maxOccurs="1"/>
+						<xs:element ref="common:Payment" minOccurs="0"/>
+						<xs:element ref="RailFareNoteList" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>List of RailFareNote(s) that is referenced by key in RailFare.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element ref="common:HostTokenList" minOccurs="0"/>
+						<xs:element ref="RailAutoSeatAssignment" minOccurs="0" maxOccurs="999"/>
+					</xs:sequence>
+					<xs:attribute name="LocatorCode" type="common:typeLocatorCode" use="required">
+						<xs:annotation>
+							<xs:documentation>The unique identifier for this rail reservation</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+					<xs:attribute name="BookingActionType" type="xs:string" use="required">
+						<xs:annotation>
+							<xs:documentation>The action associated with this booking. Three options are:Final (used to book with no ticket issuance), FinalTicket (used to book and issue the ticket), Initiate (used for a provisional booking). Provider is RCH</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+					<xs:attribute name="RefundOption" type="xs:string" use="optional">
+						<xs:annotation>
+							<xs:documentation>If the exchange results in money returned to the customer, ‘Refund’ is sent to return the money to the original form or payment or ‘Retain’ is sent if the money should be returned in the form of an eVoucher for future use.  This attribute is supported by Amtrak/2V and ignored for all others.”</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="RailExchangeRsp">
+		<xs:annotation>
+			<xs:documentation>Returns rail exchange reservation information with ticketing/refund info etc..</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="typeRailReservationRsp"/>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:complexType name="typeRailReservationRsp" abstract="true">
+		<xs:complexContent>
+			<xs:extension base="common:BaseRsp">
+				<xs:sequence>
+					<xs:element ref="univ:UniversalRecord" minOccurs="0"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+</xs:schema>

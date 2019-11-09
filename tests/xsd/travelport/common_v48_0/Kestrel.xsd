@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema targetNamespace="http://www.travelport.com/schema/common_v48_0" elementFormDefault="qualified" attributeFormDefault="unqualified"
+           xmlns="http://www.travelport.com/schema/common_v48_0" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <xs:annotation>
+        <xs:documentation>(c) Travelport GDS 2008 All rights reserved. Proprietary Information of Travelport GDS.</xs:documentation>
+    </xs:annotation>
+    <xs:include schemaLocation="CommonReqRsp.xsd" />
+</xs:schema>

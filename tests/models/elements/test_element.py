@@ -12,48 +12,48 @@ from xsdata.models.elements import (
 
 
 class ElementTests(TestCase):
-    def test_property_raw_name(self):
+    def test_property_real_name(self):
         obj = Element.build(ref="bar")
-        self.assertEqual("bar", obj.raw_name)
+        self.assertEqual("bar", obj.real_name)
 
         obj.name = "foo"
-        self.assertEqual("foo", obj.raw_name)
+        self.assertEqual("foo", obj.real_name)
 
         with self.assertRaises(NotImplementedError):
-            Element.build().raw_name
+            Element.build().real_name
 
-    def test_property_raw_type(self):
+    def test_property_real_type(self):
         obj = Element.build()
-        self.assertEquals("xs:string", obj.raw_type)
+        self.assertEqual("xs:string", obj.real_type)
 
         # Inner classes depend on the this to be None
         obj.complex_type = ComplexType.build()
-        self.assertIsNone(obj.raw_type)
+        self.assertIsNone(obj.real_type)
 
         restriction = Restriction.build(base="xs:int")
         obj.simple_type = SimpleType.build(restriction=restriction)
-        self.assertEqual(restriction.base, obj.raw_type)
+        self.assertEqual(restriction.base, obj.real_type)
 
         obj.ref = "foo"
-        self.assertEqual(obj.ref, obj.raw_type)
+        self.assertEqual(obj.ref, obj.real_type)
 
         obj.type = "bar"
-        self.assertEqual(obj.type, obj.raw_type)
+        self.assertEqual(obj.type, obj.real_type)
 
-    def test_property_raw_base(self):
+    def test_property_real_base(self):
         obj = Element.build()
-        self.assertIsNone(obj.raw_base)
+        self.assertIsNone(obj.real_base)
 
         obj.type = "foo_bar"
-        self.assertEqual("foo_bar", obj.raw_base)
+        self.assertEqual("foo_bar", obj.real_base)
 
         obj.complex_type = ComplexType.build()
-        self.assertIsNone(obj.raw_base)
+        self.assertIsNone(obj.real_base)
 
         obj.complex_type.complex_content = ComplexContent.build(
             extension=Extension.build(base="thug_life")
         )
-        self.assertEqual("thug_life", obj.raw_base)
+        self.assertEqual("thug_life", obj.real_base)
 
     def test_get_restrictions(self):
         obj = Element.build()

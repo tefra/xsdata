@@ -18,13 +18,13 @@ from xsdata.models.elements import (
 
 
 class RestrictionTests(TestCase):
-    def test_property_raw_type(self):
+    def test_property_real_type(self):
         obj = Restriction.build(base="foo")
-        self.assertEqual(obj.base, obj.raw_type)
+        self.assertEqual(obj.base, obj.real_type)
 
-    def test_property_raw_name(self):
+    def test_property_real_name(self):
         obj = Restriction.build()
-        self.assertEqual("value", obj.raw_name)
+        self.assertEqual("value", obj.real_name)
 
     def test_get_restrictions(self):
         self.assertDictEqual({}, Restriction.build().get_restrictions())

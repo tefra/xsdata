@@ -22,18 +22,18 @@ from xsdata.parser import SchemaParser
 
 
 class ComplexTypeTests(TestCase):
-    def test_raw_base_property(self):
+    def test_real_base_property(self):
         obj = ComplexType.build()
-        self.assertIsNone(obj.raw_base)
+        self.assertIsNone(obj.real_base)
 
         obj.complex_content = ComplexContent.build()
-        self.assertIsNone(obj.raw_base)
+        self.assertIsNone(obj.real_base)
 
         obj.complex_content.extension = Extension.build()
-        self.assertIsNone(obj.raw_base)
+        self.assertIsNone(obj.real_base)
 
         obj.complex_content.extension.base = "foo_bar"
-        self.assertEqual("foo_bar", obj.raw_base)
+        self.assertEqual("foo_bar", obj.real_base)
 
 
 class ComplexTypeDeserializeTests(ModelTestCase):

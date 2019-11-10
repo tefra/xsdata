@@ -3,6 +3,7 @@ import sys
 from dataclasses import MISSING
 from dataclasses import Field as Attrib
 from dataclasses import dataclass, field, fields
+from pathlib import Path
 from typing import Any as Anything
 from typing import Dict
 from typing import List as ArrayList
@@ -10,13 +11,13 @@ from typing import Optional
 
 from lxml import etree
 
-from xsdata.models.enums import XMLSchema
+from xsdata.models.enums import XMLSchema, XSDType
 from xsdata.models.mixins import (
     ExtendsMixin,
     NamedField,
     OccurrencesMixin,
     RestrictedField,
-    SignatureField,
+    TypedField,
 )
 from xsdata.utils.text import snake_case
 
@@ -39,10 +40,11 @@ class BaseModel:
             snake_case(stripns(key)): value for key, value in el.attrib.items()
         }
         data = {
-            field.name: cls.xsd_value(field, attrs)
-            if field.name in attrs
-            else cls.default_value(field)
-            for field in fields(cls)
+            attr.name: cls.xsd_value(attr, attrs)
+            if attr.name in attrs
+            else cls.default_value(attr)
+            for attr in fields(cls)
+            if attr.init
         }
 
         if "nsmap" in data:
@@ -93,10 +95,11 @@ class BaseModel:
             kwargs.update({"prefix": "xs", "nsmap": {"xs": XMLSchema}})
 
         data = {
-            field.name: kwargs[field.name]
-            if field.name in kwargs
-            else cls.default_value(field)
-            for field in fields(cls)
+            attr.name: kwargs[attr.name]
+            if attr.name in kwargs
+            else cls.default_value(attr)
+            for attr in fields(cls)
+            if attr.init
         }
 
         return cls(**data)
@@ -155,7 +158,7 @@ class AnnotationBase(ElementBase):
 
 @dataclass
 class SimpleType(
-    AnnotationBase, SignatureField, ExtendsMixin, RestrictedField
+    AnnotationBase, TypedField, NamedField, ExtendsMixin, RestrictedField
 ):
     name: Optional[str]
     restriction: Optional["Restriction"]
@@ -163,15 +166,15 @@ class SimpleType(
     union: Optional["Union"]
 
     @property
-    def raw_type(self) -> Optional[str]:
+    def real_type(self) -> Optional[str]:
         if self.restriction:
-            return self.restriction.raw_type
+            return self.restriction.real_type
         if self.list:
             return self.list.item_type
         return None
 
     @property
-    def raw_base(self) -> Optional[str]:
+    def real_base(self) -> Optional[str]:
         return None
 
     def get_restrictions(self) -> Dict[str, Anything]:
@@ -205,7 +208,9 @@ class AnyAttribute(AnnotationBase):
 
 
 @dataclass
-class Attribute(AnnotationBase, SignatureField, RestrictedField, ExtendsMixin):
+class Attribute(
+    AnnotationBase, TypedField, NamedField, RestrictedField, ExtendsMixin
+):
     default: Optional[str]
     fixed: Optional[str]
     form: Optional[str]  # qualified | unqualified
@@ -216,14 +221,15 @@ class Attribute(AnnotationBase, SignatureField, RestrictedField, ExtendsMixin):
     use: Optional[str] = "optional"  # optional | prohibited | required
 
     @property
-    def raw_type(self) -> Optional[str]:
+    def real_type(self) -> Optional[str]:
         if self.simple_type:
-            return self.simple_type.raw_type
+            return self.simple_type.real_type
         if self.type:
             return self.type
         if self.ref:
             return self.ref
-        return "xs:string"
+
+        return XSDType.STRING.code
 
     def get_restrictions(self) -> Dict[str, Anything]:
         restrictions = dict()
@@ -235,7 +241,7 @@ class Attribute(AnnotationBase, SignatureField, RestrictedField, ExtendsMixin):
         return restrictions
 
     @property
-    def raw_base(self) -> Optional[str]:
+    def real_base(self) -> Optional[str]:
         return None
 
 
@@ -365,7 +371,7 @@ class WhiteSpace(RestrictionType):
 
 
 @dataclass
-class Restriction(RestrictedField, AnnotationBase, SignatureField):
+class Restriction(RestrictedField, AnnotationBase, TypedField, NamedField):
     base: str
     group: Optional[Group]
     all: Optional[All]
@@ -388,11 +394,11 @@ class Restriction(RestrictedField, AnnotationBase, SignatureField):
     attribute_groups: ArrayList[AttributeGroup] = field(default_factory=list)
 
     @property
-    def raw_type(self) -> Optional[str]:
+    def real_type(self) -> Optional[str]:
         return self.base
 
     @property
-    def raw_name(self) -> str:
+    def real_name(self) -> str:
         return "value"
 
     def get_restrictions(self) -> Dict[str, Anything]:
@@ -448,7 +454,7 @@ class ComplexType(AnnotationBase, NamedField, ExtendsMixin):
     mixed: bool = False
 
     @property
-    def raw_base(self) -> Optional[str]:
+    def real_base(self) -> Optional[str]:
         return (
             self.complex_content.extension.base
             if self.complex_content
@@ -491,7 +497,9 @@ class Keyref(AnnotationBase):
 
 
 @dataclass
-class Element(AnnotationBase, SignatureField, OccurrencesMixin, ExtendsMixin):
+class Element(
+    AnnotationBase, TypedField, NamedField, OccurrencesMixin, ExtendsMixin
+):
     id: Optional[str]
     name: str
     ref: Optional[str]
@@ -513,23 +521,23 @@ class Element(AnnotationBase, SignatureField, OccurrencesMixin, ExtendsMixin):
     abstract: bool = False
 
     @property
-    def raw_type(self) -> Optional[str]:
+    def real_type(self) -> Optional[str]:
         if self.type:
             return self.type
         if self.ref:
             return self.ref
         if self.simple_type:
-            return self.simple_type.raw_type
+            return self.simple_type.real_type
         if self.complex_type:
             return None
-        return "xs:string"
+        return XSDType.STRING.code
 
     @property
-    def raw_base(self) -> Optional[str]:
+    def real_base(self) -> Optional[str]:
         if self.complex_type:
-            return self.complex_type.raw_base
+            return self.complex_type.real_base
         elif self.type:
-            return self.raw_type
+            return self.real_type
         return None
 
     def get_restrictions(self) -> Dict[str, Anything]:
@@ -595,3 +603,11 @@ class Schema(AnnotationBase):
     attribute_groups: ArrayList[AttributeGroup] = field(default_factory=list)
     elements: ArrayList[Element] = field(default_factory=list)
     attributes: ArrayList[Attribute] = field(default_factory=list)
+    location: Path = field(init=False)
+
+    def sub_schemas(self) -> ArrayList[str]:
+        sub = [x.schema_location for x in self.imports if x.schema_location]
+        sub.extend(
+            [x.schema_location for x in self.includes if x.schema_location]
+        )
+        return sub

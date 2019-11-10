@@ -18,7 +18,6 @@ class TextTests(TestCase):
         self.assertEqual("user", snake_case("_User"))
         self.assertEqual("user", snake_case("__user"))
         self.assertEqual("user_name", snake_case("user__name"))
-        self.assertEqual("", snake_case(None))
 
     def test_pascal_case(self):
         self.assertEqual("UserName", pascal_case("userName"))
@@ -26,9 +25,7 @@ class TextTests(TestCase):
         self.assertEqual("UserName", pascal_case("UserName"))
         self.assertEqual("UserName", pascal_case("USER_NAME"))
         self.assertEqual("UserName", pascal_case("user_name"))
-        self.assertEqual("", pascal_case(None))
 
     def test_capitalize(self):
         self.assertEqual("UserName", capitalize("userName"))
         self.assertEqual(".userName", capitalize(".userName"))
-        self.assertEqual("", pascal_case(None))

@@ -6,63 +6,73 @@ from lxml import etree
 XMLSchema = "http://www.w3.org/2001/XMLSchema"
 
 
-class XSDType:
-    MAP = {
-        "anyURI": "str",
-        "base64Binary": "str",
-        "boolean": "bool",
-        "byte": "int",
-        "date": "str",
-        "dateTime": "str",
-        "decimal": "float",
-        "derivationControl": "str",
-        "double": "float",
-        "duration": "str",
-        "ENTITIES": "int",
-        "ENTITY": "int",
-        "float": "float",
-        "gDay": "str",
-        "gMonth": "str",
-        "gMonthDay": "str",
-        "gYear": "str",
-        "gYearMonth": "str",
-        "hexBinary": "str",
-        "ID": "str",
-        "IDREF": "str",
-        "IDREFS": "str",
-        "int": "int",
-        "integer": "int",
-        "language": "str",
-        "long": "int",
-        "Name": "str",
-        "NCName": "str",
-        "negativeInteger": "int",
-        "NMTOKEN": "str",
-        "NMTOKENS": "str",
-        "nonNegativeInteger": "int",
-        "nonPositiveInteger": "int",
-        "normalizedString": "str",
-        "NOTATION": "str",
-        "positiveInteger": "int",
-        "QName": "str",
-        "short": "int",
-        "simpleDerivationSet": "str",
-        "string": "str",
-        "time": "str",
-        "token": "str",
-        "unsignedByte": "int",
-        "unsignedInt": "int",
-        "unsignedLong": "int",
-        "unsignedShort": "int",
-    }
+class XSDType(Enum):
+    ANY_URI = ("xs:anyURI", str)
+    BASE64_BINARY = ("xs:base64Binary", str)
+    BOOLEAN = ("xs:boolean", bool)
+    BYTE = ("xs:byte", int)
+    DATE = ("xs:date", str)
+    DATE_TIME = ("xs:dateTime", str)
+    DECIMAL = ("xs:decimal", float)
+    DERIVATION_CONTROL = ("xs:derivationControl", str)
+    DOUBLE = ("xs:double", float)
+    DURATION = ("xs:duration", str)
+    ENTITIES = ("xs:ENTITIES", int)
+    ENTITY = ("xs:ENTITY", int)
+    FLOAT = ("xs:float", float)
+    G_DAY = ("xs:gDay", str)
+    G_MONTH = ("xs:gMonth", str)
+    G_MONTH_DAY = ("xs:gMonthDay", str)
+    G_YEAR = ("xs:gYear", str)
+    G_YEAR_MONTH = ("xs:gYearMonth", str)
+    HEX_BINARY = ("xs:hexBinary", str)
+    ID = ("xs:ID", str)
+    IDREF = ("xs:IDREF", str)
+    IDREFS = ("xs:IDREFS", str)
+    INT = ("xs:int", int)
+    INTEGER = ("xs:integer", int)
+    LANGUAGE = ("xs:language", str)
+    LONG = ("xs:long", int)
+    NAME = ("xs:Name", str)
+    NCNAME = ("xs:NCName", str)
+    NEGATIVE_INTEGER = ("xs:negativeInteger", int)
+    NMTOKEN = ("xs:NMTOKEN", str)
+    NMTOKENS = ("xs:NMTOKENS", str)
+    NON_NEGATIVE_INTEGER = ("xs:nonNegativeInteger", int)
+    NON_POSITIVE_INTEGER = ("xs:nonPositiveInteger", int)
+    NORMALIZED_STRING = ("xs:normalizedString", str)
+    NOTATION = ("xs:NOTATION", str)
+    POSITIVE_INTEGER = ("xs:positiveInteger", int)
+    QNAME = ("xs:QName", str)
+    SHORT = ("xs:short", int)
+    SIMPLE_DERIVATION_SET = ("xs:simpleDerivationSet", str)
+    STRING = ("xs:string", str)
+    TIME = ("xs:time", str)
+    TOKEN = ("xs:token", str)
+    UNSIGNED_BYTE = ("xs:unsignedByte", int)
+    UNSIGNED_INT = ("xs:unsignedInt", int)
+    UNSIGNED_LONG = ("xs:unsignedLong", int)
+    UNSIGNED_SHORT = ("xs:unsignedShort", int)
+
+    def __init__(self, code: str, local: type):
+        self.code = code
+        self.local = local
 
     @classmethod
-    def map(cls, xsd_type: str) -> Optional[str]:
-        pos = xsd_type.find(":")
+    def get_enum(cls, code: str) -> Optional["XSDType"]:
+        pos = code.find(":")
         if pos == -1:
             return None
 
-        return cls.MAP.get(xsd_type[pos + 1 :])
+        return __XSDType__.get("xs:" + code[pos + 1:])
+
+    @classmethod
+    def get_local(cls, code: str) -> Optional[str]:
+        enum = cls.get_enum(code)
+        return enum.local.__name__ if enum else None
+
+
+__XSDType__ = {xsd.code: xsd for xsd in XSDType}
 
 
 class Event:

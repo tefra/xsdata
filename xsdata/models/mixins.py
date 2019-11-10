@@ -1,63 +1,29 @@
 from abc import ABC, abstractmethod
 from typing import Any, Dict, Optional
 
-from xsdata.models.enums import XSDType
-from xsdata.utils.text import pascal_case, safe_snake, strip_prefix
-
 
 class TypedField(ABC):
     @property
-    def display_type(self) -> Optional[str]:
-        raw_type = self.raw_type
-        if raw_type is None:
-            return None
-
-        return XSDType.map(raw_type) or pascal_case(strip_prefix(raw_type))
-
-    @property
     @abstractmethod
-    def raw_type(self) -> Optional[str]:
+    def real_type(self) -> Optional[str]:
         pass
 
 
 class ExtendsMixin(ABC):
     @property
-    def display_base(self):
-        raw_base = self.raw_base
-        if not raw_base:
-            return None
-        return XSDType.map(raw_base) or pascal_case(strip_prefix(raw_base))
-
-    @property
     @abstractmethod
-    def raw_base(self) -> Optional[str]:
+    def real_base(self) -> Optional[str]:
         pass
 
 
 class NamedField:
     @property
-    def pascal_name(self) -> str:
-        return pascal_case(self.raw_name)
-
-    @property
-    def snake_name(self) -> str:
-        return safe_snake(self.raw_name)
-
-    @property
-    def raw_name(self) -> str:
-        name = getattr(self, "name", None)
+    def real_name(self) -> str:
+        name = getattr(self, "name", None) or getattr(self, "ref", None)
         if name:
             return name
 
-        name = getattr(self, "ref", None)
-        if name:
-            return strip_prefix(name)
-
         raise NotImplementedError("Element has no name: {}".format(self))
-
-
-class SignatureField(TypedField, NamedField, ABC):
-    pass
 
 
 class RestrictedField(ABC):

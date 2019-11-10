@@ -1,95 +1,35 @@
-import logging
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import List, Set, Union
+from typing import Dict, List
 
-from jinja2 import Environment, FileSystemLoader, Template
-from toposort import toposort_flatten
-
-from xsdata.models.elements import Import, Include, Schema
-from xsdata.models.templates import Class
-from xsdata.templates.dataclass.filters import arguments
-from xsdata.utils.text import snake_case
-
-logger = logging.getLogger(__name__)
+from xsdata.models.elements import Schema
+from xsdata.models.render import Class, Renderer
+from xsdata.render.python.dataclass.renderer import DataclassRenderer
 
 
 @dataclass
 class CodeWriter:
-    classes: List[Class]
-    imports: List[Union[Import, Include]]
-    theme: str
-    target: str
-    module: str
-    env: Environment = field(init=False)
+    renderers: Dict[str, Renderer] = field(default_factory=dict)
 
-    def __post_init__(self):
-        self.env = Environment(
-            loader=FileSystemLoader(
-                str(
-                    Path(__file__)
-                    .parent.joinpath("templates")
-                    .joinpath(self.theme)
-                )
-            ),
-        )
-        self.env.filters["arguments"] = arguments
+    @property
+    def formats(self):
+        return list(self.renderers.keys())
 
-        if isinstance(self.target, str):
-            self.target = Path(self.target)
+    def register_renderer(self, name, renderer: Renderer):
+        self.renderers[name] = renderer
 
-    def template(self, name: str) -> Template:
-        return self.env.get_template("{}.jinja2".format(name))
+    def get_renderer(self, name):
+        if name in self.renderers:
+            return self.renderers[name]
+        raise ValueError(f"{name} is not a valid {Renderer.__name__}")
 
-    def write(self):
-        classes = self.sort_class_vars(self.classes)
-
-        self.target.mkdir(parents=True, exist_ok=True)
-        file_path = self.target.joinpath(f"{snake_case(self.module)}.py")
-        with open(str(file_path), "w") as fp:
-            fp.write(
-                self.template("module").render(
-                    output="\n".join(map(self.render, classes)),
-                    imports=self.organize_imports(self.imports),
-                )
-            )
-
-    def render(self, obj: Class) -> str:
-        return self.template("class").render(obj=obj)
-
-    @staticmethod
-    def organize_imports(imports):
-        def convert(value):
-            if "value" == "..":
-                return ".."
-            else:
-                return snake_case(value)
-
-        result = []
-        for import_ in imports:
-            path = Path(import_.schema_location)
-            parts = list(path.parent.parts)
-            parts.append(path.stem)
-            result.append(
-                "from .{} import *".format(".".join(map(convert, parts)))
-            )
-        return result
-
-    @classmethod
-    def sort_class_vars(cls, objects: List[Class]) -> List[Class]:
-        index = {obj.name: obj for obj in objects}
-        deps = {obj.name: cls.collect_deps(obj) for obj in objects}
-
-        return [index[name] for name in toposort_flatten(deps) if name in deps]
-
-    @classmethod
-    def collect_deps(cls, obj: Class) -> Set[str]:
-        dependencies = {attr.type for attr in obj.attrs}
-        if obj.extends:
-            dependencies.add(obj.extends)
-        for inner in obj.inner:
-            dependencies.update(cls.collect_deps(inner))
-        return dependencies
+    def write(
+        self, schema: Schema, classes: List[Class], target: Path, renderer: str
+    ):
+        engine = self.get_renderer(renderer)
+        for file, output in engine.render(schema, classes, target):
+            with open(str(file), "w") as fp:
+                fp.write(output)
 
     @staticmethod
     def adjust_target(target: Path, xsd_path: Path, schema: Schema) -> Path:
@@ -136,3 +76,7 @@ class CodeWriter:
         if len(sub):
             return target.joinpath(*sub)
         return target
+
+
+writer = CodeWriter()
+writer.register_renderer("pydata", DataclassRenderer())

@@ -15,10 +15,7 @@ class Attr:
 
     @property
     def is_list(self):
-        return (
-            "min_occurs" in self.restrictions
-            and "max_occurs" in self.restrictions
-        )
+        return int(self.restrictions.get("max_occurs", 1)) > 1
 
 
 @dataclass

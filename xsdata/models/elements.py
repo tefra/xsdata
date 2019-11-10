@@ -76,17 +76,16 @@ class BaseModel:
 
         if clazz == bool:
             return value == "true"
-        if clazz == str:
-            return str(value)
-        if clazz == int:
-            return int(value)
-        if clazz == float:
-            return str(value)
 
-        # Nothing else is allowed :)
-        raise ValueError(
-            "Failed to cast field::`{}`, value: `{}`".format(name, repr(value))
-        )
+        try:
+            if clazz == int:
+                return int(value)
+            if clazz == float:
+                return float(value)
+        except ValueError:
+            pass
+
+        return str(value)
 
     @classmethod
     def build(cls, **kwargs):
@@ -155,7 +154,9 @@ class AnnotationBase(ElementBase):
 
 
 @dataclass
-class SimpleType(AnnotationBase, SignatureField, ExtendsMixin):
+class SimpleType(
+    AnnotationBase, SignatureField, ExtendsMixin, RestrictedField
+):
     name: Optional[str]
     restriction: Optional["Restriction"]
     list: Optional["List"]
@@ -163,17 +164,31 @@ class SimpleType(AnnotationBase, SignatureField, ExtendsMixin):
 
     @property
     def raw_type(self) -> Optional[str]:
-        return self.restriction.raw_type if self.restriction else None
+        if self.restriction:
+            return self.restriction.raw_type
+        if self.list:
+            return self.list.item_type
+        return None
 
     @property
     def raw_base(self) -> Optional[str]:
         return None
 
+    def get_restrictions(self) -> Dict[str, Anything]:
+        if self.restriction:
+            return self.restriction.get_restrictions()
+        if self.list:
+            return self.list.get_restrictions()
+        return dict()
+
 
 @dataclass
-class List(AnnotationBase):
+class List(AnnotationBase, RestrictedField):
     item_type: Optional[str]
     simple_type: SimpleType
+
+    def get_restrictions(self) -> Dict[str, Anything]:
+        return dict(min_occurs=0, max_occurs=sys.maxsize)
 
 
 @dataclass
@@ -204,13 +219,20 @@ class Attribute(AnnotationBase, SignatureField, RestrictedField, ExtendsMixin):
     def raw_type(self) -> Optional[str]:
         if self.simple_type:
             return self.simple_type.raw_type
-        return self.type or self.ref
+        if self.type:
+            return self.type
+        if self.ref:
+            return self.ref
+        return "xs:string"
 
     def get_restrictions(self) -> Dict[str, Anything]:
+        restrictions = dict()
         if self.use == "required":
-            return dict(required=True)
+            restrictions["required"] = True
+        if self.simple_type:
+            restrictions.update(self.simple_type.get_restrictions())
 
-        return dict()
+        return restrictions
 
     @property
     def raw_base(self) -> Optional[str]:
@@ -492,7 +514,15 @@ class Element(AnnotationBase, SignatureField, OccurrencesMixin, ExtendsMixin):
 
     @property
     def raw_type(self) -> Optional[str]:
-        return self.type or self.ref
+        if self.type:
+            return self.type
+        if self.ref:
+            return self.ref
+        if self.simple_type:
+            return self.simple_type.raw_type
+        if self.complex_type:
+            return None
+        return "xs:string"
 
     @property
     def raw_base(self) -> Optional[str]:
@@ -501,6 +531,12 @@ class Element(AnnotationBase, SignatureField, OccurrencesMixin, ExtendsMixin):
         elif self.type:
             return self.raw_type
         return None
+
+    def get_restrictions(self) -> Dict[str, Anything]:
+        restrictions = super().get_restrictions()
+        if self.simple_type:
+            restrictions.update(self.simple_type.get_restrictions())
+        return restrictions
 
 
 @dataclass

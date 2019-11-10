@@ -55,7 +55,7 @@ class CodeGenerator:
                 yield from self.field_children(child)
 
     def generate_class_field(self, item: Class, obj: AttributeElement):
-        queued = self.queue_inner_element(item, obj)
+        inner_type = self.has_inner_type(item, obj)
         display_type = obj.display_type
         if not display_type:
             logger.warning("Failed to detect type for element: {}".format(obj))
@@ -69,14 +69,15 @@ class CodeGenerator:
                 type=display_type,
                 local_type=type(obj).__name__,
                 help=obj.display_help,
-                forward_ref=queued,
+                forward_ref=inner_type,
                 restrictions=obj.get_restrictions(),
             )
         )
 
-    def queue_inner_element(self, item: Class, obj: AttributeElement):
+    def has_inner_type(self, item: Class, obj: AttributeElement) -> bool:
         if isinstance(obj, Element):
             if not obj.raw_type and obj.complex_type:
                 obj.complex_type.name = obj.type = obj.name
                 item.inner.append(self.generate_element(obj.complex_type))
                 return True
+        return False

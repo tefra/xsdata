@@ -17,12 +17,13 @@ class AlphaNumericStringLength0To1:
 
     value: str = field(
         default=None,
-        metadata={
-            "min_length": "0",
-            "max_length": "1",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            min_length="0",
+            max_length="1"
+        )
     )
 
 
@@ -34,12 +35,13 @@ class AlphaNumericStringLength0To18:
 
     value: str = field(
         default=None,
-        metadata={
-            "min_length": "0",
-            "max_length": "18",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            min_length="0",
+            max_length="18"
+        )
     )
 
 
@@ -51,12 +53,13 @@ class AlphaNumericStringLength0To3:
 
     value: str = field(
         default=None,
-        metadata={
-            "min_length": "0",
-            "max_length": "3",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            min_length="0",
+            max_length="3"
+        )
     )
 
 
@@ -68,12 +71,13 @@ class AlphaNumericStringLength1To1:
 
     value: str = field(
         default=None,
-        metadata={
-            "min_length": "1",
-            "max_length": "1",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            min_length="1",
+            max_length="1"
+        )
     )
 
 
@@ -85,12 +89,13 @@ class AlphaNumericStringLength1To10:
 
     value: str = field(
         default=None,
-        metadata={
-            "min_length": "1",
-            "max_length": "10",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            min_length="1",
+            max_length="10"
+        )
     )
 
 
@@ -102,12 +107,13 @@ class AlphaNumericStringLength1To12:
 
     value: str = field(
         default=None,
-        metadata={
-            "min_length": "1",
-            "max_length": "12",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            min_length="1",
+            max_length="12"
+        )
     )
 
 
@@ -119,12 +125,13 @@ class AlphaNumericStringLength1To18:
 
     value: str = field(
         default=None,
-        metadata={
-            "min_length": "1",
-            "max_length": "18",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            min_length="1",
+            max_length="18"
+        )
     )
 
 
@@ -136,12 +143,13 @@ class AlphaNumericStringLength1To2:
 
     value: str = field(
         default=None,
-        metadata={
-            "min_length": "1",
-            "max_length": "2",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            min_length="1",
+            max_length="2"
+        )
     )
 
 
@@ -153,12 +161,13 @@ class AlphaNumericStringLength1To20:
 
     value: str = field(
         default=None,
-        metadata={
-            "min_length": "1",
-            "max_length": "20",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            min_length="1",
+            max_length="20"
+        )
     )
 
 
@@ -170,12 +179,13 @@ class AlphaNumericStringLength1To25:
 
     value: str = field(
         default=None,
-        metadata={
-            "min_length": "1",
-            "max_length": "25",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            min_length="1",
+            max_length="25"
+        )
     )
 
 
@@ -187,12 +197,13 @@ class AlphaNumericStringLength1To250:
 
     value: str = field(
         default=None,
-        metadata={
-            "min_length": "1",
-            "max_length": "250",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            min_length="1",
+            max_length="250"
+        )
     )
 
 
@@ -204,12 +215,13 @@ class AlphaNumericStringLength1To256:
 
     value: str = field(
         default=None,
-        metadata={
-            "min_length": "1",
-            "max_length": "256",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            min_length="1",
+            max_length="256"
+        )
     )
 
 
@@ -221,12 +233,13 @@ class AlphaNumericStringLength1To28:
 
     value: str = field(
         default=None,
-        metadata={
-            "min_length": "1",
-            "max_length": "28",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            min_length="1",
+            max_length="28"
+        )
     )
 
 
@@ -238,12 +251,13 @@ class AlphaNumericStringLength1To3:
 
     value: str = field(
         default=None,
-        metadata={
-            "min_length": "1",
-            "max_length": "3",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            min_length="1",
+            max_length="3"
+        )
     )
 
 
@@ -255,12 +269,13 @@ class AlphaNumericStringLength1To30:
 
     value: str = field(
         default=None,
-        metadata={
-            "min_length": "1",
-            "max_length": "30",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            min_length="1",
+            max_length="30"
+        )
     )
 
 
@@ -272,12 +287,13 @@ class AlphaNumericStringLength1To35:
 
     value: str = field(
         default=None,
-        metadata={
-            "min_length": "1",
-            "max_length": "35",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            min_length="1",
+            max_length="35"
+        )
     )
 
 
@@ -289,12 +305,13 @@ class AlphaNumericStringLength1To4:
 
     value: str = field(
         default=None,
-        metadata={
-            "min_length": "1",
-            "max_length": "4",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            min_length="1",
+            max_length="4"
+        )
     )
 
 
@@ -306,12 +323,13 @@ class AlphaNumericStringLength1To5:
 
     value: str = field(
         default=None,
-        metadata={
-            "min_length": "1",
-            "max_length": "5",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            min_length="1",
+            max_length="5"
+        )
     )
 
 
@@ -323,12 +341,13 @@ class AlphaNumericStringLength1To50:
 
     value: str = field(
         default=None,
-        metadata={
-            "min_length": "1",
-            "max_length": "50",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            min_length="1",
+            max_length="50"
+        )
     )
 
 
@@ -340,12 +359,13 @@ class AlphaNumericStringLength1To6:
 
     value: str = field(
         default=None,
-        metadata={
-            "min_length": "1",
-            "max_length": "6",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            min_length="1",
+            max_length="6"
+        )
     )
 
 
@@ -357,12 +377,13 @@ class AlphaNumericStringLength1To7:
 
     value: str = field(
         default=None,
-        metadata={
-            "min_length": "1",
-            "max_length": "7",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            min_length="1",
+            max_length="7"
+        )
     )
 
 
@@ -374,12 +395,13 @@ class AlphaNumericStringLength1To70:
 
     value: str = field(
         default=None,
-        metadata={
-            "min_length": "1",
-            "max_length": "70",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            min_length="1",
+            max_length="70"
+        )
     )
 
 
@@ -391,12 +413,13 @@ class AlphaNumericStringLength1To8:
 
     value: str = field(
         default=None,
-        metadata={
-            "min_length": "1",
-            "max_length": "8",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            min_length="1",
+            max_length="8"
+        )
     )
 
 
@@ -408,12 +431,13 @@ class AlphaNumericStringLength1To9:
 
     value: str = field(
         default=None,
-        metadata={
-            "min_length": "1",
-            "max_length": "9",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            min_length="1",
+            max_length="9"
+        )
     )
 
 
@@ -425,12 +449,13 @@ class AlphaNumericStringLength2To3:
 
     value: str = field(
         default=None,
-        metadata={
-            "min_length": "2",
-            "max_length": "3",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            min_length="2",
+            max_length="3"
+        )
     )
 
 
@@ -442,12 +467,13 @@ class AlphaNumericStringLength3To5:
 
     value: str = field(
         default=None,
-        metadata={
-            "min_length": "3",
-            "max_length": "5",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            min_length="3",
+            max_length="5"
+        )
     )
 
 
@@ -459,12 +485,13 @@ class AlphaNumericStringLength6To6:
 
     value: str = field(
         default=None,
-        metadata={
-            "min_length": "6",
-            "max_length": "6",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            min_length="6",
+            max_length="6"
+        )
     )
 
 
@@ -476,12 +503,13 @@ class AlphaStringLength0To1:
 
     value: str = field(
         default=None,
-        metadata={
-            "min_length": "0",
-            "max_length": "1",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            min_length="0",
+            max_length="1"
+        )
     )
 
 
@@ -493,12 +521,13 @@ class AlphaStringLength1To1:
 
     value: str = field(
         default=None,
-        metadata={
-            "min_length": "1",
-            "max_length": "1",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            min_length="1",
+            max_length="1"
+        )
     )
 
 
@@ -510,12 +539,13 @@ class AlphaStringLength1To2:
 
     value: str = field(
         default=None,
-        metadata={
-            "min_length": "1",
-            "max_length": "2",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            min_length="1",
+            max_length="2"
+        )
     )
 
 
@@ -527,12 +557,13 @@ class AlphaStringLength1To3:
 
     value: str = field(
         default=None,
-        metadata={
-            "min_length": "1",
-            "max_length": "3",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            min_length="1",
+            max_length="3"
+        )
     )
 
 
@@ -544,12 +575,13 @@ class AlphaStringLength3To3:
 
     value: str = field(
         default=None,
-        metadata={
-            "min_length": "3",
-            "max_length": "3",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            min_length="3",
+            max_length="3"
+        )
     )
 
 
@@ -561,12 +593,13 @@ class AlphaStringLength3To5:
 
     value: str = field(
         default=None,
-        metadata={
-            "min_length": "3",
-            "max_length": "5",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            min_length="3",
+            max_length="5"
+        )
     )
 
 
@@ -578,11 +611,12 @@ class AmaEdicodesetTypeLength1:
 
     value: str = field(
         default=None,
-        metadata={
-            "pattern": "[0-9A-Z]",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            pattern="[0-9A-Z]"
+        )
     )
 
 
@@ -594,11 +628,12 @@ class AmaEdicodesetTypeLength1to3:
 
     value: str = field(
         default=None,
-        metadata={
-            "pattern": "[0-9A-Z]{1,3}",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            pattern="[0-9A-Z]{1,3}"
+        )
     )
 
 
@@ -610,11 +645,12 @@ class DateDdmmyy:
 
     value: str = field(
         default=None,
-        metadata={
-            "pattern": "(0[1-9]|[1-2][0-9]|3[0-1])(0[1-9]|1[0-2])[0-9]{2}",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            pattern="(0[1-9]|[1-2][0-9]|3[0-1])(0[1-9]|1[0-2])[0-9]{2}"
+        )
     )
 
 
@@ -626,11 +662,12 @@ class DateYyyymmdd:
 
     value: str = field(
         default=None,
-        metadata={
-            "pattern": "[0-9]{4}(0[1-9]|1[0-2])(0[1-9]|[1-2][0-9]|3[0-1])",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            pattern="[0-9]{4}(0[1-9]|1[0-2])(0[1-9]|[1-2][0-9]|3[0-1])"
+        )
     )
 
 
@@ -641,7 +678,12 @@ class NumericDecimalLength1To12:
     """
 
     value: float = field(
-        default=None, metadata={"name": "value", "type": "Restriction"}
+        default=None,
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+        )
     )
 
 
@@ -652,7 +694,12 @@ class NumericDecimalLength1To18:
     """
 
     value: float = field(
-        default=None, metadata={"name": "value", "type": "Restriction"}
+        default=None,
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+        )
     )
 
 
@@ -664,11 +711,12 @@ class NumericIntegerLength0To3:
 
     value: int = field(
         default=None,
-        metadata={
-            "pattern": "-?[0-9]{0,3}",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            pattern="-?[0-9]{0,3}"
+        )
     )
 
 
@@ -680,11 +728,12 @@ class NumericIntegerLength0To35:
 
     value: int = field(
         default=None,
-        metadata={
-            "pattern": "-?[0-9]{0,35}",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            pattern="-?[0-9]{0,35}"
+        )
     )
 
 
@@ -696,11 +745,12 @@ class NumericIntegerLength1To1:
 
     value: int = field(
         default=None,
-        metadata={
-            "pattern": "-?[0-9]{1,1}",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            pattern="-?[0-9]{1,1}"
+        )
     )
 
 
@@ -712,11 +762,12 @@ class NumericIntegerLength1To15:
 
     value: int = field(
         default=None,
-        metadata={
-            "pattern": "-?[0-9]{1,15}",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            pattern="-?[0-9]{1,15}"
+        )
     )
 
 
@@ -728,11 +779,12 @@ class NumericIntegerLength1To18:
 
     value: int = field(
         default=None,
-        metadata={
-            "pattern": "-?[0-9]{1,18}",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            pattern="-?[0-9]{1,18}"
+        )
     )
 
 
@@ -744,11 +796,12 @@ class NumericIntegerLength1To2:
 
     value: int = field(
         default=None,
-        metadata={
-            "pattern": "-?[0-9]{1,2}",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            pattern="-?[0-9]{1,2}"
+        )
     )
 
 
@@ -760,11 +813,12 @@ class NumericIntegerLength1To3:
 
     value: int = field(
         default=None,
-        metadata={
-            "pattern": "-?[0-9]{1,3}",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            pattern="-?[0-9]{1,3}"
+        )
     )
 
 
@@ -776,11 +830,12 @@ class NumericIntegerLength1To4:
 
     value: int = field(
         default=None,
-        metadata={
-            "pattern": "-?[0-9]{1,4}",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            pattern="-?[0-9]{1,4}"
+        )
     )
 
 
@@ -792,11 +847,12 @@ class NumericIntegerLength1To6:
 
     value: int = field(
         default=None,
-        metadata={
-            "pattern": "-?[0-9]{1,6}",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            pattern="-?[0-9]{1,6}"
+        )
     )
 
 
@@ -808,11 +864,12 @@ class NumericIntegerLength1To8:
 
     value: int = field(
         default=None,
-        metadata={
-            "pattern": "-?[0-9]{1,8}",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            pattern="-?[0-9]{1,8}"
+        )
     )
 
 
@@ -824,11 +881,12 @@ class NumericIntegerLength1To9:
 
     value: int = field(
         default=None,
-        metadata={
-            "pattern": "-?[0-9]{1,9}",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            pattern="-?[0-9]{1,9}"
+        )
     )
 
 
@@ -840,11 +898,12 @@ class NumericIntegerLength4To4:
 
     value: int = field(
         default=None,
-        metadata={
-            "pattern": "-?[0-9]{4,4}",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            pattern="-?[0-9]{4,4}"
+        )
     )
 
 
@@ -856,11 +915,12 @@ class Time24Hhmm:
 
     value: str = field(
         default=None,
-        metadata={
-            "pattern": "([0-1][0-9]|2[0-3])[0-5][0-9]",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            pattern="([0-1][0-9]|2[0-3])[0-5][0-9]"
+        )
     )
 
 
@@ -868,37 +928,37 @@ class Time24Hhmm:
 class AdditionalProductDetailsType:
     equipment_type: AlphaNumericStringLength1To3 = field(
         default=None,
-        metadata={
-            "name": "equipmentType",
-            "type": "Element",
-            "help": "Type of aircraft",
-        },
+        metadata=dict(
+            name="equipmentType",
+            type="Element",
+            help="Type of aircraft",
+        )
     )
     operating_day: AlphaNumericStringLength1To7 = field(
         default=None,
-        metadata={
-            "name": "operatingDay",
-            "type": "Element",
-            "help": "Day number of the week",
-        },
+        metadata=dict(
+            name="operatingDay",
+            type="Element",
+            help="Day number of the week",
+        )
     )
     tech_stop_number: NumericIntegerLength1To2 = field(
         default=None,
-        metadata={
-            "name": "techStopNumber",
-            "type": "Element",
-            "help": "Number of stops made in a journey if different from 0",
-        },
+        metadata=dict(
+            name="techStopNumber",
+            type="Element",
+            help="Number of stops made in a journey if different from 0",
+        )
     )
     location_id: List[AlphaStringLength3To5] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 3,
-            "name": "locationId",
-            "type": "Element",
-            "help": "Location places of the stops",
-        },
+        metadata=dict(
+            name="locationId",
+            type="Element",
+            help="Location places of the stops",
+            min_occurs=0,
+            max_occurs=3
+        )
     )
 
 
@@ -910,27 +970,27 @@ class AdditionalProductTypeI:
 
     equipment: AlphaNumericStringLength1To3 = field(
         default=None,
-        metadata={
-            "name": "equipment",
-            "type": "Element",
-            "help": "Equipment type",
-        },
+        metadata=dict(
+            name="equipment",
+            type="Element",
+            help="Equipment type",
+        )
     )
     duration: NumericIntegerLength1To6 = field(
         default=None,
-        metadata={
-            "name": "duration",
-            "type": "Element",
-            "help": "Elaps flying time of the leg",
-        },
+        metadata=dict(
+            name="duration",
+            type="Element",
+            help="Elaps flying time of the leg",
+        )
     )
     complexing_flight_indicator: AlphaNumericStringLength1To1 = field(
         default=None,
-        metadata={
-            "name": "complexingFlightIndicator",
-            "type": "Element",
-            "help": "COG indicator",
-        },
+        metadata=dict(
+            name="complexingFlightIndicator",
+            type="Element",
+            help="COG indicator",
+        )
     )
 
 
@@ -938,27 +998,27 @@ class AdditionalProductTypeI:
 class AgentIdentificationType:
     arc_number: AlphaNumericStringLength1To12 = field(
         default=None,
-        metadata={
-            "name": "arcNumber",
-            "type": "Element",
-            "help": "Contains ARC number",
-        },
+        metadata=dict(
+            name="arcNumber",
+            type="Element",
+            help="Contains ARC number",
+        )
     )
     ersp_number: AlphaNumericStringLength1To12 = field(
         default=None,
-        metadata={
-            "name": "erspNumber",
-            "type": "Element",
-            "help": "ERSP number of the Office or Customer",
-        },
+        metadata=dict(
+            name="erspNumber",
+            type="Element",
+            help="ERSP number of the Office or Customer",
+        )
     )
     iata_number: AlphaNumericStringLength1To12 = field(
         default=None,
-        metadata={
-            "name": "iataNumber",
-            "type": "Element",
-            "help": "IATA Number",
-        },
+        metadata=dict(
+            name="iataNumber",
+            type="Element",
+            help="IATA Number",
+        )
     )
 
 
@@ -966,11 +1026,11 @@ class AgentIdentificationType:
 class ArithmeticEvaluationType:
     code_operator: AlphaNumericStringLength1To3 = field(
         default=None,
-        metadata={
-            "name": "codeOperator",
-            "type": "Element",
-            "help": "Boolean operator",
-        },
+        metadata=dict(
+            name="codeOperator",
+            type="Element",
+            help="Boolean operator",
+        )
     )
 
 
@@ -978,51 +1038,51 @@ class ArithmeticEvaluationType:
 class ArrivalLocationDetailsType:
     distance: NumericIntegerLength1To3 = field(
         default=None,
-        metadata={
-            "name": "distance",
-            "type": "Element",
-            "help": "For Radius: This is the length of the requested radius around the location of destination.",
-        },
+        metadata=dict(
+            name="distance",
+            type="Element",
+            help="For Radius: This is the length of the requested radius around the location of destination.",
+        )
     )
     distance_unit: AlphaNumericStringLength0To3 = field(
         default=None,
-        metadata={
-            "name": "distanceUnit",
-            "type": "Element",
-            "help": "Distance unit qualifier for radius",
-        },
+        metadata=dict(
+            name="distanceUnit",
+            type="Element",
+            help="Distance unit qualifier for radius",
+        )
     )
     location_id: AlphaStringLength3To5 = field(
         default=None,
-        metadata={
-            "name": "locationId",
-            "type": "Element",
-            "help": "ATA/IATA airport/city code of arrival In case of SP request from a PNR, this field is empty.",
-        },
+        metadata=dict(
+            name="locationId",
+            type="Element",
+            help="ATA/IATA airport/city code of arrival In case of SP request from a PNR, this field is empty.",
+        )
     )
     airport_city_qualifier: AlphaStringLength1To1 = field(
         default=None,
-        metadata={
-            "name": "airportCityQualifier",
-            "type": "Element",
-            "help": "Request from no PNR A = consider the locationID specified as an airport (used only when ambiguous) C = consider the locationId as a city (used only when ambiguous) A and C are not used in case of a request from PNR Request from a PNR with Radius option: O = radius applies to the origin of the PNR segments D = radius applies to the destination of the PNR segments",
-        },
+        metadata=dict(
+            name="airportCityQualifier",
+            type="Element",
+            help="Request from no PNR A = consider the locationID specified as an airport (used only when ambiguous) C = consider the locationId as a city (used only when ambiguous) A and C are not used in case of a request from PNR Request from a PNR with Radius option: O = radius applies to the origin of the PNR segments D = radius applies to the destination of the PNR segments",
+        )
     )
     latitude: AlphaNumericStringLength6To6 = field(
         default=None,
-        metadata={
-            "name": "latitude",
-            "type": "Element",
-            "help": "Latitude in degrees (decimal format) with hemisphere N=north S=south",
-        },
+        metadata=dict(
+            name="latitude",
+            type="Element",
+            help="Latitude in degrees (decimal format) with hemisphere N=north S=south",
+        )
     )
     longitude: AlphaNumericStringLength6To6 = field(
         default=None,
-        metadata={
-            "name": "longitude",
-            "type": "Element",
-            "help": "Longitude in degrees (decimal format) with hemisphere E=east, W=west",
-        },
+        metadata=dict(
+            name="longitude",
+            type="Element",
+            help="Longitude in degrees (decimal format) with hemisphere E=east, W=west",
+        )
     )
 
 
@@ -1030,51 +1090,51 @@ class ArrivalLocationDetailsType:
 class ArrivalLocationDetailsType120834C:
     distance: NumericIntegerLength1To3 = field(
         default=None,
-        metadata={
-            "name": "distance",
-            "type": "Element",
-            "help": "For Radius: This is the length of the requested radius around the location of origin.",
-        },
+        metadata=dict(
+            name="distance",
+            type="Element",
+            help="For Radius: This is the length of the requested radius around the location of origin.",
+        )
     )
     distance_unit: AlphaNumericStringLength1To3 = field(
         default=None,
-        metadata={
-            "name": "distanceUnit",
-            "type": "Element",
-            "help": "Distance unit qualifier for radius",
-        },
+        metadata=dict(
+            name="distanceUnit",
+            type="Element",
+            help="Distance unit qualifier for radius",
+        )
     )
     location_id: AlphaStringLength3To5 = field(
         default=None,
-        metadata={
-            "name": "locationId",
-            "type": "Element",
-            "help": "ATA/IATA airport/city code of arrival In case of SP request from a PNR, this field is empty.",
-        },
+        metadata=dict(
+            name="locationId",
+            type="Element",
+            help="ATA/IATA airport/city code of arrival In case of SP request from a PNR, this field is empty.",
+        )
     )
     airport_city_qualifier: AlphaStringLength1To1 = field(
         default=None,
-        metadata={
-            "name": "airportCityQualifier",
-            "type": "Element",
-            "help": "Request from no PNR A = consider the locationID specified as an airport (used only when ambiguous) C = consider the locationId as a city (used only when ambiguous) A and C are not used in case of a request from PNR Request from a PNR with Radius option: O = radius applies to the origin of the PNR segments D = radius applies to the destination of the PNR segments",
-        },
+        metadata=dict(
+            name="airportCityQualifier",
+            type="Element",
+            help="Request from no PNR A = consider the locationID specified as an airport (used only when ambiguous) C = consider the locationId as a city (used only when ambiguous) A and C are not used in case of a request from PNR Request from a PNR with Radius option: O = radius applies to the origin of the PNR segments D = radius applies to the destination of the PNR segments",
+        )
     )
     latitude: AlphaNumericStringLength6To6 = field(
         default=None,
-        metadata={
-            "name": "latitude",
-            "type": "Element",
-            "help": "Latitude in degrees (decimal format) with hemisphere N=north S=south",
-        },
+        metadata=dict(
+            name="latitude",
+            type="Element",
+            help="Latitude in degrees (decimal format) with hemisphere N=north S=south",
+        )
     )
     longitude: AlphaNumericStringLength6To6 = field(
         default=None,
-        metadata={
-            "name": "longitude",
-            "type": "Element",
-            "help": "Longitude in degrees (decimal format) with hemisphere E=east, W=west",
-        },
+        metadata=dict(
+            name="longitude",
+            type="Element",
+            help="Longitude in degrees (decimal format) with hemisphere E=east, W=west",
+        )
     )
 
 
@@ -1082,21 +1142,21 @@ class ArrivalLocationDetailsType120834C:
 class AttributeDetailsType:
     requested_sgt: AlphaNumericStringLength1To3 = field(
         default=None,
-        metadata={
-            "name": "requestedSgt",
-            "type": "Element",
-            "help": "Reference of the requested segment",
-        },
+        metadata=dict(
+            name="requestedSgt",
+            type="Element",
+            help="Reference of the requested segment",
+        )
     )
     value: List[AlphaNumericStringLength1To20] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 50,
-            "name": "value",
-            "type": "Element",
-            "help": "List of airlines, cabins, time window, number of connections.",
-        },
+        metadata=dict(
+            name="value",
+            type="Element",
+            help="List of airlines, cabins, time window, number of connections.",
+            min_occurs=0,
+            max_occurs=50
+        )
     )
 
 
@@ -1108,20 +1168,20 @@ class AttributeInformationType:
 
     option: AlphaNumericStringLength1To3 = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "option",
-            "type": "Element",
-            "help": "Code of options",
-        },
+        metadata=dict(
+            name="option",
+            type="Element",
+            help="Code of options",
+            required=True
+        )
     )
     option_information: AlphaNumericStringLength1To35 = field(
         default=None,
-        metadata={
-            "name": "optionInformation",
-            "type": "Element",
-            "help": "Mandatory when alternate date option is used (ALT), must be set to plus (P) or minus (M) a number of days around the original PNR segment dates. E.g.: M1 (for minus 1 day) or P100 (for plus 100 days)",
-        },
+        metadata=dict(
+            name="optionInformation",
+            type="Element",
+            help="Mandatory when alternate date option is used (ALT), must be set to plus (P) or minus (M) a number of days around the original PNR segment dates. E.g.: M1 (for minus 1 day) or P100 (for plus 100 days)",
+        )
     )
 
 
@@ -1133,20 +1193,20 @@ class AttributeInformationType97181C:
 
     attribute_type: AlphaNumericStringLength1To25 = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "attributeType",
-            "type": "Element",
-            "help": "Attribute type",
-        },
+        metadata=dict(
+            name="attributeType",
+            type="Element",
+            help="Attribute type",
+            required=True
+        )
     )
     attribute_description: AlphaNumericStringLength1To256 = field(
         default=None,
-        metadata={
-            "name": "attributeDescription",
-            "type": "Element",
-            "help": "Attribute description",
-        },
+        metadata=dict(
+            name="attributeDescription",
+            type="Element",
+            help="Attribute description",
+        )
     )
 
 
@@ -1154,51 +1214,67 @@ class AttributeInformationType97181C:
 class BucketInformationType:
     number: AlphaNumericStringLength1To3 = field(
         default=None,
-        metadata={"name": "number", "type": "Element", "help": "Number"},
+        metadata=dict(
+            name="number",
+            type="Element",
+            help="Number",
+        )
     )
     name: AlphaNumericStringLength1To20 = field(
         default=None,
-        metadata={"name": "name", "type": "Element", "help": "Name"},
+        metadata=dict(
+            name="name",
+            type="Element",
+            help="Name",
+        )
     )
     completion: AmaEdicodesetTypeLength1to3 = field(
         default=None,
-        metadata={
-            "name": "completion",
-            "type": "Element",
-            "help": "Completion",
-        },
+        metadata=dict(
+            name="completion",
+            type="Element",
+            help="Completion",
+        )
     )
     mode: AlphaNumericStringLength1To3 = field(
         default=None,
-        metadata={"name": "mode", "type": "Element", "help": "Mode"},
+        metadata=dict(
+            name="mode",
+            type="Element",
+            help="Mode",
+        )
     )
     value_ref: AlphaNumericStringLength1To3 = field(
         default=None,
-        metadata={
-            "name": "valueRef",
-            "type": "Element",
-            "help": "Value reference",
-        },
+        metadata=dict(
+            name="valueRef",
+            type="Element",
+            help="Value reference",
+        )
     )
     weight: NumericIntegerLength1To4 = field(
         default=None,
-        metadata={"name": "weight", "type": "Element", "help": "Weight"},
+        metadata=dict(
+            name="weight",
+            type="Element",
+            help="Weight",
+        )
     )
     count: NumericIntegerLength1To6 = field(
         default=None,
-        metadata={
-            "name": "count",
-            "type": "Element",
-            "help": "Number of solutions in the bucket",
-        },
+        metadata=dict(
+            name="count",
+            type="Element",
+            help="Number of solutions in the bucket",
+        )
     )
     attribute_count: NumericIntegerLength1To6 = field(
         default=None,
-        metadata={
-            "name": "attributeCount",
-            "type": "Element",
-            "help": "Number of solutions per attribute",
-        },
+        metadata=dict(
+            name="attributeCount",
+            type="Element",
+            help="Number of solutions per attribute",
+        )
     )
 
 
@@ -1210,12 +1286,12 @@ class CabinClassDesignationType:
 
     cabin_designator: AlphaNumericStringLength1To1 = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "cabinDesignator",
-            "type": "Element",
-            "help": "Cabin designator.",
-        },
+        metadata=dict(
+            name="cabinDesignator",
+            type="Element",
+            help="Cabin designator.",
+            required=True
+        )
     )
 
 
@@ -1223,21 +1299,21 @@ class CabinClassDesignationType:
 class CabinIdentificationType:
     cabin_qualifier: AlphaNumericStringLength1To2 = field(
         default=None,
-        metadata={
-            "name": "cabinQualifier",
-            "type": "Element",
-            "help": "Cabin qualifier. For Star Pricer,MD stands for Mandatory Cabin qualifier. For other products no qualifier stands for Mandatory Cabin.",
-        },
+        metadata=dict(
+            name="cabinQualifier",
+            type="Element",
+            help="Cabin qualifier. For Star Pricer,MD stands for Mandatory Cabin qualifier. For other products no qualifier stands for Mandatory Cabin.",
+        )
     )
     cabin: List[AlphaStringLength0To1] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 1,
-            "max_occurs": 3,
-            "name": "cabin",
-            "type": "Element",
-            "help": "Cabin",
-        },
+        metadata=dict(
+            name="cabin",
+            type="Element",
+            help="Cabin",
+            min_occurs=1,
+            max_occurs=3
+        )
     )
 
 
@@ -1245,21 +1321,21 @@ class CabinIdentificationType:
 class CabinIdentificationType233500C:
     cabin_qualifier: AlphaNumericStringLength1To2 = field(
         default=None,
-        metadata={
-            "name": "cabinQualifier",
-            "type": "Element",
-            "help": "Cabin qualifier. For Star Pricer,MD stands for Mandatory Cabin qualifier. For other products no qualifier stands for Mandatory Cabin.",
-        },
+        metadata=dict(
+            name="cabinQualifier",
+            type="Element",
+            help="Cabin qualifier. For Star Pricer,MD stands for Mandatory Cabin qualifier. For other products no qualifier stands for Mandatory Cabin.",
+        )
     )
     cabin: List[AlphaStringLength0To1] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 5,
-            "name": "cabin",
-            "type": "Element",
-            "help": "Cabin",
-        },
+        metadata=dict(
+            name="cabin",
+            type="Element",
+            help="Cabin",
+            min_occurs=0,
+            max_occurs=5
+        )
     )
 
 
@@ -1267,36 +1343,36 @@ class CabinIdentificationType233500C:
 class CabinProductDetailsType:
     rbd: AlphaStringLength1To1 = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "rbd",
-            "type": "Element",
-            "help": "Reservation booking designator - RBD",
-        },
+        metadata=dict(
+            name="rbd",
+            type="Element",
+            help="Reservation booking designator - RBD",
+            required=True
+        )
     )
     booking_modifier: AmaEdicodesetTypeLength1 = field(
         default=None,
-        metadata={
-            "name": "bookingModifier",
-            "type": "Element",
-            "help": "Reservation Booking Modifier",
-        },
+        metadata=dict(
+            name="bookingModifier",
+            type="Element",
+            help="Reservation Booking Modifier",
+        )
     )
     cabin: AlphaStringLength1To1 = field(
         default=None,
-        metadata={
-            "name": "cabin",
-            "type": "Element",
-            "help": "Indicates the cabin related to the Booking code",
-        },
+        metadata=dict(
+            name="cabin",
+            type="Element",
+            help="Indicates the cabin related to the Booking code",
+        )
     )
     avl_status: AmaEdicodesetTypeLength1to3 = field(
         default=None,
-        metadata={
-            "name": "avlStatus",
-            "type": "Element",
-            "help": "Availibility status : posting level",
-        },
+        metadata=dict(
+            name="avlStatus",
+            type="Element",
+            help="Availibility status : posting level",
+        )
     )
 
 
@@ -1308,20 +1384,20 @@ class CodedAttributeInformationType:
 
     attribute_type: AlphaNumericStringLength1To5 = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "attributeType",
-            "type": "Element",
-            "help": "Attribute type identification",
-        },
+        metadata=dict(
+            name="attributeType",
+            type="Element",
+            help="Attribute type identification",
+            required=True
+        )
     )
     attribute_description: AlphaNumericStringLength1To20 = field(
         default=None,
-        metadata={
-            "name": "attributeDescription",
-            "type": "Element",
-            "help": "Attribute Description",
-        },
+        metadata=dict(
+            name="attributeDescription",
+            type="Element",
+            help="Attribute Description",
+        )
     )
 
 
@@ -1333,22 +1409,22 @@ class CodedAttributeInformationType120742C:
 
     name: AlphaNumericStringLength1To5 = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "name",
-            "type": "Element",
-            "help": "Name.",
-        },
+        metadata=dict(
+            name="name",
+            type="Element",
+            help="Name.",
+            required=True
+        )
     )
     value: List[AlphaNumericStringLength1To20] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 10,
-            "name": "value",
-            "type": "Element",
-            "help": "Value.",
-        },
+        metadata=dict(
+            name="value",
+            type="Element",
+            help="Value.",
+            min_occurs=0,
+            max_occurs=10
+        )
     )
 
 
@@ -1360,17 +1436,21 @@ class CodedAttributeInformationType139508C:
 
     type: AlphaNumericStringLength1To5 = field(
         default=None,
-        metadata={"name": "type", "type": "Element", "help": "Attribute type"},
+        metadata=dict(
+            name="type",
+            type="Element",
+            help="Attribute type",
+        )
     )
     value: List[AlphaNumericStringLength1To20] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 10,
-            "name": "value",
-            "type": "Element",
-            "help": "Value.",
-        },
+        metadata=dict(
+            name="value",
+            type="Element",
+            help="Value.",
+            min_occurs=0,
+            max_occurs=10
+        )
     )
 
 
@@ -1382,19 +1462,20 @@ class CodedAttributeInformationType247828C:
 
     attribute_type: AlphaNumericStringLength1To5 = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "attributeType",
-            "type": "Element",
-        },
+        metadata=dict(
+            name="attributeType",
+            type="Element",
+            help=None,
+            required=True
+        )
     )
     attribute_description: AlphaNumericStringLength1To10 = field(
         default=None,
-        metadata={
-            "name": "attributeDescription",
-            "type": "Element",
-            "help": "Attribute description",
-        },
+        metadata=dict(
+            name="attributeDescription",
+            type="Element",
+            help="Attribute description",
+        )
     )
 
 
@@ -1406,20 +1487,20 @@ class CodedAttributeInformationType254574C:
 
     attribute_type: AlphaNumericStringLength1To5 = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "attributeType",
-            "type": "Element",
-            "help": "Attribute type",
-        },
+        metadata=dict(
+            name="attributeType",
+            type="Element",
+            help="Attribute type",
+            required=True
+        )
     )
     attribute_description: AlphaNumericStringLength1To50 = field(
         default=None,
-        metadata={
-            "name": "attributeDescription",
-            "type": "Element",
-            "help": "Attribute description",
-        },
+        metadata=dict(
+            name="attributeDescription",
+            type="Element",
+            help="Attribute description",
+        )
     )
 
 
@@ -1431,21 +1512,21 @@ class CodedAttributeInformationType275401C:
 
     fee_type: AlphaNumericStringLength1To5 = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "feeType",
-            "type": "Element",
-            "help": "Type of fee/reduction",
-        },
+        metadata=dict(
+            name="feeType",
+            type="Element",
+            help="Type of fee/reduction",
+            required=True
+        )
     )
     fee_id_number: AlphaNumericStringLength1To50 = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "feeIdNumber",
-            "type": "Element",
-            "help": "Fee Id Number",
-        },
+        metadata=dict(
+            name="feeIdNumber",
+            type="Element",
+            help="Fee Id Number",
+            required=True
+        )
     )
 
 
@@ -1453,22 +1534,22 @@ class CodedAttributeInformationType275401C:
 class CompanyIdentificationType120719C:
     carrier_qualifier: AlphaNumericStringLength0To1 = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "carrierQualifier",
-            "type": "Element",
-            "help": "Item description identification.",
-        },
+        metadata=dict(
+            name="carrierQualifier",
+            type="Element",
+            help="Item description identification.",
+            required=True
+        )
     )
     carrier_id: List[AlphaNumericStringLength2To3] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 1,
-            "max_occurs": 99,
-            "name": "carrierId",
-            "type": "Element",
-            "help": "carrier id",
-        },
+        metadata=dict(
+            name="carrierId",
+            type="Element",
+            help="carrier id",
+            min_occurs=1,
+            max_occurs=99
+        )
     )
 
 
@@ -1476,20 +1557,20 @@ class CompanyIdentificationType120719C:
 class CompanyIdentificationType195544C:
     marketing_carrier: AlphaNumericStringLength2To3 = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "marketingCarrier",
-            "type": "Element",
-            "help": "Marketing carrier",
-        },
+        metadata=dict(
+            name="marketingCarrier",
+            type="Element",
+            help="Marketing carrier",
+            required=True
+        )
     )
     operating_carrier: AlphaNumericStringLength2To3 = field(
         default=None,
-        metadata={
-            "name": "operatingCarrier",
-            "type": "Element",
-            "help": "Operating carrier",
-        },
+        metadata=dict(
+            name="operatingCarrier",
+            type="Element",
+            help="Operating carrier",
+        )
     )
 
 
@@ -1497,22 +1578,22 @@ class CompanyIdentificationType195544C:
 class CompanyIdentificationType275415C:
     carrier_qualifier: AlphaNumericStringLength0To1 = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "carrierQualifier",
-            "type": "Element",
-            "help": "Item description identification.",
-        },
+        metadata=dict(
+            name="carrierQualifier",
+            type="Element",
+            help="Item description identification.",
+            required=True
+        )
     )
     carrier_id: List[AlphaNumericStringLength2To3] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 1,
-            "max_occurs": 999,
-            "name": "carrierId",
-            "type": "Element",
-            "help": "carrier id",
-        },
+        metadata=dict(
+            name="carrierId",
+            type="Element",
+            help="carrier id",
+            min_occurs=1,
+            max_occurs=999
+        )
     )
 
 
@@ -1524,12 +1605,12 @@ class CompanyIdentificationTypeI:
 
     marketing_company: AlphaNumericStringLength2To3 = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "marketingCompany",
-            "type": "Element",
-            "help": "Carrier code",
-        },
+        metadata=dict(
+            name="marketingCompany",
+            type="Element",
+            help="Carrier code",
+            required=True
+        )
     )
 
 
@@ -1541,36 +1622,36 @@ class CompanyRoleIdentificationType:
 
     transport_stage_qualifier: AlphaStringLength1To1 = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "transportStageQualifier",
-            "type": "Element",
-            "help": "Codeshare qualifier",
-        },
+        metadata=dict(
+            name="transportStageQualifier",
+            type="Element",
+            help="Codeshare qualifier",
+            required=True
+        )
     )
     airline_designator: AlphaNumericStringLength2To3 = field(
         default=None,
-        metadata={
-            "name": "airlineDesignator",
-            "type": "Element",
-            "help": "company identification",
-        },
+        metadata=dict(
+            name="airlineDesignator",
+            type="Element",
+            help="company identification",
+        )
     )
     flight_number: NumericIntegerLength1To4 = field(
         default=None,
-        metadata={
-            "name": "flightNumber",
-            "type": "Element",
-            "help": "flight number",
-        },
+        metadata=dict(
+            name="flightNumber",
+            type="Element",
+            help="flight number",
+        )
     )
     operational_suffix: AlphaStringLength1To1 = field(
         default=None,
-        metadata={
-            "name": "operationalSuffix",
-            "type": "Element",
-            "help": "suffix",
-        },
+        metadata=dict(
+            name="operationalSuffix",
+            type="Element",
+            help="suffix",
+        )
     )
 
 
@@ -1582,27 +1663,27 @@ class CompanyRoleIdentificationType120761C:
 
     code_share_type: AlphaStringLength1To1 = field(
         default=None,
-        metadata={
-            "name": "codeShareType",
-            "type": "Element",
-            "help": "Type of code share agreement.",
-        },
+        metadata=dict(
+            name="codeShareType",
+            type="Element",
+            help="Type of code share agreement.",
+        )
     )
     airline_designator: AlphaNumericStringLength2To3 = field(
         default=None,
-        metadata={
-            "name": "airlineDesignator",
-            "type": "Element",
-            "help": "company identification",
-        },
+        metadata=dict(
+            name="airlineDesignator",
+            type="Element",
+            help="company identification",
+        )
     )
     flight_number: NumericIntegerLength1To4 = field(
         default=None,
-        metadata={
-            "name": "flightNumber",
-            "type": "Element",
-            "help": "flight number",
-        },
+        metadata=dict(
+            name="flightNumber",
+            type="Element",
+            help="flight number",
+        )
     )
 
 
@@ -1610,29 +1691,29 @@ class CompanyRoleIdentificationType120761C:
 class ConnectPointDetailsType:
     exclusion_identifier: AlphaStringLength0To1 = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "exclusionIdentifier",
-            "type": "Element",
-            "help": "Exclusion identification",
-        },
+        metadata=dict(
+            name="exclusionIdentifier",
+            type="Element",
+            help="Exclusion identification",
+            required=True
+        )
     )
     location_id: AlphaStringLength3To5 = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "locationId",
-            "type": "Element",
-            "help": "Place or Location identification",
-        },
+        metadata=dict(
+            name="locationId",
+            type="Element",
+            help="Place or Location identification",
+            required=True
+        )
     )
     airport_city_qualifier: AlphaStringLength1To1 = field(
         default=None,
-        metadata={
-            "name": "airportCityQualifier",
-            "type": "Element",
-            "help": "Airport/city qualifier",
-        },
+        metadata=dict(
+            name="airportCityQualifier",
+            type="Element",
+            help="Airport/city qualifier",
+        )
     )
 
 
@@ -1640,29 +1721,29 @@ class ConnectPointDetailsType:
 class ConnectPointDetailsType195492C:
     inclusion_identifier: AlphaNumericStringLength0To1 = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "inclusionIdentifier",
-            "type": "Element",
-            "help": "Inclusion identification",
-        },
+        metadata=dict(
+            name="inclusionIdentifier",
+            type="Element",
+            help="Inclusion identification",
+            required=True
+        )
     )
     location_id: AlphaStringLength3To5 = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "locationId",
-            "type": "Element",
-            "help": "Place or Location identification",
-        },
+        metadata=dict(
+            name="locationId",
+            type="Element",
+            help="Place or Location identification",
+            required=True
+        )
     )
     airport_city_qualifier: AlphaStringLength1To1 = field(
         default=None,
-        metadata={
-            "name": "airportCityQualifier",
-            "type": "Element",
-            "help": "Airport/city qualifier",
-        },
+        metadata=dict(
+            name="airportCityQualifier",
+            type="Element",
+            help="Airport/city qualifier",
+        )
     )
 
 
@@ -1674,12 +1755,12 @@ class ConnectionDetailsTypeI:
 
     location: AlphaNumericStringLength1To3 = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "location",
-            "type": "Element",
-            "help": "Location",
-        },
+        metadata=dict(
+            name="location",
+            type="Element",
+            help="Location",
+            required=True
+        )
     )
 
 
@@ -1691,22 +1772,36 @@ class ConsumerReferenceIdentificationTypeI:
 
     reference_qualifier: AlphaNumericStringLength1To3 = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "referenceQualifier",
-            "type": "Element",
-        },
+        metadata=dict(
+            name="referenceQualifier",
+            type="Element",
+            help=None,
+            required=True
+        )
     )
     reference_number: AlphaNumericStringLength1To35 = field(
-        default=None, metadata={"name": "referenceNumber", "type": "Element"}
+        default=None,
+        metadata=dict(
+            name="referenceNumber",
+            type="Element",
+            help=None,
+        )
     )
     reference_party_name: AlphaNumericStringLength1To35 = field(
         default=None,
-        metadata={"name": "referencePartyName", "type": "Element"},
+        metadata=dict(
+            name="referencePartyName",
+            type="Element",
+            help=None,
+        )
     )
     traveller_reference_nbr: AlphaNumericStringLength1To10 = field(
         default=None,
-        metadata={"name": "travellerReferenceNbr", "type": "Element"},
+        metadata=dict(
+            name="travellerReferenceNbr",
+            type="Element",
+            help=None,
+        )
     )
 
 
@@ -1714,20 +1809,20 @@ class ConsumerReferenceIdentificationTypeI:
 class ConversionRateDetailsType:
     conversion_type: AlphaNumericStringLength1To3 = field(
         default=None,
-        metadata={
-            "name": "conversionType",
-            "type": "Element",
-            "help": "Conversion type",
-        },
+        metadata=dict(
+            name="conversionType",
+            type="Element",
+            help="Conversion type",
+        )
     )
     currency: AlphaStringLength1To3 = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "currency",
-            "type": "Element",
-            "help": "Currency",
-        },
+        metadata=dict(
+            name="currency",
+            type="Element",
+            help="Currency",
+            required=True
+        )
     )
 
 
@@ -1735,21 +1830,21 @@ class ConversionRateDetailsType:
 class CorporateFareIdentifiersType:
     fare_qualifier: AlphaNumericStringLength1To3 = field(
         default=None,
-        metadata={
-            "name": "fareQualifier",
-            "type": "Element",
-            "help": "Indicates the type of corporate fares requested",
-        },
+        metadata=dict(
+            name="fareQualifier",
+            type="Element",
+            help="Indicates the type of corporate fares requested",
+        )
     )
     identify_number: List[AlphaNumericStringLength1To35] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 20,
-            "name": "identifyNumber",
-            "type": "Element",
-            "help": "Corporate contract number or name",
-        },
+        metadata=dict(
+            name="identifyNumber",
+            type="Element",
+            help="Corporate contract number or name",
+            min_occurs=0,
+            max_occurs=20
+        )
     )
 
 
@@ -1761,22 +1856,22 @@ class CorporateIdentityType:
 
     corporate_qualifier: AlphaNumericStringLength0To3 = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "corporateQualifier",
-            "type": "Element",
-            "help": "Indicates if 1A corporate (RC) or Unifare corporate (RW) requested.",
-        },
+        metadata=dict(
+            name="corporateQualifier",
+            type="Element",
+            help="Indicates if 1A corporate (RC) or Unifare corporate (RW) requested.",
+            required=True
+        )
     )
     identity: List[AlphaNumericStringLength1To20] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 1,
-            "max_occurs": 9,
-            "name": "identity",
-            "type": "Element",
-            "help": "Corporate contract number or name",
-        },
+        metadata=dict(
+            name="identity",
+            type="Element",
+            help="Corporate contract number or name",
+            min_occurs=1,
+            max_occurs=9
+        )
     )
 
 
@@ -1787,19 +1882,30 @@ class CriteriaiDetaislType:
     """
 
     type: AlphaNumericStringLength1To3 = field(
-        default=None, metadata={"name": "type", "type": "Element"}
+        default=None,
+        metadata=dict(
+            name="type",
+            type="Element",
+            help=None,
+        )
     )
     value: AlphaNumericStringLength1To18 = field(
-        default=None, metadata={"name": "value", "type": "Element"}
+        default=None,
+        metadata=dict(
+            name="value",
+            type="Element",
+            help=None,
+        )
     )
     attribute: List[AlphaNumericStringLength1To9] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 99,
-            "name": "attribute",
-            "type": "Element",
-        },
+        metadata=dict(
+            name="attribute",
+            type="Element",
+            help=None,
+            min_occurs=0,
+            max_occurs=99
+        )
     )
 
 
@@ -1811,11 +1917,11 @@ class DataInformationType:
 
     indicator: AlphaNumericStringLength1To3 = field(
         default=None,
-        metadata={
-            "name": "indicator",
-            "type": "Element",
-            "help": "Ancillary services options",
-        },
+        metadata=dict(
+            name="indicator",
+            type="Element",
+            help="Ancillary services options",
+        )
     )
 
 
@@ -1827,20 +1933,20 @@ class DataTypeInformationType:
 
     sub_type: AlphaNumericStringLength1To3 = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "subType",
-            "type": "Element",
-            "help": "Carrier fee code",
-        },
+        metadata=dict(
+            name="subType",
+            type="Element",
+            help="Carrier fee code",
+            required=True
+        )
     )
     option: AlphaNumericStringLength1To3 = field(
         default=None,
-        metadata={
-            "name": "option",
-            "type": "Element",
-            "help": "Status (automated, manually added, exempted). Default is automated",
-        },
+        metadata=dict(
+            name="option",
+            type="Element",
+            help="Status (automated, manually added, exempted). Default is automated",
+        )
     )
 
 
@@ -1852,27 +1958,27 @@ class DateAndTimeDetailsType:
 
     flexibility_qualifier: AlphaNumericStringLength1To3 = field(
         default=None,
-        metadata={
-            "name": "flexibilityQualifier",
-            "type": "Element",
-            "help": "Trip Duration type(Plus,Minus,Combined)",
-        },
+        metadata=dict(
+            name="flexibilityQualifier",
+            type="Element",
+            help="Trip Duration type(Plus,Minus,Combined)",
+        )
     )
     trip_interval: NumericIntegerLength1To6 = field(
         default=None,
-        metadata={
-            "name": "tripInterval",
-            "type": "Element",
-            "help": "Number of days added or/and retrieved to the trip duration",
-        },
+        metadata=dict(
+            name="tripInterval",
+            type="Element",
+            help="Number of days added or/and retrieved to the trip duration",
+        )
     )
     trip_duration: NumericIntegerLength1To4 = field(
         default=None,
-        metadata={
-            "name": "tripDuration",
-            "type": "Element",
-            "help": "Period between date of departure and date of arrival",
-        },
+        metadata=dict(
+            name="tripDuration",
+            type="Element",
+            help="Period between date of departure and date of arrival",
+        )
     )
 
 
@@ -1880,39 +1986,43 @@ class DateAndTimeDetailsType:
 class DateAndTimeDetailsType120762C:
     date_qualifier: AlphaNumericStringLength1To3 = field(
         default=None,
-        metadata={
-            "name": "dateQualifier",
-            "type": "Element",
-            "help": "Date time period qualifier",
-        },
+        metadata=dict(
+            name="dateQualifier",
+            type="Element",
+            help="Date time period qualifier",
+        )
     )
     date: DateDdmmyy = field(
         default=None,
-        metadata={"name": "date", "type": "Element", "help": "First Date"},
+        metadata=dict(
+            name="date",
+            type="Element",
+            help="First Date",
+        )
     )
     first_time: Time24Hhmm = field(
         default=None,
-        metadata={
-            "name": "firstTime",
-            "type": "Element",
-            "help": "First Time",
-        },
+        metadata=dict(
+            name="firstTime",
+            type="Element",
+            help="First Time",
+        )
     )
     equipement_type: AlphaNumericStringLength1To3 = field(
         default=None,
-        metadata={
-            "name": "equipementType",
-            "type": "Element",
-            "help": "Movement type.",
-        },
+        metadata=dict(
+            name="equipementType",
+            type="Element",
+            help="Movement type.",
+        )
     )
     location_id: AlphaNumericStringLength3To5 = field(
         default=None,
-        metadata={
-            "name": "locationId",
-            "type": "Element",
-            "help": "Place/location identification.",
-        },
+        metadata=dict(
+            name="locationId",
+            type="Element",
+            help="Place/location identification.",
+        )
     )
 
 
@@ -1924,27 +2034,27 @@ class DateAndTimeDetailsType254619C:
 
     range_qualifier: AlphaNumericStringLength1To3 = field(
         default=None,
-        metadata={
-            "name": "rangeQualifier",
-            "type": "Element",
-            "help": "To identify type of range (Plus,Minus or combined)",
-        },
+        metadata=dict(
+            name="rangeQualifier",
+            type="Element",
+            help="To identify type of range (Plus,Minus or combined)",
+        )
     )
     day_interval: NumericIntegerLength1To6 = field(
         default=None,
-        metadata={
-            "name": "dayInterval",
-            "type": "Element",
-            "help": "Range of dates : Number of Days preceding or/and Following the request departure date",
-        },
+        metadata=dict(
+            name="dayInterval",
+            type="Element",
+            help="Range of dates : Number of Days preceding or/and Following the request departure date",
+        )
     )
     time_atdestination: Time24Hhmm = field(
         default=None,
-        metadata={
-            "name": "timeAtdestination",
-            "type": "Element",
-            "help": "Time at destination (local)",
-        },
+        metadata=dict(
+            name="timeAtdestination",
+            type="Element",
+            help="Time at destination (local)",
+        )
     )
 
 
@@ -1956,27 +2066,35 @@ class DateAndTimeDetailsTypeI:
 
     time_qualifier: AlphaNumericStringLength1To3 = field(
         default=None,
-        metadata={
-            "name": "timeQualifier",
-            "type": "Element",
-            "help": "Toidentify type of time Arrival/Departure",
-        },
+        metadata=dict(
+            name="timeQualifier",
+            type="Element",
+            help="Toidentify type of time Arrival/Departure",
+        )
     )
     date: DateDdmmyy = field(
         default=None,
-        metadata={"name": "date", "type": "Element", "help": "Date"},
+        metadata=dict(
+            name="date",
+            type="Element",
+            help="Date",
+        )
     )
     time: Time24Hhmm = field(
         default=None,
-        metadata={"name": "time", "type": "Element", "help": "Time"},
+        metadata=dict(
+            name="time",
+            type="Element",
+            help="Time",
+        )
     )
     time_window: AlphaNumericStringLength1To3 = field(
         default=None,
-        metadata={
-            "name": "timeWindow",
-            "type": "Element",
-            "help": "Time window size in hours",
-        },
+        metadata=dict(
+            name="timeWindow",
+            type="Element",
+            help="Time window size in hours",
+        )
     )
 
 
@@ -1984,29 +2102,51 @@ class DateAndTimeDetailsTypeI:
 class DateAndTimeDetailsTypeI120740C:
     qualifier: AlphaNumericStringLength1To3 = field(
         default=None,
-        metadata={
-            "name": "qualifier",
-            "type": "Element",
-            "help": "Date time period qualifier",
-        },
+        metadata=dict(
+            name="qualifier",
+            type="Element",
+            help="Date time period qualifier",
+        )
     )
     date: DateDdmmyy = field(
         default=None,
-        metadata={"name": "date", "type": "Element", "help": "First Date"},
+        metadata=dict(
+            name="date",
+            type="Element",
+            help="First Date",
+        )
     )
     time: Time24Hhmm = field(
         default=None,
-        metadata={"name": "time", "type": "Element", "help": "First Time"},
+        metadata=dict(
+            name="time",
+            type="Element",
+            help="First Time",
+        )
     )
     qualifier2: AlphaNumericStringLength1To3 = field(
         default=None,
-        metadata={"name": "qualifier2", "type": "Element", "help": "."},
+        metadata=dict(
+            name="qualifier2",
+            type="Element",
+            help=".",
+        )
     )
     reserved1: AlphaNumericStringLength1To3 = field(
-        default=None, metadata={"name": "reserved1", "type": "Element"}
+        default=None,
+        metadata=dict(
+            name="reserved1",
+            type="Element",
+            help=None,
+        )
     )
     reserved2: AlphaNumericStringLength3To5 = field(
-        default=None, metadata={"name": "reserved2", "type": "Element"}
+        default=None,
+        metadata=dict(
+            name="reserved2",
+            type="Element",
+            help=None,
+        )
     )
 
 
@@ -2018,16 +2158,20 @@ class DateTimePeriodDetailsTypeI:
 
     qualifier: AlphaNumericStringLength1To3 = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "qualifier",
-            "type": "Element",
-            "help": "Qualifier",
-        },
+        metadata=dict(
+            name="qualifier",
+            type="Element",
+            help="Qualifier",
+            required=True
+        )
     )
     value: AlphaNumericStringLength1To35 = field(
         default=None,
-        metadata={"name": "value", "type": "Element", "help": "Value"},
+        metadata=dict(
+            name="value",
+            type="Element",
+            help="Value",
+        )
     )
 
 
@@ -2035,23 +2179,35 @@ class DateTimePeriodDetailsTypeI:
 class FareDetailsType:
     qualifier: AmaEdicodesetTypeLength1to3 = field(
         default=None,
-        metadata={"name": "qualifier", "type": "Element", "help": "Qualifier"},
+        metadata=dict(
+            name="qualifier",
+            type="Element",
+            help="Qualifier",
+        )
     )
     rate: NumericIntegerLength1To8 = field(
         default=None,
-        metadata={"name": "rate", "type": "Element", "help": "Rate"},
+        metadata=dict(
+            name="rate",
+            type="Element",
+            help="Rate",
+        )
     )
     country: AlphaNumericStringLength1To3 = field(
         default=None,
-        metadata={"name": "country", "type": "Element", "help": "Country"},
+        metadata=dict(
+            name="country",
+            type="Element",
+            help="Country",
+        )
     )
     fare_category: AmaEdicodesetTypeLength1to3 = field(
         default=None,
-        metadata={
-            "name": "fareCategory",
-            "type": "Element",
-            "help": "Fare Category",
-        },
+        metadata=dict(
+            name="fareCategory",
+            type="Element",
+            help="Fare Category",
+        )
     )
 
 
@@ -2063,12 +2219,12 @@ class FareFamilyDetailsType:
 
     commercial_family: AlphaNumericStringLength1To10 = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "commercialFamily",
-            "type": "Element",
-            "help": "Commercial fare Family Short name",
-        },
+        metadata=dict(
+            name="commercialFamily",
+            type="Element",
+            help="Commercial fare Family Short name",
+            required=True
+        )
     )
 
 
@@ -2080,15 +2236,19 @@ class FareInformationTypeI:
 
     value_qualifier: AlphaNumericStringLength1To3 = field(
         default=None,
-        metadata={
-            "name": "valueQualifier",
-            "type": "Element",
-            "help": "PTC (Full Codeset List described in ATPCo Documentation B11109 Appendix A)",
-        },
+        metadata=dict(
+            name="valueQualifier",
+            type="Element",
+            help="PTC (Full Codeset List described in ATPCo Documentation B11109 Appendix A)",
+        )
     )
     value: NumericIntegerLength1To15 = field(
         default=None,
-        metadata={"name": "value", "type": "Element", "help": "age"},
+        metadata=dict(
+            name="value",
+            type="Element",
+            help="age",
+        )
     )
 
 
@@ -2096,21 +2256,21 @@ class FareInformationTypeI:
 class FareProductDetailsType:
     fare_basis: AlphaNumericStringLength0To18 = field(
         default=None,
-        metadata={
-            "name": "fareBasis",
-            "type": "Element",
-            "help": "Fare basis code",
-        },
+        metadata=dict(
+            name="fareBasis",
+            type="Element",
+            help="Fare basis code",
+        )
     )
     fare_type: List[AlphaNumericStringLength0To3] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 3,
-            "name": "fareType",
-            "type": "Element",
-            "help": "Type of fare",
-        },
+        metadata=dict(
+            name="fareType",
+            type="Element",
+            help="Type of fare",
+            min_occurs=0,
+            max_occurs=3
+        )
     )
 
 
@@ -2122,13 +2282,13 @@ class FareQualifierInformationType:
 
     fare_family_qual: List[AlphaNumericStringLength0To3] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 1,
-            "max_occurs": 9,
-            "name": "fareFamilyQual",
-            "type": "Element",
-            "help": "Fare family combinability.",
-        },
+        metadata=dict(
+            name="fareFamilyQual",
+            type="Element",
+            help="Fare family combinability.",
+            min_occurs=1,
+            max_occurs=9
+        )
     )
 
 
@@ -2136,11 +2296,11 @@ class FareQualifierInformationType:
 class FareTypeGroupingInformationType:
     pricing_group: AlphaNumericStringLength1To35 = field(
         default=None,
-        metadata={
-            "name": "pricingGroup",
-            "type": "Element",
-            "help": "Pricing Group",
-        },
+        metadata=dict(
+            name="pricingGroup",
+            type="Element",
+            help="Pricing Group",
+        )
     )
 
 
@@ -2152,28 +2312,28 @@ class FormOfPaymentDetailsTypeI:
 
     type: AlphaNumericStringLength1To3 = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "type",
-            "type": "Element",
-            "help": "Form of payment identification",
-        },
+        metadata=dict(
+            name="type",
+            type="Element",
+            help="Form of payment identification",
+            required=True
+        )
     )
     charged_amount: NumericDecimalLength1To12 = field(
         default=None,
-        metadata={
-            "name": "chargedAmount",
-            "type": "Element",
-            "help": "amount to be charged on this form",
-        },
+        metadata=dict(
+            name="chargedAmount",
+            type="Element",
+            help="amount to be charged on this form",
+        )
     )
     credit_card_number: AlphaNumericStringLength1To20 = field(
         default=None,
-        metadata={
-            "name": "creditCardNumber",
-            "type": "Element",
-            "help": "Reference number",
-        },
+        metadata=dict(
+            name="creditCardNumber",
+            type="Element",
+            help="Reference number",
+        )
     )
 
 
@@ -2181,38 +2341,38 @@ class FormOfPaymentDetailsTypeI:
 class FreeTextDetailsType:
     text_subject_qualifier: AlphaNumericStringLength1To3 = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "textSubjectQualifier",
-            "type": "Element",
-            "help": "Qualifier of the free text. Always literal in our usage.",
-        },
+        metadata=dict(
+            name="textSubjectQualifier",
+            type="Element",
+            help="Qualifier of the free text. Always literal in our usage.",
+            required=True
+        )
     )
     information_type: AlphaNumericStringLength1To4 = field(
         default=None,
-        metadata={
-            "name": "informationType",
-            "type": "Element",
-            "help": "Type of the free text. Always 7 for our usage.",
-        },
+        metadata=dict(
+            name="informationType",
+            type="Element",
+            help="Type of the free text. Always 7 for our usage.",
+        )
     )
     source: AlphaNumericStringLength1To3 = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "source",
-            "type": "Element",
-            "help": "Source of the information.",
-        },
+        metadata=dict(
+            name="source",
+            type="Element",
+            help="Source of the information.",
+            required=True
+        )
     )
     encoding: AlphaNumericStringLength1To3 = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "encoding",
-            "type": "Element",
-            "help": "Encoding method used.",
-        },
+        metadata=dict(
+            name="encoding",
+            type="Element",
+            help="Encoding method used.",
+            required=True
+        )
     )
 
 
@@ -2224,22 +2384,22 @@ class FrequencyType:
 
     qualifier: AlphaNumericStringLength1To3 = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "qualifier",
-            "type": "Element",
-            "help": "Indicate if the sequence number represents days of the week or days of the month.",
-        },
+        metadata=dict(
+            name="qualifier",
+            type="Element",
+            help="Indicate if the sequence number represents days of the week or days of the month.",
+            required=True
+        )
     )
     value: List[NumericIntegerLength1To1] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 7,
-            "name": "value",
-            "type": "Element",
-            "help": "Used to represent days of the week. 1 is monday and 7 is sunday.",
-        },
+        metadata=dict(
+            name="value",
+            type="Element",
+            help="Used to represent days of the week. 1 is monday and 7 is sunday.",
+            min_occurs=0,
+            max_occurs=7
+        )
     )
 
 
@@ -2247,73 +2407,83 @@ class FrequencyType:
 class FrequentTravellerIdentificationType:
     carrier: AlphaNumericStringLength1To35 = field(
         default=None,
-        metadata={
-            "name": "carrier",
-            "type": "Element",
-            "help": "Carrier where the FQTV is registered.",
-        },
+        metadata=dict(
+            name="carrier",
+            type="Element",
+            help="Carrier where the FQTV is registered.",
+        )
     )
     number: AlphaNumericStringLength1To28 = field(
-        default=None, metadata={"name": "number", "type": "Element"}
+        default=None,
+        metadata=dict(
+            name="number",
+            type="Element",
+            help=None,
+        )
     )
     customer_reference: AlphaNumericStringLength1To10 = field(
         default=None,
-        metadata={
-            "name": "customerReference",
-            "type": "Element",
-            "help": "Specifies which traveller in the TIF segment the frequent traveller number applies (same as 9944 in TIF).",
-        },
+        metadata=dict(
+            name="customerReference",
+            type="Element",
+            help="Specifies which traveller in the TIF segment the frequent traveller number applies (same as 9944 in TIF).",
+        )
     )
     status: AlphaNumericStringLength1To3 = field(
         default=None,
-        metadata={
-            "name": "status",
-            "type": "Element",
-            "help": "status code: 'OK' if the frequent flyer card has been validated",
-        },
+        metadata=dict(
+            name="status",
+            type="Element",
+            help="status code: 'OK' if the frequent flyer card has been validated",
+        )
     )
     tier_level: AlphaNumericStringLength1To35 = field(
         default=None,
-        metadata={
-            "name": "tierLevel",
-            "type": "Element",
-            "help": "To specify a Tier linked to the FQTV",
-        },
+        metadata=dict(
+            name="tierLevel",
+            type="Element",
+            help="To specify a Tier linked to the FQTV",
+        )
     )
     priority_code: AlphaNumericStringLength1To12 = field(
         default=None,
-        metadata={
-            "name": "priorityCode",
-            "type": "Element",
-            "help": "For example : priority code",
-        },
+        metadata=dict(
+            name="priorityCode",
+            type="Element",
+            help="For example : priority code",
+        )
     )
     tier_description: AlphaNumericStringLength1To35 = field(
         default=None,
-        metadata={
-            "name": "tierDescription",
-            "type": "Element",
-            "help": "For example : Level description",
-        },
+        metadata=dict(
+            name="tierDescription",
+            type="Element",
+            help="For example : Level description",
+        )
     )
     company_code: AlphaNumericStringLength1To35 = field(
         default=None,
-        metadata={
-            "name": "companyCode",
-            "type": "Element",
-            "help": "For example : Company code of alliance",
-        },
+        metadata=dict(
+            name="companyCode",
+            type="Element",
+            help="For example : Company code of alliance",
+        )
     )
     customer_value: NumericIntegerLength1To4 = field(
-        default=None, metadata={"name": "customerValue", "type": "Element"}
+        default=None,
+        metadata=dict(
+            name="customerValue",
+            type="Element",
+            help=None,
+        )
     )
     type: AlphaNumericStringLength1To3 = field(
         default=None,
-        metadata={
-            "name": "type",
-            "type": "Element",
-            "help": "To specify the product/account number qualifier. (e.g. 2=Corporate Frequent Flyer).",
-        },
+        metadata=dict(
+            name="type",
+            type="Element",
+            help="To specify the product/account number qualifier. (e.g. 2=Corporate Frequent Flyer).",
+        )
     )
 
 
@@ -2325,60 +2495,60 @@ class FrequentTravellerIdentificationType249074C:
 
     carrier: AlphaNumericStringLength1To3 = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "carrier",
-            "type": "Element",
-            "help": "carrier",
-        },
+        metadata=dict(
+            name="carrier",
+            type="Element",
+            help="carrier",
+            required=True
+        )
     )
     number: AlphaNumericStringLength1To25 = field(
         default=None,
-        metadata={
-            "name": "number",
-            "type": "Element",
-            "help": "Frequent traveller number",
-        },
+        metadata=dict(
+            name="number",
+            type="Element",
+            help="Frequent traveller number",
+        )
     )
     customer_reference: AlphaNumericStringLength1To10 = field(
         default=None,
-        metadata={
-            "name": "customerReference",
-            "type": "Element",
-            "help": "Customer reference",
-        },
+        metadata=dict(
+            name="customerReference",
+            type="Element",
+            help="Customer reference",
+        )
     )
     tier_level: AlphaNumericStringLength1To35 = field(
         default=None,
-        metadata={
-            "name": "tierLevel",
-            "type": "Element",
-            "help": "Tier level",
-        },
+        metadata=dict(
+            name="tierLevel",
+            type="Element",
+            help="Tier level",
+        )
     )
     priority_code: AlphaNumericStringLength1To12 = field(
         default=None,
-        metadata={
-            "name": "priorityCode",
-            "type": "Element",
-            "help": "Priority code",
-        },
+        metadata=dict(
+            name="priorityCode",
+            type="Element",
+            help="Priority code",
+        )
     )
     tier_description: AlphaNumericStringLength1To35 = field(
         default=None,
-        metadata={
-            "name": "tierDescription",
-            "type": "Element",
-            "help": "Tier description",
-        },
+        metadata=dict(
+            name="tierDescription",
+            type="Element",
+            help="Tier description",
+        )
     )
     type: AlphaNumericStringLength1To3 = field(
         default=None,
-        metadata={
-            "name": "type",
-            "type": "Element",
-            "help": "To specify the product/account number qualifier. (e.g. 2=Corporate Frequent Flyer).",
-        },
+        metadata=dict(
+            name="type",
+            type="Element",
+            help="To specify the product/account number qualifier. (e.g. 2=Corporate Frequent Flyer).",
+        )
     )
 
 
@@ -2390,27 +2560,35 @@ class ItemNumberIdentificationType:
 
     number: AlphaNumericStringLength1To4 = field(
         default=None,
-        metadata={
-            "name": "number",
-            "type": "Element",
-            "help": "Fare family combination number",
-        },
+        metadata=dict(
+            name="number",
+            type="Element",
+            help="Fare family combination number",
+        )
     )
     type: AlphaNumericStringLength1To3 = field(
         default=None,
-        metadata={"name": "type", "type": "Element", "help": "Type"},
+        metadata=dict(
+            name="type",
+            type="Element",
+            help="Type",
+        )
     )
     qualifier: AlphaNumericStringLength1To3 = field(
         default=None,
-        metadata={"name": "qualifier", "type": "Element", "help": "Qualifier"},
+        metadata=dict(
+            name="qualifier",
+            type="Element",
+            help="Qualifier",
+        )
     )
     responsible_agency: AlphaNumericStringLength1To3 = field(
         default=None,
-        metadata={
-            "name": "responsibleAgency",
-            "type": "Element",
-            "help": "Responsible agency",
-        },
+        metadata=dict(
+            name="responsibleAgency",
+            type="Element",
+            help="Responsible agency",
+        )
     )
 
 
@@ -2422,21 +2600,21 @@ class ItineraryDetailsType:
 
     airport_city_qualifier: AlphaStringLength1To1 = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "airportCityQualifier",
-            "type": "Element",
-            "help": "Airport/City Qualifier: the passenger wants to depart/arrive from/to the same airport or city in the specified requested segment",
-        },
+        metadata=dict(
+            name="airportCityQualifier",
+            type="Element",
+            help="Airport/City Qualifier: the passenger wants to depart/arrive from/to the same airport or city in the specified requested segment",
+            required=True
+        )
     )
     segment_number: NumericIntegerLength1To3 = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "segmentNumber",
-            "type": "Element",
-            "help": "Requested segment number",
-        },
+        metadata=dict(
+            name="segmentNumber",
+            type="Element",
+            help="Requested segment number",
+            required=True
+        )
     )
 
 
@@ -2444,20 +2622,20 @@ class ItineraryDetailsType:
 class LocationDetailsTypeI:
     location_id: AlphaStringLength3To5 = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "locationId",
-            "type": "Element",
-            "help": "Place or Location identification",
-        },
+        metadata=dict(
+            name="locationId",
+            type="Element",
+            help="Place or Location identification",
+            required=True
+        )
     )
     country: AlphaNumericStringLength1To3 = field(
         default=None,
-        metadata={
-            "name": "country",
-            "type": "Element",
-            "help": "Country, coded",
-        },
+        metadata=dict(
+            name="country",
+            type="Element",
+            help="Country, coded",
+        )
     )
 
 
@@ -2465,28 +2643,28 @@ class LocationDetailsTypeI:
 class LocationIdentificationDetailsType:
     location_id: AlphaStringLength3To5 = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "locationId",
-            "type": "Element",
-            "help": "3 characters ATA/IATA airport/city code",
-        },
+        metadata=dict(
+            name="locationId",
+            type="Element",
+            help="3 characters ATA/IATA airport/city code",
+            required=True
+        )
     )
     airport_city_qualifier: AlphaStringLength1To1 = field(
         default=None,
-        metadata={
-            "name": "airportCityQualifier",
-            "type": "Element",
-            "help": "Airport/city qualifier: the requested point is an airport when ambiguity exists (e.g. HOU)",
-        },
+        metadata=dict(
+            name="airportCityQualifier",
+            type="Element",
+            help="Airport/city qualifier: the requested point is an airport when ambiguity exists (e.g. HOU)",
+        )
     )
     terminal: AlphaNumericStringLength1To5 = field(
         default=None,
-        metadata={
-            "name": "terminal",
-            "type": "Element",
-            "help": "Terminal information",
-        },
+        metadata=dict(
+            name="terminal",
+            type="Element",
+            help="Terminal information",
+        )
     )
 
 
@@ -2498,12 +2676,12 @@ class LocationTypeI:
 
     true_location_id: AlphaStringLength3To3 = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "trueLocationId",
-            "type": "Element",
-            "help": "Departure or Arrival IATA airport code",
-        },
+        metadata=dict(
+            name="trueLocationId",
+            type="Element",
+            help="Departure or Arrival IATA airport code",
+            required=True
+        )
     )
 
 
@@ -2515,11 +2693,11 @@ class MileageTimeDetailsTypeI:
 
     elapsed_ground_time: NumericIntegerLength1To4 = field(
         default=None,
-        metadata={
-            "name": "elapsedGroundTime",
-            "type": "Element",
-            "help": "Ground Time in minutes at Board point (connection with incoming flight)",
-        },
+        metadata=dict(
+            name="elapsedGroundTime",
+            type="Element",
+            help="Ground Time in minutes at Board point (connection with incoming flight)",
+        )
     )
 
 
@@ -2527,46 +2705,46 @@ class MileageTimeDetailsTypeI:
 class MonetaryAndCabinInformationDetailsType:
     amount_type: AlphaNumericStringLength0To3 = field(
         default=None,
-        metadata={
-            "name": "amountType",
-            "type": "Element",
-            "help": "Amount qualifier.",
-        },
+        metadata=dict(
+            name="amountType",
+            type="Element",
+            help="Amount qualifier.",
+        )
     )
     amount: NumericDecimalLength1To18 = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "amount",
-            "type": "Element",
-            "help": "Amount",
-        },
+        metadata=dict(
+            name="amount",
+            type="Element",
+            help="Amount",
+            required=True
+        )
     )
     currency: AlphaNumericStringLength1To3 = field(
         default=None,
-        metadata={
-            "name": "currency",
-            "type": "Element",
-            "help": "ISO currency code",
-        },
+        metadata=dict(
+            name="currency",
+            type="Element",
+            help="ISO currency code",
+        )
     )
     location_id: AlphaStringLength3To5 = field(
         default=None,
-        metadata={
-            "name": "locationId",
-            "type": "Element",
-            "help": "Airport/city code",
-        },
+        metadata=dict(
+            name="locationId",
+            type="Element",
+            help="Airport/city code",
+        )
     )
     cabin_class_designator: List[AlphaStringLength1To1] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 9,
-            "name": "cabinClassDesignator",
-            "type": "Element",
-            "help": "Cabin class designator",
-        },
+        metadata=dict(
+            name="cabinClassDesignator",
+            type="Element",
+            help="Cabin class designator",
+            min_occurs=0,
+            max_occurs=9
+        )
     )
 
 
@@ -2574,28 +2752,28 @@ class MonetaryAndCabinInformationDetailsType:
 class MonetaryInformationDetailsTypeI:
     qualifier: AlphaNumericStringLength1To3 = field(
         default=None,
-        metadata={
-            "name": "qualifier",
-            "type": "Element",
-            "help": "Monetary amount type qualifier, coded",
-        },
+        metadata=dict(
+            name="qualifier",
+            type="Element",
+            help="Monetary amount type qualifier, coded",
+        )
     )
     amount: NumericIntegerLength1To18 = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "amount",
-            "type": "Element",
-            "help": "Allowance or charge number",
-        },
+        metadata=dict(
+            name="amount",
+            type="Element",
+            help="Allowance or charge number",
+            required=True
+        )
     )
     currency: AlphaNumericStringLength1To3 = field(
         default=None,
-        metadata={
-            "name": "currency",
-            "type": "Element",
-            "help": "Currency, coded",
-        },
+        metadata=dict(
+            name="currency",
+            type="Element",
+            help="Currency, coded",
+        )
     )
 
 
@@ -2603,36 +2781,36 @@ class MonetaryInformationDetailsTypeI:
 class MonetaryInformationDetailsTypeI194597C:
     qualifier: AlphaNumericStringLength1To3 = field(
         default=None,
-        metadata={
-            "name": "qualifier",
-            "type": "Element",
-            "help": "Monetary amount type qualifier, coded",
-        },
+        metadata=dict(
+            name="qualifier",
+            type="Element",
+            help="Monetary amount type qualifier, coded",
+        )
     )
     amount: NumericIntegerLength1To18 = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "amount",
-            "type": "Element",
-            "help": "Allowance or charge number",
-        },
+        metadata=dict(
+            name="amount",
+            type="Element",
+            help="Allowance or charge number",
+            required=True
+        )
     )
     currency: AlphaNumericStringLength1To3 = field(
         default=None,
-        metadata={
-            "name": "currency",
-            "type": "Element",
-            "help": "Currency, coded",
-        },
+        metadata=dict(
+            name="currency",
+            type="Element",
+            help="Currency, coded",
+        )
     )
     location_id: AlphaStringLength3To3 = field(
         default=None,
-        metadata={
-            "name": "locationId",
-            "type": "Element",
-            "help": "Place or Location identification",
-        },
+        metadata=dict(
+            name="locationId",
+            type="Element",
+            help="Place or Location identification",
+        )
     )
 
 
@@ -2644,20 +2822,28 @@ class MonetaryInformationDetailsTypeI65140C:
 
     type_qualifier: AlphaNumericStringLength1To3 = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "typeQualifier",
-            "type": "Element",
-            "help": "Qualifier",
-        },
+        metadata=dict(
+            name="typeQualifier",
+            type="Element",
+            help="Qualifier",
+            required=True
+        )
     )
     amount: AlphaNumericStringLength1To12 = field(
         default=None,
-        metadata={"name": "amount", "type": "Element", "help": "Amount"},
+        metadata=dict(
+            name="amount",
+            type="Element",
+            help="Amount",
+        )
     )
     currency: AlphaNumericStringLength1To3 = field(
         default=None,
-        metadata={"name": "currency", "type": "Element", "help": "Currency"},
+        metadata=dict(
+            name="currency",
+            type="Element",
+            help="Currency",
+        )
     )
 
 
@@ -2669,24 +2855,36 @@ class MonetaryInformationDetailsTypeI65141C:
 
     type_qualifier: AlphaNumericStringLength1To3 = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "typeQualifier",
-            "type": "Element",
-            "help": "Qualifier",
-        },
+        metadata=dict(
+            name="typeQualifier",
+            type="Element",
+            help="Qualifier",
+            required=True
+        )
     )
     amount: AlphaNumericStringLength1To12 = field(
         default=None,
-        metadata={"name": "amount", "type": "Element", "help": "Amount"},
+        metadata=dict(
+            name="amount",
+            type="Element",
+            help="Amount",
+        )
     )
     currency: AlphaNumericStringLength1To3 = field(
         default=None,
-        metadata={"name": "currency", "type": "Element", "help": "Currency"},
+        metadata=dict(
+            name="currency",
+            type="Element",
+            help="Currency",
+        )
     )
     location: AlphaNumericStringLength1To3 = field(
         default=None,
-        metadata={"name": "location", "type": "Element", "help": "Location"},
+        metadata=dict(
+            name="location",
+            type="Element",
+            help="Location",
+        )
     )
 
 
@@ -2698,20 +2896,20 @@ class MultiCityOptionType:
 
     location_id: AlphaStringLength3To5 = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "locationId",
-            "type": "Element",
-            "help": "ATA/IATA airport/city code of arrival multi city option enable to define until 20 airports/cities",
-        },
+        metadata=dict(
+            name="locationId",
+            type="Element",
+            help="ATA/IATA airport/city code of arrival multi city option enable to define until 20 airports/cities",
+            required=True
+        )
     )
     airport_city_qualifier: AlphaStringLength1To1 = field(
         default=None,
-        metadata={
-            "name": "airportCityQualifier",
-            "type": "Element",
-            "help": "Requested arrival point is an airport or a city (default is city and used only when ambiguity)",
-        },
+        metadata=dict(
+            name="airportCityQualifier",
+            type="Element",
+            help="Requested arrival point is an airport or a city (default is city and used only when ambiguity)",
+        )
     )
 
 
@@ -2723,19 +2921,19 @@ class MultipleIdentificationNumbersTypeI:
 
     corporate_number_identifier: AlphaNumericStringLength1To12 = field(
         default=None,
-        metadata={
-            "name": "corporateNumberIdentifier",
-            "type": "Element",
-            "help": "Corporate number or ALL.",
-        },
+        metadata=dict(
+            name="corporateNumberIdentifier",
+            type="Element",
+            help="Corporate number or ALL.",
+        )
     )
     corporate_name: AlphaNumericStringLength1To20 = field(
         default=None,
-        metadata={
-            "name": "corporateName",
-            "type": "Element",
-            "help": "Corporate name.",
-        },
+        metadata=dict(
+            name="corporateName",
+            type="Element",
+            help="Corporate name.",
+        )
     )
 
 
@@ -2743,20 +2941,20 @@ class MultipleIdentificationNumbersTypeI:
 class NumberOfUnitDetailsType:
     number_of_units: NumericIntegerLength1To4 = field(
         default=None,
-        metadata={
-            "name": "numberOfUnits",
-            "type": "Element",
-            "help": "Number of Units",
-        },
+        metadata=dict(
+            name="numberOfUnits",
+            type="Element",
+            help="Number of Units",
+        )
     )
     type_of_unit: AlphaNumericStringLength1To3 = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "typeOfUnit",
-            "type": "Element",
-            "help": "Number of unit qualifier",
-        },
+        metadata=dict(
+            name="typeOfUnit",
+            type="Element",
+            help="Number of unit qualifier",
+            required=True
+        )
     )
 
 
@@ -2764,21 +2962,21 @@ class NumberOfUnitDetailsType:
 class NumberOfUnitDetailsType270113C:
     number_of_units: NumericIntegerLength1To6 = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "numberOfUnits",
-            "type": "Element",
-            "help": "Number of Units",
-        },
+        metadata=dict(
+            name="numberOfUnits",
+            type="Element",
+            help="Number of Units",
+            required=True
+        )
     )
     type_of_unit: AlphaNumericStringLength1To3 = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "typeOfUnit",
-            "type": "Element",
-            "help": "Number of unit qualifier",
-        },
+        metadata=dict(
+            name="typeOfUnit",
+            type="Element",
+            help="Number of unit qualifier",
+            required=True
+        )
     )
 
 
@@ -2786,21 +2984,21 @@ class NumberOfUnitDetailsType270113C:
 class NumberOfUnitDetailsTypeI:
     number_of_units: NumericIntegerLength1To3 = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "numberOfUnits",
-            "type": "Element",
-            "help": "Number of Units",
-        },
+        metadata=dict(
+            name="numberOfUnits",
+            type="Element",
+            help="Number of Units",
+            required=True
+        )
     )
     type_of_unit: AlphaNumericStringLength1To3 = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "typeOfUnit",
-            "type": "Element",
-            "help": "Number of unit qualifier",
-        },
+        metadata=dict(
+            name="typeOfUnit",
+            type="Element",
+            help="Number of unit qualifier",
+            required=True
+        )
     )
 
 
@@ -2812,35 +3010,35 @@ class OriginatorIdentificationDetailsTypeI:
 
     office_name: NumericIntegerLength1To9 = field(
         default=None,
-        metadata={
-            "name": "officeName",
-            "type": "Element",
-            "help": "Office Name.",
-        },
+        metadata=dict(
+            name="officeName",
+            type="Element",
+            help="Office Name.",
+        )
     )
     agent_signin: AlphaNumericStringLength1To9 = field(
         default=None,
-        metadata={
-            "name": "agentSignin",
-            "type": "Element",
-            "help": "Agent Sign In .",
-        },
+        metadata=dict(
+            name="agentSignin",
+            type="Element",
+            help="Agent Sign In .",
+        )
     )
     confidential_office: AlphaNumericStringLength1To9 = field(
         default=None,
-        metadata={
-            "name": "confidentialOffice",
-            "type": "Element",
-            "help": "Confidential Office Name.",
-        },
+        metadata=dict(
+            name="confidentialOffice",
+            type="Element",
+            help="Confidential Office Name.",
+        )
     )
     other_office: AlphaNumericStringLength1To9 = field(
         default=None,
-        metadata={
-            "name": "otherOffice",
-            "type": "Element",
-            "help": "Other Office Name",
-        },
+        metadata=dict(
+            name="otherOffice",
+            type="Element",
+            help="Other Office Name",
+        )
     )
 
 
@@ -2852,15 +3050,19 @@ class PnrsegmentReferenceType:
 
     pnr_segment_tattoo: NumericIntegerLength0To35 = field(
         default=None,
-        metadata={
-            "name": "pnrSegmentTattoo",
-            "type": "Element",
-            "help": "For a request from PNR: this is the reference number of a PNR air segment. In case a range of PNR segments is specified (eg. segments 2-5), then it is the 1st of the range, the last being in ARR.",
-        },
+        metadata=dict(
+            name="pnrSegmentTattoo",
+            type="Element",
+            help="For a request from PNR: this is the reference number of a PNR air segment. In case a range of PNR segments is specified (eg. segments 2-5), then it is the 1st of the range, the last being in ARR.",
+        )
     )
     pnr_segment_qualifier: AlphaStringLength1To1 = field(
         default=None,
-        metadata={"name": "pnrSegmentQualifier", "type": "Element"},
+        metadata=dict(
+            name="pnrSegmentQualifier",
+            type="Element",
+            help=None,
+        )
     )
 
 
@@ -2872,13 +3074,13 @@ class PricingTicketingInformationType:
 
     price_type: List[AlphaNumericStringLength0To3] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 1,
-            "max_occurs": 50,
-            "name": "priceType",
-            "type": "Element",
-            "help": "Price type qualifier",
-        },
+        metadata=dict(
+            name="priceType",
+            type="Element",
+            help="Price type qualifier",
+            min_occurs=1,
+            max_occurs=50
+        )
     )
 
 
@@ -2890,15 +3092,20 @@ class ProductDateTimeType:
 
     date: DateDdmmyy = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "date",
-            "type": "Element",
-            "help": ".",
-        },
+        metadata=dict(
+            name="date",
+            type="Element",
+            help=".",
+            required=True
+        )
     )
     time: Time24Hhmm = field(
-        default=None, metadata={"name": "time", "type": "Element", "help": "."}
+        default=None,
+        metadata=dict(
+            name="time",
+            type="Element",
+            help=".",
+        )
     )
 
 
@@ -2906,44 +3113,44 @@ class ProductDateTimeType:
 class ProductDateTimeType195546C:
     date_of_departure: DateDdmmyy = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "dateOfDeparture",
-            "type": "Element",
-            "help": "Departure date",
-        },
+        metadata=dict(
+            name="dateOfDeparture",
+            type="Element",
+            help="Departure date",
+            required=True
+        )
     )
     time_of_departure: Time24Hhmm = field(
         default=None,
-        metadata={
-            "name": "timeOfDeparture",
-            "type": "Element",
-            "help": "Departure time",
-        },
+        metadata=dict(
+            name="timeOfDeparture",
+            type="Element",
+            help="Departure time",
+        )
     )
     date_of_arrival: DateDdmmyy = field(
         default=None,
-        metadata={
-            "name": "dateOfArrival",
-            "type": "Element",
-            "help": "Arrival date",
-        },
+        metadata=dict(
+            name="dateOfArrival",
+            type="Element",
+            help="Arrival date",
+        )
     )
     time_of_arrival: Time24Hhmm = field(
         default=None,
-        metadata={
-            "name": "timeOfArrival",
-            "type": "Element",
-            "help": "Arrival time",
-        },
+        metadata=dict(
+            name="timeOfArrival",
+            type="Element",
+            help="Arrival time",
+        )
     )
     date_variation: NumericIntegerLength1To1 = field(
         default=None,
-        metadata={
-            "name": "dateVariation",
-            "type": "Element",
-            "help": "Arrival date compared to departure date, only if different from 0",
-        },
+        metadata=dict(
+            name="dateVariation",
+            type="Element",
+            help="Arrival date compared to departure date, only if different from 0",
+        )
     )
 
 
@@ -2955,43 +3162,43 @@ class ProductDateTimeTypeI:
 
     departure_date: DateYyyymmdd = field(
         default=None,
-        metadata={
-            "name": "departureDate",
-            "type": "Element",
-            "help": "Departure date in YYYYMMDD format",
-        },
+        metadata=dict(
+            name="departureDate",
+            type="Element",
+            help="Departure date in YYYYMMDD format",
+        )
     )
     departure_time: Time24Hhmm = field(
         default=None,
-        metadata={
-            "name": "departureTime",
-            "type": "Element",
-            "help": "Departure time",
-        },
+        metadata=dict(
+            name="departureTime",
+            type="Element",
+            help="Departure time",
+        )
     )
     arrival_date: DateYyyymmdd = field(
         default=None,
-        metadata={
-            "name": "arrivalDate",
-            "type": "Element",
-            "help": "Arrival date",
-        },
+        metadata=dict(
+            name="arrivalDate",
+            type="Element",
+            help="Arrival date",
+        )
     )
     arrival_time: Time24Hhmm = field(
         default=None,
-        metadata={
-            "name": "arrivalTime",
-            "type": "Element",
-            "help": "Arrival time",
-        },
+        metadata=dict(
+            name="arrivalTime",
+            type="Element",
+            help="Arrival time",
+        )
     )
     date_variation: NumericIntegerLength1To1 = field(
         default=None,
-        metadata={
-            "name": "dateVariation",
-            "type": "Element",
-            "help": "Day difference between Departure date of the leg and date of reference (Departure or Arrival date specified in the SDI)",
-        },
+        metadata=dict(
+            name="dateVariation",
+            type="Element",
+            help="Day difference between Departure date of the leg and date of reference (Departure or Arrival date specified in the SDI)",
+        )
     )
 
 
@@ -3003,20 +3210,20 @@ class ProductDateTimeTypeI194583C:
 
     date: DateDdmmyy = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "date",
-            "type": "Element",
-            "help": "Ticketing Purchase Date",
-        },
+        metadata=dict(
+            name="date",
+            type="Element",
+            help="Ticketing Purchase Date",
+            required=True
+        )
     )
     other_date: DateDdmmyy = field(
         default=None,
-        metadata={
-            "name": "otherDate",
-            "type": "Element",
-            "help": "Ticketing purchase date",
-        },
+        metadata=dict(
+            name="otherDate",
+            type="Element",
+            help="Ticketing purchase date",
+        )
     )
 
 
@@ -3024,20 +3231,20 @@ class ProductDateTimeTypeI194583C:
 class ProductDateTimeTypeI194598C:
     date: DateDdmmyy = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "date",
-            "type": "Element",
-            "help": "First date",
-        },
+        metadata=dict(
+            name="date",
+            type="Element",
+            help="First date",
+            required=True
+        )
     )
     rtc_date: DateDdmmyy = field(
         default=None,
-        metadata={
-            "name": "rtcDate",
-            "type": "Element",
-            "help": "Half round trip combination.",
-        },
+        metadata=dict(
+            name="rtcDate",
+            type="Element",
+            help="Half round trip combination.",
+        )
     )
 
 
@@ -3049,53 +3256,53 @@ class ProductFacilitiesType:
 
     last_seat_available: AlphaStringLength1To1 = field(
         default=None,
-        metadata={
-            "name": "lastSeatAvailable",
-            "type": "Element",
-            "help": "Yes-No indicator whether Last Seat Available",
-        },
+        metadata=dict(
+            name="lastSeatAvailable",
+            type="Element",
+            help="Yes-No indicator whether Last Seat Available",
+        )
     )
     level_of_access: AlphaNumericStringLength1To3 = field(
         default=None,
-        metadata={
-            "name": "levelOfAccess",
-            "type": "Element",
-            "help": "Level of access",
-        },
+        metadata=dict(
+            name="levelOfAccess",
+            type="Element",
+            help="Level of access",
+        )
     )
     electronic_ticketing: AlphaStringLength1To1 = field(
         default=None,
-        metadata={
-            "name": "electronicTicketing",
-            "type": "Element",
-            "help": "Yes-No indicator whether electronic ticketing",
-        },
+        metadata=dict(
+            name="electronicTicketing",
+            type="Element",
+            help="Yes-No indicator whether electronic ticketing",
+        )
     )
     operational_suffix: AlphaStringLength1To1 = field(
         default=None,
-        metadata={
-            "name": "operationalSuffix",
-            "type": "Element",
-            "help": "Product identification suffix",
-        },
+        metadata=dict(
+            name="operationalSuffix",
+            type="Element",
+            help="Product identification suffix",
+        )
     )
     product_detail_qualifier: AlphaNumericStringLength1To3 = field(
         default=None,
-        metadata={
-            "name": "productDetailQualifier",
-            "type": "Element",
-            "help": "Define whether a flight has been polled or not",
-        },
+        metadata=dict(
+            name="productDetailQualifier",
+            type="Element",
+            help="Define whether a flight has been polled or not",
+        )
     )
     flight_characteristic: List[AlphaNumericStringLength1To3] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 9,
-            "name": "flightCharacteristic",
-            "type": "Element",
-            "help": "Add some flight restrictions (See code set list)",
-        },
+        metadata=dict(
+            name="flightCharacteristic",
+            type="Element",
+            help="Add some flight restrictions (See code set list)",
+            min_occurs=0,
+            max_occurs=9
+        )
     )
 
 
@@ -3107,20 +3314,20 @@ class ProductIdentificationDetailsTypeI:
 
     flight_number: NumericIntegerLength1To4 = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "flightNumber",
-            "type": "Element",
-            "help": "Flight number",
-        },
+        metadata=dict(
+            name="flightNumber",
+            type="Element",
+            help="Flight number",
+            required=True
+        )
     )
     operational_suffix: AlphaStringLength1To1 = field(
         default=None,
-        metadata={
-            "name": "operationalSuffix",
-            "type": "Element",
-            "help": "Flight suffix",
-        },
+        metadata=dict(
+            name="operationalSuffix",
+            type="Element",
+            help="Flight suffix",
+        )
     )
 
 
@@ -3132,22 +3339,38 @@ class ProductIdentificationDetailsTypeI50878C:
 
     flight_number: AlphaNumericStringLength1To5 = field(
         default=None,
-        metadata={"required": True, "name": "flightNumber", "type": "Element"},
+        metadata=dict(
+            name="flightNumber",
+            type="Element",
+            help=None,
+            required=True
+        )
     )
     booking_class: AlphaNumericStringLength1To2 = field(
-        default=None, metadata={"name": "bookingClass", "type": "Element"}
+        default=None,
+        metadata=dict(
+            name="bookingClass",
+            type="Element",
+            help=None,
+        )
     )
     operational_suffix: AlphaNumericStringLength1To3 = field(
-        default=None, metadata={"name": "operationalSuffix", "type": "Element"}
+        default=None,
+        metadata=dict(
+            name="operationalSuffix",
+            type="Element",
+            help=None,
+        )
     )
     modifier: List[AlphaNumericStringLength1To7] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 3,
-            "name": "modifier",
-            "type": "Element",
-        },
+        metadata=dict(
+            name="modifier",
+            type="Element",
+            help=None,
+            min_occurs=0,
+            max_occurs=3
+        )
     )
 
 
@@ -3159,7 +3382,11 @@ class ProductLocationDetailsTypeI:
 
     station: AlphaStringLength3To3 = field(
         default=None,
-        metadata={"name": "station", "type": "Element", "help": "airport"},
+        metadata=dict(
+            name="station",
+            type="Element",
+            help="airport",
+        )
     )
 
 
@@ -3171,15 +3398,19 @@ class ProductTypeDetailsType:
 
     sequence_number: AlphaNumericStringLength1To6 = field(
         default=None,
-        metadata={"name": "sequenceNumber", "type": "Element", "help": "."},
+        metadata=dict(
+            name="sequenceNumber",
+            type="Element",
+            help=".",
+        )
     )
     availability_context: AlphaNumericStringLength1To6 = field(
         default=None,
-        metadata={
-            "name": "availabilityContext",
-            "type": "Element",
-            "help": "PNR availability context",
-        },
+        metadata=dict(
+            name="availabilityContext",
+            type="Element",
+            help="PNR availability context",
+        )
     )
 
 
@@ -3187,13 +3418,13 @@ class ProductTypeDetailsType:
 class ProductTypeDetailsType120801C:
     flight_type: List[AlphaNumericStringLength1To2] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 9,
-            "name": "flightType",
-            "type": "Element",
-            "help": "Type of flight",
-        },
+        metadata=dict(
+            name="flightType",
+            type="Element",
+            help="Type of flight",
+            min_occurs=0,
+            max_occurs=9
+        )
     )
 
 
@@ -3205,13 +3436,13 @@ class ProductTypeDetailsType205137C:
 
     avl: List[AlphaNumericStringLength1To6] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 1,
-            "max_occurs": 9,
-            "name": "avl",
-            "type": "Element",
-            "help": "indicates whether the flight is domestic or international",
-        },
+        metadata=dict(
+            name="avl",
+            type="Element",
+            help="indicates whether the flight is domestic or international",
+            min_occurs=1,
+            max_occurs=9
+        )
     )
 
 
@@ -3223,13 +3454,13 @@ class ProductTypeDetailsTypeI:
 
     flight_indicator: List[AlphaStringLength1To3] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 1,
-            "max_occurs": 5,
-            "name": "flightIndicator",
-            "type": "Element",
-            "help": "Part of the journey (C,E,S), Codeshare service (A), Technical stop at off point in a Direct (TSD), Technical stop at off point in a COG (TSC), E-Ticket candidate (ET), Prohibited Countries (RPC, WPC)",
-        },
+        metadata=dict(
+            name="flightIndicator",
+            type="Element",
+            help="Part of the journey (C,E,S), Codeshare service (A), Technical stop at off point in a Direct (TSD), Technical stop at off point in a COG (TSC), E-Ticket candidate (ET), Prohibited Countries (RPC, WPC)",
+            min_occurs=1,
+            max_occurs=5
+        )
     )
 
 
@@ -3237,19 +3468,19 @@ class ProductTypeDetailsTypeI:
 class ProposedSegmentDetailsType:
     ref: AlphaNumericStringLength1To6 = field(
         default=None,
-        metadata={
-            "name": "ref",
-            "type": "Element",
-            "help": "Flight proposal reference",
-        },
+        metadata=dict(
+            name="ref",
+            type="Element",
+            help="Flight proposal reference",
+        )
     )
     unit_qualifier: AlphaNumericStringLength1To3 = field(
         default=None,
-        metadata={
-            "name": "unitQualifier",
-            "type": "Element",
-            "help": "Elapse Flying Time",
-        },
+        metadata=dict(
+            name="unitQualifier",
+            type="Element",
+            help="Elapse Flying Time",
+        )
     )
 
 
@@ -3261,20 +3492,20 @@ class ReferencingDetailsType:
 
     ref_qualifier: AlphaNumericStringLength1To3 = field(
         default=None,
-        metadata={
-            "name": "refQualifier",
-            "type": "Element",
-            "help": "Segment reference qualifier",
-        },
+        metadata=dict(
+            name="refQualifier",
+            type="Element",
+            help="Segment reference qualifier",
+        )
     )
     ref_number: NumericIntegerLength0To3 = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "refNumber",
-            "type": "Element",
-            "help": "Flight or flight group reference",
-        },
+        metadata=dict(
+            name="refNumber",
+            type="Element",
+            help="Flight or flight group reference",
+            required=True
+        )
     )
 
 
@@ -3286,11 +3517,11 @@ class SegmentRepetitionControlDetailsTypeI:
 
     quantity: NumericIntegerLength1To15 = field(
         default=None,
-        metadata={
-            "name": "quantity",
-            "type": "Element",
-            "help": "traveller number",
-        },
+        metadata=dict(
+            name="quantity",
+            type="Element",
+            help="traveller number",
+        )
     )
 
 
@@ -3302,20 +3533,20 @@ class SelectionDetailsInformationType:
 
     type: AlphaNumericStringLength1To3 = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "type",
-            "type": "Element",
-            "help": "Carrier fee type",
-        },
+        metadata=dict(
+            name="type",
+            type="Element",
+            help="Carrier fee type",
+            required=True
+        )
     )
     option_information: AlphaNumericStringLength1To3 = field(
         default=None,
-        metadata={
-            "name": "optionInformation",
-            "type": "Element",
-            "help": "Carrier fee status",
-        },
+        metadata=dict(
+            name="optionInformation",
+            type="Element",
+            help="Carrier fee status",
+        )
     )
 
 
@@ -3327,10 +3558,20 @@ class SelectionDetailsInformationTypeI:
 
     option: AlphaNumericStringLength1To3 = field(
         default=None,
-        metadata={"required": True, "name": "option", "type": "Element"},
+        metadata=dict(
+            name="option",
+            type="Element",
+            help=None,
+            required=True
+        )
     )
     option_information: AlphaNumericStringLength1To35 = field(
-        default=None, metadata={"name": "optionInformation", "type": "Element"}
+        default=None,
+        metadata=dict(
+            name="optionInformation",
+            type="Element",
+            help=None,
+        )
     )
 
 
@@ -3342,13 +3583,13 @@ class SpecialRequirementsDataDetailsType:
 
     seat_characteristics: List[AlphaNumericStringLength1To2] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 5,
-            "name": "seatCharacteristics",
-            "type": "Element",
-            "help": "SSR seat characteristic",
-        },
+        metadata=dict(
+            name="seatCharacteristics",
+            type="Element",
+            help="SSR seat characteristic",
+            min_occurs=0,
+            max_occurs=5
+        )
     )
 
 
@@ -3356,62 +3597,62 @@ class SpecialRequirementsDataDetailsType:
 class SpecialRequirementsTypeDetailsType:
     service_classification: AlphaNumericStringLength1To4 = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "serviceClassification",
-            "type": "Element",
-            "help": "To specify the Service Classification of the Service Requirement.",
-        },
+        metadata=dict(
+            name="serviceClassification",
+            type="Element",
+            help="To specify the Service Classification of the Service Requirement.",
+            required=True
+        )
     )
     service_status: AlphaNumericStringLength1To3 = field(
         default=None,
-        metadata={
-            "name": "serviceStatus",
-            "type": "Element",
-            "help": "Status",
-        },
+        metadata=dict(
+            name="serviceStatus",
+            type="Element",
+            help="Status",
+        )
     )
     service_number_of_instances: NumericIntegerLength1To15 = field(
         default=None,
-        metadata={
-            "name": "serviceNumberOfInstances",
-            "type": "Element",
-            "help": "To specify the number of items involved",
-        },
+        metadata=dict(
+            name="serviceNumberOfInstances",
+            type="Element",
+            help="To specify the number of items involved",
+        )
     )
     service_marketing_carrier: AlphaNumericStringLength1To3 = field(
         default=None,
-        metadata={
-            "name": "serviceMarketingCarrier",
-            "type": "Element",
-            "help": "To specify to which marketing carrier the service applies",
-        },
+        metadata=dict(
+            name="serviceMarketingCarrier",
+            type="Element",
+            help="To specify to which marketing carrier the service applies",
+        )
     )
     service_group: AlphaNumericStringLength1To3 = field(
         default=None,
-        metadata={
-            "name": "serviceGroup",
-            "type": "Element",
-            "help": "Specify the Service group",
-        },
+        metadata=dict(
+            name="serviceGroup",
+            type="Element",
+            help="Specify the Service group",
+        )
     )
     service_sub_group: AlphaNumericStringLength1To3 = field(
         default=None,
-        metadata={
-            "name": "serviceSubGroup",
-            "type": "Element",
-            "help": "Specify the Service Sub-Group",
-        },
+        metadata=dict(
+            name="serviceSubGroup",
+            type="Element",
+            help="Specify the Service Sub-Group",
+        )
     )
     service_free_text: List[AlphaNumericStringLength1To70] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 99,
-            "name": "serviceFreeText",
-            "type": "Element",
-            "help": "Free Text attached to the Service.",
-        },
+        metadata=dict(
+            name="serviceFreeText",
+            type="Element",
+            help="Free Text attached to the Service.",
+            min_occurs=0,
+            max_occurs=99
+        )
     )
 
 
@@ -3423,11 +3664,11 @@ class StationInformationTypeI:
 
     terminal: AlphaNumericStringLength1To3 = field(
         default=None,
-        metadata={
-            "name": "terminal",
-            "type": "Element",
-            "help": "Departure terminal",
-        },
+        metadata=dict(
+            name="terminal",
+            type="Element",
+            help="Departure terminal",
+        )
     )
 
 
@@ -3439,27 +3680,27 @@ class StructuredDateTimeType:
 
     year: NumericIntegerLength4To4 = field(
         default=None,
-        metadata={
-            "name": "year",
-            "type": "Element",
-            "help": "Year number. The format is a little long for short term usage but it can be reduced by implementation if required.",
-        },
+        metadata=dict(
+            name="year",
+            type="Element",
+            help="Year number. The format is a little long for short term usage but it can be reduced by implementation if required.",
+        )
     )
     month: NumericIntegerLength1To2 = field(
         default=None,
-        metadata={
-            "name": "month",
-            "type": "Element",
-            "help": "Month number in the year ( begins to 1 )",
-        },
+        metadata=dict(
+            name="month",
+            type="Element",
+            help="Month number in the year ( begins to 1 )",
+        )
     )
     day: NumericIntegerLength1To2 = field(
         default=None,
-        metadata={
-            "name": "day",
-            "type": "Element",
-            "help": "Day number in the month ( begins to 1 )",
-        },
+        metadata=dict(
+            name="day",
+            type="Element",
+            help="Day number in the month ( begins to 1 )",
+        )
     )
 
 
@@ -3467,43 +3708,43 @@ class StructuredDateTimeType:
 class TaxDetailsTypeI:
     rate: AlphaNumericStringLength1To18 = field(
         default=None,
-        metadata={
-            "name": "rate",
-            "type": "Element",
-            "help": "Duty/tax/fee rate",
-        },
+        metadata=dict(
+            name="rate",
+            type="Element",
+            help="Duty/tax/fee rate",
+        )
     )
     country: AlphaNumericStringLength1To3 = field(
         default=None,
-        metadata={
-            "name": "country",
-            "type": "Element",
-            "help": "Country, coded",
-        },
+        metadata=dict(
+            name="country",
+            type="Element",
+            help="Country, coded",
+        )
     )
     currency: AlphaNumericStringLength1To3 = field(
         default=None,
-        metadata={
-            "name": "currency",
-            "type": "Element",
-            "help": "Currency, coded",
-        },
+        metadata=dict(
+            name="currency",
+            type="Element",
+            help="Currency, coded",
+        )
     )
     type: AlphaNumericStringLength1To3 = field(
         default=None,
-        metadata={
-            "name": "type",
-            "type": "Element",
-            "help": "Duty/Tax fee type, coded",
-        },
+        metadata=dict(
+            name="type",
+            type="Element",
+            help="Duty/Tax fee type, coded",
+        )
     )
     amount_qualifier: AlphaNumericStringLength1To3 = field(
         default=None,
-        metadata={
-            "name": "amountQualifier",
-            "type": "Element",
-            "help": "Amount type qualifier, coded",
-        },
+        metadata=dict(
+            name="amountQualifier",
+            type="Element",
+            help="Amount type qualifier, coded",
+        )
     )
 
 
@@ -3514,7 +3755,12 @@ class TicketNumberDetailsTypeI:
     """
 
     number: AlphaNumericStringLength1To35 = field(
-        default=None, metadata={"name": "number", "type": "Element"}
+        default=None,
+        metadata=dict(
+            name="number",
+            type="Element",
+            help=None,
+        )
     )
 
 
@@ -3526,36 +3772,36 @@ class TicketingPriceSchemeType:
 
     reference_number: AlphaNumericStringLength1To35 = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "referenceNumber",
-            "type": "Element",
-            "help": "PSR (Price Scheme Reference): unique reference of the price scheme as a 8 digit number.",
-        },
+        metadata=dict(
+            name="referenceNumber",
+            type="Element",
+            help="PSR (Price Scheme Reference): unique reference of the price scheme as a 8 digit number.",
+            required=True
+        )
     )
     name: AlphaNumericStringLength1To35 = field(
         default=None,
-        metadata={
-            "name": "name",
-            "type": "Element",
-            "help": "Price Scheme Name",
-        },
+        metadata=dict(
+            name="name",
+            type="Element",
+            help="Price Scheme Name",
+        )
     )
     status: AlphaNumericStringLength1To3 = field(
         default=None,
-        metadata={
-            "name": "status",
-            "type": "Element",
-            "help": "Price Scheme Status. Is the price scheme valid for service fee calculation ?",
-        },
+        metadata=dict(
+            name="status",
+            type="Element",
+            help="Price Scheme Status. Is the price scheme valid for service fee calculation ?",
+        )
     )
     description: AlphaNumericStringLength1To250 = field(
         default=None,
-        metadata={
-            "name": "description",
-            "type": "Element",
-            "help": "free flow description of the price scheme",
-        },
+        metadata=dict(
+            name="description",
+            type="Element",
+            help="free flow description of the price scheme",
+        )
     )
 
 
@@ -3567,11 +3813,11 @@ class TrafficRestrictionDetailsTypeI:
 
     code: AlphaNumericStringLength1To3 = field(
         default=None,
-        metadata={
-            "name": "code",
-            "type": "Element",
-            "help": "Traffic Restriction code",
-        },
+        metadata=dict(
+            name="code",
+            type="Element",
+            help="Traffic Restriction code",
+        )
     )
 
 
@@ -3579,20 +3825,20 @@ class TrafficRestrictionDetailsTypeI:
 class TravellerDetailsType:
     ref: NumericIntegerLength1To3 = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "ref",
-            "type": "Element",
-            "help": "Direct reference of passenger assigned by requesting system.",
-        },
+        metadata=dict(
+            name="ref",
+            type="Element",
+            help="Direct reference of passenger assigned by requesting system.",
+            required=True
+        )
     )
     infant_indicator: NumericIntegerLength1To1 = field(
         default=None,
-        metadata={
-            "name": "infantIndicator",
-            "type": "Element",
-            "help": "Traveller is an infant",
-        },
+        metadata=dict(
+            name="infantIndicator",
+            type="Element",
+            help="Traveller is an infant",
+        )
     )
 
 
@@ -3600,11 +3846,11 @@ class TravellerDetailsType:
 class UniqueIdDescriptionType:
     passenger_fee_ref_qualif: AlphaNumericStringLength1To3 = field(
         default=None,
-        metadata={
-            "name": "passengerFeeRefQualif",
-            "type": "Element",
-            "help": "Reference qualifier.",
-        },
+        metadata=dict(
+            name="passengerFeeRefQualif",
+            type="Element",
+            help="Reference qualifier.",
+        )
     )
 
 
@@ -3616,15 +3862,20 @@ class ActionIdentificationType:
 
     action_request_code: AlphaNumericStringLength1To3 = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "actionRequestCode",
-            "type": "Element",
-            "help": "Action request code",
-        },
+        metadata=dict(
+            name="actionRequestCode",
+            type="Element",
+            help="Action request code",
+            required=True
+        )
     )
     product_details: ProductIdentificationDetailsTypeI50878C = field(
-        default=None, metadata={"name": "productDetails", "type": "Element"}
+        default=None,
+        metadata=dict(
+            name="productDetails",
+            type="Element",
+            help=None,
+        )
     )
 
 
@@ -3636,31 +3887,35 @@ class AdditionalProductDetailsTypeI:
 
     leg_details: AdditionalProductTypeI = field(
         default=None,
-        metadata={
-            "name": "legDetails",
-            "type": "Element",
-            "help": "Flight details",
-        },
+        metadata=dict(
+            name="legDetails",
+            type="Element",
+            help="Flight details",
+        )
     )
     departure_station_info: StationInformationTypeI = field(
         default=None,
-        metadata={
-            "name": "departureStationInfo",
-            "type": "Element",
-            "help": "Departure station",
-        },
+        metadata=dict(
+            name="departureStationInfo",
+            type="Element",
+            help="Departure station",
+        )
     )
     arrival_station_info: StationInformationTypeI = field(
         default=None,
-        metadata={"name": "arrivalStationInfo", "type": "Element"},
+        metadata=dict(
+            name="arrivalStationInfo",
+            type="Element",
+            help=None,
+        )
     )
     mileage_time_details: MileageTimeDetailsTypeI = field(
         default=None,
-        metadata={
-            "name": "mileageTimeDetails",
-            "type": "Element",
-            "help": "Ground Time Details when connection",
-        },
+        metadata=dict(
+            name="mileageTimeDetails",
+            type="Element",
+            help="Ground Time Details when connection",
+        )
     )
 
 
@@ -3672,31 +3927,31 @@ class ArrivalLocalizationType:
 
     arrival_point_details: ArrivalLocationDetailsType = field(
         default=None,
-        metadata={
-            "name": "arrivalPointDetails",
-            "type": "Element",
-            "help": "Details on the location of the arrival point",
-        },
+        metadata=dict(
+            name="arrivalPointDetails",
+            type="Element",
+            help="Details on the location of the arrival point",
+        )
     )
     arrival_multi_city: List[MultiCityOptionType] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 20,
-            "name": "arrivalMultiCity",
-            "type": "Element",
-            "help": "Arrival multi city option",
-        },
+        metadata=dict(
+            name="arrivalMultiCity",
+            type="Element",
+            help="Arrival multi city option",
+            min_occurs=0,
+            max_occurs=20
+        )
     )
     attribute_details: List[CodedAttributeInformationType139508C] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 20,
-            "name": "attributeDetails",
-            "type": "Element",
-            "help": "Attribute details",
-        },
+        metadata=dict(
+            name="attributeDetails",
+            type="Element",
+            help="Attribute details",
+            min_occurs=0,
+            max_occurs=20
+        )
     )
 
 
@@ -3708,13 +3963,13 @@ class AttributeType:
 
     selection_details: List[AttributeInformationType] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 1,
-            "max_occurs": 10,
-            "name": "selectionDetails",
-            "type": "Element",
-            "help": "Option parameters",
-        },
+        metadata=dict(
+            name="selectionDetails",
+            type="Element",
+            help="Option parameters",
+            min_occurs=1,
+            max_occurs=10
+        )
     )
 
 
@@ -3726,21 +3981,21 @@ class AttributeType61377S:
 
     attribute_qualifier: AlphaNumericStringLength1To3 = field(
         default=None,
-        metadata={
-            "name": "attributeQualifier",
-            "type": "Element",
-            "help": "Criteria Set Type",
-        },
+        metadata=dict(
+            name="attributeQualifier",
+            type="Element",
+            help="Criteria Set Type",
+        )
     )
     attribute_details: List[AttributeInformationType97181C] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 1,
-            "max_occurs": 99,
-            "name": "attributeDetails",
-            "type": "Element",
-            "help": "Criteria details",
-        },
+        metadata=dict(
+            name="attributeDetails",
+            type="Element",
+            help="Criteria details",
+            min_occurs=1,
+            max_occurs=99
+        )
     )
 
 
@@ -3752,12 +4007,12 @@ class BooleanExpressionRuleType:
 
     boolean_expression: ArithmeticEvaluationType = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "booleanExpression",
-            "type": "Element",
-            "help": "Boolean expression associated to the decision rule.",
-        },
+        metadata=dict(
+            name="booleanExpression",
+            type="Element",
+            help="Boolean expression associated to the decision rule.",
+            required=True
+        )
     )
 
 
@@ -3765,25 +4020,29 @@ class BooleanExpressionRuleType:
 class BucketDetailsType:
     code: AlphaNumericStringLength1To3 = field(
         default=None,
-        metadata={"name": "code", "type": "Element", "help": "Code"},
+        metadata=dict(
+            name="code",
+            type="Element",
+            help="Code",
+        )
     )
     type: AlphaNumericStringLength1To3 = field(
         default=None,
-        metadata={
-            "name": "type",
-            "type": "Element",
-            "help": "Option or distribution",
-        },
+        metadata=dict(
+            name="type",
+            type="Element",
+            help="Option or distribution",
+        )
     )
     attribute: List[AttributeDetailsType] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 10,
-            "name": "attribute",
-            "type": "Element",
-            "help": "Attribute",
-        },
+        metadata=dict(
+            name="attribute",
+            type="Element",
+            help="Attribute",
+            min_occurs=0,
+            max_occurs=10
+        )
     )
 
 
@@ -3795,13 +4054,13 @@ class CodedAttributeType:
 
     attribute_details: List[CodedAttributeInformationType254574C] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 1,
-            "max_occurs": 9,
-            "name": "attributeDetails",
-            "type": "Element",
-            "help": "Attribute details",
-        },
+        metadata=dict(
+            name="attributeDetails",
+            type="Element",
+            help="Attribute details",
+            min_occurs=1,
+            max_occurs=9
+        )
     )
 
 
@@ -3813,13 +4072,13 @@ class CodedAttributeType197696S:
 
     fee_id: List[CodedAttributeInformationType275401C] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 20,
-            "name": "feeId",
-            "type": "Element",
-            "help": "Fee/reduction Id",
-        },
+        metadata=dict(
+            name="feeId",
+            type="Element",
+            help="Fee/reduction Id",
+            min_occurs=0,
+            max_occurs=20
+        )
     )
 
 
@@ -3831,13 +4090,13 @@ class CodedAttributeType78500S:
 
     attribute_details: List[CodedAttributeInformationType] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 1,
-            "max_occurs": 20,
-            "name": "attributeDetails",
-            "type": "Element",
-            "help": "Atrribute details.",
-        },
+        metadata=dict(
+            name="attributeDetails",
+            type="Element",
+            help="Atrribute details.",
+            min_occurs=1,
+            max_occurs=20
+        )
     )
 
 
@@ -3849,22 +4108,22 @@ class CommercialAgreementsType:
 
     codeshare_details: CompanyRoleIdentificationType = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "codeshareDetails",
-            "type": "Element",
-            "help": "Codeshare Details",
-        },
+        metadata=dict(
+            name="codeshareDetails",
+            type="Element",
+            help="Codeshare Details",
+            required=True
+        )
     )
     other_codeshare_details: List[CompanyRoleIdentificationType] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 8,
-            "name": "otherCodeshareDetails",
-            "type": "Element",
-            "help": "Other codeshare details",
-        },
+        metadata=dict(
+            name="otherCodeshareDetails",
+            type="Element",
+            help="Other codeshare details",
+            min_occurs=0,
+            max_occurs=8
+        )
     )
 
 
@@ -3876,23 +4135,21 @@ class CommercialAgreementsType78540S:
 
     codeshare_details: CompanyRoleIdentificationType120761C = field(
         default=None,
-        metadata={
-            "name": "codeshareDetails",
-            "type": "Element",
-            "help": "Codeshare Details",
-        },
+        metadata=dict(
+            name="codeshareDetails",
+            type="Element",
+            help="Codeshare Details",
+        )
     )
-    other_codeshare_details: List[
-        CompanyRoleIdentificationType120761C
-    ] = field(
+    other_codeshare_details: List[CompanyRoleIdentificationType120761C] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 9,
-            "name": "otherCodeshareDetails",
-            "type": "Element",
-            "help": "Other codeshare details",
-        },
+        metadata=dict(
+            name="otherCodeshareDetails",
+            type="Element",
+            help="Other codeshare details",
+            min_occurs=0,
+            max_occurs=9
+        )
     )
 
 
@@ -3904,13 +4161,13 @@ class ConnectionTypeI:
 
     connection_details: List[ConnectionDetailsTypeI] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 1,
-            "max_occurs": 17,
-            "name": "connectionDetails",
-            "type": "Element",
-            "help": "Connection details.",
-        },
+        metadata=dict(
+            name="connectionDetails",
+            type="Element",
+            help="Connection details.",
+            min_occurs=1,
+            max_occurs=17
+        )
     )
 
 
@@ -3922,13 +4179,13 @@ class ConsumerReferenceInformationType:
 
     customer_references: List[ConsumerReferenceIdentificationTypeI] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 1,
-            "max_occurs": 20,
-            "name": "customerReferences",
-            "type": "Element",
-            "help": "Customer references",
-        },
+        metadata=dict(
+            name="customerReferences",
+            type="Element",
+            help="Customer references",
+            min_occurs=1,
+            max_occurs=20
+        )
     )
 
 
@@ -3940,13 +4197,13 @@ class ConversionRateType:
 
     conversion_rate_detail: List[ConversionRateDetailsType] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 1,
-            "max_occurs": 2,
-            "name": "conversionRateDetail",
-            "type": "Element",
-            "help": "Detail of conversion rate of First Monetary Unit",
-        },
+        metadata=dict(
+            name="conversionRateDetail",
+            type="Element",
+            help="Detail of conversion rate of First Monetary Unit",
+            min_occurs=1,
+            max_occurs=2
+        )
     )
 
 
@@ -3958,11 +4215,11 @@ class CorporateFareInformationType:
 
     corporate_fare_identifiers: CorporateFareIdentifiersType = field(
         default=None,
-        metadata={
-            "name": "corporateFareIdentifiers",
-            "type": "Element",
-            "help": "Corporate fare identifiers",
-        },
+        metadata=dict(
+            name="corporateFareIdentifiers",
+            type="Element",
+            help="Corporate fare identifiers",
+        )
     )
 
 
@@ -3974,13 +4231,13 @@ class CorporateIdentificationType:
 
     corporate_id: List[CorporateIdentityType] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 20,
-            "name": "corporateId",
-            "type": "Element",
-            "help": "Corporate identity",
-        },
+        metadata=dict(
+            name="corporateId",
+            type="Element",
+            help="Corporate identity",
+            min_occurs=0,
+            max_occurs=20
+        )
     )
 
 
@@ -3992,13 +4249,13 @@ class DateAndTimeInformationType:
 
     stop_details: List[DateAndTimeDetailsType120762C] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 1,
-            "max_occurs": 2,
-            "name": "stopDetails",
-            "type": "Element",
-            "help": "Details on date and time",
-        },
+        metadata=dict(
+            name="stopDetails",
+            type="Element",
+            help="Details on date and time",
+            min_occurs=1,
+            max_occurs=2
+        )
     )
 
 
@@ -4010,28 +4267,28 @@ class DateAndTimeInformationType181295S:
 
     first_date_time_detail: DateAndTimeDetailsTypeI = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "firstDateTimeDetail",
-            "type": "Element",
-            "help": "Details on date and Time",
-        },
+        metadata=dict(
+            name="firstDateTimeDetail",
+            type="Element",
+            help="Details on date and Time",
+            required=True
+        )
     )
     range_of_date: DateAndTimeDetailsType254619C = field(
         default=None,
-        metadata={
-            "name": "rangeOfDate",
-            "type": "Element",
-            "help": "Details of the Requested Range of Dates",
-        },
+        metadata=dict(
+            name="rangeOfDate",
+            type="Element",
+            help="Details of the Requested Range of Dates",
+        )
     )
     trip_details: DateAndTimeDetailsType = field(
         default=None,
-        metadata={
-            "name": "tripDetails",
-            "type": "Element",
-            "help": "Details of the trip duration",
-        },
+        metadata=dict(
+            name="tripDetails",
+            type="Element",
+            help="Details of the trip duration",
+        )
     )
 
 
@@ -4043,13 +4300,13 @@ class DateAndTimeInformationTypeI:
 
     date_time_details: List[DateAndTimeDetailsTypeI120740C] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 2,
-            "name": "dateTimeDetails",
-            "type": "Element",
-            "help": "DATE AND TIME DETAILS.",
-        },
+        metadata=dict(
+            name="dateTimeDetails",
+            type="Element",
+            help="DATE AND TIME DETAILS.",
+            min_occurs=0,
+            max_occurs=2
+        )
     )
 
 
@@ -4061,39 +4318,39 @@ class DepartureLocationType:
 
     departure_point: ArrivalLocationDetailsType120834C = field(
         default=None,
-        metadata={
-            "name": "departurePoint",
-            "type": "Element",
-            "help": "Details on localization of the departure point",
-        },
+        metadata=dict(
+            name="departurePoint",
+            type="Element",
+            help="Details on localization of the departure point",
+        )
     )
     dep_multi_city: List[MultiCityOptionType] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 20,
-            "name": "depMultiCity",
-            "type": "Element",
-            "help": "Departure multi city option",
-        },
+        metadata=dict(
+            name="depMultiCity",
+            type="Element",
+            help="Departure multi city option",
+            min_occurs=0,
+            max_occurs=20
+        )
     )
     first_pnr_segment_ref: PnrsegmentReferenceType = field(
         default=None,
-        metadata={
-            "name": "firstPnrSegmentRef",
-            "type": "Element",
-            "help": "To specify a series or a range of PNR segments",
-        },
+        metadata=dict(
+            name="firstPnrSegmentRef",
+            type="Element",
+            help="To specify a series or a range of PNR segments",
+        )
     )
     attribute_details: List[CodedAttributeInformationType139508C] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 20,
-            "name": "attributeDetails",
-            "type": "Element",
-            "help": "Attribute details",
-        },
+        metadata=dict(
+            name="attributeDetails",
+            type="Element",
+            help="Attribute details",
+            min_occurs=0,
+            max_occurs=20
+        )
     )
 
 
@@ -4105,89 +4362,89 @@ class FareFamilyCriteriaType:
 
     carrier_id: List[AlphaNumericStringLength1To3] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 20,
-            "name": "carrierId",
-            "type": "Element",
-            "help": "Fare publishing carrier.",
-        },
+        metadata=dict(
+            name="carrierId",
+            type="Element",
+            help="Fare publishing carrier.",
+            min_occurs=0,
+            max_occurs=20
+        )
     )
     rdb: List[AlphaStringLength1To2] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 20,
-            "name": "rdb",
-            "type": "Element",
-            "help": "Reservation booking designator.",
-        },
+        metadata=dict(
+            name="rdb",
+            type="Element",
+            help="Reservation booking designator.",
+            min_occurs=0,
+            max_occurs=20
+        )
     )
     fare_family_info: FareQualifierInformationType = field(
         default=None,
-        metadata={
-            "name": "fareFamilyInfo",
-            "type": "Element",
-            "help": "Fare family info.",
-        },
+        metadata=dict(
+            name="fareFamilyInfo",
+            type="Element",
+            help="Fare family info.",
+        )
     )
     fare_product_detail: List[FareProductDetailsType] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 20,
-            "name": "fareProductDetail",
-            "type": "Element",
-            "help": "Fare product detail.",
-        },
+        metadata=dict(
+            name="fareProductDetail",
+            type="Element",
+            help="Fare product detail.",
+            min_occurs=0,
+            max_occurs=20
+        )
     )
     corporate_info: List[MultipleIdentificationNumbersTypeI] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 20,
-            "name": "corporateInfo",
-            "type": "Element",
-            "help": "Corporate information.",
-        },
+        metadata=dict(
+            name="corporateInfo",
+            type="Element",
+            help="Corporate information.",
+            min_occurs=0,
+            max_occurs=20
+        )
     )
     cabin_product: List[CabinClassDesignationType] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 6,
-            "name": "cabinProduct",
-            "type": "Element",
-            "help": "Indicates flight cabin details.",
-        },
+        metadata=dict(
+            name="cabinProduct",
+            type="Element",
+            help="Indicates flight cabin details.",
+            min_occurs=0,
+            max_occurs=6
+        )
     )
     cabin_processing_identifier: AlphaNumericStringLength1To3 = field(
         default=None,
-        metadata={
-            "name": "cabinProcessingIdentifier",
-            "type": "Element",
-            "help": "Cabin processing option.",
-        },
+        metadata=dict(
+            name="cabinProcessingIdentifier",
+            type="Element",
+            help="Cabin processing option.",
+        )
     )
     date_time_details: List[ProductDateTimeTypeI194583C] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 20,
-            "name": "dateTimeDetails",
-            "type": "Element",
-            "help": "Product date or time.",
-        },
+        metadata=dict(
+            name="dateTimeDetails",
+            type="Element",
+            help="Product date or time.",
+            min_occurs=0,
+            max_occurs=20
+        )
     )
     other_criteria: List[CodedAttributeInformationType120742C] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 20,
-            "name": "otherCriteria",
-            "type": "Element",
-            "help": "Other criteria.",
-        },
+        metadata=dict(
+            name="otherCriteria",
+            type="Element",
+            help="Other criteria.",
+            min_occurs=0,
+            max_occurs=20
+        )
     )
 
 
@@ -4199,13 +4456,13 @@ class FareFamilyType:
 
     commercial_family_details: List[FareFamilyDetailsType] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 20,
-            "name": "commercialFamilyDetails",
-            "type": "Element",
-            "help": "Indicates Commercial Fare Family Short names",
-        },
+        metadata=dict(
+            name="commercialFamilyDetails",
+            type="Element",
+            help="Indicates Commercial Fare Family Short names",
+            min_occurs=0,
+            max_occurs=20
+        )
     )
 
 
@@ -4217,37 +4474,37 @@ class FareFamilyType80157S:
 
     ref_number: NumericIntegerLength1To3 = field(
         default=None,
-        metadata={
-            "name": "refNumber",
-            "type": "Element",
-            "help": "Fare Family Reference Number",
-        },
+        metadata=dict(
+            name="refNumber",
+            type="Element",
+            help="Fare Family Reference Number",
+        )
     )
     fare_familyname: AlphaNumericStringLength1To10 = field(
         default=None,
-        metadata={
-            "name": "fareFamilyname",
-            "type": "Element",
-            "help": "Fare Family Short Name",
-        },
+        metadata=dict(
+            name="fareFamilyname",
+            type="Element",
+            help="Fare Family Short Name",
+        )
     )
     hierarchy: NumericIntegerLength1To4 = field(
         default=None,
-        metadata={
-            "name": "hierarchy",
-            "type": "Element",
-            "help": "HIERARCHICAL ORDER WITHIN FARE FAMILY",
-        },
+        metadata=dict(
+            name="hierarchy",
+            type="Element",
+            help="HIERARCHICAL ORDER WITHIN FARE FAMILY",
+        )
     )
     commercial_family_details: List[FareFamilyDetailsType] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 20,
-            "name": "commercialFamilyDetails",
-            "type": "Element",
-            "help": "Indicates Commercial Fare Family Short names",
-        },
+        metadata=dict(
+            name="commercialFamilyDetails",
+            type="Element",
+            help="Indicates Commercial Fare Family Short names",
+            min_occurs=0,
+            max_occurs=20
+        )
     )
 
 
@@ -4255,47 +4512,51 @@ class FareFamilyType80157S:
 class FareInformationType:
     value_qualifier: AmaEdicodesetTypeLength1to3 = field(
         default=None,
-        metadata={
-            "name": "valueQualifier",
-            "type": "Element",
-            "help": "Value Qualifier",
-        },
+        metadata=dict(
+            name="valueQualifier",
+            type="Element",
+            help="Value Qualifier",
+        )
     )
     value: NumericIntegerLength1To15 = field(
         default=None,
-        metadata={"name": "value", "type": "Element", "help": "Value"},
+        metadata=dict(
+            name="value",
+            type="Element",
+            help="Value",
+        )
     )
     fare_details: FareDetailsType = field(
         default=None,
-        metadata={
-            "name": "fareDetails",
-            "type": "Element",
-            "help": "Fare Details",
-        },
+        metadata=dict(
+            name="fareDetails",
+            type="Element",
+            help="Fare Details",
+        )
     )
     identity_number: AlphaNumericStringLength1To35 = field(
         default=None,
-        metadata={
-            "name": "identityNumber",
-            "type": "Element",
-            "help": "Identity Number",
-        },
+        metadata=dict(
+            name="identityNumber",
+            type="Element",
+            help="Identity Number",
+        )
     )
     fare_type_grouping: FareTypeGroupingInformationType = field(
         default=None,
-        metadata={
-            "name": "fareTypeGrouping",
-            "type": "Element",
-            "help": "Fare Type Grouping",
-        },
+        metadata=dict(
+            name="fareTypeGrouping",
+            type="Element",
+            help="Fare Type Grouping",
+        )
     )
     rate_category: AlphaNumericStringLength1To35 = field(
         default=None,
-        metadata={
-            "name": "rateCategory",
-            "type": "Element",
-            "help": "Rate Category",
-        },
+        metadata=dict(
+            name="rateCategory",
+            type="Element",
+            help="Rate Category",
+        )
     )
 
 
@@ -4307,21 +4568,21 @@ class FlightProductInformationType:
 
     cabin_product: List[CabinProductDetailsType] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 26,
-            "name": "cabinProduct",
-            "type": "Element",
-            "help": "Indicates flight cabin details",
-        },
+        metadata=dict(
+            name="cabinProduct",
+            type="Element",
+            help="Indicates flight cabin details",
+            min_occurs=0,
+            max_occurs=26
+        )
     )
     context_details: ProductTypeDetailsType205137C = field(
         default=None,
-        metadata={
-            "name": "contextDetails",
-            "type": "Element",
-            "help": "To specify additional characteristics.",
-        },
+        metadata=dict(
+            name="contextDetails",
+            type="Element",
+            help="To specify additional characteristics.",
+        )
     )
 
 
@@ -4333,13 +4594,13 @@ class FormOfPaymentTypeI:
 
     form_of_payment_details: List[FormOfPaymentDetailsTypeI] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 9,
-            "name": "formOfPaymentDetails",
-            "type": "Element",
-            "help": "FORM OF PAYMENT DETAILS",
-        },
+        metadata=dict(
+            name="formOfPaymentDetails",
+            type="Element",
+            help="FORM OF PAYMENT DETAILS",
+            min_occurs=0,
+            max_occurs=9
+        )
     )
 
 
@@ -4351,21 +4612,21 @@ class FreeTextInformationType:
 
     free_text_details: FreeTextDetailsType = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "freeTextDetails",
-            "type": "Element",
-            "help": "Details for the free text message",
-        },
+        metadata=dict(
+            name="freeTextDetails",
+            type="Element",
+            help="Details for the free text message",
+            required=True
+        )
     )
     free_text: AlphaNumericStringLength1To70 = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "freeText",
-            "type": "Element",
-            "help": "Free text corresponding to the DEI 127 data.",
-        },
+        metadata=dict(
+            name="freeText",
+            type="Element",
+            help="Free text corresponding to the DEI 127 data.",
+            required=True
+        )
     )
 
 
@@ -4375,17 +4636,15 @@ class FrequentTravellerIdentificationCodeType:
     To specify frequent traveler information
     """
 
-    frequent_traveller_details: List[
-        FrequentTravellerIdentificationType
-    ] = field(
+    frequent_traveller_details: List[FrequentTravellerIdentificationType] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 1,
-            "max_occurs": 99,
-            "name": "frequentTravellerDetails",
-            "type": "Element",
-            "help": "Frequent Traveller Info",
-        },
+        metadata=dict(
+            name="frequentTravellerDetails",
+            type="Element",
+            help="Frequent Traveller Info",
+            min_occurs=1,
+            max_occurs=99
+        )
     )
 
 
@@ -4395,17 +4654,15 @@ class FrequentTravellerIdentificationCodeType177150S:
     To specify frequent traveler information.
     """
 
-    frequent_traveller_details: List[
-        FrequentTravellerIdentificationType249074C
-    ] = field(
+    frequent_traveller_details: List[FrequentTravellerIdentificationType249074C] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 1,
-            "max_occurs": 99,
-            "name": "frequentTravellerDetails",
-            "type": "Element",
-            "help": "Frequent traveller details",
-        },
+        metadata=dict(
+            name="frequentTravellerDetails",
+            type="Element",
+            help="Frequent traveller details",
+            min_occurs=1,
+            max_occurs=99
+        )
     )
 
 
@@ -4417,39 +4674,39 @@ class HeaderInformationTypeI:
 
     status: List[AlphaNumericStringLength1To3] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 2,
-            "name": "status",
-            "type": "Element",
-            "help": "Status",
-        },
+        metadata=dict(
+            name="status",
+            type="Element",
+            help="Status",
+            min_occurs=0,
+            max_occurs=2
+        )
     )
     date_time_period_details: DateTimePeriodDetailsTypeI = field(
         default=None,
-        metadata={
-            "name": "dateTimePeriodDetails",
-            "type": "Element",
-            "help": "Date and Time info",
-        },
+        metadata=dict(
+            name="dateTimePeriodDetails",
+            type="Element",
+            help="Date and Time info",
+        )
     )
     reference_number: AlphaNumericStringLength1To35 = field(
         default=None,
-        metadata={
-            "name": "referenceNumber",
-            "type": "Element",
-            "help": "Reference number",
-        },
+        metadata=dict(
+            name="referenceNumber",
+            type="Element",
+            help="Reference number",
+        )
     )
     product_identification: List[AlphaNumericStringLength1To35] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 2,
-            "name": "productIdentification",
-            "type": "Element",
-            "help": "Contains product identification such as UIC code...",
-        },
+        metadata=dict(
+            name="productIdentification",
+            type="Element",
+            help="Contains product identification such as UIC code...",
+            min_occurs=0,
+            max_occurs=2
+        )
     )
 
 
@@ -4461,12 +4718,12 @@ class ItemNumberType:
 
     item_number_id: ItemNumberIdentificationType = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "itemNumberId",
-            "type": "Element",
-            "help": "Indicates the fare family combination number",
-        },
+        metadata=dict(
+            name="itemNumberId",
+            type="Element",
+            help="Indicates the fare family combination number",
+            required=True
+        )
     )
 
 
@@ -4478,12 +4735,12 @@ class ItemNumberType80866S:
 
     item_number_details: ItemNumberIdentificationType = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "itemNumberDetails",
-            "type": "Element",
-            "help": "Item number details",
-        },
+        metadata=dict(
+            name="itemNumberDetails",
+            type="Element",
+            help="Item number details",
+            required=True
+        )
     )
 
 
@@ -4495,27 +4752,27 @@ class ItemReferencesAndVersionsType:
 
     passenger_fee_ref_type: AlphaNumericStringLength1To3 = field(
         default=None,
-        metadata={
-            "name": "passengerFeeRefType",
-            "type": "Element",
-            "help": "Reference Qualifier.",
-        },
+        metadata=dict(
+            name="passengerFeeRefType",
+            type="Element",
+            help="Reference Qualifier.",
+        )
     )
     passenger_fee_ref_number: NumericIntegerLength1To3 = field(
         default=None,
-        metadata={
-            "name": "passengerFeeRefNumber",
-            "type": "Element",
-            "help": "Reference number.",
-        },
+        metadata=dict(
+            name="passengerFeeRefNumber",
+            type="Element",
+            help="Reference number.",
+        )
     )
     other_characteristics: UniqueIdDescriptionType = field(
         default=None,
-        metadata={
-            "name": "otherCharacteristics",
-            "type": "Element",
-            "help": "Unique id description.",
-        },
+        metadata=dict(
+            name="otherCharacteristics",
+            type="Element",
+            help="Unique id description.",
+        )
     )
 
 
@@ -4523,13 +4780,13 @@ class ItemReferencesAndVersionsType:
 class MonetaryAndCabinInformationType:
     money_and_cabin_info: List[MonetaryAndCabinInformationDetailsType] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 99,
-            "name": "moneyAndCabinInfo",
-            "type": "Element",
-            "help": "Monetary and cabin information.",
-        },
+        metadata=dict(
+            name="moneyAndCabinInfo",
+            type="Element",
+            help="Monetary and cabin information.",
+            min_occurs=0,
+            max_occurs=99
+        )
     )
 
 
@@ -4541,24 +4798,22 @@ class MonetaryInformationType:
 
     money_info: MonetaryInformationDetailsTypeI = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "moneyInfo",
-            "type": "Element",
-            "help": "MONEY INFORMATION",
-        },
+        metadata=dict(
+            name="moneyInfo",
+            type="Element",
+            help="MONEY INFORMATION",
+            required=True
+        )
     )
-    additional_money_info: List[
-        MonetaryInformationDetailsTypeI194597C
-    ] = field(
+    additional_money_info: List[MonetaryInformationDetailsTypeI194597C] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 19,
-            "name": "additionalMoneyInfo",
-            "type": "Element",
-            "help": "MONEY INFORMATION",
-        },
+        metadata=dict(
+            name="additionalMoneyInfo",
+            type="Element",
+            help="MONEY INFORMATION",
+            min_occurs=0,
+            max_occurs=19
+        )
     )
 
 
@@ -4570,13 +4825,13 @@ class MonetaryInformationType80162S:
 
     monetary_details: List[MonetaryInformationDetailsTypeI65140C] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 1,
-            "max_occurs": 20,
-            "name": "monetaryDetails",
-            "type": "Element",
-            "help": "Monetary info",
-        },
+        metadata=dict(
+            name="monetaryDetails",
+            type="Element",
+            help="Monetary info",
+            min_occurs=1,
+            max_occurs=20
+        )
     )
 
 
@@ -4588,13 +4843,13 @@ class MonetaryInformationTypeI:
 
     monetary_details: List[MonetaryInformationDetailsTypeI65141C] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 1,
-            "max_occurs": 20,
-            "name": "monetaryDetails",
-            "type": "Element",
-            "help": "Monetary info",
-        },
+        metadata=dict(
+            name="monetaryDetails",
+            type="Element",
+            help="Monetary info",
+            min_occurs=1,
+            max_occurs=20
+        )
     )
 
 
@@ -4606,13 +4861,13 @@ class NumberOfUnitsType:
 
     unit_number_detail: List[NumberOfUnitDetailsType270113C] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 1,
-            "max_occurs": 20,
-            "name": "unitNumberDetail",
-            "type": "Element",
-            "help": "NUMBER OF UNIT DETAILS",
-        },
+        metadata=dict(
+            name="unitNumberDetail",
+            type="Element",
+            help="NUMBER OF UNIT DETAILS",
+            min_occurs=1,
+            max_occurs=20
+        )
     )
 
 
@@ -4624,13 +4879,13 @@ class NumberOfUnitsType80154S:
 
     unit_number_detail: List[NumberOfUnitDetailsType] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 1,
-            "max_occurs": 20,
-            "name": "unitNumberDetail",
-            "type": "Element",
-            "help": "NUMBER OF UNIT DETAILS",
-        },
+        metadata=dict(
+            name="unitNumberDetail",
+            type="Element",
+            help="NUMBER OF UNIT DETAILS",
+            min_occurs=1,
+            max_occurs=20
+        )
     )
 
 
@@ -4642,22 +4897,22 @@ class OriginAndDestinationRequestType:
 
     seg_ref: NumericIntegerLength1To2 = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "segRef",
-            "type": "Element",
-            "help": "Requested segment number",
-        },
+        metadata=dict(
+            name="segRef",
+            type="Element",
+            help="Requested segment number",
+            required=True
+        )
     )
     location_forcing: List[ItineraryDetailsType] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 2,
-            "name": "locationForcing",
-            "type": "Element",
-            "help": "Forces arrival or departure, from/to the same airport/city",
-        },
+        metadata=dict(
+            name="locationForcing",
+            type="Element",
+            help="Forces arrival or departure, from/to the same airport/city",
+            min_occurs=0,
+            max_occurs=2
+        )
     )
 
 
@@ -4669,39 +4924,67 @@ class PassengerItineraryInformationType:
 
     booking: AlphaStringLength1To1 = field(
         default=None,
-        metadata={"name": "booking", "type": "Element", "help": "."},
+        metadata=dict(
+            name="booking",
+            type="Element",
+            help=".",
+        )
     )
     identifier: AlphaNumericStringLength1To1 = field(
         default=None,
-        metadata={"name": "identifier", "type": "Element", "help": "."},
+        metadata=dict(
+            name="identifier",
+            type="Element",
+            help=".",
+        )
     )
     status: AlphaNumericStringLength1To3 = field(
         default=None,
-        metadata={"name": "status", "type": "Element", "help": "."},
+        metadata=dict(
+            name="status",
+            type="Element",
+            help=".",
+        )
     )
     item_number: NumericIntegerLength1To3 = field(
         default=None,
-        metadata={"name": "itemNumber", "type": "Element", "help": "."},
+        metadata=dict(
+            name="itemNumber",
+            type="Element",
+            help=".",
+        )
     )
     date_time_details: ProductDateTimeType = field(
         default=None,
-        metadata={"name": "dateTimeDetails", "type": "Element", "help": "."},
+        metadata=dict(
+            name="dateTimeDetails",
+            type="Element",
+            help=".",
+        )
     )
     designator: AlphaStringLength1To1 = field(
         default=None,
-        metadata={"name": "designator", "type": "Element", "help": "."},
+        metadata=dict(
+            name="designator",
+            type="Element",
+            help=".",
+        )
     )
     movement_type: AlphaNumericStringLength1To3 = field(
         default=None,
-        metadata={"name": "movementType", "type": "Element", "help": "."},
+        metadata=dict(
+            name="movementType",
+            type="Element",
+            help=".",
+        )
     )
     product_type_details: ProductTypeDetailsType = field(
         default=None,
-        metadata={
-            "name": "productTypeDetails",
-            "type": "Element",
-            "help": ".",
-        },
+        metadata=dict(
+            name="productTypeDetails",
+            type="Element",
+            help=".",
+        )
     )
 
 
@@ -4713,59 +4996,59 @@ class PricingTicketingDetailsType:
 
     pricing_ticketing: PricingTicketingInformationType = field(
         default=None,
-        metadata={
-            "name": "pricingTicketing",
-            "type": "Element",
-            "help": "Pricing ticketing Details.",
-        },
+        metadata=dict(
+            name="pricingTicketing",
+            type="Element",
+            help="Pricing ticketing Details.",
+        )
     )
     ticketing_date: ProductDateTimeTypeI194598C = field(
         default=None,
-        metadata={
-            "name": "ticketingDate",
-            "type": "Element",
-            "help": "PRODUCT DATE OR TIME",
-        },
+        metadata=dict(
+            name="ticketingDate",
+            type="Element",
+            help="PRODUCT DATE OR TIME",
+        )
     )
     company_id: CompanyIdentificationType = field(
         default=None,
-        metadata={
-            "name": "companyId",
-            "type": "Element",
-            "help": "COMPANY IDENTIFICATION",
-        },
+        metadata=dict(
+            name="companyId",
+            type="Element",
+            help="COMPANY IDENTIFICATION",
+        )
     )
     selling_point: LocationDetailsTypeI = field(
         default=None,
-        metadata={
-            "name": "sellingPoint",
-            "type": "Element",
-            "help": "LOCATION DETAILS",
-        },
+        metadata=dict(
+            name="sellingPoint",
+            type="Element",
+            help="LOCATION DETAILS",
+        )
     )
     ticketing_point: LocationDetailsTypeI = field(
         default=None,
-        metadata={
-            "name": "ticketingPoint",
-            "type": "Element",
-            "help": "LOCATION DETAILS",
-        },
+        metadata=dict(
+            name="ticketingPoint",
+            type="Element",
+            help="LOCATION DETAILS",
+        )
     )
     journey_origin_point: LocationDetailsTypeI = field(
         default=None,
-        metadata={
-            "name": "journeyOriginPoint",
-            "type": "Element",
-            "help": "Used to Target Transborder Fares",
-        },
+        metadata=dict(
+            name="journeyOriginPoint",
+            type="Element",
+            help="Used to Target Transborder Fares",
+        )
     )
     corporate_id: AgentIdentificationType = field(
         default=None,
-        metadata={
-            "name": "corporateId",
-            "type": "Element",
-            "help": "Contains the ARC,IATA and ERSP numbers",
-        },
+        metadata=dict(
+            name="corporateId",
+            type="Element",
+            help="Contains the ARC,IATA and ERSP numbers",
+        )
     )
 
 
@@ -4777,29 +5060,29 @@ class ProposedSegmentType:
 
     flight_proposal: List[ProposedSegmentDetailsType] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 1,
-            "max_occurs": 9,
-            "name": "flightProposal",
-            "type": "Element",
-            "help": "Parameters for proposed flight group",
-        },
+        metadata=dict(
+            name="flightProposal",
+            type="Element",
+            help="Parameters for proposed flight group",
+            min_occurs=1,
+            max_occurs=9
+        )
     )
     flight_characteristic: AlphaNumericStringLength0To3 = field(
         default=None,
-        metadata={
-            "name": "flightCharacteristic",
-            "type": "Element",
-            "help": "Flight characteristics.",
-        },
+        metadata=dict(
+            name="flightCharacteristic",
+            type="Element",
+            help="Flight characteristics.",
+        )
     )
     maj_cabin: AlphaStringLength1To1 = field(
         default=None,
-        metadata={
-            "name": "majCabin",
-            "type": "Element",
-            "help": "Majority cabin",
-        },
+        metadata=dict(
+            name="majCabin",
+            type="Element",
+            help="Majority cabin",
+        )
     )
 
 
@@ -4811,13 +5094,13 @@ class ReferenceInfoType:
 
     referencing_detail: List[ReferencingDetailsType] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 9,
-            "name": "referencingDetail",
-            "type": "Element",
-            "help": "Referencing details",
-        },
+        metadata=dict(
+            name="referencingDetail",
+            type="Element",
+            help="Referencing details",
+            min_occurs=0,
+            max_occurs=9
+        )
     )
 
 
@@ -4829,13 +5112,13 @@ class RoutingInformationTypeI:
 
     routing_details: List[ProductLocationDetailsTypeI] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 9,
-            "name": "routingDetails",
-            "type": "Element",
-            "help": "Stops details",
-        },
+        metadata=dict(
+            name="routingDetails",
+            type="Element",
+            help="Stops details",
+            min_occurs=0,
+            max_occurs=9
+        )
     )
 
 
@@ -4845,17 +5128,15 @@ class SegmentRepetitionControlTypeI:
     To indicate the number of segment group repetitions.
     """
 
-    segment_control_details: List[
-        SegmentRepetitionControlDetailsTypeI
-    ] = field(
+    segment_control_details: List[SegmentRepetitionControlDetailsTypeI] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 9,
-            "name": "segmentControlDetails",
-            "type": "Element",
-            "help": "Segment control details",
-        },
+        metadata=dict(
+            name="segmentControlDetails",
+            type="Element",
+            help="Segment control details",
+            min_occurs=0,
+            max_occurs=9
+        )
     )
 
 
@@ -4867,21 +5148,22 @@ class SelectionDetailsType:
 
     carrier_fee_details: SelectionDetailsInformationType = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "carrierFeeDetails",
-            "type": "Element",
-            "help": "Carrier fees options",
-        },
+        metadata=dict(
+            name="carrierFeeDetails",
+            type="Element",
+            help="Carrier fees options",
+            required=True
+        )
     )
     other_selection_details: List[SelectionDetailsInformationTypeI] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 98,
-            "name": "otherSelectionDetails",
-            "type": "Element",
-        },
+        metadata=dict(
+            name="otherSelectionDetails",
+            type="Element",
+            help=None,
+            min_occurs=0,
+            max_occurs=98
+        )
     )
 
 
@@ -4893,22 +5175,22 @@ class SpecialRequirementsDetailsType:
 
     service_requirements_info: SpecialRequirementsTypeDetailsType = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "serviceRequirementsInfo",
-            "type": "Element",
-            "help": "To specify the Service Requirement of the customer",
-        },
+        metadata=dict(
+            name="serviceRequirementsInfo",
+            type="Element",
+            help="To specify the Service Requirement of the customer",
+            required=True
+        )
     )
     seat_details: List[SpecialRequirementsDataDetailsType] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 999,
-            "name": "seatDetails",
-            "type": "Element",
-            "help": "Seat details",
-        },
+        metadata=dict(
+            name="seatDetails",
+            type="Element",
+            help="Seat details",
+            min_occurs=0,
+            max_occurs=999
+        )
     )
 
 
@@ -4920,22 +5202,22 @@ class SpecificDataInformationType:
 
     data_type_information: DataTypeInformationType = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "dataTypeInformation",
-            "type": "Element",
-            "help": "Carrier fee description",
-        },
+        metadata=dict(
+            name="dataTypeInformation",
+            type="Element",
+            help="Carrier fee description",
+            required=True
+        )
     )
     data_information: List[DataInformationType] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 99,
-            "name": "dataInformation",
-            "type": "Element",
-            "help": "Data information",
-        },
+        metadata=dict(
+            name="dataInformation",
+            type="Element",
+            help="Data information",
+            min_occurs=0,
+            max_occurs=99
+        )
     )
 
 
@@ -4947,27 +5229,27 @@ class StructuredPeriodInformationType:
 
     begin_date_time: StructuredDateTimeType = field(
         default=None,
-        metadata={
-            "name": "beginDateTime",
-            "type": "Element",
-            "help": "Effective date of period of operation",
-        },
+        metadata=dict(
+            name="beginDateTime",
+            type="Element",
+            help="Effective date of period of operation",
+        )
     )
     end_date_time: StructuredDateTimeType = field(
         default=None,
-        metadata={
-            "name": "endDateTime",
-            "type": "Element",
-            "help": "Discontinue date of period of operation",
-        },
+        metadata=dict(
+            name="endDateTime",
+            type="Element",
+            help="Discontinue date of period of operation",
+        )
     )
     frequency: FrequencyType = field(
         default=None,
-        metadata={
-            "name": "frequency",
-            "type": "Element",
-            "help": "It is used with a period to give a restriction for days impacted. It permits for example to indicate on which days, a flight operates.",
-        },
+        metadata=dict(
+            name="frequency",
+            type="Element",
+            help="It is used with a period to give a restriction for days impacted. It permits for example to indicate on which days, a flight operates.",
+        )
     )
 
 
@@ -4979,21 +5261,21 @@ class TaxType:
 
     withhold_tax_surcharge: AlphaNumericStringLength1To3 = field(
         default=None,
-        metadata={
-            "name": "withholdTaxSurcharge",
-            "type": "Element",
-            "help": "Duty tax fee category, coded",
-        },
+        metadata=dict(
+            name="withholdTaxSurcharge",
+            type="Element",
+            help="Duty tax fee category, coded",
+        )
     )
     tax_detail: List[TaxDetailsTypeI] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 99,
-            "name": "taxDetail",
-            "type": "Element",
-            "help": "TAX DETAILS",
-        },
+        metadata=dict(
+            name="taxDetail",
+            type="Element",
+            help="TAX DETAILS",
+            min_occurs=0,
+            max_occurs=99
+        )
     )
 
 
@@ -5005,12 +5287,13 @@ class TicketNumberTypeI:
 
     document_details: List[TicketNumberDetailsTypeI] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 1,
-            "max_occurs": 99,
-            "name": "documentDetails",
-            "type": "Element",
-        },
+        metadata=dict(
+            name="documentDetails",
+            type="Element",
+            help=None,
+            min_occurs=1,
+            max_occurs=99
+        )
     )
 
 
@@ -5022,13 +5305,13 @@ class TrafficRestrictionTypeI:
 
     traffic_restriction_details: List[TrafficRestrictionDetailsTypeI] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 5,
-            "name": "trafficRestrictionDetails",
-            "type": "Element",
-            "help": "Traffic Restriction Details",
-        },
+        metadata=dict(
+            name="trafficRestrictionDetails",
+            type="Element",
+            help="Traffic Restriction Details",
+            min_occurs=0,
+            max_occurs=5
+        )
     )
 
 
@@ -5040,59 +5323,59 @@ class TravelFlightInformationType:
 
     cabin_id: CabinIdentificationType = field(
         default=None,
-        metadata={
-            "name": "cabinId",
-            "type": "Element",
-            "help": "Cabin identification",
-        },
+        metadata=dict(
+            name="cabinId",
+            type="Element",
+            help="Cabin identification",
+        )
     )
     company_identity: List[CompanyIdentificationType120719C] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 20,
-            "name": "companyIdentity",
-            "type": "Element",
-            "help": "Company Identification",
-        },
+        metadata=dict(
+            name="companyIdentity",
+            type="Element",
+            help="Company Identification",
+            min_occurs=0,
+            max_occurs=20
+        )
     )
     flight_detail: ProductTypeDetailsType120801C = field(
         default=None,
-        metadata={
-            "name": "flightDetail",
-            "type": "Element",
-            "help": "Type of flight details",
-        },
+        metadata=dict(
+            name="flightDetail",
+            type="Element",
+            help="Type of flight details",
+        )
     )
     inclusion_detail: List[ConnectPointDetailsType195492C] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 20,
-            "name": "inclusionDetail",
-            "type": "Element",
-            "help": "Details of included connecting points",
-        },
+        metadata=dict(
+            name="inclusionDetail",
+            type="Element",
+            help="Details of included connecting points",
+            min_occurs=0,
+            max_occurs=20
+        )
     )
     exclusion_detail: List[ConnectPointDetailsType] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 2,
-            "name": "exclusionDetail",
-            "type": "Element",
-            "help": "Further connection details",
-        },
+        metadata=dict(
+            name="exclusionDetail",
+            type="Element",
+            help="Further connection details",
+            min_occurs=0,
+            max_occurs=2
+        )
     )
     unit_number_detail: List[NumberOfUnitDetailsTypeI] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 9,
-            "name": "unitNumberDetail",
-            "type": "Element",
-            "help": "Nb of connections for each requested segment of the journey.",
-        },
+        metadata=dict(
+            name="unitNumberDetail",
+            type="Element",
+            help="Nb of connections for each requested segment of the journey.",
+            min_occurs=0,
+            max_occurs=9
+        )
     )
 
 
@@ -5104,59 +5387,59 @@ class TravelFlightInformationType165053S:
 
     cabin_id: CabinIdentificationType233500C = field(
         default=None,
-        metadata={
-            "name": "cabinId",
-            "type": "Element",
-            "help": "Cabin identification",
-        },
+        metadata=dict(
+            name="cabinId",
+            type="Element",
+            help="Cabin identification",
+        )
     )
     company_identity: List[CompanyIdentificationType120719C] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 20,
-            "name": "companyIdentity",
-            "type": "Element",
-            "help": "Company Identification",
-        },
+        metadata=dict(
+            name="companyIdentity",
+            type="Element",
+            help="Company Identification",
+            min_occurs=0,
+            max_occurs=20
+        )
     )
     flight_detail: ProductTypeDetailsType120801C = field(
         default=None,
-        metadata={
-            "name": "flightDetail",
-            "type": "Element",
-            "help": "Type of flight details",
-        },
+        metadata=dict(
+            name="flightDetail",
+            type="Element",
+            help="Type of flight details",
+        )
     )
     inclusion_detail: List[ConnectPointDetailsType195492C] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 20,
-            "name": "inclusionDetail",
-            "type": "Element",
-            "help": "Details of included connect point",
-        },
+        metadata=dict(
+            name="inclusionDetail",
+            type="Element",
+            help="Details of included connect point",
+            min_occurs=0,
+            max_occurs=20
+        )
     )
     exclusion_detail: List[ConnectPointDetailsType] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 20,
-            "name": "exclusionDetail",
-            "type": "Element",
-            "help": "Further connection details",
-        },
+        metadata=dict(
+            name="exclusionDetail",
+            type="Element",
+            help="Further connection details",
+            min_occurs=0,
+            max_occurs=20
+        )
     )
     unit_number_detail: List[NumberOfUnitDetailsTypeI] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 20,
-            "name": "unitNumberDetail",
-            "type": "Element",
-            "help": "Nb of connections allowed at requested segment level.",
-        },
+        metadata=dict(
+            name="unitNumberDetail",
+            type="Element",
+            help="Nb of connections allowed at requested segment level.",
+            min_occurs=0,
+            max_occurs=20
+        )
     )
 
 
@@ -5168,59 +5451,59 @@ class TravelFlightInformationType197722S:
 
     cabin_id: CabinIdentificationType233500C = field(
         default=None,
-        metadata={
-            "name": "cabinId",
-            "type": "Element",
-            "help": "Cabin identification",
-        },
+        metadata=dict(
+            name="cabinId",
+            type="Element",
+            help="Cabin identification",
+        )
     )
     company_identity: List[CompanyIdentificationType275415C] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 20,
-            "name": "companyIdentity",
-            "type": "Element",
-            "help": "Company Identification",
-        },
+        metadata=dict(
+            name="companyIdentity",
+            type="Element",
+            help="Company Identification",
+            min_occurs=0,
+            max_occurs=20
+        )
     )
     flight_detail: ProductTypeDetailsType120801C = field(
         default=None,
-        metadata={
-            "name": "flightDetail",
-            "type": "Element",
-            "help": "Type of flight details",
-        },
+        metadata=dict(
+            name="flightDetail",
+            type="Element",
+            help="Type of flight details",
+        )
     )
     inclusion_detail: List[ConnectPointDetailsType195492C] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 20,
-            "name": "inclusionDetail",
-            "type": "Element",
-            "help": "Details of included connect point",
-        },
+        metadata=dict(
+            name="inclusionDetail",
+            type="Element",
+            help="Details of included connect point",
+            min_occurs=0,
+            max_occurs=20
+        )
     )
     exclusion_detail: List[ConnectPointDetailsType] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 20,
-            "name": "exclusionDetail",
-            "type": "Element",
-            "help": "Further connection details",
-        },
+        metadata=dict(
+            name="exclusionDetail",
+            type="Element",
+            help="Further connection details",
+            min_occurs=0,
+            max_occurs=20
+        )
     )
     unit_number_detail: List[NumberOfUnitDetailsTypeI] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 20,
-            "name": "unitNumberDetail",
-            "type": "Element",
-            "help": "Added departed flights flag",
-        },
+        metadata=dict(
+            name="unitNumberDetail",
+            type="Element",
+            help="Added departed flights flag",
+            min_occurs=0,
+            max_occurs=20
+        )
     )
 
 
@@ -5232,53 +5515,54 @@ class TravelProductInformationTypeI:
 
     flight_date: ProductDateTimeTypeI = field(
         default=None,
-        metadata={
-            "name": "flightDate",
-            "type": "Element",
-            "help": "Flight Date",
-        },
+        metadata=dict(
+            name="flightDate",
+            type="Element",
+            help="Flight Date",
+        )
     )
     board_point_details: LocationTypeI = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "boardPointDetails",
-            "type": "Element",
-            "help": "Board point",
-        },
+        metadata=dict(
+            name="boardPointDetails",
+            type="Element",
+            help="Board point",
+            required=True
+        )
     )
     offpoint_details: LocationTypeI = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "offpointDetails",
-            "type": "Element",
-            "help": "Off point",
-        },
+        metadata=dict(
+            name="offpointDetails",
+            type="Element",
+            help="Off point",
+            required=True
+        )
     )
     company_details: CompanyIdentificationTypeI = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "companyDetails",
-            "type": "Element",
-        },
+        metadata=dict(
+            name="companyDetails",
+            type="Element",
+            help=None,
+            required=True
+        )
     )
     flight_identification: ProductIdentificationDetailsTypeI = field(
         default=None,
-        metadata={
-            "name": "flightIdentification",
-            "type": "Element",
-            "help": "Flight identification",
-        },
+        metadata=dict(
+            name="flightIdentification",
+            type="Element",
+            help="Flight identification",
+        )
     )
     flight_type_details: ProductTypeDetailsTypeI = field(
         default=None,
-        metadata={
-            "name": "flightTypeDetails",
-            "type": "Element",
-            "help": "Identify flight part of the journey",
-        },
+        metadata=dict(
+            name="flightTypeDetails",
+            type="Element",
+            help="Identify flight part of the journey",
+        )
     )
 
 
@@ -5290,64 +5574,64 @@ class TravelProductType:
 
     product_date_time: ProductDateTimeType195546C = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "productDateTime",
-            "type": "Element",
-            "help": "Date and time of departure and arrival",
-        },
+        metadata=dict(
+            name="productDateTime",
+            type="Element",
+            help="Date and time of departure and arrival",
+            required=True
+        )
     )
     location: List[LocationIdentificationDetailsType] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 1,
-            "max_occurs": 2,
-            "name": "location",
-            "type": "Element",
-            "help": "Location of departure and arrival",
-        },
+        metadata=dict(
+            name="location",
+            type="Element",
+            help="Location of departure and arrival",
+            min_occurs=1,
+            max_occurs=2
+        )
     )
     company_id: CompanyIdentificationType195544C = field(
         default=None,
-        metadata={
-            "name": "companyId",
-            "type": "Element",
-            "help": "Company identification",
-        },
+        metadata=dict(
+            name="companyId",
+            type="Element",
+            help="Company identification",
+        )
     )
     flight_ortrain_number: AlphaNumericStringLength1To8 = field(
         default=None,
-        metadata={
-            "name": "flightOrtrainNumber",
-            "type": "Element",
-            "help": "Flight number or trainNumber",
-        },
+        metadata=dict(
+            name="flightOrtrainNumber",
+            type="Element",
+            help="Flight number or trainNumber",
+        )
     )
     product_detail: AdditionalProductDetailsType = field(
         default=None,
-        metadata={
-            "name": "productDetail",
-            "type": "Element",
-            "help": "Product details",
-        },
+        metadata=dict(
+            name="productDetail",
+            type="Element",
+            help="Product details",
+        )
     )
     add_product_detail: ProductFacilitiesType = field(
         default=None,
-        metadata={
-            "name": "addProductDetail",
-            "type": "Element",
-            "help": "Additional product details",
-        },
+        metadata=dict(
+            name="addProductDetail",
+            type="Element",
+            help="Additional product details",
+        )
     )
     attribute_details: List[CodedAttributeInformationType247828C] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 20,
-            "name": "attributeDetails",
-            "type": "Element",
-            "help": "Attribute details",
-        },
+        metadata=dict(
+            name="attributeDetails",
+            type="Element",
+            help="Attribute details",
+            min_occurs=0,
+            max_occurs=20
+        )
     )
 
 
@@ -5359,23 +5643,23 @@ class TravellerReferenceInformationType:
 
     ptc: List[AlphaNumericStringLength1To6] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 3,
-            "name": "ptc",
-            "type": "Element",
-            "help": "Requested passenger type",
-        },
+        metadata=dict(
+            name="ptc",
+            type="Element",
+            help="Requested passenger type",
+            min_occurs=0,
+            max_occurs=3
+        )
     )
     traveller: List[TravellerDetailsType] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 1,
-            "max_occurs": 9,
-            "name": "traveller",
-            "type": "Element",
-            "help": "Traveller details",
-        },
+        metadata=dict(
+            name="traveller",
+            type="Element",
+            help="Traveller details",
+            min_occurs=1,
+            max_occurs=9
+        )
     )
 
 
@@ -5387,27 +5671,27 @@ class UserIdentificationType:
 
     office_identification: OriginatorIdentificationDetailsTypeI = field(
         default=None,
-        metadata={
-            "name": "officeIdentification",
-            "type": "Element",
-            "help": "Originator Identification Details",
-        },
+        metadata=dict(
+            name="officeIdentification",
+            type="Element",
+            help="Originator Identification Details",
+        )
     )
     office_type: AlphaNumericStringLength1To1 = field(
         default=None,
-        metadata={
-            "name": "officeType",
-            "type": "Element",
-            "help": "Used to specify which kind of info is given in DE 9900.",
-        },
+        metadata=dict(
+            name="officeType",
+            type="Element",
+            help="Used to specify which kind of info is given in DE 9900.",
+        )
     )
     office_code: AlphaNumericStringLength1To30 = field(
         default=None,
-        metadata={
-            "name": "officeCode",
-            "type": "Element",
-            "help": "The code given to an agent by the originating reservation system.",
-        },
+        metadata=dict(
+            name="officeCode",
+            type="Element",
+            help="The code given to an agent by the originating reservation system.",
+        )
     )
 
 
@@ -5418,22 +5702,38 @@ class ValueSearchCriteriaType:
     """
 
     criteria_name: AlphaNumericStringLength1To50 = field(
-        default=None, metadata={"name": "criteriaName", "type": "Element"}
+        default=None,
+        metadata=dict(
+            name="criteriaName",
+            type="Element",
+            help=None,
+        )
     )
     criteria_code: AlphaNumericStringLength1To3 = field(
-        default=None, metadata={"name": "criteriaCode", "type": "Element"}
+        default=None,
+        metadata=dict(
+            name="criteriaCode",
+            type="Element",
+            help=None,
+        )
     )
     value: AlphaNumericStringLength1To18 = field(
-        default=None, metadata={"name": "value", "type": "Element"}
+        default=None,
+        metadata=dict(
+            name="value",
+            type="Element",
+            help=None,
+        )
     )
     criteria_details: List[CriteriaiDetaislType] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 10,
-            "name": "criteriaDetails",
-            "type": "Element",
-        },
+        metadata=dict(
+            name="criteriaDetails",
+            type="Element",
+            help=None,
+            min_occurs=0,
+            max_occurs=10
+        )
     )
 
 
@@ -5441,20 +5741,20 @@ class ValueSearchCriteriaType:
 class FoprepresentationType:
     form_of_payment_details: FormOfPaymentTypeI = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "formOfPaymentDetails",
-            "type": "Element",
-            "help": "Form of payment information.",
-        },
+        metadata=dict(
+            name="formOfPaymentDetails",
+            type="Element",
+            help="Form of payment information.",
+            required=True
+        )
     )
     passenger_fee_reference: ItemReferencesAndVersionsType = field(
         default=None,
-        metadata={
-            "name": "passengerFeeReference",
-            "type": "Element",
-            "help": "Fee/Reduction Passenger reference.",
-        },
+        metadata=dict(
+            name="passengerFeeReference",
+            type="Element",
+            help="Fee/Reduction Passenger reference.",
+        )
     )
 
 
@@ -5466,42 +5766,42 @@ class GroupPassengerDetailsType:
 
     passenger_reference: SegmentRepetitionControlTypeI = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "passengerReference",
-            "type": "Element",
-            "help": "Trigger",
-        },
+        metadata=dict(
+            name="passengerReference",
+            type="Element",
+            help="Trigger",
+            required=True
+        )
     )
     psg_details_info: List["GroupPassengerDetailsType.PsgDetailsInfo"] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 2,
-            "name": "psgDetailsInfo",
-            "type": "Element",
-            "help": "pricing option at passenger level",
-        },
+        metadata=dict(
+            name="psgDetailsInfo",
+            type="Element",
+            help="pricing option at passenger level",
+            min_occurs=0,
+            max_occurs=2
+        )
     )
 
     @dataclass
     class PsgDetailsInfo:
         discount_ptc: FareInformationTypeI = field(
             default=None,
-            metadata={
-                "required": True,
-                "name": "discountPtc",
-                "type": "Element",
-                "help": "PTC/Discount Code age",
-            },
+            metadata=dict(
+                name="discountPtc",
+                type="Element",
+                help="PTC/Discount Code age",
+                required=True
+            )
         )
         flequent_flyer_details: FrequentTravellerIdentificationCodeType = field(
             default=None,
-            metadata={
-                "name": "flequentFlyerDetails",
-                "type": "Element",
-                "help": "Tier level information",
-            },
+            metadata=dict(
+                name="flequentFlyerDetails",
+                type="Element",
+                help="Tier level information",
+            )
         )
 
 
@@ -5513,939 +5813,911 @@ class FareMasterPricerTravelBoardSearch:
 
     number_of_unit: NumberOfUnitsType = field(
         default=None,
-        metadata={
-            "name": "numberOfUnit",
-            "type": "Element",
-            "help": "Number of seats , recommendations.",
-        },
+        metadata=dict(
+            name="numberOfUnit",
+            type="Element",
+            help="Number of seats , recommendations.",
+        )
     )
     global_options: AttributeType = field(
         default=None,
-        metadata={
-            "name": "globalOptions",
-            "type": "Element",
-            "help": "Global options",
-        },
+        metadata=dict(
+            name="globalOptions",
+            type="Element",
+            help="Global options",
+        )
     )
     pax_reference: List[TravellerReferenceInformationType] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 6,
-            "name": "paxReference",
-            "type": "Element",
-            "help": "Traveler Details",
-        },
+        metadata=dict(
+            name="paxReference",
+            type="Element",
+            help="Traveler Details",
+            min_occurs=0,
+            max_occurs=6
+        )
     )
     customer_ref: ConsumerReferenceInformationType = field(
         default=None,
-        metadata={
-            "name": "customerRef",
-            "type": "Element",
-            "help": "Customer references",
-        },
+        metadata=dict(
+            name="customerRef",
+            type="Element",
+            help="Customer references",
+        )
     )
     form_of_payment_by_passenger: List[FoprepresentationType] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 60,
-            "name": "formOfPaymentByPassenger",
-            "type": "Element",
-            "help": "Fee with different payment forms by passenger.",
-        },
+        metadata=dict(
+            name="formOfPaymentByPassenger",
+            type="Element",
+            help="Fee with different payment forms by passenger.",
+            min_occurs=0,
+            max_occurs=60
+        )
     )
     solution_family: List[FareInformationType] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 20,
-            "name": "solutionFamily",
-            "type": "Element",
-            "help": "Solution Family",
-        },
+        metadata=dict(
+            name="solutionFamily",
+            type="Element",
+            help="Solution Family",
+            min_occurs=0,
+            max_occurs=20
+        )
     )
     passenger_info_grp: List[GroupPassengerDetailsType] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 9,
-            "name": "passengerInfoGrp",
-            "type": "Element",
-            "help": "Passenger info group (9 ADT + 9 IN)",
-        },
+        metadata=dict(
+            name="passengerInfoGrp",
+            type="Element",
+            help="Passenger info group (9 ADT + 9 IN)",
+            min_occurs=0,
+            max_occurs=9
+        )
     )
-    fare_families: List[
-        "FareMasterPricerTravelBoardSearch.FareFamilies"
-    ] = field(
+    fare_families: List["FareMasterPricerTravelBoardSearch.FareFamilies"] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 20,
-            "name": "fareFamilies",
-            "type": "Element",
-            "help": "Fare families.",
-        },
+        metadata=dict(
+            name="fareFamilies",
+            type="Element",
+            help="Fare families.",
+            min_occurs=0,
+            max_occurs=20
+        )
     )
     fare_options: "FareMasterPricerTravelBoardSearch.FareOptions" = field(
         default=None,
-        metadata={
-            "name": "fareOptions",
-            "type": "Element",
-            "help": "Fare options",
-        },
+        metadata=dict(
+            name="fareOptions",
+            type="Element",
+            help="Fare options",
+        )
     )
     price_to_beat: MonetaryInformationType = field(
         default=None,
-        metadata={
-            "name": "priceToBeat",
-            "type": "Element",
-            "help": "Indicates Price to beat",
-        },
+        metadata=dict(
+            name="priceToBeat",
+            type="Element",
+            help="Indicates Price to beat",
+        )
     )
     tax_info: List[TaxType] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 9,
-            "name": "taxInfo",
-            "type": "Element",
-            "help": "Tax Details",
-        },
+        metadata=dict(
+            name="taxInfo",
+            type="Element",
+            help="Tax Details",
+            min_occurs=0,
+            max_occurs=9
+        )
     )
     travel_flight_info: TravelFlightInformationType197722S = field(
         default=None,
-        metadata={
-            "name": "travelFlightInfo",
-            "type": "Element",
-            "help": "Details of a Flight : Direct, Non stop...",
-        },
+        metadata=dict(
+            name="travelFlightInfo",
+            type="Element",
+            help="Details of a Flight : Direct, Non stop...",
+        )
     )
     value_search: List[ValueSearchCriteriaType] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 99,
-            "name": "valueSearch",
-            "type": "Element",
-        },
+        metadata=dict(
+            name="valueSearch",
+            type="Element",
+            help=None,
+            min_occurs=0,
+            max_occurs=99
+        )
     )
     buckets: List["FareMasterPricerTravelBoardSearch.Buckets"] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 10,
-            "name": "buckets",
-            "type": "Element",
-            "help": "Buckets",
-        },
+        metadata=dict(
+            name="buckets",
+            type="Element",
+            help="Buckets",
+            min_occurs=0,
+            max_occurs=10
+        )
     )
     itinerary: List["FareMasterPricerTravelBoardSearch.Itinerary"] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 18,
-            "name": "itinerary",
-            "type": "Element",
-            "help": "Itinerary",
-        },
+        metadata=dict(
+            name="itinerary",
+            type="Element",
+            help="Itinerary",
+            min_occurs=0,
+            max_occurs=18
+        )
     )
     ticket_change_info: "FareMasterPricerTravelBoardSearch.TicketChangeInfo" = field(
         default=None,
-        metadata={
-            "name": "ticketChangeInfo",
-            "type": "Element",
-            "help": "Changed ticket information.",
-        },
+        metadata=dict(
+            name="ticketChangeInfo",
+            type="Element",
+            help="Changed ticket information.",
+        )
     )
-    combination_fare_families: List[
-        "FareMasterPricerTravelBoardSearch.CombinationFareFamilies"
-    ] = field(
+    combination_fare_families: List["FareMasterPricerTravelBoardSearch.CombinationFareFamilies"] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 2000,
-            "name": "combinationFareFamilies",
-            "type": "Element",
-            "help": "Specify fare family combinations",
-        },
+        metadata=dict(
+            name="combinationFareFamilies",
+            type="Element",
+            help="Specify fare family combinations",
+            min_occurs=0,
+            max_occurs=2000
+        )
     )
     fee_option: List["FareMasterPricerTravelBoardSearch.FeeOption"] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 9,
-            "name": "feeOption",
-            "type": "Element",
-            "help": "Fee option group.",
-        },
+        metadata=dict(
+            name="feeOption",
+            type="Element",
+            help="Fee option group.",
+            min_occurs=0,
+            max_occurs=9
+        )
     )
-    office_id_details: List[
-        "FareMasterPricerTravelBoardSearch.OfficeIdDetails"
-    ] = field(
+    office_id_details: List["FareMasterPricerTravelBoardSearch.OfficeIdDetails"] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 20,
-            "name": "officeIdDetails",
-            "type": "Element",
-            "help": "List of Office Id Details",
-        },
+        metadata=dict(
+            name="officeIdDetails",
+            type="Element",
+            help="List of Office Id Details",
+            min_occurs=0,
+            max_occurs=20
+        )
     )
 
     @dataclass
     class FareFamilies:
         family_information: FareFamilyType80157S = field(
             default=None,
-            metadata={
-                "required": True,
-                "name": "familyInformation",
-                "type": "Element",
-                "help": "Segment used to target Commercial Fare Family.",
-            },
+            metadata=dict(
+                name="familyInformation",
+                type="Element",
+                help="Segment used to target Commercial Fare Family.",
+                required=True
+            )
         )
         family_criteria: FareFamilyCriteriaType = field(
             default=None,
-            metadata={
-                "name": "familyCriteria",
-                "type": "Element",
-                "help": "Description of Fare Family Criteria.",
-            },
+            metadata=dict(
+                name="familyCriteria",
+                type="Element",
+                help="Description of Fare Family Criteria.",
+            )
         )
-        fare_family_segment: List[
-            "FareMasterPricerTravelBoardSearch.FareFamilies.FareFamilySegment"
-        ] = field(
+        fare_family_segment: List["FareMasterPricerTravelBoardSearch.FareFamilies.FareFamilySegment"] = field(
             default_factory=list,
-            metadata={
-                "min_occurs": 0,
-                "max_occurs": 6,
-                "name": "fareFamilySegment",
-                "type": "Element",
-                "help": "Fare family requested segment details.",
-            },
+            metadata=dict(
+                name="fareFamilySegment",
+                type="Element",
+                help="Fare family requested segment details.",
+                min_occurs=0,
+                max_occurs=6
+            )
         )
-        other_possible_criteria: List[
-            "FareMasterPricerTravelBoardSearch.FareFamilies.OtherPossibleCriteria"
-        ] = field(
+        other_possible_criteria: List["FareMasterPricerTravelBoardSearch.FareFamilies.OtherPossibleCriteria"] = field(
             default_factory=list,
-            metadata={
-                "min_occurs": 0,
-                "max_occurs": 20,
-                "name": "otherPossibleCriteria",
-                "type": "Element",
-                "help": "Description of other possible fare family criteria.",
-            },
+            metadata=dict(
+                name="otherPossibleCriteria",
+                type="Element",
+                help="Description of other possible fare family criteria.",
+                min_occurs=0,
+                max_occurs=20
+            )
         )
 
         @dataclass
         class FareFamilySegment:
             reference_info: ReferenceInfoType = field(
                 default=None,
-                metadata={
-                    "required": True,
-                    "name": "referenceInfo",
-                    "type": "Element",
-                    "help": "Requested segment reference",
-                },
+                metadata=dict(
+                    name="referenceInfo",
+                    type="Element",
+                    help="Requested segment reference",
+                    required=True
+                )
             )
             family_criteria: FareFamilyCriteriaType = field(
                 default=None,
-                metadata={
-                    "name": "familyCriteria",
-                    "type": "Element",
-                    "help": "Description of fare family criteria.",
-                },
+                metadata=dict(
+                    name="familyCriteria",
+                    type="Element",
+                    help="Description of fare family criteria.",
+                )
             )
 
         @dataclass
         class OtherPossibleCriteria:
             logical_link: BooleanExpressionRuleType = field(
                 default=None,
-                metadata={
-                    "required": True,
-                    "name": "logicalLink",
-                    "type": "Element",
-                    "help": "Logical link with other criteria.",
-                },
+                metadata=dict(
+                    name="logicalLink",
+                    type="Element",
+                    help="Logical link with other criteria.",
+                    required=True
+                )
             )
             family_criteria: FareFamilyCriteriaType = field(
                 default=None,
-                metadata={
-                    "name": "familyCriteria",
-                    "type": "Element",
-                    "help": "Description of fare family criteria.",
-                },
+                metadata=dict(
+                    name="familyCriteria",
+                    type="Element",
+                    help="Description of fare family criteria.",
+                )
             )
-            fare_family_segment: List[
-                "FareMasterPricerTravelBoardSearch.FareFamilies.OtherPossibleCriteria.FareFamilySegment"
-            ] = field(
+            fare_family_segment: List["FareMasterPricerTravelBoardSearch.FareFamilies.OtherPossibleCriteria.FareFamilySegment"] = field(
                 default_factory=list,
-                metadata={
-                    "min_occurs": 0,
-                    "max_occurs": 6,
-                    "name": "fareFamilySegment",
-                    "type": "Element",
-                    "help": "Fare family requested segment details.",
-                },
+                metadata=dict(
+                    name="fareFamilySegment",
+                    type="Element",
+                    help="Fare family requested segment details.",
+                    min_occurs=0,
+                    max_occurs=6
+                )
             )
 
             @dataclass
             class FareFamilySegment:
                 reference_info: ReferenceInfoType = field(
                     default=None,
-                    metadata={
-                        "required": True,
-                        "name": "referenceInfo",
-                        "type": "Element",
-                        "help": "Requested segment reference",
-                    },
+                    metadata=dict(
+                        name="referenceInfo",
+                        type="Element",
+                        help="Requested segment reference",
+                        required=True
+                    )
                 )
                 family_criteria: FareFamilyCriteriaType = field(
                     default=None,
-                    metadata={
-                        "name": "familyCriteria",
-                        "type": "Element",
-                        "help": "Description of fare family criteria.",
-                    },
+                    metadata=dict(
+                        name="familyCriteria",
+                        type="Element",
+                        help="Description of fare family criteria.",
+                    )
                 )
 
     @dataclass
     class FareOptions:
         pricing_tick_info: PricingTicketingDetailsType = field(
             default=None,
-            metadata={
-                "required": True,
-                "name": "pricingTickInfo",
-                "type": "Element",
-                "help": "Pricing and ticketing details.",
-            },
+            metadata=dict(
+                name="pricingTickInfo",
+                type="Element",
+                help="Pricing and ticketing details.",
+                required=True
+            )
         )
         corporate: CorporateIdentificationType = field(
             default=None,
-            metadata={
-                "name": "corporate",
-                "type": "Element",
-                "help": "Corporate name/number used to target fares",
-            },
+            metadata=dict(
+                name="corporate",
+                type="Element",
+                help="Corporate name/number used to target fares",
+            )
         )
         ticketing_price_scheme: TicketingPriceSchemeType = field(
             default=None,
-            metadata={
-                "name": "ticketingPriceScheme",
-                "type": "Element",
-                "help": "Ticketing price scheme.",
-            },
+            metadata=dict(
+                name="ticketingPriceScheme",
+                type="Element",
+                help="Ticketing price scheme.",
+            )
         )
         fee_id_description: CodedAttributeType197696S = field(
             default=None,
-            metadata={
-                "name": "feeIdDescription",
-                "type": "Element",
-                "help": "PSR number",
-            },
+            metadata=dict(
+                name="feeIdDescription",
+                type="Element",
+                help="PSR number",
+            )
         )
         conversion_rate: ConversionRateType = field(
             default=None,
-            metadata={
-                "name": "conversionRate",
-                "type": "Element",
-                "help": "Used to force the currency of pricing",
-            },
+            metadata=dict(
+                name="conversionRate",
+                type="Element",
+                help="Used to force the currency of pricing",
+            )
         )
         form_of_payment: FormOfPaymentTypeI = field(
             default=None,
-            metadata={
-                "name": "formOfPayment",
-                "type": "Element",
-                "help": "Form of payment information.",
-            },
+            metadata=dict(
+                name="formOfPayment",
+                type="Element",
+                help="Form of payment information.",
+            )
         )
         frequent_traveller_info: FrequentTravellerIdentificationCodeType177150S = field(
             default=None,
-            metadata={
-                "name": "frequentTravellerInfo",
-                "type": "Element",
-                "help": "Frequent traveller information",
-            },
+            metadata=dict(
+                name="frequentTravellerInfo",
+                type="Element",
+                help="Frequent traveller information",
+            )
         )
         monetary_cabin_info: MonetaryAndCabinInformationType = field(
             default=None,
-            metadata={
-                "name": "monetaryCabinInfo",
-                "type": "Element",
-                "help": "Monetary and cabin information.",
-            },
+            metadata=dict(
+                name="monetaryCabinInfo",
+                type="Element",
+                help="Monetary and cabin information.",
+            )
         )
 
     @dataclass
     class Buckets:
         bucket_info: BucketInformationType = field(
             default=None,
-            metadata={
-                "required": True,
-                "name": "bucketInfo",
-                "type": "Element",
-                "help": "Bucket information: name, priority, weight",
-            },
+            metadata=dict(
+                name="bucketInfo",
+                type="Element",
+                help="Bucket information: name, priority, weight",
+                required=True
+            )
         )
         bucket_details: List[BucketDetailsType] = field(
             default_factory=list,
-            metadata={
-                "min_occurs": 0,
-                "max_occurs": 15,
-                "name": "bucketDetails",
-                "type": "Element",
-                "help": "Bucket details",
-            },
+            metadata=dict(
+                name="bucketDetails",
+                type="Element",
+                help="Bucket details",
+                min_occurs=0,
+                max_occurs=15
+            )
         )
 
     @dataclass
     class Itinerary:
         requested_segment_ref: OriginAndDestinationRequestType = field(
             default=None,
-            metadata={
-                "required": True,
-                "name": "requestedSegmentRef",
-                "type": "Element",
-                "help": "Indicates reference of the requested segment",
-            },
+            metadata=dict(
+                name="requestedSegmentRef",
+                type="Element",
+                help="Indicates reference of the requested segment",
+                required=True
+            )
         )
         departure_localization: DepartureLocationType = field(
             default=None,
-            metadata={
-                "name": "departureLocalization",
-                "type": "Element",
-                "help": "Specification of the requested departure point",
-            },
+            metadata=dict(
+                name="departureLocalization",
+                type="Element",
+                help="Specification of the requested departure point",
+            )
         )
         arrival_localization: ArrivalLocalizationType = field(
             default=None,
-            metadata={
-                "name": "arrivalLocalization",
-                "type": "Element",
-                "help": "Specification of the requested arrival point",
-            },
+            metadata=dict(
+                name="arrivalLocalization",
+                type="Element",
+                help="Specification of the requested arrival point",
+            )
         )
         time_details: DateAndTimeInformationType181295S = field(
             default=None,
-            metadata={
-                "name": "timeDetails",
-                "type": "Element",
-                "help": "Details on requested date and time plus range of date trip duration",
-            },
+            metadata=dict(
+                name="timeDetails",
+                type="Element",
+                help="Details on requested date and time plus range of date trip duration",
+            )
         )
         flight_info: TravelFlightInformationType165053S = field(
             default=None,
-            metadata={
-                "name": "flightInfo",
-                "type": "Element",
-                "help": "Specify Flight options.",
-            },
+            metadata=dict(
+                name="flightInfo",
+                type="Element",
+                help="Specify Flight options.",
+            )
         )
         family_information: FareFamilyType = field(
             default=None,
-            metadata={
-                "name": "familyInformation",
-                "type": "Element",
-                "help": "Segment used to target Commercial Fare Family at requested segment level",
-            },
+            metadata=dict(
+                name="familyInformation",
+                type="Element",
+                help="Segment used to target Commercial Fare Family at requested segment level",
+            )
         )
         value_search: List[ValueSearchCriteriaType] = field(
             default_factory=list,
-            metadata={
-                "min_occurs": 0,
-                "max_occurs": 99,
-                "name": "valueSearch",
-                "type": "Element",
-            },
+            metadata=dict(
+                name="valueSearch",
+                type="Element",
+                help=None,
+                min_occurs=0,
+                max_occurs=99
+            )
         )
-        group_of_flights: List[
-            "FareMasterPricerTravelBoardSearch.Itinerary.GroupOfFlights"
-        ] = field(
+        group_of_flights: List["FareMasterPricerTravelBoardSearch.Itinerary.GroupOfFlights"] = field(
             default_factory=list,
-            metadata={
-                "min_occurs": 0,
-                "max_occurs": 6,
-                "name": "groupOfFlights",
-                "type": "Element",
-                "help": "list of proposed segments per requested segment",
-            },
+            metadata=dict(
+                name="groupOfFlights",
+                type="Element",
+                help="list of proposed segments per requested segment",
+                min_occurs=0,
+                max_occurs=6
+            )
         )
-        flight_info_pnr: List[
-            "FareMasterPricerTravelBoardSearch.Itinerary.FlightInfoPnr"
-        ] = field(
+        flight_info_pnr: List["FareMasterPricerTravelBoardSearch.Itinerary.FlightInfoPnr"] = field(
             default_factory=list,
-            metadata={
-                "min_occurs": 0,
-                "max_occurs": 4,
-                "name": "flightInfoPNR",
-                "type": "Element",
-                "help": "Info concerning the flights booked in the PNR",
-            },
+            metadata=dict(
+                name="flightInfoPNR",
+                type="Element",
+                help="Info concerning the flights booked in the PNR",
+                min_occurs=0,
+                max_occurs=4
+            )
         )
         requested_segment_action: ActionIdentificationType = field(
             default=None,
-            metadata={
-                "name": "requestedSegmentAction",
-                "type": "Element",
-                "help": "Action identification for the requested segment",
-            },
+            metadata=dict(
+                name="requestedSegmentAction",
+                type="Element",
+                help="Action identification for the requested segment",
+            )
         )
         attributes: CodedAttributeType = field(
             default=None,
-            metadata={
-                "name": "attributes",
-                "type": "Element",
-                "help": "Coded attributes",
-            },
+            metadata=dict(
+                name="attributes",
+                type="Element",
+                help="Coded attributes",
+            )
         )
 
         @dataclass
         class GroupOfFlights:
             prop_flight_gr_detail: ProposedSegmentType = field(
                 default=None,
-                metadata={
-                    "required": True,
-                    "name": "propFlightGrDetail",
-                    "type": "Element",
-                    "help": "To indicate parameters for proposed flight group.",
-                },
+                metadata=dict(
+                    name="propFlightGrDetail",
+                    type="Element",
+                    help="To indicate parameters for proposed flight group.",
+                    required=True
+                )
             )
             price_to_beat: MonetaryInformationType = field(
                 default=None,
-                metadata={
-                    "name": "priceToBeat",
-                    "type": "Element",
-                    "help": "Indicates Price to beat",
-                },
+                metadata=dict(
+                    name="priceToBeat",
+                    type="Element",
+                    help="Indicates Price to beat",
+                )
             )
-            flight_details: List[
-                "FareMasterPricerTravelBoardSearch.Itinerary.GroupOfFlights.FlightDetails"
-            ] = field(
+            flight_details: List["FareMasterPricerTravelBoardSearch.Itinerary.GroupOfFlights.FlightDetails"] = field(
                 default_factory=list,
-                metadata={
-                    "min_occurs": 1,
-                    "max_occurs": 4,
-                    "name": "flightDetails",
-                    "type": "Element",
-                    "help": "list of flight per proposed segment",
-                },
+                metadata=dict(
+                    name="flightDetails",
+                    type="Element",
+                    help="list of flight per proposed segment",
+                    min_occurs=1,
+                    max_occurs=4
+                )
             )
 
             @dataclass
             class FlightDetails:
                 flight_information: TravelProductType = field(
                     default=None,
-                    metadata={
-                        "required": True,
-                        "name": "flightInformation",
-                        "type": "Element",
-                        "help": "Specification of details on the flight and posting availability",
-                    },
+                    metadata=dict(
+                        name="flightInformation",
+                        type="Element",
+                        help="Specification of details on the flight and posting availability",
+                        required=True
+                    )
                 )
                 avl_info: List[FlightProductInformationType] = field(
                     default_factory=list,
-                    metadata={
-                        "min_occurs": 0,
-                        "max_occurs": 6,
-                        "name": "avlInfo",
-                        "type": "Element",
-                        "help": "returns booking class and availability context",
-                    },
+                    metadata=dict(
+                        name="avlInfo",
+                        type="Element",
+                        help="returns booking class and availability context",
+                        min_occurs=0,
+                        max_occurs=6
+                    )
                 )
                 technical_stop: List[DateAndTimeInformationType] = field(
                     default_factory=list,
-                    metadata={
-                        "min_occurs": 0,
-                        "max_occurs": 5,
-                        "name": "technicalStop",
-                        "type": "Element",
-                        "help": "Details on Flight date, time and location of technical stop or change of gauge",
-                    },
+                    metadata=dict(
+                        name="technicalStop",
+                        type="Element",
+                        help="Details on Flight date, time and location of technical stop or change of gauge",
+                        min_occurs=0,
+                        max_occurs=5
+                    )
                 )
                 commercial_agreement: CommercialAgreementsType78540S = field(
                     default=None,
-                    metadata={
-                        "name": "commercialAgreement",
-                        "type": "Element",
-                        "help": "Code Share Agreement description for current flight.",
-                    },
+                    metadata=dict(
+                        name="commercialAgreement",
+                        type="Element",
+                        help="Code Share Agreement description for current flight.",
+                    )
                 )
                 add_info: HeaderInformationTypeI = field(
                     default=None,
-                    metadata={
-                        "name": "addInfo",
-                        "type": "Element",
-                        "help": "Additional Info about flight, such as Reference number, and several options",
-                    },
+                    metadata=dict(
+                        name="addInfo",
+                        type="Element",
+                        help="Additional Info about flight, such as Reference number, and several options",
+                    )
                 )
-                terminal_equipment_details: List[
-                    AdditionalProductDetailsTypeI
-                ] = field(
+                terminal_equipment_details: List[AdditionalProductDetailsTypeI] = field(
                     default_factory=list,
-                    metadata={
-                        "min_occurs": 0,
-                        "max_occurs": 2,
-                        "name": "terminalEquipmentDetails",
-                        "type": "Element",
-                        "help": "Terminal, Equipment and EFT Details. If a Total EFT of the Travel Solution is requested then we will have 2 occurrences of the terminalEquipmentDetails attached to the first leg flightInformation: the 1st occurence will give the EFT of the leg, the 2nd occurrence will give the total EFT of the Travel Solution.",
-                    },
+                    metadata=dict(
+                        name="terminalEquipmentDetails",
+                        type="Element",
+                        help="Terminal, Equipment and EFT Details. If a Total EFT of the Travel Solution is requested then we will have 2 occurrences of the terminalEquipmentDetails attached to the first leg flightInformation: the 1st occurence will give the EFT of the leg, the 2nd occurrence will give the total EFT of the Travel Solution.",
+                        min_occurs=0,
+                        max_occurs=2
+                    )
                 )
                 reservation_info: PassengerItineraryInformationType = field(
                     default=None,
-                    metadata={
-                        "name": "reservationInfo",
-                        "type": "Element",
-                        "help": "PNR flight reservation info",
-                    },
+                    metadata=dict(
+                        name="reservationInfo",
+                        type="Element",
+                        help="PNR flight reservation info",
+                    )
                 )
                 price_to_beat: MonetaryInformationType = field(
                     default=None,
-                    metadata={
-                        "name": "priceToBeat",
-                        "type": "Element",
-                        "help": "Indicates Price to beat",
-                    },
+                    metadata=dict(
+                        name="priceToBeat",
+                        type="Element",
+                        help="Indicates Price to beat",
+                    )
                 )
 
         @dataclass
         class FlightInfoPnr:
             travel_response_details: TravelProductInformationTypeI = field(
                 default=None,
-                metadata={
-                    "required": True,
-                    "name": "travelResponseDetails",
-                    "type": "Element",
-                    "help": "Travel Response Details: - Board/Off aiports - Flight number - Part of the journey - Day difference between Board and off - Departure/Arrival dates - Departure/Arrival times",
-                },
+                metadata=dict(
+                    name="travelResponseDetails",
+                    type="Element",
+                    help="Travel Response Details: - Board/Off aiports - Flight number - Part of the journey - Day difference between Board and off - Departure/Arrival dates - Departure/Arrival times",
+                    required=True
+                )
             )
             time_table_date: StructuredPeriodInformationType = field(
                 default=None,
-                metadata={
-                    "name": "timeTableDate",
-                    "type": "Element",
-                    "help": "Time Table Effective/Discontinue dates and frequency of operating Travel Solution",
-                },
+                metadata=dict(
+                    name="timeTableDate",
+                    type="Element",
+                    help="Time Table Effective/Discontinue dates and frequency of operating Travel Solution",
+                )
             )
-            terminal_equipment_details: List[
-                AdditionalProductDetailsTypeI
-            ] = field(
+            terminal_equipment_details: List[AdditionalProductDetailsTypeI] = field(
                 default_factory=list,
-                metadata={
-                    "min_occurs": 0,
-                    "max_occurs": 2,
-                    "name": "terminalEquipmentDetails",
-                    "type": "Element",
-                    "help": "Terminal, Equipment and EFT Details. If a Total EFT of the Travel Solution is requested then we will have 2 occurrences of the terminalEquipmentDetails attached to the first leg travelResponseDetails: the 1st occurrence will give the EFT of the leg, the 2nd occurrence will give the total EFT of the Travel Solution.",
-                },
+                metadata=dict(
+                    name="terminalEquipmentDetails",
+                    type="Element",
+                    help="Terminal, Equipment and EFT Details. If a Total EFT of the Travel Solution is requested then we will have 2 occurrences of the terminalEquipmentDetails attached to the first leg travelResponseDetails: the 1st occurrence will give the EFT of the leg, the 2nd occurrence will give the total EFT of the Travel Solution.",
+                    min_occurs=0,
+                    max_occurs=2
+                )
             )
             codeshare_data: CommercialAgreementsType = field(
                 default=None,
-                metadata={
-                    "name": "codeshareData",
-                    "type": "Element",
-                    "help": "Codeshare data",
-                },
+                metadata=dict(
+                    name="codeshareData",
+                    type="Element",
+                    help="Codeshare data",
+                )
             )
             disclosure: FreeTextInformationType = field(
                 default=None,
-                metadata={
-                    "name": "disclosure",
-                    "type": "Element",
-                    "help": "Disclosure message from an operating carrier.",
-                },
+                metadata=dict(
+                    name="disclosure",
+                    type="Element",
+                    help="Disclosure message from an operating carrier.",
+                )
             )
             stop_details: RoutingInformationTypeI = field(
                 default=None,
-                metadata={
-                    "name": "stopDetails",
-                    "type": "Element",
-                    "help": "Stops Details",
-                },
+                metadata=dict(
+                    name="stopDetails",
+                    type="Element",
+                    help="Stops Details",
+                )
             )
             traffic_restriction_data: TrafficRestrictionTypeI = field(
                 default=None,
-                metadata={
-                    "name": "trafficRestrictionData",
-                    "type": "Element",
-                    "help": "Traffic restriction information",
-                },
+                metadata=dict(
+                    name="trafficRestrictionData",
+                    type="Element",
+                    help="Traffic restriction information",
+                )
             )
             reservation_info: PassengerItineraryInformationType = field(
                 default=None,
-                metadata={
-                    "name": "reservationInfo",
-                    "type": "Element",
-                    "help": "PNR flight reservation info",
-                },
+                metadata=dict(
+                    name="reservationInfo",
+                    type="Element",
+                    help="PNR flight reservation info",
+                )
             )
-            incidental_stop_info: List[
-                "FareMasterPricerTravelBoardSearch.Itinerary.FlightInfoPnr.IncidentalStopInfo"
-            ] = field(
+            incidental_stop_info: List["FareMasterPricerTravelBoardSearch.Itinerary.FlightInfoPnr.IncidentalStopInfo"] = field(
                 default_factory=list,
-                metadata={
-                    "min_occurs": 0,
-                    "max_occurs": 8,
-                    "name": "incidentalStopInfo",
-                    "type": "Element",
-                    "help": "Incidental stop information.",
-                },
+                metadata=dict(
+                    name="incidentalStopInfo",
+                    type="Element",
+                    help="Incidental stop information.",
+                    min_occurs=0,
+                    max_occurs=8
+                )
             )
 
             @dataclass
             class IncidentalStopInfo:
                 date_time_info: DateAndTimeInformationTypeI = field(
                     default=None,
-                    metadata={
-                        "required": True,
-                        "name": "dateTimeInfo",
-                        "type": "Element",
-                        "help": "Incidental stop date/time information",
-                    },
+                    metadata=dict(
+                        name="dateTimeInfo",
+                        type="Element",
+                        help="Incidental stop date/time information",
+                        required=True
+                    )
                 )
 
     @dataclass
     class TicketChangeInfo:
         ticket_number_details: TicketNumberTypeI = field(
             default=None,
-            metadata={
-                "required": True,
-                "name": "ticketNumberDetails",
-                "type": "Element",
-                "help": "Ticket nb details.",
-            },
+            metadata=dict(
+                name="ticketNumberDetails",
+                type="Element",
+                help="Ticket nb details.",
+                required=True
+            )
         )
-        ticket_requested_segments: List[
-            "FareMasterPricerTravelBoardSearch.TicketChangeInfo.TicketRequestedSegments"
-        ] = field(
+        ticket_requested_segments: List["FareMasterPricerTravelBoardSearch.TicketChangeInfo.TicketRequestedSegments"] = field(
             default_factory=list,
-            metadata={
-                "min_occurs": 0,
-                "max_occurs": 6,
-                "name": "ticketRequestedSegments",
-                "type": "Element",
-                "help": "Changed ticket requested segments.",
-            },
+            metadata=dict(
+                name="ticketRequestedSegments",
+                type="Element",
+                help="Changed ticket requested segments.",
+                min_occurs=0,
+                max_occurs=6
+            )
         )
 
         @dataclass
         class TicketRequestedSegments:
             action_identification: ActionIdentificationType = field(
                 default=None,
-                metadata={
-                    "required": True,
-                    "name": "actionIdentification",
-                    "type": "Element",
-                    "help": "Action identification.",
-                },
+                metadata=dict(
+                    name="actionIdentification",
+                    type="Element",
+                    help="Action identification.",
+                    required=True
+                )
             )
             connect_point_details: ConnectionTypeI = field(
                 default=None,
-                metadata={
-                    "name": "connectPointDetails",
-                    "type": "Element",
-                    "help": "Connected cities in changed ticket requested segment.",
-                },
+                metadata=dict(
+                    name="connectPointDetails",
+                    type="Element",
+                    help="Connected cities in changed ticket requested segment.",
+                )
             )
 
     @dataclass
     class CombinationFareFamilies:
         item_ffcnumber: ItemNumberType = field(
             default=None,
-            metadata={
-                "required": True,
-                "name": "itemFFCNumber",
-                "type": "Element",
-                "help": "Specification of the item number",
-            },
+            metadata=dict(
+                name="itemFFCNumber",
+                type="Element",
+                help="Specification of the item number",
+                required=True
+            )
         )
         nb_of_units: NumberOfUnitsType80154S = field(
             default=None,
-            metadata={
-                "name": "nbOfUnits",
-                "type": "Element",
-                "help": "Number of units.",
-            },
+            metadata=dict(
+                name="nbOfUnits",
+                type="Element",
+                help="Number of units.",
+            )
         )
         reference_info: List[ReferenceInfoType] = field(
             default_factory=list,
-            metadata={
-                "min_occurs": 0,
-                "max_occurs": 6,
-                "name": "referenceInfo",
-                "type": "Element",
-                "help": "Requested segment reference",
-            },
+            metadata=dict(
+                name="referenceInfo",
+                type="Element",
+                help="Requested segment reference",
+                min_occurs=0,
+                max_occurs=6
+            )
         )
 
     @dataclass
     class FeeOption:
         fee_type_info: SelectionDetailsType = field(
             default=None,
-            metadata={
-                "required": True,
-                "name": "feeTypeInfo",
-                "type": "Element",
-                "help": "Nature of the fee (OB,OC,..)",
-            },
+            metadata=dict(
+                name="feeTypeInfo",
+                type="Element",
+                help="Nature of the fee (OB,OC,..)",
+                required=True
+            )
         )
         rate_tax: MonetaryInformationType80162S = field(
             default=None,
-            metadata={
-                "name": "rateTax",
-                "type": "Element",
-                "help": "Associated rate tax.",
-            },
+            metadata=dict(
+                name="rateTax",
+                type="Element",
+                help="Associated rate tax.",
+            )
         )
-        fee_details: List[
-            "FareMasterPricerTravelBoardSearch.FeeOption.FeeDetails"
-        ] = field(
+        fee_details: List["FareMasterPricerTravelBoardSearch.FeeOption.FeeDetails"] = field(
             default_factory=list,
-            metadata={
-                "min_occurs": 0,
-                "max_occurs": 99,
-                "name": "feeDetails",
-                "type": "Element",
-                "help": "Details for each fee.",
-            },
+            metadata=dict(
+                name="feeDetails",
+                type="Element",
+                help="Details for each fee.",
+                min_occurs=0,
+                max_occurs=99
+            )
         )
 
         @dataclass
         class FeeDetails:
             fee_info: SpecificDataInformationType = field(
                 default=None,
-                metadata={
-                    "required": True,
-                    "name": "feeInfo",
-                    "type": "Element",
-                    "help": "Fee information",
-                },
+                metadata=dict(
+                    name="feeInfo",
+                    type="Element",
+                    help="Fee information",
+                    required=True
+                )
             )
             associated_amounts: MonetaryInformationTypeI = field(
                 default=None,
-                metadata={
-                    "name": "associatedAmounts",
-                    "type": "Element",
-                    "help": "Associated amounts : amounts to take into account to calculate fee.",
-                },
+                metadata=dict(
+                    name="associatedAmounts",
+                    type="Element",
+                    help="Associated amounts : amounts to take into account to calculate fee.",
+                )
             )
             fee_description_grp: "FareMasterPricerTravelBoardSearch.FeeOption.FeeDetails.FeeDescriptionGrp" = field(
                 default=None,
-                metadata={
-                    "name": "feeDescriptionGrp",
-                    "type": "Element",
-                    "help": "Fee description",
-                },
+                metadata=dict(
+                    name="feeDescriptionGrp",
+                    type="Element",
+                    help="Fee description",
+                )
             )
 
             @dataclass
             class FeeDescriptionGrp:
                 item_number_info: ItemNumberType80866S = field(
                     default=None,
-                    metadata={
-                        "required": True,
-                        "name": "itemNumberInfo",
-                        "type": "Element",
-                        "help": "Specification of the item number",
-                    },
+                    metadata=dict(
+                        name="itemNumberInfo",
+                        type="Element",
+                        help="Specification of the item number",
+                        required=True
+                    )
                 )
                 service_attributes_info: AttributeType61377S = field(
                     default=None,
-                    metadata={
-                        "name": "serviceAttributesInfo",
-                        "type": "Element",
-                        "help": "Attributes (SSR code EMD, RFIC, SSIM)",
-                    },
+                    metadata=dict(
+                        name="serviceAttributesInfo",
+                        type="Element",
+                        help="Attributes (SSR code EMD, RFIC, SSIM)",
+                    )
                 )
                 service_description_info: SpecialRequirementsDetailsType = field(
                     default=None,
-                    metadata={
-                        "name": "serviceDescriptionInfo",
-                        "type": "Element",
-                        "help": "Other service information (service description, ...)",
-                    },
+                    metadata=dict(
+                        name="serviceDescriptionInfo",
+                        type="Element",
+                        help="Other service information (service description, ...)",
+                    )
                 )
 
     @dataclass
     class OfficeIdDetails:
         office_id_information: UserIdentificationType = field(
             default=None,
-            metadata={
-                "required": True,
-                "name": "officeIdInformation",
-                "type": "Element",
-                "help": "Office Id Information",
-            },
+            metadata=dict(
+                name="officeIdInformation",
+                type="Element",
+                help="Office Id Information",
+                required=True
+            )
         )
         nb_of_units: NumberOfUnitsType80154S = field(
             default=None,
-            metadata={
-                "name": "nbOfUnits",
-                "type": "Element",
-                "help": "Number of units.",
-            },
+            metadata=dict(
+                name="nbOfUnits",
+                type="Element",
+                help="Number of units.",
+            )
         )
         uid_option: CodedAttributeType78500S = field(
             default=None,
-            metadata={
-                "name": "uidOption",
-                "type": "Element",
-                "help": "UID option",
-            },
+            metadata=dict(
+                name="uidOption",
+                type="Element",
+                help="UID option",
+            )
         )
         pricing_tick_info: PricingTicketingDetailsType = field(
             default=None,
-            metadata={
-                "name": "pricingTickInfo",
-                "type": "Element",
-                "help": "Pricing and ticketing details.",
-            },
+            metadata=dict(
+                name="pricingTickInfo",
+                type="Element",
+                help="Pricing and ticketing details.",
+            )
         )
         corporate_fare_info: CorporateFareInformationType = field(
             default=None,
-            metadata={
-                "name": "corporateFareInfo",
-                "type": "Element",
-                "help": "Corporate fare information",
-            },
+            metadata=dict(
+                name="corporateFareInfo",
+                type="Element",
+                help="Corporate fare information",
+            )
         )
         travel_flight_info: TravelFlightInformationType = field(
             default=None,
-            metadata={
-                "name": "travelFlightInfo",
-                "type": "Element",
-                "help": "Details of a Flight : Direct, Non stop...",
-            },
+            metadata=dict(
+                name="travelFlightInfo",
+                type="Element",
+                help="Details of a Flight : Direct, Non stop...",
+            )
         )
-        airline_distribution_details: List[
-            "FareMasterPricerTravelBoardSearch.OfficeIdDetails.AirlineDistributionDetails"
-        ] = field(
+        airline_distribution_details: List["FareMasterPricerTravelBoardSearch.OfficeIdDetails.AirlineDistributionDetails"] = field(
             default_factory=list,
-            metadata={
-                "min_occurs": 0,
-                "max_occurs": 6,
-                "name": "airlineDistributionDetails",
-                "type": "Element",
-                "help": "Details of airline distribution at requested segment level",
-            },
+            metadata=dict(
+                name="airlineDistributionDetails",
+                type="Element",
+                help="Details of airline distribution at requested segment level",
+                min_occurs=0,
+                max_occurs=6
+            )
         )
 
         @dataclass
         class AirlineDistributionDetails:
             requested_segment_ref: OriginAndDestinationRequestType = field(
                 default=None,
-                metadata={
-                    "required": True,
-                    "name": "requestedSegmentRef",
-                    "type": "Element",
-                    "help": "Indicates reference of the requested segment",
-                },
+                metadata=dict(
+                    name="requestedSegmentRef",
+                    type="Element",
+                    help="Indicates reference of the requested segment",
+                    required=True
+                )
             )
             flight_info: TravelFlightInformationType = field(
                 default=None,
-                metadata={
-                    "name": "flightInfo",
-                    "type": "Element",
-                    "help": "Specify Flight options.",
-                },
+                metadata=dict(
+                    name="flightInfo",
+                    type="Element",
+                    help="Specify Flight options.",
+                )
             )

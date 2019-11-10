@@ -144,15 +144,20 @@ class AccountCode:
     """
 
     code: str = field(
-        default=None, metadata={"name": "Code", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="Code",
+            type="Attribute",
+            help=None,
+        )
     )
     type: str = field(
         default=None,
-        metadata={
-            "name": "Type",
-            "type": "Attribute",
-            "help": "An identifier to categorize this account code. For example, FlightPass for AC Flight Pass or RFB for AC corporate Rewards for Business.",
-        },
+        metadata=dict(
+            name="Type",
+            type="Attribute",
+            help="An identifier to categorize this account code. For example, FlightPass for AC Flight Pass or RFB for AC corporate Rewards for Business.",
+        )
     )
 
 
@@ -164,7 +169,12 @@ class AgentVoucher:
 
     number: str = field(
         default=None,
-        metadata={"required": True, "name": "Number", "type": "Attribute"},
+        metadata=dict(
+            name="Number",
+            type="Attribute",
+            help=None,
+            required=True
+        )
     )
 
 
@@ -176,17 +186,35 @@ class AirSearchParameters:
 
     no_advance_purchase: bool = field(
         default=None,
-        metadata={"name": "NoAdvancePurchase", "type": "Attribute"},
+        metadata=dict(
+            name="NoAdvancePurchase",
+            type="Attribute",
+            help=None,
+        )
     )
     refundable_fares: bool = field(
-        default=None, metadata={"name": "RefundableFares", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="RefundableFares",
+            type="Attribute",
+            help=None,
+        )
     )
     non_penalty_fares: bool = field(
-        default=None, metadata={"name": "NonPenaltyFares", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="NonPenaltyFares",
+            type="Attribute",
+            help=None,
+        )
     )
     un_restricted_fares: bool = field(
         default=None,
-        metadata={"name": "UnRestrictedFares", "type": "Attribute"},
+        metadata=dict(
+            name="UnRestrictedFares",
+            type="Attribute",
+            help=None,
+        )
     )
 
 
@@ -198,20 +226,20 @@ class Arcpayment:
 
     arcidentifier: str = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "ARCIdentifier",
-            "type": "Attribute",
-            "help": "Value of the ARC Direct Bill id",
-        },
+        metadata=dict(
+            name="ARCIdentifier",
+            type="Attribute",
+            help="Value of the ARC Direct Bill id",
+            required=True
+        )
     )
     arcpassword: str = field(
         default=None,
-        metadata={
-            "name": "ARCPassword",
-            "type": "Attribute",
-            "help": "Value of the ARC Direct Bill id password",
-        },
+        metadata=dict(
+            name="ARCPassword",
+            type="Attribute",
+            help="Value of the ARC Direct Bill id password",
+        )
     )
 
 
@@ -219,27 +247,34 @@ class Arcpayment:
 class Auxdata:
     entry: List["Auxdata.Entry"] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 1,
-            "max_occurs": 999,
-            "name": "Entry",
-            "type": "Element",
-        },
+        metadata=dict(
+            name="Entry",
+            type="Element",
+            help=None,
+            min_occurs=1,
+            max_occurs=999
+        )
     )
 
     @dataclass
     class Entry:
         reason: str = field(
             default=None,
-            metadata={"required": True, "name": "Reason", "type": "Element"},
+            metadata=dict(
+                name="Reason",
+                type="Element",
+                help=None,
+                required=True
+            )
         )
         description: str = field(
             default=None,
-            metadata={
-                "required": True,
-                "name": "Description",
-                "type": "Element",
-            },
+            metadata=dict(
+                name="Description",
+                type="Element",
+                help=None,
+                required=True
+            )
         )
 
 
@@ -251,20 +286,20 @@ class BillingPointOfSaleInfo:
 
     origin_application: str = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "OriginApplication",
-            "type": "Attribute",
-            "help": "Name of the Point of Sale application which initiated the Request.This information will be provided as part of the provisioning of the user.",
-        },
+        metadata=dict(
+            name="OriginApplication",
+            type="Attribute",
+            help="Name of the Point of Sale application which initiated the Request.This information will be provided as part of the provisioning of the user.",
+            required=True
+        )
     )
     cidbnumber: int = field(
         default=None,
-        metadata={
-            "name": "CIDBNumber",
-            "type": "Attribute",
-            "help": "A 10 Digit customer number generated by CIDB system.",
-        },
+        metadata=dict(
+            name="CIDBNumber",
+            type="Attribute",
+            help="A 10 Digit customer number generated by CIDB system.",
+        )
     )
 
 
@@ -272,21 +307,21 @@ class BillingPointOfSaleInfo:
 class BookingSource:
     code: str = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "Code",
-            "type": "Attribute",
-            "help": "Alternate booking source code or number.",
-        },
+        metadata=dict(
+            name="Code",
+            type="Attribute",
+            help="Alternate booking source code or number.",
+            required=True
+        )
     )
     type: str = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "Type",
-            "type": "Attribute",
-            "help": "Type of booking source sent in the Code attribute. Possible values are “PseudoCityCode”,” ArcNumber”,” IataNumber”, “CustomerId” and “BookingSourceOverrride”. “BookingSourceOverrride” is only applicable in VehicleCreateReservationReq. 1P/1J.",
-        },
+        metadata=dict(
+            name="Type",
+            type="Attribute",
+            help="Type of booking source sent in the Code attribute. Possible values are “PseudoCityCode”,” ArcNumber”,” IataNumber”, “CustomerId” and “BookingSourceOverrride”. “BookingSourceOverrride” is only applicable in VehicleCreateReservationReq. 1P/1J.",
+            required=True
+        )
     )
 
 
@@ -298,20 +333,20 @@ class Bsppayment:
 
     bspidentifier: str = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "BSPIdentifier",
-            "type": "Attribute",
-            "help": "Value of the BSP Direct Bill id",
-        },
+        metadata=dict(
+            name="BSPIdentifier",
+            type="Attribute",
+            help="Value of the BSP Direct Bill id",
+            required=True
+        )
     )
     bsppassword: str = field(
         default=None,
-        metadata={
-            "name": "BSPPassword",
-            "type": "Attribute",
-            "help": "Value of the BSP Direct Bill id password",
-        },
+        metadata=dict(
+            name="BSPPassword",
+            type="Attribute",
+            help="Value of the BSP Direct Bill id password",
+        )
     )
 
 
@@ -323,7 +358,12 @@ class CabinClass:
 
     type: str = field(
         default=None,
-        metadata={"required": True, "name": "Type", "type": "Attribute"},
+        metadata=dict(
+            name="Type",
+            type="Attribute",
+            help=None,
+            required=True
+        )
     )
 
 
@@ -335,35 +375,35 @@ class Characteristic:
 
     seat_type: str = field(
         default=None,
-        metadata={
-            "name": "SeatType",
-            "type": "Attribute",
-            "help": "Indicates codeset of values such as Seat Type like Place,Position, Smoking Choice, Place Arrangement, Place Direction, Compartment.",
-        },
+        metadata=dict(
+            name="SeatType",
+            type="Attribute",
+            help="Indicates codeset of values such as Seat Type like Place,Position, Smoking Choice, Place Arrangement, Place Direction, Compartment.",
+        )
     )
     seat_description: str = field(
         default=None,
-        metadata={
-            "name": "SeatDescription",
-            "type": "Attribute",
-            "help": "Description of the seat type.",
-        },
+        metadata=dict(
+            name="SeatDescription",
+            type="Attribute",
+            help="Description of the seat type.",
+        )
     )
     seat_value: str = field(
         default=None,
-        metadata={
-            "name": "SeatValue",
-            "type": "Attribute",
-            "help": "Indicates the value specific to the selected type.",
-        },
+        metadata=dict(
+            name="SeatValue",
+            type="Attribute",
+            help="Indicates the value specific to the selected type.",
+        )
     )
     seat_value_description: str = field(
         default=None,
-        metadata={
-            "name": "SeatValueDescription",
-            "type": "Attribute",
-            "help": "Description of the seat value.",
-        },
+        metadata=dict(
+            name="SeatValueDescription",
+            type="Attribute",
+            help="Description of the seat value.",
+        )
     )
 
 
@@ -375,35 +415,35 @@ class Check:
 
     micrnumber: str = field(
         default=None,
-        metadata={
-            "name": "MICRNumber",
-            "type": "Attribute",
-            "help": "Magnetic Ink Character Reader Number of check.",
-        },
+        metadata=dict(
+            name="MICRNumber",
+            type="Attribute",
+            help="Magnetic Ink Character Reader Number of check.",
+        )
     )
     routing_number: str = field(
         default=None,
-        metadata={
-            "name": "RoutingNumber",
-            "type": "Attribute",
-            "help": "The bank routing number of the check.",
-        },
+        metadata=dict(
+            name="RoutingNumber",
+            type="Attribute",
+            help="The bank routing number of the check.",
+        )
     )
     account_number: str = field(
         default=None,
-        metadata={
-            "name": "AccountNumber",
-            "type": "Attribute",
-            "help": "The account number of the check",
-        },
+        metadata=dict(
+            name="AccountNumber",
+            type="Attribute",
+            help="The account number of the check",
+        )
     )
     check_number: str = field(
         default=None,
-        metadata={
-            "name": "CheckNumber",
-            "type": "Attribute",
-            "help": "The sequential check number of the check.",
-        },
+        metadata=dict(
+            name="CheckNumber",
+            type="Attribute",
+            help="The sequential check number of the check.",
+        )
     )
 
 
@@ -415,11 +455,21 @@ class CoordinateLocation(Location):
 
     latitude: float = field(
         default=None,
-        metadata={"required": True, "name": "latitude", "type": "Attribute"},
+        metadata=dict(
+            name="latitude",
+            type="Attribute",
+            help=None,
+            required=True
+        )
     )
     longitude: float = field(
         default=None,
-        metadata={"required": True, "name": "longitude", "type": "Attribute"},
+        metadata=dict(
+            name="longitude",
+            type="Attribute",
+            help=None,
+            required=True
+        )
     )
 
 
@@ -431,11 +481,11 @@ class CorporateDiscountId:
 
     negotiated_rate_code: bool = field(
         default=None,
-        metadata={
-            "name": "NegotiatedRateCode",
-            "type": "Attribute",
-            "help": "When set to true, the data in the CorporateDiscountID is a negotiated rate code. Otherwise, this data is a Corporate Discount ID rate.",
-        },
+        metadata=dict(
+            name="NegotiatedRateCode",
+            type="Attribute",
+            help="When set to true, the data in the CorporateDiscountID is a negotiated rate code. Otherwise, this data is a Corporate Discount ID rate.",
+        )
     )
 
 
@@ -447,12 +497,12 @@ class Credentials:
 
     user_id: str = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "UserId",
-            "type": "Attribute",
-            "help": "The UserID associated with the entity using this request withing this BranchCode.",
-        },
+        metadata=dict(
+            name="UserId",
+            type="Attribute",
+            help="The UserID associated with the entity using this request withing this BranchCode.",
+            required=True
+        )
     )
 
 
@@ -463,7 +513,12 @@ class DirectPayment:
     """
 
     text: str = field(
-        default=None, metadata={"name": "Text", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="Text",
+            type="Attribute",
+            help=None,
+        )
     )
 
 
@@ -474,19 +529,29 @@ class Distance:
     """
 
     units: str = field(
-        default="MI", metadata={"name": "Units", "type": "Attribute"}
+        default="MI",
+        metadata=dict(
+            name="Units",
+            type="Attribute",
+            help=None,
+        )
     )
     value: int = field(
         default=None,
-        metadata={"required": True, "name": "Value", "type": "Attribute"},
+        metadata=dict(
+            name="Value",
+            type="Attribute",
+            help=None,
+            required=True
+        )
     )
     direction: str = field(
         default=None,
-        metadata={
-            "name": "Direction",
-            "type": "Attribute",
-            "help": "Directions: S, N, E, W, SE, NW, ...",
-        },
+        metadata=dict(
+            name="Direction",
+            type="Attribute",
+            help="Directions: S, N, E, W, SE, NW, ...",
+        )
     )
 
 
@@ -498,19 +563,19 @@ class FormattedTextTextType:
 
     formatted: bool = field(
         default=None,
-        metadata={
-            "name": "Formatted",
-            "type": "Attribute",
-            "help": "Textual information, which may be formatted as a line of information, or unformatted, as a paragraph of text.",
-        },
+        metadata=dict(
+            name="Formatted",
+            type="Attribute",
+            help="Textual information, which may be formatted as a line of information, or unformatted, as a paragraph of text.",
+        )
     )
     text_format: str = field(
         default=None,
-        metadata={
-            "name": "TextFormat",
-            "type": "Attribute",
-            "help": "Indicates the format of text used in the description e.g. unformatted or html.",
-        },
+        metadata=dict(
+            name="TextFormat",
+            type="Attribute",
+            help="Indicates the format of text used in the description e.g. unformatted or html.",
+        )
     )
 
 
@@ -522,11 +587,11 @@ class IndustryStandardSsr:
 
     code: str = field(
         default=None,
-        metadata={
-            "name": "Code",
-            "type": "Attribute",
-            "help": "This code indicates which Standard of SSR's they support. Sucha as the 'AIRIMP' standard identified by 'IATA.org'",
-        },
+        metadata=dict(
+            name="Code",
+            type="Attribute",
+            help="This code indicates which Standard of SSR's they support. Sucha as the 'AIRIMP' standard identified by 'IATA.org'",
+        )
     )
 
 
@@ -538,30 +603,30 @@ class KeyMapping:
 
     element_name: str = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "ElementName",
-            "type": "Attribute",
-            "help": "Name of the element.",
-        },
+        metadata=dict(
+            name="ElementName",
+            type="Attribute",
+            help="Name of the element.",
+            required=True
+        )
     )
     original_key: str = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "OriginalKey",
-            "type": "Attribute",
-            "help": "The mapping key which is sent in the request.",
-        },
+        metadata=dict(
+            name="OriginalKey",
+            type="Attribute",
+            help="The mapping key which is sent in the request.",
+            required=True
+        )
     )
     new_key: str = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "NewKey",
-            "type": "Attribute",
-            "help": "The mapping key that comes in the response.",
-        },
+        metadata=dict(
+            name="NewKey",
+            type="Attribute",
+            help="The mapping key that comes in the response.",
+            required=True
+        )
     )
 
 
@@ -573,7 +638,12 @@ class LocatorCode:
 
     value: str = field(
         default=None,
-        metadata={"min_length": "1", "name": "value", "type": "Restriction"},
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            min_length="1"
+        )
     )
 
 
@@ -585,11 +655,11 @@ class McofeeInfo:
 
     fee_applies_to_ind: str = field(
         default=None,
-        metadata={
-            "name": "FeeAppliesToInd",
-            "type": "Attribute",
-            "help": "Indicates if PTA/TOD fee is for the entire MCO or is per person.",
-        },
+        metadata=dict(
+            name="FeeAppliesToInd",
+            type="Attribute",
+            help="Indicates if PTA/TOD fee is for the entire MCO or is per person.",
+        )
     )
 
 
@@ -601,11 +671,11 @@ class Mcoremark:
 
     additional_rmk: bool = field(
         default=None,
-        metadata={
-            "name": "AdditionalRmk",
-            "type": "Attribute",
-            "help": "Indicates if the remark is additional remark or not.",
-        },
+        metadata=dict(
+            name="AdditionalRmk",
+            type="Attribute",
+            help="Indicates if the remark is additional remark or not.",
+        )
     )
 
 
@@ -617,11 +687,11 @@ class Mcotext(TypeFreeFormText):
 
     type: str = field(
         default=None,
-        metadata={
-            "name": "Type",
-            "type": "Attribute",
-            "help": "The type of text. Possible values: Command Text, Agent Entry, MCO Modifiers, Text Message",
-        },
+        metadata=dict(
+            name="Type",
+            type="Attribute",
+            help="The type of text. Possible values: Command Text, Agent Entry, MCO Modifiers, Text Message",
+        )
     )
 
 
@@ -633,7 +703,12 @@ class MealRequest:
 
     type: str = field(
         default=None,
-        metadata={"required": True, "name": "Type", "type": "Attribute"},
+        metadata=dict(
+            name="Type",
+            type="Attribute",
+            help=None,
+            required=True
+        )
     )
 
 
@@ -644,25 +719,60 @@ class MediaItem:
     """
 
     caption: str = field(
-        default=None, metadata={"name": "caption", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="caption",
+            type="Attribute",
+            help=None,
+        )
     )
     height: int = field(
-        default=None, metadata={"name": "height", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="height",
+            type="Attribute",
+            help=None,
+        )
     )
     width: int = field(
-        default=None, metadata={"name": "width", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="width",
+            type="Attribute",
+            help=None,
+        )
     )
     type: str = field(
-        default=None, metadata={"name": "type", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="type",
+            type="Attribute",
+            help=None,
+        )
     )
     url: str = field(
-        default=None, metadata={"name": "url", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="url",
+            type="Attribute",
+            help=None,
+        )
     )
     icon: str = field(
-        default=None, metadata={"name": "icon", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="icon",
+            type="Attribute",
+            help=None,
+        )
     )
     size_code: TypeResponseImageSize = field(
-        default=None, metadata={"name": "sizeCode", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="sizeCode",
+            type="Attribute",
+            help=None,
+        )
     )
 
 
@@ -674,11 +784,21 @@ class MetaData:
 
     key: str = field(
         default=None,
-        metadata={"required": True, "name": "Key", "type": "Attribute"},
+        metadata=dict(
+            name="Key",
+            type="Attribute",
+            help=None,
+            required=True
+        )
     )
     value: str = field(
         default=None,
-        metadata={"required": True, "name": "Value", "type": "Attribute"},
+        metadata=dict(
+            name="Value",
+            type="Attribute",
+            help=None,
+            required=True
+        )
     )
 
 
@@ -689,7 +809,12 @@ class ModificationType:
     """
 
     value: str = field(
-        default=None, metadata={"name": "value", "type": "Restriction"}
+        default=None,
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+        )
     )
 
 
@@ -701,25 +826,29 @@ class NameOverride:
 
     first: str = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "First",
-            "type": "Attribute",
-            "help": "First Name.",
-        },
+        metadata=dict(
+            name="First",
+            type="Attribute",
+            help="First Name.",
+            required=True
+        )
     )
     last: str = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "Last",
-            "type": "Attribute",
-            "help": "Last Name.",
-        },
+        metadata=dict(
+            name="Last",
+            type="Attribute",
+            help="Last Name.",
+            required=True
+        )
     )
     age: int = field(
         default=None,
-        metadata={"name": "Age", "type": "Attribute", "help": "Age."},
+        metadata=dict(
+            name="Age",
+            type="Attribute",
+            help="Age.",
+        )
     )
 
 
@@ -731,12 +860,13 @@ class Numeric0to999:
 
     value: int = field(
         default=None,
-        metadata={
-            "min_inclusive": "0",
-            "max_inclusive": "999",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            min_inclusive="0",
+            max_inclusive="999"
+        )
     )
 
 
@@ -747,7 +877,12 @@ class OptionalServiceApplicabilityType:
     """
 
     value: str = field(
-        default=None, metadata={"name": "value", "type": "Restriction"}
+        default=None,
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+        )
     )
 
 
@@ -755,12 +890,12 @@ class OptionalServiceApplicabilityType:
 class OtherGuaranteeInfo:
     type: str = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "Type",
-            "type": "Attribute",
-            "help": "1) IATA/ARC Number 2) Agency Address 2) Deposit Taken 3) Others",
-        },
+        metadata=dict(
+            name="Type",
+            type="Attribute",
+            help="1) IATA/ARC Number 2) Agency Address 2) Deposit Taken 3) Others",
+            required=True
+        )
     )
 
 
@@ -781,12 +916,12 @@ class RefundRemark:
 
     remark_data: str = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "RemarkData",
-            "type": "Element",
-            "help": "Actual remark data.",
-        },
+        metadata=dict(
+            name="RemarkData",
+            type="Element",
+            help="Actual remark data.",
+            required=True
+        )
     )
 
 
@@ -794,12 +929,12 @@ class RefundRemark:
 class RequiredField:
     name: str = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "Name",
-            "type": "Attribute",
-            "help": "The name of the required field",
-        },
+        metadata=dict(
+            name="Name",
+            type="Attribute",
+            help="The name of the required field",
+            required=True
+        )
     )
 
 
@@ -811,27 +946,27 @@ class Requisition:
 
     number: str = field(
         default=None,
-        metadata={
-            "name": "Number",
-            "type": "Attribute",
-            "help": "Requisition number used for accounting",
-        },
+        metadata=dict(
+            name="Number",
+            type="Attribute",
+            help="Requisition number used for accounting",
+        )
     )
     category: str = field(
         default=None,
-        metadata={
-            "name": "Category",
-            "type": "Attribute",
-            "help": "Classification Category for the requisition payment",
-        },
+        metadata=dict(
+            name="Category",
+            type="Attribute",
+            help="Classification Category for the requisition payment",
+        )
     )
     type: str = field(
         default=None,
-        metadata={
-            "name": "Type",
-            "type": "Attribute",
-            "help": "Type can be Cash or Credit for category as Government",
-        },
+        metadata=dict(
+            name="Type",
+            type="Attribute",
+            help="Type can be Cash or Credit for category as Government",
+        )
     )
 
 
@@ -843,15 +978,20 @@ class ResponseMessage:
 
     code: int = field(
         default=None,
-        metadata={"required": True, "name": "Code", "type": "Attribute"},
+        metadata=dict(
+            name="Code",
+            type="Attribute",
+            help=None,
+            required=True
+        )
     )
     type: str = field(
         default=None,
-        metadata={
-            "name": "Type",
-            "type": "Attribute",
-            "help": "Indicates the type of message (Warning, Error, Info)",
-        },
+        metadata=dict(
+            name="Type",
+            type="Attribute",
+            help="Indicates the type of message (Warning, Error, Info)",
+        )
     )
 
 
@@ -863,20 +1003,20 @@ class Restriction:
 
     operation: str = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "Operation",
-            "type": "Attribute",
-            "help": "The operation that is restricted",
-        },
+        metadata=dict(
+            name="Operation",
+            type="Attribute",
+            help="The operation that is restricted",
+            required=True
+        )
     )
     reason: str = field(
         default=None,
-        metadata={
-            "name": "Reason",
-            "type": "Attribute",
-            "help": "The reason it is restricted",
-        },
+        metadata=dict(
+            name="Reason",
+            type="Attribute",
+            help="The reason it is restricted",
+        )
     )
 
 
@@ -888,37 +1028,37 @@ class RoleInfo:
 
     id: str = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "Id",
-            "type": "Attribute",
-            "help": "Unique identifier of the role.",
-        },
+        metadata=dict(
+            name="Id",
+            type="Attribute",
+            help="Unique identifier of the role.",
+            required=True
+        )
     )
     name: str = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "Name",
-            "type": "Attribute",
-            "help": "Agent's role name",
-        },
+        metadata=dict(
+            name="Name",
+            type="Attribute",
+            help="Agent's role name",
+            required=True
+        )
     )
     source: str = field(
         default=None,
-        metadata={
-            "name": "Source",
-            "type": "Attribute",
-            "help": "Role inheritance level. Needed in the response, not in the request",
-        },
+        metadata=dict(
+            name="Source",
+            type="Attribute",
+            help="Role inheritance level. Needed in the response, not in the request",
+        )
     )
     description: str = field(
         default=None,
-        metadata={
-            "name": "Description",
-            "type": "Attribute",
-            "help": "Description of role",
-        },
+        metadata=dict(
+            name="Description",
+            type="Attribute",
+            help="Description of role",
+        )
     )
 
 
@@ -930,27 +1070,27 @@ class SearchTicketing:
 
     ticket_status: str = field(
         default="Both",
-        metadata={
-            "name": "TicketStatus",
-            "type": "Attribute",
-            "help": "Return only PNRs with ticketed, non-ticketed or both",
-        },
+        metadata=dict(
+            name="TicketStatus",
+            type="Attribute",
+            help="Return only PNRs with ticketed, non-ticketed or both",
+        )
     )
     reservation_status: str = field(
         default="Both",
-        metadata={
-            "name": "ReservationStatus",
-            "type": "Attribute",
-            "help": 'Used only if "TicketStatus" set to "No" or "Both". Return only PNRs with specific reservation status or both statuses.',
-        },
+        metadata=dict(
+            name="ReservationStatus",
+            type="Attribute",
+            help="Used only if 'TicketStatus' set to 'No' or 'Both'. Return only PNRs with specific reservation status or both statuses.",
+        )
     )
     ticket_date: str = field(
         default=None,
-        metadata={
-            "name": "TicketDate",
-            "type": "Attribute",
-            "help": "Identifies when this reservation was ticketed, or when it should be ticketed by (in the event of a TTL)",
-        },
+        metadata=dict(
+            name="TicketDate",
+            type="Attribute",
+            help="Identifies when this reservation was ticketed, or when it should be ticketed by (in the event of a TTL)",
+        )
     )
 
 
@@ -962,7 +1102,12 @@ class SeatAttribute:
 
     value: str = field(
         default=None,
-        metadata={"required": True, "name": "Value", "type": "Attribute"},
+        metadata=dict(
+            name="Value",
+            type="Attribute",
+            help=None,
+            required=True
+        )
     )
 
 
@@ -992,19 +1137,19 @@ class StockControl:
 
     type: str = field(
         default=None,
-        metadata={
-            "name": "Type",
-            "type": "Attribute",
-            "help": "Stock control type valid options include: Pending, Failed, Plain Paper, Blank, Suppressed.",
-        },
+        metadata=dict(
+            name="Type",
+            type="Attribute",
+            help="Stock control type valid options include: Pending, Failed, Plain Paper, Blank, Suppressed.",
+        )
     )
     number: str = field(
         default=None,
-        metadata={
-            "name": "Number",
-            "type": "Attribute",
-            "help": "Stock control number.",
-        },
+        metadata=dict(
+            name="Number",
+            type="Attribute",
+            help="Stock control number.",
+        )
     )
 
 
@@ -1016,7 +1161,12 @@ class StringLength1:
 
     value: str = field(
         default=None,
-        metadata={"length": 1, "name": "value", "type": "Restriction"},
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            length=1
+        )
     )
 
 
@@ -1028,12 +1178,13 @@ class StringLength1to10:
 
     value: str = field(
         default=None,
-        metadata={
-            "min_length": "1",
-            "max_length": "10",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            min_length="1",
+            max_length="10"
+        )
     )
 
 
@@ -1045,12 +1196,13 @@ class StringLength1to100:
 
     value: str = field(
         default=None,
-        metadata={
-            "min_length": "1",
-            "max_length": "100",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            min_length="1",
+            max_length="100"
+        )
     )
 
 
@@ -1062,12 +1214,13 @@ class StringLength1to1000:
 
     value: str = field(
         default=None,
-        metadata={
-            "min_length": "1",
-            "max_length": "1000",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            min_length="1",
+            max_length="1000"
+        )
     )
 
 
@@ -1079,12 +1232,13 @@ class StringLength1to1024:
 
     value: str = field(
         default=None,
-        metadata={
-            "min_length": "1",
-            "max_length": "1024",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            min_length="1",
+            max_length="1024"
+        )
     )
 
 
@@ -1096,12 +1250,13 @@ class StringLength1to116:
 
     value: str = field(
         default=None,
-        metadata={
-            "min_length": "1",
-            "max_length": "116",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            min_length="1",
+            max_length="116"
+        )
     )
 
 
@@ -1113,12 +1268,13 @@ class StringLength1to12:
 
     value: str = field(
         default=None,
-        metadata={
-            "min_length": "1",
-            "max_length": "12",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            min_length="1",
+            max_length="12"
+        )
     )
 
 
@@ -1130,12 +1286,13 @@ class StringLength1to128:
 
     value: str = field(
         default=None,
-        metadata={
-            "min_length": "1",
-            "max_length": "128",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            min_length="1",
+            max_length="128"
+        )
     )
 
 
@@ -1147,12 +1304,13 @@ class StringLength1to13:
 
     value: str = field(
         default=None,
-        metadata={
-            "min_length": "1",
-            "max_length": "13",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            min_length="1",
+            max_length="13"
+        )
     )
 
 
@@ -1164,12 +1322,13 @@ class StringLength1to14:
 
     value: str = field(
         default=None,
-        metadata={
-            "min_length": "1",
-            "max_length": "14",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            min_length="1",
+            max_length="14"
+        )
     )
 
 
@@ -1181,12 +1340,13 @@ class StringLength1to15:
 
     value: str = field(
         default=None,
-        metadata={
-            "min_length": "1",
-            "max_length": "15",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            min_length="1",
+            max_length="15"
+        )
     )
 
 
@@ -1198,12 +1358,13 @@ class StringLength1to16:
 
     value: str = field(
         default=None,
-        metadata={
-            "min_length": "1",
-            "max_length": "16",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            min_length="1",
+            max_length="16"
+        )
     )
 
 
@@ -1215,12 +1376,13 @@ class StringLength1to20:
 
     value: str = field(
         default=None,
-        metadata={
-            "min_length": "1",
-            "max_length": "20",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            min_length="1",
+            max_length="20"
+        )
     )
 
 
@@ -1232,12 +1394,13 @@ class StringLength1to2000:
 
     value: str = field(
         default=None,
-        metadata={
-            "min_length": "1",
-            "max_length": "2000",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            min_length="1",
+            max_length="2000"
+        )
     )
 
 
@@ -1249,12 +1412,13 @@ class StringLength1to25:
 
     value: str = field(
         default=None,
-        metadata={
-            "min_length": "1",
-            "max_length": "25",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            min_length="1",
+            max_length="25"
+        )
     )
 
 
@@ -1266,12 +1430,13 @@ class StringLength1to250:
 
     value: str = field(
         default=None,
-        metadata={
-            "min_length": "1",
-            "max_length": "250",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            min_length="1",
+            max_length="250"
+        )
     )
 
 
@@ -1283,12 +1448,13 @@ class StringLength1to255:
 
     value: str = field(
         default=None,
-        metadata={
-            "min_length": "1",
-            "max_length": "255",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            min_length="1",
+            max_length="255"
+        )
     )
 
 
@@ -1300,12 +1466,13 @@ class StringLength1to3:
 
     value: str = field(
         default=None,
-        metadata={
-            "min_length": "1",
-            "max_length": "3",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            min_length="1",
+            max_length="3"
+        )
     )
 
 
@@ -1317,12 +1484,13 @@ class StringLength1to30:
 
     value: str = field(
         default=None,
-        metadata={
-            "min_length": "1",
-            "max_length": "30",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            min_length="1",
+            max_length="30"
+        )
     )
 
 
@@ -1334,12 +1502,13 @@ class StringLength1to32:
 
     value: str = field(
         default=None,
-        metadata={
-            "min_length": "1",
-            "max_length": "32",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            min_length="1",
+            max_length="32"
+        )
     )
 
 
@@ -1351,12 +1520,13 @@ class StringLength1to5:
 
     value: str = field(
         default=None,
-        metadata={
-            "min_length": "1",
-            "max_length": "5",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            min_length="1",
+            max_length="5"
+        )
     )
 
 
@@ -1368,12 +1538,13 @@ class StringLength1to50:
 
     value: str = field(
         default=None,
-        metadata={
-            "min_length": "1",
-            "max_length": "50",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            min_length="1",
+            max_length="50"
+        )
     )
 
 
@@ -1385,12 +1556,13 @@ class StringLength1to500:
 
     value: str = field(
         default=None,
-        metadata={
-            "min_length": "1",
-            "max_length": "500",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            min_length="1",
+            max_length="500"
+        )
     )
 
 
@@ -1402,12 +1574,13 @@ class StringLength1to64:
 
     value: str = field(
         default=None,
-        metadata={
-            "min_length": "1",
-            "max_length": "64",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            min_length="1",
+            max_length="64"
+        )
     )
 
 
@@ -1419,12 +1592,13 @@ class StringLength1to8:
 
     value: str = field(
         default=None,
-        metadata={
-            "min_length": "1",
-            "max_length": "8",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            min_length="1",
+            max_length="8"
+        )
     )
 
 
@@ -1436,12 +1610,13 @@ class StringLength1to99:
 
     value: str = field(
         default=None,
-        metadata={
-            "min_length": "1",
-            "max_length": "99",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            min_length="1",
+            max_length="99"
+        )
     )
 
 
@@ -1453,12 +1628,13 @@ class StringLength3:
 
     value: str = field(
         default=None,
-        metadata={
-            "min_length": "3",
-            "max_length": "3",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            min_length="3",
+            max_length="3"
+        )
     )
 
 
@@ -1470,12 +1646,13 @@ class StringLength6to128:
 
     value: str = field(
         default=None,
-        metadata={
-            "min_length": "6",
-            "max_length": "128",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            min_length="6",
+            max_length="128"
+        )
     )
 
 
@@ -1496,19 +1673,19 @@ class TravelInfo:
 
     trip_name: str = field(
         default=None,
-        metadata={
-            "name": "TripName",
-            "type": "Attribute",
-            "help": "Trip Name",
-        },
+        metadata=dict(
+            name="TripName",
+            type="Attribute",
+            help="Trip Name",
+        )
     )
     travel_purpose: str = field(
         default=None,
-        metadata={
-            "name": "TravelPurpose",
-            "type": "Attribute",
-            "help": "Purpose of the trip",
-        },
+        metadata=dict(
+            name="TravelPurpose",
+            type="Attribute",
+            help="Purpose of the trip",
+        )
     )
 
 
@@ -1520,21 +1697,36 @@ class TypeAccountId:
 
     value: str = field(
         default=None,
-        metadata={"max_length": "19", "name": "value", "type": "Restriction"},
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            max_length="19"
+        )
     )
 
 
 @dataclass
 class TypeAdjustmentTarget:
     value: str = field(
-        default=None, metadata={"name": "value", "type": "Restriction"}
+        default=None,
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+        )
     )
 
 
 @dataclass
 class TypeAdjustmentType:
     value: str = field(
-        default=None, metadata={"name": "value", "type": "Restriction"}
+        default=None,
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+        )
     )
 
 
@@ -1546,12 +1738,13 @@ class TypeAgencyId:
 
     value: str = field(
         default=None,
-        metadata={
-            "min_length": "1",
-            "max_length": "19",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            min_length="1",
+            max_length="19"
+        )
     )
 
 
@@ -1563,28 +1756,28 @@ class TypeAgencyPayment:
 
     agency_billing_identifier: str = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "AgencyBillingIdentifier",
-            "type": "Attribute",
-            "help": "Value of the billing id",
-        },
+        metadata=dict(
+            name="AgencyBillingIdentifier",
+            type="Attribute",
+            help="Value of the billing id",
+            required=True
+        )
     )
     agency_billing_number: str = field(
         default=None,
-        metadata={
-            "name": "AgencyBillingNumber",
-            "type": "Attribute",
-            "help": "Value of billing number",
-        },
+        metadata=dict(
+            name="AgencyBillingNumber",
+            type="Attribute",
+            help="Value of billing number",
+        )
     )
     agency_billing_password: str = field(
         default=None,
-        metadata={
-            "name": "AgencyBillingPassword",
-            "type": "Attribute",
-            "help": "Value of billing password",
-        },
+        metadata=dict(
+            name="AgencyBillingPassword",
+            type="Attribute",
+            help="Value of billing password",
+        )
     )
 
 
@@ -1595,7 +1788,12 @@ class TypeAgencyProfileLevel:
     """
 
     value: str = field(
-        default=None, metadata={"name": "value", "type": "Restriction"}
+        default=None,
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+        )
     )
 
 
@@ -1607,11 +1805,12 @@ class TypeAgentCode:
 
     value: str = field(
         default=None,
-        metadata={
-            "pattern": "[a-zA-Z0-9\\-_\\.@ ]{1,128}",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            pattern="[a-zA-Z0-9\-_\.@ ]{1,128}"
+        )
     )
 
 
@@ -1623,7 +1822,12 @@ class TypeAirport:
 
     value: str = field(
         default=None,
-        metadata={"length": 3, "name": "value", "type": "Restriction"},
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            length=3
+        )
     )
 
 
@@ -1631,11 +1835,11 @@ class TypeAirport:
 class TypeBookingTransactionsAllowed:
     booking_enabled: bool = field(
         default=None,
-        metadata={
-            "name": "BookingEnabled",
-            "type": "Attribute",
-            "help": "Allow or prohibit booking transaction for the given product type on this Provider/Supplier. Inheritable.",
-        },
+        metadata=dict(
+            name="BookingEnabled",
+            type="Attribute",
+            help="Allow or prohibit booking transaction for the given product type on this Provider/Supplier. Inheritable.",
+        )
     )
 
 
@@ -1647,12 +1851,13 @@ class TypeBranchCode:
 
     value: str = field(
         default=None,
-        metadata={
-            "min_length": "1",
-            "max_length": "25",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            min_length="1",
+            max_length="25"
+        )
     )
 
 
@@ -1664,12 +1869,13 @@ class TypeBranchId:
 
     value: str = field(
         default=None,
-        metadata={
-            "min_length": "1",
-            "max_length": "10",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            min_length="1",
+            max_length="10"
+        )
     )
 
 
@@ -1681,12 +1887,13 @@ class TypeCardMerchantType:
 
     value: str = field(
         default=None,
-        metadata={
-            "min_length": "2",
-            "max_length": "2",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            min_length="2",
+            max_length="2"
+        )
     )
 
 
@@ -1698,12 +1905,13 @@ class TypeCardNumber:
 
     value: str = field(
         default=None,
-        metadata={
-            "min_length": "1",
-            "max_length": "36",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            min_length="1",
+            max_length="36"
+        )
     )
 
 
@@ -1715,7 +1923,12 @@ class TypeCarrier:
 
     value: str = field(
         default=None,
-        metadata={"length": 2, "name": "value", "type": "Restriction"},
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            length=2
+        )
     )
 
 
@@ -1727,7 +1940,12 @@ class TypeCity:
 
     value: str = field(
         default=None,
-        metadata={"length": 3, "name": "value", "type": "Restriction"},
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            length=3
+        )
     )
 
 
@@ -1739,12 +1957,13 @@ class TypeClassOfService:
 
     value: str = field(
         default=None,
-        metadata={
-            "min_length": "1",
-            "max_length": "2",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            min_length="1",
+            max_length="2"
+        )
     )
 
 
@@ -1755,7 +1974,12 @@ class TypeCommissionLevel:
     """
 
     value: str = field(
-        default=None, metadata={"name": "value", "type": "Restriction"}
+        default=None,
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+        )
     )
 
 
@@ -1766,7 +1990,12 @@ class TypeCommissionModifier:
     """
 
     value: str = field(
-        default=None, metadata={"name": "value", "type": "Restriction"}
+        default=None,
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+        )
     )
 
 
@@ -1777,7 +2006,12 @@ class TypeCommissionType:
     """
 
     value: str = field(
-        default=None, metadata={"name": "value", "type": "Restriction"}
+        default=None,
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+        )
     )
 
 
@@ -1789,7 +2023,12 @@ class TypeCountry:
 
     value: str = field(
         default=None,
-        metadata={"length": 2, "name": "value", "type": "Restriction"},
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            length=2
+        )
     )
 
 
@@ -1801,12 +2040,13 @@ class TypeCreditCardNumber:
 
     value: str = field(
         default=None,
-        metadata={
-            "min_length": "13",
-            "max_length": "128",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            min_length="13",
+            max_length="128"
+        )
     )
 
 
@@ -1818,7 +2058,12 @@ class TypeCurrency:
 
     value: str = field(
         default=None,
-        metadata={"length": 3, "name": "value", "type": "Restriction"},
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            length=3
+        )
     )
 
 
@@ -1830,11 +2075,12 @@ class TypeDate:
 
     value: str = field(
         default=None,
-        metadata={
-            "pattern": "[^:Z].*",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            pattern="[^:Z].*"
+        )
     )
 
 
@@ -1846,11 +2092,21 @@ class TypeDateRange:
 
     start_date: str = field(
         default=None,
-        metadata={"required": True, "name": "StartDate", "type": "Attribute"},
+        metadata=dict(
+            name="StartDate",
+            type="Attribute",
+            help=None,
+            required=True
+        )
     )
     end_date: str = field(
         default=None,
-        metadata={"required": True, "name": "EndDate", "type": "Attribute"},
+        metadata=dict(
+            name="EndDate",
+            type="Attribute",
+            help=None,
+            required=True
+        )
     )
 
 
@@ -1861,7 +2117,12 @@ class TypeDirection:
     """
 
     value: str = field(
-        default=None, metadata={"name": "value", "type": "Restriction"}
+        default=None,
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+        )
     )
 
 
@@ -1873,7 +2134,12 @@ class TypeDiscountNumber:
 
     value: str = field(
         default=None,
-        metadata={"max_length": "25", "name": "value", "type": "Restriction"},
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            max_length="25"
+        )
     )
 
 
@@ -1885,14 +2151,24 @@ class TypeDistance:
 
     value: str = field(
         default=None,
-        metadata={"length": 2, "name": "value", "type": "Restriction"},
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            length=2
+        )
     )
 
 
 @dataclass
 class TypeDoorCount:
     value: str = field(
-        default=None, metadata={"name": "value", "type": "Restriction"}
+        default=None,
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+        )
     )
 
 
@@ -1904,12 +2180,13 @@ class TypeDurationYearInDays:
 
     value: str = field(
         default=None,
-        metadata={
-            "min_inclusive": "P1D",
-            "max_inclusive": "P366D",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            min_inclusive="P1D",
+            max_inclusive="P366D"
+        )
     )
 
 
@@ -1920,7 +2197,12 @@ class TypeElement:
     """
 
     value: str = field(
-        default=None, metadata={"name": "value", "type": "Restriction"}
+        default=None,
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+        )
     )
 
 
@@ -1931,7 +2213,12 @@ class TypeElementStatus:
     """
 
     value: str = field(
-        default=None, metadata={"name": "value", "type": "Restriction"}
+        default=None,
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+        )
     )
 
 
@@ -1943,7 +2230,12 @@ class TypeEmailComment:
 
     value: str = field(
         default=None,
-        metadata={"min_length": "1", "name": "value", "type": "Restriction"},
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            min_length="1"
+        )
     )
 
 
@@ -1955,12 +2247,13 @@ class TypeEmailType:
 
     value: str = field(
         default=None,
-        metadata={
-            "min_length": "1",
-            "max_length": "128",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            min_length="1",
+            max_length="128"
+        )
     )
 
 
@@ -1972,12 +2265,13 @@ class TypeEndorsement:
 
     value: str = field(
         default=None,
-        metadata={
-            "min_length": "1",
-            "max_length": "256",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            min_length="1",
+            max_length="256"
+        )
     )
 
 
@@ -1988,7 +2282,12 @@ class TypeEventType:
     """
 
     value: str = field(
-        default=None, metadata={"name": "value", "type": "Restriction"}
+        default=None,
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+        )
     )
 
 
@@ -2000,7 +2299,12 @@ class TypeExternalReference:
 
     value: str = field(
         default=None,
-        metadata={"max_length": "32", "name": "value", "type": "Restriction"},
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            max_length="32"
+        )
     )
 
 
@@ -2012,7 +2316,12 @@ class TypeFareBasisCode:
 
     value: str = field(
         default=None,
-        metadata={"max_length": "20", "name": "value", "type": "Restriction"},
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            max_length="20"
+        )
     )
 
 
@@ -2024,19 +2333,25 @@ class TypeFareFamily:
 
     value: str = field(
         default=None,
-        metadata={
-            "min_length": "0",
-            "max_length": "32",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            min_length="0",
+            max_length="32"
+        )
     )
 
 
 @dataclass
 class TypeFarePull:
     value: str = field(
-        default=None, metadata={"name": "value", "type": "Restriction"}
+        default=None,
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+        )
     )
 
 
@@ -2048,21 +2363,36 @@ class TypeFlightNumber:
 
     value: str = field(
         default=None,
-        metadata={"max_length": "5", "name": "value", "type": "Restriction"},
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            max_length="5"
+        )
     )
 
 
 @dataclass
 class TypeFormOfRefund:
     value: str = field(
-        default=None, metadata={"name": "value", "type": "Restriction"}
+        default=None,
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+        )
     )
 
 
 @dataclass
 class TypeFuel:
     value: str = field(
-        default=None, metadata={"name": "value", "type": "Restriction"}
+        default=None,
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+        )
     )
 
 
@@ -2073,7 +2403,12 @@ class TypeFulfillmentIdtype:
     """
 
     value: str = field(
-        default=None, metadata={"name": "value", "type": "Restriction"}
+        default=None,
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+        )
     )
 
 
@@ -2084,7 +2419,12 @@ class TypeFulfillmentType:
     """
 
     value: str = field(
-        default=None, metadata={"name": "value", "type": "Restriction"}
+        default=None,
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+        )
     )
 
 
@@ -2096,7 +2436,12 @@ class TypeGdsAccountingRemark:
 
     value: str = field(
         default=None,
-        metadata={"max_length": "30", "name": "value", "type": "Restriction"},
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            max_length="30"
+        )
     )
 
 
@@ -2108,7 +2453,12 @@ class TypeGdsRemark:
 
     value: str = field(
         default=None,
-        metadata={"max_length": "30", "name": "value", "type": "Restriction"},
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            max_length="30"
+        )
     )
 
 
@@ -2120,12 +2470,13 @@ class TypeGender:
 
     value: str = field(
         default=None,
-        metadata={
-            "min_length": "1",
-            "max_length": "2",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            min_length="1",
+            max_length="2"
+        )
     )
 
 
@@ -2137,7 +2488,12 @@ class TypeGeneralText:
 
     value: str = field(
         default=None,
-        metadata={"max_length": "250", "name": "value", "type": "Restriction"},
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            max_length="250"
+        )
     )
 
 
@@ -2149,7 +2505,12 @@ class TypeHotelChainCode:
 
     value: str = field(
         default=None,
-        metadata={"length": 2, "name": "value", "type": "Restriction"},
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            length=2
+        )
     )
 
 
@@ -2161,7 +2522,12 @@ class TypeHotelCode:
 
     value: str = field(
         default=None,
-        metadata={"max_length": "32", "name": "value", "type": "Restriction"},
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            max_length="32"
+        )
     )
 
 
@@ -2173,7 +2539,12 @@ class TypeIata:
 
     value: str = field(
         default=None,
-        metadata={"max_length": "8", "name": "value", "type": "Restriction"},
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            max_length="8"
+        )
     )
 
 
@@ -2185,12 +2556,13 @@ class TypeIatacode:
 
     value: str = field(
         default=None,
-        metadata={
-            "length": 3,
-            "white_space": "collapse",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            length=3,
+            white_space="collapse"
+        )
     )
 
 
@@ -2201,7 +2573,12 @@ class TypeImageSize:
     """
 
     value: str = field(
-        default=None, metadata={"name": "value", "type": "Restriction"}
+        default=None,
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+        )
     )
 
 
@@ -2213,12 +2590,13 @@ class TypeIntegerPercentage:
 
     value: int = field(
         default=None,
-        metadata={
-            "min_inclusive": "0",
-            "max_inclusive": "100",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            min_inclusive="0",
+            max_inclusive="100"
+        )
     )
 
 
@@ -2229,21 +2607,36 @@ class TypeInvoiceRecordCategory:
     """
 
     value: str = field(
-        default=None, metadata={"name": "value", "type": "Restriction"}
+        default=None,
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+        )
     )
 
 
 @dataclass
 class TypeItineraryCode:
     value: str = field(
-        default=None, metadata={"name": "value", "type": "Restriction"}
+        default=None,
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+        )
     )
 
 
 @dataclass
 class TypeItineraryType:
     value: str = field(
-        default=None, metadata={"name": "value", "type": "Restriction"}
+        default=None,
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+        )
     )
 
 
@@ -2255,7 +2648,12 @@ class TypeLanguage:
 
     value: str = field(
         default=None,
-        metadata={"length": 2, "name": "value", "type": "Restriction"},
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            length=2
+        )
     )
 
 
@@ -2266,7 +2664,12 @@ class TypeLicenseCode:
     """
 
     value: str = field(
-        default=None, metadata={"name": "value", "type": "Restriction"}
+        default=None,
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+        )
     )
 
 
@@ -2278,12 +2681,13 @@ class TypeLocatorCode:
 
     value: str = field(
         default=None,
-        metadata={
-            "min_length": "5",
-            "max_length": "8",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            min_length="5",
+            max_length="8"
+        )
     )
 
 
@@ -2295,12 +2699,13 @@ class TypeMaxResults:
 
     value: int = field(
         default=None,
-        metadata={
-            "min_inclusive": "1",
-            "max_inclusive": "200",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            min_inclusive="1",
+            max_inclusive="200"
+        )
     )
 
 
@@ -2312,12 +2717,13 @@ class TypeMaxResults1to100:
 
     value: int = field(
         default=None,
-        metadata={
-            "min_inclusive": "1",
-            "max_inclusive": "100",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            min_inclusive="1",
+            max_inclusive="100"
+        )
     )
 
 
@@ -2328,7 +2734,12 @@ class TypeMcofeeType:
     """
 
     value: str = field(
-        default=None, metadata={"name": "value", "type": "Restriction"}
+        default=None,
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+        )
     )
 
 
@@ -2339,7 +2750,12 @@ class TypeMcostatus:
     """
 
     value: str = field(
-        default=None, metadata={"name": "value", "type": "Restriction"}
+        default=None,
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+        )
     )
 
 
@@ -2350,7 +2766,12 @@ class TypeMcotype:
     """
 
     value: str = field(
-        default=None, metadata={"name": "value", "type": "Restriction"}
+        default=None,
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+        )
     )
 
 
@@ -2362,12 +2783,13 @@ class TypeMerchandisingService:
 
     value: str = field(
         default=None,
-        metadata={
-            "min_length": "1",
-            "max_length": "128",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            min_length="1",
+            max_length="128"
+        )
     )
 
 
@@ -2378,7 +2800,12 @@ class TypeMoney:
     """
 
     value: str = field(
-        default=None, metadata={"name": "value", "type": "Restriction"}
+        default=None,
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+        )
     )
 
 
@@ -2389,7 +2816,12 @@ class TypeMoreResults:
     """
 
     value: bool = field(
-        default=None, metadata={"name": "value", "type": "Restriction"}
+        default=None,
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+        )
     )
 
 
@@ -2401,12 +2833,13 @@ class TypeNonBlanks:
 
     value: str = field(
         default=None,
-        metadata={
-            "min_length": "1",
-            "white_space": "collapse",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            min_length="1",
+            white_space="collapse"
+        )
     )
 
 
@@ -2417,7 +2850,12 @@ class TypeOtacode:
     """
 
     value: int = field(
-        default=None, metadata={"name": "value", "type": "Restriction"}
+        default=None,
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+        )
     )
 
 
@@ -2428,7 +2866,12 @@ class TypeOtherImageSize:
     """
 
     value: str = field(
-        default=None, metadata={"name": "value", "type": "Restriction"}
+        default=None,
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+        )
     )
 
 
@@ -2440,12 +2883,13 @@ class TypePcc:
 
     value: str = field(
         default=None,
-        metadata={
-            "min_length": "2",
-            "max_length": "10",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            min_length="2",
+            max_length="10"
+        )
     )
 
 
@@ -2453,11 +2897,12 @@ class TypePcc:
 class TypePercentageWithDecimal:
     value: str = field(
         default=None,
-        metadata={
-            "pattern": "([0-9]{1,2}|100)\\.[0-9]{1,2}",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            pattern="([0-9]{1,2}|100)\.[0-9]{1,2}"
+        )
     )
 
 
@@ -2468,7 +2913,12 @@ class TypePolicy:
     """
 
     value: str = field(
-        default=None, metadata={"name": "value", "type": "Restriction"}
+        default=None,
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+        )
     )
 
 
@@ -2480,12 +2930,13 @@ class TypePolicyCode:
 
     value: int = field(
         default=None,
-        metadata={
-            "min_inclusive": "1",
-            "max_inclusive": "9999",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            min_inclusive="1",
+            max_inclusive="9999"
+        )
     )
 
 
@@ -2497,26 +2948,37 @@ class TypePolicyReference:
 
     value: str = field(
         default=None,
-        metadata={
-            "min_length": "1",
-            "max_length": "20",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            min_length="1",
+            max_length="20"
+        )
     )
 
 
 @dataclass
 class TypePriceClassOfService:
     value: str = field(
-        default=None, metadata={"name": "value", "type": "Restriction"}
+        default=None,
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+        )
     )
 
 
 @dataclass
 class TypePricingType:
     value: str = field(
-        default=None, metadata={"name": "value", "type": "Restriction"}
+        default=None,
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+        )
     )
 
 
@@ -2524,11 +2986,12 @@ class TypePricingType:
 class TypePriorityCode:
     value: str = field(
         default=None,
-        metadata={
-            "pattern": "[a-zA-Z0-9]{1,1}",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            pattern="[a-zA-Z0-9]{1,1}"
+        )
     )
 
 
@@ -2539,7 +3002,12 @@ class TypeProduct:
     """
 
     value: str = field(
-        default=None, metadata={"name": "value", "type": "Restriction"}
+        default=None,
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+        )
     )
 
 
@@ -2550,7 +3018,12 @@ class TypeProfileApplicability:
     """
 
     value: str = field(
-        default=None, metadata={"name": "value", "type": "Restriction"}
+        default=None,
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+        )
     )
 
 
@@ -2561,7 +3034,12 @@ class TypeProfileEntityStatus:
     """
 
     value: str = field(
-        default=None, metadata={"name": "value", "type": "Restriction"}
+        default=None,
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+        )
     )
 
 
@@ -2572,7 +3050,12 @@ class TypeProfileEntityStatusWithDelete:
     """
 
     value: str = field(
-        default=None, metadata={"name": "value", "type": "Restriction"}
+        default=None,
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+        )
     )
 
 
@@ -2583,7 +3066,12 @@ class TypeProfileId:
     """
 
     value: int = field(
-        default=None, metadata={"name": "value", "type": "Restriction"}
+        default=None,
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+        )
     )
 
 
@@ -2594,7 +3082,12 @@ class TypeProfileLevel:
     """
 
     value: str = field(
-        default=None, metadata={"name": "value", "type": "Restriction"}
+        default=None,
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+        )
     )
 
 
@@ -2605,7 +3098,12 @@ class TypeProfileLevelWithCredential:
     """
 
     value: str = field(
-        default=None, metadata={"name": "value", "type": "Restriction"}
+        default=None,
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+        )
     )
 
 
@@ -2616,7 +3114,12 @@ class TypeProfileLevelWithSystem:
     """
 
     value: str = field(
-        default=None, metadata={"name": "value", "type": "Restriction"}
+        default=None,
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+        )
     )
 
 
@@ -2627,7 +3130,12 @@ class TypeProfileType:
     """
 
     value: str = field(
-        default=None, metadata={"name": "value", "type": "Restriction"}
+        default=None,
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+        )
     )
 
 
@@ -2639,12 +3147,13 @@ class TypeProviderCode:
 
     value: str = field(
         default=None,
-        metadata={
-            "min_length": "2",
-            "max_length": "5",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            min_length="2",
+            max_length="5"
+        )
     )
 
 
@@ -2656,7 +3165,12 @@ class TypeProviderLocatorCode:
 
     value: str = field(
         default=None,
-        metadata={"max_length": "15", "name": "value", "type": "Restriction"},
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            max_length="15"
+        )
     )
 
 
@@ -2667,7 +3181,12 @@ class TypeProviderToken:
     """
 
     value: str = field(
-        default=None, metadata={"name": "value", "type": "Restriction"}
+        default=None,
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+        )
     )
 
 
@@ -2679,12 +3198,13 @@ class TypeProvisioningCode:
 
     value: str = field(
         default=None,
-        metadata={
-            "min_length": "1",
-            "max_length": "25",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            min_length="1",
+            max_length="25"
+        )
     )
 
 
@@ -2696,12 +3216,13 @@ class TypePtc:
 
     value: str = field(
         default=None,
-        metadata={
-            "min_length": "3",
-            "max_length": "5",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            min_length="3",
+            max_length="5"
+        )
     )
 
 
@@ -2712,7 +3233,12 @@ class TypePurchaseWindow:
     """
 
     value: str = field(
-        default=None, metadata={"name": "value", "type": "Restriction"}
+        default=None,
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+        )
     )
 
 
@@ -2723,7 +3249,12 @@ class TypeQueueModifyAction:
     """
 
     value: str = field(
-        default=None, metadata={"name": "value", "type": "Restriction"}
+        default=None,
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+        )
     )
 
 
@@ -2735,12 +3266,13 @@ class TypeRailCabin:
 
     value: str = field(
         default=None,
-        metadata={
-            "min_length": "1",
-            "max_length": "128",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            min_length="1",
+            max_length="128"
+        )
     )
 
 
@@ -2752,12 +3284,13 @@ class TypeRailClass:
 
     value: str = field(
         default=None,
-        metadata={
-            "min_length": "1",
-            "max_length": "8",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            min_length="1",
+            max_length="8"
+        )
     )
 
 
@@ -2769,13 +3302,14 @@ class TypeRailLocationCode:
 
     value: str = field(
         default=None,
-        metadata={
-            "min_length": "3",
-            "max_length": "8",
-            "white_space": "collapse",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            min_length="3",
+            max_length="8",
+            white_space="collapse"
+        )
     )
 
 
@@ -2786,7 +3320,12 @@ class TypeRailSearchType:
     """
 
     value: str = field(
-        default=None, metadata={"name": "value", "type": "Restriction"}
+        default=None,
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+        )
     )
 
 
@@ -2797,7 +3336,12 @@ class TypeRateCategory:
     """
 
     value: str = field(
-        default=None, metadata={"name": "value", "type": "Restriction"}
+        default=None,
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+        )
     )
 
 
@@ -2809,7 +3353,12 @@ class TypeRateCode:
 
     value: str = field(
         default=None,
-        metadata={"max_length": "10", "name": "value", "type": "Restriction"},
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            max_length="10"
+        )
     )
 
 
@@ -2817,11 +3366,11 @@ class TypeRateCode:
 class TypeRateDescription:
     name: str = field(
         default=None,
-        metadata={
-            "name": "Name",
-            "type": "Attribute",
-            "help": "Optional context name of the text block being returned i.e. Room details",
-        },
+        metadata=dict(
+            name="Name",
+            type="Attribute",
+            help="Optional context name of the text block being returned i.e. Room details",
+        )
     )
 
 
@@ -2832,7 +3381,12 @@ class TypeRateGuarantee:
     """
 
     value: str = field(
-        default=None, metadata={"name": "value", "type": "Restriction"}
+        default=None,
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+        )
     )
 
 
@@ -2843,7 +3397,12 @@ class TypeRatePlanType:
     """
 
     value: str = field(
-        default=None, metadata={"name": "value", "type": "Restriction"}
+        default=None,
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+        )
     )
 
 
@@ -2854,7 +3413,12 @@ class TypeRateTimePeriod:
     """
 
     value: str = field(
-        default=None, metadata={"name": "value", "type": "Restriction"}
+        default=None,
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+        )
     )
 
 
@@ -2865,7 +3429,12 @@ class TypeRecordStatus:
     """
 
     value: str = field(
-        default=None, metadata={"name": "value", "type": "Restriction"}
+        default=None,
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+        )
     )
 
 
@@ -2876,7 +3445,12 @@ class TypeRef:
     """
 
     value: str = field(
-        default=None, metadata={"name": "value", "type": "Restriction"}
+        default=None,
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+        )
     )
 
 
@@ -2884,14 +3458,24 @@ class TypeRef:
 class TypeReferencePoint:
     value: str = field(
         default=None,
-        metadata={"max_length": "30", "name": "value", "type": "Restriction"},
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            max_length="30"
+        )
     )
 
 
 @dataclass
 class TypeReqSeat:
     value: str = field(
-        default=None, metadata={"name": "value", "type": "Restriction"}
+        default=None,
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+        )
     )
 
 
@@ -2903,7 +3487,12 @@ class TypeReserveRequirement:
 
     value: str = field(
         default=None,
-        metadata={"max_length": "20", "name": "value", "type": "Restriction"},
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            max_length="20"
+        )
     )
 
 
@@ -2914,7 +3503,12 @@ class TypeResidency:
     """
 
     value: str = field(
-        default=None, metadata={"name": "value", "type": "Restriction"}
+        default=None,
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+        )
     )
 
 
@@ -2926,15 +3520,20 @@ class TypeResultMessage:
 
     code: int = field(
         default=None,
-        metadata={"required": True, "name": "Code", "type": "Attribute"},
+        metadata=dict(
+            name="Code",
+            type="Attribute",
+            help=None,
+            required=True
+        )
     )
     type: str = field(
         default=None,
-        metadata={
-            "name": "Type",
-            "type": "Attribute",
-            "help": "Indicates the type of message (Warning, Error, Info)",
-        },
+        metadata=dict(
+            name="Type",
+            type="Attribute",
+            help="Indicates the type of message (Warning, Error, Info)",
+        )
     )
 
 
@@ -2945,7 +3544,12 @@ class TypeRoleId:
     """
 
     value: str = field(
-        default=None, metadata={"name": "value", "type": "Restriction"}
+        default=None,
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+        )
     )
 
 
@@ -2957,12 +3561,13 @@ class TypeSeatTypeCode:
 
     value: str = field(
         default=None,
-        metadata={
-            "length": 4,
-            "white_space": "collapse",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            length=4,
+            white_space="collapse"
+        )
     )
 
 
@@ -2973,7 +3578,12 @@ class TypeSource:
     """
 
     value: str = field(
-        default=None, metadata={"name": "value", "type": "Restriction"}
+        default=None,
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+        )
     )
 
 
@@ -2985,7 +3595,12 @@ class TypeSpecificTime:
 
     time: str = field(
         default=None,
-        metadata={"required": True, "name": "Time", "type": "Attribute"},
+        metadata=dict(
+            name="Time",
+            type="Attribute",
+            help=None,
+            required=True
+        )
     )
 
 
@@ -2997,12 +3612,13 @@ class TypeSsrcode:
 
     value: str = field(
         default=None,
-        metadata={
-            "min_length": "4",
-            "max_length": "4",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            min_length="4",
+            max_length="4"
+        )
     )
 
 
@@ -3013,7 +3629,12 @@ class TypeSsrfreeText:
     """
 
     value: str = field(
-        default=None, metadata={"name": "value", "type": "Restriction"}
+        default=None,
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+        )
     )
 
 
@@ -3025,11 +3646,12 @@ class TypeStartFromResult:
 
     value: int = field(
         default=None,
-        metadata={
-            "min_inclusive": "1",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            min_inclusive="1"
+        )
     )
 
 
@@ -3041,7 +3663,12 @@ class TypeState:
 
     value: str = field(
         default=None,
-        metadata={"max_length": "6", "name": "value", "type": "Restriction"},
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            max_length="6"
+        )
     )
 
 
@@ -3052,7 +3679,12 @@ class TypeStatus:
     """
 
     value: str = field(
-        default=None, metadata={"name": "value", "type": "Restriction"}
+        default=None,
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+        )
     )
 
 
@@ -3064,12 +3696,13 @@ class TypeStatusCode:
 
     value: str = field(
         default=None,
-        metadata={
-            "length": 2,
-            "white_space": "collapse",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            length=2,
+            white_space="collapse"
+        )
     )
 
 
@@ -3081,30 +3714,30 @@ class TypeSubKey:
 
     text: List[str] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 999,
-            "name": "Text",
-            "type": "Element",
-            "help": "Information for a sub key.",
-        },
+        metadata=dict(
+            name="Text",
+            type="Element",
+            help="Information for a sub key.",
+            min_occurs=0,
+            max_occurs=999
+        )
     )
     name: str = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "Name",
-            "type": "Attribute",
-            "help": "A subkey to identify the specific information within this keyword",
-        },
+        metadata=dict(
+            name="Name",
+            type="Attribute",
+            help="A subkey to identify the specific information within this keyword",
+            required=True
+        )
     )
     description: str = field(
         default=None,
-        metadata={
-            "name": "Description",
-            "type": "Attribute",
-            "help": "A brief description of a subkey.",
-        },
+        metadata=dict(
+            name="Description",
+            type="Attribute",
+            help="A brief description of a subkey.",
+        )
     )
 
 
@@ -3116,12 +3749,13 @@ class TypeSupplierCode:
 
     value: str = field(
         default=None,
-        metadata={
-            "min_length": "1",
-            "max_length": "5",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            min_length="1",
+            max_length="5"
+        )
     )
 
 
@@ -3133,7 +3767,12 @@ class TypeThirdPartySupplier:
 
     value: str = field(
         default=None,
-        metadata={"max_length": "64", "name": "value", "type": "Restriction"},
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            max_length="64"
+        )
     )
 
 
@@ -3145,7 +3784,12 @@ class TypeTicketNumber:
 
     value: str = field(
         default=None,
-        metadata={"length": 13, "name": "value", "type": "Restriction"},
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            length=13
+        )
     )
 
 
@@ -3157,7 +3801,12 @@ class TypeTicketStatus:
 
     value: str = field(
         default=None,
-        metadata={"length": 1, "name": "value", "type": "Restriction"},
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            length=1
+        )
     )
 
 
@@ -3169,15 +3818,21 @@ class TypeTimeRange:
 
     earliest_time: str = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "EarliestTime",
-            "type": "Attribute",
-        },
+        metadata=dict(
+            name="EarliestTime",
+            type="Attribute",
+            help=None,
+            required=True
+        )
     )
     latest_time: str = field(
         default=None,
-        metadata={"required": True, "name": "LatestTime", "type": "Attribute"},
+        metadata=dict(
+            name="LatestTime",
+            type="Attribute",
+            help=None,
+            required=True
+        )
     )
 
 
@@ -3189,7 +3844,12 @@ class TypeTravelerId:
 
     value: str = field(
         default=None,
-        metadata={"max_length": "19", "name": "value", "type": "Restriction"},
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            max_length="19"
+        )
     )
 
 
@@ -3201,12 +3861,13 @@ class TypeTravelerLastName:
 
     value: str = field(
         default=None,
-        metadata={
-            "min_length": "1",
-            "max_length": "256",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            min_length="1",
+            max_length="256"
+        )
     )
 
 
@@ -3217,7 +3878,12 @@ class TypeTrinary:
     """
 
     value: str = field(
-        default=None, metadata={"name": "value", "type": "Restriction"}
+        default=None,
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+        )
     )
 
 
@@ -3229,12 +3895,13 @@ class TypeTypeCode:
 
     value: str = field(
         default=None,
-        metadata={
-            "min_length": "1",
-            "max_length": "50",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            min_length="1",
+            max_length="50"
+        )
     )
 
 
@@ -3245,7 +3912,12 @@ class TypeUrversion:
     """
 
     value: int = field(
-        default=None, metadata={"name": "value", "type": "Restriction"}
+        default=None,
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+        )
     )
 
 
@@ -3256,7 +3928,12 @@ class TypeVehicleCategory:
     """
 
     value: str = field(
-        default=None, metadata={"name": "value", "type": "Restriction"}
+        default=None,
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+        )
     )
 
 
@@ -3267,7 +3944,12 @@ class TypeVehicleClass:
     """
 
     value: str = field(
-        default=None, metadata={"name": "value", "type": "Restriction"}
+        default=None,
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+        )
     )
 
 
@@ -3278,14 +3960,24 @@ class TypeVehicleLocation:
     """
 
     value: str = field(
-        default=None, metadata={"name": "value", "type": "Restriction"}
+        default=None,
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+        )
     )
 
 
 @dataclass
 class TypeVehicleTransmission:
     value: str = field(
-        default=None, metadata={"name": "value", "type": "Restriction"}
+        default=None,
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+        )
     )
 
 
@@ -3297,18 +3989,24 @@ class TypeVersion:
 
     value: int = field(
         default=None,
-        metadata={
-            "min_inclusive": "0",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            min_inclusive="0"
+        )
     )
 
 
 @dataclass
 class TypeVoucherType:
     value: str = field(
-        default=None, metadata={"name": "value", "type": "Restriction"}
+        default=None,
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+        )
     )
 
 
@@ -3319,7 +4017,12 @@ class TypeWildcard:
     """
 
     value: str = field(
-        default=None, metadata={"name": "value", "type": "Restriction"}
+        default=None,
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+        )
     )
 
 
@@ -3331,12 +4034,13 @@ class TypeWildcardMax50:
 
     value: str = field(
         default=None,
-        metadata={
-            "min_length": "1",
-            "max_length": "50",
-            "name": "value",
-            "type": "Restriction",
-        },
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+            min_length="1",
+            max_length="50"
+        )
     )
 
 
@@ -3348,7 +4052,12 @@ class UnitedNations:
 
     number: str = field(
         default=None,
-        metadata={"required": True, "name": "Number", "type": "Attribute"},
+        metadata=dict(
+            name="Number",
+            type="Attribute",
+            help=None,
+            required=True
+        )
     )
 
 
@@ -3359,7 +4068,12 @@ class UrticketStatus:
     """
 
     value: str = field(
-        default=None, metadata={"name": "value", "type": "Restriction"}
+        default=None,
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            help=None,
+        )
     )
 
 
@@ -3371,60 +4085,70 @@ class AccountingRemark:
 
     remark_data: str = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "RemarkData",
-            "type": "Element",
-            "help": "Actual remarks data.",
-        },
+        metadata=dict(
+            name="RemarkData",
+            type="Element",
+            help="Actual remarks data.",
+            required=True
+        )
     )
     booking_traveler_ref: List[TypeRef] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 999,
-            "name": "BookingTravelerRef",
-            "type": "Element",
-            "help": "Reference to Booking Traveler.",
-        },
+        metadata=dict(
+            name="BookingTravelerRef",
+            type="Element",
+            help="Reference to Booking Traveler.",
+            min_occurs=0,
+            max_occurs=999
+        )
     )
     key: TypeRef = field(
-        default=None, metadata={"name": "Key", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="Key",
+            type="Attribute",
+            help=None,
+        )
     )
     category: str = field(
         default=None,
-        metadata={
-            "name": "Category",
-            "type": "Attribute",
-            "help": "A category to group and organize the various remarks. This is not required, but it is recommended.",
-        },
+        metadata=dict(
+            name="Category",
+            type="Attribute",
+            help="A category to group and organize the various remarks. This is not required, but it is recommended.",
+        )
     )
     type_in_gds: TypeGdsAccountingRemark = field(
-        default=None, metadata={"name": "TypeInGds", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="TypeInGds",
+            type="Attribute",
+            help=None,
+        )
     )
     provider_reservation_info_ref: TypeRef = field(
         default=None,
-        metadata={
-            "name": "ProviderReservationInfoRef",
-            "type": "Attribute",
-            "help": "Provider reservation reference key.",
-        },
+        metadata=dict(
+            name="ProviderReservationInfoRef",
+            type="Attribute",
+            help="Provider reservation reference key.",
+        )
     )
     provider_code: TypeProviderCode = field(
         default=None,
-        metadata={
-            "name": "ProviderCode",
-            "type": "Attribute",
-            "help": "Contains the Provider Code of the provider for which this accounting remark is used",
-        },
+        metadata=dict(
+            name="ProviderCode",
+            type="Attribute",
+            help="Contains the Provider Code of the provider for which this accounting remark is used",
+        )
     )
     use_provider_native_mode: bool = field(
         default="false",
-        metadata={
-            "name": "UseProviderNativeMode",
-            "type": "Attribute",
-            "help": "Will be true when terminal process required, else false",
-        },
+        metadata=dict(
+            name="UseProviderNativeMode",
+            type="Attribute",
+            help="Will be true when terminal process required, else false",
+        )
     )
 
 
@@ -3436,51 +4160,51 @@ class AddSvc:
 
     rfic: str = field(
         default=None,
-        metadata={
-            "name": "RFIC",
-            "type": "Attribute",
-            "help": "1P - Reason for issuance",
-        },
+        metadata=dict(
+            name="RFIC",
+            type="Attribute",
+            help="1P - Reason for issuance",
+        )
     )
     rfisc: str = field(
         default=None,
-        metadata={
-            "name": "RFISC",
-            "type": "Attribute",
-            "help": "1P - Resaon for issuance sub-code",
-        },
+        metadata=dict(
+            name="RFISC",
+            type="Attribute",
+            help="1P - Resaon for issuance sub-code",
+        )
     )
     svc_description: str = field(
         default=None,
-        metadata={
-            "name": "SvcDescription",
-            "type": "Attribute",
-            "help": "1P - SVC fee description",
-        },
+        metadata=dict(
+            name="SvcDescription",
+            type="Attribute",
+            help="1P - SVC fee description",
+        )
     )
     origin: TypeIatacode = field(
         default=None,
-        metadata={
-            "name": "Origin",
-            "type": "Attribute",
-            "help": "Origin location - Airport code. If this value not provided, the last air segment arrival location is taken as default. 1P only.",
-        },
+        metadata=dict(
+            name="Origin",
+            type="Attribute",
+            help="Origin location - Airport code. If this value not provided, the last air segment arrival location is taken as default. 1P only.",
+        )
     )
     destination: TypeIatacode = field(
         default=None,
-        metadata={
-            "name": "Destination",
-            "type": "Attribute",
-            "help": "Destination location - Airport code.",
-        },
+        metadata=dict(
+            name="Destination",
+            type="Attribute",
+            help="Destination location - Airport code.",
+        )
     )
     start_date: str = field(
         default=None,
-        metadata={
-            "name": "StartDate",
-            "type": "Attribute",
-            "help": "The start date of the SVC segment. If the value not specified, the default value is set as the date next to the last airsegment arrival date. 1P only",
-        },
+        metadata=dict(
+            name="StartDate",
+            type="Attribute",
+            help="The start date of the SVC segment. If the value not specified, the default value is set as the date next to the last airsegment arrival date. 1P only",
+        )
     )
 
 
@@ -3488,12 +4212,13 @@ class AddSvc:
 class AddressRestriction:
     required_field: List[RequiredField] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 1,
-            "max_occurs": 999,
-            "name": "RequiredField",
-            "type": "Element",
-        },
+        metadata=dict(
+            name="RequiredField",
+            type="Element",
+            help=None,
+            min_occurs=1,
+            max_occurs=999
+        )
     )
 
 
@@ -3514,51 +4239,51 @@ class AgencySellInfo:
 
     iata_code: TypeIata = field(
         default=None,
-        metadata={
-            "name": "IataCode",
-            "type": "Attribute",
-            "help": "The IATA code that pertains to this Agency and Branch.",
-        },
+        metadata=dict(
+            name="IataCode",
+            type="Attribute",
+            help="The IATA code that pertains to this Agency and Branch.",
+        )
     )
     country: TypeCountry = field(
         default=None,
-        metadata={
-            "name": "Country",
-            "type": "Attribute",
-            "help": "The country code of the requesting agency.",
-        },
+        metadata=dict(
+            name="Country",
+            type="Attribute",
+            help="The country code of the requesting agency.",
+        )
     )
     currency_code: TypeCurrency = field(
         default=None,
-        metadata={
-            "name": "CurrencyCode",
-            "type": "Attribute",
-            "help": "The currency code in which the reservation will be ticketed.",
-        },
+        metadata=dict(
+            name="CurrencyCode",
+            type="Attribute",
+            help="The currency code in which the reservation will be ticketed.",
+        )
     )
     provider_code: TypeProviderCode = field(
         default=None,
-        metadata={
-            "name": "ProviderCode",
-            "type": "Attribute",
-            "help": "The IATA assigned airline/GDS code.",
-        },
+        metadata=dict(
+            name="ProviderCode",
+            type="Attribute",
+            help="The IATA assigned airline/GDS code.",
+        )
     )
     pseudo_city_code: TypePcc = field(
         default=None,
-        metadata={
-            "name": "PseudoCityCode",
-            "type": "Attribute",
-            "help": "The PCC in the host system.",
-        },
+        metadata=dict(
+            name="PseudoCityCode",
+            type="Attribute",
+            help="The PCC in the host system.",
+        )
     )
     city_code: TypeIatacode = field(
         default=None,
-        metadata={
-            "name": "CityCode",
-            "type": "Attribute",
-            "help": 'IATA code of "home" city or airport.',
-        },
+        metadata=dict(
+            name="CityCode",
+            type="Attribute",
+            help="IATA code of 'home' city or airport.",
+        )
     )
 
 
@@ -3570,56 +4295,56 @@ class AgentAction:
 
     action_type: str = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "ActionType",
-            "type": "Attribute",
-            "help": "The type of action the agent performed.",
-        },
+        metadata=dict(
+            name="ActionType",
+            type="Attribute",
+            help="The type of action the agent performed.",
+            required=True
+        )
     )
     agent_code: str = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "AgentCode",
-            "type": "Attribute",
-            "help": "The AgenctCode who performed the action.",
-        },
+        metadata=dict(
+            name="AgentCode",
+            type="Attribute",
+            help="The AgenctCode who performed the action.",
+            required=True
+        )
     )
     branch_code: TypeBranchCode = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "BranchCode",
-            "type": "Attribute",
-            "help": "The BranchCode of the branch (working branch, branchcode used for the request. If nothing specified, branchcode for the agent) who performed the action.",
-        },
+        metadata=dict(
+            name="BranchCode",
+            type="Attribute",
+            help="The BranchCode of the branch (working branch, branchcode used for the request. If nothing specified, branchcode for the agent) who performed the action.",
+            required=True
+        )
     )
     agency_code: str = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "AgencyCode",
-            "type": "Attribute",
-            "help": "The AgencyCode of the agent who performed the action.",
-        },
+        metadata=dict(
+            name="AgencyCode",
+            type="Attribute",
+            help="The AgencyCode of the agent who performed the action.",
+            required=True
+        )
     )
     agent_sine: str = field(
         default=None,
-        metadata={
-            "name": "AgentSine",
-            "type": "Attribute",
-            "help": "The sign in user name of the agent logged into the terminal. PROVIDER SUPPORTED: ACH",
-        },
+        metadata=dict(
+            name="AgentSine",
+            type="Attribute",
+            help="The sign in user name of the agent logged into the terminal. PROVIDER SUPPORTED: ACH",
+        )
     )
     event_time: str = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "EventTime",
-            "type": "Attribute",
-            "help": "Date and time at which this event took place.",
-        },
+        metadata=dict(
+            name="EventTime",
+            type="Attribute",
+            help="Date and time at which this event took place.",
+            required=True
+        )
     )
 
 
@@ -3631,29 +4356,29 @@ class AgentIdoverride:
 
     supplier_code: TypeSupplierCode = field(
         default=None,
-        metadata={
-            "name": "SupplierCode",
-            "type": "Attribute",
-            "help": "Supplier code to determine which vendor this AgentId belongs to.",
-        },
+        metadata=dict(
+            name="SupplierCode",
+            type="Attribute",
+            help="Supplier code to determine which vendor this AgentId belongs to.",
+        )
     )
     provider_code: TypeProviderCode = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "ProviderCode",
-            "type": "Attribute",
-            "help": "Provider code to route the AgentId to proper provider.",
-        },
+        metadata=dict(
+            name="ProviderCode",
+            type="Attribute",
+            help="Provider code to route the AgentId to proper provider.",
+            required=True
+        )
     )
     agent_id: str = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "AgentID",
-            "type": "Attribute",
-            "help": "The Agent ID for the applicable supplier/vendor",
-        },
+        metadata=dict(
+            name="AgentID",
+            type="Attribute",
+            help="The Agent ID for the applicable supplier/vendor",
+            required=True
+        )
     )
 
 
@@ -3665,7 +4390,12 @@ class Airport(Location):
 
     code: TypeIatacode = field(
         default=None,
-        metadata={"required": True, "name": "Code", "type": "Attribute"},
+        metadata=dict(
+            name="Code",
+            type="Attribute",
+            help=None,
+            required=True
+        )
     )
 
 
@@ -3677,59 +4407,59 @@ class AppliedProfile:
 
     key: TypeRef = field(
         default=None,
-        metadata={
-            "name": "Key",
-            "type": "Attribute",
-            "help": "Key for update/delete of the element",
-        },
+        metadata=dict(
+            name="Key",
+            type="Attribute",
+            help="Key for update/delete of the element",
+        )
     )
     traveler_id: str = field(
         default=None,
-        metadata={
-            "name": "TravelerID",
-            "type": "Attribute",
-            "help": "The ID of the TravelerProfile that was applied",
-        },
+        metadata=dict(
+            name="TravelerID",
+            type="Attribute",
+            help="The ID of the TravelerProfile that was applied",
+        )
     )
     traveler_name: str = field(
         default=None,
-        metadata={
-            "name": "TravelerName",
-            "type": "Attribute",
-            "help": "The name from the TravelerProfile that was applied",
-        },
+        metadata=dict(
+            name="TravelerName",
+            type="Attribute",
+            help="The name from the TravelerProfile that was applied",
+        )
     )
     account_id: str = field(
         default=None,
-        metadata={
-            "name": "AccountID",
-            "type": "Attribute",
-            "help": "The ID of the AccountProfile that was applied",
-        },
+        metadata=dict(
+            name="AccountID",
+            type="Attribute",
+            help="The ID of the AccountProfile that was applied",
+        )
     )
     account_name: str = field(
         default=None,
-        metadata={
-            "name": "AccountName",
-            "type": "Attribute",
-            "help": "The name from the AccountProfile that was applied",
-        },
+        metadata=dict(
+            name="AccountName",
+            type="Attribute",
+            help="The name from the AccountProfile that was applied",
+        )
     )
     immediate_parent_id: str = field(
         default=None,
-        metadata={
-            "name": "ImmediateParentID",
-            "type": "Attribute",
-            "help": "The ID of the immediate parent that was applied",
-        },
+        metadata=dict(
+            name="ImmediateParentID",
+            type="Attribute",
+            help="The ID of the immediate parent that was applied",
+        )
     )
     immediate_parent_name: str = field(
         default=None,
-        metadata={
-            "name": "ImmediateParentName",
-            "type": "Attribute",
-            "help": "The name of the immediate parent that was applied",
-        },
+        metadata=dict(
+            name="ImmediateParentName",
+            type="Attribute",
+            help="The name of the immediate parent that was applied",
+        )
     )
 
 
@@ -3741,21 +4471,21 @@ class BaseAsyncProviderSpecificResponse:
 
     provider_code: TypeProviderCode = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "ProviderCode",
-            "type": "Attribute",
-            "help": "Provider code of a specific host",
-        },
+        metadata=dict(
+            name="ProviderCode",
+            type="Attribute",
+            help="Provider code of a specific host",
+            required=True
+        )
     )
     more_results: bool = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "MoreResults",
-            "type": "Attribute",
-            "help": "Identifies whether more results are available for specific host or not.",
-        },
+        metadata=dict(
+            name="MoreResults",
+            type="Attribute",
+            help="Identifies whether more results are available for specific host or not.",
+            required=True
+        )
     )
 
 
@@ -3766,10 +4496,20 @@ class BookingDates:
     """
 
     check_in_date: TypeDate = field(
-        default=None, metadata={"name": "CheckInDate", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="CheckInDate",
+            type="Attribute",
+            help=None,
+        )
     )
     check_out_date: TypeDate = field(
-        default=None, metadata={"name": "CheckOutDate", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="CheckOutDate",
+            type="Attribute",
+            help=None,
+        )
     )
 
 
@@ -3777,30 +4517,31 @@ class BookingDates:
 class CardRestriction:
     required_field: List[RequiredField] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 1,
-            "max_occurs": 999,
-            "name": "RequiredField",
-            "type": "Element",
-        },
+        metadata=dict(
+            name="RequiredField",
+            type="Element",
+            help=None,
+            min_occurs=1,
+            max_occurs=999
+        )
     )
     code: TypeCardMerchantType = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "Code",
-            "type": "Attribute",
-            "help": "2 letter Credit/Debit Card merchant type",
-        },
+        metadata=dict(
+            name="Code",
+            type="Attribute",
+            help="2 letter Credit/Debit Card merchant type",
+            required=True
+        )
     )
     name: str = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "Name",
-            "type": "Attribute",
-            "help": "Card merchant description",
-        },
+        metadata=dict(
+            name="Name",
+            type="Attribute",
+            help="Card merchant description",
+            required=True
+        )
     )
 
 
@@ -3812,7 +4553,12 @@ class Carrier:
 
     code: TypeCarrier = field(
         default=None,
-        metadata={"required": True, "name": "Code", "type": "Attribute"},
+        metadata=dict(
+            name="Code",
+            type="Attribute",
+            help=None,
+            required=True
+        )
     )
 
 
@@ -3824,52 +4570,52 @@ class Certificate:
 
     number: str = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "Number",
-            "type": "Attribute",
-            "help": "The Certificate number",
-        },
+        metadata=dict(
+            name="Number",
+            type="Attribute",
+            help="The Certificate number",
+            required=True
+        )
     )
     amount: TypeMoney = field(
         default=None,
-        metadata={
-            "name": "Amount",
-            "type": "Attribute",
-            "help": "The monetary value of the certificate.",
-        },
+        metadata=dict(
+            name="Amount",
+            type="Attribute",
+            help="The monetary value of the certificate.",
+        )
     )
     discount_amount: TypeMoney = field(
         default=None,
-        metadata={
-            "name": "DiscountAmount",
-            "type": "Attribute",
-            "help": "The monetary discount amount of this certificate.",
-        },
+        metadata=dict(
+            name="DiscountAmount",
+            type="Attribute",
+            help="The monetary discount amount of this certificate.",
+        )
     )
     discount_percentage: int = field(
         default=None,
-        metadata={
-            "name": "DiscountPercentage",
-            "type": "Attribute",
-            "help": "The percentage discount value of this certificate.",
-        },
+        metadata=dict(
+            name="DiscountPercentage",
+            type="Attribute",
+            help="The percentage discount value of this certificate.",
+        )
     )
     not_valid_before: str = field(
         default=None,
-        metadata={
-            "name": "NotValidBefore",
-            "type": "Attribute",
-            "help": "The date that this certificate becomes valid.",
-        },
+        metadata=dict(
+            name="NotValidBefore",
+            type="Attribute",
+            help="The date that this certificate becomes valid.",
+        )
     )
     not_valid_after: str = field(
         default=None,
-        metadata={
-            "name": "NotValidAfter",
-            "type": "Attribute",
-            "help": "The date that this certificate expires.",
-        },
+        metadata=dict(
+            name="NotValidAfter",
+            type="Attribute",
+            help="The date that this certificate expires.",
+        )
     )
 
 
@@ -3881,7 +4627,12 @@ class City(Location):
 
     code: TypeIatacode = field(
         default=None,
-        metadata={"required": True, "name": "Code", "type": "Attribute"},
+        metadata=dict(
+            name="Code",
+            type="Attribute",
+            help=None,
+            required=True
+        )
     )
 
 
@@ -3893,20 +4644,20 @@ class CityOrAirport(Location):
 
     code: TypeIatacode = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "Code",
-            "type": "Attribute",
-            "help": "The airport or city IATA code.",
-        },
+        metadata=dict(
+            name="Code",
+            type="Attribute",
+            help="The airport or city IATA code.",
+            required=True
+        )
     )
     prefer_city: bool = field(
         default="false",
-        metadata={
-            "name": "PreferCity",
-            "type": "Attribute",
-            "help": "Indicates that the search should prefer city results over airport results.",
-        },
+        metadata=dict(
+            name="PreferCity",
+            type="Attribute",
+            help="Indicates that the search should prefer city results over airport results.",
+        )
     )
 
 
@@ -3917,73 +4668,78 @@ class Commission:
     """
 
     key: TypeRef = field(
-        default=None, metadata={"name": "Key", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="Key",
+            type="Attribute",
+            help=None,
+        )
     )
     level: TypeCommissionLevel = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "Level",
-            "type": "Attribute",
-            "help": "The commission percentage level.",
-        },
+        metadata=dict(
+            name="Level",
+            type="Attribute",
+            help="The commission percentage level.",
+            required=True
+        )
     )
     type: TypeCommissionType = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "Type",
-            "type": "Attribute",
-            "help": "The commission type.",
-        },
+        metadata=dict(
+            name="Type",
+            type="Attribute",
+            help="The commission type.",
+            required=True
+        )
     )
     modifier: TypeCommissionModifier = field(
         default=None,
-        metadata={
-            "name": "Modifier",
-            "type": "Attribute",
-            "help": "Optional commission modifier.",
-        },
+        metadata=dict(
+            name="Modifier",
+            type="Attribute",
+            help="Optional commission modifier.",
+        )
     )
     amount: TypeMoney = field(
         default=None,
-        metadata={
-            "name": "Amount",
-            "type": "Attribute",
-            "help": "The monetary amount of the commission.",
-        },
+        metadata=dict(
+            name="Amount",
+            type="Attribute",
+            help="The monetary amount of the commission.",
+        )
     )
     value: str = field(
         default=None,
-        metadata={
-            "name": "Value",
-            "type": "Attribute",
-            "help": "Contains alphanumeric or alpha characters intended as 1G Value Code as applicable by BSP of client.",
-        },
+        metadata=dict(
+            name="Value",
+            type="Attribute",
+            help="Contains alphanumeric or alpha characters intended as 1G Value Code as applicable by BSP of client.",
+        )
     )
     percentage: TypePercentageWithDecimal = field(
         default=None,
-        metadata={
-            "name": "Percentage",
-            "type": "Attribute",
-            "help": "The percent of the commission.",
-        },
+        metadata=dict(
+            name="Percentage",
+            type="Attribute",
+            help="The percent of the commission.",
+        )
     )
     booking_traveler_ref: TypeRef = field(
         default=None,
-        metadata={
-            "name": "BookingTravelerRef",
-            "type": "Attribute",
-            "help": "A reference to a passenger.",
-        },
+        metadata=dict(
+            name="BookingTravelerRef",
+            type="Attribute",
+            help="A reference to a passenger.",
+        )
     )
     commission_override: bool = field(
         default="false",
-        metadata={
-            "name": "CommissionOverride",
-            "type": "Attribute",
-            "help": "This is enabled to override CAT-35 commission error during air ticketing. PROVIDER SUPPORTED:Worldspan and JAL",
-        },
+        metadata=dict(
+            name="CommissionOverride",
+            type="Attribute",
+            help="This is enabled to override CAT-35 commission error during air ticketing. PROVIDER SUPPORTED:Worldspan and JAL",
+        )
     )
 
 
@@ -3995,46 +4751,46 @@ class CommissionRemark:
 
     provider_reservation_level: "CommissionRemark.ProviderReservationLevel" = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "ProviderReservationLevel",
-            "type": "Element",
-            "help": "Specify commission which is applicable to PNR level.",
-        },
+        metadata=dict(
+            name="ProviderReservationLevel",
+            type="Element",
+            help="Specify commission which is applicable to PNR level.",
+            required=True
+        )
     )
     passenger_type_level: List["CommissionRemark.PassengerTypeLevel"] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 1,
-            "max_occurs": 4,
-            "name": "PassengerTypeLevel",
-            "type": "Element",
-            "help": "Specify commission which is applicable to per PTC level.",
-        },
+        metadata=dict(
+            name="PassengerTypeLevel",
+            type="Element",
+            help="Specify commission which is applicable to per PTC level.",
+            min_occurs=1,
+            max_occurs=4
+        )
     )
     key: TypeRef = field(
         default=None,
-        metadata={
-            "name": "Key",
-            "type": "Attribute",
-            "help": "Key to be used for internal processing.",
-        },
+        metadata=dict(
+            name="Key",
+            type="Attribute",
+            help="Key to be used for internal processing.",
+        )
     )
     provider_reservation_info_ref: TypeRef = field(
         default=None,
-        metadata={
-            "name": "ProviderReservationInfoRef",
-            "type": "Attribute",
-            "help": "Provider reservation reference key.",
-        },
+        metadata=dict(
+            name="ProviderReservationInfoRef",
+            type="Attribute",
+            help="Provider reservation reference key.",
+        )
     )
     provider_code: TypeProviderCode = field(
         default=None,
-        metadata={
-            "name": "ProviderCode",
-            "type": "Attribute",
-            "help": "Contains the Provider Code of the provider for which this accounting remark is used",
-        },
+        metadata=dict(
+            name="ProviderCode",
+            type="Attribute",
+            help="Contains the Provider Code of the provider for which this accounting remark is used",
+        )
     )
 
     @dataclass
@@ -4045,11 +4801,12 @@ class CommissionRemark:
     class PassengerTypeLevel:
         traveler_type: TypePtc = field(
             default=None,
-            metadata={
-                "required": True,
-                "name": "TravelerType",
-                "type": "Attribute",
-            },
+            metadata=dict(
+                name="TravelerType",
+                type="Attribute",
+                help=None,
+                required=True
+            )
         )
 
 
@@ -4061,36 +4818,37 @@ class ConsolidatorRemark:
 
     pseudo_city_code: List[PseudoCityCode] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 1,
-            "max_occurs": 5,
-            "name": "PseudoCityCode",
-            "type": "Element",
-        },
+        metadata=dict(
+            name="PseudoCityCode",
+            type="Element",
+            help=None,
+            min_occurs=1,
+            max_occurs=5
+        )
     )
     key: TypeRef = field(
         default=None,
-        metadata={
-            "name": "Key",
-            "type": "Attribute",
-            "help": "Key to be used for internal processing.",
-        },
+        metadata=dict(
+            name="Key",
+            type="Attribute",
+            help="Key to be used for internal processing.",
+        )
     )
     provider_reservation_info_ref: TypeRef = field(
         default=None,
-        metadata={
-            "name": "ProviderReservationInfoRef",
-            "type": "Attribute",
-            "help": "Provider reservation reference key.",
-        },
+        metadata=dict(
+            name="ProviderReservationInfoRef",
+            type="Attribute",
+            help="Provider reservation reference key.",
+        )
     )
     provider_code: TypeProviderCode = field(
         default=None,
-        metadata={
-            "name": "ProviderCode",
-            "type": "Attribute",
-            "help": "Contains the Provider Code of the provider for which this element is used",
-        },
+        metadata=dict(
+            name="ProviderCode",
+            type="Attribute",
+            help="Contains the Provider Code of the provider for which this element is used",
+        )
     )
 
 
@@ -4098,11 +4856,11 @@ class ConsolidatorRemark:
 class ContinuityCheckOverride:
     key: TypeRef = field(
         default=None,
-        metadata={
-            "name": "Key",
-            "type": "Attribute",
-            "help": "Will use key to map continuity remark to a particular segment",
-        },
+        metadata=dict(
+            name="Key",
+            type="Attribute",
+            help="Will use key to map continuity remark to a particular segment",
+        )
     )
 
 
@@ -4113,71 +4871,94 @@ class CreditCardAuth:
     """
 
     key: TypeRef = field(
-        default=None, metadata={"name": "Key", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="Key",
+            type="Attribute",
+            help=None,
+        )
     )
     payment_ref: TypeRef = field(
-        default=None, metadata={"name": "PaymentRef", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="PaymentRef",
+            type="Attribute",
+            help=None,
+        )
     )
     trans_id: str = field(
         default=None,
-        metadata={
-            "name": "TransId",
-            "type": "Attribute",
-            "help": "The transaction id from the credit processing system",
-        },
+        metadata=dict(
+            name="TransId",
+            type="Attribute",
+            help="The transaction id from the credit processing system",
+        )
     )
     number: TypeCreditCardNumber = field(
-        default=None, metadata={"name": "Number", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="Number",
+            type="Attribute",
+            help=None,
+        )
     )
     amount: TypeMoney = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "Amount",
-            "type": "Attribute",
-            "help": "The amount that was authorized.",
-        },
+        metadata=dict(
+            name="Amount",
+            type="Attribute",
+            help="The amount that was authorized.",
+            required=True
+        )
     )
     auth_code: str = field(
         default=None,
-        metadata={
-            "name": "AuthCode",
-            "type": "Attribute",
-            "help": "The authorization code to confirm card acceptance",
-        },
+        metadata=dict(
+            name="AuthCode",
+            type="Attribute",
+            help="The authorization code to confirm card acceptance",
+        )
     )
     auth_result_code: str = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "AuthResultCode",
-            "type": "Attribute",
-            "help": "The result code of the authorization command.",
-        },
+        metadata=dict(
+            name="AuthResultCode",
+            type="Attribute",
+            help="The result code of the authorization command.",
+            required=True
+        )
     )
     avsresult_code: str = field(
         default=None,
-        metadata={
-            "name": "AVSResultCode",
-            "type": "Attribute",
-            "help": "The address verification result code (if AVS was requested)",
-        },
+        metadata=dict(
+            name="AVSResultCode",
+            type="Attribute",
+            help="The address verification result code (if AVS was requested)",
+        )
     )
     message: str = field(
         default=None,
-        metadata={
-            "name": "Message",
-            "type": "Attribute",
-            "help": "The message explains the result of the authorization command.",
-        },
+        metadata=dict(
+            name="Message",
+            type="Attribute",
+            help="The message explains the result of the authorization command.",
+        )
     )
     provider_reservation_info_ref: TypeRef = field(
         default=None,
-        metadata={"name": "ProviderReservationInfoRef", "type": "Attribute"},
+        metadata=dict(
+            name="ProviderReservationInfoRef",
+            type="Attribute",
+            help=None,
+        )
     )
     form_of_payment_ref: TypeRef = field(
         default=None,
-        metadata={"name": "FormOfPaymentRef", "type": "Attribute"},
+        metadata=dict(
+            name="FormOfPaymentRef",
+            type="Attribute",
+            help=None,
+        )
     )
 
 
@@ -4188,11 +4969,20 @@ class CustomizedNameData:
     """
 
     key: TypeRef = field(
-        default=None, metadata={"name": "Key", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="Key",
+            type="Attribute",
+            help=None,
+        )
     )
     provider_reservation_info_ref: TypeRef = field(
         default=None,
-        metadata={"name": "ProviderReservationInfoRef", "type": "Attribute"},
+        metadata=dict(
+            name="ProviderReservationInfoRef",
+            type="Attribute",
+            help=None,
+        )
     )
 
 
@@ -4203,17 +4993,37 @@ class DiscountCard:
     """
 
     key: TypeRef = field(
-        default=None, metadata={"name": "Key", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="Key",
+            type="Attribute",
+            help=None,
+        )
     )
     code: StringLength1to8 = field(
         default=None,
-        metadata={"required": True, "name": "Code", "type": "Attribute"},
+        metadata=dict(
+            name="Code",
+            type="Attribute",
+            help=None,
+            required=True
+        )
     )
     description: StringLength1to255 = field(
-        default=None, metadata={"name": "Description", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="Description",
+            type="Attribute",
+            help=None,
+        )
     )
     number: TypeCardNumber = field(
-        default=None, metadata={"name": "Number", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="Number",
+            type="Attribute",
+            help=None,
+        )
     )
 
 
@@ -4221,7 +5031,12 @@ class DiscountCard:
 class DiscountCardRef:
     key: TypeRef = field(
         default=None,
-        metadata={"required": True, "name": "Key", "type": "Attribute"},
+        metadata=dict(
+            name="Key",
+            type="Attribute",
+            help=None,
+            required=True
+        )
     )
 
 
@@ -4232,16 +5047,21 @@ class DriversLicense:
     """
 
     key: TypeRef = field(
-        default=None, metadata={"name": "Key", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="Key",
+            type="Attribute",
+            help=None,
+        )
     )
     license_number: str = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "LicenseNumber",
-            "type": "Attribute",
-            "help": "The driving license number of the booking traveler.",
-        },
+        metadata=dict(
+            name="LicenseNumber",
+            type="Attribute",
+            help="The driving license number of the booking traveler.",
+            required=True
+        )
     )
 
 
@@ -4249,7 +5069,12 @@ class DriversLicense:
 class DriversLicenseRef:
     key: TypeRef = field(
         default=None,
-        metadata={"required": True, "name": "Key", "type": "Attribute"},
+        metadata=dict(
+            name="Key",
+            type="Attribute",
+            help=None,
+            required=True
+        )
     )
 
 
@@ -4261,22 +5086,22 @@ class EmailNotification:
 
     email_ref: List[TypeRef] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 999,
-            "name": "EmailRef",
-            "type": "Element",
-            "help": "Reference to Booking Traveler Email.",
-        },
+        metadata=dict(
+            name="EmailRef",
+            type="Element",
+            help="Reference to Booking Traveler Email.",
+            min_occurs=0,
+            max_occurs=999
+        )
     )
     recipients: str = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "Recipients",
-            "type": "Attribute",
-            "help": "Indicates the recipients of the mail addresses for which the user requires the system to send the itinerary.List of Possible Values: All = Send Email to All addresses Default = Send Email to Primary Booking Traveler Specific = Send Email to specific address Referred in EmailRef.",
-        },
+        metadata=dict(
+            name="Recipients",
+            type="Attribute",
+            help="Indicates the recipients of the mail addresses for which the user requires the system to send the itinerary.List of Possible Values: All = Send Email to All addresses Default = Send Email to Primary Booking Traveler Specific = Send Email to specific address Referred in EmailRef.",
+            required=True
+        )
     )
 
 
@@ -4288,7 +5113,12 @@ class Endorsement:
 
     value: TypeEndorsement = field(
         default=None,
-        metadata={"required": True, "name": "Value", "type": "Attribute"},
+        metadata=dict(
+            name="Value",
+            type="Attribute",
+            help=None,
+            required=True
+        )
     )
 
 
@@ -4300,35 +5130,35 @@ class EnettVan:
 
     min_percentage: TypeIntegerPercentage = field(
         default=None,
-        metadata={
-            "name": "MinPercentage",
-            "type": "Attribute",
-            "help": "The minimum percentage that will be applied on the Total price and sent to enett,which will denote the minimum authorized amount approved by eNett.uApi will default this to zero for multi-use Van's.",
-        },
+        metadata=dict(
+            name="MinPercentage",
+            type="Attribute",
+            help="The minimum percentage that will be applied on the Total price and sent to enett,which will denote the minimum authorized amount approved by eNett.uApi will default this to zero for multi-use Van's.",
+        )
     )
     max_percentage: TypeIntegerPercentage = field(
         default=None,
-        metadata={
-            "name": "MaxPercentage",
-            "type": "Attribute",
-            "help": "The maximum percentage that will be applied on the Total price and sent to enett, which will denote the maximum authorized amount as approved by eNett. This value will be ignored and not used for Multi-Use VAN’s.",
-        },
+        metadata=dict(
+            name="MaxPercentage",
+            type="Attribute",
+            help="The maximum percentage that will be applied on the Total price and sent to enett, which will denote the maximum authorized amount as approved by eNett. This value will be ignored and not used for Multi-Use VAN’s.",
+        )
     )
     expiry_days: TypeDurationYearInDays = field(
         default=None,
-        metadata={
-            "name": "ExpiryDays",
-            "type": "Attribute",
-            "help": "The number of days from the VAN generation date that the VAN will be active for, after which the VAN cannot be used.",
-        },
+        metadata=dict(
+            name="ExpiryDays",
+            type="Attribute",
+            help="The number of days from the VAN generation date that the VAN will be active for, after which the VAN cannot be used.",
+        )
     )
     multi_use: bool = field(
         default="true",
-        metadata={
-            "name": "MultiUse",
-            "type": "Attribute",
-            "help": "Acceptable values are true or false. If set to true it will denote that the VAN being requested is multi-use else it will indicate a single -use VAN.A Single use VAN can only be debited once while the multiple use VAN's can be debited multiple times subjected to the maximum value it has been authorized for. The default value will be TRUE to indicate a multi-use VAN is being issued.",
-        },
+        metadata=dict(
+            name="MultiUse",
+            type="Attribute",
+            help="Acceptable values are true or false. If set to true it will denote that the VAN being requested is multi-use else it will indicate a single -use VAN.A Single use VAN can only be debited once while the multiple use VAN's can be debited multiple times subjected to the maximum value it has been authorized for. The default value will be TRUE to indicate a multi-use VAN is being issued.",
+        )
     )
 
 
@@ -4340,20 +5170,20 @@ class ExchangedCoupon:
 
     ticket_number: TypeTicketNumber = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "TicketNumber",
-            "type": "Attribute",
-            "help": "The ticket number for which the exchange coupons are present.",
-        },
+        metadata=dict(
+            name="TicketNumber",
+            type="Attribute",
+            help="The ticket number for which the exchange coupons are present.",
+            required=True
+        )
     )
     coupon_number: str = field(
         default=None,
-        metadata={
-            "name": "CouponNumber",
-            "type": "Attribute",
-            "help": "Coupon numbers that were exchanged specific to this ticket",
-        },
+        metadata=dict(
+            name="CouponNumber",
+            type="Attribute",
+            help="Coupon numbers that were exchanged specific to this ticket",
+        )
     )
 
 
@@ -4365,7 +5195,12 @@ class FormOfPaymentRef:
 
     key: TypeRef = field(
         default=None,
-        metadata={"required": True, "name": "Key", "type": "Attribute"},
+        metadata=dict(
+            name="Key",
+            type="Attribute",
+            help=None,
+            required=True
+        )
     )
 
 
@@ -4377,76 +5212,86 @@ class GeneralRemark:
 
     remark_data: str = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "RemarkData",
-            "type": "Element",
-            "help": "Actual remarks data.",
-        },
+        metadata=dict(
+            name="RemarkData",
+            type="Element",
+            help="Actual remarks data.",
+            required=True
+        )
     )
     booking_traveler_ref: List[TypeRef] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 999,
-            "name": "BookingTravelerRef",
-            "type": "Element",
-            "help": "Reference to Booking Traveler.",
-        },
+        metadata=dict(
+            name="BookingTravelerRef",
+            type="Element",
+            help="Reference to Booking Traveler.",
+            min_occurs=0,
+            max_occurs=999
+        )
     )
     key: TypeRef = field(
-        default=None, metadata={"name": "Key", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="Key",
+            type="Attribute",
+            help=None,
+        )
     )
     category: str = field(
         default=None,
-        metadata={
-            "name": "Category",
-            "type": "Attribute",
-            "help": "A category to group and organize the various remarks. This is not required, but it is recommended.",
-        },
+        metadata=dict(
+            name="Category",
+            type="Attribute",
+            help="A category to group and organize the various remarks. This is not required, but it is recommended.",
+        )
     )
     type_in_gds: TypeGdsRemark = field(
-        default=None, metadata={"name": "TypeInGds", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="TypeInGds",
+            type="Attribute",
+            help=None,
+        )
     )
     supplier_type: TypeProduct = field(
         default=None,
-        metadata={
-            "name": "SupplierType",
-            "type": "Attribute",
-            "help": "The type of product this reservation is relative to",
-        },
+        metadata=dict(
+            name="SupplierType",
+            type="Attribute",
+            help="The type of product this reservation is relative to",
+        )
     )
     provider_reservation_info_ref: TypeRef = field(
         default=None,
-        metadata={
-            "name": "ProviderReservationInfoRef",
-            "type": "Attribute",
-            "help": "Provider reservation reference key.",
-        },
+        metadata=dict(
+            name="ProviderReservationInfoRef",
+            type="Attribute",
+            help="Provider reservation reference key.",
+        )
     )
     direction: TypeDirection = field(
         default=None,
-        metadata={
-            "name": "Direction",
-            "type": "Attribute",
-            "help": "Direction Incoming or Outgoing of the GeneralRemark.",
-        },
+        metadata=dict(
+            name="Direction",
+            type="Attribute",
+            help="Direction Incoming or Outgoing of the GeneralRemark.",
+        )
     )
     create_date: str = field(
         default=None,
-        metadata={
-            "name": "CreateDate",
-            "type": "Attribute",
-            "help": "The date and time that this GeneralRemark was created.",
-        },
+        metadata=dict(
+            name="CreateDate",
+            type="Attribute",
+            help="The date and time that this GeneralRemark was created.",
+        )
     )
     use_provider_native_mode: bool = field(
         default="false",
-        metadata={
-            "name": "UseProviderNativeMode",
-            "type": "Attribute",
-            "help": "Will be true when terminal process required, else false",
-        },
+        metadata=dict(
+            name="UseProviderNativeMode",
+            type="Attribute",
+            help="Will be true when terminal process required, else false",
+        )
     )
 
 
@@ -4467,11 +5312,11 @@ class HostToken:
 
     host: TypeProviderCode = field(
         default=None,
-        metadata={
-            "name": "Host",
-            "type": "Attribute",
-            "help": "The host associated with this token",
-        },
+        metadata=dict(
+            name="Host",
+            type="Attribute",
+            help="The host associated with this token",
+        )
     )
 
 
@@ -4483,11 +5328,11 @@ class IncludedInBase:
 
     amount: TypeMoney = field(
         default=None,
-        metadata={
-            "name": "Amount",
-            "type": "Attribute",
-            "help": "this attribute shows the amount included in the base fare for the specific fee or tax",
-        },
+        metadata=dict(
+            name="Amount",
+            type="Attribute",
+            help="this attribute shows the amount included in the base fare for the specific fee or tax",
+        )
     )
 
 
@@ -4495,15 +5340,20 @@ class IncludedInBase:
 class LinkedUniversalRecord:
     locator_code: TypeLocatorCode = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "LocatorCode",
-            "type": "Attribute",
-            "help": "A Universal Record that need to be linked to the current Universal Record.",
-        },
+        metadata=dict(
+            name="LocatorCode",
+            type="Attribute",
+            help="A Universal Record that need to be linked to the current Universal Record.",
+            required=True
+        )
     )
     key: TypeRef = field(
-        default=None, metadata={"name": "Key", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="Key",
+            type="Attribute",
+            help=None,
+        )
     )
 
 
@@ -4511,7 +5361,12 @@ class LinkedUniversalRecord:
 class LoyaltyCardRef:
     key: TypeRef = field(
         default=None,
-        metadata={"required": True, "name": "Key", "type": "Attribute"},
+        metadata=dict(
+            name="Key",
+            type="Attribute",
+            help=None,
+            required=True
+        )
     )
 
 
@@ -4523,48 +5378,52 @@ class MiscFormOfPayment:
 
     credit_card_type: str = field(
         default=None,
-        metadata={
-            "name": "CreditCardType",
-            "type": "Attribute",
-            "help": "The 2 letter credit/ debit card type or code which may not have been issued using the standard bank card types - i.e. an airline issued card",
-        },
+        metadata=dict(
+            name="CreditCardType",
+            type="Attribute",
+            help="The 2 letter credit/ debit card type or code which may not have been issued using the standard bank card types - i.e. an airline issued card",
+        )
     )
     credit_card_number: TypeCreditCardNumber = field(
         default=None,
-        metadata={"name": "CreditCardNumber", "type": "Attribute"},
+        metadata=dict(
+            name="CreditCardNumber",
+            type="Attribute",
+            help=None,
+        )
     )
     exp_date: str = field(
         default=None,
-        metadata={
-            "name": "ExpDate",
-            "type": "Attribute",
-            "help": "The Expiration date of this card in YYYY-MM format.",
-        },
+        metadata=dict(
+            name="ExpDate",
+            type="Attribute",
+            help="The Expiration date of this card in YYYY-MM format.",
+        )
     )
     text: str = field(
         default=None,
-        metadata={
-            "name": "Text",
-            "type": "Attribute",
-            "help": "Any free form text which may be associated with the Miscellaneous Form of Payment. This text may be provider or GDS specific",
-        },
+        metadata=dict(
+            name="Text",
+            type="Attribute",
+            help="Any free form text which may be associated with the Miscellaneous Form of Payment. This text may be provider or GDS specific",
+        )
     )
     category: str = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "Category",
-            "type": "Attribute",
-            "help": 'Allowable values are "Text" "Credit" "CreditCard" "FreeFormCreditCard" "Invoice" "NonRefundable" "MultipleReceivables" "Exchange" "Cash"',
-        },
+        metadata=dict(
+            name="Category",
+            type="Attribute",
+            help="Allowable values are 'Text' 'Credit' 'CreditCard' 'FreeFormCreditCard' 'Invoice' 'NonRefundable' 'MultipleReceivables' 'Exchange' 'Cash'",
+            required=True
+        )
     )
     acceptance_override: bool = field(
         default=None,
-        metadata={
-            "name": "AcceptanceOverride",
-            "type": "Attribute",
-            "help": "Override airline restriction on the credit card.",
-        },
+        metadata=dict(
+            name="AcceptanceOverride",
+            type="Attribute",
+            help="Override airline restriction on the credit card.",
+        )
     )
 
 
@@ -4576,53 +5435,53 @@ class Name:
 
     prefix: str = field(
         default=None,
-        metadata={
-            "name": "Prefix",
-            "type": "Attribute",
-            "help": "Name prefix. Size can be up to 20 characters",
-        },
+        metadata=dict(
+            name="Prefix",
+            type="Attribute",
+            help="Name prefix. Size can be up to 20 characters",
+        )
     )
     first: str = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "First",
-            "type": "Attribute",
-            "help": "First Name. Size can be up to 256 characters",
-        },
+        metadata=dict(
+            name="First",
+            type="Attribute",
+            help="First Name. Size can be up to 256 characters",
+            required=True
+        )
     )
     middle: str = field(
         default=None,
-        metadata={
-            "name": "Middle",
-            "type": "Attribute",
-            "help": "Midle name. Size can be up to 256 characters",
-        },
+        metadata=dict(
+            name="Middle",
+            type="Attribute",
+            help="Midle name. Size can be up to 256 characters",
+        )
     )
     last: str = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "Last",
-            "type": "Attribute",
-            "help": "Last Name. Size can be up to 256 characters",
-        },
+        metadata=dict(
+            name="Last",
+            type="Attribute",
+            help="Last Name. Size can be up to 256 characters",
+            required=True
+        )
     )
     suffix: str = field(
         default=None,
-        metadata={
-            "name": "Suffix",
-            "type": "Attribute",
-            "help": "Name suffix. Size can be up to 256 characters",
-        },
+        metadata=dict(
+            name="Suffix",
+            type="Attribute",
+            help="Name suffix. Size can be up to 256 characters",
+        )
     )
     traveler_profile_id: TypeProfileId = field(
         default=None,
-        metadata={
-            "name": "TravelerProfileId",
-            "type": "Attribute",
-            "help": "Traveler Applied Profile ID.",
-        },
+        metadata=dict(
+            name="TravelerProfileId",
+            type="Attribute",
+            help="Traveler Applied Profile ID.",
+        )
     )
 
 
@@ -4634,11 +5493,11 @@ class NextResultReference:
 
     provider_code: TypeProviderCode = field(
         default=None,
-        metadata={
-            "name": "ProviderCode",
-            "type": "Attribute",
-            "help": "The code of the Provider (e.g 1G,1S)",
-        },
+        metadata=dict(
+            name="ProviderCode",
+            type="Attribute",
+            help="The code of the Provider (e.g 1G,1S)",
+        )
     )
 
 
@@ -4649,34 +5508,54 @@ class Osi:
     """
 
     key: TypeRef = field(
-        default=None, metadata={"name": "Key", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="Key",
+            type="Attribute",
+            help=None,
+        )
     )
     carrier: TypeCarrier = field(
         default=None,
-        metadata={"required": True, "name": "Carrier", "type": "Attribute"},
+        metadata=dict(
+            name="Carrier",
+            type="Attribute",
+            help=None,
+            required=True
+        )
     )
     code: str = field(
-        default=None, metadata={"name": "Code", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="Code",
+            type="Attribute",
+            help=None,
+        )
     )
     text: str = field(
         default=None,
-        metadata={"required": True, "name": "Text", "type": "Attribute"},
+        metadata=dict(
+            name="Text",
+            type="Attribute",
+            help=None,
+            required=True
+        )
     )
     provider_reservation_info_ref: TypeRef = field(
         default=None,
-        metadata={
-            "name": "ProviderReservationInfoRef",
-            "type": "Attribute",
-            "help": "Provider reservation reference key.",
-        },
+        metadata=dict(
+            name="ProviderReservationInfoRef",
+            type="Attribute",
+            help="Provider reservation reference key.",
+        )
     )
     provider_code: TypeProviderCode = field(
         default=None,
-        metadata={
-            "name": "ProviderCode",
-            "type": "Attribute",
-            "help": "Contains the Provider Code of the provider for which this OSI is used",
-        },
+        metadata=dict(
+            name="ProviderCode",
+            type="Attribute",
+            help="Contains the Provider Code of the provider for which this OSI is used",
+        )
     )
 
 
@@ -4688,21 +5567,21 @@ class OverridePcc:
 
     provider_code: TypeProviderCode = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "ProviderCode",
-            "type": "Attribute",
-            "help": "The code of the provider (e.g. 1G, 1S)",
-        },
+        metadata=dict(
+            name="ProviderCode",
+            type="Attribute",
+            help="The code of the provider (e.g. 1G, 1S)",
+            required=True
+        )
     )
     pseudo_city_code: TypePcc = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "PseudoCityCode",
-            "type": "Attribute",
-            "help": "The PCC in the host system.",
-        },
+        metadata=dict(
+            name="PseudoCityCode",
+            type="Attribute",
+            help="The PCC in the host system.",
+            required=True
+        )
     )
 
 
@@ -4714,12 +5593,12 @@ class OwnershipChange:
 
     owning_pcc: TypeRef = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "OwningPCC",
-            "type": "Attribute",
-            "help": "New owning PCC of the PNR.",
-        },
+        metadata=dict(
+            name="OwningPCC",
+            type="Attribute",
+            help="New owning PCC of the PNR.",
+            required=True
+        )
     )
 
 
@@ -4730,61 +5609,71 @@ class Payment:
     """
 
     key: TypeRef = field(
-        default=None, metadata={"name": "Key", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="Key",
+            type="Attribute",
+            help=None,
+        )
     )
     type: str = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "Type",
-            "type": "Attribute",
-            "help": "Identifies the type of payment. This can be for an itinerary, a traveler, or a service fee for example.",
-        },
+        metadata=dict(
+            name="Type",
+            type="Attribute",
+            help="Identifies the type of payment. This can be for an itinerary, a traveler, or a service fee for example.",
+            required=True
+        )
     )
     form_of_payment_ref: TypeRef = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "FormOfPaymentRef",
-            "type": "Attribute",
-            "help": "The credit card that is will be used to make this payment.",
-        },
+        metadata=dict(
+            name="FormOfPaymentRef",
+            type="Attribute",
+            help="The credit card that is will be used to make this payment.",
+            required=True
+        )
     )
     booking_traveler_ref: TypeRef = field(
         default=None,
-        metadata={
-            "name": "BookingTravelerRef",
-            "type": "Attribute",
-            "help": "If the type represents a per traveler payment, then this will reference the traveler this payment refers to.",
-        },
+        metadata=dict(
+            name="BookingTravelerRef",
+            type="Attribute",
+            help="If the type represents a per traveler payment, then this will reference the traveler this payment refers to.",
+        )
     )
     amount: TypeMoney = field(
         default=None,
-        metadata={"required": True, "name": "Amount", "type": "Attribute"},
+        metadata=dict(
+            name="Amount",
+            type="Attribute",
+            help=None,
+            required=True
+        )
     )
     amount_type: StringLength1to32 = field(
         default=None,
-        metadata={
-            "name": "AmountType",
-            "type": "Attribute",
-            "help": 'This field displays type of payment amount when it is non-monetary. Presently available/supported value is "Flight Pass Credits".',
-        },
+        metadata=dict(
+            name="AmountType",
+            type="Attribute",
+            help="This field displays type of payment amount when it is non-monetary. Presently available/supported value is 'Flight Pass Credits'.",
+        )
     )
     approximate_amount: TypeMoney = field(
         default=None,
-        metadata={
-            "name": "ApproximateAmount",
-            "type": "Attribute",
-            "help": "It stores the converted payment amount in agency's default currency",
-        },
+        metadata=dict(
+            name="ApproximateAmount",
+            type="Attribute",
+            help="It stores the converted payment amount in agency's default currency",
+        )
     )
     status: str = field(
         default=None,
-        metadata={
-            "name": "Status",
-            "type": "Attribute",
-            "help": "Status to indicate the business association of the payment element.",
-        },
+        metadata=dict(
+            name="Status",
+            type="Attribute",
+            help="Status to indicate the business association of the payment element.",
+        )
     )
 
 
@@ -4796,47 +5685,47 @@ class PaymentAdvice:
 
     type: str = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "Type",
-            "type": "Attribute",
-            "help": "Other Payment Yype. Possible Values: AGC - Agency Check, AGG - Agency Guarantee, AWC - Award Check, CSH - Cash Equivalent, DBC - Denied Boarding Compensation, MCO - Miscellaneous Charge Order, TOO - Tour Order, TOV - Tour Voucher",
-        },
+        metadata=dict(
+            name="Type",
+            type="Attribute",
+            help="Other Payment Yype. Possible Values: AGC - Agency Check, AGG - Agency Guarantee, AWC - Award Check, CSH - Cash Equivalent, DBC - Denied Boarding Compensation, MCO - Miscellaneous Charge Order, TOO - Tour Order, TOV - Tour Voucher",
+            required=True
+        )
     )
     document_number: str = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "DocumentNumber",
-            "type": "Attribute",
-            "help": "Payment Document Number Examples: 1234567890, R7777",
-        },
+        metadata=dict(
+            name="DocumentNumber",
+            type="Attribute",
+            help="Payment Document Number Examples: 1234567890, R7777",
+            required=True
+        )
     )
     issue_date: str = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "IssueDate",
-            "type": "Attribute",
-            "help": "Document Issuance date",
-        },
+        metadata=dict(
+            name="IssueDate",
+            type="Attribute",
+            help="Document Issuance date",
+            required=True
+        )
     )
     issue_city: TypeIatacode = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "IssueCity",
-            "type": "Attribute",
-            "help": "City code of document issuance",
-        },
+        metadata=dict(
+            name="IssueCity",
+            type="Attribute",
+            help="City code of document issuance",
+            required=True
+        )
     )
     original_fop: str = field(
         default=None,
-        metadata={
-            "name": "OriginalFOP",
-            "type": "Attribute",
-            "help": "Original form of payment Examples: CHECK 3500",
-        },
+        metadata=dict(
+            name="OriginalFOP",
+            type="Attribute",
+            help="Original form of payment Examples: CHECK 3500",
+        )
     )
 
 
@@ -4844,7 +5733,12 @@ class PaymentAdvice:
 class PaymentRef:
     key: TypeRef = field(
         default=None,
-        metadata={"required": True, "name": "Key", "type": "Attribute"},
+        metadata=dict(
+            name="Key",
+            type="Attribute",
+            help=None,
+            required=True
+        )
     )
 
 
@@ -4855,38 +5749,84 @@ class Penalty:
     """
 
     cancel_refund: bool = field(
-        default=None, metadata={"name": "CancelRefund", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="CancelRefund",
+            type="Attribute",
+            help=None,
+        )
     )
     non_refundable: bool = field(
-        default=None, metadata={"name": "NonRefundable", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="NonRefundable",
+            type="Attribute",
+            help=None,
+        )
     )
     non_exchangeable: bool = field(
-        default=None, metadata={"name": "NonExchangeable", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="NonExchangeable",
+            type="Attribute",
+            help=None,
+        )
     )
     cancelation_penalty: bool = field(
         default=None,
-        metadata={"name": "CancelationPenalty", "type": "Attribute"},
+        metadata=dict(
+            name="CancelationPenalty",
+            type="Attribute",
+            help=None,
+        )
     )
     reissue_penalty: bool = field(
-        default=None, metadata={"name": "ReissuePenalty", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="ReissuePenalty",
+            type="Attribute",
+            help=None,
+        )
     )
     non_reissue_penalty: bool = field(
         default=None,
-        metadata={"name": "NonReissuePenalty", "type": "Attribute"},
+        metadata=dict(
+            name="NonReissuePenalty",
+            type="Attribute",
+            help=None,
+        )
     )
     ticket_refund_penalty: bool = field(
         default=None,
-        metadata={"name": "TicketRefundPenalty", "type": "Attribute"},
+        metadata=dict(
+            name="TicketRefundPenalty",
+            type="Attribute",
+            help=None,
+        )
     )
     charge_applicable: bool = field(
         default=None,
-        metadata={"name": "ChargeApplicable", "type": "Attribute"},
+        metadata=dict(
+            name="ChargeApplicable",
+            type="Attribute",
+            help=None,
+        )
     )
     charge_portion: bool = field(
-        default=None, metadata={"name": "ChargePortion", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="ChargePortion",
+            type="Attribute",
+            help=None,
+        )
     )
     penalty_amount: TypeMoney = field(
-        default=None, metadata={"name": "PenaltyAmount", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="PenaltyAmount",
+            type="Attribute",
+            help=None,
+        )
     )
 
 
@@ -4898,27 +5838,27 @@ class PersonalGeography:
 
     country_code: TypeCountry = field(
         default=None,
-        metadata={
-            "name": "CountryCode",
-            "type": "Element",
-            "help": "Passenger country code.",
-        },
+        metadata=dict(
+            name="CountryCode",
+            type="Element",
+            help="Passenger country code.",
+        )
     )
     state_province_code: TypeState = field(
         default=None,
-        metadata={
-            "name": "StateProvinceCode",
-            "type": "Element",
-            "help": "Passenger state/province code.",
-        },
+        metadata=dict(
+            name="StateProvinceCode",
+            type="Element",
+            help="Passenger state/province code.",
+        )
     )
     city_code: TypeCity = field(
         default=None,
-        metadata={
-            "name": "CityCode",
-            "type": "Element",
-            "help": "Passenger city code.",
-        },
+        metadata=dict(
+            name="CityCode",
+            type="Element",
+            help="Passenger city code.",
+        )
     )
 
 
@@ -4930,21 +5870,21 @@ class PointOfCommencement:
 
     city_or_airport_code: TypeIatacode = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "CityOrAirportCode",
-            "type": "Attribute",
-            "help": "Three digit Airport or City code that would be the Point of Commencement location for the trips/legs mentioned.",
-        },
+        metadata=dict(
+            name="CityOrAirportCode",
+            type="Attribute",
+            help="Three digit Airport or City code that would be the Point of Commencement location for the trips/legs mentioned.",
+            required=True
+        )
     )
     time: str = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "Time",
-            "type": "Attribute",
-            "help": "Specify a date or date and time",
-        },
+        metadata=dict(
+            name="Time",
+            type="Attribute",
+            help="Specify a date or date and time",
+            required=True
+        )
     )
 
 
@@ -4956,32 +5896,37 @@ class PointOfSale:
 
     provider_code: TypeProviderCode = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "ProviderCode",
-            "type": "Attribute",
-            "help": "The provider in which the PCC is defined.",
-        },
+        metadata=dict(
+            name="ProviderCode",
+            type="Attribute",
+            help="The provider in which the PCC is defined.",
+            required=True
+        )
     )
     pseudo_city_code: TypePcc = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "PseudoCityCode",
-            "type": "Attribute",
-            "help": "The PCC in the host system.",
-        },
+        metadata=dict(
+            name="PseudoCityCode",
+            type="Attribute",
+            help="The PCC in the host system.",
+            required=True
+        )
     )
     key: TypeRef = field(
-        default=None, metadata={"name": "Key", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="Key",
+            type="Attribute",
+            help=None,
+        )
     )
     iata: TypeIata = field(
         default=None,
-        metadata={
-            "name": "IATA",
-            "type": "Attribute",
-            "help": "Used for rapid reprice. This field is the IATA associated to this Point of Sale PCC. Providers: 1G/1V",
-        },
+        metadata=dict(
+            name="IATA",
+            type="Attribute",
+            help="Used for rapid reprice. This field is the IATA associated to this Point of Sale PCC. Providers: 1G/1V",
+        )
     )
 
 
@@ -4989,79 +5934,84 @@ class PointOfSale:
 class PriceMatchError:
     error_message: str = field(
         default=None,
-        metadata={"required": True, "name": "ErrorMessage", "type": "Element"},
+        metadata=dict(
+            name="ErrorMessage",
+            type="Element",
+            help=None,
+            required=True
+        )
     )
     vendor_code: TypeSupplierCode = field(
         default=None,
-        metadata={
-            "name": "VendorCode",
-            "type": "Attribute",
-            "help": "The code of the vendor (e.g. HZ, etc.)",
-        },
+        metadata=dict(
+            name="VendorCode",
+            type="Attribute",
+            help="The code of the vendor (e.g. HZ, etc.)",
+        )
     )
     hotel_chain: TypeHotelChainCode = field(
         default=None,
-        metadata={
-            "name": "HotelChain",
-            "type": "Attribute",
-            "help": "2 Letter Hotel Chain Code",
-        },
+        metadata=dict(
+            name="HotelChain",
+            type="Attribute",
+            help="2 Letter Hotel Chain Code",
+        )
     )
     hotel_code: TypeHotelCode = field(
         default=None,
-        metadata={
-            "name": "HotelCode",
-            "type": "Attribute",
-            "help": "Unique hotel identifier for the channel.",
-        },
+        metadata=dict(
+            name="HotelCode",
+            type="Attribute",
+            help="Unique hotel identifier for the channel.",
+        )
     )
     req_base: float = field(
         default=None,
-        metadata={
-            "name": "ReqBase",
-            "type": "Attribute",
-            "help": "BaseRate in the request.",
-        },
+        metadata=dict(
+            name="ReqBase",
+            type="Attribute",
+            help="BaseRate in the request.",
+        )
     )
     rsp_base: float = field(
         default=None,
-        metadata={
-            "name": "RspBase",
-            "type": "Attribute",
-            "help": "BaseRate retruned from the supplier.",
-        },
+        metadata=dict(
+            name="RspBase",
+            type="Attribute",
+            help="BaseRate retruned from the supplier.",
+        )
     )
     base_diff: float = field(
         default=None,
-        metadata={
-            "name": "BaseDiff",
-            "type": "Attribute",
-            "help": "BaseRate Difference.",
-        },
+        metadata=dict(
+            name="BaseDiff",
+            type="Attribute",
+            help="BaseRate Difference.",
+        )
     )
     req_total: float = field(
         default=None,
-        metadata={
-            "name": "ReqTotal",
-            "type": "Attribute",
-            "help": "Estimated Total Amount in the request.",
-        },
+        metadata=dict(
+            name="ReqTotal",
+            type="Attribute",
+            help="Estimated Total Amount in the request.",
+        )
     )
     rsp_total: float = field(
         default=None,
-        metadata={
-            "name": "RspTotal",
-            "type": "Attribute",
-            "help": "Estimated Total Amount returned from the supplier.",
-        },
+        metadata=dict(
+            name="RspTotal",
+            type="Attribute",
+            help="Estimated Total Amount returned from the supplier.",
+        )
     )
     total_diff: float = field(
         default=None,
-        metadata={
-            "name": "TotalDiff",
-            "type": "Attribute",
-            "help": "Estimated Total Amount difference.",
-        },
+        metadata=dict(
+            name="TotalDiff",
+            type="Attribute",
+            help="Estimated Total Amount difference.",
+        )
     )
 
 
@@ -5073,7 +6023,12 @@ class Provider:
 
     code: TypeProviderCode = field(
         default=None,
-        metadata={"required": True, "name": "Code", "type": "Attribute"},
+        metadata=dict(
+            name="Code",
+            type="Attribute",
+            help=None,
+            required=True
+        )
     )
 
 
@@ -5085,7 +6040,12 @@ class ProviderReservationInfoRef:
 
     key: TypeRef = field(
         default=None,
-        metadata={"required": True, "name": "Key", "type": "Attribute"},
+        metadata=dict(
+            name="Key",
+            type="Attribute",
+            help=None,
+            required=True
+        )
     )
 
 
@@ -5097,21 +6057,21 @@ class QueuePlace:
 
     pseudo_city_code: TypePcc = field(
         default=None,
-        metadata={
-            "name": "PseudoCityCode",
-            "type": "Element",
-            "help": "Pseudo City Code",
-        },
+        metadata=dict(
+            name="PseudoCityCode",
+            type="Element",
+            help="Pseudo City Code",
+        )
     )
     queue_selector: List[QueueSelector] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 999,
-            "name": "QueueSelector",
-            "type": "Element",
-            "help": "Identifies the Queue Information to be selected for placing the UR",
-        },
+        metadata=dict(
+            name="QueueSelector",
+            type="Element",
+            help="Identifies the Queue Information to be selected for placing the UR",
+            min_occurs=0,
+            max_occurs=999
+        )
     )
 
 
@@ -5123,7 +6083,12 @@ class RailLocation(Location):
 
     code: TypeRailLocationCode = field(
         default=None,
-        metadata={"required": True, "name": "Code", "type": "Attribute"},
+        metadata=dict(
+            name="Code",
+            type="Attribute",
+            help=None,
+            required=True
+        )
     )
 
 
@@ -5135,29 +6100,55 @@ class RailSeatAssignment:
 
     characteristic: List[Characteristic] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 999,
-            "name": "Characteristic",
-            "type": "Element",
-        },
+        metadata=dict(
+            name="Characteristic",
+            type="Element",
+            help=None,
+            min_occurs=0,
+            max_occurs=999
+        )
     )
     key: TypeRef = field(
-        default=None, metadata={"name": "Key", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="Key",
+            type="Attribute",
+            help=None,
+        )
     )
     status: TypeStatusCode = field(
         default=None,
-        metadata={"required": True, "name": "Status", "type": "Attribute"},
+        metadata=dict(
+            name="Status",
+            type="Attribute",
+            help=None,
+            required=True
+        )
     )
     seat: str = field(
         default=None,
-        metadata={"required": True, "name": "Seat", "type": "Attribute"},
+        metadata=dict(
+            name="Seat",
+            type="Attribute",
+            help=None,
+            required=True
+        )
     )
     rail_segment_ref: TypeRef = field(
-        default=None, metadata={"name": "RailSegmentRef", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="RailSegmentRef",
+            type="Attribute",
+            help=None,
+        )
     )
     coach_number: str = field(
-        default=None, metadata={"name": "CoachNumber", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="CoachNumber",
+            type="Attribute",
+            help=None,
+        )
     )
 
 
@@ -5173,7 +6164,12 @@ class Remark:
     """
 
     key: TypeRef = field(
-        default=None, metadata={"name": "Key", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="Key",
+            type="Attribute",
+            help=None,
+        )
     )
 
 
@@ -5185,12 +6181,13 @@ class RequestKeyMappings:
 
     key_mapping: List[KeyMapping] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 999,
-            "name": "KeyMapping",
-            "type": "Element",
-        },
+        metadata=dict(
+            name="KeyMapping",
+            type="Element",
+            help=None,
+            min_occurs=0,
+            max_occurs=999
+        )
     )
 
 
@@ -5202,70 +6199,70 @@ class ReviewBooking:
 
     key: TypeRef = field(
         default=None,
-        metadata={
-            "name": "Key",
-            "type": "Attribute",
-            "help": "Returned in response. Use it for update of saved review booking.",
-        },
+        metadata=dict(
+            name="Key",
+            type="Attribute",
+            help="Returned in response. Use it for update of saved review booking.",
+        )
     )
     queue: int = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "Queue",
-            "type": "Attribute",
-            "help": "Queue number, Must be numeric and less than 100.",
-        },
+        metadata=dict(
+            name="Queue",
+            type="Attribute",
+            help="Queue number, Must be numeric and less than 100.",
+            required=True
+        )
     )
     queue_category: str = field(
         default=None,
-        metadata={
-            "name": "QueueCategory",
-            "type": "Attribute",
-            "help": "Queue Category, 2 Character Alpha or Numeric.",
-        },
+        metadata=dict(
+            name="QueueCategory",
+            type="Attribute",
+            help="Queue Category, 2 Character Alpha or Numeric.",
+        )
     )
     date_time: str = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "DateTime",
-            "type": "Attribute",
-            "help": "Date and Time to place message on designated Queue, Should be prior to the last segment date in the PNR.",
-        },
+        metadata=dict(
+            name="DateTime",
+            type="Attribute",
+            help="Date and Time to place message on designated Queue, Should be prior to the last segment date in the PNR.",
+            required=True
+        )
     )
     pseudo_city_code: TypePcc = field(
         default=None,
-        metadata={
-            "name": "PseudoCityCode",
-            "type": "Attribute",
-            "help": "Input PCC optional value for placing the PNR into Queue. If not passed, will add as default PNR's Pseudo.",
-        },
+        metadata=dict(
+            name="PseudoCityCode",
+            type="Attribute",
+            help="Input PCC optional value for placing the PNR into Queue. If not passed, will add as default PNR's Pseudo.",
+        )
     )
     provider_code: TypeProviderCode = field(
         default=None,
-        metadata={
-            "name": "ProviderCode",
-            "type": "Attribute",
-            "help": "The code of the Provider (e.g 1G,1V).",
-        },
+        metadata=dict(
+            name="ProviderCode",
+            type="Attribute",
+            help="The code of the Provider (e.g 1G,1V).",
+        )
     )
     provider_reservation_info_ref: TypeRef = field(
         default=None,
-        metadata={
-            "name": "ProviderReservationInfoRef",
-            "type": "Attribute",
-            "help": "Provider Reservation reference. Returned in the response. Use it for update of saved Review Booking.",
-        },
+        metadata=dict(
+            name="ProviderReservationInfoRef",
+            type="Attribute",
+            help="Provider Reservation reference. Returned in the response. Use it for update of saved Review Booking.",
+        )
     )
     remarks: str = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "Remarks",
-            "type": "Attribute",
-            "help": "Remark or reminder message. It can be truncated depending on the provider.",
-        },
+        metadata=dict(
+            name="Remarks",
+            type="Attribute",
+            help="Remark or reminder message. It can be truncated depending on the provider.",
+            required=True
+        )
     )
 
 
@@ -5276,45 +6273,74 @@ class SearchEvent(TypeTimeRange):
     """
 
     type: TypeEventType = field(
-        default=None, metadata={"name": "Type", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="Type",
+            type="Attribute",
+            help=None,
+        )
     )
 
 
 @dataclass
 class SeatAssignment:
     key: TypeRef = field(
-        default=None, metadata={"name": "Key", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="Key",
+            type="Attribute",
+            help=None,
+        )
     )
     status: TypeStatusCode = field(
         default=None,
-        metadata={"required": True, "name": "Status", "type": "Attribute"},
+        metadata=dict(
+            name="Status",
+            type="Attribute",
+            help=None,
+            required=True
+        )
     )
     seat: str = field(
         default=None,
-        metadata={"required": True, "name": "Seat", "type": "Attribute"},
+        metadata=dict(
+            name="Seat",
+            type="Attribute",
+            help=None,
+            required=True
+        )
     )
     seat_type_code: TypeSeatTypeCode = field(
         default=None,
-        metadata={
-            "name": "SeatTypeCode",
-            "type": "Attribute",
-            "help": "The 4 letter SSR code like SMSW,NSSW,SMST etc.",
-        },
+        metadata=dict(
+            name="SeatTypeCode",
+            type="Attribute",
+            help="The 4 letter SSR code like SMSW,NSSW,SMST etc.",
+        )
     )
     segment_ref: TypeRef = field(
-        default=None, metadata={"name": "SegmentRef", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="SegmentRef",
+            type="Attribute",
+            help=None,
+        )
     )
     flight_details_ref: TypeRef = field(
         default=None,
-        metadata={"name": "FlightDetailsRef", "type": "Attribute"},
+        metadata=dict(
+            name="FlightDetailsRef",
+            type="Attribute",
+            help=None,
+        )
     )
     rail_coach_number: str = field(
         default=None,
-        metadata={
-            "name": "RailCoachNumber",
-            "type": "Attribute",
-            "help": "Coach number for which rail seatmap/coachmap is returned.",
-        },
+        metadata=dict(
+            name="RailCoachNumber",
+            type="Attribute",
+            help="Coach number for which rail seatmap/coachmap is returned.",
+        )
     )
 
 
@@ -5326,12 +6352,13 @@ class SeatAttributes:
 
     seat_attribute: List[SeatAttribute] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 10,
-            "name": "SeatAttribute",
-            "type": "Element",
-        },
+        metadata=dict(
+            name="SeatAttribute",
+            type="Element",
+            help=None,
+            min_occurs=0,
+            max_occurs=10
+        )
     )
 
 
@@ -5343,7 +6370,12 @@ class SegmentRemark:
 
     key: TypeRef = field(
         default=None,
-        metadata={"required": True, "name": "Key", "type": "Attribute"},
+        metadata=dict(
+            name="Key",
+            type="Attribute",
+            help=None,
+            required=True
+        )
     )
 
 
@@ -5355,16 +6387,21 @@ class ServiceFeeTaxInfo:
 
     category: str = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "Category",
-            "type": "Attribute",
-            "help": "The tax category represents a valid IATA tax code.",
-        },
+        metadata=dict(
+            name="Category",
+            type="Attribute",
+            help="The tax category represents a valid IATA tax code.",
+            required=True
+        )
     )
     amount: TypeMoney = field(
         default=None,
-        metadata={"required": True, "name": "Amount", "type": "Attribute"},
+        metadata=dict(
+            name="Amount",
+            type="Attribute",
+            help=None,
+            required=True
+        )
     )
 
 
@@ -5372,22 +6409,23 @@ class ServiceFeeTaxInfo:
 class ServiceInfo:
     description: List[str] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 1,
-            "max_occurs": 999,
-            "name": "Description",
-            "type": "Element",
-            "help": "Description of the Service. Usually used in tandem with one or more media items.",
-        },
+        metadata=dict(
+            name="Description",
+            type="Element",
+            help="Description of the Service. Usually used in tandem with one or more media items.",
+            min_occurs=1,
+            max_occurs=999
+        )
     )
     media_item: List[MediaItem] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 3,
-            "name": "MediaItem",
-            "type": "Element",
-        },
+        metadata=dict(
+            name="MediaItem",
+            type="Element",
+            help=None,
+            min_occurs=0,
+            max_occurs=3
+        )
     )
 
 
@@ -5399,108 +6437,178 @@ class ShopInformation:
 
     search_request: List["ShopInformation.SearchRequest"] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 999,
-            "name": "SearchRequest",
-            "type": "Element",
-            "help": "Search parameters that were used in LFS request",
-        },
+        metadata=dict(
+            name="SearchRequest",
+            type="Element",
+            help="Search parameters that were used in LFS request",
+            min_occurs=0,
+            max_occurs=999
+        )
     )
     flights_offered: List["ShopInformation.FlightsOffered"] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 999,
-            "name": "FlightsOffered",
-            "type": "Element",
-            "help": "Flights with lowest logical airfare returned as response to LFS request",
-        },
+        metadata=dict(
+            name="FlightsOffered",
+            type="Element",
+            help="Flights with lowest logical airfare returned as response to LFS request",
+            min_occurs=0,
+            max_occurs=999
+        )
     )
     cabin_shopped: str = field(
-        default=None, metadata={"name": "CabinShopped", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="CabinShopped",
+            type="Attribute",
+            help=None,
+        )
     )
     cabin_selected: str = field(
-        default=None, metadata={"name": "CabinSelected", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="CabinSelected",
+            type="Attribute",
+            help=None,
+        )
     )
     lowest_fare_offered: TypeMoney = field(
         default=None,
-        metadata={"name": "LowestFareOffered", "type": "Attribute"},
+        metadata=dict(
+            name="LowestFareOffered",
+            type="Attribute",
+            help=None,
+        )
     )
 
     @dataclass
     class SearchRequest:
         origin: TypeIatacode = field(
-            default=None, metadata={"name": "Origin", "type": "Attribute"}
+            default=None,
+            metadata=dict(
+                name="Origin",
+                type="Attribute",
+                help=None,
+            )
         )
         destination: TypeIatacode = field(
-            default=None, metadata={"name": "Destination", "type": "Attribute"}
+            default=None,
+            metadata=dict(
+                name="Destination",
+                type="Attribute",
+                help=None,
+            )
         )
         departure_time: str = field(
             default=None,
-            metadata={
-                "name": "DepartureTime",
-                "type": "Attribute",
-                "help": "Date and Time at which this entity departs. This does not include Time Zone information since it can be derived from origin location",
-            },
+            metadata=dict(
+                name="DepartureTime",
+                type="Attribute",
+                help="Date and Time at which this entity departs. This does not include Time Zone information since it can be derived from origin location",
+            )
         )
         class_of_service: TypeClassOfService = field(
             default=None,
-            metadata={"name": "ClassOfService", "type": "Attribute"},
+            metadata=dict(
+                name="ClassOfService",
+                type="Attribute",
+                help=None,
+            )
         )
 
     @dataclass
     class FlightsOffered:
         origin: TypeIatacode = field(
-            default=None, metadata={"name": "Origin", "type": "Attribute"}
+            default=None,
+            metadata=dict(
+                name="Origin",
+                type="Attribute",
+                help=None,
+            )
         )
         destination: TypeIatacode = field(
-            default=None, metadata={"name": "Destination", "type": "Attribute"}
+            default=None,
+            metadata=dict(
+                name="Destination",
+                type="Attribute",
+                help=None,
+            )
         )
         departure_time: str = field(
             default=None,
-            metadata={
-                "name": "DepartureTime",
-                "type": "Attribute",
-                "help": "Date and Time at which this entity departs. This does not include Time Zone information since it can be derived from origin location",
-            },
+            metadata=dict(
+                name="DepartureTime",
+                type="Attribute",
+                help="Date and Time at which this entity departs. This does not include Time Zone information since it can be derived from origin location",
+            )
         )
         travel_order: int = field(
-            default=None, metadata={"name": "TravelOrder", "type": "Attribute"}
+            default=None,
+            metadata=dict(
+                name="TravelOrder",
+                type="Attribute",
+                help=None,
+            )
         )
         carrier: TypeCarrier = field(
-            default=None, metadata={"name": "Carrier", "type": "Attribute"}
+            default=None,
+            metadata=dict(
+                name="Carrier",
+                type="Attribute",
+                help=None,
+            )
         )
         flight_number: TypeFlightNumber = field(
             default=None,
-            metadata={"name": "FlightNumber", "type": "Attribute"},
+            metadata=dict(
+                name="FlightNumber",
+                type="Attribute",
+                help=None,
+            )
         )
         class_of_service: TypeClassOfService = field(
             default=None,
-            metadata={"name": "ClassOfService", "type": "Attribute"},
+            metadata=dict(
+                name="ClassOfService",
+                type="Attribute",
+                help=None,
+            )
         )
         stop_over: bool = field(
-            default="false", metadata={"name": "StopOver", "type": "Attribute"}
+            default="false",
+            metadata=dict(
+                name="StopOver",
+                type="Attribute",
+                help=None,
+            )
         )
         connection: bool = field(
             default="false",
-            metadata={"name": "Connection", "type": "Attribute"},
+            metadata=dict(
+                name="Connection",
+                type="Attribute",
+                help=None,
+            )
         )
 
 
 @dataclass
 class SpecialEquipment:
     key: TypeRef = field(
-        default=None, metadata={"name": "Key", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="Key",
+            type="Attribute",
+            help=None,
+        )
     )
     type: str = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "Type",
-            "type": "Attribute",
-            "help": "Special equipment associated with a specific vehicle",
-        },
+        metadata=dict(
+            name="Type",
+            type="Attribute",
+            help="Special equipment associated with a specific vehicle",
+            required=True
+        )
     )
 
 
@@ -5511,100 +6619,125 @@ class Ssr:
     """
 
     key: TypeRef = field(
-        default=None, metadata={"name": "Key", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="Key",
+            type="Attribute",
+            help=None,
+        )
     )
     segment_ref: TypeRef = field(
         default=None,
-        metadata={
-            "name": "SegmentRef",
-            "type": "Attribute",
-            "help": "Reference to the air segment. May be required for some Types.",
-        },
+        metadata=dict(
+            name="SegmentRef",
+            type="Attribute",
+            help="Reference to the air segment. May be required for some Types.",
+        )
     )
     passive_segment_ref: TypeRef = field(
         default=None,
-        metadata={
-            "name": "PassiveSegmentRef",
-            "type": "Attribute",
-            "help": "Reference to the passive segment.",
-        },
+        metadata=dict(
+            name="PassiveSegmentRef",
+            type="Attribute",
+            help="Reference to the passive segment.",
+        )
     )
     provider_reservation_info_ref: TypeRef = field(
         default=None,
-        metadata={
-            "name": "ProviderReservationInfoRef",
-            "type": "Attribute",
-            "help": "Provider reservation reference key.",
-        },
+        metadata=dict(
+            name="ProviderReservationInfoRef",
+            type="Attribute",
+            help="Provider reservation reference key.",
+        )
     )
     type: TypeSsrcode = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "Type",
-            "type": "Attribute",
-            "help": "Programmatic SSRs use codes recognized by the provider/supplier (example, VGML=vegetarian meal code). Manual SSRs do not have an associated programmatic code.",
-        },
+        metadata=dict(
+            name="Type",
+            type="Attribute",
+            help="Programmatic SSRs use codes recognized by the provider/supplier (example, VGML=vegetarian meal code). Manual SSRs do not have an associated programmatic code.",
+            required=True
+        )
     )
     status: str = field(
-        default=None, metadata={"name": "Status", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="Status",
+            type="Attribute",
+            help=None,
+        )
     )
     free_text: TypeSsrfreeText = field(
         default=None,
-        metadata={
-            "name": "FreeText",
-            "type": "Attribute",
-            "help": "Certain SSR types will require a free text message. For example MAAS (Meet and assist).",
-        },
+        metadata=dict(
+            name="FreeText",
+            type="Attribute",
+            help="Certain SSR types will require a free text message. For example MAAS (Meet and assist).",
+        )
     )
     carrier: TypeCarrier = field(
-        default=None, metadata={"name": "Carrier", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="Carrier",
+            type="Attribute",
+            help=None,
+        )
     )
     carrier_specific_text: str = field(
         default=None,
-        metadata={
-            "name": "CarrierSpecificText",
-            "type": "Attribute",
-            "help": "Carrier specific information which are not captured in the FreeText field(not present in IATA's standard SSR DOCO format). An example is VISA Expiration Date.",
-        },
+        metadata=dict(
+            name="CarrierSpecificText",
+            type="Attribute",
+            help="Carrier specific information which are not captured in the FreeText field(not present in IATA's standard SSR DOCO format). An example is VISA Expiration Date.",
+        )
     )
     description: str = field(
-        default=None, metadata={"name": "Description", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="Description",
+            type="Attribute",
+            help=None,
+        )
     )
     provider_defined_type: str = field(
         default=None,
-        metadata={
-            "name": "ProviderDefinedType",
-            "type": "Attribute",
-            "help": "Original Type as sent by the provider",
-        },
+        metadata=dict(
+            name="ProviderDefinedType",
+            type="Attribute",
+            help="Original Type as sent by the provider",
+        )
     )
     ssrrule_ref: TypeRef = field(
         default=None,
-        metadata={
-            "name": "SSRRuleRef",
-            "type": "Attribute",
-            "help": "UniqueID to associate a rule to the SSR",
-        },
+        metadata=dict(
+            name="SSRRuleRef",
+            type="Attribute",
+            help="UniqueID to associate a rule to the SSR",
+        )
     )
     url: str = field(
-        default=None, metadata={"name": "URL", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="URL",
+            type="Attribute",
+            help=None,
+        )
     )
     profile_id: str = field(
         default=None,
-        metadata={
-            "name": "ProfileID",
-            "type": "Attribute",
-            "help": "Key assigned for Secure Flight Document value from the specified profile",
-        },
+        metadata=dict(
+            name="ProfileID",
+            type="Attribute",
+            help="Key assigned for Secure Flight Document value from the specified profile",
+        )
     )
     profile_secure_flight_doc_key: TypeRef = field(
         default=None,
-        metadata={
-            "name": "ProfileSecureFlightDocKey",
-            "type": "Attribute",
-            "help": "Unique ID of Booking Traveler's Profile that contains the Secure flight Detail",
-        },
+        metadata=dict(
+            name="ProfileSecureFlightDocKey",
+            type="Attribute",
+            help="Unique ID of Booking Traveler's Profile that contains the Secure flight Detail",
+        )
     )
 
 
@@ -5625,133 +6758,134 @@ class TravelComplianceData:
 
     policy_compliance: List["TravelComplianceData.PolicyCompliance"] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 2,
-            "name": "PolicyCompliance",
-            "type": "Element",
-        },
+        metadata=dict(
+            name="PolicyCompliance",
+            type="Element",
+            help=None,
+            min_occurs=0,
+            max_occurs=2
+        )
     )
-    contract_compliance: List[
-        "TravelComplianceData.ContractCompliance"
-    ] = field(
+    contract_compliance: List["TravelComplianceData.ContractCompliance"] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 2,
-            "name": "ContractCompliance",
-            "type": "Element",
-        },
+        metadata=dict(
+            name="ContractCompliance",
+            type="Element",
+            help=None,
+            min_occurs=0,
+            max_occurs=2
+        )
     )
     preferred_supplier: List["TravelComplianceData.PreferredSupplier"] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 999,
-            "name": "PreferredSupplier",
-            "type": "Element",
-        },
+        metadata=dict(
+            name="PreferredSupplier",
+            type="Element",
+            help=None,
+            min_occurs=0,
+            max_occurs=999
+        )
     )
     key: TypeRef = field(
         default=None,
-        metadata={
-            "name": "Key",
-            "type": "Attribute",
-            "help": "System generated key, returned back in the response. This can be used to modify or delete a saved TravelComplianceData.",
-        },
+        metadata=dict(
+            name="Key",
+            type="Attribute",
+            help="System generated key, returned back in the response. This can be used to modify or delete a saved TravelComplianceData.",
+        )
     )
     air_segment_ref: TypeRef = field(
         default=None,
-        metadata={
-            "name": "AirSegmentRef",
-            "type": "Attribute",
-            "help": "Refers to Air Segment. Applicable only for Air. Ignored for others.",
-        },
+        metadata=dict(
+            name="AirSegmentRef",
+            type="Attribute",
+            help="Refers to Air Segment. Applicable only for Air. Ignored for others.",
+        )
     )
     passive_segment_ref: TypeRef = field(
         default=None,
-        metadata={
-            "name": "PassiveSegmentRef",
-            "type": "Attribute",
-            "help": "Refers to Passive Segment. Applicable only for Passive. Ignored for others.",
-        },
+        metadata=dict(
+            name="PassiveSegmentRef",
+            type="Attribute",
+            help="Refers to Passive Segment. Applicable only for Passive. Ignored for others.",
+        )
     )
     rail_segment_ref: TypeRef = field(
         default=None,
-        metadata={
-            "name": "RailSegmentRef",
-            "type": "Attribute",
-            "help": "Refers to Rail Segment. Applicable only for Rail. Ignored for others.",
-        },
+        metadata=dict(
+            name="RailSegmentRef",
+            type="Attribute",
+            help="Refers to Rail Segment. Applicable only for Rail. Ignored for others.",
+        )
     )
     reservation_locator_ref: TypeLocatorCode = field(
         default=None,
-        metadata={
-            "name": "ReservationLocatorRef",
-            "type": "Attribute",
-            "help": "This is returned in the response. Any input will be ignored for this attribute. This represents the association of Travel Compliance Data with the uAPI reservation locator code, mainly relevant to Hotel and Vehicle.",
-        },
+        metadata=dict(
+            name="ReservationLocatorRef",
+            type="Attribute",
+            help="This is returned in the response. Any input will be ignored for this attribute. This represents the association of Travel Compliance Data with the uAPI reservation locator code, mainly relevant to Hotel and Vehicle.",
+        )
     )
 
     @dataclass
     class PolicyCompliance:
         in_policy: bool = field(
             default=None,
-            metadata={
-                "required": True,
-                "name": "InPolicy",
-                "type": "Attribute",
-                "help": "Policy Compliance Indicator. For In-Policy set to 'true', For Out-Of-Policy set to 'false''.",
-            },
+            metadata=dict(
+                name="InPolicy",
+                type="Attribute",
+                help="Policy Compliance Indicator. For In-Policy set to 'true', For Out-Of-Policy set to 'false''.",
+                required=True
+            )
         )
         policy_token: StringLength1to128 = field(
             default=None,
-            metadata={
-                "name": "PolicyToken",
-                "type": "Attribute",
-                "help": "Optional text message to set the rule or token for which it's In Policy or Out Of Policy.",
-            },
+            metadata=dict(
+                name="PolicyToken",
+                type="Attribute",
+                help="Optional text message to set the rule or token for which it's In Policy or Out Of Policy.",
+            )
         )
 
     @dataclass
     class ContractCompliance:
         in_contract: bool = field(
             default=None,
-            metadata={
-                "required": True,
-                "name": "InContract",
-                "type": "Attribute",
-                "help": "Contract Compliance Indicator. For In-Contract set to 'true', For Out-Of-Contract set to 'false'.",
-            },
+            metadata=dict(
+                name="InContract",
+                type="Attribute",
+                help="Contract Compliance Indicator. For In-Contract set to 'true', For Out-Of-Contract set to 'false'.",
+                required=True
+            )
         )
         contract_token: StringLength1to128 = field(
             default=None,
-            metadata={
-                "name": "ContractToken",
-                "type": "Attribute",
-                "help": "Optional text message to set the rule or token for which it's In Contract or Out Of Contract.",
-            },
+            metadata=dict(
+                name="ContractToken",
+                type="Attribute",
+                help="Optional text message to set the rule or token for which it's In Contract or Out Of Contract.",
+            )
         )
 
     @dataclass
     class PreferredSupplier:
         preferred: bool = field(
             default=None,
-            metadata={
-                "required": True,
-                "name": "Preferred",
-                "type": "Attribute",
-                "help": "Preferred Supplier - 'true', 'false'.",
-            },
+            metadata=dict(
+                name="Preferred",
+                type="Attribute",
+                help="Preferred Supplier - 'true', 'false'.",
+                required=True
+            )
         )
         profile_type: TypeProfileType = field(
             default=None,
-            metadata={
-                "required": True,
-                "name": "ProfileType",
-                "type": "Attribute",
-                "help": "Indicate profile type. e.g. if Agency Preferred then pass Agency, if Traveler Preferred then pass Traveler.",
-            },
+            metadata=dict(
+                name="ProfileType",
+                type="Attribute",
+                help="Indicate profile type. e.g. if Agency Preferred then pass Agency, if Traveler Preferred then pass Traveler.",
+                required=True
+            )
         )
 
 
@@ -5763,7 +6897,12 @@ class TravelerType:
 
     code: TypePtc = field(
         default=None,
-        metadata={"required": True, "name": "Code", "type": "Attribute"},
+        metadata=dict(
+            name="Code",
+            type="Attribute",
+            help=None,
+            required=True
+        )
     )
 
 
@@ -5771,15 +6910,21 @@ class TravelerType:
 class TypeAgencyHierarchyReference:
     profile_id: TypeProfileId = field(
         default=None,
-        metadata={"required": True, "name": "ProfileID", "type": "Attribute"},
+        metadata=dict(
+            name="ProfileID",
+            type="Attribute",
+            help=None,
+            required=True
+        )
     )
     profile_type: TypeAgencyProfileLevel = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "ProfileType",
-            "type": "Attribute",
-        },
+        metadata=dict(
+            name="ProfileType",
+            type="Attribute",
+            help=None,
+            required=True
+        )
     )
 
 
@@ -5791,39 +6936,80 @@ class TypeErrorInfo:
 
     code: str = field(
         default=None,
-        metadata={"required": True, "name": "Code", "type": "Element"},
+        metadata=dict(
+            name="Code",
+            type="Element",
+            help=None,
+            required=True
+        )
     )
     service: str = field(
         default=None,
-        metadata={"required": True, "name": "Service", "type": "Element"},
+        metadata=dict(
+            name="Service",
+            type="Element",
+            help=None,
+            required=True
+        )
     )
     type: str = field(
         default=None,
-        metadata={"required": True, "name": "Type", "type": "Element"},
+        metadata=dict(
+            name="Type",
+            type="Element",
+            help=None,
+            required=True
+        )
     )
     description: str = field(
         default=None,
-        metadata={"required": True, "name": "Description", "type": "Element"},
+        metadata=dict(
+            name="Description",
+            type="Element",
+            help=None,
+            required=True
+        )
     )
     transaction_id: str = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "TransactionId",
-            "type": "Element",
-        },
+        metadata=dict(
+            name="TransactionId",
+            type="Element",
+            help=None,
+            required=True
+        )
     )
     trace_id: str = field(
-        default=None, metadata={"name": "TraceId", "type": "Element"}
+        default=None,
+        metadata=dict(
+            name="TraceId",
+            type="Element",
+            help=None,
+        )
     )
     command_history: str = field(
-        default=None, metadata={"name": "CommandHistory", "type": "Element"}
+        default=None,
+        metadata=dict(
+            name="CommandHistory",
+            type="Element",
+            help=None,
+        )
     )
     auxdata: Auxdata = field(
-        default=None, metadata={"name": "Auxdata", "type": "Element"}
+        default=None,
+        metadata=dict(
+            name="Auxdata",
+            type="Element",
+            help=None,
+        )
     )
     stack_trace: str = field(
-        default=None, metadata={"name": "StackTrace", "type": "Element"}
+        default=None,
+        metadata=dict(
+            name="StackTrace",
+            type="Element",
+            help=None,
+        )
     )
 
 
@@ -5831,19 +7017,19 @@ class TypeErrorInfo:
 class TypeFormOfPaymentPnrreference:
     key: TypeRef = field(
         default=None,
-        metadata={
-            "name": "Key",
-            "type": "Attribute",
-            "help": "Unique ID to identify a ProviderReservationInfo",
-        },
+        metadata=dict(
+            name="Key",
+            type="Attribute",
+            help="Unique ID to identify a ProviderReservationInfo",
+        )
     )
     provider_reservation_level: bool = field(
         default="true",
-        metadata={
-            "name": "ProviderReservationLevel",
-            "type": "Attribute",
-            "help": "It means that the form of payment is applied at ProviderReservation level.",
-        },
+        metadata=dict(
+            name="ProviderReservationLevel",
+            type="Attribute",
+            help="It means that the form of payment is applied at ProviderReservation level.",
+        )
     )
 
 
@@ -5851,7 +7037,12 @@ class TypeFormOfPaymentPnrreference:
 class TypeGeneralReference:
     key: TypeRef = field(
         default=None,
-        metadata={"required": True, "name": "Key", "type": "Attribute"},
+        metadata=dict(
+            name="Key",
+            type="Attribute",
+            help=None,
+            required=True
+        )
     )
 
 
@@ -5863,30 +7054,30 @@ class TypeGuaranteeInformation:
 
     type: str = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "Type",
-            "type": "Attribute",
-            "help": "Guarantee only or Deposit",
-        },
+        metadata=dict(
+            name="Type",
+            type="Attribute",
+            help="Guarantee only or Deposit",
+            required=True
+        )
     )
     agency_type: str = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "AgencyType",
-            "type": "Attribute",
-            "help": "Guarantee to Agency IATA or Guarantee to Another Agency IATA",
-        },
+        metadata=dict(
+            name="AgencyType",
+            type="Attribute",
+            help="Guarantee to Agency IATA or Guarantee to Another Agency IATA",
+            required=True
+        )
     )
     iatanumber: StringLength1to128 = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "IATANumber",
-            "type": "Attribute",
-            "help": "Payment IATA number. (ie. IATA of Agency or Other Agency)",
-        },
+        metadata=dict(
+            name="IATANumber",
+            type="Attribute",
+            help="Payment IATA number. (ie. IATA of Agency or Other Agency)",
+            required=True
+        )
     )
 
 
@@ -5898,7 +7089,12 @@ class TypeKeyBasedReference:
 
     key: TypeRef = field(
         default=None,
-        metadata={"required": True, "name": "Key", "type": "Attribute"},
+        metadata=dict(
+            name="Key",
+            type="Attribute",
+            help=None,
+            required=True
+        )
     )
 
 
@@ -5910,40 +7106,40 @@ class TypeKeyword:
 
     sub_key: List[TypeSubKey] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 99,
-            "name": "SubKey",
-            "type": "Element",
-            "help": "A further breakdown of a keyword.",
-        },
+        metadata=dict(
+            name="SubKey",
+            type="Element",
+            help="A further breakdown of a keyword.",
+            min_occurs=0,
+            max_occurs=99
+        )
     )
     text: List[str] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 999,
-            "name": "Text",
-            "type": "Element",
-            "help": "Information for a keyword.",
-        },
+        metadata=dict(
+            name="Text",
+            type="Element",
+            help="Information for a keyword.",
+            min_occurs=0,
+            max_occurs=999
+        )
     )
     name: str = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "Name",
-            "type": "Attribute",
-            "help": "The keyword name.",
-        },
+        metadata=dict(
+            name="Name",
+            type="Attribute",
+            help="The keyword name.",
+            required=True
+        )
     )
     language_code: str = field(
         default=None,
-        metadata={
-            "name": "LanguageCode",
-            "type": "Attribute",
-            "help": "ISO 639 two-character language codes are used to retrieve specific information in the requested language. For Rich Content and Branding, language codes ZH-HANT (Chinese Traditional), ZH-HANS (Chinese Simplified), FR-CA (French Canadian) and PT-BR (Portuguese Brazil) can also be used. For RCH, language codes ENGB, ENUS, DEDE, DECH can also be used. Only certain services support this attribute. Providers: ACH, RCH, 1G, 1V, 1P, 1J.",
-        },
+        metadata=dict(
+            name="LanguageCode",
+            type="Attribute",
+            help="ISO 639 two-character language codes are used to retrieve specific information in the requested language. For Rich Content and Branding, language codes ZH-HANT (Chinese Traditional), ZH-HANS (Chinese Simplified), FR-CA (French Canadian) and PT-BR (Portuguese Brazil) can also be used. For RCH, language codes ENGB, ENUS, DEDE, DECH can also be used. Only certain services support this attribute. Providers: ACH, RCH, 1G, 1V, 1P, 1J.",
+        )
     )
 
 
@@ -5951,11 +7147,12 @@ class TypeKeyword:
 class TypeNonAirReservationRef:
     locator_code: TypeLocatorCode = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "LocatorCode",
-            "type": "Attribute",
-        },
+        metadata=dict(
+            name="LocatorCode",
+            type="Attribute",
+            help=None,
+            required=True
+        )
     )
 
 
@@ -5967,30 +7164,30 @@ class TypeOtasubKey:
 
     text: List[str] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 999,
-            "name": "Text",
-            "type": "Element",
-            "help": "Information for a sub key.",
-        },
+        metadata=dict(
+            name="Text",
+            type="Element",
+            help="Information for a sub key.",
+            min_occurs=0,
+            max_occurs=999
+        )
     )
     name: TypeOtacode = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "Name",
-            "type": "Attribute",
-            "help": 'A subkey to identify the special equipment codes. Applicable when Policy/@Name is EQUIP. Uses OTA CODE "EQP". 1P/1J.',
-        },
+        metadata=dict(
+            name="Name",
+            type="Attribute",
+            help="A subkey to identify the special equipment codes. Applicable when Policy/@Name is EQUIP. Uses OTA CODE 'EQP'. 1P/1J.",
+            required=True
+        )
     )
     description: str = field(
         default=None,
-        metadata={
-            "name": "Description",
-            "type": "Attribute",
-            "help": "A brief description of a subkey.",
-        },
+        metadata=dict(
+            name="Description",
+            type="Attribute",
+            help="A brief description of a subkey.",
+        )
     )
 
 
@@ -6002,19 +7199,21 @@ class TypeProfileRef:
 
     profile_entity_id: str = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "ProfileEntityID",
-            "type": "Attribute",
-        },
+        metadata=dict(
+            name="ProfileEntityID",
+            type="Attribute",
+            help=None,
+            required=True
+        )
     )
     profile_level: TypeProfileLevel = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "ProfileLevel",
-            "type": "Attribute",
-        },
+        metadata=dict(
+            name="ProfileLevel",
+            type="Attribute",
+            help=None,
+            required=True
+        )
     )
 
 
@@ -6022,19 +7221,19 @@ class TypeProfileRef:
 class TypeRemark:
     provider_reservation_info_ref: TypeRef = field(
         default=None,
-        metadata={
-            "name": "ProviderReservationInfoRef",
-            "type": "Attribute",
-            "help": "Provider reservation reference key.",
-        },
+        metadata=dict(
+            name="ProviderReservationInfoRef",
+            type="Attribute",
+            help="Provider reservation reference key.",
+        )
     )
     provider_code: TypeProviderCode = field(
         default=None,
-        metadata={
-            "name": "ProviderCode",
-            "type": "Attribute",
-            "help": "Contains the Provider Code of the provider for which this element is used",
-        },
+        metadata=dict(
+            name="ProviderCode",
+            type="Attribute",
+            help="Contains the Provider Code of the provider for which this element is used",
+        )
     )
 
 
@@ -6042,38 +7241,38 @@ class TypeRemark:
 class TypeRemarkWithTravelerRef:
     remark_data: str = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "RemarkData",
-            "type": "Element",
-            "help": "Actual remarks data.",
-        },
+        metadata=dict(
+            name="RemarkData",
+            type="Element",
+            help="Actual remarks data.",
+            required=True
+        )
     )
     booking_traveler_ref: List[TypeRef] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 999,
-            "name": "BookingTravelerRef",
-            "type": "Element",
-            "help": "Reference to Booking Traveler.",
-        },
+        metadata=dict(
+            name="BookingTravelerRef",
+            type="Element",
+            help="Reference to Booking Traveler.",
+            min_occurs=0,
+            max_occurs=999
+        )
     )
     provider_reservation_info_ref: TypeRef = field(
         default=None,
-        metadata={
-            "name": "ProviderReservationInfoRef",
-            "type": "Attribute",
-            "help": "Provider reservation reference key.",
-        },
+        metadata=dict(
+            name="ProviderReservationInfoRef",
+            type="Attribute",
+            help="Provider reservation reference key.",
+        )
     )
     provider_code: TypeProviderCode = field(
         default=None,
-        metadata={
-            "name": "ProviderCode",
-            "type": "Attribute",
-            "help": "Contains the Provider Code of the provider for which this element is used",
-        },
+        metadata=dict(
+            name="ProviderCode",
+            type="Attribute",
+            help="Contains the Provider Code of the provider for which this element is used",
+        )
     )
 
 
@@ -6081,17 +7280,32 @@ class TypeRemarkWithTravelerRef:
 class TypeSegmentRef:
     key: TypeRef = field(
         default=None,
-        metadata={"required": True, "name": "Key", "type": "Attribute"},
+        metadata=dict(
+            name="Key",
+            type="Attribute",
+            help=None,
+            required=True
+        )
     )
 
 
 @dataclass
 class TypeTax:
     amount: TypeMoney = field(
-        default=None, metadata={"name": "Amount", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="Amount",
+            type="Attribute",
+            help=None,
+        )
     )
     code: str = field(
-        default=None, metadata={"name": "Code", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="Code",
+            type="Attribute",
+            help=None,
+        )
     )
 
 
@@ -6102,18 +7316,28 @@ class TypeTimeSpec:
     """
 
     time_range: TypeTimeRange = field(
-        default=None, metadata={"name": "TimeRange", "type": "Element"}
+        default=None,
+        metadata=dict(
+            name="TimeRange",
+            type="Element",
+            help=None,
+        )
     )
     specific_time: TypeSpecificTime = field(
-        default=None, metadata={"name": "SpecificTime", "type": "Element"}
+        default=None,
+        metadata=dict(
+            name="SpecificTime",
+            type="Element",
+            help=None,
+        )
     )
     preferred_time: str = field(
         default=None,
-        metadata={
-            "name": "PreferredTime",
-            "type": "Attribute",
-            "help": "Specifies a time that would be preferred within the time range specified.",
-        },
+        metadata=dict(
+            name="PreferredTime",
+            type="Attribute",
+            help="Specifies a time that would be preferred within the time range specified.",
+        )
     )
 
 
@@ -6121,19 +7345,19 @@ class TypeTimeSpec:
 class TypeTransactionsAllowed(TypeBookingTransactionsAllowed):
     shopping_enabled: bool = field(
         default=None,
-        metadata={
-            "name": "ShoppingEnabled",
-            "type": "Attribute",
-            "help": "Allow or prohibit shopping transaction for the given product type on this Provider/Supplier. Inheritable.",
-        },
+        metadata=dict(
+            name="ShoppingEnabled",
+            type="Attribute",
+            help="Allow or prohibit shopping transaction for the given product type on this Provider/Supplier. Inheritable.",
+        )
     )
     pricing_enabled: bool = field(
         default=None,
-        metadata={
-            "name": "PricingEnabled",
-            "type": "Attribute",
-            "help": "Allow or prohibit pricing transaction for the given product type on this Provider/Supplier. Inheritable.",
-        },
+        metadata=dict(
+            name="PricingEnabled",
+            type="Attribute",
+            help="Allow or prohibit pricing transaction for the given product type on this Provider/Supplier. Inheritable.",
+        )
     )
 
 
@@ -6141,53 +7365,53 @@ class TypeTransactionsAllowed(TypeBookingTransactionsAllowed):
 class TypeVendorLocation:
     provider_code: TypeProviderCode = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "ProviderCode",
-            "type": "Attribute",
-            "help": "The code of the provider (e.g. 1G, 1S)",
-        },
+        metadata=dict(
+            name="ProviderCode",
+            type="Attribute",
+            help="The code of the provider (e.g. 1G, 1S)",
+            required=True
+        )
     )
     vendor_code: TypeSupplierCode = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "VendorCode",
-            "type": "Attribute",
-            "help": "The code of the vendor (e.g. HZ, etc.)",
-        },
+        metadata=dict(
+            name="VendorCode",
+            type="Attribute",
+            help="The code of the vendor (e.g. HZ, etc.)",
+            required=True
+        )
     )
     preferred_option: bool = field(
         default=None,
-        metadata={
-            "name": "PreferredOption",
-            "type": "Attribute",
-            "help": "Preferred Option marker for Location.",
-        },
+        metadata=dict(
+            name="PreferredOption",
+            type="Attribute",
+            help="Preferred Option marker for Location.",
+        )
     )
     vendor_location_id: str = field(
         default=None,
-        metadata={
-            "name": "VendorLocationID",
-            "type": "Attribute",
-            "help": "Location identifier",
-        },
+        metadata=dict(
+            name="VendorLocationID",
+            type="Attribute",
+            help="Location identifier",
+        )
     )
     key: TypeRef = field(
         default=None,
-        metadata={
-            "name": "Key",
-            "type": "Attribute",
-            "help": "Key which maps vendor location with vehicles",
-        },
+        metadata=dict(
+            name="Key",
+            type="Attribute",
+            help="Key which maps vendor location with vehicles",
+        )
     )
     more_rates_token: str = field(
         default=None,
-        metadata={
-            "name": "MoreRatesToken",
-            "type": "Attribute",
-            "help": "Enter the Token when provided by hotel property, more rates exist. HADS/HSS support only.",
-        },
+        metadata=dict(
+            name="MoreRatesToken",
+            type="Attribute",
+            help="Enter the Token when provided by hotel property, more rates exist. HADS/HSS support only.",
+        )
     )
 
 
@@ -6199,44 +7423,44 @@ class TypeVoucherInformation:
 
     voucher_type: TypeVoucherType = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "VoucherType",
-            "type": "Attribute",
-            "help": "Specifies if the Voucher is for Full Credit or a Group/Day or a Monetary Amount or RegularVoucher.",
-        },
+        metadata=dict(
+            name="VoucherType",
+            type="Attribute",
+            help="Specifies if the Voucher is for Full Credit or a Group/Day or a Monetary Amount or RegularVoucher.",
+            required=True
+        )
     )
     amount: TypeMoney = field(
         default=None,
-        metadata={
-            "name": "Amount",
-            "type": "Attribute",
-            "help": "Amount associated with the Voucher.",
-        },
+        metadata=dict(
+            name="Amount",
+            type="Attribute",
+            help="Amount associated with the Voucher.",
+        )
     )
     confirmation_number: str = field(
         default=None,
-        metadata={
-            "name": "ConfirmationNumber",
-            "type": "Attribute",
-            "help": "Confirmation from the vendor for the voucher",
-        },
+        metadata=dict(
+            name="ConfirmationNumber",
+            type="Attribute",
+            help="Confirmation from the vendor for the voucher",
+        )
     )
     account_name: str = field(
         default=None,
-        metadata={
-            "name": "AccountName",
-            "type": "Attribute",
-            "help": "Associated account name for the voucher",
-        },
+        metadata=dict(
+            name="AccountName",
+            type="Attribute",
+            help="Associated account name for the voucher",
+        )
     )
     number: StringLength1to16 = field(
         default=None,
-        metadata={
-            "name": "Number",
-            "type": "Attribute",
-            "help": 'To advise car associates of the voucher number and store in the car segment. It is required when VoucherType selected as "RegularVoucher" for 1P, 1J only.',
-        },
+        metadata=dict(
+            name="Number",
+            type="Attribute",
+            help="To advise car associates of the voucher number and store in the car segment. It is required when VoucherType selected as 'RegularVoucher' for 1P, 1J only.",
+        )
     )
 
 
@@ -6247,15 +7471,20 @@ class Xmlremark:
     """
 
     key: TypeRef = field(
-        default=None, metadata={"name": "Key", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="Key",
+            type="Attribute",
+            help=None,
+        )
     )
     category: str = field(
         default=None,
-        metadata={
-            "name": "Category",
-            "type": "Attribute",
-            "help": "A category to group and organize the various remarks. This is not required, but it is recommended.",
-        },
+        metadata=dict(
+            name="Category",
+            type="Attribute",
+            help="A category to group and organize the various remarks. This is not required, but it is recommended.",
+        )
     )
 
 
@@ -6266,72 +7495,77 @@ class ActionStatus:
     """
 
     remark: Remark = field(
-        default=None, metadata={"name": "Remark", "type": "Element"}
+        default=None,
+        metadata=dict(
+            name="Remark",
+            type="Element",
+            help=None,
+        )
     )
     type: str = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "Type",
-            "type": "Attribute",
-            "help": "Identifies the type of action (if any) to take on this air reservation. Only TTL, TAU, TAX and TAW can be set by the user.",
-        },
+        metadata=dict(
+            name="Type",
+            type="Attribute",
+            help="Identifies the type of action (if any) to take on this air reservation. Only TTL, TAU, TAX and TAW can be set by the user.",
+            required=True
+        )
     )
     ticket_date: str = field(
         default=None,
-        metadata={
-            "name": "TicketDate",
-            "type": "Attribute",
-            "help": "Identifies when the action type will happen, or has happened according to the type.",
-        },
+        metadata=dict(
+            name="TicketDate",
+            type="Attribute",
+            help="Identifies when the action type will happen, or has happened according to the type.",
+        )
     )
     key: TypeRef = field(
         default=None,
-        metadata={
-            "name": "Key",
-            "type": "Attribute",
-            "help": "Identifies when the action type will happen, or has happened according to the type.",
-        },
+        metadata=dict(
+            name="Key",
+            type="Attribute",
+            help="Identifies when the action type will happen, or has happened according to the type.",
+        )
     )
     provider_reservation_info_ref: TypeRef = field(
         default=None,
-        metadata={
-            "name": "ProviderReservationInfoRef",
-            "type": "Attribute",
-            "help": "Provider reservation reference key.",
-        },
+        metadata=dict(
+            name="ProviderReservationInfoRef",
+            type="Attribute",
+            help="Provider reservation reference key.",
+        )
     )
     queue_category: TypeNonBlanks = field(
         default=None,
-        metadata={
-            "name": "QueueCategory",
-            "type": "Attribute",
-            "help": "Add Category placement to ticketing queue (required in 1P - default is 00)",
-        },
+        metadata=dict(
+            name="QueueCategory",
+            type="Attribute",
+            help="Add Category placement to ticketing queue (required in 1P - default is 00)",
+        )
     )
     airport_code: TypeAirport = field(
         default=None,
-        metadata={
-            "name": "AirportCode",
-            "type": "Attribute",
-            "help": "Used with Time Limit to specify the airport location where the ticket is to be issued.",
-        },
+        metadata=dict(
+            name="AirportCode",
+            type="Attribute",
+            help="Used with Time Limit to specify the airport location where the ticket is to be issued.",
+        )
     )
     pseudo_city_code: TypePcc = field(
         default=None,
-        metadata={
-            "name": "PseudoCityCode",
-            "type": "Attribute",
-            "help": "The Branch PCC in the host system where PNR can be queued for ticketing. When used with TAU it will auto queue to Q10. When used with TAW agent performs manual move to Q.",
-        },
+        metadata=dict(
+            name="PseudoCityCode",
+            type="Attribute",
+            help="The Branch PCC in the host system where PNR can be queued for ticketing. When used with TAU it will auto queue to Q10. When used with TAW agent performs manual move to Q.",
+        )
     )
     account_code: str = field(
         default=None,
-        metadata={
-            "name": "AccountCode",
-            "type": "Attribute",
-            "help": "Used with TAW. Used to specify a corporate or in house account code to the PNR as part of ticketing arrangement field.",
-        },
+        metadata=dict(
+            name="AccountCode",
+            type="Attribute",
+            help="Used with TAW. Used to specify a corporate or in house account code to the PNR as part of ticketing arrangement field.",
+        )
     )
 
 
@@ -6343,12 +7577,13 @@ class AgencyInfo:
 
     agent_action: List[AgentAction] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 1,
-            "max_occurs": 999,
-            "name": "AgentAction",
-            "type": "Element",
-        },
+        metadata=dict(
+            name="AgentAction",
+            type="Element",
+            help=None,
+            min_occurs=1,
+            max_occurs=999
+        )
     )
 
 
@@ -6369,15 +7604,20 @@ class BookingTravelerInformation:
 
     name: Name = field(
         default=None,
-        metadata={"required": True, "name": "Name", "type": "Element"},
+        metadata=dict(
+            name="Name",
+            type="Element",
+            help=None,
+            required=True
+        )
     )
     booking_traveler_ref: TypeRef = field(
         default=None,
-        metadata={
-            "name": "BookingTravelerRef",
-            "type": "Attribute",
-            "help": "A reference to a passenger related to a ticket.",
-        },
+        metadata=dict(
+            name="BookingTravelerRef",
+            type="Attribute",
+            help="A reference to a passenger related to a ticket.",
+        )
     )
 
 
@@ -6389,36 +7629,49 @@ class BookingTravelerRef:
 
     loyalty_card_ref: List[LoyaltyCardRef] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 999,
-            "name": "LoyaltyCardRef",
-            "type": "Element",
-        },
+        metadata=dict(
+            name="LoyaltyCardRef",
+            type="Element",
+            help=None,
+            min_occurs=0,
+            max_occurs=999
+        )
     )
     drivers_license_ref: DriversLicenseRef = field(
-        default=None, metadata={"name": "DriversLicenseRef", "type": "Element"}
+        default=None,
+        metadata=dict(
+            name="DriversLicenseRef",
+            type="Element",
+            help=None,
+        )
     )
     discount_card_ref: List[DiscountCardRef] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 9,
-            "name": "DiscountCardRef",
-            "type": "Element",
-        },
+        metadata=dict(
+            name="DiscountCardRef",
+            type="Element",
+            help=None,
+            min_occurs=0,
+            max_occurs=9
+        )
     )
     payment_ref: List[PaymentRef] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 3,
-            "name": "PaymentRef",
-            "type": "Element",
-        },
+        metadata=dict(
+            name="PaymentRef",
+            type="Element",
+            help=None,
+            min_occurs=0,
+            max_occurs=3
+        )
     )
     key: TypeRef = field(
-        default=None, metadata={"name": "Key", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="Key",
+            type="Attribute",
+            help=None,
+        )
     )
 
 
@@ -6429,7 +7682,12 @@ class CustomerId(TypeRemark):
     """
 
     key: TypeRef = field(
-        default=None, metadata={"name": "Key", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="Key",
+            type="Attribute",
+            help=None,
+        )
     )
 
 
@@ -6441,26 +7699,46 @@ class Email:
 
     provider_reservation_info_ref: List[ProviderReservationInfoRef] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 999,
-            "name": "ProviderReservationInfoRef",
-            "type": "Element",
-            "help": "Tagging provider reservation info with Email.",
-        },
+        metadata=dict(
+            name="ProviderReservationInfoRef",
+            type="Element",
+            help="Tagging provider reservation info with Email.",
+            min_occurs=0,
+            max_occurs=999
+        )
     )
     key: TypeRef = field(
-        default=None, metadata={"name": "Key", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="Key",
+            type="Attribute",
+            help=None,
+        )
     )
     type: TypeEmailType = field(
-        default=None, metadata={"name": "Type", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="Type",
+            type="Attribute",
+            help=None,
+        )
     )
     comment: TypeEmailComment = field(
-        default=None, metadata={"name": "Comment", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="Comment",
+            type="Attribute",
+            help=None,
+        )
     )
     email_id: str = field(
         default=None,
-        metadata={"required": True, "name": "EmailID", "type": "Attribute"},
+        metadata=dict(
+            name="EmailID",
+            type="Attribute",
+            help=None,
+            required=True
+        )
     )
 
 
@@ -6472,12 +7750,13 @@ class HostTokenList:
 
     host_token: List[HostToken] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 1,
-            "max_occurs": 999,
-            "name": "HostToken",
-            "type": "Element",
-        },
+        metadata=dict(
+            name="HostToken",
+            type="Element",
+            help=None,
+            min_occurs=1,
+            max_occurs=999
+        )
     )
 
 
@@ -6498,33 +7777,38 @@ class NameRemark:
 
     remark_data: str = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "RemarkData",
-            "type": "Element",
-            "help": "Actual remarks data.",
-        },
+        metadata=dict(
+            name="RemarkData",
+            type="Element",
+            help="Actual remarks data.",
+            required=True
+        )
     )
     provider_reservation_info_ref: List[ProviderReservationInfoRef] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 999,
-            "name": "ProviderReservationInfoRef",
-            "type": "Element",
-            "help": "Tagging provider reservation info with NameRemark.",
-        },
+        metadata=dict(
+            name="ProviderReservationInfoRef",
+            type="Element",
+            help="Tagging provider reservation info with NameRemark.",
+            min_occurs=0,
+            max_occurs=999
+        )
     )
     key: TypeRef = field(
-        default=None, metadata={"name": "Key", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="Key",
+            type="Attribute",
+            help=None,
+        )
     )
     category: str = field(
         default=None,
-        metadata={
-            "name": "Category",
-            "type": "Attribute",
-            "help": "A category to group and organize the various remarks. This is not required, but it is recommended.",
-        },
+        metadata=dict(
+            name="Category",
+            type="Attribute",
+            help="A category to group and organize the various remarks. This is not required, but it is recommended.",
+        )
     )
 
 
@@ -6535,23 +7819,28 @@ class PassengerInfo:
     """
 
     name: Name = field(
-        default=None, metadata={"name": "Name", "type": "Element"}
+        default=None,
+        metadata=dict(
+            name="Name",
+            type="Element",
+            help=None,
+        )
     )
     booking_traveler_ref: TypeRef = field(
         default=None,
-        metadata={
-            "name": "BookingTravelerRef",
-            "type": "Attribute",
-            "help": "A reference to a passenger related to a ticket.",
-        },
+        metadata=dict(
+            name="BookingTravelerRef",
+            type="Attribute",
+            help="A reference to a passenger related to a ticket.",
+        )
     )
     passenger_type: TypePtc = field(
         default=None,
-        metadata={
-            "name": "PassengerType",
-            "type": "Attribute",
-            "help": "Passenger Type Code.",
-        },
+        metadata=dict(
+            name="PassengerType",
+            type="Attribute",
+            help="Passenger Type Code.",
+        )
     )
 
 
@@ -6563,38 +7852,63 @@ class PassiveInfo:
 
     ticket_number: List[str] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 999,
-            "name": "TicketNumber",
-            "type": "Element",
-        },
+        metadata=dict(
+            name="TicketNumber",
+            type="Element",
+            help=None,
+            min_occurs=0,
+            max_occurs=999
+        )
     )
     confirmation_number: List[str] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 999,
-            "name": "ConfirmationNumber",
-            "type": "Element",
-        },
+        metadata=dict(
+            name="ConfirmationNumber",
+            type="Element",
+            help=None,
+            min_occurs=0,
+            max_occurs=999
+        )
     )
     commission: Commission = field(
-        default=None, metadata={"name": "Commission", "type": "Element"}
+        default=None,
+        metadata=dict(
+            name="Commission",
+            type="Element",
+            help=None,
+        )
     )
     provider_code: str = field(
-        default=None, metadata={"name": "ProviderCode", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="ProviderCode",
+            type="Attribute",
+            help=None,
+        )
     )
     provider_locator_code: str = field(
         default=None,
-        metadata={"name": "ProviderLocatorCode", "type": "Attribute"},
+        metadata=dict(
+            name="ProviderLocatorCode",
+            type="Attribute",
+            help=None,
+        )
     )
     supplier_code: str = field(
-        default=None, metadata={"name": "SupplierCode", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="SupplierCode",
+            type="Attribute",
+            help=None,
+        )
     )
     supplier_locator_code: str = field(
         default=None,
-        metadata={"name": "SupplierLocatorCode", "type": "Attribute"},
+        metadata=dict(
+            name="SupplierLocatorCode",
+            type="Attribute",
+            help=None,
+        )
     )
 
 
@@ -6602,20 +7916,22 @@ class PassiveInfo:
 class PaymentRestriction:
     card_restriction: List[CardRestriction] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 1,
-            "max_occurs": 999,
-            "name": "CardRestriction",
-            "type": "Element",
-        },
+        metadata=dict(
+            name="CardRestriction",
+            type="Element",
+            help=None,
+            min_occurs=1,
+            max_occurs=999
+        )
     )
     address_restriction: AddressRestriction = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "AddressRestriction",
-            "type": "Element",
-        },
+        metadata=dict(
+            name="AddressRestriction",
+            type="Element",
+            help=None,
+            required=True
+        )
     )
 
 
@@ -6623,7 +7939,12 @@ class PaymentRestriction:
 class PermittedProviders:
     provider: Provider = field(
         default=None,
-        metadata={"required": True, "name": "Provider", "type": "Element"},
+        metadata=dict(
+            name="Provider",
+            type="Element",
+            help=None,
+            required=True
+        )
     )
 
 
@@ -6635,52 +7956,78 @@ class PhoneNumber:
 
     provider_reservation_info_ref: List[ProviderReservationInfoRef] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 999,
-            "name": "ProviderReservationInfoRef",
-            "type": "Element",
-        },
+        metadata=dict(
+            name="ProviderReservationInfoRef",
+            type="Element",
+            help=None,
+            min_occurs=0,
+            max_occurs=999
+        )
     )
     key: TypeRef = field(
-        default=None, metadata={"name": "Key", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="Key",
+            type="Attribute",
+            help=None,
+        )
     )
     type: str = field(
-        default=None, metadata={"name": "Type", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="Type",
+            type="Attribute",
+            help=None,
+        )
     )
     location: str = field(
         default=None,
-        metadata={
-            "name": "Location",
-            "type": "Attribute",
-            "help": "IATA code for airport or city",
-        },
+        metadata=dict(
+            name="Location",
+            type="Attribute",
+            help="IATA code for airport or city",
+        )
     )
     country_code: str = field(
         default=None,
-        metadata={
-            "name": "CountryCode",
-            "type": "Attribute",
-            "help": "Hosts/providers will expect this to be international dialing digits",
-        },
+        metadata=dict(
+            name="CountryCode",
+            type="Attribute",
+            help="Hosts/providers will expect this to be international dialing digits",
+        )
     )
     area_code: str = field(
-        default=None, metadata={"name": "AreaCode", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="AreaCode",
+            type="Attribute",
+            help=None,
+        )
     )
     number: str = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "Number",
-            "type": "Attribute",
-            "help": "The local phone number",
-        },
+        metadata=dict(
+            name="Number",
+            type="Attribute",
+            help="The local phone number",
+            required=True
+        )
     )
     extension: str = field(
-        default=None, metadata={"name": "Extension", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="Extension",
+            type="Attribute",
+            help=None,
+        )
     )
     text: str = field(
-        default=None, metadata={"name": "Text", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="Text",
+            type="Attribute",
+            help=None,
+        )
     )
 
 
@@ -6692,53 +8039,63 @@ class PolicyInformation:
 
     reason_code: "PolicyInformation.ReasonCode" = field(
         default=None,
-        metadata={
-            "name": "ReasonCode",
-            "type": "Element",
-            "help": "Reason Code",
-        },
+        metadata=dict(
+            name="ReasonCode",
+            type="Element",
+            help="Reason Code",
+        )
     )
     type: TypePolicy = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "Type",
-            "type": "Attribute",
-            "help": "Policy Type - Air, Hotel, Car, Rail, Ticketing",
-        },
+        metadata=dict(
+            name="Type",
+            type="Attribute",
+            help="Policy Type - Air, Hotel, Car, Rail, Ticketing",
+            required=True
+        )
     )
     out_of_policy: bool = field(
         default=None,
-        metadata={
-            "name": "OutOfPolicy",
-            "type": "Attribute",
-            "help": "In Policy / Out of Policy Indicator",
-        },
+        metadata=dict(
+            name="OutOfPolicy",
+            type="Attribute",
+            help="In Policy / Out of Policy Indicator",
+        )
     )
     segment_ref: TypeRef = field(
-        default=None, metadata={"name": "SegmentRef", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="SegmentRef",
+            type="Attribute",
+            help=None,
+        )
     )
 
     @dataclass
     class ReasonCode:
         out_of_policy: str = field(
             default=None,
-            metadata={
-                "name": "OutOfPolicy",
-                "type": "Element",
-                "help": "Reason Code - Out of Policy",
-            },
+            metadata=dict(
+                name="OutOfPolicy",
+                type="Element",
+                help="Reason Code - Out of Policy",
+            )
         )
         purpose_of_trip: str = field(
             default=None,
-            metadata={
-                "name": "PurposeOfTrip",
-                "type": "Element",
-                "help": "Reason Code -Purpose of Trip",
-            },
+            metadata=dict(
+                name="PurposeOfTrip",
+                type="Element",
+                help="Reason Code -Purpose of Trip",
+            )
         )
         remark: Remark = field(
-            default=None, metadata={"name": "Remark", "type": "Element"}
+            default=None,
+            metadata=dict(
+                name="Remark",
+                type="Element",
+                help=None,
+            )
         )
 
 
@@ -6749,7 +8106,12 @@ class Postscript(TypeRemark):
     """
 
     key: TypeRef = field(
-        default=None, metadata={"name": "Key", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="Key",
+            type="Attribute",
+            help=None,
+        )
     )
 
 
@@ -6760,99 +8122,114 @@ class ProviderArnksegment:
     """
 
     previous_segment: "ProviderArnksegment.PreviousSegment" = field(
-        default=None, metadata={"name": "PreviousSegment", "type": "Element"}
+        default=None,
+        metadata=dict(
+            name="PreviousSegment",
+            type="Element",
+            help=None,
+        )
     )
     next_segment: "ProviderArnksegment.NextSegment" = field(
-        default=None, metadata={"name": "NextSegment", "type": "Element"}
+        default=None,
+        metadata=dict(
+            name="NextSegment",
+            type="Element",
+            help=None,
+        )
     )
     key: TypeRef = field(
-        default=None, metadata={"name": "Key", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="Key",
+            type="Attribute",
+            help=None,
+        )
     )
     provider_reservation_info_ref: TypeRef = field(
         default=None,
-        metadata={
-            "name": "ProviderReservationInfoRef",
-            "type": "Attribute",
-            "help": "Provider reservation reference key.",
-        },
+        metadata=dict(
+            name="ProviderReservationInfoRef",
+            type="Attribute",
+            help="Provider reservation reference key.",
+        )
     )
     provider_segment_order: int = field(
         default=None,
-        metadata={
-            "name": "ProviderSegmentOrder",
-            "type": "Attribute",
-            "help": "To identify the appropriate travel sequence for Air/Car/Hotel/Rail segments/reservations in the provider reservation.",
-        },
+        metadata=dict(
+            name="ProviderSegmentOrder",
+            type="Attribute",
+            help="To identify the appropriate travel sequence for Air/Car/Hotel/Rail segments/reservations in the provider reservation.",
+        )
     )
 
     @dataclass
     class PreviousSegment:
         air_segment_ref: TypeSegmentRef = field(
             default=None,
-            metadata={
-                "name": "AirSegmentRef",
-                "type": "Element",
-                "help": "Reference to AirSegment from an Air Reservation.",
-            },
+            metadata=dict(
+                name="AirSegmentRef",
+                type="Element",
+                help="Reference to AirSegment from an Air Reservation.",
+            )
         )
         hotel_reservation_ref: TypeNonAirReservationRef = field(
             default=None,
-            metadata={
-                "name": "HotelReservationRef",
-                "type": "Element",
-                "help": "Specify the locator code of Hotel reservation.",
-            },
+            metadata=dict(
+                name="HotelReservationRef",
+                type="Element",
+                help="Specify the locator code of Hotel reservation.",
+            )
         )
         vehicle_reservation_ref: TypeNonAirReservationRef = field(
             default=None,
-            metadata={
-                "name": "VehicleReservationRef",
-                "type": "Element",
-                "help": "Specify the locator code of Vehicle reservation.",
-            },
+            metadata=dict(
+                name="VehicleReservationRef",
+                type="Element",
+                help="Specify the locator code of Vehicle reservation.",
+            )
         )
         passive_segment_ref: TypeSegmentRef = field(
             default=None,
-            metadata={
-                "name": "PassiveSegmentRef",
-                "type": "Element",
-                "help": "Reference to PassiveSegment from a Passive Reservation.",
-            },
+            metadata=dict(
+                name="PassiveSegmentRef",
+                type="Element",
+                help="Reference to PassiveSegment from a Passive Reservation.",
+            )
         )
 
     @dataclass
     class NextSegment:
         air_segment_ref: TypeSegmentRef = field(
             default=None,
-            metadata={
-                "name": "AirSegmentRef",
-                "type": "Element",
-                "help": "Reference to AirSegment from an Air Reservation.",
-            },
+            metadata=dict(
+                name="AirSegmentRef",
+                type="Element",
+                help="Reference to AirSegment from an Air Reservation.",
+            )
         )
         hotel_reservation_ref: TypeNonAirReservationRef = field(
             default=None,
-            metadata={
-                "name": "HotelReservationRef",
-                "type": "Element",
-                "help": "Specify the locator code of Hotel reservation.",
-            },
+            metadata=dict(
+                name="HotelReservationRef",
+                type="Element",
+                help="Specify the locator code of Hotel reservation.",
+            )
         )
         vehicle_reservation_ref: TypeNonAirReservationRef = field(
             default=None,
-            metadata={
-                "name": "VehicleReservationRef",
-                "type": "Element",
-                "help": "Specify the locator code of Vehicle reservation.",
-            },
+            metadata=dict(
+                name="VehicleReservationRef",
+                type="Element",
+                help="Specify the locator code of Vehicle reservation.",
+            )
         )
         passive_segment_ref: TypeSegmentRef = field(
             default=None,
-            metadata={
-                "name": "PassiveSegmentRef",
-                "type": "Element",
-                "help": "Reference to PassiveSegment from a Passive Reservation.",
-            },
+            metadata=dict(
+                name="PassiveSegmentRef",
+                type="Element",
+                help="Reference to PassiveSegment from a Passive Reservation.",
+            )
         )
 
 
@@ -6864,119 +8241,140 @@ class Segment:
 
     segment_remark: List[SegmentRemark] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 999,
-            "name": "SegmentRemark",
-            "type": "Element",
-        },
+        metadata=dict(
+            name="SegmentRemark",
+            type="Element",
+            help=None,
+            min_occurs=0,
+            max_occurs=999
+        )
     )
     key: TypeRef = field(
         default=None,
-        metadata={"required": True, "name": "Key", "type": "Attribute"},
+        metadata=dict(
+            name="Key",
+            type="Attribute",
+            help=None,
+            required=True
+        )
     )
     status: str = field(
         default=None,
-        metadata={
-            "name": "Status",
-            "type": "Attribute",
-            "help": "Status of this segment.",
-        },
+        metadata=dict(
+            name="Status",
+            type="Attribute",
+            help="Status of this segment.",
+        )
     )
     passive: bool = field(
-        default=None, metadata={"name": "Passive", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="Passive",
+            type="Attribute",
+            help=None,
+        )
     )
     travel_order: int = field(
         default=None,
-        metadata={
-            "name": "TravelOrder",
-            "type": "Attribute",
-            "help": "To identify the appropriate travel sequence for Air/Car/Hotel segments/reservations based on travel dates. This ordering is applicable across the UR not provider or traveler specific",
-        },
+        metadata=dict(
+            name="TravelOrder",
+            type="Attribute",
+            help="To identify the appropriate travel sequence for Air/Car/Hotel segments/reservations based on travel dates. This ordering is applicable across the UR not provider or traveler specific",
+        )
     )
     provider_segment_order: int = field(
         default=None,
-        metadata={
-            "name": "ProviderSegmentOrder",
-            "type": "Attribute",
-            "help": "To identify the appropriate travel sequence for Air/Car/Hotel/Rail segments/reservations in the provider reservation.",
-        },
+        metadata=dict(
+            name="ProviderSegmentOrder",
+            type="Attribute",
+            help="To identify the appropriate travel sequence for Air/Car/Hotel/Rail segments/reservations in the provider reservation.",
+        )
     )
 
 
 @dataclass
 class ServiceData:
     seat_attributes: SeatAttributes = field(
-        default=None, metadata={"name": "SeatAttributes", "type": "Element"}
+        default=None,
+        metadata=dict(
+            name="SeatAttributes",
+            type="Element",
+            help=None,
+        )
     )
     cabin_class: CabinClass = field(
-        default=None, metadata={"name": "CabinClass", "type": "Element"}
+        default=None,
+        metadata=dict(
+            name="CabinClass",
+            type="Element",
+            help=None,
+        )
     )
     ssrref: List[TypeKeyBasedReference] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 999,
-            "name": "SSRRef",
-            "type": "Element",
-            "help": "References to the related SSRs. At present, only reference to ASVC SSR is supported. Supported providers are 1G/1V/1P/1J",
-        },
+        metadata=dict(
+            name="SSRRef",
+            type="Element",
+            help="References to the related SSRs. At present, only reference to ASVC SSR is supported. Supported providers are 1G/1V/1P/1J",
+            min_occurs=0,
+            max_occurs=999
+        )
     )
     data: str = field(
         default=None,
-        metadata={
-            "name": "Data",
-            "type": "Attribute",
-            "help": "Data that specifies the details of the merchandising offering (e.g. seat number for seat service)",
-        },
+        metadata=dict(
+            name="Data",
+            type="Attribute",
+            help="Data that specifies the details of the merchandising offering (e.g. seat number for seat service)",
+        )
     )
     air_segment_ref: TypeRef = field(
         default=None,
-        metadata={
-            "name": "AirSegmentRef",
-            "type": "Attribute",
-            "help": "Reference to a segment if the merchandising offering only pertains to that segment. If no segment reference is present this means this offering is for the whole itinerary.",
-        },
+        metadata=dict(
+            name="AirSegmentRef",
+            type="Attribute",
+            help="Reference to a segment if the merchandising offering only pertains to that segment. If no segment reference is present this means this offering is for the whole itinerary.",
+        )
     )
     booking_traveler_ref: TypeRef = field(
         default=None,
-        metadata={
-            "name": "BookingTravelerRef",
-            "type": "Attribute",
-            "help": "Reference to a passenger if the merchandising offering only pertains to that passenger. If no passenger reference is present this means this offering is for all passengers.",
-        },
+        metadata=dict(
+            name="BookingTravelerRef",
+            type="Attribute",
+            help="Reference to a passenger if the merchandising offering only pertains to that passenger. If no passenger reference is present this means this offering is for all passengers.",
+        )
     )
     stop_over: bool = field(
         default="false",
-        metadata={
-            "name": "StopOver",
-            "type": "Attribute",
-            "help": "Indicates that there is a significant delay between flights (usually 12 hours or more)",
-        },
+        metadata=dict(
+            name="StopOver",
+            type="Attribute",
+            help="Indicates that there is a significant delay between flights (usually 12 hours or more)",
+        )
     )
     traveler_type: TypePtc = field(
         default=None,
-        metadata={
-            "name": "TravelerType",
-            "type": "Attribute",
-            "help": "Passenger Type Code.",
-        },
+        metadata=dict(
+            name="TravelerType",
+            type="Attribute",
+            help="Passenger Type Code.",
+        )
     )
     emdsummary_ref: TypeRef = field(
         default=None,
-        metadata={
-            "name": "EMDSummaryRef",
-            "type": "Attribute",
-            "help": "Reference to the corresponding EMD issued. Supported providers are 1G/1V/1P/1J",
-        },
+        metadata=dict(
+            name="EMDSummaryRef",
+            type="Attribute",
+            help="Reference to the corresponding EMD issued. Supported providers are 1G/1V/1P/1J",
+        )
     )
     emdcoupon_ref: TypeRef = field(
         default=None,
-        metadata={
-            "name": "EMDCouponRef",
-            "type": "Attribute",
-            "help": "Reference to the corresponding EMD coupon issued. Supported providers are 1G/1V/1P/1J",
-        },
+        metadata=dict(
+            name="EMDCouponRef",
+            type="Attribute",
+            help="Reference to the corresponding EMD coupon issued. Supported providers are 1G/1V/1P/1J",
+        )
     )
 
 
@@ -6988,17 +8386,22 @@ class Ssrinfo:
 
     ssr: Ssr = field(
         default=None,
-        metadata={"required": True, "name": "SSR", "type": "Element"},
+        metadata=dict(
+            name="SSR",
+            type="Element",
+            help=None,
+            required=True
+        )
     )
     booking_traveler_ref: List[TypeRef] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 999,
-            "name": "BookingTravelerRef",
-            "type": "Element",
-            "help": "Reference to Booking Traveler.",
-        },
+        metadata=dict(
+            name="BookingTravelerRef",
+            type="Element",
+            help="Reference to Booking Traveler.",
+            min_occurs=0,
+            max_occurs=999
+        )
     )
 
 
@@ -7010,47 +8413,47 @@ class SupplierLocator:
 
     segment_ref: List[TypeGeneralReference] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 999,
-            "name": "SegmentRef",
-            "type": "Element",
-            "help": "Air/Passive Segment Reference",
-        },
+        metadata=dict(
+            name="SegmentRef",
+            type="Element",
+            help="Air/Passive Segment Reference",
+            min_occurs=0,
+            max_occurs=999
+        )
     )
     supplier_code: TypeCarrier = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "SupplierCode",
-            "type": "Attribute",
-            "help": "Carrier Code",
-        },
+        metadata=dict(
+            name="SupplierCode",
+            type="Attribute",
+            help="Carrier Code",
+            required=True
+        )
     )
     supplier_locator_code: str = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "SupplierLocatorCode",
-            "type": "Attribute",
-            "help": "Carrier reservation locator code",
-        },
+        metadata=dict(
+            name="SupplierLocatorCode",
+            type="Attribute",
+            help="Carrier reservation locator code",
+            required=True
+        )
     )
     provider_reservation_info_ref: TypeRef = field(
         default=None,
-        metadata={
-            "name": "ProviderReservationInfoRef",
-            "type": "Attribute",
-            "help": "Provider Reservation reference",
-        },
+        metadata=dict(
+            name="ProviderReservationInfoRef",
+            type="Attribute",
+            help="Provider Reservation reference",
+        )
     )
     create_date_time: str = field(
         default=None,
-        metadata={
-            "name": "CreateDateTime",
-            "type": "Attribute",
-            "help": "The Date and Time which the reservation is received from the Vendor as a SupplierLocator creation Date.",
-        },
+        metadata=dict(
+            name="CreateDateTime",
+            type="Attribute",
+            help="The Date and Time which the reservation is received from the Vendor as a SupplierLocator creation Date.",
+        )
     )
 
 
@@ -7062,53 +8465,53 @@ class ThirdPartyInformation:
 
     segment_ref: List[TypeGeneralReference] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 999,
-            "name": "SegmentRef",
-            "type": "Element",
-            "help": "Air/Passive Segment Reference",
-        },
+        metadata=dict(
+            name="SegmentRef",
+            type="Element",
+            help="Air/Passive Segment Reference",
+            min_occurs=0,
+            max_occurs=999
+        )
     )
     third_party_code: str = field(
         default=None,
-        metadata={
-            "name": "ThirdPartyCode",
-            "type": "Attribute",
-            "help": "Third party supplier code.",
-        },
+        metadata=dict(
+            name="ThirdPartyCode",
+            type="Attribute",
+            help="Third party supplier code.",
+        )
     )
     third_party_locator_code: str = field(
         default=None,
-        metadata={
-            "name": "ThirdPartyLocatorCode",
-            "type": "Attribute",
-            "help": "Confirmation number for third party supplier.",
-        },
+        metadata=dict(
+            name="ThirdPartyLocatorCode",
+            type="Attribute",
+            help="Confirmation number for third party supplier.",
+        )
     )
     third_party_name: TypeThirdPartySupplier = field(
         default=None,
-        metadata={
-            "name": "ThirdPartyName",
-            "type": "Attribute",
-            "help": "Third party supplier name.",
-        },
+        metadata=dict(
+            name="ThirdPartyName",
+            type="Attribute",
+            help="Third party supplier name.",
+        )
     )
     provider_reservation_info_ref: TypeRef = field(
         default=None,
-        metadata={
-            "name": "ProviderReservationInfoRef",
-            "type": "Attribute",
-            "help": "Provider Reservation reference",
-        },
+        metadata=dict(
+            name="ProviderReservationInfoRef",
+            type="Attribute",
+            help="Provider Reservation reference",
+        )
     )
     key: TypeRef = field(
         default=None,
-        metadata={
-            "name": "Key",
-            "type": "Attribute",
-            "help": "Unique identifier of the third party supplier. Key can be used to modify or delete saved third party information.",
-        },
+        metadata=dict(
+            name="Key",
+            type="Attribute",
+            help="Unique identifier of the third party supplier. Key can be used to modify or delete saved third party information.",
+        )
     )
 
 
@@ -7119,67 +8522,87 @@ class TransactionType:
     """
 
     air: "TransactionType.Air" = field(
-        default=None, metadata={"name": "Air", "type": "Element"}
+        default=None,
+        metadata=dict(
+            name="Air",
+            type="Element",
+            help=None,
+        )
     )
     hotel: TypeTransactionsAllowed = field(
-        default=None, metadata={"name": "Hotel", "type": "Element"}
+        default=None,
+        metadata=dict(
+            name="Hotel",
+            type="Element",
+            help=None,
+        )
     )
     rail: TypeTransactionsAllowed = field(
-        default=None, metadata={"name": "Rail", "type": "Element"}
+        default=None,
+        metadata=dict(
+            name="Rail",
+            type="Element",
+            help=None,
+        )
     )
     vehicle: TypeTransactionsAllowed = field(
-        default=None, metadata={"name": "Vehicle", "type": "Element"}
+        default=None,
+        metadata=dict(
+            name="Vehicle",
+            type="Element",
+            help=None,
+        )
     )
     passive: TypeBookingTransactionsAllowed = field(
         default=None,
-        metadata={
-            "name": "Passive",
-            "type": "Element",
-            "help": "For true passive segments such as ground, cruise etc",
-        },
+        metadata=dict(
+            name="Passive",
+            type="Element",
+            help="For true passive segments such as ground, cruise etc",
+        )
     )
     background_passive: TypeBookingTransactionsAllowed = field(
         default=None,
-        metadata={
-            "name": "BackgroundPassive",
-            "type": "Element",
-            "help": "For behind the scenes or background passives Only",
-        },
+        metadata=dict(
+            name="BackgroundPassive",
+            type="Element",
+            help="For behind the scenes or background passives Only",
+        )
     )
 
     @dataclass
     class Air(TypeTransactionsAllowed):
         one_way_shop: bool = field(
             default=None,
-            metadata={
-                "name": "OneWayShop",
-                "type": "Attribute",
-                "help": "Allows or prohibits one way shopping functionality for the associated provisioning provider configuration",
-            },
+            metadata=dict(
+                name="OneWayShop",
+                type="Attribute",
+                help="Allows or prohibits one way shopping functionality for the associated provisioning provider configuration",
+            )
         )
         flex_explore: bool = field(
             default=None,
-            metadata={
-                "name": "FlexExplore",
-                "type": "Attribute",
-                "help": "Allows or prohibits flex explore functionality for the associated provisioning provider configuration",
-            },
+            metadata=dict(
+                name="FlexExplore",
+                type="Attribute",
+                help="Allows or prohibits flex explore functionality for the associated provisioning provider configuration",
+            )
         )
         rapid_reprice_enabled: bool = field(
             default=None,
-            metadata={
-                "name": "RapidRepriceEnabled",
-                "type": "Attribute",
-                "help": "Allows or prohibits rapid reprice functionality for the associated provisioning provider configuration. Providers: 1G/1V",
-            },
+            metadata=dict(
+                name="RapidRepriceEnabled",
+                type="Attribute",
+                help="Allows or prohibits rapid reprice functionality for the associated provisioning provider configuration. Providers: 1G/1V",
+            )
         )
         return_upsell_fare: bool = field(
             default=None,
-            metadata={
-                "name": "ReturnUpsellFare",
-                "type": "Attribute",
-                "help": "When set to “true”, Upsell information will be returned in the shop response. Provider: 1G, 1V, 1P, 1J, ACH",
-            },
+            metadata=dict(
+                name="ReturnUpsellFare",
+                type="Attribute",
+                help="When set to “true”, Upsell information will be returned in the shop response. Provider: 1G, 1V, 1P, 1J, ACH",
+            )
         )
 
 
@@ -7187,20 +8610,21 @@ class TransactionType:
 class TypeAgencyHierarchyLongReference(TypeAgencyHierarchyReference):
     profile_version: int = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "ProfileVersion",
-            "type": "Attribute",
-        },
+        metadata=dict(
+            name="ProfileVersion",
+            type="Attribute",
+            help=None,
+            required=True
+        )
     )
     profile_name: str = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "ProfileName",
-            "type": "Attribute",
-            "help": "Initially: Agent: Last, First, Branch: BranchCode, Agency: Name. After new profile implementation: Agent: UserName, others levels: Name.",
-        },
+        metadata=dict(
+            name="ProfileName",
+            type="Attribute",
+            help="Initially: Agent: Last, First, Branch: BranchCode, Agency: Name. After new profile implementation: Agent: UserName, others levels: Name.",
+            required=True
+        )
     )
 
 
@@ -7211,7 +8635,12 @@ class TypeAssociatedRemark(TypeRemarkWithTravelerRef):
     """
 
     key: TypeRef = field(
-        default=None, metadata={"name": "Key", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="Key",
+            type="Attribute",
+            help=None,
+        )
     )
 
 
@@ -7223,75 +8652,124 @@ class TypeFeeInfo:
 
     tax_info_ref: List["TypeFeeInfo.TaxInfoRef"] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 999,
-            "name": "TaxInfoRef",
-            "type": "Element",
-            "help": "This reference elements will associate relevant taxes to this fee",
-        },
+        metadata=dict(
+            name="TaxInfoRef",
+            type="Element",
+            help="This reference elements will associate relevant taxes to this fee",
+            min_occurs=0,
+            max_occurs=999
+        )
     )
     included_in_base: IncludedInBase = field(
-        default=None, metadata={"name": "IncludedInBase", "type": "Element"}
+        default=None,
+        metadata=dict(
+            name="IncludedInBase",
+            type="Element",
+            help=None,
+        )
     )
     base_amount: TypeMoney = field(
-        default=None, metadata={"name": "BaseAmount", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="BaseAmount",
+            type="Attribute",
+            help=None,
+        )
     )
     description: str = field(
-        default=None, metadata={"name": "Description", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="Description",
+            type="Attribute",
+            help=None,
+        )
     )
     sub_code: str = field(
-        default=None, metadata={"name": "SubCode", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="SubCode",
+            type="Attribute",
+            help=None,
+        )
     )
     key: TypeRef = field(
         default=None,
-        metadata={"required": True, "name": "Key", "type": "Attribute"},
+        metadata=dict(
+            name="Key",
+            type="Attribute",
+            help=None,
+            required=True
+        )
     )
     amount: TypeMoney = field(
         default=None,
-        metadata={"required": True, "name": "Amount", "type": "Attribute"},
+        metadata=dict(
+            name="Amount",
+            type="Attribute",
+            help=None,
+            required=True
+        )
     )
     code: str = field(
         default=None,
-        metadata={"required": True, "name": "Code", "type": "Attribute"},
+        metadata=dict(
+            name="Code",
+            type="Attribute",
+            help=None,
+            required=True
+        )
     )
     fee_token: str = field(
-        default=None, metadata={"name": "FeeToken", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="FeeToken",
+            type="Attribute",
+            help=None,
+        )
     )
     payment_ref: TypeRef = field(
         default=None,
-        metadata={
-            "name": "PaymentRef",
-            "type": "Attribute",
-            "help": "The reference to the one of the air reservation payments if fee included in charge",
-        },
+        metadata=dict(
+            name="PaymentRef",
+            type="Attribute",
+            help="The reference to the one of the air reservation payments if fee included in charge",
+        )
     )
     booking_traveler_ref: TypeRef = field(
         default=None,
-        metadata={
-            "name": "BookingTravelerRef",
-            "type": "Attribute",
-            "help": "Reference to booking traveler",
-        },
+        metadata=dict(
+            name="BookingTravelerRef",
+            type="Attribute",
+            help="Reference to booking traveler",
+        )
     )
     passenger_type_code: TypePtc = field(
         default=None,
-        metadata={"name": "PassengerTypeCode", "type": "Attribute"},
+        metadata=dict(
+            name="PassengerTypeCode",
+            type="Attribute",
+            help=None,
+        )
     )
     text: StringLength1to64 = field(
         default=None,
-        metadata={
-            "name": "Text",
-            "type": "Attribute",
-            "help": "Additional Information returned from Supplier.(ACH only)",
-        },
+        metadata=dict(
+            name="Text",
+            type="Attribute",
+            help="Additional Information returned from Supplier.(ACH only)",
+        )
     )
 
     @dataclass
     class TaxInfoRef:
         key: TypeRef = field(
             default=None,
-            metadata={"required": True, "name": "Key", "type": "Attribute"},
+            metadata=dict(
+                name="Key",
+                type="Attribute",
+                help=None,
+                required=True
+            )
         )
 
 
@@ -7303,43 +8781,58 @@ class TypeFlexibleTimeSpec(TypeTimeSpec):
 
     search_extra_days: "TypeFlexibleTimeSpec.SearchExtraDays" = field(
         default=None,
-        metadata={
-            "name": "SearchExtraDays",
-            "type": "Element",
-            "help": "Options to search for extra days on top of the specified date",
-        },
+        metadata=dict(
+            name="SearchExtraDays",
+            type="Element",
+            help="Options to search for extra days on top of the specified date",
+        )
     )
 
     @dataclass
     class SearchExtraDays:
         days_before: int = field(
             default=None,
-            metadata={
-                "name": "DaysBefore",
-                "type": "Attribute",
-                "help": "Number of days to search before the specified date",
-            },
+            metadata=dict(
+                name="DaysBefore",
+                type="Attribute",
+                help="Number of days to search before the specified date",
+            )
         )
         days_after: int = field(
             default=None,
-            metadata={
-                "name": "DaysAfter",
-                "type": "Attribute",
-                "help": "Number of days to search after the specified date",
-            },
+            metadata=dict(
+                name="DaysAfter",
+                type="Attribute",
+                help="Number of days to search after the specified date",
+            )
         )
 
 
 @dataclass
 class TypeLocation:
     airport: Airport = field(
-        default=None, metadata={"name": "Airport", "type": "Element"}
+        default=None,
+        metadata=dict(
+            name="Airport",
+            type="Element",
+            help=None,
+        )
     )
     city: City = field(
-        default=None, metadata={"name": "City", "type": "Element"}
+        default=None,
+        metadata=dict(
+            name="City",
+            type="Element",
+            help=None,
+        )
     )
     city_or_airport: CityOrAirport = field(
-        default=None, metadata={"name": "CityOrAirport", "type": "Element"}
+        default=None,
+        metadata=dict(
+            name="CityOrAirport",
+            type="Element",
+            help=None,
+        )
     )
 
 
@@ -7351,32 +8844,32 @@ class TypeOtakeyword:
 
     sub_key: List[TypeOtasubKey] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 99,
-            "name": "SubKey",
-            "type": "Element",
-            "help": "A further breakdown of a keyword.",
-        },
+        metadata=dict(
+            name="SubKey",
+            type="Element",
+            help="A further breakdown of a keyword.",
+            min_occurs=0,
+            max_occurs=99
+        )
     )
     text: List[str] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 999,
-            "name": "Text",
-            "type": "Element",
-            "help": "Information for a keyword.",
-        },
+        metadata=dict(
+            name="Text",
+            type="Element",
+            help="Information for a keyword.",
+            min_occurs=0,
+            max_occurs=999
+        )
     )
     name: str = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "Name",
-            "type": "Attribute",
-            "help": "The keyword name.",
-        },
+        metadata=dict(
+            name="Name",
+            type="Attribute",
+            help="The keyword name.",
+            required=True
+        )
     )
 
 
@@ -7384,60 +8877,89 @@ class TypeOtakeyword:
 class TypeProviderReservationSpecificInfo:
     operated_by: List[OperatedBy] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 999,
-            "name": "OperatedBy",
-            "type": "Element",
-            "help": "Cross accrual carrier info",
-        },
+        metadata=dict(
+            name="OperatedBy",
+            type="Element",
+            help="Cross accrual carrier info",
+            min_occurs=0,
+            max_occurs=999
+        )
     )
     provider_reservation_info_ref: ProviderReservationInfoRef = field(
         default=None,
-        metadata={
-            "name": "ProviderReservationInfoRef",
-            "type": "Element",
-            "help": "Tagging provider reservation info with LoyaltyCard.",
-        },
+        metadata=dict(
+            name="ProviderReservationInfoRef",
+            type="Element",
+            help="Tagging provider reservation info with LoyaltyCard.",
+        )
     )
     provider_reservation_level: bool = field(
         default=None,
-        metadata={
-            "name": "ProviderReservationLevel",
-            "type": "Attribute",
-            "help": "If true means Loyalty card is applied at ProviderReservation level.",
-        },
+        metadata=dict(
+            name="ProviderReservationLevel",
+            type="Attribute",
+            help="If true means Loyalty card is applied at ProviderReservation level.",
+        )
     )
     reservation_level: bool = field(
         default=None,
-        metadata={
-            "name": "ReservationLevel",
-            "type": "Attribute",
-            "help": "If true means Loyalty card is applied at Universal Record Reservation level e.g. Hotel Reservation, Vehicle Reservation etc.",
-        },
+        metadata=dict(
+            name="ReservationLevel",
+            type="Attribute",
+            help="If true means Loyalty card is applied at Universal Record Reservation level e.g. Hotel Reservation, Vehicle Reservation etc.",
+        )
     )
 
 
 @dataclass
 class TypeSearchLocation:
     distance: Distance = field(
-        default=None, metadata={"name": "Distance", "type": "Element"}
+        default=None,
+        metadata=dict(
+            name="Distance",
+            type="Element",
+            help=None,
+        )
     )
     airport: Airport = field(
-        default=None, metadata={"name": "Airport", "type": "Element"}
+        default=None,
+        metadata=dict(
+            name="Airport",
+            type="Element",
+            help=None,
+        )
     )
     city: City = field(
-        default=None, metadata={"name": "City", "type": "Element"}
+        default=None,
+        metadata=dict(
+            name="City",
+            type="Element",
+            help=None,
+        )
     )
     city_or_airport: CityOrAirport = field(
-        default=None, metadata={"name": "CityOrAirport", "type": "Element"}
+        default=None,
+        metadata=dict(
+            name="CityOrAirport",
+            type="Element",
+            help=None,
+        )
     )
     coordinate_location: CoordinateLocation = field(
         default=None,
-        metadata={"name": "CoordinateLocation", "type": "Element"},
+        metadata=dict(
+            name="CoordinateLocation",
+            type="Element",
+            help=None,
+        )
     )
     rail_location: RailLocation = field(
-        default=None, metadata={"name": "RailLocation", "type": "Element"}
+        default=None,
+        metadata=dict(
+            name="RailLocation",
+            type="Element",
+            help=None,
+        )
     )
 
 
@@ -7449,29 +8971,29 @@ class TypeStructuredAddress:
 
     state: State = field(
         default=None,
-        metadata={
-            "name": "State",
-            "type": "Element",
-            "help": "The State or Province of address requested, e.g. CA, Ontario.",
-        },
+        metadata=dict(
+            name="State",
+            type="Element",
+            help="The State or Province of address requested, e.g. CA, Ontario.",
+        )
     )
     provider_reservation_info_ref: List[ProviderReservationInfoRef] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 99,
-            "name": "ProviderReservationInfoRef",
-            "type": "Element",
-            "help": "Tagging provider reservation info with Address.",
-        },
+        metadata=dict(
+            name="ProviderReservationInfoRef",
+            type="Element",
+            help="Tagging provider reservation info with Address.",
+            min_occurs=0,
+            max_occurs=99
+        )
     )
     key: TypeRef = field(
         default=None,
-        metadata={
-            "name": "Key",
-            "type": "Attribute",
-            "help": "Key for update/delete of the element",
-        },
+        metadata=dict(
+            name="Key",
+            type="Attribute",
+            help="Key for update/delete of the element",
+        )
     )
 
 
@@ -7479,96 +9001,102 @@ class TypeStructuredAddress:
 class TypeTaxInfo:
     tax_detail: List[TaxDetail] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 999,
-            "name": "TaxDetail",
-            "type": "Element",
-        },
+        metadata=dict(
+            name="TaxDetail",
+            type="Element",
+            help=None,
+            min_occurs=0,
+            max_occurs=999
+        )
     )
     included_in_base: IncludedInBase = field(
-        default=None, metadata={"name": "IncludedInBase", "type": "Element"}
+        default=None,
+        metadata=dict(
+            name="IncludedInBase",
+            type="Element",
+            help=None,
+        )
     )
     key: TypeRef = field(
         default=None,
-        metadata={
-            "name": "Key",
-            "type": "Attribute",
-            "help": "The tax key represents a valid key of tax",
-        },
+        metadata=dict(
+            name="Key",
+            type="Attribute",
+            help="The tax key represents a valid key of tax",
+        )
     )
     category: str = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "Category",
-            "type": "Attribute",
-            "help": "The tax category represents a valid IATA tax code.",
-        },
+        metadata=dict(
+            name="Category",
+            type="Attribute",
+            help="The tax category represents a valid IATA tax code.",
+            required=True
+        )
     )
     carrier_defined_category: str = field(
         default=None,
-        metadata={
-            "name": "CarrierDefinedCategory",
-            "type": "Attribute",
-            "help": 'Optional category, where a carrier has used a non-standard IATA tax category. The tax category will be set to "DU"',
-        },
+        metadata=dict(
+            name="CarrierDefinedCategory",
+            type="Attribute",
+            help="Optional category, where a carrier has used a non-standard IATA tax category. The tax category will be set to 'DU'",
+        )
     )
     segment_ref: TypeRef = field(
         default=None,
-        metadata={
-            "name": "SegmentRef",
-            "type": "Attribute",
-            "help": "The segment to which that tax is relative (if applicable)",
-        },
+        metadata=dict(
+            name="SegmentRef",
+            type="Attribute",
+            help="The segment to which that tax is relative (if applicable)",
+        )
     )
     flight_details_ref: TypeRef = field(
         default=None,
-        metadata={
-            "name": "FlightDetailsRef",
-            "type": "Attribute",
-            "help": "The flight details that this tax is relative to (if applicable)",
-        },
+        metadata=dict(
+            name="FlightDetailsRef",
+            type="Attribute",
+            help="The flight details that this tax is relative to (if applicable)",
+        )
     )
     coupon_ref: TypeRef = field(
         default=None,
-        metadata={
-            "name": "CouponRef",
-            "type": "Attribute",
-            "help": "The coupon to which that tax is relative (if applicable)",
-        },
+        metadata=dict(
+            name="CouponRef",
+            type="Attribute",
+            help="The coupon to which that tax is relative (if applicable)",
+        )
     )
     tax_exempted: bool = field(
         default=None,
-        metadata={
-            "name": "TaxExempted",
-            "type": "Attribute",
-            "help": "This indicates whether the tax specified by tax category is exempted.",
-        },
+        metadata=dict(
+            name="TaxExempted",
+            type="Attribute",
+            help="This indicates whether the tax specified by tax category is exempted.",
+        )
     )
     provider_code: TypeProviderCode = field(
         default=None,
-        metadata={
-            "name": "ProviderCode",
-            "type": "Attribute",
-            "help": "Code of the provider returning this TaxInfo.",
-        },
+        metadata=dict(
+            name="ProviderCode",
+            type="Attribute",
+            help="Code of the provider returning this TaxInfo.",
+        )
     )
     supplier_code: TypeSupplierCode = field(
         default=None,
-        metadata={
-            "name": "SupplierCode",
-            "type": "Attribute",
-            "help": "Code of the supplier returning this TaxInfo.",
-        },
+        metadata=dict(
+            name="SupplierCode",
+            type="Attribute",
+            help="Code of the supplier returning this TaxInfo.",
+        )
     )
     text: StringLength1to128 = field(
         default=None,
-        metadata={
-            "name": "Text",
-            "type": "Attribute",
-            "help": "Additional Information returned from Supplier.(ACH only)",
-        },
+        metadata=dict(
+            name="Text",
+            type="Attribute",
+            help="Additional Information returned from Supplier.(ACH only)",
+        )
     )
 
 
@@ -7579,7 +9107,12 @@ class UnassociatedRemark(TypeRemarkWithTravelerRef):
     """
 
     key: TypeRef = field(
-        default=None, metadata={"name": "Key", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="Key",
+            type="Attribute",
+            help=None,
+        )
     )
 
 
@@ -7599,19 +9132,30 @@ class AccountInformation:
     """
 
     address: TypeStructuredAddress = field(
-        default=None, metadata={"name": "Address", "type": "Element"}
+        default=None,
+        metadata=dict(
+            name="Address",
+            type="Element",
+            help=None,
+        )
     )
     phone_number: List[PhoneNumber] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 999,
-            "name": "PhoneNumber",
-            "type": "Element",
-        },
+        metadata=dict(
+            name="PhoneNumber",
+            type="Element",
+            help=None,
+            min_occurs=0,
+            max_occurs=999
+        )
     )
     account_name: str = field(
-        default=None, metadata={"name": "AccountName", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="AccountName",
+            type="Attribute",
+            help=None,
+        )
     )
 
 
@@ -7623,15 +9167,21 @@ class AgencyContactInfo:
 
     phone_number: List[PhoneNumber] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 1,
-            "max_occurs": 999,
-            "name": "PhoneNumber",
-            "type": "Element",
-        },
+        metadata=dict(
+            name="PhoneNumber",
+            type="Element",
+            help=None,
+            min_occurs=1,
+            max_occurs=999
+        )
     )
     key: TypeRef = field(
-        default=None, metadata={"name": "Key", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="Key",
+            type="Attribute",
+            help=None,
+        )
     )
 
 
@@ -7642,25 +9192,32 @@ class AgencyInformation:
     """
 
     address: TypeStructuredAddress = field(
-        default=None, metadata={"name": "Address", "type": "Element"}
+        default=None,
+        metadata=dict(
+            name="Address",
+            type="Element",
+            help=None,
+        )
     )
     email: List[Email] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 999,
-            "name": "Email",
-            "type": "Element",
-        },
+        metadata=dict(
+            name="Email",
+            type="Element",
+            help=None,
+            min_occurs=0,
+            max_occurs=999
+        )
     )
     phone_number: List[PhoneNumber] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 999,
-            "name": "PhoneNumber",
-            "type": "Element",
-        },
+        metadata=dict(
+            name="PhoneNumber",
+            type="Element",
+            help=None,
+            min_occurs=0,
+            max_occurs=999
+        )
     )
 
 
@@ -7672,233 +9229,360 @@ class AirExchangeInfo:
 
     total_penalty_tax_info: "AirExchangeInfo.TotalPenaltyTaxInfo" = field(
         default=None,
-        metadata={"name": "TotalPenaltyTaxInfo", "type": "Element"},
+        metadata=dict(
+            name="TotalPenaltyTaxInfo",
+            type="Element",
+            help=None,
+        )
     )
     paid_tax: List[TypeTax] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 999,
-            "name": "PaidTax",
-            "type": "Element",
-        },
+        metadata=dict(
+            name="PaidTax",
+            type="Element",
+            help=None,
+            min_occurs=0,
+            max_occurs=999
+        )
     )
     ticket_fee_info: List["AirExchangeInfo.TicketFeeInfo"] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 999,
-            "name": "TicketFeeInfo",
-            "type": "Element",
-            "help": "Used for rapid reprice. Providers: 1G/1V/1P/1S/1A",
-        },
+        metadata=dict(
+            name="TicketFeeInfo",
+            type="Element",
+            help="Used for rapid reprice. Providers: 1G/1V/1P/1S/1A",
+            min_occurs=0,
+            max_occurs=999
+        )
     )
     reason: List[str] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 999,
-            "name": "Reason",
-            "type": "Element",
-            "help": "Used for rapid reprice. The reason code or text is returned if the PricingTag is not equal to A, and explains why A was not returned. Providers: 1G/1V/1P/1S/1A",
-        },
+        metadata=dict(
+            name="Reason",
+            type="Element",
+            help="Used for rapid reprice. The reason code or text is returned if the PricingTag is not equal to A, and explains why A was not returned. Providers: 1G/1V/1P/1S/1A",
+            min_occurs=0,
+            max_occurs=999
+        )
     )
     fee_info: List[TypeFeeInfo] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 999,
-            "name": "FeeInfo",
-            "type": "Element",
-        },
+        metadata=dict(
+            name="FeeInfo",
+            type="Element",
+            help=None,
+            min_occurs=0,
+            max_occurs=999
+        )
     )
     tax_info: List[TypeTaxInfo] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 999,
-            "name": "TaxInfo",
-            "type": "Element",
-            "help": "Itinerary level taxes",
-        },
+        metadata=dict(
+            name="TaxInfo",
+            type="Element",
+            help="Itinerary level taxes",
+            min_occurs=0,
+            max_occurs=999
+        )
     )
     exchange_amount: TypeMoney = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "ExchangeAmount",
-            "type": "Attribute",
-        },
+        metadata=dict(
+            name="ExchangeAmount",
+            type="Attribute",
+            help=None,
+            required=True
+        )
     )
     base_fare: TypeMoney = field(
-        default=None, metadata={"name": "BaseFare", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="BaseFare",
+            type="Attribute",
+            help=None,
+        )
     )
     equivalent_base_fare: TypeMoney = field(
         default=None,
-        metadata={"name": "EquivalentBaseFare", "type": "Attribute"},
+        metadata=dict(
+            name="EquivalentBaseFare",
+            type="Attribute",
+            help=None,
+        )
     )
     taxes: TypeMoney = field(
-        default=None, metadata={"name": "Taxes", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="Taxes",
+            type="Attribute",
+            help=None,
+        )
     )
     change_fee: TypeMoney = field(
-        default=None, metadata={"name": "ChangeFee", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="ChangeFee",
+            type="Attribute",
+            help=None,
+        )
     )
     forfeit_amount: TypeMoney = field(
-        default=None, metadata={"name": "ForfeitAmount", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="ForfeitAmount",
+            type="Attribute",
+            help=None,
+        )
     )
     refundable: bool = field(
-        default=None, metadata={"name": "Refundable", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="Refundable",
+            type="Attribute",
+            help=None,
+        )
     )
     exchangeable: bool = field(
-        default=None, metadata={"name": "Exchangeable", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="Exchangeable",
+            type="Attribute",
+            help=None,
+        )
     )
     first_class_upgrade: bool = field(
         default=None,
-        metadata={"name": "FirstClassUpgrade", "type": "Attribute"},
+        metadata=dict(
+            name="FirstClassUpgrade",
+            type="Attribute",
+            help=None,
+        )
     )
     ticket_by_date: str = field(
-        default=None, metadata={"name": "TicketByDate", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="TicketByDate",
+            type="Attribute",
+            help=None,
+        )
     )
     pricing_tag: str = field(
-        default=None, metadata={"name": "PricingTag", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="PricingTag",
+            type="Attribute",
+            help=None,
+        )
     )
     equivalent_change_fee: TypeMoney = field(
         default=None,
-        metadata={"name": "EquivalentChangeFee", "type": "Attribute"},
+        metadata=dict(
+            name="EquivalentChangeFee",
+            type="Attribute",
+            help=None,
+        )
     )
     equivalent_exchange_amount: TypeMoney = field(
         default=None,
-        metadata={"name": "EquivalentExchangeAmount", "type": "Attribute"},
+        metadata=dict(
+            name="EquivalentExchangeAmount",
+            type="Attribute",
+            help=None,
+        )
     )
     add_collection: TypeMoney = field(
-        default=None, metadata={"name": "AddCollection", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="AddCollection",
+            type="Attribute",
+            help=None,
+        )
     )
     residual_value: TypeMoney = field(
-        default=None, metadata={"name": "ResidualValue", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="ResidualValue",
+            type="Attribute",
+            help=None,
+        )
     )
     total_residual_value: TypeMoney = field(
         default=None,
-        metadata={"name": "TotalResidualValue", "type": "Attribute"},
+        metadata=dict(
+            name="TotalResidualValue",
+            type="Attribute",
+            help=None,
+        )
     )
     original_flight_value: TypeMoney = field(
         default=None,
-        metadata={"name": "OriginalFlightValue", "type": "Attribute"},
+        metadata=dict(
+            name="OriginalFlightValue",
+            type="Attribute",
+            help=None,
+        )
     )
     flown_segment_value: TypeMoney = field(
         default=None,
-        metadata={"name": "FlownSegmentValue", "type": "Attribute"},
+        metadata=dict(
+            name="FlownSegmentValue",
+            type="Attribute",
+            help=None,
+        )
     )
     bulk_ticket_advisory: bool = field(
         default=None,
-        metadata={"name": "BulkTicketAdvisory", "type": "Attribute"},
+        metadata=dict(
+            name="BulkTicketAdvisory",
+            type="Attribute",
+            help=None,
+        )
     )
     fare_pull: TypeFarePull = field(
-        default=None, metadata={"name": "FarePull", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="FarePull",
+            type="Attribute",
+            help=None,
+        )
     )
     passenger_type_code: TypePtc = field(
         default=None,
-        metadata={"name": "PassengerTypeCode", "type": "Attribute"},
+        metadata=dict(
+            name="PassengerTypeCode",
+            type="Attribute",
+            help=None,
+        )
     )
     passenger_count: int = field(
-        default=None, metadata={"name": "PassengerCount", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="PassengerCount",
+            type="Attribute",
+            help=None,
+        )
     )
     form_of_refund: TypeFormOfRefund = field(
         default=None,
-        metadata={
-            "name": "FormOfRefund",
-            "type": "Attribute",
-            "help": "How the refund will be issued. Values will be MCO or FormOfPayment",
-        },
+        metadata=dict(
+            name="FormOfRefund",
+            type="Attribute",
+            help="How the refund will be issued. Values will be MCO or FormOfPayment",
+        )
     )
     refund: TypeMoney = field(
         default=None,
-        metadata={
-            "name": "Refund",
-            "type": "Attribute",
-            "help": "Total refund amount.",
-        },
+        metadata=dict(
+            name="Refund",
+            type="Attribute",
+            help="Total refund amount.",
+        )
     )
 
     @dataclass
     class TotalPenaltyTaxInfo:
         penalty_tax_info: List[TypeTax] = field(
             default_factory=list,
-            metadata={
-                "min_occurs": 0,
-                "max_occurs": 999,
-                "name": "PenaltyTaxInfo",
-                "type": "Element",
-            },
+            metadata=dict(
+                name="PenaltyTaxInfo",
+                type="Element",
+                help=None,
+                min_occurs=0,
+                max_occurs=999
+            )
         )
         total_penalty_tax: TypeMoney = field(
             default=None,
-            metadata={"name": "TotalPenaltyTax", "type": "Attribute"},
+            metadata=dict(
+                name="TotalPenaltyTax",
+                type="Attribute",
+                help=None,
+            )
         )
 
     @dataclass
     class TicketFeeInfo:
         base: TypeMoney = field(
-            default=None, metadata={"name": "Base", "type": "Attribute"}
+            default=None,
+            metadata=dict(
+                name="Base",
+                type="Attribute",
+                help=None,
+            )
         )
         tax: TypeMoney = field(
-            default=None, metadata={"name": "Tax", "type": "Attribute"}
+            default=None,
+            metadata=dict(
+                name="Tax",
+                type="Attribute",
+                help=None,
+            )
         )
         total: TypeMoney = field(
-            default=None, metadata={"name": "Total", "type": "Attribute"}
+            default=None,
+            metadata=dict(
+                name="Total",
+                type="Attribute",
+                help=None,
+            )
         )
 
 
 @dataclass
 class Apiprovider:
     transaction_type: TransactionType = field(
-        default=None, metadata={"name": "TransactionType", "type": "Element"}
+        default=None,
+        metadata=dict(
+            name="TransactionType",
+            type="Element",
+            help=None,
+        )
     )
-    available_pseudo_city_code: List[
-        "Apiprovider.AvailablePseudoCityCode"
-    ] = field(
+    available_pseudo_city_code: List["Apiprovider.AvailablePseudoCityCode"] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 999,
-            "name": "AvailablePseudoCityCode",
-            "type": "Element",
-        },
+        metadata=dict(
+            name="AvailablePseudoCityCode",
+            type="Element",
+            help=None,
+            min_occurs=0,
+            max_occurs=999
+        )
     )
     provider_code: TypeProviderCode = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "ProviderCode",
-            "type": "Attribute",
-            "help": "The Provider Code of the host",
-        },
+        metadata=dict(
+            name="ProviderCode",
+            type="Attribute",
+            help="The Provider Code of the host",
+            required=True
+        )
     )
     supplier_code: TypeSupplierCode = field(
         default=None,
-        metadata={
-            "name": "SupplierCode",
-            "type": "Attribute",
-            "help": "The Supplier Code of the host",
-        },
+        metadata=dict(
+            name="SupplierCode",
+            type="Attribute",
+            help="The Supplier Code of the host",
+        )
     )
     iatacode: TypeIata = field(
         default=None,
-        metadata={
-            "name": "IATACode",
-            "type": "Attribute",
-            "help": "Agency IATA or ARC code, used as an ID with airlines.",
-        },
+        metadata=dict(
+            name="IATACode",
+            type="Attribute",
+            help="Agency IATA or ARC code, used as an ID with airlines.",
+        )
     )
 
     @dataclass
     class AvailablePseudoCityCode:
         pseudo_city_code: TypePcc = field(
             default=None,
-            metadata={
-                "name": "PseudoCityCode",
-                "type": "Attribute",
-                "help": "The PseudoCityCode used to connect to the host.",
-            },
+            metadata=dict(
+                name="PseudoCityCode",
+                type="Attribute",
+                help="The PseudoCityCode used to connect to the host.",
+            )
         )
 
 
@@ -7906,63 +9590,76 @@ class Apiprovider:
 class BaseReservation:
     accounting_remark: List[AccountingRemark] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 999,
-            "name": "AccountingRemark",
-            "type": "Element",
-        },
+        metadata=dict(
+            name="AccountingRemark",
+            type="Element",
+            help=None,
+            min_occurs=0,
+            max_occurs=999
+        )
     )
     general_remark: List[GeneralRemark] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 999,
-            "name": "GeneralRemark",
-            "type": "Element",
-        },
+        metadata=dict(
+            name="GeneralRemark",
+            type="Element",
+            help=None,
+            min_occurs=0,
+            max_occurs=999
+        )
     )
     restriction: List[Restriction] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 999,
-            "name": "Restriction",
-            "type": "Element",
-        },
+        metadata=dict(
+            name="Restriction",
+            type="Element",
+            help=None,
+            min_occurs=0,
+            max_occurs=999
+        )
     )
     passive_info: PassiveInfo = field(
-        default=None, metadata={"name": "PassiveInfo", "type": "Element"}
+        default=None,
+        metadata=dict(
+            name="PassiveInfo",
+            type="Element",
+            help=None,
+        )
     )
     locator_code: TypeLocatorCode = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "LocatorCode",
-            "type": "Attribute",
-            "help": "The unique identifier for this reservation. If this is this View Only UR LocatorCode is '999999'.",
-        },
+        metadata=dict(
+            name="LocatorCode",
+            type="Attribute",
+            help="The unique identifier for this reservation. If this is this View Only UR LocatorCode is '999999'.",
+            required=True
+        )
     )
     create_date: str = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "CreateDate",
-            "type": "Attribute",
-            "help": "The date and time that this reservation was created.",
-        },
+        metadata=dict(
+            name="CreateDate",
+            type="Attribute",
+            help="The date and time that this reservation was created.",
+            required=True
+        )
     )
     modified_date: str = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "ModifiedDate",
-            "type": "Attribute",
-            "help": "The date and time that this reservation was last modified for any reason.",
-        },
+        metadata=dict(
+            name="ModifiedDate",
+            type="Attribute",
+            help="The date and time that this reservation was last modified for any reason.",
+            required=True
+        )
     )
     customer_number: str = field(
-        default=None, metadata={"name": "CustomerNumber", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="CustomerNumber",
+            type="Attribute",
+            help=None,
+        )
     )
 
 
@@ -7974,47 +9671,51 @@ class BookingTraveler:
 
     ssr: List[Ssr] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 999,
-            "name": "SSR",
-            "type": "Element",
-        },
+        metadata=dict(
+            name="SSR",
+            type="Element",
+            help=None,
+            min_occurs=0,
+            max_occurs=999
+        )
     )
     name_remark: List[NameRemark] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 999,
-            "name": "NameRemark",
-            "type": "Element",
-        },
+        metadata=dict(
+            name="NameRemark",
+            type="Element",
+            help=None,
+            min_occurs=0,
+            max_occurs=999
+        )
     )
     air_seat_assignment: List[AirSeatAssignment] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 999,
-            "name": "AirSeatAssignment",
-            "type": "Element",
-        },
+        metadata=dict(
+            name="AirSeatAssignment",
+            type="Element",
+            help=None,
+            min_occurs=0,
+            max_occurs=999
+        )
     )
     rail_seat_assignment: List[RailSeatAssignment] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 999,
-            "name": "RailSeatAssignment",
-            "type": "Element",
-        },
+        metadata=dict(
+            name="RailSeatAssignment",
+            type="Element",
+            help=None,
+            min_occurs=0,
+            max_occurs=999
+        )
     )
     name_number: str = field(
         default=None,
-        metadata={
-            "name": "NameNumber",
-            "type": "Attribute",
-            "help": "Host Name Number",
-        },
+        metadata=dict(
+            name="NameNumber",
+            type="Attribute",
+            help="Host Name Number",
+        )
     )
 
 
@@ -8034,56 +9735,72 @@ class DeliveryInfo:
     """
 
     shipping_address: "DeliveryInfo.ShippingAddress" = field(
-        default=None, metadata={"name": "ShippingAddress", "type": "Element"}
+        default=None,
+        metadata=dict(
+            name="ShippingAddress",
+            type="Element",
+            help=None,
+        )
     )
     phone_number: PhoneNumber = field(
-        default=None, metadata={"name": "PhoneNumber", "type": "Element"}
+        default=None,
+        metadata=dict(
+            name="PhoneNumber",
+            type="Element",
+            help=None,
+        )
     )
     email: Email = field(
-        default=None, metadata={"name": "Email", "type": "Element"}
+        default=None,
+        metadata=dict(
+            name="Email",
+            type="Element",
+            help=None,
+        )
     )
     general_remark: List[GeneralRemark] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 999,
-            "name": "GeneralRemark",
-            "type": "Element",
-        },
+        metadata=dict(
+            name="GeneralRemark",
+            type="Element",
+            help=None,
+            min_occurs=0,
+            max_occurs=999
+        )
     )
     provider_reservation_info_ref: List[ProviderReservationInfoRef] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 999,
-            "name": "ProviderReservationInfoRef",
-            "type": "Element",
-            "help": "Tagging provider reservation info with Delivery Info.",
-        },
+        metadata=dict(
+            name="ProviderReservationInfoRef",
+            type="Element",
+            help="Tagging provider reservation info with Delivery Info.",
+            min_occurs=0,
+            max_occurs=999
+        )
     )
     type: str = field(
         default=None,
-        metadata={
-            "name": "Type",
-            "type": "Attribute",
-            "help": "An arbitrary identifier to categorize this delivery info",
-        },
+        metadata=dict(
+            name="Type",
+            type="Attribute",
+            help="An arbitrary identifier to categorize this delivery info",
+        )
     )
     signature_required: str = field(
         default=None,
-        metadata={
-            "name": "SignatureRequired",
-            "type": "Attribute",
-            "help": "Indicates whether a signature shoud be required in order to make the delivery.",
-        },
+        metadata=dict(
+            name="SignatureRequired",
+            type="Attribute",
+            help="Indicates whether a signature shoud be required in order to make the delivery.",
+        )
     )
     tracking_number: str = field(
         default=None,
-        metadata={
-            "name": "TrackingNumber",
-            "type": "Attribute",
-            "help": "The tracking number of the shipping company making the delivery.",
-        },
+        metadata=dict(
+            name="TrackingNumber",
+            type="Attribute",
+            help="The tracking number of the shipping company making the delivery.",
+        )
     )
 
     @dataclass
@@ -8099,41 +9816,47 @@ class InvoiceData:
 
     booking_traveler_information: List[BookingTravelerInformation] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 1,
-            "max_occurs": 9,
-            "name": "BookingTravelerInformation",
-            "type": "Element",
-        },
+        metadata=dict(
+            name="BookingTravelerInformation",
+            type="Element",
+            help=None,
+            min_occurs=1,
+            max_occurs=9
+        )
     )
     key: TypeRef = field(
-        default=None, metadata={"name": "Key", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="Key",
+            type="Attribute",
+            help=None,
+        )
     )
     invoice_number: str = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "InvoiceNumber",
-            "type": "Attribute",
-            "help": "Invoice number",
-        },
+        metadata=dict(
+            name="InvoiceNumber",
+            type="Attribute",
+            help="Invoice number",
+            required=True
+        )
     )
     issue_date: str = field(
         default=None,
-        metadata={
-            "name": "IssueDate",
-            "type": "Attribute",
-            "help": "Invoice issue date",
-        },
+        metadata=dict(
+            name="IssueDate",
+            type="Attribute",
+            help="Invoice issue date",
+        )
     )
     provider_reservation_info_ref: TypeRef = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "ProviderReservationInfoRef",
-            "type": "Attribute",
-            "help": "Provider reservation reference key.",
-        },
+        metadata=dict(
+            name="ProviderReservationInfoRef",
+            type="Attribute",
+            help="Provider reservation reference key.",
+            required=True
+        )
     )
 
 
@@ -8141,35 +9864,35 @@ class InvoiceData:
 class InvoiceRemark(TypeAssociatedRemark):
     air_segment_ref: TypeSegmentRef = field(
         default=None,
-        metadata={
-            "name": "AirSegmentRef",
-            "type": "Element",
-            "help": "Reference to AirSegment from an Air Reservation.",
-        },
+        metadata=dict(
+            name="AirSegmentRef",
+            type="Element",
+            help="Reference to AirSegment from an Air Reservation.",
+        )
     )
     hotel_reservation_ref: TypeNonAirReservationRef = field(
         default=None,
-        metadata={
-            "name": "HotelReservationRef",
-            "type": "Element",
-            "help": "Specify the locator code of Hotel reservation.",
-        },
+        metadata=dict(
+            name="HotelReservationRef",
+            type="Element",
+            help="Specify the locator code of Hotel reservation.",
+        )
     )
     vehicle_reservation_ref: TypeNonAirReservationRef = field(
         default=None,
-        metadata={
-            "name": "VehicleReservationRef",
-            "type": "Element",
-            "help": "Specify the locator code of Vehicle reservation.",
-        },
+        metadata=dict(
+            name="VehicleReservationRef",
+            type="Element",
+            help="Specify the locator code of Vehicle reservation.",
+        )
     )
     passive_segment_ref: TypeSegmentRef = field(
         default=None,
-        metadata={
-            "name": "PassiveSegmentRef",
-            "type": "Element",
-            "help": "Reference to PassiveSegment from a Passive Reservation.",
-        },
+        metadata=dict(
+            name="PassiveSegmentRef",
+            type="Element",
+            help="Reference to PassiveSegment from a Passive Reservation.",
+        )
     )
 
 
@@ -8184,43 +9907,80 @@ class LoyaltyCard:
     Provider loyalty card information
     """
 
-    provider_reservation_specific_info: List[
-        TypeProviderReservationSpecificInfo
-    ] = field(
+    provider_reservation_specific_info: List[TypeProviderReservationSpecificInfo] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 999,
-            "name": "ProviderReservationSpecificInfo",
-            "type": "Element",
-        },
+        metadata=dict(
+            name="ProviderReservationSpecificInfo",
+            type="Element",
+            help=None,
+            min_occurs=0,
+            max_occurs=999
+        )
     )
     card_number: TypeCardNumber = field(
         default=None,
-        metadata={"required": True, "name": "CardNumber", "type": "Attribute"},
+        metadata=dict(
+            name="CardNumber",
+            type="Attribute",
+            help=None,
+            required=True
+        )
     )
     status: str = field(
-        default=None, metadata={"name": "Status", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="Status",
+            type="Attribute",
+            help=None,
+        )
     )
     membership_status: str = field(
         default=None,
-        metadata={"name": "MembershipStatus", "type": "Attribute"},
+        metadata=dict(
+            name="MembershipStatus",
+            type="Attribute",
+            help=None,
+        )
     )
     free_text: str = field(
-        default=None, metadata={"name": "FreeText", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="FreeText",
+            type="Attribute",
+            help=None,
+        )
     )
     supplier_type: TypeProduct = field(
-        default=None, metadata={"name": "SupplierType", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="SupplierType",
+            type="Attribute",
+            help=None,
+        )
     )
     level: str = field(
-        default=None, metadata={"name": "Level", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="Level",
+            type="Attribute",
+            help=None,
+        )
     )
     priority_code: TypePriorityCode = field(
-        default=None, metadata={"name": "PriorityCode", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="PriorityCode",
+            type="Attribute",
+            help=None,
+        )
     )
     vendor_location_ref: str = field(
         default=None,
-        metadata={"name": "VendorLocationRef", "type": "Attribute"},
+        metadata=dict(
+            name="VendorLocationRef",
+            type="Attribute",
+            help=None,
+        )
     )
 
 
@@ -8228,36 +9988,37 @@ class LoyaltyCard:
 class Mcoinformation:
     passenger_info: List[PassengerInfo] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 999,
-            "name": "PassengerInfo",
-            "type": "Element",
-        },
+        metadata=dict(
+            name="PassengerInfo",
+            type="Element",
+            help=None,
+            min_occurs=0,
+            max_occurs=999
+        )
     )
     mconumber: str = field(
         default=None,
-        metadata={
-            "name": "MCONumber",
-            "type": "Attribute",
-            "help": "The unique MCO number",
-        },
+        metadata=dict(
+            name="MCONumber",
+            type="Attribute",
+            help="The unique MCO number",
+        )
     )
     status: str = field(
         default=None,
-        metadata={
-            "name": "Status",
-            "type": "Attribute",
-            "help": "Current status of the MCO",
-        },
+        metadata=dict(
+            name="Status",
+            type="Attribute",
+            help="Current status of the MCO",
+        )
     )
     mcotype: str = field(
         default=None,
-        metadata={
-            "name": "MCOType",
-            "type": "Attribute",
-            "help": "The Type of MCO. Once of Agency Fee, Airline Service Fee, or Residual value from an Exchange.",
-        },
+        metadata=dict(
+            name="MCOType",
+            type="Attribute",
+            help="The Type of MCO. Once of Agency Fee, Airline Service Fee, or Residual value from an Exchange.",
+        )
     )
 
 
@@ -8265,40 +10026,46 @@ class Mcoinformation:
 class McopriceData:
     tax_info: List[TypeTaxInfo] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 999,
-            "name": "TaxInfo",
-            "type": "Element",
-        },
+        metadata=dict(
+            name="TaxInfo",
+            type="Element",
+            help=None,
+            min_occurs=0,
+            max_occurs=999
+        )
     )
     commission: "McopriceData.Commission" = field(
-        default=None, metadata={"name": "Commission", "type": "Element"}
+        default=None,
+        metadata=dict(
+            name="Commission",
+            type="Element",
+            help=None,
+        )
     )
     mcoamount: TypeMoney = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "MCOAmount",
-            "type": "Attribute",
-            "help": "The total value of the MCO including any processing fees.",
-        },
+        metadata=dict(
+            name="MCOAmount",
+            type="Attribute",
+            help="The total value of the MCO including any processing fees.",
+            required=True
+        )
     )
     mcoequivalent_fare: TypeMoney = field(
         default=None,
-        metadata={
-            "name": "MCOEquivalentFare",
-            "type": "Attribute",
-            "help": "Exchange value of the currency actually collected.",
-        },
+        metadata=dict(
+            name="MCOEquivalentFare",
+            type="Attribute",
+            help="Exchange value of the currency actually collected.",
+        )
     )
     mcototal_amount: TypeMoney = field(
         default=None,
-        metadata={
-            "name": "MCOTotalAmount",
-            "type": "Attribute",
-            "help": "The Total amount for the MCO.",
-        },
+        metadata=dict(
+            name="MCOTotalAmount",
+            type="Attribute",
+            help="The Total amount for the MCO.",
+        )
     )
 
     @dataclass
@@ -8314,20 +10081,21 @@ class ReservationName:
 
     booking_traveler_ref: BookingTravelerRef = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "BookingTravelerRef",
-            "type": "Element",
-        },
+        metadata=dict(
+            name="BookingTravelerRef",
+            type="Element",
+            help=None,
+            required=True
+        )
     )
     name_override: NameOverride = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "NameOverride",
-            "type": "Element",
-            "help": "To be used if the reservation name is other than booking travelers in the PNR",
-        },
+        metadata=dict(
+            name="NameOverride",
+            type="Element",
+            help="To be used if the reservation name is other than booking travelers in the PNR",
+            required=True
+        )
     )
 
 
@@ -8339,161 +10107,160 @@ class ServiceRuleType:
 
     application_rules: "ServiceRuleType.ApplicationRules" = field(
         default=None,
-        metadata={
-            "name": "ApplicationRules",
-            "type": "Element",
-            "help": "The rules to apply the rule to the itinerary",
-        },
+        metadata=dict(
+            name="ApplicationRules",
+            type="Element",
+            help="The rules to apply the rule to the itinerary",
+        )
     )
     application_level: "ServiceRuleType.ApplicationLevel" = field(
         default=None,
-        metadata={
-            "name": "ApplicationLevel",
-            "type": "Element",
-            "help": "Lists the levels where the option is applied in the itinerary. Some options are applied for the entire itinerary, some for entire segments, etc.",
-        },
+        metadata=dict(
+            name="ApplicationLevel",
+            type="Element",
+            help="Lists the levels where the option is applied in the itinerary. Some options are applied for the entire itinerary, some for entire segments, etc.",
+        )
     )
     modify_rules: "ServiceRuleType.ModifyRules" = field(
         default=None,
-        metadata={
-            "name": "ModifyRules",
-            "type": "Element",
-            "help": "Groups the modification rules for the Option",
-        },
+        metadata=dict(
+            name="ModifyRules",
+            type="Element",
+            help="Groups the modification rules for the Option",
+        )
     )
     secondary_type_rules: "ServiceRuleType.SecondaryTypeRules" = field(
         default=None,
-        metadata={
-            "name": "SecondaryTypeRules",
-            "type": "Element",
-            "help": "Lists the supported Secondary Codes for the optional / additional service.",
-        },
+        metadata=dict(
+            name="SecondaryTypeRules",
+            type="Element",
+            help="Lists the supported Secondary Codes for the optional / additional service.",
+        )
     )
     remarks: List[FormattedTextTextType] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 99,
-            "name": "Remarks",
-            "type": "Element",
-            "help": "Adds text remarks / rules for the optional / additional service",
-        },
+        metadata=dict(
+            name="Remarks",
+            type="Element",
+            help="Adds text remarks / rules for the optional / additional service",
+            min_occurs=0,
+            max_occurs=99
+        )
     )
     key: TypeRef = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "Key",
-            "type": "Attribute",
-            "help": "Unique ID to identify an optional service rule",
-        },
+        metadata=dict(
+            name="Key",
+            type="Attribute",
+            help="Unique ID to identify an optional service rule",
+            required=True
+        )
     )
 
     @dataclass
     class ApplicationRules:
         required_for_all_travelers: bool = field(
             default=None,
-            metadata={
-                "name": "RequiredForAllTravelers",
-                "type": "Attribute",
-                "help": "Indicates if the option needs to be applied to all travelers in the itinerary if selected",
-            },
+            metadata=dict(
+                name="RequiredForAllTravelers",
+                type="Attribute",
+                help="Indicates if the option needs to be applied to all travelers in the itinerary if selected",
+            )
         )
         required_for_all_segments: bool = field(
             default=None,
-            metadata={
-                "name": "RequiredForAllSegments",
-                "type": "Attribute",
-                "help": "Indicates if the option needs to be applied to all segments in the itinerary if selected",
-            },
+            metadata=dict(
+                name="RequiredForAllSegments",
+                type="Attribute",
+                help="Indicates if the option needs to be applied to all segments in the itinerary if selected",
+            )
         )
         required_for_all_segments_in_od: bool = field(
             default=None,
-            metadata={
-                "name": "RequiredForAllSegmentsInOD",
-                "type": "Attribute",
-                "help": "Indicates if the option needs to be applied to all segments in a origin / destination (connection flights) if selected for one segment in the OD",
-            },
+            metadata=dict(
+                name="RequiredForAllSegmentsInOD",
+                type="Attribute",
+                help="Indicates if the option needs to be applied to all segments in a origin / destination (connection flights) if selected for one segment in the OD",
+            )
         )
         unselected_option_required: bool = field(
             default=None,
-            metadata={
-                "name": "UnselectedOptionRequired",
-                "type": "Attribute",
-                "help": "If an UnselectedOption is present in the option, then the Unselected option needs to be selected even if the option is not selected when this flag is set to true",
-            },
+            metadata=dict(
+                name="UnselectedOptionRequired",
+                type="Attribute",
+                help="If an UnselectedOption is present in the option, then the Unselected option needs to be selected even if the option is not selected when this flag is set to true",
+            )
         )
         secondary_option_code_required: bool = field(
             default=None,
-            metadata={
-                "name": "SecondaryOptionCodeRequired",
-                "type": "Attribute",
-                "help": "If set to true, the secondary option code is required for this option",
-            },
+            metadata=dict(
+                name="SecondaryOptionCodeRequired",
+                type="Attribute",
+                help="If set to true, the secondary option code is required for this option",
+            )
         )
 
     @dataclass
     class ApplicationLevel:
         application_limits: "ServiceRuleType.ApplicationLevel.ApplicationLimits" = field(
             default=None,
-            metadata={
-                "name": "ApplicationLimits",
-                "type": "Element",
-                "help": "Adds the limits on the number of options that can be selected for a particular type",
-            },
+            metadata=dict(
+                name="ApplicationLimits",
+                type="Element",
+                help="Adds the limits on the number of options that can be selected for a particular type",
+            )
         )
         service_data: List[ServiceData] = field(
             default_factory=list,
-            metadata={
-                "min_occurs": 0,
-                "max_occurs": 999,
-                "name": "ServiceData",
-                "type": "Element",
-            },
+            metadata=dict(
+                name="ServiceData",
+                type="Element",
+                help=None,
+                min_occurs=0,
+                max_occurs=999
+            )
         )
         provider_defined_applicable_levels: str = field(
             default=None,
-            metadata={
-                "name": "ProviderDefinedApplicableLevels",
-                "type": "Attribute",
-                "help": "Indicates the actual provider defined ApplicableLevels which is mapped to Other",
-            },
+            metadata=dict(
+                name="ProviderDefinedApplicableLevels",
+                type="Attribute",
+                help="Indicates the actual provider defined ApplicableLevels which is mapped to Other",
+            )
         )
 
         @dataclass
         class ApplicationLimits:
-            application_limit: List[
-                OptionalServiceApplicationLimitType
-            ] = field(
+            application_limit: List[OptionalServiceApplicationLimitType] = field(
                 default_factory=list,
-                metadata={
-                    "min_occurs": 1,
-                    "max_occurs": 10,
-                    "name": "ApplicationLimit",
-                    "type": "Element",
-                    "help": "The application limits for a particular level",
-                },
+                metadata=dict(
+                    name="ApplicationLimit",
+                    type="Element",
+                    help="The application limits for a particular level",
+                    min_occurs=1,
+                    max_occurs=10
+                )
             )
 
     @dataclass
     class ModifyRules:
         modify_rule: List["ServiceRuleType.ModifyRules.ModifyRule"] = field(
             default_factory=list,
-            metadata={
-                "min_occurs": 1,
-                "max_occurs": 999,
-                "name": "ModifyRule",
-                "type": "Element",
-                "help": "Indicates modification rules for the particular modification type.",
-            },
+            metadata=dict(
+                name="ModifyRule",
+                type="Element",
+                help="Indicates modification rules for the particular modification type.",
+                min_occurs=1,
+                max_occurs=999
+            )
         )
         provider_defined_modification_type: str = field(
             default=None,
-            metadata={
-                "name": "ProviderDefinedModificationType",
-                "type": "Attribute",
-                "help": "Indicates the actual provider defined modification type which is mapped to Other",
-            },
+            metadata=dict(
+                name="ProviderDefinedModificationType",
+                type="Attribute",
+                help="Indicates the actual provider defined modification type which is mapped to Other",
+            )
         )
 
         @dataclass
@@ -8502,40 +10269,37 @@ class ServiceRuleType:
 
     @dataclass
     class SecondaryTypeRules:
-        secondary_type_rule: List[
-            "ServiceRuleType.SecondaryTypeRules.SecondaryTypeRule"
-        ] = field(
+        secondary_type_rule: List["ServiceRuleType.SecondaryTypeRules.SecondaryTypeRule"] = field(
             default_factory=list,
-            metadata={
-                "min_occurs": 1,
-                "max_occurs": 999,
-                "name": "SecondaryTypeRule",
-                "type": "Element",
-                "help": "Lists a single secondary code for the optional / additional service.",
-            },
+            metadata=dict(
+                name="SecondaryTypeRule",
+                type="Element",
+                help="Lists a single secondary code for the optional / additional service.",
+                min_occurs=1,
+                max_occurs=999
+            )
         )
 
         @dataclass
         class SecondaryTypeRule:
-            application_limit: List[
-                OptionalServiceApplicationLimitType
-            ] = field(
+            application_limit: List[OptionalServiceApplicationLimitType] = field(
                 default_factory=list,
-                metadata={
-                    "min_occurs": 0,
-                    "max_occurs": 10,
-                    "name": "ApplicationLimit",
-                    "type": "Element",
-                },
+                metadata=dict(
+                    name="ApplicationLimit",
+                    type="Element",
+                    help=None,
+                    min_occurs=0,
+                    max_occurs=10
+                )
             )
             secondary_type: TypeRef = field(
                 default=None,
-                metadata={
-                    "required": True,
-                    "name": "SecondaryType",
-                    "type": "Attribute",
-                    "help": "The unique type to associate a secondary type in an optional service",
-                },
+                metadata=dict(
+                    name="SecondaryType",
+                    type="Attribute",
+                    help="The unique type to associate a secondary type in an optional service",
+                    required=True
+                )
             )
 
 
@@ -8547,30 +10311,35 @@ class TravelSegment(Segment):
 
     origin: TypeIatacode = field(
         default=None,
-        metadata={
-            "name": "Origin",
-            "type": "Attribute",
-            "help": "The IATA location code for this origination of this entity.",
-        },
+        metadata=dict(
+            name="Origin",
+            type="Attribute",
+            help="The IATA location code for this origination of this entity.",
+        )
     )
     destination: TypeIatacode = field(
         default=None,
-        metadata={
-            "name": "Destination",
-            "type": "Attribute",
-            "help": "The IATA location code for this destination of this entity.",
-        },
+        metadata=dict(
+            name="Destination",
+            type="Attribute",
+            help="The IATA location code for this destination of this entity.",
+        )
     )
     departure_time: str = field(
         default=None,
-        metadata={
-            "name": "DepartureTime",
-            "type": "Attribute",
-            "help": "The date and time at which this entity departs. This does not include time zone information since it can be derived from the origin location.",
-        },
+        metadata=dict(
+            name="DepartureTime",
+            type="Attribute",
+            help="The date and time at which this entity departs. This does not include time zone information since it can be derived from the origin location.",
+        )
     )
     arrival_time: str = field(
-        default=None, metadata={"name": "ArrivalTime", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="ArrivalTime",
+            type="Attribute",
+            help=None,
+        )
     )
 
 
@@ -8581,29 +10350,48 @@ class TravelerInformation:
     """
 
     emergency_contact: "TravelerInformation.EmergencyContact" = field(
-        default=None, metadata={"name": "EmergencyContact", "type": "Element"}
+        default=None,
+        metadata=dict(
+            name="EmergencyContact",
+            type="Element",
+            help=None,
+        )
     )
     home_airport: TypeAirport = field(
-        default=None, metadata={"name": "HomeAirport", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="HomeAirport",
+            type="Attribute",
+            help=None,
+        )
     )
     visa_expiration_date: str = field(
         default=None,
-        metadata={"name": "VisaExpirationDate", "type": "Attribute"},
+        metadata=dict(
+            name="VisaExpirationDate",
+            type="Attribute",
+            help=None,
+        )
     )
     booking_traveler_ref: TypeRef = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "BookingTravelerRef",
-            "type": "Attribute",
-            "help": "A reference to a passenger.",
-        },
+        metadata=dict(
+            name="BookingTravelerRef",
+            type="Attribute",
+            help="A reference to a passenger.",
+            required=True
+        )
     )
 
     @dataclass
     class EmergencyContact:
         phone_number: PhoneNumber = field(
-            default=None, metadata={"name": "PhoneNumber", "type": "Element"}
+            default=None,
+            metadata=dict(
+                name="PhoneNumber",
+                type="Element",
+                help=None,
+            )
         )
 
 
@@ -8615,11 +10403,11 @@ class TypeAssociatedRemarkWithSegmentRef(TypeAssociatedRemark):
 
     segment_ref: TypeRef = field(
         default=None,
-        metadata={
-            "name": "SegmentRef",
-            "type": "Attribute",
-            "help": "Reference to an Air/Passive Segment",
-        },
+        metadata=dict(
+            name="SegmentRef",
+            type="Attribute",
+            help="Reference to an Air/Passive Segment",
+        )
     )
 
 
@@ -8630,58 +10418,68 @@ class TypePaymentCard:
     """
 
     phone_number: PhoneNumber = field(
-        default=None, metadata={"name": "PhoneNumber", "type": "Element"}
+        default=None,
+        metadata=dict(
+            name="PhoneNumber",
+            type="Element",
+            help=None,
+        )
     )
     billing_address: TypeStructuredAddress = field(
         default=None,
-        metadata={
-            "name": "BillingAddress",
-            "type": "Element",
-            "help": "The address to where the billing statements for this card are sent. Used for address verification purposes.",
-        },
+        metadata=dict(
+            name="BillingAddress",
+            type="Element",
+            help="The address to where the billing statements for this card are sent. Used for address verification purposes.",
+        )
     )
     type: TypeCardMerchantType = field(
         default=None,
-        metadata={
-            "name": "Type",
-            "type": "Attribute",
-            "help": "The 2 letter credit/ debit card type.",
-        },
+        metadata=dict(
+            name="Type",
+            type="Attribute",
+            help="The 2 letter credit/ debit card type.",
+        )
     )
     number: TypeCreditCardNumber = field(
-        default=None, metadata={"name": "Number", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="Number",
+            type="Attribute",
+            help=None,
+        )
     )
     exp_date: str = field(
         default=None,
-        metadata={
-            "name": "ExpDate",
-            "type": "Attribute",
-            "help": "The Expiration date of this card in YYYY-MM format.",
-        },
+        metadata=dict(
+            name="ExpDate",
+            type="Attribute",
+            help="The Expiration date of this card in YYYY-MM format.",
+        )
     )
     name: str = field(
         default=None,
-        metadata={
-            "name": "Name",
-            "type": "Attribute",
-            "help": "The name as it appears on the card.",
-        },
+        metadata=dict(
+            name="Name",
+            type="Attribute",
+            help="The name as it appears on the card.",
+        )
     )
     cvv: str = field(
         default=None,
-        metadata={
-            "name": "CVV",
-            "type": "Attribute",
-            "help": "Card Verification Code",
-        },
+        metadata=dict(
+            name="CVV",
+            type="Attribute",
+            help="Card Verification Code",
+        )
     )
     approval_code: str = field(
         default=None,
-        metadata={
-            "name": "ApprovalCode",
-            "type": "Attribute",
-            "help": "This code is required for an authorization process from the Credit Card company directly,required for some of the CCH carriers.This attribute is also used for EMD retrieve and issuance transactions.",
-        },
+        metadata=dict(
+            name="ApprovalCode",
+            type="Attribute",
+            help="This code is required for an authorization process from the Credit Card company directly,required for some of the CCH carriers.This attribute is also used for EMD retrieve and issuance transactions.",
+        )
     )
 
 
@@ -8693,53 +10491,123 @@ class BookingTravelerInfo:
 
     booking_traveler_name: BookingTravelerName = field(
         default=None,
-        metadata={"name": "BookingTravelerName", "type": "Element"},
+        metadata=dict(
+            name="BookingTravelerName",
+            type="Element",
+            help=None,
+        )
     )
     name_remark: NameRemark = field(
-        default=None, metadata={"name": "NameRemark", "type": "Element"}
+        default=None,
+        metadata=dict(
+            name="NameRemark",
+            type="Element",
+            help=None,
+        )
     )
     dob: str = field(
         default=None,
-        metadata={
-            "name": "DOB",
-            "type": "Element",
-            "help": "Traveler Date of Birth",
-        },
+        metadata=dict(
+            name="DOB",
+            type="Element",
+            help="Traveler Date of Birth",
+        )
     )
     travel_info: TravelInfo = field(
-        default=None, metadata={"name": "TravelInfo", "type": "Element"}
+        default=None,
+        metadata=dict(
+            name="TravelInfo",
+            type="Element",
+            help=None,
+        )
     )
     email: Email = field(
-        default=None, metadata={"name": "Email", "type": "Element"}
+        default=None,
+        metadata=dict(
+            name="Email",
+            type="Element",
+            help=None,
+        )
     )
     phone_number: PhoneNumber = field(
-        default=None, metadata={"name": "PhoneNumber", "type": "Element"}
+        default=None,
+        metadata=dict(
+            name="PhoneNumber",
+            type="Element",
+            help=None,
+        )
     )
     address: TypeStructuredAddress = field(
-        default=None, metadata={"name": "Address", "type": "Element"}
+        default=None,
+        metadata=dict(
+            name="Address",
+            type="Element",
+            help=None,
+        )
     )
     emergency_info: str = field(
-        default=None, metadata={"name": "EmergencyInfo", "type": "Element"}
+        default=None,
+        metadata=dict(
+            name="EmergencyInfo",
+            type="Element",
+            help=None,
+        )
     )
     delivery_info: DeliveryInfo = field(
-        default=None, metadata={"name": "DeliveryInfo", "type": "Element"}
+        default=None,
+        metadata=dict(
+            name="DeliveryInfo",
+            type="Element",
+            help=None,
+        )
     )
-    age: int = field(default=None, metadata={"name": "Age", "type": "Element"})
+    age: int = field(
+        default=None,
+        metadata=dict(
+            name="Age",
+            type="Element",
+            help=None,
+        )
+    )
     customized_name_data: CustomizedNameData = field(
         default=None,
-        metadata={"name": "CustomizedNameData", "type": "Element"},
+        metadata=dict(
+            name="CustomizedNameData",
+            type="Element",
+            help=None,
+        )
     )
     applied_profile: AppliedProfile = field(
-        default=None, metadata={"name": "AppliedProfile", "type": "Element"}
+        default=None,
+        metadata=dict(
+            name="AppliedProfile",
+            type="Element",
+            help=None,
+        )
     )
     key: TypeRef = field(
-        default=None, metadata={"name": "Key", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="Key",
+            type="Attribute",
+            help=None,
+        )
     )
     traveler_type: TypePtc = field(
-        default=None, metadata={"name": "TravelerType", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="TravelerType",
+            type="Attribute",
+            help=None,
+        )
     )
     gender: TypeGender = field(
-        default=None, metadata={"name": "Gender", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="Gender",
+            type="Attribute",
+            help=None,
+        )
     )
 
 
@@ -8751,11 +10619,11 @@ class DebitCard(TypePaymentCard):
 
     issue_number: str = field(
         default=None,
-        metadata={
-            "name": "IssueNumber",
-            "type": "Attribute",
-            "help": "Verification number for Debit Cards",
-        },
+        metadata=dict(
+            name="IssueNumber",
+            type="Attribute",
+            help="Verification number for Debit Cards",
+        )
     )
 
 
@@ -8766,37 +10634,56 @@ class FileFinishingInfo:
     """
 
     shop_information: ShopInformation = field(
-        default=None, metadata={"name": "ShopInformation", "type": "Element"}
+        default=None,
+        metadata=dict(
+            name="ShopInformation",
+            type="Element",
+            help=None,
+        )
     )
     policy_information: List[PolicyInformation] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 999,
-            "name": "PolicyInformation",
-            "type": "Element",
-            "help": "Policy Information required for File Finishing. Would repeat per Policy Type",
-        },
+        metadata=dict(
+            name="PolicyInformation",
+            type="Element",
+            help="Policy Information required for File Finishing. Would repeat per Policy Type",
+            min_occurs=0,
+            max_occurs=999
+        )
     )
     account_information: AccountInformation = field(
         default=None,
-        metadata={"name": "AccountInformation", "type": "Element"},
+        metadata=dict(
+            name="AccountInformation",
+            type="Element",
+            help=None,
+        )
     )
     agency_information: AgencyInformation = field(
-        default=None, metadata={"name": "AgencyInformation", "type": "Element"}
+        default=None,
+        metadata=dict(
+            name="AgencyInformation",
+            type="Element",
+            help=None,
+        )
     )
     traveler_information: List[TravelerInformation] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 999,
-            "name": "TravelerInformation",
-            "type": "Element",
-        },
+        metadata=dict(
+            name="TravelerInformation",
+            type="Element",
+            help=None,
+            min_occurs=0,
+            max_occurs=999
+        )
     )
     custom_profile_information: CustomProfileInformation = field(
         default=None,
-        metadata={"name": "CustomProfileInformation", "type": "Element"},
+        metadata=dict(
+            name="CustomProfileInformation",
+            type="Element",
+            help=None,
+        )
     )
 
 
@@ -8808,67 +10695,83 @@ class Group:
 
     name: "Group.Name" = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "Name",
-            "type": "Element",
-            "help": "Name of the group in group booking.",
-        },
+        metadata=dict(
+            name="Name",
+            type="Element",
+            help="Name of the group in group booking.",
+            required=True
+        )
     )
     delivery_info: DeliveryInfo = field(
-        default=None, metadata={"name": "DeliveryInfo", "type": "Element"}
+        default=None,
+        metadata=dict(
+            name="DeliveryInfo",
+            type="Element",
+            help=None,
+        )
     )
     phone_number: List[PhoneNumber] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 999,
-            "name": "PhoneNumber",
-            "type": "Element",
-        },
+        metadata=dict(
+            name="PhoneNumber",
+            type="Element",
+            help=None,
+            min_occurs=0,
+            max_occurs=999
+        )
     )
     ssrref: List["Group.Ssrref"] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 999,
-            "name": "SSRRef",
-            "type": "Element",
-            "help": "Reference Element for SSR.",
-        },
+        metadata=dict(
+            name="SSRRef",
+            type="Element",
+            help="Reference Element for SSR.",
+            min_occurs=0,
+            max_occurs=999
+        )
     )
     address: TypeStructuredAddress = field(
-        default=None, metadata={"name": "Address", "type": "Element"}
+        default=None,
+        metadata=dict(
+            name="Address",
+            type="Element",
+            help=None,
+        )
     )
     booking_traveler_ref: List["Group.BookingTravelerRef"] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 999,
-            "name": "BookingTravelerRef",
-            "type": "Element",
-            "help": "Reference Element for Booking Traveler.",
-        },
+        metadata=dict(
+            name="BookingTravelerRef",
+            type="Element",
+            help="Reference Element for Booking Traveler.",
+            min_occurs=0,
+            max_occurs=999
+        )
     )
     key: TypeRef = field(
-        default=None, metadata={"name": "Key", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="Key",
+            type="Attribute",
+            help=None,
+        )
     )
     traveler_type: TypePtc = field(
         default=None,
-        metadata={
-            "name": "TravelerType",
-            "type": "Attribute",
-            "help": "Defines the type of traveler used for booking which could be a non-defining type (Companion, Web-fare, etc), or a standard type (Adult, Child, etc).",
-        },
+        metadata=dict(
+            name="TravelerType",
+            type="Attribute",
+            help="Defines the type of traveler used for booking which could be a non-defining type (Companion, Web-fare, etc), or a standard type (Adult, Child, etc).",
+        )
     )
     group_size: int = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "GroupSize",
-            "type": "Attribute",
-            "help": "Represents size of the group",
-        },
+        metadata=dict(
+            name="GroupSize",
+            type="Attribute",
+            help="Represents size of the group",
+            required=True
+        )
     )
 
     @dataclass
@@ -8879,14 +10782,24 @@ class Group:
     class Ssrref:
         key: TypeRef = field(
             default=None,
-            metadata={"required": True, "name": "Key", "type": "Attribute"},
+            metadata=dict(
+                name="Key",
+                type="Attribute",
+                help=None,
+                required=True
+            )
         )
 
     @dataclass
     class BookingTravelerRef:
         key: TypeRef = field(
             default=None,
-            metadata={"required": True, "name": "Key", "type": "Attribute"},
+            metadata=dict(
+                name="Key",
+                type="Attribute",
+                help=None,
+                required=True
+            )
         )
 
 
@@ -8894,67 +10807,67 @@ class Group:
 class TypeCreditCardType(TypePaymentCard):
     extended_payment: str = field(
         default=None,
-        metadata={
-            "name": "ExtendedPayment",
-            "type": "Attribute",
-            "help": "Used for American Express cards.",
-        },
+        metadata=dict(
+            name="ExtendedPayment",
+            type="Attribute",
+            help="Used for American Express cards.",
+        )
     )
     customer_reference: str = field(
         default=None,
-        metadata={
-            "name": "CustomerReference",
-            "type": "Attribute",
-            "help": "Agencies use this to pass the traveler information to the credit card company.",
-        },
+        metadata=dict(
+            name="CustomerReference",
+            type="Attribute",
+            help="Agencies use this to pass the traveler information to the credit card company.",
+        )
     )
     acceptance_override: bool = field(
         default=None,
-        metadata={
-            "name": "AcceptanceOverride",
-            "type": "Attribute",
-            "help": "Override airline restriction on the credit card.",
-        },
+        metadata=dict(
+            name="AcceptanceOverride",
+            type="Attribute",
+            help="Override airline restriction on the credit card.",
+        )
     )
     third_party_payment: bool = field(
         default="false",
-        metadata={
-            "name": "ThirdPartyPayment",
-            "type": "Attribute",
-            "help": "If true, this indicates that the credit card holder is not one of the passengers.",
-        },
+        metadata=dict(
+            name="ThirdPartyPayment",
+            type="Attribute",
+            help="If true, this indicates that the credit card holder is not one of the passengers.",
+        )
     )
     bank_name: str = field(
         default=None,
-        metadata={
-            "name": "BankName",
-            "type": "Attribute",
-            "help": "Issuing bank name for this credit card",
-        },
+        metadata=dict(
+            name="BankName",
+            type="Attribute",
+            help="Issuing bank name for this credit card",
+        )
     )
     bank_country_code: TypeCountry = field(
         default=None,
-        metadata={
-            "name": "BankCountryCode",
-            "type": "Attribute",
-            "help": "ISO Country code associated with the issuing bank",
-        },
+        metadata=dict(
+            name="BankCountryCode",
+            type="Attribute",
+            help="ISO Country code associated with the issuing bank",
+        )
     )
     bank_state_code: TypeState = field(
         default=None,
-        metadata={
-            "name": "BankStateCode",
-            "type": "Attribute",
-            "help": "State code associated with the issuing bank.",
-        },
+        metadata=dict(
+            name="BankStateCode",
+            type="Attribute",
+            help="State code associated with the issuing bank.",
+        )
     )
     enett: bool = field(
         default="false",
-        metadata={
-            "name": "Enett",
-            "type": "Attribute",
-            "help": "Acceptable values are true or false. If set to true it will denote that the credit card used has been issued through Enett. For all other credit card payments this value will be set to false.",
-        },
+        metadata=dict(
+            name="Enett",
+            type="Attribute",
+            help="Acceptable values are true or false. If set to true it will denote that the credit card used has been issued through Enett. For all other credit card payments this value will be set to false.",
+        )
     )
 
 
@@ -8966,92 +10879,104 @@ class TypePassengerType:
 
     name: Name = field(
         default=None,
-        metadata={
-            "name": "Name",
-            "type": "Element",
-            "help": "Optional passenger Name with associated LoyaltyCard may provide benefit when pricing itineraries using Low Cost Carriers. In general, most carriers do not consider passenger LoyalyCard information when initially pricing itineraries.",
-        },
+        metadata=dict(
+            name="Name",
+            type="Element",
+            help="Optional passenger Name with associated LoyaltyCard may provide benefit when pricing itineraries using Low Cost Carriers. In general, most carriers do not consider passenger LoyalyCard information when initially pricing itineraries.",
+        )
     )
     loyalty_card: List[LoyaltyCard] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 999,
-            "name": "LoyaltyCard",
-            "type": "Element",
-        },
+        metadata=dict(
+            name="LoyaltyCard",
+            type="Element",
+            help=None,
+            min_occurs=0,
+            max_occurs=999
+        )
     )
     discount_card: List[DiscountCard] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 9,
-            "name": "DiscountCard",
-            "type": "Element",
-        },
+        metadata=dict(
+            name="DiscountCard",
+            type="Element",
+            help=None,
+            min_occurs=0,
+            max_occurs=9
+        )
     )
     personal_geography: PersonalGeography = field(
         default=None,
-        metadata={
-            "name": "PersonalGeography",
-            "type": "Element",
-            "help": "Passenger personal geography detail to be sent to Host for accessing location specific fares",
-        },
+        metadata=dict(
+            name="PersonalGeography",
+            type="Element",
+            help="Passenger personal geography detail to be sent to Host for accessing location specific fares",
+        )
     )
     code: TypePtc = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "Code",
-            "type": "Attribute",
-            "help": "The 3-char IATA passenger type code",
-        },
+        metadata=dict(
+            name="Code",
+            type="Attribute",
+            help="The 3-char IATA passenger type code",
+            required=True
+        )
     )
     age: int = field(
-        default=None, metadata={"name": "Age", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="Age",
+            type="Attribute",
+            help=None,
+        )
     )
     dob: str = field(
         default=None,
-        metadata={
-            "name": "DOB",
-            "type": "Attribute",
-            "help": "Passenger Date of Birth",
-        },
+        metadata=dict(
+            name="DOB",
+            type="Attribute",
+            help="Passenger Date of Birth",
+        )
     )
     gender: TypeGender = field(
         default=None,
-        metadata={
-            "name": "Gender",
-            "type": "Attribute",
-            "help": "The passenger gender type",
-        },
+        metadata=dict(
+            name="Gender",
+            type="Attribute",
+            help="The passenger gender type",
+        )
     )
     price_ptconly: bool = field(
-        default=None, metadata={"name": "PricePTCOnly", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="PricePTCOnly",
+            type="Attribute",
+            help=None,
+        )
     )
     booking_traveler_ref: str = field(
         default=None,
-        metadata={
-            "name": "BookingTravelerRef",
-            "type": "Attribute",
-            "help": "This value should be set for Multiple Passengers in the request.",
-        },
+        metadata=dict(
+            name="BookingTravelerRef",
+            type="Attribute",
+            help="This value should be set for Multiple Passengers in the request.",
+        )
     )
     accompanied_passenger: bool = field(
         default="false",
-        metadata={
-            "name": "AccompaniedPassenger",
-            "type": "Attribute",
-            "help": "Container to identify accompanied passenger. Set true means this passenger is accompanied",
-        },
+        metadata=dict(
+            name="AccompaniedPassenger",
+            type="Attribute",
+            help="Container to identify accompanied passenger. Set true means this passenger is accompanied",
+        )
     )
     residency_type: TypeResidency = field(
         default=None,
-        metadata={
-            "name": "ResidencyType",
-            "type": "Attribute",
-            "help": "The passenger residence type.",
-        },
+        metadata=dict(
+            name="ResidencyType",
+            type="Attribute",
+            help="The passenger residence type.",
+        )
     )
 
 
@@ -9071,7 +10996,12 @@ class SearchPassenger(TypePassengerType):
     """
 
     key: TypeRef = field(
-        default=None, metadata={"name": "Key", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="Key",
+            type="Attribute",
+            help=None,
+        )
     )
 
 
@@ -9083,127 +11013,168 @@ class FormOfPayment:
 
     provider_reservation_info_ref: List[TypeFormOfPaymentPnrreference] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 999,
-            "name": "ProviderReservationInfoRef",
-            "type": "Element",
-        },
+        metadata=dict(
+            name="ProviderReservationInfoRef",
+            type="Element",
+            help=None,
+            min_occurs=0,
+            max_occurs=999
+        )
     )
     segment_ref: List[TypeGeneralReference] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 999,
-            "name": "SegmentRef",
-            "type": "Element",
-        },
+        metadata=dict(
+            name="SegmentRef",
+            type="Element",
+            help=None,
+            min_occurs=0,
+            max_occurs=999
+        )
     )
     bsppayment: Bsppayment = field(
-        default=None, metadata={"name": "BSPPayment", "type": "Element"}
+        default=None,
+        metadata=dict(
+            name="BSPPayment",
+            type="Element",
+            help=None,
+        )
     )
     arcpayment: Arcpayment = field(
-        default=None, metadata={"name": "ARCPayment", "type": "Element"}
+        default=None,
+        metadata=dict(
+            name="ARCPayment",
+            type="Element",
+            help=None,
+        )
     )
     credit_card: CreditCard = field(
-        default=None, metadata={"name": "CreditCard", "type": "Element"}
+        default=None,
+        metadata=dict(
+            name="CreditCard",
+            type="Element",
+            help=None,
+        )
     )
     debit_card: DebitCard = field(
-        default=None, metadata={"name": "DebitCard", "type": "Element"}
+        default=None,
+        metadata=dict(
+            name="DebitCard",
+            type="Element",
+            help=None,
+        )
     )
     enett_van: EnettVan = field(
-        default=None, metadata={"name": "EnettVan", "type": "Element"}
+        default=None,
+        metadata=dict(
+            name="EnettVan",
+            type="Element",
+            help=None,
+        )
     )
     key: TypeRef = field(
-        default=None, metadata={"name": "Key", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="Key",
+            type="Attribute",
+            help=None,
+        )
     )
     type: str = field(
         default=None,
-        metadata={"required": True, "name": "Type", "type": "Attribute"},
+        metadata=dict(
+            name="Type",
+            type="Attribute",
+            help=None,
+            required=True
+        )
     )
     fulfillment_type: str = field(
         default=None,
-        metadata={
-            "name": "FulfillmentType",
-            "type": "Attribute",
-            "help": "Collect booking ticket at a Kiosk, print in agency.",
-        },
+        metadata=dict(
+            name="FulfillmentType",
+            type="Attribute",
+            help="Collect booking ticket at a Kiosk, print in agency.",
+        )
     )
     fulfillment_location: str = field(
         default=None,
-        metadata={
-            "name": "FulfillmentLocation",
-            "type": "Attribute",
-            "help": "Information about the location of the printer.",
-        },
+        metadata=dict(
+            name="FulfillmentLocation",
+            type="Attribute",
+            help="Information about the location of the printer.",
+        )
     )
     fulfillment_idtype: TypeFulfillmentIdtype = field(
         default=None,
-        metadata={
-            "name": "FulfillmentIDType",
-            "type": "Attribute",
-            "help": "Identification type, e.g. credit card, to define how the customer will identify himself when collecting the ticket",
-        },
+        metadata=dict(
+            name="FulfillmentIDType",
+            type="Attribute",
+            help="Identification type, e.g. credit card, to define how the customer will identify himself when collecting the ticket",
+        )
     )
     fulfillment_idnumber: str = field(
         default=None,
-        metadata={
-            "name": "FulfillmentIDNumber",
-            "type": "Attribute",
-            "help": "Identification number, e.g. card number, to define how the customer will identify himself when collecting the ticket",
-        },
+        metadata=dict(
+            name="FulfillmentIDNumber",
+            type="Attribute",
+            help="Identification number, e.g. card number, to define how the customer will identify himself when collecting the ticket",
+        )
     )
     is_agent_type: bool = field(
         default="false",
-        metadata={
-            "name": "IsAgentType",
-            "type": "Attribute",
-            "help": "If this is true then FormOfPayment mention in Type is anAgent type FormOfPayment.",
-        },
+        metadata=dict(
+            name="IsAgentType",
+            type="Attribute",
+            help="If this is true then FormOfPayment mention in Type is anAgent type FormOfPayment.",
+        )
     )
     agent_text: str = field(
         default=None,
-        metadata={
-            "name": "AgentText",
-            "type": "Attribute",
-            "help": "This is only relevent when IsAgentType is specified as true. Otherwise this will be ignored.",
-        },
+        metadata=dict(
+            name="AgentText",
+            type="Attribute",
+            help="This is only relevent when IsAgentType is specified as true. Otherwise this will be ignored.",
+        )
     )
     reuse_fop: TypeRef = field(
         default=None,
-        metadata={
-            "name": "ReuseFOP",
-            "type": "Attribute",
-            "help": "Key of the FOP Key to be reused as this Form of Payment.Only Credit and Debit Card will be supported for FOP Reuse.",
-        },
+        metadata=dict(
+            name="ReuseFOP",
+            type="Attribute",
+            help="Key of the FOP Key to be reused as this Form of Payment.Only Credit and Debit Card will be supported for FOP Reuse.",
+        )
     )
     external_reference: TypeExternalReference = field(
         default=None,
-        metadata={"name": "ExternalReference", "type": "Attribute"},
+        metadata=dict(
+            name="ExternalReference",
+            type="Attribute",
+            help=None,
+        )
     )
     reusable: bool = field(
         default="false",
-        metadata={
-            "name": "Reusable",
-            "type": "Attribute",
-            "help": "Indicates whether the form of payment can be reused or not. Currently applicable for Credit and Debit form of payment",
-        },
+        metadata=dict(
+            name="Reusable",
+            type="Attribute",
+            help="Indicates whether the form of payment can be reused or not. Currently applicable for Credit and Debit form of payment",
+        )
     )
     profile_id: str = field(
         default=None,
-        metadata={
-            "name": "ProfileID",
-            "type": "Attribute",
-            "help": "The unique ID of the profile that contains the payment details to use.",
-        },
+        metadata=dict(
+            name="ProfileID",
+            type="Attribute",
+            help="The unique ID of the profile that contains the payment details to use.",
+        )
     )
     profile_key: TypeRef = field(
         default=None,
-        metadata={
-            "name": "ProfileKey",
-            "type": "Attribute",
-            "help": "The Key assigned to the payment details value from the specified profile.",
-        },
+        metadata=dict(
+            name="ProfileKey",
+            type="Attribute",
+            help="The Key assigned to the payment details value from the specified profile.",
+        )
     )
 
 
@@ -9214,48 +11185,61 @@ class Guarantee:
     """
 
     credit_card: CreditCard = field(
-        default=None, metadata={"name": "CreditCard", "type": "Element"}
+        default=None,
+        metadata=dict(
+            name="CreditCard",
+            type="Element",
+            help=None,
+        )
     )
     other_guarantee_info: OtherGuaranteeInfo = field(
         default=None,
-        metadata={"name": "OtherGuaranteeInfo", "type": "Element"},
+        metadata=dict(
+            name="OtherGuaranteeInfo",
+            type="Element",
+            help=None,
+        )
     )
     type: str = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "Type",
-            "type": "Attribute",
-            "help": "Guarantee, Deposit for 1G/1V/1P/1J and PrePayment for 1P/1J only",
-        },
+        metadata=dict(
+            name="Type",
+            type="Attribute",
+            help="Guarantee, Deposit for 1G/1V/1P/1J and PrePayment for 1P/1J only",
+            required=True
+        )
     )
     key: TypeRef = field(
         default=None,
-        metadata={
-            "name": "Key",
-            "type": "Attribute",
-            "help": "Key for update/delete of the element",
-        },
+        metadata=dict(
+            name="Key",
+            type="Attribute",
+            help="Key for update/delete of the element",
+        )
     )
     reuse_fop: TypeRef = field(
         default=None,
-        metadata={
-            "name": "ReuseFOP",
-            "type": "Attribute",
-            "help": "Key of the FOP Key to be reused as this Form of Payment.Only Credit and Debit Card will be supported for FOP Reuse.",
-        },
+        metadata=dict(
+            name="ReuseFOP",
+            type="Attribute",
+            help="Key of the FOP Key to be reused as this Form of Payment.Only Credit and Debit Card will be supported for FOP Reuse.",
+        )
     )
     external_reference: TypeExternalReference = field(
         default=None,
-        metadata={"name": "ExternalReference", "type": "Attribute"},
+        metadata=dict(
+            name="ExternalReference",
+            type="Attribute",
+            help=None,
+        )
     )
     reusable: bool = field(
         default="false",
-        metadata={
-            "name": "Reusable",
-            "type": "Attribute",
-            "help": "Indicates whether the form of payment can be reused or not. Currently applicable for Credit and Debit form of payment",
-        },
+        metadata=dict(
+            name="Reusable",
+            type="Attribute",
+            help="Indicates whether the form of payment can be reused or not. Currently applicable for Credit and Debit form of payment",
+        )
     )
 
 
@@ -9266,48 +11250,54 @@ class McoexchangeInfo:
     """
 
     form_of_payment: FormOfPayment = field(
-        default=None, metadata={"name": "FormOfPayment", "type": "Element"}
+        default=None,
+        metadata=dict(
+            name="FormOfPayment",
+            type="Element",
+            help=None,
+        )
     )
     exchanged_coupon: List[ExchangedCoupon] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 4,
-            "name": "ExchangedCoupon",
-            "type": "Element",
-        },
+        metadata=dict(
+            name="ExchangedCoupon",
+            type="Element",
+            help=None,
+            min_occurs=0,
+            max_occurs=4
+        )
     )
     original_ticket_number: TypeTicketNumber = field(
         default=None,
-        metadata={
-            "name": "OriginalTicketNumber",
-            "type": "Attribute",
-            "help": "Airline form and serial number of the original ticket issued.",
-        },
+        metadata=dict(
+            name="OriginalTicketNumber",
+            type="Attribute",
+            help="Airline form and serial number of the original ticket issued.",
+        )
     )
     original_city_code: TypeCity = field(
         default=None,
-        metadata={
-            "name": "OriginalCityCode",
-            "type": "Attribute",
-            "help": "Location of honoring carrier or operator.",
-        },
+        metadata=dict(
+            name="OriginalCityCode",
+            type="Attribute",
+            help="Location of honoring carrier or operator.",
+        )
     )
     original_ticket_date: TypeDate = field(
         default=None,
-        metadata={
-            "name": "OriginalTicketDate",
-            "type": "Attribute",
-            "help": "Date that the Original ticket was issued.",
-        },
+        metadata=dict(
+            name="OriginalTicketDate",
+            type="Attribute",
+            help="Date that the Original ticket was issued.",
+        )
     )
     iatacode: TypeIata = field(
         default=None,
-        metadata={
-            "name": "IATACode",
-            "type": "Attribute",
-            "help": "IATA code of the issuing agency.",
-        },
+        metadata=dict(
+            name="IATACode",
+            type="Attribute",
+            help="IATA code of the issuing agency.",
+        )
     )
 
 
@@ -9318,113 +11308,134 @@ class ServiceFeeInfo:
     """
 
     form_of_payment: FormOfPayment = field(
-        default=None, metadata={"name": "FormOfPayment", "type": "Element"}
+        default=None,
+        metadata=dict(
+            name="FormOfPayment",
+            type="Element",
+            help=None,
+        )
     )
     service_fee_tax_info: List[ServiceFeeTaxInfo] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 999,
-            "name": "ServiceFeeTaxInfo",
-            "type": "Element",
-        },
+        metadata=dict(
+            name="ServiceFeeTaxInfo",
+            type="Element",
+            help=None,
+            min_occurs=0,
+            max_occurs=999
+        )
     )
     credit_card_auth: CreditCardAuth = field(
-        default=None, metadata={"name": "CreditCardAuth", "type": "Element"}
+        default=None,
+        metadata=dict(
+            name="CreditCardAuth",
+            type="Element",
+            help=None,
+        )
     )
     payment: Payment = field(
-        default=None, metadata={"name": "Payment", "type": "Element"}
+        default=None,
+        metadata=dict(
+            name="Payment",
+            type="Element",
+            help=None,
+        )
     )
     status: TypeStatus = field(
         default=None,
-        metadata={
-            "name": "Status",
-            "type": "Attribute",
-            "help": "Status of the service fee. Possible Values – Issued, ReadyToIssue, IssueLater.",
-        },
+        metadata=dict(
+            name="Status",
+            type="Attribute",
+            help="Status of the service fee. Possible Values – Issued, ReadyToIssue, IssueLater.",
+        )
     )
     description: str = field(
         default=None,
-        metadata={
-            "name": "Description",
-            "type": "Attribute",
-            "help": "The description of the service fee.",
-        },
+        metadata=dict(
+            name="Description",
+            type="Attribute",
+            help="The description of the service fee.",
+        )
     )
     key: TypeRef = field(
-        default=None, metadata={"name": "Key", "type": "Attribute"}
+        default=None,
+        metadata=dict(
+            name="Key",
+            type="Attribute",
+            help=None,
+        )
     )
     confirmation: str = field(
         default=None,
-        metadata={
-            "name": "Confirmation",
-            "type": "Attribute",
-            "help": "The confirmation number of the service fee in the merchant host system.",
-        },
+        metadata=dict(
+            name="Confirmation",
+            type="Attribute",
+            help="The confirmation number of the service fee in the merchant host system.",
+        )
     )
     ticket_number: str = field(
         default=None,
-        metadata={
-            "name": "TicketNumber",
-            "type": "Attribute",
-            "help": "The ticket that this fee was issued in connection with.",
-        },
+        metadata=dict(
+            name="TicketNumber",
+            type="Attribute",
+            help="The ticket that this fee was issued in connection with.",
+        )
     )
     booking_traveler_ref: TypeRef = field(
         default=None,
-        metadata={
-            "name": "BookingTravelerRef",
-            "type": "Attribute",
-            "help": "A reference to a passenger.",
-        },
+        metadata=dict(
+            name="BookingTravelerRef",
+            type="Attribute",
+            help="A reference to a passenger.",
+        )
     )
     provider_reservation_info_ref: TypeRef = field(
         default=None,
-        metadata={
-            "name": "ProviderReservationInfoRef",
-            "type": "Attribute",
-            "help": "A reference to the provider reservation info to which the service is tied.",
-        },
+        metadata=dict(
+            name="ProviderReservationInfoRef",
+            type="Attribute",
+            help="A reference to the provider reservation info to which the service is tied.",
+        )
     )
     passive_provider_reservation_info_ref: TypeRef = field(
         default=None,
-        metadata={
-            "name": "PassiveProviderReservationInfoRef",
-            "type": "Attribute",
-            "help": "A reference to the passive provider reservation info to which the service is tied.",
-        },
+        metadata=dict(
+            name="PassiveProviderReservationInfoRef",
+            type="Attribute",
+            help="A reference to the passive provider reservation info to which the service is tied.",
+        )
     )
     total_amount: TypeMoney = field(
         default=None,
-        metadata={
-            "name": "TotalAmount",
-            "type": "Attribute",
-            "help": "The total amount for this Service Fee including base amount and all taxes.",
-        },
+        metadata=dict(
+            name="TotalAmount",
+            type="Attribute",
+            help="The total amount for this Service Fee including base amount and all taxes.",
+        )
     )
     base_amount: TypeMoney = field(
         default=None,
-        metadata={
-            "name": "BaseAmount",
-            "type": "Attribute",
-            "help": "Represents the base price for this entity. This does not include any taxes.",
-        },
+        metadata=dict(
+            name="BaseAmount",
+            type="Attribute",
+            help="Represents the base price for this entity. This does not include any taxes.",
+        )
     )
     taxes: TypeMoney = field(
         default=None,
-        metadata={
-            "name": "Taxes",
-            "type": "Attribute",
-            "help": "The aggregated amount of all the taxes that are associated with this entity. See the associated Service Fee TaxInfo array for a breakdown of the individual taxes.",
-        },
+        metadata=dict(
+            name="Taxes",
+            type="Attribute",
+            help="The aggregated amount of all the taxes that are associated with this entity. See the associated Service Fee TaxInfo array for a breakdown of the individual taxes.",
+        )
     )
     booking_traveler_name: str = field(
         default=None,
-        metadata={
-            "name": "BookingTravelerName",
-            "type": "Attribute",
-            "help": "The name of the passenger.",
-        },
+        metadata=dict(
+            name="BookingTravelerName",
+            type="Attribute",
+            help="The name of the passenger.",
+        )
     )
 
 
@@ -9432,162 +11443,186 @@ class ServiceFeeInfo:
 class Mco(Mcoinformation):
     form_of_payment: List[FormOfPayment] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 999,
-            "name": "FormOfPayment",
-            "type": "Element",
-        },
+        metadata=dict(
+            name="FormOfPayment",
+            type="Element",
+            help=None,
+            min_occurs=0,
+            max_occurs=999
+        )
     )
     endorsement: Endorsement = field(
-        default=None, metadata={"name": "Endorsement", "type": "Element"}
+        default=None,
+        metadata=dict(
+            name="Endorsement",
+            type="Element",
+            help=None,
+        )
     )
     mcoexchange_info: McoexchangeInfo = field(
-        default=None, metadata={"name": "MCOExchangeInfo", "type": "Element"}
+        default=None,
+        metadata=dict(
+            name="MCOExchangeInfo",
+            type="Element",
+            help=None,
+        )
     )
     mcofee_info: McofeeInfo = field(
-        default=None, metadata={"name": "MCOFeeInfo", "type": "Element"}
+        default=None,
+        metadata=dict(
+            name="MCOFeeInfo",
+            type="Element",
+            help=None,
+        )
     )
     mcoremark: List[Mcoremark] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 999,
-            "name": "MCORemark",
-            "type": "Element",
-        },
+        metadata=dict(
+            name="MCORemark",
+            type="Element",
+            help=None,
+            min_occurs=0,
+            max_occurs=999
+        )
     )
     mcoprice_data: McopriceData = field(
-        default=None, metadata={"name": "MCOPriceData", "type": "Element"}
+        default=None,
+        metadata=dict(
+            name="MCOPriceData",
+            type="Element",
+            help=None,
+        )
     )
     stock_control: List[StockControl] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 999,
-            "name": "StockControl",
-            "type": "Element",
-        },
+        metadata=dict(
+            name="StockControl",
+            type="Element",
+            help=None,
+            min_occurs=0,
+            max_occurs=999
+        )
     )
     mcotext: List[Mcotext] = field(
         default_factory=list,
-        metadata={
-            "min_occurs": 0,
-            "max_occurs": 999,
-            "name": "MCOText",
-            "type": "Element",
-        },
+        metadata=dict(
+            name="MCOText",
+            type="Element",
+            help=None,
+            min_occurs=0,
+            max_occurs=999
+        )
     )
     ticket_type: str = field(
         default=None,
-        metadata={
-            "name": "TicketType",
-            "type": "Attribute",
-            "help": 'Ticket issue indicator. Possible values "Pre-paid ticket advice", "Ticket on departure" and "Other" .',
-        },
+        metadata=dict(
+            name="TicketType",
+            type="Attribute",
+            help="Ticket issue indicator. Possible values 'Pre-paid ticket advice', 'Ticket on departure' and 'Other' .",
+        )
     )
     ticket_number: str = field(
         default=None,
-        metadata={
-            "name": "TicketNumber",
-            "type": "Attribute",
-            "help": "The ticket that this MCO was issued in connection with. Could be the ticket that caused the fee, a residual from an exchange, or an airline service fee.",
-        },
+        metadata=dict(
+            name="TicketNumber",
+            type="Attribute",
+            help="The ticket that this MCO was issued in connection with. Could be the ticket that caused the fee, a residual from an exchange, or an airline service fee.",
+        )
     )
     mcoissued: bool = field(
         default=None,
-        metadata={
-            "required": True,
-            "name": "MCOIssued",
-            "type": "Attribute",
-            "help": "Set to true when the MCO is to be issued and set to false if it is stored for issue at a later time.",
-        },
+        metadata=dict(
+            name="MCOIssued",
+            type="Attribute",
+            help="Set to true when the MCO is to be issued and set to false if it is stored for issue at a later time.",
+            required=True
+        )
     )
     mcoissue_date: str = field(
         default=None,
-        metadata={
-            "name": "MCOIssueDate",
-            "type": "Attribute",
-            "help": "Date and time in which the MCO was issued.",
-        },
+        metadata=dict(
+            name="MCOIssueDate",
+            type="Attribute",
+            help="Date and time in which the MCO was issued.",
+        )
     )
     mcodoc_num: str = field(
         default=None,
-        metadata={
-            "name": "MCODocNum",
-            "type": "Attribute",
-            "help": "MCO document number.",
-        },
+        metadata=dict(
+            name="MCODocNum",
+            type="Attribute",
+            help="MCO document number.",
+        )
     )
     issue_reason_code: str = field(
         default=None,
-        metadata={
-            "name": "IssueReasonCode",
-            "type": "Attribute",
-            "help": "O - Other, P thru Z - airline specific, 1 thru 9 - market specific",
-        },
+        metadata=dict(
+            name="IssueReasonCode",
+            type="Attribute",
+            help="O - Other, P thru Z - airline specific, 1 thru 9 - market specific",
+        )
     )
     plating_carrier: TypeCarrier = field(
         default=None,
-        metadata={
-            "name": "PlatingCarrier",
-            "type": "Attribute",
-            "help": "The Plating Carrier for this MCO",
-        },
+        metadata=dict(
+            name="PlatingCarrier",
+            type="Attribute",
+            help="The Plating Carrier for this MCO",
+        )
     )
     tour_operator: str = field(
         default=None,
-        metadata={
-            "name": "TourOperator",
-            "type": "Attribute",
-            "help": "Tour Operator - name of honoring carrier or operator.",
-        },
+        metadata=dict(
+            name="TourOperator",
+            type="Attribute",
+            help="Tour Operator - name of honoring carrier or operator.",
+        )
     )
     location: str = field(
         default=None,
-        metadata={
-            "name": "Location",
-            "type": "Attribute",
-            "help": "Location of honoring carrier or operator.",
-        },
+        metadata=dict(
+            name="Location",
+            type="Attribute",
+            help="Location of honoring carrier or operator.",
+        )
     )
     tour_code: str = field(
         default=None,
-        metadata={
-            "name": "TourCode",
-            "type": "Attribute",
-            "help": "The Tour Code of the MCO.",
-        },
+        metadata=dict(
+            name="TourCode",
+            type="Attribute",
+            help="The Tour Code of the MCO.",
+        )
     )
     provider_code: TypeProviderCode = field(
         default=None,
-        metadata={
-            "name": "ProviderCode",
-            "type": "Attribute",
-            "help": "Contains the Provider Code of the provider that houses this MCO.",
-        },
+        metadata=dict(
+            name="ProviderCode",
+            type="Attribute",
+            help="Contains the Provider Code of the provider that houses this MCO.",
+        )
     )
     provider_locator_code: TypeProviderLocatorCode = field(
         default=None,
-        metadata={
-            "name": "ProviderLocatorCode",
-            "type": "Attribute",
-            "help": "Contains the Provider Locator Code of the Provider Reservation that houses this MCO.",
-        },
+        metadata=dict(
+            name="ProviderLocatorCode",
+            type="Attribute",
+            help="Contains the Provider Locator Code of the Provider Reservation that houses this MCO.",
+        )
     )
     pseudo_city_code: TypePcc = field(
         default=None,
-        metadata={
-            "name": "PseudoCityCode",
-            "type": "Attribute",
-            "help": "The PCC in the host system.",
-        },
+        metadata=dict(
+            name="PseudoCityCode",
+            type="Attribute",
+            help="The PCC in the host system.",
+        )
     )
     expiry_date: str = field(
         default=None,
-        metadata={
-            "name": "ExpiryDate",
-            "type": "Attribute",
-            "help": "E-Voucher’s Expiry Date. This expiry date is specific to Rail product",
-        },
+        metadata=dict(
+            name="ExpiryDate",
+            type="Attribute",
+            help="E-Voucher’s Expiry Date. This expiry date is specific to Rail product",
+        )
     )

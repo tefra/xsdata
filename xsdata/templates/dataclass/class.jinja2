@@ -1,4 +1,4 @@
-{% set outer = outer|default([obj.name]) %}
+{%- set outer = outer|default([obj.name]) %}
 
 @dataclass
 class {{ obj.name }}{{"({})".format(obj.extends) if obj.extends }}:
@@ -9,16 +9,28 @@ class {{ obj.name }}{{"({})".format(obj.extends) if obj.extends }}:
 {% endif -%}
 {%- if obj.attrs|length == 0 %}
     pass
-{% endif -%}
-{% for attr in obj.attrs %}
-    {%- set display_type = '"{}.{}"'.format(outer|join('.'), attr.type) if attr.forward_ref else attr.type %}
-    {%- set display_default = '"{}"'.format(attr.default) if attr.default else attr.default %}
-    {{ attr.name }}: {{ 'List[{}]'.format(display_type) if attr.is_list else display_type }} = field(
-        {{ "default_factory=list" if attr.is_list else "default={}".format(display_default) }},
-        metadata={{ attr.metadata }}
+{%- endif -%}
+{%- for attr in obj.attrs %}
+    {%- set display_type = '"{}.{}"'.format(outer|join('.'), attr.type) if attr.forward_ref else attr.type -%}
+    {%- set display_type = 'List[{}]'.format(display_type) if attr.is_list else display_type -%}
+    {%- set field_params = {
+                  "name" : attr.local_name,
+                  "type" : attr.local_type,
+                  "help" :attr.help,
+               }
+    %}
+    {{ attr.name }}: {{ display_type }} = field(
+        {{ "default_factory" if attr.is_list else "default" }}=
+        {{- "list" if attr.is_list else ('"{}"'.format(attr.default) if attr.default else attr.default) }},
+        metadata=dict(
+            {{ field_params|arguments|indent(12) }},
+            {%- if attr.restrictions %}
+            {{ attr.restrictions|arguments|indent(12) }}
+            {%- endif %}
+        )
     )
-{%- endfor %}
-{% for inner in obj.inner %}
+{%- endfor -%}
+{%- for inner in obj.inner %}
     {%- filter indent(4) -%}
         {%- with obj=inner, outer=outer + [inner.name],  indent=indent -%}
             {% include "class.jinja2" %}

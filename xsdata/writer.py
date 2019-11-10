@@ -3,12 +3,12 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import List, Set, Union
 
-import black
 from jinja2 import Environment, FileSystemLoader, Template
 from toposort import toposort_flatten
 
 from xsdata.models.elements import Import, Include, Schema
 from xsdata.models.templates import Class
+from xsdata.templates.dataclass.filters import arguments
 from xsdata.utils.text import snake_case
 
 logger = logging.getLogger(__name__)
@@ -32,8 +32,9 @@ class CodeWriter:
                     .joinpath(self.theme)
                 )
             ),
-            extensions=["jinja2.ext.do"],
         )
+        self.env.filters["arguments"] = arguments
+
         if isinstance(self.target, str):
             self.target = Path(self.target)
 
@@ -42,17 +43,15 @@ class CodeWriter:
 
     def write(self):
         classes = self.sort_class_vars(self.classes)
-        imports = self.organize_imports(self.imports)
-        output = "\n\n".join(map(self.render, classes))
-        output = self.black_code(output)
 
         self.target.mkdir(parents=True, exist_ok=True)
-        file_path = self.target.joinpath(
-            "{}.py".format(snake_case(self.module))
-        )
+        file_path = self.target.joinpath(f"{snake_case(self.module)}.py")
         with open(str(file_path), "w") as fp:
             fp.write(
-                self.template("module").render(output=output, imports=imports)
+                self.template("module").render(
+                    output="\n".join(map(self.render, classes)),
+                    imports=self.organize_imports(self.imports),
+                )
             )
 
     def render(self, obj: Class) -> str:
@@ -60,14 +59,6 @@ class CodeWriter:
 
     @staticmethod
     def organize_imports(imports):
-        """
-        ../common_v48_0/CommonReqRsp.xsd from ..common_v48_0.common_req_rsp
-        import *
-
-        :return:
-        :rtype:
-        """
-
         def convert(value):
             if "value" == "..":
                 return ".."
@@ -99,17 +90,6 @@ class CodeWriter:
         for inner in obj.inner:
             dependencies.update(cls.collect_deps(inner))
         return dependencies
-
-    @staticmethod
-    def black_code(string: str) -> str:
-        try:
-            mode = black.FileMode(
-                is_pyi=False, string_normalization=True, line_length=79
-            )
-            return black.format_file_contents(string, fast=False, mode=mode)
-        except Exception as e:
-            logger.exception(e)
-            return string
 
     @staticmethod
     def adjust_target(target: Path, xsd_path: Path, schema: Schema) -> Path:

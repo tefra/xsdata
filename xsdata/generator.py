@@ -12,7 +12,6 @@ from xsdata.models.elements import (
     SimpleType,
 )
 from xsdata.models.templates import Attr, Class
-from xsdata.utils.text import safe_snake
 
 logger = logging.getLogger(__name__)
 
@@ -62,19 +61,16 @@ class CodeGenerator:
             logger.warning("Failed to detect type for element: {}".format(obj))
             return None
 
-        name = obj.raw_name
-        metadata = obj.get_restrictions()
-        metadata.update(
-            dict(name=name, type=type(obj).__name__, help=obj.display_help)
-        )
-
         item.attrs.append(
             Attr(
-                name=safe_snake(name),
+                name=obj.snake_name,
+                local_name=obj.raw_name,
                 default=getattr(obj, "default", None),
-                metadata=metadata,
                 type=display_type,
+                local_type=type(obj).__name__,
+                help=obj.display_help,
                 forward_ref=queued,
+                restrictions=obj.get_restrictions(),
             )
         )
 

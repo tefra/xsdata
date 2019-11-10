@@ -6,23 +6,24 @@ from typing import Any, List, Optional
 class Attr:
     name: str
     type: str
+    help: Optional[str]
+    local_name: str
+    local_type: str
     forward_ref: bool = field(default=False)
-    metadata: dict = field(default_factory=dict)
+    restrictions: dict = field(default_factory=dict)
     default: Optional[Any] = field(default=None)
-
-    def __post_init__(self):
-        if self.metadata.get("help") is None:
-            del self.metadata["help"]
 
     @property
     def is_list(self):
-        return "min_occurs" in self.metadata and "max_occurs" in self.metadata
+        return (
+            "min_occurs" in self.restrictions
+            and "max_occurs" in self.restrictions
+        )
 
 
 @dataclass
 class Class:
     name: str
-    metadata: dict = field(default_factory=dict)
     help: Optional[str] = field(default=None)
     extends: Optional[str] = field(default=None)
     attrs: List[Attr] = field(default_factory=list)

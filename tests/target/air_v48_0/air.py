@@ -46,15 +46,6 @@ class PassengerReceiptOverride:
 
 
 @dataclass
-class TicketAgency:
-    """
-    This modifier will override the pseudo of the ticketing agency found in the AAT (TKAG). Used for all plating carrier validation.
-    """
-
-    pass
-
-
-@dataclass
 class TypeDaysOfOperation:
     pass
 
@@ -1193,6 +1184,7 @@ class ConjunctedTicketInfo:
             name="TicketingAgentSignOn",
             type="Attribute",
             help=None,
+            max_length=8.0
         )
     )
     country_code: TypeCountry = field(
@@ -1226,7 +1218,9 @@ class ContractCode:
             name="Code",
             type="Attribute",
             help="The 1-64 character string which uniquely identifies a Contract.",
-            required=True
+            required=True,
+            min_length=1.0,
+            max_length=64.0
         )
     )
     company_name: str = field(
@@ -1427,6 +1421,7 @@ class Embargo:
             name="Name",
             type="Attribute",
             help="The commercial name of the optional service on which the embargo applies. Provider: 1G, 1V, 1P, 1J",
+            max_length=30.0
         )
     )
     text: str = field(
@@ -1467,6 +1462,7 @@ class Embargo:
             name="ServiceSubCode",
             type="Attribute",
             help="The service sub code of the optional service on which the embargo applies. Provider: 1G, 1V, 1P, 1J",
+            max_length=3.0
         )
     )
 
@@ -1551,7 +1547,8 @@ class Emdcoupon:
             name="RFIC",
             type="Attribute",
             help="Reason For Issuance Code for the EMD coupon",
-            required=True
+            required=True,
+            length=1
         )
     )
     rfisc: str = field(
@@ -1568,6 +1565,8 @@ class Emdcoupon:
             name="RFIDescription",
             type="Attribute",
             help="Reason for Issueance Description for the EMD coupon",
+            min_length=1.0,
+            max_length=86.0
         )
     )
     origin: TypeIatacode = field(
@@ -1600,6 +1599,8 @@ class Emdcoupon:
             name="PresentTo",
             type="Attribute",
             help="Service provider to present the coupon to",
+            min_length=1.0,
+            max_length=71.0
         )
     )
     present_at: str = field(
@@ -1608,6 +1609,8 @@ class Emdcoupon:
             name="PresentAt",
             type="Attribute",
             help="Location of service provider where this coupon should be presented at",
+            min_length=1.0,
+            max_length=71.0
         )
     )
     non_refundable_ind: bool = field(
@@ -1648,8 +1651,8 @@ class Emdendorsement:
             name="value",
             type="Restriction",
             help=None,
-            min_length="1",
-            max_length="255"
+            min_length=1.0,
+            max_length=255.0
         )
     )
 
@@ -1766,6 +1769,7 @@ class ExemptTaxes:
             name="TaxTerritory",
             type="Attribute",
             help="exemption is achieved by sending in the TaxTerritory in the tax exempt price request.",
+            length=2
         )
     )
     company_name: str = field(
@@ -1774,6 +1778,8 @@ class ExemptTaxes:
             name="CompanyName",
             type="Attribute",
             help="The federal government body name must be provided in this element. This field is required by AC",
+            min_length=1.0,
+            max_length=24.0
         )
     )
 
@@ -2140,7 +2146,9 @@ class FareRuleCategory:
             name="Category",
             type="Attribute",
             help=None,
-            required=True
+            required=True,
+            min_inclusive=1.0,
+            max_inclusive=50.0
         )
     )
 
@@ -2450,6 +2458,7 @@ class FeeApplication:
             name="Code",
             type="Attribute",
             help="The code associated to the fee application. The choices are: 1, 2, 3, 4, 5, K, F",
+            length=1
         )
     )
 
@@ -2502,6 +2511,7 @@ class FlexExploreModifiers:
             name="GroupName",
             type="Attribute",
             help="Group name for a set of destinations to be searched. Use with Type=Group. Group names are defined in the Search Control Console. Supported Providers: 1G/1V/1P",
+            max_length=15.0
         )
     )
 
@@ -2607,6 +2617,8 @@ class FlightType:
             name="MaxConnections",
             type="Attribute",
             help="The maximum number of connections within a segment group.",
+            min_inclusive=-1.0,
+            max_inclusive=3.0
         )
     )
     max_stops: int = field(
@@ -2615,6 +2627,8 @@ class FlightType:
             name="MaxStops",
             type="Attribute",
             help="The maximum number of stops within a connection.",
+            min_inclusive=-1.0,
+            max_inclusive=3.0
         )
     )
     non_stop_directs: bool = field(
@@ -2955,8 +2969,8 @@ class MaxLayoverDurationRangeType:
             name="value",
             type="Restriction",
             help=None,
-            min_inclusive="0",
-            max_inclusive="9999"
+            min_inclusive=0.0,
+            max_inclusive=9999.0
         )
     )
 
@@ -3639,40 +3653,6 @@ class PaymentRef:
 
 
 @dataclass
-class Pcc:
-    """
-    Specify pseudo City
-    """
-
-    override_pcc: OverridePcc = field(
-        default=None,
-        metadata=dict(
-            name="OverridePCC",
-            type="Element",
-            help=None,
-        )
-    )
-    point_of_sale: List[PointOfSale] = field(
-        default_factory=list,
-        metadata=dict(
-            name="PointOfSale",
-            type="Element",
-            help=None,
-            min_occurs=0,
-            max_occurs=5
-        )
-    )
-    ticket_agency: TicketAgency = field(
-        default=None,
-        metadata=dict(
-            name="TicketAgency",
-            type="Element",
-            help=None,
-        )
-    )
-
-
-@dataclass
 class PenFeeType:
     dep_required: bool = field(
         default=None,
@@ -3896,6 +3876,7 @@ class PenaltyInformation:
             name="ChangeFeeApplicationCode",
             type="Attribute",
             help="Unique code associated with the PenaltyInformation text which defines how fees will be applied/calculated. E.g. J2 translates to 'From among all fare components, changed and unchanged....'",
+            length=2
         )
     )
 
@@ -4307,7 +4288,9 @@ class PromoCode:
             name="Code",
             type="Attribute",
             help="To be used to specify Promotional Code.",
-            required=True
+            required=True,
+            min_length=1.0,
+            max_length=64.0
         )
     )
     provider_code: TypeProviderCode = field(
@@ -4370,8 +4353,8 @@ class RefundAccessCode:
             name="value",
             type="Restriction",
             help=None,
-            min_length="1",
-            max_length="32"
+            min_length=1.0,
+            max_length=32.0
         )
     )
 
@@ -4752,6 +4735,7 @@ class SpecificSeatAssignment:
             name="RailCoachNumber",
             type="Attribute",
             help="Coach number for which rail seatmap/coachmap is returned.",
+            max_length=4.0
         )
     )
 
@@ -4873,7 +4857,8 @@ class SponsoredFltInfo:
             name="FltKey",
             type="Attribute",
             help="The unique identifying key for the sponsored flight.",
-            required=True
+            required=True,
+            max_length=5.0
         )
     )
 
@@ -4934,6 +4919,32 @@ class TextInfo:
             name="Title",
             type="Attribute",
             help=None,
+        )
+    )
+
+
+@dataclass
+class TicketAgency:
+    """
+    This modifier will override the pseudo of the ticketing agency found in the AAT (TKAG). Used for all plating carrier validation.
+    """
+
+    provider_code: str = field(
+        default=None,
+        metadata=dict(
+            name="ProviderCode",
+            type="Attribute",
+            help="The code of the Provider (e.g. 1G, 1P)",
+            required=True
+        )
+    )
+    pseudo_city_code: str = field(
+        default=None,
+        metadata=dict(
+            name="PseudoCityCode",
+            type="Attribute",
+            help="The PCC of the host system.",
+            required=True
         )
     )
 
@@ -5135,7 +5146,7 @@ class TypeAvailabilitySource:
             name="value",
             type="Restriction",
             help=None,
-            max_length="1"
+            max_length=1.0
         )
     )
 
@@ -5204,8 +5215,8 @@ class TypeBrandId:
             name="value",
             type="Restriction",
             help=None,
-            min_length="1",
-            max_length="19"
+            min_length=1.0,
+            max_length=19.0
         )
     )
 
@@ -5238,7 +5249,7 @@ class TypeCarCode:
             name="value",
             type="Restriction",
             help=None,
-            max_length="15"
+            max_length=15.0
         )
     )
 
@@ -5648,8 +5659,8 @@ class TypeFareTypeCode:
             name="value",
             type="Restriction",
             help=None,
-            min_length="1",
-            max_length="5"
+            min_length=1.0,
+            max_length=5.0
         )
     )
 
@@ -5770,8 +5781,8 @@ class TypeMaxJourneyTime:
             name="value",
             type="Restriction",
             help=None,
-            min_inclusive="0",
-            max_inclusive="99"
+            min_inclusive=0.0,
+            max_inclusive=99.0
         )
     )
 
@@ -5858,7 +5869,7 @@ class TypeOverrideOption:
             name="value",
             type="Restriction",
             help=None,
-            max_length="50"
+            max_length=50.0
         )
     )
 
@@ -5875,8 +5886,8 @@ class TypePassengerTicketNumber:
             name="value",
             type="Restriction",
             help=None,
-            min_length="1",
-            max_length="13"
+            min_length=1.0,
+            max_length=13.0
         )
     )
 
@@ -6115,8 +6126,8 @@ class TypeTicketDesignator:
             name="value",
             type="Restriction",
             help=None,
-            min_length="0",
-            max_length="20"
+            min_length=0.0,
+            max_length=20.0
         )
     )
 
@@ -6209,7 +6220,7 @@ class TypeTourCode:
             name="value",
             type="Restriction",
             help=None,
-            max_length="15"
+            max_length=15.0
         )
     )
 
@@ -6278,7 +6289,7 @@ class TypeValueCode:
             name="value",
             type="Restriction",
             help=None,
-            max_length="15"
+            max_length=15.0
         )
     )
 
@@ -7145,6 +7156,14 @@ class Apisrequirements:
             max_occurs=999
         )
     )
+    key: str = field(
+        default=None,
+        metadata=dict(
+            name="Key",
+            type="Attribute",
+            help="Unique identifier for this APIS Requirements - use this key when a single APIS Requirements is shared by multiple elements.",
+        )
+    )
     level: str = field(
         default=None,
         metadata=dict(
@@ -7938,6 +7957,8 @@ class Emd:
             name="FulfillmentType",
             type="Attribute",
             help="A one digit code specifying how the service must be fulfilled. See FulfillmentTypeDescription for the description of this value.",
+            min_inclusive=1.0,
+            max_inclusive=5.0
         )
     )
     fulfillment_type_description: str = field(
@@ -9128,6 +9149,40 @@ class PassengerTicketNumber:
 
 
 @dataclass
+class Pcc:
+    """
+    Specify pseudo City
+    """
+
+    override_pcc: OverridePcc = field(
+        default=None,
+        metadata=dict(
+            name="OverridePCC",
+            type="Element",
+            help=None,
+        )
+    )
+    point_of_sale: List[PointOfSale] = field(
+        default_factory=list,
+        metadata=dict(
+            name="PointOfSale",
+            type="Element",
+            help=None,
+            min_occurs=0,
+            max_occurs=5
+        )
+    )
+    ticket_agency: TicketAgency = field(
+        default=None,
+        metadata=dict(
+            name="TicketAgency",
+            type="Element",
+            help=None,
+        )
+    )
+
+
+@dataclass
 class PenaltyFareInformation:
     penalty_info: TypeFarePenalty = field(
         default=None,
@@ -9548,6 +9603,7 @@ class SelectionModifiers:
             name="RFIC",
             type="Attribute",
             help="Reason for issuance code for which EMDs will be generated on all the associated services.",
+            length=1
         )
     )
 
@@ -9656,6 +9712,7 @@ class SolutionGroup:
             name="Tag",
             type="Attribute",
             help="An arbitrary name for this group of solutions. Will be returned with the solution for idetification.",
+            max_length=20.0
         )
     )
     primary: bool = field(
@@ -10127,6 +10184,7 @@ class TicketInfo:
             name="TicketingAgentSignOn",
             type="Attribute",
             help=None,
+            max_length=8.0
         )
     )
     country_code: TypeCountry = field(
@@ -10427,6 +10485,8 @@ class WaiverCode:
             name="Endorsement",
             type="Attribute",
             help="Endorsement. Size can be up to 100 characters",
+            min_length=0.0,
+            max_length=100.0
         )
     )
 
@@ -11327,6 +11387,8 @@ class AirPricingModifiers:
             name="ChannelId",
             type="Attribute",
             help="A Channel ID is 2 to 4 alpha-numeric characters used to activate the Search Control Console filter for a specific group of travelers being served by the agency credential.",
+            min_length=2.0,
+            max_length=4.0
         )
     )
     return_fare_attributes: bool = field(
@@ -11456,6 +11518,14 @@ class AirRefundBundle:
             name="TicketNumber",
             type="Attribute",
             help=None,
+        )
+    )
+    ptc: str = field(
+        default=None,
+        metadata=dict(
+            name="PTC",
+            type="Attribute",
+            help="Specifies the passenger type code for 1P",
         )
     )
     refund_type: str = field(
@@ -12345,7 +12415,8 @@ class Coupon:
             name="BookingClass",
             type="Attribute",
             help="Booked fare class for coupon.",
-            required=True
+            required=True,
+            max_length=2.0
         )
     )
     fare_basis: str = field(
@@ -12379,7 +12450,8 @@ class Coupon:
             name="Status",
             type="Attribute",
             help="The status of this coupon returend from host is mapped as follows Code='A' Status='Airport Controlled' Code='C' Status='Checked In' Code='F' Status='Flown/Used' Code='L' Status='Boarded/Lifted' Code='O' Status='Open' Code='P' Status='Printed' Code='R' Status='Refunded' Code='E' Status='Exchanged' Code='V' Status='Void' Code='Z' Status='Archived/Carrier Modified' Code='U' Status='Unavailable' Code='S' Status='Suspended' Code='I' Status='Irregular Ops' Code='D' Status='Deleted/Removed' Code='X' Status='Unknown'",
-            required=True
+            required=True,
+            max_length=1.0
         )
     )
     segment_group: int = field(
@@ -12904,6 +12976,7 @@ class Facility:
             name="ServiceSubCode",
             type="Attribute",
             help="The service subcode associated with the Facility",
+            max_length=3.0
         )
     )
     ssrcode: TypeSsrcode = field(
@@ -12920,6 +12993,8 @@ class Facility:
             name="IssuanceReason",
             type="Attribute",
             help="A one-letter RFIC value filed by the airline in each Optional Service will be mapped to this attribute. RFIC is IATA Reason for Issuance Code. Possible codes are A (Air transportation),B (Surface Transportation),C(Bagage), D(Financial Impact),E(Airport Services),F(Merchandise),G(Inflight Services),I (Individual Airline use).",
+            min_length=1.0,
+            max_length=1.0
         )
     )
     base_seat_price: TypeMoney = field(
@@ -13508,6 +13583,7 @@ class FlightInfoDetail:
             name="OriginGate",
             type="Attribute",
             help="To be used to display origin flight gate number",
+            max_length=6.0
         )
     )
     destination_terminal: str = field(
@@ -13524,6 +13600,7 @@ class FlightInfoDetail:
             name="DestinationGate",
             type="Attribute",
             help="To be used to display destination flight gate number",
+            max_length=6.0
         )
     )
     automated_checkin: bool = field(
@@ -13725,6 +13802,8 @@ class FlightTimeDetail:
             name="InsideAvailability",
             type="Attribute",
             help=None,
+            min_length=1.0,
+            max_length=1.0
         )
     )
     secure_sell: str = field(
@@ -13733,6 +13812,8 @@ class FlightTimeDetail:
             name="SecureSell",
             type="Attribute",
             help=None,
+            min_length=0.0,
+            max_length=2.0
         )
     )
     availability_source: TypeAvailabilitySource = field(
@@ -13958,6 +14039,15 @@ class RepricingModifiers:
     Used for rapid reprice to provide additional options for the reprice. Providers: 1G/1V/1P/1S/1A
     """
 
+    private_fare_options: str = field(
+        default=None,
+        metadata=dict(
+            name="PrivateFareOptions",
+            type="Element",
+            help="Public and/or Private Fares requested for pricing. Currently supported: AccountCodeOnly, PrivateFaresOnly, PublicPrivateFaresOnly.",
+            max_length=50.0
+        )
+    )
     fare_type: List[FareType] = field(
         default_factory=list,
         metadata=dict(
@@ -13992,6 +14082,17 @@ class RepricingModifiers:
             help=None,
             min_occurs=0,
             max_occurs=999
+        )
+    )
+    withhold_tax_code: List[str] = field(
+        default_factory=list,
+        metadata=dict(
+            name="WithholdTaxCode",
+            type="Element",
+            help="Used to request tax withholding for the tax code specified. Providers supported 1G/1P",
+            min_occurs=0,
+            max_occurs=4,
+            length=2
         )
     )
     price_class_of_service: TypePriceClassOfService = field(
@@ -14048,6 +14149,7 @@ class RepricingModifiers:
             name="PenaltyAsTaxCode",
             type="Attribute",
             help="Used to request that the penalty be applied as a tax, to the tax code specified. Providers supported 1G/1P",
+            length=2
         )
     )
     air_pricing_solution_ref: TypeRef = field(
@@ -14104,6 +14206,8 @@ class RepricingModifiers:
             name="TimeWindow",
             type="Attribute",
             help="A value of Time Window is optional. Available in AirExchangeMultiQuoteReq only.",
+            min_inclusive=1.0,
+            max_inclusive=12.0
         )
     )
     flight_type: str = field(
@@ -14337,6 +14441,7 @@ class AirPricingCommand:
             name="CommandKey",
             type="Attribute",
             help="An identifier to link the pricing responses to the pricing commands. The value passed here will be returned in the resulting AirPricingInfo(s) from this command.",
+            max_length=10.0
         )
     )
     cabin_class: str = field(
@@ -14426,6 +14531,7 @@ class AutoPricingInfo:
             name="PricingType",
             type="Attribute",
             help="Indicates the Pricing Type used. The possible values are TicketRecord, StoredFare, PricingInstruction.",
+            max_length=25.0
         )
     )
     plating_carrier: TypeCarrier = field(
@@ -15152,6 +15258,7 @@ class OptionalService:
             name="ServiceSubCode",
             type="Attribute",
             help="The service subcode associated with the OptionalService",
+            max_length=3.0
         )
     )
     ssrcode: TypeSsrcode = field(
@@ -15168,6 +15275,8 @@ class OptionalService:
             name="IssuanceReason",
             type="Attribute",
             help="A one-letter code specifying the reason for issuance of the OptionalService",
+            min_length=1.0,
+            max_length=1.0
         )
     )
     provider_defined_type: str = field(
@@ -15176,6 +15285,8 @@ class OptionalService:
             name="ProviderDefinedType",
             type="Attribute",
             help="Original Type as sent by the provider",
+            min_length=1.0,
+            max_length=16.0
         )
     )
     key: TypeRef = field(
@@ -15208,6 +15319,8 @@ class OptionalService:
             name="ApplicableFFLevel",
             type="Attribute",
             help="Numerical value of the loyalty card level for which this service is available.",
+            min_inclusive=0.0,
+            max_inclusive=9.0
         )
     )
     private: bool = field(
@@ -15384,6 +15497,8 @@ class OptionalService:
             name="Tag",
             type="Attribute",
             help="Optional service group name.",
+            min_length=1.0,
+            max_length=256.0
         )
     )
     display_order: int = field(
@@ -15392,6 +15507,8 @@ class OptionalService:
             name="DisplayOrder",
             type="Attribute",
             help="Optional service group display order.",
+            min_inclusive=0.0,
+            max_inclusive=999.0
         )
     )
 
@@ -15904,6 +16021,8 @@ class TypeBaseAirSegment(Segment):
             name="NumberInParty",
             type="Attribute",
             help="Number of person traveling in this air segment excluding the number of infants on lap.",
+            min_inclusive=1.0,
+            max_inclusive=99.0
         )
     )
     rail_coach_number: str = field(
@@ -15912,6 +16031,7 @@ class TypeBaseAirSegment(Segment):
             name="RailCoachNumber",
             type="Attribute",
             help="Coach number for which rail seatmap/coachmap is returned.",
+            max_length=4.0
         )
     )
     booking_date: str = field(
@@ -16769,6 +16889,7 @@ class TicketingModifiers:
             name="Status",
             type="Attribute",
             help="DI line status - ex:Ticketed",
+            max_length=30.0
         )
     )
     free_text: str = field(
@@ -16777,6 +16898,7 @@ class TicketingModifiers:
             name="FreeText",
             type="Attribute",
             help="DI line information shown as free text as in Host. 1P only",
+            max_length=756.0
         )
     )
     name_number: str = field(
@@ -16833,6 +16955,7 @@ class TicketingModifiers:
             name="CurrencyOverrideCode",
             type="Attribute",
             help="This modifier allows an agency to specify the currency like L for Local, E for Euro, U for USD, C for CAD (Canadian dollars).",
+            length=1
         )
     )
     key: TypeRef = field(
@@ -18121,6 +18244,7 @@ class AirPricingInfo:
             name="CommandKey",
             type="Attribute",
             help="The command identifier used when this is in response to an AirPricingCommand. Not used in any request processing.",
+            max_length=10.0
         )
     )
     amount_type: StringLength1to32 = field(
@@ -18250,6 +18374,7 @@ class AirPricingInfo:
             name="PricingType",
             type="Attribute",
             help="Indicates the Pricing Type used. The possible values are TicketRecord, StoredFare, PricingInstruction.",
+            max_length=25.0
         )
     )
     true_last_date_to_ticket: str = field(
@@ -18266,6 +18391,7 @@ class AirPricingInfo:
             name="FareCalculationInd",
             type="Attribute",
             help="Fare calculation that was used to price the itinerary.",
+            length=1
         )
     )
     cat35_indicator: bool = field(
@@ -19327,6 +19453,7 @@ class AirPriceResult:
             name="CommandKey",
             type="Attribute",
             help="The command identifier used when this is in response to an AirPricingCommand. Not used in any request processing.",
+            max_length=10.0
         )
     )
 

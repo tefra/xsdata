@@ -21,8 +21,8 @@ class AlphaNumericStringLength0To1:
             name="value",
             type="Restriction",
             help=None,
-            min_length="0",
-            max_length="1"
+            min_length=0.0,
+            max_length=1.0
         )
     )
 
@@ -39,8 +39,8 @@ class AlphaNumericStringLength0To18:
             name="value",
             type="Restriction",
             help=None,
-            min_length="0",
-            max_length="18"
+            min_length=0.0,
+            max_length=18.0
         )
     )
 
@@ -57,8 +57,8 @@ class AlphaNumericStringLength0To3:
             name="value",
             type="Restriction",
             help=None,
-            min_length="0",
-            max_length="3"
+            min_length=0.0,
+            max_length=3.0
         )
     )
 
@@ -75,8 +75,8 @@ class AlphaNumericStringLength1To1:
             name="value",
             type="Restriction",
             help=None,
-            min_length="1",
-            max_length="1"
+            min_length=1.0,
+            max_length=1.0
         )
     )
 
@@ -93,8 +93,8 @@ class AlphaNumericStringLength1To10:
             name="value",
             type="Restriction",
             help=None,
-            min_length="1",
-            max_length="10"
+            min_length=1.0,
+            max_length=10.0
         )
     )
 
@@ -111,8 +111,8 @@ class AlphaNumericStringLength1To12:
             name="value",
             type="Restriction",
             help=None,
-            min_length="1",
-            max_length="12"
+            min_length=1.0,
+            max_length=12.0
         )
     )
 
@@ -129,8 +129,8 @@ class AlphaNumericStringLength1To18:
             name="value",
             type="Restriction",
             help=None,
-            min_length="1",
-            max_length="18"
+            min_length=1.0,
+            max_length=18.0
         )
     )
 
@@ -147,8 +147,8 @@ class AlphaNumericStringLength1To2:
             name="value",
             type="Restriction",
             help=None,
-            min_length="1",
-            max_length="2"
+            min_length=1.0,
+            max_length=2.0
         )
     )
 
@@ -165,8 +165,8 @@ class AlphaNumericStringLength1To20:
             name="value",
             type="Restriction",
             help=None,
-            min_length="1",
-            max_length="20"
+            min_length=1.0,
+            max_length=20.0
         )
     )
 
@@ -183,8 +183,8 @@ class AlphaNumericStringLength1To25:
             name="value",
             type="Restriction",
             help=None,
-            min_length="1",
-            max_length="25"
+            min_length=1.0,
+            max_length=25.0
         )
     )
 
@@ -201,8 +201,8 @@ class AlphaNumericStringLength1To250:
             name="value",
             type="Restriction",
             help=None,
-            min_length="1",
-            max_length="250"
+            min_length=1.0,
+            max_length=250.0
         )
     )
 
@@ -219,8 +219,8 @@ class AlphaNumericStringLength1To256:
             name="value",
             type="Restriction",
             help=None,
-            min_length="1",
-            max_length="256"
+            min_length=1.0,
+            max_length=256.0
         )
     )
 
@@ -237,8 +237,8 @@ class AlphaNumericStringLength1To28:
             name="value",
             type="Restriction",
             help=None,
-            min_length="1",
-            max_length="28"
+            min_length=1.0,
+            max_length=28.0
         )
     )
 
@@ -255,8 +255,8 @@ class AlphaNumericStringLength1To3:
             name="value",
             type="Restriction",
             help=None,
-            min_length="1",
-            max_length="3"
+            min_length=1.0,
+            max_length=3.0
         )
     )
 
@@ -273,8 +273,8 @@ class AlphaNumericStringLength1To30:
             name="value",
             type="Restriction",
             help=None,
-            min_length="1",
-            max_length="30"
+            min_length=1.0,
+            max_length=30.0
         )
     )
 
@@ -291,8 +291,8 @@ class AlphaNumericStringLength1To35:
             name="value",
             type="Restriction",
             help=None,
-            min_length="1",
-            max_length="35"
+            min_length=1.0,
+            max_length=35.0
         )
     )
 
@@ -309,8 +309,8 @@ class AlphaNumericStringLength1To4:
             name="value",
             type="Restriction",
             help=None,
-            min_length="1",
-            max_length="4"
+            min_length=1.0,
+            max_length=4.0
         )
     )
 
@@ -327,8 +327,8 @@ class AlphaNumericStringLength1To5:
             name="value",
             type="Restriction",
             help=None,
-            min_length="1",
-            max_length="5"
+            min_length=1.0,
+            max_length=5.0
         )
     )
 
@@ -345,8 +345,8 @@ class AlphaNumericStringLength1To50:
             name="value",
             type="Restriction",
             help=None,
-            min_length="1",
-            max_length="50"
+            min_length=1.0,
+            max_length=50.0
         )
     )
 
@@ -363,8 +363,8 @@ class AlphaNumericStringLength1To6:
             name="value",
             type="Restriction",
             help=None,
-            min_length="1",
-            max_length="6"
+            min_length=1.0,
+            max_length=6.0
         )
     )
 
@@ -381,8 +381,8 @@ class AlphaNumericStringLength1To7:
             name="value",
             type="Restriction",
             help=None,
-            min_length="1",
-            max_length="7"
+            min_length=1.0,
+            max_length=7.0
         )
     )
 
@@ -399,8 +399,8 @@ class AlphaNumericStringLength1To70:
             name="value",
             type="Restriction",
             help=None,
-            min_length="1",
-            max_length="70"
+            min_length=1.0,
+            max_length=70.0
         )
     )
 
@@ -417,8 +417,8 @@ class AlphaNumericStringLength1To8:
             name="value",
             type="Restriction",
             help=None,
-            min_length="1",
-            max_length="8"
+            min_length=1.0,
+            max_length=8.0
         )
     )
 
@@ -435,8 +435,8 @@ class AlphaNumericStringLength1To9:
             name="value",
             type="Restriction",
             help=None,
-            min_length="1",
-            max_length="9"
+            min_length=1.0,
+            max_length=9.0
         )
     )
 
@@ -453,8 +453,8 @@ class AlphaNumericStringLength2To3:
             name="value",
             type="Restriction",
             help=None,
-            min_length="2",
-            max_length="3"
+            min_length=2.0,
+            max_length=3.0
         )
     )
 
@@ -471,8 +471,8 @@ class AlphaNumericStringLength3To5:
             name="value",
             type="Restriction",
             help=None,
-            min_length="3",
-            max_length="5"
+            min_length=3.0,
+            max_length=5.0
         )
     )
 
@@ -489,8 +489,8 @@ class AlphaNumericStringLength6To6:
             name="value",
             type="Restriction",
             help=None,
-            min_length="6",
-            max_length="6"
+            min_length=6.0,
+            max_length=6.0
         )
     )
 
@@ -507,8 +507,8 @@ class AlphaStringLength0To1:
             name="value",
             type="Restriction",
             help=None,
-            min_length="0",
-            max_length="1"
+            min_length=0.0,
+            max_length=1.0
         )
     )
 
@@ -525,8 +525,8 @@ class AlphaStringLength1To1:
             name="value",
             type="Restriction",
             help=None,
-            min_length="1",
-            max_length="1"
+            min_length=1.0,
+            max_length=1.0
         )
     )
 
@@ -543,8 +543,8 @@ class AlphaStringLength1To2:
             name="value",
             type="Restriction",
             help=None,
-            min_length="1",
-            max_length="2"
+            min_length=1.0,
+            max_length=2.0
         )
     )
 
@@ -561,8 +561,8 @@ class AlphaStringLength1To3:
             name="value",
             type="Restriction",
             help=None,
-            min_length="1",
-            max_length="3"
+            min_length=1.0,
+            max_length=3.0
         )
     )
 
@@ -579,8 +579,8 @@ class AlphaStringLength3To3:
             name="value",
             type="Restriction",
             help=None,
-            min_length="3",
-            max_length="3"
+            min_length=3.0,
+            max_length=3.0
         )
     )
 
@@ -597,8 +597,8 @@ class AlphaStringLength3To5:
             name="value",
             type="Restriction",
             help=None,
-            min_length="3",
-            max_length="5"
+            min_length=3.0,
+            max_length=5.0
         )
     )
 
@@ -3591,6 +3591,14 @@ class SpecialRequirementsDataDetailsType:
             max_occurs=5
         )
     )
+    dummy_net: str = field(
+        default=None,
+        metadata=dict(
+            name="Dummy.NET",
+            type="Element",
+            help=None,
+        )
+    )
 
 
 @dataclass
@@ -4255,6 +4263,14 @@ class DateAndTimeInformationType:
             help="Details on date and time",
             min_occurs=1,
             max_occurs=2
+        )
+    )
+    dummy_net: str = field(
+        default=None,
+        metadata=dict(
+            name="Dummy.NET",
+            type="Element",
+            help=None,
         )
     )
 
@@ -5100,6 +5116,14 @@ class ReferenceInfoType:
             help="Referencing details",
             min_occurs=0,
             max_occurs=9
+        )
+    )
+    dummy_net: str = field(
+        default=None,
+        metadata=dict(
+            name="Dummy.NET",
+            type="Element",
+            help=None,
         )
     )
 

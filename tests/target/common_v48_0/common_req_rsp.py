@@ -388,6 +388,7 @@ class BaseCreateReservationReq(BaseReq):
             name="RuleName",
             type="Attribute",
             help="This attribute is meant to attach a mandatory custom check rule name to a PNR. A non-mandatory custom check rule too can be attached to a PNR.",
+            max_length=10.0
         )
     )
     universal_record_locator_code: TypeLocatorCode = field(

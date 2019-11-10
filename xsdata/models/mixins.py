@@ -72,7 +72,6 @@ class OccurrencesMixin:
         max_occurs = getattr(self, "max_occurs", 1)
         if min_occurs == max_occurs == 1:
             return dict(required=True)
-        elif min_occurs == 0 and max_occurs == 1:
-            return dict()
-
-        return dict(min_occurs=min_occurs, max_occurs=max_occurs,)
+        if max_occurs > min_occurs and max_occurs > 1:
+            return dict(min_occurs=min_occurs, max_occurs=max_occurs)
+        return dict()

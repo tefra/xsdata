@@ -1,4 +1,5 @@
 import sys
+from unittest import TestCase
 
 from tests.testcases import ModelTestCase
 from xsdata.models.elements import (
@@ -20,7 +21,22 @@ from xsdata.models.elements import (
 from xsdata.parser import SchemaParser
 
 
-class ComplexTypeTests(ModelTestCase):
+class ComplexTypeTests(TestCase):
+    def test_raw_base_property(self):
+        obj = ComplexType.build()
+        self.assertIsNone(obj.raw_base)
+
+        obj.complex_content = ComplexContent.build()
+        self.assertIsNone(obj.raw_base)
+
+        obj.complex_content.extension = Extension.build()
+        self.assertIsNone(obj.raw_base)
+
+        obj.complex_content.extension.base = "foo_bar"
+        self.assertEqual("foo_bar", obj.raw_base)
+
+
+class ComplexTypeDeserializeTests(ModelTestCase):
     result: BaseModel
 
     @classmethod
@@ -96,7 +112,7 @@ class ComplexTypeTests(ModelTestCase):
                             simple_type=SimpleType.build(
                                 restriction=Restriction.build(
                                     base="xs:string",
-                                    min_length=MinLength.build(value="1"),
+                                    min_length=MinLength.build(value=1),
                                 )
                             ),
                         )

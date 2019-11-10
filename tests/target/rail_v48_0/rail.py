@@ -49,8 +49,8 @@ class FulFillmentType:
             name="value",
             type="Restriction",
             help=None,
-            min_length="0",
-            max_length="255"
+            min_length=0.0,
+            max_length=255.0
         )
     )
 
@@ -108,7 +108,9 @@ class RailAutoSeatAssignment:
             name="SeatType",
             type="Attribute",
             help="Indicates codeset of values such as Seat Type like Place,Position, Smoking Choice, Place Arrangement, Place Direction, Compartment.",
-            required=True
+            required=True,
+            min_length=0.0,
+            max_length=255.0
         )
     )
     seat_value: str = field(
@@ -117,7 +119,9 @@ class RailAutoSeatAssignment:
             name="SeatValue",
             type="Attribute",
             help="Indicates the value specific to the selected type.",
-            required=True
+            required=True,
+            min_length=0.0,
+            max_length=255.0
         )
     )
     rail_segment_ref: TypeRef = field(
@@ -842,8 +846,8 @@ class TypeTrainNumber:
             name="value",
             type="Restriction",
             help=None,
-            min_length="1",
-            max_length="8"
+            min_length=1.0,
+            max_length=8.0
         )
     )
 
@@ -860,8 +864,8 @@ class TypeTrainType:
             name="value",
             type="Restriction",
             help=None,
-            min_length="1",
-            max_length="8"
+            min_length=1.0,
+            max_length=8.0
         )
     )
 
@@ -1069,6 +1073,8 @@ class RailFare:
             name="FareReference",
             type="Attribute",
             help="Unique reference for the fare that is required in RailExchangeQuote request.",
+            min_length=1.0,
+            max_length=32.0
         )
     )
     cross_city_fare: bool = field(
@@ -1220,6 +1226,8 @@ class RailSearchModifiers:
             name="MaxChanges",
             type="Attribute",
             help="The maximum number of stops within a connection.",
+            min_inclusive=0.0,
+            max_inclusive=3.0
         )
     )
     direction: TypeRailDirection = field(
@@ -1314,7 +1322,9 @@ class RailTicketInfo:
             name="Number",
             type="Attribute",
             help="Ticket number.",
-            required=True
+            required=True,
+            min_length=1.0,
+            max_length=19.0
         )
     )
     issue_location: str = field(
@@ -1323,6 +1333,8 @@ class RailTicketInfo:
             name="IssueLocation",
             type="Attribute",
             help="Issue location is internal distributor code associated with the PCC.",
+            min_length=0.0,
+            max_length=128.0
         )
     )
     ticket_status: StringLength1to255 = field(
@@ -1339,6 +1351,8 @@ class RailTicketInfo:
             name="TicketFormType",
             type="Attribute",
             help="FormType of Ticket.",
+            min_length=0.0,
+            max_length=255.0
         )
     )
     traffic_type: StringLength1to255 = field(
@@ -1705,6 +1719,7 @@ class RailJourney:
             name="RouteDescription",
             type="Attribute",
             help="The description of the route.",
+            max_length=255.0
         )
     )
     journey_direction: TypeJourneyDirection = field(
@@ -1761,6 +1776,8 @@ class RailJourney:
             name="RouteReference",
             type="Attribute",
             help="RouteReference is required in seat assignment purpose",
+            min_length=0.0,
+            max_length=255.0
         )
     )
     operation: str = field(

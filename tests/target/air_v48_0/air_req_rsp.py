@@ -577,6 +577,8 @@ class AirFareDisplayReq(BaseReq):
             name="ChannelId",
             type="Attribute",
             help="A Channel ID is 4 alpha-numeric characters used to activate the Search Control Console filter for a specific group of travelers being served by the agency credential.",
+            min_length=2.0,
+            max_length=4.0
         )
     )
     nscc: str = field(
@@ -585,6 +587,8 @@ class AirFareDisplayReq(BaseReq):
             name="NSCC",
             type="Attribute",
             help="1 to 3 numeric that define a Search Control Console filter.This attribute is used to override that filter.",
+            min_length=1.0,
+            max_length=3.0
         )
     )
     return_mm: bool = field(
@@ -686,6 +690,16 @@ class AirFareRulesReq(BaseReq):
 
     @dataclass
     class FareRulesFilterCategory:
+        category_code: List[str] = field(
+            default_factory=list,
+            metadata=dict(
+                name="CategoryCode",
+                type="Element",
+                help="Structured Fare Rules can be requested for 'ADV', 'MIN', 'MAX', 'STP', and 'CHG'.",
+                min_occurs=1,
+                max_occurs=35
+            )
+        )
         fare_info_ref: str = field(
             default=None,
             metadata=dict(
@@ -1797,6 +1811,8 @@ class BaseAirPriceReq(BaseCoreReq):
             name="NSCC",
             type="Attribute",
             help="1 to 3 numeric that defines a Search Control Console filter.This attribute is used to override that filter.",
+            min_length=1.0,
+            max_length=3.0
         )
     )
     split_pricing: bool = field(
@@ -3057,6 +3073,8 @@ class AvailabilitySearchReq(AirSearchReq):
             name="ChannelId",
             type="Attribute",
             help="A Channel ID is 4 alpha-numeric characters used to activate the Search Control Console filter for a specific group of travelers being served by the agency credential.",
+            min_length=2.0,
+            max_length=4.0
         )
     )
     nscc: str = field(
@@ -3065,6 +3083,8 @@ class AvailabilitySearchReq(AirSearchReq):
             name="NSCC",
             type="Attribute",
             help="Allows the agency to bypass/override the Search Control Console rule.",
+            min_length=1.0,
+            max_length=3.0
         )
     )
 
@@ -3189,6 +3209,8 @@ class BaseLowFareSearchReq(BaseAirSearchReq):
             name="MetaOptionIdentifier",
             type="Attribute",
             help="Invoke Meta Search. Valid values are 00 to 99, or D for the default meta search configuration. When Meta Search not requested, normal LowFareSearch applies. Supported Providers; 1g/1v/1p/1j",
+            min_length=1.0,
+            max_length=2.0
         )
     )
     return_upsell_fare: bool = field(
@@ -3245,6 +3267,8 @@ class BaseLowFareSearchReq(BaseAirSearchReq):
             name="NSCC",
             type="Attribute",
             help="1 to 3 numeric that defines a Search Control Console filter.This attribute is used to override that filter.",
+            min_length=1.0,
+            max_length=3.0
         )
     )
     fare_info_rules: bool = field(

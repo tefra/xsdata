@@ -18,27 +18,27 @@ from xsdata.parser import SchemaParser
 
 
 class SimpleTypeTests(TestCase):
-    def test_property_raw_name(self):
+    def test_property_real_name(self):
         obj = SimpleType.build(name="foo")
-        self.assertEqual("foo", obj.raw_name)
+        self.assertEqual("foo", obj.real_name)
 
         with self.assertRaises(NotImplementedError):
             obj = SimpleType.build()
             self.assertFalse(hasattr(obj, "ref"))
-            obj.raw_name
+            obj.real_name
 
-    def test_property_raw_base(self):
-        self.assertIsNone(SimpleType.build().raw_base)
+    def test_property_real_base(self):
+        self.assertIsNone(SimpleType.build().real_base)
 
-    def test_property_raw_type(self):
+    def test_property_real_type(self):
         obj = SimpleType.build()
-        self.assertIsNone(obj.raw_type)
+        self.assertIsNone(obj.real_type)
 
         obj.list = List.build(item_type="foo")
-        self.assertEquals("foo", obj.raw_type)
+        self.assertEqual("foo", obj.real_type)
 
         obj.restriction = Restriction.build(base="bar")
-        self.assertEquals("bar", obj.raw_type)
+        self.assertEqual("bar", obj.real_type)
 
     def test_get_restrictions(self):
         obj = SimpleType.build()

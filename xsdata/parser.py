@@ -33,7 +33,7 @@ class SchemaParser:
                 )
 
             if event == Event.START:
-                builder = getattr(elements, capitalize(tag.value))
+                builder = getattr(elements, capitalize(tag.value) or "")
                 element = builder.from_element(elem)
                 self.elements.append(element)
             elif event == Event.END:
@@ -46,6 +46,10 @@ class SchemaParser:
                 method(element, elem)
 
         return element
+
+    def end_schema(self, element, *args):
+        assert isinstance(element, Schema)
+        element.location = self.path
 
     def assign_to_parent(self, element):
         name = snake_case(type(element).__name__)

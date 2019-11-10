@@ -4,10 +4,10 @@ from typing import List
 import click
 import click_completion
 
-from xsdata.generator import CodeGenerator
+from xsdata.builder import builder
 from xsdata.parser import SchemaParser
 from xsdata.version import version
-from xsdata.writer import CodeWriter
+from xsdata.writer import writer
 
 click_completion.init(complete_options=True)
 
@@ -27,53 +27,48 @@ def cli(ctx: click.Context):
     required=True,
     help="Target directory",
 )
-@click.option("--theme", help="Target theme", default="dataclass")
-@click.option("--verbose", is_flag=True, help="Pretty print result")
-def generate(file: str, target: str, theme: str, verbose: bool = False):
+@click.option(
+    "--renderer",
+    type=click.Choice(writer.formats),
+    help="Output renderer",
+    default="pydata",
+)
+def generate(file: str, target: str, renderer: str):
     process(
         xsd_path=Path(file).resolve(),
-        theme=theme,
         target=Path(target).resolve(),
+        renderer=renderer,
     )
 
 
 processed: List[Path] = []
 
 
-def process(xsd_path, theme, target, target_adjusted=False):
+def process(
+    xsd_path: Path, target: Path, renderer: str, target_adjusted=False
+):
 
     if xsd_path in processed:
         return
 
     processed.append(xsd_path)
 
-    reader = SchemaParser(path=xsd_path)
-    schema = reader.parse()
-    module = xsd_path.stem
+    schema = SchemaParser(path=xsd_path).parse()
     if not target_adjusted:
-        target = CodeWriter.adjust_target(target, xsd_path, schema)
+        target = writer.adjust_target(target, xsd_path, schema)
 
-    imports = schema.imports + schema.includes
-    CodeWriter.organize_imports(imports)
-    for _import in imports:
-        import_xsd_path = xsd_path.parent.joinpath(
-            _import.schema_location
-        ).resolve()
-        import_target_path = target.joinpath(
-            _import.schema_location
-        ).parent.resolve()
+    for sub_schema in schema.sub_schemas():
         process(
-            import_xsd_path, theme, import_target_path, target_adjusted=True
+            xsd_path=xsd_path.parent.joinpath(sub_schema).resolve(),
+            target=target.joinpath(sub_schema).parent.resolve(),
+            renderer=renderer,
+            target_adjusted=True,
         )
 
-    classes = CodeGenerator(schema=schema).generate()
-    CodeWriter(
-        module=module,
-        classes=classes,
-        imports=imports,
-        theme=theme,
-        target=target,
-    ).write()
+    classes = builder.build(schema=schema)
+    writer.write(
+        schema=schema, classes=classes, target=target, renderer=renderer
+    )
 
 
 if __name__ == "__main__":

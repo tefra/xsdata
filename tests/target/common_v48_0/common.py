@@ -5,15 +5,6 @@ from typing import List
 
 
 @dataclass
-class BookingTravelerName:
-    """
-    Complete name fields
-    """
-
-    pass
-
-
-@dataclass
 class CustomProfileInformation:
     """
     Custom Profile Field Data required for File Finishing
@@ -32,75 +23,7 @@ class Location:
 
 
 @dataclass
-class OperatedBy:
-    """
-    This is the carrier code to support Cross Accrual
-    """
-
-    pass
-
-
-@dataclass
-class OptionalServiceApplicationLimitType:
-    """
-    The optional service application limit
-    """
-
-    pass
-
-
-@dataclass
-class PseudoCityCode:
-    pass
-
-
-@dataclass
-class QueueSelector:
-    """
-    Identifies the Queue with Queue Number , Category and Date Range.
-    """
-
-    pass
-
-
-@dataclass
-class State:
-    """
-    Container to house the state code for an address
-    """
-
-    pass
-
-
-@dataclass
-class TaxDetail:
-    """
-    The tax idetail nformation for a fare quote tax.
-    """
-
-    pass
-
-
-@dataclass
 class TypeAgentInfo:
-    pass
-
-
-@dataclass
-class TypeFreeFormText:
-    """
-    Free form Text
-    """
-
-    pass
-
-
-@dataclass
-class TypeProviderReservationDetail:
-    """
-    Details of a provider reservation locator consisting of provider locator code and provider code. To be used as a request element type while accessing a specific PNR
-    """
-
     pass
 
 
@@ -116,31 +39,6 @@ class TypeResponseImageSize:
 @dataclass
 class TypeSearchTimeSpec:
     pass
-
-
-@dataclass
-class AccountCode:
-    """
-    it will be considered a default AccounCode to be sent to all the Providers or Suppliers.
-    """
-
-    code: str = field(
-        default=None,
-        metadata=dict(
-            name="Code",
-            type="Attribute",
-            help=None,
-            max_length=36.0
-        )
-    )
-    type: str = field(
-        default=None,
-        metadata=dict(
-            name="Type",
-            type="Attribute",
-            help="An identifier to categorize this account code. For example, FlightPass for AC Flight Pass or RFB for AC corporate Rewards for Business.",
-        )
-    )
 
 
 @dataclass
@@ -223,6 +121,258 @@ class Arcpayment:
             type="Attribute",
             help="Value of the ARC Direct Bill id password",
             max_length=128.0
+        )
+    )
+
+
+@dataclass
+class AttrAgentOverride:
+    agent_override: str = field(
+        default=None,
+        metadata=dict(
+            name="AgentOverride",
+            type="Attribute",
+            help="AgentSine value that was used during PNR creation or End Transact.",
+            min_length=1.0,
+            max_length=32.0
+        )
+    )
+
+
+@dataclass
+class AttrDow:
+    """
+    Basic attributes used to describe day of week
+    """
+
+    mon: bool = field(
+        default=None,
+        metadata=dict(
+            name="Mon",
+            type="Attribute",
+            help=None,
+        )
+    )
+    tue: bool = field(
+        default=None,
+        metadata=dict(
+            name="Tue",
+            type="Attribute",
+            help=None,
+        )
+    )
+    wed: bool = field(
+        default=None,
+        metadata=dict(
+            name="Wed",
+            type="Attribute",
+            help=None,
+        )
+    )
+    thu: bool = field(
+        default=None,
+        metadata=dict(
+            name="Thu",
+            type="Attribute",
+            help=None,
+        )
+    )
+    fri: bool = field(
+        default=None,
+        metadata=dict(
+            name="Fri",
+            type="Attribute",
+            help=None,
+        )
+    )
+    sat: bool = field(
+        default=None,
+        metadata=dict(
+            name="Sat",
+            type="Attribute",
+            help=None,
+        )
+    )
+    sun: bool = field(
+        default=None,
+        metadata=dict(
+            name="Sun",
+            type="Attribute",
+            help=None,
+        )
+    )
+
+
+@dataclass
+class AttrFlexShopping:
+    tier: int = field(
+        default=None,
+        metadata=dict(
+            name="Tier",
+            type="Attribute",
+            help="Indicate the Tier Level",
+        )
+    )
+    days_enabled: bool = field(
+        default=None,
+        metadata=dict(
+            name="DaysEnabled",
+            type="Attribute",
+            help="Allow or prohibit Flexible Days (within a date range) shopping option",
+        )
+    )
+    weekends_enabled: bool = field(
+        default=None,
+        metadata=dict(
+            name="WeekendsEnabled",
+            type="Attribute",
+            help="Allow or prohibit Flexible Weekends shopping option",
+        )
+    )
+    airports_enabled: bool = field(
+        default=None,
+        metadata=dict(
+            name="AirportsEnabled",
+            type="Attribute",
+            help="Allow or prohibit Flexible Airport (choice of Origin and Destination airports) shopping option",
+        )
+    )
+    odenabled: bool = field(
+        default=None,
+        metadata=dict(
+            name="ODEnabled",
+            type="Attribute",
+            help="Allow or prohibit Flexible Origin and Destination (choice of airports within a radius) shopping option",
+        )
+    )
+
+
+@dataclass
+class AttrFlightTimes:
+    """
+    Basic attributes used to describe flight time information
+    """
+
+    flight_time: int = field(
+        default=None,
+        metadata=dict(
+            name="FlightTime",
+            type="Attribute",
+            help="Time spent (minutes) traveling in flight, including airport taxi time.",
+        )
+    )
+    travel_time: int = field(
+        default=None,
+        metadata=dict(
+            name="TravelTime",
+            type="Attribute",
+            help="Total time spent (minutes) traveling including flight time and ground time.",
+        )
+    )
+    distance: int = field(
+        default=None,
+        metadata=dict(
+            name="Distance",
+            type="Attribute",
+            help="The distance traveled. Units are specified in the parent response element.",
+        )
+    )
+
+
+@dataclass
+class AttrName:
+    """
+    Basic attributes used to describe a name
+    """
+
+    prefix: str = field(
+        default=None,
+        metadata=dict(
+            name="Prefix",
+            type="Attribute",
+            help=None,
+        )
+    )
+    first: str = field(
+        default=None,
+        metadata=dict(
+            name="First",
+            type="Attribute",
+            help=None,
+        )
+    )
+    middle: str = field(
+        default=None,
+        metadata=dict(
+            name="Middle",
+            type="Attribute",
+            help=None,
+        )
+    )
+    last: str = field(
+        default=None,
+        metadata=dict(
+            name="Last",
+            type="Attribute",
+            help=None,
+            required=True,
+            min_length=1.0
+        )
+    )
+    suffix: str = field(
+        default=None,
+        metadata=dict(
+            name="Suffix",
+            type="Attribute",
+            help=None,
+        )
+    )
+
+
+@dataclass
+class AttrQueueInfo:
+    """
+    Attributes related to queue information
+    """
+
+    queue: str = field(
+        default=None,
+        metadata=dict(
+            name="Queue",
+            type="Attribute",
+            help="Queue Number . Possible values are 01, AA , A1 etc.",
+        )
+    )
+    category: str = field(
+        default=None,
+        metadata=dict(
+            name="Category",
+            type="Attribute",
+            help="If using for Sabre is mandatory and is Prefatory Instruction Code value of 0-999.",
+        )
+    )
+    date_range: str = field(
+        default=None,
+        metadata=dict(
+            name="DateRange",
+            type="Attribute",
+            help="Date range number where the PNR should be queued. Possible values are 1,2,1-4 etc.",
+        )
+    )
+
+
+@dataclass
+class AttrReqRspInfo:
+    """
+    Basic information on all request response pairs.
+    """
+
+    transaction_id: str = field(
+        default=None,
+        metadata=dict(
+            name="TransactionId",
+            type="Attribute",
+            help="Unique identifier for this atomic transaction. Use is optional.",
         )
     )
 
@@ -471,7 +621,7 @@ class CoordinateLocation(Location):
 
 
 @dataclass
-class CorporateDiscountId:
+class CorporateDiscountId(str):
     """
     These are zero or more negotiated rate codes
     """
@@ -556,7 +706,7 @@ class Distance:
 
 
 @dataclass
-class FormattedTextTextType:
+class FormattedTextTextType(str):
     """
     Provides text and indicates whether it is formatted or not.
     """
@@ -631,6 +781,22 @@ class KeyMapping:
 
 
 @dataclass
+class LanguageGroup:
+    """
+    Identifies language.
+    """
+
+    language: str = field(
+        default=None,
+        metadata=dict(
+            name="Language",
+            type="Attribute",
+            help="Language identification.",
+        )
+    )
+
+
+@dataclass
 class LocatorCode:
     """
     A locator code that identifies a PNR or searches for one.
@@ -643,18 +809,6 @@ class LocatorCode:
             type="Restriction",
             help=None,
             min_length=1.0
-        )
-    )
-
-
-@dataclass
-class LoyaltyProgram:
-    level: str = field(
-        default=None,
-        metadata=dict(
-            name="Level",
-            type="Attribute",
-            help=None,
         )
     )
 
@@ -678,23 +832,7 @@ class MarketingInformation:
 
 
 @dataclass
-class McofeeInfo:
-    """
-    Information related to the PTA/TOD (Prepaid Ticket Advice / Ticket on Departure) related to the MCO
-    """
-
-    fee_applies_to_ind: str = field(
-        default=None,
-        metadata=dict(
-            name="FeeAppliesToInd",
-            type="Attribute",
-            help="Indicates if PTA/TOD fee is for the entire MCO or is per person.",
-        )
-    )
-
-
-@dataclass
-class Mcoremark:
+class Mcoremark(str):
     """
     Information related to fare construction, free form text etc. of the MCO
     """
@@ -705,22 +843,6 @@ class Mcoremark:
             name="AdditionalRmk",
             type="Attribute",
             help="Indicates if the remark is additional remark or not.",
-        )
-    )
-
-
-@dataclass
-class Mcotext(TypeFreeFormText):
-    """
-    All type of free format text messages related to MCO like - Command Text, Agent Entry, MCO Modifiers, Text Message
-    """
-
-    type: str = field(
-        default=None,
-        metadata=dict(
-            name="Type",
-            type="Attribute",
-            help="The type of text. Possible values: Command Text, Agent Entry, MCO Modifiers, Text Message",
         )
     )
 
@@ -926,7 +1048,7 @@ class OptionalServiceApplicabilityType:
 
 
 @dataclass
-class OtherGuaranteeInfo:
+class OtherGuaranteeInfo(str):
     type: str = field(
         default=None,
         metadata=dict(
@@ -936,15 +1058,6 @@ class OtherGuaranteeInfo:
             required=True
         )
     )
-
-
-@dataclass
-class ProviderReservationDetail(TypeProviderReservationDetail):
-    """
-    common element for mentioning provider reservation locator (PNR) details in request.
-    """
-
-    pass
 
 
 @dataclass
@@ -1010,7 +1123,7 @@ class Requisition:
 
 
 @dataclass
-class ResponseMessage:
+class ResponseMessage(str):
     """
     A simple textual fare note. Used within several other objects.
     """
@@ -1168,6 +1281,15 @@ class SellMessage(str):
 class SimpleName(str):
     """
     Free text name
+    """
+
+    pass
+
+
+@dataclass
+class State(str):
+    """
+    Container to house the state code for an address
     """
 
     pass
@@ -2434,6 +2556,15 @@ class TypeFormOfRefund:
 
 
 @dataclass
+class TypeFreeFormText(str):
+    """
+    Free form Text
+    """
+
+    pass
+
+
+@dataclass
 class TypeFuel:
     value: str = field(
         default=None,
@@ -3606,7 +3737,7 @@ class TypeResidency:
 
 
 @dataclass
-class TypeResultMessage:
+class TypeResultMessage(str):
     """
     Used to identify the results of a requests
     """
@@ -4171,82 +4302,6 @@ class UrticketStatus:
 
 
 @dataclass
-class AccountingRemark:
-    """
-    An accounting remark container to hold any printable text.
-    """
-
-    remark_data: str = field(
-        default=None,
-        metadata=dict(
-            name="RemarkData",
-            type="Element",
-            help="Actual remarks data.",
-            required=True
-        )
-    )
-    booking_traveler_ref: List[TypeRef] = field(
-        default_factory=list,
-        metadata=dict(
-            name="BookingTravelerRef",
-            type="Element",
-            help="Reference to Booking Traveler.",
-            min_occurs=0,
-            max_occurs=999
-        )
-    )
-    key: TypeRef = field(
-        default=None,
-        metadata=dict(
-            name="Key",
-            type="Attribute",
-            help=None,
-        )
-    )
-    category: str = field(
-        default=None,
-        metadata=dict(
-            name="Category",
-            type="Attribute",
-            help="A category to group and organize the various remarks. This is not required, but it is recommended.",
-            max_length=14.0
-        )
-    )
-    type_in_gds: TypeGdsAccountingRemark = field(
-        default=None,
-        metadata=dict(
-            name="TypeInGds",
-            type="Attribute",
-            help=None,
-        )
-    )
-    provider_reservation_info_ref: TypeRef = field(
-        default=None,
-        metadata=dict(
-            name="ProviderReservationInfoRef",
-            type="Attribute",
-            help="Provider reservation reference key.",
-        )
-    )
-    provider_code: TypeProviderCode = field(
-        default=None,
-        metadata=dict(
-            name="ProviderCode",
-            type="Attribute",
-            help="Contains the Provider Code of the provider for which this accounting remark is used",
-        )
-    )
-    use_provider_native_mode: bool = field(
-        default="false",
-        metadata=dict(
-            name="UseProviderNativeMode",
-            type="Attribute",
-            help="Will be true when terminal process required, else false",
-        )
-    )
-
-
-@dataclass
 class AddSvc:
     """
     1P - Add SVC segments to collect additional fee
@@ -4382,7 +4437,7 @@ class AgencySellInfo:
 
 
 @dataclass
-class AgentAction:
+class AgentAction(AttrAgentOverride):
     """
     Depending on context, this will represent information about which agent perform different actions.
     """
@@ -4496,65 +4551,616 @@ class Airport(Location):
 
 
 @dataclass
-class AppliedProfile:
+class AttrAmountPercent:
     """
-    A simple container to specify the profiles that were applied to a reservation.
+    Amount or Percentage
     """
 
+    amount: TypeMoney = field(
+        default=None,
+        metadata=dict(
+            name="Amount",
+            type="Attribute",
+            help="The monetary amount.",
+        )
+    )
+    percentage: TypePercentageWithDecimal = field(
+        default=None,
+        metadata=dict(
+            name="Percentage",
+            type="Attribute",
+            help="The percentage.",
+        )
+    )
+
+
+@dataclass
+class AttrAppliedProfilePaymentInfo:
+    """
+    ProfileID and Key are required in order to reference a payment method from a profile.
+    """
+
+    profile_id: str = field(
+        default=None,
+        metadata=dict(
+            name="ProfileID",
+            type="Attribute",
+            help="The unique ID of the profile that contains the payment details to use.",
+        )
+    )
     key: TypeRef = field(
         default=None,
         metadata=dict(
             name="Key",
             type="Attribute",
-            help="Key for update/delete of the element",
+            help="The Key assigned to the payment details value from the specified profile.",
         )
     )
-    traveler_id: str = field(
+
+
+@dataclass
+class AttrBookingTravelerGrp:
+    key: TypeRef = field(
         default=None,
         metadata=dict(
-            name="TravelerID",
+            name="Key",
             type="Attribute",
-            help="The ID of the TravelerProfile that was applied",
+            help=None,
         )
     )
-    traveler_name: str = field(
+    traveler_type: TypePtc = field(
         default=None,
         metadata=dict(
-            name="TravelerName",
+            name="TravelerType",
             type="Attribute",
-            help="The name from the TravelerProfile that was applied",
+            help="Defines the type of traveler used for booking which could be a non-defining type (Companion, Web-fare, etc), or a standard type (Adult, Child, etc).",
         )
     )
-    account_id: str = field(
+    age: int = field(
         default=None,
         metadata=dict(
-            name="AccountID",
+            name="Age",
             type="Attribute",
-            help="The ID of the AccountProfile that was applied",
+            help="BookingTraveler age",
         )
     )
-    account_name: str = field(
-        default=None,
+    vip: bool = field(
+        default="false",
         metadata=dict(
-            name="AccountName",
+            name="VIP",
             type="Attribute",
-            help="The name from the AccountProfile that was applied",
+            help="When set to True indicates that the Booking Traveler is a VIP based on agency/customer criteria",
         )
     )
-    immediate_parent_id: str = field(
+    dob: str = field(
         default=None,
         metadata=dict(
-            name="ImmediateParentID",
+            name="DOB",
             type="Attribute",
-            help="The ID of the immediate parent that was applied",
+            help="Traveler Date of Birth",
         )
     )
-    immediate_parent_name: str = field(
+    gender: TypeGender = field(
         default=None,
         metadata=dict(
-            name="ImmediateParentName",
+            name="Gender",
             type="Attribute",
-            help="The name of the immediate parent that was applied",
+            help="The BookingTraveler gender type",
+        )
+    )
+    nationality: TypeCountry = field(
+        default=None,
+        metadata=dict(
+            name="Nationality",
+            type="Attribute",
+            help="Specify ISO country code for nationality of the Booking Traveler",
+        )
+    )
+
+
+@dataclass
+class AttrBookingTravelerName:
+    """
+    Details of Booking Traveler Name
+    """
+
+    prefix: str = field(
+        default=None,
+        metadata=dict(
+            name="Prefix",
+            type="Attribute",
+            help="Name prefix.",
+            min_length=1.0,
+            max_length=20.0
+        )
+    )
+    first: str = field(
+        default=None,
+        metadata=dict(
+            name="First",
+            type="Attribute",
+            help="First Name.",
+            required=True,
+            min_length=1.0,
+            max_length=256.0
+        )
+    )
+    middle: str = field(
+        default=None,
+        metadata=dict(
+            name="Middle",
+            type="Attribute",
+            help="Midle name.",
+            min_length=1.0,
+            max_length=256.0
+        )
+    )
+    last: TypeTravelerLastName = field(
+        default=None,
+        metadata=dict(
+            name="Last",
+            type="Attribute",
+            help="Last Name.",
+            required=True
+        )
+    )
+    suffix: str = field(
+        default=None,
+        metadata=dict(
+            name="Suffix",
+            type="Attribute",
+            help="Name suffix.",
+            min_length=1.0,
+            max_length=256.0
+        )
+    )
+
+
+@dataclass
+class AttrCommissionRemark:
+    amount: TypeMoney = field(
+        default=None,
+        metadata=dict(
+            name="Amount",
+            type="Attribute",
+            help="The monetary amount of the commission.",
+        )
+    )
+    percentage: TypePercentageWithDecimal = field(
+        default=None,
+        metadata=dict(
+            name="Percentage",
+            type="Attribute",
+            help="The percent of the commission.",
+        )
+    )
+    commission_cap: TypeMoney = field(
+        default=None,
+        metadata=dict(
+            name="CommissionCap",
+            type="Attribute",
+            help="Commission cap for the Airline.",
+        )
+    )
+
+
+@dataclass
+class AttrDocument:
+    """
+    Containing all document information
+    """
+
+    document_number: StringLength1to13 = field(
+        default=None,
+        metadata=dict(
+            name="DocumentNumber",
+            type="Attribute",
+            help="Identifies the document number to be voided.",
+        )
+    )
+    document_type: str = field(
+        default=None,
+        metadata=dict(
+            name="DocumentType",
+            type="Attribute",
+            help="Identifies the document type to be voided, Document Type can have four values like Service Fee, Paper Ticket , MCO and E-Ticket.",
+        )
+    )
+
+
+@dataclass
+class AttrElementKeyResults:
+    """
+    ElementStatus and KeyOverride to show the changes in the element keys
+    """
+
+    el_stat: TypeElementStatus = field(
+        default=None,
+        metadata=dict(
+            name="ElStat",
+            type="Attribute",
+            help="This attribute is used to show the action results of an element. Possible values are 'A' (when elements have been added to the UR) and 'M' (when existing elements have been modified). Response only.",
+        )
+    )
+    key_override: bool = field(
+        default=None,
+        metadata=dict(
+            name="KeyOverride",
+            type="Attribute",
+            help="If a duplicate key is found where we are adding elements in some cases like URAdd, then instead of erroring out set this attribute to true.",
+        )
+    )
+
+
+@dataclass
+class AttrLocatorInfo:
+    """
+    Holds the Universal Record and Provider Reservation Locators for an individual product.
+    """
+
+    universal_record_locator_code: TypeLocatorCode = field(
+        default=None,
+        metadata=dict(
+            name="UniversalRecordLocatorCode",
+            type="Attribute",
+            help="Contains the Locator Code of the Universal Record that houses this reservation.",
+        )
+    )
+    provider_code: TypeProviderCode = field(
+        default=None,
+        metadata=dict(
+            name="ProviderCode",
+            type="Attribute",
+            help="Contains the Provider Code of the provider that houses this reservation.",
+        )
+    )
+    provider_locator_code: TypeProviderLocatorCode = field(
+        default=None,
+        metadata=dict(
+            name="ProviderLocatorCode",
+            type="Attribute",
+            help="Contains the Locator Code of the Provider Reservation that houses this reservation.",
+        )
+    )
+
+
+@dataclass
+class AttrLoyalty:
+    key: TypeRef = field(
+        default=None,
+        metadata=dict(
+            name="Key",
+            type="Attribute",
+            help=None,
+        )
+    )
+    supplier_code: TypeCarrier = field(
+        default=None,
+        metadata=dict(
+            name="SupplierCode",
+            type="Attribute",
+            help="The code used to identify the Loyalty supplier, e.g. AA, ZE, MC",
+            required=True
+        )
+    )
+    alliance_level: str = field(
+        default=None,
+        metadata=dict(
+            name="AllianceLevel",
+            type="Attribute",
+            help=None,
+        )
+    )
+    membership_program: StringLength1to32 = field(
+        default=None,
+        metadata=dict(
+            name="MembershipProgram",
+            type="Attribute",
+            help="Loyalty Program membership Id of the traveler specific to Amtrak(2V) Guest Rewards",
+        )
+    )
+
+
+@dataclass
+class AttrOrigDestDepatureInfo:
+    """
+    Basic attributes used to describe an origin destination pair
+    """
+
+    origin: TypeIatacode = field(
+        default=None,
+        metadata=dict(
+            name="Origin",
+            type="Attribute",
+            help="The IATA location code for this origination of this entity.",
+            required=True
+        )
+    )
+    destination: TypeIatacode = field(
+        default=None,
+        metadata=dict(
+            name="Destination",
+            type="Attribute",
+            help="The IATA location code for this destination of this entity.",
+            required=True
+        )
+    )
+    departure_time: str = field(
+        default=None,
+        metadata=dict(
+            name="DepartureTime",
+            type="Attribute",
+            help="The date and time at which this entity departs. Date and time are represented as Airport Local Time at the place of departure. The correct time zone offset is also included.",
+        )
+    )
+    arrival_time: str = field(
+        default=None,
+        metadata=dict(
+            name="ArrivalTime",
+            type="Attribute",
+            help="The date and time at which this entity arrives at the destination. Date and time are represented as Airport Local Time at the place of arrival. The correct time zone offset is also included.",
+        )
+    )
+
+
+@dataclass
+class AttrOrigDestInfo:
+    """
+    Basic attributes used to describe an origin destination pair
+    """
+
+    origin: TypeIatacode = field(
+        default=None,
+        metadata=dict(
+            name="Origin",
+            type="Attribute",
+            help="The IATA location code for this origination of this entity.",
+            required=True
+        )
+    )
+    destination: TypeIatacode = field(
+        default=None,
+        metadata=dict(
+            name="Destination",
+            type="Attribute",
+            help="The IATA location code for this destination of this entity.",
+            required=True
+        )
+    )
+    departure_time: str = field(
+        default=None,
+        metadata=dict(
+            name="DepartureTime",
+            type="Attribute",
+            help="The date and time at which this entity departs. This does not include time zone information since it can be derived from the origin location.",
+            required=True
+        )
+    )
+    arrival_time: str = field(
+        default=None,
+        metadata=dict(
+            name="ArrivalTime",
+            type="Attribute",
+            help="The date and time at which this entity arrives at the destination. This does not include time zone information since it can be derived from the origin location.",
+        )
+    )
+
+
+@dataclass
+class AttrPolicyMarking:
+    in_policy: bool = field(
+        default=None,
+        metadata=dict(
+            name="InPolicy",
+            type="Attribute",
+            help="This attribute will be used to indicate if a fare or rate has been determined to be ‘in policy’ based on the associated policy settings.",
+        )
+    )
+    policy_code: TypePolicyCode = field(
+        default=None,
+        metadata=dict(
+            name="PolicyCode",
+            type="Attribute",
+            help="This attribute is used to provide a code that can be used to determine why an item was determined to be ‘out of policy’.",
+        )
+    )
+    preferred_option: bool = field(
+        default=None,
+        metadata=dict(
+            name="PreferredOption",
+            type="Attribute",
+            help="This attribute is used to indicate if the vendors responsible for the fare or rate being returned have been determined to be ‘preferred’ based on the associated policy settings.",
+        )
+    )
+
+
+@dataclass
+class AttrPrices:
+    """
+    Basic monetary value for Air pricing structures
+    """
+
+    total_price: TypeMoney = field(
+        default=None,
+        metadata=dict(
+            name="TotalPrice",
+            type="Attribute",
+            help="The total price for this entity including base price and all taxes.",
+        )
+    )
+    base_price: TypeMoney = field(
+        default=None,
+        metadata=dict(
+            name="BasePrice",
+            type="Attribute",
+            help="Represents the base price for this entity. This does not include any taxes or surcharges.",
+        )
+    )
+    approximate_total_price: TypeMoney = field(
+        default=None,
+        metadata=dict(
+            name="ApproximateTotalPrice",
+            type="Attribute",
+            help="The Converted total price in Default Currency for this entity including base price and all taxes.",
+        )
+    )
+    approximate_base_price: TypeMoney = field(
+        default=None,
+        metadata=dict(
+            name="ApproximateBasePrice",
+            type="Attribute",
+            help="The Converted base price in Default Currency for this entity. This does not include any taxes or surcharges.",
+        )
+    )
+    equivalent_base_price: TypeMoney = field(
+        default=None,
+        metadata=dict(
+            name="EquivalentBasePrice",
+            type="Attribute",
+            help="Represents the base price in the related currency for this entity. This does not include any taxes or surcharges.",
+        )
+    )
+    taxes: TypeMoney = field(
+        default=None,
+        metadata=dict(
+            name="Taxes",
+            type="Attribute",
+            help="The aggregated amount of all the taxes that are associated with this entity. See the associated TaxInfo array for a breakdown of the individual taxes.",
+        )
+    )
+    fees: TypeMoney = field(
+        default=None,
+        metadata=dict(
+            name="Fees",
+            type="Attribute",
+            help="The aggregated amount of all the fees that are associated with this entity. See the associated FeeInfo array for a breakdown of the individual fees.",
+        )
+    )
+    services: TypeMoney = field(
+        default=None,
+        metadata=dict(
+            name="Services",
+            type="Attribute",
+            help="The total cost for all optional services.",
+        )
+    )
+    approximate_taxes: TypeMoney = field(
+        default=None,
+        metadata=dict(
+            name="ApproximateTaxes",
+            type="Attribute",
+            help="The Converted tax amount in Default Currency.",
+        )
+    )
+    approximate_fees: TypeMoney = field(
+        default=None,
+        metadata=dict(
+            name="ApproximateFees",
+            type="Attribute",
+            help="The Converted fee amount in Default Currency.",
+        )
+    )
+
+
+@dataclass
+class AttrProviderSupplier:
+    """
+    Attributes used to uniquely describe a content source
+    """
+
+    provider_code: TypeProviderCode = field(
+        default=None,
+        metadata=dict(
+            name="ProviderCode",
+            type="Attribute",
+            help=None,
+        )
+    )
+    supplier_code: TypeSupplierCode = field(
+        default=None,
+        metadata=dict(
+            name="SupplierCode",
+            type="Attribute",
+            help=None,
+        )
+    )
+
+
+@dataclass
+class AttrTaxDetail:
+    """
+    Holds fare quote tax information.
+    """
+
+    amount: TypeMoney = field(
+        default=None,
+        metadata=dict(
+            name="Amount",
+            type="Attribute",
+            help=None,
+            required=True
+        )
+    )
+    origin_airport: TypeAirport = field(
+        default=None,
+        metadata=dict(
+            name="OriginAirport",
+            type="Attribute",
+            help=None,
+        )
+    )
+    destination_airport: TypeAirport = field(
+        default=None,
+        metadata=dict(
+            name="DestinationAirport",
+            type="Attribute",
+            help=None,
+        )
+    )
+    country_code: str = field(
+        default=None,
+        metadata=dict(
+            name="CountryCode",
+            type="Attribute",
+            help=None,
+        )
+    )
+    fare_info_ref: TypeRef = field(
+        default=None,
+        metadata=dict(
+            name="FareInfoRef",
+            type="Attribute",
+            help=None,
+        )
+    )
+
+
+@dataclass
+class AttrTicketNumberStatus:
+    number: str = field(
+        default=None,
+        metadata=dict(
+            name="Number",
+            type="Attribute",
+            help=None,
+            required=True
+        )
+    )
+    status: TypeTicketStatus = field(
+        default=None,
+        metadata=dict(
+            name="Status",
+            type="Attribute",
+            help=None,
+            required=True
+        )
+    )
+    name: str = field(
+        default=None,
+        metadata=dict(
+            name="Name",
+            type="Attribute",
+            help=None,
         )
     )
 
@@ -4842,116 +5448,7 @@ class Commission:
 
 
 @dataclass
-class CommissionRemark:
-    """
-    Identifies the agency commision remarks. Specifically used for Worldspan.
-    """
-
-    provider_reservation_level: "CommissionRemark.ProviderReservationLevel" = field(
-        default=None,
-        metadata=dict(
-            name="ProviderReservationLevel",
-            type="Element",
-            help="Specify commission which is applicable to PNR level.",
-            required=True
-        )
-    )
-    passenger_type_level: List["CommissionRemark.PassengerTypeLevel"] = field(
-        default_factory=list,
-        metadata=dict(
-            name="PassengerTypeLevel",
-            type="Element",
-            help="Specify commission which is applicable to per PTC level.",
-            min_occurs=1,
-            max_occurs=4
-        )
-    )
-    key: TypeRef = field(
-        default=None,
-        metadata=dict(
-            name="Key",
-            type="Attribute",
-            help="Key to be used for internal processing.",
-        )
-    )
-    provider_reservation_info_ref: TypeRef = field(
-        default=None,
-        metadata=dict(
-            name="ProviderReservationInfoRef",
-            type="Attribute",
-            help="Provider reservation reference key.",
-        )
-    )
-    provider_code: TypeProviderCode = field(
-        default=None,
-        metadata=dict(
-            name="ProviderCode",
-            type="Attribute",
-            help="Contains the Provider Code of the provider for which this accounting remark is used",
-        )
-    )
-
-    @dataclass
-    class ProviderReservationLevel:
-        pass
-
-    @dataclass
-    class PassengerTypeLevel:
-        traveler_type: TypePtc = field(
-            default=None,
-            metadata=dict(
-                name="TravelerType",
-                type="Attribute",
-                help=None,
-                required=True
-            )
-        )
-
-
-@dataclass
-class ConsolidatorRemark:
-    """
-    Authorization remark for Consolidator access to a PNR . Contains PCC information created by retail agent to allow a consolidator or other Axess users to service their PNR. PROVIDER SUPPORTED: Worldspan and JAL.
-    """
-
-    pseudo_city_code: List[PseudoCityCode] = field(
-        default_factory=list,
-        metadata=dict(
-            name="PseudoCityCode",
-            type="Element",
-            help=None,
-            min_occurs=1,
-            max_occurs=5
-        )
-    )
-    key: TypeRef = field(
-        default=None,
-        metadata=dict(
-            name="Key",
-            type="Attribute",
-            help="Key to be used for internal processing.",
-        )
-    )
-    provider_reservation_info_ref: TypeRef = field(
-        default=None,
-        metadata=dict(
-            name="ProviderReservationInfoRef",
-            type="Attribute",
-            help="Provider reservation reference key.",
-        )
-    )
-    provider_code: TypeProviderCode = field(
-        default=None,
-        metadata=dict(
-            name="ProviderCode",
-            type="Attribute",
-            help="Contains the Provider Code of the provider for which this element is used",
-        )
-    )
-
-
-@dataclass
-class ContinuityCheckOverride:
+class ContinuityCheckOverride(TypeNonBlanks):
     key: TypeRef = field(
         default=None,
         metadata=dict(
@@ -5061,7 +5558,7 @@ class CreditCardAuth:
 
 
 @dataclass
-class CustomizedNameData:
+class CustomizedNameData(str):
     """
     Customized Name Data is used to print customized name on the different documents.
     """
@@ -5085,47 +5582,6 @@ class CustomizedNameData:
 
 
 @dataclass
-class DiscountCard:
-    """
-    Rail Discount Card Information
-    """
-
-    key: TypeRef = field(
-        default=None,
-        metadata=dict(
-            name="Key",
-            type="Attribute",
-            help=None,
-        )
-    )
-    code: StringLength1to8 = field(
-        default=None,
-        metadata=dict(
-            name="Code",
-            type="Attribute",
-            help=None,
-            required=True
-        )
-    )
-    description: StringLength1to255 = field(
-        default=None,
-        metadata=dict(
-            name="Description",
-            type="Attribute",
-            help=None,
-        )
-    )
-    number: TypeCardNumber = field(
-        default=None,
-        metadata=dict(
-            name="Number",
-            type="Attribute",
-            help=None,
-        )
-    )
-
-
-@dataclass
 class DiscountCardRef:
     key: TypeRef = field(
         default=None,
@@ -5133,31 +5589,6 @@ class DiscountCardRef:
             name="Key",
             type="Attribute",
             help=None,
-            required=True
-        )
-    )
-
-
-@dataclass
-class DriversLicense:
-    """
-    Details of drivers license
-    """
-
-    key: TypeRef = field(
-        default=None,
-        metadata=dict(
-            name="Key",
-            type="Attribute",
-            help=None,
-        )
-    )
-    license_number: str = field(
-        default=None,
-        metadata=dict(
-            name="LicenseNumber",
-            type="Attribute",
-            help="The driving license number of the booking traveler.",
             required=True
         )
     )
@@ -5303,98 +5734,6 @@ class FormOfPaymentRef:
 
 
 @dataclass
-class GeneralRemark:
-    """
-    A textual remark container to hold any printable text. (max 512 chars)
-    """
-
-    remark_data: str = field(
-        default=None,
-        metadata=dict(
-            name="RemarkData",
-            type="Element",
-            help="Actual remarks data.",
-            required=True
-        )
-    )
-    booking_traveler_ref: List[TypeRef] = field(
-        default_factory=list,
-        metadata=dict(
-            name="BookingTravelerRef",
-            type="Element",
-            help="Reference to Booking Traveler.",
-            min_occurs=0,
-            max_occurs=999
-        )
-    )
-    key: TypeRef = field(
-        default=None,
-        metadata=dict(
-            name="Key",
-            type="Attribute",
-            help=None,
-        )
-    )
-    category: str = field(
-        default=None,
-        metadata=dict(
-            name="Category",
-            type="Attribute",
-            help="A category to group and organize the various remarks. This is not required, but it is recommended.",
-            max_length=20.0
-        )
-    )
-    type_in_gds: TypeGdsRemark = field(
-        default=None,
-        metadata=dict(
-            name="TypeInGds",
-            type="Attribute",
-            help=None,
-        )
-    )
-    supplier_type: TypeProduct = field(
-        default=None,
-        metadata=dict(
-            name="SupplierType",
-            type="Attribute",
-            help="The type of product this reservation is relative to",
-        )
-    )
-    provider_reservation_info_ref: TypeRef = field(
-        default=None,
-        metadata=dict(
-            name="ProviderReservationInfoRef",
-            type="Attribute",
-            help="Provider reservation reference key.",
-        )
-    )
-    direction: TypeDirection = field(
-        default=None,
-        metadata=dict(
-            name="Direction",
-            type="Attribute",
-            help="Direction Incoming or Outgoing of the GeneralRemark.",
-        )
-    )
-    create_date: str = field(
-        default=None,
-        metadata=dict(
-            name="CreateDate",
-            type="Attribute",
-            help="The date and time that this GeneralRemark was created.",
-        )
-    )
-    use_provider_native_mode: bool = field(
-        default="false",
-        metadata=dict(
-            name="UseProviderNativeMode",
-            type="Attribute",
-            help="Will be true when terminal process required, else false",
-        )
-    )
-
-
-@dataclass
 class GuaranteeType(TypeGeneralText):
     """
     A type of guarantee i.e
@@ -5404,7 +5743,7 @@ class GuaranteeType(TypeGeneralText):
 
 
 @dataclass
-class HostToken:
+class HostToken(str):
     """
     one or more hosts
     """
@@ -5444,27 +5783,6 @@ class IncludedInBase:
 
 
 @dataclass
-class LinkedUniversalRecord:
-    locator_code: TypeLocatorCode = field(
-        default=None,
-        metadata=dict(
-            name="LocatorCode",
-            type="Attribute",
-            help="A Universal Record that need to be linked to the current Universal Record.",
-            required=True
-        )
-    )
-    key: TypeRef = field(
-        default=None,
-        metadata=dict(
-            name="Key",
-            type="Attribute",
-            help=None,
-        )
-    )
-
-
-@dataclass
 class LoyaltyCardRef:
     key: TypeRef = field(
         default=None,
@@ -5473,6 +5791,22 @@ class LoyaltyCardRef:
             type="Attribute",
             help=None,
             required=True
+        )
+    )
+
+
+@dataclass
+class Mcotext(TypeFreeFormText):
+    """
+    All type of free format text messages related to MCO like - Command Text, Agent Entry, MCO Modifiers, Text Message
+    """
+
+    type: str = field(
+        default=None,
+        metadata=dict(
+            name="Type",
+            type="Attribute",
+            help="The type of text. Possible values: Command Text, Agent Entry, MCO Modifiers, Text Message",
         )
     )
 
@@ -5531,6 +5865,63 @@ class MiscFormOfPayment:
             name="AcceptanceOverride",
             type="Attribute",
             help="Override airline restriction on the credit card.",
+        )
+    )
+
+
+@dataclass
+class ModificationRulesGroup:
+    """
+    Groups the rules for handling options when modifying an itinerary. One attribute group repreents the rules for a particular type of modification supported by the adapter for a single modification type.
+    """
+
+    modification: ModificationType = field(
+        default=None,
+        metadata=dict(
+            name="Modification",
+            type="Attribute",
+            help="The modificaiton for which this rule group applies.",
+            required=True
+        )
+    )
+    automatically_applied_on_add: bool = field(
+        default="false",
+        metadata=dict(
+            name="AutomaticallyAppliedOnAdd",
+            type="Attribute",
+            help="Indicates if the option will be automatically added to new segments / passengers in the itinerary.",
+        )
+    )
+    can_delete: bool = field(
+        default=None,
+        metadata=dict(
+            name="CanDelete",
+            type="Attribute",
+            help="Indicates if the option can be deleted from the itinerary without segment or passenger modifications",
+        )
+    )
+    can_add: bool = field(
+        default=None,
+        metadata=dict(
+            name="CanAdd",
+            type="Attribute",
+            help="Indicates if the option can be added to the itinerary without segment or passenger modification",
+        )
+    )
+    refundable: bool = field(
+        default=None,
+        metadata=dict(
+            name="Refundable",
+            type="Attribute",
+            help="Indicates if the price of the option is refundable.",
+        )
+    )
+    provider_defined_modification_type: str = field(
+        default=None,
+        metadata=dict(
+            name="ProviderDefinedModificationType",
+            type="Attribute",
+            help="Indicates the actual provider defined modification type which is mapped to Other",
         )
     )
 
@@ -5604,7 +5995,7 @@ class Name:
 
 
 @dataclass
-class NextResultReference:
+class NextResultReference(TypeNonBlanks):
     """
     Container to return/send additional retrieve/request additional search results
     """
@@ -5620,61 +6011,101 @@ class NextResultReference:
 
 
 @dataclass
-class Osi:
+class OperatedBy(TypeNonBlanks):
     """
-    Other Service information sent to the carriers during air bookings
+    This is the carrier code to support Cross Accrual
     """
 
-    key: TypeRef = field(
+    pass
+
+
+@dataclass
+class OptionalServiceApplicabilityLimitGroup:
+    """
+    Holds the limits on how many options of the particular type can be applied.
+    """
+
+    applicable_level: OptionalServiceApplicabilityType = field(
         default=None,
         metadata=dict(
-            name="Key",
+            name="ApplicableLevel",
             type="Attribute",
-            help=None,
-        )
-    )
-    carrier: TypeCarrier = field(
-        default=None,
-        metadata=dict(
-            name="Carrier",
-            type="Attribute",
-            help=None,
+            help="Indicates the applicable level for the option",
             required=True
         )
     )
-    code: str = field(
+    provider_defined_applicable_levels: str = field(
+        default=None,
+        metadata=dict(
+            name="ProviderDefinedApplicableLevels",
+            type="Attribute",
+            help="Indicates the actual provider defined ApplicableLevels which is mapped to Other",
+        )
+    )
+    maximum_quantity: int = field(
+        default=None,
+        metadata=dict(
+            name="MaximumQuantity",
+            type="Attribute",
+            help="The maximum quantity allowed for the type",
+            required=True
+        )
+    )
+    minimum_quantity: int = field(
+        default=None,
+        metadata=dict(
+            name="MinimumQuantity",
+            type="Attribute",
+            help="Indicates the minimum number of the option that can be selected.",
+        )
+    )
+
+
+@dataclass
+class OptionalServicesTypeCodeGroup:
+    """
+    Holds the attributes to identify an option
+    """
+
+    code: StringLength1to8 = field(
         default=None,
         metadata=dict(
             name="Code",
             type="Attribute",
-            help=None,
-            max_length=4.0
+            help="The ACH code for the OptionalService",
+            required=True
         )
     )
-    text: str = field(
+    vendor_option_code: StringLength1to64 = field(
         default=None,
         metadata=dict(
-            name="Text",
+            name="VendorOptionCode",
             type="Attribute",
-            help=None,
-            required=True,
-            max_length=256.0
+            help="The vendor specific code for the OptionalService",
         )
     )
-    provider_reservation_info_ref: TypeRef = field(
+    type: str = field(
         default=None,
         metadata=dict(
-            name="ProviderReservationInfoRef",
+            name="Type",
             type="Attribute",
-            help="Provider reservation reference key.",
+            help="The type of the option",
         )
     )
-    provider_code: TypeProviderCode = field(
+    secondary_code: StringLength1to32 = field(
         default=None,
         metadata=dict(
-            name="ProviderCode",
+            name="SecondaryCode",
             type="Attribute",
-            help="Contains the Provider Code of the provider for which this OSI is used",
+            help="An additional code for the option required when the option identifies a larger type and specific codes are required by the vendor. For example, sports equipment may be a Code, and the secondary code could be SKIS or BIKE.",
+        )
+    )
+    selected_by_default: bool = field(
+        default=None,
+        metadata=dict(
+            name="SelectedByDefault",
+            type="Attribute",
+            help="Flag to indicate if the option has been selected by default",
         )
     )
 
@@ -5723,76 +6154,25 @@ class OwnershipChange:
 
 
 @dataclass
-class Payment:
+class PageAttributes:
     """
-    Payment information - must be used in conjunction with credit card info
+    Attributes to control pagination.
     """
 
-    key: TypeRef = field(
+    max_results: TypeMaxResults = field(
         default=None,
         metadata=dict(
-            name="Key",
+            name="MaxResults",
             type="Attribute",
             help=None,
         )
     )
-    type: str = field(
+    start_from_result: TypeStartFromResult = field(
         default=None,
         metadata=dict(
-            name="Type",
-            type="Attribute",
-            help="Identifies the type of payment. This can be for an itinerary, a traveler, or a service fee for example.",
-            required=True
-        )
-    )
-    form_of_payment_ref: TypeRef = field(
-        default=None,
-        metadata=dict(
-            name="FormOfPaymentRef",
-            type="Attribute",
-            help="The credit card that is will be used to make this payment.",
-            required=True
-        )
-    )
-    booking_traveler_ref: TypeRef = field(
-        default=None,
-        metadata=dict(
-            name="BookingTravelerRef",
-            type="Attribute",
-            help="If the type represents a per traveler payment, then this will reference the traveler this payment refers to.",
-        )
-    )
-    amount: TypeMoney = field(
-        default=None,
-        metadata=dict(
-            name="Amount",
+            name="StartFromResult",
             type="Attribute",
             help=None,
-            required=True
-        )
-    )
-    amount_type: StringLength1to32 = field(
-        default=None,
-        metadata=dict(
-            name="AmountType",
-            type="Attribute",
-            help="This field displays type of payment amount when it is non-monetary. Presently available/supported value is 'Flight Pass Credits'.",
-        )
-    )
-    approximate_amount: TypeMoney = field(
-        default=None,
-        metadata=dict(
-            name="ApproximateAmount",
-            type="Attribute",
-            help="It stores the converted payment amount in agency's default currency",
-        )
-    )
-    status: str = field(
-        default=None,
-        metadata=dict(
-            name="Status",
-            type="Attribute",
-            help="Status to indicate the business association of the payment element.",
         )
     )
 
@@ -6156,6 +6536,28 @@ class Provider:
 
 
 @dataclass
+class ProviderReservation:
+    provider_code: TypeProviderCode = field(
+        default=None,
+        metadata=dict(
+            name="ProviderCode",
+            type="Attribute",
+            help=None,
+            required=True
+        )
+    )
+    provider_locator_code: TypeProviderLocatorCode = field(
+        default=None,
+        metadata=dict(
+            name="ProviderLocatorCode",
+            type="Attribute",
+            help=None,
+            required=True
+        )
+    )
+
+
+@dataclass
 class ProviderReservationInfoRef:
     """
     Container for Provider reservation reference key.
@@ -6173,29 +6575,17 @@ class ProviderReservationInfoRef:
 
 
 @dataclass
-class QueuePlace:
+class PseudoCityCode(TypePcc):
+    pass
+
+
+@dataclass
+class QueueSelector(AttrQueueInfo):
     """
-    Allow queue placement of a PNR at the time of booking to be used for Providers 1G,1V,1P and 1J.
+    Identifies the Queue with Queue Number , Category and Date Range.
     """
 
-    pseudo_city_code: TypePcc = field(
-        default=None,
-        metadata=dict(
-            name="PseudoCityCode",
-            type="Element",
-            help="Pseudo City Code",
-        )
-    )
-    queue_selector: List[QueueSelector] = field(
-        default_factory=list,
-        metadata=dict(
-            name="QueueSelector",
-            type="Element",
-            help="Identifies the Queue Information to be selected for placing the UR",
-            min_occurs=0,
-            max_occurs=999
-        )
-    )
+    pass
 
 
 @dataclass
@@ -6216,72 +6606,12 @@ class RailLocation(Location):
 
 
 @dataclass
-class RailSeatAssignment:
-    """
-    Identifies the seat assignment for a passenger on RailSegment.
-    """
-
-    characteristic: List[Characteristic] = field(
-        default_factory=list,
-        metadata=dict(
-            name="Characteristic",
-            type="Element",
-            help=None,
-            min_occurs=0,
-            max_occurs=999
-        )
-    )
-    key: TypeRef = field(
-        default=None,
-        metadata=dict(
-            name="Key",
-            type="Attribute",
-            help=None,
-        )
-    )
-    status: TypeStatusCode = field(
-        default=None,
-        metadata=dict(
-            name="Status",
-            type="Attribute",
-            help=None,
-            required=True
-        )
-    )
-    seat: str = field(
-        default=None,
-        metadata=dict(
-            name="Seat",
-            type="Attribute",
-            help=None,
-            required=True
-        )
-    )
-    rail_segment_ref: TypeRef = field(
-        default=None,
-        metadata=dict(
-            name="RailSegmentRef",
-            type="Attribute",
-            help=None,
-        )
-    )
-    coach_number: str = field(
-        default=None,
-        metadata=dict(
-            name="CoachNumber",
-            type="Attribute",
-            help=None,
-        )
-    )
-
-
-@dataclass
 class ReferencePoint(TypeReferencePoint):
     pass
 
 
 @dataclass
-class Remark:
+class Remark(str):
     """
     A textual remark container to hold any printable text. (max 512 chars)
     """
@@ -6315,84 +6645,6 @@ class RequestKeyMappings:
 
 
 @dataclass
-class ReviewBooking:
-    """
-    Review Booking or Queue Minders is to add the reminders in the Provider Reservation along with the date time and Queue details. On the date time defined in reminders, the message along with the PNR goes to the desired Queue.
-    """
-
-    key: TypeRef = field(
-        default=None,
-        metadata=dict(
-            name="Key",
-            type="Attribute",
-            help="Returned in response. Use it for update of saved review booking.",
-        )
-    )
-    queue: int = field(
-        default=None,
-        metadata=dict(
-            name="Queue",
-            type="Attribute",
-            help="Queue number, Must be numeric and less than 100.",
-            required=True,
-            max_inclusive=99.0
-        )
-    )
-    queue_category: str = field(
-        default=None,
-        metadata=dict(
-            name="QueueCategory",
-            type="Attribute",
-            help="Queue Category, 2 Character Alpha or Numeric.",
-            max_length=2.0
-        )
-    )
-    date_time: str = field(
-        default=None,
-        metadata=dict(
-            name="DateTime",
-            type="Attribute",
-            help="Date and Time to place message on designated Queue, Should be prior to the last segment date in the PNR.",
-            required=True
-        )
-    )
-    pseudo_city_code: TypePcc = field(
-        default=None,
-        metadata=dict(
-            name="PseudoCityCode",
-            type="Attribute",
-            help="Input PCC optional value for placing the PNR into Queue. If not passed, will add as default PNR's Pseudo.",
-        )
-    )
-    provider_code: TypeProviderCode = field(
-        default=None,
-        metadata=dict(
-            name="ProviderCode",
-            type="Attribute",
-            help="The code of the Provider (e.g 1G,1V).",
-        )
-    )
-    provider_reservation_info_ref: TypeRef = field(
-        default=None,
-        metadata=dict(
-            name="ProviderReservationInfoRef",
-            type="Attribute",
-            help="Provider Reservation reference. Returned in the response. Use it for update of saved Review Booking.",
-        )
-    )
-    remarks: str = field(
-        default=None,
-        metadata=dict(
-            name="Remarks",
-            type="Attribute",
-            help="Remark or reminder message. It can be truncated depending on the provider.",
-            required=True,
-            max_length=300.0
-        )
-    )
-
-
-@dataclass
 class SearchEvent(TypeTimeRange):
     """
     Search for various reservation events
@@ -6404,68 +6656,6 @@ class SearchEvent(TypeTimeRange):
             name="Type",
             type="Attribute",
             help=None,
-        )
-    )
-
-
-@dataclass
-class SeatAssignment:
-    key: TypeRef = field(
-        default=None,
-        metadata=dict(
-            name="Key",
-            type="Attribute",
-            help=None,
-        )
-    )
-    status: TypeStatusCode = field(
-        default=None,
-        metadata=dict(
-            name="Status",
-            type="Attribute",
-            help=None,
-            required=True
-        )
-    )
-    seat: str = field(
-        default=None,
-        metadata=dict(
-            name="Seat",
-            type="Attribute",
-            help=None,
-            required=True
-        )
-    )
-    seat_type_code: TypeSeatTypeCode = field(
-        default=None,
-        metadata=dict(
-            name="SeatTypeCode",
-            type="Attribute",
-            help="The 4 letter SSR code like SMSW,NSSW,SMST etc.",
-        )
-    )
-    segment_ref: TypeRef = field(
-        default=None,
-        metadata=dict(
-            name="SegmentRef",
-            type="Attribute",
-            help=None,
-        )
-    )
-    flight_details_ref: TypeRef = field(
-        default=None,
-        metadata=dict(
-            name="FlightDetailsRef",
-            type="Attribute",
-            help=None,
-        )
-    )
-    rail_coach_number: str = field(
-        default=None,
-        metadata=dict(
-            name="RailCoachNumber",
-            type="Attribute",
-            help="Coach number for which rail seatmap/coachmap is returned.",
         )
     )
 
@@ -6489,7 +6679,7 @@ class SeatAttributes:
 
 
 @dataclass
-class SegmentRemark:
+class SegmentRemark(str):
     """
     A textual remark container to hold any printable text. (max 512 chars)
     """
@@ -6718,305 +6908,12 @@ class ShopInformation:
 
 
 @dataclass
-class SpecialEquipment:
-    key: TypeRef = field(
-        default=None,
-        metadata=dict(
-            name="Key",
-            type="Attribute",
-            help=None,
-        )
-    )
-    type: str = field(
-        default=None,
-        metadata=dict(
-            name="Type",
-            type="Attribute",
-            help="Special equipment associated with a specific vehicle",
-            required=True
-        )
-    )
-
-
-@dataclass
-class Ssr:
-    """
-    Special serivces like wheel chair, or pet carrier.
-    """
-
-    key: TypeRef = field(
-        default=None,
-        metadata=dict(
-            name="Key",
-            type="Attribute",
-            help=None,
-        )
-    )
-    segment_ref: TypeRef = field(
-        default=None,
-        metadata=dict(
-            name="SegmentRef",
-            type="Attribute",
-            help="Reference to the air segment. May be required for some Types.",
-        )
-    )
-    passive_segment_ref: TypeRef = field(
-        default=None,
-        metadata=dict(
-            name="PassiveSegmentRef",
-            type="Attribute",
-            help="Reference to the passive segment.",
-        )
-    )
-    provider_reservation_info_ref: TypeRef = field(
-        default=None,
-        metadata=dict(
-            name="ProviderReservationInfoRef",
-            type="Attribute",
-            help="Provider reservation reference key.",
-        )
-    )
-    type: TypeSsrcode = field(
-        default=None,
-        metadata=dict(
-            name="Type",
-            type="Attribute",
-            help="Programmatic SSRs use codes recognized by the provider/supplier (example, VGML=vegetarian meal code). Manual SSRs do not have an associated programmatic code.",
-            required=True
-        )
-    )
-    status: str = field(
-        default=None,
-        metadata=dict(
-            name="Status",
-            type="Attribute",
-            help=None,
-        )
-    )
-    free_text: TypeSsrfreeText = field(
-        default=None,
-        metadata=dict(
-            name="FreeText",
-            type="Attribute",
-            help="Certain SSR types will require a free text message. For example MAAS (Meet and assist).",
-        )
-    )
-    carrier: TypeCarrier = field(
-        default=None,
-        metadata=dict(
-            name="Carrier",
-            type="Attribute",
-            help=None,
-        )
-    )
-    carrier_specific_text: str = field(
-        default=None,
-        metadata=dict(
-            name="CarrierSpecificText",
-            type="Attribute",
-            help="Carrier specific information which are not captured in the FreeText field(not present in IATA's standard SSR DOCO format). An example is VISA Expiration Date.",
-            min_length=1.0,
-            max_length=64.0
-        )
-    )
-    description: str = field(
-        default=None,
-        metadata=dict(
-            name="Description",
-            type="Attribute",
-            help=None,
-        )
-    )
-    provider_defined_type: str = field(
-        default=None,
-        metadata=dict(
-            name="ProviderDefinedType",
-            type="Attribute",
-            help="Original Type as sent by the provider",
-            min_length=1.0,
-            max_length=16.0
-        )
-    )
-    ssrrule_ref: TypeRef = field(
-        default=None,
-        metadata=dict(
-            name="SSRRuleRef",
-            type="Attribute",
-            help="UniqueID to associate a rule to the SSR",
-        )
-    )
-    url: str = field(
-        default=None,
-        metadata=dict(
-            name="URL",
-            type="Attribute",
-            help=None,
-        )
-    )
-    profile_id: str = field(
-        default=None,
-        metadata=dict(
-            name="ProfileID",
-            type="Attribute",
-            help="Key assigned for Secure Flight Document value from the specified profile",
-        )
-    )
-    profile_secure_flight_doc_key: TypeRef = field(
-        default=None,
-        metadata=dict(
-            name="ProfileSecureFlightDocKey",
-            type="Attribute",
-            help="Unique ID of Booking Traveler's Profile that contains the Secure flight Detail",
-        )
-    )
-
-
-@dataclass
 class TicketNumber(StringLength1to13):
     """
     The identifying number for the actual ticket
     """
 
     pass
-
-
-@dataclass
-class TravelComplianceData:
-    """
-    Travel Compliance and Preferred Supplier information of the traveler specific to a segment.
-    """
-
-    policy_compliance: List["TravelComplianceData.PolicyCompliance"] = field(
-        default_factory=list,
-        metadata=dict(
-            name="PolicyCompliance",
-            type="Element",
-            help=None,
-            min_occurs=0,
-            max_occurs=2
-        )
-    )
-    contract_compliance: List["TravelComplianceData.ContractCompliance"] = field(
-        default_factory=list,
-        metadata=dict(
-            name="ContractCompliance",
-            type="Element",
-            help=None,
-            min_occurs=0,
-            max_occurs=2
-        )
-    )
-    preferred_supplier: List["TravelComplianceData.PreferredSupplier"] = field(
-        default_factory=list,
-        metadata=dict(
-            name="PreferredSupplier",
-            type="Element",
-            help=None,
-            min_occurs=0,
-            max_occurs=999
-        )
-    )
-    key: TypeRef = field(
-        default=None,
-        metadata=dict(
-            name="Key",
-            type="Attribute",
-            help="System generated key, returned back in the response. This can be used to modify or delete a saved TravelComplianceData.",
-        )
-    )
-    air_segment_ref: TypeRef = field(
-        default=None,
-        metadata=dict(
-            name="AirSegmentRef",
-            type="Attribute",
-            help="Refers to Air Segment. Applicable only for Air. Ignored for others.",
-        )
-    )
-    passive_segment_ref: TypeRef = field(
-        default=None,
-        metadata=dict(
-            name="PassiveSegmentRef",
-            type="Attribute",
-            help="Refers to Passive Segment. Applicable only for Passive. Ignored for others.",
-        )
-    )
-    rail_segment_ref: TypeRef = field(
-        default=None,
-        metadata=dict(
-            name="RailSegmentRef",
-            type="Attribute",
-            help="Refers to Rail Segment. Applicable only for Rail. Ignored for others.",
-        )
-    )
-    reservation_locator_ref: TypeLocatorCode = field(
-        default=None,
-        metadata=dict(
-            name="ReservationLocatorRef",
-            type="Attribute",
-            help="This is returned in the response. Any input will be ignored for this attribute. This represents the association of Travel Compliance Data with the uAPI reservation locator code, mainly relevant to Hotel and Vehicle.",
-        )
-    )
-
-    @dataclass
-    class PolicyCompliance:
-        in_policy: bool = field(
-            default=None,
-            metadata=dict(
-                name="InPolicy",
-                type="Attribute",
-                help="Policy Compliance Indicator. For In-Policy set to 'true', For Out-Of-Policy set to 'false''.",
-                required=True
-            )
-        )
-        policy_token: StringLength1to128 = field(
-            default=None,
-            metadata=dict(
-                name="PolicyToken",
-                type="Attribute",
-                help="Optional text message to set the rule or token for which it's In Policy or Out Of Policy.",
-            )
-        )
-
-    @dataclass
-    class ContractCompliance:
-        in_contract: bool = field(
-            default=None,
-            metadata=dict(
-                name="InContract",
-                type="Attribute",
-                help="Contract Compliance Indicator. For In-Contract set to 'true', For Out-Of-Contract set to 'false'.",
-                required=True
-            )
-        )
-        contract_token: StringLength1to128 = field(
-            default=None,
-            metadata=dict(
-                name="ContractToken",
-                type="Attribute",
-                help="Optional text message to set the rule or token for which it's In Contract or Out Of Contract.",
-            )
-        )
-
-    @dataclass
-    class PreferredSupplier:
-        preferred: bool = field(
-            default=None,
-            metadata=dict(
-                name="Preferred",
-                type="Attribute",
-                help="Preferred Supplier - 'true', 'false'.",
-                required=True
-            )
-        )
-        profile_type: TypeProfileType = field(
-            default=None,
-            metadata=dict(
-                name="ProfileType",
-                type="Attribute",
-                help="Indicate profile type. e.g. if Agency Preferred then pass Agency, if Traveler Preferred then pass Traveler.",
-                required=True
-            )
-        )
 
 
 @dataclass
@@ -7365,7 +7262,7 @@ class TypeProfileRef:
 
 
 @dataclass
-class TypeRemark:
+class TypeRemark(str):
     provider_reservation_info_ref: TypeRef = field(
         default=None,
         metadata=dict(
@@ -7616,7 +7513,7 @@ class TypeVoucherInformation:
 
 
 @dataclass
-class Xmlremark:
+class Xmlremark(str):
     """
     A remark container to hold an XML document. (max 1024 chars) This will be encoded with xml encoding.
     """
@@ -7641,7 +7538,108 @@ class Xmlremark:
 
 
 @dataclass
-class ActionStatus:
+class AccountCode(AttrProviderSupplier):
+    """
+    it will be considered a default AccounCode to be sent to all the Providers or Suppliers.
+    """
+
+    code: str = field(
+        default=None,
+        metadata=dict(
+            name="Code",
+            type="Attribute",
+            help=None,
+            max_length=36.0
+        )
+    )
+    type: str = field(
+        default=None,
+        metadata=dict(
+            name="Type",
+            type="Attribute",
+            help="An identifier to categorize this account code. For example, FlightPass for AC Flight Pass or RFB for AC corporate Rewards for Business.",
+        )
+    )
+
+
+@dataclass
+class AccountingRemark(AttrElementKeyResults):
+    """
+    An accounting remark container to hold any printable text.
+    """
+
+    remark_data: str = field(
+        default=None,
+        metadata=dict(
+            name="RemarkData",
+            type="Element",
+            help="Actual remarks data.",
+            required=True
+        )
+    )
+    booking_traveler_ref: List[TypeRef] = field(
+        default_factory=list,
+        metadata=dict(
+            name="BookingTravelerRef",
+            type="Element",
+            help="Reference to Booking Traveler.",
+            min_occurs=0,
+            max_occurs=999
+        )
+    )
+    key: TypeRef = field(
+        default=None,
+        metadata=dict(
+            name="Key",
+            type="Attribute",
+            help=None,
+        )
+    )
+    category: str = field(
+        default=None,
+        metadata=dict(
+            name="Category",
+            type="Attribute",
+            help="A category to group and organize the various remarks. This is not required, but it is recommended.",
+            max_length=14.0
+        )
+    )
+    type_in_gds: TypeGdsAccountingRemark = field(
+        default=None,
+        metadata=dict(
+            name="TypeInGds",
+            type="Attribute",
+            help=None,
+        )
+    )
+    provider_reservation_info_ref: TypeRef = field(
+        default=None,
+        metadata=dict(
+            name="ProviderReservationInfoRef",
+            type="Attribute",
+            help="Provider reservation reference key.",
+        )
+    )
+    provider_code: TypeProviderCode = field(
+        default=None,
+        metadata=dict(
+            name="ProviderCode",
+            type="Attribute",
+            help="Contains the Provider Code of the provider for which this accounting remark is used",
+        )
+    )
+    use_provider_native_mode: bool = field(
+        default="false",
+        metadata=dict(
+            name="UseProviderNativeMode",
+            type="Attribute",
+            help="Will be true when terminal process required, else false",
+        )
+    )
+
+
+@dataclass
+class ActionStatus(AttrProviderSupplier, AttrElementKeyResults):
     """
     Status of the action that will happen or has happened to the air reservation. One Action status for each provider reservation
     """
@@ -7740,12 +7738,67 @@ class AgencyInfo:
 
 
 @dataclass
-class AirSeatAssignment(SeatAssignment):
+class AppliedProfile(AttrElementKeyResults):
     """
-    Identifies the seat assignment for a passenger.
+    A simple container to specify the profiles that were applied to a reservation.
     """
 
-    pass
+    key: TypeRef = field(
+        default=None,
+        metadata=dict(
+            name="Key",
+            type="Attribute",
+            help="Key for update/delete of the element",
+        )
+    )
+    traveler_id: str = field(
+        default=None,
+        metadata=dict(
+            name="TravelerID",
+            type="Attribute",
+            help="The ID of the TravelerProfile that was applied",
+        )
+    )
+    traveler_name: str = field(
+        default=None,
+        metadata=dict(
+            name="TravelerName",
+            type="Attribute",
+            help="The name from the TravelerProfile that was applied",
+        )
+    )
+    account_id: str = field(
+        default=None,
+        metadata=dict(
+            name="AccountID",
+            type="Attribute",
+            help="The ID of the AccountProfile that was applied",
+        )
+    )
+    account_name: str = field(
+        default=None,
+        metadata=dict(
+            name="AccountName",
+            type="Attribute",
+            help="The name from the AccountProfile that was applied",
+        )
+    )
+    immediate_parent_id: str = field(
+        default=None,
+        metadata=dict(
+            name="ImmediateParentID",
+            type="Attribute",
+            help="The ID of the immediate parent that was applied",
+        )
+    )
+    immediate_parent_name: str = field(
+        default=None,
+        metadata=dict(
+            name="ImmediateParentName",
+            type="Attribute",
+            help="The name of the immediate parent that was applied",
+        )
+    )
 
 
 @dataclass
@@ -7771,6 +7824,15 @@ class BookingTravelerInformation:
             help="A reference to a passenger related to a ticket.",
         )
     )
+
+
+@dataclass
+class BookingTravelerName(AttrBookingTravelerName):
+    """
+    Complete name fields
+    """
+
+    pass
 
 
 @dataclass
@@ -7828,6 +7890,115 @@ class BookingTravelerRef:
 
 
 @dataclass
+class CommissionRemark(AttrElementKeyResults):
+    """
+    Identifies the agency commision remarks. Specifically used for Worldspan.
+    """
+
+    provider_reservation_level: "CommissionRemark.ProviderReservationLevel" = field(
+        default=None,
+        metadata=dict(
+            name="ProviderReservationLevel",
+            type="Element",
+            help="Specify commission which is applicable to PNR level.",
+            required=True
+        )
+    )
+    passenger_type_level: List["CommissionRemark.PassengerTypeLevel"] = field(
+        default_factory=list,
+        metadata=dict(
+            name="PassengerTypeLevel",
+            type="Element",
+            help="Specify commission which is applicable to per PTC level.",
+            min_occurs=1,
+            max_occurs=4
+        )
+    )
+    key: TypeRef = field(
+        default=None,
+        metadata=dict(
+            name="Key",
+            type="Attribute",
+            help="Key to be used for internal processing.",
+        )
+    )
+    provider_reservation_info_ref: TypeRef = field(
+        default=None,
+        metadata=dict(
+            name="ProviderReservationInfoRef",
+            type="Attribute",
+            help="Provider reservation reference key.",
+        )
+    )
+    provider_code: TypeProviderCode = field(
+        default=None,
+        metadata=dict(
+            name="ProviderCode",
+            type="Attribute",
+            help="Contains the Provider Code of the provider for which this accounting remark is used",
+        )
+    )
+
+    @dataclass
+    class ProviderReservationLevel(AttrCommissionRemark):
+        pass
+
+    @dataclass
+    class PassengerTypeLevel(AttrCommissionRemark):
+        traveler_type: TypePtc = field(
+            default=None,
+            metadata=dict(
+                name="TravelerType",
+                type="Attribute",
+                help=None,
+                required=True
+            )
+        )
+
+
+@dataclass
+class ConsolidatorRemark(AttrElementKeyResults):
+    """
+    Authorization remark for Consolidator access to a PNR . Contains PCC information created by retail agent to allow a consolidator or other Axess users to service their PNR. PROVIDER SUPPORTED: Worldspan and JAL.
+    """
+
+    pseudo_city_code: List[PseudoCityCode] = field(
+        default_factory=list,
+        metadata=dict(
+            name="PseudoCityCode",
+            type="Element",
+            help=None,
+            min_occurs=1,
+            max_occurs=5
+        )
+    )
+    key: TypeRef = field(
+        default=None,
+        metadata=dict(
+            name="Key",
+            type="Attribute",
+            help="Key to be used for internal processing.",
+        )
+    )
+    provider_reservation_info_ref: TypeRef = field(
+        default=None,
+        metadata=dict(
+            name="ProviderReservationInfoRef",
+            type="Attribute",
+            help="Provider reservation reference key.",
+        )
+    )
+    provider_code: TypeProviderCode = field(
+        default=None,
+        metadata=dict(
+            name="ProviderCode",
+            type="Attribute",
+            help="Contains the Provider Code of the provider for which this element is used",
+        )
+    )
+
+
+@dataclass
 class CustomerId(TypeRemark):
     """
     A provider reservation field used to store customer information. It may be used to identify reservations which will/will not be available for access.
@@ -7844,7 +8015,73 @@ class CustomerId(TypeRemark):
 
 
 @dataclass
-class Email:
+class DiscountCard(AttrElementKeyResults):
+    """
+    Rail Discount Card Information
+    """
+
+    key: TypeRef = field(
+        default=None,
+        metadata=dict(
+            name="Key",
+            type="Attribute",
+            help=None,
+        )
+    )
+    code: StringLength1to8 = field(
+        default=None,
+        metadata=dict(
+            name="Code",
+            type="Attribute",
+            help=None,
+            required=True
+        )
+    )
+    description: StringLength1to255 = field(
+        default=None,
+        metadata=dict(
+            name="Description",
+            type="Attribute",
+            help=None,
+        )
+    )
+    number: TypeCardNumber = field(
+        default=None,
+        metadata=dict(
+            name="Number",
+            type="Attribute",
+            help=None,
+        )
+    )
+
+
+@dataclass
+class DriversLicense(AttrElementKeyResults):
+    """
+    Details of drivers license
+    """
+
+    key: TypeRef = field(
+        default=None,
+        metadata=dict(
+            name="Key",
+            type="Attribute",
+            help=None,
+        )
+    )
+    license_number: str = field(
+        default=None,
+        metadata=dict(
+            name="LicenseNumber",
+            type="Attribute",
+            help="The driving license number of the booking traveler.",
+            required=True
+        )
+    )
+
+
+@dataclass
+class Email(AttrElementKeyResults):
     """
     Container for an email address with a type specifier (max 128 chars)
     """
@@ -7895,6 +8132,98 @@ class Email:
 
 
 @dataclass
+class GeneralRemark(AttrProviderSupplier, AttrElementKeyResults):
+    """
+    A textual remark container to hold any printable text. (max 512 chars)
+    """
+
+    remark_data: str = field(
+        default=None,
+        metadata=dict(
+            name="RemarkData",
+            type="Element",
+            help="Actual remarks data.",
+            required=True
+        )
+    )
+    booking_traveler_ref: List[TypeRef] = field(
+        default_factory=list,
+        metadata=dict(
+            name="BookingTravelerRef",
+            type="Element",
+            help="Reference to Booking Traveler.",
+            min_occurs=0,
+            max_occurs=999
+        )
+    )
+    key: TypeRef = field(
+        default=None,
+        metadata=dict(
+            name="Key",
+            type="Attribute",
+            help=None,
+        )
+    )
+    category: str = field(
+        default=None,
+        metadata=dict(
+            name="Category",
+            type="Attribute",
+            help="A category to group and organize the various remarks. This is not required, but it is recommended.",
+            max_length=20.0
+        )
+    )
+    type_in_gds: TypeGdsRemark = field(
+        default=None,
+        metadata=dict(
+            name="TypeInGds",
+            type="Attribute",
+            help=None,
+        )
+    )
+    supplier_type: TypeProduct = field(
+        default=None,
+        metadata=dict(
+            name="SupplierType",
+            type="Attribute",
+            help="The type of product this reservation is relative to",
+        )
+    )
+    provider_reservation_info_ref: TypeRef = field(
+        default=None,
+        metadata=dict(
+            name="ProviderReservationInfoRef",
+            type="Attribute",
+            help="Provider reservation reference key.",
+        )
+    )
+    direction: TypeDirection = field(
+        default=None,
+        metadata=dict(
+            name="Direction",
+            type="Attribute",
+            help="Direction Incoming or Outgoing of the GeneralRemark.",
+        )
+    )
+    create_date: str = field(
+        default=None,
+        metadata=dict(
+            name="CreateDate",
+            type="Attribute",
+            help="The date and time that this GeneralRemark was created.",
+        )
+    )
+    use_provider_native_mode: bool = field(
+        default="false",
+        metadata=dict(
+            name="UseProviderNativeMode",
+            type="Attribute",
+            help="Will be true when terminal process required, else false",
+        )
+    )
+
+
+@dataclass
 class HostTokenList:
     """
     The shared object list of Host Tokens
@@ -7922,7 +8251,56 @@ class Keyword(TypeKeyword):
 
 
 @dataclass
-class NameRemark:
+class LinkedUniversalRecord(AttrElementKeyResults):
+    locator_code: TypeLocatorCode = field(
+        default=None,
+        metadata=dict(
+            name="LocatorCode",
+            type="Attribute",
+            help="A Universal Record that need to be linked to the current Universal Record.",
+            required=True
+        )
+    )
+    key: TypeRef = field(
+        default=None,
+        metadata=dict(
+            name="Key",
+            type="Attribute",
+            help=None,
+        )
+    )
+
+
+@dataclass
+class LoyaltyProgram(AttrLoyalty):
+    level: str = field(
+        default=None,
+        metadata=dict(
+            name="Level",
+            type="Attribute",
+            help=None,
+        )
+    )
+
+
+@dataclass
+class McofeeInfo(AttrAmountPercent):
+    """
+    Information related to the PTA/TOD (Prepaid Ticket Advice / Ticket on Departure) related to the MCO
+    """
+
+    fee_applies_to_ind: str = field(
+        default=None,
+        metadata=dict(
+            name="FeeAppliesToInd",
+            type="Attribute",
+            help="Indicates if PTA/TOD fee is for the entire MCO or is per person.",
+        )
+    )
+
+
+@dataclass
+class NameRemark(AttrElementKeyResults):
     """
     Text that support Name Remarks.
     """
@@ -7960,6 +8338,75 @@ class NameRemark:
             name="Category",
             type="Attribute",
             help="A category to group and organize the various remarks. This is not required, but it is recommended.",
+        )
+    )
+
+
+@dataclass
+class OptionalServiceApplicationLimitType(OptionalServiceApplicabilityLimitGroup):
+    """
+    The optional service application limit
+    """
+
+    pass
+
+
+@dataclass
+class Osi(AttrElementKeyResults):
+    """
+    Other Service information sent to the carriers during air bookings
+    """
+
+    key: TypeRef = field(
+        default=None,
+        metadata=dict(
+            name="Key",
+            type="Attribute",
+            help=None,
+        )
+    )
+    carrier: TypeCarrier = field(
+        default=None,
+        metadata=dict(
+            name="Carrier",
+            type="Attribute",
+            help=None,
+            required=True
+        )
+    )
+    code: str = field(
+        default=None,
+        metadata=dict(
+            name="Code",
+            type="Attribute",
+            help=None,
+            max_length=4.0
+        )
+    )
+    text: str = field(
+        default=None,
+        metadata=dict(
+            name="Text",
+            type="Attribute",
+            help=None,
+            required=True,
+            max_length=256.0
+        )
+    )
+    provider_reservation_info_ref: TypeRef = field(
+        default=None,
+        metadata=dict(
+            name="ProviderReservationInfoRef",
+            type="Attribute",
+            help="Provider reservation reference key.",
+        )
+    )
+    provider_code: TypeProviderCode = field(
+        default=None,
+        metadata=dict(
+            name="ProviderCode",
+            type="Attribute",
+            help="Contains the Provider Code of the provider for which this OSI is used",
         )
     )
 
@@ -8065,6 +8512,81 @@ class PassiveInfo:
 
 
 @dataclass
+class Payment(AttrElementKeyResults):
+    """
+    Payment information - must be used in conjunction with credit card info
+    """
+
+    key: TypeRef = field(
+        default=None,
+        metadata=dict(
+            name="Key",
+            type="Attribute",
+            help=None,
+        )
+    )
+    type: str = field(
+        default=None,
+        metadata=dict(
+            name="Type",
+            type="Attribute",
+            help="Identifies the type of payment. This can be for an itinerary, a traveler, or a service fee for example.",
+            required=True
+        )
+    )
+    form_of_payment_ref: TypeRef = field(
+        default=None,
+        metadata=dict(
+            name="FormOfPaymentRef",
+            type="Attribute",
+            help="The credit card that is will be used to make this payment.",
+            required=True
+        )
+    )
+    booking_traveler_ref: TypeRef = field(
+        default=None,
+        metadata=dict(
+            name="BookingTravelerRef",
+            type="Attribute",
+            help="If the type represents a per traveler payment, then this will reference the traveler this payment refers to.",
+        )
+    )
+    amount: TypeMoney = field(
+        default=None,
+        metadata=dict(
+            name="Amount",
+            type="Attribute",
+            help=None,
+            required=True
+        )
+    )
+    amount_type: StringLength1to32 = field(
+        default=None,
+        metadata=dict(
+            name="AmountType",
+            type="Attribute",
+            help="This field displays type of payment amount when it is non-monetary. Presently available/supported value is 'Flight Pass Credits'.",
+        )
+    )
+    approximate_amount: TypeMoney = field(
+        default=None,
+        metadata=dict(
+            name="ApproximateAmount",
+            type="Attribute",
+            help="It stores the converted payment amount in agency's default currency",
+        )
+    )
+    status: str = field(
+        default=None,
+        metadata=dict(
+            name="Status",
+            type="Attribute",
+            help="Status to indicate the business association of the payment element.",
+        )
+    )
+
+
+@dataclass
 class PaymentRestriction:
     card_restriction: List[CardRestriction] = field(
         default_factory=list,
@@ -8101,7 +8623,7 @@ class PermittedProviders:
 
 
 @dataclass
-class PhoneNumber:
+class PhoneNumber(AttrElementKeyResults):
     """
     Consists of type (office, home, fax), location (city code), the country code, the number, and an extension.
     """
@@ -8402,7 +8924,233 @@ class ProviderArnksegment:
 
 
 @dataclass
-class Segment:
+class QueuePlace:
+    """
+    Allow queue placement of a PNR at the time of booking to be used for Providers 1G,1V,1P and 1J.
+    """
+
+    pseudo_city_code: TypePcc = field(
+        default=None,
+        metadata=dict(
+            name="PseudoCityCode",
+            type="Element",
+            help="Pseudo City Code",
+        )
+    )
+    queue_selector: List[QueueSelector] = field(
+        default_factory=list,
+        metadata=dict(
+            name="QueueSelector",
+            type="Element",
+            help="Identifies the Queue Information to be selected for placing the UR",
+            min_occurs=0,
+            max_occurs=999
+        )
+    )
+
+
+@dataclass
+class RailSeatAssignment(AttrElementKeyResults):
+    """
+    Identifies the seat assignment for a passenger on RailSegment.
+    """
+
+    characteristic: List[Characteristic] = field(
+        default_factory=list,
+        metadata=dict(
+            name="Characteristic",
+            type="Element",
+            help=None,
+            min_occurs=0,
+            max_occurs=999
+        )
+    )
+    key: TypeRef = field(
+        default=None,
+        metadata=dict(
+            name="Key",
+            type="Attribute",
+            help=None,
+        )
+    )
+    status: TypeStatusCode = field(
+        default=None,
+        metadata=dict(
+            name="Status",
+            type="Attribute",
+            help=None,
+            required=True
+        )
+    )
+    seat: str = field(
+        default=None,
+        metadata=dict(
+            name="Seat",
+            type="Attribute",
+            help=None,
+            required=True
+        )
+    )
+    rail_segment_ref: TypeRef = field(
+        default=None,
+        metadata=dict(
+            name="RailSegmentRef",
+            type="Attribute",
+            help=None,
+        )
+    )
+    coach_number: str = field(
+        default=None,
+        metadata=dict(
+            name="CoachNumber",
+            type="Attribute",
+            help=None,
+        )
+    )
+
+
+@dataclass
+class ReviewBooking(AttrElementKeyResults):
+    """
+    Review Booking or Queue Minders is to add the reminders in the Provider Reservation along with the date time and Queue details. On the date time defined in reminders, the message along with the PNR goes to the desired Queue.
+    """
+
+    key: TypeRef = field(
+        default=None,
+        metadata=dict(
+            name="Key",
+            type="Attribute",
+            help="Returned in response. Use it for update of saved review booking.",
+        )
+    )
+    queue: int = field(
+        default=None,
+        metadata=dict(
+            name="Queue",
+            type="Attribute",
+            help="Queue number, Must be numeric and less than 100.",
+            required=True,
+            max_inclusive=99.0
+        )
+    )
+    queue_category: str = field(
+        default=None,
+        metadata=dict(
+            name="QueueCategory",
+            type="Attribute",
+            help="Queue Category, 2 Character Alpha or Numeric.",
+            max_length=2.0
+        )
+    )
+    date_time: str = field(
+        default=None,
+        metadata=dict(
+            name="DateTime",
+            type="Attribute",
+            help="Date and Time to place message on designated Queue, Should be prior to the last segment date in the PNR.",
+            required=True
+        )
+    )
+    pseudo_city_code: TypePcc = field(
+        default=None,
+        metadata=dict(
+            name="PseudoCityCode",
+            type="Attribute",
+            help="Input PCC optional value for placing the PNR into Queue. If not passed, will add as default PNR's Pseudo.",
+        )
+    )
+    provider_code: TypeProviderCode = field(
+        default=None,
+        metadata=dict(
+            name="ProviderCode",
+            type="Attribute",
+            help="The code of the Provider (e.g 1G,1V).",
+        )
+    )
+    provider_reservation_info_ref: TypeRef = field(
+        default=None,
+        metadata=dict(
+            name="ProviderReservationInfoRef",
+            type="Attribute",
+            help="Provider Reservation reference. Returned in the response. Use it for update of saved Review Booking.",
+        )
+    )
+    remarks: str = field(
+        default=None,
+        metadata=dict(
+            name="Remarks",
+            type="Attribute",
+            help="Remark or reminder message. It can be truncated depending on the provider.",
+            required=True,
+            max_length=300.0
+        )
+    )
+
+
+@dataclass
+class SeatAssignment(AttrElementKeyResults):
+    key: TypeRef = field(
+        default=None,
+        metadata=dict(
+            name="Key",
+            type="Attribute",
+            help=None,
+        )
+    )
+    status: TypeStatusCode = field(
+        default=None,
+        metadata=dict(
+            name="Status",
+            type="Attribute",
+            help=None,
+            required=True
+        )
+    )
+    seat: str = field(
+        default=None,
+        metadata=dict(
+            name="Seat",
+            type="Attribute",
+            help=None,
+            required=True
+        )
+    )
+    seat_type_code: TypeSeatTypeCode = field(
+        default=None,
+        metadata=dict(
+            name="SeatTypeCode",
+            type="Attribute",
+            help="The 4 letter SSR code like SMSW,NSSW,SMST etc.",
+        )
+    )
+    segment_ref: TypeRef = field(
+        default=None,
+        metadata=dict(
+            name="SegmentRef",
+            type="Attribute",
+            help=None,
+        )
+    )
+    flight_details_ref: TypeRef = field(
+        default=None,
+        metadata=dict(
+            name="FlightDetailsRef",
+            type="Attribute",
+            help=None,
+        )
+    )
+    rail_coach_number: str = field(
+        default=None,
+        metadata=dict(
+            name="RailCoachNumber",
+            type="Attribute",
+            help="Coach number for which rail seatmap/coachmap is returned.",
+        )
+    )
+
+
+@dataclass
+class Segment(AttrElementKeyResults):
     """
     The base segment type
     """
@@ -8548,28 +9296,155 @@ class ServiceData:
 
 
 @dataclass
-class Ssrinfo:
-    """
-    Bundle SSR with BookingTraveler reference in order to add SSR post booking
-    """
-
-    ssr: Ssr = field(
+class SpecialEquipment(AttrElementKeyResults):
+    key: TypeRef = field(
         default=None,
         metadata=dict(
-            name="SSR",
-            type="Element",
+            name="Key",
+            type="Attribute",
             help=None,
+        )
+    )
+    type: str = field(
+        default=None,
+        metadata=dict(
+            name="Type",
+            type="Attribute",
+            help="Special equipment associated with a specific vehicle",
             required=True
         )
     )
-    booking_traveler_ref: List[TypeRef] = field(
-        default_factory=list,
+
+
+@dataclass
+class Ssr(AttrElementKeyResults):
+    """
+    Special serivces like wheel chair, or pet carrier.
+    """
+
+    key: TypeRef = field(
+        default=None,
         metadata=dict(
-            name="BookingTravelerRef",
-            type="Element",
-            help="Reference to Booking Traveler.",
-            min_occurs=0,
-            max_occurs=999
+            name="Key",
+            type="Attribute",
+            help=None,
+        )
+    )
+    segment_ref: TypeRef = field(
+        default=None,
+        metadata=dict(
+            name="SegmentRef",
+            type="Attribute",
+            help="Reference to the air segment. May be required for some Types.",
+        )
+    )
+    passive_segment_ref: TypeRef = field(
+        default=None,
+        metadata=dict(
+            name="PassiveSegmentRef",
+            type="Attribute",
+            help="Reference to the passive segment.",
+        )
+    )
+    provider_reservation_info_ref: TypeRef = field(
+        default=None,
+        metadata=dict(
+            name="ProviderReservationInfoRef",
+            type="Attribute",
+            help="Provider reservation reference key.",
+        )
+    )
+    type: TypeSsrcode = field(
+        default=None,
+        metadata=dict(
+            name="Type",
+            type="Attribute",
+            help="Programmatic SSRs use codes recognized by the provider/supplier (example, VGML=vegetarian meal code). Manual SSRs do not have an associated programmatic code.",
+            required=True
+        )
+    )
+    status: str = field(
+        default=None,
+        metadata=dict(
+            name="Status",
+            type="Attribute",
+            help=None,
+        )
+    )
+    free_text: TypeSsrfreeText = field(
+        default=None,
+        metadata=dict(
+            name="FreeText",
+            type="Attribute",
+            help="Certain SSR types will require a free text message. For example MAAS (Meet and assist).",
+        )
+    )
+    carrier: TypeCarrier = field(
+        default=None,
+        metadata=dict(
+            name="Carrier",
+            type="Attribute",
+            help=None,
+        )
+    )
+    carrier_specific_text: str = field(
+        default=None,
+        metadata=dict(
+            name="CarrierSpecificText",
+            type="Attribute",
+            help="Carrier specific information which are not captured in the FreeText field(not present in IATA's standard SSR DOCO format). An example is VISA Expiration Date.",
+            min_length=1.0,
+            max_length=64.0
+        )
+    )
+    description: str = field(
+        default=None,
+        metadata=dict(
+            name="Description",
+            type="Attribute",
+            help=None,
+        )
+    )
+    provider_defined_type: str = field(
+        default=None,
+        metadata=dict(
+            name="ProviderDefinedType",
+            type="Attribute",
+            help="Original Type as sent by the provider",
+            min_length=1.0,
+            max_length=16.0
+        )
+    )
+    ssrrule_ref: TypeRef = field(
+        default=None,
+        metadata=dict(
+            name="SSRRuleRef",
+            type="Attribute",
+            help="UniqueID to associate a rule to the SSR",
+        )
+    )
+    url: str = field(
+        default=None,
+        metadata=dict(
+            name="URL",
+            type="Attribute",
+            help=None,
+        )
+    )
+    profile_id: str = field(
+        default=None,
+        metadata=dict(
+            name="ProfileID",
+            type="Attribute",
+            help="Key assigned for Secure Flight Document value from the specified profile",
+        )
+    )
+    profile_secure_flight_doc_key: TypeRef = field(
+        default=None,
+        metadata=dict(
+            name="ProfileSecureFlightDocKey",
+            type="Attribute",
+            help="Unique ID of Booking Traveler's Profile that contains the Secure flight Detail",
         )
     )
 
@@ -8627,7 +9502,16 @@ class SupplierLocator:
 
 
 @dataclass
-class ThirdPartyInformation:
+class TaxDetail(AttrTaxDetail):
+    """
+    The tax idetail nformation for a fare quote tax.
+    """
+
+    pass
+
+
+@dataclass
+class ThirdPartyInformation(AttrElementKeyResults):
     """
     Third party supplier locator information. Specifically applicable for SDK booking.
     """
@@ -8779,6 +9663,145 @@ class TransactionType:
 
 
 @dataclass
+class TravelComplianceData(AttrElementKeyResults):
+    """
+    Travel Compliance and Preferred Supplier information of the traveler specific to a segment.
+    """
+
+    policy_compliance: List["TravelComplianceData.PolicyCompliance"] = field(
+        default_factory=list,
+        metadata=dict(
+            name="PolicyCompliance",
+            type="Element",
+            help=None,
+            min_occurs=0,
+            max_occurs=2
+        )
+    )
+    contract_compliance: List["TravelComplianceData.ContractCompliance"] = field(
+        default_factory=list,
+        metadata=dict(
+            name="ContractCompliance",
+            type="Element",
+            help=None,
+            min_occurs=0,
+            max_occurs=2
+        )
+    )
+    preferred_supplier: List["TravelComplianceData.PreferredSupplier"] = field(
+        default_factory=list,
+        metadata=dict(
+            name="PreferredSupplier",
+            type="Element",
+            help=None,
+            min_occurs=0,
+            max_occurs=999
+        )
+    )
+    key: TypeRef = field(
+        default=None,
+        metadata=dict(
+            name="Key",
+            type="Attribute",
+            help="System generated key, returned back in the response. This can be used to modify or delete a saved TravelComplianceData.",
+        )
+    )
+    air_segment_ref: TypeRef = field(
+        default=None,
+        metadata=dict(
+            name="AirSegmentRef",
+            type="Attribute",
+            help="Refers to Air Segment. Applicable only for Air. Ignored for others.",
+        )
+    )
+    passive_segment_ref: TypeRef = field(
+        default=None,
+        metadata=dict(
+            name="PassiveSegmentRef",
+            type="Attribute",
+            help="Refers to Passive Segment. Applicable only for Passive. Ignored for others.",
+        )
+    )
+    rail_segment_ref: TypeRef = field(
+        default=None,
+        metadata=dict(
+            name="RailSegmentRef",
+            type="Attribute",
+            help="Refers to Rail Segment. Applicable only for Rail. Ignored for others.",
+        )
+    )
+    reservation_locator_ref: TypeLocatorCode = field(
+        default=None,
+        metadata=dict(
+            name="ReservationLocatorRef",
+            type="Attribute",
+            help="This is returned in the response. Any input will be ignored for this attribute. This represents the association of Travel Compliance Data with the uAPI reservation locator code, mainly relevant to Hotel and Vehicle.",
+        )
+    )
+
+    @dataclass
+    class PolicyCompliance:
+        in_policy: bool = field(
+            default=None,
+            metadata=dict(
+                name="InPolicy",
+                type="Attribute",
+                help="Policy Compliance Indicator. For In-Policy set to 'true', For Out-Of-Policy set to 'false''.",
+                required=True
+            )
+        )
+        policy_token: StringLength1to128 = field(
+            default=None,
+            metadata=dict(
+                name="PolicyToken",
+                type="Attribute",
+                help="Optional text message to set the rule or token for which it's In Policy or Out Of Policy.",
+            )
+        )
+
+    @dataclass
+    class ContractCompliance:
+        in_contract: bool = field(
+            default=None,
+            metadata=dict(
+                name="InContract",
+                type="Attribute",
+                help="Contract Compliance Indicator. For In-Contract set to 'true', For Out-Of-Contract set to 'false'.",
+                required=True
+            )
+        )
+        contract_token: StringLength1to128 = field(
+            default=None,
+            metadata=dict(
+                name="ContractToken",
+                type="Attribute",
+                help="Optional text message to set the rule or token for which it's In Contract or Out Of Contract.",
+            )
+        )
+
+    @dataclass
+    class PreferredSupplier:
+        preferred: bool = field(
+            default=None,
+            metadata=dict(
+                name="Preferred",
+                type="Attribute",
+                help="Preferred Supplier - 'true', 'false'.",
+                required=True
+            )
+        )
+        profile_type: TypeProfileType = field(
+            default=None,
+            metadata=dict(
+                name="ProfileType",
+                type="Attribute",
+                help="Indicate profile type. e.g. if Agency Preferred then pass Agency, if Traveler Preferred then pass Traveler.",
+                required=True
+            )
+        )
+
+
+@dataclass
 class TypeAgencyHierarchyLongReference(TypeAgencyHierarchyReference):
     profile_version: int = field(
         default=None,
@@ -8818,7 +9841,7 @@ class TypeAssociatedRemark(TypeRemarkWithTravelerRef):
 
 
 @dataclass
-class TypeFeeInfo:
+class TypeFeeInfo(AttrProviderSupplier, AttrElementKeyResults):
     """
     A generic type of fee for those charges which are incurred by the passenger, but not necessarily shown on tickets
     """
@@ -9064,6 +10087,15 @@ class TypeOtakeyword:
 
 
 @dataclass
+class TypeProviderReservationDetail(ProviderReservation):
+    """
+    Details of a provider reservation locator consisting of provider locator code and provider code. To be used as a request element type while accessing a specific PNR
+    """
+
+    pass
+
+
+@dataclass
 class TypeProviderReservationSpecificInfo:
     operated_by: List[OperatedBy] = field(
         default_factory=list,
@@ -9154,7 +10186,7 @@ class TypeSearchLocation:
 
 
 @dataclass
-class TypeStructuredAddress:
+class TypeStructuredAddress(AttrElementKeyResults):
     """
     A fully structured address
     """
@@ -9233,109 +10265,6 @@ class TypeStructuredAddress:
             name="Key",
             type="Attribute",
             help="Key for update/delete of the element",
-        )
-    )
-
-
-@dataclass
-class TypeTaxInfo:
-    tax_detail: List[TaxDetail] = field(
-        default_factory=list,
-        metadata=dict(
-            name="TaxDetail",
-            type="Element",
-            help=None,
-            min_occurs=0,
-            max_occurs=999
-        )
-    )
-    included_in_base: IncludedInBase = field(
-        default=None,
-        metadata=dict(
-            name="IncludedInBase",
-            type="Element",
-            help=None,
-        )
-    )
-    key: TypeRef = field(
-        default=None,
-        metadata=dict(
-            name="Key",
-            type="Attribute",
-            help="The tax key represents a valid key of tax",
-        )
-    )
-    category: str = field(
-        default=None,
-        metadata=dict(
-            name="Category",
-            type="Attribute",
-            help="The tax category represents a valid IATA tax code.",
-            required=True
-        )
-    )
-    carrier_defined_category: str = field(
-        default=None,
-        metadata=dict(
-            name="CarrierDefinedCategory",
-            type="Attribute",
-            help="Optional category, where a carrier has used a non-standard IATA tax category. The tax category will be set to 'DU'",
-        )
-    )
-    segment_ref: TypeRef = field(
-        default=None,
-        metadata=dict(
-            name="SegmentRef",
-            type="Attribute",
-            help="The segment to which that tax is relative (if applicable)",
-        )
-    )
-    flight_details_ref: TypeRef = field(
-        default=None,
-        metadata=dict(
-            name="FlightDetailsRef",
-            type="Attribute",
-            help="The flight details that this tax is relative to (if applicable)",
-        )
-    )
-    coupon_ref: TypeRef = field(
-        default=None,
-        metadata=dict(
-            name="CouponRef",
-            type="Attribute",
-            help="The coupon to which that tax is relative (if applicable)",
-        )
-    )
-    tax_exempted: bool = field(
-        default=None,
-        metadata=dict(
-            name="TaxExempted",
-            type="Attribute",
-            help="This indicates whether the tax specified by tax category is exempted.",
-        )
-    )
-    provider_code: TypeProviderCode = field(
-        default=None,
-        metadata=dict(
-            name="ProviderCode",
-            type="Attribute",
-            help="Code of the provider returning this TaxInfo.",
-        )
-    )
-    supplier_code: TypeSupplierCode = field(
-        default=None,
-        metadata=dict(
-            name="SupplierCode",
-            type="Attribute",
-            help="Code of the supplier returning this TaxInfo.",
-        )
-    )
-    text: StringLength1to128 = field(
-        default=None,
-        metadata=dict(
-            name="Text",
-            type="Attribute",
-            help="Additional Information returned from Supplier.(ACH only)",
         )
     )
 
@@ -9457,6 +10386,1044 @@ class AgencyInformation:
             help=None,
             min_occurs=0,
             max_occurs=999
+        )
+    )
+
+
+@dataclass
+class AirSeatAssignment(SeatAssignment):
+    """
+    Identifies the seat assignment for a passenger.
+    """
+
+    pass
+
+
+@dataclass
+class Apiprovider:
+    transaction_type: TransactionType = field(
+        default=None,
+        metadata=dict(
+            name="TransactionType",
+            type="Element",
+            help=None,
+        )
+    )
+    available_pseudo_city_code: List["Apiprovider.AvailablePseudoCityCode"] = field(
+        default_factory=list,
+        metadata=dict(
+            name="AvailablePseudoCityCode",
+            type="Element",
+            help=None,
+            min_occurs=0,
+            max_occurs=999
+        )
+    )
+    provider_code: TypeProviderCode = field(
+        default=None,
+        metadata=dict(
+            name="ProviderCode",
+            type="Attribute",
+            help="The Provider Code of the host",
+            required=True
+        )
+    )
+    supplier_code: TypeSupplierCode = field(
+        default=None,
+        metadata=dict(
+            name="SupplierCode",
+            type="Attribute",
+            help="The Supplier Code of the host",
+        )
+    )
+    iatacode: TypeIata = field(
+        default=None,
+        metadata=dict(
+            name="IATACode",
+            type="Attribute",
+            help="Agency IATA or ARC code, used as an ID with airlines.",
+        )
+    )
+
+    @dataclass
+    class AvailablePseudoCityCode:
+        pseudo_city_code: TypePcc = field(
+            default=None,
+            metadata=dict(
+                name="PseudoCityCode",
+                type="Attribute",
+                help="The PseudoCityCode used to connect to the host.",
+            )
+        )
+
+
+@dataclass
+class BaseReservation:
+    accounting_remark: List[AccountingRemark] = field(
+        default_factory=list,
+        metadata=dict(
+            name="AccountingRemark",
+            type="Element",
+            help=None,
+            min_occurs=0,
+            max_occurs=999
+        )
+    )
+    general_remark: List[GeneralRemark] = field(
+        default_factory=list,
+        metadata=dict(
+            name="GeneralRemark",
+            type="Element",
+            help=None,
+            min_occurs=0,
+            max_occurs=999
+        )
+    )
+    restriction: List[Restriction] = field(
+        default_factory=list,
+        metadata=dict(
+            name="Restriction",
+            type="Element",
+            help=None,
+            min_occurs=0,
+            max_occurs=999
+        )
+    )
+    passive_info: PassiveInfo = field(
+        default=None,
+        metadata=dict(
+            name="PassiveInfo",
+            type="Element",
+            help=None,
+        )
+    )
+    locator_code: TypeLocatorCode = field(
+        default=None,
+        metadata=dict(
+            name="LocatorCode",
+            type="Attribute",
+            help="The unique identifier for this reservation. If this is this View Only UR LocatorCode is '999999'.",
+            required=True
+        )
+    )
+    create_date: str = field(
+        default=None,
+        metadata=dict(
+            name="CreateDate",
+            type="Attribute",
+            help="The date and time that this reservation was created.",
+            required=True
+        )
+    )
+    modified_date: str = field(
+        default=None,
+        metadata=dict(
+            name="ModifiedDate",
+            type="Attribute",
+            help="The date and time that this reservation was last modified for any reason.",
+            required=True
+        )
+    )
+    customer_number: str = field(
+        default=None,
+        metadata=dict(
+            name="CustomerNumber",
+            type="Attribute",
+            help=None,
+        )
+    )
+
+
+@dataclass
+class ConnectionPoint(TypeLocation):
+    """
+    A connection point can be eith an IATA airport or cir city code.
+    """
+
+    pass
+
+
+@dataclass
+class DeliveryInfo:
+    """
+    Container to encapsulate all delivery related information
+    """
+
+    shipping_address: "DeliveryInfo.ShippingAddress" = field(
+        default=None,
+        metadata=dict(
+            name="ShippingAddress",
+            type="Element",
+            help=None,
+        )
+    )
+    phone_number: PhoneNumber = field(
+        default=None,
+        metadata=dict(
+            name="PhoneNumber",
+            type="Element",
+            help=None,
+        )
+    )
+    email: Email = field(
+        default=None,
+        metadata=dict(
+            name="Email",
+            type="Element",
+            help=None,
+        )
+    )
+    general_remark: List[GeneralRemark] = field(
+        default_factory=list,
+        metadata=dict(
+            name="GeneralRemark",
+            type="Element",
+            help=None,
+            min_occurs=0,
+            max_occurs=999
+        )
+    )
+    provider_reservation_info_ref: List[ProviderReservationInfoRef] = field(
+        default_factory=list,
+        metadata=dict(
+            name="ProviderReservationInfoRef",
+            type="Element",
+            help="Tagging provider reservation info with Delivery Info.",
+            min_occurs=0,
+            max_occurs=999
+        )
+    )
+    type: str = field(
+        default=None,
+        metadata=dict(
+            name="Type",
+            type="Attribute",
+            help="An arbitrary identifier to categorize this delivery info",
+        )
+    )
+    signature_required: str = field(
+        default=None,
+        metadata=dict(
+            name="SignatureRequired",
+            type="Attribute",
+            help="Indicates whether a signature shoud be required in order to make the delivery.",
+            max_length=10.0
+        )
+    )
+    tracking_number: str = field(
+        default=None,
+        metadata=dict(
+            name="TrackingNumber",
+            type="Attribute",
+            help="The tracking number of the shipping company making the delivery.",
+        )
+    )
+
+    @dataclass
+    class ShippingAddress(TypeStructuredAddress):
+        pass
+
+
+@dataclass
+class InvoiceData:
+    """
+    List of invoices only for 1G/1V
+    """
+
+    booking_traveler_information: List[BookingTravelerInformation] = field(
+        default_factory=list,
+        metadata=dict(
+            name="BookingTravelerInformation",
+            type="Element",
+            help=None,
+            min_occurs=1,
+            max_occurs=9
+        )
+    )
+    key: TypeRef = field(
+        default=None,
+        metadata=dict(
+            name="Key",
+            type="Attribute",
+            help=None,
+        )
+    )
+    invoice_number: str = field(
+        default=None,
+        metadata=dict(
+            name="InvoiceNumber",
+            type="Attribute",
+            help="Invoice number",
+            required=True
+        )
+    )
+    issue_date: str = field(
+        default=None,
+        metadata=dict(
+            name="IssueDate",
+            type="Attribute",
+            help="Invoice issue date",
+        )
+    )
+    provider_reservation_info_ref: TypeRef = field(
+        default=None,
+        metadata=dict(
+            name="ProviderReservationInfoRef",
+            type="Attribute",
+            help="Provider reservation reference key.",
+            required=True
+        )
+    )
+
+
+@dataclass
+class InvoiceRemark(TypeAssociatedRemark):
+    air_segment_ref: TypeSegmentRef = field(
+        default=None,
+        metadata=dict(
+            name="AirSegmentRef",
+            type="Element",
+            help="Reference to AirSegment from an Air Reservation.",
+        )
+    )
+    hotel_reservation_ref: TypeNonAirReservationRef = field(
+        default=None,
+        metadata=dict(
+            name="HotelReservationRef",
+            type="Element",
+            help="Specify the locator code of Hotel reservation.",
+        )
+    )
+    vehicle_reservation_ref: TypeNonAirReservationRef = field(
+        default=None,
+        metadata=dict(
+            name="VehicleReservationRef",
+            type="Element",
+            help="Specify the locator code of Vehicle reservation.",
+        )
+    )
+    passive_segment_ref: TypeSegmentRef = field(
+        default=None,
+        metadata=dict(
+            name="PassiveSegmentRef",
+            type="Element",
+            help="Reference to PassiveSegment from a Passive Reservation.",
+        )
+    )
+
+
+@dataclass
+class LocationAddress(TypeStructuredAddress):
+    pass
+
+
+@dataclass
+class LoyaltyCard(AttrLoyalty):
+    """
+    Provider loyalty card information
+    """
+
+    provider_reservation_specific_info: List[TypeProviderReservationSpecificInfo] = field(
+        default_factory=list,
+        metadata=dict(
+            name="ProviderReservationSpecificInfo",
+            type="Element",
+            help=None,
+            min_occurs=0,
+            max_occurs=999
+        )
+    )
+    card_number: TypeCardNumber = field(
+        default=None,
+        metadata=dict(
+            name="CardNumber",
+            type="Attribute",
+            help=None,
+            required=True
+        )
+    )
+    status: str = field(
+        default=None,
+        metadata=dict(
+            name="Status",
+            type="Attribute",
+            help=None,
+        )
+    )
+    membership_status: str = field(
+        default=None,
+        metadata=dict(
+            name="MembershipStatus",
+            type="Attribute",
+            help=None,
+        )
+    )
+    free_text: str = field(
+        default=None,
+        metadata=dict(
+            name="FreeText",
+            type="Attribute",
+            help=None,
+        )
+    )
+    supplier_type: TypeProduct = field(
+        default=None,
+        metadata=dict(
+            name="SupplierType",
+            type="Attribute",
+            help=None,
+        )
+    )
+    level: str = field(
+        default=None,
+        metadata=dict(
+            name="Level",
+            type="Attribute",
+            help=None,
+            pattern="[a-zA-Z0-9]{1,1}"
+        )
+    )
+    priority_code: TypePriorityCode = field(
+        default=None,
+        metadata=dict(
+            name="PriorityCode",
+            type="Attribute",
+            help=None,
+        )
+    )
+    vendor_location_ref: str = field(
+        default=None,
+        metadata=dict(
+            name="VendorLocationRef",
+            type="Attribute",
+            help=None,
+        )
+    )
+
+
+@dataclass
+class Mcoinformation:
+    passenger_info: List[PassengerInfo] = field(
+        default_factory=list,
+        metadata=dict(
+            name="PassengerInfo",
+            type="Element",
+            help=None,
+            min_occurs=0,
+            max_occurs=999
+        )
+    )
+    mconumber: str = field(
+        default=None,
+        metadata=dict(
+            name="MCONumber",
+            type="Attribute",
+            help="The unique MCO number",
+        )
+    )
+    status: str = field(
+        default=None,
+        metadata=dict(
+            name="Status",
+            type="Attribute",
+            help="Current status of the MCO",
+        )
+    )
+    mcotype: str = field(
+        default=None,
+        metadata=dict(
+            name="MCOType",
+            type="Attribute",
+            help="The Type of MCO. Once of Agency Fee, Airline Service Fee, or Residual value from an Exchange.",
+        )
+    )
+
+
+@dataclass
+class ProviderReservationDetail(TypeProviderReservationDetail):
+    """
+    common element for mentioning provider reservation locator (PNR) details in request.
+    """
+
+    pass
+
+
+@dataclass
+class ReservationName:
+    """
+    Container to represent reservation name as appears in GDS booking
+    """
+
+    booking_traveler_ref: BookingTravelerRef = field(
+        default=None,
+        metadata=dict(
+            name="BookingTravelerRef",
+            type="Element",
+            help=None,
+            required=True
+        )
+    )
+    name_override: NameOverride = field(
+        default=None,
+        metadata=dict(
+            name="NameOverride",
+            type="Element",
+            help="To be used if the reservation name is other than booking travelers in the PNR",
+            required=True
+        )
+    )
+
+
+@dataclass
+class ServiceRuleType:
+    """
+    Contains the rules for applying service rules
+    """
+
+    application_rules: "ServiceRuleType.ApplicationRules" = field(
+        default=None,
+        metadata=dict(
+            name="ApplicationRules",
+            type="Element",
+            help="The rules to apply the rule to the itinerary",
+        )
+    )
+    application_level: "ServiceRuleType.ApplicationLevel" = field(
+        default=None,
+        metadata=dict(
+            name="ApplicationLevel",
+            type="Element",
+            help="Lists the levels where the option is applied in the itinerary. Some options are applied for the entire itinerary, some for entire segments, etc.",
+        )
+    )
+    modify_rules: "ServiceRuleType.ModifyRules" = field(
+        default=None,
+        metadata=dict(
+            name="ModifyRules",
+            type="Element",
+            help="Groups the modification rules for the Option",
+        )
+    )
+    secondary_type_rules: "ServiceRuleType.SecondaryTypeRules" = field(
+        default=None,
+        metadata=dict(
+            name="SecondaryTypeRules",
+            type="Element",
+            help="Lists the supported Secondary Codes for the optional / additional service.",
+        )
+    )
+    remarks: List[FormattedTextTextType] = field(
+        default_factory=list,
+        metadata=dict(
+            name="Remarks",
+            type="Element",
+            help="Adds text remarks / rules for the optional / additional service",
+            min_occurs=0,
+            max_occurs=99
+        )
+    )
+    key: TypeRef = field(
+        default=None,
+        metadata=dict(
+            name="Key",
+            type="Attribute",
+            help="Unique ID to identify an optional service rule",
+            required=True
+        )
+    )
+
+    @dataclass
+    class ApplicationRules:
+        required_for_all_travelers: bool = field(
+            default=None,
+            metadata=dict(
+                name="RequiredForAllTravelers",
+                type="Attribute",
+                help="Indicates if the option needs to be applied to all travelers in the itinerary if selected",
+            )
+        )
+        required_for_all_segments: bool = field(
+            default=None,
+            metadata=dict(
+                name="RequiredForAllSegments",
+                type="Attribute",
+                help="Indicates if the option needs to be applied to all segments in the itinerary if selected",
+            )
+        )
+        required_for_all_segments_in_od: bool = field(
+            default=None,
+            metadata=dict(
+                name="RequiredForAllSegmentsInOD",
+                type="Attribute",
+                help="Indicates if the option needs to be applied to all segments in a origin / destination (connection flights) if selected for one segment in the OD",
+            )
+        )
+        unselected_option_required: bool = field(
+            default=None,
+            metadata=dict(
+                name="UnselectedOptionRequired",
+                type="Attribute",
+                help="If an UnselectedOption is present in the option, then the Unselected option needs to be selected even if the option is not selected when this flag is set to true",
+            )
+        )
+        secondary_option_code_required: bool = field(
+            default=None,
+            metadata=dict(
+                name="SecondaryOptionCodeRequired",
+                type="Attribute",
+                help="If set to true, the secondary option code is required for this option",
+            )
+        )
+
+    @dataclass
+    class ApplicationLevel:
+        application_limits: "ServiceRuleType.ApplicationLevel.ApplicationLimits" = field(
+            default=None,
+            metadata=dict(
+                name="ApplicationLimits",
+                type="Element",
+                help="Adds the limits on the number of options that can be selected for a particular type",
+            )
+        )
+        service_data: List[ServiceData] = field(
+            default_factory=list,
+            metadata=dict(
+                name="ServiceData",
+                type="Element",
+                help=None,
+                min_occurs=0,
+                max_occurs=999
+            )
+        )
+        applicable_levels: List[OptionalServiceApplicabilityType] = field(
+            default_factory=list,
+            metadata=dict(
+                name="ApplicableLevels",
+                type="Attribute",
+                help="Indicates the level in the itinerary when the option is applied.",
+                min_occurs=0,
+                max_occurs=9223372036854775807
+            )
+        )
+        provider_defined_applicable_levels: str = field(
+            default=None,
+            metadata=dict(
+                name="ProviderDefinedApplicableLevels",
+                type="Attribute",
+                help="Indicates the actual provider defined ApplicableLevels which is mapped to Other",
+            )
+        )
+
+        @dataclass
+        class ApplicationLimits:
+            application_limit: List[OptionalServiceApplicationLimitType] = field(
+                default_factory=list,
+                metadata=dict(
+                    name="ApplicationLimit",
+                    type="Element",
+                    help="The application limits for a particular level",
+                    min_occurs=1,
+                    max_occurs=10
+                )
+            )
+
+    @dataclass
+    class ModifyRules:
+        modify_rule: List["ServiceRuleType.ModifyRules.ModifyRule"] = field(
+            default_factory=list,
+            metadata=dict(
+                name="ModifyRule",
+                type="Element",
+                help="Indicates modification rules for the particular modification type.",
+                min_occurs=1,
+                max_occurs=999
+            )
+        )
+        supported_modifications: List[ModificationType] = field(
+            default_factory=list,
+            metadata=dict(
+                name="SupportedModifications",
+                type="Attribute",
+                help="Lists the supported modifications for the itinerary.",
+                min_occurs=0,
+                max_occurs=9223372036854775807
+            )
+        )
+        provider_defined_modification_type: str = field(
+            default=None,
+            metadata=dict(
+                name="ProviderDefinedModificationType",
+                type="Attribute",
+                help="Indicates the actual provider defined modification type which is mapped to Other",
+            )
+        )
+
+        @dataclass
+        class ModifyRule(ModificationRulesGroup):
+            pass
+
+    @dataclass
+    class SecondaryTypeRules:
+        secondary_type_rule: List["ServiceRuleType.SecondaryTypeRules.SecondaryTypeRule"] = field(
+            default_factory=list,
+            metadata=dict(
+                name="SecondaryTypeRule",
+                type="Element",
+                help="Lists a single secondary code for the optional / additional service.",
+                min_occurs=1,
+                max_occurs=999
+            )
+        )
+
+        @dataclass
+        class SecondaryTypeRule:
+            application_limit: List[OptionalServiceApplicationLimitType] = field(
+                default_factory=list,
+                metadata=dict(
+                    name="ApplicationLimit",
+                    type="Element",
+                    help=None,
+                    min_occurs=0,
+                    max_occurs=10
+                )
+            )
+            secondary_type: TypeRef = field(
+                default=None,
+                metadata=dict(
+                    name="SecondaryType",
+                    type="Attribute",
+                    help="The unique type to associate a secondary type in an optional service",
+                    required=True
+                )
+            )
+
+
+@dataclass
+class Ssrinfo:
+    """
+    Bundle SSR with BookingTraveler reference in order to add SSR post booking
+    """
+
+    ssr: Ssr = field(
+        default=None,
+        metadata=dict(
+            name="SSR",
+            type="Element",
+            help=None,
+            required=True
+        )
+    )
+    booking_traveler_ref: List[TypeRef] = field(
+        default_factory=list,
+        metadata=dict(
+            name="BookingTravelerRef",
+            type="Element",
+            help="Reference to Booking Traveler.",
+            min_occurs=0,
+            max_occurs=999
+        )
+    )
+
+
+@dataclass
+class TravelSegment(Segment):
+    """
+    Generic segment used to provide travel information that was not processed by the system
+    """
+
+    origin: TypeIatacode = field(
+        default=None,
+        metadata=dict(
+            name="Origin",
+            type="Attribute",
+            help="The IATA location code for this origination of this entity.",
+        )
+    )
+    destination: TypeIatacode = field(
+        default=None,
+        metadata=dict(
+            name="Destination",
+            type="Attribute",
+            help="The IATA location code for this destination of this entity.",
+        )
+    )
+    departure_time: str = field(
+        default=None,
+        metadata=dict(
+            name="DepartureTime",
+            type="Attribute",
+            help="The date and time at which this entity departs. This does not include time zone information since it can be derived from the origin location.",
+        )
+    )
+    arrival_time: str = field(
+        default=None,
+        metadata=dict(
+            name="ArrivalTime",
+            type="Attribute",
+            help=None,
+        )
+    )
+
+
+@dataclass
+class TravelerInformation:
+    """
+    Traveler Information required for File Finishing
+    """
+
+    emergency_contact: "TravelerInformation.EmergencyContact" = field(
+        default=None,
+        metadata=dict(
+            name="EmergencyContact",
+            type="Element",
+            help=None,
+        )
+    )
+    home_airport: TypeAirport = field(
+        default=None,
+        metadata=dict(
+            name="HomeAirport",
+            type="Attribute",
+            help=None,
+        )
+    )
+    visa_expiration_date: str = field(
+        default=None,
+        metadata=dict(
+            name="VisaExpirationDate",
+            type="Attribute",
+            help=None,
+        )
+    )
+    booking_traveler_ref: TypeRef = field(
+        default=None,
+        metadata=dict(
+            name="BookingTravelerRef",
+            type="Attribute",
+            help="A reference to a passenger.",
+            required=True
+        )
+    )
+
+    @dataclass
+    class EmergencyContact:
+        phone_number: PhoneNumber = field(
+            default=None,
+            metadata=dict(
+                name="PhoneNumber",
+                type="Element",
+                help=None,
+            )
+        )
+        name: str = field(
+            default=None,
+            metadata=dict(
+                name="Name",
+                type="Attribute",
+                help="Name of Emergency Contact Person",
+            )
+        )
+        relationship: str = field(
+            default=None,
+            metadata=dict(
+                name="Relationship",
+                type="Attribute",
+                help="Relationship between Traveler and Emergency Contact Person",
+            )
+        )
+
+
+@dataclass
+class TypeAssociatedRemarkWithSegmentRef(TypeAssociatedRemark):
+    """
+    A textual remark container to hold Associated itinerary remarks with segment association
+    """
+
+    segment_ref: TypeRef = field(
+        default=None,
+        metadata=dict(
+            name="SegmentRef",
+            type="Attribute",
+            help="Reference to an Air/Passive Segment",
+        )
+    )
+
+
+@dataclass
+class TypePaymentCard:
+    """
+    Container for all credit and debit card information.
+    """
+
+    phone_number: PhoneNumber = field(
+        default=None,
+        metadata=dict(
+            name="PhoneNumber",
+            type="Element",
+            help=None,
+        )
+    )
+    billing_address: TypeStructuredAddress = field(
+        default=None,
+        metadata=dict(
+            name="BillingAddress",
+            type="Element",
+            help="The address to where the billing statements for this card are sent. Used for address verification purposes.",
+        )
+    )
+    type: TypeCardMerchantType = field(
+        default=None,
+        metadata=dict(
+            name="Type",
+            type="Attribute",
+            help="The 2 letter credit/ debit card type.",
+        )
+    )
+    number: TypeCreditCardNumber = field(
+        default=None,
+        metadata=dict(
+            name="Number",
+            type="Attribute",
+            help=None,
+        )
+    )
+    exp_date: str = field(
+        default=None,
+        metadata=dict(
+            name="ExpDate",
+            type="Attribute",
+            help="The Expiration date of this card in YYYY-MM format.",
+        )
+    )
+    name: str = field(
+        default=None,
+        metadata=dict(
+            name="Name",
+            type="Attribute",
+            help="The name as it appears on the card.",
+            max_length=128.0
+        )
+    )
+    cvv: str = field(
+        default=None,
+        metadata=dict(
+            name="CVV",
+            type="Attribute",
+            help="Card Verification Code",
+            max_length=4.0
+        )
+    )
+    approval_code: str = field(
+        default=None,
+        metadata=dict(
+            name="ApprovalCode",
+            type="Attribute",
+            help="This code is required for an authorization process from the Credit Card company directly,required for some of the CCH carriers.This attribute is also used for EMD retrieve and issuance transactions.",
+            min_length=1.0,
+            max_length=16.0
+        )
+    )
+
+
+@dataclass
+class TypeTaxInfo(AttrTaxDetail):
+    tax_detail: List[TaxDetail] = field(
+        default_factory=list,
+        metadata=dict(
+            name="TaxDetail",
+            type="Element",
+            help=None,
+            min_occurs=0,
+            max_occurs=999
+        )
+    )
+    included_in_base: IncludedInBase = field(
+        default=None,
+        metadata=dict(
+            name="IncludedInBase",
+            type="Element",
+            help=None,
+        )
+    )
+    key: TypeRef = field(
+        default=None,
+        metadata=dict(
+            name="Key",
+            type="Attribute",
+            help="The tax key represents a valid key of tax",
+        )
+    )
+    category: str = field(
+        default=None,
+        metadata=dict(
+            name="Category",
+            type="Attribute",
+            help="The tax category represents a valid IATA tax code.",
+            required=True
+        )
+    )
+    carrier_defined_category: str = field(
+        default=None,
+        metadata=dict(
+            name="CarrierDefinedCategory",
+            type="Attribute",
+            help="Optional category, where a carrier has used a non-standard IATA tax category. The tax category will be set to 'DU'",
+        )
+    )
+    segment_ref: TypeRef = field(
+        default=None,
+        metadata=dict(
+            name="SegmentRef",
+            type="Attribute",
+            help="The segment to which that tax is relative (if applicable)",
+        )
+    )
+    flight_details_ref: TypeRef = field(
+        default=None,
+        metadata=dict(
+            name="FlightDetailsRef",
+            type="Attribute",
+            help="The flight details that this tax is relative to (if applicable)",
+        )
+    )
+    coupon_ref: TypeRef = field(
+        default=None,
+        metadata=dict(
+            name="CouponRef",
+            type="Attribute",
+            help="The coupon to which that tax is relative (if applicable)",
+        )
+    )
+    tax_exempted: bool = field(
+        default=None,
+        metadata=dict(
+            name="TaxExempted",
+            type="Attribute",
+            help="This indicates whether the tax specified by tax category is exempted.",
+        )
+    )
+    provider_code: TypeProviderCode = field(
+        default=None,
+        metadata=dict(
+            name="ProviderCode",
+            type="Attribute",
+            help="Code of the provider returning this TaxInfo.",
+        )
+    )
+    supplier_code: TypeSupplierCode = field(
+        default=None,
+        metadata=dict(
+            name="SupplierCode",
+            type="Attribute",
+            help="Code of the supplier returning this TaxInfo.",
+        )
+    )
+    text: StringLength1to128 = field(
+        default=None,
+        metadata=dict(
+            name="Text",
+            type="Attribute",
+            help="Additional Information returned from Supplier.(ACH only)",
         )
     )
 
@@ -9769,142 +11736,7 @@ class AirExchangeInfo:
 
 
 @dataclass
-class Apiprovider:
-    transaction_type: TransactionType = field(
-        default=None,
-        metadata=dict(
-            name="TransactionType",
-            type="Element",
-            help=None,
-        )
-    )
-    available_pseudo_city_code: List["Apiprovider.AvailablePseudoCityCode"] = field(
-        default_factory=list,
-        metadata=dict(
-            name="AvailablePseudoCityCode",
-            type="Element",
-            help=None,
-            min_occurs=0,
-            max_occurs=999
-        )
-    )
-    provider_code: TypeProviderCode = field(
-        default=None,
-        metadata=dict(
-            name="ProviderCode",
-            type="Attribute",
-            help="The Provider Code of the host",
-            required=True
-        )
-    )
-    supplier_code: TypeSupplierCode = field(
-        default=None,
-        metadata=dict(
-            name="SupplierCode",
-            type="Attribute",
-            help="The Supplier Code of the host",
-        )
-    )
-    iatacode: TypeIata = field(
-        default=None,
-        metadata=dict(
-            name="IATACode",
-            type="Attribute",
-            help="Agency IATA or ARC code, used as an ID with airlines.",
-        )
-    )
-
-    @dataclass
-    class AvailablePseudoCityCode:
-        pseudo_city_code: TypePcc = field(
-            default=None,
-            metadata=dict(
-                name="PseudoCityCode",
-                type="Attribute",
-                help="The PseudoCityCode used to connect to the host.",
-            )
-        )
-
-
-@dataclass
-class BaseReservation:
-    accounting_remark: List[AccountingRemark] = field(
-        default_factory=list,
-        metadata=dict(
-            name="AccountingRemark",
-            type="Element",
-            help=None,
-            min_occurs=0,
-            max_occurs=999
-        )
-    )
-    general_remark: List[GeneralRemark] = field(
-        default_factory=list,
-        metadata=dict(
-            name="GeneralRemark",
-            type="Element",
-            help=None,
-            min_occurs=0,
-            max_occurs=999
-        )
-    )
-    restriction: List[Restriction] = field(
-        default_factory=list,
-        metadata=dict(
-            name="Restriction",
-            type="Element",
-            help=None,
-            min_occurs=0,
-            max_occurs=999
-        )
-    )
-    passive_info: PassiveInfo = field(
-        default=None,
-        metadata=dict(
-            name="PassiveInfo",
-            type="Element",
-            help=None,
-        )
-    )
-    locator_code: TypeLocatorCode = field(
-        default=None,
-        metadata=dict(
-            name="LocatorCode",
-            type="Attribute",
-            help="The unique identifier for this reservation. If this is this View Only UR LocatorCode is '999999'.",
-            required=True
-        )
-    )
-    create_date: str = field(
-        default=None,
-        metadata=dict(
-            name="CreateDate",
-            type="Attribute",
-            help="The date and time that this reservation was created.",
-            required=True
-        )
-    )
-    modified_date: str = field(
-        default=None,
-        metadata=dict(
-            name="ModifiedDate",
-            type="Attribute",
-            help="The date and time that this reservation was last modified for any reason.",
-            required=True
-        )
-    )
-    customer_number: str = field(
-        default=None,
-        metadata=dict(
-            name="CustomerNumber",
-            type="Attribute",
-            help=None,
-        )
-    )
-
-
-@dataclass
-class BookingTraveler:
+class BookingTraveler(AttrBookingTravelerGrp, AttrElementKeyResults):
     """
     A traveler and all their accompanying data.
     """
@@ -9955,812 +11787,6 @@ class BookingTraveler:
             name="NameNumber",
             type="Attribute",
             help="Host Name Number",
-        )
-    )
-
-
-@dataclass
-class ConnectionPoint(TypeLocation):
-    """
-    A connection point can be eith an IATA airport or cir city code.
-    """
-
-    pass
-
-
-@dataclass
-class DeliveryInfo:
-    """
-    Container to encapsulate all delivery related information
-    """
-
-    shipping_address: "DeliveryInfo.ShippingAddress" = field(
-        default=None,
-        metadata=dict(
-            name="ShippingAddress",
-            type="Element",
-            help=None,
-        )
-    )
-    phone_number: PhoneNumber = field(
-        default=None,
-        metadata=dict(
-            name="PhoneNumber",
-            type="Element",
-            help=None,
-        )
-    )
-    email: Email = field(
-        default=None,
-        metadata=dict(
-            name="Email",
-            type="Element",
-            help=None,
-        )
-    )
-    general_remark: List[GeneralRemark] = field(
-        default_factory=list,
-        metadata=dict(
-            name="GeneralRemark",
-            type="Element",
-            help=None,
-            min_occurs=0,
-            max_occurs=999
-        )
-    )
-    provider_reservation_info_ref: List[ProviderReservationInfoRef] = field(
-        default_factory=list,
-        metadata=dict(
-            name="ProviderReservationInfoRef",
-            type="Element",
-            help="Tagging provider reservation info with Delivery Info.",
-            min_occurs=0,
-            max_occurs=999
-        )
-    )
-    type: str = field(
-        default=None,
-        metadata=dict(
-            name="Type",
-            type="Attribute",
-            help="An arbitrary identifier to categorize this delivery info",
-        )
-    )
-    signature_required: str = field(
-        default=None,
-        metadata=dict(
-            name="SignatureRequired",
-            type="Attribute",
-            help="Indicates whether a signature shoud be required in order to make the delivery.",
-            max_length=10.0
-        )
-    )
-    tracking_number: str = field(
-        default=None,
-        metadata=dict(
-            name="TrackingNumber",
-            type="Attribute",
-            help="The tracking number of the shipping company making the delivery.",
-        )
-    )
-
-    @dataclass
-    class ShippingAddress(TypeStructuredAddress):
-        pass
-
-
-@dataclass
-class InvoiceData:
-    """
-    List of invoices only for 1G/1V
-    """
-
-    booking_traveler_information: List[BookingTravelerInformation] = field(
-        default_factory=list,
-        metadata=dict(
-            name="BookingTravelerInformation",
-            type="Element",
-            help=None,
-            min_occurs=1,
-            max_occurs=9
-        )
-    )
-    key: TypeRef = field(
-        default=None,
-        metadata=dict(
-            name="Key",
-            type="Attribute",
-            help=None,
-        )
-    )
-    invoice_number: str = field(
-        default=None,
-        metadata=dict(
-            name="InvoiceNumber",
-            type="Attribute",
-            help="Invoice number",
-            required=True
-        )
-    )
-    issue_date: str = field(
-        default=None,
-        metadata=dict(
-            name="IssueDate",
-            type="Attribute",
-            help="Invoice issue date",
-        )
-    )
-    provider_reservation_info_ref: TypeRef = field(
-        default=None,
-        metadata=dict(
-            name="ProviderReservationInfoRef",
-            type="Attribute",
-            help="Provider reservation reference key.",
-            required=True
-        )
-    )
-
-
-@dataclass
-class InvoiceRemark(TypeAssociatedRemark):
-    air_segment_ref: TypeSegmentRef = field(
-        default=None,
-        metadata=dict(
-            name="AirSegmentRef",
-            type="Element",
-            help="Reference to AirSegment from an Air Reservation.",
-        )
-    )
-    hotel_reservation_ref: TypeNonAirReservationRef = field(
-        default=None,
-        metadata=dict(
-            name="HotelReservationRef",
-            type="Element",
-            help="Specify the locator code of Hotel reservation.",
-        )
-    )
-    vehicle_reservation_ref: TypeNonAirReservationRef = field(
-        default=None,
-        metadata=dict(
-            name="VehicleReservationRef",
-            type="Element",
-            help="Specify the locator code of Vehicle reservation.",
-        )
-    )
-    passive_segment_ref: TypeSegmentRef = field(
-        default=None,
-        metadata=dict(
-            name="PassiveSegmentRef",
-            type="Element",
-            help="Reference to PassiveSegment from a Passive Reservation.",
-        )
-    )
-
-
-@dataclass
-class LocationAddress(TypeStructuredAddress):
-    pass
-
-
-@dataclass
-class LoyaltyCard:
-    """
-    Provider loyalty card information
-    """
-
-    provider_reservation_specific_info: List[TypeProviderReservationSpecificInfo] = field(
-        default_factory=list,
-        metadata=dict(
-            name="ProviderReservationSpecificInfo",
-            type="Element",
-            help=None,
-            min_occurs=0,
-            max_occurs=999
-        )
-    )
-    card_number: TypeCardNumber = field(
-        default=None,
-        metadata=dict(
-            name="CardNumber",
-            type="Attribute",
-            help=None,
-            required=True
-        )
-    )
-    status: str = field(
-        default=None,
-        metadata=dict(
-            name="Status",
-            type="Attribute",
-            help=None,
-        )
-    )
-    membership_status: str = field(
-        default=None,
-        metadata=dict(
-            name="MembershipStatus",
-            type="Attribute",
-            help=None,
-        )
-    )
-    free_text: str = field(
-        default=None,
-        metadata=dict(
-            name="FreeText",
-            type="Attribute",
-            help=None,
-        )
-    )
-    supplier_type: TypeProduct = field(
-        default=None,
-        metadata=dict(
-            name="SupplierType",
-            type="Attribute",
-            help=None,
-        )
-    )
-    level: str = field(
-        default=None,
-        metadata=dict(
-            name="Level",
-            type="Attribute",
-            help=None,
-            pattern="[a-zA-Z0-9]{1,1}"
-        )
-    )
-    priority_code: TypePriorityCode = field(
-        default=None,
-        metadata=dict(
-            name="PriorityCode",
-            type="Attribute",
-            help=None,
-        )
-    )
-    vendor_location_ref: str = field(
-        default=None,
-        metadata=dict(
-            name="VendorLocationRef",
-            type="Attribute",
-            help=None,
-        )
-    )
-
-
-@dataclass
-class Mcoinformation:
-    passenger_info: List[PassengerInfo] = field(
-        default_factory=list,
-        metadata=dict(
-            name="PassengerInfo",
-            type="Element",
-            help=None,
-            min_occurs=0,
-            max_occurs=999
-        )
-    )
-    mconumber: str = field(
-        default=None,
-        metadata=dict(
-            name="MCONumber",
-            type="Attribute",
-            help="The unique MCO number",
-        )
-    )
-    status: str = field(
-        default=None,
-        metadata=dict(
-            name="Status",
-            type="Attribute",
-            help="Current status of the MCO",
-        )
-    )
-    mcotype: str = field(
-        default=None,
-        metadata=dict(
-            name="MCOType",
-            type="Attribute",
-            help="The Type of MCO. Once of Agency Fee, Airline Service Fee, or Residual value from an Exchange.",
-        )
-    )
-
-
-@dataclass
-class McopriceData:
-    tax_info: List[TypeTaxInfo] = field(
-        default_factory=list,
-        metadata=dict(
-            name="TaxInfo",
-            type="Element",
-            help=None,
-            min_occurs=0,
-            max_occurs=999
-        )
-    )
-    commission: "McopriceData.Commission" = field(
-        default=None,
-        metadata=dict(
-            name="Commission",
-            type="Element",
-            help=None,
-        )
-    )
-    mcoamount: TypeMoney = field(
-        default=None,
-        metadata=dict(
-            name="MCOAmount",
-            type="Attribute",
-            help="The total value of the MCO including any processing fees.",
-            required=True
-        )
-    )
-    mcoequivalent_fare: TypeMoney = field(
-        default=None,
-        metadata=dict(
-            name="MCOEquivalentFare",
-            type="Attribute",
-            help="Exchange value of the currency actually collected.",
-        )
-    )
-    mcototal_amount: TypeMoney = field(
-        default=None,
-        metadata=dict(
-            name="MCOTotalAmount",
-            type="Attribute",
-            help="The Total amount for the MCO.",
-        )
-    )
-
-    @dataclass
-    class Commission:
-        pass
-
-
-@dataclass
-class ReservationName:
-    """
-    Container to represent reservation name as appears in GDS booking
-    """
-
-    booking_traveler_ref: BookingTravelerRef = field(
-        default=None,
-        metadata=dict(
-            name="BookingTravelerRef",
-            type="Element",
-            help=None,
-            required=True
-        )
-    )
-    name_override: NameOverride = field(
-        default=None,
-        metadata=dict(
-            name="NameOverride",
-            type="Element",
-            help="To be used if the reservation name is other than booking travelers in the PNR",
-            required=True
-        )
-    )
-
-
-@dataclass
-class ServiceRuleType:
-    """
-    Contains the rules for applying service rules
-    """
-
-    application_rules: "ServiceRuleType.ApplicationRules" = field(
-        default=None,
-        metadata=dict(
-            name="ApplicationRules",
-            type="Element",
-            help="The rules to apply the rule to the itinerary",
-        )
-    )
-    application_level: "ServiceRuleType.ApplicationLevel" = field(
-        default=None,
-        metadata=dict(
-            name="ApplicationLevel",
-            type="Element",
-            help="Lists the levels where the option is applied in the itinerary. Some options are applied for the entire itinerary, some for entire segments, etc.",
-        )
-    )
-    modify_rules: "ServiceRuleType.ModifyRules" = field(
-        default=None,
-        metadata=dict(
-            name="ModifyRules",
-            type="Element",
-            help="Groups the modification rules for the Option",
-        )
-    )
-    secondary_type_rules: "ServiceRuleType.SecondaryTypeRules" = field(
-        default=None,
-        metadata=dict(
-            name="SecondaryTypeRules",
-            type="Element",
-            help="Lists the supported Secondary Codes for the optional / additional service.",
-        )
-    )
-    remarks: List[FormattedTextTextType] = field(
-        default_factory=list,
-        metadata=dict(
-            name="Remarks",
-            type="Element",
-            help="Adds text remarks / rules for the optional / additional service",
-            min_occurs=0,
-            max_occurs=99
-        )
-    )
-    key: TypeRef = field(
-        default=None,
-        metadata=dict(
-            name="Key",
-            type="Attribute",
-            help="Unique ID to identify an optional service rule",
-            required=True
-        )
-    )
-
-    @dataclass
-    class ApplicationRules:
-        required_for_all_travelers: bool = field(
-            default=None,
-            metadata=dict(
-                name="RequiredForAllTravelers",
-                type="Attribute",
-                help="Indicates if the option needs to be applied to all travelers in the itinerary if selected",
-            )
-        )
-        required_for_all_segments: bool = field(
-            default=None,
-            metadata=dict(
-                name="RequiredForAllSegments",
-                type="Attribute",
-                help="Indicates if the option needs to be applied to all segments in the itinerary if selected",
-            )
-        )
-        required_for_all_segments_in_od: bool = field(
-            default=None,
-            metadata=dict(
-                name="RequiredForAllSegmentsInOD",
-                type="Attribute",
-                help="Indicates if the option needs to be applied to all segments in a origin / destination (connection flights) if selected for one segment in the OD",
-            )
-        )
-        unselected_option_required: bool = field(
-            default=None,
-            metadata=dict(
-                name="UnselectedOptionRequired",
-                type="Attribute",
-                help="If an UnselectedOption is present in the option, then the Unselected option needs to be selected even if the option is not selected when this flag is set to true",
-            )
-        )
-        secondary_option_code_required: bool = field(
-            default=None,
-            metadata=dict(
-                name="SecondaryOptionCodeRequired",
-                type="Attribute",
-                help="If set to true, the secondary option code is required for this option",
-            )
-        )
-
-    @dataclass
-    class ApplicationLevel:
-        application_limits: "ServiceRuleType.ApplicationLevel.ApplicationLimits" = field(
-            default=None,
-            metadata=dict(
-                name="ApplicationLimits",
-                type="Element",
-                help="Adds the limits on the number of options that can be selected for a particular type",
-            )
-        )
-        service_data: List[ServiceData] = field(
-            default_factory=list,
-            metadata=dict(
-                name="ServiceData",
-                type="Element",
-                help=None,
-                min_occurs=0,
-                max_occurs=999
-            )
-        )
-        applicable_levels: List[OptionalServiceApplicabilityType] = field(
-            default_factory=list,
-            metadata=dict(
-                name="ApplicableLevels",
-                type="Attribute",
-                help="Indicates the level in the itinerary when the option is applied.",
-                min_occurs=0,
-                max_occurs=9223372036854775807
-            )
-        )
-        provider_defined_applicable_levels: str = field(
-            default=None,
-            metadata=dict(
-                name="ProviderDefinedApplicableLevels",
-                type="Attribute",
-                help="Indicates the actual provider defined ApplicableLevels which is mapped to Other",
-            )
-        )
-
-        @dataclass
-        class ApplicationLimits:
-            application_limit: List[OptionalServiceApplicationLimitType] = field(
-                default_factory=list,
-                metadata=dict(
-                    name="ApplicationLimit",
-                    type="Element",
-                    help="The application limits for a particular level",
-                    min_occurs=1,
-                    max_occurs=10
-                )
-            )
-
-    @dataclass
-    class ModifyRules:
-        modify_rule: List["ServiceRuleType.ModifyRules.ModifyRule"] = field(
-            default_factory=list,
-            metadata=dict(
-                name="ModifyRule",
-                type="Element",
-                help="Indicates modification rules for the particular modification type.",
-                min_occurs=1,
-                max_occurs=999
-            )
-        )
-        supported_modifications: List[ModificationType] = field(
-            default_factory=list,
-            metadata=dict(
-                name="SupportedModifications",
-                type="Attribute",
-                help="Lists the supported modifications for the itinerary.",
-                min_occurs=0,
-                max_occurs=9223372036854775807
-            )
-        )
-        provider_defined_modification_type: str = field(
-            default=None,
-            metadata=dict(
-                name="ProviderDefinedModificationType",
-                type="Attribute",
-                help="Indicates the actual provider defined modification type which is mapped to Other",
-            )
-        )
-
-        @dataclass
-        class ModifyRule:
-            pass
-
-    @dataclass
-    class SecondaryTypeRules:
-        secondary_type_rule: List["ServiceRuleType.SecondaryTypeRules.SecondaryTypeRule"] = field(
-            default_factory=list,
-            metadata=dict(
-                name="SecondaryTypeRule",
-                type="Element",
-                help="Lists a single secondary code for the optional / additional service.",
-                min_occurs=1,
-                max_occurs=999
-            )
-        )
-
-        @dataclass
-        class SecondaryTypeRule:
-            application_limit: List[OptionalServiceApplicationLimitType] = field(
-                default_factory=list,
-                metadata=dict(
-                    name="ApplicationLimit",
-                    type="Element",
-                    help=None,
-                    min_occurs=0,
-                    max_occurs=10
-                )
-            )
-            secondary_type: TypeRef = field(
-                default=None,
-                metadata=dict(
-                    name="SecondaryType",
-                    type="Attribute",
-                    help="The unique type to associate a secondary type in an optional service",
-                    required=True
-                )
-            )
-
-
-@dataclass
-class TravelSegment(Segment):
-    """
-    Generic segment used to provide travel information that was not processed by the system
-    """
-
-    origin: TypeIatacode = field(
-        default=None,
-        metadata=dict(
-            name="Origin",
-            type="Attribute",
-            help="The IATA location code for this origination of this entity.",
-        )
-    )
-    destination: TypeIatacode = field(
-        default=None,
-        metadata=dict(
-            name="Destination",
-            type="Attribute",
-            help="The IATA location code for this destination of this entity.",
-        )
-    )
-    departure_time: str = field(
-        default=None,
-        metadata=dict(
-            name="DepartureTime",
-            type="Attribute",
-            help="The date and time at which this entity departs. This does not include time zone information since it can be derived from the origin location.",
-        )
-    )
-    arrival_time: str = field(
-        default=None,
-        metadata=dict(
-            name="ArrivalTime",
-            type="Attribute",
-            help=None,
-        )
-    )
-
-
-@dataclass
-class TravelerInformation:
-    """
-    Traveler Information required for File Finishing
-    """
-
-    emergency_contact: "TravelerInformation.EmergencyContact" = field(
-        default=None,
-        metadata=dict(
-            name="EmergencyContact",
-            type="Element",
-            help=None,
-        )
-    )
-    home_airport: TypeAirport = field(
-        default=None,
-        metadata=dict(
-            name="HomeAirport",
-            type="Attribute",
-            help=None,
-        )
-    )
-    visa_expiration_date: str = field(
-        default=None,
-        metadata=dict(
-            name="VisaExpirationDate",
-            type="Attribute",
-            help=None,
-        )
-    )
-    booking_traveler_ref: TypeRef = field(
-        default=None,
-        metadata=dict(
-            name="BookingTravelerRef",
-            type="Attribute",
-            help="A reference to a passenger.",
-            required=True
-        )
-    )
-
-    @dataclass
-    class EmergencyContact:
-        phone_number: PhoneNumber = field(
-            default=None,
-            metadata=dict(
-                name="PhoneNumber",
-                type="Element",
-                help=None,
-            )
-        )
-        name: str = field(
-            default=None,
-            metadata=dict(
-                name="Name",
-                type="Attribute",
-                help="Name of Emergency Contact Person",
-            )
-        )
-        relationship: str = field(
-            default=None,
-            metadata=dict(
-                name="Relationship",
-                type="Attribute",
-                help="Relationship between Traveler and Emergency Contact Person",
-            )
-        )
-
-
-@dataclass
-class TypeAssociatedRemarkWithSegmentRef(TypeAssociatedRemark):
-    """
-    A textual remark container to hold Associated itinerary remarks with segment association
-    """
-
-    segment_ref: TypeRef = field(
-        default=None,
-        metadata=dict(
-            name="SegmentRef",
-            type="Attribute",
-            help="Reference to an Air/Passive Segment",
-        )
-    )
-
-
-@dataclass
-class TypePaymentCard:
-    """
-    Container for all credit and debit card information.
-    """
-
-    phone_number: PhoneNumber = field(
-        default=None,
-        metadata=dict(
-            name="PhoneNumber",
-            type="Element",
-            help=None,
-        )
-    )
-    billing_address: TypeStructuredAddress = field(
-        default=None,
-        metadata=dict(
-            name="BillingAddress",
-            type="Element",
-            help="The address to where the billing statements for this card are sent. Used for address verification purposes.",
-        )
-    )
-    type: TypeCardMerchantType = field(
-        default=None,
-        metadata=dict(
-            name="Type",
-            type="Attribute",
-            help="The 2 letter credit/ debit card type.",
-        )
-    )
-    number: TypeCreditCardNumber = field(
-        default=None,
-        metadata=dict(
-            name="Number",
-            type="Attribute",
-            help=None,
-        )
-    )
-    exp_date: str = field(
-        default=None,
-        metadata=dict(
-            name="ExpDate",
-            type="Attribute",
-            help="The Expiration date of this card in YYYY-MM format.",
-        )
-    )
-    name: str = field(
-        default=None,
-        metadata=dict(
-            name="Name",
-            type="Attribute",
-            help="The name as it appears on the card.",
-            max_length=128.0
-        )
-    )
-    cvv: str = field(
-        default=None,
-        metadata=dict(
-            name="CVV",
-            type="Attribute",
-            help="Card Verification Code",
-            max_length=4.0
-        )
-    )
-    approval_code: str = field(
-        default=None,
-        metadata=dict(
-            name="ApprovalCode",
-            type="Attribute",
-            help="This code is required for an authorization process from the Credit Card company directly,required for some of the CCH carriers.This attribute is also used for EMD retrieve and issuance transactions.",
-            min_length=1.0,
-            max_length=16.0
         )
     )
 
@@ -10971,7 +11997,7 @@ class FileFinishingInfo:
 
 
 @dataclass
-class Group:
+class Group(AttrElementKeyResults):
     """
     Represents a traveler group for Group booking and all their accompanying data. SUPPORTED PROVIDER: Worldspan and JAL.
     """
@@ -11058,7 +12084,7 @@ class Group:
     )
 
     @dataclass
-    class Name:
+    class Name(TypeNonBlanks):
         pass
 
     @dataclass
@@ -11084,6 +12110,57 @@ class Group:
                 required=True
             )
         )
+
+
+@dataclass
+class McopriceData:
+    tax_info: List[TypeTaxInfo] = field(
+        default_factory=list,
+        metadata=dict(
+            name="TaxInfo",
+            type="Element",
+            help=None,
+            min_occurs=0,
+            max_occurs=999
+        )
+    )
+    commission: "McopriceData.Commission" = field(
+        default=None,
+        metadata=dict(
+            name="Commission",
+            type="Element",
+            help=None,
+        )
+    )
+    mcoamount: TypeMoney = field(
+        default=None,
+        metadata=dict(
+            name="MCOAmount",
+            type="Attribute",
+            help="The total value of the MCO including any processing fees.",
+            required=True
+        )
+    )
+    mcoequivalent_fare: TypeMoney = field(
+        default=None,
+        metadata=dict(
+            name="MCOEquivalentFare",
+            type="Attribute",
+            help="Exchange value of the currency actually collected.",
+        )
+    )
+    mcototal_amount: TypeMoney = field(
+        default=None,
+        metadata=dict(
+            name="MCOTotalAmount",
+            type="Attribute",
+            help="The Total amount for the MCO.",
+        )
+    )
+
+    @dataclass
+    class Commission(AttrAmountPercent):
+        pass
 
 
 @dataclass
@@ -11289,7 +12366,7 @@ class SearchPassenger(TypePassengerType):
 
 
 @dataclass
-class FormOfPayment:
+class FormOfPayment(AttrElementKeyResults):
     """
     A Form of Payment used to purchase all or part of a booking.
     """
@@ -11463,7 +12540,7 @@ class FormOfPayment:
 
 
 @dataclass
-class Guarantee:
+class Guarantee(AttrElementKeyResults):
     """
     Guarantee, Deposit or PrePayment
     """
@@ -11586,7 +12663,7 @@ class McoexchangeInfo:
 
 
 @dataclass
-class ServiceFeeInfo:
+class ServiceFeeInfo(AttrElementKeyResults):
     """
     Travel Agency Service Fees (TASF) are charged by the agency through BSP or Airline Reporting Corporation (ARC).
     """

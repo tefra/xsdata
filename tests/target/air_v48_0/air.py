@@ -5,55 +5,9 @@ from ..common_v48_0.common import *
 
 
 @dataclass
-class AddlBookingCodeInformation:
-    """
-    Returns additional booking codes for the selected fare
-    """
-
-    pass
-
-
-@dataclass
-class AirReservationLocatorCode:
-    """
-    Identifies the AirReservation LocatorCode within the Universal Record
-    """
-
-    pass
-
-
-@dataclass
-class CarrierCode:
-    pass
-
-
-@dataclass
 class CustomerSearch:
     """
     Detailed customer information for searching pre pay profiles
-    """
-
-    pass
-
-
-@dataclass
-class PassengerReceiptOverride:
-    """
-    It is required when a passenger receipt is required immediately ,GDS overrides the default value
-    """
-
-    pass
-
-
-@dataclass
-class TypeDaysOfOperation:
-    pass
-
-
-@dataclass
-class VoidDocumentInfo:
-    """
-    Container to represent document information.
     """
 
     pass
@@ -118,6 +72,15 @@ class AdditionalInfo:
             required=True
         )
     )
+
+
+@dataclass
+class AddlBookingCodeInformation(TypeNonBlanks):
+    """
+    Returns additional booking codes for the selected fare
+    """
+
+    pass
 
 
 @dataclass
@@ -432,7 +395,7 @@ class Advtype:
 
 
 @dataclass
-class AirFareDisplayRuleKey:
+class AirFareDisplayRuleKey(TypeNonBlanks):
     """
     The Tariff Fare Rule requested using a Key. The key is typically a provider specific string which is required to make either a following Air Fare Tariff request for Mileage/Routing information or Air Fare Tariff Rule Request.
     """
@@ -585,6 +548,15 @@ class AirRefundInfo:
             help="This indicates whether carrier/host supports refund for the correcponding pnr.",
         )
     )
+
+
+@dataclass
+class AirReservationLocatorCode(TypeLocatorCode):
+    """
+    Identifies the AirReservation LocatorCode within the Universal Record
+    """
+
+    pass
 
 
 @dataclass
@@ -746,6 +718,66 @@ class AsyncProviderSpecificResponse(BaseAsyncProviderSpecificResponse):
     """
 
     pass
+
+
+@dataclass
+class AttrLinkInfo:
+    """
+    Holds Participant Level information.
+    """
+
+    participant_level: str = field(
+        default=None,
+        metadata=dict(
+            name="ParticipantLevel",
+            type="Attribute",
+            help="Type of sell agreement between host and link carrier.",
+        )
+    )
+    link_availability: bool = field(
+        default=None,
+        metadata=dict(
+            name="LinkAvailability",
+            type="Attribute",
+            help="Indicates if carrier has link (carrier specific) display option.",
+        )
+    )
+    polled_availability_option: str = field(
+        default=None,
+        metadata=dict(
+            name="PolledAvailabilityOption",
+            type="Attribute",
+            help="Indicates if carrier has Inside (polled)Availability option.",
+        )
+    )
+    availability_display_type: str = field(
+        default=None,
+        metadata=dict(
+            name="AvailabilityDisplayType",
+            type="Attribute",
+            help="The type of availability from which the segment is sold.Possible Values (List): G - General S - Flight Specific L - Carrier Specific/Direct Access M - Manual Sell F - Fare Shop/Optimal Shop Q - Fare Specific Fare Quote unbooked R - Redemption Availability used to complete the sell. Supported Providers: 1G,1V.",
+        )
+    )
+
+
+@dataclass
+class AttrPolicyMarking:
+    in_policy: bool = field(
+        default=None,
+        metadata=dict(
+            name="InPolicy",
+            type="Attribute",
+            help="This attribute will be used to indicate if a fare or rate has been determined to be ‘in policy’ based on the associated policy settings.",
+        )
+    )
+    preferred_option: bool = field(
+        default=None,
+        metadata=dict(
+            name="PreferredOption",
+            type="Attribute",
+            help="This attribute is used to indicate if the vendors responsible for the fare or rate being returned have been determined to be ‘preferred’ based on the associated policy settings.",
+        )
+    )
 
 
 @dataclass
@@ -1064,26 +1096,8 @@ class BrandModifiers:
 
 
 @dataclass
-class CarrierList:
-    carrier_code: List[CarrierCode] = field(
-        default_factory=list,
-        metadata=dict(
-            name="CarrierCode",
-            type="Element",
-            help=None,
-            min_occurs=1,
-            max_occurs=6
-        )
-    )
-    include_carrier: bool = field(
-        default=None,
-        metadata=dict(
-            name="IncludeCarrier",
-            type="Attribute",
-            help=None,
-            required=True
-        )
-    )
+class CarrierCode(TypeCarrier):
+    pass
 
 
 @dataclass
@@ -1111,7 +1125,7 @@ class Co2Emission:
 
 
 @dataclass
-class CodeshareInfo:
+class CodeshareInfo(str):
     """
     Describes the codeshare disclosure (simple text string) or the specific operating flight information (as attributes).
     """
@@ -1207,7 +1221,7 @@ class ConjunctedTicketInfo:
 
 
 @dataclass
-class ContractCode:
+class ContractCode(AttrProviderSupplier):
     """
     Some private fares (non-ATPCO) are secured to a contract code.
     """
@@ -1502,7 +1516,7 @@ class Emdcommission:
 
 
 @dataclass
-class Emdcoupon:
+class Emdcoupon(AttrElementKeyResults):
     """
     The coupon information for the EMD issued. Supported providers are 1G/1V/1P/1J
     """
@@ -1690,7 +1704,7 @@ class EmdtravelerInfo:
     )
 
     @dataclass
-    class NameInfo:
+    class NameInfo(AttrBookingTravelerName):
         pass
 
 
@@ -1836,7 +1850,7 @@ class FareDetailsRef:
 
 
 @dataclass
-class FareInfoMessage:
+class FareInfoMessage(str):
     """
     A simple textual fare information message.Providers supported : 1G/1V/1P/1J
     """
@@ -1879,7 +1893,7 @@ class FareMileageInformation(str):
 
 
 @dataclass
-class FareNote:
+class FareNote(str):
     """
     A simple textual fare note. Used within several other objects.
     """
@@ -2154,7 +2168,7 @@ class FareRuleCategory:
 
 
 @dataclass
-class FareRuleKey:
+class FareRuleKey(TypeNonBlanks):
     """
     The Fare Rule requested using a Key. The key is typically a provider specific string which is required to make a following Air Fare Rule Request. This Key is returned in Low Fare Shop or Air Price Response
     """
@@ -2180,7 +2194,7 @@ class FareRuleKey:
 
 
 @dataclass
-class FareRuleLong:
+class FareRuleLong(str):
     """
     Long Text Fare Rule
     """
@@ -2401,7 +2415,7 @@ class FareStatusFailureInfo:
 
 
 @dataclass
-class FareSurcharge:
+class FareSurcharge(AttrElementKeyResults):
     """
     Surcharges for a fare component
     """
@@ -2446,19 +2460,6 @@ class FareSurcharge:
             name="CouponRef",
             type="Attribute",
             help="The coupon to which that surcharge is relative (if applicable)",
-        )
-    )
-
-
-@dataclass
-class FeeApplication:
-    code: str = field(
-        default=None,
-        metadata=dict(
-            name="Code",
-            type="Attribute",
-            help="The code associated to the fee application. The choices are: 1, 2, 3, 4, 5, K, F",
-            length=1
         )
     )
 
@@ -2789,7 +2790,7 @@ class HostTokenList:
 
 
 @dataclass
-class ImageLocation:
+class ImageLocation(str):
     type: str = field(
         default=None,
         metadata=dict(
@@ -3610,6 +3611,15 @@ class PassengerDetailsRef:
 
 
 @dataclass
+class PassengerReceiptOverride(TypeNonBlanks):
+    """
+    It is required when a passenger receipt is required immediately ,GDS overrides the default value
+    """
+
+    pass
+
+
+@dataclass
 class PassengerSeatPrice:
     """
     Only used when a passenger has a different price than the default.
@@ -3781,7 +3791,7 @@ class Penalty:
 
 
 @dataclass
-class PenaltyInformation:
+class PenaltyInformation(str):
     carrier: TypeCarrier = field(
         default=None,
         metadata=dict(
@@ -4006,7 +4016,7 @@ class PreferredCarriers:
 
 
 @dataclass
-class PriceChangeType:
+class PriceChangeType(str):
     """
     Indicates a price change is found in Fare Control Manager
     """
@@ -4387,7 +4397,7 @@ class Restriction:
     )
 
     @dataclass
-    class DaysOfWeekRestriction:
+    class DaysOfWeekRestriction(AttrDow):
         restriction_exists_ind: bool = field(
             default=None,
             metadata=dict(
@@ -4651,7 +4661,7 @@ class SeatInformation:
     )
 
     @dataclass
-    class Rating:
+    class Rating(str):
         number: int = field(
             default=None,
             metadata=dict(
@@ -5004,7 +5014,7 @@ class TicketingModifiersRef:
 
 
 @dataclass
-class TravelArranger:
+class TravelArranger(str):
     """
     Details of Travel Arranger
     """
@@ -5301,6 +5311,11 @@ class TypeCouponStatus:
             length=1
         )
     )
+
+
+@dataclass
+class TypeDaysOfOperation(AttrDow):
+    pass
 
 
 @dataclass
@@ -5820,7 +5835,7 @@ class TypeMileOrRouteBasedFare:
 
 
 @dataclass
-class TypeNativeSearchModifier:
+class TypeNativeSearchModifier(str):
     provider_code: TypeProviderCode = field(
         default=None,
         metadata=dict(
@@ -6094,7 +6109,7 @@ class TypeTcrstatus:
 
 
 @dataclass
-class TypeTextElement:
+class TypeTextElement(str):
     type: str = field(
         default=None,
         metadata=dict(
@@ -6351,7 +6366,7 @@ class UpsellBrand:
 
 
 @dataclass
-class Url:
+class Url(str):
     type: str = field(
         default=None,
         metadata=dict(
@@ -6413,7 +6428,16 @@ class ValueDetails:
 
 
 @dataclass
-class VoidFailureInfo:
+class VoidDocumentInfo(AttrDocument):
+    """
+    Container to represent document information.
+    """
+
+    pass
+
+
+@dataclass
+class VoidFailureInfo(str):
     ticket_number: str = field(
         default=None,
         metadata=dict(
@@ -6434,7 +6458,7 @@ class VoidFailureInfo:
 
 
 @dataclass
-class VoidResultInfo:
+class VoidResultInfo(AttrDocument):
     """
     List of Successful Or Failed void document results.
     """
@@ -7216,7 +7240,64 @@ class ApplicableSegment(TypeApplicableSegment):
 
 
 @dataclass
-class AuditData:
+class AttrEmdsummary:
+    """
+    Details of Booking Traveler Name
+    """
+
+    number: TypeEmdnumber = field(
+        default=None,
+        metadata=dict(
+            name="Number",
+            type="Attribute",
+            help="EMD Number",
+            required=True
+        )
+    )
+    primary_document_indicator: bool = field(
+        default=None,
+        metadata=dict(
+            name="PrimaryDocumentIndicator",
+            type="Attribute",
+            help="Indicates whether the EMD is a primary EMD.",
+        )
+    )
+    in_conjunction_with: TypeEmdnumber = field(
+        default=None,
+        metadata=dict(
+            name="InConjunctionWith",
+            type="Attribute",
+            help="Returns the number of the Primary EMD, if this EMD is a conjunctive EMD",
+        )
+    )
+    associated_ticket_number: TypeTicketNumber = field(
+        default=None,
+        metadata=dict(
+            name="AssociatedTicketNumber",
+            type="Attribute",
+            help="This number indicates the e-Ticket number associated with this EMD",
+        )
+    )
+    plating_carrier: TypeCarrier = field(
+        default=None,
+        metadata=dict(
+            name="PlatingCarrier",
+            type="Attribute",
+            help="Plating carrier code for which this EMD is issued",
+        )
+    )
+    issue_date: str = field(
+        default=None,
+        metadata=dict(
+            name="IssueDate",
+            type="Attribute",
+            help="Issue Date for this EMD",
+        )
+    )
+
+
+@dataclass
+class AuditData(AttrPrices):
     """
     Container for Pricing Audit Data.For providers 1P/1J
     """
@@ -7379,7 +7460,7 @@ class BillingDetailItem:
 
 
 @dataclass
-class BookingRulesFareReference:
+class BookingRulesFareReference(str):
     """
     Fare Reference associated with the BookingRules. Containing a text container for vendor response text.
     """
@@ -7527,6 +7608,29 @@ class BundledService:
             name="Occurrence",
             type="Attribute",
             help="How many of the service are included in the bundled service.",
+        )
+    )
+
+
+@dataclass
+class CarrierList:
+    carrier_code: List[CarrierCode] = field(
+        default_factory=list,
+        metadata=dict(
+            name="CarrierCode",
+            type="Element",
+            help=None,
+            min_occurs=1,
+            max_occurs=6
+        )
+    )
+    include_carrier: bool = field(
+        default=None,
+        metadata=dict(
+            name="IncludeCarrier",
+            type="Attribute",
+            help=None,
+            required=True
         )
     )
 
@@ -7898,40 +8002,6 @@ class DocumentOptions:
 
 
 @dataclass
-class ElectronicMiscDocument:
-    """
-    Electronic miscellaneous document. Supported providers are 1G/1V/1P/1J
-    """
-
-    emdcoupon: List[Emdcoupon] = field(
-        default_factory=list,
-        metadata=dict(
-            name="EMDCoupon",
-            type="Element",
-            help="The coupon information for the EMD issued.",
-            min_occurs=1,
-            max_occurs=999
-        )
-    )
-    status: str = field(
-        default=None,
-        metadata=dict(
-            name="Status",
-            type="Attribute",
-            help="Status of the EMD calculated on the basis of coupon status. Possible values Open, Void, Refunded, Exchanged, Irregular Operations,Airport Control, Checked In, Flown/Used, Boarded/Lifted, Suspended, Unknown",
-        )
-    )
-    key: TypeRef = field(
-        default=None,
-        metadata=dict(
-            name="Key",
-            type="Attribute",
-            help="System generated Key",
-        )
-    )
-
-
-@dataclass
 class EmbargoList:
     """
     List of embargoes. Provider: 1G, 1V, 1P, 1J
@@ -8097,32 +8167,6 @@ class EmdpricingInfo:
             name="EquivFare",
             type="Attribute",
             help=None,
-        )
-    )
-
-
-@dataclass
-class Emdsummary:
-    """
-    EMD summary information. Supported providers are 1G/1V/1P/1J
-    """
-
-    emdcoupon: List[Emdcoupon] = field(
-        default_factory=list,
-        metadata=dict(
-            name="EMDCoupon",
-            type="Element",
-            help="The coupon information for the EMD issued.",
-            min_occurs=0,
-            max_occurs=999
-        )
-    )
-    key: TypeRef = field(
-        default=None,
-        metadata=dict(
-            name="Key",
-            type="Attribute",
-            help="System generated Key",
         )
     )
 
@@ -8498,80 +8542,14 @@ class FareType:
 
 
 @dataclass
-class GeneralTimeTable:
-    days_of_operation: TypeDaysOfOperation = field(
+class FeeApplication(TypeFeeApplication):
+    code: str = field(
         default=None,
         metadata=dict(
-            name="DaysOfOperation",
-            type="Element",
-            help=None,
-        )
-    )
-    flight_origin: TypeLocation = field(
-        default=None,
-        metadata=dict(
-            name="FlightOrigin",
-            type="Element",
-            help=None,
-            required=True
-        )
-    )
-    flight_destination: TypeLocation = field(
-        default=None,
-        metadata=dict(
-            name="FlightDestination",
-            type="Element",
-            help=None,
-            required=True
-        )
-    )
-    carrier_list: CarrierList = field(
-        default=None,
-        metadata=dict(
-            name="CarrierList",
-            type="Element",
-            help=None,
-        )
-    )
-    start_date: str = field(
-        default=None,
-        metadata=dict(
-            name="StartDate",
+            name="Code",
             type="Attribute",
-            help=None,
-            required=True
-        )
-    )
-    end_date: str = field(
-        default=None,
-        metadata=dict(
-            name="EndDate",
-            type="Attribute",
-            help=None,
-        )
-    )
-    start_time: str = field(
-        default=None,
-        metadata=dict(
-            name="StartTime",
-            type="Attribute",
-            help="Flight start time of flight time tabel .",
-        )
-    )
-    end_time: str = field(
-        default=None,
-        metadata=dict(
-            name="EndTime",
-            type="Attribute",
-            help="Flight end time of flight time tabel .",
-        )
-    )
-    include_connection: bool = field(
-        default=None,
-        metadata=dict(
-            name="IncludeConnection",
-            type="Attribute",
-            help="Include or exclude connecting flights.",
+            help="The code associated to the fee application. The choices are: 1, 2, 3, 4, 5, K, F",
+            length=1
         )
     )
 
@@ -12303,7 +12281,7 @@ class BundledServices:
 
 
 @dataclass
-class Coupon:
+class Coupon(AttrElementKeyResults):
     """
     The flight coupon that resulted from the ticketing operation.
     """
@@ -12595,97 +12573,27 @@ class DocumentSelect:
 
 
 @dataclass
-class EmbargoInfo(BaseBaggageAllowanceInfo):
+class ElectronicMiscDocument(AttrEmdsummary, AttrElementKeyResults):
     """
-    Information related to Embargo
-    """
-
-    pass
-
-
-@dataclass
-class Emdinfo:
-    """
-    This is the parent container to display EMD information. Occurrence of multiple unique EMDs inside this container indicate that those EMDs are conjunctive to each other. Supported providers are 1G/1V/1P/1J
+    Electronic miscellaneous document. Supported providers are 1G/1V/1P/1J
     """
 
-    emdtraveler_info: EmdtravelerInfo = field(
-        default=None,
-        metadata=dict(
-            name="EMDTravelerInfo",
-            type="Element",
-            help="Basic information of the traveler associated with this EMDInfo.",
-            required=True
-        )
-    )
-    supplier_locator: List[SupplierLocator] = field(
+    emdcoupon: List[Emdcoupon] = field(
         default_factory=list,
         metadata=dict(
-            name="SupplierLocator",
+            name="EMDCoupon",
             type="Element",
-            help="List of Supplier Locator information that is associated with this document",
-            min_occurs=0,
-            max_occurs=999
-        )
-    )
-    electronic_misc_document: List[ElectronicMiscDocument] = field(
-        default_factory=list,
-        metadata=dict(
-            name="ElectronicMiscDocument",
-            type="Element",
-            help="Electronic miscellaneous documents.As an EMDInfo container displays all the EMDs which are in conjunction, there can be maximum 4 ElectronicMiscDocuments present in an EMDInfo",
+            help="The coupon information for the EMD issued.",
             min_occurs=1,
             max_occurs=999
         )
     )
-    payment: Payment = field(
+    status: str = field(
         default=None,
         metadata=dict(
-            name="Payment",
-            type="Element",
-            help="Payment charged for EMD isuance",
-        )
-    )
-    form_of_payment: FormOfPayment = field(
-        default=None,
-        metadata=dict(
-            name="FormOfPayment",
-            type="Element",
-            help="FormOfPayment used for issuing these electronic miscellaneous documents",
-        )
-    )
-    emdpricing_info: EmdpricingInfo = field(
-        default=None,
-        metadata=dict(
-            name="EMDPricingInfo",
-            type="Element",
-            help="Fare related information for these electronic miscellaneous documents",
-        )
-    )
-    emdendorsement: List[Emdendorsement] = field(
-        default_factory=list,
-        metadata=dict(
-            name="EMDEndorsement",
-            type="Element",
-            help=None,
-            min_occurs=0,
-            max_occurs=999
-        )
-    )
-    fare_calc: FareCalc = field(
-        default=None,
-        metadata=dict(
-            name="FareCalc",
-            type="Element",
-            help="Infomration about the fare calculation",
-        )
-    )
-    emdcommission: Emdcommission = field(
-        default=None,
-        metadata=dict(
-            name="EMDCommission",
-            type="Element",
-            help="Commission information applied during EMD issuance",
+            name="Status",
+            type="Attribute",
+            help="Status of the EMD calculated on the basis of coupon status. Possible values Open, Void, Refunded, Exchanged, Irregular Operations,Airport Control, Checked In, Flown/Used, Boarded/Lifted, Suspended, Unknown",
         )
     )
     key: TypeRef = field(
@@ -12699,44 +12607,28 @@ class Emdinfo:
 
 
 @dataclass
-class EmdsummaryInfo:
+class EmbargoInfo(BaseBaggageAllowanceInfo):
     """
-    Container for EMD summary information. Supported providers are 1G/1V/1P/1J
+    Information related to Embargo
     """
 
-    emdsummary: List[Emdsummary] = field(
+    pass
+
+
+@dataclass
+class Emdsummary(AttrEmdsummary, AttrElementKeyResults):
+    """
+    EMD summary information. Supported providers are 1G/1V/1P/1J
+    """
+
+    emdcoupon: List[Emdcoupon] = field(
         default_factory=list,
         metadata=dict(
-            name="EMDSummary",
+            name="EMDCoupon",
             type="Element",
-            help="Summary information for EMDs conjuncted to each other.",
-            min_occurs=1,
+            help="The coupon information for the EMD issued.",
+            min_occurs=0,
             max_occurs=999
-        )
-    )
-    emdtraveler_info: EmdtravelerInfo = field(
-        default=None,
-        metadata=dict(
-            name="EMDTravelerInfo",
-            type="Element",
-            help="EMD traveler information.",
-            required=True
-        )
-    )
-    payment: Payment = field(
-        default=None,
-        metadata=dict(
-            name="Payment",
-            type="Element",
-            help="Payment charged to issue EMD.",
-        )
-    )
-    provider_reservation_info_ref: TypeRef = field(
-        default=None,
-        metadata=dict(
-            name="ProviderReservationInfoRef",
-            type="Attribute",
-            help="A reference to the provider reservation with which the document is associated.Displayed when shown as part of UR.Not displayed in EMDRetrieveRsp",
         )
     )
     key: TypeRef = field(
@@ -13379,7 +13271,7 @@ class FaxDetails:
 
 
 @dataclass
-class FlightDetails:
+class FlightDetails(AttrOrigDestDepatureInfo, AttrFlightTimes, AttrElementKeyResults):
     """
     Specific details within a flight segment.
     """
@@ -13827,27 +13719,80 @@ class FlightTimeDetail:
 
 
 @dataclass
-class FlightTimeTableCriteria:
-    """
-    Flight Time Table Search Criteria
-    """
-
-    general_time_table: GeneralTimeTable = field(
+class GeneralTimeTable:
+    days_of_operation: TypeDaysOfOperation = field(
         default=None,
         metadata=dict(
-            name="GeneralTimeTable",
+            name="DaysOfOperation",
+            type="Element",
+            help=None,
+        )
+    )
+    flight_origin: TypeLocation = field(
+        default=None,
+        metadata=dict(
+            name="FlightOrigin",
             type="Element",
             help=None,
             required=True
         )
     )
-    specific_time_table: SpecificTimeTable = field(
+    flight_destination: TypeLocation = field(
         default=None,
         metadata=dict(
-            name="SpecificTimeTable",
+            name="FlightDestination",
             type="Element",
             help=None,
             required=True
+        )
+    )
+    carrier_list: CarrierList = field(
+        default=None,
+        metadata=dict(
+            name="CarrierList",
+            type="Element",
+            help=None,
+        )
+    )
+    start_date: str = field(
+        default=None,
+        metadata=dict(
+            name="StartDate",
+            type="Attribute",
+            help=None,
+            required=True
+        )
+    )
+    end_date: str = field(
+        default=None,
+        metadata=dict(
+            name="EndDate",
+            type="Attribute",
+            help=None,
+        )
+    )
+    start_time: str = field(
+        default=None,
+        metadata=dict(
+            name="StartTime",
+            type="Attribute",
+            help="Flight start time of flight time tabel .",
+        )
+    )
+    end_time: str = field(
+        default=None,
+        metadata=dict(
+            name="EndTime",
+            type="Attribute",
+            help="Flight end time of flight time tabel .",
+        )
+    )
+    include_connection: bool = field(
+        default=None,
+        metadata=dict(
+            name="IncludeConnection",
+            type="Attribute",
+            help="Include or exclude connecting flights.",
         )
     )
 
@@ -14473,7 +14418,7 @@ class AlternateRouteList:
 
 
 @dataclass
-class AutoPricingInfo:
+class AutoPricingInfo(AttrElementKeyResults):
     """
     Auto Pricing based on Segment and Traveler Association.
     """
@@ -14707,6 +14652,152 @@ class DefaultBrandDetail(TypeDefaultBrandDetail):
     """
 
     pass
+
+
+@dataclass
+class Emdinfo(ProviderReservation, AttrElementKeyResults):
+    """
+    This is the parent container to display EMD information. Occurrence of multiple unique EMDs inside this container indicate that those EMDs are conjunctive to each other. Supported providers are 1G/1V/1P/1J
+    """
+
+    emdtraveler_info: EmdtravelerInfo = field(
+        default=None,
+        metadata=dict(
+            name="EMDTravelerInfo",
+            type="Element",
+            help="Basic information of the traveler associated with this EMDInfo.",
+            required=True
+        )
+    )
+    supplier_locator: List[SupplierLocator] = field(
+        default_factory=list,
+        metadata=dict(
+            name="SupplierLocator",
+            type="Element",
+            help="List of Supplier Locator information that is associated with this document",
+            min_occurs=0,
+            max_occurs=999
+        )
+    )
+    electronic_misc_document: List[ElectronicMiscDocument] = field(
+        default_factory=list,
+        metadata=dict(
+            name="ElectronicMiscDocument",
+            type="Element",
+            help="Electronic miscellaneous documents.As an EMDInfo container displays all the EMDs which are in conjunction, there can be maximum 4 ElectronicMiscDocuments present in an EMDInfo",
+            min_occurs=1,
+            max_occurs=999
+        )
+    )
+    payment: Payment = field(
+        default=None,
+        metadata=dict(
+            name="Payment",
+            type="Element",
+            help="Payment charged for EMD isuance",
+        )
+    )
+    form_of_payment: FormOfPayment = field(
+        default=None,
+        metadata=dict(
+            name="FormOfPayment",
+            type="Element",
+            help="FormOfPayment used for issuing these electronic miscellaneous documents",
+        )
+    )
+    emdpricing_info: EmdpricingInfo = field(
+        default=None,
+        metadata=dict(
+            name="EMDPricingInfo",
+            type="Element",
+            help="Fare related information for these electronic miscellaneous documents",
+        )
+    )
+    emdendorsement: List[Emdendorsement] = field(
+        default_factory=list,
+        metadata=dict(
+            name="EMDEndorsement",
+            type="Element",
+            help=None,
+            min_occurs=0,
+            max_occurs=999
+        )
+    )
+    fare_calc: FareCalc = field(
+        default=None,
+        metadata=dict(
+            name="FareCalc",
+            type="Element",
+            help="Infomration about the fare calculation",
+        )
+    )
+    emdcommission: Emdcommission = field(
+        default=None,
+        metadata=dict(
+            name="EMDCommission",
+            type="Element",
+            help="Commission information applied during EMD issuance",
+        )
+    )
+    key: TypeRef = field(
+        default=None,
+        metadata=dict(
+            name="Key",
+            type="Attribute",
+            help="System generated Key",
+        )
+    )
+
+
+@dataclass
+class EmdsummaryInfo(AttrElementKeyResults):
+    """
+    Container for EMD summary information. Supported providers are 1G/1V/1P/1J
+    """
+
+    emdsummary: List[Emdsummary] = field(
+        default_factory=list,
+        metadata=dict(
+            name="EMDSummary",
+            type="Element",
+            help="Summary information for EMDs conjuncted to each other.",
+            min_occurs=1,
+            max_occurs=999
+        )
+    )
+    emdtraveler_info: EmdtravelerInfo = field(
+        default=None,
+        metadata=dict(
+            name="EMDTravelerInfo",
+            type="Element",
+            help="EMD traveler information.",
+            required=True
+        )
+    )
+    payment: Payment = field(
+        default=None,
+        metadata=dict(
+            name="Payment",
+            type="Element",
+            help="Payment charged to issue EMD.",
+        )
+    )
+    provider_reservation_info_ref: TypeRef = field(
+        default=None,
+        metadata=dict(
+            name="ProviderReservationInfoRef",
+            type="Attribute",
+            help="A reference to the provider reservation with which the document is associated.Displayed when shown as part of UR.Not displayed in EMDRetrieveRsp",
+        )
+    )
+    key: TypeRef = field(
+        default=None,
+        metadata=dict(
+            name="Key",
+            type="Attribute",
+            help="System generated Key",
+        )
+    )
 
 
 @dataclass
@@ -14957,6 +15048,32 @@ class FlightOption:
 
 
 @dataclass
+class FlightTimeTableCriteria:
+    """
+    Flight Time Table Search Criteria
+    """
+
+    general_time_table: GeneralTimeTable = field(
+        default=None,
+        metadata=dict(
+            name="GeneralTimeTable",
+            type="Element",
+            help=None,
+            required=True
+        )
+    )
+    specific_time_table: SpecificTimeTable = field(
+        default=None,
+        metadata=dict(
+            name="SpecificTimeTable",
+            type="Element",
+            help=None,
+            required=True
+        )
+    )
+
+
+@dataclass
 class MerchandisingAvailabilityDetails:
     """
     Rich Content and Branding for an air segment
@@ -15010,7 +15127,7 @@ class MerchandisingDetails:
 
 
 @dataclass
-class OptionalService:
+class OptionalService(AttrProviderSupplier, AttrPrices, AttrElementKeyResults):
     service_data: List[ServiceData] = field(
         default_factory=list,
         metadata=dict(
@@ -15688,7 +15805,7 @@ class StructuredFareRulesType:
 
 
 @dataclass
-class Ticket:
+class Ticket(AttrElementKeyResults):
     """
     The ticket that resulted from an air booking
     """
@@ -16374,7 +16491,7 @@ class FareDisplay:
 
 
 @dataclass
-class FareRule:
+class FareRule(AttrProviderSupplier):
     """
     Fare Rule Container
     """
@@ -16539,7 +16656,7 @@ class OptionalServices:
     )
 
     @dataclass
-    class OptionalServicesTotal:
+    class OptionalServicesTotal(AttrPrices):
         tax_info: List[TaxInfo] = field(
             default_factory=list,
             metadata=dict(
@@ -16654,7 +16771,7 @@ class Rows:
 
 
 @dataclass
-class TicketingModifiers:
+class TicketingModifiers(AttrElementKeyResults):
     """
     A container to identify individual ticketing modifiers.
     """
@@ -17584,7 +17701,7 @@ class AvailabilityErrorInfo(TypeErrorInfo):
 
 
 @dataclass
-class FareInfo:
+class FareInfo(AttrElementKeyResults):
     """
     Information about this fare component
     """
@@ -17966,7 +18083,7 @@ class AirExchangeMultiQuoteOption:
 
 
 @dataclass
-class AirPricingInfo:
+class AirPricingInfo(AttrPrices, AttrProviderSupplier, AttrElementKeyResults, AttrPolicyMarking):
     """
     Per traveler type pricing breakdown. This will reflect the pricing for all travelers of the specified type.
     """
@@ -18441,7 +18558,7 @@ class AirExchangeMulitQuoteList:
 
 
 @dataclass
-class AirPricePoint:
+class AirPricePoint(AttrPrices):
     """
     The container which holds the Non Solutioned result.
     """
@@ -18534,7 +18651,7 @@ class AirPricingInfoList:
 
 
 @dataclass
-class AirPricingSolution:
+class AirPricingSolution(AttrPrices):
     """
     The pricing container for an air travel itinerary
     """
@@ -18739,7 +18856,7 @@ class AirPricingSolution:
 
 
 @dataclass
-class Etr:
+class Etr(AttrPrices, AttrElementKeyResults):
     """
     Result of ticketing request
     """
@@ -18980,7 +19097,7 @@ class Etr:
 
 
 @dataclass
-class Tcr:
+class Tcr(ProviderReservation):
     """
     Information related to Ticketless carriers
     """

@@ -5,6 +5,160 @@ from ..common_v48_0.common import *
 
 
 @dataclass
+class AttrRailInfoOrgDesAndRailLoc:
+    """
+    Basic attributes used to describe an origin destination pair
+    """
+
+    origin: TypeIatacode = field(
+        default=None,
+        metadata=dict(
+            name="Origin",
+            type="Attribute",
+            help="The IATA location code for this origination of this entity.",
+        )
+    )
+    rail_loc_origin: TypeRailLocationCode = field(
+        default=None,
+        metadata=dict(
+            name="RailLocOrigin",
+            type="Attribute",
+            help="RCH specific origin code (a.k.a UCodes) which uniquely identifies a train station.",
+        )
+    )
+    destination: TypeIatacode = field(
+        default=None,
+        metadata=dict(
+            name="Destination",
+            type="Attribute",
+            help="The IATA location code for this destination of this entity.",
+        )
+    )
+    rail_loc_destination: TypeRailLocationCode = field(
+        default=None,
+        metadata=dict(
+            name="RailLocDestination",
+            type="Attribute",
+            help="RCH specific destination code (a.k.a UCodes) which uniquely identifies a train station.",
+        )
+    )
+    departure_time: str = field(
+        default=None,
+        metadata=dict(
+            name="DepartureTime",
+            type="Attribute",
+            help="The date and time at which this entity departs. This does not include time zone information since it can be derived from the origin location.",
+            required=True
+        )
+    )
+    arrival_time: str = field(
+        default=None,
+        metadata=dict(
+            name="ArrivalTime",
+            type="Attribute",
+            help="The date and time at which this entity arrives at the destination. This does not include time zone information since it can be derived from the origin location.",
+        )
+    )
+
+
+@dataclass
+class AttrRailOrigDestInfo:
+    """
+    Holds all relevant origin/destination and departure/arrival details.
+    """
+
+    origin_station_name: str = field(
+        default=None,
+        metadata=dict(
+            name="OriginStationName",
+            type="Attribute",
+            help="The origin station name for the Journey.",
+        )
+    )
+    destination_station_name: str = field(
+        default=None,
+        metadata=dict(
+            name="DestinationStationName",
+            type="Attribute",
+            help="The destination station name for the Journey.",
+        )
+    )
+
+
+@dataclass
+class AttrRailSegmentOrigDestInfo:
+    """
+    Holds all relevant origin/destination and departure/arrival details.
+    """
+
+    origin: TypeIatacode = field(
+        default=None,
+        metadata=dict(
+            name="Origin",
+            type="Attribute",
+            help="The IATA location code for this origination of this entity.",
+        )
+    )
+    destination: TypeIatacode = field(
+        default=None,
+        metadata=dict(
+            name="Destination",
+            type="Attribute",
+            help="The IATA location code for this destination of this entity.",
+        )
+    )
+    departure_time: str = field(
+        default=None,
+        metadata=dict(
+            name="DepartureTime",
+            type="Attribute",
+            help="The date and time at which this entity departs. This does not include time zone information since it can be derived from the origin location.",
+            required=True
+        )
+    )
+    arrival_time: str = field(
+        default=None,
+        metadata=dict(
+            name="ArrivalTime",
+            type="Attribute",
+            help="The date and time at which this entity arrives at the destination. This does not include time zone information since it can be derived from the origin location.",
+        )
+    )
+    origin_station_name: str = field(
+        default=None,
+        metadata=dict(
+            name="OriginStationName",
+            type="Attribute",
+            help="The origin station name for the Journey.",
+        )
+    )
+    destination_station_name: str = field(
+        default=None,
+        metadata=dict(
+            name="DestinationStationName",
+            type="Attribute",
+            help="The destination station name for the Journey.",
+        )
+    )
+    rail_loc_origin: TypeRailLocationCode = field(
+        default=None,
+        metadata=dict(
+            name="RailLocOrigin",
+            type="Attribute",
+            help="RCH specific origin code (a.k.a UCodes) which uniquely identifies a train station.",
+        )
+    )
+    rail_loc_destination: TypeRailLocationCode = field(
+        default=None,
+        metadata=dict(
+            name="RailLocDestination",
+            type="Attribute",
+            help="RCH specific destination code (a.k.a UCodes) which uniquely identifies a train station.",
+        )
+    )
+
+
+@dataclass
 class FareValidity:
     """
     Associates fare validity dates with journeys.
@@ -56,7 +210,7 @@ class FulFillmentType:
 
 
 @dataclass
-class JourneyRemark:
+class JourneyRemark(str):
     """
     A Remark for a Journey.
     """
@@ -72,7 +226,7 @@ class JourneyRemark:
 
 
 @dataclass
-class OperatingCompany:
+class OperatingCompany(str):
     """
     A textual remark identifying the OperatingCompany/Train Service other than BN orTL
     """
@@ -357,7 +511,7 @@ class RailFareComponent:
 
 
 @dataclass
-class RailFareId:
+class RailFareId(str):
     key: TypeRef = field(
         default=None,
         metadata=dict(
@@ -395,7 +549,7 @@ class RailFareIdref:
 
 
 @dataclass
-class RailFareNote:
+class RailFareNote(str):
     """
     A simple textual fare note. Used within several other objects.
     """
@@ -715,7 +869,7 @@ class RailSupplier:
 
 
 @dataclass
-class TicketAdvisory:
+class TicketAdvisory(StringLength1to500):
     """
     Additional ticket information.
     """
@@ -911,7 +1065,7 @@ class Characteristic:
 
 
 @dataclass
-class RailFare:
+class RailFare(AttrElementKeyResults):
     """
     Information about this fare component
     """
@@ -1172,7 +1326,7 @@ class RailFareNoteList:
 
 
 @dataclass
-class RailInfo:
+class RailInfo(AttrRailInfoOrgDesAndRailLoc):
     """
     Container for rail-related information required for retrieving a rail seat map/coach map
     """
@@ -1270,7 +1424,7 @@ class RailSearchModifiers:
 
 
 @dataclass
-class RailSegmentInfo:
+class RailSegmentInfo(str):
     """
     Holds the ExtraSegmentInfo and VendorMessages from RCH response.
     """
@@ -1442,7 +1596,7 @@ class RailFareList:
 
 
 @dataclass
-class RailPricingInfo:
+class RailPricingInfo(AttrPrices, AttrElementKeyResults):
     """
     Per traveler type pricing breakdown.
     """
@@ -1659,7 +1813,7 @@ class RailSegment(Segment):
 
 
 @dataclass
-class RailJourney:
+class RailJourney(AttrRailSegmentOrigDestInfo, AttrPrices, AttrProviderSupplier, AttrElementKeyResults):
     """
     Captures all journey-related data
     """
@@ -1976,7 +2130,7 @@ class SearchRailLeg:
 
 
 @dataclass
-class TypeRailPricingSolution:
+class TypeRailPricingSolution(AttrPrices):
     """
     Common RailPricingSolution container
     """

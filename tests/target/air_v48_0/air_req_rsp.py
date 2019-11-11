@@ -40,7 +40,7 @@ class AirExchangeEligibilityReq(BaseReq):
     )
 
     @dataclass
-    class ProviderReservationInfo:
+    class ProviderReservationInfo(ProviderReservation):
         pass
 
 
@@ -1117,7 +1117,7 @@ class AirRefundQuoteReq(BaseReq):
     )
 
     @dataclass
-    class ProviderReservationInfo:
+    class ProviderReservationInfo(ProviderReservation):
         pass
 
 
@@ -1566,7 +1566,7 @@ class BaseAirExchangeMultiQuoteReq(BaseCoreReq):
     )
 
     @dataclass
-    class ProviderReservationInfo:
+    class ProviderReservationInfo(ProviderReservation):
         pass
 
 
@@ -1670,7 +1670,7 @@ class BaseAirExchangeQuoteReq(BaseCoreReq):
     )
 
     @dataclass
-    class ProviderReservationInfo:
+    class ProviderReservationInfo(ProviderReservation):
         pass
 
 

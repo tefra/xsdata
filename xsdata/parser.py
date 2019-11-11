@@ -33,11 +33,13 @@ class SchemaParser:
                 )
 
             if event == Event.START:
-                builder = getattr(elements, capitalize(tag.value) or "")
+                builder = getattr(elements, capitalize(tag.value))
                 element = builder.from_element(elem)
                 self.elements.append(element)
             elif event == Event.END:
                 element = self.elements.pop()
+                if len(elem.attrib) == 0 and elem.text is None:
+                    continue
                 if len(self.elements) > 0:
                     self.assign_to_parent(element)
 

@@ -432,16 +432,9 @@ class Restriction(RestrictedField, AnnotationBase, TypedField, NamedField):
 
 
 @dataclass
-class SimpleContent(AnnotationBase):
+class SimpleContent(AnnotationBase, ExtendsMixin):
     restriction: Optional[Restriction]
     extension: Optional[Extension]
-
-
-@dataclass
-class ComplexContent(AnnotationBase, ExtendsMixin):
-    restriction: Optional[Restriction]
-    extension: Optional[Extension]
-    mixed: bool = False
 
     @property
     def extensions(self) -> ArrayList[str]:
@@ -449,6 +442,11 @@ class ComplexContent(AnnotationBase, ExtendsMixin):
             return self.extension.extensions
         else:
             return []
+
+
+@dataclass
+class ComplexContent(SimpleContent):
+    mixed: bool = False
 
 
 @dataclass
@@ -472,6 +470,8 @@ class ComplexType(AnnotationBase, NamedField, ExtendsMixin):
     def extensions(self) -> ArrayList[str]:
         if self.complex_content:
             return self.complex_content.extensions
+        if self.simple_content:
+            return self.simple_content.extensions
         if self.attribute_groups:
             return [group.real_name for group in self.attribute_groups]
         return []

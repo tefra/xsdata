@@ -40,20 +40,20 @@ class ElementTests(TestCase):
         obj.type = "bar"
         self.assertEqual(obj.type, obj.real_type)
 
-    def test_property_real_base(self):
+    def test_property_extensions(self):
         obj = Element.build()
-        self.assertIsNone(obj.real_base)
+        self.assertEqual([], obj.extensions)
 
         obj.type = "foo_bar"
-        self.assertEqual("foo_bar", obj.real_base)
+        self.assertEqual(["foo_bar"], obj.extensions)
 
         obj.complex_type = ComplexType.build()
-        self.assertIsNone(obj.real_base)
+        self.assertEqual([], obj.extensions)
 
         obj.complex_type.complex_content = ComplexContent.build(
             extension=Extension.build(base="thug_life")
         )
-        self.assertEqual("thug_life", obj.real_base)
+        self.assertEqual(["thug_life"], obj.extensions)
 
     def test_get_restrictions(self):
         obj = Element.build()

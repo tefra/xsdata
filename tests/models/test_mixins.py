@@ -31,7 +31,7 @@ class OccurrencesMixinTests(TestCase):
             el.Group,
             el.Sequence,
         ]
-        self.assertListEqual(expected, self.subclasses)
+        self.assertEqual(expected, self.subclasses)
 
     def test_get_restrictions(self):
         data = dict(min_occurs=1, max_occurs=2)

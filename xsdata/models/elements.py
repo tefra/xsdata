@@ -174,8 +174,8 @@ class SimpleType(
         return None
 
     @property
-    def real_base(self) -> Optional[str]:
-        return None
+    def extensions(self) -> ArrayList[str]:
+        return []
 
     def get_restrictions(self) -> Dict[str, Anything]:
         if self.restriction:
@@ -241,17 +241,21 @@ class Attribute(
         return restrictions
 
     @property
-    def real_base(self) -> Optional[str]:
-        return None
+    def extensions(self) -> ArrayList[str]:
+        return []
 
 
 @dataclass
-class AttributeGroup(AnnotationBase):
+class AttributeGroup(AnnotationBase, NamedField, ExtendsMixin):
     name: Optional[str]
     ref: Optional[str]
     any_attribute: Optional[AnyAttribute]
     attributes: ArrayList[Attribute] = field(default_factory=list)
     attribute_groups: ArrayList["AttributeGroup"] = field(default_factory=list)
+
+    @property
+    def extensions(self) -> ArrayList[str]:
+        return []
 
 
 @dataclass
@@ -294,7 +298,7 @@ class Group(AnnotationBase, OccurrencesMixin):
 
 
 @dataclass
-class Extension(AnnotationBase):
+class Extension(AnnotationBase, ExtendsMixin):
     base: str
     group: Optional[Group]
     all: Optional[All]
@@ -303,6 +307,10 @@ class Extension(AnnotationBase):
     any_attribute: Optional[AnyAttribute]
     attributes: ArrayList[Attribute] = field(default_factory=list)
     attribute_groups: ArrayList[AttributeGroup] = field(default_factory=list)
+
+    @property
+    def extensions(self) -> ArrayList[str]:
+        return [self.base]
 
 
 @dataclass
@@ -430,10 +438,17 @@ class SimpleContent(AnnotationBase):
 
 
 @dataclass
-class ComplexContent(AnnotationBase):
+class ComplexContent(AnnotationBase, ExtendsMixin):
     restriction: Optional[Restriction]
     extension: Optional[Extension]
     mixed: bool = False
+
+    @property
+    def extensions(self) -> ArrayList[str]:
+        if self.extension:
+            return self.extension.extensions
+        else:
+            return []
 
 
 @dataclass
@@ -454,14 +469,12 @@ class ComplexType(AnnotationBase, NamedField, ExtendsMixin):
     mixed: bool = False
 
     @property
-    def real_base(self) -> Optional[str]:
-        return (
-            self.complex_content.extension.base
-            if self.complex_content
-            and self.complex_content.extension
-            and self.complex_content.extension.base
-            else None
-        )
+    def extensions(self) -> ArrayList[str]:
+        if self.complex_content:
+            return self.complex_content.extensions
+        if self.attribute_groups:
+            return [group.real_name for group in self.attribute_groups]
+        return []
 
 
 @dataclass
@@ -533,12 +546,12 @@ class Element(
         return XSDType.STRING.code
 
     @property
-    def real_base(self) -> Optional[str]:
+    def extensions(self) -> ArrayList[str]:
         if self.complex_type:
-            return self.complex_type.real_base
+            return self.complex_type.extensions
         elif self.type:
-            return self.real_type
-        return None
+            return [self.type]
+        return []
 
     def get_restrictions(self) -> Dict[str, Anything]:
         restrictions = super().get_restrictions()

@@ -27,8 +27,8 @@ class SimpleTypeTests(TestCase):
             self.assertFalse(hasattr(obj, "ref"))
             obj.real_name
 
-    def test_property_real_base(self):
-        self.assertIsNone(SimpleType.build().real_base)
+    def test_property_extensions(self):
+        self.assertEqual([], SimpleType.build().extensions)
 
     def test_property_real_type(self):
         obj = SimpleType.build()

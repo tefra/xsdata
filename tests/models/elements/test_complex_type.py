@@ -5,6 +5,7 @@ from tests.testcases import ModelTestCase
 from xsdata.models.elements import (
     AnnotationBase,
     Attribute,
+    AttributeGroup,
     BaseModel,
     ComplexContent,
     ComplexType,
@@ -22,18 +23,22 @@ from xsdata.parser import SchemaParser
 
 
 class ComplexTypeTests(TestCase):
-    def test_real_base_property(self):
+    def test_property_extensions(self):
         obj = ComplexType.build()
-        self.assertIsNone(obj.real_base)
+        self.assertEqual([], obj.extensions)
 
         obj.complex_content = ComplexContent.build()
-        self.assertIsNone(obj.real_base)
+        self.assertEqual([], obj.extensions)
 
-        obj.complex_content.extension = Extension.build()
-        self.assertIsNone(obj.real_base)
+        obj.complex_content.extension = Extension.build(base="foo_bar")
+        self.assertEqual(["foo_bar"], obj.extensions)
 
-        obj.complex_content.extension.base = "foo_bar"
-        self.assertEqual("foo_bar", obj.real_base)
+        obj.complex_content = None
+        obj.attribute_groups = [
+            AttributeGroup.build(name="foo"),
+            AttributeGroup.build(ref="bar"),
+        ]
+        self.assertEqual(["foo", "bar"], obj.extensions)
 
 
 class ComplexTypeDeserializeTests(ModelTestCase):

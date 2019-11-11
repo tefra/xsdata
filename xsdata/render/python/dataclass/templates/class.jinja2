@@ -1,7 +1,7 @@
 {%- set outer = outer|default([obj.name]) %}
 
 @dataclass
-class {{ obj.name }}{{"({})".format(obj.extends) if obj.extends }}:
+class {{ obj.name }}{{"({})".format(obj.extensions|join(', ')) if obj.extensions }}:
 {%- if obj.help %}
     """
     {{ obj.help }}

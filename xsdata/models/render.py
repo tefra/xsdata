@@ -29,7 +29,7 @@ class Attr:
 class Class:
     name: str
     help: Optional[str] = field(default=None)
-    extends: Optional[str] = field(default=None)
+    extensions: List[str] = field(default_factory=list)
     attrs: List[Attr] = field(default_factory=list)
     inner: List["Class"] = field(default_factory=list)
 

@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional
 
 
 class TypedField(ABC):
@@ -12,7 +12,7 @@ class TypedField(ABC):
 class ExtendsMixin(ABC):
     @property
     @abstractmethod
-    def real_base(self) -> Optional[str]:
+    def extensions(self) -> List[str]:
         pass
 
 

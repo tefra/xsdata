@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from xsdata.models.elements import Attribute, Restriction, SimpleType
+from xsdata.models.elements import Attribute, Length, Restriction, SimpleType
 
 
 class AttributeTests(TestCase):
@@ -35,8 +35,15 @@ class AttributeTests(TestCase):
         self.assertDictEqual({}, obj.get_restrictions())
 
         obj.use = "required"
-        self.assertDictEqual(dict(required=1), obj.get_restrictions())
+        expected = dict(required=1)
+        self.assertDictEqual(expected, obj.get_restrictions())
 
-    def test_real_base_property(self):
+        obj.simple_type = SimpleType.build(
+            restriction=Restriction.build(length=Length.build(value=1))
+        )
+        expected.update(dict(length=1))
+        self.assertDictEqual(expected, obj.get_restrictions())
+
+    def test_property_extensions(self):
         obj = Attribute.build()
-        self.assertIsNone(obj.real_base)
+        self.assertEqual([], obj.extensions)

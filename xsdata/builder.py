@@ -3,6 +3,7 @@ from typing import Iterator, List, Union
 
 from xsdata.models.elements import (
     Attribute,
+    AttributeGroup,
     ComplexType,
     Element,
     ElementBase,
@@ -14,7 +15,9 @@ from xsdata.models.render import Attr, Class
 
 logger = logging.getLogger(__name__)
 
-BaseElement = Union[Attribute, Element, ComplexType, SimpleType]
+BaseElement = Union[
+    Attribute, AttributeGroup, Element, ComplexType, SimpleType
+]
 AttributeElement = Union[Attribute, Element, Restriction]
 
 
@@ -23,6 +26,7 @@ class ClassBuilder:
         """Generate classes from schema elements."""
         classes: List[Class] = []
         classes.extend(map(self.build_class, schema.attributes))
+        classes.extend(map(self.build_class, schema.attribute_groups))
         classes.extend(map(self.build_class, schema.simple_types))
         classes.extend(map(self.build_class, schema.complex_types))
         classes.extend(map(self.build_class, schema.elements))
@@ -30,12 +34,14 @@ class ClassBuilder:
 
     def build_class(self, obj: BaseElement) -> Class:
         item = Class(
-            name=obj.real_name, extends=obj.real_base, help=obj.display_help,
+            name=obj.real_name,
+            extensions=obj.extensions,
+            help=obj.display_help,
         )
         for child in self.element_children(obj):
             self.build_class_attribute(item, child)
 
-        if item.extends is None and len(item.attrs) == 0:
+        if len(item.extensions) == 0 and len(item.attrs) == 0:
             logger.warning(
                 f"Generating class without base and no fields `{item.name}`"
             )

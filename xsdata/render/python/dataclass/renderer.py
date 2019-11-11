@@ -66,9 +66,7 @@ class DataclassRenderer(Renderer):
         for obj in classes:
             cls.convert_names(obj.inner)
             obj.name = cls.class_name(obj.name)
-
-            if obj.extends:
-                obj.extends = cls.type_name(obj.extends)
+            obj.extensions = [cls.type_name(ext) for ext in obj.extensions]
 
             for attr in obj.attrs:
                 attr.name = cls.attribute_name(attr.name)
@@ -98,8 +96,8 @@ class DataclassRenderer(Renderer):
     @classmethod
     def collect_deps(cls, obj: Class) -> Set[str]:
         dependencies = {attr.type for attr in obj.attrs}
-        if obj.extends:
-            dependencies.add(obj.extends)
+        if len(obj.extensions) > 0:
+            dependencies.update(obj.extensions)
         for inner in obj.inner:
             dependencies.update(cls.collect_deps(inner))
         return dependencies

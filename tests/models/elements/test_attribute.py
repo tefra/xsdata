@@ -15,7 +15,7 @@ class AttributeTests(TestCase):
         self.assertEqual(obj.type, obj.real_type)
 
         obj.simple_type = SimpleType.build()
-        self.assertIsNone(obj.real_type)
+        self.assertEqual("xs:string", obj.real_type)
 
         obj.simple_type.restriction = Restriction.build(base="thug")
         self.assertEqual(obj.simple_type.restriction.base, obj.real_type)

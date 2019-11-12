@@ -170,8 +170,10 @@ class SimpleType(
         if self.restriction:
             return self.restriction.real_type
         if self.list:
-            return self.list.item_type
-        return None
+            return self.list.real_type
+        if self.union:
+            pass  # I can't do unions
+        return XSDType.STRING.code
 
     @property
     def extensions(self) -> ArrayList[str]:
@@ -190,8 +192,19 @@ class List(AnnotationBase, RestrictedField):
     item_type: Optional[str]
     simple_type: SimpleType
 
+    @property
+    def real_type(self) -> Optional[str]:
+        if self.item_type:
+            return self.item_type
+        if self.simple_type:
+            return self.simple_type.real_type
+        return None
+
     def get_restrictions(self) -> Dict[str, Anything]:
-        return dict(min_occurs=0, max_occurs=sys.maxsize)
+        restrictions = dict(min_occurs=0, max_occurs=sys.maxsize)
+        if self.simple_type:
+            restrictions.update(self.simple_type.get_restrictions())
+        return restrictions
 
 
 @dataclass

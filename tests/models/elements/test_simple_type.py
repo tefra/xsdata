@@ -13,6 +13,7 @@ from xsdata.models.elements import (
     Restriction,
     Schema,
     SimpleType,
+    Union,
 )
 from xsdata.parser import SchemaParser
 
@@ -32,7 +33,10 @@ class SimpleTypeTests(TestCase):
 
     def test_property_real_type(self):
         obj = SimpleType.build()
-        self.assertIsNone(obj.real_type)
+        self.assertEqual("xs:string", obj.real_type)
+
+        obj.union = Union.build()
+        self.assertEqual("xs:string", obj.real_type)
 
         obj.list = List.build(item_type="foo")
         self.assertEqual("foo", obj.real_type)

@@ -5,83 +5,8 @@ from .common import *
 
 
 @dataclass
-class BaseRsp:
-    """
-    The base type for all responses.
-    """
-
-    response_message: List[ResponseMessage] = field(
-        default_factory=list,
-        metadata=dict(
-            name="ResponseMessage",
-            type="Element",
-            help=None,
-            min_occurs=0,
-            max_occurs=999
-        )
-    )
-    trace_id: str = field(
-        default=None,
-        metadata=dict(
-            name="TraceId",
-            type="Attribute",
-            help="Unique identifier for this atomic transaction traced by the user. Use is optional.",
-        )
-    )
-    transaction_id: str = field(
-        default=None,
-        metadata=dict(
-            name="TransactionId",
-            type="Attribute",
-            help="System generated unique identifier for this atomic transaction.",
-        )
-    )
-    response_time: int = field(
-        default=None,
-        metadata=dict(
-            name="ResponseTime",
-            type="Attribute",
-            help="The time (in ms) the system spent processing this request, not including transmission times.",
-        )
-    )
-    command_history: str = field(
-        default=None,
-        metadata=dict(
-            name="CommandHistory",
-            type="Attribute",
-            help="HTTP link to download command history and debugging information of the request that generated this response. Must be enabled on the system.",
-        )
-    )
-
-
-@dataclass
-class ErrorInfo(TypeErrorInfo):
-    """
-    Container for error data when there is an application error.
-    """
-
-    pass
-
-
-@dataclass
-class TypeLoggingLevel:
-    """
-    The type of various Logging levels
-    """
-
-    value: str = field(
-        default=None,
-        metadata=dict(
-            name="value",
-            type="Restriction",
-            help=None,
-        )
-    )
-
-
-@dataclass
 class BaseCoreReq:
-    billing_point_of_sale_info: BillingPointOfSaleInfo = field(
+    billing_point_of_sale_info: str = field(
         default=None,
         metadata=dict(
             name="BillingPointOfSaleInfo",
@@ -90,7 +15,7 @@ class BaseCoreReq:
             required=True
         )
     )
-    agent_idoverride: List[AgentIdoverride] = field(
+    agent_idoverride: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="AgentIDOverride",
@@ -100,7 +25,7 @@ class BaseCoreReq:
             max_occurs=999
         )
     )
-    terminal_session_info: TerminalSessionInfo = field(
+    terminal_session_info: str = field(
         default=None,
         metadata=dict(
             name="TerminalSessionInfo",
@@ -132,15 +57,17 @@ class BaseCoreReq:
             help="Used in showing who authorized the request. Use is optional.",
         )
     )
-    target_branch: TypeBranchCode = field(
+    target_branch: str = field(
         default=None,
         metadata=dict(
             name="TargetBranch",
             type="Attribute",
             help="Used for Emulation - If authorised will execute the request as if the agent's parent branch is the TargetBranch specified.",
+            min_length=1.0,
+            max_length=25.0
         )
     )
-    override_logging: TypeLoggingLevel = field(
+    override_logging: str = field(
         default=None,
         metadata=dict(
             name="OverrideLogging",
@@ -159,17 +86,62 @@ class BaseCoreReq:
 
 
 @dataclass
-class BaseSearchRsp(BaseRsp):
-    next_result_reference: List[NextResultReference] = field(
+class BaseRsp:
+    """
+    The base type for all responses.
+    """
+
+    response_message: List[str] = field(
         default_factory=list,
         metadata=dict(
-            name="NextResultReference",
+            name="ResponseMessage",
             type="Element",
             help=None,
             min_occurs=0,
             max_occurs=999
         )
     )
+    trace_id: str = field(
+        default=None,
+        metadata=dict(
+            name="TraceId",
+            type="Attribute",
+            help="Unique identifier for this atomic transaction traced by the user. Use is optional.",
+        )
+    )
+    transaction_id: str = field(
+        default=None,
+        metadata=dict(
+            name="TransactionId",
+            type="Attribute",
+            help="System generated unique identifier for this atomic transaction.",
+        )
+    )
+    response_time: str = field(
+        default=None,
+        metadata=dict(
+            name="ResponseTime",
+            type="Attribute",
+            help="The time (in ms) the system spent processing this request, not including transmission times.",
+        )
+    )
+    command_history: str = field(
+        default=None,
+        metadata=dict(
+            name="CommandHistory",
+            type="Attribute",
+            help="HTTP link to download command history and debugging information of the request that generated this response. Must be enabled on the system.",
+        )
+    )
+
+
+@dataclass
+class ErrorInfo(TypeErrorInfo):
+    """
+    Container for error data when there is an application error.
+    """
+
+    pass
 
 
 @dataclass
@@ -178,7 +150,7 @@ class BaseCoreSearchReq(BaseCoreReq):
     Base Request for Air Search
     """
 
-    next_result_reference: List[NextResultReference] = field(
+    next_result_reference: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="NextResultReference",
@@ -192,7 +164,7 @@ class BaseCoreSearchReq(BaseCoreReq):
 
 @dataclass
 class BaseReq(BaseCoreReq):
-    override_pcc: OverridePcc = field(
+    override_pcc: str = field(
         default=None,
         metadata=dict(
             name="OverridePCC",
@@ -200,7 +172,7 @@ class BaseReq(BaseCoreReq):
             help=None,
         )
     )
-    retrieve_provider_reservation_details: bool = field(
+    retrieve_provider_reservation_details: str = field(
         default="false",
         metadata=dict(
             name="RetrieveProviderReservationDetails",
@@ -211,8 +183,22 @@ class BaseReq(BaseCoreReq):
 
 
 @dataclass
+class BaseSearchRsp(BaseRsp):
+    next_result_reference: List[str] = field(
+        default_factory=list,
+        metadata=dict(
+            name="NextResultReference",
+            type="Element",
+            help=None,
+            min_occurs=0,
+            max_occurs=999
+        )
+    )
+
+
+@dataclass
 class BaseCreateReservationReq(BaseReq):
-    linked_universal_record: List[LinkedUniversalRecord] = field(
+    linked_universal_record: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="LinkedUniversalRecord",
@@ -222,7 +208,7 @@ class BaseCreateReservationReq(BaseReq):
             max_occurs=999
         )
     )
-    booking_traveler: List[BookingTraveler] = field(
+    booking_traveler: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="BookingTraveler",
@@ -232,7 +218,7 @@ class BaseCreateReservationReq(BaseReq):
             max_occurs=999
         )
     )
-    osi: List[Osi] = field(
+    osi: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="OSI",
@@ -242,7 +228,7 @@ class BaseCreateReservationReq(BaseReq):
             max_occurs=999
         )
     )
-    accounting_remark: List[AccountingRemark] = field(
+    accounting_remark: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="AccountingRemark",
@@ -252,7 +238,7 @@ class BaseCreateReservationReq(BaseReq):
             max_occurs=999
         )
     )
-    general_remark: List[GeneralRemark] = field(
+    general_remark: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="GeneralRemark",
@@ -262,7 +248,7 @@ class BaseCreateReservationReq(BaseReq):
             max_occurs=999
         )
     )
-    xmlremark: List[Xmlremark] = field(
+    xmlremark: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="XMLRemark",
@@ -272,7 +258,7 @@ class BaseCreateReservationReq(BaseReq):
             max_occurs=999
         )
     )
-    unassociated_remark: List[UnassociatedRemark] = field(
+    unassociated_remark: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="UnassociatedRemark",
@@ -282,7 +268,7 @@ class BaseCreateReservationReq(BaseReq):
             max_occurs=999
         )
     )
-    postscript: Postscript = field(
+    postscript: str = field(
         default=None,
         metadata=dict(
             name="Postscript",
@@ -290,7 +276,7 @@ class BaseCreateReservationReq(BaseReq):
             help=None,
         )
     )
-    passive_info: PassiveInfo = field(
+    passive_info: str = field(
         default=None,
         metadata=dict(
             name="PassiveInfo",
@@ -298,7 +284,7 @@ class BaseCreateReservationReq(BaseReq):
             help=None,
         )
     )
-    continuity_check_override: ContinuityCheckOverride = field(
+    continuity_check_override: str = field(
         default=None,
         metadata=dict(
             name="ContinuityCheckOverride",
@@ -306,7 +292,7 @@ class BaseCreateReservationReq(BaseReq):
             help="This element will be used if user wants to override segment continuity check.",
         )
     )
-    agency_contact_info: AgencyContactInfo = field(
+    agency_contact_info: str = field(
         default=None,
         metadata=dict(
             name="AgencyContactInfo",
@@ -314,7 +300,7 @@ class BaseCreateReservationReq(BaseReq):
             help=None,
         )
     )
-    customer_id: CustomerId = field(
+    customer_id: str = field(
         default=None,
         metadata=dict(
             name="CustomerID",
@@ -322,7 +308,7 @@ class BaseCreateReservationReq(BaseReq):
             help=None,
         )
     )
-    file_finishing_info: FileFinishingInfo = field(
+    file_finishing_info: str = field(
         default=None,
         metadata=dict(
             name="FileFinishingInfo",
@@ -330,7 +316,7 @@ class BaseCreateReservationReq(BaseReq):
             help=None,
         )
     )
-    commission_remark: CommissionRemark = field(
+    commission_remark: str = field(
         default=None,
         metadata=dict(
             name="CommissionRemark",
@@ -338,7 +324,7 @@ class BaseCreateReservationReq(BaseReq):
             help=None,
         )
     )
-    consolidator_remark: ConsolidatorRemark = field(
+    consolidator_remark: str = field(
         default=None,
         metadata=dict(
             name="ConsolidatorRemark",
@@ -346,7 +332,7 @@ class BaseCreateReservationReq(BaseReq):
             help=None,
         )
     )
-    invoice_remark: List[InvoiceRemark] = field(
+    invoice_remark: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="InvoiceRemark",
@@ -356,7 +342,7 @@ class BaseCreateReservationReq(BaseReq):
             max_occurs=999
         )
     )
-    ssr: List[Ssr] = field(
+    ssr: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="SSR",
@@ -366,7 +352,7 @@ class BaseCreateReservationReq(BaseReq):
             max_occurs=999
         )
     )
-    email_notification: EmailNotification = field(
+    email_notification: str = field(
         default=None,
         metadata=dict(
             name="EmailNotification",
@@ -374,7 +360,7 @@ class BaseCreateReservationReq(BaseReq):
             help=None,
         )
     )
-    queue_place: QueuePlace = field(
+    queue_place: str = field(
         default=None,
         metadata=dict(
             name="QueuePlace",
@@ -391,20 +377,24 @@ class BaseCreateReservationReq(BaseReq):
             max_length=10.0
         )
     )
-    universal_record_locator_code: TypeLocatorCode = field(
+    universal_record_locator_code: str = field(
         default=None,
         metadata=dict(
             name="UniversalRecordLocatorCode",
             type="Attribute",
             help="Which UniversalRecord should this new reservation be applied to. If blank, then a new one is created.",
+            min_length=5.0,
+            max_length=8.0
         )
     )
-    provider_locator_code: TypeLocatorCode = field(
+    provider_locator_code: str = field(
         default=None,
         metadata=dict(
             name="ProviderLocatorCode",
             type="Attribute",
             help="Which Provider reservation does this reservation get added to.",
+            min_length=5.0,
+            max_length=8.0
         )
     )
     provider_code: str = field(
@@ -423,7 +413,7 @@ class BaseCreateReservationReq(BaseReq):
             help="Optional client centric customer identifier",
         )
     )
-    version: int = field(
+    version: str = field(
         default=None,
         metadata=dict(
             name="Version",
@@ -435,7 +425,7 @@ class BaseCreateReservationReq(BaseReq):
 
 @dataclass
 class BaseSearchReq(BaseReq):
-    next_result_reference: List[NextResultReference] = field(
+    next_result_reference: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="NextResultReference",
@@ -453,7 +443,7 @@ class BaseCreateWithFormOfPaymentReq(BaseCreateReservationReq):
     Container for BaseCreateReservation along with Form Of Payment
     """
 
-    form_of_payment: List[FormOfPayment] = field(
+    form_of_payment: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="FormOfPayment",

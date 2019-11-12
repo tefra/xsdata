@@ -21,7 +21,7 @@ class AirExchangeEligibilityReq(BaseReq):
     Request to determine if the fares in an itinerary are exchangeable
     """
 
-    provider_reservation_info: "AirExchangeEligibilityReq.ProviderReservationInfo" = field(
+    provider_reservation_info: "AirExchangeEligibilityReq.str" = field(
         default=None,
         metadata=dict(
             name="ProviderReservationInfo",
@@ -46,7 +46,7 @@ class AirExchangeEligibilityReq(BaseReq):
 
 @dataclass
 class AirExchangeEligibilityRsp(BaseRsp):
-    exchange_eligibility_info: ExchangeEligibilityInfo = field(
+    exchange_eligibility_info: str = field(
         default=None,
         metadata=dict(
             name="ExchangeEligibilityInfo",
@@ -58,8 +58,42 @@ class AirExchangeEligibilityRsp(BaseRsp):
 
 
 @dataclass
+class AirExchangeMultiQuoteRsp(BaseRsp):
+    air_segment_list: List[str] = field(
+        default_factory=list,
+        metadata=dict(
+            name="AirSegmentList",
+            type="Element",
+            help=None,
+            min_occurs=0,
+            max_occurs=999
+        )
+    )
+    brand_list: List[str] = field(
+        default_factory=list,
+        metadata=dict(
+            name="BrandList",
+            type="Element",
+            help=None,
+            min_occurs=0,
+            max_occurs=999
+        )
+    )
+    air_exchange_mulit_quote_list: List[str] = field(
+        default_factory=list,
+        metadata=dict(
+            name="AirExchangeMulitQuoteList",
+            type="Element",
+            help=None,
+            min_occurs=0,
+            max_occurs=999
+        )
+    )
+
+
+@dataclass
 class AirExchangeQuoteRsp(BaseRsp):
-    ticket_number: List[TicketNumber] = field(
+    ticket_number: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="TicketNumber",
@@ -69,7 +103,7 @@ class AirExchangeQuoteRsp(BaseRsp):
             max_occurs=999
         )
     )
-    air_pricing_solution: List[AirPricingSolution] = field(
+    air_pricing_solution: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="AirPricingSolution",
@@ -79,7 +113,7 @@ class AirExchangeQuoteRsp(BaseRsp):
             max_occurs=999
         )
     )
-    air_exchange_bundle_total: AirExchangeBundleTotal = field(
+    air_exchange_bundle_total: str = field(
         default=None,
         metadata=dict(
             name="AirExchangeBundleTotal",
@@ -87,7 +121,7 @@ class AirExchangeQuoteRsp(BaseRsp):
             help=None,
         )
     )
-    air_exchange_bundle: List[AirExchangeBundle] = field(
+    air_exchange_bundle: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="AirExchangeBundle",
@@ -97,7 +131,7 @@ class AirExchangeQuoteRsp(BaseRsp):
             max_occurs=999
         )
     )
-    host_token: List[HostToken] = field(
+    host_token: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="HostToken",
@@ -107,7 +141,7 @@ class AirExchangeQuoteRsp(BaseRsp):
             max_occurs=999
         )
     )
-    optional_services: OptionalServices = field(
+    optional_services: str = field(
         default=None,
         metadata=dict(
             name="OptionalServices",
@@ -115,7 +149,7 @@ class AirExchangeQuoteRsp(BaseRsp):
             help="Provider: ACH.",
         )
     )
-    fare_rule: List[FareRule] = field(
+    fare_rule: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="FareRule",
@@ -133,7 +167,7 @@ class AirExchangeReq(BaseReq):
     Request to exchange an itinerary
     """
 
-    air_reservation_locator_code: AirReservationLocatorCode = field(
+    air_reservation_locator_code: str = field(
         default=None,
         metadata=dict(
             name="AirReservationLocatorCode",
@@ -142,7 +176,7 @@ class AirExchangeReq(BaseReq):
             required=True
         )
     )
-    ticket_number: List[TicketNumber] = field(
+    ticket_number: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="TicketNumber",
@@ -152,7 +186,7 @@ class AirExchangeReq(BaseReq):
             max_occurs=999
         )
     )
-    specific_seat_assignment: List[SpecificSeatAssignment] = field(
+    specific_seat_assignment: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="SpecificSeatAssignment",
@@ -162,7 +196,7 @@ class AirExchangeReq(BaseReq):
             max_occurs=999
         )
     )
-    air_pricing_solution: List[AirPricingSolution] = field(
+    air_pricing_solution: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="AirPricingSolution",
@@ -172,7 +206,7 @@ class AirExchangeReq(BaseReq):
             max_occurs=999
         )
     )
-    air_exchange_modifiers: AirExchangeModifiers = field(
+    air_exchange_modifiers: str = field(
         default=None,
         metadata=dict(
             name="AirExchangeModifiers",
@@ -180,7 +214,7 @@ class AirExchangeReq(BaseReq):
             help="Provider: ACH.",
         )
     )
-    air_exchange_bundle_total: AirExchangeBundleTotal = field(
+    air_exchange_bundle_total: str = field(
         default=None,
         metadata=dict(
             name="AirExchangeBundleTotal",
@@ -188,7 +222,7 @@ class AirExchangeReq(BaseReq):
             help="Provider: 1G/1V/1P/1S/1A.",
         )
     )
-    air_exchange_bundle: List[AirExchangeBundle] = field(
+    air_exchange_bundle: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="AirExchangeBundle",
@@ -198,7 +232,7 @@ class AirExchangeReq(BaseReq):
             max_occurs=999
         )
     )
-    host_token: List[HostToken] = field(
+    host_token: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="HostToken",
@@ -208,7 +242,7 @@ class AirExchangeReq(BaseReq):
             max_occurs=999
         )
     )
-    optional_services: OptionalServices = field(
+    optional_services: str = field(
         default=None,
         metadata=dict(
             name="OptionalServices",
@@ -216,7 +250,7 @@ class AirExchangeReq(BaseReq):
             help="Provider: ACH.",
         )
     )
-    form_of_payment: FormOfPayment = field(
+    form_of_payment: str = field(
         default=None,
         metadata=dict(
             name="FormOfPayment",
@@ -224,7 +258,7 @@ class AirExchangeReq(BaseReq):
             help="Form of Payment for any additional collection charges for the Exchange. For ACH, most carriers will only allow refund amounts to the original form of payment. Providers ACH/1G/1V/1P",
         )
     )
-    form_of_payment_ref: FormOfPaymentRef = field(
+    form_of_payment_ref: str = field(
         default=None,
         metadata=dict(
             name="FormOfPaymentRef",
@@ -232,7 +266,7 @@ class AirExchangeReq(BaseReq):
             help="Provider: ACH-Universal Record reference to Form of Payment for any Additional Collection charges or Refund due for the itinerary exchange",
         )
     )
-    ssrinfo: List[Ssrinfo] = field(
+    ssrinfo: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="SSRInfo",
@@ -242,7 +276,7 @@ class AirExchangeReq(BaseReq):
             max_occurs=999
         )
     )
-    add_svc: AddSvc = field(
+    add_svc: str = field(
         default=None,
         metadata=dict(
             name="AddSvc",
@@ -250,7 +284,7 @@ class AirExchangeReq(BaseReq):
             help="1P - Add SVC segments to collect additional fee",
         )
     )
-    return_reservation: bool = field(
+    return_reservation: str = field(
         default="false",
         metadata=dict(
             name="ReturnReservation",
@@ -262,7 +296,7 @@ class AirExchangeReq(BaseReq):
 
 @dataclass
 class AirExchangeRsp(BaseRsp):
-    ticket_number: List[TicketNumber] = field(
+    ticket_number: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="TicketNumber",
@@ -272,7 +306,7 @@ class AirExchangeRsp(BaseRsp):
             max_occurs=999
         )
     )
-    booking_traveler: List[BookingTraveler] = field(
+    booking_traveler: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="BookingTraveler",
@@ -282,7 +316,7 @@ class AirExchangeRsp(BaseRsp):
             max_occurs=999
         )
     )
-    air_reservation: TypeAirReservationWithFop = field(
+    air_reservation: str = field(
         default=None,
         metadata=dict(
             name="AirReservation",
@@ -290,7 +324,7 @@ class AirExchangeRsp(BaseRsp):
             help="Provider: ACH.",
         )
     )
-    exchange_failure_info: List[TypeTicketFailureInfo] = field(
+    exchange_failure_info: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="ExchangeFailureInfo",
@@ -308,7 +342,7 @@ class AirExchangeTicketingReq(BaseReq):
     Request to ticket an exchanged itinerary. Providers 1G, 1V, 1P.
     """
 
-    air_reservation_locator_code: AirReservationLocatorCode = field(
+    air_reservation_locator_code: str = field(
         default=None,
         metadata=dict(
             name="AirReservationLocatorCode",
@@ -317,7 +351,7 @@ class AirExchangeTicketingReq(BaseReq):
             required=True
         )
     )
-    ticket_number: TicketNumber = field(
+    ticket_number: str = field(
         default=None,
         metadata=dict(
             name="TicketNumber",
@@ -326,7 +360,7 @@ class AirExchangeTicketingReq(BaseReq):
             required=True
         )
     )
-    ticketing_modifiers_ref: List[TypeTicketingModifiersRef] = field(
+    ticketing_modifiers_ref: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="TicketingModifiersRef",
@@ -336,7 +370,7 @@ class AirExchangeTicketingReq(BaseReq):
             max_occurs=999
         )
     )
-    waiver_code: WaiverCode = field(
+    waiver_code: str = field(
         default=None,
         metadata=dict(
             name="WaiverCode",
@@ -344,7 +378,7 @@ class AirExchangeTicketingReq(BaseReq):
             help=None,
         )
     )
-    detailed_billing_information: List[DetailedBillingInformation] = field(
+    detailed_billing_information: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="DetailedBillingInformation",
@@ -354,7 +388,7 @@ class AirExchangeTicketingReq(BaseReq):
             max_occurs=999
         )
     )
-    air_ticketing_modifiers: List[AirTicketingModifiers] = field(
+    air_ticketing_modifiers: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="AirTicketingModifiers",
@@ -364,7 +398,7 @@ class AirExchangeTicketingReq(BaseReq):
             max_occurs=999
         )
     )
-    bulk_ticket: bool = field(
+    bulk_ticket: str = field(
         default="false",
         metadata=dict(
             name="BulkTicket",
@@ -372,7 +406,7 @@ class AirExchangeTicketingReq(BaseReq):
             help="Providers 1G, 1V, 1P.",
         )
     )
-    change_fee_on_ticket: bool = field(
+    change_fee_on_ticket: str = field(
         default="true",
         metadata=dict(
             name="ChangeFeeOnTicket",
@@ -388,7 +422,7 @@ class AirExchangeTicketingRsp(BaseRsp):
     Response to reissue a ticket.
     """
 
-    air_solution_changed_info: AirSolutionChangedInfo = field(
+    air_solution_changed_info: str = field(
         default=None,
         metadata=dict(
             name="AirSolutionChangedInfo",
@@ -396,7 +430,7 @@ class AirExchangeTicketingRsp(BaseRsp):
             help=None,
         )
     )
-    etr: Etr = field(
+    etr: str = field(
         default=None,
         metadata=dict(
             name="ETR",
@@ -404,7 +438,7 @@ class AirExchangeTicketingRsp(BaseRsp):
             help="Provider 1G, 1V, 1P.",
         )
     )
-    ticket_failure_info: TicketFailureInfo = field(
+    ticket_failure_info: str = field(
         default=None,
         metadata=dict(
             name="TicketFailureInfo",
@@ -412,7 +446,7 @@ class AirExchangeTicketingRsp(BaseRsp):
             help="Provider 1G, 1V, 1P.",
         )
     )
-    detailed_billing_information: DetailedBillingInformation = field(
+    detailed_billing_information: str = field(
         default=None,
         metadata=dict(
             name="DetailedBillingInformation",
@@ -428,7 +462,7 @@ class AirFareDisplayReq(BaseReq):
     Request to display a tariff for based on origin, destination, and other options
     """
 
-    fare_type: List[FareType] = field(
+    fare_type: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="FareType",
@@ -438,7 +472,7 @@ class AirFareDisplayReq(BaseReq):
             max_occurs=5
         )
     )
-    passenger_type: List[TypePassengerType] = field(
+    passenger_type: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="PassengerType",
@@ -448,7 +482,7 @@ class AirFareDisplayReq(BaseReq):
             max_occurs=999
         )
     )
-    booking_code: List[BookingCode] = field(
+    booking_code: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="BookingCode",
@@ -458,7 +492,7 @@ class AirFareDisplayReq(BaseReq):
             max_occurs=5
         )
     )
-    include_addl_booking_code_info: IncludeAddlBookingCodeInfo = field(
+    include_addl_booking_code_info: str = field(
         default=None,
         metadata=dict(
             name="IncludeAddlBookingCodeInfo",
@@ -466,7 +500,7 @@ class AirFareDisplayReq(BaseReq):
             help="Provider: 1G,1V,1P,1J.",
         )
     )
-    fare_basis: FareBasis = field(
+    fare_basis: str = field(
         default=None,
         metadata=dict(
             name="FareBasis",
@@ -474,7 +508,7 @@ class AirFareDisplayReq(BaseReq):
             help="Provider: 1G,1V,1P,1J.",
         )
     )
-    carrier: List[Carrier] = field(
+    carrier: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="Carrier",
@@ -484,7 +518,7 @@ class AirFareDisplayReq(BaseReq):
             max_occurs=10
         )
     )
-    account_code: List[AccountCode] = field(
+    account_code: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="AccountCode",
@@ -494,7 +528,7 @@ class AirFareDisplayReq(BaseReq):
             max_occurs=5
         )
     )
-    contract_code: ContractCode = field(
+    contract_code: str = field(
         default=None,
         metadata=dict(
             name="ContractCode",
@@ -502,7 +536,7 @@ class AirFareDisplayReq(BaseReq):
             help="Provider: 1G,1V.",
         )
     )
-    air_fare_display_modifiers: AirFareDisplayModifiers = field(
+    air_fare_display_modifiers: str = field(
         default=None,
         metadata=dict(
             name="AirFareDisplayModifiers",
@@ -510,7 +544,7 @@ class AirFareDisplayReq(BaseReq):
             help="Provider: 1G,1V,1P,1J.",
         )
     )
-    point_of_sale: List[PointOfSale] = field(
+    point_of_sale: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="PointOfSale",
@@ -520,7 +554,7 @@ class AirFareDisplayReq(BaseReq):
             max_occurs=5
         )
     )
-    air_fare_display_rule_key: AirFareDisplayRuleKey = field(
+    air_fare_display_rule_key: str = field(
         default=None,
         metadata=dict(
             name="AirFareDisplayRuleKey",
@@ -528,34 +562,40 @@ class AirFareDisplayReq(BaseReq):
             help="Provider: 1G,1V,1P,1J.",
         )
     )
-    origin: TypeIatacode = field(
+    origin: str = field(
         default=None,
         metadata=dict(
             name="Origin",
             type="Attribute",
             help="Provider: 1G,1V,1P,1J.",
-            required=True
+            required=True,
+            length=3,
+            white_space="collapse"
         )
     )
-    destination: TypeIatacode = field(
+    destination: str = field(
         default=None,
         metadata=dict(
             name="Destination",
             type="Attribute",
             help="Provider: 1G,1V,1P,1J.",
-            required=True
+            required=True,
+            length=3,
+            white_space="collapse"
         )
     )
-    provider_code: TypeProviderCode = field(
+    provider_code: str = field(
         default=None,
         metadata=dict(
             name="ProviderCode",
             type="Attribute",
             help="Provider: 1G,1V,1P,1J.",
-            required=True
+            required=True,
+            min_length=2.0,
+            max_length=5.0
         )
     )
-    include_mile_route_information: TypeMileOrRouteBasedFare = field(
+    include_mile_route_information: str = field(
         default=None,
         metadata=dict(
             name="IncludeMileRouteInformation",
@@ -563,7 +603,7 @@ class AirFareDisplayReq(BaseReq):
             help="Provider: 1G,1V,1P,1J-Used to request Mile/Route Information in follow on (Mile, Route, Both)",
         )
     )
-    un_saleable_fares_only: bool = field(
+    un_saleable_fares_only: str = field(
         default=None,
         metadata=dict(
             name="UnSaleableFaresOnly",
@@ -591,7 +631,7 @@ class AirFareDisplayReq(BaseReq):
             max_length=3.0
         )
     )
-    return_mm: bool = field(
+    return_mm: str = field(
         default="false",
         metadata=dict(
             name="ReturnMM",
@@ -607,7 +647,7 @@ class AirFareDisplayRsp(BaseRsp):
     Response to an AirFareDisplayReq
     """
 
-    fare_display: List[FareDisplay] = field(
+    fare_display: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="FareDisplay",
@@ -625,7 +665,7 @@ class AirFareRulesReq(BaseReq):
     Request to display the full text fare rules.
     """
 
-    air_fare_rules_modifier: AirFareRulesModifier = field(
+    air_fare_rules_modifier: str = field(
         default=None,
         metadata=dict(
             name="AirFareRulesModifier",
@@ -633,7 +673,7 @@ class AirFareRulesReq(BaseReq):
             help="Provider: 1G,1V.",
         )
     )
-    fare_rules_filter_category: List["AirFareRulesReq.FareRulesFilterCategory"] = field(
+    fare_rules_filter_category: List["AirFareRulesReq.str"] = field(
         default_factory=list,
         metadata=dict(
             name="FareRulesFilterCategory",
@@ -643,7 +683,7 @@ class AirFareRulesReq(BaseReq):
             max_occurs=16
         )
     )
-    air_reservation_selector: "AirFareRulesReq.AirReservationSelector" = field(
+    air_reservation_selector: "AirFareRulesReq.str" = field(
         default=None,
         metadata=dict(
             name="AirReservationSelector",
@@ -652,7 +692,7 @@ class AirFareRulesReq(BaseReq):
             required=True
         )
     )
-    fare_rule_lookup: FareRuleLookup = field(
+    fare_rule_lookup: str = field(
         default=None,
         metadata=dict(
             name="FareRuleLookup",
@@ -660,7 +700,7 @@ class AirFareRulesReq(BaseReq):
             help="Used to look up fare rules based on the origin, destination, and carrier of the air segment, the fare basis code and the provider code. Providers: 1P, 1J.",
         )
     )
-    fare_rule_key: List[FareRuleKey] = field(
+    fare_rule_key: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="FareRuleKey",
@@ -670,7 +710,7 @@ class AirFareRulesReq(BaseReq):
             max_occurs=999
         )
     )
-    air_fare_display_rule_key: AirFareDisplayRuleKey = field(
+    air_fare_display_rule_key: str = field(
         default=None,
         metadata=dict(
             name="AirFareDisplayRuleKey",
@@ -679,7 +719,7 @@ class AirFareRulesReq(BaseReq):
             required=True
         )
     )
-    fare_rule_type: TypeFareRuleType = field(
+    fare_rule_type: str = field(
         default="long",
         metadata=dict(
             name="FareRuleType",
@@ -711,7 +751,7 @@ class AirFareRulesReq(BaseReq):
 
     @dataclass
     class AirReservationSelector:
-        fare_info_ref: List[FareInfoRef] = field(
+        fare_info_ref: List[str] = field(
             default_factory=list,
             metadata=dict(
                 name="FareInfoRef",
@@ -721,13 +761,15 @@ class AirFareRulesReq(BaseReq):
                 max_occurs=999
             )
         )
-        air_reservation_locator_code: TypeLocatorCode = field(
+        air_reservation_locator_code: str = field(
             default=None,
             metadata=dict(
                 name="AirReservationLocatorCode",
                 type="Attribute",
                 help="The Air Reservation locator code which is an unique identifier for the reservation",
-                required=True
+                required=True,
+                min_length=5.0,
+                max_length=8.0
             )
         )
 
@@ -738,7 +780,7 @@ class AirFareRulesRsp(BaseRsp):
     Response to an AirFareRuleReq.
     """
 
-    fare_rule: List[FareRule] = field(
+    fare_rule: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="FareRule",
@@ -756,7 +798,7 @@ class AirMerchandisingDetailsReq(BaseReq):
     Request to retrieve brand details and optional services included in the brand
     """
 
-    merchandising_details: MerchandisingDetails = field(
+    merchandising_details: str = field(
         default=None,
         metadata=dict(
             name="MerchandisingDetails",
@@ -765,7 +807,7 @@ class AirMerchandisingDetailsReq(BaseReq):
             required=True
         )
     )
-    optional_service_modifiers: OptionalServiceModifiers = field(
+    optional_service_modifiers: str = field(
         default=None,
         metadata=dict(
             name="OptionalServiceModifiers",
@@ -774,7 +816,7 @@ class AirMerchandisingDetailsReq(BaseReq):
             required=True
         )
     )
-    merchandising_availability_details: MerchandisingAvailabilityDetails = field(
+    merchandising_availability_details: str = field(
         default=None,
         metadata=dict(
             name="MerchandisingAvailabilityDetails",
@@ -791,7 +833,7 @@ class AirMerchandisingDetailsRsp(BaseRsp):
     Response for retrieved brand details and optional services included in them
     """
 
-    optional_services: OptionalServices = field(
+    optional_services: str = field(
         default=None,
         metadata=dict(
             name="OptionalServices",
@@ -799,7 +841,7 @@ class AirMerchandisingDetailsRsp(BaseRsp):
             help=None,
         )
     )
-    brand: List[Brand] = field(
+    brand: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="Brand",
@@ -809,7 +851,7 @@ class AirMerchandisingDetailsRsp(BaseRsp):
             max_occurs=99
         )
     )
-    unassociated_booking_code_list: "AirMerchandisingDetailsRsp.UnassociatedBookingCodeList" = field(
+    unassociated_booking_code_list: "AirMerchandisingDetailsRsp.str" = field(
         default=None,
         metadata=dict(
             name="UnassociatedBookingCodeList",
@@ -820,7 +862,7 @@ class AirMerchandisingDetailsRsp(BaseRsp):
 
     @dataclass
     class UnassociatedBookingCodeList:
-        applicable_segment: List[TypeApplicableSegment] = field(
+        applicable_segment: List[str] = field(
             default_factory=list,
             metadata=dict(
                 name="ApplicableSegment",
@@ -838,7 +880,7 @@ class AirMerchandisingOfferAvailabilityReq(BaseReq):
     Check with the supplier whether or not the reservation or air solution supports any merchandising offerings.
     """
 
-    agency_sell_info: AgencySellInfo = field(
+    agency_sell_info: str = field(
         default=None,
         metadata=dict(
             name="AgencySellInfo",
@@ -846,7 +888,7 @@ class AirMerchandisingOfferAvailabilityReq(BaseReq):
             help="Provider: 1G,1V,1P,1J,ACH.",
         )
     )
-    air_solution: AirSolution = field(
+    air_solution: str = field(
         default=None,
         metadata=dict(
             name="AirSolution",
@@ -854,7 +896,7 @@ class AirMerchandisingOfferAvailabilityReq(BaseReq):
             help="Provider: 1G,1V,1P,1J,ACH.",
         )
     )
-    host_reservation: List[HostReservation] = field(
+    host_reservation: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="HostReservation",
@@ -864,7 +906,7 @@ class AirMerchandisingOfferAvailabilityReq(BaseReq):
             max_occurs=999
         )
     )
-    offer_availability_modifiers: List[OfferAvailabilityModifiers] = field(
+    offer_availability_modifiers: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="OfferAvailabilityModifiers",
@@ -874,7 +916,7 @@ class AirMerchandisingOfferAvailabilityReq(BaseReq):
             max_occurs=999
         )
     )
-    merchandising_pricing_modifiers: MerchandisingPricingModifiers = field(
+    merchandising_pricing_modifiers: str = field(
         default=None,
         metadata=dict(
             name="MerchandisingPricingModifiers",
@@ -890,7 +932,7 @@ class AirMerchandisingOfferAvailabilityRsp(BaseRsp):
     Contains the merchandising offerings for the given passenger and itinerary.
     """
 
-    air_solution: AirSolution = field(
+    air_solution: str = field(
         default=None,
         metadata=dict(
             name="AirSolution",
@@ -899,7 +941,7 @@ class AirMerchandisingOfferAvailabilityRsp(BaseRsp):
             required=True
         )
     )
-    remark: Remark = field(
+    remark: str = field(
         default=None,
         metadata=dict(
             name="Remark",
@@ -907,7 +949,7 @@ class AirMerchandisingOfferAvailabilityRsp(BaseRsp):
             help="Provider: 1G,1V,1P,1J,ACH.",
         )
     )
-    optional_services: OptionalServices = field(
+    optional_services: str = field(
         default=None,
         metadata=dict(
             name="OptionalServices",
@@ -915,7 +957,7 @@ class AirMerchandisingOfferAvailabilityRsp(BaseRsp):
             help=None,
         )
     )
-    embargo_list: EmbargoList = field(
+    embargo_list: str = field(
         default=None,
         metadata=dict(
             name="EmbargoList",
@@ -931,7 +973,7 @@ class AirPrePayReq(BaseReq):
     Flight Pass Request.
     """
 
-    list_search: "AirPrePayReq.ListSearch" = field(
+    list_search: "AirPrePayReq.str" = field(
         default=None,
         metadata=dict(
             name="ListSearch",
@@ -940,7 +982,7 @@ class AirPrePayReq(BaseReq):
             required=True
         )
     )
-    pre_pay_retrieve: "AirPrePayReq.PrePayRetrieve" = field(
+    pre_pay_retrieve: "AirPrePayReq.str" = field(
         default=None,
         metadata=dict(
             name="PrePayRetrieve",
@@ -952,7 +994,7 @@ class AirPrePayReq(BaseReq):
 
     @dataclass
     class ListSearch:
-        person_name_search: PersonNameSearch = field(
+        person_name_search: str = field(
             default=None,
             metadata=dict(
                 name="PersonNameSearch",
@@ -961,7 +1003,7 @@ class AirPrePayReq(BaseReq):
                 required=True
             )
         )
-        loyalty_card: List[LoyaltyCard] = field(
+        loyalty_card: List[str] = field(
             default_factory=list,
             metadata=dict(
                 name="LoyaltyCard",
@@ -971,34 +1013,39 @@ class AirPrePayReq(BaseReq):
                 max_occurs=999
             )
         )
-        start_from_result: TypeStartFromResult = field(
+        start_from_result: str = field(
             default=None,
             metadata=dict(
                 name="StartFromResult",
                 type="Attribute",
                 help="Start index of the section of flight pass numbers that is being requested.",
-                required=True
+                required=True,
+                min_inclusive=1.0
             )
         )
-        max_results: TypeMaxResults = field(
+        max_results: str = field(
             default=None,
             metadata=dict(
                 name="MaxResults",
                 type="Attribute",
                 help="Max Number of Flight Passes being requested for.",
-                required=True
+                required=True,
+                min_inclusive=1.0,
+                max_inclusive=200.0
             )
         )
 
     @dataclass
     class PrePayRetrieve:
-        id: TypeCardNumber = field(
+        id: str = field(
             default=None,
             metadata=dict(
                 name="Id",
                 type="Attribute",
                 help="Pre pay id to retrieved,example flight pass number",
-                required=True
+                required=True,
+                min_length=1.0,
+                max_length=36.0
             )
         )
         type: str = field(
@@ -1017,7 +1064,7 @@ class AirPrePayRsp(BaseRsp):
     Flight Pass Response.
     """
 
-    pre_pay_profile_info: List[PrePayProfileInfo] = field(
+    pre_pay_profile_info: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="PrePayProfileInfo",
@@ -1027,15 +1074,17 @@ class AirPrePayRsp(BaseRsp):
             max_occurs=999
         )
     )
-    max_results: TypeMaxResults = field(
+    max_results: str = field(
         default=None,
         metadata=dict(
             name="MaxResults",
             type="Attribute",
             help="Provider: ACH-Max Number of Flight Passes being returned.",
+            min_inclusive=1.0,
+            max_inclusive=200.0
         )
     )
-    more_indicator: bool = field(
+    more_indicator: str = field(
         default=None,
         metadata=dict(
             name="MoreIndicator",
@@ -1059,7 +1108,7 @@ class AirRefundQuoteReq(BaseReq):
     Request to quote a refund for an itinerary
     """
 
-    ticket_number: List[TicketNumber] = field(
+    ticket_number: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="TicketNumber",
@@ -1069,7 +1118,7 @@ class AirRefundQuoteReq(BaseReq):
             max_occurs=999
         )
     )
-    tcrnumber: List[TypeTcrnumber] = field(
+    tcrnumber: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="TCRNumber",
@@ -1079,7 +1128,7 @@ class AirRefundQuoteReq(BaseReq):
             max_occurs=999
         )
     )
-    air_refund_modifiers: AirRefundModifiers = field(
+    air_refund_modifiers: str = field(
         default=None,
         metadata=dict(
             name="AirRefundModifiers",
@@ -1087,7 +1136,7 @@ class AirRefundQuoteReq(BaseReq):
             help="Provider: ACH.",
         )
     )
-    host_token: List[HostToken] = field(
+    host_token: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="HostToken",
@@ -1097,7 +1146,7 @@ class AirRefundQuoteReq(BaseReq):
             max_occurs=999
         )
     )
-    provider_reservation_info: List["AirRefundQuoteReq.ProviderReservationInfo"] = field(
+    provider_reservation_info: List["AirRefundQuoteReq.str"] = field(
         default_factory=list,
         metadata=dict(
             name="ProviderReservationInfo",
@@ -1107,7 +1156,7 @@ class AirRefundQuoteReq(BaseReq):
             max_occurs=999
         )
     )
-    ignore: bool = field(
+    ignore: str = field(
         default="false",
         metadata=dict(
             name="Ignore",
@@ -1123,7 +1172,7 @@ class AirRefundQuoteReq(BaseReq):
 
 @dataclass
 class AirRefundQuoteRsp(BaseRsp):
-    air_refund_bundle: List[AirRefundBundle] = field(
+    air_refund_bundle: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="AirRefundBundle",
@@ -1133,7 +1182,7 @@ class AirRefundQuoteRsp(BaseRsp):
             max_occurs=999
         )
     )
-    tcrrefund_bundle: List[TcrrefundBundle] = field(
+    tcrrefund_bundle: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="TCRRefundBundle",
@@ -1151,7 +1200,7 @@ class AirRefundReq(BaseReq):
     Request to refund an itinerary for the amount previously quoted
     """
 
-    air_refund_bundle: List[AirRefundBundle] = field(
+    air_refund_bundle: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="AirRefundBundle",
@@ -1161,7 +1210,7 @@ class AirRefundReq(BaseReq):
             max_occurs=999
         )
     )
-    tcrrefund_bundle: List[TcrrefundBundle] = field(
+    tcrrefund_bundle: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="TCRRefundBundle",
@@ -1171,7 +1220,7 @@ class AirRefundReq(BaseReq):
             max_occurs=999
         )
     )
-    air_refund_modifiers: AirRefundModifiers = field(
+    air_refund_modifiers: str = field(
         default=None,
         metadata=dict(
             name="AirRefundModifiers",
@@ -1179,7 +1228,7 @@ class AirRefundReq(BaseReq):
             help=None,
         )
     )
-    commission: List[Commission] = field(
+    commission: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="Commission",
@@ -1189,7 +1238,7 @@ class AirRefundReq(BaseReq):
             max_occurs=9
         )
     )
-    form_of_payment: FormOfPayment = field(
+    form_of_payment: str = field(
         default=None,
         metadata=dict(
             name="FormOfPayment",
@@ -1201,7 +1250,7 @@ class AirRefundReq(BaseReq):
 
 @dataclass
 class AirRefundRsp(BaseRsp):
-    etr: List[Etr] = field(
+    etr: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="ETR",
@@ -1211,7 +1260,7 @@ class AirRefundRsp(BaseRsp):
             max_occurs=999
         )
     )
-    tcr: List[Tcr] = field(
+    tcr: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="TCR",
@@ -1221,7 +1270,7 @@ class AirRefundRsp(BaseRsp):
             max_occurs=999
         )
     )
-    refund_failure_info: List[TypeTicketFailureInfo] = field(
+    refund_failure_info: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="RefundFailureInfo",
@@ -1235,7 +1284,7 @@ class AirRefundRsp(BaseRsp):
 
 @dataclass
 class AirRepriceRsp(BaseRsp):
-    air_pricing_solution: AirPricingSolution = field(
+    air_pricing_solution: str = field(
         default=None,
         metadata=dict(
             name="AirPricingSolution",
@@ -1244,7 +1293,7 @@ class AirRepriceRsp(BaseRsp):
             required=True
         )
     )
-    fare_rule: List[FareRule] = field(
+    fare_rule: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="FareRule",
@@ -1262,7 +1311,7 @@ class AirRetrieveDocumentReq(BaseReq):
     Retrieve the post booking information for a PNR. ETRs will be returned for standard carriers. TCRs will be returned for Ticketless carriers. If the locator is send on a standard carrier, all ETRs will be retrieved.
     """
 
-    air_reservation_locator_code: AirReservationLocatorCode = field(
+    air_reservation_locator_code: str = field(
         default=None,
         metadata=dict(
             name="AirReservationLocatorCode",
@@ -1270,7 +1319,7 @@ class AirRetrieveDocumentReq(BaseReq):
             help="Provider: 1G,1V,1P,1J.",
         )
     )
-    ticket_number: List[TicketNumber] = field(
+    ticket_number: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="TicketNumber",
@@ -1280,7 +1329,7 @@ class AirRetrieveDocumentReq(BaseReq):
             max_occurs=999
         )
     )
-    tcrnumber: List[TypeTcrnumber] = field(
+    tcrnumber: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="TCRNumber",
@@ -1290,7 +1339,7 @@ class AirRetrieveDocumentReq(BaseReq):
             max_occurs=999
         )
     )
-    return_restrictions: bool = field(
+    return_restrictions: str = field(
         default=None,
         metadata=dict(
             name="ReturnRestrictions",
@@ -1298,7 +1347,7 @@ class AirRetrieveDocumentReq(BaseReq):
             help="Will return a response which includes a set of restrictions associated with the document.",
         )
     )
-    return_pricing: bool = field(
+    return_pricing: str = field(
         default=None,
         metadata=dict(
             name="ReturnPricing",
@@ -1306,7 +1355,7 @@ class AirRetrieveDocumentReq(BaseReq):
             help="Provider: 1G,1V,1P,1J-Will return a response which includes the pricing associated with the ETR.",
         )
     )
-    retrieve_mco: bool = field(
+    retrieve_mco: str = field(
         default=None,
         metadata=dict(
             name="RetrieveMCO",
@@ -1318,7 +1367,7 @@ class AirRetrieveDocumentReq(BaseReq):
 
 @dataclass
 class AirRetrieveDocumentRsp(BaseRsp):
-    etr: List[Etr] = field(
+    etr: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="ETR",
@@ -1328,7 +1377,7 @@ class AirRetrieveDocumentRsp(BaseRsp):
             max_occurs=999
         )
     )
-    mco: List[Mco] = field(
+    mco: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="MCO",
@@ -1338,7 +1387,7 @@ class AirRetrieveDocumentRsp(BaseRsp):
             max_occurs=999
         )
     )
-    tcr: List[Tcr] = field(
+    tcr: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="TCR",
@@ -1348,7 +1397,7 @@ class AirRetrieveDocumentRsp(BaseRsp):
             max_occurs=999
         )
     )
-    document_failure_info: List[TypeFailureInfo] = field(
+    document_failure_info: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="DocumentFailureInfo",
@@ -1358,7 +1407,7 @@ class AirRetrieveDocumentRsp(BaseRsp):
             max_occurs=999
         )
     )
-    service_fee_info: List[ServiceFeeInfo] = field(
+    service_fee_info: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="ServiceFeeInfo",
@@ -1368,12 +1417,66 @@ class AirRetrieveDocumentRsp(BaseRsp):
             max_occurs=99
         )
     )
-    universal_record_locator_code: TypeLocatorCode = field(
+    universal_record_locator_code: str = field(
         default=None,
         metadata=dict(
             name="UniversalRecordLocatorCode",
             type="Attribute",
             help="Provider: 1G,1V,1P,1J-Represents a valid Universal Record locator code.",
+            min_length=5.0,
+            max_length=8.0
+        )
+    )
+
+
+@dataclass
+class AirSearchReq(BaseSearchReq):
+    """
+    Base Request for Air Search
+    """
+
+    point_of_commencement: str = field(
+        default=None,
+        metadata=dict(
+            name="PointOfCommencement",
+            type="Element",
+            help=None,
+        )
+    )
+    air_search_modifiers: str = field(
+        default=None,
+        metadata=dict(
+            name="AirSearchModifiers",
+            type="Element",
+            help=None,
+        )
+    )
+    journey_data: str = field(
+        default=None,
+        metadata=dict(
+            name="JourneyData",
+            type="Element",
+            help=None,
+        )
+    )
+    search_air_leg: List[str] = field(
+        default_factory=list,
+        metadata=dict(
+            name="SearchAirLeg",
+            type="Element",
+            help=None,
+            min_occurs=1,
+            max_occurs=16
+        )
+    )
+    search_specific_air_segment: List[str] = field(
+        default_factory=list,
+        metadata=dict(
+            name="SearchSpecificAirSegment",
+            type="Element",
+            help=None,
+            min_occurs=1,
+            max_occurs=999
         )
     )
 
@@ -1384,7 +1487,7 @@ class AirTicketingRsp(BaseRsp):
     Response to ticket a previously stored reservation.
     """
 
-    air_solution_changed_info: AirSolutionChangedInfo = field(
+    air_solution_changed_info: str = field(
         default=None,
         metadata=dict(
             name="AirSolutionChangedInfo",
@@ -1392,7 +1495,7 @@ class AirTicketingRsp(BaseRsp):
             help=None,
         )
     )
-    etr: List[Etr] = field(
+    etr: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="ETR",
@@ -1402,7 +1505,7 @@ class AirTicketingRsp(BaseRsp):
             max_occurs=999
         )
     )
-    ticket_failure_info: List[TicketFailureInfo] = field(
+    ticket_failure_info: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="TicketFailureInfo",
@@ -1412,7 +1515,7 @@ class AirTicketingRsp(BaseRsp):
             max_occurs=999
         )
     )
-    detailed_billing_information: List[DetailedBillingInformation] = field(
+    detailed_billing_information: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="DetailedBillingInformation",
@@ -1430,7 +1533,7 @@ class AirVoidDocumentReq(BaseReq):
     Request to void all previously issued tickets for the PNR.
     """
 
-    air_reservation_locator_code: AirReservationLocatorCode = field(
+    air_reservation_locator_code: str = field(
         default=None,
         metadata=dict(
             name="AirReservationLocatorCode",
@@ -1438,7 +1541,7 @@ class AirVoidDocumentReq(BaseReq):
             help="Provider: 1G,1V.",
         )
     )
-    void_document_info: List[VoidDocumentInfo] = field(
+    void_document_info: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="VoidDocumentInfo",
@@ -1448,7 +1551,7 @@ class AirVoidDocumentReq(BaseReq):
             max_occurs=999
         )
     )
-    show_etr: bool = field(
+    show_etr: str = field(
         default="false",
         metadata=dict(
             name="ShowETR",
@@ -1456,12 +1559,14 @@ class AirVoidDocumentReq(BaseReq):
             help="Provider: 1G,1V-If set as true, response will display the detailed ETR for successfully voided E-Tickets.",
         )
     )
-    provider_code: TypeProviderCode = field(
+    provider_code: str = field(
         default=None,
         metadata=dict(
             name="ProviderCode",
             type="Attribute",
             help="Provider: 1G,1V-Provider code of a specific host.",
+            min_length=2.0,
+            max_length=5.0
         )
     )
     provider_locator_code: str = field(
@@ -1472,7 +1577,7 @@ class AirVoidDocumentReq(BaseReq):
             help="Provider: 1G,1V-Contains the locator of the host reservation.",
         )
     )
-    validate_spanish_residency: bool = field(
+    validate_spanish_residency: str = field(
         default="false",
         metadata=dict(
             name="ValidateSpanishResidency",
@@ -1488,7 +1593,7 @@ class AirVoidDocumentRsp(BaseRsp):
     Result of void ticket request. Includes ticket number of voided tickets and air segments with updated status.
     """
 
-    etr: List[Etr] = field(
+    etr: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="ETR",
@@ -1498,7 +1603,7 @@ class AirVoidDocumentRsp(BaseRsp):
             max_occurs=999
         )
     )
-    void_result_info: List[VoidResultInfo] = field(
+    void_result_info: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="VoidResultInfo",
@@ -1512,7 +1617,7 @@ class AirVoidDocumentRsp(BaseRsp):
 
 @dataclass
 class BaseAirExchangeMultiQuoteReq(BaseCoreReq):
-    ticket_number: List[TicketNumber] = field(
+    ticket_number: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="TicketNumber",
@@ -1522,7 +1627,7 @@ class BaseAirExchangeMultiQuoteReq(BaseCoreReq):
             max_occurs=999
         )
     )
-    provider_reservation_info: "BaseAirExchangeMultiQuoteReq.ProviderReservationInfo" = field(
+    provider_reservation_info: "BaseAirExchangeMultiQuoteReq.str" = field(
         default=None,
         metadata=dict(
             name="ProviderReservationInfo",
@@ -1530,7 +1635,7 @@ class BaseAirExchangeMultiQuoteReq(BaseCoreReq):
             help="Provider: 1P - Represents a valid Provider Reservation/PNR whose itinerary is to be exchanged",
         )
     )
-    air_pricing_solution: List[AirPricingSolution] = field(
+    air_pricing_solution: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="AirPricingSolution",
@@ -1540,7 +1645,7 @@ class BaseAirExchangeMultiQuoteReq(BaseCoreReq):
             max_occurs=2
         )
     )
-    repricing_modifiers: RepricingModifiers = field(
+    repricing_modifiers: str = field(
         default=None,
         metadata=dict(
             name="RepricingModifiers",
@@ -1548,7 +1653,7 @@ class BaseAirExchangeMultiQuoteReq(BaseCoreReq):
             help=None,
         )
     )
-    original_itinerary_details: OriginalItineraryDetails = field(
+    original_itinerary_details: str = field(
         default=None,
         metadata=dict(
             name="OriginalItineraryDetails",
@@ -1556,7 +1661,7 @@ class BaseAirExchangeMultiQuoteReq(BaseCoreReq):
             help=None,
         )
     )
-    override_pcc: OverridePcc = field(
+    override_pcc: str = field(
         default=None,
         metadata=dict(
             name="OverridePCC",
@@ -1572,7 +1677,7 @@ class BaseAirExchangeMultiQuoteReq(BaseCoreReq):
 
 @dataclass
 class BaseAirExchangeQuoteReq(BaseCoreReq):
-    ticket_number: List[TicketNumber] = field(
+    ticket_number: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="TicketNumber",
@@ -1582,7 +1687,7 @@ class BaseAirExchangeQuoteReq(BaseCoreReq):
             max_occurs=999
         )
     )
-    provider_reservation_info: "BaseAirExchangeQuoteReq.ProviderReservationInfo" = field(
+    provider_reservation_info: "BaseAirExchangeQuoteReq.str" = field(
         default=None,
         metadata=dict(
             name="ProviderReservationInfo",
@@ -1590,7 +1695,7 @@ class BaseAirExchangeQuoteReq(BaseCoreReq):
             help="Provider: 1G/1V/1P/ACH - Represents a valid Provider Reservation/PNR whose itinerary is to be exchanged",
         )
     )
-    air_pricing_solution: List[AirPricingSolution] = field(
+    air_pricing_solution: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="AirPricingSolution",
@@ -1600,7 +1705,7 @@ class BaseAirExchangeQuoteReq(BaseCoreReq):
             max_occurs=2
         )
     )
-    air_exchange_modifiers: AirExchangeModifiers = field(
+    air_exchange_modifiers: str = field(
         default=None,
         metadata=dict(
             name="AirExchangeModifiers",
@@ -1608,7 +1713,7 @@ class BaseAirExchangeQuoteReq(BaseCoreReq):
             help="Provider: ACH.",
         )
     )
-    host_token: List[HostToken] = field(
+    host_token: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="HostToken",
@@ -1618,7 +1723,7 @@ class BaseAirExchangeQuoteReq(BaseCoreReq):
             max_occurs=999
         )
     )
-    optional_services: OptionalServices = field(
+    optional_services: str = field(
         default=None,
         metadata=dict(
             name="OptionalServices",
@@ -1626,7 +1731,7 @@ class BaseAirExchangeQuoteReq(BaseCoreReq):
             help="Provider: ACH.",
         )
     )
-    form_of_payment: List[FormOfPayment] = field(
+    form_of_payment: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="FormOfPayment",
@@ -1636,7 +1741,7 @@ class BaseAirExchangeQuoteReq(BaseCoreReq):
             max_occurs=999
         )
     )
-    repricing_modifiers: RepricingModifiers = field(
+    repricing_modifiers: str = field(
         default=None,
         metadata=dict(
             name="RepricingModifiers",
@@ -1644,7 +1749,7 @@ class BaseAirExchangeQuoteReq(BaseCoreReq):
             help=None,
         )
     )
-    original_itinerary_details: OriginalItineraryDetails = field(
+    original_itinerary_details: str = field(
         default=None,
         metadata=dict(
             name="OriginalItineraryDetails",
@@ -1652,7 +1757,7 @@ class BaseAirExchangeQuoteReq(BaseCoreReq):
             help=None,
         )
     )
-    pcc: Pcc = field(
+    pcc: str = field(
         default=None,
         metadata=dict(
             name="PCC",
@@ -1660,7 +1765,7 @@ class BaseAirExchangeQuoteReq(BaseCoreReq):
             help=None,
         )
     )
-    fare_rule_type: TypeFareRuleType = field(
+    fare_rule_type: str = field(
         default="none",
         metadata=dict(
             name="FareRuleType",
@@ -1676,7 +1781,7 @@ class BaseAirExchangeQuoteReq(BaseCoreReq):
 
 @dataclass
 class BaseAirPriceReq(BaseCoreReq):
-    air_itinerary: AirItinerary = field(
+    air_itinerary: str = field(
         default=None,
         metadata=dict(
             name="AirItinerary",
@@ -1685,7 +1790,7 @@ class BaseAirPriceReq(BaseCoreReq):
             required=True
         )
     )
-    air_pricing_modifiers: AirPricingModifiers = field(
+    air_pricing_modifiers: str = field(
         default=None,
         metadata=dict(
             name="AirPricingModifiers",
@@ -1693,7 +1798,7 @@ class BaseAirPriceReq(BaseCoreReq):
             help="Provider: 1G,1V,1P,1J,ACH.",
         )
     )
-    search_passenger: List[SearchPassenger] = field(
+    search_passenger: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="SearchPassenger",
@@ -1703,7 +1808,7 @@ class BaseAirPriceReq(BaseCoreReq):
             max_occurs=18
         )
     )
-    air_pricing_command: List[AirPricingCommand] = field(
+    air_pricing_command: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="AirPricingCommand",
@@ -1713,7 +1818,7 @@ class BaseAirPriceReq(BaseCoreReq):
             max_occurs=16
         )
     )
-    air_reservation_locator_code: AirReservationLocatorCode = field(
+    air_reservation_locator_code: str = field(
         default=None,
         metadata=dict(
             name="AirReservationLocatorCode",
@@ -1721,7 +1826,7 @@ class BaseAirPriceReq(BaseCoreReq):
             help="Provider: ACH,1P,1J",
         )
     )
-    optional_services: OptionalServices = field(
+    optional_services: str = field(
         default=None,
         metadata=dict(
             name="OptionalServices",
@@ -1729,7 +1834,7 @@ class BaseAirPriceReq(BaseCoreReq):
             help="Provider: ACH.",
         )
     )
-    form_of_payment: List[FormOfPayment] = field(
+    form_of_payment: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="FormOfPayment",
@@ -1739,7 +1844,7 @@ class BaseAirPriceReq(BaseCoreReq):
             max_occurs=999
         )
     )
-    pcc: Pcc = field(
+    pcc: str = field(
         default=None,
         metadata=dict(
             name="PCC",
@@ -1747,7 +1852,7 @@ class BaseAirPriceReq(BaseCoreReq):
             help=None,
         )
     )
-    ssr: List[Ssr] = field(
+    ssr: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="SSR",
@@ -1765,7 +1870,7 @@ class BaseAirPriceReq(BaseCoreReq):
             help="A flag to return fees for ticketing and for various forms of payment. The default is “TicketingOnly” and will return only ticketing fees. The value “All” will return ticketing fees and the applicable form of payment fees for the form of payment information specified in the request. “FOPOnly” will return the applicable form of payment fees for the form of payment information specified in the request. Form of payment fees are never included in the total unless specific card details are in the request.Provider notes:ACH - CheckOBFees is valid only for LowFareSearch. The valid values are “All”, “TicketingOnly” and “None” and the default value is “None”. 1P/1J -The valid values are “All”, “None” and “TicketingOnly”.1G – All four values are supported.1V/RCH – CheckOBFees are not supported.”",
         )
     )
-    fare_rule_type: TypeFareRuleType = field(
+    fare_rule_type: str = field(
         default="none",
         metadata=dict(
             name="FareRuleType",
@@ -1773,12 +1878,14 @@ class BaseAirPriceReq(BaseCoreReq):
             help="Provider: 1G,1V,1P,1J,ACH.",
         )
     )
-    supplier_code: TypeSupplierCode = field(
+    supplier_code: str = field(
         default=None,
         metadata=dict(
             name="SupplierCode",
             type="Attribute",
             help="Specifies the supplier/ vendor for vendor specific price requests",
+            min_length=1.0,
+            max_length=5.0
         )
     )
     ticket_date: str = field(
@@ -1789,7 +1896,7 @@ class BaseAirPriceReq(BaseCoreReq):
             help="YYYY-MM-DD Using a date in the past is a request for an historical fare",
         )
     )
-    check_flight_details: bool = field(
+    check_flight_details: str = field(
         default="false",
         metadata=dict(
             name="CheckFlightDetails",
@@ -1797,7 +1904,7 @@ class BaseAirPriceReq(BaseCoreReq):
             help="To Include FlightDetails in Response set to “true” the Default value is “false”.",
         )
     )
-    return_mm: bool = field(
+    return_mm: str = field(
         default="false",
         metadata=dict(
             name="ReturnMM",
@@ -1815,7 +1922,7 @@ class BaseAirPriceReq(BaseCoreReq):
             max_length=3.0
         )
     )
-    split_pricing: bool = field(
+    split_pricing: str = field(
         default="false",
         metadata=dict(
             name="SplitPricing",
@@ -1823,7 +1930,7 @@ class BaseAirPriceReq(BaseCoreReq):
             help="Indicates whether the AirSegments should be priced together or separately. Set ‘true’ for split pricing. Set ‘false’ for pricing together.SplitPricing is not supported with post book re-pricing.",
         )
     )
-    ignore_availability: bool = field(
+    ignore_availability: str = field(
         default="false",
         metadata=dict(
             name="IgnoreAvailability",
@@ -1835,7 +1942,7 @@ class BaseAirPriceReq(BaseCoreReq):
 
 @dataclass
 class BaseAirPriceRsp(BaseRsp):
-    air_itinerary: AirItinerary = field(
+    air_itinerary: str = field(
         default=None,
         metadata=dict(
             name="AirItinerary",
@@ -1844,7 +1951,7 @@ class BaseAirPriceRsp(BaseRsp):
             required=True
         )
     )
-    air_price_result: List[AirPriceResult] = field(
+    air_price_result: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="AirPriceResult",
@@ -1857,12 +1964,64 @@ class BaseAirPriceRsp(BaseRsp):
 
 
 @dataclass
+class BaseAirSearchReq(BaseCoreSearchReq):
+    """
+    Base Request for Low fare air Search
+    """
+
+    air_search_modifiers: str = field(
+        default=None,
+        metadata=dict(
+            name="AirSearchModifiers",
+            type="Element",
+            help=None,
+        )
+    )
+    split_ticketing_search: str = field(
+        default=None,
+        metadata=dict(
+            name="SplitTicketingSearch",
+            type="Element",
+            help=None,
+        )
+    )
+    journey_data: str = field(
+        default=None,
+        metadata=dict(
+            name="JourneyData",
+            type="Element",
+            help=None,
+        )
+    )
+    search_air_leg: List[str] = field(
+        default_factory=list,
+        metadata=dict(
+            name="SearchAirLeg",
+            type="Element",
+            help=None,
+            min_occurs=1,
+            max_occurs=9
+        )
+    )
+    search_specific_air_segment: List[str] = field(
+        default_factory=list,
+        metadata=dict(
+            name="SearchSpecificAirSegment",
+            type="Element",
+            help=None,
+            min_occurs=1,
+            max_occurs=999
+        )
+    )
+
+
+@dataclass
 class BaseAvailabilitySearchRsp(BaseSearchRsp):
     """
     Availability Search response
     """
 
-    flight_details_list: FlightDetailsList = field(
+    flight_details_list: str = field(
         default=None,
         metadata=dict(
             name="FlightDetailsList",
@@ -1870,7 +2029,7 @@ class BaseAvailabilitySearchRsp(BaseSearchRsp):
             help=None,
         )
     )
-    air_segment_list: AirSegmentList = field(
+    air_segment_list: str = field(
         default=None,
         metadata=dict(
             name="AirSegmentList",
@@ -1878,7 +2037,7 @@ class BaseAvailabilitySearchRsp(BaseSearchRsp):
             help=None,
         )
     )
-    fare_info_list: FareInfoList = field(
+    fare_info_list: str = field(
         default=None,
         metadata=dict(
             name="FareInfoList",
@@ -1886,7 +2045,7 @@ class BaseAvailabilitySearchRsp(BaseSearchRsp):
             help=None,
         )
     )
-    fare_remark_list: FareRemarkList = field(
+    fare_remark_list: str = field(
         default=None,
         metadata=dict(
             name="FareRemarkList",
@@ -1894,7 +2053,7 @@ class BaseAvailabilitySearchRsp(BaseSearchRsp):
             help=None,
         )
     )
-    air_itinerary_solution: List[AirItinerarySolution] = field(
+    air_itinerary_solution: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="AirItinerarySolution",
@@ -1904,7 +2063,7 @@ class BaseAvailabilitySearchRsp(BaseSearchRsp):
             max_occurs=999
         )
     )
-    host_token_list: HostTokenList = field(
+    host_token_list: str = field(
         default=None,
         metadata=dict(
             name="HostTokenList",
@@ -1912,7 +2071,7 @@ class BaseAvailabilitySearchRsp(BaseSearchRsp):
             help=None,
         )
     )
-    apisrequirements_list: ApisrequirementsList = field(
+    apisrequirements_list: str = field(
         default=None,
         metadata=dict(
             name="APISRequirementsList",
@@ -1920,19 +2079,20 @@ class BaseAvailabilitySearchRsp(BaseSearchRsp):
             help=None,
         )
     )
-    distance_units: TypeDistance = field(
+    distance_units: str = field(
         default=None,
         metadata=dict(
             name="DistanceUnits",
             type="Attribute",
             help=None,
+            length=2
         )
     )
 
 
 @dataclass
 class BrandList:
-    brand: List[Brand] = field(
+    brand: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="Brand",
@@ -1950,7 +2110,7 @@ class EmdissuanceReq(BaseReq):
     Electronic Miscellaneous Document issuance request.Supported providers are 1V/1G/1P/1J
     """
 
-    provider_reservation_detail: ProviderReservationDetail = field(
+    provider_reservation_detail: str = field(
         default=None,
         metadata=dict(
             name="ProviderReservationDetail",
@@ -1959,7 +2119,7 @@ class EmdissuanceReq(BaseReq):
             required=True
         )
     )
-    ticket_number: TicketNumber = field(
+    ticket_number: str = field(
         default=None,
         metadata=dict(
             name="TicketNumber",
@@ -1967,7 +2127,7 @@ class EmdissuanceReq(BaseReq):
             help="Ticket number for which EMD is going to be issued.Required for EMD-A issuance.",
         )
     )
-    issuance_modifiers: IssuanceModifiers = field(
+    issuance_modifiers: str = field(
         default=None,
         metadata=dict(
             name="IssuanceModifiers",
@@ -1975,7 +2135,7 @@ class EmdissuanceReq(BaseReq):
             help="General modifiers related to EMD issuance.",
         )
     )
-    selection_modifiers: SelectionModifiers = field(
+    selection_modifiers: str = field(
         default=None,
         metadata=dict(
             name="SelectionModifiers",
@@ -1983,16 +2143,18 @@ class EmdissuanceReq(BaseReq):
             help="Modifiers related to selection of services during EMD issuance.",
         )
     )
-    universal_record_locator_code: TypeLocatorCode = field(
+    universal_record_locator_code: str = field(
         default=None,
         metadata=dict(
             name="UniversalRecordLocatorCode",
             type="Attribute",
             help="Represents a valid Universal Record locator code.",
-            required=True
+            required=True,
+            min_length=5.0,
+            max_length=8.0
         )
     )
-    show_details: bool = field(
+    show_details: str = field(
         default="false",
         metadata=dict(
             name="ShowDetails",
@@ -2000,7 +2162,7 @@ class EmdissuanceReq(BaseReq):
             help="This attribute gives the control to request for complete information on Issued EMDs or minimal information.Requesting complete information leads to possible multiple supplier calls for fetching all the details.",
         )
     )
-    issue_all_open_svc: bool = field(
+    issue_all_open_svc: str = field(
         default="false",
         metadata=dict(
             name="IssueAllOpenSVC",
@@ -2016,7 +2178,7 @@ class EmdissuanceRsp(BaseRsp):
     Electronic Miscellaneous Document issuance response.Supported providers are 1V/1G/1P/1J
     """
 
-    emdsummary_info: List[EmdsummaryInfo] = field(
+    emdsummary_info: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="EMDSummaryInfo",
@@ -2026,7 +2188,7 @@ class EmdissuanceRsp(BaseRsp):
             max_occurs=999
         )
     )
-    emdinfo: List[Emdinfo] = field(
+    emdinfo: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="EMDInfo",
@@ -2044,7 +2206,7 @@ class EmdretrieveReq(BaseReq):
     Electronic Miscellaneous Document retrieve request.Supported providers are 1G/1V/1P/1J
     """
 
-    list_retrieve: "EmdretrieveReq.ListRetrieve" = field(
+    list_retrieve: "EmdretrieveReq.str" = field(
         default=None,
         metadata=dict(
             name="ListRetrieve",
@@ -2053,7 +2215,7 @@ class EmdretrieveReq(BaseReq):
             required=True
         )
     )
-    detail_retrieve: "EmdretrieveReq.DetailRetrieve" = field(
+    detail_retrieve: "EmdretrieveReq.str" = field(
         default=None,
         metadata=dict(
             name="DetailRetrieve",
@@ -2065,7 +2227,7 @@ class EmdretrieveReq(BaseReq):
 
     @dataclass
     class ListRetrieve:
-        provider_reservation_detail: ProviderReservationDetail = field(
+        provider_reservation_detail: str = field(
             default=None,
             metadata=dict(
                 name="ProviderReservationDetail",
@@ -2077,7 +2239,7 @@ class EmdretrieveReq(BaseReq):
 
     @dataclass
     class DetailRetrieve:
-        provider_reservation_detail: ProviderReservationDetail = field(
+        provider_reservation_detail: str = field(
             default=None,
             metadata=dict(
                 name="ProviderReservationDetail",
@@ -2085,13 +2247,14 @@ class EmdretrieveReq(BaseReq):
                 help="Provider reservation locator to be specified for display operation, if mentioned along woth the EMD number then synchronization of that EMD is performed considering the same to be associated with the mentioned PNR.",
             )
         )
-        emdnumber: TypeEmdnumber = field(
+        emdnumber: str = field(
             default=None,
             metadata=dict(
                 name="EMDNumber",
                 type="Element",
                 help="EMD number to be specified for display operation. If mentioned along with provider reservation detail then synchronization of that EMD is performed considering the same to be associated with the mentioned PNR.",
-                required=True
+                required=True,
+                length=13
             )
         )
 
@@ -2102,7 +2265,7 @@ class EmdretrieveRsp(BaseRsp):
     Electronic Miscellaneous Document list and detail retrieve response.Supported providers are 1G/1V/1P/1J
     """
 
-    emdinfo: Emdinfo = field(
+    emdinfo: str = field(
         default=None,
         metadata=dict(
             name="EMDInfo",
@@ -2111,7 +2274,7 @@ class EmdretrieveRsp(BaseRsp):
             required=True
         )
     )
-    emdsummary_info: List[EmdsummaryInfo] = field(
+    emdsummary_info: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="EMDSummaryInfo",
@@ -2129,7 +2292,7 @@ class FlightDetailsReq(BaseReq):
     Request for the Flight Details of segments.
     """
 
-    air_segment: List[AirSegment] = field(
+    air_segment: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="AirSegment",
@@ -2143,7 +2306,7 @@ class FlightDetailsReq(BaseReq):
 
 @dataclass
 class FlightDetailsRsp(BaseRsp):
-    air_segment: List[AirSegment] = field(
+    air_segment: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="AirSegment",
@@ -2153,7 +2316,7 @@ class FlightDetailsRsp(BaseRsp):
             max_occurs=999
         )
     )
-    co2_emissions: List[Co2Emissions] = field(
+    co2_emissions: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="CO2Emissions",
@@ -2171,7 +2334,7 @@ class FlightInformationReq(BaseReq):
     Request for the Flight Info of segments.
     """
 
-    flight_info_criteria: List[FlightInfoCriteria] = field(
+    flight_info_criteria: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="FlightInfoCriteria",
@@ -2185,7 +2348,7 @@ class FlightInformationReq(BaseReq):
 
 @dataclass
 class FlightInformationRsp(BaseRsp):
-    flight_info: List[FlightInfo] = field(
+    flight_info: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="FlightInfo",
@@ -2203,7 +2366,7 @@ class FlightTimeTableReq(BaseSearchReq):
     Request for Flight Time Table.
     """
 
-    flight_time_table_criteria: FlightTimeTableCriteria = field(
+    flight_time_table_criteria: str = field(
         default=None,
         metadata=dict(
             name="FlightTimeTableCriteria",
@@ -2220,7 +2383,7 @@ class FlightTimeTableRsp(BaseSearchRsp):
     Response for Flight Time Table.
     """
 
-    flight_time_table_list: "FlightTimeTableRsp.FlightTimeTableList" = field(
+    flight_time_table_list: "FlightTimeTableRsp.str" = field(
         default=None,
         metadata=dict(
             name="FlightTimeTableList",
@@ -2231,7 +2394,7 @@ class FlightTimeTableRsp(BaseSearchRsp):
 
     @dataclass
     class FlightTimeTableList:
-        flight_time_detail: List[FlightTimeDetail] = field(
+        flight_time_detail: List[str] = field(
             default_factory=list,
             metadata=dict(
                 name="FlightTimeDetail",
@@ -2249,7 +2412,7 @@ class RetrieveLowFareSearchReq(BaseReq):
     Retrieve low fare search responses that were initiated by an asynchronous request.
     """
 
-    search_id: TypeLowFareSearchId = field(
+    search_id: str = field(
         default=None,
         metadata=dict(
             name="SearchId",
@@ -2258,13 +2421,15 @@ class RetrieveLowFareSearchReq(BaseReq):
             required=True
         )
     )
-    provider_code: TypeProviderCode = field(
+    provider_code: str = field(
         default=None,
         metadata=dict(
             name="ProviderCode",
             type="Attribute",
             help="Provider: 1G,1V,1P,1J,ACH-Provider code of a specific host",
-            required=True
+            required=True,
+            min_length=2.0,
+            max_length=5.0
         )
     )
 
@@ -2280,43 +2445,49 @@ class SearchSpecificAirSegment:
             required=True
         )
     )
-    carrier: TypeCarrier = field(
+    carrier: str = field(
         default=None,
         metadata=dict(
             name="Carrier",
             type="Attribute",
             help="The carrier that is marketing this segment",
-            required=True
+            required=True,
+            length=2
         )
     )
-    flight_number: TypeFlightNumber = field(
+    flight_number: str = field(
         default=None,
         metadata=dict(
             name="FlightNumber",
             type="Attribute",
             help="The flight number under which the marketing carrier is marketing this flight",
-            required=True
+            required=True,
+            max_length=5.0
         )
     )
-    origin: TypeIatacode = field(
+    origin: str = field(
         default=None,
         metadata=dict(
             name="Origin",
             type="Attribute",
             help="The IATA location code for this origination of this entity.",
-            required=True
+            required=True,
+            length=3,
+            white_space="collapse"
         )
     )
-    destination: TypeIatacode = field(
+    destination: str = field(
         default=None,
         metadata=dict(
             name="Destination",
             type="Attribute",
             help="The IATA location code for this destination of this entity.",
-            required=True
+            required=True,
+            length=3,
+            white_space="collapse"
         )
     )
-    segment_index: int = field(
+    segment_index: str = field(
         default=None,
         metadata=dict(
             name="SegmentIndex",
@@ -2332,7 +2503,7 @@ class SeatMapReq(BaseReq):
     Request a seat map for the give flight information
     """
 
-    agency_sell_info: AgencySellInfo = field(
+    agency_sell_info: str = field(
         default=None,
         metadata=dict(
             name="AgencySellInfo",
@@ -2340,7 +2511,7 @@ class SeatMapReq(BaseReq):
             help="Provider: ACH-Required if the user requesting the seat map is not the same agent authenticated in the request.",
         )
     )
-    air_segment: List[AirSegment] = field(
+    air_segment: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="AirSegment",
@@ -2350,7 +2521,7 @@ class SeatMapReq(BaseReq):
             max_occurs=99
         )
     )
-    host_token: List[HostToken] = field(
+    host_token: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="HostToken",
@@ -2360,7 +2531,7 @@ class SeatMapReq(BaseReq):
             max_occurs=99
         )
     )
-    search_traveler: List[SearchTraveler] = field(
+    search_traveler: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="SearchTraveler",
@@ -2370,7 +2541,7 @@ class SeatMapReq(BaseReq):
             max_occurs=999
         )
     )
-    host_reservation: HostReservation = field(
+    host_reservation: str = field(
         default=None,
         metadata=dict(
             name="HostReservation",
@@ -2378,7 +2549,7 @@ class SeatMapReq(BaseReq):
             help="Provider: ACH,MCH-Required when seat price is requested.",
         )
     )
-    merchandising_pricing_modifiers: MerchandisingPricingModifiers = field(
+    merchandising_pricing_modifiers: str = field(
         default=None,
         metadata=dict(
             name="MerchandisingPricingModifiers",
@@ -2386,7 +2557,7 @@ class SeatMapReq(BaseReq):
             help="Used to provide additional pricing options. Provider:ACH.",
         )
     )
-    return_seat_pricing: bool = field(
+    return_seat_pricing: str = field(
         default=None,
         metadata=dict(
             name="ReturnSeatPricing",
@@ -2395,7 +2566,7 @@ class SeatMapReq(BaseReq):
             required=True
         )
     )
-    return_branding_info: bool = field(
+    return_branding_info: str = field(
         default="false",
         metadata=dict(
             name="ReturnBrandingInfo",
@@ -2407,7 +2578,7 @@ class SeatMapReq(BaseReq):
 
 @dataclass
 class SeatMapRsp(BaseRsp):
-    host_token: List[HostToken] = field(
+    host_token: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="HostToken",
@@ -2417,7 +2588,7 @@ class SeatMapRsp(BaseRsp):
             max_occurs=99
         )
     )
-    cabin_class: CabinClass = field(
+    cabin_class: str = field(
         default=None,
         metadata=dict(
             name="CabinClass",
@@ -2425,7 +2596,7 @@ class SeatMapRsp(BaseRsp):
             help="Provider: 1G,1V,1P,1J,ACH,MCH.",
         )
     )
-    air_segment: List[AirSegment] = field(
+    air_segment: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="AirSegment",
@@ -2435,7 +2606,7 @@ class SeatMapRsp(BaseRsp):
             max_occurs=99
         )
     )
-    search_traveler: List[SearchTraveler] = field(
+    search_traveler: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="SearchTraveler",
@@ -2445,7 +2616,7 @@ class SeatMapRsp(BaseRsp):
             max_occurs=999
         )
     )
-    optional_services: OptionalServices = field(
+    optional_services: str = field(
         default=None,
         metadata=dict(
             name="OptionalServices",
@@ -2453,7 +2624,7 @@ class SeatMapRsp(BaseRsp):
             help="A wrapper for all the information regarding each of the Optional Services. Provider: 1G,1V,1P,1J,ACH.",
         )
     )
-    remark: Remark = field(
+    remark: str = field(
         default=None,
         metadata=dict(
             name="Remark",
@@ -2461,7 +2632,7 @@ class SeatMapRsp(BaseRsp):
             help="Provider: 1G,1V,1P,1J,ACH,MCH.",
         )
     )
-    rows: List[Rows] = field(
+    rows: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="Rows",
@@ -2471,7 +2642,7 @@ class SeatMapRsp(BaseRsp):
             max_occurs=99
         )
     )
-    payment_restriction: List[PaymentRestriction] = field(
+    payment_restriction: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="PaymentRestriction",
@@ -2481,7 +2652,7 @@ class SeatMapRsp(BaseRsp):
             max_occurs=999
         )
     )
-    seat_information: List[SeatInformation] = field(
+    seat_information: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="SeatInformation",
@@ -2499,7 +2670,7 @@ class SeatMapRsp(BaseRsp):
             help="Copyright text applicable for some seat content. Providers: 1G, 1V, 1P, 1J,ACH",
         )
     )
-    group_seat_price: TypeMoney = field(
+    group_seat_price: str = field(
         default=None,
         metadata=dict(
             name="GroupSeatPrice",
@@ -2521,40 +2692,6 @@ class AirExchangeMultiQuoteReq(BaseAirExchangeMultiQuoteReq):
             name="Type",
             type="Attribute",
             help="Type choices are 'Detail' or 'Summary' Default will be Summary",
-        )
-    )
-
-
-@dataclass
-class AirExchangeMultiQuoteRsp(BaseRsp):
-    air_segment_list: List[AirSegmentList] = field(
-        default_factory=list,
-        metadata=dict(
-            name="AirSegmentList",
-            type="Element",
-            help=None,
-            min_occurs=0,
-            max_occurs=999
-        )
-    )
-    brand_list: List[BrandList] = field(
-        default_factory=list,
-        metadata=dict(
-            name="BrandList",
-            type="Element",
-            help=None,
-            min_occurs=0,
-            max_occurs=999
-        )
-    )
-    air_exchange_mulit_quote_list: List[AirExchangeMulitQuoteList] = field(
-        default_factory=list,
-        metadata=dict(
-            name="AirExchangeMulitQuoteList",
-            type="Element",
-            help=None,
-            min_occurs=0,
-            max_occurs=999
         )
     )
 
@@ -2588,7 +2725,7 @@ class AirRepriceReq(AirBaseReq):
     Request to reprice a solution.
     """
 
-    air_reservation_locator_code: AirReservationLocatorCode = field(
+    air_reservation_locator_code: str = field(
         default=None,
         metadata=dict(
             name="AirReservationLocatorCode",
@@ -2596,7 +2733,7 @@ class AirRepriceReq(AirBaseReq):
             help=None,
         )
     )
-    air_pricing_solution: AirPricingSolution = field(
+    air_pricing_solution: str = field(
         default=None,
         metadata=dict(
             name="AirPricingSolution",
@@ -2605,7 +2742,7 @@ class AirRepriceReq(AirBaseReq):
             required=True
         )
     )
-    fare_rule_type: TypeFareRuleType = field(
+    fare_rule_type: str = field(
         default="none",
         metadata=dict(
             name="FareRuleType",
@@ -2613,7 +2750,7 @@ class AirRepriceReq(AirBaseReq):
             help=None,
         )
     )
-    ignore_availability: bool = field(
+    ignore_availability: str = field(
         default="false",
         metadata=dict(
             name="IgnoreAvailability",
@@ -2624,64 +2761,12 @@ class AirRepriceReq(AirBaseReq):
 
 
 @dataclass
-class AirSearchReq(BaseSearchReq):
-    """
-    Base Request for Air Search
-    """
-
-    point_of_commencement: PointOfCommencement = field(
-        default=None,
-        metadata=dict(
-            name="PointOfCommencement",
-            type="Element",
-            help=None,
-        )
-    )
-    air_search_modifiers: AirSearchModifiers = field(
-        default=None,
-        metadata=dict(
-            name="AirSearchModifiers",
-            type="Element",
-            help=None,
-        )
-    )
-    journey_data: JourneyData = field(
-        default=None,
-        metadata=dict(
-            name="JourneyData",
-            type="Element",
-            help=None,
-        )
-    )
-    search_air_leg: List[SearchAirLeg] = field(
-        default_factory=list,
-        metadata=dict(
-            name="SearchAirLeg",
-            type="Element",
-            help=None,
-            min_occurs=1,
-            max_occurs=16
-        )
-    )
-    search_specific_air_segment: List[SearchSpecificAirSegment] = field(
-        default_factory=list,
-        metadata=dict(
-            name="SearchSpecificAirSegment",
-            type="Element",
-            help=None,
-            min_occurs=1,
-            max_occurs=999
-        )
-    )
-
-
-@dataclass
 class AirSearchRsp(BaseAvailabilitySearchRsp):
     """
     Base Response for Air Search
     """
 
-    fare_note_list: FareNoteList = field(
+    fare_note_list: str = field(
         default=None,
         metadata=dict(
             name="FareNoteList",
@@ -2689,7 +2774,7 @@ class AirSearchRsp(BaseAvailabilitySearchRsp):
             help=None,
         )
     )
-    expert_solution_list: ExpertSolutionList = field(
+    expert_solution_list: str = field(
         default=None,
         metadata=dict(
             name="ExpertSolutionList",
@@ -2697,7 +2782,7 @@ class AirSearchRsp(BaseAvailabilitySearchRsp):
             help=None,
         )
     )
-    route_list: RouteList = field(
+    route_list: str = field(
         default=None,
         metadata=dict(
             name="RouteList",
@@ -2705,7 +2790,7 @@ class AirSearchRsp(BaseAvailabilitySearchRsp):
             help=None,
         )
     )
-    alternate_route_list: AlternateRouteList = field(
+    alternate_route_list: str = field(
         default=None,
         metadata=dict(
             name="AlternateRouteList",
@@ -2713,7 +2798,7 @@ class AirSearchRsp(BaseAvailabilitySearchRsp):
             help=None,
         )
     )
-    alternate_location_distance_list: AlternateLocationDistanceList = field(
+    alternate_location_distance_list: str = field(
         default=None,
         metadata=dict(
             name="AlternateLocationDistanceList",
@@ -2721,7 +2806,7 @@ class AirSearchRsp(BaseAvailabilitySearchRsp):
             help=None,
         )
     )
-    fare_info_message: List[FareInfoMessage] = field(
+    fare_info_message: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="FareInfoMessage",
@@ -2731,7 +2816,7 @@ class AirSearchRsp(BaseAvailabilitySearchRsp):
             max_occurs=99
         )
     )
-    rail_segment_list: RailSegmentList = field(
+    rail_segment_list: str = field(
         default=None,
         metadata=dict(
             name="RailSegmentList",
@@ -2739,7 +2824,7 @@ class AirSearchRsp(BaseAvailabilitySearchRsp):
             help=None,
         )
     )
-    rail_journey_list: RailJourneyList = field(
+    rail_journey_list: str = field(
         default=None,
         metadata=dict(
             name="RailJourneyList",
@@ -2747,7 +2832,7 @@ class AirSearchRsp(BaseAvailabilitySearchRsp):
             help=None,
         )
     )
-    rail_fare_note_list: RailFareNoteList = field(
+    rail_fare_note_list: str = field(
         default=None,
         metadata=dict(
             name="RailFareNoteList",
@@ -2755,7 +2840,7 @@ class AirSearchRsp(BaseAvailabilitySearchRsp):
             help=None,
         )
     )
-    rail_fare_idlist: RailFareIdlist = field(
+    rail_fare_idlist: str = field(
         default=None,
         metadata=dict(
             name="RailFareIDList",
@@ -2763,7 +2848,7 @@ class AirSearchRsp(BaseAvailabilitySearchRsp):
             help=None,
         )
     )
-    rail_fare_list: RailFareList = field(
+    rail_fare_list: str = field(
         default=None,
         metadata=dict(
             name="RailFareList",
@@ -2771,7 +2856,7 @@ class AirSearchRsp(BaseAvailabilitySearchRsp):
             help=None,
         )
     )
-    rail_pricing_solution: List[RailPricingSolution] = field(
+    rail_pricing_solution: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="RailPricingSolution",
@@ -2781,7 +2866,7 @@ class AirSearchRsp(BaseAvailabilitySearchRsp):
             max_occurs=999
         )
     )
-    air_pricing_solution: List[AirPricingSolution] = field(
+    air_pricing_solution: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="AirPricingSolution",
@@ -2791,7 +2876,7 @@ class AirSearchRsp(BaseAvailabilitySearchRsp):
             max_occurs=999
         )
     )
-    air_price_point_list: AirPricePointList = field(
+    air_price_point_list: str = field(
         default=None,
         metadata=dict(
             name="AirPricePointList",
@@ -2807,7 +2892,7 @@ class AirTicketingReq(AirBaseReq):
     Request to ticket a previously stored reservation.
     """
 
-    air_reservation_locator_code: AirReservationLocatorCode = field(
+    air_reservation_locator_code: str = field(
         default=None,
         metadata=dict(
             name="AirReservationLocatorCode",
@@ -2816,7 +2901,7 @@ class AirTicketingReq(AirBaseReq):
             required=True
         )
     )
-    air_pricing_info_ref: List["AirTicketingReq.AirPricingInfoRef"] = field(
+    air_pricing_info_ref: List["AirTicketingReq.str"] = field(
         default_factory=list,
         metadata=dict(
             name="AirPricingInfoRef",
@@ -2826,7 +2911,7 @@ class AirTicketingReq(AirBaseReq):
             max_occurs=999
         )
     )
-    ticketing_modifiers_ref: List[TypeTicketingModifiersRef] = field(
+    ticketing_modifiers_ref: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="TicketingModifiersRef",
@@ -2836,7 +2921,7 @@ class AirTicketingReq(AirBaseReq):
             max_occurs=999
         )
     )
-    waiver_code: WaiverCode = field(
+    waiver_code: str = field(
         default=None,
         metadata=dict(
             name="WaiverCode",
@@ -2844,7 +2929,7 @@ class AirTicketingReq(AirBaseReq):
             help=None,
         )
     )
-    commission: List[Commission] = field(
+    commission: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="Commission",
@@ -2854,7 +2939,7 @@ class AirTicketingReq(AirBaseReq):
             max_occurs=18
         )
     )
-    detailed_billing_information: List[DetailedBillingInformation] = field(
+    detailed_billing_information: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="DetailedBillingInformation",
@@ -2864,7 +2949,7 @@ class AirTicketingReq(AirBaseReq):
             max_occurs=999
         )
     )
-    fax_details_information: FaxDetailsInformation = field(
+    fax_details_information: str = field(
         default=None,
         metadata=dict(
             name="FaxDetailsInformation",
@@ -2872,7 +2957,7 @@ class AirTicketingReq(AirBaseReq):
             help="Provider: 1V.",
         )
     )
-    air_ticketing_modifiers: List[AirTicketingModifiers] = field(
+    air_ticketing_modifiers: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="AirTicketingModifiers",
@@ -2882,7 +2967,7 @@ class AirTicketingReq(AirBaseReq):
             max_occurs=999
         )
     )
-    air_segment_ticketing_modifiers: List[AirSegmentTicketingModifiers] = field(
+    air_segment_ticketing_modifiers: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="AirSegmentTicketingModifiers",
@@ -2892,7 +2977,7 @@ class AirTicketingReq(AirBaseReq):
             max_occurs=999
         )
     )
-    return_info_on_fail: bool = field(
+    return_info_on_fail: str = field(
         default="true",
         metadata=dict(
             name="ReturnInfoOnFail",
@@ -2900,7 +2985,7 @@ class AirTicketingReq(AirBaseReq):
             help=None,
         )
     )
-    bulk_ticket: bool = field(
+    bulk_ticket: str = field(
         default="false",
         metadata=dict(
             name="BulkTicket",
@@ -2908,7 +2993,7 @@ class AirTicketingReq(AirBaseReq):
             help="Provider: 1G,1V,1P,1J.",
         )
     )
-    validate_spanish_residency: bool = field(
+    validate_spanish_residency: str = field(
         default="false",
         metadata=dict(
             name="ValidateSpanishResidency",
@@ -2919,7 +3004,7 @@ class AirTicketingReq(AirBaseReq):
 
     @dataclass
     class AirPricingInfoRef:
-        booking_traveler_ref: List[BookingTravelerRef] = field(
+        booking_traveler_ref: List[str] = field(
             default_factory=list,
             metadata=dict(
                 name="BookingTravelerRef",
@@ -2929,7 +3014,7 @@ class AirTicketingReq(AirBaseReq):
                 max_occurs=9
             )
         )
-        key: TypeRef = field(
+        key: str = field(
             default=None,
             metadata=dict(
                 name="Key",
@@ -2946,7 +3031,7 @@ class AirUpsellSearchReq(AirBaseReq):
     Request to search for Upsell Offers based on the Itinerary.
     """
 
-    air_itinerary: AirItinerary = field(
+    air_itinerary: str = field(
         default=None,
         metadata=dict(
             name="AirItinerary",
@@ -2955,7 +3040,7 @@ class AirUpsellSearchReq(AirBaseReq):
             required=True
         )
     )
-    air_price_result: List[AirPriceResult] = field(
+    air_price_result: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="AirPriceResult",
@@ -2977,69 +3062,12 @@ class AirUpsellSearchRsp(BaseAirPriceRsp):
 
 
 @dataclass
-class AvailabilitySearchRsp(BaseAvailabilitySearchRsp):
-    pass
-
-
-@dataclass
-class BaseAirSearchReq(BaseCoreSearchReq):
-    """
-    Base Request for Low fare air Search
-    """
-
-    air_search_modifiers: AirSearchModifiers = field(
-        default=None,
-        metadata=dict(
-            name="AirSearchModifiers",
-            type="Element",
-            help=None,
-        )
-    )
-    split_ticketing_search: SplitTicketingSearch = field(
-        default=None,
-        metadata=dict(
-            name="SplitTicketingSearch",
-            type="Element",
-            help=None,
-        )
-    )
-    journey_data: JourneyData = field(
-        default=None,
-        metadata=dict(
-            name="JourneyData",
-            type="Element",
-            help=None,
-        )
-    )
-    search_air_leg: List[SearchAirLeg] = field(
-        default_factory=list,
-        metadata=dict(
-            name="SearchAirLeg",
-            type="Element",
-            help=None,
-            min_occurs=1,
-            max_occurs=9
-        )
-    )
-    search_specific_air_segment: List[SearchSpecificAirSegment] = field(
-        default_factory=list,
-        metadata=dict(
-            name="SearchSpecificAirSegment",
-            type="Element",
-            help=None,
-            min_occurs=1,
-            max_occurs=999
-        )
-    )
-
-
-@dataclass
 class AvailabilitySearchReq(AirSearchReq):
     """
     Availability Search request.
     """
 
-    search_passenger: List[SearchPassenger] = field(
+    search_passenger: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="SearchPassenger",
@@ -3049,7 +3077,7 @@ class AvailabilitySearchReq(AirSearchReq):
             max_occurs=18
         )
     )
-    point_of_sale: List[PointOfSale] = field(
+    point_of_sale: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="PointOfSale",
@@ -3059,7 +3087,7 @@ class AvailabilitySearchReq(AirSearchReq):
             max_occurs=5
         )
     )
-    return_brand_indicator: bool = field(
+    return_brand_indicator: str = field(
         default="false",
         metadata=dict(
             name="ReturnBrandIndicator",
@@ -3090,12 +3118,17 @@ class AvailabilitySearchReq(AirSearchReq):
 
 
 @dataclass
+class AvailabilitySearchRsp(BaseAvailabilitySearchRsp):
+    pass
+
+
+@dataclass
 class BaseLowFareSearchReq(BaseAirSearchReq):
     """
     Base Low Fare Search Request
     """
 
-    search_passenger: List[SearchPassenger] = field(
+    search_passenger: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="SearchPassenger",
@@ -3105,7 +3138,7 @@ class BaseLowFareSearchReq(BaseAirSearchReq):
             max_occurs=18
         )
     )
-    air_pricing_modifiers: AirPricingModifiers = field(
+    air_pricing_modifiers: str = field(
         default=None,
         metadata=dict(
             name="AirPricingModifiers",
@@ -3113,7 +3146,7 @@ class BaseLowFareSearchReq(BaseAirSearchReq):
             help="Provider: 1G,1V,1P,1J,ACH.",
         )
     )
-    enumeration: Enumeration = field(
+    enumeration: str = field(
         default=None,
         metadata=dict(
             name="Enumeration",
@@ -3121,7 +3154,7 @@ class BaseLowFareSearchReq(BaseAirSearchReq):
             help="Provider: 1G,1V,1P,1J,ACH.",
         )
     )
-    air_exchange_modifiers: AirExchangeModifiers = field(
+    air_exchange_modifiers: str = field(
         default=None,
         metadata=dict(
             name="AirExchangeModifiers",
@@ -3129,7 +3162,7 @@ class BaseLowFareSearchReq(BaseAirSearchReq):
             help="Provider: ACH.",
         )
     )
-    flex_explore_modifiers: FlexExploreModifiers = field(
+    flex_explore_modifiers: str = field(
         default=None,
         metadata=dict(
             name="FlexExploreModifiers",
@@ -3137,7 +3170,7 @@ class BaseLowFareSearchReq(BaseAirSearchReq):
             help="This is the container for a set of modifiers which allow the user to perform a special kind of low fare search, depicted as flex explore, based on different parameters like Area, Zone, Country, State, Specific locations, Distance around the actual destination of the itinerary. Applicable for providers 1G,1V,1P.",
         )
     )
-    pcc: Pcc = field(
+    pcc: str = field(
         default=None,
         metadata=dict(
             name="PCC",
@@ -3145,7 +3178,7 @@ class BaseLowFareSearchReq(BaseAirSearchReq):
             help=None,
         )
     )
-    fare_rules_filter_category: FareRulesFilterCategory = field(
+    fare_rules_filter_category: str = field(
         default=None,
         metadata=dict(
             name="FareRulesFilterCategory",
@@ -3153,7 +3186,7 @@ class BaseLowFareSearchReq(BaseAirSearchReq):
             help=None,
         )
     )
-    form_of_payment: List[FormOfPayment] = field(
+    form_of_payment: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="FormOfPayment",
@@ -3163,7 +3196,7 @@ class BaseLowFareSearchReq(BaseAirSearchReq):
             max_occurs=99
         )
     )
-    enable_point_to_point_search: bool = field(
+    enable_point_to_point_search: str = field(
         default="false",
         metadata=dict(
             name="EnablePointToPointSearch",
@@ -3171,7 +3204,7 @@ class BaseLowFareSearchReq(BaseAirSearchReq):
             help="Provider: 1G,1V,1P,1J,ACH-Indicates that low cost providers should be queried for top connection options and the results returned with the search.",
         )
     )
-    enable_point_to_point_alternates: bool = field(
+    enable_point_to_point_alternates: str = field(
         default="false",
         metadata=dict(
             name="EnablePointToPointAlternates",
@@ -3179,7 +3212,7 @@ class BaseLowFareSearchReq(BaseAirSearchReq):
             help="Provider: 1G,1V,1P,1J,ACH-Indicates that suggestions for alternate connection cities for low cost providers should be returned with the search.",
         )
     )
-    max_number_of_expert_solutions: int = field(
+    max_number_of_expert_solutions: str = field(
         default="0",
         metadata=dict(
             name="MaxNumberOfExpertSolutions",
@@ -3187,7 +3220,7 @@ class BaseLowFareSearchReq(BaseAirSearchReq):
             help="Provider: 1G,1V,1P,1J,ACH-Indicates the Maximum Number of Expert Solutions to be returned from the Knowledge Base for the provided search criteria",
         )
     )
-    solution_result: bool = field(
+    solution_result: str = field(
         default="false",
         metadata=dict(
             name="SolutionResult",
@@ -3195,7 +3228,7 @@ class BaseLowFareSearchReq(BaseAirSearchReq):
             help="Provider: 1G,1V,1P,1J,ACH-Indicates whether the response will contain Solution result (AirPricingSolution) or Non Solution Result (AirPricingPoints). The default value is false. This attribute cannot be combined with EnablePointToPointSearch, EnablePointToPointAlternates and MaxNumberOfExpertSolutions.",
         )
     )
-    prefer_complete_itinerary: bool = field(
+    prefer_complete_itinerary: str = field(
         default="true",
         metadata=dict(
             name="PreferCompleteItinerary",
@@ -3213,7 +3246,7 @@ class BaseLowFareSearchReq(BaseAirSearchReq):
             max_length=2.0
         )
     )
-    return_upsell_fare: bool = field(
+    return_upsell_fare: str = field(
         default="false",
         metadata=dict(
             name="ReturnUpsellFare",
@@ -3221,7 +3254,7 @@ class BaseLowFareSearchReq(BaseAirSearchReq):
             help="When set to “true”, Upsell information will be returned in the shop response. Provider supported : 1G, 1V, 1P, 1J",
         )
     )
-    include_fare_info_messages: bool = field(
+    include_fare_info_messages: str = field(
         default="false",
         metadata=dict(
             name="IncludeFareInfoMessages",
@@ -3229,7 +3262,7 @@ class BaseLowFareSearchReq(BaseAirSearchReq):
             help="Set to True to return FareInfoMessageList. Providers supported: 1G/1V/1P/1J",
         )
     )
-    return_branded_fares: bool = field(
+    return_branded_fares: str = field(
         default="true",
         metadata=dict(
             name="ReturnBrandedFares",
@@ -3237,7 +3270,7 @@ class BaseLowFareSearchReq(BaseAirSearchReq):
             help="When ReturnBrandedFares is set to “false”, Rich Content and Branding will not be returned in the shop response. When ReturnBrandedFares it is set to “true” or is not sent, Rich Content and Branding will be returned in the shop response. Provider: 1P/1J/ACH.",
         )
     )
-    multi_gdssearch: bool = field(
+    multi_gdssearch: str = field(
         default="false",
         metadata=dict(
             name="MultiGDSSearch",
@@ -3245,7 +3278,7 @@ class BaseLowFareSearchReq(BaseAirSearchReq):
             help="A 'true' value indicates MultiGDSSearch. Specific provisioning is required.",
         )
     )
-    return_mm: bool = field(
+    return_mm: str = field(
         default="false",
         metadata=dict(
             name="ReturnMM",
@@ -3271,114 +3304,12 @@ class BaseLowFareSearchReq(BaseAirSearchReq):
             max_length=3.0
         )
     )
-    fare_info_rules: bool = field(
+    fare_info_rules: str = field(
         default="false",
         metadata=dict(
             name="FareInfoRules",
             type="Attribute",
             help="Returns ChangePenalty and CancelPenalty values at the FareInfo level. If FareRulesFilterCategory is sent FareRulesFilter will be returned at FareInfo level. Provider: 1G/1V.",
-        )
-    )
-
-
-@dataclass
-class LowFareSearchAsynchRsp(AirSearchRsp):
-    """
-    Asynchronous Low Fare Search Response contains only the 1st Provider response unless time out occurs.
-    """
-
-    async_provider_specific_response: List[AsyncProviderSpecificResponse] = field(
-        default_factory=list,
-        metadata=dict(
-            name="AsyncProviderSpecificResponse",
-            type="Element",
-            help=None,
-            min_occurs=0,
-            max_occurs=999
-        )
-    )
-    brand_list: BrandList = field(
-        default=None,
-        metadata=dict(
-            name="BrandList",
-            type="Element",
-            help=None,
-        )
-    )
-    search_id: TypeLowFareSearchId = field(
-        default=None,
-        metadata=dict(
-            name="SearchId",
-            type="Attribute",
-            help="Provider: 1G,1V,1P,1J,ACH-Indicates the Search Id of the LFS search",
-            required=True
-        )
-    )
-    currency_type: TypeCurrency = field(
-        default=None,
-        metadata=dict(
-            name="CurrencyType",
-            type="Attribute",
-            help="Provider: 1G,1V,1P,1J,ACH-Specifies the default Currency Type in the response.",
-        )
-    )
-
-
-@dataclass
-class LowFareSearchRsp(AirSearchRsp):
-    """
-    Low Fare Search Response
-    """
-
-    brand_list: BrandList = field(
-        default=None,
-        metadata=dict(
-            name="BrandList",
-            type="Element",
-            help=None,
-        )
-    )
-    currency_type: TypeCurrency = field(
-        default=None,
-        metadata=dict(
-            name="CurrencyType",
-            type="Attribute",
-            help="Provider: 1G,1V,1P,1J,ACH.",
-            required=True
-        )
-    )
-
-
-@dataclass
-class RetrieveLowFareSearchRsp(AirSearchRsp):
-    """
-    Low Fare Search Asynchronous Result response.
-    """
-
-    async_provider_specific_response: List[AsyncProviderSpecificResponse] = field(
-        default_factory=list,
-        metadata=dict(
-            name="AsyncProviderSpecificResponse",
-            type="Element",
-            help="Provider: 1G,1V,1P,1J,ACH-Identifies pending responses from a specific provider using MoreResults attribute",
-            min_occurs=0,
-            max_occurs=999
-        )
-    )
-    brand_list: BrandList = field(
-        default=None,
-        metadata=dict(
-            name="BrandList",
-            type="Element",
-            help=None,
-        )
-    )
-    currency_type: TypeCurrency = field(
-        default=None,
-        metadata=dict(
-            name="CurrencyType",
-            type="Attribute",
-            help="Provider: 1G,1V,1P,1J,ACH.",
         )
     )
 
@@ -3393,21 +3324,12 @@ class ScheduleSearchReq(AirSearchReq):
 
 
 @dataclass
-class ScheduleSearchRsp(AirSearchRsp):
-    """
-    Schedule Search response
-    """
-
-    pass
-
-
-@dataclass
 class LowFareSearchAsynchReq(BaseLowFareSearchReq):
     """
     Asynchronous Low Fare Search request.
     """
 
-    air_search_asynch_modifiers: AirSearchAsynchModifiers = field(
+    air_search_asynch_modifiers: str = field(
         default=None,
         metadata=dict(
             name="AirSearchAsynchModifiers",
@@ -3418,16 +3340,132 @@ class LowFareSearchAsynchReq(BaseLowFareSearchReq):
 
 
 @dataclass
+class LowFareSearchAsynchRsp(AirSearchRsp):
+    """
+    Asynchronous Low Fare Search Response contains only the 1st Provider response unless time out occurs.
+    """
+
+    async_provider_specific_response: List[str] = field(
+        default_factory=list,
+        metadata=dict(
+            name="AsyncProviderSpecificResponse",
+            type="Element",
+            help=None,
+            min_occurs=0,
+            max_occurs=999
+        )
+    )
+    brand_list: str = field(
+        default=None,
+        metadata=dict(
+            name="BrandList",
+            type="Element",
+            help=None,
+        )
+    )
+    search_id: str = field(
+        default=None,
+        metadata=dict(
+            name="SearchId",
+            type="Attribute",
+            help="Provider: 1G,1V,1P,1J,ACH-Indicates the Search Id of the LFS search",
+            required=True
+        )
+    )
+    currency_type: str = field(
+        default=None,
+        metadata=dict(
+            name="CurrencyType",
+            type="Attribute",
+            help="Provider: 1G,1V,1P,1J,ACH-Specifies the default Currency Type in the response.",
+            length=3
+        )
+    )
+
+
+@dataclass
 class LowFareSearchReq(BaseLowFareSearchReq):
     """
     Low Fare Search request.
     """
 
-    policy_reference: TypePolicyReference = field(
+    policy_reference: str = field(
         default=None,
         metadata=dict(
             name="PolicyReference",
             type="Attribute",
             help="This attribute will be used to pass in a value on the request which would be used to link to a ‘Policy Group’ in a policy engine external to UAPI.",
+            min_length=1.0,
+            max_length=20.0
         )
     )
+
+
+@dataclass
+class LowFareSearchRsp(AirSearchRsp):
+    """
+    Low Fare Search Response
+    """
+
+    brand_list: str = field(
+        default=None,
+        metadata=dict(
+            name="BrandList",
+            type="Element",
+            help=None,
+        )
+    )
+    currency_type: str = field(
+        default=None,
+        metadata=dict(
+            name="CurrencyType",
+            type="Attribute",
+            help="Provider: 1G,1V,1P,1J,ACH.",
+            required=True,
+            length=3
+        )
+    )
+
+
+@dataclass
+class RetrieveLowFareSearchRsp(AirSearchRsp):
+    """
+    Low Fare Search Asynchronous Result response.
+    """
+
+    async_provider_specific_response: List[str] = field(
+        default_factory=list,
+        metadata=dict(
+            name="AsyncProviderSpecificResponse",
+            type="Element",
+            help="Provider: 1G,1V,1P,1J,ACH-Identifies pending responses from a specific provider using MoreResults attribute",
+            min_occurs=0,
+            max_occurs=999
+        )
+    )
+    brand_list: str = field(
+        default=None,
+        metadata=dict(
+            name="BrandList",
+            type="Element",
+            help=None,
+        )
+    )
+    currency_type: str = field(
+        default=None,
+        metadata=dict(
+            name="CurrencyType",
+            type="Attribute",
+            help="Provider: 1G,1V,1P,1J,ACH.",
+            length=3
+        )
+    )
+
+
+@dataclass
+class ScheduleSearchRsp(AirSearchRsp):
+    """
+    Schedule Search response
+    """
+
+    pass

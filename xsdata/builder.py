@@ -89,7 +89,9 @@ class ClassBuilder:
 
             for attr in item.attrs:
                 simple = self.find_simple_type(attr.type)
-                if simple and len(simple.attrs) == 1:
+                if not simple:
+                    pass
+                elif len(simple.attrs) == 1:
                     value = simple.attrs[0]
                     attr.type = value.type
                     attr.restrictions.update(value.restrictions)

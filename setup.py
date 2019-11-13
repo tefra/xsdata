@@ -12,7 +12,13 @@ if __name__ == "__main__":
     setup(
         packages=find_packages(),
         version=meta["version"],
-        install_requires=["lxml", "click", "click_completion", "toposort"],
+        install_requires=[
+            "lxml",
+            "click",
+            "click_completion",
+            "toposort",
+            "docformatter",
+        ],
         extras_require={
             "dev": ["pre-commit", "pytest", "pytest-cov", "codecov", "tox"]
         },

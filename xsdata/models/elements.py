@@ -140,7 +140,7 @@ class Appinfo(ElementBase):
 @dataclass
 class Annotation(ElementBase):
     appinfo: Optional[Appinfo]
-    documentation: Optional[Documentation]
+    documentations: ArrayList[Documentation] = field(default_factory=list)
 
 
 @dataclass
@@ -149,11 +149,15 @@ class AnnotationBase(ElementBase):
 
     @property
     def display_help(self) -> Optional[str]:
-        return (
-            self.annotation.documentation.text
-            if self.annotation and self.annotation.documentation
-            else None
-        )
+        if self.annotation and len(self.annotation.documentations):
+            return "\n".join(
+                [
+                    re.sub(r"[\s+]", " ", doc.text)
+                    for doc in self.annotation.documentations
+                    if doc.text
+                ]
+            ).strip()
+        return None
 
 
 @dataclass

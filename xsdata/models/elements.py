@@ -11,7 +11,7 @@ from typing import Optional
 
 from lxml import etree
 
-from xsdata.models.enums import XMLSchema, XSDType
+from xsdata.models.enums import Form, XMLSchema, XSDType
 from xsdata.models.mixins import (
     ExtendsMixin,
     NamedField,
@@ -85,9 +85,9 @@ class BaseModel:
             if clazz == float:
                 return float(value)
         except ValueError:
-            pass
+            return str(value)
 
-        return str(value)
+        return clazz(value)
 
     @classmethod
     def build(cls, **kwargs):
@@ -230,7 +230,7 @@ class Attribute(
 ):
     default: Optional[str]
     fixed: Optional[str]
-    form: Optional[str]  # qualified | unqualified
+    form: Optional[Form]
     name: Optional[str]
     ref: Optional[str]
     type: Optional[str]
@@ -537,7 +537,7 @@ class Element(
     substitution_group: Optional[str]
     default: Optional[str]
     fixed: Optional[str]
-    form: Optional[str]
+    form: Optional[Form]
     block: Optional[List]
     final: Optional[List]
     simple_type: Optional[SimpleType]
@@ -616,13 +616,13 @@ class Redefined(AnnotationBase):
 @dataclass
 class Schema(AnnotationBase):
     target: Optional[str]
-    attribute_form_default: Optional[str]
-    element_form_default: Optional[str]
     block_default: Optional[str]
     final_default: Optional[str]
     target_namespace: Optional[str]
     version: Optional[str]
     xmlns: Optional[str]
+    element_form_default: Form = field(default=Form.UNQUALIFIED)
+    attribute_form_default: Form = field(default=Form.UNQUALIFIED)
     includes: ArrayList[Include] = field(default_factory=list)
     imports: ArrayList[Import] = field(default_factory=list)
     redefineds: ArrayList[Redefined] = field(default_factory=list)

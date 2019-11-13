@@ -125,6 +125,7 @@ class ClassBuilder:
                 local_type=type(obj).__name__,
                 help=obj.display_help,
                 forward_ref=inner_type,
+                namespace=obj.namespace,
                 restrictions=obj.get_restrictions(),
             )
         )

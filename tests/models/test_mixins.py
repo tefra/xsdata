@@ -3,7 +3,7 @@ from typing import Type
 from unittest import TestCase
 
 from xsdata.models import elements as el
-from xsdata.models.mixins import OccurrencesMixin
+from xsdata.models.mixins import OccurrencesMixin, TypedField
 
 
 def get_subclasses(clazz: Type):
@@ -48,3 +48,33 @@ class OccurrencesMixinTests(TestCase):
         for clazz in self.subclasses:
             obj = clazz.build(**data)
             self.assertDictEqual(dict(), obj.get_restrictions())
+
+
+class TypedFieldTests(TestCase):
+    def setUp(self) -> None:
+        self.subclasses = [c for _, c in get_subclasses(TypedField)]
+
+    def test_subclasses(self):
+        expected = [el.Attribute, el.Element, el.Restriction, el.SimpleType]
+        self.assertEqual(expected, self.subclasses)
+
+    def test_property_namespace_with_unqualified_form(self):
+        obj = el.Element.build()
+        self.assertIsNone(obj.namespace)
+
+    def test_property_namespace_with_no_ref_type(self):
+        obj = el.Element.build(type="foo")
+        self.assertIsNone(obj.namespace)
+
+    def test_property_namespace_with_xsd_ref_type(self):
+        obj = el.Element.build(type="xs:int")
+        self.assertIsNone(obj.namespace)
+
+    def test_property_namespace_with_unknown_ref_type(self):
+        obj = el.Element.build(type="ns:foo")
+        self.assertIsNone(obj.namespace)
+
+    def test_property_namespace_with_known_ref_type(self):
+        obj = el.Element.build(type="ns:foo")
+        obj.nsmap["ns"] = "bar"
+        self.assertEqual("bar", obj.namespace)

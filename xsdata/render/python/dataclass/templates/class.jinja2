@@ -9,16 +9,18 @@ class {{ obj.name }}{{"({})".format(obj.extensions|join(', ')) if obj.extensions
 {%- for attr in obj.attrs %}
     {%- set display_type = '"{}.{}"'.format(outer|join('.'), attr.type) if attr.forward_ref else attr.type -%}
     {%- set display_type = 'List[{}]'.format(display_type) if attr.is_list else display_type -%}
-    {%- set field_params = {
-                  "name" : attr.local_name,
-                  "type" : attr.local_type,
-               }
+    {%- set field_params = dict(
+                  name=attr.local_name,
+                  type=attr.local_type,
+                  namespace=attr.namespace,
+                  ** attr.restrictions
+            )
     %}
     {{ attr.name }}: {{ display_type }} = field(
         {{ "default_factory" if attr.is_list else "default" }}=
         {{- "list" if attr.is_list else ('"{}"'.format(attr.default) if attr.default else attr.default) }},
         metadata=dict(
-            {{ field_params|update(attr.restrictions)|arguments|indent(12) }}
+            {{ field_params|arguments|indent(12) }}
         )
     )
 {%- endfor -%}

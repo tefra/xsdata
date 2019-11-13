@@ -1,12 +1,12 @@
 import pathlib
 from dataclasses import dataclass, field
-from typing import List
+from typing import List, Optional
 
 from lxml import etree
 
 from xsdata.models import elements
-from xsdata.models.elements import BaseModel, Schema
-from xsdata.models.enums import Event, Tag
+from xsdata.models.elements import Attribute, BaseModel, Element, Schema
+from xsdata.models.enums import Event, Form, Tag
 from xsdata.utils.text import capitalize, snake_case
 
 
@@ -14,7 +14,9 @@ from xsdata.utils.text import capitalize, snake_case
 class SchemaParser:
     path: pathlib.Path
     elements: List[BaseModel] = field(default_factory=list)
-    methods: dict = field(init=False)
+    methods: dict = field(init=False, default_factory=dict)
+    element_form: Optional[Form] = field(init=False, default=None)
+    attribute_form: Optional[Form] = field(init=False, default=None)
 
     def __post_init__(self):
         self.methods = {tag.qname: tag for tag in Tag}
@@ -48,6 +50,21 @@ class SchemaParser:
                 method(element, elem)
 
         return element
+
+    def start_element(self, element: Element, *args):
+        assert isinstance(element, Element)
+        if element.form is None:
+            element.form = self.element_form
+
+    def start_attribute(self, element: Attribute, *args):
+        assert isinstance(element, Attribute)
+        if element.form is None:
+            element.form = self.attribute_form
+
+    def start_schema(self, element, *args):
+        assert isinstance(element, Schema)
+        self.element_form = element.element_form_default
+        self.attribute_form = element.attribute_form_default
 
     def end_schema(self, element, *args):
         assert isinstance(element, Schema)

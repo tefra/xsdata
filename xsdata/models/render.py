@@ -9,10 +9,11 @@ from xsdata.models.elements import Schema
 @dataclass
 class Attr:
     name: str
-    type: str
-    help: Optional[str]
-    local_type: str
     local_name: str = field(init=False)
+    type: str
+    local_type: str
+    namespace: Optional[str]
+    help: Optional[str]
     forward_ref: bool = field(default=False)
     restrictions: dict = field(default_factory=dict)
     default: Optional[Any] = field(default=None)

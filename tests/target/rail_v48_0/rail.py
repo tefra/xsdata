@@ -542,6 +542,7 @@ class RailFareComponent:
             metadata=dict(
                 name="DiscountCard",
                 type="Element",
+                namespace="http://www.travelport.com/schema/common_v48_0",
                 min_occurs=1,
                 max_occurs=9
             )
@@ -706,6 +707,7 @@ class RailLegModifiers:
             metadata=dict(
                 name="ConnectionPoint",
                 type="Element",
+                namespace="http://www.travelport.com/schema/common_v48_0",
                 min_occurs=1,
                 max_occurs=999
             )
@@ -721,6 +723,7 @@ class RailLegModifiers:
             metadata=dict(
                 name="ConnectionPoint",
                 type="Element",
+                namespace="http://www.travelport.com/schema/common_v48_0",
                 min_occurs=1,
                 max_occurs=999
             )
@@ -742,6 +745,7 @@ class RailPricingModifiers:
         metadata=dict(
             name="DiscountCard",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=9
         )
@@ -996,6 +1000,7 @@ class Coach:
         metadata=dict(
             name="Remark",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=999
         )
@@ -1061,7 +1066,8 @@ class RailFare(AttrElementKeyResults):
         default=None,
         metadata=dict(
             name="HostToken",
-            type="Element"
+            type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0"
         )
     )
     ful_fillment_type: List[FulFillmentType] = field(
@@ -1680,6 +1686,7 @@ class RailJourney(AttrRailSegmentOrigDestInfo, AttrPrices, AttrProviderSupplier,
         metadata=dict(
             name="HostToken",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=999
         )
@@ -1805,6 +1812,7 @@ class RailPricingInfo(AttrPrices, AttrElementKeyResults):
         metadata=dict(
             name="PassengerType",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=999
         )
@@ -1814,6 +1822,7 @@ class RailPricingInfo(AttrPrices, AttrElementKeyResults):
         metadata=dict(
             name="BookingTravelerRef",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=999
         )
@@ -1912,6 +1921,7 @@ class RailReservation(BaseReservation):
         metadata=dict(
             name="BookingTravelerRef",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=1,
             max_occurs=9
         )
@@ -1939,6 +1949,7 @@ class RailReservation(BaseReservation):
         metadata=dict(
             name="Payment",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=999
         )
@@ -1964,6 +1975,7 @@ class RailReservation(BaseReservation):
         metadata=dict(
             name="SupplierLocator",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=999
         )
@@ -1994,6 +2006,7 @@ class SearchRailLeg:
         metadata=dict(
             name="SearchOrigin",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=1,
             max_occurs=999
         )
@@ -2003,6 +2016,7 @@ class SearchRailLeg:
         metadata=dict(
             name="SearchDestination",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=1,
             max_occurs=999
         )
@@ -2026,6 +2040,7 @@ class SearchRailLeg:
         metadata=dict(
             name="SearchDepTime",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=1,
             max_occurs=999
         )
@@ -2035,6 +2050,7 @@ class SearchRailLeg:
         metadata=dict(
             name="SearchArvTime",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=1,
             max_occurs=999
         )

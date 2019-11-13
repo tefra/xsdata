@@ -72,6 +72,7 @@ class AirExchangeQuoteRsp(BaseRsp):
         metadata=dict(
             name="TicketNumber",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=999
         )
@@ -106,6 +107,7 @@ class AirExchangeQuoteRsp(BaseRsp):
         metadata=dict(
             name="HostToken",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=999
         )
@@ -160,6 +162,7 @@ class AirExchangeReq(BaseReq):
         metadata=dict(
             name="TicketNumber",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=999
         )
@@ -210,6 +213,7 @@ class AirExchangeReq(BaseReq):
         metadata=dict(
             name="HostToken",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=999
         )
@@ -225,14 +229,16 @@ class AirExchangeReq(BaseReq):
         default=None,
         metadata=dict(
             name="FormOfPayment",
-            type="Element"
+            type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0"
         )
     )
     form_of_payment_ref: FormOfPaymentRef = field(
         default=None,
         metadata=dict(
             name="FormOfPaymentRef",
-            type="Element"
+            type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0"
         )
     )
     ssrinfo: List[Ssrinfo] = field(
@@ -240,6 +246,7 @@ class AirExchangeReq(BaseReq):
         metadata=dict(
             name="SSRInfo",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=999
         )
@@ -248,7 +255,8 @@ class AirExchangeReq(BaseReq):
         default=None,
         metadata=dict(
             name="AddSvc",
-            type="Element"
+            type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0"
         )
     )
     return_reservation: bool = field(
@@ -273,6 +281,7 @@ class AirExchangeRsp(BaseRsp):
         metadata=dict(
             name="TicketNumber",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=999
         )
@@ -282,6 +291,7 @@ class AirExchangeRsp(BaseRsp):
         metadata=dict(
             name="BookingTraveler",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=999
         )
@@ -330,6 +340,7 @@ class AirExchangeTicketingReq(BaseReq):
         metadata=dict(
             name="TicketNumber",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             required=True
         )
     )
@@ -461,6 +472,7 @@ class AirFareDisplayReq(BaseReq):
         metadata=dict(
             name="PassengerType",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=999
         )
@@ -493,6 +505,7 @@ class AirFareDisplayReq(BaseReq):
         metadata=dict(
             name="Carrier",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=10
         )
@@ -502,6 +515,7 @@ class AirFareDisplayReq(BaseReq):
         metadata=dict(
             name="AccountCode",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=5
         )
@@ -525,6 +539,7 @@ class AirFareDisplayReq(BaseReq):
         metadata=dict(
             name="PointOfSale",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=5
         )
@@ -857,7 +872,8 @@ class AirMerchandisingOfferAvailabilityReq(BaseReq):
         default=None,
         metadata=dict(
             name="AgencySellInfo",
-            type="Element"
+            type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0"
         )
     )
     air_solution: AirSolution = field(
@@ -915,7 +931,8 @@ class AirMerchandisingOfferAvailabilityRsp(BaseRsp):
         default=None,
         metadata=dict(
             name="Remark",
-            type="Element"
+            type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0"
         )
     )
     optional_services: OptionalServices = field(
@@ -979,6 +996,7 @@ class AirPrePayReq(BaseReq):
             metadata=dict(
                 name="LoyaltyCard",
                 type="Element",
+                namespace="http://www.travelport.com/schema/common_v48_0",
                 min_occurs=1,
                 max_occurs=999
             )
@@ -1087,6 +1105,7 @@ class AirRefundQuoteReq(BaseReq):
         metadata=dict(
             name="TicketNumber",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=999
         )
@@ -1112,6 +1131,7 @@ class AirRefundQuoteReq(BaseReq):
         metadata=dict(
             name="HostToken",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=999
         )
@@ -1205,6 +1225,7 @@ class AirRefundReq(BaseReq):
         metadata=dict(
             name="Commission",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=9
         )
@@ -1213,7 +1234,8 @@ class AirRefundReq(BaseReq):
         default=None,
         metadata=dict(
             name="FormOfPayment",
-            type="Element"
+            type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0"
         )
     )
 
@@ -1304,6 +1326,7 @@ class AirRetrieveDocumentReq(BaseReq):
         metadata=dict(
             name="TicketNumber",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=999
         )
@@ -1364,6 +1387,7 @@ class AirRetrieveDocumentRsp(BaseRsp):
         metadata=dict(
             name="MCO",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=999
         )
@@ -1391,6 +1415,7 @@ class AirRetrieveDocumentRsp(BaseRsp):
         metadata=dict(
             name="ServiceFeeInfo",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=99
         )
@@ -1553,6 +1578,7 @@ class BaseAirExchangeMultiQuoteReq(BaseCoreReq):
         metadata=dict(
             name="TicketNumber",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=999
         )
@@ -1591,7 +1617,8 @@ class BaseAirExchangeMultiQuoteReq(BaseCoreReq):
         default=None,
         metadata=dict(
             name="OverridePCC",
-            type="Element"
+            type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0"
         )
     )
 
@@ -1621,6 +1648,7 @@ class BaseAirExchangeQuoteReq(BaseCoreReq):
         metadata=dict(
             name="TicketNumber",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=999
         )
@@ -1653,6 +1681,7 @@ class BaseAirExchangeQuoteReq(BaseCoreReq):
         metadata=dict(
             name="HostToken",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=999
         )
@@ -1669,6 +1698,7 @@ class BaseAirExchangeQuoteReq(BaseCoreReq):
         metadata=dict(
             name="FormOfPayment",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=999
         )
@@ -1750,6 +1780,7 @@ class BaseAirPriceReq(BaseCoreReq):
         metadata=dict(
             name="SearchPassenger",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=1,
             max_occurs=18
         )
@@ -1782,6 +1813,7 @@ class BaseAirPriceReq(BaseCoreReq):
         metadata=dict(
             name="FormOfPayment",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=999
         )
@@ -1798,6 +1830,7 @@ class BaseAirPriceReq(BaseCoreReq):
         metadata=dict(
             name="SSR",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=99
         )
@@ -2004,6 +2037,7 @@ class EmdissuanceReq(BaseReq):
         metadata=dict(
             name="ProviderReservationDetail",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             required=True
         )
     )
@@ -2011,7 +2045,8 @@ class EmdissuanceReq(BaseReq):
         default=None,
         metadata=dict(
             name="TicketNumber",
-            type="Element"
+            type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0"
         )
     )
     issuance_modifiers: IssuanceModifiers = field(
@@ -2117,6 +2152,7 @@ class EmdretrieveReq(BaseReq):
             metadata=dict(
                 name="ProviderReservationDetail",
                 type="Element",
+                namespace="http://www.travelport.com/schema/common_v48_0",
                 required=True
             )
         )
@@ -2131,7 +2167,8 @@ class EmdretrieveReq(BaseReq):
             default=None,
             metadata=dict(
                 name="ProviderReservationDetail",
-                type="Element"
+                type="Element",
+                namespace="http://www.travelport.com/schema/common_v48_0"
             )
         )
         emdnumber: str = field(
@@ -2404,7 +2441,8 @@ class SeatMapReq(BaseReq):
         default=None,
         metadata=dict(
             name="AgencySellInfo",
-            type="Element"
+            type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0"
         )
     )
     air_segment: List[AirSegment] = field(
@@ -2421,6 +2459,7 @@ class SeatMapReq(BaseReq):
         metadata=dict(
             name="HostToken",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=99
         )
@@ -2485,6 +2524,7 @@ class SeatMapRsp(BaseRsp):
         metadata=dict(
             name="HostToken",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=99
         )
@@ -2493,7 +2533,8 @@ class SeatMapRsp(BaseRsp):
         default=None,
         metadata=dict(
             name="CabinClass",
-            type="Element"
+            type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0"
         )
     )
     air_segment: List[AirSegment] = field(
@@ -2525,7 +2566,8 @@ class SeatMapRsp(BaseRsp):
         default=None,
         metadata=dict(
             name="Remark",
-            type="Element"
+            type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0"
         )
     )
     rows: List[Rows] = field(
@@ -2542,6 +2584,7 @@ class SeatMapRsp(BaseRsp):
         metadata=dict(
             name="PaymentRestriction",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=999
         )
@@ -2698,7 +2741,8 @@ class AirSearchReq(BaseSearchReq):
         default=None,
         metadata=dict(
             name="PointOfCommencement",
-            type="Element"
+            type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0"
         )
     )
     air_search_modifiers: AirSearchModifiers = field(
@@ -2802,35 +2846,40 @@ class AirSearchRsp(BaseAvailabilitySearchRsp):
         default=None,
         metadata=dict(
             name="RailSegmentList",
-            type="Element"
+            type="Element",
+            namespace="http://www.travelport.com/schema/rail_v48_0"
         )
     )
     rail_journey_list: RailJourneyList = field(
         default=None,
         metadata=dict(
             name="RailJourneyList",
-            type="Element"
+            type="Element",
+            namespace="http://www.travelport.com/schema/rail_v48_0"
         )
     )
     rail_fare_note_list: RailFareNoteList = field(
         default=None,
         metadata=dict(
             name="RailFareNoteList",
-            type="Element"
+            type="Element",
+            namespace="http://www.travelport.com/schema/rail_v48_0"
         )
     )
     rail_fare_idlist: RailFareIdlist = field(
         default=None,
         metadata=dict(
             name="RailFareIDList",
-            type="Element"
+            type="Element",
+            namespace="http://www.travelport.com/schema/rail_v48_0"
         )
     )
     rail_fare_list: RailFareList = field(
         default=None,
         metadata=dict(
             name="RailFareList",
-            type="Element"
+            type="Element",
+            namespace="http://www.travelport.com/schema/rail_v48_0"
         )
     )
     rail_pricing_solution: List[RailPricingSolution] = field(
@@ -2838,6 +2887,7 @@ class AirSearchRsp(BaseAvailabilitySearchRsp):
         metadata=dict(
             name="RailPricingSolution",
             type="Element",
+            namespace="http://www.travelport.com/schema/rail_v48_0",
             min_occurs=0,
             max_occurs=999
         )
@@ -2915,6 +2965,7 @@ class AirTicketingReq(AirBaseReq):
         metadata=dict(
             name="Commission",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=18
         )
@@ -2986,6 +3037,7 @@ class AirTicketingReq(AirBaseReq):
             metadata=dict(
                 name="BookingTravelerRef",
                 type="Element",
+                namespace="http://www.travelport.com/schema/common_v48_0",
                 min_occurs=0,
                 max_occurs=9
             )
@@ -3104,6 +3156,7 @@ class AvailabilitySearchReq(AirSearchReq):
         metadata=dict(
             name="SearchPassenger",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=18
         )
@@ -3113,6 +3166,7 @@ class AvailabilitySearchReq(AirSearchReq):
         metadata=dict(
             name="PointOfSale",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=5
         )
@@ -3176,6 +3230,7 @@ class BaseLowFareSearchReq(BaseAirSearchReq):
         metadata=dict(
             name="SearchPassenger",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=1,
             max_occurs=18
         )
@@ -3227,6 +3282,7 @@ class BaseLowFareSearchReq(BaseAirSearchReq):
         metadata=dict(
             name="FormOfPayment",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=99
         )

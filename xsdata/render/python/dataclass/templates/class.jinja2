@@ -2,11 +2,7 @@
 
 @dataclass
 class {{ obj.name }}{{"({})".format(obj.extensions|join(', ')) if obj.extensions }}:
-{%- if obj.help %}
-    """
-    {{ obj.help }}
-    """
-{% endif -%}
+    {{ obj|docstring|indent(4) }}
 {%- if obj.attrs|length == 0 %}
     pass
 {%- endif -%}
@@ -16,17 +12,13 @@ class {{ obj.name }}{{"({})".format(obj.extensions|join(', ')) if obj.extensions
     {%- set field_params = {
                   "name" : attr.local_name,
                   "type" : attr.local_type,
-                  "help" :attr.help,
                }
     %}
     {{ attr.name }}: {{ display_type }} = field(
         {{ "default_factory" if attr.is_list else "default" }}=
         {{- "list" if attr.is_list else ('"{}"'.format(attr.default) if attr.default else attr.default) }},
         metadata=dict(
-            {{ field_params|arguments|indent(12) }},
-            {%- if attr.restrictions %}
-            {{ attr.restrictions|arguments|indent(12) }}
-            {%- endif %}
+            {{ field_params|update(attr.restrictions)|arguments|indent(12) }}
         )
     )
 {%- endfor -%}

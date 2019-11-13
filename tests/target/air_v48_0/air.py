@@ -109,6 +109,7 @@ class Adjustment:
         metadata=dict(
             name="Amount",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             required=True
         )
     )
@@ -545,6 +546,7 @@ class AirRefundInfo:
         metadata=dict(
             name="RefundRemark",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=999
         )
@@ -780,6 +782,7 @@ class AlternateLocationDistance:
         metadata=dict(
             name="Distance",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             required=True
         )
     )
@@ -1025,6 +1028,7 @@ class AvailableDiscount:
         metadata=dict(
             name="LoyaltyProgram",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=999
         )
@@ -1073,6 +1077,7 @@ class AvailableSsr:
         metadata=dict(
             name="SSR",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=999
         )
@@ -1082,6 +1087,7 @@ class AvailableSsr:
         metadata=dict(
             name="SSRRules",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=999
         )
@@ -1091,6 +1097,7 @@ class AvailableSsr:
         metadata=dict(
             name="IndustryStandardSSR",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=999
         )
@@ -2366,6 +2373,7 @@ class ExcludeTicketing:
         metadata=dict(
             name="BookingTravelerRef",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=999
         )
@@ -2406,6 +2414,7 @@ class ExemptTaxes:
         metadata=dict(
             name="CountryCode",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=999,
             length=2
@@ -3063,14 +3072,16 @@ class FareRuleLookup:
         default=None,
         metadata=dict(
             name="AccountCode",
-            type="Element"
+            type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0"
         )
     )
     point_of_sale: PointOfSale = field(
         default=None,
         metadata=dict(
             name="PointOfSale",
-            type="Element"
+            type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0"
         )
     )
     origin: str = field(
@@ -3358,6 +3369,7 @@ class FlexExploreModifiers:
         metadata=dict(
             name="Destination",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=59,
             length=3,
@@ -3674,6 +3686,7 @@ class HostTokenList:
         metadata=dict(
             name="HostToken",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=1,
             max_occurs=999
         )
@@ -4122,6 +4135,7 @@ class MerchandisingPricingModifiers:
         metadata=dict(
             name="AccountCode",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=10
         )
@@ -4259,6 +4273,7 @@ class OfferAvailabilityModifiers:
         metadata=dict(
             name="ServiceType",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=999,
             min_length=1.0,
@@ -4270,6 +4285,7 @@ class OfferAvailabilityModifiers:
         metadata=dict(
             name="Carrier",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=999,
             length=2
@@ -5097,6 +5113,7 @@ class PermittedCabins:
         metadata=dict(
             name="CabinClass",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=1,
             max_occurs=5
         )
@@ -5113,6 +5130,7 @@ class PermittedCarriers:
         metadata=dict(
             name="Carrier",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=1,
             max_occurs=999
         )
@@ -5191,6 +5209,7 @@ class PolicyCodesList:
         metadata=dict(
             name="PolicyCode",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=1,
             max_occurs=10,
             min_inclusive=1.0,
@@ -5209,6 +5228,7 @@ class PreferredCabins:
         metadata=dict(
             name="CabinClass",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             required=True
         )
     )
@@ -5224,6 +5244,7 @@ class PreferredCarriers:
         metadata=dict(
             name="Carrier",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=1,
             max_occurs=999
         )
@@ -5485,6 +5506,7 @@ class ProhibitedCabins:
         metadata=dict(
             name="CabinClass",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=1,
             max_occurs=3
         )
@@ -5501,6 +5523,7 @@ class ProhibitedCarriers:
         metadata=dict(
             name="Carrier",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=1,
             max_occurs=999
         )
@@ -5614,6 +5637,7 @@ class RefundFailureInfo:
         metadata=dict(
             name="BookingTravelerRef",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=1,
             max_occurs=999
         )
@@ -5631,6 +5655,7 @@ class RefundFailureInfo:
         metadata=dict(
             name="TicketNumber",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             required=True
         )
     )
@@ -5939,6 +5964,7 @@ class SearchTraveler(TypePassengerType):
         metadata=dict(
             name="AirSeatAssignment",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=999
         )
@@ -6148,6 +6174,7 @@ class SolutionGroup:
             metadata=dict(
                 name="AccountCode",
                 type="Element",
+                namespace="http://www.travelport.com/schema/common_v48_0",
                 min_occurs=1,
                 max_occurs=999
             )
@@ -6163,6 +6190,7 @@ class SolutionGroup:
             metadata=dict(
                 name="AccountCode",
                 type="Element",
+                namespace="http://www.travelport.com/schema/common_v48_0",
                 min_occurs=1,
                 max_occurs=999
             )
@@ -6178,6 +6206,7 @@ class SolutionGroup:
             metadata=dict(
                 name="AccountCode",
                 type="Element",
+                namespace="http://www.travelport.com/schema/common_v48_0",
                 min_occurs=1,
                 max_occurs=999
             )
@@ -6193,6 +6222,7 @@ class SolutionGroup:
             metadata=dict(
                 name="PointOfSale",
                 type="Element",
+                namespace="http://www.travelport.com/schema/common_v48_0",
                 min_occurs=1,
                 max_occurs=999
             )
@@ -6208,6 +6238,7 @@ class SolutionGroup:
             metadata=dict(
                 name="PointOfSale",
                 type="Element",
+                namespace="http://www.travelport.com/schema/common_v48_0",
                 min_occurs=1,
                 max_occurs=999
             )
@@ -6325,6 +6356,7 @@ class SpecificTimeTable:
             metadata=dict(
                 name="Airport",
                 type="Element",
+                namespace="http://www.travelport.com/schema/common_v48_0",
                 required=True
             )
         )
@@ -6339,6 +6371,7 @@ class SpecificTimeTable:
             metadata=dict(
                 name="Airport",
                 type="Element",
+                namespace="http://www.travelport.com/schema/common_v48_0",
                 required=True
             )
         )
@@ -6608,6 +6641,7 @@ class TextInfo:
         metadata=dict(
             name="Text",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=999,
             max_length=250.0
@@ -6888,7 +6922,8 @@ class TypeFarePenalty:
         default=None,
         metadata=dict(
             name="Amount",
-            type="Element"
+            type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0"
         )
     )
     percentage: str = field(
@@ -6896,6 +6931,7 @@ class TypeFarePenalty:
         metadata=dict(
             name="Percentage",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             pattern="([0-9]{1,2}|100)\.[0-9]{1,2}"
         )
     )
@@ -7042,6 +7078,7 @@ class TypeTicketFailureInfo:
         metadata=dict(
             name="BookingTravelerRef",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=1,
             max_occurs=999
         )
@@ -7059,6 +7096,7 @@ class TypeTicketFailureInfo:
         metadata=dict(
             name="TicketNumber",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             required=True
         )
     )
@@ -7255,6 +7293,7 @@ class Urlinfo:
         metadata=dict(
             name="Text",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=999,
             max_length=250.0
@@ -7549,6 +7588,7 @@ class AirExchangeBundle:
         metadata=dict(
             name="AirExchangeInfo",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             required=True
         )
     )
@@ -7575,6 +7615,7 @@ class AirExchangeBundle:
         metadata=dict(
             name="Penalty",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=999
         )
@@ -7593,6 +7634,7 @@ class AirExchangeBundleTotal:
         metadata=dict(
             name="AirExchangeInfo",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             required=True
         )
     )
@@ -7601,6 +7643,7 @@ class AirExchangeBundleTotal:
         metadata=dict(
             name="Penalty",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=999
         )
@@ -7728,6 +7771,7 @@ class AirExchangeTicketBundle:
         metadata=dict(
             name="TicketNumber",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             required=True
         )
     )
@@ -7736,6 +7780,7 @@ class AirExchangeTicketBundle:
         metadata=dict(
             name="FormOfPayment",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=2
         )
@@ -7744,7 +7789,8 @@ class AirExchangeTicketBundle:
         default=None,
         metadata=dict(
             name="FormOfPaymentRef",
-            type="Element"
+            type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0"
         )
     )
     waiver_code: WaiverCode = field(
@@ -8202,7 +8248,8 @@ class AirTicketingModifiers:
         default=None,
         metadata=dict(
             name="Commission",
-            type="Element"
+            type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0"
         )
     )
     form_of_payment: List[FormOfPayment] = field(
@@ -8210,6 +8257,7 @@ class AirTicketingModifiers:
         metadata=dict(
             name="FormOfPayment",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=999
         )
@@ -8219,6 +8267,7 @@ class AirTicketingModifiers:
         metadata=dict(
             name="CreditCardAuth",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=999
         )
@@ -8228,6 +8277,7 @@ class AirTicketingModifiers:
         metadata=dict(
             name="Payment",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=999
         )
@@ -8940,7 +8990,8 @@ class DetailedBillingInformation:
         default=None,
         metadata=dict(
             name="FormOfPaymentRef",
-            type="Element"
+            type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0"
         )
     )
     air_pricing_info_ref: List[AirPricingInfoRef] = field(
@@ -9296,6 +9347,7 @@ class Facility:
         metadata=dict(
             name="Remark",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=999
         )
@@ -9330,6 +9382,7 @@ class Facility:
         metadata=dict(
             name="ServiceData",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=999
         )
@@ -9906,14 +9959,16 @@ class IssuanceModifiers:
         default=None,
         metadata=dict(
             name="FormOfPaymentRef",
-            type="Element"
+            type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0"
         )
     )
     form_of_payment: FormOfPayment = field(
         default=None,
         metadata=dict(
             name="FormOfPayment",
-            type="Element"
+            type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0"
         )
     )
     plating_carrier: str = field(
@@ -10199,7 +10254,8 @@ class Pcc:
         default=None,
         metadata=dict(
             name="OverridePCC",
-            type="Element"
+            type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0"
         )
     )
     point_of_sale: List[PointOfSale] = field(
@@ -10207,6 +10263,7 @@ class Pcc:
         metadata=dict(
             name="PointOfSale",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=5
         )
@@ -10350,6 +10407,7 @@ class RelatedTraveler:
         metadata=dict(
             name="LoyaltyCard",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=999
         )
@@ -10540,6 +10598,7 @@ class SelectionModifiers:
         metadata=dict(
             name="SvcSegmentRef",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=999
         )
@@ -10605,6 +10664,7 @@ class TcrexchangeBundle:
         metadata=dict(
             name="AirExchangeInfo",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             required=True
         )
     )
@@ -10640,6 +10700,7 @@ class TcrexchangeBundle:
         metadata=dict(
             name="Penalty",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=999
         )
@@ -10962,7 +11023,8 @@ class AirFareDisplayModifiers:
         default=None,
         metadata=dict(
             name="CabinClass",
-            type="Element"
+            type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0"
         )
     )
     penalty_fare_information: PenaltyFareInformation = field(
@@ -11391,6 +11453,7 @@ class AirLegModifiers:
             metadata=dict(
                 name="ConnectionPoint",
                 type="Element",
+                namespace="http://www.travelport.com/schema/common_v48_0",
                 min_occurs=1,
                 max_occurs=999
             )
@@ -11406,6 +11469,7 @@ class AirLegModifiers:
             metadata=dict(
                 name="ConnectionPoint",
                 type="Element",
+                namespace="http://www.travelport.com/schema/common_v48_0",
                 min_occurs=1,
                 max_occurs=999
             )
@@ -11421,6 +11485,7 @@ class AirLegModifiers:
             metadata=dict(
                 name="ConnectionPoint",
                 type="Element",
+                namespace="http://www.travelport.com/schema/common_v48_0",
                 min_occurs=1,
                 max_occurs=99
             )
@@ -11576,6 +11641,7 @@ class AirPricingModifiers:
         metadata=dict(
             name="DiscountCard",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=9
         )
@@ -11600,7 +11666,8 @@ class AirPricingModifiers:
         default=None,
         metadata=dict(
             name="PointOfSale",
-            type="Element"
+            type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0"
         )
     )
     brand_modifiers: BrandModifiers = field(
@@ -11821,6 +11888,7 @@ class AirPricingModifiers:
             metadata=dict(
                 name="AccountCode",
                 type="Element",
+                namespace="http://www.travelport.com/schema/common_v48_0",
                 min_occurs=1,
                 max_occurs=999
             )
@@ -12124,6 +12192,7 @@ class AirSearchModifiers:
             metadata=dict(
                 name="Provider",
                 type="Element",
+                namespace="http://www.travelport.com/schema/common_v48_0",
                 min_occurs=1,
                 max_occurs=999
             )
@@ -12139,6 +12208,7 @@ class AirSearchModifiers:
             metadata=dict(
                 name="Provider",
                 type="Element",
+                namespace="http://www.travelport.com/schema/common_v48_0",
                 min_occurs=1,
                 max_occurs=999
             )
@@ -12154,6 +12224,7 @@ class AirSearchModifiers:
             metadata=dict(
                 name="Carrier",
                 type="Element",
+                namespace="http://www.travelport.com/schema/common_v48_0",
                 min_occurs=1,
                 max_occurs=999
             )
@@ -12434,6 +12505,7 @@ class BrandingInfo:
         metadata=dict(
             name="AirSegmentRef",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=1,
             max_occurs=99
         )
@@ -12505,6 +12577,7 @@ class DocumentInfo:
         metadata=dict(
             name="MCOInfo",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=999
         )
@@ -12556,6 +12629,7 @@ class Emdinfo(ProviderReservation, AttrElementKeyResults):
         metadata=dict(
             name="SupplierLocator",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=999
         )
@@ -12573,14 +12647,16 @@ class Emdinfo(ProviderReservation, AttrElementKeyResults):
         default=None,
         metadata=dict(
             name="Payment",
-            type="Element"
+            type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0"
         )
     )
     form_of_payment: FormOfPayment = field(
         default=None,
         metadata=dict(
             name="FormOfPayment",
-            type="Element"
+            type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0"
         )
     )
     emdpricing_info: EmdpricingInfo = field(
@@ -12653,7 +12729,8 @@ class EmdsummaryInfo(AttrElementKeyResults):
         default=None,
         metadata=dict(
             name="Payment",
-            type="Element"
+            type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0"
         )
     )
     provider_reservation_info_ref: str = field(
@@ -12967,6 +13044,7 @@ class FaxDetails:
         metadata=dict(
             name="PhoneNumber",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             required=True
         )
     )
@@ -12982,6 +13060,7 @@ class FaxDetails:
         metadata=dict(
             name="Remark",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=999
         )
@@ -13143,6 +13222,7 @@ class FlightInfo:
         metadata=dict(
             name="FlightInfoErrorMessage",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=999
         )
@@ -13456,6 +13536,7 @@ class GeneralTimeTable:
         metadata=dict(
             name="FlightOrigin",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             required=True
         )
     )
@@ -13464,6 +13545,7 @@ class GeneralTimeTable:
         metadata=dict(
             name="FlightDestination",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             required=True
         )
     )
@@ -13641,6 +13723,7 @@ class PrePayCustomer:
         metadata=dict(
             name="Email",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=999
         )
@@ -13650,6 +13733,7 @@ class PrePayCustomer:
         metadata=dict(
             name="Address",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=999
         )
@@ -13668,6 +13752,7 @@ class PrePayCustomer:
         metadata=dict(
             name="LoyaltyCard",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=999
         )
@@ -14042,7 +14127,8 @@ class ServiceAssociations:
             default=None,
             metadata=dict(
                 name="ResponseMessage",
-                type="Element"
+                type="Element",
+                namespace="http://www.travelport.com/schema/common_v48_0"
             )
         )
         optional_service_ref: OptionalServiceRef = field(
@@ -14291,6 +14377,7 @@ class AutoPricingInfo(AttrElementKeyResults):
         metadata=dict(
             name="BookingTravelerRef",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=100
         )
@@ -14612,6 +14699,7 @@ class FareDisplay:
         metadata=dict(
             name="AccountCode",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=999
         )
@@ -14920,7 +15008,8 @@ class MerchandisingAvailabilityDetails:
         default=None,
         metadata=dict(
             name="AccountCode",
-            type="Element"
+            type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0"
         )
     )
 
@@ -14946,6 +15035,7 @@ class MerchandisingDetails:
         metadata=dict(
             name="AccountCode",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=10
         )
@@ -15020,6 +15110,7 @@ class OptionalService(AttrProviderSupplier, AttrPrices, AttrElementKeyResults):
         metadata=dict(
             name="ServiceData",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=999
         )
@@ -15028,7 +15119,8 @@ class OptionalService(AttrProviderSupplier, AttrPrices, AttrElementKeyResults):
         default=None,
         metadata=dict(
             name="ServiceInfo",
-            type="Element"
+            type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0"
         )
     )
     remark: List[Remark] = field(
@@ -15036,6 +15128,7 @@ class OptionalService(AttrProviderSupplier, AttrPrices, AttrElementKeyResults):
         metadata=dict(
             name="Remark",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=999
         )
@@ -15522,6 +15615,7 @@ class SearchAirLeg:
         metadata=dict(
             name="SearchOrigin",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=1,
             max_occurs=999
         )
@@ -15531,6 +15625,7 @@ class SearchAirLeg:
         metadata=dict(
             name="SearchDestination",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=999
         )
@@ -15547,6 +15642,7 @@ class SearchAirLeg:
         metadata=dict(
             name="SearchDepTime",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=1,
             max_occurs=999
         )
@@ -15556,6 +15652,7 @@ class SearchAirLeg:
         metadata=dict(
             name="SearchArvTime",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=1,
             max_occurs=999
         )
@@ -15625,6 +15722,7 @@ class TicketingModifiers(AttrElementKeyResults):
         metadata=dict(
             name="BookingTravelerRef",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=999
         )
@@ -15689,7 +15787,8 @@ class TicketingModifiers(AttrElementKeyResults):
         default=None,
         metadata=dict(
             name="Commission",
-            type="Element"
+            type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0"
         )
     )
     tour_code: TourCode = field(
@@ -15749,7 +15848,8 @@ class TicketingModifiers(AttrElementKeyResults):
         default=None,
         metadata=dict(
             name="SupplierLocator",
-            type="Element"
+            type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0"
         )
     )
     destination_purpose_code: DestinationPurposeCode = field(
@@ -16010,6 +16110,7 @@ class TypeBaseAirSegment(Segment):
         metadata=dict(
             name="SellMessage",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=999
         )
@@ -16351,6 +16452,7 @@ class FareRule(AttrProviderSupplier):
         metadata=dict(
             name="FareRuleResultMessage",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=999
         )
@@ -16448,6 +16550,7 @@ class OptionalServices:
         metadata=dict(
             name="OptionalServiceRules",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=999
         )
@@ -16567,6 +16670,7 @@ class AirItinerary:
         metadata=dict(
             name="HostToken",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=999
         )
@@ -16657,6 +16761,7 @@ class AirSolution:
         metadata=dict(
             name="HostToken",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=16
         )
@@ -16919,6 +17024,7 @@ class ExchangeAirSegment:
         metadata=dict(
             name="CabinClass",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             required=True
         )
     )
@@ -17010,6 +17116,7 @@ class TcrrefundBundle:
         metadata=dict(
             name="HostToken",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=999
         )
@@ -17195,6 +17302,7 @@ class FareInfo(AttrElementKeyResults):
         metadata=dict(
             name="AccountCode",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=999
         )
@@ -17213,6 +17321,7 @@ class FareInfo(AttrElementKeyResults):
         metadata=dict(
             name="Endorsement",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=999
         )
@@ -17258,7 +17367,8 @@ class FareInfo(AttrElementKeyResults):
         default=None,
         metadata=dict(
             name="Commission",
-            type="Element"
+            type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0"
         )
     )
     fare_attributes: str = field(
@@ -17641,6 +17751,7 @@ class AirPricingInfo(AttrPrices, AttrProviderSupplier, AttrElementKeyResults, At
         metadata=dict(
             name="BookingTravelerRef",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=999
         )
@@ -17789,6 +17900,7 @@ class AirPricingInfo(AttrPrices, AttrProviderSupplier, AttrElementKeyResults, At
         metadata=dict(
             name="Commission",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=999
         )
@@ -18028,6 +18140,7 @@ class AirPricePoint(AttrPrices):
         metadata=dict(
             name="AirPricingResultMessage",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=999
         )
@@ -18196,6 +18309,7 @@ class AirPricingSolution(AttrPrices):
         metadata=dict(
             name="MetaData",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=999
         )
@@ -18205,6 +18319,7 @@ class AirPricingSolution(AttrPrices):
         metadata=dict(
             name="AirPricingResultMessage",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=999
         )
@@ -18241,6 +18356,7 @@ class AirPricingSolution(AttrPrices):
         metadata=dict(
             name="HostToken",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=999
         )
@@ -18340,7 +18456,8 @@ class Etr(AttrPrices, AttrElementKeyResults):
         default=None,
         metadata=dict(
             name="AgencyInfo",
-            type="Element"
+            type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0"
         )
     )
     booking_traveler: BookingTraveler = field(
@@ -18348,6 +18465,7 @@ class Etr(AttrPrices, AttrElementKeyResults):
         metadata=dict(
             name="BookingTraveler",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             required=True
         )
     )
@@ -18356,6 +18474,7 @@ class Etr(AttrPrices, AttrElementKeyResults):
         metadata=dict(
             name="FormOfPayment",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=999
         )
@@ -18365,6 +18484,7 @@ class Etr(AttrPrices, AttrElementKeyResults):
         metadata=dict(
             name="Payment",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=999
         )
@@ -18374,6 +18494,7 @@ class Etr(AttrPrices, AttrElementKeyResults):
         metadata=dict(
             name="CreditCardAuth",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=999
         )
@@ -18383,6 +18504,7 @@ class Etr(AttrPrices, AttrElementKeyResults):
         metadata=dict(
             name="SupplierLocator",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=999
         )
@@ -18409,6 +18531,7 @@ class Etr(AttrPrices, AttrElementKeyResults):
         metadata=dict(
             name="Commission",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=999
         )
@@ -18432,6 +18555,7 @@ class Etr(AttrPrices, AttrElementKeyResults):
         metadata=dict(
             name="Restriction",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=999
         )
@@ -18580,6 +18704,7 @@ class Tcr(ProviderReservation):
         metadata=dict(
             name="FormOfPayment",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=999
         )
@@ -18589,6 +18714,7 @@ class Tcr(ProviderReservation):
         metadata=dict(
             name="Payment",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=999
         )
@@ -18598,6 +18724,7 @@ class Tcr(ProviderReservation):
         metadata=dict(
             name="BookingTraveler",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=1,
             max_occurs=999
         )
@@ -18624,7 +18751,8 @@ class Tcr(ProviderReservation):
         default=None,
         metadata=dict(
             name="AgencyInfo",
-            type="Element"
+            type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0"
         )
     )
     air_reservation_locator_code: AirReservationLocatorCode = field(
@@ -18639,6 +18767,7 @@ class Tcr(ProviderReservation):
         metadata=dict(
             name="SupplierLocator",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=999
         )
@@ -18648,6 +18777,7 @@ class Tcr(ProviderReservation):
         metadata=dict(
             name="RefundRemark",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=999
         )
@@ -18805,6 +18935,7 @@ class TypeBaseAirReservation(BaseReservation):
         metadata=dict(
             name="SupplierLocator",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=999
         )
@@ -18814,6 +18945,7 @@ class TypeBaseAirReservation(BaseReservation):
         metadata=dict(
             name="ThirdPartyInformation",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=999
         )
@@ -18830,6 +18962,7 @@ class TypeBaseAirReservation(BaseReservation):
         metadata=dict(
             name="BookingTravelerRef",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=999
         )
@@ -18839,6 +18972,7 @@ class TypeBaseAirReservation(BaseReservation):
         metadata=dict(
             name="ProviderReservationInfoRef",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=999
         )
@@ -18875,6 +19009,7 @@ class TypeBaseAirReservation(BaseReservation):
         metadata=dict(
             name="Payment",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=999
         )
@@ -18884,6 +19019,7 @@ class TypeBaseAirReservation(BaseReservation):
         metadata=dict(
             name="CreditCardAuth",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=999
         )
@@ -19009,7 +19145,8 @@ class AirPriceResult:
         default=None,
         metadata=dict(
             name="AirPriceError",
-            type="Element"
+            type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0"
         )
     )
     command_key: str = field(
@@ -19095,6 +19232,7 @@ class OptionalServicesInfo:
         metadata=dict(
             name="FormOfPayment",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=999
         )
@@ -19104,6 +19242,7 @@ class OptionalServicesInfo:
         metadata=dict(
             name="FormOfPaymentRef",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=999
         )
@@ -19121,6 +19260,7 @@ class TypeAirReservationWithFop(TypeBaseAirReservation):
         metadata=dict(
             name="FormOfPayment",
             type="Element",
+            namespace="http://www.travelport.com/schema/common_v48_0",
             min_occurs=0,
             max_occurs=999
         )

@@ -7,7 +7,7 @@ from toposort import toposort_flatten
 from xsdata.models.elements import Schema
 from xsdata.models.enums import XSDType
 from xsdata.models.render import Class, Renderer
-from xsdata.render.python.dataclass.filters import arguments, docstring, update
+from xsdata.render.python.dataclass.filters import filters
 from xsdata.render.python.dataclass.utils import replace_words
 from xsdata.utils import text
 from xsdata.utils.text import snake_case, strip_prefix
@@ -16,10 +16,11 @@ from xsdata.utils.text import snake_case, strip_prefix
 class DataclassRenderer(Renderer):
     def __init__(self):
         templates_dir = Path(__file__).parent.joinpath("templates")
-        self.env = Environment(loader=FileSystemLoader(str(templates_dir)),)
-        self.env.filters["arguments"] = arguments
-        self.env.filters["docstring"] = docstring
-        self.env.filters["update"] = update
+        self.env = Environment(
+            loader=FileSystemLoader(str(templates_dir)),
+            extensions=["jinja2.ext.do"],
+        )
+        self.env.filters.update(filters)
 
     def template(self, name: str) -> Template:
         return self.env.get_template("{}.jinja2".format(name))

@@ -19,6 +19,7 @@ from xsdata.models.elements import (
     SimpleContent,
     SimpleType,
 )
+from xsdata.models.enums import Form
 from xsdata.parser import SchemaParser
 
 
@@ -74,9 +75,14 @@ class ComplexTypeDeserializeTests(ModelTestCase):
                 elements=[
                     Element.build(
                         name="PointOfSale",
+                        form=Form.UNQUALIFIED,
                         complex_type=ComplexType.build(
                             attributes=[
-                                Attribute.build(name="id", type="xs:string")
+                                Attribute.build(
+                                    name="id",
+                                    type="xs:string",
+                                    form=Form.UNQUALIFIED,
+                                )
                             ]
                         ),
                     )
@@ -98,6 +104,7 @@ class ComplexTypeDeserializeTests(ModelTestCase):
                         Attribute.build(
                             name="currency",
                             use="required",
+                            form=Form.UNQUALIFIED,
                             simple_type=SimpleType.build(
                                 restriction=Restriction.build(
                                     base="xs:string",
@@ -125,6 +132,7 @@ class ComplexTypeDeserializeTests(ModelTestCase):
                         Attribute.build(
                             name="id",
                             use="required",
+                            form=Form.UNQUALIFIED,
                             simple_type=SimpleType.build(
                                 restriction=Restriction.build(
                                     base="xs:string",

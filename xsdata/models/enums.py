@@ -6,6 +6,11 @@ from lxml import etree
 XMLSchema = "http://www.w3.org/2001/XMLSchema"
 
 
+class Form(Enum):
+    QUALIFIED = "qualified"
+    UNQUALIFIED = "unqualified"
+
+
 class XSDType(Enum):
     ANY_URI = ("xs:anyURI", str)
     BASE64_BINARY = ("xs:base64Binary", str)
@@ -64,7 +69,7 @@ class XSDType(Enum):
         if pos == -1:
             return None
 
-        return __XSDType__.get("xs:" + code[pos + 1:])
+        return __XSDType__.get("xs:" + code[pos + 1 :])
 
     @classmethod
     def get_local(cls, code: str) -> Optional[str]:

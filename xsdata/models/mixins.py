@@ -1,12 +1,27 @@
 from abc import ABC, abstractmethod
 from typing import Any, Dict, List, Optional
 
+from xsdata.models.enums import Form, XSDType
+
 
 class TypedField(ABC):
     @property
     @abstractmethod
     def real_type(self) -> Optional[str]:
         pass
+
+    @property
+    def namespace(self):
+        form: Form = getattr(self, "form", Form.UNQUALIFIED)
+        if form == Form.UNQUALIFIED:
+            return None
+
+        real_type = self.real_type
+        prefix_pos = real_type.find(":")
+        if prefix_pos == -1 or XSDType.get_enum(real_type):
+            return None
+
+        return self.nsmap.get(real_type[:prefix_pos])
 
 
 class ExtendsMixin(ABC):

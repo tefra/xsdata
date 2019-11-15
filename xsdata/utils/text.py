@@ -2,7 +2,8 @@ from typing import List
 
 
 def strip_prefix(string: str, sep: str = ":") -> str:
-    return string.split(sep)[-1]
+    pos = string.find(sep) + 1
+    return string[pos:] if pos else string
 
 
 def capitalize(string: str) -> str:

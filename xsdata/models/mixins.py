@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Any, Dict, List, Optional
 
-from xsdata.models.enums import Form, XSDType
+from xsdata.models.enums import FormType, XSDType
 
 
 class TypedField(ABC):
@@ -12,8 +12,8 @@ class TypedField(ABC):
 
     @property
     def namespace(self):
-        form: Form = getattr(self, "form", Form.UNQUALIFIED)
-        if form == Form.UNQUALIFIED:
+        form: FormType = getattr(self, "form", FormType.UNQUALIFIED)
+        if form == FormType.UNQUALIFIED:
             return None
 
         real_type = self.real_type

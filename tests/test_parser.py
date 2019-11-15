@@ -17,7 +17,7 @@ from xsdata.models.elements import (
     SimpleContent,
     SimpleType,
 )
-from xsdata.models.enums import Form
+from xsdata.models.enums import FormType
 from xsdata.parser import SchemaParser
 
 
@@ -69,13 +69,13 @@ class ParserTests(TestCase):
                 elements=[
                     Element.build(
                         name="PointOfSale",
-                        form=Form.QUALIFIED,
+                        form=FormType.QUALIFIED,
                         complex_type=ComplexType.build(
                             attributes=[
                                 Attribute.build(
                                     name="id",
                                     type="xs:string",
-                                    form=Form.UNQUALIFIED,
+                                    form=FormType.UNQUALIFIED,
                                 )
                             ]
                         ),
@@ -110,7 +110,7 @@ class ParserTests(TestCase):
                         Attribute.build(
                             name="currency",
                             use="required",
-                            form=Form.UNQUALIFIED,
+                            form=FormType.UNQUALIFIED,
                             simple_type=SimpleType.build(
                                 restriction=Restriction.build(
                                     base="xs:string",
@@ -151,7 +151,7 @@ class ParserTests(TestCase):
                         Attribute.build(
                             name="id",
                             use="required",
-                            form=Form.QUALIFIED,
+                            form=FormType.QUALIFIED,
                             simple_type=SimpleType.build(
                                 restriction=Restriction.build(
                                     base="xs:string",
@@ -179,10 +179,10 @@ class ParserTests(TestCase):
                 min_occurs=1,
                 elements=[
                     Element.build(
-                        name="first", min_occurs=0, form=Form.QUALIFIED
+                        name="first", min_occurs=0, form=FormType.QUALIFIED
                     ),
                     Element.build(
-                        name="second", min_occurs=0, form=Form.QUALIFIED
+                        name="second", min_occurs=0, form=FormType.QUALIFIED
                     ),
                 ],
             ),

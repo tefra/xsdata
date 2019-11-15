@@ -6,7 +6,7 @@ from lxml import etree
 XMLSchema = "http://www.w3.org/2001/XMLSchema"
 
 
-class Form(Enum):
+class FormType(Enum):
     QUALIFIED = "qualified"
     UNQUALIFIED = "unqualified"
 
@@ -80,12 +80,12 @@ class XSDType(Enum):
 __XSDType__ = {xsd.code: xsd for xsd in XSDType}
 
 
-class Event:
+class EventType:
     START = "start"
     END = "end"
 
 
-class Tag(Enum):
+class TagType(Enum):
     ALL = "all"
     ANNOTATION = "annotation"
     ANY = "any"
@@ -137,4 +137,16 @@ class Tag(Enum):
 
     @classmethod
     def qnames(cls):
-        return {tag.qname: tag for tag in Tag}
+        return {tag.qname: tag for tag in TagType}
+
+
+class UseType(Enum):
+    OPTIONAL = "optional"
+    PROHIBITED = "prohibited"
+    REQUIRED = "required"
+
+
+class ProcessType(Enum):
+    LAX = "lax"
+    SKIP = "skip"
+    STRICT = "strict"

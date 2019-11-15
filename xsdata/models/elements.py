@@ -11,7 +11,13 @@ from typing import Optional
 
 from lxml import etree
 
-from xsdata.models.enums import Form, XMLSchema, XSDType
+from xsdata.models.enums import (
+    FormType,
+    ProcessType,
+    UseType,
+    XMLSchema,
+    XSDType,
+)
 from xsdata.models.mixins import (
     ExtendsMixin,
     NamedField,
@@ -19,15 +25,7 @@ from xsdata.models.mixins import (
     RestrictedField,
     TypedField,
 )
-from xsdata.utils.text import snake_case
-
-
-def stripns(text: str) -> str:
-    try:
-        namespace, text = text.split("}", 1)
-        return text
-    except ValueError:
-        return text
+from xsdata.utils.text import snake_case, strip_prefix
 
 
 class BaseModel:
@@ -37,7 +35,8 @@ class BaseModel:
     @classmethod
     def from_element(cls, el: etree.Element):
         attrs = {
-            snake_case(stripns(key)): value for key, value in el.attrib.items()
+            snake_case(strip_prefix(key, "}")): value
+            for key, value in el.attrib.items()
         }
         data = {
             attr.name: cls.xsd_value(attr, attrs)
@@ -220,7 +219,7 @@ class Union(AnnotationBase):
 @dataclass
 class AnyAttribute(AnnotationBase):
     namespace: Optional[str]
-    process_contents: Optional[str]  # lax | skip | strict
+    process_contents: Optional[ProcessType]
     simple_type: Optional[SimpleType]
 
 
@@ -230,12 +229,12 @@ class Attribute(
 ):
     default: Optional[str]
     fixed: Optional[str]
-    form: Optional[Form]
+    form: Optional[FormType]
     name: Optional[str]
     ref: Optional[str]
     type: Optional[str]
     simple_type: Optional[SimpleType]
-    use: Optional[str] = "optional"  # optional | prohibited | required
+    use: Optional[UseType] = field(default=UseType.OPTIONAL)
 
     @property
     def real_type(self) -> Optional[str]:
@@ -250,7 +249,7 @@ class Attribute(
 
     def get_restrictions(self) -> Dict[str, Anything]:
         restrictions = dict()
-        if self.use == "required":
+        if self.use == UseType.REQUIRED:
             restrictions["required"] = True
         if self.simple_type:
             restrictions.update(self.simple_type.get_restrictions())
@@ -537,7 +536,7 @@ class Element(
     substitution_group: Optional[str]
     default: Optional[str]
     fixed: Optional[str]
-    form: Optional[Form]
+    form: Optional[FormType]
     block: Optional[List]
     final: Optional[List]
     simple_type: Optional[SimpleType]
@@ -580,7 +579,7 @@ class Element(
 @dataclass
 class Any(AnnotationBase, OccurrencesMixin):
     namespace: Optional[str]
-    process_contents: Optional[str]  # lax | skip | strict
+    process_contents: Optional[ProcessType]
     annotation: Optional[Annotation]
     max_occurs: int = 1
     min_occurs: int = 1
@@ -622,8 +621,8 @@ class Schema(AnnotationBase):
     version: Optional[str]
     xmlns: Optional[str]
     location: Optional[Path] = field(init=False)
-    element_form_default: Form = field(default=Form.UNQUALIFIED)
-    attribute_form_default: Form = field(default=Form.UNQUALIFIED)
+    element_form_default: FormType = field(default=FormType.UNQUALIFIED)
+    attribute_form_default: FormType = field(default=FormType.UNQUALIFIED)
     includes: ArrayList[Include] = field(default_factory=list)
     imports: ArrayList[Import] = field(default_factory=list)
     redefineds: ArrayList[Redefined] = field(default_factory=list)

@@ -13,7 +13,7 @@ from xsdata.models.elements import (
     Element,
     Schema,
 )
-from xsdata.models.enums import Event, Form, Tag
+from xsdata.models.enums import EventType, FormType, TagType
 from xsdata.utils.text import capitalize, snake_case
 
 
@@ -29,15 +29,15 @@ class SchemaParser:
 
     context: etree.iterparse
     elements: List[BaseModel] = field(default_factory=list)
-    element_form: Optional[Form] = field(init=False, default=None)
-    attribute_form: Optional[Form] = field(init=False, default=None)
+    element_form: Optional[FormType] = field(init=False, default=None)
+    attribute_form: Optional[FormType] = field(init=False, default=None)
 
     @classmethod
     def create(cls, source: object) -> Schema:
         """A shortcut class method to initialize the parser, parse the given
         source and return the generated Schema instance."""
 
-        ctx = etree.iterparse(source, events=(Event.START, Event.END))
+        ctx = etree.iterparse(source, events=(EventType.START, EventType.END))
         return cls(context=ctx).parse()
 
     @classmethod
@@ -75,7 +75,7 @@ class SchemaParser:
         Elements with no attributes and text are ignored.
         """
 
-        methods = Tag.qnames()
+        methods = TagType.qnames()
         for event, elem in self.context:
             tag = methods.get(elem.tag)
             if tag is None:
@@ -83,11 +83,11 @@ class SchemaParser:
                     "Unsupported tag `{}`".format(elem.tag)
                 )
 
-            if event == Event.START:
+            if event == EventType.START:
                 builder = getattr(elements, capitalize(tag.value))
                 element = builder.from_element(elem)
                 self.elements.append(element)
-            elif event == Event.END:
+            elif event == EventType.END:
                 element = self.elements.pop()
                 if len(elem.attrib) == 0 and elem.text is None:
                     continue

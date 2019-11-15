@@ -47,13 +47,11 @@ processed: List[Path] = []
 def process(
     xsd_path: Path, target: Path, renderer: str, target_adjusted=False
 ):
-
     if xsd_path in processed:
         return
-
     processed.append(xsd_path)
 
-    schema = SchemaParser(path=xsd_path).parse()
+    schema = SchemaParser.from_file(xsd_path)
     if not target_adjusted:
         target = writer.adjust_target(target, xsd_path, schema)
 

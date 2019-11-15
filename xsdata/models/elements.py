@@ -621,6 +621,7 @@ class Schema(AnnotationBase):
     target_namespace: Optional[str]
     version: Optional[str]
     xmlns: Optional[str]
+    location: Optional[Path] = field(init=False)
     element_form_default: Form = field(default=Form.UNQUALIFIED)
     attribute_form_default: Form = field(default=Form.UNQUALIFIED)
     includes: ArrayList[Include] = field(default_factory=list)
@@ -633,7 +634,6 @@ class Schema(AnnotationBase):
     attribute_groups: ArrayList[AttributeGroup] = field(default_factory=list)
     elements: ArrayList[Element] = field(default_factory=list)
     attributes: ArrayList[Attribute] = field(default_factory=list)
-    location: Path = field(init=False)
 
     def sub_schemas(self) -> ArrayList[str]:
         sub = [x.schema_location for x in self.imports if x.schema_location]
@@ -641,3 +641,21 @@ class Schema(AnnotationBase):
             [x.schema_location for x in self.includes if x.schema_location]
         )
         return sub
+
+    @property
+    def module(self):
+        if self.location:
+            return self.location.stem
+
+        if self.target_namespace:
+            return Path(self.target_namespace).stem
+
+        for el in self.elements:
+            if el.name:
+                return Path(el.name).stem
+
+        for el in self.complex_types:
+            if el.name:
+                return Path(el.name).stem
+
+        raise ValueError("Unknown schema module")

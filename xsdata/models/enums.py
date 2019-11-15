@@ -89,13 +89,13 @@ class Tag(Enum):
     ALL = "all"
     ANNOTATION = "annotation"
     ANY = "any"
-    ANYATTRIBUTE = "anyAttribute"
+    ANY_ATTRIBUTE = "anyAttribute"
     APPINFO = "appinfo"
     ATTRIBUTE = "attribute"
     ATTRIBUTEGROUP = "attributeGroup"
     CHOICE = "choice"
-    COMPLEXCONTENT = "complexContent"
-    COMPLEXTYPE = "complexType"
+    COMPLEX_CONTENT = "complexContent"
+    COMPLEX_TYPE = "complexType"
     DOCUMENTATION = "documentation"
     ELEMENT = "element"
     EXTENSION = "extension"
@@ -112,25 +112,29 @@ class Tag(Enum):
     SCHEMA = "schema"
     SELECTOR = "selector"
     SEQUENCE = "sequence"
-    SIMPLECONTENT = "simpleContent"
-    SIMPLETYPE = "simpleType"
+    SIMPLE_CONTENT = "simpleContent"
+    SIMPLE_TYPE = "simpleType"
     UNION = "union"
     UNIQUE = "unique"
 
     # Restrictions
     ENUMERATION = "enumeration"
-    FRACTIONDIGITS = "fractionDigits"
+    FRACTION_DIGITS = "fractionDigits"
     LENGTH = "length"
-    MAXEXCLUSIVE = "maxExclusive"
-    MAXINCLUSIVE = "maxInclusive"
-    MAXLENGTH = "maxLength"
-    MINEXCLUSIVE = "minExclusive"
-    MININCLUSIVE = "minInclusive"
-    MINLENGTH = "minLength"
+    MAX_EXCLUSIVE = "maxExclusive"
+    MAX_INCLUSIVE = "maxInclusive"
+    MAX_LENGTH = "maxLength"
+    MIN_EXCLUSIVE = "minExclusive"
+    MIN_INCLUSIVE = "minInclusive"
+    MIN_LENGTH = "minLength"
     PATTERN = "pattern"
-    TOTALDIGITS = "totalDigits"
-    WHITESPACE = "whiteSpace"
+    TOTAL_DIGITS = "totalDigits"
+    WHITE_SPACE = "whiteSpace"
 
     @property
     def qname(self):
         return etree.QName(XMLSchema, self.value)
+
+    @classmethod
+    def qnames(cls):
+        return {tag.qname: tag for tag in Tag}

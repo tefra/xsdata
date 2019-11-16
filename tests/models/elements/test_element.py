@@ -13,25 +13,25 @@ from xsdata.models.elements import (
 
 class ElementTests(TestCase):
     def test_property_real_name(self):
-        obj = Element.build(ref="bar")
+        obj = Element.create(ref="bar")
         self.assertEqual("bar", obj.real_name)
 
         obj.name = "foo"
         self.assertEqual("foo", obj.real_name)
 
         with self.assertRaises(NotImplementedError):
-            Element.build().real_name
+            Element.create().real_name
 
     def test_property_real_type(self):
-        obj = Element.build()
+        obj = Element.create()
         self.assertEqual("xs:string", obj.real_type)
 
         # Inner classes depend on the this to be None
-        obj.complex_type = ComplexType.build()
+        obj.complex_type = ComplexType.create()
         self.assertIsNone(obj.real_type)
 
-        restriction = Restriction.build(base="xs:int")
-        obj.simple_type = SimpleType.build(restriction=restriction)
+        restriction = Restriction.create(base="xs:int")
+        obj.simple_type = SimpleType.create(restriction=restriction)
         self.assertEqual(restriction.base, obj.real_type)
 
         obj.ref = "foo"
@@ -41,27 +41,27 @@ class ElementTests(TestCase):
         self.assertEqual(obj.type, obj.real_type)
 
     def test_property_extensions(self):
-        obj = Element.build()
+        obj = Element.create()
         self.assertEqual([], obj.extensions)
 
         obj.type = "foo_bar"
         self.assertEqual(["foo_bar"], obj.extensions)
 
-        obj.complex_type = ComplexType.build()
+        obj.complex_type = ComplexType.create()
         self.assertEqual([], obj.extensions)
 
-        obj.complex_type.complex_content = ComplexContent.build(
-            extension=Extension.build(base="thug_life")
+        obj.complex_type.complex_content = ComplexContent.create(
+            extension=Extension.create(base="thug_life")
         )
         self.assertEqual(["thug_life"], obj.extensions)
 
     def test_get_restrictions(self):
-        obj = Element.build()
+        obj = Element.create()
         expected = {"required": True}
         self.assertDictEqual(expected, obj.get_restrictions())
 
-        obj.simple_type = SimpleType.build(
-            restriction=Restriction.build(length=Length.build(value=9))
+        obj.simple_type = SimpleType.create(
+            restriction=Restriction.create(length=Length.create(value=9))
         )
         expected.update({"length": 9})
         self.assertDictEqual(expected, obj.get_restrictions())

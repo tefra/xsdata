@@ -6,7 +6,7 @@ from xsdata.models.elements import AttributeGroup
 class AttributeGroupTests(TestCase):
     def test_property_real_name(self):
         with self.assertRaises(NotImplementedError):
-            obj = AttributeGroup.build()
+            obj = AttributeGroup.create()
             obj.real_name
 
         obj.ref = "foo"
@@ -16,5 +16,5 @@ class AttributeGroupTests(TestCase):
         self.assertEqual(obj.name, obj.real_name)
 
     def test_property_extensions(self):
-        obj = AttributeGroup.build()
+        obj = AttributeGroup.create()
         self.assertEqual([], obj.extensions)

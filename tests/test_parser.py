@@ -17,7 +17,7 @@ from xsdata.models.elements import (
     SimpleContent,
     SimpleType,
 )
-from xsdata.models.enums import FormType
+from xsdata.models.enums import FormType, UseType
 from xsdata.parser import SchemaParser
 
 
@@ -62,17 +62,17 @@ class ParserTests(TestCase):
         </xs:sequence>
     </xs:complexType>"""
 
-        expected = ComplexType.build(
+        expected = ComplexType.create(
             name="allowablePointsOfSaleType",
-            sequence=Sequence.build(
+            sequence=Sequence.create(
                 max_occurs=sys.maxsize,
                 elements=[
-                    Element.build(
+                    Element.create(
                         name="PointOfSale",
                         form=FormType.QUALIFIED,
-                        complex_type=ComplexType.build(
+                        complex_type=ComplexType.create(
                             attributes=[
-                                Attribute.build(
+                                Attribute.create(
                                     name="id",
                                     type="xs:string",
                                     form=FormType.UNQUALIFIED,
@@ -101,20 +101,20 @@ class ParserTests(TestCase):
         </xs:simpleContent>
     </xs:complexType>"""
 
-        expected = ComplexType.build(
+        expected = ComplexType.create(
             name="priceCurrencyType",
-            simple_content=SimpleContent.build(
-                extension=Extension.build(
+            simple_content=SimpleContent.create(
+                extension=Extension.create(
                     base="priceType",
                     attributes=[
-                        Attribute.build(
+                        Attribute.create(
                             name="currency",
-                            use="required",
+                            use=UseType.REQUIRED,
                             form=FormType.UNQUALIFIED,
-                            simple_type=SimpleType.build(
-                                restriction=Restriction.build(
+                            simple_type=SimpleType.create(
+                                restriction=Restriction.create(
                                     base="xs:string",
-                                    pattern=Pattern.build(
+                                    pattern=Pattern.create(
                                         value="[A-Z][A-Z][A-Z]"
                                     ),
                                 )
@@ -142,20 +142,20 @@ class ParserTests(TestCase):
                   </xs:complexContent>
                 </xs:complexType>"""
 
-        expected = ComplexType.build(
+        expected = ComplexType.create(
             name="UserRateConditionType",
-            complex_content=ComplexContent.build(
-                extension=Extension.build(
+            complex_content=ComplexContent.create(
+                extension=Extension.create(
                     base="UserRateConditionBaseType",
                     attributes=[
-                        Attribute.build(
+                        Attribute.create(
                             name="id",
-                            use="required",
+                            use=UseType.REQUIRED,
                             form=FormType.QUALIFIED,
-                            simple_type=SimpleType.build(
-                                restriction=Restriction.build(
+                            simple_type=SimpleType.create(
+                                restriction=Restriction.create(
                                     base="xs:string",
-                                    min_length=MinLength.build(value=1),
+                                    min_length=MinLength.create(value=1),
                                 )
                             ),
                         )
@@ -174,14 +174,14 @@ class ParserTests(TestCase):
                 </xs:choice>
             </xs:complexType>"""
 
-        expected = ComplexType.build(
-            choice=Choice.build(
+        expected = ComplexType.create(
+            choice=Choice.create(
                 min_occurs=1,
                 elements=[
-                    Element.build(
+                    Element.create(
                         name="first", min_occurs=0, form=FormType.QUALIFIED
                     ),
-                    Element.build(
+                    Element.create(
                         name="second", min_occurs=0, form=FormType.QUALIFIED
                     ),
                 ],

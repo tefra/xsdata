@@ -89,7 +89,7 @@ class BaseModel:
         return clazz(value)
 
     @classmethod
-    def build(cls, **kwargs):
+    def create(cls, **kwargs) -> "BaseModel":
         if not kwargs.get("prefix") and not kwargs.get("nsmap"):
             kwargs.update({"prefix": "xs", "nsmap": {"xs": XMLSchema}})
 
@@ -529,8 +529,8 @@ class Keyref(AnnotationBase):
 class Element(
     AnnotationBase, TypedField, NamedField, OccurrencesMixin, ExtendsMixin
 ):
-    id: Optional[str]
     name: str
+    id: Optional[str]
     ref: Optional[str]
     type: Optional[str]
     substitution_group: Optional[str]

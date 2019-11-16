@@ -5,6 +5,7 @@ recursive-include xsdata *
 
 
 prune docs/_build
+prune docs/_static
 exclude .travis.yml
 exclude .readthedocs.yml
 exclude .pre-commit-config.yaml

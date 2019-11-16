@@ -20,7 +20,12 @@ if __name__ == "__main__":
             "docformatter",
         ],
         extras_require={
-            "dev": ["pre-commit", "pytest", "pytest-cov", "codecov", "tox"]
+            "dev": ["pre-commit", "pytest", "pytest-cov", "codecov", "tox"],
+            "docs": [
+                "sphinx",
+                "sphinx-rtd-theme",
+                "sphinxcontrib-programoutput",
+            ],
         },
         entry_points={"console_scripts": ["xsdata=xsdata:cli"]},
     )

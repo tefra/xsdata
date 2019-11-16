@@ -109,3 +109,5 @@ venv.bak/
 tests/xsd/go*
 
 wsdl/
+
+docs/build/

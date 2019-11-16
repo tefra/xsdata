@@ -1,8 +1,6 @@
 import sys
 from unittest import TestCase
 
-import pytest
-
 from xsdata.models.elements import (
     Attribute,
     Choice,
@@ -50,17 +48,16 @@ class ParserTests(TestCase):
         self.assertEqual(0, len(schema.elements))
         self.assertEqual(1, len(schema.complex_types))
 
-    @pytest.mark.parametrize
     def test_complex_type_with_sequence(self):
         xsd = """<xs:complexType name="allowablePointsOfSaleType">
-        <xs:sequence maxOccurs="unbounded">
-            <xs:element name="PointOfSale">
-                <xs:complexType>
-                    <xs:attribute name="id" type="xs:string"/>
-                </xs:complexType>
-            </xs:element>
-        </xs:sequence>
-    </xs:complexType>"""
+            <xs:sequence maxOccurs="unbounded">
+                <xs:element name="PointOfSale">
+                    <xs:complexType>
+                        <xs:attribute name="id" type="xs:string"/>
+                    </xs:complexType>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>"""
 
         expected = ComplexType.create(
             name="allowablePointsOfSaleType",
@@ -88,18 +85,18 @@ class ParserTests(TestCase):
 
     def test_complex_type_with_simple_content_and_extension(self):
         xsd = """<xs:complexType name="priceCurrencyType">
-        <xs:simpleContent>
-            <xs:extension base="priceType">
-                <xs:attribute name="currency" use="required">
-                    <xs:simpleType>
-                        <xs:restriction base="xs:string">
-                            <xs:pattern value="[A-Z][A-Z][A-Z]"/>
-                        </xs:restriction>
-                    </xs:simpleType>
-                </xs:attribute>
-            </xs:extension>
-        </xs:simpleContent>
-    </xs:complexType>"""
+            <xs:simpleContent>
+                <xs:extension base="priceType">
+                    <xs:attribute name="currency" use="required">
+                        <xs:simpleType>
+                            <xs:restriction base="xs:string">
+                                <xs:pattern value="[A-Z][A-Z][A-Z]"/>
+                            </xs:restriction>
+                        </xs:simpleType>
+                    </xs:attribute>
+                </xs:extension>
+            </xs:simpleContent>
+        </xs:complexType>"""
 
         expected = ComplexType.create(
             name="priceCurrencyType",

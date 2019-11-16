@@ -11,29 +11,29 @@ from xsdata.models.elements import (
 
 class ComplexTypeTests(TestCase):
     def test_property_extensions_with_no_content(self):
-        obj = ComplexType.build()
+        obj = ComplexType.create()
         self.assertEqual([], obj.extensions)
 
     def test_property_extensions_with_complex_content(self):
-        obj = ComplexType.build()
-        obj.complex_content = ComplexContent.build()
+        obj = ComplexType.create()
+        obj.complex_content = ComplexContent.create()
         self.assertEqual([], obj.extensions)
 
-        obj.complex_content.extension = Extension.build(base="foo_bar")
+        obj.complex_content.extension = Extension.create(base="foo_bar")
         self.assertEqual(["foo_bar"], obj.extensions)
 
     def test_property_extensions_with_attribute_groups(self):
-        obj = ComplexType.build()
+        obj = ComplexType.create()
         obj.attribute_groups = [
-            AttributeGroup.build(name="foo"),
-            AttributeGroup.build(ref="bar"),
+            AttributeGroup.create(name="foo"),
+            AttributeGroup.create(ref="bar"),
         ]
         self.assertEqual(["foo", "bar"], obj.extensions)
 
     def test_property_extensions_with_simple_content(self):
-        obj = ComplexType.build()
-        obj.simple_content = SimpleContent.build()
+        obj = ComplexType.create()
+        obj.simple_content = SimpleContent.create()
         self.assertEqual([], obj.extensions)
 
-        obj.simple_content.extension = Extension.build(base="foo_bar")
+        obj.simple_content.extension = Extension.create(base="foo_bar")
         self.assertEqual(["foo_bar"], obj.extensions)

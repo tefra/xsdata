@@ -36,17 +36,17 @@ class OccurrencesMixinTests(TestCase):
     def test_get_restrictions(self):
         data = dict(min_occurs=1, max_occurs=2)
         for clazz in self.subclasses:
-            obj = clazz.build(**data)
+            obj = clazz.create(**data)
             self.assertDictEqual(data, obj.get_restrictions())
 
         data = dict(min_occurs=1, max_occurs=1)
         for clazz in self.subclasses:
-            obj = clazz.build(**data)
+            obj = clazz.create(**data)
             self.assertDictEqual(dict(required=True), obj.get_restrictions())
 
         data = dict(min_occurs=0, max_occurs=1)
         for clazz in self.subclasses:
-            obj = clazz.build(**data)
+            obj = clazz.create(**data)
             self.assertDictEqual(dict(), obj.get_restrictions())
 
 
@@ -59,22 +59,22 @@ class TypedFieldTests(TestCase):
         self.assertEqual(expected, self.subclasses)
 
     def test_property_namespace_with_unqualified_form(self):
-        obj = el.Element.build()
+        obj = el.Element.create()
         self.assertIsNone(obj.namespace)
 
     def test_property_namespace_with_no_ref_type(self):
-        obj = el.Element.build(type="foo")
+        obj = el.Element.create(type="foo")
         self.assertIsNone(obj.namespace)
 
     def test_property_namespace_with_xsd_ref_type(self):
-        obj = el.Element.build(type="xs:int")
+        obj = el.Element.create(type="xs:int")
         self.assertIsNone(obj.namespace)
 
     def test_property_namespace_with_unknown_ref_type(self):
-        obj = el.Element.build(type="ns:foo")
+        obj = el.Element.create(type="ns:foo")
         self.assertIsNone(obj.namespace)
 
     def test_property_namespace_with_known_ref_type(self):
-        obj = el.Element.build(type="ns:foo")
+        obj = el.Element.create(type="ns:foo")
         obj.nsmap["ns"] = "bar"
         self.assertEqual("bar", obj.namespace)

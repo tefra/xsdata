@@ -19,29 +19,29 @@ from xsdata.models.elements import (
 
 class RestrictionTests(TestCase):
     def test_property_real_type(self):
-        obj = Restriction.build(base="foo")
+        obj = Restriction.create(base="foo")
         self.assertEqual(obj.base, obj.real_type)
 
     def test_property_real_name(self):
-        obj = Restriction.build()
+        obj = Restriction.create()
         self.assertEqual("value", obj.real_name)
 
     def test_get_restrictions(self):
-        self.assertDictEqual({}, Restriction.build().get_restrictions())
+        self.assertDictEqual({}, Restriction.create().get_restrictions())
 
-        obj = Restriction.build(
-            min_exclusive=MinExclusive.build(value=1),
-            min_inclusive=MinInclusive.build(value=2),
-            min_length=MinLength.build(value=3),
-            max_exclusive=MaxExclusive.build(value=4),
-            max_inclusive=MaxInclusive.build(value=5),
-            max_length=MaxLength.build(value=6),
-            total_digits=TotalDigits.build(value=7),
-            fraction_digits=FractionDigits.build(value=8),
-            length=Length.build(value=9),
-            white_space=WhiteSpace.build(value="collapse"),
-            pattern=Pattern.build(value=".*"),
-            enumerations=Enumeration.build(value="str"),
+        obj = Restriction.create(
+            min_exclusive=MinExclusive.create(value=1),
+            min_inclusive=MinInclusive.create(value=2),
+            min_length=MinLength.create(value=3),
+            max_exclusive=MaxExclusive.create(value=4),
+            max_inclusive=MaxInclusive.create(value=5),
+            max_length=MaxLength.create(value=6),
+            total_digits=TotalDigits.create(value=7),
+            fraction_digits=FractionDigits.create(value=8),
+            length=Length.create(value=9),
+            white_space=WhiteSpace.create(value="collapse"),
+            pattern=Pattern.create(value=".*"),
+            enumerations=Enumeration.create(value="str"),
         )
         expected = {
             "enumerations": "str",

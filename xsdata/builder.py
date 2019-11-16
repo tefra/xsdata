@@ -31,13 +31,15 @@ class ClassBuilder:
 
     def build(self, schema: Schema) -> List[Class]:
         """Generate classes from schema elements."""
+
         self.register_simple_types(schema.simple_types)
         return self.build_classes(schema)
 
     def register_simple_types(self, simple_types: List[SimpleType]):
-        """Take global simple types build them and add them to the internal
+        """Take global simple types create them and add them to the internal
         storage for later usage when we attempt to replace class extensions and
         attributes with the simple type restrictions and value fields."""
+
         for simple_type in simple_types:
             obj = self.build_class(simple_type)
             if obj.name not in self.simple_types:
@@ -45,9 +47,12 @@ class ClassBuilder:
             else:
                 # If you encounter this warning then it's time to implement
                 # qname lookup {namespace}{name}
-                logger.warning(f"Name Collision for simple type: {obj.name}")
+                logger.warning(f"Name conflict for simple type: {obj.name}")
 
-    def build_classes(self, schema):
+    def build_classes(self, schema) -> List[Class]:
+        """Go through the global elements of a schema: attributes, attribute
+        groups, complex types and elements and build a list of classes."""
+
         classes: List[Class] = []
         classes.extend(map(self.build_class, schema.attributes))
         classes.extend(map(self.build_class, schema.attribute_groups))
@@ -57,10 +62,13 @@ class ClassBuilder:
 
     def find_simple_type(self, name: str):
         """String namespace prefix and look just for the name."""
+
         name = strip_prefix(name)
         return self.simple_types.get(name)
 
     def build_class(self, obj: BaseElement) -> Class:
+        """Build and return a class instance."""
+
         item = Class(
             name=obj.real_name,
             extensions=obj.extensions,
@@ -76,6 +84,9 @@ class ClassBuilder:
         return item
 
     def replace_simple_types(self, item: Class):
+        """Flatten simple types like strings or numbers with restrictions by
+        merging the simple types properties into the input class instance."""
+
         try:
             for inner in item.inner:
                 self.replace_simple_types(inner)
@@ -103,6 +114,9 @@ class ClassBuilder:
             logger.warning(f"Failed to flatten types:`{item.name}`")
 
     def element_children(self, obj: ElementBase) -> Iterator[AttributeElement]:
+        """Recursively find and return all child elements that can be used to
+        generate class attributes."""
+
         for child in obj.children():
             if isinstance(child, (Attribute, Element, Restriction)):
                 yield child
@@ -110,7 +124,17 @@ class ClassBuilder:
                 yield from self.element_children(child)
 
     def build_class_attribute(self, parent: Class, obj: AttributeElement):
-        inner_type = self.has_inner_type(parent, obj)
+        """
+        Generate and append an attribute instance to the parent class.
+
+        Skip if no real type could be detected because of an invalid
+        schema or missing implementation.
+        """
+        forward_ref = False
+        if self.has_inner_type(obj):
+            forward_ref = True
+            self.build_inner_class(parent, obj)
+
         if not obj.real_type:
             logger.warning(
                 f"Failed to detect type for element: {obj.real_name}"
@@ -124,19 +148,37 @@ class ClassBuilder:
                 type=obj.real_type,
                 local_type=type(obj).__name__,
                 help=obj.display_help,
-                forward_ref=inner_type,
+                forward_ref=forward_ref,
                 namespace=obj.namespace,
                 restrictions=obj.get_restrictions(),
             )
         )
 
-    def has_inner_type(self, parent: Class, obj: AttributeElement) -> bool:
-        if isinstance(obj, Element):
-            if not obj.real_type and obj.complex_type:
-                obj.complex_type.name = obj.type = obj.name
-                parent.inner.append(self.build_class(obj.complex_type))
-                return True
-        return False
+    def build_inner_class(self, parent: Class, obj: AttributeElement):
+        """
+        Build a class from an Element complex type and append it to the parent
+        inner class list.
+
+        Assign the element name to the complex type name and to the
+        element type.
+        """
+        if isinstance(obj, Element) and obj.complex_type:
+            obj.complex_type.name = obj.type = obj.name
+            parent.inner.append(self.build_class(obj.complex_type))
+
+    @staticmethod
+    def has_inner_type(obj: AttributeElement) -> bool:
+        """
+        Detect and return if an element instance has inner reference to a
+        complex type.
+
+        Generate and append the inner class to the parent class.
+        """
+        return (
+            isinstance(obj, Element)
+            and obj.real_type is None
+            and obj.complex_type is not None
+        )
 
 
 builder = ClassBuilder()

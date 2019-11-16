@@ -9,7 +9,7 @@ class CodeWriterTests(TestCase):
     def test_adjust_target_without_imports(self):
         target = Path("/project/target/")
         xsd_path = Path("/somewhere/name/version/subfolder/here.xsd")
-        schema = Schema.build()
+        schema = Schema.create()
 
         actual = CodeWriter.adjust_target(target, xsd_path, schema)
         self.assertEqual(target, actual)
@@ -17,8 +17,8 @@ class CodeWriterTests(TestCase):
     def test_adjust_target_with_one_import(self):
         target = Path("/project/target/")
         xsd_path = Path("/somewhere/name/version/subfolder/here.xsd")
-        schema = Schema.build(
-            imports=[Import.build(schema_location="../common/common.xsd")]
+        schema = Schema.create(
+            imports=[Import.create(schema_location="../common/common.xsd")]
         )
 
         actual = CodeWriter.adjust_target(target, xsd_path, schema)
@@ -28,10 +28,10 @@ class CodeWriterTests(TestCase):
     def test_adjust_target_with_imports_from_different_levels(self):
         target = Path("/project/target/")
         xsd_path = Path("/somewhere/name/version/subfolder/here.xsd")
-        schema = Schema.build(
+        schema = Schema.create(
             imports=[
-                Import.build(schema_location="../common/common.xsd"),
-                Import.build(schema_location="../../back/common.xsd"),
+                Import.create(schema_location="../common/common.xsd"),
+                Import.create(schema_location="../../back/common.xsd"),
             ]
         )
 

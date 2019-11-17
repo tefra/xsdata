@@ -22,10 +22,7 @@ def cli(ctx: click.Context):
 @cli.command()
 @click.argument("file", type=click.Path(exists=True), required=True)
 @click.option(
-    "--target",
-    type=click.Path(exists=False, file_okay=False, resolve_path=True),
-    required=True,
-    help="Target directory",
+    "--package", required=True, help="Target Package",
 )
 @click.option(
     "--renderer",
@@ -33,40 +30,42 @@ def cli(ctx: click.Context):
     help="Output renderer",
     default="pydata",
 )
-def generate(file: str, target: str, renderer: str):
+def generate(file: str, package: str, renderer: str):
     process(
-        xsd_path=Path(file).resolve(),
-        target=Path(target).resolve(),
-        renderer=renderer,
+        xsd_path=Path(file).resolve(), package=package, renderer=renderer,
     )
 
 
 processed: List[Path] = []
 
 
-def process(
-    xsd_path: Path, target: Path, renderer: str, target_adjusted=False
-):
+def process(xsd_path: Path, package: str, renderer: str):
     if xsd_path in processed:
         return
     processed.append(xsd_path)
 
     schema = SchemaParser.from_file(xsd_path)
-    if not target_adjusted:
-        target = writer.adjust_target(target, xsd_path, schema)
-
     for sub_schema in schema.sub_schemas():
         process(
             xsd_path=xsd_path.parent.joinpath(sub_schema).resolve(),
-            target=target.joinpath(sub_schema).parent.resolve(),
+            package=adjust_package(package, sub_schema),
             renderer=renderer,
-            target_adjusted=True,
         )
 
     classes = builder.build(schema=schema)
     writer.write(
-        schema=schema, classes=classes, target=target, renderer=renderer
+        schema=schema, classes=classes, package=package, renderer=renderer
     )
+
+
+def adjust_package(package: str, relative_file_path: str):
+    pp = package.split(".")
+    for part in Path(relative_file_path).parent.parts:
+        if part == "..":
+            pp.pop()
+        else:
+            pp.append(part)
+    return ".".join(pp)
 
 
 if __name__ == "__main__":

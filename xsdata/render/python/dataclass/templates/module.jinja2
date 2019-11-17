@@ -1,5 +1,10 @@
 from dataclasses import dataclass, field
 from typing import List, Optional
 
-{{ imports|join("\n")}}
+{%- for package, classes in imports.items() %}
+from {{ package }} import (
+    {{ classes|sort|join(",\n    ") }}
+)
+{%- endfor -%}
+
 {{ output }}

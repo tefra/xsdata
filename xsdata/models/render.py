@@ -1,9 +1,5 @@
-from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from pathlib import Path
-from typing import Any, Iterator, List, Optional, Tuple
-
-from xsdata.models.elements import Schema
+from typing import Any, List, Optional
 
 
 @dataclass
@@ -33,11 +29,3 @@ class Class:
     extensions: List[str] = field(default_factory=list)
     attrs: List[Attr] = field(default_factory=list)
     inner: List["Class"] = field(default_factory=list)
-
-
-class Renderer(ABC):
-    @abstractmethod
-    def render(
-        self, schema: Schema, classes: List[Class], target: Path
-    ) -> Iterator[Tuple[Path, str]]:
-        pass

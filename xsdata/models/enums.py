@@ -76,6 +76,10 @@ class XSDType(Enum):
         enum = cls.get_enum(code)
         return enum.local.__name__ if enum else None
 
+    @classmethod
+    def codes(cls):
+        return list(__XSDType__.keys())
+
 
 __XSDType__ = {xsd.code: xsd for xsd in XSDType}
 

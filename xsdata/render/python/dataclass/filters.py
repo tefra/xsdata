@@ -36,4 +36,7 @@ def has_quotes(string: str):
     return False
 
 
-filters = {"arguments": arguments, "docstring": docstring}
+filters = {
+    "arguments": arguments,
+    "docstring": docstring,
+}

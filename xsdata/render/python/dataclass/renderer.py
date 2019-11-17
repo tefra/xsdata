@@ -1,12 +1,12 @@
 from pathlib import Path
-from typing import Iterator, List, Set, Tuple
+from typing import Any, Iterator, List, Optional, Set, Tuple
 
 from jinja2 import Environment, FileSystemLoader, Template
 from toposort import toposort_flatten
 
 from xsdata.models.elements import Schema
 from xsdata.models.enums import XSDType
-from xsdata.models.render import Class, Renderer
+from xsdata.models.render import Attr, Class, Renderer
 from xsdata.render.python.dataclass.filters import filters
 from xsdata.render.python.dataclass.utils import replace_words
 from xsdata.utils import text
@@ -60,21 +60,25 @@ class DataclassRenderer(Renderer):
 
     @classmethod
     def prepare_classes(cls, classes: List[Class]):
-        cls.convert_names(classes)
         classes = cls.sort_classes(classes)
+        cls.apply_conventions(classes)
         return classes
 
     @classmethod
-    def convert_names(cls, classes: List[Class]):
+    def apply_conventions(
+        cls, classes: List[Class], parents: List[str] = None
+    ):
+        parents = parents or []
         for obj in classes:
-            cls.convert_names(obj.inner)
             obj.name = cls.class_name(obj.name)
             obj.extensions = [cls.type_name(ext) for ext in obj.extensions]
+            cls.apply_conventions(obj.inner, parents + [obj.name])
 
             for attr in obj.attrs:
                 attr.name = cls.attribute_name(attr.name)
-                attr.type = cls.type_name(attr.type)
+                attr.type = cls.attribute_type(attr, parents + [obj.name])
                 attr.local_name = strip_prefix(attr.local_name)
+                attr.default = cls.attribute_default(attr)
 
     @classmethod
     def class_name(cls, name: str) -> str:
@@ -88,6 +92,32 @@ class DataclassRenderer(Renderer):
     def attribute_name(cls, name: str) -> str:
         name = strip_prefix(name)
         return text.snake_case(replace_words.get(name.lower(), name))
+
+    @classmethod
+    def attribute_type(cls, attr: Attr, parents: List[str]) -> str:
+        result = cls.type_name(attr.type)
+        if attr.forward_ref:
+            outer_str = ".".join(parents)
+            result = f'"{outer_str}.{result}"'
+        if attr.is_list:
+            result = f"List[{result}]"
+        elif attr.default is None:
+            result = f"Optional[{result}]"
+        return result
+
+    @classmethod
+    def attribute_default(cls, attr: Attr) -> Optional[Any]:
+        if attr.is_list:
+            return "list"
+        elif isinstance(attr.default, str):
+            if attr.type == "bool":
+                return attr.default == "true"
+            if attr.type == "int":
+                return int(attr.default)
+            if attr.type == "float":
+                return float(attr.default)
+            return f'"{attr.default}"'
+        return attr.default
 
     @classmethod
     def sort_classes(cls, classes: List[Class]) -> List[Class]:

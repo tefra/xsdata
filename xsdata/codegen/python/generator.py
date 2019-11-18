@@ -8,7 +8,7 @@ from xsdata.models.enums import XSDType
 from xsdata.utils import text
 
 
-class PythonGenerator(AbstractGenerator, ABC):
+class PythonAbstractGenerator(AbstractGenerator, ABC):
     @classmethod
     def process_class(
         cls, obj: Class, overrides: Dict[str, str], parents: List[str] = None
@@ -16,6 +16,9 @@ class PythonGenerator(AbstractGenerator, ABC):
         parents = parents or []
         obj.name = cls.class_name(obj.name)
         obj.extensions = [cls.type_name(ext) for ext in obj.extensions]
+
+        if obj.inner and obj.extensions and obj.attrs:
+            pass
 
         for inner in obj.inner:
             cls.process_class(inner, overrides, parents + [obj.name])

@@ -4,14 +4,14 @@ from typing import Iterator, List, Tuple
 from jinja2 import Environment, FileSystemLoader, Template
 
 from xsdata.codegen.python.dataclass.filters import filters
-from xsdata.codegen.python.generator import PythonGenerator
+from xsdata.codegen.python.generator import PythonAbstractGenerator
 from xsdata.codegen.python.resolver import ImportResolver
 from xsdata.models.codegen import Class
 from xsdata.models.elements import Schema
 from xsdata.utils.text import snake_case
 
 
-class DataclassGenerator(PythonGenerator):
+class DataclassGenerator(PythonAbstractGenerator):
     def __init__(self):
         templates_dir = Path(__file__).parent.joinpath("templates")
         self.env = Environment(

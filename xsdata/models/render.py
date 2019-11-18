@@ -29,3 +29,15 @@ class Class:
     extensions: List[str] = field(default_factory=list)
     attrs: List[Attr] = field(default_factory=list)
     inner: List["Class"] = field(default_factory=list)
+
+
+@dataclass
+class Object:
+    name: str
+    alias: Optional[str] = field(default=None)
+
+
+@dataclass
+class Package:
+    name: str
+    objects: List[Object] = field(default_factory=list)

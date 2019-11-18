@@ -3,15 +3,15 @@ from typing import Iterator, List, Tuple
 
 from jinja2 import Environment, FileSystemLoader, Template
 
+from xsdata.codegen.python.dataclass.filters import filters
+from xsdata.codegen.python.generator import PythonGenerator
+from xsdata.codegen.python.resolver import ImportResolver
+from xsdata.models.codegen import Class
 from xsdata.models.elements import Schema
-from xsdata.models.render import Class
-from xsdata.render.python.dataclass.filters import filters
-from xsdata.render.python.renderer import PythonRenderer
-from xsdata.render.python.resolver import ImportResolver
 from xsdata.utils.text import snake_case
 
 
-class DataclassRenderer(PythonRenderer):
+class DataclassGenerator(PythonGenerator):
     def __init__(self):
         templates_dir = Path(__file__).parent.joinpath("templates")
         self.env = Environment(
@@ -36,10 +36,9 @@ class DataclassRenderer(PythonRenderer):
         module = snake_case(schema.module)
         package_arr = list(map(snake_case, package.split(".")))
         package = "{}.{}".format(".".join(package_arr), module)
-
-        self.resolver.current(classes, schema)
         target = Path.cwd().joinpath(*package_arr)
 
+        self.resolver.current(classes, schema)
         overrides = self.resolver.type_overrides()
 
         imports = [

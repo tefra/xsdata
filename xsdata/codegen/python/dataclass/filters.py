@@ -1,6 +1,6 @@
 from docformatter import format_code
 
-from xsdata.models.render import Class
+from xsdata.models.codegen import Class
 
 
 def arguments(data: dict):

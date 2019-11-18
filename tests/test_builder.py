@@ -3,6 +3,7 @@ from unittest import TestCase
 from unittest.mock import MagicMock, PropertyMock, call, patch
 
 from xsdata.builder import ClassBuilder
+from xsdata.models.codegen import Attr, Class
 from xsdata.models.elements import (
     Attribute,
     AttributeGroup,
@@ -12,7 +13,6 @@ from xsdata.models.elements import (
     Schema,
     SimpleType,
 )
-from xsdata.models.render import Attr, Class
 
 
 class ClassBuilderTests(TestCase):

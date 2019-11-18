@@ -1,14 +1,14 @@
 from abc import ABC
 from typing import Any, Dict, List, Optional
 
+from xsdata.codegen.generator import AbstractGenerator
+from xsdata.codegen.python.dataclass.utils import replace_words
+from xsdata.models.codegen import Attr, Class, Package
 from xsdata.models.enums import XSDType
-from xsdata.models.render import Attr, Class, Package
-from xsdata.render.python.dataclass.utils import replace_words
-from xsdata.render.renderer import AbstractRenderer
 from xsdata.utils import text
 
 
-class PythonRenderer(AbstractRenderer, ABC):
+class PythonGenerator(AbstractGenerator, ABC):
     @classmethod
     def process_class(
         cls, obj: Class, overrides: Dict[str, str], parents: List[str] = None

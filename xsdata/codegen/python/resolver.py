@@ -5,14 +5,13 @@ from typing import Dict, List, Set
 from lxml import etree
 from toposort import toposort_flatten
 
+from xsdata.models.codegen import Class, Object, Package
 from xsdata.models.elements import Schema
 from xsdata.models.enums import XSDType
-from xsdata.models.render import Class, Object, Package
 
 
 @dataclass
 class ImportResolver:
-
     processed: Dict[str, str] = field(default_factory=dict)
     imports: List[Package] = field(default_factory=list)
     class_list: List[str] = field(init=False)
@@ -23,12 +22,16 @@ class ImportResolver:
         self.class_map = self.create_class_map(classes)
         self.class_list = self.create_class_list(classes)
         self.schema = schema
+        self.imports.clear()
 
     def import_packages(self):
         len(self.imports) or self.resolve_imports()
+
         return self.imports
 
     def process_classes(self, package):
+        len(self.imports) or self.resolve_imports()
+
         for name in self.class_list:
             obj = self.class_map.get(name)
             if obj:

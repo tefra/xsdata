@@ -8,8 +8,8 @@ class Attr:
     local_name: str = field(init=False)
     type: str
     local_type: str
-    namespace: Optional[str]
-    help: Optional[str]
+    namespace: Optional[str] = field(default=None)
+    help: Optional[str] = field(default=None)
     forward_ref: bool = field(default=False)
     restrictions: dict = field(default_factory=dict)
     default: Optional[Any] = field(default=None)

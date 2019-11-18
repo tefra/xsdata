@@ -1,5 +1,5 @@
 replace_words = {
-    word: "{}_value".format(word)
+    word.lower(): "{}_value".format(word.lower())
     for word in [
         "and",
         "except",

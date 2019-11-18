@@ -1,10 +1,13 @@
 from dataclasses import dataclass, field
 from typing import List, Optional
 
-{%- for package, classes in imports.items() %}
-from {{ package }} import (
-    {{ classes|sort|join(",\n    ") }}
+{%- for package in imports%}
+from {{ package.name }} import (
+    {%- for obj in package.objects %}
+    {{ "{} as {}".format(obj.name, obj.alias) if obj.alias else obj.name }},
+    {%- endfor %}
 )
 {%- endfor -%}
+
 
 {{ output }}

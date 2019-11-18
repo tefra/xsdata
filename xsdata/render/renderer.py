@@ -7,7 +7,7 @@ from xsdata.models.enums import XSDType
 from xsdata.models.render import Class
 
 
-class Renderer(ABC):
+class AbstractRenderer(ABC):
     @abstractmethod
     def render(
         self, schema: Schema, classes: List[Class], package: str

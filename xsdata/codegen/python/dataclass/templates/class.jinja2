@@ -1,8 +1,10 @@
-
+{% set help = obj|docstring|trim %}
 
 @dataclass
 class {{ obj.name }}{{"({})".format(obj.extensions|join(', ')) if obj.extensions }}:
-    {{ obj|docstring|indent(4) }}
+{%- if help %}
+{{ help|indent(4, first=True) }}
+{%- endif -%}
 {%- if obj.attrs|length == 0 %}
     pass
 {%- endif -%}

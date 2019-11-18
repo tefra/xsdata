@@ -1,27 +1,27 @@
 from dataclasses import dataclass, field
 from typing import Dict, List
 
+from xsdata.codegen.generator import AbstractGenerator
+from xsdata.codegen.python.dataclass.generator import DataclassGenerator
+from xsdata.models.codegen import Class
 from xsdata.models.elements import Schema
-from xsdata.models.render import Class
-from xsdata.render.python.dataclass.renderer import DataclassRenderer
-from xsdata.render.renderer import AbstractRenderer
 
 
 @dataclass
 class CodeWriter:
-    renderers: Dict[str, AbstractRenderer] = field(default_factory=dict)
+    generators: Dict[str, AbstractGenerator] = field(default_factory=dict)
 
     @property
     def formats(self):
-        return list(self.renderers.keys())
+        return list(self.generators.keys())
 
-    def register_renderer(self, name, renderer: AbstractRenderer):
-        self.renderers[name] = renderer
+    def register_generator(self, name, renderer: AbstractGenerator):
+        self.generators[name] = renderer
 
     def get_renderer(self, name):
-        if name in self.renderers:
-            return self.renderers[name]
-        raise ValueError(f"{name} is not a valid {AbstractRenderer.__name__}")
+        if name in self.generators:
+            return self.generators[name]
+        raise ValueError(f"{name} is not a valid {AbstractGenerator.__name__}")
 
     def write(
         self, schema: Schema, classes: List[Class], package: str, renderer: str
@@ -33,4 +33,4 @@ class CodeWriter:
 
 
 writer = CodeWriter()
-writer.register_renderer("pydata", DataclassRenderer())
+writer.register_generator("pydata", DataclassGenerator())

@@ -3,6 +3,7 @@ import logging
 from dataclasses import dataclass, field
 from typing import Dict, Iterator, List, Union
 
+from xsdata.models.codegen import Attr, Class
 from xsdata.models.elements import (
     Attribute,
     AttributeGroup,
@@ -14,7 +15,6 @@ from xsdata.models.elements import (
     SimpleType,
 )
 from xsdata.models.enums import XSDType
-from xsdata.models.render import Attr, Class
 from xsdata.utils.text import strip_prefix
 
 logger = logging.getLogger(__name__)
@@ -115,7 +115,7 @@ class ClassBuilder:
 
     def element_children(self, obj: ElementBase) -> Iterator[AttributeElement]:
         """Recursively find and return all child elements that can be used to
-        generate class attributes."""
+        codegen class attributes."""
 
         for child in obj.children():
             if isinstance(child, (Attribute, Element, Restriction)):

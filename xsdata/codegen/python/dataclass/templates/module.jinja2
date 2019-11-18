@@ -7,7 +7,5 @@ from {{ package.name }} import (
     {{ "{} as {}".format(obj.name, obj.alias) if obj.alias else obj.name }},
     {%- endfor %}
 )
-{%- endfor -%}
-
-
+{%- endfor %}
 {{ output }}

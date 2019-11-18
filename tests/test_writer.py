@@ -1,40 +1,45 @@
+import copy
+from dataclasses import dataclass
 from pathlib import Path
+from tempfile import TemporaryDirectory
+from typing import Iterator, Optional, Tuple
 from unittest import TestCase
 
-from xsdata.models.elements import Import, Schema
-from xsdata.writer import CodeWriter
+from xsdata.codegen.generator import AbstractGenerator
+from xsdata.codegen.python.dataclass.generator import DataclassGenerator
+from xsdata.models.elements import Schema
+from xsdata.writer import writer
+
+
+@dataclass
+class FakeRenderer(AbstractGenerator):
+    dir: Optional[TemporaryDirectory] = None
+
+    def render(self, *args, **kwargs) -> Iterator[Tuple[Path, str]]:
+        yield Path(f"{self.dir}/test.txt"), "foobar"
 
 
 class CodeWriterTests(TestCase):
-    def test_adjust_target_without_imports(self):
-        target = Path("/project/target/")
-        xsd_path = Path("/somewhere/name/version/subfolder/here.xsd")
-        schema = Schema.create()
+    def setUp(self) -> None:
+        self.generators = copy.deepcopy(writer.generators)
 
-        actual = CodeWriter.adjust_target(target, xsd_path, schema)
-        self.assertEqual(target, actual)
+    def tearDown(self) -> None:
+        writer.generators = self.generators
 
-    def test_adjust_target_with_one_import(self):
-        target = Path("/project/target/")
-        xsd_path = Path("/somewhere/name/version/subfolder/here.xsd")
-        schema = Schema.create(
-            imports=[Import.create(schema_location="../common/common.xsd")]
+    def test_formats(self):
+        expected = ["pydata"]
+        self.assertEqual(expected, writer.formats)
+        self.assertIsInstance(
+            writer.get_renderer("pydata"), DataclassGenerator
         )
 
-        actual = CodeWriter.adjust_target(target, xsd_path, schema)
-        expected = target.joinpath("subfolder")
-        self.assertEqual(expected, actual)
+    def test_register_generator(self):
+        writer.register_generator("fake", FakeRenderer())
+        self.assertIn("fake", writer.formats)
+        self.assertIsInstance(writer.get_renderer("fake"), FakeRenderer)
 
-    def test_adjust_target_with_imports_from_different_levels(self):
-        target = Path("/project/target/")
-        xsd_path = Path("/somewhere/name/version/subfolder/here.xsd")
-        schema = Schema.create(
-            imports=[
-                Import.create(schema_location="../common/common.xsd"),
-                Import.create(schema_location="../../back/common.xsd"),
-            ]
-        )
-
-        actual = CodeWriter.adjust_target(target, xsd_path, schema)
-        expected = target.joinpath("version/subfolder")
-        self.assertEqual(expected, actual)
+    def test_write(self):
+        with TemporaryDirectory() as tmpdir:
+            writer.register_generator("fake", FakeRenderer(tmpdir))
+            writer.write(Schema.create(), [], "", "fake")
+            self.assertEqual("foobar", Path(f"{tmpdir}/test.txt").read_text())

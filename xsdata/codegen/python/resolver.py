@@ -1,11 +1,10 @@
-from collections import defaultdict
 from dataclasses import dataclass, field
 from typing import Dict, List, Set
 
 from lxml import etree
 from toposort import toposort_flatten
 
-from xsdata.models.codegen import Class, Object, Package
+from xsdata.models.codegen import Class, Package
 from xsdata.models.elements import Schema
 from xsdata.models.enums import XSDType
 
@@ -13,60 +12,58 @@ from xsdata.models.enums import XSDType
 @dataclass
 class ImportResolver:
     processed: Dict[str, str] = field(default_factory=dict)
+    aliases: Dict[str, str] = field(default_factory=dict)
     imports: List[Package] = field(default_factory=list)
     class_list: List[str] = field(init=False)
     class_map: Dict[str, Class] = field(init=False)
     schema: Schema = field(init=False)
+    package: str = field(init=False)
 
-    def current(self, classes: List[Class], schema: Schema):
+    def process(self, classes: List[Class], schema: Schema, package: str):
         self.class_map = self.create_class_map(classes)
         self.class_list = self.create_class_list(classes)
         self.schema = schema
+        self.package = package
         self.imports.clear()
+        self.resolve_imports()
 
-    def import_packages(self):
-        len(self.imports) or self.resolve_imports()
+    def sorted_imports(self):
+        return sorted(self.imports, key=lambda x: x.name)
 
-        return self.imports
-
-    def process_classes(self, package):
-        len(self.imports) or self.resolve_imports()
-
+    def sorted_classes(self):
         for name in self.class_list:
-            obj = self.class_map.get(name)
-            if obj:
-                qname = etree.QName(self.schema.target_namespace, obj.name)
-                self.processed[qname.text] = package
-                yield obj
+            if name in self.class_map:
+                obj = self.class_map.get(name)
+                self.add_package(obj)
+                self.apply_aliases(obj)
+                yield self.apply_aliases(obj)
 
-    def type_overrides(self):
-        len(self.imports) or self.resolve_imports()
+    def apply_aliases(self, obj: Class):
+        for attr in obj.attrs:
+            attr.type_alias = self.aliases.get(attr.type)
 
-        return {
-            obj.alias: True
-            for package in self.imports
-            for obj in package.objects
-            if obj.alias
-        }
+        for inner in obj.inner:
+            self.apply_aliases(inner)
+
+        return obj
 
     def resolve_imports(self):
-        tmp = defaultdict(list)
         for ref in self.import_classes():
             has_ns = ref.find(":") > -1
-
             prefix, name = ref.split(":") if has_ns else (None, ref)
             package = self.find_package(prefix, name)
-            tmp[package].append(
-                (name, ref) if has_ns and name in self.class_map else (name,)
-            )
+            alias = ref if has_ns and self.class_map.get(name) else None
 
-        self.imports = [
-            Package(
-                name=package,
-                objects=[Object(*value) for value in sorted(tmp[package])],
-            )
-            for package in sorted(tmp.keys())
-        ]
+            self.add_import(name, alias, package)
+
+    def add_import(self, name, alias, package):
+        if alias:
+            self.aliases[alias] = alias
+        self.imports.append(Package(name=name, alias=alias, source=package))
+
+    def add_package(self, obj: Class):
+        qname = etree.QName(self.schema.target_namespace, obj.name)
+        self.processed[qname.text] = self.package
 
     def find_package(self, prefix, name):
         namespace = self.schema.nsmap.get(prefix)

@@ -1,132 +1,89 @@
-from dataclasses import asdict
-from unittest import TestCase
+from unittest import TestCase, mock
 
 from xsdata.codegen.python.generator import (
     PythonAbstractGenerator as generator,
 )
-from xsdata.models.codegen import Attr, Class, Object, Package
+from xsdata.models.codegen import Attr, Class, Package
 
 
 class AbstractPythonGeneratorTests(TestCase):
-    def test_process_class(self):
-        obj = Class(
-            name="TypeFlexibleTimeSpec",
-            help="",
-            extensions=["TypeTimeSpec"],
-            attrs=[
-                Attr(
-                    name="SearchExtraDays",
-                    type="SearchExtraDays",
-                    local_type="Element",
-                    namespace=None,
-                    help="",
-                    forward_ref=True,
-                    restrictions={},
-                    default=None,
-                )
-            ],
-            inner=[
-                Class(
-                    name="SearchExtraDays",
-                    help=None,
-                    extensions=[],
-                    attrs=[
-                        Attr(
-                            name="DaysBefore",
-                            type="xs:int",
-                            local_type="Attribute",
-                            namespace=None,
-                            help="",
-                            forward_ref=False,
-                            restrictions={},
-                            default=None,
-                        ),
-                        Attr(
-                            name="DaysAfter",
-                            type="xs:int",
-                            local_type="Attribute",
-                            namespace=None,
-                            help="",
-                            forward_ref=False,
-                            restrictions={},
-                            default=None,
-                        ),
-                    ],
-                    inner=[],
-                )
-            ],
+    @mock.patch.object(generator, "process_attribute")
+    @mock.patch.object(generator, "type_name")
+    @mock.patch.object(generator, "class_name")
+    def test_process_class(
+        self, mock_class_name, mock_type_name, mock_process_attribute
+    ):
+        mock_class_name.side_effect = lambda x: f"@{x}"
+        mock_type_name.side_effect = lambda x: f"!{x}"
+
+        a = Class(name="a", extensions=["m", "n"])
+        a.attrs = [
+            Attr(name=x, type=x, default=x, local_type=x) for x in "bcd"
+        ]
+        e = Class(name="e")
+        e.attrs = [
+            Attr(name=x, type=x, default=x, local_type=x) for x in "fgh"
+        ]
+
+        i = Class(name="i", extensions=["o"])
+        i.attrs = [
+            Attr(name=x, type=x, default=x, local_type=x) for x in "jkl"
+        ]
+        a.inner = [e, i]
+
+        generator.process_class(a)
+
+        mock_class_name.assert_has_calls(
+            [mock.call("a"), mock.call("e"), mock.call("i")]
         )
 
-        actual = generator.process_class(obj, {})
-        self.maxDiff = None
-        expected = {
-            "attrs": [
-                {
-                    "default": None,
-                    "forward_ref": True,
-                    "help": "",
-                    "local_name": "SearchExtraDays",
-                    "local_type": "Element",
-                    "name": "search_extra_days",
-                    "namespace": None,
-                    "restrictions": {},
-                    "type": 'Optional["TypeFlexibleTimeSpec.SearchExtraDays"]',
-                }
-            ],
-            "extensions": ["TypeTimeSpec"],
-            "help": "",
-            "inner": [
-                {
-                    "attrs": [
-                        {
-                            "default": None,
-                            "forward_ref": False,
-                            "help": "",
-                            "local_name": "DaysBefore",
-                            "local_type": "Attribute",
-                            "name": "days_before",
-                            "namespace": None,
-                            "restrictions": {},
-                            "type": "Optional[int]",
-                        },
-                        {
-                            "default": None,
-                            "forward_ref": False,
-                            "help": "",
-                            "local_name": "DaysAfter",
-                            "local_type": "Attribute",
-                            "name": "days_after",
-                            "namespace": None,
-                            "restrictions": {},
-                            "type": "Optional[int]",
-                        },
-                    ],
-                    "extensions": [],
-                    "help": None,
-                    "inner": [],
-                    "name": "SearchExtraDays",
-                }
-            ],
-            "name": "TypeFlexibleTimeSpec",
-        }
-        self.assertDictEqual(expected, asdict(actual))
+        mock_type_name.assert_has_calls(
+            [mock.call("m"), mock.call("n"), mock.call("o")]
+        )
+
+        mock_process_attribute.assert_has_calls(
+            [
+                mock.call(e.attrs[0], ["@a", "@e"]),
+                mock.call(e.attrs[1], ["@a", "@e"]),
+                mock.call(e.attrs[2], ["@a", "@e"]),
+                mock.call(i.attrs[0], ["@a", "@i"]),
+                mock.call(i.attrs[1], ["@a", "@i"]),
+                mock.call(i.attrs[2], ["@a", "@i"]),
+                mock.call(a.attrs[0], ["@a"]),
+                mock.call(a.attrs[1], ["@a"]),
+                mock.call(a.attrs[2], ["@a"]),
+            ]
+        )
+        self.assertEqual(9, mock_process_attribute.call_count)
+
+    @mock.patch("xsdata.utils.text.strip_prefix", return_value="nope")
+    @mock.patch.object(generator, "attribute_default", return_value="life")
+    @mock.patch.object(generator, "attribute_type", return_value="rab")
+    @mock.patch.object(generator, "attribute_name", return_value="oof")
+    def test_process_attribute(
+        self, mock_name, mock_type, mock_default, mock_strip_prefix
+    ):
+        attr = Attr(name="foo", type="bar", default="thug", local_type="")
+        generator.process_attribute(attr, ["a", "b"])
+
+        self.assertEqual("oof", attr.name)
+        self.assertEqual("rab", attr.type)
+        self.assertEqual("nope", attr.local_name)
+        self.assertEqual("life", attr.default)
+
+        mock_name.assert_called_once_with("foo")
+        mock_type.assert_called_once_with(attr, ["a", "b"])
+        mock_default.assert_called_once_with(attr)
+        mock_strip_prefix.assert_called_once_with("foo")
 
     def test_process_import(self):
-        package = Package(
-            name="FoObAr",
-            objects=[
-                Object(name="foo", alias="foo:bar"),
-                Object(name="foo_bar"),
-            ],
-        )
+        package = Package(name="bar", alias="foo:bar", source="some.foo.bar")
 
         actual = generator.process_import(package)
         self.assertIs(actual, package)
-        self.assertEqual("FoObAr", package.name)
-        self.assertEqual("Foo", package.objects[0].name)
-        self.assertEqual("FooBar", package.objects[0].alias)
-        self.assertEqual("FooBar", package.objects[1].name)
-        self.assertIsNone(package.objects[1].alias)
+        self.assertEqual("Bar", package.name)
+        self.assertEqual("FooBar", package.alias)
+        self.assertEqual("some.foo.bar", package.source)
 
     def test_class_name(self):
         self.assertEqual("XsString", generator.class_name("xs:string"))
@@ -144,30 +101,30 @@ class AbstractPythonGeneratorTests(TestCase):
         self.assertEqual("break_value", generator.attribute_name("BrEak"))
 
     def test_attribute_type(self):
-        overrides = {"thug:life"}
         parents = []
         attr = Attr(name="foo", type="foo_bar", default="foo", local_type="")
 
-        actual = generator.attribute_type(attr, overrides, parents)
+        actual = generator.attribute_type(attr, parents)
         self.assertEqual("FooBar", actual)
 
         attr.default = None
-        actual = generator.attribute_type(attr, overrides, parents)
+        actual = generator.attribute_type(attr, parents)
         self.assertEqual("Optional[FooBar]", actual)
 
         attr.forward_ref = True
         parents = ["Parent"]
-        actual = generator.attribute_type(attr, overrides, parents)
+        actual = generator.attribute_type(attr, parents)
         self.assertEqual('Optional["Parent.FooBar"]', actual)
 
         parents = ["A", "Parent"]
         attr.restrictions["max_occurs"] = "2"
-        actual = generator.attribute_type(attr, overrides, parents)
+        actual = generator.attribute_type(attr, parents)
         self.assertEqual('List["A.Parent.FooBar"]', actual)
 
         attr.type = "thug:life"
-        actual = generator.attribute_type(attr, overrides, parents)
-        self.assertEqual('List["A.Parent.ThugLife"]', actual)
+        attr.type_alias = "Boss:Life"
+        actual = generator.attribute_type(attr, parents)
+        self.assertEqual('List["A.Parent.BossLife"]', actual)
 
     def test_attribute_default(self):
         attr = Attr(name="foo", type="str", local_type="")

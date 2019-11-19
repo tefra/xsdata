@@ -620,7 +620,7 @@ class Schema(AnnotationBase):
     target_namespace: Optional[str]
     version: Optional[str]
     xmlns: Optional[str]
-    location: Optional[Path] = field(init=False)
+    location: Optional[Path] = field(default=None)
     element_form_default: FormType = field(default=FormType.UNQUALIFIED)
     attribute_form_default: FormType = field(default=FormType.UNQUALIFIED)
     includes: ArrayList[Include] = field(default_factory=list)

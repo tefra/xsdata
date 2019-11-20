@@ -6,7 +6,7 @@ from jinja2 import Environment, FileSystemLoader, Template
 
 from xsdata.codegen.python.dataclass.filters import filters
 from xsdata.codegen.python.generator import PythonAbstractGenerator
-from xsdata.codegen.python.resolver import ImportResolver
+from xsdata.codegen.resolver import DependenciesResolver
 from xsdata.models.codegen import Class, Package
 from xsdata.models.elements import Schema
 from xsdata.utils.text import snake_case
@@ -17,7 +17,7 @@ class DataclassGenerator(PythonAbstractGenerator):
         templates_dir = Path(__file__).parent.joinpath("templates")
         self.env = Environment(loader=FileSystemLoader(str(templates_dir)),)
         self.env.filters.update(filters)
-        self.resolver = ImportResolver()
+        self.resolver = DependenciesResolver()
 
     def template(self, name: str) -> Template:
         return self.env.get_template("{}.jinja2".format(name))

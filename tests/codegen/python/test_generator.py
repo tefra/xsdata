@@ -6,7 +6,7 @@ from xsdata.codegen.python.generator import (
 from xsdata.models.codegen import Attr, Class, Package
 
 
-class AbstractPythonGeneratorTests(TestCase):
+class PythonAbstractGeneratorTests(TestCase):
     @mock.patch.object(generator, "process_attribute")
     @mock.patch.object(generator, "type_name")
     @mock.patch.object(generator, "class_name")

@@ -2,13 +2,14 @@ from pathlib import Path
 from unittest import TestCase, mock
 
 from xsdata.codegen.python.dataclass.generator import DataclassGenerator
-from xsdata.codegen.python.resolver import ImportResolver
+from xsdata.codegen.resolver import DependenciesResolver
 from xsdata.models.codegen import Class, Package
 from xsdata.models.elements import Schema
 
 
 class DataclassGeneratorTests(TestCase):
-    @mock.patch.object(ImportResolver, "process")
+    @mock.patch.object(Path, "mkdir")
+    @mock.patch.object(DependenciesResolver, "process")
     @mock.patch.object(DataclassGenerator, "render_module")
     @mock.patch.object(DataclassGenerator, "render_classes")
     @mock.patch.object(DataclassGenerator, "prepare_imports")
@@ -18,6 +19,7 @@ class DataclassGeneratorTests(TestCase):
         mock_render_classes,
         mock_render_module,
         mock_resolved_process,
+        mock_mkdir,
     ):
         schema = Schema.create(location=Path("foo.xsd"))
         package = "some.Foo.Some.ThugLife"
@@ -52,10 +54,11 @@ class DataclassGeneratorTests(TestCase):
             imports=mock_prepare_imports.return_value,
             output=mock_render_classes.return_value,
         )
+        mock_mkdir.assert_called_once_with(parents=True, exist_ok=True)
 
     @mock.patch.object(DataclassGenerator, "render_class")
     @mock.patch.object(DataclassGenerator, "process_class")
-    @mock.patch.object(ImportResolver, "sorted_classes")
+    @mock.patch.object(DependenciesResolver, "sorted_classes")
     def test_render_classes(
         self, mock_sorted_classes, mock_process_class, mock_render_class
     ):
@@ -69,7 +72,7 @@ class DataclassGeneratorTests(TestCase):
         self.assertEqual(f"\n\n{output}\n", actual)
 
     @mock.patch.object(DataclassGenerator, "process_import")
-    @mock.patch.object(ImportResolver, "sorted_imports")
+    @mock.patch.object(DependenciesResolver, "sorted_imports")
     def test_prepare_imports(self, mock_sorted_imports, mock_process_import):
         packages = [
             Package(name="foo", source="omg"),

@@ -11,6 +11,8 @@ from xsdata.utils import text
 class PythonAbstractGenerator(AbstractGenerator, ABC):
     @classmethod
     def process_class(cls, obj: Class, parents: List[str] = None) -> Class:
+        """Normalize all class instance fields, extensions, name and the inner
+        classes recursively."""
         parents = parents or []
         obj.name = cls.class_name(obj.name)
         obj.extensions = [cls.type_name(ext) for ext in obj.extensions]
@@ -26,6 +28,7 @@ class PythonAbstractGenerator(AbstractGenerator, ABC):
 
     @classmethod
     def process_attribute(cls, attr: Attr, parents):
+        """Normalize attribute properties."""
         attr.name = cls.attribute_name(attr.name)
         attr.type = cls.attribute_type(attr, parents)
         attr.local_name = text.strip_prefix(attr.local_name)
@@ -33,6 +36,7 @@ class PythonAbstractGenerator(AbstractGenerator, ABC):
 
     @classmethod
     def process_import(cls, package: Package):
+        """Normalize import package properties."""
         package.name = cls.class_name(package.name)
         if package.alias:
             package.alias = cls.class_name(package.alias)
@@ -41,21 +45,40 @@ class PythonAbstractGenerator(AbstractGenerator, ABC):
 
     @classmethod
     def class_name(cls, name: str) -> str:
+        """Convert class names to pascal case."""
         return text.pascal_case(name)
 
     @classmethod
     def type_name(cls, name: str) -> str:
+        """Convert xsd types to python or apply class name conventions after
+        stripping any reference prefix."""
         return XSDType.get_local(name) or cls.class_name(
             text.strip_prefix(name)
         )
 
     @classmethod
     def attribute_name(cls, name: str) -> str:
+        """
+        Strip reference prefix and turn to snake case.
+
+        If the name is one of the python reserved words append the
+        prefix _value
+        """
         name = text.strip_prefix(name)
         return text.snake_case(replace_words.get(name.lower(), name))
 
     @classmethod
     def attribute_type(cls, attr: Attr, parents: List[str]) -> str:
+        """
+        Normalize attribute type.
+
+        Steps:
+            * If type alias is present use class name normalization
+            * Otherwise use the type name normalization
+            * Prepend outer class names and quote result for forward references
+            * Wrap the result with List if the field accepts a list of values
+            * Wrap the result with Optional if the field default value is None
+        """
         result = (
             cls.class_name(attr.type_alias)
             if attr.type_alias
@@ -74,6 +97,7 @@ class PythonAbstractGenerator(AbstractGenerator, ABC):
 
     @classmethod
     def attribute_default(cls, attr: Attr) -> Optional[Any]:
+        """Normalize default value/factory by the attribute type."""
         if attr.is_list:
             return "list"
         elif isinstance(attr.default, str):

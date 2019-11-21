@@ -7,6 +7,8 @@ def arguments(data: dict):
     def prep(key, value):
         if isinstance(value, str) and not has_quotes(value):
             value = '"{}"'.format(value.replace('"', "'"))
+            if key == "pattern":
+                value = f"r{value}"
         return f"{key}={value}"
 
     return ",\n".join(

@@ -2,6 +2,8 @@ from types import GeneratorType
 from unittest import TestCase
 from unittest.mock import MagicMock, PropertyMock, call, patch
 
+from lxml import etree
+
 from xsdata.builder import ClassBuilder
 from xsdata.models.codegen import Attr, Class
 from xsdata.models.elements import (
@@ -20,44 +22,58 @@ class ClassBuilderTests(TestCase):
         self.builder = ClassBuilder()
 
     @patch.object(ClassBuilder, "build_classes")
-    @patch.object(ClassBuilder, "register_simple_types")
-    def test_build(self, mock_register_simple_types, mock_build_classes):
+    @patch.object(ClassBuilder, "add_common_types")
+    def test_build(self, mock_add_common_types, mock_build_classes):
         class_list = [Class(name="foo")]
         mock_build_classes.return_value = [Class(name="foo")]
-        schema = Schema.create(simple_types=[SimpleType.create()])
+        schema = Schema.create()
 
         result = self.builder.build(schema)
 
-        mock_register_simple_types.assert_called_once_with(schema.simple_types)
+        mock_add_common_types.assert_called_once_with(schema)
         self.assertEqual(class_list, result)
 
-    @patch("xsdata.builder.logger.warning")
+    @patch.object(ClassBuilder, "flatten_common_types")
     @patch.object(ClassBuilder, "build_class")
-    def test_register_simple_types(self, mock_build_class, mock_warning):
-        class_list = [Class(name="a"), Class(name="a"), Class(name="b")]
+    def test_add_common_types(
+        self, mock_build_class, mock_flatten_common_types
+    ):
+        class_list = [Class(name=x) for x in "abcd"]
         mock_build_class.side_effect = class_list
+        mock_flatten_common_types.side_effect = lambda x, y: x
 
-        simple_types = [SimpleType.create(name=x) for x in "aab"]
-        schema = Schema.create(simple_types=simple_types)
-        expected = {x.name: x for x in class_list}
+        schema = Schema.create(
+            nsmap={"other": "http://namespace/other"},
+            target_namespace="http://namespace/common",
+            simple_types=[SimpleType.create(name=x) for x in "ab"],
+            attribute_groups=[AttributeGroup.create(name=x) for x in "cd"],
+        )
+        self.builder.add_common_types(schema)
 
-        self.builder.register_simple_types(schema.simple_types)
-        self.assertEqual(expected, self.builder.simple_types)
+        expected = {
+            etree.QName(schema.target_namespace, obj.name).text: obj
+            for obj in class_list
+        }
+        self.assertEqual(expected, self.builder.common_types)
+
         mock_build_class.assert_has_calls(
-            [call(item) for item in simple_types]
+            [call(item) for item in schema.simple_types]
+            + [call(item) for item in schema.attribute_groups]
         )
-        mock_warning.assert_called_once_with(
-            "Name conflict for simple type: a"
+        mock_flatten_common_types.assert_has_calls(
+            [call(obj, schema.nsmap) for obj in class_list]
         )
 
+    @patch.object(ClassBuilder, "flatten_common_types")
     @patch.object(ClassBuilder, "build_class")
-    def test_build_classes(self, mock_build_class):
+    def test_build_classes(self, mock_build_class, mock_flatten_common_types):
         attributes = [Attribute.create(name=name) for name in "ab"]
         attribute_groups = [AttributeGroup.create(name=name) for name in "cd"]
         complex_types = [ComplexType.create(name=name) for name in "ef"]
         elements = [Element.create(name=name) for name in "gh"]
 
         schema = Schema.create(
+            nsmap={None: "http://namespace/target"},
             attributes=attributes,
             attribute_groups=attribute_groups,
             complex_types=complex_types,
@@ -65,29 +81,46 @@ class ClassBuilderTests(TestCase):
         )
 
         side_effect = [Class(name=x.name) for x in attributes]
-        side_effect.extend([Class(name=x.name) for x in attribute_groups])
         side_effect.extend([Class(name=x.name) for x in complex_types])
         side_effect.extend([Class(name=x.name) for x in elements])
         mock_build_class.side_effect = side_effect
 
         calls = [call(x) for x in attributes]
-        calls.extend([call(x) for x in attribute_groups])
         calls.extend([call(x) for x in complex_types])
         calls.extend([call(x) for x in elements])
 
         class_list = self.builder.build_classes(schema)
         self.assertEqual(side_effect, class_list)
         mock_build_class.assert_has_calls(calls)
+        mock_flatten_common_types.assert_has_calls(
+            [call(x, schema.nsmap) for x in side_effect]
+        )
 
-    def test_find_simple_type(self):
-        classes = {name: Class(name=name) for name in "ab"}
-        self.builder.simple_types.update(classes)
+    def test_find_common_type(self):
+        nsmap = {
+            None: "http://namespace/target",
+            "other": "http://namespace/other",
+        }
 
-        self.assertEqual(classes["a"], self.builder.find_simple_type("ref:a"))
-        self.assertEqual(classes["a"], self.builder.find_simple_type("a"))
-        self.assertIsNone(self.builder.find_simple_type("c"))
+        self.builder.common_types.update(
+            {etree.QName(nsmap[None], x).text: Class(name=x) for x in "ab"}
+        )
+        self.builder.common_types.update(
+            {etree.QName(nsmap["other"], x).text: Class(name=x) for x in "cd"}
+        )
 
-    @patch.object(ClassBuilder, "replace_simple_types", return_value=None)
+        common_keys = list(self.builder.common_types.keys())
+        common_values = list(self.builder.common_types.values())
+
+        actual = self.builder.find_common_type("a", nsmap)
+        self.assertEqual(0, common_values.index(actual))
+        self.assertEqual("{http://namespace/target}a", common_keys[0])
+
+        self.assertIsNone(self.builder.find_common_type("d", nsmap))
+        actual = self.builder.find_common_type("other:d", nsmap)
+        self.assertEqual(3, common_values.index(actual))
+        self.assertEqual("{http://namespace/other}d", common_keys[3])
+
     @patch.object(ClassBuilder, "build_class_attribute", return_value=None)
     @patch.object(ClassBuilder, "element_children")
     @patch.object(Element, "display_help", new_callable=PropertyMock)
@@ -100,7 +133,6 @@ class ClassBuilderTests(TestCase):
         mock_display_help,
         mock_element_children,
         mock_build_class_attribute,
-        mock_replace_simple_types,
     ):
         mock_real_name.return_value = "name"
         mock_extensions.return_value = ["foo", "bar"]
@@ -117,13 +149,11 @@ class ClassBuilderTests(TestCase):
                 for child in mock_element_children.return_value
             ]
         )
-        mock_replace_simple_types.assert_called_once_with(result)
 
         expected = Class(name="name", extensions=["foo", "bar"], help="sos")
         self.assertEqual(expected, result)
 
     @patch("xsdata.builder.logger.warning")
-    @patch.object(ClassBuilder, "replace_simple_types", return_value=None)
     @patch.object(ClassBuilder, "build_class_attribute", return_value=None)
     @patch.object(ClassBuilder, "element_children")
     @patch.object(Element, "display_help", new_callable=PropertyMock)
@@ -136,7 +166,6 @@ class ClassBuilderTests(TestCase):
         mock_display_help,
         mock_element_children,
         mock_build_class_attribute,
-        mock_replace_simple_types,
         mock_warning,
     ):
         mock_real_name.return_value = "name"
@@ -148,7 +177,6 @@ class ClassBuilderTests(TestCase):
         result = self.builder.build_class(element)
 
         mock_build_class_attribute.assert_not_called()
-        mock_replace_simple_types.assert_not_called()
         mock_warning.assert_called_once_with("Empty class: `name`")
 
         expected = Class(name="name", help="sos")
@@ -283,9 +311,13 @@ class ClassBuilderTests(TestCase):
         self.assertEqual(mock_build_class.return_value, parent.inner[0])
 
 
-class ClassBuilderReplaceSimpleTypesTests(TestCase):
+class ClassBuilderFlattenCommonTypesTests(TestCase):
     def setUp(self) -> None:
         self.builder = ClassBuilder()
+        self.nsmap = {
+            None: "http://namespace/target",
+            "other": "http://namespace/other",
+        }
         self.super_int = Class(
             name="SuperInt",
             attrs=[
@@ -295,7 +327,14 @@ class ClassBuilderReplaceSimpleTypesTests(TestCase):
                     local_type="Attribute",
                     help=None,
                     namespace=None,
-                )
+                ),
+                Attr(
+                    name="decimals",
+                    type="int",
+                    local_type="Attribute",
+                    help=None,
+                    namespace=None,
+                ),
             ],
         )
         self.super_str = Class(
@@ -311,35 +350,51 @@ class ClassBuilderReplaceSimpleTypesTests(TestCase):
                 )
             ],
         )
-        self.builder.simple_types = {
-            "SuperInt": self.super_int,
-            "SuperStr": self.super_str,
+        self.super_float = Class(
+            name="SuperFloat",
+            attrs=[
+                Attr(
+                    name="text",
+                    type="float",
+                    restrictions={},
+                    local_type="Attribute",
+                    help=None,
+                    namespace=None,
+                )
+            ],
+        )
+
+        self.builder.common_types = {
+            "{http://namespace/target}SuperInt": self.super_int,
+            "{http://namespace/target}SuperFloat": self.super_float,
+            "{http://namespace/other}SuperStr": self.super_str,
         }
 
     def test_add_class_attributes(self):
         item = Class(name="parent")
         item.extensions = ["SuperInt"]
 
-        self.builder.replace_simple_types(item)
+        self.builder.flatten_common_types(item, nsmap=self.nsmap)
         self.assertEqual([], item.extensions)
-        self.assertEqual(self.super_int.attrs[0], item.attrs[0])
+        self.assertEqual(self.super_int.attrs, item.attrs)
         self.assertIsNot(self.super_int.attrs[0], item.attrs[0])
+        self.assertIsNot(self.super_int.attrs[1], item.attrs[1])
 
     def test_update_class_attributes(self):
         item = Class(
             name="parent",
             attrs=[
                 Attr(
-                    name="number",
-                    type="SuperInt",
+                    name="text",
+                    type="SuperFloat",
                     local_type="Attribute",
                     help=None,
                     namespace=None,
-                    restrictions={"min": 1},
+                    restrictions={"fraction_digits": 3},
                 ),
                 Attr(
                     name="text",
-                    type="SuperStr",
+                    type="other:SuperStr",
                     local_type="Attribute",
                     help=None,
                     namespace=None,
@@ -348,9 +403,9 @@ class ClassBuilderReplaceSimpleTypesTests(TestCase):
             ],
         )
 
-        self.builder.replace_simple_types(item)
-        self.assertEqual("int", item.attrs[0].type)
-        self.assertEqual({"min": 1}, item.attrs[0].restrictions)
+        self.builder.flatten_common_types(item, nsmap=self.nsmap)
+        self.assertEqual("float", item.attrs[0].type)
+        self.assertEqual({"fraction_digits": 3}, item.attrs[0].restrictions)
         self.assertEqual("str", item.attrs[1].type)
         self.assertEqual(
             {"length": 3, "required": True}, item.attrs[1].restrictions
@@ -361,11 +416,11 @@ class ClassBuilderReplaceSimpleTypesTests(TestCase):
             name="parent",
             inner=[
                 Class(name="foo", extensions=["SuperInt"]),
-                Class(name="bar", extensions=["SuperStr"]),
+                Class(name="bar", extensions=["other:SuperStr"]),
             ],
         )
 
-        self.builder.replace_simple_types(item)
+        self.builder.flatten_common_types(item, nsmap=self.nsmap)
         self.assertEqual([], item.extensions)
         self.assertEqual(self.super_int.attrs[0], item.inner[0].attrs[0])
         self.assertIsNot(self.super_int.attrs[0], item.inner[1].attrs[0])

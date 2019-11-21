@@ -80,7 +80,7 @@ class DependenciesResolver:
         """Create and append an import package to the list of imports, collect
         a map of aliases for when we process the list of classes to
         generate."""
-        if alias:
+        if alias is not None:
             self.aliases[alias] = alias
         self.imports.append(Package(name=name, source=package, alias=alias))
 

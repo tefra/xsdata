@@ -1,7 +1,9 @@
 import copy
 import logging
 from dataclasses import dataclass, field
-from typing import Dict, Iterator, List, Union
+from typing import Any, Dict, Iterator, List, Optional, Union
+
+from lxml import etree
 
 from xsdata.models.codegen import Attr, Class
 from xsdata.models.elements import (
@@ -15,7 +17,6 @@ from xsdata.models.elements import (
     SimpleType,
 )
 from xsdata.models.enums import XSDType
-from xsdata.utils.text import strip_prefix
 
 logger = logging.getLogger(__name__)
 
@@ -27,27 +28,27 @@ AttributeElement = Union[Attribute, Element, Restriction]
 
 @dataclass
 class ClassBuilder:
-    simple_types: Dict[str, Class] = field(default_factory=dict)
+    common_types: Dict[str, Class] = field(default_factory=dict)
 
     def build(self, schema: Schema) -> List[Class]:
         """Generate classes from schema elements."""
 
-        self.register_simple_types(schema.simple_types)
+        self.add_common_types(schema)
         return self.build_classes(schema)
 
-    def register_simple_types(self, simple_types: List[SimpleType]):
-        """Take global simple types create them and add them to the internal
-        storage for later usage when we attempt to replace class extensions and
-        attributes with the simple type restrictions and value fields."""
+    def add_common_types(self, schema: Schema):
+        classes: List[Class] = []
+        classes.extend(map(self.build_class, schema.simple_types))
+        classes.extend(map(self.build_class, schema.attribute_groups))
 
-        for simple_type in simple_types:
-            obj = self.build_class(simple_type)
-            if obj.name not in self.simple_types:
-                self.simple_types[obj.name] = obj
-            else:
-                # If you encounter this warning then it's time to implement
-                # qname lookup {namespace}{name}
-                logger.warning(f"Name conflict for simple type: {obj.name}")
+        self.common_types.update(
+            {
+                etree.QName(
+                    schema.target_namespace, obj.name
+                ).text: self.flatten_common_types(obj, schema.nsmap)
+                for obj in classes
+            }
+        )
 
     def build_classes(self, schema) -> List[Class]:
         """Go through the global elements of a schema: attributes, attribute
@@ -55,16 +56,26 @@ class ClassBuilder:
 
         classes: List[Class] = []
         classes.extend(map(self.build_class, schema.attributes))
-        classes.extend(map(self.build_class, schema.attribute_groups))
         classes.extend(map(self.build_class, schema.complex_types))
         classes.extend(map(self.build_class, schema.elements))
+
+        for obj in classes:
+            self.flatten_common_types(obj, schema.nsmap)
+
         return classes
 
-    def find_simple_type(self, name: str):
-        """String namespace prefix and look just for the name."""
+    def find_common_type(
+        self, name: str, nsmap: Dict[Any, str]
+    ) -> Optional[Class]:
+        """Find by namespace reference a common class."""
+        prefix = None
+        split_name = name.split(":")
+        if len(split_name) == 2:
+            prefix, name = split_name
 
-        name = strip_prefix(name)
-        return self.simple_types.get(name)
+        namespace = nsmap.get(prefix)
+        qname = etree.QName(namespace, name)
+        return self.common_types.get(qname.text)
 
     def build_class(self, obj: BaseElement) -> Class:
         """Build and return a class instance."""
@@ -79,39 +90,41 @@ class ClassBuilder:
 
         if len(item.extensions) == 0 and len(item.attrs) == 0:
             logger.warning(f"Empty class: `{item.name}`")
-        else:
-            self.replace_simple_types(item)
+
         return item
 
-    def replace_simple_types(self, item: Class):
+    def flatten_common_types(
+        self, item: Class, nsmap: Dict[Any, str]
+    ) -> Class:
         """Flatten simple types like strings or numbers with restrictions by
         merging the simple types properties into the input class instance."""
 
         try:
             for inner in item.inner:
-                self.replace_simple_types(inner)
+                self.flatten_common_types(inner, nsmap)
 
-            for i in range(len(item.extensions)):
-                ext = item.extensions[i]
-                simple = self.find_simple_type(ext)
-                if simple:
-                    item.attrs.insert(0, copy.deepcopy(simple.attrs[0]))
-                    item.extensions.pop(i)
+            for ext in list(item.extensions):
+                common = self.find_common_type(ext, nsmap)
+                if common is not None:
+                    item.attrs = copy.deepcopy(common.attrs) + item.attrs
+                    item.extensions.remove(ext)
 
             for attr in item.attrs:
-                simple = self.find_simple_type(attr.type)
-                if not simple:
-                    pass
-                elif len(simple.attrs) == 1:
-                    value = simple.attrs[0]
+                common = self.find_common_type(attr.type, nsmap)
+                if common is None:
+                    continue
+                elif len(common.attrs) == 1:
+                    value = common.attrs[0]
                     attr.type = value.type
                     attr.restrictions.update(value.restrictions)
                 else:
                     # Most likely enumeration
-                    logger.debug(f"Missing implementation: {type(simple)} ")
+                    logger.debug(f"Missing implementation: {type(common)} ")
                     attr.type = XSDType.STRING.code
         except IndexError:
             logger.warning(f"Failed to flatten types:`{item.name}`")
+
+        return item
 
     def element_children(self, obj: ElementBase) -> Iterator[AttributeElement]:
         """Recursively find and return all child elements that can be used to

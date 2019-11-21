@@ -1,8 +1,8 @@
 from dataclasses import dataclass, field
-from typing import Any, List, Optional
+from typing import Any, List, Optional, Type
 
 
-@dataclass
+@dataclass(unsafe_hash=True)
 class Attr:
     name: str
     local_name: str = field(init=False)
@@ -23,16 +23,17 @@ class Attr:
         return int(self.restrictions.get("max_occurs", 1)) > 1
 
 
-@dataclass
+@dataclass(unsafe_hash=True)
 class Class:
     name: str
+    type: Type
     help: Optional[str] = field(default=None)
     extensions: List[str] = field(default_factory=list)
     attrs: List[Attr] = field(default_factory=list)
     inner: List["Class"] = field(default_factory=list)
 
 
-@dataclass
+@dataclass(unsafe_hash=True)
 class Package:
     name: str
     source: str

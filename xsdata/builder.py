@@ -1,9 +1,6 @@
-import copy
 import logging
-from dataclasses import dataclass, field
-from typing import Any, Dict, Iterator, List, Optional, Union
-
-from lxml import etree
+from dataclasses import dataclass
+from typing import Iterator, List, Union
 
 from xsdata.models.codegen import Attr, Class
 from xsdata.models.elements import (
@@ -16,7 +13,6 @@ from xsdata.models.elements import (
     Schema,
     SimpleType,
 )
-from xsdata.models.enums import XSDType
 
 logger = logging.getLogger(__name__)
 
@@ -28,60 +24,24 @@ AttributeElement = Union[Attribute, Element, Restriction]
 
 @dataclass
 class ClassBuilder:
-    common_types: Dict[str, Class] = field(default_factory=dict)
+    schema: Schema
 
-    def build(self, schema: Schema) -> List[Class]:
+    def build(self) -> List[Class]:
         """Generate classes from schema elements."""
-
-        self.add_common_types(schema)
-        return self.build_classes(schema)
-
-    def add_common_types(self, schema: Schema):
         classes: List[Class] = []
-        classes.extend(map(self.build_class, schema.simple_types))
-        classes.extend(map(self.build_class, schema.attribute_groups))
-
-        self.common_types.update(
-            {
-                etree.QName(
-                    schema.target_namespace, obj.name
-                ).text: self.flatten_common_types(obj, schema.nsmap)
-                for obj in classes
-            }
-        )
-
-    def build_classes(self, schema) -> List[Class]:
-        """Go through the global elements of a schema: attributes, attribute
-        groups, complex types and elements and build a list of classes."""
-
-        classes: List[Class] = []
-        classes.extend(map(self.build_class, schema.attributes))
-        classes.extend(map(self.build_class, schema.complex_types))
-        classes.extend(map(self.build_class, schema.elements))
-
-        for obj in classes:
-            self.flatten_common_types(obj, schema.nsmap)
-
+        classes.extend(map(self.build_class, self.schema.simple_types))
+        classes.extend(map(self.build_class, self.schema.attribute_groups))
+        classes.extend(map(self.build_class, self.schema.attributes))
+        classes.extend(map(self.build_class, self.schema.complex_types))
+        classes.extend(map(self.build_class, self.schema.elements))
         return classes
-
-    def find_common_type(
-        self, name: str, nsmap: Dict[Any, str]
-    ) -> Optional[Class]:
-        """Find by namespace reference a common class."""
-        prefix = None
-        split_name = name.split(":")
-        if len(split_name) == 2:
-            prefix, name = split_name
-
-        namespace = nsmap.get(prefix)
-        qname = etree.QName(namespace, name)
-        return self.common_types.get(qname.text)
 
     def build_class(self, obj: BaseElement) -> Class:
         """Build and return a class instance."""
 
         item = Class(
             name=obj.real_name,
+            type=type(obj),
             extensions=obj.extensions,
             help=obj.display_help,
         )
@@ -90,39 +50,6 @@ class ClassBuilder:
 
         if len(item.extensions) == 0 and len(item.attrs) == 0:
             logger.warning(f"Empty class: `{item.name}`")
-
-        return item
-
-    def flatten_common_types(
-        self, item: Class, nsmap: Dict[Any, str]
-    ) -> Class:
-        """Flatten simple types like strings or numbers with restrictions by
-        merging the simple types properties into the input class instance."""
-
-        try:
-            for inner in item.inner:
-                self.flatten_common_types(inner, nsmap)
-
-            for ext in list(item.extensions):
-                common = self.find_common_type(ext, nsmap)
-                if common is not None:
-                    item.attrs = copy.deepcopy(common.attrs) + item.attrs
-                    item.extensions.remove(ext)
-
-            for attr in item.attrs:
-                common = self.find_common_type(attr.type, nsmap)
-                if common is None:
-                    continue
-                elif len(common.attrs) == 1:
-                    value = common.attrs[0]
-                    attr.type = value.type
-                    attr.restrictions.update(value.restrictions)
-                else:
-                    # Most likely enumeration
-                    logger.debug(f"Missing implementation: {type(common)} ")
-                    attr.type = XSDType.STRING.code
-        except IndexError:
-            logger.warning(f"Failed to flatten types:`{item.name}`")
 
         return item
 
@@ -192,6 +119,3 @@ class ClassBuilder:
             and obj.real_type is None
             and obj.complex_type is not None
         )
-
-
-builder = ClassBuilder()

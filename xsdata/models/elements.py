@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import Any as Anything
 from typing import Dict
 from typing import List as ArrayList
-from typing import Optional
+from typing import Optional, Type, TypeVar
 
 from lxml import etree
 
@@ -27,13 +27,15 @@ from xsdata.models.mixins import (
 )
 from xsdata.utils.text import snake_case, strip_prefix
 
+T = TypeVar("T", bound="BaseModel")
+
 
 class BaseModel:
     def __init__(self, *args, **kwargs):
         pass
 
     @classmethod
-    def from_element(cls, el: etree.Element):
+    def from_element(cls: Type[T], el: etree.Element) -> T:
         attrs = {
             snake_case(strip_prefix(key, "}")): value
             for key, value in el.attrib.items()
@@ -56,14 +58,14 @@ class BaseModel:
         return cls(**data)
 
     @classmethod
-    def default_value(cls, field: Attrib):
+    def default_value(cls: Type[T], field: Attrib) -> Anything:
         factory = getattr(field, "default_factory")
         if getattr(field, "default_factory") is not MISSING:
             return factory()  # mypy: ignore
         return None if field.default is MISSING else field.default
 
     @classmethod
-    def xsd_value(cls, field: Attrib, kwargs):
+    def xsd_value(cls, field: Attrib, kwargs: Dict) -> Anything:
         name = field.name
         value = kwargs[name]
         clazz = field.type
@@ -89,7 +91,7 @@ class BaseModel:
         return clazz(value)
 
     @classmethod
-    def create(cls, **kwargs) -> "BaseModel":
+    def create(cls: Type[T], **kwargs) -> T:
         if not kwargs.get("prefix") and not kwargs.get("nsmap"):
             kwargs.update({"prefix": "xs", "nsmap": {"xs": XMLSchema}})
 
@@ -604,7 +606,7 @@ class Notation(AnnotationBase):
 
 
 @dataclass
-class Redefined(AnnotationBase):
+class Redefine(AnnotationBase):
     schema_location: str
     simple_type: Optional[SimpleType]
     complex_type: Optional[ComplexType]
@@ -625,7 +627,7 @@ class Schema(AnnotationBase):
     attribute_form_default: FormType = field(default=FormType.UNQUALIFIED)
     includes: ArrayList[Include] = field(default_factory=list)
     imports: ArrayList[Import] = field(default_factory=list)
-    redefineds: ArrayList[Redefined] = field(default_factory=list)
+    redefines: ArrayList[Redefine] = field(default_factory=list)
     annotations: ArrayList[Annotation] = field(default_factory=list)
     simple_types: ArrayList[SimpleType] = field(default_factory=list)
     complex_types: ArrayList[ComplexType] = field(default_factory=list)

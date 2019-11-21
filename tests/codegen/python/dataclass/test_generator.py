@@ -1,9 +1,9 @@
 from pathlib import Path
 from unittest import TestCase, mock
 
+from tests.unittest import ClassFactory, PackageFactory
 from xsdata.codegen.python.dataclass.generator import DataclassGenerator
 from xsdata.codegen.resolver import DependenciesResolver
-from xsdata.models.codegen import Class, Package
 from xsdata.models.elements import Schema
 
 
@@ -23,10 +23,12 @@ class DataclassGeneratorTests(TestCase):
     ):
         schema = Schema.create(location=Path("foo.xsd"))
         package = "some.Foo.Some.ThugLife"
-        classes = [Class(name="a")]
+        classes = ClassFactory.list(3)
 
         mock_render_module.return_value = "module"
-        mock_prepare_imports.return_value = [Package(name="foo", source="bar")]
+        mock_prepare_imports.return_value = [
+            PackageFactory.create(name="foo", source="bar")
+        ]
         mock_render_classes.return_value = "classes"
 
         iterator = DataclassGenerator().render(schema, classes, package)
@@ -63,8 +65,8 @@ class DataclassGeneratorTests(TestCase):
         self, mock_sorted_classes, mock_process_class, mock_render_class
     ):
         renders = [" does it matter?", " white space "]
-        mock_sorted_classes.return_value = [Class(name=name) for name in "ab"]
-        mock_process_class.side_effect = [Class(name=name) for name in "cd"]
+        mock_sorted_classes.return_value = ClassFactory.list(2)
+        mock_process_class.side_effect = ClassFactory.list(2)
         mock_render_class.side_effect = renders
         output = "\n".join(renders).strip()
 
@@ -75,14 +77,14 @@ class DataclassGeneratorTests(TestCase):
     @mock.patch.object(DependenciesResolver, "sorted_imports")
     def test_prepare_imports(self, mock_sorted_imports, mock_process_import):
         packages = [
-            Package(name="foo", source="omg"),
-            Package(name="bar", source="omg"),
-            Package(name="thug", source="life"),
+            PackageFactory.create(name="foo", source="omg"),
+            PackageFactory.create(name="bar", source="omg"),
+            PackageFactory.create(name="thug", source="life"),
         ]
         processed = [
-            Package(name="aaa", source="a"),
-            Package(name="bbb", source="b"),
-            Package(name="ccc", source="c"),
+            PackageFactory.create(name="aaa", source="a"),
+            PackageFactory.create(name="bbb", source="b"),
+            PackageFactory.create(name="ccc", source="c"),
         ]
 
         mock_sorted_imports.return_value = packages

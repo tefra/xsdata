@@ -4,8 +4,9 @@ from typing import List
 import click
 import click_completion
 
-from xsdata.builder import builder
+from xsdata.builder import ClassBuilder
 from xsdata.parser import SchemaParser
+from xsdata.reducer import reducer
 from xsdata.version import version
 from xsdata.writer import writer
 
@@ -52,7 +53,8 @@ def process(xsd_path: Path, package: str, renderer: str):
             renderer=renderer,
         )
 
-    classes = builder.build(schema=schema)
+    classes = ClassBuilder(schema=schema).build()
+    classes = reducer.process(schema=schema, classes=classes)
     writer.write(
         schema=schema, classes=classes, package=package, renderer=renderer
     )

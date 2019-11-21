@@ -1,8 +1,8 @@
 from collections.abc import Iterator
 from unittest import TestCase, mock
 
+from tests.unittest import AttrFactory, ClassFactory, PackageFactory
 from xsdata.codegen.resolver import DependenciesResolver
-from xsdata.models.codegen import Attr, Class, Package
 from xsdata.models.elements import Schema
 
 
@@ -16,14 +16,16 @@ class DependenciesResolverTest(TestCase):
     def test_process(
         self, mock_create_class_map, create_class_list, mock_resolve_imports
     ):
-        classes = [Class(name=name) for name in "ab"]
+        classes = ClassFactory.list(3)
         schema = Schema.create()
         package = "foo.bar.thug"
 
         mock_create_class_map.return_value = {"b": classes[0]}
         create_class_list.return_value = classes[::-1]
 
-        self.resolver.imports.append(Package(name="foo", source="bar"))
+        self.resolver.imports.append(
+            PackageFactory.create(name="foo", source="bar")
+        )
         self.resolver.aliases = {"a": "a"}
 
         self.resolver.process(classes, schema, package)
@@ -43,7 +45,10 @@ class DependenciesResolverTest(TestCase):
         mock_resolve_imports.assert_called_once_with()
 
     def test_sorted_imports(self):
-        packages = [Package(name=x, alias=None, source="foo") for x in "cab"]
+        packages = [
+            PackageFactory.create(name=x, alias=None, source="foo")
+            for x in "cab"
+        ]
         self.resolver.imports = packages
 
         result = self.resolver.sorted_imports()
@@ -59,7 +64,9 @@ class DependenciesResolverTest(TestCase):
         mock_apply_aliases.side_effect = lambda x: x
 
         self.resolver.class_list = ["a", "b", "c", "d"]
-        self.resolver.class_map = {x: Class(name=x) for x in "ca"}
+        self.resolver.class_map = {
+            x: ClassFactory.create(name=x) for x in "ca"
+        }
 
         result = self.resolver.sorted_classes()
         self.assertIsInstance(result, Iterator)
@@ -72,16 +79,13 @@ class DependenciesResolverTest(TestCase):
 
     def test_apply_aliases(self):
         self.resolver.aliases = {"d": "IamD", "a": "IamA"}
-        obj = Class(
+        obj = ClassFactory.create(
             name="a",
-            attrs=[Attr(name=x, type=x, local_type="Element") for x in "ab"],
+            attrs=[AttrFactory.create(name=x, type=x) for x in "ab"],
             inner=[
-                Class(
+                ClassFactory.create(
                     name="b",
-                    attrs=[
-                        Attr(name=x, type=x, local_type="Element")
-                        for x in "cd"
-                    ],
+                    attrs=[AttrFactory.create(name=x, type=x) for x in "cd"],
                 ),
             ],
         )
@@ -105,7 +109,7 @@ class DependenciesResolverTest(TestCase):
             "thug:life",  # life class exists add alias
             "common:type",  # type class doesn't exist add just the name
         ]
-        self.resolver.class_map = {"life": Class(name="life")}
+        self.resolver.class_map = {"life": ClassFactory.create(name="life")}
         mock_import_classes.return_value = classes
         mock_find_package.side_effect = ["first", "second", "third", "forth"]
 
@@ -125,8 +129,8 @@ class DependenciesResolverTest(TestCase):
         self.resolver.add_import("foo", "there", "bar")
         self.resolver.add_import("thug", "there", None)
 
-        first = Package(name="foo", alias="bar", source="there")
-        second = Package(name="thug", alias=None, source="there")
+        first = PackageFactory.create(name="foo", alias="bar", source="there")
+        second = PackageFactory.create(name="thug", source="there")
 
         self.assertEqual(2, len(self.resolver.imports))
         self.assertEqual(first, self.resolver.imports[0])
@@ -138,8 +142,8 @@ class DependenciesResolverTest(TestCase):
             target_namespace="http://foobar/common"
         )
         self.resolver.package = "common.foo"
-        self.resolver.add_package(Class(name="foobar"))
-        self.resolver.add_package(Class(name="none"))
+        self.resolver.add_package(ClassFactory.create(name="foobar"))
+        self.resolver.add_package(ClassFactory.create(name="none"))
 
         expected = {
             "{http://foobar/common}foobar": "common.foo",
@@ -174,38 +178,38 @@ class DependenciesResolverTest(TestCase):
         self.assertEqual(["a", "c", "e", "f"], self.resolver.import_classes())
 
     def test_create_class_map(self):
-        classes = [Class(name=name) for name in "ab"]
+        classes = [ClassFactory.create(name=name) for name in "ab"]
         expected = {obj.name: obj for obj in classes}
         self.assertEqual(expected, self.resolver.create_class_map(classes))
 
     def test_create_class_list(self):
-        first = Class(
+        first = ClassFactory.create(
             name="a",
             inner=[
-                Class(
+                ClassFactory.create(
                     name="b",
                     attrs=[
-                        Attr(
-                            name="c", type="f", local_type="", forward_ref=True
+                        AttrFactory.create(
+                            name="c", type="f", forward_ref=True
                         ),
-                        Attr(name="d", type="xs:string", local_type=""),
-                        Attr(name="e", type="c:g", local_type=""),
+                        AttrFactory.create(name="d", type="xs:string"),
+                        AttrFactory.create(name="e", type="c:g"),
                     ],
                 ),
-                Class(
+                ClassFactory.create(
                     name="f",
                     attrs=[
-                        Attr(name="h", type="i", local_type=""),
-                        Attr(name="j", type="xs:string", local_type=""),
-                        Attr(name="k", type="l", local_type=""),
+                        AttrFactory.create(name="h", type="i"),
+                        AttrFactory.create(name="j", type="xs:string"),
+                        AttrFactory.create(name="k", type="l"),
                     ],
                 ),
             ],
         )
-        second = Class(
-            name="l", attrs=[Attr(name="m", type="o", local_type="")]
+        second = ClassFactory.create(
+            name="l", attrs=[AttrFactory.create(name="m", type="o")],
         )
-        third = Class(name="p", extensions=["xs:int", "a"])
+        third = ClassFactory.create(name="p", extensions=["xs:int", "a"])
 
         classes = [first, second, third]
         expected = ["c:g", "i", "o", "l", "a", "p"]

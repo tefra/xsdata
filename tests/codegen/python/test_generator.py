@@ -1,9 +1,9 @@
 from unittest import TestCase, mock
 
+from tests.unittest import AttrFactory, ClassFactory, PackageFactory
 from xsdata.codegen.python.generator import (
     PythonAbstractGenerator as generator,
 )
-from xsdata.models.codegen import Attr, Class, Package
 
 
 class PythonAbstractGeneratorTests(TestCase):
@@ -16,19 +16,13 @@ class PythonAbstractGeneratorTests(TestCase):
         mock_class_name.side_effect = lambda x: f"@{x}"
         mock_type_name.side_effect = lambda x: f"!{x}"
 
-        a = Class(name="a", extensions=["m", "n"])
-        a.attrs = [
-            Attr(name=x, type=x, default=x, local_type=x) for x in "bcd"
-        ]
-        e = Class(name="e")
-        e.attrs = [
-            Attr(name=x, type=x, default=x, local_type=x) for x in "fgh"
-        ]
+        a = ClassFactory.create(name="a", extensions=["m", "n"])
+        a.attrs = [AttrFactory.create(name=x) for x in "bcd"]
+        e = ClassFactory.create(name="e")
+        e.attrs = [AttrFactory.create(name=x) for x in "fgh"]
 
-        i = Class(name="i", extensions=["o"])
-        i.attrs = [
-            Attr(name=x, type=x, default=x, local_type=x) for x in "jkl"
-        ]
+        i = ClassFactory.create(name="i", extensions=["o"])
+        i.attrs = [AttrFactory.create(name=x) for x in "jkl"]
         a.inner = [e, i]
 
         generator.process_class(a)
@@ -63,7 +57,7 @@ class PythonAbstractGeneratorTests(TestCase):
     def test_process_attribute(
         self, mock_name, mock_type, mock_default, mock_strip_prefix
     ):
-        attr = Attr(name="foo", type="bar", default="thug", local_type="")
+        attr = AttrFactory.create(name="foo", type="bar", default="thug")
         generator.process_attribute(attr, ["a", "b"])
 
         self.assertEqual("oof", attr.name)
@@ -77,7 +71,9 @@ class PythonAbstractGeneratorTests(TestCase):
         mock_strip_prefix.assert_called_once_with("foo")
 
     def test_process_import(self):
-        package = Package(name="bar", alias="foo:bar", source="some.foo.bar")
+        package = PackageFactory.create(
+            name="bar", alias="foo:bar", source="some.foo.bar"
+        )
 
         actual = generator.process_import(package)
         self.assertIs(actual, package)
@@ -102,7 +98,7 @@ class PythonAbstractGeneratorTests(TestCase):
 
     def test_attribute_type(self):
         parents = []
-        attr = Attr(name="foo", type="foo_bar", default="foo", local_type="")
+        attr = AttrFactory.create(name="foo", type="foo_bar", default="foo")
 
         actual = generator.attribute_type(attr, parents)
         self.assertEqual("FooBar", actual)
@@ -127,7 +123,7 @@ class PythonAbstractGeneratorTests(TestCase):
         self.assertEqual('List["A.Parent.BossLife"]', actual)
 
     def test_attribute_default(self):
-        attr = Attr(name="foo", type="str", local_type="")
+        attr = AttrFactory.create(name="foo", type="str")
         self.assertEqual(None, generator.attribute_default(attr))
 
         attr.default = "foo"

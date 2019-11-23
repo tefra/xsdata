@@ -2,7 +2,7 @@ from dataclasses import dataclass, field
 from typing import Any, List, Optional, Type
 
 
-@dataclass(unsafe_hash=True)
+@dataclass
 class Attr:
     name: str
     local_name: str = field(init=False)
@@ -23,7 +23,7 @@ class Attr:
         return int(self.restrictions.get("max_occurs", 1)) > 1
 
 
-@dataclass(unsafe_hash=True)
+@dataclass
 class Class:
     name: str
     type: Type
@@ -33,7 +33,7 @@ class Class:
     inner: List["Class"] = field(default_factory=list)
 
 
-@dataclass(unsafe_hash=True)
+@dataclass
 class Package:
     name: str
     source: str

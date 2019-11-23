@@ -31,6 +31,18 @@ class CodeWriter:
             with open(str(file), "w") as fp:
                 fp.write(output)
 
+    def print(
+        self, schema: Schema, classes: List[Class], package: str, renderer: str
+    ):
+        engine = self.get_renderer(renderer)
+        for package, item in engine.print(schema, classes, package):
+            extensions = sorted(item.extensions)
+            extends: str = f"({', '.join(extensions)})" if extensions else ""
+            print(f"{package}.{item.name}{extends}")
+
+            for attr in sorted(item.attrs, key=lambda x: x.name):
+                print(f"    {attr.name}: {attr.type} = {attr.default}")
+
 
 writer = CodeWriter()
 writer.register_generator("pydata", DataclassGenerator())

@@ -31,16 +31,20 @@ def cli(ctx: click.Context):
     help="Output renderer",
     default="pydata",
 )
-def generate(file: str, package: str, renderer: str):
+@click.option("--print", is_flag=True, default=False)
+def generate(file: str, package: str, renderer: str, print: bool):
     process(
-        xsd_path=Path(file).resolve(), package=package, renderer=renderer,
+        xsd_path=Path(file).resolve(),
+        package=package,
+        renderer=renderer,
+        print=print,
     )
 
 
 processed: List[Path] = []
 
 
-def process(xsd_path: Path, package: str, renderer: str):
+def process(xsd_path: Path, package: str, renderer: str, print: bool):
     if xsd_path in processed:
         return
     processed.append(xsd_path)
@@ -51,11 +55,14 @@ def process(xsd_path: Path, package: str, renderer: str):
             xsd_path=xsd_path.parent.joinpath(sub_schema).resolve(),
             package=adjust_package(package, sub_schema),
             renderer=renderer,
+            print=print,
         )
 
     classes = ClassBuilder(schema=schema).build()
     classes = reducer.process(schema=schema, classes=classes)
-    writer.write(
+
+    callback = writer.print if print else writer.write
+    callback(
         schema=schema, classes=classes, package=package, renderer=renderer
     )
 

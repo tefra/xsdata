@@ -6,14 +6,9 @@ from typing import List, Optional
 from lxml import etree
 
 from xsdata.models import elements
-from xsdata.models.elements import (
-    Attribute,
-    BaseModel,
-    Choice,
-    Element,
-    Schema,
-)
+from xsdata.models.elements import Attribute, Choice, Element, Schema
 from xsdata.models.enums import EventType, FormType, TagType
+from xsdata.models.mixins import BaseModel
 from xsdata.utils.text import capitalize, snake_case
 
 

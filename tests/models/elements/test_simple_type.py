@@ -32,12 +32,12 @@ class SimpleTypeTests(TestCase):
 
     def test_get_restrictions(self):
         obj = SimpleType.create()
-        self.assertDictEqual({}, obj.get_restrictions())
+        self.assertEqual({}, obj.get_restrictions())
 
         expected = dict(min_occurs=0, max_occurs=sys.maxsize)
         obj.list = List.create()
-        self.assertDictEqual(expected, obj.get_restrictions())
+        self.assertEqual(expected, obj.get_restrictions())
 
         expected = dict(length=2)
         obj.restriction = Restriction.create(length=Length.create(value=2))
-        self.assertDictEqual(expected, obj.get_restrictions())
+        self.assertEqual(expected, obj.get_restrictions())

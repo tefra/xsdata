@@ -1,20 +1,24 @@
 from types import GeneratorType
-from unittest.mock import MagicMock, PropertyMock, call, patch
+from unittest.mock import PropertyMock, call, patch
 
-from tests.unittest import AttrFactory, ClassFactory, TestCase
+from tests.factories import AttrFactory, ClassFactory, FactoryTestCase
 from xsdata.builder import ClassBuilder
 from xsdata.models.elements import (
     Attribute,
     AttributeGroup,
+    ComplexContent,
     ComplexType,
     Element,
+    Enumeration,
     Restriction,
     Schema,
+    Sequence,
+    SimpleContent,
     SimpleType,
 )
 
 
-class ClassBuilderTests(TestCase):
+class ClassBuilderTests(FactoryTestCase):
     def setUp(self) -> None:
         self.schema = Schema.create()
         self.builder = ClassBuilder(schema=self.schema)
@@ -100,31 +104,32 @@ class ClassBuilderTests(TestCase):
 
         self.assertEqual(item, result)
 
-    def test_element_children_recursively_return_all_non_container_children(
-        self,
-    ):
-        element_a = Element.create()
-        element_b = Element.create()
-        attribute_a = Attribute.create()
-        attribute_b = Attribute.create()
-        restriction = Restriction.create()
-        complex_type = ComplexType.create()
-        complex_type.children = MagicMock(
-            return_value=[element_b, attribute_b]
+    def test_element_children(self):
+        complex_type = ComplexType.create(
+            attributes=[Attribute.create() for i in range(2)],
+            sequence=Sequence.create(
+                elements=[Element.create() for i in range(2)]
+            ),
+            simple_content=SimpleContent.create(
+                restriction=Restriction.create()
+            ),
+            complex_content=ComplexContent.create(
+                restriction=Restriction.create(
+                    enumerations=[Enumeration.create(value=x) for x in "abc"]
+                )
+            ),
         )
 
-        input_element = Element.create()
-        input_element.children = MagicMock(
-            return_value=[element_a, attribute_a, complex_type, restriction]
-        )
-
-        children = self.builder.element_children(input_element)
+        children = self.builder.element_children(complex_type)
         expected = [
-            element_a,
-            attribute_a,
-            element_b,
-            attribute_b,
-            restriction,
+            complex_type.simple_content.restriction,
+            complex_type.complex_content.restriction.enumerations[0],
+            complex_type.complex_content.restriction.enumerations[1],
+            complex_type.complex_content.restriction.enumerations[2],
+            complex_type.sequence.elements[0],
+            complex_type.sequence.elements[1],
+            complex_type.attributes[0],
+            complex_type.attributes[1],
         ]
         self.assertIsInstance(children, GeneratorType)
         self.assertEqual(expected, list(children))

@@ -1,13 +1,13 @@
 from pathlib import Path
-from unittest import TestCase, mock
+from unittest import mock
 
-from tests.unittest import ClassFactory, PackageFactory
+from tests.factories import ClassFactory, FactoryTestCase, PackageFactory
 from xsdata.codegen.python.dataclass.generator import DataclassGenerator
 from xsdata.codegen.resolver import DependenciesResolver
 from xsdata.models.elements import Schema
 
 
-class DataclassGeneratorTests(TestCase):
+class DataclassGeneratorTests(FactoryTestCase):
     @mock.patch.object(Path, "mkdir")
     @mock.patch.object(DependenciesResolver, "process")
     @mock.patch.object(DataclassGenerator, "render_module")

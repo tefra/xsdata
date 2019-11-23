@@ -22,6 +22,10 @@ class Attr:
     def is_list(self):
         return int(self.restrictions.get("max_occurs", 1)) > 1
 
+    @property
+    def is_enumeration(self):
+        return self.local_type == "Enumeration"
+
 
 @dataclass
 class Class:
@@ -31,6 +35,10 @@ class Class:
     extensions: List[str] = field(default_factory=list)
     attrs: List[Attr] = field(default_factory=list)
     inner: List["Class"] = field(default_factory=list)
+
+    @property
+    def is_enumeration(self):
+        return self.attrs and self.attrs[0].is_enumeration
 
 
 @dataclass

@@ -8,6 +8,7 @@ from lxml import etree
 from xsdata.models.codegen import Attr, Class
 from xsdata.models.elements import Attribute, ComplexType, Element, Schema
 from xsdata.models.enums import XSDType
+from xsdata.utils.text import split_prefix
 
 logger = logging.getLogger(__name__)
 
@@ -63,10 +64,6 @@ class ClassReducer:
 
         return common_types, classes
 
-    def is_common(self, obj: Class) -> bool:
-        """Return true if class is not one of the generation types."""
-        return obj.type not in [Attribute, Element, ComplexType]
-
     def add_common_type(self, obj: Class, namespace: Optional[str]) -> None:
         """Add class to the common types registry with its qualified name with
         the target namespace."""
@@ -108,11 +105,20 @@ class ClassReducer:
         If the extension class is found in the registry prepend it's attributes
         to the given class.
 
-        The attribute list is deep cloned.
+        The attribute list is deep cloned and each attribute type is
+        prepended with the extension prefix if it isn't a reference to
+        another schema.
         """
         common = self.find_common_type(extension, nsmap)
         if common is not None:
-            item.attrs = copy.deepcopy(common.attrs) + item.attrs
+            prefix, ext = split_prefix(extension)
+            new_attrs = copy.deepcopy(common.attrs)
+            if prefix:
+                for attr in new_attrs:
+                    if attr.type.find(":") == -1:
+                        attr.type = f"{prefix}:{attr.type}"
+
+            item.attrs = new_attrs + item.attrs
             item.extensions.remove(extension)
 
     def flatten_attribute(self, attr: Attr, nsmap: Dict):
@@ -134,6 +140,14 @@ class ClassReducer:
                     f"Missing type implementation: {common.type.__name__}"
                 )
                 attr.type = XSDType.STRING.code
+
+    @staticmethod
+    def is_common(obj: Class) -> bool:
+        """Return true if class is not one of the generation types."""
+        return (
+            obj.type not in [Attribute, Element, ComplexType]
+            and not obj.is_enumeration
+        )
 
 
 reducer = ClassReducer()

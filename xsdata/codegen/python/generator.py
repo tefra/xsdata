@@ -21,8 +21,14 @@ class PythonAbstractGenerator(AbstractGenerator, ABC):
         for inner in obj.inner:
             cls.process_class(inner, curr_parents)
 
+        attr_processor = (
+            cls.process_enumeration
+            if obj.is_enumeration
+            else cls.process_attribute
+        )
+
         for attr in obj.attrs:
-            cls.process_attribute(attr, curr_parents)
+            attr_processor(attr, curr_parents)
 
         return obj
 
@@ -32,6 +38,12 @@ class PythonAbstractGenerator(AbstractGenerator, ABC):
         attr.name = cls.attribute_name(attr.name)
         attr.type = cls.attribute_type(attr, parents)
         attr.local_name = text.strip_prefix(attr.local_name)
+        attr.default = cls.attribute_default(attr)
+
+    @classmethod
+    def process_enumeration(cls, attr: Attr, parents):
+        """Normalize attribute properties."""
+        attr.name = cls.enumeration_name(attr.name)
         attr.default = cls.attribute_default(attr)
 
     @classmethod
@@ -66,6 +78,16 @@ class PythonAbstractGenerator(AbstractGenerator, ABC):
         """
         name = text.strip_prefix(name)
         return text.snake_case(replace_words.get(name.lower(), name))
+
+    @classmethod
+    def enumeration_name(cls, name: str) -> str:
+        """
+        Strip reference prefix and turn to snake case.
+
+        If the name is one of the python reserved words append the
+        prefix _value
+        """
+        return cls.attribute_name(name).upper()
 
     @classmethod
     def attribute_type(cls, attr: Attr, parents: List[str]) -> str:

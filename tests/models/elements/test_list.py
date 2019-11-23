@@ -18,10 +18,10 @@ class ListTests(TestCase):
     def test_get_restrictions(self):
         obj = List.create()
         expected = dict(min_occurs=0, max_occurs=sys.maxsize)
-        self.assertDictEqual(expected, obj.get_restrictions())
+        self.assertEqual(expected, obj.get_restrictions())
 
         obj.simple_type = SimpleType.create(
             restriction=Restriction.create(length=Length.create(value=1))
         )
         expected.update(dict(length=1))
-        self.assertDictEqual(expected, obj.get_restrictions())
+        self.assertEqual(expected, obj.get_restrictions())

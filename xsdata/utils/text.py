@@ -1,9 +1,17 @@
-from typing import List
+from typing import List, Tuple
 
 
 def strip_prefix(string: str, sep: str = ":") -> str:
-    pos = string.find(sep) + 1
-    return string[pos:] if pos else string
+    prefix, string = split_prefix(string, sep)
+    return string
+
+
+def split_prefix(string: str, sep: str = ":") -> Tuple:
+    index = string.find(sep)
+    if index == -1:
+        return None, string
+    else:
+        return string[:index], string[index + 1 :]
 
 
 def capitalize(string: str) -> str:

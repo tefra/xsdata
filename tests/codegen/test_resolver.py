@@ -1,12 +1,17 @@
 from collections.abc import Iterator
-from unittest import TestCase, mock
+from unittest import mock
 
-from tests.unittest import AttrFactory, ClassFactory, PackageFactory
+from tests.factories import (
+    AttrFactory,
+    ClassFactory,
+    FactoryTestCase,
+    PackageFactory,
+)
 from xsdata.codegen.resolver import DependenciesResolver
 from xsdata.models.elements import Schema
 
 
-class DependenciesResolverTest(TestCase):
+class DependenciesResolverTest(FactoryTestCase):
     def setUp(self) -> None:
         self.resolver = DependenciesResolver()
 

@@ -8,18 +8,19 @@ from xsdata.models.elements import (
     AttributeGroup,
     ComplexType,
     Element,
-    ElementBase,
+    Enumeration,
     Restriction,
     Schema,
     SimpleType,
 )
+from xsdata.models.mixins import ElementBase
 
 logger = logging.getLogger(__name__)
 
 BaseElement = Union[
     Attribute, AttributeGroup, Element, ComplexType, SimpleType
 ]
-AttributeElement = Union[Attribute, Element, Restriction]
+AttributeElement = Union[Attribute, Element, Restriction, Enumeration]
 
 
 @dataclass
@@ -54,13 +55,12 @@ class ClassBuilder:
         return item
 
     def element_children(self, obj: ElementBase) -> Iterator[AttributeElement]:
-        """Recursively find and return all child elements that can be used to
-        codegen class attributes."""
-
+        """Recursively find and return all child elements that are qualified to
+        be class attributes."""
         for child in obj.children():
-            if isinstance(child, (Attribute, Element, Restriction)):
+            if child.is_attribute:
                 yield child
-            elif isinstance(child, ElementBase):
+            else:
                 yield from self.element_children(child)
 
     def build_class_attribute(self, parent: Class, obj: AttributeElement):

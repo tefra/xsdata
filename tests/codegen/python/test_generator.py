@@ -1,12 +1,17 @@
-from unittest import TestCase, mock
+from unittest import mock
 
-from tests.unittest import AttrFactory, ClassFactory, PackageFactory
+from tests.factories import (
+    AttrFactory,
+    ClassFactory,
+    FactoryTestCase,
+    PackageFactory,
+)
 from xsdata.codegen.python.generator import (
     PythonAbstractGenerator as generator,
 )
 
 
-class PythonAbstractGeneratorTests(TestCase):
+class PythonAbstractGeneratorTests(FactoryTestCase):
     @mock.patch.object(generator, "process_attribute")
     @mock.patch.object(generator, "type_name")
     @mock.patch.object(generator, "class_name")

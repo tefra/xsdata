@@ -36,12 +36,26 @@ class CodeWriter:
     ):
         engine = self.get_renderer(renderer)
         for package, item in engine.print(schema, classes, package):
-            extensions = sorted(item.extensions)
-            extends: str = f"({', '.join(extensions)})" if extensions else ""
-            print(f"{package}.{item.name}{extends}")
+            self.print_class(package, item)
 
-            for attr in sorted(item.attrs, key=lambda x: x.name):
-                print(f"    {attr.name}: {attr.type} = {attr.default}")
+    def print_class(self, package: str, obj: Class, indent: int = 0):
+
+        print(
+            f"\n{indent * ' '}{package}.{obj.name}({', '.join(sorted(obj.extensions))})"
+        )
+
+        for attr in sorted(obj.attrs, key=lambda x: x.name):
+            params = [("default", attr.default)]
+            params.extend(
+                [
+                    (key, value)
+                    for key, value in sorted(attr.restrictions.items())
+                ]
+            )
+            print(f"{(indent + 4) * ' '}{attr.name}: {attr.type} = {params}")
+
+        for inner in sorted(obj.inner, key=lambda x: x.name):
+            self.print_class(f"{package}.{obj.name}", inner, indent + 4)
 
 
 writer = CodeWriter()

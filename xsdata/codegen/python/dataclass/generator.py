@@ -49,16 +49,28 @@ class DataclassGenerator(PythonAbstractGenerator):
 
         yield file_path, self.render_module(imports=imports, output=output)
 
+    def print(
+        self, schema: Schema, classes: List[Class], package: str
+    ) -> Iterator[Tuple[str, Class]]:
+        module = snake_case(schema.module)
+        package_arr = list(map(snake_case, package.split(".")))
+        package = "{}.{}".format(".".join(package_arr), module)
+        self.resolver.process(classes=classes, schema=schema, package=package)
+
+        for obj in sorted(self.prepare_classes(), key=lambda x: x.name):
+            yield package, obj
+
     def render_classes(self) -> str:
         """Get a list of sorted classes from the imports resolver, apply the
         python code conventions and return the rendered output."""
         output = "\n".join(
-            [
-                self.render_class(self.process_class(obj))
-                for obj in self.resolver.sorted_classes()
-            ]
+            map(self.render_class, self.prepare_classes())
         ).strip()
         return f"\n\n{output}\n"
+
+    def prepare_classes(self):
+        for obj in self.resolver.sorted_classes():
+            yield self.process_class(obj)
 
     def prepare_imports(self) -> Dict[str, List[Package]]:
         """Get a list of sorted packages from the imports resolver apply the

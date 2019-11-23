@@ -12,3 +12,9 @@ class AbstractGenerator(ABC):
         self, schema: Schema, classes: List[Class], package: str
     ) -> Iterator[Tuple[Path, str]]:
         pass
+
+    @abstractmethod
+    def print(
+        self, schema: Schema, classes: List[Class], package: str
+    ) -> Iterator[Tuple[str, Class]]:
+        pass

@@ -1,0 +1,9 @@
+{% set help = obj|docstring|trim %}
+
+class {{ obj.name }}(Enum):
+{%- if help %}
+{{ help|indent(4, first=True) }}
+{%- endif -%}
+{%- for attr in obj.attrs %}
+    {{ attr.name }} = {{ attr.default }}
+{%- endfor -%}

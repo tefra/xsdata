@@ -1,7 +1,15 @@
+import re
+import sys
 from abc import ABC, abstractmethod
-from typing import Any, Dict, List, Optional
+from dataclasses import MISSING
+from dataclasses import Field as Attrib
+from dataclasses import dataclass, fields
+from typing import Any, Dict, List, Optional, Type, TypeVar
 
-from xsdata.models.enums import FormType, XSDType
+from lxml import etree
+
+from xsdata.models.enums import FormType, XMLSchema, XSDType
+from xsdata.utils.text import snake_case, split_prefix, strip_prefix
 
 
 class TypedField(ABC):
@@ -17,11 +25,12 @@ class TypedField(ABC):
             return None
 
         real_type = self.real_type
-        prefix_pos = real_type.find(":")
-        if prefix_pos == -1 or XSDType.get_enum(real_type):
-            return None
-
-        return self.nsmap.get(real_type[:prefix_pos])
+        prefix, suffix = split_prefix(real_type)
+        return (
+            None
+            if prefix is None or XSDType.get_enum(real_type)
+            else self.nsmap.get(prefix)
+        )
 
 
 class ExtendsMixin(ABC):
@@ -56,3 +65,106 @@ class OccurrencesMixin:
         if max_occurs > min_occurs and max_occurs > 1:
             return dict(min_occurs=min_occurs, max_occurs=max_occurs)
         return dict()
+
+
+T = TypeVar("T", bound="BaseModel")
+
+
+class BaseModel:
+    def __init__(self, *args, **kwargs):
+        pass
+
+    @classmethod
+    def from_element(cls: Type[T], el: etree.Element) -> T:
+        attrs = {
+            snake_case(strip_prefix(key, "}")): value
+            for key, value in el.attrib.items()
+        }
+        data = {
+            attr.name: cls.xsd_value(attr, attrs)
+            if attr.name in attrs
+            else cls.default_value(attr)
+            for attr in fields(cls)
+            if attr.init
+        }
+
+        if "nsmap" in data:
+            data["nsmap"] = el.nsmap
+        if "prefix" in data:
+            data["prefix"] = el.prefix
+        if "text" in data and el.text:
+            data["text"] = re.sub(r"\s+", " ", el.text).strip()
+
+        return cls(**data)
+
+    @classmethod
+    def default_value(cls: Type[T], field: Attrib) -> Any:
+        factory = getattr(field, "default_factory")
+        if getattr(field, "default_factory") is not MISSING:
+            return factory()  # mypy: ignore
+        return None if field.default is MISSING else field.default
+
+    @classmethod
+    def xsd_value(cls, field: Attrib, kwargs: Dict) -> Any:
+        name = field.name
+        value = kwargs[name]
+        clazz = field.type
+
+        if name == "max_occurs" and value == "unbounded":
+            return sys.maxsize
+
+        # Optional
+        if hasattr(clazz, "__origin__"):
+            clazz = clazz.__args__[0]
+
+        if clazz == bool:
+            return value == "true"
+
+        try:
+            if clazz == int:
+                return int(value)
+            if clazz == float:
+                return float(value)
+        except ValueError:
+            return str(value)
+
+        return clazz(value)
+
+    @classmethod
+    def create(cls: Type[T], **kwargs) -> T:
+        if not kwargs.get("prefix") and not kwargs.get("nsmap"):
+            kwargs.update({"prefix": "xs", "nsmap": {"xs": XMLSchema}})
+
+        data = {
+            attr.name: kwargs[attr.name]
+            if attr.name in kwargs
+            else cls.default_value(attr)
+            for attr in fields(cls)
+            if attr.init
+        }
+
+        return cls(**data)
+
+
+@dataclass
+class ElementBase(BaseModel):
+    id: Optional[str]
+    prefix: str
+    nsmap: dict
+
+    def children(self):
+        for attribute in fields(self):
+            value = getattr(self, attribute.name)
+            if (
+                isinstance(value, list)
+                and len(value)
+                and isinstance(value[0], ElementBase)
+            ):
+                for v in value:
+                    yield v
+            elif isinstance(value, ElementBase):
+                yield value
+
+    @property
+    def is_attribute(self) -> bool:
+        return False

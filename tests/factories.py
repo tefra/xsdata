@@ -16,7 +16,7 @@ from xsdata.models.enums import XSDType
 fixtures_dir = path.join(path.dirname(path.abspath(__file__)), "xsd")
 
 
-class TestCase(unittest.TestCase):
+class FactoryTestCase(unittest.TestCase):
     def setUp(self) -> None:
         ClassFactory.reset()
         AttrFactory.reset()

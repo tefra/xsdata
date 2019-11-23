@@ -3,6 +3,7 @@ from unittest import TestCase
 from xsdata.models.elements import (
     Enumeration,
     FractionDigits,
+    Group,
     Length,
     MaxExclusive,
     MaxInclusive,
@@ -26,8 +27,33 @@ class RestrictionTests(TestCase):
         obj = Restriction.create()
         self.assertEqual("value", obj.real_name)
 
+    def test_property_is_attribute(self):
+        obj = Restriction.create()
+        self.assertTrue(obj.is_attribute)
+
+        obj = Restriction.create(group=Group.create())
+        self.assertFalse(obj.is_attribute)
+
+        self.assertEqual(
+            (
+                "group",
+                "all",
+                "choice",
+                "sequence",
+                "any_attribute",
+                "attributes",
+                "attribute_groups",
+                "enumerations",
+            ),
+            obj.CONTAINER_FIELDS,
+        )
+
+    def test_property_extensions(self):
+        obj = Restriction.create(base="foo")
+        self.assertEqual(["foo"], obj.extensions)
+
     def test_get_restrictions(self):
-        self.assertDictEqual({}, Restriction.create().get_restrictions())
+        self.assertEqual({}, Restriction.create().get_restrictions())
 
         obj = Restriction.create(
             min_exclusive=MinExclusive.create(value=1),
@@ -41,10 +67,9 @@ class RestrictionTests(TestCase):
             length=Length.create(value=9),
             white_space=WhiteSpace.create(value="collapse"),
             pattern=Pattern.create(value=".*"),
-            enumerations=Enumeration.create(value="str"),
+            enumerations=[Enumeration.create(value="str")],
         )
         expected = {
-            "enumerations": "str",
             "fraction_digits": 8,
             "length": 9,
             "max_exclusive": 4,
@@ -58,4 +83,4 @@ class RestrictionTests(TestCase):
             "white_space": "collapse",
         }
 
-        self.assertDictEqual(expected, obj.get_restrictions())
+        self.assertEqual(expected, obj.get_restrictions())

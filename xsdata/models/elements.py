@@ -1,129 +1,21 @@
 import re
 import sys
-from dataclasses import MISSING
-from dataclasses import Field as Attrib
-from dataclasses import dataclass, field, fields
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any as Anything
 from typing import Dict
 from typing import List as ArrayList
-from typing import Optional, Type, TypeVar
+from typing import Optional
 
-from lxml import etree
-
-from xsdata.models.enums import (
-    FormType,
-    ProcessType,
-    UseType,
-    XMLSchema,
-    XSDType,
-)
+from xsdata.models.enums import FormType, ProcessType, UseType, XSDType
 from xsdata.models.mixins import (
+    ElementBase,
     ExtendsMixin,
     NamedField,
     OccurrencesMixin,
     RestrictedField,
     TypedField,
 )
-from xsdata.utils.text import snake_case, strip_prefix
-
-T = TypeVar("T", bound="BaseModel")
-
-
-class BaseModel:
-    def __init__(self, *args, **kwargs):
-        pass
-
-    @classmethod
-    def from_element(cls: Type[T], el: etree.Element) -> T:
-        attrs = {
-            snake_case(strip_prefix(key, "}")): value
-            for key, value in el.attrib.items()
-        }
-        data = {
-            attr.name: cls.xsd_value(attr, attrs)
-            if attr.name in attrs
-            else cls.default_value(attr)
-            for attr in fields(cls)
-            if attr.init
-        }
-
-        if "nsmap" in data:
-            data["nsmap"] = el.nsmap
-        if "prefix" in data:
-            data["prefix"] = el.prefix
-        if "text" in data and el.text:
-            data["text"] = re.sub(r"\s+", " ", el.text).strip()
-
-        return cls(**data)
-
-    @classmethod
-    def default_value(cls: Type[T], field: Attrib) -> Anything:
-        factory = getattr(field, "default_factory")
-        if getattr(field, "default_factory") is not MISSING:
-            return factory()  # mypy: ignore
-        return None if field.default is MISSING else field.default
-
-    @classmethod
-    def xsd_value(cls, field: Attrib, kwargs: Dict) -> Anything:
-        name = field.name
-        value = kwargs[name]
-        clazz = field.type
-
-        if name == "max_occurs" and value == "unbounded":
-            return sys.maxsize
-
-        # Optional
-        if hasattr(clazz, "__origin__"):
-            clazz = clazz.__args__[0]
-
-        if clazz == bool:
-            return value == "true"
-
-        try:
-            if clazz == int:
-                return int(value)
-            if clazz == float:
-                return float(value)
-        except ValueError:
-            return str(value)
-
-        return clazz(value)
-
-    @classmethod
-    def create(cls: Type[T], **kwargs) -> T:
-        if not kwargs.get("prefix") and not kwargs.get("nsmap"):
-            kwargs.update({"prefix": "xs", "nsmap": {"xs": XMLSchema}})
-
-        data = {
-            attr.name: kwargs[attr.name]
-            if attr.name in kwargs
-            else cls.default_value(attr)
-            for attr in fields(cls)
-            if attr.init
-        }
-
-        return cls(**data)
-
-
-@dataclass
-class ElementBase(BaseModel):
-    id: Optional[str]
-    prefix: str
-    nsmap: dict
-
-    def children(self):
-        for attribute in fields(self):
-            value = getattr(self, attribute.name)
-            if (
-                isinstance(value, list)
-                and len(value)
-                and isinstance(value[0], ElementBase)
-            ):
-                for v in value:
-                    yield v
-            elif isinstance(value, ElementBase):
-                yield value
 
 
 @dataclass
@@ -239,6 +131,10 @@ class Attribute(
     use: Optional[UseType] = field(default=UseType.OPTIONAL)
 
     @property
+    def is_attribute(self) -> bool:
+        return True
+
+    @property
     def real_type(self) -> Optional[str]:
         if self.simple_type:
             return self.simple_type.real_type
@@ -337,8 +233,31 @@ class RestrictionType(AnnotationBase):
 
 
 @dataclass
-class Enumeration(RestrictionType):
+class Enumeration(RestrictionType, TypedField, NamedField, RestrictedField):
     value: str
+
+    @property
+    def is_attribute(self) -> bool:
+        return True
+
+    @property
+    def real_type(self):
+        return XSDType.STRING.code
+
+    @property
+    def real_name(self):
+        return self.value
+
+    @property
+    def default(self):
+        return self.value
+
+    @property
+    def namespace(self):
+        return None
+
+    def get_restrictions(self):
+        return {}
 
 
 @dataclass
@@ -397,7 +316,33 @@ class WhiteSpace(RestrictionType):
 
 
 @dataclass
-class Restriction(RestrictedField, AnnotationBase, TypedField, NamedField):
+class Restriction(
+    RestrictedField, AnnotationBase, TypedField, NamedField, ExtendsMixin
+):
+    VALUE_FIELDS = (
+        "min_exclusive",
+        "min_inclusive",
+        "min_length",
+        "max_exclusive",
+        "max_inclusive",
+        "max_length",
+        "total_digits",
+        "fraction_digits",
+        "length",
+        "white_space",
+        "pattern",
+    )
+    CONTAINER_FIELDS = (
+        "group",
+        "all",
+        "choice",
+        "sequence",
+        "any_attribute",
+        "attributes",
+        "attribute_groups",
+        "enumerations",
+    )
+
     base: str
     group: Optional[Group]
     all: Optional[All]
@@ -420,6 +365,13 @@ class Restriction(RestrictedField, AnnotationBase, TypedField, NamedField):
     attribute_groups: ArrayList[AttributeGroup] = field(default_factory=list)
 
     @property
+    def is_attribute(self) -> bool:
+        for key in self.CONTAINER_FIELDS:
+            if getattr(self, key):
+                return False
+        return True
+
+    @property
     def real_type(self) -> Optional[str]:
         return self.base
 
@@ -427,24 +379,14 @@ class Restriction(RestrictedField, AnnotationBase, TypedField, NamedField):
     def real_name(self) -> str:
         return "value"
 
+    @property
+    def extensions(self) -> ArrayList[str]:
+        return [self.base]
+
     def get_restrictions(self) -> Dict[str, Anything]:
-        lookup = [
-            "min_exclusive",
-            "min_inclusive",
-            "min_length",
-            "max_exclusive",
-            "max_inclusive",
-            "max_length",
-            "total_digits",
-            "fraction_digits",
-            "length",
-            "white_space",
-            "pattern",
-            "enumerations",
-        ]
         return {
             key: getattr(self, key).value
-            for key in lookup
+            for key in self.VALUE_FIELDS
             if isinstance(getattr(self, key), RestrictionType)
         }
 
@@ -458,8 +400,9 @@ class SimpleContent(AnnotationBase, ExtendsMixin):
     def extensions(self) -> ArrayList[str]:
         if self.extension:
             return self.extension.extensions
-        else:
-            return []
+        elif self.restriction:
+            return self.restriction.extensions
+        return []
 
 
 @dataclass
@@ -550,6 +493,10 @@ class Element(
     max_occurs: int = 1
     nillable: bool = False
     abstract: bool = False
+
+    @property
+    def is_attribute(self) -> bool:
+        return True
 
     @property
     def real_type(self) -> Optional[str]:

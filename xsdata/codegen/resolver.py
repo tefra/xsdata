@@ -7,6 +7,7 @@ from toposort import toposort_flatten
 from xsdata.models.codegen import Class, Package
 from xsdata.models.elements import Schema
 from xsdata.models.enums import XSDType
+from xsdata.utils.text import split_prefix
 
 
 @dataclass
@@ -67,10 +68,9 @@ class DependenciesResolver:
         collisions with the given list of classes and build a list of import
         packages."""
         for ref in self.import_classes():
-            has_ns = ref.find(":") > -1
-            prefix, name = ref.split(":") if has_ns else (None, ref)
+            prefix, name = split_prefix(ref)
             package = self.find_package(prefix, name)
-            alias = ref if has_ns and self.class_map.get(name) else None
+            alias = ref if prefix and self.class_map.get(name) else None
 
             self.add_import(name=name, package=package, alias=alias)
 
@@ -104,10 +104,6 @@ class DependenciesResolver:
             * Resolved processed {"{http://www.common/ns}address": "source.package"}
             * Request for (common, address) will return source.package
         """
-
-        if name == "typeElementStatus":
-            pass
-
         namespace = self.schema.nsmap.get(prefix)
         qname = etree.QName(namespace, name)
         return self.processed[qname.text]

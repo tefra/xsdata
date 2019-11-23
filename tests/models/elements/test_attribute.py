@@ -5,6 +5,10 @@ from xsdata.models.enums import UseType
 
 
 class AttributeTests(TestCase):
+    def test_property_is_attribute(self):
+        obj = Attribute.create()
+        self.assertTrue(obj)
+
     def test_property_real_type(self):
         obj = Attribute.create()
         self.assertEqual("xs:string", obj.real_type)
@@ -33,17 +37,17 @@ class AttributeTests(TestCase):
 
     def test_get_restrictions(self):
         obj = Attribute.create()
-        self.assertDictEqual({}, obj.get_restrictions())
+        self.assertEqual({}, obj.get_restrictions())
 
         obj.use = UseType.REQUIRED
         expected = dict(required=1)
-        self.assertDictEqual(expected, obj.get_restrictions())
+        self.assertEqual(expected, obj.get_restrictions())
 
         obj.simple_type = SimpleType.create(
             restriction=Restriction.create(length=Length.create(value=1))
         )
         expected.update(dict(length=1))
-        self.assertDictEqual(expected, obj.get_restrictions())
+        self.assertEqual(expected, obj.get_restrictions())
 
     def test_property_extensions(self):
         obj = Attribute.create()

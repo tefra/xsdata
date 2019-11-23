@@ -3,6 +3,8 @@ from typing import Optional
 
 from lxml import etree
 
+from xsdata.utils.text import split_prefix
+
 XMLSchema = "http://www.w3.org/2001/XMLSchema"
 
 
@@ -65,11 +67,8 @@ class XSDType(Enum):
 
     @classmethod
     def get_enum(cls, code: str) -> Optional["XSDType"]:
-        pos = code.find(":")
-        if pos == -1:
-            return None
-
-        return __XSDType__.get("xs:" + code[pos + 1 :])
+        prefix, suffix = split_prefix(code)
+        return __XSDType__.get("xs:" + suffix) if prefix else None
 
     @classmethod
     def get_local(cls, code: str) -> Optional[str]:

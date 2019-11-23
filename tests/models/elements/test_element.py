@@ -12,6 +12,10 @@ from xsdata.models.elements import (
 
 
 class ElementTests(TestCase):
+    def test_property_is_attribute(self):
+        obj = Element.create()
+        self.assertTrue(obj)
+
     def test_property_real_name(self):
         obj = Element.create(ref="bar")
         self.assertEqual("bar", obj.real_name)
@@ -58,10 +62,10 @@ class ElementTests(TestCase):
     def test_get_restrictions(self):
         obj = Element.create()
         expected = {"required": True}
-        self.assertDictEqual(expected, obj.get_restrictions())
+        self.assertEqual(expected, obj.get_restrictions())
 
         obj.simple_type = SimpleType.create(
             restriction=Restriction.create(length=Length.create(value=9))
         )
         expected.update({"length": 9})
-        self.assertDictEqual(expected, obj.get_restrictions())
+        self.assertEqual(expected, obj.get_restrictions())

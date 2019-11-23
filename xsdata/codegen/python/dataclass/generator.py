@@ -28,7 +28,8 @@ class DataclassGenerator(PythonAbstractGenerator):
         return self.template("module").render(output=output, imports=imports)
 
     def render_class(self, obj: Class) -> str:
-        return self.template("class").render(obj=obj)
+        template = "enum" if obj.is_enumeration else "class"
+        return self.template(template).render(obj=obj)
 
     def render(
         self, schema: Schema, classes: List[Class], package: str

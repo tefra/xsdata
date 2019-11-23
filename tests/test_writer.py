@@ -2,11 +2,12 @@ import copy
 from dataclasses import dataclass
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from typing import Iterator, Optional, Tuple
+from typing import Iterator, List, Optional, Tuple
 from unittest import TestCase
 
 from xsdata.codegen.generator import AbstractGenerator
 from xsdata.codegen.python.dataclass.generator import DataclassGenerator
+from xsdata.models.codegen import Class
 from xsdata.models.elements import Schema
 from xsdata.writer import writer
 
@@ -17,6 +18,11 @@ class FakeRenderer(AbstractGenerator):
 
     def render(self, *args, **kwargs) -> Iterator[Tuple[Path, str]]:
         yield Path(f"{self.dir}/test.txt"), "foobar"
+
+    def print(
+        self, schema: Schema, classes: List[Class], package: str
+    ) -> Iterator[Tuple[str, Class]]:
+        pass
 
 
 class CodeWriterTests(TestCase):

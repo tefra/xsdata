@@ -1,4 +1,4 @@
-{% set help = obj|docstring|trim %}
+{% set help = obj|docstring(enum=True)|trim %}
 
 class {{ obj.name }}(Enum):
 {%- if help %}

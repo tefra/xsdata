@@ -1,7 +1,6 @@
 import random
 import unittest
 from abc import ABC, abstractmethod
-from os import path
 
 from xsdata.models.codegen import Attr, Class, Package
 from xsdata.models.elements import (
@@ -13,17 +12,12 @@ from xsdata.models.elements import (
 )
 from xsdata.models.enums import XSDType
 
-fixtures_dir = path.join(path.dirname(path.abspath(__file__)), "xsd")
-
 
 class FactoryTestCase(unittest.TestCase):
     def setUp(self) -> None:
+        super(FactoryTestCase, self).setUp()
         ClassFactory.reset()
         AttrFactory.reset()
-
-    @staticmethod
-    def fixture_path(file_name):
-        return "{}/{}.xsd".format(fixtures_dir, file_name)
 
 
 class Factory(ABC):

@@ -13,6 +13,7 @@ from xsdata.models.elements import Schema
 
 class DependenciesResolverTest(FactoryTestCase):
     def setUp(self) -> None:
+        super(DependenciesResolverTest, self).setUp()
         self.resolver = DependenciesResolver()
 
     @mock.patch.object(DependenciesResolver, "resolve_imports")

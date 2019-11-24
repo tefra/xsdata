@@ -27,6 +27,7 @@ class FakeRenderer(AbstractGenerator):
 
 class CodeWriterTests(TestCase):
     def setUp(self) -> None:
+        super(CodeWriterTests, self).setUp()
         self.generators = copy.deepcopy(writer.generators)
 
     def tearDown(self) -> None:

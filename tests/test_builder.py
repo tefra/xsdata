@@ -20,6 +20,7 @@ from xsdata.models.elements import (
 
 class ClassBuilderTests(FactoryTestCase):
     def setUp(self) -> None:
+        super(ClassBuilderTests, self).setUp()
         self.schema = Schema.create()
         self.builder = ClassBuilder(schema=self.schema)
 

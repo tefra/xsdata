@@ -9,7 +9,7 @@ from xsdata.models import elements
 from xsdata.models.elements import Attribute, Choice, Element, Schema
 from xsdata.models.enums import EventType, FormType, TagType
 from xsdata.models.mixins import BaseModel
-from xsdata.utils.text import capitalize, snake_case
+from xsdata.utils.text import snake_case
 
 
 @dataclass
@@ -79,7 +79,7 @@ class SchemaParser:
                 )
 
             if event == EventType.START:
-                builder = getattr(elements, capitalize(tag.value))
+                builder = getattr(elements, tag.cname)
                 element = builder.from_element(elem)
                 self.elements.append(element)
             elif event == EventType.END:

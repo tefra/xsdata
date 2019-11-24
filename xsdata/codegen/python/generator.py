@@ -21,19 +21,17 @@ class PythonAbstractGenerator(AbstractGenerator, ABC):
         for inner in obj.inner:
             cls.process_class(inner, curr_parents)
 
-        attr_processor = (
-            cls.process_enumeration
-            if obj.is_enumeration
-            else cls.process_attribute
-        )
-
+        is_enum = obj.is_enumeration
         for attr in obj.attrs:
-            attr_processor(attr, curr_parents)
+            if is_enum:
+                cls.process_enumeration(attr)
+            else:
+                cls.process_attribute(attr, curr_parents)
 
         return obj
 
     @classmethod
-    def process_attribute(cls, attr: Attr, parents):
+    def process_attribute(cls, attr: Attr, parents) -> None:
         """Normalize attribute properties."""
         attr.name = cls.attribute_name(attr.name)
         attr.type = cls.attribute_type(attr, parents)
@@ -41,13 +39,13 @@ class PythonAbstractGenerator(AbstractGenerator, ABC):
         attr.default = cls.attribute_default(attr)
 
     @classmethod
-    def process_enumeration(cls, attr: Attr, parents):
+    def process_enumeration(cls, attr: Attr, *args) -> None:
         """Normalize attribute properties."""
         attr.name = cls.enumeration_name(attr.name)
         attr.default = cls.attribute_default(attr)
 
     @classmethod
-    def process_import(cls, package: Package):
+    def process_import(cls, package: Package) -> Package:
         """Normalize import package properties."""
         package.name = cls.class_name(package.name)
         if package.alias:

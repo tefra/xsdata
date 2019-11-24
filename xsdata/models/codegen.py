@@ -1,6 +1,8 @@
 from dataclasses import dataclass, field
 from typing import Any, List, Optional, Type
 
+from xsdata.models.enums import TagType
+
 
 @dataclass
 class Attr:
@@ -24,7 +26,7 @@ class Attr:
 
     @property
     def is_enumeration(self):
-        return self.local_type == "Enumeration"
+        return self.local_type == TagType.ENUMERATION.cname
 
 
 @dataclass

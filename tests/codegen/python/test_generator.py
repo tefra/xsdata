@@ -9,6 +9,7 @@ from tests.factories import (
 from xsdata.codegen.python.generator import (
     PythonAbstractGenerator as generator,
 )
+from xsdata.models.enums import TagType
 
 
 class PythonAbstractGeneratorTests(FactoryTestCase):
@@ -55,6 +56,19 @@ class PythonAbstractGeneratorTests(FactoryTestCase):
         )
         self.assertEqual(9, mock_process_attribute.call_count)
 
+    @mock.patch.object(generator, "process_enumeration")
+    def test_process_enum_class(self, mock_process_enumeration):
+        a = ClassFactory.create(
+            name="a",
+            attrs=AttrFactory.list(2, local_type=TagType.ENUMERATION.cname),
+        )
+        generator.process_class(a)
+
+        mock_process_enumeration.assert_has_calls(
+            [mock.call(a.attrs[0]), mock.call(a.attrs[1])]
+        )
+        self.assertEqual(2, mock_process_enumeration.call_count)
+
     @mock.patch("xsdata.utils.text.strip_prefix", return_value="nope")
     @mock.patch.object(generator, "attribute_default", return_value="life")
     @mock.patch.object(generator, "attribute_type", return_value="rab")
@@ -74,6 +88,20 @@ class PythonAbstractGeneratorTests(FactoryTestCase):
         mock_type.assert_called_once_with(attr, ["a", "b"])
         mock_default.assert_called_once_with(attr)
         mock_strip_prefix.assert_called_once_with("foo")
+
+    @mock.patch.object(generator, "attribute_default", return_value="life")
+    @mock.patch.object(generator, "enumeration_name", return_value="OOF")
+    def test_process_enumeration(self, mock_name, mock_default):
+        attr = AttrFactory.create(name="foo", type="bar", default="thug")
+        generator.process_enumeration(attr, ["a", "b"])
+
+        self.assertEqual("OOF", attr.name)
+        self.assertEqual("bar", attr.type)
+        self.assertEqual("foo", attr.local_name)
+        self.assertEqual("life", attr.default)
+
+        mock_name.assert_called_once_with("foo")
+        mock_default.assert_called_once_with(attr)
 
     def test_process_import(self):
         package = PackageFactory.create(
@@ -100,6 +128,13 @@ class PythonAbstractGeneratorTests(FactoryTestCase):
         self.assertEqual("foo_bar", generator.attribute_name("FooBar"))
         self.assertEqual("none_value", generator.attribute_name("None"))
         self.assertEqual("break_value", generator.attribute_name("BrEak"))
+
+    def test_enumeration_name(self):
+        self.assertEqual("FOO", generator.enumeration_name("foo"))
+        self.assertEqual("BAR", generator.enumeration_name("foo:bar"))
+        self.assertEqual("FOO_BAR", generator.enumeration_name("FooBar"))
+        self.assertEqual("NONE_VALUE", generator.enumeration_name("None"))
+        self.assertEqual("BREAK_VALUE", generator.enumeration_name("BrEak"))
 
     def test_attribute_type(self):
         parents = []

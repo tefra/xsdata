@@ -16,14 +16,15 @@ def arguments(data: dict):
     )
 
 
-def docstring(obj: Class):
+def docstring(obj: Class, enum=False):
     lines = []
     if obj.help:
         lines.append(obj.help)
 
+    var_type = "cvar" if enum else "ivar"
     for attr in obj.attrs:
         description = attr.help.strip() if attr.help else ""
-        lines.append(f":ivar {attr.name}: {description}".strip())
+        lines.append(f":{var_type} {attr.name}: {description}".strip())
 
     return (
         format_code('"""\n{}\n"""'.format("\n".join(lines))) if lines else ""

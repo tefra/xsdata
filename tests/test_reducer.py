@@ -58,7 +58,7 @@ class ClassReducerTests(FactoryTestCase):
 
         obj = ClassFactory.create(
             type=SimpleType,
-            attrs=[AttrFactory.create(local_type="Enumeration")],
+            attrs=AttrFactory.list(1, local_type=TagType.ENUMERATION.cname),
         )
         self.assertFalse(ClassReducer.is_common(obj))
 

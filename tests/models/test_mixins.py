@@ -20,6 +20,7 @@ def get_subclasses(clazz: Type):
 
 class OccurrencesMixinTests(TestCase):
     def setUp(self) -> None:
+        super(OccurrencesMixinTests, self).setUp()
         self.subclasses = [c for _, c in get_subclasses(OccurrencesMixin)]
 
     def test_subclasses(self):
@@ -52,6 +53,7 @@ class OccurrencesMixinTests(TestCase):
 
 class TypedFieldTests(TestCase):
     def setUp(self) -> None:
+        super(TypedFieldTests, self).setUp()
         self.subclasses = [c for _, c in get_subclasses(TypedField)]
 
     def test_subclasses(self):

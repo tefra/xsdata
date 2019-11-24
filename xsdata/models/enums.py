@@ -3,7 +3,7 @@ from typing import Optional
 
 from lxml import etree
 
-from xsdata.utils.text import split_prefix
+from xsdata.utils.text import capitalize, split_prefix
 
 XMLSchema = "http://www.w3.org/2001/XMLSchema"
 
@@ -136,10 +136,17 @@ class TagType(Enum):
 
     @property
     def qname(self):
+        """Qualified name: {namespace}tag."""
         return etree.QName(XMLSchema, self.value)
+
+    @property
+    def cname(self):
+        """Class name."""
+        return capitalize(self.value)
 
     @classmethod
     def qnames(cls):
+        """All types indexed by their qname."""
         return {tag.qname: tag for tag in TagType}
 
 

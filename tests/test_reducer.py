@@ -174,17 +174,11 @@ class ClassReducerTests(FactoryTestCase):
     def test_flatten_attribute(self, mock_find_common_type):
         common = ClassFactory.create(
             name="bar",
-            attrs=[
-                AttrFactory.create(
-                    name="b", type="b", restrictions={"required": True},
-                )
-            ],
+            attrs=[AttrFactory.create(name="b", type="b", required=True)],
         )
         mock_find_common_type.side_effect = [None, common]
 
-        obj = AttrFactory.create(
-            name="a", type="a", restrictions={"min_occurs": 1}
-        )
+        obj = AttrFactory.create(name="a", type="a", min_occurs=1)
 
         reducer = ClassReducer()
         reducer.flatten_attribute(obj, self.nsmap)

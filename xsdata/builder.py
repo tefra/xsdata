@@ -90,7 +90,7 @@ class ClassBuilder:
                 help=obj.display_help,
                 forward_ref=forward_ref,
                 namespace=obj.namespace,
-                restrictions=obj.get_restrictions(),
+                **obj.get_restrictions(),
             )
         )
 

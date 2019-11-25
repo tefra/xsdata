@@ -83,8 +83,8 @@ class AttrFactory(Factory):
         namespace=None,
         help=None,
         forward_ref=False,
-        restrictions=None,
         default=None,
+        **kwargs,
     ):
 
         return cls.model(
@@ -95,8 +95,8 @@ class AttrFactory(Factory):
             namespace=namespace or None,
             help=help or None,
             forward_ref=forward_ref,
-            restrictions=restrictions or {},
             default=default or None,
+            **kwargs,
         )
 
 

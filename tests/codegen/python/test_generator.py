@@ -153,7 +153,7 @@ class PythonAbstractGeneratorTests(FactoryTestCase):
         self.assertEqual('Optional["Parent.FooBar"]', actual)
 
         parents = ["A", "Parent"]
-        attr.restrictions["max_occurs"] = "2"
+        attr.max_occurs = 2
         actual = generator.attribute_type(attr, parents)
         self.assertEqual('List["A.Parent.FooBar"]', actual)
 
@@ -184,5 +184,5 @@ class PythonAbstractGeneratorTests(FactoryTestCase):
         attr.default = "not-true"
         self.assertFalse(generator.attribute_default(attr))
 
-        attr.restrictions["max_occurs"] = "2"
+        attr.max_occurs = 2
         self.assertEqual("list", generator.attribute_default(attr))

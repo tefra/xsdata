@@ -134,7 +134,8 @@ class ClassReducer:
             if len(common.attrs) == 1:
                 value = common.attrs[0]
                 attr.type = value.type
-                attr.restrictions.update(value.restrictions)
+                for key, value in value.restrictions.items():
+                    setattr(attr, key, value)
             else:
                 logger.debug(
                     f"Missing type implementation: {common.type.__name__}"

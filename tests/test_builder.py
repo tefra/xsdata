@@ -171,8 +171,8 @@ class ClassBuilderTests(FactoryTestCase):
             namespace=mock_namespace.return_value,
             help=mock_display_help.return_value,
             forward_ref=False,
-            restrictions=mock_get_restrictions.return_value,
             default="false",
+            **mock_get_restrictions.return_value,
         )
         self.assertEqual(expected, item.attrs[0])
         has_inner_type.assert_called_once_with(attribute)

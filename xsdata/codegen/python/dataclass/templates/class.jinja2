@@ -5,8 +5,11 @@ class {{ obj.name }}{{"({})".format(obj.extensions|join(', ')) if obj.extensions
 {%- if help %}
 {{ help|indent(4, first=True) }}
 {%- endif -%}
-{%- if obj.attrs|length == 0 %}
+{%- if obj.attrs|length == 0 and not obj.is_root %}
     pass
+{%- endif -%}
+{%- if obj.is_root %}
+    ROOT_NAME = "{{ obj.local_name }}"
 {%- endif -%}
 {%- for attr in obj.attrs %}
     {%- set field_params = dict(

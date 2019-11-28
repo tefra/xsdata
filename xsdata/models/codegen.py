@@ -68,10 +68,15 @@ class Attr:
 class Class:
     name: str
     type: Type
+    is_root: bool
+    local_name: str = field(init=False)
     help: Optional[str] = field(default=None)
     extensions: List[str] = field(default_factory=list)
     attrs: List[Attr] = field(default_factory=list)
     inner: List["Class"] = field(default_factory=list)
+
+    def __post_init__(self):
+        self.local_name = self.name
 
     @property
     def is_enumeration(self):

@@ -26,20 +26,30 @@ class ClassBuilderTests(FactoryTestCase):
 
     @patch.object(ClassBuilder, "build_class")
     def test_process(self, mock_build_class):
-        self.schema.simple_types = [SimpleType.create() for i in range(2)]
-        self.schema.attribute_groups = [
-            AttributeGroup.create() for i in range(2)
-        ]
-        self.schema.attributes = [Attribute.create() for i in range(2)]
-        self.schema.complex_types = [ComplexType.create() for i in range(2)]
-        self.schema.elements = [Element.create() for i in range(2)]
+        self.schema.simple_types = [SimpleType.create() for _ in "ab"]
+        self.schema.attribute_groups = [AttributeGroup.create() for _ in "ab"]
+        self.schema.attributes = [Attribute.create() for _ in "ab"]
+        self.schema.complex_types = [ComplexType.create() for _ in "ab"]
+        self.schema.elements = [Element.create() for _ in "ab"]
 
-        classes = ClassFactory.list(10)
-        mock_build_class.side_effect = classes
+        mock_build_class.side_effect = classes = ClassFactory.list(10)
 
-        result = self.builder.build()
+        self.assertEqual(classes, self.builder.build())
 
-        self.assertEqual(classes, result)
+        mock_build_class.assert_has_calls(
+            [
+                call(self.schema.simple_types[0]),
+                call(self.schema.simple_types[1]),
+                call(self.schema.attribute_groups[0]),
+                call(self.schema.attribute_groups[1]),
+                call(self.schema.attributes[0]),
+                call(self.schema.attributes[1]),
+                call(self.schema.complex_types[0], is_root=True),
+                call(self.schema.complex_types[1], is_root=True),
+                call(self.schema.elements[0], is_root=True),
+                call(self.schema.elements[1], is_root=True),
+            ]
+        )
 
     @patch.object(ClassBuilder, "build_class_attribute", return_value=None)
     @patch.object(ClassBuilder, "element_children")
@@ -177,24 +187,6 @@ class ClassBuilderTests(FactoryTestCase):
         self.assertEqual(expected, item.attrs[0])
         has_inner_type.assert_called_once_with(attribute)
         mock_warning.assert_not_called()
-
-    @patch("xsdata.builder.logger.warning")
-    @patch.object(ClassBuilder, "has_inner_type")
-    @patch.object(Element, "real_type", new_callable=PropertyMock)
-    def test_build_class_attribute_when_failed_to_detect_real_type(
-        self, mock_real_type, has_inner_type, mock_warning,
-    ):
-        mock_real_type.return_value = None
-        has_inner_type.return_value = False
-
-        item = ClassFactory.create()
-        attribute = Element.create(name="foo", type="bar")
-        self.builder.build_class_attribute(item, attribute)
-
-        has_inner_type.assert_called_once_with(attribute)
-        mock_warning.assert_called_once_with(
-            "Failed to detect type for element: foo"
-        )
 
     @patch.object(ClassBuilder, "build_inner_class")
     @patch.object(ClassBuilder, "has_inner_type")

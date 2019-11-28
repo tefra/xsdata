@@ -33,15 +33,19 @@ class ClassBuilder:
         classes.extend(map(self.build_class, self.schema.simple_types))
         classes.extend(map(self.build_class, self.schema.attribute_groups))
         classes.extend(map(self.build_class, self.schema.attributes))
-        classes.extend(map(self.build_class, self.schema.complex_types))
-        classes.extend(map(self.build_class, self.schema.elements))
+        classes.extend(map(self.build_root_class, self.schema.complex_types))
+        classes.extend(map(self.build_root_class, self.schema.elements))
         return classes
 
-    def build_class(self, obj: BaseElement) -> Class:
+    def build_root_class(self, obj: BaseElement):
+        return self.build_class(obj, is_root=True)
+
+    def build_class(self, obj: BaseElement, is_root=False) -> Class:
         """Build and return a class instance."""
 
         item = Class(
             name=obj.real_name,
+            is_root=is_root,
             type=type(obj),
             extensions=obj.extensions,
             help=obj.display_help,
@@ -76,10 +80,7 @@ class ClassBuilder:
             self.build_inner_class(parent, obj)
 
         if not obj.real_type:
-            logger.warning(
-                f"Failed to detect type for element: {obj.real_name}"
-            )
-            return None
+            raise ValueError(f"Failed to detect type for element: {obj}")
 
         parent.attrs.append(
             Attr(

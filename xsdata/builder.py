@@ -1,6 +1,6 @@
 import logging
-from dataclasses import dataclass
-from typing import Iterator, List, Union
+from dataclasses import dataclass, field
+from typing import Iterator, List, Optional, Union
 
 from xsdata.models.codegen import Attr, Class
 from xsdata.models.elements import (
@@ -14,6 +14,7 @@ from xsdata.models.elements import (
     SimpleType,
 )
 from xsdata.models.mixins import ElementBase
+from xsdata.utils import text
 
 logger = logging.getLogger(__name__)
 
@@ -26,6 +27,14 @@ AttributeElement = Union[Attribute, Element, Restriction, Enumeration]
 @dataclass
 class ClassBuilder:
     schema: Schema
+    target_prefix: Optional[str] = field(init=False)
+
+    def __post_init__(self) -> None:
+        """Find and set the target prefix for local types."""
+        self.target_prefix = None
+        for prefix, namespace in self.schema.nsmap.items():
+            if namespace == self.schema.target_namespace:
+                self.target_prefix = f"{prefix}:"
 
     def build(self) -> List[Class]:
         """Generate classes from schema elements."""
@@ -47,7 +56,7 @@ class ClassBuilder:
             name=obj.real_name,
             is_root=is_root,
             type=type(obj),
-            extensions=obj.extensions,
+            extensions=list(map(self.strip_target_namespace, obj.extensions)),
             help=obj.display_help,
         )
         for child in self.element_children(obj):
@@ -86,7 +95,7 @@ class ClassBuilder:
             Attr(
                 name=obj.real_name,
                 default=getattr(obj, "default", None),
-                type=obj.real_type,
+                type=self.strip_target_namespace(obj.real_type),
                 local_type=type(obj).__name__,
                 help=obj.display_help,
                 forward_ref=forward_ref,
@@ -106,6 +115,18 @@ class ClassBuilder:
         if isinstance(obj, Element) and obj.complex_type:
             obj.complex_type.name = obj.type = obj.name
             parent.inner.append(self.build_class(obj.complex_type))
+
+    def strip_target_namespace(self, value: str) -> str:
+        """
+        Strip prefixes when they match the target namespace.
+
+        Example: targetNamespace="urn:books" xmlns:bks="urn:books"
+        strip prefix bks from type="bks:BookForm" or base="bks:BookForm"
+        """
+        if self.target_prefix is None:
+            return value
+
+        return text.strip_prefix(value, self.target_prefix)
 
     @staticmethod
     def has_inner_type(obj: AttributeElement) -> bool:

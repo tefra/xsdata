@@ -51,6 +51,7 @@ class ClassBuilderTests(FactoryTestCase):
             ]
         )
 
+    @patch.object(ClassBuilder, "strip_target_namespace")
     @patch.object(ClassBuilder, "build_class_attribute", return_value=None)
     @patch.object(ClassBuilder, "element_children")
     @patch.object(Element, "display_help", new_callable=PropertyMock)
@@ -63,7 +64,9 @@ class ClassBuilderTests(FactoryTestCase):
         mock_display_help,
         mock_element_children,
         mock_build_class_attribute,
+        mock_strip_target_namespace,
     ):
+        mock_strip_target_namespace.side_effect = lambda x: x
         mock_real_name.return_value = "name"
         mock_extensions.return_value = ["foo", "bar"]
         mock_display_help.return_value = "sos"
@@ -78,6 +81,9 @@ class ClassBuilderTests(FactoryTestCase):
                 call(result, child)
                 for child in mock_element_children.return_value
             ]
+        )
+        mock_strip_target_namespace.assert_has_calls(
+            [call("foo"), call("bar")]
         )
 
         expected = ClassFactory.create(
@@ -146,6 +152,7 @@ class ClassBuilderTests(FactoryTestCase):
         self.assertEqual(expected, list(children))
 
     @patch("xsdata.builder.logger.warning")
+    @patch.object(ClassBuilder, "strip_target_namespace")
     @patch.object(ClassBuilder, "has_inner_type")
     @patch.object(Attribute, "get_restrictions")
     @patch.object(Attribute, "namespace", new_callable=PropertyMock)
@@ -159,7 +166,8 @@ class ClassBuilderTests(FactoryTestCase):
         mock_display_help,
         mock_namespace,
         mock_get_restrictions,
-        has_inner_type,
+        mock_has_inner_type,
+        mock_strip_target_namespace,
         mock_warning,
     ):
         item = ClassFactory.create()
@@ -169,7 +177,8 @@ class ClassBuilderTests(FactoryTestCase):
         mock_display_help.return_value = "sos"
         mock_namespace.return_value = "http://something/common"
         mock_get_restrictions.return_value = {"required": True}
-        has_inner_type.return_value = False
+        mock_has_inner_type.return_value = False
+        mock_strip_target_namespace.side_effect = lambda x: x
 
         attribute = Attribute.create(default="false")
 
@@ -185,8 +194,11 @@ class ClassBuilderTests(FactoryTestCase):
             **mock_get_restrictions.return_value,
         )
         self.assertEqual(expected, item.attrs[0])
-        has_inner_type.assert_called_once_with(attribute)
+        mock_has_inner_type.assert_called_once_with(attribute)
         mock_warning.assert_not_called()
+        mock_strip_target_namespace.assert_called_once_with(
+            mock_real_type.return_value
+        )
 
     @patch.object(ClassBuilder, "build_inner_class")
     @patch.object(ClassBuilder, "has_inner_type")
@@ -226,3 +238,15 @@ class ClassBuilderTests(FactoryTestCase):
 
         self.builder.build_inner_class(parent, element)
         self.assertEqual(mock_build_class.return_value, parent.inner[0])
+
+    def test_strip_target_namespace(self):
+        self.schema.nsmap = {
+            "bks": "urn:books",
+            "foo": "bar",
+            None: "http://namespace/other",
+        }
+        self.schema.target_namespace = "urn:books"
+        builder = ClassBuilder(schema=self.schema)
+        self.assertEqual("xs:int", builder.strip_target_namespace("xs:int"))
+        self.assertEqual("int", builder.strip_target_namespace("bks:int"))
+        self.assertEqual("int", builder.strip_target_namespace("int"))

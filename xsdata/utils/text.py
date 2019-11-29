@@ -11,7 +11,7 @@ def split_prefix(string: str, sep: str = ":") -> Tuple:
     if index == -1:
         return None, string
     else:
-        return string[:index], string[index + 1 :]
+        return string[:index], string[index + len(sep) :]
 
 
 def capitalize(string: str) -> str:

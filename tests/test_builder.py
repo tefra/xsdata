@@ -10,6 +10,7 @@ from xsdata.models.elements import (
     ComplexType,
     Element,
     Enumeration,
+    Group,
     Restriction,
     Schema,
     Sequence,
@@ -26,22 +27,25 @@ class ClassBuilderTests(FactoryTestCase):
 
     @patch.object(ClassBuilder, "build_class")
     def test_process(self, mock_build_class):
-        self.schema.simple_types = [SimpleType.create() for _ in "ab"]
-        self.schema.attribute_groups = [AttributeGroup.create() for _ in "ab"]
-        self.schema.attributes = [Attribute.create() for _ in "ab"]
-        self.schema.complex_types = [ComplexType.create() for _ in "ab"]
-        self.schema.elements = [Element.create() for _ in "ab"]
+        for i in range(2):
+            self.schema.simple_types.append(SimpleType.create())
+            self.schema.attribute_groups.append(AttributeGroup.create())
+            self.schema.groups.append(Group.create())
+            self.schema.attributes.append(Attribute.create())
+            self.schema.complex_types.append(ComplexType.create())
+            self.schema.elements.append(Element.create())
 
-        mock_build_class.side_effect = classes = ClassFactory.list(10)
+        mock_build_class.side_effect = classes = ClassFactory.list(12)
 
         self.assertEqual(classes, self.builder.build())
-
         mock_build_class.assert_has_calls(
             [
                 call(self.schema.simple_types[0]),
                 call(self.schema.simple_types[1]),
                 call(self.schema.attribute_groups[0]),
                 call(self.schema.attribute_groups[1]),
+                call(self.schema.groups[0]),
+                call(self.schema.groups[1]),
                 call(self.schema.attributes[0]),
                 call(self.schema.attributes[1]),
                 call(self.schema.complex_types[0], is_root=True),

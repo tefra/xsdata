@@ -9,6 +9,7 @@ from xsdata.models.elements import (
     ComplexType,
     Element,
     Enumeration,
+    Group,
     Restriction,
     Schema,
     SimpleType,
@@ -19,7 +20,7 @@ from xsdata.utils import text
 logger = logging.getLogger(__name__)
 
 BaseElement = Union[
-    Attribute, AttributeGroup, Element, ComplexType, SimpleType
+    Attribute, AttributeGroup, Element, ComplexType, SimpleType, Group
 ]
 AttributeElement = Union[Attribute, Element, Restriction, Enumeration]
 
@@ -41,6 +42,7 @@ class ClassBuilder:
         classes: List[Class] = []
         classes.extend(map(self.build_class, self.schema.simple_types))
         classes.extend(map(self.build_class, self.schema.attribute_groups))
+        classes.extend(map(self.build_class, self.schema.groups))
         classes.extend(map(self.build_class, self.schema.attributes))
         classes.extend(map(self.build_root_class, self.schema.complex_types))
         classes.extend(map(self.build_root_class, self.schema.elements))

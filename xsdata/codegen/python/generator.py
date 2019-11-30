@@ -11,7 +11,7 @@ from xsdata.utils import text
 class PythonAbstractGenerator(AbstractGenerator, ABC):
     @classmethod
     def process_class(cls, obj: Class, parents: List[str] = None) -> Class:
-        """Normalize all class instance fields, extensions, name and the inner
+        """Normalize all class instance fields, extends, name and the inner
         classes recursively."""
         parents = parents or []
         obj.name = cls.class_name(obj.name)

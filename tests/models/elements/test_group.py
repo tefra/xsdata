@@ -4,6 +4,6 @@ from xsdata.models.elements import Group
 
 
 class GroupTests(TestCase):
-    def test_property_extensions(self):
+    def test_property_extends(self):
         obj = Group.create()
-        self.assertEqual([], obj.extensions)
+        self.assertIsNone(obj.extends)

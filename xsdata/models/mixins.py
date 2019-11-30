@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 from dataclasses import MISSING
 from dataclasses import Field as Attrib
 from dataclasses import dataclass, fields
-from typing import Any, Dict, List, Optional, Type, TypeVar
+from typing import Any, Dict, Optional, Type, TypeVar
 
 from lxml import etree
 
@@ -31,13 +31,6 @@ class TypedField(ABC):
             if prefix is None or XSDType.get_enum(real_type)
             else self.nsmap.get(prefix)
         )
-
-
-class ExtendsMixin(ABC):
-    @property
-    @abstractmethod
-    def extensions(self) -> List[str]:
-        pass
 
 
 class NamedField:
@@ -168,3 +161,7 @@ class ElementBase(BaseModel):
     @property
     def is_attribute(self) -> bool:
         return False
+
+    @property
+    def extends(self) -> Optional[str]:
+        return None

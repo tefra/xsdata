@@ -15,6 +15,9 @@ class AttributeGroupTests(TestCase):
         obj.name = "bar"
         self.assertEqual(obj.name, obj.real_name)
 
-    def test_property_extensions(self):
+    def test_property_extends(self):
         obj = AttributeGroup.create()
-        self.assertEqual([], obj.extensions)
+        self.assertIsNone(obj.extends)
+
+        obj.ref = "foo"
+        self.assertEqual("foo", obj.extends)

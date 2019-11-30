@@ -1,10 +1,8 @@
 from unittest import TestCase
 
 from xsdata.models.elements import (
-    ComplexContent,
     ComplexType,
     Element,
-    Extension,
     Length,
     Restriction,
     SimpleType,
@@ -44,20 +42,9 @@ class ElementTests(TestCase):
         obj.type = "bar"
         self.assertEqual(obj.type, obj.real_type)
 
-    def test_property_extensions(self):
+    def test_property_extends(self):
         obj = Element.create()
-        self.assertEqual([], obj.extensions)
-
-        obj.type = "foo_bar"
-        self.assertEqual(["foo_bar"], obj.extensions)
-
-        obj.complex_type = ComplexType.create()
-        self.assertEqual([], obj.extensions)
-
-        obj.complex_type.complex_content = ComplexContent.create(
-            extension=Extension.create(base="thug_life")
-        )
-        self.assertEqual(["thug_life"], obj.extensions)
+        self.assertIsNone(obj.extends)
 
     def test_get_restrictions(self):
         obj = Element.create()

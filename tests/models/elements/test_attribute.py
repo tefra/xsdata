@@ -49,6 +49,6 @@ class AttributeTests(TestCase):
         expected.update(dict(length=1))
         self.assertEqual(expected, obj.get_restrictions())
 
-    def test_property_extensions(self):
+    def test_property_extends(self):
         obj = Attribute.create()
-        self.assertEqual([], obj.extensions)
+        self.assertIsNone(obj.extends)

@@ -10,7 +10,6 @@ from typing import Optional
 from xsdata.models.enums import FormType, ProcessType, UseType, XSDType
 from xsdata.models.mixins import (
     ElementBase,
-    ExtendsMixin,
     NamedField,
     OccurrencesMixin,
     RestrictedField,
@@ -54,9 +53,7 @@ class AnnotationBase(ElementBase):
 
 
 @dataclass
-class SimpleType(
-    AnnotationBase, TypedField, NamedField, ExtendsMixin, RestrictedField
-):
+class SimpleType(AnnotationBase, TypedField, NamedField, RestrictedField):
     name: Optional[str]
     restriction: Optional["Restriction"]
     list: Optional["List"]
@@ -71,10 +68,6 @@ class SimpleType(
         if self.union:
             pass  # I can't do unions
         return XSDType.STRING.code
-
-    @property
-    def extensions(self) -> ArrayList[str]:
-        return []
 
     def get_restrictions(self) -> Dict[str, Anything]:
         if self.restriction:
@@ -118,9 +111,7 @@ class AnyAttribute(AnnotationBase):
 
 
 @dataclass
-class Attribute(
-    AnnotationBase, TypedField, NamedField, RestrictedField, ExtendsMixin
-):
+class Attribute(AnnotationBase, TypedField, NamedField, RestrictedField):
     default: Optional[str]
     fixed: Optional[str]
     form: Optional[FormType]
@@ -154,13 +145,9 @@ class Attribute(
 
         return restrictions
 
-    @property
-    def extensions(self) -> ArrayList[str]:
-        return []
-
 
 @dataclass
-class AttributeGroup(AnnotationBase, NamedField, ExtendsMixin):
+class AttributeGroup(AnnotationBase, NamedField):
     name: Optional[str]
     ref: Optional[str]
     any_attribute: Optional[AnyAttribute]
@@ -168,8 +155,8 @@ class AttributeGroup(AnnotationBase, NamedField, ExtendsMixin):
     attribute_groups: ArrayList["AttributeGroup"] = field(default_factory=list)
 
     @property
-    def extensions(self) -> ArrayList[str]:
-        return []
+    def extends(self) -> Optional[str]:
+        return self.ref
 
 
 @dataclass
@@ -201,7 +188,7 @@ class Choice(AnnotationBase, OccurrencesMixin):
 
 
 @dataclass
-class Group(AnnotationBase, OccurrencesMixin, NamedField, ExtendsMixin):
+class Group(AnnotationBase, OccurrencesMixin, NamedField):
     name: Optional[str]
     ref: Optional[str]
     max_occurs: int = 1
@@ -211,12 +198,12 @@ class Group(AnnotationBase, OccurrencesMixin, NamedField, ExtendsMixin):
     sequence = Optional[Sequence]
 
     @property
-    def extensions(self) -> ArrayList[str]:
-        return []
+    def extends(self) -> Optional[str]:
+        return self.ref
 
 
 @dataclass
-class Extension(AnnotationBase, ExtendsMixin):
+class Extension(AnnotationBase):
     base: str
     group: Optional[Group]
     all: Optional[All]
@@ -227,14 +214,8 @@ class Extension(AnnotationBase, ExtendsMixin):
     attribute_groups: ArrayList[AttributeGroup] = field(default_factory=list)
 
     @property
-    def extensions(self) -> ArrayList[str]:
-        extensions = (
-            [group.real_name for group in self.attribute_groups]
-            if self.attribute_groups
-            else []
-        )
-        extensions.append(self.base)
-        return extensions
+    def extends(self) -> str:
+        return self.base
 
 
 @dataclass
@@ -326,9 +307,7 @@ class WhiteSpace(RestrictionType):
 
 
 @dataclass
-class Restriction(
-    RestrictedField, AnnotationBase, TypedField, NamedField, ExtendsMixin
-):
+class Restriction(RestrictedField, AnnotationBase, TypedField, NamedField):
     VALUE_FIELDS = (
         "min_exclusive",
         "min_inclusive",
@@ -390,8 +369,8 @@ class Restriction(
         return "value"
 
     @property
-    def extensions(self) -> ArrayList[str]:
-        return [self.base]
+    def extends(self) -> Optional[str]:
+        return self.base
 
     def get_restrictions(self) -> Dict[str, Anything]:
         return {
@@ -402,17 +381,9 @@ class Restriction(
 
 
 @dataclass
-class SimpleContent(AnnotationBase, ExtendsMixin):
+class SimpleContent(AnnotationBase):
     restriction: Optional[Restriction]
     extension: Optional[Extension]
-
-    @property
-    def extensions(self) -> ArrayList[str]:
-        if self.extension:
-            return self.extension.extensions
-        elif self.restriction:
-            return self.restriction.extensions
-        return []
 
 
 @dataclass
@@ -421,7 +392,7 @@ class ComplexContent(SimpleContent):
 
 
 @dataclass
-class ComplexType(AnnotationBase, NamedField, ExtendsMixin):
+class ComplexType(AnnotationBase, NamedField):
     name: Optional[str]
     block: Optional[str]
     final: Optional[str]
@@ -436,16 +407,6 @@ class ComplexType(AnnotationBase, NamedField, ExtendsMixin):
     attribute_groups: ArrayList[AttributeGroup] = field(default_factory=list)
     abstract: bool = False
     mixed: bool = False
-
-    @property
-    def extensions(self) -> ArrayList[str]:
-        if self.complex_content:
-            return self.complex_content.extensions
-        if self.simple_content:
-            return self.simple_content.extensions
-        if self.attribute_groups:
-            return [group.real_name for group in self.attribute_groups]
-        return []
 
 
 @dataclass
@@ -481,9 +442,7 @@ class Keyref(AnnotationBase):
 
 
 @dataclass
-class Element(
-    AnnotationBase, TypedField, NamedField, OccurrencesMixin, ExtendsMixin
-):
+class Element(AnnotationBase, TypedField, NamedField, OccurrencesMixin):
     name: str
     id: Optional[str]
     ref: Optional[str]
@@ -519,14 +478,6 @@ class Element(
         if self.complex_type:
             return None
         return XSDType.STRING.code
-
-    @property
-    def extensions(self) -> ArrayList[str]:
-        if self.complex_type:
-            return self.complex_type.extensions
-        elif self.type:
-            return [self.type]
-        return []
 
     def get_restrictions(self) -> Dict[str, Anything]:
         restrictions = super().get_restrictions()

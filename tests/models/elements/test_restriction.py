@@ -48,9 +48,9 @@ class RestrictionTests(TestCase):
             obj.CONTAINER_FIELDS,
         )
 
-    def test_property_extensions(self):
+    def test_property_extends(self):
         obj = Restriction.create(base="foo")
-        self.assertEqual(["foo"], obj.extensions)
+        self.assertEqual("foo", obj.extends)
 
     def test_get_restrictions(self):
         self.assertEqual({}, Restriction.create().get_restrictions())

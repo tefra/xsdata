@@ -58,11 +58,15 @@ class ClassBuilder:
             name=obj.real_name,
             is_root=is_root,
             type=type(obj),
-            extensions=list(map(self.strip_target_namespace, obj.extensions)),
             help=obj.display_help,
         )
+
         for child in self.element_children(obj):
             self.build_class_attribute(item, child)
+
+        extensions = set([ext for ext in self.element_extensions(obj)])
+        extensions.add(getattr(obj, "type", None))
+        item.extensions = list(sorted(filter(None, extensions)))
 
         if len(item.extensions) == 0 and len(item.attrs) == 0:
             logger.warning(f"Empty class: `{item.name}`")
@@ -77,6 +81,18 @@ class ClassBuilder:
                 yield child
             else:
                 yield from self.element_children(child)
+
+    def element_extensions(self, obj: ElementBase) -> Iterator[str]:
+        """Recursively find and return all child elements that are qualified to
+        be class attributes."""
+        for child in obj.children():
+            if child.is_attribute:
+                continue
+
+            if child.extends is not None:
+                yield self.strip_target_namespace(child.extends)
+
+            yield from self.element_extensions(child)
 
     def build_class_attribute(self, parent: Class, obj: AttributeElement):
         """

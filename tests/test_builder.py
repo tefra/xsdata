@@ -10,6 +10,7 @@ from xsdata.models.elements import (
     ComplexType,
     Element,
     Enumeration,
+    Extension,
     Group,
     Restriction,
     Schema,
@@ -55,24 +56,21 @@ class ClassBuilderTests(FactoryTestCase):
             ]
         )
 
-    @patch.object(ClassBuilder, "strip_target_namespace")
     @patch.object(ClassBuilder, "build_class_attribute", return_value=None)
+    @patch.object(ClassBuilder, "element_extensions")
     @patch.object(ClassBuilder, "element_children")
     @patch.object(Element, "display_help", new_callable=PropertyMock)
-    @patch.object(Element, "extensions", new_callable=PropertyMock)
     @patch.object(Element, "real_name", new_callable=PropertyMock)
     def test_build_class(
         self,
         mock_real_name,
-        mock_extensions,
         mock_display_help,
         mock_element_children,
+        mock_element_extensions,
         mock_build_class_attribute,
-        mock_strip_target_namespace,
     ):
-        mock_strip_target_namespace.side_effect = lambda x: x
         mock_real_name.return_value = "name"
-        mock_extensions.return_value = ["foo", "bar"]
+        mock_element_extensions.return_value = ["foo", "bar"]
         mock_display_help.return_value = "sos"
         mock_element_children.return_value = [
             Attribute.create(name=x) for x in "ab"
@@ -86,12 +84,8 @@ class ClassBuilderTests(FactoryTestCase):
                 for child in mock_element_children.return_value
             ]
         )
-        mock_strip_target_namespace.assert_has_calls(
-            [call("foo"), call("bar")]
-        )
-
         expected = ClassFactory.create(
-            name="name", type=Element, extensions=["foo", "bar"], help="sos"
+            name="name", type=Element, extensions=["bar", "foo"], help="sos"
         )
         self.assertEqual(expected, result)
 
@@ -99,7 +93,7 @@ class ClassBuilderTests(FactoryTestCase):
     @patch.object(ClassBuilder, "build_class_attribute", return_value=None)
     @patch.object(ClassBuilder, "element_children")
     @patch.object(Element, "display_help", new_callable=PropertyMock)
-    @patch.object(Element, "extensions", new_callable=PropertyMock)
+    @patch.object(Element, "extends", new_callable=PropertyMock)
     @patch.object(Element, "real_name", new_callable=PropertyMock)
     def test_build_class_with_no_extensions_and_attributes(
         self,
@@ -124,6 +118,12 @@ class ClassBuilderTests(FactoryTestCase):
         mock_warning.assert_called_once_with(f"Empty class: `{item.name}`")
 
         self.assertEqual(item, result)
+
+    def test_build_class_with_typed_element(self):
+        result = self.builder.build_class(
+            Attribute.create(type="foo", name="attr")
+        )
+        self.assertEqual(["foo"], result.extensions)
 
     def test_element_children(self):
         complex_type = ComplexType.create(
@@ -154,6 +154,32 @@ class ClassBuilderTests(FactoryTestCase):
         ]
         self.assertIsInstance(children, GeneratorType)
         self.assertEqual(expected, list(children))
+
+    @patch.object(ClassBuilder, "strip_target_namespace")
+    def test_element_extensions(self, mock_strip_target_namespace):
+        mock_strip_target_namespace.side_effect = lambda x: x
+
+        complex_type = ComplexType.create(
+            attributes=[Attribute.create() for i in range(2)],
+            sequence=Sequence.create(
+                elements=[Group.create(ref=x) for x in "abc"]
+            ),
+            simple_content=SimpleContent.create(
+                restriction=Restriction.create(base="isAttribute")
+            ),
+            complex_content=ComplexContent.create(
+                extension=Extension.create(base="ext")
+            ),
+        )
+
+        children = self.builder.element_extensions(complex_type)
+        expected = ["ext", "a", "b", "c"]
+
+        self.assertIsInstance(children, GeneratorType)
+        self.assertEqual(expected, list(children))
+        mock_strip_target_namespace.assert_has_calls(
+            [call(x) for x in expected]
+        )
 
     @patch("xsdata.builder.logger.warning")
     @patch.object(ClassBuilder, "strip_target_namespace")

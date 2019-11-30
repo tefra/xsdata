@@ -201,7 +201,7 @@ class Choice(AnnotationBase, OccurrencesMixin):
 
 
 @dataclass
-class Group(AnnotationBase, OccurrencesMixin):
+class Group(AnnotationBase, OccurrencesMixin, NamedField, ExtendsMixin):
     name: Optional[str]
     ref: Optional[str]
     max_occurs: int = 1
@@ -209,6 +209,10 @@ class Group(AnnotationBase, OccurrencesMixin):
     all = Optional[All]
     choice = Optional[Choice]
     sequence = Optional[Sequence]
+
+    @property
+    def extensions(self) -> ArrayList[str]:
+        return []
 
 
 @dataclass
@@ -224,7 +228,13 @@ class Extension(AnnotationBase, ExtendsMixin):
 
     @property
     def extensions(self) -> ArrayList[str]:
-        return [self.base]
+        extensions = (
+            [group.real_name for group in self.attribute_groups]
+            if self.attribute_groups
+            else []
+        )
+        extensions.append(self.base)
+        return extensions
 
 
 @dataclass

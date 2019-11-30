@@ -191,11 +191,11 @@ class Choice(AnnotationBase, OccurrencesMixin):
 class Group(AnnotationBase, OccurrencesMixin, NamedField):
     name: Optional[str]
     ref: Optional[str]
+    all: Optional[All]
+    choice: Optional[Choice]
+    sequence: Optional[Sequence]
     max_occurs: int = 1
     min_occurs: int = 1
-    all = Optional[All]
-    choice = Optional[Choice]
-    sequence = Optional[Sequence]
 
     @property
     def extends(self) -> Optional[str]:

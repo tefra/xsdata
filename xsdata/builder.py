@@ -14,6 +14,7 @@ from xsdata.models.elements import (
     Schema,
     SimpleType,
 )
+from xsdata.models.enums import TagType, XSDType
 from xsdata.models.mixins import ElementBase
 from xsdata.utils import text
 
@@ -69,6 +70,14 @@ class ClassBuilder:
         item.extensions = list(sorted(filter(None, extensions)))
 
         if len(item.extensions) == 0 and len(item.attrs) == 0:
+            item.attrs.append(
+                Attr(
+                    name="value",
+                    default=None,
+                    type=XSDType.STRING.code,
+                    local_type=TagType.RESTRICTION.cname,
+                )
+            )
             logger.warning(f"Empty class: `{item.name}`")
 
         return item

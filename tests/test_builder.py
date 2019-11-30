@@ -18,6 +18,7 @@ from xsdata.models.elements import (
     SimpleContent,
     SimpleType,
 )
+from xsdata.models.enums import TagType, XSDType
 
 
 class ClassBuilderTests(FactoryTestCase):
@@ -104,7 +105,18 @@ class ClassBuilderTests(FactoryTestCase):
         mock_build_class_attribute,
         mock_warning,
     ):
-        item = ClassFactory.create(type=Element, help="sos")
+        item = ClassFactory.create(
+            type=Element,
+            help="sos",
+            attrs=[
+                AttrFactory.create(
+                    name="value",
+                    default=None,
+                    type=XSDType.STRING.code,
+                    local_type=TagType.RESTRICTION.cname,
+                )
+            ],
+        )
 
         mock_real_name.return_value = item.name
         mock_extensions.return_value = []

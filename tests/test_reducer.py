@@ -1,17 +1,9 @@
 from unittest import mock
 
 from tests.factories import AttrFactory, ClassFactory, FactoryTestCase
-from xsdata.models import elements
-from xsdata.models.elements import (
-    Attribute,
-    ComplexType,
-    Element,
-    Schema,
-    SimpleType,
-)
+from xsdata.models.elements import Element, Restriction, Schema, SimpleType
 from xsdata.models.enums import TagType, XSDType
 from xsdata.reducer import ClassReducer
-from xsdata.utils.text import capitalize
 
 
 class ClassReducerTests(FactoryTestCase):
@@ -26,55 +18,60 @@ class ClassReducerTests(FactoryTestCase):
             target_namespace=self.target_namespace, nsmap=self.nsmap
         )
 
-    @mock.patch.object(ClassReducer, "flatten_class")
-    @mock.patch.object(ClassReducer, "add_common_type")
-    def test_process(self, mock_add_common_type, mock_flatten_class):
+    @mock.patch.object(ClassReducer, "flatten_classes")
+    @mock.patch.object(ClassReducer, "add_common_types")
+    def test_process(self, mock_add_common_types, mock_flatten_classes):
         classes = ClassFactory.list(3, type=Element)
-        classes.extend(ClassFactory.list(3, type=SimpleType))
-
-        result = ClassReducer().process(self.schema, classes.copy())
-        self.assertEqual(classes[:3], result)
-
-        common_types = reversed(classes[3:])
-        mock_add_common_type.assert_has_calls(
-            [mock.call(obj, self.target_namespace) for obj in common_types]
+        common = ClassFactory.list(2, type=SimpleType)
+        enums = ClassFactory.list(
+            2,
+            type=Restriction,
+            attrs=AttrFactory.list(2, local_type=TagType.ENUMERATION.cname),
         )
+
+        all = classes + common + enums
+
+        result = ClassReducer().process(self.schema, all)
+
+        self.assertEqual(enums + classes, result)
+
+        mock_add_common_types.assert_has_calls(
+            [
+                mock.call(enums, self.target_namespace),
+                mock.call(common, self.target_namespace),
+            ]
+        )
+
+        mock_flatten_classes.assert_has_calls(
+            [mock.call(common, self.nsmap), mock.call(classes, self.nsmap)]
+        )
+
+    @mock.patch.object(ClassReducer, "flatten_class")
+    def test_flatten_classes(self, mock_flatten_class):
+        classes = ClassFactory.list(2)
+        ClassReducer().flatten_classes(classes, self.target_namespace)
+
         mock_flatten_class.assert_has_calls(
-            [mock.call(obj, self.nsmap) for obj in classes], any_order=True
+            [mock.call(obj, self.target_namespace) for obj in classes]
         )
 
-    def test_is_common(self):
-        for tag in TagType:
-            cl = getattr(elements, capitalize(tag.value))
-            obj = ClassFactory.create(name="foo", type=cl)
-            if obj.type in [Attribute, Element, ComplexType]:
-                self.assertFalse(
-                    ClassReducer.is_common(obj), f"Is common: {cl}"
-                )
-            else:
-                self.assertTrue(
-                    ClassReducer.is_common(obj), f"Is not common: {cl}"
-                )
-
-        obj = ClassFactory.create(
-            type=SimpleType,
-            attrs=AttrFactory.list(1, local_type=TagType.ENUMERATION.cname),
-        )
-        self.assertFalse(ClassReducer.is_common(obj))
-
-    def test_add_common_type(self):
+    def test_add_common_types(self):
         reducer = ClassReducer()
-        obj = ClassFactory.create(name="foo", type=SimpleType)
-        reducer.add_common_type(obj, "common")
-        reducer.add_common_type(obj, None)
-        expected = {"{common}foo": obj, "foo": obj}
+        classes = ClassFactory.list(2)
+        reducer.add_common_types(classes, self.target_namespace)
+        expected = {
+            f"{{{self.target_namespace}}}{obj.name}": obj for obj in classes
+        }
+
         self.assertEqual(expected, reducer.common_types)
 
     def test_find_common_type(self):
         reducer = ClassReducer()
         obj = ClassFactory.create(name="foo", type=SimpleType)
-        reducer.add_common_type(obj, self.nsmap["common"])
-        reducer.add_common_type(obj, self.nsmap[None])
+        reducer.common_types = {
+            f"{{http://namespace/target}}{obj.name}": obj,
+            f"{{http://namespace/common}}{obj.name}": obj,
+        }
 
         self.assertEqual(obj, reducer.find_common_type("foo", self.nsmap))
         self.assertEqual(

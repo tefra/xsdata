@@ -1,16 +1,24 @@
 import copy
 import logging
 from dataclasses import dataclass, field
-from typing import Dict, List, Optional, Tuple
+from typing import Callable, Dict, List, Optional
 
 from lxml import etree
 
 from xsdata.models.codegen import Attr, Class
-from xsdata.models.elements import Attribute, ComplexType, Element, Schema
+from xsdata.models.elements import Schema
 from xsdata.models.enums import XSDType
 from xsdata.utils.text import split_prefix
 
 logger = logging.getLogger(__name__)
+
+
+def is_enumeration(obj: Class) -> bool:
+    return obj.is_enumeration
+
+
+def is_common(obj: Class) -> bool:
+    return obj.is_common
 
 
 @dataclass
@@ -25,50 +33,38 @@ class ClassReducer:
         Process class list in steps.
 
         Steps:
-            * Separate common from generation types
-            * Add all common types to registry
+            * Separate common/enumerations from class list
+            * Add all common/enumerations to registry
             * Flatten the current common types
             * Flatten the generation types
 
-        :return: The final list of normalized classes for generation
+        :return: The final list of normalized classes/enumerations
         """
         namespace = schema.target_namespace
         nsmap = schema.nsmap
-        common_types, classes = self.split_common_types(classes)
 
-        for obj in common_types:
-            self.add_common_type(obj, namespace)
+        enumerations = self.pop_classes(classes, condition=is_enumeration)
+        common_types = self.pop_classes(classes, condition=is_common)
 
-        for obj in common_types:
-            self.flatten_class(obj, nsmap)
+        self.add_common_types(enumerations, namespace)
+        self.add_common_types(common_types, namespace)
 
+        self.flatten_classes(common_types, nsmap)
+        self.flatten_classes(classes, nsmap)
+
+        return enumerations + classes
+
+    def flatten_classes(self, classes: List[Class], nsmap: Dict):
         for obj in classes:
             self.flatten_class(obj, nsmap)
 
-        return classes
-
-    def split_common_types(
-        self, classes: List[Class]
-    ) -> Tuple[List[Class], List[Class]]:
-        """
-        Separate common types from the given class list, the original class
-        list is updated in place but return it as well for consistency.
-
-        :return: A tuple with a list of common types and the list of generation
-            types
-        """
-        common_types = []
-        for i in range(len(classes) - 1, -1, -1):
-            if self.is_common(classes[i]):
-                common_types.append(classes.pop(i))
-
-        return common_types, classes
-
-    def add_common_type(self, obj: Class, namespace: Optional[str]) -> None:
+    def add_common_types(self, classes: List[Class], namespace: Optional[str]):
         """Add class to the common types registry with its qualified name with
         the target namespace."""
-        qname = etree.QName(namespace, obj.name)
-        self.common_types[qname.text] = obj
+
+        self.common_types.update(
+            {etree.QName(namespace, obj.name).text: obj for obj in classes}
+        )
 
     def find_common_type(self, name: str, nsmap: Dict) -> Optional[Class]:
         """Find a common type by the qualified named with the namespace
@@ -143,12 +139,15 @@ class ClassReducer:
                 attr.type = XSDType.STRING.code
 
     @staticmethod
-    def is_common(obj: Class) -> bool:
-        """Return true if class is not one of the generation types."""
-        return (
-            obj.type not in [Attribute, Element, ComplexType]
-            and not obj.is_enumeration
-        )
+    def pop_classes(classes: List[Class], condition: Callable) -> List[Class]:
+        """Pop and return the objects matching the given condition from the
+        given list of of classes."""
+        matches = []
+        for i in range(len(classes) - 1, -1, -1):
+            if condition(classes[i]):
+                matches.append(classes.pop(i))
+
+        return list(reversed(matches))
 
 
 reducer = ClassReducer()

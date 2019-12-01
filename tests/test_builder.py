@@ -57,7 +57,8 @@ class ClassBuilderTests(FactoryTestCase):
             ]
         )
 
-    @patch.object(ClassBuilder, "build_class_attribute", return_value=None)
+    @patch.object(ClassBuilder, "build_class_extensions")
+    @patch.object(ClassBuilder, "build_class_attribute")
     @patch.object(ClassBuilder, "element_extensions")
     @patch.object(ClassBuilder, "element_children")
     @patch.object(Element, "display_help", new_callable=PropertyMock)
@@ -69,9 +70,10 @@ class ClassBuilderTests(FactoryTestCase):
         mock_element_children,
         mock_element_extensions,
         mock_build_class_attribute,
+        mock_build_class_extensions,
     ):
         mock_real_name.return_value = "name"
-        mock_element_extensions.return_value = ["foo", "bar"]
+        mock_build_class_extensions.return_value = ["foo", "bar"]
         mock_display_help.return_value = "sos"
         mock_element_children.return_value = [
             Attribute.create(name=x) for x in "ab"
@@ -86,7 +88,7 @@ class ClassBuilderTests(FactoryTestCase):
             ]
         )
         expected = ClassFactory.create(
-            name="name", type=Element, extensions=["bar", "foo"], help="sos"
+            name="name", type=Element, extensions=["foo", "bar"], help="sos"
         )
         self.assertEqual(expected, result)
 
@@ -137,6 +139,24 @@ class ClassBuilderTests(FactoryTestCase):
         )
         self.assertEqual(["foo"], result.extensions)
 
+    @patch.object(ClassBuilder, "element_extensions")
+    def test_build_class_extensions(self, mock_element_extensions):
+        mock_element_extensions.return_value = [
+            "bks:books",
+            "xs:string",
+            "title",
+            "genre",
+            None,
+        ]
+        obj = Element.create(type="bks:paper")
+
+        expected = ["bks:books", "bks:paper", "genre", "title", "xs:string"]
+        self.assertEqual(expected, self.builder.build_class_extensions(obj))
+
+        self.builder.target_prefix = "bks:"
+        expected = ["books", "genre", "paper", "title", "xs:string"]
+        self.assertEqual(expected, self.builder.build_class_extensions(obj))
+
     def test_element_children(self):
         complex_type = ComplexType.create(
             attributes=[Attribute.create() for i in range(2)],
@@ -167,9 +187,7 @@ class ClassBuilderTests(FactoryTestCase):
         self.assertIsInstance(children, GeneratorType)
         self.assertEqual(expected, list(children))
 
-    @patch.object(ClassBuilder, "strip_target_namespace")
-    def test_element_extensions(self, mock_strip_target_namespace):
-        mock_strip_target_namespace.side_effect = lambda x: x
+    def test_element_extensions(self):
 
         complex_type = ComplexType.create(
             attributes=[Attribute.create() for i in range(2)],
@@ -189,9 +207,6 @@ class ClassBuilderTests(FactoryTestCase):
 
         self.assertIsInstance(children, GeneratorType)
         self.assertEqual(expected, list(children))
-        mock_strip_target_namespace.assert_has_calls(
-            [call(x) for x in expected]
-        )
 
     @patch("xsdata.builder.logger.warning")
     @patch.object(ClassBuilder, "strip_target_namespace")

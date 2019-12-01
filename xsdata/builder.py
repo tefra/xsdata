@@ -59,15 +59,12 @@ class ClassBuilder:
             name=obj.real_name,
             is_root=is_root,
             type=type(obj),
+            extensions=self.build_class_extensions(obj),
             help=obj.display_help,
         )
 
         for child in self.element_children(obj):
             self.build_class_attribute(item, child)
-
-        extensions = set([ext for ext in self.element_extensions(obj)])
-        extensions.add(getattr(obj, "type", None))
-        item.extensions = list(sorted(filter(None, extensions)))
 
         if len(item.extensions) == 0 and len(item.attrs) == 0:
             item.attrs.append(
@@ -81,6 +78,15 @@ class ClassBuilder:
             logger.warning(f"Empty class: `{item.name}`")
 
         return item
+
+    def build_class_extensions(self, obj: ElementBase) -> List[str]:
+        """Return a sorted, filtered list of base class names with stripped the
+        target namespace prefix."""
+        extensions = set([ext for ext in self.element_extensions(obj)])
+        extensions.add(getattr(obj, "type", None))
+        return list(
+            sorted(map(self.strip_target_namespace, filter(None, extensions)))
+        )
 
     def element_children(self, obj: ElementBase) -> Iterator[AttributeElement]:
         """Recursively find and return all child elements that are qualified to
@@ -99,7 +105,7 @@ class ClassBuilder:
                 continue
 
             if child.extends is not None:
-                yield self.strip_target_namespace(child.extends)
+                yield child.extends
 
             yield from self.element_extensions(child)
 

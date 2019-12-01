@@ -9,9 +9,9 @@ class Field:
     name: str
     local_name: str
     type: Any
-    is_list: bool
-    is_attribute: bool
-    default: Any
+    is_list: bool = False
+    is_attribute: bool = False
+    default: Any = None
 
 
 @dataclass

@@ -5,7 +5,7 @@ from typing import Callable, Dict, List, Optional
 
 from lxml import etree
 
-from xsdata.models.codegen import Attr, Class
+from xsdata.models.codegen import Attr, Class, Extension
 from xsdata.models.elements import Schema
 from xsdata.models.enums import XSDType
 from xsdata.utils.text import split_prefix
@@ -87,6 +87,13 @@ class ClassReducer:
             * Attributes
             * Inner classes
         """
+
+        if (
+            "OriginDestinationInformationTPA_ExtensionsGroup"
+            in item.extensions
+        ):
+            pass
+
         for extension in list(item.extensions):
             self.flatten_extension(item, extension, nsmap)
 
@@ -96,7 +103,9 @@ class ClassReducer:
         for inner in item.inner:
             self.flatten_class(inner, nsmap)
 
-    def flatten_extension(self, item: Class, extension: str, nsmap: Dict):
+    def flatten_extension(
+        self, item: Class, extension: Extension, nsmap: Dict
+    ):
         """
         If the extension class is found in the registry prepend it's attributes
         to the given class.
@@ -105,16 +114,26 @@ class ClassReducer:
         prepended with the extension prefix if it isn't a reference to
         another schema.
         """
-        common = self.find_common_type(extension, nsmap)
+        common = self.find_common_type(extension.name, nsmap)
         if common is not None:
-            prefix, ext = split_prefix(extension)
+            prefix, ext = split_prefix(extension.name)
+            item.inner.extend(copy.deepcopy(common.inner))
             new_attrs = copy.deepcopy(common.attrs)
-            if prefix:
-                for attr in new_attrs:
-                    if attr.type.find(":") == -1:
-                        attr.type = f"{prefix}:{attr.type}"
+            position = next(
+                (
+                    index
+                    for index, attr in enumerate(item.attrs)
+                    if attr.index > extension.index
+                ),
+                0,
+            )
+            for attr in new_attrs:
+                if prefix and attr.type.find(":") == -1:
+                    attr.type = f"{prefix}:{attr.type}"
 
-            item.attrs = new_attrs + item.attrs
+                item.attrs.insert(position, attr)
+                position += 1
+
             item.extensions.remove(extension)
 
     def flatten_attribute(self, attr: Attr, nsmap: Dict):

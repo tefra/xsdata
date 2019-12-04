@@ -2,7 +2,7 @@ import logging
 from dataclasses import dataclass, field
 from typing import Iterator, List, Optional, Union
 
-from xsdata.models.codegen import Attr, Class
+from xsdata.models.codegen import Attr, Class, Extension
 from xsdata.models.elements import (
     Attribute,
     AttributeGroup,
@@ -63,32 +63,36 @@ class ClassBuilder:
             help=obj.display_help,
         )
 
-        for child in self.element_children(obj):
-            self.build_class_attribute(item, child)
-
-        item.attrs.sort(key=lambda x: x.index)
-
-        if len(item.extensions) == 0 and len(item.attrs) == 0:
-            item.attrs.append(
-                Attr(
-                    index=0,
-                    name="value",
-                    default=None,
-                    type=XSDType.STRING.code,
-                    local_type=TagType.RESTRICTION.cname,
-                )
-            )
-            logger.warning(f"Empty class: `{item.name}`")
+        self.build_class_attributes(obj, item)
 
         return item
 
-    def build_class_extensions(self, obj: ElementBase) -> List[str]:
-        """Return a sorted, filtered list of base class names with stripped the
-        target namespace prefix."""
-        extensions = set([ext for ext in self.element_extensions(obj)])
-        extensions.add(getattr(obj, "type", None))
-        return list(
-            sorted(map(self.strip_target_namespace, filter(None, extensions)))
+    def build_class_attributes(self, obj: ElementBase, item: Class):
+        for child in self.element_children(obj):
+            self.build_class_attribute(item, child)
+
+        default_value_type = self.default_value_type(item)
+        if default_value_type is not None:
+            value_attr = Attr(
+                index=0,
+                name="value",
+                default=None,
+                type=default_value_type,
+                local_type=TagType.EXTENSION.cname,
+            )
+            item.attrs.append(value_attr)
+
+        item.attrs.sort(key=lambda x: x.index)
+
+    def build_class_extensions(self, obj: ElementBase) -> List[Extension]:
+        """Return a sorted, filtered list of extensions."""
+        return sorted(
+            list(
+                {
+                    ext.name: ext for ext in self.element_extensions(obj)
+                }.values()
+            ),
+            key=lambda x: x.name,
         )
 
     def element_children(self, obj: ElementBase) -> Iterator[AttributeElement]:
@@ -100,17 +104,29 @@ class ClassBuilder:
             else:
                 yield from self.element_children(child)
 
-    def element_extensions(self, obj: ElementBase) -> Iterator[str]:
-        """Recursively find and return all child elements that are qualified to
-        be class attributes."""
+    def element_extensions(
+        self, obj: ElementBase, include_current=True
+    ) -> Iterator[Extension]:
+        """
+        Recursively find and return all parent Extension classes.
+
+        If the initial given obj has a type attribute include it in
+        result.
+        """
+
+        if include_current and getattr(obj, "type", None):
+            name = self.strip_target_namespace(getattr(obj, "type"))
+            yield Extension(name=name, index=0)
+
         for child in obj.children():
             if child.is_attribute:
                 continue
 
             if child.extends is not None:
-                yield child.extends
+                name = self.strip_target_namespace(child.extends)
+                yield Extension(name=name, index=child.index)
 
-            yield from self.element_extensions(child)
+            yield from self.element_extensions(child, include_current=False)
 
     def build_class_attribute(self, parent: Class, obj: AttributeElement):
         """
@@ -119,6 +135,10 @@ class ClassBuilder:
         Skip if no real type could be detected because of an invalid
         schema or missing implementation.
         """
+
+        if obj.real_name == "DateFlexibility":
+            pass
+
         forward_ref = False
         if self.has_inner_type(obj):
             forward_ref = True
@@ -182,3 +202,20 @@ class ClassBuilder:
             and obj.real_type is None
             and obj.complex_type is not None
         )
+
+    @staticmethod
+    def default_value_type(item: Class):
+        value_type = None
+        if len(item.extensions) == 0 and len(item.attrs) == 0:
+            value_type = XSDType.STRING.code
+            logger.warning(f"Empty class: `{item.name}`")
+        elif not item.is_enumeration:
+            extension = next(
+                (ext for ext in item.extensions if XSDType.get_enum(ext.name)),
+                None,
+            )
+            if extension:
+                item.extensions.remove(extension)
+                value_type = extension.name
+
+        return value_type

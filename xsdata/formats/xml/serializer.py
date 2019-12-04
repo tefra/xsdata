@@ -71,7 +71,15 @@ class XmlSerializer(ModelInspect):
                 parent.set(f.local_name, self.render_value(value))
             else:
                 value = value if type(value) is list else [value]
-                qname = self.render_tag(f.local_name, f.namespace)
+                if f.namespace:
+                    qname = self.render_tag(f.local_name, f.namespace)
+                elif parent.prefix:
+                    qname = self.render_tag(
+                        f.local_name, parent.nsmap[parent.prefix]
+                    )
+                else:
+                    qname = f.local_name
+
                 for val in value:
                     sub_element = SubElement(parent, qname)
                     self.render_node(val, sub_element)

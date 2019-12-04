@@ -67,6 +67,12 @@ class Attr:
 
 
 @dataclass
+class Extension:
+    name: str
+    index: int
+
+
+@dataclass
 class Class:
     name: str
     type: Type
@@ -74,7 +80,7 @@ class Class:
     namespace: Optional[str] = field(default=None)
     local_name: str = field(init=False)
     help: Optional[str] = field(default=None)
-    extensions: List[str] = field(default_factory=list)
+    extensions: List[Extension] = field(default_factory=list)
     attrs: List[Attr] = field(default_factory=list)
     inner: List["Class"] = field(default_factory=list)
 

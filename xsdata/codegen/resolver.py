@@ -130,7 +130,7 @@ class DependenciesResolver:
             * Filter the standard xsd types
         """
         deps = {attr.type for attr in obj.attrs if not attr.forward_ref}
-        deps.update(obj.extensions)
+        deps.update(ext.name for ext in obj.extensions)
         for inner in obj.inner:
             deps.update(self.collect_deps(inner))
 

@@ -63,6 +63,8 @@ class ModelInspect:
             )
 
     def get_type_hints(self, model):
+        if model == "TpaExtensions":
+            foo = True
         if model not in self.cache:
             self.cache[model] = get_type_hints(model)
         return self.cache[model]

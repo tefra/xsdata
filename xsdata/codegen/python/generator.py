@@ -15,7 +15,9 @@ class PythonAbstractGenerator(AbstractGenerator, ABC):
         classes recursively."""
         parents = parents or []
         obj.name = cls.class_name(obj.name)
-        obj.extensions = [cls.type_name(ext) for ext in obj.extensions]
+
+        for extension in obj.extensions:
+            extension.name = cls.type_name(extension.name)
 
         curr_parents = parents + [obj.name]
         for inner in obj.inner:

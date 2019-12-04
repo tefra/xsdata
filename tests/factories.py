@@ -2,7 +2,7 @@ import random
 import unittest
 from abc import ABC, abstractmethod
 
-from xsdata.models.codegen import Attr, Class, Package
+from xsdata.models.codegen import Attr, Class, Extension, Package
 from xsdata.models.elements import (
     Attribute,
     ComplexType,
@@ -117,4 +117,17 @@ class PackageFactory(Factory):
             name=name or f"package_{cls.next()}",
             source=source or "target",
             alias=alias or None,
+        )
+
+
+class ExtensionFactory(Factory):
+    model = Extension
+    counter = 65
+
+    @classmethod
+    def create(cls, name=None, index=None):
+
+        return cls.model(
+            name=name or f"ext_{cls.next()}",
+            index=cls.counter if index is None else index,
         )

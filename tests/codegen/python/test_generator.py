@@ -3,6 +3,7 @@ from unittest import mock
 from tests.factories import (
     AttrFactory,
     ClassFactory,
+    ExtensionFactory,
     FactoryTestCase,
     PackageFactory,
 )
@@ -22,16 +23,28 @@ class PythonAbstractGeneratorTests(FactoryTestCase):
         mock_class_name.side_effect = lambda x: f"@{x}"
         mock_type_name.side_effect = lambda x: f"!{x}"
 
-        a = ClassFactory.create(name="a", extensions=["m", "n"])
+        a = ClassFactory.create(
+            name="a",
+            extensions=[
+                ExtensionFactory.create(name="m"),
+                ExtensionFactory.create(name="n"),
+            ],
+        )
         a.attrs = [AttrFactory.create(name=x) for x in "bcd"]
         e = ClassFactory.create(name="e")
         e.attrs = [AttrFactory.create(name=x) for x in "fgh"]
 
-        i = ClassFactory.create(name="i", extensions=["o"])
+        i = ClassFactory.create(
+            name="i", extensions=ExtensionFactory.list(1, name="o")
+        )
         i.attrs = [AttrFactory.create(name=x) for x in "jkl"]
         a.inner = [e, i]
 
         generator.process_class(a)
+
+        self.assertEqual("!m", a.extensions[0].name)
+        self.assertEqual("!n", a.extensions[1].name)
+        self.assertEqual("!o", i.extensions[0].name)
 
         mock_class_name.assert_has_calls(
             [mock.call("a"), mock.call("e"), mock.call("i")]

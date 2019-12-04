@@ -1,7 +1,7 @@
 {% set help = obj|docstring|trim %}
 
 @dataclass
-class {{ obj.name }}{{"({})".format(obj.extensions|join(', ')) if obj.extensions }}:
+class {{ obj.name }}{{"({})".format(obj.extensions|join(', ', attribute="name")) if obj.extensions }}:
 {%- if help %}
 {{ help|indent(4, first=True) }}
 {%- endif -%}

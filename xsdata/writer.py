@@ -40,9 +40,8 @@ class CodeWriter:
 
     def print_class(self, package: str, obj: Class, indent: int = 0):
 
-        print(
-            f"\n{indent * ' '}{package}.{obj.name}({', '.join(sorted(obj.extensions))})"
-        )
+        extensions = ", ".join(sorted([ext.name for ext in obj.extensions]))
+        print(f"\n{indent * ' '}{package}.{obj.name}({extensions})")
 
         for attr in sorted(obj.attrs, key=lambda x: x.name):
             params = [("default", attr.default)]

@@ -4,6 +4,7 @@ from unittest import mock
 from tests.factories import (
     AttrFactory,
     ClassFactory,
+    ExtensionFactory,
     FactoryTestCase,
     PackageFactory,
 )
@@ -215,7 +216,13 @@ class DependenciesResolverTest(FactoryTestCase):
         second = ClassFactory.create(
             name="l", attrs=[AttrFactory.create(name="m", type="o")],
         )
-        third = ClassFactory.create(name="p", extensions=["xs:int", "a"])
+        third = ClassFactory.create(
+            name="p",
+            extensions=[
+                ExtensionFactory.create(name="xs:int"),
+                ExtensionFactory.create(name="a"),
+            ],
+        )
 
         classes = [first, second, third]
         expected = ["c:g", "i", "o", "l", "a", "p"]

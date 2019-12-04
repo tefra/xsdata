@@ -33,8 +33,10 @@ class DictParser(ModelInspect):
                     if field.is_list
                     else field.type(value)
                 )
-
-        return model(**params)
+        try:
+            return model(**params)
+        except Exception as e:
+            raise TypeError("Serialization failed")
 
     @staticmethod
     def parse_value(data: Dict, field: Field):

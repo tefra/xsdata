@@ -1,6 +1,11 @@
 from unittest import mock
 
-from tests.factories import AttrFactory, ClassFactory, FactoryTestCase
+from tests.factories import (
+    AttrFactory,
+    ClassFactory,
+    ExtensionFactory,
+    FactoryTestCase,
+)
 from xsdata.models.elements import Element, Restriction, Schema, SimpleType
 from xsdata.models.enums import TagType, XSDType
 from xsdata.reducer import ClassReducer
@@ -134,29 +139,32 @@ class ClassReducerTests(FactoryTestCase):
                 AttrFactory.create(name="y", type="other:y"),
             ],
         )
+        ext_a = ExtensionFactory.create(name="a", index=1)
+        ext_b = ExtensionFactory.create(name="b", index=2)
+        ext_c = ExtensionFactory.create(name="common:c", index=66)
 
         obj = ClassFactory.create(
             name="foo",
-            extensions=["a", "b", "common:c"],
-            attrs=[AttrFactory.create(name=x) for x in "ab"],
+            extensions=[ext_a, ext_b, ext_c],
+            attrs=[AttrFactory.create(name=x, index=ord(x)) for x in "ab"],
         )
 
         mock_find_common_type.side_effect = [None, common_b, common_c]
 
         reducer = ClassReducer()
-        reducer.flatten_extension(obj, "a", self.nsmap)
-        reducer.flatten_extension(obj, "b", self.nsmap)
-        reducer.flatten_extension(obj, "common:c", self.nsmap)
+        for extension in list(obj.extensions):
+            reducer.flatten_extension(obj, extension, self.nsmap)
+
         attrs = [
-            ("x", "common:x"),
-            ("y", "other:y"),
             ("i", "i"),
             ("j", "other:j"),
+            ("x", "common:x"),
+            ("y", "other:y"),
             ("a", "xs:string"),
             ("b", "xs:string"),
         ]
 
-        self.assertEqual(["a"], obj.extensions)
+        self.assertEqual([ext_a], obj.extensions)
         self.assertEqual(attrs, [(attr.name, attr.type) for attr in obj.attrs])
 
         mock_find_common_type.assert_has_calls(

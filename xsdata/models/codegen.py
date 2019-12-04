@@ -11,6 +11,7 @@ class Attr:
     local_name: str = field(init=False)
     type: str
     local_type: str
+    index: int
     type_alias: Optional[str] = field(default=None)
     namespace: Optional[str] = field(default=None)
     help: Optional[str] = field(default=None)
@@ -70,6 +71,7 @@ class Class:
     name: str
     type: Type
     is_root: bool
+    namespace: Optional[str] = field(default=None)
     local_name: str = field(init=False)
     help: Optional[str] = field(default=None)
     extensions: List[str] = field(default_factory=list)

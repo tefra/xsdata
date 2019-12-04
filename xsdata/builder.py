@@ -54,10 +54,10 @@ class ClassBuilder:
 
     def build_class(self, obj: BaseElement, is_root=False) -> Class:
         """Build and return a class instance."""
-
         item = Class(
             name=obj.real_name,
             is_root=is_root,
+            namespace=obj.namespace if is_root else None,
             type=type(obj),
             extensions=self.build_class_extensions(obj),
             help=obj.display_help,
@@ -66,9 +66,12 @@ class ClassBuilder:
         for child in self.element_children(obj):
             self.build_class_attribute(item, child)
 
+        item.attrs.sort(key=lambda x: x.index)
+
         if len(item.extensions) == 0 and len(item.attrs) == 0:
             item.attrs.append(
                 Attr(
+                    index=0,
                     name="value",
                     default=None,
                     type=XSDType.STRING.code,
@@ -124,15 +127,20 @@ class ClassBuilder:
         if not obj.real_type:
             raise ValueError(f"Failed to detect type for element: {obj}")
 
+        namespace = obj.namespace
+
         parent.attrs.append(
             Attr(
+                index=obj.index,
                 name=obj.real_name,
                 default=getattr(obj, "default", None),
                 type=self.strip_target_namespace(obj.real_type),
                 local_type=type(obj).__name__,
                 help=obj.display_help,
                 forward_ref=forward_ref,
-                namespace=obj.namespace,
+                namespace=None
+                if namespace == self.schema.target_namespace
+                else namespace,
                 **obj.get_restrictions(),
             )
         )

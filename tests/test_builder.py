@@ -116,6 +116,7 @@ class ClassBuilderTests(FactoryTestCase):
                     default=None,
                     type=XSDType.STRING.code,
                     local_type=TagType.RESTRICTION.cname,
+                    index=0,
                 )
             ],
         )
@@ -237,7 +238,7 @@ class ClassBuilderTests(FactoryTestCase):
         mock_has_inner_type.return_value = False
         mock_strip_target_namespace.side_effect = lambda x: x
 
-        attribute = Attribute.create(default="false")
+        attribute = Attribute.create(default="false", index=66)
 
         self.builder.build_class_attribute(item, attribute)
         expected = AttrFactory.create(
@@ -248,6 +249,7 @@ class ClassBuilderTests(FactoryTestCase):
             help=mock_display_help.return_value,
             forward_ref=False,
             default="false",
+            index=66,
             **mock_get_restrictions.return_value,
         )
         self.assertEqual(expected, item.attrs[0])

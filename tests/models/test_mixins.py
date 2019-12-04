@@ -3,6 +3,7 @@ from typing import Type
 from unittest import TestCase
 
 from xsdata.models import elements as el
+from xsdata.models.enums import FormType
 from xsdata.models.mixins import ElementBase, OccurrencesMixin, TypedField
 
 
@@ -66,24 +67,22 @@ class TypedFieldTests(TestCase):
         ]
         self.assertEqual(expected, self.subclasses)
 
+
+class NamedFieldTests(TestCase):
     def test_property_namespace_with_unqualified_form(self):
-        obj = el.Element.create()
+        obj = el.Element.create(name="foo", form=FormType.UNQUALIFIED)
         self.assertIsNone(obj.namespace)
 
     def test_property_namespace_with_no_ref_type(self):
-        obj = el.Element.create(type="foo")
-        self.assertIsNone(obj.namespace)
-
-    def test_property_namespace_with_xsd_ref_type(self):
-        obj = el.Element.create(type="xs:int")
+        obj = el.Element.create(name="foo")
         self.assertIsNone(obj.namespace)
 
     def test_property_namespace_with_unknown_ref_type(self):
-        obj = el.Element.create(type="ns:foo")
+        obj = el.Element.create(ref="ns:foo")
         self.assertIsNone(obj.namespace)
 
     def test_property_namespace_with_known_ref_type(self):
-        obj = el.Element.create(type="ns:foo")
+        obj = el.Element.create(ref="ns:foo")
         obj.nsmap["ns"] = "bar"
         self.assertEqual("bar", obj.namespace)
 

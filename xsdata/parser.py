@@ -71,6 +71,7 @@ class SchemaParser:
         """
 
         methods = TagType.qnames()
+        index = 0
         for event, elem in self.context:
             tag = methods.get(elem.tag)
             if tag is None:
@@ -80,8 +81,9 @@ class SchemaParser:
 
             if event == EventType.START:
                 builder = getattr(elements, tag.cname)
-                element = builder.from_element(elem)
+                element = builder.from_element(elem, index=index)
                 self.elements.append(element)
+                index += 1
             elif event == EventType.END:
                 element = self.elements.pop()
                 if len(elem.attrib) == 0 and elem.text is None:

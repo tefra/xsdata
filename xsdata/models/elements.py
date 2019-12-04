@@ -243,10 +243,6 @@ class Enumeration(RestrictionType, TypedField, NamedField, RestrictedField):
     def default(self):
         return self.value
 
-    @property
-    def namespace(self):
-        return None
-
     def get_restrictions(self):
         return {}
 

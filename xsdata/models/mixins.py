@@ -1,15 +1,14 @@
 import re
 import sys
 from abc import ABC, abstractmethod
-from dataclasses import MISSING
-from dataclasses import Field as Attrib
-from dataclasses import dataclass, fields
+from dataclasses import MISSING, Field, dataclass, fields
 from typing import Any, Dict, Optional, Type, TypeVar
 
 from lxml import etree
 
-from xsdata.models.enums import FormType, XMLSchema, XSDType
-from xsdata.utils.text import snake_case, split_prefix, strip_prefix
+from xsdata.models.enums import FormType, XMLSchema
+from xsdata.utils import text
+from xsdata.utils.text import snake_case, strip_prefix
 
 
 class TypedField(ABC):
@@ -17,20 +16,6 @@ class TypedField(ABC):
     @abstractmethod
     def real_type(self) -> Optional[str]:
         pass
-
-    @property
-    def namespace(self):
-        form: FormType = getattr(self, "form", FormType.UNQUALIFIED)
-        if form == FormType.UNQUALIFIED:
-            return None
-
-        real_type = self.real_type
-        prefix, suffix = split_prefix(real_type)
-        return (
-            None
-            if prefix is None or XSDType.get_enum(real_type)
-            else self.nsmap.get(prefix)
-        )
 
 
 class NamedField:
@@ -41,6 +26,17 @@ class NamedField:
             return name
 
         raise NotImplementedError("Element has no name: {}".format(self))
+
+    @property
+    def namespace(self):
+        form: FormType = getattr(self, "form", FormType.UNQUALIFIED)
+        if form == FormType.UNQUALIFIED:
+            return None
+
+        lookup = getattr(self, "ref", None) or getattr(self, "name")
+
+        prefix, name = text.split_prefix(lookup)
+        return self.nsmap.get(prefix)
 
 
 class RestrictedField(ABC):
@@ -68,7 +64,7 @@ class BaseModel:
         pass
 
     @classmethod
-    def from_element(cls: Type[T], el: etree.Element) -> T:
+    def from_element(cls: Type[T], el: etree.Element, index: int) -> T:
         attrs = {
             snake_case(strip_prefix(key, "}")): value
             for key, value in el.attrib.items()
@@ -87,18 +83,19 @@ class BaseModel:
             data["prefix"] = el.prefix
         if "text" in data and el.text:
             data["text"] = re.sub(r"\s+", " ", el.text).strip()
+        data["index"] = index
 
         return cls(**data)
 
     @classmethod
-    def default_value(cls: Type[T], field: Attrib) -> Any:
+    def default_value(cls: Type[T], field: Field) -> Any:
         factory = getattr(field, "default_factory")
         if getattr(field, "default_factory") is not MISSING:
             return factory()  # mypy: ignore
         return None if field.default is MISSING else field.default
 
     @classmethod
-    def xsd_value(cls, field: Attrib, kwargs: Dict) -> Any:
+    def xsd_value(cls, field: Field, kwargs: Dict) -> Any:
         name = field.name
         value = kwargs[name]
         clazz = field.type
@@ -144,6 +141,7 @@ class ElementBase(BaseModel):
     id: Optional[str]
     prefix: str
     nsmap: dict
+    index: int
 
     def children(self):
         for attribute in fields(self):

@@ -60,21 +60,26 @@ class ParserTests(TestCase):
         </xs:complexType>"""
 
         expected = ComplexType.create(
+            index=1,
             name="allowablePointsOfSaleType",
             sequence=Sequence.create(
+                index=2,
                 max_occurs=sys.maxsize,
                 elements=[
                     Element.create(
+                        index=3,
                         name="PointOfSale",
                         form=FormType.QUALIFIED,
                         complex_type=ComplexType.create(
+                            index=4,
                             attributes=[
                                 Attribute.create(
+                                    index=5,
                                     name="id",
                                     type="xs:string",
                                     form=FormType.UNQUALIFIED,
                                 )
-                            ]
+                            ],
                         ),
                     )
                 ],
@@ -99,26 +104,32 @@ class ParserTests(TestCase):
         </xs:complexType>"""
 
         expected = ComplexType.create(
+            index=1,
             name="priceCurrencyType",
             simple_content=SimpleContent.create(
+                index=2,
                 extension=Extension.create(
+                    index=3,
                     base="priceType",
                     attributes=[
                         Attribute.create(
+                            index=4,
                             name="currency",
                             use=UseType.REQUIRED,
                             form=FormType.UNQUALIFIED,
                             simple_type=SimpleType.create(
+                                index=5,
                                 restriction=Restriction.create(
+                                    index=6,
                                     base="xs:string",
                                     pattern=Pattern.create(
-                                        value="[A-Z][A-Z][A-Z]"
+                                        index=7, value="[A-Z][A-Z][A-Z]"
                                     ),
-                                )
+                                ),
                             ),
                         )
                     ],
-                )
+                ),
             ),
         )
         schema = SchemaParser.from_string(wrap(xsd))
@@ -140,24 +151,32 @@ class ParserTests(TestCase):
                 </xs:complexType>"""
 
         expected = ComplexType.create(
+            index=1,
             name="UserRateConditionType",
             complex_content=ComplexContent.create(
+                index=2,
                 extension=Extension.create(
+                    index=3,
                     base="UserRateConditionBaseType",
                     attributes=[
                         Attribute.create(
+                            index=4,
                             name="id",
                             use=UseType.REQUIRED,
                             form=FormType.QUALIFIED,
                             simple_type=SimpleType.create(
+                                index=5,
                                 restriction=Restriction.create(
+                                    index=6,
                                     base="xs:string",
-                                    min_length=MinLength.create(value=1),
-                                )
+                                    min_length=MinLength.create(
+                                        value=1, index=7
+                                    ),
+                                ),
                             ),
                         )
                     ],
-                )
+                ),
             ),
         )
         schema = SchemaParser.from_string(wrap(xsd))
@@ -172,14 +191,22 @@ class ParserTests(TestCase):
             </xs:complexType>"""
 
         expected = ComplexType.create(
+            index=1,
             choice=Choice.create(
+                index=2,
                 min_occurs=1,
                 elements=[
                     Element.create(
-                        name="first", min_occurs=0, form=FormType.QUALIFIED
+                        name="first",
+                        min_occurs=0,
+                        form=FormType.QUALIFIED,
+                        index=3,
                     ),
                     Element.create(
-                        name="second", min_occurs=0, form=FormType.QUALIFIED
+                        name="second",
+                        min_occurs=0,
+                        form=FormType.QUALIFIED,
+                        index=4,
                     ),
                 ],
             ),

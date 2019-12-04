@@ -14,7 +14,6 @@ class BookForm:
     :ivar id:
     """
 
-    ROOT_NAME = "BookForm"
     author: Optional[str] = field(
         default=None,
         metadata=dict(name="author", type="Element", required=True),
@@ -50,7 +49,6 @@ class BooksForm:
     :ivar book:
     """
 
-    ROOT_NAME = "BooksForm"
     book: List[BookForm] = field(
         default_factory=list,
         metadata=dict(
@@ -64,4 +62,5 @@ class BooksForm:
 
 @dataclass
 class Books(BooksForm):
-    ROOT_NAME = "books"
+    class Meta:
+        name = "books"

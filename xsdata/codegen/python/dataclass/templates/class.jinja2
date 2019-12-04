@@ -8,9 +8,15 @@ class {{ obj.name }}{{"({})".format(obj.extensions|join(', ')) if obj.extensions
 {%- if obj.attrs|length == 0 and not obj.is_root %}
     pass
 {%- endif -%}
-{%- if obj.is_root %}
-    ROOT_NAME = "{{ obj.local_name }}"
-{%- endif -%}
+{%- if obj.is_root and (obj.local_name != obj.name or obj.namespace) %}
+    class Meta:
+        {%- if obj.local_name != obj.name %}
+        name = "{{ obj.local_name }}"
+        {%- endif -%}
+        {%- if obj.namespace %}
+        namespace = "{{ obj.namespace }}"
+        {%- endif %}
+{% endif -%}
 {%- for attr in obj.attrs %}
     {%- set field_params = dict(
                   name=attr.local_name,

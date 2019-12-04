@@ -1,14 +1,15 @@
-from dataclasses import dataclass, is_dataclass
+from dataclasses import dataclass, field
 from enum import Enum
 
-from lxml import etree
-from lxml.etree import Element, SubElement
+from lxml.etree import Element, QName, SubElement, cleanup_namespaces, tostring
 
 from xsdata.formats.inspect import ModelInspect
 
 
 @dataclass
 class XmlSerializer(ModelInspect):
+    ns_list: list = field(init=False, default_factory=list)
+
     def render(
         self,
         obj: object,
@@ -19,7 +20,7 @@ class XmlSerializer(ModelInspect):
     ) -> bytes:
 
         tree = self.render_tree(obj)
-        return etree.tostring(
+        return tostring(
             tree,
             xml_declaration=xml_declaration,
             encoding=encoding,
@@ -40,36 +41,50 @@ class XmlSerializer(ModelInspect):
         if not self.is_dataclass(obj):
             raise TypeError(f"Object {obj} is not a dataclass.")
 
-        name = getattr(obj, "ROOT_NAME", obj.__class__.__name__)
-        root = Element(name)
-        return self.render_node(obj, root)
+        meta = self.type_meta(obj.__class__)
+        qname = self.render_tag(meta.name, meta.namespace)
+        root = self.render_node(obj, Element(qname))
+
+        cleanup_namespaces(
+            root,
+            top_nsmap={
+                None if index == 0 else f"ns{index}": namespace
+                for index, namespace in enumerate(self.ns_list)
+            },
+        )
+
+        return root
 
     def render_node(self, obj, parent) -> Element:
         """Recursively traverse the given dataclass instance fields and build
         the lxml Element structure."""
-        if not is_dataclass(obj):
+        if not self.is_dataclass(obj):
             parent.text = self.render_value(obj)
             return parent
 
-        for field in self.fields(obj.__class__):
-            value = getattr(obj, field.name)
+        for f in self.fields(obj.__class__):
+            value = getattr(obj, f.name)
+
             if not value:
                 continue
-
-            if field.is_attribute:
-                parent.set(field.local_name, self.render_value(value))
-            elif field.is_list and len(value):
+            elif f.is_attribute:
+                parent.set(f.local_name, self.render_value(value))
+            else:
+                value = value if type(value) is list else [value]
+                qname = self.render_tag(f.local_name, f.namespace)
                 for val in value:
-                    sub_element = SubElement(parent, field.local_name)
+                    sub_element = SubElement(parent, qname)
                     self.render_node(val, sub_element)
-            elif value:
-                sub_element = SubElement(parent, field.local_name)
-                self.render_node(value, sub_element)
 
         return parent
 
+    def render_tag(self, name, namespace=None) -> QName:
+        if namespace and namespace not in self.ns_list:
+            self.ns_list.append(namespace)
+        return QName(namespace, name)
+
     @staticmethod
-    def render_value(value):
+    def render_value(value) -> str:
         if isinstance(value, bool):
             return "true" if value else "false"
         if isinstance(value, Enum):

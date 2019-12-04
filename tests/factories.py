@@ -79,6 +79,7 @@ class AttrFactory(Factory):
     def create(
         cls,
         name=None,
+        index=None,
         type=None,
         local_type=None,
         type_alias=None,
@@ -91,6 +92,7 @@ class AttrFactory(Factory):
 
         return cls.model(
             name=name or f"attr_{cls.next()}",
+            index=cls.counter if index is None else index,
             type=type or XSDType.STRING.code,
             local_type=local_type or random.choice(cls.types).__name__,
             type_alias=type_alias or None,

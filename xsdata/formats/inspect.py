@@ -11,6 +11,7 @@ class Field:
     type: Any
     is_list: bool = False
     is_attribute: bool = False
+    is_dataclass: bool = False
     default: Any = None
     namespace: Optional[str] = None
 
@@ -29,8 +30,12 @@ class ModelInspect:
         if not self.is_dataclass(clazz):
             raise TypeError(f"Object {clazz} is not a dataclass")
 
-        clazz_meta = self.type_meta(clazz)
-        type_hints = self.get_type_hints(clazz)
+        if clazz not in self.cache:
+            self.cache[clazz] = list(self.get_type_hints(clazz))
+        return self.cache[clazz]
+
+    def get_type_hints(self, clazz) -> Iterator[Field]:
+        type_hints = get_type_hints(clazz)
 
         for f in fields(clazz):
             tp = type_hints[f.name]
@@ -47,9 +52,7 @@ class ModelInspect:
                 default_value = f.default
 
             namespace = (
-                f.metadata.get("namespace")
-                or self.type_meta(tp).namespace
-                or clazz_meta.namespace
+                f.metadata.get("namespace") or self.class_meta(tp).namespace
             )
 
             yield Field(
@@ -57,20 +60,14 @@ class ModelInspect:
                 local_name=f.metadata["name"],
                 is_attribute=f.metadata["type"] == TagType.ATTRIBUTE.cname,
                 is_list=is_list,
+                is_dataclass=self.is_dataclass(tp),
                 type=tp,
                 default=default_value,
                 namespace=namespace,
             )
 
-    def get_type_hints(self, model):
-        if model == "TpaExtensions":
-            foo = True
-        if model not in self.cache:
-            self.cache[model] = get_type_hints(model)
-        return self.cache[model]
-
     @staticmethod
-    def type_meta(clazz: Type) -> Meta:
+    def class_meta(clazz: Type) -> Meta:
         meta = getattr(clazz, "Meta", None)
         return Meta(
             name=getattr(meta, "name", clazz.__name__),

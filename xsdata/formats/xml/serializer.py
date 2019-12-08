@@ -41,7 +41,7 @@ class XmlSerializer(ModelInspect):
         if not self.is_dataclass(obj):
             raise TypeError(f"Object {obj} is not a dataclass.")
 
-        meta = self.type_meta(obj.__class__)
+        meta = self.class_meta(obj.__class__)
         qname = self.render_tag(meta.name, meta.namespace)
         root = self.render_node(obj, Element(qname))
 

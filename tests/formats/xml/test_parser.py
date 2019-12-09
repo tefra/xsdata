@@ -48,5 +48,5 @@ class XmlParserTests(TestCase):
             "  </book>\n"
             "</books>\n"
         )
-        actual = XmlParser().parse(xml, Books)
+        actual = XmlParser().from_string(xml, Books)
         self.assertEqual(self.books, actual)

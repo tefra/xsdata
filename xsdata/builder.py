@@ -136,9 +136,6 @@ class ClassBuilder:
         schema or missing implementation.
         """
 
-        if obj.real_name == "DateFlexibility":
-            pass
-
         forward_ref = False
         if self.has_inner_type(obj):
             forward_ref = True

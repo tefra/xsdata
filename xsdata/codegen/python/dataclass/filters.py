@@ -31,6 +31,26 @@ def docstring(obj: Class, enum=False):
     )
 
 
+def lib_imports(output: str):
+    result = []
+    if "(Enum)" in output:
+        result.append("from enum import Enum")
+
+    result.append("from dataclasses import dataclass, field")
+
+    has_list = "List[" in output
+    has_optional = "Optional[" in output
+
+    if has_list and has_optional:
+        result.append("from typing import List, Optional")
+    elif has_optional:
+        result.append("from typing import Optional")
+    elif has_list:
+        result.append("from typing import List")
+
+    return "\n".join(result)
+
+
 def has_quotes(string: str):
     quote_types = ["'''", '"""', "'", '"']
     for quote in quote_types:
@@ -42,4 +62,5 @@ def has_quotes(string: str):
 filters = {
     "arguments": arguments,
     "docstring": docstring,
+    "lib_imports": lib_imports,
 }

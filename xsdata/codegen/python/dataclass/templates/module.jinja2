@@ -1,6 +1,4 @@
-from enum import Enum
-from dataclasses import dataclass, field
-from typing import List, Optional
+{{ output|lib_imports }}
 
 {%- for source, packages in imports.items() %}
 from {{ source }} import (

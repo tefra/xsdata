@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 from typing import Any, List, Optional, Type
 
-from xsdata.models.elements import Attribute, ComplexType, Element
+from xsdata.models.elements import ComplexType, Element
 from xsdata.models.enums import TagType
 
 
@@ -93,7 +93,7 @@ class Class:
 
     @property
     def is_common(self):
-        return self.type not in [Attribute, Element, ComplexType]
+        return self.type not in [Element, ComplexType]
 
 
 @dataclass

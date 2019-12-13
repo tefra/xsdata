@@ -87,13 +87,6 @@ class ClassReducer:
             * Attributes
             * Inner classes
         """
-
-        if (
-            "OriginDestinationInformationTPA_ExtensionsGroup"
-            in item.extensions
-        ):
-            pass
-
         for extension in list(item.extensions):
             self.flatten_extension(item, extension, nsmap)
 

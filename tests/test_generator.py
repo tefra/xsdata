@@ -7,9 +7,7 @@ from tests.factories import (
     FactoryTestCase,
     PackageFactory,
 )
-from xsdata.codegen.python.generator import (
-    PythonAbstractGenerator as generator,
-)
+from xsdata.generators import PythonAbstractGenerator as generator
 from xsdata.models.enums import TagType
 
 

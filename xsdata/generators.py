@@ -1,11 +1,26 @@
-from abc import ABC
-from typing import Any, List, Optional
+from abc import ABC, abstractmethod
+from pathlib import Path
+from typing import Any, Iterator, List, Optional, Tuple
 
-from xsdata.codegen.generator import AbstractGenerator
-from xsdata.codegen.python.dataclass.utils import replace_words
+from xsdata.formats.dataclass.utils import replace_words
 from xsdata.models.codegen import Attr, Class, Package
+from xsdata.models.elements import Schema
 from xsdata.models.enums import XSDType
 from xsdata.utils import text
+
+
+class AbstractGenerator(ABC):
+    @abstractmethod
+    def render(
+        self, schema: Schema, classes: List[Class], package: str
+    ) -> Iterator[Tuple[Path, str]]:
+        pass
+
+    @abstractmethod
+    def print(
+        self, schema: Schema, classes: List[Class], package: str
+    ) -> Iterator[Tuple[str, Class]]:
+        pass
 
 
 class PythonAbstractGenerator(AbstractGenerator, ABC):

@@ -1,8 +1,8 @@
 from dataclasses import dataclass, field
 from typing import Dict, List
 
-from xsdata.codegen.generator import AbstractGenerator
-from xsdata.codegen.python.dataclass.generator import DataclassGenerator
+from xsdata.formats.dataclass.generator import DataclassGenerator
+from xsdata.generators import AbstractGenerator
 from xsdata.models.codegen import Class
 from xsdata.models.elements import Schema
 

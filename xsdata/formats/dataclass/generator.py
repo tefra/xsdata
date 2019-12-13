@@ -4,11 +4,11 @@ from typing import DefaultDict, Dict, Iterator, List, Tuple
 
 from jinja2 import Environment, FileSystemLoader, Template
 
-from xsdata.codegen.python.dataclass.filters import filters
-from xsdata.codegen.python.generator import PythonAbstractGenerator
-from xsdata.codegen.resolver import DependenciesResolver
+from xsdata.formats.dataclass.filters import filters
+from xsdata.generators import PythonAbstractGenerator
 from xsdata.models.codegen import Class, Package
 from xsdata.models.elements import Schema
+from xsdata.resolver import DependenciesResolver
 from xsdata.utils.text import snake_case
 
 

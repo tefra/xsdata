@@ -2,9 +2,9 @@ from pathlib import Path
 from unittest import mock
 
 from tests.factories import ClassFactory, FactoryTestCase, PackageFactory
-from xsdata.codegen.python.dataclass.generator import DataclassGenerator
-from xsdata.codegen.resolver import DependenciesResolver
+from xsdata.formats.dataclass.generator import DataclassGenerator
 from xsdata.models.elements import Schema
+from xsdata.resolver import DependenciesResolver
 
 
 class DataclassGeneratorTests(FactoryTestCase):

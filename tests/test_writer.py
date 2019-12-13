@@ -5,8 +5,8 @@ from tempfile import TemporaryDirectory
 from typing import Iterator, List, Optional, Tuple
 from unittest import TestCase
 
-from xsdata.codegen.generator import AbstractGenerator
-from xsdata.codegen.python.dataclass.generator import DataclassGenerator
+from xsdata.formats.dataclass.generator import DataclassGenerator
+from xsdata.generators import AbstractGenerator
 from xsdata.models.codegen import Class
 from xsdata.models.elements import Schema
 from xsdata.writer import writer

@@ -6,9 +6,8 @@ from typing import Any, Dict, Optional, Type, TypeVar
 
 from lxml import etree
 
-from xsdata.models.enums import FormType, XMLSchema
+from xsdata.models.enums import FormType, Namespace
 from xsdata.utils import text
-from xsdata.utils.text import snake_case, strip_prefix
 
 
 class TypedField(ABC):
@@ -66,7 +65,7 @@ class BaseModel:
     @classmethod
     def from_element(cls: Type[T], el: etree.Element, index: int) -> T:
         attrs = {
-            snake_case(strip_prefix(key, "}")): value
+            text.snake_case(text.strip_prefix(key, "}")): value
             for key, value in el.attrib.items()
         }
         data = {
@@ -123,7 +122,7 @@ class BaseModel:
     @classmethod
     def create(cls: Type[T], **kwargs) -> T:
         if not kwargs.get("prefix") and not kwargs.get("nsmap"):
-            kwargs.update({"prefix": "xs", "nsmap": {"xs": XMLSchema}})
+            kwargs.update({"prefix": "xs", "nsmap": {"xs": Namespace.SCHEMA}})
 
         data = {
             attr.name: kwargs[attr.name]

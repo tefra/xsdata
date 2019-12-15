@@ -1,3 +1,4 @@
+from typing import Iterator
 from unittest import TestCase
 
 from xsdata.models.elements import Import, Include, Schema
@@ -16,5 +17,6 @@ class SchemaTests(TestCase):
             ],
         )
 
-        expected = ["../foo.xsd", "../bar.xsd", "common.xsd", "uncommon.xsd"]
-        self.assertEqual(expected, schema.sub_schemas())
+        actual = schema.sub_schemas()
+        self.assertIsInstance(actual, Iterator)
+        self.assertEqual(schema.imports + schema.includes, list(actual))

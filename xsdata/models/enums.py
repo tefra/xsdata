@@ -5,7 +5,10 @@ from lxml import etree
 
 from xsdata.utils.text import capitalize, split_prefix
 
-XMLSchema = "http://www.w3.org/2001/XMLSchema"
+
+class Namespace:
+    SCHEMA = "http://www.w3.org/2001/XMLSchema"
+    XML = "http://www.w3.org/XML/1998/namespace"
 
 
 class FormType(Enum):
@@ -137,7 +140,7 @@ class TagType(Enum):
     @property
     def qname(self):
         """Qualified name: {namespace}tag."""
-        return etree.QName(XMLSchema, self.value)
+        return etree.QName(Namespace.SCHEMA, self.value)
 
     @property
     def cname(self):

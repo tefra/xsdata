@@ -3,9 +3,10 @@ import sys
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any as Anything
-from typing import Dict
+from typing import Dict, Iterator
 from typing import List as ArrayList
 from typing import Optional
+from typing import Union as UnionType
 
 from xsdata.models.enums import FormType, ProcessType, UseType, XSDType
 from xsdata.models.mixins import (
@@ -499,7 +500,11 @@ class Import(AnnotationBase):
 
 @dataclass
 class Include(AnnotationBase):
-    schema_location: Optional[str]
+    schema_location: str
+
+    @property
+    def namespace(self):
+        return None
 
 
 @dataclass
@@ -540,12 +545,12 @@ class Schema(AnnotationBase):
     elements: ArrayList[Element] = field(default_factory=list)
     attributes: ArrayList[Attribute] = field(default_factory=list)
 
-    def sub_schemas(self) -> ArrayList[str]:
-        sub = [x.schema_location for x in self.imports if x.schema_location]
-        sub.extend(
-            [x.schema_location for x in self.includes if x.schema_location]
-        )
-        return sub
+    def sub_schemas(self) -> Iterator[UnionType[Import, Include]]:
+        for imp in self.imports:
+            yield imp
+
+        for inc in self.includes:
+            yield inc
 
     @property
     def module(self):

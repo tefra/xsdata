@@ -5,6 +5,7 @@ import click
 import click_completion
 
 from xsdata.builder import ClassBuilder
+from xsdata.models.enums import Namespace
 from xsdata.parser import SchemaParser
 from xsdata.reducer import reducer
 from xsdata.version import version
@@ -51,9 +52,16 @@ def process(xsd_path: Path, package: str, renderer: str, print: bool):
 
     schema = SchemaParser.from_file(xsd_path)
     for sub_schema in schema.sub_schemas():
+        if (
+            sub_schema.namespace == Namespace.XML
+            or not sub_schema.schema_location
+        ):
+            continue
         process(
-            xsd_path=xsd_path.parent.joinpath(sub_schema).resolve(),
-            package=adjust_package(package, sub_schema),
+            xsd_path=xsd_path.parent.joinpath(
+                sub_schema.schema_location
+            ).resolve(),
+            package=adjust_package(package, sub_schema.schema_location),
             renderer=renderer,
             print=print,
         )

@@ -16,7 +16,6 @@ from xsdata.models.elements import (
 )
 from xsdata.models.enums import TagType, XSDType
 from xsdata.models.mixins import ElementBase
-from xsdata.utils import text
 
 logger = logging.getLogger(__name__)
 
@@ -30,13 +29,6 @@ AttributeElement = Union[Attribute, Element, Restriction, Enumeration]
 class ClassBuilder:
     schema: Schema
     target_prefix: Optional[str] = field(init=False)
-
-    def __post_init__(self) -> None:
-        """Find and set the target prefix for local types."""
-        self.target_prefix = None
-        for prefix, namespace in self.schema.nsmap.items():
-            if namespace == self.schema.target_namespace:
-                self.target_prefix = f"{prefix}:"
 
     def build(self) -> List[Class]:
         """Generate classes from schema elements."""
@@ -57,7 +49,7 @@ class ClassBuilder:
         item = Class(
             name=obj.real_name,
             is_root=is_root,
-            namespace=obj.namespace if is_root else None,
+            namespace=obj.namespace,
             type=type(obj),
             extensions=self.build_class_extensions(obj),
             help=obj.display_help,
@@ -115,16 +107,14 @@ class ClassBuilder:
         """
 
         if include_current and getattr(obj, "type", None):
-            name = self.strip_target_namespace(getattr(obj, "type"))
-            yield Extension(name=name, index=0)
+            yield Extension(name=getattr(obj, "type"), index=0)
 
         for child in obj.children():
             if child.is_attribute:
                 continue
 
             if child.extends is not None:
-                name = self.strip_target_namespace(child.extends)
-                yield Extension(name=name, index=child.index)
+                yield Extension(name=child.extends, index=child.index)
 
             yield from self.element_extensions(child, include_current=False)
 
@@ -135,7 +125,6 @@ class ClassBuilder:
         Skip if no real type could be detected because of an invalid
         schema or missing implementation.
         """
-
         forward_ref = False
         if self.has_inner_type(obj):
             forward_ref = True
@@ -144,20 +133,16 @@ class ClassBuilder:
         if not obj.real_type:
             raise ValueError(f"Failed to detect type for element: {obj}")
 
-        namespace = obj.namespace
-
         parent.attrs.append(
             Attr(
                 index=obj.index,
                 name=obj.real_name,
                 default=getattr(obj, "default", None),
-                type=self.strip_target_namespace(obj.real_type),
+                type=obj.real_type,
                 local_type=type(obj).__name__,
                 help=obj.display_help,
                 forward_ref=forward_ref,
-                namespace=None
-                if namespace == self.schema.target_namespace
-                else namespace,
+                namespace=obj.namespace,
                 **obj.get_restrictions(),
             )
         )
@@ -173,18 +158,6 @@ class ClassBuilder:
         if isinstance(obj, Element) and obj.complex_type:
             obj.complex_type.name = obj.type = obj.name
             parent.inner.append(self.build_class(obj.complex_type))
-
-    def strip_target_namespace(self, value: str) -> str:
-        """
-        Strip prefixes when they match the target namespace.
-
-        Example: targetNamespace="urn:books" xmlns:bks="urn:books"
-        strip prefix bks from type="bks:BookForm" or base="bks:BookForm"
-        """
-        if self.target_prefix is None:
-            return value
-
-        return text.strip_prefix(value, self.target_prefix)
 
     @staticmethod
     def has_inner_type(obj: AttributeElement) -> bool:

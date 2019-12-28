@@ -8,7 +8,7 @@ from lxml import etree
 from xsdata.models.codegen import Attr, Class, Extension
 from xsdata.models.elements import Schema
 from xsdata.models.enums import XSDType
-from xsdata.utils.text import split_prefix
+from xsdata.utils.text import split
 
 logger = logging.getLogger(__name__)
 
@@ -109,7 +109,7 @@ class ClassReducer:
         """
         common = self.find_common_type(extension.name, nsmap)
         if common is not None:
-            prefix, ext = split_prefix(extension.name)
+            prefix, ext = split(extension.name)
             item.inner.extend(copy.deepcopy(common.inner))
             new_attrs = copy.deepcopy(common.attrs)
             position = next(

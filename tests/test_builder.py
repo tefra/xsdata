@@ -197,9 +197,9 @@ class ClassBuilderTests(FactoryTestCase):
 
         children = self.builder.element_extensions(complex_type)
         expected = [
-            ExtensionFactory.create(name="ext", index=7),
+            ExtensionFactory.create(name="bk:ext", index=7),
             ExtensionFactory.create(name="a", index=3),
-            ExtensionFactory.create(name="b", index=4),
+            ExtensionFactory.create(name="bk:b", index=4),
             ExtensionFactory.create(name="c", index=5),
         ]
 
@@ -210,11 +210,10 @@ class ClassBuilderTests(FactoryTestCase):
         self.builder.target_prefix = "bk:"
         element = Element.create(type="bk:book", index=23)
         children = self.builder.element_extensions(element)
-        expected = [ExtensionFactory.create(name="book", index=0)]
+        expected = [ExtensionFactory.create(name="bk:book", index=0)]
 
         self.assertEqual(expected, list(children))
 
-    @patch.object(ClassBuilder, "strip_target_namespace")
     @patch.object(ClassBuilder, "has_inner_type")
     @patch.object(Attribute, "get_restrictions")
     @patch.object(Attribute, "namespace", new_callable=PropertyMock)
@@ -229,7 +228,6 @@ class ClassBuilderTests(FactoryTestCase):
         mock_namespace,
         mock_get_restrictions,
         mock_has_inner_type,
-        mock_strip_target_namespace,
     ):
         item = ClassFactory.create()
 
@@ -239,7 +237,6 @@ class ClassBuilderTests(FactoryTestCase):
         mock_namespace.return_value = "http://something/common"
         mock_get_restrictions.return_value = {"required": True}
         mock_has_inner_type.return_value = False
-        mock_strip_target_namespace.side_effect = lambda x: x
 
         attribute = Attribute.create(default="false", index=66)
 
@@ -257,9 +254,6 @@ class ClassBuilderTests(FactoryTestCase):
         )
         self.assertEqual(expected, item.attrs[0])
         mock_has_inner_type.assert_called_once_with(attribute)
-        mock_strip_target_namespace.assert_called_once_with(
-            mock_real_type.return_value
-        )
 
     @patch.object(ClassBuilder, "build_inner_class")
     @patch.object(ClassBuilder, "has_inner_type")
@@ -299,18 +293,6 @@ class ClassBuilderTests(FactoryTestCase):
 
         self.builder.build_inner_class(parent, element)
         self.assertEqual(mock_build_class.return_value, parent.inner[0])
-
-    def test_strip_target_namespace(self):
-        self.schema.nsmap = {
-            "bks": "urn:books",
-            "foo": "bar",
-            None: "http://namespace/other",
-        }
-        self.schema.target_namespace = "urn:books"
-        builder = ClassBuilder(schema=self.schema)
-        self.assertEqual("xs:int", builder.strip_target_namespace("xs:int"))
-        self.assertEqual("int", builder.strip_target_namespace("bks:int"))
-        self.assertEqual("int", builder.strip_target_namespace("int"))
 
     @patch("xsdata.builder.logger.warning")
     def test_default_value_type(self, mock_warning):

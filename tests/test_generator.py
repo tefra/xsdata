@@ -80,12 +80,12 @@ class PythonAbstractGeneratorTests(FactoryTestCase):
         )
         self.assertEqual(2, mock_process_enumeration.call_count)
 
-    @mock.patch("xsdata.utils.text.strip_prefix", return_value="nope")
+    @mock.patch("xsdata.utils.text.split", return_value=[None, "nope"])
     @mock.patch.object(generator, "attribute_default", return_value="life")
     @mock.patch.object(generator, "attribute_type", return_value="rab")
     @mock.patch.object(generator, "attribute_name", return_value="oof")
     def test_process_attribute(
-        self, mock_name, mock_type, mock_default, mock_strip_prefix
+        self, mock_name, mock_type, mock_default, mock_split
     ):
         attr = AttrFactory.create(name="foo", type="bar", default="thug")
         generator.process_attribute(attr, ["a", "b"])
@@ -98,7 +98,7 @@ class PythonAbstractGeneratorTests(FactoryTestCase):
         mock_name.assert_called_once_with("foo")
         mock_type.assert_called_once_with(attr, ["a", "b"])
         mock_default.assert_called_once_with(attr)
-        mock_strip_prefix.assert_called_once_with("foo")
+        mock_split.assert_called_once_with("foo")
 
     @mock.patch.object(generator, "attribute_default", return_value="life")
     @mock.patch.object(generator, "enumeration_name", return_value="OOF")

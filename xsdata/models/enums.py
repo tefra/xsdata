@@ -3,7 +3,7 @@ from typing import Optional
 
 from lxml import etree
 
-from xsdata.utils.text import capitalize, split_prefix
+from xsdata.utils.text import capitalize, split
 
 
 class Namespace:
@@ -70,7 +70,7 @@ class XSDType(Enum):
 
     @classmethod
     def get_enum(cls, code: str) -> Optional["XSDType"]:
-        prefix, suffix = split_prefix(code)
+        prefix, suffix = split(code)
         return __XSDType__.get("xs:" + suffix) if prefix else None
 
     @classmethod

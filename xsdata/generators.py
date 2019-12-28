@@ -52,7 +52,7 @@ class PythonAbstractGenerator(AbstractGenerator, ABC):
         """Normalize attribute properties."""
         attr.name = cls.attribute_name(attr.name)
         attr.type = cls.attribute_type(attr, parents)
-        attr.local_name = text.strip_prefix(attr.local_name)
+        attr.local_name = text.split(attr.local_name)[1]
         attr.default = cls.attribute_default(attr)
 
     @classmethod
@@ -79,9 +79,7 @@ class PythonAbstractGenerator(AbstractGenerator, ABC):
     def type_name(cls, name: str) -> str:
         """Convert xsd types to python or apply class name conventions after
         stripping any reference prefix."""
-        return XSDType.get_local(name) or cls.class_name(
-            text.strip_prefix(name)
-        )
+        return XSDType.get_local(name) or cls.class_name(text.split(name)[1])
 
     @classmethod
     def attribute_name(cls, name: str) -> str:
@@ -91,8 +89,10 @@ class PythonAbstractGenerator(AbstractGenerator, ABC):
         If the name is one of the python reserved words append the
         prefix _value
         """
-        name = text.strip_prefix(name)
-        return text.snake_case(replace_words.get(name.lower(), name))
+        local_name = text.split(name)[1]
+        return text.snake_case(
+            replace_words.get(local_name.lower(), local_name)
+        )
 
     @classmethod
     def enumeration_name(cls, name: str) -> str:

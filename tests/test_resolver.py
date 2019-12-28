@@ -206,7 +206,7 @@ class DependenciesResolverTest(FactoryTestCase):
                 ClassFactory.create(
                     name="f",
                     attrs=[
-                        AttrFactory.create(name="h", type="i"),
+                        AttrFactory.create(name="h", type="bks:i"),
                         AttrFactory.create(name="j", type="xs:string"),
                         AttrFactory.create(name="k", type="l"),
                     ],
@@ -220,10 +220,14 @@ class DependenciesResolverTest(FactoryTestCase):
             name="p",
             extensions=[
                 ExtensionFactory.create(name="xs:int"),
-                ExtensionFactory.create(name="a"),
+                ExtensionFactory.create(name="bks:a"),
             ],
         )
 
         classes = [first, second, third]
         expected = ["c:g", "i", "o", "l", "a", "p"]
+        self.resolver.schema = Schema.create(
+            nsmap={"bks": "urn:books"}, target_namespace="urn:books"
+        )
+
         self.assertEqual(expected, self.resolver.create_class_list(classes))

@@ -1,4 +1,5 @@
-{% set help = obj|docstring|trim %}
+{% set help = obj|docstring|trim -%}
+{% set namespace = obj.namespace or namespace|default(None) %}
 
 @dataclass
 class {{ obj.name }}{{"({})".format(obj.extensions|join(', ', attribute="name")) if obj.extensions }}:
@@ -21,7 +22,7 @@ class {{ obj.name }}{{"({})".format(obj.extensions|join(', ', attribute="name"))
     {%- set field_params = dict(
                   name=attr.local_name,
                   type=attr.local_type,
-                  namespace=attr.namespace,
+                  namespace=attr.namespace if namespace != attr.namespace else None,
                   ** attr.restrictions
             )
     %}
@@ -34,7 +35,7 @@ class {{ obj.name }}{{"({})".format(obj.extensions|join(', ', attribute="name"))
 {%- endfor -%}
 {%- for inner in obj.inner %}
     {%- filter indent(4) -%}
-        {%- with obj=inner, indent=indent -%}
+        {%- with obj=inner, namespace=obj.namespace or namespace -%}
             {% include "class.jinja2" %}
         {%- endwith -%}
     {%- endfilter -%}

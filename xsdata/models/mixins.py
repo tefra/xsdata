@@ -34,7 +34,7 @@ class NamedField:
 
         lookup = getattr(self, "ref", None) or getattr(self, "name")
 
-        prefix, name = text.split_prefix(lookup)
+        prefix, name = text.split(lookup or "")
         return self.nsmap.get(prefix)
 
 
@@ -65,7 +65,7 @@ class BaseModel:
     @classmethod
     def from_element(cls: Type[T], el: etree.Element, index: int) -> T:
         attrs = {
-            text.snake_case(text.strip_prefix(key, "}")): value
+            text.snake_case(etree.QName(key).localname): value
             for key, value in el.attrib.items()
         }
         data = {

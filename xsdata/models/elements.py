@@ -569,3 +569,14 @@ class Schema(AnnotationBase):
                 return Path(el.name).stem
 
         raise ValueError("Unknown schema module")
+
+    @property
+    def target_prefix(self):
+        return next(
+            (
+                prefix
+                for prefix, namespace in self.nsmap.items()
+                if namespace == self.target_namespace
+            ),
+            None,
+        )

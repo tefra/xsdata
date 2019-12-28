@@ -1,9 +1,14 @@
 from unittest import TestCase
 
-from xsdata.utils.text import capitalize, pascal_case, snake_case
+from xsdata.utils.text import capitalize, pascal_case, snake_case, strip_prefix
 
 
 class TextTests(TestCase):
+    def test_strip_prefix(self):
+        self.assertEqual("bks:books", strip_prefix("bks:books", None))
+        self.assertEqual("bks:books", strip_prefix("bks:books", "bk"))
+        self.assertEqual("books", strip_prefix("bks:books", "bks"))
+
     def test_snake_case(self):
         self.assertEqual("user_name", snake_case("userName"))
         self.assertEqual("user_name", snake_case("User.Name"))

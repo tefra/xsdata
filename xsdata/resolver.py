@@ -7,7 +7,8 @@ from toposort import toposort_flatten
 from xsdata.models.codegen import Class, Package
 from xsdata.models.elements import Schema
 from xsdata.models.enums import XSDType
-from xsdata.utils.text import split_prefix
+from xsdata.utils import text
+from xsdata.utils.text import split
 
 
 @dataclass
@@ -27,9 +28,9 @@ class DependenciesResolver:
         Reset aliases and imports from any previous runs keep the record
         of the processed class names
         """
+        self.schema = schema
         self.class_map = self.create_class_map(classes)
         self.class_list = self.create_class_list(classes)
-        self.schema = schema
         self.package = package
         self.imports.clear()
         self.aliases.clear()
@@ -68,7 +69,7 @@ class DependenciesResolver:
         collisions with the given list of classes and build a list of import
         packages."""
         for ref in self.import_classes():
-            prefix, name = split_prefix(ref)
+            prefix, name = split(ref)
             package = self.find_package(prefix, name)
             alias = ref if prefix and self.class_map.get(name) else None
 
@@ -114,11 +115,13 @@ class DependenciesResolver:
 
     def create_class_list(self, classes: List[Class]):
         """Use topology sort to return a flat list for all the dependencies."""
+
+        prefix = self.schema.target_prefix
         return toposort_flatten(
-            {obj.name: self.collect_deps(obj) for obj in classes}
+            {obj.name: self.collect_deps(obj, prefix) for obj in classes}
         )
 
-    def collect_deps(self, obj: Class) -> Set[str]:
+    def collect_deps(self, obj: Class, prefix: Optional[str]) -> Set[str]:
         """
         Return a list of dependencies for the given class.
 
@@ -129,10 +132,16 @@ class DependenciesResolver:
             * Ignore inner class references
             * Filter the standard xsd types
         """
-        deps = {attr.type for attr in obj.attrs if not attr.forward_ref}
-        deps.update(ext.name for ext in obj.extensions)
+        deps = {
+            text.strip_prefix(attr.type, prefix)
+            for attr in obj.attrs
+            if not attr.forward_ref
+        }
+        deps.update(
+            text.strip_prefix(ext.name, prefix) for ext in obj.extensions
+        )
         for inner in obj.inner:
-            deps.update(self.collect_deps(inner))
+            deps.update(self.collect_deps(inner, prefix))
 
         return set(filter(lambda name: XSDType.get_enum(name) is None, deps))
 

@@ -1,12 +1,15 @@
-from typing import List, Tuple
+from typing import List, Optional, Tuple
 
 
-def strip_prefix(string: str, sep: str = ":") -> str:
-    prefix, string = split_prefix(string, sep)
-    return string
+def strip_prefix(string: str, prefix: Optional[str]):
+    return (
+        string[len(prefix) + 1 :]
+        if prefix and string.startswith(f"{prefix}:", 0)
+        else string
+    )
 
 
-def split_prefix(string: str, sep: str = ":") -> Tuple:
+def split(string: str, sep: str = ":") -> Tuple:
     index = string.find(sep)
     if index == -1:
         return None, string

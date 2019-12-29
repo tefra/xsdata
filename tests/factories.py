@@ -53,6 +53,7 @@ class ClassFactory(Factory):
         name=None,
         type=None,
         is_root=False,
+        is_abstract=False,
         help=None,
         extensions=None,
         attrs=None,
@@ -62,6 +63,7 @@ class ClassFactory(Factory):
         return cls.model(
             name=name or f"class_{cls.next()}",
             is_root=is_root,
+            is_abstract=is_abstract,
             type=type or random.choice(cls.types),
             extensions=extensions or [],
             attrs=attrs or [],

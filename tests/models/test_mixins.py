@@ -86,6 +86,16 @@ class NamedFieldTests(TestCase):
         obj.nsmap["ns"] = "bar"
         self.assertEqual("bar", obj.namespace)
 
+    def test_property_is_abstract(self):
+        obj = el.Element.create(abstract=True)
+        self.assertTrue(obj.is_abstract)
+
+        obj = el.Element.create(abstract=False)
+        self.assertFalse(obj.is_abstract)
+
+        obj = el.Group.create()
+        self.assertFalse(obj.is_abstract)
+
 
 class ElementBaseTests(TestCase):
     def test_is_attribute(self):

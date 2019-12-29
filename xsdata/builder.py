@@ -49,6 +49,7 @@ class ClassBuilder:
         item = Class(
             name=obj.real_name,
             is_root=is_root,
+            is_abstract=obj.is_abstract,
             namespace=obj.namespace,
             type=type(obj),
             extensions=self.build_class_extensions(obj),

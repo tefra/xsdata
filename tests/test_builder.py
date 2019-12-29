@@ -65,18 +65,21 @@ class ClassBuilderTests(FactoryTestCase):
 
     @patch.object(ClassBuilder, "build_class_attributes")
     @patch.object(ClassBuilder, "build_class_extensions")
+    @patch.object(Element, "is_abstract", new_callable=PropertyMock)
     @patch.object(Element, "display_help", new_callable=PropertyMock)
     @patch.object(Element, "real_name", new_callable=PropertyMock)
     def test_build_class(
         self,
         mock_real_name,
         mock_display_help,
+        mock_is_abstract,
         mock_build_class_extensions,
         build_class_attributes,
     ):
         extensions = ExtensionFactory.list(2)
         mock_real_name.return_value = "name"
         mock_display_help.return_value = "sos"
+        mock_is_abstract.return_value = True
         mock_build_class_extensions.return_value = extensions
 
         element = Element.create()
@@ -85,7 +88,11 @@ class ClassBuilderTests(FactoryTestCase):
         build_class_attributes.assert_called_once_with(element, result)
 
         expected = ClassFactory.create(
-            name="name", type=Element, extensions=extensions, help="sos"
+            name="name",
+            type=Element,
+            extensions=extensions,
+            help="sos",
+            is_abstract=True,
         )
         self.assertEqual(expected, result)
 

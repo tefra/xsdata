@@ -189,45 +189,41 @@ class DependenciesResolverTest(FactoryTestCase):
         expected = {obj.name: obj for obj in classes}
         self.assertEqual(expected, self.resolver.create_class_map(classes))
 
-    def test_create_class_list(self):
-        first = ClassFactory.create(
-            name="a",
-            inner=[
-                ClassFactory.create(
-                    name="b",
-                    attrs=[
-                        AttrFactory.create(
-                            name="c", type="f", forward_ref=True
-                        ),
-                        AttrFactory.create(name="d", type="xs:string"),
-                        AttrFactory.create(name="e", type="c:g"),
-                    ],
-                ),
-                ClassFactory.create(
-                    name="f",
-                    attrs=[
-                        AttrFactory.create(name="h", type="bks:i"),
-                        AttrFactory.create(name="j", type="xs:string"),
-                        AttrFactory.create(name="k", type="l"),
-                    ],
-                ),
-            ],
-        )
-        second = ClassFactory.create(
-            name="l", attrs=[AttrFactory.create(name="m", type="o")],
-        )
-        third = ClassFactory.create(
-            name="p",
-            extensions=[
-                ExtensionFactory.create(name="xs:int"),
-                ExtensionFactory.create(name="bks:a"),
-            ],
-        )
+    @mock.patch.object(DependenciesResolver, "collect_deps")
+    def test_create_class_list(self, mock_collect_deps):
+        classes = ClassFactory.list(3)
+        mock_collect_deps.side_effect = [
+            {"class_C", "b"},
+            {"c", "d"},
+            {"e", "d"},
+        ]
 
-        classes = [first, second, third]
-        expected = ["c:g", "i", "o", "l", "a", "p"]
         self.resolver.schema = Schema.create(
             nsmap={"bks": "urn:books"}, target_namespace="urn:books"
         )
+        actual = self.resolver.create_class_list(classes)
+        expected = ["b", "c", "d", "e", "class_C", "class_D", "class_B"]
+        self.assertEqual(expected, actual)
+        mock_collect_deps.assert_has_calls(
+            [mock.call(obj, "bks") for obj in classes]
+        )
 
-        self.assertEqual(expected, self.resolver.create_class_list(classes))
+    def test_collect_deps(self):
+        obj = ClassFactory.create(
+            attrs=[
+                AttrFactory.create(type="xs:decimal"),
+                AttrFactory.create(type="xs:annotated", forward_ref=True),
+                AttrFactory.create(type="xs:openAttrs"),
+            ],
+            extensions=[ExtensionFactory.create(name="xs:localElement")],
+            inner=[ClassFactory.create(attrs=AttrFactory.list(2, type="foo"))],
+        )
+
+        self.assertEqual(
+            {"localElement", "openAttrs", "foo"},
+            self.resolver.collect_deps(obj, "xs"),
+        )
+        self.assertEqual(
+            {"foo", "xs:localElement", "xs:openAttrs"},
+            self.resolver.collect_deps(obj, ""),
+        )

@@ -1,3 +1,4 @@
+import logging
 from dataclasses import dataclass, field
 from typing import Dict, Iterator, List, Optional, Set
 
@@ -9,6 +10,8 @@ from xsdata.models.elements import Schema
 from xsdata.models.enums import XSDType
 from xsdata.utils import text
 from xsdata.utils.text import split
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -132,18 +135,16 @@ class DependenciesResolver:
             * Ignore inner class references
             * Filter the standard xsd types
         """
-        deps = {
-            text.strip_prefix(attr.type, prefix)
-            for attr in obj.attrs
-            if not attr.forward_ref
-        }
-        deps.update(
-            text.strip_prefix(ext.name, prefix) for ext in obj.extensions
-        )
+        deps = {attr.type for attr in obj.attrs if not attr.forward_ref}
+        deps.update(ext.name for ext in obj.extensions)
         for inner in obj.inner:
             deps.update(self.collect_deps(inner, prefix))
 
-        return set(filter(lambda name: XSDType.get_enum(name) is None, deps))
+        return {
+            text.strip_prefix(dep, prefix)
+            for dep in deps
+            if dep and not XSDType.get_enum(dep)
+        }
 
     @staticmethod
     def create_class_map(classes: List[Class]):

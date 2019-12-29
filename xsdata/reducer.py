@@ -145,7 +145,7 @@ class ClassReducer:
         the default xsd type xs:string
         """
         common = self.find_common_type(attr.type, nsmap)
-        if common is not None:
+        if common is not None and not common.is_enumeration:
             if len(common.attrs) == 1:
                 value = common.attrs[0]
                 attr.type = value.type

@@ -18,6 +18,7 @@ class FormType(Enum):
 
 class XSDType(Enum):
     ANY_URI = ("xs:anyURI", str)
+    ANY_SIMPLE_TYPE = ("xs:anySimpleType", str)
     BASE64_BINARY = ("xs:base64Binary", str)
     BOOLEAN = ("xs:boolean", bool)
     BYTE = ("xs:byte", int)

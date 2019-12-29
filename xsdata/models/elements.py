@@ -346,6 +346,7 @@ class Restriction(RestrictedField, AnnotationBase, TypedField, NamedField):
     length: Optional[Length]
     white_space: Optional[WhiteSpace]
     pattern: Optional[Pattern]
+    simple_type: Optional[SimpleType]
     enumerations: ArrayList[Enumeration] = field(default_factory=list)
     attributes: ArrayList[Attribute] = field(default_factory=list)
     attribute_groups: ArrayList[AttributeGroup] = field(default_factory=list)
@@ -359,6 +360,8 @@ class Restriction(RestrictedField, AnnotationBase, TypedField, NamedField):
 
     @property
     def real_type(self) -> Optional[str]:
+        if self.simple_type:
+            return self.simple_type.real_type
         return self.base
 
     @property
@@ -544,6 +547,7 @@ class Schema(AnnotationBase):
     attribute_groups: ArrayList[AttributeGroup] = field(default_factory=list)
     elements: ArrayList[Element] = field(default_factory=list)
     attributes: ArrayList[Attribute] = field(default_factory=list)
+    notations: ArrayList[Notation] = field(default_factory=list)
 
     def sub_schemas(self) -> Iterator[UnionType[Import, Include]]:
         for imp in self.imports:

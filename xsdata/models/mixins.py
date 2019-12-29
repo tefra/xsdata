@@ -27,6 +27,10 @@ class NamedField:
         raise NotImplementedError("Element has no name: {}".format(self))
 
     @property
+    def is_abstract(self) -> bool:
+        return getattr(self, "abstract", False)
+
+    @property
     def namespace(self):
         form: FormType = getattr(self, "form", FormType.UNQUALIFIED)
         if form == FormType.UNQUALIFIED:

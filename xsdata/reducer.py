@@ -21,6 +21,10 @@ def is_common(obj: Class) -> bool:
     return obj.is_common
 
 
+def is_abstract(obj: Class) -> bool:
+    return obj.is_abstract
+
+
 @dataclass
 class ClassReducer:
     """The purpose of this class is to minimize the number of generated classes
@@ -45,11 +49,14 @@ class ClassReducer:
 
         enumerations = self.pop_classes(classes, condition=is_enumeration)
         common_types = self.pop_classes(classes, condition=is_common)
+        abstract_types = self.pop_classes(classes, condition=is_abstract)
 
         self.add_common_types(enumerations, namespace)
         self.add_common_types(common_types, namespace)
+        self.add_common_types(abstract_types, namespace)
 
         self.flatten_classes(common_types, nsmap)
+        self.flatten_classes(abstract_types, nsmap)
         self.flatten_classes(classes, nsmap)
 
         return enumerations + classes
@@ -145,7 +152,7 @@ class ClassReducer:
                 for key, value in value.restrictions.items():
                     setattr(attr, key, value)
             else:
-                logger.debug(
+                logger.warning(
                     f"Missing type implementation: {common.type.__name__}"
                 )
                 attr.type = XSDType.STRING.code

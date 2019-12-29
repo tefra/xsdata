@@ -6,7 +6,13 @@ from tests.factories import (
     ExtensionFactory,
     FactoryTestCase,
 )
-from xsdata.models.elements import Element, Restriction, Schema, SimpleType
+from xsdata.models.elements import (
+    ComplexType,
+    Element,
+    Restriction,
+    Schema,
+    SimpleType,
+)
 from xsdata.models.enums import TagType, XSDType
 from xsdata.reducer import ClassReducer
 
@@ -33,8 +39,9 @@ class ClassReducerTests(FactoryTestCase):
             type=Restriction,
             attrs=AttrFactory.list(2, local_type=TagType.ENUMERATION.cname),
         )
+        abstracts = ClassFactory.list(2, is_abstract=True, type=ComplexType)
 
-        all = classes + common + enums
+        all = classes + common + abstracts + enums
 
         result = ClassReducer().process(self.schema, all)
 
@@ -44,11 +51,16 @@ class ClassReducerTests(FactoryTestCase):
             [
                 mock.call(enums, self.target_namespace),
                 mock.call(common, self.target_namespace),
+                mock.call(abstracts, self.target_namespace),
             ]
         )
 
         mock_flatten_classes.assert_has_calls(
-            [mock.call(common, self.nsmap), mock.call(classes, self.nsmap)]
+            [
+                mock.call(common, self.nsmap),
+                mock.call(abstracts, self.nsmap),
+                mock.call(classes, self.nsmap),
+            ]
         )
 
     @mock.patch.object(ClassReducer, "flatten_class")

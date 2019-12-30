@@ -1,46 +1,57 @@
+import json
 from dataclasses import asdict, dataclass, field
 from enum import Enum
-from typing import Callable, Dict, List, Tuple
+from typing import Callable, Dict, Tuple
 
 from lxml.etree import Element, QName, SubElement, cleanup_namespaces, tostring
 
-from xsdata.formats.inspect import ModelInspect
+from xsdata.formats.dataclass.mixins import ModelInspect
+from xsdata.formats.mixins import AbstractSerializer
 
 
-class DictSerializer:
-    def render(self, obj: object, dict_factory: Callable = dict) -> Dict:
-        return asdict(obj, dict_factory=dict_factory)
+def filter_none(x: Tuple):
+    return dict((k, v) for k, v in x if v is not None)
 
-    @staticmethod
-    def filter(data: List[Tuple], filter: Callable):
-        return dict((key, value) for key, value in data if filter(value))
 
-    @staticmethod
-    def filter_none(data):
-        return DictSerializer.filter(data, filter=lambda x: x is not None)
+class DictFactory:
+    FILTER_NONE = filter_none
 
 
 @dataclass
-class XmlSerializer(ModelInspect):
+class DictSerializer(AbstractSerializer):
+    dict_factory: Callable = field(default=dict)
+
+    def render(self, obj: object) -> Dict:
+        """Convert the given object tree to dictionary with primitive
+        values."""
+        return asdict(obj, dict_factory=self.dict_factory)
+
+
+@dataclass
+class JsonSerializer(AbstractSerializer):
+    dict_factory: Callable = field(default=dict)
+
+    def render(self, obj: object) -> str:
+        """Convert the given object tree to json string."""
+        return json.dumps(asdict(obj, dict_factory=self.dict_factory))
+
+
+@dataclass
+class XmlSerializer(AbstractSerializer, ModelInspect):
+    xml_declaration: bool = field(default=True)
+    encoding: str = field(default="UTF-8")
+    pretty_print: bool = field(default=False)
     ns_list: list = field(init=False, default_factory=list)
 
-    def render(
-        self,
-        obj: object,
-        xml_declaration=True,
-        encoding="UTF-8",
-        pretty_print=False,
-        **kwargs,
-    ) -> bytes:
-
+    def render(self, obj: object) -> str:
+        """Convert the given object tree to xml string."""
         tree = self.render_tree(obj)
         return tostring(
             tree,
-            xml_declaration=xml_declaration,
-            encoding=encoding,
-            pretty_print=pretty_print,
-            **kwargs,
-        )
+            xml_declaration=self.xml_declaration,
+            encoding=self.encoding,
+            pretty_print=self.pretty_print,
+        ).decode()
 
     def render_tree(self, obj: object) -> Element:
         """

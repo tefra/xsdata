@@ -1,7 +1,11 @@
 from unittest.case import TestCase
 
 from tests.fixtures.books import BookForm, Books
-from xsdata.formats.dataclass.serializers import DictSerializer, XmlSerializer
+from xsdata.formats.dataclass.serializers import (
+    DictFactory,
+    DictSerializer,
+    XmlSerializer,
+)
 from xsdata.models.enums import TagType
 
 
@@ -30,9 +34,9 @@ class DictSerializerTests(TestCase):
         )
 
     def test_render(self):
-        actual = DictSerializer().render(
-            self.books, dict_factory=DictSerializer.filter_none
-        )
+        serializer = DictSerializer(dict_factory=DictFactory.FILTER_NONE)
+        actual = serializer.render(self.books)
+
         expected = {
             "book": [
                 {
@@ -81,7 +85,9 @@ class XmlSerializerTests(TestCase):
         )
 
     def test_render(self):
-        actual = XmlSerializer().render(self.books, pretty_print=True).decode()
+        serializer = XmlSerializer(pretty_print=True)
+        actual = serializer.render(self.books)
+
         expected = (
             "<?xml version='1.0' encoding='UTF-8'?>\n"
             "<books>\n"

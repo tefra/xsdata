@@ -149,4 +149,11 @@ class DependenciesResolver:
     @staticmethod
     def create_class_map(classes: List[Class]):
         """Index the list of classes by name."""
-        return {obj.name: obj for obj in classes}
+
+        result: Dict[str, Class] = dict()
+        for obj in classes:
+            if obj.name in result:
+                raise ValueError(f"Duplicate class name`{obj.name}`")
+            result[obj.name] = obj
+
+        return result

@@ -2,8 +2,8 @@ import json
 from unittest.case import TestCase
 
 from tests.fixtures.books import BookForm, Books
-from xsdata.formats.dataclass.parsers import DictParser, XmlParser
-from xsdata.formats.inspect import Field
+from xsdata.formats.dataclass.mixins import Field
+from xsdata.formats.dataclass.parsers import JsonParser, XmlParser
 
 
 class DictParserTests(TestCase):
@@ -32,8 +32,8 @@ class DictParserTests(TestCase):
         }
 
     def test_parser(self):
-        parser = DictParser()
-        books = parser.from_json(json.dumps(self.data), Books)
+        parser = JsonParser()
+        books = parser.from_string(json.dumps(self.data), Books)
 
         self.assertIsInstance(books, Books)
 
@@ -69,14 +69,14 @@ class DictParserTests(TestCase):
         foo_field = Field(name="", local_name="foo", type=str)
         bar_field = Field(name="", local_name="bar", type=str, is_list=True)
 
-        self.assertEqual("bar", DictParser.parse_value(data, foo_field))
-        self.assertEqual(["foo"], DictParser.parse_value(data, bar_field))
+        self.assertEqual("bar", JsonParser.parse_value(data, foo_field))
+        self.assertEqual(["foo"], JsonParser.parse_value(data, bar_field))
 
         none_field = Field(name="", local_name="nope", type=str, default=list)
-        self.assertEqual([], DictParser.parse_value(data, none_field))
+        self.assertEqual([], JsonParser.parse_value(data, none_field))
 
         none_field = Field(name="", local_name="nope", type=str, default=1)
-        self.assertEqual(1, DictParser.parse_value(data, none_field))
+        self.assertEqual(1, JsonParser.parse_value(data, none_field))
 
 
 class XmlParserTests(TestCase):

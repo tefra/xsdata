@@ -2,7 +2,7 @@ from typing import Iterator
 from unittest import TestCase
 
 from tests.fixtures.books import BookForm, Books
-from xsdata.formats.inspect import Field, ModelInspect
+from xsdata.formats.dataclass.mixins import Field, ModelInspect
 
 
 class ModelInspectTests(TestCase):
@@ -54,6 +54,3 @@ class ModelInspectTests(TestCase):
         self.assertTrue(ModelInspect.is_dataclass(BookForm))
         self.assertFalse(ModelInspect.is_dataclass(str))
         self.assertFalse(ModelInspect.is_dataclass(self.__class__))
-
-
-#

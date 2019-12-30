@@ -1,21 +1,24 @@
-import io
 import json
-import pathlib
 from dataclasses import dataclass, is_dataclass
+from io import BytesIO
 from typing import Any, Dict, List, Optional, Type
 
 from lxml.etree import Element, QName, iterparse
 
-from xsdata.formats.inspect import Field, ModelInspect
+from xsdata.formats.dataclass.mixins import Field, ModelInspect
+from xsdata.formats.mixins import AbstractParser
 from xsdata.models.enums import EventType
 
 
 @dataclass
-class DictParser(ModelInspect):
-    def from_json(self, json_str: str, model: Type) -> Type:
-        return self.parse(json.loads(json_str), model)
+class JsonParser(AbstractParser, ModelInspect):
+    def parse(self, source: BytesIO, clazz: Type) -> Type:
+        """Parse the JSON input stream and return the resulting object tree."""
+        ctx = json.load(source)
+        return self.parse_context(ctx, clazz)
 
-    def parse(self, data: Dict, model: Type) -> Type:
+    def parse_context(self, data: Dict, model: Type) -> Type:
+        """Recursively build the given model from the input dict data."""
         params = {}
 
         if type(data) is list and len(data) == 1:
@@ -28,9 +31,9 @@ class DictParser(ModelInspect):
                 params[field.name] = value
             elif is_dataclass(field.type):
                 params[field.name] = (
-                    [self.parse(val, field.type) for val in value]
+                    [self.parse_context(val, field.type) for val in value]
                     if field.is_list
-                    else self.parse(value, field.type)
+                    else self.parse_context(value, field.type)
                 )
             else:
                 params[field.name] = (
@@ -58,31 +61,14 @@ class DictParser(ModelInspect):
 
 
 @dataclass
-class XmlParser(ModelInspect):
-    def from_path(self, path: pathlib.Path, clazz: Type) -> Type:
-        """A shortcut class method for file path source."""
-        if isinstance(path, str):
-            path = pathlib.Path(path).resolve()
-
-        return self.parse(str(path), clazz)
-
-    def from_string(self, source: str, clazz: Type) -> Type:
-        """A shortcut class method for str source."""
-        return self.from_bytes(source.encode(), clazz)
-
-    def from_bytes(self, source: bytes, clazz: Type) -> Type:
-        """A shortcut class method for bytes source."""
-        return self.parse(io.BytesIO(source), clazz)
-
-    def parse(self, source: object, clazz: Type) -> Type:
-        """Create an iterparse instance with only start/end events and pass the
-        ball the the context parser."""
+class XmlParser(AbstractParser, ModelInspect):
+    def parse(self, source: BytesIO, clazz: Type) -> Type:
+        """Parse the XML input stream and return the resulting object tree."""
         ctx = iterparse(source=source, events=(EventType.START, EventType.END))
         return self.parse_context(ctx, clazz)
 
     def parse_context(self, context: iterparse, clazz: Type) -> Type:
-        """Run the iterator and build the objects tree according to the given
-        class."""
+        """Build the given model from the iterparse event data."""
         _, root = next(context)
         namespace = self.class_meta(clazz).namespace
         queue = [self.class_ns_fields(clazz, namespace)]

@@ -76,7 +76,6 @@ class Extension:
 class Class:
     name: str
     type: Type
-    is_root: bool
     is_abstract: bool
     namespace: Optional[str] = field(default=None)
     local_name: str = field(init=False)

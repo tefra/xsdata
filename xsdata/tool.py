@@ -3,6 +3,7 @@ from pathlib import Path
 from typing import List, Union
 
 from xsdata.builder import ClassBuilder
+from xsdata.logger import logger
 from xsdata.models.elements import Import, Include
 from xsdata.models.enums import Namespace
 from xsdata.parser import SchemaParser
@@ -19,7 +20,7 @@ class ProcessTask:
 
     def process(self, xsd: Path, package: str):
         if xsd in self.processed:
-            return
+            return logger.debug(f"Circular import skipping: {xsd.name}")
         self.processed.append(xsd)
 
         schema = SchemaParser.from_file(xsd)
@@ -30,8 +31,15 @@ class ProcessTask:
                     package=self.adjust_package(package, sub_schema),
                 )
 
+        logger.info(
+            f"Schema: {xsd.relative_to(Path.cwd())}, elements: {schema.num}"
+        )
+
         classes = ClassBuilder(schema=schema).build()
+        logger.info(f"Class candidates: {len(classes)}")
+
         classes = reducer.process(schema=schema, classes=classes)
+        logger.info(f"Class graduated: {len(classes)}")
 
         callback = writer.print if self.print else writer.write
         callback(
@@ -43,7 +51,10 @@ class ProcessTask:
 
     @staticmethod
     def is_valid(schema: Union[Import, Include]) -> bool:
-        return schema.namespace == Namespace.XML or not schema.schema_location
+        return (
+            schema.namespace != Namespace.XML
+            and schema.schema_location is not None
+        )
 
     @staticmethod
     def resolve_schema(xsd: Path, schema: Union[Import, Include]) -> Path:

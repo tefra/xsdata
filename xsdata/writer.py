@@ -3,6 +3,7 @@ from typing import Dict, List
 
 from xsdata.formats.dataclass.generator import DataclassGenerator
 from xsdata.generators import AbstractGenerator
+from xsdata.logger import logger
 from xsdata.models.codegen import Class
 from xsdata.models.elements import Schema
 
@@ -28,6 +29,7 @@ class CodeWriter:
     ):
         engine = self.get_renderer(renderer)
         for file, output in engine.render(schema, classes, package):
+            logger.info(f"Generating package: `{package}`")
             with open(str(file), "w") as fp:
                 fp.write(output)
 

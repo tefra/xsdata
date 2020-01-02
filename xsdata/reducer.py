@@ -1,16 +1,14 @@
 import copy
-import logging
 from dataclasses import dataclass, field
 from typing import Callable, Dict, List, Optional
 
 from lxml import etree
 
+from xsdata.logger import logger
 from xsdata.models.codegen import Attr, Class, Extension
 from xsdata.models.elements import Schema
 from xsdata.models.enums import XSDType
 from xsdata.utils.text import split
-
-logger = logging.getLogger(__name__)
 
 
 def is_enumeration(obj: Class) -> bool:
@@ -152,7 +150,7 @@ class ClassReducer:
                 for key, value in value.restrictions.items():
                     setattr(attr, key, value)
             else:
-                logger.warning(
+                logger.debug(
                     f"Missing type implementation: {common.type.__name__}"
                 )
                 attr.type = XSDType.STRING.code

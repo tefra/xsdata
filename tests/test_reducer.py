@@ -234,7 +234,7 @@ class ClassReducerTests(FactoryTestCase):
     @mock.patch("xsdata.reducer.logger.warning")
     @mock.patch.object(ClassReducer, "find_common_type")
     def test_flatten_attribute_with_common_multiple_attributes(
-        self, mock_find_common_type, mock_logger_warning
+        self, mock_find_common_type, mock_logger_debug
     ):
         common = ClassFactory.create(name="bar", attrs=AttrFactory.list(2))
         mock_find_common_type.return_value = common
@@ -245,6 +245,6 @@ class ClassReducerTests(FactoryTestCase):
         reducer.flatten_attribute(obj, self.nsmap)
 
         self.assertEqual(XSDType.STRING.code, obj.type)
-        mock_logger_warning.assert_called_once_with(
+        mock_logger_debug.assert_called_once_with(
             f"Missing type implementation: {common.type.__name__}"
         )

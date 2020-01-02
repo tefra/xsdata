@@ -1,0 +1,21 @@
+site_name: xsdata
+site_description: Python XML Binding
+site_author: Christodoulos Tsoulloftas
+
+repo_url: https://github.com/tefra/xsdata
+edit_uri: https://github.com/tefra/xsdata/edit/master/docs
+
+theme: readthedocs
+
+plugins:
+  - search
+  - macros
+
+
+nav:
+  - Home: index.md
+  - Advanced: advanced.md
+  - About:
+      - Release Notes: about/changelog.md
+      - Contributing: about/contributing.md
+      - License: about/license.md

@@ -1,6 +1,9 @@
 build:
   image: latest
 
+mkdocs:
+  configuration: mkdocs.yml
+
 python:
   version: 3.7
   pip_install: true

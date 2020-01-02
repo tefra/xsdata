@@ -21,11 +21,7 @@ if __name__ == "__main__":
         ],
         extras_require={
             "dev": ["pre-commit", "pytest", "pytest-cov", "codecov", "tox"],
-            "docs": [
-                "sphinx",
-                "sphinx-rtd-theme",
-                "sphinxcontrib-programoutput",
-            ],
+            "docs": ["mkdocs", "mkdocs-macros-plugin"],
         },
         entry_points={"console_scripts": ["xsdata=xsdata:cli"]},
     )

@@ -166,3 +166,14 @@ class ElementBase(BaseModel):
     @property
     def extends(self) -> Optional[str]:
         return None
+
+    @property
+    def num(self):
+
+        return sum(
+            [
+                len(getattr(self, attribute.name))
+                for attribute in fields(self)
+                if isinstance(getattr(self, attribute.name), list)
+            ]
+        )

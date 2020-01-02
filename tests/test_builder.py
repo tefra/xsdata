@@ -56,10 +56,10 @@ class ClassBuilderTests(FactoryTestCase):
                 call(self.schema.groups[1]),
                 call(self.schema.attributes[0]),
                 call(self.schema.attributes[1]),
-                call(self.schema.complex_types[0], is_root=True),
-                call(self.schema.complex_types[1], is_root=True),
-                call(self.schema.elements[0], is_root=True),
-                call(self.schema.elements[1], is_root=True),
+                call(self.schema.complex_types[0]),
+                call(self.schema.complex_types[1]),
+                call(self.schema.elements[0]),
+                call(self.schema.elements[1]),
             ]
         )
 
@@ -302,7 +302,7 @@ class ClassBuilderTests(FactoryTestCase):
         self.assertEqual(mock_build_class.return_value, parent.inner[0])
 
     @patch("xsdata.builder.logger.warning")
-    def test_default_value_type(self, mock_warning):
+    def test_default_value_type(self, mock_logger_warning):
         item = ClassFactory.create()
         self.assertEqual("xs:string", ClassBuilder.default_value_type(item))
 
@@ -321,3 +321,4 @@ class ClassBuilderTests(FactoryTestCase):
         )
 
         self.assertIsNone(ClassBuilder.default_value_type(item))
+        mock_logger_warning.assert_called_once_with("Empty class: `class_B`")

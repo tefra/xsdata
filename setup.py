@@ -12,7 +12,14 @@ if __name__ == "__main__":
     setup(
         packages=find_packages(),
         version=meta["version"],
-        install_requires=["lxml", "click", "toposort", "docformatter"],
+        install_requires=[
+            "lxml",
+            "click",
+            "click_log",
+            "toposort",
+            "docformatter",
+            "jinja2",
+        ],
         extras_require={
             "dev": ["pre-commit", "pytest", "pytest-cov", "codecov", "tox"],
             "docs": ["mkdocs", "mkdocs-macros-plugin"],

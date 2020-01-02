@@ -1,4 +1,5 @@
 {% set help = obj|docstring|trim -%}
+{% set level = level|default(0)-%}
 {% set namespace = obj.namespace or namespace|default(None) %}
 
 @dataclass
@@ -6,10 +7,10 @@ class {{ obj.name }}{{"({})".format(obj.extensions|join(', ', attribute="name"))
 {%- if help %}
 {{ help|indent(4, first=True) }}
 {%- endif -%}
-{%- if obj.attrs|length == 0 and not obj.is_root %}
+{%- if obj.attrs|length == 0 and level > 0 %}
     pass
 {%- endif -%}
-{%- if obj.is_root and (obj.local_name != obj.name or obj.namespace) %}
+{%- if level == 0 and (obj.local_name != obj.name or obj.namespace) %}
     class Meta:
         {%- if obj.local_name != obj.name %}
         name = "{{ obj.local_name }}"
@@ -35,7 +36,7 @@ class {{ obj.name }}{{"({})".format(obj.extensions|join(', ', attribute="name"))
 {%- endfor -%}
 {%- for inner in obj.inner %}
     {%- filter indent(4) -%}
-        {%- with obj=inner, namespace=obj.namespace or namespace -%}
+        {%- with obj=inner, namespace=obj.namespace or namespace, level=level + 1 -%}
             {% include "class.jinja2" %}
         {%- endwith -%}
     {%- endfilter -%}

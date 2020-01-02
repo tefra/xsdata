@@ -1,7 +1,7 @@
-import logging
 from dataclasses import dataclass, field
 from typing import Iterator, List, Optional, Union
 
+from xsdata.logger import logger
 from xsdata.models.codegen import Attr, Class, Extension
 from xsdata.models.elements import (
     Attribute,
@@ -16,8 +16,6 @@ from xsdata.models.elements import (
 )
 from xsdata.models.enums import TagType, XSDType
 from xsdata.models.mixins import ElementBase
-
-logger = logging.getLogger(__name__)
 
 BaseElement = Union[
     Attribute, AttributeGroup, Element, ComplexType, SimpleType, Group
@@ -37,18 +35,14 @@ class ClassBuilder:
         classes.extend(map(self.build_class, self.schema.attribute_groups))
         classes.extend(map(self.build_class, self.schema.groups))
         classes.extend(map(self.build_class, self.schema.attributes))
-        classes.extend(map(self.build_root_class, self.schema.complex_types))
-        classes.extend(map(self.build_root_class, self.schema.elements))
+        classes.extend(map(self.build_class, self.schema.complex_types))
+        classes.extend(map(self.build_class, self.schema.elements))
         return classes
 
-    def build_root_class(self, obj: BaseElement):
-        return self.build_class(obj, is_root=True)
-
-    def build_class(self, obj: BaseElement, is_root=False) -> Class:
+    def build_class(self, obj: BaseElement, inner=False) -> Class:
         """Build and return a class instance."""
         item = Class(
             name=obj.real_name,
-            is_root=is_root,
             is_abstract=obj.is_abstract,
             namespace=obj.namespace,
             type=type(obj),
@@ -56,8 +50,10 @@ class ClassBuilder:
             help=obj.display_help,
         )
 
-        self.build_class_attributes(obj, item)
+        prefix = "Inner" if inner else "Root"
+        logger.info(f"{prefix } candidate: `{item.name}`")
 
+        self.build_class_attributes(obj, item)
         return item
 
     def build_class_attributes(self, obj: ElementBase, item: Class):
@@ -158,7 +154,7 @@ class ClassBuilder:
         """
         if isinstance(obj, Element) and obj.complex_type:
             obj.complex_type.name = obj.type = obj.name
-            parent.inner.append(self.build_class(obj.complex_type))
+            parent.inner.append(self.build_class(obj.complex_type, inner=True))
 
     @staticmethod
     def has_inner_type(obj: AttributeElement) -> bool:

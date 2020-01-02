@@ -1,13 +1,15 @@
 from pathlib import Path
 
 import click
+import click_log
 
+from xsdata.logger import logger
 from xsdata.tool import ProcessTask
 from xsdata.writer import writer
 
 
 @click.command("generate")
-@click.argument("file", type=click.Path(exists=True), required=True)
+@click.argument("XSD-Path", type=click.Path(exists=True), required=True)
 @click.option(
     "--package", required=True, help="Target Package",
 )
@@ -17,10 +19,19 @@ from xsdata.writer import writer
     help="Output renderer",
     default="pydata",
 )
-@click.option("--print", is_flag=True, default=False)
-def cli(file: str, package: str, renderer: str, print: bool):
+@click.option(
+    "--print",
+    is_flag=True,
+    default=False,
+    help="Preview the resulting classes.",
+)
+@click_log.simple_verbosity_option(logger)
+def cli(xsd_path: str, package: str, renderer: str, print: bool):
+    if print:
+        logger.setLevel("ERROR")
+
     task = ProcessTask(renderer=renderer, print=print)
-    task.process(xsd=Path(file).resolve(), package=package)
+    task.process(xsd=Path(xsd_path).resolve(), package=package)
 
 
 if __name__ == "__main__":

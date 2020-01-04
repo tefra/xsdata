@@ -110,8 +110,8 @@ class ClassBuilder:
             if child.is_attribute:
                 continue
 
-            if child.extends is not None:
-                yield Extension(name=child.extends, index=child.index)
+            for ext in child.extensions:
+                yield Extension(name=ext, index=child.index)
 
             yield from self.element_extensions(child, include_current=False)
 
@@ -171,18 +171,19 @@ class ClassBuilder:
         )
 
     @staticmethod
-    def default_value_type(item: Class):
+    def default_value_type(item: Class) -> Optional[str]:
         value_type = None
         if len(item.extensions) == 0 and len(item.attrs) == 0:
             value_type = XSDType.STRING.code
             logger.warning(f"Empty class: `{item.name}`")
         elif not item.is_enumeration:
-            extension = next(
-                (ext for ext in item.extensions if XSDType.get_enum(ext.name)),
-                None,
-            )
-            if extension:
-                item.extensions.remove(extension)
-                value_type = extension.name
+            tmp = []
+            for i in range(len(item.extensions) - 1, -1, -1):
+                extension = item.extensions[i]
+                if XSDType.get_enum(extension.name):
+                    tmp.append(extension.name)
+                    item.extensions.pop(i)
+            if tmp:
+                value_type = " ".join(reversed(tmp))
 
         return value_type

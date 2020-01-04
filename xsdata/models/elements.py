@@ -67,7 +67,7 @@ class SimpleType(AnnotationBase, TypedField, NamedField, RestrictedField):
         if self.list:
             return self.list.real_type
         if self.union:
-            pass  # I can't do unions
+            return self.union.member_types
         return XSDType.STRING.code
 
     def get_restrictions(self) -> Dict[str, Anything]:
@@ -102,6 +102,12 @@ class List(AnnotationBase, RestrictedField):
 class Union(AnnotationBase):
     member_types: Optional[str]
     simple_types: ArrayList[SimpleType] = field(default_factory=list)
+
+    @property
+    def extends(self) -> Optional[str]:
+        if self.member_types:
+            return self.member_types
+        return None
 
 
 @dataclass

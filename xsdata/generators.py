@@ -116,15 +116,24 @@ class PythonAbstractGenerator(AbstractGenerator, ABC):
             * Wrap the result with List if the field accepts a list of values
             * Wrap the result with Optional if the field default value is None
         """
-        result = (
-            cls.class_name(attr.type_alias)
-            if attr.type_alias
-            else cls.type_name(attr.type)
-        )
 
+        type_names: List[str] = []
+        for name in attr.types:
+            type_name = (
+                cls.class_name(attr.type_aliases[name])
+                if name in attr.type_aliases
+                else cls.type_name(name)
+            )
+            if type_name not in type_names:
+                type_names.append(type_name)
+
+        result = ", ".join(type_names)
         if attr.forward_ref:
             outer_str = ".".join(parents)
             result = f'"{outer_str}.{result}"'
+        elif len(type_names) > 1:
+            result = f"Union[{result}]"
+
         if attr.is_list:
             result = f"List[{result}]"
         elif attr.default is None:

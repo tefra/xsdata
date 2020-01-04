@@ -2,7 +2,7 @@ import re
 import sys
 from abc import ABC, abstractmethod
 from dataclasses import MISSING, Field, dataclass, fields
-from typing import Any, Dict, Optional, Type, TypeVar
+from typing import Any, Dict, Iterator, Optional, Type, TypeVar
 
 from lxml import etree
 
@@ -168,8 +168,12 @@ class ElementBase(BaseModel):
         return None
 
     @property
-    def num(self):
+    def extensions(self) -> Iterator[str]:
+        extends = self.extends or ""
+        return filter(None, extends.split(" "))
 
+    @property
+    def num(self):
         return sum(
             [
                 len(getattr(self, attribute.name))

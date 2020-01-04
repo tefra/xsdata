@@ -22,8 +22,8 @@ class SimpleTypeTests(TestCase):
         obj = SimpleType.create()
         self.assertEqual("xs:string", obj.real_type)
 
-        obj.union = Union.create()
-        self.assertEqual("xs:string", obj.real_type)
+        obj.union = Union.create(member_types="thug")
+        self.assertEqual("thug", obj.real_type)
 
         obj.list = List.create(item_type="foo")
         self.assertEqual("foo", obj.real_type)

@@ -169,9 +169,15 @@ class PythonAbstractGeneratorTests(FactoryTestCase):
         self.assertEqual('List["A.Parent.FooBar"]', actual)
 
         attr.type = "thug:life"
-        attr.type_alias = "Boss:Life"
+        attr.type_aliases = {"thug:life": "Boss:Life"}
         actual = generator.attribute_type(attr, parents)
         self.assertEqual('List["A.Parent.BossLife"]', actual)
+
+        attr.type = "thug:life xs:int"
+        attr.forward_ref = False
+        attr.type_aliases = {"thug:life": "Boss:Life"}
+        actual = generator.attribute_type(attr, parents)
+        self.assertEqual("List[Union[BossLife, int]]", actual)
 
     def test_attribute_default(self):
         attr = AttrFactory.create(name="foo", type="str")

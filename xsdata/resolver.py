@@ -60,7 +60,11 @@ class DependenciesResolver:
     def apply_aliases(self, obj: Class) -> Class:
         """Walk the attributes tree and set the type aliases."""
         for attr in obj.attrs:
-            attr.type_alias = self.aliases.get(attr.type)
+            attr.type_aliases = {
+                type_name: self.aliases.get(type_name)
+                for type_name in attr.types
+                if self.aliases.get(type_name)
+            }
 
         for inner in obj.inner:
             self.apply_aliases(inner)
@@ -135,7 +139,11 @@ class DependenciesResolver:
             * Ignore inner class references
             * Filter the standard xsd types
         """
-        deps = {attr.type for attr in obj.attrs if not attr.forward_ref}
+        deps = set()
+        for attr in obj.attrs:
+            if not attr.forward_ref:
+                deps.update(list(attr.types))
+
         deps.update(ext.name for ext in obj.extensions)
         for inner in obj.inner:
             deps.update(self.collect_deps(inner, prefix))

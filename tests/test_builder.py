@@ -310,10 +310,15 @@ class ClassBuilderTests(FactoryTestCase):
         self.assertIsNone(ClassBuilder.default_value_type(item))
 
         item = ClassFactory.create(
-            extensions=ExtensionFactory.list(2, name="xs:int")
+            extensions=[
+                ExtensionFactory.create(name="xs:int"),
+                ExtensionFactory.create(name="xs:boolean"),
+            ]
         )
-        self.assertEqual("xs:int", ClassBuilder.default_value_type(item))
-        self.assertEqual(1, len(item.extensions))
+        self.assertEqual(
+            "xs:int xs:boolean", ClassBuilder.default_value_type(item)
+        )
+        self.assertEqual(0, len(item.extensions))
 
         item = ClassFactory.create(
             attrs=AttrFactory.list(2, local_type=TagType.ENUMERATION.cname),

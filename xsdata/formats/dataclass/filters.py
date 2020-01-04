@@ -38,15 +38,9 @@ def lib_imports(output: str):
 
     result.append("from dataclasses import dataclass, field")
 
-    has_list = "List[" in output
-    has_optional = "Optional[" in output
-
-    if has_list and has_optional:
-        result.append("from typing import List, Optional")
-    elif has_optional:
-        result.append("from typing import Optional")
-    elif has_list:
-        result.append("from typing import List")
+    types = [tp for tp in ["List", "Optional", "Union"] if f"{tp}[" in output]
+    if types:
+        result.append(f"from typing import {', '.join(types)}")
 
     return "\n".join(result)
 

@@ -88,7 +88,11 @@ class DependenciesResolverTest(FactoryTestCase):
         self.resolver.aliases = {"d": "IamD", "a": "IamA"}
         obj = ClassFactory.create(
             name="a",
-            attrs=[AttrFactory.create(name=x, type=x) for x in "ab"],
+            attrs=[
+                AttrFactory.create(name="a", type="a"),
+                AttrFactory.create(name="b", type="b"),
+                AttrFactory.create(name="c", type="a d"),
+            ],
             inner=[
                 ClassFactory.create(
                     name="b",
@@ -99,10 +103,11 @@ class DependenciesResolverTest(FactoryTestCase):
 
         result = self.resolver.apply_aliases(obj)
         self.assertIs(result, obj)
-        self.assertEqual("IamA", obj.attrs[0].type_alias)
-        self.assertIsNone(obj.attrs[1].type_alias)
-        self.assertIsNone(obj.inner[0].attrs[0].type_alias)
-        self.assertEqual("IamD", obj.inner[0].attrs[1].type_alias)
+        self.assertEqual({"a": "IamA"}, obj.attrs[0].type_aliases)
+        self.assertEqual({}, obj.attrs[1].type_aliases)
+        self.assertEqual({"a": "IamA", "d": "IamD"}, obj.attrs[2].type_aliases)
+        self.assertEqual({}, obj.inner[0].attrs[0].type_aliases)
+        self.assertEqual({"d": "IamD"}, obj.inner[0].attrs[1].type_aliases)
 
     @mock.patch.object(DependenciesResolver, "add_import")
     @mock.patch.object(DependenciesResolver, "find_package")
@@ -213,17 +218,17 @@ class DependenciesResolverTest(FactoryTestCase):
             attrs=[
                 AttrFactory.create(type="xs:decimal"),
                 AttrFactory.create(type="xs:annotated", forward_ref=True),
-                AttrFactory.create(type="xs:openAttrs"),
+                AttrFactory.create(type="xs:openAttrs xs:localAttribute"),
             ],
             extensions=[ExtensionFactory.create(name="xs:localElement")],
             inner=[ClassFactory.create(attrs=AttrFactory.list(2, type="foo"))],
         )
 
         self.assertEqual(
-            {"localElement", "openAttrs", "foo"},
+            {"localElement", "localAttribute", "openAttrs", "foo"},
             self.resolver.collect_deps(obj, "xs"),
         )
         self.assertEqual(
-            {"foo", "xs:localElement", "xs:openAttrs"},
+            {"foo", "xs:localElement", "xs:openAttrs", "xs:localAttribute"},
             self.resolver.collect_deps(obj, ""),
         )

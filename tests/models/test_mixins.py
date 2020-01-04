@@ -1,6 +1,7 @@
 import inspect
 from typing import Type
-from unittest import TestCase
+from unittest import TestCase, mock
+from unittest.mock import PropertyMock
 
 from xsdata.models import elements as el
 from xsdata.models.enums import FormType
@@ -101,3 +102,11 @@ class ElementBaseTests(TestCase):
     def test_is_attribute(self):
         obj = ElementBase.create()
         self.assertFalse(obj.is_attribute)
+
+    @mock.patch.object(ElementBase, "extends", new_callable=PropertyMock)
+    def test_extensions(self, mock_extends_property):
+        mock_extends_property.side_effect = [None, "", "foo  bar"]
+        obj = ElementBase.create()
+        self.assertEqual([], list(obj.extensions))
+        self.assertEqual([], list(obj.extensions))
+        self.assertEqual(["foo", "bar"], list(obj.extensions))

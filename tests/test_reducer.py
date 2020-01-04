@@ -33,7 +33,7 @@ class ClassReducerTests(FactoryTestCase):
     @mock.patch.object(ClassReducer, "add_common_types")
     def test_process(self, mock_add_common_types, mock_flatten_classes):
         classes = ClassFactory.list(3, type=Element)
-        common = ClassFactory.list(2, type=SimpleType)
+        simplies = ClassFactory.list(2, type=SimpleType)
         enums = ClassFactory.list(
             2,
             type=Restriction,
@@ -41,26 +41,18 @@ class ClassReducerTests(FactoryTestCase):
         )
         abstracts = ClassFactory.list(2, is_abstract=True, type=ComplexType)
 
-        all = classes + common + abstracts + enums
+        common = simplies + abstracts + enums
+        all = classes + common
 
         result = ClassReducer().process(self.schema, all)
 
         self.assertEqual(enums + classes, result)
 
-        mock_add_common_types.assert_has_calls(
-            [
-                mock.call(enums, self.target_namespace),
-                mock.call(common, self.target_namespace),
-                mock.call(abstracts, self.target_namespace),
-            ]
+        mock_add_common_types.assert_called_once_with(
+            common, self.target_namespace
         )
-
         mock_flatten_classes.assert_has_calls(
-            [
-                mock.call(common, self.nsmap),
-                mock.call(abstracts, self.nsmap),
-                mock.call(classes, self.nsmap),
-            ]
+            [mock.call(common, self.nsmap), mock.call(classes, self.nsmap)]
         )
 
     @mock.patch.object(ClassReducer, "flatten_class")

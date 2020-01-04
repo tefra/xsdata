@@ -11,18 +11,6 @@ from xsdata.models.enums import XSDType
 from xsdata.utils.text import split
 
 
-def is_enumeration(obj: Class) -> bool:
-    return obj.is_enumeration
-
-
-def is_common(obj: Class) -> bool:
-    return obj.is_common
-
-
-def is_abstract(obj: Class) -> bool:
-    return obj.is_abstract
-
-
 @dataclass
 class ClassReducer:
     """The purpose of this class is to minimize the number of generated classes
@@ -45,19 +33,14 @@ class ClassReducer:
         namespace = schema.target_namespace
         nsmap = schema.nsmap
 
-        enumerations = self.pop_classes(classes, condition=is_enumeration)
-        common_types = self.pop_classes(classes, condition=is_common)
-        abstract_types = self.pop_classes(classes, condition=is_abstract)
+        classes, common = self.separate_common_types(classes)
 
-        self.add_common_types(enumerations, namespace)
-        self.add_common_types(common_types, namespace)
-        self.add_common_types(abstract_types, namespace)
+        self.add_common_types(common, namespace)
 
-        self.flatten_classes(common_types, nsmap)
-        self.flatten_classes(abstract_types, nsmap)
+        self.flatten_classes(common, nsmap)
         self.flatten_classes(classes, nsmap)
 
-        return enumerations + classes
+        return [obj for obj in common if obj.is_enumeration] + classes
 
     def flatten_classes(self, classes: List[Class], nsmap: Dict):
         for obj in classes:
@@ -142,18 +125,30 @@ class ClassReducer:
         If the common type doesn't have just one attribute fallback to
         the default xsd type xs:string
         """
-        common = self.find_common_type(attr.type, nsmap)
-        if common is not None and not common.is_enumeration:
-            if len(common.attrs) == 1:
+        if attr.type == "xs:nonNegativeInteger xs:boolean":
+            pass
+
+        for type_name in attr.type.split(" "):
+            common = self.find_common_type(type_name, nsmap)
+            if common is None or common.is_enumeration:
+                continue
+            elif len(common.attrs) == 1:
                 value = common.attrs[0]
                 attr.type = value.type
                 for key, value in value.restrictions.items():
                     setattr(attr, key, value)
             else:
-                logger.debug(
+                logger.warning(
                     f"Missing type implementation: {common.type.__name__}"
                 )
                 attr.type = XSDType.STRING.code
+
+    def separate_common_types(self, classes: List[Class]):
+        def condition(x: Class):
+            return x.is_enumeration or x.is_abstract or x.is_common
+
+        matches = self.pop_classes(classes, condition=condition)
+        return classes, matches
 
     @staticmethod
     def pop_classes(classes: List[Class], condition: Callable) -> List[Class]:

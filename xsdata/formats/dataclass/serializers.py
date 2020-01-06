@@ -37,6 +37,12 @@ class DictSerializer(AbstractSerializer):
 
 @dataclass
 class JsonSerializer(AbstractSerializer):
+    """
+    :param dict_factory: Callable to generate dictionary
+    :param encoder: Value encoder
+    :param indent: Pretty print indent
+    """
+
     dict_factory: Callable = field(default=dict)
     encoder: Type[json.JSONEncoder] = field(default=EnumEncoder)
     indent: Optional[int] = field(default=None)
@@ -52,6 +58,12 @@ class JsonSerializer(AbstractSerializer):
 
 @dataclass
 class XmlSerializer(AbstractSerializer, ModelInspect):
+    """
+    :param xml_declaration: Add xml declaration
+    :param encoding: Result text encoding
+    :param pretty_print: Enable pretty output
+    """
+
     xml_declaration: bool = field(default=True)
     encoding: str = field(default="UTF-8")
     pretty_print: bool = field(default=False)

@@ -18,7 +18,11 @@ class JsonParser(AbstractParser, ModelInspect):
         return self.parse_context(ctx, clazz)
 
     def parse_context(self, data: Dict, model: Type) -> Type:
-        """Recursively build the given model from the input dict data."""
+        """
+        Recursively build the given model from the input dict data.
+
+        :raise TypeError: When parsing fails for any reason
+        """
         params = {}
 
         if type(data) is list and len(data) == 1:
@@ -44,10 +48,12 @@ class JsonParser(AbstractParser, ModelInspect):
         try:
             return model(**params)
         except Exception:
-            raise TypeError("Serialization failed")
+            raise TypeError("Parsing failed")
 
     @staticmethod
     def parse_value(data: Dict, field: Field):
+        """Find the field value in the given dictionary or return the default
+        field value."""
         if field.local_name in data:
             value = data[field.local_name]
             if field.is_list and type(value) is not list:

@@ -20,6 +20,12 @@ from xsdata.models.mixins import (
 
 @dataclass
 class Documentation(ElementBase):
+    """
+    The documentation element is used to enter text comments in a schema.
+
+    Reference: https://www.w3schools.com/xml/el_documentation.asp.
+    """
+
     lang: Optional[str]
     source: Optional[str]
     text: Optional[str]
@@ -27,17 +33,32 @@ class Documentation(ElementBase):
 
 @dataclass
 class Appinfo(ElementBase):
+    """
+    The appinfo element specifies information to be used by the application.
+
+    Reference: https://www.w3schools.com/xml/el_appinfo.asp.
+    """
+
     source: Optional[str]
 
 
 @dataclass
 class Annotation(ElementBase):
+    """
+    The annotation element is a top level element that specifies schema
+    comments.
+
+    Reference: https://www.w3schools.com/xml/el_annotation.asp.
+    """
+
     appinfo: Optional[Appinfo]
     documentations: ArrayList[Documentation] = field(default_factory=list)
 
 
 @dataclass
 class AnnotationBase(ElementBase):
+    """Base Class for elements that can contain annotations."""
+
     annotation: Optional[Annotation]
 
     @property
@@ -55,6 +76,13 @@ class AnnotationBase(ElementBase):
 
 @dataclass
 class SimpleType(AnnotationBase, TypedField, NamedField, RestrictedField):
+    """
+    The simpleType element defines a simple type and specifies the constraints
+    and information about the values of attributes or text-only elements.
+
+    XSD Element reference : Reference: https://www.w3schools.com/xml/el_simpletype.asp.
+    """
+
     name: Optional[str]
     restriction: Optional["Restriction"]
     list: Optional["List"]
@@ -80,6 +108,13 @@ class SimpleType(AnnotationBase, TypedField, NamedField, RestrictedField):
 
 @dataclass
 class List(AnnotationBase, RestrictedField):
+    """
+    The list element defines a simple type element as a list of values of a
+    specified data type.
+
+    Reference: https://www.w3schools.com/xml/el_list.asp.
+    """
+
     item_type: Optional[str]
     simple_type: SimpleType
 
@@ -100,6 +135,13 @@ class List(AnnotationBase, RestrictedField):
 
 @dataclass
 class Union(AnnotationBase):
+    """
+    The union element defines a simple type as a collection (union) of values
+    from specified simple data types.
+
+    Reference: https://www.w3schools.com/xml/el_union.asp.
+    """
+
     member_types: Optional[str]
     simple_types: ArrayList[SimpleType] = field(default_factory=list)
 
@@ -112,6 +154,14 @@ class Union(AnnotationBase):
 
 @dataclass
 class AnyAttribute(AnnotationBase):
+    """
+    The anyAttribute element enables the author to extend the XML document with
+    attributes not specified by the schema.
+
+     XSD Element reference
+    : Reference: https://www.w3schools.com/xml/el_anyattribute.asp.
+    """
+
     namespace: Optional[str]
     process_contents: Optional[ProcessType]
     simple_type: Optional[SimpleType]
@@ -119,6 +169,12 @@ class AnyAttribute(AnnotationBase):
 
 @dataclass
 class Attribute(AnnotationBase, TypedField, NamedField, RestrictedField):
+    """
+    The attribute element defines an attribute.
+
+    Reference: https://www.w3schools.com/xml/el_attribute.asp.
+    """
+
     default: Optional[str]
     fixed: Optional[str]
     form: Optional[FormType]
@@ -155,6 +211,14 @@ class Attribute(AnnotationBase, TypedField, NamedField, RestrictedField):
 
 @dataclass
 class AttributeGroup(AnnotationBase, NamedField):
+    """
+    The attributeGroup element is used to group a set of attribute declarations
+    so that they can be incorporated as a group into complex type definitions.
+
+     XSD Element reference
+    : Reference: https://www.w3schools.com/xml/el_attributegroup.asp.
+    """
+
     name: Optional[str]
     ref: Optional[str]
     any_attribute: Optional[AnyAttribute]
@@ -168,6 +232,13 @@ class AttributeGroup(AnnotationBase, NamedField):
 
 @dataclass
 class All(AnnotationBase, OccurrencesMixin):
+    """
+    The all element specifies that the child elements can appear in any order
+    and that each child element can occur zero or one time.
+
+    Reference: https://www.w3schools.com/xml/el_all.asp.
+    """
+
     elements: ArrayList["Element"] = field(default_factory=list)
     max_occurs: int = 1
     min_occurs: int = 1
@@ -175,6 +246,13 @@ class All(AnnotationBase, OccurrencesMixin):
 
 @dataclass
 class Sequence(AnnotationBase, OccurrencesMixin):
+    """
+    The sequence element specifies that the child elements must appear in a
+    sequence. Each child element can occur from 0 to any number of times.
+
+    Reference: https://www.w3schools.com/xml/el_sequence.asp.
+    """
+
     elements: ArrayList["Element"] = field(default_factory=list)
     groups: ArrayList["Group"] = field(default_factory=list)
     choices: ArrayList["Choice"] = field(default_factory=list)
@@ -186,6 +264,13 @@ class Sequence(AnnotationBase, OccurrencesMixin):
 
 @dataclass
 class Choice(AnnotationBase, OccurrencesMixin):
+    """
+    XML Schema choice element allows only one of the elements contained in the
+    <choice> declaration to be present within the containing element.
+
+    Reference: https://www.w3schools.com/xml/el_choice.asp.
+    """
+
     elements: ArrayList["Element"] = field(default_factory=list)
     groups: ArrayList["Group"] = field(default_factory=list)
     choices: ArrayList["Choice"] = field(default_factory=list)
@@ -196,6 +281,13 @@ class Choice(AnnotationBase, OccurrencesMixin):
 
 @dataclass
 class Group(AnnotationBase, OccurrencesMixin, NamedField):
+    """
+    The group element is used to define a group of elements to be used in
+    complex type definitions.
+
+    Reference: https://www.w3schools.com/xml/el_group.asp.
+    """
+
     name: Optional[str]
     ref: Optional[str]
     all: Optional[All]
@@ -211,6 +303,13 @@ class Group(AnnotationBase, OccurrencesMixin, NamedField):
 
 @dataclass
 class Extension(AnnotationBase):
+    """
+    The extension element extends an existing simpleType or complexType
+    element.
+
+    Reference: https://www.w3schools.com/xml/el_extension.asp.
+    """
+
     base: str
     group: Optional[Group]
     all: Optional[All]
@@ -227,11 +326,24 @@ class Extension(AnnotationBase):
 
 @dataclass
 class RestrictionType(AnnotationBase):
-    pass
+    """
+    The restriction element defines restrictions on a simpleType,
+    simpleContent, or complexContent definition.
+
+     XSD Element reference
+    : Reference: https://www.w3schools.com/xml/el_restriction.asp.
+    """
 
 
 @dataclass
 class Enumeration(RestrictionType, TypedField, NamedField, RestrictedField):
+    """
+    Defines a list of acceptable values.
+
+    Schema Facet: Reference:
+    https://www.w3schools.com/xml/schema_facets.asp.
+    """
+
     value: str
 
     @property
@@ -256,61 +368,150 @@ class Enumeration(RestrictionType, TypedField, NamedField, RestrictedField):
 
 @dataclass
 class FractionDigits(RestrictionType):
+    """
+    Specifies the maximum number of decimal places allowed. Must be equal to or
+    greater than zero.
+
+    Schema Facet: Reference:
+    https://www.w3schools.com/xml/schema_facets.asp.
+    """
+
     value: int
 
 
 @dataclass
 class Length(RestrictionType):
+    """
+    Specifies the exact number of characters or list items allowed. Must be
+    equal to or greater than zero.
+
+    Schema Facet: Reference:
+    https://www.w3schools.com/xml/schema_facets.asp.
+    """
+
     value: int
 
 
 @dataclass
 class MaxExclusive(RestrictionType):
+    """
+    Specifies the upper bounds for numeric values (the value must be less than
+    this value)
+
+    Schema Facet: Reference:
+    https://www.w3schools.com/xml/schema_facets.asp.
+    """
+
     value: float
 
 
 @dataclass
 class MaxInclusive(RestrictionType):
+    """
+    Specifies the upper bounds for numeric values (the value must be less than
+    or equal to this value)
+
+    Schema Facet: Reference:
+    https://www.w3schools.com/xml/schema_facets.asp.
+    """
+
     value: float
 
 
 @dataclass
 class MaxLength(RestrictionType):
+    """
+    Specifies the maximum number of characters or list items allowed. Must be
+    equal to or greater than zero.
+
+    Schema Facet: Reference:
+    https://www.w3schools.com/xml/schema_facets.asp.
+    """
+
     value: float
 
 
 @dataclass
 class MinExclusive(RestrictionType):
+    """Schema Facet: Reference:
+    https://www.w3schools.com/xml/schema_facets.asp."""
+
     value: float
 
 
 @dataclass
 class MinInclusive(RestrictionType):
+    """
+    Specifies the lower bounds for numeric values (the value must be greater
+    than this value)
+
+    Schema Facet: Reference:
+    https://www.w3schools.com/xml/schema_facets.asp.
+    """
+
     value: float
 
 
 @dataclass
 class MinLength(RestrictionType):
+    """
+    Specifies the lower bounds for numeric values (the value must be greater
+    than or equal to this value)
+
+    Schema Facet: Reference:
+    https://www.w3schools.com/xml/schema_facets.asp.
+    """
+
     value: float
 
 
 @dataclass
 class Pattern(RestrictionType):
+    """
+    Defines the exact sequence of characters that are acceptable.
+
+    Schema Facet: Reference:
+    https://www.w3schools.com/xml/schema_facets.asp.
+    """
+
     value: str
 
 
 @dataclass
 class TotalDigits(RestrictionType):
+    """
+    Specifies the exact number of digits allowed. Must be greater than zero.
+
+    Schema Facet: Reference:
+    https://www.w3schools.com/xml/schema_facets.asp.
+    """
+
     value: int
 
 
 @dataclass
 class WhiteSpace(RestrictionType):
+    """
+    Specifies how white space (line feeds, tabs, spaces, and carriage returns)
+    is handled.
+
+    Schema Facet: Reference:
+    https://www.w3schools.com/xml/schema_facets.asp.
+    """
+
     value: str  # preserve, collapse, replace
 
 
 @dataclass
 class Restriction(RestrictedField, AnnotationBase, TypedField, NamedField):
+    """
+    The restriction element defines restrictions on a simpleType,
+    simpleContent, or complexContent definition.
+
+     XSD Element reference
+    : Reference: https://www.w3schools.com/xml/el_restriction.asp.
+    """
+
     VALUE_FIELDS = (
         "min_exclusive",
         "min_inclusive",
@@ -388,17 +589,41 @@ class Restriction(RestrictedField, AnnotationBase, TypedField, NamedField):
 
 @dataclass
 class SimpleContent(AnnotationBase):
+    """
+    The simpleContent element contains extensions or restrictions on a text-
+    only complex type or on a simple type as content and contains no elements.
+
+     XSD Element reference
+    : Reference: https://www.w3schools.com/xml/el_simplecontent.asp.
+    """
+
     restriction: Optional[Restriction]
     extension: Optional[Extension]
 
 
 @dataclass
 class ComplexContent(SimpleContent):
+    """
+    The complexContent element defines extensions or restrictions on a complex
+    type that contains mixed content or elements only.
+
+     XSD Element reference
+    : Reference: https://www.w3schools.com/xml/el_complexcontent.asp.
+    """
+
     mixed: bool = False
 
 
 @dataclass
 class ComplexType(AnnotationBase, NamedField):
+    """
+    The complexType element defines a complex type. A complex type element is
+    an XML element that contains other elements and/or attributes.
+
+     XSD Element reference
+    : Reference: https://www.w3schools.com/xml/el_complextype.asp.
+    """
+
     name: Optional[str]
     block: Optional[str]
     final: Optional[str]
@@ -417,16 +642,34 @@ class ComplexType(AnnotationBase, NamedField):
 
 @dataclass
 class Field(AnnotationBase):
+    """Reference: https://www.w3schools.com/xml/el_field.asp."""
+
     xpath: str
 
 
 @dataclass
 class Selector(Field):
-    pass
+    """
+    The field element specifies an XPath expression that specifies the value
+    used to define an identity constraint.
+
+    Reference: https://www.w3schools.com/xml/el_selector.asp.
+    """
 
 
 @dataclass
 class Unique(AnnotationBase):
+    """
+    The unique element defines that an element or an attribute value must be
+    unique within the scope. The unique element MUST contain the following (in
+    order):
+
+     * one and only one selector element  (contains an XPath expression that specifies the set of elements across which the values specified by field must be unique)
+     * one or more field elements (contains an XPath expression that specifies the values that must be unique for the set of elements specified by the selector element)
+
+    Reference: https://www.w3schools.com/xml/el_unique.asp.
+    """
+
     name: str
     selector: Optional[Selector]
     field: Optional[Field]
@@ -434,6 +677,8 @@ class Unique(AnnotationBase):
 
 @dataclass
 class Key(AnnotationBase):
+    """Reference: https://www.w3schools.com/xml/el_key.asp."""
+
     name: str
     selector: Optional[Selector]
     fields: ArrayList[Selector] = field(default_factory=list)
@@ -441,6 +686,18 @@ class Key(AnnotationBase):
 
 @dataclass
 class Keyref(AnnotationBase):
+    """
+    The key element specifies an attribute or element value as a key (unique,
+    non-nullable, and always present) within the containing element in an
+    instance document.
+
+    The key element MUST contain the following (in order):
+     * one and only one selector element  (contains an XPath expression that specifies the set of elements across which the values specified by field must be unique)
+     * one or more field elements (contains an XPath expression that specifies the values that must be unique for the set of elements specified by the selector element)
+
+    Reference: https://www.w3schools.com/xml/el_keyref.asp.
+    """
+
     name: str
     refer: str
     selector: Optional[Selector]
@@ -449,6 +706,12 @@ class Keyref(AnnotationBase):
 
 @dataclass
 class Element(AnnotationBase, TypedField, NamedField, OccurrencesMixin):
+    """
+    The element element defines an element.
+
+    Reference: https://www.w3schools.com/xml/el_element.asp.
+    """
+
     name: str
     id: Optional[str]
     ref: Optional[str]
@@ -494,6 +757,13 @@ class Element(AnnotationBase, TypedField, NamedField, OccurrencesMixin):
 
 @dataclass
 class Any(AnnotationBase, OccurrencesMixin):
+    """
+    The any element enables the author to extend the XML document with elements
+    not specified by the schema.
+
+    Reference: https://www.w3schools.com/xml/el_any.asp.
+    """
+
     namespace: Optional[str]
     process_contents: Optional[ProcessType]
     annotation: Optional[Annotation]
@@ -503,12 +773,26 @@ class Any(AnnotationBase, OccurrencesMixin):
 
 @dataclass
 class Import(AnnotationBase):
+    """
+    The import element is used to add multiple schemas with different target
+    namespace to a document.
+
+    Reference: https://www.w3schools.com/xml/el_import.asp.
+    """
+
     namespace: Optional[str]
     schema_location: Optional[str]
 
 
 @dataclass
 class Include(AnnotationBase):
+    """
+    The include element is used to add multiple schemas with the same target
+    namespace to a document.
+
+    Reference: https://www.w3schools.com/xml/el_include.asp.
+    """
+
     schema_location: str
 
     @property
@@ -518,6 +802,13 @@ class Include(AnnotationBase):
 
 @dataclass
 class Notation(AnnotationBase):
+    """
+    The notation element describes the format of non-XML data within an XML
+    document.
+
+    Reference: https://www.w3schools.com/xml/el_notation.asp.
+    """
+
     name: str
     public: str
     system: Optional[str]
@@ -525,6 +816,13 @@ class Notation(AnnotationBase):
 
 @dataclass
 class Redefine(AnnotationBase):
+    """
+    The redefine element redefines simple and complex types, groups, and
+    attribute groups from an external schema.
+
+    Reference: https://www.w3schools.com/xml/el_redefine.asp.
+    """
+
     schema_location: str
     simple_type: Optional[SimpleType]
     complex_type: Optional[ComplexType]
@@ -534,6 +832,12 @@ class Redefine(AnnotationBase):
 
 @dataclass
 class Schema(AnnotationBase):
+    """
+    The schema element defines the root element of a schema.
+
+    Reference: https://www.w3schools.com/xml/el_schema.asp.
+    """
+
     target: Optional[str]
     block_default: Optional[str]
     final_default: Optional[str]

@@ -22,7 +22,15 @@ if __name__ == "__main__":
         ],
         extras_require={
             "dev": ["pre-commit", "pytest", "pytest-cov", "codecov", "tox"],
-            "docs": ["mkdocs", "mkdocs-macros-plugin"],
+            "docs": [
+                "sphinx",
+                "sphinx-autobuild",
+                "sphinx-material",
+                "sphinx-autodoc-typehints",
+                "sphinxcontrib-apidoc",
+                "sphinxcontrib-programoutput",
+                "sphinxcontrib-osexample",
+            ],
         },
         entry_points={"console_scripts": ["xsdata=xsdata:cli"]},
     )

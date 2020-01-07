@@ -19,6 +19,12 @@ xsData naive XML Bindings for python
 .. image:: https://api.codacy.com/project/badge/Grade/1248c5bc72684854899a043986d4fa06
    :target: https://www.codacy.com/manual/tefra/xsdata?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=tefra/xsdata&amp;utm_campaign=Badge_Grade
 
+.. image:: https://img.shields.io/pypi/pyversions/xsdata.svg
+    :target: https://pypi.org/pypi/xsdata/
+
+.. image:: https://img.shields.io/pypi/v/xsdata.svg
+    :target: https://pypi.org/pypi/xsdata/
+
 -------
 
 Features

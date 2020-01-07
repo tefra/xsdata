@@ -6,8 +6,8 @@ xsData naive XML Bindings for python
 .. image:: https://travis-ci.org/tefra/xsdata.svg?branch=master
         :target: https://travis-ci.org/tefra/xsdata
 
-.. image:: https://readthedocs.org/projects/pytuber/badge
-    :target: https://pytuber.readthedocs.io/en/latest
+.. image:: https://readthedocs.org/projects/xsdata/badge
+    :target: https://xsdata.readthedocs.io/en/latest
 
 .. image:: https://codecov.io/gh/tefra/xsdata/branch/master/graph/badge.svg
         :target: https://codecov.io/gh/tefra/xsdata

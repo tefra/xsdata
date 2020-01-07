@@ -1,4 +1,4 @@
-.. image:: https://raw.githubusercontent.com/tefra/xsdata/release/docs/img/logo.png
+.. image:: https://raw.githubusercontent.com/tefra/xsdata/master/docs/img/logo.png
     :target: https://xsdata.readthedocs.io/
 
 xsData naive XML Bindings for python

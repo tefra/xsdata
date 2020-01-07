@@ -1,4 +1,4 @@
-.. image:: https://raw.githubusercontent.com/tefra/xsdata/master/docs/img/logo.png
+.. image:: https://github.com/tefra/xsdata/raw/master/docs/_static/logo.png
     :target: https://xsdata.readthedocs.io/
 
 xsData naive XML Bindings for python
@@ -28,3 +28,5 @@ Features
 * Pluggable engine to support other libraries and languages
 * Ships with python native dataclasses renderer
 * Serializer/Parser for xml and json
+
+.. image:: https://github.com/tefra/xsdata/raw/master/docs/_static/demo.gif

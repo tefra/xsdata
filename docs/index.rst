@@ -6,15 +6,6 @@
 
     Itergration teams and clients don't care about any of that, take out abstraction and flexibility and you are left with lean named data structures with typed attributes and a namespace for humans to read!
 
-
-Sample output
--------------
-
-.. literalinclude:: examples/primer.py
-   :language: python
-   :lines: 159-205
-
-
 Roadmap
 -------
 

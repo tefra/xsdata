@@ -2,14 +2,31 @@ from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import Any, Iterator, List, Optional, Tuple
 
+from jinja2 import Environment, FileSystemLoader, Template
+
 from xsdata.formats.dataclass.utils import replace_words
 from xsdata.models.codegen import Attr, Class, Package
 from xsdata.models.elements import Schema
 from xsdata.models.enums import XSDType
+from xsdata.resolver import DependenciesResolver
 from xsdata.utils import text
 
 
 class AbstractGenerator(ABC):
+    templates_dir: Optional[Path] = None
+
+    def __init__(self):
+        if self.templates_dir is None:
+            raise TypeError("Missing renderer templates directory")
+
+        self.env = Environment(
+            loader=FileSystemLoader(str(self.templates_dir))
+        )
+        self.resolver = DependenciesResolver()
+
+    def template(self, name: str) -> Template:
+        return self.env.get_template("{}.jinja2".format(name))
+
     @abstractmethod
     def render(
         self, schema: Schema, classes: List[Class], package: str

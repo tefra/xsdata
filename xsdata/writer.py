@@ -2,6 +2,7 @@ from dataclasses import dataclass, field
 from typing import Dict, List
 
 from xsdata.formats.dataclass.generator import DataclassGenerator
+from xsdata.formats.plantuml.generator import PlantUmlGenerator
 from xsdata.generators import AbstractGenerator
 from xsdata.logger import logger
 from xsdata.models.codegen import Class
@@ -38,27 +39,10 @@ class CodeWriter:
         self, schema: Schema, classes: List[Class], package: str, renderer: str
     ):
         engine = self.get_renderer(renderer)
-        for package, item in engine.print(schema, classes, package):
-            self.print_class(package, item)
-
-    def print_class(self, package: str, obj: Class, indent: int = 0):
-
-        extensions = ", ".join(sorted([ext.name for ext in obj.extensions]))
-        print(f"\n{indent * ' '}{package}.{obj.name}({extensions})")
-
-        for attr in sorted(obj.attrs, key=lambda x: x.name):
-            params = [("default", attr.default)]
-            params.extend(
-                [
-                    (key, value)
-                    for key, value in sorted(attr.restrictions.items())
-                ]
-            )
-            print(f"{(indent + 4) * ' '}{attr.name}: {attr.type} = {params}")
-
-        for inner in sorted(obj.inner, key=lambda x: x.name):
-            self.print_class(f"{package}.{obj.name}", inner, indent + 4)
+        for file, output in engine.render(schema, classes, package):
+            print(output)
 
 
 writer = CodeWriter()
 writer.register_generator("pydata", DataclassGenerator())
+writer.register_generator("plantuml", PlantUmlGenerator())

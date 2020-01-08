@@ -2,25 +2,19 @@ from collections import defaultdict
 from pathlib import Path
 from typing import DefaultDict, Dict, Iterator, List, Tuple
 
-from jinja2 import Environment, FileSystemLoader, Template
-
 from xsdata.formats.dataclass.filters import filters
 from xsdata.generators import PythonAbstractGenerator
 from xsdata.models.codegen import Class, Package
 from xsdata.models.elements import Schema
-from xsdata.resolver import DependenciesResolver
 from xsdata.utils.text import snake_case
 
 
 class DataclassGenerator(PythonAbstractGenerator):
-    def __init__(self):
-        templates_dir = Path(__file__).parent.joinpath("templates")
-        self.env = Environment(loader=FileSystemLoader(str(templates_dir)),)
-        self.env.filters.update(filters)
-        self.resolver = DependenciesResolver()
+    templates_dir = Path(__file__).parent.joinpath("templates")
 
-    def template(self, name: str) -> Template:
-        return self.env.get_template("{}.jinja2".format(name))
+    def __init__(self):
+        super(DataclassGenerator, self).__init__()
+        self.env.filters.update(filters)
 
     def render_module(
         self, output: str, imports: Dict[str, List[Package]]

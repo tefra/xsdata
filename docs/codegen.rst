@@ -34,46 +34,7 @@ Renderer
 The renderer option changes the output format.
 
 * ``pydata``: Python lib `dataclasses <https://docs.python.org/3/library/dataclasses.html>`_
-
-
-Print
------
-
-The print flag bypasses the file writer and instead prints a quick preview of what the generator would create otherwise.
-
-It's a very useful option when the class building process changes with new features.
-
-.. admonition:: Example Output
-    :class: hint
-
-    .. code-block:: python
-
-        samples.sabre.output.bargain_finder_max_common_types_v1_9_7.AdvResTicketingType()
-            adv_res_ind: Optional[bool] = [('default', None)]
-            adv_reservation: Optional["AdvResTicketingType.AdvReservation"] = [('default', None)]
-            adv_ticketing: Optional["AdvResTicketingType.AdvTicketing"] = [('default', None)]
-            adv_ticketing_ind: Optional[bool] = [('default', None)]
-
-            samples.sabre.output.bargain_finder_max_common_types_v1_9_7.AdvResTicketingType.AdvReservation()
-                latest_period: Optional[str] = [('default', None), ('pattern', '[0-9]{1,3}')]
-                latest_time_of_day: Optional[str] = [('default', None)]
-                latest_unit: Optional[StayUnitType] = [('default', None)]
-
-            samples.sabre.output.bargain_finder_max_common_types_v1_9_7.AdvResTicketingType.AdvTicketing()
-                from_depart_period: Optional[str] = [('default', None), ('pattern', '[0-9]{1,3}')]
-                from_depart_time_of_day: Optional[str] = [('default', None)]
-                from_depart_unit: Optional[StayUnitType] = [('default', None)]
-                from_res_period: Optional[str] = [('default', None), ('pattern', '[0-9]{1,3}')]
-                from_res_time_of_day: Optional[str] = [('default', None)]
-                from_res_unit: Optional[StayUnitType] = [('default', None)]
-
-        samples.sabre.output.bargain_finder_max_common_types_v1_9_7.AirTripType(str)
-            CIRCLE: xs:string = [('default', '"Circle"')]
-            ONE_WAY: xs:string = [('default', '"OneWay"')]
-            OPEN_JAW: xs:string = [('default', '"OpenJaw"')]
-            OTHER: xs:string = [('default', '"Other"')]
-            RETURN_VALUE: xs:string = [('default', '"Return"')]
-
+* ``plantuml``: `PlantUML <https://plantuml.com/class-diagram>`_ class diagram
 
 Verbosity
 ---------
@@ -82,6 +43,10 @@ The verbosity option changes what messages will be printed.
 
 Available options: ``CRITICAL``, ``ERROR``, ``WARNING``, ``INFO`` or ``DEBUG``
 
+Print
+-----
+
+The print flag overwrites the verbosity level to `Error` and print to stdOut the output result without writing to the target file.
 
 Examples
 --------

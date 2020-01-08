@@ -7,6 +7,7 @@ Subpackages
 .. toctree::
 
    xsdata.formats.dataclass
+   xsdata.formats.plantuml
 
 Submodules
 ----------

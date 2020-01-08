@@ -44,6 +44,9 @@ Features
   - JSON Parser & Serializer with type casting
   - Serializer/Parser for xml and json
 
+- Format: PlantUML class diagram
+
+-------
 
 .. image:: https://github.com/tefra/xsdata/raw/master/docs/_static/demo.gif
 

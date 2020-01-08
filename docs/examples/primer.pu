@@ -1,0 +1,37 @@
+@startuml
+
+class Items {
+    +item : item[]
+}
+Items +-- item
+class item {
+    +productName : xsd:string
+    +quantity : xsd:positiveInteger
+    +USPrice : xsd:decimal
+    +comment : comment
+    +shipDate : xsd:date
+    +partNum : xsd:string
+}
+class PurchaseOrderType {
+    +shipTo : USAddress
+    +billTo : USAddress
+    +comment : comment
+    +items : Items
+    +orderDate : xsd:date
+}
+class USAddress {
+    +name : xsd:string
+    +street : xsd:string
+    +city : xsd:string
+    +state : xsd:string
+    +zip : xsd:decimal
+    +country : xsd:NMTOKEN
+}
+class comment {
+    +value : xsd:string
+}
+class purchaseOrder {
+}
+purchaseOrder *- PurchaseOrderType
+
+@enduml

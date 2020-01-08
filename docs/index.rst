@@ -24,3 +24,4 @@ Roadmap
     formats
     about
     api
+    changelog

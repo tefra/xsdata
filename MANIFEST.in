@@ -1,4 +1,4 @@
-include LICENSE README.rst tox.ini
+include LICENSE README.rst LICENSE.rst CHANGES.rst tox.ini
 recursive-include docs *
 recursive-include tests *
 recursive-include xsdata *

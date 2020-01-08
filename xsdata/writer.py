@@ -30,8 +30,9 @@ class CodeWriter:
         engine = self.get_renderer(renderer)
         for file, output in engine.render(schema, classes, package):
             logger.info(f"Generating package: `{package}`")
-            with open(str(file), "w") as fp:
-                fp.write(output)
+
+            file.parent.mkdir(parents=True, exist_ok=True)
+            file.write_text(output)
 
     def print(
         self, schema: Schema, classes: List[Class], package: str, renderer: str

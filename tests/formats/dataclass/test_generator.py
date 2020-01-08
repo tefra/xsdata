@@ -8,7 +8,6 @@ from xsdata.resolver import DependenciesResolver
 
 
 class DataclassGeneratorTests(FactoryTestCase):
-    @mock.patch.object(Path, "mkdir")
     @mock.patch.object(DependenciesResolver, "process")
     @mock.patch.object(DataclassGenerator, "render_module")
     @mock.patch.object(DataclassGenerator, "render_classes")
@@ -19,7 +18,6 @@ class DataclassGeneratorTests(FactoryTestCase):
         mock_render_classes,
         mock_render_module,
         mock_resolved_process,
-        mock_mkdir,
     ):
         schema = Schema.create(location=Path("foo.xsd"))
         package = "some.Foo.Some.ThugLife"
@@ -56,7 +54,6 @@ class DataclassGeneratorTests(FactoryTestCase):
             imports=mock_prepare_imports.return_value,
             output=mock_render_classes.return_value,
         )
-        mock_mkdir.assert_called_once_with(parents=True, exist_ok=True)
 
     @mock.patch.object(DataclassGenerator, "render_class")
     @mock.patch.object(DataclassGenerator, "process_class")

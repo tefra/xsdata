@@ -1,0 +1,14 @@
+class {{ obj.name }} {
+{%- for attr in obj.attrs %}
+    +{{ attr.name }} : {{   attr.type }}{{ "[]" if attr.is_list else "" }}
+{%- endfor %}
+}
+{%- for ext in obj.extensions %}
+{{ obj.name }} *- {{ ext.name }}
+{%- endfor %}
+{%- for inner in obj.inner %}
+{{ obj.name }} +-- {{ inner.name }}
+{% with obj=inner -%}
+    {%- include "class.jinja2" %}
+{%- endwith -%}
+{%- endfor %}

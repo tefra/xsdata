@@ -34,7 +34,7 @@ class CodeWriterTests(TestCase):
         writer.generators = self.generators
 
     def test_formats(self):
-        expected = ["pydata"]
+        expected = ["pydata", "plantuml"]
         self.assertEqual(expected, writer.formats)
         self.assertIsInstance(
             writer.get_renderer("pydata"), DataclassGenerator

@@ -14,13 +14,16 @@ from xsdata.models.elements import (
     Schema,
     SimpleType,
 )
+from xsdata.models.elements import Union as UnionElement
 from xsdata.models.enums import TagType, XSDType
 from xsdata.models.mixins import ElementBase
 
 BaseElement = Union[
     Attribute, AttributeGroup, Element, ComplexType, SimpleType, Group
 ]
-AttributeElement = Union[Attribute, Element, Restriction, Enumeration]
+AttributeElement = Union[
+    Attribute, Element, Restriction, Enumeration, UnionElement
+]
 
 
 @dataclass

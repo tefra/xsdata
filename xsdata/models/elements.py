@@ -134,7 +134,7 @@ class List(AnnotationBase, RestrictedField):
 
 
 @dataclass
-class Union(AnnotationBase):
+class Union(AnnotationBase, TypedField, NamedField, RestrictedField):
     """
     The union element defines a simple type as a collection (union) of values
     from specified simple data types.
@@ -150,6 +150,29 @@ class Union(AnnotationBase):
         if self.member_types:
             return self.member_types
         return None
+
+    @property
+    def is_attribute(self) -> bool:
+        return True if self.simple_types else False
+
+    @property
+    def real_type(self) -> Optional[str]:
+        if self.is_attribute:
+            return " ".join(
+                filter(None, [x.real_type for x in self.simple_types])
+            )
+
+        return None
+
+    @property
+    def real_name(self) -> str:
+        return "value" if self.is_attribute else ""
+
+    def get_restrictions(self) -> Dict[str, Anything]:
+        restrictions = dict()
+        for simple_type in self.simple_types:
+            restrictions.update(simple_type.get_restrictions())
+        return restrictions
 
 
 @dataclass
@@ -265,7 +288,8 @@ class Sequence(AnnotationBase, OccurrencesMixin):
 @dataclass
 class Choice(AnnotationBase, OccurrencesMixin):
     """
-    XML Schema choice element allows only one of the elements contained in the
+    XML Schema choice element allows only one of the elements contained in the.
+
     <choice> declaration to be present within the containing element.
 
     Reference: https://www.w3schools.com/xml/el_choice.asp.
@@ -433,8 +457,11 @@ class MaxLength(RestrictionType):
 
 @dataclass
 class MinExclusive(RestrictionType):
-    """Schema Facet: Reference:
-    https://www.w3schools.com/xml/schema_facets.asp."""
+    """
+    Schema Facet: Reference:
+
+    https://www.w3schools.com/xml/schema_facets.asp.
+    """
 
     value: float
 

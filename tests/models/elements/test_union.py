@@ -1,12 +1,72 @@
 from unittest import TestCase
 
-from xsdata.models.elements import Union
+from xsdata.models.elements import (
+    MaxExclusive,
+    MinExclusive,
+    MinInclusive,
+    MinLength,
+    Restriction,
+    SimpleType,
+    Union,
+)
 
 
 class UnionTests(TestCase):
-    def test_property_real_name(self):
+    def test_property_extends(self):
         obj = Union.create()
         self.assertIsNone(obj.extends)
 
         obj.member_types = "foo"
         self.assertEqual("foo", obj.extends)
+
+    def test_property_is_attribute(self):
+        obj = Union.create()
+        self.assertFalse(obj.is_attribute)
+
+        obj.simple_types.append(SimpleType.create())
+        self.assertTrue(obj.is_attribute)
+
+    def test_property_real_type(self):
+        obj = Union.create()
+        obj.member_types = "foo bar"
+        self.assertIsNone(obj.real_type)
+
+        obj = Union.create(
+            simple_types=[
+                SimpleType.create(restriction=Restriction.create(base="foo")),
+                SimpleType.create(restriction=Restriction.create(base="bar")),
+            ]
+        )
+
+        self.assertEqual("foo bar", obj.real_type)
+
+    def test_property_real_name(self):
+        obj = Union.create()
+        self.assertEqual("", obj.real_name)
+
+        obj = Union.create(simple_types=[SimpleType.create()])
+        self.assertEqual("value", obj.real_name)
+
+    def test_get_restrictions(self):
+        first = Restriction.create(
+            min_exclusive=MinExclusive.create(value=1),
+            min_inclusive=MinInclusive.create(value=2),
+        )
+        second = Restriction.create(
+            min_length=MinLength.create(value=3),
+            max_exclusive=MaxExclusive.create(value=4),
+        )
+        obj = Union.create(
+            simple_types=[
+                SimpleType.create(restriction=first),
+                SimpleType.create(restriction=second),
+            ]
+        )
+
+        expected = {
+            "max_exclusive": 4,
+            "min_exclusive": 1,
+            "min_inclusive": 2,
+            "min_length": 3,
+        }
+        self.assertEqual(expected, obj.get_restrictions())

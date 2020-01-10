@@ -74,6 +74,11 @@ class Attr:
 class Extension:
     name: str
     index: int
+    type: str
+
+    @property
+    def is_restriction(self):
+        return self.type == TagType.RESTRICTION.cname
 
 
 @dataclass

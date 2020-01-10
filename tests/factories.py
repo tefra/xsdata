@@ -9,6 +9,7 @@ from xsdata.models.elements import (
     Element,
     Restriction,
     SimpleType,
+    Union,
 )
 from xsdata.models.enums import XSDType
 
@@ -121,13 +122,15 @@ class PackageFactory(Factory):
 
 
 class ExtensionFactory(Factory):
+    types = [Union, Restriction, Extension]
     model = Extension
     counter = 65
 
     @classmethod
-    def create(cls, name=None, index=None):
+    def create(cls, name=None, index=None, type=None):
 
         return cls.model(
             name=name or f"ext_{cls.next()}",
             index=cls.counter if index is None else index,
+            type=type or random.choice(cls.types).__name__,
         )

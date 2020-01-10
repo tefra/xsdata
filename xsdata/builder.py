@@ -104,14 +104,17 @@ class ClassBuilder:
         """
 
         if include_current and getattr(obj, "type", None):
-            yield Extension(name=getattr(obj, "type"), index=0)
+            name = getattr(obj, "type")
+            type_name = type(obj).__name__
+            yield Extension(name=name, index=0, type=type_name)
 
         for child in obj.children():
             if child.is_attribute:
                 continue
 
             for ext in child.extensions:
-                yield Extension(name=ext, index=child.index)
+                type_name = type(child).__name__
+                yield Extension(name=ext, index=child.index, type=type_name)
 
             yield from self.element_extensions(child, include_current=False)
 

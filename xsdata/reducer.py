@@ -96,26 +96,33 @@ class ClassReducer:
         another schema.
         """
         common = self.find_common_type(extension.name, nsmap)
-        if common is not None:
-            prefix, ext = split(extension.name)
-            item.inner.extend(copy.deepcopy(common.inner))
-            new_attrs = copy.deepcopy(common.attrs)
-            position = next(
-                (
-                    index
-                    for index, attr in enumerate(item.attrs)
-                    if attr.index > extension.index
-                ),
-                0,
-            )
-            for attr in new_attrs:
-                if prefix and attr.type.find(":") == -1:
-                    attr.type = f"{prefix}:{attr.type}"
+        if common is None:
+            return
 
-                item.attrs.insert(position, attr)
-                position += 1
+        if not (extension.is_restriction and item.is_enumeration):
+            self.copy_attributes(common, item, extension)
 
-            item.extensions.remove(extension)
+        item.extensions.remove(extension)
+
+    @staticmethod
+    def copy_attributes(source: Class, target: Class, extension: Extension):
+        prefix, ext = split(extension.name)
+        target.inner.extend(copy.deepcopy(source.inner))
+        new_attrs = copy.deepcopy(source.attrs)
+        position = next(
+            (
+                index
+                for index, attr in enumerate(target.attrs)
+                if attr.index > extension.index
+            ),
+            0,
+        )
+        for attr in new_attrs:
+            if prefix and attr.type.find(":") == -1:
+                attr.type = f"{prefix}:{attr.type}"
+
+            target.attrs.insert(position, attr)
+            position += 1
 
     def flatten_attribute(self, attr: Attr, nsmap: Dict):
         """

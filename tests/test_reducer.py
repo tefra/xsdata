@@ -128,36 +128,84 @@ class ClassReducerTests(FactoryTestCase):
         )
 
     @mock.patch.object(ClassReducer, "find_common_type")
-    def test_flatten_extension(self, mock_find_common_type):
+    def test_flatten_extension_when_common_not_found(
+        self, mock_find_common_type
+    ):
+        mock_find_common_type.return_value = None
+
+        reducer = ClassReducer()
+        extension = ExtensionFactory.create()
+        obj = ClassFactory.create(extensions=[extension])
+        reducer.flatten_extension(obj, extension, self.nsmap)
+
+        self.assertEqual(1, len(obj.extensions))
+        mock_find_common_type.assert_called_once_with(
+            extension.name, self.nsmap
+        )
+
+    @mock.patch.object(ClassReducer, "find_common_type")
+    def test_flatten_extension_with_enumeration_when_extension_is_restriction(
+        self, mock_find_common_type
+    ):
+        mock_find_common_type.return_value = ClassFactory.create(
+            attrs=AttrFactory.list(2, local_type=TagType.ENUMERATION.cname)
+        )
+
+        reducer = ClassReducer()
+        extension = ExtensionFactory.create(type=TagType.EXTENSION.cname)
+        obj = ClassFactory.create(
+            extensions=[extension],
+            attrs=AttrFactory.list(2, local_type=TagType.ENUMERATION.cname),
+        )
+
+        reducer.flatten_extension(obj, extension, self.nsmap)
+
+        self.assertEqual(0, len(obj.extensions))
+
+    @mock.patch.object(ClassReducer, "copy_attributes")
+    @mock.patch.object(ClassReducer, "find_common_type")
+    def test_flatten_extension_copy_attributes(
+        self, mock_find_common_type, mock_copy_attributes
+    ):
+        common = ClassFactory.create(attrs=AttrFactory.list(2))
+        mock_find_common_type.return_value = common
+
+        reducer = ClassReducer()
+        extension = ExtensionFactory.create(type=TagType.UNION.cname)
+        obj = ClassFactory.create(
+            extensions=[extension], attrs=AttrFactory.list(2)
+        )
+
+        reducer.flatten_extension(obj, extension, self.nsmap)
+
+        mock_copy_attributes.assert_called_once_with(common, obj, extension)
+        self.assertEqual(0, len(obj.extensions))
+
+    def test_copy_attributes(self):
         common_b = ClassFactory.create(
-            name="b",
             attrs=[
                 AttrFactory.create(name="i", type="i"),
                 AttrFactory.create(name="j", type="other:j"),
             ],
         )
         common_c = ClassFactory.create(
-            name="c",
             attrs=[
                 AttrFactory.create(name="x", type="x"),
                 AttrFactory.create(name="y", type="other:y"),
             ],
         )
-        ext_a = ExtensionFactory.create(name="a", index=1)
         ext_b = ExtensionFactory.create(name="b", index=2)
         ext_c = ExtensionFactory.create(name="common:c", index=66)
 
         obj = ClassFactory.create(
             name="foo",
-            extensions=[ext_a, ext_b, ext_c],
+            extensions=[ext_b, ext_c],
             attrs=[AttrFactory.create(name=x, index=ord(x)) for x in "ab"],
         )
 
-        mock_find_common_type.side_effect = [None, common_b, common_c]
-
         reducer = ClassReducer()
-        for extension in list(obj.extensions):
-            reducer.flatten_extension(obj, extension, self.nsmap)
+        reducer.copy_attributes(common_b, obj, ext_b)
+        reducer.copy_attributes(common_c, obj, ext_c)
 
         attrs = [
             ("i", "i"),
@@ -167,17 +215,7 @@ class ClassReducerTests(FactoryTestCase):
             ("a", "xs:string"),
             ("b", "xs:string"),
         ]
-
-        self.assertEqual([ext_a], obj.extensions)
         self.assertEqual(attrs, [(attr.name, attr.type) for attr in obj.attrs])
-
-        mock_find_common_type.assert_has_calls(
-            [
-                mock.call("a", self.nsmap),
-                mock.call("b", self.nsmap),
-                mock.call("common:c", self.nsmap),
-            ]
-        )
 
     @mock.patch.object(ClassReducer, "find_common_type")
     def test_flatten_attribute_with_no_common_type(

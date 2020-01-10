@@ -52,14 +52,14 @@ class PythonAbstractGenerator(AbstractGenerator, ABC):
         is_enum = obj.is_enumeration
         for attr in obj.attrs:
             if is_enum:
-                cls.process_enumeration(attr)
+                cls.process_enumeration(attr, obj)
             else:
                 cls.process_attribute(attr, curr_parents)
 
         return obj
 
     @classmethod
-    def process_attribute(cls, attr: Attr, parents) -> None:
+    def process_attribute(cls, attr: Attr, parents: List[str]) -> None:
         """Normalize attribute properties."""
         attr.name = cls.attribute_name(attr.name)
         attr.type = cls.attribute_type(attr, parents)
@@ -67,8 +67,16 @@ class PythonAbstractGenerator(AbstractGenerator, ABC):
         attr.default = cls.attribute_default(attr)
 
     @classmethod
-    def process_enumeration(cls, attr: Attr, *args) -> None:
-        """Normalize attribute properties."""
+    def process_enumeration(cls, attr: Attr, parent: Class) -> None:
+        """Normalize enumeration properties."""
+        valid_types = ("str", "int", "float", "bool")
+
+        attr.type = (
+            parent.extensions[0].name
+            if len(parent.extensions) == 1
+            and parent.extensions[0].name in valid_types
+            else "str"
+        )
         attr.name = cls.enumeration_name(attr.name)
         attr.default = cls.attribute_default(attr)
 

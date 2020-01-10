@@ -76,7 +76,7 @@ class PythonAbstractGeneratorTests(FactoryTestCase):
         generator.process_class(a)
 
         mock_process_enumeration.assert_has_calls(
-            [mock.call(a.attrs[0]), mock.call(a.attrs[1])]
+            [mock.call(a.attrs[0], a), mock.call(a.attrs[1], a)]
         )
         self.assertEqual(2, mock_process_enumeration.call_count)
 
@@ -100,19 +100,40 @@ class PythonAbstractGeneratorTests(FactoryTestCase):
         mock_default.assert_called_once_with(attr)
         mock_split.assert_called_once_with("foo")
 
-    @mock.patch.object(generator, "attribute_default", return_value="life")
+    @mock.patch.object(generator, "attribute_default", return_value="2")
     @mock.patch.object(generator, "enumeration_name", return_value="OOF")
     def test_process_enumeration(self, mock_name, mock_default):
         attr = AttrFactory.create(name="foo", type="bar", default="thug")
-        generator.process_enumeration(attr, ["a", "b"])
+        extensions = ExtensionFactory.list(1, name="int")
+        parent = ClassFactory.create(extensions=extensions)
+        generator.process_enumeration(attr, parent)
 
         self.assertEqual("OOF", attr.name)
-        self.assertEqual("bar", attr.type)
+        self.assertEqual("int", attr.type)
         self.assertEqual("foo", attr.local_name)
-        self.assertEqual("life", attr.default)
+        self.assertEqual("2", attr.default)
 
         mock_name.assert_called_once_with("foo")
         mock_default.assert_called_once_with(attr)
+
+    def test_process_enumeration_with_invalid_parent_extensions(self):
+        attr = AttrFactory.create(name="foo", type="bar", default="thug")
+
+        parent = ClassFactory.create()
+        generator.process_enumeration(attr, parent)
+        self.assertEqual("str", attr.type)
+
+        attr.type = None
+        extensions = ExtensionFactory.list(2, name="str")
+        parent = ClassFactory.create(extensions=extensions)
+        generator.process_enumeration(attr, parent)
+        self.assertEqual("str", attr.type)
+
+        attr.type = None
+        extensions = ExtensionFactory.list(1, name="foo")
+        parent = ClassFactory.create(extensions=extensions)
+        generator.process_enumeration(attr, parent)
+        self.assertEqual("str", attr.type)
 
     def test_process_import(self):
         package = PackageFactory.create(

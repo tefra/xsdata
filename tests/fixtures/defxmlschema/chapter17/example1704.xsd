@@ -1,0 +1,11 @@
+<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<!-- Example 17-4 Constraining uniqueness of two combined fields -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="catalog" type="CatalogType">
+    <xs:unique name="dateAndProdNumKey">
+      <xs:selector xpath="department/product" />
+      <xs:field xpath="number" />
+      <xs:field xpath="@effDate" />
+    </xs:unique>
+  </xs:element>
+</xs:schema>

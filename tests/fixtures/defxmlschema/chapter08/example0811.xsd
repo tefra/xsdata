@@ -1,0 +1,13 @@
+<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<!-- Example 8-11 Illegal attempt to extend an enumeration -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:simpleType name="XSMLXSizeType">
+    <xs:restriction base="SMLXSizeType">
+      <xs:enumeration value="extra small" />
+      <xs:enumeration value="small" />
+      <xs:enumeration value="medium" />
+      <xs:enumeration value="large" />
+      <xs:enumeration value="extra large" />
+    </xs:restriction>
+  </xs:simpleType>
+</xs:schema>

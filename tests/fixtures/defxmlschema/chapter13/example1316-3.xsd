@@ -1,0 +1,9 @@
+<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<!-- Example 13-16 Restricting element declarations -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:sequence>
+    <xs:element name="a" maxOccurs="4" />
+    <xs:element name="b" fixed="newValue" />
+    <xs:element name="c" type="xs:integer" />
+  </xs:sequence>
+</xs:schema>

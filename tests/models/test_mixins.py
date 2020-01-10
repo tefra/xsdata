@@ -65,6 +65,7 @@ class TypedFieldTests(TestCase):
             el.Enumeration,
             el.Restriction,
             el.SimpleType,
+            el.Union,
         ]
         self.assertEqual(expected, self.subclasses)
 

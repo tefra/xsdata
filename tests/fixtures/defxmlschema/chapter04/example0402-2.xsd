@@ -1,0 +1,13 @@
+<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<!-- Example 4-2 Chameleon include -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:complexType name="CustomerType">
+    <xs:sequence>
+      <xs:element name="name" type="CustNameType" />
+      <!-- ... -->
+    </xs:sequence>
+  </xs:complexType>
+  <xs:simpleType name="CustNameType">
+    <xs:restriction base="xs:string" />
+  </xs:simpleType>
+</xs:schema>

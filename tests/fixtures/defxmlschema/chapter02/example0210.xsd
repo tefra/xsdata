@@ -1,0 +1,18 @@
+<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<!-- Example 2-10 Product schema document with target namespace -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://datypic.com/prod" xmlns:prod="http://datypic.com/prod">
+  <xs:element name="product" type="prod:ProductType" />
+  <xs:complexType name="ProductType">
+    <xs:sequence>
+      <xs:element name="number" type="xs:integer" />
+      <xs:element name="size" type="prod:SizeType" />
+    </xs:sequence>
+    <xs:attribute name="effDate" type="xs:date" />
+  </xs:complexType>
+  <xs:simpleType name="SizeType">
+    <xs:restriction base="xs:integer">
+      <xs:minInclusive value="2" />
+      <xs:maxInclusive value="18" />
+    </xs:restriction>
+  </xs:simpleType>
+</xs:schema>

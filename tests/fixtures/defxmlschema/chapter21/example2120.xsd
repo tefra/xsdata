@@ -1,0 +1,21 @@
+<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<!-- Example 21-20 Code documentation -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:doc="http://datypic.com/doc">
+  <xs:simpleType name="CountryType">
+    <xs:annotation>
+      <xs:documentation>
+        <doc:author>Priscilla Walmsley</doc:author>
+        <doc:version>1.1</doc:version>
+        <doc:since>1.0</doc:since>
+        <doc:see>
+          <doc:label>Country Code Listings</doc:label>
+          <doc:link>http://datypic.com/countries.html</doc:link>
+        </doc:see>
+        <doc:deprecated>false</doc:deprecated>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:token">
+      <!-- ... -->
+    </xs:restriction>
+  </xs:simpleType>
+</xs:schema>

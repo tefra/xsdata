@@ -1,0 +1,14 @@
+<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<!-- Example 13-29 Empty content restriction -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:complexType name="ItemType">
+    <xs:attribute name="routingNum" type="xs:integer" />
+  </xs:complexType>
+  <xs:complexType name="RestrictedItemType">
+    <xs:complexContent>
+      <xs:restriction base="ItemType">
+        <xs:attribute name="routingNum" type="xs:short" />
+      </xs:restriction>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:schema>

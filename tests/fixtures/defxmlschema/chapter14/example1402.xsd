@@ -1,0 +1,9 @@
+<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<!-- Example 14-2 An assertion on a simple type -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:simpleType name="SizeType">
+    <xs:restriction base="xs:integer">
+      <xs:assertion test="$value != 0" />
+    </xs:restriction>
+  </xs:simpleType>
+</xs:schema>

@@ -1,0 +1,14 @@
+<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<!-- Example 21-16 Schema for qualified local element names -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://datypic.com/prod" targetNamespace="http://datypic.com/prod" elementFormDefault="qualified">
+  <xs:complexType name="ItemsType">
+    <xs:sequence maxOccurs="unbounded">
+      <xs:element name="product" type="ProductType" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="ProductType">
+    <xs:sequence>
+      <xs:element name="number" type="xs:integer" />
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>

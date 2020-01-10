@@ -1,0 +1,29 @@
+<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<!-- Example 16-7 Defining derived types -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:complexType name="ShirtType">
+    <xs:complexContent>
+      <xs:extension base="ProductType">
+        <xs:sequence>
+          <xs:element name="size" type="ShirtSizeType" />
+          <xs:element name="color" type="ColorType" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="HatType">
+    <xs:complexContent>
+      <xs:extension base="ProductType">
+        <xs:sequence>
+          <xs:element name="size" type="HatSizeType" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="UmbrellaType">
+    <xs:complexContent>
+      <xs:extension base="ProductType" />
+    </xs:complexContent>
+  </xs:complexType>
+  <!-- ... -->
+</xs:schema>

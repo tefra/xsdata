@@ -1,0 +1,15 @@
+<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<!-- Example 7-3 Declaring the types of attributes -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:attribute name="color" type="ColorType" />
+  <xs:attribute name="dim" type="xs:integer" />
+  <xs:attribute name="system">
+    <xs:simpleType>
+      <xs:restriction base="xs:string">
+        <xs:enumeration value="US-DRESS" />
+        <!-- ... -->
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:attribute>
+  <xs:attribute name="anything" />
+</xs:schema>

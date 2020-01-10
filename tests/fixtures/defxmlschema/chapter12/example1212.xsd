@@ -1,0 +1,17 @@
+<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<!-- Example 12-12 Element references -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="number" type="xs:integer" />
+  <xs:element name="name" type="xs:string" />
+  <xs:element name="size" type="SizeType" />
+  <xs:element name="color" type="ColorType" />
+  <xs:complexType name="ProductType">
+    <xs:sequence>
+      <xs:element ref="number" />
+      <xs:element ref="name" />
+      <xs:element ref="size" minOccurs="0" />
+      <xs:element ref="color" minOccurs="0" />
+    </xs:sequence>
+  </xs:complexType>
+  <!-- ... -->
+</xs:schema>

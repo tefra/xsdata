@@ -1,0 +1,12 @@
+<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<!-- Example 6-11 Specifying an element's default value -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="product">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="name" type="xs:string" default="N/A" />
+        <xs:element name="size" type="xs:integer" default="12" />
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

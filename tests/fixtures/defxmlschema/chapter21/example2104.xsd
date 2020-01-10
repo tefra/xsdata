@@ -1,0 +1,28 @@
+<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<!-- Example 21-4 Schema for Garden of Eden approach -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://datypic.com/prod" targetNamespace="http://datypic.com/prod" elementFormDefault="qualified">
+  <xs:element name="catalog" type="CatalogType" />
+  <xs:complexType name="CatalogType">
+    <xs:sequence>
+      <xs:element ref="product" maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="product" type="ProductType" />
+  <xs:complexType name="ProductType">
+    <xs:sequence>
+      <xs:element ref="number" />
+      <xs:element ref="name" />
+      <xs:element ref="size" />
+    </xs:sequence>
+    <xs:attribute name="dept" type="xs:string" />
+  </xs:complexType>
+  <xs:element name="number" type="xs:integer" />
+  <xs:element name="name" type="xs:string" />
+  <xs:element name="size" type="SizeType" />
+  <xs:simpleType name="SizeType">
+    <xs:restriction base="xs:integer">
+      <xs:minInclusive value="2" />
+      <xs:maxInclusive value="18" />
+    </xs:restriction>
+  </xs:simpleType>
+</xs:schema>

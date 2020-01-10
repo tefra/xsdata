@@ -1,0 +1,9 @@
+<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<!-- Example 12-35 Complex type with element wildcard -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:complexType name="DescriptionType" mixed="true">
+    <xs:sequence>
+      <xs:any namespace="http://www.w3.org/1999/xhtml" minOccurs="0" maxOccurs="unbounded" processContents="skip" />
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>

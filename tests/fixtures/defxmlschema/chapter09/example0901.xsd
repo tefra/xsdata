@@ -1,0 +1,9 @@
+<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<!-- Example 9-1 A simple type with a pattern -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:simpleType name="ProductNumberType">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="\d{3}-[A-Z]{2}|\d{7}" />
+    </xs:restriction>
+  </xs:simpleType>
+</xs:schema>

@@ -1,0 +1,23 @@
+<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<!-- Example 19-26 Comments -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:doc="http://datypic.com/doc">
+  <xs:annotation>
+    <xs:documentation>
+      <doc:section>CUSTOMER INFORMATION</doc:section>
+    </xs:documentation>
+  </xs:annotation>
+  <xs:element name="billTo" type="AddressType">
+    <xs:annotation>
+      <xs:documentation>
+        <doc:description>billing address</doc:description>
+      </xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="shipTo" type="AddressType">
+    <xs:annotation>
+      <xs:documentation>
+        <doc:description>shipping address</doc:description>
+      </xs:documentation>
+    </xs:annotation>
+  </xs:element>
+</xs:schema>

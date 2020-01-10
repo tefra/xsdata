@@ -1,0 +1,8 @@
+<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<!-- Example 13-21 Maintaining the order of the children in an all group -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:all>
+    <xs:element name="c" />
+    <xs:element name="a" />
+  </xs:all>
+</xs:schema>

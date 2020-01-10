@@ -1,0 +1,9 @@
+<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<!-- Example 11-8 Using ENTITIES -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="pictures">
+    <xs:complexType>
+      <xs:attribute name="location" type="xs:ENTITIES" />
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

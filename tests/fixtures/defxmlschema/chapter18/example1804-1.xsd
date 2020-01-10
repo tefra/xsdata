@@ -1,0 +1,10 @@
+<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<!-- Example 18-4 Redefining a named model group as a subset -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:group name="DescriptionGroup">
+    <xs:sequence>
+      <xs:element name="description" type="xs:string" />
+      <xs:element name="comment" type="xs:string" minOccurs="0" />
+    </xs:sequence>
+  </xs:group>
+</xs:schema>

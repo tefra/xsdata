@@ -1,0 +1,6 @@
+<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<!-- Example 6-2 Illegal attempt to prefix an element name -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:prod="http://datypic.com/prod" targetNamespace="http://datypic.com/prod">
+  <xs:element name="name" type="xs:string" />
+  <xs:element name="prod:size" type="xs:integer" />
+</xs:schema>

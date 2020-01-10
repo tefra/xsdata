@@ -1,0 +1,18 @@
+<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<!-- Example 23-17 Using vc:typeAvailable and vc:typeUnavailable -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:ext="http://example.org/extensions" xmlns:vc="http://www.w3.org/2007/XMLSchema-versioning">
+  <xs:element name="anyOrdinalDate" type="ext:ordinalDate" vc:typeAvailable="ext:ordinalDate" />
+  <xs:element name="anyOrdinalDate" type="xs:string" vc:typeUnavailable="ext:ordinalDate" />
+  <xs:element name="recentOrdinalDate" type="OrdinalDateIn2011" />
+  <xs:simpleType name="OrdinalDateIn2011" vc:typeAvailable="ext:ordinalDate">
+    <xs:restriction base="ext:ordinalDate">
+      <xs:minInclusive value="2011-001" />
+      <xs:maxInclusive value="2011-365" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="OrdinalDateIn2011" vc:typeUnavailable="ext:ordinalDate">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="2011-\d{3}" />
+    </xs:restriction>
+  </xs:simpleType>
+</xs:schema>

@@ -1,0 +1,6 @@
+<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<!-- Example 4-7 Illegal duplication of element names -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://datypic.com/ord" targetNamespace="http://datypic.com/ord">
+  <xs:include schemaLocation="ord2.xsd" />
+  <xs:element name="order" type="OrderType" />
+</xs:schema>

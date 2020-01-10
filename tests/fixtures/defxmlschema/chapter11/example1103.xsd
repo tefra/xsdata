@@ -1,0 +1,8 @@
+<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<!-- Example 11-3 Illegal duplication of ID attributes (version 1.0) -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:complexType name="CustType">
+    <xs:attribute name="id" type="xs:ID" />
+    <xs:attribute name="custID" type="xs:ID" />
+  </xs:complexType>
+</xs:schema>

@@ -1,0 +1,16 @@
+<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<!-- Example 13-10 Attribute extension -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:complexType name="ItemType">
+    <xs:attribute name="id" type="xs:ID" use="required" />
+    <xs:attribute ref="xml:lang" />
+  </xs:complexType>
+  <xs:complexType name="ProductType">
+    <xs:complexContent>
+      <xs:extension base="ItemType">
+        <xs:attribute name="effDate" type="xs:date" />
+        <xs:attribute name="lang" type="xs:language" />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:schema>

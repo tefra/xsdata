@@ -1,0 +1,14 @@
+<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<!-- Example 20-4 Using identity constraints to validate references -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="report" type="ReportType">
+    <xs:key name="productKey">
+      <xs:selector xpath=".//product" />
+      <xs:field xpath="number" />
+    </xs:key>
+    <xs:keyref name="productKeyRef" refer="productKey">
+      <xs:selector xpath=".//productRef" />
+      <xs:field xpath="@ref" />
+    </xs:keyref>
+  </xs:element>
+</xs:schema>

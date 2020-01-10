@@ -1,0 +1,7 @@
+<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<!-- Example 16-4 Substitution group with simple types -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="number" />
+  <xs:element name="skuNumber" type="xs:string" substitutionGroup="number" />
+  <xs:element name="productID" type="xs:integer" substitutionGroup="number" />
+</xs:schema>

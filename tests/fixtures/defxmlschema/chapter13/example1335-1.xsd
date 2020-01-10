@@ -1,0 +1,12 @@
+<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<!-- Example 13-35 Using targetNamespace on element and attribute declarations -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://datypic.com/prod" elementFormDefault="qualified" attributeFormDefault="qualified">
+  <xs:complexType name="ProductType">
+    <xs:sequence>
+      <xs:element name="number" type="xs:integer" />
+      <xs:element name="name" type="xs:string" />
+      <xs:element name="size" type="xs:integer" minOccurs="0" />
+    </xs:sequence>
+    <xs:attribute name="dept" type="xs:string" />
+  </xs:complexType>
+</xs:schema>

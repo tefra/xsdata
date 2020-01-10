@@ -22,6 +22,7 @@ Roadmap
     codegen
     architecture
     formats
+    tests
+    changelog
     about
     api
-    changelog

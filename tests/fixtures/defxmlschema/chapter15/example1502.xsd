@@ -1,0 +1,12 @@
+<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<!-- Example 15-2 Named model group with element references -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="description" type="xs:string" />
+  <xs:element name="comment" type="xs:string" />
+  <xs:group name="DescriptionGroup">
+    <xs:sequence>
+      <xs:element ref="description" />
+      <xs:element ref="comment" minOccurs="0" />
+    </xs:sequence>
+  </xs:group>
+</xs:schema>

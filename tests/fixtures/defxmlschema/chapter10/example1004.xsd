@@ -1,0 +1,12 @@
+<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<!-- Example 10-4 Restricting a union -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:simpleType name="SmallSizeType">
+    <xs:restriction base="SizeType">
+      <xs:enumeration value="2" />
+      <xs:enumeration value="4" />
+      <xs:enumeration value="6" />
+      <xs:enumeration value="small" />
+    </xs:restriction>
+  </xs:simpleType>
+</xs:schema>

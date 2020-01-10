@@ -1,0 +1,16 @@
+<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<!-- Example 19-14 Allowing future extensions for sequence groups -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:group name="ext">
+    <xs:sequence />
+  </xs:group>
+  <xs:element name="x">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="a" />
+        <xs:element ref="b" />
+        <xs:group ref="ext" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

@@ -1,0 +1,13 @@
+<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<!-- Example 19-13 Reusing groups of attributes -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:attributeGroup name="HeaderGroup">
+    <xs:attribute name="id" type="xs:ID" use="required" />
+    <xs:attribute name="variety" type="xs:NMTOKEN" />
+  </xs:attributeGroup>
+  <xs:element name="x">
+    <xs:complexType>
+      <xs:attributeGroup ref="HeaderGroup" />
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

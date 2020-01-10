@@ -1,0 +1,11 @@
+<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<!-- Example 8-5 Effective definition of MediumDressSizeType -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:simpleType name="MediumDressSizeType">
+    <xs:restriction base="xs:integer">
+      <xs:minInclusive value="8" />
+      <xs:maxInclusive value="12" />
+      <xs:pattern value="\d{1,2}" />
+    </xs:restriction>
+  </xs:simpleType>
+</xs:schema>

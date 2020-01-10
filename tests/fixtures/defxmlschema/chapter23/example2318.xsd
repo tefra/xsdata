@@ -1,0 +1,17 @@
+<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<!-- Example 23-18 Using vc:facetAvailable and vc:facetUnavailable -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:saxon="http://saxon.sf.net/" xmlns:vc="http://www.w3.org/2007/XMLSchema-versioning">
+  <xs:element name="size" type="SMLXSizeType" />
+  <xs:simpleType name="SMLXSizeType" vc:facetAvailable="saxon:preprocess">
+    <xs:restriction base="xs:token">
+      <saxon:preprocess action="upper-case($value)" />
+      <xs:enumeration value="SMALL" />
+      <xs:enumeration value="MEDIUM" />
+      <xs:enumeration value="LARGE" />
+      <xs:enumeration value="EXTRA LARGE" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="SMLXSizeType" vc:facetUnavailable="saxon:preprocess">
+    <xs:restriction base="xs:token" />
+  </xs:simpleType>
+</xs:schema>

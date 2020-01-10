@@ -1,0 +1,5 @@
+<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<!-- Example 6-15 Making size elements nillable -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="size" type="xs:integer" nillable="true" />
+</xs:schema>

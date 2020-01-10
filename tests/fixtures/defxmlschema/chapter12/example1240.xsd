@@ -1,0 +1,14 @@
+<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<!-- Example 12-40 Defining an interleaved open content model -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="product" type="OpenProductType" />
+  <xs:complexType name="OpenProductType">
+    <xs:openContent>
+      <xs:any namespace="##other" processContents="lax" />
+    </xs:openContent>
+    <xs:sequence>
+      <xs:element name="number" type="xs:integer" />
+      <xs:element name="name" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>

@@ -1,0 +1,13 @@
+<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<!-- Example 12-9 Complex type with mixed content -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="desc" type="DescType" />
+  <xs:complexType name="DescType" mixed="true">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element name="i" type="xs:string" />
+      <xs:element name="b" type="xs:string" />
+      <xs:element name="u" type="xs:string" />
+      <!-- ... -->
+    </xs:choice>
+  </xs:complexType>
+</xs:schema>

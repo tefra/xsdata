@@ -1,0 +1,15 @@
+<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<!-- Example 10-21 An array using markup -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:complexType name="VectorType">
+    <xs:sequence maxOccurs="unbounded">
+      <xs:element name="e" type="xs:integer" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="ArrayType">
+    <xs:sequence maxOccurs="unbounded">
+      <xs:element name="r" type="VectorType" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="array" type="ArrayType" />
+</xs:schema>

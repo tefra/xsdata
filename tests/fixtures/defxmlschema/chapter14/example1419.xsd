@@ -1,0 +1,16 @@
+<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<!-- Example 14-19 Assertions using xpathDefaultNamespace -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://datypic.com/prod" xmlns:prod="http://datypic.com/prod" elementFormDefault="qualified" xpathDefaultNamespace="http://datypic.com/prod">
+  <xs:element name="product" type="prod:ProductType" />
+  <xs:complexType name="ProductType">
+    <xs:sequence>
+      <xs:element name="number" type="xs:integer" />
+      <xs:element name="name" type="xs:string" />
+      <xs:element name="size" type="xs:string" minOccurs="0" />
+    </xs:sequence>
+    <xs:attribute name="dept" type="xs:string" />
+    <xs:assert test="" "(@dept="ACC" and="" number="">
+      <xs:assert test="if (@dept = 'ACC')                      then not(size)                      else true()" />
+    </xs:assert>
+  </xs:complexType>
+</xs:schema>

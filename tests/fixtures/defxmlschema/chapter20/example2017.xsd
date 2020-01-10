@@ -1,0 +1,23 @@
+<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<!-- Example 20-17 AddressType and revised OrderType definitions -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:complexType name="OrderType">
+    <xs:sequence>
+      <xs:element name="number" type="xs:integer" />
+      <xs:element name="date" type="xs:date" />
+      <xs:element name="customerNumber" type="xs:integer" />
+      <xs:element name="customerName" type="xs:string" />
+      <xs:element name="billToAddress" type="AddressType" />
+      <xs:element name="shipToAddress" type="AddressType" />
+      <xs:element name="lineItem" type="LineItemType" maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="AddressType">
+    <xs:sequence>
+      <xs:element name="addressLine" type="xs:string" />
+      <xs:element name="city" type="xs:string" />
+      <xs:element name="state" type="xs:string" />
+      <xs:element name="zip" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>

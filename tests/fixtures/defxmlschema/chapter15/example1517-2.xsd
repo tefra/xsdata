@@ -1,0 +1,15 @@
+<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<!-- Example 15-17 Named groups across namespaces -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" xmlns="http://datypic.com/prod" targetNamespace="http://datypic.com/prod">
+  <xs:group name="DescriptionGroup">
+    <xs:sequence>
+      <xs:element name="description" type="xs:string" />
+      <xs:element name="comment" type="xs:string" minOccurs="0" />
+    </xs:sequence>
+  </xs:group>
+  <xs:attributeGroup name="IdentifierGroup">
+    <xs:attribute name="id" type="xs:ID" use="required" />
+    <xs:attribute name="version" type="xs:decimal" />
+    <xs:anyAttribute namespace="##other" />
+  </xs:attributeGroup>
+</xs:schema>

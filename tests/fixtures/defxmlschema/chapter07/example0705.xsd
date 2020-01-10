@@ -1,0 +1,9 @@
+<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<!-- Example 7-5 Declaring a default value for an attribute -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="size">
+    <xs:complexType>
+      <xs:attribute name="dim" type="xs:integer" default="1" />
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

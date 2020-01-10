@@ -1,0 +1,11 @@
+<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<!-- Example 18-9 Overriding a simple type -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:simpleType name="DressSizeType">
+    <xs:restriction base="xs:integer">
+      <xs:minInclusive value="0" />
+      <xs:maxInclusive value="18" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:element name="size" type="DressSizeType" />
+</xs:schema>

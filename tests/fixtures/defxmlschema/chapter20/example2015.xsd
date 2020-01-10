@@ -1,0 +1,28 @@
+<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<!-- Example 20-15 A flat order schema -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="order" type="OrderType" />
+  <xs:complexType name="OrderType">
+    <xs:sequence>
+      <xs:element name="number" type="xs:integer" />
+      <xs:element name="date" type="xs:date" />
+      <xs:element name="customerNumber" type="xs:integer" />
+      <xs:element name="customerName" type="xs:string" />
+      <xs:element name="billToAddressLine" type="xs:string" maxOccurs="unbounded" />
+      <xs:element name="billToCity" type="xs:string" />
+      <xs:element name="billToState" type="xs:string" />
+      <xs:element name="billToZip" type="xs:string" />
+      <xs:element name="shipToAddressLine" type="xs:string" maxOccurs="unbounded" />
+      <xs:element name="shipToCity" type="xs:string" />
+      <xs:element name="shipToState" type="xs:string" />
+      <xs:element name="shipToZip" type="xs:string" />
+      <xs:element name="lineItem" type="LineItemType" maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="LineItemType">
+    <xs:sequence>
+      <xs:element name="number" type="xs:integer" />
+      <!-- ... -->
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>

@@ -1,0 +1,18 @@
+<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<!-- Example 7-7 Declaring an inheritable attribute -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="chapter" type="ChapterType" />
+  <xs:complexType name="ChapterType">
+    <xs:sequence>
+      <xs:element name="p" type="ParaType" maxOccurs="unbounded" />
+    </xs:sequence>
+    <xs:attribute name="language" type="xs:language" inheritable="true" />
+  </xs:complexType>
+  <xs:complexType name="ParaType">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute name="language" type="xs:language" />
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+</xs:schema>

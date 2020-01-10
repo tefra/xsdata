@@ -1,0 +1,12 @@
+<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<!-- Example 8-2 Defining an anonymous simple type -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="size">
+    <xs:simpleType>
+      <xs:restriction base="xs:integer">
+        <xs:minInclusive value="2" />
+        <xs:maxInclusive value="18" />
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:element>
+</xs:schema>

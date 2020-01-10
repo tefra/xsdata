@@ -1,0 +1,15 @@
+<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<!-- Example 4-4 Multiple levels of import -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://datypic.com/ord" xmlns:prod="http://datypic.com/prod" xmlns:ext="http://datypic.com/ext" targetNamespace="http://datypic.com/ord">
+  <xs:import namespace="http://datypic.com/prod" schemaLocation="prod.xsd" />
+  <xs:import namespace="http://datypic.com/ext" schemaLocation="extension.xsd" />
+  <xs:element name="order" type="OrderType" />
+  <xs:complexType name="OrderType">
+    <xs:sequence>
+      <xs:element name="number" type="xs:string" />
+      <xs:element name="items" type="prod:ItemsType" />
+      <!-- ... -->
+      <xs:element name="extension" type="ext:ExtensionType" />
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>

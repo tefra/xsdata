@@ -1,0 +1,11 @@
+<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<!-- Example 8-15 Restricting a pattern -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:simpleType name="SmallDressSizeType">
+    <xs:restriction base="DressSizeType">
+      <xs:minInclusive value="2" />
+      <xs:maxInclusive value="6" />
+      <xs:pattern value="\d{1}" />
+    </xs:restriction>
+  </xs:simpleType>
+</xs:schema>

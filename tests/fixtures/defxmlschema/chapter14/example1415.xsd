@@ -1,0 +1,23 @@
+<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<!-- Example 14-15 Assertions in complex type extension -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:complexType name="ProductType">
+    <xs:sequence>
+      <xs:element name="number" type="xs:integer" />
+      <xs:element name="name" type="xs:string" />
+    </xs:sequence>
+    <xs:attribute name="dept" type="xs:string" />
+    <xs:assert test="" "(@dept="ACC" and="" number="">500) or
+                   (number &lt; 300)"/></xs:assert>
+    <xs:complexType name="ExtendedProductType">
+      <xs:complexContent>
+        <xs:extension base="ProductType">
+          <xs:sequence>
+            <xs:element name="size" type="xs:integer" minOccurs="0" />
+          </xs:sequence>
+          <xs:assert test="if (@dept = 'ACC')                        then not(size)                        else true()" />
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:complexType>
+</xs:schema>

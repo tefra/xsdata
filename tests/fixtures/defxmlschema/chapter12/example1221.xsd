@@ -1,0 +1,11 @@
+<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<!-- Example 12-21 A repeating choice group -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:complexType name="ItemsType">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element name="shirt" type="ShirtType" />
+      <xs:element name="umbrella" type="UmbrellaType" />
+      <xs:element name="hat" type="HatType" />
+    </xs:choice>
+  </xs:complexType>
+</xs:schema>

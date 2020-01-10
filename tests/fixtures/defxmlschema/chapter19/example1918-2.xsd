@@ -1,0 +1,7 @@
+<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<!-- Example 19-18 Implementing extensions for choice groups -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:include schemaLocation="original.xsd" />
+  <xs:element name="c" substitutionGroup="ext" />
+  <xs:element name="d" substitutionGroup="ext" />
+</xs:schema>

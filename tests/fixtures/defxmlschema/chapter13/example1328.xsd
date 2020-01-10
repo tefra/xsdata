@@ -1,0 +1,20 @@
+<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<!-- Example 13-28 Mixed content restricted to simple content -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:complexType name="LetterType" mixed="true">
+    <xs:sequence minOccurs="0">
+      <xs:element name="custName" type="xs:string" />
+      <xs:element name="prodName" type="xs:string" />
+      <xs:element name="prodSize" type="xs:integer" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="RestrictedLetterType">
+    <xs:simpleContent>
+      <xs:restriction base="LetterType">
+        <xs:simpleType>
+          <xs:restriction base="xs:string" />
+        </xs:simpleType>
+      </xs:restriction>
+    </xs:simpleContent>
+  </xs:complexType>
+</xs:schema>

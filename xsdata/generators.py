@@ -4,7 +4,7 @@ from typing import Any, Iterator, List, Optional, Tuple
 
 from jinja2 import Environment, FileSystemLoader, Template
 
-from xsdata.formats.dataclass.utils import replace_words
+from xsdata.formats.dataclass.utils import safe_snake
 from xsdata.models.codegen import Attr, Class, Package
 from xsdata.models.elements import Schema
 from xsdata.models.enums import XSDType
@@ -101,9 +101,7 @@ class PythonAbstractGenerator(AbstractGenerator, ABC):
         prefix _value
         """
         local_name = text.split(name)[1]
-        return text.snake_case(
-            replace_words.get(local_name.lower(), local_name)
-        )
+        return text.snake_case(safe_snake(local_name))
 
     @classmethod
     def enumeration_name(cls, name: str) -> str:

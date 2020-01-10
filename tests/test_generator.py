@@ -138,14 +138,15 @@ class PythonAbstractGeneratorTests(FactoryTestCase):
         self.assertEqual("bar", generator.attribute_name("foo:bar"))
         self.assertEqual("foo_bar", generator.attribute_name("FooBar"))
         self.assertEqual("none_value", generator.attribute_name("None"))
-        self.assertEqual("break_value", generator.attribute_name("BrEak"))
+        self.assertEqual("br_eak_value", generator.attribute_name("BrEak"))
+        self.assertEqual("value_1", generator.attribute_name("1"))
 
     def test_enumeration_name(self):
         self.assertEqual("FOO", generator.enumeration_name("foo"))
         self.assertEqual("BAR", generator.enumeration_name("foo:bar"))
         self.assertEqual("FOO_BAR", generator.enumeration_name("FooBar"))
         self.assertEqual("NONE_VALUE", generator.enumeration_name("None"))
-        self.assertEqual("BREAK_VALUE", generator.enumeration_name("BrEak"))
+        self.assertEqual("BR_EAK_VALUE", generator.enumeration_name("BrEak"))
 
     def test_attribute_type(self):
         parents = []

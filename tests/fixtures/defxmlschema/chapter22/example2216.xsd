@@ -1,0 +1,17 @@
+<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<!-- Example 22-16 Redefined named model group and attribute group -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:spc="http://datypic.com/spc" xmlns="http://datypic.com/ord" targetNamespace="http://datypic.com/ord">
+  <xs:import namespace="http://datypic.com/spc" />
+  <xs:redefine schemaLocation="original.xsd">
+    <xs:group name="ProductPropertyGroup">
+      <xs:sequence>
+        <xs:element ref="spc:giftWrap" />
+        <xs:group ref="ProductPropertyGroup" />
+      </xs:sequence>
+    </xs:group>
+    <xs:attributeGroup name="ExtensionGroup">
+      <xs:attributeGroup ref="ExtensionGroup" />
+      <xs:attribute ref="spc:points" />
+    </xs:attributeGroup>
+  </xs:redefine>
+</xs:schema>

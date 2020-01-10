@@ -1,0 +1,24 @@
+{{  suite }}
+=======================================
+
+{%- for item in items | sort(attribute='title') %}
+
+{{ item.title }}
+-----------
+
+.. literalinclude:: {{ item.source }}
+   :language: xml
+   :lines: 3-
+
+.. literalinclude:: {{ item.output }}
+   :language: python
+   :lines: 4-
+
+{%- endfor %}
+
+
+
+.. admonition:: Samples Source
+    :class: hint
+
+    `Definitive XML Schema <http://http://www.datypic.com/books/defxmlschema/>`_ by Priscilla Walmsley (c) 2012 Prentice Hall PTR

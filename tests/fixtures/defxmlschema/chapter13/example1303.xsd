@@ -1,0 +1,16 @@
+<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<!-- Example 13-3 Effective content model of ShirtType -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:complexType name="ShirtType">
+    <xs:sequence>
+      <xs:sequence>
+        <xs:element name="number" type="xs:integer" />
+        <xs:element name="name" type="xs:string" />
+      </xs:sequence>
+      <xs:choice maxOccurs="unbounded">
+        <xs:element name="size" type="xs:integer" />
+        <xs:element name="color" type="xs:string" />
+      </xs:choice>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>

@@ -1,0 +1,11 @@
+<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<!-- Example 12-32 Complex type with attribute group reference -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:complexType name="ProductType">
+    <xs:sequence>
+      <!-- ... -->
+    </xs:sequence>
+    <xs:attributeGroup ref="IdentifierGroup" />
+    <xs:attribute name="effDate" type="xs:date" />
+  </xs:complexType>
+</xs:schema>

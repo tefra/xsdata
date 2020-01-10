@@ -1,0 +1,16 @@
+<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<!-- Example 11-5 Using IDREF -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="quote">
+    <xs:complexType>
+      <!-- content model -->
+      <xs:attribute name="ref" type="xs:IDREF" />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="footnote">
+    <xs:complexType>
+      <!-- content model -->
+      <xs:attribute name="id" type="xs:ID" use="required" />
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

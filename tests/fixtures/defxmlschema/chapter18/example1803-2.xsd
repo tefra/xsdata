@@ -1,0 +1,16 @@
+<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<!-- Example 18-3 Redefining a complex type -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:redefine schemaLocation="prod1.xsd">
+    <xs:complexType name="ProductType">
+      <xs:complexContent>
+        <xs:extension base="ProductType">
+          <xs:sequence>
+            <xs:element name="color" type="xs:string" />
+          </xs:sequence>
+          <xs:attribute name="effDate" type="xs:date" />
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:redefine>
+</xs:schema>

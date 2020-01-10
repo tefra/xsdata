@@ -1,0 +1,18 @@
+<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<!-- Example 14-11 Assertions on a list type and its item type -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:simpleType name="SizeListType">
+    <xs:restriction>
+      <xs:simpleType>
+        <xs:list>
+          <xs:simpleType>
+            <xs:restriction base="xs:integer">
+              <xs:assertion test="$value &lt; 12" />
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:list>
+      </xs:simpleType>
+      <xs:assertion test="" "count($value)="">2"/></xs:assertion>
+    </xs:restriction>
+  </xs:simpleType>
+</xs:schema>

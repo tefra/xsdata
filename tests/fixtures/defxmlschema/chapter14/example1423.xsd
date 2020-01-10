@@ -1,0 +1,9 @@
+<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<!-- Example 14-23 Using the error type as the default -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="product">
+    <xs:alternative test="@dept='ACC'" type="AccessoryType" />
+    <xs:alternative test="@dept='WMN' or @dept='MEN'" type="ClothingType" />
+    <xs:alternative type="xs:error" />
+  </xs:element>
+</xs:schema>

@@ -1,0 +1,7 @@
+<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<!-- Example 12-11 Complex type with empty content -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:complexType name="ColorType">
+    <xs:attribute name="value" type="ColorValueType" />
+  </xs:complexType>
+</xs:schema>

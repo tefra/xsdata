@@ -1,0 +1,19 @@
+<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<!-- Example 23-1 Version 2.0 of a complex type -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" version="2.0">
+  <xs:element name="product" type="ProductType" />
+  <xs:complexType name="ProductType">
+    <xs:sequence>
+      <xs:element name="number" type="xs:integer" minOccurs="0" />
+      <xs:element name="name" type="xs:string" />
+      <xs:element name="size" type="SizeType" maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="SizeType">
+    <xs:simpleContent>
+      <xs:extension base="xs:integer">
+        <xs:attribute name="system" type="xs:token" />
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+</xs:schema>

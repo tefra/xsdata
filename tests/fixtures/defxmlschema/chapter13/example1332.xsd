@@ -1,0 +1,14 @@
+<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<!-- Example 13-32 Restricting an attribute wildcard -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:complexType name="BaseType">
+    <xs:anyAttribute processContents="lax" namespace="##any" />
+  </xs:complexType>
+  <xs:complexType name="DerivedType">
+    <xs:complexContent>
+      <xs:restriction base="BaseType">
+        <xs:anyAttribute processContents="strict" namespace="##targetNamespace                                   http://www.w3.org/1999/xhtml" />
+      </xs:restriction>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:schema>

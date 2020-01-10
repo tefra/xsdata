@@ -1,4 +1,3 @@
-import copy
 from dataclasses import dataclass
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -26,12 +25,10 @@ class FakeRenderer(AbstractGenerator):
 
 
 class CodeWriterTests(TestCase):
-    def setUp(self) -> None:
-        super(CodeWriterTests, self).setUp()
-        self.generators = copy.deepcopy(writer.generators)
+    FAKE_NAME = "fake"
 
     def tearDown(self) -> None:
-        writer.generators = self.generators
+        writer.generators.pop(self.FAKE_NAME, False)
 
     def test_formats(self):
         expected = ["pydata", "plantuml"]
@@ -41,12 +38,12 @@ class CodeWriterTests(TestCase):
         )
 
     def test_register_generator(self):
-        writer.register_generator("fake", FakeRenderer())
+        writer.register_generator(self.FAKE_NAME, FakeRenderer())
         self.assertIn("fake", writer.formats)
         self.assertIsInstance(writer.get_renderer("fake"), FakeRenderer)
 
     def test_write(self):
         with TemporaryDirectory() as tmpdir:
-            writer.register_generator("fake", FakeRenderer(tmpdir))
+            writer.register_generator(self.FAKE_NAME, FakeRenderer(tmpdir))
             writer.write(Schema.create(), [], "", "fake")
             self.assertEqual("foobar", Path(f"{tmpdir}/test.txt").read_text())

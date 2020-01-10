@@ -1,0 +1,14 @@
+<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<!-- Example 19-16 Implementing extensions for sequence groups using override -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:override schemaLocation="original.xsd">
+    <xs:group name="ext">
+      <xs:sequence>
+        <xs:element ref="a" />
+        <xs:element ref="b" />
+        <xs:element ref="c" />
+        <xs:element ref="d" />
+      </xs:sequence>
+    </xs:group>
+  </xs:override>
+</xs:schema>

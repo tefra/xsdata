@@ -150,7 +150,8 @@ class ClassReducer:
 
             attr.type = f"{attr.type} {type_name}" if append else type_name
             for key, value in restrictions.items():
-                setattr(attr, key, value)
+                if not hasattr(attr, key):
+                    setattr(attr, key, value)
             append = True
 
     def separate_common_types(self, classes: List[Class]):

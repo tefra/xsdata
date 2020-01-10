@@ -36,7 +36,14 @@ def lib_imports(output: str):
     if "(Enum)" in output:
         result.append("from enum import Enum")
 
-    result.append("from dataclasses import dataclass, field")
+    dataclasses = []
+    if "@dataclass" in output:
+        dataclasses.append("dataclass")
+    if "field(" in output:
+        dataclasses.append("field")
+
+    if dataclasses:
+        result.append(f"from dataclasses import {', '.join(dataclasses)}")
 
     types = [tp for tp in ["List", "Optional", "Union"] if f"{tp}[" in output]
     if types:

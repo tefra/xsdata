@@ -1,0 +1,27 @@
+<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<!-- Example 13-30 Legal restrictions of attributes -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:complexType name="BaseType">
+    <xs:attribute name="a" type="xs:integer" />
+    <xs:attribute name="b" type="xs:string" />
+    <xs:attribute name="c" type="xs:string" default="c" />
+    <xs:attribute name="d" type="xs:string" />
+    <xs:attribute name="e" type="xs:string" fixed="e" />
+    <xs:attribute name="f" type="xs:string" />
+    <xs:attribute name="g" type="xs:string" />
+    <xs:attribute name="x" type="xs:string" />
+  </xs:complexType>
+  <xs:complexType name="DerivedType">
+    <xs:complexContent>
+      <xs:restriction base="BaseType">
+        <xs:attribute name="a" type="xs:positiveInteger" />
+        <xs:attribute name="b" type="xs:string" default="b" />
+        <xs:attribute name="c" type="xs:string" default="c2" />
+        <xs:attribute name="d" type="xs:string" fixed="d" />
+        <xs:attribute name="e" type="xs:string" fixed="e" />
+        <xs:attribute name="f" type="xs:string" use="required" />
+        <xs:attribute name="g" type="xs:string" use="prohibited" />
+      </xs:restriction>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:schema>

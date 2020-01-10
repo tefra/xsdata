@@ -1,0 +1,24 @@
+<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<!-- Example 13-31 Illegal attribute restrictions -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:complexType name="BaseType2">
+    <xs:attribute name="h" type="xs:integer" />
+    <xs:attribute name="i" type="xs:string" fixed="i" />
+    <xs:attribute name="j" type="xs:string" fixed="j" />
+    <xs:attribute name="k" type="xs:string" use="required" />
+    <xs:attribute name="l" type="xs:string" use="required" />
+  </xs:complexType>
+  <xs:complexType name="IllegalDerivedType">
+    <xs:complexContent>
+      <xs:restriction base="BaseType2">
+        <xs:attribute name="h" type="xs:decimal" />
+        <xs:attribute name="i" type="xs:string" fixed="i2" />
+        <xs:attribute name="j" type="xs:string" default="j" />
+        <xs:attribute name="k" type="xs:string" />
+        <xs:attribute name="l" type="xs:string" use="prohibited" />
+        <xs:attribute ref="pref:l" />
+        <xs:attribute name="m" type="xs:string" />
+      </xs:restriction>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:schema>

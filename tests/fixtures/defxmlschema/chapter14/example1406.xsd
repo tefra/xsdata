@@ -1,0 +1,9 @@
+<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<!-- Example 14-6 Using parentheses to create sequences -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:simpleType name="DepartmentCodeType">
+    <xs:restriction base="xs:token">
+      <xs:assertion test="$value = ('ACC','WMN','MEN')" />
+    </xs:restriction>
+  </xs:simpleType>
+</xs:schema>

@@ -1,0 +1,5 @@
+<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<!-- Example 21-24 A schema for non-native attributes -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://datypic.com/doc" targetNamespace="http://datypic.com/doc">
+  <xs:attribute name="description" type="xs:string" />
+</xs:schema>

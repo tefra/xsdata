@@ -1,0 +1,10 @@
+<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<!-- Example 18-7 Redefining an attribute group as a superset -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:import namespace="http://www.w3.org/XML/1998/namespace" />
+  <xs:attributeGroup name="IdentifierGroup">
+    <xs:attribute name="id" type="xs:ID" use="required" />
+    <xs:attribute name="version" type="xs:decimal" />
+    <xs:attribute ref="xml:lang" />
+  </xs:attributeGroup>
+</xs:schema>

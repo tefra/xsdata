@@ -1,0 +1,18 @@
+<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<!-- Example 14-14 An assertion using conditional expressions -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:complexType name="ProductType">
+    <xs:sequence>
+      <xs:element name="number" type="xs:integer" />
+      <xs:element name="name" type="xs:string" />
+      <xs:element name="size" type="xs:integer" />
+    </xs:sequence>
+    <xs:attribute name="dept" type="xs:string" />
+    <xs:assert test="" "if="" (@dept="ACC" )="" then="" number="">500
+                   else if (@dept = 'WMN')
+                   then number &lt;= 300 and number > 200
+                   else if (@dept = 'MEN')
+                   then number &lt; 200
+                   else false()"/></xs:assert>
+  </xs:complexType>
+</xs:schema>

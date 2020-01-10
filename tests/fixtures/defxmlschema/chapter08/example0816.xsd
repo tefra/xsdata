@@ -1,0 +1,9 @@
+<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<!-- Example 8-16 Illegal attempt to extend a pattern -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:simpleType name="LongerDressSizeType">
+    <xs:restriction base="DressSizeType">
+      <xs:pattern value="\d{1,3}" />
+    </xs:restriction>
+  </xs:simpleType>
+</xs:schema>

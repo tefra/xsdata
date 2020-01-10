@@ -1,0 +1,22 @@
+<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<!-- Example 13-41 An abstract type -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:complexType name="ProductType" abstract="true">
+    <xs:sequence>
+      <xs:element name="number" type="xs:integer" />
+      <xs:element name="name" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="product" type="ProductType" />
+  <xs:complexType name="ShirtType">
+    <xs:complexContent>
+      <xs:extension base="ProductType">
+        <xs:choice maxOccurs="unbounded">
+          <xs:element name="size" type="xs:integer" />
+          <xs:element name="color" type="xs:string" />
+        </xs:choice>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element name="shirt" type="ShirtType" />
+</xs:schema>

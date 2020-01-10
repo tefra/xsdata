@@ -1,0 +1,9 @@
+<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<!-- Example 3-20 Prefixing all namespaces -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:prod="http://datypic.com/prod" targetNamespace="http://datypic.com/prod">
+  <xs:element name="number" type="xs:integer" />
+  <xs:element name="size" type="prod:SizeType" />
+  <xs:simpleType name="SizeType">
+    <!-- ... -->
+  </xs:simpleType>
+</xs:schema>

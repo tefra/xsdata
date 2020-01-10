@@ -1,0 +1,7 @@
+<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<!-- Example 2-12 Schema composition using include and import -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://datypic.com/ord" targetNamespace="http://datypic.com/ord">
+  <xs:include schemaLocation="moreOrderInfo.xsd" />
+  <xs:import namespace="http://datypic.com/prod" schemaLocation="productInfo.xsd" />
+  <!-- ... -->
+</xs:schema>

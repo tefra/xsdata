@@ -1,0 +1,10 @@
+<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<!-- Example 15-9 Attribute group with attribute references -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:attribute name="id" type="xs:ID" />
+  <xs:attribute name="version" type="xs:decimal" />
+  <xs:attributeGroup name="IdentifierGroup">
+    <xs:attribute ref="id" use="required" />
+    <xs:attribute ref="version" />
+  </xs:attributeGroup>
+</xs:schema>

@@ -1,0 +1,7 @@
+<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<!-- Example 10-2 Using the memberTypes attribute -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:simpleType name="SizeType">
+    <xs:union memberTypes="DressSizeType SMLSizeType" />
+  </xs:simpleType>
+</xs:schema>

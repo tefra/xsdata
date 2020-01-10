@@ -1,0 +1,12 @@
+<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<!-- Example 6-1 Global element declarations -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://datypic.com/prod" targetNamespace="http://datypic.com/prod">
+  <xs:element name="name" type="xs:string" />
+  <xs:element name="size" type="xs:integer" />
+  <xs:complexType name="ProductType">
+    <xs:sequence>
+      <xs:element ref="name" />
+      <xs:element ref="size" minOccurs="0" />
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>

@@ -1,0 +1,10 @@
+<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<!-- Example 18-7 Redefining an attribute group as a superset -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:redefine schemaLocation="prod1.xsd">
+    <xs:attributeGroup name="IdentifierGroup">
+      <xs:attributeGroup ref="IdentifierGroup" />
+      <xs:attribute name="effDate" type="xs:date" />
+    </xs:attributeGroup>
+  </xs:redefine>
+</xs:schema>

@@ -1,0 +1,12 @@
+<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<!-- Example 8-9 Applying the enumeration facet -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:simpleType name="SMLXSizeType">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="small" />
+      <xs:enumeration value="medium" />
+      <xs:enumeration value="large" />
+      <xs:enumeration value="extra large" />
+    </xs:restriction>
+  </xs:simpleType>
+</xs:schema>

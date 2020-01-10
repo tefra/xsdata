@@ -40,7 +40,7 @@ class CodeWriter:
     ):
         engine = self.get_renderer(renderer)
         for file, output in engine.render(schema, classes, package):
-            print(output)
+            print(output, end="")
 
 
 writer = CodeWriter()

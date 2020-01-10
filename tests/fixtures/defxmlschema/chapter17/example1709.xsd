@@ -1,0 +1,15 @@
+<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<!-- Example 17-9 Prefixing names in the XPath expression -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:prod="http://datypic.com/prod" targetNamespace="http://datypic.com/prod">
+  <xs:element name="catalog" type="prod:CatalogType">
+    <xs:unique name="dateAndProdNumKey">
+      <xs:selector xpath="prod:department/prod:product" />
+      <xs:field xpath="prod:number" />
+      <xs:field xpath="@effDate" />
+    </xs:unique>
+  </xs:element>
+  <xs:element name="department" type="prod:DepartmentType" />
+  <xs:element name="product" type="prod:ProductType" />
+  <xs:element name="number" type="xs:integer" />
+  <!-- ... -->
+</xs:schema>

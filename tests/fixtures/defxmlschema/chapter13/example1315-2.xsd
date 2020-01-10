@@ -1,0 +1,8 @@
+<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<!-- Example 13-15 Eliminating meaningless groups -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:sequence>
+    <xs:element name="a" />
+    <xs:element name="b" />
+  </xs:sequence>
+</xs:schema>

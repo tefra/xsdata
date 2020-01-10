@@ -1,0 +1,19 @@
+<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<!-- Example 14-1 Assertions on simple and complex types -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:simpleType name="SizeType">
+    <xs:restriction base="xs:integer">
+      <xs:assertion test="$value != 0" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="ProductType">
+    <xs:sequence>
+      <xs:element name="number" type="xs:integer" />
+      <xs:element name="name" type="xs:string" />
+      <xs:element name="size" type="SizeType" />
+    </xs:sequence>
+    <xs:attribute name="dept" type="xs:string" />
+    <xs:assert test="" "(@dept="ACC" and="" number="">500) or
+                   (number &lt; 300)"/></xs:assert>
+  </xs:complexType>
+</xs:schema>

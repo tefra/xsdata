@@ -1,0 +1,15 @@
+<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<!-- Example 10-16 Defining a list of a string-based type -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:simpleType name="AvailableSizesType">
+    <xs:list itemType="SMLXSizeType" />
+  </xs:simpleType>
+  <xs:simpleType name="SMLXSizeType">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="small" />
+      <xs:enumeration value="medium" />
+      <xs:enumeration value="large" />
+      <xs:enumeration value="extra large" />
+    </xs:restriction>
+  </xs:simpleType>
+</xs:schema>

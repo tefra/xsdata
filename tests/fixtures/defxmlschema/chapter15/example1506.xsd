@@ -1,0 +1,10 @@
+<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<!-- Example 15-6 Group with an all model group -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:group name="DescriptionGroup">
+    <xs:all>
+      <xs:element name="description" type="xs:string" />
+      <xs:element name="comment" type="xs:string" minOccurs="0" />
+    </xs:all>
+  </xs:group>
+</xs:schema>

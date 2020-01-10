@@ -1,0 +1,12 @@
+<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<!-- Example 7-4 Qualified and unqualified attribute names -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://datypic.com/prod" targetNamespace="http://datypic.com/prod">
+  <xs:attribute name="global" type="xs:string" />
+  <xs:element name="size" type="SizeType" />
+  <xs:complexType name="SizeType">
+    <xs:attribute ref="global" />
+    <xs:attribute name="unqual" form="unqualified" />
+    <xs:attribute name="qual" form="qualified" />
+    <xs:attribute name="unspec" />
+  </xs:complexType>
+</xs:schema>

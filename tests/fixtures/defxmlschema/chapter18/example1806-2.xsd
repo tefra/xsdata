@@ -1,0 +1,10 @@
+<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<!-- Example 18-6 Redefining an attribute group as a subset -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:redefine schemaLocation="prod1.xsd">
+    <xs:attributeGroup name="IdentifierGroup">
+      <xs:attribute name="id" type="xs:ID" use="required" />
+      <xs:attribute name="version" type="xs:integer" />
+    </xs:attributeGroup>
+  </xs:redefine>
+</xs:schema>

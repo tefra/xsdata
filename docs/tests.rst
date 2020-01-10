@@ -1,0 +1,8 @@
+Tests
+=============
+
+
+.. toctree::
+    :glob:
+
+    tests/*/*

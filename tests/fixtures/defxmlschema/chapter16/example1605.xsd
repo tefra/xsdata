@@ -1,0 +1,10 @@
+<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<!-- Example 16-5 A member of two substitution groups -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="product" type="ProductType" />
+  <xs:element name="discontinuedProduct" type="ProductType" />
+  <xs:element name="hat" type="HatType" substitutionGroup="product" />
+  <xs:element name="shirt" type="ShirtType" substitutionGroup="product" />
+  <xs:element name="umbrella" type="UmbrellaType" substitutionGroup="product discontinuedProduct" />
+  <!-- ... -->
+</xs:schema>

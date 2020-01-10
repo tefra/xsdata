@@ -123,9 +123,12 @@ class ClassBuilder:
         schema or missing implementation.
         """
         forward_ref = False
-        if self.has_inner_type(obj):
+        if self.has_anonymous_class(obj):
             forward_ref = True
             self.build_inner_class(parent, obj)
+        elif self.has_anonymous_enumeration(obj):
+            forward_ref = True
+            self.build_inner_enumeration(parent, obj)
 
         if not obj.real_type:
             raise ValueError(f"Failed to detect type for element: {obj}")
@@ -145,29 +148,40 @@ class ClassBuilder:
         )
 
     def build_inner_class(self, parent: Class, obj: AttributeElement):
-        """
-        Build a class from an Element complex type and append it to the parent
-        inner class list.
-
-        Assign the element name to the complex type name and to the
-        element type.
-        """
+        """Build a class from an anonymous complex type inside an element."""
         if isinstance(obj, Element) and obj.complex_type:
             obj.complex_type.name = obj.type = obj.name
             parent.inner.append(self.build_class(obj.complex_type, inner=True))
 
-    @staticmethod
-    def has_inner_type(obj: AttributeElement) -> bool:
-        """
-        Detect and return if an element instance has inner reference to a
-        complex type.
+    def build_inner_enumeration(self, parent: Class, obj: AttributeElement):
+        """Build an enumeration class from an anonymous restriction with
+        enumeration facet."""
+        if isinstance(obj, (Element, Attribute)) and obj.simple_type:
+            obj.simple_type.name = obj.name
+            parent.inner.append(self.build_class(obj.simple_type, inner=True))
 
-        Generate and append the inner class to the parent class.
-        """
+            obj.type = obj.simple_type.name
+            obj.simple_type = None
+
+    @staticmethod
+    def has_anonymous_class(obj: AttributeElement) -> bool:
+        """Check if the attribute element contains anonymous complex type."""
         return (
             isinstance(obj, Element)
             and obj.real_type is None
             and obj.complex_type is not None
+        )
+
+    @staticmethod
+    def has_anonymous_enumeration(obj: AttributeElement) -> bool:
+        """Check if the attribute element contains anonymous restriction with
+        enumeration facet."""
+        return (
+            isinstance(obj, (Attribute, Element))
+            and obj.type is None
+            and obj.simple_type is not None
+            and obj.simple_type.restriction is not None
+            and len(obj.simple_type.restriction.enumerations) > 0
         )
 
     @staticmethod

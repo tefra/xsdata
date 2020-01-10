@@ -35,9 +35,10 @@ class {{ obj.name }}{{"({})".format(obj.extensions|join(', ', attribute="name"))
     )
 {%- endfor -%}
 {%- for inner in obj.inner %}
+    {%- set tpl = "enum.jinja2" if inner.is_enumeration else "class.jinja2" -%}
     {%- filter indent(4) -%}
         {%- with obj=inner, namespace=obj.namespace or namespace, level=level + 1 -%}
-            {% include "class.jinja2" %}
+            {% include tpl %}
         {%- endwith -%}
     {%- endfilter -%}
 {%- endfor -%}

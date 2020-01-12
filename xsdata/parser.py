@@ -7,7 +7,7 @@ from lxml import etree
 
 from xsdata.models import elements
 from xsdata.models.elements import Attribute, Choice, Element, Schema
-from xsdata.models.enums import EventType, FormType, TagType
+from xsdata.models.enums import EventType, FormType, TagType, XSDType
 from xsdata.models.mixins import BaseModel
 from xsdata.utils.text import snake_case
 
@@ -145,9 +145,14 @@ class SchemaParser:
         else:
             plural_name = "{}s".format(name)
             if hasattr(parent, plural_name):
-                children = getattr(parent, plural_name)
-                if type(children) == list:
-                    return children.append(element)
+                siblings = getattr(parent, plural_name)
+                if type(siblings) == list:
+                    if getattr(element, "type", "") == XSDType.ID.code:
+                        for sibling in siblings:
+                            if getattr(sibling, "type", "") == XSDType.ID.code:
+                                raise ValueError(f"Duplicated ID: `{element}`")
+
+                    return siblings.append(element)
 
         raise ValueError(
             "Class {} missing attribute `{}`".format(

@@ -20,7 +20,7 @@ class CodeWriter:
     def register_generator(self, name, renderer: AbstractGenerator):
         self.generators[name] = renderer
 
-    def get_renderer(self, name):
+    def get_renderer(self, name) -> AbstractGenerator:
         if name in self.generators:
             return self.generators[name]
         raise ValueError(f"{name} is not a valid {AbstractGenerator.__name__}")

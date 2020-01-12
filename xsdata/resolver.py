@@ -140,16 +140,9 @@ class DependenciesResolver:
             * Filter the standard xsd types
         """
         deps: Set[str] = set()
-        attr_names: List[str] = []
         for attr in obj.attrs:
             if not attr.forward_ref:
                 deps.update(list(attr.types))
-
-            if attr.name in attr_names:
-                raise ValueError(
-                    f"Duplicate class attribute `{obj.name}:{attr.name}`"
-                )
-            attr_names.append(attr.name)
 
         deps.update(ext.name for ext in obj.extensions)
         for inner in obj.inner:

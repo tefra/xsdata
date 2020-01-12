@@ -7,4 +7,7 @@
       <xs:element name="comment" type="xs:string" minOccurs="0" />
     </xs:all>
   </xs:group>
+  <xs:complexType name="DescriptionGroup">
+    <xs:group ref="DescriptionGroup" />
+  </xs:complexType>
 </xs:schema>

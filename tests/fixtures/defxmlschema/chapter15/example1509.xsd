@@ -7,4 +7,7 @@
     <xs:attribute ref="id" use="required" />
     <xs:attribute ref="version" />
   </xs:attributeGroup>
+  <xs:complexType name="IdentifierGroup">
+    <xs:attributeGroup ref="IdentifierGroup" />
+  </xs:complexType>
 </xs:schema>

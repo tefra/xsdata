@@ -7,8 +7,14 @@
       <xs:element name="name" type="xs:string" />
       <xs:all>
         <xs:element name="size" type="SizeType" minOccurs="0" />
-        <xs:element name="color" type="ColorType" minOccurs="0" />
+        <xs:element name="color" type="xs:string" minOccurs="0" />
       </xs:all>
     </xs:sequence>
   </xs:complexType>
+  <xs:simpleType name="SizeType">
+    <xs:restriction base="xs:integer">
+      <xs:minInclusive value="2" />
+      <xs:maxInclusive value="18" />
+    </xs:restriction>
+  </xs:simpleType>
 </xs:schema>

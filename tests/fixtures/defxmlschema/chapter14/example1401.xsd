@@ -3,6 +3,7 @@
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
   <xs:simpleType name="SizeType">
     <xs:restriction base="xs:integer">
+      <!-- SKIPTEST: XML Schema 1.1 -->
       <xs:assertion test="$value != 0" />
     </xs:restriction>
   </xs:simpleType>
@@ -15,5 +16,6 @@
     <xs:attribute name="dept" type="xs:string" />
     <xs:assert test="" "(@dept="ACC" and="" number="">500) or
                    (number &lt; 300)"/></xs:assert>
+    <!-- SKIPTEST: XML Schema 1.1 -->
   </xs:complexType>
 </xs:schema>

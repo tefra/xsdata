@@ -1,0 +1,5 @@
+<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<!-- Example 4-5 Multiple imports of the same namespace -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://datypic.com/ord" targetNamespace="http://datypic.com/ord">
+  <xs:element name="orderSummary" />
+</xs:schema>

@@ -1,0 +1,13 @@
+<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<!-- Example 21-10 Different namespaces in a schema -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:prod="http://datypic.com/prod" xmlns:cust="http://datypic.com/cust" xmlns="http://datypic.com/ord" targetNamespace="http://datypic.com/ord" elementFormDefault="qualified">
+  <xs:import schemaLocation="example21102.xsd" namespace="http://datypic.com/prod" />
+  <xs:import schemaLocation="example21103.xsd" namespace="http://datypic.com/cust" />
+  <xs:element name="order" type="OrderType" />
+  <xs:complexType name="OrderType">
+    <xs:sequence>
+      <xs:element name="customer" type="cust:CustomerType" />
+      <xs:element name="items" type="prod:ItemsType" />
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>

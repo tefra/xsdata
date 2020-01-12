@@ -5,8 +5,8 @@
     <xs:sequence>
       <xs:element name="number" type="xs:integer" />
       <xs:choice minOccurs="0" maxOccurs="3">
-        <xs:element name="size" type="SizeType" />
-        <xs:element name="color" type="ColorType" />
+        <xs:element name="size" type="xs:int" />
+        <xs:element name="color" type="xs:string" />
       </xs:choice>
       <xs:any namespace="##other" />
     </xs:sequence>

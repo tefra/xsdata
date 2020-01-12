@@ -6,8 +6,8 @@
       <xs:element name="number" type="xs:integer" />
       <xs:element name="name" type="xs:string" />
       <xs:choice minOccurs="0" maxOccurs="unbounded">
-        <xs:element name="size" type="SizeType" />
-        <xs:element name="color" type="ColorType" />
+        <xs:element name="size" type="xs:int" />
+        <xs:element name="color" type="xs:string" />
       </xs:choice>
     </xs:sequence>
   </xs:complexType>

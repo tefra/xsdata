@@ -1,0 +1,8 @@
+<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<!-- Example 4-1 Include -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://datypic.com/ord" targetNamespace="http://datypic.com/ord">
+  <xs:simpleType name="OrderNumType">
+    <xs:restriction base="xs:string" />
+  </xs:simpleType>
+  <xs:element name="OrderNumType" type="OrderNumType" />
+</xs:schema>

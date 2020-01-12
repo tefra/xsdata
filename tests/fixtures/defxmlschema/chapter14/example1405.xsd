@@ -3,6 +3,7 @@
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
   <xs:simpleType name="SizeType">
     <xs:restriction base="xs:integer">
+      <!-- SKIPTEST: XML Schema 1.1 -->
       <xs:assertion 12="" test="" "($value="" &lt;="" or="" $value="">50)
                         and $value != 0"/></xs:assertion>
     </xs:restriction>

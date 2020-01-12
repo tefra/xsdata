@@ -1,0 +1,16 @@
+<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<!-- Example 18-12 Overriding named groups -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:override schemaLocation="prod1.xsd">
+    <!-- SKIPTEST: XML Schema 1.1. -->
+    <xs:group name="DescriptionGroup">
+      <xs:sequence>
+        <xs:element name="description" type="xs:string" />
+      </xs:sequence>
+    </xs:group>
+    <xs:attributeGroup name="IdentifierGroup">
+      <xs:attribute name="effDate" type="xs:date" />
+      <xs:attribute name="id" type="xs:ID" />
+    </xs:attributeGroup>
+  </xs:override>
+</xs:schema>

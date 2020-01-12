@@ -3,10 +3,12 @@
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
   <xs:attributeGroup name="HeaderGroup">
     <xs:attributeGroup ref="IdentifierGroup" />
-    <xs:attribute ref="xml:lang" />
   </xs:attributeGroup>
   <xs:attributeGroup name="IdentifierGroup">
     <xs:attribute name="id" type="xs:ID" use="required" />
     <xs:attribute name="version" type="xs:decimal" />
   </xs:attributeGroup>
+  <xs:complexType name="HeaderGroup">
+    <xs:attributeGroup ref="HeaderGroup" />
+  </xs:complexType>
 </xs:schema>

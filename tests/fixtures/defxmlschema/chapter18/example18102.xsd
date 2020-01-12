@@ -1,0 +1,14 @@
+<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<!-- Example 18-10 Overriding a complex type -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:override schemaLocation="prod1.xsd">
+    <!-- SKIPTEST: XML Schema 1.1. -->
+    <xs:complexType name="ProductType">
+      <xs:sequence>
+        <xs:element name="number" type="xs:string" />
+        <xs:element name="name" type="xs:string" />
+        <xs:element name="color" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:override>
+</xs:schema>

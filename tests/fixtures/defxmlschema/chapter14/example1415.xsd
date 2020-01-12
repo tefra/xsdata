@@ -9,6 +9,7 @@
     <xs:attribute name="dept" type="xs:string" />
     <xs:assert test="" "(@dept="ACC" and="" number="">500) or
                    (number &lt; 300)"/></xs:assert>
+    <!-- SKIPTEST: XML Schema 1.1 -->
     <xs:complexType name="ExtendedProductType">
       <xs:complexContent>
         <xs:extension base="ProductType">

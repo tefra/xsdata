@@ -1,5 +1,0 @@
-<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
-<!-- Example 13-18 Replacing a wildcard with another wildcard -->
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
-  <xs:any namespace="urn:a:1" maxOccurs="1" />
-</xs:schema>

@@ -9,4 +9,7 @@
       <xs:element ref="comment" minOccurs="0" />
     </xs:sequence>
   </xs:group>
+  <xs:complexType name="DescriptionGroup">
+    <xs:group ref="DescriptionGroup" />
+  </xs:complexType>
 </xs:schema>

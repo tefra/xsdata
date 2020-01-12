@@ -1,9 +1,12 @@
 <!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
 <!-- Example 8-17 Simple type assertion -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:include schemaLocation="example0814.xsd" />
   <xs:simpleType name="EvenDressSizeType">
     <xs:restriction base="DressSizeType">
+      <!-- SKIPTEST: XML Schema 1.1 -->
       <xs:assertion test="$value mod 2 = 0" />
+      <!-- SKIPTEST: XML Schema 1.1 -->
     </xs:restriction>
   </xs:simpleType>
 </xs:schema>

@@ -6,4 +6,7 @@
     <xs:attribute name="version" type="xs:decimal" />
     <xs:anyAttribute namespace="##other" />
   </xs:attributeGroup>
+  <xs:complexType name="IdentifierGroup">
+    <xs:attributeGroup ref="IdentifierGroup" />
+  </xs:complexType>
 </xs:schema>

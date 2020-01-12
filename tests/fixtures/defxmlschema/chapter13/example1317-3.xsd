@@ -1,9 +1,0 @@
-<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
-<!-- Example 13-17 Replacing a wildcard with element declarations -->
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
-  <xs:sequence>
-    <xs:element name="a" />
-    <xs:element ref="b" />
-    <xs:element name="c" />
-  </xs:sequence>
-</xs:schema>

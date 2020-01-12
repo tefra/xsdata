@@ -8,4 +8,10 @@
       <xs:element name="name" type="xs:string" />
     </xs:sequence>
   </xs:complexType>
+  <xs:group name="DescriptionGroup">
+    <xs:sequence>
+      <xs:element name="description" type="xs:string" />
+      <xs:element name="comment" type="xs:string" minOccurs="0" />
+    </xs:sequence>
+  </xs:group>
 </xs:schema>

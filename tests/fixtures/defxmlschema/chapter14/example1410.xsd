@@ -6,6 +6,7 @@
       <xs:simpleType>
         <xs:list itemType="xs:integer" />
       </xs:simpleType>
+      <!-- SKIPTEST: XML Schema 1.1 -->
       <xs:assertion test="$value[1] = 0" />
     </xs:restriction>
   </xs:simpleType>

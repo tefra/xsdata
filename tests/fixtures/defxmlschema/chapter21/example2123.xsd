@@ -2,5 +2,5 @@
 <!-- Example 21-23 Non-native attributes -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:doc="http://datypic.com/doc" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://datypic.com/doc doc.xsd">
   <xs:element name="product" type="ProductType" doc:description="This element represents a product." />
-  <!-- ... -->
+  <!-- SKIPTEST: Incomplete fixture -->
 </xs:schema>

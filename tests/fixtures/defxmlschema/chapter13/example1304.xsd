@@ -18,4 +18,17 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
+  <xs:element name="product" type="ProductType" />
+  <xs:element name="shirt" type="ProductType" />
+  <xs:element name="hat" type="ProductType" />
+  <xs:element name="umbrella" type="ProductType" />
+  <xs:element name="sweater" type="ProductType" />
+  <xs:element name="suit" type="ProductType" />
+  <xs:complexType name="ProductType">
+    <xs:sequence>
+      <xs:element name="number" type="xs:integer" />
+      <xs:element name="name" type="xs:string" />
+      <xs:element name="size" type="xs:integer" />
+    </xs:sequence>
+  </xs:complexType>
 </xs:schema>

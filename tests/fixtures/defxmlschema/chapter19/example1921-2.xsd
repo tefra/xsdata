@@ -1,9 +1,0 @@
-<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
-<!-- Example 19-21 Implementing extensions for attributes using override -->
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
-  <xs:override schemaLocation="original.xsd">
-    <xs:attributeGroup name="attExt">
-      <xs:attribute name="myAttr" type="xs:NMTOKEN" />
-    </xs:attributeGroup>
-  </xs:override>
-</xs:schema>

@@ -7,11 +7,13 @@
         <xs:list>
           <xs:simpleType>
             <xs:restriction base="xs:integer">
+              <!-- SKIPTEST: XML Schema 1.1 -->
               <xs:assertion test="$value &lt; 12" />
             </xs:restriction>
           </xs:simpleType>
         </xs:list>
       </xs:simpleType>
+      <!-- SKIPTEST: XML Schema 1.1 -->
       <xs:assertion test="" "count($value)="">2"/></xs:assertion>
     </xs:restriction>
   </xs:simpleType>

@@ -12,7 +12,7 @@
       <xs:extension base="DescribedType">
         <xs:sequence>
           <xs:element ref="items" />
-          <!-- ... -->
+          <!-- SKIPTEST: Incomplete fixture -->
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>
@@ -22,7 +22,7 @@
       <xs:extension base="DescribedType">
         <xs:sequence>
           <xs:element ref="product" maxOccurs="unbounded" />
-          <!-- ... -->
+          <!-- SKIPTEST: Incomplete fixture -->
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>

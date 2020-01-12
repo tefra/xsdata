@@ -1,0 +1,14 @@
+<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<!-- Example 18-1 A simple redefinition -->
+<!-- SKIPTEST -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://datypic.com/prod" targetNamespace="http://datypic.com/prod">
+  <xs:redefine schemaLocation="prod1.xsd">
+    <xs:simpleType name="DressSizeType">
+      <xs:restriction base="DressSizeType">
+        <xs:minInclusive value="2" />
+        <xs:maxInclusive value="16" />
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:redefine>
+  <xs:element name="newSize" type="DressSizeType" />
+</xs:schema>

@@ -11,5 +11,5 @@
   <xs:element name="discontinuedProductList" type="CatalogType">
     <xs:unique ref="dateAndProdNumKey" />
   </xs:element>
-  <!-- ... -->
+  <!-- SKIPTEST: Incomplete fixture -->
 </xs:schema>

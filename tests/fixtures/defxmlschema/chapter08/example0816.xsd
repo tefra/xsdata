@@ -6,4 +6,5 @@
       <xs:pattern value="\d{1,3}" />
     </xs:restriction>
   </xs:simpleType>
+  <xs:element name="LongerDressSize" type="LongerDressSizeType" />
 </xs:schema>

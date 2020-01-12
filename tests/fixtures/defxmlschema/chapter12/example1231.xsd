@@ -4,7 +4,7 @@
   <xs:attribute name="effDate" type="xs:date" default="1900-01-01" />
   <xs:complexType name="ProductType">
     <xs:sequence>
-      <!-- ... -->
+      <!-- SKIPTEST: Incomplete fixture -->
     </xs:sequence>
     <xs:attribute ref="effDate" default="2000-12-31" />
   </xs:complexType>

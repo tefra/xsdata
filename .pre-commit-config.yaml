@@ -1,3 +1,4 @@
+exclude: tests/fixtures|docs/examples
 repos:
   - repo: https://github.com/asottile/seed-isort-config
     rev: v1.9.4
@@ -12,7 +13,6 @@ repos:
     rev: 19.10b0
     hooks:
       - id: black
-        exclude: tests/fixtures|docs/examples
         args: ['--line-length=79']
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v2.4.0

@@ -7,9 +7,6 @@ class {{ obj.name }}{{"({})".format(obj.extensions|join(', ', attribute="name"))
 {%- if help %}
 {{ help|indent(4, first=True) }}
 {%- endif -%}
-{%- if obj.attrs|length == 0 and level > 0 %}
-    pass
-{%- endif -%}
 {%- if level == 0 and (obj.local_name != obj.name or obj.namespace) %}
     class Meta:
         {%- if obj.local_name != obj.name %}
@@ -18,7 +15,9 @@ class {{ obj.name }}{{"({})".format(obj.extensions|join(', ', attribute="name"))
         {%- if obj.namespace %}
         namespace = "{{ obj.namespace }}"
         {%- endif %}
-{% endif -%}
+{% elif obj.attrs|length == 0 and not help %}
+    pass
+{%- endif -%}
 {%- for attr in obj.attrs %}
     {%- set field_params = dict(
                   name=attr.local_name,

@@ -249,7 +249,9 @@ class ClassReducerTests(FactoryTestCase):
     def test_flatten_attribute(self, mock_find_common_type):
         mock_find_common_type.return_value = ClassFactory.create(
             name="bar",
-            attrs=AttrFactory.list(1, name="b", type="b", required=True),
+            attrs=AttrFactory.list(
+                1, name="b", type="b", required=True, min_occurs=2
+            ),
         )
 
         obj = AttrFactory.create(name="a", type="a", min_occurs=1)

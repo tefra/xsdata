@@ -150,7 +150,7 @@ class ClassReducer:
 
             attr.type = f"{attr.type} {type_name}" if append else type_name
             for key, value in restrictions.items():
-                if not hasattr(attr, key):
+                if getattr(attr, key) is None:
                     setattr(attr, key, value)
             append = True
 

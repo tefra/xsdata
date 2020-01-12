@@ -9,7 +9,9 @@ from click.testing import CliRunner
 from jinja2 import Template
 
 from xsdata import cli
+from xsdata.formats.dataclass.generator import DataclassGenerator
 from xsdata.reducer import reducer
+from xsdata.writer import writer
 
 runner = CliRunner()
 
@@ -27,33 +29,60 @@ class Documentation:
 
 
 docs: Dict[str, List[Documentation]] = defaultdict(list)
+schemas = sorted([xsd for xsd in fixtures.glob("defxmlschema/*/*.xsd")])
+
+skipped = 0
+passed = 0
 
 
-@pytest.mark.parametrize(
-    "fixture",
-    [
-        pytest.param(fixture)
-        for fixture in fixtures.glob("defxmlschema/*/*.xsd")
-    ],
-    ids=lambda x: x.name,
-)
+@pytest.mark.parametrize("fixture", schemas, ids=lambda x: x.name)
 def test_generation(fixture: Path):
+    global passed, skipped
 
-    reducer.common_types.clear()
+    package = ".".join(fixture.relative_to(fixtures).parent.parts)
+    source = fixture.read_text()
+    should_fail = is_illegal_definition(source)
+    skip_message = parse_skip_message(source)
+
     result = runner.invoke(
-        cli,
-        [str(fixture), "--package=test", "--print"],
-        catch_exceptions=False,
+        cli, [str(fixture), f"--package=tests.fixtures.{package}"]
     )
 
-    expected = fixture.with_suffix(".py")
-    if expected.exists():
-        assert result.output == expected.read_text()
-        assert len(result.output.strip()) > 0
-    else:
-        expected.write_text(result.output)
+    if skip_message:
+        skipped += 1
+        pytest.skip(skip_message)
 
+    if should_fail:
+        if result.exception is None:
+            pytest.fail(f"Illegal definition: Should have failed!")
+        return
+
+    if result.exception is not None:
+        raise result.exception
+
+    expected = fixture.with_suffix(".py")
+    output = expected.read_text().strip() if expected.exists() else ""
+
+    if len(output) == 0 and len(fixture.name) > 15:
+        pytest.skip("Assisting schema")
+
+    assert len(output.strip()) > 0
     log_output(fixture, expected)
+    passed += 1
+
+
+def is_illegal_definition(source):
+    return source.find("llegal") > -1
+
+
+def parse_skip_message(source):
+    skip_message = None
+    skip = source.find("<!-- SKIPTEST")
+    if skip > -1:
+        skipend = source.find("-->", skip)
+        msg = source[skip + 13 : skipend].strip()
+        skip_message = msg if msg else "Unsupported feature!"
+    return skip_message
 
 
 def log_output(xsd: Path, expected: Path):
@@ -75,10 +104,27 @@ def log_output(xsd: Path, expected: Path):
     )
 
 
+def teardown_function():
+    reducer.common_types.clear()
+    writer.register_generator("pydata", DataclassGenerator())
+
+
 def teardown_module():
+
+    fixtures.joinpath("defxmlschema/results.rst").write_text(
+        ", ".join(
+            [
+                f"Total tests: **{passed + skipped}**",
+                f"Passed: **{passed}**",
+                f"Skipped: **{skipped}**",
+            ]
+        )
+    )
+
     for suite, items in docs.items():
         template = Template(
-            here.joinpath(f"fixtures/{suite}/../output.jinja2").read_text()
+            here.joinpath(f"fixtures/{suite}/../output.jinja2").read_text(),
+            keep_trailing_newline=True,
         )
         output = template.render(suite=suite, items=items)
 

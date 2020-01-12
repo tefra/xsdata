@@ -14,3 +14,10 @@ for xsd in files:
         lines.append(root_end)
 
         xsd.write_text("\n".join(lines))
+
+    if "-" in xsd.name:
+        name = xsd.name.replace("-", "")
+        dir = xsd.parent
+        new_path = dir.joinpath(name)
+
+        xsd.rename(new_path)

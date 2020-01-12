@@ -1,6 +1,7 @@
 <!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
 <!-- Example 12-19 A choice group -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:include schemaLocation="../chapter16/example1607.xsd" />
   <xs:complexType name="ItemsType">
     <xs:choice>
       <xs:element name="shirt" type="ShirtType" />

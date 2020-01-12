@@ -1,0 +1,11 @@
+<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<!-- Example 4-1 Include -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://datypic.com/ord" targetNamespace="http://datypic.com/ord">
+  <xs:include schemaLocation="example04012.xsd" />
+  <xs:element name="order" type="OrderType" />
+  <xs:complexType name="OrderType">
+    <xs:sequence>
+      <xs:element name="number" type="OrderNumType" />
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>

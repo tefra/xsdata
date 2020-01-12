@@ -4,6 +4,7 @@
   <xs:simpleType name="SMLXSizeType">
     <xs:restriction base="xs:token">
       <saxon:preprocess action="upper-case($value)" />
+      <!-- SKIPTEST: XML Schema 1.1 -->
       <xs:enumeration value="SMALL" />
       <xs:enumeration value="MEDIUM" />
       <xs:enumeration value="LARGE" />

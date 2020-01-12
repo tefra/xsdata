@@ -1,8 +1,0 @@
-<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
-<!-- Example 13-19 Replacing a group with an element declaration -->
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
-  <xs:sequence>
-    <xs:element name="a" />
-    <xs:element name="b" minOccurs="0" />
-  </xs:sequence>
-</xs:schema>

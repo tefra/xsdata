@@ -15,5 +15,5 @@
   </xs:annotation>
   <xs:element name="order" type="OrderType" />
   <xs:element name="items" type="ItemsType" />
-  <!-- ... -->
+  <!-- SKIPTEST: Incomplete fixture -->
 </xs:schema>

@@ -6,6 +6,7 @@
       <xs:extension base="xs:integer">
         <xs:attribute name="system" type="xs:string" />
         <xs:assert 20="" test="" "if="" (@system="US" )="" then="" $value="" &lt;="" else="">= 20"/></xs:assert>
+        <!-- SKIPTEST: XML Schema 1.1 -->
       </xs:extension>
     </xs:simpleContent>
   </xs:complexType>

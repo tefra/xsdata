@@ -2,8 +2,11 @@
 <!-- Example 14-24 Using the error type with a test -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
   <xs:element name="product">
+    <!-- SKIPTEST: XML Schema 1.1 -->
     <xs:alternative test="not(@dept)" type="xs:error" />
+    <!-- SKIPTEST: XML Schema 1.1 -->
     <xs:alternative test="@dept='ACC'" type="AccessoryType" />
+    <!-- SKIPTEST: XML Schema 1.1 -->
     <xs:alternative test="@dept='WMN' or @dept='MEN'" type="ClothingType" />
   </xs:element>
 </xs:schema>

@@ -1,0 +1,17 @@
+<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<!-- Example 13-26 Restricting open content -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:complexType name="IllegalDerivedType">
+    <xs:complexContent>
+      <xs:restriction base="BaseType">
+        <xs:openContent mode="interleave">
+          <!-- SKIPTEST: XML Schema 1.1 -->
+          <xs:any namespace="##any" />
+        </xs:openContent>
+        <xs:sequence>
+          <xs:element name="a" type="xs:string" minOccurs="0" />
+        </xs:sequence>
+      </xs:restriction>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:schema>

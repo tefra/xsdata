@@ -1,5 +1,6 @@
 <!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
 <!-- Example 17-7 Defining a key reference on product number -->
+<!-- SKIPTEST -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
   <xs:element name="order" type="OrderType">
     <xs:keyref name="prodNumKeyRef" refer="prodNumKey">

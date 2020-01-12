@@ -12,11 +12,11 @@
           world.</doc:definition>
         <doc:keyword>geopolitical entity</doc:keyword>
         <doc:keyword>country</doc:keyword>
-        <!-- ... -->
+        <!-- SKIPTEST: Incomplete fixture -->
       </xs:documentation>
     </xs:annotation>
     <xs:restriction base="xs:token">
-      <!-- ... -->
+      <!-- SKIPTEST: Incomplete fixture -->
     </xs:restriction>
   </xs:simpleType>
 </xs:schema>

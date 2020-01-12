@@ -1,9 +1,0 @@
-<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
-<!-- Example 13-25 Replacing a choice group with a sequence group -->
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
-  <xs:choice maxOccurs="2">
-    <xs:element name="a" />
-    <xs:element name="b" />
-    <xs:element name="c" />
-  </xs:choice>
-</xs:schema>

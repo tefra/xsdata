@@ -23,5 +23,5 @@
       </xs:restriction>
     </xs:complexContent>
   </xs:complexType>
-  <!-- ... -->
+  <!-- SKIPTEST: Incomplete fixture -->
 </xs:schema>

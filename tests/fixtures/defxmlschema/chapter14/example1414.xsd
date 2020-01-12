@@ -14,5 +14,6 @@
                    else if (@dept = 'MEN')
                    then number &lt; 200
                    else false()"/></xs:assert>
+    <!-- SKIPTEST: XML Schema 1.1 -->
   </xs:complexType>
 </xs:schema>

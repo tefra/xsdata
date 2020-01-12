@@ -11,5 +11,5 @@
   <xs:element name="department" type="prod:DepartmentType" />
   <xs:element name="product" type="prod:ProductType" />
   <xs:element name="number" type="xs:integer" />
-  <!-- ... -->
+  <!-- SKIPTEST: Incomplete fixture -->
 </xs:schema>

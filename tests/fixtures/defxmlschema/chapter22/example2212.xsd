@@ -1,6 +1,0 @@
-<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
-<!-- Example 22-12 Extension using substitution groups -->
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
-  <xs:element name="sweater" substitutionGroup="otherProduct" />
-  <xs:element name="suit" substitutionGroup="otherProduct" />
-</xs:schema>

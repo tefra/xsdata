@@ -1,6 +1,7 @@
 <!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
 <!-- Example 10-10 Length facet applied to a list -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:import schemaLocation="../chapter08/example0810.xsd" />
   <xs:simpleType name="AvailableSizesType">
     <xs:restriction>
       <xs:simpleType>
@@ -9,4 +10,5 @@
       <xs:maxLength value="3" />
     </xs:restriction>
   </xs:simpleType>
+  <xs:element name="AvailableSizesType" type="AvailableSizesType" />
 </xs:schema>

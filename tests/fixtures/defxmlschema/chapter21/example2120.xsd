@@ -15,7 +15,7 @@
       </xs:documentation>
     </xs:annotation>
     <xs:restriction base="xs:token">
-      <!-- ... -->
+      <!-- SKIPTEST: Incomplete fixture -->
     </xs:restriction>
   </xs:simpleType>
 </xs:schema>

@@ -11,6 +11,7 @@
   <xs:complexType name="RestrictedSizeType">
     <xs:simpleContent>
       <xs:restriction base="SizeType">
+        <!-- SKIPTEST: XML Schema 1.1 -->
         <xs:assertion test="$value != 0" />
       </xs:restriction>
     </xs:simpleContent>

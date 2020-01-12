@@ -5,6 +5,7 @@
   <xs:complexType name="WorkTitlesType">
     <xs:sequence>
       <xs:element name="title" maxOccurs="unbounded" type="TitleType">
+        <!-- SKIPTEST: XML Schema 1.1 -->
         <xs:alternative test="@language='en'" type="EnglishTitleType" />
       </xs:element>
     </xs:sequence>

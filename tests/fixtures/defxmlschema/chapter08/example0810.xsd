@@ -1,6 +1,7 @@
 <!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
 <!-- Example 8-10 Restricting an enumeration -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:include schemaLocation="example0809.xsd" />
   <xs:simpleType name="SMLSizeType">
     <xs:restriction base="SMLXSizeType">
       <xs:enumeration value="small" />

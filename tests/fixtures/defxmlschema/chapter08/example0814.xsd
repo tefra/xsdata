@@ -8,4 +8,5 @@
       <xs:pattern value="\d{1,2}" />
     </xs:restriction>
   </xs:simpleType>
+  <xs:element name="DressSizeType" type="DressSizeType" />
 </xs:schema>

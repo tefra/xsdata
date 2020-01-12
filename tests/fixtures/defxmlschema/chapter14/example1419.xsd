@@ -12,5 +12,6 @@
     <xs:assert test="" "(@dept="ACC" and="" number="">
       <xs:assert test="if (@dept = 'ACC')                      then not(size)                      else true()" />
     </xs:assert>
+    <!-- SKIPTEST: XML Schema 1.1 -->
   </xs:complexType>
 </xs:schema>

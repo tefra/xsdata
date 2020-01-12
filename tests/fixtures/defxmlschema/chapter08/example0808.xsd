@@ -16,4 +16,5 @@
       </xs:simpleType>
     </xs:union>
   </xs:simpleType>
+  <xs:element name="DressSize" type="DressSizeType" />
 </xs:schema>

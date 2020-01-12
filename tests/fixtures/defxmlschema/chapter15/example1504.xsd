@@ -7,8 +7,6 @@
         <xs:element name="description" type="xs:string" />
         <xs:element name="comment" type="xs:string" minOccurs="0" />
       </xs:sequence>
-      <xs:element ref="items" />
-      <!-- ... -->
     </xs:sequence>
   </xs:complexType>
 </xs:schema>

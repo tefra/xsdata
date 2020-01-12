@@ -5,7 +5,7 @@
     <xs:sequence>
       <xs:element name="number" type="xs:integer" />
       <xs:element name="name" type="xs:string" />
-      <xs:element name="size" type="SizeType" />
+      <xs:element name="size" type="xs:integer" />
     </xs:sequence>
   </xs:complexType>
   <xs:element name="product" type="ProductType" />

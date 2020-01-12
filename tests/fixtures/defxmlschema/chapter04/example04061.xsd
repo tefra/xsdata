@@ -1,0 +1,13 @@
+<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<!-- Example 4-6 Proxy schema to avoid multiple imports -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://datypic.com/root" xmlns:ord="http://datypic.com/ord" targetNamespace="http://datypic.com/root">
+  <xs:import namespace="http://datypic.com/ord" schemaLocation="Orders.xsd" />
+  <xs:element name="root" type="RootType" />
+  <xs:complexType name="RootType">
+    <xs:sequence>
+      <xs:element ref="ord:orderSummary" />
+      <xs:element ref="ord:orderDetails" />
+      <!-- SKIPTEST: Incomplete fixture -->
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>

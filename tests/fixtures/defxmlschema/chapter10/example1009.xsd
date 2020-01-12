@@ -11,4 +11,5 @@
       </xs:simpleType>
     </xs:list>
   </xs:simpleType>
+  <xs:element name="AvailableSizesType" type="AvailableSizesType" />
 </xs:schema>

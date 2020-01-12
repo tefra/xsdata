@@ -1,0 +1,11 @@
+<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<!-- Example 15-17 Named groups across namespaces -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" xmlns="http://datypic.com/ord" xmlns:prod="http://datypic.com/prod" targetNamespace="http://datypic.com/ord">
+  <xs:import namespace="http://datypic.com/prod" schemaLocation="example15172.xsd" />
+  <xs:complexType name="PurchaseOrderType">
+    <xs:sequence>
+      <xs:group ref="prod:DescriptionGroup" minOccurs="0" />
+    </xs:sequence>
+    <xs:attributeGroup ref="prod:IdentifierGroup" />
+  </xs:complexType>
+</xs:schema>

@@ -18,4 +18,5 @@
       </xs:simpleType>
     </xs:union>
   </xs:simpleType>
+  <xs:element name="Size" type="SizeType" />
 </xs:schema>

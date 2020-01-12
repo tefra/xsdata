@@ -7,13 +7,13 @@
   </xs:attributeGroup>
   <xs:complexType name="ProductType">
     <xs:sequence>
-      <!-- ... -->
+      <!-- SKIPTEST: Incomplete fixture -->
     </xs:sequence>
     <xs:attribute name="dept" type="xs:string" />
   </xs:complexType>
   <xs:complexType name="CatalogType" defaultAttributesApply="false">
     <xs:sequence>
-      <!-- ... -->
+      <!-- SKIPTEST: Incomplete fixture -->
     </xs:sequence>
     <xs:attribute name="catalogNumber" type="xs:integer" />
   </xs:complexType>

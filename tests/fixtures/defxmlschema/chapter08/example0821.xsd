@@ -7,4 +7,5 @@
       <xs:maxInclusive value="18" />
     </xs:restriction>
   </xs:simpleType>
+  <xs:element name="DressSize" type="DressSizeType" />
 </xs:schema>

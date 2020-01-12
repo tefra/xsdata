@@ -1,5 +1,6 @@
 <!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
 <!-- Example 8-22 Using an implementation-defined type -->
+<!-- SKIPTEST -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:ext="http://example.org/extensions">
   <xs:element name="anyOrdinalDate" type="ext:ordinalDate" />
   <xs:element name="recentOrdinalDate" type="OrdinalDateIn2011" />

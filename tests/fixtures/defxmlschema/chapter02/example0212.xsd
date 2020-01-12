@@ -3,5 +3,5 @@
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://datypic.com/ord" targetNamespace="http://datypic.com/ord">
   <xs:include schemaLocation="moreOrderInfo.xsd" />
   <xs:import namespace="http://datypic.com/prod" schemaLocation="productInfo.xsd" />
-  <!-- ... -->
+  <!-- SKIPTEST: Incomplete fixture -->
 </xs:schema>

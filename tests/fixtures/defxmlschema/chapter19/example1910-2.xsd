@@ -1,8 +1,0 @@
-<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
-<!-- Example 19-10 Attribute declarations -->
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
-  <xs:attribute name="id" type="xs:ID" use="required" />
-  <xs:attribute name="name" type="xs:normalizedString" use="optional" />
-  <xs:attribute name="type" type="xs:NMTOKEN" default="PR" />
-  <xs:attribute name="version" type="xs:NMTOKEN" fixed="A123" />
-</xs:schema>

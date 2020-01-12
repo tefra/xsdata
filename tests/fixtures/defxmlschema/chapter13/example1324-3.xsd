@@ -1,9 +1,0 @@
-<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
-<!-- Example 13-24 Replacing an all group with a sequence group -->
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
-  <xs:sequence>
-    <xs:element name="a" />
-    <xs:element name="b" />
-    <xs:element name="c" minOccurs="2" />
-  </xs:sequence>
-</xs:schema>

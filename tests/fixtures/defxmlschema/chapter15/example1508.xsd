@@ -5,4 +5,7 @@
     <xs:attribute name="id" type="xs:ID" use="required" />
     <xs:attribute name="version" type="xs:decimal" />
   </xs:attributeGroup>
+  <xs:complexType name="IdentifierGroup">
+    <xs:attributeGroup ref="IdentifierGroup" />
+  </xs:complexType>
 </xs:schema>

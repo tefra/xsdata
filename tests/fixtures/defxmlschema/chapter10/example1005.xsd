@@ -1,6 +1,7 @@
 <!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
 <!-- Example 10-5 A union of a union -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:import schemaLocation="example1001.xsd" />
   <xs:simpleType name="InternationalSizeType">
     <xs:union memberTypes="SizeType">
       <xs:simpleType>
@@ -11,4 +12,5 @@
       </xs:simpleType>
     </xs:union>
   </xs:simpleType>
+  <xs:element name="InternationalSizeType" type="InternationalSizeType" />
 </xs:schema>

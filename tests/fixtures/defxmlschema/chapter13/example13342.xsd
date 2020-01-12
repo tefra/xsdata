@@ -1,0 +1,16 @@
+<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<!-- Example 13-34 Restricting a type from another namespace with global declarations -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://datypic.com/ord" xmlns:prod="http://datypic.com/prod">
+  <xs:import namespace="http://datypic.com/prod" schemaLocation="example13341.xsd" />
+  <xs:complexType name="RestrictedProductType">
+    <xs:complexContent>
+      <xs:restriction base="prod:ProductType">
+        <xs:sequence>
+          <xs:element ref="prod:number" />
+          <xs:element ref="prod:name" />
+        </xs:sequence>
+        <xs:attribute ref="prod:dept" use="required" />
+      </xs:restriction>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:schema>

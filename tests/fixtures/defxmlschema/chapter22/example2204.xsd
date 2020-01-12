@@ -1,6 +1,0 @@
-<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
-<!-- Example 22-4 Schema for extensions -->
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://datypic.com/spc" targetNamespace="http://datypic.com/spc">
-  <xs:element name="giftWrap" type="xs:string" />
-  <xs:attribute name="points" type="xs:nonNegativeInteger" />
-</xs:schema>

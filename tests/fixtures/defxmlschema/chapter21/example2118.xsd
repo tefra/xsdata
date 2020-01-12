@@ -8,5 +8,5 @@
       </xs:documentation>
     </xs:annotation>
   </xs:element>
-  <!-- ... -->
+  <!-- SKIPTEST: Incomplete fixture -->
 </xs:schema>

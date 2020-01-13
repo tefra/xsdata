@@ -91,9 +91,9 @@ class SchemaParser:
                 if len(self.elements) > 0:
                     self.assign_to_parent(element)
 
-            method = getattr(self, "{}_{}".format(event, tag.value), None)
-            if method:
-                method(element, elem)
+            method_name = f"{event}_{tag.value}"
+            if hasattr(self, method_name):
+                getattr(self, method_name)(element, elem)
 
         return element
 
@@ -146,13 +146,12 @@ class SchemaParser:
             plural_name = "{}s".format(name)
             if hasattr(parent, plural_name):
                 siblings = getattr(parent, plural_name)
-                if type(siblings) == list:
-                    if getattr(element, "type", "") == XSDType.ID.code:
-                        for sibling in siblings:
-                            if getattr(sibling, "type", "") == XSDType.ID.code:
-                                raise ValueError(f"Duplicated ID: `{element}`")
+                if getattr(element, "type", "") == XSDType.ID.code:
+                    for sibling in siblings:
+                        if getattr(sibling, "type", "") == XSDType.ID.code:
+                            raise ValueError(f"Duplicated ID: `{element}`")
 
-                    return siblings.append(element)
+                return siblings.append(element)
 
         raise ValueError(
             "Class {} missing attribute `{}`".format(

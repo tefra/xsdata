@@ -35,9 +35,9 @@ stop_words = [
 ]
 
 
-def safe_snake(input: str) -> str:
-    if input.lower() in stop_words:
-        return f"{input}_value"
-    if input[0].isdigit():
-        return f"value_{input}"
-    return input
+def safe_snake(string: str) -> str:
+    if string.lower() in stop_words:
+        return f"{string}_value"
+    if string[0].isdigit():
+        return f"value_{string}"
+    return string

@@ -121,7 +121,7 @@ class XmlSerializer(AbstractSerializer, ModelInspect):
             elif f.is_attribute:
                 parent.set(f.local_name, self.render_value(value))
             else:
-                value = value if type(value) is list else [value]
+                value = value if isinstance(value, list) else [value]
                 if f.namespace:
                     qname = self.render_tag(f.local_name, f.namespace)
                 elif parent.prefix:

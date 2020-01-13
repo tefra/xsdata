@@ -38,7 +38,7 @@ class NamedField:
 
         lookup = getattr(self, "ref", None) or getattr(self, "name")
 
-        prefix, name = text.split(lookup or "")
+        prefix, _ = text.split(lookup or "")
         return self.nsmap.get(prefix)
 
 

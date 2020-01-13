@@ -1,0 +1,2 @@
+[bandit]
+tests: B410

@@ -1,37 +1,13 @@
-import os
+from pathlib import Path
 
-from setuptools import find_packages, setup
+from setuptools import setup
 
-here = os.path.abspath(os.path.dirname(__file__))
 
-meta = dict()  # type: dict
-with open(os.path.join(here, "xsdata", "version.py"), encoding="utf-8") as f:
-    exec(f.read(), meta)
+def get_version(rel_path):
+    for line in Path(rel_path).read_text().splitlines():
+        if line.startswith("__version__"):
+            return line.split('"')[1]
+    raise RuntimeError("Unable to find version string.")
 
-if __name__ == "__main__":
-    setup(
-        packages=find_packages(),
-        version=meta["version"],
-        include_package_data=True,
-        install_requires=[
-            "lxml",
-            "click",
-            "click_log",
-            "toposort",
-            "docformatter",
-            "jinja2",
-        ],
-        extras_require={
-            "dev": ["pre-commit", "pytest", "pytest-cov", "codecov", "tox"],
-            "docs": [
-                "sphinx",
-                "sphinx-autobuild",
-                "sphinx-material",
-                "sphinx-autodoc-typehints",
-                "sphinxcontrib-apidoc",
-                "sphinxcontrib-programoutput",
-                "sphinxcontrib-osexample",
-            ],
-        },
-        entry_points={"console_scripts": ["xsdata=xsdata:cli"]},
-    )
+
+setup(version=get_version("xsdata/__init__.py"))

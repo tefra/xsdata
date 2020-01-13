@@ -20,7 +20,8 @@ class ProcessTask:
 
     def process(self, xsd: Path, package: str):
         if xsd in self.processed:
-            return logger.debug(f"Circular import skipping: {xsd.name}")
+            logger.debug("Circular import skipping: %s", xsd.name)
+            return
         self.processed.append(xsd)
 
         schema = SchemaParser.from_file(xsd)
@@ -32,14 +33,14 @@ class ProcessTask:
                 )
 
         logger.info(
-            f"Schema: {xsd.relative_to(Path.cwd())}, elements: {schema.num}"
+            "Schema: %s, elements: %d", xsd.relative_to(Path.cwd()), schema.num
         )
 
         classes = ClassBuilder(schema=schema).build()
-        logger.info(f"Class candidates: {len(classes)}")
+        logger.info("Class candidates: %d", len(classes))
 
         classes = reducer.process(schema=schema, classes=classes)
-        logger.info(f"Class graduated: {len(classes)}")
+        logger.info("Class graduated: %d", len(classes))
 
         callback = writer.print if self.print else writer.write
         callback(

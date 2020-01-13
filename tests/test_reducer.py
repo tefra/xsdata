@@ -42,9 +42,9 @@ class ClassReducerTests(FactoryTestCase):
         abstracts = ClassFactory.list(2, is_abstract=True, type=ComplexType)
 
         common = simplies + abstracts + enums
-        all = classes + common
+        all_classes = classes + common
 
-        result = ClassReducer().process(self.schema, all)
+        result = ClassReducer().process(self.schema, all_classes)
 
         self.assertEqual(enums + classes, result)
 

@@ -14,6 +14,8 @@
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
 
+from pkg_resources import get_distribution
+
 import sphinx_material
 
 # -- Project information -----------------------------------------------------
@@ -23,7 +25,7 @@ copyright = "2020, Christodoulos Tsoulloftas"
 author = "Christodoulos Tsoulloftas"
 
 # The full version, including alpha/beta/rc tags
-release = "20.1"
+release = get_distribution("xsdata").version
 
 
 # -- General configuration ---------------------------------------------------

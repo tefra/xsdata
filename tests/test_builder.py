@@ -35,7 +35,7 @@ class ClassBuilderTests(FactoryTestCase):
 
     @patch.object(ClassBuilder, "build_class")
     def test_process(self, mock_build_class):
-        for i in range(2):
+        for _ in range(2):
             self.schema.simple_types.append(SimpleType.create())
             self.schema.attribute_groups.append(AttributeGroup.create())
             self.schema.groups.append(Group.create())

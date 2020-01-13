@@ -23,7 +23,6 @@ Submodules
    xsdata.reducer
    xsdata.resolver
    xsdata.tool
-   xsdata.version
    xsdata.writer
 
 Module contents

@@ -22,7 +22,8 @@ class ElementTests(TestCase):
         self.assertEqual("foo", obj.real_name)
 
         with self.assertRaises(NotImplementedError):
-            Element.create().real_name
+            obj = Element.create()
+            obj.real_name
 
     def test_property_real_type(self):
         obj = Element.create()

@@ -91,6 +91,16 @@ Example 4-5 Multiple imports of the same namespace
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter04/example04053.py
    :language: python
 
+Example 4-6 Proxy schema to avoid multiple imports
+--------------------------------------------------
+
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter04/example04061.xsd
+   :language: xml
+   :lines: 3-
+
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter04/example04061.py
+   :language: python
+
 
 .. admonition:: Samples Source
     :class: hint

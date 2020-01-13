@@ -2,7 +2,7 @@ import os
 from collections import defaultdict
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, List
+from typing import DefaultDict, Dict, List
 
 import pytest
 from click.testing import CliRunner
@@ -31,7 +31,7 @@ class Documentation:
 docs: Dict[str, List[Documentation]] = defaultdict(list)
 schemas = sorted([xsd for xsd in fixtures.glob("defxmlschema/*/*.xsd")])
 
-skipped = 0
+skipped: DefaultDict[str, int] = defaultdict(int)
 passed = 0
 
 
@@ -49,7 +49,7 @@ def test_generation(fixture: Path):
     )
 
     if skip_message:
-        skipped += 1
+        skipped[skip_message] += 1
         pytest.skip(skip_message)
 
     if should_fail:
@@ -80,7 +80,7 @@ def parse_skip_message(source):
     skip = source.find("<!-- SKIPTEST")
     if skip > -1:
         skipend = source.find("-->", skip)
-        msg = source[skip + 13 : skipend].strip()
+        msg = source[skip + 14 : skipend].strip()
         skip_message = msg if msg else "Unsupported feature!"
     return skip_message
 
@@ -111,16 +111,16 @@ def teardown_function():
 
 def teardown_module():
 
-    fixtures.joinpath("defxmlschema/results.rst").write_text(
-        ", ".join(
-            [
-                f"Total tests: **{passed + skipped}**",
-                f"Passed: **{passed}**",
-                f"Skipped: **{skipped}**",
-            ]
-        )
-    )
+    results = [
+        f"- Total tests: **{passed + sum(skipped.values())}**",
+        f"- Passed: **{passed}**",
+    ]
+    for reason, count in skipped.items():
+        results.append(f"- {reason}: **{count}**")
 
+    fixtures.joinpath("defxmlschema/results.rst").write_text(
+        "\n".join(results)
+    )
     for suite, items in docs.items():
         template = Template(
             here.joinpath(f"fixtures/{suite}/../output.jinja2").read_text(),

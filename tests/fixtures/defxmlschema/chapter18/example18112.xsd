@@ -2,7 +2,7 @@
 <!-- Example 18-11 Overriding element and attribute declarations -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
   <xs:override schemaLocation="prod1.xsd">
-    <!-- SKIPTEST: XML Schema 1.1. -->
+    <!-- SKIPTEST: XML Schema 1.1 -->
     <xs:element name="description" type="DescriptionType" />
     <xs:attribute name="version" type="xs:string" default="1.0" />
   </xs:override>

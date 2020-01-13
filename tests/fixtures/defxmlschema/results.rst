@@ -1,1 +1,10 @@
-Total tests: **230**, Passed: **133**, Skipped: **97**
+- Total tests: **228**
+- Passed: **134**
+- Custom documentation structure: **1**
+- Incomplete fixture: **24**
+- XML Schema 1.1: **43**
+- Unsupported feature!: **21**
+- Should fail: **1**
+- XML Reference: **2**
+- Duplicated attributes: **1**
+- Fails: **1**

@@ -2,7 +2,7 @@
 <!-- Example 18-9 Overriding a simple type -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
   <xs:override schemaLocation="prod1.xsd">
-    <!-- SKIPTEST: XML Schema 1.1. -->
+    <!-- SKIPTEST: XML Schema 1.1 -->
     <xs:simpleType name="DressSizeType">
       <xs:restriction base="xs:integer">
         <xs:minInclusive value="2" />

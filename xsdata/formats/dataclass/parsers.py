@@ -25,7 +25,7 @@ class JsonParser(AbstractParser, ModelInspect):
         """
         params = {}
 
-        if type(data) is list and len(data) == 1:
+        if isinstance(data, list) and len(data) == 1:
             data = data[0]
 
         for field in self.fields(model):

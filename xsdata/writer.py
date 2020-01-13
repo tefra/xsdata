@@ -39,7 +39,7 @@ class CodeWriter:
         self, schema: Schema, classes: List[Class], package: str, renderer: str
     ):
         engine = self.get_renderer(renderer)
-        for file, output in engine.render(schema, classes, package):
+        for _, output in engine.render(schema, classes, package):
             print(output, end="")
 
 

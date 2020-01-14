@@ -1,5 +1,5 @@
-defxmlschema/chapter12
-======================
+Chapter #12
+===========
 
 Example 12-11 Complex type with empty content
 ---------------------------------------------
@@ -20,6 +20,30 @@ Example 12-12 Element references
 
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1212.py
    :language: python
+
+Example 12-13 Legal duplication of element names
+------------------------------------------------
+
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1213.xsd
+   :language: xml
+   :lines: 3-
+
+.. warning::
+
+    Should fail
+
+
+Example 12-14 Illegal duplication of element names
+--------------------------------------------------
+
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1214.xsd
+   :language: xml
+   :lines: 3-
+
+.. warning::
+
+    Unsupported feature!
+
 
 Example 12-15 A sequence group
 ------------------------------
@@ -91,6 +115,18 @@ Example 12-24 An all group
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1224.py
    :language: python
 
+Example 12-26 An illegal all group
+----------------------------------
+
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1226.xsd
+   :language: xml
+   :lines: 3-
+
+.. warning::
+
+    Illegal definition
+
+
 Example 12-27 Complex type with a named model group reference
 -------------------------------------------------------------
 
@@ -100,6 +136,30 @@ Example 12-27 Complex type with a named model group reference
 
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1227.py
    :language: python
+
+Example 12-28 Illegal nondeterministic content model
+----------------------------------------------------
+
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1228.xsd
+   :language: xml
+   :lines: 3-
+
+.. warning::
+
+    Duplicated attributes
+
+
+Example 12-29 Deterministic content model
+-----------------------------------------
+
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1229.xsd
+   :language: xml
+   :lines: 3-
+
+.. warning::
+
+    Duplicated attributes
+
 
 Example 12-3 Anonymous complex type
 -----------------------------------
@@ -171,6 +231,66 @@ Example 12-37 Negative wildcards
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1237.py
    :language: python
 
+Example 12-40 Defining an interleaved open content model
+--------------------------------------------------------
+
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1240.xsd
+   :language: xml
+   :lines: 3-
+
+.. warning::
+
+    XML Schema 1.1
+
+
+Example 12-42 Defining a suffix open content model
+--------------------------------------------------
+
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1242.xsd
+   :language: xml
+   :lines: 3-
+
+.. warning::
+
+    XML Schema 1.1
+
+
+Example 12-44 Defining a default open content model
+---------------------------------------------------
+
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1244.xsd
+   :language: xml
+   :lines: 3-
+
+.. warning::
+
+    XML Schema 1.1
+
+
+Example 12-46 Overriding a default open content model
+-----------------------------------------------------
+
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1246.xsd
+   :language: xml
+   :lines: 3-
+
+.. warning::
+
+    XML Schema 1.1
+
+
+Example 12-47 Complex type with attribute wildcard
+--------------------------------------------------
+
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1247.xsd
+   :language: xml
+   :lines: 3-
+
+.. warning::
+
+    Unsupported feature!
+
+
 Example 12-5 Complex type with simple content
 ---------------------------------------------
 
@@ -190,6 +310,17 @@ Example 12-7 Complex type with element-only content
 
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1207.py
    :language: python
+
+Example 12-9 Complex type with mixed content
+--------------------------------------------
+
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1209.xsd
+   :language: xml
+   :lines: 3-
+
+.. warning::
+
+    Unsupported feature!
 
 
 .. admonition:: Samples Source

@@ -1,5 +1,5 @@
-defxmlschema/chapter15
-======================
+Chapter #15
+===========
 
 Example 15-1 Named model group with local element declarations
 --------------------------------------------------------------
@@ -21,6 +21,38 @@ Example 15-10 Attribute group with a wildcard
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter15/example1510.py
    :language: python
 
+Example 15-11 Referencing an attribute group from a complex type definition
+---------------------------------------------------------------------------
+
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter15/example1511.xsd
+   :language: xml
+   :lines: 3-
+
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter15/example1511.py
+   :language: python
+
+Example 15-12 Equivalent complex type without an attribute group
+----------------------------------------------------------------
+
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter15/example1512.xsd
+   :language: xml
+   :lines: 3-
+
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter15/example1512.py
+   :language: python
+
+Example 15-13 Illegal duplication of attributes
+-----------------------------------------------
+
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter15/example1513.xsd
+   :language: xml
+   :lines: 3-
+
+.. warning::
+
+    Unsupported feature!
+
+
 Example 15-14 Attribute group referencing an attribute group
 ------------------------------------------------------------
 
@@ -31,6 +63,28 @@ Example 15-14 Attribute group referencing an attribute group
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter15/example1514.py
    :language: python
 
+Example 15-15 Default attribute group
+-------------------------------------
+
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter15/example1515.xsd
+   :language: xml
+   :lines: 3-
+
+.. warning::
+
+    XML Schema 1.1
+
+
+Example 15-16 Named groups with a target namespace
+--------------------------------------------------
+
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter15/example1516.xsd
+   :language: xml
+   :lines: 3-
+
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter15/example1516.py
+   :language: python
+
 Example 15-17 Named groups across namespaces
 --------------------------------------------
 
@@ -39,6 +93,28 @@ Example 15-17 Named groups across namespaces
    :lines: 3-
 
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter15/example15171.py
+   :language: python
+
+Example 15-17 Named groups across namespaces
+--------------------------------------------
+
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter15/example15172.xsd
+   :language: xml
+   :lines: 3-
+
+.. warning::
+
+    Illegal definition
+
+
+Example 15-18 Reusing content model fragments through derivation
+----------------------------------------------------------------
+
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter15/example1518.xsd
+   :language: xml
+   :lines: 3-
+
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter15/example1518.py
    :language: python
 
 Example 15-2 Named model group with element references
@@ -110,7 +186,6 @@ Example 15-9 Attribute group with attribute references
 
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter15/example1509.py
    :language: python
-
 
 .. admonition:: Samples Source
     :class: hint

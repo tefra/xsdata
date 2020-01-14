@@ -1,5 +1,6 @@
 <!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
 <!-- Example 21-19 ISO 11179-based type definition -->
+<!-- SKIPTEST: Mixed Content -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:doc="http://datypic.com/doc">
   <xs:simpleType name="CountryType">
     <xs:annotation>
@@ -12,11 +13,8 @@
           world.</doc:definition>
         <doc:keyword>geopolitical entity</doc:keyword>
         <doc:keyword>country</doc:keyword>
-        <!-- SKIPTEST: Incomplete fixture -->
       </xs:documentation>
     </xs:annotation>
-    <xs:restriction base="xs:token">
-      <!-- SKIPTEST: Incomplete fixture -->
-    </xs:restriction>
+    <xs:restriction base="xs:token" />
   </xs:simpleType>
 </xs:schema>

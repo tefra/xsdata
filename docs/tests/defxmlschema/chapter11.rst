@@ -1,5 +1,41 @@
-defxmlschema/chapter11
-======================
+Chapter #11
+===========
+
+Example 11-1 Extensible mixed content
+-------------------------------------
+
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter11/example1101.xsd
+   :language: xml
+   :lines: 3-
+
+.. warning::
+
+    XML Reference
+
+
+Example 11-3 Illegal duplication of ID attributes (version 1.0)
+---------------------------------------------------------------
+
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter11/example1103.xsd
+   :language: xml
+   :lines: 3-
+
+.. warning::
+
+    Illegal definition
+
+
+Example 11-4 Illegal attribute declarations (version 1.0)
+---------------------------------------------------------
+
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter11/example1104.xsd
+   :language: xml
+   :lines: 3-
+
+.. warning::
+
+    Illegal definition
+
 
 Example 11-5 Using IDREF
 ------------------------
@@ -40,7 +76,6 @@ Example 11-8 Using ENTITIES
 
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter11/example11081.py
    :language: python
-
 
 .. admonition:: Samples Source
     :class: hint

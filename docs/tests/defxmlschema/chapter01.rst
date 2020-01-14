@@ -1,5 +1,5 @@
-defxmlschema/chapter01
-======================
+Chapter #01
+===========
 
 Example 1-2 Product schema in XSD schema language
 -------------------------------------------------
@@ -10,7 +10,6 @@ Example 1-2 Product schema in XSD schema language
 
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter01/example0102.py
    :language: python
-
 
 .. admonition:: Samples Source
     :class: hint

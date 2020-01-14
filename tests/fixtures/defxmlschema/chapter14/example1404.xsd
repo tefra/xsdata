@@ -1,11 +1,10 @@
 <!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
 <!-- Example 14-4 A simple type with more than one assertion -->
+<!-- SKIPTEST: XML Schema 1.1 -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
   <xs:simpleType name="DepartmentCodeType">
     <xs:restriction base="xs:token">
-      <!-- SKIPTEST: XML Schema 1.1 -->
       <xs:assertion test="not(contains($value,'X'))" />
-      <!-- SKIPTEST: XML Schema 1.1 -->
       <xs:assertion test="substring($value,2,2) != '00'" />
       <xs:length value="3" />
     </xs:restriction>

@@ -10,11 +10,15 @@
    :language: xml
    :lines: 3-
 
-.. literalinclude:: {{ item.output }}
+{% if item.skip_message or not item.target -%}
+.. warning::
+
+    {{ item.skip_message or "Illegal definition" }}
+{% else -%}
+.. literalinclude:: {{ item.target }}
    :language: python
-
+{%- endif -%}
 {%- endfor %}
-
 
 .. admonition:: Samples Source
     :class: hint

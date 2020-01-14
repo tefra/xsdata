@@ -1,5 +1,6 @@
 <!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
 <!-- Example 17-13 Referencing an identity constraint in a restriction -->
+<!-- SKIPTEST -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://datypic.com/prod" xmlns="http://datypic.com/prod" xpathDefaultNamespace="http://datypic.com/prod">
   <xs:complexType name="CatalogListType">
     <xs:sequence>
@@ -23,5 +24,4 @@
       </xs:restriction>
     </xs:complexContent>
   </xs:complexType>
-  <!-- SKIPTEST: Incomplete fixture -->
 </xs:schema>

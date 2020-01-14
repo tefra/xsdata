@@ -1,12 +1,10 @@
 <!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
 <!-- Example 14-20 Conditional type assignment with default type -->
+<!-- SKIPTEST: XML Schema 1.1 -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
   <xs:element name="product">
-    <!-- SKIPTEST: XML Schema 1.1 -->
     <xs:alternative test="@dept='ACC'" type="AccessoryType" />
-    <!-- SKIPTEST: XML Schema 1.1 -->
     <xs:alternative test="@dept='WMN' or @dept='MEN'" type="ClothingType" />
-    <!-- SKIPTEST: XML Schema 1.1 -->
     <xs:alternative type="ProductType" />
   </xs:element>
 </xs:schema>

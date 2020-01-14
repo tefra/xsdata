@@ -1,5 +1,5 @@
-defxmlschema/chapter02
-======================
+Chapter #02
+===========
 
 Example 2-10 Product schema document with target namespace
 ----------------------------------------------------------
@@ -10,6 +10,18 @@ Example 2-10 Product schema document with target namespace
 
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter02/example0210.py
    :language: python
+
+Example 2-14 Annotation
+-----------------------
+
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter02/example0214.xsd
+   :language: xml
+   :lines: 3-
+
+.. warning::
+
+    Mixed Content
+
 
 Example 2-2 Product schema
 --------------------------
@@ -50,7 +62,6 @@ Example 2-9 Complex type extension
 
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter02/example0209.py
    :language: python
-
 
 .. admonition:: Samples Source
     :class: hint

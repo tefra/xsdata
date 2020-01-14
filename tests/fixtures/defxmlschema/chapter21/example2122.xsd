@@ -1,5 +1,6 @@
 <!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
 <!-- Example 21-22 Application information -->
+<!-- SKIPTEST: Mixed Content -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:app="http://datypic.com/app">
   <xs:element name="product" type="ProductType">
     <xs:annotation>
@@ -10,5 +11,4 @@
       </xs:appinfo>
     </xs:annotation>
   </xs:element>
-  <!-- SKIPTEST: Incomplete fixture -->
 </xs:schema>

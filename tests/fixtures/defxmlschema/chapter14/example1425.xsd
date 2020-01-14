@@ -1,10 +1,9 @@
 <!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
 <!-- Example 14-25 Conditional type assignment with globally declared attribute -->
+<!-- SKIPTEST: XML Schema 1.1 -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://datypic.com/prod" xmlns:prod="http://datypic.com/prod" elementFormDefault="qualified">
   <xs:element name="product" type="prod:ProductType">
-    <!-- SKIPTEST: XML Schema 1.1 -->
     <xs:alternative test="@prod:dept='ACC'" type="prod:AccessoryType" />
-    <!-- SKIPTEST: XML Schema 1.1 -->
     <xs:alternative test="@prod:dept='WMN' or @prod:dept='MEN'" type="prod:ClothingType" />
   </xs:element>
   <xs:complexType name="ProductType">
@@ -15,5 +14,4 @@
     <xs:attribute ref="prod:dept" />
   </xs:complexType>
   <xs:attribute name="dept" type="xs:string" />
-  <!-- SKIPTEST: Incomplete fixture -->
 </xs:schema>

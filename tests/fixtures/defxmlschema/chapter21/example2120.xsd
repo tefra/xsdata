@@ -1,5 +1,6 @@
 <!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
 <!-- Example 21-20 Code documentation -->
+<!-- SKIPTEST: Mixed Content -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:doc="http://datypic.com/doc">
   <xs:simpleType name="CountryType">
     <xs:annotation>
@@ -14,8 +15,6 @@
         <doc:deprecated>false</doc:deprecated>
       </xs:documentation>
     </xs:annotation>
-    <xs:restriction base="xs:token">
-      <!-- SKIPTEST: Incomplete fixture -->
-    </xs:restriction>
+    <xs:restriction base="xs:token" />
   </xs:simpleType>
 </xs:schema>

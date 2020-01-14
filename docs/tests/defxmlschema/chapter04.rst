@@ -1,5 +1,5 @@
-defxmlschema/chapter04
-======================
+Chapter #04
+===========
 
 Example 4-1 Include
 -------------------
@@ -100,6 +100,53 @@ Example 4-6 Proxy schema to avoid multiple imports
 
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter04/example04061.py
    :language: python
+
+Example 4-6 Proxy schema to avoid multiple imports
+--------------------------------------------------
+
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter04/example04062.xsd
+   :language: xml
+   :lines: 3-
+
+.. warning::
+
+    Illegal definition
+
+
+Example 4-7 Illegal duplication of element names
+------------------------------------------------
+
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter04/example04071.xsd
+   :language: xml
+   :lines: 3-
+
+.. warning::
+
+    Illegal definition
+
+
+Example 4-7 Illegal duplication of element names
+------------------------------------------------
+
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter04/example04072.xsd
+   :language: xml
+   :lines: 3-
+
+.. warning::
+
+    Illegal definition
+
+
+Example 4-8 Illegal Missing component
+-------------------------------------
+
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter04/example0408.xsd
+   :language: xml
+   :lines: 3-
+
+.. warning::
+
+    Illegal definition
 
 
 .. admonition:: Samples Source

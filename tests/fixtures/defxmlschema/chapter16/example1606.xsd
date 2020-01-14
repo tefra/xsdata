@@ -1,7 +1,7 @@
 <!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
 <!-- Example 16-6 Using a choice group -->
-<!-- SKIPTEST -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:include schemaLocation="../chapter16/example1607.xsd" />
   <xs:element name="items" type="ItemsType" />
   <xs:complexType name="ItemsType">
     <xs:group ref="ProductGroup" maxOccurs="unbounded" />
@@ -14,5 +14,4 @@
       <xs:element name="umbrella" type="ProductType" />
     </xs:choice>
   </xs:group>
-  <!-- SKIPTEST: Incomplete fixture -->
 </xs:schema>

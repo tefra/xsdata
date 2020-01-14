@@ -1,5 +1,6 @@
 <!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
 <!-- Example 17-11 Using xpathDefaultNamespace -->
+<!-- SKIPTEST -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://datypic.com/prod" targetNamespace="http://datypic.com/prod" xpathDefaultNamespace="http://datypic.com/prod">
   <xs:element name="catalog" type="CatalogType">
     <xs:unique name="dateAndProdNumKey">
@@ -11,5 +12,4 @@
   <xs:element name="department" type="DepartmentType" />
   <xs:element name="product" type="ProductType" />
   <xs:element name="number" type="xs:integer" />
-  <!-- SKIPTEST: Incomplete fixture -->
 </xs:schema>

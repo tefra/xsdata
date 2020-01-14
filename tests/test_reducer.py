@@ -278,5 +278,5 @@ class ClassReducerTests(FactoryTestCase):
 
         self.assertEqual(XSDType.STRING.code, obj.type)
         mock_logger_debug.assert_called_once_with(
-            f"Missing type implementation: {common.type.__name__}"
+            "Missing type implementation: %s", common.type.__name__
         )

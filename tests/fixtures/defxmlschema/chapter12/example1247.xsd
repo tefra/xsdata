@@ -1,9 +1,9 @@
 <!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
 <!-- Example 12-47 Complex type with attribute wildcard -->
+<!-- SKIPTEST -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
   <xs:complexType name="ProductType">
     <xs:sequence>
-      <!-- SKIPTEST: Incomplete fixture -->
     </xs:sequence>
     <xs:anyAttribute namespace="##other" processContents="lax" />
   </xs:complexType>

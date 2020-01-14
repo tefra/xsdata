@@ -132,27 +132,26 @@ class ClassReducer:
         If the common type doesn't have just one attribute fallback to
         the default xsd type xs:string
         """
-        append = False
-        for type_name in attr.types:
+        types = []
+        for index, type_name in enumerate(attr.types):
             common = self.find_common_type(type_name, nsmap)
+            restrictions = {}
             if common is None or common.is_enumeration:
-                continue
-
-            if len(common.attrs) == 1:
-                type_name = common.attrs[0].type
+                types.append(type_name)
+            elif len(common.attrs) == 1:
+                types.append(common.attrs[0].type)
                 restrictions = common.attrs[0].restrictions
             else:
-                type_name = XSDType.STRING.code
-                restrictions = {}
+                types.append(XSDType.STRING.code)
                 logger.warning(
-                    f"Missing type implementation: {common.type.__name__}"
+                    "Missing type implementation: %s", common.type.__name__
                 )
 
-            attr.type = f"{attr.type} {type_name}" if append else type_name
             for key, value in restrictions.items():
                 if getattr(attr, key) is None:
                     setattr(attr, key, value)
-            append = True
+
+        attr.type = " ".join(types)
 
     def separate_common_types(self, classes: List[Class]):
         def condition(x: Class):

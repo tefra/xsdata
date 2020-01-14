@@ -121,6 +121,10 @@ def teardown_module():
     fixtures.joinpath("defxmlschema/results.rst").write_text(
         "\n".join(results)
     )
+
+    for rst in here.parent.joinpath(f"").glob("docs/tests/defxmlschema/*.rst"):
+        rst.unlink()
+
     for suite, items in docs.items():
         template = Template(
             here.joinpath(f"fixtures/{suite}/../output.jinja2").read_text(),

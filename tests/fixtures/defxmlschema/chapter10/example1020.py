@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import Optional
+from typing import List
 
 
 @dataclass
@@ -7,10 +7,12 @@ class TwoDimensionalArray:
     """
     :ivar value:
     """
-    value: Optional[str] = field(
-        default=None,
+    value: List[int] = field(
+        default_factory=list,
         metadata=dict(
             name="value",
-            type="Extension"
+            type="List",
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )

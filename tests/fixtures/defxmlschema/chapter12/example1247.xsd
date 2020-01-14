@@ -3,8 +3,7 @@
 <!-- SKIPTEST -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
   <xs:complexType name="ProductType">
-    <xs:sequence>
-    </xs:sequence>
+    <xs:sequence />
     <xs:anyAttribute namespace="##other" processContents="lax" />
   </xs:complexType>
 </xs:schema>

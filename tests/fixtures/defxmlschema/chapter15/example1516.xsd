@@ -15,8 +15,6 @@
   <xs:complexType name="PurchaseOrderType">
     <xs:sequence>
       <xs:group ref="DescriptionGroup" minOccurs="0" />
-      <xs:element ref="items" />
-      <!-- SKIPTEST: Incomplete fixture -->
     </xs:sequence>
     <xs:attributeGroup ref="IdentifierGroup" />
   </xs:complexType>

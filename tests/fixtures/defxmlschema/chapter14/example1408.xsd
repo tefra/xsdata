@@ -1,5 +1,6 @@
 <!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
 <!-- Example 14-8 Assertions with corrected type errors -->
+<!-- SKIPTEST: XML Schema 1.1 -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
   <xs:simpleType name="SizeType">
     <xs:restriction base="xs:integer">
@@ -8,13 +9,11 @@
   </xs:simpleType>
   <xs:simpleType name="DepartmentCodeType">
     <xs:restriction base="xs:string">
-      <!-- SKIPTEST: XML Schema 1.1 -->
       <xs:assertion test="$value != '001'" />
     </xs:restriction>
   </xs:simpleType>
   <xs:simpleType name="EffectiveDateTimeType">
     <xs:restriction base="xs:dateTime">
-      <!-- SKIPTEST: XML Schema 1.1 -->
       <xs:assertion test="" "$value="">xs:dateTime('2000-01-01T12:00:00')"/></xs:assertion>
     </xs:restriction>
   </xs:simpleType>

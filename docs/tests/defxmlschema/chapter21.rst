@@ -1,5 +1,5 @@
-defxmlschema/chapter21
-======================
+Chapter #21
+===========
 
 Example 21-1 Schema for Russian Doll approach
 ---------------------------------------------
@@ -44,6 +44,18 @@ Example 21-10 Different namespaces in a schema
 Example 21-13 Chameleon namespaces in a schema
 ----------------------------------------------
 
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter21/example21131.xsd
+   :language: xml
+   :lines: 3-
+
+.. warning::
+
+    Fails
+
+
+Example 21-13 Chameleon namespaces in a schema
+----------------------------------------------
+
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter21/example21132.xsd
    :language: xml
    :lines: 3-
@@ -81,6 +93,30 @@ Example 21-16 Schema for qualified local element names
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter21/example21162.py
    :language: python
 
+Example 21-18 Documentation
+---------------------------
+
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter21/example2118.xsd
+   :language: xml
+   :lines: 3-
+
+.. warning::
+
+    Mixed Content
+
+
+Example 21-19 ISO 11179-based type definition
+---------------------------------------------
+
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter21/example2119.xsd
+   :language: xml
+   :lines: 3-
+
+.. warning::
+
+    Mixed Content
+
+
 Example 21-2 Schema for Salami Slice approach
 ---------------------------------------------
 
@@ -90,6 +126,54 @@ Example 21-2 Schema for Salami Slice approach
 
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter21/example2102.py
    :language: python
+
+Example 21-20 Code documentation
+--------------------------------
+
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter21/example2120.xsd
+   :language: xml
+   :lines: 3-
+
+.. warning::
+
+    Mixed Content
+
+
+Example 21-21 Section identifiers
+---------------------------------
+
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter21/example2121.xsd
+   :language: xml
+   :lines: 3-
+
+.. warning::
+
+    Mixed Content
+
+
+Example 21-22 Application information
+-------------------------------------
+
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter21/example2122.xsd
+   :language: xml
+   :lines: 3-
+
+.. warning::
+
+    Mixed Content
+
+
+Example 21-23 Non-native attributes
+-----------------------------------
+
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter21/example2123.xsd
+   :language: xml
+   :lines: 3-
+
+.. warning::
+
+    Unsupported feature!
+
 
 Example 21-3 Schema for Venetian Blind approach
 -----------------------------------------------
@@ -140,7 +224,6 @@ Example 21-8 Same namespace in a schema
 
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter21/example21083.py
    :language: python
-
 
 .. admonition:: Samples Source
     :class: hint

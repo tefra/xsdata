@@ -1,5 +1,5 @@
-defxmlschema/chapter13
-======================
+Chapter #13
+===========
 
 Example 13-1 Simple content extension
 -------------------------------------
@@ -10,6 +10,18 @@ Example 13-1 Simple content extension
 
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter13/example13011.py
    :language: python
+
+Example 13-10 Attribute extension
+---------------------------------
+
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter13/example13101.xsd
+   :language: xml
+   :lines: 3-
+
+.. warning::
+
+    XML Reference
+
 
 Example 13-11 Attribute wildcard extension
 ------------------------------------------
@@ -61,6 +73,42 @@ Example 13-2 Complex content extension
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter13/example1302.py
    :language: python
 
+Example 13-26 Restricting open content
+--------------------------------------
+
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter13/example13261.xsd
+   :language: xml
+   :lines: 3-
+
+.. warning::
+
+    XML Schema 1.1
+
+
+Example 13-26 Restricting open content
+--------------------------------------
+
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter13/example13262.xsd
+   :language: xml
+   :lines: 3-
+
+.. warning::
+
+    XML Schema 1.1
+
+
+Example 13-26 Restricting open content
+--------------------------------------
+
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter13/example13263.xsd
+   :language: xml
+   :lines: 3-
+
+.. warning::
+
+    XML Schema 1.1
+
+
 Example 13-27 Mixed content restriction
 ---------------------------------------
 
@@ -110,6 +158,18 @@ Example 13-30 Legal restrictions of attributes
 
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter13/example1330.py
    :language: python
+
+Example 13-31 Illegal attribute restrictions
+--------------------------------------------
+
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter13/example1331.xsd
+   :language: xml
+   :lines: 3-
+
+.. warning::
+
+    Illegal definition
+
 
 Example 13-32 Restricting an attribute wildcard
 -----------------------------------------------
@@ -241,6 +301,18 @@ Example 13-6 Effective content model of ShirtType with all groups combined
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter13/example1306.py
    :language: python
 
+Example 13-7 Extending open content
+-----------------------------------
+
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter13/example1307.xsd
+   :language: xml
+   :lines: 3-
+
+.. warning::
+
+    XML Schema 1.1
+
+
 Example 13-8 Mixed content extension
 ------------------------------------
 
@@ -260,7 +332,6 @@ Example 13-9 Empty content extension
 
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter13/example1309.py
    :language: python
-
 
 .. admonition:: Samples Source
     :class: hint

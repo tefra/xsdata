@@ -1,5 +1,6 @@
 <!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
 <!-- Example 21-21 Section identifiers -->
+<!-- SKIPTEST: Mixed Content -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
   <xs:annotation>
     <xs:documentation>
@@ -15,5 +16,4 @@
   </xs:annotation>
   <xs:element name="order" type="OrderType" />
   <xs:element name="items" type="ItemsType" />
-  <!-- SKIPTEST: Incomplete fixture -->
 </xs:schema>

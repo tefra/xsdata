@@ -1,6 +1,7 @@
 <!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
 <!-- Example 15-18 Reusing content model fragments through derivation -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:include schemaLocation="../chapter16/example1601.xsd" />
   <xs:complexType name="DescribedType">
     <xs:sequence>
       <xs:element name="description" type="xs:string" />
@@ -12,7 +13,6 @@
       <xs:extension base="DescribedType">
         <xs:sequence>
           <xs:element ref="items" />
-          <!-- SKIPTEST: Incomplete fixture -->
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>
@@ -22,7 +22,6 @@
       <xs:extension base="DescribedType">
         <xs:sequence>
           <xs:element ref="product" maxOccurs="unbounded" />
-          <!-- SKIPTEST: Incomplete fixture -->
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>

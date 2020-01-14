@@ -1,5 +1,5 @@
-defxmlschema/chapter07
-======================
+Chapter #07
+===========
 
 Example 7-1 Global attribute declarations
 -----------------------------------------
@@ -60,7 +60,6 @@ Example 7-7 Declaring an inheritable attribute
 
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter07/example0707.py
    :language: python
-
 
 .. admonition:: Samples Source
     :class: hint

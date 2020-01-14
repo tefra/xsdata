@@ -24,13 +24,12 @@ is_travis = "TRAVIS" in os.environ
 @dataclass
 class Documentation:
     title: str
+    skip_message: str
     source: str
-    output: str
+    target: str
 
 
-docs: Dict[str, List[Documentation]] = defaultdict(list)
 schemas = sorted([xsd for xsd in fixtures.glob("defxmlschema/*/*.xsd")])
-
 skipped: DefaultDict[str, int] = defaultdict(int)
 passed = 0
 
@@ -67,7 +66,6 @@ def test_generation(fixture: Path):
         pytest.skip("Assisting schema")
 
     assert len(output.strip()) > 0
-    log_output(fixture, expected)
     passed += 1
 
 
@@ -85,23 +83,12 @@ def parse_skip_message(source):
     return skip_message
 
 
-def log_output(xsd: Path, expected: Path):
-    if is_travis:
-        return
-
-    source = xsd.read_text()
-    source_lines = source.split("\n")
-    suite = str(xsd.relative_to(fixtures).parent)
-    docs[suite].append(
-        Documentation(
-            title=source_lines[1]
-            .replace("<!--", "")
-            .replace("-->", "")
-            .strip(),
-            source=f"/../tests/{xsd.relative_to(here)}",
-            output=f"/../tests/{expected.relative_to(here)}",
-        )
-    )
+def parse_title(source):
+    pos = source.find("<!-- Example ")
+    if pos > -1:
+        end = source.find("-->", pos)
+        return source[pos + 5 : end].strip()
+    return ""
 
 
 def teardown_function():
@@ -125,13 +112,31 @@ def teardown_module():
     for rst in here.parent.joinpath(f"").glob("docs/tests/defxmlschema/*.rst"):
         rst.unlink()
 
+    docs: Dict[str, List[Documentation]] = defaultdict(list)
+    for schema in schemas:
+        source = schema.read_text()
+        target = schema.with_suffix(".py")
+
+        docs[schema.parent.name].append(
+            Documentation(
+                title=parse_title(source),
+                skip_message=parse_skip_message(source),
+                source=f"/../tests/{schema.relative_to(here)}",
+                target=f"/../tests/{target.relative_to(here)}"
+                if target.exists()
+                else None,
+            )
+        )
+
     for suite, items in docs.items():
         template = Template(
-            here.joinpath(f"fixtures/{suite}/../output.jinja2").read_text(),
+            here.joinpath(f"fixtures/defxmlschema/output.jinja2").read_text(),
             keep_trailing_newline=True,
         )
-        output = template.render(suite=suite, items=items)
+        output = template.render(
+            suite=suite.replace("chapter", "Chapter #"), items=items
+        )
 
-        file = here.parent.joinpath(f"docs/tests/{suite}.rst")
+        file = here.parent.joinpath(f"docs/tests/defxmlschema/{suite}.rst")
         file.parent.mkdir(parents=True, exist_ok=True)
         file.write_text(output)

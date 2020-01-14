@@ -2,7 +2,6 @@
 <!-- Example 15-12 Equivalent complex type without an attribute group -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
   <xs:complexType name="ProductType">
-    <!-- SKIPTEST: Incomplete fixture -->
     <xs:attribute name="id" type="xs:ID" use="required" />
     <xs:attribute name="version" type="xs:decimal" />
     <xs:attribute name="effDate" type="xs:date" />

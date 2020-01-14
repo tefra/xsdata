@@ -1,5 +1,5 @@
-defxmlschema/chapter06
-======================
+Chapter #06
+===========
 
 Example 6-1 Global element declarations
 ---------------------------------------
@@ -31,6 +31,18 @@ Example 6-15 Making size elements nillable
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter06/example0615.py
    :language: python
 
+Example 6-2 Illegal attempt to prefix an element name
+-----------------------------------------------------
+
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter06/example0602.xsd
+   :language: xml
+   :lines: 3-
+
+.. warning::
+
+    Illegal definition
+
+
 Example 6-3 Local element declarations
 --------------------------------------
 
@@ -60,6 +72,17 @@ Example 6-8 Using the form attribute
 
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter06/example0608.py
    :language: python
+
+Example Illegal 6-4 Assigning types to elements
+-----------------------------------------------
+
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter06/example0604.xsd
+   :language: xml
+   :lines: 3-
+
+.. warning::
+
+    Illegal definition
 
 
 .. admonition:: Samples Source

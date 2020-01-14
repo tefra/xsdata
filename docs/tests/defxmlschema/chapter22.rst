@@ -1,5 +1,5 @@
-defxmlschema/chapter22
-======================
+Chapter #22
+===========
 
 Example 22-7 Original type
 --------------------------
@@ -10,7 +10,6 @@ Example 22-7 Original type
 
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter22/example2207.py
    :language: python
-
 
 .. admonition:: Samples Source
     :class: hint

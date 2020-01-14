@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import Optional
+from typing import Optional, Union
 
 
 @dataclass
@@ -26,7 +26,7 @@ class ProductType:
             required=True
         )
     )
-    size: Optional[int] = field(
+    size: Optional[Union[int, str]] = field(
         default=None,
         metadata=dict(
             name="size",

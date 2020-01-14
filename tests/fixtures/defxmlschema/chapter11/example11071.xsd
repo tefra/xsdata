@@ -6,5 +6,4 @@
       <xs:attribute name="location" type="xs:ENTITY" />
     </xs:complexType>
   </xs:element>
-  <!-- SKIPTEST: Incomplete fixture -->
 </xs:schema>

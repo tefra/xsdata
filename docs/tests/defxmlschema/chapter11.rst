@@ -21,6 +21,16 @@ Example 11-6 Using IDREFS
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter11/example11061.py
    :language: python
 
+Example 11-7 Using an unparsed entity
+-------------------------------------
+
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter11/example11071.xsd
+   :language: xml
+   :lines: 3-
+
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter11/example11071.py
+   :language: python
+
 Example 11-8 Using ENTITIES
 ---------------------------
 

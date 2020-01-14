@@ -7,7 +7,7 @@
       <xs:element name="i" type="xs:string" />
       <xs:element name="b" type="xs:string" />
       <xs:element name="u" type="xs:string" />
-      <!-- SKIPTEST: Incomplete fixture -->
+      <!-- SKIPTEST -->
     </xs:choice>
   </xs:complexType>
 </xs:schema>

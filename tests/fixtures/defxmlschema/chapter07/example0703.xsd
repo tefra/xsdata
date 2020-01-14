@@ -7,9 +7,14 @@
     <xs:simpleType>
       <xs:restriction base="xs:string">
         <xs:enumeration value="US-DRESS" />
-        <!-- SKIPTEST: Incomplete fixture -->
       </xs:restriction>
     </xs:simpleType>
   </xs:attribute>
   <xs:attribute name="anything" />
+    <xs:complexType name="attributes">
+        <xs:attribute ref="anything" />
+        <xs:attribute ref="color" />
+        <xs:attribute ref="dim" />
+        <xs:attribute ref="system" />
+    </xs:complexType>
 </xs:schema>

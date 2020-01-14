@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import Optional
+from typing import List
 
 
 @dataclass
@@ -7,11 +7,13 @@ class AvailableSizesType:
     """
     :ivar value:
     """
-    value: Optional[int] = field(
-        default=None,
+    value: List[int] = field(
+        default_factory=list,
         metadata=dict(
             name="value",
-            type="Restriction",
+            type="List",
+            min_occurs=0,
+            max_occurs=9223372036854775807,
             min_inclusive=2.0,
             max_inclusive=18.0
         )

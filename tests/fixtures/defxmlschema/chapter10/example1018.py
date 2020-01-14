@@ -1,5 +1,8 @@
 from dataclasses import dataclass, field
 from typing import List, Union
+from tests.fixtures.defxmlschema.chapter08.example0809 import (
+    SmlxsizeType,
+)
 
 
 @dataclass
@@ -7,7 +10,7 @@ class AvailableSizesType:
     """
     :ivar value:
     """
-    value: List[Union[int, str]] = field(
+    value: List[Union[int, SmlxsizeType]] = field(
         default_factory=list,
         metadata=dict(
             name="value",

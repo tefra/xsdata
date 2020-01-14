@@ -10,10 +10,9 @@ from xsdata.models.elements import (
     Element,
     Enumeration,
     Group,
-    Restriction,
-    Schema,
-    SimpleType,
 )
+from xsdata.models.elements import List as ListElement
+from xsdata.models.elements import Restriction, Schema, SimpleType
 from xsdata.models.elements import Union as UnionElement
 from xsdata.models.enums import TagType, XSDType
 from xsdata.models.mixins import ElementBase
@@ -22,7 +21,7 @@ BaseElement = Union[
     Attribute, AttributeGroup, Element, ComplexType, SimpleType, Group
 ]
 AttributeElement = Union[
-    Attribute, Element, Restriction, Enumeration, UnionElement
+    Attribute, Element, Restriction, Enumeration, UnionElement, ListElement
 ]
 
 
@@ -162,8 +161,11 @@ class ClassBuilder:
     def build_inner_enumeration(self, parent: Class, obj: AttributeElement):
         """Build an enumeration class from an anonymous restriction with
         enumeration facet."""
-        if isinstance(obj, (Element, Attribute)) and obj.simple_type:
-            obj.simple_type.name = obj.name
+        if (
+            isinstance(obj, (Element, Attribute, ListElement))
+            and obj.simple_type
+        ):
+            obj.simple_type.name = obj.real_name
             parent.inner.append(self.build_class(obj.simple_type, inner=True))
 
             obj.type = obj.simple_type.name
@@ -183,7 +185,7 @@ class ClassBuilder:
         """Check if the attribute element contains anonymous restriction with
         enumeration facet."""
         return (
-            isinstance(obj, (Attribute, Element))
+            isinstance(obj, (Attribute, Element, ListElement))
             and obj.type is None
             and obj.simple_type is not None
             and obj.simple_type.restriction is not None

@@ -21,16 +21,6 @@ Example 10-10 Length facet applied to a list
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter10/example1010.py
    :language: python
 
-Example 10-12 Enumeration applied inappropriately to a list type
-----------------------------------------------------------------
-
-.. literalinclude:: /../tests/fixtures/defxmlschema/chapter10/example1012.xsd
-   :language: xml
-   :lines: 3-
-
-.. literalinclude:: /../tests/fixtures/defxmlschema/chapter10/example1012.py
-   :language: python
-
 Example 10-13 Enumeration applied to the item type of a list
 ------------------------------------------------------------
 
@@ -44,11 +34,11 @@ Example 10-13 Enumeration applied to the item type of a list
 Example 10-14 Enumeration correctly applied to a list type
 ----------------------------------------------------------
 
-.. literalinclude:: /../tests/fixtures/defxmlschema/chapter10/example10141.xsd
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter10/example1014.xsd
    :language: xml
    :lines: 3-
 
-.. literalinclude:: /../tests/fixtures/defxmlschema/chapter10/example10141.py
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter10/example1014.py
    :language: python
 
 Example 10-15 Pattern applied to a list type
@@ -69,6 +59,16 @@ Example 10-16 Defining a list of a string-based type
    :lines: 3-
 
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter10/example1016.py
+   :language: python
+
+Example 10-18 Defining a list of a union
+----------------------------------------
+
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter10/example1018.xsd
+   :language: xml
+   :lines: 3-
+
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter10/example1018.py
    :language: python
 
 Example 10-2 Using the memberTypes attribute

@@ -1,6 +1,5 @@
 <!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
 <!-- Example 10-18 Defining a list of a union -->
-<!-- SKIPTEST -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
   <xs:import schemaLocation="../chapter08/example0801.xsd" />
   <xs:import schemaLocation="../chapter08/example0809.xsd" />

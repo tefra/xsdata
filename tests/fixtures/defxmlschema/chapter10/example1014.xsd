@@ -1,6 +1,7 @@
 <!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
 <!-- Example 10-14 Enumeration correctly applied to a list type -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <xs:include schemaLocation="example1002.xsd" />
   <xs:simpleType name="ApplicableSizesType">
     <xs:restriction>
       <xs:simpleType>
@@ -10,4 +11,5 @@
       <xs:enumeration value="2 4 6 8 10 12 14 16 18" />
     </xs:restriction>
   </xs:simpleType>
+     <xs:element name="ApplicableSizesType" type="ApplicableSizesType" />
 </xs:schema>

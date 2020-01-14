@@ -21,15 +21,12 @@ class UnionTests(TestCase):
 
     def test_property_is_attribute(self):
         obj = Union.create()
-        self.assertFalse(obj.is_attribute)
-
-        obj.simple_types.append(SimpleType.create())
         self.assertTrue(obj.is_attribute)
 
     def test_property_real_type(self):
         obj = Union.create()
-        obj.member_types = "foo bar"
-        self.assertIsNone(obj.real_type)
+        obj.member_types = "thug life"
+        self.assertEqual(obj.member_types, obj.real_type)
 
         obj = Union.create(
             simple_types=[
@@ -42,9 +39,6 @@ class UnionTests(TestCase):
 
     def test_property_real_name(self):
         obj = Union.create()
-        self.assertEqual("", obj.real_name)
-
-        obj = Union.create(simple_types=[SimpleType.create()])
         self.assertEqual("value", obj.real_name)
 
     def test_get_restrictions(self):

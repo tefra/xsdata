@@ -4,7 +4,6 @@
   <xs:include schemaLocation="example0814.xsd" />
   <xs:simpleType name="EvenDressSizeType">
     <xs:restriction base="DressSizeType">
-      <!-- SKIPTEST: XML Schema 1.1 -->
       <xs:assertion test="$value mod 2 = 0" />
       <!-- SKIPTEST: XML Schema 1.1 -->
     </xs:restriction>

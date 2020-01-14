@@ -107,7 +107,7 @@ class SimpleType(AnnotationBase, TypedField, NamedField, RestrictedField):
 
 
 @dataclass
-class List(AnnotationBase, RestrictedField):
+class List(AnnotationBase, RestrictedField, NamedField):
     """
     The list element defines a simple type element as a list of values of a
     specified data type.
@@ -117,6 +117,24 @@ class List(AnnotationBase, RestrictedField):
 
     item_type: Optional[str]
     simple_type: SimpleType
+
+    @property
+    def type(self):
+        """Property alias for item type."""
+        return self.item_type
+
+    @type.setter
+    def type(self, value):
+        """Property setter alias for item type."""
+        self.item_type = value
+
+    @property
+    def is_attribute(self) -> bool:
+        return True
+
+    @property
+    def real_name(self) -> str:
+        return "value"
 
     @property
     def real_type(self) -> Optional[str]:
@@ -153,20 +171,22 @@ class Union(AnnotationBase, TypedField, NamedField, RestrictedField):
 
     @property
     def is_attribute(self) -> bool:
-        return True if self.simple_types else False
+        return True
 
     @property
     def real_type(self) -> Optional[str]:
-        if self.is_attribute:
+        if self.simple_types:
             return " ".join(
                 filter(None, [x.real_type for x in self.simple_types])
             )
+        if self.member_types:
+            return self.member_types
 
         return None
 
     @property
     def real_name(self) -> str:
-        return "value" if self.is_attribute else ""
+        return "value"
 
     def get_restrictions(self) -> Dict[str, Anything]:
         restrictions = dict()

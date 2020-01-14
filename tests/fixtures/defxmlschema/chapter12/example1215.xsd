@@ -1,6 +1,7 @@
 <!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
 <!-- Example 12-15 A sequence group -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <xs:import schemaLocation="../chapter10/example1001.xsd" />
   <xs:complexType name="ProductType">
     <xs:sequence>
       <xs:element name="number" type="xs:integer" />
@@ -9,10 +10,4 @@
       <xs:element name="color" type="xs:string" minOccurs="0" />
     </xs:sequence>
   </xs:complexType>
-  <xs:simpleType name="SizeType">
-    <xs:restriction base="xs:integer">
-      <xs:minInclusive value="2" />
-      <xs:maxInclusive value="18" />
-    </xs:restriction>
-  </xs:simpleType>
 </xs:schema>

@@ -11,6 +11,16 @@ Example 12-11 Complex type with empty content
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1211.py
    :language: python
 
+Example 12-12 Element references
+--------------------------------
+
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1212.xsd
+   :language: xml
+   :lines: 3-
+
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1212.py
+   :language: python
+
 Example 12-15 A sequence group
 ------------------------------
 
@@ -99,6 +109,36 @@ Example 12-3 Anonymous complex type
    :lines: 3-
 
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1203.py
+   :language: python
+
+Example 12-30 Local attribute declaration
+-----------------------------------------
+
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1230.xsd
+   :language: xml
+   :lines: 3-
+
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1230.py
+   :language: python
+
+Example 12-31 Attribute reference
+---------------------------------
+
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1231.xsd
+   :language: xml
+   :lines: 3-
+
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1231.py
+   :language: python
+
+Example 12-32 Complex type with attribute group reference
+---------------------------------------------------------
+
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1232.xsd
+   :language: xml
+   :lines: 3-
+
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1232.py
    :language: python
 
 Example 12-33 Using an element wildcard

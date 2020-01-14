@@ -1,6 +1,7 @@
 <!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
 <!-- Example 12-12 Element references -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+ <xs:import schemaLocation="../chapter10/example1001.xsd" />
   <xs:element name="number" type="xs:integer" />
   <xs:element name="name" type="xs:string" />
   <xs:element name="size" type="SizeType" />
@@ -13,5 +14,4 @@
       <xs:element ref="color" minOccurs="0" />
     </xs:sequence>
   </xs:complexType>
-  <!-- SKIPTEST: Incomplete fixture -->
 </xs:schema>

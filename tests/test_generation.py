@@ -112,6 +112,32 @@ def teardown_module():
     for rst in here.parent.joinpath(f"").glob("docs/tests/defxmlschema/*.rst"):
         rst.unlink()
 
+    titles = {
+        "01": "Chapter 01: Schemas: An introduction",
+        "02": "Chapter 02: A quick tour of XML Schema",
+        "03": "Chapter 03: Namespaces",
+        "04": "Chapter 04: Schema composition",
+        "05": "Chapter 05: Instances and schemas",
+        "06": "Chapter 06: Element declarations",
+        "07": "Chapter 07: Attribute declarations",
+        "08": "Chapter 08: Simple types",
+        "09": "Chapter 09: Regular expressions",
+        "10": "Chapter 10: Union and list types",
+        "11": "Chapter 11: Built-in simple types",
+        "12": "Chapter 12: Complex types",
+        "13": "Chapter 13: Deriving complex types",
+        "14": "Chapter 14: Assertions",
+        "15": "Chapter 15: Named groups",
+        "16": "Chapter 16: Substitution groups",
+        "17": "Chapter 17: Identity constraints",
+        "18": "Chapter 18: Redefining and overriding schema components",
+        "19": "Chapter 19: Topics for DTD users",
+        "20": "Chapter 20: XML information modeling",
+        "21": "Chapter 21: Schema design and documentation",
+        "22": "Chapter 22: Extensibility and reuse",
+        "23": "Chapter 23: Versioning",
+    }
+
     docs: Dict[str, List[Documentation]] = defaultdict(list)
     for schema in schemas:
         source = schema.read_text()
@@ -129,13 +155,12 @@ def teardown_module():
         )
 
     for suite, items in docs.items():
+        number = suite.replace("chapter", "")
         template = Template(
             here.joinpath(f"fixtures/defxmlschema/output.jinja2").read_text(),
             keep_trailing_newline=True,
         )
-        output = template.render(
-            suite=suite.replace("chapter", "Chapter #"), items=items
-        )
+        output = template.render(suite=titles[number], items=items)
 
         file = here.parent.joinpath(f"docs/tests/defxmlschema/{suite}.rst")
         file.parent.mkdir(parents=True, exist_ok=True)

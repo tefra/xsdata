@@ -1,5 +1,5 @@
-Chapter #08
-===========
+Chapter 08: Simple types
+========================
 
 Example 8-1 Defining and referencing a named simple type
 --------------------------------------------------------

@@ -1,5 +1,5 @@
-Chapter #17
-===========
+Chapter 17: Identity constraints
+================================
 
 Example 17-10 Illegal attempt to apply default namespace to XPath
 -----------------------------------------------------------------

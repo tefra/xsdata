@@ -1,5 +1,5 @@
-Chapter #14
-===========
+Chapter 14: Assertions
+======================
 
 Example 14-1 Assertions on simple and complex types
 ---------------------------------------------------

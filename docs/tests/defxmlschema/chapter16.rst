@@ -1,5 +1,5 @@
-Chapter #16
-===========
+Chapter 16: Substitution groups
+===============================
 
 Example 16-1 The head of a substitution group
 ---------------------------------------------

@@ -1,5 +1,5 @@
-Chapter #10
-===========
+Chapter 10: Union and list types
+================================
 
 Example 10-1 Defining a union type
 ----------------------------------

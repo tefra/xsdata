@@ -1,5 +1,5 @@
-Chapter #01
-===========
+Chapter 01: Schemas: An introduction
+====================================
 
 Example 1-2 Product schema in XSD schema language
 -------------------------------------------------

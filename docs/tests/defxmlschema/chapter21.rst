@@ -1,5 +1,5 @@
-Chapter #21
-===========
+Chapter 21: Schema design and documentation
+===========================================
 
 Example 21-1 Schema for Russian Doll approach
 ---------------------------------------------

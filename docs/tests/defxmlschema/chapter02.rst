@@ -1,5 +1,5 @@
-Chapter #02
-===========
+Chapter 02: A quick tour of XML Schema
+======================================
 
 Example 2-10 Product schema document with target namespace
 ----------------------------------------------------------

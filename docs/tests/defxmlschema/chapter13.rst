@@ -1,5 +1,5 @@
-Chapter #13
-===========
+Chapter 13: Deriving complex types
+==================================
 
 Example 13-1 Simple content extension
 -------------------------------------

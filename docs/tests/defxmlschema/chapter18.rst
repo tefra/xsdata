@@ -1,5 +1,5 @@
-Chapter #18
-===========
+Chapter 18: Redefining and overriding schema components
+=======================================================
 
 Example 18-1 A simple redefinition
 ----------------------------------

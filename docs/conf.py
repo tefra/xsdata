@@ -75,6 +75,10 @@ html_context = sphinx_material.get_html_context()
 html_show_sourcelink = True
 html_sidebars = {"**": ["logo-text.html", "globaltoc.html", "searchbox.html"]}
 
+html_baseurl = "https://xsdata.readthedocs.io/en/latest/"
+
+html_extra_path = ["robots.txt"]
+
 
 # Material theme options (see theme.conf for more information)
 html_theme_options = {
@@ -92,6 +96,7 @@ html_theme_options = {
     "globaltoc_collapse": True,
     # If True, show hidden TOC entries
     "globaltoc_includehidden": False,
+    "base_url": "https://xsdata.readthedocs.io/en/latest/",
 }
 
 intersphinx_mapping = {"https://docs.python.org/": None}

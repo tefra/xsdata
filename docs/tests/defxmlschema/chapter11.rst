@@ -1,5 +1,5 @@
-Chapter #11
-===========
+Chapter 11: Built-in simple types
+=================================
 
 Example 11-1 Extensible mixed content
 -------------------------------------

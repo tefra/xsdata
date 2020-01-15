@@ -1,5 +1,5 @@
-Chapter #06
-===========
+Chapter 06: Element declarations
+================================
 
 Example 6-1 Global element declarations
 ---------------------------------------

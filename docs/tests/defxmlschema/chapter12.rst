@@ -1,5 +1,5 @@
-Chapter #12
-===========
+Chapter 12: Complex types
+=========================
 
 Example 12-11 Complex type with empty content
 ---------------------------------------------

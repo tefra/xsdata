@@ -1,5 +1,5 @@
-Chapter #07
-===========
+Chapter 07: Attribute declarations
+==================================
 
 Example 7-1 Global attribute declarations
 -----------------------------------------

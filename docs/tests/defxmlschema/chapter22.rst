@@ -1,5 +1,5 @@
-Chapter #22
-===========
+Chapter 22: Extensibility and reuse
+===================================
 
 Example 22-7 Original type
 --------------------------

@@ -1,5 +1,5 @@
-Chapter #15
-===========
+Chapter 15: Named groups
+========================
 
 Example 15-1 Named model group with local element declarations
 --------------------------------------------------------------

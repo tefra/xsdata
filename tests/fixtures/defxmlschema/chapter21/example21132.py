@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import Optional
+from typing import List, Optional
 
 
 @dataclass
@@ -22,11 +22,12 @@ class ItemsType:
     """
     :ivar product:
     """
-    product: Optional[ProductType] = field(
-        default=None,
+    product: List[ProductType] = field(
+        default_factory=list,
         metadata=dict(
             name="product",
             type="Element",
-            required=True
+            min_occurs=1,
+            max_occurs=9223372036854775807
         )
     )

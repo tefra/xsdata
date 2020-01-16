@@ -6,7 +6,14 @@ from typing import List, Optional
 from lxml import etree
 
 from xsdata.models import elements
-from xsdata.models.elements import Attribute, Choice, Element, Schema
+from xsdata.models.elements import (
+    All,
+    Attribute,
+    Choice,
+    Element,
+    Schema,
+    Sequence,
+)
 from xsdata.models.enums import EventType, FormType, TagType, XSDType
 from xsdata.models.mixins import BaseModel
 from xsdata.utils.text import snake_case
@@ -97,35 +104,57 @@ class SchemaParser:
 
         return element
 
-    def start_schema(self, schema: Schema, *args):
+    def start_schema(self, obj: Schema, *args):
         """Collect the schema's default form for attributes and elements for
         later usage."""
 
-        if isinstance(schema, Schema):
-            self.element_form = schema.element_form_default
-            self.attribute_form = schema.attribute_form_default
+        if isinstance(obj, Schema):
+            self.element_form = obj.element_form_default
+            self.attribute_form = obj.attribute_form_default
 
-    def start_element(self, element: Element, *args):
+    def start_element(self, obj: Element, *args):
         """Assign the schema's default form for elements if the given element
         form is None."""
 
-        if isinstance(element, Element) and element.form is None:
-            element.form = self.element_form
+        if isinstance(obj, Element) and obj.form is None:
+            obj.form = self.element_form
 
-    def start_attribute(self, attribute: Attribute, *args):
+    def start_attribute(self, obj: Attribute, *args):
         """Assign the schema's default form for attributes if the given
         attribute form is None."""
 
-        if isinstance(attribute, Attribute) and attribute.form is None:
-            attribute.form = self.attribute_form
+        if isinstance(obj, Attribute) and obj.form is None:
+            obj.form = self.attribute_form
 
-    def end_choice(self, choice: Choice, *args):
+    def end_choice(self, obj: Choice, *args):
         """Elements inside a choice are by definition optional, reset their min
         occurs counter."""
 
-        if isinstance(choice, Choice):
-            for child in choice.elements:
+        if isinstance(obj, Choice):
+            for child in obj.elements:
                 child.min_occurs = 0
+                if child.max_occurs is None:
+                    child.max_occurs = obj.max_occurs
+
+    def end_all(self, obj: All, *args):
+        """Elements inside an all element can by definition appear at most
+        once, reset their max occur counter."""
+
+        if isinstance(obj, All):
+            for child in obj.elements:
+                child.max_occurs = 1
+                if child.min_occurs is None:
+                    child.min_occurs = obj.min_occurs
+
+    def end_sequence(self, obj: Sequence, *args):
+        """Elements inside a sequence inherit min|max occur counter if it is
+        not set."""
+        if isinstance(obj, Sequence):
+            for child in obj.elements:
+                if child.min_occurs is None:
+                    child.min_occurs = obj.min_occurs
+                if child.max_occurs is None:
+                    child.max_occurs = obj.max_occurs
 
     def assign_to_parent(self, element):
         """

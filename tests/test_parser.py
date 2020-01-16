@@ -2,6 +2,7 @@ import sys
 from unittest import TestCase
 
 from xsdata.models.elements import (
+    All,
     Attribute,
     Choice,
     ComplexContent,
@@ -70,6 +71,8 @@ class ParserTests(TestCase):
                         index=3,
                         name="PointOfSale",
                         form=FormType.QUALIFIED,
+                        max_occurs=sys.maxsize,
+                        min_occurs=1,
                         complex_type=ComplexType.create(
                             index=4,
                             attributes=[
@@ -199,12 +202,48 @@ class ParserTests(TestCase):
                     Element.create(
                         name="first",
                         min_occurs=0,
+                        max_occurs=1,
                         form=FormType.QUALIFIED,
                         index=3,
                     ),
                     Element.create(
                         name="second",
                         min_occurs=0,
+                        max_occurs=1,
+                        form=FormType.QUALIFIED,
+                        index=4,
+                    ),
+                ],
+            ),
+        )
+        schema = SchemaParser.from_string(wrap(xsd))
+        self.assertEqual(expected, schema.complex_types[0])
+
+    def test_complex_type_with_all_resets_elements_max_occurs(self):
+        xsd = """<xs:complexType>
+                    <xs:all minOccurs="1">
+                    <xs:element name="first" maxOccurs="100" />
+                    <xs:element name="second" maxOccurs="100" />
+                    </xs:all>
+              </xs:complexType>"""
+
+        expected = ComplexType.create(
+            index=1,
+            all=All.create(
+                index=2,
+                min_occurs=1,
+                elements=[
+                    Element.create(
+                        name="first",
+                        min_occurs=1,
+                        max_occurs=1,
+                        form=FormType.QUALIFIED,
+                        index=3,
+                    ),
+                    Element.create(
+                        name="second",
+                        min_occurs=1,
+                        max_occurs=1,
                         form=FormType.QUALIFIED,
                         index=4,
                     ),

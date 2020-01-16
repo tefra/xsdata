@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import Optional
+from typing import List
 
 
 @dataclass
@@ -7,12 +7,13 @@ class VectorType:
     """
     :ivar e:
     """
-    e: Optional[int] = field(
-        default=None,
+    e: List[int] = field(
+        default_factory=list,
         metadata=dict(
             name="e",
             type="Element",
-            required=True
+            min_occurs=1,
+            max_occurs=9223372036854775807
         )
     )
 
@@ -22,12 +23,13 @@ class ArrayType:
     """
     :ivar r:
     """
-    r: Optional[VectorType] = field(
-        default=None,
+    r: List[VectorType] = field(
+        default_factory=list,
         metadata=dict(
             name="r",
             type="Element",
-            required=True
+            min_occurs=1,
+            max_occurs=9223372036854775807
         )
     )
 

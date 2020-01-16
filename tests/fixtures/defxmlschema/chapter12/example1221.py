@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import Optional
+from typing import List
 from tests.fixtures.defxmlschema.chapter16.example1607 import (
     HatType,
     ShirtType,
@@ -14,24 +14,30 @@ class ItemsType:
     :ivar umbrella:
     :ivar hat:
     """
-    shirt: Optional[ShirtType] = field(
-        default=None,
+    shirt: List[ShirtType] = field(
+        default_factory=list,
         metadata=dict(
             name="shirt",
-            type="Element"
+            type="Element",
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )
-    umbrella: Optional[UmbrellaType] = field(
-        default=None,
+    umbrella: List[UmbrellaType] = field(
+        default_factory=list,
         metadata=dict(
             name="umbrella",
-            type="Element"
+            type="Element",
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )
-    hat: Optional[HatType] = field(
-        default=None,
+    hat: List[HatType] = field(
+        default_factory=list,
         metadata=dict(
             name="hat",
-            type="Element"
+            type="Element",
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )

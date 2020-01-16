@@ -48,7 +48,7 @@ class ElementTests(TestCase):
         self.assertIsNone(obj.extends)
 
     def test_get_restrictions(self):
-        obj = Element.create()
+        obj = Element.create(min_occurs=1, max_occurs=1)
         expected = {"required": True}
         self.assertEqual(expected, obj.get_restrictions())
 

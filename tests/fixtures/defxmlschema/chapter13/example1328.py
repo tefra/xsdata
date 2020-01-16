@@ -13,24 +13,21 @@ class LetterType:
         default=None,
         metadata=dict(
             name="custName",
-            type="Element",
-            required=True
+            type="Element"
         )
     )
     prod_name: Optional[str] = field(
         default=None,
         metadata=dict(
             name="prodName",
-            type="Element",
-            required=True
+            type="Element"
         )
     )
     prod_size: Optional[int] = field(
         default=None,
         metadata=dict(
             name="prodSize",
-            type="Element",
-            required=True
+            type="Element"
         )
     )
 

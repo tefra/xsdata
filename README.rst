@@ -1,7 +1,8 @@
 .. image:: https://github.com/tefra/xsdata/raw/master/docs/_static/logo.png
     :target: https://xsdata.readthedocs.io/
 
-xsData naive XML Bindings for python
+Naive XML Bindings for python
+=============================
 
 .. image:: https://travis-ci.org/tefra/xsdata.svg?branch=master
         :target: https://travis-ci.org/tefra/xsdata
@@ -24,7 +25,7 @@ xsData naive XML Bindings for python
 .. image:: https://img.shields.io/pypi/v/xsdata.svg
     :target: https://pypi.org/pypi/xsdata/
 
--------
+--------
 
 Features
 --------

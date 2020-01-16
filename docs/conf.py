@@ -25,8 +25,7 @@ copyright = "2020, Christodoulos Tsoulloftas"
 author = "Christodoulos Tsoulloftas"
 
 # The full version, including alpha/beta/rc tags
-release = get_distribution("xsdata").version
-
+version = release = get_distribution("xsdata").version
 
 # -- General configuration ---------------------------------------------------
 
@@ -55,11 +54,6 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 
 # -- Options for HTML output -------------------------------------------------
 
-# The theme to use for HTML and HTML Help pages.  See the documentation for
-# a list of builtin themes.
-#
-html_theme = "alabaster"
-
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
@@ -73,9 +67,15 @@ html_theme_path = sphinx_material.html_theme_path()
 html_context = sphinx_material.get_html_context()
 
 html_show_sourcelink = True
-html_sidebars = {"**": ["logo-text.html", "globaltoc.html", "searchbox.html"]}
 
-html_baseurl = "https://xsdata.readthedocs.io/en/latest/"
+html_sidebars = {
+    "**": [
+        "logo-text.html",
+        "globaltoc.html",
+        "localtoc.html",
+        "searchbox.html",
+    ]
+}
 
 html_extra_path = ["robots.txt"]
 
@@ -89,7 +89,7 @@ html_theme_options = {
     "color_accent": "light-blue",
     # Set the repo location to get a badge with stats
     "repo_url": "https://github.com/tefra/xsdata/",
-    "repo_name": "xsData",
+    "repo_name": "xsData: naive xml bindings",
     # Visible levels of the global TOC; -1 means unlimited
     "globaltoc_depth": 3,
     # If False, expand all TOC entries

@@ -21,8 +21,8 @@ Example 21-10 Different namespaces in a schema
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter21/example21101.py
    :language: python
 
-Example 21-10 Different namespaces in a schema
-----------------------------------------------
+Example 21-10.2 Different namespaces in a schema
+------------------------------------------------
 
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter21/example21102.xsd
    :language: xml
@@ -31,8 +31,8 @@ Example 21-10 Different namespaces in a schema
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter21/example21102.py
    :language: python
 
-Example 21-10 Different namespaces in a schema
-----------------------------------------------
+Example 21-10.3 Different namespaces in a schema
+------------------------------------------------
 
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter21/example21103.xsd
    :language: xml
@@ -53,8 +53,8 @@ Example 21-13 Chameleon namespaces in a schema
     Fails
 
 
-Example 21-13 Chameleon namespaces in a schema
-----------------------------------------------
+Example 21-13.2 Chameleon namespaces in a schema
+------------------------------------------------
 
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter21/example21132.xsd
    :language: xml
@@ -63,8 +63,8 @@ Example 21-13 Chameleon namespaces in a schema
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter21/example21132.py
    :language: python
 
-Example 21-13 Chameleon namespaces in a schema
-----------------------------------------------
+Example 21-13.3 Chameleon namespaces in a schema
+------------------------------------------------
 
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter21/example21133.xsd
    :language: xml
@@ -83,8 +83,8 @@ Example 21-16 Schema for qualified local element names
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter21/example21161.py
    :language: python
 
-Example 21-16 Schema for qualified local element names
-------------------------------------------------------
+Example 21-16.2 Schema for qualified local element names
+--------------------------------------------------------
 
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter21/example21162.xsd
    :language: xml
@@ -205,8 +205,8 @@ Example 21-8 Same namespace in a schema
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter21/example21081.py
    :language: python
 
-Example 21-8 Same namespace in a schema
----------------------------------------
+Example 21-8.2 Same namespace in a schema
+-----------------------------------------
 
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter21/example21082.xsd
    :language: xml
@@ -215,8 +215,8 @@ Example 21-8 Same namespace in a schema
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter21/example21082.py
    :language: python
 
-Example 21-8 Same namespace in a schema
----------------------------------------
+Example 21-8.3 Same namespace in a schema
+-----------------------------------------
 
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter21/example21083.xsd
    :language: xml

@@ -139,13 +139,24 @@ def teardown_module():
     }
 
     docs: Dict[str, List[Documentation]] = defaultdict(list)
+    sections = defaultdict(int)
     for schema in schemas:
         source = schema.read_text()
         target = schema.with_suffix(".py")
+        section_title = parse_title(source)
+        rename = section_title in sections
+        sections[section_title] += 1
+
+        if rename:
+            parts = section_title.split(" ")
+            for i in range(len(parts)):
+                if parts[i][0].isdigit():
+                    parts[i] += f".{sections[section_title]}"
+            section_title = " ".join(parts)
 
         docs[schema.parent.name].append(
             Documentation(
-                title=parse_title(source),
+                title=section_title,
                 skip_message=parse_skip_message(source),
                 source=f"/../tests/{schema.relative_to(here)}",
                 target=f"/../tests/{target.relative_to(here)}"

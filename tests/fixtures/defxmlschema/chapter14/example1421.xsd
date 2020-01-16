@@ -1,9 +1,0 @@
-<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
-<!-- Example 14-21 Conditional type assignment with declared type -->
-<!-- SKIPTEST: XML Schema 1.1 -->
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
-  <xs:element name="product" type="ProductType">
-    <xs:alternative test="@dept='ACC'" type="AccessoryType" />
-    <xs:alternative test="@dept='WMN' or @dept='MEN'" type="ClothingType" />
-  </xs:element>
-</xs:schema>

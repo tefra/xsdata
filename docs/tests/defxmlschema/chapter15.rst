@@ -95,8 +95,8 @@ Example 15-17 Named groups across namespaces
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter15/example15171.py
    :language: python
 
-Example 15-17 Named groups across namespaces
---------------------------------------------
+Example 15-17.2 Named groups across namespaces
+----------------------------------------------
 
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter15/example15172.xsd
    :language: xml

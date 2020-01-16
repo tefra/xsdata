@@ -85,8 +85,8 @@ Example 13-26 Restricting open content
     XML Schema 1.1
 
 
-Example 13-26 Restricting open content
---------------------------------------
+Example 13-26.2 Restricting open content
+----------------------------------------
 
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter13/example13262.xsd
    :language: xml
@@ -97,8 +97,8 @@ Example 13-26 Restricting open content
     XML Schema 1.1
 
 
-Example 13-26 Restricting open content
---------------------------------------
+Example 13-26.3 Restricting open content
+----------------------------------------
 
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter13/example13263.xsd
    :language: xml
@@ -201,8 +201,8 @@ Example 13-34 Restricting a type from another namespace with global declarations
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter13/example13341.py
    :language: python
 
-Example 13-34 Restricting a type from another namespace with global declarations
---------------------------------------------------------------------------------
+Example 13-34.2 Restricting a type from another namespace with global declarations
+----------------------------------------------------------------------------------
 
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter13/example13342.xsd
    :language: xml
@@ -221,8 +221,8 @@ Example 13-35 Using targetNamespace on element and attribute declarations
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter13/example13351.py
    :language: python
 
-Example 13-35 Using targetNamespace on element and attribute declarations
--------------------------------------------------------------------------
+Example 13-35.2 Using targetNamespace on element and attribute declarations
+---------------------------------------------------------------------------
 
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter13/example13352.xsd
    :language: xml

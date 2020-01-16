@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import Optional
+from typing import List
 
 
 @dataclass
@@ -9,25 +9,31 @@ class DescType:
     :ivar b:
     :ivar u:
     """
-    i: Optional[str] = field(
-        default=None,
+    i: List[str] = field(
+        default_factory=list,
         metadata=dict(
             name="i",
-            type="Element"
+            type="Element",
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )
-    b: Optional[str] = field(
-        default=None,
+    b: List[str] = field(
+        default_factory=list,
         metadata=dict(
             name="b",
-            type="Element"
+            type="Element",
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )
-    u: Optional[str] = field(
-        default=None,
+    u: List[str] = field(
+        default_factory=list,
         metadata=dict(
             name="u",
-            type="Element"
+            type="Element",
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )
 

@@ -50,8 +50,8 @@ class RestrictedField(ABC):
 
 class OccurrencesMixin:
     def get_restrictions(self) -> Dict[str, Any]:
-        min_occurs = getattr(self, "min_occurs", 1)
-        max_occurs = getattr(self, "max_occurs", 1)
+        min_occurs = getattr(self, "min_occurs")
+        max_occurs = getattr(self, "max_occurs")
         if min_occurs == max_occurs == 1:
             return dict(required=True)
         if max_occurs > min_occurs and max_occurs > 1:

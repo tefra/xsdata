@@ -774,8 +774,8 @@ class Element(AnnotationBase, TypedField, NamedField, OccurrencesMixin):
     uniques: ArrayList[Unique] = field(default_factory=list)
     keys: ArrayList[Key] = field(default_factory=list)
     keyrefs: ArrayList[Keyref] = field(default_factory=list)
-    min_occurs: int = 1
-    max_occurs: int = 1
+    min_occurs: Optional[int] = None
+    max_occurs: Optional[int] = None
     nillable: bool = False
     abstract: bool = False
 

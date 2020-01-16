@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import Optional
+from typing import List, Optional
 
 
 @dataclass
@@ -84,25 +84,31 @@ class ItemsType:
     :ivar hat:
     :ivar umbrella:
     """
-    shirt: Optional[Shirt] = field(
-        default=None,
+    shirt: List[Shirt] = field(
+        default_factory=list,
         metadata=dict(
             name="shirt",
-            type="Element"
+            type="Element",
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )
-    hat: Optional[Hat] = field(
-        default=None,
+    hat: List[Hat] = field(
+        default_factory=list,
         metadata=dict(
             name="hat",
-            type="Element"
+            type="Element",
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )
-    umbrella: Optional[Umbrella] = field(
-        default=None,
+    umbrella: List[Umbrella] = field(
+        default_factory=list,
         metadata=dict(
             name="umbrella",
-            type="Element"
+            type="Element",
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )
 
@@ -113,17 +119,21 @@ class ExpandedItemsType(ItemsType):
     :ivar sweater:
     :ivar suit:
     """
-    sweater: Optional[Sweater] = field(
-        default=None,
+    sweater: List[Sweater] = field(
+        default_factory=list,
         metadata=dict(
             name="sweater",
-            type="Element"
+            type="Element",
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )
-    suit: Optional[Suit] = field(
-        default=None,
+    suit: List[Suit] = field(
+        default_factory=list,
         metadata=dict(
             name="suit",
-            type="Element"
+            type="Element",
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )

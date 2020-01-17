@@ -33,6 +33,7 @@ class SchemaParser:
     elements: List[BaseModel] = field(default_factory=list)
     element_form: Optional[FormType] = field(init=False, default=None)
     attribute_form: Optional[FormType] = field(init=False, default=None)
+    target_namespace: Optional[str] = field(init=False, default=None)
 
     @classmethod
     def create(cls, source: object) -> Schema:
@@ -111,6 +112,7 @@ class SchemaParser:
         if isinstance(obj, Schema):
             self.element_form = obj.element_form_default
             self.attribute_form = obj.attribute_form_default
+            self.target_namespace = obj.target_namespace
 
     def start_element(self, obj: Element, *args):
         """Assign the schema's default form for elements if the given element
@@ -118,6 +120,8 @@ class SchemaParser:
 
         if isinstance(obj, Element) and obj.form is None:
             obj.form = self.element_form
+            if self.target_namespace:
+                obj.nsmap[None] = self.target_namespace
 
     def start_attribute(self, obj: Attribute, *args):
         """Assign the schema's default form for attributes if the given
@@ -125,6 +129,8 @@ class SchemaParser:
 
         if isinstance(obj, Attribute) and obj.form is None:
             obj.form = self.attribute_form
+            if self.target_namespace:
+                obj.nsmap[None] = self.target_namespace
 
     def end_choice(self, obj: Choice, *args):
         """Elements inside a choice are by definition optional, reset their min

@@ -36,9 +36,7 @@ class NamedField:
         if form == FormType.UNQUALIFIED:
             return None
 
-        lookup = getattr(self, "ref", None) or getattr(self, "name")
-
-        prefix, _ = text.split(lookup or "")
+        prefix, _ = text.split(getattr(self, "ref", "") or "")
         return self.nsmap.get(prefix)
 
 

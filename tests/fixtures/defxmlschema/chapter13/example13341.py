@@ -9,6 +9,7 @@ class Name:
     """
     class Meta:
         name = "name"
+        namespace = "http://datypic.com/prod"
 
     value: Optional[str] = field(
         default=None,
@@ -26,6 +27,7 @@ class Number:
     """
     class Meta:
         name = "number"
+        namespace = "http://datypic.com/prod"
 
     value: Optional[int] = field(
         default=None,
@@ -43,6 +45,7 @@ class Size:
     """
     class Meta:
         name = "size"
+        namespace = "http://datypic.com/prod"
 
     value: Optional[int] = field(
         default=None,

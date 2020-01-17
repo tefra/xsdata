@@ -17,6 +17,7 @@ class RestrictedProductType(ProductType):
         metadata=dict(
             name="number",
             type="Element",
+            namespace="http://datypic.com/ord",
             required=True
         )
     )
@@ -25,6 +26,7 @@ class RestrictedProductType(ProductType):
         metadata=dict(
             name="name",
             type="Element",
+            namespace="http://datypic.com/ord",
             required=True
         )
     )
@@ -33,6 +35,7 @@ class RestrictedProductType(ProductType):
         metadata=dict(
             name="dept",
             type="Attribute",
+            namespace="http://datypic.com/ord",
             required=True
         )
     )

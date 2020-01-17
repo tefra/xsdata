@@ -132,7 +132,8 @@ class SchemaParser:
             if self.target_namespace:
                 obj.nsmap[None] = self.target_namespace
 
-    def end_choice(self, obj: Choice, *args):
+    @classmethod
+    def end_choice(cls, obj: Choice, *args):
         """Elements inside a choice are by definition optional, reset their min
         occurs counter."""
 
@@ -142,7 +143,8 @@ class SchemaParser:
                 if child.max_occurs is None:
                     child.max_occurs = obj.max_occurs
 
-    def end_all(self, obj: All, *args):
+    @classmethod
+    def end_all(cls, obj: All, *args):
         """Elements inside an all element can by definition appear at most
         once, reset their max occur counter."""
 
@@ -152,7 +154,8 @@ class SchemaParser:
                 if child.min_occurs is None:
                     child.min_occurs = obj.min_occurs
 
-    def end_sequence(self, obj: Sequence, *args):
+    @classmethod
+    def end_sequence(cls, obj: Sequence, *args):
         """Elements inside a sequence inherit min|max occur counter if it is
         not set."""
         if isinstance(obj, Sequence):

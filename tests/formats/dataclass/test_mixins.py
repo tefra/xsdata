@@ -6,6 +6,11 @@ from xsdata.formats.dataclass.mixins import Field, ModelInspect
 
 
 class ModelInspectTests(TestCase):
+    def test_get_unique_namespaces(self):
+        inspect = ModelInspect()
+        result = inspect.get_unique_namespaces(Books)
+        self.assertEqual({"urn:books"}, result)
+
     def test_get_type_hints(self):
         inspect = ModelInspect()
         result = inspect.get_type_hints(BookForm)
@@ -49,6 +54,12 @@ class ModelInspectTests(TestCase):
         inspect.cache[BookForm] = {"foo": str}
 
         self.assertEqual({"foo": str}, inspect.fields(BookForm))
+
+    def test_namespaces(self):
+        inspect = ModelInspect()
+        inspect.ns_cache[BookForm] = {"foo"}
+
+        self.assertEqual({"foo"}, inspect.namespaces(BookForm))
 
     def test_is_dataclass(self):
         self.assertTrue(ModelInspect.is_dataclass(BookForm))

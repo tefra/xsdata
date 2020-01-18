@@ -1,5 +1,14 @@
 from dataclasses import MISSING, dataclass, field, fields, is_dataclass
-from typing import Any, Dict, Iterator, Optional, Type, get_type_hints
+from typing import (
+    Any,
+    Dict,
+    Iterator,
+    List,
+    Optional,
+    Set,
+    Type,
+    get_type_hints,
+)
 
 from xsdata.models.enums import TagType
 
@@ -25,14 +34,38 @@ class Meta:
 @dataclass
 class ModelInspect:
     cache: Dict = field(init=False, default_factory=dict)
+    ns_cache: Dict = field(init=False, default_factory=dict)
 
-    def fields(self, clazz: Type) -> Iterator[Field]:
+    def fields(self, clazz: Type) -> List[Field]:
         if not self.is_dataclass(clazz):
             raise TypeError(f"Object {clazz} is not a dataclass")
 
         if clazz not in self.cache:
             self.cache[clazz] = list(self.get_type_hints(clazz))
         return self.cache[clazz]
+
+    def namespaces(self, clazz: Type) -> List[str]:
+        if not self.is_dataclass(clazz):
+            raise TypeError(f"Object {clazz} is not a dataclass")
+
+        if clazz not in self.ns_cache:
+            self.ns_cache[clazz] = list(self.get_unique_namespaces(clazz))
+        return self.ns_cache[clazz]
+
+    def get_unique_namespaces(self, clazz) -> Set[str]:
+        namespaces = set()
+        if self.is_dataclass(clazz):
+            meta = self.class_meta(clazz)
+            if meta.namespace:
+                namespaces.add(meta.namespace)
+
+            for f in self.fields(clazz):
+                if f.namespace:
+                    namespaces.add(f.namespace)
+                if f.is_dataclass:
+                    namespaces.update(self.namespaces(f.type))
+
+        return namespaces
 
     def get_type_hints(self, clazz) -> Iterator[Field]:
         type_hints = get_type_hints(clazz)

@@ -40,6 +40,13 @@ class ParserTests(TestCase):
             str(cm.exception),
         )
 
+    def test_top_level_elements_and_attributes_are_qualified(self):
+        xsd = """<xs:element name="a" /><xs:attribute name="b" />"""
+
+        schema = SchemaParser.from_string(wrap(xsd))
+        self.assertEqual(FormType.QUALIFIED, schema.attributes[0].form)
+        self.assertEqual(FormType.QUALIFIED, schema.elements[0].form)
+
     def test_with_empty_tags_are_ignored(self):
         xsd = """<xs:complexType name="foo" />
         <xs:element />

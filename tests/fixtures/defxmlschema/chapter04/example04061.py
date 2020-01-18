@@ -36,3 +36,4 @@ class RootType:
 class Root(RootType):
     class Meta:
         name = "root"
+        namespace = "http://datypic.com/root"

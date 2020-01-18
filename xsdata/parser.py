@@ -114,6 +114,15 @@ class SchemaParser:
             self.attribute_form = obj.attribute_form_default
             self.target_namespace = obj.target_namespace
 
+    @classmethod
+    def end_schema(cls, obj: Schema, *args):
+        """Root elements and attributes are always qualified."""
+        if isinstance(obj, Schema):
+            for element in obj.elements:
+                element.form = FormType.QUALIFIED
+            for attribute in obj.attributes:
+                attribute.form = FormType.QUALIFIED
+
     def start_element(self, obj: Element, *args):
         """Assign the schema's default form for elements if the given element
         form is None."""

@@ -40,3 +40,4 @@ class ProductType:
 class Product(ProductType):
     class Meta:
         name = "product"
+        namespace = "http://datypic.com/prod"

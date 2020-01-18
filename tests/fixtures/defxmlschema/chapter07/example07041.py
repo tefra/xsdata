@@ -45,3 +45,4 @@ class SizeType:
 class Size(SizeType):
     class Meta:
         name = "size"
+        namespace = "http://datypic.com/prod"

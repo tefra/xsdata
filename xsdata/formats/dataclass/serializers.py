@@ -1,9 +1,9 @@
 import json
 from dataclasses import asdict, dataclass, field
 from enum import Enum
-from typing import Callable, Dict, Optional, Tuple, Type
+from typing import Callable, Dict, List, Optional, Tuple, Type
 
-from lxml.etree import Element, QName, SubElement, cleanup_namespaces, tostring
+from lxml.etree import Element, QName, SubElement, tostring
 
 from xsdata.formats.dataclass.mixins import ModelInspect
 from xsdata.formats.mixins import AbstractSerializer
@@ -67,7 +67,6 @@ class XmlSerializer(AbstractSerializer, ModelInspect):
     xml_declaration: bool = field(default=True)
     encoding: str = field(default="UTF-8")
     pretty_print: bool = field(default=False)
-    ns_list: list = field(init=False, default_factory=list)
 
     def render(self, obj: object) -> str:
         """Convert the given object tree to xml string."""
@@ -94,17 +93,27 @@ class XmlSerializer(AbstractSerializer, ModelInspect):
 
         meta = self.class_meta(obj.__class__)
         qname = self.render_tag(meta.name, meta.namespace)
-        root = self.render_node(obj, Element(qname))
+        namespaces = self.namespaces(obj.__class__)
+        nsmap = self.nsmap(namespaces, meta.namespace)
 
-        cleanup_namespaces(
-            root,
-            top_nsmap={
-                None if index == 0 else f"ns{index}": namespace
-                for index, namespace in enumerate(self.ns_list)
-            },
-        )
+        return self.render_node(obj, Element(qname, nsmap=nsmap))
 
-        return root
+    @staticmethod
+    def nsmap(namespaces: List[str], default_namespace: Optional[str] = None):
+        """
+        Convert list of namespaces to map for the lxml element factort.
+
+        The default namespace is assigned to key with value None the
+        rest are assigned nsXX indexes.
+        """
+        index = 0
+        result: Dict[Optional[str], str] = dict()
+        for namespace in namespaces:
+            if namespace == default_namespace:
+                result[None] = namespace
+            else:
+                result[f"ns{index}"] = namespace
+        return result
 
     def render_node(self, obj, parent) -> Element:
         """Recursively traverse the given dataclass instance fields and build
@@ -137,9 +146,8 @@ class XmlSerializer(AbstractSerializer, ModelInspect):
 
         return parent
 
-    def render_tag(self, name, namespace=None) -> QName:
-        if namespace and namespace not in self.ns_list:
-            self.ns_list.append(namespace)
+    @staticmethod
+    def render_tag(name, namespace=None) -> QName:
         return QName(namespace, name)
 
     @staticmethod

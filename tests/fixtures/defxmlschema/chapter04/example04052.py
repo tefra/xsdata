@@ -9,6 +9,7 @@ class OrderSummary:
     """
     class Meta:
         name = "orderSummary"
+        namespace = "http://datypic.com/ord"
 
     value: Optional[str] = field(
         default=None,

@@ -33,3 +33,4 @@ class OrderType:
 class Order(OrderType):
     class Meta:
         name = "order"
+        namespace = "http://datypic.com/ord"

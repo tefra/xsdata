@@ -105,8 +105,8 @@ class XmlParserTests(TestCase):
 
     def test_parse(self):
         xml = (
-            "<?xml version='1.0' encoding='UTF-8'?>\n"
-            "<books>\n"
+            '<?xml version="1.0" encoding="UTF-8"?>\n'
+            '<books xmlns="urn:books">\n'
             '  <book id="bk001">\n'
             "    <author>Hightower, Kim</author>\n"
             "    <title>The First Book</title>\n"

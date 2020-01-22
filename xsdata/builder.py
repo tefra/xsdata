@@ -41,12 +41,18 @@ class ClassBuilder:
         classes.extend(map(self.build_class, self.schema.elements))
         return classes
 
+    def prefix_namespace(self, prefix: Optional[str]):
+        if prefix is None:
+            return self.schema.target_namespace
+        return self.schema.nsmap.get(prefix)
+
     def build_class(self, obj: BaseElement, inner=False) -> Class:
         """Build and return a class instance."""
+        namespace = self.prefix_namespace(obj.prefix)
         item = Class(
             name=obj.real_name,
             is_abstract=obj.is_abstract,
-            namespace=obj.namespace,
+            namespace=namespace,
             type=type(obj),
             extensions=self.build_class_extensions(obj),
             help=obj.display_help,
@@ -138,6 +144,8 @@ class ClassBuilder:
         if not obj.real_type:
             raise ValueError(f"Failed to detect type for element: {obj}")
 
+        namespace = self.prefix_namespace(obj.prefix)
+
         parent.attrs.append(
             Attr(
                 index=obj.index,
@@ -147,7 +155,7 @@ class ClassBuilder:
                 local_type=type(obj).__name__,
                 help=obj.display_help,
                 forward_ref=forward_ref,
-                namespace=obj.namespace,
+                namespace=namespace,
                 **obj.get_restrictions(),
             )
         )

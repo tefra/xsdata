@@ -40,6 +40,37 @@ class ParserTests(TestCase):
             str(cm.exception),
         )
 
+    def test_schema_nsmap_with_target_and_default_namespace(self):
+        xsd = """<?xml version="1.0" encoding="utf-8"?>
+                <xs:schema xmlns="http://www/default"
+                targetNamespace="http://www/target"
+                xmlns:xs="http://www.w3.org/2001/XMLSchema" />"""
+
+        schema = SchemaParser.from_string(xsd, target_namespace="parent")
+        self.assertEqual(
+            {
+                None: "http://www/default",
+                "xs": "http://www.w3.org/2001/XMLSchema",
+            },
+            schema.nsmap,
+        )
+        self.assertEqual("http://www/target", schema.target_namespace)
+
+    def test_schema_nsmap_without_target_namespace(self):
+        xsd = """<?xml version="1.0" encoding="utf-8"?>
+                <xs:schema xmlns="http://www/default"
+                xmlns:xs="http://www.w3.org/2001/XMLSchema" />"""
+
+        schema = SchemaParser.from_string(xsd, target_namespace="parent")
+        self.assertEqual(
+            {
+                None: "http://www/default",
+                "xs": "http://www.w3.org/2001/XMLSchema",
+            },
+            schema.nsmap,
+        )
+        self.assertEqual("parent", schema.target_namespace)
+
     def test_top_level_elements_and_attributes_are_qualified(self):
         xsd = """<xs:element name="a" /><xs:attribute name="b" />"""
 

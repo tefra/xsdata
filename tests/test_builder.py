@@ -225,9 +225,10 @@ class ClassBuilderTests(FactoryTestCase):
 
         self.assertEqual(expected, list(children))
 
+    @patch.object(ClassBuilder, "prefix_namespace")
     @patch.object(ClassBuilder, "has_anonymous_class")
     @patch.object(Attribute, "get_restrictions")
-    @patch.object(Attribute, "namespace", new_callable=PropertyMock)
+    @patch.object(Attribute, "prefix", new_callable=PropertyMock)
     @patch.object(Attribute, "display_help", new_callable=PropertyMock)
     @patch.object(Attribute, "real_type", new_callable=PropertyMock)
     @patch.object(Attribute, "real_name", new_callable=PropertyMock)
@@ -236,18 +237,20 @@ class ClassBuilderTests(FactoryTestCase):
         mock_real_name,
         mock_real_type,
         mock_display_help,
-        mock_namespace,
+        mock_prefix_property,
         mock_get_restrictions,
-        has_anonymous_class,
+        mock_has_anonymous_class,
+        mock_prefix_namespace,
     ):
         item = ClassFactory.create()
 
         mock_real_name.return_value = item.name
         mock_real_type.return_value = "xs:int"
         mock_display_help.return_value = "sos"
-        mock_namespace.return_value = "http://something/common"
+        mock_prefix_property.return_value = "com"
+        mock_prefix_namespace.return_value = "http://something/common"
         mock_get_restrictions.return_value = {"required": True}
-        has_anonymous_class.return_value = False
+        mock_has_anonymous_class.return_value = False
 
         attribute = Attribute.create(default="false", index=66)
 
@@ -256,7 +259,7 @@ class ClassBuilderTests(FactoryTestCase):
             name=mock_real_name.return_value,
             type=mock_real_type.return_value,
             local_type=Attribute.__name__,
-            namespace=mock_namespace.return_value,
+            namespace=mock_prefix_namespace.return_value,
             help=mock_display_help.return_value,
             forward_ref=False,
             default="false",
@@ -264,22 +267,25 @@ class ClassBuilderTests(FactoryTestCase):
             **mock_get_restrictions.return_value,
         )
         self.assertEqual(expected, item.attrs[0])
-        has_anonymous_class.assert_called_once_with(attribute)
+        mock_has_anonymous_class.assert_called_once_with(attribute)
+        mock_prefix_namespace.assert_called_once_with(
+            mock_prefix_property.return_value
+        )
 
     @patch.object(ClassBuilder, "build_inner_class")
     @patch.object(ClassBuilder, "has_anonymous_class")
     def test_build_class_attribute_with_anonymous_class(
-        self, has_inner_type, build_inner_class,
+        self, mock_has_inner_type, mock_build_inner_class,
     ):
-        has_inner_type.return_value = True
+        mock_has_inner_type.return_value = True
 
         item = ClassFactory.create()
         attribute = Attribute.create(ref="foo")
         self.builder.build_class_attribute(item, attribute)
 
         self.assertEqual(True, item.attrs[0].forward_ref)
-        has_inner_type.assert_called_once_with(attribute)
-        build_inner_class.assert_called_once_with(item, attribute)
+        mock_has_inner_type.assert_called_once_with(attribute)
+        mock_build_inner_class.assert_called_once_with(item, attribute)
 
     def test_has_anonymous_class(self):
         obj = Element.create()

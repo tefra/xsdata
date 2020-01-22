@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import List, Union
+from typing import List, Optional, Union
 
 from xsdata.builder import ClassBuilder
 from xsdata.logger import logger
@@ -18,18 +18,21 @@ class ProcessTask:
     renderer: str
     processed: List[Path] = field(init=False, default_factory=list)
 
-    def process(self, xsd: Path, package: str):
+    def process(
+        self, xsd: Path, package: str, target_namespace: Optional[str] = None
+    ):
         if xsd in self.processed:
             logger.debug("Circular import skipping: %s", xsd.name)
             return
         self.processed.append(xsd)
 
-        schema = SchemaParser.from_file(xsd)
+        schema = SchemaParser.from_file(xsd, target_namespace=target_namespace)
         for sub_schema in schema.sub_schemas():
             if self.is_valid(sub_schema):
                 self.process(
                     xsd=self.resolve_schema(xsd, sub_schema),
                     package=self.adjust_package(package, sub_schema),
+                    target_namespace=schema.target_namespace,
                 )
 
         logger.info(

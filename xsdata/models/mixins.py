@@ -31,13 +31,21 @@ class NamedField:
         return getattr(self, "abstract", False)
 
     @property
-    def namespace(self):
+    def prefix(self):
+        """
+        Return the namespace prefix for this element.
+
+        Examples:
+            "xxx": external reference
+            "": no namespace
+            None: target namespace
+        """
         form: FormType = getattr(self, "form", FormType.UNQUALIFIED)
         if form == FormType.UNQUALIFIED:
-            return None
+            return ""
 
         prefix, _ = text.split(getattr(self, "ref", "") or "")
-        return self.nsmap.get(prefix)
+        return prefix
 
 
 class RestrictedField(ABC):
@@ -78,10 +86,6 @@ class BaseModel:
             if attr.init
         }
 
-        if "nsmap" in data:
-            data["nsmap"] = el.nsmap
-        if "prefix" in data:
-            data["prefix"] = el.prefix
         if "text" in data and el.text:
             data["text"] = re.sub(r"\s+", " ", el.text).strip()
         data["index"] = index
@@ -140,8 +144,6 @@ class BaseModel:
 @dataclass
 class ElementBase(BaseModel):
     id: Optional[str]
-    prefix: str
-    nsmap: dict
     index: int
 
     def children(self):

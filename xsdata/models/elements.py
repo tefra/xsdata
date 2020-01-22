@@ -891,6 +891,7 @@ class Schema(AnnotationBase):
     target_namespace: Optional[str]
     version: Optional[str]
     xmlns: Optional[str]
+    nsmap: Dict = field(default_factory=dict)
     location: Optional[Path] = field(default=None)
     element_form_default: FormType = field(default=FormType.UNQUALIFIED)
     attribute_form_default: FormType = field(default=FormType.UNQUALIFIED)
@@ -941,3 +942,7 @@ class Schema(AnnotationBase):
             ),
             None,
         )
+
+    def get_namespace(self, prefix: Optional[str]):
+        if prefix is None:
+            return self.target_namespace

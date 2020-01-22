@@ -52,7 +52,7 @@ class ClassReducerTests(FactoryTestCase):
             common, self.target_namespace
         )
         mock_flatten_classes.assert_has_calls(
-            [mock.call(common, self.nsmap), mock.call(classes, self.nsmap)]
+            [mock.call(common, self.schema), mock.call(classes, self.schema)]
         )
 
     @mock.patch.object(ClassReducer, "flatten_class")
@@ -82,11 +82,11 @@ class ClassReducerTests(FactoryTestCase):
             f"{{http://namespace/common}}{obj.name}": obj,
         }
 
-        self.assertEqual(obj, reducer.find_common_type("foo", self.nsmap))
+        self.assertEqual(obj, reducer.find_common_type("foo", self.schema))
         self.assertEqual(
-            obj, reducer.find_common_type("common:foo", self.nsmap)
+            obj, reducer.find_common_type("common:foo", self.schema)
         )
-        self.assertIsNone(reducer.find_common_type("bar", self.nsmap))
+        self.assertIsNone(reducer.find_common_type("bar", self.schema))
 
     @mock.patch.object(ClassReducer, "flatten_attribute")
     @mock.patch.object(ClassReducer, "flatten_extension")

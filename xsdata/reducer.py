@@ -30,21 +30,18 @@ class ClassReducer:
 
         :return: The final list of normalized classes/enumerations
         """
-        namespace = schema.target_namespace
-        nsmap = schema.nsmap
-
         classes, common = self.separate_common_types(classes)
 
-        self.add_common_types(common, namespace)
+        self.add_common_types(common, schema.target_namespace)
 
-        self.flatten_classes(common, nsmap)
-        self.flatten_classes(classes, nsmap)
+        self.flatten_classes(common, schema)
+        self.flatten_classes(classes, schema)
 
         return [obj for obj in common if obj.is_enumeration] + classes
 
-    def flatten_classes(self, classes: List[Class], nsmap: Dict):
+    def flatten_classes(self, classes: List[Class], schema: Schema):
         for obj in classes:
-            self.flatten_class(obj, nsmap)
+            self.flatten_class(obj, schema)
 
     def add_common_types(self, classes: List[Class], namespace: Optional[str]):
         """Add class to the common types registry with its qualified name with
@@ -54,19 +51,19 @@ class ClassReducer:
             {etree.QName(namespace, obj.name).text: obj for obj in classes}
         )
 
-    def find_common_type(self, name: str, nsmap: Dict) -> Optional[Class]:
-        """Find a common type by the qualified named with the namespace
-        prefix."""
+    def find_common_type(self, name: str, schema: Schema) -> Optional[Class]:
+        """Find a common type by the qualified named with the prefixed
+        namespace if exists or the target namespace."""
         prefix = None
         split_name = name.split(":")
         if len(split_name) == 2:
             prefix, name = split_name
 
-        namespace = nsmap.get(prefix)
+        namespace = schema.nsmap.get(prefix, schema.target_namespace)
         qname = etree.QName(namespace, name)
         return self.common_types.get(qname.text)
 
-    def flatten_class(self, item: Class, nsmap: Dict):
+    def flatten_class(self, item: Class, schema: Schema):
         """
         Flatten class traits from the common types registry.
 
@@ -76,16 +73,16 @@ class ClassReducer:
             * Inner classes
         """
         for extension in list(item.extensions):
-            self.flatten_extension(item, extension, nsmap)
+            self.flatten_extension(item, extension, schema)
 
         for attr in item.attrs:
-            self.flatten_attribute(attr, nsmap)
+            self.flatten_attribute(attr, schema)
 
         for inner in item.inner:
-            self.flatten_class(inner, nsmap)
+            self.flatten_class(inner, schema)
 
     def flatten_extension(
-        self, item: Class, extension: Extension, nsmap: Dict
+        self, item: Class, extension: Extension, schema: Schema
     ):
         """
         If the extension class is found in the registry prepend it's attributes
@@ -95,7 +92,7 @@ class ClassReducer:
         prepended with the extension prefix if it isn't a reference to
         another schema.
         """
-        common = self.find_common_type(extension.name, nsmap)
+        common = self.find_common_type(extension.name, schema)
         if common is None:
             return
 
@@ -124,7 +121,7 @@ class ClassReducer:
             target.attrs.insert(position, attr)
             position += 1
 
-    def flatten_attribute(self, attr: Attr, nsmap: Dict):
+    def flatten_attribute(self, attr: Attr, schema: Schema):
         """
         If the attribute type is found in the registry overwrite the given
         attribute type and merge the restrictions.
@@ -134,7 +131,7 @@ class ClassReducer:
         """
         types = []
         for type_name in attr.types:
-            common = self.find_common_type(type_name, nsmap)
+            common = self.find_common_type(type_name, schema)
             restrictions = {}
             if common is None or common.is_enumeration:
                 types.append(type_name)

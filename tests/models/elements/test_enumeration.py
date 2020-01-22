@@ -20,10 +20,6 @@ class EnumerationTests(TestCase):
         obj = Enumeration.create(value="foo")
         self.assertEqual("foo", obj.default)
 
-    def test_property_namespace(self):
-        obj = Enumeration.create()
-        self.assertIsNone(obj.namespace)
-
     def test_get_restrictions(self):
         obj = Enumeration.create()
         self.assertEqual({}, obj.get_restrictions())

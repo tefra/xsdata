@@ -112,7 +112,12 @@ class DependenciesResolver:
             * Resolved processed {"{http://www.common/ns}address": "source.package"}
             * Request for (common, address) will return source.package
         """
-        namespace = self.schema.nsmap.get(prefix)
+
+        namespace = (
+            self.schema.nsmap.get(prefix)
+            if prefix
+            else self.schema.target_namespace
+        )
         qname = etree.QName(namespace, name)
         return self.processed[qname.text]
 

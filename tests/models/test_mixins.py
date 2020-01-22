@@ -73,20 +73,19 @@ class TypedFieldTests(TestCase):
 class NamedFieldTests(TestCase):
     def test_property_namespace_with_unqualified_form(self):
         obj = el.Element.create(name="foo", form=FormType.UNQUALIFIED)
-        self.assertIsNone(obj.namespace)
+        self.assertEqual("", obj.prefix)
 
-    def test_property_namespace_with_no_ref_type(self):
+    def test_property_prefix_with_no_ref_type(self):
         obj = el.Element.create(name="foo")
-        self.assertIsNone(obj.namespace)
+        self.assertIsNone(obj.prefix)
 
-    def test_property_namespace_with_unknown_ref_type(self):
+    def test_property_prefix_with_unknown_ref_type(self):
         obj = el.Element.create(ref="ns:foo")
-        self.assertIsNone(obj.namespace)
+        self.assertEqual("ns", obj.prefix)
 
-    def test_property_namespace_with_known_ref_type(self):
+    def test_property_prefix_with_known_ref_type(self):
         obj = el.Element.create(ref="ns:foo")
-        obj.nsmap["ns"] = "bar"
-        self.assertEqual("bar", obj.namespace)
+        self.assertEqual("ns", obj.prefix)
 
     def test_property_is_abstract(self):
         obj = el.Element.create(abstract=True)

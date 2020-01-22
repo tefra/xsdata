@@ -33,37 +33,41 @@ class SchemaParser:
     elements: List[BaseModel] = field(default_factory=list)
     element_form: Optional[FormType] = field(init=False, default=None)
     attribute_form: Optional[FormType] = field(init=False, default=None)
-    target_namespace: Optional[str] = field(init=False, default=None)
+    target_namespace: Optional[str] = field(default=None)
 
     @classmethod
-    def create(cls, source: object) -> Schema:
+    def create(cls, source: object, target_namespace=None) -> Schema:
         """A shortcut class method to initialize the parser, parse the given
         source and return the generated Schema instance."""
 
         ctx = etree.iterparse(source, events=(EventType.START, EventType.END))
-        return cls(context=ctx).parse()
+        return cls(context=ctx, target_namespace=target_namespace).parse()
 
     @classmethod
-    def from_file(cls, path: pathlib.Path) -> Schema:
+    def from_file(cls, path: pathlib.Path, target_namespace=None) -> Schema:
         """A shortcut class method for file path sources."""
 
         if isinstance(path, str):
             path = pathlib.Path(path).resolve()
 
-        schema = cls.create(str(path))
+        schema = cls.create(str(path), target_namespace=target_namespace)
         schema.location = path
         return schema
 
     @classmethod
-    def from_bytes(cls, source: bytes) -> Schema:
+    def from_bytes(cls, source: bytes, target_namespace=None) -> Schema:
         """A shortcut class method for bytes source."""
 
-        return cls.create(io.BytesIO(source))
+        return cls.create(
+            io.BytesIO(source), target_namespace=target_namespace
+        )
 
     @classmethod
-    def from_string(cls, source: str) -> Schema:
+    def from_string(cls, source: str, target_namespace=None) -> Schema:
         """A shortcut class method for string source."""
-        return cls.from_bytes(source=source.encode())
+        return cls.from_bytes(
+            source.encode(), target_namespace=target_namespace
+        )
 
     def parse(self) -> Schema:
         """
@@ -105,14 +109,18 @@ class SchemaParser:
 
         return element
 
-    def start_schema(self, obj: Schema, *args):
+    def start_schema(self, obj: Schema, element: etree.Element):
         """Collect the schema's default form for attributes and elements for
         later usage."""
 
         if isinstance(obj, Schema):
             self.element_form = obj.element_form_default
             self.attribute_form = obj.attribute_form_default
-            self.target_namespace = obj.target_namespace
+
+            obj.nsmap = element.nsmap
+            if obj.target_namespace is None:
+                if self.target_namespace is not None:
+                    obj.target_namespace = self.target_namespace
 
     @classmethod
     def end_schema(cls, obj: Schema, *args):
@@ -129,8 +137,6 @@ class SchemaParser:
 
         if isinstance(obj, Element) and obj.form is None:
             obj.form = self.element_form
-            if self.target_namespace:
-                obj.nsmap[None] = self.target_namespace
 
     def start_attribute(self, obj: Attribute, *args):
         """Assign the schema's default form for attributes if the given
@@ -138,8 +144,6 @@ class SchemaParser:
 
         if isinstance(obj, Attribute) and obj.form is None:
             obj.form = self.attribute_form
-            if self.target_namespace:
-                obj.nsmap[None] = self.target_namespace
 
     @classmethod
     def end_choice(cls, obj: Choice, *args):

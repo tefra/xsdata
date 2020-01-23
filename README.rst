@@ -8,7 +8,7 @@ Naive XML Bindings for python
         :target: https://travis-ci.org/tefra/xsdata
 
 .. image:: https://readthedocs.org/projects/xsdata/badge
-    :target: https://xsdata.readthedocs.io/en/latest
+    :target: https://xsdata.readthedocs.io/
 
 .. image:: https://codecov.io/gh/tefra/xsdata/branch/master/graph/badge.svg
         :target: https://codecov.io/gh/tefra/xsdata
@@ -30,20 +30,18 @@ Naive XML Bindings for python
 Features
 --------
 
-- Generate code for XML Schema 1.0 definitions
-- Generate namespaces all qualified elements and attributes
-- Generate Enum and inner classes
-- Generate restrictions and rules (validations coming)
-- Reduce schemas overhead by flattening common types
+- Code generation for XML Schema 1.0 definitions
+- Supports qualified/unqualified elements and attributes
+- Supports enumerations and inner classes
+- Flattening strategies to keep the code as simple as possible.
 - Preserve embedded documentation and references
-- Pluggable code writer to support multiple formats
+- Pluggable code writer that supports different formats
 - Format: Python Data Classes
 
   - PEP8 naming conventions and code output
   - Full support for type hints even with forward references
   - XML Parser & Serializer based on lxml with type casting
   - JSON Parser & Serializer with type casting
-  - Serializer/Parser for xml and json
 
 - Format: PlantUML class diagram
 
@@ -51,4 +49,4 @@ Features
 
 .. image:: https://github.com/tefra/xsdata/raw/master/docs/_static/demo.gif
 
-Check the `samples repo <https://github.com/tefra/xsdata-samples>`_ for more ✨✨✨
+Check the documentation `test suites <https://xsdata.readthedocs.io/>`_ and the `samples repo <https://github.com/tefra/xsdata-samples>`_ for more ✨✨✨

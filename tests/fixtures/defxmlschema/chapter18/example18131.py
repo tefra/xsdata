@@ -13,21 +13,24 @@ class ProductType:
         default=None,
         metadata=dict(
             name="number",
-            type="Element"
+            type="Element",
+            namespace=""
         )
     )
     name: Optional[str] = field(
         default=None,
         metadata=dict(
             name="name",
-            type="Element"
+            type="Element",
+            namespace=""
         )
     )
     size: Optional[str] = field(
         default=None,
         metadata=dict(
             name="size",
-            type="Element"
+            type="Element",
+            namespace=""
         )
     )
 
@@ -42,14 +45,16 @@ class RestrictedProductType(ProductType):
         default=None,
         metadata=dict(
             name="number",
-            type="Element"
+            type="Element",
+            namespace=""
         )
     )
     size: Optional[str] = field(
         default=None,
         metadata=dict(
             name="size",
-            type="Element"
+            type="Element",
+            namespace=""
         )
     )
 
@@ -64,6 +69,7 @@ class ShirtType(ProductType):
         metadata=dict(
             name="color",
             type="Element",
+            namespace="",
             required=True
         )
     )

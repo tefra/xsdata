@@ -13,6 +13,7 @@ class ProductType:
         metadata=dict(
             name="number",
             type="Element",
+            namespace="",
             required=True
         )
     )

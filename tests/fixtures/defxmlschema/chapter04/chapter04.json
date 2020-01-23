@@ -1,0 +1,20 @@
+{
+    "number": "123ABBCC123",
+    "customer": {
+        "name": "Priscilla Walmsley",
+        "number": 15466
+    },
+    "items": {
+        "product": {
+            "number": 557,
+            "name": "Short-Sleeved Linen Blouse",
+            "size": {
+                "value": 10,
+                "system": "US-DRESS"
+            },
+            "color": {
+                "value": "blue"
+            }
+        }
+    }
+}

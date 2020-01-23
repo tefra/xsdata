@@ -12,6 +12,7 @@ class CustomerType:
         metadata=dict(
             name="name",
             type="Element",
+            namespace="",
             required=True
         )
     )

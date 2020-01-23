@@ -1,0 +1,48 @@
+{
+    "number": "123ABBCC123",
+    "items": {
+        "shirt": [
+            {
+                "quantity": 1,
+                "color": {
+                    "value": "blue"
+                },
+                "number": 557
+            },
+            {
+                "quantity": 1,
+                "color": {
+                    "value": "sage"
+                },
+                "number": 557
+            }
+        ],
+        "hat": [
+            {
+                "quantity": 1,
+                "color": null,
+                "number": 563
+            }
+        ]
+    },
+    "products": {
+        "product": [
+            {
+                "number": 557,
+                "name": "Short-Sleeved Linen Blouse",
+                "price": {
+                    "value": 29.99,
+                    "currency": "USD"
+                }
+            },
+            {
+                "number": 563,
+                "name": "Ten-Gallon Hat",
+                "price": {
+                    "value": 69.99,
+                    "currency": "USD"
+                }
+            }
+        ]
+    }
+}

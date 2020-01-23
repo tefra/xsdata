@@ -1,0 +1,44 @@
+{
+    "hat": [
+        {
+            "routing_num": 123456,
+            "number": 557,
+            "name": "Ten-Gallon Hat",
+            "description": "This is a great hat!",
+            "eff_date": "2002-04-02",
+            "lang": "en-US"
+        }
+    ],
+    "umbrella": [
+        {
+            "routing_num": 123,
+            "number": 557,
+            "name": "Ten-Gallon Hat",
+            "description": null,
+            "eff_date": "2002-04-02",
+            "lang": null
+        }
+    ],
+    "shirt": [
+        {
+            "routing_num": 124,
+            "number": 557,
+            "name": "Short-Sleeved Linen Blouse",
+            "description": null,
+            "eff_date": "2002-04-02",
+            "lang": null,
+            "size": [
+                {
+                    "value": 6,
+                    "system": "US-DRESS"
+                }
+            ],
+            "color": [
+                {
+                    "value": "blue"
+                }
+            ],
+            "sleeve": 17
+        }
+    ]
+}

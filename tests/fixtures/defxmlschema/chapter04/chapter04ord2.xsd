@@ -1,0 +1,10 @@
+<!--Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns="http://example.org/ord"
+            targetNamespace="http://example.org/ord">
+
+  <xsd:simpleType name="OrderNumType">
+    <xsd:restriction base="xsd:string"/>
+  </xsd:simpleType>
+
+</xsd:schema>

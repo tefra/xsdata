@@ -19,6 +19,7 @@ class RootType:
         metadata=dict(
             name="orderSummary",
             type="Element",
+            namespace="http://datypic.com/ord",
             required=True
         )
     )
@@ -27,6 +28,7 @@ class RootType:
         metadata=dict(
             name="orderDetails",
             type="Element",
+            namespace="http://datypic.com/ord",
             required=True
         )
     )

@@ -16,6 +16,7 @@ class Product:
         metadata=dict(
             name="name",
             type="Element",
+            namespace="",
             min_occurs=0,
             max_occurs=9223372036854775807
         )
@@ -25,6 +26,7 @@ class Product:
         metadata=dict(
             name="size",
             type="Element",
+            namespace="",
             min_occurs=0,
             max_occurs=9223372036854775807
         )

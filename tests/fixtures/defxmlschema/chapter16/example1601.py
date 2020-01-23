@@ -13,6 +13,7 @@ class ProductType:
         metadata=dict(
             name="number",
             type="Element",
+            namespace="",
             required=True
         )
     )
@@ -21,6 +22,7 @@ class ProductType:
         metadata=dict(
             name="name",
             type="Element",
+            namespace="",
             required=True
         )
     )
@@ -43,6 +45,7 @@ class ItemsType:
         metadata=dict(
             name="product",
             type="Element",
+            namespace="",
             min_occurs=1,
             max_occurs=9223372036854775807
         )

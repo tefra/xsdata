@@ -1,0 +1,24 @@
+<!--Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            targetNamespace="http://example.org/ord"
+            xmlns:ord="http://example.org/ord"
+            xmlns:prod="http://example.org/prod"
+            elementFormDefault="qualified">
+
+  <xsd:import namespace="http://example.org/prod" schemaLocation="chapter03prod.xsd"/>
+  <xsd:element name="order" type="ord:OrderType"/>
+
+  <xsd:complexType name="OrderType">
+    <xsd:sequence>
+      <xsd:element name="number" type="xsd:string"/>
+      <xsd:element name="items" type="ord:ItemsType"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="ItemsType">
+    <xsd:sequence>
+      <xsd:element ref="prod:product" maxOccurs="unbounded"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+</xsd:schema>

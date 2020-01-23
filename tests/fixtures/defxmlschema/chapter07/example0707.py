@@ -35,6 +35,7 @@ class ChapterType:
         metadata=dict(
             name="p",
             type="Element",
+            namespace="",
             min_occurs=1,
             max_occurs=9223372036854775807
         )

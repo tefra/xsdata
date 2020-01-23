@@ -13,6 +13,7 @@ class DescriptionGroup:
         metadata=dict(
             name="description",
             type="Element",
+            namespace="",
             required=True
         )
     )
@@ -20,6 +21,7 @@ class DescriptionGroup:
         default=None,
         metadata=dict(
             name="comment",
-            type="Element"
+            type="Element",
+            namespace=""
         )
     )

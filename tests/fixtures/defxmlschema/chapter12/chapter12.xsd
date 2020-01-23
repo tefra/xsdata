@@ -1,0 +1,60 @@
+<!--Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+
+  <xsd:annotation>
+    <xsd:documentation>
+      This example illustrates complex types that are not derived from other specified types.
+      It includes an example of each content type: element-only, simple, empty and mixed.
+    </xsd:documentation>
+  </xsd:annotation>
+
+  <xsd:element name="items" type="ItemsType"/>
+
+  <xsd:complexType name="ItemsType">
+    <xsd:choice minOccurs="0" maxOccurs="unbounded">
+      <xsd:element name="shirt" type="ProductType"/>
+      <xsd:element name="hat" type="ProductType"/>
+      <xsd:element name="umbrella" type="ProductType"/>
+    </xsd:choice>
+  </xsd:complexType>
+
+  <!-- Element-only content -->
+  <xsd:complexType name="ProductType">
+    <xsd:sequence>
+      <xsd:element name="number" type="xsd:integer"/>
+      <xsd:element name="name" type="xsd:string"/>
+      <xsd:choice minOccurs="0" maxOccurs="unbounded">
+        <xsd:element name="size" type="SizeType"/>
+        <xsd:element name="color" type="ColorType"/>
+        <xsd:element name="description" type="DescriptionType"/>
+      </xsd:choice>
+    </xsd:sequence>
+    <xsd:attribute  name="effDate" type="xsd:date"
+                    default="1900-01-01"/>
+    <xsd:anyAttribute namespace="##other" processContents="lax"/>
+  </xsd:complexType>
+
+  <!-- Simple content -->
+  <xsd:complexType name="SizeType">
+    <xsd:simpleContent>
+      <xsd:extension base="xsd:integer">
+        <xsd:attribute name="system" type="xsd:token"/>
+      </xsd:extension>
+    </xsd:simpleContent>
+  </xsd:complexType>
+
+  <!-- Empty content -->
+  <xsd:complexType name="ColorType">
+    <xsd:attribute name="value" type="xsd:string"/>
+  </xsd:complexType>
+
+  <!-- Mixed content -->
+  <xsd:complexType name="DescriptionType" mixed="true">
+    <xsd:sequence>
+      <xsd:any namespace="http://www.w3.org/1999/xhtml"
+      minOccurs="0" maxOccurs="unbounded"
+      processContents="skip"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+</xsd:schema>

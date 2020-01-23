@@ -1,0 +1,54 @@
+<!--Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+
+  <xsd:annotation>
+    <xsd:documentation>
+      This example illustrates named model groups and attribute groups.
+    </xsd:documentation>
+  </xsd:annotation>
+
+  <xsd:element name="shirt" type="ShirtType"/>
+
+  <xsd:complexType name="ShirtType">
+    <xsd:sequence>
+      <xsd:group ref="ProductPropertyGroup" minOccurs="0"/>
+      <xsd:element name="size" type="SizeType"/>
+    </xsd:sequence>
+    <xsd:attributeGroup ref="IdentifierGroup"/>
+    <xsd:attribute name="effDate" type="xsd:date"/>
+  </xsd:complexType>
+
+  <xsd:group name="DescriptionGroup">
+    <xsd:sequence>
+      <xsd:element name="description" type="xsd:string"/>
+      <xsd:element name="comment" type="xsd:string" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:group>
+
+  <xsd:group name="ProductPropertyGroup">
+    <xsd:sequence>
+      <xsd:group ref="DescriptionGroup"/>
+      <xsd:element name="number" type="xsd:integer"/>
+      <xsd:element name="name" type="xsd:string"/>
+    </xsd:sequence>
+  </xsd:group>
+
+  <xsd:attributeGroup name="IdentifierGroup">
+    <xsd:attribute name="id" type="xsd:ID" use="required"/>
+    <xsd:attribute name="version" type="xsd:decimal"/>
+  </xsd:attributeGroup>
+
+  <xsd:complexType name="SizeType">
+    <xsd:simpleContent>
+      <xsd:extension base="xsd:integer">
+        <xsd:attribute name="system" type="xsd:token"/>
+      </xsd:extension>
+    </xsd:simpleContent>
+  </xsd:complexType>
+
+</xsd:schema>
+
+
+
+
+

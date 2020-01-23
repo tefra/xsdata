@@ -17,12 +17,14 @@ class ModelInspectTests(TestCase):
         self.assertIsInstance(result, Iterator)
 
         expected = [
-            Field(name="author", local_name="author", type=str),
-            Field(name="title", local_name="title", type=str),
-            Field(name="genre", local_name="genre", type=str),
-            Field(name="price", local_name="price", type=float),
-            Field(name="pub_date", local_name="pub_date", type=str),
-            Field(name="review", local_name="review", type=str),
+            Field(name="author", local_name="author", type=str, namespace=""),
+            Field(name="title", local_name="title", type=str, namespace=""),
+            Field(name="genre", local_name="genre", type=str, namespace=""),
+            Field(name="price", local_name="price", type=float, namespace=""),
+            Field(
+                name="pub_date", local_name="pub_date", type=str, namespace=""
+            ),
+            Field(name="review", local_name="review", type=str, namespace=""),
             Field(name="id", local_name="id", type=str, is_attribute=True),
         ]
 
@@ -39,6 +41,7 @@ class ModelInspectTests(TestCase):
             is_list=True,
             is_dataclass=True,
             default=list,
+            namespace="",
         )
 
         self.assertEqual(1, len(result))

@@ -52,6 +52,7 @@ class ClassFactory(Factory):
     def create(
         cls,
         name=None,
+        namespace=None,
         type=None,
         is_abstract=False,
         help=None,
@@ -62,6 +63,7 @@ class ClassFactory(Factory):
 
         return cls.model(
             name=name or f"class_{cls.next()}",
+            namespace=namespace,
             is_abstract=is_abstract,
             type=type or random.choice(cls.types),
             extensions=extensions or [],

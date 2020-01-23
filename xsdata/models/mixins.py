@@ -31,19 +31,13 @@ class NamedField:
         return getattr(self, "abstract", False)
 
     @property
+    def is_qualified(self):
+        return (
+            getattr(self, "form", FormType.UNQUALIFIED) == FormType.QUALIFIED
+        )
+
+    @property
     def prefix(self):
-        """
-        Return the namespace prefix for this element.
-
-        Examples:
-            "xxx": external reference
-            "": no namespace
-            None: target namespace
-        """
-        form: FormType = getattr(self, "form", FormType.UNQUALIFIED)
-        if form == FormType.UNQUALIFIED:
-            return ""
-
         prefix, _ = text.split(getattr(self, "ref", "") or "")
         return prefix
 

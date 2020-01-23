@@ -1,7 +1,7 @@
 import json
 from dataclasses import asdict, dataclass, field
 from enum import Enum
-from typing import Callable, Dict, List, Optional, Tuple, Type
+from typing import Callable, Dict, Optional, Tuple, Type
 
 from lxml.etree import Element, QName, SubElement, tostring
 
@@ -94,26 +94,8 @@ class XmlSerializer(AbstractSerializer, ModelInspect):
         meta = self.class_meta(obj.__class__)
         qname = self.render_tag(meta.name, meta.namespace)
         namespaces = self.namespaces(obj.__class__)
-        nsmap = self.nsmap(namespaces, meta.namespace)
-
+        nsmap = {f"ns{index}": ns for index, ns in enumerate(namespaces)}
         return self.render_node(obj, Element(qname, nsmap=nsmap))
-
-    @staticmethod
-    def nsmap(namespaces: List[str], default_namespace: Optional[str] = None):
-        """
-        Convert list of namespaces to map for the lxml element factort.
-
-        The default namespace is assigned to key with value None the
-        rest are assigned nsXX indexes.
-        """
-        index = 0
-        result: Dict[Optional[str], str] = dict()
-        for namespace in namespaces:
-            if namespace == default_namespace:
-                result[None] = namespace
-            else:
-                result[f"ns{index}"] = namespace
-        return result
 
     def render_node(self, obj, parent) -> Element:
         """Recursively traverse the given dataclass instance fields and build
@@ -131,7 +113,10 @@ class XmlSerializer(AbstractSerializer, ModelInspect):
                 parent.set(f.local_name, self.render_value(value))
             else:
                 value = value if isinstance(value, list) else [value]
-                if f.namespace:
+
+                if f.namespace == "":
+                    qname = f.local_name
+                elif f.namespace:
                     qname = self.render_tag(f.local_name, f.namespace)
                 elif parent.prefix:
                     qname = self.render_tag(

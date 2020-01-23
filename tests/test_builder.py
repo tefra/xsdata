@@ -24,7 +24,7 @@ from xsdata.models.elements import (
     SimpleContent,
     SimpleType,
 )
-from xsdata.models.enums import TagType, XSDType
+from xsdata.models.enums import FormType, TagType, XSDType
 
 
 class ClassBuilderTests(FactoryTestCase):
@@ -63,6 +63,23 @@ class ClassBuilderTests(FactoryTestCase):
             ]
         )
 
+    def test_element_namespace(self):
+        self.schema.nsmap["foo"] = "bar"
+        self.schema.target_namespace = "foobar"
+
+        element = Element.create(ref="foo:something")
+        self.assertEqual("bar", self.builder.element_namespace(element))
+
+        element = Element.create(form=FormType.QUALIFIED)
+        self.assertEqual("foobar", self.builder.element_namespace(element))
+
+        element = Element.create()
+        self.assertEqual("", self.builder.element_namespace(element))
+
+        attribute = Attribute.create()
+        self.assertIsNone(self.builder.element_namespace(attribute))
+
+    @patch.object(ClassBuilder, "element_namespace")
     @patch.object(ClassBuilder, "build_class_attributes")
     @patch.object(ClassBuilder, "build_class_extensions")
     @patch.object(Element, "is_abstract", new_callable=PropertyMock)
@@ -74,18 +91,21 @@ class ClassBuilderTests(FactoryTestCase):
         mock_display_help,
         mock_is_abstract,
         mock_build_class_extensions,
-        build_class_attributes,
+        mock_build_class_attributes,
+        mock_element_namespace,
     ):
         extensions = ExtensionFactory.list(2)
         mock_real_name.return_value = "name"
         mock_display_help.return_value = "sos"
         mock_is_abstract.return_value = True
         mock_build_class_extensions.return_value = extensions
+        mock_element_namespace.return_value = "foo:name"
 
         element = Element.create()
         result = self.builder.build_class(element)
 
-        build_class_attributes.assert_called_once_with(element, result)
+        mock_build_class_attributes.assert_called_once_with(element, result)
+        mock_element_namespace.assert_called_once_with(element)
 
         expected = ClassFactory.create(
             name="name",
@@ -93,6 +113,7 @@ class ClassBuilderTests(FactoryTestCase):
             extensions=extensions,
             help="sos",
             is_abstract=True,
+            namespace="foo:name",
         )
         self.assertEqual(expected, result)
 
@@ -225,7 +246,7 @@ class ClassBuilderTests(FactoryTestCase):
 
         self.assertEqual(expected, list(children))
 
-    @patch.object(ClassBuilder, "prefix_namespace")
+    @patch.object(ClassBuilder, "element_namespace")
     @patch.object(ClassBuilder, "has_anonymous_class")
     @patch.object(Attribute, "get_restrictions")
     @patch.object(Attribute, "prefix", new_callable=PropertyMock)
@@ -240,7 +261,7 @@ class ClassBuilderTests(FactoryTestCase):
         mock_prefix_property,
         mock_get_restrictions,
         mock_has_anonymous_class,
-        mock_prefix_namespace,
+        mock_element_namespace,
     ):
         item = ClassFactory.create()
 
@@ -248,7 +269,7 @@ class ClassBuilderTests(FactoryTestCase):
         mock_real_type.return_value = "xs:int"
         mock_display_help.return_value = "sos"
         mock_prefix_property.return_value = "com"
-        mock_prefix_namespace.return_value = "http://something/common"
+        mock_element_namespace.return_value = "http://something/common"
         mock_get_restrictions.return_value = {"required": True}
         mock_has_anonymous_class.return_value = False
 
@@ -259,7 +280,7 @@ class ClassBuilderTests(FactoryTestCase):
             name=mock_real_name.return_value,
             type=mock_real_type.return_value,
             local_type=Attribute.__name__,
-            namespace=mock_prefix_namespace.return_value,
+            namespace=mock_element_namespace.return_value,
             help=mock_display_help.return_value,
             forward_ref=False,
             default="false",
@@ -268,9 +289,7 @@ class ClassBuilderTests(FactoryTestCase):
         )
         self.assertEqual(expected, item.attrs[0])
         mock_has_anonymous_class.assert_called_once_with(attribute)
-        mock_prefix_namespace.assert_called_once_with(
-            mock_prefix_property.return_value
-        )
+        mock_element_namespace.assert_called_once_with(attribute)
 
     @patch.object(ClassBuilder, "build_inner_class")
     @patch.object(ClassBuilder, "has_anonymous_class")

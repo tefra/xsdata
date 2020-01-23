@@ -4,7 +4,6 @@ from unittest import TestCase, mock
 from unittest.mock import PropertyMock
 
 from xsdata.models import elements as el
-from xsdata.models.enums import FormType
 from xsdata.models.mixins import ElementBase, OccurrencesMixin, TypedField
 
 
@@ -71,10 +70,6 @@ class TypedFieldTests(TestCase):
 
 
 class NamedFieldTests(TestCase):
-    def test_property_namespace_with_unqualified_form(self):
-        obj = el.Element.create(name="foo", form=FormType.UNQUALIFIED)
-        self.assertEqual("", obj.prefix)
-
     def test_property_prefix_with_no_ref_type(self):
         obj = el.Element.create(name="foo")
         self.assertIsNone(obj.prefix)

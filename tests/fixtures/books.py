@@ -18,6 +18,7 @@ class BookForm:
         metadata=dict(
             name="author",
             type="Element",
+            namespace="",
             required=True
         )
     )
@@ -26,6 +27,7 @@ class BookForm:
         metadata=dict(
             name="title",
             type="Element",
+            namespace="",
             required=True
         )
     )
@@ -34,6 +36,7 @@ class BookForm:
         metadata=dict(
             name="genre",
             type="Element",
+            namespace="",
             required=True
         )
     )
@@ -42,6 +45,7 @@ class BookForm:
         metadata=dict(
             name="price",
             type="Element",
+            namespace="",
             required=True
         )
     )
@@ -50,6 +54,7 @@ class BookForm:
         metadata=dict(
             name="pub_date",
             type="Element",
+            namespace="",
             required=True
         )
     )
@@ -58,6 +63,7 @@ class BookForm:
         metadata=dict(
             name="review",
             type="Element",
+            namespace="",
             required=True
         )
     )
@@ -80,6 +86,7 @@ class BooksForm:
         metadata=dict(
             name="book",
             type="Element",
+            namespace="",
             min_occurs=0,
             max_occurs=9223372036854775807
         )

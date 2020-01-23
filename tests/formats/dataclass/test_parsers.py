@@ -106,7 +106,7 @@ class XmlParserTests(TestCase):
     def test_parse(self):
         xml = (
             '<?xml version="1.0" encoding="UTF-8"?>\n'
-            '<books xmlns="urn:books">\n'
+            '<brk:books xmlns:brk="urn:books">\n'
             '  <book id="bk001">\n'
             "    <author>Hightower, Kim</author>\n"
             "    <title>The First Book</title>\n"
@@ -121,7 +121,7 @@ class XmlParserTests(TestCase):
             "    <genre>Biography</genre>\n"
             "    <review>A masterpiece of the fine art of gossiping.</review>\n"
             "  </book>\n"
-            "</books>\n"
+            "</brk:books>\n"
         )
         actual = XmlParser().from_string(xml, Books)
         self.assertEqual(self.books, actual)

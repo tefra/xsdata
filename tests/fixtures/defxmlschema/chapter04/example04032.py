@@ -15,6 +15,7 @@ class ItemsType:
         metadata=dict(
             name="product",
             type="Element",
+            namespace="",
             required=True
         )
     )

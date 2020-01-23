@@ -1,0 +1,14 @@
+{
+    "items": {
+        "product": [
+            {
+                "number": 557,
+                "name": "Short-Sleeved Linen Blouse",
+                "size": {
+                    "value": null,
+                    "system": null
+                }
+            }
+        ]
+    }
+}

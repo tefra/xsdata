@@ -1,0 +1,3 @@
+- Total tests: **11**
+- Passed: **8**
+- Skipped: **3**

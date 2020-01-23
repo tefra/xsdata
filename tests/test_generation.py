@@ -29,7 +29,7 @@ class Documentation:
     target: str
 
 
-schemas = sorted([xsd for xsd in fixtures.glob("defxmlschema/*/*.xsd")])
+schemas = sorted([xsd for xsd in fixtures.glob("defxmlschema/*/example*.xsd")])
 skipped: DefaultDict[str, int] = defaultdict(int)
 passed = 0
 
@@ -105,7 +105,7 @@ def teardown_module():
     for reason, count in skipped.items():
         results.append(f"- {reason}: **{count}**")
 
-    fixtures.joinpath("defxmlschema/results.rst").write_text(
+    fixtures.joinpath("defxmlschema/generation.results.rst").write_text(
         "\n".join(results)
     )
 
@@ -143,9 +143,14 @@ def teardown_module():
     for schema in schemas:
         source = schema.read_text()
         target = schema.with_suffix(".py")
-        section_title = parse_title(source)
-        rename = section_title in sections
-        sections[section_title] += 1
+
+        if "chapter" in schema.name:
+            section_title = "full example"
+            rename = False
+        else:
+            section_title = parse_title(source)
+            rename = section_title in sections
+            sections[section_title] += 1
 
         if rename:
             parts = section_title.split(" ")
@@ -168,11 +173,13 @@ def teardown_module():
     for suite, items in docs.items():
         number = suite.replace("chapter", "")
         template = Template(
-            here.joinpath(f"fixtures/defxmlschema/output.jinja2").read_text(),
+            here.joinpath(
+                f"fixtures/defxmlschema/generation.output.jinja2"
+            ).read_text(),
             keep_trailing_newline=True,
         )
         output = template.render(suite=titles[number], items=items)
 
-        file = here.parent.joinpath(f"docs/tests/defxmlschema/{suite}.rst")
+        file = here.parent.joinpath(f"docs/tests/generation/{suite}.rst")
         file.parent.mkdir(parents=True, exist_ok=True)
         file.write_text(output)

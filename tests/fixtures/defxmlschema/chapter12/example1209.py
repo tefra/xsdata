@@ -14,6 +14,7 @@ class DescType:
         metadata=dict(
             name="i",
             type="Element",
+            namespace="",
             min_occurs=0,
             max_occurs=9223372036854775807
         )
@@ -23,6 +24,7 @@ class DescType:
         metadata=dict(
             name="b",
             type="Element",
+            namespace="",
             min_occurs=0,
             max_occurs=9223372036854775807
         )
@@ -32,6 +34,7 @@ class DescType:
         metadata=dict(
             name="u",
             type="Element",
+            namespace="",
             min_occurs=0,
             max_occurs=9223372036854775807
         )

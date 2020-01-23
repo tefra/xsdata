@@ -14,6 +14,7 @@ class ProductType:
         metadata=dict(
             name="number",
             type="Element",
+            namespace="",
             required=True
         )
     )
@@ -22,6 +23,7 @@ class ProductType:
         metadata=dict(
             name="name",
             type="Element",
+            namespace="",
             required=True
         )
     )
@@ -30,6 +32,7 @@ class ProductType:
         metadata=dict(
             name="size",
             type="Element",
+            namespace="",
             required=True
         )
     )
@@ -89,6 +92,7 @@ class ItemsType:
         metadata=dict(
             name="shirt",
             type="Element",
+            namespace="",
             min_occurs=0,
             max_occurs=9223372036854775807
         )
@@ -98,6 +102,7 @@ class ItemsType:
         metadata=dict(
             name="hat",
             type="Element",
+            namespace="",
             min_occurs=0,
             max_occurs=9223372036854775807
         )
@@ -107,6 +112,7 @@ class ItemsType:
         metadata=dict(
             name="umbrella",
             type="Element",
+            namespace="",
             min_occurs=0,
             max_occurs=9223372036854775807
         )
@@ -124,6 +130,7 @@ class ExpandedItemsType(ItemsType):
         metadata=dict(
             name="sweater",
             type="Element",
+            namespace="",
             min_occurs=0,
             max_occurs=9223372036854775807
         )
@@ -133,6 +140,7 @@ class ExpandedItemsType(ItemsType):
         metadata=dict(
             name="suit",
             type="Element",
+            namespace="",
             min_occurs=0,
             max_occurs=9223372036854775807
         )

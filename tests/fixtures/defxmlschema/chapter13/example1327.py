@@ -14,6 +14,7 @@ class LetterType:
         metadata=dict(
             name="custName",
             type="Element",
+            namespace="",
             required=True
         )
     )
@@ -22,6 +23,7 @@ class LetterType:
         metadata=dict(
             name="prodName",
             type="Element",
+            namespace="",
             required=True
         )
     )
@@ -29,7 +31,8 @@ class LetterType:
         default=None,
         metadata=dict(
             name="prodSize",
-            type="Element"
+            type="Element",
+            namespace=""
         )
     )
 
@@ -45,6 +48,7 @@ class RestrictedLetterType(LetterType):
         metadata=dict(
             name="custName",
             type="Element",
+            namespace="",
             required=True
         )
     )
@@ -53,6 +57,7 @@ class RestrictedLetterType(LetterType):
         metadata=dict(
             name="prodName",
             type="Element",
+            namespace="",
             required=True
         )
     )

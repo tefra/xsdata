@@ -14,6 +14,7 @@ class DescriptionType:
         metadata=dict(
             name="description",
             type="Element",
+            namespace="",
             required=True
         )
     )
@@ -21,7 +22,8 @@ class DescriptionType:
         default=None,
         metadata=dict(
             name="comment",
-            type="Element"
+            type="Element",
+            namespace=""
         )
     )
     lang: Optional[str] = field(

@@ -1,0 +1,32 @@
+<!--Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            targetNamespace="http://example.org/ord"
+            xmlns="http://example.org/ord"
+            xmlns:prod="http://example.org/prod">
+
+  <xsd:annotation>
+    <xsd:documentation>
+      This example shows how xsi:schemaLocation can be used to pull together multiple schema documents.
+      An import is used to show the dependence on the prod namespace, but no schema location
+      is provided in the schema; this type of "dangling" reference to product is allowed.
+      This example also exhibits xsi:nil and xsi:type.
+    </xsd:documentation>
+  </xsd:annotation>
+
+  <xsd:import namespace="http://example.org/prod" schemaLocation="chapter05prod.xsd"/>
+
+  <xsd:element name="order" type="OrderType"/>
+  <xsd:complexType name="OrderType">
+    <xsd:sequence>
+      <xsd:element name="items" type="ItemsType"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="ItemsType">
+    <xsd:sequence>
+      <xsd:element ref="prod:product" maxOccurs="unbounded"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+
+</xsd:schema>

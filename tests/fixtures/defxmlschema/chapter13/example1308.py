@@ -14,6 +14,7 @@ class LetterType:
         metadata=dict(
             name="custName",
             type="Element",
+            namespace="",
             required=True
         )
     )
@@ -22,6 +23,7 @@ class LetterType:
         metadata=dict(
             name="prodName",
             type="Element",
+            namespace="",
             required=True
         )
     )
@@ -30,6 +32,7 @@ class LetterType:
         metadata=dict(
             name="prodSize",
             type="Element",
+            namespace="",
             required=True
         )
     )
@@ -45,6 +48,7 @@ class ExtendedLetterType(LetterType):
         metadata=dict(
             name="prodNum",
             type="Element",
+            namespace="",
             required=True
         )
     )

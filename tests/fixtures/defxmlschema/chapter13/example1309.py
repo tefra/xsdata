@@ -27,6 +27,7 @@ class ProductType(ItemType):
         metadata=dict(
             name="number",
             type="Element",
+            namespace="",
             required=True
         )
     )
@@ -35,6 +36,7 @@ class ProductType(ItemType):
         metadata=dict(
             name="name",
             type="Element",
+            namespace="",
             required=True
         )
     )

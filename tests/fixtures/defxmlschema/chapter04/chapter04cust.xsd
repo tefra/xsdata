@@ -1,0 +1,15 @@
+<!--Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+
+  <xsd:complexType name="CustomerType">
+    <xsd:sequence>
+      <xsd:element name="name" type="CustNameType"/>
+      <xsd:element name="number" type="xsd:integer"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:simpleType name="CustNameType">
+    <xsd:restriction base="xsd:string"/>
+  </xsd:simpleType>
+
+</xsd:schema>

@@ -1,0 +1,75 @@
+<!--Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+
+  <xsd:annotation>
+    <xsd:documentation>
+      This example illustrates list and union types.
+    </xsd:documentation>
+  </xsd:annotation>
+
+  <xsd:element name="sizes" type="SizesType"/>
+
+  <xsd:complexType name="SizesType">
+    <xsd:choice maxOccurs="unbounded">
+      <xsd:element name="size" type="SizeType"/>
+      <xsd:element name="smallSize" type="SmallSizeType"/>
+      <xsd:element name="internationalSize" type="InternationalSizeType"/>
+      <xsd:element name="availableSizes" type="AvailableSizesType"/>
+      <xsd:element name="applicableSizes" type="ApplicableSizesType"/>
+    </xsd:choice>
+  </xsd:complexType>
+
+  <xsd:simpleType name="SizeType">
+    <xsd:union memberTypes="DressSizeType">
+      <xsd:simpleType>
+        <xsd:restriction base="xsd:token">
+          <xsd:enumeration value="small"/>
+          <xsd:enumeration value="medium"/>
+          <xsd:enumeration value="large"/>
+        </xsd:restriction>
+      </xsd:simpleType>
+    </xsd:union>
+  </xsd:simpleType>
+
+  <xsd:simpleType name="DressSizeType">
+    <xsd:restriction base="xsd:integer">
+      <xsd:minInclusive value="2"/>
+      <xsd:maxInclusive value="18"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <xsd:simpleType name="SmallSizeType">
+    <xsd:restriction base="SizeType">
+      <xsd:enumeration value="2"/>
+      <xsd:enumeration value="4"/>
+      <xsd:enumeration value="6"/>
+      <xsd:enumeration value="small"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <xsd:simpleType name="InternationalSizeType">
+    <xsd:union memberTypes="SizeType">
+      <xsd:simpleType>
+        <xsd:restriction base="xsd:integer">
+          <xsd:minInclusive value="24"/>
+          <xsd:maxInclusive value="54"/>
+        </xsd:restriction>
+      </xsd:simpleType>
+    </xsd:union>
+  </xsd:simpleType>
+
+  <xsd:simpleType name="AvailableSizesType">
+    <xsd:list itemType="SizeType"/>
+  </xsd:simpleType>
+
+  <xsd:simpleType name="ApplicableSizesType">
+    <xsd:restriction>
+      <xsd:simpleType>
+        <xsd:list itemType="SizeType"/>
+      </xsd:simpleType>
+      <xsd:enumeration value="small medium large"/>
+      <xsd:enumeration value="2 4 6 8 10 12 14 16 18"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+
+</xsd:schema>

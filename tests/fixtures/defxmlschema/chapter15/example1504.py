@@ -12,13 +12,15 @@ class PurchaseOrderType:
         default=None,
         metadata=dict(
             name="description",
-            type="Element"
+            type="Element",
+            namespace=""
         )
     )
     comment: Optional[str] = field(
         default=None,
         metadata=dict(
             name="comment",
-            type="Element"
+            type="Element",
+            namespace=""
         )
     )

@@ -15,6 +15,7 @@ class HatType(ProductType):
         metadata=dict(
             name="size",
             type="Element",
+            namespace="",
             required=True
         )
     )
@@ -31,6 +32,7 @@ class ShirtType(ProductType):
         metadata=dict(
             name="size",
             type="Element",
+            namespace="",
             required=True
         )
     )
@@ -39,6 +41,7 @@ class ShirtType(ProductType):
         metadata=dict(
             name="color",
             type="Element",
+            namespace="",
             required=True
         )
     )

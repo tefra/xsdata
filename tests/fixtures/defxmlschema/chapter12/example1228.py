@@ -17,14 +17,16 @@ class AorBorBothType:
         default=None,
         metadata=dict(
             name="a",
-            type="Element"
+            type="Element",
+            namespace=""
         )
     )
     b: Optional[str] = field(
         default=None,
         metadata=dict(
             name="b",
-            type="Element"
+            type="Element",
+            namespace=""
         )
     )
     a: Optional[str] = field(
@@ -32,6 +34,7 @@ class AorBorBothType:
         metadata=dict(
             name="a",
             type="Element",
+            namespace="",
             required=True
         )
     )
@@ -40,6 +43,7 @@ class AorBorBothType:
         metadata=dict(
             name="b",
             type="Element",
+            namespace="",
             required=True
         )
     )

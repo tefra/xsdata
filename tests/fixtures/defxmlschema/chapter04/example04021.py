@@ -16,6 +16,7 @@ class OrderType:
         metadata=dict(
             name="number",
             type="Element",
+            namespace="",
             required=True
         )
     )
@@ -24,6 +25,7 @@ class OrderType:
         metadata=dict(
             name="customer",
             type="Element",
+            namespace="",
             required=True
         )
     )

@@ -21,28 +21,32 @@ class ItemsType:
         default=None,
         metadata=dict(
             name="product",
-            type="Element"
+            type="Element",
+            namespace=""
         )
     )
     shirt: Optional[ShirtType] = field(
         default=None,
         metadata=dict(
             name="shirt",
-            type="Element"
+            type="Element",
+            namespace=""
         )
     )
     hat: Optional[HatType] = field(
         default=None,
         metadata=dict(
             name="hat",
-            type="Element"
+            type="Element",
+            namespace=""
         )
     )
     umbrella: Optional[ProductType] = field(
         default=None,
         metadata=dict(
             name="umbrella",
-            type="Element"
+            type="Element",
+            namespace=""
         )
     )
 

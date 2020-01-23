@@ -12,6 +12,7 @@ class OrderType:
         metadata=dict(
             name="number",
             type="Element",
+            namespace="",
             required=True
         )
     )

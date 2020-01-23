@@ -90,7 +90,7 @@ class XmlSerializerTests(TestCase):
 
         expected = (
             "<?xml version='1.0' encoding='UTF-8'?>\n"
-            '<books xmlns="urn:books">\n'
+            '<ns0:books xmlns:ns0="urn:books">\n'
             '  <book id="bk001">\n'
             "    <author>Hightower, Kim</author>\n"
             "    <title>The First Book</title>\n"
@@ -105,7 +105,7 @@ class XmlSerializerTests(TestCase):
             "    <genre>Biography</genre>\n"
             "    <review>A masterpiece of the fine art of gossiping.</review>\n"
             "  </book>\n"
-            "</books>\n"
+            "</ns0:books>\n"
         )
         self.assertEqual(expected, actual)
 

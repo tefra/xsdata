@@ -15,7 +15,7 @@ from xsdata.models.elements import List as ListElement
 from xsdata.models.elements import Restriction, Schema, SimpleType
 from xsdata.models.elements import Union as UnionElement
 from xsdata.models.enums import TagType, XSDType
-from xsdata.models.mixins import ElementBase
+from xsdata.models.mixins import ElementBase, NamedField
 
 BaseElement = Union[
     Attribute, AttributeGroup, Element, ComplexType, SimpleType, Group
@@ -41,25 +41,16 @@ class ClassBuilder:
         classes.extend(map(self.build_class, self.schema.elements))
         return classes
 
-    def prefix_namespace(self, prefix: Optional[str]):
-        if prefix is None:
-            return self.schema.target_namespace
-        return self.schema.nsmap.get(prefix)
-
-    def build_class(self, obj: BaseElement, inner=False) -> Class:
+    def build_class(self, obj: BaseElement) -> Class:
         """Build and return a class instance."""
-        namespace = self.prefix_namespace(obj.prefix)
         item = Class(
             name=obj.real_name,
             is_abstract=obj.is_abstract,
-            namespace=namespace,
+            namespace=self.element_namespace(obj),
             type=type(obj),
             extensions=self.build_class_extensions(obj),
             help=obj.display_help,
         )
-
-        prefix = "Inner" if inner else "Root"
-        logger.info(f"{prefix } candidate: `{item.name}`")
 
         self.build_class_attributes(obj, item)
         return item
@@ -100,6 +91,27 @@ class ClassBuilder:
                 yield child
             else:
                 yield from self.element_children(child)
+
+    def element_namespace(self, obj: NamedField) -> Optional[str]:
+        """
+        Returns an element's namespace by its prefix and form.
+
+        Examples:
+            - prefixed elements returns the namespace from schema nsmap
+            - qualified elements returns the schema target namespace
+            - unqualified elements return an empty string
+            - unqualified attributes return None
+        """
+
+        prefix = obj.prefix
+        if prefix:
+            return self.schema.nsmap.get(prefix)
+        elif obj.is_qualified:
+            return self.schema.target_namespace
+        elif isinstance(obj, Element):
+            return ""
+
+        return None
 
     def element_extensions(
         self, obj: ElementBase, include_current=True
@@ -144,8 +156,6 @@ class ClassBuilder:
         if not obj.real_type:
             raise ValueError(f"Failed to detect type for element: {obj}")
 
-        namespace = self.prefix_namespace(obj.prefix)
-
         parent.attrs.append(
             Attr(
                 index=obj.index,
@@ -155,7 +165,7 @@ class ClassBuilder:
                 local_type=type(obj).__name__,
                 help=obj.display_help,
                 forward_ref=forward_ref,
-                namespace=namespace,
+                namespace=self.element_namespace(obj),
                 **obj.get_restrictions(),
             )
         )
@@ -164,7 +174,7 @@ class ClassBuilder:
         """Build a class from an anonymous complex type inside an element."""
         if isinstance(obj, Element) and obj.complex_type:
             obj.complex_type.name = obj.type = obj.name
-            parent.inner.append(self.build_class(obj.complex_type, inner=True))
+            parent.inner.append(self.build_class(obj.complex_type))
 
     def build_inner_enumeration(self, parent: Class, obj: AttributeElement):
         """Build an enumeration class from an anonymous restriction with
@@ -174,7 +184,7 @@ class ClassBuilder:
             and obj.simple_type
         ):
             obj.simple_type.name = obj.real_name
-            parent.inner.append(self.build_class(obj.simple_type, inner=True))
+            parent.inner.append(self.build_class(obj.simple_type))
 
             obj.type = obj.simple_type.name
             obj.simple_type = None

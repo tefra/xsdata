@@ -160,10 +160,15 @@ class XmlParser(AbstractParser, ModelInspect):
     ) -> Dict[str, Field]:
         """Returns the given class fields indexed by their namespace qualified
         names for easier match."""
-        return {
-            QName(f.namespace or namespace, f.local_name).text: f
-            for f in self.fields(clazz)
-        }
+
+        res: Dict = dict()
+        for field in self.fields(clazz):
+            if field.namespace == "":
+                res[field.local_name] = field
+            else:
+                qname = QName(field.namespace or namespace, field.local_name)
+                res[qname.text] = field
+        return res
 
     @staticmethod
     def parse_value(tp: Type, value: Any) -> Any:

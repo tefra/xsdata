@@ -84,9 +84,9 @@ class ModelInspect:
             elif f.default is not MISSING:
                 default_value = f.default
 
-            namespace = (
-                f.metadata.get("namespace") or self.class_meta(tp).namespace
-            )
+            namespace = f.metadata.get("namespace")
+            if namespace is None:
+                namespace = self.class_meta(tp).namespace
 
             yield Field(
                 name=f.name,

@@ -33,6 +33,7 @@ class Attr:
     length: Optional[int] = field(default=None)
     white_space: Optional[str] = field(default=None)
     pattern: Optional[str] = field(default=None)
+    nillable: Optional[bool] = field(default=None)
 
     def __post_init__(self):
         self.local_name = self.name
@@ -54,6 +55,7 @@ class Attr:
             "pattern": self.pattern,
             "total_digits": self.total_digits,
             "white_space": self.white_space,
+            "nillable": self.nillable,
         }
         return {k: v for k, v in result.items() if v is not None}
 

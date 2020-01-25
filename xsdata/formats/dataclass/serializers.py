@@ -97,7 +97,7 @@ class XmlSerializer(AbstractSerializer, ModelInspect):
         nsmap = {f"ns{index}": ns for index, ns in enumerate(namespaces)}
         return self.render_node(obj, Element(qname, nsmap=nsmap))
 
-    def render_node(self, obj, parent) -> Element:
+    def render_node(self, obj, parent, nillable=False) -> Element:
         """Recursively traverse the given dataclass instance fields and build
         the lxml Element structure."""
         if not self.is_dataclass(obj):
@@ -135,6 +135,16 @@ class XmlSerializer(AbstractSerializer, ModelInspect):
                 for val in value:
                     sub_element = SubElement(parent, qname)
                     self.render_node(val, sub_element)
+
+                    if (
+                        f.is_nillable
+                        and sub_element.text is None
+                        and len(sub_element) == 0
+                    ):
+                        sub_element.set(
+                            "{http://www.w3.org/2001/XMLSchema-instance}nil",
+                            "true",
+                        )
 
         return parent
 

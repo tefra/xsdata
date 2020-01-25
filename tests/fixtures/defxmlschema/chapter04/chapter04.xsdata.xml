@@ -9,9 +9,7 @@
     <product>
       <number>557</number>
       <name>Short-Sleeved Linen Blouse</name>
-      <size system="US-DRESS">
-        <value>10</value>
-      </size>
+      <size system="US-DRESS">10</size>
       <color value="blue"/>
     </product>
   </items>

@@ -6,6 +6,7 @@ from pathlib import Path
 import pytest
 from click.testing import CliRunner
 from jinja2 import Template
+from lxml import etree
 
 from xsdata import cli
 from xsdata.formats.dataclass.generator import DataclassGenerator
@@ -67,6 +68,9 @@ def test_binding(fixture: Path):
         expected.write_text(actual)
 
     xml = xml_serializer.render(obj)
+
+    schema = etree.XMLSchema(etree.parse(str(fixture.with_suffix(".xsd"))))
+    assert schema.validate(etree.fromstring(xml.encode())), schema.error_log
 
     expected.with_suffix(".xsdata.xml").write_text(xml)
 

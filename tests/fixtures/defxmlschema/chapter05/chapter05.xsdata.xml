@@ -1,10 +1,10 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<ns0:order xmlns:ns0="http://example.org/ord" xmlns:ns1="http://example.org/prod">
+<ns1:order xmlns:ns0="http://example.org/prod" xmlns:ns1="http://example.org/ord">
   <items>
-    <ns1:product>
+    <ns0:product>
       <number>557</number>
       <name>Short-Sleeved Linen Blouse</name>
-      <size/>
-    </ns1:product>
+      <size xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"/>
+    </ns0:product>
   </items>
-</ns0:order>
+</ns1:order>

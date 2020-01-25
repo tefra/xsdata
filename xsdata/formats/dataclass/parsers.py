@@ -78,12 +78,12 @@ class XmlParser(AbstractParser, ModelInspect):
         _, root = next(context)
         namespace = self.class_meta(clazz).namespace
         queue = [self.class_ns_fields(clazz, namespace)]
-        objects = [self.build_object(clazz, root)]
+        objects = [self.build_object(clazz, namespace, root)]
 
         for event, element in context:
             if event == EventType.START:
                 field = self.find_field(queue, namespace, element)
-                obj = self.build_object_from_field(field, element)
+                obj = self.build_object_from_field(field, namespace, element)
                 objects.append(obj)
             elif event == EventType.END:
                 obj = self.end_element(objects, queue, element)
@@ -107,24 +107,28 @@ class XmlParser(AbstractParser, ModelInspect):
 
         return field
 
-    def build_object_from_field(self, field: Field, element: Element) -> Type:
+    def build_object_from_field(
+        self, field: Field, namespace: Optional[str], element: Element
+    ) -> Type:
         """Bind the current element to a dataclass or simply parse its text
         value."""
         if not field.is_dataclass:
             return self.parse_value(field.type, element.text)
 
-        return self.build_object(field.type, element)
+        return self.build_object(field.type, namespace, element)
 
-    def build_object(self, clazz: Type, element: Element) -> Type:
+    def build_object(
+        self, clazz: Type, namespace: Optional[str], element: Element
+    ) -> Type:
         """Create a new class instance by the current element attributes and
         text."""
         params = {}
-        for f in self.fields(clazz):
-            if f.name == "value" and element.text:
-                params[f.name] = self.parse_value(f.type, element.text)
-            elif f.local_name in element.attrib:
-                params[f.name] = self.parse_value(
-                    f.type, element.attrib[f.local_name]
+        for qname, field in self.class_ns_fields(clazz, namespace).items():
+            if field.is_text and element.text:
+                params[field.name] = self.parse_value(field.type, element.text)
+            elif qname in element.attrib:
+                params[field.name] = self.parse_value(
+                    field.type, element.attrib[qname]
                 )
 
         return clazz(**params)
@@ -163,7 +167,9 @@ class XmlParser(AbstractParser, ModelInspect):
 
         res: Dict = dict()
         for field in self.fields(clazz):
-            if field.namespace == "":
+            if field.is_element and field.namespace == "":
+                res[field.local_name] = field
+            if field.is_attribute and field.namespace is None:
                 res[field.local_name] = field
             else:
                 qname = QName(field.namespace or namespace, field.local_name)

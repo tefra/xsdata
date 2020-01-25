@@ -110,7 +110,12 @@ class XmlSerializer(AbstractSerializer, ModelInspect):
             if not value:
                 continue
             elif f.is_attribute:
-                parent.set(f.local_name, self.render_value(value))
+                if f.namespace is None:
+                    qname = f.local_name
+                else:
+                    qname = self.render_tag(f.local_name, f.namespace)
+
+                parent.set(qname, self.render_value(value))
             elif f.is_text:
                 parent.text = self.render_value(value)
             else:

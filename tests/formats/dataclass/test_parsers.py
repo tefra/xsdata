@@ -2,7 +2,7 @@ import json
 from unittest.case import TestCase
 
 from tests.fixtures.books import BookForm, Books
-from xsdata.formats.dataclass.mixins import Field
+from xsdata.formats.dataclass.mixins import Field, NodeType
 from xsdata.formats.dataclass.parsers import JsonParser, XmlParser
 
 
@@ -66,16 +66,36 @@ class DictParserTests(TestCase):
     def test_parse_value(self):
         data = dict(foo="bar", bar="foo")
 
-        foo_field = Field(name="", local_name="foo", type=str)
-        bar_field = Field(name="", local_name="bar", type=str, is_list=True)
+        foo_field = Field(
+            name="", local_name="foo", type=str, node_type=NodeType.TEXT
+        )
+        bar_field = Field(
+            name="",
+            local_name="bar",
+            type=str,
+            is_list=True,
+            node_type=NodeType.ELEMENT,
+        )
 
         self.assertEqual("bar", JsonParser.parse_value(data, foo_field))
         self.assertEqual(["foo"], JsonParser.parse_value(data, bar_field))
 
-        none_field = Field(name="", local_name="nope", type=str, default=list)
+        none_field = Field(
+            name="",
+            local_name="nope",
+            type=str,
+            default=list,
+            node_type=NodeType.ELEMENT,
+        )
         self.assertEqual([], JsonParser.parse_value(data, none_field))
 
-        none_field = Field(name="", local_name="nope", type=str, default=1)
+        none_field = Field(
+            name="",
+            local_name="nope",
+            type=str,
+            default=1,
+            node_type=NodeType.ATTRIBUTE,
+        )
         self.assertEqual(1, JsonParser.parse_value(data, none_field))
 
 

@@ -57,3 +57,10 @@ class ElementTests(TestCase):
         )
         expected.update({"length": 9})
         self.assertEqual(expected, obj.get_restrictions())
+
+        obj.nillable = False
+        self.assertEqual(expected, obj.get_restrictions())
+
+        obj.nillable = True
+        expected.update({"nillable": True})
+        self.assertEqual(expected, obj.get_restrictions())

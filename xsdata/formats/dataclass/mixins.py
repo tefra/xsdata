@@ -26,6 +26,7 @@ class Field:
     local_name: str
     type: Any
     node_type: NodeType
+    is_nillable: bool = False
     is_list: bool = False
     is_dataclass: bool = False
     default: Any = None
@@ -112,6 +113,7 @@ class ModelInspect:
                 local_name=f.metadata["name"],
                 node_type=self.node_type(f.metadata["type"]),
                 is_list=is_list,
+                is_nillable=f.metadata.get("nillable") is True,
                 is_dataclass=self.is_dataclass(tp),
                 type=tp,
                 default=default_value,

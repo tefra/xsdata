@@ -799,6 +799,8 @@ class Element(AnnotationBase, TypedField, NamedField, OccurrencesMixin):
         restrictions = super().get_restrictions()
         if self.simple_type:
             restrictions.update(self.simple_type.get_restrictions())
+        if self.nillable:
+            restrictions.update({"nillable": True})
         return restrictions
 
 

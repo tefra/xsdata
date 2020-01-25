@@ -1,4 +1,5 @@
 from dataclasses import MISSING, dataclass, field, fields, is_dataclass
+from enum import Enum
 from typing import (
     Any,
     Dict,
@@ -13,16 +14,34 @@ from typing import (
 from xsdata.models.enums import TagType
 
 
+class NodeType(Enum):
+    TEXT = 1
+    ATTRIBUTE = 2
+    ELEMENT = 3
+
+
 @dataclass(frozen=True)
 class Field:
     name: str
     local_name: str
     type: Any
+    node_type: NodeType
     is_list: bool = False
-    is_attribute: bool = False
     is_dataclass: bool = False
     default: Any = None
     namespace: Optional[str] = None
+
+    @property
+    def is_attribute(self):
+        return self.node_type == NodeType.ATTRIBUTE
+
+    @property
+    def is_text(self):
+        return self.node_type == NodeType.TEXT
+
+    @property
+    def is_element(self):
+        return self.node_type == NodeType.ELEMENT
 
 
 @dataclass(frozen=True)
@@ -91,13 +110,21 @@ class ModelInspect:
             yield Field(
                 name=f.name,
                 local_name=f.metadata["name"],
-                is_attribute=f.metadata["type"] == TagType.ATTRIBUTE.cname,
+                node_type=self.node_type(f.metadata["type"]),
                 is_list=is_list,
                 is_dataclass=self.is_dataclass(tp),
                 type=tp,
                 default=default_value,
                 namespace=namespace,
             )
+
+    @staticmethod
+    def node_type(type_str: str):
+        if type_str == TagType.ATTRIBUTE.cname:
+            return NodeType.ATTRIBUTE
+        if type_str not in (TagType.ATTRIBUTE.cname, TagType.ELEMENT.cname):
+            return NodeType.TEXT
+        return NodeType.ELEMENT
 
     @staticmethod
     def class_meta(clazz: Type) -> Meta:

@@ -111,6 +111,8 @@ class XmlSerializer(AbstractSerializer, ModelInspect):
                 continue
             elif f.is_attribute:
                 parent.set(f.local_name, self.render_value(value))
+            elif f.is_text:
+                parent.text = self.render_value(value)
             else:
                 value = value if isinstance(value, list) else [value]
 

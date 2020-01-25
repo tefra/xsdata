@@ -1,5 +1,5 @@
 import json
-from dataclasses import dataclass, is_dataclass
+from dataclasses import dataclass
 from io import BytesIO
 from typing import Any, Dict, List, Optional, Type
 
@@ -33,7 +33,7 @@ class JsonParser(AbstractParser, ModelInspect):
 
             if not value:
                 params[field.name] = value
-            elif is_dataclass(field.type):
+            elif field.is_dataclass:
                 params[field.name] = (
                     [self.parse_context(val, field.type) for val in value]
                     if field.is_list

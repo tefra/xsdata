@@ -2,7 +2,7 @@ from typing import Iterator
 from unittest import TestCase
 
 from tests.fixtures.books import BookForm, Books
-from xsdata.formats.dataclass.mixins import Field, ModelInspect
+from xsdata.formats.dataclass.mixins import Field, ModelInspect, NodeType
 
 
 class ModelInspectTests(TestCase):
@@ -17,15 +17,54 @@ class ModelInspectTests(TestCase):
         self.assertIsInstance(result, Iterator)
 
         expected = [
-            Field(name="author", local_name="author", type=str, namespace=""),
-            Field(name="title", local_name="title", type=str, namespace=""),
-            Field(name="genre", local_name="genre", type=str, namespace=""),
-            Field(name="price", local_name="price", type=float, namespace=""),
             Field(
-                name="pub_date", local_name="pub_date", type=str, namespace=""
+                name="author",
+                local_name="author",
+                type=str,
+                namespace="",
+                node_type=NodeType.ELEMENT,
             ),
-            Field(name="review", local_name="review", type=str, namespace=""),
-            Field(name="id", local_name="id", type=str, is_attribute=True),
+            Field(
+                name="title",
+                local_name="title",
+                type=str,
+                namespace="",
+                node_type=NodeType.ELEMENT,
+            ),
+            Field(
+                name="genre",
+                local_name="genre",
+                type=str,
+                namespace="",
+                node_type=NodeType.ELEMENT,
+            ),
+            Field(
+                name="price",
+                local_name="price",
+                type=float,
+                namespace="",
+                node_type=NodeType.ELEMENT,
+            ),
+            Field(
+                name="pub_date",
+                local_name="pub_date",
+                type=str,
+                namespace="",
+                node_type=NodeType.ELEMENT,
+            ),
+            Field(
+                name="review",
+                local_name="review",
+                type=str,
+                namespace="",
+                node_type=NodeType.ELEMENT,
+            ),
+            Field(
+                name="id",
+                local_name="id",
+                type=str,
+                node_type=NodeType.ATTRIBUTE,
+            ),
         ]
 
         self.assertEqual(expected, list(result))
@@ -42,6 +81,7 @@ class ModelInspectTests(TestCase):
             is_dataclass=True,
             default=list,
             namespace="",
+            node_type=NodeType.ELEMENT,
         )
 
         self.assertEqual(1, len(result))

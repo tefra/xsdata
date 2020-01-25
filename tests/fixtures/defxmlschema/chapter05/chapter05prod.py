@@ -55,7 +55,8 @@ class ProductType:
             name="size",
             type="Element",
             namespace="",
-            required=True
+            required=True,
+            nillable=True
         )
     )
 

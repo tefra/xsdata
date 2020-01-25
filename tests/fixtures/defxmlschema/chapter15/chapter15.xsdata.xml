@@ -3,7 +3,5 @@
   <description>This is a great shirt.</description>
   <number>557</number>
   <name>Short-Sleeved Linen Blouse</name>
-  <size system="US-DRESS">
-    <value>6</value>
-  </size>
+  <size system="US-DRESS">6</size>
 </shirt>

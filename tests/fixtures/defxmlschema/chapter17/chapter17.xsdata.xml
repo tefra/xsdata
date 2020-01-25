@@ -18,16 +18,12 @@
     <product>
       <number>557</number>
       <name>Short-Sleeved Linen Blouse</name>
-      <price currency="USD">
-        <value>29.99</value>
-      </price>
+      <price currency="USD">29.99</price>
     </product>
     <product>
       <number>563</number>
       <name>Ten-Gallon Hat</name>
-      <price currency="USD">
-        <value>69.99</value>
-      </price>
+      <price currency="USD">69.99</price>
     </product>
   </products>
 </order>

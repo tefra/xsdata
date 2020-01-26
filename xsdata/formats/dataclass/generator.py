@@ -53,7 +53,7 @@ class DataclassGenerator(PythonAbstractGenerator):
 
     def prepare_classes(self):
         for obj in self.resolver.sorted_classes():
-            yield self.process_class(obj)
+            yield self.process_class(obj.clone())
 
     def prepare_imports(self) -> Dict[str, List[Package]]:
         """Get a list of sorted packages from the imports resolver apply the

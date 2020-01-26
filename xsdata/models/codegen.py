@@ -1,4 +1,4 @@
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from typing import Any, List, Optional, Type
 
 from xsdata.models.elements import ComplexType, Element
@@ -10,6 +10,9 @@ class AttrType:
     name: str
     alias: Optional[str] = field(default=None)
     forward_ref: bool = field(default=False)
+
+    def clone(self):
+        return replace(self)
 
 
 @dataclass
@@ -73,6 +76,10 @@ class Attr:
     def is_enumeration(self) -> bool:
         return self.local_type == TagType.ENUMERATION.cname
 
+    def clone(self):
+        types = [type.clone() for type in self.types]
+        return replace(self, types=types)
+
 
 @dataclass
 class Extension:
@@ -83,6 +90,9 @@ class Extension:
     @property
     def is_restriction(self):
         return self.type == TagType.RESTRICTION.cname
+
+    def clone(self):
+        return replace(self)
 
 
 @dataclass
@@ -107,6 +117,12 @@ class Class:
     @property
     def is_common(self):
         return self.type not in [Element, ComplexType]
+
+    def clone(self):
+        inners = [inner.clone() for inner in self.inner]
+        extensions = [extension.clone() for extension in self.extensions]
+        attrs = [attr.clone() for attr in self.attrs]
+        return replace(self, inner=inners, extensions=extensions, attrs=attrs)
 
 
 @dataclass

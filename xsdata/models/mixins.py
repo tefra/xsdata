@@ -10,14 +10,13 @@ from xsdata.models.enums import FormType, Namespace
 from xsdata.utils import text
 
 
-class TypedField(ABC):
-    @property
-    @abstractmethod
-    def real_type(self) -> Optional[str]:
-        pass
-
-
 class NamedField:
+    @property
+    def real_type(self) -> Optional[str]:
+        raise NotImplementedError(
+            "%s::real_type missing implementation", self.__class__.__name__
+        )
+
     @property
     def real_name(self) -> str:
         name = getattr(self, "name", None) or getattr(self, "ref", None)

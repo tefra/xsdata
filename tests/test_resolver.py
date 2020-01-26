@@ -3,6 +3,7 @@ from unittest import mock
 
 from tests.factories import (
     AttrFactory,
+    AttrTypeFactory,
     ClassFactory,
     ExtensionFactory,
     FactoryTestCase,
@@ -86,28 +87,48 @@ class DependenciesResolverTest(FactoryTestCase):
 
     def test_apply_aliases(self):
         self.resolver.aliases = {"d": "IamD", "a": "IamA"}
+        type_a = AttrTypeFactory.create(name="a")
+        type_b = AttrTypeFactory.create(name="b")
+        type_c = AttrTypeFactory.create(name="c")
+        type_d = AttrTypeFactory.create(name="d")
+
         obj = ClassFactory.create(
             name="a",
             attrs=[
-                AttrFactory.create(name="a", type="a"),
-                AttrFactory.create(name="b", type="b"),
-                AttrFactory.create(name="c", type="a d"),
+                AttrFactory.create(name="a", types=[type_a]),
+                AttrFactory.create(name="b", types=[type_b]),
+                AttrFactory.create(name="c", types=[type_a, type_d]),
             ],
             inner=[
                 ClassFactory.create(
                     name="b",
-                    attrs=[AttrFactory.create(name=x, type=x) for x in "cd"],
+                    attrs=[
+                        AttrFactory.create(name="c", types=[type_c]),
+                        AttrFactory.create(name="d", types=[type_d]),
+                    ],
                 ),
             ],
         )
 
         result = self.resolver.apply_aliases(obj)
         self.assertIs(result, obj)
-        self.assertEqual({"a": "IamA"}, obj.attrs[0].type_aliases)
-        self.assertEqual({}, obj.attrs[1].type_aliases)
-        self.assertEqual({"a": "IamA", "d": "IamD"}, obj.attrs[2].type_aliases)
-        self.assertEqual({}, obj.inner[0].attrs[0].type_aliases)
-        self.assertEqual({"d": "IamD"}, obj.inner[0].attrs[1].type_aliases)
+
+        self.assertEqual(3, len(obj.attrs))
+        self.assertEqual(1, len(obj.attrs[0].types))
+        self.assertEqual(1, len(obj.attrs[1].types))
+        self.assertEqual(2, len(obj.attrs[2].types))
+
+        self.assertEqual("IamA", obj.attrs[0].types[0].alias)
+        self.assertIsNone(obj.attrs[1].types[0].alias)
+        self.assertEqual("IamA", obj.attrs[2].types[0].alias)
+        self.assertEqual("IamD", obj.attrs[2].types[1].alias)
+
+        self.assertEqual(1, len(obj.inner))
+        self.assertEqual(2, len(obj.inner[0].attrs))
+        self.assertEqual(1, len(obj.inner[0].attrs[0].types))
+        self.assertEqual(1, len(obj.inner[0].attrs[1].types))
+        self.assertIsNone(obj.inner[0].attrs[0].types[0].alias)
+        self.assertEqual("IamD", obj.inner[0].attrs[1].types[0].alias)
 
     @mock.patch.object(DependenciesResolver, "add_import")
     @mock.patch.object(DependenciesResolver, "find_package")
@@ -216,12 +237,31 @@ class DependenciesResolverTest(FactoryTestCase):
     def test_collect_deps(self):
         obj = ClassFactory.create(
             attrs=[
-                AttrFactory.create(type="xs:decimal"),
-                AttrFactory.create(type="xs:annotated", forward_ref=True),
-                AttrFactory.create(type="xs:openAttrs xs:localAttribute"),
+                AttrFactory.create(
+                    types=[AttrTypeFactory.create(name="xs:decimal")]
+                ),
+                AttrFactory.create(
+                    types=[
+                        AttrTypeFactory.create(
+                            name="xs:annotated", forward_ref=True
+                        )
+                    ]
+                ),
+                AttrFactory.create(
+                    types=[
+                        AttrTypeFactory.create(name="xs:openAttrs"),
+                        AttrTypeFactory.create(name="xs:localAttribute"),
+                    ]
+                ),
             ],
             extensions=[ExtensionFactory.create(name="xs:localElement")],
-            inner=[ClassFactory.create(attrs=AttrFactory.list(2, type="foo"))],
+            inner=[
+                ClassFactory.create(
+                    attrs=AttrFactory.list(
+                        2, types=AttrTypeFactory.list(1, name="foo")
+                    )
+                )
+            ],
         )
 
         self.assertEqual(

@@ -10,5 +10,4 @@
       <xs:maxLength value="3" />
     </xs:restriction>
   </xs:simpleType>
-  <xs:element name="AvailableSizesType" type="AvailableSizesType" />
 </xs:schema>

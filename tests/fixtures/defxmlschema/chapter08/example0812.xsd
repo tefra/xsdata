@@ -11,5 +11,4 @@
       </xs:simpleType>
     </xs:union>
   </xs:simpleType>
-  <xs:element name="XSMLXSizeType" type="XSMLXSizeType" />
 </xs:schema>

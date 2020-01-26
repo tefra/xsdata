@@ -1,19 +1,16 @@
-from dataclasses import dataclass, field
-from typing import Optional
+from enum import Enum
 
 
-@dataclass
-class XsmlxsizeType:
+class XsmlxsizeType(Enum):
     """
-    :ivar value:
+    :cvar SMALL:
+    :cvar MEDIUM:
+    :cvar LARGE:
+    :cvar EXTRA_LARGE:
+    :cvar EXTRA_SMALL:
     """
-    class Meta:
-        name = "XSMLXSizeType"
-
-    value: Optional[str] = field(
-        default=None,
-        metadata=dict(
-            name="value",
-            type="Union"
-        )
-    )
+    SMALL = "small"
+    MEDIUM = "medium"
+    LARGE = "large"
+    EXTRA_LARGE = "extra large"
+    EXTRA_SMALL = "extra small"

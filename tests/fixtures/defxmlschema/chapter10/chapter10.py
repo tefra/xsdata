@@ -1,6 +1,6 @@
 from enum import Enum
 from dataclasses import dataclass, field
-from typing import List
+from typing import List, Union
 
 
 class SmallSizeType(Enum):
@@ -25,14 +25,16 @@ class SizesType:
     :ivar available_sizes:
     :ivar applicable_sizes:
     """
-    size: List[str] = field(
+    size: List[Union[int, "SizesType.Value"]] = field(
         default_factory=list,
         metadata=dict(
             name="size",
             type="Element",
             namespace="",
             min_occurs=0,
-            max_occurs=9223372036854775807
+            max_occurs=9223372036854775807,
+            min_inclusive=2.0,
+            max_inclusive=18.0
         )
     )
     small_size: List[SmallSizeType] = field(
@@ -45,7 +47,7 @@ class SizesType:
             max_occurs=9223372036854775807
         )
     )
-    international_size: List[int] = field(
+    international_size: List[Union[int, "SizesType.Value"]] = field(
         default_factory=list,
         metadata=dict(
             name="internationalSize",
@@ -57,14 +59,16 @@ class SizesType:
             max_inclusive=54.0
         )
     )
-    available_sizes: List[str] = field(
+    available_sizes: List[Union[int, "SizesType.Value"]] = field(
         default_factory=list,
         metadata=dict(
             name="availableSizes",
             type="Element",
             namespace="",
             min_occurs=0,
-            max_occurs=9223372036854775807
+            max_occurs=9223372036854775807,
+            min_inclusive=2.0,
+            max_inclusive=18.0
         )
     )
     applicable_sizes: List[str] = field(
@@ -77,6 +81,16 @@ class SizesType:
             max_occurs=9223372036854775807
         )
     )
+
+    class Value(Enum):
+        """
+        :cvar SMALL:
+        :cvar MEDIUM:
+        :cvar LARGE:
+        """
+        SMALL = "small"
+        MEDIUM = "medium"
+        LARGE = "large"
 
 
 @dataclass

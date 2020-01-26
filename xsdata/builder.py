@@ -235,7 +235,7 @@ class ClassBuilder:
         """Check if the attribute element contains anonymous restriction with
         enumeration facet."""
         return (
-            isinstance(obj, (Attribute, Element, ListElement))
+            isinstance(obj, (Attribute, Element))
             and obj.type is None
             and obj.simple_type is not None
             and obj.simple_type.is_enumeration

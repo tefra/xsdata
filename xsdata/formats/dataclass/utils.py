@@ -36,6 +36,9 @@ stop_words = [
 
 
 def safe_snake(string: str) -> str:
+    if not string:
+        return "empty"
+
     if string.lower() in stop_words:
         return f"{string}_value"
     if string[0].isdigit():

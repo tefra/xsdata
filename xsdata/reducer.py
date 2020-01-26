@@ -1,4 +1,3 @@
-import copy
 from dataclasses import dataclass, field
 from typing import Callable, Dict, List, Optional
 
@@ -95,13 +94,13 @@ class ClassReducer:
                 if attr_type.forward_ref and len(item.inner) == 1:
                     if item.inner[0].is_enumeration:
                         is_enumeration = True
-                        attrs.extend(copy.deepcopy(item.inner[0].attrs))
+                        attrs.extend(item.inner[0].attrs)
 
                 elif not attr_type.forward_ref:
                     common = self.find_common_type(attr_type.name, schema)
                     if common is not None and common.is_enumeration:
                         is_enumeration = True
-                        attrs.extend(copy.deepcopy(common.attrs))
+                        attrs.extend(common.attrs)
 
                 if not is_enumeration:
                     all_enums = False
@@ -145,7 +144,7 @@ class ClassReducer:
                 types.append(attr_type)
             elif len(common.attrs) == 1:
                 common_attr = common.attrs[0]
-                types.extend(copy.deepcopy(common_attr.types))
+                types.extend(common_attr.types)
                 restrictions = common_attr.restrictions
                 self.copy_inner_classes(common, item)
             else:
@@ -181,8 +180,7 @@ class ClassReducer:
     @staticmethod
     def copy_attributes(source: Class, target: Class, extension: Extension):
         prefix, ext = split(extension.name)
-        target.inner.extend(copy.deepcopy(source.inner))
-        new_attrs = copy.deepcopy(source.attrs)
+        target.inner.extend(source.inner)
         position = next(
             (
                 index
@@ -191,13 +189,14 @@ class ClassReducer:
             ),
             0,
         )
-        for attr in new_attrs:
+        for attr in source.attrs:
+            new_attr = attr.clone()
             if prefix:
-                for attr_type in attr.types:
+                for attr_type in new_attr.types:
                     if attr_type.name.find(":") == -1:
                         attr_type.name = f"{prefix}:{attr_type.name}"
 
-            target.attrs.insert(position, attr)
+            target.attrs.insert(position, new_attr)
             position += 1
 
     @staticmethod
@@ -208,7 +207,7 @@ class ClassReducer:
                 None,
             )
             if not exists:
-                target.inner.append(copy.deepcopy(inner))
+                target.inner.append(inner)
 
 
 reducer = ClassReducer()

@@ -21,7 +21,7 @@ class {{ obj.name }}{{"({})".format(obj.extensions|join(', ', attribute="name"))
 {%- for attr in obj.attrs %}
     {%- set field_params = dict(
                   name=attr.local_name,
-                  type=attr.local_type,
+                  type=attr.display_type,
                   namespace=attr.namespace if namespace != attr.namespace else None,
                   ** attr.restrictions
             )

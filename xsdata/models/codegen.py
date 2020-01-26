@@ -18,8 +18,8 @@ class Attr:
     local_name: str = field(init=False)
     local_type: str
     index: int
-
     types: List[AttrType] = field(default_factory=list)
+    display_type: Optional[str] = field(default=None)
     namespace: Optional[str] = field(default=None)
     help: Optional[str] = field(default=None)
     default: Optional[Any] = field(default=None)

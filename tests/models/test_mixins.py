@@ -4,7 +4,7 @@ from unittest import TestCase, mock
 from unittest.mock import PropertyMock
 
 from xsdata.models import elements as el
-from xsdata.models.mixins import ElementBase, OccurrencesMixin, TypedField
+from xsdata.models.mixins import ElementBase, OccurrencesMixin
 
 
 def get_subclasses(clazz: Type):
@@ -50,23 +50,6 @@ class OccurrencesMixinTests(TestCase):
         for clazz in self.subclasses:
             obj = clazz.create(**data)
             self.assertEqual(dict(), obj.get_restrictions())
-
-
-class TypedFieldTests(TestCase):
-    def setUp(self) -> None:
-        super(TypedFieldTests, self).setUp()
-        self.subclasses = [c for _, c in get_subclasses(TypedField)]
-
-    def test_subclasses(self):
-        expected = [
-            el.Attribute,
-            el.Element,
-            el.Enumeration,
-            el.Restriction,
-            el.SimpleType,
-            el.Union,
-        ]
-        self.assertEqual(expected, self.subclasses)
 
 
 class NamedFieldTests(TestCase):

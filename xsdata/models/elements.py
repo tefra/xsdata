@@ -14,7 +14,6 @@ from xsdata.models.mixins import (
     NamedField,
     OccurrencesMixin,
     RestrictedField,
-    TypedField,
 )
 
 
@@ -75,7 +74,7 @@ class AnnotationBase(ElementBase):
 
 
 @dataclass
-class SimpleType(AnnotationBase, TypedField, NamedField, RestrictedField):
+class SimpleType(AnnotationBase, NamedField, RestrictedField):
     """
     The simpleType element defines a simple type and specifies the constraints
     and information about the values of attributes or text-only elements.
@@ -152,7 +151,7 @@ class List(AnnotationBase, RestrictedField, NamedField):
 
 
 @dataclass
-class Union(AnnotationBase, TypedField, NamedField, RestrictedField):
+class Union(AnnotationBase, NamedField, RestrictedField):
     """
     The union element defines a simple type as a collection (union) of values
     from specified simple data types.
@@ -211,7 +210,7 @@ class AnyAttribute(AnnotationBase):
 
 
 @dataclass
-class Attribute(AnnotationBase, TypedField, NamedField, RestrictedField):
+class Attribute(AnnotationBase, NamedField, RestrictedField):
     """
     The attribute element defines an attribute.
 
@@ -380,7 +379,7 @@ class RestrictionType(AnnotationBase):
 
 
 @dataclass
-class Enumeration(RestrictionType, TypedField, NamedField, RestrictedField):
+class Enumeration(RestrictionType, NamedField, RestrictedField):
     """
     Defines a list of acceptable values.
 
@@ -550,7 +549,7 @@ class WhiteSpace(RestrictionType):
 
 
 @dataclass
-class Restriction(RestrictedField, AnnotationBase, TypedField, NamedField):
+class Restriction(RestrictedField, AnnotationBase, NamedField):
     """
     The restriction element defines restrictions on a simpleType,
     simpleContent, or complexContent definition.
@@ -752,7 +751,7 @@ class Keyref(AnnotationBase):
 
 
 @dataclass
-class Element(AnnotationBase, TypedField, NamedField, OccurrencesMixin):
+class Element(AnnotationBase, NamedField, OccurrencesMixin):
     """
     The element element defines an element.
 

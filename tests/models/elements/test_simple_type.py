@@ -20,7 +20,7 @@ class SimpleTypeTests(TestCase):
 
     def test_property_real_type(self):
         obj = SimpleType.create()
-        self.assertEqual("xs:string", obj.real_type)
+        self.assertIsNone(obj.real_type)
 
         obj.union = Union.create(member_types="thug")
         self.assertEqual("thug", obj.real_type)

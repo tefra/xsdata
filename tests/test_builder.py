@@ -292,24 +292,6 @@ class ClassBuilderTests(FactoryTestCase):
         )
         mock_element_namespace.assert_called_once_with(attribute)
 
-    @patch.object(ClassBuilder, "build_class_attribute_types")
-    @patch.object(Attribute, "real_name", new_callable=PropertyMock)
-    def test_build_class_attribute_raises_exception_when_empty_types(
-        self, mock_real_name, mock_build_class_attribute_types
-    ):
-        item = ClassFactory.create()
-
-        mock_build_class_attribute_types.return_value = []
-        mock_real_name.return_value = "quantity"
-
-        attribute = Attribute.create(default="false", index=66)
-
-        with self.assertRaises(ValueError) as cm:
-            self.builder.build_class_attribute(item, attribute)
-
-        msg = f"Failed to detect type for attribute: class_B.quantity"
-        self.assertEqual(msg, str(cm.exception))
-
     @patch.object(Attribute, "real_type", new_callable=PropertyMock)
     @patch.object(ClassBuilder, "build_inner_class")
     def test_build_class_attribute_types(
@@ -320,14 +302,14 @@ class ClassBuilderTests(FactoryTestCase):
 
         item = ClassFactory.create()
         attribute = Attribute.create(default="false", index=66)
-        expected = self.builder.build_class_attribute_types(item, attribute)
+        actual = self.builder.build_class_attribute_types(item, attribute)
 
-        actual = [
+        expected = [
             AttrTypeFactory.create(name="xs:int"),
             AttrTypeFactory.create(name="xs:str"),
         ]
 
-        self.assertEqual(actual, expected)
+        self.assertEqual(expected, actual)
 
     @patch.object(Attribute, "real_type", new_callable=PropertyMock)
     @patch.object(ClassBuilder, "build_inner_class")
@@ -340,30 +322,37 @@ class ClassBuilderTests(FactoryTestCase):
 
         item = ClassFactory.create()
         attribute = Attribute.create(default="false", index=66)
-        expected = self.builder.build_class_attribute_types(item, attribute)
+        actual = self.builder.build_class_attribute_types(item, attribute)
 
-        actual = [
+        expected = [
             AttrTypeFactory.create(name="xs:int"),
             AttrTypeFactory.create(name="xs:str"),
             AttrTypeFactory.create(name="foo", forward_ref=True),
         ]
 
-        self.assertEqual(actual, expected)
+        self.assertEqual(expected, actual)
         self.assertEqual([inner_class], item.inner)
 
+    @patch("xsdata.builder.logger.warning")
     @patch.object(Attribute, "real_type", new_callable=PropertyMock)
     @patch.object(ClassBuilder, "build_inner_class")
     def test_build_class_attribute_types_when_obj_has_no_types(
-        self, mock_build_inner_class, mock_real_type
+        self, mock_build_inner_class, mock_real_type, mock_warning
     ):
         mock_real_type.return_value = None
         mock_build_inner_class.return_value = None
 
         item = ClassFactory.create()
-        attribute = Attribute.create(default="false", index=66)
-        expected = self.builder.build_class_attribute_types(item, attribute)
+        attribute = Attribute.create(default="false", index=66, name="attr")
+        actual = self.builder.build_class_attribute_types(item, attribute)
+        expected = [
+            AttrTypeFactory.create(name="xs:string"),
+        ]
 
-        self.assertEqual([], expected)
+        self.assertEqual(expected, actual)
+        mock_warning.assert_called_once_with(
+            "Default type string for attribute %s.%s", "class_B", "attr"
+        )
 
     @patch.object(ClassBuilder, "build_class")
     @patch.object(ClassBuilder, "has_anonymous_class")

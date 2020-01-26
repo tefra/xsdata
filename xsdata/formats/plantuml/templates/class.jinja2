@@ -1,6 +1,6 @@
 class {{ obj.name }} {
 {%- for attr in obj.attrs %}
-    +{{ attr.name }} : {{   attr.display_type }}{{ "[]" if attr.is_list else "" }}
+    +{{ attr.name }} : {{   attr.types|join(", ", attribute="name") }}{{ "[]" if attr.is_list else "" }}
 {%- endfor %}
 }
 {%- for ext in obj.extensions %}

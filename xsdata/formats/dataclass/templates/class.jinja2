@@ -21,12 +21,12 @@ class {{ obj.name }}{{"({})".format(obj.extensions|join(', ', attribute="name"))
 {%- for attr in obj.attrs %}
     {%- set field_params = dict(
                   name=attr.local_name,
-                  type=attr.display_type,
+                  type=attr.local_type,
                   namespace=attr.namespace if namespace != attr.namespace else None,
                   ** attr.restrictions
             )
     %}
-    {{ attr.name }}: {{ attr.type }} = field(
+    {{ attr.name }}: {{ attr.display_type }} = field(
         {{ "default_factory" if attr.is_list else "default" }}={{ attr.default }},
         metadata=dict(
             {{ field_params|arguments|indent(12) }}

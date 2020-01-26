@@ -95,7 +95,8 @@ class SimpleType(AnnotationBase, NamedField, RestrictedField):
             return self.list.real_type
         if self.union:
             return self.union.member_types
-        return XSDType.STRING.code
+
+        return None
 
     def get_restrictions(self) -> Dict[str, Anything]:
         if self.restriction:
@@ -141,6 +142,7 @@ class List(AnnotationBase, RestrictedField, NamedField):
             return self.item_type
         if self.simple_type:
             return self.simple_type.real_type
+
         return None
 
     def get_restrictions(self) -> Dict[str, Anything]:
@@ -239,7 +241,7 @@ class Attribute(AnnotationBase, NamedField, RestrictedField):
         if self.ref:
             return self.ref
 
-        return XSDType.STRING.code
+        return None
 
     def get_restrictions(self) -> Dict[str, Anything]:
         restrictions = dict()
@@ -790,9 +792,8 @@ class Element(AnnotationBase, NamedField, OccurrencesMixin):
             return self.ref
         if self.simple_type:
             return self.simple_type.real_type
-        if self.complex_type:
-            return None
-        return XSDType.STRING.code
+
+        return None
 
     def get_restrictions(self) -> Dict[str, Anything]:
         restrictions = super().get_restrictions()

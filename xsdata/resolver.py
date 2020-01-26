@@ -60,11 +60,8 @@ class DependenciesResolver:
     def apply_aliases(self, obj: Class) -> Class:
         """Walk the attributes tree and set the type aliases."""
         for attr in obj.attrs:
-            attr.type_aliases = {
-                type_name: self.aliases.get(type_name)
-                for type_name in attr.types
-                if self.aliases.get(type_name)
-            }
+            for att_type in attr.types:
+                att_type.alias = self.aliases.get(att_type.name)
 
         for inner in obj.inner:
             self.apply_aliases(inner)
@@ -146,8 +143,13 @@ class DependenciesResolver:
         """
         deps: Set[str] = set()
         for attr in obj.attrs:
-            if not attr.forward_ref:
-                deps.update(list(attr.types))
+            deps.update(
+                [
+                    attr_type.name
+                    for attr_type in attr.types
+                    if not attr_type.forward_ref
+                ]
+            )
 
         deps.update(ext.name for ext in obj.extensions)
         for inner in obj.inner:

@@ -2,13 +2,14 @@ from unittest import mock
 
 from tests.factories import (
     AttrFactory,
+    AttrTypeFactory,
     ClassFactory,
     ExtensionFactory,
     FactoryTestCase,
     PackageFactory,
 )
 from xsdata.generators import PythonAbstractGenerator as generator
-from xsdata.models.enums import TagType
+from xsdata.models.enums import TagType, XSDType
 
 
 class PythonAbstractGeneratorTests(FactoryTestCase):
@@ -49,7 +50,7 @@ class PythonAbstractGeneratorTests(FactoryTestCase):
         )
 
         mock_type_name.assert_has_calls(
-            [mock.call("m"), mock.call("n"), mock.call("o")]
+            [mock.call("o"), mock.call("m"), mock.call("n")]
         )
 
         mock_process_attribute.assert_has_calls(
@@ -82,58 +83,63 @@ class PythonAbstractGeneratorTests(FactoryTestCase):
 
     @mock.patch("xsdata.utils.text.split", return_value=[None, "nope"])
     @mock.patch.object(generator, "attribute_default", return_value="life")
-    @mock.patch.object(generator, "attribute_type", return_value="rab")
+    @mock.patch.object(generator, "attribute_display_type", return_value="rab")
     @mock.patch.object(generator, "attribute_name", return_value="oof")
     def test_process_attribute(
-        self, mock_name, mock_type, mock_default, mock_split
+        self, mock_name, mock_display_type, mock_default, mock_split
     ):
-        attr = AttrFactory.create(name="foo", type="bar", default="thug")
+        type_bar = AttrTypeFactory.create(name="bar")
+        attr = AttrFactory.create(name="foo", types=[type_bar], default="thug")
+
+        self.assertIsNone(attr.display_type)
+
         generator.process_attribute(attr, ["a", "b"])
 
         self.assertEqual("oof", attr.name)
-        self.assertEqual("rab", attr.type)
+        self.assertEqual("rab", attr.display_type)
         self.assertEqual("nope", attr.local_name)
         self.assertEqual("life", attr.default)
 
         mock_name.assert_called_once_with("foo")
-        mock_type.assert_called_once_with(attr, ["a", "b"])
+        mock_display_type.assert_called_once_with(attr, ["a", "b"])
         mock_default.assert_called_once_with(attr)
         mock_split.assert_called_once_with("foo")
 
     @mock.patch.object(generator, "attribute_default", return_value="2")
     @mock.patch.object(generator, "enumeration_name", return_value="OOF")
     def test_process_enumeration(self, mock_name, mock_default):
-        attr = AttrFactory.create(name="foo", type="bar", default="thug")
-        extensions = ExtensionFactory.list(1, name="int")
+        type_bar = AttrTypeFactory.create(name="bar")
+        attr = AttrFactory.create(name="foo", types=[type_bar], default="thug")
+        extensions = ExtensionFactory.list(1, name="xs:int")
         parent = ClassFactory.create(extensions=extensions)
         generator.process_enumeration(attr, parent)
 
         self.assertEqual("OOF", attr.name)
-        self.assertEqual("int", attr.type)
         self.assertEqual("foo", attr.local_name)
         self.assertEqual("2", attr.default)
 
         mock_name.assert_called_once_with("foo")
         mock_default.assert_called_once_with(attr)
 
-    def test_process_enumeration_with_invalid_parent_extensions(self):
-        attr = AttrFactory.create(name="foo", type="bar", default="thug")
+    def test_process_enumeration_with_non_xsd_type_extensions(self):
+        type_bar = AttrTypeFactory.create(name="bar")
+        attr = AttrFactory.create(name="foo", types=[type_bar], default="thug")
 
         parent = ClassFactory.create()
         generator.process_enumeration(attr, parent)
-        self.assertEqual("str", attr.type)
+        self.assertEqual([type_bar], attr.types)
 
-        attr.type = None
-        extensions = ExtensionFactory.list(2, name="str")
+        attr.types = []
+        extensions = ExtensionFactory.list(2, name="xs:string")
         parent = ClassFactory.create(extensions=extensions)
         generator.process_enumeration(attr, parent)
-        self.assertEqual("str", attr.type)
+        self.assertEqual([], attr.types)
 
-        attr.type = None
+        attr.types = []
         extensions = ExtensionFactory.list(1, name="foo")
         parent = ClassFactory.create(extensions=extensions)
         generator.process_enumeration(attr, parent)
-        self.assertEqual("str", attr.type)
+        self.assertEqual([], attr.types)
 
     def test_process_import(self):
         package = PackageFactory.create(
@@ -169,55 +175,67 @@ class PythonAbstractGeneratorTests(FactoryTestCase):
         self.assertEqual("NONE_VALUE", generator.enumeration_name("None"))
         self.assertEqual("BR_EAK_VALUE", generator.enumeration_name("BrEak"))
 
-    def test_attribute_type(self):
+    def test_attribute_display_type(self):
         parents = []
-        attr = AttrFactory.create(name="foo", type="foo_bar", default="foo")
+        type_foo_bar = AttrTypeFactory.create(name="foo_bar")
 
-        actual = generator.attribute_type(attr, parents)
+        attr = AttrFactory.create(
+            name="foo", default="foo", types=[type_foo_bar]
+        )
+
+        actual = generator.attribute_display_type(attr, parents)
         self.assertEqual("FooBar", actual)
 
         attr.default = None
-        actual = generator.attribute_type(attr, parents)
+        actual = generator.attribute_display_type(attr, parents)
         self.assertEqual("Optional[FooBar]", actual)
 
-        attr.forward_ref = True
         parents = ["Parent"]
-        actual = generator.attribute_type(attr, parents)
+        attr.types[0].forward_ref = True
+        actual = generator.attribute_display_type(attr, parents)
         self.assertEqual('Optional["Parent.FooBar"]', actual)
 
         parents = ["A", "Parent"]
         attr.max_occurs = 2
-        actual = generator.attribute_type(attr, parents)
+        actual = generator.attribute_display_type(attr, parents)
         self.assertEqual('List["A.Parent.FooBar"]', actual)
 
-        attr.type = "thug:life"
-        attr.type_aliases = {"thug:life": "Boss:Life"}
-        actual = generator.attribute_type(attr, parents)
+        attr.types[0].alias = "Boss:Life"
+        actual = generator.attribute_display_type(attr, parents)
         self.assertEqual('List["A.Parent.BossLife"]', actual)
 
-        attr.type = "thug:life xs:int"
-        attr.forward_ref = False
-        attr.type_aliases = {"thug:life": "Boss:Life"}
-        actual = generator.attribute_type(attr, parents)
-        self.assertEqual("List[Union[BossLife, int]]", actual)
+        attr.types = [
+            AttrTypeFactory.create(
+                name="thug:life", alias="Boss:Life", forward_ref=True
+            ),
+            AttrTypeFactory.create(name="xs:int"),
+        ]
+        actual = generator.attribute_display_type(attr, parents)
+        self.assertEqual('List[Union["A.Parent.BossLife", int]]', actual)
 
     def test_attribute_default(self):
-        attr = AttrFactory.create(name="foo", type="str")
+        type_str = AttrTypeFactory.create(name=XSDType.STRING.code)
+        type_int = AttrTypeFactory.create(name=XSDType.INTEGER.code)
+        type_float = AttrTypeFactory.create(name=XSDType.FLOAT.code)
+        type_bool = AttrTypeFactory.create(name=XSDType.BOOLEAN.code)
+        type_str = AttrTypeFactory.create(name=XSDType.STRING.code)
+
+        attr = AttrFactory.create(name="foo", types=[type_str])
         self.assertEqual(None, generator.attribute_default(attr))
 
         attr.default = "foo"
         self.assertEqual('"foo"', generator.attribute_default(attr))
 
         attr.default = "1.5"
-        attr.type = "float"
+        attr.types[0] = type_float
         self.assertEqual(1.5, generator.attribute_default(attr))
 
         attr.default = "1"
-        attr.type = "int"
+        attr.types[0] = type_int
         self.assertEqual(1, generator.attribute_default(attr))
 
         attr.default = "true"
-        attr.type = "bool"
+        attr.types[0] = type_bool
         self.assertTrue(generator.attribute_default(attr))
 
         attr.default = "not-true"
@@ -225,3 +243,14 @@ class PythonAbstractGeneratorTests(FactoryTestCase):
 
         attr.max_occurs = 2
         self.assertEqual("list", generator.attribute_default(attr))
+
+        attr.default = "1"
+        attr.max_occurs = 1
+        attr.types = [type_bool, type_int, type_float]
+        self.assertEqual(1, generator.attribute_default(attr))
+
+        attr.default = "1.0"
+        self.assertEqual(1.0, generator.attribute_default(attr))
+
+        attr.default = "true"
+        self.assertTrue(generator.attribute_default(attr))

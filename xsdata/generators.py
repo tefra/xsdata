@@ -5,7 +5,7 @@ from typing import Any, Iterator, List, Optional, Tuple
 from jinja2 import Environment, FileSystemLoader, Template
 
 from xsdata.formats.dataclass.utils import safe_snake
-from xsdata.models.codegen import Attr, Class, Package
+from xsdata.models.codegen import Attr, AttrType, Class, Package
 from xsdata.models.elements import Schema
 from xsdata.models.enums import XSDType
 from xsdata.resolver import DependenciesResolver
@@ -42,9 +42,6 @@ class PythonAbstractGenerator(AbstractGenerator, ABC):
         parents = parents or []
         obj.name = cls.class_name(obj.name)
 
-        for extension in obj.extensions:
-            extension.name = cls.type_name(extension.name)
-
         curr_parents = parents + [obj.name]
         for inner in obj.inner:
             cls.process_class(inner, curr_parents)
@@ -56,27 +53,27 @@ class PythonAbstractGenerator(AbstractGenerator, ABC):
             else:
                 cls.process_attribute(attr, curr_parents)
 
+        for extension in obj.extensions:
+            extension.name = cls.type_name(extension.name)
+
         return obj
 
     @classmethod
     def process_attribute(cls, attr: Attr, parents: List[str]) -> None:
         """Normalize attribute properties."""
         attr.name = cls.attribute_name(attr.name)
-        attr.type = cls.attribute_type(attr, parents)
+        attr.display_type = cls.attribute_display_type(attr, parents)
         attr.local_name = text.split(attr.local_name)[1]
         attr.default = cls.attribute_default(attr)
 
     @classmethod
     def process_enumeration(cls, attr: Attr, parent: Class) -> None:
         """Normalize enumeration properties."""
-        valid_types = ("str", "int", "float", "bool")
 
-        attr.type = (
-            parent.extensions[0].name
-            if len(parent.extensions) == 1
-            and parent.extensions[0].name in valid_types
-            else "str"
-        )
+        if len(parent.extensions) == 1:
+            xsd_type = XSDType.get_enum(parent.extensions[0].name)
+            if xsd_type:
+                attr.types.append(AttrType(name=xsd_type.code))
         attr.name = cls.enumeration_name(attr.name)
         attr.default = cls.attribute_default(attr)
 
@@ -122,7 +119,7 @@ class PythonAbstractGenerator(AbstractGenerator, ABC):
         return cls.attribute_name(name).upper()
 
     @classmethod
-    def attribute_type(cls, attr: Attr, parents: List[str]) -> str:
+    def attribute_display_type(cls, attr: Attr, parents: List[str]) -> str:
         """
         Normalize attribute type.
 
@@ -135,20 +132,21 @@ class PythonAbstractGenerator(AbstractGenerator, ABC):
         """
 
         type_names: List[str] = []
-        for name in attr.types:
+        for attr_type in attr.types:
             type_name = (
-                cls.class_name(attr.type_aliases[name])
-                if name in attr.type_aliases
-                else cls.type_name(name)
+                cls.class_name(attr_type.alias)
+                if attr_type.alias
+                else cls.type_name(attr_type.name)
             )
+            if attr_type.forward_ref:
+                outer_str = ".".join(parents)
+                type_name = f'"{outer_str}.{type_name}"'
+
             if type_name not in type_names:
                 type_names.append(type_name)
 
         result = ", ".join(type_names)
-        if attr.forward_ref:
-            outer_str = ".".join(parents)
-            result = f'"{outer_str}.{result}"'
-        elif len(type_names) > 1:
+        if len(type_names) > 1:
             result = f"Union[{result}]"
 
         if attr.is_list:
@@ -164,12 +162,30 @@ class PythonAbstractGenerator(AbstractGenerator, ABC):
         if attr.is_list:
             return "list"
         elif isinstance(attr.default, str):
-            if attr.type == "bool":
-                return attr.default == "true"
-            if attr.type == "int":
-                return int(attr.default)
-            if attr.type == "float":
-                return float(attr.default)
+            local_types = set()
+            for attr_type in attr.types:
+                xsd_type = XSDType.get_enum(attr_type.name)
+                if xsd_type:
+                    local_types.add(xsd_type.local)
+
+            if bool in local_types:
+                if attr.default == "true":
+                    return True
+                if attr.default == "false" or len(local_types) == 1:
+                    return False
+
+            if int in local_types:
+                try:
+                    return int(attr.default)
+                except ValueError:
+                    pass
+
+            if float in local_types:
+                try:
+                    return float(attr.default)
+                except ValueError:
+                    pass
+
             return f'"{attr.default}"'
         else:
             return attr.default

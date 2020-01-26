@@ -1,21 +1,27 @@
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional, Type
+from typing import Any, List, Optional, Type
 
 from xsdata.models.elements import ComplexType, Element
 from xsdata.models.enums import TagType
 
 
 @dataclass
+class AttrType:
+    name: str
+    alias: Optional[str] = field(default=None)
+    forward_ref: bool = field(default=False)
+
+
+@dataclass
 class Attr:
     name: str
     local_name: str = field(init=False)
-    type: str
     local_type: str
     index: int
-    type_aliases: Dict = field(default_factory=dict)
+
+    types: List[AttrType] = field(default_factory=list)
     namespace: Optional[str] = field(default=None)
     help: Optional[str] = field(default=None)
-    forward_ref: bool = field(default=False)
     default: Optional[Any] = field(default=None)
 
     # Restrictions
@@ -58,10 +64,6 @@ class Attr:
             "nillable": self.nillable,
         }
         return {k: v for k, v in result.items() if v is not None}
-
-    @property
-    def types(self):
-        return filter(None, self.type.split(" "))
 
     @property
     def is_list(self):

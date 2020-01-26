@@ -3,6 +3,7 @@ from unittest.mock import PropertyMock, call, patch
 
 from tests.factories import (
     AttrFactory,
+    AttrTypeFactory,
     ClassFactory,
     ExtensionFactory,
     FactoryTestCase,
@@ -155,7 +156,7 @@ class ClassBuilderTests(FactoryTestCase):
             index=0,
             name="value",
             default=None,
-            type=XSDType.STRING.code,
+            types=AttrTypeFactory.list(1, name=XSDType.STRING.code),
             local_type=TagType.EXTENSION.cname,
         )
         self.assertEqual(1, len(item.attrs))
@@ -246,65 +247,163 @@ class ClassBuilderTests(FactoryTestCase):
 
         self.assertEqual(expected, list(children))
 
+    @patch.object(ClassBuilder, "build_class_attribute_types")
     @patch.object(ClassBuilder, "element_namespace")
-    @patch.object(ClassBuilder, "has_anonymous_class")
     @patch.object(Attribute, "get_restrictions")
     @patch.object(Attribute, "prefix", new_callable=PropertyMock)
     @patch.object(Attribute, "display_help", new_callable=PropertyMock)
-    @patch.object(Attribute, "real_type", new_callable=PropertyMock)
     @patch.object(Attribute, "real_name", new_callable=PropertyMock)
     def test_build_class_attribute(
         self,
         mock_real_name,
-        mock_real_type,
         mock_display_help,
         mock_prefix_property,
         mock_get_restrictions,
-        mock_has_anonymous_class,
         mock_element_namespace,
+        mock_build_class_attribute_types,
     ):
         item = ClassFactory.create()
 
+        mock_build_class_attribute_types.return_value = AttrTypeFactory.list(
+            1, name="xs:int"
+        )
         mock_real_name.return_value = item.name
-        mock_real_type.return_value = "xs:int"
         mock_display_help.return_value = "sos"
         mock_prefix_property.return_value = "com"
         mock_element_namespace.return_value = "http://something/common"
         mock_get_restrictions.return_value = {"required": True}
-        mock_has_anonymous_class.return_value = False
 
         attribute = Attribute.create(default="false", index=66)
 
         self.builder.build_class_attribute(item, attribute)
         expected = AttrFactory.create(
             name=mock_real_name.return_value,
-            type=mock_real_type.return_value,
+            types=mock_build_class_attribute_types.return_value,
             local_type=Attribute.__name__,
             namespace=mock_element_namespace.return_value,
             help=mock_display_help.return_value,
-            forward_ref=False,
             default="false",
             index=66,
             **mock_get_restrictions.return_value,
         )
         self.assertEqual(expected, item.attrs[0])
-        mock_has_anonymous_class.assert_called_once_with(attribute)
+        mock_build_class_attribute_types.assert_called_once_with(
+            item, attribute
+        )
         mock_element_namespace.assert_called_once_with(attribute)
 
-    @patch.object(ClassBuilder, "build_inner_class")
-    @patch.object(ClassBuilder, "has_anonymous_class")
-    def test_build_class_attribute_with_anonymous_class(
-        self, mock_has_inner_type, mock_build_inner_class,
+    @patch.object(ClassBuilder, "build_class_attribute_types")
+    @patch.object(Attribute, "real_name", new_callable=PropertyMock)
+    def test_build_class_attribute_raises_exception_when_empty_types(
+        self, mock_real_name, mock_build_class_attribute_types
     ):
-        mock_has_inner_type.return_value = True
+        item = ClassFactory.create()
+
+        mock_build_class_attribute_types.return_value = []
+        mock_real_name.return_value = "quantity"
+
+        attribute = Attribute.create(default="false", index=66)
+
+        with self.assertRaises(ValueError) as cm:
+            self.builder.build_class_attribute(item, attribute)
+
+        msg = f"Failed to detect type for attribute: class_B.quantity"
+        self.assertEqual(msg, str(cm.exception))
+
+    @patch.object(Attribute, "real_type", new_callable=PropertyMock)
+    @patch.object(ClassBuilder, "build_inner_class")
+    def test_build_class_attribute_types(
+        self, mock_build_inner_class, mock_real_type
+    ):
+        mock_real_type.return_value = " xs:int  xs:str "
+        mock_build_inner_class.return_value = None
 
         item = ClassFactory.create()
-        attribute = Attribute.create(ref="foo")
-        self.builder.build_class_attribute(item, attribute)
+        attribute = Attribute.create(default="false", index=66)
+        expected = self.builder.build_class_attribute_types(item, attribute)
 
-        self.assertEqual(True, item.attrs[0].forward_ref)
-        mock_has_inner_type.assert_called_once_with(attribute)
-        mock_build_inner_class.assert_called_once_with(item, attribute)
+        actual = [
+            AttrTypeFactory.create(name="xs:int"),
+            AttrTypeFactory.create(name="xs:str"),
+        ]
+
+        self.assertEqual(actual, expected)
+
+    @patch.object(Attribute, "real_type", new_callable=PropertyMock)
+    @patch.object(ClassBuilder, "build_inner_class")
+    def test_build_class_attribute_types_when_obj_has_inner_class(
+        self, mock_build_inner_class, mock_real_type
+    ):
+        inner_class = ClassFactory.create(name="foo")
+        mock_real_type.return_value = " xs:int  xs:str "
+        mock_build_inner_class.return_value = inner_class
+
+        item = ClassFactory.create()
+        attribute = Attribute.create(default="false", index=66)
+        expected = self.builder.build_class_attribute_types(item, attribute)
+
+        actual = [
+            AttrTypeFactory.create(name="xs:int"),
+            AttrTypeFactory.create(name="xs:str"),
+            AttrTypeFactory.create(name="foo", forward_ref=True),
+        ]
+
+        self.assertEqual(actual, expected)
+        self.assertEqual([inner_class], item.inner)
+
+    @patch.object(Attribute, "real_type", new_callable=PropertyMock)
+    @patch.object(ClassBuilder, "build_inner_class")
+    def test_build_class_attribute_types_when_obj_has_no_types(
+        self, mock_build_inner_class, mock_real_type
+    ):
+        mock_real_type.return_value = None
+        mock_build_inner_class.return_value = None
+
+        item = ClassFactory.create()
+        attribute = Attribute.create(default="false", index=66)
+        expected = self.builder.build_class_attribute_types(item, attribute)
+
+        self.assertEqual([], expected)
+
+    @patch.object(ClassBuilder, "build_class")
+    @patch.object(ClassBuilder, "has_anonymous_class")
+    def test_build_inner_class_when_has_anonymous_class(
+        self, mock_has_anonymous_class, mock_build_class,
+    ):
+        inner_class = ClassFactory.create()
+        mock_build_class.return_value = inner_class
+        mock_has_anonymous_class.return_value = True
+
+        complex_type = ComplexType.create()
+        element = Element.create(name="foo", complex_type=complex_type)
+
+        self.assertEqual(inner_class, self.builder.build_inner_class(element))
+        self.assertIsNone(element.complex_type)
+        self.assertEqual("foo", complex_type.name)
+
+    @patch.object(ClassBuilder, "build_class")
+    @patch.object(ClassBuilder, "has_anonymous_enumeration")
+    @patch.object(ClassBuilder, "has_anonymous_class")
+    def test_build_inner_class_when_has_anonymous_enumeration(
+        self,
+        mock_has_anonymous_class,
+        mock_has_anonymous_enumeration,
+        mock_build_class,
+    ):
+        inner_class = ClassFactory.create()
+        mock_build_class.return_value = inner_class
+        mock_has_anonymous_class.return_value = False
+        mock_has_anonymous_enumeration.return_value = True
+
+        simple_type = SimpleType.create()
+        element = Element.create(
+            name="foo", simple_type=simple_type, type="xs:int"
+        )
+
+        self.assertEqual(inner_class, self.builder.build_inner_class(element))
+        self.assertIsNone(element.simple_type)
+        self.assertIsNone(element.type)
+        self.assertEqual("foo", simple_type.name)
 
     def test_has_anonymous_class(self):
         obj = Element.create()
@@ -337,34 +436,6 @@ class ClassBuilderTests(FactoryTestCase):
 
             obj.type = "foo"
             self.assertFalse(self.builder.has_anonymous_enumeration(obj))
-
-    @patch.object(ClassBuilder, "build_class")
-    def test_build_inner_class(self, mock_build_class):
-
-        mock_build_class.return_value = ClassFactory.create()
-        element = Element.create(name="foo", complex_type=ComplexType.create())
-        parent = ClassFactory.create()
-
-        self.builder.build_inner_class(parent, element)
-        self.assertEqual(mock_build_class.return_value, parent.inner[0])
-
-    @patch.object(ClassBuilder, "build_class")
-    def test_build_inner_enumeration(self, mock_build_class):
-
-        mock_build_class.return_value = ClassFactory.create()
-        simple_type = SimpleType.create(
-            restriction=Restriction.create(
-                enumerations=[Enumeration.create(name="a")]
-            )
-        )
-        element = Element.create(name="foo", simple_type=simple_type)
-        parent = ClassFactory.create()
-
-        self.builder.build_inner_enumeration(parent, element)
-        self.assertEqual(mock_build_class.return_value, parent.inner[0])
-        self.assertIsNone(element.simple_type)
-        self.assertEqual("foo", element.type)
-        self.assertEqual("foo", simple_type.name)
 
     @patch("xsdata.builder.logger.warning")
     def test_default_value_type(self, mock_logger_warning):

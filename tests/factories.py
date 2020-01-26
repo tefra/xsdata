@@ -2,7 +2,7 @@ import random
 import unittest
 from abc import ABC, abstractmethod
 
-from xsdata.models.codegen import Attr, Class, Extension, Package
+from xsdata.models.codegen import Attr, AttrType, Class, Extension, Package
 from xsdata.models.elements import (
     Attribute,
     ComplexType,
@@ -73,6 +73,20 @@ class ClassFactory(Factory):
         )
 
 
+class AttrTypeFactory(Factory):
+    model = AttrType
+    counter = 65
+
+    @classmethod
+    def create(cls, name=None, alias=None, forward_ref=False):
+
+        return cls.model(
+            name=name or f"attr_{cls.next()}",
+            alias=alias,
+            forward_ref=forward_ref,
+        )
+
+
 class AttrFactory(Factory):
     model = Attr
     types = [Attribute, Element, Restriction]
@@ -83,12 +97,10 @@ class AttrFactory(Factory):
         cls,
         name=None,
         index=None,
-        type=None,
+        types=None,
         local_type=None,
-        type_aliases=None,
         namespace=None,
         help=None,
-        forward_ref=False,
         default=None,
         **kwargs,
     ):
@@ -96,12 +108,10 @@ class AttrFactory(Factory):
         return cls.model(
             name=name or f"attr_{cls.next()}",
             index=cls.counter if index is None else index,
-            type=type or XSDType.STRING.code,
+            types=types or AttrTypeFactory.list(1, name=XSDType.STRING.code),
             local_type=local_type or random.choice(cls.types).__name__,
-            type_aliases=type_aliases or {},
             namespace=namespace or None,
             help=help or None,
-            forward_ref=forward_ref,
             default=default or None,
             **kwargs,
         )

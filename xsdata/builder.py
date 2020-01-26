@@ -2,7 +2,7 @@ from dataclasses import dataclass, field
 from typing import Iterator, List, Optional, Union
 
 from xsdata.logger import logger
-from xsdata.models.codegen import Attr, Class, Extension
+from xsdata.models.codegen import Attr, AttrType, Class, Extension
 from xsdata.models.elements import (
     Attribute,
     AttributeGroup,
@@ -56,6 +56,12 @@ class ClassBuilder:
         return item
 
     def build_class_attributes(self, obj: ElementBase, item: Class):
+        """
+        Build the target item class attributes from the given obj child
+        elements.
+
+        If exists append default value attribute.
+        """
         for child in self.element_children(obj):
             self.build_class_attribute(item, child)
 
@@ -65,7 +71,7 @@ class ClassBuilder:
                 index=0,
                 name="value",
                 default=None,
-                type=default_value_type,
+                types=[AttrType(name=default_value_type)],
                 local_type=TagType.EXTENSION.cname,
             )
             item.attrs.append(value_attr)
@@ -142,52 +148,62 @@ class ClassBuilder:
         """
         Generate and append an attribute instance to the parent class.
 
-        Skip if no real type could be detected because of an invalid
-        schema or missing implementation.
+        :raise ValueError:  if types list is empty
         """
-        forward_ref = False
-        if self.has_anonymous_class(obj):
-            forward_ref = True
-            self.build_inner_class(parent, obj)
-        elif self.has_anonymous_enumeration(obj):
-            forward_ref = True
-            self.build_inner_enumeration(parent, obj)
-
-        if not obj.real_type:
-            raise ValueError(f"Failed to detect type for element: {obj}")
+        types = self.build_class_attribute_types(parent, obj)
+        if not types:
+            raise ValueError(
+                f"Failed to detect type for attribute: {parent.name}.{obj.real_name}"
+            )
 
         parent.attrs.append(
             Attr(
                 index=obj.index,
                 name=obj.real_name,
                 default=getattr(obj, "default", None),
-                type=obj.real_type,
+                types=types,
                 local_type=type(obj).__name__,
                 help=obj.display_help,
-                forward_ref=forward_ref,
                 namespace=self.element_namespace(obj),
                 **obj.get_restrictions(),
             )
         )
 
-    def build_inner_class(self, parent: Class, obj: AttributeElement):
-        """Build a class from an anonymous complex type inside an element."""
-        if isinstance(obj, Element) and obj.complex_type:
-            obj.complex_type.name = obj.type = obj.name
-            parent.inner.append(self.build_class(obj.complex_type))
+    def build_class_attribute_types(
+        self, parent: Class, obj: AttributeElement
+    ) -> List[AttrType]:
+        """Convert real type and anonymous inner elements to an attribute type
+        list."""
+        inner_class = self.build_inner_class(obj)
+        types = [
+            AttrType(name=name)
+            for name in (obj.real_type or "").split(" ")
+            if name
+        ]
 
-    def build_inner_enumeration(self, parent: Class, obj: AttributeElement):
-        """Build an enumeration class from an anonymous restriction with
-        enumeration facet."""
-        if (
-            isinstance(obj, (Element, Attribute, ListElement))
-            and obj.simple_type
-        ):
-            obj.simple_type.name = obj.real_name
-            parent.inner.append(self.build_class(obj.simple_type))
+        if inner_class:
+            parent.inner.append(inner_class)
+            types.append(AttrType(name=inner_class.name, forward_ref=True))
+        return types
 
-            obj.type = obj.simple_type.name
-            obj.simple_type = None
+    def build_inner_class(self, obj: AttributeElement) -> Optional[Class]:
+        """Convert anonymous type to class to be appended in the parent inner
+        class list."""
+        if self.has_anonymous_class(obj):
+            complex_type = obj.complex_type  # type: ignore
+            complex_type.name = obj.name  # type: ignore
+            obj.complex_type = None  # type: ignore
+            return self.build_class(complex_type)  # type: ignore
+
+        if self.has_anonymous_enumeration(obj):
+            simple_type = obj.simple_type  # type: ignore
+            simple_type.name = obj.real_name  # type: ignore
+            obj.type = None  # type: ignore
+            obj.simple_type = None  # type: ignore
+
+            return self.build_class(simple_type)  # type: ignore
+
+        return None
 
     @staticmethod
     def has_anonymous_class(obj: AttributeElement) -> bool:

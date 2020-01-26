@@ -1,3 +1,16 @@
+20.1.3 (2020-01-26)
+-------------------
+- Fixed elements min|man occurs inheritance from their container.
+- Fixed global elements and attributes are now always qualified.
+- Fixed including no namespace schemas.
+- Fixed list elements attribute handling.
+- Added support for unqualified elements.
+- Added support for qualified attributes.
+- Added support for nillable elements.
+- Added support for unions of member and simple types.
+- Added binding test suite
+
+
 20.1.2 (2020-01-13)
 -------------------
 - Generate anonymous Enumerations

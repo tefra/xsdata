@@ -5,7 +5,7 @@ from typing import Callable, Dict, List, Optional
 from lxml import etree
 
 from xsdata.logger import logger
-from xsdata.models.codegen import Attr, Class, Extension
+from xsdata.models.codegen import Attr, AttrType, Class, Extension
 from xsdata.models.elements import Schema
 from xsdata.models.enums import XSDType
 from xsdata.utils.text import split
@@ -115,8 +115,10 @@ class ClassReducer:
             0,
         )
         for attr in new_attrs:
-            if prefix and attr.type.find(":") == -1:
-                attr.type = f"{prefix}:{attr.type}"
+            if prefix:
+                for attr_type in attr.types:
+                    if attr_type.name.find(":") == -1:
+                        attr_type.name = f"{prefix}:{attr_type.name}"
 
             target.attrs.insert(position, attr)
             position += 1
@@ -130,16 +132,17 @@ class ClassReducer:
         the default xsd type xs:string
         """
         types = []
-        for type_name in attr.types:
-            common = self.find_common_type(type_name, schema)
+        for attr_type in attr.types:
+            common = self.find_common_type(attr_type.name, schema)
             restrictions = {}
             if common is None or common.is_enumeration:
-                types.append(type_name)
+                types.append(attr_type)
             elif len(common.attrs) == 1:
-                types.append(common.attrs[0].type)
-                restrictions = common.attrs[0].restrictions
+                common_attr = common.attrs[0]
+                types.extend(copy.deepcopy(common_attr.types))
+                restrictions = common_attr.restrictions
             else:
-                types.append(XSDType.STRING.code)
+                types.append(AttrType(name=XSDType.STRING.code))
                 logger.warning(
                     "Missing type implementation: %s", common.type.__name__
                 )
@@ -148,7 +151,7 @@ class ClassReducer:
                 if getattr(attr, key) is None:
                     setattr(attr, key, value)
 
-        attr.type = " ".join(types)
+        attr.types = types
 
     def separate_common_types(self, classes: List[Class]):
         def condition(x: Class):

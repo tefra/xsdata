@@ -1,3 +1,4 @@
+from enum import Enum
 from dataclasses import dataclass, field
 from typing import List, Union
 
@@ -7,7 +8,7 @@ class AvailableSizesType:
     """
     :ivar value:
     """
-    value: List[Union[int, str]] = field(
+    value: List[Union[int, "AvailableSizesType.Value"]] = field(
         default_factory=list,
         metadata=dict(
             name="value",
@@ -18,3 +19,9 @@ class AvailableSizesType:
             max_inclusive=18.0
         )
     )
+
+    class Value(Enum):
+        """
+        :cvar EMPTY:
+        """
+        EMPTY = ""

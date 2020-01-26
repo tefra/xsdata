@@ -16,6 +16,21 @@ class SmlxsizeType(Enum):
     EXTRA_LARGE = "extra large"
 
 
+class XsmlxsizeType(Enum):
+    """
+    :cvar SMALL:
+    :cvar MEDIUM:
+    :cvar LARGE:
+    :cvar EXTRA_LARGE:
+    :cvar EXTRA_SMALL:
+    """
+    SMALL = "small"
+    MEDIUM = "medium"
+    LARGE = "large"
+    EXTRA_LARGE = "extra large"
+    EXTRA_SMALL = "extra small"
+
+
 @dataclass
 class SizesType:
     """
@@ -74,7 +89,7 @@ class SizesType:
             max_occurs=9223372036854775807
         )
     )
-    xsmlx_size: List[str] = field(
+    xsmlx_size: List[XsmlxsizeType] = field(
         default_factory=list,
         metadata=dict(
             name="xsmlxSize",

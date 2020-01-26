@@ -1,20 +1,12 @@
-from dataclasses import dataclass, field
-from typing import Optional
-from tests.fixtures.defxmlschema.chapter08.example0810 import (
-    SmlsizeType,
-)
+from enum import Enum
 
 
-@dataclass
-class AvailableSizesType:
+class AvailableSizesType(Enum):
     """
-    :ivar value:
+    :cvar SMALL:
+    :cvar MEDIUM:
+    :cvar LARGE:
     """
-    value: Optional[SmlsizeType] = field(
-        default=None,
-        metadata=dict(
-            name="value",
-            type="Restriction",
-            max_length=3.0
-        )
-    )
+    SMALL = "small"
+    MEDIUM = "medium"
+    LARGE = "large"

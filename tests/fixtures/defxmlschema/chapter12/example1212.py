@@ -1,3 +1,4 @@
+from enum import Enum
 from dataclasses import dataclass, field
 from typing import Optional, Union
 
@@ -61,7 +62,7 @@ class Size:
     class Meta:
         name = "size"
 
-    value: Optional[Union[int, str]] = field(
+    value: Optional[Union[int, "Size.Value"]] = field(
         default=None,
         metadata=dict(
             name="value",
@@ -70,6 +71,16 @@ class Size:
             max_inclusive=18.0
         )
     )
+
+    class Value(Enum):
+        """
+        :cvar SMALL:
+        :cvar MEDIUM:
+        :cvar LARGE:
+        """
+        SMALL = "small"
+        MEDIUM = "medium"
+        LARGE = "large"
 
 
 @dataclass

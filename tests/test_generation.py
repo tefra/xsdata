@@ -29,9 +29,7 @@ class Documentation:
     target: str
 
 
-schemas = sorted(
-    [xsd for xsd in fixtures.glob("defxmlschema/*/example1013.xsd")]
-)
+schemas = sorted([xsd for xsd in fixtures.glob("defxmlschema/*/example*.xsd")])
 skipped: DefaultDict[str, int] = defaultdict(int)
 passed = 0
 

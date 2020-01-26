@@ -25,7 +25,7 @@ class ListTests(TestCase):
         self.assertIsNone(obj.real_type)
 
         obj.simple_type = SimpleType.create()
-        self.assertEqual("xs:string", obj.real_type)
+        self.assertIsNone(obj.real_type)
 
         obj.item_type = "foo"
         self.assertEqual("foo", obj.real_type)

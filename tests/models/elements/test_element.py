@@ -27,7 +27,7 @@ class ElementTests(TestCase):
 
     def test_property_real_type(self):
         obj = Element.create()
-        self.assertEqual("xs:string", obj.real_type)
+        self.assertIsNone(obj.real_type)
 
         # Inner classes depend on the this to be None
         obj.complex_type = ComplexType.create()

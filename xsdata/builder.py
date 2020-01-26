@@ -43,6 +43,10 @@ class ClassBuilder:
 
     def build_class(self, obj: BaseElement) -> Class:
         """Build and return a class instance."""
+
+        if obj.real_name == "travelFlightInfo":
+            pass
+
         item = Class(
             name=obj.real_name,
             is_abstract=obj.is_abstract,
@@ -151,11 +155,6 @@ class ClassBuilder:
         :raise ValueError:  if types list is empty
         """
         types = self.build_class_attribute_types(parent, obj)
-        if not types:
-            raise ValueError(
-                f"Failed to detect type for attribute: {parent.name}.{obj.real_name}"
-            )
-
         parent.attrs.append(
             Attr(
                 index=obj.index,
@@ -184,6 +183,15 @@ class ClassBuilder:
         if inner_class:
             parent.inner.append(inner_class)
             types.append(AttrType(name=inner_class.name, forward_ref=True))
+
+        if len(types) == 0:
+            types.append(AttrType(name=XSDType.STRING.code))
+            logger.warning(
+                "Default type string for attribute %s.%s",
+                parent.name,
+                obj.real_name,
+            )
+
         return types
 
     def build_inner_class(self, obj: AttributeElement) -> Optional[Class]:

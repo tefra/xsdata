@@ -176,7 +176,16 @@ class XmlParser(AbstractParser, ModelInspect):
                 res[qname.text] = field
         return res
 
-    @staticmethod
-    def parse_value(tp: Type, value: Any) -> Any:
+    @classmethod
+    def parse_value(cls, tp: Type, value: Any) -> Any:
         """Convert xml string values to python primite types."""
+
+        if hasattr(tp, "__origin__"):
+            for tp_arg in tp.__args__:
+                try:
+                    return cls.parse_value(tp_arg, value)
+                except ValueError:
+                    pass
+            return value
+
         return value == "true" if tp is bool else tp(value)

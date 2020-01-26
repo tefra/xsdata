@@ -1,5 +1,4 @@
 import re
-import sys
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any as Anything
@@ -123,16 +122,6 @@ class List(AnnotationBase, RestrictedField, NamedField):
     simple_type: SimpleType
 
     @property
-    def type(self):
-        """Property alias for item type."""
-        return self.item_type
-
-    @type.setter
-    def type(self, value):
-        """Property setter alias for item type."""
-        self.item_type = value
-
-    @property
     def is_attribute(self) -> bool:
         return True
 
@@ -142,18 +131,10 @@ class List(AnnotationBase, RestrictedField, NamedField):
 
     @property
     def real_type(self) -> Optional[str]:
-        if self.item_type:
-            return self.item_type
-        if self.simple_type:
-            return self.simple_type.real_type
-
-        return None
+        return XSDType.STRING.code
 
     def get_restrictions(self) -> Dict[str, Anything]:
-        restrictions = dict(min_occurs=0, max_occurs=sys.maxsize)
-        if self.simple_type:
-            restrictions.update(self.simple_type.get_restrictions())
-        return restrictions
+        return dict()
 
 
 @dataclass

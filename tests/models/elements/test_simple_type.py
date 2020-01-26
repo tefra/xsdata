@@ -1,7 +1,7 @@
-import sys
 from unittest import TestCase
 
 from xsdata.models.elements import Length, List, Restriction, SimpleType, Union
+from xsdata.models.enums import XSDType
 
 
 class SimpleTypeTests(TestCase):
@@ -26,7 +26,7 @@ class SimpleTypeTests(TestCase):
         self.assertEqual("thug", obj.real_type)
 
         obj.list = List.create(item_type="foo")
-        self.assertEqual("foo", obj.real_type)
+        self.assertEqual(XSDType.STRING.code, obj.real_type)
 
         obj.restriction = Restriction.create(base="bar")
         self.assertEqual("bar", obj.real_type)
@@ -34,10 +34,6 @@ class SimpleTypeTests(TestCase):
     def test_get_restrictions(self):
         obj = SimpleType.create()
         self.assertEqual({}, obj.get_restrictions())
-
-        expected = dict(min_occurs=0, max_occurs=sys.maxsize)
-        obj.list = List.create()
-        self.assertEqual(expected, obj.get_restrictions())
 
         expected = dict(length=2)
         obj.restriction = Restriction.create(length=Length.create(value=2))

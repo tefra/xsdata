@@ -2,10 +2,12 @@ from unittest import mock
 
 from tests.factories import (
     AttrFactory,
+    AttrTypeFactory,
     ClassFactory,
     ExtensionFactory,
     FactoryTestCase,
 )
+from xsdata.models.codegen import AttrType
 from xsdata.models.elements import (
     ComplexType,
     Element,
@@ -184,14 +186,22 @@ class ClassReducerTests(FactoryTestCase):
     def test_copy_attributes(self):
         common_b = ClassFactory.create(
             attrs=[
-                AttrFactory.create(name="i", type="i"),
-                AttrFactory.create(name="j", type="other:j"),
+                AttrFactory.create(
+                    name="i", types=AttrTypeFactory.list(1, name="i")
+                ),
+                AttrFactory.create(
+                    name="j", types=AttrTypeFactory.list(1, name="other:j")
+                ),
             ],
         )
         common_c = ClassFactory.create(
             attrs=[
-                AttrFactory.create(name="x", type="x"),
-                AttrFactory.create(name="y", type="other:y"),
+                AttrFactory.create(
+                    name="x", types=AttrTypeFactory.list(1, name="x")
+                ),
+                AttrFactory.create(
+                    name="y", types=AttrTypeFactory.list(1, name="other:y")
+                ),
             ],
         )
         ext_b = ExtensionFactory.create(name="b", index=2)
@@ -215,7 +225,16 @@ class ClassReducerTests(FactoryTestCase):
             ("a", "xs:string"),
             ("b", "xs:string"),
         ]
-        self.assertEqual(attrs, [(attr.name, attr.type) for attr in obj.attrs])
+        self.assertEqual(
+            attrs,
+            [
+                (
+                    attr.name,
+                    " ".join([attr_type.name for attr_type in attr.types]),
+                )
+                for attr in obj.attrs
+            ],
+        )
 
     @mock.patch.object(ClassReducer, "find_common_type")
     def test_flatten_attribute_with_no_common_type(
@@ -223,11 +242,12 @@ class ClassReducerTests(FactoryTestCase):
     ):
         mock_find_common_type.return_value = None
 
-        obj = AttrFactory.create(name="a", type="a", min_occurs=1)
+        type_a = AttrTypeFactory.create(name="a")
+        obj = AttrFactory.create(name="a", types=[type_a], min_occurs=1)
         reducer = ClassReducer()
         reducer.flatten_attribute(obj, self.nsmap)
 
-        self.assertEqual("a", obj.type)
+        self.assertEqual([type_a], obj.types)
         mock_find_common_type.assert_called_once_with("a", self.nsmap)
 
     @mock.patch.object(ClassReducer, "find_common_type")
@@ -238,45 +258,51 @@ class ClassReducerTests(FactoryTestCase):
             attrs=AttrFactory.list(1, local_type=TagType.ENUMERATION.cname)
         )
 
-        obj = AttrFactory.create(name="a", type="a", min_occurs=1)
+        type_a = AttrTypeFactory.create(name="a")
+        obj = AttrFactory.create(name="a", types=[type_a], min_occurs=1)
         reducer = ClassReducer()
         reducer.flatten_attribute(obj, self.nsmap)
 
-        self.assertEqual("a", obj.type)
+        self.assertEqual([type_a], obj.types)
         mock_find_common_type.assert_called_once_with("a", self.nsmap)
 
     @mock.patch.object(ClassReducer, "find_common_type")
     def test_flatten_attribute(self, mock_find_common_type):
+        type_a = AttrTypeFactory.create(name="a")
+        type_b = AttrTypeFactory.create(name="b")
+
         mock_find_common_type.return_value = ClassFactory.create(
             name="bar",
             attrs=AttrFactory.list(
-                1, name="b", type="b", required=True, min_occurs=2
+                1, name="b", types=[type_b], required=True, min_occurs=2
             ),
         )
 
-        obj = AttrFactory.create(name="a", type="a", min_occurs=1)
+        obj = AttrFactory.create(name="a", types=[type_a], min_occurs=1)
 
         reducer = ClassReducer()
         reducer.flatten_attribute(obj, self.nsmap)
 
-        self.assertEqual("b", obj.type)
+        self.assertEqual([type_b], obj.types)
         self.assertEqual({"required": True, "min_occurs": 1}, obj.restrictions)
-        mock_find_common_type.assert_called_once_with("a", self.nsmap)
+        mock_find_common_type.assert_called_once_with(type_a.name, self.nsmap)
 
     @mock.patch("xsdata.reducer.logger.warning")
     @mock.patch.object(ClassReducer, "find_common_type")
     def test_flatten_attribute_with_common_multiple_attributes(
         self, mock_find_common_type, mock_logger_debug
     ):
+        type_a = AttrTypeFactory.create(name="a")
+        type_str = AttrType(name=XSDType.STRING.code)
         common = ClassFactory.create(name="bar", attrs=AttrFactory.list(2))
         mock_find_common_type.return_value = common
 
-        obj = AttrFactory.create(name="a", type="a")
+        obj = AttrFactory.create(name="a", types=[type_a])
 
         reducer = ClassReducer()
         reducer.flatten_attribute(obj, self.nsmap)
 
-        self.assertEqual(XSDType.STRING.code, obj.type)
+        self.assertEqual([type_str], obj.types)
         mock_logger_debug.assert_called_once_with(
             "Missing type implementation: %s", common.type.__name__
         )

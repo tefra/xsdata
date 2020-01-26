@@ -68,18 +68,46 @@ class ClassReducer:
         Flatten class traits from the common types registry.
 
         Steps:
+            * Enum unions
             * Parent classes
             * Attributes
             * Inner classes
         """
+
+        self.flatten_enumeration_unions(item, schema)
+
         for extension in list(item.extensions):
             self.flatten_extension(item, extension, schema)
 
         for attr in item.attrs:
-            self.flatten_attribute(attr, schema)
+            self.flatten_attribute(item, attr, schema)
 
         for inner in item.inner:
             self.flatten_class(inner, schema)
+
+    def flatten_enumeration_unions(self, item: Class, schema: Schema):
+
+        if len(item.attrs) == 1 and item.attrs[0].name == "value":
+            all_enums = True
+            attrs = []
+            for attr_type in item.attrs[0].types:
+                is_enumeration = False
+                if attr_type.forward_ref and len(item.inner) == 1:
+                    if item.inner[0].is_enumeration:
+                        is_enumeration = True
+                        attrs.extend(copy.deepcopy(item.inner[0].attrs))
+
+                elif not attr_type.forward_ref:
+                    common = self.find_common_type(attr_type.name, schema)
+                    if common is not None and common.is_enumeration:
+                        is_enumeration = True
+                        attrs.extend(copy.deepcopy(common.attrs))
+
+                if not is_enumeration:
+                    all_enums = False
+
+            if all_enums:
+                item.attrs = attrs
 
     def flatten_extension(
         self, item: Class, extension: Extension, schema: Schema
@@ -101,29 +129,7 @@ class ClassReducer:
 
         item.extensions.remove(extension)
 
-    @staticmethod
-    def copy_attributes(source: Class, target: Class, extension: Extension):
-        prefix, ext = split(extension.name)
-        target.inner.extend(copy.deepcopy(source.inner))
-        new_attrs = copy.deepcopy(source.attrs)
-        position = next(
-            (
-                index
-                for index, attr in enumerate(target.attrs)
-                if attr.index > extension.index
-            ),
-            0,
-        )
-        for attr in new_attrs:
-            if prefix:
-                for attr_type in attr.types:
-                    if attr_type.name.find(":") == -1:
-                        attr_type.name = f"{prefix}:{attr_type.name}"
-
-            target.attrs.insert(position, attr)
-            position += 1
-
-    def flatten_attribute(self, attr: Attr, schema: Schema):
+    def flatten_attribute(self, item: Class, attr: Attr, schema: Schema):
         """
         If the attribute type is found in the registry overwrite the given
         attribute type and merge the restrictions.
@@ -141,6 +147,7 @@ class ClassReducer:
                 common_attr = common.attrs[0]
                 types.extend(copy.deepcopy(common_attr.types))
                 restrictions = common_attr.restrictions
+                self.copy_inner_classes(common, item)
             else:
                 types.append(AttrType(name=XSDType.STRING.code))
                 logger.warning(
@@ -170,6 +177,38 @@ class ClassReducer:
                 matches.append(classes.pop(i))
 
         return list(reversed(matches))
+
+    @staticmethod
+    def copy_attributes(source: Class, target: Class, extension: Extension):
+        prefix, ext = split(extension.name)
+        target.inner.extend(copy.deepcopy(source.inner))
+        new_attrs = copy.deepcopy(source.attrs)
+        position = next(
+            (
+                index
+                for index, attr in enumerate(target.attrs)
+                if attr.index > extension.index
+            ),
+            0,
+        )
+        for attr in new_attrs:
+            if prefix:
+                for attr_type in attr.types:
+                    if attr_type.name.find(":") == -1:
+                        attr_type.name = f"{prefix}:{attr_type.name}"
+
+            target.attrs.insert(position, attr)
+            position += 1
+
+    @staticmethod
+    def copy_inner_classes(source: Class, target: Class):
+        for inner in source.inner:
+            exists = next(
+                (found for found in target.inner if found.name == inner.name),
+                None,
+            )
+            if not exists:
+                target.inner.append(copy.deepcopy(inner))
 
 
 reducer = ClassReducer()

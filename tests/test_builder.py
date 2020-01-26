@@ -24,6 +24,7 @@ from xsdata.models.elements import (
     Sequence,
     SimpleContent,
     SimpleType,
+    Union,
 )
 from xsdata.models.enums import FormType, TagType, XSDType
 
@@ -393,6 +394,37 @@ class ClassBuilderTests(FactoryTestCase):
         self.assertIsNone(element.simple_type)
         self.assertIsNone(element.type)
         self.assertEqual("foo", simple_type.name)
+
+    @patch.object(ClassBuilder, "build_class")
+    @patch.object(ClassBuilder, "has_anonymous_enumeration")
+    @patch.object(ClassBuilder, "has_anonymous_class")
+    def test_build_inner_class_when_union_has_anonymous_enumeration(
+        self,
+        mock_has_anonymous_class,
+        mock_has_anonymous_enumeration,
+        mock_build_class,
+    ):
+        inner_class = ClassFactory.create()
+        mock_build_class.return_value = inner_class
+        mock_has_anonymous_class.return_value = False
+        mock_has_anonymous_enumeration.return_value = False
+
+        union = Union.create(name="foo", type="xs:int")
+        simple_type_a = SimpleType.create(
+            restriction=Restriction.create(
+                enumerations=[Enumeration.create(value="a")]
+            )
+        )
+        simple_type_b = SimpleType.create(
+            restriction=Restriction.create(
+                enumerations=[Enumeration.create(value="b")]
+            )
+        )
+        union.simple_types = [simple_type_a, simple_type_b]
+
+        self.assertEqual(inner_class, self.builder.build_inner_class(union))
+        self.assertEqual([simple_type_a], union.simple_types)
+        mock_build_class.assert_called_once_with(simple_type_b)
 
     def test_has_anonymous_class(self):
         obj = Element.create()

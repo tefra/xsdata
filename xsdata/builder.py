@@ -43,10 +43,6 @@ class ClassBuilder:
 
     def build_class(self, obj: BaseElement) -> Class:
         """Build and return a class instance."""
-
-        if obj.real_name == "travelFlightInfo":
-            pass
-
         item = Class(
             name=obj.real_name,
             is_abstract=obj.is_abstract,
@@ -208,8 +204,20 @@ class ClassBuilder:
             simple_type.name = obj.real_name  # type: ignore
             obj.type = None  # type: ignore
             obj.simple_type = None  # type: ignore
-
             return self.build_class(simple_type)  # type: ignore
+
+        if isinstance(obj, UnionElement) and obj.simple_types:
+            """
+            Only the first occurrence from the bottom will be converted.
+
+            It doesn't make any sense to have a union with two anonymous
+            enumerations.
+            """
+            for i in range(len(obj.simple_types) - 1, -1, -1):
+                if obj.simple_types[i].is_enumeration:
+                    simple_type = obj.simple_types.pop(i)
+                    simple_type.name = obj.real_name
+                    return self.build_class(simple_type)
 
         return None
 
@@ -230,8 +238,7 @@ class ClassBuilder:
             isinstance(obj, (Attribute, Element, ListElement))
             and obj.type is None
             and obj.simple_type is not None
-            and obj.simple_type.restriction is not None
-            and len(obj.simple_type.restriction.enumerations) > 0
+            and obj.simple_type.is_enumeration
         )
 
     @staticmethod

@@ -70,7 +70,7 @@ class Attr:
         return self.max_occurs and self.max_occurs > 1
 
     @property
-    def is_enumeration(self):
+    def is_enumeration(self) -> bool:
         return self.local_type == TagType.ENUMERATION.cname
 
 
@@ -101,8 +101,8 @@ class Class:
         self.local_name = self.name
 
     @property
-    def is_enumeration(self):
-        return self.attrs and self.attrs[0].is_enumeration
+    def is_enumeration(self) -> bool:
+        return len(self.attrs) > 0 and self.attrs[0].is_enumeration
 
     @property
     def is_common(self):

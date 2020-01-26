@@ -88,6 +88,10 @@ class SimpleType(AnnotationBase, NamedField, RestrictedField):
     union: Optional["Union"]
 
     @property
+    def is_enumeration(self):
+        return self.restriction and len(self.restriction.enumerations) > 0
+
+    @property
     def real_type(self) -> Optional[str]:
         if self.restriction:
             return self.restriction.real_type
@@ -176,14 +180,21 @@ class Union(AnnotationBase, NamedField, RestrictedField):
 
     @property
     def real_type(self) -> Optional[str]:
+        types = []
         if self.simple_types:
-            return " ".join(
-                filter(None, [x.real_type for x in self.simple_types])
+            types.extend(
+                [
+                    simple_type.real_type
+                    for simple_type in self.simple_types
+                    if simple_type.real_type
+                ]
             )
         if self.member_types:
-            return self.member_types
+            types.extend(
+                [member for member in self.member_types.split(" ") if member]
+            )
 
-        return None
+        return " ".join(types) if types else None
 
     @property
     def real_name(self) -> str:

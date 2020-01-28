@@ -50,7 +50,7 @@ Example 15-13 Illegal duplication of attributes
 
 .. warning::
 
-    Unsupported feature!
+    Duplicated attributes
 
 
 Example 15-14 Attribute group referencing an attribute group

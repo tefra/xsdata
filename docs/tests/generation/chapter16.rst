@@ -20,7 +20,7 @@ Example 16-10 Using block to prevent substitution group use
 
 .. warning::
 
-    Unsupported feature!
+    substitution groups
 
 
 Example 16-11 An abstract element declaration
@@ -56,7 +56,7 @@ Example 16-4 Substitution group with simple types
 
 .. warning::
 
-    Unsupported feature!
+    substitution groups
 
 
 Example 16-5 A member of two substitution groups
@@ -100,7 +100,7 @@ Example 16-9 Using final to control substitution group declaration
 
 .. warning::
 
-    Unsupported feature!
+    substitution groups
 
 
 .. admonition:: Samples Source

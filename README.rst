@@ -16,8 +16,8 @@ Naive XML Bindings for python
 .. image:: https://img.shields.io/github/languages/top/tefra/xsdata.svg
     :target: https://xsdata.readthedocs.io/
 
-.. image:: https://api.codacy.com/project/badge/Grade/1248c5bc72684854899a043986d4fa06
-   :target: https://www.codacy.com/manual/tefra/xsdata?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=tefra/xsdata&amp;utm_campaign=Badge_Grade
+.. image:: https://api.codacy.com/project/badge/Grade/d2f2190a7d514562be35ab647ef4e101
+   :target: https://app.codacy.com/manual/tefra/xsdata?utm_source=github.com&utm_medium=referral&utm_content=tefra/xsdata&utm_campaign=Badge_Grade_Dashboard
 
 .. image:: https://img.shields.io/pypi/pyversions/xsdata.svg
     :target: https://pypi.org/pypi/xsdata/

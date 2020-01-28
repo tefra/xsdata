@@ -42,7 +42,7 @@ Example 12-14 Illegal duplication of element names
 
 .. warning::
 
-    Unsupported feature!
+    Duplicated attributes
 
 
 Example 12-15 A sequence group
@@ -318,10 +318,8 @@ Example 12-9 Complex type with mixed content
    :language: xml
    :lines: 3-
 
-.. warning::
-
-    Unsupported feature!
-
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1209.py
+   :language: python
 
 .. admonition:: Samples Source
     :class: hint

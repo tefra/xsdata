@@ -1,6 +1,6 @@
 <!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
 <!-- Example 15-13 Illegal duplication of attributes -->
-<!-- SKIPTEST -->
+<!-- SKIPTEST: Duplicated attributes -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
   <xs:attributeGroup name="IdentifierGroup">
     <xs:attribute name="id" type="xs:ID" use="required" />

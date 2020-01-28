@@ -1,6 +1,6 @@
 <!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
 <!-- Example 16-10 Using block to prevent substitution group use -->
-<!-- SKIPTEST -->
+<!-- SKIPTEST: substitution groups -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
   <xs:element name="product" type="ProductType" block="#all" />
   <xs:element name="hat" type="HatType" block="substitution" />

@@ -1,6 +1,6 @@
 <!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
 <!-- Example 16-9 Using final to control substitution group declaration -->
-<!-- SKIPTEST -->
+<!-- SKIPTEST: substitution groups -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
   <xs:element name="product" type="ProductType" final="#all" />
   <xs:element name="items" type="ItemsType" final="extension" />

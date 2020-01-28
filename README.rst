@@ -50,3 +50,8 @@ Features
 .. image:: https://github.com/tefra/xsdata/raw/master/docs/_static/demo.gif
 
 Check the documentation `test suites <https://xsdata.readthedocs.io/>`_ and the `samples repo <https://github.com/tefra/xsdata-samples>`_ for more ✨✨✨
+
+
+.. image:: https://api.codacy.com/project/badge/Grade/d2f2190a7d514562be35ab647ef4e101
+   :alt: Codacy Badge
+   :target: https://app.codacy.com/manual/tefra/xsdata?utm_source=github.com&utm_medium=referral&utm_content=tefra/xsdata&utm_campaign=Badge_Grade_Dashboard

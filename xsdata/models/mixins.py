@@ -1,4 +1,3 @@
-import re
 import sys
 from abc import ABC, abstractmethod
 from dataclasses import MISSING, Field, dataclass, fields
@@ -79,8 +78,6 @@ class BaseModel:
             if attr.init
         }
 
-        if "text" in data and el.text:
-            data["text"] = re.sub(r"\s+", " ", el.text).strip()
         data["index"] = index
 
         return cls(**data)
@@ -136,8 +133,8 @@ class BaseModel:
 
 @dataclass
 class ElementBase(BaseModel):
-    id: Optional[str]
     index: int
+    id: Optional[str]
 
     def children(self):
         for attribute in fields(self):

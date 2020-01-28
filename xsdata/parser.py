@@ -1,5 +1,6 @@
 import io
 import pathlib
+import re
 from dataclasses import dataclass, field
 from typing import List, Optional
 
@@ -15,7 +16,7 @@ from xsdata.models.elements import (
     Sequence,
 )
 from xsdata.models.enums import EventType, FormType, TagType, XSDType
-from xsdata.models.mixins import BaseModel
+from xsdata.models.mixins import BaseModel, ElementBase
 from xsdata.utils.text import snake_case
 
 
@@ -84,23 +85,29 @@ class SchemaParser:
 
         methods = TagType.qnames()
         index = 0
+        mixed = None
         for event, elem in self.context:
             tag = methods.get(elem.tag)
             if tag is None:
-                raise NotImplementedError(
-                    "Unsupported tag `{}`".format(elem.tag)
-                )
+                mixed = elem
+                continue
 
             if event == EventType.START:
+                if mixed is not None:
+                    raise NotImplementedError(f"Unsupported tag `{elem.tag}`")
+
                 builder = getattr(elements, tag.cname)
                 element = builder.from_element(elem, index=index)
                 self.elements.append(element)
                 index += 1
             elif event == EventType.END:
                 element = self.elements.pop()
-                if len(elem.attrib) == 0 and elem.text is None:
+                self.set_text(element, elem, mixed)
+                if mixed is not None:
+                    mixed = None
+                if not elem.attrib and elem.text is None:
                     continue
-                if len(self.elements) > 0:
+                if self.elements:
                     self.assign_to_parent(element)
 
             method_name = f"{event}_{tag.value}"
@@ -108,6 +115,31 @@ class SchemaParser:
                 getattr(self, method_name)(element, elem)
 
         return element
+
+    @classmethod
+    def set_text(
+        cls,
+        obj: ElementBase,
+        element: etree.Element,
+        mixed: Optional[etree.Element],
+    ):
+        """Set text attributes to elements that support well formed xml."""
+
+        if not hasattr(obj, "text"):  # It's ok not to have text attribute
+            if mixed is None:  # It's not ok if the mixed arguments is not None
+                return
+            raise NotImplementedError(f"Unsupported tag `{mixed.tag}`")
+
+        xml = etree.tostring(
+            element, method="c14n", pretty_print=True
+        ).decode()
+        start_root = xml.find(">")
+        end_root = xml.rfind("<")
+
+        clean_text = re.sub(
+            r"\s+", " ", xml[start_root + 1 : end_root]
+        ).strip()
+        setattr(obj, "text", clean_text)
 
     def start_schema(self, obj: Schema, element: etree.Element):
         """Collect the schema's default form for attributes and elements for
@@ -178,7 +210,7 @@ class SchemaParser:
                 if child.max_occurs is None:
                     child.max_occurs = obj.max_occurs
 
-    def assign_to_parent(self, element):
+    def assign_to_parent(self, element, has_mixed_content=False):
         """
         Assign an element to its parent either in a list of same type objects
         or directly as an attribute.

@@ -94,7 +94,9 @@ class XmlSerializer(AbstractSerializer, ModelInspect):
         meta = self.class_meta(obj.__class__)
         qname = self.render_tag(meta.name, meta.namespace)
         namespaces = self.namespaces(obj.__class__)
-        nsmap = {f"ns{index}": ns for index, ns in enumerate(namespaces)}
+        nsmap = {
+            f"ns{index}": ns for index, ns in enumerate(sorted(namespaces))
+        }
         return self.render_node(obj, Element(qname, nsmap=nsmap))
 
     def render_node(self, obj, parent, nillable=False) -> Element:

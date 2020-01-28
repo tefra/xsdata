@@ -38,6 +38,7 @@ class Appinfo(ElementBase):
     """
 
     source: Optional[str]
+    text: Optional[str]
 
 
 @dataclass

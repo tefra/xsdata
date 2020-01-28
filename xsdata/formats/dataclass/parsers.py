@@ -56,7 +56,7 @@ class JsonParser(AbstractParser, ModelInspect):
         field value."""
         if field.local_name in data:
             value = data[field.local_name]
-            if field.is_list and type(value) is not list:
+            if field.is_list and not isinstance(value, list):
                 value = [value]
         elif callable(field.default):
             value = field.default()

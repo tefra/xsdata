@@ -7,7 +7,7 @@ from xsdata.logger import logger
 from xsdata.models.codegen import Attr, AttrType, Class, Extension
 from xsdata.models.elements import Schema
 from xsdata.models.enums import XSDType
-from xsdata.utils.text import split
+from xsdata.utils import text
 
 
 @dataclass
@@ -179,7 +179,7 @@ class ClassReducer:
 
     @staticmethod
     def copy_attributes(source: Class, target: Class, extension: Extension):
-        prefix, ext = split(extension.name)
+        prefix = text.prefix(extension.name)
         target.inner.extend(source.inner)
         position = next(
             (

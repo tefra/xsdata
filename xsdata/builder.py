@@ -207,12 +207,8 @@ class ClassBuilder:
             return self.build_class(simple_type)  # type: ignore
 
         if isinstance(obj, UnionElement) and obj.simple_types:
-            """
-            Only the first occurrence from the bottom will be converted.
-
-            It doesn't make any sense to have a union with two anonymous
-            enumerations.
-            """
+            # Only the last occurrence will be converted. It doesn't make sense
+            # to have a union with two anonymous enumerations.
             for i in range(len(obj.simple_types) - 1, -1, -1):
                 if obj.simple_types[i].is_enumeration:
                     simple_type = obj.simple_types.pop(i)

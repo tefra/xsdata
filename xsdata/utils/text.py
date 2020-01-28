@@ -9,6 +9,10 @@ def strip_prefix(string: str, prefix: Optional[str]):
     )
 
 
+def prefix(string: str, sep: str = ":"):
+    return split(string, sep)[0]
+
+
 def split(string: str, sep: str = ":") -> Tuple:
     index = string.find(sep)
     if index == -1:

@@ -100,10 +100,8 @@ Example 21-18 Documentation
    :language: xml
    :lines: 3-
 
-.. warning::
-
-    Mixed Content
-
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter21/example2118.py
+   :language: python
 
 Example 21-19 ISO 11179-based type definition
 ---------------------------------------------
@@ -112,10 +110,8 @@ Example 21-19 ISO 11179-based type definition
    :language: xml
    :lines: 3-
 
-.. warning::
-
-    Mixed Content
-
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter21/example2119.py
+   :language: python
 
 Example 21-2 Schema for Salami Slice approach
 ---------------------------------------------
@@ -134,10 +130,8 @@ Example 21-20 Code documentation
    :language: xml
    :lines: 3-
 
-.. warning::
-
-    Mixed Content
-
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter21/example2120.py
+   :language: python
 
 Example 21-21 Section identifiers
 ---------------------------------
@@ -146,10 +140,8 @@ Example 21-21 Section identifiers
    :language: xml
    :lines: 3-
 
-.. warning::
-
-    Mixed Content
-
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter21/example2121.py
+   :language: python
 
 Example 21-22 Application information
 -------------------------------------
@@ -158,10 +150,8 @@ Example 21-22 Application information
    :language: xml
    :lines: 3-
 
-.. warning::
-
-    Mixed Content
-
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter21/example2122.py
+   :language: python
 
 Example 21-23 Non-native attributes
 -----------------------------------

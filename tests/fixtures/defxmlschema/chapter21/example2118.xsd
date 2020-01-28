@@ -1,7 +1,7 @@
 <!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
 <!-- Example 21-18 Documentation -->
-<!-- SKIPTEST: Mixed Content -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:doc="http://datypic.com/doc">
+  <xs:include schemaLocation="../chapter01/example0102.xsd" />
   <xs:element name="product" type="ProductType">
     <xs:annotation>
       <xs:documentation xml:lang="en" source="http://datypic.com/prod.html#product">

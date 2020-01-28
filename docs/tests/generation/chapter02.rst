@@ -18,10 +18,8 @@ Example 2-14 Annotation
    :language: xml
    :lines: 3-
 
-.. warning::
-
-    Mixed Content
-
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter02/example0214.py
+   :language: python
 
 Example 2-2 Product schema
 --------------------------

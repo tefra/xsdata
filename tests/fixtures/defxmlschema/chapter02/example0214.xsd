@@ -1,6 +1,5 @@
 <!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
 <!-- Example 2-14 Annotation -->
-<!-- SKIPTEST: Mixed Content -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:doc="http://datypic.com/doc">
   <xs:element name="product" type="ProductType">
     <xs:annotation>

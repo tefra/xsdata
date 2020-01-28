@@ -1,6 +1,5 @@
 - Total tests: **202**
-- Passed: **146**
-- Mixed Content: **6**
+- Passed: **152**
 - XML Schema 1.1: **20**
 - Unsupported feature!: **22**
 - Should fail: **3**

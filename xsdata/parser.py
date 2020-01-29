@@ -15,7 +15,7 @@ from xsdata.models.elements import (
     Schema,
     Sequence,
 )
-from xsdata.models.enums import EventType, FormType, TagType, XSDType
+from xsdata.models.enums import DataType, EventType, FormType, TagType
 from xsdata.models.mixins import BaseModel, ElementBase
 from xsdata.utils.text import snake_case
 
@@ -108,7 +108,7 @@ class SchemaParser:
                 if not elem.attrib and elem.text is None:
                     continue
                 if self.elements:
-                    self.assign_to_parent(element)
+                    self.assign_to_parent(element, elem.prefix)
 
             method_name = f"{event}_{tag.value}"
             if hasattr(self, method_name):
@@ -210,7 +210,7 @@ class SchemaParser:
                 if child.max_occurs is None:
                     child.max_occurs = obj.max_occurs
 
-    def assign_to_parent(self, element, has_mixed_content=False):
+    def assign_to_parent(self, element, prefix):
         """
         Assign an element to its parent either in a list of same type objects
         or directly as an attribute.
@@ -229,9 +229,10 @@ class SchemaParser:
             plural_name = "{}s".format(name)
             if hasattr(parent, plural_name):
                 siblings = getattr(parent, plural_name)
-                if getattr(element, "type", "") == XSDType.ID.code:
+                id = f"{prefix}:{DataType.ID.code}"
+                if getattr(element, "type", "") == id:
                     for sibling in siblings:
-                        if getattr(sibling, "type", "") == XSDType.ID.code:
+                        if getattr(sibling, "type", "") == id:
                             raise ValueError(f"Duplicated ID: `{element}`")
 
                 return siblings.append(element)

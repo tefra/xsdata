@@ -1,7 +1,6 @@
 from unittest import TestCase
 
 from xsdata.models.elements import Length, List, Restriction, SimpleType, Union
-from xsdata.models.enums import XSDType
 
 
 class SimpleTypeTests(TestCase):
@@ -26,7 +25,7 @@ class SimpleTypeTests(TestCase):
         self.assertEqual("thug", obj.real_type)
 
         obj.list = List.create(item_type="foo")
-        self.assertEqual(XSDType.STRING.code, obj.real_type)
+        self.assertIsNone(obj.real_type)
 
         obj.restriction = Restriction.create(base="bar")
         self.assertEqual("bar", obj.real_type)

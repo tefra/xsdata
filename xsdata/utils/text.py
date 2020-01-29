@@ -13,6 +13,10 @@ def prefix(string: str, sep: str = ":"):
     return split(string, sep)[0]
 
 
+def suffix(string: str, sep: str = ":"):
+    return split(string, sep)[1]
+
+
 def split(string: str, sep: str = ":") -> Tuple:
     index = string.find(sep)
     if index == -1:

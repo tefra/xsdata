@@ -4,7 +4,6 @@ from tests.factories import (
     AttrFactory,
     AttrTypeFactory,
     ClassFactory,
-    ExtensionFactory,
     FactoryTestCase,
 )
 from xsdata.models.codegen import AttrType
@@ -15,7 +14,7 @@ from xsdata.models.elements import (
     Schema,
     SimpleType,
 )
-from xsdata.models.enums import TagType, XSDType
+from xsdata.models.enums import DataType, TagType
 from xsdata.reducer import ClassReducer
 
 
@@ -145,7 +144,7 @@ class ClassReducerTests(FactoryTestCase):
         mock_find_common_type.return_value = None
 
         reducer = ClassReducer()
-        extension = ExtensionFactory.create()
+        extension = AttrTypeFactory.create()
         obj = ClassFactory.create(extensions=[extension])
         reducer.flatten_extension(obj, extension, self.nsmap)
 
@@ -163,7 +162,7 @@ class ClassReducerTests(FactoryTestCase):
         )
 
         reducer = ClassReducer()
-        extension = ExtensionFactory.create(type=TagType.EXTENSION.cname)
+        extension = AttrTypeFactory.create()
         obj = ClassFactory.create(
             extensions=[extension],
             attrs=AttrFactory.list(2, local_type=TagType.ENUMERATION.cname),
@@ -182,7 +181,7 @@ class ClassReducerTests(FactoryTestCase):
         mock_find_common_type.return_value = common
 
         reducer = ClassReducer()
-        extension = ExtensionFactory.create(type=TagType.UNION.cname)
+        extension = AttrTypeFactory.create()
         obj = ClassFactory.create(
             extensions=[extension], attrs=AttrFactory.list(2)
         )
@@ -213,8 +212,8 @@ class ClassReducerTests(FactoryTestCase):
                 ),
             ],
         )
-        ext_b = ExtensionFactory.create(name="b", index=2)
-        ext_c = ExtensionFactory.create(name="common:c", index=66)
+        ext_b = AttrTypeFactory.create(name="b", index=2)
+        ext_c = AttrTypeFactory.create(name="common:c", index=66)
 
         obj = ClassFactory.create(
             name="foo",
@@ -231,8 +230,8 @@ class ClassReducerTests(FactoryTestCase):
             ("j", "other:j"),
             ("x", "common:x"),
             ("y", "other:y"),
-            ("a", "xs:string"),
-            ("b", "xs:string"),
+            ("a", "string"),
+            ("b", "string"),
         ]
         self.assertEqual(
             attrs,
@@ -312,7 +311,7 @@ class ClassReducerTests(FactoryTestCase):
         self, mock_find_common_type, mock_logger_debug
     ):
         type_a = AttrTypeFactory.create(name="a")
-        type_str = AttrType(name=XSDType.STRING.code)
+        type_str = AttrType(name=DataType.STRING.code, native=True)
         common = ClassFactory.create(name="bar", attrs=AttrFactory.list(2))
         mock_find_common_type.return_value = common
 

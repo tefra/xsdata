@@ -1,7 +1,6 @@
 from unittest import TestCase
 
 from xsdata.models.elements import List
-from xsdata.models.enums import XSDType
 
 
 class ListTests(TestCase):
@@ -15,7 +14,7 @@ class ListTests(TestCase):
 
     def test_real_type(self):
         obj = List.create()
-        self.assertEqual(XSDType.STRING.code, obj.real_type)
+        self.assertIsNone(obj.real_type)
 
     def test_get_restrictions(self):
         obj = List.create()

@@ -5,11 +5,9 @@ from tests.factories import (
     AttrFactory,
     AttrTypeFactory,
     ClassFactory,
-    ExtensionFactory,
     FactoryTestCase,
 )
 from xsdata.builder import ClassBuilder
-from xsdata.models.codegen import Attr
 from xsdata.models.elements import (
     Attribute,
     AttributeGroup,
@@ -26,7 +24,7 @@ from xsdata.models.elements import (
     SimpleType,
     Union,
 )
-from xsdata.models.enums import FormType, TagType, XSDType
+from xsdata.models.enums import DataType, FormType, TagType
 
 
 class ClassBuilderTests(FactoryTestCase):
@@ -96,7 +94,7 @@ class ClassBuilderTests(FactoryTestCase):
         mock_build_class_attributes,
         mock_element_namespace,
     ):
-        extensions = ExtensionFactory.list(2)
+        extensions = AttrTypeFactory.list(2)
         mock_real_name.return_value = "name"
         mock_display_help.return_value = "sos"
         mock_is_abstract.return_value = True
@@ -119,12 +117,12 @@ class ClassBuilderTests(FactoryTestCase):
         )
         self.assertEqual(expected, result)
 
-    @patch.object(ClassBuilder, "default_value_type")
+    @patch.object(ClassBuilder, "default_class_attribute")
     @patch.object(ClassBuilder, "build_class_attribute")
     def test_build_class_attributes_without_default_value_type(
-        self, mock_build_class_attribute, default_value_type
+        self, mock_build_class_attribute, mock_default_class_attribute
     ):
-        default_value_type.return_value = None
+        mock_default_class_attribute.return_value = None
         element = Element.create(
             complex_type=ComplexType.create(
                 attributes=[Attribute.create(), Attribute.create()]
@@ -140,12 +138,13 @@ class ClassBuilderTests(FactoryTestCase):
 
         self.assertEqual(0, len(item.attrs))
 
-    @patch.object(ClassBuilder, "default_value_type")
+    @patch.object(ClassBuilder, "default_class_attribute")
     @patch.object(ClassBuilder, "build_class_attribute")
-    def test_build_class_attributes_with_default_value_type(
-        self, mock_build_class_attribute, default_value_type
+    def test_build_class_attributes_with_default_class_attribute(
+        self, mock_build_class_attribute, mock_default_class_attribute
     ):
-        default_value_type.return_value = "xs:string"
+        attr = AttrFactory.create(name="foo")
+        mock_default_class_attribute.return_value = attr
         element = Element.create()
         item = ClassFactory.create()
 
@@ -153,21 +152,14 @@ class ClassBuilderTests(FactoryTestCase):
 
         mock_build_class_attribute.assert_not_called()
 
-        expected = Attr(
-            index=0,
-            name="value",
-            default=None,
-            types=AttrTypeFactory.list(1, name=XSDType.STRING.code),
-            local_type=TagType.EXTENSION.cname,
-        )
         self.assertEqual(1, len(item.attrs))
-        self.assertEqual(expected, item.attrs[0])
+        self.assertEqual(attr, item.attrs[0])
 
     @patch.object(ClassBuilder, "element_extensions")
     def test_build_class_extensions(self, mock_element_extensions):
-        bar = ExtensionFactory.create(name="bar", index=3)
-        bar_dub = ExtensionFactory.create(name="bar", index=2)
-        foo = ExtensionFactory.create(name="foo", index=1)
+        bar = AttrTypeFactory.create(name="bar", index=3)
+        bar_dub = AttrTypeFactory.create(name="bar", index=2)
+        foo = AttrTypeFactory.create(name="foo", index=1)
 
         mock_element_extensions.return_value = [bar, bar_dub, foo]
 
@@ -221,18 +213,16 @@ class ClassBuilderTests(FactoryTestCase):
                 restriction=Restriction.create(base="isAttribute")
             ),
             complex_content=ComplexContent.create(
-                extension=Extension.create(
-                    base="bk:ext", index=7, type="Extension"
-                )
+                extension=Extension.create(base="bk:ext", index=7)
             ),
         )
 
         children = self.builder.element_extensions(complex_type)
         expected = [
-            ExtensionFactory.create(name="bk:ext", index=7, type="Extension"),
-            ExtensionFactory.create(name="a", index=3, type="Group"),
-            ExtensionFactory.create(name="bk:b", index=4, type="Group"),
-            ExtensionFactory.create(name="c", index=5, type="Group"),
+            AttrTypeFactory.create(name="bk:ext", index=7),
+            AttrTypeFactory.create(name="a", index=3),
+            AttrTypeFactory.create(name="bk:b", index=4),
+            AttrTypeFactory.create(name="c", index=5),
         ]
 
         self.assertIsInstance(children, GeneratorType)
@@ -242,9 +232,7 @@ class ClassBuilderTests(FactoryTestCase):
         self.builder.target_prefix = "bk:"
         element = Element.create(type="bk:book", index=23)
         children = self.builder.element_extensions(element)
-        expected = ExtensionFactory.list(
-            1, name="bk:book", index=0, type="Element"
-        )
+        expected = AttrTypeFactory.list(1, name="bk:book", index=0)
 
         self.assertEqual(expected, list(children))
 
@@ -306,8 +294,8 @@ class ClassBuilderTests(FactoryTestCase):
         actual = self.builder.build_class_attribute_types(item, attribute)
 
         expected = [
-            AttrTypeFactory.create(name="xs:int"),
-            AttrTypeFactory.create(name="xs:str"),
+            AttrTypeFactory.create(name="int", native=True),
+            AttrTypeFactory.create(name="str", native=True),
         ]
 
         self.assertEqual(expected, actual)
@@ -326,8 +314,8 @@ class ClassBuilderTests(FactoryTestCase):
         actual = self.builder.build_class_attribute_types(item, attribute)
 
         expected = [
-            AttrTypeFactory.create(name="xs:int"),
-            AttrTypeFactory.create(name="xs:str"),
+            AttrTypeFactory.create(name="int", native=True),
+            AttrTypeFactory.create(name="str", native=True),
             AttrTypeFactory.create(name="foo", forward_ref=True),
         ]
 
@@ -347,7 +335,7 @@ class ClassBuilderTests(FactoryTestCase):
         attribute = Attribute.create(default="false", index=66, name="attr")
         actual = self.builder.build_class_attribute_types(item, attribute)
         expected = [
-            AttrTypeFactory.create(name="xs:string"),
+            AttrTypeFactory.create(name="string", native=True),
         ]
 
         self.assertEqual(expected, actual)
@@ -459,28 +447,41 @@ class ClassBuilderTests(FactoryTestCase):
             self.assertFalse(self.builder.has_anonymous_enumeration(obj))
 
     @patch("xsdata.builder.logger.warning")
-    def test_default_value_type(self, mock_logger_warning):
+    def test_default_class_attribute(self, mock_logger_warning):
         item = ClassFactory.create()
-        self.assertEqual("xs:string", ClassBuilder.default_value_type(item))
-
-        item = ClassFactory.create(extensions=ExtensionFactory.list(1))
-        self.assertIsNone(ClassBuilder.default_value_type(item))
-
-        item = ClassFactory.create(
-            extensions=[
-                ExtensionFactory.create(name="xs:int"),
-                ExtensionFactory.create(name="xs:boolean"),
-            ]
+        expected = AttrFactory.create(
+            name="value",
+            index=0,
+            local_type=TagType.EXTENSION.cname,
+            types=[
+                AttrTypeFactory.create(name=DataType.STRING.code, native=True)
+            ],
         )
-        self.assertEqual(
-            "xs:int xs:boolean", ClassBuilder.default_value_type(item)
+
+        self.assertEqual(expected, ClassBuilder.default_class_attribute(item))
+
+        item = ClassFactory.create(extensions=AttrTypeFactory.list(1))
+        self.assertIsNone(ClassBuilder.default_class_attribute(item))
+
+        type_int = AttrTypeFactory.create(name=DataType.INT.code, native=True)
+        type_bool = AttrTypeFactory.create(
+            name=DataType.BOOLEAN.code, native=True
         )
+        item = ClassFactory.create(extensions=[type_int, type_bool])
+        expected = AttrFactory.create(
+            name="value",
+            index=0,
+            local_type=TagType.EXTENSION.cname,
+            types=[type_int, type_bool],
+        )
+
+        self.assertEqual(expected, ClassBuilder.default_class_attribute(item))
         self.assertEqual(0, len(item.extensions))
 
         item = ClassFactory.create(
             attrs=AttrFactory.list(2, local_type=TagType.ENUMERATION.cname),
-            extensions=ExtensionFactory.list(1, name="xs:int"),
+            extensions=AttrTypeFactory.list(1, name="xs:int"),
         )
 
-        self.assertIsNone(ClassBuilder.default_value_type(item))
+        self.assertIsNone(ClassBuilder.default_class_attribute(item))
         mock_logger_warning.assert_called_once_with("Empty class: `class_B`")

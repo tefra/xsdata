@@ -2,16 +2,14 @@ import random
 import unittest
 from abc import ABC, abstractmethod
 
-from xsdata.models.codegen import Attr, AttrType, Class, Extension, Package
+from xsdata.models.codegen import Attr, AttrType, Class, Package
 from xsdata.models.elements import (
     Attribute,
     ComplexType,
     Element,
     Restriction,
     SimpleType,
-    Union,
 )
-from xsdata.models.enums import XSDType
 
 
 class FactoryTestCase(unittest.TestCase):
@@ -78,11 +76,15 @@ class AttrTypeFactory(Factory):
     counter = 65
 
     @classmethod
-    def create(cls, name=None, alias=None, forward_ref=False):
+    def create(
+        cls, name=None, index=None, alias=None, native=False, forward_ref=False
+    ):
 
         return cls.model(
             name=name or f"attr_{cls.next()}",
+            index=index or 0,
             alias=alias,
+            native=native,
             forward_ref=forward_ref,
         )
 
@@ -108,7 +110,7 @@ class AttrFactory(Factory):
         return cls.model(
             name=name or f"attr_{cls.next()}",
             index=cls.counter if index is None else index,
-            types=types or AttrTypeFactory.list(1, name=XSDType.STRING.code),
+            types=types or AttrTypeFactory.list(1, name="string", native=True),
             local_type=local_type or random.choice(cls.types).__name__,
             namespace=namespace or None,
             help=help or None,
@@ -130,19 +132,4 @@ class PackageFactory(Factory):
             name=name or f"package_{cls.next()}",
             source=source or "target",
             alias=alias or None,
-        )
-
-
-class ExtensionFactory(Factory):
-    types = [Union, Restriction, Extension]
-    model = Extension
-    counter = 65
-
-    @classmethod
-    def create(cls, name=None, index=None, type=None):
-
-        return cls.model(
-            name=name or f"ext_{cls.next()}",
-            index=cls.counter if index is None else index,
-            type=type or random.choice(cls.types).__name__,
         )

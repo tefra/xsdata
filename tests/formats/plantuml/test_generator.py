@@ -29,13 +29,13 @@ class PlantUmlGeneratorTests(FactoryTestCase):
         output = """@startuml
 
 class class_B {
-    +attr_B : xs:string
-    +attr_C : xs:string
+    +attr_B : string
+    +attr_C : string
 }
 class class_C {
-    +attr_D : xs:string
-    +attr_E : xs:string
-    +attr_F : xs:string
+    +attr_D : string
+    +attr_E : string
+    +attr_F : string
 }
 
 @enduml"""

@@ -2,14 +2,25 @@ from dataclasses import dataclass, field, replace
 from typing import Any, List, Optional, Type
 
 from xsdata.models.elements import ComplexType, Element
-from xsdata.models.enums import TagType
+from xsdata.models.enums import DataType, TagType
 
 
 @dataclass
 class AttrType:
     name: str
+    index: int = field(default_factory=int)
     alias: Optional[str] = field(default=None)
+    native: bool = field(default=False)
     forward_ref: bool = field(default=False)
+
+    @property
+    def native_name(self):
+        native_type = self.native_type
+        return native_type.__name__ if native_type else None
+
+    @property
+    def native_type(self):
+        return DataType.get_enum(self.name).local if self.native else None
 
     def clone(self):
         return replace(self)
@@ -103,7 +114,7 @@ class Class:
     namespace: Optional[str] = field(default=None)
     local_name: str = field(init=False)
     help: Optional[str] = field(default=None)
-    extensions: List[Extension] = field(default_factory=list)
+    extensions: List[AttrType] = field(default_factory=list)
     attrs: List[Attr] = field(default_factory=list)
     inner: List["Class"] = field(default_factory=list)
 

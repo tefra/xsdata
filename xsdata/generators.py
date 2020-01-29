@@ -7,7 +7,6 @@ from jinja2 import Environment, FileSystemLoader, Template
 from xsdata.formats.dataclass.utils import safe_snake
 from xsdata.models.codegen import Attr, AttrType, Class, Package
 from xsdata.models.elements import Schema
-from xsdata.models.enums import XSDType
 from xsdata.resolver import DependenciesResolver
 from xsdata.utils import text
 
@@ -54,9 +53,13 @@ class PythonAbstractGenerator(AbstractGenerator, ABC):
                 cls.process_attribute(attr, curr_parents)
 
         for extension in obj.extensions:
-            extension.name = cls.type_name(extension.name)
+            cls.process_extension(extension)
 
         return obj
+
+    @classmethod
+    def process_extension(cls, extension: AttrType):
+        extension.name = cls.type_name(extension)
 
     @classmethod
     def process_attribute(cls, attr: Attr, parents: List[str]) -> None:
@@ -70,10 +73,9 @@ class PythonAbstractGenerator(AbstractGenerator, ABC):
     def process_enumeration(cls, attr: Attr, parent: Class) -> None:
         """Normalize enumeration properties."""
 
-        if len(parent.extensions) == 1:
-            xsd_type = XSDType.get_enum(parent.extensions[0].name)
-            if xsd_type:
-                attr.types.append(AttrType(name=xsd_type.code))
+        if len(parent.extensions) == 1 and parent.extensions[0].native:
+            attr.types.append(parent.extensions[0])
+
         attr.name = cls.enumeration_name(attr.name)
         attr.default = cls.attribute_default(attr)
 
@@ -92,10 +94,14 @@ class PythonAbstractGenerator(AbstractGenerator, ABC):
         return text.pascal_case(name)
 
     @classmethod
-    def type_name(cls, name: str) -> str:
+    def type_name(cls, attr_type: AttrType) -> str:
         """Convert xsd types to python or apply class name conventions after
         stripping any reference prefix."""
-        return XSDType.get_local(name) or cls.class_name(text.split(name)[1])
+
+        if attr_type.native:
+            return attr_type.native_name
+        else:
+            return cls.class_name(text.suffix(attr_type.name))
 
     @classmethod
     def attribute_name(cls, name: str) -> str:
@@ -136,7 +142,7 @@ class PythonAbstractGenerator(AbstractGenerator, ABC):
             type_name = (
                 cls.class_name(attr_type.alias)
                 if attr_type.alias
-                else cls.type_name(attr_type.name)
+                else cls.type_name(attr_type)
             )
             if attr_type.forward_ref:
                 outer_str = ".".join(parents)
@@ -162,11 +168,11 @@ class PythonAbstractGenerator(AbstractGenerator, ABC):
         if attr.is_list:
             return "list"
         elif isinstance(attr.default, str):
-            local_types = set()
-            for attr_type in attr.types:
-                xsd_type = XSDType.get_enum(attr_type.name)
-                if xsd_type:
-                    local_types.add(xsd_type.local)
+            local_types = {
+                attr_type.native_type
+                for attr_type in attr.types
+                if attr_type.native
+            }
 
             if bool in local_types:
                 if attr.default == "true":

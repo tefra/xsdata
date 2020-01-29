@@ -2,7 +2,7 @@ from dataclasses import dataclass, field
 from typing import Iterator, List, Optional, Union
 
 from xsdata.logger import logger
-from xsdata.models.codegen import Attr, AttrType, Class, Extension
+from xsdata.models.codegen import Attr, AttrType, Class
 from xsdata.models.elements import (
     Attribute,
     AttributeGroup,
@@ -14,8 +14,9 @@ from xsdata.models.elements import (
 from xsdata.models.elements import List as ListElement
 from xsdata.models.elements import Restriction, Schema, SimpleType
 from xsdata.models.elements import Union as UnionElement
-from xsdata.models.enums import TagType, XSDType
+from xsdata.models.enums import DataType, Namespace, TagType
 from xsdata.models.mixins import ElementBase, NamedField
+from xsdata.utils import text
 
 BaseElement = Union[
     Attribute, AttributeGroup, Element, ComplexType, SimpleType, Group
@@ -65,20 +66,13 @@ class ClassBuilder:
         for child in self.element_children(obj):
             self.build_class_attribute(item, child)
 
-        default_value_type = self.default_value_type(item)
-        if default_value_type is not None:
-            value_attr = Attr(
-                index=0,
-                name="value",
-                default=None,
-                types=[AttrType(name=default_value_type)],
-                local_type=TagType.EXTENSION.cname,
-            )
-            item.attrs.append(value_attr)
+        attr = self.default_class_attribute(item)
+        if attr:
+            item.attrs.append(attr)
 
         item.attrs.sort(key=lambda x: x.index)
 
-    def build_class_extensions(self, obj: ElementBase) -> List[Extension]:
+    def build_class_extensions(self, obj: ElementBase) -> List[AttrType]:
         """Return a sorted, filtered list of extensions."""
         return sorted(
             list(
@@ -87,6 +81,23 @@ class ClassBuilder:
                 }.values()
             ),
             key=lambda x: x.name,
+        )
+
+    def build_data_type(
+        self, name, index: int = 0, forward_ref: bool = False
+    ) -> AttrType:
+        prefix, suffix = text.split(name)
+        native = False
+
+        if prefix and (
+            prefix == "xml"
+            or self.schema.nsmap.get(prefix) == Namespace.SCHEMA
+        ):
+            name = suffix
+            native = True
+
+        return AttrType(
+            name=name, index=index, native=native, forward_ref=forward_ref
         )
 
     def element_children(self, obj: ElementBase) -> Iterator[AttributeElement]:
@@ -121,7 +132,7 @@ class ClassBuilder:
 
     def element_extensions(
         self, obj: ElementBase, include_current=True
-    ) -> Iterator[Extension]:
+    ) -> Iterator[AttrType]:
         """
         Recursively find and return all parent Extension classes.
 
@@ -131,16 +142,14 @@ class ClassBuilder:
 
         if include_current and getattr(obj, "type", None):
             name = getattr(obj, "type")
-            type_name = type(obj).__name__
-            yield Extension(name=name, index=0, type=type_name)
+            yield self.build_data_type(name, index=0)
 
         for child in obj.children():
             if child.is_attribute:
                 continue
 
             for ext in child.extensions:
-                type_name = type(child).__name__
-                yield Extension(name=ext, index=child.index, type=type_name)
+                yield self.build_data_type(ext, index=child.index)
 
             yield from self.element_extensions(child, include_current=False)
 
@@ -170,18 +179,19 @@ class ClassBuilder:
         """Convert real type and anonymous inner elements to an attribute type
         list."""
         inner_class = self.build_inner_class(obj)
-        types = [
-            AttrType(name=name)
-            for name in (obj.real_type or "").split(" ")
-            if name
-        ]
+        types = list(
+            map(
+                self.build_data_type,
+                [name for name in (obj.real_type or "").split(" ") if name],
+            )
+        )
 
         if inner_class:
             parent.inner.append(inner_class)
             types.append(AttrType(name=inner_class.name, forward_ref=True))
 
         if len(types) == 0:
-            types.append(AttrType(name=XSDType.STRING.code))
+            types.append(AttrType(name=DataType.STRING.code, native=True))
             logger.warning(
                 "Default type string for attribute %s.%s",
                 parent.name,
@@ -238,19 +248,22 @@ class ClassBuilder:
         )
 
     @staticmethod
-    def default_value_type(item: Class) -> Optional[str]:
-        value_type = None
+    def default_class_attribute(item: Class) -> Optional[Attr]:
+        types = []
         if len(item.extensions) == 0 and len(item.attrs) == 0:
-            value_type = XSDType.STRING.code
+            types.append(AttrType(name=DataType.STRING.code, native=True))
             logger.warning(f"Empty class: `{item.name}`")
         elif not item.is_enumeration:
-            tmp = []
             for i in range(len(item.extensions) - 1, -1, -1):
-                extension = item.extensions[i]
-                if XSDType.get_enum(extension.name):
-                    tmp.append(extension.name)
-                    item.extensions.pop(i)
-            if tmp:
-                value_type = " ".join(reversed(tmp))
+                if item.extensions[i].native:
+                    types.insert(0, item.extensions.pop(i))
 
-        return value_type
+        if types:
+            return Attr(
+                name="value",
+                index=0,
+                default=None,
+                types=types,
+                local_type=TagType.EXTENSION.cname,
+            )
+        return None

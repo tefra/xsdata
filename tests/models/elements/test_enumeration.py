@@ -14,7 +14,7 @@ class EnumerationTests(TestCase):
 
     def test_property_real_type(self):
         obj = Enumeration.create()
-        self.assertEqual("xs:string", obj.real_type)
+        self.assertIsNone(obj.real_type)
 
     def test_property_default(self):
         obj = Enumeration.create(value="foo")

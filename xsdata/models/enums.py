@@ -3,7 +3,7 @@ from typing import Optional
 
 from lxml import etree
 
-from xsdata.utils.text import capitalize, split
+from xsdata.utils.text import capitalize
 
 
 class Namespace:
@@ -16,63 +16,62 @@ class FormType(Enum):
     UNQUALIFIED = "unqualified"
 
 
-class XSDType(Enum):
-    ANY_URI = ("xs:anyURI", str)
-    ANY_SIMPLE_TYPE = ("xs:anySimpleType", str)
-    BASE64_BINARY = ("xs:base64Binary", str)
-    BOOLEAN = ("xs:boolean", bool)
-    BYTE = ("xs:byte", int)
-    DATE = ("xs:date", str)
-    DATE_TIME = ("xs:dateTime", str)
-    DECIMAL = ("xs:decimal", float)
-    DERIVATION_CONTROL = ("xs:derivationControl", str)
-    DOUBLE = ("xs:double", float)
-    DURATION = ("xs:duration", str)
-    ENTITIES = ("xs:ENTITIES", int)
-    ENTITY = ("xs:ENTITY", int)
-    FLOAT = ("xs:float", float)
-    G_DAY = ("xs:gDay", str)
-    G_MONTH = ("xs:gMonth", str)
-    G_MONTH_DAY = ("xs:gMonthDay", str)
-    G_YEAR = ("xs:gYear", str)
-    G_YEAR_MONTH = ("xs:gYearMonth", str)
-    HEX_BINARY = ("xs:hexBinary", str)
-    ID = ("xs:ID", str)
-    IDREF = ("xs:IDREF", str)
-    IDREFS = ("xs:IDREFS", str)
-    INT = ("xs:int", int)
-    INTEGER = ("xs:integer", int)
-    LANGUAGE = ("xs:language", str)
-    LONG = ("xs:long", int)
-    NAME = ("xs:Name", str)
-    NCNAME = ("xs:NCName", str)
-    NEGATIVE_INTEGER = ("xs:negativeInteger", int)
-    NMTOKEN = ("xs:NMTOKEN", str)
-    NMTOKENS = ("xs:NMTOKENS", str)
-    NON_NEGATIVE_INTEGER = ("xs:nonNegativeInteger", int)
-    NON_POSITIVE_INTEGER = ("xs:nonPositiveInteger", int)
-    NORMALIZED_STRING = ("xs:normalizedString", str)
-    NOTATION = ("xs:NOTATION", str)
-    POSITIVE_INTEGER = ("xs:positiveInteger", int)
-    QNAME = ("xs:QName", str)
-    SHORT = ("xs:short", int)
-    SIMPLE_DERIVATION_SET = ("xs:simpleDerivationSet", str)
-    STRING = ("xs:string", str)
-    TIME = ("xs:time", str)
-    TOKEN = ("xs:token", str)
-    UNSIGNED_BYTE = ("xs:unsignedByte", int)
-    UNSIGNED_INT = ("xs:unsignedInt", int)
-    UNSIGNED_LONG = ("xs:unsignedLong", int)
-    UNSIGNED_SHORT = ("xs:unsignedShort", int)
+class DataType(Enum):
+    ANY_URI = ("anyURI", str)
+    ANY_SIMPLE_TYPE = ("anySimpleType", str)
+    BASE64_BINARY = ("base64Binary", str)
+    BOOLEAN = ("boolean", bool)
+    BYTE = ("byte", int)
+    DATE = ("date", str)
+    DATE_TIME = ("dateTime", str)
+    DECIMAL = ("decimal", float)
+    DERIVATION_CONTROL = ("derivationControl", str)
+    DOUBLE = ("double", float)
+    DURATION = ("duration", str)
+    ENTITIES = ("ENTITIES", int)
+    ENTITY = ("ENTITY", int)
+    FLOAT = ("float", float)
+    G_DAY = ("gDay", str)
+    G_MONTH = ("gMonth", str)
+    G_MONTH_DAY = ("gMonthDay", str)
+    G_YEAR = ("gYear", str)
+    G_YEAR_MONTH = ("gYearMonth", str)
+    HEX_BINARY = ("hexBinary", str)
+    ID = ("ID", str)
+    IDREF = ("IDREF", str)
+    IDREFS = ("IDREFS", str)
+    INT = ("int", int)
+    INTEGER = ("integer", int)
+    LANGUAGE = ("language", str)
+    LONG = ("long", int)
+    NAME = ("Name", str)
+    NCNAME = ("NCName", str)
+    NEGATIVE_INTEGER = ("negativeInteger", int)
+    NMTOKEN = ("NMTOKEN", str)
+    NMTOKENS = ("NMTOKENS", str)
+    NON_NEGATIVE_INTEGER = ("nonNegativeInteger", int)
+    NON_POSITIVE_INTEGER = ("nonPositiveInteger", int)
+    NORMALIZED_STRING = ("normalizedString", str)
+    NOTATION = ("NOTATION", str)
+    POSITIVE_INTEGER = ("positiveInteger", int)
+    QNAME = ("QName", str)
+    SHORT = ("short", int)
+    SIMPLE_DERIVATION_SET = ("simpleDerivationSet", str)
+    STRING = ("string", str)
+    TIME = ("time", str)
+    TOKEN = ("token", str)
+    UNSIGNED_BYTE = ("unsignedByte", int)
+    UNSIGNED_INT = ("unsignedInt", int)
+    UNSIGNED_LONG = ("unsignedLong", int)
+    UNSIGNED_SHORT = ("unsignedShort", int)
 
     def __init__(self, code: str, local: type):
         self.code = code
         self.local = local
 
     @classmethod
-    def get_enum(cls, code: str) -> Optional["XSDType"]:
-        prefix, suffix = split(code)
-        return __XSDType__.get("xs:" + suffix) if prefix else None
+    def get_enum(cls, code: str) -> Optional["DataType"]:
+        return __XSDType__.get(code) if code else None
 
     @classmethod
     def get_local(cls, code: str) -> Optional[str]:
@@ -84,7 +83,7 @@ class XSDType(Enum):
         return list(__XSDType__.keys())
 
 
-__XSDType__ = {xsd.code: xsd for xsd in XSDType}
+__XSDType__ = {xsd.code: xsd for xsd in DataType}
 
 
 class EventType:

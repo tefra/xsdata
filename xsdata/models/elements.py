@@ -7,7 +7,7 @@ from typing import List as ArrayList
 from typing import Optional
 from typing import Union as UnionType
 
-from xsdata.models.enums import FormType, ProcessType, UseType, XSDType
+from xsdata.models.enums import FormType, ProcessType, UseType
 from xsdata.models.mixins import (
     ElementBase,
     NamedField,
@@ -132,7 +132,7 @@ class List(AnnotationBase, RestrictedField, NamedField):
 
     @property
     def real_type(self) -> Optional[str]:
-        return XSDType.STRING.code
+        return None
 
     def get_restrictions(self) -> Dict[str, Anything]:
         return dict()
@@ -390,7 +390,7 @@ class Enumeration(RestrictionType, NamedField, RestrictedField):
 
     @property
     def real_type(self):
-        return XSDType.STRING.code
+        return None
 
     @property
     def real_name(self):
@@ -937,7 +937,3 @@ class Schema(AnnotationBase):
             ),
             None,
         )
-
-    def get_namespace(self, prefix: Optional[str]):
-        if prefix is None:
-            return self.target_namespace

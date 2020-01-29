@@ -7,7 +7,6 @@ from toposort import toposort_flatten
 
 from xsdata.models.codegen import Class, Package
 from xsdata.models.elements import Schema
-from xsdata.models.enums import XSDType
 from xsdata.utils import text
 from xsdata.utils.text import split
 
@@ -147,19 +146,15 @@ class DependenciesResolver:
                 [
                     attr_type.name
                     for attr_type in attr.types
-                    if not attr_type.forward_ref
+                    if not attr_type.forward_ref and not attr_type.native
                 ]
             )
 
-        deps.update(ext.name for ext in obj.extensions)
+        deps.update(ext.name for ext in obj.extensions if not ext.native)
         for inner in obj.inner:
             deps.update(self.collect_deps(inner, prefix))
 
-        return {
-            text.strip_prefix(dep, prefix)
-            for dep in deps
-            if dep and not XSDType.get_enum(dep)
-        }
+        return {text.strip_prefix(dep, prefix) for dep in deps}
 
     @staticmethod
     def create_class_map(classes: List[Class]):

@@ -5,7 +5,6 @@ from tests.factories import (
     AttrFactory,
     AttrTypeFactory,
     ClassFactory,
-    ExtensionFactory,
     FactoryTestCase,
     PackageFactory,
 )
@@ -238,7 +237,7 @@ class DependenciesResolverTest(FactoryTestCase):
         obj = ClassFactory.create(
             attrs=[
                 AttrFactory.create(
-                    types=[AttrTypeFactory.create(name="xs:decimal")]
+                    types=[AttrTypeFactory.create(name="decimal", native=True)]
                 ),
                 AttrFactory.create(
                     types=[
@@ -254,7 +253,7 @@ class DependenciesResolverTest(FactoryTestCase):
                     ]
                 ),
             ],
-            extensions=[ExtensionFactory.create(name="xs:localElement")],
+            extensions=[AttrTypeFactory.create(name="xs:localElement")],
             inner=[
                 ClassFactory.create(
                     attrs=AttrFactory.list(

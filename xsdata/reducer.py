@@ -4,9 +4,9 @@ from typing import Callable, Dict, List, Optional
 from lxml import etree
 
 from xsdata.logger import logger
-from xsdata.models.codegen import Attr, AttrType, Class, Extension
+from xsdata.models.codegen import Attr, AttrType, Class
 from xsdata.models.elements import Schema
-from xsdata.models.enums import XSDType
+from xsdata.models.enums import DataType
 from xsdata.utils import text
 
 
@@ -53,10 +53,8 @@ class ClassReducer:
     def find_common_type(self, name: str, schema: Schema) -> Optional[Class]:
         """Find a common type by the qualified named with the prefixed
         namespace if exists or the target namespace."""
-        prefix = None
-        split_name = name.split(":")
-        if len(split_name) == 2:
-            prefix, name = split_name
+        prefix, suffix = text.split(name)
+        name = suffix if prefix else name
 
         namespace = schema.nsmap.get(prefix, schema.target_namespace)
         qname = etree.QName(namespace, name)
@@ -96,7 +94,7 @@ class ClassReducer:
                         is_enumeration = True
                         attrs.extend(item.inner[0].attrs)
 
-                elif not attr_type.forward_ref:
+                elif not attr_type.forward_ref and not attr_type.native:
                     common = self.find_common_type(attr_type.name, schema)
                     if common is not None and common.is_enumeration:
                         is_enumeration = True
@@ -109,7 +107,7 @@ class ClassReducer:
                 item.attrs = attrs
 
     def flatten_extension(
-        self, item: Class, extension: Extension, schema: Schema
+        self, item: Class, extension: AttrType, schema: Schema
     ):
         """
         If the extension class is found in the registry prepend it's attributes
@@ -119,11 +117,14 @@ class ClassReducer:
         prepended with the extension prefix if it isn't a reference to
         another schema.
         """
+        if extension.native:
+            return
+
         common = self.find_common_type(extension.name, schema)
         if common is None:
             return
 
-        if not (extension.is_restriction and item.is_enumeration):
+        if not item.is_enumeration:
             self.copy_attributes(common, item, extension)
 
         item.extensions.remove(extension)
@@ -138,7 +139,10 @@ class ClassReducer:
         """
         types = []
         for attr_type in attr.types:
-            common = self.find_common_type(attr_type.name, schema)
+            common = None
+            if not attr_type.native:
+                common = self.find_common_type(attr_type.name, schema)
+
             restrictions = {}
             if common is None or common.is_enumeration:
                 types.append(attr_type)
@@ -148,7 +152,7 @@ class ClassReducer:
                 restrictions = common_attr.restrictions
                 self.copy_inner_classes(common, item)
             else:
-                types.append(AttrType(name=XSDType.STRING.code))
+                types.append(AttrType(name=DataType.STRING.code, native=True))
                 logger.warning(
                     "Missing type implementation: %s", common.type.__name__
                 )
@@ -178,7 +182,7 @@ class ClassReducer:
         return list(reversed(matches))
 
     @staticmethod
-    def copy_attributes(source: Class, target: Class, extension: Extension):
+    def copy_attributes(source: Class, target: Class, extension: AttrType):
         prefix = text.prefix(extension.name)
         target.inner.extend(source.inner)
         position = next(
@@ -193,7 +197,7 @@ class ClassReducer:
             new_attr = attr.clone()
             if prefix:
                 for attr_type in new_attr.types:
-                    if attr_type.name.find(":") == -1:
+                    if not attr_type.native and attr_type.name.find(":") == -1:
                         attr_type.name = f"{prefix}:{attr_type.name}"
 
             target.attrs.insert(position, new_attr)

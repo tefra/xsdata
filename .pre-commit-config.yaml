@@ -5,7 +5,7 @@ repos:
     rev: v1.9.4
     hooks:
       - id: seed-isort-config
-        args: ['--exclude=docs/*']
+        args: ["--exclude=docs/*"]
   - repo: https://github.com/timothycrosley/isort
     rev: 4.3.21
     hooks:
@@ -14,7 +14,7 @@ repos:
     rev: 19.10b0
     hooks:
       - id: black
-        args: ['--line-length=79']
+        args: ["--line-length=79"]
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v2.4.0
     hooks:
@@ -23,19 +23,19 @@ repos:
       - id: end-of-file-fixer
       - id: debug-statements
       - id: pretty-format-json
-        args: ['--autofix', '--indent=4']
+        args: ["--autofix", "--indent=4"]
       - id: fix-encoding-pragma
-        args: ['--remove']
+        args: ["--remove"]
   - repo: git@github.com:humitos/mirrors-autoflake.git
     rev: v1.1
     hooks:
       - id: autoflake
-        args: ['--in-place', '--remove-all-unused-imports', '--remove-unused-variable']
+        args: ["--in-place", "--remove-all-unused-imports", "--remove-unused-variable"]
   - repo: git@github.com:humitos/mirrors-docformatter.git
     rev: v1.0
     hooks:
       - id: docformatter
-        args: ['--in-place', '--pre-summary-newline']
+        args: ["--in-place", "--pre-summary-newline"]
   - repo: https://github.com/pre-commit/mirrors-mypy
     rev: v0.761
     hooks:
@@ -45,3 +45,8 @@ repos:
     rev: v1.6.0
     hooks:
       - id: setup-cfg-fmt
+  - repo: https://github.com/prettier/prettier
+    rev: 1.18.2
+    hooks:
+      - id: prettier
+        args: [--prose-wrap=always, --print-width=88]

@@ -18,10 +18,8 @@ Example 13-10 Attribute extension
    :language: xml
    :lines: 3-
 
-.. warning::
-
-    XML Reference
-
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter13/example13101.py
+   :language: python
 
 Example 13-11 Attribute wildcard extension
 ------------------------------------------

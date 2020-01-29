@@ -19,6 +19,7 @@ class FormType(Enum):
 class DataType(Enum):
     ANY_URI = ("anyURI", str)
     ANY_SIMPLE_TYPE = ("anySimpleType", str)
+    BASE = ("base", str)
     BASE64_BINARY = ("base64Binary", str)
     BOOLEAN = ("boolean", bool)
     BYTE = ("byte", int)
@@ -42,6 +43,7 @@ class DataType(Enum):
     IDREFS = ("IDREFS", str)
     INT = ("int", int)
     INTEGER = ("integer", int)
+    LANG = ("lang", str)
     LANGUAGE = ("language", str)
     LONG = ("long", int)
     NAME = ("Name", str)

@@ -229,9 +229,6 @@ class PythonAbstractGeneratorTests(FactoryTestCase):
         type_bool = AttrTypeFactory.create(
             name=DataType.BOOLEAN.code, native=True
         )
-        type_str = AttrTypeFactory.create(
-            name=DataType.STRING.code, native=True
-        )
 
         attr = AttrFactory.create(name="foo", types=[type_str])
         self.assertEqual(None, generator.attribute_default(attr))

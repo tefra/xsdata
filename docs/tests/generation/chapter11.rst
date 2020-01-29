@@ -8,10 +8,8 @@ Example 11-1 Extensible mixed content
    :language: xml
    :lines: 3-
 
-.. warning::
-
-    XML Reference
-
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter11/example1101.py
+   :language: python
 
 Example 11-3 Illegal duplication of ID attributes (version 1.0)
 ---------------------------------------------------------------

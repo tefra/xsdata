@@ -1,15 +1,17 @@
-from dataclasses import MISSING, dataclass, field, fields, is_dataclass
+from dataclasses import dataclass
+from dataclasses import field
+from dataclasses import fields
+from dataclasses import is_dataclass
+from dataclasses import MISSING
 from enum import Enum
-from typing import (
-    Any,
-    Dict,
-    Iterator,
-    List,
-    Optional,
-    Set,
-    Type,
-    get_type_hints,
-)
+from typing import Any
+from typing import Dict
+from typing import get_type_hints
+from typing import Iterator
+from typing import List
+from typing import Optional
+from typing import Set
+from typing import Type
 
 from xsdata.models.enums import TagType
 

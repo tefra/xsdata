@@ -1,14 +1,13 @@
 from unittest import mock
 
-from tests.factories import (
-    AttrFactory,
-    AttrTypeFactory,
-    ClassFactory,
-    FactoryTestCase,
-    PackageFactory,
-)
+from tests.factories import AttrFactory
+from tests.factories import AttrTypeFactory
+from tests.factories import ClassFactory
+from tests.factories import FactoryTestCase
+from tests.factories import PackageFactory
 from xsdata.generators import PythonAbstractGenerator as generator
-from xsdata.models.enums import DataType, TagType
+from xsdata.models.enums import DataType
+from xsdata.models.enums import TagType
 
 
 class PythonAbstractGeneratorTests(FactoryTestCase):
@@ -61,8 +60,7 @@ class PythonAbstractGeneratorTests(FactoryTestCase):
     @mock.patch.object(generator, "process_enumeration")
     def test_process_enum_class(self, mock_process_enumeration):
         a = ClassFactory.create(
-            name="a",
-            attrs=AttrFactory.list(2, local_type=TagType.ENUMERATION.cname),
+            name="a", attrs=AttrFactory.list(2, local_type=TagType.ENUMERATION.cname)
         )
         generator.process_class(a)
 
@@ -182,9 +180,7 @@ class PythonAbstractGeneratorTests(FactoryTestCase):
         parents = []
         type_foo_bar = AttrTypeFactory.create(name="foo_bar")
 
-        attr = AttrFactory.create(
-            name="foo", default="foo", types=[type_foo_bar]
-        )
+        attr = AttrFactory.create(name="foo", default="foo", types=[type_foo_bar])
 
         actual = generator.attribute_display_type(attr, parents)
         self.assertEqual("FooBar", actual)
@@ -217,18 +213,10 @@ class PythonAbstractGeneratorTests(FactoryTestCase):
         self.assertEqual('List[Union["A.Parent.BossLife", int]]', actual)
 
     def test_attribute_default(self):
-        type_str = AttrTypeFactory.create(
-            name=DataType.STRING.code, native=True
-        )
-        type_int = AttrTypeFactory.create(
-            name=DataType.INTEGER.code, native=True
-        )
-        type_float = AttrTypeFactory.create(
-            name=DataType.FLOAT.code, native=True
-        )
-        type_bool = AttrTypeFactory.create(
-            name=DataType.BOOLEAN.code, native=True
-        )
+        type_str = AttrTypeFactory.create(name=DataType.STRING.code, native=True)
+        type_int = AttrTypeFactory.create(name=DataType.INTEGER.code, native=True)
+        type_float = AttrTypeFactory.create(name=DataType.FLOAT.code, native=True)
+        type_bool = AttrTypeFactory.create(name=DataType.BOOLEAN.code, native=True)
 
         attr = AttrFactory.create(name="foo", types=[type_str])
         self.assertEqual(None, generator.attribute_default(attr))

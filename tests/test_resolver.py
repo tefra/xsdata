@@ -1,13 +1,11 @@
 from collections.abc import Iterator
 from unittest import mock
 
-from tests.factories import (
-    AttrFactory,
-    AttrTypeFactory,
-    ClassFactory,
-    FactoryTestCase,
-    PackageFactory,
-)
+from tests.factories import AttrFactory
+from tests.factories import AttrTypeFactory
+from tests.factories import ClassFactory
+from tests.factories import FactoryTestCase
+from tests.factories import PackageFactory
 from xsdata.models.elements import Schema
 from xsdata.resolver import DependenciesResolver
 
@@ -30,21 +28,15 @@ class DependenciesResolverTest(FactoryTestCase):
         mock_create_class_map.return_value = {"b": classes[0]}
         create_class_list.return_value = classes[::-1]
 
-        self.resolver.imports.append(
-            PackageFactory.create(name="foo", source="bar")
-        )
+        self.resolver.imports.append(PackageFactory.create(name="foo", source="bar"))
         self.resolver.aliases = {"a": "a"}
 
         self.resolver.process(classes, schema, package)
         self.assertEqual([], self.resolver.imports)
         self.assertEqual({}, self.resolver.aliases)
 
-        self.assertEqual(
-            mock_create_class_map.return_value, self.resolver.class_map
-        )
-        self.assertEqual(
-            create_class_list.return_value, self.resolver.class_list
-        )
+        self.assertEqual(mock_create_class_map.return_value, self.resolver.class_map)
+        self.assertEqual(create_class_list.return_value, self.resolver.class_list)
         self.assertEqual(schema, self.resolver.schema)
         self.assertEqual(package, self.resolver.package)
         self.assertEqual(package, self.resolver.package)
@@ -53,8 +45,7 @@ class DependenciesResolverTest(FactoryTestCase):
 
     def test_sorted_imports(self):
         packages = [
-            PackageFactory.create(name=x, alias=None, source="foo")
-            for x in "cab"
+            PackageFactory.create(name=x, alias=None, source="foo") for x in "cab"
         ]
         self.resolver.imports = packages
 
@@ -71,9 +62,7 @@ class DependenciesResolverTest(FactoryTestCase):
         mock_apply_aliases.side_effect = lambda x: x
 
         self.resolver.class_list = ["a", "b", "c", "d"]
-        self.resolver.class_map = {
-            x: ClassFactory.create(name=x) for x in "ca"
-        }
+        self.resolver.class_map = {x: ClassFactory.create(name=x) for x in "ca"}
 
         result = self.resolver.sorted_classes()
         self.assertIsInstance(result, Iterator)
@@ -105,7 +94,7 @@ class DependenciesResolverTest(FactoryTestCase):
                         AttrFactory.create(name="c", types=[type_c]),
                         AttrFactory.create(name="d", types=[type_d]),
                     ],
-                ),
+                )
             ],
         )
 
@@ -170,9 +159,7 @@ class DependenciesResolverTest(FactoryTestCase):
         self.assertEqual({"bar": "bar"}, self.resolver.aliases)
 
     def test_add_package(self):
-        self.resolver.schema = Schema.create(
-            target_namespace="http://foobar/common"
-        )
+        self.resolver.schema = Schema.create(target_namespace="http://foobar/common")
         self.resolver.package = "common.foo"
         self.resolver.add_package(ClassFactory.create(name="foobar"))
         self.resolver.add_package(ClassFactory.create(name="none"))
@@ -198,9 +185,7 @@ class DependenciesResolverTest(FactoryTestCase):
             }
         )
 
-        self.assertEqual(
-            "foo.bar", self.resolver.find_package("common", "foobar")
-        )
+        self.assertEqual("foo.bar", self.resolver.find_package("common", "foobar"))
         with self.assertRaises(KeyError):
             self.resolver.find_package("other", "something")
 
@@ -217,11 +202,7 @@ class DependenciesResolverTest(FactoryTestCase):
     @mock.patch.object(DependenciesResolver, "collect_deps")
     def test_create_class_list(self, mock_collect_deps):
         classes = ClassFactory.list(3)
-        mock_collect_deps.side_effect = [
-            {"class_C", "b"},
-            {"c", "d"},
-            {"e", "d"},
-        ]
+        mock_collect_deps.side_effect = [{"class_C", "b"}, {"c", "d"}, {"e", "d"}]
 
         self.resolver.schema = Schema.create(
             nsmap={"bks": "urn:books"}, target_namespace="urn:books"
@@ -229,9 +210,7 @@ class DependenciesResolverTest(FactoryTestCase):
         actual = self.resolver.create_class_list(classes)
         expected = ["b", "c", "d", "e", "class_C", "class_D", "class_B"]
         self.assertEqual(expected, actual)
-        mock_collect_deps.assert_has_calls(
-            [mock.call(obj, "bks") for obj in classes]
-        )
+        mock_collect_deps.assert_has_calls([mock.call(obj, "bks") for obj in classes])
 
     def test_collect_deps(self):
         obj = ClassFactory.create(
@@ -241,9 +220,7 @@ class DependenciesResolverTest(FactoryTestCase):
                 ),
                 AttrFactory.create(
                     types=[
-                        AttrTypeFactory.create(
-                            name="xs:annotated", forward_ref=True
-                        )
+                        AttrTypeFactory.create(name="xs:annotated", forward_ref=True)
                     ]
                 ),
                 AttrFactory.create(
@@ -256,9 +233,7 @@ class DependenciesResolverTest(FactoryTestCase):
             extensions=[AttrTypeFactory.create(name="xs:localElement")],
             inner=[
                 ClassFactory.create(
-                    attrs=AttrFactory.list(
-                        2, types=AttrTypeFactory.list(1, name="foo")
-                    )
+                    attrs=AttrFactory.list(2, types=AttrTypeFactory.list(1, name="foo"))
                 )
             ],
         )

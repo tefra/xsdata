@@ -1,10 +1,15 @@
 from collections import defaultdict
 from pathlib import Path
-from typing import DefaultDict, Dict, Iterator, List, Tuple
+from typing import DefaultDict
+from typing import Dict
+from typing import Iterator
+from typing import List
+from typing import Tuple
 
 from xsdata.formats.dataclass.filters import filters
 from xsdata.generators import PythonAbstractGenerator
-from xsdata.models.codegen import Class, Package
+from xsdata.models.codegen import Class
+from xsdata.models.codegen import Package
 from xsdata.models.elements import Schema
 from xsdata.utils.text import snake_case
 
@@ -16,9 +21,7 @@ class DataclassGenerator(PythonAbstractGenerator):
         super(DataclassGenerator, self).__init__()
         self.env.filters.update(filters)
 
-    def render_module(
-        self, output: str, imports: Dict[str, List[Package]]
-    ) -> str:
+    def render_module(self, output: str, imports: Dict[str, List[Package]]) -> str:
         return self.template("module").render(output=output, imports=imports)
 
     def render_class(self, obj: Class) -> str:
@@ -46,9 +49,7 @@ class DataclassGenerator(PythonAbstractGenerator):
     def render_classes(self) -> str:
         """Get a list of sorted classes from the imports resolver, apply the
         python code conventions and return the rendered output."""
-        output = "\n".join(
-            map(self.render_class, self.prepare_classes())
-        ).strip()
+        output = "\n".join(map(self.render_class, self.prepare_classes())).strip()
         return f"\n\n{output}\n"
 
     def prepare_classes(self):

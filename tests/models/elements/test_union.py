@@ -1,14 +1,12 @@
 from unittest import TestCase
 
-from xsdata.models.elements import (
-    MaxExclusive,
-    MinExclusive,
-    MinInclusive,
-    MinLength,
-    Restriction,
-    SimpleType,
-    Union,
-)
+from xsdata.models.elements import MaxExclusive
+from xsdata.models.elements import MinExclusive
+from xsdata.models.elements import MinInclusive
+from xsdata.models.elements import MinLength
+from xsdata.models.elements import Restriction
+from xsdata.models.elements import SimpleType
+from xsdata.models.elements import Union
 
 
 class UnionTests(TestCase):

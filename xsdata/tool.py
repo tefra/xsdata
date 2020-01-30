@@ -1,10 +1,14 @@
-from dataclasses import dataclass, field
+from dataclasses import dataclass
+from dataclasses import field
 from pathlib import Path
-from typing import List, Optional, Union
+from typing import List
+from typing import Optional
+from typing import Union
 
 from xsdata.builder import ClassBuilder
 from xsdata.logger import logger
-from xsdata.models.elements import Import, Include
+from xsdata.models.elements import Import
+from xsdata.models.elements import Include
 from xsdata.models.enums import Namespace
 from xsdata.parser import SchemaParser
 from xsdata.reducer import reducer
@@ -18,9 +22,7 @@ class ProcessTask:
     renderer: str
     processed: List[Path] = field(init=False, default_factory=list)
 
-    def process(
-        self, xsd: Path, package: str, target_namespace: Optional[str] = None
-    ):
+    def process(self, xsd: Path, package: str, target_namespace: Optional[str] = None):
         if xsd in self.processed:
             logger.debug("Circular import skipping: %s", xsd.name)
             return
@@ -35,9 +37,7 @@ class ProcessTask:
                     target_namespace=schema.target_namespace,
                 )
 
-        logger.info(
-            "Schema: %s, elements: %d", xsd.relative_to(Path.cwd()), schema.num
-        )
+        logger.info("Schema: %s, elements: %d", xsd.relative_to(Path.cwd()), schema.num)
 
         classes = ClassBuilder(schema=schema).build()
         logger.info("Class candidates: %d", len(classes))
@@ -47,18 +47,12 @@ class ProcessTask:
 
         callback = writer.print if self.print else writer.write
         callback(
-            schema=schema,
-            classes=classes,
-            package=package,
-            renderer=self.renderer,
+            schema=schema, classes=classes, package=package, renderer=self.renderer
         )
 
     @staticmethod
     def is_valid(schema: Union[Import, Include]) -> bool:
-        return (
-            schema.namespace != Namespace.XML
-            and schema.schema_location is not None
-        )
+        return schema.namespace != Namespace.XML and schema.schema_location is not None
 
     @staticmethod
     def resolve_schema(xsd: Path, schema: Union[Import, Include]) -> Path:

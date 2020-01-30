@@ -1,36 +1,26 @@
 exclude: tests/fixtures|docs/examples
 
 repos:
-  - repo: https://github.com/asottile/seed-isort-config
-    rev: v1.9.4
+  - repo: https://github.com/asottile/reorder_python_imports
+    rev: v1.9.0
     hooks:
-      - id: seed-isort-config
-        args: ["--exclude=docs/*"]
-  - repo: https://github.com/timothycrosley/isort
-    rev: 4.3.21
-    hooks:
-      - id: isort
+      - id: reorder-python-imports
   - repo: https://github.com/ambv/black
     rev: 19.10b0
     hooks:
       - id: black
-        args: ["--line-length=79"]
+  - repo: https://gitlab.com/pycqa/flake8
+    rev: 3.7.7
+    hooks:
+      - id: flake8
+        additional_dependencies: [flake8-bugbear]
+
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v2.4.0
     hooks:
-      - id: flake8
       - id: trailing-whitespace
       - id: end-of-file-fixer
       - id: debug-statements
-      - id: pretty-format-json
-        args: ["--autofix", "--indent=4"]
-      - id: fix-encoding-pragma
-        args: ["--remove"]
-  - repo: git@github.com:humitos/mirrors-autoflake.git
-    rev: v1.1
-    hooks:
-      - id: autoflake
-        args: ["--in-place", "--remove-all-unused-imports", "--remove-unused-variable"]
   - repo: git@github.com:humitos/mirrors-docformatter.git
     rev: v1.0
     hooks:

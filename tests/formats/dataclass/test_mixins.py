@@ -1,8 +1,11 @@
 from typing import Iterator
 from unittest import TestCase
 
-from tests.fixtures.books import BookForm, Books
-from xsdata.formats.dataclass.mixins import Field, ModelInspect, NodeType
+from tests.fixtures.books import BookForm
+from tests.fixtures.books import Books
+from xsdata.formats.dataclass.mixins import Field
+from xsdata.formats.dataclass.mixins import ModelInspect
+from xsdata.formats.dataclass.mixins import NodeType
 
 
 class ModelInspectTests(TestCase):
@@ -59,12 +62,7 @@ class ModelInspectTests(TestCase):
                 namespace="",
                 node_type=NodeType.ELEMENT,
             ),
-            Field(
-                name="id",
-                local_name="id",
-                type=str,
-                node_type=NodeType.ATTRIBUTE,
-            ),
+            Field(name="id", local_name="id", type=str, node_type=NodeType.ATTRIBUTE),
         ]
 
         self.assertEqual(expected, list(result))

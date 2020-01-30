@@ -1,5 +1,7 @@
 from pathlib import Path
-from typing import Iterator, List, Tuple
+from typing import Iterator
+from typing import List
+from typing import Tuple
 
 from xsdata.generators import AbstractGenerator
 from xsdata.models.codegen import Class

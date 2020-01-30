@@ -1,26 +1,33 @@
-from dataclasses import dataclass, field
-from typing import Iterator, List, Optional, Union
+from dataclasses import dataclass
+from dataclasses import field
+from typing import Iterator
+from typing import List
+from typing import Optional
+from typing import Union
 
 from xsdata.logger import logger
-from xsdata.models.codegen import Attr, AttrType, Class
-from xsdata.models.elements import (
-    Attribute,
-    AttributeGroup,
-    ComplexType,
-    Element,
-    Enumeration,
-    Group,
-)
+from xsdata.models.codegen import Attr
+from xsdata.models.codegen import AttrType
+from xsdata.models.codegen import Class
+from xsdata.models.elements import Attribute
+from xsdata.models.elements import AttributeGroup
+from xsdata.models.elements import ComplexType
+from xsdata.models.elements import Element
+from xsdata.models.elements import Enumeration
+from xsdata.models.elements import Group
 from xsdata.models.elements import List as ListElement
-from xsdata.models.elements import Restriction, Schema, SimpleType
+from xsdata.models.elements import Restriction
+from xsdata.models.elements import Schema
+from xsdata.models.elements import SimpleType
 from xsdata.models.elements import Union as UnionElement
-from xsdata.models.enums import DataType, Namespace, TagType
-from xsdata.models.mixins import ElementBase, NamedField
+from xsdata.models.enums import DataType
+from xsdata.models.enums import Namespace
+from xsdata.models.enums import TagType
+from xsdata.models.mixins import ElementBase
+from xsdata.models.mixins import NamedField
 from xsdata.utils import text
 
-BaseElement = Union[
-    Attribute, AttributeGroup, Element, ComplexType, SimpleType, Group
-]
+BaseElement = Union[Attribute, AttributeGroup, Element, ComplexType, SimpleType, Group]
 AttributeElement = Union[
     Attribute, Element, Restriction, Enumeration, UnionElement, ListElement
 ]
@@ -75,11 +82,7 @@ class ClassBuilder:
     def build_class_extensions(self, obj: ElementBase) -> List[AttrType]:
         """Return a sorted, filtered list of extensions."""
         return sorted(
-            list(
-                {
-                    ext.name: ext for ext in self.element_extensions(obj)
-                }.values()
-            ),
+            list({ext.name: ext for ext in self.element_extensions(obj)}.values()),
             key=lambda x: x.name,
         )
 
@@ -90,15 +93,12 @@ class ClassBuilder:
         native = False
 
         if prefix and (
-            prefix == "xml"
-            or self.schema.nsmap.get(prefix) == Namespace.SCHEMA
+            prefix == "xml" or self.schema.nsmap.get(prefix) == Namespace.SCHEMA
         ):
             name = suffix
             native = True
 
-        return AttrType(
-            name=name, index=index, native=native, forward_ref=forward_ref
-        )
+        return AttrType(name=name, index=index, native=native, forward_ref=forward_ref)
 
     def element_children(self, obj: ElementBase) -> Iterator[AttributeElement]:
         """Recursively find and return all child elements that are qualified to
@@ -141,7 +141,7 @@ class ClassBuilder:
         """
 
         if include_current and getattr(obj, "type", None):
-            name = getattr(obj, "type")
+            name = getattr(obj, "type", None)
             yield self.build_data_type(name, index=0)
 
         for child in obj.children():
@@ -193,9 +193,7 @@ class ClassBuilder:
         if len(types) == 0:
             types.append(AttrType(name=DataType.STRING.code, native=True))
             logger.warning(
-                "Default type string for attribute %s.%s",
-                parent.name,
-                obj.real_name,
+                "Default type string for attribute %s.%s", parent.name, obj.real_name
             )
 
         return types

@@ -1,15 +1,17 @@
 import random
 import unittest
-from abc import ABC, abstractmethod
+from abc import ABC
+from abc import abstractmethod
 
-from xsdata.models.codegen import Attr, AttrType, Class, Package
-from xsdata.models.elements import (
-    Attribute,
-    ComplexType,
-    Element,
-    Restriction,
-    SimpleType,
-)
+from xsdata.models.codegen import Attr
+from xsdata.models.codegen import AttrType
+from xsdata.models.codegen import Class
+from xsdata.models.codegen import Package
+from xsdata.models.elements import Attribute
+from xsdata.models.elements import ComplexType
+from xsdata.models.elements import Element
+from xsdata.models.elements import Restriction
+from xsdata.models.elements import SimpleType
 
 
 class FactoryTestCase(unittest.TestCase):
@@ -32,9 +34,9 @@ class Factory(ABC):
         cls.counter = 65
 
     @classmethod
-    def next(self):
-        self.counter += 1
-        return chr(self.counter)
+    def next_letter(cls):
+        cls.counter += 1
+        return chr(cls.counter)
 
     @classmethod
     def list(cls, number: int, **kwargs):
@@ -60,7 +62,7 @@ class ClassFactory(Factory):
     ):
 
         return cls.model(
-            name=name or f"class_{cls.next()}",
+            name=name or f"class_{cls.next_letter()}",
             namespace=namespace,
             is_abstract=is_abstract,
             type=type or random.choice(cls.types),
@@ -76,12 +78,10 @@ class AttrTypeFactory(Factory):
     counter = 65
 
     @classmethod
-    def create(
-        cls, name=None, index=None, alias=None, native=False, forward_ref=False
-    ):
+    def create(cls, name=None, index=None, alias=None, native=False, forward_ref=False):
 
         return cls.model(
-            name=name or f"attr_{cls.next()}",
+            name=name or f"attr_{cls.next_letter()}",
             index=index or 0,
             alias=alias,
             native=native,
@@ -108,7 +108,7 @@ class AttrFactory(Factory):
     ):
 
         return cls.model(
-            name=name or f"attr_{cls.next()}",
+            name=name or f"attr_{cls.next_letter()}",
             index=cls.counter if index is None else index,
             types=types or AttrTypeFactory.list(1, name="string", native=True),
             local_type=local_type or random.choice(cls.types).__name__,
@@ -124,12 +124,10 @@ class PackageFactory(Factory):
     counter = 65
 
     @classmethod
-    def create(
-        cls, name=None, source=None, alias=None,
-    ):
+    def create(cls, name=None, source=None, alias=None):
 
         return cls.model(
-            name=name or f"package_{cls.next()}",
+            name=name or f"package_{cls.next_letter()}",
             source=source or "target",
             alias=alias or None,
         )

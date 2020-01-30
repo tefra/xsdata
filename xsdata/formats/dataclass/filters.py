@@ -26,9 +26,7 @@ def docstring(obj: Class, enum=False):
         description = attr.help.strip() if attr.help else ""
         lines.append(f":{var_type} {attr.name}: {description}".strip())
 
-    return (
-        format_code('"""\n{}\n"""'.format("\n".join(lines))) if lines else ""
-    )
+    return format_code('"""\n{}\n"""'.format("\n".join(lines))) if lines else ""
 
 
 def lib_imports(output: str):
@@ -60,8 +58,4 @@ def has_quotes(string: str):
     return False
 
 
-filters = {
-    "arguments": arguments,
-    "docstring": docstring,
-    "lib_imports": lib_imports,
-}
+filters = {"arguments": arguments, "docstring": docstring, "lib_imports": lib_imports}

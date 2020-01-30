@@ -1,10 +1,12 @@
 import inspect
 from typing import Type
-from unittest import TestCase, mock
+from unittest import mock
+from unittest import TestCase
 from unittest.mock import PropertyMock
 
 from xsdata.models import elements as el
-from xsdata.models.mixins import ElementBase, OccurrencesMixin
+from xsdata.models.mixins import ElementBase
+from xsdata.models.mixins import OccurrencesMixin
 
 
 def get_subclasses(clazz: Type):
@@ -25,14 +27,7 @@ class OccurrencesMixinTests(TestCase):
         self.subclasses = [c for _, c in get_subclasses(OccurrencesMixin)]
 
     def test_subclasses(self):
-        expected = [
-            el.All,
-            el.Any,
-            el.Choice,
-            el.Element,
-            el.Group,
-            el.Sequence,
-        ]
+        expected = [el.All, el.Any, el.Choice, el.Element, el.Group, el.Sequence]
         self.assertEqual(expected, self.subclasses)
 
     def test_get_restrictions(self):

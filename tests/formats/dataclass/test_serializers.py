@@ -1,11 +1,10 @@
 from unittest.case import TestCase
 
-from tests.fixtures.books import BookForm, Books
-from xsdata.formats.dataclass.serializers import (
-    DictFactory,
-    DictSerializer,
-    XmlSerializer,
-)
+from tests.fixtures.books import BookForm
+from tests.fixtures.books import Books
+from xsdata.formats.dataclass.serializers import DictFactory
+from xsdata.formats.dataclass.serializers import DictSerializer
+from xsdata.formats.dataclass.serializers import XmlSerializer
 from xsdata.models.enums import TagType
 
 
@@ -112,9 +111,7 @@ class XmlSerializerTests(TestCase):
     def test_render_no_dataclass(self):
         with self.assertRaises(TypeError) as cm:
             XmlSerializer().render(self)
-        self.assertEqual(
-            f"Object {self} is not a dataclass.", str(cm.exception)
-        )
+        self.assertEqual(f"Object {self} is not a dataclass.", str(cm.exception))
 
     def test_render_value(self):
         self.assertEqual("1", XmlSerializer.render_value(1))

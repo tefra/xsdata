@@ -1,6 +1,8 @@
 from pathlib import Path
 
-from tests.factories import AttrFactory, ClassFactory, FactoryTestCase
+from tests.factories import AttrFactory
+from tests.factories import ClassFactory
+from tests.factories import FactoryTestCase
 from xsdata.formats.plantuml.generator import PlantUmlGenerator
 from xsdata.models.elements import Schema
 
@@ -22,8 +24,7 @@ class PlantUmlGeneratorTests(FactoryTestCase):
         self.assertIsInstance(actual[0][0], Path)
         self.assertTrue(actual[0][0].is_absolute())
         self.assertEqual(
-            "some/Foo/Some/ThugLife/foo.pu",
-            str(actual[0][0].relative_to(Path.cwd())),
+            "some/Foo/Some/ThugLife/foo.pu", str(actual[0][0].relative_to(Path.cwd()))
         )
 
         output = """@startuml

@@ -91,7 +91,7 @@ class AddSvc:
     :ivar svc_description: 1P - SVC fee description
     :ivar origin: Origin location - Airport code. If this value not provided, the last air segment arrival location is taken as default. 1P only.
     :ivar destination: Destination location - Airport code.
-    :ivar start_date: The start date of the SVC segment. If the value not specified, the default value is set as the date next to the last airsegment arrival date. 1P only
+    :ivar start_date: The start date of the SVC segment. If the value not specified, the default value is set as the date next_letter to the last airsegment arrival date. 1P only
     """
     class Meta:
         namespace = "http://www.travelport.com/schema/common_v48_0"

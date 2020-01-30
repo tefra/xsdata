@@ -1,6 +1,9 @@
 from unittest import TestCase
 
-from xsdata.utils.text import capitalize, pascal_case, snake_case, strip_prefix
+from xsdata.utils.text import capitalize
+from xsdata.utils.text import pascal_case
+from xsdata.utils.text import snake_case
+from xsdata.utils.text import strip_prefix
 
 
 class TextTests(TestCase):

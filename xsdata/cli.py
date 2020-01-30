@@ -10,9 +10,7 @@ from xsdata.writer import writer
 
 @click.command("generate")
 @click.argument("XSD-Path", type=click.Path(exists=True), required=True)
-@click.option(
-    "--package", required=True, help="Target Package",
-)
+@click.option("--package", required=True, help="Target Package")
 @click.option(
     "--renderer",
     type=click.Choice(writer.formats),
@@ -20,10 +18,7 @@ from xsdata.writer import writer
     default="pydata",
 )
 @click.option(
-    "--print",
-    is_flag=True,
-    default=False,
-    help="Preview the resulting classes.",
+    "--print", is_flag=True, default=False, help="Preview the resulting classes."
 )
 @click_log.simple_verbosity_option(logger)
 def cli(xsd_path: str, package: str, renderer: str, print: bool):

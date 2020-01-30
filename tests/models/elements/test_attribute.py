@@ -1,6 +1,9 @@
 from unittest import TestCase
 
-from xsdata.models.elements import Attribute, Length, Restriction, SimpleType
+from xsdata.models.elements import Attribute
+from xsdata.models.elements import Length
+from xsdata.models.elements import Restriction
+from xsdata.models.elements import SimpleType
 from xsdata.models.enums import UseType
 
 

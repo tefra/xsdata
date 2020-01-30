@@ -1,21 +1,19 @@
 from unittest import TestCase
 
-from xsdata.models.elements import (
-    Enumeration,
-    FractionDigits,
-    Group,
-    Length,
-    MaxExclusive,
-    MaxInclusive,
-    MaxLength,
-    MinExclusive,
-    MinInclusive,
-    MinLength,
-    Pattern,
-    Restriction,
-    TotalDigits,
-    WhiteSpace,
-)
+from xsdata.models.elements import Enumeration
+from xsdata.models.elements import FractionDigits
+from xsdata.models.elements import Group
+from xsdata.models.elements import Length
+from xsdata.models.elements import MaxExclusive
+from xsdata.models.elements import MaxInclusive
+from xsdata.models.elements import MaxLength
+from xsdata.models.elements import MinExclusive
+from xsdata.models.elements import MinInclusive
+from xsdata.models.elements import MinLength
+from xsdata.models.elements import Pattern
+from xsdata.models.elements import Restriction
+from xsdata.models.elements import TotalDigits
+from xsdata.models.elements import WhiteSpace
 
 
 class RestrictionTests(TestCase):

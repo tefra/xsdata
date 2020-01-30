@@ -1,30 +1,30 @@
 from types import GeneratorType
-from unittest.mock import PropertyMock, call, patch
+from unittest.mock import call
+from unittest.mock import patch
+from unittest.mock import PropertyMock
 
-from tests.factories import (
-    AttrFactory,
-    AttrTypeFactory,
-    ClassFactory,
-    FactoryTestCase,
-)
+from tests.factories import AttrFactory
+from tests.factories import AttrTypeFactory
+from tests.factories import ClassFactory
+from tests.factories import FactoryTestCase
 from xsdata.builder import ClassBuilder
-from xsdata.models.elements import (
-    Attribute,
-    AttributeGroup,
-    ComplexContent,
-    ComplexType,
-    Element,
-    Enumeration,
-    Extension,
-    Group,
-    Restriction,
-    Schema,
-    Sequence,
-    SimpleContent,
-    SimpleType,
-    Union,
-)
-from xsdata.models.enums import DataType, FormType, TagType
+from xsdata.models.elements import Attribute
+from xsdata.models.elements import AttributeGroup
+from xsdata.models.elements import ComplexContent
+from xsdata.models.elements import ComplexType
+from xsdata.models.elements import Element
+from xsdata.models.elements import Enumeration
+from xsdata.models.elements import Extension
+from xsdata.models.elements import Group
+from xsdata.models.elements import Restriction
+from xsdata.models.elements import Schema
+from xsdata.models.elements import Sequence
+from xsdata.models.elements import SimpleContent
+from xsdata.models.elements import SimpleType
+from xsdata.models.elements import Union
+from xsdata.models.enums import DataType
+from xsdata.models.enums import FormType
+from xsdata.models.enums import TagType
 
 
 class ClassBuilderTests(FactoryTestCase):
@@ -171,12 +171,8 @@ class ClassBuilderTests(FactoryTestCase):
     def test_element_children(self):
         complex_type = ComplexType.create(
             attributes=[Attribute.create() for i in range(2)],
-            sequence=Sequence.create(
-                elements=[Element.create() for i in range(2)]
-            ),
-            simple_content=SimpleContent.create(
-                restriction=Restriction.create()
-            ),
+            sequence=Sequence.create(elements=[Element.create() for i in range(2)]),
+            simple_content=SimpleContent.create(restriction=Restriction.create()),
             complex_content=ComplexContent.create(
                 restriction=Restriction.create(
                     enumerations=[Enumeration.create(value=x) for x in "abc"]
@@ -276,16 +272,12 @@ class ClassBuilderTests(FactoryTestCase):
             **mock_get_restrictions.return_value,
         )
         self.assertEqual(expected, item.attrs[0])
-        mock_build_class_attribute_types.assert_called_once_with(
-            item, attribute
-        )
+        mock_build_class_attribute_types.assert_called_once_with(item, attribute)
         mock_element_namespace.assert_called_once_with(attribute)
 
     @patch.object(Attribute, "real_type", new_callable=PropertyMock)
     @patch.object(ClassBuilder, "build_inner_class")
-    def test_build_class_attribute_types(
-        self, mock_build_inner_class, mock_real_type
-    ):
+    def test_build_class_attribute_types(self, mock_build_inner_class, mock_real_type):
         mock_real_type.return_value = " xs:int  xs:str "
         mock_build_inner_class.return_value = None
 
@@ -334,9 +326,7 @@ class ClassBuilderTests(FactoryTestCase):
         item = ClassFactory.create()
         attribute = Attribute.create(default="false", index=66, name="attr")
         actual = self.builder.build_class_attribute_types(item, attribute)
-        expected = [
-            AttrTypeFactory.create(name="string", native=True),
-        ]
+        expected = [AttrTypeFactory.create(name="string", native=True)]
 
         self.assertEqual(expected, actual)
         mock_warning.assert_called_once_with(
@@ -346,7 +336,7 @@ class ClassBuilderTests(FactoryTestCase):
     @patch.object(ClassBuilder, "build_class")
     @patch.object(ClassBuilder, "has_anonymous_class")
     def test_build_inner_class_when_has_anonymous_class(
-        self, mock_has_anonymous_class, mock_build_class,
+        self, mock_has_anonymous_class, mock_build_class
     ):
         inner_class = ClassFactory.create()
         mock_build_class.return_value = inner_class
@@ -363,10 +353,7 @@ class ClassBuilderTests(FactoryTestCase):
     @patch.object(ClassBuilder, "has_anonymous_enumeration")
     @patch.object(ClassBuilder, "has_anonymous_class")
     def test_build_inner_class_when_has_anonymous_enumeration(
-        self,
-        mock_has_anonymous_class,
-        mock_has_anonymous_enumeration,
-        mock_build_class,
+        self, mock_has_anonymous_class, mock_has_anonymous_enumeration, mock_build_class
     ):
         inner_class = ClassFactory.create()
         mock_build_class.return_value = inner_class
@@ -374,9 +361,7 @@ class ClassBuilderTests(FactoryTestCase):
         mock_has_anonymous_enumeration.return_value = True
 
         simple_type = SimpleType.create()
-        element = Element.create(
-            name="foo", simple_type=simple_type, type="xs:int"
-        )
+        element = Element.create(name="foo", simple_type=simple_type, type="xs:int")
 
         self.assertEqual(inner_class, self.builder.build_inner_class(element))
         self.assertIsNone(element.simple_type)
@@ -387,10 +372,7 @@ class ClassBuilderTests(FactoryTestCase):
     @patch.object(ClassBuilder, "has_anonymous_enumeration")
     @patch.object(ClassBuilder, "has_anonymous_class")
     def test_build_inner_class_when_union_has_anonymous_enumeration(
-        self,
-        mock_has_anonymous_class,
-        mock_has_anonymous_enumeration,
-        mock_build_class,
+        self, mock_has_anonymous_class, mock_has_anonymous_enumeration, mock_build_class
     ):
         inner_class = ClassFactory.create()
         mock_build_class.return_value = inner_class
@@ -399,14 +381,10 @@ class ClassBuilderTests(FactoryTestCase):
 
         union = Union.create(name="foo", type="xs:int")
         simple_type_a = SimpleType.create(
-            restriction=Restriction.create(
-                enumerations=[Enumeration.create(value="a")]
-            )
+            restriction=Restriction.create(enumerations=[Enumeration.create(value="a")])
         )
         simple_type_b = SimpleType.create(
-            restriction=Restriction.create(
-                enumerations=[Enumeration.create(value="b")]
-            )
+            restriction=Restriction.create(enumerations=[Enumeration.create(value="b")])
         )
         union.simple_types = [simple_type_a, simple_type_b]
 
@@ -438,9 +416,7 @@ class ClassBuilderTests(FactoryTestCase):
             obj.simple_type.restriction = Restriction.create()
             self.assertFalse(self.builder.has_anonymous_enumeration(obj))
 
-            obj.simple_type.restriction.enumerations.append(
-                Enumeration.create()
-            )
+            obj.simple_type.restriction.enumerations.append(Enumeration.create())
             self.assertTrue(self.builder.has_anonymous_enumeration(obj))
 
             obj.type = "foo"
@@ -453,9 +429,7 @@ class ClassBuilderTests(FactoryTestCase):
             name="value",
             index=0,
             local_type=TagType.EXTENSION.cname,
-            types=[
-                AttrTypeFactory.create(name=DataType.STRING.code, native=True)
-            ],
+            types=[AttrTypeFactory.create(name=DataType.STRING.code, native=True)],
         )
 
         self.assertEqual(expected, ClassBuilder.default_class_attribute(item))
@@ -464,9 +438,7 @@ class ClassBuilderTests(FactoryTestCase):
         self.assertIsNone(ClassBuilder.default_class_attribute(item))
 
         type_int = AttrTypeFactory.create(name=DataType.INT.code, native=True)
-        type_bool = AttrTypeFactory.create(
-            name=DataType.BOOLEAN.code, native=True
-        )
+        type_bool = AttrTypeFactory.create(name=DataType.BOOLEAN.code, native=True)
         item = ClassFactory.create(extensions=[type_int, type_bool])
         expected = AttrFactory.create(
             name="value",

@@ -1,11 +1,18 @@
 import json
 from dataclasses import dataclass
 from io import BytesIO
-from typing import Any, Dict, List, Optional, Type
+from typing import Any
+from typing import Dict
+from typing import List
+from typing import Optional
+from typing import Type
 
-from lxml.etree import Element, QName, iterparse
+from lxml.etree import Element
+from lxml.etree import iterparse
+from lxml.etree import QName
 
-from xsdata.formats.dataclass.mixins import Field, ModelInspect
+from xsdata.formats.dataclass.mixins import Field
+from xsdata.formats.dataclass.mixins import ModelInspect
 from xsdata.formats.mixins import AbstractParser
 from xsdata.models.enums import EventType
 
@@ -41,9 +48,7 @@ class JsonParser(AbstractParser, ModelInspect):
                 )
             else:
                 params[field.name] = (
-                    list(map(field.type, value))
-                    if field.is_list
-                    else field.type(value)
+                    list(map(field.type, value)) if field.is_list else field.type(value)
                 )
         try:
             return model(**params)
@@ -92,13 +97,13 @@ class XmlParser(AbstractParser, ModelInspect):
         return obj
 
     def find_field(
-        self, queue: List[Dict], namespace: Optional[str], element: Element,
+        self, queue: List[Dict], namespace: Optional[str], element: Element
     ) -> Field:
         """
         Find the current field from the fields queue.
 
-        If the next field is also a dataclass append its fields map to
-        the queue for the next event
+        If the next_letter field is also a dataclass append its fields
+        map to the queue for the next_letter event
         """
         field = queue[-1][element.tag]
         if field.is_dataclass:
@@ -127,9 +132,7 @@ class XmlParser(AbstractParser, ModelInspect):
             if field.is_text and element.text:
                 params[field.name] = self.parse_value(field.type, element.text)
             elif qname in element.attrib:
-                params[field.name] = self.parse_value(
-                    field.type, element.attrib[qname]
-                )
+                params[field.name] = self.parse_value(field.type, element.attrib[qname])
 
         return clazz(**params)
 

@@ -1,9 +1,12 @@
 import json
 from unittest.case import TestCase
 
-from tests.fixtures.books import BookForm, Books
-from xsdata.formats.dataclass.mixins import Field, NodeType
-from xsdata.formats.dataclass.parsers import JsonParser, XmlParser
+from tests.fixtures.books import BookForm
+from tests.fixtures.books import Books
+from xsdata.formats.dataclass.mixins import Field
+from xsdata.formats.dataclass.mixins import NodeType
+from xsdata.formats.dataclass.parsers import JsonParser
+from xsdata.formats.dataclass.parsers import XmlParser
 
 
 class DictParserTests(TestCase):
@@ -66,9 +69,7 @@ class DictParserTests(TestCase):
     def test_parse_value(self):
         data = dict(foo="bar", bar="foo")
 
-        foo_field = Field(
-            name="", local_name="foo", type=str, node_type=NodeType.TEXT
-        )
+        foo_field = Field(name="", local_name="foo", type=str, node_type=NodeType.TEXT)
         bar_field = Field(
             name="",
             local_name="bar",

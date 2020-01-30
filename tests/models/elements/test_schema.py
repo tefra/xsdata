@@ -1,7 +1,9 @@
 from typing import Iterator
 from unittest import TestCase
 
-from xsdata.models.elements import Import, Include, Schema
+from xsdata.models.elements import Import
+from xsdata.models.elements import Include
+from xsdata.models.elements import Schema
 
 
 class SchemaTests(TestCase):

@@ -2,7 +2,9 @@ import os
 from collections import defaultdict
 from dataclasses import dataclass
 from pathlib import Path
-from typing import DefaultDict, Dict, List
+from typing import DefaultDict
+from typing import Dict
+from typing import List
 
 import pytest
 from click.testing import CliRunner
@@ -43,9 +45,7 @@ def test_generation(fixture: Path):
     should_fail = is_illegal_definition(source)
     skip_message = parse_skip_message(source)
 
-    result = runner.invoke(
-        cli, [str(fixture), f"--package=tests.fixtures.{package}"]
-    )
+    result = runner.invoke(cli, [str(fixture), f"--package=tests.fixtures.{package}"])
 
     if skip_message:
         skipped[skip_message] += 1

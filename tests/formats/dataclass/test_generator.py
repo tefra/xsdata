@@ -1,7 +1,9 @@
 from pathlib import Path
 from unittest import mock
 
-from tests.factories import ClassFactory, FactoryTestCase, PackageFactory
+from tests.factories import ClassFactory
+from tests.factories import FactoryTestCase
+from tests.factories import PackageFactory
 from xsdata.formats.dataclass.generator import DataclassGenerator
 from xsdata.models.elements import Schema
 from xsdata.resolver import DependenciesResolver
@@ -37,15 +39,12 @@ class DataclassGeneratorTests(FactoryTestCase):
         self.assertIsInstance(actual[0][0], Path)
         self.assertTrue(actual[0][0].is_absolute())
         self.assertEqual(
-            "some/foo/some/thug_life/foo.py",
-            str(actual[0][0].relative_to(Path.cwd())),
+            "some/foo/some/thug_life/foo.py", str(actual[0][0].relative_to(Path.cwd()))
         )
         self.assertEqual(mock_render_module.return_value, actual[0][1])
 
         mock_resolved_process.assert_called_once_with(
-            classes=classes,
-            schema=schema,
-            package="some.foo.some.thug_life.foo",
+            classes=classes, schema=schema, package="some.foo.some.thug_life.foo"
         )
 
         mock_prepare_imports.assert_called_once()

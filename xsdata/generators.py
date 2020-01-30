@@ -1,11 +1,21 @@
-from abc import ABC, abstractmethod
+from abc import ABC
+from abc import abstractmethod
 from pathlib import Path
-from typing import Any, Iterator, List, Optional, Tuple
+from typing import Any
+from typing import Iterator
+from typing import List
+from typing import Optional
+from typing import Tuple
 
-from jinja2 import Environment, FileSystemLoader, Template
+from jinja2 import Environment
+from jinja2 import FileSystemLoader
+from jinja2 import Template
 
 from xsdata.formats.dataclass.utils import safe_snake
-from xsdata.models.codegen import Attr, AttrType, Class, Package
+from xsdata.models.codegen import Attr
+from xsdata.models.codegen import AttrType
+from xsdata.models.codegen import Class
+from xsdata.models.codegen import Package
 from xsdata.models.elements import Schema
 from xsdata.resolver import DependenciesResolver
 from xsdata.utils import text
@@ -18,9 +28,7 @@ class AbstractGenerator(ABC):
         if self.templates_dir is None:
             raise TypeError("Missing renderer templates directory")
 
-        self.env = Environment(
-            loader=FileSystemLoader(str(self.templates_dir))
-        )
+        self.env = Environment(loader=FileSystemLoader(str(self.templates_dir)))
         self.resolver = DependenciesResolver()
 
     def template(self, name: str) -> Template:
@@ -169,9 +177,7 @@ class PythonAbstractGenerator(AbstractGenerator, ABC):
             return "list"
         elif isinstance(attr.default, str):
             local_types = {
-                attr_type.native_type
-                for attr_type in attr.types
-                if attr_type.native
+                attr_type.native_type for attr_type in attr.types if attr_type.native
             }
 
             if bool in local_types:

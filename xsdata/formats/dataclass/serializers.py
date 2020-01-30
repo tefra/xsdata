@@ -1,9 +1,18 @@
 import json
-from dataclasses import asdict, dataclass, field
+from dataclasses import asdict
+from dataclasses import dataclass
+from dataclasses import field
 from enum import Enum
-from typing import Callable, Dict, Optional, Tuple, Type
+from typing import Callable
+from typing import Dict
+from typing import Optional
+from typing import Tuple
+from typing import Type
 
-from lxml.etree import Element, QName, SubElement, tostring
+from lxml.etree import Element
+from lxml.etree import QName
+from lxml.etree import SubElement
+from lxml.etree import tostring
 
 from xsdata.formats.dataclass.mixins import ModelInspect
 from xsdata.formats.mixins import AbstractSerializer
@@ -94,9 +103,7 @@ class XmlSerializer(AbstractSerializer, ModelInspect):
         meta = self.class_meta(obj.__class__)
         qname = self.render_tag(meta.name, meta.namespace)
         namespaces = self.namespaces(obj.__class__)
-        nsmap = {
-            f"ns{index}": ns for index, ns in enumerate(sorted(namespaces))
-        }
+        nsmap = {f"ns{index}": ns for index, ns in enumerate(sorted(namespaces))}
         return self.render_node(obj, Element(qname, nsmap=nsmap))
 
     def render_node(self, obj, parent, nillable=False) -> Element:
@@ -128,9 +135,7 @@ class XmlSerializer(AbstractSerializer, ModelInspect):
                 elif f.namespace:
                     qname = self.render_tag(f.local_name, f.namespace)
                 elif parent.prefix:
-                    qname = self.render_tag(
-                        f.local_name, parent.nsmap[parent.prefix]
-                    )
+                    qname = self.render_tag(f.local_name, parent.nsmap[parent.prefix])
                 else:
                     qname = f.local_name
 
@@ -144,8 +149,7 @@ class XmlSerializer(AbstractSerializer, ModelInspect):
                         and len(sub_element) == 0
                     ):
                         sub_element.set(
-                            "{http://www.w3.org/2001/XMLSchema-instance}nil",
-                            "true",
+                            "{http://www.w3.org/2001/XMLSchema-instance}nil", "true"
                         )
 
         return parent

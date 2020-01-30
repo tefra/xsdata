@@ -1,19 +1,21 @@
 import re
-from dataclasses import dataclass, field
+from dataclasses import dataclass
+from dataclasses import field
 from pathlib import Path
 from typing import Any as Anything
-from typing import Dict, Iterator
+from typing import Dict
+from typing import Iterator
 from typing import List as ArrayList
 from typing import Optional
 from typing import Union as UnionType
 
-from xsdata.models.enums import FormType, ProcessType, UseType
-from xsdata.models.mixins import (
-    ElementBase,
-    NamedField,
-    OccurrencesMixin,
-    RestrictedField,
-)
+from xsdata.models.enums import FormType
+from xsdata.models.enums import ProcessType
+from xsdata.models.enums import UseType
+from xsdata.models.mixins import ElementBase
+from xsdata.models.mixins import NamedField
+from xsdata.models.mixins import OccurrencesMixin
+from xsdata.models.mixins import RestrictedField
 
 
 @dataclass
@@ -172,9 +174,7 @@ class Union(AnnotationBase, NamedField, RestrictedField):
                 ]
             )
         if self.member_types:
-            types.extend(
-                [member for member in self.member_types.split(" ") if member]
-            )
+            types.extend([member for member in self.member_types.split(" ") if member])
 
         return " ".join(types) if types else None
 
@@ -705,8 +705,8 @@ class Unique(AnnotationBase):
     unique within the scope. The unique element MUST contain the following (in
     order):
 
-     * one and only one selector element  (contains an XPath expression that specifies the set of elements across which the values specified by field must be unique)
-     * one or more field elements (contains an XPath expression that specifies the values that must be unique for the set of elements specified by the selector element)
+     * one and only one selector element
+     * one or more field elements
 
     Reference: https://www.w3schools.com/xml/el_unique.asp.
     """
@@ -733,8 +733,8 @@ class Keyref(AnnotationBase):
     instance document.
 
     The key element MUST contain the following (in order):
-     * one and only one selector element  (contains an XPath expression that specifies the set of elements across which the values specified by field must be unique)
-     * one or more field elements (contains an XPath expression that specifies the values that must be unique for the set of elements specified by the selector element)
+     * one and only one selector element
+     * one or more field elements
 
     Reference: https://www.w3schools.com/xml/el_keyref.asp.
     """

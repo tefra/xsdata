@@ -1,12 +1,10 @@
 from unittest import TestCase
 
-from xsdata.models.elements import (
-    ComplexType,
-    Element,
-    Length,
-    Restriction,
-    SimpleType,
-)
+from xsdata.models.elements import ComplexType
+from xsdata.models.elements import Element
+from xsdata.models.elements import Length
+from xsdata.models.elements import Restriction
+from xsdata.models.elements import SimpleType
 
 
 class ElementTests(TestCase):

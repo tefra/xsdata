@@ -1,22 +1,21 @@
 import sys
 from unittest import TestCase
 
-from xsdata.models.elements import (
-    All,
-    Attribute,
-    Choice,
-    ComplexContent,
-    ComplexType,
-    Element,
-    Extension,
-    MinLength,
-    Pattern,
-    Restriction,
-    Sequence,
-    SimpleContent,
-    SimpleType,
-)
-from xsdata.models.enums import FormType, UseType
+from xsdata.models.elements import All
+from xsdata.models.elements import Attribute
+from xsdata.models.elements import Choice
+from xsdata.models.elements import ComplexContent
+from xsdata.models.elements import ComplexType
+from xsdata.models.elements import Element
+from xsdata.models.elements import Extension
+from xsdata.models.elements import MinLength
+from xsdata.models.elements import Pattern
+from xsdata.models.elements import Restriction
+from xsdata.models.elements import Sequence
+from xsdata.models.elements import SimpleContent
+from xsdata.models.elements import SimpleType
+from xsdata.models.enums import FormType
+from xsdata.models.enums import UseType
 from xsdata.parser import SchemaParser
 
 
@@ -48,10 +47,7 @@ class ParserTests(TestCase):
 
         schema = SchemaParser.from_string(xsd, target_namespace="parent")
         self.assertEqual(
-            {
-                None: "http://www/default",
-                "xs": "http://www.w3.org/2001/XMLSchema",
-            },
+            {None: "http://www/default", "xs": "http://www.w3.org/2001/XMLSchema"},
             schema.nsmap,
         )
         self.assertEqual("http://www/target", schema.target_namespace)
@@ -63,10 +59,7 @@ class ParserTests(TestCase):
 
         schema = SchemaParser.from_string(xsd, target_namespace="parent")
         self.assertEqual(
-            {
-                None: "http://www/default",
-                "xs": "http://www.w3.org/2001/XMLSchema",
-            },
+            {None: "http://www/default", "xs": "http://www.w3.org/2001/XMLSchema"},
             schema.nsmap,
         )
         self.assertEqual("parent", schema.target_namespace)
@@ -210,9 +203,7 @@ class ParserTests(TestCase):
                                 restriction=Restriction.create(
                                     index=6,
                                     base="xs:string",
-                                    min_length=MinLength.create(
-                                        value=1, index=7
-                                    ),
+                                    min_length=MinLength.create(value=1, index=7),
                                 ),
                             ),
                         )

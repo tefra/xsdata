@@ -1,11 +1,17 @@
 import logging
-from dataclasses import dataclass, field
-from typing import Dict, Iterator, List, Optional, Set
+from dataclasses import dataclass
+from dataclasses import field
+from typing import Dict
+from typing import Iterator
+from typing import List
+from typing import Optional
+from typing import Set
 
 from lxml import etree
 from toposort import toposort_flatten
 
-from xsdata.models.codegen import Class, Package
+from xsdata.models.codegen import Class
+from xsdata.models.codegen import Package
 from xsdata.models.elements import Schema
 from xsdata.utils import text
 from xsdata.utils.text import split
@@ -78,9 +84,7 @@ class DependenciesResolver:
 
             self.add_import(name=name, package=package, alias=alias)
 
-    def add_import(
-        self, name: str, package: str, alias: Optional[str]
-    ) -> None:
+    def add_import(self, name: str, package: str, alias: Optional[str]) -> None:
         """Create and append an import package to the list of imports, collect
         a map of aliases for when we process the list of classes to
         generate."""
@@ -110,9 +114,7 @@ class DependenciesResolver:
         """
 
         namespace = (
-            self.schema.nsmap.get(prefix)
-            if prefix
-            else self.schema.target_namespace
+            self.schema.nsmap.get(prefix) if prefix else self.schema.target_namespace
         )
         qname = etree.QName(namespace, name)
         return self.processed[qname.text]

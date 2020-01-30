@@ -1,10 +1,16 @@
-from dataclasses import dataclass, field
-from typing import Callable, Dict, List, Optional
+from dataclasses import dataclass
+from dataclasses import field
+from typing import Callable
+from typing import Dict
+from typing import List
+from typing import Optional
 
 from lxml import etree
 
 from xsdata.logger import logger
-from xsdata.models.codegen import Attr, AttrType, Class
+from xsdata.models.codegen import Attr
+from xsdata.models.codegen import AttrType
+from xsdata.models.codegen import Class
 from xsdata.models.elements import Schema
 from xsdata.models.enums import DataType
 from xsdata.utils import text
@@ -106,9 +112,7 @@ class ClassReducer:
             if all_enums:
                 item.attrs = attrs
 
-    def flatten_extension(
-        self, item: Class, extension: AttrType, schema: Schema
-    ):
+    def flatten_extension(self, item: Class, extension: AttrType, schema: Schema):
         """
         If the extension class is found in the registry prepend it's attributes
         to the given class.
@@ -153,9 +157,7 @@ class ClassReducer:
                 self.copy_inner_classes(common, item)
             else:
                 types.append(AttrType(name=DataType.STRING.code, native=True))
-                logger.warning(
-                    "Missing type implementation: %s", common.type.__name__
-                )
+                logger.warning("Missing type implementation: %s", common.type.__name__)
 
             for key, value in restrictions.items():
                 if getattr(attr, key) is None:
@@ -207,8 +209,7 @@ class ClassReducer:
     def copy_inner_classes(source: Class, target: Class):
         for inner in source.inner:
             exists = next(
-                (found for found in target.inner if found.name == inner.name),
-                None,
+                (found for found in target.inner if found.name == inner.name), None
             )
             if not exists:
                 target.inner.append(inner)

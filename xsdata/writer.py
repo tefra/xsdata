@@ -1,5 +1,7 @@
-from dataclasses import dataclass, field
-from typing import Dict, List
+from dataclasses import dataclass
+from dataclasses import field
+from typing import Dict
+from typing import List
 
 from xsdata.formats.dataclass.generator import DataclassGenerator
 from xsdata.formats.plantuml.generator import PlantUmlGenerator
@@ -25,9 +27,7 @@ class CodeWriter:
             return self.generators[name]
         raise ValueError(f"{name} is not a valid {AbstractGenerator.__name__}")
 
-    def write(
-        self, schema: Schema, classes: List[Class], package: str, renderer: str
-    ):
+    def write(self, schema: Schema, classes: List[Class], package: str, renderer: str):
         engine = self.get_renderer(renderer)
         for file, output in engine.render(schema, classes, package):
             if len(output.strip()) > 0:
@@ -36,9 +36,7 @@ class CodeWriter:
                 file.parent.mkdir(parents=True, exist_ok=True)
                 file.write_text(output)
 
-    def print(
-        self, schema: Schema, classes: List[Class], package: str, renderer: str
-    ):
+    def print(self, schema: Schema, classes: List[Class], package: str, renderer: str):
         engine = self.get_renderer(renderer)
         for _, output in engine.render(schema, classes, package):
             print(output, end="")

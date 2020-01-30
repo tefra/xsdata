@@ -1,7 +1,10 @@
 from dataclasses import dataclass
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from typing import Iterator, List, Optional, Tuple
+from typing import Iterator
+from typing import List
+from typing import Optional
+from typing import Tuple
 from unittest import TestCase
 
 from xsdata.formats.dataclass.generator import DataclassGenerator
@@ -33,9 +36,7 @@ class CodeWriterTests(TestCase):
     def test_formats(self):
         expected = ["pydata", "plantuml"]
         self.assertEqual(expected, writer.formats)
-        self.assertIsInstance(
-            writer.get_renderer("pydata"), DataclassGenerator
-        )
+        self.assertIsInstance(writer.get_renderer("pydata"), DataclassGenerator)
 
     def test_register_generator(self):
         writer.register_generator(self.FAKE_NAME, FakeRenderer())

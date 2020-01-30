@@ -11,7 +11,8 @@ from lxml import etree
 from xsdata import cli
 from xsdata.formats.dataclass.generator import DataclassGenerator
 from xsdata.formats.dataclass.parsers import XmlParser
-from xsdata.formats.dataclass.serializers import JsonSerializer, XmlSerializer
+from xsdata.formats.dataclass.serializers import JsonSerializer
+from xsdata.formats.dataclass.serializers import XmlSerializer
 from xsdata.reducer import reducer
 from xsdata.writer import writer
 
@@ -93,9 +94,7 @@ def setup_module(module):
         writer.register_generator("pydata", DataclassGenerator())
 
         package = ".".join(xsd.relative_to(fixtures).parent.parts)
-        result = runner.invoke(
-            cli, [str(xsd), f"--package=tests.fixtures.{package}"]
-        )
+        result = runner.invoke(cli, [str(xsd), f"--package=tests.fixtures.{package}"])
         if result.exception:
             raise result.exception
 
@@ -107,9 +106,7 @@ def teardown_module():
         f"- Skipped: **{skipped}**",
     ]
 
-    fixtures.joinpath("defxmlschema/binding.results.rst").write_text(
-        "\n".join(results)
-    )
+    fixtures.joinpath("defxmlschema/binding.results.rst").write_text("\n".join(results))
 
     for rst in here.parent.joinpath(f"").glob("docs/tests/binding/*.rst"):
         rst.unlink()
@@ -122,9 +119,7 @@ def teardown_module():
 
         schema = xml.with_suffix(".xsd")
         template = Template(
-            here.joinpath(
-                f"fixtures/defxmlschema/binding.output.jinja2"
-            ).read_text(),
+            here.joinpath(f"fixtures/defxmlschema/binding.output.jinja2").read_text(),
             keep_trailing_newline=True,
         )
 

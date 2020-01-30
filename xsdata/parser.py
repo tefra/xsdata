@@ -1,22 +1,20 @@
 import io
 import pathlib
 import re
-from dataclasses import dataclass, field
-from typing import List, Optional
+from dataclasses import dataclass
+from dataclasses import field
+from typing import List
+from typing import Optional
 
 from lxml import etree
 
-from xsdata.models import elements
-from xsdata.models.elements import (
-    All,
-    Attribute,
-    Choice,
-    Element,
-    Schema,
-    Sequence,
-)
-from xsdata.models.enums import DataType, EventType, FormType, TagType
-from xsdata.models.mixins import BaseModel, ElementBase
+from xsdata.models import elements as xsd
+from xsdata.models.enums import DataType
+from xsdata.models.enums import EventType
+from xsdata.models.enums import FormType
+from xsdata.models.enums import TagType
+from xsdata.models.mixins import BaseModel
+from xsdata.models.mixins import ElementBase
 from xsdata.utils.text import snake_case
 
 
@@ -37,7 +35,7 @@ class SchemaParser:
     target_namespace: Optional[str] = field(default=None)
 
     @classmethod
-    def create(cls, source: object, target_namespace=None) -> Schema:
+    def create(cls, source: object, target_namespace=None) -> xsd.Schema:
         """A shortcut class method to initialize the parser, parse the given
         source and return the generated Schema instance."""
 
@@ -45,7 +43,7 @@ class SchemaParser:
         return cls(context=ctx, target_namespace=target_namespace).parse()
 
     @classmethod
-    def from_file(cls, path: pathlib.Path, target_namespace=None) -> Schema:
+    def from_file(cls, path: pathlib.Path, target_namespace=None) -> xsd.Schema:
         """A shortcut class method for file path sources."""
 
         if isinstance(path, str):
@@ -56,21 +54,17 @@ class SchemaParser:
         return schema
 
     @classmethod
-    def from_bytes(cls, source: bytes, target_namespace=None) -> Schema:
+    def from_bytes(cls, source: bytes, target_namespace=None) -> xsd.Schema:
         """A shortcut class method for bytes source."""
 
-        return cls.create(
-            io.BytesIO(source), target_namespace=target_namespace
-        )
+        return cls.create(io.BytesIO(source), target_namespace=target_namespace)
 
     @classmethod
-    def from_string(cls, source: str, target_namespace=None) -> Schema:
+    def from_string(cls, source: str, target_namespace=None) -> xsd.Schema:
         """A shortcut class method for string source."""
-        return cls.from_bytes(
-            source.encode(), target_namespace=target_namespace
-        )
+        return cls.from_bytes(source.encode(), target_namespace=target_namespace)
 
-    def parse(self) -> Schema:
+    def parse(self) -> xsd.Schema:
         """
         Main parse procedure which depends heavily on binding data classes that
         have all the necessary attributes to match all the possible xsd
@@ -96,7 +90,7 @@ class SchemaParser:
                 if mixed is not None:
                     raise NotImplementedError(f"Unsupported tag `{elem.tag}`")
 
-                builder = getattr(elements, tag.cname)
+                builder = getattr(xsd, tag.cname)
                 element = builder.from_element(elem, index=index)
                 self.elements.append(element)
                 index += 1
@@ -118,34 +112,27 @@ class SchemaParser:
 
     @classmethod
     def set_text(
-        cls,
-        obj: ElementBase,
-        element: etree.Element,
-        mixed: Optional[etree.Element],
+        cls, obj: ElementBase, element: etree.Element, mixed: Optional[etree.Element]
     ):
         """Set text attributes to elements that support well formed xml."""
 
-        if not hasattr(obj, "text"):  # It's ok not to have text attribute
+        if not isinstance(obj, (xsd.Documentation, xsd.Appinfo)):
             if mixed is None:  # It's not ok if the mixed arguments is not None
                 return
             raise NotImplementedError(f"Unsupported tag `{mixed.tag}`")
 
-        xml = etree.tostring(
-            element, method="c14n", pretty_print=True
-        ).decode()
+        xml = etree.tostring(element, method="c14n", pretty_print=True).decode()
         start_root = xml.find(">")
         end_root = xml.rfind("<")
 
-        clean_text = re.sub(
-            r"\s+", " ", xml[start_root + 1 : end_root]
-        ).strip()
-        setattr(obj, "text", clean_text)
+        clean_text = re.sub(r"\s+", " ", xml[start_root + 1 : end_root]).strip()
+        obj.text = clean_text
 
-    def start_schema(self, obj: Schema, element: etree.Element):
+    def start_schema(self, obj: xsd.Schema, element: etree.Element):
         """Collect the schema's default form for attributes and elements for
         later usage."""
 
-        if isinstance(obj, Schema):
+        if isinstance(obj, xsd.Schema):
             self.element_form = obj.element_form_default
             self.attribute_form = obj.attribute_form_default
 
@@ -155,55 +142,55 @@ class SchemaParser:
                     obj.target_namespace = self.target_namespace
 
     @classmethod
-    def end_schema(cls, obj: Schema, *args):
+    def end_schema(cls, obj: xsd.Schema, *args):
         """Root elements and attributes are always qualified."""
-        if isinstance(obj, Schema):
+        if isinstance(obj, xsd.Schema):
             for element in obj.elements:
                 element.form = FormType.QUALIFIED
             for attribute in obj.attributes:
                 attribute.form = FormType.QUALIFIED
 
-    def start_element(self, obj: Element, *args):
+    def start_element(self, obj: xsd.Element, *args):
         """Assign the schema's default form for elements if the given element
         form is None."""
 
-        if isinstance(obj, Element) and obj.form is None:
+        if isinstance(obj, xsd.Element) and obj.form is None:
             obj.form = self.element_form
 
-    def start_attribute(self, obj: Attribute, *args):
+    def start_attribute(self, obj: xsd.Attribute, *args):
         """Assign the schema's default form for attributes if the given
         attribute form is None."""
 
-        if isinstance(obj, Attribute) and obj.form is None:
+        if isinstance(obj, xsd.Attribute) and obj.form is None:
             obj.form = self.attribute_form
 
     @classmethod
-    def end_choice(cls, obj: Choice, *args):
+    def end_choice(cls, obj: xsd.Choice, *args):
         """Elements inside a choice are by definition optional, reset their min
         occurs counter."""
 
-        if isinstance(obj, Choice):
+        if isinstance(obj, xsd.Choice):
             for child in obj.elements:
                 child.min_occurs = 0
                 if child.max_occurs is None:
                     child.max_occurs = obj.max_occurs
 
     @classmethod
-    def end_all(cls, obj: All, *args):
+    def end_all(cls, obj: xsd.All, *args):
         """Elements inside an all element can by definition appear at most
         once, reset their max occur counter."""
 
-        if isinstance(obj, All):
+        if isinstance(obj, xsd.All):
             for child in obj.elements:
                 child.max_occurs = 1
                 if child.min_occurs is None:
                     child.min_occurs = obj.min_occurs
 
     @classmethod
-    def end_sequence(cls, obj: Sequence, *args):
+    def end_sequence(cls, obj: xsd.Sequence, *args):
         """Elements inside a sequence inherit min|max occur counter if it is
         not set."""
-        if isinstance(obj, Sequence):
+        if isinstance(obj, xsd.Sequence):
             for child in obj.elements:
                 if child.min_occurs is None:
                     child.min_occurs = obj.min_occurs
@@ -237,8 +224,4 @@ class SchemaParser:
 
                 return siblings.append(element)
 
-        raise ValueError(
-            "Class {} missing attribute `{}`".format(
-                type(parent).__name__, name
-            )
-        )
+        raise ValueError(f"Class {type(parent).__name__} missing attribute `{name}`")

@@ -1,4 +1,6 @@
-from typing import List, Optional, Tuple
+from typing import List
+from typing import Optional
+from typing import Tuple
 
 
 def strip_prefix(string: str, prefix: Optional[str]):
@@ -30,9 +32,7 @@ def capitalize(string: str) -> str:
 
 
 def pascal_case(string: str) -> str:
-    return "".join(
-        [capitalize(part) for part in snake_case(string).split("_") if part]
-    )
+    return "".join([capitalize(part) for part in snake_case(string).split("_") if part])
 
 
 def snake_case(string: str) -> str:

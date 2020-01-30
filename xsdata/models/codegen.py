@@ -1,8 +1,15 @@
-from dataclasses import dataclass, field, replace
-from typing import Any, List, Optional, Type
+from dataclasses import dataclass
+from dataclasses import field
+from dataclasses import replace
+from typing import Any
+from typing import List
+from typing import Optional
+from typing import Type
 
-from xsdata.models.elements import ComplexType, Element
-from xsdata.models.enums import DataType, TagType
+from xsdata.models.elements import ComplexType
+from xsdata.models.elements import Element
+from xsdata.models.enums import DataType
+from xsdata.models.enums import TagType
 
 
 @dataclass

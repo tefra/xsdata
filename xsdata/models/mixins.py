@@ -1,11 +1,22 @@
 import sys
-from abc import ABC, abstractmethod
-from dataclasses import MISSING, Field, dataclass, fields
-from typing import Any, Dict, Iterator, Optional, Type, TypeVar
+from abc import ABC
+from abc import abstractmethod
+from dataclasses import dataclass
+from dataclasses import Field
+from dataclasses import fields
+from dataclasses import MISSING
+from types import FunctionType
+from typing import Any
+from typing import Dict
+from typing import Iterator
+from typing import Optional
+from typing import Type
+from typing import TypeVar
 
 from lxml import etree
 
-from xsdata.models.enums import FormType, Namespace
+from xsdata.models.enums import FormType
+from xsdata.models.enums import Namespace
 from xsdata.utils import text
 
 
@@ -30,9 +41,7 @@ class NamedField:
 
     @property
     def is_qualified(self):
-        return (
-            getattr(self, "form", FormType.UNQUALIFIED) == FormType.QUALIFIED
-        )
+        return getattr(self, "form", FormType.UNQUALIFIED) == FormType.QUALIFIED
 
     @property
     def prefix(self):
@@ -48,8 +57,8 @@ class RestrictedField(ABC):
 
 class OccurrencesMixin:
     def get_restrictions(self) -> Dict[str, Any]:
-        min_occurs = getattr(self, "min_occurs")
-        max_occurs = getattr(self, "max_occurs")
+        min_occurs = getattr(self, "min_occurs", None)
+        max_occurs = getattr(self, "max_occurs", None)
         if min_occurs == max_occurs == 1:
             return dict(required=True)
         if max_occurs > min_occurs and max_occurs > 1:
@@ -84,9 +93,9 @@ class BaseModel:
 
     @classmethod
     def default_value(cls: Type[T], field: Field) -> Any:
-        factory = getattr(field, "default_factory")
-        if getattr(field, "default_factory") is not MISSING:
-            return factory()  # mypy: ignore
+        factory = field.default_factory  # type: ignore
+        if isinstance(factory, FunctionType):
+            return factory()
         return None if field.default is MISSING else field.default
 
     @classmethod

@@ -14,7 +14,6 @@ from xsdata.models.enums import EventType
 from xsdata.models.enums import FormType
 from xsdata.models.enums import TagType
 from xsdata.models.mixins import BaseModel
-from xsdata.models.mixins import ElementBase
 from xsdata.utils.text import snake_case
 
 
@@ -29,6 +28,7 @@ class SchemaParser:
     """
 
     context: etree.iterparse
+    mixed_content: Optional[etree.Element] = field(default=None)
     elements: List[BaseModel] = field(default_factory=list)
     element_form: Optional[FormType] = field(init=False, default=None)
     attribute_form: Optional[FormType] = field(init=False, default=None)
@@ -79,28 +79,22 @@ class SchemaParser:
 
         methods = TagType.qnames()
         index = 0
-        mixed = None
         for event, elem in self.context:
             tag = methods.get(elem.tag)
             if tag is None:
-                mixed = elem
+                self.mixed_content = elem
                 continue
 
             if event == EventType.START:
-                if mixed is not None:
-                    raise NotImplementedError(f"Unsupported tag `{elem.tag}`")
-
-                builder = getattr(xsd, tag.cname)
-                element = builder.from_element(elem, index=index)
+                model = getattr(xsd, tag.cname)
+                element = model.create(index=index, **elem.attrib)
                 self.elements.append(element)
                 index += 1
             elif event == EventType.END:
                 element = self.elements.pop()
-                self.set_text(element, elem, mixed)
-                if mixed is not None:
-                    mixed = None
                 if not elem.attrib and elem.text is None:
                     continue
+
                 if self.elements:
                     self.assign_to_parent(element, elem.prefix)
 
@@ -108,25 +102,30 @@ class SchemaParser:
             if hasattr(self, method_name):
                 getattr(self, method_name)(element, elem)
 
+        if self.mixed_content is not None:
+            raise NotImplementedError(f"Unsupported tag `{self.mixed_content.tag}`")
+
         return element
 
-    @classmethod
-    def set_text(
-        cls, obj: ElementBase, element: etree.Element, mixed: Optional[etree.Element]
-    ):
-        """Set text attributes to elements that support well formed xml."""
+    def end_documentation(self, obj: xsd.Schema, element: etree.Element):
+        if isinstance(obj, xsd.Documentation):
+            obj.text = self.get_mixed_text(element)
+            self.mixed_content = None
 
-        if not isinstance(obj, (xsd.Documentation, xsd.Appinfo)):
-            if mixed is None:  # It's not ok if the mixed arguments is not None
-                return
-            raise NotImplementedError(f"Unsupported tag `{mixed.tag}`")
+    def end_appinfo(self, obj: xsd.Schema, element: etree.Element):
+        if isinstance(obj, xsd.Appinfo):
+            obj.text = self.get_mixed_text(element)
+            self.mixed_content = None
+
+    @classmethod
+    def get_mixed_text(cls, element: etree.Element):
+        """Set text attributes to elements that support well formed xml."""
 
         xml = etree.tostring(element, method="c14n", pretty_print=True).decode()
         start_root = xml.find(">")
         end_root = xml.rfind("<")
 
-        clean_text = re.sub(r"\s+", " ", xml[start_root + 1 : end_root]).strip()
-        obj.text = clean_text
+        return re.sub(r"\s+", " ", xml[start_root + 1 : end_root]).strip()
 
     def start_schema(self, obj: xsd.Schema, element: etree.Element):
         """Collect the schema's default form for attributes and elements for

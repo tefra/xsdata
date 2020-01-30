@@ -362,12 +362,8 @@ class Extension(AnnotationBase):
         return self.base
 
 
-class RestrictionType:
-    pass
-
-
 @dataclass
-class Enumeration(AnnotationBase, RestrictionType, NamedField, RestrictedField):
+class Enumeration(AnnotationBase, NamedField, RestrictedField):
     """
     Defines a list of acceptable values.
 
@@ -398,7 +394,7 @@ class Enumeration(AnnotationBase, RestrictionType, NamedField, RestrictedField):
 
 
 @dataclass
-class FractionDigits(AnnotationBase, RestrictionType):
+class FractionDigits(AnnotationBase):
     """
     Specifies the maximum number of decimal places allowed. Must be equal to or
     greater than zero.
@@ -411,7 +407,7 @@ class FractionDigits(AnnotationBase, RestrictionType):
 
 
 @dataclass
-class Length(AnnotationBase, RestrictionType):
+class Length(AnnotationBase):
     """
     Specifies the exact number of characters or list items allowed. Must be
     equal to or greater than zero.
@@ -424,7 +420,7 @@ class Length(AnnotationBase, RestrictionType):
 
 
 @dataclass
-class MaxExclusive(AnnotationBase, RestrictionType):
+class MaxExclusive(AnnotationBase):
     """
     Specifies the upper bounds for numeric values (the value must be less than
     this value)
@@ -437,7 +433,7 @@ class MaxExclusive(AnnotationBase, RestrictionType):
 
 
 @dataclass
-class MaxInclusive(AnnotationBase, RestrictionType):
+class MaxInclusive(AnnotationBase):
     """
     Specifies the upper bounds for numeric values (the value must be less than
     or equal to this value)
@@ -450,7 +446,7 @@ class MaxInclusive(AnnotationBase, RestrictionType):
 
 
 @dataclass
-class MaxLength(AnnotationBase, RestrictionType):
+class MaxLength(AnnotationBase):
     """
     Specifies the maximum number of characters or list items allowed. Must be
     equal to or greater than zero.
@@ -463,7 +459,7 @@ class MaxLength(AnnotationBase, RestrictionType):
 
 
 @dataclass
-class MinExclusive(AnnotationBase, RestrictionType):
+class MinExclusive(AnnotationBase):
     """
     Schema Facet: Reference:
 
@@ -474,7 +470,7 @@ class MinExclusive(AnnotationBase, RestrictionType):
 
 
 @dataclass
-class MinInclusive(AnnotationBase, RestrictionType):
+class MinInclusive(AnnotationBase):
     """
     Specifies the lower bounds for numeric values (the value must be greater
     than this value)
@@ -487,7 +483,7 @@ class MinInclusive(AnnotationBase, RestrictionType):
 
 
 @dataclass
-class MinLength(AnnotationBase, RestrictionType):
+class MinLength(AnnotationBase):
     """
     Specifies the lower bounds for numeric values (the value must be greater
     than or equal to this value)
@@ -500,7 +496,7 @@ class MinLength(AnnotationBase, RestrictionType):
 
 
 @dataclass
-class Pattern(AnnotationBase, RestrictionType):
+class Pattern(AnnotationBase):
     """
     Defines the exact sequence of characters that are acceptable.
 
@@ -512,7 +508,7 @@ class Pattern(AnnotationBase, RestrictionType):
 
 
 @dataclass
-class TotalDigits(AnnotationBase, RestrictionType):
+class TotalDigits(AnnotationBase):
     """
     Specifies the exact number of digits allowed. Must be greater than zero.
 
@@ -524,7 +520,7 @@ class TotalDigits(AnnotationBase, RestrictionType):
 
 
 @dataclass
-class WhiteSpace(AnnotationBase, RestrictionType):
+class WhiteSpace(AnnotationBase):
     """
     Specifies how white space (line feeds, tabs, spaces, and carriage returns)
     is handled.
@@ -617,7 +613,7 @@ class Restriction(RestrictedField, AnnotationBase, NamedField):
         return {
             key: getattr(self, key).value
             for key in self.VALUE_FIELDS
-            if isinstance(getattr(self, key), RestrictionType)
+            if getattr(self, key) is not None
         }
 
 

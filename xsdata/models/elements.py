@@ -26,9 +26,9 @@ class Documentation(ElementBase):
     Reference: https://www.w3schools.com/xml/el_documentation.asp.
     """
 
-    lang: Optional[str]
-    source: Optional[str]
-    text: Optional[str]
+    lang: Optional[str] = None
+    source: Optional[str] = None
+    text: Optional[str] = None
 
 
 @dataclass
@@ -39,8 +39,8 @@ class Appinfo(ElementBase):
     Reference: https://www.w3schools.com/xml/el_appinfo.asp.
     """
 
-    source: Optional[str]
-    text: Optional[str]
+    source: Optional[str] = None
+    text: Optional[str] = None
 
 
 @dataclass
@@ -52,7 +52,7 @@ class Annotation(ElementBase):
     Reference: https://www.w3schools.com/xml/el_annotation.asp.
     """
 
-    appinfo: Optional[Appinfo]
+    appinfo: Optional[Appinfo] = None
     documentations: ArrayList[Documentation] = field(default_factory=list)
 
 
@@ -60,7 +60,7 @@ class Annotation(ElementBase):
 class AnnotationBase(ElementBase):
     """Base Class for elements that can contain annotations."""
 
-    annotation: Optional[Annotation]
+    annotation: Optional[Annotation] = None
 
     @property
     def display_help(self) -> Optional[str]:
@@ -84,10 +84,10 @@ class SimpleType(AnnotationBase, NamedField, RestrictedField):
     XSD Element reference : Reference: https://www.w3schools.com/xml/el_simpletype.asp.
     """
 
-    name: Optional[str]
-    restriction: Optional["Restriction"]
-    list: Optional["List"]
-    union: Optional["Union"]
+    name: Optional[str] = None
+    restriction: Optional["Restriction"] = None
+    list: Optional["List"] = None
+    union: Optional["Union"] = None
 
     @property
     def is_enumeration(self):
@@ -121,8 +121,8 @@ class List(AnnotationBase, RestrictedField, NamedField):
     Reference: https://www.w3schools.com/xml/el_list.asp.
     """
 
-    item_type: Optional[str]
-    simple_type: SimpleType
+    simple_type: Optional[SimpleType] = None
+    item_type: Optional[str] = None
 
     @property
     def is_attribute(self) -> bool:
@@ -149,7 +149,7 @@ class Union(AnnotationBase, NamedField, RestrictedField):
     Reference: https://www.w3schools.com/xml/el_union.asp.
     """
 
-    member_types: Optional[str]
+    member_types: Optional[str] = None
     simple_types: ArrayList[SimpleType] = field(default_factory=list)
 
     @property
@@ -199,9 +199,9 @@ class AnyAttribute(AnnotationBase):
     : Reference: https://www.w3schools.com/xml/el_anyattribute.asp.
     """
 
-    namespace: Optional[str]
-    process_contents: Optional[ProcessType]
-    simple_type: Optional[SimpleType]
+    namespace: Optional[str] = None
+    process_contents: Optional[ProcessType] = None
+    simple_type: Optional[SimpleType] = None
 
 
 @dataclass
@@ -212,13 +212,13 @@ class Attribute(AnnotationBase, NamedField, RestrictedField):
     Reference: https://www.w3schools.com/xml/el_attribute.asp.
     """
 
-    default: Optional[str]
-    fixed: Optional[str]
-    form: Optional[FormType]
-    name: Optional[str]
-    ref: Optional[str]
-    type: Optional[str]
-    simple_type: Optional[SimpleType]
+    default: Optional[str] = None
+    fixed: Optional[str] = None
+    form: Optional[FormType] = None
+    name: Optional[str] = None
+    ref: Optional[str] = None
+    type: Optional[str] = None
+    simple_type: Optional[SimpleType] = None
     use: Optional[UseType] = field(default=UseType.OPTIONAL)
 
     @property
@@ -256,9 +256,9 @@ class AttributeGroup(AnnotationBase, NamedField):
     : Reference: https://www.w3schools.com/xml/el_attributegroup.asp.
     """
 
-    name: Optional[str]
-    ref: Optional[str]
-    any_attribute: Optional[AnyAttribute]
+    name: Optional[str] = None
+    ref: Optional[str] = None
+    any_attribute: Optional[AnyAttribute] = None
     attributes: ArrayList[Attribute] = field(default_factory=list)
     attribute_groups: ArrayList["AttributeGroup"] = field(default_factory=list)
 
@@ -326,11 +326,11 @@ class Group(AnnotationBase, OccurrencesMixin, NamedField):
     Reference: https://www.w3schools.com/xml/el_group.asp.
     """
 
-    name: Optional[str]
-    ref: Optional[str]
-    all: Optional[All]
-    choice: Optional[Choice]
-    sequence: Optional[Sequence]
+    name: Optional[str] = None
+    ref: Optional[str] = None
+    all: Optional[All] = None
+    choice: Optional[Choice] = None
+    sequence: Optional[Sequence] = None
     max_occurs: int = 1
     min_occurs: int = 1
 
@@ -348,33 +348,26 @@ class Extension(AnnotationBase):
     Reference: https://www.w3schools.com/xml/el_extension.asp.
     """
 
-    base: str
-    group: Optional[Group]
-    all: Optional[All]
-    choice: Optional[Choice]
-    sequence: Optional[Sequence]
-    any_attribute: Optional[AnyAttribute]
+    base: Optional[str] = None
+    group: Optional[Group] = None
+    all: Optional[All] = None
+    choice: Optional[Choice] = None
+    sequence: Optional[Sequence] = None
+    any_attribute: Optional[AnyAttribute] = None
     attributes: ArrayList[Attribute] = field(default_factory=list)
     attribute_groups: ArrayList[AttributeGroup] = field(default_factory=list)
 
     @property
-    def extends(self) -> str:
+    def extends(self) -> Optional[str]:
         return self.base
 
 
-@dataclass
-class RestrictionType(AnnotationBase):
-    """
-    The restriction element defines restrictions on a simpleType,
-    simpleContent, or complexContent definition.
-
-     XSD Element reference
-    : Reference: https://www.w3schools.com/xml/el_restriction.asp.
-    """
+class RestrictionType:
+    pass
 
 
 @dataclass
-class Enumeration(RestrictionType, NamedField, RestrictedField):
+class Enumeration(AnnotationBase, RestrictionType, NamedField, RestrictedField):
     """
     Defines a list of acceptable values.
 
@@ -382,7 +375,7 @@ class Enumeration(RestrictionType, NamedField, RestrictedField):
     https://www.w3schools.com/xml/schema_facets.asp.
     """
 
-    value: str
+    value: Optional[str] = None
 
     @property
     def is_attribute(self) -> bool:
@@ -405,7 +398,7 @@ class Enumeration(RestrictionType, NamedField, RestrictedField):
 
 
 @dataclass
-class FractionDigits(RestrictionType):
+class FractionDigits(AnnotationBase, RestrictionType):
     """
     Specifies the maximum number of decimal places allowed. Must be equal to or
     greater than zero.
@@ -414,11 +407,11 @@ class FractionDigits(RestrictionType):
     https://www.w3schools.com/xml/schema_facets.asp.
     """
 
-    value: int
+    value: Optional[int] = None
 
 
 @dataclass
-class Length(RestrictionType):
+class Length(AnnotationBase, RestrictionType):
     """
     Specifies the exact number of characters or list items allowed. Must be
     equal to or greater than zero.
@@ -427,11 +420,11 @@ class Length(RestrictionType):
     https://www.w3schools.com/xml/schema_facets.asp.
     """
 
-    value: int
+    value: Optional[int] = None
 
 
 @dataclass
-class MaxExclusive(RestrictionType):
+class MaxExclusive(AnnotationBase, RestrictionType):
     """
     Specifies the upper bounds for numeric values (the value must be less than
     this value)
@@ -440,11 +433,11 @@ class MaxExclusive(RestrictionType):
     https://www.w3schools.com/xml/schema_facets.asp.
     """
 
-    value: float
+    value: Optional[float] = None
 
 
 @dataclass
-class MaxInclusive(RestrictionType):
+class MaxInclusive(AnnotationBase, RestrictionType):
     """
     Specifies the upper bounds for numeric values (the value must be less than
     or equal to this value)
@@ -453,11 +446,11 @@ class MaxInclusive(RestrictionType):
     https://www.w3schools.com/xml/schema_facets.asp.
     """
 
-    value: float
+    value: Optional[float] = None
 
 
 @dataclass
-class MaxLength(RestrictionType):
+class MaxLength(AnnotationBase, RestrictionType):
     """
     Specifies the maximum number of characters or list items allowed. Must be
     equal to or greater than zero.
@@ -466,22 +459,22 @@ class MaxLength(RestrictionType):
     https://www.w3schools.com/xml/schema_facets.asp.
     """
 
-    value: float
+    value: Optional[float] = None
 
 
 @dataclass
-class MinExclusive(RestrictionType):
+class MinExclusive(AnnotationBase, RestrictionType):
     """
     Schema Facet: Reference:
 
     https://www.w3schools.com/xml/schema_facets.asp.
     """
 
-    value: float
+    value: Optional[float] = None
 
 
 @dataclass
-class MinInclusive(RestrictionType):
+class MinInclusive(AnnotationBase, RestrictionType):
     """
     Specifies the lower bounds for numeric values (the value must be greater
     than this value)
@@ -490,11 +483,11 @@ class MinInclusive(RestrictionType):
     https://www.w3schools.com/xml/schema_facets.asp.
     """
 
-    value: float
+    value: Optional[float] = None
 
 
 @dataclass
-class MinLength(RestrictionType):
+class MinLength(AnnotationBase, RestrictionType):
     """
     Specifies the lower bounds for numeric values (the value must be greater
     than or equal to this value)
@@ -503,11 +496,11 @@ class MinLength(RestrictionType):
     https://www.w3schools.com/xml/schema_facets.asp.
     """
 
-    value: float
+    value: Optional[float] = None
 
 
 @dataclass
-class Pattern(RestrictionType):
+class Pattern(AnnotationBase, RestrictionType):
     """
     Defines the exact sequence of characters that are acceptable.
 
@@ -515,11 +508,11 @@ class Pattern(RestrictionType):
     https://www.w3schools.com/xml/schema_facets.asp.
     """
 
-    value: str
+    value: Optional[str] = None
 
 
 @dataclass
-class TotalDigits(RestrictionType):
+class TotalDigits(AnnotationBase, RestrictionType):
     """
     Specifies the exact number of digits allowed. Must be greater than zero.
 
@@ -527,11 +520,11 @@ class TotalDigits(RestrictionType):
     https://www.w3schools.com/xml/schema_facets.asp.
     """
 
-    value: int
+    value: Optional[int] = None
 
 
 @dataclass
-class WhiteSpace(RestrictionType):
+class WhiteSpace(AnnotationBase, RestrictionType):
     """
     Specifies how white space (line feeds, tabs, spaces, and carriage returns)
     is handled.
@@ -540,7 +533,7 @@ class WhiteSpace(RestrictionType):
     https://www.w3schools.com/xml/schema_facets.asp.
     """
 
-    value: str  # preserve, collapse, replace
+    value: Optional[str] = None  # preserve, collapse, replace
 
 
 @dataclass
@@ -577,24 +570,24 @@ class Restriction(RestrictedField, AnnotationBase, NamedField):
         "enumerations",
     )
 
-    base: str
-    group: Optional[Group]
-    all: Optional[All]
-    choice: Optional[Choice]
-    sequence: Optional[Sequence]
-    any_attribute: Optional[AnyAttribute]
-    min_exclusive: Optional[MinExclusive]
-    min_inclusive: Optional[MinInclusive]
-    min_length: Optional[MinLength]
-    max_exclusive: Optional[MaxExclusive]
-    max_inclusive: Optional[MaxInclusive]
-    max_length: Optional[MaxLength]
-    total_digits: Optional[TotalDigits]
-    fraction_digits: Optional[FractionDigits]
-    length: Optional[Length]
-    white_space: Optional[WhiteSpace]
-    pattern: Optional[Pattern]
-    simple_type: Optional[SimpleType]
+    base: Optional[str] = None
+    group: Optional[Group] = None
+    all: Optional[All] = None
+    choice: Optional[Choice] = None
+    sequence: Optional[Sequence] = None
+    any_attribute: Optional[AnyAttribute] = None
+    min_exclusive: Optional[MinExclusive] = None
+    min_inclusive: Optional[MinInclusive] = None
+    min_length: Optional[MinLength] = None
+    max_exclusive: Optional[MaxExclusive] = None
+    max_inclusive: Optional[MaxInclusive] = None
+    max_length: Optional[MaxLength] = None
+    total_digits: Optional[TotalDigits] = None
+    fraction_digits: Optional[FractionDigits] = None
+    length: Optional[Length] = None
+    white_space: Optional[WhiteSpace] = None
+    pattern: Optional[Pattern] = None
+    simple_type: Optional[SimpleType] = None
     enumerations: ArrayList[Enumeration] = field(default_factory=list)
     attributes: ArrayList[Attribute] = field(default_factory=list)
     attribute_groups: ArrayList[AttributeGroup] = field(default_factory=list)
@@ -638,8 +631,8 @@ class SimpleContent(AnnotationBase):
     : Reference: https://www.w3schools.com/xml/el_simplecontent.asp.
     """
 
-    restriction: Optional[Restriction]
-    extension: Optional[Extension]
+    restriction: Optional[Restriction] = None
+    extension: Optional[Extension] = None
 
 
 @dataclass
@@ -665,16 +658,16 @@ class ComplexType(AnnotationBase, NamedField):
     : Reference: https://www.w3schools.com/xml/el_complextype.asp.
     """
 
-    name: Optional[str]
-    block: Optional[str]
-    final: Optional[str]
-    simple_content: Optional[SimpleContent]
-    complex_content: Optional[ComplexContent]
-    group: Optional[Group]
-    all: Optional[All]
-    choice: Optional[Choice]
-    sequence: Optional[Sequence]
-    any_attribute: Optional[AnyAttribute]
+    name: Optional[str] = None
+    block: Optional[str] = None
+    final: Optional[str] = None
+    simple_content: Optional[SimpleContent] = None
+    complex_content: Optional[ComplexContent] = None
+    group: Optional[Group] = None
+    all: Optional[All] = None
+    choice: Optional[Choice] = None
+    sequence: Optional[Sequence] = None
+    any_attribute: Optional[AnyAttribute] = None
     attributes: ArrayList[Attribute] = field(default_factory=list)
     attribute_groups: ArrayList[AttributeGroup] = field(default_factory=list)
     abstract: bool = False
@@ -685,7 +678,7 @@ class ComplexType(AnnotationBase, NamedField):
 class Field(AnnotationBase):
     """Reference: https://www.w3schools.com/xml/el_field.asp."""
 
-    xpath: str
+    xpath: Optional[str] = None
 
 
 @dataclass
@@ -711,17 +704,17 @@ class Unique(AnnotationBase):
     Reference: https://www.w3schools.com/xml/el_unique.asp.
     """
 
-    name: str
-    selector: Optional[Selector]
-    field: Optional[Field]
+    name: Optional[str] = None
+    selector: Optional[Selector] = None
+    field: Optional[Field] = None
 
 
 @dataclass
 class Key(AnnotationBase):
     """Reference: https://www.w3schools.com/xml/el_key.asp."""
 
-    name: str
-    selector: Optional[Selector]
+    name: Optional[str] = None
+    selector: Optional[Selector] = None
     fields: ArrayList[Selector] = field(default_factory=list)
 
 
@@ -739,9 +732,9 @@ class Keyref(AnnotationBase):
     Reference: https://www.w3schools.com/xml/el_keyref.asp.
     """
 
-    name: str
-    refer: str
-    selector: Optional[Selector]
+    name: Optional[str] = None
+    refer: Optional[str] = None
+    selector: Optional[Selector] = None
     fields: ArrayList[Selector] = field(default_factory=list)
 
 
@@ -753,18 +746,18 @@ class Element(AnnotationBase, NamedField, OccurrencesMixin):
     Reference: https://www.w3schools.com/xml/el_element.asp.
     """
 
-    name: str
-    id: Optional[str]
-    ref: Optional[str]
-    type: Optional[str]
-    substitution_group: Optional[str]
-    default: Optional[str]
-    fixed: Optional[str]
-    form: Optional[FormType]
-    block: Optional[List]
-    final: Optional[List]
-    simple_type: Optional[SimpleType]
-    complex_type: Optional[ComplexType]
+    name: Optional[str] = None
+    id: Optional[str] = None
+    ref: Optional[str] = None
+    type: Optional[str] = None
+    substitution_group: Optional[str] = None
+    default: Optional[str] = None
+    fixed: Optional[str] = None
+    form: Optional[FormType] = None
+    block: Optional[List] = None
+    final: Optional[List] = None
+    simple_type: Optional[SimpleType] = None
+    complex_type: Optional[ComplexType] = None
     uniques: ArrayList[Unique] = field(default_factory=list)
     keys: ArrayList[Key] = field(default_factory=list)
     keyrefs: ArrayList[Keyref] = field(default_factory=list)
@@ -806,9 +799,9 @@ class Any(AnnotationBase, OccurrencesMixin):
     Reference: https://www.w3schools.com/xml/el_any.asp.
     """
 
-    namespace: Optional[str]
-    process_contents: Optional[ProcessType]
-    annotation: Optional[Annotation]
+    namespace: Optional[str] = None
+    process_contents: Optional[ProcessType] = None
+    annotation: Optional[Annotation] = None
     max_occurs: int = 1
     min_occurs: int = 1
 
@@ -822,8 +815,8 @@ class Import(AnnotationBase):
     Reference: https://www.w3schools.com/xml/el_import.asp.
     """
 
-    namespace: Optional[str]
-    schema_location: Optional[str]
+    namespace: Optional[str] = None
+    schema_location: Optional[str] = None
 
 
 @dataclass
@@ -835,7 +828,7 @@ class Include(AnnotationBase):
     Reference: https://www.w3schools.com/xml/el_include.asp.
     """
 
-    schema_location: str
+    schema_location: Optional[str] = None
 
     @property
     def namespace(self):
@@ -851,9 +844,9 @@ class Notation(AnnotationBase):
     Reference: https://www.w3schools.com/xml/el_notation.asp.
     """
 
-    name: str
-    public: str
-    system: Optional[str]
+    name: Optional[str] = None
+    public: Optional[str] = None
+    system: Optional[str] = None
 
 
 @dataclass
@@ -865,11 +858,11 @@ class Redefine(AnnotationBase):
     Reference: https://www.w3schools.com/xml/el_redefine.asp.
     """
 
-    schema_location: str
-    simple_type: Optional[SimpleType]
-    complex_type: Optional[ComplexType]
-    group: Optional[Group]
-    attribute_group: Optional[AttributeGroup]
+    schema_location: Optional[str] = None
+    simple_type: Optional[SimpleType] = None
+    complex_type: Optional[ComplexType] = None
+    group: Optional[Group] = None
+    attribute_group: Optional[AttributeGroup] = None
 
 
 @dataclass
@@ -880,12 +873,12 @@ class Schema(AnnotationBase):
     Reference: https://www.w3schools.com/xml/el_schema.asp.
     """
 
-    target: Optional[str]
-    block_default: Optional[str]
-    final_default: Optional[str]
-    target_namespace: Optional[str]
-    version: Optional[str]
-    xmlns: Optional[str]
+    target: Optional[str] = None
+    block_default: Optional[str] = None
+    final_default: Optional[str] = None
+    target_namespace: Optional[str] = None
+    version: Optional[str] = None
+    xmlns: Optional[str] = None
     nsmap: Dict = field(default_factory=dict)
     location: Optional[Path] = field(default=None)
     element_form_default: FormType = field(default=FormType.UNQUALIFIED)

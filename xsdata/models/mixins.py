@@ -3,9 +3,9 @@ from abc import ABC
 from abc import abstractmethod
 from dataclasses import dataclass
 from dataclasses import Field
+from dataclasses import field
 from dataclasses import fields
-from dataclasses import MISSING
-from types import FunctionType
+from dataclasses import is_dataclass
 from typing import Any
 from typing import Dict
 from typing import Iterator
@@ -74,36 +74,37 @@ class BaseModel:
         pass
 
     @classmethod
-    def from_element(cls: Type[T], el: etree.Element, index: int) -> T:
-        attrs = {
+    def create(cls: Type[T], **kwargs) -> T:
+        if not kwargs.get("nsmap"):
+            kwargs.update({"nsmap": {"xs": Namespace.SCHEMA}})
+
+        kwargs = {
             text.snake_case(etree.QName(key).localname): value
-            for key, value in el.attrib.items()
-        }
-        data = {
-            attr.name: cls.xsd_value(attr, attrs)
-            if attr.name in attrs
-            else cls.default_value(attr)
-            for attr in fields(cls)
-            if attr.init
+            for key, value in kwargs.items()
+            if value is not None
         }
 
-        data["index"] = index
+        data = {
+            attr.name: cls.prepare_value(attr, kwargs)
+            for attr in fields(cls)
+            if attr.name in kwargs
+        }
 
         return cls(**data)
 
     @classmethod
-    def default_value(cls: Type[T], field: Field) -> Any:
-        factory = field.default_factory  # type: ignore
-        if isinstance(factory, FunctionType):
-            return factory()
-        return None if field.default is MISSING else field.default
-
-    @classmethod
-    def xsd_value(cls, field: Field, kwargs: Dict) -> Any:
-        name = field.name
+    def prepare_value(cls, attr: Field, kwargs: Dict) -> Any:
+        name = attr.name
         value = kwargs[name]
-        clazz = field.type
 
+        if is_dataclass(value):
+            return value
+        if isinstance(value, dict):
+            return value
+        if isinstance(value, list):
+            return value
+
+        clazz = attr.type
         if name == "max_occurs" and value == "unbounded":
             return sys.maxsize
 
@@ -111,39 +112,23 @@ class BaseModel:
         if hasattr(clazz, "__origin__"):
             clazz = clazz.__args__[0]
 
-        if clazz == bool:
-            return value == "true"
-
         try:
-            if clazz == int:
+            if clazz is bool:
+                return value == "true" or value is True
+            if clazz is int:
                 return int(value)
-            if clazz == float:
+            if clazz is float:
                 return float(value)
         except ValueError:
             return str(value)
 
         return clazz(value)
 
-    @classmethod
-    def create(cls: Type[T], **kwargs) -> T:
-        if not kwargs.get("prefix") and not kwargs.get("nsmap"):
-            kwargs.update({"prefix": "xs", "nsmap": {"xs": Namespace.SCHEMA}})
-
-        data = {
-            attr.name: kwargs[attr.name]
-            if attr.name in kwargs
-            else cls.default_value(attr)
-            for attr in fields(cls)
-            if attr.init
-        }
-
-        return cls(**data)
-
 
 @dataclass
 class ElementBase(BaseModel):
-    index: int
-    id: Optional[str]
+    index: int = field(default_factory=int)
+    id: Optional[str] = None
 
     def children(self):
         for attribute in fields(self):

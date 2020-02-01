@@ -13,6 +13,8 @@ from typing import Optional
 from typing import Set
 from typing import Type
 
+from lxml.etree import QName
+
 from xsdata.models.enums import TagType
 
 
@@ -51,6 +53,15 @@ class Field:
 class Meta:
     name: str
     namespace: Optional[str]
+
+
+@dataclass
+class QueueItem:
+
+    qname: QName
+    clazz: Type
+    fields: Dict
+    index: int = field(default_factory=int)
 
 
 @dataclass

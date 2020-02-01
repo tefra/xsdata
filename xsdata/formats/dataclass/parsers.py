@@ -5,6 +5,7 @@ from typing import Any
 from typing import Dict
 from typing import List
 from typing import Optional
+from typing import Tuple
 from typing import Type
 
 from lxml.etree import Element
@@ -13,6 +14,7 @@ from lxml.etree import QName
 
 from xsdata.formats.dataclass.mixins import Field
 from xsdata.formats.dataclass.mixins import ModelInspect
+from xsdata.formats.dataclass.mixins import QueueItem
 from xsdata.formats.mixins import AbstractParser
 from xsdata.models.enums import EventType
 
@@ -80,87 +82,98 @@ class XmlParser(AbstractParser, ModelInspect):
 
     def parse_context(self, context: iterparse, clazz: Type) -> Type:
         """Build the given model from the iterparse event data."""
+
+        meta = self.class_meta(clazz)
+        queue = []
+        stack: List[Tuple[QName, Any]] = []
         _, root = next(context)
-        namespace = self.class_meta(clazz).namespace
-        queue = [self.class_ns_fields(clazz, namespace)]
-        objects = [self.build_object(clazz, namespace, root)]
+        qname = QName(meta.namespace, meta.name)
+
+        fields = self.class_ns_fields(clazz, meta.namespace)
+        item = QueueItem(qname=qname, clazz=clazz, fields=fields)
+        queue.append(item)
 
         for event, element in context:
+            qname = element.tag
+            item = queue[-1]
+
             if event == EventType.START:
-                field = self.find_field(queue, namespace, element)
-                obj = self.build_object_from_field(field, namespace, element)
-                objects.append(obj)
+                field = item.fields[qname]
+                fields = self.class_ns_fields(field.type, meta.namespace)
+                queue.append(
+                    QueueItem(
+                        qname=qname, clazz=field.type, fields=fields, index=len(stack)
+                    )
+                )
             elif event == EventType.END:
-                obj = self.end_element(objects, queue, element)
+                item = queue.pop()
+                stack.append(self.build_object(item, element, stack))
                 element.clear()
 
+        if len(queue) > 0 or len(stack) != 1:
+            raise AssertionError("Parsing failed with residual metadata")
+
+        _, obj = stack.pop()
+
         return obj
-
-    def find_field(
-        self, queue: List[Dict], namespace: Optional[str], element: Element
-    ) -> Field:
-        """
-        Find the current field from the fields queue.
-
-        If the next_letter field is also a dataclass append its fields
-        map to the queue for the next_letter event
-        """
-        field = queue[-1][element.tag]
-        if field.is_dataclass:
-            class_fields = self.class_ns_fields(field.type, namespace)
-            queue.append(class_fields)
-
-        return field
-
-    def build_object_from_field(
-        self, field: Field, namespace: Optional[str], element: Element
-    ) -> Type:
-        """Bind the current element to a dataclass or simply parse its text
-        value."""
-        if not field.is_dataclass:
-            return self.parse_value(field.type, element.text)
-
-        return self.build_object(field.type, namespace, element)
 
     def build_object(
-        self, clazz: Type, namespace: Optional[str], element: Element
-    ) -> Type:
-        """Create a new class instance by the current element attributes and
-        text."""
-        params = {}
-        for qname, field in self.class_ns_fields(clazz, namespace).items():
-            if field.is_text and element.text:
-                params[field.name] = self.parse_value(field.type, element.text)
-            elif qname in element.attrib:
-                params[field.name] = self.parse_value(field.type, element.attrib[qname])
-
-        return clazz(**params)
-
-    def end_element(
-        self, objects: List[Type], queue: List[Dict], element: Element
-    ) -> Type:
+        self, item: QueueItem, element: Element, stack: List[Tuple[QName, Any]]
+    ) -> Tuple[QName, Any]:
         """
-        Finalize and return the last item of the objects list.
+        Objectify current element by the item clazz type.
 
-        Steps:
-           * Pop the last item of the objects
-           * If the object is a dataclass pop the fields queue which should be
-             the current object's fields map
-           * If the object is not the last in the list assign or append it
-             to the correct parent field
+        If the clazz is a dataclass build the objects tree and parse attributes from
+        the element. Otherwise parse the elements text value
+
+        :returns Tuple: The qualified object name and the object
         """
-        obj = objects.pop()
-        if self.is_dataclass(obj):
-            queue.pop()
+        if self.is_dataclass(item.clazz):
+            children = self.fetch_class_children(item, stack)
+            attributes = self.parse_element_attributes(item, element)
+            obj = item.clazz(**children, **attributes)
+        else:
+            obj = self.parse_value(item.clazz, element.text)
 
-        if len(objects):
-            field = queue[-1][element.tag]
+        return item.qname, obj
+
+    @staticmethod
+    def fetch_class_children(
+        item: QueueItem, stack: List[Tuple[QName, Any]]
+    ) -> Dict[str, Any]:
+        """
+        Return a dictionary of qualified object names and objects for the given
+        queue item.
+
+        The object can be a primitive, another dataclass, or a list of
+        either primitive values and dataclasses.
+        """
+        params: Dict[str, Any] = dict()
+        while len(stack) > item.index:
+            qname, value = stack.pop()
+            field = item.fields[qname]
             if field.is_list:
-                getattr(objects[-1], field.name).append(obj)
+                if field.name not in params:
+                    params[field.name] = [value]
+                else:
+                    params[field.name].insert(0, value)
             else:
-                setattr(objects[-1], field.name, obj)
+                params[field.name] = value
+        return params
 
-        return obj
+    def parse_element_attributes(
+        self, item: QueueItem, element: Element
+    ) -> Dict[str, Any]:
+        """Parse the given element's attributes and text value if any and
+        return a dictionary of field names and values."""
+        params: Dict[str, Any] = dict()
+        for qname, field in item.fields.items():
+            if qname in element.attrib:
+                params[field.name] = self.parse_value(field.type, element.attrib[qname])
+            elif field.is_text and element.text:
+                params[field.name] = self.parse_value(field.type, element.text)
+
+        return params
 
     def class_ns_fields(
         self, clazz: Type, namespace: Optional[str]
@@ -169,6 +182,9 @@ class XmlParser(AbstractParser, ModelInspect):
         names for easier match."""
 
         res: Dict = dict()
+        if not self.is_dataclass(clazz):
+            return res
+
         for field in self.fields(clazz):
             if field.is_element and field.namespace == "":
                 res[field.local_name] = field

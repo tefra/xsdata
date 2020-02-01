@@ -192,9 +192,6 @@ class ClassBuilder:
 
         if len(types) == 0:
             types.append(AttrType(name=DataType.STRING.code, native=True))
-            logger.warning(
-                "Default type string for attribute %s.%s", parent.name, obj.real_name
-            )
 
         return types
 

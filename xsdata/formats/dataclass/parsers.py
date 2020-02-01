@@ -150,13 +150,13 @@ class XmlParser(AbstractParser, ModelInspect):
         """
         params: Dict[str, Any] = dict()
         while len(stack) > item.index:
-            qname, value = stack.pop()
+            qname, value = stack.pop(item.index)
             field = item.fields[qname]
             if field.is_list:
                 if field.name not in params:
                     params[field.name] = [value]
                 else:
-                    params[field.name].insert(0, value)
+                    params[field.name].append(value)
             else:
                 params[field.name] = value
         return params

@@ -1,3 +1,11 @@
+20.2 (2020-02-02)
+-------------------
+- Added support for mixed content in xsd documentation and appinfo.
+- Added support for auto detecting XML Schema namespace prefix.
+- Added support for xml datatypes lang and base.
+- Updated XmlParser and SchameParser to create objects when elements are fully parsed
+
+
 20.1.3 (2020-01-26)
 -------------------
 - Fixed elements min|man occurs inheritance from their container.

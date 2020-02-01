@@ -170,8 +170,8 @@ class ClassBuilderTests(FactoryTestCase):
 
     def test_element_children(self):
         complex_type = ComplexType.create(
-            attributes=[Attribute.create() for i in range(2)],
-            sequence=Sequence.create(elements=[Element.create() for i in range(2)]),
+            attributes=[Attribute.create(), Attribute.create()],
+            sequence=Sequence.create(elements=[Element.create(), Element.create()]),
             simple_content=SimpleContent.create(restriction=Restriction.create()),
             complex_content=ComplexContent.create(
                 restriction=Restriction.create(
@@ -314,11 +314,10 @@ class ClassBuilderTests(FactoryTestCase):
         self.assertEqual(expected, actual)
         self.assertEqual([inner_class], item.inner)
 
-    @patch("xsdata.builder.logger.warning")
     @patch.object(Attribute, "real_type", new_callable=PropertyMock)
     @patch.object(ClassBuilder, "build_inner_class")
     def test_build_class_attribute_types_when_obj_has_no_types(
-        self, mock_build_inner_class, mock_real_type, mock_warning
+        self, mock_build_inner_class, mock_real_type
     ):
         mock_real_type.return_value = None
         mock_build_inner_class.return_value = None
@@ -329,9 +328,6 @@ class ClassBuilderTests(FactoryTestCase):
         expected = [AttrTypeFactory.create(name="string", native=True)]
 
         self.assertEqual(expected, actual)
-        mock_warning.assert_called_once_with(
-            "Default type string for attribute %s.%s", "class_B", "attr"
-        )
 
     @patch.object(ClassBuilder, "build_class")
     @patch.object(ClassBuilder, "has_anonymous_class")

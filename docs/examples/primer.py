@@ -20,6 +20,7 @@ class Usaddress:
         metadata=dict(
             name="name",
             type="Element",
+            namespace="",
             required=True
         )
     )
@@ -28,6 +29,7 @@ class Usaddress:
         metadata=dict(
             name="street",
             type="Element",
+            namespace="",
             required=True
         )
     )
@@ -36,6 +38,7 @@ class Usaddress:
         metadata=dict(
             name="city",
             type="Element",
+            namespace="",
             required=True
         )
     )
@@ -44,6 +47,7 @@ class Usaddress:
         metadata=dict(
             name="state",
             type="Element",
+            namespace="",
             required=True
         )
     )
@@ -52,6 +56,7 @@ class Usaddress:
         metadata=dict(
             name="zip",
             type="Element",
+            namespace="",
             required=True
         )
     )
@@ -91,6 +96,7 @@ class Items:
         metadata=dict(
             name="item",
             type="Element",
+            namespace="",
             min_occurs=0,
             max_occurs=9223372036854775807
         )
@@ -111,6 +117,7 @@ class Items:
             metadata=dict(
                 name="productName",
                 type="Element",
+                namespace="",
                 required=True
             )
         )
@@ -119,6 +126,7 @@ class Items:
             metadata=dict(
                 name="quantity",
                 type="Element",
+                namespace="",
                 required=True,
                 max_exclusive=100.0
             )
@@ -128,6 +136,7 @@ class Items:
             metadata=dict(
                 name="USPrice",
                 type="Element",
+                namespace="",
                 required=True
             )
         )
@@ -135,14 +144,16 @@ class Items:
             default=None,
             metadata=dict(
                 name="comment",
-                type="Element"
+                type="Element",
+                namespace=""
             )
         )
         ship_date: Optional[str] = field(
             default=None,
             metadata=dict(
                 name="shipDate",
-                type="Element"
+                type="Element",
+                namespace=""
             )
         )
         part_num: Optional[str] = field(
@@ -170,6 +181,7 @@ class PurchaseOrderType:
         metadata=dict(
             name="shipTo",
             type="Element",
+            namespace="",
             required=True
         )
     )
@@ -178,6 +190,7 @@ class PurchaseOrderType:
         metadata=dict(
             name="billTo",
             type="Element",
+            namespace="",
             required=True
         )
     )
@@ -185,7 +198,8 @@ class PurchaseOrderType:
         default=None,
         metadata=dict(
             name="comment",
-            type="Element"
+            type="Element",
+            namespace=""
         )
     )
     items: Optional[Items] = field(
@@ -193,6 +207,7 @@ class PurchaseOrderType:
         metadata=dict(
             name="items",
             type="Element",
+            namespace="",
             required=True
         )
     )

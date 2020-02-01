@@ -5,30 +5,30 @@ class Items {
 }
 Items +-- item
 class item {
-    +productName : xsd:string
-    +quantity : xsd:positiveInteger
-    +USPrice : xsd:decimal
+    +productName : string
+    +quantity : positiveInteger
+    +USPrice : decimal
     +comment : comment
-    +shipDate : xsd:date
-    +partNum : xsd:string
+    +shipDate : date
+    +partNum : string
 }
 class PurchaseOrderType {
     +shipTo : USAddress
     +billTo : USAddress
     +comment : comment
     +items : Items
-    +orderDate : xsd:date
+    +orderDate : date
 }
 class USAddress {
-    +name : xsd:string
-    +street : xsd:string
-    +city : xsd:string
-    +state : xsd:string
-    +zip : xsd:decimal
-    +country : xsd:NMTOKEN
+    +name : string
+    +street : string
+    +city : string
+    +state : string
+    +zip : decimal
+    +country : NMTOKEN
 }
 class comment {
-    +value : xsd:string
+    +value : string
 }
 class purchaseOrder {
 }

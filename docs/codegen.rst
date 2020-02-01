@@ -48,31 +48,8 @@ Print
 
 The print flag overwrites the verbosity level to `Error` and print to stdOut the output result without writing to the target file.
 
-Examples
---------
 
-Check the `samples repo <https://github.com/tefra/xsdata-samples>`_ for more.
+.. admonition:: Examples
+    :class: hint
 
-
-Basic
-^^^^^
-
-.. literalinclude:: examples/common.py
-   :language: python
-   :lines: 353-392
-
-
-Enum
-^^^^
-
-.. literalinclude:: examples/common.py
-   :language: python
-   :lines: 1685-1702
-
-
-Inner Class
-^^^^^^^^^^^^
-
-.. literalinclude:: examples/common.py
-   :language: python
-   :lines: 395-434
+    Check the :doc:`tests` and the `samples repo <https://github.com/tefra/xsdata-samples>`_ for more ✨✨✨

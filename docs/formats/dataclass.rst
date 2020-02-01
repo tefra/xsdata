@@ -13,26 +13,26 @@ This is the default format and also comes with parsers and serializers for both 
     .. code-block:: python
 
             str:
-             xs:anySimpleType     xs:gDay       xs:IDREF    xs:normalizedString
-             xs:anyURI            xs:gMonth     xs:IDREFS   xs:NOTATION
-             xs:base64Binary      xs:gMonthDay  xs:language xs:QName
-             xs:date              xs:gYear      xs:Name     xs:simpleDerivationSet
-             xs:dateTime          xs:gYearMonth xs:NCName   xs:string
-             xs:derivationControl xs:hexBinary  xs:NMTOKEN  xs:time
-             xs:duration          xs:ID         xs:NMTOKENS xs:token
+                anyURI     anySimpleType base                base64Binary
+                date       dateTime      derivationControl   duration
+                gDay       gMonth        gMonthDay           gYear
+                gYearMonth hexBinary     ID                  IDREF
+                IDREFS     lang          language            Name
+                NCName     NMTOKEN       NMTOKENS            normalizedString
+                NOTATION   QName         simpleDerivationSet string
+                time       token
 
             bool:
-                xs:boolean
+                boolean
 
             int:
-             xs:byte               xs:ENTITIES        xs:ENTITY          xs:int
-             xs:integer            xs:long            xs:negativeInteger xs:nonNegativeInteger
-             xs:nonPositiveInteger xs:positiveInteger xs:short           xs:unsignedByte
-             xs:unsignedInt        xs:unsignedLong    xs:unsignedShort
-
+                byte               ENTITIES        ENTITY          int
+                integer            long            negativeInteger nonNegativeInteger
+                nonPositiveInteger positiveInteger short           unsignedByte
+                unsignedInt        unsignedLong    unsignedShort
 
             float:
-                xs:decimal         xs:double          xs:float
+                decimal            double          float
 
 
 XmlSerializer

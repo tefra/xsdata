@@ -99,6 +99,7 @@ class TagType(Enum):
     ANY = "any"
     ANY_ATTRIBUTE = "anyAttribute"
     APPINFO = "appinfo"
+    ASSERTION = "assertion"
     ATTRIBUTE = "attribute"
     ATTRIBUTEGROUP = "attributeGroup"
     CHOICE = "choice"

@@ -106,6 +106,9 @@ venv.bak/
 # idea
 .idea/
 
+# vscode
+.vscode/
+
 tests/xsd/go*
 
 wsdl/

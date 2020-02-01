@@ -533,6 +533,11 @@ class WhiteSpace(AnnotationBase):
 
 
 @dataclass
+class Assertion(AnnotationBase):
+    test: Optional[str] = None
+
+
+@dataclass
 class Restriction(RestrictedField, AnnotationBase, NamedField):
     """
     The restriction element defines restrictions on a simpleType,
@@ -585,6 +590,7 @@ class Restriction(RestrictedField, AnnotationBase, NamedField):
     pattern: Optional[Pattern] = None
     simple_type: Optional[SimpleType] = None
     enumerations: ArrayList[Enumeration] = field(default_factory=list)
+    assertions: ArrayList[Assertion] = field(default_factory=list)
     attributes: ArrayList[Attribute] = field(default_factory=list)
     attribute_groups: ArrayList[AttributeGroup] = field(default_factory=list)
 

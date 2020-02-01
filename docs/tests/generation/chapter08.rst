@@ -92,10 +92,8 @@ Example 8-17 Simple type assertion
    :language: xml
    :lines: 3-
 
-.. warning::
-
-    XML Schema 1.1
-
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter08/example0817.py
+   :language: python
 
 Example 8-18 Explicit time zone
 -------------------------------

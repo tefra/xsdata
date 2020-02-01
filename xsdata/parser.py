@@ -9,7 +9,6 @@ from typing import Optional
 from lxml import etree
 
 from xsdata.models import elements as xsd
-from xsdata.models.enums import DataType
 from xsdata.models.enums import EventType
 from xsdata.models.enums import FormType
 from xsdata.models.enums import TagType
@@ -79,40 +78,50 @@ class SchemaParser:
 
         methods = TagType.qnames()
         index = 0
+        queue = []
+
         for event, elem in self.context:
             tag = methods.get(elem.tag)
+
             if tag is None:
                 self.mixed_content = elem
                 continue
-
-            if event == EventType.START:
+            elif event == EventType.START:
                 model = getattr(xsd, tag.cname)
-                element = model.create(index=index, **elem.attrib)
-                self.elements.append(element)
+                queue.append((model, index, len(self.elements)))
                 index += 1
             elif event == EventType.END:
-                element = self.elements.pop()
-                if not elem.attrib and elem.text is None:
+                model, obj_index, chd_index = queue.pop()
+                if not elem.attrib and elem.text is None and model is not xsd.Schema:
                     continue
 
-                if self.elements:
-                    self.assign_to_parent(element, elem.prefix)
+                obj = model.create(index=obj_index, **elem.attrib)
+                while len(self.elements) > chd_index:
+                    self.assign_to_parent(obj, self.elements.pop(chd_index))
+
+                self.elements.append(obj)
 
             method_name = f"{event}_{tag.value}"
             if hasattr(self, method_name):
-                getattr(self, method_name)(element, elem)
+                getattr(self, method_name)(elem)
 
         if self.mixed_content is not None:
             raise NotImplementedError(f"Unsupported tag `{self.mixed_content.tag}`")
 
-        return element
+        obj = self.elements.pop()
+        if not isinstance(obj, xsd.Schema):
+            raise ValueError("Schema parser failed for an unknown reason.")
 
-    def end_documentation(self, obj: xsd.Schema, element: etree.Element):
+        return obj
+
+    def end_documentation(self, element: etree.Element):
+        obj = self.elements[-1]
         if isinstance(obj, xsd.Documentation):
             obj.text = self.get_mixed_text(element)
             self.mixed_content = None
 
-    def end_appinfo(self, obj: xsd.Schema, element: etree.Element):
+    def end_appinfo(self, element: etree.Element):
+        obj = self.elements[-1]
         if isinstance(obj, xsd.Appinfo):
             obj.text = self.get_mixed_text(element)
             self.mixed_content = None
@@ -127,68 +136,71 @@ class SchemaParser:
 
         return re.sub(r"\s+", " ", xml[start_root + 1 : end_root]).strip()
 
-    def start_schema(self, obj: xsd.Schema, element: etree.Element):
+    def start_schema(self, element: etree.Element):
         """Collect the schema's default form for attributes and elements for
         later usage."""
 
+        self.element_form = element.attrib.get("elementFormDefault", None)
+        self.attribute_form = element.attrib.get("attributeFormDefault", None)
+
+    def end_schema(self, element: etree.Element):
+        """Collect the schema's default form for attributes and elements for
+        later usage."""
+        obj = self.elements[-1]
         if isinstance(obj, xsd.Schema):
-            self.element_form = obj.element_form_default
-            self.attribute_form = obj.attribute_form_default
+            if self.element_form:
+                obj.element_form_default = FormType(self.element_form)
+            if self.attribute_form:
+                obj.attribute_form_default = FormType(self.attribute_form)
 
             obj.nsmap = element.nsmap
-            if obj.target_namespace is None:
-                if self.target_namespace is not None:
-                    obj.target_namespace = self.target_namespace
+            if obj.target_namespace is None and self.target_namespace is not None:
+                obj.target_namespace = self.target_namespace
 
-    @classmethod
-    def end_schema(cls, obj: xsd.Schema, *args):
-        """Root elements and attributes are always qualified."""
-        if isinstance(obj, xsd.Schema):
             for element in obj.elements:
                 element.form = FormType.QUALIFIED
             for attribute in obj.attributes:
                 attribute.form = FormType.QUALIFIED
 
-    def start_element(self, obj: xsd.Element, *args):
+    def end_element(self, element: etree.Element):
         """Assign the schema's default form for elements if the given element
         form is None."""
+        obj = self.elements[-1]
+        if isinstance(obj, xsd.Element) and obj.form is None and self.element_form:
+            obj.form = FormType(self.element_form)
 
-        if isinstance(obj, xsd.Element) and obj.form is None:
-            obj.form = self.element_form
-
-    def start_attribute(self, obj: xsd.Attribute, *args):
+    def end_attribute(self, element: etree.Element):
         """Assign the schema's default form for attributes if the given
         attribute form is None."""
+        obj = self.elements[-1]
+        if isinstance(obj, xsd.Attribute) and obj.form is None and self.attribute_form:
+            obj.form = FormType(self.attribute_form)
 
-        if isinstance(obj, xsd.Attribute) and obj.form is None:
-            obj.form = self.attribute_form
-
-    @classmethod
-    def end_choice(cls, obj: xsd.Choice, *args):
+    def end_choice(self, element: etree.Element):
         """Elements inside a choice are by definition optional, reset their min
         occurs counter."""
-
+        obj = self.elements[-1]
         if isinstance(obj, xsd.Choice):
             for child in obj.elements:
                 child.min_occurs = 0
                 if child.max_occurs is None:
                     child.max_occurs = obj.max_occurs
 
-    @classmethod
-    def end_all(cls, obj: xsd.All, *args):
+    def end_all(self, element: etree.Element):
         """Elements inside an all element can by definition appear at most
         once, reset their max occur counter."""
 
+        obj = self.elements[-1]
         if isinstance(obj, xsd.All):
             for child in obj.elements:
                 child.max_occurs = 1
                 if child.min_occurs is None:
                     child.min_occurs = obj.min_occurs
 
-    @classmethod
-    def end_sequence(cls, obj: xsd.Sequence, *args):
+    def end_sequence(self, element: etree.Element):
         """Elements inside a sequence inherit min|max occur counter if it is
         not set."""
+        obj = self.elements[-1]
         if isinstance(obj, xsd.Sequence):
             for child in obj.elements:
                 if child.min_occurs is None:
@@ -196,31 +208,27 @@ class SchemaParser:
                 if child.max_occurs is None:
                     child.max_occurs = obj.max_occurs
 
-    def assign_to_parent(self, element, prefix):
+    @classmethod
+    def assign_to_parent(cls, parent: BaseModel, child: BaseModel):
         """
         Assign an element to its parent either in a list of same type objects
         or directly as an attribute.
 
-        :raise ValueError when we can't assign or append the element to the
+        :raise ValueError: when we can't assign or append the element to the
             correct place. This practically will mean that we encountered a
             new not implemented element.
         """
 
-        name = snake_case(type(element).__name__)
-        parent = self.elements[-1]
-
+        name = snake_case(child.__class__.__name__)
         if hasattr(parent, name):
-            return setattr(parent, name, element)
+            setattr(parent, name, child)
+            return
         else:
-            plural_name = "{}s".format(name)
+            plural_name = f"{name}s"
             if hasattr(parent, plural_name):
                 siblings = getattr(parent, plural_name)
-                id = f"{prefix}:{DataType.ID.code}"
-                if getattr(element, "type", "") == id:
-                    for sibling in siblings:
-                        if getattr(sibling, "type", "") == id:
-                            raise ValueError(f"Duplicated ID: `{element}`")
+                return siblings.append(child)
 
-                return siblings.append(element)
-
-        raise ValueError(f"Class {type(parent).__name__} missing attribute `{name}`")
+        raise ValueError(
+            f"Class {parent.__class__.__name__} missing attribute `{name}`"
+        )

@@ -55,7 +55,7 @@ class ParserTests(TestCase):
     def test_schema_nsmap_without_target_namespace(self):
         xsd = """<?xml version="1.0" encoding="utf-8"?>
                 <xs:schema xmlns="http://www/default"
-                xmlns:xs="http://www.w3.org/2001/XMLSchema" />"""
+                xmlns:xs="http://www.w3.org/2001/XMLSchema"></xs:schema>"""
 
         schema = SchemaParser.from_string(xsd, target_namespace="parent")
         self.assertEqual(

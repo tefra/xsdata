@@ -29,13 +29,17 @@ def wrap(str, element_form="qualified", attribute_form="unqualified"):
 
 
 class ParserTests(TestCase):
+    def setUp(self) -> None:
+        self.parser = SchemaParser()
+        super(ParserTests, self).setUp()
+
     def test_with_unknown_tags_raise_exception(self):
-        xsd = "<xs:assert />"
+        xsd = "<xs:foobar />"
         with self.assertRaises(NotImplementedError) as cm:
-            SchemaParser.from_string(wrap(xsd))
+            self.parser.from_xsd_string(wrap(xsd))
 
         self.assertEqual(
-            "Unsupported tag `{http://www.w3.org/2001/XMLSchema}assert`",
+            "Unsupported tag `{http://www.w3.org/2001/XMLSchema}foobar`",
             str(cm.exception),
         )
 
@@ -45,7 +49,7 @@ class ParserTests(TestCase):
                 targetNamespace="http://www/target"
                 xmlns:xs="http://www.w3.org/2001/XMLSchema" />"""
 
-        schema = SchemaParser.from_string(xsd, target_namespace="parent")
+        schema = self.parser.from_xsd_string(xsd)
         self.assertEqual(
             {None: "http://www/default", "xs": "http://www.w3.org/2001/XMLSchema"},
             schema.nsmap,
@@ -57,7 +61,8 @@ class ParserTests(TestCase):
                 <xs:schema xmlns="http://www/default"
                 xmlns:xs="http://www.w3.org/2001/XMLSchema"></xs:schema>"""
 
-        schema = SchemaParser.from_string(xsd, target_namespace="parent")
+        self.parser.target_namespace = "parent"
+        schema = self.parser.from_xsd_string(xsd)
         self.assertEqual(
             {None: "http://www/default", "xs": "http://www.w3.org/2001/XMLSchema"},
             schema.nsmap,
@@ -67,7 +72,7 @@ class ParserTests(TestCase):
     def test_top_level_elements_and_attributes_are_qualified(self):
         xsd = """<xs:element name="a" /><xs:attribute name="b" />"""
 
-        schema = SchemaParser.from_string(wrap(xsd))
+        schema = self.parser.from_xsd_string(wrap(xsd))
         self.assertEqual(FormType.QUALIFIED, schema.attributes[0].form)
         self.assertEqual(FormType.QUALIFIED, schema.elements[0].form)
 
@@ -76,7 +81,7 @@ class ParserTests(TestCase):
         <xs:element />
         """
 
-        schema = SchemaParser.from_string(wrap(xsd))
+        schema = self.parser.from_xsd_string(wrap(xsd))
         self.assertEqual(0, len(schema.elements))
         self.assertEqual(1, len(schema.complex_types))
 
@@ -119,7 +124,7 @@ class ParserTests(TestCase):
                 ],
             ),
         )
-        schema = SchemaParser.from_string(wrap(xsd))
+        schema = self.parser.from_xsd_string(wrap(xsd))
         self.assertEqual(expected, schema.complex_types[0])
 
     def test_complex_type_with_simple_content_and_extension(self):
@@ -166,7 +171,7 @@ class ParserTests(TestCase):
                 ),
             ),
         )
-        schema = SchemaParser.from_string(wrap(xsd))
+        schema = self.parser.from_xsd_string(wrap(xsd))
         self.assertEqual(expected, schema.complex_types[0])
 
     def test_complex_type_with_complex_content(self):
@@ -211,7 +216,7 @@ class ParserTests(TestCase):
                 ),
             ),
         )
-        schema = SchemaParser.from_string(wrap(xsd))
+        schema = self.parser.from_xsd_string(wrap(xsd))
         self.assertEqual(expected, schema.complex_types[0])
 
     def test_complex_type_with_choice_resets_elements_min_occurs(self):
@@ -245,7 +250,7 @@ class ParserTests(TestCase):
                 ],
             ),
         )
-        schema = SchemaParser.from_string(wrap(xsd))
+        schema = self.parser.from_xsd_string(wrap(xsd))
         self.assertEqual(expected, schema.complex_types[0])
 
     def test_complex_type_with_all_resets_elements_max_occurs(self):
@@ -279,5 +284,5 @@ class ParserTests(TestCase):
                 ],
             ),
         )
-        schema = SchemaParser.from_string(wrap(xsd))
+        schema = self.parser.from_xsd_string(wrap(xsd))
         self.assertEqual(expected, schema.complex_types[0])

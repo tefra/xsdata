@@ -66,7 +66,7 @@ class DictParserTests(TestCase):
             books.book[1],
         )
 
-    def test_parse_value(self):
+    def test_get_value(self):
         data = dict(foo="bar", bar="foo")
 
         foo_field = Field(name="", local_name="foo", type=str, node_type=NodeType.TEXT)
@@ -78,8 +78,8 @@ class DictParserTests(TestCase):
             node_type=NodeType.ELEMENT,
         )
 
-        self.assertEqual("bar", JsonParser.parse_value(data, foo_field))
-        self.assertEqual(["foo"], JsonParser.parse_value(data, bar_field))
+        self.assertEqual("bar", JsonParser.get_value(data, foo_field))
+        self.assertEqual(["foo"], JsonParser.get_value(data, bar_field))
 
         none_field = Field(
             name="",
@@ -88,7 +88,7 @@ class DictParserTests(TestCase):
             default=list,
             node_type=NodeType.ELEMENT,
         )
-        self.assertEqual([], JsonParser.parse_value(data, none_field))
+        self.assertEqual([], JsonParser.get_value(data, none_field))
 
         none_field = Field(
             name="",
@@ -97,7 +97,7 @@ class DictParserTests(TestCase):
             default=1,
             node_type=NodeType.ATTRIBUTE,
         )
-        self.assertEqual(1, JsonParser.parse_value(data, none_field))
+        self.assertEqual(1, JsonParser.get_value(data, none_field))
 
 
 class XmlParserTests(TestCase):

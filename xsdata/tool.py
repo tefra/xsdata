@@ -28,7 +28,8 @@ class ProcessTask:
             return
         self.processed.append(xsd)
 
-        schema = SchemaParser.from_file(xsd, target_namespace=target_namespace)
+        parser = SchemaParser(target_namespace=target_namespace)
+        schema = parser.from_xsd_path(xsd)
         for sub_schema in schema.sub_schemas():
             if self.is_valid(sub_schema):
                 self.process(

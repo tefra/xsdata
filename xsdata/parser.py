@@ -3,13 +3,16 @@ import pathlib
 import re
 from dataclasses import dataclass
 from dataclasses import field
+from typing import Dict
 from typing import List
 from typing import Optional
+from typing import Type
+from typing import TypeVar
 
 from lxml import etree
 
+from xsdata.formats.mixins import AbstractXmlParser
 from xsdata.models import elements as xsd
-from xsdata.models.enums import EventType
 from xsdata.models.enums import FormType
 from xsdata.models.enums import TagType
 from xsdata.models.mixins import BaseModel
@@ -17,7 +20,18 @@ from xsdata.utils.text import snake_case
 
 
 @dataclass
-class SchemaParser:
+class QueueItem:
+
+    clazz: Type
+    index: int
+    child_index: int
+
+
+T = TypeVar("T")
+
+
+@dataclass
+class SchemaParser(AbstractXmlParser):
     """
     A simple parser to convert an xsd schema to an easy to handle data
     structure based on dataclasses.
@@ -26,91 +40,64 @@ class SchemaParser:
     certain things like apply parent properties to children.
     """
 
-    context: etree.iterparse
-    mixed_content: Optional[etree.Element] = field(default=None)
-    elements: List[BaseModel] = field(default_factory=list)
+    mixed_content: Optional[etree.Element] = field(init=False, default=None)
+    elements: List[BaseModel] = field(init=False, default_factory=list)
     element_form: Optional[FormType] = field(init=False, default=None)
     attribute_form: Optional[FormType] = field(init=False, default=None)
     target_namespace: Optional[str] = field(default=None)
+    tags: Dict[str, TagType] = field(default_factory=TagType.qnames)
+    queue: List[QueueItem] = field(default_factory=list)
+    index: int = field(init=False, default_factory=int)
 
-    @classmethod
-    def create(cls, source: object, target_namespace=None) -> xsd.Schema:
-        """A shortcut class method to initialize the parser, parse the given
-        source and return the generated Schema instance."""
+    def from_xsd_string(self, source: str) -> xsd.Schema:
+        return super().from_string(source, xsd.Schema)
 
-        ctx = etree.iterparse(source, events=(EventType.START, EventType.END))
-        return cls(context=ctx, target_namespace=target_namespace).parse()
-
-    @classmethod
-    def from_file(cls, path: pathlib.Path, target_namespace=None) -> xsd.Schema:
-        """A shortcut class method for file path sources."""
-
-        if isinstance(path, str):
-            path = pathlib.Path(path).resolve()
-
-        schema = cls.create(str(path), target_namespace=target_namespace)
+    def from_xsd_path(self, path: pathlib.Path) -> xsd.Schema:
+        schema = super().from_path(path, xsd.Schema)
         schema.location = path
         return schema
 
-    @classmethod
-    def from_bytes(cls, source: bytes, target_namespace=None) -> xsd.Schema:
-        """A shortcut class method for bytes source."""
-
-        return cls.create(io.BytesIO(source), target_namespace=target_namespace)
-
-    @classmethod
-    def from_string(cls, source: str, target_namespace=None) -> xsd.Schema:
-        """A shortcut class method for string source."""
-        return cls.from_bytes(source.encode(), target_namespace=target_namespace)
-
-    def parse(self) -> xsd.Schema:
-        """
-        Main parse procedure which depends heavily on binding data classes that
-        have all the necessary attributes to match all the possible xsd
-        elements and attributes.
-
-        Elements are initialized on the start event of the parser and assigned
-        to the parent element on the end event. The procedure all includes
-        start/end hooks for each element type.
-
-        Elements with no attributes and text are ignored.
-        """
-
-        methods = TagType.qnames()
-        index = 0
-        queue = []
-
-        for event, elem in self.context:
-            tag = methods.get(elem.tag)
-
-            if tag is None:
-                self.mixed_content = elem
-                continue
-            elif event == EventType.START:
-                model = getattr(xsd, tag.cname)
-                queue.append((model, index, len(self.elements)))
-                index += 1
-            elif event == EventType.END:
-                model, obj_index, chd_index = queue.pop()
-                if not elem.attrib and elem.text is None and model is not xsd.Schema:
-                    continue
-
-                obj = model.create(index=obj_index, **elem.attrib)
-                while len(self.elements) > chd_index:
-                    self.assign_to_parent(obj, self.elements.pop(chd_index))
-
-                self.elements.append(obj)
-
-            method_name = f"{event}_{tag.value}"
-            if hasattr(self, method_name):
-                getattr(self, method_name)(elem)
-
+    def parse(self, source: io.BytesIO, clazz: Type[T]) -> T:
+        obj = super().parse(source, clazz)
         if self.mixed_content is not None:
             raise NotImplementedError(f"Unsupported tag `{self.mixed_content.tag}`")
 
-        obj = self.elements.pop()
-        if not isinstance(obj, xsd.Schema):
-            raise ValueError("Schema parser failed for an unknown reason.")
+        return obj
+
+    def start_node(self, element: etree.Element):
+        tag = self.tags.get(element.tag)
+        if tag is None:
+            self.mixed_content = element
+            return
+
+        model = getattr(xsd, tag.cname)
+        self.queue.append(
+            QueueItem(clazz=model, index=self.index, child_index=len(self.elements))
+        )
+        self.index += 1
+
+        method_name = f"start_{tag.value}"
+        if hasattr(self, method_name):
+            getattr(self, method_name)(element)
+
+    def end_node(self, element: etree.Element) -> Optional[Type]:
+        tag = self.tags.get(element.tag)
+        if tag is None:
+            return None
+
+        item = self.queue.pop()
+        if not element.attrib and element.text is None and item.clazz is not xsd.Schema:
+            return None
+
+        obj = item.clazz.create(index=item.index, **element.attrib)
+        while len(self.elements) > item.child_index:
+            self.assign_to_parent(obj, self.elements.pop(item.child_index))
+
+        self.elements.append(obj)
+
+        method_name = f"end_{tag.value}"
+        if hasattr(self, method_name):
+            getattr(self, method_name)(element)
 
         return obj
 

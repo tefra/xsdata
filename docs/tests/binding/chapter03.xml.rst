@@ -1,5 +1,5 @@
-Chapter 03
-==========
+Chapter 03: Namespaces
+======================
 
 **Schema**
 

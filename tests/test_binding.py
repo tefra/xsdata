@@ -8,6 +8,7 @@ from click.testing import CliRunner
 from jinja2 import Template
 from lxml import etree
 
+from tests.test_generation import titles
 from xsdata import cli
 from xsdata.formats.dataclass.generator import DataclassGenerator
 from xsdata.formats.dataclass.parsers import XmlParser
@@ -123,8 +124,9 @@ def teardown_module():
             keep_trailing_newline=True,
         )
 
+        number = xml.name.replace("chapter", "").replace(".xml", "")
         output = template.render(
-            suite=xml.name.replace("chapter", "Chapter ").replace(".xml", ""),
+            suite=titles[number],
             schema=f"/../tests/{schema.relative_to(here)}",
             source=f"/../tests/{xml.relative_to(here)}",
             xsdata_json=f"/../tests/{json.relative_to(here)}",

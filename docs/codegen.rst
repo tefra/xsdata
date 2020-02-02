@@ -25,7 +25,7 @@ If the main xsd has any parent include or import you should adjust the target pa
     :class: warning
 
     * Output directory ``./api/models``
-    * Main xsd ``./api/air/AirReqRsp.xsd` that includes ``../common/CommonReqRsp.xsd``
+    * Main xsd ``./api/air/AirReqRsp.xsd`` that includes ``../common/CommonReqRsp.xsd``
     * Adjust the package from ``api.models`` to ``api.models.air`` because the generator has to also create the ``common.common_req_rsp`` module.
 
 Renderer

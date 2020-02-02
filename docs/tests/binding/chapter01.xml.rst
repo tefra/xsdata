@@ -1,5 +1,5 @@
-Chapter 01
-==========
+Chapter 01: Schemas: An introduction
+====================================
 
 **Schema**
 

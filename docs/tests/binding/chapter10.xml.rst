@@ -1,5 +1,5 @@
-Chapter 10
-==========
+Chapter 10: Union and list types
+================================
 
 **Schema**
 

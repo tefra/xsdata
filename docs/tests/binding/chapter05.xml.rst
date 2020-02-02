@@ -1,5 +1,5 @@
-Chapter 05
-==========
+Chapter 05: Instances and schemas
+=================================
 
 **Schema**
 

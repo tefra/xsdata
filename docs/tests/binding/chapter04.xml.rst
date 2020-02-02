@@ -1,5 +1,5 @@
-Chapter 04
-==========
+Chapter 04: Schema composition
+==============================
 
 **Schema**
 

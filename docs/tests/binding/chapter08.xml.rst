@@ -1,5 +1,5 @@
-Chapter 08
-==========
+Chapter 08: Simple types
+========================
 
 **Schema**
 

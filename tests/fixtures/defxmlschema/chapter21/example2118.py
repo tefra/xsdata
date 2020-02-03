@@ -6,6 +6,6 @@ from tests.fixtures.defxmlschema.chapter01.example0102 import (
 
 @dataclass
 class Product(ProductType):
-    """<doc:description></doc:description>"""
+    """<doc:description>This element represents a product.</doc:description>"""
     class Meta:
         name = "product"

@@ -9,6 +9,9 @@ class DescType:
     :ivar b:
     :ivar u:
     """
+    class Meta:
+        mixed = True
+
     i: List[str] = field(
         default_factory=list,
         metadata=dict(

@@ -5,6 +5,7 @@ from dataclasses import is_dataclass
 from dataclasses import MISSING
 from enum import Enum
 from typing import Any
+from typing import Callable
 from typing import Dict
 from typing import get_type_hints
 from typing import Iterator
@@ -22,6 +23,7 @@ class NodeType(Enum):
     TEXT = 1
     ATTRIBUTE = 2
     ELEMENT = 3
+    ROOT = 4
 
 
 @dataclass(frozen=True)
@@ -52,37 +54,44 @@ class Field:
 @dataclass(frozen=True)
 class Meta:
     name: str
+    mixed: bool
     namespace: Optional[str]
 
 
 @dataclass
 class QueueItem:
 
-    qname: QName
-    clazz: Type
-    fields: Dict
     index: int = field(default_factory=int)
+    child_index: int = field(default_factory=int)
+    qname: Optional[QName] = None
+    clazz: Optional[Type] = None
+    meta: Optional[Meta] = None
+    fields: Dict = field(default_factory=dict)
 
 
 @dataclass
 class ModelInspect:
-    cache: Dict = field(init=False, default_factory=dict)
+    name: Callable = field(default=lambda x: x)
+    fields_cache: Dict = field(init=False, default_factory=dict)
+    class_cache: Dict = field(init=False, default_factory=dict)
     ns_cache: Dict = field(init=False, default_factory=dict)
 
     def fields(self, clazz: Type) -> List[Field]:
-        if not self.is_dataclass(clazz):
-            raise TypeError(f"Object {clazz} is not a dataclass")
+        if clazz not in self.fields_cache:
+            if not self.is_dataclass(clazz):
+                raise TypeError(f"Object {clazz} is not a dataclass")
 
-        if clazz not in self.cache:
-            self.cache[clazz] = list(self.get_type_hints(clazz))
-        return self.cache[clazz]
+            self.fields_cache[clazz] = list(self.get_type_hints(clazz))
+
+        return self.fields_cache[clazz]
 
     def namespaces(self, clazz: Type) -> List[str]:
-        if not self.is_dataclass(clazz):
-            raise TypeError(f"Object {clazz} is not a dataclass")
-
         if clazz not in self.ns_cache:
+            if not self.is_dataclass(clazz):
+                raise TypeError(f"Object {clazz} is not a dataclass")
+
             self.ns_cache[clazz] = list(self.get_unique_namespaces(clazz))
+
         return self.ns_cache[clazz]
 
     def get_unique_namespaces(self, clazz) -> Set[str]:
@@ -103,8 +112,8 @@ class ModelInspect:
     def get_type_hints(self, clazz) -> Iterator[Field]:
         type_hints = get_type_hints(clazz)
 
-        for f in fields(clazz):
-            tp = type_hints[f.name]
+        for arg in fields(clazz):
+            tp = type_hints[arg.name]
             is_list = False
 
             if hasattr(tp, "__origin__"):
@@ -112,21 +121,21 @@ class ModelInspect:
                 tp = tp.__args__[0]
 
             default_value = None
-            if f.default_factory is not MISSING:  # type: ignore
-                default_value = f.default_factory  # type: ignore
-            elif f.default is not MISSING:
-                default_value = f.default
+            if arg.default_factory is not MISSING:  # type: ignore
+                default_value = arg.default_factory  # type: ignore
+            elif arg.default is not MISSING:
+                default_value = arg.default
 
-            namespace = f.metadata.get("namespace")
+            namespace = arg.metadata.get("namespace")
             if namespace is None:
                 namespace = self.class_meta(tp).namespace
 
             yield Field(
-                name=f.name,
-                local_name=f.metadata["name"],
-                node_type=self.node_type(f.metadata["type"]),
+                name=arg.name,
+                local_name=arg.metadata.get("name") or self.name(arg.name),
+                node_type=self.node_type(arg.metadata.get("type")),
                 is_list=is_list,
-                is_nillable=f.metadata.get("nillable") is True,
+                is_nillable=arg.metadata.get("nillable") is True,
                 is_dataclass=self.is_dataclass(tp),
                 type=tp,
                 default=default_value,
@@ -134,20 +143,23 @@ class ModelInspect:
             )
 
     @staticmethod
-    def node_type(type_str: str):
+    def node_type(type_str: Optional[str]):
         if type_str == TagType.ATTRIBUTE.cname:
             return NodeType.ATTRIBUTE
-        if type_str not in (TagType.ATTRIBUTE.cname, TagType.ELEMENT.cname):
-            return NodeType.TEXT
-        return NodeType.ELEMENT
+        if type_str == TagType.ELEMENT.cname:
+            return NodeType.ELEMENT
 
-    @staticmethod
-    def class_meta(clazz: Type) -> Meta:
-        meta = getattr(clazz, "Meta", None)
-        return Meta(
-            name=getattr(meta, "name", clazz.__name__),
-            namespace=getattr(meta, "namespace", None),
-        )
+        return NodeType.TEXT
+
+    def class_meta(self, clazz: Type) -> Meta:
+        if clazz not in self.class_cache:
+            meta = getattr(clazz, "Meta", None)
+            self.class_cache[clazz] = Meta(
+                name=getattr(meta, "name", self.name(clazz.__name__)),
+                mixed=getattr(meta, "mixed", False),
+                namespace=getattr(meta, "namespace", None),
+            )
+        return self.class_cache[clazz]
 
     @staticmethod
     def is_dataclass(obj: object):

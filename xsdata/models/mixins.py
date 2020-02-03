@@ -148,6 +148,10 @@ class ElementBase(BaseModel):
         return False
 
     @property
+    def is_mixed(self):
+        return False
+
+    @property
     def extends(self) -> Optional[str]:
         return None
 

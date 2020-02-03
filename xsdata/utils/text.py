@@ -35,6 +35,11 @@ def pascal_case(string: str) -> str:
     return "".join([capitalize(part) for part in snake_case(string).split("_") if part])
 
 
+def camel_case(string: str) -> str:
+    string = pascal_case(string)
+    return string[0].lower() + string[1:]
+
+
 def snake_case(string: str) -> str:
     result: List[str] = []
     was_upper = False

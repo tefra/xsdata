@@ -55,6 +55,7 @@ class ClassBuilder:
             name=obj.real_name,
             is_abstract=obj.is_abstract,
             namespace=self.element_namespace(obj),
+            is_mixed=obj.is_mixed,
             type=type(obj),
             extensions=self.build_class_extensions(obj),
             help=obj.display_help,

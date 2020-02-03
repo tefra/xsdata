@@ -7,6 +7,9 @@ class TextType:
     """
     :ivar lang:
     """
+    class Meta:
+        mixed = True
+
     lang: Optional[str] = field(
         default=None,
         metadata=dict(

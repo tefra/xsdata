@@ -9,6 +9,9 @@ class LetterType:
     :ivar prod_name:
     :ivar prod_size:
     """
+    class Meta:
+        mixed = True
+
     cust_name: Optional[str] = field(
         default=None,
         metadata=dict(
@@ -43,6 +46,9 @@ class ExtendedLetterType(LetterType):
     """
     :ivar prod_num:
     """
+    class Meta:
+        mixed = True
+
     prod_num: Optional[str] = field(
         default=None,
         metadata=dict(

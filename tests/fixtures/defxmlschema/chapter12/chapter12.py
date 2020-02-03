@@ -21,6 +21,9 @@ class DescriptionType:
     """
     :ivar value:
     """
+    class Meta:
+        mixed = True
+
     value: Optional[str] = field(
         default=None,
         metadata=dict(

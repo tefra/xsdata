@@ -92,7 +92,7 @@ class ModelInspectTests(TestCase):
 
     def test_fields(self):
         inspect = ModelInspect()
-        inspect.cache[BookForm] = {"foo": str}
+        inspect.fields_cache[BookForm] = {"foo": str}
 
         self.assertEqual({"foo": str}, inspect.fields(BookForm))
 

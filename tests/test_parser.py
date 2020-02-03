@@ -33,15 +33,29 @@ class ParserTests(TestCase):
         self.parser = SchemaParser()
         super(ParserTests, self).setUp()
 
+    def test_with_mixed_content(self):
+        xsd = """<xs:simpleType name="CountryType">
+                    <xs:annotation>
+                      <xs:documentation>
+                        <doc:keyword>country</doc:keyword>
+                      </xs:documentation>
+                    </xs:annotation>
+                  </xs:simpleType>"""
+        schema = self.parser.from_xsd_string(wrap(xsd))
+
+        expected = "<doc:keyword>country</doc:keyword>"
+        self.assertEqual(expected, schema.simple_types[0].display_help)
+
     def test_with_unknown_tags_raise_exception(self):
         xsd = "<xs:foobar />"
-        with self.assertRaises(NotImplementedError) as cm:
+        with self.assertRaises(ValueError) as cm:
             self.parser.from_xsd_string(wrap(xsd))
 
-        self.assertEqual(
-            "Unsupported tag `{http://www.w3.org/2001/XMLSchema}foobar`",
-            str(cm.exception),
+        msg = (
+            "{http://www.w3.org/2001/XMLSchema}schema does not support "
+            "mixed content: {http://www.w3.org/2001/XMLSchema}foobar"
         )
+        self.assertEqual(msg, str(cm.exception))
 
     def test_schema_nsmap_with_target_and_default_namespace(self):
         xsd = """<?xml version="1.0" encoding="utf-8"?>
@@ -59,7 +73,7 @@ class ParserTests(TestCase):
     def test_schema_nsmap_without_target_namespace(self):
         xsd = """<?xml version="1.0" encoding="utf-8"?>
                 <xs:schema xmlns="http://www/default"
-                xmlns:xs="http://www.w3.org/2001/XMLSchema"></xs:schema>"""
+                xmlns:xs="http://www.w3.org/2001/XMLSchema" version="1"></xs:schema>"""
 
         self.parser.target_namespace = "parent"
         schema = self.parser.from_xsd_string(xsd)

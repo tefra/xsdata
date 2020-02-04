@@ -260,6 +260,6 @@ class ClassBuilder:
                 index=0,
                 default=None,
                 types=types,
-                local_type=TagType.EXTENSION.cname,
+                local_type=TagType.EXTENSION,
             )
         return None

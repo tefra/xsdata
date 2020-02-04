@@ -424,7 +424,7 @@ class ClassBuilderTests(FactoryTestCase):
         expected = AttrFactory.create(
             name="value",
             index=0,
-            local_type=TagType.EXTENSION.cname,
+            local_type=TagType.EXTENSION,
             types=[AttrTypeFactory.create(name=DataType.STRING.code, native=True)],
         )
 
@@ -439,7 +439,7 @@ class ClassBuilderTests(FactoryTestCase):
         expected = AttrFactory.create(
             name="value",
             index=0,
-            local_type=TagType.EXTENSION.cname,
+            local_type=TagType.EXTENSION,
             types=[type_int, type_bool],
         )
 
@@ -447,7 +447,7 @@ class ClassBuilderTests(FactoryTestCase):
         self.assertEqual(0, len(item.extensions))
 
         item = ClassFactory.create(
-            attrs=AttrFactory.list(2, local_type=TagType.ENUMERATION.cname),
+            attrs=AttrFactory.list(2, local_type=TagType.ENUMERATION),
             extensions=AttrTypeFactory.list(1, name="xs:int"),
         )
 

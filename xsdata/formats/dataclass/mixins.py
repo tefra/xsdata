@@ -144,9 +144,9 @@ class ModelInspect:
 
     @staticmethod
     def node_type(type_str: Optional[str]):
-        if type_str == TagType.ATTRIBUTE.cname:
+        if type_str == TagType.ATTRIBUTE:
             return NodeType.ATTRIBUTE
-        if type_str == TagType.ELEMENT.cname:
+        if type_str == TagType.ELEMENT:
             return NodeType.ELEMENT
 
         return NodeType.TEXT

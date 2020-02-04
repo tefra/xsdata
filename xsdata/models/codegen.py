@@ -92,7 +92,7 @@ class Attr:
 
     @property
     def is_enumeration(self) -> bool:
-        return self.local_type == TagType.ENUMERATION.cname
+        return self.local_type == TagType.ENUMERATION
 
     def clone(self):
         types = [type.clone() for type in self.types]
@@ -107,7 +107,7 @@ class Extension:
 
     @property
     def is_restriction(self):
-        return self.type == TagType.RESTRICTION.cname
+        return self.type == TagType.RESTRICTION
 
     def clone(self):
         return replace(self)

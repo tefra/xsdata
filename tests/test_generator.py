@@ -60,7 +60,7 @@ class PythonAbstractGeneratorTests(FactoryTestCase):
     @mock.patch.object(generator, "process_enumeration")
     def test_process_enum_class(self, mock_process_enumeration):
         a = ClassFactory.create(
-            name="a", attrs=AttrFactory.list(2, local_type=TagType.ENUMERATION.cname)
+            name="a", attrs=AttrFactory.list(2, local_type=TagType.ENUMERATION)
         )
         generator.process_class(a)
 

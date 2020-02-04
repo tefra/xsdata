@@ -35,7 +35,7 @@ class ClassReducerTests(FactoryTestCase):
         enums = ClassFactory.list(
             2,
             type=Restriction,
-            attrs=AttrFactory.list(2, local_type=TagType.ENUMERATION.cname),
+            attrs=AttrFactory.list(2, local_type=TagType.ENUMERATION),
         )
         abstracts = ClassFactory.list(2, is_abstract=True, type=ComplexType)
 
@@ -145,14 +145,14 @@ class ClassReducerTests(FactoryTestCase):
         self, mock_find_common_type
     ):
         mock_find_common_type.return_value = ClassFactory.create(
-            attrs=AttrFactory.list(2, local_type=TagType.ENUMERATION.cname)
+            attrs=AttrFactory.list(2, local_type=TagType.ENUMERATION)
         )
 
         reducer = ClassReducer()
         extension = AttrTypeFactory.create()
         obj = ClassFactory.create(
             extensions=[extension],
-            attrs=AttrFactory.list(2, local_type=TagType.ENUMERATION.cname),
+            attrs=AttrFactory.list(2, local_type=TagType.ENUMERATION),
         )
 
         reducer.flatten_extension(obj, extension, self.nsmap)
@@ -240,7 +240,7 @@ class ClassReducerTests(FactoryTestCase):
         self, mock_find_common_type
     ):
         mock_find_common_type.return_value = ClassFactory.create(
-            attrs=AttrFactory.list(1, local_type=TagType.ENUMERATION.cname)
+            attrs=AttrFactory.list(1, local_type=TagType.ENUMERATION)
         )
 
         parent = ClassFactory.create()
@@ -301,10 +301,10 @@ class ClassReducerTests(FactoryTestCase):
     @mock.patch.object(ClassReducer, "find_common_type")
     def test_flatten_enumeration_unions(self, mock_find_common_type):
         enum_a = ClassFactory.create(
-            attrs=AttrFactory.list(2, local_type=TagType.ENUMERATION.cname)
+            attrs=AttrFactory.list(2, local_type=TagType.ENUMERATION)
         )
         enum_b = ClassFactory.create(
-            attrs=AttrFactory.list(3, local_type=TagType.ENUMERATION.cname)
+            attrs=AttrFactory.list(3, local_type=TagType.ENUMERATION)
         )
 
         mock_find_common_type.return_value = enum_b

@@ -1,10 +1,6 @@
 from enum import Enum
 from typing import Optional
 
-from lxml import etree
-
-from xsdata.utils.text import capitalize
-
 
 class Namespace:
     SCHEMA = "http://www.w3.org/2001/XMLSchema"
@@ -93,67 +89,52 @@ class EventType:
     END = "end"
 
 
-class TagType(Enum):
-    ALL = "all"
-    ANNOTATION = "annotation"
-    ANY = "any"
-    ANY_ATTRIBUTE = "anyAttribute"
-    APPINFO = "appinfo"
-    ASSERTION = "assertion"
-    ATTRIBUTE = "attribute"
-    ATTRIBUTEGROUP = "attributeGroup"
-    CHOICE = "choice"
-    COMPLEX_CONTENT = "complexContent"
-    COMPLEX_TYPE = "complexType"
-    DOCUMENTATION = "documentation"
-    ELEMENT = "element"
-    EXTENSION = "extension"
-    FIELD = "field"
-    GROUP = "group"
-    IMPORT = "import"
-    INCLUDE = "include"
-    KEY = "key"
-    KEYREF = "keyref"
-    LIST = "list"
-    NOTATION = "notation"
-    REDEFINE = "redefine"
-    RESTRICTION = "restriction"
-    SCHEMA = "schema"
-    SELECTOR = "selector"
-    SEQUENCE = "sequence"
-    SIMPLE_CONTENT = "simpleContent"
-    SIMPLE_TYPE = "simpleType"
-    UNION = "union"
-    UNIQUE = "unique"
+class TagType:
+    ALL = "All"
+    ANNOTATION = "Annotation"
+    ANY = "Any"
+    ANY_ATTRIBUTE = "AnyAttribute"
+    APPINFO = "Appinfo"
+    ASSERTION = "Assertion"
+    ATTRIBUTE = "Attribute"
+    ATTRIBUTEGROUP = "AttributeGroup"
+    CHOICE = "Choice"
+    COMPLEX_CONTENT = "ComplexContent"
+    COMPLEX_TYPE = "ComplexType"
+    DOCUMENTATION = "Documentation"
+    ELEMENT = "Element"
+    EXTENSION = "Extension"
+    FIELD = "Field"
+    GROUP = "Group"
+    IMPORT = "Import"
+    INCLUDE = "Include"
+    KEY = "Key"
+    KEYREF = "Keyref"
+    LIST = "List"
+    NOTATION = "Notation"
+    REDEFINE = "Redefine"
+    RESTRICTION = "Restriction"
+    SCHEMA = "Schema"
+    SELECTOR = "Selector"
+    SEQUENCE = "Sequence"
+    SIMPLE_CONTENT = "SimpleContent"
+    SIMPLE_TYPE = "SimpleType"
+    UNION = "Union"
+    UNIQUE = "Unique"
 
     # Restrictions
-    ENUMERATION = "enumeration"
-    FRACTION_DIGITS = "fractionDigits"
-    LENGTH = "length"
-    MAX_EXCLUSIVE = "maxExclusive"
-    MAX_INCLUSIVE = "maxInclusive"
-    MAX_LENGTH = "maxLength"
-    MIN_EXCLUSIVE = "minExclusive"
-    MIN_INCLUSIVE = "minInclusive"
-    MIN_LENGTH = "minLength"
-    PATTERN = "pattern"
-    TOTAL_DIGITS = "totalDigits"
-    WHITE_SPACE = "whiteSpace"
-
-    @property
-    def qname(self):
-        """Qualified name: {namespace}tag."""
-        return etree.QName(Namespace.SCHEMA, self.value)
-
-    @property
-    def cname(self):
-        """Class name."""
-        return capitalize(self.value)
-
-    @classmethod
-    def qnames(cls):
-        """All types indexed by their qname."""
-        return {tag.qname: tag for tag in TagType}
+    ENUMERATION = "Enumeration"
+    FRACTION_DIGITS = "FractionDigits"
+    LENGTH = "Length"
+    MAX_EXCLUSIVE = "MaxExclusive"
+    MAX_INCLUSIVE = "MaxInclusive"
+    MAX_LENGTH = "MaxLength"
+    MIN_EXCLUSIVE = "MinExclusive"
+    MIN_INCLUSIVE = "MinInclusive"
+    MIN_LENGTH = "MinLength"
+    PATTERN = "Pattern"
+    TOTAL_DIGITS = "TotalDigits"
+    WHITE_SPACE = "WhiteSpace"
 
 
 class UseType(Enum):

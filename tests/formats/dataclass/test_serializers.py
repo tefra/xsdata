@@ -5,7 +5,7 @@ from tests.fixtures.books import Books
 from xsdata.formats.dataclass.serializers import DictFactory
 from xsdata.formats.dataclass.serializers import DictSerializer
 from xsdata.formats.dataclass.serializers import XmlSerializer
-from xsdata.models.enums import TagType
+from xsdata.models.enums import UseType
 
 
 class DictSerializerTests(TestCase):
@@ -118,4 +118,4 @@ class XmlSerializerTests(TestCase):
         self.assertEqual("1.5", XmlSerializer.render_value(1.5))
         self.assertEqual("true", XmlSerializer.render_value(True))
         self.assertEqual("false", XmlSerializer.render_value(False))
-        self.assertEqual("all", XmlSerializer.render_value(TagType.ALL))
+        self.assertEqual("optional", XmlSerializer.render_value(UseType.OPTIONAL))

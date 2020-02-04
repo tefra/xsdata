@@ -22,17 +22,17 @@ from xsdata.models.mixins import RestrictedField
 
 
 def at(default=MISSING, default_factory=MISSING, **kwargs):
-    kwargs.update(type=TagType.ATTRIBUTE.cname)
+    kwargs.update(type=TagType.ATTRIBUTE)
     return field(default=default, default_factory=default_factory, metadata=kwargs)
 
 
 def el(default=MISSING, default_factory=MISSING, **kwargs):
-    kwargs.update(type=TagType.ELEMENT.cname)
+    kwargs.update(type=TagType.ELEMENT)
     return field(default=default, default_factory=default_factory, metadata=kwargs)
 
 
 def ex(default=MISSING, default_factory=MISSING, **kwargs):
-    kwargs.update(type=TagType.EXTENSION.cname)
+    kwargs.update(type=TagType.EXTENSION)
     return field(default=default, default_factory=default_factory, metadata=kwargs)
 
 

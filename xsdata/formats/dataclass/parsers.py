@@ -16,10 +16,9 @@ from lxml.etree import iterparse
 from lxml.etree import QName
 from lxml.etree import tostring
 
-from xsdata.formats.dataclass.mixins import Field
+from xsdata.formats.dataclass.mixins import ClassMeta
+from xsdata.formats.dataclass.mixins import ClassVar
 from xsdata.formats.dataclass.mixins import ModelInspect
-from xsdata.formats.dataclass.mixins import NodeType
-from xsdata.formats.dataclass.mixins import QueueItem
 from xsdata.formats.mixins import AbstractParser
 from xsdata.formats.mixins import AbstractXmlParser
 from xsdata.models.enums import EventType
@@ -45,7 +44,7 @@ class JsonParser(AbstractParser, ModelInspect):
         if isinstance(data, list) and len(data) == 1:
             data = data[0]
 
-        for arg in self.fields(clazz):
+        for _, arg in self.class_meta(clazz).vars.items():
             value = self.get_value(data, arg)
 
             if value is None:
@@ -69,11 +68,11 @@ class JsonParser(AbstractParser, ModelInspect):
             raise TypeError("Parsing failed")
 
     @staticmethod
-    def get_value(data: Dict, field: Field):
+    def get_value(data: Dict, field: ClassVar):
         """Find the field value in the given dictionary or return the default
         field value."""
-        if field.local_name in data:
-            value = data[field.local_name]
+        if field.qname.localname in data:
+            value = data[field.qname.localname]
             if field.is_list and not isinstance(value, list):
                 value = [value]
         elif callable(field.default):
@@ -82,6 +81,14 @@ class JsonParser(AbstractParser, ModelInspect):
             value = field.default
 
         return value
+
+
+@dataclass(frozen=True)
+class QueueItem:
+    type: Type
+    index: int
+    meta: Optional[ClassMeta] = field(default=None)
+    position: int = field(default_factory=int)
 
 
 @dataclass
@@ -97,25 +104,8 @@ class XmlParser(AbstractXmlParser, ModelInspect):
 
         self.queue = []
         self.elements = []
-        self.namespace = meta.namespace
-        qname = QName(meta.namespace, meta.name)
-
-        self.queue.append(
-            QueueItem(
-                qname=qname,
-                clazz=clazz,
-                fields={
-                    qname: Field(
-                        name=clazz.__name__,
-                        local_name=meta.name,
-                        node_type=NodeType.ROOT,
-                        type=clazz,
-                        namespace=meta.namespace,
-                        is_dataclass=True,
-                    )
-                },
-            )
-        )
+        queue_item = QueueItem(type=clazz, index=0, meta=meta,)
+        self.queue.append(queue_item)
 
         return super(XmlParser, self).parse_context(context, clazz)
 
@@ -133,23 +123,28 @@ class XmlParser(AbstractXmlParser, ModelInspect):
         qname = element.tag
         item = self.queue[-1]
 
-        if not item:
+        if not item or not item.meta:
             return self.queue.append(None)
-        if qname not in item.fields:
-            if item.meta and item.meta.mixed:
-                return self.queue.append(None)
-            raise ValueError(f"{item.qname} does not support mixed content: {qname}")
 
-        arg = item.fields[qname]
-        item = QueueItem(
-            qname=qname,
-            clazz=arg.type,
-            meta=self.class_meta(arg.type) if arg.is_dataclass else None,
-            fields=self.class_ns_fields(arg.type) if arg.is_dataclass else dict(),
-            index=self.index,
-            child_index=len(self.elements),
+        if item.meta and qname not in item.meta.vars:
+            if item.meta.qname == qname:
+                self.index += 1
+                self.emit_event(EventType.START, qname, item=item, element=element)
+                return None  # root
+            elif item.meta.mixed:
+                return self.queue.append(None)
+            else:
+                raise ValueError(
+                    f"{item.meta.qname} does not support mixed content: {qname}"
+                )
+
+        var = item.meta.vars[qname]
+        meta = self.class_meta(var.type, item.meta.qname) if var.is_dataclass else None
+        queue_item = QueueItem(
+            type=var.type, index=self.index, meta=meta, position=len(self.elements)
         )
-        self.queue.append(item)
+
+        self.queue.append(queue_item)
         self.index += 1
         self.emit_event(EventType.START, qname, item=item, element=element)
 
@@ -159,7 +154,7 @@ class XmlParser(AbstractXmlParser, ModelInspect):
         obj = None
         if item is not None:
             obj = self.build_object(item, element)
-            self.elements.append((item.qname, obj))
+            self.elements.append((QName(element.tag), obj))
             self.emit_event(EventType.END, element.tag, obj=obj, element=element)
 
         return obj
@@ -178,12 +173,12 @@ class XmlParser(AbstractXmlParser, ModelInspect):
         attributes from the element. Otherwise parse the elements text
         value
         """
-        if item.fields and item.clazz:
+        if item.meta:
             attributes = self.parse_element_attributes(item, element)
             children = self.fetch_class_children(item)
-            obj = item.clazz(**children, **attributes)
-        elif item.clazz:
-            obj = self.parse_value(item.clazz, element.text)
+            obj = item.type(**children, **attributes)
+        elif item.type:
+            obj = self.parse_value(item.type, element.text)
         else:
             raise ValueError(f"Failed to create object from {element.tag}")
 
@@ -197,10 +192,13 @@ class XmlParser(AbstractXmlParser, ModelInspect):
         The object can be a primitive, another dataclass, or a list of
         either primitive values and dataclasses.
         """
+        if not item.meta:
+            raise ValueError("Queue item is not a dataclass!")
+
         params: Dict[str, Any] = dict()
-        while len(self.elements) > item.child_index:
-            qname, value = self.elements.pop(item.child_index)
-            arg = item.fields[qname]
+        while len(self.elements) > item.position:
+            qname, value = self.elements.pop(item.position)
+            arg = item.meta.vars[qname]
 
             if arg.is_list:
                 if arg.name not in params:
@@ -217,8 +215,11 @@ class XmlParser(AbstractXmlParser, ModelInspect):
         """Parse the given element's attributes and text value if any and
         return a dictionary of field names and values."""
 
+        if not item.meta:
+            raise ValueError("Queue item is not a dataclass!")
+
         params: Dict[str, Any] = dict()
-        for qname, arg in item.fields.items():
+        for qname, arg in item.meta.vars.items():
             value = None
             if qname in element.attrib:
                 value = element.attrib[qname]
@@ -232,20 +233,6 @@ class XmlParser(AbstractXmlParser, ModelInspect):
                 params[arg.name] = self.parse_value(arg.type, value)
 
         return params
-
-    def class_ns_fields(self, clazz: Type) -> Dict[str, Field]:
-        """Returns the given class fields indexed by their qualified names."""
-
-        res: Dict = dict()
-        for arg in self.fields(clazz):
-            if arg.is_attribute and arg.namespace is None:
-                res[arg.local_name] = arg
-            elif arg.namespace == "":
-                res[arg.local_name] = arg
-            else:
-                qname = QName(arg.namespace or self.namespace, arg.local_name)
-                res[qname.text] = arg
-        return res
 
     @classmethod
     def parse_mixed_content(cls, element: Element):

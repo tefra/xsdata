@@ -2,20 +2,25 @@ import json
 from dataclasses import asdict
 from dataclasses import dataclass
 from dataclasses import field
+from dataclasses import is_dataclass
 from enum import Enum
 from typing import Callable
 from typing import Dict
 from typing import Optional
+from typing import Set
 from typing import Tuple
 from typing import Type
 
+from lxml.etree import cleanup_namespaces
 from lxml.etree import Element
 from lxml.etree import QName
 from lxml.etree import SubElement
 from lxml.etree import tostring
 
+from xsdata.formats.dataclass.mixins import ClassVar
 from xsdata.formats.dataclass.mixins import ModelInspect
 from xsdata.formats.mixins import AbstractSerializer
+from xsdata.models.enums import Namespace
 
 
 def filter_none(x: Tuple):
@@ -47,9 +52,9 @@ class DictSerializer(AbstractSerializer):
 @dataclass
 class JsonSerializer(AbstractSerializer):
     """
-    :param dict_factory: Callable to generate dictionary
-    :param encoder: Value encoder
-    :param indent: Pretty print indent
+    :ivar dict_factory: Callable to generate dictionary
+    :ivar encoder: Value encoder
+    :ivar indent: Pretty print indent
     """
 
     dict_factory: Callable = field(default=dict)
@@ -68,9 +73,9 @@ class JsonSerializer(AbstractSerializer):
 @dataclass
 class XmlSerializer(AbstractSerializer, ModelInspect):
     """
-    :param xml_declaration: Add xml declaration
-    :param encoding: Result text encoding
-    :param pretty_print: Enable pretty output
+    :ivar xml_declaration: Add xml declaration
+    :ivar encoding: Result text encoding
+    :ivar pretty_print: Enable pretty output
     """
 
     xml_declaration: bool = field(default=True)
@@ -87,7 +92,7 @@ class XmlSerializer(AbstractSerializer, ModelInspect):
             pretty_print=self.pretty_print,
         ).decode()
 
-    def render_tree(self, obj: object) -> Element:
+    def render_tree(self, obj: object, namespace: Optional[str] = None) -> Element:
         """
         Convert a dataclass instance to a nested Element structure.
 
@@ -97,66 +102,52 @@ class XmlSerializer(AbstractSerializer, ModelInspect):
 
         :raise TypeError: If the instance is not a dataclass
         """
-        if not self.is_dataclass(obj):
-            raise TypeError(f"Object {obj} is not a dataclass.")
+        meta = self.class_meta(obj.__class__, namespace)
 
-        meta = self.class_meta(obj.__class__)
-        qname = self.render_tag(meta.name, meta.namespace)
-        namespaces = self.namespaces(obj.__class__)
+        namespaces = set()
+        if meta.namespace:
+            namespaces.add(meta.namespace)
+
+        root = self.render_node(obj, Element(meta.qname), namespaces)
         nsmap = {f"ns{index}": ns for index, ns in enumerate(sorted(namespaces))}
-        return self.render_node(obj, Element(qname, nsmap=nsmap))
+        cleanup_namespaces(root, top_nsmap=nsmap)
+        return root
 
-    def render_node(self, obj, parent) -> Element:
+    def render_node(self, obj, parent, namespaces) -> Element:
         """Recursively traverse the given dataclass instance fields and build
         the lxml Element structure."""
-        if not self.is_dataclass(obj):
+        if not is_dataclass(obj):
             parent.text = self.render_value(obj)
             return parent
 
-        for f in self.fields(obj.__class__):
-            value = getattr(obj, f.name)
+        meta = self.class_meta(obj.__class__, QName(parent).namespace)
+        for var in meta.vars.values():
+            value = getattr(obj, var.name)
+
+            if value and var.namespace:
+                namespaces.add(var.namespace)
 
             if not value:
                 continue
-            elif f.is_attribute:
-                if f.namespace is None:
-                    qname = f.local_name
-                else:
-                    qname = self.render_tag(f.local_name, f.namespace)
-
-                parent.set(qname, self.render_value(value))
-            elif f.is_text:
+            elif var.is_attribute:
+                parent.set(var.qname, self.render_value(value))
+            elif var.is_text:
                 parent.text = self.render_value(value)
             else:
                 value = value if isinstance(value, list) else [value]
-
-                if f.namespace == "":
-                    qname = f.local_name
-                elif f.namespace:
-                    qname = self.render_tag(f.local_name, f.namespace)
-                elif parent.prefix:
-                    qname = self.render_tag(f.local_name, parent.nsmap[parent.prefix])
-                else:
-                    qname = f.local_name
-
                 for val in value:
-                    sub_element = SubElement(parent, qname)
-                    self.render_node(val, sub_element)
-
-                    if (
-                        f.is_nillable
-                        and sub_element.text is None
-                        and len(sub_element) == 0
-                    ):
-                        sub_element.set(
-                            "{http://www.w3.org/2001/XMLSchema-instance}nil", "true"
-                        )
+                    sub_element = SubElement(parent, var.qname)
+                    self.render_node(val, sub_element, namespaces)
+                    self.set_nil_attribute(var, sub_element, namespaces)
 
         return parent
 
     @staticmethod
-    def render_tag(name, namespace=None) -> QName:
-        return QName(namespace, name)
+    def set_nil_attribute(var: ClassVar, element: Element, namespaces: Set[str]):
+        if var.is_nillable and element.text is None and len(element) == 0:
+            namespaces.add(Namespace.INSTANCE)
+            qname = QName(Namespace.INSTANCE, "nil")
+            element.set(qname, "true")
 
     @staticmethod
     def render_value(value) -> str:

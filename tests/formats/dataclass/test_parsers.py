@@ -1,10 +1,12 @@
 import json
 from unittest.case import TestCase
 
+from lxml.etree import QName
+
 from tests.fixtures.books import BookForm
 from tests.fixtures.books import Books
-from xsdata.formats.dataclass.mixins import Field
-from xsdata.formats.dataclass.mixins import NodeType
+from xsdata.formats.dataclass.mixins import ClassVar
+from xsdata.formats.dataclass.mixins import Tag
 from xsdata.formats.dataclass.parsers import JsonParser
 from xsdata.formats.dataclass.parsers import XmlParser
 
@@ -69,33 +71,21 @@ class DictParserTests(TestCase):
     def test_get_value(self):
         data = dict(foo="bar", bar="foo")
 
-        foo_field = Field(name="", local_name="foo", type=str, node_type=NodeType.TEXT)
-        bar_field = Field(
-            name="",
-            local_name="bar",
-            type=str,
-            is_list=True,
-            node_type=NodeType.ELEMENT,
+        foo_field = ClassVar(name="foo", qname=QName("foo"), type=str, tag=Tag.TEXT)
+        bar_field = ClassVar(
+            name="bar", qname=QName("bar"), type=str, is_list=True, tag=Tag.ELEMENT,
         )
 
         self.assertEqual("bar", JsonParser.get_value(data, foo_field))
         self.assertEqual(["foo"], JsonParser.get_value(data, bar_field))
 
-        none_field = Field(
-            name="",
-            local_name="nope",
-            type=str,
-            default=list,
-            node_type=NodeType.ELEMENT,
+        none_field = ClassVar(
+            name="nope", qname=QName("nope"), type=str, default=list, tag=Tag.ELEMENT,
         )
         self.assertEqual([], JsonParser.get_value(data, none_field))
 
-        none_field = Field(
-            name="",
-            local_name="nope",
-            type=str,
-            default=1,
-            node_type=NodeType.ATTRIBUTE,
+        none_field = ClassVar(
+            name="nope", qname=QName("nope"), type=str, default=1, tag=Tag.ATTRIBUTE,
         )
         self.assertEqual(1, JsonParser.get_value(data, none_field))
 

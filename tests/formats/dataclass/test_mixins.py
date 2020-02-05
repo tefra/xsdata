@@ -1,85 +1,47 @@
 from typing import Iterator
 from unittest import TestCase
 
+from lxml.etree import QName
+
 from tests.fixtures.books import BookForm
 from tests.fixtures.books import Books
-from xsdata.formats.dataclass.mixins import Field
+from xsdata.formats.dataclass.mixins import ClassVar
 from xsdata.formats.dataclass.mixins import ModelInspect
-from xsdata.formats.dataclass.mixins import NodeType
+from xsdata.formats.dataclass.mixins import Tag
 
 
 class ModelInspectTests(TestCase):
-    def test_get_unique_namespaces(self):
-        inspect = ModelInspect()
-        result = inspect.get_unique_namespaces(Books)
-        self.assertEqual({"urn:books"}, result)
-
     def test_get_type_hints(self):
         inspect = ModelInspect()
-        result = inspect.get_type_hints(BookForm)
+        result = inspect.get_type_hints(BookForm, None)
         self.assertIsInstance(result, Iterator)
 
         expected = [
-            Field(
-                name="author",
-                local_name="author",
-                type=str,
-                namespace="",
-                node_type=NodeType.ELEMENT,
+            ClassVar(name="author", qname=QName("author"), type=str, tag=Tag.ELEMENT,),
+            ClassVar(name="title", qname=QName("title"), type=str, tag=Tag.ELEMENT,),
+            ClassVar(name="genre", qname=QName("genre"), type=str, tag=Tag.ELEMENT,),
+            ClassVar(name="price", qname=QName("price"), type=float, tag=Tag.ELEMENT,),
+            ClassVar(
+                name="pub_date", qname=QName("pub_date"), type=str, tag=Tag.ELEMENT,
             ),
-            Field(
-                name="title",
-                local_name="title",
-                type=str,
-                namespace="",
-                node_type=NodeType.ELEMENT,
-            ),
-            Field(
-                name="genre",
-                local_name="genre",
-                type=str,
-                namespace="",
-                node_type=NodeType.ELEMENT,
-            ),
-            Field(
-                name="price",
-                local_name="price",
-                type=float,
-                namespace="",
-                node_type=NodeType.ELEMENT,
-            ),
-            Field(
-                name="pub_date",
-                local_name="pub_date",
-                type=str,
-                namespace="",
-                node_type=NodeType.ELEMENT,
-            ),
-            Field(
-                name="review",
-                local_name="review",
-                type=str,
-                namespace="",
-                node_type=NodeType.ELEMENT,
-            ),
-            Field(name="id", local_name="id", type=str, node_type=NodeType.ATTRIBUTE),
+            ClassVar(name="review", qname=QName("review"), type=str, tag=Tag.ELEMENT,),
+            ClassVar(name="id", qname=QName("id"), type=str, tag=Tag.ATTRIBUTE),
         ]
 
         self.assertEqual(expected, list(result))
 
     def test_get_type_hints_with_dataclass_list(self):
         inspect = ModelInspect()
-        result = list(inspect.get_type_hints(Books))
+        result = list(inspect.get_type_hints(Books, None))
 
-        expected = Field(
+        expected = ClassVar(
             name="book",
-            local_name="book",
+            qname=QName("book"),
             type=BookForm,
             is_list=True,
             is_dataclass=True,
             default=list,
-            namespace="",
-            node_type=NodeType.ELEMENT,
+            tag=Tag.ELEMENT,
         )
 
         self.assertEqual(1, len(result))
@@ -88,21 +50,4 @@ class ModelInspectTests(TestCase):
     def test_get_type_hints_with_no_dataclass(self):
         inspect = ModelInspect()
         with self.assertRaises(TypeError):
-            list(inspect.get_type_hints(self.__class__))
-
-    def test_fields(self):
-        inspect = ModelInspect()
-        inspect.fields_cache[BookForm] = {"foo": str}
-
-        self.assertEqual({"foo": str}, inspect.fields(BookForm))
-
-    def test_namespaces(self):
-        inspect = ModelInspect()
-        inspect.ns_cache[BookForm] = {"foo"}
-
-        self.assertEqual({"foo"}, inspect.namespaces(BookForm))
-
-    def test_is_dataclass(self):
-        self.assertTrue(ModelInspect.is_dataclass(BookForm))
-        self.assertFalse(ModelInspect.is_dataclass(str))
-        self.assertFalse(ModelInspect.is_dataclass(self.__class__))
+            list(inspect.get_type_hints(self.__class__, None))

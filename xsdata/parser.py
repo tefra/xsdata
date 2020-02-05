@@ -10,7 +10,7 @@ from typing import TypeVar
 
 from lxml import etree
 
-from xsdata.formats.dataclass.mixins import QueueItem
+from xsdata.formats.dataclass.parsers import QueueItem
 from xsdata.formats.dataclass.parsers import XmlParser
 from xsdata.models import elements as xsd
 from xsdata.models.enums import FormType

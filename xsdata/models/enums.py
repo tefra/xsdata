@@ -5,6 +5,7 @@ from typing import Optional
 class Namespace:
     SCHEMA = "http://www.w3.org/2001/XMLSchema"
     XML = "http://www.w3.org/XML/1998/namespace"
+    INSTANCE = "http://www.w3.org/2001/XMLSchema-instance"
 
 
 class FormType(Enum):

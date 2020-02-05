@@ -111,7 +111,9 @@ class XmlSerializerTests(TestCase):
     def test_render_no_dataclass(self):
         with self.assertRaises(TypeError) as cm:
             XmlSerializer().render(self)
-        self.assertEqual(f"Object {self} is not a dataclass.", str(cm.exception))
+        self.assertEqual(
+            f"Object {self.__class__} is not a dataclass.", str(cm.exception)
+        )
 
     def test_render_value(self):
         self.assertEqual("1", XmlSerializer.render_value(1))

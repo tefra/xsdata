@@ -60,6 +60,7 @@ class Attr:
     length: Optional[int] = field(default=None)
     white_space: Optional[str] = field(default=None)
     pattern: Optional[str] = field(default=None)
+    explicit_timezone: Optional[str] = field(default=None)
     nillable: Optional[bool] = field(default=None)
 
     def __post_init__(self):
@@ -80,6 +81,7 @@ class Attr:
             "length": self.length,
             "fraction_digits": self.fraction_digits,
             "pattern": self.pattern,
+            "explicit_timezone": self.explicit_timezone,
             "total_digits": self.total_digits,
             "white_space": self.white_space,
             "nillable": self.nillable,

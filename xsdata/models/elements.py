@@ -568,6 +568,12 @@ class Assertion(AnnotationBase):
 
 
 @dataclass
+class ExplicitTimezone(AnnotationBase):
+    value: Optional[UseType] = at(default=None)
+    fixed: Optional[str] = at(default=None)
+
+
+@dataclass
 class Restriction(RestrictedField, AnnotationBase, NamedField):
     """
     The restriction element defines restrictions on a simpleType,
@@ -589,6 +595,7 @@ class Restriction(RestrictedField, AnnotationBase, NamedField):
         "length",
         "white_space",
         "pattern",
+        "explicit_timezone",
     )
     CONTAINER_FIELDS = (
         "group",
@@ -618,6 +625,7 @@ class Restriction(RestrictedField, AnnotationBase, NamedField):
     length: Optional[Length] = el(default=None)
     white_space: Optional[WhiteSpace] = el(default=None)
     pattern: Optional[Pattern] = el(default=None)
+    explicit_timezone: Optional[ExplicitTimezone] = el(default=None)
     simple_type: Optional[SimpleType] = el(default=None)
     enumerations: ArrayList[Enumeration] = el(default_factory=list, name="enumeration")
     assertions: ArrayList[Assertion] = el(default_factory=list, name="assertion")

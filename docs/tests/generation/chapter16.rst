@@ -23,18 +23,6 @@ Example 16-10 Using block to prevent substitution group use
     substitution groups
 
 
-Example 16-11 An abstract element declaration
----------------------------------------------
-
-.. literalinclude:: /../tests/fixtures/defxmlschema/chapter16/example1611.xsd
-   :language: xml
-   :lines: 3-
-
-.. warning::
-
-    Unsupported feature!
-
-
 Example 16-2 Members of a substitution group
 --------------------------------------------
 

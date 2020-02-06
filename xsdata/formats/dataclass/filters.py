@@ -1,10 +1,13 @@
 from docformatter import format_code
 
 from xsdata.models.codegen import Class
+from xsdata.models.enums import UseType
 
 
 def arguments(data: dict):
     def prep(key, value):
+        if isinstance(value, UseType):
+            value = value.value
         if isinstance(value, str) and not has_quotes(value):
             value = '"{}"'.format(value.replace('"', "'"))
             if key == "pattern":

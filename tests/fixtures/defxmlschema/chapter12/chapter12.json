@@ -1,0 +1,40 @@
+{
+    "shirt": [
+        {
+            "number": 557,
+            "name": "Short-Sleeved Linen Blouse",
+            "size": [
+                {
+                    "value": 10,
+                    "system": "US-DRESS"
+                }
+            ],
+            "color": [
+                {
+                    "value": "blue"
+                }
+            ],
+            "description": [
+                {
+                    "value": "This shirt is the <xhtml:b>best-selling</xhtml:b> shirt in our catalog! <xhtml:br/> Note: runs large."
+                }
+            ],
+            "eff_date": "2002-04-02"
+        }
+    ],
+    "hat": [
+        {
+            "number": 557,
+            "name": "Ten-Gallon Hat",
+            "size": [],
+            "color": [
+                {
+                    "value": "red"
+                }
+            ],
+            "description": [],
+            "eff_date": "1900-01-01"
+        }
+    ],
+    "umbrella": []
+}

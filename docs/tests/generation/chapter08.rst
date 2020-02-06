@@ -102,10 +102,8 @@ Example 8-18 Explicit time zone
    :language: xml
    :lines: 3-
 
-.. warning::
-
-    XML Schema 1.1
-
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter08/example0818.py
+   :language: python
 
 Example 8-2 Defining an anonymous simple type
 ---------------------------------------------

@@ -21,7 +21,7 @@ T = TypeVar("T")
 
 @dataclass
 class SchemaParser(XmlParser):
-    name: Callable = field(default=text.camel_case)
+    name_generator: Callable = field(default=text.camel_case)
     """
     A simple parser to convert an xsd schema to an easy to handle data
     structure based on dataclasses.
@@ -42,7 +42,7 @@ class SchemaParser(XmlParser):
         schema.location = path
         return schema
 
-    def end_node(self, element: etree.Element) -> Optional[Type]:
+    def end_node(self, element: etree.Element) -> Optional[T]:
         """Override parent method to skip empty elements and to set the object
         index."""
         if not element.attrib and element.text is None:

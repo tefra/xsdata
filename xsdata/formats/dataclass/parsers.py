@@ -1,6 +1,7 @@
 import io
 import json
 import re
+from collections import defaultdict
 from dataclasses import dataclass
 from dataclasses import field
 from typing import Any
@@ -96,29 +97,37 @@ class XmlParser(AbstractXmlParser, ModelInspect):
     index: int = field(default_factory=int)
     queue: List[Optional[QueueItem]] = field(init=False, default_factory=list)
     namespace: Optional[str] = field(init=False, default=None)
-    elements: List[Tuple[QName, Any]] = field(init=False, default_factory=list)
+    objects: List[Tuple[QName, Any]] = field(init=False, default_factory=list)
 
     def parse_context(self, context: iterparse, clazz: Type[T]) -> T:
-        """Forward the xml stream iterator to move after the root element."""
+        """
+        Dispatch elements to handlers as they arrive and are fully parsed.
+
+        Initialize queue with clazz metadata and reset pending objects list.
+
+        :raises ValueError: When the requested type doesn't match the result object
+        """
         meta = self.class_meta(clazz)
 
-        self.queue = []
-        self.elements = []
-        queue_item = QueueItem(type=clazz, index=0, meta=meta,)
-        self.queue.append(queue_item)
+        self.objects = []
+        self.queue = [QueueItem(type=clazz, index=0, meta=meta)]
 
         return super(XmlParser, self).parse_context(context, clazz)
 
     def start_node(self, element: Element):
         """
-        Append to queue the necessary, to construct, metadata for the given
-        element.
+        Prepare metadata queue to bind the given element to a dataclass object.
 
-        The metadata includes:
-        - the qualified name of the element
-        - the python dataclass type
-        - the fields objects list of the class
-        - the next elements index for the object that will be created
+        In order:
+        - If last item in queue is None assume we are inside mixed content
+        - If element qname is not a var in the last item in the queue.
+          - Check if the first element element is root and skip the rest.
+          - Check if the last queue item supports mixed content and setup the queue to
+          bypass direct data binding to a new dataclass object.
+        - If element qname is a var in the last item in the queue append its class
+        metadata to the queue for the upcoming data binding.
+
+        :raises Value: When the parser doesn't know how to handle the given element.
         """
         qname = element.tag
         item = self.queue[-1]
@@ -141,40 +150,30 @@ class XmlParser(AbstractXmlParser, ModelInspect):
         var = item.meta.vars[qname]
         meta = self.class_meta(var.type, item.meta.qname) if var.is_dataclass else None
         queue_item = QueueItem(
-            type=var.type, index=self.index, meta=meta, position=len(self.elements)
+            type=var.type, index=self.index, meta=meta, position=len(self.objects)
         )
 
         self.queue.append(queue_item)
         self.index += 1
         self.emit_event(EventType.START, qname, item=item, element=element)
 
-    def end_node(self, element: Element) -> Optional[Type]:
-        """Build an object for the given element by the last queue metadata."""
+    def end_node(self, element: Element) -> Optional[T]:
+        """
+        Build an objects tree for the given element.
+
+        Construct a dataclass instance with the attributes of the given element and if
+        any pending objects that belong to the model. Otherwise parse as a primitive
+        type the element's text content.
+
+        :returns object: A dataclass object or a python primitive value.
+        :raises ValueError: When parser has no data bind strategy for the given object.
+        """
         item = self.queue.pop()
-        obj = None
-        if item is not None:
-            obj = self.build_object(item, element)
-            self.elements.append((QName(element.tag), obj))
-            self.emit_event(EventType.END, element.tag, obj=obj, element=element)
 
-        return obj
-
-    def emit_event(self, event: str, name: str, **kwargs):
-        local_name = QName(name).localname
-        method_name = f"{event}_{local_name}"
-        if hasattr(self, method_name):
-            getattr(self, method_name)(**kwargs)
-
-    def build_object(self, item: QueueItem, element: Element) -> Any:
-        """
-        Objectify current element by the item clazz type.
-
-        If the clazz is a dataclass build the objects tree and parse
-        attributes from the element. Otherwise parse the elements text
-        value
-        """
-        if item.meta:
-            attributes = self.parse_element_attributes(item, element)
+        if item is None:
+            return None
+        elif item.meta:
+            attributes = self.parse_element_attributes(item.meta, element)
             children = self.fetch_class_children(item)
             obj = item.type(**children, **attributes)
         elif item.type:
@@ -182,55 +181,56 @@ class XmlParser(AbstractXmlParser, ModelInspect):
         else:
             raise ValueError(f"Failed to create object from {element.tag}")
 
+        self.objects.append((QName(element.tag), obj))
+        self.emit_event(EventType.END, element.tag, obj=obj, element=element)
+
         return obj
+
+    def emit_event(self, event: str, name: str, **kwargs):
+        """Call if exist the parser's hook for the given element and event."""
+        local_name = QName(name).localname
+        method_name = f"{event}_{local_name}"
+        if hasattr(self, method_name):
+            getattr(self, method_name)(**kwargs)
 
     def fetch_class_children(self, item: QueueItem) -> Dict[str, Any]:
         """
-        Return a dictionary of qualified object names and objects for the given
-        queue item.
+        Return a dictionary of qualified object names and their values for the
+        given queue item.
 
-        The object can be a primitive, another dataclass, or a list of
-        either primitive values and dataclasses.
+        :raises ValueError: if queue item type is primitive.
         """
         if not item.meta:
             raise ValueError("Queue item is not a dataclass!")
 
-        params: Dict[str, Any] = dict()
-        while len(self.elements) > item.position:
-            qname, value = self.elements.pop(item.position)
+        params: Dict[str, Any] = defaultdict(list)
+        while len(self.objects) > item.position:
+            qname, value = self.objects.pop(item.position)
             arg = item.meta.vars[qname]
 
             if arg.is_list:
-                if arg.name not in params:
-                    params[arg.name] = []
-
                 params[arg.name].append(value)
             else:
                 params[arg.name] = value
+
         return params
 
-    def parse_element_attributes(
-        self, item: QueueItem, element: Element
-    ) -> Dict[str, Any]:
-        """Parse the given element's attributes and text value if any and
-        return a dictionary of field names and values."""
+    def parse_element_attributes(self, metadata: ClassMeta, element: Element) -> Dict:
+        """Parse the given element's attributes and any text content and return
+        a dictionary of field names and values based on the given class
+        metadata."""
 
-        if not item.meta:
-            raise ValueError("Queue item is not a dataclass!")
+        var = metadata.vars
+        params = {
+            var[qname].name: self.parse_value(var[qname].type, value)
+            for qname, value in element.attrib.items()
+            if qname in var
+        }
 
-        params: Dict[str, Any] = dict()
-        for qname, arg in item.meta.vars.items():
-            value = None
-            if qname in element.attrib:
-                value = element.attrib[qname]
-            elif arg.is_text:
-                if item.meta and item.meta.mixed:
-                    value = self.parse_mixed_content(element)
-                elif not len(element):
-                    value = element.text
-
-            if value is not None:
-                params[arg.name] = self.parse_value(arg.type, value)
+        text_var = next((var for var in metadata.vars.values() if var.is_text), None)
+        if text_var and element.text is not None:
+            text = self.parse_mixed_content(element) if metadata.mixed else element.text
+            params[text_var.name] = self.parse_value(text_var.type, text)
 
         return params
 
@@ -238,7 +238,7 @@ class XmlParser(AbstractXmlParser, ModelInspect):
     def parse_mixed_content(cls, element: Element):
         """Parse element mixed content by preserving the raw string."""
 
-        xml = tostring(element, method="c14n", pretty_print=True).decode()
+        xml = tostring(element, pretty_print=True).decode()
         start_root = xml.find(">")
         end_root = xml.rfind("<")
 

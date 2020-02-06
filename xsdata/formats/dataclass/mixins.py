@@ -24,6 +24,7 @@ class Tag(Enum):
     ATTRIBUTE = 2
     ELEMENT = 3
     ROOT = 4
+    MISC = 5
 
     @classmethod
     def from_metadata_type(cls, meta_type):
@@ -31,8 +32,10 @@ class Tag(Enum):
             return cls.ATTRIBUTE
         elif meta_type == TagType.ELEMENT:
             return cls.ELEMENT
-        else:
+        elif meta_type:
             return cls.TEXT
+        else:
+            return cls.MISC
 
 
 @dataclass(frozen=True)
@@ -77,7 +80,7 @@ class ClassMeta:
 
 @dataclass
 class ModelInspect:
-    name: Callable = field(default=lambda x: x)
+    name_generator: Callable = field(default=lambda x: x)
     cache: Dict[Type, ClassMeta] = field(default_factory=dict)
 
     def class_meta(self, clazz: Type, parent_ns: Optional[str] = None) -> ClassMeta:
@@ -86,7 +89,7 @@ class ModelInspect:
                 raise TypeError(f"Object {clazz} is not a dataclass.")
 
             meta = getattr(clazz, "Meta", None)
-            name = getattr(meta, "name", self.name(clazz.__name__))
+            name = getattr(meta, "name", self.name_generator(clazz.__name__))
             mixed = getattr(meta, "mixed", False)
             namespace = getattr(meta, "namespace", parent_ns)
 
@@ -107,7 +110,7 @@ class ModelInspect:
 
             tag = Tag.from_metadata_type(var.metadata.get("type"))
             namespace = self.real_namespace(var, tag, parent_ns)
-            local_name = var.metadata.get("name") or self.name(var.name)
+            local_name = var.metadata.get("name") or self.name_generator(var.name)
 
             yield ClassVar(
                 name=var.name,

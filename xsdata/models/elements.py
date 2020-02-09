@@ -872,7 +872,7 @@ class Element(AnnotationBase, NamedField, OccurrencesMixin):
 
 
 @dataclass
-class Any(AnnotationBase, OccurrencesMixin):
+class Any(AnnotationBase, OccurrencesMixin, NamedField):
     """
     The any element enables the author to extend the XML document with elements
     not specified by the schema.
@@ -885,6 +885,18 @@ class Any(AnnotationBase, OccurrencesMixin):
     namespace: Optional[str] = at(default=None)
     process_contents: Optional[ProcessType] = at(default=None)
     annotation: Optional[Annotation] = el(default=None)
+
+    @property
+    def is_attribute(self) -> bool:
+        return True
+
+    @property
+    def real_type(self) -> Optional[str]:
+        return DataType.OBJECT.xml_prefixed
+
+    @property
+    def real_name(self) -> str:
+        return "elements"
 
 
 @dataclass

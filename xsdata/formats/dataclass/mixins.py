@@ -89,6 +89,18 @@ class ClassMeta:
     def namespace(self):
         return self.qname.namespace
 
+    @property
+    def any_text(self) -> Optional[ClassVar]:
+        return next((var for var in self.vars.values() if var.is_text), None)
+
+    @property
+    def any_attribute(self) -> Optional[ClassVar]:
+        return next((var for var in self.vars.values() if var.is_any_attribute), None)
+
+    @property
+    def any_element(self) -> Optional[ClassVar]:
+        return next((var for var in self.vars.values() if var.is_any_element), None)
+
 
 @dataclass
 class ModelInspect:

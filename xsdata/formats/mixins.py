@@ -51,7 +51,7 @@ class AbstractParser(ABC):
                     pass
             return value
 
-        return value == "true" if tp is bool else tp(value)
+        return value == "true" if tp is bool and isinstance(value, str) else tp(value)
 
 
 class AbstractXmlParser(AbstractParser):

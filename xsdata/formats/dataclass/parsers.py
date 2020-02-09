@@ -46,32 +46,44 @@ class JsonParser(AbstractParser, ModelInspect):
         if isinstance(data, list) and len(data) == 1:
             data = data[0]
 
-        for _, arg in self.class_meta(clazz).vars.items():
-            value = self.get_value(data, arg)
+        for var in self.class_meta(clazz).vars.values():
+            value = self.get_value(data, var)
 
             if value is None:
                 continue
-            if not isinstance(value, list):
-                value = [value]
-
-            if arg.is_dataclass:
-                value = [self.parse_context(val, arg.type) for val in value]
-            elif arg.is_any_attribute:
-                value[0] = dict(value[0])
-            elif arg.is_any_element:
-                value = [
-                    val if isinstance(val, str) else self.parse_context(val, AnyElement)
-                    for val in value
-                ]
+            elif var.is_list:
+                params[var.name] = [self.bind_value(var, val) for val in value]
             else:
-                value = [self.parse_value(arg.type, val) for val in value]
-
-            params[arg.name] = value if arg.is_list else value[0]
+                params[var.name] = self.bind_value(var, value)
 
         try:
             return clazz(**params)  # type: ignore
         except Exception:
             raise TypeError("Parsing failed")
+
+    def bind_value(self, var: ClassVar, value) -> Any:
+        """
+        Bind value according to the class var.
+
+        The return value can be:
+        - a dataclass instance
+        - a dictionary with unknown attributes
+        - a list of unknown elements
+        - an enumeration
+        - a primitive value
+        """
+        if var.is_dataclass:
+            return self.parse_context(value, var.type)
+        elif var.is_any_attribute:
+            return dict(value)
+        elif var.is_any_element:
+            return (
+                value
+                if isinstance(value, str)
+                else self.parse_context(value, AnyElement)
+            )
+        else:
+            return self.parse_value(var.type, value)
 
     @staticmethod
     def get_value(data: Dict, field: ClassVar):

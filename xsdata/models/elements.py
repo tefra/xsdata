@@ -1,4 +1,3 @@
-import re
 from dataclasses import dataclass
 from dataclasses import field
 from dataclasses import MISSING
@@ -8,8 +7,12 @@ from typing import Dict
 from typing import Iterator
 from typing import List as ArrayList
 from typing import Optional
+from typing import Set
 from typing import Union as UnionType
 
+from lxml import etree
+
+from xsdata.formats.dataclass.serializers import XmlSerializer
 from xsdata.models.enums import DataType
 from xsdata.models.enums import FormType
 from xsdata.models.enums import Namespace
@@ -22,29 +25,22 @@ from xsdata.models.mixins import OccurrencesMixin
 from xsdata.models.mixins import RestrictedField
 
 
-def at(default=MISSING, default_factory=MISSING, init=True, **kwargs):
+def attribute(default=MISSING, default_factory=MISSING, init=True, **kwargs):
     kwargs.update(type=TagType.ATTRIBUTE)
     return field(
         init=init, default=default, default_factory=default_factory, metadata=kwargs
     )
 
 
-def aat(default=MISSING, default_factory=MISSING, init=True, **kwargs):
-    kwargs.update(type=TagType.ANY_ATTRIBUTE)
-    return field(
-        init=init, default=default, default_factory=default_factory, metadata=kwargs
-    )
-
-
-def el(default=MISSING, default_factory=MISSING, init=True, **kwargs):
+def element(default=MISSING, default_factory=MISSING, init=True, **kwargs):
     kwargs.update(type=TagType.ELEMENT)
     return field(
         init=init, default=default, default_factory=default_factory, metadata=kwargs
     )
 
 
-def ex(default=MISSING, default_factory=MISSING, init=True, **kwargs):
-    kwargs.update(type=TagType.EXTENSION)
+def any_element(default=MISSING, default_factory=MISSING, init=True, **kwargs):
+    kwargs.update(type=TagType.ANY)
     return field(
         init=init, default=default, default_factory=default_factory, metadata=kwargs
     )
@@ -61,9 +57,21 @@ class Documentation(ElementBase):
     class Meta:
         mixed = True
 
-    lang: Optional[str] = at(default=None)
-    source: Optional[str] = at(default=None)
-    text: Optional[str] = ex(default=None)
+    lang: Optional[str] = attribute(default=None)
+    source: Optional[str] = attribute(default=None)
+    elements: ArrayList[object] = any_element(default_factory=list)
+
+    def tostring(self) -> Optional[str]:
+        if not self.elements:
+            return None
+
+        root = etree.Element("xsdata")
+        namespaces: Set[str] = set()
+        XmlSerializer.set_any_children(root, self.elements, namespaces)
+        nsmap = {f"ns{index}": ns for index, ns in enumerate(sorted(namespaces))}
+        etree.cleanup_namespaces(root, top_nsmap=nsmap)
+        xml = etree.tostring(root, pretty_print=True).decode()
+        return xml[xml.find(">") + 1 :].replace("</xsdata>", "").strip()
 
 
 @dataclass
@@ -77,8 +85,8 @@ class Appinfo(ElementBase):
     class Meta:
         mixed = True
 
-    source: Optional[str] = at(default=None)
-    text: Optional[str] = ex(default=None)
+    source: Optional[str] = attribute(default=None)
+    elements: ArrayList[object] = any_element(default_factory=list)
 
 
 @dataclass
@@ -90,8 +98,8 @@ class Annotation(ElementBase):
     Reference: https://www.w3schools.com/xml/el_annotation.asp.
     """
 
-    appinfo: Optional[Appinfo] = el(default=None)
-    documentations: ArrayList[Documentation] = el(
+    appinfo: Optional[Appinfo] = element(default=None)
+    documentations: ArrayList[Documentation] = element(
         default_factory=list, name="documentation"
     )
 
@@ -100,18 +108,14 @@ class Annotation(ElementBase):
 class AnnotationBase(ElementBase):
     """Base Class for elements that can contain annotations."""
 
-    annotation: Optional[Annotation] = el(default=None)
+    annotation: Optional[Annotation] = element(default=None)
 
     @property
     def display_help(self) -> Optional[str]:
         if self.annotation and len(self.annotation.documentations):
             return "\n".join(
-                [
-                    re.sub(r"[\s+]", " ", doc.text)
-                    for doc in self.annotation.documentations
-                    if doc.text
-                ]
-            ).strip()
+                filter(None, [doc.tostring() for doc in self.annotation.documentations])
+            )
         return None
 
 
@@ -124,10 +128,10 @@ class SimpleType(AnnotationBase, NamedField, RestrictedField):
     XSD Element reference : Reference: https://www.w3schools.com/xml/el_simpletype.asp.
     """
 
-    name: Optional[str] = at(default=None)
-    restriction: Optional["Restriction"] = el(default=None)
-    list: Optional["List"] = el(default=None)
-    union: Optional["Union"] = el(default=None)
+    name: Optional[str] = attribute(default=None)
+    restriction: Optional["Restriction"] = element(default=None)
+    list: Optional["List"] = element(default=None)
+    union: Optional["Union"] = element(default=None)
 
     @property
     def is_enumeration(self):
@@ -161,8 +165,8 @@ class List(AnnotationBase, RestrictedField, NamedField):
     Reference: https://www.w3schools.com/xml/el_list.asp.
     """
 
-    simple_type: Optional[SimpleType] = el(default=None)
-    item_type: Optional[str] = at(default=None)
+    simple_type: Optional[SimpleType] = element(default=None)
+    item_type: Optional[str] = attribute(default=None)
 
     @property
     def is_attribute(self) -> bool:
@@ -189,8 +193,10 @@ class Union(AnnotationBase, NamedField, RestrictedField):
     Reference: https://www.w3schools.com/xml/el_union.asp.
     """
 
-    member_types: Optional[str] = at(default=None)
-    simple_types: ArrayList[SimpleType] = el(default_factory=list, name="simpleType")
+    member_types: Optional[str] = attribute(default=None)
+    simple_types: ArrayList[SimpleType] = element(
+        default_factory=list, name="simpleType"
+    )
 
     @property
     def extends(self) -> Optional[str]:
@@ -239,8 +245,8 @@ class AnyAttribute(AnnotationBase, NamedField, RestrictedField):
     : Reference: https://www.w3schools.com/xml/el_anyattribute.asp.
     """
 
-    namespace: Optional[str] = at(default=None)
-    process_contents: Optional[ProcessType] = at(default=None)
+    namespace: Optional[str] = attribute(default=None)
+    process_contents: Optional[ProcessType] = attribute(default=None)
 
     @property
     def is_attribute(self) -> bool:
@@ -266,14 +272,14 @@ class Attribute(AnnotationBase, NamedField, RestrictedField):
     Reference: https://www.w3schools.com/xml/el_attribute.asp.
     """
 
-    default: Optional[str] = at(default=None)
-    fixed: Optional[str] = at(default=None)
-    form: Optional[FormType] = at(default=None)
-    name: Optional[str] = at(default=None)
-    ref: Optional[str] = at(default=None)
-    type: Optional[str] = at(default=None)
-    simple_type: Optional[SimpleType] = el(default=None)
-    use: Optional[UseType] = at(default=UseType.OPTIONAL)
+    default: Optional[str] = attribute(default=None)
+    fixed: Optional[str] = attribute(default=None)
+    form: Optional[FormType] = attribute(default=None)
+    name: Optional[str] = attribute(default=None)
+    ref: Optional[str] = attribute(default=None)
+    type: Optional[str] = attribute(default=None)
+    simple_type: Optional[SimpleType] = element(default=None)
+    use: Optional[UseType] = attribute(default=UseType.OPTIONAL)
 
     @property
     def is_attribute(self) -> bool:
@@ -310,11 +316,11 @@ class AttributeGroup(AnnotationBase, NamedField):
     : Reference: https://www.w3schools.com/xml/el_attributegroup.asp.
     """
 
-    name: Optional[str] = at(default=None)
-    ref: Optional[str] = at(default=None)
-    any_attribute: Optional[AnyAttribute] = el(default=None)
-    attributes: ArrayList[Attribute] = el(default_factory=list, name="attribute")
-    attribute_groups: ArrayList["AttributeGroup"] = el(
+    name: Optional[str] = attribute(default=None)
+    ref: Optional[str] = attribute(default=None)
+    any_attribute: Optional[AnyAttribute] = element(default=None)
+    attributes: ArrayList[Attribute] = element(default_factory=list, name="attribute")
+    attribute_groups: ArrayList["AttributeGroup"] = element(
         default_factory=list, name="attributeGroup"
     )
 
@@ -332,9 +338,9 @@ class All(AnnotationBase, OccurrencesMixin):
     Reference: https://www.w3schools.com/xml/el_all.asp.
     """
 
-    min_occurs: int = at(default=1)
-    max_occurs: int = at(default=1)
-    elements: ArrayList["Element"] = el(default_factory=list, name="element")
+    min_occurs: int = attribute(default=1)
+    max_occurs: int = attribute(default=1)
+    elements: ArrayList["Element"] = element(default_factory=list, name="element")
 
 
 @dataclass
@@ -346,13 +352,13 @@ class Sequence(AnnotationBase, OccurrencesMixin):
     Reference: https://www.w3schools.com/xml/el_sequence.asp.
     """
 
-    min_occurs: int = at(default=1)
-    max_occurs: int = at(default=1)
-    elements: ArrayList["Element"] = el(default_factory=list, name="element")
-    groups: ArrayList["Group"] = el(default_factory=list, name="group")
-    choices: ArrayList["Choice"] = el(default_factory=list, name="choice")
-    sequences: ArrayList["Sequence"] = el(default_factory=list, name="sequence")
-    any: ArrayList["Any"] = el(default_factory=list)
+    min_occurs: int = attribute(default=1)
+    max_occurs: int = attribute(default=1)
+    elements: ArrayList["Element"] = element(default_factory=list, name="element")
+    groups: ArrayList["Group"] = element(default_factory=list, name="group")
+    choices: ArrayList["Choice"] = element(default_factory=list, name="choice")
+    sequences: ArrayList["Sequence"] = element(default_factory=list, name="sequence")
+    any: ArrayList["Any"] = element(default_factory=list)
 
 
 @dataclass
@@ -365,12 +371,12 @@ class Choice(AnnotationBase, OccurrencesMixin):
     Reference: https://www.w3schools.com/xml/el_choice.asp.
     """
 
-    min_occurs: int = at(default=1)
-    max_occurs: int = at(default=1)
-    elements: ArrayList["Element"] = el(default_factory=list, name="element")
-    groups: ArrayList["Group"] = el(default_factory=list, name="group")
-    choices: ArrayList["Choice"] = el(default_factory=list, name="choice")
-    sequences: ArrayList[Sequence] = el(default_factory=list, name="sequence")
+    min_occurs: int = attribute(default=1)
+    max_occurs: int = attribute(default=1)
+    elements: ArrayList["Element"] = element(default_factory=list, name="element")
+    groups: ArrayList["Group"] = element(default_factory=list, name="group")
+    choices: ArrayList["Choice"] = element(default_factory=list, name="choice")
+    sequences: ArrayList[Sequence] = element(default_factory=list, name="sequence")
 
 
 @dataclass
@@ -382,13 +388,13 @@ class Group(AnnotationBase, OccurrencesMixin, NamedField):
     Reference: https://www.w3schools.com/xml/el_group.asp.
     """
 
-    name: Optional[str] = at(default=None)
-    ref: Optional[str] = at(default=None)
-    min_occurs: int = at(default=1)
-    max_occurs: int = at(default=1)
-    all: Optional[All] = el(default=None)
-    choice: Optional[Choice] = el(default=None)
-    sequence: Optional[Sequence] = el(default=None)
+    name: Optional[str] = attribute(default=None)
+    ref: Optional[str] = attribute(default=None)
+    min_occurs: int = attribute(default=1)
+    max_occurs: int = attribute(default=1)
+    all: Optional[All] = element(default=None)
+    choice: Optional[Choice] = element(default=None)
+    sequence: Optional[Sequence] = element(default=None)
 
     @property
     def extends(self) -> Optional[str]:
@@ -404,14 +410,14 @@ class Extension(AnnotationBase):
     Reference: https://www.w3schools.com/xml/el_extension.asp.
     """
 
-    base: Optional[str] = at(default=None)
-    group: Optional[Group] = el(default=None)
-    all: Optional[All] = el(default=None)
-    choice: Optional[Choice] = el(default=None)
-    sequence: Optional[Sequence] = el(default=None)
-    any_attribute: Optional[AnyAttribute] = el(default=None)
-    attributes: ArrayList[Attribute] = el(default_factory=list, name="attribute")
-    attribute_groups: ArrayList[AttributeGroup] = el(
+    base: Optional[str] = attribute(default=None)
+    group: Optional[Group] = element(default=None)
+    all: Optional[All] = element(default=None)
+    choice: Optional[Choice] = element(default=None)
+    sequence: Optional[Sequence] = element(default=None)
+    any_attribute: Optional[AnyAttribute] = element(default=None)
+    attributes: ArrayList[Attribute] = element(default_factory=list, name="attribute")
+    attribute_groups: ArrayList[AttributeGroup] = element(
         default_factory=list, name="attributeGroup"
     )
 
@@ -429,7 +435,7 @@ class Enumeration(AnnotationBase, NamedField, RestrictedField):
     https://www.w3schools.com/xml/schema_facets.asp.
     """
 
-    value: Optional[str] = at(default=None)
+    value: Optional[str] = attribute(default=None)
 
     @property
     def is_attribute(self) -> bool:
@@ -461,7 +467,7 @@ class FractionDigits(AnnotationBase):
     https://www.w3schools.com/xml/schema_facets.asp.
     """
 
-    value: Optional[int] = at(default=None)
+    value: Optional[int] = attribute(default=None)
 
 
 @dataclass
@@ -474,7 +480,7 @@ class Length(AnnotationBase):
     https://www.w3schools.com/xml/schema_facets.asp.
     """
 
-    value: Optional[int] = at(default=None)
+    value: Optional[int] = attribute(default=None)
 
 
 @dataclass
@@ -487,7 +493,7 @@ class MaxExclusive(AnnotationBase):
     https://www.w3schools.com/xml/schema_facets.asp.
     """
 
-    value: Optional[float] = at(default=None)
+    value: Optional[float] = attribute(default=None)
 
 
 @dataclass
@@ -500,7 +506,7 @@ class MaxInclusive(AnnotationBase):
     https://www.w3schools.com/xml/schema_facets.asp.
     """
 
-    value: Optional[float] = at(default=None)
+    value: Optional[float] = attribute(default=None)
 
 
 @dataclass
@@ -513,7 +519,7 @@ class MaxLength(AnnotationBase):
     https://www.w3schools.com/xml/schema_facets.asp.
     """
 
-    value: Optional[float] = at(default=None)
+    value: Optional[float] = attribute(default=None)
 
 
 @dataclass
@@ -524,7 +530,7 @@ class MinExclusive(AnnotationBase):
     https://www.w3schools.com/xml/schema_facets.asp.
     """
 
-    value: Optional[float] = at(default=None)
+    value: Optional[float] = attribute(default=None)
 
 
 @dataclass
@@ -537,7 +543,7 @@ class MinInclusive(AnnotationBase):
     https://www.w3schools.com/xml/schema_facets.asp.
     """
 
-    value: Optional[float] = at(default=None)
+    value: Optional[float] = attribute(default=None)
 
 
 @dataclass
@@ -550,7 +556,7 @@ class MinLength(AnnotationBase):
     https://www.w3schools.com/xml/schema_facets.asp.
     """
 
-    value: Optional[float] = at(default=None)
+    value: Optional[float] = attribute(default=None)
 
 
 @dataclass
@@ -562,7 +568,7 @@ class Pattern(AnnotationBase):
     https://www.w3schools.com/xml/schema_facets.asp.
     """
 
-    value: Optional[str] = at(default=None)
+    value: Optional[str] = attribute(default=None)
 
 
 @dataclass
@@ -574,7 +580,7 @@ class TotalDigits(AnnotationBase):
     https://www.w3schools.com/xml/schema_facets.asp.
     """
 
-    value: Optional[int] = at(default=None)
+    value: Optional[int] = attribute(default=None)
 
 
 @dataclass
@@ -587,18 +593,18 @@ class WhiteSpace(AnnotationBase):
     https://www.w3schools.com/xml/schema_facets.asp.
     """
 
-    value: Optional[str] = at(default=None)  # preserve, collapse, replace
+    value: Optional[str] = attribute(default=None)  # preserve, collapse, replace
 
 
 @dataclass
 class Assertion(AnnotationBase):
-    test: Optional[str] = at(default=None)
+    test: Optional[str] = attribute(default=None)
 
 
 @dataclass
 class ExplicitTimezone(AnnotationBase):
-    value: Optional[UseType] = at(default=None)
-    fixed: Optional[str] = at(default=None)
+    value: Optional[UseType] = attribute(default=None)
+    fixed: Optional[str] = attribute(default=None)
 
 
 @dataclass
@@ -636,29 +642,31 @@ class Restriction(RestrictedField, AnnotationBase, NamedField):
         "enumerations",
     )
 
-    base: Optional[str] = at(default=None)
-    group: Optional[Group] = el(default=None)
-    all: Optional[All] = el(default=None)
-    choice: Optional[Choice] = el(default=None)
-    sequence: Optional[Sequence] = el(default=None)
-    any_attribute: Optional[AnyAttribute] = el(default=None)
-    min_exclusive: Optional[MinExclusive] = el(default=None)
-    min_inclusive: Optional[MinInclusive] = el(default=None)
-    min_length: Optional[MinLength] = el(default=None)
-    max_exclusive: Optional[MaxExclusive] = el(default=None)
-    max_inclusive: Optional[MaxInclusive] = el(default=None)
-    max_length: Optional[MaxLength] = el(default=None)
-    total_digits: Optional[TotalDigits] = el(default=None)
-    fraction_digits: Optional[FractionDigits] = el(default=None)
-    length: Optional[Length] = el(default=None)
-    white_space: Optional[WhiteSpace] = el(default=None)
-    pattern: Optional[Pattern] = el(default=None)
-    explicit_timezone: Optional[ExplicitTimezone] = el(default=None)
-    simple_type: Optional[SimpleType] = el(default=None)
-    enumerations: ArrayList[Enumeration] = el(default_factory=list, name="enumeration")
-    assertions: ArrayList[Assertion] = el(default_factory=list, name="assertion")
-    attributes: ArrayList[Attribute] = el(default_factory=list, name="attribute")
-    attribute_groups: ArrayList[AttributeGroup] = el(
+    base: Optional[str] = attribute(default=None)
+    group: Optional[Group] = element(default=None)
+    all: Optional[All] = element(default=None)
+    choice: Optional[Choice] = element(default=None)
+    sequence: Optional[Sequence] = element(default=None)
+    any_attribute: Optional[AnyAttribute] = element(default=None)
+    min_exclusive: Optional[MinExclusive] = element(default=None)
+    min_inclusive: Optional[MinInclusive] = element(default=None)
+    min_length: Optional[MinLength] = element(default=None)
+    max_exclusive: Optional[MaxExclusive] = element(default=None)
+    max_inclusive: Optional[MaxInclusive] = element(default=None)
+    max_length: Optional[MaxLength] = element(default=None)
+    total_digits: Optional[TotalDigits] = element(default=None)
+    fraction_digits: Optional[FractionDigits] = element(default=None)
+    length: Optional[Length] = element(default=None)
+    white_space: Optional[WhiteSpace] = element(default=None)
+    pattern: Optional[Pattern] = element(default=None)
+    explicit_timezone: Optional[ExplicitTimezone] = element(default=None)
+    simple_type: Optional[SimpleType] = element(default=None)
+    enumerations: ArrayList[Enumeration] = element(
+        default_factory=list, name="enumeration"
+    )
+    assertions: ArrayList[Assertion] = element(default_factory=list, name="assertion")
+    attributes: ArrayList[Attribute] = element(default_factory=list, name="attribute")
+    attribute_groups: ArrayList[AttributeGroup] = element(
         default_factory=list, name="attributeGroup"
     )
 
@@ -701,8 +709,8 @@ class SimpleContent(AnnotationBase):
     : Reference: https://www.w3schools.com/xml/el_simplecontent.asp.
     """
 
-    restriction: Optional[Restriction] = el(default=None)
-    extension: Optional[Extension] = el(default=None)
+    restriction: Optional[Restriction] = element(default=None)
+    extension: Optional[Extension] = element(default=None)
 
 
 @dataclass
@@ -715,7 +723,7 @@ class ComplexContent(SimpleContent):
     : Reference: https://www.w3schools.com/xml/el_complexcontent.asp.
     """
 
-    mixed: bool = at(default=False)
+    mixed: bool = attribute(default=False)
 
 
 @dataclass
@@ -728,22 +736,22 @@ class ComplexType(AnnotationBase, NamedField):
     : Reference: https://www.w3schools.com/xml/el_complextype.asp.
     """
 
-    name: Optional[str] = at(default=None)
-    block: Optional[str] = at(default=None)
-    final: Optional[str] = at(default=None)
-    simple_content: Optional[SimpleContent] = el(default=None)
-    complex_content: Optional[ComplexContent] = el(default=None)
-    group: Optional[Group] = el(default=None)
-    all: Optional[All] = el(default=None)
-    choice: Optional[Choice] = el(default=None)
-    sequence: Optional[Sequence] = el(default=None)
-    any_attribute: Optional[AnyAttribute] = el(default=None)
-    attributes: ArrayList[Attribute] = el(default_factory=list, name="attribute")
-    attribute_groups: ArrayList[AttributeGroup] = el(
+    name: Optional[str] = attribute(default=None)
+    block: Optional[str] = attribute(default=None)
+    final: Optional[str] = attribute(default=None)
+    simple_content: Optional[SimpleContent] = element(default=None)
+    complex_content: Optional[ComplexContent] = element(default=None)
+    group: Optional[Group] = element(default=None)
+    all: Optional[All] = element(default=None)
+    choice: Optional[Choice] = element(default=None)
+    sequence: Optional[Sequence] = element(default=None)
+    any_attribute: Optional[AnyAttribute] = element(default=None)
+    attributes: ArrayList[Attribute] = element(default_factory=list, name="attribute")
+    attribute_groups: ArrayList[AttributeGroup] = element(
         default_factory=list, name="attributeGroup"
     )
-    abstract: bool = at(default=False)
-    mixed: bool = at(default=False)
+    abstract: bool = attribute(default=False)
+    mixed: bool = attribute(default=False)
 
     @property
     def is_mixed(self) -> bool:
@@ -759,7 +767,7 @@ class ComplexType(AnnotationBase, NamedField):
 class Field(AnnotationBase):
     """Reference: https://www.w3schools.com/xml/el_field.asp."""
 
-    xpath: Optional[str] = at(default=None)
+    xpath: Optional[str] = attribute(default=None)
 
 
 @dataclass
@@ -785,18 +793,18 @@ class Unique(AnnotationBase):
     Reference: https://www.w3schools.com/xml/el_unique.asp.
     """
 
-    name: Optional[str] = at(default=None)
-    selector: Optional[Selector] = el(default=None)
-    field: Optional[Field] = el(default=None)
+    name: Optional[str] = attribute(default=None)
+    selector: Optional[Selector] = element(default=None)
+    field: Optional[Field] = element(default=None)
 
 
 @dataclass
 class Key(AnnotationBase):
     """Reference: https://www.w3schools.com/xml/el_key.asp."""
 
-    name: Optional[str] = at(default=None)
-    selector: Optional[Selector] = el(default=None)
-    fields: ArrayList[Selector] = el(default_factory=list, name="field")
+    name: Optional[str] = attribute(default=None)
+    selector: Optional[Selector] = element(default=None)
+    fields: ArrayList[Selector] = element(default_factory=list, name="field")
 
 
 @dataclass
@@ -813,10 +821,10 @@ class Keyref(AnnotationBase):
     Reference: https://www.w3schools.com/xml/el_keyref.asp.
     """
 
-    name: Optional[str] = at(default=None)
-    refer: Optional[str] = at(default=None)
-    selector: Optional[Selector] = el(default=None)
-    fields: ArrayList[Selector] = el(default_factory=list, name="field")
+    name: Optional[str] = attribute(default=None)
+    refer: Optional[str] = attribute(default=None)
+    selector: Optional[Selector] = element(default=None)
+    fields: ArrayList[Selector] = element(default_factory=list, name="field")
 
 
 @dataclass
@@ -827,25 +835,25 @@ class Element(AnnotationBase, NamedField, OccurrencesMixin):
     Reference: https://www.w3schools.com/xml/el_element.asp.
     """
 
-    name: Optional[str] = at(default=None)
-    id: Optional[str] = at(default=None)
-    ref: Optional[str] = at(default=None)
-    type: Optional[str] = at(default=None)
-    substitution_group: Optional[str] = at(default=None)
-    default: Optional[str] = at(default=None)
-    fixed: Optional[str] = at(default=None)
-    form: Optional[FormType] = at(default=None)
-    block: Optional[List] = at(default=None)
-    final: Optional[List] = at(default=None)
-    simple_type: Optional[SimpleType] = el(default=None)
-    complex_type: Optional[ComplexType] = el(default=None)
-    uniques: ArrayList[Unique] = el(default_factory=list, name="unique")
-    keys: ArrayList[Key] = el(default_factory=list, name="key")
-    keyrefs: ArrayList[Keyref] = el(default_factory=list, name="keyref")
-    min_occurs: Optional[int] = at(default=None)
-    max_occurs: Optional[int] = at(default=None)
-    nillable: bool = at(default=False)
-    abstract: bool = at(default=False)
+    name: Optional[str] = attribute(default=None)
+    id: Optional[str] = attribute(default=None)
+    ref: Optional[str] = attribute(default=None)
+    type: Optional[str] = attribute(default=None)
+    substitution_group: Optional[str] = attribute(default=None)
+    default: Optional[str] = attribute(default=None)
+    fixed: Optional[str] = attribute(default=None)
+    form: Optional[FormType] = attribute(default=None)
+    block: Optional[List] = attribute(default=None)
+    final: Optional[List] = attribute(default=None)
+    simple_type: Optional[SimpleType] = element(default=None)
+    complex_type: Optional[ComplexType] = element(default=None)
+    uniques: ArrayList[Unique] = element(default_factory=list, name="unique")
+    keys: ArrayList[Key] = element(default_factory=list, name="key")
+    keyrefs: ArrayList[Keyref] = element(default_factory=list, name="keyref")
+    min_occurs: Optional[int] = attribute(default=None)
+    max_occurs: Optional[int] = attribute(default=None)
+    nillable: bool = attribute(default=False)
+    abstract: bool = attribute(default=False)
 
     @property
     def is_attribute(self) -> bool:
@@ -880,11 +888,11 @@ class Any(AnnotationBase, OccurrencesMixin, NamedField):
     Reference: https://www.w3schools.com/xml/el_any.asp.
     """
 
-    min_occurs: int = at(default=1)
-    max_occurs: int = at(default=1)
-    namespace: Optional[str] = at(default=None)
-    process_contents: Optional[ProcessType] = at(default=None)
-    annotation: Optional[Annotation] = el(default=None)
+    min_occurs: int = attribute(default=1)
+    max_occurs: int = attribute(default=1)
+    namespace: Optional[str] = attribute(default=None)
+    process_contents: Optional[ProcessType] = attribute(default=None)
+    annotation: Optional[Annotation] = element(default=None)
 
     @property
     def is_attribute(self) -> bool:
@@ -908,8 +916,8 @@ class Import(AnnotationBase):
     Reference: https://www.w3schools.com/xml/el_import.asp.
     """
 
-    namespace: Optional[str] = at(default=None)
-    schema_location: Optional[str] = at(default=None)
+    namespace: Optional[str] = attribute(default=None)
+    schema_location: Optional[str] = attribute(default=None)
 
 
 @dataclass
@@ -921,7 +929,7 @@ class Include(AnnotationBase):
     Reference: https://www.w3schools.com/xml/el_include.asp.
     """
 
-    schema_location: Optional[str] = at(default=None)
+    schema_location: Optional[str] = attribute(default=None)
 
     @property
     def namespace(self):
@@ -937,9 +945,9 @@ class Notation(AnnotationBase):
     Reference: https://www.w3schools.com/xml/el_notation.asp.
     """
 
-    name: Optional[str] = at(default=None)
-    public: Optional[str] = at(default=None)
-    system: Optional[str] = at(default=None)
+    name: Optional[str] = attribute(default=None)
+    public: Optional[str] = attribute(default=None)
+    system: Optional[str] = attribute(default=None)
 
 
 @dataclass
@@ -951,11 +959,11 @@ class Redefine(AnnotationBase):
     Reference: https://www.w3schools.com/xml/el_redefine.asp.
     """
 
-    schema_location: Optional[str] = at(default=None)
-    simple_type: Optional[SimpleType] = el(default=None)
-    complex_type: Optional[ComplexType] = el(default=None)
-    group: Optional[Group] = el(default=None)
-    attribute_group: Optional[AttributeGroup] = el(default=None)
+    schema_location: Optional[str] = attribute(default=None)
+    simple_type: Optional[SimpleType] = element(default=None)
+    complex_type: Optional[ComplexType] = element(default=None)
+    group: Optional[Group] = element(default=None)
+    attribute_group: Optional[AttributeGroup] = element(default=None)
 
 
 @dataclass
@@ -969,29 +977,35 @@ class Schema(AnnotationBase):
     class Meta:
         namespace = Namespace.SCHEMA
 
-    target: Optional[str] = at(default=None)
-    block_default: Optional[str] = at(default=None)
-    final_default: Optional[str] = at(default=None)
-    target_namespace: Optional[str] = at(default=None)
-    version: Optional[str] = at(default=None)
-    xmlns: Optional[str] = at(default=None)
+    target: Optional[str] = attribute(default=None)
+    block_default: Optional[str] = attribute(default=None)
+    final_default: Optional[str] = attribute(default=None)
+    target_namespace: Optional[str] = attribute(default=None)
+    version: Optional[str] = attribute(default=None)
+    xmlns: Optional[str] = attribute(default=None)
     nsmap: Dict = field(default_factory=dict)
     location: Optional[Path] = field(default=None)
-    element_form_default: FormType = at(default=FormType.UNQUALIFIED)
-    attribute_form_default: FormType = at(default=FormType.UNQUALIFIED)
-    includes: ArrayList[Include] = el(default_factory=list, name="include")
-    imports: ArrayList[Import] = el(default_factory=list, name="import")
-    redefines: ArrayList[Redefine] = el(default_factory=list, name="redefine")
-    annotations: ArrayList[Annotation] = el(default_factory=list, name="annotation")
-    simple_types: ArrayList[SimpleType] = el(default_factory=list, name="simpleType")
-    complex_types: ArrayList[ComplexType] = el(default_factory=list, name="complexType")
-    groups: ArrayList[Group] = el(default_factory=list, name="group")
-    attribute_groups: ArrayList[AttributeGroup] = el(
+    element_form_default: FormType = attribute(default=FormType.UNQUALIFIED)
+    attribute_form_default: FormType = attribute(default=FormType.UNQUALIFIED)
+    includes: ArrayList[Include] = element(default_factory=list, name="include")
+    imports: ArrayList[Import] = element(default_factory=list, name="import")
+    redefines: ArrayList[Redefine] = element(default_factory=list, name="redefine")
+    annotations: ArrayList[Annotation] = element(
+        default_factory=list, name="annotation"
+    )
+    simple_types: ArrayList[SimpleType] = element(
+        default_factory=list, name="simpleType"
+    )
+    complex_types: ArrayList[ComplexType] = element(
+        default_factory=list, name="complexType"
+    )
+    groups: ArrayList[Group] = element(default_factory=list, name="group")
+    attribute_groups: ArrayList[AttributeGroup] = element(
         default_factory=list, name="attributeGroup"
     )
-    elements: ArrayList[Element] = el(default_factory=list, name="element")
-    attributes: ArrayList[Attribute] = el(default_factory=list, name="attribute")
-    notations: ArrayList[Notation] = el(default_factory=list, name="notation")
+    elements: ArrayList[Element] = element(default_factory=list, name="element")
+    attributes: ArrayList[Attribute] = element(default_factory=list, name="attribute")
+    notations: ArrayList[Notation] = element(default_factory=list, name="notation")
 
     # any_attribute: AnyAttribute = aat(default_factory=list)
 

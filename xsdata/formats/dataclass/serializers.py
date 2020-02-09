@@ -161,7 +161,8 @@ class XmlSerializer(AbstractSerializer, ModelInspect):
             self.render_node(val, sub_element, namespaces)
             self.set_nil_attribute(var, sub_element, namespaces)
 
-    def set_any_children(self, parent: Element, value: Any, namespaces: Set[str]):
+    @classmethod
+    def set_any_children(cls, parent: Element, value: Any, namespaces: Set[str]):
         value = value if isinstance(value, list) else [value]
         for val in value:
 
@@ -181,7 +182,7 @@ class XmlSerializer(AbstractSerializer, ModelInspect):
                 sub_element.tail = val.tail
 
                 for child in val.children:
-                    self.set_any_children(sub_element, child, namespaces)
+                    cls.set_any_children(sub_element, child, namespaces)
 
     @staticmethod
     def set_nil_attribute(var: ClassVar, element: Element, namespaces: Set[str]):

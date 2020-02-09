@@ -30,7 +30,7 @@ Naive XML Bindings for python
 Features
 --------
 
-- Code generation for XML Schema 1.0 definitions
+- Code generation for XML Schema definitions
 - Supports qualified/unqualified elements and attributes
 - Supports enumerations and inner classes
 - Flattening strategies to keep the code as simple as possible.
@@ -40,8 +40,8 @@ Features
 
   - PEP8 naming conventions and code output
   - Full support for type hints even with forward references
-  - XML Parser & Serializer based on lxml with type casting
-  - JSON Parser & Serializer with type casting
+  - XML Parser & Serializer based on lxml
+  - JSON Parser & Serializer
 
 - Format: PlantUML class diagram
 

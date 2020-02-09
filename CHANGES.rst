@@ -1,9 +1,10 @@
-20.2 (2020-02-02)
+20.2 (2020-02-09)
 -------------------
-- Added support for mixed content in xsd documentation and appinfo.
+- Added support xs:any and xs:anyAttribute elements.
 - Added support for auto detecting XML Schema namespace prefix.
 - Added support for xml datatypes lang and base.
-- Updated XmlParser and SchameParser to create objects when elements are fully parsed
+- Refactored SchemaParser to use the XmlParser.
+- Updated XmlParser to bind after elements are fully parsed.
 
 
 20.1.3 (2020-01-26)

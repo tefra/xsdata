@@ -125,7 +125,7 @@ class XmlSerializer(AbstractSerializer, ModelInspect):
         meta = self.class_meta(obj.__class__, QName(parent).namespace)
         for var in meta.vars.values():
             value = getattr(obj, var.name)
-            if value:
+            if value is not None:
                 if var.namespace:
                     namespaces.add(var.namespace)
 

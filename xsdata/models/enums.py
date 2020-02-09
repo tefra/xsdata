@@ -1,5 +1,8 @@
 from enum import Enum
+from typing import Iterable
 from typing import Optional
+
+from lxml.etree import QName
 
 
 class Namespace:
@@ -14,6 +17,10 @@ class FormType(Enum):
 
 
 class DataType(Enum):
+    # xsdata custom any type
+    QMAP = ("qmap", (QName, str))
+
+    # xsd and xml data types
     ANY_URI = ("anyURI", str)
     ANY_SIMPLE_TYPE = ("anySimpleType", str)
     BASE = ("base", str)
@@ -68,18 +75,20 @@ class DataType(Enum):
         self.code = code
         self.local = local
 
+    @property
+    def xml_prefixed(self):
+        return f"xml:{self.code}"
+
+    @property
+    def local_name(self) -> str:
+        if isinstance(self.local, Iterable):
+            return ", ".join([local.__name__ for local in self.local])
+        else:
+            return self.local.__name__
+
     @classmethod
     def get_enum(cls, code: str) -> Optional["DataType"]:
         return __XSDType__.get(code) if code else None
-
-    @classmethod
-    def get_local(cls, code: str) -> Optional[str]:
-        enum = cls.get_enum(code)
-        return enum.local.__name__ if enum else None
-
-    @classmethod
-    def codes(cls):
-        return list(__XSDType__.keys())
 
 
 __XSDType__ = {xsd.code: xsd for xsd in DataType}

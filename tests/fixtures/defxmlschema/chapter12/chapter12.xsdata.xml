@@ -7,7 +7,7 @@
     <color value="blue"/>
     <description>This shirt is the &lt;xhtml:b&gt;best-selling&lt;/xhtml:b&gt; shirt in our catalog! &lt;xhtml:br/&gt; Note: runs large.</description>
   </shirt>
-  <hat effDate="1900-01-01">
+  <hat xmlns:ns0="http://example.org/oth" effDate="1900-01-01" ns0:custom="12">
     <number>557</number>
     <name>Ten-Gallon Hat</name>
     <color value="red"/>

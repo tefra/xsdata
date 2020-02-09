@@ -106,10 +106,7 @@ class PythonAbstractGenerator(AbstractGenerator, ABC):
         """Convert xsd types to python or apply class name conventions after
         stripping any reference prefix."""
 
-        if attr_type.native:
-            return attr_type.native_name
-        else:
-            return cls.class_name(text.suffix(attr_type.name))
+        return attr_type.native_name or cls.class_name(text.suffix(attr_type.name))
 
     @classmethod
     def attribute_name(cls, name: str) -> str:
@@ -165,7 +162,9 @@ class PythonAbstractGenerator(AbstractGenerator, ABC):
 
         if attr.is_list:
             result = f"List[{result}]"
-        elif attr.default is None:
+        elif attr.is_map:
+            result = f"Dict[{result}]"
+        elif attr.default is None and "Dict" not in result:
             result = f"Optional[{result}]"
 
         return result
@@ -175,6 +174,8 @@ class PythonAbstractGenerator(AbstractGenerator, ABC):
         """Normalize default value/factory by the attribute type."""
         if attr.is_list:
             return "list"
+        if attr.is_map:
+            return "dict"
         elif isinstance(attr.default, str):
             local_types = {
                 attr_type.native_type for attr_type in attr.types if attr_type.native

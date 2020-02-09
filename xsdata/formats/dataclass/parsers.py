@@ -54,7 +54,9 @@ class JsonParser(AbstractParser, ModelInspect):
                 if arg.is_dataclass:
                     value = [self.parse_context(val, arg.type) for val in value]
                 else:
-                    value = list(map(arg.type, value))
+                    value = [self.parse_value(arg.type, val) for val in value]
+            elif arg.is_any_attribute:
+                value = dict(value)
             else:
                 if arg.is_dataclass:
                     value = self.parse_context(value, arg.type)
@@ -74,12 +76,15 @@ class JsonParser(AbstractParser, ModelInspect):
         field value."""
         if field.qname.localname in data:
             value = data[field.qname.localname]
-            if field.is_list and not isinstance(value, list):
-                value = [value]
+        elif field.name in data:
+            value = data[field.name]
         elif callable(field.default):
             value = field.default()
         else:
             value = field.default
+
+        if field.is_list and not isinstance(value, list):
+            value = [value]
 
         return value
 
@@ -173,9 +178,9 @@ class XmlParser(AbstractXmlParser, ModelInspect):
         if item is None:
             return None
         elif item.meta:
-            attributes = self.parse_element_attributes(item.meta, element)
+            params = self.bind_element_params(item.meta, element)
             children = self.fetch_class_children(item)
-            obj = item.type(**children, **attributes)
+            obj = item.type(**children, **params)
         elif item.type:
             obj = self.parse_value(item.type, element.text)
         else:
@@ -215,17 +220,23 @@ class XmlParser(AbstractXmlParser, ModelInspect):
 
         return params
 
-    def parse_element_attributes(self, metadata: ClassMeta, element: Element) -> Dict:
+    def bind_element_params(self, metadata: ClassMeta, element: Element) -> Dict:
         """Parse the given element's attributes and any text content and return
         a dictionary of field names and values based on the given class
         metadata."""
 
-        var = metadata.vars
-        params = {
-            var[qname].name: self.parse_value(var[qname].type, value)
-            for qname, value in element.attrib.items()
-            if qname in var
-        }
+        params = dict()
+        any_attr = next(
+            (var for var in metadata.vars.values() if var.is_any_attribute), None
+        )
+        for qname, value in element.attrib.items():
+            if qname in metadata.vars:
+                var = metadata.vars[qname]
+                params[var.name] = self.parse_value(var.type, value)
+            elif any_attr:
+                if any_attr.name not in params:
+                    params[any_attr.name] = dict()
+                params[any_attr.name][qname] = value
 
         text_var = next((var for var in metadata.vars.values() if var.is_text), None)
         if text_var and element.text is not None:
@@ -243,17 +254,3 @@ class XmlParser(AbstractXmlParser, ModelInspect):
         end_root = xml.rfind("<")
 
         return re.sub(r"\s+", " ", xml[start_root + 1 : end_root]).strip()
-
-    @classmethod
-    def parse_value(cls, tp: Type, value: Any) -> Any:
-        """Convert xml string values to s python primitive type."""
-
-        if hasattr(tp, "__origin__"):
-            for tp_arg in tp.__args__:
-                try:
-                    return cls.parse_value(tp_arg, value)
-                except ValueError:
-                    pass
-            return value
-
-        return value == "true" if tp is bool else tp(value)

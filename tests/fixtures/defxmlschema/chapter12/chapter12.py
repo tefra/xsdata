@@ -1,5 +1,6 @@
 from dataclasses import dataclass, field
-from typing import List, Optional
+from lxml.etree import QName
+from typing import Dict, List, Optional
 
 
 @dataclass
@@ -64,6 +65,7 @@ class ProductType:
     :ivar color:
     :ivar description:
     :ivar eff_date:
+    :ivar attributes:
     """
     number: Optional[int] = field(
         default=None,
@@ -118,6 +120,13 @@ class ProductType:
         metadata=dict(
             name="effDate",
             type="Attribute"
+        )
+    )
+    attributes: Dict[QName, str] = field(
+        default_factory=dict,
+        metadata=dict(
+            name="attributes",
+            type="AnyAttribute"
         )
     )
 

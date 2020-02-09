@@ -10,6 +10,7 @@ from typing import List as ArrayList
 from typing import Optional
 from typing import Union as UnionType
 
+from xsdata.models.enums import DataType
 from xsdata.models.enums import FormType
 from xsdata.models.enums import Namespace
 from xsdata.models.enums import ProcessType
@@ -21,19 +22,32 @@ from xsdata.models.mixins import OccurrencesMixin
 from xsdata.models.mixins import RestrictedField
 
 
-def at(default=MISSING, default_factory=MISSING, **kwargs):
+def at(default=MISSING, default_factory=MISSING, init=True, **kwargs):
     kwargs.update(type=TagType.ATTRIBUTE)
-    return field(default=default, default_factory=default_factory, metadata=kwargs)
+    return field(
+        init=init, default=default, default_factory=default_factory, metadata=kwargs
+    )
 
 
-def el(default=MISSING, default_factory=MISSING, **kwargs):
+def aat(default=MISSING, default_factory=MISSING, init=True, **kwargs):
+    kwargs.update(type=TagType.ANY_ATTRIBUTE)
+    return field(
+        init=init, default=default, default_factory=default_factory, metadata=kwargs
+    )
+
+
+def el(default=MISSING, default_factory=MISSING, init=True, **kwargs):
     kwargs.update(type=TagType.ELEMENT)
-    return field(default=default, default_factory=default_factory, metadata=kwargs)
+    return field(
+        init=init, default=default, default_factory=default_factory, metadata=kwargs
+    )
 
 
-def ex(default=MISSING, default_factory=MISSING, **kwargs):
+def ex(default=MISSING, default_factory=MISSING, init=True, **kwargs):
     kwargs.update(type=TagType.EXTENSION)
-    return field(default=default, default_factory=default_factory, metadata=kwargs)
+    return field(
+        init=init, default=default, default_factory=default_factory, metadata=kwargs
+    )
 
 
 @dataclass
@@ -216,7 +230,7 @@ class Union(AnnotationBase, NamedField, RestrictedField):
 
 
 @dataclass
-class AnyAttribute(AnnotationBase):
+class AnyAttribute(AnnotationBase, NamedField, RestrictedField):
     """
     The anyAttribute element enables the author to extend the XML document with
     attributes not specified by the schema.
@@ -227,7 +241,21 @@ class AnyAttribute(AnnotationBase):
 
     namespace: Optional[str] = at(default=None)
     process_contents: Optional[ProcessType] = at(default=None)
-    simple_type: Optional[SimpleType] = el(default=None)
+
+    @property
+    def is_attribute(self) -> bool:
+        return True
+
+    @property
+    def real_type(self) -> Optional[str]:
+        return DataType.QMAP.xml_prefixed
+
+    @property
+    def real_name(self) -> str:
+        return "attributes"
+
+    def get_restrictions(self) -> Dict[str, Anything]:
+        return dict()
 
 
 @dataclass
@@ -952,6 +980,8 @@ class Schema(AnnotationBase):
     elements: ArrayList[Element] = el(default_factory=list, name="element")
     attributes: ArrayList[Attribute] = el(default_factory=list, name="attribute")
     notations: ArrayList[Notation] = el(default_factory=list, name="notation")
+
+    # any_attribute: AnyAttribute = aat(default_factory=list)
 
     def sub_schemas(self) -> Iterator[UnionType[Import, Include]]:
         for imp in self.imports:

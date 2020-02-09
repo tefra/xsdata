@@ -19,7 +19,8 @@
                     "value": "This shirt is the <xhtml:b>best-selling</xhtml:b> shirt in our catalog! <xhtml:br/> Note: runs large."
                 }
             ],
-            "eff_date": "2002-04-02"
+            "eff_date": "2002-04-02",
+            "attributes": {}
         }
     ],
     "hat": [
@@ -33,7 +34,10 @@
                 }
             ],
             "description": [],
-            "eff_date": "1900-01-01"
+            "eff_date": "1900-01-01",
+            "attributes": {
+                "{http://example.org/oth}custom": "12"
+            }
         }
     ],
     "umbrella": []

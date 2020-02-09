@@ -11,6 +11,7 @@ from lxml import etree
 from tests.test_generation import titles
 from xsdata import cli
 from xsdata.formats.dataclass.generator import DataclassGenerator
+from xsdata.formats.dataclass.parsers import JsonParser
 from xsdata.formats.dataclass.parsers import XmlParser
 from xsdata.formats.dataclass.serializers import JsonSerializer
 from xsdata.formats.dataclass.serializers import XmlSerializer
@@ -34,6 +35,7 @@ class Documentation:
 
 
 xml_parser = XmlParser()
+json_parser = JsonParser()
 xml_serializer = XmlSerializer(pretty_print=True)
 json_serializer = JsonSerializer(indent=4)
 
@@ -66,6 +68,7 @@ def test_binding(fixture: Path):
     expected = fixture.with_suffix(".json")
     if expected.exists():
         assert expected.read_text() == actual
+        assert obj == json_parser.from_string(actual, clazz)
     else:
         expected.write_text(actual)
 

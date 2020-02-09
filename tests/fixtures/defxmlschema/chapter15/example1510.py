@@ -1,5 +1,6 @@
 from dataclasses import dataclass, field
-from typing import Optional
+from lxml.etree import QName
+from typing import Dict, Optional
 
 
 @dataclass
@@ -7,6 +8,7 @@ class IdentifierGroup:
     """
     :ivar id:
     :ivar version:
+    :ivar attributes:
     """
     id: Optional[str] = field(
         default=None,
@@ -21,5 +23,12 @@ class IdentifierGroup:
         metadata=dict(
             name="version",
             type="Attribute"
+        )
+    )
+    attributes: Dict[QName, str] = field(
+        default_factory=dict,
+        metadata=dict(
+            name="attributes",
+            type="AnyAttribute"
         )
     )

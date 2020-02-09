@@ -46,7 +46,10 @@ def lib_imports(output: str):
     if dataclasses:
         result.append(f"from dataclasses import {', '.join(dataclasses)}")
 
-    types = [tp for tp in ["List", "Optional", "Union"] if f"{tp}[" in output]
+    if "QName" in output:
+        result.append("from lxml.etree import QName")
+
+    types = [tp for tp in ["Dict", "List", "Optional", "Union"] if f"{tp}[" in output]
     if types:
         result.append(f"from typing import {', '.join(types)}")
 

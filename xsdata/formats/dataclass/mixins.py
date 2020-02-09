@@ -4,7 +4,7 @@ from dataclasses import field
 from dataclasses import fields
 from dataclasses import is_dataclass
 from dataclasses import MISSING
-from enum import Enum
+from enum import IntEnum
 from typing import Any
 from typing import Callable
 from typing import Dict
@@ -19,23 +19,27 @@ from lxml.etree import QName
 from xsdata.models.enums import TagType
 
 
-class Tag(Enum):
+class Tag(IntEnum):
     TEXT = 1
     ATTRIBUTE = 2
-    ELEMENT = 3
-    ROOT = 4
-    MISC = 5
+    ANY_ATTRIBUTE = 3
+    ELEMENT = 4
+    ANY_ELEMENT = 5
+    ROOT = 6
+    MISC = 7
 
     @classmethod
-    def from_metadata_type(cls, meta_type):
-        if meta_type == TagType.ATTRIBUTE:
-            return cls.ATTRIBUTE
-        elif meta_type == TagType.ELEMENT:
-            return cls.ELEMENT
-        elif meta_type:
-            return cls.TEXT
-        else:
-            return cls.MISC
+    def from_metadata_type(cls, meta_type: Optional[str]) -> "Tag":
+        return __tag_type_map__.get(meta_type, cls.TEXT)
+
+
+__tag_type_map__ = {
+    TagType.ATTRIBUTE: Tag.ATTRIBUTE,
+    TagType.ANY_ATTRIBUTE: Tag.ANY_ATTRIBUTE,
+    TagType.ELEMENT: Tag.ELEMENT,
+    TagType.ANY: Tag.ANY_ELEMENT,
+    None: Tag.MISC,
+}
 
 
 @dataclass(frozen=True)
@@ -54,12 +58,20 @@ class ClassVar:
         return self.tag == Tag.ATTRIBUTE
 
     @property
-    def is_text(self):
-        return self.tag == Tag.TEXT
+    def is_any_attribute(self):
+        return self.tag == Tag.ANY_ATTRIBUTE
 
     @property
     def is_element(self):
         return self.tag == Tag.ELEMENT
+
+    @property
+    def is_any_element(self):
+        return self.tag == Tag.ANY_ELEMENT
+
+    @property
+    def is_text(self):
+        return self.tag == Tag.TEXT
 
     @property
     def namespace(self):

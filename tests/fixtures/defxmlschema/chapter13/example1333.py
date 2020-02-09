@@ -1,17 +1,18 @@
 from dataclasses import dataclass, field
-from typing import Optional
+from lxml.etree import QName
+from typing import Dict, Optional
 
 
 @dataclass
 class BaseType:
     """
-    :ivar value:
+    :ivar attributes:
     """
-    value: Optional[str] = field(
-        default=None,
+    attributes: Dict[QName, str] = field(
+        default_factory=dict,
         metadata=dict(
-            name="value",
-            type="Extension"
+            name="attributes",
+            type="AnyAttribute"
         )
     )
 

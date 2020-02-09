@@ -21,13 +21,14 @@ class AttrType:
     forward_ref: bool = field(default=False)
 
     @property
-    def native_name(self):
-        native_type = self.native_type
-        return native_type.__name__ if native_type else None
+    def native_name(self) -> Optional[str]:
+        data_type = DataType.get_enum(self.name) if self.native else None
+        return data_type.local_name if data_type else None
 
     @property
     def native_type(self):
-        return DataType.get_enum(self.name).local if self.native else None
+        data_type = DataType.get_enum(self.name) if self.native else None
+        return data_type.local if data_type else None
 
     def clone(self):
         return replace(self)
@@ -91,6 +92,18 @@ class Attr:
     @property
     def is_list(self):
         return self.max_occurs and self.max_occurs > 1
+
+    @property
+    def is_map(self) -> bool:
+        return (
+            len(self.types) == 1
+            and self.types[0].native
+            and isinstance(self.types[0].native_type, tuple)
+        )
+
+    @property
+    def is_factory(self):
+        return self.is_list or self.is_map
 
     @property
     def is_enumeration(self) -> bool:

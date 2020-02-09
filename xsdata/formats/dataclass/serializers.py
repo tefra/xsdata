@@ -131,6 +131,9 @@ class XmlSerializer(AbstractSerializer, ModelInspect):
                 continue
             elif var.is_attribute:
                 parent.set(var.qname, self.render_value(value))
+            elif var.is_any_attribute:
+                for qname, value in value.items():
+                    parent.set(qname, value)
             elif var.is_text:
                 parent.text = self.render_value(value)
             else:

@@ -2,6 +2,7 @@ import io
 import pathlib
 from abc import ABC
 from abc import abstractmethod
+from typing import Any
 from typing import Optional
 from typing import Type
 from typing import TypeVar
@@ -37,6 +38,20 @@ class AbstractParser(ABC):
     @abstractmethod
     def parse(self, source: io.BytesIO, clazz: Type[T]) -> T:
         """Parse the input stream and return the resulting object tree."""
+
+    @classmethod
+    def parse_value(cls, tp: Type, value: Any) -> Any:
+        """Convert xml string values to s python primitive type."""
+
+        if hasattr(tp, "__origin__"):
+            for tp_arg in tp.__args__:
+                try:
+                    return cls.parse_value(tp_arg, value)
+                except ValueError:
+                    pass
+            return value
+
+        return value == "true" if tp is bool else tp(value)
 
 
 class AbstractXmlParser(AbstractParser):

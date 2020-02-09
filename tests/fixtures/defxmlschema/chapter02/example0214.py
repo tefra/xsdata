@@ -40,6 +40,5 @@ class ProductType:
 
 @dataclass
 class Product(ProductType):
-    """<doc:description>This element represents a product.</doc:description>"""
     class Meta:
         name = "product"

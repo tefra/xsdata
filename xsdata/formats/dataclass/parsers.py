@@ -20,6 +20,7 @@ from lxml.etree import tostring
 from xsdata.formats.dataclass.mixins import ClassMeta
 from xsdata.formats.dataclass.mixins import ClassVar
 from xsdata.formats.dataclass.mixins import ModelInspect
+from xsdata.formats.dataclass.models import AnyElement
 from xsdata.formats.mixins import AbstractParser
 from xsdata.formats.mixins import AbstractXmlParser
 from xsdata.models.enums import EventType
@@ -49,21 +50,23 @@ class JsonParser(AbstractParser, ModelInspect):
             value = self.get_value(data, arg)
 
             if value is None:
-                pass
-            elif arg.is_list:
-                if arg.is_dataclass:
-                    value = [self.parse_context(val, arg.type) for val in value]
-                else:
-                    value = [self.parse_value(arg.type, val) for val in value]
-            elif arg.is_any_attribute:
-                value = dict(value)
-            else:
-                if arg.is_dataclass:
-                    value = self.parse_context(value, arg.type)
-                else:
-                    value = arg.type(value)
+                continue
+            if not isinstance(value, list):
+                value = [value]
 
-            params[arg.name] = value
+            if arg.is_dataclass:
+                value = [self.parse_context(val, arg.type) for val in value]
+            elif arg.is_any_attribute:
+                value[0] = dict(value[0])
+            elif arg.is_any_element:
+                value = [
+                    val if isinstance(val, str) else self.parse_context(val, AnyElement)
+                    for val in value
+                ]
+            else:
+                value = [self.parse_value(arg.type, val) for val in value]
+
+            params[arg.name] = value if arg.is_list else value[0]
 
         try:
             return clazz(**params)  # type: ignore
@@ -178,9 +181,12 @@ class XmlParser(AbstractXmlParser, ModelInspect):
         if item is None:
             return None
         elif item.meta:
-            params = self.bind_element_params(item.meta, element)
+            attr_params = self.bind_element_attrs(item.meta, element)
+            text_params = self.bind_element_text(item.meta, element)
+            any_params = self.bind_element_any(item.meta, element)
             children = self.fetch_class_children(item)
-            obj = item.type(**children, **params)
+
+            obj = item.type(**attr_params, **text_params, **any_params, **children)
         elif item.type:
             obj = self.parse_value(item.type, element.text)
         else:
@@ -220,15 +226,13 @@ class XmlParser(AbstractXmlParser, ModelInspect):
 
         return params
 
-    def bind_element_params(self, metadata: ClassMeta, element: Element) -> Dict:
+    def bind_element_attrs(self, metadata: ClassMeta, element: Element) -> Dict:
         """Parse the given element's attributes and any text content and return
         a dictionary of field names and values based on the given class
         metadata."""
 
         params = dict()
-        any_attr = next(
-            (var for var in metadata.vars.values() if var.is_any_attribute), None
-        )
+        any_attr = metadata.any_attribute
         for qname, value in element.attrib.items():
             if qname in metadata.vars:
                 var = metadata.vars[qname]
@@ -238,12 +242,45 @@ class XmlParser(AbstractXmlParser, ModelInspect):
                     params[any_attr.name] = dict()
                 params[any_attr.name][qname] = value
 
-        text_var = next((var for var in metadata.vars.values() if var.is_text), None)
+        return params
+
+    def bind_element_text(self, metadata: ClassMeta, element: Element):
+        params = dict()
+        text_var = metadata.any_text
         if text_var and element.text is not None:
-            text = self.parse_mixed_content(element) if metadata.mixed else element.text
-            params[text_var.name] = self.parse_value(text_var.type, text)
+            params[text_var.name] = self.parse_value(text_var.type, element.text)
 
         return params
+
+    def bind_element_any(self, metadata: ClassMeta, element: Element):
+        params = dict()
+        any_var = metadata.any_element
+        if any_var:
+            text = element.text.strip() if element.text else None
+            tail = element.tail.strip() if element.tail else None
+            any_values = list(map(self.parse_any_element, element))
+
+            if text:
+                any_values.insert(0, text)
+            if tail:
+                any_values.append(tail)
+            if any_values:
+                params[any_var.name] = any_values
+
+        return params
+
+    @classmethod
+    def parse_any_element(cls, element: Element):
+        text = element.text.strip() if element.text else None
+        tail = element.tail.strip() if element.tail else None
+
+        return AnyElement(
+            qname=element.tag,
+            text=text or None,
+            tail=tail or None,
+            children=list(map(cls.parse_any_element, element)),
+            attributes={k: v for k, v in element.attrib.items()},
+        )
 
     @classmethod
     def parse_mixed_content(cls, element: Element):

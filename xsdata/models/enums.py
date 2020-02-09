@@ -19,6 +19,7 @@ class FormType(Enum):
 class DataType(Enum):
     # xsdata custom any type
     QMAP = ("qmap", (QName, str))
+    OBJECT = ("object", object)
 
     # xsd and xml data types
     ANY_URI = ("anyURI", str)

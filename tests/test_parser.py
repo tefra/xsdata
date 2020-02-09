@@ -37,13 +37,13 @@ class ParserTests(TestCase):
         xsd = """<xs:simpleType name="CountryType">
                     <xs:annotation>
                       <xs:documentation>
-                        <doc:keyword>country</doc:keyword>
+                        <keyword>country</keyword>
                       </xs:documentation>
                     </xs:annotation>
                   </xs:simpleType>"""
         schema = self.parser.from_xsd_string(wrap(xsd))
 
-        expected = "<doc:keyword>country</doc:keyword>"
+        expected = "<keyword>country</keyword>"
         self.assertEqual(expected, schema.simple_types[0].display_help)
 
     def test_with_unknown_tags_raise_exception(self):

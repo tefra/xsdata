@@ -40,5 +40,6 @@ class ProductType:
 
 @dataclass
 class Product(ProductType):
+    """<ns0:description>This element represents a product.</ns0:description>"""
     class Meta:
         name = "product"

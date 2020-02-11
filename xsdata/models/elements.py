@@ -860,6 +860,13 @@ class Element(AnnotationBase, NamedField, OccurrencesMixin):
         return True
 
     @property
+    def is_mixed(self) -> bool:
+        if self.complex_type:
+            return self.complex_type.is_mixed
+
+        return False
+
+    @property
     def real_type(self) -> Optional[str]:
         if self.type:
             return self.type

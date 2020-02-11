@@ -90,14 +90,16 @@ class ParserTests(TestCase):
         self.assertEqual(FormType.QUALIFIED, schema.attributes[0].form)
         self.assertEqual(FormType.QUALIFIED, schema.elements[0].form)
 
-    def test_with_empty_tags_are_ignored(self):
-        xsd = """<xs:complexType name="foo" />
-        <xs:element />
+    def test_empty_tags_without_children_are_ignored(self):
+        xsd = """<xs:complexType name="foo" /><xs:element />
+        <xs:annotation><xs:documentation></xs:documentation></xs:annotation>
         """
 
         schema = self.parser.from_xsd_string(wrap(xsd))
         self.assertEqual(0, len(schema.elements))
         self.assertEqual(1, len(schema.complex_types))
+        self.assertEqual(1, len(schema.annotations))
+        self.assertEqual(0, len(schema.annotations[0].documentations))
 
     def test_complex_type_with_sequence(self):
         xsd = """<xs:complexType name="allowablePointsOfSaleType">

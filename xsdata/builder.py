@@ -94,7 +94,8 @@ class ClassBuilder:
         native = False
 
         if prefix and (
-            prefix == "xml" or self.schema.nsmap.get(prefix) == Namespace.SCHEMA
+            prefix == Namespace.XML.prefix
+            or self.schema.nsmap.get(prefix) == Namespace.SCHEMA.uri
         ):
             name = suffix
             native = True

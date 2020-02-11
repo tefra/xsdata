@@ -76,7 +76,7 @@ class BaseModel:
     @classmethod
     def create(cls: Type[T], **kwargs) -> T:
         if not kwargs.get("nsmap"):
-            kwargs.update({"nsmap": {"xs": Namespace.SCHEMA}})
+            kwargs.update({"nsmap": {"xs": Namespace.SCHEMA.uri}})
 
         kwargs = {
             text.snake_case(etree.QName(key).localname): value

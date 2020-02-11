@@ -5,10 +5,19 @@ from typing import Optional
 from lxml.etree import QName
 
 
-class Namespace:
+class Namespace(Enum):
     SCHEMA = "http://www.w3.org/2001/XMLSchema"
     XML = "http://www.w3.org/XML/1998/namespace"
     INSTANCE = "http://www.w3.org/2001/XMLSchema-instance"
+    XLINK = "http://www.w3.org/1999/xlink"
+
+    @property
+    def uri(self):
+        return self.value
+
+    @property
+    def prefix(self):
+        return self.name.lower()
 
 
 class FormType(Enum):

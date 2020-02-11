@@ -982,7 +982,7 @@ class Schema(AnnotationBase):
     """
 
     class Meta:
-        namespace = Namespace.SCHEMA
+        namespace = Namespace.SCHEMA.uri
 
     target: Optional[str] = attribute(default=None)
     block_default: Optional[str] = attribute(default=None)

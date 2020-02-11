@@ -31,14 +31,9 @@ class ProcessTask:
         parser = SchemaParser(target_namespace=target_namespace)
         schema = parser.from_xsd_path(xsd)
         for sub_schema in schema.sub_schemas():
-            if self.is_valid(sub_schema):
-                self.process(
-                    xsd=self.resolve_schema(xsd, sub_schema),
-                    package=self.adjust_package(package, sub_schema),
-                    target_namespace=schema.target_namespace,
-                )
+            self.process_import(sub_schema, xsd, package, schema.target_namespace)
 
-        logger.info("Schema: %s, elements: %d", xsd.relative_to(Path.cwd()), schema.num)
+        logger.info("Schema: %s, elements: %d", xsd.name, schema.num)
 
         classes = ClassBuilder(schema=schema).build()
         logger.info("Class candidates: %d", len(classes))
@@ -51,9 +46,41 @@ class ProcessTask:
             schema=schema, classes=classes, package=package, renderer=self.renderer
         )
 
+    def process_import(
+        self,
+        schema: Union[Import, Include],
+        path: Path,
+        package: str,
+        target_namespace: Optional[str],
+    ):
+        sub_xsd_package = None
+        sub_xsd_path = self.resolve_local_schema(schema)
+
+        if schema.schema_location is None:
+            return
+        elif sub_xsd_path is None:
+            sub_xsd_path = self.resolve_schema(path, schema)
+            sub_xsd_package = self.adjust_package(package, schema)
+
+        self.process(
+            xsd=sub_xsd_path,
+            package=sub_xsd_package or package,
+            target_namespace=target_namespace,
+        )
+
     @staticmethod
-    def is_valid(schema: Union[Import, Include]) -> bool:
-        return schema.namespace != Namespace.XML and schema.schema_location is not None
+    def resolve_local_schema(schema: Union[Import, Include]) -> Optional[Path]:
+        try:
+            namespace = Namespace(schema.namespace)
+            path = (
+                Path(__file__)
+                .absolute()
+                .parent.joinpath(f"schemas/{namespace.prefix}.xsd")
+            )
+            schema.schema_location = str(path)
+            return path
+        except ValueError:
+            return None
 
     @staticmethod
     def resolve_schema(xsd: Path, schema: Union[Import, Include]) -> Path:

@@ -270,29 +270,33 @@ class XmlParser(AbstractXmlParser, ModelInspect):
         if any_var:
             text = element.text.strip() if element.text else None
             tail = element.tail.strip() if element.tail else None
-            any_values = list(map(self.parse_any_element, element))
+            value: List[object] = list(
+                filter(None, map(self.parse_any_element, element))
+            )
 
             if text:
-                any_values.insert(0, text)
+                value.insert(0, text)
             if tail:
-                any_values.append(tail)
-            if any_values:
-                params[any_var.name] = any_values
+                value.append(tail)
+            if value:
+                params[any_var.name] = value
 
         return params
 
     @classmethod
-    def parse_any_element(cls, element: Element):
+    def parse_any_element(cls, element: Element) -> Optional[AnyElement]:
         text = element.text.strip() if element.text else None
         tail = element.tail.strip() if element.tail else None
 
-        return AnyElement(
-            qname=element.tag,
-            text=text or None,
-            tail=tail or None,
-            children=list(map(cls.parse_any_element, element)),
-            attributes={k: v for k, v in element.attrib.items()},
-        )
+        if isinstance(element.tag, str):
+            return AnyElement(
+                qname=element.tag,
+                text=text or None,
+                tail=tail or None,
+                children=list(filter(None, map(cls.parse_any_element, element))),
+                attributes={k: v for k, v in element.attrib.items()},
+            )
+        return None
 
     @classmethod
     def parse_mixed_content(cls, element: Element):

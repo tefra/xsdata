@@ -45,6 +45,16 @@ class ElementTests(TestCase):
         obj = Element.create()
         self.assertIsNone(obj.extends)
 
+    def test_property_is_mixed(self):
+        obj = Element.create()
+        self.assertFalse(obj.is_mixed)
+
+        obj.complex_type = ComplexType.create()
+        self.assertFalse(obj.is_mixed)
+
+        obj.complex_type.mixed = True
+        self.assertTrue(obj.is_mixed)
+
     def test_get_restrictions(self):
         obj = Element.create(min_occurs=1, max_occurs=1)
         expected = {"required": True}

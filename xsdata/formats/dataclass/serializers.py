@@ -187,8 +187,8 @@ class XmlSerializer(AbstractSerializer, ModelInspect):
     @staticmethod
     def set_nil_attribute(var: ClassVar, element: Element, namespaces: Set[str]):
         if var.is_nillable and element.text is None and len(element) == 0:
-            namespaces.add(Namespace.INSTANCE)
-            qname = QName(Namespace.INSTANCE, "nil")
+            namespaces.add(Namespace.INSTANCE.uri)
+            qname = QName(Namespace.INSTANCE.uri, "nil")
             element.set(qname, "true")
 
     @staticmethod

@@ -7,12 +7,9 @@ from typing import Dict
 from typing import Iterator
 from typing import List as ArrayList
 from typing import Optional
-from typing import Set
 from typing import Union as UnionType
 
-from lxml import etree
-
-from xsdata.formats.dataclass.serializers import XmlSerializer
+from xsdata.formats.dataclass.utils import tostring
 from xsdata.models.enums import DataType
 from xsdata.models.enums import FormType
 from xsdata.models.enums import Namespace
@@ -65,13 +62,7 @@ class Documentation(ElementBase):
         if not self.elements:
             return None
 
-        root = etree.Element("xsdata")
-        namespaces: Set[str] = set()
-        XmlSerializer.set_any_children(root, self.elements, namespaces)
-        nsmap = {f"ns{index}": ns for index, ns in enumerate(sorted(namespaces))}
-        etree.cleanup_namespaces(root, top_nsmap=nsmap)
-        xml = etree.tostring(root, pretty_print=True).decode()
-        return xml[xml.find(">") + 1 :].replace("</xsdata>", "").strip()
+        return tostring(self.elements)
 
 
 @dataclass

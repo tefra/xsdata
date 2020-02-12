@@ -123,11 +123,18 @@ class SchemaParser(XmlParser):
         """Elements inside a sequence inherit min|max occur counter if it is
         not set."""
         if isinstance(obj, xsd.Sequence):
-            for child in obj.elements:
-                if child.min_occurs is None:
-                    child.min_occurs = obj.min_occurs
-                if child.max_occurs is None:
-                    child.max_occurs = obj.max_occurs
+
+            for element in obj.elements:
+                if element.min_occurs is None:
+                    element.min_occurs = obj.min_occurs
+                if element.max_occurs is None:
+                    element.max_occurs = obj.max_occurs
+
+            for any_element in obj.any:
+                if any_element.min_occurs is None:
+                    any_element.min_occurs = obj.min_occurs
+                if any_element.max_occurs is None:
+                    any_element.max_occurs = obj.max_occurs
 
     @classmethod
     def parse_value(cls, tp: Type, value: Any) -> Any:

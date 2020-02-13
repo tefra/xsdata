@@ -1,4 +1,4 @@
-from string import printable
+import re
 from typing import List
 from typing import Set
 
@@ -45,17 +45,19 @@ stop_words = [
 
 def safe_snake(string: str) -> str:
     if not string:
-        return "empty"
+        return "value"
 
-    string = "".join([ch for ch in string if ch in printable])
-    if string.lower() in stop_words:
-        return f"{string}_value"
-    elif string[0].isdigit():
+    # Remove invalid characters
+    string = re.sub("[^0-9a-zA-Z_]", " ", string)
+
+    if not string.strip():
+        return "value"
+    elif not string[0].isalpha():
         return f"value_{string}"
-    elif string[0] == "-" and string[1].isdigit():
-        return f"value_minus_{string[1:]}"
+    elif string.lower() in stop_words:
+        return f"{string}_value"
     else:
-        return string
+        return string.strip("_")
 
 
 def tostring(elements: List):

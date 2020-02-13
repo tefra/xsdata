@@ -2,6 +2,7 @@ import sys
 from unittest import TestCase
 
 from xsdata.models.elements import All
+from xsdata.models.elements import Any
 from xsdata.models.elements import Attribute
 from xsdata.models.elements import Choice
 from xsdata.models.elements import ComplexContent
@@ -15,6 +16,7 @@ from xsdata.models.elements import Sequence
 from xsdata.models.elements import SimpleContent
 from xsdata.models.elements import SimpleType
 from xsdata.models.enums import FormType
+from xsdata.models.enums import ProcessType
 from xsdata.models.enums import UseType
 from xsdata.parser import SchemaParser
 
@@ -109,6 +111,7 @@ class ParserTests(TestCase):
                         <xs:attribute name="id" type="xs:string"/>
                     </xs:complexType>
                 </xs:element>
+                <xs:any processContents="lax" />
             </xs:sequence>
         </xs:complexType>"""
 
@@ -136,6 +139,14 @@ class ParserTests(TestCase):
                                 )
                             ],
                         ),
+                    )
+                ],
+                any=[
+                    Any.create(
+                        index=6,
+                        min_occurs=1,
+                        max_occurs=9223372036854775807,
+                        process_contents=ProcessType.LAX,
                     )
                 ],
             ),

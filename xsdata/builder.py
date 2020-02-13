@@ -93,7 +93,7 @@ class ClassBuilder:
         prefix, suffix = text.split(name)
         native = False
 
-        if prefix and (
+        if (
             prefix == Namespace.XML.prefix
             or self.schema.nsmap.get(prefix) == Namespace.SCHEMA.uri
         ):

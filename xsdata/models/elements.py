@@ -886,8 +886,8 @@ class Any(AnnotationBase, OccurrencesMixin, NamedField):
     Reference: https://www.w3schools.com/xml/el_any.asp.
     """
 
-    min_occurs: int = attribute(default=1)
-    max_occurs: int = attribute(default=1)
+    min_occurs: Optional[int] = attribute(default=None)
+    max_occurs: Optional[int] = attribute(default=None)
     namespace: Optional[str] = attribute(default=None)
     process_contents: Optional[ProcessType] = attribute(default=None)
     annotation: Optional[Annotation] = element(default=None)

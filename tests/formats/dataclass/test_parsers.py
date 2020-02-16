@@ -71,21 +71,25 @@ class DictParserTests(TestCase):
     def test_get_value(self):
         data = dict(foo="bar", bar="foo")
 
-        foo_field = ClassVar(name="foo", qname=QName("foo"), type=str, tag=Tag.TEXT)
+        foo_field = ClassVar(name="foo", qname=QName("foo"), types=[str], tag=Tag.TEXT)
         bar_field = ClassVar(
-            name="bar", qname=QName("bar"), type=str, is_list=True, tag=Tag.ELEMENT,
+            name="bar", qname=QName("bar"), types=[str], is_list=True, tag=Tag.ELEMENT,
         )
 
         self.assertEqual("bar", JsonParser.get_value(data, foo_field))
         self.assertEqual(["foo"], JsonParser.get_value(data, bar_field))
 
         none_field = ClassVar(
-            name="nope", qname=QName("nope"), type=str, default=list, tag=Tag.ELEMENT,
+            name="nope",
+            qname=QName("nope"),
+            types=[str],
+            default=list,
+            tag=Tag.ELEMENT,
         )
         self.assertEqual([], JsonParser.get_value(data, none_field))
 
         none_field = ClassVar(
-            name="nope", qname=QName("nope"), type=str, default=1, tag=Tag.ATTRIBUTE,
+            name="nope", qname=QName("nope"), types=[str], default=1, tag=Tag.ATTRIBUTE,
         )
         self.assertEqual(1, JsonParser.get_value(data, none_field))
 

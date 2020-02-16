@@ -19,13 +19,16 @@ from xsdata.utils import text
 class ModelInspectTests(TestCase):
     @mock.patch.object(ModelInspect, "get_type_hints")
     def test_class_meta_build_vars(self, mock_get_type_hints):
-        var = ClassVar(name="foo", qname=QName("foo", "bar"), type=int, tag=Tag.ELEMENT)
+        var = ClassVar(
+            name="foo", qname=QName("foo", "bar"), types=[int], tag=Tag.ELEMENT
+        )
         mock_get_type_hints.return_value = [var]
 
         inspect = ModelInspect()
         result = inspect.class_meta(ItemsType, None)
         expected = ClassMeta(
             name="ItemsType",
+            clazz=ItemsType,
             qname=QName("ItemsType"),
             mixed=False,
             vars={var.qname: var},
@@ -66,18 +69,28 @@ class ModelInspectTests(TestCase):
         self.assertIsInstance(result, Iterator)
 
         expected = [
-            ClassVar(name="author", qname=QName("author"), type=str, tag=Tag.ELEMENT,),
-            ClassVar(name="title", qname=QName("title"), type=str, tag=Tag.ELEMENT,),
-            ClassVar(name="genre", qname=QName("genre"), type=str, tag=Tag.ELEMENT,),
-            ClassVar(name="price", qname=QName("price"), type=float, tag=Tag.ELEMENT,),
             ClassVar(
-                name="pub_date", qname=QName("pub_date"), type=str, tag=Tag.ELEMENT,
+                name="author", qname=QName("author"), types=[str], tag=Tag.ELEMENT,
             ),
-            ClassVar(name="review", qname=QName("review"), type=str, tag=Tag.ELEMENT,),
-            ClassVar(name="id", qname=QName("id"), type=str, tag=Tag.ATTRIBUTE),
+            ClassVar(name="title", qname=QName("title"), types=[str], tag=Tag.ELEMENT,),
+            ClassVar(name="genre", qname=QName("genre"), types=[str], tag=Tag.ELEMENT,),
+            ClassVar(
+                name="price", qname=QName("price"), types=[float], tag=Tag.ELEMENT,
+            ),
+            ClassVar(
+                name="pub_date", qname=QName("pub_date"), types=[str], tag=Tag.ELEMENT,
+            ),
+            ClassVar(
+                name="review", qname=QName("review"), types=[str], tag=Tag.ELEMENT,
+            ),
+            ClassVar(name="id", qname=QName("id"), types=[str], tag=Tag.ATTRIBUTE),
         ]
 
-        self.assertEqual(expected, list(result))
+        result = list(result)
+        self.assertEqual(expected, result)
+        for var in result:
+            self.assertFalse(var.is_dataclass)
+            self.assertIsNone(var.clazz)
 
     def test_get_type_hints_with_dataclass_list(self):
         inspect = ModelInspect()
@@ -86,7 +99,7 @@ class ModelInspectTests(TestCase):
         expected = ClassVar(
             name="book",
             qname=QName("book"),
-            type=BookForm,
+            types=[BookForm],
             is_list=True,
             is_dataclass=True,
             default=list,
@@ -95,6 +108,8 @@ class ModelInspectTests(TestCase):
 
         self.assertEqual(1, len(result))
         self.assertEqual(expected, result[0])
+        self.assertTrue(result[0].is_dataclass)
+        self.assertEqual(BookForm, result[0].clazz)
 
     def test_get_type_hints_with_no_dataclass(self):
         inspect = ModelInspect()

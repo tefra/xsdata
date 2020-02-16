@@ -41,6 +41,10 @@ class ClassBuilder:
     def build(self) -> List[Class]:
         """Generate classes from schema elements."""
         classes: List[Class] = []
+
+        for redefine in self.schema.redefines:
+            classes.extend(map(self.build_class, redefine.children()))
+
         classes.extend(map(self.build_class, self.schema.simple_types))
         classes.extend(map(self.build_class, self.schema.attribute_groups))
         classes.extend(map(self.build_class, self.schema.groups))
@@ -51,54 +55,59 @@ class ClassBuilder:
 
     def build_class(self, obj: BaseElement) -> Class:
         """Build and return a class instance."""
-        item = Class(
+        namespace = self.element_namespace(obj)
+        instance = Class(
             name=obj.real_name,
             is_abstract=obj.is_abstract,
-            namespace=self.element_namespace(obj),
+            namespace=namespace,
             is_mixed=obj.is_mixed,
             type=type(obj),
-            extensions=self.build_class_extensions(obj),
             help=obj.display_help,
         )
 
-        self.build_class_attributes(obj, item)
-        return item
+        self.build_class_extensions(obj, instance)
+        self.build_class_attributes(obj, instance)
+        return instance
 
-    def build_class_attributes(self, obj: ElementBase, item: Class):
-        """
-        Build the target item class attributes from the given obj child
-        elements.
-
-        If exists append default value attribute.
-        """
+    def build_class_attributes(self, obj: ElementBase, instance: Class):
+        """Build the instance class attributes from the given ElementBase
+        children."""
         for child in self.element_children(obj):
-            self.build_class_attribute(item, child)
+            self.build_class_attribute(instance, child)
 
-        attr = self.default_class_attribute(item)
+        attr = self.default_class_attribute(instance)
         if attr:
-            item.attrs.append(attr)
+            instance.attrs.append(attr)
 
-        item.attrs.sort(key=lambda x: x.index)
+        instance.attrs.sort(key=lambda x: x.index)
 
-    def build_class_extensions(self, obj: ElementBase) -> List[AttrType]:
-        """Return a sorted, filtered list of extensions."""
-        return sorted(
-            list({ext.name: ext for ext in self.element_extensions(obj)}.values()),
-            key=lambda x: x.name,
-        )
+    def build_class_extensions(self, obj: ElementBase, instance: Class):
+        """Build the item class extensions from the given ElementBase
+        children."""
+        extensions = dict()
+        if getattr(obj, "type", None):
+            name = getattr(obj, "type", None)
+            extension = self.build_data_type(instance, name, index=0)
+            extensions[extension.name] = extension
+
+        for extension in self.children_extensions(obj, instance):
+            extensions[extension.name] = extension
+
+        instance.extensions = sorted(extensions.values(), key=lambda x: x.name)
 
     def build_data_type(
-        self, name, index: int = 0, forward_ref: bool = False
+        self, instance: Class, name: str, index: int = 0, forward_ref: bool = False
     ) -> AttrType:
         prefix, suffix = text.split(name)
         native = False
+        namespace = self.schema.nsmap.get(prefix)
 
-        if (
-            prefix == Namespace.XML.prefix
-            or self.schema.nsmap.get(prefix) == Namespace.SCHEMA.uri
-        ):
+        if prefix == Namespace.XML.prefix or namespace == Namespace.SCHEMA.uri:
             name = suffix
             native = True
+        elif prefix and namespace == self.schema.target_namespace:
+            if suffix == instance.name:
+                forward_ref = True
 
         return AttrType(name=name, index=index, native=native, forward_ref=forward_ref)
 
@@ -132,37 +141,32 @@ class ClassBuilder:
 
         return None
 
-    def element_extensions(
-        self, obj: ElementBase, include_current=True
+    def children_extensions(
+        self, obj: ElementBase, instance: Class
     ) -> Iterator[AttrType]:
         """
-        Recursively find and return all parent Extension classes.
+        Recursively find and return all instance's Extension classes.
 
         If the initial given obj has a type attribute include it in
         result.
         """
-
-        if include_current and getattr(obj, "type", None):
-            name = getattr(obj, "type", None)
-            yield self.build_data_type(name, index=0)
-
         for child in obj.children():
             if child.is_attribute:
                 continue
 
             for ext in child.extensions:
-                yield self.build_data_type(ext, index=child.index)
+                yield self.build_data_type(instance, ext, index=child.index)
 
-            yield from self.element_extensions(child, include_current=False)
+            yield from self.children_extensions(child, instance)
 
-    def build_class_attribute(self, parent: Class, obj: AttributeElement):
+    def build_class_attribute(self, instance: Class, obj: AttributeElement):
         """
-        Generate and append an attribute instance to the parent class.
+        Generate and append an attribute instance to the instance class.
 
         :raise ValueError:  if types list is empty
         """
-        types = self.build_class_attribute_types(parent, obj)
-        parent.attrs.append(
+        types = self.build_class_attribute_types(instance, obj)
+        instance.attrs.append(
             Attr(
                 index=obj.index,
                 name=obj.real_name,
@@ -176,20 +180,18 @@ class ClassBuilder:
         )
 
     def build_class_attribute_types(
-        self, parent: Class, obj: AttributeElement
+        self, instance: Class, obj: AttributeElement
     ) -> List[AttrType]:
         """Convert real type and anonymous inner elements to an attribute type
         list."""
         inner_class = self.build_inner_class(obj)
-        types = list(
-            map(
-                self.build_data_type,
-                [name for name in (obj.real_type or "").split(" ") if name],
-            )
-        )
+        types = []
+        for name in (obj.real_type or "").split(" "):
+            if name:
+                types.append(self.build_data_type(instance, name))
 
         if inner_class:
-            parent.inner.append(inner_class)
+            instance.inner.append(inner_class)
             types.append(AttrType(name=inner_class.name, forward_ref=True))
 
         if len(types) == 0:
@@ -198,8 +200,7 @@ class ClassBuilder:
         return types
 
     def build_inner_class(self, obj: AttributeElement) -> Optional[Class]:
-        """Convert anonymous type to class to be appended in the parent inner
-        class list."""
+        """Find and convert anonymous types to a class instance."""
         if self.has_anonymous_class(obj):
             complex_type = obj.complex_type  # type: ignore
             complex_type.name = obj.name  # type: ignore
@@ -245,15 +246,15 @@ class ClassBuilder:
         )
 
     @staticmethod
-    def default_class_attribute(item: Class) -> Optional[Attr]:
+    def default_class_attribute(instance: Class) -> Optional[Attr]:
         types = []
-        if len(item.extensions) == 0 and len(item.attrs) == 0:
+        if len(instance.extensions) == 0 and len(instance.attrs) == 0:
             types.append(AttrType(name=DataType.STRING.code, native=True))
-            logger.warning(f"Empty class: `{item.name}`")
-        elif not item.is_enumeration:
-            for i in range(len(item.extensions) - 1, -1, -1):
-                if item.extensions[i].native:
-                    types.insert(0, item.extensions.pop(i))
+            logger.warning(f"Empty class: `{instance.name}`")
+        elif not instance.is_enumeration:
+            for i in range(len(instance.extensions) - 1, -1, -1):
+                if instance.extensions[i].native:
+                    types.insert(0, instance.extensions.pop(i))
 
         if types:
             return Attr(

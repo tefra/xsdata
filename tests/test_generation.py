@@ -15,8 +15,6 @@ from xsdata.formats.dataclass.generator import DataclassGenerator
 from xsdata.reducer import reducer
 from xsdata.writer import writer
 
-runner = CliRunner()
-
 here = Path(__file__).parent
 fixtures = here.joinpath("fixtures")
 
@@ -70,6 +68,7 @@ def test_generation(fixture: Path):
     should_fail = is_illegal_definition(source)
     skip_message = parse_skip_message(source)
 
+    runner = CliRunner()
     result = runner.invoke(cli, [str(fixture), f"--package=tests.fixtures.{package}"])
 
     if skip_message:

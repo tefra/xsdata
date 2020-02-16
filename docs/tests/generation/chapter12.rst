@@ -286,10 +286,8 @@ Example 12-47 Complex type with attribute wildcard
    :language: xml
    :lines: 3-
 
-.. warning::
-
-    Unsupported feature!
-
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1247.py
+   :language: python
 
 Example 12-5 Complex type with simple content
 ---------------------------------------------

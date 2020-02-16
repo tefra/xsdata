@@ -16,6 +16,7 @@ from xsdata.models.elements import Element
 from xsdata.models.elements import Enumeration
 from xsdata.models.elements import Extension
 from xsdata.models.elements import Group
+from xsdata.models.elements import Redefine
 from xsdata.models.elements import Restriction
 from xsdata.models.elements import Schema
 from xsdata.models.elements import Sequence
@@ -34,7 +35,7 @@ class ClassBuilderTests(FactoryTestCase):
         self.builder = ClassBuilder(schema=self.schema)
 
     @patch.object(ClassBuilder, "build_class")
-    def test_process(self, mock_build_class):
+    def test_build(self, mock_build_class):
         for _ in range(2):
             self.schema.simple_types.append(SimpleType.create())
             self.schema.attribute_groups.append(AttributeGroup.create())
@@ -42,12 +43,17 @@ class ClassBuilderTests(FactoryTestCase):
             self.schema.attributes.append(Attribute.create())
             self.schema.complex_types.append(ComplexType.create())
             self.schema.elements.append(Element.create())
+            self.schema.redefines.append(
+                Redefine.create(complex_type=ComplexType.create())
+            )
 
-        mock_build_class.side_effect = classes = ClassFactory.list(12)
+        mock_build_class.side_effect = classes = ClassFactory.list(14)
 
         self.assertEqual(classes, self.builder.build())
         mock_build_class.assert_has_calls(
             [
+                call(self.schema.redefines[0].complex_type),
+                call(self.schema.redefines[1].complex_type),
                 call(self.schema.simple_types[0]),
                 call(self.schema.simple_types[1]),
                 call(self.schema.attribute_groups[0]),
@@ -94,23 +100,21 @@ class ClassBuilderTests(FactoryTestCase):
         mock_build_class_attributes,
         mock_element_namespace,
     ):
-        extensions = AttrTypeFactory.list(2)
         mock_real_name.return_value = "name"
         mock_display_help.return_value = "sos"
         mock_is_abstract.return_value = True
-        mock_build_class_extensions.return_value = extensions
         mock_element_namespace.return_value = "foo:name"
 
         element = Element.create()
         result = self.builder.build_class(element)
 
         mock_build_class_attributes.assert_called_once_with(element, result)
+        mock_build_class_extensions.assert_called_once_with(element, result)
         mock_element_namespace.assert_called_once_with(element)
 
         expected = ClassFactory.create(
             name="name",
             type=Element,
-            extensions=extensions,
             help="sos",
             is_abstract=True,
             namespace="foo:name",
@@ -155,18 +159,20 @@ class ClassBuilderTests(FactoryTestCase):
         self.assertEqual(1, len(item.attrs))
         self.assertEqual(attr, item.attrs[0])
 
-    @patch.object(ClassBuilder, "element_extensions")
-    def test_build_class_extensions(self, mock_element_extensions):
+    @patch.object(ClassBuilder, "children_extensions")
+    def test_build_class_extensions(self, mock_children_extensions):
         bar = AttrTypeFactory.create(name="bar", index=3)
-        bar_dub = AttrTypeFactory.create(name="bar", index=2)
+        double = AttrTypeFactory.create(name="bar", index=2)
         foo = AttrTypeFactory.create(name="foo", index=1)
 
-        mock_element_extensions.return_value = [bar, bar_dub, foo]
+        mock_children_extensions.return_value = [bar, double, foo]
 
-        element = Element.create()
-        actual = self.builder.build_class_extensions(element)
+        item = ClassFactory.create()
+        element = Element.create(type="something")
+        self.builder.build_class_extensions(element, item)
 
-        self.assertEqual([bar_dub, foo], actual)
+        expected = ["bar", "foo", "something"]
+        self.assertEqual(expected, [ext.name for ext in item.extensions])
 
     def test_element_children(self):
         complex_type = ComplexType.create(
@@ -194,7 +200,7 @@ class ClassBuilderTests(FactoryTestCase):
         self.assertIsInstance(children, GeneratorType)
         self.assertEqual(expected, list(children))
 
-    def test_element_extensions(self):
+    def test_children_extensions(self):
         self.builder.target_prefix = "bk:"
         complex_type = ComplexType.create(
             attributes=[Attribute.create(index=i) for i in range(2)],
@@ -213,7 +219,8 @@ class ClassBuilderTests(FactoryTestCase):
             ),
         )
 
-        children = self.builder.element_extensions(complex_type)
+        item = ClassFactory.create()
+        children = self.builder.children_extensions(complex_type, item)
         expected = [
             AttrTypeFactory.create(name="bk:ext", index=7),
             AttrTypeFactory.create(name="a", index=3),
@@ -222,14 +229,6 @@ class ClassBuilderTests(FactoryTestCase):
         ]
 
         self.assertIsInstance(children, GeneratorType)
-        self.assertEqual(expected, list(children))
-
-    def test_element_extensions_with_typed_parent(self):
-        self.builder.target_prefix = "bk:"
-        element = Element.create(type="bk:book", index=23)
-        children = self.builder.element_extensions(element)
-        expected = AttrTypeFactory.list(1, name="bk:book", index=0)
-
         self.assertEqual(expected, list(children))
 
     @patch.object(ClassBuilder, "build_class_attribute_types")

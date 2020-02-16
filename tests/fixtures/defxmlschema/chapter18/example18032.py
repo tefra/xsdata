@@ -3,26 +3,24 @@ from typing import Optional
 
 
 @dataclass
-class DescriptionGroup:
+class ProductType(ProductType):
     """
-    :ivar description:
-    :ivar comment:
+    :ivar color:
+    :ivar eff_date:
     """
-    description: Optional[str] = field(
+    color: Optional[str] = field(
         default=None,
         metadata=dict(
-            name="description",
+            name="color",
             type="Element",
             namespace="",
             required=True
         )
     )
-    comment: Optional[str] = field(
+    eff_date: Optional[str] = field(
         default=None,
         metadata=dict(
-            name="comment",
-            type="Element",
-            namespace="",
-            required=True
+            name="effDate",
+            type="Attribute"
         )
     )

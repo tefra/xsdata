@@ -4,6 +4,7 @@ from abc import ABC
 from abc import abstractmethod
 from enum import Enum
 from typing import Any
+from typing import List
 from typing import Optional
 from typing import Type
 from typing import TypeVar
@@ -41,22 +42,26 @@ class AbstractParser(ABC):
         """Parse the input stream and return the resulting object tree."""
 
     @classmethod
-    def parse_value(cls, tp: Type, value: Any) -> Any:
+    def parse_value(cls, types: List[Type], value: Any) -> Any:
         """Convert xml string values to s python primitive type."""
 
-        if hasattr(tp, "__origin__"):
-            for tp_arg in tp.__args__:
-                try:
-                    return cls.parse_value(tp_arg, value)
-                except ValueError:
-                    pass
+        if not isinstance(value, str):
             return value
 
-        if issubclass(tp, Enum):
-            enumeration = next(enumeration for enumeration in tp)
-            value = type(enumeration.value)(value)
+        for cast in types:
 
-        return value == "true" if tp is bool and isinstance(value, str) else tp(value)
+            try:
+                if issubclass(cast, Enum):
+                    enumeration = next(enumeration for enumeration in cast)
+                    return cast(type(enumeration.value)(value))
+                elif cast is bool and value in ("true", "false"):
+                    return value == "true"
+                else:
+                    return cast(value)
+            except ValueError:
+                pass
+
+        return value
 
 
 class AbstractXmlParser(AbstractParser):

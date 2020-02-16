@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from dataclasses import field
 from typing import Any
 from typing import Callable
+from typing import List
 from typing import Optional
 from typing import Type
 from typing import TypeVar
@@ -144,10 +145,10 @@ class SchemaParser(XmlParser):
             child.max_occurs = parent.max_occurs
 
     @classmethod
-    def parse_value(cls, tp: Type, value: Any) -> Any:
-        if tp is int and value == "unbounded":
+    def parse_value(cls, types: List[Type], value: Any) -> Any:
+        if int in types and value == "unbounded":
             return sys.maxsize
         try:
-            return super().parse_value(tp, value)
+            return super().parse_value(types, value)
         except ValueError:
             return str(value)

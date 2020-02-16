@@ -10,6 +10,7 @@ from typing import Callable
 from typing import Dict
 from typing import get_type_hints
 from typing import Iterator
+from typing import List
 from typing import Optional
 from typing import Tuple
 from typing import Type
@@ -46,12 +47,16 @@ __tag_type_map__ = {
 class ClassVar:
     name: str
     qname: QName
-    type: Any
+    types: List[Type]
     tag: Tag
     is_nillable: bool = False
     is_list: bool = False
     is_dataclass: bool = False
     default: Any = None
+
+    @property
+    def clazz(self):
+        return self.types[0] if self.is_dataclass else None
 
     @property
     def is_attribute(self):
@@ -81,6 +86,7 @@ class ClassVar:
 @dataclass(frozen=True)
 class ClassMeta:
     name: str
+    clazz: Type
     qname: QName
     mixed: bool
     vars: Dict[QName, ClassVar]
@@ -119,6 +125,7 @@ class ModelInspect:
 
             self.cache[clazz] = ClassMeta(
                 name=name,
+                clazz=clazz,
                 qname=QName(namespace, name),
                 mixed=mixed,
                 vars={arg.qname: arg for arg in self.get_type_hints(clazz, namespace)},
@@ -130,11 +137,12 @@ class ModelInspect:
 
         for var in fields(clazz):
             type_hint = type_hints[var.name]
-            is_list, type_hint = self.real_type(type_hint)
+            is_list, types = self.real_types(type_hint)
 
             tag = Tag.from_metadata_type(var.metadata.get("type"))
             namespace = self.real_namespace(var, tag, parent_ns)
             local_name = var.metadata.get("name") or self.name_generator(var.name)
+            is_class = next((False for clazz in types if not is_dataclass(clazz)), True)
 
             yield ClassVar(
                 name=var.name,
@@ -142,8 +150,8 @@ class ModelInspect:
                 tag=tag,
                 is_list=is_list,
                 is_nillable=var.metadata.get("nillable") is True,
-                is_dataclass=is_dataclass(type_hint),
-                type=type_hint,
+                is_dataclass=is_class,
+                types=types,
                 default=self.default_value(var),
             )
 
@@ -165,10 +173,23 @@ class ModelInspect:
             return None
 
     @staticmethod
-    def real_type(type_hint) -> Tuple[bool, Type]:
+    def real_types(type_hint) -> Tuple:
         is_list = False
-        if hasattr(type_hint, "__origin__"):
+        types = []
+        if type_hint is Dict:
+            types.append(type_hint)
+        elif hasattr(type_hint, "__origin__"):
             is_list = type_hint.__origin__ is list
-            type_hint = type_hint.__args__[0]
 
-        return is_list, type_hint
+            while len(type_hint.__args__) == 1 and hasattr(
+                type_hint.__args__[0], "__origin__"
+            ):
+                type_hint = type_hint.__args__[0]
+
+            types = [
+                x for x in type_hint.__args__ if x is not None.__class__  # type: ignore
+            ]
+        else:
+            types.append(type_hint)
+
+        return is_list, types

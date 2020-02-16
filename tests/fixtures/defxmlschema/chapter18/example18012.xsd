@@ -2,7 +2,7 @@
 <!-- Example 18-1 A simple redefinition -->
 <!-- SKIPTEST -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://datypic.com/prod" targetNamespace="http://datypic.com/prod">
-  <xs:redefine schemaLocation="prod1.xsd">
+  <xs:redefine schemaLocation="example18011.xsd">
     <xs:simpleType name="DressSizeType">
       <xs:restriction base="DressSizeType">
         <xs:minInclusive value="2" />

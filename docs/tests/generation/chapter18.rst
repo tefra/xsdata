@@ -130,10 +130,8 @@ Example 18-2.2 Redefining a simple type
    :language: xml
    :lines: 3-
 
-.. warning::
-
-    Unsupported feature!
-
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter18/example18022.py
+   :language: python
 
 Example 18-3 Redefining a complex type
 --------------------------------------
@@ -152,10 +150,8 @@ Example 18-3.2 Redefining a complex type
    :language: xml
    :lines: 3-
 
-.. warning::
-
-    Illegal definition
-
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter18/example18032.py
+   :language: python
 
 Example 18-4 Redefining a named model group as a subset
 -------------------------------------------------------

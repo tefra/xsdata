@@ -1,7 +1,7 @@
 <!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
 <!-- Example 18-5 Redefining a named model group as a superset -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
-  <xs:redefine schemaLocation="example1804-1.xsd">
+  <xs:redefine schemaLocation="example18041.xsd">
     <xs:group name="DescriptionGroup">
       <xs:sequence>
         <xs:group ref="DescriptionGroup" />

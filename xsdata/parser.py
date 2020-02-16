@@ -7,6 +7,7 @@ from typing import Callable
 from typing import Optional
 from typing import Type
 from typing import TypeVar
+from typing import Union
 
 from lxml import etree
 
@@ -107,34 +108,40 @@ class SchemaParser(XmlParser):
                 if child.max_occurs is None:
                     child.max_occurs = obj.max_occurs
 
-    @staticmethod
-    def end_all(obj: T, element: etree.Element):
+    @classmethod
+    def end_all(cls, obj: T, element: etree.Element):
         """Elements inside an all element can by definition appear at most
         once, reset their max occur counter."""
 
         if isinstance(obj, xsd.All):
-            for child in obj.elements:
-                child.max_occurs = 1
-                if child.min_occurs is None:
-                    child.min_occurs = obj.min_occurs
+            for element in obj.elements:
+                cls.inherit_occurs(obj, element, force=True)
 
-    @staticmethod
-    def end_sequence(obj: T, element: etree.Element):
+            if obj.any:
+                cls.inherit_occurs(obj, obj.any, force=True)
+
+    @classmethod
+    def end_sequence(cls, obj: T, element: etree.Element):
         """Elements inside a sequence inherit min|max occur counter if it is
         not set."""
         if isinstance(obj, xsd.Sequence):
-
             for element in obj.elements:
-                if element.min_occurs is None:
-                    element.min_occurs = obj.min_occurs
-                if element.max_occurs is None:
-                    element.max_occurs = obj.max_occurs
+                cls.inherit_occurs(obj, element)
 
             for any_element in obj.any:
-                if any_element.min_occurs is None:
-                    any_element.min_occurs = obj.min_occurs
-                if any_element.max_occurs is None:
-                    any_element.max_occurs = obj.max_occurs
+                cls.inherit_occurs(obj, any_element)
+
+    @classmethod
+    def inherit_occurs(
+        cls,
+        parent: Union[xsd.Sequence, xsd.All],
+        child: Union[xsd.Element, xsd.Any],
+        force: bool = False,
+    ):
+        if child.min_occurs is None or force:
+            child.min_occurs = parent.min_occurs
+        if child.max_occurs is None or force:
+            child.max_occurs = parent.max_occurs
 
     @classmethod
     def parse_value(cls, tp: Type, value: Any) -> Any:

@@ -13,6 +13,7 @@ from xsdata.models.codegen import AttrType
 from xsdata.models.codegen import Class
 from xsdata.models.elements import Schema
 from xsdata.models.enums import DataType
+from xsdata.models.enums import TagType
 from xsdata.utils import text
 
 
@@ -22,6 +23,7 @@ class ClassReducer:
     because of excess verbosity in the given xsd schema and duplicate types."""
 
     common_types: Dict[str, Class] = field(default_factory=dict)
+    redefined_types: Dict[str, Class] = field(default_factory=dict)
 
     def process(self, schema: Schema, classes: List[Class]) -> List[Class]:
         """
@@ -37,10 +39,12 @@ class ClassReducer:
         """
         classes, common = self.separate_common_types(classes)
 
-        self.add_common_types(common, schema.target_namespace)
+        self.add_common_types(common, schema)
 
         self.flatten_classes(common, schema)
         self.flatten_classes(classes, schema)
+
+        self.redefined_types.clear()
 
         return [obj for obj in common if obj.is_enumeration] + classes
 
@@ -48,23 +52,32 @@ class ClassReducer:
         for obj in classes:
             self.flatten_class(obj, schema)
 
-    def add_common_types(self, classes: List[Class], namespace: Optional[str]):
+    def add_common_types(self, classes: List[Class], schema: Schema):
         """Add class to the common types registry with its qualified name with
         the target namespace."""
 
-        self.common_types.update(
-            {etree.QName(namespace, obj.name).text: obj for obj in classes}
-        )
+        for item in classes:
+            qname = etree.QName(schema.target_namespace, item.name).text
+            if qname in self.common_types:
+                self.flatten_class(item, schema)
+                self.redefined_types[qname] = item
+            else:
+                self.common_types[qname] = item
 
     def find_common_type(self, name: str, schema: Schema) -> Optional[Class]:
         """Find a common type by the qualified named with the prefixed
         namespace if exists or the target namespace."""
         prefix, suffix = text.split(name)
-        name = suffix if prefix else name
+        namespace = schema.target_namespace
 
-        namespace = schema.nsmap.get(prefix, schema.target_namespace)
+        if prefix:
+            name = suffix
+            namespace = schema.nsmap.get(prefix)
+
         qname = etree.QName(namespace, name)
-        return self.common_types.get(qname.text)
+
+        redefined = self.redefined_types.get(qname.text)
+        return redefined or self.common_types.get(qname.text)
 
     def flatten_class(self, item: Class, schema: Schema):
         """
@@ -77,7 +90,8 @@ class ClassReducer:
             * Inner classes
         """
 
-        self.flatten_enumeration_unions(item, schema)
+        if item.is_common:
+            self.flatten_enumeration_unions(item, schema)
 
         for extension in list(item.extensions):
             self.flatten_extension(item, extension, schema)
@@ -127,8 +141,11 @@ class ClassReducer:
         common = self.find_common_type(extension.name, schema)
         if common is None:
             return
-
-        if not item.is_enumeration:
+        elif common is item:
+            logger.warning("Class referencing itself skipping...")
+        elif common.is_enumeration and not item.attrs:
+            self.create_default_attribute(item, extension)
+        elif not item.is_enumeration:
             self.copy_attributes(common, item, extension)
 
         item.extensions.remove(extension)
@@ -213,6 +230,18 @@ class ClassReducer:
             )
             if not exists:
                 target.inner.append(inner)
+
+    @staticmethod
+    def create_default_attribute(item: Class, extension: AttrType):
+        item.attrs.append(
+            Attr(
+                name="value",
+                index=0,
+                default=None,
+                types=[extension],
+                local_type=TagType.EXTENSION,
+            )
+        )
 
 
 reducer = ClassReducer()

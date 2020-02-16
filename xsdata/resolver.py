@@ -36,12 +36,12 @@ class DependenciesResolver:
         Reset aliases and imports from any previous runs keep the record
         of the processed class names
         """
+        self.imports.clear()
+        self.aliases.clear()
         self.schema = schema
         self.class_map = self.create_class_map(classes)
         self.class_list = self.create_class_list(classes)
         self.package = package
-        self.imports.clear()
-        self.aliases.clear()
         self.resolve_imports()
 
     def sorted_imports(self) -> List[Package]:

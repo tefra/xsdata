@@ -321,6 +321,34 @@ class AttributeGroup(AnnotationBase, NamedField):
 
 
 @dataclass
+class Any(AnnotationBase, OccurrencesMixin, NamedField):
+    """
+    The any element enables the author to extend the XML document with elements
+    not specified by the schema.
+
+    Reference: https://www.w3schools.com/xml/el_any.asp.
+    """
+
+    min_occurs: Optional[int] = attribute(default=None)
+    max_occurs: Optional[int] = attribute(default=None)
+    namespace: Optional[str] = attribute(default=None)
+    process_contents: Optional[ProcessType] = attribute(default=None)
+    annotation: Optional[Annotation] = element(default=None)
+
+    @property
+    def is_attribute(self) -> bool:
+        return True
+
+    @property
+    def real_type(self) -> Optional[str]:
+        return DataType.OBJECT.xml_prefixed
+
+    @property
+    def real_name(self) -> str:
+        return "elements"
+
+
+@dataclass
 class All(AnnotationBase, OccurrencesMixin):
     """
     The all element specifies that the child elements can appear in any order
@@ -332,6 +360,7 @@ class All(AnnotationBase, OccurrencesMixin):
     min_occurs: int = attribute(default=1)
     max_occurs: int = attribute(default=1)
     elements: ArrayList["Element"] = element(default_factory=list, name="element")
+    any: Any = element(default=None)
 
 
 @dataclass
@@ -878,34 +907,6 @@ class Element(AnnotationBase, NamedField, OccurrencesMixin):
 
 
 @dataclass
-class Any(AnnotationBase, OccurrencesMixin, NamedField):
-    """
-    The any element enables the author to extend the XML document with elements
-    not specified by the schema.
-
-    Reference: https://www.w3schools.com/xml/el_any.asp.
-    """
-
-    min_occurs: Optional[int] = attribute(default=None)
-    max_occurs: Optional[int] = attribute(default=None)
-    namespace: Optional[str] = attribute(default=None)
-    process_contents: Optional[ProcessType] = attribute(default=None)
-    annotation: Optional[Annotation] = element(default=None)
-
-    @property
-    def is_attribute(self) -> bool:
-        return True
-
-    @property
-    def real_type(self) -> Optional[str]:
-        return DataType.OBJECT.xml_prefixed
-
-    @property
-    def real_name(self) -> str:
-        return "elements"
-
-
-@dataclass
 class Import(AnnotationBase):
     """
     The import element is used to add multiple schemas with different target
@@ -1007,12 +1008,15 @@ class Schema(AnnotationBase):
 
     # any_attribute: AnyAttribute = aat(default_factory=list)
 
-    def sub_schemas(self) -> Iterator[UnionType[Import, Include]]:
+    def sub_schemas(self) -> Iterator[UnionType[Import, Include, Redefine]]:
         for imp in self.imports:
             yield imp
 
         for inc in self.includes:
             yield inc
+
+        for red in self.redefines:
+            yield red
 
     @property
     def module(self):

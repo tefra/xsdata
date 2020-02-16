@@ -1,7 +1,7 @@
 <!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
 <!-- Example 18-3 Redefining a complex type -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
-  <xs:redefine schemaLocation="prod1.xsd">
+  <xs:redefine schemaLocation="example18031.xsd">
     <xs:complexType name="ProductType">
       <xs:complexContent>
         <xs:extension base="ProductType">

@@ -9,6 +9,7 @@ from xsdata.builder import ClassBuilder
 from xsdata.logger import logger
 from xsdata.models.elements import Import
 from xsdata.models.elements import Include
+from xsdata.models.elements import Redefine
 from xsdata.models.enums import Namespace
 from xsdata.parser import SchemaParser
 from xsdata.reducer import reducer
@@ -48,7 +49,7 @@ class ProcessTask:
 
     def process_import(
         self,
-        schema: Union[Import, Include],
+        schema: Union[Import, Include, Redefine],
         path: Path,
         package: str,
         target_namespace: Optional[str],
@@ -62,6 +63,9 @@ class ProcessTask:
             sub_xsd_path = self.resolve_schema(path, schema)
             sub_xsd_package = self.adjust_package(package, schema)
 
+        if isinstance(schema, Redefine):
+            target_namespace = None
+
         self.process(
             xsd=sub_xsd_path,
             package=sub_xsd_package or package,
@@ -69,9 +73,11 @@ class ProcessTask:
         )
 
     @staticmethod
-    def resolve_local_schema(schema: Union[Import, Include]) -> Optional[Path]:
+    def resolve_local_schema(
+        schema: Union[Import, Include, Redefine]
+    ) -> Optional[Path]:
         try:
-            namespace = Namespace(schema.namespace)
+            namespace = Namespace(schema.namespace)  # type: ignore
             path = (
                 Path(__file__)
                 .absolute()
@@ -79,17 +85,17 @@ class ProcessTask:
             )
             schema.schema_location = str(path)
             return path
-        except ValueError:
+        except (ValueError, AttributeError):
             return None
 
     @staticmethod
-    def resolve_schema(xsd: Path, schema: Union[Import, Include]) -> Path:
+    def resolve_schema(xsd: Path, schema: Union[Import, Include, Redefine]) -> Path:
         assert schema.schema_location is not None
 
         return xsd.parent.joinpath(schema.schema_location).resolve()
 
     @staticmethod
-    def adjust_package(package: str, schema: Union[Import, Include]) -> str:
+    def adjust_package(package: str, schema: Union[Import, Include, Redefine]) -> str:
         assert schema.schema_location is not None
 
         pp = package.split(".")

@@ -33,7 +33,8 @@ class ProductType:
         metadata=dict(
             name="size",
             type="Element",
-            namespace=""
+            namespace="",
+            required=True
         )
     )
     color: Optional[str] = field(
@@ -41,6 +42,7 @@ class ProductType:
         metadata=dict(
             name="color",
             type="Element",
-            namespace=""
+            namespace="",
+            required=True
         )
     )

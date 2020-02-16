@@ -2,6 +2,7 @@ import io
 import pathlib
 from abc import ABC
 from abc import abstractmethod
+from enum import Enum
 from typing import Any
 from typing import Optional
 from typing import Type
@@ -50,6 +51,10 @@ class AbstractParser(ABC):
                 except ValueError:
                     pass
             return value
+
+        if issubclass(tp, Enum):
+            enumeration = next(enumeration for enumeration in tp)
+            value = type(enumeration.value)(value)
 
         return value == "true" if tp is bool and isinstance(value, str) else tp(value)
 

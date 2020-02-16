@@ -285,6 +285,7 @@ class ParserTests(TestCase):
                     <xs:all minOccurs="1">
                     <xs:element name="first" maxOccurs="100" />
                     <xs:element name="second" maxOccurs="100" />
+                    <xs:any processContents="lax" />
                     </xs:all>
               </xs:complexType>"""
 
@@ -309,6 +310,12 @@ class ParserTests(TestCase):
                         index=4,
                     ),
                 ],
+                any=Any.create(
+                    index=5,
+                    min_occurs=1,
+                    max_occurs=1,
+                    process_contents=ProcessType.LAX,
+                ),
             ),
         )
         schema = self.parser.from_xsd_string(wrap(xsd))

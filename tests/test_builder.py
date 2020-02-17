@@ -234,6 +234,8 @@ class ClassBuilderTests(FactoryTestCase):
     @patch.object(ClassBuilder, "build_class_attribute_types")
     @patch.object(ClassBuilder, "element_namespace")
     @patch.object(Attribute, "get_restrictions")
+    @patch.object(Attribute, "is_fixed", new_callable=PropertyMock)
+    @patch.object(Attribute, "default_value", new_callable=PropertyMock)
     @patch.object(Attribute, "prefix", new_callable=PropertyMock)
     @patch.object(Attribute, "display_help", new_callable=PropertyMock)
     @patch.object(Attribute, "real_name", new_callable=PropertyMock)
@@ -241,7 +243,9 @@ class ClassBuilderTests(FactoryTestCase):
         self,
         mock_real_name,
         mock_display_help,
-        mock_prefix_property,
+        mock_prefix,
+        mock_default_value,
+        mock_is_fixed,
         mock_get_restrictions,
         mock_element_namespace,
         mock_build_class_attribute_types,
@@ -253,7 +257,9 @@ class ClassBuilderTests(FactoryTestCase):
         )
         mock_real_name.return_value = item.name
         mock_display_help.return_value = "sos"
-        mock_prefix_property.return_value = "com"
+        mock_prefix.return_value = "com"
+        mock_default_value.return_value = "default"
+        mock_is_fixed.return_value = True
         mock_element_namespace.return_value = "http://something/common"
         mock_get_restrictions.return_value = {"required": True}
 
@@ -266,7 +272,8 @@ class ClassBuilderTests(FactoryTestCase):
             local_type=Attribute.__name__,
             namespace=mock_element_namespace.return_value,
             help=mock_display_help.return_value,
-            default="false",
+            default=mock_default_value.return_value,
+            fixed=mock_is_fixed.return_value,
             index=66,
             **mock_get_restrictions.return_value,
         )

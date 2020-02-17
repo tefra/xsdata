@@ -22,4 +22,4 @@ class DressSize:
         """
         :cvar VALUE:
         """
-        VALUE = ""
+        VALUE = None

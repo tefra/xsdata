@@ -148,6 +148,14 @@ class ElementBase(BaseModel):
         return False
 
     @property
+    def default_value(self):
+        return getattr(self, "default", None) or getattr(self, "fixed", None)
+
+    @property
+    def is_fixed(self):
+        return getattr(self, "fixed", None) is not None
+
+    @property
     def is_mixed(self):
         return False
 
@@ -159,6 +167,10 @@ class ElementBase(BaseModel):
     def extensions(self) -> Iterator[str]:
         extends = self.extends or ""
         return filter(None, extends.split(" "))
+
+    @property
+    def class_name(self):
+        return self.__class__.__name__
 
     @property
     def num(self):

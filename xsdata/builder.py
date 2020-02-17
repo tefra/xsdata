@@ -170,9 +170,10 @@ class ClassBuilder:
             Attr(
                 index=obj.index,
                 name=obj.real_name,
-                default=getattr(obj, "default", None),
+                default=obj.default_value,
+                fixed=obj.is_fixed,
                 types=types,
-                local_type=type(obj).__name__,
+                local_type=obj.class_name,
                 help=obj.display_help,
                 namespace=self.element_namespace(obj),
                 **obj.get_restrictions(),

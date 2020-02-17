@@ -72,9 +72,22 @@ class NamedFieldTests(TestCase):
 
 
 class ElementBaseTests(TestCase):
-    def test_is_attribute(self):
+    def test_property_is_attribute(self):
         obj = ElementBase.create()
         self.assertFalse(obj.is_attribute)
+
+    def test_property_default_value(self):
+        obj = ElementBase.create()
+        self.assertIsNone(obj.default_value)
+
+        obj = el.Element.create(default="a")
+        self.assertEqual("a", obj.default_value)
+        self.assertFalse(obj.is_fixed)
+
+        obj.default = None
+        obj.fixed = 2
+        self.assertEqual(2, obj.default_value)
+        self.assertTrue(obj.is_fixed)
 
     @mock.patch.object(ElementBase, "extends", new_callable=PropertyMock)
     def test_extensions(self, mock_extends_property):

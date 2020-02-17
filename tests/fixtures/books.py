@@ -12,6 +12,7 @@ class BookForm:
     :ivar pub_date:
     :ivar review:
     :ivar id:
+    :ivar lang:
     """
     author: Optional[str] = field(
         default=None,
@@ -71,6 +72,14 @@ class BookForm:
         default=None,
         metadata=dict(
             name="id",
+            type="Attribute"
+        )
+    )
+    lang: str = field(
+        init=False,
+        default="en",
+        metadata=dict(
+            name="lang",
             type="Attribute"
         )
     )

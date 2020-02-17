@@ -49,6 +49,7 @@ class ClassVar:
     qname: QName
     types: List[Type]
     tag: Tag
+    init: bool = True
     is_nillable: bool = False
     is_list: bool = False
     is_dataclass: bool = False
@@ -148,6 +149,7 @@ class ModelInspect:
                 name=var.name,
                 qname=QName(namespace or None, local_name),
                 tag=tag,
+                init=var.init,
                 is_list=is_list,
                 is_nillable=var.metadata.get("nillable") is True,
                 is_dataclass=is_class,

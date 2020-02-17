@@ -93,10 +93,8 @@ class JsonParser(AbstractParser, ModelInspect):
             value = data[field.qname.localname]
         elif field.name in data:
             value = data[field.name]
-        elif callable(field.default):
-            value = field.default()
         else:
-            value = field.default
+            return None
 
         if field.is_list and not isinstance(value, list):
             value = [value]
@@ -234,6 +232,8 @@ class XmlParser(AbstractXmlParser, ModelInspect):
         while len(self.objects) > item.position:
             qname, value = self.objects.pop(item.position)
             arg = item.meta.vars[qname]
+            if value is None or not arg.init:
+                continue
 
             if arg.is_list:
                 params[arg.name].append(value)
@@ -252,7 +252,8 @@ class XmlParser(AbstractXmlParser, ModelInspect):
         for qname, value in element.attrib.items():
             if qname in metadata.vars:
                 var = metadata.vars[qname]
-                params[var.name] = self.parse_value(var.types, value)
+                if var.init:
+                    params[var.name] = self.parse_value(var.types, value)
             elif any_attr:
                 if any_attr.name not in params:
                     params[any_attr.name] = dict()
@@ -263,7 +264,7 @@ class XmlParser(AbstractXmlParser, ModelInspect):
     def bind_element_text(self, metadata: ClassMeta, element: Element):
         params = dict()
         text_var = metadata.any_text
-        if text_var and element.text is not None:
+        if text_var and element.text is not None and text_var.init:
             params[text_var.name] = self.parse_value(text_var.types, element.text)
 
         return params

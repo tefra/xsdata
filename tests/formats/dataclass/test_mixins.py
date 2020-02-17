@@ -72,8 +72,8 @@ class ModelInspectTests(TestCase):
             ClassVar(
                 name="author", qname=QName("author"), types=[str], tag=Tag.ELEMENT,
             ),
-            ClassVar(name="title", qname=QName("title"), types=[str], tag=Tag.ELEMENT,),
-            ClassVar(name="genre", qname=QName("genre"), types=[str], tag=Tag.ELEMENT,),
+            ClassVar(name="title", qname=QName("title"), types=[str], tag=Tag.ELEMENT),
+            ClassVar(name="genre", qname=QName("genre"), types=[str], tag=Tag.ELEMENT),
             ClassVar(
                 name="price", qname=QName("price"), types=[float], tag=Tag.ELEMENT,
             ),
@@ -84,6 +84,14 @@ class ModelInspectTests(TestCase):
                 name="review", qname=QName("review"), types=[str], tag=Tag.ELEMENT,
             ),
             ClassVar(name="id", qname=QName("id"), types=[str], tag=Tag.ATTRIBUTE),
+            ClassVar(
+                name="lang",
+                qname=QName("lang"),
+                types=[str],
+                tag=Tag.ATTRIBUTE,
+                init=False,
+                default="en",
+            ),
         ]
 
         result = list(result)

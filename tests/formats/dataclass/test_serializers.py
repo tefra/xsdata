@@ -42,6 +42,7 @@ class DictSerializerTests(TestCase):
                     "author": "Hightower, Kim",
                     "genre": "Fiction",
                     "id": "bk001",
+                    "lang": "en",
                     "price": 44.95,
                     "pub_date": "2000-10-01",
                     "review": "An amazing story of nothing.",
@@ -51,6 +52,7 @@ class DictSerializerTests(TestCase):
                     "author": "Nagata, Suanne",
                     "genre": "Biography",
                     "id": "bk002",
+                    "lang": "en",
                     "review": "A masterpiece of the fine art of gossiping.",
                     "title": "Becoming Somebody",
                 },
@@ -90,7 +92,7 @@ class XmlSerializerTests(TestCase):
         expected = (
             "<?xml version='1.0' encoding='UTF-8'?>\n"
             '<ns0:books xmlns:ns0="urn:books">\n'
-            '  <book id="bk001">\n'
+            '  <book id="bk001" lang="en">\n'
             "    <author>Hightower, Kim</author>\n"
             "    <title>The First Book</title>\n"
             "    <genre>Fiction</genre>\n"
@@ -98,7 +100,7 @@ class XmlSerializerTests(TestCase):
             "    <pub_date>2000-10-01</pub_date>\n"
             "    <review>An amazing story of nothing.</review>\n"
             "  </book>\n"
-            '  <book id="bk002">\n'
+            '  <book id="bk002" lang="en">\n'
             "    <author>Nagata, Suanne</author>\n"
             "    <title>Becoming Somebody</title>\n"
             "    <genre>Biography</genre>\n"

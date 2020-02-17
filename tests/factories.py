@@ -106,6 +106,7 @@ class AttrFactory(Factory):
         namespace=None,
         help=None,
         default=None,
+        fixed=False,
         **kwargs,
     ):
 
@@ -117,6 +118,7 @@ class AttrFactory(Factory):
             namespace=namespace or None,
             help=help or None,
             default=default or None,
+            fixed=fixed,
             **kwargs,
         )
 

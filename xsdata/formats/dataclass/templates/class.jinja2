@@ -30,6 +30,9 @@ class {{ obj.name }}{{"({})".format(obj.extensions|join(', ', attribute="name"))
             )
     %}
     {{ attr.name }}: {{ attr.display_type }} = field(
+        {% if attr.fixed -%}
+        init=False,
+        {% endif -%}
         {{ "default_factory" if attr.is_factory else "default" }}={{ attr.default }},
         metadata=dict(
             {{ field_params|arguments|indent(12) }}

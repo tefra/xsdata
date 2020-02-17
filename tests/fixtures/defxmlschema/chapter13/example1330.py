@@ -42,8 +42,9 @@ class BaseType:
             type="Attribute"
         )
     )
-    e: Optional[str] = field(
-        default=None,
+    e: str = field(
+        init=False,
+        default="e",
         metadata=dict(
             name="e",
             type="Attribute"
@@ -104,15 +105,17 @@ class DerivedType(BaseType):
             type="Attribute"
         )
     )
-    d: Optional[str] = field(
-        default=None,
+    d: str = field(
+        init=False,
+        default="d",
         metadata=dict(
             name="d",
             type="Attribute"
         )
     )
-    e: Optional[str] = field(
-        default=None,
+    e: str = field(
+        init=False,
+        default="e",
         metadata=dict(
             name="e",
             type="Attribute"

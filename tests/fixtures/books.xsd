@@ -15,5 +15,6 @@
       <xsd:element name="review" type="xsd:string" />
     </xsd:sequence>
     <xsd:attribute name="id" type="xsd:string" />
+    <xsd:attribute name="lang" type="xsd:string" fixed="en" />
   </xsd:complexType>
 </xsd:schema>

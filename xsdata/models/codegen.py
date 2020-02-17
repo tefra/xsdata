@@ -40,6 +40,7 @@ class Attr:
     local_name: str = field(init=False)
     local_type: str
     index: int
+    fixed: bool = field(default=False)
     types: List[AttrType] = field(default_factory=list)
     display_type: Optional[str] = field(default=None)
     namespace: Optional[str] = field(default=None)

@@ -11,7 +11,7 @@ from xsdata.formats.dataclass.parsers import JsonParser
 from xsdata.formats.dataclass.parsers import XmlParser
 
 
-class DictParserTests(TestCase):
+class JsonParserTests(TestCase):
     def setUp(self) -> None:
         self.data = {
             "book": [
@@ -78,20 +78,7 @@ class DictParserTests(TestCase):
 
         self.assertEqual("bar", JsonParser.get_value(data, foo_field))
         self.assertEqual(["foo"], JsonParser.get_value(data, bar_field))
-
-        none_field = ClassVar(
-            name="nope",
-            qname=QName("nope"),
-            types=[str],
-            default=list,
-            tag=Tag.ELEMENT,
-        )
-        self.assertEqual([], JsonParser.get_value(data, none_field))
-
-        none_field = ClassVar(
-            name="nope", qname=QName("nope"), types=[str], default=1, tag=Tag.ATTRIBUTE,
-        )
-        self.assertEqual(1, JsonParser.get_value(data, none_field))
+        self.assertIsNone(JsonParser.get_value({}, bar_field))
 
 
 class XmlParserTests(TestCase):

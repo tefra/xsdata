@@ -26,6 +26,11 @@ class AttrType:
         return data_type.local_name if data_type else None
 
     @property
+    def native_code(self) -> Optional[str]:
+        data_type = DataType.get_enum(self.name) if self.native else None
+        return data_type.code if data_type else None
+
+    @property
     def native_type(self):
         data_type = DataType.get_enum(self.name) if self.native else None
         return data_type.local if data_type else None
@@ -109,6 +114,10 @@ class Attr:
     @property
     def is_enumeration(self) -> bool:
         return self.local_type == TagType.ENUMERATION
+
+    @property
+    def is_attribute(self) -> bool:
+        return self.local_type == TagType.ATTRIBUTE
 
     def clone(self):
         types = [type.clone() for type in self.types]

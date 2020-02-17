@@ -1,3 +1,4 @@
+import re
 from abc import ABC
 from abc import abstractmethod
 from pathlib import Path
@@ -17,6 +18,7 @@ from xsdata.models.codegen import AttrType
 from xsdata.models.codegen import Class
 from xsdata.models.codegen import Package
 from xsdata.models.elements import Schema
+from xsdata.models.enums import DataType
 from xsdata.resolver import DependenciesResolver
 from xsdata.utils import text
 
@@ -198,6 +200,25 @@ class PythonAbstractGenerator(AbstractGenerator, ABC):
                     return float(attr.default)
                 except ValueError:
                     pass
+
+            collapse_whitespace = next(
+                (
+                    True
+                    for attr_type in attr.types
+                    if attr_type.native_code == DataType.NMTOKENS.code
+                ),
+                False,
+            )
+            if collapse_whitespace:
+                attr.default = " ".join(
+                    filter(None, map(str.strip, re.split(r"\s+", attr.default)))
+                )
+
+            attr.default = (
+                attr.default.replace("\r", "&#xD;")
+                .replace("\n", "&#xA;")
+                .replace("\t", "&#x9;")
+            )
 
             return f'"{attr.default}"'
         else:

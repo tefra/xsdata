@@ -232,8 +232,10 @@ class XmlParser(AbstractXmlParser, ModelInspect):
         while len(self.objects) > item.position:
             qname, value = self.objects.pop(item.position)
             arg = item.meta.vars[qname]
-            if value is None or not arg.init:
+            if not arg.init:
                 continue
+            if value is None:
+                value = ""
 
             if arg.is_list:
                 params[arg.name].append(value)

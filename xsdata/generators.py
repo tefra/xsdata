@@ -7,11 +7,13 @@ from typing import Iterator
 from typing import List
 from typing import Optional
 from typing import Tuple
+from xml.sax.saxutils import quoteattr
 
 from jinja2 import Environment
 from jinja2 import FileSystemLoader
 from jinja2 import Template
 
+from xsdata.formats.converters import to_python
 from xsdata.formats.dataclass.utils import safe_snake
 from xsdata.models.codegen import Attr
 from xsdata.models.codegen import AttrType
@@ -178,48 +180,24 @@ class PythonAbstractGenerator(AbstractGenerator, ABC):
             return "list"
         if attr.is_map:
             return "dict"
-        elif isinstance(attr.default, str):
-            local_types = {
-                attr_type.native_type for attr_type in attr.types if attr_type.native
-            }
+        elif not isinstance(attr.default, str):
+            return attr.default
 
-            if bool in local_types:
-                if attr.default == "true":
-                    return True
-                if attr.default == "false" or len(local_types) == 1:
-                    return False
+        data_types = {
+            attr_type.native_code: attr_type.native_type
+            for attr_type in attr.types
+            if attr_type.native
+        }
 
-            if int in local_types:
-                try:
-                    return int(attr.default)
-                except ValueError:
-                    pass
+        local_types = list(set(data_types.values()))
+        default_value = to_python(local_types, attr.default, in_order=False)
 
-            if float in local_types:
-                try:
-                    return float(attr.default)
-                except ValueError:
-                    pass
-
-            collapse_whitespace = next(
-                (
-                    True
-                    for attr_type in attr.types
-                    if attr_type.native_code == DataType.NMTOKENS.code
-                ),
-                False,
-            )
-            if collapse_whitespace:
-                attr.default = " ".join(
-                    filter(None, map(str.strip, re.split(r"\s+", attr.default)))
+        if isinstance(default_value, str):
+            if DataType.NMTOKENS.code in data_types:
+                default_value = " ".join(
+                    filter(None, map(str.strip, re.split(r"\s+", default_value)))
                 )
 
-            attr.default = (
-                attr.default.replace("\r", "&#xD;")
-                .replace("\n", "&#xA;")
-                .replace("\t", "&#x9;")
-            )
+            default_value = quoteattr(default_value)
 
-            return f'"{attr.default}"'
-        else:
-            return attr.default
+        return default_value

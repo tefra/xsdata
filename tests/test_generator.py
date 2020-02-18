@@ -236,9 +236,6 @@ class PythonAbstractGeneratorTests(FactoryTestCase):
         attr.types[0] = type_bool
         self.assertTrue(generator.attribute_default(attr))
 
-        attr.default = "not-true"
-        self.assertFalse(generator.attribute_default(attr))
-
         attr.max_occurs = 2
         self.assertEqual("list", generator.attribute_default(attr))
 

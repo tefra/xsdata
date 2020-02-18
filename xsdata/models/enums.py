@@ -39,6 +39,8 @@ class DataType(Enum):
     BYTE = ("byte", int)
     DATE = ("date", str)
     DATE_TIME = ("dateTime", str)
+    DAY_TIME_DURATION = ("dayTimeDuration", str)
+    YEAR_MONTH_DURATION = ("yearMonthDuration", str)
     DECIMAL = ("decimal", float)
     DERIVATION_CONTROL = ("derivationControl", str)
     DOUBLE = ("double", float)

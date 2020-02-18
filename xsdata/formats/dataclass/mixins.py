@@ -17,6 +17,7 @@ from typing import Type
 
 from lxml.etree import QName
 
+from xsdata.formats.converters import sort_types
 from xsdata.models.enums import TagType
 
 
@@ -194,4 +195,4 @@ class ModelInspect:
         else:
             types.append(type_hint)
 
-        return is_list, types
+        return is_list, sort_types(types)

@@ -5,7 +5,6 @@ from tests.fixtures.books import Books
 from xsdata.formats.dataclass.serializers import DictFactory
 from xsdata.formats.dataclass.serializers import DictSerializer
 from xsdata.formats.dataclass.serializers import XmlSerializer
-from xsdata.models.enums import UseType
 
 
 class DictSerializerTests(TestCase):
@@ -116,10 +115,3 @@ class XmlSerializerTests(TestCase):
         self.assertEqual(
             f"Object {self.__class__} is not a dataclass.", str(cm.exception)
         )
-
-    def test_render_value(self):
-        self.assertEqual("1", XmlSerializer.render_value(1))
-        self.assertEqual("1.5", XmlSerializer.render_value(1.5))
-        self.assertEqual("true", XmlSerializer.render_value(True))
-        self.assertEqual("false", XmlSerializer.render_value(False))
-        self.assertEqual("optional", XmlSerializer.render_value(UseType.OPTIONAL))

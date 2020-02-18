@@ -2,7 +2,6 @@ import io
 import pathlib
 from abc import ABC
 from abc import abstractmethod
-from enum import Enum
 from typing import Any
 from typing import List
 from typing import Optional
@@ -12,6 +11,7 @@ from typing import TypeVar
 from lxml.etree import Element
 from lxml.etree import iterparse
 
+from xsdata.formats.converters import to_python
 from xsdata.models.enums import EventType
 
 
@@ -45,23 +45,7 @@ class AbstractParser(ABC):
     def parse_value(cls, types: List[Type], value: Any) -> Any:
         """Convert xml string values to s python primitive type."""
 
-        if not isinstance(value, str):
-            return value
-
-        for cast in types:
-
-            try:
-                if issubclass(cast, Enum):
-                    enumeration = next(enumeration for enumeration in cast)
-                    return cast(type(enumeration.value)(value))
-                elif cast is bool and value in ("true", "false"):
-                    return value == "true"
-                else:
-                    return cast(value)
-            except ValueError:
-                pass
-
-        return value
+        return to_python(types, value)
 
 
 class AbstractXmlParser(AbstractParser):

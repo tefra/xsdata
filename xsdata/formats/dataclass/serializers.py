@@ -18,6 +18,7 @@ from lxml.etree import QName
 from lxml.etree import SubElement
 from lxml.etree import tostring
 
+from xsdata.formats.converters import to_xml
 from xsdata.formats.dataclass.mixins import ClassVar
 from xsdata.formats.dataclass.mixins import ModelInspect
 from xsdata.formats.dataclass.models import AnyElement
@@ -119,7 +120,7 @@ class XmlSerializer(AbstractSerializer, ModelInspect):
         """Recursively traverse the given dataclass instance fields and build
         the lxml Element structure."""
         if not is_dataclass(obj):
-            parent.text = self.render_value(obj)
+            parent.text = to_xml(obj)
             return parent
 
         meta = self.class_meta(obj.__class__, QName(parent).namespace)
@@ -143,14 +144,14 @@ class XmlSerializer(AbstractSerializer, ModelInspect):
         return parent
 
     def set_attribute(self, parent: Element, value: Any, var: ClassVar):
-        parent.set(var.qname, self.render_value(value))
+        parent.set(var.qname, to_xml(value))
 
     def set_attributes(self, parent: Element, value: Any):
         for qname, value in value.items():
-            parent.set(qname, self.render_value(value))
+            parent.set(qname, to_xml(value))
 
     def set_text(self, parent: Element, value: Any):
-        parent.text = self.render_value(value)
+        parent.text = to_xml(value)
 
     def set_children(
         self, parent: Element, value: Any, var: ClassVar, namespaces: Set[str]
@@ -190,12 +191,3 @@ class XmlSerializer(AbstractSerializer, ModelInspect):
             namespaces.add(Namespace.INSTANCE.uri)
             qname = QName(Namespace.INSTANCE.uri, "nil")
             element.set(qname, "true")
-
-    @staticmethod
-    def render_value(value) -> str:
-        if isinstance(value, bool):
-            return "true" if value else "false"
-        if isinstance(value, Enum):
-            return str(value.value)
-
-        return str(value)

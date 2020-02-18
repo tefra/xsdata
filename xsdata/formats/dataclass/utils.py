@@ -48,10 +48,12 @@ def safe_snake(string: str) -> str:
         return "value"
 
     # Remove invalid characters
-    string = re.sub("[^0-9a-zA-Z_]", " ", string)
+    string = re.sub("[^0-9a-zA-Z_-]", " ", string)
 
     if not string.strip():
         return "value"
+    elif re.match(r"^-\d*\.?\d+$", string):
+        return f"value_minus_{string}"
     elif not string[0].isalpha():
         return f"value_{string}"
     elif string.lower() in stop_words:

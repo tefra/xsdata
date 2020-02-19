@@ -165,25 +165,9 @@ class ClassReducerTests(FactoryTestCase):
         self.assertEqual(1, len(obj.extensions))
         mock_find_common_type.assert_called_once_with(extension.name, self.nsmap)
 
-    @mock.patch.object(ClassReducer, "find_common_type")
-    def test_flatten_extension_when_common_is_enumeration(self, mock_find_common_type):
-        mock_find_common_type.return_value = ClassFactory.create(
-            attrs=AttrFactory.list(2, local_type=TagType.ENUMERATION)
-        )
-
-        extension = AttrTypeFactory.create()
-        obj = ClassFactory.create(
-            extensions=[extension],
-            attrs=AttrFactory.list(2, local_type=TagType.ENUMERATION),
-        )
-
-        self.reducer.flatten_extension(obj, extension, self.nsmap)
-
-        self.assertEqual(0, len(obj.extensions))
-
     @mock.patch.object(ClassReducer, "create_default_attribute")
     @mock.patch.object(ClassReducer, "find_common_type")
-    def test_flatten_extension_when_common_is_enumeration_value(
+    def test_flatten_extension_when_common_is_enumeration(
         self, mock_find_common_type, mock_create_default_attribute
     ):
         mock_find_common_type.return_value = ClassFactory.create(
@@ -200,7 +184,7 @@ class ClassReducerTests(FactoryTestCase):
 
     @mock.patch.object(ClassReducer, "copy_attributes")
     @mock.patch.object(ClassReducer, "find_common_type")
-    def test_flatten_extension_copy_attributes(
+    def test_flatten_extension_when_item_is_not_enumeration(
         self, mock_find_common_type, mock_copy_attributes
     ):
         common = ClassFactory.create(attrs=AttrFactory.list(2))
@@ -213,6 +197,24 @@ class ClassReducerTests(FactoryTestCase):
 
         mock_copy_attributes.assert_called_once_with(common, obj, extension)
         self.assertEqual(0, len(obj.extensions))
+
+    @mock.patch.object(ClassReducer, "create_default_attribute")
+    @mock.patch.object(ClassReducer, "copy_attributes")
+    @mock.patch.object(ClassReducer, "find_common_type")
+    def test_flatten_extension_when_item_is_common(
+        self, mock_find_common_type, mock_copy_attributes, mock_create_default_attribute
+    ):
+        item = ClassFactory.create(attrs=AttrFactory.create(local_type=TagType.ELEMENT))
+        mock_find_common_type.return_value = item
+
+        extension = AttrTypeFactory.create()
+        item.extensions.append(extension)
+
+        self.reducer.flatten_extension(item, extension, self.nsmap)
+
+        self.assertEqual(0, len(item.extensions))
+        self.assertEqual(0, mock_copy_attributes.call_count)
+        self.assertEqual(0, mock_create_default_attribute.call_count)
 
     def test_create_default_attribute(self):
         item = ClassFactory.create()
@@ -330,7 +332,7 @@ class ClassReducerTests(FactoryTestCase):
     @mock.patch("xsdata.reducer.logger.warning")
     @mock.patch.object(ClassReducer, "find_common_type")
     def test_flatten_attribute_with_common_multiple_attributes(
-        self, mock_find_common_type, mock_logger_debug
+        self, mock_find_common_type, mock_logger_warning
     ):
         type_a = AttrTypeFactory.create(name="a")
         type_str = AttrType(name=DataType.STRING.code, native=True)
@@ -343,7 +345,7 @@ class ClassReducerTests(FactoryTestCase):
         self.reducer.flatten_attribute(parent, attr, self.schema)
 
         self.assertEqual([type_str], attr.types)
-        mock_logger_debug.assert_called_once_with(
+        mock_logger_warning.assert_called_once_with(
             "Missing type implementation: %s", common.type.__name__
         )
 

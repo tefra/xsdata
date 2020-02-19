@@ -142,8 +142,8 @@ class ClassReducer:
         if common is None:
             return
         elif common is item:
-            logger.warning("Class referencing itself skipping...")
-        elif common.is_enumeration and not item.attrs:
+            pass
+        elif not item.is_enumeration and common.is_enumeration:
             self.create_default_attribute(item, extension)
         elif not item.is_enumeration:
             self.copy_attributes(common, item, extension)

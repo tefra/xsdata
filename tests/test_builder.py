@@ -373,6 +373,24 @@ class ClassBuilderTests(FactoryTestCase):
     @patch.object(ClassBuilder, "build_class")
     @patch.object(ClassBuilder, "has_anonymous_enumeration")
     @patch.object(ClassBuilder, "has_anonymous_class")
+    def test_build_inner_class_when_is_anonymous_enumeration(
+        self, mock_has_anonymous_class, mock_has_anonymous_enumeration, mock_build_class
+    ):
+        inner_class = ClassFactory.create()
+        mock_build_class.return_value = inner_class
+        mock_has_anonymous_class.return_value = False
+        mock_has_anonymous_enumeration.return_value = False
+
+        simple_type = SimpleType.create(restriction=Restriction.create())
+        simple_type.restriction.enumerations.append(Enumeration.create())
+
+        self.assertEqual(inner_class, self.builder.build_inner_class(simple_type))
+        self.assertEqual("value", simple_type.name)
+        self.assertIsNone(simple_type.restriction)
+
+    @patch.object(ClassBuilder, "build_class")
+    @patch.object(ClassBuilder, "has_anonymous_enumeration")
+    @patch.object(ClassBuilder, "has_anonymous_class")
     def test_build_inner_class_when_union_has_anonymous_enumeration(
         self, mock_has_anonymous_class, mock_has_anonymous_enumeration, mock_build_class
     ):

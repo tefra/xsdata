@@ -1,6 +1,5 @@
 import io
 import json
-import re
 from collections import defaultdict
 from dataclasses import dataclass
 from dataclasses import field
@@ -15,7 +14,6 @@ from typing import TypeVar
 from lxml.etree import Element
 from lxml.etree import iterparse
 from lxml.etree import QName
-from lxml.etree import tostring
 
 from xsdata.formats.dataclass.mixins import ClassMeta
 from xsdata.formats.dataclass.mixins import ClassVar
@@ -158,7 +156,7 @@ class XmlParser(AbstractXmlParser, ModelInspect):
                 self.index += 1
                 self.emit_event(EventType.START, qname, item=item, element=element)
                 return None  # root
-            elif item.meta.mixed:
+            elif item.meta.any_element:
                 return self.queue.append(None)
             else:
                 raise ValueError(
@@ -304,13 +302,3 @@ class XmlParser(AbstractXmlParser, ModelInspect):
                 attributes={k: v for k, v in element.attrib.items()},
             )
         return None
-
-    @classmethod
-    def parse_mixed_content(cls, element: Element):
-        """Parse element mixed content by preserving the raw string."""
-
-        xml = tostring(element, pretty_print=True).decode()
-        start_root = xml.find(">")
-        end_root = xml.rfind("<")
-
-        return re.sub(r"\s+", " ", xml[start_root + 1 : end_root]).strip()

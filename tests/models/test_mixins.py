@@ -36,6 +36,11 @@ class OccurrencesMixinTests(TestCase):
             obj = clazz.create(**data)
             self.assertEqual(data, obj.get_restrictions())
 
+        data = dict(min_occurs=2, max_occurs=2)
+        for clazz in self.subclasses:
+            obj = clazz.create(**data)
+            self.assertEqual(data, obj.get_restrictions())
+
         data = dict(min_occurs=1, max_occurs=1)
         for clazz in self.subclasses:
             obj = clazz.create(**data)

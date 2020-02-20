@@ -29,7 +29,7 @@ from xsdata.utils import text
 
 BaseElement = Union[Attribute, AttributeGroup, Element, ComplexType, SimpleType, Group]
 AttributeElement = Union[
-    Attribute, Element, Restriction, Enumeration, UnionElement, ListElement
+    Attribute, Element, Restriction, Enumeration, UnionElement, ListElement, SimpleType
 ]
 
 
@@ -186,10 +186,12 @@ class ClassBuilder:
         """Convert real type and anonymous inner elements to an attribute type
         list."""
         inner_class = self.build_inner_class(obj)
-        types = []
-        for name in (obj.real_type or "").split(" "):
-            if name:
-                types.append(self.build_data_type(instance, name))
+
+        types = [
+            self.build_data_type(instance, name)
+            for name in (obj.real_type or "").split(" ")
+            if name
+        ]
 
         if inner_class:
             instance.inner.append(inner_class)
@@ -214,6 +216,13 @@ class ClassBuilder:
             obj.type = None  # type: ignore
             obj.simple_type = None  # type: ignore
             return self.build_class(simple_type)  # type: ignore
+
+        if isinstance(obj, SimpleType) and obj.is_enumeration:
+            obj.name = "type"
+            inner = self.build_class(obj)
+            obj.name = "value"
+            obj.restriction = None
+            return inner
 
         if isinstance(obj, UnionElement) and obj.simple_types:
             # Only the last occurrence will be converted. It doesn't make sense

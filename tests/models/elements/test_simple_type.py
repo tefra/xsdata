@@ -1,5 +1,6 @@
 from unittest import TestCase
 
+from xsdata.models.elements import Enumeration
 from xsdata.models.elements import Length
 from xsdata.models.elements import List
 from xsdata.models.elements import Restriction
@@ -33,6 +34,19 @@ class SimpleTypeTests(TestCase):
 
         obj.restriction = Restriction.create(base="bar")
         self.assertEqual("bar", obj.real_type)
+
+    def test_property_is_enumeration(self):
+        obj = SimpleType.create()
+        self.assertFalse(obj.is_enumeration)
+        self.assertFalse(obj.is_attribute)
+
+        obj.restriction = Restriction.create()
+        self.assertFalse(obj.is_enumeration)
+        self.assertFalse(obj.is_attribute)
+
+        obj.restriction.enumerations.append(Enumeration.create())
+        self.assertTrue(obj.is_enumeration)
+        self.assertTrue(obj.is_attribute)
 
     def test_get_restrictions(self):
         obj = SimpleType.create()

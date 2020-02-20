@@ -134,6 +134,10 @@ class SimpleType(AnnotationBase, NamedField, RestrictedField):
         return self.restriction and len(self.restriction.enumerations) > 0
 
     @property
+    def is_attribute(self) -> bool:
+        return self.is_enumeration
+
+    @property
     def real_type(self) -> Optional[str]:
         if self.restriction:
             return self.restriction.real_type

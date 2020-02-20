@@ -111,6 +111,11 @@ class AnnotationBase(ElementBase):
 
 
 @dataclass
+class Assertion(AnnotationBase):
+    test: Optional[str] = attribute(default=None)
+
+
+@dataclass
 class SimpleType(AnnotationBase, NamedField, RestrictedField):
     """
     The simpleType element defines a simple type and specifies the constraints
@@ -440,6 +445,7 @@ class Extension(AnnotationBase):
     attribute_groups: ArrayList[AttributeGroup] = element(
         default_factory=list, name="attributeGroup"
     )
+    assertions: ArrayList[Assertion] = element(default_factory=list, name="assert")
 
     @property
     def extends(self) -> Optional[str]:
@@ -617,11 +623,6 @@ class WhiteSpace(AnnotationBase):
 
 
 @dataclass
-class Assertion(AnnotationBase):
-    test: Optional[str] = attribute(default=None)
-
-
-@dataclass
 class ExplicitTimezone(AnnotationBase):
     value: Optional[UseType] = attribute(default=None)
     fixed: Optional[str] = attribute(default=None)
@@ -684,6 +685,7 @@ class Restriction(RestrictedField, AnnotationBase, NamedField):
     enumerations: ArrayList[Enumeration] = element(
         default_factory=list, name="enumeration"
     )
+    asserts: ArrayList[Assertion] = element(default_factory=list, name="assert")
     assertions: ArrayList[Assertion] = element(default_factory=list, name="assertion")
     attributes: ArrayList[Attribute] = element(default_factory=list, name="attribute")
     attribute_groups: ArrayList[AttributeGroup] = element(
@@ -770,6 +772,7 @@ class ComplexType(AnnotationBase, NamedField):
     attribute_groups: ArrayList[AttributeGroup] = element(
         default_factory=list, name="attributeGroup"
     )
+    assertion: ArrayList[Assertion] = element(default_factory=list, name="assert")
     abstract: bool = attribute(default=False)
     mixed: bool = attribute(default=False)
 

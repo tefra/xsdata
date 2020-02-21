@@ -52,10 +52,10 @@ class ProductType:
 
     class Value(Enum):
         """
-        :cvar SMALL:
-        :cvar MEDIUM:
         :cvar LARGE:
+        :cvar MEDIUM:
+        :cvar SMALL:
         """
-        SMALL = "small"
-        MEDIUM = "medium"
         LARGE = "large"
+        MEDIUM = "medium"
+        SMALL = "small"

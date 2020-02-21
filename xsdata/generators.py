@@ -57,17 +57,33 @@ class PythonAbstractGenerator(AbstractGenerator, ABC):
         for inner in obj.inner:
             cls.process_class(inner, curr_parents)
 
-        is_enum = obj.is_enumeration
-        for attr in obj.attrs:
-            if is_enum:
-                cls.process_enumeration(attr, obj)
-            else:
-                cls.process_attribute(attr, curr_parents)
+        if obj.is_enumeration:
+            cls.process_enumerations(obj)
+        else:
+            cls.process_attributes(obj, curr_parents)
 
         for extension in obj.extensions:
             cls.process_extension(extension)
 
         return obj
+
+    @classmethod
+    def process_enumerations(cls, obj: Class):
+        values: List[Any] = []
+        for i in range(len(obj.attrs) - 1, -1, -1):
+            attr = obj.attrs[i]
+            cls.process_enumeration(attr, obj)
+
+            if attr.default in values:
+                obj.attrs.pop(i)
+            values.append(attr.default)
+
+        obj.attrs.sort(key=lambda x: x.default)
+
+    @classmethod
+    def process_attributes(cls, obj: Class, parents_list: List[str]):
+        for attr in obj.attrs:
+            cls.process_attribute(attr, parents_list)
 
     @classmethod
     def process_extension(cls, extension: AttrType):

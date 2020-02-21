@@ -11,11 +11,16 @@ from xsdata.models.enums import TagType
 
 
 class PythonAbstractGeneratorTests(FactoryTestCase):
-    @mock.patch.object(generator, "process_attribute")
+    @mock.patch.object(generator, "process_enumerations")
+    @mock.patch.object(generator, "process_attributes")
     @mock.patch.object(generator, "process_extension")
     @mock.patch.object(generator, "class_name")
     def test_process_class(
-        self, mock_class_name, mock_process_extension, mock_process_attribute
+        self,
+        mock_class_name,
+        mock_process_extension,
+        mock_process_attributes,
+        mock_process_enumerations,
     ):
         mock_class_name.side_effect = lambda x: f"@{x}"
 
@@ -23,13 +28,19 @@ class PythonAbstractGeneratorTests(FactoryTestCase):
         type_m = AttrTypeFactory.create(name="m")
         type_n = AttrTypeFactory.create(name="n")
 
-        a = ClassFactory.create(name="a", extensions=[type_m, type_n])
-        a.attrs = [AttrFactory.create(name=x) for x in "bcd"]
-        e = ClassFactory.create(name="e")
-        e.attrs = [AttrFactory.create(name=x) for x in "fgh"]
-
-        i = ClassFactory.create(name="i", extensions=[type_o])
-        i.attrs = [AttrFactory.create(name=x) for x in "jkl"]
+        a = ClassFactory.create(
+            name="a",
+            extensions=[type_m, type_n],
+            attrs=AttrFactory.list(2, local_type=TagType.EXTENSION),
+        )
+        e = ClassFactory.create(
+            name="e", attrs=AttrFactory.list(2, local_type=TagType.ENUMERATION)
+        )
+        i = ClassFactory.create(
+            name="i",
+            extensions=[type_o],
+            attrs=AttrFactory.list(2, local_type=TagType.EXTENSION),
+        )
         a.inner = [e, i]
 
         generator.process_class(a)
@@ -42,32 +53,37 @@ class PythonAbstractGeneratorTests(FactoryTestCase):
             [mock.call(type_o), mock.call(type_m), mock.call(type_n)]
         )
 
-        mock_process_attribute.assert_has_calls(
-            [
-                mock.call(e.attrs[0], ["@a", "@e"]),
-                mock.call(e.attrs[1], ["@a", "@e"]),
-                mock.call(e.attrs[2], ["@a", "@e"]),
-                mock.call(i.attrs[0], ["@a", "@i"]),
-                mock.call(i.attrs[1], ["@a", "@i"]),
-                mock.call(i.attrs[2], ["@a", "@i"]),
-                mock.call(a.attrs[0], ["@a"]),
-                mock.call(a.attrs[1], ["@a"]),
-                mock.call(a.attrs[2], ["@a"]),
-            ]
+        mock_process_attributes.assert_has_calls(
+            [mock.call(i, ["@a", "@i"]), mock.call(a, ["@a"])]
         )
-        self.assertEqual(9, mock_process_attribute.call_count)
+        mock_process_enumerations.assert_called_once_with(e)
 
     @mock.patch.object(generator, "process_enumeration")
-    def test_process_enum_class(self, mock_process_enumeration):
-        a = ClassFactory.create(
-            name="a", attrs=AttrFactory.list(2, local_type=TagType.ENUMERATION)
+    def test_process_enumerations(self, mock_process_enumeration):
+        obj = ClassFactory.create(
+            attrs=[
+                AttrFactory.create(default=3),
+                AttrFactory.create(default=2),
+                AttrFactory.create(default=1),
+                AttrFactory.create(default=1),
+            ]
         )
-        generator.process_class(a)
+        calls = reversed([mock.call(attr, obj) for attr in obj.attrs])
 
-        mock_process_enumeration.assert_has_calls(
-            [mock.call(a.attrs[0], a), mock.call(a.attrs[1], a)]
+        generator.process_enumerations(obj)
+        mock_process_enumeration.assert_has_calls(calls)
+        self.assertEqual(1, obj.attrs[0].default)
+        self.assertEqual(2, obj.attrs[1].default)
+        self.assertEqual(3, obj.attrs[2].default)
+        self.assertEqual(3, len(obj.attrs))
+
+    @mock.patch.object(generator, "process_attribute")
+    def test_process_attributes(self, mock_process_attribute):
+        obj = ClassFactory.create(attrs=AttrFactory.list(3))
+        generator.process_attributes(obj, ["a", "b"])
+        mock_process_attribute.assert_has_calls(
+            [mock.call(attr, ["a", "b"]) for attr in obj.attrs]
         )
-        self.assertEqual(2, mock_process_enumeration.call_count)
 
     @mock.patch.object(generator, "type_name", return_value="oof")
     def test_process_extension(self, mock_type_name):

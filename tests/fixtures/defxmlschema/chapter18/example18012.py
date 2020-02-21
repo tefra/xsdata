@@ -3,12 +3,13 @@ from typing import Optional
 
 
 @dataclass
-class Size:
+class NewSize:
     """
     :ivar value:
     """
     class Meta:
-        name = "size"
+        name = "newSize"
+        namespace = "http://datypic.com/prod"
 
     value: Optional[int] = field(
         default=None,
@@ -16,6 +17,6 @@ class Size:
             name="value",
             type="Restriction",
             min_inclusive=2.0,
-            max_inclusive=18.0
+            max_inclusive=16.0
         )
     )

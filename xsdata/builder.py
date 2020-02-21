@@ -16,6 +16,7 @@ from xsdata.models.elements import Element
 from xsdata.models.elements import Enumeration
 from xsdata.models.elements import Group
 from xsdata.models.elements import List as ListElement
+from xsdata.models.elements import Redefine
 from xsdata.models.elements import Restriction
 from xsdata.models.elements import Schema
 from xsdata.models.elements import SimpleType
@@ -36,15 +37,26 @@ AttributeElement = Union[
 @dataclass
 class ClassBuilder:
     schema: Schema
+    redefine: Optional[Redefine] = field(default=None)
     target_prefix: Optional[str] = field(init=False)
+
+    def __post_init__(self):
+        """Append redefine element to the appropriate schema list of
+        elements."""
+        if not self.redefine:
+            return
+        if self.redefine.simple_type:
+            self.schema.simple_types.append(self.redefine.simple_type)
+        if self.redefine.complex_type:
+            self.schema.complex_types.append(self.redefine.complex_type)
+        if self.redefine.group:
+            self.schema.groups.append(self.redefine.group)
+        if self.redefine.attribute_group:
+            self.schema.attribute_groups.append(self.redefine.attribute_group)
 
     def build(self) -> List[Class]:
         """Generate classes from schema elements."""
         classes: List[Class] = []
-
-        for redefine in self.schema.redefines:
-            classes.extend(map(self.build_class, redefine.children()))
-
         classes.extend(map(self.build_class, self.schema.simple_types))
         classes.extend(map(self.build_class, self.schema.attribute_groups))
         classes.extend(map(self.build_class, self.schema.groups))
@@ -91,6 +103,7 @@ class ClassBuilder:
             extensions[extension.name] = extension
 
         for extension in self.children_extensions(obj, instance):
+            extension.forward_ref = False
             extensions[extension.name] = extension
 
         instance.extensions = sorted(extensions.values(), key=lambda x: x.name)

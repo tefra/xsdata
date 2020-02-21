@@ -23,7 +23,13 @@ class ProcessTask:
     renderer: str
     processed: List[Path] = field(init=False, default_factory=list)
 
-    def process(self, xsd: Path, package: str, target_namespace: Optional[str] = None):
+    def process(
+        self,
+        xsd: Path,
+        package: str,
+        target_namespace: Optional[str] = None,
+        redefine: Optional[Redefine] = None,
+    ):
         if xsd in self.processed:
             logger.debug("Circular import skipping: %s", xsd.name)
             return
@@ -36,7 +42,7 @@ class ProcessTask:
 
         logger.info("Schema: %s, elements: %d", xsd.name, schema.num)
 
-        classes = ClassBuilder(schema=schema).build()
+        classes = ClassBuilder(schema=schema, redefine=redefine).build()
         logger.info("Class candidates: %d", len(classes))
 
         classes = reducer.process(schema=schema, classes=classes)
@@ -63,13 +69,13 @@ class ProcessTask:
             sub_xsd_path = self.resolve_schema(path, schema)
             sub_xsd_package = self.adjust_package(package, schema)
 
-        if isinstance(schema, Redefine):
-            target_namespace = None
+        redefine = schema if isinstance(schema, Redefine) else None
 
         self.process(
             xsd=sub_xsd_path,
             package=sub_xsd_package or package,
             target_namespace=target_namespace,
+            redefine=redefine,
         )
 
     @staticmethod

@@ -34,6 +34,25 @@ class ClassBuilderTests(FactoryTestCase):
         self.schema = Schema.create()
         self.builder = ClassBuilder(schema=self.schema)
 
+    def test_post_init_with_redefine_appends_elements_to_schema(self):
+        redefine = Redefine.create(
+            simple_type=SimpleType.create(),
+            complex_type=ComplexType.create(),
+            group=Group.create(),
+            attribute_group=AttributeGroup.create(),
+        )
+        self.schema.simple_types.append(SimpleType.create())
+        self.schema.complex_types.append(ComplexType.create())
+        self.schema.groups.append(Group.create())
+        self.schema.attribute_groups.append(AttributeGroup.create())
+
+        ClassBuilder(schema=self.schema, redefine=redefine)
+
+        self.assertEqual(redefine.simple_type, self.schema.simple_types[1])
+        self.assertEqual(redefine.complex_type, self.schema.complex_types[1])
+        self.assertEqual(redefine.group, self.schema.groups[1])
+        self.assertEqual(redefine.attribute_group, self.schema.attribute_groups[1])
+
     @patch.object(ClassBuilder, "build_class")
     def test_build(self, mock_build_class):
         for _ in range(2):
@@ -47,13 +66,11 @@ class ClassBuilderTests(FactoryTestCase):
                 Redefine.create(complex_type=ComplexType.create())
             )
 
-        mock_build_class.side_effect = classes = ClassFactory.list(14)
+        mock_build_class.side_effect = classes = ClassFactory.list(12)
 
         self.assertEqual(classes, self.builder.build())
         mock_build_class.assert_has_calls(
             [
-                call(self.schema.redefines[0].complex_type),
-                call(self.schema.redefines[1].complex_type),
                 call(self.schema.simple_types[0]),
                 call(self.schema.simple_types[1]),
                 call(self.schema.attribute_groups[0]),

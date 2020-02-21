@@ -15,9 +15,9 @@ from xsdata.models.enums import TagType
 from xsdata.reducer import ClassReducer
 
 
-class ClassReducerTests(FactoryTestCase):
+class ClassReducerBaseTestCase(FactoryTestCase):
     def setUp(self) -> None:
-        super(ClassReducerTests, self).setUp()
+        super(ClassReducerBaseTestCase, self).setUp()
         self.target_namespace = "http://namespace/target"
         self.nsmap = {
             None: "http://namespace/foobar",
@@ -28,9 +28,14 @@ class ClassReducerTests(FactoryTestCase):
         )
         self.reducer = ClassReducer()
 
+
+class ClassReducerProcessTests(ClassReducerBaseTestCase):
+    @mock.patch.object(ClassReducer, "flatten_redefines")
     @mock.patch.object(ClassReducer, "flatten_classes")
     @mock.patch.object(ClassReducer, "add_common_types")
-    def test_process(self, mock_add_common_types, mock_flatten_classes):
+    def test_process(
+        self, mock_add_common_types, mock_flatten_classes, mock_flatten_redefines
+    ):
         classes = ClassFactory.list(3, type=Element)
         simplies = ClassFactory.list(2, type=SimpleType)
         enums = ClassFactory.list(
@@ -43,12 +48,11 @@ class ClassReducerTests(FactoryTestCase):
         common = simplies + abstracts + enums
         all_classes = classes + common
 
-        self.reducer.redefined_types = {"a": ClassFactory.create()}
         result = self.reducer.process(self.schema, all_classes)
 
         self.assertEqual(enums + classes, result)
-        self.assertEqual(0, len(self.reducer.redefined_types))
 
+        mock_flatten_redefines.assert_called_once_with(all_classes)
         mock_add_common_types.assert_called_once_with(common, self.schema)
         mock_flatten_classes.assert_has_calls(
             [mock.call(common, self.schema), mock.call(classes, self.schema)]
@@ -70,23 +74,6 @@ class ClassReducerTests(FactoryTestCase):
         self.reducer.add_common_types(classes, self.schema)
         self.assertEqual(expected, self.reducer.common_types)
 
-    @mock.patch.object(ClassReducer, "flatten_class")
-    def test_add_common_types_with_redefine(self, mock_flatten_class):
-        classes = ClassFactory.list(2)
-        self.reducer.add_common_types(classes, self.schema)
-
-        expected = {f"{{{self.target_namespace}}}{obj.name}": obj for obj in classes}
-        self.assertEqual(expected, self.reducer.common_types)
-        self.assertEqual(dict(), self.reducer.redefined_types)
-
-        self.reducer.add_common_types(classes, self.schema)
-        self.assertEqual(expected, self.reducer.common_types)
-        self.assertEqual(expected, self.reducer.redefined_types)
-
-        mock_flatten_class.assert_has_calls(
-            [mock.call(classes[0], self.schema), mock.call(classes[1], self.schema)]
-        )
-
     def test_find_common_type(self):
         obj = ClassFactory.create(name="foo", type=SimpleType)
         self.reducer.common_types = {
@@ -98,10 +85,12 @@ class ClassReducerTests(FactoryTestCase):
         self.assertEqual(obj, self.reducer.find_common_type("common:foo", self.schema))
         self.assertIsNone(self.reducer.find_common_type("bar", self.schema))
 
+
+class ClassReducerFlattenClassTests(ClassReducerBaseTestCase):
     @mock.patch.object(ClassReducer, "flatten_enumeration_unions")
     @mock.patch.object(ClassReducer, "flatten_attribute")
     @mock.patch.object(ClassReducer, "flatten_extension")
-    def test_flatten_class(
+    def test_basic(
         self,
         mock_flatten_extension,
         mock_flatten_attribute,
@@ -146,7 +135,7 @@ class ClassReducerTests(FactoryTestCase):
         )
 
     @mock.patch.object(ClassReducer, "flatten_enumeration_unions")
-    def test_flatten_class_skip_enumeration_unions_when_class_not_common(
+    def test_skip_enumeration_unions_when_class_not_common(
         self, mock_flatten_enumeration_unions,
     ):
         obj = ClassFactory.create(type=Element)
@@ -154,8 +143,10 @@ class ClassReducerTests(FactoryTestCase):
 
         self.assertEqual(0, mock_flatten_enumeration_unions.call_count)
 
+
+class ClassReducerFlattenExtensionTests(ClassReducerBaseTestCase):
     @mock.patch.object(ClassReducer, "find_common_type")
-    def test_flatten_extension_when_no_common(self, mock_find_common_type):
+    def test_when_no_common_is_found(self, mock_find_common_type):
         mock_find_common_type.return_value = None
 
         extension = AttrTypeFactory.create()
@@ -167,7 +158,7 @@ class ClassReducerTests(FactoryTestCase):
 
     @mock.patch.object(ClassReducer, "create_default_attribute")
     @mock.patch.object(ClassReducer, "find_common_type")
-    def test_flatten_extension_when_common_is_enumeration(
+    def test_when_common_is_enumeration(
         self, mock_find_common_type, mock_create_default_attribute
     ):
         mock_find_common_type.return_value = ClassFactory.create(
@@ -184,7 +175,7 @@ class ClassReducerTests(FactoryTestCase):
 
     @mock.patch.object(ClassReducer, "copy_attributes")
     @mock.patch.object(ClassReducer, "find_common_type")
-    def test_flatten_extension_when_item_is_not_enumeration(
+    def test_when_class_is_not_enumeration(
         self, mock_find_common_type, mock_copy_attributes
     ):
         common = ClassFactory.create(attrs=AttrFactory.list(2))
@@ -201,7 +192,7 @@ class ClassReducerTests(FactoryTestCase):
     @mock.patch.object(ClassReducer, "create_default_attribute")
     @mock.patch.object(ClassReducer, "copy_attributes")
     @mock.patch.object(ClassReducer, "find_common_type")
-    def test_flatten_extension_when_item_is_common(
+    def test_when_class_is_common(
         self, mock_find_common_type, mock_copy_attributes, mock_create_default_attribute
     ):
         item = ClassFactory.create(attrs=AttrFactory.create(local_type=TagType.ELEMENT))
@@ -216,6 +207,8 @@ class ClassReducerTests(FactoryTestCase):
         self.assertEqual(0, mock_copy_attributes.call_count)
         self.assertEqual(0, mock_create_default_attribute.call_count)
 
+
+class ClassReducerHelpersTests(ClassReducerBaseTestCase):
     def test_create_default_attribute(self):
         item = ClassFactory.create()
         extension = AttrTypeFactory.create()
@@ -277,8 +270,10 @@ class ClassReducerTests(FactoryTestCase):
             ],
         )
 
+
+class ClassReducerFlattenAttributeTests(ClassReducerBaseTestCase):
     @mock.patch.object(ClassReducer, "find_common_type")
-    def test_flatten_attribute_with_no_common_type(self, mock_find_common_type):
+    def test_when_no_common_is_found(self, mock_find_common_type):
         mock_find_common_type.return_value = None
 
         parent = ClassFactory.create()
@@ -290,9 +285,7 @@ class ClassReducerTests(FactoryTestCase):
         mock_find_common_type.assert_called_once_with("a", self.schema)
 
     @mock.patch.object(ClassReducer, "find_common_type")
-    def test_flatten_attribute_with_enumeration_common_type(
-        self, mock_find_common_type
-    ):
+    def test_when_common_is_enumeration(self, mock_find_common_type):
         mock_find_common_type.return_value = ClassFactory.create(
             attrs=AttrFactory.list(1, local_type=TagType.ENUMERATION)
         )
@@ -307,7 +300,9 @@ class ClassReducerTests(FactoryTestCase):
 
     @mock.patch.object(ClassReducer, "copy_inner_classes")
     @mock.patch.object(ClassReducer, "find_common_type")
-    def test_flatten_attribute(self, mock_find_common_type, mock_copy_inner_classes):
+    def test_when_common_class_only_one_attribute(
+        self, mock_find_common_type, mock_copy_inner_classes
+    ):
         type_a = AttrTypeFactory.create(name="a")
         type_b = AttrTypeFactory.create(name="b")
         common = ClassFactory.create(
@@ -331,7 +326,7 @@ class ClassReducerTests(FactoryTestCase):
 
     @mock.patch("xsdata.reducer.logger.warning")
     @mock.patch.object(ClassReducer, "find_common_type")
-    def test_flatten_attribute_with_common_multiple_attributes(
+    def test_when_common_class_has_more_than_one_attribute(
         self, mock_find_common_type, mock_logger_warning
     ):
         type_a = AttrTypeFactory.create(name="a")
@@ -349,8 +344,10 @@ class ClassReducerTests(FactoryTestCase):
             "Missing type implementation: %s", common.type.__name__
         )
 
+
+class ClassReducerFlattenEnumerationUnionsTests(ClassReducerBaseTestCase):
     @mock.patch.object(ClassReducer, "find_common_type")
-    def test_flatten_enumeration_unions(self, mock_find_common_type):
+    def test_merge_enumeration_into_the_target_class(self, mock_find_common_type):
         enum_a = ClassFactory.create(
             attrs=AttrFactory.list(2, local_type=TagType.ENUMERATION)
         )
@@ -382,4 +379,62 @@ class ClassReducerTests(FactoryTestCase):
         self.assertEqual(
             ["attr_B", "attr_C", "attr_D", "attr_E", "attr_F"],
             [attr.name for attr in obj.attrs],
+        )
+
+
+class ClassReducerFlattenRedefinesTests(ClassReducerBaseTestCase):
+    def test_with_unique_classes(self):
+        classes = ClassFactory.list(2)
+        self.reducer.flatten_redefines(classes)
+        self.assertEqual(2, len(classes))
+
+    def test_raises_exception_with_more_than_two_redefines(self):
+        class_a = ClassFactory.create()
+        class_b = class_a.clone()
+        class_c = class_a.clone()
+
+        classes = [class_a, class_b, class_c]
+        with self.assertRaises(NotImplementedError) as cm:
+            self.reducer.flatten_redefines(classes)
+
+        self.assertEqual("Redefined class `class_B` more than once.", str(cm.exception))
+
+    @mock.patch.object(ClassReducer, "copy_attributes")
+    def test_copies_attributes(self, mock_copy_attributes):
+        class_a = ClassFactory.create()
+        class_b = ClassFactory.create()
+        class_c = class_a.clone()
+
+        ext_a = AttrTypeFactory.create(name=class_a.name)
+        ext_str = AttrTypeFactory.create(name="foo")
+        class_c.extensions.append(ext_a)
+        class_c.extensions.append(ext_str)
+        classes = [class_a, class_b, class_c]
+
+        self.reducer.flatten_redefines(classes)
+        self.assertEqual(2, len(classes))
+
+        mock_copy_attributes.assert_called_once_with(class_a, class_c, ext_a)
+        self.assertEqual([ext_str], class_c.extensions)
+
+    def test_copies_attr_properties(self):
+        class_a = ClassFactory.create(
+            attrs=[AttrFactory.create(min_length=10), AttrFactory.create(max_length=10)]
+        )
+        class_b = ClassFactory.create()
+        class_c = class_a.clone()
+        class_c.attrs[0].required = True
+        class_c.attrs[1].total_digits = 3
+        class_c.attrs[1].max_length = 5
+
+        classes = [class_a, class_b, class_c]
+
+        self.reducer.flatten_redefines(classes)
+        self.assertEqual(2, len(classes))
+
+        self.assertEqual(
+            {"min_length": 10, "required": True}, class_c.attrs[0].restrictions
+        )
+        self.assertEqual(
+            {"max_length": 5, "total_digits": 3}, class_c.attrs[1].restrictions
         )

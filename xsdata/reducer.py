@@ -1,3 +1,4 @@
+from collections import defaultdict
 from dataclasses import dataclass
 from dataclasses import field
 from typing import Callable
@@ -23,7 +24,6 @@ class ClassReducer:
     because of excess verbosity in the given xsd schema and duplicate types."""
 
     common_types: Dict[str, Class] = field(default_factory=dict)
-    redefined_types: Dict[str, Class] = field(default_factory=dict)
 
     def process(self, schema: Schema, classes: List[Class]) -> List[Class]:
         """
@@ -37,14 +37,14 @@ class ClassReducer:
 
         :return: The final list of normalized classes/enumerations
         """
+        self.flatten_redefines(classes)
+
         classes, common = self.separate_common_types(classes)
 
         self.add_common_types(common, schema)
 
         self.flatten_classes(common, schema)
         self.flatten_classes(classes, schema)
-
-        self.redefined_types.clear()
 
         return [obj for obj in common if obj.is_enumeration] + classes
 
@@ -58,11 +58,7 @@ class ClassReducer:
 
         for item in classes:
             qname = etree.QName(schema.target_namespace, item.name).text
-            if qname in self.common_types:
-                self.flatten_class(item, schema)
-                self.redefined_types[qname] = item
-            else:
-                self.common_types[qname] = item
+            self.common_types[qname] = item
 
     def find_common_type(self, name: str, schema: Schema) -> Optional[Class]:
         """Find a common type by the qualified named with the prefixed
@@ -76,8 +72,45 @@ class ClassReducer:
 
         qname = etree.QName(namespace, name)
 
-        redefined = self.redefined_types.get(qname.text)
-        return redefined or self.common_types.get(qname.text)
+        return self.common_types.get(qname.text)
+
+    def flatten_redefines(self, classes: List[Class]):
+        """Merge original and redefined classes."""
+        grouped: Dict[str, List[Class]] = defaultdict(list)
+        for item in classes:
+            grouped[f"{item.type.__name__}{item.name}"].append(item)
+
+        for items in grouped.values():
+            if len(items) == 1:
+                continue
+            if len(items) > 2:
+                raise NotImplementedError(
+                    f"Redefined class `{items[0].name}` more than once."
+                )
+
+            winner: Class = items.pop()
+            looser: Class = items.pop()
+            classes.remove(looser)
+
+            for i in range(len(winner.attrs)):
+                attr = winner.attrs[i]
+
+                if attr.types[0].name == winner.name or attr.types[0].name.endswith(
+                    f":{winner.name}"
+                ):
+                    restrictions = looser.attrs[i].restrictions
+                    attr.types = looser.attrs[i].types
+                    for key, value in restrictions.items():
+                        if getattr(attr, key) is None:
+                            setattr(attr, key, value)
+
+            for i in range(len(winner.extensions) - 1, -1, -1):
+                extension = winner.extensions[i]
+                if extension.name == winner.name or extension.name.endswith(
+                    f":{winner.name}"
+                ):
+                    winner.extensions.pop(i)
+                    self.copy_attributes(looser, winner, extension)
 
     def flatten_class(self, item: Class, schema: Schema):
         """

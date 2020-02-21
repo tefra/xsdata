@@ -9,6 +9,7 @@ class Color:
     """
     class Meta:
         name = "color"
+        namespace = "http://datypic.com/prod"
 
     value: Optional[str] = field(
         default=None,
@@ -26,11 +27,14 @@ class Size:
     """
     class Meta:
         name = "size"
+        namespace = "http://datypic.com/prod"
 
     value: Optional[int] = field(
         default=None,
         metadata=dict(
             name="value",
-            type="Restriction"
+            type="Restriction",
+            min_inclusive=2.0,
+            max_inclusive=16.0
         )
     )

@@ -18,10 +18,8 @@ Example 18-1.2 A simple redefinition
    :language: xml
    :lines: 3-
 
-.. warning::
-
-    Unsupported feature!
-
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter18/example18012.py
+   :language: python
 
 Example 18-10 Overriding a complex type
 ---------------------------------------

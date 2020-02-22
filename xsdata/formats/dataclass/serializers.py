@@ -3,6 +3,7 @@ from dataclasses import asdict
 from dataclasses import dataclass
 from dataclasses import field
 from dataclasses import is_dataclass
+from decimal import Decimal
 from enum import Enum
 from typing import Any
 from typing import Callable
@@ -38,6 +39,8 @@ class JsonEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, Enum):
             return obj.value
+        if isinstance(obj, Decimal):
+            return str(obj)
 
         return super(JsonEncoder, self).default(obj)
 

@@ -1,3 +1,4 @@
+from decimal import Decimal
 from enum import Enum
 from typing import Iterable
 from typing import Optional
@@ -42,7 +43,7 @@ class DataType(Enum):
     DATE_TIMESTAMP = ("dateTimeStamp", str)
     DAY_TIME_DURATION = ("dayTimeDuration", str)
     YEAR_MONTH_DURATION = ("yearMonthDuration", str)
-    DECIMAL = ("decimal", float)
+    DECIMAL = ("decimal", Decimal)
     DERIVATION_CONTROL = ("derivationControl", str)
     DOUBLE = ("double", float)
     DURATION = ("duration", str)

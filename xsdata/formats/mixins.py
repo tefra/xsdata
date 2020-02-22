@@ -71,6 +71,9 @@ class AbstractXmlParser(AbstractParser):
                 if obj is not None:
                     element.clear()
 
+        if obj and not isinstance(obj, clazz):
+            return clazz(obj)  # type: ignore
+
         if not obj or not isinstance(obj, clazz):
             raise ValueError(
                 f"Failed to create target class {clazz.__class__.__name__}."

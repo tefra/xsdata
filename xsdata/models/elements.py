@@ -406,6 +406,7 @@ class Choice(AnnotationBase, OccurrencesMixin):
     groups: ArrayList["Group"] = element(default_factory=list, name="group")
     choices: ArrayList["Choice"] = element(default_factory=list, name="choice")
     sequences: ArrayList[Sequence] = element(default_factory=list, name="sequence")
+    any: ArrayList["Any"] = element(default_factory=list)
 
 
 @dataclass

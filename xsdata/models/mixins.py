@@ -56,13 +56,19 @@ class RestrictedField(ABC):
 
 
 class OccurrencesMixin:
+    min_occurs: Optional[int] = None
+    max_occurs: Optional[int] = None
+
     def get_restrictions(self) -> Dict[str, Any]:
-        min_occurs = getattr(self, "min_occurs", None)
-        max_occurs = getattr(self, "max_occurs", None)
-        if min_occurs == max_occurs == 1:
+        if self.min_occurs is None or self.max_occurs is None:
+            raise ValueError(
+                f"Class `{self.__class__.__name__}` min or max occurs is empty"
+            )
+
+        if self.min_occurs == self.max_occurs == 1:
             return dict(required=True)
-        if max_occurs >= min_occurs and max_occurs > 1:
-            return dict(min_occurs=min_occurs, max_occurs=max_occurs)
+        if self.max_occurs >= self.min_occurs and self.max_occurs > 1:
+            return dict(min_occurs=self.min_occurs, max_occurs=self.max_occurs)
         return dict()
 
 

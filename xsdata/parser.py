@@ -16,6 +16,7 @@ from xsdata.formats.dataclass.parsers import QueueItem
 from xsdata.formats.dataclass.parsers import XmlParser
 from xsdata.models import elements as xsd
 from xsdata.models.enums import FormType
+from xsdata.models.mixins import OccurrencesMixin
 from xsdata.utils import text
 
 T = TypeVar("T")
@@ -103,8 +104,11 @@ class SchemaParser(XmlParser):
     def end_choice(obj: T, element: etree.Element):
         """Elements inside a choice are by definition optional, reset their min
         occurs counter."""
-        if isinstance(obj, xsd.Choice):
-            for child in obj.elements:
+        if not isinstance(obj, xsd.Choice):
+            return
+
+        for child in obj.children():
+            if isinstance(child, OccurrencesMixin):
                 child.min_occurs = 0
                 if child.max_occurs is None:
                     child.max_occurs = obj.max_occurs
@@ -114,29 +118,29 @@ class SchemaParser(XmlParser):
         """Elements inside an all element can by definition appear at most
         once, reset their max occur counter."""
 
-        if isinstance(obj, xsd.All):
-            for element in obj.elements:
-                cls.inherit_occurs(obj, element, force=True)
+        if not isinstance(obj, xsd.All):
+            return
 
-            if obj.any:
-                cls.inherit_occurs(obj, obj.any, force=True)
+        for child in obj.children():
+            if isinstance(child, OccurrencesMixin):
+                cls.inherit_occurs(obj, child, force=True)
 
     @classmethod
     def end_sequence(cls, obj: T, element: etree.Element):
         """Elements inside a sequence inherit min|max occur counter if it is
         not set."""
-        if isinstance(obj, xsd.Sequence):
-            for element in obj.elements:
-                cls.inherit_occurs(obj, element)
+        if not isinstance(obj, xsd.Sequence):
+            return
 
-            for any_element in obj.any:
-                cls.inherit_occurs(obj, any_element)
+        for child in obj.children():
+            if isinstance(child, OccurrencesMixin):
+                cls.inherit_occurs(obj, child)
 
     @classmethod
     def inherit_occurs(
         cls,
         parent: Union[xsd.Sequence, xsd.All],
-        child: Union[xsd.Element, xsd.Any],
+        child: OccurrencesMixin,
         force: bool = False,
     ):
         if child.min_occurs is None or force:

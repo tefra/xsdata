@@ -1,8 +1,7 @@
 <!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
 <!-- Example 18-8 A simple override -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://datypic.com/prod" targetNamespace="http://datypic.com/prod">
-  <xs:override schemaLocation="prod1.xsd">
-    <!-- SKIPTEST: XML Schema 1.1 -->
+  <xs:override schemaLocation="example18082.xsd">
     <xs:simpleType name="DressSizeType">
       <xs:restriction base="xs:integer">
         <xs:minInclusive value="2" />

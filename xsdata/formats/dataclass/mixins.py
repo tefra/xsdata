@@ -125,6 +125,9 @@ class ModelInspect:
                 raise TypeError(f"Object {clazz} is not a dataclass.")
 
             meta = getattr(clazz, "Meta", None)
+            if meta and meta.__qualname__ != f"{clazz.__name__}.Meta":
+                meta = None
+
             name = getattr(meta, "name", self.name_generator(clazz.__name__))
             mixed = getattr(meta, "mixed", False)
             namespace = getattr(meta, "namespace", parent_ns)

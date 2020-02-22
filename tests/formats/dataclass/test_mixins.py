@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from typing import Iterator
 from unittest import mock
 from unittest import TestCase
@@ -55,6 +56,22 @@ class ModelInspectTests(TestCase):
         inspect = ModelInspect(name_generator=lambda x: text.snake_case(x))
         result = inspect.class_meta(ItemsType)
         self.assertEqual(QName("items_type"), str(result.qname))
+
+    def test_class_meta_with_no_meta_not_inherit_from_parent(self):
+        @dataclass
+        class Bar:
+            class Meta:
+                name = "bar"
+
+        @dataclass
+        class Foo(Bar):
+            pass
+
+        inspect = ModelInspect()
+        result = inspect.class_meta(Foo)
+        self.assertEqual("Foo", result.name)
+        self.assertFalse(result.mixed)
+        self.assertIsNone(result.namespace)
 
     @mock.patch.object(ModelInspect, "get_type_hints", return_value=dict())
     def test_class_meta_with_no_dataclass_raises_exception(self, *args):

@@ -1,3 +1,4 @@
+from decimal import Decimal
 from dataclasses import dataclass, field
 from lxml.etree import QName
 from typing import Dict, Optional
@@ -18,7 +19,7 @@ class IdentifierGroup:
             required=True
         )
     )
-    version: Optional[float] = field(
+    version: Optional[Decimal] = field(
         default=None,
         metadata=dict(
             name="version",

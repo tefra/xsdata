@@ -1,3 +1,4 @@
+from decimal import Decimal
 from dataclasses import dataclass, field
 from typing import List, Optional
 
@@ -22,7 +23,7 @@ class PriceType:
     :ivar value:
     :ivar currency:
     """
-    value: Optional[float] = field(
+    value: Optional[Decimal] = field(
         default=None,
         metadata=dict(
             name="value",

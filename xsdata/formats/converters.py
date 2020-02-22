@@ -1,4 +1,5 @@
 from dataclasses import is_dataclass
+from decimal import Decimal
 from enum import Enum
 from typing import Any
 from typing import Callable
@@ -8,7 +9,7 @@ from typing import Type
 
 
 def sort_types(types: List[Type]):
-    in_order = (bool, int, str, float)
+    in_order = (bool, int, str, float, Decimal)
 
     sorted_types = []
     for ordered in in_order:
@@ -77,4 +78,5 @@ func_map: Dict[str, Callable] = {
     "int": int,
     "float": float,
     "bool": to_bool,
+    "Decimal": Decimal,
 }

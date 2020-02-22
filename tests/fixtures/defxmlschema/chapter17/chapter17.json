@@ -31,7 +31,7 @@
                 "number": 557,
                 "name": "Short-Sleeved Linen Blouse",
                 "price": {
-                    "value": 29.99,
+                    "value": "29.99",
                     "currency": "USD"
                 }
             },
@@ -39,7 +39,7 @@
                 "number": 563,
                 "name": "Ten-Gallon Hat",
                 "price": {
-                    "value": 69.99,
+                    "value": "69.99",
                     "currency": "USD"
                 }
             }

@@ -34,6 +34,10 @@ def docstring(obj: Class, enum=False):
 
 def lib_imports(output: str):
     result = []
+
+    if "Decimal" in output:
+        result.append("from decimal import Decimal")
+
     if "(Enum)" in output:
         result.append("from enum import Enum")
 

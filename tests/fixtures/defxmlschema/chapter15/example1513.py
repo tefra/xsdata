@@ -1,3 +1,4 @@
+from decimal import Decimal
 from dataclasses import dataclass, field
 from typing import Optional
 
@@ -9,7 +10,7 @@ class ProductType:
     :ivar id:
     :ivar version:
     """
-    version: Optional[float] = field(
+    version: Optional[Decimal] = field(
         default=None,
         metadata=dict(
             name="version",
@@ -24,7 +25,7 @@ class ProductType:
             required=True
         )
     )
-    version: Optional[float] = field(
+    version: Optional[Decimal] = field(
         default=None,
         metadata=dict(
             name="version",

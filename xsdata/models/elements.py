@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Any as Anything
 from typing import Dict
 from typing import Iterator
-from typing import List as ArrayList
+from typing import List as Array
 from typing import Optional
 from typing import Union as UnionType
 
@@ -22,11 +22,9 @@ from xsdata.models.mixins import OccurrencesMixin
 from xsdata.models.mixins import RestrictedField
 
 
-def attribute(default=MISSING, default_factory=MISSING, init=True, **kwargs):
+def attribute(default=None, init=True, **kwargs):
     kwargs.update(type=TagType.ATTRIBUTE)
-    return field(
-        init=init, default=default, default_factory=default_factory, metadata=kwargs
-    )
+    return field(init=init, default=default, metadata=kwargs)
 
 
 def element(default=MISSING, default_factory=MISSING, init=True, **kwargs):
@@ -34,6 +32,11 @@ def element(default=MISSING, default_factory=MISSING, init=True, **kwargs):
     return field(
         init=init, default=default, default_factory=default_factory, metadata=kwargs
     )
+
+
+def array_element(init=True, **kwargs):
+    kwargs.update(type=TagType.ELEMENT)
+    return field(init=init, default_factory=list, metadata=kwargs)
 
 
 def any_element(default=MISSING, default_factory=MISSING, init=True, **kwargs):
@@ -57,9 +60,10 @@ class Documentation(ElementBase):
     class Meta:
         mixed = True
 
-    lang: Optional[str] = attribute(default=None)
-    source: Optional[str] = attribute(default=None)
-    elements: ArrayList[object] = any_element(default_factory=list)
+    lang: Optional[str] = attribute()
+    source: Optional[str] = attribute()
+    elements: Array[object] = any_element(default_factory=list)
+    any_attribute: Optional["AnyAttribute"] = element(default=None)
 
     def tostring(self) -> Optional[str]:
         if not self.elements:
@@ -81,8 +85,9 @@ class Appinfo(ElementBase):
     class Meta:
         mixed = True
 
-    source: Optional[str] = attribute(default=None)
-    elements: ArrayList[object] = any_element(default_factory=list)
+    source: Optional[str] = attribute()
+    elements: Array[object] = any_element(default_factory=list)
+    any_attribute: Optional["AnyAttribute"] = element(default=None)
 
 
 @dataclass
@@ -96,9 +101,8 @@ class Annotation(ElementBase):
     """
 
     appinfo: Optional[Appinfo] = element(default=None)
-    documentations: ArrayList[Documentation] = element(
-        default_factory=list, name="documentation"
-    )
+    documentations: Array[Documentation] = array_element(name="documentation")
+    any_attribute: Optional["AnyAttribute"] = element(default=None)
 
 
 @dataclass
@@ -106,6 +110,7 @@ class AnnotationBase(ElementBase):
     """Base Class for elements that can contain annotations."""
 
     annotation: Optional[Annotation] = element(default=None)
+    any_attribute: Optional["AnyAttribute"] = element(default=None)
 
     @property
     def display_help(self) -> Optional[str]:
@@ -117,14 +122,52 @@ class AnnotationBase(ElementBase):
 
 
 @dataclass
+class AnyAttribute(AnnotationBase, NamedField, RestrictedField):
+    """
+    <anyAttribute
+      id = ID
+      namespace = ((##any | ##other) | List of (anyURI | (##targetNamespace | ##local)))
+      notNamespace = List of (anyURI | (##targetNamespace | ##local))
+      notQName = List of (QName | ##defined)
+      processContents = (lax | skip | strict) : strict
+      {any attributes with non-schema namespace . . .}>
+      Content: (annotation?)
+    </anyAttribute>
+    """
+
+    namespace: Optional[str] = attribute()
+    process_contents: Optional[ProcessType] = attribute()
+
+    @property
+    def is_attribute(self) -> bool:
+        return True
+
+    @property
+    def real_type(self) -> Optional[str]:
+        return DataType.QMAP.xml_prefixed
+
+    @property
+    def real_name(self) -> str:
+        return "attributes"
+
+    def get_restrictions(self) -> Dict[str, Anything]:
+        return dict()
+
+
+@dataclass
 class Assertion(AnnotationBase):
     """
-    {annotations} A sequence of Annotation components.
-
-    {test} An XPath Expression property record. Required.
+    <assertion
+      id = ID
+      test = an XPath expression
+      xpathDefaultNamespace =
+        (anyURI | (##defaultNamespace | ##targetNamespace | ##local))
+      {any attributes with non-schema namespace . . .}>
+      Content: (annotation?)
+    </assertion>
     """
 
-    test: Optional[str] = attribute(default=None)
+    test: Optional[str] = attribute()
 
 
 @dataclass
@@ -139,7 +182,7 @@ class SimpleType(AnnotationBase, NamedField, RestrictedField):
     </simpleType>
     """
 
-    name: Optional[str] = attribute(default=None)
+    name: Optional[str] = attribute()
     restriction: Optional["Restriction"] = element(default=None)
     list: Optional["List"] = element(default=None)
     union: Optional["Union"] = element(default=None)
@@ -183,7 +226,7 @@ class List(AnnotationBase, RestrictedField, NamedField):
     """
 
     simple_type: Optional[SimpleType] = element(default=None)
-    item_type: Optional[str] = attribute(default=None)
+    item_type: Optional[str] = attribute()
 
     @property
     def is_attribute(self) -> bool:
@@ -212,10 +255,8 @@ class Union(AnnotationBase, NamedField, RestrictedField):
     </union>
     """
 
-    member_types: Optional[str] = attribute(default=None)
-    simple_types: ArrayList[SimpleType] = element(
-        default_factory=list, name="simpleType"
-    )
+    member_types: Optional[str] = attribute()
+    simple_types: Array[SimpleType] = array_element(name="simpleType")
 
     @property
     def extends(self) -> Optional[str]:
@@ -255,39 +296,6 @@ class Union(AnnotationBase, NamedField, RestrictedField):
 
 
 @dataclass
-class AnyAttribute(AnnotationBase, NamedField, RestrictedField):
-    """
-    <anyAttribute
-      id = ID
-      namespace = ((##any | ##other) | List of (anyURI | (##targetNamespace | ##local)))
-      notNamespace = List of (anyURI | (##targetNamespace | ##local))
-      notQName = List of (QName | ##defined)
-      processContents = (lax | skip | strict) : strict
-      {any attributes with non-schema namespace . . .}>
-      Content: (annotation?)
-    </anyAttribute>
-    """
-
-    namespace: Optional[str] = attribute(default=None)
-    process_contents: Optional[ProcessType] = attribute(default=None)
-
-    @property
-    def is_attribute(self) -> bool:
-        return True
-
-    @property
-    def real_type(self) -> Optional[str]:
-        return DataType.QMAP.xml_prefixed
-
-    @property
-    def real_name(self) -> str:
-        return "attributes"
-
-    def get_restrictions(self) -> Dict[str, Anything]:
-        return dict()
-
-
-@dataclass
 class Attribute(AnnotationBase, NamedField, RestrictedField):
     """
     <attribute
@@ -306,12 +314,12 @@ class Attribute(AnnotationBase, NamedField, RestrictedField):
     </attribute>
     """
 
-    default: Optional[str] = attribute(default=None)
-    fixed: Optional[str] = attribute(default=None)
-    form: Optional[FormType] = attribute(default=None)
-    name: Optional[str] = attribute(default=None)
-    ref: Optional[str] = attribute(default=None)
-    type: Optional[str] = attribute(default=None)
+    default: Optional[str] = attribute()
+    fixed: Optional[str] = attribute()
+    form: Optional[FormType] = attribute()
+    name: Optional[str] = attribute()
+    ref: Optional[str] = attribute()
+    type: Optional[str] = attribute()
     simple_type: Optional[SimpleType] = element(default=None)
     use: Optional[UseType] = attribute(default=UseType.OPTIONAL)
 
@@ -351,13 +359,10 @@ class AttributeGroup(AnnotationBase, NamedField):
     </attributeGroup>
     """
 
-    name: Optional[str] = attribute(default=None)
-    ref: Optional[str] = attribute(default=None)
-    any_attribute: Optional[AnyAttribute] = element(default=None)
-    attributes: ArrayList[Attribute] = element(default_factory=list, name="attribute")
-    attribute_groups: ArrayList["AttributeGroup"] = element(
-        default_factory=list, name="attributeGroup"
-    )
+    name: Optional[str] = attribute()
+    ref: Optional[str] = attribute()
+    attributes: Array[Attribute] = array_element(name="attribute")
+    attribute_groups: Array["AttributeGroup"] = array_element(name="attributeGroup")
 
     @property
     def extends(self) -> Optional[str]:
@@ -384,11 +389,10 @@ class Any(AnnotationBase, OccurrencesMixin, NamedField):
     </any>
     """
 
-    min_occurs: Optional[int] = attribute(default=None)
-    max_occurs: Optional[int] = attribute(default=None)
-    namespace: Optional[str] = attribute(default=None)
-    process_contents: Optional[ProcessType] = attribute(default=None)
-    annotation: Optional[Annotation] = element(default=None)
+    min_occurs: Optional[int] = attribute()
+    max_occurs: Optional[int] = attribute()
+    namespace: Optional[str] = attribute()
+    process_contents: Optional[ProcessType] = attribute()
 
     @property
     def is_attribute(self) -> bool:
@@ -417,7 +421,7 @@ class All(AnnotationBase, OccurrencesMixin):
 
     min_occurs: int = attribute(default=1)
     max_occurs: int = attribute(default=1)
-    elements: ArrayList["Element"] = element(default_factory=list, name="element")
+    elements: Array["Element"] = array_element(name="element")
     any: Any = element(default=None)
 
 
@@ -435,11 +439,11 @@ class Sequence(AnnotationBase, OccurrencesMixin):
 
     min_occurs: int = attribute(default=1)
     max_occurs: int = attribute(default=1)
-    elements: ArrayList["Element"] = element(default_factory=list, name="element")
-    groups: ArrayList["Group"] = element(default_factory=list, name="group")
-    choices: ArrayList["Choice"] = element(default_factory=list, name="choice")
-    sequences: ArrayList["Sequence"] = element(default_factory=list, name="sequence")
-    any: ArrayList["Any"] = element(default_factory=list)
+    elements: Array["Element"] = array_element(name="element")
+    groups: Array["Group"] = array_element(name="group")
+    choices: Array["Choice"] = array_element(name="choice")
+    sequences: Array["Sequence"] = array_element(name="sequence")
+    any: Array["Any"] = element(default_factory=list)
 
 
 @dataclass
@@ -456,11 +460,11 @@ class Choice(AnnotationBase, OccurrencesMixin):
 
     min_occurs: int = attribute(default=1)
     max_occurs: int = attribute(default=1)
-    elements: ArrayList["Element"] = element(default_factory=list, name="element")
-    groups: ArrayList["Group"] = element(default_factory=list, name="group")
-    choices: ArrayList["Choice"] = element(default_factory=list, name="choice")
-    sequences: ArrayList[Sequence] = element(default_factory=list, name="sequence")
-    any: ArrayList["Any"] = element(default_factory=list)
+    elements: Array["Element"] = array_element(name="element")
+    groups: Array["Group"] = array_element(name="group")
+    choices: Array["Choice"] = array_element(name="choice")
+    sequences: Array[Sequence] = array_element(name="sequence")
+    any: Array["Any"] = element(default_factory=list)
 
 
 @dataclass
@@ -477,8 +481,8 @@ class Group(AnnotationBase, OccurrencesMixin, NamedField):
     </group>
     """
 
-    name: Optional[str] = attribute(default=None)
-    ref: Optional[str] = attribute(default=None)
+    name: Optional[str] = attribute()
+    ref: Optional[str] = attribute()
     min_occurs: int = attribute(default=1)
     max_occurs: int = attribute(default=1)
     all: Optional[All] = element(default=None)
@@ -501,17 +505,15 @@ class Extension(AnnotationBase):
     </extension>
     """
 
-    base: Optional[str] = attribute(default=None)
+    base: Optional[str] = attribute()
     group: Optional[Group] = element(default=None)
     all: Optional[All] = element(default=None)
     choice: Optional[Choice] = element(default=None)
     sequence: Optional[Sequence] = element(default=None)
     any_attribute: Optional[AnyAttribute] = element(default=None)
-    attributes: ArrayList[Attribute] = element(default_factory=list, name="attribute")
-    attribute_groups: ArrayList[AttributeGroup] = element(
-        default_factory=list, name="attributeGroup"
-    )
-    assertions: ArrayList[Assertion] = element(default_factory=list, name="assert")
+    attributes: Array[Attribute] = array_element(name="attribute")
+    attribute_groups: Array[AttributeGroup] = array_element(name="attributeGroup")
+    assertions: Array[Assertion] = array_element(name="assert")
 
     @property
     def extends(self) -> Optional[str]:
@@ -529,7 +531,7 @@ class Enumeration(AnnotationBase, NamedField, RestrictedField):
     </enumeration>
     """
 
-    value: Optional[str] = attribute(default=None)
+    value: Optional[str] = attribute()
 
     @property
     def is_attribute(self) -> bool:
@@ -563,7 +565,7 @@ class FractionDigits(AnnotationBase):
     </fractionDigits>
     """
 
-    value: Optional[int] = attribute(default=None)
+    value: Optional[int] = attribute()
 
 
 @dataclass
@@ -578,7 +580,7 @@ class Length(AnnotationBase):
     </length>
     """
 
-    value: Optional[int] = attribute(default=None)
+    value: Optional[int] = attribute()
 
 
 @dataclass
@@ -593,7 +595,7 @@ class MaxExclusive(AnnotationBase):
     </maxExclusive>
     """
 
-    value: Optional[float] = attribute(default=None)
+    value: Optional[float] = attribute()
 
 
 @dataclass
@@ -608,7 +610,7 @@ class MaxInclusive(AnnotationBase):
     </maxInclusive>
     """
 
-    value: Optional[float] = attribute(default=None)
+    value: Optional[float] = attribute()
 
 
 @dataclass
@@ -623,7 +625,7 @@ class MaxLength(AnnotationBase):
     </maxLength>
     """
 
-    value: Optional[float] = attribute(default=None)
+    value: Optional[float] = attribute()
 
 
 @dataclass
@@ -638,7 +640,7 @@ class MinExclusive(AnnotationBase):
     </minExclusive>
     """
 
-    value: Optional[float] = attribute(default=None)
+    value: Optional[float] = attribute()
 
 
 @dataclass
@@ -653,7 +655,7 @@ class MinInclusive(AnnotationBase):
     </minInclusive>
     """
 
-    value: Optional[float] = attribute(default=None)
+    value: Optional[float] = attribute()
 
 
 @dataclass
@@ -668,7 +670,7 @@ class MinLength(AnnotationBase):
     </minLength>
     """
 
-    value: Optional[float] = attribute(default=None)
+    value: Optional[float] = attribute()
 
 
 @dataclass
@@ -682,7 +684,7 @@ class Pattern(AnnotationBase):
     </pattern>
     """
 
-    value: Optional[str] = attribute(default=None)
+    value: Optional[str] = attribute()
 
 
 @dataclass
@@ -697,7 +699,7 @@ class TotalDigits(AnnotationBase):
     </totalDigits>
     """
 
-    value: Optional[int] = attribute(default=None)
+    value: Optional[int] = attribute()
 
 
 @dataclass
@@ -712,7 +714,7 @@ class WhiteSpace(AnnotationBase):
     </whiteSpace>
     """
 
-    value: Optional[str] = attribute(default=None)  # preserve, collapse, replace
+    value: Optional[str] = attribute()  # preserve, collapse, replace
 
 
 @dataclass
@@ -727,8 +729,8 @@ class ExplicitTimezone(AnnotationBase):
     </explicitTimezone>
     """
 
-    value: Optional[UseType] = attribute(default=None)
-    fixed: Optional[str] = attribute(default=None)
+    value: Optional[UseType] = attribute()
+    fixed: Optional[str] = attribute()
 
 
 @dataclass
@@ -772,7 +774,7 @@ class Restriction(RestrictedField, AnnotationBase, NamedField):
         "enumerations",
     )
 
-    base: Optional[str] = attribute(default=None)
+    base: Optional[str] = attribute()
     group: Optional[Group] = element(default=None)
     all: Optional[All] = element(default=None)
     choice: Optional[Choice] = element(default=None)
@@ -791,15 +793,11 @@ class Restriction(RestrictedField, AnnotationBase, NamedField):
     pattern: Optional[Pattern] = element(default=None)
     explicit_timezone: Optional[ExplicitTimezone] = element(default=None)
     simple_type: Optional[SimpleType] = element(default=None)
-    enumerations: ArrayList[Enumeration] = element(
-        default_factory=list, name="enumeration"
-    )
-    asserts: ArrayList[Assertion] = element(default_factory=list, name="assert")
-    assertions: ArrayList[Assertion] = element(default_factory=list, name="assertion")
-    attributes: ArrayList[Attribute] = element(default_factory=list, name="attribute")
-    attribute_groups: ArrayList[AttributeGroup] = element(
-        default_factory=list, name="attributeGroup"
-    )
+    enumerations: Array[Enumeration] = array_element(name="enumeration")
+    asserts: Array[Assertion] = array_element(name="assert")
+    assertions: Array[Assertion] = array_element(name="assertion")
+    attributes: Array[Attribute] = array_element(name="attribute")
+    attribute_groups: Array[AttributeGroup] = array_element(name="attributeGroup")
 
     @property
     def is_attribute(self) -> bool:
@@ -878,9 +876,9 @@ class ComplexType(AnnotationBase, NamedField):
     </complexType>
     """
 
-    name: Optional[str] = attribute(default=None)
-    block: Optional[str] = attribute(default=None)
-    final: Optional[str] = attribute(default=None)
+    name: Optional[str] = attribute()
+    block: Optional[str] = attribute()
+    final: Optional[str] = attribute()
     simple_content: Optional[SimpleContent] = element(default=None)
     complex_content: Optional[ComplexContent] = element(default=None)
     group: Optional[Group] = element(default=None)
@@ -888,11 +886,9 @@ class ComplexType(AnnotationBase, NamedField):
     choice: Optional[Choice] = element(default=None)
     sequence: Optional[Sequence] = element(default=None)
     any_attribute: Optional[AnyAttribute] = element(default=None)
-    attributes: ArrayList[Attribute] = element(default_factory=list, name="attribute")
-    attribute_groups: ArrayList[AttributeGroup] = element(
-        default_factory=list, name="attributeGroup"
-    )
-    assertion: ArrayList[Assertion] = element(default_factory=list, name="assert")
+    attributes: Array[Attribute] = array_element(name="attribute")
+    attribute_groups: Array[AttributeGroup] = array_element(name="attributeGroup")
+    assertion: Array[Assertion] = array_element(name="assert")
     abstract: bool = attribute(default=False)
     mixed: bool = attribute(default=False)
 
@@ -919,7 +915,7 @@ class Field(AnnotationBase):
     </field>
     """
 
-    xpath: Optional[str] = attribute(default=None)
+    xpath: Optional[str] = attribute()
 
 
 @dataclass
@@ -948,7 +944,7 @@ class Unique(AnnotationBase):
     </unique>
     """
 
-    name: Optional[str] = attribute(default=None)
+    name: Optional[str] = attribute()
     selector: Optional[Selector] = element(default=None)
     field: Optional[Field] = element(default=None)
 
@@ -965,9 +961,9 @@ class Key(AnnotationBase):
     </key>
     """
 
-    name: Optional[str] = attribute(default=None)
+    name: Optional[str] = attribute()
     selector: Optional[Selector] = element(default=None)
-    fields: ArrayList[Selector] = element(default_factory=list, name="field")
+    fields: Array[Selector] = array_element(name="field")
 
 
 @dataclass
@@ -983,10 +979,10 @@ class Keyref(AnnotationBase):
     </keyref>
     """
 
-    name: Optional[str] = attribute(default=None)
-    refer: Optional[str] = attribute(default=None)
+    name: Optional[str] = attribute()
+    refer: Optional[str] = attribute()
     selector: Optional[Selector] = element(default=None)
-    fields: ArrayList[Selector] = element(default_factory=list, name="field")
+    fields: Array[Selector] = array_element(name="field")
 
 
 @dataclass
@@ -1014,23 +1010,23 @@ class Element(AnnotationBase, NamedField, OccurrencesMixin):
     </element>
     """
 
-    name: Optional[str] = attribute(default=None)
-    id: Optional[str] = attribute(default=None)
-    ref: Optional[str] = attribute(default=None)
-    type: Optional[str] = attribute(default=None)
-    substitution_group: Optional[str] = attribute(default=None)
-    default: Optional[str] = attribute(default=None)
-    fixed: Optional[str] = attribute(default=None)
-    form: Optional[FormType] = attribute(default=None)
-    block: Optional[str] = attribute(default=None)
-    final: Optional[str] = attribute(default=None)
+    name: Optional[str] = attribute()
+    id: Optional[str] = attribute()
+    ref: Optional[str] = attribute()
+    type: Optional[str] = attribute()
+    substitution_group: Optional[str] = attribute()
+    default: Optional[str] = attribute()
+    fixed: Optional[str] = attribute()
+    form: Optional[FormType] = attribute()
+    block: Optional[str] = attribute()
+    final: Optional[str] = attribute()
     simple_type: Optional[SimpleType] = element(default=None)
     complex_type: Optional[ComplexType] = element(default=None)
-    uniques: ArrayList[Unique] = element(default_factory=list, name="unique")
-    keys: ArrayList[Key] = element(default_factory=list, name="key")
-    keyrefs: ArrayList[Keyref] = element(default_factory=list, name="keyref")
-    min_occurs: Optional[int] = attribute(default=None)
-    max_occurs: Optional[int] = attribute(default=None)
+    uniques: Array[Unique] = array_element(name="unique")
+    keys: Array[Key] = array_element(name="key")
+    keyrefs: Array[Keyref] = array_element(name="keyref")
+    min_occurs: Optional[int] = attribute()
+    max_occurs: Optional[int] = attribute()
     nillable: bool = attribute(default=False)
     abstract: bool = attribute(default=False)
 
@@ -1077,8 +1073,8 @@ class Import(AnnotationBase):
     </import>
     """
 
-    namespace: Optional[str] = attribute(default=None)
-    schema_location: Optional[str] = attribute(default=None)
+    namespace: Optional[str] = attribute()
+    schema_location: Optional[str] = attribute()
 
 
 @dataclass
@@ -1092,7 +1088,7 @@ class Include(AnnotationBase):
     </include>
     """
 
-    schema_location: Optional[str] = attribute(default=None)
+    schema_location: Optional[str] = attribute()
 
     @property
     def namespace(self):
@@ -1112,9 +1108,9 @@ class Notation(AnnotationBase):
     </notation>
     """
 
-    name: Optional[str] = attribute(default=None)
-    public: Optional[str] = attribute(default=None)
-    system: Optional[str] = attribute(default=None)
+    name: Optional[str] = attribute()
+    public: Optional[str] = attribute()
+    system: Optional[str] = attribute()
 
 
 @dataclass
@@ -1128,17 +1124,11 @@ class Redefine(AnnotationBase):
     </redefine>
     """
 
-    schema_location: Optional[str] = attribute(default=None)
-    simple_types: ArrayList[SimpleType] = element(
-        default_factory=list, name="simpleType"
-    )
-    complex_types: ArrayList[ComplexType] = element(
-        default_factory=list, name="complexType"
-    )
-    groups: ArrayList[Group] = element(default_factory=list, name="group")
-    attribute_groups: ArrayList[AttributeGroup] = element(
-        default_factory=list, name="attributeGroup"
-    )
+    schema_location: Optional[str] = attribute()
+    simple_types: Array[SimpleType] = array_element(name="simpleType")
+    complex_types: Array[ComplexType] = array_element(name="complexType")
+    groups: Array[Group] = array_element(name="group")
+    attribute_groups: Array[AttributeGroup] = array_element(name="attributeGroup")
 
 
 @dataclass
@@ -1155,19 +1145,33 @@ class Override(AnnotationBase):
     </override>
     """
 
-    schema_location: Optional[str] = attribute(default=None)
-    simple_types: ArrayList[SimpleType] = element(
-        default_factory=list, name="simpleType"
-    )
-    complex_types: ArrayList[ComplexType] = element(
-        default_factory=list, name="complexType"
-    )
-    groups: ArrayList[Group] = element(default_factory=list, name="group")
-    attribute_groups: ArrayList[AttributeGroup] = element(
-        default_factory=list, name="attributeGroup"
-    )
-    elements: ArrayList[Element] = element(default_factory=list, name="element")
-    attributes: ArrayList[Attribute] = element(default_factory=list, name="attribute")
+    schema_location: Optional[str] = attribute()
+    simple_types: Array[SimpleType] = array_element(name="simpleType")
+    complex_types: Array[ComplexType] = array_element(name="complexType")
+    groups: Array[Group] = array_element(name="group")
+    attribute_groups: Array[AttributeGroup] = array_element(name="attributeGroup")
+    elements: Array[Element] = array_element(name="element")
+    attributes: Array[Attribute] = array_element(name="attribute")
+
+
+@dataclass
+class Alternative(AnnotationBase):
+    """
+    <alternative
+      id = ID
+      test = an XPath expression
+      type = QName
+      xpathDefaultNamespace =
+        (anyURI | (##defaultNamespace | ##targetNamespace | ##local))
+      {any attributes with non-schema namespace . . .}>
+      Content: (annotation?, (simpleType | complexType)?)
+    </alternative>
+    """
+
+    type: Optional[str] = attribute()
+    test: Optional[str] = attribute()
+    simple_type: Optional[SimpleType] = element(default=None)
+    complex_type: Optional[ComplexType] = element(default=None)
 
 
 @dataclass
@@ -1197,38 +1201,28 @@ class Schema(AnnotationBase):
     class Meta:
         namespace = Namespace.SCHEMA.uri
 
-    target: Optional[str] = attribute(default=None)
-    block_default: Optional[str] = attribute(default=None)
-    final_default: Optional[str] = attribute(default=None)
-    target_namespace: Optional[str] = attribute(default=None)
-    version: Optional[str] = attribute(default=None)
-    xmlns: Optional[str] = attribute(default=None)
+    target: Optional[str] = attribute()
+    block_default: Optional[str] = attribute()
+    final_default: Optional[str] = attribute()
+    target_namespace: Optional[str] = attribute()
+    version: Optional[str] = attribute()
+    xmlns: Optional[str] = attribute()
     nsmap: Dict = field(default_factory=dict)
     location: Optional[Path] = field(default=None)
     element_form_default: FormType = attribute(default=FormType.UNQUALIFIED)
     attribute_form_default: FormType = attribute(default=FormType.UNQUALIFIED)
-    includes: ArrayList[Include] = element(default_factory=list, name="include")
-    imports: ArrayList[Import] = element(default_factory=list, name="import")
-    redefines: ArrayList[Redefine] = element(default_factory=list, name="redefine")
-    overrides: ArrayList[Override] = element(default_factory=list, name="override")
-    annotations: ArrayList[Annotation] = element(
-        default_factory=list, name="annotation"
-    )
-    simple_types: ArrayList[SimpleType] = element(
-        default_factory=list, name="simpleType"
-    )
-    complex_types: ArrayList[ComplexType] = element(
-        default_factory=list, name="complexType"
-    )
-    groups: ArrayList[Group] = element(default_factory=list, name="group")
-    attribute_groups: ArrayList[AttributeGroup] = element(
-        default_factory=list, name="attributeGroup"
-    )
-    elements: ArrayList[Element] = element(default_factory=list, name="element")
-    attributes: ArrayList[Attribute] = element(default_factory=list, name="attribute")
-    notations: ArrayList[Notation] = element(default_factory=list, name="notation")
-
-    # any_attribute: AnyAttribute = aat(default_factory=list)
+    includes: Array[Include] = array_element(name="include")
+    imports: Array[Import] = array_element(name="import")
+    redefines: Array[Redefine] = array_element(name="redefine")
+    overrides: Array[Override] = array_element(name="override")
+    annotations: Array[Annotation] = array_element(name="annotation")
+    simple_types: Array[SimpleType] = array_element(name="simpleType")
+    complex_types: Array[ComplexType] = array_element(name="complexType")
+    groups: Array[Group] = array_element(name="group")
+    attribute_groups: Array[AttributeGroup] = array_element(name="attributeGroup")
+    elements: Array[Element] = array_element(name="element")
+    attributes: Array[Attribute] = array_element(name="attribute")
+    notations: Array[Notation] = array_element(name="notation")
 
     def sub_schemas(self) -> Iterator[UnionType[Import, Include, Redefine, Override]]:
         for imp in self.imports:

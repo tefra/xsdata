@@ -966,10 +966,33 @@ class Redefine(AnnotationBase):
     """
 
     schema_location: Optional[str] = attribute(default=None)
-    simple_type: Optional[SimpleType] = element(default=None)
-    complex_type: Optional[ComplexType] = element(default=None)
-    group: Optional[Group] = element(default=None)
-    attribute_group: Optional[AttributeGroup] = element(default=None)
+    simple_types: ArrayList[SimpleType] = element(
+        default_factory=list, name="simpleType"
+    )
+    complex_types: ArrayList[ComplexType] = element(
+        default_factory=list, name="complexType"
+    )
+    groups: ArrayList[Group] = element(default_factory=list, name="group")
+    attribute_groups: ArrayList[AttributeGroup] = element(
+        default_factory=list, name="attributeGroup"
+    )
+
+
+@dataclass
+class Override(AnnotationBase):
+    schema_location: Optional[str] = attribute(default=None)
+    simple_types: ArrayList[SimpleType] = element(
+        default_factory=list, name="simpleType"
+    )
+    complex_types: ArrayList[ComplexType] = element(
+        default_factory=list, name="complexType"
+    )
+    groups: ArrayList[Group] = element(default_factory=list, name="group")
+    attribute_groups: ArrayList[AttributeGroup] = element(
+        default_factory=list, name="attributeGroup"
+    )
+    elements: ArrayList[Element] = element(default_factory=list, name="element")
+    attributes: ArrayList[Attribute] = element(default_factory=list, name="attribute")
 
 
 @dataclass
@@ -996,6 +1019,7 @@ class Schema(AnnotationBase):
     includes: ArrayList[Include] = element(default_factory=list, name="include")
     imports: ArrayList[Import] = element(default_factory=list, name="import")
     redefines: ArrayList[Redefine] = element(default_factory=list, name="redefine")
+    overrides: ArrayList[Override] = element(default_factory=list, name="override")
     annotations: ArrayList[Annotation] = element(
         default_factory=list, name="annotation"
     )
@@ -1015,7 +1039,7 @@ class Schema(AnnotationBase):
 
     # any_attribute: AnyAttribute = aat(default_factory=list)
 
-    def sub_schemas(self) -> Iterator[UnionType[Import, Include, Redefine]]:
+    def sub_schemas(self) -> Iterator[UnionType[Import, Include, Redefine, Override]]:
         for imp in self.imports:
             yield imp
 
@@ -1024,6 +1048,9 @@ class Schema(AnnotationBase):
 
         for red in self.redefines:
             yield red
+
+        for over in self.overrides:
+            yield over
 
     @property
     def module(self):

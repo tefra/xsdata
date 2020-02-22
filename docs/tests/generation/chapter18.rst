@@ -38,10 +38,8 @@ Example 18-10.2 Overriding a complex type
    :language: xml
    :lines: 3-
 
-.. warning::
-
-    XML Schema 1.1
-
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter18/example18102.py
+   :language: python
 
 Example 18-11 Overriding element and attribute declarations
 -----------------------------------------------------------
@@ -60,10 +58,8 @@ Example 18-11.2 Overriding element and attribute declarations
    :language: xml
    :lines: 3-
 
-.. warning::
-
-    XML Schema 1.1
-
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter18/example18112.py
+   :language: python
 
 Example 18-12 Overriding named groups
 -------------------------------------
@@ -86,7 +82,7 @@ Example 18-12.2 Overriding named groups
 
 .. warning::
 
-    XML Schema 1.1
+    Illegal definition
 
 
 Example 18-13 Risks of overriding types
@@ -106,10 +102,8 @@ Example 18-13.2 Risks of overriding types
    :language: xml
    :lines: 3-
 
-.. warning::
-
-    XML Schema 1.1
-
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter18/example18132.py
+   :language: python
 
 Example 18-2 Redefining a simple type
 -------------------------------------
@@ -264,10 +258,8 @@ Example 18-8.2 A simple override
    :language: xml
    :lines: 3-
 
-.. warning::
-
-    XML Schema 1.1
-
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter18/example18082.py
+   :language: python
 
 Example 18-9 Overriding a simple type
 -------------------------------------
@@ -286,10 +278,8 @@ Example 18-9.2 Overriding a simple type
    :language: xml
    :lines: 3-
 
-.. warning::
-
-    XML Schema 1.1
-
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter18/example18092.py
+   :language: python
 
 .. admonition:: Samples Source
     :class: hint

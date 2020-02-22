@@ -19,6 +19,7 @@ class AttrType:
     alias: Optional[str] = field(default=None)
     native: bool = field(default=False)
     forward_ref: bool = field(default=False)
+    self_ref: bool = field(default=False)
 
     @property
     def native_name(self) -> Optional[str]:

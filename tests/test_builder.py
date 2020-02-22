@@ -16,6 +16,7 @@ from xsdata.models.elements import Element
 from xsdata.models.elements import Enumeration
 from xsdata.models.elements import Extension
 from xsdata.models.elements import Group
+from xsdata.models.elements import Override
 from xsdata.models.elements import Redefine
 from xsdata.models.elements import Restriction
 from xsdata.models.elements import Schema
@@ -34,27 +35,20 @@ class ClassBuilderTests(FactoryTestCase):
         self.schema = Schema.create()
         self.builder = ClassBuilder(schema=self.schema)
 
-    def test_post_init_with_redefine_appends_elements_to_schema(self):
+    @patch.object(Redefine, "children")
+    @patch.object(Override, "children")
+    @patch.object(ClassBuilder, "build_class")
+    def test_build(
+        self, mock_build_class, mock_override_children, mock_redefine_children
+    ):
         redefine = Redefine.create(
             simple_type=SimpleType.create(),
             complex_type=ComplexType.create(),
             group=Group.create(),
             attribute_group=AttributeGroup.create(),
         )
-        self.schema.simple_types.append(SimpleType.create())
-        self.schema.complex_types.append(ComplexType.create())
-        self.schema.groups.append(Group.create())
-        self.schema.attribute_groups.append(AttributeGroup.create())
+        self.builder = ClassBuilder(schema=self.schema, redefine=redefine)
 
-        ClassBuilder(schema=self.schema, redefine=redefine)
-
-        self.assertEqual(redefine.simple_type, self.schema.simple_types[1])
-        self.assertEqual(redefine.complex_type, self.schema.complex_types[1])
-        self.assertEqual(redefine.group, self.schema.groups[1])
-        self.assertEqual(redefine.attribute_group, self.schema.attribute_groups[1])
-
-    @patch.object(ClassBuilder, "build_class")
-    def test_build(self, mock_build_class):
         for _ in range(2):
             self.schema.simple_types.append(SimpleType.create())
             self.schema.attribute_groups.append(AttributeGroup.create())
@@ -65,12 +59,30 @@ class ClassBuilderTests(FactoryTestCase):
             self.schema.redefines.append(
                 Redefine.create(complex_type=ComplexType.create())
             )
+            self.schema.overrides.append(Override.create())
 
-        mock_build_class.side_effect = classes = ClassFactory.list(12)
+        override_element = Element.create()
+        override_attribute = Attribute.create()
+        override_complex_type = ComplexType.create()
+        redefine_simple_type = SimpleType.create()
+        redefine_attribute_group = AttributeGroup.create()
+        mock_redefine_children.return_value = [
+            redefine_simple_type,
+            redefine_attribute_group,
+        ]
+
+        mock_override_children.side_effect = [
+            [override_element, override_attribute],
+            [override_complex_type],
+        ]
+        mock_build_class.side_effect = classes = ClassFactory.list(17)
 
         self.assertEqual(classes, self.builder.build())
         mock_build_class.assert_has_calls(
             [
+                call(override_element),
+                call(override_attribute),
+                call(override_complex_type),
                 call(self.schema.simple_types[0]),
                 call(self.schema.simple_types[1]),
                 call(self.schema.attribute_groups[0]),
@@ -83,6 +95,8 @@ class ClassBuilderTests(FactoryTestCase):
                 call(self.schema.complex_types[1]),
                 call(self.schema.elements[0]),
                 call(self.schema.elements[1]),
+                call(redefine_simple_type),
+                call(redefine_attribute_group),
             ]
         )
 

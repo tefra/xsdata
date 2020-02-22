@@ -9,11 +9,14 @@ from xsdata.builder import ClassBuilder
 from xsdata.logger import logger
 from xsdata.models.elements import Import
 from xsdata.models.elements import Include
+from xsdata.models.elements import Override
 from xsdata.models.elements import Redefine
 from xsdata.models.enums import Namespace
 from xsdata.parser import SchemaParser
 from xsdata.reducer import reducer
 from xsdata.writer import writer
+
+SchemaLocator = Union[Import, Include, Redefine, Override]
 
 
 @dataclass
@@ -55,7 +58,7 @@ class ProcessTask:
 
     def process_import(
         self,
-        schema: Union[Import, Include, Redefine],
+        schema: SchemaLocator,
         path: Path,
         package: str,
         target_namespace: Optional[str],
@@ -79,9 +82,7 @@ class ProcessTask:
         )
 
     @staticmethod
-    def resolve_local_schema(
-        schema: Union[Import, Include, Redefine]
-    ) -> Optional[Path]:
+    def resolve_local_schema(schema: SchemaLocator) -> Optional[Path]:
         try:
             namespace = Namespace(schema.namespace)  # type: ignore
             path = (
@@ -95,13 +96,13 @@ class ProcessTask:
             return None
 
     @staticmethod
-    def resolve_schema(xsd: Path, schema: Union[Import, Include, Redefine]) -> Path:
+    def resolve_schema(xsd: Path, schema: SchemaLocator) -> Path:
         assert schema.schema_location is not None
 
         return xsd.parent.joinpath(schema.schema_location).resolve()
 
     @staticmethod
-    def adjust_package(package: str, schema: Union[Import, Include, Redefine]) -> str:
+    def adjust_package(package: str, schema: SchemaLocator) -> str:
         assert schema.schema_location is not None
 
         pp = package.split(".")

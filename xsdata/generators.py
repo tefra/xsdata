@@ -172,6 +172,8 @@ class PythonAbstractGenerator(AbstractGenerator, ABC):
             if attr_type.forward_ref:
                 outer_str = ".".join(parents)
                 type_name = f'"{outer_str}.{type_name}"'
+            elif attr_type.self_ref:
+                type_name = f'"{type_name}"'
 
             if type_name not in type_names:
                 type_names.append(type_name)

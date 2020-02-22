@@ -40,29 +40,23 @@ class ClassBuilder:
     redefine: Optional[Redefine] = field(default=None)
     target_prefix: Optional[str] = field(init=False)
 
-    def __post_init__(self):
-        """Append redefine element to the appropriate schema list of
-        elements."""
-        if not self.redefine:
-            return
-        if self.redefine.simple_type:
-            self.schema.simple_types.append(self.redefine.simple_type)
-        if self.redefine.complex_type:
-            self.schema.complex_types.append(self.redefine.complex_type)
-        if self.redefine.group:
-            self.schema.groups.append(self.redefine.group)
-        if self.redefine.attribute_group:
-            self.schema.attribute_groups.append(self.redefine.attribute_group)
-
     def build(self) -> List[Class]:
-        """Generate classes from schema elements."""
+        """Generate classes from schema and redefined elements."""
         classes: List[Class] = []
+
+        for override in self.schema.overrides:
+            classes.extend(map(self.build_class, override.children()))
+
         classes.extend(map(self.build_class, self.schema.simple_types))
         classes.extend(map(self.build_class, self.schema.attribute_groups))
         classes.extend(map(self.build_class, self.schema.groups))
         classes.extend(map(self.build_class, self.schema.attributes))
         classes.extend(map(self.build_class, self.schema.complex_types))
         classes.extend(map(self.build_class, self.schema.elements))
+
+        if self.redefine:
+            classes.extend(map(self.build_class, self.redefine.children()))
+
         return classes
 
     def build_class(self, obj: BaseElement) -> Class:
@@ -113,16 +107,23 @@ class ClassBuilder:
     ) -> AttrType:
         prefix, suffix = text.split(name)
         native = False
+        self_ref = False
         namespace = self.schema.nsmap.get(prefix)
 
         if prefix == Namespace.XML.prefix or namespace == Namespace.SCHEMA.uri:
             name = suffix
             native = True
-        elif prefix and namespace == self.schema.target_namespace:
+        elif namespace == self.schema.target_namespace:
             if suffix == instance.name:
-                forward_ref = True
+                self_ref = True
 
-        return AttrType(name=name, index=index, native=native, forward_ref=forward_ref)
+        return AttrType(
+            name=name,
+            index=index,
+            native=native,
+            forward_ref=forward_ref,
+            self_ref=self_ref,
+        )
 
     def element_children(self, obj: ElementBase) -> Iterator[AttributeElement]:
         """Recursively find and return all child elements that are qualified to

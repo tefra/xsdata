@@ -140,6 +140,8 @@ class XmlSerializer(AbstractSerializer, ModelInspect):
                 elif var.is_any_element:
                     self.set_any_children(parent, value, namespaces)
                 elif var.is_text:
+                    if is_dataclass(value):
+                        raise ValueError("Text nodes can't be dataclasses!")
                     self.set_text(parent, value)
                 else:
                     self.set_children(parent, value, var, namespaces)

@@ -1,12 +1,17 @@
-from enum import Enum
+from dataclasses import dataclass, field
+from typing import Optional
 
 
-class AvailableSizesType(Enum):
+@dataclass
+class AvailableSizesType:
     """
-    :cvar SMALL:
-    :cvar MEDIUM:
-    :cvar LARGE:
+    :ivar value:
     """
-    SMALL = "small"
-    MEDIUM = "medium"
-    LARGE = "large"
+    value: Optional[str] = field(
+        default=None,
+        metadata=dict(
+            name="value",
+            type="Restriction",
+            max_length=3.0
+        )
+    )

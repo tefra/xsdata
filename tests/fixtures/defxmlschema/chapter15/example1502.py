@@ -56,6 +56,7 @@ class DescriptionGroup:
         metadata=dict(
             name="comment",
             type="Element",
-            namespace=""
+            namespace="",
+            required=True
         )
     )

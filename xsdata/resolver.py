@@ -152,7 +152,7 @@ class DependenciesResolver:
                 ]
             )
 
-        deps.update(ext.name for ext in obj.extensions if not ext.native)
+        deps.update(ext.type.name for ext in obj.extensions if not ext.type.native)
         for inner in obj.inner:
             deps.update(self.collect_deps(inner, prefix))
 

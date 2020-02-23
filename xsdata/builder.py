@@ -9,6 +9,8 @@ from xsdata.logger import logger
 from xsdata.models.codegen import Attr
 from xsdata.models.codegen import AttrType
 from xsdata.models.codegen import Class
+from xsdata.models.codegen import Extension
+from xsdata.models.codegen import Restrictions
 from xsdata.models.elements import Attribute
 from xsdata.models.elements import AttributeGroup
 from xsdata.models.elements import ComplexType
@@ -93,14 +95,14 @@ class ClassBuilder:
         extensions = dict()
         if getattr(obj, "type", None):
             name = getattr(obj, "type", None)
-            extension = self.build_data_type(instance, name, index=0)
-            extensions[extension.name] = extension
+            extension = self.build_class_extension(instance, name, 0, dict())
+            extensions[name] = extension
 
         for extension in self.children_extensions(obj, instance):
             extension.forward_ref = False
-            extensions[extension.name] = extension
+            extensions[extension.type.name] = extension
 
-        instance.extensions = sorted(extensions.values(), key=lambda x: x.name)
+        instance.extensions = sorted(extensions.values(), key=lambda x: x.type.name)
 
     def build_data_type(
         self, instance: Class, name: str, index: int = 0, forward_ref: bool = False
@@ -157,7 +159,7 @@ class ClassBuilder:
 
     def children_extensions(
         self, obj: ElementBase, instance: Class
-    ) -> Iterator[AttrType]:
+    ) -> Iterator[Extension]:
         """
         Recursively find and return all instance's Extension classes.
 
@@ -169,9 +171,17 @@ class ClassBuilder:
                 continue
 
             for ext in child.extensions:
-                yield self.build_data_type(instance, ext, index=child.index)
+                yield self.build_class_extension(
+                    instance, ext, child.index, child.get_restrictions()
+                )
 
             yield from self.children_extensions(child, instance)
+
+    def build_class_extension(self, instance, name, index, restrictions):
+        return Extension(
+            type=self.build_data_type(instance, name, index=index),
+            restrictions=Restrictions(**restrictions),
+        )
 
     def build_class_attribute(self, instance: Class, obj: AttributeElement):
         """
@@ -180,6 +190,7 @@ class ClassBuilder:
         :raise ValueError:  if types list is empty
         """
         types = self.build_class_attribute_types(instance, obj)
+        restrictions = Restrictions(**obj.get_restrictions())
         instance.attrs.append(
             Attr(
                 index=obj.index,
@@ -190,7 +201,7 @@ class ClassBuilder:
                 local_type=obj.class_name,
                 help=obj.display_help,
                 namespace=self.element_namespace(obj),
-                **obj.get_restrictions(),
+                restrictions=restrictions,
             )
         )
 
@@ -272,13 +283,16 @@ class ClassBuilder:
     @staticmethod
     def default_class_attribute(instance: Class) -> Optional[Attr]:
         types = []
+        restrictions = Restrictions()
         if len(instance.extensions) == 0 and len(instance.attrs) == 0:
             types.append(AttrType(name=DataType.STRING.code, native=True))
             logger.warning(f"Empty class: `{instance.name}`")
         elif not instance.is_enumeration:
             for i in range(len(instance.extensions) - 1, -1, -1):
-                if instance.extensions[i].native:
-                    types.insert(0, instance.extensions.pop(i))
+                if instance.extensions[i].type.native:
+                    extension = instance.extensions.pop(i)
+                    types.insert(0, extension.type)
+                    restrictions.update(extension.restrictions)
 
         if types:
             return Attr(
@@ -287,5 +301,6 @@ class ClassBuilder:
                 default=None,
                 types=types,
                 local_type=TagType.EXTENSION,
+                restrictions=restrictions,
             )
         return None

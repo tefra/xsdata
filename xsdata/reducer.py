@@ -11,10 +11,15 @@ from xsdata.logger import logger
 from xsdata.models.codegen import Attr
 from xsdata.models.codegen import AttrType
 from xsdata.models.codegen import Class
+from xsdata.models.codegen import Extension
 from xsdata.models.elements import Schema
 from xsdata.models.enums import DataType
 from xsdata.models.enums import TagType
 from xsdata.utils import text
+
+
+def simple_type(item: Class):
+    return item.is_enumeration or item.is_abstract or item.is_common
 
 
 @dataclass
@@ -22,9 +27,12 @@ class ClassReducer:
     """The purpose of this class is to minimize the number of generated classes
     because of excess verbosity in the given xsd schema and duplicate types."""
 
+    schema: Schema = field(init=False)
     common_types: Dict[str, Class] = field(default_factory=dict)
     processed: Dict = field(default_factory=dict)
-    class_index: Dict = field(default_factory=lambda: defaultdict(list))
+    class_index: Dict[str, List[Class]] = field(
+        default_factory=lambda: defaultdict(list)
+    )
 
     def process(self, schema: Schema, classes: List[Class]) -> List[Class]:
         """
@@ -37,23 +45,25 @@ class ClassReducer:
             * Store common types and return the rest
         """
 
+        self.schema = schema
+
         self.merge_classes(classes)
 
-        self.index_classes(classes, schema)
+        self.index_classes(classes)
 
-        self.flatten_classes(classes, schema)
+        self.flatten_classes(classes)
 
-        remaining = self.store_common_types(classes, schema)
+        remaining = self.store_common_types(classes)
 
         return remaining
 
-    def store_common_types(self, classes: List[Class], schema: Schema) -> List[Class]:
+    def store_common_types(self, classes: List[Class]) -> List[Class]:
         result = []
         for item in classes:
             should_store = item.is_common or item.is_abstract
 
             if should_store:
-                qname = self.qname(item.name, schema)
+                qname = self.qname(item.name)
                 self.common_types[qname] = item
 
             if not should_store or item.is_enumeration:
@@ -61,43 +71,44 @@ class ClassReducer:
 
         return result
 
-    def index_classes(self, classes: List[Class], schema: Schema):
+    def index_classes(self, classes: List[Class]):
         self.class_index.clear()
         self.processed.clear()
         for item in classes:
-            qname = self.qname(item.name, schema)
+            qname = self.qname(item.name)
             self.class_index[qname].append(item)
 
-    def flatten_classes(self, classes: List[Class], schema: Schema):
+    def flatten_classes(self, classes: List[Class]):
         for obj in classes:
             if obj.key not in self.processed:
-                self.processed[obj.key] = True
-                self.flatten_class(obj, schema)
+                self.flatten_class(obj)
 
-    def find_common_type(self, name: str, schema: Schema) -> Optional[Class]:
-        """Find a common type by the qualified named with the prefixed
-        namespace if exists or the target namespace."""
+    def find_class(
+        self, dependency: AttrType, condition=simple_type
+    ) -> Optional[Class]:
+        qname = self.qname(dependency.name)
+        item = self.find_schema_class(qname, condition=condition)
+        return item or self.find_common_class(qname, condition=condition)
 
-        qname = self.qname(name, schema)
-        common = None
-        candidates = self.class_index.get(qname)
+    def find_common_class(self, qname: str, condition=None):
+        if qname in self.common_types:
+            candidate = self.common_types[qname]
+            return candidate if not condition or condition(candidate) else None
+        else:
+            return None
 
+    def find_schema_class(self, qname: str, condition=None) -> Optional[Class]:
+        candidates = list(filter(condition, self.class_index.get(qname, [])))
         if candidates:
-            common = next(
-                (
-                    item
-                    for item in candidates
-                    if item.is_common or item.is_abstract or item.is_enumeration
-                ),
-                None,
-            )
+            candidate = candidates.pop(0)
+            if candidates:
+                logger.warning("More than one candidate found for %s", qname)
 
-        common = common or self.common_types.get(qname)
+            if candidate.key not in self.processed:
+                self.flatten_class(candidate)
+            return candidate
 
-        if common and common.key not in self.processed:
-            self.flatten_class(common, schema)
-
-        return common
+        return None
 
     def merge_classes(self, classes: List[Class]):
         """Merge original and redefined classes."""
@@ -125,19 +136,17 @@ class ClassReducer:
                 ):
                     restrictions = looser.attrs[i].restrictions
                     attr.types = looser.attrs[i].types
-                    for key, value in restrictions.items():
-                        if getattr(attr, key) is None:
-                            setattr(attr, key, value)
+                    attr.restrictions.update(restrictions)
 
             for i in range(len(winner.extensions) - 1, -1, -1):
                 extension = winner.extensions[i]
-                if extension.name == winner.name or extension.name.endswith(
+                if extension.type.name == winner.name or extension.type.name.endswith(
                     f":{winner.name}"
                 ):
                     winner.extensions.pop(i)
                     self.copy_attributes(looser, winner, extension)
 
-    def flatten_class(self, item: Class, schema: Schema):
+    def flatten_class(self, item: Class):
         """
         Flatten class traits from the common types registry.
 
@@ -147,20 +156,21 @@ class ClassReducer:
             * Attributes
             * Inner classes
         """
+        self.processed[item.key] = True
 
         if item.is_common:
-            self.flatten_enumeration_unions(item, schema)
+            self.flatten_enumeration_unions(item)
 
         for extension in list(item.extensions):
-            self.flatten_extension(item, extension, schema)
+            self.flatten_extension(item, extension)
 
-        for attr in item.attrs:
-            self.flatten_attribute(item, attr, schema)
+        for attr in list(item.attrs):
+            self.flatten_attribute(item, attr)
 
         for inner in item.inner:
-            self.flatten_class(inner, schema)
+            self.flatten_class(inner)
 
-    def flatten_enumeration_unions(self, item: Class, schema: Schema):
+    def flatten_enumeration_unions(self, item: Class):
 
         if len(item.attrs) == 1 and item.attrs[0].name == "value":
             all_enums = True
@@ -173,7 +183,7 @@ class ClassReducer:
                         attrs.extend(item.inner[0].attrs)
 
                 elif not attr_type.forward_ref and not attr_type.native:
-                    common = self.find_common_type(attr_type.name, schema)
+                    common = self.find_class(attr_type)
                     if common is not None and common.is_enumeration:
                         is_enumeration = True
                         attrs.extend(common.attrs)
@@ -184,7 +194,7 @@ class ClassReducer:
             if all_enums:
                 item.attrs = attrs
 
-    def flatten_extension(self, item: Class, extension: AttrType, schema: Schema):
+    def flatten_extension(self, item: Class, extension: Extension):
         """
         If the extension class is found in the registry prepend it's attributes
         to the given class.
@@ -193,10 +203,10 @@ class ClassReducer:
         prepended with the extension prefix if it isn't a reference to
         another schema.
         """
-        if extension.native:
+        if extension.type.native:
             return
 
-        common = self.find_common_type(extension.name, schema)
+        common = self.find_class(extension.type)
         if common is None:
             return
         elif common is item:
@@ -208,7 +218,7 @@ class ClassReducer:
 
         item.extensions.remove(extension)
 
-    def flatten_attribute(self, item: Class, attr: Attr, schema: Schema):
+    def flatten_attribute(self, item: Class, attr: Attr):
         """
         If the attribute type is found in the registry overwrite the given
         attribute type and merge the restrictions.
@@ -220,51 +230,46 @@ class ClassReducer:
         for attr_type in attr.types:
             common = None
             if not attr_type.native:
-                common = self.find_common_type(attr_type.name, schema)
+                common = self.find_class(attr_type)
 
-            restrictions = {}
             if common is None or common.is_enumeration:
                 types.append(attr_type)
             elif len(common.attrs) == 1:
                 common_attr = common.attrs[0]
                 types.extend(common_attr.types)
-                restrictions = common_attr.restrictions
+                attr.restrictions.update(common_attr.restrictions)
                 self.copy_inner_classes(common, item)
             else:
                 types.append(AttrType(name=DataType.STRING.code, native=True))
                 logger.warning("Missing type implementation: %s", common.type.__name__)
 
-            for key, value in restrictions.items():
-                if getattr(attr, key) is None:
-                    setattr(attr, key, value)
-
         attr.types = types
 
-    @staticmethod
-    def qname(name: str, schema: Schema) -> str:
+    def qname(self, name: str) -> str:
         prefix, suffix = text.split(name)
-        namespace = schema.target_namespace
+        namespace = self.schema.target_namespace
 
         if prefix:
             name = suffix
-            namespace = schema.nsmap.get(prefix)
+            namespace = self.schema.nsmap.get(prefix)
 
         return etree.QName(namespace, name).text
 
     @staticmethod
-    def copy_attributes(source: Class, target: Class, extension: AttrType):
-        prefix = text.prefix(extension.name)
+    def copy_attributes(source: Class, target: Class, extension: Extension):
+        prefix = text.prefix(extension.type.name)
         target.inner.extend(source.inner)
         position = next(
             (
                 index
                 for index, attr in enumerate(target.attrs)
-                if attr.index > extension.index
+                if attr.index > extension.type.index
             ),
             0,
         )
         for attr in source.attrs:
             new_attr = attr.clone()
+            new_attr.restrictions.update(extension.restrictions, force=True)
             if prefix:
                 for attr_type in new_attr.types:
                     if not attr_type.native and attr_type.name.find(":") == -1:
@@ -283,14 +288,15 @@ class ClassReducer:
                 target.inner.append(inner)
 
     @staticmethod
-    def create_default_attribute(item: Class, extension: AttrType):
+    def create_default_attribute(item: Class, extension: Extension):
         item.attrs.append(
             Attr(
                 name="value",
                 index=0,
                 default=None,
-                types=[extension],
+                types=[extension.type.clone()],
                 local_type=TagType.EXTENSION,
+                restrictions=extension.restrictions.clone(),
             )
         )
 

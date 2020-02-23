@@ -117,7 +117,7 @@ class AnnotationBase(ElementBase):
 
 
 @dataclass
-class AnyAttribute(AnnotationBase, NamedField, RestrictedField):
+class AnyAttribute(AnnotationBase, NamedField):
     """
     <anyAttribute
       id = ID
@@ -166,7 +166,7 @@ class Assertion(AnnotationBase):
 
 
 @dataclass
-class SimpleType(AnnotationBase, NamedField, RestrictedField):
+class SimpleType(AnnotationBase, NamedField):
     """
     <simpleType
       final = (#all | List of (list | union | restriction | extension))
@@ -210,7 +210,7 @@ class SimpleType(AnnotationBase, NamedField, RestrictedField):
 
 
 @dataclass
-class List(AnnotationBase, RestrictedField, NamedField):
+class List(AnnotationBase, NamedField):
     """
     <list
       id = ID
@@ -240,7 +240,7 @@ class List(AnnotationBase, RestrictedField, NamedField):
 
 
 @dataclass
-class Union(AnnotationBase, NamedField, RestrictedField):
+class Union(AnnotationBase, NamedField):
     """
     <union
       id = ID
@@ -291,7 +291,7 @@ class Union(AnnotationBase, NamedField, RestrictedField):
 
 
 @dataclass
-class Attribute(AnnotationBase, NamedField, RestrictedField):
+class Attribute(AnnotationBase, NamedField):
     """
     <attribute
       default = string
@@ -344,7 +344,7 @@ class Attribute(AnnotationBase, NamedField, RestrictedField):
 
 
 @dataclass
-class AttributeGroup(AnnotationBase, NamedField):
+class AttributeGroup(AnnotationBase, NamedField, RestrictedField):
     """
     <attributeGroup
       id = ID
@@ -366,6 +366,9 @@ class AttributeGroup(AnnotationBase, NamedField):
     @property
     def real_type(self) -> Optional[str]:
         return None
+
+    def get_restrictions(self):
+        return dict()
 
 
 @dataclass
@@ -514,9 +517,12 @@ class Extension(AnnotationBase):
     def extends(self) -> Optional[str]:
         return self.base
 
+    def get_restrictions(self) -> Dict[str, Any]:
+        return dict()
+
 
 @dataclass
-class Enumeration(AnnotationBase, NamedField, RestrictedField):
+class Enumeration(AnnotationBase, NamedField):
     """
     <enumeration
       id = ID
@@ -758,16 +764,6 @@ class Restriction(RestrictedField, AnnotationBase, NamedField):
         "pattern",
         "explicit_timezone",
     )
-    CONTAINER_FIELDS = (
-        "group",
-        "all",
-        "choice",
-        "sequence",
-        "any_attribute",
-        "attributes",
-        "attribute_groups",
-        "enumerations",
-    )
 
     base: Optional[str] = attribute()
     group: Optional[Group] = element()
@@ -794,13 +790,6 @@ class Restriction(RestrictedField, AnnotationBase, NamedField):
     pattern: Optional[Pattern] = element()
     explicit_timezone: Optional[ExplicitTimezone] = element()
     simple_type: Optional[SimpleType] = element()
-
-    @property
-    def is_attribute(self) -> bool:
-        for key in self.CONTAINER_FIELDS:
-            if getattr(self, key):
-                return False
-        return True
 
     @property
     def real_type(self) -> Optional[str]:

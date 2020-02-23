@@ -82,7 +82,7 @@ Example 8-16 Illegal attempt to extend a pattern
 
 .. warning::
 
-    Illegal definition
+    Should fail
 
 
 Example 8-17 Simple type assertion
@@ -188,7 +188,7 @@ Example 8-6 Illegal attempt to extend a simple type
 
 .. warning::
 
-    Illegal definition
+    Should fail
 
 
 Example 8-7 Fixed facets

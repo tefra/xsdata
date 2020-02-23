@@ -11,7 +11,7 @@ class MediumDressSizeType:
         default=None,
         metadata=dict(
             name="value",
-            type="Restriction",
+            type="Extension",
             min_inclusive=8.0,
             max_inclusive=12.0,
             pattern=r"\d{1,2}"

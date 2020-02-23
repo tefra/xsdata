@@ -6,8 +6,10 @@ from unittest.mock import PropertyMock
 from tests.factories import AttrFactory
 from tests.factories import AttrTypeFactory
 from tests.factories import ClassFactory
+from tests.factories import ExtensionFactory
 from tests.factories import FactoryTestCase
 from xsdata.builder import ClassBuilder
+from xsdata.models.codegen import Restrictions
 from xsdata.models.elements import Attribute
 from xsdata.models.elements import AttributeGroup
 from xsdata.models.elements import ComplexContent
@@ -192,9 +194,11 @@ class ClassBuilderTests(FactoryTestCase):
 
     @patch.object(ClassBuilder, "children_extensions")
     def test_build_class_extensions(self, mock_children_extensions):
-        bar = AttrTypeFactory.create(name="bar", index=3)
-        double = AttrTypeFactory.create(name="bar", index=2)
-        foo = AttrTypeFactory.create(name="foo", index=1)
+        bar = ExtensionFactory.create(type=AttrTypeFactory.create(name="bar", index=3))
+        double = ExtensionFactory.create(
+            type=AttrTypeFactory.create(name="bar", index=2)
+        )
+        foo = ExtensionFactory.create(type=AttrTypeFactory.create(name="foo", index=1))
 
         mock_children_extensions.return_value = [bar, double, foo]
 
@@ -203,7 +207,7 @@ class ClassBuilderTests(FactoryTestCase):
         self.builder.build_class_extensions(element, item)
 
         expected = ["bar", "foo", "something"]
-        self.assertEqual(expected, [ext.name for ext in item.extensions])
+        self.assertEqual(expected, [ext.type.name for ext in item.extensions])
 
     def test_element_children(self):
         complex_type = ComplexType.create(
@@ -219,7 +223,6 @@ class ClassBuilderTests(FactoryTestCase):
 
         children = self.builder.element_children(complex_type)
         expected = [
-            complex_type.simple_content.restriction,
             complex_type.complex_content.restriction.enumerations[0],
             complex_type.complex_content.restriction.enumerations[1],
             complex_type.complex_content.restriction.enumerations[2],
@@ -237,13 +240,10 @@ class ClassBuilderTests(FactoryTestCase):
             attributes=[Attribute.create(index=i) for i in range(2)],
             sequence=Sequence.create(
                 groups=[
-                    Group.create(ref="a", index=3),
-                    Group.create(ref="bk:b", index=4),
-                    Group.create(ref="c", index=5),
+                    Group.create(ref="a", index=3, min_occurs=0),
+                    Group.create(ref="bk:b", index=4, min_occurs=0),
+                    Group.create(ref="c", index=5, min_occurs=0),
                 ]
-            ),
-            simple_content=SimpleContent.create(
-                restriction=Restriction.create(base="isAttribute")
             ),
             complex_content=ComplexContent.create(
                 extension=Extension.create(base="bk:ext", index=7)
@@ -252,12 +252,17 @@ class ClassBuilderTests(FactoryTestCase):
 
         item = ClassFactory.create()
         children = self.builder.children_extensions(complex_type, item)
-        expected = [
-            AttrTypeFactory.create(name="bk:ext", index=7),
-            AttrTypeFactory.create(name="a", index=3),
-            AttrTypeFactory.create(name="bk:b", index=4),
-            AttrTypeFactory.create(name="c", index=5),
-        ]
+        expected = list(
+            map(
+                ExtensionFactory.create,
+                [
+                    AttrTypeFactory.create(name="bk:ext", index=7),
+                    AttrTypeFactory.create(name="a", index=3),
+                    AttrTypeFactory.create(name="bk:b", index=4),
+                    AttrTypeFactory.create(name="c", index=5),
+                ],
+            )
+        )
 
         self.assertIsInstance(children, GeneratorType)
         self.assertEqual(expected, list(children))
@@ -306,7 +311,7 @@ class ClassBuilderTests(FactoryTestCase):
             default=mock_default_value.return_value,
             fixed=mock_is_fixed.return_value,
             index=66,
-            **mock_get_restrictions.return_value,
+            restrictions=Restrictions(required=True),
         )
         self.assertEqual(expected, item.attrs[0])
         mock_build_class_attribute_types.assert_called_once_with(item, attribute)
@@ -485,12 +490,15 @@ class ClassBuilderTests(FactoryTestCase):
 
         self.assertEqual(expected, ClassBuilder.default_class_attribute(item))
 
-        item = ClassFactory.create(extensions=AttrTypeFactory.list(1))
+        item = ClassFactory.create(extensions=ExtensionFactory.list(1))
         self.assertIsNone(ClassBuilder.default_class_attribute(item))
 
         type_int = AttrTypeFactory.create(name=DataType.INT.code, native=True)
         type_bool = AttrTypeFactory.create(name=DataType.BOOLEAN.code, native=True)
-        item = ClassFactory.create(extensions=[type_int, type_bool])
+
+        extensions = list(map(ExtensionFactory.create, [type_int, type_bool]))
+
+        item = ClassFactory.create(extensions=extensions)
         expected = AttrFactory.create(
             name="value",
             index=0,

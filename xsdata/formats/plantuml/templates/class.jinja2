@@ -4,7 +4,7 @@ class {{ obj.name }} {
 {%- endfor %}
 }
 {%- for ext in obj.extensions %}
-{{ obj.name }} *- {{ ext.name }}
+{{ obj.name }} *- {{ ext.type.name }}
 {%- endfor %}
 {%- for inner in obj.inner %}
 {{ obj.name }} +-- {{ inner.name }}

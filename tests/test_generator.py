@@ -3,6 +3,7 @@ from unittest import mock
 from tests.factories import AttrFactory
 from tests.factories import AttrTypeFactory
 from tests.factories import ClassFactory
+from tests.factories import ExtensionFactory
 from tests.factories import FactoryTestCase
 from tests.factories import PackageFactory
 from xsdata.generators import PythonAbstractGenerator as generator
@@ -87,12 +88,12 @@ class PythonAbstractGeneratorTests(FactoryTestCase):
 
     @mock.patch.object(generator, "type_name", return_value="oof")
     def test_process_extension(self, mock_type_name):
-        extension = AttrTypeFactory.create(name="foobar")
+        extension = ExtensionFactory.create(type=AttrTypeFactory.create(name="foobar"))
         generator.process_extension(extension)
 
-        mock_type_name.assert_called_once_with(extension)
+        mock_type_name.assert_called_once_with(extension.type)
 
-        self.assertEqual("oof", extension.name)
+        self.assertEqual("oof", extension.type.name)
 
     @mock.patch("xsdata.utils.text.split", return_value=[None, "nope"])
     @mock.patch.object(generator, "attribute_default", return_value="life")
@@ -123,7 +124,9 @@ class PythonAbstractGeneratorTests(FactoryTestCase):
     def test_process_enumeration(self, mock_name, mock_default):
         type_bar = AttrTypeFactory.create(name="bar")
         attr = AttrFactory.create(name="foo", types=[type_bar], default="thug")
-        extensions = AttrTypeFactory.list(1, name="xs:int")
+        extensions = ExtensionFactory.list(
+            1, type=AttrTypeFactory.create(name="xs:int")
+        )
         parent = ClassFactory.create(extensions=extensions)
         generator.process_enumeration(attr, parent)
 
@@ -143,13 +146,15 @@ class PythonAbstractGeneratorTests(FactoryTestCase):
         self.assertEqual([type_bar], attr.types)
 
         attr.types = []
-        extensions = AttrTypeFactory.list(2, name="xs:string")
+        extensions = ExtensionFactory.list(
+            2, type=AttrTypeFactory.create(name="xs:string")
+        )
         parent = ClassFactory.create(extensions=extensions)
         generator.process_enumeration(attr, parent)
         self.assertEqual([], attr.types)
 
         attr.types = []
-        extensions = AttrTypeFactory.list(1, name="foo")
+        extensions = ExtensionFactory.list(1, type=AttrTypeFactory.create(name="foo"))
         parent = ClassFactory.create(extensions=extensions)
         generator.process_enumeration(attr, parent)
         self.assertEqual([], attr.types)
@@ -211,7 +216,7 @@ class PythonAbstractGeneratorTests(FactoryTestCase):
         self.assertEqual('Optional["Parent.FooBar"]', actual)
 
         parents = ["A", "Parent"]
-        attr.max_occurs = 2
+        attr.restrictions.max_occurs = 2
         actual = generator.attribute_display_type(attr, parents)
         self.assertEqual('List["A.Parent.FooBar"]', actual)
 
@@ -252,11 +257,11 @@ class PythonAbstractGeneratorTests(FactoryTestCase):
         attr.types[0] = type_bool
         self.assertTrue(generator.attribute_default(attr))
 
-        attr.max_occurs = 2
+        attr.restrictions.max_occurs = 2
         self.assertEqual("list", generator.attribute_default(attr))
 
         attr.default = "1"
-        attr.max_occurs = 1
+        attr.restrictions.max_occurs = 1
         attr.types = [type_bool, type_int, type_float]
         self.assertEqual(1, generator.attribute_default(attr))
 

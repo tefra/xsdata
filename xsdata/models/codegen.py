@@ -1,7 +1,9 @@
 from dataclasses import dataclass
 from dataclasses import field
+from dataclasses import fields
 from dataclasses import replace
 from typing import Any
+from typing import Dict
 from typing import List
 from typing import Optional
 from typing import Type
@@ -10,6 +12,51 @@ from xsdata.models.elements import ComplexType
 from xsdata.models.elements import Element
 from xsdata.models.enums import DataType
 from xsdata.models.enums import TagType
+
+
+@dataclass
+class Restrictions:
+    required: Optional[bool] = field(default=None)
+    min_occurs: Optional[int] = field(default=None)
+    max_occurs: Optional[int] = field(default=None)
+    min_exclusive: Optional[float] = field(default=None)
+    min_inclusive: Optional[float] = field(default=None)
+    min_length: Optional[float] = field(default=None)
+    max_exclusive: Optional[float] = field(default=None)
+    max_inclusive: Optional[float] = field(default=None)
+    max_length: Optional[float] = field(default=None)
+    total_digits: Optional[int] = field(default=None)
+    fraction_digits: Optional[int] = field(default=None)
+    length: Optional[int] = field(default=None)
+    white_space: Optional[str] = field(default=None)
+    pattern: Optional[str] = field(default=None)
+    explicit_timezone: Optional[str] = field(default=None)
+    nillable: Optional[bool] = field(default=None)
+
+    @property
+    def is_list(self):
+        return self.max_occurs and self.max_occurs > 1
+
+    def update(self, source: "Restrictions", force=False):
+        for restriction in fields(self):
+            value = getattr(source, restriction.name)
+            if value is None:
+                continue
+            elif force or getattr(self, restriction.name) is None:
+                setattr(self, restriction.name, value)
+
+        if self.is_list:
+            self.required = None
+
+    def asdict(self) -> Dict:
+        return {
+            restriction.name: getattr(self, restriction.name)
+            for restriction in fields(self)
+            if getattr(self, restriction.name) is not None
+        }
+
+    def clone(self):
+        return replace(self)
 
 
 @dataclass
@@ -52,53 +99,14 @@ class Attr:
     namespace: Optional[str] = field(default=None)
     help: Optional[str] = field(default=None)
     default: Optional[Any] = field(default=None)
-
-    # Restrictions
-    required: Optional[bool] = field(default=None)
-    min_occurs: Optional[int] = field(default=None)
-    max_occurs: Optional[int] = field(default=None)
-    min_exclusive: Optional[float] = field(default=None)
-    min_inclusive: Optional[float] = field(default=None)
-    min_length: Optional[float] = field(default=None)
-    max_exclusive: Optional[float] = field(default=None)
-    max_inclusive: Optional[float] = field(default=None)
-    max_length: Optional[float] = field(default=None)
-    total_digits: Optional[int] = field(default=None)
-    fraction_digits: Optional[int] = field(default=None)
-    length: Optional[int] = field(default=None)
-    white_space: Optional[str] = field(default=None)
-    pattern: Optional[str] = field(default=None)
-    explicit_timezone: Optional[str] = field(default=None)
-    nillable: Optional[bool] = field(default=None)
+    restrictions: Restrictions = field(default_factory=Restrictions)
 
     def __post_init__(self):
         self.local_name = self.name
 
     @property
-    def restrictions(self):
-        result = {
-            "required": self.required,
-            "min_occurs": self.min_occurs,
-            "max_occurs": self.max_occurs,
-            "min_exclusive": self.min_exclusive,
-            "max_exclusive": self.max_exclusive,
-            "min_inclusive": self.min_inclusive,
-            "max_inclusive": self.max_inclusive,
-            "min_length": self.min_length,
-            "max_length": self.max_length,
-            "length": self.length,
-            "fraction_digits": self.fraction_digits,
-            "pattern": self.pattern,
-            "explicit_timezone": self.explicit_timezone,
-            "total_digits": self.total_digits,
-            "white_space": self.white_space,
-            "nillable": self.nillable,
-        }
-        return {k: v for k, v in result.items() if v is not None}
-
-    @property
     def is_list(self):
-        return self.max_occurs and self.max_occurs > 1
+        return self.restrictions.is_list
 
     @property
     def is_map(self) -> bool:
@@ -120,23 +128,24 @@ class Attr:
     def is_attribute(self) -> bool:
         return self.local_type == TagType.ATTRIBUTE
 
-    def clone(self):
-        types = [type.clone() for type in self.types]
-        return replace(self, types=types)
+    def clone(self, **kwargs):
+        return replace(
+            self,
+            types=[type.clone() for type in self.types],
+            restrictions=self.restrictions.clone(),
+            **kwargs,
+        )
 
 
 @dataclass
 class Extension:
-    name: str
-    index: int
-    type: str
-
-    @property
-    def is_restriction(self):
-        return self.type == TagType.RESTRICTION
+    type: AttrType
+    restrictions: Restrictions
 
     def clone(self):
-        return replace(self)
+        return replace(
+            self, type=self.type.clone(), restrictions=self.restrictions.clone()
+        )
 
 
 @dataclass
@@ -148,7 +157,7 @@ class Class:
     namespace: Optional[str] = field(default=None)
     local_name: str = field(init=False)
     help: Optional[str] = field(default=None)
-    extensions: List[AttrType] = field(default_factory=list)
+    extensions: List[Extension] = field(default_factory=list)
     attrs: List[Attr] = field(default_factory=list)
     inner: List["Class"] = field(default_factory=list)
 

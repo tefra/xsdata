@@ -14,7 +14,7 @@ class NewSize:
         default=None,
         metadata=dict(
             name="value",
-            type="Restriction",
+            type="Extension",
             min_inclusive=2.0,
             max_inclusive=18.0
         )

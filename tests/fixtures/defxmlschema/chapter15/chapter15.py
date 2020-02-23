@@ -51,7 +51,8 @@ class ShirtType:
         metadata=dict(
             name="comment",
             type="Element",
-            namespace=""
+            namespace="",
+            required=True
         )
     )
     number: Optional[int] = field(

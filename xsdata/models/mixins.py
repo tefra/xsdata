@@ -52,7 +52,7 @@ class NamedField:
 class RestrictedField(ABC):
     @abstractmethod
     def get_restrictions(self) -> Dict[str, Any]:
-        pass
+        return dict()
 
 
 class OccurrencesMixin:

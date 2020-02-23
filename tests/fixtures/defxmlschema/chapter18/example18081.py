@@ -31,6 +31,6 @@ class Size:
         default=None,
         metadata=dict(
             name="value",
-            type="Restriction"
+            type="Extension"
         )
     )

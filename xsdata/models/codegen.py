@@ -156,6 +156,10 @@ class Class:
         self.local_name = self.name
 
     @property
+    def key(self) -> str:
+        return f"{self.type.__name__}::{self.name}"
+
+    @property
     def is_enumeration(self) -> bool:
         return len(self.attrs) > 0 and self.attrs[0].is_enumeration
 

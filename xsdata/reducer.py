@@ -1,7 +1,6 @@
 from collections import defaultdict
 from dataclasses import dataclass
 from dataclasses import field
-from typing import Callable
 from typing import Dict
 from typing import List
 from typing import Optional
@@ -24,57 +23,83 @@ class ClassReducer:
     because of excess verbosity in the given xsd schema and duplicate types."""
 
     common_types: Dict[str, Class] = field(default_factory=dict)
+    processed: Dict = field(default_factory=dict)
+    class_index: Dict = field(default_factory=lambda: defaultdict(list))
 
     def process(self, schema: Schema, classes: List[Class]) -> List[Class]:
         """
         Process class list in steps.
 
         Steps:
-            * Separate common/enumerations from class list
-            * Add all common/enumerations to registry
-            * Flatten the current common types
-            * Flatten the generation types
-
-        :return: The final list of normalized classes/enumerations
+            * Merge redefined classes
+            * Create a class qname index
+            * Flatten classes
+            * Store common types and return the rest
         """
-        self.flatten_redefines(classes)
 
-        classes, common = self.separate_common_types(classes)
+        self.merge_classes(classes)
 
-        self.add_common_types(common, schema)
+        self.index_classes(classes, schema)
 
-        self.flatten_classes(common, schema)
         self.flatten_classes(classes, schema)
 
-        return [obj for obj in common if obj.is_enumeration] + classes
+        remaining = self.store_common_types(classes, schema)
+
+        return remaining
+
+    def store_common_types(self, classes: List[Class], schema: Schema) -> List[Class]:
+        result = []
+        for item in classes:
+            should_store = item.is_common or item.is_abstract
+
+            if should_store:
+                qname = self.qname(item.name, schema)
+                self.common_types[qname] = item
+
+            if not should_store or item.is_enumeration:
+                result.append(item)
+
+        return result
+
+    def index_classes(self, classes: List[Class], schema: Schema):
+        self.class_index.clear()
+        self.processed.clear()
+        for item in classes:
+            qname = self.qname(item.name, schema)
+            self.class_index[qname].append(item)
 
     def flatten_classes(self, classes: List[Class], schema: Schema):
         for obj in classes:
-            self.flatten_class(obj, schema)
-
-    def add_common_types(self, classes: List[Class], schema: Schema):
-        """Add class to the common types registry with its qualified name with
-        the target namespace."""
-
-        for item in classes:
-            qname = etree.QName(schema.target_namespace, item.name).text
-            self.common_types[qname] = item
+            if obj.key not in self.processed:
+                self.processed[obj.key] = True
+                self.flatten_class(obj, schema)
 
     def find_common_type(self, name: str, schema: Schema) -> Optional[Class]:
         """Find a common type by the qualified named with the prefixed
         namespace if exists or the target namespace."""
-        prefix, suffix = text.split(name)
-        namespace = schema.target_namespace
 
-        if prefix:
-            name = suffix
-            namespace = schema.nsmap.get(prefix)
+        qname = self.qname(name, schema)
+        common = None
+        candidates = self.class_index.get(qname)
 
-        qname = etree.QName(namespace, name)
+        if candidates:
+            common = next(
+                (
+                    item
+                    for item in candidates
+                    if item.is_common or item.is_abstract or item.is_enumeration
+                ),
+                None,
+            )
 
-        return self.common_types.get(qname.text)
+        common = common or self.common_types.get(qname)
 
-    def flatten_redefines(self, classes: List[Class]):
+        if common and common.key not in self.processed:
+            self.flatten_class(common, schema)
+
+        return common
+
+    def merge_classes(self, classes: List[Class]):
         """Merge original and redefined classes."""
         grouped: Dict[str, List[Class]] = defaultdict(list)
         for item in classes:
@@ -215,23 +240,16 @@ class ClassReducer:
 
         attr.types = types
 
-    def separate_common_types(self, classes: List[Class]):
-        def condition(x: Class):
-            return x.is_enumeration or x.is_abstract or x.is_common
-
-        matches = self.pop_classes(classes, condition=condition)
-        return classes, matches
-
     @staticmethod
-    def pop_classes(classes: List[Class], condition: Callable) -> List[Class]:
-        """Pop and return the objects matching the given condition from the
-        given list of of classes."""
-        matches = []
-        for i in range(len(classes) - 1, -1, -1):
-            if condition(classes[i]):
-                matches.append(classes.pop(i))
+    def qname(name: str, schema: Schema) -> str:
+        prefix, suffix = text.split(name)
+        namespace = schema.target_namespace
 
-        return list(reversed(matches))
+        if prefix:
+            name = suffix
+            namespace = schema.nsmap.get(prefix)
+
+        return etree.QName(namespace, name).text
 
     @staticmethod
     def copy_attributes(source: Class, target: Class, extension: AttrType):

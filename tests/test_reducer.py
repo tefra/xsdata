@@ -7,7 +7,6 @@ from tests.factories import FactoryTestCase
 from xsdata.models.codegen import AttrType
 from xsdata.models.elements import ComplexType
 from xsdata.models.elements import Element
-from xsdata.models.elements import Restriction
 from xsdata.models.elements import Schema
 from xsdata.models.elements import SimpleType
 from xsdata.models.enums import DataType
@@ -30,49 +29,79 @@ class ClassReducerBaseTestCase(FactoryTestCase):
 
 
 class ClassReducerProcessTests(ClassReducerBaseTestCase):
-    @mock.patch.object(ClassReducer, "flatten_redefines")
+    @mock.patch.object(ClassReducer, "store_common_types")
     @mock.patch.object(ClassReducer, "flatten_classes")
-    @mock.patch.object(ClassReducer, "add_common_types")
+    @mock.patch.object(ClassReducer, "index_classes")
+    @mock.patch.object(ClassReducer, "merge_classes")
     def test_process(
-        self, mock_add_common_types, mock_flatten_classes, mock_flatten_redefines
+        self,
+        mock_merge_classes,
+        mock_index_classes,
+        mock_flatten_classes,
+        mock_store_common_types,
     ):
         classes = ClassFactory.list(3, type=Element)
-        simplies = ClassFactory.list(2, type=SimpleType)
-        enums = ClassFactory.list(
-            2,
-            type=Restriction,
-            attrs=AttrFactory.list(2, local_type=TagType.ENUMERATION),
-        )
-        abstracts = ClassFactory.list(2, is_abstract=True, type=ComplexType)
+        self.reducer.process(self.schema, classes)
 
-        common = simplies + abstracts + enums
-        all_classes = classes + common
+        mock_merge_classes.assert_called_once_with(classes)
+        mock_index_classes.assert_called_once_with(classes, self.schema)
+        mock_flatten_classes.assert_called_once_with(classes, self.schema)
+        mock_store_common_types.assert_called_once_with(classes, self.schema)
 
-        result = self.reducer.process(self.schema, all_classes)
+    def test_index_classes(self):
+        classes = [
+            ClassFactory.create(type=Element, name="foo"),
+            ClassFactory.create(type=ComplexType, name="foo"),
+            ClassFactory.create(type=ComplexType, name="foobar"),
+        ]
 
-        self.assertEqual(enums + classes, result)
+        expected = {
+            "{http://namespace/target}foo": classes[:2],
+            "{http://namespace/target}foobar": classes[2:],
+        }
 
-        mock_flatten_redefines.assert_called_once_with(all_classes)
-        mock_add_common_types.assert_called_once_with(common, self.schema)
-        mock_flatten_classes.assert_has_calls(
-            [mock.call(common, self.schema), mock.call(classes, self.schema)]
-        )
+        self.reducer.index_classes(classes, self.schema)
+        self.assertEqual(2, len(self.reducer.class_index))
+        self.assertEqual(expected, self.reducer.class_index)
+
+    def test_store_common_types(self):
+        classes = [
+            ClassFactory.create(is_abstract=True, type=Element),
+            ClassFactory.create(type=Element),
+            ClassFactory.create(type=ComplexType),
+            ClassFactory.create(type=SimpleType),
+            ClassFactory.create(
+                type=SimpleType,
+                attrs=AttrFactory.list(2, local_type=TagType.ENUMERATION),
+            ),
+        ]
+
+        expected = [
+            classes[1],
+            classes[2],
+            classes[4],
+        ]
+
+        result = self.reducer.store_common_types(classes, self.schema)
+        self.assertEqual(expected, result)
+        self.assertEqual(3, len(self.reducer.common_types))
+
+        expected = [
+            "{http://namespace/target}" + classes[0].name,
+            "{http://namespace/target}" + classes[3].name,
+            "{http://namespace/target}" + classes[4].name,
+        ]
+        self.assertEqual(expected, list(self.reducer.common_types.keys()))
 
     @mock.patch.object(ClassReducer, "flatten_class")
     def test_flatten_classes(self, mock_flatten_class):
         classes = ClassFactory.list(2)
-        ClassReducer().flatten_classes(classes, self.target_namespace)
+        self.reducer.flatten_classes(classes, self.schema)
 
         mock_flatten_class.assert_has_calls(
-            [mock.call(obj, self.target_namespace) for obj in classes]
+            [mock.call(obj, self.schema) for obj in classes]
         )
-
-    def test_add_common_types(self):
-        classes = ClassFactory.list(2)
-        expected = {f"{{{self.target_namespace}}}{obj.name}": obj for obj in classes}
-
-        self.reducer.add_common_types(classes, self.schema)
-        self.assertEqual(expected, self.reducer.common_types)
+        self.assertEqual({obj.key: True for obj in classes}, self.reducer.processed)
 
     def test_find_common_type(self):
         obj = ClassFactory.create(name="foo", type=SimpleType)
@@ -382,10 +411,10 @@ class ClassReducerFlattenEnumerationUnionsTests(ClassReducerBaseTestCase):
         )
 
 
-class ClassReducerFlattenRedefinesTests(ClassReducerBaseTestCase):
+class ClassReducerMergeClassesTests(ClassReducerBaseTestCase):
     def test_with_unique_classes(self):
         classes = ClassFactory.list(2)
-        self.reducer.flatten_redefines(classes)
+        self.reducer.merge_classes(classes)
         self.assertEqual(2, len(classes))
 
     def test_raises_exception_with_more_than_two_redefines(self):
@@ -395,7 +424,7 @@ class ClassReducerFlattenRedefinesTests(ClassReducerBaseTestCase):
 
         classes = [class_a, class_b, class_c]
         with self.assertRaises(NotImplementedError) as cm:
-            self.reducer.flatten_redefines(classes)
+            self.reducer.merge_classes(classes)
 
         self.assertEqual("Redefined class `class_B` more than once.", str(cm.exception))
 
@@ -411,7 +440,7 @@ class ClassReducerFlattenRedefinesTests(ClassReducerBaseTestCase):
         class_c.extensions.append(ext_str)
         classes = [class_a, class_b, class_c]
 
-        self.reducer.flatten_redefines(classes)
+        self.reducer.merge_classes(classes)
         self.assertEqual(2, len(classes))
 
         mock_copy_attributes.assert_called_once_with(class_a, class_c, ext_a)
@@ -429,7 +458,7 @@ class ClassReducerFlattenRedefinesTests(ClassReducerBaseTestCase):
 
         classes = [class_a, class_b, class_c]
 
-        self.reducer.flatten_redefines(classes)
+        self.reducer.merge_classes(classes)
         self.assertEqual(2, len(classes))
 
         self.assertEqual(

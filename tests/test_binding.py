@@ -93,7 +93,8 @@ def import_clazz(source):
 
 
 def setup_module(module):
-    for xsd in fixtures.glob("defxmlschema/*/chapter*.xsd"):
+    for xml in xmls:
+        xsd = xml.with_suffix(".xsd")
         reducer.common_types.clear()
         writer.register_generator("pydata", DataclassGenerator())
 

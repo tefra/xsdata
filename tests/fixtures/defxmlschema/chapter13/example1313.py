@@ -12,7 +12,9 @@ class SmallSizeType:
         default=None,
         metadata=dict(
             name="value",
-            type="Extension"
+            type="Extension",
+            min_inclusive=2.0,
+            max_inclusive=6.0
         )
     )
     system: Optional[str] = field(

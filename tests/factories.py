@@ -6,7 +6,9 @@ from abc import abstractmethod
 from xsdata.models.codegen import Attr
 from xsdata.models.codegen import AttrType
 from xsdata.models.codegen import Class
+from xsdata.models.codegen import Extension
 from xsdata.models.codegen import Package
+from xsdata.models.codegen import Restrictions
 from xsdata.models.elements import Attribute
 from xsdata.models.elements import ComplexType
 from xsdata.models.elements import Element
@@ -19,6 +21,8 @@ class FactoryTestCase(unittest.TestCase):
         super(FactoryTestCase, self).setUp()
         ClassFactory.reset()
         AttrFactory.reset()
+        ExtensionFactory.reset()
+        RestrictionsFactory.reset()
 
 
 class Factory(ABC):
@@ -61,7 +65,6 @@ class ClassFactory(Factory):
         attrs=None,
         inner=None,
     ):
-
         return cls.model(
             name=name or f"class_{cls.next_letter()}",
             namespace=namespace,
@@ -72,6 +75,62 @@ class ClassFactory(Factory):
             attrs=attrs or [],
             inner=inner or [],
             help=help,
+        )
+
+
+class RestrictionsFactory(Factory):
+    model = Restrictions
+    counter = 65
+
+    @classmethod
+    def create(
+        cls,
+        required=None,
+        min_occurs=None,
+        max_occurs=None,
+        min_exclusive=None,
+        min_inclusive=None,
+        min_length=None,
+        max_exclusive=None,
+        max_inclusive=None,
+        max_length=None,
+        total_digits=None,
+        fraction_digits=None,
+        length=None,
+        white_space=None,
+        pattern=None,
+        explicit_timezone=None,
+        nillable=None,
+    ):
+        return cls.model(
+            required=required,
+            min_occurs=min_occurs,
+            max_occurs=max_occurs,
+            min_exclusive=min_exclusive,
+            min_inclusive=min_inclusive,
+            min_length=min_length,
+            max_exclusive=max_exclusive,
+            max_inclusive=max_inclusive,
+            max_length=max_length,
+            total_digits=total_digits,
+            fraction_digits=fraction_digits,
+            length=length,
+            white_space=white_space,
+            pattern=pattern,
+            explicit_timezone=explicit_timezone,
+            nillable=nillable,
+        )
+
+
+class ExtensionFactory(Factory):
+    model = Extension
+    counter = 65
+
+    @classmethod
+    def create(cls, type=None, restrictions=None):
+        return cls.model(
+            type=type or AttrTypeFactory.create(),
+            restrictions=restrictions or RestrictionsFactory.create(),
         )
 
 
@@ -107,7 +166,7 @@ class AttrFactory(Factory):
         help=None,
         default=None,
         fixed=False,
-        **kwargs,
+        restrictions=None,
     ):
 
         return cls.model(
@@ -119,7 +178,7 @@ class AttrFactory(Factory):
             help=help or None,
             default=default or None,
             fixed=fixed,
-            **kwargs,
+            restrictions=restrictions or RestrictionsFactory.create(),
         )
 
 

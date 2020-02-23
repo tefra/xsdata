@@ -1,5 +1,6 @@
 <!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
 <!-- Example 8-6 Illegal attempt to extend a simple type -->
+<!-- SKIPTEST: Should fail -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
   <xs:simpleType name="SmallDressSizeType">
     <xs:restriction base="DressSizeType">

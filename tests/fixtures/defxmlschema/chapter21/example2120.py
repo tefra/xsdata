@@ -11,6 +11,6 @@ class Country:
         default=None,
         metadata=dict(
             name="value",
-            type="Restriction"
+            type="Extension"
         )
     )

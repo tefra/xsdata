@@ -18,6 +18,7 @@ from xsdata.formats.dataclass.utils import safe_snake
 from xsdata.models.codegen import Attr
 from xsdata.models.codegen import AttrType
 from xsdata.models.codegen import Class
+from xsdata.models.codegen import Extension
 from xsdata.models.codegen import Package
 from xsdata.models.elements import Schema
 from xsdata.models.enums import DataType
@@ -86,8 +87,8 @@ class PythonAbstractGenerator(AbstractGenerator, ABC):
             cls.process_attribute(attr, parents_list)
 
     @classmethod
-    def process_extension(cls, extension: AttrType):
-        extension.name = cls.type_name(extension)
+    def process_extension(cls, extension: Extension):
+        extension.type.name = cls.type_name(extension.type)
 
     @classmethod
     def process_attribute(cls, attr: Attr, parents: List[str]) -> None:
@@ -101,8 +102,8 @@ class PythonAbstractGenerator(AbstractGenerator, ABC):
     def process_enumeration(cls, attr: Attr, parent: Class) -> None:
         """Normalize enumeration properties."""
 
-        if len(parent.extensions) == 1 and parent.extensions[0].native:
-            attr.types.append(parent.extensions[0])
+        if len(parent.extensions) == 1 and parent.extensions[0].type.native:
+            attr.types.append(parent.extensions[0].type)
 
         attr.name = cls.enumeration_name(attr.name)
         attr.default = cls.attribute_default(attr)

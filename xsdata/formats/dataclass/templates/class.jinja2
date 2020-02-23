@@ -3,7 +3,7 @@
 {% set namespace = obj.namespace or namespace|default(None) %}
 
 @dataclass
-class {{ obj.name }}{{"({})".format(obj.extensions|join(', ', attribute="name")) if obj.extensions }}:
+class {{ obj.name }}{{"({})".format(obj.extensions|join(', ', attribute="type.name")) if obj.extensions }}:
 {%- if help %}
 {{ help|indent(4, first=True) }}
 {%- endif -%}
@@ -26,7 +26,7 @@ class {{ obj.name }}{{"({})".format(obj.extensions|join(', ', attribute="name"))
                   name=attr.local_name,
                   type=attr.local_type,
                   namespace=attr.namespace if namespace != attr.namespace or attr.is_attribute else None,
-                  ** attr.restrictions
+                  ** attr.restrictions.asdict()
             )
     %}
     {{ attr.name }}: {{ attr.display_type }} = field(

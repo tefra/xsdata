@@ -11,7 +11,6 @@ class VectorType:
         default=None,
         metadata=dict(
             name="value",
-            type="Restriction",
-            pattern=r"\d+\s+\d+\s+((\d+\s+){3})*\d+"
+            type="List"
         )
     )

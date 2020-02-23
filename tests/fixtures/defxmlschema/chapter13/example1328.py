@@ -39,7 +39,7 @@ class LetterType:
 
 
 @dataclass
-class RestrictedLetterType:
+class RestrictedLetterType(LetterType):
     """
     :ivar value:
     """
@@ -47,6 +47,6 @@ class RestrictedLetterType:
         default=None,
         metadata=dict(
             name="value",
-            type="Restriction"
+            type="Extension"
         )
     )

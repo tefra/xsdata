@@ -4,6 +4,7 @@ from unittest import mock
 from tests.factories import AttrFactory
 from tests.factories import AttrTypeFactory
 from tests.factories import ClassFactory
+from tests.factories import ExtensionFactory
 from tests.factories import FactoryTestCase
 from tests.factories import PackageFactory
 from xsdata.models.elements import Schema
@@ -230,7 +231,9 @@ class DependenciesResolverTest(FactoryTestCase):
                     ]
                 ),
             ],
-            extensions=[AttrTypeFactory.create(name="xs:localElement")],
+            extensions=ExtensionFactory.list(
+                1, type=AttrTypeFactory.create(name="xs:localElement")
+            ),
             inner=[
                 ClassFactory.create(
                     attrs=AttrFactory.list(2, types=AttrTypeFactory.list(1, name="foo"))

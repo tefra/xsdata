@@ -2,7 +2,6 @@ from unittest import TestCase
 
 from xsdata.models.elements import Enumeration
 from xsdata.models.elements import FractionDigits
-from xsdata.models.elements import Group
 from xsdata.models.elements import Length
 from xsdata.models.elements import MaxExclusive
 from xsdata.models.elements import MaxInclusive
@@ -24,27 +23,6 @@ class RestrictionTests(TestCase):
     def test_property_real_name(self):
         obj = Restriction.create()
         self.assertEqual("value", obj.real_name)
-
-    def test_property_is_attribute(self):
-        obj = Restriction.create()
-        self.assertTrue(obj.is_attribute)
-
-        obj = Restriction.create(group=Group.create())
-        self.assertFalse(obj.is_attribute)
-
-        self.assertEqual(
-            (
-                "group",
-                "all",
-                "choice",
-                "sequence",
-                "any_attribute",
-                "attributes",
-                "attribute_groups",
-                "enumerations",
-            ),
-            obj.CONTAINER_FIELDS,
-        )
 
     def test_property_extends(self):
         obj = Restriction.create(base="foo")

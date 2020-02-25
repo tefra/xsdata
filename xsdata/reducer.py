@@ -213,7 +213,7 @@ class ClassReducer:
             pass
         elif not item.is_enumeration and common.is_enumeration:
             self.create_default_attribute(item, extension)
-        elif not item.is_enumeration:
+        elif not item.is_enumeration or common.is_enumeration:
             self.copy_attributes(common, item, extension)
 
         item.extensions.remove(extension)

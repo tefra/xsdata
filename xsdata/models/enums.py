@@ -32,6 +32,7 @@ class DataType(Enum):
     OBJECT = ("object", object)
 
     # xsd and xml data types
+    ANY_ATOMIC_TYPE = ("anyAtomicType", str)
     ANY_URI = ("anyURI", str)
     ANY_SIMPLE_TYPE = ("anySimpleType", str)
     BASE = ("base", str)

@@ -176,6 +176,10 @@ class Class:
     def is_common(self):
         return self.type not in [Element, ComplexType]
 
+    @property
+    def is_element(self):
+        return self.type is Element
+
     def clone(self):
         inners = [inner.clone() for inner in self.inner]
         extensions = [extension.clone() for extension in self.extensions]

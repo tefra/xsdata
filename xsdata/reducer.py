@@ -47,41 +47,43 @@ class ClassReducer:
 
         self.schema = schema
 
-        self.merge_classes(classes)
+        self.merge_redefined_classes(classes)
 
-        self.index_classes(classes)
+        self.create_class_qname_index(classes)
 
-        self.flatten_classes(classes)
+        self.mark_abstract_duplicate_classes()
 
-        remaining = self.store_common_types(classes)
+        self.flatten_classes()
 
-        return remaining
+        return self.fetch_classes_for_generation()
 
-    def store_common_types(self, classes: List[Class]) -> List[Class]:
+    def fetch_classes_for_generation(self) -> List[Class]:
         result = []
-        for item in classes:
-            should_store = item.is_common or item.is_abstract
+        for qname, classes in self.class_index.items():
+            for item in classes:
+                should_store = item.is_common or item.is_abstract
 
-            if should_store:
-                qname = self.qname(item.name)
-                self.common_types[qname] = item
+                if should_store:
+                    qname = self.qname(item.name)
+                    self.common_types[qname] = item
 
-            if not should_store or item.is_enumeration:
-                result.append(item)
+                if not should_store or item.is_enumeration:
+                    result.append(item)
 
         return result
 
-    def index_classes(self, classes: List[Class]):
+    def create_class_qname_index(self, classes: List[Class]):
         self.class_index.clear()
         self.processed.clear()
         for item in classes:
             qname = self.qname(item.name)
             self.class_index[qname].append(item)
 
-    def flatten_classes(self, classes: List[Class]):
-        for obj in classes:
-            if obj.key not in self.processed:
-                self.flatten_class(obj)
+    def flatten_classes(self):
+        for classes in self.class_index.values():
+            for obj in classes:
+                if obj.key not in self.processed:
+                    self.flatten_class(obj)
 
     def find_class(
         self, dependency: AttrType, condition=simple_type
@@ -110,7 +112,7 @@ class ClassReducer:
 
         return None
 
-    def merge_classes(self, classes: List[Class]):
+    def merge_redefined_classes(self, classes: List[Class]):
         """Merge original and redefined classes."""
         grouped: Dict[str, List[Class]] = defaultdict(list)
         for item in classes:
@@ -145,6 +147,24 @@ class ClassReducer:
                 ):
                     winner.extensions.pop(i)
                     self.copy_attributes(looser, winner, extension)
+
+    def mark_abstract_duplicate_classes(self):
+        """Search for groups with more than one class and mark as abstract any
+        complex type with the same name as an element."""
+        for classes in self.class_index.values():
+            if len(classes) == 1:
+                continue
+
+            element = next(
+                (obj for obj in classes if obj.is_element and not obj.is_abstract), None
+            )
+
+            if not element:
+                continue
+
+            for obj in classes:
+                if obj is not element and not obj.is_common:
+                    obj.is_abstract = True
 
     def flatten_class(self, item: Class):
         """

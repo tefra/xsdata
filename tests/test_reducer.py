@@ -33,29 +33,33 @@ class ClassReducerBaseTestCase(FactoryTestCase):
 
 
 class ClassReducerProcessTests(ClassReducerBaseTestCase):
-    @mock.patch.object(ClassReducer, "store_common_types")
+    @mock.patch.object(ClassReducer, "fetch_classes_for_generation")
     @mock.patch.object(ClassReducer, "flatten_classes")
-    @mock.patch.object(ClassReducer, "index_classes")
-    @mock.patch.object(ClassReducer, "merge_classes")
+    @mock.patch.object(ClassReducer, "mark_abstract_duplicate_classes")
+    @mock.patch.object(ClassReducer, "create_class_qname_index")
+    @mock.patch.object(ClassReducer, "merge_redefined_classes")
     def test_process(
         self,
-        mock_merge_classes,
-        mock_index_classes,
+        mock_merge_redefined_classes,
+        mock_create_class_qname_index,
+        mock_mark_abstract_duplicate_classes,
         mock_flatten_classes,
-        mock_store_common_types,
+        mock_fetch_classes_for_generation,
     ):
         self.reducer.schema = None
+        mock_fetch_classes_for_generation.return_value = "foo"
         classes = ClassFactory.list(3, type=Element)
 
-        self.reducer.process(self.schema, classes)
+        self.assertEqual("foo", self.reducer.process(self.schema, classes))
 
-        mock_merge_classes.assert_called_once_with(classes)
-        mock_index_classes.assert_called_once_with(classes)
-        mock_flatten_classes.assert_called_once_with(classes)
-        mock_store_common_types.assert_called_once_with(classes)
+        mock_merge_redefined_classes.assert_called_once_with(classes)
+        mock_create_class_qname_index.assert_called_once_with(classes)
+        mock_mark_abstract_duplicate_classes.assert_called_once()
+        mock_flatten_classes.assert_called_once_with()
+        mock_fetch_classes_for_generation.assert_called_once_with()
         self.assertEqual(self.schema, self.reducer.schema)
 
-    def test_index_classes(self):
+    def test_create_class_qname_index(self):
         classes = [
             ClassFactory.create(type=Element, name="foo"),
             ClassFactory.create(type=ComplexType, name="foo"),
@@ -67,11 +71,32 @@ class ClassReducerProcessTests(ClassReducerBaseTestCase):
             "{http://namespace/target}foobar": classes[2:],
         }
 
-        self.reducer.index_classes(classes)
+        self.reducer.create_class_qname_index(classes)
         self.assertEqual(2, len(self.reducer.class_index))
         self.assertEqual(expected, self.reducer.class_index)
 
-    def test_store_common_types(self):
+    def test_mark_abstract_duplicate_classes(self):
+        one = ClassFactory.create(name="foo", is_abstract=True, type=Element)
+        two = ClassFactory.create(name="foo", type=Element)
+        three = ClassFactory.create(name="foo", type=ComplexType)
+        four = ClassFactory.create(name="foo", type=SimpleType)
+
+        five = ClassFactory.create(name="bar", is_abstract=True, type=Element)
+        six = ClassFactory.create(name="bar", type=ComplexType)
+        seven = ClassFactory.create(name="opa", type=ComplexType)
+
+        self.reducer.create_class_qname_index([one, two, three, four, five, six, seven])
+        self.reducer.mark_abstract_duplicate_classes()
+
+        self.assertTrue(one.is_abstract)  # Was abstract already
+        self.assertFalse(two.is_abstract)  # Is an element
+        self.assertTrue(three.is_abstract)  # Marked as abstract
+        self.assertFalse(four.is_abstract)  # Is common
+        self.assertTrue(five.is_abstract)  # Was abstract already
+        self.assertFalse(six.is_abstract)  # No element in group
+        self.assertFalse(seven.is_abstract)  # Alone
+
+    def test_fetch_classes_for_generation(self):
         classes = [
             ClassFactory.create(is_abstract=True, type=Element),
             ClassFactory.create(type=Element),
@@ -89,7 +114,8 @@ class ClassReducerProcessTests(ClassReducerBaseTestCase):
             classes[4],
         ]
 
-        result = self.reducer.store_common_types(classes)
+        self.reducer.create_class_qname_index(classes)
+        result = self.reducer.fetch_classes_for_generation()
         self.assertEqual(expected, result)
         self.assertEqual(3, len(self.reducer.common_types))
 
@@ -103,7 +129,8 @@ class ClassReducerProcessTests(ClassReducerBaseTestCase):
     @mock.patch.object(ClassReducer, "flatten_class")
     def test_flatten_classes(self, mock_flatten_class):
         classes = ClassFactory.list(2)
-        self.reducer.flatten_classes(classes)
+        self.reducer.create_class_qname_index(classes)
+        self.reducer.flatten_classes()
         mock_flatten_class.assert_has_calls(list(map(mock.call, classes)))
 
 
@@ -483,7 +510,7 @@ class ClassReducerFlattenEnumerationUnionsTests(ClassReducerBaseTestCase):
 class ClassReducerMergeClassesTests(ClassReducerBaseTestCase):
     def test_with_unique_classes(self):
         classes = ClassFactory.list(2)
-        self.reducer.merge_classes(classes)
+        self.reducer.merge_redefined_classes(classes)
         self.assertEqual(2, len(classes))
 
     def test_raises_exception_with_more_than_two_redefines(self):
@@ -493,7 +520,7 @@ class ClassReducerMergeClassesTests(ClassReducerBaseTestCase):
 
         classes = [class_a, class_b, class_c]
         with self.assertRaises(NotImplementedError) as cm:
-            self.reducer.merge_classes(classes)
+            self.reducer.merge_redefined_classes(classes)
 
         self.assertEqual("Redefined class `class_B` more than once.", str(cm.exception))
 
@@ -509,7 +536,7 @@ class ClassReducerMergeClassesTests(ClassReducerBaseTestCase):
         class_c.extensions.append(ext_str)
         classes = [class_a, class_b, class_c]
 
-        self.reducer.merge_classes(classes)
+        self.reducer.merge_redefined_classes(classes)
         self.assertEqual(2, len(classes))
 
         mock_copy_attributes.assert_called_once_with(class_a, class_c, ext_a)
@@ -534,7 +561,7 @@ class ClassReducerMergeClassesTests(ClassReducerBaseTestCase):
 
         classes = [class_a, class_b, class_c]
 
-        self.reducer.merge_classes(classes)
+        self.reducer.merge_redefined_classes(classes)
         self.assertEqual(2, len(classes))
 
         self.assertEqual(

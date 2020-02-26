@@ -117,7 +117,7 @@ class AnnotationBase(ElementBase):
 
 
 @dataclass
-class AnyAttribute(AnnotationBase, NamedField):
+class AnyAttribute(AnnotationBase, NamedField, RestrictedField):
     """
     <anyAttribute
       id = ID
@@ -144,9 +144,6 @@ class AnyAttribute(AnnotationBase, NamedField):
     @property
     def real_name(self) -> str:
         return "attributes"
-
-    def get_restrictions(self) -> Dict[str, Anything]:
-        return dict()
 
 
 @dataclass
@@ -210,7 +207,7 @@ class SimpleType(AnnotationBase, NamedField):
 
 
 @dataclass
-class List(AnnotationBase, NamedField):
+class List(AnnotationBase, NamedField, RestrictedField):
     """
     <list
       id = ID
@@ -234,9 +231,6 @@ class List(AnnotationBase, NamedField):
     @property
     def real_type(self) -> Optional[str]:
         return None
-
-    def get_restrictions(self) -> Dict[str, Anything]:
-        return dict()
 
 
 @dataclass
@@ -367,9 +361,6 @@ class AttributeGroup(AnnotationBase, NamedField, RestrictedField):
     def real_type(self) -> Optional[str]:
         return None
 
-    def get_restrictions(self):
-        return dict()
-
 
 @dataclass
 class Any(AnnotationBase, OccurrencesMixin, NamedField):
@@ -493,7 +484,7 @@ class Group(AnnotationBase, OccurrencesMixin, NamedField):
 
 
 @dataclass
-class Extension(AnnotationBase):
+class Extension(AnnotationBase, RestrictedField):
     """
     <extension
       base = QName
@@ -517,12 +508,9 @@ class Extension(AnnotationBase):
     def extends(self) -> Optional[str]:
         return self.base
 
-    def get_restrictions(self) -> Dict[str, Any]:
-        return dict()
-
 
 @dataclass
-class Enumeration(AnnotationBase, NamedField):
+class Enumeration(AnnotationBase, NamedField, RestrictedField):
     """
     <enumeration
       id = ID
@@ -549,9 +537,6 @@ class Enumeration(AnnotationBase, NamedField):
     @property
     def default(self):
         return self.value
-
-    def get_restrictions(self):
-        return {}
 
 
 @dataclass
@@ -842,7 +827,7 @@ class ComplexContent(SimpleContent):
 
 
 @dataclass
-class ComplexType(AnnotationBase, NamedField):
+class ComplexType(AnnotationBase, NamedField, RestrictedField):
     """
     <complexType
       abstract = boolean : false
@@ -876,6 +861,9 @@ class ComplexType(AnnotationBase, NamedField):
     assertion: Array[Assertion] = array_element(name="assert")
     abstract: bool = attribute(default=False)
     mixed: bool = attribute(default=False)
+    default_attributes_apply: bool = attribute(
+        default=True, name="defaultAttributesApply"
+    )
 
     @property
     def is_mixed(self) -> bool:
@@ -1189,6 +1177,7 @@ class Schema(AnnotationBase):
 
     target: Optional[str] = attribute()
     block_default: Optional[str] = attribute()
+    default_attributes: Optional[str] = attribute(name="defaultAttributes")
     final_default: Optional[str] = attribute()
     target_namespace: Optional[str] = attribute()
     version: Optional[str] = attribute()

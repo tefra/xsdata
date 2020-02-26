@@ -36,6 +36,7 @@ class SchemaParser(XmlParser):
     element_form: Optional[FormType] = field(init=False, default=None)
     attribute_form: Optional[FormType] = field(init=False, default=None)
     target_namespace: Optional[str] = field(default=None)
+    default_attributes: Optional[str] = field(default=None)
 
     def from_xsd_string(self, source: str) -> xsd.Schema:
         return super().from_string(source, xsd.Schema)
@@ -68,6 +69,7 @@ class SchemaParser(XmlParser):
 
         self.element_form = element.attrib.get("elementFormDefault", None)
         self.attribute_form = element.attrib.get("attributeFormDefault", None)
+        self.default_attributes = element.attrib.get("defaultAttributes", None)
 
     def end_schema(self, obj: T, element: etree.Element):
         """Collect the schema's default form for attributes and elements for
@@ -99,6 +101,17 @@ class SchemaParser(XmlParser):
         attribute form is None."""
         if isinstance(obj, xsd.Attribute) and obj.form is None and self.attribute_form:
             obj.form = FormType(self.attribute_form)
+
+    def end_complex_type(self, obj: T, element: etree.Element):
+        """Prepend an attribute group references when default attributes
+        apply."""
+        if (
+            isinstance(obj, xsd.ComplexType)
+            and obj.default_attributes_apply
+            and self.default_attributes
+        ):
+            attribute_group = xsd.AttributeGroup.create(ref=self.default_attributes)
+            obj.attribute_groups.insert(0, attribute_group)
 
     @staticmethod
     def end_choice(obj: T, element: etree.Element):

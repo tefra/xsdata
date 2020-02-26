@@ -35,6 +35,7 @@ class DataType(Enum):
     ANY_ATOMIC_TYPE = ("anyAtomicType", str)
     ANY_URI = ("anyURI", str)
     ANY_SIMPLE_TYPE = ("anySimpleType", str)
+    ANY_TYPE = ("anyType", str)
     BASE = ("base", str)
     BASE64_BINARY = ("base64Binary", str)
     BOOLEAN = ("boolean", bool)

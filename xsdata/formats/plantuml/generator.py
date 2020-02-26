@@ -23,7 +23,7 @@ class PlantUmlGenerator(AbstractGenerator):
     ) -> Iterator[Tuple[Path, str]]:
         """Given a schema, a list of classes and a target package return to the
         writer factory the target file path and the rendered output."""
-        module = schema.module
+        module = schema.module.replace(".xsd", "")
         package_arr = package.split(".")
         package = "{}.{}".format(".".join(package_arr), module)
         target = Path.cwd().joinpath(*package_arr)

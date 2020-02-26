@@ -1215,7 +1215,7 @@ class Schema(AnnotationBase):
     @property
     def module(self):
         if self.location:
-            return self.location.stem
+            return self.location.name
 
         if self.target_namespace:
             return Path(self.target_namespace).stem

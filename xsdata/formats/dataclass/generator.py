@@ -20,6 +20,7 @@ class DataclassGenerator(PythonAbstractGenerator):
     def __init__(self):
         super(DataclassGenerator, self).__init__()
         self.env.filters.update(filters)
+        self.modules = defaultdict(int)
 
     def render_module(self, output: str, imports: Dict[str, List[Package]]) -> str:
         return self.template("module").render(output=output, imports=imports)
@@ -33,7 +34,7 @@ class DataclassGenerator(PythonAbstractGenerator):
     ) -> Iterator[Tuple[Path, str]]:
         """Given a schema, a list of classes and a target package return to the
         writer factory the target file path and the rendered code."""
-        module = snake_case(schema.module)
+        module = self.module_name(schema.module)
         package_arr = list(map(snake_case, package.split(".")))
         package = "{}.{}".format(".".join(package_arr), module)
         target = Path.cwd().joinpath(*package_arr)
@@ -45,6 +46,19 @@ class DataclassGenerator(PythonAbstractGenerator):
         output = self.render_classes()
 
         yield file_path, self.render_module(imports=imports, output=output)
+
+    def module_name(self, module: str) -> str:
+        """
+        Return a unique and safe module name.
+
+        In case of module name collisions append the module name index.
+        """
+        module = module[:-4] if module.endswith(".xsd") else module
+        module = snake_case(module)
+        self.modules[module] += 1
+        if self.modules[module] > 1:
+            module = f"{module}_{self.modules[module] - 1}"
+        return module
 
     def render_classes(self) -> str:
         """Get a list of sorted classes from the imports resolver, apply the

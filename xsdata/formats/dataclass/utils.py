@@ -40,6 +40,10 @@ stop_words = [
     "else",
     "is",
     "try",
+    "str",
+    "int",
+    "bool",
+    "float",
 ]
 
 

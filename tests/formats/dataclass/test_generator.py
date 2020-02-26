@@ -90,3 +90,10 @@ class DataclassGeneratorTests(FactoryTestCase):
 
         actual = DataclassGenerator().prepare_imports()
         self.assertEqual(expected, actual)
+
+    def test_module_name(self):
+        generator = DataclassGenerator()
+        self.assertEqual("foo_bar", generator.module_name("fooBar.xsd"))
+        self.assertEqual("foo_bar_1", generator.module_name("fooBar.xsd"))
+        self.assertEqual("foo_bar_2", generator.module_name("fooBar.xsd"))
+        self.assertEqual("foo_bar_wtf", generator.module_name("fooBar.wtf"))

@@ -21,12 +21,17 @@ from xsdata.models.enums import UseType
 from xsdata.parser import SchemaParser
 
 
-def wrap(str, element_form="qualified", attribute_form="unqualified"):
+def wrap(string: str, **kwargs):
+    attributes = {
+        "elementFormDefault": "qualified",
+        "attributeFormDefault": "unqualified",
+    }
+    attributes.update(kwargs)
+
+    attrs = " ".join([f'{key}="{value}"' for key, value in attributes.items()])
     return f"""<?xml version="1.0" encoding="utf-8"?>
-    <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
-        elementFormDefault="{element_form}"
-        attributeFormDefault="{attribute_form}">
-        {str}
+    <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" {attrs}>
+        {string}
 </xs:schema>"""
 
 
@@ -320,3 +325,29 @@ class ParserTests(TestCase):
         )
         schema = self.parser.from_xsd_string(wrap(xsd))
         self.assertEqual(expected, schema.complex_types[0])
+
+    def test_schema_with_default_attributes(self):
+        xsd = """<xs:complexType>
+                    <xs:attributeGroup ref="bar" />
+              </xs:complexType>
+              <xs:element name="first">
+                  <xs:complexType>
+                        <xs:attribute name="second" />
+                  </xs:complexType>
+              </xs:element>
+              <xs:element name="third">
+                  <xs:complexType defaultAttributesApply="false">
+                        <xs:attribute name="w" />
+                  </xs:complexType>
+              </xs:element>
+              """
+
+        attrs = {"defaultAttributes": "foo"}
+
+        schema = self.parser.from_xsd_string(wrap(xsd, **attrs))
+
+        self.assertEqual(2, len(schema.complex_types[0].attribute_groups))
+        self.assertEqual("foo", schema.complex_types[0].attribute_groups[0].ref)
+        self.assertEqual("bar", schema.complex_types[0].attribute_groups[1].ref)
+        self.assertEqual("foo", schema.elements[0].complex_type.attribute_groups[0].ref)
+        self.assertEqual(0, len(schema.elements[1].complex_type.attribute_groups))

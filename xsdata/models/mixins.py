@@ -1,6 +1,4 @@
 import sys
-from abc import ABC
-from abc import abstractmethod
 from dataclasses import dataclass
 from dataclasses import Field
 from dataclasses import field
@@ -49,13 +47,12 @@ class NamedField:
         return prefix
 
 
-class RestrictedField(ABC):
-    @abstractmethod
+class RestrictedField:
     def get_restrictions(self) -> Dict[str, Any]:
         return dict()
 
 
-class OccurrencesMixin:
+class OccurrencesMixin(RestrictedField):
     min_occurs: Optional[int] = None
     max_occurs: Optional[int] = None
 

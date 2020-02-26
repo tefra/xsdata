@@ -22,6 +22,7 @@ from xsdata.formats.dataclass.models import AnyElement
 from xsdata.formats.mixins import AbstractParser
 from xsdata.formats.mixins import AbstractXmlParser
 from xsdata.models.enums import EventType
+from xsdata.utils import text
 
 T = TypeVar("T")
 
@@ -211,7 +212,7 @@ class XmlParser(AbstractXmlParser, ModelInspect):
 
     def emit_event(self, event: str, name: str, **kwargs):
         """Call if exist the parser's hook for the given element and event."""
-        local_name = QName(name).localname
+        local_name = text.snake_case(QName(name).localname)
         method_name = f"{event}_{local_name}"
         if hasattr(self, method_name):
             getattr(self, method_name)(**kwargs)

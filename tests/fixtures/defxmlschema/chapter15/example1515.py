@@ -1,3 +1,4 @@
+from decimal import Decimal
 from dataclasses import dataclass, field
 from typing import Optional
 
@@ -19,8 +20,25 @@ class CatalogType:
 @dataclass
 class ProductType:
     """
+    :ivar id:
+    :ivar version:
     :ivar dept:
     """
+    id: Optional[str] = field(
+        default=None,
+        metadata=dict(
+            name="id",
+            type="Attribute",
+            required=True
+        )
+    )
+    version: Optional[Decimal] = field(
+        default=None,
+        metadata=dict(
+            name="version",
+            type="Attribute"
+        )
+    )
     dept: Optional[str] = field(
         default=None,
         metadata=dict(

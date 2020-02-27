@@ -18,11 +18,12 @@ class PlantUmlGeneratorTests(FactoryTestCase):
 
         iterator = PlantUmlGenerator().render(schema, classes, package)
 
-        actual = [(file, output) for file, output in iterator]
+        actual = [out for out in iterator]
         self.assertEqual(1, len(actual))
-        self.assertEqual(2, len(actual[0]))
+        self.assertEqual(3, len(actual[0]))
         self.assertIsInstance(actual[0][0], Path)
         self.assertTrue(actual[0][0].is_absolute())
+        self.assertEqual("some.Foo.Some.ThugLife.foo", actual[0][1])
         self.assertEqual(
             "some/Foo/Some/ThugLife/foo.pu", str(actual[0][0].relative_to(Path.cwd()))
         )
@@ -40,4 +41,4 @@ class class_C {
 }
 
 @enduml"""
-        self.assertEqual(output, actual[0][1])
+        self.assertEqual(output, actual[0][2])

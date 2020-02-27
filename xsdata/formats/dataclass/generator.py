@@ -31,7 +31,7 @@ class DataclassGenerator(PythonAbstractGenerator):
 
     def render(
         self, schema: Schema, classes: List[Class], package: str
-    ) -> Iterator[Tuple[Path, str]]:
+    ) -> Iterator[Tuple[Path, str, str]]:
         """Given a schema, a list of classes and a target package return to the
         writer factory the target file path and the rendered code."""
         module = self.module_name(schema.module)
@@ -45,7 +45,7 @@ class DataclassGenerator(PythonAbstractGenerator):
         imports = self.prepare_imports()
         output = self.render_classes()
 
-        yield file_path, self.render_module(imports=imports, output=output)
+        yield file_path, package, self.render_module(imports=imports, output=output)
 
     def module_name(self, module: str) -> str:
         """

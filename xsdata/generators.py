@@ -1,6 +1,7 @@
 import re
 from abc import ABC
 from abc import abstractmethod
+from base64 import urlsafe_b64encode
 from pathlib import Path
 from typing import Any
 from typing import Iterator
@@ -42,7 +43,7 @@ class AbstractGenerator(ABC):
     @abstractmethod
     def render(
         self, schema: Schema, classes: List[Class], package: str
-    ) -> Iterator[Tuple[Path, str]]:
+    ) -> Iterator[Tuple[Path, str, str]]:
         pass
 
 
@@ -70,16 +71,21 @@ class PythonAbstractGenerator(AbstractGenerator, ABC):
 
     @classmethod
     def process_enumerations(cls, obj: Class):
-        values: List[Any] = []
-        for i in range(len(obj.attrs) - 1, -1, -1):
-            attr = obj.attrs[i]
-            cls.process_enumeration(attr, obj)
+        attr_types = {ext.type.name: ext.type for ext in obj.extensions}
+        attrs = {str(attr.default): attr for attr in obj.attrs}
+        obj.attrs = sorted(attrs.values(), key=lambda x: str(x.default))
 
-            if attr.default in values:
-                obj.attrs.pop(i)
-            values.append(attr.default)
+        names = set()
+        for attr in obj.attrs:
+            attr.types.extend(attr_types.values())
+            attr.default = cls.attribute_default(attr)
+            attr.name = cls.enumeration_name(str(attr.default).strip("\"'"))
+            names.add(attr.name)
 
-        obj.attrs.sort(key=lambda x: x.default)
+        if len(names) != len(obj.attrs):
+            for attr in obj.attrs:
+                hash = urlsafe_b64encode(str(attr.default).encode()).decode()
+                attr.name = cls.enumeration_name(hash)
 
     @classmethod
     def process_attributes(cls, obj: Class, parents_list: List[str]):
@@ -137,7 +143,7 @@ class PythonAbstractGenerator(AbstractGenerator, ABC):
         If the name is one of the python reserved words append the
         prefix _value
         """
-        local_name = text.split(name)[1]
+        local_name = text.suffix(name)
         return text.snake_case(safe_snake(local_name))
 
     @classmethod
@@ -148,7 +154,7 @@ class PythonAbstractGenerator(AbstractGenerator, ABC):
         If the name is one of the python reserved words append the
         prefix _value
         """
-        return cls.attribute_name(name).upper()
+        return text.snake_case(safe_snake(name)).upper()
 
     @classmethod
     def attribute_display_type(cls, attr: Attr, parents: List[str]) -> str:

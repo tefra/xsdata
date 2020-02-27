@@ -59,24 +59,62 @@ class PythonAbstractGeneratorTests(FactoryTestCase):
         )
         mock_process_enumerations.assert_called_once_with(e)
 
-    @mock.patch.object(generator, "process_enumeration")
-    def test_process_enumerations(self, mock_process_enumeration):
+    def test_process_enumerations(self):
+        obj = ClassFactory.create(
+            attrs=[
+                AttrFactory.create(default="2020-12-13"),
+                AttrFactory.create(default="2020-12-14"),
+            ]
+        )
+
+        generator.process_enumerations(obj)
+        actual = [(attr.name, attr.default) for attr in obj.attrs]
+        expected = [
+            ("VALUE_2020_12_13", '"2020-12-13"'),
+            ("VALUE_2020_12_14", '"2020-12-14"'),
+        ]
+
+        self.assertEqual(expected, actual)
+
+    def test_process_enumerations_with_mixed_types(self):
+        obj = ClassFactory.create(
+            attrs=[
+                AttrFactory.create(default="aaBB"),
+                AttrFactory.create(
+                    default=1, types=AttrTypeFactory.list(1, name="int", native=True)
+                ),
+            ]
+        )
+
+        generator.process_enumerations(obj)
+        actual = [(attr.name, attr.default) for attr in obj.attrs]
+        expected = [("VALUE_1", 1), ("AA_BB", '"aaBB"')]
+
+        self.assertEqual(expected, actual)
+
+    def test_process_enumerations_with_duplicate_names(self):
         obj = ClassFactory.create(
             attrs=[
                 AttrFactory.create(default=3),
                 AttrFactory.create(default=2),
                 AttrFactory.create(default=1),
-                AttrFactory.create(default=1),
+                AttrFactory.create(default=1),  # this is removed
+                AttrFactory.create(default="the"),
+                AttrFactory.create(default="The"),  # this is the duplicate
             ]
         )
-        calls = reversed([mock.call(attr, obj) for attr in obj.attrs])
 
         generator.process_enumerations(obj)
-        mock_process_enumeration.assert_has_calls(calls)
-        self.assertEqual(1, obj.attrs[0].default)
-        self.assertEqual(2, obj.attrs[1].default)
-        self.assertEqual(3, obj.attrs[2].default)
-        self.assertEqual(3, len(obj.attrs))
+        actual = [(attr.name, attr.default) for attr in obj.attrs]
+        expected = [
+            ("MQ", 1),
+            ("MG", 2),
+            ("MW", 3),
+            ("IL_RO_ZSI", '"The"'),
+            ("IN_RO_ZSI", '"the"'),
+        ]
+
+        self.assertEqual(expected, actual)
 
     @mock.patch.object(generator, "process_attribute")
     def test_process_attributes(self, mock_process_attribute):
@@ -119,46 +157,6 @@ class PythonAbstractGeneratorTests(FactoryTestCase):
         mock_default.assert_called_once_with(attr)
         mock_split.assert_called_once_with("foo")
 
-    @mock.patch.object(generator, "attribute_default", return_value="2")
-    @mock.patch.object(generator, "enumeration_name", return_value="OOF")
-    def test_process_enumeration(self, mock_name, mock_default):
-        type_bar = AttrTypeFactory.create(name="bar")
-        attr = AttrFactory.create(name="foo", types=[type_bar], default="thug")
-        extensions = ExtensionFactory.list(
-            1, type=AttrTypeFactory.create(name="xs:int")
-        )
-        parent = ClassFactory.create(extensions=extensions)
-        generator.process_enumeration(attr, parent)
-
-        self.assertEqual("OOF", attr.name)
-        self.assertEqual("foo", attr.local_name)
-        self.assertEqual("2", attr.default)
-
-        mock_name.assert_called_once_with("foo")
-        mock_default.assert_called_once_with(attr)
-
-    def test_process_enumeration_with_non_xsd_type_extensions(self):
-        type_bar = AttrTypeFactory.create(name="bar")
-        attr = AttrFactory.create(name="foo", types=[type_bar], default="thug")
-
-        parent = ClassFactory.create()
-        generator.process_enumeration(attr, parent)
-        self.assertEqual([type_bar], attr.types)
-
-        attr.types = []
-        extensions = ExtensionFactory.list(
-            2, type=AttrTypeFactory.create(name="xs:string")
-        )
-        parent = ClassFactory.create(extensions=extensions)
-        generator.process_enumeration(attr, parent)
-        self.assertEqual([], attr.types)
-
-        attr.types = []
-        extensions = ExtensionFactory.list(1, type=AttrTypeFactory.create(name="foo"))
-        parent = ClassFactory.create(extensions=extensions)
-        generator.process_enumeration(attr, parent)
-        self.assertEqual([], attr.types)
-
     def test_process_import(self):
         package = PackageFactory.create(
             name="bar", alias="foo:bar", source="some.foo.bar"
@@ -189,13 +187,6 @@ class PythonAbstractGeneratorTests(FactoryTestCase):
         self.assertEqual("none_value", generator.attribute_name("None"))
         self.assertEqual("br_eak_value", generator.attribute_name("BrEak"))
         self.assertEqual("value_1", generator.attribute_name("1"))
-
-    def test_enumeration_name(self):
-        self.assertEqual("FOO", generator.enumeration_name("foo"))
-        self.assertEqual("BAR", generator.enumeration_name("foo:bar"))
-        self.assertEqual("FOO_BAR", generator.enumeration_name("FooBar"))
-        self.assertEqual("NONE_VALUE", generator.enumeration_name("None"))
-        self.assertEqual("BR_EAK_VALUE", generator.enumeration_name("BrEak"))
 
     def test_attribute_display_type(self):
         parents = []

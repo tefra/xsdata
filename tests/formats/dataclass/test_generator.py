@@ -33,15 +33,16 @@ class DataclassGeneratorTests(FactoryTestCase):
 
         iterator = DataclassGenerator().render(schema, classes, package)
 
-        actual = [(file, output) for file, output in iterator]
+        actual = [out for out in iterator]
         self.assertEqual(1, len(actual))
-        self.assertEqual(2, len(actual[0]))
+        self.assertEqual(3, len(actual[0]))
         self.assertIsInstance(actual[0][0], Path)
         self.assertTrue(actual[0][0].is_absolute())
+        self.assertEqual("some.foo.some.thug_life.foo", actual[0][1])
         self.assertEqual(
             "some/foo/some/thug_life/foo.py", str(actual[0][0].relative_to(Path.cwd()))
         )
-        self.assertEqual(mock_render_module.return_value, actual[0][1])
+        self.assertEqual(mock_render_module.return_value, actual[0][2])
 
         mock_resolved_process.assert_called_once_with(
             classes=classes, schema=schema, package="some.foo.some.thug_life.foo"

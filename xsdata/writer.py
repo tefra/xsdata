@@ -29,7 +29,7 @@ class CodeWriter:
 
     def write(self, schema: Schema, classes: List[Class], package: str, renderer: str):
         engine = self.get_renderer(renderer)
-        for file, output in engine.render(schema, classes, package):
+        for file, package, output in engine.render(schema, classes, package):
             if len(output.strip()) > 0:
                 logger.info("Generating package: %s", package)
 
@@ -38,7 +38,7 @@ class CodeWriter:
 
     def print(self, schema: Schema, classes: List[Class], package: str, renderer: str):
         engine = self.get_renderer(renderer)
-        for _, output in engine.render(schema, classes, package):
+        for _, _, output in engine.render(schema, classes, package):
             print(output, end="")
 
 

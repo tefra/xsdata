@@ -20,6 +20,6 @@ class DressSize:
 
     class Value(Enum):
         """
-        :cvar VALUE:
+        :cvar NONE_VALUE:
         """
-        VALUE = None
+        NONE_VALUE = None

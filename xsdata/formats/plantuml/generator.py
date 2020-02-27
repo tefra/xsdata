@@ -20,7 +20,7 @@ class PlantUmlGenerator(AbstractGenerator):
 
     def render(
         self, schema: Schema, classes: List[Class], package: str
-    ) -> Iterator[Tuple[Path, str]]:
+    ) -> Iterator[Tuple[Path, str, str]]:
         """Given a schema, a list of classes and a target package return to the
         writer factory the target file path and the rendered output."""
         module = schema.module.replace(".xsd", "")
@@ -33,7 +33,7 @@ class PlantUmlGenerator(AbstractGenerator):
 
         output = self.render_classes()
 
-        yield file_path, self.render_module(output=output)
+        yield file_path, package, self.render_module(output=output)
 
     def render_classes(self) -> str:
         """Sort classes by name and return the rendered output."""

@@ -70,10 +70,8 @@ Example 15-15 Default attribute group
    :language: xml
    :lines: 3-
 
-.. warning::
-
-    XML Schema 1.1
-
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter15/example1515.py
+   :language: python
 
 Example 15-16 Named groups with a target namespace
 --------------------------------------------------

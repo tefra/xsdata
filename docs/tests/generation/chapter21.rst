@@ -48,10 +48,8 @@ Example 21-13 Chameleon namespaces in a schema
    :language: xml
    :lines: 3-
 
-.. warning::
-
-    Fails
-
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter21/example21131.py
+   :language: python
 
 Example 21-13.2 Chameleon namespaces in a schema
 ------------------------------------------------

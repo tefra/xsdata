@@ -238,10 +238,8 @@ Example 12-40 Defining an interleaved open content model
    :language: xml
    :lines: 3-
 
-.. warning::
-
-    XML Schema 1.1
-
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1240.py
+   :language: python
 
 Example 12-42 Defining a suffix open content model
 --------------------------------------------------
@@ -250,10 +248,8 @@ Example 12-42 Defining a suffix open content model
    :language: xml
    :lines: 3-
 
-.. warning::
-
-    XML Schema 1.1
-
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1242.py
+   :language: python
 
 Example 12-44 Defining a default open content model
 ---------------------------------------------------
@@ -262,10 +258,8 @@ Example 12-44 Defining a default open content model
    :language: xml
    :lines: 3-
 
-.. warning::
-
-    XML Schema 1.1
-
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1244.py
+   :language: python
 
 Example 12-46 Overriding a default open content model
 -----------------------------------------------------
@@ -274,10 +268,8 @@ Example 12-46 Overriding a default open content model
    :language: xml
    :lines: 3-
 
-.. warning::
-
-    XML Schema 1.1
-
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1246.py
+   :language: python
 
 Example 12-47 Complex type with attribute wildcard
 --------------------------------------------------

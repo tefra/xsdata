@@ -11,6 +11,7 @@ from typing import Union as UnionType
 from xsdata.formats.dataclass.utils import tostring
 from xsdata.models.enums import DataType
 from xsdata.models.enums import FormType
+from xsdata.models.enums import Mode
 from xsdata.models.enums import Namespace
 from xsdata.models.enums import ProcessType
 from xsdata.models.enums import TagType
@@ -410,8 +411,9 @@ class All(AnnotationBase, OccurrencesMixin):
 
     min_occurs: int = attribute(default=1)
     max_occurs: int = attribute(default=1)
-    elements: Array["Element"] = array_element(name="element")
     any: Any = element()
+    elements: Array["Element"] = array_element(name="element")
+    groups: Array["Group"] = array_element(name="group")
 
 
 @dataclass
@@ -484,6 +486,35 @@ class Group(AnnotationBase, OccurrencesMixin, NamedField):
 
 
 @dataclass
+class OpenContent(AnnotationBase):
+    """
+    <openContent
+      id = ID
+      mode = (none | interleave | suffix) : interleave
+      {any attributes with non-schema namespace . . .}>
+      Content: (annotation?, any?)
+    </openContent>
+    """
+
+    applies_to_empty: bool = attribute(default=False, name="appliesToEmpty")
+    mode: Mode = attribute(default=Mode.INTERLEAVE)
+    any: Any = element()
+
+
+@dataclass
+class DefaultOpenContent(OpenContent):
+    """
+    <defaultOpenContent
+      appliesToEmpty = boolean : false
+      id = ID
+      mode = (interleave | suffix) : interleave
+      {any attributes with non-schema namespace . . .}>
+      Content: (annotation?, any)
+    </defaultOpenContent>
+    """
+
+
+@dataclass
 class Extension(AnnotationBase, RestrictedField):
     """
     <extension
@@ -500,6 +531,7 @@ class Extension(AnnotationBase, RestrictedField):
     choice: Optional[Choice] = element()
     sequence: Optional[Sequence] = element()
     any_attribute: Optional[AnyAttribute] = element()
+    open_content: Optional[OpenContent] = element(name="openContent")
     attributes: Array[Attribute] = array_element(name="attribute")
     attribute_groups: Array[AttributeGroup] = array_element(name="attributeGroup")
     assertions: Array[Assertion] = array_element(name="assert")
@@ -755,7 +787,7 @@ class Restriction(RestrictedField, AnnotationBase, NamedField):
     all: Optional[All] = element()
     choice: Optional[Choice] = element()
     sequence: Optional[Sequence] = element()
-    any_attribute: Optional[AnyAttribute] = element()
+    open_content: Optional[OpenContent] = element(name="openContent")
     attributes: Array[Attribute] = array_element(name="attribute")
     attribute_groups: Array[AttributeGroup] = array_element(name="attributeGroup")
     enumerations: Array[Enumeration] = array_element(name="enumeration")
@@ -856,6 +888,7 @@ class ComplexType(AnnotationBase, NamedField, RestrictedField):
     choice: Optional[Choice] = element()
     sequence: Optional[Sequence] = element()
     any_attribute: Optional[AnyAttribute] = element()
+    open_content: Optional[OpenContent] = element(name="openContent")
     attributes: Array[Attribute] = array_element(name="attribute")
     attribute_groups: Array[AttributeGroup] = array_element(name="attributeGroup")
     assertion: Array[Assertion] = array_element(name="assert")
@@ -1146,6 +1179,7 @@ class Override(AnnotationBase):
     attribute_groups: Array[AttributeGroup] = array_element(name="attributeGroup")
     elements: Array[Element] = array_element(name="element")
     attributes: Array[Attribute] = array_element(name="attribute")
+    notations: Array[Notation] = array_element(name="notation")
 
 
 @dataclass
@@ -1186,6 +1220,9 @@ class Schema(AnnotationBase):
     location: Optional[Path] = field(default=None)
     element_form_default: FormType = attribute(default=FormType.UNQUALIFIED)
     attribute_form_default: FormType = attribute(default=FormType.UNQUALIFIED)
+    default_open_content: Optional[DefaultOpenContent] = element(
+        name="defaultOpenContent"
+    )
     includes: Array[Include] = array_element(name="include")
     imports: Array[Import] = array_element(name="import")
     redefines: Array[Redefine] = array_element(name="redefine")
@@ -1200,6 +1237,11 @@ class Schema(AnnotationBase):
     notations: Array[Notation] = array_element(name="notation")
 
     def sub_schemas(self) -> Iterator[UnionType[Import, Include, Redefine, Override]]:
+        imp_namespaces = [imp.namespace for imp in self.imports]
+        instance_ns = Namespace.INSTANCE.value
+        if instance_ns in self.nsmap.values() and instance_ns not in imp_namespaces:
+            yield Import.create(namespace=instance_ns)
+
         for imp in self.imports:
             yield imp
 

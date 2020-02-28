@@ -78,10 +78,8 @@ Example 13-26 Restricting open content
    :language: xml
    :lines: 3-
 
-.. warning::
-
-    XML Schema 1.1
-
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter13/example13261.py
+   :language: python
 
 Example 13-26.2 Restricting open content
 ----------------------------------------
@@ -90,10 +88,8 @@ Example 13-26.2 Restricting open content
    :language: xml
    :lines: 3-
 
-.. warning::
-
-    XML Schema 1.1
-
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter13/example13262.py
+   :language: python
 
 Example 13-26.3 Restricting open content
 ----------------------------------------
@@ -102,10 +98,8 @@ Example 13-26.3 Restricting open content
    :language: xml
    :lines: 3-
 
-.. warning::
-
-    XML Schema 1.1
-
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter13/example13263.py
+   :language: python
 
 Example 13-27 Mixed content restriction
 ---------------------------------------
@@ -306,10 +300,8 @@ Example 13-7 Extending open content
    :language: xml
    :lines: 3-
 
-.. warning::
-
-    XML Schema 1.1
-
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter13/example1307.py
+   :language: python
 
 Example 13-8 Mixed content extension
 ------------------------------------

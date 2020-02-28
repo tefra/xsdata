@@ -5,6 +5,7 @@ from xsdata.models.elements import Import
 from xsdata.models.elements import Include
 from xsdata.models.elements import Redefine
 from xsdata.models.elements import Schema
+from xsdata.models.enums import Namespace
 
 
 class SchemaTests(TestCase):
@@ -28,3 +29,18 @@ class SchemaTests(TestCase):
         expected = schema.imports + schema.includes + schema.redefines
         self.assertIsInstance(actual, Iterator)
         self.assertEqual(expected, list(actual))
+
+    def test_sub_schemas_include_instance_import_if_missing(self):
+        schema = Schema.create(nsmap={"foo": Namespace.INSTANCE.value})
+
+        actual = list(schema.sub_schemas())
+        self.assertEqual(1, len(actual))
+        self.assertEqual(Import.create(namespace=Namespace.INSTANCE.value), actual[0])
+
+        instance_import = Import.create(
+            namespace=Namespace.INSTANCE.value, schema_location="somewhere.xsd"
+        )
+        schema.imports.append(instance_import)
+        actual = list(schema.sub_schemas())
+        self.assertEqual(1, len(actual))
+        self.assertEqual(instance_import, actual[0])

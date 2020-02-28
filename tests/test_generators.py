@@ -124,6 +124,29 @@ class PythonAbstractGeneratorTests(FactoryTestCase):
             [mock.call(attr, ["a", "b"]) for attr in obj.attrs]
         )
 
+    def test_process_attributes_prevent_duplicates(self):
+        a = AttrFactory.create(name="a")
+        a_a = AttrFactory.create(name="a")
+        b = AttrFactory.create(name="b")
+        obj = ClassFactory.create(attrs=[a, a_a, b])
+
+        generator.process_attributes(obj, [])
+        self.assertEqual([a, b], obj.attrs)
+
+    def test_process_attributes_prevent_duplicates_after_process(self, *args):
+        obj = ClassFactory.create(
+            attrs=[
+                AttrFactory.create(name="a."),
+                AttrFactory.create(name="a-"),
+                AttrFactory.create(name="a*"),
+            ]
+        )
+
+        generator.process_attributes(obj, [])
+        actual = [(attr.name, attr.local_name) for attr in obj.attrs]
+        expected = [("ys4", "a."), ("ys0", "a-"), ("yso", "a*")]
+        self.assertEqual(expected, actual)
+
     @mock.patch.object(generator, "type_name", return_value="oof")
     def test_process_extension(self, mock_type_name):
         extension = ExtensionFactory.create(type=AttrTypeFactory.create(name="foobar"))
@@ -133,12 +156,12 @@ class PythonAbstractGeneratorTests(FactoryTestCase):
 
         self.assertEqual("oof", extension.type.name)
 
-    @mock.patch("xsdata.utils.text.split", return_value=[None, "nope"])
+    @mock.patch("xsdata.utils.text.suffix", return_value="nope")
     @mock.patch.object(generator, "attribute_default", return_value="life")
     @mock.patch.object(generator, "attribute_display_type", return_value="rab")
     @mock.patch.object(generator, "attribute_name", return_value="oof")
     def test_process_attribute(
-        self, mock_name, mock_display_type, mock_default, mock_split
+        self, mock_name, mock_display_type, mock_default, mock_suffix
     ):
         type_bar = AttrTypeFactory.create(name="bar")
         attr = AttrFactory.create(name="foo", types=[type_bar], default="thug")
@@ -155,7 +178,7 @@ class PythonAbstractGeneratorTests(FactoryTestCase):
         mock_name.assert_called_once_with("foo")
         mock_display_type.assert_called_once_with(attr, ["a", "b"])
         mock_default.assert_called_once_with(attr)
-        mock_split.assert_called_once_with("foo")
+        mock_suffix.assert_called_once_with("foo")
 
     def test_process_import(self):
         package = PackageFactory.create(

@@ -156,10 +156,8 @@ Example 12-29 Deterministic content model
    :language: xml
    :lines: 3-
 
-.. warning::
-
-    Duplicated attributes
-
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1229.py
+   :language: python
 
 Example 12-3 Anonymous complex type
 -----------------------------------

@@ -8,7 +8,6 @@ class ProductType:
     """
     :ivar version:
     :ivar id:
-    :ivar version:
     """
     version: Optional[Decimal] = field(
         default=None,
@@ -23,12 +22,5 @@ class ProductType:
             name="id",
             type="Attribute",
             required=True
-        )
-    )
-    version: Optional[Decimal] = field(
-        default=None,
-        metadata=dict(
-            name="version",
-            type="Attribute"
         )
     )

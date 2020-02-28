@@ -32,7 +32,7 @@ Example 16-2 Members of a substitution group
 
 .. warning::
 
-    XML Schema 1.1
+    substitution groups
 
 
 Example 16-4 Substitution group with simple types
@@ -56,7 +56,7 @@ Example 16-5 A member of two substitution groups
 
 .. warning::
 
-    XML Schema 1.1
+    substitution groups
 
 
 Example 16-6 Using a choice group

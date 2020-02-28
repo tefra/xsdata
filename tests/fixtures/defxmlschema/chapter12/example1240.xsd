@@ -4,7 +4,6 @@
   <xs:element name="product" type="OpenProductType" />
   <xs:complexType name="OpenProductType">
     <xs:openContent>
-      <!-- SKIPTEST: XML Schema 1.1 -->
       <xs:any namespace="##other" processContents="lax" />
     </xs:openContent>
     <xs:sequence>

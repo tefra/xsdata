@@ -26,6 +26,12 @@ class FormType(Enum):
     UNQUALIFIED = "unqualified"
 
 
+class Mode(Enum):
+    NONE = "none"
+    SUFFIX = "suffix"
+    INTERLEAVE = "interleave"
+
+
 class DataType(Enum):
     # xsdata custom any type
     QMAP = ("qmap", (QName, str))

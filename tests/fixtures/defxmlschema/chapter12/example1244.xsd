@@ -2,7 +2,6 @@
 <!-- Example 12-44 Defining a default open content model -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
   <xs:defaultOpenContent mode="suffix">
-    <!-- SKIPTEST: XML Schema 1.1 -->
     <xs:any namespace="##local" />
   </xs:defaultOpenContent>
   <xs:element name="catalog" type="CatalogType" />

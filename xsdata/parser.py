@@ -126,6 +126,30 @@ class SchemaParser(XmlParser):
                 if child.max_occurs is None:
                     child.max_occurs = obj.max_occurs
 
+    @staticmethod
+    def end_default_open_content(obj: T, element: etree.Element):
+        if not isinstance(obj, xsd.DefaultOpenContent):
+            return
+
+        for child in obj.children():
+            if isinstance(child, OccurrencesMixin):
+                if child.min_occurs is None:
+                    child.min_occurs = 1
+                if child.max_occurs is None:
+                    child.max_occurs = 1
+
+    @staticmethod
+    def end_open_content(obj: T, element: etree.Element):
+        if not isinstance(obj, xsd.OpenContent):
+            return
+
+        for child in obj.children():
+            if isinstance(child, OccurrencesMixin):
+                if child.min_occurs is None:
+                    child.min_occurs = 1
+                if child.max_occurs is None:
+                    child.max_occurs = 1
+
     @classmethod
     def end_all(cls, obj: T, element: etree.Element):
         """Elements inside an all element can by definition appear at most

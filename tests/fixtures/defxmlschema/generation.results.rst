@@ -1,7 +1,7 @@
 - Total tests: **203**
-- Passed: **176**
+- Passed: **177**
 - Should fail: **5**
 - Unsupported feature!: **12**
 - XML Schema 1.1: **1**
-- Duplicated attributes: **4**
+- Duplicated attributes: **3**
 - substitution groups: **5**

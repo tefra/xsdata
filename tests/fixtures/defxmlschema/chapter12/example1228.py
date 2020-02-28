@@ -7,8 +7,6 @@ class AorBorBothType:
     """
     :ivar a:
     :ivar b:
-    :ivar a:
-    :ivar b:
     """
     class Meta:
         name = "AOrBOrBothType"
@@ -27,23 +25,5 @@ class AorBorBothType:
             name="b",
             type="Element",
             namespace=""
-        )
-    )
-    a: Optional[str] = field(
-        default=None,
-        metadata=dict(
-            name="a",
-            type="Element",
-            namespace="",
-            required=True
-        )
-    )
-    b: Optional[str] = field(
-        default=None,
-        metadata=dict(
-            name="b",
-            type="Element",
-            namespace="",
-            required=True
         )
     )

@@ -7,6 +7,7 @@ from typing import Any
 from typing import Iterator
 from typing import List
 from typing import Optional
+from typing import Set
 from typing import Tuple
 from xml.sax.saxutils import quoteattr
 
@@ -89,8 +90,22 @@ class PythonAbstractGenerator(AbstractGenerator, ABC):
 
     @classmethod
     def process_attributes(cls, obj: Class, parents_list: List[str]):
+        seen: Set[str] = set()
+        obj.attrs = [
+            attr
+            for attr in obj.attrs
+            if attr.name not in seen and seen.add(attr.name) is None  # type: ignore
+        ]
+
+        seen.clear()
         for attr in obj.attrs:
             cls.process_attribute(attr, parents_list)
+            seen.add(attr.name)
+
+        if len(seen) != len(obj.attrs):
+            for attr in obj.attrs:
+                hash = urlsafe_b64encode(str(attr.local_name).encode()).decode()
+                attr.name = cls.attribute_name(hash)
 
     @classmethod
     def process_extension(cls, extension: Extension):
@@ -101,7 +116,7 @@ class PythonAbstractGenerator(AbstractGenerator, ABC):
         """Normalize attribute properties."""
         attr.name = cls.attribute_name(attr.name)
         attr.display_type = cls.attribute_display_type(attr, parents)
-        attr.local_name = text.split(attr.local_name)[1]
+        attr.local_name = text.suffix(attr.local_name)
         attr.default = cls.attribute_default(attr)
 
     @classmethod

@@ -7,7 +7,6 @@ class ProductType:
     """
     :ivar number:
     :ivar name:
-    :ivar name:
     """
     number: Optional[int] = field(
         default=None,
@@ -16,14 +15,6 @@ class ProductType:
             type="Element",
             namespace="",
             required=True
-        )
-    )
-    name: Optional[str] = field(
-        default=None,
-        metadata=dict(
-            name="name",
-            type="Element",
-            namespace=""
         )
     )
     name: Optional[str] = field(

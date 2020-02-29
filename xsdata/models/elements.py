@@ -1070,14 +1070,18 @@ class Element(AnnotationBase, NamedField, OccurrencesMixin):
 
     @property
     def real_type(self) -> Optional[str]:
-        if self.type:
-            return self.type
-        if self.ref:
-            return self.ref
-        if self.simple_type:
-            return self.simple_type.real_type
 
-        return None
+        types = set(
+            alternative.type for alternative in self.alternatives if alternative.type
+        )
+        if self.type:
+            types.add(self.type)
+        elif self.ref:
+            types.add(self.ref)
+        elif self.simple_type and self.simple_type.real_type:
+            types.add(self.simple_type.real_type)
+
+        return " ".join(sorted(types)) or None
 
     def get_restrictions(self) -> Dict[str, Anything]:
         restrictions = super().get_restrictions()

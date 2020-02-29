@@ -310,6 +310,7 @@ class Attribute(AnnotationBase, NamedField):
     name: Optional[str] = attribute()
     ref: Optional[str] = attribute()
     type: Optional[str] = attribute()
+    target_namespace: Optional[str] = attribute(name="targetNamespace")
     simple_type: Optional[SimpleType] = element()
     use: Optional[UseType] = attribute(default=UseType.OPTIONAL)
 
@@ -1046,6 +1047,7 @@ class Element(AnnotationBase, NamedField, OccurrencesMixin):
     form: Optional[FormType] = attribute()
     block: Optional[str] = attribute()
     final: Optional[str] = attribute()
+    target_namespace: Optional[str] = attribute(name="targetNamespace")
     simple_type: Optional[SimpleType] = element()
     complex_type: Optional[ComplexType] = element()
     alternatives: Array[Alternative] = array_element(name="alternative")

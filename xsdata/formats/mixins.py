@@ -42,8 +42,11 @@ class AbstractParser(ABC):
         """Parse the input stream and return the resulting object tree."""
 
     @classmethod
-    def parse_value(cls, types: List[Type], value: Any) -> Any:
+    def parse_value(cls, types: List[Type], value: Any, default: Any = None) -> Any:
         """Convert xml string values to s python primitive type."""
+
+        if value is None:
+            return default
 
         return to_python(types, value)
 

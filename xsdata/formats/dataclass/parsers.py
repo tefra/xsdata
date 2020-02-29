@@ -82,7 +82,7 @@ class JsonParser(AbstractParser, ModelInspect):
                 else self.parse_context(value, AnyElement)
             )
         else:
-            return self.parse_value(var.types, value)
+            return self.parse_value(var.types, value, var.default)
 
     @staticmethod
     def get_value(data: Dict, field: ClassVar):
@@ -105,6 +105,7 @@ class JsonParser(AbstractParser, ModelInspect):
 class QueueItem:
     index: int
     position: int
+    default: Any
     meta: Optional[ClassMeta] = field(default=None)
     types: List[Type] = field(default_factory=list)
 
@@ -127,7 +128,7 @@ class XmlParser(AbstractXmlParser, ModelInspect):
         meta = self.class_meta(clazz)
 
         self.objects = []
-        self.queue = [QueueItem(index=0, position=0, meta=meta)]
+        self.queue = [QueueItem(index=0, position=0, meta=meta, default=None)]
 
         return super(XmlParser, self).parse_context(context, clazz)
 
@@ -169,7 +170,11 @@ class XmlParser(AbstractXmlParser, ModelInspect):
         types = [] if meta else var.types
 
         queue_item = QueueItem(
-            meta=meta, index=self.index, types=types, position=len(self.objects)
+            meta=meta,
+            index=self.index,
+            types=types,
+            position=len(self.objects),
+            default=var.default,
         )
 
         self.queue.append(queue_item)
@@ -201,7 +206,7 @@ class XmlParser(AbstractXmlParser, ModelInspect):
                 **attr_params, **text_params, **any_params, **children
             )
         elif item.types:
-            obj = self.parse_value(item.types, element.text)
+            obj = self.parse_value(item.types, element.text, item.default)
         else:
             raise ValueError(f"Failed to create object from {element.tag}")
 
@@ -254,7 +259,7 @@ class XmlParser(AbstractXmlParser, ModelInspect):
             if qname in metadata.vars:
                 var = metadata.vars[qname]
                 if var.init:
-                    params[var.name] = self.parse_value(var.types, value)
+                    params[var.name] = self.parse_value(var.types, value, var.default)
             elif any_attr:
                 if any_attr.name not in params:
                     params[any_attr.name] = dict()
@@ -264,9 +269,9 @@ class XmlParser(AbstractXmlParser, ModelInspect):
 
     def bind_element_text(self, metadata: ClassMeta, element: Element):
         params = dict()
-        text_var = metadata.any_text
-        if text_var and element.text is not None and text_var.init:
-            params[text_var.name] = self.parse_value(text_var.types, element.text)
+        var = metadata.any_text
+        if var and element.text is not None and var.init:
+            params[var.name] = self.parse_value(var.types, element.text, var.default)
 
         return params
 

@@ -189,10 +189,10 @@ class SchemaParser(XmlParser):
                     child.max_occurs = max_occurs
 
     @classmethod
-    def parse_value(cls, types: List[Type], value: Any) -> Any:
+    def parse_value(cls, types: List[Type], value: Any, default: Any = None) -> Any:
         if int in types and value == "unbounded":
             return sys.maxsize
         try:
-            return super().parse_value(types, value)
+            return super().parse_value(types, value, default)
         except ValueError:
             return str(value)

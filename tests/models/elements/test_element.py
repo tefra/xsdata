@@ -1,5 +1,6 @@
 from unittest import TestCase
 
+from xsdata.models.elements import Alternative
 from xsdata.models.elements import ComplexType
 from xsdata.models.elements import Element
 from xsdata.models.elements import Length
@@ -40,6 +41,11 @@ class ElementTests(TestCase):
 
         obj.type = "bar"
         self.assertEqual(obj.type, obj.real_type)
+
+        obj.alternatives.append(Alternative.create(type="foo"))
+        obj.alternatives.append(Alternative.create(type="bar"))
+        obj.alternatives.append(Alternative.create(type="thug"))
+        self.assertEqual("bar foo thug", obj.real_type)
 
     def test_property_extends(self):
         obj = Element.create()

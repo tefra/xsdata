@@ -85,8 +85,8 @@ class PythonAbstractGenerator(AbstractGenerator, ABC):
 
         if len(names) != len(obj.attrs):
             for attr in obj.attrs:
-                hash = urlsafe_b64encode(str(attr.default).encode()).decode()
-                attr.name = cls.enumeration_name(hash)
+                safe_name = urlsafe_b64encode(str(attr.default).encode()).decode()
+                attr.name = cls.enumeration_name(safe_name)
 
     @classmethod
     def process_attributes(cls, obj: Class, parents_list: List[str]):
@@ -104,8 +104,8 @@ class PythonAbstractGenerator(AbstractGenerator, ABC):
 
         if len(seen) != len(obj.attrs):
             for attr in obj.attrs:
-                hash = urlsafe_b64encode(str(attr.local_name).encode()).decode()
-                attr.name = cls.attribute_name(hash)
+                safe_name = urlsafe_b64encode(str(attr.local_name).encode()).decode()
+                attr.name = cls.attribute_name(safe_name)
 
     @classmethod
     def process_extension(cls, extension: Extension):

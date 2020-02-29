@@ -31,14 +31,14 @@ class SchemaTests(TestCase):
         self.assertEqual(expected, list(actual))
 
     def test_sub_schemas_include_instance_import_if_missing(self):
-        schema = Schema.create(nsmap={"foo": Namespace.INSTANCE.value})
+        schema = Schema.create(nsmap={"foo": Namespace.XSI.value})
 
         actual = list(schema.sub_schemas())
         self.assertEqual(1, len(actual))
-        self.assertEqual(Import.create(namespace=Namespace.INSTANCE.value), actual[0])
+        self.assertEqual(Import.create(namespace=Namespace.XSI.value), actual[0])
 
         instance_import = Import.create(
-            namespace=Namespace.INSTANCE.value, schema_location="somewhere.xsd"
+            namespace=Namespace.XSI.value, schema_location="somewhere.xsd"
         )
         schema.imports.append(instance_import)
         actual = list(schema.sub_schemas())

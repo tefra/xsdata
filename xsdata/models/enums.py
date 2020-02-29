@@ -7,9 +7,9 @@ from lxml.etree import QName
 
 
 class Namespace(Enum):
-    SCHEMA = "http://www.w3.org/2001/XMLSchema"
+    XS = "http://www.w3.org/2001/XMLSchema"
     XML = "http://www.w3.org/XML/1998/namespace"
-    INSTANCE = "http://www.w3.org/2001/XMLSchema-instance"
+    XSI = "http://www.w3.org/2001/XMLSchema-instance"
     XLINK = "http://www.w3.org/1999/xlink"
 
     @property
@@ -19,6 +19,13 @@ class Namespace(Enum):
     @property
     def prefix(self):
         return self.name.lower()
+
+    @classmethod
+    def get_enum(cls, uri: str) -> Optional["Namespace"]:
+        return __STANDARD_NAMESPACES__.get(uri) if uri else None
+
+
+__STANDARD_NAMESPACES__ = {ns.uri: ns for ns in Namespace}
 
 
 class FormType(Enum):

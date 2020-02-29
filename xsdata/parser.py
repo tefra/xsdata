@@ -2,13 +2,13 @@ import pathlib
 import sys
 from dataclasses import dataclass
 from dataclasses import field
+from enum import Enum
 from typing import Any
 from typing import Callable
 from typing import List
 from typing import Optional
 from typing import Type
 from typing import TypeVar
-from typing import Union
 
 from lxml import etree
 
@@ -16,10 +16,18 @@ from xsdata.formats.dataclass.parsers import QueueItem
 from xsdata.formats.dataclass.parsers import XmlParser
 from xsdata.models import elements as xsd
 from xsdata.models.enums import FormType
+from xsdata.models.enums import Namespace
 from xsdata.models.mixins import OccurrencesMixin
 from xsdata.utils import text
 
 T = TypeVar("T")
+
+
+class Force(Enum):
+    NO = 0
+    MIN_ONLY = 1
+    MAX_ONLY = 2
+    BOTH = 3
 
 
 @dataclass
@@ -72,23 +80,40 @@ class SchemaParser(XmlParser):
         self.default_attributes = element.attrib.get("defaultAttributes", None)
 
     def end_schema(self, obj: T, element: etree.Element):
-        """Collect the schema's default form for attributes and elements for
-        later usage."""
+        """Set schema namespaces and default form for elements and
+        attributes."""
         if isinstance(obj, xsd.Schema):
-            if self.element_form:
-                obj.element_form_default = FormType(self.element_form)
-            if self.attribute_form:
-                obj.attribute_form_default = FormType(self.attribute_form)
+            self.set_schema_forms(obj)
+            self.set_schema_namespaces(obj, element)
 
-            obj.nsmap = element.nsmap
-            if obj.target_namespace is None and self.target_namespace is not None:
-                obj.target_namespace = self.target_namespace
+    def set_schema_forms(self, obj: xsd.Schema):
+        """
+        Set the default form type for elements and attributes.
 
-            for child_element in obj.elements:
-                child_element.form = FormType.QUALIFIED
+        Global elements and attributes are by default qualified.
+        """
+        if self.element_form:
+            obj.element_form_default = FormType(self.element_form)
+        if self.attribute_form:
+            obj.attribute_form_default = FormType(self.attribute_form)
 
-            for child_attribute in obj.attributes:
-                child_attribute.form = FormType.QUALIFIED
+        for child_element in obj.elements:
+            child_element.form = FormType.QUALIFIED
+
+        for child_attribute in obj.attributes:
+            child_attribute.form = FormType.QUALIFIED
+
+    def set_schema_namespaces(self, obj: xsd.Schema, element: etree.Element):
+        """Set the given schema's target namespace and add the default
+        namespaces if the are missing xsi, xlink, xml, xs."""
+        obj.target_namespace = obj.target_namespace or self.target_namespace
+
+        obj.nsmap = element.nsmap
+        namespaces = obj.nsmap.values()
+
+        for namespace in Namespace:
+            if namespace.uri not in namespaces:
+                obj.nsmap[namespace.prefix] = namespace.uri
 
     def end_element(self, obj: T, element: etree.Element):
         """Assign the schema's default form for elements if the given element
@@ -103,7 +128,7 @@ class SchemaParser(XmlParser):
             obj.form = FormType(self.attribute_form)
 
     def end_complex_type(self, obj: T, element: etree.Element):
-        """Prepend an attribute group references when default attributes
+        """Prepend an attribute group reference when default attributes
         apply."""
         if (
             isinstance(obj, xsd.ComplexType)
@@ -113,77 +138,55 @@ class SchemaParser(XmlParser):
             attribute_group = xsd.AttributeGroup.create(ref=self.default_attributes)
             obj.attribute_groups.insert(0, attribute_group)
 
-    @staticmethod
-    def end_choice(obj: T, element: etree.Element):
+    @classmethod
+    def end_choice(cls, obj: T, element: etree.Element):
         """Elements inside a choice are by definition optional, reset their min
         occurs counter."""
-        if not isinstance(obj, xsd.Choice):
-            return
+        if isinstance(obj, xsd.Choice):
+            cls.cascade_occurs(obj, 0, obj.max_occurs, force=Force.MIN_ONLY)
 
-        for child in obj.children():
-            if isinstance(child, OccurrencesMixin):
-                child.min_occurs = 0
-                if child.max_occurs is None:
-                    child.max_occurs = obj.max_occurs
+    @classmethod
+    def end_default_open_content(cls, obj: T, element: etree.Element):
+        if isinstance(obj, xsd.DefaultOpenContent):
+            cls.cascade_occurs(obj, min_occurs=1, max_occurs=1)
 
-    @staticmethod
-    def end_default_open_content(obj: T, element: etree.Element):
-        if not isinstance(obj, xsd.DefaultOpenContent):
-            return
-
-        for child in obj.children():
-            if isinstance(child, OccurrencesMixin):
-                if child.min_occurs is None:
-                    child.min_occurs = 1
-                if child.max_occurs is None:
-                    child.max_occurs = 1
-
-    @staticmethod
-    def end_open_content(obj: T, element: etree.Element):
-        if not isinstance(obj, xsd.OpenContent):
-            return
-
-        for child in obj.children():
-            if isinstance(child, OccurrencesMixin):
-                if child.min_occurs is None:
-                    child.min_occurs = 1
-                if child.max_occurs is None:
-                    child.max_occurs = 1
+    @classmethod
+    def end_open_content(cls, obj: T, element: etree.Element):
+        if isinstance(obj, xsd.OpenContent):
+            cls.cascade_occurs(obj, 1, 1)
 
     @classmethod
     def end_all(cls, obj: T, element: etree.Element):
         """Elements inside an all element can by definition appear at most
         once, reset their max occur counter."""
-
-        if not isinstance(obj, xsd.All):
-            return
-
-        for child in obj.children():
-            if isinstance(child, OccurrencesMixin):
-                cls.inherit_occurs(obj, child, force=True)
+        if isinstance(obj, xsd.All):
+            cls.cascade_occurs(obj, obj.min_occurs, obj.max_occurs, force=Force.BOTH)
 
     @classmethod
     def end_sequence(cls, obj: T, element: etree.Element):
         """Elements inside a sequence inherit min|max occur counter if it is
         not set."""
-        if not isinstance(obj, xsd.Sequence):
-            return
-
-        for child in obj.children():
-            if isinstance(child, OccurrencesMixin):
-                cls.inherit_occurs(obj, child)
+        if isinstance(obj, xsd.Sequence):
+            cls.cascade_occurs(obj, obj.min_occurs, obj.max_occurs)
 
     @classmethod
-    def inherit_occurs(
+    def cascade_occurs(
         cls,
-        parent: Union[xsd.Sequence, xsd.All],
-        child: OccurrencesMixin,
-        force: bool = False,
+        parent: xsd.ElementBase,
+        min_occurs: Optional[int] = None,
+        max_occurs: Optional[int] = None,
+        force: Force = Force.NO,
     ):
-        if child.min_occurs is None or force:
-            child.min_occurs = parent.min_occurs
-        if child.max_occurs is None or force:
-            child.max_occurs = parent.max_occurs
+
+        force_min = force in (Force.BOTH, Force.MIN_ONLY)
+        force_max = force in (Force.BOTH, Force.MAX_ONLY)
+
+        for child in parent.children():
+            if isinstance(child, OccurrencesMixin):
+                if child.min_occurs is None or force_min:
+                    child.min_occurs = min_occurs
+                if child.max_occurs is None or force_max:
+                    child.max_occurs = max_occurs
 
     @classmethod
     def parse_value(cls, types: List[Type], value: Any) -> Any:

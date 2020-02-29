@@ -83,17 +83,19 @@ class ProcessTask:
 
     @staticmethod
     def resolve_local_schema(schema: SchemaLocator) -> Optional[Path]:
-        try:
-            namespace = Namespace(schema.namespace)  # type: ignore
-            path = (
-                Path(__file__)
-                .absolute()
-                .parent.joinpath(f"schemas/{namespace.prefix}.xsd")
-            )
-            schema.schema_location = str(path)
-            return path
-        except (ValueError, AttributeError):
-            return None
+        if not isinstance(schema, (Override, Redefine)) and schema.namespace:
+            ns = Namespace.get_enum(schema.namespace)
+            uri = schema.schema_location
+            if ns and (not uri or uri.startswith("http")):
+                path = (
+                    Path(__file__)
+                    .absolute()
+                    .parent.joinpath(f"schemas/{ns.prefix}.xsd")
+                )
+                schema.schema_location = str(path)
+                return path
+
+        return None
 
     @staticmethod
     def resolve_schema(xsd: Path, schema: SchemaLocator) -> Path:

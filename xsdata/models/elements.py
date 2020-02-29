@@ -1207,7 +1207,7 @@ class Schema(AnnotationBase):
     """
 
     class Meta:
-        namespace = Namespace.SCHEMA.uri
+        namespace = Namespace.XS.uri
 
     target: Optional[str] = attribute()
     block_default: Optional[str] = attribute()
@@ -1238,7 +1238,7 @@ class Schema(AnnotationBase):
 
     def sub_schemas(self) -> Iterator[UnionType[Import, Include, Redefine, Override]]:
         imp_namespaces = [imp.namespace for imp in self.imports]
-        instance_ns = Namespace.INSTANCE.value
+        instance_ns = Namespace.XSI.value
         if instance_ns in self.nsmap.values() and instance_ns not in imp_namespaces:
             yield Import.create(namespace=instance_ns)
 

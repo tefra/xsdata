@@ -138,14 +138,19 @@ class ClassBuilder:
 
     def element_namespace(self, obj: NamedField) -> Optional[str]:
         """
-        Returns an element's namespace by its prefix and form.
+        Return the target namespace for the given schema element.
 
-        Examples:
+        In order:
+            - elements/attributes with specific target namespace
             - prefixed elements returns the namespace from schema nsmap
             - qualified elements returns the schema target namespace
             - unqualified elements return an empty string
             - unqualified attributes return None
         """
+
+        target_namespace = getattr(obj, "target_namespace", None)
+        if target_namespace:
+            return target_namespace
 
         prefix = obj.prefix
         if prefix:

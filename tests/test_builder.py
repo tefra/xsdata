@@ -115,8 +115,14 @@ class ClassBuilderTests(FactoryTestCase):
         element = Element.create()
         self.assertEqual("", self.builder.element_namespace(element))
 
+        element.target_namespace = "tns"
+        self.assertEqual("tns", self.builder.element_namespace(element))
+
         attribute = Attribute.create()
         self.assertIsNone(self.builder.element_namespace(attribute))
+
+        attribute.target_namespace = "tns"
+        self.assertEqual("tns", self.builder.element_namespace(attribute))
 
     @patch.object(ClassBuilder, "element_namespace")
     @patch.object(ClassBuilder, "build_class_attributes")

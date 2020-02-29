@@ -82,7 +82,6 @@ class DerivedType(BaseType):
     :ivar d:
     :ivar e:
     :ivar f:
-    :ivar g:
     """
     a: Optional[int] = field(
         default=None,
@@ -127,12 +126,5 @@ class DerivedType(BaseType):
             name="f",
             type="Attribute",
             required=True
-        )
-    )
-    g: Optional[str] = field(
-        default=None,
-        metadata=dict(
-            name="g",
-            type="Attribute"
         )
     )

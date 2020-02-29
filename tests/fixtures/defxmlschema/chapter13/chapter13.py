@@ -104,7 +104,6 @@ class RestrictedProductType(ProductType):
     :ivar name:
     :ivar routing_num:
     :ivar eff_date:
-    :ivar lang:
     """
     number: Optional[int] = field(
         default=None,
@@ -136,13 +135,6 @@ class RestrictedProductType(ProductType):
         default="1900-01-01",
         metadata=dict(
             name="effDate",
-            type="Attribute"
-        )
-    )
-    lang: Optional[str] = field(
-        default=None,
-        metadata=dict(
-            name="lang",
             type="Attribute"
         )
     )

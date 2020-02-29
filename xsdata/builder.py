@@ -191,6 +191,10 @@ class ClassBuilder:
         """
         types = self.build_class_attribute_types(instance, obj)
         restrictions = Restrictions(**obj.get_restrictions())
+
+        if restrictions.prohibited:
+            return
+
         instance.attrs.append(
             Attr(
                 index=obj.index,

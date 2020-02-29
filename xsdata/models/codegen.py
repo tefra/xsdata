@@ -17,6 +17,7 @@ from xsdata.models.enums import TagType
 @dataclass
 class Restrictions:
     required: Optional[bool] = field(default=None)
+    prohibited: Optional[bool] = field(default=None)
     min_occurs: Optional[int] = field(default=None)
     max_occurs: Optional[int] = field(default=None)
     min_exclusive: Optional[float] = field(default=None)

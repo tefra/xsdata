@@ -330,8 +330,8 @@ class Attribute(AnnotationBase, NamedField):
 
     def get_restrictions(self) -> Dict[str, Anything]:
         restrictions = dict()
-        if self.use == UseType.REQUIRED:
-            restrictions["required"] = True
+        if self.use in (UseType.REQUIRED, UseType.PROHIBITED):
+            restrictions[self.use.value] = True
         if self.simple_type:
             restrictions.update(self.simple_type.get_restrictions())
 

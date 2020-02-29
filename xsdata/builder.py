@@ -112,7 +112,7 @@ class ClassBuilder:
         self_ref = False
         namespace = self.schema.nsmap.get(prefix)
 
-        if prefix == Namespace.XML.prefix or namespace == Namespace.SCHEMA.uri:
+        if Namespace.get_enum(namespace) and DataType.get_enum(suffix):
             name = suffix
             native = True
         elif namespace == self.schema.target_namespace:

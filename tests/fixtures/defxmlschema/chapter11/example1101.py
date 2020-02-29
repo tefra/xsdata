@@ -24,6 +24,7 @@ class TextType:
         default=None,
         metadata=dict(
             name="lang",
-            type="Attribute"
+            type="Attribute",
+            namespace="http://www.w3.org/XML/1998/namespace"
         )
     )

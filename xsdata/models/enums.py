@@ -21,7 +21,7 @@ class Namespace(Enum):
         return self.name.lower()
 
     @classmethod
-    def get_enum(cls, uri: str) -> Optional["Namespace"]:
+    def get_enum(cls, uri: Optional[str]) -> Optional["Namespace"]:
         return __STANDARD_NAMESPACES__.get(uri) if uri else None
 
 

@@ -320,7 +320,7 @@ class ClassBuilderTests(FactoryTestCase):
     @patch.object(Attribute, "real_type", new_callable=PropertyMock)
     @patch.object(ClassBuilder, "build_inner_class")
     def test_build_class_attribute_types(self, mock_build_inner_class, mock_real_type):
-        mock_real_type.return_value = " xs:int  xs:str "
+        mock_real_type.return_value = " xs:int  xs:string "
         mock_build_inner_class.return_value = None
 
         item = ClassFactory.create()
@@ -329,7 +329,7 @@ class ClassBuilderTests(FactoryTestCase):
 
         expected = [
             AttrTypeFactory.create(name="int", native=True),
-            AttrTypeFactory.create(name="str", native=True),
+            AttrTypeFactory.create(name="string", native=True),
         ]
 
         self.assertEqual(expected, actual)
@@ -340,7 +340,7 @@ class ClassBuilderTests(FactoryTestCase):
         self, mock_build_inner_class, mock_real_type
     ):
         inner_class = ClassFactory.create(name="foo")
-        mock_real_type.return_value = " xs:int  xs:str "
+        mock_real_type.return_value = " xs:int  xs:string "
         mock_build_inner_class.return_value = inner_class
 
         item = ClassFactory.create()
@@ -349,7 +349,7 @@ class ClassBuilderTests(FactoryTestCase):
 
         expected = [
             AttrTypeFactory.create(name="int", native=True),
-            AttrTypeFactory.create(name="str", native=True),
+            AttrTypeFactory.create(name="string", native=True),
             AttrTypeFactory.create(name="foo", forward_ref=True),
         ]
 

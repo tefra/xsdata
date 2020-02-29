@@ -71,10 +71,15 @@ class ParserTests(TestCase):
                 xmlns:xs="http://www.w3.org/2001/XMLSchema" />"""
 
         schema = self.parser.from_xsd_string(xsd)
-        self.assertEqual(
-            {None: "http://www/default", "xs": "http://www.w3.org/2001/XMLSchema"},
-            schema.nsmap,
-        )
+        expected = {
+            None: "http://www/default",
+            "xlink": "http://www.w3.org/1999/xlink",
+            "xml": "http://www.w3.org/XML/1998/namespace",
+            "xs": "http://www.w3.org/2001/XMLSchema",
+            "xsi": "http://www.w3.org/2001/XMLSchema-instance",
+        }
+
+        self.assertEqual(expected, schema.nsmap)
         self.assertEqual("http://www/target", schema.target_namespace)
 
     def test_schema_nsmap_without_target_namespace(self):
@@ -84,10 +89,14 @@ class ParserTests(TestCase):
 
         self.parser.target_namespace = "parent"
         schema = self.parser.from_xsd_string(xsd)
-        self.assertEqual(
-            {None: "http://www/default", "xs": "http://www.w3.org/2001/XMLSchema"},
-            schema.nsmap,
-        )
+        expected = {
+            None: "http://www/default",
+            "xlink": "http://www.w3.org/1999/xlink",
+            "xml": "http://www.w3.org/XML/1998/namespace",
+            "xs": "http://www.w3.org/2001/XMLSchema",
+            "xsi": "http://www.w3.org/2001/XMLSchema-instance",
+        }
+        self.assertEqual(expected, schema.nsmap)
         self.assertEqual("parent", schema.target_namespace)
 
     def test_top_level_elements_and_attributes_are_qualified(self):

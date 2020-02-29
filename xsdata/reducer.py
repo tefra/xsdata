@@ -41,8 +41,9 @@ class ClassReducer:
         Steps:
             * Merge redefined classes
             * Create a class qname index
+            * Mark as abstract classes with the same qname
             * Flatten classes
-            * Store common types and return the rest
+            * Return a final class list for code generators.
         """
 
         self.schema = schema
@@ -58,6 +59,16 @@ class ClassReducer:
         return self.fetch_classes_for_generation()
 
     def fetch_classes_for_generation(self) -> List[Class]:
+        """
+        Return the qualified classes to continue for code generation.
+
+        The rest of the classes are stored as common types to be used later
+        by the next schemas in the proccess.
+
+        Qualifications:
+            * not an abstract
+            * type: element | complexType | simpleType with enumerations
+        """
         result = []
         for qname, classes in self.class_index.items():
             for item in classes:
@@ -84,6 +95,9 @@ class ClassReducer:
             for obj in classes:
                 if obj.key not in self.processed:
                     self.flatten_class(obj)
+
+    def is_self_referencing(self, item: Class, dependency: AttrType) -> bool:
+        return self.find_class(dependency, condition=lambda x: x is item) is not None
 
     def find_class(
         self, dependency: AttrType, condition=simple_type
@@ -252,7 +266,10 @@ class ClassReducer:
             if not attr_type.native:
                 common = self.find_class(attr_type)
 
-            if common is None or common.is_enumeration:
+            if common is None:
+                attr_type.self_ref = self.is_self_referencing(item, attr_type)
+                types.append(attr_type)
+            elif common.is_enumeration:
                 types.append(attr_type)
             elif len(common.attrs) == 1:
                 common_attr = common.attrs[0]

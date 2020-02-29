@@ -201,6 +201,18 @@ class ClassReducerFindClassTests(ClassReducerBaseTestCase):
         )
         self.assertIsNone(actual)
 
+    def test_is_self_referencing(self):
+        item = ClassFactory.create()
+        attr_type = AttrTypeFactory.create(name=item.name)
+        attr = AttrFactory.create(types=[attr_type])
+        item.attrs.append(attr)
+
+        self.reducer.create_class_qname_index([item])
+        self.assertTrue(self.reducer.is_self_referencing(item, attr_type))
+
+        attr_type.name = "foobar"
+        self.assertFalse(self.reducer.is_self_referencing(item, attr_type))
+
 
 class ClassReducerFlattenClassTests(ClassReducerBaseTestCase):
     @mock.patch.object(ClassReducer, "flatten_enumeration_unions")
@@ -388,8 +400,9 @@ class ClassReducerHelpersTests(ClassReducerBaseTestCase):
 
 
 class ClassReducerFlattenAttributeTests(ClassReducerBaseTestCase):
+    @mock.patch.object(ClassReducer, "is_self_referencing", return_value=False)
     @mock.patch.object(ClassReducer, "find_class")
-    def test_when_no_common_is_found(self, mock_find_class):
+    def test_when_no_common_is_found(self, mock_find_class, mock_is_self_referencing):
         mock_find_class.return_value = None
 
         parent = ClassFactory.create()
@@ -399,6 +412,17 @@ class ClassReducerFlattenAttributeTests(ClassReducerBaseTestCase):
 
         self.assertEqual([type_a], attr.types)
         mock_find_class.assert_called_once_with(type_a)
+
+    @mock.patch.object(ClassReducer, "is_self_referencing", return_value=True)
+    @mock.patch.object(ClassReducer, "find_class", return_value=None)
+    def test_when_attr_is_self_referencing(self, *args):
+        parent = ClassFactory.create()
+        type_a = AttrTypeFactory.create()
+        attr = AttrFactory.create(name="a", types=[type_a])
+        self.reducer.flatten_attribute(parent, attr)
+
+        self.assertEqual([type_a], attr.types)
+        self.assertTrue(type_a.self_ref)
 
     @mock.patch.object(ClassReducer, "find_class")
     def test_when_common_is_enumeration(self, mock_find_class):
@@ -416,7 +440,7 @@ class ClassReducerFlattenAttributeTests(ClassReducerBaseTestCase):
 
     @mock.patch.object(ClassReducer, "copy_inner_classes")
     @mock.patch.object(ClassReducer, "find_class")
-    def test_when_common_class_only_one_attribute(
+    def test_when_common_class_has_only_one_attribute(
         self, mock_find_class, mock_copy_inner_classes
     ):
         type_a = AttrTypeFactory.create(name="a")

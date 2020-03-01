@@ -105,7 +105,8 @@ class JsonParser(AbstractParser, ModelInspect):
 class QueueItem:
     index: int
     position: int
-    default: Any
+    default: Any = field(default=None)
+    qname: Optional[str] = field(default=None)
     meta: Optional[ClassMeta] = field(default=None)
     types: List[Type] = field(default_factory=list)
 
@@ -134,42 +135,46 @@ class XmlParser(AbstractXmlParser, ModelInspect):
 
     def start_node(self, element: Element):
         """
-        Prepare metadata queue to bind the given element to a dataclass object.
+        Queue the necessary metadata to bind the given element when it's fully
+        parsed.
 
-        In order:
-        - If last item in queue is None assume we are inside mixed content
-        - If element qname is not a var in the last item in the queue.
-          - Check if the first element element is root and skip the rest.
-          - Check if the last queue item supports mixed content and setup the queue to
-          bypass direct data binding to a new dataclass object.
-        - If element qname is a var in the last item in the queue append its class
-        metadata to the queue for the upcoming data binding.
+        Checks for the last item in queue:
+        - Is none or has none meta                        -> inside a wildcard
+        - Element tag exists in known variables           -> dataclass or primitive
+        - Element tag equals meta qualified name          -> root element
+        - Element tag unknown but queue supports wildcard -> start a wildcard
 
         :raises Value: When the parser doesn't know how to handle the given element.
         """
         qname = element.tag
         item = self.queue[-1]
 
-        if not item or not item.meta:
+        if not item or not item.meta:  # Assuming inside a wildcard
             return self.queue.append(None)
+        elif qname in item.meta.vars:  # A dataclass or a primitive field
+            queue_item = self.create_queue_item(item.meta.vars[qname], item.meta.qname)
+            self.queue.append(queue_item)
+        elif item.meta.qname == qname:  # root
+            pass
+        elif item.meta.any_element:  # Wildcard jackpot
+            queue_item = self.create_wildcard_queue_item(item.meta.any_element.qname)
+            self.queue.append(queue_item)
+        else:  # Unknown :)
+            raise ValueError(
+                f"{item.meta.qname} does not support mixed content: {qname}"
+            )
 
-        if item.meta and qname not in item.meta.vars:
-            if item.meta.qname == qname:
-                self.index += 1
-                self.emit_event(EventType.START, qname, item=item, element=element)
-                return None  # root
-            elif item.meta.any_element:
-                return self.queue.append(None)
-            else:
-                raise ValueError(
-                    f"{item.meta.qname} does not support mixed content: {qname}"
-                )
+        self.index += 1
+        self.emit_event(EventType.START, qname, item=item, element=element)
 
-        var = item.meta.vars[qname]
-        meta = self.class_meta(var.clazz, item.meta.qname) if var.is_dataclass else None
-        types = [] if meta else var.types
+    def create_queue_item(self, var: ClassVar, parent_qname: QName):
+        meta = None
+        types = var.types
+        if var.is_dataclass:
+            meta = self.class_meta(var.clazz, parent_qname)
+            types = []
 
-        queue_item = QueueItem(
+        return QueueItem(
             meta=meta,
             index=self.index,
             types=types,
@@ -177,40 +182,41 @@ class XmlParser(AbstractXmlParser, ModelInspect):
             default=var.default,
         )
 
-        self.queue.append(queue_item)
-        self.index += 1
-        self.emit_event(EventType.START, qname, item=item, element=element)
+    def create_wildcard_queue_item(self, parent_qname: QName):
+        return QueueItem(
+            index=self.index, position=len(self.objects), qname=parent_qname,
+        )
 
     def end_node(self, element: Element) -> Optional[T]:
         """
         Build an objects tree for the given element.
 
-        Construct a dataclass instance with the attributes of the given element and if
-        any pending objects that belong to the model. Otherwise parse as a primitive
-        type the element's text content.
+        Construct a dataclass instance with the attributes of the given element and any
+        pending objects that belong to the model. Otherwise parse as a primitive type
+        the element's text content.
 
         :returns object: A dataclass object or a python primitive value.
-        :raises ValueError: When parser has no data bind strategy for the given object.
         """
         item = self.queue.pop()
-
-        if item is None:
+        if not item:  # Assuming inside a wildcard
             return None
-        elif item.meta:
+
+        qname = QName(element.tag)
+        if item.meta:  # dataclass
             attr_params = self.bind_element_attrs(item.meta, element)
             text_params = self.bind_element_text(item.meta, element)
-            any_params = self.bind_element_any(item.meta, element)
-            children = self.fetch_class_children(item)
-
-            obj = item.meta.clazz(
-                **attr_params, **text_params, **any_params, **children
-            )
-        elif item.types:
+            children = self.fetch_class_children(item, element)
+            obj = item.meta.clazz(**attr_params, **text_params, **children)
+        elif item.types:  # primitive
             obj = self.parse_value(item.types, element.text, item.default)
-        else:
+        elif item.qname:  # wildcard
+            obj = self.parse_any_element(element)
+            obj.children = self.fetch_any_children(item)
+            qname = item.qname
+        else:  # unknown :)
             raise ValueError(f"Failed to create object from {element.tag}")
 
-        self.objects.append((QName(element.tag), obj))
+        self.objects.append((qname, obj))
         self.emit_event(EventType.END, element.tag, obj=obj, element=element)
 
         return obj
@@ -222,7 +228,7 @@ class XmlParser(AbstractXmlParser, ModelInspect):
         if hasattr(self, method_name):
             getattr(self, method_name)(**kwargs)
 
-    def fetch_class_children(self, item: QueueItem) -> Dict[str, Any]:
+    def fetch_class_children(self, item: QueueItem, element: Element) -> Dict[str, Any]:
         """
         Return a dictionary of qualified object names and their values for the
         given queue item.
@@ -236,6 +242,7 @@ class XmlParser(AbstractXmlParser, ModelInspect):
         while len(self.objects) > item.position:
             qname, value = self.objects.pop(item.position)
             arg = item.meta.vars[qname]
+
             if not arg.init:
                 continue
             if value is None:
@@ -246,7 +253,22 @@ class XmlParser(AbstractXmlParser, ModelInspect):
             else:
                 params[arg.name] = value
 
+        if item.meta.mixed and item.meta.any_element:
+            var = item.meta.any_element
+            txt, tail = self.element_text_and_tail(element)
+            if text:
+                params[var.name].insert(0, txt)
+            if tail:
+                params[var.name].append(tail)
+
         return params
+
+    def fetch_any_children(self, item: QueueItem) -> List[object]:
+        children = []
+        while len(self.objects) > item.position:
+            _, value = self.objects.pop(item.position)
+            children.append(value)
+        return children
 
     def bind_element_attrs(self, metadata: ClassMeta, element: Element) -> Dict:
         """Parse the given element's attributes and any text content and return
@@ -275,36 +297,22 @@ class XmlParser(AbstractXmlParser, ModelInspect):
 
         return params
 
-    def bind_element_any(self, metadata: ClassMeta, element: Element):
-        params = dict()
-        any_var = metadata.any_element
-        if any_var:
-            text = element.text.strip() if element.text else None
-            tail = element.tail.strip() if element.tail else None
-            value: List[object] = list(
-                filter(None, map(self.parse_any_element, element))
-            )
-
-            if text:
-                value.insert(0, text)
-            if tail:
-                value.append(tail)
-            if value:
-                params[any_var.name] = value
-
-        return params
-
     @classmethod
     def parse_any_element(cls, element: Element) -> Optional[AnyElement]:
-        text = element.text.strip() if element.text else None
-        tail = element.tail.strip() if element.tail else None
-
-        if isinstance(element.tag, str):
+        if not isinstance(element.tag, str):
+            return None
+        else:
+            txt, tail = cls.element_text_and_tail(element)
             return AnyElement(
                 qname=element.tag,
-                text=text or None,
+                text=txt or None,
                 tail=tail or None,
-                children=list(filter(None, map(cls.parse_any_element, element))),
                 attributes={k: v for k, v in element.attrib.items()},
             )
-        return None
+
+    @classmethod
+    def element_text_and_tail(cls, element: Element) -> Tuple:
+        return (
+            element.text.strip() if element.text else None,
+            element.tail.strip() if element.tail else None,
+        )

@@ -41,7 +41,6 @@ class ItemsType(DescribedType):
         metadata=dict(
             name="product",
             type="Element",
-            namespace="",
             min_occurs=1,
             max_occurs=9223372036854775807
         )
@@ -58,7 +57,6 @@ class PurchaseOrderType(DescribedType):
         metadata=dict(
             name="items",
             type="Element",
-            namespace="",
             required=True
         )
     )

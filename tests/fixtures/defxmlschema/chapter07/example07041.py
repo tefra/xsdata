@@ -14,7 +14,8 @@ class SizeType:
         default=None,
         metadata=dict(
             name="global",
-            type="Attribute"
+            type="Attribute",
+            namespace="http://datypic.com/prod"
         )
     )
     unqual: Optional[str] = field(

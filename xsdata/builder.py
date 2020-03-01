@@ -27,7 +27,6 @@ from xsdata.models.enums import DataType
 from xsdata.models.enums import Namespace
 from xsdata.models.enums import TagType
 from xsdata.models.mixins import ElementBase
-from xsdata.models.mixins import NamedField
 from xsdata.utils import text
 
 BaseElement = Union[Attribute, AttributeGroup, Element, ComplexType, SimpleType, Group]
@@ -93,10 +92,10 @@ class ClassBuilder:
         """Build the item class extensions from the given ElementBase
         children."""
         extensions = dict()
-        if getattr(obj, "type", None):
-            name = getattr(obj, "type", None)
-            extension = self.build_class_extension(instance, name, 0, dict())
-            extensions[name] = extension
+        raw_type = obj.raw_type
+        if raw_type:
+            extension = self.build_class_extension(instance, raw_type, 0, dict())
+            extensions[raw_type] = extension
 
         for extension in self.children_extensions(obj, instance):
             extension.forward_ref = False
@@ -136,7 +135,7 @@ class ClassBuilder:
             else:
                 yield from self.element_children(child)
 
-    def element_namespace(self, obj: NamedField) -> Optional[str]:
+    def element_namespace(self, obj: ElementBase) -> Optional[str]:
         """
         Return the target namespace for the given schema element.
 
@@ -148,14 +147,15 @@ class ClassBuilder:
             - unqualified attributes return None
         """
 
-        target_namespace = getattr(obj, "target_namespace", None)
-        if target_namespace:
-            return target_namespace
+        raw_namespace = obj.raw_namespace
+        if raw_namespace:
+            return raw_namespace
 
         prefix = obj.prefix
         if prefix:
             return self.schema.nsmap.get(prefix)
-        elif obj.is_qualified:
+
+        if obj.is_qualified:
             return self.schema.target_namespace
         elif isinstance(obj, Element):
             return ""

@@ -49,7 +49,7 @@ class ProductType:
         metadata=dict(
             name="name",
             type="Element",
-            namespace="",
+            namespace="http://datypic.com/prod",
             required=True
         )
     )
@@ -58,6 +58,6 @@ class ProductType:
         metadata=dict(
             name="size",
             type="Element",
-            namespace=""
+            namespace="http://datypic.com/prod"
         )
     )

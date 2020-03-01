@@ -17,7 +17,6 @@ from xsdata.models.enums import ProcessType
 from xsdata.models.enums import TagType
 from xsdata.models.enums import UseType
 from xsdata.models.mixins import ElementBase
-from xsdata.models.mixins import NamedField
 from xsdata.models.mixins import OccurrencesMixin
 from xsdata.models.mixins import RestrictedField
 
@@ -118,7 +117,7 @@ class AnnotationBase(ElementBase):
 
 
 @dataclass
-class AnyAttribute(AnnotationBase, NamedField, RestrictedField):
+class AnyAttribute(AnnotationBase, RestrictedField):
     """
     <anyAttribute
       id = ID
@@ -164,7 +163,7 @@ class Assertion(AnnotationBase):
 
 
 @dataclass
-class SimpleType(AnnotationBase, NamedField):
+class SimpleType(AnnotationBase, RestrictedField):
     """
     <simpleType
       final = (#all | List of (list | union | restriction | extension))
@@ -208,7 +207,7 @@ class SimpleType(AnnotationBase, NamedField):
 
 
 @dataclass
-class List(AnnotationBase, NamedField, RestrictedField):
+class List(AnnotationBase, RestrictedField):
     """
     <list
       id = ID
@@ -235,7 +234,7 @@ class List(AnnotationBase, NamedField, RestrictedField):
 
 
 @dataclass
-class Union(AnnotationBase, NamedField):
+class Union(AnnotationBase, RestrictedField):
     """
     <union
       id = ID
@@ -286,7 +285,7 @@ class Union(AnnotationBase, NamedField):
 
 
 @dataclass
-class Attribute(AnnotationBase, NamedField):
+class Attribute(AnnotationBase, RestrictedField):
     """
     <attribute
       default = string
@@ -340,7 +339,7 @@ class Attribute(AnnotationBase, NamedField):
 
 
 @dataclass
-class AttributeGroup(AnnotationBase, NamedField, RestrictedField):
+class AttributeGroup(AnnotationBase, RestrictedField):
     """
     <attributeGroup
       id = ID
@@ -365,7 +364,7 @@ class AttributeGroup(AnnotationBase, NamedField, RestrictedField):
 
 
 @dataclass
-class Any(AnnotationBase, OccurrencesMixin, NamedField):
+class Any(AnnotationBase, OccurrencesMixin):
     """
     <any
       id = ID
@@ -460,7 +459,7 @@ class Choice(AnnotationBase, OccurrencesMixin):
 
 
 @dataclass
-class Group(AnnotationBase, OccurrencesMixin, NamedField):
+class Group(AnnotationBase, OccurrencesMixin):
     """
     <group
       id = ID
@@ -543,7 +542,7 @@ class Extension(AnnotationBase, RestrictedField):
 
 
 @dataclass
-class Enumeration(AnnotationBase, NamedField, RestrictedField):
+class Enumeration(AnnotationBase, RestrictedField):
     """
     <enumeration
       id = ID
@@ -753,7 +752,7 @@ class ExplicitTimezone(AnnotationBase):
 
 
 @dataclass
-class Restriction(RestrictedField, AnnotationBase, NamedField):
+class Restriction(RestrictedField, AnnotationBase):
     """
     <restriction
       base = QName
@@ -860,7 +859,7 @@ class ComplexContent(SimpleContent):
 
 
 @dataclass
-class ComplexType(AnnotationBase, NamedField, RestrictedField):
+class ComplexType(AnnotationBase, RestrictedField):
     """
     <complexType
       abstract = boolean : false
@@ -1013,7 +1012,7 @@ class Alternative(AnnotationBase):
 
 
 @dataclass
-class Element(AnnotationBase, NamedField, OccurrencesMixin):
+class Element(AnnotationBase, OccurrencesMixin):
     """
     <element
       abstract = boolean : false

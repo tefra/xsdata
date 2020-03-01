@@ -1,10 +1,11 @@
 import inspect
+from typing import Iterator
+from typing import Optional
 from typing import Type
-from unittest import mock
 from unittest import TestCase
-from unittest.mock import PropertyMock
 
 from xsdata.models import elements as el
+from xsdata.models.enums import FormType
 from xsdata.models.mixins import ElementBase
 from xsdata.models.mixins import OccurrencesMixin
 
@@ -52,52 +53,132 @@ class OccurrencesMixinTests(TestCase):
             self.assertEqual(dict(), obj.get_restrictions())
 
 
-class NamedFieldTests(TestCase):
-    def test_property_prefix_with_no_ref_type(self):
-        obj = el.Element.create(name="foo")
-        self.assertIsNone(obj.prefix)
-
-    def test_property_prefix_with_unknown_ref_type(self):
-        obj = el.Element.create(ref="ns:foo")
-        self.assertEqual("ns", obj.prefix)
-
-    def test_property_prefix_with_known_ref_type(self):
-        obj = el.Element.create(ref="ns:foo")
-        self.assertEqual("ns", obj.prefix)
-
-    def test_property_is_abstract(self):
-        obj = el.Element.create(abstract=True)
-        self.assertTrue(obj.is_abstract)
-
-        obj = el.Element.create(abstract=False)
-        self.assertFalse(obj.is_abstract)
-
-        obj = el.Group.create()
-        self.assertFalse(obj.is_abstract)
-
-
 class ElementBaseTests(TestCase):
-    def test_property_is_attribute(self):
-        obj = ElementBase.create()
-        self.assertFalse(obj.is_attribute)
+    def test_property_class_name(self):
+        class Foo(ElementBase):
+            pass
+
+        self.assertEqual("Foo", Foo().class_name)
 
     def test_property_default_value(self):
-        obj = ElementBase.create()
-        self.assertIsNone(obj.default_value)
+        element = ElementBase()
+        self.assertIsNone(element.default_value)
 
-        obj = el.Element.create(default="a")
-        self.assertEqual("a", obj.default_value)
-        self.assertFalse(obj.is_fixed)
+        element.fixed = "foo"
+        self.assertEqual("foo", element.default_value)
 
-        obj.default = None
-        obj.fixed = 2
-        self.assertEqual(2, obj.default_value)
-        self.assertTrue(obj.is_fixed)
+        element.default = "bar"
+        self.assertEqual("bar", element.default_value)
 
-    @mock.patch.object(ElementBase, "extends", new_callable=PropertyMock)
-    def test_extensions(self, mock_extends_property):
-        mock_extends_property.side_effect = [None, "", "foo  bar"]
-        obj = ElementBase.create()
-        self.assertEqual([], list(obj.extensions))
-        self.assertEqual([], list(obj.extensions))
-        self.assertEqual(["foo", "bar"], list(obj.extensions))
+    def test_property_extends(self):
+        element = ElementBase()
+        self.assertIsNone(element.extends)
+
+    def test_property_extensions(self):
+        element = ElementBase()
+        self.assertIsInstance(element.extensions, Iterator)
+        self.assertEqual([], list(element.extensions))
+
+        class Foo(ElementBase):
+            @property
+            def extends(self) -> Optional[str]:
+                return "a b   c"
+
+        self.assertEqual(["a", "b", "c"], list(Foo().extensions))
+
+    def test_property_has_form(self):
+        element = ElementBase()
+        self.assertFalse(element.has_form)
+
+        element.form = None
+        self.assertTrue(element.has_form)
+
+    def test_property_is_abstract(self):
+        element = ElementBase()
+        self.assertFalse(element.is_abstract)
+
+        element.abstract = False
+        self.assertFalse(element.is_abstract)
+
+        element.abstract = True
+        self.assertTrue(element.is_abstract)
+
+    def test_property_is_attribute(self):
+        element = ElementBase()
+        self.assertFalse(element.is_attribute)
+
+    def test_property_is_fixed(self):
+        element = ElementBase()
+        self.assertFalse(element.is_fixed)
+
+        element.fixed = None
+        self.assertFalse(element.is_fixed)
+
+        element.fixed = "foo"
+        self.assertTrue(element.is_fixed)
+
+    def test_property_is_mixed(self):
+        element = ElementBase()
+        self.assertFalse(element.is_mixed)
+
+    def test_property_is_qualified(self):
+        element = ElementBase()
+        self.assertFalse(element.is_qualified)
+
+        element.form = None
+        self.assertFalse(element.is_qualified)
+
+        element.form = FormType.UNQUALIFIED
+        self.assertFalse(element.is_qualified)
+
+        element.form = FormType.QUALIFIED
+        self.assertTrue(element.is_qualified)
+
+        element = ElementBase()
+        element.form = FormType.UNQUALIFIED
+        element.ref = None
+        self.assertFalse(element.is_qualified)
+
+        element.ref = "foo"
+        self.assertTrue(element.is_qualified)
+
+    def test_property_prefix(self):
+        element = ElementBase()
+        self.assertIsNone(element.prefix)
+
+        element.ref = "foo"
+        self.assertIsNone(element.prefix)
+
+        element.ref = "foo:bar"
+        self.assertEqual("foo", element.prefix)
+
+    def test_raw_namespace(self):
+        element = ElementBase()
+        self.assertIsNone(element.raw_namespace)
+
+        element.target_namespace = "tns"
+        self.assertEqual("tns", element.raw_namespace)
+
+    def test_raw_type(self):
+        element = ElementBase()
+        self.assertIsNone(element.raw_namespace)
+
+        element.type = "xs:int"
+        self.assertEqual("xs:int", element.raw_type)
+
+    def test_real_name(self):
+        element = ElementBase()
+
+        with self.assertRaises(NotImplementedError):
+            element.real_name
+
+        element.ref = "foo"
+        self.assertEqual("foo", element.real_name)
+
+        element.name = "bar"
+        self.assertEqual("bar", element.real_name)
+
+    def test_real_type(self):
+        element = ElementBase()
+        with self.assertRaises(NotImplementedError):
+            element.real_type

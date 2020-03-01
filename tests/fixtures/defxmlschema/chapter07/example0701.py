@@ -13,6 +13,7 @@ class SizeType:
         metadata=dict(
             name="system",
             type="Attribute",
+            namespace="http://datypic.com/prod",
             required=True
         )
     )
@@ -20,6 +21,7 @@ class SizeType:
         default=None,
         metadata=dict(
             name="dim",
-            type="Attribute"
+            type="Attribute",
+            namespace="http://datypic.com/prod"
         )
     )

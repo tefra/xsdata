@@ -1,5 +1,26 @@
+20.3 (2020-03-01)
+-----------------
+- Added copies of common schemas xlink, xsi, xml.
+- Added XML Schema 1.1 models and properties.
+- Added support for redefines, overrides, alternatives and default attributes.
+- Added missing xsd data types: dateTimestamp, anyType, anyAtomicType.
+- Added protection against duplicate class fields enumerations.
+- Added python common types to the stop word list.
+- Updated wildcards parsing to avoid duplicate elements.
+- Updated native datatype detection made stricter.
+- Updated enumerations generation to sort and filter values.
+- Updated mapping xs:decimal to python Decimal
+- Fixed elements/attribute not inheriting namespaces from references.
+- Fixed module names collisions.
+- Fixed self referencing classes.
+- Fixed class name collisions complexTypes vs elements.
+- Fixed parsers not respecting default values.
+- Fixed AbstractXmlParser to handle leafless root nodes.
+- Pass more than 90% of the `W3C XML Schema 1.1 test cases <https://travis-ci.org/tefra/xsdata-w3c-tests>`_.
+
+
 20.2 (2020-02-09)
--------------------
+-----------------
 - Added support xs:any and xs:anyAttribute elements.
 - Added support for auto detecting XML Schema namespace prefix.
 - Added support for xml datatypes lang and base.

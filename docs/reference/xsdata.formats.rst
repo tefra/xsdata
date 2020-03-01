@@ -14,6 +14,7 @@ Submodules
 
 .. toctree::
 
+   xsdata.formats.converters
    xsdata.formats.mixins
 
 Module contents

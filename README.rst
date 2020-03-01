@@ -49,4 +49,4 @@ Features
 
 .. image:: https://github.com/tefra/xsdata/raw/master/docs/_static/demo.gif
 
-Check the documentation `test suites <https://xsdata.readthedocs.io/>`_ and the `samples repo <https://github.com/tefra/xsdata-samples>`_ for more ✨✨✨
+Check the documentation `test suites <https://xsdata.readthedocs.io/>`_ or our `W3C XML Schema 1.1  <https://github.com/tefra/xsdata-w3c-tests>`_ test runner and the `samples repo <https://github.com/tefra/xsdata-samples>`_ for more ✨✨✨

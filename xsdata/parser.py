@@ -12,8 +12,8 @@ from typing import TypeVar
 
 from lxml import etree
 
-from xsdata.formats.dataclass.parsers import QueueItem
-from xsdata.formats.dataclass.parsers import XmlParser
+from xsdata.formats.dataclass.parsers.xml import QueueItem
+from xsdata.formats.dataclass.parsers.xml import XmlParser
 from xsdata.models import elements as xsd
 from xsdata.models.enums import FormType
 from xsdata.models.enums import Namespace

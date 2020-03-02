@@ -26,10 +26,28 @@ from xsdata.utils import text
 class QueueItem:
     index: int
     position: int
+
+
+@dataclass(frozen=True)
+class ClassQueueItem(QueueItem):
+    meta: ClassMeta
     default: Any = field(default=None)
-    qname: Optional[str] = field(default=None)
-    meta: Optional[ClassMeta] = field(default=None)
-    types: List[Type] = field(default_factory=list)
+
+
+@dataclass(frozen=True)
+class PrimitiveQueueItem(QueueItem):
+    types: List[Type]
+    default: Any = field(default=None)
+
+
+@dataclass(frozen=True)
+class WildcardQueueItem(QueueItem):
+    qname: str
+
+
+@dataclass(frozen=True)
+class SkipQueueItem(QueueItem):
+    pass
 
 
 @dataclass
@@ -50,7 +68,7 @@ class XmlParser(AbstractXmlParser, ModelInspect):
         meta = self.class_meta(clazz)
 
         self.objects = []
-        self.queue = [QueueItem(index=0, position=0, meta=meta, default=None)]
+        self.queue = [ClassQueueItem(index=0, position=0, meta=meta)]
 
         return super(XmlParser, self).parse_context(context, clazz)
 
@@ -68,43 +86,53 @@ class XmlParser(AbstractXmlParser, ModelInspect):
         :raises Value: When the parser doesn't know how to handle the given element.
         """
         qname = element.tag
+        queue_item = None
         item = self.queue[-1]
 
-        if not item or not item.meta:  # Assuming inside a wildcard
-            return self.queue.append(None)
-        elif qname in item.meta.vars:  # A dataclass or a primitive field
-            queue_item = self.create_queue_item(item.meta.vars[qname], item.meta.qname)
-            self.queue.append(queue_item)
-        elif item.meta.qname == qname:  # root
-            pass
-        elif item.meta.any_element:  # Wildcard jackpot
-            queue_item = self.create_wildcard_queue_item(item.meta.any_element.qname)
-            self.queue.append(queue_item)
-        else:  # Unknown :)
-            raise ValueError(
-                f"{item.meta.qname} does not support mixed content: {qname}"
-            )
+        if isinstance(item, (SkipQueueItem, WildcardQueueItem, PrimitiveQueueItem)):
+            queue_item = self.create_skip_queue_item()
+        elif isinstance(item, ClassQueueItem):
+            var = item.meta.vars.get(qname)
+
+            if not var and item.meta.qname == qname:
+                queue_item = self.queue.pop()
+            elif not var and item.meta.any_element:
+                parent_qname = item.meta.any_element.qname
+                queue_item = self.create_wildcard_queue_item(parent_qname)
+            elif var and var.is_dataclass:
+                queue_item = self.create_class_queue_item(var, item.meta.qname)
+            elif var:
+                queue_item = self.create_primitive_queue_item(var)
+
+        if queue_item is None:
+            parent = item.meta.qname if isinstance(item, ClassQueueItem) else "unknown"
+            raise ValueError(f"{parent} does not support mixed content: {qname}")
 
         self.index += 1
+        self.queue.append(queue_item)
         self.emit_event(EventType.START, qname, item=item, element=element)
 
-    def create_queue_item(self, var: ClassVar, parent_qname: QName):
-        meta = None
-        types = var.types
-        if var.is_dataclass:
-            meta = self.class_meta(var.clazz, parent_qname)
-            types = []
+    def create_skip_queue_item(self):
+        return SkipQueueItem(index=self.index, position=len(self.objects))
 
-        return QueueItem(
-            meta=meta,
+    def create_class_queue_item(self, var: ClassVar, parent_qname: QName):
+        return ClassQueueItem(
             index=self.index,
-            types=types,
             position=len(self.objects),
+            meta=self.class_meta(var.clazz, parent_qname),
+            default=var.default,
+        )
+
+    def create_primitive_queue_item(self, var: ClassVar):
+        return PrimitiveQueueItem(
+            index=self.index,
+            position=len(self.objects),
+            types=var.types,
             default=var.default,
         )
 
     def create_wildcard_queue_item(self, parent_qname: QName):
-        return QueueItem(
+        return WildcardQueueItem(
             index=self.index, position=len(self.objects), qname=parent_qname,
         )
 
@@ -119,21 +147,25 @@ class XmlParser(AbstractXmlParser, ModelInspect):
         :returns object: A dataclass object or a python primitive value.
         """
         item = self.queue.pop()
-        if not item:  # Assuming inside a wildcard
-            return None
+        qname = obj = None
 
-        qname = QName(element.tag)
-        if item.meta:  # dataclass
+        if isinstance(item, SkipQueueItem):
+            return None
+        elif isinstance(item, PrimitiveQueueItem):
+            qname = QName(element.tag)
+            obj = self.parse_value(item.types, element.text, item.default)
+        elif isinstance(item, WildcardQueueItem):
+            obj = self.parse_any_element(element)
+            if not obj:
+                return None
+            obj.children = self.fetch_any_children(item)
+            qname = item.qname
+        elif isinstance(item, ClassQueueItem):
             attr_params = self.bind_element_attrs(item.meta, element)
             text_params = self.bind_element_text(item.meta, element)
             children = self.fetch_class_children(item, element)
+            qname = QName(element.tag)
             obj = item.meta.clazz(**attr_params, **text_params, **children)
-        elif item.types:  # primitive
-            obj = self.parse_value(item.types, element.text, item.default)
-        elif item.qname:  # wildcard
-            obj = self.parse_any_element(element)
-            obj.children = self.fetch_any_children(item)
-            qname = item.qname
         else:  # unknown :)
             raise ValueError(f"Failed to create object from {element.tag}")
 
@@ -149,15 +181,9 @@ class XmlParser(AbstractXmlParser, ModelInspect):
         if hasattr(self, method_name):
             getattr(self, method_name)(**kwargs)
 
-    def fetch_class_children(self, item: QueueItem, element: Element) -> Dict[str, Any]:
-        """
-        Return a dictionary of qualified object names and their values for the
-        given queue item.
-
-        :raises ValueError: if queue item type is primitive.
-        """
-        if not item.meta:
-            raise ValueError("Queue item is not a dataclass!")
+    def fetch_class_children(self, item: ClassQueueItem, element: Element) -> Dict:
+        """Return a dictionary of qualified object names and their values for
+        the given queue item."""
 
         params: Dict[str, Any] = defaultdict(list)
         while len(self.objects) > item.position:
@@ -184,7 +210,7 @@ class XmlParser(AbstractXmlParser, ModelInspect):
 
         return params
 
-    def fetch_any_children(self, item: QueueItem) -> List[object]:
+    def fetch_any_children(self, item: WildcardQueueItem) -> List[object]:
         children = []
         while len(self.objects) > item.position:
             _, value = self.objects.pop(item.position)
@@ -226,14 +252,14 @@ class XmlParser(AbstractXmlParser, ModelInspect):
             txt, tail = cls.element_text_and_tail(element)
             return AnyElement(
                 qname=element.tag,
-                text=txt or None,
-                tail=tail or None,
+                text=txt,
+                tail=tail,
                 attributes={k: v for k, v in element.attrib.items()},
             )
 
     @classmethod
     def element_text_and_tail(cls, element: Element) -> Tuple:
-        return (
-            element.text.strip() if element.text else None,
-            element.tail.strip() if element.tail else None,
-        )
+        txt = element.text.strip() if element.text else None
+        tail = element.tail.strip() if element.tail else None
+
+        return txt or None, tail or None

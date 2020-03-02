@@ -10,7 +10,7 @@ class AnyElement:
     qname: Optional[str] = field(default=None)
     text: Optional[str] = field(default=None)
     tail: Optional[str] = field(default=None)
-    children: List["AnyElement"] = field(default_factory=list)
+    children: List[object] = field(default_factory=list)
     attributes: Dict[str, str] = field(
         default_factory=dict, metadata=dict(name="attributes", type="AnyAttribute")
     )

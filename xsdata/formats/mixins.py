@@ -46,7 +46,7 @@ class AbstractParser(ABC):
         """Convert xml string values to s python primitive type."""
 
         if value is None:
-            return default
+            return None if callable(default) else default
 
         return to_python(types, value)
 

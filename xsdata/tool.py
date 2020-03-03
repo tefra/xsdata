@@ -11,6 +11,7 @@ from xsdata.models.elements import Import
 from xsdata.models.elements import Include
 from xsdata.models.elements import Override
 from xsdata.models.elements import Redefine
+from xsdata.models.elements import Schema
 from xsdata.models.enums import Namespace
 from xsdata.parser import SchemaParser
 from xsdata.reducer import reducer
@@ -25,6 +26,7 @@ class ProcessTask:
     print: bool
     renderer: str
     processed: List[Path] = field(init=False, default_factory=list)
+    imported: List[Path] = field(init=False, default_factory=list)
 
     def process(
         self,
@@ -36,12 +38,11 @@ class ProcessTask:
         if xsd in self.processed:
             logger.debug("Circular import skipping: %s", xsd.name)
             return
-        self.processed.append(xsd)
 
         parser = SchemaParser(target_namespace=target_namespace)
         schema = parser.from_xsd_path(xsd)
-        for sub_schema in schema.sub_schemas():
-            self.process_import(sub_schema, xsd, package, schema.target_namespace)
+
+        self.process_imports(schema, xsd, package, schema.target_namespace)
 
         logger.info("Schema: %s, elements: %d", xsd.name, schema.num)
 
@@ -55,31 +56,33 @@ class ProcessTask:
         callback(
             schema=schema, classes=classes, package=package, renderer=self.renderer
         )
+        self.processed.append(xsd)
 
-    def process_import(
-        self,
-        schema: SchemaLocator,
-        path: Path,
-        package: str,
-        target_namespace: Optional[str],
+    def process_imports(
+        self, schema: Schema, xsd: Path, package: str, target_namespace: Optional[str]
     ):
-        sub_xsd_package = None
-        sub_xsd_path = self.resolve_local_schema(schema)
+        for sub_schema in schema.sub_schemas():
 
-        if schema.schema_location is None:
-            return
-        elif sub_xsd_path is None:
-            sub_xsd_path = self.resolve_schema(path, schema)
-            sub_xsd_package = self.adjust_package(package, schema)
+            sub_xsd_package = None
+            sub_xsd_path = self.resolve_local_schema(sub_schema)
 
-        redefine = schema if isinstance(schema, Redefine) else None
+            if sub_schema.schema_location is None:
+                continue
+            elif sub_xsd_path is None:
+                sub_xsd_path = self.resolve_schema(xsd, sub_schema)
+                sub_xsd_package = self.adjust_package(package, sub_schema)
 
-        self.process(
-            xsd=sub_xsd_path,
-            package=sub_xsd_package or package,
-            target_namespace=target_namespace,
-            redefine=redefine,
-        )
+            if sub_xsd_path in self.imported:
+                continue
+
+            self.imported.append(sub_xsd_path)
+
+            self.process(
+                xsd=sub_xsd_path,
+                package=sub_xsd_package or package,
+                target_namespace=target_namespace,
+                redefine=sub_schema if isinstance(sub_schema, Redefine) else None,
+            )
 
     @staticmethod
     def resolve_local_schema(schema: SchemaLocator) -> Optional[Path]:

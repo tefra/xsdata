@@ -200,20 +200,27 @@ class ClassBuilderTests(FactoryTestCase):
 
     @patch.object(ClassBuilder, "children_extensions")
     def test_build_class_extensions(self, mock_children_extensions):
-        bar = ExtensionFactory.create(type=AttrTypeFactory.create(name="bar", index=3))
-        double = ExtensionFactory.create(
-            type=AttrTypeFactory.create(name="bar", index=2)
-        )
-        foo = ExtensionFactory.create(type=AttrTypeFactory.create(name="foo", index=1))
+        bar_type = AttrTypeFactory.create(name="bar", index=3)
+        foo_type = AttrTypeFactory.create(name="foo", index=1)
+        some_type = AttrTypeFactory.create(name="something", index=0)
+
+        bar = ExtensionFactory.create(type=bar_type)
+        double = ExtensionFactory.create(type=bar_type)
+        foo = ExtensionFactory.create(type=foo_type)
 
         mock_children_extensions.return_value = [bar, double, foo]
+        self_ext = ExtensionFactory.create(
+            type=some_type, restrictions=Restrictions(required=True)
+        )
 
         item = ClassFactory.create()
         element = Element.create(type="something")
         self.builder.build_class_extensions(element, item)
 
-        expected = ["bar", "foo", "something"]
-        self.assertEqual(expected, [ext.type.name for ext in item.extensions])
+        self.assertEqual(3, len(item.extensions))
+        self.assertIs(double, item.extensions[0])
+        self.assertIs(foo, item.extensions[1])
+        self.assertEqual(self_ext, item.extensions[2])
 
     def test_element_children(self):
         complex_type = ComplexType.create(

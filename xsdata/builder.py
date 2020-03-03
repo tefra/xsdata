@@ -76,7 +76,7 @@ class ClassBuilder:
         self.build_class_attributes(obj, instance)
         return instance
 
-    def build_class_attributes(self, obj: ElementBase, instance: Class):
+    def build_class_attributes(self, obj: BaseElement, instance: Class):
         """Build the instance class attributes from the given ElementBase
         children."""
         for child in self.element_children(obj):
@@ -88,13 +88,14 @@ class ClassBuilder:
 
         instance.attrs.sort(key=lambda x: x.index)
 
-    def build_class_extensions(self, obj: ElementBase, instance: Class):
+    def build_class_extensions(self, obj: BaseElement, instance: Class):
         """Build the item class extensions from the given ElementBase
         children."""
         extensions = dict()
         raw_type = obj.raw_type
         if raw_type:
-            extension = self.build_class_extension(instance, raw_type, 0, dict())
+            restrictions = obj.get_restrictions()
+            extension = self.build_class_extension(instance, raw_type, 0, restrictions)
             extensions[raw_type] = extension
 
         for extension in self.children_extensions(obj, instance):

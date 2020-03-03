@@ -15,7 +15,8 @@ class Name:
         default=None,
         metadata=dict(
             name="value",
-            type="Extension"
+            type="Extension",
+            required=True
         )
     )
 
@@ -33,7 +34,8 @@ class Number:
         default=None,
         metadata=dict(
             name="value",
-            type="Extension"
+            type="Extension",
+            required=True
         )
     )
 
@@ -52,6 +54,7 @@ class Size:
         metadata=dict(
             name="value",
             type="Extension",
+            required=True,
             min_inclusive=2.0,
             max_inclusive=18.0
         )

@@ -14,6 +14,7 @@ class OrderNumType:
         default=None,
         metadata=dict(
             name="value",
-            type="Extension"
+            type="Extension",
+            required=True
         )
     )

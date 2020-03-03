@@ -12,6 +12,7 @@ class SmallDressSizeType:
         metadata=dict(
             name="value",
             type="Extension",
+            required=True,
             min_inclusive=2.0,
             max_inclusive=6.0,
             pattern=r"\d{1}"

@@ -7,6 +7,7 @@ from typing import List
 from typing import Tuple
 
 from xsdata.formats.dataclass.filters import filters
+from xsdata.formats.dataclass.utils import safe_snake
 from xsdata.generators import PythonAbstractGenerator
 from xsdata.models.codegen import Class
 from xsdata.models.codegen import Package
@@ -35,9 +36,9 @@ class DataclassGenerator(PythonAbstractGenerator):
         """Given a schema, a list of classes and a target package return to the
         writer factory the target file path and the rendered code."""
         module = self.module_name(schema.module)
-        package_arr = list(map(snake_case, package.split(".")))
-        package = "{}.{}".format(".".join(package_arr), module)
-        target = Path.cwd().joinpath(*package_arr)
+        package_parts = self.package_parts(package)
+        package = "{}.{}".format(".".join(package_parts), module)
+        target = Path.cwd().joinpath(*package_parts)
         file_path = target.joinpath(f"{module}.py")
 
         self.resolver.process(classes=classes, schema=schema, package=package)
@@ -59,6 +60,13 @@ class DataclassGenerator(PythonAbstractGenerator):
         if self.modules[module] > 1:
             module = f"{module}_{self.modules[module] - 1}"
         return module
+
+    @staticmethod
+    def package_parts(package: str) -> List[str]:
+        """Split and normalize the given dot separated package name."""
+        return list(
+            map(lambda x: snake_case(safe_snake(x, default="pkg")), package.split("."))
+        )
 
     def render_classes(self) -> str:
         """Get a list of sorted classes from the imports resolver, apply the

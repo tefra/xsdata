@@ -89,8 +89,10 @@ class XmlParser(AbstractXmlParser, ModelInspect):
         queue_item = None
         item = self.queue[-1]
 
-        if isinstance(item, (SkipQueueItem, WildcardQueueItem, PrimitiveQueueItem)):
+        if isinstance(item, (SkipQueueItem, PrimitiveQueueItem)):
             queue_item = self.create_skip_queue_item()
+        elif isinstance(item, WildcardQueueItem):
+            queue_item = self.create_wildcard_queue_item(item.qname)
         elif isinstance(item, ClassQueueItem):
             var = item.meta.vars.get(qname)
 

@@ -56,7 +56,7 @@ class XmlParserTests(TestCase):
     def test_start_node_with_wildcard_queue_item(
         self, mock_create_skip_queue_item, mock_emit_event
     ):
-        expected_queue_item = SkipQueueItem(index=10, position=5)
+        expected_queue_item = WildcardQueueItem(index=10, position=5, qname="foo")
         mock_create_skip_queue_item.return_value = expected_queue_item
 
         element = Element("{urn:books}books")

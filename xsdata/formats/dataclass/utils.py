@@ -47,21 +47,21 @@ stop_words = [
 ]
 
 
-def safe_snake(string: str) -> str:
+def safe_snake(string: str, default: str = "value") -> str:
     if not string:
-        return "value"
+        return default
 
     # Remove invalid characters
     string = re.sub("[^0-9a-zA-Z_-]", " ", string)
 
     if not string.strip():
-        return "value"
+        return default
     elif re.match(r"^-\d*\.?\d+$", string):
-        return f"value_minus_{string}"
+        return f"{default}_minus_{string}"
     elif not string[0].isalpha():
-        return f"value_{string}"
+        return f"{default}_{string}"
     elif string.lower() in stop_words:
-        return f"{string}_value"
+        return f"{string}_{default}"
     else:
         return string.strip("_")
 

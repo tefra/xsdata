@@ -183,9 +183,9 @@ class SchemaParser(XmlParser):
 
         for child in parent.children():
             if isinstance(child, OccurrencesMixin):
-                if child.min_occurs is None or force_min:
+                if child.min_occurs == 1 or force_min:
                     child.min_occurs = min_occurs
-                if child.max_occurs is None or force_max:
+                if child.max_occurs == 1 or force_max:
                     child.max_occurs = max_occurs
 
     @classmethod

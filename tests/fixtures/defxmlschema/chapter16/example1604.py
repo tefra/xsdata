@@ -31,7 +31,8 @@ class ProductId:
         default=None,
         metadata=dict(
             name="value",
-            type="Extension"
+            type="Extension",
+            required=True
         )
     )
 
@@ -48,6 +49,7 @@ class SkuNumber:
         default=None,
         metadata=dict(
             name="value",
-            type="Extension"
+            type="Extension",
+            required=True
         )
     )

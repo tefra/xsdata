@@ -14,7 +14,8 @@ class Comment:
         default=None,
         metadata=dict(
             name="value",
-            type="Extension"
+            type="Extension",
+            required=True
         )
     )
 
@@ -31,7 +32,8 @@ class Description:
         default=None,
         metadata=dict(
             name="value",
-            type="Extension"
+            type="Extension",
+            required=True
         )
     )
 

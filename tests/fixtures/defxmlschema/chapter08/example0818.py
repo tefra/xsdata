@@ -12,6 +12,7 @@ class SpecificTime:
         metadata=dict(
             name="value",
             type="Extension",
+            required=True,
             explicit_timezone="required"
         )
     )

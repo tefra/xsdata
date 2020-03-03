@@ -88,6 +88,8 @@ class XmlSerializer(AbstractSerializer, ModelInspect):
                     self.set_text(parent, value)
                 else:
                     self.set_children(parent, value, var, namespaces)
+            elif var.is_text:
+                self.set_nil_attribute(var, parent, namespaces)
 
         return parent
 

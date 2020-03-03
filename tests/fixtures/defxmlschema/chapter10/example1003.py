@@ -13,6 +13,7 @@ class Size:
         metadata=dict(
             name="value",
             type="Union",
+            required=True,
             min_inclusive=2.0,
             max_inclusive=18.0,
             pattern=r"\d{1,2}"

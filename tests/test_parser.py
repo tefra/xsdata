@@ -35,10 +35,10 @@ def wrap(string: str, **kwargs):
 </xs:schema>"""
 
 
-class ParserTests(TestCase):
+class SchemaParserTests(TestCase):
     def setUp(self) -> None:
         self.parser = SchemaParser()
-        super(ParserTests, self).setUp()
+        super(SchemaParserTests, self).setUp()
 
     def test_with_mixed_content(self):
         xsd = """<xs:simpleType name="CountryType">

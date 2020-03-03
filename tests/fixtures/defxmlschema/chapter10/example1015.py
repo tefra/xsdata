@@ -11,6 +11,7 @@ class VectorType:
         default=None,
         metadata=dict(
             name="value",
-            type="List"
+            type="List",
+            required=True
         )
     )

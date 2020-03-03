@@ -14,6 +14,8 @@ class Size:
         default=None,
         metadata=dict(
             name="value",
-            type="Extension"
+            type="Extension",
+            required=True,
+            nillable=True
         )
     )

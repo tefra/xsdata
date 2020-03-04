@@ -72,7 +72,7 @@ class XmlParser(AbstractXmlParser, ModelInspect):
 
         return super(XmlParser, self).parse_context(context, clazz)
 
-    def start_node(self, element: Element):
+    def queue_node(self, element: Element):
         """
         Queue the necessary metadata to bind the given element when it's fully
         parsed.
@@ -138,7 +138,7 @@ class XmlParser(AbstractXmlParser, ModelInspect):
             index=self.index, position=len(self.objects), qname=parent_qname,
         )
 
-    def end_node(self, element: Element) -> Optional[T]:
+    def dequeue_node(self, element: Element) -> Optional[T]:
         """
         Build an objects tree for the given element.
 

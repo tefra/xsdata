@@ -54,7 +54,7 @@ class SchemaParser(XmlParser):
         schema.location = path
         return schema
 
-    def end_node(self, element: etree.Element) -> Optional[T]:
+    def dequeue_node(self, element: etree.Element) -> Optional[T]:
         """Override parent method to skip empty elements and to set the object
         index."""
         if not element.attrib and element.text is None and len(element) == 0:
@@ -62,7 +62,7 @@ class SchemaParser(XmlParser):
             return None
 
         item = self.queue[-1]
-        obj = super(SchemaParser, self).end_node(element)
+        obj = super(SchemaParser, self).dequeue_node(element)
 
         # Make sure queue item is not part of mixed content
         if obj is None or item is None:

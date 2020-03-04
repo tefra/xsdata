@@ -7,6 +7,8 @@ from typing import Dict
 from typing import List
 from typing import Type
 
+from xsdata.exceptions import ConverterError
+
 
 def sort_types(types: List[Type]):
     in_order = (bool, int, str, float, Decimal)
@@ -47,7 +49,7 @@ def to_class(clazz: Any, value: Any) -> Any:
         elif is_dataclass(clazz):
             return clazz(value)
     except KeyError:
-        raise ValueError(f"Unhandled class type {clazz.__name__}")
+        raise ConverterError(f"Unhandled class type {clazz.__name__}")
 
 
 def to_enum(clazz: Type[Enum], value: Any) -> Enum:
@@ -61,7 +63,7 @@ def to_bool(value: Any) -> bool:
     if value in ("false", "0"):
         return False
 
-    raise ValueError(f"Invalid bool literal '{value}'")
+    raise ConverterError(f"Invalid bool literal '{value}'")
 
 
 def to_xml(value: Any) -> str:

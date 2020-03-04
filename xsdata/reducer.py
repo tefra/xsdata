@@ -7,6 +7,7 @@ from typing import Optional
 
 from lxml import etree
 
+from xsdata.exceptions import ReducerValueError
 from xsdata.logger import logger
 from xsdata.models.codegen import Attr
 from xsdata.models.codegen import AttrType
@@ -136,7 +137,7 @@ class ClassReducer:
             if len(items) == 1:
                 continue
             if len(items) > 2:
-                raise NotImplementedError(
+                raise ReducerValueError(
                     f"Redefined class `{items[0].name}` more than once."
                 )
 

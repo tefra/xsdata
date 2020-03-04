@@ -10,6 +10,7 @@ from tests.fixtures.books import Books
 from tests.fixtures.defxmlschema.chapter02.example0210 import Product
 from tests.fixtures.defxmlschema.chapter13.chapter13 import ItemsType
 from tests.fixtures.defxmlschema.chapter13.chapter13 import ProductType
+from xsdata.exceptions import ModelInspectionError
 from xsdata.formats.dataclass.mixins import ClassMeta
 from xsdata.formats.dataclass.mixins import ClassVar
 from xsdata.formats.dataclass.mixins import ModelInspect
@@ -75,7 +76,7 @@ class ModelInspectTests(TestCase):
 
     @mock.patch.object(ModelInspect, "get_type_hints", return_value=dict())
     def test_class_meta_with_no_dataclass_raises_exception(self, *args):
-        with self.assertRaises(TypeError) as cm:
+        with self.assertRaises(ModelInspectionError) as cm:
             ModelInspect().class_meta(int)
 
         self.assertEqual(f"Object {int} is not a dataclass.", str(cm.exception))

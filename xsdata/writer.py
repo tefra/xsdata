@@ -3,6 +3,7 @@ from dataclasses import field
 from typing import Dict
 from typing import List
 
+from xsdata.exceptions import CodeWriterError
 from xsdata.formats.dataclass.generator import DataclassGenerator
 from xsdata.formats.plantuml.generator import PlantUmlGenerator
 from xsdata.generators import AbstractGenerator
@@ -25,7 +26,7 @@ class CodeWriter:
     def get_renderer(self, name) -> AbstractGenerator:
         if name in self.generators:
             return self.generators[name]
-        raise ValueError(f"{name} is not a valid {AbstractGenerator.__name__}")
+        raise CodeWriterError(f"Unknown code generator `{name}`")
 
     def write(self, schema: Schema, classes: List[Class], package: str, renderer: str):
         engine = self.get_renderer(renderer)

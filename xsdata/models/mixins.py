@@ -13,6 +13,7 @@ from typing import TypeVar
 
 from lxml import etree
 
+from xsdata.exceptions import SchemaValueError
 from xsdata.models.enums import FormType
 from xsdata.models.enums import Namespace
 from xsdata.utils import text
@@ -29,7 +30,7 @@ class OccurrencesMixin(RestrictedField):
 
     def get_restrictions(self) -> Dict[str, Any]:
         if self.min_occurs is None or self.max_occurs is None:
-            raise ValueError(
+            raise SchemaValueError(
                 f"Class `{self.__class__.__name__}` min or max occurs is empty"
             )
 
@@ -174,13 +175,11 @@ class ElementBase(BaseModel):
         if name:
             return name
 
-        raise NotImplementedError("Element has no name: {}".format(self))
+        raise SchemaValueError(f"Schema class `{self.class_name}` unknown real name.")
 
     @property
     def real_type(self) -> Optional[str]:
-        raise NotImplementedError(
-            "%s::real_type missing implementation", self.__class__.__name__
-        )
+        raise SchemaValueError(f"Schema class `{self.class_name}` unknown real type.")
 
     @property
     def num(self):

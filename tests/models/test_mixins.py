@@ -4,6 +4,7 @@ from typing import Optional
 from typing import Type
 from unittest import TestCase
 
+from xsdata.exceptions import SchemaValueError
 from xsdata.models import elements as el
 from xsdata.models.enums import FormType
 from xsdata.models.mixins import ElementBase
@@ -169,7 +170,7 @@ class ElementBaseTests(TestCase):
     def test_real_name(self):
         element = ElementBase()
 
-        with self.assertRaises(NotImplementedError):
+        with self.assertRaises(SchemaValueError):
             element.real_name
 
         element.ref = "foo"
@@ -180,5 +181,5 @@ class ElementBaseTests(TestCase):
 
     def test_real_type(self):
         element = ElementBase()
-        with self.assertRaises(NotImplementedError):
+        with self.assertRaises(SchemaValueError):
             element.real_type

@@ -1,5 +1,6 @@
 from unittest import TestCase
 
+from xsdata.exceptions import SchemaValueError
 from xsdata.models.elements import Alternative
 from xsdata.models.elements import ComplexType
 from xsdata.models.elements import Element
@@ -20,7 +21,7 @@ class ElementTests(TestCase):
         obj.name = "foo"
         self.assertEqual("foo", obj.real_name)
 
-        with self.assertRaises(NotImplementedError):
+        with self.assertRaises(SchemaValueError):
             obj = Element.create()
             obj.real_name
 

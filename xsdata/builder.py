@@ -190,11 +190,7 @@ class ClassBuilder:
         )
 
     def build_class_attribute(self, instance: Class, obj: AttributeElement):
-        """
-        Generate and append an attribute instance to the instance class.
-
-        :raise ValueError:  if types list is empty
-        """
+        """Generate and append an attribute instance to the instance class."""
         types = self.build_class_attribute_types(instance, obj)
         restrictions = Restrictions(**obj.get_restrictions())
 

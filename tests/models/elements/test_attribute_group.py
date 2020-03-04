@@ -1,11 +1,12 @@
 from unittest import TestCase
 
+from xsdata.exceptions import SchemaValueError
 from xsdata.models.elements import AttributeGroup
 
 
 class AttributeGroupTests(TestCase):
     def test_property_real_name(self):
-        with self.assertRaises(NotImplementedError):
+        with self.assertRaises(SchemaValueError):
             obj = AttributeGroup.create()
             obj.real_name
 

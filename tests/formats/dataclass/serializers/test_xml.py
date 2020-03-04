@@ -2,6 +2,7 @@ from unittest.case import TestCase
 
 from tests.fixtures.books import BookForm
 from tests.fixtures.books import Books
+from xsdata.exceptions import ModelInspectionError
 from xsdata.formats.dataclass.serializers import XmlSerializer
 
 
@@ -55,7 +56,7 @@ class XmlSerializerTests(TestCase):
         self.assertEqual(expected, actual)
 
     def test_render_no_dataclass(self):
-        with self.assertRaises(TypeError) as cm:
+        with self.assertRaises(ModelInspectionError) as cm:
             XmlSerializer().render(self)
         self.assertEqual(
             f"Object {self.__class__} is not a dataclass.", str(cm.exception)

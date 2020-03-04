@@ -8,6 +8,7 @@ from typing import List as Array
 from typing import Optional
 from typing import Union as UnionType
 
+from xsdata.exceptions import SchemaValueError
 from xsdata.formats.dataclass.utils import tostring
 from xsdata.models.enums import DataType
 from xsdata.models.enums import FormType
@@ -1260,22 +1261,14 @@ class Schema(AnnotationBase):
             yield over
 
     @property
-    def module(self):
+    def module(self) -> str:
         if self.location:
             return self.location.name
 
         if self.target_namespace:
             return Path(self.target_namespace).stem
 
-        for el in self.elements:
-            if el.name:
-                return Path(el.name).stem
-
-        for el in self.complex_types:
-            if el.name:
-                return Path(el.name).stem
-
-        raise ValueError("Unknown schema module")
+        raise SchemaValueError("Unknown schema module")
 
     @property
     def target_prefix(self):

@@ -6,6 +6,7 @@ from typing import Dict
 from typing import Type
 from typing import TypeVar
 
+from xsdata.exceptions import ParserError
 from xsdata.formats.dataclass.mixins import ClassVar
 from xsdata.formats.dataclass.mixins import ModelInspect
 from xsdata.formats.dataclass.models import AnyElement
@@ -45,7 +46,7 @@ class JsonParser(AbstractParser, ModelInspect):
         try:
             return clazz(**params)  # type: ignore
         except Exception:
-            raise TypeError("Parsing failed")
+            raise ParserError("Parsing failed")
 
     def bind_value(self, var: ClassVar, value) -> Any:
         """

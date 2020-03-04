@@ -17,6 +17,7 @@ from typing import Type
 
 from lxml.etree import QName
 
+from xsdata.exceptions import ModelInspectionError
 from xsdata.formats.converters import sort_types
 from xsdata.models.enums import TagType
 
@@ -122,7 +123,7 @@ class ModelInspect:
     def class_meta(self, clazz: Type, parent_ns: Optional[str] = None) -> ClassMeta:
         if clazz not in self.cache:
             if not is_dataclass(clazz):
-                raise TypeError(f"Object {clazz} is not a dataclass.")
+                raise ModelInspectionError(f"Object {clazz} is not a dataclass.")
 
             meta = getattr(clazz, "Meta", None)
             if meta and meta.__qualname__ != f"{clazz.__name__}.Meta":

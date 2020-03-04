@@ -111,7 +111,10 @@ class ElementBase(BaseModel):
 
     @property
     def default_value(self):
-        return getattr(self, "default", None) or getattr(self, "fixed", None)
+        default = getattr(self, "default", None)
+        if default is None and hasattr(self, "fixed"):
+            default = getattr(self, "fixed", None)
+        return default
 
     @property
     def extends(self) -> Optional[str]:

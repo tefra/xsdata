@@ -44,6 +44,9 @@ stop_words = [
     "int",
     "bool",
     "float",
+    "list",
+    "optional",
+    "dict",
 ]
 
 

@@ -142,7 +142,7 @@ class PythonAbstractGenerator(AbstractGenerator, ABC):
     @classmethod
     def class_name(cls, name: str) -> str:
         """Convert class names to pascal case."""
-        class_name = text.pascal_case(name)
+        class_name = text.pascal_case(safe_snake(name, "type"))
         if not class_name or class_name[0].isdigit():
             safe_name = urlsafe_b64encode(str(name).encode()).decode()
             class_name = text.pascal_case(safe_name)

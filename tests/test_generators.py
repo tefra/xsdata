@@ -194,6 +194,7 @@ class PythonAbstractGeneratorTests(FactoryTestCase):
     def test_class_name(self):
         self.assertEqual("XsString", generator.class_name("xs:string"))
         self.assertEqual("FooBarBam", generator.class_name("foo:bar_bam"))
+        self.assertEqual("ListType", generator.class_name("List"))
 
     def test_type_name(self):
 

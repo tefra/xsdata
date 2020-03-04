@@ -1,5 +1,6 @@
 from unittest import TestCase
 
+from xsdata.exceptions import SchemaValueError
 from xsdata.models.elements import Attribute
 from xsdata.models.elements import Length
 from xsdata.models.elements import Restriction
@@ -35,7 +36,7 @@ class AttributeTests(TestCase):
         obj.name = "foo"
         self.assertEqual("foo", obj.real_name)
 
-        with self.assertRaises(NotImplementedError):
+        with self.assertRaises(SchemaValueError):
             Attribute.create().real_name
 
     def test_get_restrictions(self):

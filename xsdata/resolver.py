@@ -10,6 +10,7 @@ from typing import Set
 from lxml import etree
 from toposort import toposort_flatten
 
+from xsdata.exceptions import ResolverValueError
 from xsdata.models.codegen import Class
 from xsdata.models.codegen import Package
 from xsdata.models.elements import Schema
@@ -165,7 +166,7 @@ class DependenciesResolver:
         result: Dict[str, Class] = dict()
         for obj in classes:
             if obj.name in result:
-                raise ValueError(f"Duplicate class name`{obj.name}`")
+                raise ResolverValueError(f"Duplicate class name`{obj.name}`")
             result[obj.name] = obj
 
         return result

@@ -15,6 +15,7 @@ from jinja2 import Environment
 from jinja2 import FileSystemLoader
 from jinja2 import Template
 
+from xsdata.exceptions import CodeGeneratorError
 from xsdata.formats.converters import to_python
 from xsdata.formats.dataclass.utils import safe_snake
 from xsdata.models.codegen import Attr
@@ -33,7 +34,7 @@ class AbstractGenerator(ABC):
 
     def __init__(self):
         if self.templates_dir is None:
-            raise TypeError("Missing renderer templates directory")
+            raise CodeGeneratorError("Missing renderer templates directory")
 
         self.env = Environment(loader=FileSystemLoader(str(self.templates_dir)))
         self.resolver = DependenciesResolver()

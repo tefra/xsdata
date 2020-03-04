@@ -12,6 +12,7 @@ from lxml.etree import Element
 from lxml.etree import iterparse
 from lxml.etree import QName
 
+from xsdata.exceptions import ParserError
 from xsdata.formats.dataclass.mixins import ClassMeta
 from xsdata.formats.dataclass.mixins import ClassVar
 from xsdata.formats.dataclass.mixins import ModelInspect
@@ -108,7 +109,7 @@ class XmlParser(AbstractXmlParser, ModelInspect):
 
         if queue_item is None:
             parent = item.meta.qname if isinstance(item, ClassQueueItem) else "unknown"
-            raise ValueError(f"{parent} does not support mixed content: {qname}")
+            raise ParserError(f"{parent} does not support mixed content: {qname}")
 
         self.index += 1
         self.queue.append(queue_item)
@@ -169,7 +170,7 @@ class XmlParser(AbstractXmlParser, ModelInspect):
             qname = QName(element.tag)
             obj = item.meta.clazz(**attr_params, **text_params, **children)
         else:  # unknown :)
-            raise ValueError(f"Failed to create object from {element.tag}")
+            raise ParserError(f"Failed to create object from {element.tag}")
 
         self.objects.append((qname, obj))
         self.emit_event(EventType.END, element.tag, obj=obj, element=element)

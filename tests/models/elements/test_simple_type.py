@@ -1,5 +1,6 @@
 from unittest import TestCase
 
+from xsdata.exceptions import SchemaValueError
 from xsdata.models.elements import Enumeration
 from xsdata.models.elements import Length
 from xsdata.models.elements import List
@@ -13,7 +14,7 @@ class SimpleTypeTests(TestCase):
         obj = SimpleType.create(name="foo")
         self.assertEqual("foo", obj.real_name)
 
-        with self.assertRaises(NotImplementedError):
+        with self.assertRaises(SchemaValueError):
             obj = SimpleType.create()
             self.assertFalse(hasattr(obj, "ref"))
             obj.real_name

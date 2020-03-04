@@ -6,6 +6,7 @@ from tests.factories import ClassFactory
 from tests.factories import ExtensionFactory
 from tests.factories import FactoryTestCase
 from tests.factories import RestrictionsFactory
+from xsdata.exceptions import ReducerValueError
 from xsdata.models.codegen import AttrType
 from xsdata.models.elements import ComplexType
 from xsdata.models.elements import Element
@@ -543,7 +544,7 @@ class ClassReducerMergeClassesTests(ClassReducerBaseTestCase):
         class_c = class_a.clone()
 
         classes = [class_a, class_b, class_c]
-        with self.assertRaises(NotImplementedError) as cm:
+        with self.assertRaises(ReducerValueError) as cm:
             self.reducer.merge_redefined_classes(classes)
 
         self.assertEqual("Redefined class `class_B` more than once.", str(cm.exception))

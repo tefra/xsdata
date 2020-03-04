@@ -11,6 +11,7 @@ from lxml.etree import QName
 from lxml.etree import SubElement
 from lxml.etree import tostring
 
+from xsdata.exceptions import SerializerError
 from xsdata.formats.converters import to_xml
 from xsdata.formats.dataclass.mixins import ClassVar
 from xsdata.formats.dataclass.mixins import ModelInspect
@@ -48,8 +49,6 @@ class XmlSerializer(AbstractSerializer, ModelInspect):
         If the instance class is generated from the xsdata cli the root
         element's name will be auto assigned otherwise it will default
         to the class name.
-
-        :raise TypeError: If the instance is not a dataclass
         """
         meta = self.class_meta(obj.__class__, namespace)
 
@@ -84,7 +83,7 @@ class XmlSerializer(AbstractSerializer, ModelInspect):
                     self.set_any_children(parent, value, namespaces)
                 elif var.is_text:
                     if is_dataclass(value):
-                        raise ValueError("Text nodes can't be dataclasses!")
+                        raise SerializerError("Text nodes can't be dataclasses!")
                     self.set_text(parent, value)
                 else:
                     self.set_children(parent, value, var, namespaces)

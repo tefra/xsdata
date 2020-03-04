@@ -11,6 +11,7 @@ from typing import TypeVar
 from lxml.etree import Element
 from lxml.etree import iterparse
 
+from xsdata.exceptions import ParserError
 from xsdata.formats.converters import to_python
 from xsdata.models.enums import EventType
 
@@ -78,7 +79,7 @@ class AbstractXmlParser(AbstractParser):
             return clazz(obj)  # type: ignore
 
         if not obj or not isinstance(obj, clazz):
-            raise ValueError(
+            raise ParserError(
                 f"Failed to create target class {clazz.__class__.__name__}."
             )
 

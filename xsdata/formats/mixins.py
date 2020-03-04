@@ -68,9 +68,9 @@ class AbstractXmlParser(AbstractParser):
 
         for event, element in context:
             if event == EventType.START:
-                self.start_node(element)
+                self.queue_node(element)
             elif event == EventType.END:
-                obj = self.end_node(element)
+                obj = self.dequeue_node(element)
                 if obj is not None:
                     element.clear()
 
@@ -85,9 +85,9 @@ class AbstractXmlParser(AbstractParser):
         return obj
 
     @abstractmethod
-    def start_node(self, element: Element):
+    def queue_node(self, element: Element):
         """Prepare to create an object tree from the given starting element."""
 
     @abstractmethod
-    def end_node(self, element: Element) -> Optional[Type]:
+    def dequeue_node(self, element: Element) -> Optional[Type]:
         """Create an object tree from the given fully parsed element."""

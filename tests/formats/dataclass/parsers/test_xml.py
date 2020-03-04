@@ -31,7 +31,7 @@ class XmlParserTests(TestCase):
 
     @mock.patch.object(XmlParser, "emit_event")
     @mock.patch.object(XmlParser, "create_skip_queue_item")
-    def test_start_node_with_skip_queue_item(
+    def test_queue_node_with_skip_queue_item(
         self, mock_create_skip_queue_item, mock_emit_event
     ):
         expected_queue_item = SkipQueueItem(index=10, position=5)
@@ -40,7 +40,7 @@ class XmlParserTests(TestCase):
         element = Element("{urn:books}books")
         last_in_queue_item = SkipQueueItem(index=0, position=0)
         self.parser.queue.append(last_in_queue_item)
-        self.parser.start_node(element)
+        self.parser.queue_node(element)
 
         self.assertEqual(11, self.parser.index)
         self.assertEqual(2, len(self.parser.queue))
@@ -53,7 +53,7 @@ class XmlParserTests(TestCase):
 
     @mock.patch.object(XmlParser, "emit_event")
     @mock.patch.object(XmlParser, "create_skip_queue_item")
-    def test_start_node_with_wildcard_queue_item(
+    def test_queue_node_with_wildcard_queue_item(
         self, mock_create_skip_queue_item, mock_emit_event
     ):
         expected_queue_item = WildcardQueueItem(index=10, position=5, qname="foo")
@@ -62,7 +62,7 @@ class XmlParserTests(TestCase):
         element = Element("{urn:books}books")
         last_in_queue_item = WildcardQueueItem(index=0, position=0, qname="foo")
         self.parser.queue.append(last_in_queue_item)
-        self.parser.start_node(element)
+        self.parser.queue_node(element)
 
         self.assertEqual(11, self.parser.index)
         self.assertEqual(2, len(self.parser.queue))
@@ -75,7 +75,7 @@ class XmlParserTests(TestCase):
 
     @mock.patch.object(XmlParser, "emit_event")
     @mock.patch.object(XmlParser, "create_skip_queue_item")
-    def test_start_node_with_primitive_queue_item(
+    def test_queue_node_with_primitive_queue_item(
         self, mock_create_skip_queue_item, mock_emit_event
     ):
         expected_queue_item = SkipQueueItem(index=10, position=5)
@@ -84,7 +84,7 @@ class XmlParserTests(TestCase):
         element = Element("{urn:books}books")
         last_in_queue_item = PrimitiveQueueItem(index=0, position=0, types=[])
         self.parser.queue.append(last_in_queue_item)
-        self.parser.start_node(element)
+        self.parser.queue_node(element)
 
         self.assertEqual(11, self.parser.index)
         self.assertEqual(2, len(self.parser.queue))
@@ -96,13 +96,13 @@ class XmlParserTests(TestCase):
         )
 
     @mock.patch.object(XmlParser, "emit_event")
-    def test_start_node_with_root(self, mock_emit_event):
+    def test_queue_node_with_root(self, mock_emit_event):
         element = Element("{urn:books}books")
         root_queue_item = ClassQueueItem(
             index=0, position=0, meta=self.parser.class_meta(Books)
         )
         self.parser.queue.append(root_queue_item)
-        self.parser.start_node(element)
+        self.parser.queue_node(element)
 
         self.assertEqual(11, self.parser.index)
         self.assertEqual(1, len(self.parser.queue))
@@ -115,7 +115,7 @@ class XmlParserTests(TestCase):
     @mock.patch.object(XmlParser, "emit_event")
     @mock.patch.object(XmlParser, "create_wildcard_queue_item", return_value="yes")
     @mock.patch.object(ClassMeta, "any_element", new_callable=PropertyMock)
-    def test_start_node_with_wildcard_element(
+    def test_queue_node_with_wildcard_element(
         self, mock_any_element, mock_create_wildcard_queue_item, mock_emit_event
     ):
         element = Element("{urn:books}foobar")
@@ -127,7 +127,7 @@ class XmlParserTests(TestCase):
         )
 
         self.parser.queue.append(class_queue_item)
-        self.parser.start_node(element)
+        self.parser.queue_node(element)
 
         self.assertEqual(11, self.parser.index)
         self.assertEqual(2, len(self.parser.queue))
@@ -141,14 +141,14 @@ class XmlParserTests(TestCase):
 
     @mock.patch.object(XmlParser, "emit_event")
     @mock.patch.object(XmlParser, "create_class_queue_item", return_value="yes")
-    def test_start_node_with_dataclass_variable(
+    def test_queue_node_with_dataclass_variable(
         self, mock_create_class_queue_item, mock_emit_event
     ):
         element = Element("book")
         meta = self.parser.class_meta(Books)
         class_queue_item = ClassQueueItem(index=0, position=0, meta=meta)
         self.parser.queue.append(class_queue_item)
-        self.parser.start_node(element)
+        self.parser.queue_node(element)
 
         self.assertEqual(11, self.parser.index)
         self.assertEqual(2, len(self.parser.queue))
@@ -162,25 +162,25 @@ class XmlParserTests(TestCase):
             EventType.START, element.tag, item=class_queue_item, element=element
         )
 
-    def test_start_node_with_unkown_element(self):
+    def test_queue_node_with_unkown_element(self):
         element = Element("unknown")
         meta = self.parser.class_meta(Books)
         class_queue_item = ClassQueueItem(index=0, position=0, meta=meta)
         self.parser.queue.append(class_queue_item)
 
         with self.assertRaises(ValueError):
-            self.parser.start_node(element)
+            self.parser.queue_node(element)
 
     @mock.patch.object(XmlParser, "emit_event")
     @mock.patch.object(XmlParser, "create_primitive_queue_item", return_value="yes")
-    def test_start_node_with_primitive_variable(
+    def test_queue_node_with_primitive_variable(
         self, mock_create_primitive_queue_item, mock_emit_event
     ):
         element = Element("author")
         meta = self.parser.class_meta(BookForm)
         class_queue_item = ClassQueueItem(index=0, position=0, meta=meta)
         self.parser.queue.append(class_queue_item)
-        self.parser.start_node(element)
+        self.parser.queue_node(element)
 
         self.assertEqual(11, self.parser.index)
         self.assertEqual(2, len(self.parser.queue))
@@ -221,28 +221,28 @@ class XmlParserTests(TestCase):
         self.assertEqual(expected, actual)
 
     @mock.patch.object(XmlParser, "emit_event")
-    def test_end_node_with_skip_item(self, mock_emit_event):
+    def test_dequeue_node_with_skip_item(self, mock_emit_event):
         element = Element("author")
         element.text = "foobar"
 
         queue_item = SkipQueueItem(index=0, position=0)
         self.parser.queue.append(queue_item)
 
-        result = self.parser.end_node(element)
+        result = self.parser.dequeue_node(element)
         self.assertIsNone(result)
         self.assertEqual(0, len(self.parser.queue))
         self.assertEqual(0, mock_emit_event.call_count)
 
     @mock.patch.object(XmlParser, "emit_event")
     @mock.patch.object(XmlParser, "parse_value", return_value="result")
-    def test_end_node_with_primitive_item(self, mock_parse_value, mock_emit_event):
+    def test_dequeue_node_with_primitive_item(self, mock_parse_value, mock_emit_event):
         element = Element("author")
         element.text = "foobar"
 
         queue_item = PrimitiveQueueItem(index=0, position=0, types=[str], default=None)
         self.parser.queue.append(queue_item)
 
-        result = self.parser.end_node(element)
+        result = self.parser.dequeue_node(element)
         self.assertEqual("result", result)
         self.assertEqual(0, len(self.parser.queue))
         self.assertEqual((QName(element.tag), result), self.parser.objects[-1])
@@ -257,7 +257,7 @@ class XmlParserTests(TestCase):
     @mock.patch.object(XmlParser, "emit_event")
     @mock.patch.object(XmlParser, "fetch_any_children", return_value=[1, 2, 3])
     @mock.patch.object(XmlParser, "parse_any_element")
-    def test_end_node_with_wildcard_item(
+    def test_dequeue_node_with_wildcard_item(
         self, mock_parse_any_element, mock_fetch_any_children, mock_emit_event
     ):
         obj = AnyElement()
@@ -268,7 +268,7 @@ class XmlParserTests(TestCase):
         queue_item = WildcardQueueItem(index=0, position=0, qname=QName("parent"))
         self.parser.queue.append(queue_item)
 
-        result = self.parser.end_node(element)
+        result = self.parser.dequeue_node(element)
         self.assertEqual(obj, result)
         self.assertEqual(0, len(self.parser.queue))
         self.assertEqual((queue_item.qname, result), self.parser.objects[-1])
@@ -284,7 +284,7 @@ class XmlParserTests(TestCase):
     @mock.patch.object(XmlParser, "fetch_class_children")
     @mock.patch.object(XmlParser, "bind_element_text")
     @mock.patch.object(XmlParser, "bind_element_attrs")
-    def test_end_node_with_class_item(
+    def test_dequeue_node_with_class_item(
         self,
         mock_bind_element_attrs,
         mock_bind_element_text,
@@ -308,7 +308,7 @@ class XmlParserTests(TestCase):
         )
         self.parser.queue.append(queue_item)
 
-        result = self.parser.end_node(element)
+        result = self.parser.dequeue_node(element)
         self.assertEqual(Foo(1, 2, 3), result)
         self.assertEqual(0, len(self.parser.queue))
         self.assertEqual((QName(element.tag), result), self.parser.objects[-1])
@@ -320,10 +320,10 @@ class XmlParserTests(TestCase):
             EventType.END, element.tag, obj=result, element=element
         )
 
-    def test_end_node_with_unknown_item(self):
+    def test_dequeue_node_with_unknown_item(self):
         self.parser.queue.append(None)
         with self.assertRaises(ValueError):
-            self.parser.end_node(Element("foo"))
+            self.parser.dequeue_node(Element("foo"))
 
     def test_emit_event(self):
         mock_func = mock.Mock()

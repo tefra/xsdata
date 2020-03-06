@@ -1,3 +1,4 @@
+import math
 import re
 from abc import ABC
 from abc import abstractmethod
@@ -244,5 +245,7 @@ class PythonAbstractGenerator(AbstractGenerator, ABC):
                 )
 
             default_value = quoteattr(default_value)
+        elif isinstance(default_value, float) and math.isinf(default_value):
+            default_value = f"float('{default_value}')"
 
         return default_value

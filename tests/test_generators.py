@@ -285,3 +285,10 @@ class PythonAbstractGeneratorTests(FactoryTestCase):
 
         attr.default = "true"
         self.assertTrue(generator.attribute_default(attr))
+
+        attr.default = "inf"
+        attr.types = [type_int, type_float]
+        self.assertEqual("float('inf')", generator.attribute_default(attr))
+
+        attr.default = "-inf"
+        self.assertEqual("float('-inf')", generator.attribute_default(attr))

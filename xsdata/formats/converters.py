@@ -1,3 +1,4 @@
+import math
 from dataclasses import is_dataclass
 from decimal import Decimal
 from enum import Enum
@@ -71,6 +72,11 @@ def to_xml(value: Any) -> str:
         return "true" if value else "false"
     if isinstance(value, Enum):
         return str(value.value)
+    if isinstance(value, float):
+        if math.isinf(value):
+            return str(value).upper()
+        if math.isnan(value):
+            return "NaN"
 
     return str(value)
 

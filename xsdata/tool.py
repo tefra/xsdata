@@ -77,6 +77,13 @@ class ProcessTask:
 
             self.imported.append(sub_xsd_path)
 
+            if not sub_xsd_path.exists():
+                logger.warning(
+                    "%s: %s unresolved schema location..",
+                    sub_schema.class_name,
+                    sub_xsd_path,
+                )
+
             self.process(
                 xsd=sub_xsd_path,
                 package=sub_xsd_package or package,

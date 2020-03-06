@@ -14,6 +14,7 @@ from xsdata.models.enums import DataType
 from xsdata.models.enums import FormType
 from xsdata.models.enums import Mode
 from xsdata.models.enums import Namespace
+from xsdata.models.enums import NamespaceType
 from xsdata.models.enums import ProcessType
 from xsdata.models.enums import TagType
 from xsdata.models.enums import UseType
@@ -38,7 +39,7 @@ def array_element(init=True, **kwargs):
 
 
 def array_any_element(init=True, **kwargs):
-    kwargs.update(type=TagType.ANY)
+    kwargs.update(type=TagType.ANY, namespace=NamespaceType.ANY.value)
     return field(init=init, default_factory=list, metadata=kwargs)
 
 
@@ -382,7 +383,7 @@ class Any(AnnotationBase, OccurrencesMixin):
 
     min_occurs: Optional[int] = attribute(default=1)
     max_occurs: Optional[int] = attribute(default=1)
-    namespace: Optional[str] = attribute()
+    namespace: Optional[str] = attribute(default="##any")
     process_contents: Optional[ProcessType] = attribute()
 
     @property
@@ -390,12 +391,20 @@ class Any(AnnotationBase, OccurrencesMixin):
         return True
 
     @property
-    def real_type(self) -> Optional[str]:
-        return DataType.OBJECT.xml_prefixed
+    def is_wildcard(self) -> bool:
+        return True
 
     @property
     def real_name(self) -> str:
-        return "elements"
+        return f"{self.namespace}_element"
+
+    @property
+    def raw_namespace(self) -> Optional[str]:
+        return self.namespace
+
+    @property
+    def real_type(self) -> Optional[str]:
+        return DataType.OBJECT.xml_prefixed
 
 
 @dataclass
@@ -412,7 +421,7 @@ class All(AnnotationBase, OccurrencesMixin):
 
     min_occurs: int = attribute(default=1)
     max_occurs: int = attribute(default=1)
-    any: Any = element()
+    any: Array[Any] = array_element(name="any")
     elements: Array["Element"] = array_element(name="element")
     groups: Array["Group"] = array_element(name="group")
 

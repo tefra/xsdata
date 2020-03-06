@@ -72,7 +72,7 @@ class XmlSerializer(AbstractSerializer, ModelInspect):
         for var in meta.vars.values():
             value = getattr(obj, var.name)
             if value is not None:
-                if var.namespace:
+                if var.namespace and not var.is_any_element:
                     namespaces.add(var.namespace)
 
                 if var.is_attribute:

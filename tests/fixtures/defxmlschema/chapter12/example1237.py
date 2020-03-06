@@ -7,7 +7,7 @@ class ProductType:
     """
     :ivar number:
     :ivar name:
-    :ivar elements:
+    :ivar any_element:
     """
     number: Optional[int] = field(
         default=None,
@@ -27,11 +27,11 @@ class ProductType:
             required=True
         )
     )
-    elements: List[object] = field(
+    any_element: List[object] = field(
         default_factory=list,
         metadata=dict(
-            name="elements",
             type="Any",
+            namespace="##any",
             min_occurs=0,
             max_occurs=9223372036854775807
         )

@@ -166,6 +166,7 @@ class AttrFactory(Factory):
         help=None,
         default=None,
         fixed=False,
+        wildcard=False,
         restrictions=None,
     ):
 
@@ -178,6 +179,7 @@ class AttrFactory(Factory):
             help=help or None,
             default=default or None,
             fixed=fixed,
+            wildcard=wildcard,
             restrictions=restrictions or RestrictionsFactory.create(),
         )
 

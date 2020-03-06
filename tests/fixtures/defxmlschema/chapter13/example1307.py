@@ -5,15 +5,15 @@ from typing import Optional
 @dataclass
 class ProductType:
     """
-    :ivar elements:
+    :ivar other_element:
     :ivar number:
     :ivar name:
     """
-    elements: Optional[object] = field(
+    other_element: Optional[object] = field(
         default=None,
         metadata=dict(
-            name="elements",
             type="Any",
+            namespace="##other",
             required=True
         )
     )
@@ -40,15 +40,15 @@ class ProductType:
 @dataclass
 class ShirtType(ProductType):
     """
-    :ivar elements:
+    :ivar any_element:
     :ivar size:
     :ivar color:
     """
-    elements: Optional[object] = field(
+    any_element: Optional[object] = field(
         default=None,
         metadata=dict(
-            name="elements",
             type="Any",
+            namespace="##any",
             required=True
         )
     )

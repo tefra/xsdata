@@ -19,6 +19,7 @@ from lxml.etree import QName
 
 from xsdata.exceptions import ModelInspectionError
 from xsdata.formats.converters import sort_types
+from xsdata.models.enums import NamespaceType
 from xsdata.models.enums import TagType
 
 
@@ -56,6 +57,7 @@ class ClassVar:
     is_list: bool = False
     is_dataclass: bool = False
     default: Any = None
+    wild_ns: List[str] = field(default_factory=list)
 
     @property
     def clazz(self):
@@ -114,6 +116,32 @@ class ClassMeta:
             (var for qname, var in self.vars.items() if var.is_any_element), None
         )
 
+    def get_var(self, qname: QName) -> Optional[ClassVar]:
+        if qname in self.vars:
+            return self.vars[qname]
+
+        return next(
+            (
+                var
+                for _, var in self.vars.items()
+                for wild_ns in var.wild_ns
+                if self.match(wild_ns, qname)
+            ),
+            None,
+        )
+
+    @staticmethod
+    def match(namespace: str, qname: QName):
+        return (
+            namespace
+            and (
+                namespace == qname.namespace
+                or namespace == NamespaceType.ANY.value
+                or namespace[0] == "!"
+                and namespace[1:] != qname.namespace
+            )
+        ) or (not namespace and qname.namespace is None)
+
 
 @dataclass
 class ModelInspect:
@@ -150,13 +178,17 @@ class ModelInspect:
             is_list, types = self.real_types(type_hint)
 
             tag = Tag.from_metadata_type(var.metadata.get("type"))
-            namespace = self.real_namespace(var, tag, parent_ns)
+            namespace = var.metadata.get("namespace")
+            real_namespace = self.resolve_namespace(namespace, tag, parent_ns)
+            wild_namespaces = self.wild_namespaces(namespace, tag, parent_ns)
+
             local_name = var.metadata.get("name") or self.name_generator(var.name)
             is_class = next((False for clazz in types if not is_dataclass(clazz)), True)
 
             yield ClassVar(
                 name=var.name,
-                qname=QName(namespace or None, local_name),
+                qname=QName(real_namespace, local_name),
+                wild_ns=wild_namespaces,
                 tag=tag,
                 init=var.init,
                 is_list=is_list,
@@ -167,12 +199,37 @@ class ModelInspect:
             )
 
     @staticmethod
-    def real_namespace(var: Field, tag: Tag, parent_ns: Optional[str]) -> Optional[str]:
-        namespace = var.metadata.get("namespace")
-        if tag == Tag.ELEMENT:
-            return namespace if namespace is not None else parent_ns
-        else:
-            return namespace
+    def resolve_namespace(
+        namespace: Optional[str], tag: Tag, parent_namespace: Optional[str]
+    ) -> Optional[str]:
+        if tag == Tag.ANY_ELEMENT:
+            namespace = None
+        elif tag == Tag.ELEMENT and namespace is None:
+            namespace = parent_namespace
+
+        return namespace or None
+
+    @staticmethod
+    def wild_namespaces(
+        namespace: Optional[str], tag: Tag, parent_namespace: Optional[str]
+    ) -> List[str]:
+        if tag != Tag.ANY_ELEMENT:
+            return []
+
+        result = set()
+        for ns in (namespace or "##any").split(" "):
+            ns = ns.strip()
+            if ns:
+                ns_type = NamespaceType.get_enum(ns)
+                if ns_type == NamespaceType.TARGET:
+                    result.add(parent_namespace or NamespaceType.ANY.value)
+                elif ns_type == NamespaceType.LOCAL:
+                    result.add("")
+                elif ns_type == NamespaceType.OTHER:
+                    result.add(f"!{parent_namespace or ''}")
+                else:
+                    result.add(ns)
+        return list(result)
 
     @staticmethod
     def default_value(var: Field) -> Any:

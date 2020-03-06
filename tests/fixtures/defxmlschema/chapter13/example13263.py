@@ -8,14 +8,14 @@ from tests.fixtures.defxmlschema.chapter13.example13261 import (
 @dataclass
 class IlegalDerivedType(BaseType):
     """
-    :ivar elements:
+    :ivar any_element:
     :ivar a:
     """
-    elements: Optional[object] = field(
+    any_element: Optional[object] = field(
         default=None,
         metadata=dict(
-            name="elements",
             type="Any",
+            namespace="##any",
             required=True
         )
     )

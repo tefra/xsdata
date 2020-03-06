@@ -296,7 +296,7 @@ class SchemaParserTests(TestCase):
 
     def test_complex_type_with_all_resets_elements_max_occurs(self):
         xsd = """<xs:complexType>
-                    <xs:all minOccurs="1">
+                    <xs:all minOccurs="0">
                     <xs:element name="first" maxOccurs="100" />
                     <xs:element name="second" maxOccurs="100" />
                     <xs:any processContents="lax" />
@@ -307,29 +307,31 @@ class SchemaParserTests(TestCase):
             index=1,
             all=All.create(
                 index=2,
-                min_occurs=1,
+                min_occurs=0,
                 elements=[
                     Element.create(
                         name="first",
-                        min_occurs=1,
-                        max_occurs=1,
+                        min_occurs=0,
+                        max_occurs=100,
                         form=FormType.QUALIFIED,
                         index=3,
                     ),
                     Element.create(
                         name="second",
-                        min_occurs=1,
-                        max_occurs=1,
+                        min_occurs=0,
+                        max_occurs=100,
                         form=FormType.QUALIFIED,
                         index=4,
                     ),
                 ],
-                any=Any.create(
-                    index=5,
-                    min_occurs=1,
-                    max_occurs=1,
-                    process_contents=ProcessType.LAX,
-                ),
+                any=[
+                    Any.create(
+                        index=5,
+                        min_occurs=0,
+                        max_occurs=1,
+                        process_contents=ProcessType.LAX,
+                    )
+                ],
             ),
         )
         schema = self.parser.from_xsd_string(wrap(xsd))

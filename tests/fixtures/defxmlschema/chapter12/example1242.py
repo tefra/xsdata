@@ -5,15 +5,15 @@ from typing import Optional
 @dataclass
 class OpenProductType:
     """
-    :ivar elements:
+    :ivar local_element:
     :ivar number:
     :ivar name:
     """
-    elements: Optional[object] = field(
+    local_element: Optional[object] = field(
         default=None,
         metadata=dict(
-            name="elements",
             type="Any",
+            namespace="##local",
             required=True
         )
     )

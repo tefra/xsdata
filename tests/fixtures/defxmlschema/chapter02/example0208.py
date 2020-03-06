@@ -8,7 +8,7 @@ class ProductType:
     :ivar number:
     :ivar size:
     :ivar color:
-    :ivar elements:
+    :ivar other_element:
     :ivar eff_date:
     """
     number: Optional[int] = field(
@@ -40,11 +40,11 @@ class ProductType:
             max_occurs=3
         )
     )
-    elements: Optional[object] = field(
+    other_element: Optional[object] = field(
         default=None,
         metadata=dict(
-            name="elements",
             type="Any",
+            namespace="##other",
             required=True
         )
     )

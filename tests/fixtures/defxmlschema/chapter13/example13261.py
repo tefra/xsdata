@@ -5,14 +5,14 @@ from typing import Optional
 @dataclass
 class BaseType:
     """
-    :ivar elements:
+    :ivar datypic_com_prod_http_datypic_com_ord_element:
     :ivar a:
     """
-    elements: Optional[object] = field(
+    datypic_com_prod_http_datypic_com_ord_element: Optional[object] = field(
         default=None,
         metadata=dict(
-            name="elements",
             type="Any",
+            namespace="http://datypic.com/prod                        http://datypic.com/ord",
             required=True
         )
     )

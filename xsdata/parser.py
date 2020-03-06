@@ -160,7 +160,7 @@ class SchemaParser(XmlParser):
         """Elements inside an all element can by definition appear at most
         once, reset their max occur counter."""
         if isinstance(obj, xsd.All):
-            cls.cascade_occurs(obj, obj.min_occurs, obj.max_occurs, force=Force.BOTH)
+            cls.cascade_occurs(obj, obj.min_occurs, obj.max_occurs)
 
     @classmethod
     def end_sequence(cls, obj: T, element: etree.Element):

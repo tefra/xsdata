@@ -203,6 +203,7 @@ class ClassBuilder:
                 name=obj.real_name,
                 default=obj.default_value,
                 fixed=obj.is_fixed,
+                wildcard=obj.is_wildcard,
                 types=types,
                 local_type=obj.class_name,
                 help=obj.display_help,

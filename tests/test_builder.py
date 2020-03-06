@@ -283,6 +283,7 @@ class ClassBuilderTests(FactoryTestCase):
     @patch.object(ClassBuilder, "build_class_attribute_types")
     @patch.object(ClassBuilder, "element_namespace")
     @patch.object(Attribute, "get_restrictions")
+    @patch.object(Attribute, "is_wildcard", new_callable=PropertyMock)
     @patch.object(Attribute, "is_fixed", new_callable=PropertyMock)
     @patch.object(Attribute, "default_value", new_callable=PropertyMock)
     @patch.object(Attribute, "prefix", new_callable=PropertyMock)
@@ -295,6 +296,7 @@ class ClassBuilderTests(FactoryTestCase):
         mock_prefix,
         mock_default_value,
         mock_is_fixed,
+        mock_is_wildcard,
         mock_get_restrictions,
         mock_element_namespace,
         mock_build_class_attribute_types,
@@ -309,6 +311,7 @@ class ClassBuilderTests(FactoryTestCase):
         mock_prefix.return_value = "com"
         mock_default_value.return_value = "default"
         mock_is_fixed.return_value = True
+        mock_is_wildcard.return_value = True
         mock_element_namespace.return_value = "http://something/common"
         mock_get_restrictions.return_value = {"required": True}
 
@@ -323,6 +326,7 @@ class ClassBuilderTests(FactoryTestCase):
             help=mock_display_help.return_value,
             default=mock_default_value.return_value,
             fixed=mock_is_fixed.return_value,
+            wildcard=mock_is_wildcard.return_value,
             index=66,
             restrictions=Restrictions(required=True),
         )

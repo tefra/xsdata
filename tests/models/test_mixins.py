@@ -150,6 +150,10 @@ class ElementBaseTests(TestCase):
         element.ref = "foo"
         self.assertTrue(element.is_qualified)
 
+    def test_property_is_wildcard(self):
+        element = ElementBase()
+        self.assertFalse(element.is_wildcard)
+
     def test_property_prefix(self):
         element = ElementBase()
         self.assertIsNone(element.prefix)

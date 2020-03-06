@@ -161,6 +161,10 @@ class ElementBase(BaseModel):
         return getattr(self, "ref", None) is not None
 
     @property
+    def is_wildcard(self) -> bool:
+        return False
+
+    @property
     def prefix(self):
         return text.prefix(self.ref) if self.is_ref else None
 

@@ -8,14 +8,14 @@ from tests.fixtures.defxmlschema.chapter13.example13261 import (
 @dataclass
 class LegalDerivedType(BaseType):
     """
-    :ivar elements:
+    :ivar datypic_com_prod_element:
     :ivar a:
     """
-    elements: Optional[object] = field(
+    datypic_com_prod_element: Optional[object] = field(
         default=None,
         metadata=dict(
-            name="elements",
             type="Any",
+            namespace="http://datypic.com/prod",
             required=True
         )
     )

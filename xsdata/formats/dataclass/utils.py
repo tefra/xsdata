@@ -55,9 +55,9 @@ def safe_snake(string: str, default: str = "value") -> str:
         return default
 
     # Remove invalid characters
-    string = re.sub("[^0-9a-zA-Z_-]", " ", string)
+    string = re.sub("[^0-9a-zA-Z_-]", " ", string).strip()
 
-    if not string.strip():
+    if not string:
         return default
     elif re.match(r"^-\d*\.?\d+$", string):
         return f"{default}_minus_{string}"

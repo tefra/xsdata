@@ -5,17 +5,17 @@ from typing import List, Optional
 @dataclass
 class TextType:
     """
-    :ivar elements:
+    :ivar any_element:
     :ivar lang:
     """
     class Meta:
         mixed = True
 
-    elements: List[object] = field(
+    any_element: List[object] = field(
         default_factory=list,
         metadata=dict(
-            name="elements",
             type="Any",
+            namespace="##any",
             min_occurs=0,
             max_occurs=9223372036854775807
         )

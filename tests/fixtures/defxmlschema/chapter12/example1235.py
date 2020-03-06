@@ -5,16 +5,16 @@ from typing import List
 @dataclass
 class DescriptionType:
     """
-    :ivar elements:
+    :ivar www_w3_org_1999_xhtml_element:
     """
     class Meta:
         mixed = True
 
-    elements: List[object] = field(
+    www_w3_org_1999_xhtml_element: List[object] = field(
         default_factory=list,
         metadata=dict(
-            name="elements",
             type="Any",
+            namespace="http://www.w3.org/1999/xhtml",
             min_occurs=0,
             max_occurs=9223372036854775807
         )

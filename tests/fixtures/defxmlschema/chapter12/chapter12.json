@@ -16,7 +16,7 @@
             ],
             "description": [
                 {
-                    "elements": [
+                    "www_w3_org_1999_xhtml_element": [
                         "This shirt is the",
                         {
                             "qname": "{http://www.w3.org/1999/xhtml}b",

@@ -94,12 +94,13 @@ class Attr:
     local_name: str = field(init=False)
     local_type: str
     index: int
+    default: Any = field(default=None)
+    wildcard: bool = field(default=False)
     fixed: bool = field(default=False)
     types: List[AttrType] = field(default_factory=list)
     display_type: Optional[str] = field(default=None)
     namespace: Optional[str] = field(default=None)
     help: Optional[str] = field(default=None)
-    default: Optional[Any] = field(default=None)
     restrictions: Restrictions = field(default_factory=Restrictions)
 
     def __post_init__(self):

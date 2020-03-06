@@ -28,6 +28,27 @@ class Namespace(Enum):
 __STANDARD_NAMESPACES__ = {ns.uri: ns for ns in Namespace}
 
 
+class NamespaceType(Enum):
+    """
+    :cvar ANY: elements from any namespace is allowed
+    :cvar OTHER: elements from any namespace other than the parent element's namespace
+    :cvar LOCAL: elements must come from no namespace
+    :cvar TARGET: elements from the namespace of the parent element can be present
+    """
+
+    ANY = "##any"
+    OTHER = "##other"
+    LOCAL = "##local"
+    TARGET = "##targetNamespace"
+
+    @classmethod
+    def get_enum(cls, value: str) -> Optional["NamespaceType"]:
+        try:
+            return NamespaceType(value)
+        except ValueError:
+            return None
+
+
 class FormType(Enum):
     QUALIFIED = "qualified"
     UNQUALIFIED = "unqualified"

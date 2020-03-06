@@ -2,7 +2,6 @@ from dataclasses import dataclass
 from dataclasses import replace
 from unittest import mock
 from unittest.case import TestCase
-from unittest.mock import PropertyMock
 
 from lxml.etree import Comment
 from lxml.etree import Element
@@ -14,6 +13,7 @@ from tests.fixtures.defxmlschema.chapter04.example04052 import OrderSummary
 from tests.fixtures.defxmlschema.chapter12.chapter12 import ProductType
 from xsdata.formats.dataclass.mixins import ClassMeta
 from xsdata.formats.dataclass.mixins import ClassVar
+from xsdata.formats.dataclass.mixins import Tag
 from xsdata.formats.dataclass.models import AnyElement
 from xsdata.formats.dataclass.parsers.xml import ClassQueueItem
 from xsdata.formats.dataclass.parsers.xml import PrimitiveQueueItem
@@ -101,10 +101,12 @@ class XmlParserTests(TestCase):
         root_queue_item = ClassQueueItem(
             index=0, position=0, meta=self.parser.class_meta(Books)
         )
+
+        self.parser.index = 0
         self.parser.queue.append(root_queue_item)
         self.parser.queue_node(element)
 
-        self.assertEqual(11, self.parser.index)
+        self.assertEqual(1, self.parser.index)
         self.assertEqual(1, len(self.parser.queue))
         self.assertEqual(root_queue_item, self.parser.queue[0])
 
@@ -114,16 +116,16 @@ class XmlParserTests(TestCase):
 
     @mock.patch.object(XmlParser, "emit_event")
     @mock.patch.object(XmlParser, "create_wildcard_queue_item", return_value="yes")
-    @mock.patch.object(ClassMeta, "any_element", new_callable=PropertyMock)
+    @mock.patch.object(ClassMeta, "get_var")
     def test_queue_node_with_wildcard_element(
-        self, mock_any_element, mock_create_wildcard_queue_item, mock_emit_event
+        self, mock_get_var, mock_create_wildcard_queue_item, mock_emit_event
     ):
         element = Element("{urn:books}foobar")
         class_queue_item = ClassQueueItem(
             index=0, position=0, meta=self.parser.class_meta(Books)
         )
-        mock_any_element.return_value = ClassVar(
-            qname="{urn:books}:parent", types=[], name="", tag=""
+        mock_get_var.return_value = ClassVar(
+            qname="{urn:books}:parent", types=[], name="", tag=Tag.ANY_ELEMENT
         )
 
         self.parser.queue.append(class_queue_item)
@@ -200,11 +202,20 @@ class XmlParserTests(TestCase):
     @mock.patch.object(XmlParser, "class_meta")
     def test_create_class_queue_item(self, mock_class_meta):
         mock_class_meta.return_value = "yes"
-        class_var = ClassVar(qname="author", types=[], name="", tag="", default=10)
+        class_var = ClassVar(
+            qname="author",
+            types=[BookForm],
+            is_dataclass=True,
+            name="",
+            tag="",
+            default=10,
+        )
 
-        actual = self.parser.create_class_queue_item(class_var, "{urn:book}")
+        qname = QName("{urn}book")
+        actual = self.parser.create_class_queue_item(class_var, qname)
         expected = ClassQueueItem(index=10, position=5, default=10, meta="yes")
         self.assertEqual(expected, actual)
+        mock_class_meta.assert_called_once_with(BookForm, qname.namespace)
 
     def test_create_primitive_queue_item(self):
         class_var = ClassVar(qname="", types=[int, str], name="", tag="", default=1)

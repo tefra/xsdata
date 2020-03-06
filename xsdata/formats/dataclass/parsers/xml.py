@@ -69,6 +69,7 @@ class XmlParser(AbstractXmlParser, ModelInspect):
         meta = self.class_meta(clazz)
 
         self.objects = []
+        self.index = 0
         self.queue = [ClassQueueItem(index=0, position=0, meta=meta)]
 
         return super(XmlParser, self).parse_context(context, clazz)
@@ -86,7 +87,7 @@ class XmlParser(AbstractXmlParser, ModelInspect):
 
         :raises Value: When the parser doesn't know how to handle the given element.
         """
-        qname = element.tag
+        qname = QName(element.tag)
         queue_item = None
         item = self.queue[-1]
 
@@ -95,17 +96,17 @@ class XmlParser(AbstractXmlParser, ModelInspect):
         elif isinstance(item, WildcardQueueItem):
             queue_item = self.create_wildcard_queue_item(item.qname)
         elif isinstance(item, ClassQueueItem):
-            var = item.meta.vars.get(qname)
 
-            if not var and item.meta.qname == qname:
+            if item.meta.qname == qname and self.index == 0:
                 queue_item = self.queue.pop()
-            elif not var and item.meta.any_element:
-                parent_qname = item.meta.any_element.qname
-                queue_item = self.create_wildcard_queue_item(parent_qname)
-            elif var and var.is_dataclass:
-                queue_item = self.create_class_queue_item(var, item.meta.qname)
-            elif var:
-                queue_item = self.create_primitive_queue_item(var)
+            else:
+                var = item.meta.get_var(qname)
+                if var and var.is_dataclass:
+                    queue_item = self.create_class_queue_item(var, item.meta.qname)
+                elif var and var.is_any_element:
+                    queue_item = self.create_wildcard_queue_item(var.qname)
+                elif var:
+                    queue_item = self.create_primitive_queue_item(var)
 
         if queue_item is None:
             parent = item.meta.qname if isinstance(item, ClassQueueItem) else "unknown"
@@ -113,7 +114,7 @@ class XmlParser(AbstractXmlParser, ModelInspect):
 
         self.index += 1
         self.queue.append(queue_item)
-        self.emit_event(EventType.START, qname, item=item, element=element)
+        self.emit_event(EventType.START, element.tag, item=item, element=element)
 
     def create_skip_queue_item(self):
         return SkipQueueItem(index=self.index, position=len(self.objects))
@@ -122,7 +123,7 @@ class XmlParser(AbstractXmlParser, ModelInspect):
         return ClassQueueItem(
             index=self.index,
             position=len(self.objects),
-            meta=self.class_meta(var.clazz, parent_qname),
+            meta=self.class_meta(var.clazz, parent_qname.namespace),
             default=var.default,
         )
 

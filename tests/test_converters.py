@@ -13,6 +13,10 @@ class ConvertersTestCases(TestCase):
         self.assertEqual("true", to_xml(True))
         self.assertEqual("false", to_xml(False))
         self.assertEqual("optional", to_xml(UseType.OPTIONAL))
+        self.assertEqual("INF", to_xml(float("inf")))
+        self.assertEqual("INF", to_xml(float("+inf")))
+        self.assertEqual("-INF", to_xml(float("-inf")))
+        self.assertEqual("NaN", to_xml(float("nan")))
 
     def test_to_python_integer(self):
         self.assertEqual(1, to_python([int], "1"))

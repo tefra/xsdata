@@ -248,7 +248,6 @@ class ClassBuilderTests(FactoryTestCase):
         self.assertEqual(expected, list(children))
 
     def test_children_extensions(self):
-        self.builder.target_prefix = "bk:"
         complex_type = ComplexType.create(
             attributes=[Attribute.create(index=i) for i in range(2)],
             sequence=Sequence.create(

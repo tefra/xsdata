@@ -69,4 +69,4 @@ Code Writer
 
 :class:`xsdata.writer.CodeWriter`
 
-Code writer is a factory that delegates the code generation with any language and library conventions to the given renderer.
+Code writer is a factory that delegates the code generation with any language and library conventions to the given format.

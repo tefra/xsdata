@@ -1,4 +1,6 @@
 import sys
+from pathlib import Path
+from unittest import mock
 from unittest import TestCase
 
 from xsdata.models.elements import All
@@ -9,13 +11,19 @@ from xsdata.models.elements import ComplexContent
 from xsdata.models.elements import ComplexType
 from xsdata.models.elements import Element
 from xsdata.models.elements import Extension
+from xsdata.models.elements import Import
+from xsdata.models.elements import Include
 from xsdata.models.elements import MinLength
+from xsdata.models.elements import Override
 from xsdata.models.elements import Pattern
+from xsdata.models.elements import Redefine
 from xsdata.models.elements import Restriction
+from xsdata.models.elements import Schema
 from xsdata.models.elements import Sequence
 from xsdata.models.elements import SimpleContent
 from xsdata.models.elements import SimpleType
 from xsdata.models.enums import FormType
+from xsdata.models.enums import Namespace
 from xsdata.models.enums import ProcessType
 from xsdata.models.enums import UseType
 from xsdata.parser import SchemaParser
@@ -362,3 +370,111 @@ class SchemaParserTests(TestCase):
         self.assertEqual("bar", schema.complex_types[0].attribute_groups[1].ref)
         self.assertEqual("foo", schema.elements[0].complex_type.attribute_groups[0].ref)
         self.assertEqual(0, len(schema.elements[1].complex_type.attribute_groups))
+
+    @mock.patch.object(SchemaParser, "resolve_schemas_locations")
+    @mock.patch.object(SchemaParser, "add_default_imports")
+    @mock.patch.object(SchemaParser, "set_schema_namespaces")
+    @mock.patch.object(SchemaParser, "set_schema_forms")
+    def test_end_schema(
+        self,
+        mock_set_schema_forms,
+        mock_set_schema_namespaces,
+        mock_add_default_imports,
+        mock_resolve_schemas_locations,
+    ):
+        schema = Schema.create()
+        element = Element("schema")
+
+        self.parser.end_schema(schema, element)
+        mock_set_schema_forms.assert_called_once_with(schema)
+        mock_set_schema_namespaces.assert_called_once_with(schema, element)
+        mock_add_default_imports.assert_called_once_with(schema)
+        mock_resolve_schemas_locations.assert_called_once_with(schema)
+
+    def test_add_default_imports(self):
+        schema = Schema.create()
+        schema.imports.append(Import.create(namespace="foo"))
+
+        self.parser.add_default_imports(schema)
+        self.assertEqual(1, len(schema.imports))
+
+        xsi = Namespace.XSI.value
+        schema.nsmap["foo"] = xsi
+        self.parser.add_default_imports(schema)
+        self.assertEqual(2, len(schema.imports))
+        self.assertEqual(Import.create(namespace=xsi), schema.imports[0])
+
+    @mock.patch.object(SchemaParser, "resolve_local_path")
+    @mock.patch.object(SchemaParser, "resolve_path")
+    def test_resolve_schemas_locations(
+        self, mock_resolve_path, mock_resolve_local_path
+    ):
+        schema = Schema.create()
+        self.parser.resolve_schemas_locations(schema)
+
+        self.parser.schema_location = Path.cwd()
+
+        mock_resolve_path.side_effect = lambda x: Path.cwd().joinpath(x)
+        mock_resolve_local_path.side_effect = lambda x, y: Path.cwd().joinpath(x)
+
+        schema.overrides.append(Override.create(schema_location="o1"))
+        schema.overrides.append(Override.create(schema_location="o2"))
+        schema.redefines.append(Redefine.create(schema_location="r1"))
+        schema.redefines.append(Redefine.create(schema_location="r2"))
+        schema.includes.append(Include.create(schema_location="i1"))
+        schema.includes.append(Include.create(schema_location="i2"))
+        schema.imports.append(Import.create(schema_location="i3", namespace="ns_i3"))
+        schema.imports.append(Import.create(schema_location="i4", namespace="ns_i4"))
+
+        self.parser.resolve_schemas_locations(schema)
+
+        mock_resolve_path.assert_has_calls(
+            [
+                mock.call("o1"),
+                mock.call("o2"),
+                mock.call("r1"),
+                mock.call("r2"),
+                mock.call("i1"),
+                mock.call("i2"),
+            ]
+        )
+
+        mock_resolve_local_path.assert_has_calls(
+            [mock.call("i3", "ns_i3"), mock.call("i4", "ns_i4")]
+        )
+
+        for sub in schema.included():
+            self.assertEqual(Path.cwd().joinpath(sub.schema_location), sub.location)
+
+    def test_resolve_path(self):
+        self.assertIsNone(self.parser.resolve_path("foo"))
+        iam = Path(__file__)
+
+        self.parser.schema_location = iam
+        self.assertIsNone(self.parser.resolve_path(""))
+        self.assertIsNone(self.parser.resolve_path(None))
+        self.assertIsNone(self.parser.resolve_path("a"))
+
+        actual = self.parser.resolve_path(iam.name)
+        self.assertEqual(iam, actual)
+
+    def test_resolve_local_path(self):
+        self.assertIsNone(self.parser.resolve_local_path("foo", "bar"))
+        self.assertIsNone(self.parser.resolve_local_path("foo", None))
+        self.assertIsNone(self.parser.resolve_local_path(None, None))
+        self.assertIsNone(self.parser.resolve_local_path(None, "bar"))
+
+        self.assertEqual(
+            Namespace.XSI.location,
+            self.parser.resolve_local_path(None, Namespace.XSI.value),
+        )
+
+        self.assertEqual(
+            Namespace.XSI.location,
+            self.parser.resolve_local_path("http://something", Namespace.XSI.value),
+        )
+        iam = Path(__file__)
+        self.parser.schema_location = iam
+        self.assertEqual(
+            iam, self.parser.resolve_local_path(iam.name, Namespace.XSI.value)
+        )

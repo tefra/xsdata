@@ -6,7 +6,7 @@ from tests.factories import ClassFactory
 from tests.factories import ExtensionFactory
 from tests.factories import FactoryTestCase
 from tests.factories import PackageFactory
-from xsdata.generators import PythonAbstractGenerator as generator
+from xsdata.formats.generators import PythonAbstractGenerator as generator
 from xsdata.models.enums import DataType
 from xsdata.models.enums import TagType
 

@@ -188,16 +188,6 @@ class ElementBase(BaseModel):
     def real_type(self) -> Optional[str]:
         raise SchemaValueError(f"Schema class `{self.class_name}` unknown real type.")
 
-    @property
-    def num(self):
-        return sum(
-            [
-                len(getattr(self, attribute.name))
-                for attribute in fields(self)
-                if isinstance(getattr(self, attribute.name), list)
-            ]
-        )
-
     def children(self):
         for attribute in fields(self):
             value = getattr(self, attribute.name)

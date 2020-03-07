@@ -10,8 +10,8 @@ Roadmap
 -------
 
 * Add option to split classes in multiple files
-* Python renderers: attrs and pydantic
-* Java renderer: JaxB compatible models :)
+* Python formats: attrs and pydantic
+* Java format: JaxB compatible models :)
 * Validators
 
 .. toctree::

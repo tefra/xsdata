@@ -8,7 +8,7 @@ from typing import Tuple
 
 from xsdata.formats.dataclass.filters import filters
 from xsdata.formats.dataclass.utils import safe_snake
-from xsdata.generators import PythonAbstractGenerator
+from xsdata.formats.generators import PythonAbstractGenerator
 from xsdata.models.codegen import Class
 from xsdata.models.codegen import Package
 from xsdata.models.elements import Schema

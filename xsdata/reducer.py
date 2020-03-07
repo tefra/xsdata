@@ -64,7 +64,7 @@ class ClassReducer:
         Return the qualified classes to continue for code generation.
 
         The rest of the classes are stored as common types to be used later
-        by the next schemas in the proccess.
+        by the next schemas in the process.
 
         Qualifications:
             * not an abstract

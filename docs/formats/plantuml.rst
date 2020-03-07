@@ -13,7 +13,7 @@ Which is translated to this nice svg
 
     Then above output was generating by running the following command
 
-        ``xsdata docs/examples/primer.xsd --package docs.examples --renderer plantuml --print``
+        ``xsdata docs/examples/primer.xsd --package docs.examples --format plantuml --print``
 
     The output was converted to svg with the plantUML cli tool
 

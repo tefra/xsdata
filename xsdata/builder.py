@@ -39,7 +39,6 @@ AttributeElement = Union[
 class ClassBuilder:
     schema: Schema
     redefine: Optional[Redefine] = field(default=None)
-    target_prefix: Optional[str] = field(init=False)
 
     def build(self) -> List[Class]:
         """Generate classes from schema and redefined elements."""

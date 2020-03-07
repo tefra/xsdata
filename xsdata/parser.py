@@ -1,8 +1,8 @@
-import pathlib
 import sys
 from dataclasses import dataclass
 from dataclasses import field
 from enum import Enum
+from pathlib import Path
 from typing import Any
 from typing import Callable
 from typing import List
@@ -32,7 +32,6 @@ class Force(Enum):
 
 @dataclass
 class SchemaParser(XmlParser):
-    name_generator: Callable = field(default=text.camel_case)
     """
     A simple parser to convert an xsd schema to an easy to handle data
     structure based on dataclasses.
@@ -45,14 +44,15 @@ class SchemaParser(XmlParser):
     attribute_form: Optional[FormType] = field(init=False, default=None)
     target_namespace: Optional[str] = field(default=None)
     default_attributes: Optional[str] = field(default=None)
+    schema_location: Optional[Path] = field(default=None)
+    name_generator: Callable = field(default=text.camel_case)
 
     def from_xsd_string(self, source: str) -> xsd.Schema:
         return super().from_string(source, xsd.Schema)
 
-    def from_xsd_path(self, path: pathlib.Path) -> xsd.Schema:
-        schema = super().from_path(path, xsd.Schema)
-        schema.location = path
-        return schema
+    def from_xsd_path(self, path: Path) -> xsd.Schema:
+        self.schema_location = path
+        return super().from_path(path, xsd.Schema)
 
     def dequeue_node(self, element: etree.Element) -> Optional[T]:
         """Override parent method to skip empty elements and to set the object
@@ -80,11 +80,12 @@ class SchemaParser(XmlParser):
         self.default_attributes = element.attrib.get("defaultAttributes", None)
 
     def end_schema(self, obj: T, element: etree.Element):
-        """Set schema namespaces and default form for elements and
-        attributes."""
+        """Normalize various properties for the schema and it's children."""
         if isinstance(obj, xsd.Schema):
             self.set_schema_forms(obj)
             self.set_schema_namespaces(obj, element)
+            self.add_default_imports(obj)
+            self.resolve_schemas_locations(obj)
 
     def set_schema_forms(self, obj: xsd.Schema):
         """
@@ -114,6 +115,51 @@ class SchemaParser(XmlParser):
         for namespace in Namespace:
             if namespace.uri not in namespaces:
                 obj.nsmap[namespace.prefix] = namespace.uri
+
+    @staticmethod
+    def add_default_imports(obj: xsd.Schema):
+        """Add missing imports to the standard schemas if the namespace is
+        declared and."""
+        imp_namespaces = [imp.namespace for imp in obj.imports]
+        xsi_ns = Namespace.XSI.value
+        if xsi_ns in obj.nsmap.values() and xsi_ns not in imp_namespaces:
+            obj.imports.insert(0, xsd.Import.create(namespace=xsi_ns))
+
+    def resolve_schemas_locations(self, obj: xsd.Schema):
+        """Resolve the locations of the schema overrides, redefines, includes
+        and imports relatively to the schema location."""
+        if not self.schema_location:
+            return
+
+        obj.location = self.schema_location
+        for over in obj.overrides:
+            over.location = self.resolve_path(over.schema_location)
+
+        for red in obj.redefines:
+            red.location = self.resolve_path(red.schema_location)
+
+        for inc in obj.includes:
+            inc.location = self.resolve_path(inc.schema_location)
+
+        for imp in obj.imports:
+            imp.location = self.resolve_local_path(imp.schema_location, imp.namespace)
+
+    def resolve_path(self, location: Optional[str]) -> Optional[Path]:
+        """Resolve the given location string relatively the schema location
+        path."""
+        path = None
+        if self.schema_location and location:
+            path = self.schema_location.parent.joinpath(location).resolve()
+        return path if path and path.exists() else None
+
+    def resolve_local_path(self, location, namespace):
+        """Resolve the given namespace to one of the local standard schemas or
+        fallback to the external file path."""
+        if not location or location.startswith("http"):
+            ns = Namespace.get_enum(namespace)
+            return ns.location if ns else None
+        else:
+            return self.resolve_path(location)
 
     def end_element(self, obj: T, element: etree.Element):
         """Assign the schema's default form for elements if the given element

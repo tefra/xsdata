@@ -1104,40 +1104,6 @@ class Element(AnnotationBase, OccurrencesMixin):
 
 
 @dataclass
-class Import(AnnotationBase):
-    """
-    <import
-      id = ID
-      namespace = anyURI
-      schemaLocation = anyURI
-      {any attributes with non-schema namespace . . .}>
-      Content: (annotation?)
-    </import>
-    """
-
-    namespace: Optional[str] = attribute()
-    schema_location: Optional[str] = attribute()
-
-
-@dataclass
-class Include(AnnotationBase):
-    """
-    <include
-      id = ID
-      schemaLocation = anyURI
-      {any attributes with non-schema namespace . . .}>
-      Content: (annotation?)
-    </include>
-    """
-
-    schema_location: Optional[str] = attribute()
-
-    @property
-    def namespace(self):
-        return None
-
-
-@dataclass
 class Notation(AnnotationBase):
     """
     <notation
@@ -1156,7 +1122,42 @@ class Notation(AnnotationBase):
 
 
 @dataclass
-class Redefine(AnnotationBase):
+class SchemaLocation(AnnotationBase):
+    location: Optional[Path] = field(default=None)
+
+
+@dataclass
+class Import(SchemaLocation):
+    """
+    <import
+      id = ID
+      namespace = anyURI
+      schemaLocation = anyURI
+      {any attributes with non-schema namespace . . .}>
+      Content: (annotation?)
+    </import>
+    """
+
+    namespace: Optional[str] = attribute()
+    schema_location: Optional[str] = attribute()
+
+
+@dataclass
+class Include(SchemaLocation):
+    """
+    <include
+      id = ID
+      schemaLocation = anyURI
+      {any attributes with non-schema namespace . . .}>
+      Content: (annotation?)
+    </include>
+    """
+
+    schema_location: Optional[str] = attribute()
+
+
+@dataclass
+class Redefine(SchemaLocation):
     """
     <redefine
       id = ID
@@ -1174,7 +1175,7 @@ class Redefine(AnnotationBase):
 
 
 @dataclass
-class Override(AnnotationBase):
+class Override(SchemaLocation):
     """
     <override
       id = ID
@@ -1198,7 +1199,7 @@ class Override(AnnotationBase):
 
 
 @dataclass
-class Schema(AnnotationBase):
+class Schema(SchemaLocation):
     """
     <schema
       attributeFormDefault = (qualified | unqualified) : unqualified
@@ -1232,7 +1233,6 @@ class Schema(AnnotationBase):
     version: Optional[str] = attribute()
     xmlns: Optional[str] = attribute()
     nsmap: Dict = field(default_factory=dict)
-    location: Optional[Path] = field(default=None)
     element_form_default: FormType = attribute(default=FormType.UNQUALIFIED)
     attribute_form_default: FormType = attribute(default=FormType.UNQUALIFIED)
     default_open_content: Optional[DefaultOpenContent] = element(
@@ -1251,12 +1251,7 @@ class Schema(AnnotationBase):
     attributes: Array[Attribute] = array_element(name="attribute")
     notations: Array[Notation] = array_element(name="notation")
 
-    def sub_schemas(self) -> Iterator[UnionType[Import, Include, Redefine, Override]]:
-        imp_namespaces = [imp.namespace for imp in self.imports]
-        instance_ns = Namespace.XSI.value
-        if instance_ns in self.nsmap.values() and instance_ns not in imp_namespaces:
-            yield Import.create(namespace=instance_ns)
-
+    def included(self) -> Iterator[UnionType[Import, Include, Redefine, Override]]:
         for imp in self.imports:
             yield imp
 

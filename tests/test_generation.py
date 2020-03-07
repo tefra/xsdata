@@ -117,7 +117,7 @@ def parse_title(source):
 
 def teardown_function():
     reducer.common_types.clear()
-    writer.register_generator("pydata", DataclassGenerator())
+    writer.register_format("pydata", DataclassGenerator())
 
 
 def teardown_module():

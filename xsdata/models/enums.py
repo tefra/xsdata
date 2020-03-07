@@ -1,5 +1,6 @@
 from decimal import Decimal
 from enum import Enum
+from pathlib import Path
 from typing import Iterable
 from typing import Optional
 
@@ -19,6 +20,14 @@ class Namespace(Enum):
     @property
     def prefix(self):
         return self.name.lower()
+
+    @property
+    def location(self):
+        return (
+            Path(__file__)
+            .absolute()
+            .parent.parent.joinpath(f"schemas/{self.prefix}.xsd")
+        )
 
     @classmethod
     def get_enum(cls, uri: Optional[str]) -> Optional["Namespace"]:

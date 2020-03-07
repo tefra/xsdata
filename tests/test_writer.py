@@ -8,14 +8,14 @@ from typing import Tuple
 from unittest import TestCase
 
 from xsdata.formats.dataclass.generator import DataclassGenerator
-from xsdata.generators import AbstractGenerator
+from xsdata.formats.generators import AbstractGenerator
 from xsdata.models.codegen import Class
 from xsdata.models.elements import Schema
 from xsdata.writer import writer
 
 
 @dataclass
-class FakeRenderer(AbstractGenerator):
+class FakeGenerator(AbstractGenerator):
     dir: Optional[TemporaryDirectory] = None
 
     def render(
@@ -34,15 +34,15 @@ class CodeWriterTests(TestCase):
     def test_formats(self):
         expected = ["pydata", "plantuml"]
         self.assertEqual(expected, writer.formats)
-        self.assertIsInstance(writer.get_renderer("pydata"), DataclassGenerator)
+        self.assertIsInstance(writer.get_format("pydata"), DataclassGenerator)
 
     def test_register_generator(self):
-        writer.register_generator(self.FAKE_NAME, FakeRenderer())
+        writer.register_format(self.FAKE_NAME, FakeGenerator())
         self.assertIn("fake", writer.formats)
-        self.assertIsInstance(writer.get_renderer("fake"), FakeRenderer)
+        self.assertIsInstance(writer.get_format("fake"), FakeGenerator)
 
     def test_write(self):
         with TemporaryDirectory() as tmpdir:
-            writer.register_generator(self.FAKE_NAME, FakeRenderer(tmpdir))
+            writer.register_format(self.FAKE_NAME, FakeGenerator(tmpdir))
             writer.write(Schema.create(), [], "", "fake")
             self.assertEqual("foobar", Path(f"{tmpdir}/test.txt").read_text())

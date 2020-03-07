@@ -35,7 +35,7 @@ class AbstractGenerator(ABC):
 
     def __init__(self):
         if self.templates_dir is None:
-            raise CodeGeneratorError("Missing renderer templates directory")
+            raise CodeGeneratorError("Missing generator templates directory")
 
         self.env = Environment(loader=FileSystemLoader(str(self.templates_dir)))
         self.resolver = DependenciesResolver()

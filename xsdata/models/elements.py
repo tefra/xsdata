@@ -21,6 +21,7 @@ from xsdata.models.enums import UseType
 from xsdata.models.mixins import ElementBase
 from xsdata.models.mixins import OccurrencesMixin
 from xsdata.models.mixins import RestrictedField
+from xsdata.utils.text import collapse_whitespace
 
 
 def attribute(default=None, init=True, **kwargs):
@@ -385,6 +386,9 @@ class Any(AnnotationBase, OccurrencesMixin):
     max_occurs: Optional[int] = attribute(default=1)
     namespace: Optional[str] = attribute(default="##any")
     process_contents: Optional[ProcessType] = attribute()
+
+    def __post_init__(self):
+        self.namespace = collapse_whitespace(self.namespace)
 
     @property
     def is_attribute(self) -> bool:

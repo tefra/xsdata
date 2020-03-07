@@ -27,6 +27,10 @@ def split(string: str, sep: str = ":") -> Tuple:
         return string[:index], string[index + len(sep) :]
 
 
+def collapse_whitespace(string: str):
+    return " ".join([part for part in string.split(" ") if part.strip()])
+
+
 def capitalize(string: str) -> str:
     return string[0].upper() + string[1:]
 

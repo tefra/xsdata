@@ -3,7 +3,7 @@ from typing import Iterator
 from typing import List
 from typing import Tuple
 
-from xsdata.generators import AbstractGenerator
+from xsdata.formats.generators import AbstractGenerator
 from xsdata.models.codegen import Class
 from xsdata.models.elements import Schema
 

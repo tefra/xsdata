@@ -96,7 +96,7 @@ def setup_module(module):
     for xml in xmls:
         xsd = xml.with_suffix(".xsd")
         reducer.common_types.clear()
-        writer.register_generator("pydata", DataclassGenerator())
+        writer.register_format("pydata", DataclassGenerator())
 
         package = ".".join(xsd.relative_to(fixtures).parent.parts)
         result = runner.invoke(cli, [str(xsd), f"--package=tests.fixtures.{package}"])

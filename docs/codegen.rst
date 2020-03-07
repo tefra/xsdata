@@ -28,10 +28,10 @@ If the main xsd has any parent include or import you should adjust the target pa
     * Main xsd ``./api/air/AirReqRsp.xsd`` that includes ``../common/CommonReqRsp.xsd``
     * Adjust the package from ``api.models`` to ``api.models.air`` because the generator has to also create the ``common.common_req_rsp`` module.
 
-Renderer
---------
+Format
+------
 
-The renderer option changes the output format.
+The format option changes the generation output.
 
 * ``pydata``: Python lib `dataclasses <https://docs.python.org/3/library/dataclasses.html>`_
 * ``plantuml``: `PlantUML <https://plantuml.com/class-diagram>`_ class diagram

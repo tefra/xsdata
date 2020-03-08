@@ -14,6 +14,17 @@ class ElementTests(TestCase):
         obj = Element.create()
         self.assertTrue(obj)
 
+    def test_property_raw_type(self):
+        obj = Element.create()
+        self.assertEqual("xml:anyType", obj.raw_type)
+
+        obj.type = "foo"
+        self.assertEqual("foo", obj.raw_type)
+
+        obj.type = None
+        obj.complex_type = ComplexType.create()
+        self.assertIsNone(obj.raw_type)
+
     def test_property_real_name(self):
         obj = Element.create(ref="bar")
         self.assertEqual("bar", obj.real_name)

@@ -1,3 +1,4 @@
+import sys
 from unittest import mock
 
 from tests.factories import AttrFactory
@@ -10,6 +11,7 @@ from xsdata.analyzer import ClassAnalyzer
 from xsdata.analyzer import simple_type
 from xsdata.exceptions import AnalyzerValueError
 from xsdata.models.codegen import AttrType
+from xsdata.models.codegen import Restrictions
 from xsdata.models.elements import ComplexType
 from xsdata.models.elements import Element
 from xsdata.models.elements import Schema
@@ -368,6 +370,48 @@ class ClassAnalyzerHelpersTests(ClassAnalyzerBaseTestCase):
         self.assertEqual(1, len(item.attrs))
         self.assertEqual(expected, item.attrs[0])
 
+    def test_create_default_attribute_with_any_type(self):
+        item = ClassFactory.create()
+        extension = ExtensionFactory.create(
+            type=AttrTypeFactory.create(name=DataType.ANY_TYPE.code, native=True),
+            restrictions=Restrictions(min_occurs=1, max_occurs=1, required=True),
+        )
+
+        ClassAnalyzer.create_default_attribute(item, extension)
+        expected = AttrFactory.create(
+            name="##any_element",
+            index=0,
+            wildcard=True,
+            default=None,
+            types=[extension.type.clone()],
+            local_type=TagType.ANY,
+            restrictions=Restrictions(min_occurs=1, max_occurs=1, required=True),
+        )
+
+        self.assertEqual(1, len(item.attrs))
+        self.assertEqual(expected, item.attrs[0])
+
+    def test_create_default_attribute_with_any_type_defaults_to_list(self):
+        item = ClassFactory.create()
+        extension = ExtensionFactory.create(
+            type=AttrTypeFactory.create(name=DataType.ANY_TYPE.code, native=True),
+            restrictions=Restrictions(required=True),
+        )
+
+        ClassAnalyzer.create_default_attribute(item, extension)
+        expected = AttrFactory.create(
+            name="##any_element",
+            index=0,
+            wildcard=True,
+            default=list,
+            types=[extension.type.clone()],
+            local_type=TagType.ANY,
+            restrictions=Restrictions(min_occurs=0, max_occurs=sys.maxsize),
+        )
+
+        self.assertEqual(1, len(item.attrs))
+        self.assertEqual(expected, item.attrs[0])
+
     def test_copy_attributes(self):
         common_b = ClassFactory.create(
             attrs=[
@@ -583,31 +627,27 @@ class ClassAnalyzerMergeClassesTests(ClassAnalyzerBaseTestCase):
         mock_copy_attributes.assert_called_once_with(class_a, class_c, ext_a)
         self.assertEqual([ext_str], class_c.extensions)
 
-    def test_copies_attr_properties(self):
-        class_a = ClassFactory.create(
-            attrs=[
-                AttrFactory.create(
-                    restrictions=RestrictionsFactory.create(min_length=10)
-                ),
-                AttrFactory.create(
-                    restrictions=RestrictionsFactory.create(max_length=10)
-                ),
-            ]
-        )
-        class_b = ClassFactory.create()
+    def test_copies_extensions(self):
+        class_a = ClassFactory.create()
         class_c = class_a.clone()
-        class_c.attrs[0].restrictions.required = True
-        class_c.attrs[1].restrictions.total_digits = 3
-        class_c.attrs[1].restrictions.max_length = 5
 
-        classes = [class_a, class_b, class_c]
+        type_int = AttrTypeFactory.create(name=DataType.INTEGER.code, native=True,)
+
+        ext_a = ExtensionFactory.create(
+            type=type_int,
+            restrictions=Restrictions(max_inclusive=10, min_inclusive=1, required=True),
+        )
+        ext_c = ExtensionFactory.create(
+            type=AttrTypeFactory.create(name=class_a.name),
+            restrictions=Restrictions(max_inclusive=0, min_inclusive=-10),
+        )
+
+        class_a.extensions.append(ext_a)
+        class_c.extensions.append(ext_c)
+        classes = [class_a, class_c]
+        expected = {"max_inclusive": 0, "min_inclusive": -10, "required": True}
 
         self.analyzer.merge_redefined_classes(classes)
-        self.assertEqual(2, len(classes))
-
-        self.assertEqual(
-            {"min_length": 10, "required": True}, class_c.attrs[0].restrictions.asdict()
-        )
-        self.assertEqual(
-            {"max_length": 5, "total_digits": 3}, class_c.attrs[1].restrictions.asdict()
-        )
+        self.assertEqual(1, len(classes))
+        self.assertEqual(1, len(classes[0].extensions))
+        self.assertEqual(expected, classes[0].extensions[0].restrictions.asdict())

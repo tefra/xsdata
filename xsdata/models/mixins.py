@@ -126,6 +126,10 @@ class ElementBase(BaseModel):
         return filter(None, extends.split(" "))
 
     @property
+    def has_children(self) -> bool:
+        return next((True for child in self.children()), False)
+
+    @property
     def has_form(self) -> bool:
         return hasattr(self, "form")
 

@@ -1080,8 +1080,17 @@ class Element(AnnotationBase, OccurrencesMixin):
     def is_mixed(self) -> bool:
         if self.complex_type:
             return self.complex_type.is_mixed
+        else:
+            return False
 
-        return False
+    @property
+    def raw_type(self) -> Optional[str]:
+        if self.type:
+            return self.type
+        elif self.has_children:
+            return None
+        else:
+            return DataType.ANY_TYPE.xml_prefixed
 
     @property
     def real_type(self) -> Optional[str]:

@@ -1,3 +1,4 @@
+import sys
 from collections import defaultdict
 from dataclasses import dataclass
 from dataclasses import field
@@ -13,6 +14,7 @@ from xsdata.models.codegen import Attr
 from xsdata.models.codegen import AttrType
 from xsdata.models.codegen import Class
 from xsdata.models.codegen import Extension
+from xsdata.models.codegen import Restrictions
 from xsdata.models.elements import Schema
 from xsdata.models.enums import DataType
 from xsdata.models.enums import TagType
@@ -25,8 +27,13 @@ def simple_type(item: Class):
 
 @dataclass
 class ClassAnalyzer:
-    """The purpose of this class is to minimize the number of generated classes
-    because of excess verbosity in the given xsd schema and duplicate types."""
+    """
+    Class analyzer is responsible to minize the final classes footprint by
+    merging and flattening extensions and attributes.
+
+    Also promotes the classes necessary for generation and demotes the
+    classes to be used as common types for future runs.
+    """
 
     schema: Schema = field(init=False)
     common_types: Dict[str, Class] = field(default_factory=dict)
@@ -145,17 +152,22 @@ class ClassAnalyzer:
             looser: Class = items.pop()
             classes.remove(looser)
 
-            for i in range(len(winner.extensions) - 1, -1, -1):
-                extension = winner.extensions[i]
-                suffix = text.suffix(extension.type.name)
-                if winner.name == suffix:
-                    removed = winner.extensions.pop(i)
-                    self.copy_attributes(looser, winner, extension)
+            self_extension = next(
+                (
+                    ext
+                    for ext in winner.extensions
+                    if text.suffix(ext.type.name) == winner.name
+                ),
+                None,
+            )
 
-                    for looser_ext in looser.extensions:
-                        new_ext = looser_ext.clone()
-                        new_ext.restrictions.update(removed.restrictions, force=True)
-                        winner.extensions.append(new_ext)
+            if self_extension:
+                winner.extensions.remove(self_extension)
+                self.copy_attributes(looser, winner, self_extension)
+                for looser_ext in looser.extensions:
+                    new_ext = looser_ext.clone()
+                    new_ext.restrictions.update(self_extension.restrictions, force=True)
+                    winner.extensions.append(new_ext)
 
     def mark_abstract_duplicate_classes(self):
         """Search for groups with more than one class and mark as abstract any
@@ -321,17 +333,30 @@ class ClassAnalyzer:
 
     @staticmethod
     def create_default_attribute(item: Class, extension: Extension):
-        item.attrs.insert(
-            0,
-            Attr(
+
+        if extension.type.native_code == DataType.ANY_TYPE.code:
+            restrictions = Restrictions(min_occurs=0, max_occurs=sys.maxsize)
+            restrictions.update(extension.restrictions, force=True)
+            attr = Attr(
+                name="##any_element",
+                index=0,
+                wildcard=True,
+                default=list if restrictions.is_list else None,
+                types=[extension.type.clone()],
+                local_type=TagType.ANY,
+                restrictions=restrictions,
+            )
+        else:
+            attr = Attr(
                 name="value",
                 index=0,
                 default=None,
                 types=[extension.type.clone()],
                 local_type=TagType.EXTENSION,
                 restrictions=extension.restrictions.clone(),
-            ),
-        )
+            )
+
+        item.attrs.insert(0, attr)
 
 
 analyzer = ClassAnalyzer()

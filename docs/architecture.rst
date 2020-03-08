@@ -49,12 +49,12 @@ The builder goes through all the root elements of a schema to create a list of c
 **Extension elements**: ``union``, ``attributeGroup``, ``group``, ``extension``, ``restriction``
 
 
-Class Reducer
+Class Analyzer
 -------------
 
-:class:`xsdata.reducer.ClassReducer`
+:class:`xsdata.analyzer.ClassAnalyzer`
 
-The reducer goes through all class candidates and flattens attributes and extensions based on certain criteria.
+The analyzer goes through all class candidates and flattens attributes and extensions based on certain criteria.
 
 Promote for generation:
 

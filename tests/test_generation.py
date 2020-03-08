@@ -11,8 +11,8 @@ from click.testing import CliRunner
 from jinja2 import Template
 
 from xsdata import cli
+from xsdata.analyzer import analyzer
 from xsdata.formats.dataclass.generator import DataclassGenerator
-from xsdata.reducer import reducer
 from xsdata.writer import writer
 
 here = Path(__file__).parent
@@ -116,7 +116,7 @@ def parse_title(source):
 
 
 def teardown_function():
-    reducer.common_types.clear()
+    analyzer.common_types.clear()
     writer.register_format("pydata", DataclassGenerator())
 
 

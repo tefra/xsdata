@@ -3,12 +3,12 @@ from unittest import mock
 
 from tests.factories import ClassFactory
 from tests.factories import FactoryTestCase
+from xsdata.analyzer import ClassAnalyzer
 from xsdata.builder import ClassBuilder
 from xsdata.models.elements import Include
 from xsdata.models.elements import Override
 from xsdata.models.elements import Redefine
 from xsdata.models.elements import Schema
-from xsdata.reducer import ClassReducer
 from xsdata.transformer import SchemaTransformer
 from xsdata.writer import CodeWriter
 
@@ -129,14 +129,14 @@ class SchemaTransformerTests(FactoryTestCase):
     @mock.patch("xsdata.transformer.logger.info")
     @mock.patch.object(CodeWriter, "print")
     @mock.patch.object(SchemaTransformer, "count_classes")
-    @mock.patch.object(ClassReducer, "process")
+    @mock.patch.object(ClassAnalyzer, "process")
     @mock.patch.object(ClassBuilder, "build")
     @mock.patch.object(ClassBuilder, "__init__", return_value=None)
     def test_generate_code(
         self,
         mock_builder_init,
         mock_builder_build,
-        mock_reducer_process,
+        mock_analyzer_process,
         mock_count_classes,
         mock_writer_print,
         mock_logger_info,
@@ -147,13 +147,13 @@ class SchemaTransformerTests(FactoryTestCase):
         final_classes = classes[1:]
 
         mock_builder_build.return_value = classes
-        mock_reducer_process.return_value = final_classes
+        mock_analyzer_process.return_value = final_classes
         mock_count_classes.return_value = 2, 4
         self.transformer.generate_code(schema, "foo.bar", redefine)
 
         mock_builder_init.assert_called_once_with(schema, redefine)
         mock_builder_build.assert_called_once_with()
-        mock_reducer_process.assert_called_once_with(schema, classes)
+        mock_analyzer_process.assert_called_once_with(schema, classes)
         mock_logger_info.assert_has_calls(
             [
                 mock.call("Compiling schema..."),
@@ -164,14 +164,14 @@ class SchemaTransformerTests(FactoryTestCase):
 
     @mock.patch.object(CodeWriter, "write")
     @mock.patch.object(SchemaTransformer, "count_classes")
-    @mock.patch.object(ClassReducer, "process")
+    @mock.patch.object(ClassAnalyzer, "process")
     @mock.patch.object(ClassBuilder, "build")
     @mock.patch.object(ClassBuilder, "__init__", return_value=None)
     def test_generate_code_when_print_is_false(
         self,
         mock_builder_init,
         mock_builder_build,
-        mock_reducer_process,
+        mock_analyzer_process,
         mock_count_classes,
         mock_writer_write,
     ):
@@ -180,7 +180,7 @@ class SchemaTransformerTests(FactoryTestCase):
         classes = ClassFactory.list(2)
 
         mock_builder_build.return_value = classes
-        mock_reducer_process.return_value = classes
+        mock_analyzer_process.return_value = classes
         mock_count_classes.return_value = 2, 4
         self.transformer.print = False
         self.transformer.generate_code(schema, "foo.bar", redefine)
@@ -189,14 +189,14 @@ class SchemaTransformerTests(FactoryTestCase):
 
     @mock.patch("xsdata.transformer.logger.info")
     @mock.patch.object(CodeWriter, "print")
-    @mock.patch.object(ClassReducer, "process")
+    @mock.patch.object(ClassAnalyzer, "process")
     @mock.patch.object(ClassBuilder, "build")
     @mock.patch.object(ClassBuilder, "__init__", return_value=None)
-    def test_generate_code_when_reducer_returns_no_classes(
+    def test_generate_code_when_analyzer_returns_no_classes(
         self,
         mock_builder_init,
         mock_builder_build,
-        mock_reducer_process,
+        mock_analyzer_process,
         mock_writer_print,
         mock_logger_info,
     ):
@@ -204,13 +204,13 @@ class SchemaTransformerTests(FactoryTestCase):
         classes = ClassFactory.list(2)
 
         mock_builder_build.return_value = classes
-        mock_reducer_process.return_value = []
+        mock_analyzer_process.return_value = []
         self.transformer.generate_code(schema, "foo.bar", None)
         self.assertEqual(0, mock_writer_print.call_count)
 
         mock_builder_init.assert_called_once_with(schema, None)
         mock_builder_build.assert_called_once_with()
-        mock_reducer_process.assert_called_once_with(schema, classes)
+        mock_analyzer_process.assert_called_once_with(schema, classes)
         mock_logger_info.assert_called_once_with("Compiling schema...")
 
     def test_parse_schema(self):

@@ -7,7 +7,7 @@ from typing import Optional
 
 from lxml import etree
 
-from xsdata.exceptions import ReducerValueError
+from xsdata.exceptions import AnalyzerValueError
 from xsdata.logger import logger
 from xsdata.models.codegen import Attr
 from xsdata.models.codegen import AttrType
@@ -24,7 +24,7 @@ def simple_type(item: Class):
 
 
 @dataclass
-class ClassReducer:
+class ClassAnalyzer:
     """The purpose of this class is to minimize the number of generated classes
     because of excess verbosity in the given xsd schema and duplicate types."""
 
@@ -137,7 +137,7 @@ class ClassReducer:
             if len(items) == 1:
                 continue
             if len(items) > 2:
-                raise ReducerValueError(
+                raise AnalyzerValueError(
                     f"Redefined class `{items[0].name}` more than once."
                 )
 
@@ -145,23 +145,17 @@ class ClassReducer:
             looser: Class = items.pop()
             classes.remove(looser)
 
-            for i in range(len(winner.attrs)):
-                attr = winner.attrs[i]
-
-                if attr.types[0].name == winner.name or attr.types[0].name.endswith(
-                    f":{winner.name}"
-                ):
-                    restrictions = looser.attrs[i].restrictions
-                    attr.types = looser.attrs[i].types
-                    attr.restrictions.update(restrictions)
-
             for i in range(len(winner.extensions) - 1, -1, -1):
                 extension = winner.extensions[i]
-                if extension.type.name == winner.name or extension.type.name.endswith(
-                    f":{winner.name}"
-                ):
-                    winner.extensions.pop(i)
+                suffix = text.suffix(extension.type.name)
+                if winner.name == suffix:
+                    removed = winner.extensions.pop(i)
                     self.copy_attributes(looser, winner, extension)
+
+                    for looser_ext in looser.extensions:
+                        new_ext = looser_ext.clone()
+                        new_ext.restrictions.update(removed.restrictions, force=True)
+                        winner.extensions.append(new_ext)
 
     def mark_abstract_duplicate_classes(self):
         """Search for groups with more than one class and mark as abstract any
@@ -238,18 +232,18 @@ class ClassReducer:
         prepended with the extension prefix if it isn't a reference to
         another schema.
         """
-        if extension.type.native:
-            return
-
-        common = self.find_class(extension.type)
-        if common is None:
-            return
-        elif common is item:
-            pass
-        elif not item.is_enumeration and common.is_enumeration:
+        if extension.type.native and not item.is_enumeration:
             self.create_default_attribute(item, extension)
-        elif not item.is_enumeration or common.is_enumeration:
-            self.copy_attributes(common, item, extension)
+        else:
+            common = self.find_class(extension.type)
+            if common is None:
+                return
+            elif common is item:
+                pass
+            elif not item.is_enumeration and common.is_enumeration:
+                self.create_default_attribute(item, extension)
+            elif not item.is_enumeration or common.is_enumeration:
+                self.copy_attributes(common, item, extension)
 
         item.extensions.remove(extension)
 
@@ -327,7 +321,8 @@ class ClassReducer:
 
     @staticmethod
     def create_default_attribute(item: Class, extension: Extension):
-        item.attrs.append(
+        item.attrs.insert(
+            0,
             Attr(
                 name="value",
                 index=0,
@@ -335,8 +330,8 @@ class ClassReducer:
                 types=[extension.type.clone()],
                 local_type=TagType.EXTENSION,
                 restrictions=extension.restrictions.clone(),
-            )
+            ),
         )
 
 
-reducer = ClassReducer()
+analyzer = ClassAnalyzer()

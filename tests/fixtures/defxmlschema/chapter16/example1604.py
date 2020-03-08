@@ -4,19 +4,9 @@ from typing import Optional
 
 @dataclass
 class Number:
-    """
-    :ivar value:
-    """
     class Meta:
         name = "number"
 
-    value: Optional[str] = field(
-        default=None,
-        metadata=dict(
-            name="value",
-            type="Extension"
-        )
-    )
 
 
 @dataclass

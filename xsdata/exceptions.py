@@ -26,7 +26,7 @@ class SchemaValueError(ValueError):
     pass
 
 
-class ReducerValueError(ValueError):
+class AnalyzerValueError(ValueError):
     pass
 
 

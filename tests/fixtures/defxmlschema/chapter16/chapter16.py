@@ -88,19 +88,9 @@ class ShirtSizeType:
 
 @dataclass
 class Umbrella:
-    """
-    :ivar value:
-    """
     class Meta:
         name = "umbrella"
 
-    value: Optional[str] = field(
-        default=None,
-        metadata=dict(
-            name="value",
-            type="Extension"
-        )
-    )
 
 
 @dataclass

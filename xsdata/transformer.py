@@ -5,6 +5,7 @@ from typing import List
 from typing import Optional
 from typing import Union
 
+from xsdata.analyzer import analyzer
 from xsdata.builder import ClassBuilder
 from xsdata.logger import logger
 from xsdata.models.codegen import Class
@@ -14,7 +15,6 @@ from xsdata.models.elements import Override
 from xsdata.models.elements import Redefine
 from xsdata.models.elements import Schema
 from xsdata.parser import SchemaParser
-from xsdata.reducer import reducer
 from xsdata.writer import writer
 
 
@@ -81,7 +81,7 @@ class SchemaTransformer:
         factory to either generate or print the result code."""
         logger.info("Compiling schema...")
         classes = ClassBuilder(schema, redefine).build()
-        classes = reducer.process(schema, classes)
+        classes = analyzer.process(schema, classes)
 
         class_num, inner_num = self.count_classes(classes)
         if class_num > 0:

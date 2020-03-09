@@ -16,7 +16,7 @@ class ElementTests(TestCase):
 
     def test_property_raw_type(self):
         obj = Element.create()
-        self.assertEqual("xml:anyType", obj.raw_type)
+        self.assertEqual("xs:anyType", obj.raw_type)
 
         obj.type = "foo"
         self.assertEqual("foo", obj.raw_type)

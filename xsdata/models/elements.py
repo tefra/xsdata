@@ -142,7 +142,9 @@ class AnyAttribute(AnnotationBase, RestrictedField):
 
     @property
     def real_type(self) -> Optional[str]:
-        return DataType.QMAP.xml_prefixed
+        prefix = self.schema_prefix()
+        suffix = DataType.QMAP.code
+        return f"{prefix}:{suffix}" if prefix else suffix
 
     @property
     def real_name(self) -> str:
@@ -408,7 +410,9 @@ class Any(AnnotationBase, OccurrencesMixin):
 
     @property
     def real_type(self) -> Optional[str]:
-        return DataType.OBJECT.xml_prefixed
+        prefix = self.schema_prefix()
+        suffix = DataType.OBJECT.code
+        return f"{prefix}:{suffix}" if prefix else suffix
 
 
 @dataclass
@@ -1090,7 +1094,9 @@ class Element(AnnotationBase, OccurrencesMixin):
         elif self.has_children:
             return None
         else:
-            return DataType.ANY_TYPE.xml_prefixed
+            prefix = self.schema_prefix()
+            suffix = DataType.ANY_TYPE.code
+            return f"{prefix}:{suffix}" if prefix else suffix
 
     @property
     def real_type(self) -> Optional[str]:

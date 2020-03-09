@@ -365,6 +365,7 @@ class ClassAnalyzerHelpersTests(ClassAnalyzerBaseTestCase):
             default=None,
             types=[extension.type],
             local_type=TagType.EXTENSION,
+            nsmap={},
         )
 
         self.assertEqual(1, len(item.attrs))
@@ -386,6 +387,7 @@ class ClassAnalyzerHelpersTests(ClassAnalyzerBaseTestCase):
             types=[extension.type.clone()],
             local_type=TagType.ANY,
             restrictions=Restrictions(min_occurs=1, max_occurs=1, required=True),
+            nsmap={},
         )
 
         self.assertEqual(1, len(item.attrs))
@@ -407,6 +409,7 @@ class ClassAnalyzerHelpersTests(ClassAnalyzerBaseTestCase):
             types=[extension.type.clone()],
             local_type=TagType.ANY,
             restrictions=Restrictions(min_occurs=0, max_occurs=sys.maxsize),
+            nsmap={},
         )
 
         self.assertEqual(1, len(item.attrs))

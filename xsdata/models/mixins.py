@@ -193,6 +193,26 @@ class ElementBase(BaseModel):
     def real_type(self) -> Optional[str]:
         raise SchemaValueError(f"Schema class `{self.class_name}` unknown real type.")
 
+    def schema_prefix(self):
+        return next(
+            (
+                prefix
+                for prefix, namespace in self.nsmap.items()
+                if namespace == Namespace.XS.uri
+            ),
+            None,
+        )
+
+    def xml_prefix(self):
+        return next(
+            (
+                prefix
+                for prefix, namespace in self.nsmap.items()
+                if namespace == Namespace.XML.uri
+            ),
+            None,
+        )
+
     def children(self):
         for attribute in fields(self):
             value = getattr(self, attribute.name)

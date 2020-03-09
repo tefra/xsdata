@@ -102,6 +102,7 @@ class Attr:
     namespace: Optional[str] = field(default=None)
     help: Optional[str] = field(default=None)
     restrictions: Restrictions = field(default_factory=Restrictions)
+    nsmap: Dict = field(default_factory=dict)
 
     def __post_init__(self):
         self.local_name = self.name
@@ -162,6 +163,7 @@ class Class:
     extensions: List[Extension] = field(default_factory=list)
     attrs: List[Attr] = field(default_factory=list)
     inner: List["Class"] = field(default_factory=list)
+    nsmap: Dict = field(default_factory=dict)
 
     def __post_init__(self):
         self.local_name = self.name

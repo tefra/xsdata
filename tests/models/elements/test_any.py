@@ -15,7 +15,7 @@ class AnyTests(TestCase):
 
     def test_property_real_type(self):
         obj = Any.create()
-        self.assertEqual("xml:object", obj.real_type)
+        self.assertEqual("xs:object", obj.real_type)
 
     def test_property_raw_namespace(self):
         obj = Any.create()

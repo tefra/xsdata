@@ -101,10 +101,11 @@ class ClassBuilderTests(FactoryTestCase):
         )
 
     def test_element_namespace(self):
-        self.schema.nsmap["foo"] = "bar"
         self.schema.target_namespace = "foobar"
 
         element = Element.create(ref="foo:something")
+        element.nsmap["foo"] = "bar"
+
         self.assertEqual("bar", self.builder.element_namespace(element))
 
         element = Element.create(form=FormType.QUALIFIED)
@@ -155,6 +156,7 @@ class ClassBuilderTests(FactoryTestCase):
             help="sos",
             is_abstract=True,
             namespace="foo:name",
+            nsmap=element.nsmap,
         )
         self.assertEqual(expected, result)
 
@@ -288,6 +290,7 @@ class ClassBuilderTests(FactoryTestCase):
             wildcard=mock_is_wildcard.return_value,
             index=66,
             restrictions=Restrictions(required=True),
+            nsmap=attribute.nsmap,
         )
         self.assertEqual(expected, item.attrs[0])
         mock_build_class_attribute_types.assert_called_once_with(item, attribute)

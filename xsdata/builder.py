@@ -67,6 +67,7 @@ class ClassBuilder:
             is_mixed=obj.is_mixed,
             type=type(obj),
             help=obj.display_help,
+            nsmap=obj.nsmap,
         )
 
         self.build_class_extensions(obj, instance)
@@ -103,7 +104,7 @@ class ClassBuilder:
         prefix, suffix = text.split(name)
         native = False
         self_ref = False
-        namespace = self.schema.nsmap.get(prefix)
+        namespace = instance.nsmap.get(prefix)
 
         if Namespace.get_enum(namespace) and DataType.get_enum(suffix):
             name = suffix
@@ -147,7 +148,7 @@ class ClassBuilder:
 
         prefix = obj.prefix
         if prefix:
-            return self.schema.nsmap.get(prefix)
+            return obj.nsmap.get(prefix)
 
         if obj.is_qualified:
             return self.schema.target_namespace
@@ -202,6 +203,7 @@ class ClassBuilder:
                 help=obj.display_help,
                 namespace=self.element_namespace(obj),
                 restrictions=restrictions,
+                nsmap=obj.nsmap,
             )
         )
 

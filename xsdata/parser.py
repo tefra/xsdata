@@ -69,6 +69,7 @@ class SchemaParser(XmlParser):
             return None
 
         obj.index = item.index
+        self.set_namespace_map(element, obj)
         return obj
 
     def start_schema(self, element: etree.Element, item: QueueItem):
@@ -109,9 +110,11 @@ class SchemaParser(XmlParser):
         namespaces if the are missing xsi, xlink, xml, xs."""
         obj.target_namespace = obj.target_namespace or self.target_namespace
 
+        self.set_namespace_map(element, obj)
+
+    def set_namespace_map(self, element, obj):
         obj.nsmap = element.nsmap
         namespaces = obj.nsmap.values()
-
         for namespace in Namespace:
             if namespace.uri not in namespaces:
                 obj.nsmap[namespace.prefix] = namespace.uri

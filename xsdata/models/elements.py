@@ -1245,7 +1245,6 @@ class Schema(SchemaLocation):
     target_namespace: Optional[str] = attribute()
     version: Optional[str] = attribute()
     xmlns: Optional[str] = attribute()
-    nsmap: Dict = field(default_factory=dict)
     element_form_default: FormType = attribute(default=FormType.UNQUALIFIED)
     attribute_form_default: FormType = attribute(default=FormType.UNQUALIFIED)
     default_open_content: Optional[DefaultOpenContent] = element(

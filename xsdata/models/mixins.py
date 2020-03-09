@@ -104,6 +104,7 @@ class BaseModel:
 class ElementBase(BaseModel):
     index: int = field(default_factory=int)
     id: Optional[str] = None
+    nsmap: Dict = field(default_factory=dict)
 
     @property
     def class_name(self):

@@ -44,6 +44,13 @@ def wrap(string: str, **kwargs):
 
 
 class SchemaParserTests(TestCase):
+    nsmap = {
+        "xs": "http://www.w3.org/2001/XMLSchema",
+        "xml": "http://www.w3.org/XML/1998/namespace",
+        "xsi": "http://www.w3.org/2001/XMLSchema-instance",
+        "xlink": "http://www.w3.org/1999/xlink",
+    }
+
     def setUp(self) -> None:
         self.parser = SchemaParser()
         super(SchemaParserTests, self).setUp()
@@ -140,21 +147,26 @@ class SchemaParserTests(TestCase):
         expected = ComplexType.create(
             index=1,
             name="allowablePointsOfSaleType",
+            nsmap=self.nsmap,
             sequence=Sequence.create(
                 index=2,
+                nsmap=self.nsmap,
                 max_occurs=sys.maxsize,
                 elements=[
                     Element.create(
                         index=3,
+                        nsmap=self.nsmap,
                         name="PointOfSale",
                         form=FormType.QUALIFIED,
                         max_occurs=sys.maxsize,
                         min_occurs=1,
                         complex_type=ComplexType.create(
                             index=4,
+                            nsmap=self.nsmap,
                             attributes=[
                                 Attribute.create(
                                     index=5,
+                                    nsmap=self.nsmap,
                                     name="id",
                                     type="xs:string",
                                     form=FormType.UNQUALIFIED,
@@ -166,6 +178,7 @@ class SchemaParserTests(TestCase):
                 any=[
                     Any.create(
                         index=6,
+                        nsmap=self.nsmap,
                         min_occurs=1,
                         max_occurs=9223372036854775807,
                         process_contents=ProcessType.LAX,
@@ -193,25 +206,33 @@ class SchemaParserTests(TestCase):
 
         expected = ComplexType.create(
             index=1,
+            nsmap=self.nsmap,
             name="priceCurrencyType",
             simple_content=SimpleContent.create(
                 index=2,
+                nsmap=self.nsmap,
                 extension=Extension.create(
                     index=3,
+                    nsmap=self.nsmap,
                     base="priceType",
                     attributes=[
                         Attribute.create(
                             index=4,
+                            nsmap=self.nsmap,
                             name="currency",
                             use=UseType.REQUIRED,
                             form=FormType.UNQUALIFIED,
                             simple_type=SimpleType.create(
+                                nsmap=self.nsmap,
                                 index=5,
                                 restriction=Restriction.create(
+                                    nsmap=self.nsmap,
                                     index=6,
                                     base="xs:string",
                                     pattern=Pattern.create(
-                                        index=7, value="[A-Z][A-Z][A-Z]"
+                                        index=7,
+                                        value="[A-Z][A-Z][A-Z]",
+                                        nsmap=self.nsmap,
                                     ),
                                 ),
                             ),
@@ -240,24 +261,32 @@ class SchemaParserTests(TestCase):
 
         expected = ComplexType.create(
             index=1,
+            nsmap=self.nsmap,
             name="UserRateConditionType",
             complex_content=ComplexContent.create(
                 index=2,
+                nsmap=self.nsmap,
                 extension=Extension.create(
                     index=3,
+                    nsmap=self.nsmap,
                     base="UserRateConditionBaseType",
                     attributes=[
                         Attribute.create(
                             index=4,
+                            nsmap=self.nsmap,
                             name="id",
                             use=UseType.REQUIRED,
                             form=FormType.QUALIFIED,
                             simple_type=SimpleType.create(
                                 index=5,
+                                nsmap=self.nsmap,
                                 restriction=Restriction.create(
                                     index=6,
+                                    nsmap=self.nsmap,
                                     base="xs:string",
-                                    min_length=MinLength.create(value=1, index=7),
+                                    min_length=MinLength.create(
+                                        value=1, index=7, nsmap=self.nsmap
+                                    ),
                                 ),
                             ),
                         )
@@ -278,8 +307,10 @@ class SchemaParserTests(TestCase):
 
         expected = ComplexType.create(
             index=1,
+            nsmap=self.nsmap,
             choice=Choice.create(
                 index=2,
+                nsmap=self.nsmap,
                 min_occurs=1,
                 elements=[
                     Element.create(
@@ -288,6 +319,7 @@ class SchemaParserTests(TestCase):
                         max_occurs=1,
                         form=FormType.QUALIFIED,
                         index=3,
+                        nsmap=self.nsmap,
                     ),
                     Element.create(
                         name="second",
@@ -295,6 +327,7 @@ class SchemaParserTests(TestCase):
                         max_occurs=1,
                         form=FormType.QUALIFIED,
                         index=4,
+                        nsmap=self.nsmap,
                     ),
                 ],
             ),
@@ -313,8 +346,10 @@ class SchemaParserTests(TestCase):
 
         expected = ComplexType.create(
             index=1,
+            nsmap=self.nsmap,
             all=All.create(
                 index=2,
+                nsmap=self.nsmap,
                 min_occurs=0,
                 elements=[
                     Element.create(
@@ -323,6 +358,7 @@ class SchemaParserTests(TestCase):
                         max_occurs=100,
                         form=FormType.QUALIFIED,
                         index=3,
+                        nsmap=self.nsmap,
                     ),
                     Element.create(
                         name="second",
@@ -330,11 +366,13 @@ class SchemaParserTests(TestCase):
                         max_occurs=100,
                         form=FormType.QUALIFIED,
                         index=4,
+                        nsmap=self.nsmap,
                     ),
                 ],
                 any=[
                     Any.create(
                         index=5,
+                        nsmap=self.nsmap,
                         min_occurs=0,
                         max_occurs=1,
                         process_contents=ProcessType.LAX,

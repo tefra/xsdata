@@ -32,3 +32,7 @@ class AnalyzerValueError(ValueError):
 
 class ResolverValueError(ValueError):
     pass
+
+
+class GeneratorValueError(ValueError):
+    pass

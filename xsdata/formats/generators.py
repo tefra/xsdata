@@ -24,7 +24,6 @@ from xsdata.models.codegen import AttrType
 from xsdata.models.codegen import Class
 from xsdata.models.codegen import Extension
 from xsdata.models.codegen import Package
-from xsdata.models.elements import Schema
 from xsdata.models.enums import DataType
 from xsdata.resolver import DependenciesResolver
 from xsdata.utils import text
@@ -45,7 +44,7 @@ class AbstractGenerator(ABC):
 
     @abstractmethod
     def render(
-        self, schema: Schema, classes: List[Class], package: str
+        self, classes: List[Class], package: str
     ) -> Iterator[Tuple[Path, str, str]]:
         pass
 

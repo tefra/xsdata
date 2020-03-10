@@ -87,7 +87,7 @@ class SchemaTransformer:
         if class_num > 0:
             logger.info("Compiled %d main and %d inner classes", class_num, inner_num)
             callback = writer.print if self.print else writer.write
-            callback(schema, classes, package, self.format)
+            callback(classes, package, self.format)
 
     @staticmethod
     def parse_schema(schema_path: Path, target_namespace: Optional[str]) -> Schema:

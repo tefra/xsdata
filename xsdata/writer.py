@@ -9,7 +9,6 @@ from xsdata.formats.generators import AbstractGenerator
 from xsdata.formats.plantuml.generator import PlantUmlGenerator
 from xsdata.logger import logger
 from xsdata.models.codegen import Class
-from xsdata.models.elements import Schema
 
 
 @dataclass
@@ -28,18 +27,18 @@ class CodeWriter:
             return self.generators[name]
         raise CodeWriterError(f"Unknown code generator `{name}`")
 
-    def write(self, schema: Schema, classes: List[Class], package: str, format: str):
+    def write(self, classes: List[Class], package: str, format: str):
         engine = self.get_format(format)
-        for file, package, output in engine.render(schema, classes, package):
+        for file, package, output in engine.render(classes, package):
             if len(output.strip()) > 0:
                 logger.info("Generating package: %s", package)
 
                 file.parent.mkdir(parents=True, exist_ok=True)
                 file.write_text(output)
 
-    def print(self, schema: Schema, classes: List[Class], package: str, format: str):
+    def print(self, classes: List[Class], package: str, format: str):
         engine = self.get_format(format)
-        for _, _, output in engine.render(schema, classes, package):
+        for _, _, output in engine.render(classes, package):
             print(output, end="")
 
 

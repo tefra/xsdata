@@ -70,7 +70,7 @@ class ClassFactory(Factory):
         attrs=None,
         inner=None,
         nsmap=None,
-        module=None,
+        module="tests",
     ):
         return cls.model(
             name=name or f"class_{cls.next_letter()}",

@@ -3,9 +3,9 @@ from typing import Iterator
 from typing import List
 from typing import Tuple
 
+from xsdata.exceptions import GeneratorValueError
 from xsdata.formats.generators import AbstractGenerator
 from xsdata.models.codegen import Class
-from xsdata.models.elements import Schema
 
 
 class PlantUmlGenerator(AbstractGenerator):
@@ -19,11 +19,15 @@ class PlantUmlGenerator(AbstractGenerator):
         return self.template(template).render(obj=obj)
 
     def render(
-        self, schema: Schema, classes: List[Class], package: str
+        self, classes: List[Class], package: str
     ) -> Iterator[Tuple[Path, str, str]]:
         """Given a schema, a list of classes and a target package return to the
         writer factory the target file path and the rendered output."""
-        module = schema.module.replace(".xsd", "")
+
+        if not classes[0].module:
+            raise GeneratorValueError("Empty module name, aborting...")
+
+        module = classes[0].module.replace(".xsd", "")
         package_arr = package.split(".")
         package = "{}.{}".format(".".join(package_arr), module)
         target = Path.cwd().joinpath(*package_arr)

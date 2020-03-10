@@ -4,14 +4,15 @@ from typing import DefaultDict
 from typing import Dict
 from typing import Iterator
 from typing import List
+from typing import Optional
 from typing import Tuple
 
+from xsdata.exceptions import GeneratorValueError
 from xsdata.formats.dataclass.filters import filters
 from xsdata.formats.dataclass.utils import safe_snake
 from xsdata.formats.generators import PythonAbstractGenerator
 from xsdata.models.codegen import Class
 from xsdata.models.codegen import Package
-from xsdata.models.elements import Schema
 from xsdata.utils.text import snake_case
 
 
@@ -31,11 +32,11 @@ class DataclassGenerator(PythonAbstractGenerator):
         return self.template(template).render(obj=obj)
 
     def render(
-        self, schema: Schema, classes: List[Class], package: str
+        self, classes: List[Class], package: str
     ) -> Iterator[Tuple[Path, str, str]]:
         """Given a schema, a list of classes and a target package return to the
         writer factory the target file path and the rendered code."""
-        module = self.module_name(schema.module)
+        module = self.module_name(classes[0].module)
         package_parts = self.package_parts(package)
         package = "{}.{}".format(".".join(package_parts), module)
         target = Path.cwd().joinpath(*package_parts)
@@ -48,12 +49,16 @@ class DataclassGenerator(PythonAbstractGenerator):
 
         yield file_path, package, self.render_module(imports=imports, output=output)
 
-    def module_name(self, module: str) -> str:
+    def module_name(self, module: Optional[str]) -> str:
         """
         Return a unique and safe module name.
 
         In case of module name collisions append the module name index.
         """
+
+        if not module:
+            raise GeneratorValueError("Empty module name, aborting...")
+
         module = module[:-4] if module.endswith(".xsd") else module
         module = snake_case(module)
         self.modules[module] += 1

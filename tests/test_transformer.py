@@ -153,7 +153,7 @@ class SchemaTransformerTests(FactoryTestCase):
 
         mock_builder_init.assert_called_once_with(schema, redefine)
         mock_builder_build.assert_called_once_with()
-        mock_analyzer_process.assert_called_once_with(schema, classes)
+        mock_analyzer_process.assert_called_once_with(classes)
         mock_logger_info.assert_has_calls(
             [
                 mock.call("Compiling schema..."),
@@ -210,7 +210,7 @@ class SchemaTransformerTests(FactoryTestCase):
 
         mock_builder_init.assert_called_once_with(schema, None)
         mock_builder_build.assert_called_once_with()
-        mock_analyzer_process.assert_called_once_with(schema, classes)
+        mock_analyzer_process.assert_called_once_with(classes)
         mock_logger_info.assert_called_once_with("Compiling schema...")
 
     def test_parse_schema(self):

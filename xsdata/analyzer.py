@@ -15,7 +15,6 @@ from xsdata.models.codegen import AttrType
 from xsdata.models.codegen import Class
 from xsdata.models.codegen import Extension
 from xsdata.models.codegen import Restrictions
-from xsdata.models.elements import Schema
 from xsdata.models.enums import DataType
 from xsdata.models.enums import TagType
 from xsdata.utils import text
@@ -35,14 +34,13 @@ class ClassAnalyzer:
     classes to be used as common types for future runs.
     """
 
-    schema: Schema = field(init=False)
-    common_types: Dict[str, Class] = field(default_factory=dict)
+    common_types: Dict[etree.QName, Class] = field(default_factory=dict)
     processed: Dict = field(default_factory=dict)
-    class_index: Dict[str, List[Class]] = field(
+    class_index: Dict[etree.QName, List[Class]] = field(
         default_factory=lambda: defaultdict(list)
     )
 
-    def process(self, schema: Schema, classes: List[Class]) -> List[Class]:
+    def process(self, classes: List[Class]) -> List[Class]:
         """
         Process class list in steps.
 
@@ -53,8 +51,6 @@ class ClassAnalyzer:
             * Flatten classes
             * Return a final class list for code generators.
         """
-
-        self.schema = schema
 
         self.merge_redefined_classes(classes)
 
@@ -78,13 +74,12 @@ class ClassAnalyzer:
             * type: element | complexType | simpleType with enumerations
         """
         result = []
-        for qname, classes in self.class_index.items():
+        for classes in self.class_index.values():
             for item in classes:
                 should_store = item.is_common or item.is_abstract
 
                 if should_store:
-                    qname = self.qname(item.name)
-                    self.common_types[qname] = item
+                    self.common_types[item.source_qname()] = item
 
                 if not should_store or item.is_enumeration:
                     result.append(item)
@@ -95,8 +90,7 @@ class ClassAnalyzer:
         self.class_index.clear()
         self.processed.clear()
         for item in classes:
-            qname = self.qname(item.name)
-            self.class_index[qname].append(item)
+            self.class_index[item.source_qname()].append(item)
 
     def flatten_classes(self):
         for classes in self.class_index.values():
@@ -105,12 +99,12 @@ class ClassAnalyzer:
                     self.flatten_class(obj)
 
     def is_self_referencing(self, item: Class, dependency: AttrType) -> bool:
-        return self.find_class(dependency, condition=lambda x: x is item) is not None
+        dependency_qname = item.source_qname(dependency.name)
+        return (
+            self.find_class(dependency_qname, condition=lambda x: x is item) is not None
+        )
 
-    def find_class(
-        self, dependency: AttrType, condition=simple_type
-    ) -> Optional[Class]:
-        qname = self.qname(dependency.name)
+    def find_class(self, qname: etree.QName, condition=simple_type) -> Optional[Class]:
         item = self.find_schema_class(qname, condition=condition)
         return item or self.find_common_class(qname, condition=condition)
 
@@ -224,7 +218,9 @@ class ClassAnalyzer:
                         attrs.extend(item.inner[0].attrs)
 
                 elif not attr_type.forward_ref and not attr_type.native:
-                    common = self.find_class(attr_type)
+                    type_qname = item.source_qname(attr_type.name)
+                    common = self.find_class(type_qname)
+
                     if common is not None and common.is_enumeration:
                         is_enumeration = True
                         attrs.extend(common.attrs)
@@ -247,7 +243,8 @@ class ClassAnalyzer:
         if extension.type.native and not item.is_enumeration:
             self.create_default_attribute(item, extension)
         else:
-            common = self.find_class(extension.type)
+            type_qname = item.source_qname(extension.type.name)
+            common = self.find_class(type_qname)
             if common is None:
                 return
             elif common is item:
@@ -271,7 +268,8 @@ class ClassAnalyzer:
         for attr_type in attr.types:
             common = None
             if not attr_type.native:
-                common = self.find_class(attr_type)
+                type_qname = item.source_qname(attr_type.name)
+                common = self.find_class(type_qname)
 
             if common is None:
                 attr_type.self_ref = self.is_self_referencing(item, attr_type)
@@ -288,16 +286,6 @@ class ClassAnalyzer:
                 logger.warning("Missing type implementation: %s", common.type.__name__)
 
         attr.types = types
-
-    def qname(self, name: str) -> str:
-        prefix, suffix = text.split(name)
-        namespace = self.schema.target_namespace
-
-        if prefix:
-            name = suffix
-            namespace = self.schema.nsmap.get(prefix)
-
-        return etree.QName(namespace, name).text
 
     @staticmethod
     def copy_attributes(source: Class, target: Class, extension: Extension):

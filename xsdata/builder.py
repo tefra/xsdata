@@ -68,6 +68,8 @@ class ClassBuilder:
             type=type(obj),
             help=obj.display_help,
             nsmap=obj.nsmap,
+            source_namespace=self.schema.target_namespace,
+            module=self.schema.module,
         )
 
         self.build_class_extensions(obj, instance)

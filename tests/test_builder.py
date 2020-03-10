@@ -1,3 +1,4 @@
+from pathlib import Path
 from types import GeneratorType
 from unittest.mock import call
 from unittest.mock import patch
@@ -32,7 +33,7 @@ from xsdata.models.enums import FormType
 class ClassBuilderTests(FactoryTestCase):
     def setUp(self) -> None:
         super(ClassBuilderTests, self).setUp()
-        self.schema = Schema.create()
+        self.schema = Schema.create(location=Path(__file__), target_namespace="builder")
         self.builder = ClassBuilder(schema=self.schema)
 
     @patch.object(Redefine, "children")
@@ -157,6 +158,8 @@ class ClassBuilderTests(FactoryTestCase):
             is_abstract=True,
             namespace="foo:name",
             nsmap=element.nsmap,
+            module=self.schema.module,
+            source_namespace=self.schema.target_namespace,
         )
         self.assertEqual(expected, result)
 

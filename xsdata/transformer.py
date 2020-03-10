@@ -81,7 +81,7 @@ class SchemaTransformer:
         factory to either generate or print the result code."""
         logger.info("Compiling schema...")
         classes = ClassBuilder(schema, redefine).build()
-        classes = analyzer.process(schema, classes)
+        classes = analyzer.process(classes)
 
         class_num, inner_num = self.count_classes(classes)
         if class_num > 0:

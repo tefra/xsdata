@@ -14,7 +14,6 @@ from xsdata.models.codegen import AttrType
 from xsdata.models.codegen import Restrictions
 from xsdata.models.elements import ComplexType
 from xsdata.models.elements import Element
-from xsdata.models.elements import Schema
 from xsdata.models.elements import SimpleType
 from xsdata.models.enums import DataType
 from xsdata.models.enums import TagType
@@ -28,11 +27,7 @@ class ClassAnalyzerBaseTestCase(FactoryTestCase):
             None: "http://namespace/foobar",
             "common": "http://namespace/common",
         }
-        self.schema = Schema.create(
-            target_namespace=self.target_namespace, nsmap=self.nsmap
-        )
         self.analyzer = ClassAnalyzer()
-        self.analyzer.schema = self.schema
 
 
 class ClassAnalyzerProcessTests(ClassAnalyzerBaseTestCase):
@@ -53,14 +48,13 @@ class ClassAnalyzerProcessTests(ClassAnalyzerBaseTestCase):
         mock_fetch_classes_for_generation.return_value = "foo"
         classes = ClassFactory.list(3, type=Element)
 
-        self.assertEqual("foo", self.analyzer.process(self.schema, classes))
+        self.assertEqual("foo", self.analyzer.process(classes))
 
         mock_merge_redefined_classes.assert_called_once_with(classes)
         mock_create_class_qname_index.assert_called_once_with(classes)
         mock_mark_abstract_duplicate_classes.assert_called_once()
         mock_flatten_classes.assert_called_once_with()
         mock_fetch_classes_for_generation.assert_called_once_with()
-        self.assertEqual(self.schema, self.analyzer.schema)
 
     def test_create_class_qname_index(self):
         classes = [
@@ -70,8 +64,8 @@ class ClassAnalyzerProcessTests(ClassAnalyzerBaseTestCase):
         ]
 
         expected = {
-            "{http://namespace/target}foo": classes[:2],
-            "{http://namespace/target}foobar": classes[2:],
+            "{xsdata}foo": classes[:2],
+            "{xsdata}foobar": classes[2:],
         }
 
         self.analyzer.create_class_qname_index(classes)
@@ -125,9 +119,9 @@ class ClassAnalyzerProcessTests(ClassAnalyzerBaseTestCase):
         self.assertEqual(3, len(self.analyzer.common_types))
 
         expected = [
-            "{http://namespace/target}" + classes[0].name,
-            "{http://namespace/target}" + classes[3].name,
-            "{http://namespace/target}" + classes[4].name,
+            "{xsdata}" + classes[0].name,
+            "{xsdata}" + classes[3].name,
+            "{xsdata}" + classes[4].name,
         ]
         self.assertEqual(expected, list(self.analyzer.common_types.keys()))
 
@@ -140,10 +134,6 @@ class ClassAnalyzerProcessTests(ClassAnalyzerBaseTestCase):
 
 
 class ClassAnalyzerFindClassTests(ClassAnalyzerBaseTestCase):
-    def setUp(self) -> None:
-        super(ClassAnalyzerFindClassTests, self).setUp()
-        self.analyzer.schema = self.schema
-
     @mock.patch.object(ClassAnalyzer, "find_common_class")
     @mock.patch.object(ClassAnalyzer, "find_schema_class")
     def test_searches_in_class_index_and_common_types(
@@ -152,11 +142,12 @@ class ClassAnalyzerFindClassTests(ClassAnalyzerBaseTestCase):
         mock_find_schema_class.side_effect = [None, "a"]
         mock_find_common_class.return_value = "b"
 
+        item = ClassFactory.create()
         dependency = AttrTypeFactory.create()
-        qname = self.analyzer.qname(dependency.name)
+        qname = item.source_qname(dependency.name)
 
-        self.assertEqual("b", self.analyzer.find_class(dependency))
-        self.assertEqual("a", self.analyzer.find_class(dependency))
+        self.assertEqual("b", self.analyzer.find_class(qname))
+        self.assertEqual("a", self.analyzer.find_class(qname))
 
         mock_find_schema_class.assert_has_calls(
             [
@@ -284,10 +275,12 @@ class ClassAnalyzerFlattenExtensionTests(ClassAnalyzerBaseTestCase):
 
         extension = ExtensionFactory.create()
         obj = ClassFactory.create(extensions=[extension])
+
         self.analyzer.flatten_extension(obj, extension)
 
         self.assertEqual(1, len(obj.extensions))
-        mock_find_class.assert_called_once_with(extension.type)
+        ext_type_qname = obj.source_qname(extension.type.name)
+        mock_find_class.assert_called_once_with(ext_type_qname)
 
     @mock.patch.object(ClassAnalyzer, "create_default_attribute")
     @mock.patch.object(ClassAnalyzer, "find_class")
@@ -475,7 +468,7 @@ class ClassAnalyzerFlattenAttributeTests(ClassAnalyzerBaseTestCase):
         self.analyzer.flatten_attribute(parent, attr)
 
         self.assertEqual([type_a], attr.types)
-        mock_find_class.assert_called_once_with(type_a)
+        mock_find_class.assert_called_once_with(parent.source_qname(type_a.name))
 
     @mock.patch.object(ClassAnalyzer, "is_self_referencing", return_value=True)
     @mock.patch.object(ClassAnalyzer, "find_class", return_value=None)
@@ -500,7 +493,7 @@ class ClassAnalyzerFlattenAttributeTests(ClassAnalyzerBaseTestCase):
         self.analyzer.flatten_attribute(parent, attr)
 
         self.assertEqual([type_a], attr.types)
-        mock_find_class.assert_called_once_with(type_a)
+        mock_find_class.assert_called_once_with(parent.source_qname(type_a.name))
 
     @mock.patch.object(ClassAnalyzer, "copy_inner_classes")
     @mock.patch.object(ClassAnalyzer, "find_class")
@@ -534,7 +527,7 @@ class ClassAnalyzerFlattenAttributeTests(ClassAnalyzerBaseTestCase):
         self.assertEqual(
             {"required": True, "min_occurs": 1}, attr.restrictions.asdict()
         )
-        mock_find_class.assert_called_once_with(type_a)
+        mock_find_class.assert_called_once_with(parent.source_qname(type_a.name))
         mock_copy_inner_classes.assert_called_once_with(common, parent)
 
     @mock.patch("xsdata.analyzer.logger.warning")

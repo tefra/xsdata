@@ -61,6 +61,7 @@ class ClassFactory(Factory):
         cls,
         name=None,
         namespace=None,
+        source_namespace=None,
         type=None,
         is_abstract=False,
         is_mixed=False,
@@ -69,10 +70,12 @@ class ClassFactory(Factory):
         attrs=None,
         inner=None,
         nsmap=None,
+        module=None,
     ):
         return cls.model(
             name=name or f"class_{cls.next_letter()}",
             namespace=namespace,
+            source_namespace=source_namespace or "xsdata",
             is_abstract=is_abstract,
             is_mixed=is_mixed,
             type=type or random.choice(cls.types),
@@ -80,6 +83,7 @@ class ClassFactory(Factory):
             attrs=attrs or [],
             inner=inner or [],
             help=help,
+            module=module,
             nsmap=nsmap if isinstance(nsmap, dict) else NSMAP,
         )
 

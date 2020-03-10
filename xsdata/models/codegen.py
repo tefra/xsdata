@@ -8,10 +8,24 @@ from typing import List
 from typing import Optional
 from typing import Type
 
+from lxml.etree import QName
+
 from xsdata.models.elements import ComplexType
 from xsdata.models.elements import Element
 from xsdata.models.enums import DataType
 from xsdata.models.enums import TagType
+from xsdata.utils import text
+
+
+def qname(name: str, nsmap, default_namespace: Optional[str] = None) -> str:
+    prefix, suffix = text.split(name)
+    namespace = default_namespace
+
+    if prefix:
+        name = suffix
+        namespace = nsmap.get(prefix)
+
+    return QName(namespace, name)
 
 
 @dataclass
@@ -139,6 +153,14 @@ class Attr:
             **kwargs,
         )
 
+    def qname(self, name: Optional[str] = None):
+        prefix, name = text.split(name or self.name)
+        namespace = self.namespace
+        if prefix:
+            namespace = self.nsmap.get(prefix)
+
+        return QName(namespace or None, name).text
+
 
 @dataclass
 class Extension:
@@ -164,6 +186,8 @@ class Class:
     attrs: List[Attr] = field(default_factory=list)
     inner: List["Class"] = field(default_factory=list)
     nsmap: Dict = field(default_factory=dict)
+    module: Optional[str] = field(default=None)
+    source_namespace: Optional[str] = field(default=None)
 
     def __post_init__(self):
         self.local_name = self.name
@@ -189,6 +213,9 @@ class Class:
         extensions = [extension.clone() for extension in self.extensions]
         attrs = [attr.clone() for attr in self.attrs]
         return replace(self, inner=inners, extensions=extensions, attrs=attrs)
+
+    def source_qname(self, name: Optional[str] = None) -> QName:
+        return qname(name or self.name, self.nsmap, self.source_namespace)
 
 
 @dataclass

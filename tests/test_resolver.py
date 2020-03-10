@@ -1,13 +1,15 @@
 from collections.abc import Iterator
 from unittest import mock
 
+from lxml.etree import QName
+
 from tests.factories import AttrFactory
 from tests.factories import AttrTypeFactory
 from tests.factories import ClassFactory
 from tests.factories import ExtensionFactory
 from tests.factories import FactoryTestCase
 from tests.factories import PackageFactory
-from xsdata.models.elements import Schema
+from xsdata.exceptions import ResolverValueError
 from xsdata.resolver import DependenciesResolver
 
 
@@ -23,23 +25,20 @@ class DependenciesResolverTest(FactoryTestCase):
         self, mock_create_class_map, create_class_list, mock_resolve_imports
     ):
         classes = ClassFactory.list(3)
-        schema = Schema.create()
         package = "foo.bar.thug"
 
-        mock_create_class_map.return_value = {"b": classes[0]}
+        mock_create_class_map.return_value = {QName("b"): classes[0]}
         create_class_list.return_value = classes[::-1]
 
         self.resolver.imports.append(PackageFactory.create(name="foo", source="bar"))
-        self.resolver.aliases = {"a": "a"}
+        self.resolver.aliases = {QName("a"): "a"}
 
-        self.resolver.process(classes, schema, package)
+        self.resolver.process(classes, package)
         self.assertEqual([], self.resolver.imports)
         self.assertEqual({}, self.resolver.aliases)
 
         self.assertEqual(mock_create_class_map.return_value, self.resolver.class_map)
         self.assertEqual(create_class_list.return_value, self.resolver.class_list)
-        self.assertEqual(schema, self.resolver.schema)
-        self.assertEqual(package, self.resolver.package)
         self.assertEqual(package, self.resolver.package)
 
         mock_resolve_imports.assert_called_once_with()
@@ -75,7 +74,7 @@ class DependenciesResolverTest(FactoryTestCase):
         mock_add_package.assert_has_calls([mock.call(x) for x in expected])
 
     def test_apply_aliases(self):
-        self.resolver.aliases = {"d": "IamD", "a": "IamA"}
+        self.resolver.aliases = {QName("d"): "IamD", QName("a"): "IamA"}
         type_a = AttrTypeFactory.create(name="a")
         type_b = AttrTypeFactory.create(name="b")
         type_c = AttrTypeFactory.create(name="c")
@@ -88,9 +87,11 @@ class DependenciesResolverTest(FactoryTestCase):
                 AttrFactory.create(name="b", types=[type_b]),
                 AttrFactory.create(name="c", types=[type_a, type_d]),
             ],
+            source_namespace=None,
             inner=[
                 ClassFactory.create(
                     name="b",
+                    source_namespace=None,
                     attrs=[
                         AttrFactory.create(name="c", types=[type_c]),
                         AttrFactory.create(name="d", types=[type_d]),
@@ -125,70 +126,63 @@ class DependenciesResolverTest(FactoryTestCase):
     def test_resolve_imports(
         self, mock_import_classes, mock_find_package, mock_add_import
     ):
-        classes = [
-            "foo",  # cool
-            "bar",  # cool
-            "thug:life",  # life class exists add alias
-            "common:type",  # type class doesn't exist add just the name
+        class_life = ClassFactory.create(name="life")
+        import_names = [
+            QName("foo"),  # cool
+            QName("bar"),  # cool
+            QName("{thug}life"),  # life class exists add alias
+            QName("{common}type"),  # type class doesn't exist add just the name
         ]
-        self.resolver.class_map = {"life": ClassFactory.create(name="life")}
-        mock_import_classes.return_value = classes
+        self.resolver.class_map = {class_life.source_qname(): class_life}
+        mock_import_classes.return_value = import_names
         mock_find_package.side_effect = ["first", "second", "third", "forth"]
 
         self.resolver.resolve_imports()
         mock_add_import.assert_has_calls(
             [
-                mock.call(alias=None, name="foo", package="first"),
-                mock.call(alias=None, name="bar", package="second"),
-                mock.call(alias="thug:life", name="life", package="third"),
-                mock.call(alias=None, name="type", package="forth"),
+                mock.call(qname=import_names[0], package="first", exists=False),
+                mock.call(qname=import_names[1], package="second", exists=False),
+                mock.call(qname=import_names[2], package="third", exists=True),
+                mock.call(qname=import_names[3], package="forth", exists=False),
             ]
         )
 
     def test_add_import(self):
         self.assertEqual(0, len(self.resolver.imports))
 
-        self.resolver.add_import("foo", "there", "bar")
-        self.resolver.add_import("thug", "there", None)
+        package = "here.there"
+        foo_qname = QName("foo")
+        bar_qname = QName("bar")
 
-        first = PackageFactory.create(name="foo", alias="bar", source="there")
-        second = PackageFactory.create(name="thug", source="there")
+        self.resolver.add_import(foo_qname, package, False)
+        self.resolver.add_import(bar_qname, package, True)
+
+        first = PackageFactory.create(name="foo", source=package, alias=None)
+        second = PackageFactory.create(name="bar", source=package, alias="there:bar")
 
         self.assertEqual(2, len(self.resolver.imports))
         self.assertEqual(first, self.resolver.imports[0])
         self.assertEqual(second, self.resolver.imports[1])
-        self.assertEqual({"bar": "bar"}, self.resolver.aliases)
+        self.assertEqual({bar_qname: "there:bar"}, self.resolver.aliases)
 
     def test_add_package(self):
-        self.resolver.schema = Schema.create(target_namespace="http://foobar/common")
         self.resolver.package = "common.foo"
         self.resolver.add_package(ClassFactory.create(name="foobar"))
         self.resolver.add_package(ClassFactory.create(name="none"))
 
         expected = {
-            "{http://foobar/common}foobar": "common.foo",
-            "{http://foobar/common}none": "common.foo",
+            "{xsdata}foobar": "common.foo",
+            "{xsdata}none": "common.foo",
         }
         self.assertEqual(expected, self.resolver.processed)
 
     def test_find_package(self):
-        self.resolver.schema = Schema.create(
-            nsmap={
-                "common": "http://wwww.foobar.xx/common",
-                "other": "http://wwww.foobar.xx/other",
-            }
-        )
+        class_a = ClassFactory.create()
+        self.resolver.processed[class_a.source_qname()] = "foo.bar"
 
-        self.resolver.processed.update(
-            {
-                "{http://wwww.foobar.xx/common}foobar": "foo.bar",
-                "{http://wwww.foobar.xx/common}something": "some.thing",
-            }
-        )
-
-        self.assertEqual("foo.bar", self.resolver.find_package("common", "foobar"))
-        with self.assertRaises(KeyError):
-            self.resolver.find_package("other", "something")
+        self.assertEqual("foo.bar", self.resolver.find_package(class_a.source_qname()))
+        with self.assertRaises(ResolverValueError):
+            self.resolver.find_package(QName("nope"))
 
     def test_import_classes(self):
         self.resolver.class_list = [x for x in "abcdefg"]
@@ -197,21 +191,30 @@ class DependenciesResolverTest(FactoryTestCase):
 
     def test_create_class_map(self):
         classes = [ClassFactory.create(name=name) for name in "ab"]
-        expected = {obj.name: obj for obj in classes}
+        expected = {obj.source_qname(): obj for obj in classes}
         self.assertEqual(expected, self.resolver.create_class_map(classes))
 
     @mock.patch.object(DependenciesResolver, "collect_deps")
     def test_create_class_list(self, mock_collect_deps):
         classes = ClassFactory.list(3)
-        mock_collect_deps.side_effect = [{"class_C", "b"}, {"c", "d"}, {"e", "d"}]
+        mock_collect_deps.side_effect = [
+            {QName("xsdata", "class_C"), QName("b")},
+            {QName("c"), QName("d")},
+            {QName("e"), QName("d")},
+        ]
 
-        self.resolver.schema = Schema.create(
-            nsmap={"bks": "urn:books"}, target_namespace="urn:books"
-        )
         actual = self.resolver.create_class_list(classes)
-        expected = ["b", "c", "d", "e", "class_C", "class_D", "class_B"]
-        self.assertEqual(expected, actual)
-        mock_collect_deps.assert_has_calls([mock.call(obj, "bks") for obj in classes])
+        expected = [
+            "b",
+            "c",
+            "d",
+            "e",
+            "{xsdata}class_C",
+            "{xsdata}class_D",
+            "{xsdata}class_B",
+        ]
+        self.assertEqual(expected, list(map(str, actual)))
+        mock_collect_deps.assert_has_calls([mock.call(obj) for obj in classes])
 
     def test_collect_deps(self):
         obj = ClassFactory.create(
@@ -241,11 +244,10 @@ class DependenciesResolverTest(FactoryTestCase):
             ],
         )
 
-        self.assertEqual(
-            {"localElement", "localAttribute", "openAttrs", "foo"},
-            self.resolver.collect_deps(obj, "xs"),
-        )
-        self.assertEqual(
-            {"foo", "xs:localElement", "xs:openAttrs", "xs:localAttribute"},
-            self.resolver.collect_deps(obj, ""),
-        )
+        expected = {
+            QName("{http://www.w3.org/2001/XMLSchema}localAttribute"),
+            QName("{http://www.w3.org/2001/XMLSchema}localElement"),
+            QName("{http://www.w3.org/2001/XMLSchema}openAttrs"),
+            QName("{xsdata}foo"),
+        }
+        self.assertEqual(expected, self.resolver.collect_deps(obj))

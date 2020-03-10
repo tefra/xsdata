@@ -41,7 +41,7 @@ class DataclassGenerator(PythonAbstractGenerator):
         target = Path.cwd().joinpath(*package_parts)
         file_path = target.joinpath(f"{module}.py")
 
-        self.resolver.process(classes=classes, schema=schema, package=package)
+        self.resolver.process(classes=classes, package=package)
 
         imports = self.prepare_imports()
         output = self.render_classes()

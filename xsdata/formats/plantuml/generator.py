@@ -29,7 +29,7 @@ class PlantUmlGenerator(AbstractGenerator):
         target = Path.cwd().joinpath(*package_arr)
         file_path = target.joinpath(f"{module}.pu")
 
-        self.resolver.process(classes=classes, schema=schema, package=package)
+        self.resolver.process(classes=classes, package=package)
 
         output = self.render_classes()
 

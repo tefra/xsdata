@@ -45,7 +45,7 @@ class DataclassGeneratorTests(FactoryTestCase):
         self.assertEqual(mock_render_module.return_value, actual[0][2])
 
         mock_resolved_process.assert_called_once_with(
-            classes=classes, schema=schema, package="some.foo.some.thug_life.foo"
+            classes=classes, package="some.foo.some.thug_life.foo"
         )
 
         mock_prepare_imports.assert_called_once()

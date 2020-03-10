@@ -61,7 +61,7 @@ class ClassFactory(Factory):
         cls,
         name=None,
         namespace=None,
-        source_namespace=None,
+        source_namespace="xsdata",
         type=None,
         is_abstract=False,
         is_mixed=False,
@@ -75,7 +75,7 @@ class ClassFactory(Factory):
         return cls.model(
             name=name or f"class_{cls.next_letter()}",
             namespace=namespace,
-            source_namespace=source_namespace or "xsdata",
+            source_namespace=source_namespace,
             is_abstract=is_abstract,
             is_mixed=is_mixed,
             type=type or random.choice(cls.types),

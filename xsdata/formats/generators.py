@@ -44,10 +44,12 @@ class AbstractGenerator(ABC):
     def render(self, classes: List[Class]) -> Iterator[Tuple[Path, str, str]]:
         pass
 
-    def module_name(self, name: str) -> str:
+    @classmethod
+    def module_name(cls, name: str) -> str:
         return name
 
-    def package_name(self, name: str) -> str:
+    @classmethod
+    def package_name(cls, name: str) -> str:
         return name
 
 

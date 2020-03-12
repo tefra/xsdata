@@ -12,7 +12,7 @@ from xsdata.writer import writer
 @click.argument("XSD-Path", type=click.Path(exists=True), required=True)
 @click.option("--package", required=True, help="Target Package")
 @click.option(
-    "--format",
+    "--output",
     type=click.Choice(writer.formats),
     help="Output Format",
     default="pydata",
@@ -21,11 +21,11 @@ from xsdata.writer import writer
     "--print", is_flag=True, default=False, help="Preview the resulting classes."
 )
 @click_log.simple_verbosity_option(logger)
-def cli(xsd_path: str, package: str, format: str, print: bool):
+def cli(xsd_path: str, package: str, output: str, print: bool):
     if print:
         logger.setLevel("ERROR")
 
-    transformer = SchemaTransformer(format=format, print=print)
+    transformer = SchemaTransformer(output=output, print=print)
     transformer.process(Path(xsd_path).resolve(), package)
 
 

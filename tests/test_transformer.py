@@ -14,7 +14,7 @@ from xsdata.writer import CodeWriter
 
 class SchemaTransformerTests(FactoryTestCase):
     def setUp(self) -> None:
-        self.transformer = SchemaTransformer(print=True, format="pydata")
+        self.transformer = SchemaTransformer(print=True, output="pydata")
 
     @mock.patch("xsdata.transformer.logger.info")
     @mock.patch.object(CodeWriter, "print")

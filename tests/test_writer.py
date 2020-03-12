@@ -23,10 +23,12 @@ class FakeGenerator(AbstractGenerator):
         path = Path(f"{self.dir}/test.txt")
         yield path, ".".join(path.with_suffix("").parts), "foobar"
 
-    def module_name(self, name):
+    @classmethod
+    def module_name(cls, name):
         return text.snake_case(name)
 
-    def package_name(self, name):
+    @classmethod
+    def package_name(cls, name):
         return text.snake_case(name)
 
 

@@ -21,7 +21,7 @@ from xsdata.writer import writer
 @dataclass
 class SchemaTransformer:
     print: bool
-    format: str
+    output: str
     processed: List[Path] = field(init=False, default_factory=list)
 
     def process(self, schema_path: Path, package: str):
@@ -34,15 +34,11 @@ class SchemaTransformer:
 
         logger.info("Analyzer: %d main and %d inner classes", class_num, inner_num)
 
-        writer.designate(classes, self.format)
+        writer.designate(classes, self.output)
         if self.print:
-            writer.print(classes, self.format)
+            writer.print(classes, self.output)
         else:
-            writer.write(classes, self.format)
-
-    def analyze_classes(self, classes: List[Class]):
-        analyzer = ClassAnalyzer()
-        return analyzer.process(classes)
+            writer.write(classes, self.output)
 
     def process_schema(
         self,
@@ -125,6 +121,13 @@ class SchemaTransformer:
         """
         parser = SchemaParser(target_namespace=target_namespace)
         return parser.from_xsd_path(schema_path)
+
+    @staticmethod
+    def analyze_classes(classes: List[Class]):
+        """Analyzer the given class list and simplify attributes and
+        extensions."""
+        analyzer = ClassAnalyzer()
+        return analyzer.process(classes)
 
     @staticmethod
     def adjust_package(package: str, location: Optional[str]) -> str:

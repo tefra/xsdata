@@ -112,7 +112,8 @@ class SchemaParser(XmlParser):
 
         self.set_namespace_map(element, obj)
 
-    def set_namespace_map(self, element, obj):
+    @staticmethod
+    def set_namespace_map(element, obj):
         obj.nsmap = element.nsmap
         namespaces = obj.nsmap.values()
         for namespace in Namespace:

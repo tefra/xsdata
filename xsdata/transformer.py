@@ -23,7 +23,6 @@ class SchemaTransformer:
     print: bool
     format: str
     processed: List[Path] = field(init=False, default_factory=list)
-    included: List[Path] = field(init=False, default_factory=list)
 
     def process(self, schema_path: Path, package: str):
         classes = self.process_schema(schema_path, package)
@@ -56,6 +55,7 @@ class SchemaTransformer:
         generate a list of classes."""
         classes = []
         if schema_path not in self.processed:
+            self.processed.append(schema_path)
             logger.info("Parsing schema...")
             schema = self.parse_schema(schema_path, target_namespace)
             target_namespace = schema.target_namespace
@@ -63,10 +63,9 @@ class SchemaTransformer:
                 included_classes = self.process_included(sub, package, target_namespace)
                 classes.extend(included_classes)
 
-            self.processed.append(schema_path)
             classes.extend(self.generate_classes(schema, package, redefine))
         else:
-            logger.debug("Circular import skipping: %s", schema_path.name)
+            logger.debug("Already processed skipping: %s", schema_path.name)
         return classes
 
     def process_included(
@@ -84,16 +83,14 @@ class SchemaTransformer:
                 included.class_name,
                 included.schema_location,
             )
-        elif included.location in self.included:
+        elif included.location in self.processed:
             logger.debug(
                 "%s: %s already included skipping..",
                 included.class_name,
                 included.schema_location,
             )
-        elif included.location not in self.included:
-            self.included.append(included.location)
+        else:
             package = self.adjust_package(package, included.schema_location)
-
             classes = self.process_schema(
                 included.location,
                 package=package,

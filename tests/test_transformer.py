@@ -160,7 +160,7 @@ class SchemaTransformerTests(FactoryTestCase):
 
         self.assertEqual(0, mock_parse_schema.call_count)
         mock_logger_debug.assert_called_once_with(
-            "Circular import skipping: %s", path.name
+            "Already processed skipping: %s", path.name
         )
 
     @mock.patch.object(SchemaTransformer, "process_schema")
@@ -174,8 +174,6 @@ class SchemaTransformerTests(FactoryTestCase):
         result = self.transformer.process_included(include, "foo.bar", "thug")
 
         self.assertEqual(2, len(result))
-        self.assertTrue(path in self.transformer.included)
-
         mock_adjust_package.assert_called_once_with("foo.bar", include.schema_location)
         mock_process_schema.assert_called_once_with(
             path, package="adjusted.foo.bar", target_namespace="thug", redefine=None
@@ -194,8 +192,6 @@ class SchemaTransformerTests(FactoryTestCase):
         result = self.transformer.process_included(redefine, "foo.bar", "thug")
 
         self.assertEqual(2, len(result))
-        self.assertTrue(path in self.transformer.included)
-
         mock_process_schema.assert_called_once_with(
             path, package="adjusted.foo.bar", target_namespace="thug", redefine=redefine
         )
@@ -206,7 +202,7 @@ class SchemaTransformerTests(FactoryTestCase):
     ):
         path = Path(__file__)
         include = Include.create(location=path)
-        self.transformer.included.append(path)
+        self.transformer.processed.append(path)
 
         result = self.transformer.process_included(include, "foo.bar", "thug")
 

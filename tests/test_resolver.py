@@ -25,7 +25,6 @@ class DependenciesResolverTest(FactoryTestCase):
         self, mock_create_class_map, create_class_list, mock_resolve_imports
     ):
         classes = ClassFactory.list(3)
-        package = "foo.bar.thug"
 
         mock_create_class_map.return_value = {QName("b"): classes[0]}
         create_class_list.return_value = classes[::-1]
@@ -33,13 +32,12 @@ class DependenciesResolverTest(FactoryTestCase):
         self.resolver.imports.append(PackageFactory.create(name="foo", source="bar"))
         self.resolver.aliases = {QName("a"): "a"}
 
-        self.resolver.process(classes, package)
+        self.resolver.process(classes)
         self.assertEqual([], self.resolver.imports)
         self.assertEqual({}, self.resolver.aliases)
 
         self.assertEqual(mock_create_class_map.return_value, self.resolver.class_map)
         self.assertEqual(create_class_list.return_value, self.resolver.class_list)
-        self.assertEqual(package, self.resolver.package)
 
         mock_resolve_imports.assert_called_once_with()
 
@@ -57,8 +55,7 @@ class DependenciesResolverTest(FactoryTestCase):
         self.assertEqual(packages[0], result[2])
 
     @mock.patch.object(DependenciesResolver, "apply_aliases")
-    @mock.patch.object(DependenciesResolver, "add_package")
-    def test_sorted_classes(self, mock_add_package, mock_apply_aliases):
+    def test_sorted_classes(self, mock_apply_aliases):
         mock_apply_aliases.side_effect = lambda x: x
 
         self.resolver.class_list = ["a", "b", "c", "d"]
@@ -71,7 +68,6 @@ class DependenciesResolverTest(FactoryTestCase):
 
         self.assertEqual(expected, list(result))
         mock_apply_aliases.assert_has_calls([mock.call(x) for x in expected])
-        mock_add_package.assert_has_calls([mock.call(x) for x in expected])
 
     def test_apply_aliases(self):
         self.resolver.aliases = {QName("d"): "IamD", QName("a"): "IamA"}
@@ -165,20 +161,9 @@ class DependenciesResolverTest(FactoryTestCase):
         self.assertEqual(second, self.resolver.imports[1])
         self.assertEqual({bar_qname: "there:bar"}, self.resolver.aliases)
 
-    def test_add_package(self):
-        self.resolver.package = "common.foo"
-        self.resolver.add_package(ClassFactory.create(name="foobar"))
-        self.resolver.add_package(ClassFactory.create(name="none"))
-
-        expected = {
-            "{xsdata}foobar": "common.foo",
-            "{xsdata}none": "common.foo",
-        }
-        self.assertEqual(expected, self.resolver.processed)
-
     def test_find_package(self):
         class_a = ClassFactory.create()
-        self.resolver.processed[class_a.source_qname()] = "foo.bar"
+        self.resolver.packages[class_a.source_qname()] = "foo.bar"
 
         self.assertEqual("foo.bar", self.resolver.find_package(class_a.source_qname()))
         with self.assertRaises(ResolverValueError):

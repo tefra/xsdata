@@ -18,14 +18,14 @@ logger = logging.getLogger(__name__)
 
 @dataclass
 class DependenciesResolver:
-    processed: Dict[QName, str] = field(default_factory=dict)
+    packages: Dict[QName, str] = field(default_factory=dict)
     aliases: Dict[QName, str] = field(default_factory=dict)
     imports: List[Package] = field(default_factory=list)
     class_list: List[QName] = field(init=False, default_factory=list)
     class_map: Dict[QName, Class] = field(init=False, default_factory=dict)
     package: str = field(init=False)
 
-    def process(self, classes: List[Class], package: str):
+    def process(self, classes: List[Class]):
         """
         Resolve the dependencies for the given list of classes and the target
         package.
@@ -37,7 +37,6 @@ class DependenciesResolver:
         self.aliases.clear()
         self.class_map = self.create_class_map(classes)
         self.class_list = self.create_class_list(classes)
-        self.package = package
         self.resolve_imports()
 
     def sorted_imports(self) -> List[Package]:
@@ -45,16 +44,11 @@ class DependenciesResolver:
         return sorted(self.imports, key=lambda x: x.name)
 
     def sorted_classes(self) -> Iterator[Class]:
-        """
-        Return an iterator of classes property sorted for generation.
-
-        Keep track of the class names and their target package name for
-        future runs. Also apply type aliases for the given process run.
-        """
+        """Return an iterator of classes property sorted for generation and
+        apply import aliases."""
         for name in self.class_list:
             obj = self.class_map.get(name)
             if obj is not None:
-                self.add_package(obj)
                 yield self.apply_aliases(obj)
 
     def apply_aliases(self, obj: Class) -> Class:
@@ -89,24 +83,15 @@ class DependenciesResolver:
 
         self.imports.append(Package(name=qname.localname, source=package, alias=alias))
 
-    def add_package(self, obj: Class) -> None:
-        """
-        Add the given class to the map of processed items indexed with the
-        qname of the class and the source namespace.
-
-        eg {http://www.namespace/name}ClassName
-        """
-        self.processed[obj.source_qname()] = self.package
-
     def find_package(self, qname: QName) -> str:
         """
         Return the package name for the given qualified class name.
 
         :raises ResolverValueError: if name doesn't exist.
         """
-        if qname not in self.processed:
+        if qname not in self.packages:
             raise ResolverValueError(f"Unknown dependency: {qname.text}")
-        return self.processed[qname]
+        return self.packages[qname]
 
     def import_classes(self) -> List[QName]:
         """Return a list of class that need to be imported."""

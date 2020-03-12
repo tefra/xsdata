@@ -14,6 +14,10 @@ from xsdata.models.elements import ComplexType
 from xsdata.models.elements import Element
 from xsdata.models.elements import Restriction
 from xsdata.models.elements import SimpleType
+from xsdata.models.enums import Namespace
+
+
+NSMAP = {ns.prefix: ns.uri for ns in Namespace}
 
 
 class FactoryTestCase(unittest.TestCase):
@@ -57,6 +61,7 @@ class ClassFactory(Factory):
         cls,
         name=None,
         namespace=None,
+        source_namespace="xsdata",
         type=None,
         is_abstract=False,
         is_mixed=False,
@@ -64,10 +69,14 @@ class ClassFactory(Factory):
         extensions=None,
         attrs=None,
         inner=None,
+        nsmap=None,
+        package="foo",
+        module="tests",
     ):
         return cls.model(
             name=name or f"class_{cls.next_letter()}",
             namespace=namespace,
+            source_namespace=source_namespace,
             is_abstract=is_abstract,
             is_mixed=is_mixed,
             type=type or random.choice(cls.types),
@@ -75,6 +84,9 @@ class ClassFactory(Factory):
             attrs=attrs or [],
             inner=inner or [],
             help=help,
+            package=package,
+            module=module,
+            nsmap=nsmap if isinstance(nsmap, dict) else NSMAP,
         )
 
 
@@ -168,6 +180,7 @@ class AttrFactory(Factory):
         fixed=False,
         wildcard=False,
         restrictions=None,
+        nsmap=None,
     ):
 
         return cls.model(
@@ -181,6 +194,7 @@ class AttrFactory(Factory):
             fixed=fixed,
             wildcard=wildcard,
             restrictions=restrictions or RestrictionsFactory.create(),
+            nsmap=nsmap if isinstance(nsmap, dict) else NSMAP,
         )
 
 

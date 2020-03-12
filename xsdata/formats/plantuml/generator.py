@@ -1,11 +1,13 @@
+from collections import defaultdict
 from pathlib import Path
+from typing import Dict
 from typing import Iterator
 from typing import List
 from typing import Tuple
 
 from xsdata.formats.generators import AbstractGenerator
 from xsdata.models.codegen import Class
-from xsdata.models.elements import Schema
+from xsdata.resolver import DependenciesResolver
 
 
 class PlantUmlGenerator(AbstractGenerator):
@@ -18,25 +20,26 @@ class PlantUmlGenerator(AbstractGenerator):
         template = "enum" if obj.is_enumeration else "class"
         return self.template(template).render(obj=obj)
 
-    def render(
-        self, schema: Schema, classes: List[Class], package: str
-    ) -> Iterator[Tuple[Path, str, str]]:
-        """Given a schema, a list of classes and a target package return to the
-        writer factory the target file path and the rendered output."""
-        module = schema.module.replace(".xsd", "")
-        package_arr = package.split(".")
-        package = "{}.{}".format(".".join(package_arr), module)
-        target = Path.cwd().joinpath(*package_arr)
-        file_path = target.joinpath(f"{module}.pu")
+    def render(self, classes: List[Class]) -> Iterator[Tuple[Path, str, str]]:
+        """Given  a list of classes return to the writer factory the target
+        file path full module path and the rendered code."""
 
-        self.resolver.process(classes=classes, schema=schema, package=package)
+        packages = {obj.source_qname(): obj.target_module for obj in classes}
+        resolver = DependenciesResolver(packages=packages)
 
-        output = self.render_classes()
+        groups: Dict[str, List] = defaultdict(list)
+        for obj in classes:
+            groups[obj.target_module].append(obj)
 
-        yield file_path, package, self.render_module(output=output)
+        for target_module, classes in groups.items():
+            resolver.process(classes)
+            output = self.render_classes(resolver.sorted_classes())
+            file_path = Path.cwd().joinpath(target_module.replace(".", "/") + ".pu")
 
-    def render_classes(self) -> str:
+            yield file_path, target_module, self.render_module(output=output)
+
+    def render_classes(self, classes: List[Class]) -> str:
         """Sort classes by name and return the rendered output."""
-        classes = sorted(self.resolver.sorted_classes(), key=lambda x: x.name)
+        classes = sorted(classes, key=lambda x: x.name)
         output = "\n".join(map(self.render_class, classes)).strip()
         return f"\n{output}\n"

@@ -40,7 +40,7 @@ Example 6-2 Illegal attempt to prefix an element name
 
 .. warning::
 
-    Illegal definition
+    Should fail
 
 
 Example 6-3 Local element declarations

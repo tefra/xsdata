@@ -8,10 +8,24 @@ from typing import List
 from typing import Optional
 from typing import Type
 
+from lxml.etree import QName
+
 from xsdata.models.elements import ComplexType
 from xsdata.models.elements import Element
 from xsdata.models.enums import DataType
 from xsdata.models.enums import TagType
+from xsdata.utils import text
+
+
+def qname(name: str, nsmap, default_namespace: Optional[str] = None) -> str:
+    prefix, suffix = text.split(name)
+    namespace = default_namespace
+
+    if prefix:
+        name = suffix
+        namespace = nsmap.get(prefix)
+
+    return QName(namespace, name)
 
 
 @dataclass
@@ -102,6 +116,7 @@ class Attr:
     namespace: Optional[str] = field(default=None)
     help: Optional[str] = field(default=None)
     restrictions: Restrictions = field(default_factory=Restrictions)
+    nsmap: Dict = field(default_factory=dict)
 
     def __post_init__(self):
         self.local_name = self.name
@@ -138,6 +153,14 @@ class Attr:
             **kwargs,
         )
 
+    def qname(self, name: Optional[str] = None):
+        prefix, name = text.split(name or self.name)
+        namespace = self.namespace
+        if prefix:
+            namespace = self.nsmap.get(prefix)
+
+        return QName(namespace or None, name).text
+
 
 @dataclass
 class Extension:
@@ -156,19 +179,23 @@ class Class:
     type: Type
     is_abstract: bool
     is_mixed: bool
+    package: str
+    module: str
     namespace: Optional[str] = field(default=None)
     local_name: str = field(init=False)
     help: Optional[str] = field(default=None)
     extensions: List[Extension] = field(default_factory=list)
     attrs: List[Attr] = field(default_factory=list)
     inner: List["Class"] = field(default_factory=list)
+    nsmap: Dict = field(default_factory=dict)
+    source_namespace: Optional[str] = field(default=None)
 
     def __post_init__(self):
         self.local_name = self.name
 
     @property
     def key(self) -> str:
-        return f"{self.type.__name__}::{self.name}"
+        return f"{self.source_namespace}::{self.type.__name__}::{self.name}"
 
     @property
     def is_enumeration(self) -> bool:
@@ -179,6 +206,10 @@ class Class:
         return self.type not in [Element, ComplexType]
 
     @property
+    def target_module(self):
+        return f"{self.package}.{self.module}"
+
+    @property
     def is_element(self):
         return self.type is Element
 
@@ -187,6 +218,9 @@ class Class:
         extensions = [extension.clone() for extension in self.extensions]
         attrs = [attr.clone() for attr in self.attrs]
         return replace(self, inner=inners, extensions=extensions, attrs=attrs)
+
+    def source_qname(self, name: Optional[str] = None) -> QName:
+        return qname(name or self.name, self.nsmap, self.source_namespace)
 
 
 @dataclass

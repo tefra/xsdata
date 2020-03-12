@@ -4,7 +4,7 @@ Data Class: pydata
 
 Generate Python Data Classes with type hints grouped in the same modules by the original schema.
 
-This is the default format and also comes with parsers and serializers for both xml and json.
+This is the default output format and also comes with parsers and serializers for both xml and json.
 
 
 .. admonition:: XSD Types mapping

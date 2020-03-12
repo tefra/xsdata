@@ -10,13 +10,10 @@ from lxml import etree
 
 from tests.test_generation import titles
 from xsdata import cli
-from xsdata.formats.dataclass.generator import DataclassGenerator
 from xsdata.formats.dataclass.parsers import JsonParser
 from xsdata.formats.dataclass.parsers import XmlParser
 from xsdata.formats.dataclass.serializers import JsonSerializer
 from xsdata.formats.dataclass.serializers import XmlSerializer
-from xsdata.reducer import reducer
-from xsdata.writer import writer
 
 runner = CliRunner()
 
@@ -95,8 +92,6 @@ def import_clazz(source):
 def setup_module(module):
     for xml in xmls:
         xsd = xml.with_suffix(".xsd")
-        reducer.common_types.clear()
-        writer.register_format("pydata", DataclassGenerator())
 
         package = ".".join(xsd.relative_to(fixtures).parent.parts)
         result = runner.invoke(cli, [str(xsd), f"--package=tests.fixtures.{package}"])

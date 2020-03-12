@@ -8,41 +8,134 @@ from xsdata.models.elements import Include
 from xsdata.models.elements import Override
 from xsdata.models.elements import Redefine
 from xsdata.models.elements import Schema
-from xsdata.reducer import ClassReducer
 from xsdata.transformer import SchemaTransformer
 from xsdata.writer import CodeWriter
 
 
 class SchemaTransformerTests(FactoryTestCase):
     def setUp(self) -> None:
-        self.transformer = SchemaTransformer(print=True, format="pydata")
+        self.transformer = SchemaTransformer(print=True, output="pydata")
 
     @mock.patch("xsdata.transformer.logger.info")
-    @mock.patch.object(Schema, "included")
-    @mock.patch.object(SchemaTransformer, "generate_code")
+    @mock.patch.object(CodeWriter, "print")
+    @mock.patch.object(CodeWriter, "designate")
+    @mock.patch.object(SchemaTransformer, "count_classes")
+    @mock.patch.object(SchemaTransformer, "analyze_classes")
+    @mock.patch.object(SchemaTransformer, "process_schema")
+    def test_process_with_print_true(
+        self,
+        mock_process_schema,
+        mock_analyze_classes,
+        mock_count_classes,
+        mock_writer_designate,
+        mock_writer_print,
+        mock_logger_into,
+    ):
+        path = Path(__file__)
+        package = "test"
+        schema_classes = ClassFactory.list(2)
+        analyzer_classes = ClassFactory.list(2)
+        mock_count_classes.return_value = 1, 2
+        mock_process_schema.return_value = schema_classes
+        mock_analyze_classes.return_value = analyzer_classes
+
+        self.transformer.process(path, package)
+        mock_process_schema.assert_called_once_with(path, package)
+        mock_analyze_classes.assert_called_once_with(schema_classes)
+        mock_count_classes.assert_called_once_with(analyzer_classes)
+        mock_writer_designate.assert_called_once_with(analyzer_classes, "pydata")
+        mock_writer_print.assert_called_once_with(analyzer_classes, "pydata")
+        mock_logger_into.assert_called_once_with(
+            "Analyzer: %d main and %d inner classes", 1, 2
+        )
+
+    @mock.patch("xsdata.transformer.logger.info")
+    @mock.patch.object(CodeWriter, "write")
+    @mock.patch.object(CodeWriter, "designate")
+    @mock.patch.object(SchemaTransformer, "count_classes")
+    @mock.patch.object(SchemaTransformer, "analyze_classes")
+    @mock.patch.object(SchemaTransformer, "process_schema")
+    def test_process_with_print_false(
+        self,
+        mock_process_schema,
+        mock_analyze_classes,
+        mock_count_classes,
+        mock_writer_designate,
+        mock_writer_write,
+        mock_logger_into,
+    ):
+        path = Path(__file__)
+        package = "test"
+        schema_classes = ClassFactory.list(2)
+        analyzer_classes = ClassFactory.list(2)
+        mock_count_classes.return_value = 1, 2
+        mock_process_schema.return_value = schema_classes
+        mock_analyze_classes.return_value = analyzer_classes
+
+        self.transformer.print = False
+        self.transformer.process(path, package)
+        mock_process_schema.assert_called_once_with(path, package)
+        mock_analyze_classes.assert_called_once_with(schema_classes)
+        mock_count_classes.assert_called_once_with(analyzer_classes)
+        mock_writer_designate.assert_called_once_with(analyzer_classes, "pydata")
+        mock_writer_write.assert_called_once_with(analyzer_classes, "pydata")
+        mock_logger_into.assert_called_once_with(
+            "Analyzer: %d main and %d inner classes", 1, 2
+        )
+
+    @mock.patch("xsdata.transformer.logger.warning")
+    @mock.patch.object(SchemaTransformer, "count_classes")
+    @mock.patch.object(SchemaTransformer, "analyze_classes")
+    @mock.patch.object(SchemaTransformer, "process_schema")
+    def test_process_with_zero_classes_after_analyze(
+        self,
+        mock_process_schema,
+        mock_analyze_classes,
+        mock_count_classes,
+        mock_logger_warning,
+    ):
+        path = Path(__file__)
+        package = "test"
+        schema_classes = ClassFactory.list(2)
+        analyzer_classes = []
+        mock_count_classes.return_value = 0, 0
+        mock_process_schema.return_value = schema_classes
+        mock_analyze_classes.return_value = analyzer_classes
+
+        self.transformer.process(path, package)
+        mock_process_schema.assert_called_once_with(path, package)
+        mock_analyze_classes.assert_called_once_with(schema_classes)
+        mock_count_classes.assert_called_once_with(analyzer_classes)
+        mock_logger_warning.assert_called_once_with("Analyzer returned zero classes!")
+
+    @mock.patch("xsdata.transformer.logger.info")
+    @mock.patch.object(SchemaTransformer, "generate_classes")
     @mock.patch.object(SchemaTransformer, "process_included")
     @mock.patch.object(SchemaTransformer, "parse_schema")
-    def test_process(
+    def test_process_schema(
         self,
         mock_parse_schema,
         mock_process_included,
-        mock_generate_code,
-        mock_included,
+        mock_generate_classes,
         mock_logger_info,
     ):
         include = Include.create()
         override = Override.create()
         redefine = Redefine.create()
         schema = Schema.create(target_namespace="thug")
+        schema.includes.append(include)
+        schema.overrides.append(override)
+        mock_process_included.side_effect = [ClassFactory.list(2), ClassFactory.list(3)]
+        mock_generate_classes.return_value = ClassFactory.list(4)
 
         mock_parse_schema.return_value = schema
-        mock_included.return_value = [include, override]
 
         path = Path(__file__)
-        self.transformer.process(
+        result = self.transformer.process_schema(
             path, package="foo.bar", target_namespace="foo-bar", redefine=redefine
         )
 
+        self.assertEqual(9, len(result))
         self.assertTrue(path in self.transformer.processed)
 
         mock_parse_schema.assert_called_once_with(path, "foo-bar")
@@ -52,51 +145,54 @@ class SchemaTransformerTests(FactoryTestCase):
                 mock.call(override, "foo.bar", schema.target_namespace),
             ]
         )
-        mock_generate_code.assert_called_once_with(schema, "foo.bar", redefine)
 
-        self.transformer.process(path, None, None, None)
+        self.transformer.process_schema(path, None, None, None)
         mock_logger_info.assert_called_once_with("Parsing schema...")
 
     @mock.patch("xsdata.transformer.logger.debug")
     @mock.patch.object(SchemaTransformer, "parse_schema")
-    def test_process_avoid_processing_twice_circular_imports(
+    def test_process_schema_avoid_circular_imports(
         self, mock_parse_schema, mock_logger_debug
     ):
         path = Path(__file__)
         self.transformer.processed.append(path)
-        self.transformer.process(path, "foo.bar", None, None)
+        self.transformer.process_schema(path, "foo.bar", None, None)
 
         self.assertEqual(0, mock_parse_schema.call_count)
         mock_logger_debug.assert_called_once_with(
-            "Circular import skipping: %s", path.name
+            "Already processed skipping: %s", path.name
         )
 
-    @mock.patch.object(SchemaTransformer, "process")
+    @mock.patch.object(SchemaTransformer, "process_schema")
     @mock.patch.object(SchemaTransformer, "adjust_package")
-    def test_process_included(self, mock_adjust_package, mock_process):
+    def test_process_included(self, mock_adjust_package, mock_process_schema):
         path = Path(__file__)
         include = Include.create(location=path, schema_location="foo.xsd")
         mock_adjust_package.return_value = "adjusted.foo.bar"
+        mock_process_schema.return_value = ClassFactory.list(2)
 
-        self.transformer.process_included(include, "foo.bar", "thug")
-        self.assertTrue(path in self.transformer.included)
+        result = self.transformer.process_included(include, "foo.bar", "thug")
 
+        self.assertEqual(2, len(result))
         mock_adjust_package.assert_called_once_with("foo.bar", include.schema_location)
-        mock_process.assert_called_once_with(
+        mock_process_schema.assert_called_once_with(
             path, package="adjusted.foo.bar", target_namespace="thug", redefine=None
         )
 
-    @mock.patch.object(SchemaTransformer, "process")
+    @mock.patch.object(SchemaTransformer, "process_schema")
     @mock.patch.object(SchemaTransformer, "adjust_package")
-    def test_process_included_with_redefine(self, mock_adjust_package, mock_process):
+    def test_process_included_with_redefine(
+        self, mock_adjust_package, mock_process_schema
+    ):
         path = Path(__file__)
         redefine = Redefine.create(location=path)
         mock_adjust_package.return_value = "adjusted.foo.bar"
+        mock_process_schema.return_value = ClassFactory.list(2)
 
-        self.transformer.process_included(redefine, "foo.bar", "thug")
-        self.assertTrue(path in self.transformer.included)
+        result = self.transformer.process_included(redefine, "foo.bar", "thug")
 
-        mock_process.assert_called_once_with(
+        self.assertEqual(2, len(result))
+        mock_process_schema.assert_called_once_with(
             path, package="adjusted.foo.bar", target_namespace="thug", redefine=redefine
         )
 
@@ -106,9 +202,12 @@ class SchemaTransformerTests(FactoryTestCase):
     ):
         path = Path(__file__)
         include = Include.create(location=path)
-        self.transformer.included.append(path)
+        self.transformer.processed.append(path)
 
-        self.transformer.process_included(include, "foo.bar", "thug")
+        result = self.transformer.process_included(include, "foo.bar", "thug")
+
+        self.assertIsInstance(result, list)
+        self.assertEqual(0, len(result))
         mock_logger_debug.assert_called_once_with(
             "%s: %s already included skipping..",
             include.class_name,
@@ -118,8 +217,10 @@ class SchemaTransformerTests(FactoryTestCase):
     @mock.patch("xsdata.transformer.logger.warning")
     def test_process_included_skip_when_location_is_missing(self, mock_logger_warning):
         include = Include.create()
-        self.transformer.process_included(include, "foo.bar", "thug")
+        result = self.transformer.process_included(include, "foo.bar", "thug")
 
+        self.assertIsInstance(result, list)
+        self.assertEqual(0, len(result))
         mock_logger_warning.assert_called_once_with(
             "%s: %s unresolved schema location..",
             include.class_name,
@@ -127,91 +228,34 @@ class SchemaTransformerTests(FactoryTestCase):
         )
 
     @mock.patch("xsdata.transformer.logger.info")
-    @mock.patch.object(CodeWriter, "print")
     @mock.patch.object(SchemaTransformer, "count_classes")
-    @mock.patch.object(ClassReducer, "process")
     @mock.patch.object(ClassBuilder, "build")
     @mock.patch.object(ClassBuilder, "__init__", return_value=None)
-    def test_generate_code(
+    def test_generate_classes(
         self,
         mock_builder_init,
         mock_builder_build,
-        mock_reducer_process,
         mock_count_classes,
-        mock_writer_print,
         mock_logger_info,
     ):
         schema = Schema.create()
         redefine = Redefine.create()
         classes = ClassFactory.list(2)
-        final_classes = classes[1:]
 
         mock_builder_build.return_value = classes
-        mock_reducer_process.return_value = final_classes
         mock_count_classes.return_value = 2, 4
-        self.transformer.generate_code(schema, "foo.bar", redefine)
+        self.transformer.generate_classes(schema, "foo.bar", redefine)
 
-        mock_builder_init.assert_called_once_with(schema, redefine)
+        mock_builder_init.assert_called_once_with(
+            schema=schema, package="foo.bar", redefine=redefine
+        )
         mock_builder_build.assert_called_once_with()
-        mock_reducer_process.assert_called_once_with(schema, classes)
         mock_logger_info.assert_has_calls(
             [
                 mock.call("Compiling schema..."),
-                mock.call("Compiled %d main and %d inner classes", 2, 4),
+                mock.call("Builder: %d main and %d inner classes", 2, 4),
             ]
         )
-        mock_writer_print(schema, final_classes, "foo.bar", self.transformer.format)
-
-    @mock.patch.object(CodeWriter, "write")
-    @mock.patch.object(SchemaTransformer, "count_classes")
-    @mock.patch.object(ClassReducer, "process")
-    @mock.patch.object(ClassBuilder, "build")
-    @mock.patch.object(ClassBuilder, "__init__", return_value=None)
-    def test_generate_code_when_print_is_false(
-        self,
-        mock_builder_init,
-        mock_builder_build,
-        mock_reducer_process,
-        mock_count_classes,
-        mock_writer_write,
-    ):
-        schema = Schema.create()
-        redefine = Redefine.create()
-        classes = ClassFactory.list(2)
-
-        mock_builder_build.return_value = classes
-        mock_reducer_process.return_value = classes
-        mock_count_classes.return_value = 2, 4
-        self.transformer.print = False
-        self.transformer.generate_code(schema, "foo.bar", redefine)
-
-        mock_writer_write(schema, classes, "foo.bar", self.transformer.format)
-
-    @mock.patch("xsdata.transformer.logger.info")
-    @mock.patch.object(CodeWriter, "print")
-    @mock.patch.object(ClassReducer, "process")
-    @mock.patch.object(ClassBuilder, "build")
-    @mock.patch.object(ClassBuilder, "__init__", return_value=None)
-    def test_generate_code_when_reducer_returns_no_classes(
-        self,
-        mock_builder_init,
-        mock_builder_build,
-        mock_reducer_process,
-        mock_writer_print,
-        mock_logger_info,
-    ):
-        schema = Schema.create()
-        classes = ClassFactory.list(2)
-
-        mock_builder_build.return_value = classes
-        mock_reducer_process.return_value = []
-        self.transformer.generate_code(schema, "foo.bar", None)
-        self.assertEqual(0, mock_writer_print.call_count)
-
-        mock_builder_init.assert_called_once_with(schema, None)
-        mock_builder_build.assert_called_once_with()
-        mock_reducer_process.assert_called_once_with(schema, classes)
-        mock_logger_info.assert_called_once_with("Compiling schema...")
 
     def test_parse_schema(self):
         path = Path(__file__).parent.joinpath("fixtures/books.xsd")

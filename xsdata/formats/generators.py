@@ -24,9 +24,7 @@ from xsdata.models.codegen import AttrType
 from xsdata.models.codegen import Class
 from xsdata.models.codegen import Extension
 from xsdata.models.codegen import Package
-from xsdata.models.elements import Schema
 from xsdata.models.enums import DataType
-from xsdata.resolver import DependenciesResolver
 from xsdata.utils import text
 
 
@@ -38,16 +36,21 @@ class AbstractGenerator(ABC):
             raise CodeGeneratorError("Missing generator templates directory")
 
         self.env = Environment(loader=FileSystemLoader(str(self.templates_dir)))
-        self.resolver = DependenciesResolver()
 
     def template(self, name: str) -> Template:
         return self.env.get_template("{}.jinja2".format(name))
 
     @abstractmethod
-    def render(
-        self, schema: Schema, classes: List[Class], package: str
-    ) -> Iterator[Tuple[Path, str, str]]:
+    def render(self, classes: List[Class]) -> Iterator[Tuple[Path, str, str]]:
         pass
+
+    @classmethod
+    def module_name(cls, name: str) -> str:
+        return name
+
+    @classmethod
+    def package_name(cls, name: str) -> str:
+        return name
 
 
 class PythonAbstractGenerator(AbstractGenerator, ABC):
@@ -139,6 +142,18 @@ class PythonAbstractGenerator(AbstractGenerator, ABC):
             package.alias = cls.class_name(package.alias)
 
         return package
+
+    @classmethod
+    def module_name(cls, name: str) -> str:
+        return text.snake_case(name)
+
+    @classmethod
+    def package_name(cls, name: str) -> str:
+        return ".".join(
+            map(
+                lambda x: text.snake_case(safe_snake(x, default="pkg")), name.split(".")
+            )
+        )
 
     @classmethod
     def class_name(cls, name: str) -> str:

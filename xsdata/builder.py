@@ -5,7 +5,6 @@ from typing import List
 from typing import Optional
 from typing import Union
 
-from xsdata.logger import logger
 from xsdata.models.codegen import Attr
 from xsdata.models.codegen import AttrType
 from xsdata.models.codegen import Class
@@ -25,7 +24,6 @@ from xsdata.models.elements import SimpleType
 from xsdata.models.elements import Union as UnionElement
 from xsdata.models.enums import DataType
 from xsdata.models.enums import Namespace
-from xsdata.models.enums import TagType
 from xsdata.models.mixins import ElementBase
 from xsdata.utils import text
 
@@ -38,6 +36,7 @@ AttributeElement = Union[
 @dataclass
 class ClassBuilder:
     schema: Schema
+    package: str
     redefine: Optional[Redefine] = field(default=None)
 
     def build(self) -> List[Class]:
@@ -69,6 +68,10 @@ class ClassBuilder:
             is_mixed=obj.is_mixed,
             type=type(obj),
             help=obj.display_help,
+            nsmap=obj.nsmap,
+            source_namespace=self.schema.target_namespace,
+            module=self.schema.module,
+            package=self.package,
         )
 
         self.build_class_extensions(obj, instance)
@@ -80,10 +83,6 @@ class ClassBuilder:
         children."""
         for child in self.element_children(obj):
             self.build_class_attribute(instance, child)
-
-        attr = self.default_class_attribute(instance)
-        if attr:
-            instance.attrs.append(attr)
 
         instance.attrs.sort(key=lambda x: x.index)
 
@@ -109,7 +108,7 @@ class ClassBuilder:
         prefix, suffix = text.split(name)
         native = False
         self_ref = False
-        namespace = self.schema.nsmap.get(prefix)
+        namespace = instance.nsmap.get(prefix)
 
         if Namespace.get_enum(namespace) and DataType.get_enum(suffix):
             name = suffix
@@ -153,7 +152,7 @@ class ClassBuilder:
 
         prefix = obj.prefix
         if prefix:
-            return self.schema.nsmap.get(prefix)
+            return obj.nsmap.get(prefix)
 
         if obj.is_qualified:
             return self.schema.target_namespace
@@ -208,6 +207,7 @@ class ClassBuilder:
                 help=obj.display_help,
                 namespace=self.element_namespace(obj),
                 restrictions=restrictions,
+                nsmap=obj.nsmap,
             )
         )
 
@@ -285,28 +285,3 @@ class ClassBuilder:
             and obj.simple_type is not None
             and obj.simple_type.is_enumeration
         )
-
-    @staticmethod
-    def default_class_attribute(instance: Class) -> Optional[Attr]:
-        types = []
-        restrictions = Restrictions()
-        if len(instance.extensions) == 0 and len(instance.attrs) == 0:
-            types.append(AttrType(name=DataType.STRING.code, native=True))
-            logger.warning(f"Empty class: `{instance.name}`")
-        elif not instance.is_enumeration:
-            for i in range(len(instance.extensions) - 1, -1, -1):
-                if instance.extensions[i].type.native:
-                    extension = instance.extensions.pop(i)
-                    types.insert(0, extension.type)
-                    restrictions.update(extension.restrictions)
-
-        if types:
-            return Attr(
-                name="value",
-                index=0,
-                default=None,
-                types=types,
-                local_type=TagType.EXTENSION,
-                restrictions=restrictions,
-            )
-        return None

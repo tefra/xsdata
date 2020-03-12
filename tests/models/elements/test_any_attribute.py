@@ -14,7 +14,7 @@ class AnyAttributeTests(TestCase):
 
     def test_property_real_type(self):
         obj = AnyAttribute.create()
-        self.assertEqual("xml:qmap", obj.real_type)
+        self.assertEqual("xs:qmap", obj.real_type)
 
     def get_restrictions(self):
         obj = AnyAttribute.create()

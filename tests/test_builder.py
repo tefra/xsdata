@@ -1,3 +1,4 @@
+from pathlib import Path
 from types import GeneratorType
 from unittest.mock import call
 from unittest.mock import patch
@@ -26,16 +27,14 @@ from xsdata.models.elements import Sequence
 from xsdata.models.elements import SimpleContent
 from xsdata.models.elements import SimpleType
 from xsdata.models.elements import Union
-from xsdata.models.enums import DataType
 from xsdata.models.enums import FormType
-from xsdata.models.enums import TagType
 
 
 class ClassBuilderTests(FactoryTestCase):
     def setUp(self) -> None:
         super(ClassBuilderTests, self).setUp()
-        self.schema = Schema.create()
-        self.builder = ClassBuilder(schema=self.schema)
+        self.schema = Schema.create(location=Path(__file__), target_namespace="builder")
+        self.builder = ClassBuilder(schema=self.schema, package="tests")
 
     @patch.object(Redefine, "children")
     @patch.object(Override, "children")
@@ -49,7 +48,7 @@ class ClassBuilderTests(FactoryTestCase):
             group=Group.create(),
             attribute_group=AttributeGroup.create(),
         )
-        self.builder = ClassBuilder(schema=self.schema, redefine=redefine)
+        self.builder.redefine = redefine
 
         for _ in range(2):
             self.schema.simple_types.append(SimpleType.create())
@@ -103,10 +102,11 @@ class ClassBuilderTests(FactoryTestCase):
         )
 
     def test_element_namespace(self):
-        self.schema.nsmap["foo"] = "bar"
         self.schema.target_namespace = "foobar"
 
         element = Element.create(ref="foo:something")
+        element.nsmap["foo"] = "bar"
+
         self.assertEqual("bar", self.builder.element_namespace(element))
 
         element = Element.create(form=FormType.QUALIFIED)
@@ -157,46 +157,12 @@ class ClassBuilderTests(FactoryTestCase):
             help="sos",
             is_abstract=True,
             namespace="foo:name",
+            nsmap=element.nsmap,
+            package=self.builder.package,
+            module=self.schema.module,
+            source_namespace=self.schema.target_namespace,
         )
         self.assertEqual(expected, result)
-
-    @patch.object(ClassBuilder, "default_class_attribute")
-    @patch.object(ClassBuilder, "build_class_attribute")
-    def test_build_class_attributes_without_default_value_type(
-        self, mock_build_class_attribute, mock_default_class_attribute
-    ):
-        mock_default_class_attribute.return_value = None
-        element = Element.create(
-            complex_type=ComplexType.create(
-                attributes=[Attribute.create(), Attribute.create()]
-            )
-        )
-        item = ClassFactory.create()
-
-        self.builder.build_class_attributes(element, item)
-
-        mock_build_class_attribute.assert_has_calls(
-            [call(item, attr) for attr in element.complex_type.attributes]
-        )
-
-        self.assertEqual(0, len(item.attrs))
-
-    @patch.object(ClassBuilder, "default_class_attribute")
-    @patch.object(ClassBuilder, "build_class_attribute")
-    def test_build_class_attributes_with_default_class_attribute(
-        self, mock_build_class_attribute, mock_default_class_attribute
-    ):
-        attr = AttrFactory.create(name="foo")
-        mock_default_class_attribute.return_value = attr
-        element = Element.create()
-        item = ClassFactory.create()
-
-        self.builder.build_class_attributes(element, item)
-
-        mock_build_class_attribute.assert_not_called()
-
-        self.assertEqual(1, len(item.attrs))
-        self.assertEqual(attr, item.attrs[0])
 
     @patch.object(ClassBuilder, "children_extensions")
     def test_build_class_extensions(self, mock_children_extensions):
@@ -328,6 +294,7 @@ class ClassBuilderTests(FactoryTestCase):
             wildcard=mock_is_wildcard.return_value,
             index=66,
             restrictions=Restrictions(required=True),
+            nsmap=attribute.nsmap,
         )
         self.assertEqual(expected, item.attrs[0])
         mock_build_class_attribute_types.assert_called_once_with(item, attribute)
@@ -493,42 +460,3 @@ class ClassBuilderTests(FactoryTestCase):
 
             obj.type = "foo"
             self.assertFalse(self.builder.has_anonymous_enumeration(obj))
-
-    @patch("xsdata.builder.logger.warning")
-    def test_default_class_attribute(self, mock_logger_warning):
-        item = ClassFactory.create()
-        expected = AttrFactory.create(
-            name="value",
-            index=0,
-            local_type=TagType.EXTENSION,
-            types=[AttrTypeFactory.create(name=DataType.STRING.code, native=True)],
-        )
-
-        self.assertEqual(expected, ClassBuilder.default_class_attribute(item))
-
-        item = ClassFactory.create(extensions=ExtensionFactory.list(1))
-        self.assertIsNone(ClassBuilder.default_class_attribute(item))
-
-        type_int = AttrTypeFactory.create(name=DataType.INT.code, native=True)
-        type_bool = AttrTypeFactory.create(name=DataType.BOOLEAN.code, native=True)
-
-        extensions = list(map(ExtensionFactory.create, [type_int, type_bool]))
-
-        item = ClassFactory.create(extensions=extensions)
-        expected = AttrFactory.create(
-            name="value",
-            index=0,
-            local_type=TagType.EXTENSION,
-            types=[type_int, type_bool],
-        )
-
-        self.assertEqual(expected, ClassBuilder.default_class_attribute(item))
-        self.assertEqual(0, len(item.extensions))
-
-        item = ClassFactory.create(
-            attrs=AttrFactory.list(2, local_type=TagType.ENUMERATION),
-            extensions=AttrTypeFactory.list(1, name="xs:int"),
-        )
-
-        self.assertIsNone(ClassBuilder.default_class_attribute(item))
-        mock_logger_warning.assert_called_once_with("Empty class: `class_B`")

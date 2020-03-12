@@ -1,20 +1,21 @@
 from dataclasses import dataclass, field
-from typing import Optional
+from typing import List
 
 
 @dataclass
 class OrderDetails:
     """
-    :ivar value:
+    :ivar any_element:
     """
     class Meta:
         name = "orderDetails"
         namespace = "http://datypic.com/ord"
 
-    value: Optional[str] = field(
-        default=None,
+    any_element: List[object] = field(
+        default_factory=list,
         metadata=dict(
-            name="value",
-            type="Extension"
+            type="Any",
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )

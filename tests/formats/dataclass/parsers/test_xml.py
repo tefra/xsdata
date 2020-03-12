@@ -9,7 +9,7 @@ from lxml.etree import QName
 
 from tests.fixtures.books import BookForm
 from tests.fixtures.books import Books
-from tests.fixtures.defxmlschema.chapter04.example04052 import OrderSummary
+from tests.fixtures.defxmlschema.chapter08.example0803 import DressSize
 from tests.fixtures.defxmlschema.chapter12.chapter12 import ProductType
 from xsdata.formats.dataclass.mixins import ClassMeta
 from xsdata.formats.dataclass.mixins import ClassVar
@@ -382,7 +382,7 @@ class XmlParserTests(TestCase):
         result = self.parser.bind_element_text(metadata, element)
         self.assertEqual({}, result)
 
-        metadata = self.parser.class_meta(OrderSummary)
+        metadata = self.parser.class_meta(DressSize)
         result = self.parser.bind_element_text(metadata, element)
         self.assertEqual({}, result)
 

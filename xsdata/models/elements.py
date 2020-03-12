@@ -21,6 +21,7 @@ from xsdata.models.enums import UseType
 from xsdata.models.mixins import ElementBase
 from xsdata.models.mixins import OccurrencesMixin
 from xsdata.models.mixins import RestrictedField
+from xsdata.utils.text import collapse_whitespace
 
 
 def attribute(default=None, init=True, **kwargs):
@@ -141,7 +142,9 @@ class AnyAttribute(AnnotationBase, RestrictedField):
 
     @property
     def real_type(self) -> Optional[str]:
-        return DataType.QMAP.xml_prefixed
+        prefix = self.schema_prefix()
+        suffix = DataType.QMAP.code
+        return f"{prefix}:{suffix}" if prefix else suffix
 
     @property
     def real_name(self) -> str:
@@ -386,6 +389,9 @@ class Any(AnnotationBase, OccurrencesMixin):
     namespace: Optional[str] = attribute(default="##any")
     process_contents: Optional[ProcessType] = attribute()
 
+    def __post_init__(self):
+        self.namespace = collapse_whitespace(self.namespace)
+
     @property
     def is_attribute(self) -> bool:
         return True
@@ -404,7 +410,9 @@ class Any(AnnotationBase, OccurrencesMixin):
 
     @property
     def real_type(self) -> Optional[str]:
-        return DataType.OBJECT.xml_prefixed
+        prefix = self.schema_prefix()
+        suffix = DataType.OBJECT.code
+        return f"{prefix}:{suffix}" if prefix else suffix
 
 
 @dataclass
@@ -1076,8 +1084,19 @@ class Element(AnnotationBase, OccurrencesMixin):
     def is_mixed(self) -> bool:
         if self.complex_type:
             return self.complex_type.is_mixed
+        else:
+            return False
 
-        return False
+    @property
+    def raw_type(self) -> Optional[str]:
+        if self.type:
+            return self.type
+        elif self.has_children:
+            return None
+        else:
+            prefix = self.schema_prefix()
+            suffix = DataType.ANY_TYPE.code
+            return f"{prefix}:{suffix}" if prefix else suffix
 
     @property
     def real_type(self) -> Optional[str]:
@@ -1232,7 +1251,6 @@ class Schema(SchemaLocation):
     target_namespace: Optional[str] = attribute()
     version: Optional[str] = attribute()
     xmlns: Optional[str] = attribute()
-    nsmap: Dict = field(default_factory=dict)
     element_form_default: FormType = attribute(default=FormType.UNQUALIFIED)
     attribute_form_default: FormType = attribute(default=FormType.UNQUALIFIED)
     default_open_content: Optional[DefaultOpenContent] = element(

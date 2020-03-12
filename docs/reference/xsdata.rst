@@ -15,14 +15,14 @@ Submodules
 
 .. toctree::
 
+   xsdata.analyzer
    xsdata.builder
    xsdata.cli
-   xsdata.generators
+   xsdata.exceptions
    xsdata.logger
    xsdata.parser
-   xsdata.reducer
    xsdata.resolver
-   xsdata.tool
+   xsdata.transformer
    xsdata.writer
 
 Module contents

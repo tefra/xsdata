@@ -12,7 +12,7 @@ class BaseType:
         default=None,
         metadata=dict(
             type="Any",
-            namespace="http://datypic.com/prod                        http://datypic.com/ord",
+            namespace="http://datypic.com/prod http://datypic.com/ord",
             required=True
         )
     )

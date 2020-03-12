@@ -104,6 +104,7 @@ class BaseModel:
 class ElementBase(BaseModel):
     index: int = field(default_factory=int)
     id: Optional[str] = None
+    nsmap: Dict = field(default_factory=dict)
 
     @property
     def class_name(self):
@@ -124,6 +125,10 @@ class ElementBase(BaseModel):
     def extensions(self) -> Iterator[str]:
         extends = self.extends or ""
         return filter(None, extends.split(" "))
+
+    @property
+    def has_children(self) -> bool:
+        return next((True for child in self.children()), False)
 
     @property
     def has_form(self) -> bool:
@@ -187,6 +192,26 @@ class ElementBase(BaseModel):
     @property
     def real_type(self) -> Optional[str]:
         raise SchemaValueError(f"Schema class `{self.class_name}` unknown real type.")
+
+    def schema_prefix(self):
+        return next(
+            (
+                prefix
+                for prefix, namespace in self.nsmap.items()
+                if namespace == Namespace.XS.uri
+            ),
+            None,
+        )
+
+    def xml_prefix(self):
+        return next(
+            (
+                prefix
+                for prefix, namespace in self.nsmap.items()
+                if namespace == Namespace.XML.uri
+            ),
+            None,
+        )
 
     def children(self):
         for attribute in fields(self):

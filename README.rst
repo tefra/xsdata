@@ -36,14 +36,14 @@ Features
 - Flattening strategies to keep the code as simple as possible.
 - Preserve embedded documentation and references
 - Pluggable code writer that supports different formats
-- Format: Python Data Classes
+- Output: Python Data Classes
 
   - PEP8 naming conventions and code output
   - Full support for type hints even with forward references
   - XML Parser & Serializer based on lxml
   - JSON Parser & Serializer
 
-- Format: PlantUML class diagram
+- Output: PlantUML class diagram
 
 -------
 

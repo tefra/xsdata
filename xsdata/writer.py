@@ -9,12 +9,14 @@ from xsdata.formats.generators import AbstractGenerator
 from xsdata.formats.plantuml.generator import PlantUmlGenerator
 from xsdata.logger import logger
 from xsdata.models.codegen import Class
-from xsdata.models.elements import Schema
 
 
 @dataclass
 class CodeWriter:
     generators: Dict[str, AbstractGenerator] = field(default_factory=dict)
+    modules: Dict = field(default_factory=dict)
+    packages: Dict = field(default_factory=dict)
+    module_names: Dict = field(default_factory=dict)
 
     @property
     def formats(self):
@@ -28,19 +30,45 @@ class CodeWriter:
             return self.generators[name]
         raise CodeWriterError(f"Unknown code generator `{name}`")
 
-    def write(self, schema: Schema, classes: List[Class], package: str, format: str):
-        engine = self.get_format(format)
-        for file, package, output in engine.render(schema, classes, package):
-            if len(output.strip()) > 0:
+    def write(self, classes: List[Class], output: str):
+        engine = self.get_format(output)
+        for file, package, buffer in engine.render(classes):
+            if len(buffer.strip()) > 0:
                 logger.info("Generating package: %s", package)
 
                 file.parent.mkdir(parents=True, exist_ok=True)
-                file.write_text(output)
+                file.write_text(buffer)
 
-    def print(self, schema: Schema, classes: List[Class], package: str, format: str):
-        engine = self.get_format(format)
-        for _, _, output in engine.render(schema, classes, package):
-            print(output, end="")
+    def print(self, classes: List[Class], output: str):
+        engine = self.get_format(output)
+        for _, _, buffer in engine.render(classes):
+            print(buffer, end="")
+
+    def designate(self, classes: List[Class], output: str):
+        for obj in classes:
+            obj.module = self.unique_module_name(obj.module, output)
+            obj.package = self.unique_package_name(obj.package, output)
+
+    def unique_module_name(self, module: str, output: str):
+        if module not in self.modules:
+            engine = self.get_format(output)
+            name = module[:-4] if module.endswith(".xsd") else module
+            name = engine.module_name(name)
+            if name in self.module_names:
+                self.module_names[name] += 1
+                name = engine.module_name(f"{name}_{self.module_names[name] - 1}")
+            else:
+                self.module_names[name] = 1
+
+            self.modules[module] = name
+
+        return self.modules[module]
+
+    def unique_package_name(self, package: str, output: str):
+        if package not in self.packages:
+            engine = self.get_format(output)
+            self.packages[package] = engine.package_name(package)
+        return self.packages[package]
 
 
 writer = CodeWriter()

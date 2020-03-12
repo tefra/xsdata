@@ -6,13 +6,6 @@
 
     Itergration teams and clients don't care about any of that, take out abstraction and flexibility and you are left with lean named data structures with typed attributes and a namespace for humans to read!
 
-Roadmap
--------
-
-* Add option to split classes in multiple files
-* Python formats: attrs and pydantic
-* Java format: JaxB compatible models :)
-* Validators
 
 .. toctree::
     :maxdepth: 2

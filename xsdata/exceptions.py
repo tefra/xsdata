@@ -26,9 +26,13 @@ class SchemaValueError(ValueError):
     pass
 
 
-class ReducerValueError(ValueError):
+class AnalyzerValueError(ValueError):
     pass
 
 
 class ResolverValueError(ValueError):
+    pass
+
+
+class GeneratorValueError(ValueError):
     pass

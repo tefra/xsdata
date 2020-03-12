@@ -6,6 +6,8 @@ from unittest import TestCase
 
 from xsdata.exceptions import SchemaValueError
 from xsdata.models import elements as el
+from xsdata.models.elements import ComplexType
+from xsdata.models.elements import Element
 from xsdata.models.enums import FormType
 from xsdata.models.mixins import ElementBase
 from xsdata.models.mixins import OccurrencesMixin
@@ -93,6 +95,16 @@ class ElementBaseTests(TestCase):
                 return "a b   c"
 
         self.assertEqual(["a", "b", "c"], list(Foo().extensions))
+
+    def test_property_has_children(self):
+        element = ElementBase()
+        self.assertFalse(element.has_children)
+
+        element = Element.create()
+        self.assertFalse(element.has_children)
+
+        element.complex_type = ComplexType.create()
+        self.assertTrue(element.has_children)
 
     def test_property_has_form(self):
         element = ElementBase()

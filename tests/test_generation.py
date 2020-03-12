@@ -11,9 +11,6 @@ from click.testing import CliRunner
 from jinja2 import Template
 
 from xsdata import cli
-from xsdata.formats.dataclass.generator import DataclassGenerator
-from xsdata.reducer import reducer
-from xsdata.writer import writer
 
 here = Path(__file__).parent
 fixtures = here.joinpath("fixtures")
@@ -115,11 +112,6 @@ def parse_title(source):
     return ""
 
 
-def teardown_function():
-    reducer.common_types.clear()
-    writer.register_format("pydata", DataclassGenerator())
-
-
 def teardown_module():
 
     results = [
@@ -133,8 +125,9 @@ def teardown_module():
         "\n".join(results)
     )
 
-    for rst in here.parent.joinpath(f"").glob("docs/tests/defxmlschema/*.rst"):
-        rst.unlink()
+    if passed > 1:
+        for rst in here.parent.joinpath(f"").glob("docs/tests/defxmlschema/*.rst"):
+            rst.unlink()
 
     docs: Dict[str, List[Documentation]] = defaultdict(list)
     sections = defaultdict(int)

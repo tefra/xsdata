@@ -5,7 +5,6 @@ from tests.factories import ClassFactory
 from tests.factories import FactoryTestCase
 from tests.factories import PackageFactory
 from xsdata.formats.dataclass.generator import DataclassGenerator
-from xsdata.models.elements import Schema
 from xsdata.resolver import DependenciesResolver
 
 
@@ -19,10 +18,8 @@ class DataclassGeneratorTests(FactoryTestCase):
         mock_prepare_imports,
         mock_render_classes,
         mock_render_module,
-        mock_resolved_process,
+        mock_resolver_process,
     ):
-        schema = Schema.create(location=Path("foo.xsd"))
-        package = "some.Foo.Some.ThugLife"
         classes = ClassFactory.list(3)
 
         mock_render_module.return_value = "module"
@@ -31,22 +28,18 @@ class DataclassGeneratorTests(FactoryTestCase):
         ]
         mock_render_classes.return_value = "classes"
 
-        iterator = DataclassGenerator().render(schema, classes, package)
+        iterator = DataclassGenerator().render(classes)
 
         actual = [out for out in iterator]
         self.assertEqual(1, len(actual))
         self.assertEqual(3, len(actual[0]))
         self.assertIsInstance(actual[0][0], Path)
         self.assertTrue(actual[0][0].is_absolute())
-        self.assertEqual("some.foo.some.thug_life.foo", actual[0][1])
-        self.assertEqual(
-            "some/foo/some/thug_life/foo.py", str(actual[0][0].relative_to(Path.cwd()))
-        )
+        self.assertEqual("foo.tests", actual[0][1])
+        self.assertEqual("foo/tests.py", str(actual[0][0].relative_to(Path.cwd())))
         self.assertEqual(mock_render_module.return_value, actual[0][2])
 
-        mock_resolved_process.assert_called_once_with(
-            classes=classes, schema=schema, package="some.foo.some.thug_life.foo"
-        )
+        mock_resolver_process.assert_called_once_with(classes)
 
         mock_prepare_imports.assert_called_once()
         mock_prepare_imports.render_classes()
@@ -57,22 +50,18 @@ class DataclassGeneratorTests(FactoryTestCase):
 
     @mock.patch.object(DataclassGenerator, "render_class")
     @mock.patch.object(DataclassGenerator, "process_class")
-    @mock.patch.object(DependenciesResolver, "sorted_classes")
-    def test_render_classes(
-        self, mock_sorted_classes, mock_process_class, mock_render_class
-    ):
+    def test_render_classes(self, mock_process_class, mock_render_class):
         renders = [" does it matter?", " white space "]
-        mock_sorted_classes.return_value = ClassFactory.list(2)
+        classes = ClassFactory.list(2)
         mock_process_class.side_effect = ClassFactory.list(2)
         mock_render_class.side_effect = renders
         output = "\n".join(renders).strip()
 
-        actual = DataclassGenerator().render_classes()
+        actual = DataclassGenerator().render_classes(classes)
         self.assertEqual(f"\n\n{output}\n", actual)
 
     @mock.patch.object(DataclassGenerator, "process_import")
-    @mock.patch.object(DependenciesResolver, "sorted_imports")
-    def test_prepare_imports(self, mock_sorted_imports, mock_process_import):
+    def test_prepare_imports(self, mock_process_import):
         packages = [
             PackageFactory.create(name="foo", source="omg"),
             PackageFactory.create(name="bar", source="omg"),
@@ -84,17 +73,14 @@ class DataclassGeneratorTests(FactoryTestCase):
             PackageFactory.create(name="ccc", source="c"),
         ]
 
-        mock_sorted_imports.return_value = packages
         mock_process_import.side_effect = processed
 
         expected = {"omg": processed[:2], "life": processed[2:]}
 
-        actual = DataclassGenerator().prepare_imports()
+        actual = DataclassGenerator().prepare_imports(packages)
         self.assertEqual(expected, actual)
 
     def test_module_name(self):
         generator = DataclassGenerator()
-        self.assertEqual("foo_bar", generator.module_name("fooBar.xsd"))
-        self.assertEqual("foo_bar_1", generator.module_name("fooBar.xsd"))
-        self.assertEqual("foo_bar_2", generator.module_name("fooBar.xsd"))
+        self.assertEqual("foo_bar", generator.module_name("fooBar"))
         self.assertEqual("foo_bar_wtf", generator.module_name("fooBar.wtf"))

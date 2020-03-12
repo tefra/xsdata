@@ -1,7 +1,7 @@
-xsdata.generators module
+xsdata.exceptions module
 ========================
 
-.. automodule:: xsdata.generators
+.. automodule:: xsdata.exceptions
    :members:
    :undoc-members:
    :show-inheritance:

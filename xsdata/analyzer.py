@@ -8,7 +8,6 @@ from typing import Optional
 
 from lxml import etree
 
-from xsdata.exceptions import AnalyzerValueError
 from xsdata.logger import logger
 from xsdata.models.codegen import Attr
 from xsdata.models.codegen import AttrType
@@ -132,33 +131,31 @@ class ClassAnalyzer:
         """Merge original and redefined classes."""
         grouped: Dict[str, List[Class]] = defaultdict(list)
         for item in classes:
-            grouped[f"{item.type.__name__}{item.name}"].append(item)
+            grouped[f"{item.type.__name__}{item.source_qname()}"].append(item)
 
         for items in grouped.values():
             if len(items) == 1:
                 continue
-            if len(items) > 2:
-                raise AnalyzerValueError(
-                    f"Redefined class `{items[0].name}` more than once."
-                )
 
             winner: Class = items.pop()
-            looser: Class = items.pop()
-            classes.remove(looser)
+            for item in items:
+                classes.remove(item)
 
-            self_extension = next(
-                (
-                    ext
-                    for ext in winner.extensions
-                    if text.suffix(ext.type.name) == winner.name
-                ),
-                None,
-            )
+                self_extension = next(
+                    (
+                        ext
+                        for ext in winner.extensions
+                        if text.suffix(ext.type.name) == winner.name
+                    ),
+                    None,
+                )
 
-            if self_extension:
+                if not self_extension:
+                    continue
+
                 winner.extensions.remove(self_extension)
-                self.copy_attributes(looser, winner, self_extension)
-                for looser_ext in looser.extensions:
+                self.copy_attributes(item, winner, self_extension)
+                for looser_ext in item.extensions:
                     new_ext = looser_ext.clone()
                     new_ext.restrictions.update(self_extension.restrictions, force=True)
                     winner.extensions.append(new_ext)

@@ -9,7 +9,6 @@ from tests.factories import FactoryTestCase
 from tests.factories import RestrictionsFactory
 from xsdata.analyzer import ClassAnalyzer
 from xsdata.analyzer import simple_type
-from xsdata.exceptions import AnalyzerValueError
 from xsdata.models.codegen import AttrType
 from xsdata.models.codegen import Restrictions
 from xsdata.models.elements import ComplexType
@@ -593,17 +592,6 @@ class ClassAnalyzerMergeClassesTests(ClassAnalyzerBaseTestCase):
         classes = ClassFactory.list(2)
         self.analyzer.merge_redefined_classes(classes)
         self.assertEqual(2, len(classes))
-
-    def test_raises_exception_with_more_than_two_redefines(self):
-        class_a = ClassFactory.create()
-        class_b = class_a.clone()
-        class_c = class_a.clone()
-
-        classes = [class_a, class_b, class_c]
-        with self.assertRaises(AnalyzerValueError) as cm:
-            self.analyzer.merge_redefined_classes(classes)
-
-        self.assertEqual("Redefined class `class_B` more than once.", str(cm.exception))
 
     @mock.patch.object(ClassAnalyzer, "copy_attributes")
     def test_copies_attributes(self, mock_copy_attributes):

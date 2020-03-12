@@ -62,11 +62,9 @@ class DependenciesResolverTest(FactoryTestCase):
         self.resolver.class_map = {x: ClassFactory.create(name=x) for x in "ca"}
 
         result = self.resolver.sorted_classes()
-        self.assertIsInstance(result, Iterator)
-
         expected = [self.resolver.class_map[x] for x in "ac"]
 
-        self.assertEqual(expected, list(result))
+        self.assertEqual(expected, result)
         mock_apply_aliases.assert_has_calls([mock.call(x) for x in expected])
 
     def test_apply_aliases(self):
@@ -96,8 +94,7 @@ class DependenciesResolverTest(FactoryTestCase):
             ],
         )
 
-        result = self.resolver.apply_aliases(obj)
-        self.assertIs(result, obj)
+        self.resolver.apply_aliases(obj)
 
         self.assertEqual(3, len(obj.attrs))
         self.assertEqual(1, len(obj.attrs[0].types))

@@ -2,7 +2,6 @@ import logging
 from dataclasses import dataclass
 from dataclasses import field
 from typing import Dict
-from typing import Iterator
 from typing import List
 from typing import Set
 
@@ -43,15 +42,19 @@ class DependenciesResolver:
         """Return a new sorted by name list of import packages."""
         return sorted(self.imports, key=lambda x: x.name)
 
-    def sorted_classes(self) -> Iterator[Class]:
+    def sorted_classes(self) -> List[Class]:
         """Return an iterator of classes property sorted for generation and
         apply import aliases."""
+
+        result = []
         for name in self.class_list:
             obj = self.class_map.get(name)
             if obj is not None:
-                yield self.apply_aliases(obj)
+                self.apply_aliases(obj)
+                result.append(obj)
+        return result
 
-    def apply_aliases(self, obj: Class) -> Class:
+    def apply_aliases(self, obj: Class):
         """Walk the attributes tree and set the type aliases."""
         for attr in obj.attrs:
             for attr_type in attr.types:
@@ -60,8 +63,6 @@ class DependenciesResolver:
 
         for inner in obj.inner:
             self.apply_aliases(inner)
-
-        return obj
 
     def resolve_imports(self):
         """Walk the import qualified names, check for naming collisions and add

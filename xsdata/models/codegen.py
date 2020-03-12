@@ -179,6 +179,8 @@ class Class:
     type: Type
     is_abstract: bool
     is_mixed: bool
+    package: str
+    module: str
     namespace: Optional[str] = field(default=None)
     local_name: str = field(init=False)
     help: Optional[str] = field(default=None)
@@ -186,8 +188,6 @@ class Class:
     attrs: List[Attr] = field(default_factory=list)
     inner: List["Class"] = field(default_factory=list)
     nsmap: Dict = field(default_factory=dict)
-    package: Optional[str] = field(default=None)
-    module: Optional[str] = field(default=None)
     source_namespace: Optional[str] = field(default=None)
 
     def __post_init__(self):

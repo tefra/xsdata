@@ -36,6 +36,7 @@ AttributeElement = Union[
 @dataclass
 class ClassBuilder:
     schema: Schema
+    package: str
     redefine: Optional[Redefine] = field(default=None)
 
     def build(self) -> List[Class]:
@@ -70,6 +71,7 @@ class ClassBuilder:
             nsmap=obj.nsmap,
             source_namespace=self.schema.target_namespace,
             module=self.schema.module,
+            package=self.package,
         )
 
         self.build_class_extensions(obj, instance)

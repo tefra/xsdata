@@ -70,6 +70,7 @@ class ClassFactory(Factory):
         attrs=None,
         inner=None,
         nsmap=None,
+        package="foo",
         module="tests",
     ):
         return cls.model(
@@ -83,6 +84,7 @@ class ClassFactory(Factory):
             attrs=attrs or [],
             inner=inner or [],
             help=help,
+            package=package,
             module=module,
             nsmap=nsmap if isinstance(nsmap, dict) else NSMAP,
         )

@@ -34,7 +34,7 @@ class ClassBuilderTests(FactoryTestCase):
     def setUp(self) -> None:
         super(ClassBuilderTests, self).setUp()
         self.schema = Schema.create(location=Path(__file__), target_namespace="builder")
-        self.builder = ClassBuilder(schema=self.schema)
+        self.builder = ClassBuilder(schema=self.schema, package="tests")
 
     @patch.object(Redefine, "children")
     @patch.object(Override, "children")
@@ -48,7 +48,7 @@ class ClassBuilderTests(FactoryTestCase):
             group=Group.create(),
             attribute_group=AttributeGroup.create(),
         )
-        self.builder = ClassBuilder(schema=self.schema, redefine=redefine)
+        self.builder.redefine = redefine
 
         for _ in range(2):
             self.schema.simple_types.append(SimpleType.create())
@@ -158,6 +158,7 @@ class ClassBuilderTests(FactoryTestCase):
             is_abstract=True,
             namespace="foo:name",
             nsmap=element.nsmap,
+            package=self.builder.package,
             module=self.schema.module,
             source_namespace=self.schema.target_namespace,
         )

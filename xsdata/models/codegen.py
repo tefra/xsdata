@@ -186,6 +186,7 @@ class Class:
     attrs: List[Attr] = field(default_factory=list)
     inner: List["Class"] = field(default_factory=list)
     nsmap: Dict = field(default_factory=dict)
+    package: Optional[str] = field(default=None)
     module: Optional[str] = field(default=None)
     source_namespace: Optional[str] = field(default=None)
 
@@ -203,6 +204,10 @@ class Class:
     @property
     def is_common(self):
         return self.type not in [Element, ComplexType]
+
+    @property
+    def target_module(self):
+        return f"{self.package}.{self.module}"
 
     @property
     def is_element(self):

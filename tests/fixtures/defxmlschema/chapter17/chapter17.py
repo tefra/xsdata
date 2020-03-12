@@ -187,9 +187,3 @@ class OrderType:
             required=True
         )
     )
-
-
-@dataclass
-class Order(OrderType):
-    class Meta:
-        name = "order"

@@ -195,7 +195,7 @@ class Class:
 
     @property
     def key(self) -> str:
-        return f"{self.type.__name__}::{self.name}"
+        return f"{self.source_namespace}::{self.type.__name__}::{self.name}"
 
     @property
     def is_enumeration(self) -> bool:

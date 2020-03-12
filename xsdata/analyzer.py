@@ -345,6 +345,3 @@ class ClassAnalyzer:
             )
 
         item.attrs.insert(0, attr)
-
-
-analyzer = ClassAnalyzer()

@@ -5,7 +5,7 @@ from typing import List
 from typing import Optional
 from typing import Union
 
-from xsdata.analyzer import analyzer
+from xsdata.analyzer import ClassAnalyzer
 from xsdata.builder import ClassBuilder
 from xsdata.logger import logger
 from xsdata.models.codegen import Class
@@ -25,34 +25,59 @@ class SchemaTransformer:
     processed: List[Path] = field(init=False, default_factory=list)
     included: List[Path] = field(init=False, default_factory=list)
 
-    def process(
+    def process(self, schema_path: Path, package: str):
+        classes = self.process_schema(schema_path, package)
+        classes = self.analyze_classes(classes)
+        class_num, inner_num = self.count_classes(classes)
+
+        if not class_num:
+            return logger.warning("Analyzer returned zero classes!")
+
+        logger.info("Analyzer: %d main and %d inner classes", class_num, inner_num)
+
+        writer.designate(classes, self.format)
+        if self.print:
+            writer.print(classes, self.format)
+        else:
+            writer.write(classes, self.format)
+
+    def analyze_classes(self, classes: List[Class]):
+        analyzer = ClassAnalyzer()
+        return analyzer.process(classes)
+
+    def process_schema(
         self,
         schema_path: Path,
         package: str,
         target_namespace: Optional[str] = None,
         redefine: Optional[Redefine] = None,
-    ):
+    ) -> List[Class]:
         """Recursively parse the given schema and all it's included schemas and
-        orchestrate the code generation to the target format."""
+        generate a list of classes."""
+        classes = []
         if schema_path not in self.processed:
             logger.info("Parsing schema...")
             schema = self.parse_schema(schema_path, target_namespace)
+            target_namespace = schema.target_namespace
             for sub in schema.included():
-                self.process_included(sub, package, schema.target_namespace)
+                included_classes = self.process_included(sub, package, target_namespace)
+                classes.extend(included_classes)
 
             self.processed.append(schema_path)
-            self.generate_code(schema, package, redefine)
+            classes.extend(self.generate_classes(schema, package, redefine))
         else:
             logger.debug("Circular import skipping: %s", schema_path.name)
+        return classes
 
     def process_included(
         self,
         included: Union[Import, Include, Redefine, Override],
         package: str,
         target_namespace: Optional[str],
-    ):
+    ) -> List[Class]:
         """Prepare the given included schema location and send it for
         processing."""
+        classes = []
         if not included.location:
             logger.warning(
                 "%s: %s unresolved schema location..",
@@ -69,25 +94,29 @@ class SchemaTransformer:
             self.included.append(included.location)
             package = self.adjust_package(package, included.schema_location)
 
-            self.process(
+            classes = self.process_schema(
                 included.location,
                 package=package,
                 target_namespace=target_namespace,
                 redefine=included if isinstance(included, Redefine) else None,
             )
+        return classes
 
-    def generate_code(self, schema: Schema, package: str, redefine: Optional[Redefine]):
+    def generate_classes(
+        self, schema: Schema, package: str, redefine: Optional[Redefine]
+    ):
         """Convert the given schema tree to codegen classes and use the writer
         factory to either generate or print the result code."""
         logger.info("Compiling schema...")
-        classes = ClassBuilder(schema, redefine).build()
-        classes = analyzer.process(classes)
+        classes = ClassBuilder(
+            schema=schema, package=package, redefine=redefine
+        ).build()
 
         class_num, inner_num = self.count_classes(classes)
         if class_num > 0:
-            logger.info("Compiled %d main and %d inner classes", class_num, inner_num)
-            callback = writer.print if self.print else writer.write
-            callback(classes, package, self.format)
+            logger.info("Builder: %d main and %d inner classes", class_num, inner_num)
+
+        return classes
 
     @staticmethod
     def parse_schema(schema_path: Path, target_namespace: Optional[str]) -> Schema:

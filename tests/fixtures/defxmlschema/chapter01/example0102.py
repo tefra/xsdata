@@ -36,9 +36,3 @@ class ProductType:
             type="Attribute"
         )
     )
-
-
-@dataclass
-class Product(ProductType):
-    class Meta:
-        name = "product"

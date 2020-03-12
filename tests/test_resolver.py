@@ -1,4 +1,3 @@
-from collections.abc import Iterator
 from unittest import mock
 
 from lxml.etree import QName

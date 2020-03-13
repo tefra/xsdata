@@ -1,4 +1,3 @@
-import sys
 from unittest import mock
 
 from tests.factories import AttrFactory
@@ -379,28 +378,6 @@ class ClassAnalyzerHelpersTests(ClassAnalyzerBaseTestCase):
             types=[extension.type.clone()],
             local_type=TagType.ANY,
             restrictions=Restrictions(min_occurs=1, max_occurs=1, required=True),
-            nsmap={},
-        )
-
-        self.assertEqual(1, len(item.attrs))
-        self.assertEqual(expected, item.attrs[0])
-
-    def test_create_default_attribute_with_any_type_defaults_to_list(self):
-        item = ClassFactory.create()
-        extension = ExtensionFactory.create(
-            type=AttrTypeFactory.create(name=DataType.ANY_TYPE.code, native=True),
-            restrictions=Restrictions(required=True),
-        )
-
-        ClassAnalyzer.create_default_attribute(item, extension)
-        expected = AttrFactory.create(
-            name="##any_element",
-            index=0,
-            wildcard=True,
-            default=list,
-            types=[extension.type.clone()],
-            local_type=TagType.ANY,
-            restrictions=Restrictions(min_occurs=0, max_occurs=sys.maxsize),
             nsmap={},
         )
 

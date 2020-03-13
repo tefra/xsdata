@@ -1,4 +1,3 @@
-import sys
 from collections import defaultdict
 from dataclasses import dataclass
 from dataclasses import field
@@ -13,7 +12,6 @@ from xsdata.models.codegen import Attr
 from xsdata.models.codegen import AttrType
 from xsdata.models.codegen import Class
 from xsdata.models.codegen import Extension
-from xsdata.models.codegen import Restrictions
 from xsdata.models.enums import DataType
 from xsdata.models.enums import TagType
 from xsdata.utils import text
@@ -318,18 +316,15 @@ class ClassAnalyzer:
 
     @staticmethod
     def create_default_attribute(item: Class, extension: Extension):
-
         if extension.type.native_code == DataType.ANY_TYPE.code:
-            restrictions = Restrictions(min_occurs=0, max_occurs=sys.maxsize)
-            restrictions.update(extension.restrictions, force=True)
             attr = Attr(
                 name="##any_element",
                 index=0,
                 wildcard=True,
-                default=list if restrictions.is_list else None,
+                default=list if extension.restrictions.is_list else None,
                 types=[extension.type.clone()],
                 local_type=TagType.ANY,
-                restrictions=restrictions,
+                restrictions=extension.restrictions.clone(),
             )
         else:
             attr = Attr(

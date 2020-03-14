@@ -184,9 +184,9 @@ class ClassBuilderTests(FactoryTestCase):
         self.builder.build_class_extensions(element, item)
 
         self.assertEqual(3, len(item.extensions))
-        self.assertIs(double, item.extensions[0])
+        self.assertEqual(self_ext, item.extensions[0])
         self.assertIs(foo, item.extensions[1])
-        self.assertEqual(self_ext, item.extensions[2])
+        self.assertIs(double, item.extensions[2])
 
     def test_element_children(self):
         complex_type = ComplexType.create(

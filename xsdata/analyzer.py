@@ -191,7 +191,7 @@ class ClassAnalyzer:
         if item.is_common:
             self.flatten_enumeration_unions(item)
 
-        for extension in list(item.extensions):
+        for extension in reversed(item.extensions):
             self.flatten_extension(item, extension)
 
         for attr in list(item.attrs):
@@ -292,7 +292,7 @@ class ClassAnalyzer:
                 for index, attr in enumerate(target.attrs)
                 if attr.index > extension.type.index
             ),
-            0,
+            len(target.attrs),
         )
         for attr in source.attrs:
             new_attr = attr.clone()

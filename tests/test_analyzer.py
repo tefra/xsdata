@@ -241,10 +241,10 @@ class ClassAnalyzerFlattenClassTests(ClassAnalyzerBaseTestCase):
 
         mock_flatten_extension.assert_has_calls(
             [
-                mock.call(obj, "b"),
                 mock.call(obj, "c"),
-                mock.call(obj.inner[0], "g"),
+                mock.call(obj, "b"),
                 mock.call(obj.inner[0], "h"),
+                mock.call(obj.inner[0], "g"),
             ]
         )
         mock_flatten_attribute.assert_has_calls(
@@ -403,7 +403,7 @@ class ClassAnalyzerHelpersTests(ClassAnalyzerBaseTestCase):
         )
         ext_b = ExtensionFactory.create(type=AttrTypeFactory.create(name="b", index=2))
         ext_c = ExtensionFactory.create(
-            type=AttrTypeFactory.create(name="common:c", index=66)
+            type=AttrTypeFactory.create(name="common:c", index=111)
         )
 
         obj = ClassFactory.create(
@@ -418,10 +418,10 @@ class ClassAnalyzerHelpersTests(ClassAnalyzerBaseTestCase):
         attrs = [
             ("i", "i"),
             ("j", "other:j"),
-            ("x", "common:x"),
-            ("y", "other:y"),
             ("a", "string"),
             ("b", "string"),
+            ("x", "common:x"),
+            ("y", "other:y"),
         ]
         self.assertEqual(
             attrs,

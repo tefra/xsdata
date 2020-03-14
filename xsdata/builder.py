@@ -100,7 +100,7 @@ class ClassBuilder:
             extension.forward_ref = False
             extensions[extension.type.name] = extension
 
-        instance.extensions = sorted(extensions.values(), key=lambda x: x.type.name)
+        instance.extensions = sorted(extensions.values(), key=lambda x: x.type.index)
 
     def build_data_type(
         self, instance: Class, name: str, index: int = 0, forward_ref: bool = False

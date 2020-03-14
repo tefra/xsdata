@@ -17,6 +17,7 @@ from xsdata.formats.dataclass.mixins import ClassMeta
 from xsdata.formats.dataclass.mixins import ClassVar
 from xsdata.formats.dataclass.mixins import ModelInspect
 from xsdata.formats.dataclass.models import AnyElement
+from xsdata.formats.dataclass.models import AnyText
 from xsdata.formats.dataclass.parsers.json import T
 from xsdata.formats.mixins import AbstractXmlParser
 from xsdata.models.enums import EventType
@@ -167,9 +168,9 @@ class XmlParser(AbstractXmlParser, ModelInspect):
         elif isinstance(item, ClassQueueItem):
             attr_params = self.bind_element_attrs(item.meta, element)
             text_params = self.bind_element_text(item.meta, element)
-            children = self.fetch_class_children(item, element)
+            child_params = self.fetch_class_children(item, element)
             qname = QName(element.tag)
-            obj = item.meta.clazz(**attr_params, **text_params, **children)
+            obj = item.meta.clazz(**attr_params, **text_params, **child_params)
         else:  # unknown :)
             raise ParserError(f"Failed to create object from {element.tag}")
 
@@ -241,12 +242,16 @@ class XmlParser(AbstractXmlParser, ModelInspect):
         return params
 
     def bind_element_text(self, metadata: ClassMeta, element: Element):
-        params = dict()
+        if len(element):
+            return dict()
+
         var = metadata.any_text
         if var and element.text is not None and var.init:
-            params[var.name] = self.parse_value(var.types, element.text, var.default)
-
-        return params
+            return {var.name: self.parse_value(var.types, element.text, var.default)}
+        var = metadata.any_element
+        if var and element.text is not None and not var.is_list:
+            return {var.name: self.parse_any_text(element)}
+        return {}
 
     @classmethod
     def parse_any_element(cls, element: Element) -> Optional[AnyElement]:
@@ -258,8 +263,26 @@ class XmlParser(AbstractXmlParser, ModelInspect):
                 qname=element.tag,
                 text=txt,
                 tail=tail,
-                attributes={k: v for k, v in element.attrib.items()},
+                attributes=cls.parse_any_attributes(element),
             )
+
+    @classmethod
+    def parse_any_text(cls, element: Element) -> Optional[AnyText]:
+        return AnyText(
+            text=element.text or None,
+            nsmap=element.nsmap,
+            attributes=cls.parse_any_attributes(element),
+        )
+
+    @classmethod
+    def parse_any_attributes(cls, element: Element):
+        def qname(name):
+            prefix, suffix = text.split(name)
+            if prefix and prefix in element.nsmap:
+                return QName(element.nsmap[prefix], suffix)
+            return name
+
+        return {qname(key): qname(value) for key, value in element.attrib.items()}
 
     @classmethod
     def element_text_and_tail(cls, element: Element) -> Tuple:

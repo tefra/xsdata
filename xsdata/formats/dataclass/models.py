@@ -11,6 +11,15 @@ class AnyElement:
     text: Optional[str] = field(default=None)
     tail: Optional[str] = field(default=None)
     children: List[object] = field(default_factory=list)
-    attributes: Dict[str, str] = field(
+    attributes: Dict = field(
+        default_factory=dict, metadata=dict(name="attributes", type="AnyAttribute")
+    )
+
+
+@dataclass
+class AnyText:
+    text: Optional[str]
+    nsmap: Dict = field(default_factory=dict)
+    attributes: Dict = field(
         default_factory=dict, metadata=dict(name="attributes", type="AnyAttribute")
     )

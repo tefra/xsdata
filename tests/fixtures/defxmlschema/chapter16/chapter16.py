@@ -94,12 +94,11 @@ class Umbrella:
     class Meta:
         name = "umbrella"
 
-    any_element: List[object] = field(
-        default_factory=list,
+    any_element: Optional[object] = field(
+        default=None,
         metadata=dict(
             type="Any",
-            min_occurs=0,
-            max_occurs=9223372036854775807
+            required=True
         )
     )
 

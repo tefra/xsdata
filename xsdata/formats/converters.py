@@ -87,4 +87,5 @@ func_map: Dict[str, Callable] = {
     "float": float,
     "bool": to_bool,
     "Decimal": Decimal,
+    "object": str,
 }

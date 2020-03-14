@@ -6,21 +6,26 @@ from unittest.case import TestCase
 from lxml.etree import Comment
 from lxml.etree import Element
 from lxml.etree import QName
+from lxml.etree import SubElement
 
 from tests.fixtures.books import BookForm
 from tests.fixtures.books import Books
+from tests.fixtures.defxmlschema.chapter04.example04052 import OrderSummary
 from tests.fixtures.defxmlschema.chapter08.example0803 import DressSize
+from tests.fixtures.defxmlschema.chapter11.example1101 import TextType
 from tests.fixtures.defxmlschema.chapter12.chapter12 import ProductType
 from xsdata.formats.dataclass.mixins import ClassMeta
 from xsdata.formats.dataclass.mixins import ClassVar
 from xsdata.formats.dataclass.mixins import Tag
 from xsdata.formats.dataclass.models import AnyElement
+from xsdata.formats.dataclass.models import AnyText
 from xsdata.formats.dataclass.parsers.xml import ClassQueueItem
 from xsdata.formats.dataclass.parsers.xml import PrimitiveQueueItem
 from xsdata.formats.dataclass.parsers.xml import SkipQueueItem
 from xsdata.formats.dataclass.parsers.xml import WildcardQueueItem
 from xsdata.formats.dataclass.parsers.xml import XmlParser
 from xsdata.models.enums import EventType
+from xsdata.models.enums import Namespace
 
 
 class XmlParserTests(TestCase):
@@ -374,13 +379,22 @@ class XmlParserTests(TestCase):
         actual = self.parser.bind_element_attrs(metadata, element)
         self.assertEqual({}, actual)
 
-    @mock.patch.object(XmlParser, "parse_value", return_value="yes!")
-    def test_bind_element_text(self, mock_parse_value):
+    def test_bind_element_text_with_no_text_and_any_var(self):
         element = Element("foo")
+        element.text = "foo"
 
         metadata = self.parser.class_meta(Books)
         result = self.parser.bind_element_text(metadata, element)
         self.assertEqual({}, result)
+
+        SubElement(element, "bar")  # skip with children
+        metadata = self.parser.class_meta(DressSize)
+        result = self.parser.bind_element_text(metadata, element)
+        self.assertEqual({}, result)
+
+    @mock.patch.object(XmlParser, "parse_value", return_value="yes!")
+    def test_bind_element_text_with_text_var(self, mock_parse_value):
+        element = Element("foo")
 
         metadata = self.parser.class_meta(DressSize)
         result = self.parser.bind_element_text(metadata, element)
@@ -393,6 +407,18 @@ class XmlParserTests(TestCase):
             metadata.any_text.types, element.text, metadata.any_text.default
         )
 
+    def test_bind_element_text_with_any_var(self):
+        element = Element("foo")
+        element.text = "foo"
+
+        metadata = self.parser.class_meta(TextType)  # is list and will be ignored
+        result = self.parser.bind_element_text(metadata, element)
+        self.assertEqual({}, result)
+
+        metadata = self.parser.class_meta(OrderSummary)
+        result = self.parser.bind_element_text(metadata, element)
+        self.assertEqual({"any_element": AnyText(text="foo")}, result)
+
     def test_parse_any_element(self):
         comment = Comment("foo")
         self.assertIsNone(XmlParser.parse_any_element(comment))
@@ -400,12 +426,44 @@ class XmlParserTests(TestCase):
         element = Element("foo")
         element.set("a", "1")
         element.set("b", "2")
+        element.set(
+            QName(Namespace.XSI.uri, "type").text, QName(Namespace.XS.uri, "float").text
+        )
         element.text = "yes"
         element.tail = "no"
 
         actual = XmlParser.parse_any_element(element)
         expected = AnyElement(
-            qname=element.tag, text="yes", tail="no", attributes=dict(a="1", b="2")
+            qname=element.tag,
+            text="yes",
+            tail="no",
+            attributes={
+                "a": "1",
+                "b": "2",
+                QName(Namespace.XSI.uri, "type"): QName(Namespace.XS.uri, "float"),
+            },
+        )
+        self.assertEqual(expected, actual)
+
+    def test_parse_any_text(self):
+        element = Element("foo")
+        element.set("a", "1")
+        element.set("b", "2")
+        element.set(
+            QName(Namespace.XSI.uri, "type").text, QName(Namespace.XS.uri, "float").text
+        )
+        element.text = "yes"
+        element.tail = "no"
+
+        actual = XmlParser.parse_any_text(element)
+        expected = AnyText(
+            text="yes",
+            nsmap=element.nsmap,
+            attributes={
+                "a": "1",
+                "b": "2",
+                QName(Namespace.XSI.uri, "type"): QName(Namespace.XS.uri, "float"),
+            },
         )
         self.assertEqual(expected, actual)
 

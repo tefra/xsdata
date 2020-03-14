@@ -4,6 +4,73 @@ from tests.fixtures.books import BookForm
 from tests.fixtures.books import Books
 from xsdata.exceptions import ModelInspectionError
 from xsdata.formats.dataclass.serializers import XmlSerializer
+from xsdata.formats.dataclass.serializers.xml import Namespaces
+from xsdata.models.enums import Namespace
+
+
+class NamespacesTests(TestCase):
+    def test_add(self):
+        namespaces = Namespaces()
+        namespaces.add("foo")
+        namespaces.add("bar", "b")
+        namespaces.add(Namespace.XSI.uri, "superxsi")
+        namespaces.add(Namespace.XS.uri, "xs")
+
+        expected = {
+            "bar": "b",
+            "foo": "ns0",
+            "http://www.w3.org/2001/XMLSchema": "xs",
+            "http://www.w3.org/2001/XMLSchema-instance": "xsi",
+        }
+        self.assertEqual(expected, namespaces.items)
+
+    def test_add_all(self):
+        namespaces = Namespaces()
+        namespaces.add_all(
+            {
+                "b": "bar",
+                None: "http://www.w3.org/2001/XMLSchema",
+                "foo": "http://www.w3.org/2001/XMLSchema-instance",
+            }
+        )
+        expected = {
+            "bar": "b",
+            "http://www.w3.org/2001/XMLSchema": "xs",
+            "http://www.w3.org/2001/XMLSchema-instance": "xsi",
+        }
+        self.assertEqual(expected, namespaces.items)
+
+    def test_property_prefixes(self):
+        namespaces = Namespaces()
+        namespaces.add_all(
+            {
+                "b": "bar",
+                None: "http://www.w3.org/2001/XMLSchema",
+                "foo": "http://www.w3.org/2001/XMLSchema-instance",
+            }
+        )
+        self.assertEqual(["b", "xs", "xsi"], namespaces.prefixes)
+
+    def test_property_ns_map(self):
+        namespaces = Namespaces()
+        namespaces.add_all(
+            {
+                "b": "bar",
+                None: "http://www.w3.org/2001/XMLSchema",
+                "foo": "http://www.w3.org/2001/XMLSchema-instance",
+            }
+        )
+        namespaces.add("one")
+        namespaces.add("two")
+
+        expected = {
+            "b": "bar",
+            "ns0": "one",
+            "ns1": "two",
+            "xs": "http://www.w3.org/2001/XMLSchema",
+            "xsi": "http://www.w3.org/2001/XMLSchema-instance",
+        }
+        self.assertEqual(expected, namespaces.ns_map)
 
 
 class XmlSerializerTests(TestCase):

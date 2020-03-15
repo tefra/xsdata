@@ -42,13 +42,6 @@ class ClassBuilderTests(FactoryTestCase):
     def test_build(
         self, mock_build_class, mock_override_children, mock_redefine_children
     ):
-        redefine = Redefine.create(
-            simple_type=SimpleType.create(),
-            complex_type=ComplexType.create(),
-            group=Group.create(),
-            attribute_group=AttributeGroup.create(),
-        )
-        self.builder.redefine = redefine
 
         for _ in range(2):
             self.schema.simple_types.append(SimpleType.create())
@@ -57,26 +50,25 @@ class ClassBuilderTests(FactoryTestCase):
             self.schema.attributes.append(Attribute.create())
             self.schema.complex_types.append(ComplexType.create())
             self.schema.elements.append(Element.create())
-            self.schema.redefines.append(
-                Redefine.create(complex_type=ComplexType.create())
-            )
+            self.schema.redefines.append(Redefine.create())
             self.schema.overrides.append(Override.create())
 
         override_element = Element.create()
         override_attribute = Attribute.create()
         override_complex_type = ComplexType.create()
         redefine_simple_type = SimpleType.create()
+        redefine_group = Group.create()
         redefine_attribute_group = AttributeGroup.create()
-        mock_redefine_children.return_value = [
-            redefine_simple_type,
-            redefine_attribute_group,
+        mock_redefine_children.side_effect = [
+            [redefine_simple_type, redefine_group],
+            [redefine_attribute_group],
         ]
 
         mock_override_children.side_effect = [
             [override_element, override_attribute],
             [override_complex_type],
         ]
-        mock_build_class.side_effect = classes = ClassFactory.list(17)
+        mock_build_class.side_effect = classes = ClassFactory.list(18)
 
         self.assertEqual(classes, self.builder.build())
         mock_build_class.assert_has_calls(
@@ -84,6 +76,9 @@ class ClassBuilderTests(FactoryTestCase):
                 call(override_element),
                 call(override_attribute),
                 call(override_complex_type),
+                call(redefine_simple_type),
+                call(redefine_group),
+                call(redefine_attribute_group),
                 call(self.schema.simple_types[0]),
                 call(self.schema.simple_types[1]),
                 call(self.schema.attribute_groups[0]),
@@ -96,8 +91,6 @@ class ClassBuilderTests(FactoryTestCase):
                 call(self.schema.complex_types[1]),
                 call(self.schema.elements[0]),
                 call(self.schema.elements[1]),
-                call(redefine_simple_type),
-                call(redefine_attribute_group),
             ]
         )
 

@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-from dataclasses import field
 from typing import Iterator
 from typing import List
 from typing import Optional
@@ -17,7 +16,6 @@ from xsdata.models.elements import Element
 from xsdata.models.elements import Enumeration
 from xsdata.models.elements import Group
 from xsdata.models.elements import List as ListElement
-from xsdata.models.elements import Redefine
 from xsdata.models.elements import Restriction
 from xsdata.models.elements import Schema
 from xsdata.models.elements import SimpleType
@@ -37,7 +35,6 @@ AttributeElement = Union[
 class ClassBuilder:
     schema: Schema
     package: str
-    redefine: Optional[Redefine] = field(default=None)
 
     def build(self) -> List[Class]:
         """Generate classes from schema and redefined elements."""
@@ -46,15 +43,15 @@ class ClassBuilder:
         for override in self.schema.overrides:
             classes.extend(map(self.build_class, override.children()))
 
+        for redefine in self.schema.redefines:
+            classes.extend(map(self.build_class, redefine.children()))
+
         classes.extend(map(self.build_class, self.schema.simple_types))
         classes.extend(map(self.build_class, self.schema.attribute_groups))
         classes.extend(map(self.build_class, self.schema.groups))
         classes.extend(map(self.build_class, self.schema.attributes))
         classes.extend(map(self.build_class, self.schema.complex_types))
         classes.extend(map(self.build_class, self.schema.elements))
-
-        if self.redefine:
-            classes.extend(map(self.build_class, self.redefine.children()))
 
         return classes
 
@@ -113,9 +110,8 @@ class ClassBuilder:
         if Namespace.get_enum(namespace) and DataType.get_enum(suffix):
             name = suffix
             native = True
-        elif namespace == self.schema.target_namespace:
-            if suffix == instance.name:
-                self_ref = True
+        elif namespace == self.schema.target_namespace and suffix == instance.name:
+            self_ref = True
 
         return AttrType(
             name=name,

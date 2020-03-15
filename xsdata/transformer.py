@@ -41,11 +41,7 @@ class SchemaTransformer:
             writer.write(classes, self.output)
 
     def process_schema(
-        self,
-        schema_path: Path,
-        package: str,
-        target_namespace: Optional[str] = None,
-        redefine: Optional[Redefine] = None,
+        self, schema_path: Path, package: str, target_namespace: Optional[str] = None,
     ) -> List[Class]:
         """Recursively parse the given schema and all it's included schemas and
         generate a list of classes."""
@@ -59,7 +55,7 @@ class SchemaTransformer:
                 included_classes = self.process_included(sub, package, target_namespace)
                 classes.extend(included_classes)
 
-            classes.extend(self.generate_classes(schema, package, redefine))
+            classes.extend(self.generate_classes(schema, package))
         else:
             logger.debug("Already processed skipping: %s", schema_path.name)
         return classes
@@ -87,23 +83,14 @@ class SchemaTransformer:
             )
         else:
             package = self.adjust_package(package, included.schema_location)
-            classes = self.process_schema(
-                included.location,
-                package=package,
-                target_namespace=target_namespace,
-                redefine=included if isinstance(included, Redefine) else None,
-            )
+            classes = self.process_schema(included.location, package, target_namespace)
         return classes
 
-    def generate_classes(
-        self, schema: Schema, package: str, redefine: Optional[Redefine]
-    ):
+    def generate_classes(self, schema: Schema, package: str):
         """Convert the given schema tree to codegen classes and use the writer
         factory to either generate or print the result code."""
         logger.info("Compiling schema...")
-        classes = ClassBuilder(
-            schema=schema, package=package, redefine=redefine
-        ).build()
+        classes = ClassBuilder(schema=schema, package=package).build()
 
         class_num, inner_num = self.count_classes(classes)
         if class_num > 0:

@@ -18,6 +18,7 @@ from xsdata.formats.dataclass.mixins import ClassVar
 from xsdata.formats.dataclass.mixins import ModelInspect
 from xsdata.formats.dataclass.models import AnyElement
 from xsdata.formats.dataclass.models import AnyText
+from xsdata.formats.dataclass.models import Namespaces
 from xsdata.formats.dataclass.parsers.json import T
 from xsdata.formats.mixins import AbstractXmlParser
 from xsdata.models.enums import EventType
@@ -56,7 +57,7 @@ class SkipQueueItem(QueueItem):
 class XmlParser(AbstractXmlParser, ModelInspect):
     index: int = field(default_factory=int)
     queue: List[Optional[QueueItem]] = field(init=False, default_factory=list)
-    namespace: Optional[str] = field(init=False, default=None)
+    namespaces: Namespaces = field(init=False, default_factory=Namespaces)
     objects: List[Tuple[QName, Any]] = field(init=False, default_factory=list)
 
     def parse_context(self, context: iterparse, clazz: Type[T]) -> T:
@@ -71,6 +72,7 @@ class XmlParser(AbstractXmlParser, ModelInspect):
 
         self.objects = []
         self.index = 0
+        self.namespaces.clear()
         self.queue = [ClassQueueItem(index=0, position=0, meta=meta)]
 
         return super(XmlParser, self).parse_context(context, clazz)
@@ -176,7 +178,7 @@ class XmlParser(AbstractXmlParser, ModelInspect):
 
         self.objects.append((qname, obj))
         self.emit_event(EventType.END, element.tag, obj=obj, element=element)
-
+        self.namespaces.add_all(element.nsmap)
         return obj
 
     def emit_event(self, event: str, name: str, **kwargs):

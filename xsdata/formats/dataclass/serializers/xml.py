@@ -140,6 +140,7 @@ class XmlSerializer(AbstractSerializer, ModelInspect):
                 sub_element.text = val.text
                 sub_element.tail = val.tail
 
+                cls.set_attributes(sub_element, val.attributes)
                 for child in val.children:
                     cls.set_any_children(sub_element, child, namespaces)
 

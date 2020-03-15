@@ -74,10 +74,7 @@ def to_xml(value: Any) -> str:
     if isinstance(value, Enum):
         return str(value.value)
     if isinstance(value, float):
-        if math.isinf(value):
-            return str(value).upper()
-        if math.isnan(value):
-            return "NaN"
+        return "NaN" if math.isnan(value) else str(value).upper()
     if isinstance(value, Decimal) and value.is_infinite():
         return str(value).replace("Infinity", "INF")
 

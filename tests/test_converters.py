@@ -22,6 +22,7 @@ class ConvertersTestCases(TestCase):
         self.assertEqual("INF", to_xml(Decimal("+inf")))
         self.assertEqual("-INF", to_xml(Decimal("-inf")))
         self.assertEqual("8.77683E-8", to_xml(Decimal("8.77683E-8")))
+        self.assertEqual("8.77683E-08", to_xml(float("8.77683E-8")))
 
     def test_to_python_integer(self):
         self.assertEqual(1, to_python([int], "1"))

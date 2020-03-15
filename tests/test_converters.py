@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from decimal import Decimal
 from unittest import TestCase
 
 from xsdata.formats.converters import to_python
@@ -17,6 +18,10 @@ class ConvertersTestCases(TestCase):
         self.assertEqual("INF", to_xml(float("+inf")))
         self.assertEqual("-INF", to_xml(float("-inf")))
         self.assertEqual("NaN", to_xml(float("nan")))
+        self.assertEqual("INF", to_xml(Decimal("inf")))
+        self.assertEqual("INF", to_xml(Decimal("+inf")))
+        self.assertEqual("-INF", to_xml(Decimal("-inf")))
+        self.assertEqual("8.77683E-8", to_xml(Decimal("8.77683E-8")))
 
     def test_to_python_integer(self):
         self.assertEqual(1, to_python([int], "1"))

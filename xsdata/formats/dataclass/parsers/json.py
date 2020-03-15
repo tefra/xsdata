@@ -7,10 +7,10 @@ from typing import Type
 from typing import TypeVar
 
 from xsdata.exceptions import ParserError
+from xsdata.formats.bindings import AbstractParser
 from xsdata.formats.dataclass.mixins import ClassVar
 from xsdata.formats.dataclass.mixins import ModelInspect
 from xsdata.formats.dataclass.models import AnyElement
-from xsdata.formats.mixins import AbstractParser
 
 T = TypeVar("T")
 

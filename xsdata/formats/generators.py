@@ -17,7 +17,6 @@ from jinja2 import Environment
 from jinja2 import FileSystemLoader
 from jinja2 import Template
 
-from xsdata.exceptions import CodeGeneratorError
 from xsdata.formats.converters import to_python
 from xsdata.formats.dataclass.utils import safe_snake
 from xsdata.models.codegen import Attr
@@ -33,9 +32,6 @@ class AbstractGenerator(ABC):
     templates_dir: Optional[Path] = None
 
     def __init__(self):
-        if self.templates_dir is None:
-            raise CodeGeneratorError("Missing generator templates directory")
-
         self.env = Environment(loader=FileSystemLoader(str(self.templates_dir)))
 
     def template(self, name: str) -> Template:
@@ -126,16 +122,6 @@ class PythonAbstractGenerator(AbstractGenerator, ABC):
         attr.default = cls.attribute_default(attr)
 
     @classmethod
-    def process_enumeration(cls, attr: Attr, parent: Class) -> None:
-        """Normalize enumeration properties."""
-
-        if len(parent.extensions) == 1 and parent.extensions[0].type.native:
-            attr.types.append(parent.extensions[0].type)
-
-        attr.name = cls.enumeration_name(attr.name)
-        attr.default = cls.attribute_default(attr)
-
-    @classmethod
     def process_import(cls, package: Package) -> Package:
         """Normalize import package properties."""
         package.name = cls.class_name(package.name)
@@ -159,11 +145,7 @@ class PythonAbstractGenerator(AbstractGenerator, ABC):
     @classmethod
     def class_name(cls, name: str) -> str:
         """Convert class names to pascal case."""
-        class_name = text.pascal_case(safe_snake(name, "type"))
-        if not class_name or class_name[0].isdigit():
-            safe_name = urlsafe_b64encode(str(name).encode()).decode()
-            class_name = text.pascal_case(safe_name)
-        return class_name
+        return text.pascal_case(safe_snake(name, "type"))
 
     @classmethod
     def type_name(cls, attr_type: AttrType) -> str:

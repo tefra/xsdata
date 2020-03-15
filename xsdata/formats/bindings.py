@@ -19,7 +19,7 @@ from xsdata.models.enums import EventType
 class AbstractSerializer(ABC):
     @abstractmethod
     def render(self, obj: object) -> object:
-        pass
+        """Render the given object to the target output format."""
 
 
 T = TypeVar("T")
@@ -69,7 +69,7 @@ class AbstractXmlParser(AbstractParser):
 
         :raises ValueError: When the requested type doesn't match the result object
         """
-
+        obj = None
         for event, element in context:
             if event == EventType.START:
                 self.queue_node(element)
@@ -78,13 +78,8 @@ class AbstractXmlParser(AbstractParser):
                 if obj is not None:
                     element.clear()
 
-        if obj and not isinstance(obj, clazz):
-            return clazz(obj)  # type: ignore
-
         if not obj or not isinstance(obj, clazz):
-            raise ParserError(
-                f"Failed to create target class {clazz.__class__.__name__}."
-            )
+            raise ParserError(f"Failed to create target class `{clazz.__name__}`")
 
         return obj
 

@@ -6,9 +6,18 @@ from tests.factories import ClassFactory
 from tests.factories import ExtensionFactory
 from tests.factories import FactoryTestCase
 from tests.factories import PackageFactory
+from xsdata.formats.generators import AbstractGenerator
 from xsdata.formats.generators import PythonAbstractGenerator as generator
 from xsdata.models.enums import DataType
 from xsdata.models.enums import TagType
+
+
+class AbstractGeneratorTests(FactoryTestCase):
+    def test_module_name(self):
+        self.assertEqual("a", AbstractGenerator.module_name(("a")))
+
+    def test_package_name(self):
+        self.assertEqual("a", AbstractGenerator.package_name(("a")))
 
 
 class PythonAbstractGeneratorTests(FactoryTestCase):
@@ -191,10 +200,19 @@ class PythonAbstractGeneratorTests(FactoryTestCase):
         self.assertEqual("FooBar", package.alias)
         self.assertEqual("some.foo.bar", package.source)
 
+    def test_module_name(self):
+        self.assertEqual("xs_string", generator.module_name("xs:string"))
+        self.assertEqual("foo_bar_bam", generator.module_name("foo:bar_bam"))
+        self.assertEqual("list_type", generator.module_name("ListType"))
+
+    def test_package_name(self):
+        self.assertEqual("foo.bar_bar.pkg_1", generator.package_name("Foo.BAR_bar.1"))
+
     def test_class_name(self):
         self.assertEqual("XsString", generator.class_name("xs:string"))
         self.assertEqual("FooBarBam", generator.class_name("foo:bar_bam"))
         self.assertEqual("ListType", generator.class_name("List"))
+        self.assertEqual("Type", generator.class_name(".*"))
 
     def test_type_name(self):
 
@@ -226,6 +244,10 @@ class PythonAbstractGeneratorTests(FactoryTestCase):
         self.assertEqual("Optional[FooBar]", actual)
 
         parents = ["Parent"]
+        attr.types[0].self_ref = True
+        actual = generator.attribute_display_type(attr, parents)
+        self.assertEqual('Optional["FooBar"]', actual)
+
         attr.types[0].forward_ref = True
         actual = generator.attribute_display_type(attr, parents)
         self.assertEqual('Optional["Parent.FooBar"]', actual)
@@ -247,6 +269,11 @@ class PythonAbstractGeneratorTests(FactoryTestCase):
         ]
         actual = generator.attribute_display_type(attr, parents)
         self.assertEqual('List[Union["A.Parent.BossLife", int]]', actual)
+
+        attr.restrictions.max_occurs = 1
+        attr.types = AttrTypeFactory.list(1, name=DataType.QMAP.code, native=True)
+        actual = generator.attribute_display_type(attr, parents)
+        self.assertEqual("Dict[QName, str]", actual)
 
     def test_attribute_default(self):
         type_str = AttrTypeFactory.create(name=DataType.STRING.code, native=True)

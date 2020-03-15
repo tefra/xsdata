@@ -384,8 +384,8 @@ class Any(AnnotationBase, OccurrencesMixin):
     </any>
     """
 
-    min_occurs: Optional[int] = attribute(default=1)
-    max_occurs: Optional[int] = attribute(default=1)
+    min_occurs: int = attribute(default=1)
+    max_occurs: int = attribute(default=1)
     namespace: Optional[str] = attribute(default="##any")
     process_contents: Optional[ProcessType] = attribute()
 
@@ -1071,8 +1071,8 @@ class Element(AnnotationBase, OccurrencesMixin):
     uniques: Array[Unique] = array_element(name="unique")
     keys: Array[Key] = array_element(name="key")
     keyrefs: Array[Keyref] = array_element(name="keyref")
-    min_occurs: Optional[int] = attribute(default=1)
-    max_occurs: Optional[int] = attribute(default=1)
+    min_occurs: int = attribute(default=1)
+    max_occurs: int = attribute(default=1)
     nillable: bool = attribute(default=False)
     abstract: bool = attribute(default=False)
 

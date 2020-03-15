@@ -3,7 +3,6 @@ from dataclasses import field
 from typing import Dict
 from typing import List
 
-from xsdata.exceptions import CodeWriterError
 from xsdata.formats.dataclass.generator import DataclassGenerator
 from xsdata.formats.generators import AbstractGenerator
 from xsdata.formats.plantuml.generator import PlantUmlGenerator
@@ -26,9 +25,7 @@ class CodeWriter:
         self.generators[name] = generator
 
     def get_format(self, name) -> AbstractGenerator:
-        if name in self.generators:
-            return self.generators[name]
-        raise CodeWriterError(f"Unknown code generator `{name}`")
+        return self.generators[name]
 
     def write(self, classes: List[Class], output: str):
         engine = self.get_format(output)

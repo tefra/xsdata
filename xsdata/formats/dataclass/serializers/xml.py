@@ -11,13 +11,13 @@ from lxml.etree import SubElement
 from lxml.etree import tostring
 
 from xsdata.exceptions import SerializerError
+from xsdata.formats.bindings import AbstractSerializer
 from xsdata.formats.converters import to_xml
 from xsdata.formats.dataclass.mixins import ClassVar
 from xsdata.formats.dataclass.mixins import ModelInspect
 from xsdata.formats.dataclass.models import AnyElement
 from xsdata.formats.dataclass.models import AnyText
 from xsdata.formats.dataclass.models import Namespaces
-from xsdata.formats.mixins import AbstractSerializer
 from xsdata.models.enums import Namespace
 
 

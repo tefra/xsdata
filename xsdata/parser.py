@@ -223,8 +223,8 @@ class SchemaParser(XmlParser):
     def cascade_occurs(
         cls,
         parent: xsd.ElementBase,
-        min_occurs: Optional[int] = None,
-        max_occurs: Optional[int] = None,
+        min_occurs: int,
+        max_occurs: int,
         force: Force = Force.NO,
     ):
 

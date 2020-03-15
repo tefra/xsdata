@@ -153,14 +153,6 @@ class Attr:
             **kwargs,
         )
 
-    def qname(self, name: Optional[str] = None):
-        prefix, name = text.split(name or self.name)
-        namespace = self.namespace
-        if prefix:
-            namespace = self.nsmap.get(prefix)
-
-        return QName(namespace or None, name).text
-
 
 @dataclass
 class Extension:

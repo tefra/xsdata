@@ -143,7 +143,7 @@ class DependenciesResolver:
         for obj in classes:
             qname = obj.source_qname()
             if qname in result:
-                raise ResolverValueError(f"Duplicate class name`{obj.name}`")
+                raise ResolverValueError(f"Duplicate class: `{obj.name}`")
             result[qname] = obj
 
         return result

@@ -1,9 +1,6 @@
-import sys
 from dataclasses import dataclass
-from dataclasses import Field
 from dataclasses import field
 from dataclasses import fields
-from dataclasses import is_dataclass
 from typing import Any
 from typing import Dict
 from typing import Iterator
@@ -25,15 +22,10 @@ class RestrictedField:
 
 
 class OccurrencesMixin(RestrictedField):
-    min_occurs: Optional[int] = None
-    max_occurs: Optional[int] = None
+    min_occurs: int = 1
+    max_occurs: int = 1
 
     def get_restrictions(self) -> Dict[str, Any]:
-        if self.min_occurs is None or self.max_occurs is None:
-            raise SchemaValueError(
-                f"Class `{self.__class__.__name__}` min or max occurs is empty"
-            )
-
         if self.min_occurs == self.max_occurs == 1:
             return dict(required=True)
         if self.max_occurs >= self.min_occurs and self.max_occurs > 1:
@@ -60,44 +52,10 @@ class BaseModel:
         }
 
         data = {
-            attr.name: cls.prepare_value(attr, kwargs)
-            for attr in fields(cls)
-            if attr.name in kwargs
+            attr.name: kwargs[attr.name] for attr in fields(cls) if attr.name in kwargs
         }
 
         return cls(**data)
-
-    @classmethod
-    def prepare_value(cls, attr: Field, kwargs: Dict) -> Any:
-        name = attr.name
-        value = kwargs[name]
-
-        if is_dataclass(value):
-            return value
-        if isinstance(value, dict):
-            return value
-        if isinstance(value, list):
-            return value
-
-        clazz = attr.type
-        if name == "max_occurs" and value == "unbounded":
-            return sys.maxsize
-
-        # Optional
-        if hasattr(clazz, "__origin__"):
-            clazz = clazz.__args__[0]
-
-        try:
-            if clazz is bool:
-                return value == "true" or value is True
-            if clazz is int:
-                return int(value)
-            if clazz is float:
-                return float(value)
-        except ValueError:
-            return str(value)
-
-        return clazz(value)
 
 
 @dataclass
@@ -199,16 +157,6 @@ class ElementBase(BaseModel):
                 prefix
                 for prefix, namespace in self.nsmap.items()
                 if namespace == Namespace.XS.uri
-            ),
-            None,
-        )
-
-    def xml_prefix(self):
-        return next(
-            (
-                prefix
-                for prefix, namespace in self.nsmap.items()
-                if namespace == Namespace.XML.uri
             ),
             None,
         )

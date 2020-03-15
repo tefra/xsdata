@@ -5,6 +5,7 @@ from typing import Iterator
 from typing import List
 from typing import Optional
 from typing import Tuple
+from unittest import mock
 
 from tests.factories import ClassFactory
 from tests.factories import FactoryTestCase
@@ -20,8 +21,8 @@ class FakeGenerator(AbstractGenerator):
     dir: Optional[TemporaryDirectory] = None
 
     def render(self, classes: List[Class]) -> Iterator[Tuple[Path, str, str]]:
-        path = Path(f"{self.dir}/test.txt")
-        yield path, ".".join(path.with_suffix("").parts), "foobar"
+        for obj in classes:
+            yield Path(f"{self.dir}/{obj.name}.txt"), obj.package, obj.name
 
     @classmethod
     def module_name(cls, name):
@@ -49,10 +50,21 @@ class CodeWriterTests(FactoryTestCase):
         self.assertIsInstance(writer.get_format("fake"), FakeGenerator)
 
     def test_write(self):
+        classes = ClassFactory.list(2)
         with TemporaryDirectory() as tmpdir:
             writer.register_format(self.FAKE_NAME, FakeGenerator(tmpdir))
-            writer.write([], "fake")
-            self.assertEqual("foobar", Path(f"{tmpdir}/test.txt").read_text())
+            writer.write(classes, "fake")
+
+            for obj in classes:
+                self.assertEqual(obj.name, Path(f"{tmpdir}/{obj.name}.txt").read_text())
+
+    @mock.patch("builtins.print")
+    def test_print(self, mock_print):
+        classes = ClassFactory.list(2)
+        writer.register_format(self.FAKE_NAME, FakeGenerator())
+        writer.print(classes, "fake")
+
+        mock_print.assert_has_calls([mock.call(obj.name, end="") for obj in classes])
 
     def test_designate(self):
         classes = ClassFactory.list(3)

@@ -13,6 +13,7 @@ from lxml.etree import iterparse
 from lxml.etree import QName
 
 from xsdata.exceptions import ParserError
+from xsdata.formats.bindings import AbstractXmlParser
 from xsdata.formats.dataclass.mixins import ClassMeta
 from xsdata.formats.dataclass.mixins import ClassVar
 from xsdata.formats.dataclass.mixins import ModelInspect
@@ -20,7 +21,6 @@ from xsdata.formats.dataclass.models import AnyElement
 from xsdata.formats.dataclass.models import AnyText
 from xsdata.formats.dataclass.models import Namespaces
 from xsdata.formats.dataclass.parsers.json import T
-from xsdata.formats.mixins import AbstractXmlParser
 from xsdata.models.enums import EventType
 from xsdata.utils import text
 

@@ -10,7 +10,7 @@ from typing import Optional
 from typing import Tuple
 from typing import Type
 
-from xsdata.formats.mixins import AbstractSerializer
+from xsdata.formats.bindings import AbstractSerializer
 
 
 def filter_none(x: Tuple):

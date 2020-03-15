@@ -2,7 +2,6 @@ from dataclasses import dataclass
 from dataclasses import field
 from dataclasses import is_dataclass
 from typing import Any
-from typing import Dict
 from typing import Optional
 
 from lxml.etree import cleanup_namespaces
@@ -17,36 +16,9 @@ from xsdata.formats.dataclass.mixins import ClassVar
 from xsdata.formats.dataclass.mixins import ModelInspect
 from xsdata.formats.dataclass.models import AnyElement
 from xsdata.formats.dataclass.models import AnyText
+from xsdata.formats.dataclass.models import Namespaces
 from xsdata.formats.mixins import AbstractSerializer
 from xsdata.models.enums import Namespace
-
-
-@dataclass
-class Namespaces:
-    items: Dict = field(default_factory=dict, init=False)
-    auto_ns: int = field(default_factory=int, init=False)
-
-    @property
-    def prefixes(self):
-        return list(filter(None, self.items.values()))
-
-    @property
-    def ns_map(self):
-        return {v: k for k, v in self.items.items()}
-
-    def add(self, uri: Optional[str], prefix: Optional[str] = None):
-        if uri and uri not in self.items:
-            namespace = Namespace.get_enum(uri)
-            if namespace:
-                prefix = namespace.prefix
-            elif not prefix:
-                prefix = f"ns{self.auto_ns}"
-                self.auto_ns += 1
-            self.items[uri] = prefix
-
-    def add_all(self, ns_map: Dict):
-        for prefix, uri in ns_map.items():
-            self.add(uri, prefix)
 
 
 @dataclass
@@ -61,9 +33,14 @@ class XmlSerializer(AbstractSerializer, ModelInspect):
     encoding: str = field(default="UTF-8")
     pretty_print: bool = field(default=False)
 
-    def render(self, obj: object) -> str:
-        """Convert the given object tree to xml string."""
-        tree = self.render_tree(obj)
+    def render(self, obj: Any, namespaces: Optional[Namespaces] = None) -> str:
+        """
+        Convert the given object tree to xml string.
+
+        Optionally provide a namespaces instance with a predefined list
+        of namespace uris and prefixes.
+        """
+        tree = self.render_tree(obj, namespaces)
         return tostring(
             tree,
             xml_declaration=self.xml_declaration,
@@ -71,17 +48,16 @@ class XmlSerializer(AbstractSerializer, ModelInspect):
             pretty_print=self.pretty_print,
         ).decode()
 
-    def render_tree(self, obj: object, namespace: Optional[str] = None) -> Element:
+    def render_tree(self, obj: Any, namespaces: Optional[Namespaces] = None) -> Element:
         """
         Convert a dataclass instance to a nested Element structure.
 
-        If the instance class is generated from the xsdata cli the root
-        element's name will be auto assigned otherwise it will default
-        to the class name.
+        Optionally provide a namespaces instance with a predefined list
+        of namespace uris and prefixes.
         """
-        meta = self.class_meta(obj.__class__, namespace)
-
-        namespaces = Namespaces()
+        meta = self.class_meta(obj.__class__)
+        namespaces = namespaces or Namespaces()
+        namespaces.register()
         namespaces.add(meta.namespace)
 
         root = self.render_node(obj, Element(meta.qname), namespaces)

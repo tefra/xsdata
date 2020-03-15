@@ -3,8 +3,8 @@ from typing import List
 
 from lxml import etree
 
-from xsdata.formats.dataclass.serializers import XmlSerializer
 from xsdata.formats.dataclass.models import Namespaces
+from xsdata.formats.dataclass.serializers import XmlSerializer
 
 stop_words = [
     "and",

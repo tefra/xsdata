@@ -1,3 +1,4 @@
+from typing import Iterator
 from unittest import mock
 
 from tests.factories import AttrFactory
@@ -7,7 +8,6 @@ from tests.factories import ExtensionFactory
 from tests.factories import FactoryTestCase
 from tests.factories import RestrictionsFactory
 from xsdata.analyzer import ClassAnalyzer
-from xsdata.analyzer import simple_type
 from xsdata.models.codegen import AttrType
 from xsdata.models.codegen import Restrictions
 from xsdata.models.elements import ComplexType
@@ -28,7 +28,7 @@ class ClassAnalyzerBaseTestCase(FactoryTestCase):
         self.analyzer = ClassAnalyzer()
 
 
-class ClassAnalyzerProcessTests(ClassAnalyzerBaseTestCase):
+class ClassAnalyzerTests(ClassAnalyzerBaseTestCase):
     @mock.patch.object(ClassAnalyzer, "fetch_classes_for_generation")
     @mock.patch.object(ClassAnalyzer, "flatten_classes")
     @mock.patch.object(ClassAnalyzer, "mark_abstract_duplicate_classes")
@@ -42,11 +42,11 @@ class ClassAnalyzerProcessTests(ClassAnalyzerBaseTestCase):
         mock_flatten_classes,
         mock_fetch_classes_for_generation,
     ):
-        self.analyzer.schema = None
-        mock_fetch_classes_for_generation.return_value = "foo"
+        gen_classes = ClassFactory.list(2)
+        mock_fetch_classes_for_generation.return_value = [obj for obj in gen_classes]
         classes = ClassFactory.list(3, type=Element)
 
-        self.assertEqual("foo", self.analyzer.process(classes))
+        self.assertEqual(gen_classes, self.analyzer.process(classes))
 
         mock_merge_redefined_classes.assert_called_once_with(classes)
         mock_create_class_qname_index.assert_called_once_with(classes)
@@ -113,15 +113,8 @@ class ClassAnalyzerProcessTests(ClassAnalyzerBaseTestCase):
 
         self.analyzer.create_class_qname_index(classes)
         result = self.analyzer.fetch_classes_for_generation()
-        self.assertEqual(expected, result)
-        self.assertEqual(3, len(self.analyzer.common_types))
-
-        expected = [
-            "{xsdata}" + classes[0].name,
-            "{xsdata}" + classes[3].name,
-            "{xsdata}" + classes[4].name,
-        ]
-        self.assertEqual(expected, list(self.analyzer.common_types.keys()))
+        self.assertIsInstance(result, Iterator)
+        self.assertEqual(expected, list(result))
 
     @mock.patch.object(ClassAnalyzer, "flatten_class")
     def test_flatten_classes(self, mock_flatten_class):
@@ -130,70 +123,25 @@ class ClassAnalyzerProcessTests(ClassAnalyzerBaseTestCase):
         self.analyzer.flatten_classes()
         mock_flatten_class.assert_has_calls(list(map(mock.call, classes)))
 
-
-class ClassAnalyzerFindClassTests(ClassAnalyzerBaseTestCase):
-    @mock.patch.object(ClassAnalyzer, "find_common_class")
-    @mock.patch.object(ClassAnalyzer, "find_schema_class")
-    def test_searches_in_class_index_and_common_types(
-        self, mock_find_schema_class, mock_find_common_class
-    ):
-        mock_find_schema_class.side_effect = [None, "a"]
-        mock_find_common_class.return_value = "b"
-
-        item = ClassFactory.create()
-        dependency = AttrTypeFactory.create()
-        qname = item.source_qname(dependency.name)
-
-        self.assertEqual("b", self.analyzer.find_class(qname))
-        self.assertEqual("a", self.analyzer.find_class(qname))
-
-        mock_find_schema_class.assert_has_calls(
-            [
-                mock.call(qname, condition=simple_type),
-                mock.call(qname, condition=simple_type),
-            ]
-        )
-        mock_find_common_class.assert_called_once_with(qname, condition=simple_type)
-
     @mock.patch.object(ClassAnalyzer, "flatten_class")
-    def test_search_for_schema_class(self, mock_flatten_class):
+    def test_find_class(self, mock_flatten_class):
         qname = "foo"
         class_a = ClassFactory.create()
         class_b = ClassFactory.create()
         self.analyzer.class_index[qname] = [class_a, class_b]
         self.analyzer.processed[class_b.key] = True
 
-        self.assertIsNone(self.analyzer.find_schema_class("b"))
+        self.assertIsNone(self.analyzer.find_class("b"))
 
-        actual = self.analyzer.find_schema_class(
+        actual = self.analyzer.find_class(
             qname, condition=lambda x: x.name == class_b.name
         )
         self.assertEqual(class_b, actual)
 
-        actual = self.analyzer.find_schema_class(qname, condition=None)
+        actual = self.analyzer.find_class(qname, condition=None)
         self.assertEqual(class_a, actual)
 
         mock_flatten_class.assert_called_once_with(class_a)
-
-    def test_search_for_common_class(self):
-        qname = "foo"
-        class_a = ClassFactory.create()
-        self.analyzer.common_types[qname] = class_a
-
-        self.assertIsNone(self.analyzer.find_common_class("b"))
-
-        actual = self.analyzer.find_common_class(qname, condition=None)
-        self.assertEqual(class_a, actual)
-
-        actual = self.analyzer.find_common_class(
-            qname, condition=lambda x: x.name == class_a.name
-        )
-        self.assertEqual(class_a, actual)
-
-        actual = self.analyzer.find_common_class(
-            qname, condition=lambda x: x.name == "$$$"
-        )
-        self.assertIsNone(actual)
 
     def test_is_self_referencing(self):
         item = ClassFactory.create()

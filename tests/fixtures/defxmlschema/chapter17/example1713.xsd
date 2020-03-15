@@ -1,8 +1,8 @@
 <!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
 <!-- Example 17-13 Referencing an identity constraint in a restriction -->
-<!-- SKIPTEST -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://datypic.com/prod" xmlns="http://datypic.com/prod" xpathDefaultNamespace="http://datypic.com/prod">
-  <xs:complexType name="CatalogListType">
+    <xs:include  schemaLocation="../chapter15/example1515.xsd" />
+    <xs:complexType name="CatalogListType">
     <xs:sequence>
       <xs:element name="catalog" type="CatalogType" maxOccurs="unbounded">
         <xs:unique name="dateAndProdNumKey">

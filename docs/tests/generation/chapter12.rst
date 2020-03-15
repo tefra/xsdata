@@ -33,18 +33,6 @@ Example 12-13 Legal duplication of element names
     Should fail
 
 
-Example 12-14 Illegal duplication of element names
---------------------------------------------------
-
-.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1214.xsd
-   :language: xml
-   :lines: 3-
-
-.. warning::
-
-    Duplicated attributes
-
-
 Example 12-15 A sequence group
 ------------------------------
 
@@ -136,18 +124,6 @@ Example 12-27 Complex type with a named model group reference
 
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1227.py
    :language: python
-
-Example 12-28 Illegal nondeterministic content model
-----------------------------------------------------
-
-.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1228.xsd
-   :language: xml
-   :lines: 3-
-
-.. warning::
-
-    Duplicated attributes
-
 
 Example 12-29 Deterministic content model
 -----------------------------------------

@@ -2,10 +2,10 @@ from collections import defaultdict
 from dataclasses import dataclass
 from dataclasses import field
 from typing import Dict
+from typing import Iterator
 from typing import List
 from typing import Optional
-
-from lxml import etree
+from xml.etree.ElementTree import QName
 
 from xsdata.logger import logger
 from xsdata.models.codegen import Attr
@@ -31,9 +31,8 @@ class ClassAnalyzer:
     classes to be used as common types for future runs.
     """
 
-    common_types: Dict[etree.QName, Class] = field(default_factory=dict)
     processed: Dict = field(default_factory=dict)
-    class_index: Dict[etree.QName, List[Class]] = field(
+    class_index: Dict[QName, List[Class]] = field(
         default_factory=lambda: defaultdict(list)
     )
 
@@ -57,9 +56,11 @@ class ClassAnalyzer:
 
         self.flatten_classes()
 
-        return self.fetch_classes_for_generation()
+        gen_classes = self.fetch_classes_for_generation()
 
-    def fetch_classes_for_generation(self) -> List[Class]:
+        return list(gen_classes)
+
+    def fetch_classes_for_generation(self) -> Iterator[Class]:
         """
         Return the qualified classes to continue for code generation.
 
@@ -70,18 +71,11 @@ class ClassAnalyzer:
             * not an abstract
             * type: element | complexType | simpleType with enumerations
         """
-        result = []
         for classes in self.class_index.values():
             for item in classes:
                 should_store = item.is_common or item.is_abstract
-
-                if should_store:
-                    self.common_types[item.source_qname()] = item
-
                 if not should_store or item.is_enumeration:
-                    result.append(item)
-
-        return result
+                    yield item
 
     def create_class_qname_index(self, classes: List[Class]):
         self.class_index.clear()
@@ -101,18 +95,7 @@ class ClassAnalyzer:
             self.find_class(dependency_qname, condition=lambda x: x is item) is not None
         )
 
-    def find_class(self, qname: etree.QName, condition=simple_type) -> Optional[Class]:
-        item = self.find_schema_class(qname, condition=condition)
-        return item or self.find_common_class(qname, condition=condition)
-
-    def find_common_class(self, qname: str, condition=None):
-        if qname in self.common_types:
-            candidate = self.common_types[qname]
-            return candidate if not condition or condition(candidate) else None
-        else:
-            return None
-
-    def find_schema_class(self, qname: str, condition=None) -> Optional[Class]:
+    def find_class(self, qname: QName, condition=simple_type) -> Optional[Class]:
         candidates = list(filter(condition, self.class_index.get(qname, [])))
         if candidates:
             candidate = candidates.pop(0)

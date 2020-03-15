@@ -206,6 +206,12 @@ class Class:
         return self.type not in [Element, ComplexType]
 
     @property
+    def is_nillable(self) -> bool:
+        return next(
+            (True for ext in self.extensions if ext.restrictions.nillable), False
+        )
+
+    @property
     def target_module(self):
         return f"{self.package}.{self.module}"
 

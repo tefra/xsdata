@@ -53,6 +53,8 @@ class ConvertersTestCases(TestCase):
             self.assertEqual(False, to_python([str, bool], val, in_order=False))
 
         self.assertEqual("a", to_python([bool], "a"))
+        self.assertEqual(True, to_python([bool], "1 "))
+        self.assertEqual(False, to_python([bool], "false "))
 
     def test_to_python_enum(self):
         self.assertEqual(UseType.OPTIONAL, to_python([UseType], "optional"))

@@ -125,18 +125,6 @@ Example 8-21 Preventing type derivation
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter08/example0821.py
    :language: python
 
-Example 8-22 Using an implementation-defined type
--------------------------------------------------
-
-.. literalinclude:: /../tests/fixtures/defxmlschema/chapter08/example0822.xsd
-   :language: xml
-   :lines: 3-
-
-.. warning::
-
-    Unsupported feature!
-
-
 Example 8-23 Using the Saxon preprocess facet
 ---------------------------------------------
 

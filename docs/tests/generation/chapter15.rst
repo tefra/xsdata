@@ -41,18 +41,6 @@ Example 15-12 Equivalent complex type without an attribute group
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter15/example1512.py
    :language: python
 
-Example 15-13 Illegal duplication of attributes
------------------------------------------------
-
-.. literalinclude:: /../tests/fixtures/defxmlschema/chapter15/example1513.xsd
-   :language: xml
-   :lines: 3-
-
-.. warning::
-
-    Duplicated attributes
-
-
 Example 15-14 Attribute group referencing an attribute group
 ------------------------------------------------------------
 

@@ -238,7 +238,7 @@ class XmlParserTests(TestCase):
 
     @mock.patch.object(XmlParser, "emit_event")
     def test_dequeue_node_with_skip_item(self, mock_emit_event):
-        element = Element("author")
+        element = Element("author", nsmap={"foo": "bar"})
         element.text = "foobar"
 
         queue_item = SkipQueueItem(index=0, position=0)
@@ -248,11 +248,12 @@ class XmlParserTests(TestCase):
         self.assertIsNone(result)
         self.assertEqual(0, len(self.parser.queue))
         self.assertEqual(0, mock_emit_event.call_count)
+        self.assertEqual({}, self.parser.namespaces.items)
 
     @mock.patch.object(XmlParser, "emit_event")
     @mock.patch.object(XmlParser, "parse_value", return_value="result")
     def test_dequeue_node_with_primitive_item(self, mock_parse_value, mock_emit_event):
-        element = Element("author")
+        element = Element("author", nsmap={"prefix": "uri"})
         element.text = "foobar"
 
         queue_item = PrimitiveQueueItem(index=0, position=0, types=[str], default=None)
@@ -262,7 +263,7 @@ class XmlParserTests(TestCase):
         self.assertEqual("result", result)
         self.assertEqual(0, len(self.parser.queue))
         self.assertEqual((QName(element.tag), result), self.parser.objects[-1])
-
+        self.assertEqual({"uri": "prefix"}, self.parser.namespaces.items)
         mock_parse_value.assert_called_once_with(
             queue_item.types, element.text, queue_item.default
         )
@@ -279,7 +280,7 @@ class XmlParserTests(TestCase):
         obj = AnyElement()
         mock_parse_any_element.return_value = obj
 
-        element = Element("author")
+        element = Element("author", nsmap={"prefix": "uri"})
 
         queue_item = WildcardQueueItem(index=0, position=0, qname=QName("parent"))
         self.parser.queue.append(queue_item)
@@ -289,6 +290,7 @@ class XmlParserTests(TestCase):
         self.assertEqual(0, len(self.parser.queue))
         self.assertEqual((queue_item.qname, result), self.parser.objects[-1])
         self.assertEqual([1, 2, 3], result.children)
+        self.assertEqual({"uri": "prefix"}, self.parser.namespaces.items)
 
         mock_parse_any_element.assert_called_once_with(element)
         mock_fetch_any_children.assert_called_once_with(queue_item)
@@ -311,7 +313,7 @@ class XmlParserTests(TestCase):
         mock_bind_element_text.return_value = {"b": 2}
         mock_fetch_class_children.return_value = {"c": 3}
 
-        element = Element("author")
+        element = Element("author", nsmap={"prefix": "uri"})
 
         @dataclass
         class Foo:
@@ -328,6 +330,7 @@ class XmlParserTests(TestCase):
         self.assertEqual(Foo(1, 2, 3), result)
         self.assertEqual(0, len(self.parser.queue))
         self.assertEqual((QName(element.tag), result), self.parser.objects[-1])
+        self.assertEqual({"uri": "prefix"}, self.parser.namespaces.items)
 
         mock_bind_element_attrs.assert_called_once_with(queue_item.meta, element)
         mock_bind_element_text.assert_called_once_with(queue_item.meta, element)

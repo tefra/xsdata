@@ -159,6 +159,7 @@ class ModelInspect:
 
             name = getattr(meta, "name", self.name_generator(clazz.__name__))
             mixed = getattr(meta, "mixed", False)
+            nillable = getattr(meta, "nillable", False)
             namespace = getattr(meta, "namespace", parent_ns)
 
             self.cache[clazz] = ClassMeta(
@@ -166,11 +167,16 @@ class ModelInspect:
                 clazz=clazz,
                 qname=QName(namespace, name),
                 mixed=mixed,
-                vars={arg.qname: arg for arg in self.get_type_hints(clazz, namespace)},
+                vars={
+                    arg.qname: arg
+                    for arg in self.get_type_hints(clazz, namespace, nillable)
+                },
             )
         return self.cache[clazz]
 
-    def get_type_hints(self, clazz, parent_ns: Optional[str]) -> Iterator[ClassVar]:
+    def get_type_hints(
+        self, clazz, parent_ns: Optional[str], nillable: bool
+    ) -> Iterator[ClassVar]:
         type_hints = get_type_hints(clazz)
 
         for var in fields(clazz):
@@ -192,7 +198,7 @@ class ModelInspect:
                 tag=tag,
                 init=var.init,
                 is_list=is_list,
-                is_nillable=var.metadata.get("nillable") is True,
+                is_nillable=var.metadata.get("nillable", nillable),
                 is_dataclass=is_class,
                 types=types,
                 default=self.default_value(var),

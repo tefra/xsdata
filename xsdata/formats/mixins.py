@@ -56,7 +56,10 @@ class AbstractXmlParser(AbstractParser):
     def parse(self, source: io.BytesIO, clazz: Type[T]) -> T:
         """Parse the XML input stream and return the resulting object tree."""
         ctx = iterparse(
-            source=source, events=(EventType.START, EventType.END), recover=True
+            source=source,
+            events=(EventType.START, EventType.END),
+            recover=True,
+            remove_comments=True,
         )
         return self.parse_context(ctx, clazz)
 

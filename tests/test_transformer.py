@@ -6,7 +6,6 @@ from tests.factories import FactoryTestCase
 from xsdata.builder import ClassBuilder
 from xsdata.models.elements import Include
 from xsdata.models.elements import Override
-from xsdata.models.elements import Redefine
 from xsdata.models.elements import Schema
 from xsdata.transformer import SchemaTransformer
 from xsdata.writer import CodeWriter
@@ -121,7 +120,6 @@ class SchemaTransformerTests(FactoryTestCase):
     ):
         include = Include.create()
         override = Override.create()
-        redefine = Redefine.create()
         schema = Schema.create(target_namespace="thug")
         schema.includes.append(include)
         schema.overrides.append(override)
@@ -132,7 +130,7 @@ class SchemaTransformerTests(FactoryTestCase):
 
         path = Path(__file__)
         result = self.transformer.process_schema(
-            path, package="foo.bar", target_namespace="foo-bar", redefine=redefine
+            path, package="foo.bar", target_namespace="foo-bar"
         )
 
         self.assertEqual(9, len(result))
@@ -146,7 +144,7 @@ class SchemaTransformerTests(FactoryTestCase):
             ]
         )
 
-        self.transformer.process_schema(path, None, None, None)
+        self.transformer.process_schema(path, None, None)
         mock_logger_info.assert_called_once_with("Parsing schema...")
 
     @mock.patch("xsdata.transformer.logger.debug")
@@ -156,7 +154,7 @@ class SchemaTransformerTests(FactoryTestCase):
     ):
         path = Path(__file__)
         self.transformer.processed.append(path)
-        self.transformer.process_schema(path, "foo.bar", None, None)
+        self.transformer.process_schema(path, "foo.bar", None)
 
         self.assertEqual(0, mock_parse_schema.call_count)
         mock_logger_debug.assert_called_once_with(
@@ -175,26 +173,7 @@ class SchemaTransformerTests(FactoryTestCase):
 
         self.assertEqual(2, len(result))
         mock_adjust_package.assert_called_once_with("foo.bar", include.schema_location)
-        mock_process_schema.assert_called_once_with(
-            path, package="adjusted.foo.bar", target_namespace="thug", redefine=None
-        )
-
-    @mock.patch.object(SchemaTransformer, "process_schema")
-    @mock.patch.object(SchemaTransformer, "adjust_package")
-    def test_process_included_with_redefine(
-        self, mock_adjust_package, mock_process_schema
-    ):
-        path = Path(__file__)
-        redefine = Redefine.create(location=path)
-        mock_adjust_package.return_value = "adjusted.foo.bar"
-        mock_process_schema.return_value = ClassFactory.list(2)
-
-        result = self.transformer.process_included(redefine, "foo.bar", "thug")
-
-        self.assertEqual(2, len(result))
-        mock_process_schema.assert_called_once_with(
-            path, package="adjusted.foo.bar", target_namespace="thug", redefine=redefine
-        )
+        mock_process_schema.assert_called_once_with(path, "adjusted.foo.bar", "thug")
 
     @mock.patch("xsdata.transformer.logger.debug")
     def test_process_included_skip_when_location_already_imported(
@@ -239,16 +218,13 @@ class SchemaTransformerTests(FactoryTestCase):
         mock_logger_info,
     ):
         schema = Schema.create()
-        redefine = Redefine.create()
         classes = ClassFactory.list(2)
 
         mock_builder_build.return_value = classes
         mock_count_classes.return_value = 2, 4
-        self.transformer.generate_classes(schema, "foo.bar", redefine)
+        self.transformer.generate_classes(schema, "foo.bar")
 
-        mock_builder_init.assert_called_once_with(
-            schema=schema, package="foo.bar", redefine=redefine
-        )
+        mock_builder_init.assert_called_once_with(schema=schema, package="foo.bar")
         mock_builder_build.assert_called_once_with()
         mock_logger_info.assert_has_calls(
             [

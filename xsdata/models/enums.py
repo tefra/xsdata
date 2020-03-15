@@ -90,7 +90,7 @@ class DataType(Enum):
     YEAR_MONTH_DURATION = ("yearMonthDuration", str)
     DECIMAL = ("decimal", Decimal)
     DERIVATION_CONTROL = ("derivationControl", str)
-    DOUBLE = ("double", float)
+    DOUBLE = ("double", Decimal)
     DURATION = ("duration", str)
     ENTITIES = ("ENTITIES", int)
     ENTITY = ("ENTITY", int)

@@ -252,6 +252,7 @@ class PythonAbstractGeneratorTests(FactoryTestCase):
         type_str = AttrTypeFactory.create(name=DataType.STRING.code, native=True)
         type_int = AttrTypeFactory.create(name=DataType.INTEGER.code, native=True)
         type_float = AttrTypeFactory.create(name=DataType.FLOAT.code, native=True)
+        type_decimal = AttrTypeFactory.create(name=DataType.DECIMAL.code, native=True)
         type_bool = AttrTypeFactory.create(name=DataType.BOOLEAN.code, native=True)
 
         attr = AttrFactory.create(name="foo", types=[type_str])
@@ -292,3 +293,9 @@ class PythonAbstractGeneratorTests(FactoryTestCase):
 
         attr.default = "-inf"
         self.assertEqual("float('-inf')", generator.attribute_default(attr))
+
+        attr.types = [type_decimal]
+        self.assertEqual("Decimal('-Infinity')", generator.attribute_default(attr))
+
+        attr.default = "inf"
+        self.assertEqual("Decimal('Infinity')", generator.attribute_default(attr))

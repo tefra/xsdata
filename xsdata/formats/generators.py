@@ -3,6 +3,7 @@ import re
 from abc import ABC
 from abc import abstractmethod
 from base64 import urlsafe_b64encode
+from decimal import Decimal
 from pathlib import Path
 from typing import Any
 from typing import Iterator
@@ -262,5 +263,7 @@ class PythonAbstractGenerator(AbstractGenerator, ABC):
             default_value = quoteattr(default_value)
         elif isinstance(default_value, float) and math.isinf(default_value):
             default_value = f"float('{default_value}')"
+        elif isinstance(default_value, Decimal):
+            default_value = repr(default_value)
 
         return default_value

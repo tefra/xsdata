@@ -59,9 +59,10 @@ def to_enum(clazz: Type[Enum], value: Any) -> Enum:
 
 
 def to_bool(value: Any) -> bool:
-    if value in ("true", "1"):
+    val = value.strip()
+    if val in ("true", "1"):
         return True
-    if value in ("false", "0"):
+    if val in ("false", "0"):
         return False
 
     raise ConverterError(f"Invalid bool literal '{value}'")

@@ -259,7 +259,7 @@ class ClassBuilderTests(FactoryTestCase):
         mock_element_namespace,
         mock_build_class_attribute_types,
     ):
-        item = ClassFactory.create()
+        item = ClassFactory.create(nsmap={"bar": "foo"})
 
         mock_build_class_attribute_types.return_value = AttrTypeFactory.list(
             1, name="xs:int"
@@ -273,7 +273,7 @@ class ClassBuilderTests(FactoryTestCase):
         mock_element_namespace.return_value = "http://something/common"
         mock_get_restrictions.return_value = {"required": True}
 
-        attribute = Attribute.create(default="false", index=66)
+        attribute = Attribute.create(default="false", index=66, nsmap={"foo": "bar"})
 
         self.builder.build_class_attribute(item, attribute)
         expected = AttrFactory.create(
@@ -287,9 +287,9 @@ class ClassBuilderTests(FactoryTestCase):
             wildcard=mock_is_wildcard.return_value,
             index=66,
             restrictions=Restrictions(required=True),
-            nsmap=attribute.nsmap,
         )
         self.assertEqual(expected, item.attrs[0])
+        self.assertEqual({"bar": "foo", "foo": "bar"}, item.nsmap)
         mock_build_class_attribute_types.assert_called_once_with(item, attribute)
         mock_element_namespace.assert_called_once_with(attribute)
 

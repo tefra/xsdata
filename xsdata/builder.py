@@ -191,6 +191,7 @@ class ClassBuilder:
         if restrictions.prohibited:
             return
 
+        instance.nsmap.update(obj.nsmap)
         instance.attrs.append(
             Attr(
                 index=obj.index,
@@ -203,7 +204,6 @@ class ClassBuilder:
                 help=obj.display_help,
                 namespace=self.element_namespace(obj),
                 restrictions=restrictions,
-                nsmap=obj.nsmap,
             )
         )
 

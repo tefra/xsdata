@@ -1,3 +1,4 @@
+from collections import defaultdict
 from dataclasses import dataclass
 from dataclasses import field
 from typing import Dict
@@ -31,26 +32,30 @@ class AnyText:
 
 @dataclass
 class Namespaces:
-    items: Dict = field(default_factory=dict, init=False)
+    items: Dict = field(default_factory=lambda: defaultdict(set), init=False)
     auto_ns: int = field(default_factory=int, init=False)
 
     @property
     def prefixes(self):
-        return list(filter(None, self.items.values()))
+        return list(filter(None, self.ns_map.keys()))
 
     @property
     def ns_map(self):
-        return {v: k for k, v in self.items.items()}
+        return {
+            prefix: uri for uri, prefixes in self.items.items() for prefix in prefixes
+        }
 
     def add(self, uri: Optional[str], prefix: Optional[str] = None):
-        if uri and uri not in self.items:
-            namespace = Namespace.get_enum(uri)
-            if namespace:
-                prefix = namespace.prefix
-            elif not prefix:
-                prefix = f"ns{self.auto_ns}"
-                self.auto_ns += 1
-            self.items[uri] = prefix
+        if not uri or uri in self.items and not prefix:
+            return
+
+        namespace = Namespace.get_enum(uri)
+        prefix = namespace.prefix if namespace else prefix
+        if not prefix:
+            prefix = f"ns{self.auto_ns}"
+            self.auto_ns += 1
+
+        self.items[uri].add(prefix)
 
     def add_all(self, ns_map: Dict):
         for prefix, uri in ns_map.items():
@@ -60,6 +65,6 @@ class Namespaces:
         self.items.clear()
 
     def register(self):
-        for uri, prefix in self.items.items():
+        for prefix, uri in self.ns_map.items():
             if prefix and not prefix.startswith("ns"):
                 register_namespace(prefix, uri)

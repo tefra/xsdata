@@ -1,4 +1,3 @@
-from typing import Iterator
 from unittest import mock
 
 from tests.factories import AttrFactory
@@ -43,7 +42,7 @@ class ClassAnalyzerTests(ClassAnalyzerBaseTestCase):
         mock_fetch_classes_for_generation,
     ):
         gen_classes = ClassFactory.list(2)
-        mock_fetch_classes_for_generation.return_value = [obj for obj in gen_classes]
+        mock_fetch_classes_for_generation.return_value = gen_classes
         classes = ClassFactory.list(3, type=Element)
 
         self.assertEqual(gen_classes, self.analyzer.process(classes))
@@ -113,8 +112,14 @@ class ClassAnalyzerTests(ClassAnalyzerBaseTestCase):
 
         self.analyzer.create_class_qname_index(classes)
         result = self.analyzer.fetch_classes_for_generation()
-        self.assertIsInstance(result, Iterator)
-        self.assertEqual(expected, list(result))
+        self.assertEqual(expected, result)
+
+    def test_fetch_classes_for_generation_return_simple_when_no_complex_types(self):
+        classes = ClassFactory.list(2, type=SimpleType)
+        self.analyzer.create_class_qname_index(classes)
+
+        actual = self.analyzer.fetch_classes_for_generation()
+        self.assertEqual(classes, actual)
 
     @mock.patch.object(ClassAnalyzer, "flatten_class")
     def test_flatten_classes(self, mock_flatten_class):

@@ -68,10 +68,8 @@ Example 18-12 Overriding named groups
    :language: xml
    :lines: 3-
 
-.. warning::
-
-    Illegal definition
-
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter18/example18121.py
+   :language: python
 
 Example 18-12.2 Overriding named groups
 ---------------------------------------
@@ -80,10 +78,8 @@ Example 18-12.2 Overriding named groups
    :language: xml
    :lines: 3-
 
-.. warning::
-
-    Illegal definition
-
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter18/example18122.py
+   :language: python
 
 Example 18-13 Risks of overriding types
 ---------------------------------------
@@ -152,10 +148,8 @@ Example 18-4 Redefining a named model group as a subset
    :language: xml
    :lines: 3-
 
-.. warning::
-
-    Illegal definition
-
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter18/example18041.py
+   :language: python
 
 Example 18-4.2 Redefining a named model group as a subset
 ---------------------------------------------------------
@@ -164,10 +158,8 @@ Example 18-4.2 Redefining a named model group as a subset
    :language: xml
    :lines: 3-
 
-.. warning::
-
-    Illegal definition
-
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter18/example18042.py
+   :language: python
 
 Example 18-5 Redefining a named model group as a superset
 ---------------------------------------------------------
@@ -176,10 +168,8 @@ Example 18-5 Redefining a named model group as a superset
    :language: xml
    :lines: 3-
 
-.. warning::
-
-    Illegal definition
-
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter18/example18051.py
+   :language: python
 
 Example 18-5.2 Redefining a named model group as a superset
 -----------------------------------------------------------
@@ -188,10 +178,8 @@ Example 18-5.2 Redefining a named model group as a superset
    :language: xml
    :lines: 3-
 
-.. warning::
-
-    Illegal definition
-
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter18/example18052.py
+   :language: python
 
 Example 18-6 Redefining an attribute group as a subset
 ------------------------------------------------------

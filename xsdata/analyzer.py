@@ -2,7 +2,6 @@ from collections import defaultdict
 from dataclasses import dataclass
 from dataclasses import field
 from typing import Dict
-from typing import Iterator
 from typing import List
 from typing import Optional
 from xml.etree.ElementTree import QName
@@ -58,21 +57,25 @@ class ClassAnalyzer:
 
         gen_classes = self.fetch_classes_for_generation()
 
-        return list(gen_classes)
+        return gen_classes
 
-    def fetch_classes_for_generation(self) -> Iterator[Class]:
+    def fetch_classes_for_generation(self) -> List[Class]:
         """
-        Return the qualified classes to continue for code generation.
+        Return the qualified classes to continue for code generation. Return
+        all if there are not primary classes.
 
         Qualifications:
             * not an abstract
             * type: element | complexType | simpleType with enumerations
         """
-        for classes in self.class_index.values():
-            for item in classes:
-                should_store = item.is_common or item.is_abstract
-                if not should_store or item.is_enumeration:
-                    yield item
+        all_classes = [item for values in self.class_index.values() for item in values]
+        primary_classes = [
+            item
+            for item in all_classes
+            if item.is_enumeration or not (item.is_abstract or item.is_common)
+        ]
+
+        return primary_classes or all_classes
 
     def create_class_qname_index(self, classes: List[Class]):
         self.class_index.clear()

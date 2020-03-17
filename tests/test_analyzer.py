@@ -150,10 +150,10 @@ class ClassAnalyzerTests(ClassAnalyzerBaseTestCase):
         item.attrs.append(attr)
 
         self.analyzer.create_class_qname_index([item])
-        self.assertTrue(self.analyzer.is_self_referencing(item, attr_type))
+        self.assertTrue(self.analyzer.is_attribute_self_reference(item, attr_type))
 
         attr_type.name = "foobar"
-        self.assertFalse(self.analyzer.is_self_referencing(item, attr_type))
+        self.assertFalse(self.analyzer.is_attribute_self_reference(item, attr_type))
 
 
 class ClassAnalyzerFlattenClassTests(ClassAnalyzerBaseTestCase):
@@ -215,9 +215,13 @@ class ClassAnalyzerFlattenClassTests(ClassAnalyzerBaseTestCase):
 
 
 class ClassAnalyzerFlattenExtensionTests(ClassAnalyzerBaseTestCase):
+    @mock.patch.object(ClassAnalyzer, "is_extension_subset")
     @mock.patch.object(ClassAnalyzer, "find_class")
-    def test_when_no_common_is_found(self, mock_find_class):
+    def test_when_no_source_is_found_and_extension_is_not_subset(
+        self, mock_find_class, mock_is_extension_subset
+    ):
         mock_find_class.return_value = None
+        mock_is_extension_subset.return_value = False
 
         extension = ExtensionFactory.create()
         obj = ClassFactory.create(extensions=[extension])
@@ -228,9 +232,27 @@ class ClassAnalyzerFlattenExtensionTests(ClassAnalyzerBaseTestCase):
         ext_type_qname = obj.source_qname(extension.type.name)
         mock_find_class.assert_called_once_with(ext_type_qname)
 
+    @mock.patch.object(ClassAnalyzer, "is_extension_subset")
+    @mock.patch.object(ClassAnalyzer, "find_class")
+    def test_when_no_source_is_found_and_extension_is_subset(
+        self, mock_find_class, mock_is_extension_subset
+    ):
+        mock_find_class.return_value = None
+        mock_is_extension_subset.return_value = True
+
+        extension = ExtensionFactory.create()
+        obj = ClassFactory.create(extensions=[extension])
+
+        self.analyzer.flatten_extension(obj, extension)
+
+        self.assertEqual(0, len(obj.extensions))
+        ext_type_qname = obj.source_qname(extension.type.name)
+        mock_find_class.assert_called_once_with(ext_type_qname)
+        mock_is_extension_subset.assert_called_once_with(obj, extension)
+
     @mock.patch.object(ClassAnalyzer, "create_default_attribute")
     @mock.patch.object(ClassAnalyzer, "find_class")
-    def test_when_common_is_enumeration(
+    def test_when_source_is_enumeration(
         self, mock_find_class, mock_create_default_attribute
     ):
         mock_find_class.return_value = ClassFactory.create(
@@ -241,13 +263,13 @@ class ClassAnalyzerFlattenExtensionTests(ClassAnalyzerBaseTestCase):
         obj = ClassFactory.create(extensions=[extension])
 
         self.analyzer.flatten_extension(obj, extension)
-
-        self.assertEqual(0, len(obj.extensions))
         mock_create_default_attribute.assert_called_once_with(obj, extension)
 
     @mock.patch.object(ClassAnalyzer, "copy_attributes")
     @mock.patch.object(ClassAnalyzer, "find_class")
-    def test_when_class_is_not_enumeration(self, mock_find_class, mock_copy_attributes):
+    def test_when_target_is_not_enumeration(
+        self, mock_find_class, mock_copy_attributes
+    ):
         common = ClassFactory.create(attrs=AttrFactory.list(2))
         mock_find_class.return_value = common
 
@@ -255,14 +277,12 @@ class ClassAnalyzerFlattenExtensionTests(ClassAnalyzerBaseTestCase):
         obj = ClassFactory.create(extensions=[extension], attrs=AttrFactory.list(2))
 
         self.analyzer.flatten_extension(obj, extension)
-
         mock_copy_attributes.assert_called_once_with(common, obj, extension)
-        self.assertEqual(0, len(obj.extensions))
 
     @mock.patch.object(ClassAnalyzer, "create_default_attribute")
     @mock.patch.object(ClassAnalyzer, "copy_attributes")
     @mock.patch.object(ClassAnalyzer, "find_class")
-    def test_when_class_is_common(
+    def test_when_target_is_source(
         self, mock_find_class, mock_copy_attributes, mock_create_default_attribute
     ):
         item = ClassFactory.create(
@@ -280,7 +300,7 @@ class ClassAnalyzerFlattenExtensionTests(ClassAnalyzerBaseTestCase):
         self.assertEqual(0, mock_create_default_attribute.call_count)
 
     @mock.patch.object(ClassAnalyzer, "create_default_attribute")
-    def test_when_type_is_native(self, mock_create_default_attribute):
+    def test_when_extension_type_is_native(self, mock_create_default_attribute):
         extension = ExtensionFactory.create(type=AttrTypeFactory.create(native=True))
         item = ClassFactory.create(
             attrs=AttrFactory.list(1, local_type=TagType.ELEMENT),
@@ -288,14 +308,26 @@ class ClassAnalyzerFlattenExtensionTests(ClassAnalyzerBaseTestCase):
         )
 
         self.analyzer.flatten_extension(item, extension)
-        self.assertEqual(0, len(item.extensions))
         mock_create_default_attribute.assert_called_once_with(item, extension)
+
+    @mock.patch.object(ClassAnalyzer, "create_default_attribute")
+    def test_when_extension_type_is_native_but_target_is_enumeration(
+        self, mock_create_default_attribute
+    ):
+        extension = ExtensionFactory.create(type=AttrTypeFactory.create(native=True))
+        item = ClassFactory.create(
+            attrs=AttrFactory.list(1, local_type=TagType.ENUMERATION),
+            extensions=[extension],
+        )
+
+        self.analyzer.flatten_extension(item, extension)
+        self.assertEqual(0, mock_create_default_attribute.call_count)
 
 
 class ClassAnalyzerHelpersTests(ClassAnalyzerBaseTestCase):
     def test_create_default_attribute(self):
-        item = ClassFactory.create()
         extension = ExtensionFactory.create()
+        item = ClassFactory.create(extensions=[extension])
 
         ClassAnalyzer.create_default_attribute(item, extension)
         expected = AttrFactory.create(
@@ -308,14 +340,15 @@ class ClassAnalyzerHelpersTests(ClassAnalyzerBaseTestCase):
         )
 
         self.assertEqual(1, len(item.attrs))
+        self.assertEqual(0, len(item.extensions))
         self.assertEqual(expected, item.attrs[0])
 
     def test_create_default_attribute_with_any_type(self):
-        item = ClassFactory.create()
         extension = ExtensionFactory.create(
             type=AttrTypeFactory.create(name=DataType.ANY_TYPE.code, native=True),
             restrictions=Restrictions(min_occurs=1, max_occurs=1, required=True),
         )
+        item = ClassFactory.create(extensions=[extension])
 
         ClassAnalyzer.create_default_attribute(item, extension)
         expected = AttrFactory.create(
@@ -330,6 +363,7 @@ class ClassAnalyzerHelpersTests(ClassAnalyzerBaseTestCase):
         )
 
         self.assertEqual(1, len(item.attrs))
+        self.assertEqual(0, len(item.extensions))
         self.assertEqual(expected, item.attrs[0])
 
     def test_copy_attributes(self):
@@ -361,7 +395,10 @@ class ClassAnalyzerHelpersTests(ClassAnalyzerBaseTestCase):
         )
 
         ClassAnalyzer.copy_attributes(common_b, obj, ext_b)
+        self.assertEqual(1, len(obj.extensions))
+
         ClassAnalyzer.copy_attributes(common_c, obj, ext_c)
+        self.assertEqual(0, len(obj.extensions))
 
         attrs = [
             ("i", "i"),
@@ -381,9 +418,11 @@ class ClassAnalyzerHelpersTests(ClassAnalyzerBaseTestCase):
 
 
 class ClassAnalyzerFlattenAttributeTests(ClassAnalyzerBaseTestCase):
-    @mock.patch.object(ClassAnalyzer, "is_self_referencing", return_value=False)
+    @mock.patch.object(ClassAnalyzer, "is_attribute_self_reference", return_value=False)
     @mock.patch.object(ClassAnalyzer, "find_class")
-    def test_when_no_common_is_found(self, mock_find_class, mock_is_self_referencing):
+    def test_when_no_source_is_found(
+        self, mock_find_class, mock_is_attribute_self_reference
+    ):
         mock_find_class.return_value = None
 
         parent = ClassFactory.create()
@@ -394,9 +433,9 @@ class ClassAnalyzerFlattenAttributeTests(ClassAnalyzerBaseTestCase):
         self.assertEqual([type_a], attr.types)
         mock_find_class.assert_called_once_with(parent.source_qname(type_a.name))
 
-    @mock.patch.object(ClassAnalyzer, "is_self_referencing", return_value=True)
+    @mock.patch.object(ClassAnalyzer, "is_attribute_self_reference", return_value=True)
     @mock.patch.object(ClassAnalyzer, "find_class", return_value=None)
-    def test_when_attr_is_self_referencing(self, *args):
+    def test_when_is_attribute_self_reference(self, *args):
         parent = ClassFactory.create()
         type_a = AttrTypeFactory.create()
         attr = AttrFactory.create(name="a", types=[type_a])
@@ -406,7 +445,7 @@ class ClassAnalyzerFlattenAttributeTests(ClassAnalyzerBaseTestCase):
         self.assertTrue(type_a.self_ref)
 
     @mock.patch.object(ClassAnalyzer, "find_class")
-    def test_when_common_is_enumeration(self, mock_find_class):
+    def test_when_source_is_enumeration(self, mock_find_class):
         mock_find_class.return_value = ClassFactory.create(
             attrs=AttrFactory.list(1, local_type=TagType.ENUMERATION)
         )
@@ -421,7 +460,7 @@ class ClassAnalyzerFlattenAttributeTests(ClassAnalyzerBaseTestCase):
 
     @mock.patch.object(ClassAnalyzer, "copy_inner_classes")
     @mock.patch.object(ClassAnalyzer, "find_class")
-    def test_when_common_class_has_only_one_attribute(
+    def test_when_source_has_only_one_attribute(
         self, mock_find_class, mock_copy_inner_classes
     ):
         type_a = AttrTypeFactory.create(name="a")
@@ -456,7 +495,7 @@ class ClassAnalyzerFlattenAttributeTests(ClassAnalyzerBaseTestCase):
 
     @mock.patch("xsdata.analyzer.logger.warning")
     @mock.patch.object(ClassAnalyzer, "find_class")
-    def test_when_common_class_has_more_than_one_attribute(
+    def test_when_source_has_more_than_one_attribute(
         self, mock_find_class, mock_logger_warning
     ):
         type_a = AttrTypeFactory.create(name="a")
@@ -534,7 +573,6 @@ class ClassAnalyzerMergeClassesTests(ClassAnalyzerBaseTestCase):
         self.assertEqual(2, len(classes))
 
         mock_copy_attributes.assert_called_once_with(class_a, class_c, ext_a)
-        self.assertEqual([ext_str], class_c.extensions)
 
     def test_copies_extensions(self):
         class_a = ClassFactory.create()

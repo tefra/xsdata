@@ -64,9 +64,6 @@ class ClassAnalyzer:
         """
         Return the qualified classes to continue for code generation.
 
-        The rest of the classes are stored as common types to be used later
-        by the next schemas in the process.
-
         Qualifications:
             * not an abstract
             * type: element | complexType | simpleType with enumerations
@@ -82,18 +79,6 @@ class ClassAnalyzer:
         self.processed.clear()
         for item in classes:
             self.class_index[item.source_qname()].append(item)
-
-    def flatten_classes(self):
-        for classes in self.class_index.values():
-            for obj in classes:
-                if obj.key not in self.processed:
-                    self.flatten_class(obj)
-
-    def is_self_referencing(self, item: Class, dependency: AttrType) -> bool:
-        dependency_qname = item.source_qname(dependency.name)
-        return (
-            self.find_class(dependency_qname, condition=lambda x: x is item) is not None
-        )
 
     def find_class(self, qname: QName, condition=simple_type) -> Optional[Class]:
         candidates = list(filter(condition, self.class_index.get(qname, [])))
@@ -134,7 +119,6 @@ class ClassAnalyzer:
                 if not self_extension:
                     continue
 
-                winner.extensions.remove(self_extension)
                 self.copy_attributes(item, winner, self_extension)
                 for looser_ext in item.extensions:
                     new_ext = looser_ext.clone()
@@ -159,9 +143,15 @@ class ClassAnalyzer:
                 if obj is not element and not obj.is_common:
                     obj.is_abstract = True
 
-    def flatten_class(self, item: Class):
+    def flatten_classes(self):
+        for classes in self.class_index.values():
+            for obj in classes:
+                if obj.key not in self.processed:
+                    self.flatten_class(obj)
+
+    def flatten_class(self, target: Class):
         """
-        Flatten class traits from the common types registry.
+        Flatten class extensions, attributes and inner classes.
 
         Steps:
             * Enum unions
@@ -169,47 +159,47 @@ class ClassAnalyzer:
             * Attributes
             * Inner classes
         """
-        self.processed[item.key] = True
+        self.processed[target.key] = True
 
-        if item.is_common:
-            self.flatten_enumeration_unions(item)
+        if target.is_common:
+            self.flatten_enumeration_unions(target)
 
-        for extension in reversed(item.extensions):
-            self.flatten_extension(item, extension)
+        for extension in reversed(target.extensions):
+            self.flatten_extension(target, extension)
 
-        for attr in list(item.attrs):
-            self.flatten_attribute(item, attr)
+        for attr in list(target.attrs):
+            self.flatten_attribute(target, attr)
 
-        for inner in item.inner:
+        for inner in target.inner:
             self.flatten_class(inner)
 
-    def flatten_enumeration_unions(self, item: Class):
+    def flatten_enumeration_unions(self, target: Class):
 
-        if len(item.attrs) == 1 and item.attrs[0].name == "value":
+        if len(target.attrs) == 1 and target.attrs[0].name == "value":
             all_enums = True
             attrs = []
-            for attr_type in item.attrs[0].types:
+            for attr_type in target.attrs[0].types:
                 is_enumeration = False
-                if attr_type.forward_ref and len(item.inner) == 1:
-                    if item.inner[0].is_enumeration:
+                if attr_type.forward_ref and len(target.inner) == 1:
+                    if target.inner[0].is_enumeration:
                         is_enumeration = True
-                        attrs.extend(item.inner[0].attrs)
+                        attrs.extend(target.inner[0].attrs)
 
                 elif not attr_type.forward_ref and not attr_type.native:
-                    type_qname = item.source_qname(attr_type.name)
-                    common = self.find_class(type_qname)
+                    type_qname = target.source_qname(attr_type.name)
+                    source = self.find_class(type_qname)
 
-                    if common is not None and common.is_enumeration:
+                    if source is not None and source.is_enumeration:
                         is_enumeration = True
-                        attrs.extend(common.attrs)
+                        attrs.extend(source.attrs)
 
                 if not is_enumeration:
                     all_enums = False
 
             if all_enums:
-                item.attrs = attrs
+                target.attrs = attrs
 
-    def flatten_extension(self, item: Class, extension: Extension):
+    def flatten_extension(self, target: Class, extension: Extension):
         """
         If the extension class is found in the registry prepend it's attributes
         to the given class.
@@ -218,57 +208,79 @@ class ClassAnalyzer:
         prepended with the extension prefix if it isn't a reference to
         another schema.
         """
-        if extension.type.native and not item.is_enumeration:
-            self.create_default_attribute(item, extension)
-        else:
-            type_qname = item.source_qname(extension.type.name)
-            common = self.find_class(type_qname)
-            if common is None:
-                return
-            elif common is item:
-                pass
-            elif not item.is_enumeration and common.is_enumeration:
-                self.create_default_attribute(item, extension)
-            elif not item.is_enumeration or common.is_enumeration:
-                self.copy_attributes(common, item, extension)
+        if extension.type.native and not target.is_enumeration:
+            return self.create_default_attribute(target, extension)
 
-        item.extensions.remove(extension)
+        type_qname = target.source_qname(extension.type.name)
+        source = self.find_class(type_qname)
+        if source is None:
+            if self.is_extension_subset(target, extension):
+                target.extensions.remove(extension)
+        elif source is target:
+            target.extensions.remove(extension)
+        elif source.is_enumeration and not target.is_enumeration:
+            self.create_default_attribute(target, extension)
+        elif source.is_enumeration == target.is_enumeration:
+            self.copy_attributes(source, target, extension)
+        elif target.is_enumeration:
+            target.extensions.remove(extension)
 
-    def flatten_attribute(self, item: Class, attr: Attr):
+    def flatten_attribute(self, target: Class, attr: Attr):
         """
-        If the attribute type is found in the registry overwrite the given
-        attribute type and merge the restrictions.
+        Flatten attribute types by using the source attribute type.
 
-        If the common type doesn't have just one attribute fallback to
-        the default xsd type xs:string
+        Steps:
+            * Skip xsd native types
+            * Detect circular references if no source is found
+            * Skip enumeration types
+            * Overwrite attribute type from source
         """
         types = []
         for attr_type in attr.types:
-            common = None
+            source = None
             if not attr_type.native:
-                type_qname = item.source_qname(attr_type.name)
-                common = self.find_class(type_qname)
+                type_qname = target.source_qname(attr_type.name)
+                source = self.find_class(type_qname)
 
-            if common is None:
-                attr_type.self_ref = self.is_self_referencing(item, attr_type)
+            if source is None:
+                attr_type.self_ref = self.is_attribute_self_reference(target, attr_type)
                 types.append(attr_type)
-            elif common.is_enumeration:
+            elif source.is_enumeration:
                 types.append(attr_type)
-            elif len(common.attrs) == 1:
-                common_attr = common.attrs[0]
-                types.extend(common_attr.types)
-                attr.restrictions.update(common_attr.restrictions)
-                self.copy_inner_classes(common, item)
+            elif len(source.attrs) == 1:
+                source_attr = source.attrs[0]
+                types.extend(source_attr.types)
+                attr.restrictions.update(source_attr.restrictions)
+                self.copy_inner_classes(source, target)
             else:
                 types.append(AttrType(name=DataType.STRING.code, native=True))
-                logger.warning("Missing type implementation: %s", common.type.__name__)
+                logger.warning("Missing type implementation: %s", source.type.__name__)
 
         attr.types = types
+
+    def is_extension_subset(self, target, extension) -> bool:
+        if not len(target.attrs):
+            return False
+
+        type_qname = target.source_qname(extension.type.name)
+        source = self.find_class(type_qname, condition=None)
+
+        if not source:
+            return False
+
+        source_attrs = {attr.name for attr in source.attrs}
+        target_attrs = {attr.name for attr in target.attrs}
+        return len(source_attrs - target_attrs) == 0
+
+    def is_attribute_self_reference(self, target: Class, dependency: AttrType) -> bool:
+        qname = target.source_qname(dependency.name)
+        return self.find_class(qname, condition=lambda x: x is target) is not None
 
     @staticmethod
     def copy_attributes(source: Class, target: Class, extension: Extension):
         prefix = text.prefix(extension.type.name)
         target.inner.extend(source.inner)
+        target.extensions.remove(extension)
         position = next(
             (
                 index
@@ -320,3 +332,4 @@ class ClassAnalyzer:
             )
 
         item.attrs.insert(0, attr)
+        item.extensions.remove(extension)

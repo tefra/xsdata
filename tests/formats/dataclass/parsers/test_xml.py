@@ -263,7 +263,7 @@ class XmlParserTests(TestCase):
         self.assertEqual("result", result)
         self.assertEqual(0, len(self.parser.queue))
         self.assertEqual((QName(element.tag), result), self.parser.objects[-1])
-        self.assertEqual({"uri": "prefix"}, self.parser.namespaces.items)
+        self.assertEqual({"prefix": "uri"}, self.parser.namespaces.ns_map)
         mock_parse_value.assert_called_once_with(
             queue_item.types, element.text, queue_item.default
         )
@@ -290,7 +290,7 @@ class XmlParserTests(TestCase):
         self.assertEqual(0, len(self.parser.queue))
         self.assertEqual((queue_item.qname, result), self.parser.objects[-1])
         self.assertEqual([1, 2, 3], result.children)
-        self.assertEqual({"uri": "prefix"}, self.parser.namespaces.items)
+        self.assertEqual({"prefix": "uri"}, self.parser.namespaces.ns_map)
 
         mock_parse_any_element.assert_called_once_with(element)
         mock_fetch_any_children.assert_called_once_with(queue_item)
@@ -330,7 +330,7 @@ class XmlParserTests(TestCase):
         self.assertEqual(Foo(1, 2, 3), result)
         self.assertEqual(0, len(self.parser.queue))
         self.assertEqual((QName(element.tag), result), self.parser.objects[-1])
-        self.assertEqual({"uri": "prefix"}, self.parser.namespaces.items)
+        self.assertEqual({"prefix": "uri"}, self.parser.namespaces.ns_map)
 
         mock_bind_element_attrs.assert_called_once_with(queue_item.meta, element)
         mock_bind_element_text.assert_called_once_with(queue_item.meta, element)

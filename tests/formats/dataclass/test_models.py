@@ -10,15 +10,19 @@ class NamespacesTests(TestCase):
     def test_add(self):
         namespaces = Namespaces()
         namespaces.add("foo")
-        namespaces.add("bar", "b")
-        namespaces.add(Namespace.XSI.uri, "superxsi")
-        namespaces.add(Namespace.XS.uri, "xs")
+        namespaces.add("foo")
+        namespaces.add("bar", "one")
+        namespaces.add("bar", "two")
+        namespaces.add(Namespace.XSI.uri, "a")
+        namespaces.add(Namespace.XSI.uri, "b")
+        namespaces.add(Namespace.XS.uri, "c")
+        namespaces.add(Namespace.XS.uri, "d")
 
         expected = {
-            "bar": "b",
-            "foo": "ns0",
-            "http://www.w3.org/2001/XMLSchema": "xs",
-            "http://www.w3.org/2001/XMLSchema-instance": "xsi",
+            "bar": {"one", "two"},
+            "foo": {"ns0"},
+            "http://www.w3.org/2001/XMLSchema": {"xs"},
+            "http://www.w3.org/2001/XMLSchema-instance": {"xsi"},
         }
         self.assertEqual(expected, namespaces.items)
 
@@ -32,9 +36,9 @@ class NamespacesTests(TestCase):
             }
         )
         expected = {
-            "bar": "b",
-            "http://www.w3.org/2001/XMLSchema": "xs",
-            "http://www.w3.org/2001/XMLSchema-instance": "xsi",
+            "bar": {"b"},
+            "http://www.w3.org/2001/XMLSchema": {"xs"},
+            "http://www.w3.org/2001/XMLSchema-instance": {"xsi"},
         }
         self.assertEqual(expected, namespaces.items)
 
@@ -58,11 +62,13 @@ class NamespacesTests(TestCase):
                 "foo": "http://www.w3.org/2001/XMLSchema-instance",
             }
         )
+        namespaces.add("bar", "again")
         namespaces.add("one")
         namespaces.add("two")
 
         expected = {
             "b": "bar",
+            "again": "bar",
             "ns0": "one",
             "ns1": "two",
             "xs": "http://www.w3.org/2001/XMLSchema",
@@ -73,7 +79,7 @@ class NamespacesTests(TestCase):
     def test_clear(self):
         namespaces = Namespaces()
         namespaces.add_all(
-            {"b": "bar", "foo": "http://www.w3.org/2001/XMLSchema-instance",}
+            {"b": "bar", "foo": "http://www.w3.org/2001/XMLSchema-instance"}
         )
         self.assertEqual(2, len(namespaces.ns_map))
         namespaces.clear()

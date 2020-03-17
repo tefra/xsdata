@@ -23,7 +23,7 @@ class CatalogListType:
 
 
 @dataclass
-class RestrictedCatalogListType(CatalogListType):
+class RestrictedCatalogListType:
     """
     :ivar catalog:
     """

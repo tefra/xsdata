@@ -18,7 +18,7 @@ class BaseType:
 
 
 @dataclass
-class DerivedType(BaseType):
+class DerivedType:
     """
     :ivar attributes:
     """

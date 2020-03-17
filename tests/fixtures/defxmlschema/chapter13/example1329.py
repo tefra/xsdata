@@ -17,7 +17,7 @@ class ItemType:
 
 
 @dataclass
-class RestrictedItemType(ItemType):
+class RestrictedItemType:
     """
     :ivar routing_num:
     """

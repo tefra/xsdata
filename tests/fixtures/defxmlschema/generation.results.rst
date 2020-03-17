@@ -1,5 +1,5 @@
-- Total tests: **192**
-- Passed: **178**
+- Total tests: **199**
+- Passed: **185**
 - Should fail: **6**
 - XML Schema 1.1: **1**
 - substitution groups: **5**

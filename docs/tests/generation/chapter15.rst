@@ -88,10 +88,8 @@ Example 15-17.2 Named groups across namespaces
    :language: xml
    :lines: 3-
 
-.. warning::
-
-    Illegal definition
-
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter15/example15172.py
+   :language: python
 
 Example 15-18 Reusing content model fragments through derivation
 ----------------------------------------------------------------

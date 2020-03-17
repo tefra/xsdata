@@ -180,7 +180,6 @@ class AttrFactory(Factory):
         fixed=False,
         wildcard=False,
         restrictions=None,
-        nsmap=None,
     ):
 
         return cls.model(
@@ -194,7 +193,6 @@ class AttrFactory(Factory):
             fixed=fixed,
             wildcard=wildcard,
             restrictions=restrictions or RestrictionsFactory.create(),
-            nsmap=nsmap if isinstance(nsmap, dict) else NSMAP,
         )
 
 

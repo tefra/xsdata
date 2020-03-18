@@ -5,18 +5,10 @@ from typing import Optional
 @dataclass
 class ProductType:
     """
-    :ivar other_element:
     :ivar number:
     :ivar name:
+    :ivar other_element:
     """
-    other_element: Optional[object] = field(
-        default=None,
-        metadata=dict(
-            type="Any",
-            namespace="##other",
-            required=True
-        )
-    )
     number: Optional[int] = field(
         default=None,
         metadata=dict(
@@ -35,23 +27,23 @@ class ProductType:
             required=True
         )
     )
+    other_element: Optional[object] = field(
+        default=None,
+        metadata=dict(
+            type="Any",
+            namespace="##other",
+            required=True
+        )
+    )
 
 
 @dataclass
 class ShirtType(ProductType):
     """
-    :ivar any_element:
     :ivar size:
     :ivar color:
+    :ivar any_element:
     """
-    any_element: Optional[object] = field(
-        default=None,
-        metadata=dict(
-            type="Any",
-            namespace="##any",
-            required=True
-        )
-    )
     size: Optional[int] = field(
         default=None,
         metadata=dict(
@@ -67,6 +59,14 @@ class ShirtType(ProductType):
             name="color",
             type="Element",
             namespace="",
+            required=True
+        )
+    )
+    any_element: Optional[object] = field(
+        default=None,
+        metadata=dict(
+            type="Any",
+            namespace="##any",
             required=True
         )
     )

@@ -7,6 +7,7 @@ class ProductType:
     """
     :ivar number:
     :ivar name:
+    :ivar local_element:
     """
     number: Optional[int] = field(
         default=None,
@@ -23,6 +24,14 @@ class ProductType:
             name="name",
             type="Element",
             namespace="",
+            required=True
+        )
+    )
+    local_element: Optional[object] = field(
+        default=None,
+        metadata=dict(
+            type="Any",
+            namespace="##local",
             required=True
         )
     )
@@ -50,6 +59,7 @@ class Something:
 class CatalogType:
     """
     :ivar product:
+    :ivar local_element:
     """
     product: List[ProductType] = field(
         default_factory=list,
@@ -59,6 +69,14 @@ class CatalogType:
             namespace="",
             min_occurs=1,
             max_occurs=9223372036854775807
+        )
+    )
+    local_element: Optional[object] = field(
+        default=None,
+        metadata=dict(
+            type="Any",
+            namespace="##local",
+            required=True
         )
     )
 

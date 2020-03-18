@@ -17,7 +17,7 @@ from xsdata.utils import text
 
 
 def simple_type(item: Class):
-    return item.is_enumeration or item.is_abstract or item.is_common
+    return item.is_enumeration or item.abstract or item.is_common
 
 
 @dataclass
@@ -72,7 +72,7 @@ class ClassAnalyzer:
         primary_classes = [
             item
             for item in all_classes
-            if item.is_enumeration or not (item.is_abstract or item.is_common)
+            if item.is_enumeration or not (item.abstract or item.is_common)
         ]
 
         return primary_classes or all_classes
@@ -136,7 +136,7 @@ class ClassAnalyzer:
                 continue
 
             element = next(
-                (obj for obj in classes if obj.is_element and not obj.is_abstract), None
+                (obj for obj in classes if obj.is_element and not obj.abstract), None
             )
 
             if not element:
@@ -144,7 +144,7 @@ class ClassAnalyzer:
 
             for obj in classes:
                 if obj is not element and not obj.is_common:
-                    obj.is_abstract = True
+                    obj.abstract = True
 
     def flatten_classes(self):
         for classes in self.class_index.values():

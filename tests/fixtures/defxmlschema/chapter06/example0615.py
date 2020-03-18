@@ -9,6 +9,7 @@ class Size:
     """
     class Meta:
         name = "size"
+        nillable = True
 
     value: Optional[int] = field(
         default=None,

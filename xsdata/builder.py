@@ -60,9 +60,10 @@ class ClassBuilder:
         namespace = self.element_namespace(obj)
         instance = Class(
             name=obj.real_name,
-            is_abstract=obj.is_abstract,
+            abstract=obj.is_abstract,
             namespace=namespace,
-            is_mixed=obj.is_mixed,
+            mixed=obj.is_mixed,
+            nillable=obj.is_nillable,
             type=type(obj),
             help=obj.display_help,
             nsmap=obj.nsmap,

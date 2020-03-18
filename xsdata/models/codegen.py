@@ -168,10 +168,11 @@ class Extension:
 class Class:
     name: str
     type: Type
-    is_abstract: bool
-    is_mixed: bool
-    package: str
     module: str
+    package: str
+    mixed: bool
+    abstract: bool
+    nillable: bool
     namespace: Optional[str] = field(default=None)
     local_name: str = field(init=False)
     help: Optional[str] = field(default=None)
@@ -198,7 +199,7 @@ class Class:
 
     @property
     def is_nillable(self) -> bool:
-        return next(
+        return self.nillable or next(
             (True for ext in self.extensions if ext.restrictions.nillable), False
         )
 

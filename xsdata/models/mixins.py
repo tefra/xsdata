@@ -109,6 +109,10 @@ class ElementBase(BaseModel):
         return False
 
     @property
+    def is_nillable(self):
+        return getattr(self, "nillable", False)
+
+    @property
     def is_qualified(self):
         if self.has_form:
             if getattr(self, "form", FormType.UNQUALIFIED) == FormType.QUALIFIED:

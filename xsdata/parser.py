@@ -16,6 +16,7 @@ from xsdata.formats.dataclass.parsers.xml import QueueItem
 from xsdata.formats.dataclass.parsers.xml import XmlParser
 from xsdata.models import elements as xsd
 from xsdata.models.enums import FormType
+from xsdata.models.enums import Mode
 from xsdata.models.enums import Namespace
 from xsdata.models.mixins import OccurrencesMixin
 from xsdata.utils import text
@@ -44,6 +45,7 @@ class SchemaParser(XmlParser):
     attribute_form: Optional[FormType] = field(init=False, default=None)
     target_namespace: Optional[str] = field(default=None)
     default_attributes: Optional[str] = field(default=None)
+    default_open_content: Optional[xsd.DefaultOpenContent] = field(default=None)
     schema_location: Optional[Path] = field(default=None)
     name_generator: Callable = field(default=text.camel_case)
 
@@ -79,14 +81,6 @@ class SchemaParser(XmlParser):
         self.element_form = element.attrib.get("elementFormDefault", None)
         self.attribute_form = element.attrib.get("attributeFormDefault", None)
         self.default_attributes = element.attrib.get("defaultAttributes", None)
-
-    def end_schema(self, obj: T, element: etree.Element):
-        """Normalize various properties for the schema and it's children."""
-        if isinstance(obj, xsd.Schema):
-            self.set_schema_forms(obj)
-            self.set_schema_namespaces(obj, element)
-            self.add_default_imports(obj)
-            self.resolve_schemas_locations(obj)
 
     def set_schema_forms(self, obj: xsd.Schema):
         """
@@ -165,28 +159,18 @@ class SchemaParser(XmlParser):
         else:
             return self.resolve_path(location)
 
-    def end_element(self, obj: T, element: etree.Element):
-        """Assign the schema's default form for elements if the given element
-        form is None."""
-        if isinstance(obj, xsd.Element) and obj.form is None and self.element_form:
-            obj.form = FormType(self.element_form)
+    @classmethod
+    def end_all(cls, obj: T, element: etree.Element):
+        """Elements inside an all element can by definition appear at most
+        once, reset their max occur counter."""
+        if isinstance(obj, xsd.All):
+            cls.cascade_occurs(obj, obj.min_occurs, obj.max_occurs)
 
     def end_attribute(self, obj: T, element: etree.Element):
         """Assign the schema's default form for attributes if the given
         attribute form is None."""
         if isinstance(obj, xsd.Attribute) and obj.form is None and self.attribute_form:
             obj.form = FormType(self.attribute_form)
-
-    def end_complex_type(self, obj: T, element: etree.Element):
-        """Prepend an attribute group reference when default attributes
-        apply."""
-        if (
-            isinstance(obj, xsd.ComplexType)
-            and obj.default_attributes_apply
-            and self.default_attributes
-        ):
-            attribute_group = xsd.AttributeGroup.create(ref=self.default_attributes)
-            obj.attribute_groups.insert(0, attribute_group)
 
     @classmethod
     def end_choice(cls, obj: T, element: etree.Element):
@@ -195,22 +179,54 @@ class SchemaParser(XmlParser):
         if isinstance(obj, xsd.Choice):
             cls.cascade_occurs(obj, 0, obj.max_occurs, force=Force.MIN_ONLY)
 
-    @classmethod
-    def end_default_open_content(cls, obj: T, element: etree.Element):
+    def end_complex_type(self, obj: T, element: etree.Element):
+        """Prepend an attribute group reference when default attributes
+        apply."""
+        if not isinstance(obj, xsd.ComplexType):
+            return
+
+        if obj.default_attributes_apply and self.default_attributes:
+            attribute_group = xsd.AttributeGroup.create(ref=self.default_attributes)
+            obj.attribute_groups.insert(0, attribute_group)
+
+        if not obj.open_content:
+            obj.open_content = self.default_open_content
+
+    def end_default_open_content(self, obj: T, element: etree.Element):
         if isinstance(obj, xsd.DefaultOpenContent):
-            cls.cascade_occurs(obj, min_occurs=1, max_occurs=1)
+            if obj.any and obj.mode == Mode.SUFFIX:
+                obj.any.index = sys.maxsize
+
+            self.default_open_content = obj
+
+    def end_element(self, obj: T, element: etree.Element):
+        """Assign the schema's default form for elements if the given element
+        form is None."""
+        if isinstance(obj, xsd.Element) and obj.form is None and self.element_form:
+            obj.form = FormType(self.element_form)
+
+    def end_extension(self, obj: T, element: etree.Element):
+        if isinstance(obj, xsd.Extension) and not obj.open_content:
+            obj.open_content = self.default_open_content
 
     @classmethod
     def end_open_content(cls, obj: T, element: etree.Element):
         if isinstance(obj, xsd.OpenContent):
             cls.cascade_occurs(obj, 1, 1)
+            if obj.any and obj.mode == Mode.SUFFIX:
+                obj.any.index = sys.maxsize
 
-    @classmethod
-    def end_all(cls, obj: T, element: etree.Element):
-        """Elements inside an all element can by definition appear at most
-        once, reset their max occur counter."""
-        if isinstance(obj, xsd.All):
-            cls.cascade_occurs(obj, obj.min_occurs, obj.max_occurs)
+    def end_restriction(self, obj: T, element: etree.Element):
+        if isinstance(obj, xsd.Restriction) and not obj.open_content:
+            obj.open_content = self.default_open_content
+
+    def end_schema(self, obj: T, element: etree.Element):
+        """Normalize various properties for the schema and it's children."""
+        if isinstance(obj, xsd.Schema):
+            self.set_schema_forms(obj)
+            self.set_schema_namespaces(obj, element)
+            self.add_default_imports(obj)
+            self.resolve_schemas_locations(obj)
 
     @classmethod
     def end_sequence(cls, obj: T, element: etree.Element):

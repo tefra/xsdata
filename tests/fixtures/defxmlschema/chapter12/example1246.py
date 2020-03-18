@@ -7,6 +7,7 @@ class ProductType:
     """
     :ivar number:
     :ivar name:
+    :ivar local_element:
     """
     number: Optional[int] = field(
         default=None,
@@ -23,6 +24,14 @@ class ProductType:
             name="name",
             type="Element",
             namespace="",
+            required=True
+        )
+    )
+    local_element: Optional[object] = field(
+        default=None,
+        metadata=dict(
+            type="Any",
+            namespace="##local",
             required=True
         )
     )

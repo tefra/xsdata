@@ -121,12 +121,14 @@ class ClassBuilderTests(FactoryTestCase):
     @patch.object(ClassBuilder, "build_class_attributes")
     @patch.object(ClassBuilder, "build_class_extensions")
     @patch.object(Element, "is_abstract", new_callable=PropertyMock)
+    @patch.object(Element, "is_nillable", new_callable=PropertyMock)
     @patch.object(Element, "display_help", new_callable=PropertyMock)
     @patch.object(Element, "real_name", new_callable=PropertyMock)
     def test_build_class(
         self,
         mock_real_name,
         mock_display_help,
+        mock_is_nillable,
         mock_is_abstract,
         mock_build_class_extensions,
         mock_build_class_attributes,
@@ -135,6 +137,7 @@ class ClassBuilderTests(FactoryTestCase):
         mock_real_name.return_value = "name"
         mock_display_help.return_value = "sos"
         mock_is_abstract.return_value = True
+        mock_is_nillable.return_value = True
         mock_element_namespace.return_value = "foo:name"
 
         element = Element.create()
@@ -148,7 +151,8 @@ class ClassBuilderTests(FactoryTestCase):
             name="name",
             type=Element,
             help="sos",
-            is_abstract=True,
+            abstract=True,
+            nillable=True,
             namespace="foo:name",
             nsmap=element.nsmap,
             package=self.builder.package,

@@ -70,12 +70,12 @@ class ClassAnalyzerTests(ClassAnalyzerBaseTestCase):
         self.assertEqual(expected, self.analyzer.class_index)
 
     def test_mark_abstract_duplicate_classes(self):
-        one = ClassFactory.create(name="foo", is_abstract=True, type=Element)
+        one = ClassFactory.create(name="foo", abstract=True, type=Element)
         two = ClassFactory.create(name="foo", type=Element)
         three = ClassFactory.create(name="foo", type=ComplexType)
         four = ClassFactory.create(name="foo", type=SimpleType)
 
-        five = ClassFactory.create(name="bar", is_abstract=True, type=Element)
+        five = ClassFactory.create(name="bar", abstract=True, type=Element)
         six = ClassFactory.create(name="bar", type=ComplexType)
         seven = ClassFactory.create(name="opa", type=ComplexType)
 
@@ -84,17 +84,17 @@ class ClassAnalyzerTests(ClassAnalyzerBaseTestCase):
         )
         self.analyzer.mark_abstract_duplicate_classes()
 
-        self.assertTrue(one.is_abstract)  # Was abstract already
-        self.assertFalse(two.is_abstract)  # Is an element
-        self.assertTrue(three.is_abstract)  # Marked as abstract
-        self.assertFalse(four.is_abstract)  # Is common
-        self.assertTrue(five.is_abstract)  # Was abstract already
-        self.assertFalse(six.is_abstract)  # No element in group
-        self.assertFalse(seven.is_abstract)  # Alone
+        self.assertTrue(one.abstract)  # Was abstract already
+        self.assertFalse(two.abstract)  # Is an element
+        self.assertTrue(three.abstract)  # Marked as abstract
+        self.assertFalse(four.abstract)  # Is common
+        self.assertTrue(five.abstract)  # Was abstract already
+        self.assertFalse(six.abstract)  # No element in group
+        self.assertFalse(seven.abstract)  # Alone
 
     def test_fetch_classes_for_generation(self):
         classes = [
-            ClassFactory.create(is_abstract=True, type=Element),
+            ClassFactory.create(abstract=True, type=Element),
             ClassFactory.create(type=Element),
             ClassFactory.create(type=ComplexType),
             ClassFactory.create(type=SimpleType),

@@ -20,6 +20,8 @@ from xsdata.formats.dataclass.models import AnyText
 from xsdata.formats.dataclass.models import Namespaces
 from xsdata.models.enums import Namespace
 
+XSI_NIL_QNAME = QName(Namespace.XSI.uri, "nil")
+
 
 @dataclass
 class XmlSerializer(AbstractSerializer, ModelInspect):
@@ -92,9 +94,11 @@ class XmlSerializer(AbstractSerializer, ModelInspect):
                     self.set_text(parent, value)
                 else:
                     self.set_children(parent, value, var, namespaces)
-            elif var.is_text:
+                    self.set_nil_attribute(var, parent, namespaces)
+            else:
                 self.set_nil_attribute(var, parent, namespaces)
 
+        self.unset_nil_attribute(parent)
         return parent
 
     def set_children(
@@ -148,5 +152,9 @@ class XmlSerializer(AbstractSerializer, ModelInspect):
     def set_nil_attribute(var: ClassVar, element: Element, namespaces: Namespaces):
         if var.is_nillable and element.text is None and len(element) == 0:
             namespaces.add(Namespace.XSI.uri, Namespace.XSI.prefix)
-            qname = QName(Namespace.XSI.uri, "nil")
-            element.set(qname, "true")
+            element.set(XSI_NIL_QNAME, "true")
+
+    @staticmethod
+    def unset_nil_attribute(element: Element):
+        if len(element) > 0 or element.text:
+            element.attrib.pop(XSI_NIL_QNAME, None)

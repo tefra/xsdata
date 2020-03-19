@@ -6,12 +6,12 @@ from typing import Dict
 @dataclass
 class DerivedType:
     """
-    :ivar attributes:
+    :ivar datypic_com_prod_target_namespace_http_www_w3_org_1999_xhtml_attributes:
     """
-    attributes: Dict[QName, str] = field(
+    datypic_com_prod_target_namespace_http_www_w3_org_1999_xhtml_attributes: Dict[QName, str] = field(
         default_factory=dict,
         metadata=dict(
-            name="attributes",
-            type="AnyAttribute"
+            type="AnyAttribute",
+            namespace="##local http://datypic.com/prod ##targetNamespace http://www.w3.org/1999/xhtml"
         )
     )

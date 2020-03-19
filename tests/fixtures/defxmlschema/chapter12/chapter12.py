@@ -67,7 +67,7 @@ class ProductType:
     :ivar color:
     :ivar description:
     :ivar eff_date:
-    :ivar attributes:
+    :ivar other_attributes:
     """
     number: Optional[int] = field(
         default=None,
@@ -124,11 +124,11 @@ class ProductType:
             type="Attribute"
         )
     )
-    attributes: Dict[QName, str] = field(
+    other_attributes: Dict[QName, str] = field(
         default_factory=dict,
         metadata=dict(
-            name="attributes",
-            type="AnyAttribute"
+            type="AnyAttribute",
+            namespace="##other"
         )
     )
 

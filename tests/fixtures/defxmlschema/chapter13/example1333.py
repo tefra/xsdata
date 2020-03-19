@@ -6,13 +6,13 @@ from typing import Dict, Optional
 @dataclass
 class BaseType:
     """
-    :ivar attributes:
+    :ivar any_attributes:
     """
-    attributes: Dict[QName, str] = field(
+    any_attributes: Dict[QName, str] = field(
         default_factory=dict,
         metadata=dict(
-            name="attributes",
-            type="AnyAttribute"
+            type="AnyAttribute",
+            namespace="##any"
         )
     )
 

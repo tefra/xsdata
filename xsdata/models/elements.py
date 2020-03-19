@@ -133,22 +133,33 @@ class AnyAttribute(AnnotationBase, RestrictedField):
     </anyAttribute>
     """
 
-    namespace: Optional[str] = attribute()
+    namespace: Optional[str] = attribute(default="##any")
     process_contents: Optional[ProcessType] = attribute()
+
+    def __post_init__(self):
+        self.namespace = collapse_whitespace(self.namespace)
 
     @property
     def is_attribute(self) -> bool:
         return True
 
     @property
+    def is_wildcard(self) -> bool:
+        return True
+
+    @property
+    def raw_namespace(self) -> Optional[str]:
+        return self.namespace
+
+    @property
+    def real_name(self) -> str:
+        return f"{self.namespace}_attributes"
+
+    @property
     def real_type(self) -> Optional[str]:
         prefix = self.schema_prefix()
         suffix = DataType.QMAP.code
         return f"{prefix}:{suffix}" if prefix else suffix
-
-    @property
-    def real_name(self) -> str:
-        return "attributes"
 
 
 @dataclass

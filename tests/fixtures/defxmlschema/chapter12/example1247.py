@@ -6,12 +6,12 @@ from typing import Dict
 @dataclass
 class ProductType:
     """
-    :ivar attributes:
+    :ivar other_attributes:
     """
-    attributes: Dict[QName, str] = field(
+    other_attributes: Dict[QName, str] = field(
         default_factory=dict,
         metadata=dict(
-            name="attributes",
-            type="AnyAttribute"
+            type="AnyAttribute",
+            namespace="##other"
         )
     )

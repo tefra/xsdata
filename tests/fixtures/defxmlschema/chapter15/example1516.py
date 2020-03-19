@@ -9,7 +9,7 @@ class PurchaseOrderType:
     """
     :ivar id:
     :ivar version:
-    :ivar attributes:
+    :ivar other_attributes:
     :ivar description:
     :ivar comment:
     """
@@ -28,11 +28,11 @@ class PurchaseOrderType:
             type="Attribute"
         )
     )
-    attributes: Dict[QName, str] = field(
+    other_attributes: Dict[QName, str] = field(
         default_factory=dict,
         metadata=dict(
-            name="attributes",
-            type="AnyAttribute"
+            type="AnyAttribute",
+            namespace="##other"
         )
     )
     description: Optional[str] = field(

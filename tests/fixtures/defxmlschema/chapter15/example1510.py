@@ -9,7 +9,7 @@ class IdentifierGroup:
     """
     :ivar id:
     :ivar version:
-    :ivar attributes:
+    :ivar other_attributes:
     """
     id: Optional[str] = field(
         default=None,
@@ -26,10 +26,10 @@ class IdentifierGroup:
             type="Attribute"
         )
     )
-    attributes: Dict[QName, str] = field(
+    other_attributes: Dict[QName, str] = field(
         default_factory=dict,
         metadata=dict(
-            name="attributes",
-            type="AnyAttribute"
+            type="AnyAttribute",
+            namespace="##other"
         )
     )

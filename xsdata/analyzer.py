@@ -180,6 +180,8 @@ class ClassAnalyzer:
         for attr in list(target.attrs):
             self.flatten_attribute(target, attr)
 
+        self.flatten_duplicate_attributes(target)
+
         for inner in target.inner:
             self.flatten_class(inner)
 
@@ -310,6 +312,31 @@ class ClassAnalyzer:
     def is_attribute_self_reference(self, target: Class, dependency: AttrType) -> bool:
         qname = target.source_qname(dependency.name)
         return self.find_class(qname, condition=lambda x: x is target) is not None
+
+    @staticmethod
+    def flatten_duplicate_attributes(target: Class):
+        """
+        Flatten duplicate attributes.
+
+        Remove duplicate fields in case of attributes or enumerations
+        otherwise convert fields to lists.
+        """
+        result: List[Attr] = []
+        for attr in target.attrs:
+            existing = next((item for item in result if attr == item), None)
+
+            if not existing:
+                result.append(attr)
+            elif not (attr.is_attribute or attr.is_enumeration):
+                min_occurs = existing.restrictions.min_occurs or 0
+                max_occurs = existing.restrictions.max_occurs or 1
+                attr_min_occurs = attr.restrictions.min_occurs or 0
+                attr_max_occurs = attr.restrictions.max_occurs or 1
+
+                existing.restrictions.min_occurs = min(min_occurs, attr_min_occurs)
+                existing.restrictions.max_occurs = max_occurs + attr_max_occurs
+
+        target.attrs = result
 
     @staticmethod
     def copy_attributes(source: Class, target: Class, extension: Extension):

@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import Optional
+from typing import List, Optional
 
 
 @dataclass
@@ -17,11 +17,13 @@ class ProductType:
             required=True
         )
     )
-    name: Optional[str] = field(
-        default=None,
+    name: List[str] = field(
+        default_factory=list,
         metadata=dict(
             name="name",
             type="Element",
-            namespace=""
+            namespace="",
+            min_occurs=0,
+            max_occurs=2
         )
     )

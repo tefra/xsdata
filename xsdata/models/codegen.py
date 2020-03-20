@@ -117,7 +117,7 @@ class Attr:
     name: str
     local_name: str = field(init=False)
     local_type: str
-    index: int
+    index: int = field(compare=False)
     default: Any = field(default=None)
     wildcard: bool = field(default=False)
     fixed: bool = field(default=False)
@@ -125,7 +125,7 @@ class Attr:
     display_type: Optional[str] = field(default=None)
     namespace: Optional[str] = field(default=None)
     help: Optional[str] = field(default=None)
-    restrictions: Restrictions = field(default_factory=Restrictions)
+    restrictions: Restrictions = field(default_factory=Restrictions, compare=False)
 
     def __post_init__(self):
         self.local_name = self.name

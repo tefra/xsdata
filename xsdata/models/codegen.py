@@ -1,3 +1,4 @@
+from dataclasses import asdict
 from dataclasses import dataclass
 from dataclasses import field
 from dataclasses import fields
@@ -52,23 +53,32 @@ class Restrictions:
     def is_list(self):
         return self.max_occurs and self.max_occurs > 1
 
-    def update(self, source: "Restrictions", force=False):
+    def __post_init__(self):
+        self.correct_required()
+
+    def update(self, source: "Restrictions"):
         for restriction in fields(self):
             value = getattr(source, restriction.name)
-            if value is None:
-                continue
-            elif force or getattr(self, restriction.name) is None:
+            if value is not None:
                 setattr(self, restriction.name, value)
 
-        if self.is_list:
+        self.correct_required()
+
+    def correct_required(self):
+        if self.min_occurs == 0 and self.max_occurs <= 1:
+            self.required = None
+            self.min_occurs = None
+            self.max_occurs = None
+        if self.min_occurs == 1 and self.max_occurs == 1:
+            self.required = True
+            self.min_occurs = None
+            self.max_occurs = None
+        elif self.max_occurs and self.max_occurs > 1:
+            self.min_occurs = 0 if self.min_occurs is None else self.min_occurs
             self.required = None
 
     def asdict(self) -> Dict:
-        return {
-            restriction.name: getattr(self, restriction.name)
-            for restriction in fields(self)
-            if getattr(self, restriction.name) is not None
-        }
+        return {k: v for k, v in asdict(self).items() if v is not None}
 
     def clone(self):
         return replace(self)

@@ -132,7 +132,7 @@ class ClassAnalyzer:
                 self.copy_attributes(item, winner, self_extension)
                 for looser_ext in item.extensions:
                     new_ext = looser_ext.clone()
-                    new_ext.restrictions.update(self_extension.restrictions, force=True)
+                    new_ext.restrictions.update(self_extension.restrictions)
                     winner.extensions.append(new_ext)
 
     def mark_abstract_duplicate_classes(self):
@@ -297,7 +297,9 @@ class ClassAnalyzer:
             elif len(source.attrs) == 1:
                 source_attr = source.attrs[0]
                 types.extend(source_attr.types)
-                attr.restrictions.update(source_attr.restrictions)
+                restrictions = source_attr.restrictions.clone()
+                restrictions.update(attr.restrictions)
+                attr.restrictions = restrictions
                 self.copy_inner_classes(source, target)
             else:
                 types.append(AttrType(name=DataType.STRING.code, native=True))
@@ -333,7 +335,7 @@ class ClassAnalyzer:
                 continue
 
             new_attr = attr.clone()
-            new_attr.restrictions.update(extension.restrictions, force=True)
+            new_attr.restrictions.update(extension.restrictions)
             if prefix:
                 for attr_type in new_attr.types:
                     if not attr_type.native and attr_type.name.find(":") == -1:

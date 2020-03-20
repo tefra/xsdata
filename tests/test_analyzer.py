@@ -487,7 +487,9 @@ class ClassAnalyzerFlattenAttributeTests(ClassAnalyzerBaseTestCase):
         self.analyzer.flatten_attribute(parent, attr)
 
         self.assertEqual([type_a], attr.types)
+        self.assertFalse(type_a.self_ref)
         mock_find_class.assert_called_once_with(parent.source_qname(type_a.name))
+        mock_is_attribute_self_reference.assert_called_once_with(parent, type_a)
 
     @mock.patch.object(ClassAnalyzer, "is_attribute_self_reference", return_value=True)
     @mock.patch.object(ClassAnalyzer, "find_class", return_value=None)

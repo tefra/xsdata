@@ -160,6 +160,7 @@ class ClassAnalyzerTests(ClassAnalyzerBaseTestCase):
         attr_type.name = "foobar"
         self.assertFalse(self.analyzer.is_attribute_self_reference(item, attr_type))
 
+    @mock.patch.object(ClassAnalyzer, "flatten_duplicate_attributes")
     @mock.patch.object(ClassAnalyzer, "flatten_enumeration_unions")
     @mock.patch.object(ClassAnalyzer, "flatten_attribute")
     @mock.patch.object(ClassAnalyzer, "flatten_extension")
@@ -168,6 +169,7 @@ class ClassAnalyzerTests(ClassAnalyzerBaseTestCase):
         mock_flatten_extension,
         mock_flatten_attribute,
         mock_flatten_enumeration_unions,
+        mock_flatten_duplicate_attributes,
     ):
         obj = ClassFactory.create(
             name="a",
@@ -205,6 +207,9 @@ class ClassAnalyzerTests(ClassAnalyzerBaseTestCase):
                 mock.call(obj.inner[0], obj.inner[0].attrs[0]),
                 mock.call(obj.inner[0], obj.inner[0].attrs[1]),
             ]
+        )
+        mock_flatten_duplicate_attributes.assert_has_calls(
+            [mock.call(obj), mock.call(obj.inner[0])]
         )
 
     @mock.patch.object(ClassAnalyzer, "flatten_enumeration_unions")
@@ -570,6 +575,56 @@ class ClassAnalyzerFlattenAttributeTests(ClassAnalyzerBaseTestCase):
         mock_logger_warning.assert_called_once_with(
             "Missing type implementation: %s", common.type.__name__
         )
+
+    def test_with_duplicate_attributes(self):
+        one = AttrFactory.create(local_type=TagType.ATTRIBUTE)
+        one_clone = one.clone()
+        restrictions = Restrictions(min_occurs=10, max_occurs=15)
+        two = AttrFactory.create(local_type=TagType.ELEMENT, restrictions=restrictions)
+        two_clone = two.clone()
+        two_clone.restrictions.min_occurs = 5
+        two_clone.restrictions.max_occurs = 5
+        two_clone_two = two.clone()
+        two_clone_two.restrictions.min_occurs = 4
+        two_clone_two.restrictions.max_occurs = 4
+        three = AttrFactory.create(local_type=TagType.ELEMENT)
+        four = AttrFactory.create(local_type=TagType.ENUMERATION)
+        four_clone = four.clone()
+        five = AttrFactory.create(local_type=TagType.ELEMENT)
+        five_clone = five.clone()
+        five_clone_two = five.clone()
+
+        target = ClassFactory.create(
+            attrs=[
+                one,
+                one_clone,
+                two,
+                two_clone,
+                two_clone_two,
+                three,
+                four,
+                four_clone,
+                five,
+                five_clone,
+                five_clone_two,
+            ]
+        )
+
+        winners = [one, two, three, four, five]
+
+        self.analyzer.flatten_duplicate_attributes(target)
+        self.assertEqual(winners, target.attrs)
+
+        self.assertIsNone(one.restrictions.min_occurs)
+        self.assertIsNone(one.restrictions.max_occurs)
+        self.assertEqual(4, two.restrictions.min_occurs)
+        self.assertEqual(24, two.restrictions.max_occurs)
+        self.assertIsNone(three.restrictions.min_occurs)
+        self.assertIsNone(three.restrictions.max_occurs)
+        self.assertIsNone(four.restrictions.min_occurs)
+        self.assertIsNone(four.restrictions.max_occurs)
+        self.assertEqual(0, five.restrictions.min_occurs)
+        self.assertEqual(3, five.restrictions.max_occurs)
 
 
 class ClassAnalyzerFlattenEnumerationUnionsTests(ClassAnalyzerBaseTestCase):

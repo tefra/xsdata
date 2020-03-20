@@ -41,10 +41,11 @@ class LetterType:
 
 
 @dataclass
-class RestrictedLetterType(LetterType):
+class RestrictedLetterType:
     """
     :ivar cust_name:
     :ivar prod_name:
+    :ivar prod_size:
     """
     class Meta:
         mixed = True
@@ -65,5 +66,13 @@ class RestrictedLetterType(LetterType):
             type="Element",
             namespace="",
             required=True
+        )
+    )
+    prod_size: Optional[int] = field(
+        default=None,
+        metadata=dict(
+            name="prodSize",
+            type="Element",
+            namespace=""
         )
     )

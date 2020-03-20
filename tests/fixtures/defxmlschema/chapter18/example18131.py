@@ -1,14 +1,13 @@
 from dataclasses import dataclass, field
 from typing import Optional
-from tests.fixtures.defxmlschema.chapter18.example18132 import (
-    ProductType,
-)
 
 
 @dataclass
-class RestrictedProductType(ProductType):
+class RestrictedProductType:
     """
     :ivar number:
+    :ivar name:
+    :ivar color:
     :ivar size:
     """
     number: Optional[int] = field(
@@ -17,6 +16,24 @@ class RestrictedProductType(ProductType):
             name="number",
             type="Element",
             namespace=""
+        )
+    )
+    name: Optional[str] = field(
+        default=None,
+        metadata=dict(
+            name="name",
+            type="Element",
+            namespace="",
+            required=True
+        )
+    )
+    color: Optional[str] = field(
+        default=None,
+        metadata=dict(
+            name="color",
+            type="Element",
+            namespace="",
+            required=True
         )
     )
     size: Optional[str] = field(
@@ -30,10 +47,30 @@ class RestrictedProductType(ProductType):
 
 
 @dataclass
-class ShirtType(ProductType):
+class ShirtType:
     """
+    :ivar number:
+    :ivar name:
     :ivar color:
     """
+    number: Optional[int] = field(
+        default=None,
+        metadata=dict(
+            name="number",
+            type="Element",
+            namespace="",
+            required=True
+        )
+    )
+    name: Optional[str] = field(
+        default=None,
+        metadata=dict(
+            name="name",
+            type="Element",
+            namespace="",
+            required=True
+        )
+    )
     color: Optional[int] = field(
         default=None,
         metadata=dict(

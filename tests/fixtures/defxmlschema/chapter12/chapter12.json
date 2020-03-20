@@ -36,7 +36,7 @@
                 }
             ],
             "eff_date": "2002-04-02",
-            "attributes": {}
+            "other_attributes": {}
         }
     ],
     "hat": [
@@ -51,7 +51,7 @@
             ],
             "description": [],
             "eff_date": "1900-01-01",
-            "attributes": {
+            "other_attributes": {
                 "{http://example.org/oth}custom": "12"
             }
         }

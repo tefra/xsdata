@@ -11,22 +11,22 @@
     ],
     "umbrella": [
         {
-            "routing_num": 123,
             "number": 557,
             "name": "Ten-Gallon Hat",
             "description": null,
-            "eff_date": "2002-04-02",
-            "lang": null
+            "routing_num": 123,
+            "lang": null,
+            "eff_date": "2002-04-02"
         }
     ],
     "shirt": [
         {
-            "routing_num": 124,
             "number": 557,
             "name": "Short-Sleeved Linen Blouse",
             "description": null,
-            "eff_date": "2002-04-02",
+            "routing_num": 124,
             "lang": null,
+            "eff_date": "2002-04-02",
             "size": [
                 {
                     "value": 6,

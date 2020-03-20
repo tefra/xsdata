@@ -367,7 +367,7 @@ class XmlParserTests(TestCase):
         element.set("whatever", "foo")
 
         actual = self.parser.bind_element_attrs(metadata, element)
-        expected = {"attributes": {"whatever": "foo"}, "eff_date": "2020-03-02"}
+        expected = {"eff_date": "2020-03-02", "other_attributes": {"whatever": "foo"}}
         self.assertEqual(expected, actual)
         mock_parse_value.assert_called_once_with(
             eff_date.types, "2020-03-01", eff_date.default,

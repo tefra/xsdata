@@ -76,6 +76,66 @@ class ProductType:
 
 
 @dataclass
+class RestrictedProductType:
+    """
+    :ivar number:
+    :ivar name:
+    :ivar description:
+    :ivar routing_num:
+    :ivar lang:
+    :ivar eff_date:
+    """
+    number: Optional[int] = field(
+        default=None,
+        metadata=dict(
+            name="number",
+            type="Element",
+            namespace="",
+            required=True
+        )
+    )
+    name: Optional[str] = field(
+        default=None,
+        metadata=dict(
+            name="name",
+            type="Element",
+            namespace="",
+            required=True
+        )
+    )
+    description: Optional[str] = field(
+        default=None,
+        metadata=dict(
+            name="description",
+            type="Element",
+            namespace=""
+        )
+    )
+    routing_num: Optional[int] = field(
+        default=None,
+        metadata=dict(
+            name="routingNum",
+            type="Attribute",
+            required=True
+        )
+    )
+    lang: Optional[str] = field(
+        default=None,
+        metadata=dict(
+            name="lang",
+            type="Attribute"
+        )
+    )
+    eff_date: str = field(
+        default="1900-01-01",
+        metadata=dict(
+            name="effDate",
+            type="Attribute"
+        )
+    )
+
+
+@dataclass
 class SizeType:
     """
     :ivar value:
@@ -98,53 +158,20 @@ class SizeType:
 
 
 @dataclass
-class RestrictedProductType(ProductType):
+class SmallSizeType:
     """
-    :ivar number:
-    :ivar name:
-    :ivar routing_num:
-    :ivar eff_date:
-    """
-    number: Optional[int] = field(
-        default=None,
-        metadata=dict(
-            name="number",
-            type="Element",
-            namespace="",
-            required=True
-        )
-    )
-    name: Optional[str] = field(
-        default=None,
-        metadata=dict(
-            name="name",
-            type="Element",
-            namespace="",
-            required=True
-        )
-    )
-    routing_num: Optional[int] = field(
-        default=None,
-        metadata=dict(
-            name="routingNum",
-            type="Attribute",
-            required=True
-        )
-    )
-    eff_date: str = field(
-        default="1900-01-01",
-        metadata=dict(
-            name="effDate",
-            type="Attribute"
-        )
-    )
-
-
-@dataclass
-class SmallSizeType(SizeType):
-    """
+    :ivar value:
     :ivar system:
     """
+    value: Optional[int] = field(
+        default=None,
+        metadata=dict(
+            name="value",
+            type="Extension",
+            min_inclusive=2.0,
+            max_inclusive=6.0
+        )
+    )
     system: Optional[str] = field(
         default=None,
         metadata=dict(

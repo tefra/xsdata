@@ -75,7 +75,7 @@ class ElementTests(TestCase):
 
     def test_get_restrictions(self):
         obj = Element.create(min_occurs=1, max_occurs=1)
-        expected = {"required": True}
+        expected = {"min_occurs": 1, "max_occurs": 1}
         self.assertEqual(expected, obj.get_restrictions())
 
         obj.simple_type = SimpleType.create(

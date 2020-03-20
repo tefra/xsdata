@@ -26,11 +26,7 @@ class OccurrencesMixin(RestrictedField):
     max_occurs: int = 1
 
     def get_restrictions(self) -> Dict[str, Any]:
-        if self.min_occurs == self.max_occurs == 1:
-            return dict(required=True)
-        if self.max_occurs >= self.min_occurs and self.max_occurs > 1:
-            return dict(min_occurs=self.min_occurs, max_occurs=self.max_occurs)
-        return dict()
+        return {"min_occurs": self.min_occurs, "max_occurs": self.max_occurs}
 
 
 T = TypeVar("T", bound="BaseModel")

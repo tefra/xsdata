@@ -1,6 +1,7 @@
 from collections import defaultdict
 from dataclasses import dataclass
 from dataclasses import field
+from enum import Enum
 from typing import Dict
 from typing import List
 from typing import Optional
@@ -18,6 +19,12 @@ from xsdata.utils import text
 
 def simple_type(item: Class):
     return item.is_enumeration or item.abstract or item.is_common
+
+
+class AttributeComparison(Enum):
+    ALL = 0
+    NONE = 1
+    MIXED = 2
 
 
 @dataclass
@@ -204,29 +211,66 @@ class ClassAnalyzer:
 
     def flatten_extension(self, target: Class, extension: Extension):
         """
-        If the extension class is found in the registry prepend it's attributes
-        to the given class.
+        Remove if possible the given extension for the target class.
 
-        The attribute list is deep cloned and each attribute type is
-        prepended with the extension prefix if it isn't a reference to
-        another schema.
+        If extension type is xsd native and target is not enumeration
+        create a default value attribute otherwise delegate the task to
+        the responsible handler based on the extension source type
+        complex or simple.
         """
         if extension.type.native and not target.is_enumeration:
             return self.create_default_attribute(target, extension)
 
         type_qname = target.source_qname(extension.type.name)
-        source = self.find_class(type_qname)
-        if source is None:
-            if self.is_extension_subset(target, extension):
-                target.extensions.remove(extension)
-        elif source is target:
-            target.extensions.remove(extension)
+        simple_source = self.find_class(type_qname)
+
+        if simple_source:
+            return self.flatten_extension_simple(simple_source, target, extension)
+
+        complex_source = self.find_class(type_qname, condition=None)
+        if complex_source:
+            return self.flatten_extension_complex(complex_source, target, extension)
+
+    def flatten_extension_simple(self, source: Class, target: Class, ext: Extension):
+        """
+        Simple flatten extension handler for common classes eg SimpleType,
+        Restriction.
+
+        Steps:
+            1. If target is source: drop the extension.
+            2. If source is enumeration and target isn't create default value attribute.
+            3. If both source and target are enumerations copy all attributes.
+            4. If both source and target are not enumerations copy all attributes.
+            5. If target is enumeration: drop the extension.
+        """
+        if source is target:
+            target.extensions.remove(ext)
         elif source.is_enumeration and not target.is_enumeration:
-            self.create_default_attribute(target, extension)
+            self.create_default_attribute(target, ext)
         elif source.is_enumeration == target.is_enumeration:
-            self.copy_attributes(source, target, extension)
+            self.copy_attributes(source, target, ext)
         elif target.is_enumeration:
-            target.extensions.remove(extension)
+            target.extensions.remove(ext)
+
+    def flatten_extension_complex(self, source: Class, target: Class, ext: Extension):
+        """
+        Complex flatten extension handler for primary classes eg ComplexType,
+        Element.
+
+        Steps:
+            1. If target is source: drop the extension.
+            2. If target already includes all the target attributes drop the extension.
+            3. If target has at least one of the source attributes copy attributes.
+            4. Otherwise maintain the extension.
+        """
+        if source is target:
+            return target.extensions.remove(ext)
+
+        result = self.compare_attributes(source, target)
+        if result == AttributeComparison.ALL:
+            target.extensions.remove(ext)
+        elif result == AttributeComparison.MIXED:
+            self.copy_attributes(source, target, ext)
 
     def flatten_attribute(self, target: Class, attr: Attr):
         """
@@ -261,20 +305,6 @@ class ClassAnalyzer:
 
         attr.types = types
 
-    def is_extension_subset(self, target, extension) -> bool:
-        if not len(target.attrs):
-            return False
-
-        type_qname = target.source_qname(extension.type.name)
-        source = self.find_class(type_qname, condition=None)
-
-        if not source:
-            return False
-
-        source_attrs = {attr.name for attr in source.attrs}
-        target_attrs = {attr.name for attr in target.attrs}
-        return len(source_attrs - target_attrs) == 0
-
     def is_attribute_self_reference(self, target: Class, dependency: AttrType) -> bool:
         qname = target.source_qname(dependency.name)
         return self.find_class(qname, condition=lambda x: x is target) is not None
@@ -284,6 +314,9 @@ class ClassAnalyzer:
         prefix = text.prefix(extension.type.name)
         target.inner.extend(source.inner)
         target.extensions.remove(extension)
+        target_attr_names = {
+            text.suffix(attr.name): index for index, attr in enumerate(target.attrs)
+        }
         position = next(
             (
                 index
@@ -292,7 +325,13 @@ class ClassAnalyzer:
             ),
             len(target.attrs),
         )
+
         for attr in source.attrs:
+            suffix = text.suffix(attr.name)
+            if suffix in target_attr_names:
+                position = target_attr_names[suffix] + 1
+                continue
+
             new_attr = attr.clone()
             new_attr.restrictions.update(extension.restrictions, force=True)
             if prefix:
@@ -336,3 +375,19 @@ class ClassAnalyzer:
 
         item.attrs.insert(0, attr)
         item.extensions.remove(extension)
+
+    @staticmethod
+    def compare_attributes(source, target):
+        if not len(target.attrs):
+            return AttributeComparison.NONE
+
+        source_attrs = {attr.name for attr in source.attrs}
+        target_attrs = {attr.name for attr in target.attrs}
+        difference = source_attrs - target_attrs
+
+        if not difference:
+            return AttributeComparison.ALL
+        if len(difference) == len(source_attrs):
+            return AttributeComparison.NONE
+
+        return AttributeComparison.MIXED

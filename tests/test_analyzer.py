@@ -160,12 +160,10 @@ class ClassAnalyzerTests(ClassAnalyzerBaseTestCase):
         attr_type.name = "foobar"
         self.assertFalse(self.analyzer.is_attribute_self_reference(item, attr_type))
 
-
-class ClassAnalyzerFlattenClassTests(ClassAnalyzerBaseTestCase):
     @mock.patch.object(ClassAnalyzer, "flatten_enumeration_unions")
     @mock.patch.object(ClassAnalyzer, "flatten_attribute")
     @mock.patch.object(ClassAnalyzer, "flatten_extension")
-    def test_basic(
+    def test_flatten_class(
         self,
         mock_flatten_extension,
         mock_flatten_attribute,
@@ -210,123 +208,178 @@ class ClassAnalyzerFlattenClassTests(ClassAnalyzerBaseTestCase):
         )
 
     @mock.patch.object(ClassAnalyzer, "flatten_enumeration_unions")
-    def test_skip_enumeration_unions_when_class_not_common(
-        self, mock_flatten_enumeration_unions,
+    def test_test_flatten_when_target_is_not_common(
+        self, mock_flatten_enumeration_unions
     ):
         obj = ClassFactory.create(type=Element)
         self.analyzer.flatten_class(obj)
 
         self.assertEqual(0, mock_flatten_enumeration_unions.call_count)
 
-
-class ClassAnalyzerFlattenExtensionTests(ClassAnalyzerBaseTestCase):
-    @mock.patch.object(ClassAnalyzer, "is_extension_subset")
-    @mock.patch.object(ClassAnalyzer, "find_class")
-    def test_when_no_source_is_found_and_extension_is_not_subset(
-        self, mock_find_class, mock_is_extension_subset
-    ):
-        mock_find_class.return_value = None
-        mock_is_extension_subset.return_value = False
-
-        extension = ExtensionFactory.create()
-        obj = ClassFactory.create(extensions=[extension])
-
-        self.analyzer.flatten_extension(obj, extension)
-
-        self.assertEqual(1, len(obj.extensions))
-        ext_type_qname = obj.source_qname(extension.type.name)
-        mock_find_class.assert_called_once_with(ext_type_qname)
-
-    @mock.patch.object(ClassAnalyzer, "is_extension_subset")
-    @mock.patch.object(ClassAnalyzer, "find_class")
-    def test_when_no_source_is_found_and_extension_is_subset(
-        self, mock_find_class, mock_is_extension_subset
-    ):
-        mock_find_class.return_value = None
-        mock_is_extension_subset.return_value = True
-
-        extension = ExtensionFactory.create()
-        obj = ClassFactory.create(extensions=[extension])
-
-        self.analyzer.flatten_extension(obj, extension)
-
-        self.assertEqual(0, len(obj.extensions))
-        ext_type_qname = obj.source_qname(extension.type.name)
-        mock_find_class.assert_called_once_with(ext_type_qname)
-        mock_is_extension_subset.assert_called_once_with(obj, extension)
-
     @mock.patch.object(ClassAnalyzer, "create_default_attribute")
-    @mock.patch.object(ClassAnalyzer, "find_class")
-    def test_when_source_is_enumeration(
-        self, mock_find_class, mock_create_default_attribute
+    def test_flatten_extension_with_native_type_and_target_not_enumeration(
+        self, mock_create_default_attribute
     ):
-        mock_find_class.return_value = ClassFactory.create(
-            attrs=AttrFactory.list(2, local_type=TagType.ENUMERATION)
-        )
-
-        extension = ExtensionFactory.create()
-        obj = ClassFactory.create(extensions=[extension])
-
-        self.analyzer.flatten_extension(obj, extension)
-        mock_create_default_attribute.assert_called_once_with(obj, extension)
-
-    @mock.patch.object(ClassAnalyzer, "copy_attributes")
-    @mock.patch.object(ClassAnalyzer, "find_class")
-    def test_when_target_is_not_enumeration(
-        self, mock_find_class, mock_copy_attributes
-    ):
-        common = ClassFactory.create(attrs=AttrFactory.list(2))
-        mock_find_class.return_value = common
-
-        extension = ExtensionFactory.create()
-        obj = ClassFactory.create(extensions=[extension], attrs=AttrFactory.list(2))
-
-        self.analyzer.flatten_extension(obj, extension)
-        mock_copy_attributes.assert_called_once_with(common, obj, extension)
-
-    @mock.patch.object(ClassAnalyzer, "create_default_attribute")
-    @mock.patch.object(ClassAnalyzer, "copy_attributes")
-    @mock.patch.object(ClassAnalyzer, "find_class")
-    def test_when_target_is_source(
-        self, mock_find_class, mock_copy_attributes, mock_create_default_attribute
-    ):
-        item = ClassFactory.create(
-            attrs=AttrFactory.list(1, local_type=TagType.ELEMENT)
-        )
-        mock_find_class.return_value = item
-
-        extension = ExtensionFactory.create()
-        item.extensions.append(extension)
-
-        self.analyzer.flatten_extension(item, extension)
-
-        self.assertEqual(0, len(item.extensions))
-        self.assertEqual(0, mock_copy_attributes.call_count)
-        self.assertEqual(0, mock_create_default_attribute.call_count)
-
-    @mock.patch.object(ClassAnalyzer, "create_default_attribute")
-    def test_when_extension_type_is_native(self, mock_create_default_attribute):
         extension = ExtensionFactory.create(type=AttrTypeFactory.create(native=True))
-        item = ClassFactory.create(
+        target = ClassFactory.create(
             attrs=AttrFactory.list(1, local_type=TagType.ELEMENT),
             extensions=[extension],
         )
 
-        self.analyzer.flatten_extension(item, extension)
-        mock_create_default_attribute.assert_called_once_with(item, extension)
+        self.analyzer.flatten_extension(target, extension)
+        mock_create_default_attribute.assert_called_once_with(target, extension)
+
+    @mock.patch.object(ClassAnalyzer, "flatten_extension_simple")
+    @mock.patch.object(ClassAnalyzer, "find_class")
+    def test_flatten_extension_with_simple_source_extension(
+        self, mock_find_class, mock_flatten_extension_simple
+    ):
+        extension = ExtensionFactory.create()
+        target = ClassFactory.create(extensions=[extension])
+        source = ClassFactory.create()
+        mock_find_class.return_value = source
+
+        self.analyzer.flatten_extension(target, extension)
+
+        type_qname = target.source_qname(extension.type.name)
+        mock_find_class.assert_called_once_with(type_qname)
+        mock_flatten_extension_simple.assert_called_once_with(source, target, extension)
+
+    @mock.patch.object(ClassAnalyzer, "flatten_extension_complex")
+    @mock.patch.object(ClassAnalyzer, "find_class")
+    def test_flatten_extension_with_complex_source_extension(
+        self, mock_find_class, mock_flatten_extension_complex
+    ):
+        extension = ExtensionFactory.create()
+        target = ClassFactory.create(extensions=[extension])
+        source = ClassFactory.create()
+        mock_find_class.side_effect = [None, source]
+
+        self.analyzer.flatten_extension(target, extension)
+        type_qname = target.source_qname(extension.type.name)
+        mock_find_class.assert_has_calls(
+            [mock.call(type_qname), mock.call(type_qname, condition=None)]
+        )
+        mock_flatten_extension_complex.assert_called_once_with(
+            source, target, extension
+        )
+
+    def test_flatten_extension_simple_when_target_is_source(self):
+        extension = ExtensionFactory.create()
+        target = ClassFactory.create(extensions=[extension])
+        self.analyzer.flatten_extension_simple(target, target, extension)
+        self.assertEqual(0, len(target.extensions))
 
     @mock.patch.object(ClassAnalyzer, "create_default_attribute")
-    def test_when_extension_type_is_native_but_target_is_enumeration(
+    def test_flatten_extension_simple_when_source_is_enumeration_and_target_is_not(
         self, mock_create_default_attribute
     ):
-        extension = ExtensionFactory.create(type=AttrTypeFactory.create(native=True))
-        item = ClassFactory.create(
+        source = ClassFactory.create(
+            attrs=AttrFactory.list(2, local_type=TagType.ENUMERATION)
+        )
+        target = ClassFactory.create(
+            attrs=AttrFactory.list(1, local_type=TagType.ELEMENT)
+        )
+        extension = ExtensionFactory.create()
+
+        self.analyzer.flatten_extension_simple(source, target, extension)
+        mock_create_default_attribute.assert_called_once_with(target, extension)
+
+    @mock.patch.object(ClassAnalyzer, "copy_attributes")
+    @mock.patch.object(ClassAnalyzer, "create_default_attribute")
+    def test_flatten_extension_simple_when_target_is_enumeration_and_source_is_not(
+        self, mock_create_default_attribute, mock_copy_attributes
+    ):
+        extension = ExtensionFactory.create()
+        source = ClassFactory.create(
+            attrs=AttrFactory.list(2, local_type=TagType.ELEMENT)
+        )
+        target = ClassFactory.create(
             attrs=AttrFactory.list(1, local_type=TagType.ENUMERATION),
             extensions=[extension],
         )
 
-        self.analyzer.flatten_extension(item, extension)
+        self.analyzer.flatten_extension_simple(source, target, extension)
         self.assertEqual(0, mock_create_default_attribute.call_count)
+        self.assertEqual(0, mock_copy_attributes.call_count)
+        self.assertEqual(0, len(target.extensions))
+
+    @mock.patch.object(ClassAnalyzer, "copy_attributes")
+    def test_flatten_extension_simple_when_source_and_target_are_enumerations(
+        self, mock_copy_attributes
+    ):
+        source = ClassFactory.create(
+            attrs=AttrFactory.list(2, local_type=TagType.ENUMERATION)
+        )
+        target = ClassFactory.create(
+            attrs=AttrFactory.list(1, local_type=TagType.ENUMERATION)
+        )
+        extension = ExtensionFactory.create()
+
+        self.analyzer.flatten_extension_simple(source, target, extension)
+        mock_copy_attributes.assert_called_once_with(source, target, extension)
+
+    @mock.patch.object(ClassAnalyzer, "copy_attributes")
+    def test_flatten_extension_simple_when_source_and_target_are_not_enumerations(
+        self, mock_copy_attributes
+    ):
+        source = ClassFactory.create(
+            attrs=AttrFactory.list(2, local_type=TagType.ELEMENT)
+        )
+        target = ClassFactory.create(
+            attrs=AttrFactory.list(1, local_type=TagType.ELEMENT)
+        )
+        extension = ExtensionFactory.create()
+
+        self.analyzer.flatten_extension_simple(source, target, extension)
+        mock_copy_attributes.assert_called_once_with(source, target, extension)
+
+    def test_flatten_extension_complex_when_target_is_source(self):
+        extension = ExtensionFactory.create()
+        target = ClassFactory.create(extensions=[extension])
+        self.analyzer.flatten_extension_complex(target, target, extension)
+        self.assertEqual(0, len(target.extensions))
+
+    @mock.patch.object(ClassAnalyzer, "copy_attributes")
+    def test_flatten_extension_complex_when_source_and_target_equal(
+        self, mock_copy_attributes
+    ):
+        source = ClassFactory.create(attrs=AttrFactory.list(2))
+        target = source.clone()
+        extension = ExtensionFactory.create()
+        target.extensions.append(extension)
+
+        self.analyzer.flatten_extension_complex(source, target, extension)
+        self.assertEqual(0, len(target.extensions))
+        self.assertEqual(0, mock_copy_attributes.call_count)
+
+    @mock.patch.object(ClassAnalyzer, "copy_attributes")
+    def test_flatten_extension_complex_when_source_and_target_have_mixed_attributes(
+        self, mock_copy_attributes
+    ):
+        source = ClassFactory.create(attrs=AttrFactory.list(2))
+        target = source.clone()
+        source.attrs.append(AttrFactory.create())
+        target.attrs.append(AttrFactory.create())
+
+        extension = ExtensionFactory.create()
+        target.extensions.append(extension)
+
+        self.analyzer.flatten_extension_complex(source, target, extension)
+        mock_copy_attributes.assert_called_once_with(source, target, extension)
+
+    @mock.patch.object(ClassAnalyzer, "copy_attributes")
+    def test_flatten_extension_complex_when_source_and_target_have_no_common_attributes(
+        self, mock_copy_attributes
+    ):
+        source = ClassFactory.create(attrs=AttrFactory.list(2))
+        target = ClassFactory.create(attrs=AttrFactory.list(2))
+        extension = ExtensionFactory.create()
+        target.extensions.append(extension)
+
+        self.analyzer.flatten_extension_complex(source, target, extension)
+        self.assertEqual(1, len(target.extensions))
+        self.assertEqual(0, mock_copy_attributes.call_count)
 
 
 class ClassAnalyzerHelpersTests(ClassAnalyzerBaseTestCase):

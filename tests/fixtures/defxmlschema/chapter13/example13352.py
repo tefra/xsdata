@@ -1,15 +1,13 @@
 from dataclasses import dataclass, field
 from typing import Optional
-from tests.fixtures.defxmlschema.chapter13.example13351 import (
-    ProductType,
-)
 
 
 @dataclass
-class RestrictedProductType(ProductType):
+class RestrictedProductType:
     """
     :ivar number:
     :ivar name:
+    :ivar size:
     :ivar dept:
     """
     number: Optional[str] = field(
@@ -28,6 +26,14 @@ class RestrictedProductType(ProductType):
             type="Element",
             namespace="http://datypic.com/prod",
             required=True
+        )
+    )
+    size: Optional[int] = field(
+        default=None,
+        metadata=dict(
+            name="size",
+            type="Element",
+            namespace="http://datypic.com/prod"
         )
     )
     dept: Optional[str] = field(

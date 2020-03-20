@@ -6,10 +6,30 @@ from tests.fixtures.defxmlschema.chapter22.example2207 import (
 
 
 @dataclass
-class HatType(ProductType):
+class HatType:
     """
+    :ivar number:
+    :ivar name:
     :ivar size:
     """
+    number: Optional[int] = field(
+        default=None,
+        metadata=dict(
+            name="number",
+            type="Element",
+            namespace="",
+            required=True
+        )
+    )
+    name: Optional[str] = field(
+        default=None,
+        metadata=dict(
+            name="name",
+            type="Element",
+            namespace="",
+            required=True
+        )
+    )
     size: Optional[int] = field(
         default=None,
         metadata=dict(
@@ -22,11 +42,31 @@ class HatType(ProductType):
 
 
 @dataclass
-class ShirtType(ProductType):
+class ShirtType:
     """
+    :ivar number:
+    :ivar name:
     :ivar size:
     :ivar color:
     """
+    number: Optional[int] = field(
+        default=None,
+        metadata=dict(
+            name="number",
+            type="Element",
+            namespace="",
+            required=True
+        )
+    )
+    name: Optional[str] = field(
+        default=None,
+        metadata=dict(
+            name="name",
+            type="Element",
+            namespace="",
+            required=True
+        )
+    )
     size: Optional[int] = field(
         default=None,
         metadata=dict(

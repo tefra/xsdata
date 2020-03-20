@@ -47,10 +47,12 @@ class ProductType:
 
 
 @dataclass
-class RestrictedProductType(ProductType):
+class RestrictedProductType:
     """
     :ivar number:
     :ivar name:
+    :ivar size:
+    :ivar color:
     """
     number: Optional[int] = field(
         default=None,
@@ -68,5 +70,21 @@ class RestrictedProductType(ProductType):
             type="Element",
             namespace="",
             required=True
+        )
+    )
+    size: Optional[int] = field(
+        default=None,
+        metadata=dict(
+            name="size",
+            type="Element",
+            namespace=""
+        )
+    )
+    color: Optional[str] = field(
+        default=None,
+        metadata=dict(
+            name="color",
+            type="Element",
+            namespace=""
         )
     )

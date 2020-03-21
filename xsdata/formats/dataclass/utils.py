@@ -1,10 +1,4 @@
 import re
-from typing import List
-
-from lxml import etree
-
-from xsdata.formats.dataclass.models import Namespaces
-from xsdata.formats.dataclass.serializers import XmlSerializer
 
 stop_words = [
     "and",
@@ -67,12 +61,3 @@ def safe_snake(string: str, default: str = "value") -> str:
         return f"{string}_{default}"
     else:
         return string.strip("_")
-
-
-def tostring(elements: List):
-    root = etree.Element("xsdata")
-    namespaces = Namespaces()
-    XmlSerializer.set_any_children(root, elements, namespaces)
-    etree.cleanup_namespaces(root, top_nsmap=namespaces.ns_map)
-    xml = etree.tostring(root, pretty_print=True).decode()
-    return xml[xml.find(">") + 1 :].replace("</xsdata>", "").strip()

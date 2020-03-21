@@ -42,7 +42,7 @@ class RestrictionTests(TestCase):
             fraction_digits=FractionDigits.create(value=8),
             length=Length.create(value=9),
             white_space=WhiteSpace.create(value="collapse"),
-            pattern=Pattern.create(value=".*"),
+            patterns=[Pattern.create(value="[0-9]"), Pattern.create(value="[A-Z]")],
             enumerations=[Enumeration.create(value="str")],
         )
         expected = {
@@ -54,7 +54,7 @@ class RestrictionTests(TestCase):
             "min_exclusive": 1,
             "min_inclusive": 2,
             "min_length": 3,
-            "pattern": ".*",
+            "pattern": "[0-9]|[A-Z]",
             "total_digits": 7,
             "white_space": "collapse",
         }

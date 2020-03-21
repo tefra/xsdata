@@ -591,7 +591,7 @@ class Enumeration(AnnotationBase, RestrictedField):
     </enumeration>
     """
 
-    value: Optional[str] = attribute()
+    value: str = attribute()
 
     @property
     def is_attribute(self) -> bool:
@@ -622,7 +622,7 @@ class FractionDigits(AnnotationBase):
     </fractionDigits>
     """
 
-    value: Optional[int] = attribute()
+    value: int = attribute()
 
 
 @dataclass
@@ -637,7 +637,7 @@ class Length(AnnotationBase):
     </length>
     """
 
-    value: Optional[int] = attribute()
+    value: int = attribute()
 
 
 @dataclass
@@ -652,7 +652,7 @@ class MaxExclusive(AnnotationBase):
     </maxExclusive>
     """
 
-    value: Optional[float] = attribute()
+    value: float = attribute()
 
 
 @dataclass
@@ -667,7 +667,7 @@ class MaxInclusive(AnnotationBase):
     </maxInclusive>
     """
 
-    value: Optional[float] = attribute()
+    value: float = attribute()
 
 
 @dataclass
@@ -682,7 +682,7 @@ class MaxLength(AnnotationBase):
     </maxLength>
     """
 
-    value: Optional[float] = attribute()
+    value: float = attribute()
 
 
 @dataclass
@@ -697,7 +697,7 @@ class MinExclusive(AnnotationBase):
     </minExclusive>
     """
 
-    value: Optional[float] = attribute()
+    value: float = attribute()
 
 
 @dataclass
@@ -712,7 +712,7 @@ class MinInclusive(AnnotationBase):
     </minInclusive>
     """
 
-    value: Optional[float] = attribute()
+    value: float = attribute()
 
 
 @dataclass
@@ -727,7 +727,7 @@ class MinLength(AnnotationBase):
     </minLength>
     """
 
-    value: Optional[float] = attribute()
+    value: float = attribute()
 
 
 @dataclass
@@ -741,7 +741,7 @@ class Pattern(AnnotationBase):
     </pattern>
     """
 
-    value: Optional[str] = attribute()
+    value: str = attribute()
 
 
 @dataclass
@@ -756,7 +756,7 @@ class TotalDigits(AnnotationBase):
     </totalDigits>
     """
 
-    value: Optional[int] = attribute()
+    value: int = attribute()
 
 
 @dataclass
@@ -771,7 +771,7 @@ class WhiteSpace(AnnotationBase):
     </whiteSpace>
     """
 
-    value: Optional[str] = attribute()  # preserve, collapse, replace
+    value: str = attribute()  # preserve, collapse, replace
 
 
 @dataclass
@@ -786,8 +786,8 @@ class ExplicitTimezone(AnnotationBase):
     </explicitTimezone>
     """
 
-    value: Optional[UseType] = attribute()
-    fixed: Optional[str] = attribute()
+    value: str = attribute()
+    fixed: bool = attribute(default=False)
 
 
 @dataclass
@@ -805,21 +805,6 @@ class Restriction(RestrictedField, AnnotationBase):
       )
     </restriction>
     """
-
-    VALUE_FIELDS = (
-        "min_exclusive",
-        "min_inclusive",
-        "min_length",
-        "max_exclusive",
-        "max_inclusive",
-        "max_length",
-        "total_digits",
-        "fraction_digits",
-        "length",
-        "white_space",
-        "pattern",
-        "explicit_timezone",
-    )
 
     base: Optional[str] = attribute()
     group: Optional[Group] = element()
@@ -843,7 +828,7 @@ class Restriction(RestrictedField, AnnotationBase):
     fraction_digits: Optional[FractionDigits] = element()
     length: Optional[Length] = element()
     white_space: Optional[WhiteSpace] = element()
-    pattern: Optional[Pattern] = element()
+    patterns: Array[Pattern] = array_element(name="pattern")
     explicit_timezone: Optional[ExplicitTimezone] = element()
     simple_type: Optional[SimpleType] = element()
 
@@ -862,11 +847,31 @@ class Restriction(RestrictedField, AnnotationBase):
         return self.base
 
     def get_restrictions(self) -> Dict[str, Anything]:
-        return {
+        keys = (
+            "min_exclusive",
+            "min_inclusive",
+            "min_length",
+            "max_exclusive",
+            "max_inclusive",
+            "max_length",
+            "total_digits",
+            "fraction_digits",
+            "length",
+            "white_space",
+            "explicit_timezone",
+        )
+        restrictions = {
             key: getattr(self, key).value
-            for key in self.VALUE_FIELDS
+            for key in keys
             if getattr(self, key) is not None
         }
+
+        if self.patterns:
+            restrictions["pattern"] = "|".join(
+                [pattern.value for pattern in self.patterns]
+            )
+
+        return restrictions
 
 
 @dataclass
@@ -991,7 +996,7 @@ class Unique(AnnotationBase):
 
     name: Optional[str] = attribute()
     selector: Optional[Selector] = element()
-    field: Optional[Field] = element()
+    fields: Array[Field] = array_element(name="field")
 
 
 @dataclass

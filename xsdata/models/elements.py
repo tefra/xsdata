@@ -9,7 +9,7 @@ from typing import Optional
 from typing import Union as UnionType
 
 from xsdata.exceptions import SchemaValueError
-from xsdata.formats.dataclass.utils import tostring
+from xsdata.formats.dataclass.serializers import XmlSerializer
 from xsdata.models.enums import DataType
 from xsdata.models.enums import FormType
 from xsdata.models.enums import Mode
@@ -44,6 +44,16 @@ def array_any_element(init=True, **kwargs):
     return field(init=init, default_factory=list, metadata=kwargs)
 
 
+@dataclass(frozen=True)
+class XmlString:
+    elements: Array[object] = array_any_element()
+
+    def render(self):
+        name = self.__class__.__name__
+        xml = XmlSerializer(pretty_print=True, xml_declaration=False).render(self)
+        return xml[xml.find(">") + 1 :].replace(f"</{name}>", "").strip()
+
+
 @dataclass
 class Documentation(ElementBase):
     """
@@ -61,13 +71,13 @@ class Documentation(ElementBase):
     lang: Optional[str] = attribute()
     source: Optional[str] = attribute()
     elements: Array[object] = array_any_element()
-    any_attribute: Optional["AnyAttribute"] = element()
+    attributes: Optional["AnyAttribute"] = element()
 
     def tostring(self) -> Optional[str]:
-        if not self.elements:
+        if self.elements:
+            return XmlString(self.elements).render()
+        else:
             return None
-
-        return tostring(self.elements)
 
 
 @dataclass

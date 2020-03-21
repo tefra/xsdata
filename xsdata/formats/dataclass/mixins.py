@@ -119,7 +119,10 @@ class ClassMeta:
     def get_var(self, qname: QName) -> Optional[ClassVar]:
         if qname in self.vars:
             return self.vars[qname]
+        else:
+            return self.get_wild_var(qname)
 
+    def get_wild_var(self, qname: QName) -> Optional[ClassVar]:
         return next(
             (
                 var

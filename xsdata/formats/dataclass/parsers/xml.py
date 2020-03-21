@@ -204,8 +204,12 @@ class XmlParser(AbstractXmlParser, ModelInspect):
 
             if arg.is_list:
                 params[arg.name].append(value)
-            else:
+            elif arg.name not in params:
                 params[arg.name] = value
+            else:
+                wild = item.meta.get_wild_var(qname)
+                if wild:
+                    params[wild.name] = value
 
         if item.meta.mixed and item.meta.any_element:
             var = item.meta.any_element

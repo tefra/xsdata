@@ -1,7 +1,6 @@
 from collections import defaultdict
 from dataclasses import dataclass
 from dataclasses import field
-from enum import Enum
 from typing import Dict
 from typing import List
 from typing import Optional
@@ -20,12 +19,6 @@ from xsdata.utils.codegen import ClassUtils
 
 def simple_type(item: Class):
     return item.is_enumeration or item.abstract or item.is_common
-
-
-class AttributeComparison(Enum):
-    ALL = 0
-    NONE = 1
-    MIXED = 2
 
 
 @dataclass
@@ -301,11 +294,14 @@ class ClassAnalyzer(ClassUtils):
         else:
             index = target.attrs.index(attr)
             target.attrs.pop(index)
+            prefix = text.prefix(attr.name)
+
             for source_attr in source.attrs:
-                clone = source_attr.clone()
-                clone.restrictions.update(attr.restrictions)
+                clone = self.clone_attribute(source_attr, attr.restrictions, prefix)
                 target.attrs.insert(index, clone)
                 index += 1
+
+            self.copy_inner_classes(source, target)
 
     def flatten_attribute(self, target: Class, attr: Attr):
         """

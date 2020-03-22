@@ -131,8 +131,16 @@ class Attr:
         self.local_name = self.name
 
     @property
-    def is_list(self):
-        return self.restrictions.is_list
+    def is_attribute(self) -> bool:
+        return self.local_type in (TagType.ATTRIBUTE, TagType.ANY_ATTRIBUTE)
+
+    @property
+    def is_enumeration(self) -> bool:
+        return self.local_type == TagType.ENUMERATION
+
+    @property
+    def is_factory(self):
+        return self.is_list or self.is_map
 
     @property
     def is_map(self) -> bool:
@@ -143,16 +151,12 @@ class Attr:
         )
 
     @property
-    def is_factory(self):
-        return self.is_list or self.is_map
+    def is_list(self):
+        return self.restrictions.is_list
 
     @property
-    def is_enumeration(self) -> bool:
-        return self.local_type == TagType.ENUMERATION
-
-    @property
-    def is_attribute(self) -> bool:
-        return self.local_type == TagType.ATTRIBUTE
+    def is_group(self):
+        return self.local_type in (TagType.ATTRIBUTE_GROUP, TagType.GROUP)
 
     def clone(self, **kwargs):
         return replace(

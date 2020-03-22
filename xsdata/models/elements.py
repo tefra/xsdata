@@ -381,12 +381,12 @@ class AttributeGroup(AnnotationBase, RestrictedField):
     attribute_groups: Array["AttributeGroup"] = array_element(name="attributeGroup")
 
     @property
-    def extends(self) -> Optional[str]:
-        return self.ref
+    def is_attribute(self) -> bool:
+        return True
 
     @property
     def real_type(self) -> Optional[str]:
-        return None
+        return self.ref
 
 
 @dataclass
@@ -520,7 +520,11 @@ class Group(AnnotationBase, OccurrencesMixin):
     sequence: Optional[Sequence] = element()
 
     @property
-    def extends(self) -> Optional[str]:
+    def is_attribute(self) -> bool:
+        return True
+
+    @property
+    def real_type(self) -> Optional[str]:
         return self.ref
 
 

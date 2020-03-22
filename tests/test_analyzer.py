@@ -378,24 +378,30 @@ class ClassAnalyzerTests(ClassAnalyzerBaseTestCase):
         )
         mock_merge_duplicate_attributes.assert_called_once_with(target)
 
+    @mock.patch.object(ClassAnalyzer, "clone_attribute")
     @mock.patch.object(ClassAnalyzer, "find_class")
-    def test_expand_attribute_group(self, mock_find_class):
-        restrictions = Restrictions(min_occurs=0, max_occurs=2)
+    def test_expand_attribute_group(self, mock_find_class, mock_clone_attribute):
         source = ClassFactory.elements(2)
-        group_attr = AttrFactory.create(restrictions=restrictions)
+        group_attr = AttrFactory.create(name="foo:bar")
         target = ClassFactory.create()
         target.attrs.append(group_attr)
 
         mock_find_class.return_value = source
+        mock_clone_attribute.side_effect = lambda x, y, z: x.clone()
 
         self.analyzer.expand_attribute_group(target, group_attr)
 
         self.assertEqual(2, len(target.attrs))
-        self.assertEqual(restrictions, target.attrs[0].restrictions)
-        self.assertEqual(restrictions, target.attrs[1].restrictions)
         self.assertIsNot(source.attrs[0], target.attrs[0])
         self.assertIsNot(source.attrs[1], target.attrs[1])
         self.assertNotIn(group_attr, target.attrs)
+
+        mock_clone_attribute.assert_has_calls(
+            [
+                mock.call(source.attrs[0], group_attr.restrictions, "foo"),
+                mock.call(source.attrs[1], group_attr.restrictions, "foo"),
+            ]
+        )
 
     @mock.patch.object(ClassAnalyzer, "is_attribute_self_reference", return_value=False)
     @mock.patch.object(ClassAnalyzer, "find_class")

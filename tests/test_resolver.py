@@ -200,9 +200,7 @@ class DependenciesResolverTest(FactoryTestCase):
     def test_collect_deps(self):
         obj = ClassFactory.create(
             attrs=[
-                AttrFactory.create(
-                    types=[AttrTypeFactory.create(name="decimal", native=True)]
-                ),
+                AttrFactory.create(types=[AttrTypeFactory.xs_decimal()]),
                 AttrFactory.create(
                     types=[
                         AttrTypeFactory.create(name="xs:annotated", forward_ref=True)

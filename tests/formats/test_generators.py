@@ -8,7 +8,6 @@ from tests.factories import FactoryTestCase
 from tests.factories import PackageFactory
 from xsdata.formats.generators import AbstractGenerator
 from xsdata.formats.generators import PythonAbstractGenerator as generator
-from xsdata.models.enums import DataType
 from xsdata.models.enums import TagType
 
 
@@ -43,9 +42,7 @@ class PythonAbstractGeneratorTests(FactoryTestCase):
             extensions=[type_m, type_n],
             attrs=AttrFactory.list(2, local_type=TagType.EXTENSION),
         )
-        e = ClassFactory.create(
-            name="e", attrs=AttrFactory.list(2, local_type=TagType.ENUMERATION)
-        )
+        e = ClassFactory.enumeration(2, name="e")
         i = ClassFactory.create(
             name="i",
             extensions=[type_o],
@@ -89,9 +86,7 @@ class PythonAbstractGeneratorTests(FactoryTestCase):
         obj = ClassFactory.create(
             attrs=[
                 AttrFactory.create(default="aaBB"),
-                AttrFactory.create(
-                    default=1, types=AttrTypeFactory.list(1, name="int", native=True)
-                ),
+                AttrFactory.create(default=1, types=[AttrTypeFactory.xs_int()]),
             ]
         )
 
@@ -127,7 +122,7 @@ class PythonAbstractGeneratorTests(FactoryTestCase):
 
     @mock.patch.object(generator, "process_attribute")
     def test_process_attributes(self, mock_process_attribute):
-        obj = ClassFactory.create(attrs=AttrFactory.list(3))
+        obj = ClassFactory.elements(3)
         generator.process_attributes(obj, ["a", "b"])
         mock_process_attribute.assert_has_calls(
             [mock.call(attr, ["a", "b"]) for attr in obj.attrs]
@@ -216,7 +211,7 @@ class PythonAbstractGeneratorTests(FactoryTestCase):
 
     def test_type_name(self):
 
-        type_str = AttrTypeFactory.create(name="string", native=True)
+        type_str = AttrTypeFactory.xs_string()
         self.assertEqual("str", generator.type_name(type_str))
 
         type_foo_bar_bam = AttrTypeFactory.create(name="foo:bar_bam")
@@ -265,22 +260,22 @@ class PythonAbstractGeneratorTests(FactoryTestCase):
             AttrTypeFactory.create(
                 name="thug:life", alias="Boss:Life", forward_ref=True
             ),
-            AttrTypeFactory.create(name="int", native=True),
+            AttrTypeFactory.xs_int(),
         ]
         actual = generator.attribute_display_type(attr, parents)
         self.assertEqual('List[Union["A.Parent.BossLife", int]]', actual)
 
         attr.restrictions.max_occurs = 1
-        attr.types = AttrTypeFactory.list(1, name=DataType.QMAP.code, native=True)
+        attr.types = [AttrTypeFactory.xs_qmap()]
         actual = generator.attribute_display_type(attr, parents)
         self.assertEqual("Dict[QName, str]", actual)
 
     def test_attribute_default(self):
-        type_str = AttrTypeFactory.create(name=DataType.STRING.code, native=True)
-        type_int = AttrTypeFactory.create(name=DataType.INTEGER.code, native=True)
-        type_float = AttrTypeFactory.create(name=DataType.FLOAT.code, native=True)
-        type_decimal = AttrTypeFactory.create(name=DataType.DECIMAL.code, native=True)
-        type_bool = AttrTypeFactory.create(name=DataType.BOOLEAN.code, native=True)
+        type_str = AttrTypeFactory.xs_string()
+        type_int = AttrTypeFactory.xs_int()
+        type_float = AttrTypeFactory.xs_float()
+        type_decimal = AttrTypeFactory.xs_decimal()
+        type_bool = AttrTypeFactory.xs_bool()
 
         attr = AttrFactory.create(name="foo", types=[type_str])
         self.assertEqual(None, generator.attribute_default(attr))

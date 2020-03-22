@@ -7,12 +7,10 @@ from tests.factories import ExtensionFactory
 from tests.factories import FactoryTestCase
 from tests.factories import RestrictionsFactory
 from xsdata.analyzer import ClassAnalyzer
-from xsdata.models.codegen import AttrType
 from xsdata.models.codegen import Restrictions
 from xsdata.models.elements import ComplexType
 from xsdata.models.elements import Element
 from xsdata.models.elements import SimpleType
-from xsdata.models.enums import DataType
 from xsdata.models.enums import TagType
 
 
@@ -98,10 +96,7 @@ class ClassAnalyzerTests(ClassAnalyzerBaseTestCase):
             ClassFactory.create(type=Element),
             ClassFactory.create(type=ComplexType),
             ClassFactory.create(type=SimpleType),
-            ClassFactory.create(
-                type=SimpleType,
-                attrs=AttrFactory.list(2, local_type=TagType.ENUMERATION),
-            ),
+            ClassFactory.enumeration(2),
         ]
 
         expected = [
@@ -215,11 +210,8 @@ class ClassAnalyzerTests(ClassAnalyzerBaseTestCase):
     def test_flatten_extension_with_native_type_and_target_not_enumeration(
         self, mock_create_default_attribute
     ):
-        extension = ExtensionFactory.create(type=AttrTypeFactory.create(native=True))
-        target = ClassFactory.create(
-            attrs=AttrFactory.list(1, local_type=TagType.ELEMENT),
-            extensions=[extension],
-        )
+        extension = ExtensionFactory.create(type=AttrTypeFactory.xs_string())
+        target = ClassFactory.elements(1, extensions=[extension])
 
         self.analyzer.flatten_extension(target, extension)
         mock_create_default_attribute.assert_called_once_with(target, extension)
@@ -269,12 +261,8 @@ class ClassAnalyzerTests(ClassAnalyzerBaseTestCase):
     def test_flatten_extension_simple_when_source_is_enumeration_and_target_is_not(
         self, mock_create_default_attribute
     ):
-        source = ClassFactory.create(
-            attrs=AttrFactory.list(2, local_type=TagType.ENUMERATION)
-        )
-        target = ClassFactory.create(
-            attrs=AttrFactory.list(1, local_type=TagType.ELEMENT)
-        )
+        source = ClassFactory.enumeration(2)
+        target = ClassFactory.elements(1)
         extension = ExtensionFactory.create()
 
         self.analyzer.flatten_extension_simple(source, target, extension)
@@ -286,13 +274,8 @@ class ClassAnalyzerTests(ClassAnalyzerBaseTestCase):
         self, mock_create_default_attribute, mock_copy_attributes
     ):
         extension = ExtensionFactory.create()
-        source = ClassFactory.create(
-            attrs=AttrFactory.list(2, local_type=TagType.ELEMENT)
-        )
-        target = ClassFactory.create(
-            attrs=AttrFactory.list(1, local_type=TagType.ENUMERATION),
-            extensions=[extension],
-        )
+        source = ClassFactory.elements(2)
+        target = ClassFactory.enumeration(1, extensions=[extension])
 
         self.analyzer.flatten_extension_simple(source, target, extension)
         self.assertEqual(0, mock_create_default_attribute.call_count)
@@ -303,12 +286,8 @@ class ClassAnalyzerTests(ClassAnalyzerBaseTestCase):
     def test_flatten_extension_simple_when_source_and_target_are_enumerations(
         self, mock_copy_attributes
     ):
-        source = ClassFactory.create(
-            attrs=AttrFactory.list(2, local_type=TagType.ENUMERATION)
-        )
-        target = ClassFactory.create(
-            attrs=AttrFactory.list(1, local_type=TagType.ENUMERATION)
-        )
+        source = ClassFactory.enumeration(2)
+        target = ClassFactory.enumeration(1)
         extension = ExtensionFactory.create()
 
         self.analyzer.flatten_extension_simple(source, target, extension)
@@ -318,12 +297,8 @@ class ClassAnalyzerTests(ClassAnalyzerBaseTestCase):
     def test_flatten_extension_simple_when_source_and_target_are_not_enumerations(
         self, mock_copy_attributes
     ):
-        source = ClassFactory.create(
-            attrs=AttrFactory.list(2, local_type=TagType.ELEMENT)
-        )
-        target = ClassFactory.create(
-            attrs=AttrFactory.list(1, local_type=TagType.ELEMENT)
-        )
+        source = ClassFactory.elements(2)
+        target = ClassFactory.elements(1)
         extension = ExtensionFactory.create()
 
         self.analyzer.flatten_extension_simple(source, target, extension)
@@ -339,7 +314,7 @@ class ClassAnalyzerTests(ClassAnalyzerBaseTestCase):
     def test_flatten_extension_complex_when_source_and_target_equal(
         self, mock_copy_attributes
     ):
-        source = ClassFactory.create(attrs=AttrFactory.list(2))
+        source = ClassFactory.elements(2)
         target = source.clone()
         extension = ExtensionFactory.create()
         target.extensions.append(extension)
@@ -352,7 +327,7 @@ class ClassAnalyzerTests(ClassAnalyzerBaseTestCase):
     def test_flatten_extension_complex_when_source_and_target_have_mixed_attributes(
         self, mock_copy_attributes
     ):
-        source = ClassFactory.create(attrs=AttrFactory.list(2))
+        source = ClassFactory.elements(2)
         target = source.clone()
         source.attrs.append(AttrFactory.create())
         target.attrs.append(AttrFactory.create())
@@ -367,8 +342,8 @@ class ClassAnalyzerTests(ClassAnalyzerBaseTestCase):
     def test_flatten_extension_complex_when_source_and_target_have_no_common_attributes(
         self, mock_copy_attributes
     ):
-        source = ClassFactory.create(attrs=AttrFactory.list(2))
-        target = ClassFactory.create(attrs=AttrFactory.list(2))
+        source = ClassFactory.elements(2)
+        target = ClassFactory.elements(2)
         extension = ExtensionFactory.create()
         target.extensions.append(extension)
 
@@ -406,7 +381,7 @@ class ClassAnalyzerTests(ClassAnalyzerBaseTestCase):
     @mock.patch.object(ClassAnalyzer, "find_class")
     def test_expand_attribute_group(self, mock_find_class):
         restrictions = Restrictions(min_occurs=0, max_occurs=2)
-        source = ClassFactory.create(attrs=AttrFactory.list(2))
+        source = ClassFactory.elements(2)
         group_attr = AttrFactory.create(restrictions=restrictions)
         target = ClassFactory.create()
         target.attrs.append(group_attr)
@@ -452,9 +427,7 @@ class ClassAnalyzerTests(ClassAnalyzerBaseTestCase):
 
     @mock.patch.object(ClassAnalyzer, "find_class")
     def test_flatten_attribute_when_source_is_enumeration(self, mock_find_class):
-        mock_find_class.return_value = ClassFactory.create(
-            attrs=AttrFactory.list(1, local_type=TagType.ENUMERATION)
-        )
+        mock_find_class.return_value = ClassFactory.enumeration(1)
 
         parent = ClassFactory.create()
         type_a = AttrTypeFactory.create(name="a")
@@ -505,7 +478,7 @@ class ClassAnalyzerTests(ClassAnalyzerBaseTestCase):
         self, mock_find_class, mock_logger_warning
     ):
         type_a = AttrTypeFactory.create(name="a")
-        type_str = AttrType(name=DataType.STRING.code, native=True)
+        type_str = AttrTypeFactory.xs_string()
         common = ClassFactory.create(name="bar", attrs=AttrFactory.list(2))
         mock_find_class.return_value = common
 
@@ -521,12 +494,8 @@ class ClassAnalyzerTests(ClassAnalyzerBaseTestCase):
 
     @mock.patch.object(ClassAnalyzer, "find_class")
     def test_flatten_enumeration_unions(self, mock_find_class):
-        enum_a = ClassFactory.create(
-            attrs=AttrFactory.list(2, local_type=TagType.ENUMERATION)
-        )
-        enum_b = ClassFactory.create(
-            attrs=AttrFactory.list(3, local_type=TagType.ENUMERATION)
-        )
+        enum_a = ClassFactory.enumeration(2)
+        enum_b = ClassFactory.enumeration(3)
 
         mock_find_class.return_value = enum_b
 
@@ -580,7 +549,7 @@ class ClassAnalyzerTests(ClassAnalyzerBaseTestCase):
         class_a = ClassFactory.create()
         class_c = class_a.clone()
 
-        type_int = AttrTypeFactory.create(name=DataType.INTEGER.code, native=True,)
+        type_int = AttrTypeFactory.xs_int()
 
         ext_a = ExtensionFactory.create(
             type=type_int,

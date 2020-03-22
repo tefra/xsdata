@@ -13,6 +13,7 @@ from xsdata.models.codegen import Attr
 from xsdata.models.codegen import AttrType
 from xsdata.models.codegen import Class
 from xsdata.models.codegen import Extension
+from xsdata.models.codegen import Restrictions
 from xsdata.models.enums import DataType
 from xsdata.models.enums import TagType
 from xsdata.utils import text
@@ -259,18 +260,21 @@ class ClassAnalyzer:
 
         Steps:
             1. If target is source: drop the extension.
-            2. If target already includes all the target attributes drop the extension.
-            3. If target has at least one of the source attributes copy attributes.
+            2. If target includes all the source attributes drop the extension.
+            3. If target includes some of the source attributes copy attributes.
             4. Otherwise maintain the extension.
         """
         if source is target:
-            return target.extensions.remove(ext)
-
-        result = self.compare_attributes(source, target)
-        if result == AttributeComparison.ALL:
             target.extensions.remove(ext)
-        elif result == AttributeComparison.MIXED:
-            self.copy_attributes(source, target, ext)
+        elif len(target.attrs):
+            source_attrs = {attr.name for attr in source.attrs}
+            target_attrs = {attr.name for attr in target.attrs}
+            difference = source_attrs - target_attrs
+
+            if not difference:
+                target.extensions.remove(ext)
+            elif len(difference) != len(source_attrs):
+                self.copy_attributes(source, target, ext)
 
     def flatten_attributes(self, target: Class):
         for attr in list(target.attrs):
@@ -343,8 +347,8 @@ class ClassAnalyzer:
         qname = target.source_qname(dependency.name)
         return self.find_class(qname, condition=lambda x: x is target) is not None
 
-    @staticmethod
-    def flatten_duplicate_attributes(target: Class):
+    @classmethod
+    def flatten_duplicate_attributes(cls, target: Class):
         """
         Flatten duplicate attributes.
 
@@ -368,41 +372,36 @@ class ClassAnalyzer:
 
         target.attrs = result
 
-    @staticmethod
-    def copy_attributes(source: Class, target: Class, extension: Extension):
+    @classmethod
+    def copy_attributes(cls, source: Class, target: Class, extension: Extension):
         prefix = text.prefix(extension.type.name)
-        target.inner.extend(source.inner)
         target.extensions.remove(extension)
-        target_attr_names = {
-            text.suffix(attr.name): index for index, attr in enumerate(target.attrs)
-        }
-        position = next(
-            (
-                index
-                for index, attr in enumerate(target.attrs)
-                if attr.index > extension.type.index
-            ),
-            len(target.attrs),
-        )
+        target_attr_names = {text.suffix(attr.name) for attr in target.attrs}
 
+        index = 0
         for attr in source.attrs:
-            suffix = text.suffix(attr.name)
-            if suffix in target_attr_names:
-                position = target_attr_names[suffix] + 1
-                continue
+            if text.suffix(attr.name) not in target_attr_names:
+                clone = cls.clone_attribute(attr, extension.restrictions, prefix)
+                target.attrs.insert(index, clone)
+            index += 1
 
-            new_attr = attr.clone()
-            new_attr.restrictions.update(extension.restrictions)
-            if prefix:
-                for attr_type in new_attr.types:
-                    if not attr_type.native and attr_type.name.find(":") == -1:
-                        attr_type.name = f"{prefix}:{attr_type.name}"
+        cls.copy_inner_classes(source, target)
 
-            target.attrs.insert(position, new_attr)
-            position += 1
+    @classmethod
+    def clone_attribute(
+        cls, attr: Attr, restrictions: Restrictions, prefix: Optional[str] = None
+    ):
+        clone = attr.clone()
+        clone.restrictions.update(restrictions)
+        if prefix:
+            for attr_type in clone.types:
+                if not attr_type.native and attr_type.name.find(":") == -1:
+                    attr_type.name = f"{prefix}:{attr_type.name}"
 
-    @staticmethod
-    def copy_inner_classes(source: Class, target: Class):
+        return clone
+
+    @classmethod
+    def copy_inner_classes(cls, source: Class, target: Class):
         for inner in source.inner:
             exists = next(
                 (found for found in target.inner if found.name == inner.name), None
@@ -410,8 +409,8 @@ class ClassAnalyzer:
             if not exists:
                 target.inner.append(inner)
 
-    @staticmethod
-    def create_default_attribute(item: Class, extension: Extension):
+    @classmethod
+    def create_default_attribute(cls, item: Class, extension: Extension):
         if extension.type.native_code == DataType.ANY_TYPE.code:
             attr = Attr(
                 name="##any_element",
@@ -434,19 +433,3 @@ class ClassAnalyzer:
 
         item.attrs.insert(0, attr)
         item.extensions.remove(extension)
-
-    @staticmethod
-    def compare_attributes(source, target):
-        if not len(target.attrs):
-            return AttributeComparison.NONE
-
-        source_attrs = {attr.name for attr in source.attrs}
-        target_attrs = {attr.name for attr in target.attrs}
-        difference = source_attrs - target_attrs
-
-        if not difference:
-            return AttributeComparison.ALL
-        if len(difference) == len(source_attrs):
-            return AttributeComparison.NONE
-
-        return AttributeComparison.MIXED

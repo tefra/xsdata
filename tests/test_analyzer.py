@@ -690,52 +690,49 @@ class ClassAnalyzerTests(ClassAnalyzerBaseTestCase):
         self.assertEqual(0, len(item.extensions))
         self.assertEqual(expected, item.attrs[0])
 
-    def test_copy_attributes(self):
-        common_b = ClassFactory.create(
+    @mock.patch.object(ClassAnalyzer, "copy_inner_classes")
+    @mock.patch.object(ClassAnalyzer, "clone_attribute")
+    def test_copy_attributes(self, mock_clone_attribute, mock_copy_inner_classes):
+        mock_clone_attribute.side_effect = lambda x, y, z: x.clone()
+        target = ClassFactory.create(
+            attrs=[AttrFactory.create(name="foo:a"), AttrFactory.create(name="b")]
+        )
+        source = ClassFactory.create(
             attrs=[
-                AttrFactory.create(name="i", types=AttrTypeFactory.list(1, name="i")),
-                AttrFactory.create(
-                    name="j", types=AttrTypeFactory.list(1, name="other:j")
-                ),
+                AttrFactory.create(name="c"),
+                AttrFactory.create(name="a"),
+                AttrFactory.create(name="boo:b"),
+                AttrFactory.create(name="d"),
             ]
         )
-        common_c = ClassFactory.create(
-            attrs=[
-                AttrFactory.create(name="x", types=AttrTypeFactory.list(1, name="x")),
-                AttrFactory.create(
-                    name="y", types=AttrTypeFactory.list(1, name="other:y")
-                ),
-            ]
-        )
-        ext_b = ExtensionFactory.create(type=AttrTypeFactory.create(name="b", index=2))
-        ext_c = ExtensionFactory.create(
-            type=AttrTypeFactory.create(name="common:c", index=111)
-        )
+        extension = ExtensionFactory.create(type=AttrTypeFactory.create(name="foo:foo"))
+        target.extensions.append(extension)
 
-        obj = ClassFactory.create(
-            name="foo",
-            extensions=[ext_b, ext_c],
-            attrs=[AttrFactory.create(name=x, index=ord(x)) for x in "ab"],
-        )
+        self.analyzer.copy_attributes(source, target, extension)
 
-        ClassAnalyzer.copy_attributes(common_b, obj, ext_b)
-        self.assertEqual(1, len(obj.extensions))
-
-        ClassAnalyzer.copy_attributes(common_c, obj, ext_c)
-        self.assertEqual(0, len(obj.extensions))
-
-        attrs = [
-            ("i", "i"),
-            ("j", "other:j"),
-            ("a", "string"),
-            ("b", "string"),
-            ("x", "common:x"),
-            ("y", "other:y"),
-        ]
-        self.assertEqual(
-            attrs,
+        self.assertEqual(["c", "foo:a", "b", "d"], [attr.name for attr in target.attrs])
+        mock_copy_inner_classes.assert_called_once_with(source, target)
+        mock_clone_attribute.assert_has_calls(
             [
-                (attr.name, " ".join([attr_type.name for attr_type in attr.types]))
-                for attr in obj.attrs
+                mock.call(source.attrs[0], extension.restrictions, "foo"),
+                mock.call(source.attrs[3], extension.restrictions, "foo"),
+            ]
+        )
+
+    def test_clone_attribute(self):
+        attr = AttrFactory.create(
+            restrictions=RestrictionsFactory.create(length=1),
+            types=[
+                AttrTypeFactory.create(name="foo:x"),
+                AttrTypeFactory.create(name="y"),
+                AttrTypeFactory.create(name="z", native=True),
             ],
         )
+        restrictions = RestrictionsFactory.create(length=2)
+        prefix = "foo"
+
+        clone = self.analyzer.clone_attribute(attr, restrictions, prefix)
+
+        self.assertEqual(["foo:x", "foo:y", "z"], [x.name for x in clone.types])
+        self.assertEqual(2, clone.restrictions.length)
+        self.assertIsNot(attr, clone)

@@ -7,12 +7,29 @@ from typing import Dict, Optional
 @dataclass
 class PurchaseOrderType:
     """
+    :ivar description:
+    :ivar comment:
     :ivar id:
     :ivar version:
     :ivar other_attributes:
-    :ivar description:
-    :ivar comment:
     """
+    description: Optional[str] = field(
+        default=None,
+        metadata=dict(
+            name="description",
+            type="Element",
+            namespace="http://datypic.com/prod",
+            required=True
+        )
+    )
+    comment: Optional[str] = field(
+        default=None,
+        metadata=dict(
+            name="comment",
+            type="Element",
+            namespace="http://datypic.com/prod"
+        )
+    )
     id: Optional[str] = field(
         default=None,
         metadata=dict(
@@ -33,22 +50,5 @@ class PurchaseOrderType:
         metadata=dict(
             type="AnyAttribute",
             namespace="##other"
-        )
-    )
-    description: Optional[str] = field(
-        default=None,
-        metadata=dict(
-            name="description",
-            type="Element",
-            namespace="http://datypic.com/prod",
-            required=True
-        )
-    )
-    comment: Optional[str] = field(
-        default=None,
-        metadata=dict(
-            name="comment",
-            type="Element",
-            namespace="http://datypic.com/prod"
         )
     )

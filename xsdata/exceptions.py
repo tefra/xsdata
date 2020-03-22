@@ -36,3 +36,7 @@ class ResolverValueError(ValueError):
 
 class GeneratorValueError(ValueError):
     pass
+
+
+class AnalyzerError(ValueError):
+    pass

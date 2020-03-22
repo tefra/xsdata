@@ -160,16 +160,14 @@ class ClassAnalyzerTests(ClassAnalyzerBaseTestCase):
         attr_type.name = "foobar"
         self.assertFalse(self.analyzer.is_attribute_self_reference(item, attr_type))
 
-    @mock.patch.object(ClassAnalyzer, "flatten_duplicate_attributes")
     @mock.patch.object(ClassAnalyzer, "flatten_enumeration_unions")
-    @mock.patch.object(ClassAnalyzer, "flatten_attribute")
+    @mock.patch.object(ClassAnalyzer, "flatten_attributes")
     @mock.patch.object(ClassAnalyzer, "flatten_extension")
     def test_flatten_class(
         self,
         mock_flatten_extension,
-        mock_flatten_attribute,
+        mock_flatten_attributes,
         mock_flatten_enumeration_unions,
-        mock_flatten_duplicate_attributes,
     ):
         obj = ClassFactory.create(
             name="a",
@@ -200,20 +198,12 @@ class ClassAnalyzerTests(ClassAnalyzerBaseTestCase):
                 mock.call(obj.inner[0], "g"),
             ]
         )
-        mock_flatten_attribute.assert_has_calls(
-            [
-                mock.call(obj, obj.attrs[0]),
-                mock.call(obj, obj.attrs[1]),
-                mock.call(obj.inner[0], obj.inner[0].attrs[0]),
-                mock.call(obj.inner[0], obj.inner[0].attrs[1]),
-            ]
-        )
-        mock_flatten_duplicate_attributes.assert_has_calls(
+        mock_flatten_attributes.assert_has_calls(
             [mock.call(obj), mock.call(obj.inner[0])]
         )
 
     @mock.patch.object(ClassAnalyzer, "flatten_enumeration_unions")
-    def test_test_flatten_when_target_is_not_common(
+    def test_flatten_class_when_target_is_not_common(
         self, mock_flatten_enumeration_unions
     ):
         obj = ClassFactory.create(type=Element)
@@ -386,8 +376,281 @@ class ClassAnalyzerTests(ClassAnalyzerBaseTestCase):
         self.assertEqual(1, len(target.extensions))
         self.assertEqual(0, mock_copy_attributes.call_count)
 
+    @mock.patch.object(ClassAnalyzer, "flatten_duplicate_attributes")
+    @mock.patch.object(ClassAnalyzer, "flatten_attribute")
+    @mock.patch.object(ClassAnalyzer, "expand_attribute_group")
+    def test_flatten_attributes(
+        self,
+        mock_expand_attribute_group,
+        mock_flatten_attribute,
+        mock_flatten_duplicate_attributes,
+    ):
+        target = ClassFactory.create(
+            attrs=[
+                AttrFactory.create(local_type=TagType.ATTRIBUTE_GROUP),
+                AttrFactory.create(local_type=TagType.ATTRIBUTE),
+                AttrFactory.create(local_type=TagType.GROUP),
+                AttrFactory.create(local_type=TagType.ELEMENT),
+            ]
+        )
 
-class ClassAnalyzerHelpersTests(ClassAnalyzerBaseTestCase):
+        self.analyzer.flatten_attributes(target)
+        mock_expand_attribute_group.assert_has_calls(
+            [mock.call(target, attr) for attr in target.attrs if attr.is_group]
+        )
+        mock_flatten_attribute.assert_has_calls(
+            [mock.call(target, attr) for attr in target.attrs]
+        )
+        mock_flatten_duplicate_attributes.assert_called_once_with(target)
+
+    @mock.patch.object(ClassAnalyzer, "find_class")
+    def test_expand_attribute_group(self, mock_find_class):
+        restrictions = Restrictions(min_occurs=0, max_occurs=2)
+        source = ClassFactory.create(attrs=AttrFactory.list(2))
+        group_attr = AttrFactory.create(restrictions=restrictions)
+        target = ClassFactory.create()
+        target.attrs.append(group_attr)
+
+        mock_find_class.return_value = source
+
+        self.analyzer.expand_attribute_group(target, group_attr)
+
+        self.assertEqual(2, len(target.attrs))
+        self.assertEqual(restrictions, target.attrs[0].restrictions)
+        self.assertEqual(restrictions, target.attrs[1].restrictions)
+        self.assertIsNot(source.attrs[0], target.attrs[0])
+        self.assertIsNot(source.attrs[1], target.attrs[1])
+        self.assertNotIn(group_attr, target.attrs)
+
+    @mock.patch.object(ClassAnalyzer, "is_attribute_self_reference", return_value=False)
+    @mock.patch.object(ClassAnalyzer, "find_class")
+    def test_flatten_attribute_when_no_source_is_found(
+        self, mock_find_class, mock_is_attribute_self_reference
+    ):
+        mock_find_class.return_value = None
+
+        parent = ClassFactory.create()
+        type_a = AttrTypeFactory.create()
+        attr = AttrFactory.create(name="a", types=[type_a])
+        self.analyzer.flatten_attribute(parent, attr)
+
+        self.assertEqual([type_a], attr.types)
+        self.assertFalse(type_a.self_ref)
+        mock_find_class.assert_called_once_with(parent.source_qname(type_a.name))
+        mock_is_attribute_self_reference.assert_called_once_with(parent, type_a)
+
+    @mock.patch.object(ClassAnalyzer, "is_attribute_self_reference", return_value=True)
+    @mock.patch.object(ClassAnalyzer, "find_class", return_value=None)
+    def test_flatten_attribute_when_attribute_self_reference(self, *args):
+        parent = ClassFactory.create()
+        type_a = AttrTypeFactory.create()
+        attr = AttrFactory.create(name="a", types=[type_a])
+        self.analyzer.flatten_attribute(parent, attr)
+
+        self.assertEqual([type_a], attr.types)
+        self.assertTrue(type_a.self_ref)
+
+    @mock.patch.object(ClassAnalyzer, "find_class")
+    def test_flatten_attribute_when_source_is_enumeration(self, mock_find_class):
+        mock_find_class.return_value = ClassFactory.create(
+            attrs=AttrFactory.list(1, local_type=TagType.ENUMERATION)
+        )
+
+        parent = ClassFactory.create()
+        type_a = AttrTypeFactory.create(name="a")
+        attr = AttrFactory.create(name="a", types=[type_a])
+        self.analyzer.flatten_attribute(parent, attr)
+
+        self.assertEqual([type_a], attr.types)
+        mock_find_class.assert_called_once_with(parent.source_qname(type_a.name))
+
+    @mock.patch.object(ClassAnalyzer, "copy_inner_classes")
+    @mock.patch.object(ClassAnalyzer, "find_class")
+    def test_flatten_attribute_when_source_has_only_one_attribute(
+        self, mock_find_class, mock_copy_inner_classes
+    ):
+        type_a = AttrTypeFactory.create(name="a")
+        type_b = AttrTypeFactory.create(name="b")
+        common = ClassFactory.create(
+            name="bar",
+            attrs=AttrFactory.list(
+                1,
+                name="b",
+                types=[type_b],
+                restrictions=RestrictionsFactory.create(required=True, min_occurs=2),
+            ),
+        )
+
+        mock_find_class.return_value = common
+
+        parent = ClassFactory.create()
+        attr = AttrFactory.create(
+            name="a",
+            types=[type_a],
+            restrictions=RestrictionsFactory.create(min_occurs=1),
+        )
+
+        self.analyzer.flatten_attribute(parent, attr)
+
+        self.assertEqual([type_b], attr.types)
+        self.assertEqual(
+            {"required": True, "min_occurs": 1}, attr.restrictions.asdict()
+        )
+        mock_find_class.assert_called_once_with(parent.source_qname(type_a.name))
+        mock_copy_inner_classes.assert_called_once_with(common, parent)
+
+    @mock.patch("xsdata.analyzer.logger.warning")
+    @mock.patch.object(ClassAnalyzer, "find_class")
+    def test_flatten_attribute_when_source_has_more_than_one_attribute(
+        self, mock_find_class, mock_logger_warning
+    ):
+        type_a = AttrTypeFactory.create(name="a")
+        type_str = AttrType(name=DataType.STRING.code, native=True)
+        common = ClassFactory.create(name="bar", attrs=AttrFactory.list(2))
+        mock_find_class.return_value = common
+
+        parent = ClassFactory.create()
+        attr = AttrFactory.create(name="a", types=[type_a])
+
+        self.analyzer.flatten_attribute(parent, attr)
+
+        self.assertEqual([type_str], attr.types)
+        mock_logger_warning.assert_called_once_with(
+            "Missing type implementation: %s", common.type.__name__
+        )
+
+    def test_flatten_duplicate_attributes(self):
+        one = AttrFactory.create(local_type=TagType.ATTRIBUTE)
+        one_clone = one.clone()
+        restrictions = Restrictions(min_occurs=10, max_occurs=15)
+        two = AttrFactory.create(local_type=TagType.ELEMENT, restrictions=restrictions)
+        two_clone = two.clone()
+        two_clone.restrictions.min_occurs = 5
+        two_clone.restrictions.max_occurs = 5
+        two_clone_two = two.clone()
+        two_clone_two.restrictions.min_occurs = 4
+        two_clone_two.restrictions.max_occurs = 4
+        three = AttrFactory.create(local_type=TagType.ELEMENT)
+        four = AttrFactory.create(local_type=TagType.ENUMERATION)
+        four_clone = four.clone()
+        five = AttrFactory.create(local_type=TagType.ELEMENT)
+        five_clone = five.clone()
+        five_clone_two = five.clone()
+
+        target = ClassFactory.create(
+            attrs=[
+                one,
+                one_clone,
+                two,
+                two_clone,
+                two_clone_two,
+                three,
+                four,
+                four_clone,
+                five,
+                five_clone,
+                five_clone_two,
+            ]
+        )
+
+        winners = [one, two, three, four, five]
+
+        self.analyzer.flatten_duplicate_attributes(target)
+        self.assertEqual(winners, target.attrs)
+
+        self.assertIsNone(one.restrictions.min_occurs)
+        self.assertIsNone(one.restrictions.max_occurs)
+        self.assertEqual(4, two.restrictions.min_occurs)
+        self.assertEqual(24, two.restrictions.max_occurs)
+        self.assertIsNone(three.restrictions.min_occurs)
+        self.assertIsNone(three.restrictions.max_occurs)
+        self.assertIsNone(four.restrictions.min_occurs)
+        self.assertIsNone(four.restrictions.max_occurs)
+        self.assertEqual(0, five.restrictions.min_occurs)
+        self.assertEqual(3, five.restrictions.max_occurs)
+
+    @mock.patch.object(ClassAnalyzer, "find_class")
+    def test_flatten_enumeration_unions(self, mock_find_class):
+        enum_a = ClassFactory.create(
+            attrs=AttrFactory.list(2, local_type=TagType.ENUMERATION)
+        )
+        enum_b = ClassFactory.create(
+            attrs=AttrFactory.list(3, local_type=TagType.ENUMERATION)
+        )
+
+        mock_find_class.return_value = enum_b
+
+        obj = ClassFactory.create(
+            attrs=[
+                AttrFactory.create(
+                    name="value",
+                    types=[
+                        AttrTypeFactory.create(name=enum_a.name, forward_ref=True),
+                        AttrTypeFactory.create(name=enum_b.name),
+                    ],
+                )
+            ],
+            inner=[enum_a],
+        )
+
+        self.assertFalse(obj.is_enumeration)
+
+        self.analyzer.flatten_enumeration_unions(obj)
+
+        self.assertTrue(obj.is_enumeration)
+        self.assertEqual(5, len(obj.attrs))
+        self.assertEqual(
+            ["attr_B", "attr_C", "attr_D", "attr_E", "attr_F"],
+            [attr.name for attr in obj.attrs],
+        )
+
+    def test_merge_redefined_classes_with_unique_classes(self):
+        classes = ClassFactory.list(2)
+        self.analyzer.merge_redefined_classes(classes)
+        self.assertEqual(2, len(classes))
+
+    @mock.patch.object(ClassAnalyzer, "copy_attributes")
+    def test_merge_redefined_classes_copies_attributes(self, mock_copy_attributes):
+        class_a = ClassFactory.create()
+        class_b = ClassFactory.create()
+        class_c = class_a.clone()
+
+        ext_a = ExtensionFactory.create(type=AttrTypeFactory.create(name=class_a.name))
+        ext_str = ExtensionFactory.create(type=AttrTypeFactory.create(name="foo"))
+        class_c.extensions.append(ext_a)
+        class_c.extensions.append(ext_str)
+        classes = [class_a, class_b, class_c]
+
+        self.analyzer.merge_redefined_classes(classes)
+        self.assertEqual(2, len(classes))
+
+        mock_copy_attributes.assert_called_once_with(class_a, class_c, ext_a)
+
+    def test_merge_redefined_classes_copies_extensions(self):
+        class_a = ClassFactory.create()
+        class_c = class_a.clone()
+
+        type_int = AttrTypeFactory.create(name=DataType.INTEGER.code, native=True,)
+
+        ext_a = ExtensionFactory.create(
+            type=type_int,
+            restrictions=Restrictions(max_inclusive=10, min_inclusive=1, required=True),
+        )
+        ext_c = ExtensionFactory.create(
+            type=AttrTypeFactory.create(name=class_a.name),
+            restrictions=Restrictions(max_inclusive=0, min_inclusive=-10),
+        )
+
+        class_a.extensions.append(ext_a)
+        class_c.extensions.append(ext_c)
+        classes = [class_a, class_c]
+        expected = {"max_inclusive": 0, "min_inclusive": -10, "required": True}
+
+        self.analyzer.merge_redefined_classes(classes)
+        self.assertEqual(1, len(classes))
+        self.assertEqual(1, len(classes[0].extensions))
+        self.assertEqual(expected, classes[0].extensions[0].restrictions.asdict())
+
     def test_create_default_attribute(self):
         extension = ExtensionFactory.create()
         item = ClassFactory.create(extensions=[extension])
@@ -476,238 +739,3 @@ class ClassAnalyzerHelpersTests(ClassAnalyzerBaseTestCase):
                 for attr in obj.attrs
             ],
         )
-
-
-class ClassAnalyzerFlattenAttributeTests(ClassAnalyzerBaseTestCase):
-    @mock.patch.object(ClassAnalyzer, "is_attribute_self_reference", return_value=False)
-    @mock.patch.object(ClassAnalyzer, "find_class")
-    def test_when_no_source_is_found(
-        self, mock_find_class, mock_is_attribute_self_reference
-    ):
-        mock_find_class.return_value = None
-
-        parent = ClassFactory.create()
-        type_a = AttrTypeFactory.create()
-        attr = AttrFactory.create(name="a", types=[type_a])
-        self.analyzer.flatten_attribute(parent, attr)
-
-        self.assertEqual([type_a], attr.types)
-        self.assertFalse(type_a.self_ref)
-        mock_find_class.assert_called_once_with(parent.source_qname(type_a.name))
-        mock_is_attribute_self_reference.assert_called_once_with(parent, type_a)
-
-    @mock.patch.object(ClassAnalyzer, "is_attribute_self_reference", return_value=True)
-    @mock.patch.object(ClassAnalyzer, "find_class", return_value=None)
-    def test_when_is_attribute_self_reference(self, *args):
-        parent = ClassFactory.create()
-        type_a = AttrTypeFactory.create()
-        attr = AttrFactory.create(name="a", types=[type_a])
-        self.analyzer.flatten_attribute(parent, attr)
-
-        self.assertEqual([type_a], attr.types)
-        self.assertTrue(type_a.self_ref)
-
-    @mock.patch.object(ClassAnalyzer, "find_class")
-    def test_when_source_is_enumeration(self, mock_find_class):
-        mock_find_class.return_value = ClassFactory.create(
-            attrs=AttrFactory.list(1, local_type=TagType.ENUMERATION)
-        )
-
-        parent = ClassFactory.create()
-        type_a = AttrTypeFactory.create(name="a")
-        attr = AttrFactory.create(name="a", types=[type_a])
-        self.analyzer.flatten_attribute(parent, attr)
-
-        self.assertEqual([type_a], attr.types)
-        mock_find_class.assert_called_once_with(parent.source_qname(type_a.name))
-
-    @mock.patch.object(ClassAnalyzer, "copy_inner_classes")
-    @mock.patch.object(ClassAnalyzer, "find_class")
-    def test_when_source_has_only_one_attribute(
-        self, mock_find_class, mock_copy_inner_classes
-    ):
-        type_a = AttrTypeFactory.create(name="a")
-        type_b = AttrTypeFactory.create(name="b")
-        common = ClassFactory.create(
-            name="bar",
-            attrs=AttrFactory.list(
-                1,
-                name="b",
-                types=[type_b],
-                restrictions=RestrictionsFactory.create(required=True, min_occurs=2),
-            ),
-        )
-
-        mock_find_class.return_value = common
-
-        parent = ClassFactory.create()
-        attr = AttrFactory.create(
-            name="a",
-            types=[type_a],
-            restrictions=RestrictionsFactory.create(min_occurs=1),
-        )
-
-        self.analyzer.flatten_attribute(parent, attr)
-
-        self.assertEqual([type_b], attr.types)
-        self.assertEqual(
-            {"required": True, "min_occurs": 1}, attr.restrictions.asdict()
-        )
-        mock_find_class.assert_called_once_with(parent.source_qname(type_a.name))
-        mock_copy_inner_classes.assert_called_once_with(common, parent)
-
-    @mock.patch("xsdata.analyzer.logger.warning")
-    @mock.patch.object(ClassAnalyzer, "find_class")
-    def test_when_source_has_more_than_one_attribute(
-        self, mock_find_class, mock_logger_warning
-    ):
-        type_a = AttrTypeFactory.create(name="a")
-        type_str = AttrType(name=DataType.STRING.code, native=True)
-        common = ClassFactory.create(name="bar", attrs=AttrFactory.list(2))
-        mock_find_class.return_value = common
-
-        parent = ClassFactory.create()
-        attr = AttrFactory.create(name="a", types=[type_a])
-
-        self.analyzer.flatten_attribute(parent, attr)
-
-        self.assertEqual([type_str], attr.types)
-        mock_logger_warning.assert_called_once_with(
-            "Missing type implementation: %s", common.type.__name__
-        )
-
-    def test_with_duplicate_attributes(self):
-        one = AttrFactory.create(local_type=TagType.ATTRIBUTE)
-        one_clone = one.clone()
-        restrictions = Restrictions(min_occurs=10, max_occurs=15)
-        two = AttrFactory.create(local_type=TagType.ELEMENT, restrictions=restrictions)
-        two_clone = two.clone()
-        two_clone.restrictions.min_occurs = 5
-        two_clone.restrictions.max_occurs = 5
-        two_clone_two = two.clone()
-        two_clone_two.restrictions.min_occurs = 4
-        two_clone_two.restrictions.max_occurs = 4
-        three = AttrFactory.create(local_type=TagType.ELEMENT)
-        four = AttrFactory.create(local_type=TagType.ENUMERATION)
-        four_clone = four.clone()
-        five = AttrFactory.create(local_type=TagType.ELEMENT)
-        five_clone = five.clone()
-        five_clone_two = five.clone()
-
-        target = ClassFactory.create(
-            attrs=[
-                one,
-                one_clone,
-                two,
-                two_clone,
-                two_clone_two,
-                three,
-                four,
-                four_clone,
-                five,
-                five_clone,
-                five_clone_two,
-            ]
-        )
-
-        winners = [one, two, three, four, five]
-
-        self.analyzer.flatten_duplicate_attributes(target)
-        self.assertEqual(winners, target.attrs)
-
-        self.assertIsNone(one.restrictions.min_occurs)
-        self.assertIsNone(one.restrictions.max_occurs)
-        self.assertEqual(4, two.restrictions.min_occurs)
-        self.assertEqual(24, two.restrictions.max_occurs)
-        self.assertIsNone(three.restrictions.min_occurs)
-        self.assertIsNone(three.restrictions.max_occurs)
-        self.assertIsNone(four.restrictions.min_occurs)
-        self.assertIsNone(four.restrictions.max_occurs)
-        self.assertEqual(0, five.restrictions.min_occurs)
-        self.assertEqual(3, five.restrictions.max_occurs)
-
-
-class ClassAnalyzerFlattenEnumerationUnionsTests(ClassAnalyzerBaseTestCase):
-    @mock.patch.object(ClassAnalyzer, "find_class")
-    def test_merge_enumeration_into_the_target_class(self, mock_find_class):
-        enum_a = ClassFactory.create(
-            attrs=AttrFactory.list(2, local_type=TagType.ENUMERATION)
-        )
-        enum_b = ClassFactory.create(
-            attrs=AttrFactory.list(3, local_type=TagType.ENUMERATION)
-        )
-
-        mock_find_class.return_value = enum_b
-
-        obj = ClassFactory.create(
-            attrs=[
-                AttrFactory.create(
-                    name="value",
-                    types=[
-                        AttrTypeFactory.create(name=enum_a.name, forward_ref=True),
-                        AttrTypeFactory.create(name=enum_b.name),
-                    ],
-                )
-            ],
-            inner=[enum_a],
-        )
-
-        self.assertFalse(obj.is_enumeration)
-
-        self.analyzer.flatten_enumeration_unions(obj)
-
-        self.assertTrue(obj.is_enumeration)
-        self.assertEqual(5, len(obj.attrs))
-        self.assertEqual(
-            ["attr_B", "attr_C", "attr_D", "attr_E", "attr_F"],
-            [attr.name for attr in obj.attrs],
-        )
-
-
-class ClassAnalyzerMergeClassesTests(ClassAnalyzerBaseTestCase):
-    def test_with_unique_classes(self):
-        classes = ClassFactory.list(2)
-        self.analyzer.merge_redefined_classes(classes)
-        self.assertEqual(2, len(classes))
-
-    @mock.patch.object(ClassAnalyzer, "copy_attributes")
-    def test_copies_attributes(self, mock_copy_attributes):
-        class_a = ClassFactory.create()
-        class_b = ClassFactory.create()
-        class_c = class_a.clone()
-
-        ext_a = ExtensionFactory.create(type=AttrTypeFactory.create(name=class_a.name))
-        ext_str = ExtensionFactory.create(type=AttrTypeFactory.create(name="foo"))
-        class_c.extensions.append(ext_a)
-        class_c.extensions.append(ext_str)
-        classes = [class_a, class_b, class_c]
-
-        self.analyzer.merge_redefined_classes(classes)
-        self.assertEqual(2, len(classes))
-
-        mock_copy_attributes.assert_called_once_with(class_a, class_c, ext_a)
-
-    def test_copies_extensions(self):
-        class_a = ClassFactory.create()
-        class_c = class_a.clone()
-
-        type_int = AttrTypeFactory.create(name=DataType.INTEGER.code, native=True,)
-
-        ext_a = ExtensionFactory.create(
-            type=type_int,
-            restrictions=Restrictions(max_inclusive=10, min_inclusive=1, required=True),
-        )
-        ext_c = ExtensionFactory.create(
-            type=AttrTypeFactory.create(name=class_a.name),
-            restrictions=Restrictions(max_inclusive=0, min_inclusive=-10),
-        )
-
-        class_a.extensions.append(ext_a)
-        class_c.extensions.append(ext_c)
-        classes = [class_a, class_c]
-        expected = {"max_inclusive": 0, "min_inclusive": -10, "required": True}
-
-        self.analyzer.merge_redefined_classes(classes)
-        self.assertEqual(1, len(classes))
-        self.assertEqual(1, len(classes[0].extensions))
-        self.assertEqual(expected, classes[0].extensions[0].restrictions.asdict())

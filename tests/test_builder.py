@@ -213,12 +213,8 @@ class ClassBuilderTests(FactoryTestCase):
     def test_children_extensions(self):
         complex_type = ComplexType.create(
             attributes=[Attribute.create(index=i) for i in range(2)],
-            sequence=Sequence.create(
-                groups=[
-                    Group.create(ref="a", index=3, min_occurs=0),
-                    Group.create(ref="bk:b", index=4, min_occurs=0),
-                    Group.create(ref="c", index=5, min_occurs=0),
-                ]
+            simple_content=SimpleContent.create(
+                restriction=Restriction.create(base="bk:b", index=4)
             ),
             complex_content=ComplexContent.create(
                 extension=Extension.create(base="bk:ext", index=7)
@@ -231,10 +227,8 @@ class ClassBuilderTests(FactoryTestCase):
             map(
                 ExtensionFactory.create,
                 [
-                    AttrTypeFactory.create(name="bk:ext", index=7),
-                    AttrTypeFactory.create(name="a", index=3),
                     AttrTypeFactory.create(name="bk:b", index=4),
-                    AttrTypeFactory.create(name="c", index=5),
+                    AttrTypeFactory.create(name="bk:ext", index=7),
                 ],
             )
         )

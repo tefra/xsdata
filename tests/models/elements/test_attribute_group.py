@@ -1,24 +1,16 @@
 from unittest import TestCase
 
-from xsdata.exceptions import SchemaValueError
 from xsdata.models.elements import AttributeGroup
 
 
 class AttributeGroupTests(TestCase):
-    def test_property_real_name(self):
-        with self.assertRaises(SchemaValueError):
-            obj = AttributeGroup.create()
-            obj.real_name
-
-        obj.ref = "foo"
-        self.assertEqual(obj.ref, obj.real_name)
-
-        obj.name = "bar"
-        self.assertEqual(obj.name, obj.real_name)
-
-    def test_property_extends(self):
+    def test_property_is_attribute(self):
         obj = AttributeGroup.create()
-        self.assertIsNone(obj.extends)
+        self.assertTrue(obj.is_attribute)
+
+    def test_property_real_type(self):
+        obj = AttributeGroup.create()
+        self.assertIsNone(obj.real_type)
 
         obj.ref = "foo"
-        self.assertEqual("foo", obj.extends)
+        self.assertEqual("foo", obj.real_type)

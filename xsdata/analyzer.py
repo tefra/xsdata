@@ -7,6 +7,7 @@ from typing import List
 from typing import Optional
 from xml.etree.ElementTree import QName
 
+from xsdata.exceptions import AnalyzerError
 from xsdata.logger import logger
 from xsdata.models.codegen import Attr
 from xsdata.models.codegen import AttrType
@@ -177,10 +178,7 @@ class ClassAnalyzer:
         for extension in reversed(target.extensions):
             self.flatten_extension(target, extension)
 
-        for attr in list(target.attrs):
-            self.flatten_attribute(target, attr)
-
-        self.flatten_duplicate_attributes(target)
+        self.flatten_attributes(target)
 
         for inner in target.inner:
             self.flatten_class(inner)
@@ -273,6 +271,38 @@ class ClassAnalyzer:
             target.extensions.remove(ext)
         elif result == AttributeComparison.MIXED:
             self.copy_attributes(source, target, ext)
+
+    def flatten_attributes(self, target: Class):
+        for attr in list(target.attrs):
+            if attr.is_group:
+                self.expand_attribute_group(target, attr)
+
+        for attr in list(target.attrs):
+            self.flatten_attribute(target, attr)
+
+        self.flatten_duplicate_attributes(target)
+
+    def expand_attribute_group(self, target: Class, attr: Attr):
+        """
+        Expand a group attribute with the source class attributes.
+
+        Clone the attributes and apply the group restrictions as well.
+        """
+        attr_qname = target.source_qname(attr.name)
+        source = self.find_class(attr_qname, condition=None)
+
+        if not source:
+            raise AnalyzerError(f"Group attribute not found: `{attr_qname}`")
+        elif source is target:
+            target.attrs.remove(attr)
+        else:
+            index = target.attrs.index(attr)
+            target.attrs.pop(index)
+            for source_attr in source.attrs:
+                clone = source_attr.clone()
+                clone.restrictions.update(attr.restrictions)
+                target.attrs.insert(index, clone)
+                index += 1
 
     def flatten_attribute(self, target: Class, attr: Attr):
         """

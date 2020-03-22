@@ -5,28 +5,8 @@ from typing import Optional
 @dataclass
 class DescriptionGroup:
     """
-    :ivar description:
-    :ivar comment:
     :ivar notes:
     """
-    description: Optional[str] = field(
-        default=None,
-        metadata=dict(
-            name="description",
-            type="Element",
-            namespace="",
-            required=True
-        )
-    )
-    comment: Optional[str] = field(
-        default=None,
-        metadata=dict(
-            name="comment",
-            type="Element",
-            namespace="",
-            required=True
-        )
-    )
     notes: Optional[str] = field(
         default=None,
         metadata=dict(

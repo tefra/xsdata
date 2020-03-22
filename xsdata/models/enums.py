@@ -166,7 +166,7 @@ class TagType:
     APPINFO = "Appinfo"
     ASSERTION = "Assertion"
     ATTRIBUTE = "Attribute"
-    ATTRIBUTEGROUP = "AttributeGroup"
+    ATTRIBUTE_GROUP = "AttributeGroup"
     CHOICE = "Choice"
     COMPLEX_CONTENT = "ComplexContent"
     COMPLEX_TYPE = "ComplexType"

@@ -10,7 +10,6 @@ from lxml.etree import QName
 from lxml.etree import SubElement
 from lxml.etree import tostring
 
-from xsdata.exceptions import SerializerError
 from xsdata.formats.bindings import AbstractSerializer
 from xsdata.formats.converters import to_xml
 from xsdata.formats.dataclass.mixins import ClassVar
@@ -72,7 +71,8 @@ class XmlSerializer(AbstractSerializer, ModelInspect):
         """Recursively traverse the given dataclass instance fields and build
         the lxml Element structure."""
         if not is_dataclass(obj):
-            return self.set_text(parent, obj)
+            self.set_text(parent, obj)
+            return parent
 
         meta = self.class_meta(obj.__class__, QName(parent).namespace)
         for var in meta.vars.values():
@@ -106,28 +106,26 @@ class XmlSerializer(AbstractSerializer, ModelInspect):
         for value in values:
             if value is None:
                 continue
-
             elif not is_wildcard:
                 sub_element = SubElement(parent, var.qname)
                 self.render_node(value, sub_element, namespaces)
                 self.set_nil_attribute(sub_element, var, namespaces)
             elif isinstance(value, str):
                 if parent.text:
-                    parent.tail = value
+                    self.set_tail(parent, value)
                 else:
-                    parent.text = value
+                    self.set_text(parent, value)
             elif isinstance(value, AnyText):
-                parent.text = value.text
                 namespaces.add_all(value.nsmap)
+                self.set_text(parent, value.text)
                 self.set_attributes(parent, value.attributes)
             elif isinstance(value, AnyElement):
                 qname = QName(value.qname)
                 namespaces.add(qname.namespace)
 
                 sub_element = SubElement(parent, qname)
-                sub_element.text = value.text
-                sub_element.tail = value.tail
-
+                self.set_text(sub_element, value.text)
+                self.set_tail(sub_element, value.tail)
                 self.set_attributes(sub_element, value.attributes)
                 for child in value.children:
                     self.render_sub_nodes(sub_element, child, var, namespaces)
@@ -139,19 +137,20 @@ class XmlSerializer(AbstractSerializer, ModelInspect):
 
     @classmethod
     def set_attribute(cls, parent: Element, key: Any, value: Any):
-        parent.set(key, to_xml(value))
+        parent.set(to_xml(key), to_xml(value))
 
     @classmethod
     def set_attributes(cls, parent: Element, values: Any):
         for key, value in values.items():
-            parent.set(key, value)
+            cls.set_attribute(parent, key, value)
 
     @classmethod
     def set_text(cls, parent: Element, value: Any):
-        if is_dataclass(value):
-            raise SerializerError("Text nodes can't be dataclasses!")
         parent.text = to_xml(value)
-        return parent
+
+    @classmethod
+    def set_tail(cls, parent: Element, value: Any):
+        parent.tail = to_xml(value)
 
     @staticmethod
     def set_nil_attribute(element: Element, var: ClassVar, namespaces: Namespaces):

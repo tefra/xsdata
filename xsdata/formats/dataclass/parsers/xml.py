@@ -1,6 +1,7 @@
 from collections import defaultdict
 from dataclasses import dataclass
 from dataclasses import field
+from dataclasses import is_dataclass
 from typing import Any
 from typing import Dict
 from typing import List
@@ -89,7 +90,7 @@ class XmlParser(AbstractXmlParser, ModelInspect):
         - Element tag equals meta qualified name          -> root element
         - Element tag unknown but queue supports wildcard -> start a wildcard
 
-        :raises Value: When the parser doesn't know how to handle the given element.
+        :raises ParserError: When the parser cant compute next queue item.
         """
         qname = QName(element.tag)
         queue_item = None
@@ -207,8 +208,10 @@ class XmlParser(AbstractXmlParser, ModelInspect):
                 if wild_var is None:
                     logger.warning("Unassigned parsed object %s", qname)
                     continue
-                if not isinstance(value, str):
+                if is_dataclass(value):
                     value.qname = qname
+                else:
+                    value = AnyElement(qname=qname, text=value)
                 arg = wild_var
 
             if arg.is_list:

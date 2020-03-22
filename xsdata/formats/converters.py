@@ -8,6 +8,8 @@ from typing import Dict
 from typing import List
 from typing import Type
 
+from lxml.etree import QName
+
 from xsdata.exceptions import ConverterError
 
 
@@ -68,7 +70,9 @@ def to_bool(value: Any) -> bool:
     raise ConverterError(f"Invalid bool literal '{value}'")
 
 
-def to_xml(value: Any) -> str:
+def to_xml(value: Any) -> Any:
+    if value is None:
+        return None
     if isinstance(value, bool):
         return "true" if value else "false"
     if isinstance(value, Enum):
@@ -77,6 +81,10 @@ def to_xml(value: Any) -> str:
         return "NaN" if math.isnan(value) else str(value).upper()
     if isinstance(value, Decimal) and value.is_infinite():
         return str(value).replace("Infinity", "INF")
+    if isinstance(value, QName):
+        return value
+    if is_dataclass(value):
+        raise ConverterError("Text nodes can't be dataclasses!")
 
     return str(value)
 

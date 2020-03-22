@@ -2,6 +2,10 @@ from dataclasses import dataclass
 from decimal import Decimal
 from unittest import TestCase
 
+from lxml.etree import QName
+
+from tests.fixtures.books import BookForm
+from xsdata.exceptions import ConverterError
 from xsdata.formats.converters import to_python
 from xsdata.formats.converters import to_xml
 from xsdata.models.enums import UseType
@@ -9,6 +13,7 @@ from xsdata.models.enums import UseType
 
 class ConvertersTestCases(TestCase):
     def test_to_xml(self):
+        self.assertEqual(None, to_xml(None))
         self.assertEqual("1", to_xml(1))
         self.assertEqual("1.5", to_xml(1.5))
         self.assertEqual("true", to_xml(True))
@@ -23,6 +28,10 @@ class ConvertersTestCases(TestCase):
         self.assertEqual("-INF", to_xml(Decimal("-inf")))
         self.assertEqual("8.77683E-8", to_xml(Decimal("8.77683E-8")))
         self.assertEqual("8.77683E-08", to_xml(float("8.77683E-8")))
+        self.assertEqual(QName("a"), to_xml(QName("a")))
+
+        with self.assertRaises(ConverterError):
+            to_xml(BookForm())
 
     def test_to_python_integer(self):
         self.assertEqual(1, to_python([int], "1"))

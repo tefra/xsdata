@@ -104,8 +104,10 @@ class XmlSerializer(AbstractSerializer, ModelInspect):
         is_wildcard = var.is_any_element
 
         for value in values:
+            if value is None:
+                continue
 
-            if not is_wildcard:
+            elif not is_wildcard:
                 sub_element = SubElement(parent, var.qname)
                 self.render_node(value, sub_element, namespaces)
                 self.set_nil_attribute(sub_element, var, namespaces)
@@ -129,6 +131,9 @@ class XmlSerializer(AbstractSerializer, ModelInspect):
                 self.set_attributes(sub_element, value.attributes)
                 for child in value.children:
                     self.render_sub_nodes(sub_element, child, var, namespaces)
+            else:
+                sub_element = SubElement(parent, value.qname)
+                self.render_node(value, sub_element, namespaces)
 
         self.set_nil_attribute(parent, var, namespaces)
 

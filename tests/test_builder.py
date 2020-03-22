@@ -294,17 +294,14 @@ class ClassBuilderTests(FactoryTestCase):
     @patch.object(Attribute, "real_type", new_callable=PropertyMock)
     @patch.object(ClassBuilder, "build_inner_class")
     def test_build_class_attribute_types(self, mock_build_inner_class, mock_real_type):
-        mock_real_type.return_value = " xs:int  xs:string "
+        mock_real_type.return_value = " xs:integer  xs:string "
         mock_build_inner_class.return_value = None
 
         item = ClassFactory.create()
         attribute = Attribute.create(default="false", index=66)
         actual = self.builder.build_class_attribute_types(item, attribute)
 
-        expected = [
-            AttrTypeFactory.create(name="int", native=True),
-            AttrTypeFactory.create(name="string", native=True),
-        ]
+        expected = [AttrTypeFactory.xs_int(), AttrTypeFactory.xs_string()]
 
         self.assertEqual(expected, actual)
 
@@ -314,7 +311,7 @@ class ClassBuilderTests(FactoryTestCase):
         self, mock_build_inner_class, mock_real_type
     ):
         inner_class = ClassFactory.create(name="foo")
-        mock_real_type.return_value = " xs:int  xs:string "
+        mock_real_type.return_value = " xs:integer  xs:string "
         mock_build_inner_class.return_value = inner_class
 
         item = ClassFactory.create()
@@ -322,8 +319,8 @@ class ClassBuilderTests(FactoryTestCase):
         actual = self.builder.build_class_attribute_types(item, attribute)
 
         expected = [
-            AttrTypeFactory.create(name="int", native=True),
-            AttrTypeFactory.create(name="string", native=True),
+            AttrTypeFactory.xs_int(),
+            AttrTypeFactory.xs_string(),
             AttrTypeFactory.create(name="foo", forward_ref=True),
         ]
 
@@ -341,9 +338,9 @@ class ClassBuilderTests(FactoryTestCase):
         item = ClassFactory.create()
         attribute = Attribute.create(default="false", index=66, name="attr")
         actual = self.builder.build_class_attribute_types(item, attribute)
-        expected = [AttrTypeFactory.create(name="string", native=True)]
 
-        self.assertEqual(expected, actual)
+        self.assertEqual(1, len(actual))
+        self.assertEqual(AttrTypeFactory.xs_string(), actual[0])
 
     @patch.object(ClassBuilder, "build_class")
     @patch.object(ClassBuilder, "has_anonymous_class")

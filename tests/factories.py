@@ -14,8 +14,9 @@ from xsdata.models.elements import ComplexType
 from xsdata.models.elements import Element
 from xsdata.models.elements import Restriction
 from xsdata.models.elements import SimpleType
+from xsdata.models.enums import DataType
 from xsdata.models.enums import Namespace
-
+from xsdata.models.enums import TagType
 
 NSMAP = {ns.prefix: ns.uri for ns in Namespace}
 
@@ -91,6 +92,22 @@ class ClassFactory(Factory):
             nsmap=nsmap if isinstance(nsmap, dict) else NSMAP,
         )
 
+    @classmethod
+    def enumeration(cls, attributes: int, **kwargs) -> Class:
+        return ClassFactory.create(
+            type=SimpleType,
+            attrs=AttrFactory.list(attributes, local_type=TagType.ENUMERATION),
+            **kwargs,
+        )
+
+    @classmethod
+    def elements(cls, attributes: int, **kwargs) -> Class:
+        return ClassFactory.create(
+            type=ComplexType,
+            attrs=AttrFactory.list(attributes, local_type=TagType.ELEMENT),
+            **kwargs,
+        )
+
 
 class RestrictionsFactory(Factory):
     model = Restrictions
@@ -162,6 +179,34 @@ class AttrTypeFactory(Factory):
             native=native,
             forward_ref=forward_ref,
         )
+
+    @classmethod
+    def xs_string(cls):
+        return cls.create(name=DataType.STRING.code, native=True)
+
+    @classmethod
+    def xs_int(cls):
+        return cls.create(name=DataType.INTEGER.code, native=True)
+
+    @classmethod
+    def xs_float(cls):
+        return cls.create(name=DataType.FLOAT.code, native=True)
+
+    @classmethod
+    def xs_decimal(cls):
+        return cls.create(name=DataType.DECIMAL.code, native=True)
+
+    @classmethod
+    def xs_bool(cls):
+        return cls.create(name=DataType.BOOLEAN.code, native=True)
+
+    @classmethod
+    def xs_any(cls):
+        return cls.create(name=DataType.ANY_TYPE.code, native=True)
+
+    @classmethod
+    def xs_qmap(cls):
+        return cls.create(name=DataType.QMAP.code, native=True)
 
 
 class AttrFactory(Factory):

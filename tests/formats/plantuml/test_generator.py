@@ -1,6 +1,5 @@
 from pathlib import Path
 
-from tests.factories import AttrFactory
 from tests.factories import ClassFactory
 from tests.factories import FactoryTestCase
 from xsdata.formats.plantuml.generator import PlantUmlGenerator
@@ -9,8 +8,8 @@ from xsdata.formats.plantuml.generator import PlantUmlGenerator
 class PlantUmlGeneratorTests(FactoryTestCase):
     def test_render(self):
         classes = [
-            ClassFactory.create(attrs=AttrFactory.list(2)),
-            ClassFactory.create(attrs=AttrFactory.list(3)),
+            ClassFactory.elements(2),
+            ClassFactory.elements(3),
         ]
 
         iterator = PlantUmlGenerator().render(classes)

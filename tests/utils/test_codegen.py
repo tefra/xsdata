@@ -7,7 +7,6 @@ from tests.factories import ExtensionFactory
 from tests.factories import FactoryTestCase
 from tests.factories import RestrictionsFactory
 from xsdata.models.codegen import Restrictions
-from xsdata.models.enums import DataType
 from xsdata.models.enums import TagType
 from xsdata.utils.codegen import ClassUtils
 
@@ -98,7 +97,7 @@ class ClassUtilsTests(FactoryTestCase):
             types=[
                 AttrTypeFactory.create(name="foo:x"),
                 AttrTypeFactory.create(name="y"),
-                AttrTypeFactory.create(name="z", native=True),
+                AttrTypeFactory.xs_int(),
             ],
         )
         restrictions = RestrictionsFactory.create(length=2)
@@ -106,7 +105,7 @@ class ClassUtilsTests(FactoryTestCase):
 
         clone = ClassUtils.clone_attribute(attr, restrictions, prefix)
 
-        self.assertEqual(["foo:x", "foo:y", "z"], [x.name for x in clone.types])
+        self.assertEqual(["foo:x", "foo:y", "integer"], [x.name for x in clone.types])
         self.assertEqual(2, clone.restrictions.length)
         self.assertIsNot(attr, clone)
 
@@ -129,7 +128,7 @@ class ClassUtilsTests(FactoryTestCase):
 
     def test_create_default_attribute_with_any_type(self):
         extension = ExtensionFactory.create(
-            type=AttrTypeFactory.create(name=DataType.ANY_TYPE.code, native=True),
+            type=AttrTypeFactory.xs_any(),
             restrictions=Restrictions(min_occurs=1, max_occurs=1, required=True),
         )
         item = ClassFactory.create(extensions=[extension])

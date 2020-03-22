@@ -80,10 +80,10 @@ class RestrictedProductType:
     """
     :ivar number:
     :ivar name:
-    :ivar description:
     :ivar routing_num:
-    :ivar lang:
+    :ivar description:
     :ivar eff_date:
+    :ivar lang:
     """
     number: Optional[int] = field(
         default=None,
@@ -103,14 +103,6 @@ class RestrictedProductType:
             required=True
         )
     )
-    description: Optional[str] = field(
-        default=None,
-        metadata=dict(
-            name="description",
-            type="Element",
-            namespace=""
-        )
-    )
     routing_num: Optional[int] = field(
         default=None,
         metadata=dict(
@@ -119,17 +111,25 @@ class RestrictedProductType:
             required=True
         )
     )
-    lang: Optional[str] = field(
+    description: Optional[str] = field(
         default=None,
         metadata=dict(
-            name="lang",
-            type="Attribute"
+            name="description",
+            type="Element",
+            namespace=""
         )
     )
     eff_date: str = field(
         default="1900-01-01",
         metadata=dict(
             name="effDate",
+            type="Attribute"
+        )
+    )
+    lang: Optional[str] = field(
+        default=None,
+        metadata=dict(
+            name="lang",
             type="Attribute"
         )
     )

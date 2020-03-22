@@ -21,6 +21,7 @@ from xsdata.formats.dataclass.models import AnyElement
 from xsdata.formats.dataclass.models import AnyText
 from xsdata.formats.dataclass.models import Namespaces
 from xsdata.formats.dataclass.parsers.json import T
+from xsdata.logger import logger
 from xsdata.models.enums import EventType
 from xsdata.utils import text
 
@@ -201,23 +202,33 @@ class XmlParser(AbstractXmlParser, ModelInspect):
                 continue
             if value is None:
                 value = ""
+            if arg.name in params and not arg.is_list:
+                wild_var = item.meta.get_wild_var(qname)
+                if wild_var is None:
+                    logger.warning("Unassigned parsed object %s", qname)
+                    continue
+                if not isinstance(value, str):
+                    value.qname = qname
+                arg = wild_var
 
             if arg.is_list:
                 params[arg.name].append(value)
             elif arg.name not in params:
                 params[arg.name] = value
-            else:
-                wild = item.meta.get_wild_var(qname)
-                if wild:
-                    params[wild.name] = value
 
         if item.meta.mixed and item.meta.any_element:
             var = item.meta.any_element
             txt, tail = self.element_text_and_tail(element)
-            if text:
-                params[var.name].insert(0, txt)
-            if tail:
-                params[var.name].append(tail)
+            if var.is_list:
+                if text:
+                    params[var.name].insert(0, txt)
+                if tail:
+                    params[var.name].append(tail)
+            elif var.name in params:
+                if text:
+                    params[var.name].text = txt
+                if tail:
+                    params[var.name].tail = tail
 
         return params
 

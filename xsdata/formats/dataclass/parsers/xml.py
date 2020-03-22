@@ -247,17 +247,18 @@ class XmlParser(AbstractXmlParser, ModelInspect):
         a dictionary of field names and values based on the given class
         metadata."""
 
-        params = dict()
-        any_attr = metadata.any_attribute
+        params: Dict = defaultdict(dict)
+        wildcard = metadata.any_attribute
         for qname, value in element.attrib.items():
+            var = None
             if qname in metadata.vars:
                 var = metadata.vars[qname]
-                if var.init:
-                    params[var.name] = self.parse_value(var.types, value, var.default)
-            elif any_attr:
-                if any_attr.name not in params:
-                    params[any_attr.name] = dict()
-                params[any_attr.name][qname] = value
+                var = None if var.name in params or not var.is_attribute else var
+
+            if not var and wildcard:
+                params[wildcard.name][qname] = value
+            elif var and var.init:
+                params[var.name] = self.parse_value(var.types, value, var.default)
 
         return params
 

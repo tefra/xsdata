@@ -33,6 +33,7 @@ class ClassUtils:
 
                 existing.restrictions.min_occurs = min(min_occurs, attr_min_occurs)
                 existing.restrictions.max_occurs = max_occurs + attr_max_occurs
+                existing.fixed = False
 
         target.attrs = result
 

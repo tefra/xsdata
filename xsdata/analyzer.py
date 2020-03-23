@@ -251,22 +251,18 @@ class ClassAnalyzer(ClassUtils):
         Element.
 
         Steps:
-            1. If target is source: drop the extension.
-            2. If target includes all the source attributes drop the extension.
-            3. If target includes some of the source attributes copy attributes.
+            1. If source includes all target attributes: drop the extension
+            2. If source includes some of the target attributes copy attributes
+            3. If source depends on target class copy all attributes
             4. Otherwise maintain the extension.
         """
-        if source is target:
+        res = self.compare_attributes(source, target)
+        if res == self.INCLUDES_ALL:
             target.extensions.remove(ext)
-        elif len(target.attrs):
-            source_attrs = {attr.name for attr in source.attrs}
-            target_attrs = {attr.name for attr in target.attrs}
-            difference = source_attrs - target_attrs
-
-            if not difference:
-                target.extensions.remove(ext)
-            elif len(difference) != len(source_attrs):
-                self.copy_attributes(source, target, ext)
+        elif res == self.INCLUDES_SOME:
+            self.copy_attributes(source, target, ext)
+        elif self.class_depends_on(source, target):
+            self.copy_attributes(source, target, ext)
 
     def flatten_attributes(self, target: Class):
         for attr in list(target.attrs):
@@ -337,6 +333,13 @@ class ClassAnalyzer(ClassUtils):
                 logger.warning("Missing type implementation: %s", source.type.__name__)
 
         attr.types = types
+
+    def class_depends_on(self, source: Class, target: Class):
+        for qname in source.dependencies():
+            if self.find_class(qname, condition=None) is target:
+                return True
+
+        return False
 
     def is_attribute_self_reference(self, target: Class, dependency: AttrType) -> bool:
         qname = target.source_qname(dependency.name)

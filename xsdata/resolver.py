@@ -3,7 +3,6 @@ from dataclasses import dataclass
 from dataclasses import field
 from typing import Dict
 from typing import List
-from typing import Set
 
 from lxml.etree import QName
 from toposort import toposort_flatten
@@ -98,42 +97,12 @@ class DependenciesResolver:
         """Return a list of class that need to be imported."""
         return [qname for qname in self.class_list if qname not in self.class_map]
 
-    def create_class_list(self, classes: List[Class]):
+    @staticmethod
+    def create_class_list(classes: List[Class]):
         """Use topology sort to return a flat list for all the dependencies."""
         return toposort_flatten(
-            {obj.source_qname(): self.collect_deps(obj) for obj in classes}
+            {obj.source_qname(): obj.dependencies() for obj in classes}
         )
-
-    def collect_deps(self, obj: Class) -> Set[QName]:
-        """
-        Return a list of dependencies for the given class.
-
-        Collect:
-            * base classes
-            * attribute types
-            * recursively go through the inner classes
-            * Ignore inner class references
-            * Ignore native types.
-        """
-        deps: Set[QName] = set()
-        for attr in obj.attrs:
-            deps.update(
-                [
-                    obj.source_qname(attr_type.name)
-                    for attr_type in attr.types
-                    if not attr_type.forward_ref and not attr_type.native
-                ]
-            )
-
-        deps.update(
-            obj.source_qname(ext.type.name)
-            for ext in obj.extensions
-            if not ext.type.native
-        )
-        for inner in obj.inner:
-            deps.update(self.collect_deps(inner))
-
-        return deps
 
     @staticmethod
     def create_class_map(classes: List[Class]):

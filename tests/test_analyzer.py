@@ -1,5 +1,7 @@
 from unittest import mock
 
+from lxml.etree import QName
+
 from tests.factories import AttrFactory
 from tests.factories import AttrTypeFactory
 from tests.factories import ClassFactory
@@ -7,6 +9,7 @@ from tests.factories import ExtensionFactory
 from tests.factories import FactoryTestCase
 from tests.factories import RestrictionsFactory
 from xsdata.analyzer import ClassAnalyzer
+from xsdata.models.codegen import Class
 from xsdata.models.codegen import Restrictions
 from xsdata.models.elements import ComplexType
 from xsdata.models.elements import Element
@@ -304,52 +307,67 @@ class ClassAnalyzerTests(ClassAnalyzerBaseTestCase):
         self.analyzer.flatten_extension_simple(source, target, extension)
         mock_copy_attributes.assert_called_once_with(source, target, extension)
 
-    def test_flatten_extension_complex_when_target_is_source(self):
+    @mock.patch.object(ClassAnalyzer, "copy_attributes")
+    @mock.patch.object(ClassAnalyzer, "compare_attributes")
+    def test_flatten_extension_complex_when_target_includes_all_source_attrs(
+        self, mock_compare_attributes, mock_copy_attributes
+    ):
+        mock_compare_attributes.return_value = self.analyzer.INCLUDES_ALL
         extension = ExtensionFactory.create()
         target = ClassFactory.create(extensions=[extension])
-        self.analyzer.flatten_extension_complex(target, target, extension)
-        self.assertEqual(0, len(target.extensions))
-
-    @mock.patch.object(ClassAnalyzer, "copy_attributes")
-    def test_flatten_extension_complex_when_source_and_target_equal(
-        self, mock_copy_attributes
-    ):
-        source = ClassFactory.elements(2)
-        target = source.clone()
-        extension = ExtensionFactory.create()
-        target.extensions.append(extension)
+        source = ClassFactory.create()
 
         self.analyzer.flatten_extension_complex(source, target, extension)
+
         self.assertEqual(0, len(target.extensions))
+
+        mock_compare_attributes.assert_called_once_with(source, target)
         self.assertEqual(0, mock_copy_attributes.call_count)
 
     @mock.patch.object(ClassAnalyzer, "copy_attributes")
-    def test_flatten_extension_complex_when_source_and_target_have_mixed_attributes(
-        self, mock_copy_attributes
+    @mock.patch.object(ClassAnalyzer, "compare_attributes")
+    def test_flatten_extension_complex_when_target_includes_some_source_attrs(
+        self, mock_compare_attributes, mock_copy_attributes
     ):
-        source = ClassFactory.elements(2)
-        target = source.clone()
-        source.attrs.append(AttrFactory.create())
-        target.attrs.append(AttrFactory.create())
-
+        mock_compare_attributes.return_value = self.analyzer.INCLUDES_SOME
         extension = ExtensionFactory.create()
-        target.extensions.append(extension)
+        target = ClassFactory.create()
+        source = ClassFactory.create()
 
         self.analyzer.flatten_extension_complex(source, target, extension)
+        mock_compare_attributes.assert_called_once_with(source, target)
         mock_copy_attributes.assert_called_once_with(source, target, extension)
 
     @mock.patch.object(ClassAnalyzer, "copy_attributes")
-    def test_flatten_extension_complex_when_source_and_target_have_no_common_attributes(
-        self, mock_copy_attributes
+    @mock.patch.object(ClassAnalyzer, "compare_attributes")
+    def test_flatten_extension_complex_when_target_includes_no_source_attrs(
+        self, mock_compare_attributes, mock_copy_attributes
     ):
-        source = ClassFactory.elements(2)
-        target = ClassFactory.elements(2)
+        mock_compare_attributes.return_value = self.analyzer.INCLUDES_NONE
         extension = ExtensionFactory.create()
-        target.extensions.append(extension)
+        target = ClassFactory.create(extensions=[extension])
+        source = ClassFactory.create()
 
         self.analyzer.flatten_extension_complex(source, target, extension)
-        self.assertEqual(1, len(target.extensions))
+        mock_compare_attributes.assert_called_once_with(source, target)
         self.assertEqual(0, mock_copy_attributes.call_count)
+        self.assertEqual(1, len(target.extensions))
+
+    @mock.patch.object(ClassAnalyzer, "copy_attributes")
+    @mock.patch.object(ClassAnalyzer, "class_depends_on")
+    @mock.patch.object(ClassAnalyzer, "compare_attributes")
+    def test_flatten_extension_complex_when_source_depends_on_target(
+        self, mock_compare_attributes, mock_class_depends_on_class, mock_copy_attributes
+    ):
+        mock_compare_attributes.return_value = self.analyzer.INCLUDES_SOME
+        mock_class_depends_on_class.return_value = True
+        extension = ExtensionFactory.create()
+        target = ClassFactory.create()
+        source = ClassFactory.create()
+
+        self.analyzer.flatten_extension_complex(source, target, extension)
+        mock_compare_attributes.assert_called_once_with(source, target)
+        mock_copy_attributes.assert_called_once_with(source, target, extension)
 
     @mock.patch.object(ClassAnalyzer, "merge_duplicate_attributes")
     @mock.patch.object(ClassAnalyzer, "flatten_attribute")
@@ -575,3 +593,30 @@ class ClassAnalyzerTests(ClassAnalyzerBaseTestCase):
         self.assertEqual(1, len(classes))
         self.assertEqual(1, len(classes[0].extensions))
         self.assertEqual(expected, classes[0].extensions[0].restrictions.asdict())
+
+    @mock.patch.object(ClassAnalyzer, "find_class")
+    @mock.patch.object(Class, "dependencies")
+    def test_class_depends_on(self, mock_dependencies, mock_find_class):
+        source = ClassFactory.create()
+        target = ClassFactory.create()
+
+        mock_find_class.side_effect = (
+            lambda x, condition: target if x == QName("b") else None
+        )
+        mock_dependencies.side_effect = [
+            [QName(x) for x in "cde"],
+            [QName(x) for x in "abc"],
+        ]
+
+        self.assertFalse(self.analyzer.class_depends_on(source, target))
+        self.assertTrue(self.analyzer.class_depends_on(source, target))
+
+        mock_find_class.assert_has_calls(
+            [
+                mock.call(QName("c"), condition=None),
+                mock.call(QName("d"), condition=None),
+                mock.call(QName("e"), condition=None),
+                mock.call(QName("a"), condition=None),
+                mock.call(QName("b"), condition=None),
+            ]
+        )

@@ -7,6 +7,7 @@ from typing import Any
 from typing import Dict
 from typing import List
 from typing import Optional
+from typing import Set
 from typing import Type
 
 from lxml.etree import QName
@@ -233,6 +234,39 @@ class Class:
 
     def source_qname(self, name: Optional[str] = None) -> QName:
         return qname(name or self.name, self.nsmap, self.source_namespace)
+
+    def dependencies(self) -> Set[QName]:
+        """
+        Return a set of dependencies for the given class.
+
+        Collect:
+            * base classes
+            * attribute types
+            * recursively go through the inner classes
+            * Ignore inner class references
+            * Ignore native types.
+        """
+
+        deps: Set[QName] = set()
+        for attr in self.attrs:
+            deps.update(
+                [
+                    self.source_qname(attr_type.name)
+                    for attr_type in attr.types
+                    if not attr_type.forward_ref and not attr_type.native
+                ]
+            )
+
+        deps.update(
+            self.source_qname(ext.type.name)
+            for ext in self.extensions
+            if not ext.type.native
+        )
+
+        for inner in self.inner:
+            deps.update(inner.dependencies())
+
+        return deps
 
 
 @dataclass

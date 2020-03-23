@@ -11,6 +11,29 @@ from xsdata.utils import text
 
 
 class ClassUtils:
+
+    INCLUDES_NONE = 0
+    INCLUDES_SOME = 1
+    INCLUDES_ALL = 2
+
+    @classmethod
+    def compare_attributes(cls, source: Class, target: Class):
+        if source is target:
+            return cls.INCLUDES_ALL
+        elif not target.attrs:
+            return cls.INCLUDES_NONE
+
+        source_attrs = {attr.name for attr in source.attrs}
+        target_attrs = {attr.name for attr in target.attrs}
+        difference = source_attrs - target_attrs
+
+        if not difference:
+            return cls.INCLUDES_ALL
+        elif len(difference) != len(source_attrs):
+            return cls.INCLUDES_SOME
+        else:
+            return cls.INCLUDES_NONE
+
     @classmethod
     def merge_duplicate_attributes(cls, target: Class):
         """

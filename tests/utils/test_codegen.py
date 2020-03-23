@@ -12,6 +12,26 @@ from xsdata.utils.codegen import ClassUtils
 
 
 class ClassUtilsTests(FactoryTestCase):
+    def test_compare_attributes(self):
+        source = ClassFactory.elements(2)
+        self.assertEqual(2, ClassUtils.compare_attributes(source, source))
+
+        target = ClassFactory.create()
+        self.assertEqual(0, ClassUtils.compare_attributes(source, target))
+
+        target.attrs = [attr.clone() for attr in source.attrs]
+        self.assertEqual(2, ClassUtils.compare_attributes(source, target))
+
+        source.attrs.append(AttrFactory.element())
+        self.assertEqual(1, ClassUtils.compare_attributes(source, target))
+
+        source.attrs = AttrFactory.list(3)
+        self.assertEqual(0, ClassUtils.compare_attributes(source, target))
+
+        self.assertEqual(0, ClassUtils.INCLUDES_NONE)
+        self.assertEqual(1, ClassUtils.INCLUDES_SOME)
+        self.assertEqual(2, ClassUtils.INCLUDES_ALL)
+
     def test_merge_duplicate_attributes(self):
         one = AttrFactory.attribute(fixed=True)
         one_clone = one.clone()

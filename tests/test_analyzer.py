@@ -146,18 +146,6 @@ class ClassAnalyzerTests(ClassAnalyzerBaseTestCase):
 
         mock_flatten_class.assert_called_once_with(class_a)
 
-    def test_is_self_referencing(self):
-        item = ClassFactory.create()
-        attr_type = AttrTypeFactory.create(name=item.name)
-        attr = AttrFactory.create(types=[attr_type])
-        item.attrs.append(attr)
-
-        self.analyzer.create_class_qname_index([item])
-        self.assertTrue(self.analyzer.is_attribute_self_reference(item, attr_type))
-
-        attr_type.name = "foobar"
-        self.assertFalse(self.analyzer.is_attribute_self_reference(item, attr_type))
-
     @mock.patch.object(ClassAnalyzer, "flatten_enumeration_unions")
     @mock.patch.object(ClassAnalyzer, "flatten_attributes")
     @mock.patch.object(ClassAnalyzer, "flatten_extension")
@@ -421,10 +409,10 @@ class ClassAnalyzerTests(ClassAnalyzerBaseTestCase):
             ]
         )
 
-    @mock.patch.object(ClassAnalyzer, "is_attribute_self_reference", return_value=False)
+    @mock.patch.object(ClassAnalyzer, "attr_depends_on", return_value=False)
     @mock.patch.object(ClassAnalyzer, "find_class")
     def test_flatten_attribute_when_no_source_is_found(
-        self, mock_find_class, mock_is_attribute_self_reference
+        self, mock_find_class, mock_attr_depends_on
     ):
         mock_find_class.return_value = None
 
@@ -436,9 +424,9 @@ class ClassAnalyzerTests(ClassAnalyzerBaseTestCase):
         self.assertEqual([type_a], attr.types)
         self.assertFalse(type_a.self_ref)
         mock_find_class.assert_called_once_with(parent.source_qname(type_a.name))
-        mock_is_attribute_self_reference.assert_called_once_with(parent, type_a)
+        mock_attr_depends_on.assert_called_once_with(type_a, parent)
 
-    @mock.patch.object(ClassAnalyzer, "is_attribute_self_reference", return_value=True)
+    @mock.patch.object(ClassAnalyzer, "attr_depends_on", return_value=True)
     @mock.patch.object(ClassAnalyzer, "find_class", return_value=None)
     def test_flatten_attribute_when_attribute_self_reference(self, *args):
         parent = ClassFactory.create()
@@ -599,13 +587,15 @@ class ClassAnalyzerTests(ClassAnalyzerBaseTestCase):
     def test_class_depends_on(self, mock_dependencies, mock_find_class):
         source = ClassFactory.create()
         target = ClassFactory.create()
+        another = ClassFactory.create()
 
-        mock_find_class.side_effect = (
-            lambda x, condition: target if x == QName("b") else None
-        )
+        find_classes = {QName("a"): another, QName("b"): target}
+
+        mock_find_class.side_effect = lambda x, condition: find_classes.get(x)
         mock_dependencies.side_effect = [
             [QName(x) for x in "cde"],
             [QName(x) for x in "abc"],
+            [QName(x) for x in "xy"],
         ]
 
         self.assertFalse(self.analyzer.class_depends_on(source, target))
@@ -617,6 +607,24 @@ class ClassAnalyzerTests(ClassAnalyzerBaseTestCase):
                 mock.call(QName("d"), condition=None),
                 mock.call(QName("e"), condition=None),
                 mock.call(QName("a"), condition=None),
+                mock.call(QName("x"), condition=None),
+                mock.call(QName("y"), condition=None),
                 mock.call(QName("b"), condition=None),
             ]
         )
+
+    @mock.patch.object(ClassAnalyzer, "class_depends_on")
+    @mock.patch.object(ClassAnalyzer, "find_class")
+    def test_attr_depends_one(self, mock_find_class, mock_class_depends_on):
+        target = ClassFactory.create()
+        source = ClassFactory.create()
+        attr_type = AttrTypeFactory.create()
+
+        mock_find_class.side_effect = [None, target, source]
+        mock_class_depends_on.return_value = True
+
+        self.assertFalse(self.analyzer.attr_depends_on(attr_type, target))
+        self.assertTrue(self.analyzer.attr_depends_on(attr_type, target))
+        self.assertTrue(self.analyzer.attr_depends_on(attr_type, target))
+
+        mock_class_depends_on.assert_called_once_with(source, target)

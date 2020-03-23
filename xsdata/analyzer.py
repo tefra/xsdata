@@ -317,7 +317,7 @@ class ClassAnalyzer(ClassUtils):
                 source = self.find_class(type_qname)
 
             if source is None:
-                attr_type.self_ref = self.is_attribute_self_reference(target, attr_type)
+                attr_type.self_ref = self.attr_depends_on(attr_type, target)
                 types.append(attr_type)
             elif source.is_enumeration:
                 types.append(attr_type)
@@ -334,13 +334,25 @@ class ClassAnalyzer(ClassUtils):
 
         attr.types = types
 
-    def class_depends_on(self, source: Class, target: Class):
+    def class_depends_on(self, source: Class, target: Class) -> bool:
+        """Check if any source dependencies recursively match the target
+        class."""
         for qname in source.dependencies():
-            if self.find_class(qname, condition=None) is target:
+            check = self.find_class(qname, condition=None)
+            if check is target or (check and self.class_depends_on(check, target)):
                 return True
 
         return False
 
-    def is_attribute_self_reference(self, target: Class, dependency: AttrType) -> bool:
+    def attr_depends_on(self, dependency: AttrType, target: Class) -> bool:
+        """Check if dependency or any of its dependencies match the target
+        class."""
         qname = target.source_qname(dependency.name)
-        return self.find_class(qname, condition=lambda x: x is target) is not None
+        source = self.find_class(qname, condition=None)
+
+        if source is None:
+            return False
+        elif source is target:
+            return True
+        else:
+            return self.class_depends_on(source, target)

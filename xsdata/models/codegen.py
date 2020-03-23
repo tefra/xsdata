@@ -253,14 +253,18 @@ class Class:
                 [
                     self.source_qname(attr_type.name)
                     for attr_type in attr.types
-                    if not attr_type.forward_ref and not attr_type.native
+                    if not attr_type.forward_ref
+                    and not attr_type.native
+                    and not attr_type.self_ref
                 ]
             )
 
         deps.update(
             self.source_qname(ext.type.name)
             for ext in self.extensions
-            if not ext.type.native
+            if not ext.type.forward_ref
+            and not ext.type.native
+            and not ext.type.self_ref
         )
 
         for inner in self.inner:

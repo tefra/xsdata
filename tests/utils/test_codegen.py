@@ -13,20 +13,20 @@ from xsdata.utils.codegen import ClassUtils
 
 class ClassUtilsTests(FactoryTestCase):
     def test_merge_duplicate_attributes(self):
-        one = AttrFactory.create(local_type=TagType.ATTRIBUTE)
+        one = AttrFactory.attribute(fixed=True)
         one_clone = one.clone()
         restrictions = Restrictions(min_occurs=10, max_occurs=15)
-        two = AttrFactory.create(local_type=TagType.ELEMENT, restrictions=restrictions)
+        two = AttrFactory.element(restrictions=restrictions, fixed=True)
         two_clone = two.clone()
         two_clone.restrictions.min_occurs = 5
         two_clone.restrictions.max_occurs = 5
         two_clone_two = two.clone()
         two_clone_two.restrictions.min_occurs = 4
         two_clone_two.restrictions.max_occurs = 4
-        three = AttrFactory.create(local_type=TagType.ELEMENT)
-        four = AttrFactory.create(local_type=TagType.ENUMERATION)
+        three = AttrFactory.element()
+        four = AttrFactory.enumeration()
         four_clone = four.clone()
-        five = AttrFactory.create(local_type=TagType.ELEMENT)
+        five = AttrFactory.element()
         five_clone = five.clone()
         five_clone_two = five.clone()
 
@@ -51,8 +51,10 @@ class ClassUtilsTests(FactoryTestCase):
         ClassUtils.merge_duplicate_attributes(target)
         self.assertEqual(winners, target.attrs)
 
+        self.assertTrue(one.fixed)
         self.assertIsNone(one.restrictions.min_occurs)
         self.assertIsNone(one.restrictions.max_occurs)
+        self.assertFalse(two.fixed)
         self.assertEqual(4, two.restrictions.min_occurs)
         self.assertEqual(24, two.restrictions.max_occurs)
         self.assertIsNone(three.restrictions.min_occurs)

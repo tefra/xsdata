@@ -118,7 +118,7 @@ class Attr:
     local_name: str = field(init=False)
     local_type: str
     index: int = field(compare=False)
-    default: Any = field(default=None)
+    default: Any = field(default=None, compare=False)
     wildcard: bool = field(default=False)
     fixed: bool = field(default=False)
     types: List[AttrType] = field(default_factory=list)
@@ -143,6 +143,10 @@ class Attr:
         return self.is_list or self.is_map
 
     @property
+    def is_group(self):
+        return self.local_type in (TagType.ATTRIBUTE_GROUP, TagType.GROUP)
+
+    @property
     def is_map(self) -> bool:
         return (
             len(self.types) == 1
@@ -153,10 +157,6 @@ class Attr:
     @property
     def is_list(self):
         return self.restrictions.is_list
-
-    @property
-    def is_group(self):
-        return self.local_type in (TagType.ATTRIBUTE_GROUP, TagType.GROUP)
 
     def clone(self, **kwargs):
         return replace(

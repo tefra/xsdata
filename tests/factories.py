@@ -26,8 +26,10 @@ class FactoryTestCase(unittest.TestCase):
         super(FactoryTestCase, self).setUp()
         ClassFactory.reset()
         AttrFactory.reset()
+        AttrTypeFactory.reset()
         ExtensionFactory.reset()
         RestrictionsFactory.reset()
+        PackageFactory.reset()
 
 
 class Factory(ABC):
@@ -232,7 +234,7 @@ class AttrFactory(Factory):
         return cls.model(
             name=name or f"attr_{cls.next_letter()}",
             index=cls.counter if index is None else index,
-            types=types or AttrTypeFactory.list(1, name="string", native=True),
+            types=types or [AttrTypeFactory.xs_string()],
             local_type=local_type or random.choice(cls.types).__name__,
             namespace=namespace or None,
             help=help or None,
@@ -241,6 +243,40 @@ class AttrFactory(Factory):
             wildcard=wildcard,
             restrictions=restrictions or RestrictionsFactory.create(),
         )
+
+    @classmethod
+    def enumeration(cls, **kwargs) -> Attr:
+        return cls.create(local_type=TagType.ENUMERATION, **kwargs)
+
+    @classmethod
+    def element(cls, **kwargs) -> Attr:
+        return cls.create(local_type=TagType.ELEMENT, **kwargs)
+
+    @classmethod
+    def any(cls, **kwargs) -> Attr:
+        return cls.create(
+            local_type=TagType.ANY, types=[AttrTypeFactory.xs_any()], **kwargs
+        )
+
+    @classmethod
+    def any_attribute(cls, **kwargs) -> Attr:
+        return cls.create(
+            local_type=TagType.ANY_ATTRIBUTE,
+            types=[AttrTypeFactory.xs_qmap()],
+            **kwargs,
+        )
+
+    @classmethod
+    def attribute(cls, **kwargs) -> Attr:
+        return cls.create(local_type=TagType.ATTRIBUTE, **kwargs)
+
+    @classmethod
+    def attribute_group(cls, **kwargs) -> Attr:
+        return cls.create(local_type=TagType.ATTRIBUTE_GROUP, **kwargs)
+
+    @classmethod
+    def group(cls, **kwargs) -> Attr:
+        return cls.create(local_type=TagType.GROUP, **kwargs)
 
 
 class PackageFactory(Factory):

@@ -28,6 +28,7 @@ class {{ obj.name }}{{"({})".format(obj.extensions|join(', ', attribute="type.na
     {%- set field_params = dict(
                   name=None if attr.wildcard else attr.local_name,
                   type=attr.local_type,
+                  sequential=True if attr.sequential else None,
                   namespace=attr.namespace if namespace != attr.namespace or attr.is_attribute else None,
                   ** attr.restrictions.asdict()
             )

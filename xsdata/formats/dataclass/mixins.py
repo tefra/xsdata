@@ -56,6 +56,7 @@ class ClassVar:
     is_nillable: bool = False
     is_list: bool = False
     is_dataclass: bool = False
+    sequential: bool = False
     default: Any = None
     wild_ns: List[str] = field(default_factory=list)
 
@@ -94,6 +95,7 @@ class ClassMeta:
     clazz: Type
     qname: QName
     mixed: bool
+    nillable: bool
     vars: Dict[QName, ClassVar]
 
     @property
@@ -170,6 +172,7 @@ class ModelInspect:
                 clazz=clazz,
                 qname=QName(namespace, name),
                 mixed=mixed,
+                nillable=nillable,
                 vars={
                     arg.qname: arg
                     for arg in self.get_type_hints(clazz, namespace, nillable)
@@ -203,6 +206,7 @@ class ModelInspect:
                 is_list=is_list,
                 is_nillable=var.metadata.get("nillable", nillable),
                 is_dataclass=is_class,
+                sequential=var.metadata.get("sequential", False),
                 types=types,
                 default=self.default_value(var),
             )

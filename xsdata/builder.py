@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from typing import Iterator
 from typing import List
 from typing import Optional
+from typing import Tuple
 from typing import Union
 
 from xsdata.models.codegen import Attr
@@ -79,8 +80,8 @@ class ClassBuilder:
     def build_class_attributes(self, obj: BaseElement, instance: Class):
         """Build the instance class attributes from the given ElementBase
         children."""
-        for child in self.element_children(obj):
-            self.build_class_attribute(instance, child)
+        for child, sequential in self.element_children(obj):
+            self.build_class_attribute(instance, child, sequential)
 
         instance.attrs.sort(key=lambda x: x.index)
 
@@ -122,14 +123,16 @@ class ClassBuilder:
             self_ref=self_ref,
         )
 
-    def element_children(self, obj: ElementBase) -> Iterator[AttributeElement]:
+    def element_children(
+        self, obj: ElementBase, sequential: bool = False
+    ) -> Iterator[Tuple[AttributeElement, bool]]:
         """Recursively find and return all child elements that are qualified to
         be class attributes."""
         for child in obj.children():
             if child.is_attribute:
-                yield child
+                yield child, sequential
             else:
-                yield from self.element_children(child)
+                yield from self.element_children(child, child.is_sequential)
 
     def element_namespace(self, obj: ElementBase) -> Optional[str]:
         """
@@ -184,7 +187,9 @@ class ClassBuilder:
             restrictions=Restrictions(**restrictions),
         )
 
-    def build_class_attribute(self, instance: Class, obj: AttributeElement):
+    def build_class_attribute(
+        self, instance: Class, obj: AttributeElement, sequential: bool
+    ):
         """Generate and append an attribute instance to the instance class."""
         types = self.build_class_attribute_types(instance, obj)
         restrictions = Restrictions(**obj.get_restrictions())
@@ -199,6 +204,7 @@ class ClassBuilder:
                 name=obj.real_name,
                 default=obj.default_value,
                 fixed=obj.is_fixed,
+                sequential=sequential,
                 wildcard=obj.is_wildcard,
                 types=types,
                 local_type=obj.class_name,

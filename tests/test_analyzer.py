@@ -358,12 +358,14 @@ class ClassAnalyzerTests(ClassAnalyzerBaseTestCase):
         mock_copy_attributes.assert_called_once_with(source, target, extension)
 
     @mock.patch.object(ClassAnalyzer, "merge_duplicate_attributes")
-    @mock.patch.object(ClassAnalyzer, "flatten_attribute")
+    @mock.patch.object(ClassAnalyzer, "unset_sequential_attributes")
+    @mock.patch.object(ClassAnalyzer, "flatten_attribute_types")
     @mock.patch.object(ClassAnalyzer, "expand_attribute_group")
     def test_flatten_attributes(
         self,
         mock_expand_attribute_group,
         mock_flatten_attribute,
+        mock_unset_sequential_attributes,
         mock_merge_duplicate_attributes,
     ):
         target = ClassFactory.create(
@@ -383,6 +385,7 @@ class ClassAnalyzerTests(ClassAnalyzerBaseTestCase):
             [mock.call(target, attr) for attr in target.attrs]
         )
         mock_merge_duplicate_attributes.assert_called_once_with(target)
+        mock_unset_sequential_attributes.assert_called_once_with(target)
 
     @mock.patch.object(ClassAnalyzer, "clone_attribute")
     @mock.patch.object(ClassAnalyzer, "find_class")
@@ -419,7 +422,7 @@ class ClassAnalyzerTests(ClassAnalyzerBaseTestCase):
         parent = ClassFactory.create()
         type_a = AttrTypeFactory.create()
         attr = AttrFactory.create(name="a", types=[type_a])
-        self.analyzer.flatten_attribute(parent, attr)
+        self.analyzer.flatten_attribute_types(parent, attr)
 
         self.assertEqual([type_a], attr.types)
         self.assertFalse(type_a.self_ref)
@@ -432,7 +435,7 @@ class ClassAnalyzerTests(ClassAnalyzerBaseTestCase):
         parent = ClassFactory.create()
         type_a = AttrTypeFactory.create()
         attr = AttrFactory.create(name="a", types=[type_a])
-        self.analyzer.flatten_attribute(parent, attr)
+        self.analyzer.flatten_attribute_types(parent, attr)
 
         self.assertEqual([type_a], attr.types)
         self.assertTrue(type_a.self_ref)
@@ -444,7 +447,7 @@ class ClassAnalyzerTests(ClassAnalyzerBaseTestCase):
         parent = ClassFactory.create()
         type_a = AttrTypeFactory.create(name="a")
         attr = AttrFactory.create(name="a", types=[type_a])
-        self.analyzer.flatten_attribute(parent, attr)
+        self.analyzer.flatten_attribute_types(parent, attr)
 
         self.assertEqual([type_a], attr.types)
         mock_find_class.assert_called_once_with(parent.source_qname(type_a.name))
@@ -475,7 +478,7 @@ class ClassAnalyzerTests(ClassAnalyzerBaseTestCase):
             restrictions=RestrictionsFactory.create(min_occurs=1),
         )
 
-        self.analyzer.flatten_attribute(parent, attr)
+        self.analyzer.flatten_attribute_types(parent, attr)
 
         self.assertEqual([type_b], attr.types)
         self.assertEqual(
@@ -497,7 +500,7 @@ class ClassAnalyzerTests(ClassAnalyzerBaseTestCase):
         parent = ClassFactory.create()
         attr = AttrFactory.create(name="a", types=[type_a])
 
-        self.analyzer.flatten_attribute(parent, attr)
+        self.analyzer.flatten_attribute_types(parent, attr)
 
         self.assertEqual([type_str], attr.types)
         mock_logger_warning.assert_called_once_with(

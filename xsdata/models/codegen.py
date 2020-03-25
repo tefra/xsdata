@@ -121,6 +121,7 @@ class Attr:
     index: int = field(compare=False)
     default: Any = field(default=None, compare=False)
     wildcard: bool = field(default=False)
+    sequential: bool = field(default=False, compare=False)
     fixed: bool = field(default=False, compare=False)
     types: List[AttrType] = field(default_factory=list)
     display_type: Optional[str] = field(default=None)

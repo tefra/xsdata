@@ -120,6 +120,10 @@ class ElementBase(BaseModel):
         return False
 
     @property
+    def is_sequential(self):
+        return False
+
+    @property
     def is_ref(self):
         return getattr(self, "ref", None) is not None
 

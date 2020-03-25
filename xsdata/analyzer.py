@@ -265,14 +265,27 @@ class ClassAnalyzer(ClassUtils):
             self.copy_attributes(source, target, ext)
 
     def flatten_attributes(self, target: Class):
+        """
+        Simplify class attributes complexity.
+
+        Steps:
+            1. Expand attribute groups references.
+            2. Flatten attribute types.
+            3. Merge duplicate attributes.
+            4. Remove useless sequential flags.
+        """
         for attr in list(target.attrs):
             if attr.is_group:
                 self.expand_attribute_group(target, attr)
 
         for attr in list(target.attrs):
-            self.flatten_attribute(target, attr)
+            self.flatten_attribute_types(target, attr)
 
-        self.merge_duplicate_attributes(target)
+        if target.attrs:
+            self.merge_duplicate_attributes(target)
+
+        if target.attrs:
+            self.unset_sequential_attributes(target)
 
     def expand_attribute_group(self, target: Class, attr: Attr):
         """
@@ -299,7 +312,7 @@ class ClassAnalyzer(ClassUtils):
 
             self.copy_inner_classes(source, target)
 
-    def flatten_attribute(self, target: Class, attr: Attr):
+    def flatten_attribute_types(self, target: Class, attr: Attr):
         """
         Flatten attribute types by using the source attribute type.
 

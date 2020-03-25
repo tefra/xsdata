@@ -475,6 +475,10 @@ class Sequence(AnnotationBase, OccurrencesMixin):
     sequences: Array["Sequence"] = array_element(name="sequence")
     any: Array["Any"] = array_element()
 
+    @property
+    def is_sequential(self):
+        return self.max_occurs > 1
+
 
 @dataclass
 class Choice(AnnotationBase, OccurrencesMixin):

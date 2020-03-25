@@ -192,20 +192,25 @@ class ClassBuilderTests(FactoryTestCase):
             simple_content=SimpleContent.create(restriction=Restriction.create()),
             complex_content=ComplexContent.create(
                 restriction=Restriction.create(
-                    enumerations=[Enumeration.create(value=x) for x in "abc"]
-                )
+                    enumerations=[Enumeration.create(value=x) for x in "abc"],
+                    sequence=Sequence.create(
+                        max_occurs=2, elements=[Element.create(), Element.create()]
+                    ),
+                ),
             ),
         )
 
         children = self.builder.element_children(complex_type)
         expected = [
-            complex_type.complex_content.restriction.enumerations[0],
-            complex_type.complex_content.restriction.enumerations[1],
-            complex_type.complex_content.restriction.enumerations[2],
-            complex_type.sequence.elements[0],
-            complex_type.sequence.elements[1],
-            complex_type.attributes[0],
-            complex_type.attributes[1],
+            (complex_type.complex_content.restriction.sequence.elements[0], True),
+            (complex_type.complex_content.restriction.sequence.elements[1], True),
+            (complex_type.complex_content.restriction.enumerations[0], False),
+            (complex_type.complex_content.restriction.enumerations[1], False),
+            (complex_type.complex_content.restriction.enumerations[2], False),
+            (complex_type.sequence.elements[0], False),
+            (complex_type.sequence.elements[1], False),
+            (complex_type.attributes[0], False),
+            (complex_type.attributes[1], False),
         ]
         self.assertIsInstance(children, GeneratorType)
         self.assertEqual(expected, list(children))
@@ -273,7 +278,7 @@ class ClassBuilderTests(FactoryTestCase):
 
         attribute = Attribute.create(default="false", index=66, nsmap={"foo": "bar"})
 
-        self.builder.build_class_attribute(item, attribute)
+        self.builder.build_class_attribute(item, attribute, True)
         expected = AttrFactory.create(
             name=mock_real_name.return_value,
             types=mock_build_class_attribute_types.return_value,
@@ -283,6 +288,7 @@ class ClassBuilderTests(FactoryTestCase):
             default=mock_default_value.return_value,
             fixed=mock_is_fixed.return_value,
             wildcard=mock_is_wildcard.return_value,
+            sequential=True,
             index=66,
             restrictions=Restrictions(required=True),
         )

@@ -37,6 +37,7 @@ class ModelInspectTests(TestCase):
             clazz=ItemsType,
             qname=QName("ItemsType"),
             mixed=False,
+            nillable=False,
             vars={var.qname: var},
         )
 

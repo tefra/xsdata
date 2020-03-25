@@ -228,6 +228,7 @@ class AttrFactory(Factory):
         default=None,
         fixed=False,
         wildcard=False,
+        sequential=False,
         restrictions=None,
     ):
 
@@ -241,6 +242,7 @@ class AttrFactory(Factory):
             default=default or None,
             fixed=fixed,
             wildcard=wildcard,
+            sequential=sequential,
             restrictions=restrictions or RestrictionsFactory.create(),
         )
 

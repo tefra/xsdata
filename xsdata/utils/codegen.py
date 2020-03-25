@@ -35,6 +35,33 @@ class ClassUtils:
             return cls.INCLUDES_NONE
 
     @classmethod
+    def unset_sequential_attributes(cls, target: Class):
+        """
+        Reset the class attributes sequential flags where needed.
+
+        Reasons:
+            1. Attribute not a list
+            2. Attribute siblings are not sequential.
+        """
+
+        for attr in target.attrs:
+            if attr.sequential and not attr.is_list:
+                attr.sequential = False
+
+        total = len(target.attrs)
+        for idx, attr in enumerate(target.attrs):
+            if not attr.sequential:
+                continue
+
+            siblings = False
+            if idx - 1 >= 0 and target.attrs[idx - 1].sequential:
+                siblings = True
+            if not siblings and idx + 1 < total and target.attrs[idx + 1].sequential:
+                siblings = True
+            if not siblings:
+                attr.sequential = False
+
+    @classmethod
     def merge_duplicate_attributes(cls, target: Class):
         """
         Flatten duplicate attributes.

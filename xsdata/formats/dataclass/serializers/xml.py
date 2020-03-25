@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from dataclasses import field
 from dataclasses import is_dataclass
 from typing import Any
+from typing import List
 from typing import Optional
 
 from lxml.etree import cleanup_namespaces
@@ -75,8 +76,7 @@ class XmlSerializer(AbstractSerializer, ModelInspect):
             return parent
 
         meta = self.class_meta(obj.__class__, QName(parent).namespace)
-        for var in meta.vars.values():
-            value = getattr(obj, var.name)
+        for var, value in self.next_value(list(meta.vars.values()), obj):
             if value is not None:
                 if not var.is_any_element and not var.is_any_attribute:
                     namespaces.add(var.namespace)
@@ -90,10 +90,37 @@ class XmlSerializer(AbstractSerializer, ModelInspect):
                 else:
                     self.render_sub_nodes(parent, value, var, namespaces)
             else:
-                self.set_nil_attribute(parent, var, namespaces)
+                self.set_nil_attribute(parent, var.is_nillable, namespaces)
 
         self.unset_nil_attribute(parent)
         return parent
+
+    def next_value(self, vars: List[ClassVar], obj: Any):
+        index = 0
+        stop = len(vars)
+        while index < stop:
+            var = vars[index]
+            if not var.sequential:
+                yield var, getattr(obj, var.name)
+                index += 1
+                continue
+
+            end = next(
+                (i for i in range(index + 1, stop) if not vars[i].sequential), stop
+            )
+            sequence = vars[index:end]
+            index = end
+            j = 0
+
+            rolling = True
+            while rolling:
+                rolling = False
+                for var in sequence:
+                    values = getattr(obj, var.name)
+                    if j < len(values):
+                        rolling = True
+                        yield var, values[j]
+                j += 1
 
     def render_sub_nodes(
         self, parent, values: Any, var: ClassVar, namespaces: Namespaces
@@ -109,7 +136,7 @@ class XmlSerializer(AbstractSerializer, ModelInspect):
             elif not is_wildcard:
                 sub_element = SubElement(parent, var.qname)
                 self.render_node(value, sub_element, namespaces)
-                self.set_nil_attribute(sub_element, var, namespaces)
+                self.set_nil_attribute(sub_element, var.is_nillable, namespaces)
             elif isinstance(value, str):
                 if parent.text:
                     self.set_tail(parent, value)
@@ -133,7 +160,7 @@ class XmlSerializer(AbstractSerializer, ModelInspect):
                 sub_element = SubElement(parent, value.qname)
                 self.render_node(value, sub_element, namespaces)
 
-        self.set_nil_attribute(parent, var, namespaces)
+        self.set_nil_attribute(parent, var.is_nillable, namespaces)
 
     @classmethod
     def set_attribute(cls, parent: Element, key: Any, value: Any):
@@ -153,8 +180,8 @@ class XmlSerializer(AbstractSerializer, ModelInspect):
         parent.tail = to_xml(value)
 
     @staticmethod
-    def set_nil_attribute(element: Element, var: ClassVar, namespaces: Namespaces):
-        if var.is_nillable and element.text is None and len(element) == 0:
+    def set_nil_attribute(element: Element, is_nillable: bool, namespaces: Namespaces):
+        if is_nillable and element.text is None and len(element) == 0:
             namespaces.add(Namespace.XSI.uri, Namespace.XSI.prefix)
             element.set(XSI_NIL_QNAME, "true")
 

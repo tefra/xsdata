@@ -32,6 +32,26 @@ class ClassUtilsTests(FactoryTestCase):
         self.assertEqual(1, ClassUtils.INCLUDES_SOME)
         self.assertEqual(2, ClassUtils.INCLUDES_ALL)
 
+    def test_unset_sequential_attributes(self):
+        restrictions = Restrictions(max_occurs=2)
+        attrs = AttrFactory.list(3, sequential=True, restrictions=restrictions)
+        target = ClassFactory.create(attrs=attrs)
+
+        ClassUtils.unset_sequential_attributes(target)
+        self.assertEqual(3, len([attr for attr in target.attrs if attr.sequential]))
+
+        restrictions.max_occurs = 1
+        ClassUtils.unset_sequential_attributes(target)
+        self.assertEqual(0, len([attr for attr in target.attrs if attr.sequential]))
+
+        restrictions = Restrictions(max_occurs=2)
+        attrs = AttrFactory.list(3, sequential=True, restrictions=restrictions)
+        target.attrs = attrs
+        target.attrs[1].sequential = False
+
+        ClassUtils.unset_sequential_attributes(target)
+        self.assertEqual(0, len([attr for attr in target.attrs if attr.sequential]))
+
     def test_merge_duplicate_attributes(self):
         one = AttrFactory.attribute(fixed=True)
         one_clone = one.clone()

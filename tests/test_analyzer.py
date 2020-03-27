@@ -14,12 +14,11 @@ from xsdata.models.codegen import Restrictions
 from xsdata.models.elements import ComplexType
 from xsdata.models.elements import Element
 from xsdata.models.elements import SimpleType
-from xsdata.models.enums import TagType
 
 
-class ClassAnalyzerBaseTestCase(FactoryTestCase):
+class ClassAnalyzerTests(FactoryTestCase):
     def setUp(self) -> None:
-        super(ClassAnalyzerBaseTestCase, self).setUp()
+        super(ClassAnalyzerTests, self).setUp()
         self.target_namespace = "http://namespace/target"
         self.nsmap = {
             None: "http://namespace/foobar",
@@ -27,8 +26,6 @@ class ClassAnalyzerBaseTestCase(FactoryTestCase):
         }
         self.analyzer = ClassAnalyzer()
 
-
-class ClassAnalyzerTests(ClassAnalyzerBaseTestCase):
     @mock.patch.object(ClassAnalyzer, "fetch_classes_for_generation")
     @mock.patch.object(ClassAnalyzer, "flatten_classes")
     @mock.patch.object(ClassAnalyzer, "mark_abstract_duplicate_classes")
@@ -93,7 +90,8 @@ class ClassAnalyzerTests(ClassAnalyzerBaseTestCase):
         self.assertFalse(six.abstract)  # No element in group
         self.assertFalse(seven.abstract)  # Alone
 
-    def test_fetch_classes_for_generation(self):
+    @mock.patch.object(ClassAnalyzer, "unset_sequential_attributes")
+    def test_fetch_classes_for_generation(self, mock_unset_sequential_attributes):
         classes = [
             ClassFactory.create(abstract=True, type=Element),
             ClassFactory.create(type=Element),
@@ -101,6 +99,7 @@ class ClassAnalyzerTests(ClassAnalyzerBaseTestCase):
             ClassFactory.create(type=SimpleType),
             ClassFactory.enumeration(2),
         ]
+        self.analyzer.create_class_qname_index(classes)
 
         expected = [
             classes[1],
@@ -108,16 +107,24 @@ class ClassAnalyzerTests(ClassAnalyzerBaseTestCase):
             classes[4],
         ]
 
-        self.analyzer.create_class_qname_index(classes)
         result = self.analyzer.fetch_classes_for_generation()
         self.assertEqual(expected, result)
+        mock_unset_sequential_attributes.assert_has_calls(
+            [mock.call(x) for x in expected]
+        )
 
-    def test_fetch_classes_for_generation_return_simple_when_no_complex_types(self):
+    @mock.patch.object(ClassAnalyzer, "unset_sequential_attributes")
+    def test_fetch_classes_for_generation_return_simple_when_no_complex_types(
+        self, mock_unset_sequential_attributes
+    ):
         classes = ClassFactory.list(2, type=SimpleType)
         self.analyzer.create_class_qname_index(classes)
 
         actual = self.analyzer.fetch_classes_for_generation()
         self.assertEqual(classes, actual)
+        mock_unset_sequential_attributes.assert_has_calls(
+            [mock.call(x) for x in classes]
+        )
 
     @mock.patch.object(ClassAnalyzer, "flatten_class")
     def test_flatten_classes(self, mock_flatten_class):
@@ -146,56 +153,47 @@ class ClassAnalyzerTests(ClassAnalyzerBaseTestCase):
 
         mock_flatten_class.assert_called_once_with(class_a)
 
-    @mock.patch.object(ClassAnalyzer, "flatten_enumeration_unions")
-    @mock.patch.object(ClassAnalyzer, "flatten_attributes")
+    @mock.patch.object(ClassAnalyzer, "merge_duplicate_attributes")
+    @mock.patch.object(ClassAnalyzer, "flatten_attribute_types")
     @mock.patch.object(ClassAnalyzer, "flatten_extension")
+    @mock.patch.object(ClassAnalyzer, "expand_attribute_group")
+    @mock.patch.object(ClassAnalyzer, "flatten_enumeration_unions")
     def test_flatten_class(
         self,
-        mock_flatten_extension,
-        mock_flatten_attributes,
         mock_flatten_enumeration_unions,
+        mock_expand_attribute_group,
+        mock_flatten_extension,
+        mock_flatten_attribute_types,
+        mock_merge_duplicate_attributes,
     ):
-        obj = ClassFactory.create(
-            name="a",
-            type=SimpleType,
-            extensions=["b", "c"],
-            attrs=[AttrFactory.create(name=x) for x in "de"],
-            inner=[
-                ClassFactory.create(
-                    name="f",
-                    type=SimpleType,
-                    extensions=["g", "h"],
-                    attrs=[AttrFactory.create(name=x) for x in "ij"],
-                )
-            ],
-        )
+        inner = ClassFactory.list(2)
+        extensions = ExtensionFactory.list(2)
+        target = ClassFactory.elements(2, inner=inner, extensions=extensions)
 
-        self.analyzer.flatten_class(obj)
+        self.analyzer.flatten_class(target)
 
         mock_flatten_enumeration_unions.assert_has_calls(
-            [mock.call(obj), mock.call(obj.inner[0])]
+            [mock.call(target), mock.call(inner[0]), mock.call(inner[1])]
+        )
+
+        mock_expand_attribute_group.assert_has_calls(
+            [mock.call(target, target.attrs[0]), mock.call(target, target.attrs[1])]
         )
 
         mock_flatten_extension.assert_has_calls(
             [
-                mock.call(obj, "c"),
-                mock.call(obj, "b"),
-                mock.call(obj.inner[0], "h"),
-                mock.call(obj.inner[0], "g"),
+                mock.call(target, target.extensions[1]),
+                mock.call(target, target.extensions[0]),
             ]
         )
-        mock_flatten_attributes.assert_has_calls(
-            [mock.call(obj), mock.call(obj.inner[0])]
+
+        mock_flatten_attribute_types.assert_has_calls(
+            [mock.call(target, target.attrs[0]), mock.call(target, target.attrs[1])]
         )
 
-    @mock.patch.object(ClassAnalyzer, "flatten_enumeration_unions")
-    def test_flatten_class_when_target_is_not_common(
-        self, mock_flatten_enumeration_unions
-    ):
-        obj = ClassFactory.create(type=Element)
-        self.analyzer.flatten_class(obj)
-
-        self.assertEqual(0, mock_flatten_enumeration_unions.call_count)
+        mock_merge_duplicate_attributes.assert_has_calls(
+            [mock.call(target), mock.call(inner[0]), mock.call(inner[1])]
+        )
 
     @mock.patch.object(ClassAnalyzer, "create_default_attribute")
     def test_flatten_extension_with_native_type_and_target_not_enumeration(
@@ -357,41 +355,11 @@ class ClassAnalyzerTests(ClassAnalyzerBaseTestCase):
         mock_compare_attributes.assert_called_once_with(source, target)
         mock_copy_attributes.assert_called_once_with(source, target, extension)
 
-    @mock.patch.object(ClassAnalyzer, "merge_duplicate_attributes")
-    @mock.patch.object(ClassAnalyzer, "unset_sequential_attributes")
-    @mock.patch.object(ClassAnalyzer, "flatten_attribute_types")
-    @mock.patch.object(ClassAnalyzer, "expand_attribute_group")
-    def test_flatten_attributes(
-        self,
-        mock_expand_attribute_group,
-        mock_flatten_attribute,
-        mock_unset_sequential_attributes,
-        mock_merge_duplicate_attributes,
-    ):
-        target = ClassFactory.create(
-            attrs=[
-                AttrFactory.create(local_type=TagType.ATTRIBUTE_GROUP),
-                AttrFactory.create(local_type=TagType.ATTRIBUTE),
-                AttrFactory.create(local_type=TagType.GROUP),
-                AttrFactory.create(local_type=TagType.ELEMENT),
-            ]
-        )
-
-        self.analyzer.flatten_attributes(target)
-        mock_expand_attribute_group.assert_has_calls(
-            [mock.call(target, attr) for attr in target.attrs if attr.is_group]
-        )
-        mock_flatten_attribute.assert_has_calls(
-            [mock.call(target, attr) for attr in target.attrs]
-        )
-        mock_merge_duplicate_attributes.assert_called_once_with(target)
-        mock_unset_sequential_attributes.assert_called_once_with(target)
-
     @mock.patch.object(ClassAnalyzer, "clone_attribute")
     @mock.patch.object(ClassAnalyzer, "find_class")
     def test_expand_attribute_group(self, mock_find_class, mock_clone_attribute):
         source = ClassFactory.elements(2)
-        group_attr = AttrFactory.create(name="foo:bar")
+        group_attr = AttrFactory.attribute_group(name="foo:bar")
         target = ClassFactory.create()
         target.attrs.append(group_attr)
 
@@ -515,6 +483,7 @@ class ClassAnalyzerTests(ClassAnalyzerBaseTestCase):
         mock_find_class.return_value = enum_b
 
         obj = ClassFactory.create(
+            type=SimpleType,
             attrs=[
                 AttrFactory.create(
                     name="value",
@@ -530,7 +499,6 @@ class ClassAnalyzerTests(ClassAnalyzerBaseTestCase):
         self.assertFalse(obj.is_enumeration)
 
         self.analyzer.flatten_enumeration_unions(obj)
-
         self.assertTrue(obj.is_enumeration)
         self.assertEqual(5, len(obj.attrs))
         self.assertEqual(

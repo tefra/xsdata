@@ -76,7 +76,12 @@ class ClassAnalyzer(ClassUtils):
             if item.is_enumeration or not (item.abstract or item.is_common)
         ]
 
-        return primary_classes or all_classes
+        classes = primary_classes or all_classes
+
+        for target in classes:
+            self.unset_sequential_attributes(target)
+
+        return classes
 
     def create_class_qname_index(self, classes: List[Class]):
         self.class_index.clear()
@@ -126,7 +131,7 @@ class ClassAnalyzer(ClassUtils):
                 self.copy_attributes(item, winner, self_extension)
                 for looser_ext in item.extensions:
                     new_ext = looser_ext.clone()
-                    new_ext.restrictions.update(self_extension.restrictions)
+                    new_ext.restrictions.merge(self_extension.restrictions)
                     winner.extensions.append(new_ext)
 
     def mark_abstract_duplicate_classes(self):
@@ -155,28 +160,39 @@ class ClassAnalyzer(ClassUtils):
 
     def flatten_class(self, target: Class):
         """
-        Flatten class extensions, attributes and inner classes.
+        Simplify class footprint by flattening class extensions, attributes and
+        inner classes.
 
         Steps:
-            * Enum unions
-            * Parent classes
-            * Attributes
-            * Inner classes
+            * Merge enum unions
+            * Expand attribute groups
+            * Copy extensions attributes
+            * Flatten attribute types
+            * Merge duplicate attributes
+            * Unset sequential attributes
+            * Flatten inner classes
         """
         self.processed[target.key] = True
 
-        if target.is_common:
-            self.flatten_enumeration_unions(target)
+        self.flatten_enumeration_unions(target)
+
+        for attr in list(target.attrs):
+            self.expand_attribute_group(target, attr)
 
         for extension in reversed(target.extensions):
             self.flatten_extension(target, extension)
 
-        self.flatten_attributes(target)
+        for attr in list(target.attrs):
+            self.flatten_attribute_types(target, attr)
+
+        self.merge_duplicate_attributes(target)
 
         for inner in target.inner:
             self.flatten_class(inner)
 
     def flatten_enumeration_unions(self, target: Class):
+        if not target.is_common:
+            return
 
         if len(target.attrs) == 1 and target.attrs[0].name == "value":
             all_enums = True
@@ -264,35 +280,16 @@ class ClassAnalyzer(ClassUtils):
         elif self.class_depends_on(source, target):
             self.copy_attributes(source, target, ext)
 
-    def flatten_attributes(self, target: Class):
-        """
-        Simplify class attributes complexity.
-
-        Steps:
-            1. Expand attribute groups references.
-            2. Flatten attribute types.
-            3. Merge duplicate attributes.
-            4. Remove useless sequential flags.
-        """
-        for attr in list(target.attrs):
-            if attr.is_group:
-                self.expand_attribute_group(target, attr)
-
-        for attr in list(target.attrs):
-            self.flatten_attribute_types(target, attr)
-
-        if target.attrs:
-            self.merge_duplicate_attributes(target)
-
-        if target.attrs:
-            self.unset_sequential_attributes(target)
-
     def expand_attribute_group(self, target: Class, attr: Attr):
         """
         Expand a group attribute with the source class attributes.
 
         Clone the attributes and apply the group restrictions as well.
         """
+
+        if not attr.is_group:
+            return
+
         attr_qname = target.source_qname(attr.name)
         source = self.find_class(attr_qname, condition=None)
 
@@ -338,7 +335,7 @@ class ClassAnalyzer(ClassUtils):
                 source_attr = source.attrs[0]
                 types.extend(source_attr.types)
                 restrictions = source_attr.restrictions.clone()
-                restrictions.update(attr.restrictions)
+                restrictions.merge(attr.restrictions)
                 attr.restrictions = restrictions
                 self.copy_inner_classes(source, target)
             else:

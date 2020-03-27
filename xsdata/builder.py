@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import Dict
 from typing import Iterator
 from typing import List
 from typing import Optional
@@ -23,6 +24,7 @@ from xsdata.models.elements import SimpleType
 from xsdata.models.elements import Union as UnionElement
 from xsdata.models.enums import DataType
 from xsdata.models.enums import Namespace
+from xsdata.models.enums import TagType
 from xsdata.models.mixins import ElementBase
 from xsdata.utils import text
 
@@ -77,42 +79,42 @@ class ClassBuilder:
         self.build_class_attributes(obj, instance)
         return instance
 
-    def build_class_attributes(self, obj: BaseElement, instance: Class):
-        """Build the instance class attributes from the given ElementBase
+    def build_class_attributes(self, obj: BaseElement, target: Class):
+        """Build the target class attributes from the given ElementBase
         children."""
-        for child, sequential in self.element_children(obj):
-            self.build_class_attribute(instance, child, sequential)
+        for child, restrictions in self.element_children(obj):
+            self.build_class_attribute(target, child, restrictions)
 
-        instance.attrs.sort(key=lambda x: x.index)
+        target.attrs.sort(key=lambda x: x.index)
 
-    def build_class_extensions(self, obj: BaseElement, instance: Class):
+    def build_class_extensions(self, obj: BaseElement, target: Class):
         """Build the item class extensions from the given ElementBase
         children."""
         extensions = dict()
         raw_type = obj.raw_type
         if raw_type:
             restrictions = obj.get_restrictions()
-            extension = self.build_class_extension(instance, raw_type, 0, restrictions)
+            extension = self.build_class_extension(target, raw_type, 0, restrictions)
             extensions[raw_type] = extension
 
-        for extension in self.children_extensions(obj, instance):
+        for extension in self.children_extensions(obj, target):
             extension.forward_ref = False
             extensions[extension.type.name] = extension
 
-        instance.extensions = sorted(extensions.values(), key=lambda x: x.type.index)
+        target.extensions = sorted(extensions.values(), key=lambda x: x.type.index)
 
     def build_data_type(
-        self, instance: Class, name: str, index: int = 0, forward_ref: bool = False
+        self, target: Class, name: str, index: int = 0, forward_ref: bool = False
     ) -> AttrType:
         prefix, suffix = text.split(name)
         native = False
         self_ref = False
-        namespace = instance.nsmap.get(prefix)
+        namespace = target.nsmap.get(prefix)
 
         if Namespace.get_enum(namespace) and DataType.get_enum(suffix):
             name = suffix
             native = True
-        elif namespace == self.schema.target_namespace and suffix == instance.name:
+        elif namespace == self.schema.target_namespace and suffix == target.name:
             self_ref = True
 
         return AttrType(
@@ -124,15 +126,18 @@ class ClassBuilder:
         )
 
     def element_children(
-        self, obj: ElementBase, sequential: bool = False
-    ) -> Iterator[Tuple[AttributeElement, bool]]:
+        self, obj: ElementBase, restrictions: Optional[Restrictions] = None
+    ) -> Iterator[Tuple[AttributeElement, Restrictions]]:
         """Recursively find and return all child elements that are qualified to
         be class attributes."""
+
         for child in obj.children():
             if child.is_attribute:
-                yield child, sequential
+                yield child, restrictions or Restrictions()
             else:
-                yield from self.element_children(child, child.is_sequential)
+                yield from self.element_children(
+                    child, restrictions=Restrictions.from_element(child)
+                )
 
     def element_namespace(self, obj: ElementBase) -> Optional[str]:
         """
@@ -162,10 +167,10 @@ class ClassBuilder:
         return None
 
     def children_extensions(
-        self, obj: ElementBase, instance: Class
+        self, obj: ElementBase, target: Class
     ) -> Iterator[Extension]:
         """
-        Recursively find and return all instance's Extension classes.
+        Recursively find and return all target's Extension classes.
 
         If the initial given obj has a type attribute include it in
         result.
@@ -176,35 +181,39 @@ class ClassBuilder:
 
             for ext in child.extensions:
                 yield self.build_class_extension(
-                    instance, ext, child.index, child.get_restrictions()
+                    target, ext, child.index, child.get_restrictions()
                 )
 
-            yield from self.children_extensions(child, instance)
+            yield from self.children_extensions(child, target)
 
-    def build_class_extension(self, instance, name, index, restrictions):
+    def build_class_extension(
+        self, target: Class, name: str, index: int, restrictions: Dict
+    ):
         return Extension(
-            type=self.build_data_type(instance, name, index=index),
+            type=self.build_data_type(target, name, index=index),
             restrictions=Restrictions(**restrictions),
         )
 
     def build_class_attribute(
-        self, instance: Class, obj: AttributeElement, sequential: bool
+        self, target: Class, obj: AttributeElement, parent_restrictions: Restrictions
     ):
-        """Generate and append an attribute instance to the instance class."""
-        types = self.build_class_attribute_types(instance, obj)
-        restrictions = Restrictions(**obj.get_restrictions())
+        """Generate and append an attribute target to the target class."""
+        types = self.build_class_attribute_types(target, obj)
+        restrictions = Restrictions.from_element(obj)
+
+        if obj.class_name in (TagType.ELEMENT, TagType.ANY):
+            restrictions.merge(parent_restrictions)
 
         if restrictions.prohibited:
             return
 
-        instance.nsmap.update(obj.nsmap)
-        instance.attrs.append(
+        target.nsmap.update(obj.nsmap)
+        target.attrs.append(
             Attr(
                 index=obj.index,
                 name=obj.real_name,
                 default=obj.default_value,
                 fixed=obj.is_fixed,
-                sequential=sequential,
                 wildcard=obj.is_wildcard,
                 types=types,
                 local_type=obj.class_name,
@@ -215,20 +224,20 @@ class ClassBuilder:
         )
 
     def build_class_attribute_types(
-        self, instance: Class, obj: AttributeElement
+        self, target: Class, obj: AttributeElement
     ) -> List[AttrType]:
         """Convert real type and anonymous inner elements to an attribute type
         list."""
         inner_class = self.build_inner_class(obj)
 
         types = [
-            self.build_data_type(instance, name)
+            self.build_data_type(target, name)
             for name in (obj.real_type or "").split(" ")
             if name
         ]
 
         if inner_class:
-            instance.inner.append(inner_class)
+            target.inner.append(inner_class)
             types.append(AttrType(name=inner_class.name, forward_ref=True))
 
         if len(types) == 0:

@@ -18,7 +18,6 @@ from xsdata.models import elements as xsd
 from xsdata.models.enums import FormType
 from xsdata.models.enums import Mode
 from xsdata.models.enums import Namespace
-from xsdata.models.mixins import OccurrencesMixin
 from xsdata.utils import text
 
 T = TypeVar("T")
@@ -155,25 +154,11 @@ class SchemaParser(XmlParser):
         else:
             return self.resolve_path(location)
 
-    @classmethod
-    def end_all(cls, obj: T, element: etree.Element):
-        """Elements inside an all element can by definition appear at most
-        once, reset their max occur counter."""
-        if isinstance(obj, xsd.All):
-            cls.cascade_occurs(obj, obj.min_occurs, obj.max_occurs)
-
     def end_attribute(self, obj: T, element: etree.Element):
         """Assign the schema's default form for attributes if the given
         attribute form is None."""
         if isinstance(obj, xsd.Attribute) and obj.form is None and self.attribute_form:
             obj.form = FormType(self.attribute_form)
-
-    @classmethod
-    def end_choice(cls, obj: T, element: etree.Element):
-        """Elements inside a choice are by definition optional, reset their min
-        occurs counter."""
-        if isinstance(obj, xsd.Choice):
-            cls.cascade_occurs(obj, 0, obj.max_occurs, force=Force.MIN_ONLY)
 
     def end_complex_type(self, obj: T, element: etree.Element):
         """Prepend an attribute group reference when default attributes
@@ -208,7 +193,6 @@ class SchemaParser(XmlParser):
     @classmethod
     def end_open_content(cls, obj: T, element: etree.Element):
         if isinstance(obj, xsd.OpenContent):
-            cls.cascade_occurs(obj, 1, 1)
             if obj.any and obj.mode == Mode.SUFFIX:
                 obj.any.index = sys.maxsize
 
@@ -223,32 +207,6 @@ class SchemaParser(XmlParser):
             self.set_schema_namespaces(obj, element)
             self.add_default_imports(obj)
             self.resolve_schemas_locations(obj)
-
-    @classmethod
-    def end_sequence(cls, obj: T, element: etree.Element):
-        """Elements inside a sequence inherit min|max occur counter if it is
-        not set."""
-        if isinstance(obj, xsd.Sequence):
-            cls.cascade_occurs(obj, obj.min_occurs, obj.max_occurs)
-
-    @classmethod
-    def cascade_occurs(
-        cls,
-        parent: xsd.ElementBase,
-        min_occurs: int,
-        max_occurs: int,
-        force: Force = Force.NO,
-    ):
-
-        force_min = force in (Force.BOTH, Force.MIN_ONLY)
-        force_max = force in (Force.BOTH, Force.MAX_ONLY)
-
-        for child in parent.children():
-            if isinstance(child, OccurrencesMixin):
-                if child.min_occurs == 1 or force_min:
-                    child.min_occurs = min_occurs
-                if child.max_occurs == 1 or force_max:
-                    child.max_occurs = max_occurs
 
     @classmethod
     def parse_value(cls, types: List[Type], value: Any, default: Any = None) -> Any:

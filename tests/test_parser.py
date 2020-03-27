@@ -5,11 +5,9 @@ from unittest import TestCase
 
 from lxml import etree
 
-from xsdata.models.elements import All
 from xsdata.models.elements import Any
 from xsdata.models.elements import Attribute
 from xsdata.models.elements import AttributeGroup
-from xsdata.models.elements import Choice
 from xsdata.models.elements import ComplexType
 from xsdata.models.elements import DefaultOpenContent
 from xsdata.models.elements import Element
@@ -21,11 +19,9 @@ from xsdata.models.elements import Override
 from xsdata.models.elements import Redefine
 from xsdata.models.elements import Restriction
 from xsdata.models.elements import Schema
-from xsdata.models.elements import Sequence
 from xsdata.models.enums import FormType
 from xsdata.models.enums import Mode
 from xsdata.models.enums import Namespace
-from xsdata.parser import Force
 from xsdata.parser import SchemaParser
 
 
@@ -257,16 +253,6 @@ class SchemaParserTests(TestCase):
             iam, self.parser.resolve_local_path(iam.name, Namespace.XSI.value)
         )
 
-    @mock.patch.object(SchemaParser, "cascade_occurs")
-    def test_end_all(self, mock_cascade_occurs):
-        xsd_all = All(min_occurs=2, max_occurs=3)
-        not_all = Element()
-        element = etree.Element("uno")
-
-        self.parser.end_all(not_all, element)
-        self.parser.end_all(xsd_all, element)
-        mock_cascade_occurs.assert_called_once_with(xsd_all, 2, 3)
-
     def test_end_attribute(self):
         attribute = Attribute()
         element = etree.Element("uno")
@@ -277,16 +263,6 @@ class SchemaParserTests(TestCase):
         self.parser.attribute_form = "qualified"
         self.parser.end_attribute(attribute, element)
         self.assertEqual(FormType.QUALIFIED, attribute.form)
-
-    @mock.patch.object(SchemaParser, "cascade_occurs")
-    def test_end_choice(self, mock_cascade_occurs):
-        choice = Choice(min_occurs=2, max_occurs=3)
-        not_choice = Element()
-        element = etree.Element("uno")
-
-        self.parser.end_choice(not_choice, element)
-        self.parser.end_choice(choice, element)
-        mock_cascade_occurs.assert_called_once_with(choice, 0, 3, force=Force.MIN_ONLY)
 
     def test_end_complex_type(self):
         complex_type = ComplexType()
@@ -360,8 +336,7 @@ class SchemaParserTests(TestCase):
         self.parser.end_extension(extension, element)
         self.assertIs(open_content, extension.open_content)
 
-    @mock.patch.object(SchemaParser, "cascade_occurs")
-    def test_end_open_content(self, mock_cascade_occurs):
+    def test_end_open_content(self):
         open_content = OpenContent()
         open_content.any = Any.create()
         element = etree.Element("uno")
@@ -372,8 +347,6 @@ class SchemaParserTests(TestCase):
         open_content.mode = Mode.SUFFIX
         self.parser.end_open_content(open_content, element)
         self.assertEqual(sys.maxsize, open_content.any.index)
-
-        mock_cascade_occurs.assert_has_calls([mock.call(open_content, 1, 1)])
 
     def test_end_restriction(self):
         restriction = Restriction()
@@ -413,58 +386,6 @@ class SchemaParserTests(TestCase):
         mock_set_schema_namespaces.assert_called_once_with(schema, element)
         mock_add_default_imports.assert_called_once_with(schema)
         mock_resolve_schemas_locations.assert_called_once_with(schema)
-
-    @mock.patch.object(SchemaParser, "cascade_occurs")
-    def test_end_sequence(self, mock_cascade_occurs):
-        sequence = Sequence(min_occurs=2, max_occurs=3)
-        not_sequence = Element()
-        element = etree.Element("uno")
-
-        self.parser.end_sequence(sequence, element)
-        self.parser.end_sequence(not_sequence, element)
-
-        mock_cascade_occurs.assert_called_once_with(sequence, 2, 3)
-
-    def test_cascade_occurs_overwrites_default_values(self):
-        sequence = Sequence()
-        sequence.elements.append(Element())
-        sequence.elements.append(Element())
-
-        self.parser.cascade_occurs(sequence, 2, 3)
-        self.assertEqual(2, sequence.elements[0].min_occurs)
-        self.assertEqual(3, sequence.elements[0].max_occurs)
-        self.assertEqual(2, sequence.elements[1].min_occurs)
-        self.assertEqual(3, sequence.elements[1].max_occurs)
-
-        self.parser.cascade_occurs(sequence, 3, 4)
-        self.assertEqual(2, sequence.elements[0].min_occurs)
-        self.assertEqual(3, sequence.elements[0].max_occurs)
-        self.assertEqual(2, sequence.elements[1].min_occurs)
-        self.assertEqual(3, sequence.elements[1].max_occurs)
-
-    def test_cascade_occurs_with_force_flags(self):
-        sequence = Sequence()
-        sequence.elements.append(Element())
-        sequence.elements.append(Element())
-
-        self.parser.cascade_occurs(sequence, 2, 3)
-        self.parser.cascade_occurs(sequence, 3, 4, force=Force.MIN_ONLY)
-        self.assertEqual(3, sequence.elements[0].min_occurs)
-        self.assertEqual(3, sequence.elements[0].max_occurs)
-        self.assertEqual(3, sequence.elements[1].min_occurs)
-        self.assertEqual(3, sequence.elements[1].max_occurs)
-
-        self.parser.cascade_occurs(sequence, 2, 4, force=Force.MAX_ONLY)
-        self.assertEqual(3, sequence.elements[0].min_occurs)
-        self.assertEqual(4, sequence.elements[0].max_occurs)
-        self.assertEqual(3, sequence.elements[1].min_occurs)
-        self.assertEqual(4, sequence.elements[1].max_occurs)
-
-        self.parser.cascade_occurs(sequence, 0, 0, force=Force.BOTH)
-        self.assertEqual(0, sequence.elements[0].min_occurs)
-        self.assertEqual(0, sequence.elements[0].max_occurs)
-        self.assertEqual(0, sequence.elements[1].min_occurs)
-        self.assertEqual(0, sequence.elements[1].max_occurs)
 
     def test_parse_value(self):
         types = [int]

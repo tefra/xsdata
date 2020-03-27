@@ -173,7 +173,7 @@ class ClassBuilderTests(FactoryTestCase):
 
         mock_children_extensions.return_value = [bar, double, foo]
         self_ext = ExtensionFactory.create(
-            type=some_type, restrictions=Restrictions(required=True)
+            type=some_type, restrictions=Restrictions(min_occurs=1, max_occurs=1)
         )
 
         item = ClassFactory.create()
@@ -186,31 +186,32 @@ class ClassBuilderTests(FactoryTestCase):
         self.assertIs(double, item.extensions[2])
 
     def test_element_children(self):
+        sequence_one = Sequence.create(elements=[Element.create(), Element.create()])
+        sequence_two = Sequence.create(
+            max_occurs=2, elements=[Element.create(), Element.create()]
+        )
+        restriction = Restriction.create(
+            enumerations=[Enumeration.create(value=x) for x in "abc"],
+            sequence=sequence_two,
+        )
         complex_type = ComplexType.create(
             attributes=[Attribute.create(), Attribute.create()],
-            sequence=Sequence.create(elements=[Element.create(), Element.create()]),
+            sequence=sequence_one,
             simple_content=SimpleContent.create(restriction=Restriction.create()),
-            complex_content=ComplexContent.create(
-                restriction=Restriction.create(
-                    enumerations=[Enumeration.create(value=x) for x in "abc"],
-                    sequence=Sequence.create(
-                        max_occurs=2, elements=[Element.create(), Element.create()]
-                    ),
-                ),
-            ),
+            complex_content=ComplexContent.create(restriction=restriction,),
         )
 
         children = self.builder.element_children(complex_type)
         expected = [
-            (complex_type.complex_content.restriction.sequence.elements[0], True),
-            (complex_type.complex_content.restriction.sequence.elements[1], True),
-            (complex_type.complex_content.restriction.enumerations[0], False),
-            (complex_type.complex_content.restriction.enumerations[1], False),
-            (complex_type.complex_content.restriction.enumerations[2], False),
-            (complex_type.sequence.elements[0], False),
-            (complex_type.sequence.elements[1], False),
-            (complex_type.attributes[0], False),
-            (complex_type.attributes[1], False),
+            (sequence_two.elements[0], Restrictions.from_element(sequence_two)),
+            (sequence_two.elements[1], Restrictions.from_element(sequence_two)),
+            (restriction.enumerations[0], Restrictions.from_element(restriction)),
+            (restriction.enumerations[1], Restrictions.from_element(restriction)),
+            (restriction.enumerations[2], Restrictions.from_element(restriction)),
+            (sequence_one.elements[0], Restrictions.from_element(sequence_one)),
+            (sequence_one.elements[1], Restrictions.from_element(sequence_one)),
+            (complex_type.attributes[0], Restrictions.from_element(complex_type)),
+            (complex_type.attributes[1], Restrictions.from_element(complex_type)),
         ]
         self.assertIsInstance(children, GeneratorType)
         self.assertEqual(expected, list(children))
@@ -278,7 +279,7 @@ class ClassBuilderTests(FactoryTestCase):
 
         attribute = Attribute.create(default="false", index=66, nsmap={"foo": "bar"})
 
-        self.builder.build_class_attribute(item, attribute, True)
+        self.builder.build_class_attribute(item, attribute, Restrictions())
         expected = AttrFactory.create(
             name=mock_real_name.return_value,
             types=mock_build_class_attribute_types.return_value,
@@ -288,7 +289,6 @@ class ClassBuilderTests(FactoryTestCase):
             default=mock_default_value.return_value,
             fixed=mock_is_fixed.return_value,
             wildcard=mock_is_wildcard.return_value,
-            sequential=True,
             index=66,
             restrictions=Restrictions(required=True),
         )

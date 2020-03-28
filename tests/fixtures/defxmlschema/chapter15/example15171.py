@@ -18,8 +18,7 @@ class PurchaseOrderType:
         metadata=dict(
             name="description",
             type="Element",
-            namespace="http://datypic.com/prod",
-            required=True
+            namespace="http://datypic.com/prod"
         )
     )
     comment: Optional[str] = field(

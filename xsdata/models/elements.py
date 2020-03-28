@@ -19,8 +19,6 @@ from xsdata.models.enums import ProcessType
 from xsdata.models.enums import TagType
 from xsdata.models.enums import UseType
 from xsdata.models.mixins import ElementBase
-from xsdata.models.mixins import OccurrencesMixin
-from xsdata.models.mixins import RestrictedField
 from xsdata.utils.text import collapse_whitespace
 
 
@@ -130,7 +128,7 @@ class AnnotationBase(ElementBase):
 
 
 @dataclass
-class AnyAttribute(AnnotationBase, RestrictedField):
+class AnyAttribute(AnnotationBase):
     """
     <anyAttribute
       id = ID
@@ -189,7 +187,7 @@ class Assertion(AnnotationBase):
 
 
 @dataclass
-class SimpleType(AnnotationBase, RestrictedField):
+class SimpleType(AnnotationBase):
     """
     <simpleType
       final = (#all | List of (list | union | restriction | extension))
@@ -233,7 +231,7 @@ class SimpleType(AnnotationBase, RestrictedField):
 
 
 @dataclass
-class List(AnnotationBase, RestrictedField):
+class List(AnnotationBase):
     """
     <list
       id = ID
@@ -260,7 +258,7 @@ class List(AnnotationBase, RestrictedField):
 
 
 @dataclass
-class Union(AnnotationBase, RestrictedField):
+class Union(AnnotationBase):
     """
     <union
       id = ID
@@ -311,7 +309,7 @@ class Union(AnnotationBase, RestrictedField):
 
 
 @dataclass
-class Attribute(AnnotationBase, RestrictedField):
+class Attribute(AnnotationBase):
     """
     <attribute
       default = string
@@ -356,8 +354,11 @@ class Attribute(AnnotationBase, RestrictedField):
 
     def get_restrictions(self) -> Dict[str, Anything]:
         restrictions = dict()
-        if self.use in (UseType.REQUIRED, UseType.PROHIBITED):
-            restrictions[self.use.value] = True
+        if self.use == UseType.REQUIRED:
+            restrictions.update({"min_occurs": 1, "max_occurs": 1, "required": True})
+        elif self.use == UseType.PROHIBITED:
+            restrictions.update({"prohibited": True})
+
         if self.simple_type:
             restrictions.update(self.simple_type.get_restrictions())
 
@@ -365,7 +366,7 @@ class Attribute(AnnotationBase, RestrictedField):
 
 
 @dataclass
-class AttributeGroup(AnnotationBase, RestrictedField):
+class AttributeGroup(AnnotationBase):
     """
     <attributeGroup
       id = ID
@@ -390,7 +391,7 @@ class AttributeGroup(AnnotationBase, RestrictedField):
 
 
 @dataclass
-class Any(AnnotationBase, OccurrencesMixin):
+class Any(AnnotationBase):
     """
     <any
       id = ID
@@ -435,9 +436,12 @@ class Any(AnnotationBase, OccurrencesMixin):
         suffix = DataType.OBJECT.code
         return f"{prefix}:{suffix}" if prefix else suffix
 
+    def get_restrictions(self) -> Dict[str, Anything]:
+        return {"min_occurs": self.min_occurs, "max_occurs": self.max_occurs}
+
 
 @dataclass
-class All(AnnotationBase, OccurrencesMixin):
+class All(AnnotationBase):
     """
     <all
       id = ID
@@ -454,9 +458,12 @@ class All(AnnotationBase, OccurrencesMixin):
     elements: Array["Element"] = array_element(name="element")
     groups: Array["Group"] = array_element(name="group")
 
+    def get_restrictions(self) -> Dict[str, Anything]:
+        return {"min_occurs": self.min_occurs, "max_occurs": self.max_occurs}
+
 
 @dataclass
-class Sequence(AnnotationBase, OccurrencesMixin):
+class Sequence(AnnotationBase):
     """
     <sequence
       id = ID
@@ -475,13 +482,16 @@ class Sequence(AnnotationBase, OccurrencesMixin):
     sequences: Array["Sequence"] = array_element(name="sequence")
     any: Array["Any"] = array_element()
 
-    @property
-    def is_sequential(self):
-        return self.max_occurs > 1
+    def get_restrictions(self) -> Dict[str, Anything]:
+        return {
+            "min_occurs": self.min_occurs,
+            "max_occurs": self.max_occurs,
+            "sequential": True,
+        }
 
 
 @dataclass
-class Choice(AnnotationBase, OccurrencesMixin):
+class Choice(AnnotationBase):
     """
     <choice
       id = ID
@@ -500,9 +510,15 @@ class Choice(AnnotationBase, OccurrencesMixin):
     sequences: Array[Sequence] = array_element(name="sequence")
     any: Array["Any"] = array_element()
 
+    def get_restrictions(self) -> Dict[str, Anything]:
+        return {
+            "min_occurs": self.min_occurs if self.min_occurs > 1 else 0,
+            "max_occurs": self.max_occurs,
+        }
+
 
 @dataclass
-class Group(AnnotationBase, OccurrencesMixin):
+class Group(AnnotationBase):
     """
     <group
       id = ID
@@ -530,6 +546,9 @@ class Group(AnnotationBase, OccurrencesMixin):
     @property
     def real_type(self) -> Optional[str]:
         return self.ref
+
+    def get_restrictions(self) -> Dict[str, Anything]:
+        return {"min_occurs": self.min_occurs, "max_occurs": self.max_occurs}
 
 
 @dataclass
@@ -562,7 +581,7 @@ class DefaultOpenContent(OpenContent):
 
 
 @dataclass
-class Extension(AnnotationBase, RestrictedField):
+class Extension(AnnotationBase):
     """
     <extension
       base = QName
@@ -589,7 +608,7 @@ class Extension(AnnotationBase, RestrictedField):
 
 
 @dataclass
-class Enumeration(AnnotationBase, RestrictedField):
+class Enumeration(AnnotationBase):
     """
     <enumeration
       id = ID
@@ -799,7 +818,7 @@ class ExplicitTimezone(AnnotationBase):
 
 
 @dataclass
-class Restriction(RestrictedField, AnnotationBase):
+class Restriction(AnnotationBase):
     """
     <restriction
       base = QName
@@ -911,7 +930,7 @@ class ComplexContent(SimpleContent):
 
 
 @dataclass
-class ComplexType(AnnotationBase, RestrictedField):
+class ComplexType(AnnotationBase):
     """
     <complexType
       abstract = boolean : false
@@ -1064,7 +1083,7 @@ class Alternative(AnnotationBase):
 
 
 @dataclass
-class Element(AnnotationBase, OccurrencesMixin):
+class Element(AnnotationBase):
     """
     <element
       abstract = boolean : false
@@ -1148,7 +1167,7 @@ class Element(AnnotationBase, OccurrencesMixin):
         return " ".join(sorted(types)) or None
 
     def get_restrictions(self) -> Dict[str, Anything]:
-        restrictions = super().get_restrictions()
+        restrictions = {"min_occurs": self.min_occurs, "max_occurs": self.max_occurs}
         if self.simple_type:
             restrictions.update(self.simple_type.get_restrictions())
         if self.nillable:

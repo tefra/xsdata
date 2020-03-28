@@ -16,19 +16,6 @@ from xsdata.models.enums import Namespace
 from xsdata.utils import text
 
 
-class RestrictedField:
-    def get_restrictions(self) -> Dict[str, Any]:
-        return dict()
-
-
-class OccurrencesMixin(RestrictedField):
-    min_occurs: int = 1
-    max_occurs: int = 1
-
-    def get_restrictions(self) -> Dict[str, Any]:
-        return {"min_occurs": self.min_occurs, "max_occurs": self.max_occurs}
-
-
 T = TypeVar("T", bound="BaseModel")
 
 
@@ -120,10 +107,6 @@ class ElementBase(BaseModel):
         return False
 
     @property
-    def is_sequential(self):
-        return False
-
-    @property
     def is_ref(self):
         return getattr(self, "ref", None) is not None
 
@@ -154,6 +137,9 @@ class ElementBase(BaseModel):
     @property
     def real_type(self) -> Optional[str]:
         raise SchemaValueError(f"Schema class `{self.class_name}` unknown real type.")
+
+    def get_restrictions(self) -> Dict[str, Any]:
+        return dict()
 
     def schema_prefix(self):
         return next(

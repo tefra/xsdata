@@ -23,7 +23,7 @@ class ItemsType:
             name="product",
             type="Element",
             namespace="",
-            min_occurs=1,
+            min_occurs=0,
             max_occurs=9223372036854775807
         )
     )
@@ -33,7 +33,7 @@ class ItemsType:
             name="shirt",
             type="Element",
             namespace="",
-            min_occurs=1,
+            min_occurs=0,
             max_occurs=9223372036854775807
         )
     )
@@ -43,7 +43,7 @@ class ItemsType:
             name="hat",
             type="Element",
             namespace="",
-            min_occurs=1,
+            min_occurs=0,
             max_occurs=9223372036854775807
         )
     )
@@ -53,7 +53,7 @@ class ItemsType:
             name="umbrella",
             type="Element",
             namespace="",
-            min_occurs=1,
+            min_occurs=0,
             max_occurs=9223372036854775807
         )
     )

@@ -79,7 +79,7 @@ class ClassAnalyzer(ClassUtils):
         classes = primary_classes or all_classes
 
         for target in classes:
-            self.unset_sequential_attributes(target)
+            self.sanitize_properties(target)
 
         return classes
 

@@ -23,8 +23,7 @@ class DescriptionType:
         metadata=dict(
             name="comment",
             type="Element",
-            namespace="",
-            required=True
+            namespace=""
         )
     )
     lang: Optional[str] = field(

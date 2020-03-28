@@ -1,7 +1,6 @@
 import sys
 from dataclasses import dataclass
 from dataclasses import field
-from enum import Enum
 from pathlib import Path
 from typing import Any
 from typing import Callable
@@ -21,13 +20,6 @@ from xsdata.models.enums import Namespace
 from xsdata.utils import text
 
 T = TypeVar("T")
-
-
-class Force(Enum):
-    NO = 0
-    MIN_ONLY = 1
-    MAX_ONLY = 2
-    BOTH = 3
 
 
 @dataclass

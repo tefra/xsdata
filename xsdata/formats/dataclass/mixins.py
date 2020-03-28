@@ -125,18 +125,21 @@ class ClassMeta:
             return self.get_wild_var(qname)
 
     def get_wild_var(self, qname: QName) -> Optional[ClassVar]:
+        return next((var for var in self.get_wild_vars(qname)), None)
+
+    def get_wild_vars(self, qname: QName):
+        for var in self.vars.values():
+            if self.matches(var.wild_ns, qname):
+                yield var
+
+    @classmethod
+    def matches(cls, namespaces: List[str], qname: QName) -> bool:
         return next(
-            (
-                var
-                for _, var in self.vars.items()
-                for wild_ns in var.wild_ns
-                if self.match(wild_ns, qname)
-            ),
-            None,
+            (True for namespace in namespaces if cls.match(namespace, qname)), False
         )
 
-    @staticmethod
-    def match(namespace: str, qname: QName):
+    @classmethod
+    def match(cls, namespace: str, qname: QName):
         return (
             namespace
             and (

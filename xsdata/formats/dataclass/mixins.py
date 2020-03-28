@@ -173,16 +173,11 @@ class ModelInspect:
                 qname=QName(namespace, name),
                 mixed=mixed,
                 nillable=nillable,
-                vars={
-                    arg.qname: arg
-                    for arg in self.get_type_hints(clazz, namespace, nillable)
-                },
+                vars={arg.qname: arg for arg in self.get_type_hints(clazz, namespace)},
             )
         return self.cache[clazz]
 
-    def get_type_hints(
-        self, clazz, parent_ns: Optional[str], nillable: bool
-    ) -> Iterator[ClassVar]:
+    def get_type_hints(self, clazz, parent_ns: Optional[str]) -> Iterator[ClassVar]:
         type_hints = get_type_hints(clazz)
 
         for var in fields(clazz):
@@ -204,7 +199,7 @@ class ModelInspect:
                 tag=tag,
                 init=var.init,
                 is_list=is_list,
-                is_nillable=var.metadata.get("nillable", nillable),
+                is_nillable=var.metadata.get("nillable", False),
                 is_dataclass=is_class,
                 sequential=var.metadata.get("sequential", False),
                 types=types,

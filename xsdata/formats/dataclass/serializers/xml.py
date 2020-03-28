@@ -89,10 +89,8 @@ class XmlSerializer(AbstractSerializer, ModelInspect):
                     self.set_text(parent, value)
                 else:
                     self.render_sub_nodes(parent, value, var, namespaces)
-            else:
-                self.set_nil_attribute(parent, var.is_nillable, namespaces)
 
-        self.unset_nil_attribute(parent)
+        self.set_nil_attribute(parent, meta.nillable, namespaces)
         return parent
 
     def next_value(self, vars: List[ClassVar], obj: Any):
@@ -156,15 +154,16 @@ class XmlSerializer(AbstractSerializer, ModelInspect):
                 self.set_attributes(sub_element, value.attributes)
                 for child in value.children:
                     self.render_sub_nodes(sub_element, child, var, namespaces)
+                    self.set_nil_attribute(parent, var.is_nillable, namespaces)
             else:
                 sub_element = SubElement(parent, value.qname)
                 self.render_node(value, sub_element, namespaces)
-
-        self.set_nil_attribute(parent, var.is_nillable, namespaces)
+                self.set_nil_attribute(sub_element, var.is_nillable, namespaces)
 
     @classmethod
     def set_attribute(cls, parent: Element, key: Any, value: Any):
-        parent.set(to_xml(key), to_xml(value))
+        if key != XSI_NIL_QNAME or (not parent.text and len(parent) == 0):
+            parent.set(to_xml(key), to_xml(value))
 
     @classmethod
     def set_attributes(cls, parent: Element, values: Any):
@@ -173,7 +172,10 @@ class XmlSerializer(AbstractSerializer, ModelInspect):
 
     @classmethod
     def set_text(cls, parent: Element, value: Any):
-        parent.text = to_xml(value)
+        value = to_xml(value)
+        if value is not None and len(value) == 0:
+            value = None
+        parent.text = value
 
     @classmethod
     def set_tail(cls, parent: Element, value: Any):
@@ -184,8 +186,3 @@ class XmlSerializer(AbstractSerializer, ModelInspect):
         if is_nillable and element.text is None and len(element) == 0:
             namespaces.add(Namespace.XSI.uri, Namespace.XSI.prefix)
             element.set(XSI_NIL_QNAME, "true")
-
-    @staticmethod
-    def unset_nil_attribute(element: Element):
-        if len(element) > 0 or element.text:
-            element.attrib.pop(XSI_NIL_QNAME, None)

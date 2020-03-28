@@ -108,9 +108,3 @@ venv.bak/
 
 # vscode
 .vscode/
-
-tests/xsd/go*
-
-wsdl/
-
-docs/build/

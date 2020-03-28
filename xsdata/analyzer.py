@@ -79,7 +79,7 @@ class ClassAnalyzer(ClassUtils):
         classes = primary_classes or all_classes
 
         for target in classes:
-            self.sanitize_properties(target)
+            self.sanitize_attributes(target)
 
         return classes
 

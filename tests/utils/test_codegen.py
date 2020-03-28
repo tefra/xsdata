@@ -32,6 +32,61 @@ class ClassUtilsTests(FactoryTestCase):
         self.assertEqual(1, ClassUtils.INCLUDES_SOME)
         self.assertEqual(2, ClassUtils.INCLUDES_ALL)
 
+    @mock.patch.object(ClassUtils, "sanitize_sequential")
+    @mock.patch.object(ClassUtils, "sanitize_restrictions")
+    @mock.patch.object(ClassUtils, "sanitize_attribute")
+    def test_sanitize_attributes(
+        self,
+        mock_sanitize_attribute,
+        mock_sanitize_restrictions,
+        mock_sanitize_sequential,
+    ):
+
+        target = ClassFactory.elements(3)
+        inner = ClassFactory.elements(2)
+        target.inner.append(inner)
+
+        ClassUtils.sanitize_attributes(target)
+        ClassUtils.sanitize_attributes(ClassFactory.create())
+
+        mock_sanitize_attribute.assert_has_calls(
+            [
+                mock.call(target.attrs[0]),
+                mock.call(target.attrs[1]),
+                mock.call(target.attrs[2]),
+                mock.call(target.inner[0].attrs[0]),
+                mock.call(target.inner[0].attrs[1]),
+            ]
+        )
+        mock_sanitize_restrictions.assert_has_calls(
+            [
+                mock.call(target.attrs[0].restrictions),
+                mock.call(target.attrs[1].restrictions),
+                mock.call(target.attrs[2].restrictions),
+                mock.call(target.inner[0].attrs[0].restrictions),
+                mock.call(target.inner[0].attrs[1].restrictions),
+            ]
+        )
+        mock_sanitize_sequential.assert_has_calls(
+            [
+                mock.call(target.attrs, 0),
+                mock.call(target.attrs, 1),
+                mock.call(target.attrs, 2),
+                mock.call(target.inner[0].attrs, 0),
+                mock.call(target.inner[0].attrs, 1),
+            ]
+        )
+
+    def test_sanitize_attribute(self):
+        attr = AttrFactory.create(fixed=True)
+
+        ClassUtils.sanitize_attribute(attr)
+        self.assertTrue(attr.fixed)
+
+        attr.restrictions.max_occurs = 2
+        ClassUtils.sanitize_attribute(attr)
+        self.assertFalse(attr.fixed)
+
     def test_sanitize_restrictions(self):
         restrictions = [
             Restrictions(min_occurs=0, max_occurs=0, required=True),
@@ -40,12 +95,6 @@ class ClassUtilsTests(FactoryTestCase):
             Restrictions(max_occurs=2, required=True),
             Restrictions(min_occurs=2, max_occurs=2, required=True),
         ]
-        target = ClassFactory.elements(5)
-        for i in range(len(restrictions)):
-            target.attrs[i].restrictions = restrictions[i]
-
-        ClassUtils.sanitize_restrictions(target)
-
         expected = [
             {},
             {},
@@ -53,30 +102,35 @@ class ClassUtilsTests(FactoryTestCase):
             {"max_occurs": 2, "min_occurs": 0},
             {"max_occurs": 2, "min_occurs": 2},
         ]
-        self.assertEqual(expected, [x.asdict() for x in restrictions])
 
-    def test_unset_sequential_attributes(self):
-        restrictions = Restrictions(max_occurs=2, sequential=True)
-        attrs = AttrFactory.list(3, restrictions=restrictions)
-        target = ClassFactory.create(attrs=attrs)
+        for idx, input in enumerate(restrictions):
+            ClassUtils.sanitize_restrictions(input)
+            self.assertEqual(expected[idx], input.asdict())
 
+    def test_sanitize_sequential(self):
         def len_sequential(target):
-            return len([attr for attr in target.attrs if attr.restrictions.sequential])
-
-        ClassUtils.unset_sequential_attributes(target)
-        self.assertEqual(3, len_sequential(target))
-
-        restrictions.max_occurs = 1
-        ClassUtils.unset_sequential_attributes(target)
-        self.assertEqual(0, len_sequential(target))
+            return len([attr for attr in attrs if attr.restrictions.sequential])
 
         restrictions = Restrictions(max_occurs=2, sequential=True)
-        attrs = AttrFactory.list(3, restrictions=restrictions)
-        target.attrs = attrs
-        target.attrs[1].restrictions.sequential = False
+        attrs = [
+            AttrFactory.create(restrictions=restrictions.clone()),
+            AttrFactory.create(restrictions=restrictions.clone()),
+        ]
+        attrs_clone = [attr.clone() for attr in attrs]
 
-        ClassUtils.unset_sequential_attributes(target)
-        self.assertEqual(0, len_sequential(target))
+        ClassUtils.sanitize_sequential(attrs, 0)
+        self.assertEqual(2, len_sequential(attrs))
+
+        attrs[0].restrictions.sequential = False
+        ClassUtils.sanitize_sequential(attrs, 0)
+        self.assertEqual(1, len_sequential(attrs))
+
+        ClassUtils.sanitize_sequential(attrs, 1)
+        self.assertEqual(0, len_sequential(attrs))
+
+        attrs_clone[1].restrictions.sequential = False
+        ClassUtils.sanitize_sequential(attrs_clone, 0)
+        self.assertEqual(0, len_sequential(attrs_clone))
 
     def test_merge_duplicate_attributes(self):
         one = AttrFactory.attribute(fixed=True)

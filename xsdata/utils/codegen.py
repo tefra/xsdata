@@ -35,61 +35,54 @@ class ClassUtils:
             return cls.INCLUDES_NONE
 
     @classmethod
-    def sanitize_properties(cls, target: Class):
-        if not target.attrs:
-            return
+    def sanitize_attributes(cls, target: Class):
+        for attr in target.attrs:
+            cls.sanitize_attribute(attr)
+            cls.sanitize_restrictions(attr.restrictions)
 
-        cls.sanitize_restrictions(target)
-        cls.unset_sequential_attributes(target)
+        for i in range(len(target.attrs)):
+            cls.sanitize_sequential(target.attrs, i)
 
         for inner in target.inner:
-            cls.sanitize_properties(inner)
+            cls.sanitize_attributes(inner)
 
     @classmethod
-    def sanitize_restrictions(cls, target: Class):
-        for attr in target.attrs:
-            res = attr.restrictions
-            min_occurs = res.min_occurs or 0
-            max_occurs = res.max_occurs or 0
-
-            if min_occurs == 0 and max_occurs <= 1:
-                res.required = None
-                res.min_occurs = None
-                res.max_occurs = None
-            if min_occurs == 1 and max_occurs == 1:
-                res.required = True
-                res.min_occurs = None
-                res.max_occurs = None
-            elif res.max_occurs and max_occurs > 1:
-                res.min_occurs = min_occurs
-                res.required = None
+    def sanitize_attribute(cls, attr: Attr):
+        if attr.is_list:
+            attr.fixed = False
+        else:
+            attr.restrictions.sequential = False
 
     @classmethod
-    def unset_sequential_attributes(cls, target: Class):
-        """
-        Reset the class attributes sequential flags where needed.
+    def sanitize_restrictions(cls, restrictions: Restrictions):
+        min_occurs = restrictions.min_occurs or 0
+        max_occurs = restrictions.max_occurs or 0
 
-        Reasons:
-            1. Attribute not a list
-            2. Attribute siblings are not sequential.
-        """
+        if min_occurs == 0 and max_occurs <= 1:
+            restrictions.required = None
+            restrictions.min_occurs = None
+            restrictions.max_occurs = None
+        if min_occurs == 1 and max_occurs == 1:
+            restrictions.required = True
+            restrictions.min_occurs = None
+            restrictions.max_occurs = None
+        elif restrictions.max_occurs and max_occurs > 1:
+            restrictions.min_occurs = min_occurs
+            restrictions.required = None
 
-        for attr in target.attrs:
-            if not attr.is_list:
-                attr.restrictions.sequential = False
+    @classmethod
+    def sanitize_sequential(cls, attrs: List[Attr], index: int):
+        """Reset the attribute at the given index if it has no siblings with
+        the sequential restriction."""
 
-        total = len(target.attrs)
-        for idx, attr in enumerate(target.attrs):
-            if not attr.restrictions.sequential:
-                continue
+        if (
+            not attrs[index].restrictions.sequential
+            or (index - 1 >= 0 and attrs[index - 1].restrictions.sequential)
+            or (index + 1 < len(attrs) and attrs[index + 1].restrictions.sequential)
+        ):
+            return
 
-            siblings = False
-            if idx - 1 >= 0 and target.attrs[idx - 1].restrictions.sequential:
-                siblings = True
-            elif idx + 1 < total and target.attrs[idx + 1].restrictions.sequential:
-                siblings = True
-            if not siblings:
-                attr.restrictions.sequential = False
+        attrs[index].restrictions.sequential = False
 
     @classmethod
     def merge_duplicate_attributes(cls, target: Class):

@@ -90,8 +90,8 @@ class ClassAnalyzerTests(FactoryTestCase):
         self.assertFalse(six.abstract)  # No element in group
         self.assertFalse(seven.abstract)  # Alone
 
-    @mock.patch.object(ClassAnalyzer, "sanitize_properties")
-    def test_fetch_classes_for_generation(self, mock_sanitize_properties):
+    @mock.patch.object(ClassAnalyzer, "sanitize_attributes")
+    def test_fetch_classes_for_generation(self, mock_sanitize_attributes):
         classes = [
             ClassFactory.create(abstract=True, type=Element),
             ClassFactory.create(type=Element),
@@ -109,18 +109,18 @@ class ClassAnalyzerTests(FactoryTestCase):
 
         result = self.analyzer.fetch_classes_for_generation()
         self.assertEqual(expected, result)
-        mock_sanitize_properties.assert_has_calls([mock.call(x) for x in expected])
+        mock_sanitize_attributes.assert_has_calls([mock.call(x) for x in expected])
 
-    @mock.patch.object(ClassAnalyzer, "sanitize_properties")
+    @mock.patch.object(ClassAnalyzer, "sanitize_attributes")
     def test_fetch_classes_for_generation_return_simple_when_no_complex_types(
-        self, mock_sanitize_properties
+        self, mock_sanitize_attributes
     ):
         classes = ClassFactory.list(2, type=SimpleType)
         self.analyzer.create_class_qname_index(classes)
 
         actual = self.analyzer.fetch_classes_for_generation()
         self.assertEqual(classes, actual)
-        mock_sanitize_properties.assert_has_calls([mock.call(x) for x in classes])
+        mock_sanitize_attributes.assert_has_calls([mock.call(x) for x in classes])
 
     @mock.patch.object(ClassAnalyzer, "flatten_class")
     def test_flatten_classes(self, mock_flatten_class):

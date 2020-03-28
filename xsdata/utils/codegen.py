@@ -53,6 +53,10 @@ class ClassUtils:
         else:
             attr.restrictions.sequential = False
 
+        if attr.is_optional:
+            attr.fixed = False
+            attr.default = None
+
     @classmethod
     def sanitize_restrictions(cls, restrictions: Restrictions):
         min_occurs = restrictions.min_occurs or 0

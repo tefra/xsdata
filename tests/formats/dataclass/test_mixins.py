@@ -42,7 +42,7 @@ class ModelInspectTests(TestCase):
         )
 
         self.assertEqual(expected, result)
-        mock_get_type_hints.assert_called_once_with(ItemsType, None, False)
+        mock_get_type_hints.assert_called_once_with(ItemsType, None)
 
     @mock.patch.object(ModelInspect, "get_type_hints", return_value=dict())
     def test_class_meta_with_meta_namespace(self, mock_get_type_hints):
@@ -50,23 +50,14 @@ class ModelInspectTests(TestCase):
         result = self.inspect.class_meta(Product, None)
 
         self.assertEqual(QName(namespace, "product"), result.qname)
-        mock_get_type_hints.assert_called_once_with(Product, namespace, False)
-
-    @mock.patch.object(ModelInspect, "get_type_hints", return_value=dict())
-    def test_class_meta_with_nillable_true(self, mock_get_type_hints):
-        Product.Meta.nillable = True
-        self.inspect.class_meta(Product, None)
-
-        mock_get_type_hints.assert_called_once_with(
-            Product, Product.Meta.namespace, Product.Meta.nillable
-        )
+        mock_get_type_hints.assert_called_once_with(Product, namespace)
 
     @mock.patch.object(ModelInspect, "get_type_hints", return_value=dict())
     def test_class_meta_with_parent_ns(self, mock_get_type_hints):
         result = self.inspect.class_meta(ProductType, "http://xsdata")
 
         self.assertEqual(QName("http://xsdata", "ProductType"), str(result.qname))
-        mock_get_type_hints.assert_called_once_with(ProductType, "http://xsdata", False)
+        mock_get_type_hints.assert_called_once_with(ProductType, "http://xsdata")
 
     @mock.patch.object(ModelInspect, "get_type_hints", return_value=dict())
     def test_class_meta_with_no_meta_name_and_name_generator(self, *args):
@@ -98,7 +89,7 @@ class ModelInspectTests(TestCase):
         self.assertEqual(f"Object {int} is not a dataclass.", str(cm.exception))
 
     def test_get_type_hints(self):
-        result = self.inspect.get_type_hints(BookForm, None, False)
+        result = self.inspect.get_type_hints(BookForm, None)
         self.assertIsInstance(result, Iterator)
 
         expected = [
@@ -134,7 +125,7 @@ class ModelInspectTests(TestCase):
             self.assertIsNone(var.clazz)
 
     def test_get_type_hints_with_dataclass_list(self):
-        result = list(self.inspect.get_type_hints(Books, None, False))
+        result = list(self.inspect.get_type_hints(Books, None))
 
         expected = ClassVar(
             name="book",
@@ -152,7 +143,7 @@ class ModelInspectTests(TestCase):
         self.assertEqual(BookForm, result[0].clazz)
 
     def test_get_type_hints_with_wildcard_element(self):
-        result = list(self.inspect.get_type_hints(TextType, None, False))
+        result = list(self.inspect.get_type_hints(TextType, None))
 
         expected = ClassVar(
             name="any_element",
@@ -169,15 +160,6 @@ class ModelInspectTests(TestCase):
 
         self.assertEqual(2, len(result))
         self.assertEqual(expected, result[0])
-
-    def test_get_type_hints_inherit_nillable_flag(self):
-        result = list(self.inspect.get_type_hints(ProductType, None, False))
-
-        self.assertEqual(3, len(result))
-        self.assertEqual(1, len([var for var in result if var.is_nillable]))
-
-        result = list(self.inspect.get_type_hints(ProductType, None, True))
-        self.assertEqual(3, len([var for var in result if var.is_nillable]))
 
     def test_get_type_hints_with_no_dataclass(self):
         with self.assertRaises(TypeError):

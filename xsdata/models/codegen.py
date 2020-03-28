@@ -55,6 +55,10 @@ class Restrictions:
     def is_list(self):
         return self.max_occurs and self.max_occurs > 1
 
+    @property
+    def is_optional(self):
+        return self.min_occurs == 0
+
     def merge(self, source: "Restrictions"):
         self.update(source.asdict())
 
@@ -160,6 +164,10 @@ class Attr:
     @property
     def is_list(self):
         return self.restrictions.is_list
+
+    @property
+    def is_optional(self):
+        return self.restrictions.is_optional
 
     def clone(self, **kwargs):
         return replace(

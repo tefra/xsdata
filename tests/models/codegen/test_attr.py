@@ -1,6 +1,7 @@
 from tests.factories import AttrFactory
 from tests.factories import FactoryTestCase
 from xsdata.models.codegen import Attr
+from xsdata.models.codegen import Restrictions
 
 
 class AttrTests(FactoryTestCase):
@@ -49,3 +50,17 @@ class AttrTests(FactoryTestCase):
         self.assertTrue(AttrFactory.group().is_group)
         self.assertTrue(AttrFactory.attribute_group().is_group)
         self.assertFalse(AttrFactory.element().is_group)
+
+    def test_property_is_list(self):
+        attr = AttrFactory.create(restrictions=Restrictions(max_occurs=2))
+        self.assertTrue(attr.is_list)
+
+        attr.restrictions.max_occurs = 1
+        self.assertFalse(attr.is_list)
+
+    def test_property_is_optional(self):
+        attr = AttrFactory.create(restrictions=Restrictions(min_occurs=0))
+        self.assertTrue(attr.is_optional)
+
+        attr.restrictions.min_occurs = 1
+        self.assertFalse(attr.is_optional)

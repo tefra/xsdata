@@ -87,6 +87,14 @@ class ClassUtilsTests(FactoryTestCase):
         ClassUtils.sanitize_attribute(attr)
         self.assertFalse(attr.fixed)
 
+        attr.restrictions.max_occurs = 1
+        attr.restrictions.min_occurs = 0
+        attr.fixed = True
+        attr.default = "foo"
+        ClassUtils.sanitize_attribute(attr)
+        self.assertFalse(attr.fixed)
+        self.assertIsNone(attr.default)
+
     def test_sanitize_restrictions(self):
         restrictions = [
             Restrictions(min_occurs=0, max_occurs=0, required=True),

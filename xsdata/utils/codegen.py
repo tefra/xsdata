@@ -35,6 +35,36 @@ class ClassUtils:
             return cls.INCLUDES_NONE
 
     @classmethod
+    def sanitize_properties(cls, target: Class):
+        if not target.attrs:
+            return
+
+        cls.sanitize_restrictions(target)
+        cls.unset_sequential_attributes(target)
+
+        for inner in target.inner:
+            cls.sanitize_properties(inner)
+
+    @classmethod
+    def sanitize_restrictions(cls, target: Class):
+        for attr in target.attrs:
+            res = attr.restrictions
+            min_occurs = res.min_occurs or 0
+            max_occurs = res.max_occurs or 0
+
+            if min_occurs == 0 and max_occurs <= 1:
+                res.required = None
+                res.min_occurs = None
+                res.max_occurs = None
+            if min_occurs == 1 and max_occurs == 1:
+                res.required = True
+                res.min_occurs = None
+                res.max_occurs = None
+            elif res.max_occurs and max_occurs > 1:
+                res.min_occurs = min_occurs
+                res.required = None
+
+    @classmethod
     def unset_sequential_attributes(cls, target: Class):
         """
         Reset the class attributes sequential flags where needed.
@@ -45,21 +75,21 @@ class ClassUtils:
         """
 
         for attr in target.attrs:
-            if attr.sequential and not attr.is_list:
-                attr.sequential = False
+            if not attr.is_list:
+                attr.restrictions.sequential = False
 
         total = len(target.attrs)
         for idx, attr in enumerate(target.attrs):
-            if not attr.sequential:
+            if not attr.restrictions.sequential:
                 continue
 
             siblings = False
-            if idx - 1 >= 0 and target.attrs[idx - 1].sequential:
+            if idx - 1 >= 0 and target.attrs[idx - 1].restrictions.sequential:
                 siblings = True
-            if not siblings and idx + 1 < total and target.attrs[idx + 1].sequential:
+            elif idx + 1 < total and target.attrs[idx + 1].restrictions.sequential:
                 siblings = True
             if not siblings:
-                attr.sequential = False
+                attr.restrictions.sequential = False
 
     @classmethod
     def merge_duplicate_attributes(cls, target: Class):
@@ -69,6 +99,10 @@ class ClassUtils:
         Remove duplicate fields in case of attributes or enumerations
         otherwise convert fields to lists.
         """
+
+        if not target.attrs:
+            return
+
         result: List[Attr] = []
         for attr in target.attrs:
             existing = next((item for item in result if attr == item), None)
@@ -84,6 +118,9 @@ class ClassUtils:
                 existing.restrictions.min_occurs = min(min_occurs, attr_min_occurs)
                 existing.restrictions.max_occurs = max_occurs + attr_max_occurs
                 existing.fixed = False
+                existing.restrictions.sequential = (
+                    existing.restrictions.sequential or attr.restrictions.sequential
+                )
 
         target.attrs = result
 
@@ -107,7 +144,7 @@ class ClassUtils:
         cls, attr: Attr, restrictions: Restrictions, prefix: Optional[str] = None
     ):
         clone = attr.clone()
-        clone.restrictions.update(restrictions)
+        clone.restrictions.merge(restrictions)
         if prefix:
             for attr_type in clone.types:
                 if not attr_type.native and attr_type.name.find(":") == -1:

@@ -1,44 +1,12 @@
-import inspect
 from typing import Iterator
 from typing import Optional
-from typing import Type
 from unittest import TestCase
 
 from xsdata.exceptions import SchemaValueError
-from xsdata.models import elements as el
 from xsdata.models.elements import ComplexType
 from xsdata.models.elements import Element
 from xsdata.models.enums import FormType
 from xsdata.models.mixins import ElementBase
-from xsdata.models.mixins import OccurrencesMixin
-
-
-def get_subclasses(clazz: Type):
-    def predicate(member):
-        return (
-            isinstance(member, type)
-            and issubclass(member, clazz)
-            and not inspect.isabstract(member)
-            and member is not clazz
-        )
-
-    return inspect.getmembers(el, predicate=predicate)
-
-
-class OccurrencesMixinTests(TestCase):
-    def setUp(self) -> None:
-        super(OccurrencesMixinTests, self).setUp()
-        self.subclasses = [c for _, c in get_subclasses(OccurrencesMixin)]
-
-    def test_subclasses(self):
-        expected = [el.All, el.Any, el.Choice, el.Element, el.Group, el.Sequence]
-        self.assertEqual(expected, self.subclasses)
-
-    def test_get_restrictions(self):
-        data = dict(min_occurs=1, max_occurs=2)
-        for clazz in self.subclasses:
-            obj = clazz.create(**data)
-            self.assertEqual(data, obj.get_restrictions())
 
 
 class ElementBaseTests(TestCase):

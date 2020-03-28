@@ -42,8 +42,7 @@ class ShirtType:
         metadata=dict(
             name="description",
             type="Element",
-            namespace="",
-            required=True
+            namespace=""
         )
     )
     comment: Optional[str] = field(
@@ -51,8 +50,7 @@ class ShirtType:
         metadata=dict(
             name="comment",
             type="Element",
-            namespace="",
-            required=True
+            namespace=""
         )
     )
     number: Optional[int] = field(
@@ -60,8 +58,7 @@ class ShirtType:
         metadata=dict(
             name="number",
             type="Element",
-            namespace="",
-            required=True
+            namespace=""
         )
     )
     name: Optional[str] = field(
@@ -69,8 +66,7 @@ class ShirtType:
         metadata=dict(
             name="name",
             type="Element",
-            namespace="",
-            required=True
+            namespace=""
         )
     )
     size: Optional[SizeType] = field(

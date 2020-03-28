@@ -1,7 +1,6 @@
 from dataclasses import asdict
 from dataclasses import dataclass
 from dataclasses import field
-from dataclasses import fields
 from dataclasses import replace
 from typing import Any
 from typing import Dict
@@ -16,6 +15,7 @@ from xsdata.models.elements import ComplexType
 from xsdata.models.elements import Element
 from xsdata.models.enums import DataType
 from xsdata.models.enums import TagType
+from xsdata.models.mixins import ElementBase
 from xsdata.utils import text
 
 
@@ -49,40 +49,42 @@ class Restrictions:
     pattern: Optional[str] = field(default=None)
     explicit_timezone: Optional[str] = field(default=None)
     nillable: Optional[bool] = field(default=None)
+    sequential: Optional[bool] = field(default=None)
 
     @property
     def is_list(self):
         return self.max_occurs and self.max_occurs > 1
 
-    def __post_init__(self):
-        self.correct_required()
+    def merge(self, source: "Restrictions"):
+        self.update(source.asdict())
 
-    def update(self, source: "Restrictions"):
-        for restriction in fields(self):
-            value = getattr(source, restriction.name)
-            if value is not None:
-                setattr(self, restriction.name, value)
+    def update(self, data):
+        min_occurs = data.pop("min_occurs", None)
+        max_occurs = data.pop("max_occurs", None)
+        sequential = data.pop("sequential", False)
 
-        self.correct_required()
+        for key, value in data.items():
+            setattr(self, key, value)
 
-    def correct_required(self):
-        if self.min_occurs == 0 and self.max_occurs <= 1:
-            self.required = None
-            self.min_occurs = None
-            self.max_occurs = None
-        if self.min_occurs == 1 and self.max_occurs == 1:
-            self.required = True
-            self.min_occurs = None
-            self.max_occurs = None
-        elif self.max_occurs and self.max_occurs > 1:
-            self.min_occurs = 0 if self.min_occurs is None else self.min_occurs
-            self.required = None
+        is_list = max_occurs is not None and max_occurs > 1
+        if sequential and (is_list or not self.is_list):
+            self.sequential = sequential
+
+        if self.min_occurs is None or (min_occurs is not None and min_occurs != 1):
+            self.min_occurs = min_occurs
+
+        if self.max_occurs is None or (max_occurs is not None and max_occurs != 1):
+            self.max_occurs = max_occurs
 
     def asdict(self) -> Dict:
         return {k: v for k, v in asdict(self).items() if v is not None}
 
     def clone(self):
         return replace(self)
+
+    @classmethod
+    def from_element(cls, element: ElementBase) -> "Restrictions":
+        return cls(**element.get_restrictions())
 
 
 @dataclass
@@ -121,7 +123,6 @@ class Attr:
     index: int = field(compare=False)
     default: Any = field(default=None, compare=False)
     wildcard: bool = field(default=False)
-    sequential: bool = field(default=False, compare=False)
     fixed: bool = field(default=False, compare=False)
     types: List[AttrType] = field(default_factory=list)
     display_type: Optional[str] = field(default=None)

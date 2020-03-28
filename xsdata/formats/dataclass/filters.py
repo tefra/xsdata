@@ -15,7 +15,11 @@ def arguments(data: dict):
         return f"{key}={value}"
 
     return ",\n".join(
-        [prep(key, value) for key, value in data.items() if value is not None]
+        [
+            prep(key, value)
+            for key, value in data.items()
+            if value is not None and value is not False
+        ]
     )
 
 

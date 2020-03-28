@@ -24,8 +24,7 @@ class ProductType:
         metadata=dict(
             name="comment",
             type="Element",
-            namespace="",
-            required=True
+            namespace=""
         )
     )
     number: Optional[int] = field(

@@ -1,6 +1,5 @@
-- Total tests: **199**
+- Total tests: **197**
 - Passed: **185**
 - Should fail: **6**
 - XML Schema 1.1: **1**
 - substitution groups: **5**
-- Unsupported feature!: **2**

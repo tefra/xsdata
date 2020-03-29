@@ -4,7 +4,6 @@ from dataclasses import field
 from dataclasses import fields
 from dataclasses import is_dataclass
 from dataclasses import MISSING
-from enum import IntEnum
 from typing import Any
 from typing import Callable
 from typing import Dict
@@ -12,7 +11,6 @@ from typing import get_type_hints
 from typing import Iterator
 from typing import List
 from typing import Optional
-from typing import Tuple
 from typing import Type
 
 from lxml.etree import QName
@@ -20,135 +18,9 @@ from lxml.etree import QName
 from xsdata.exceptions import ModelInspectionError
 from xsdata.formats.converters import sort_types
 from xsdata.models.enums import NamespaceType
-from xsdata.models.enums import TagType
-
-
-class Tag(IntEnum):
-    TEXT = 1
-    ATTRIBUTE = 2
-    ANY_ATTRIBUTE = 3
-    ELEMENT = 4
-    ANY_ELEMENT = 5
-    ROOT = 6
-    MISC = 7
-
-    @classmethod
-    def from_metadata_type(cls, meta_type: Optional[str]) -> "Tag":
-        return __tag_type_map__.get(meta_type, cls.TEXT)
-
-
-__tag_type_map__ = {
-    TagType.ATTRIBUTE: Tag.ATTRIBUTE,
-    TagType.ANY_ATTRIBUTE: Tag.ANY_ATTRIBUTE,
-    TagType.ELEMENT: Tag.ELEMENT,
-    TagType.ANY: Tag.ANY_ELEMENT,
-    None: Tag.MISC,
-}
-
-
-@dataclass(frozen=True)
-class ClassVar:
-    name: str
-    qname: QName
-    types: List[Type]
-    tag: Tag
-    init: bool = True
-    is_nillable: bool = False
-    is_list: bool = False
-    is_dataclass: bool = False
-    sequential: bool = False
-    default: Any = None
-    wild_ns: List[str] = field(default_factory=list)
-
-    @property
-    def clazz(self):
-        return self.types[0] if self.is_dataclass else None
-
-    @property
-    def is_attribute(self):
-        return self.tag == Tag.ATTRIBUTE
-
-    @property
-    def is_any_attribute(self):
-        return self.tag == Tag.ANY_ATTRIBUTE
-
-    @property
-    def is_element(self):
-        return self.tag == Tag.ELEMENT
-
-    @property
-    def is_any_element(self):
-        return self.tag == Tag.ANY_ELEMENT
-
-    @property
-    def is_text(self):
-        return self.tag == Tag.TEXT
-
-    @property
-    def namespace(self):
-        return self.qname.namespace
-
-
-@dataclass(frozen=True)
-class ClassMeta:
-    name: str
-    clazz: Type
-    qname: QName
-    mixed: bool
-    nillable: bool
-    vars: Dict[QName, ClassVar]
-
-    @property
-    def namespace(self):
-        return self.qname.namespace
-
-    @property
-    def any_text(self) -> Optional[ClassVar]:
-        return next((var for qname, var in self.vars.items() if var.is_text), None)
-
-    @property
-    def any_attribute(self) -> Optional[ClassVar]:
-        return next(
-            (var for qname, var in self.vars.items() if var.is_any_attribute), None
-        )
-
-    @property
-    def any_element(self) -> Optional[ClassVar]:
-        return next(
-            (var for qname, var in self.vars.items() if var.is_any_element), None
-        )
-
-    def get_var(self, qname: QName) -> Optional[ClassVar]:
-        if qname in self.vars:
-            return self.vars[qname]
-        else:
-            return self.get_wild_var(qname)
-
-    def get_wild_var(self, qname: QName) -> Optional[ClassVar]:
-        return next((var for var in self.get_wild_vars(qname)), None)
-
-    def get_wild_vars(self, qname: QName):
-        for var in self.vars.values():
-            if self.matches(var.wild_ns, qname):
-                yield var
-
-    @classmethod
-    def matches(cls, namespaces: List[str], qname: QName) -> bool:
-        return next(
-            (True for namespace in namespaces if cls.match(namespace, qname)), False
-        )
-
-    @classmethod
-    def match(cls, namespace: str, qname: QName):
-        return (
-            namespace
-            and (
-                namespace == qname.namespace
-                or namespace == NamespaceType.ANY.value
-                or namespace[0] == "!"
-                and namespace[1:] != qname.namespace
-            )
-        ) or (not namespace and qname.namespace is None)
+from xsdata.models.inspect import ClassMeta
+from xsdata.models.inspect import ClassVar
+from xsdata.models.inspect import Tag
 
 
 @dataclass
@@ -185,7 +57,7 @@ class ModelInspect:
 
         for var in fields(clazz):
             type_hint = type_hints[var.name]
-            is_list, types = self.real_types(type_hint)
+            types = self.real_types(type_hint)
 
             tag = Tag.from_metadata_type(var.metadata.get("type"))
             namespace = var.metadata.get("namespace")
@@ -201,9 +73,8 @@ class ModelInspect:
                 wild_ns=wild_namespaces,
                 tag=tag,
                 init=var.init,
-                is_list=is_list,
-                is_nillable=var.metadata.get("nillable", False),
-                is_dataclass=is_class,
+                nillable=var.metadata.get("nillable", False),
+                dataclass=is_class,
                 sequential=var.metadata.get("sequential", False),
                 types=types,
                 default=self.default_value(var),
@@ -252,14 +123,11 @@ class ModelInspect:
             return None
 
     @staticmethod
-    def real_types(type_hint) -> Tuple:
-        is_list = False
+    def real_types(type_hint) -> List:
         types = []
         if type_hint is Dict:
             types.append(type_hint)
         elif hasattr(type_hint, "__origin__"):
-            is_list = type_hint.__origin__ is list
-
             while len(type_hint.__args__) == 1 and hasattr(
                 type_hint.__args__[0], "__origin__"
             ):
@@ -271,4 +139,4 @@ class ModelInspect:
         else:
             types.append(type_hint)
 
-        return is_list, sort_types(types)
+        return sort_types(types)

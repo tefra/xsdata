@@ -12,10 +12,10 @@ from tests.fixtures.defxmlschema.chapter05.chapter05prod import ProductType
 from tests.fixtures.defxmlschema.chapter11.example1101 import TextType
 from tests.fixtures.defxmlschema.chapter13.chapter13 import ItemsType
 from xsdata.exceptions import ModelInspectionError
-from xsdata.formats.dataclass.mixins import ClassMeta
-from xsdata.formats.dataclass.mixins import ClassVar
 from xsdata.formats.dataclass.mixins import ModelInspect
-from xsdata.formats.dataclass.mixins import Tag
+from xsdata.models.inspect import ClassMeta
+from xsdata.models.inspect import ClassVar
+from xsdata.models.inspect import Tag
 from xsdata.utils import text
 
 
@@ -121,7 +121,7 @@ class ModelInspectTests(TestCase):
         result = list(result)
         self.assertEqual(expected, result)
         for var in result:
-            self.assertFalse(var.is_dataclass)
+            self.assertFalse(var.dataclass)
             self.assertIsNone(var.clazz)
 
     def test_get_type_hints_with_dataclass_list(self):
@@ -131,15 +131,15 @@ class ModelInspectTests(TestCase):
             name="book",
             qname=QName("book"),
             types=[BookForm],
-            is_list=True,
-            is_dataclass=True,
+            dataclass=True,
             default=list,
             tag=Tag.ELEMENT,
         )
 
+        self.assertTrue(expected.is_list)
         self.assertEqual(1, len(result))
         self.assertEqual(expected, result[0])
-        self.assertTrue(result[0].is_dataclass)
+        self.assertTrue(result[0].dataclass)
         self.assertEqual(BookForm, result[0].clazz)
 
     def test_get_type_hints_with_wildcard_element(self):
@@ -151,9 +151,8 @@ class ModelInspectTests(TestCase):
             types=[object],
             tag=Tag.ANY_ELEMENT,
             init=True,
-            is_nillable=False,
-            is_list=True,
-            is_dataclass=False,
+            nillable=False,
+            dataclass=False,
             default=list,
             wild_ns=["##any"],
         )

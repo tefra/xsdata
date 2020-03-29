@@ -15,8 +15,6 @@ from lxml.etree import QName
 
 from xsdata.exceptions import ParserError
 from xsdata.formats.bindings import AbstractXmlParser
-from xsdata.formats.dataclass.mixins import ClassMeta
-from xsdata.formats.dataclass.mixins import ClassVar
 from xsdata.formats.dataclass.mixins import ModelInspect
 from xsdata.formats.dataclass.models import AnyElement
 from xsdata.formats.dataclass.models import AnyText
@@ -24,6 +22,8 @@ from xsdata.formats.dataclass.models import Namespaces
 from xsdata.formats.dataclass.parsers.json import T
 from xsdata.logger import logger
 from xsdata.models.enums import EventType
+from xsdata.models.inspect import ClassMeta
+from xsdata.models.inspect import ClassVar
 from xsdata.utils import text
 
 
@@ -106,7 +106,7 @@ class XmlParser(AbstractXmlParser, ModelInspect):
                 queue_item = self.queue.pop()
             else:
                 var = item.meta.get_var(qname)
-                if var and var.is_dataclass:
+                if var and var.dataclass:
                     queue_item = self.create_class_queue_item(var, item.meta.qname)
                 elif var and var.is_any_element:
                     queue_item = self.create_wildcard_queue_item(var.qname)

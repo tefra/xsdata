@@ -5,9 +5,9 @@ from lxml.etree import QName
 
 from tests.fixtures.books import BookForm
 from tests.fixtures.books import Books
-from xsdata.formats.dataclass.mixins import ClassVar
-from xsdata.formats.dataclass.mixins import Tag
 from xsdata.formats.dataclass.parsers.json import JsonParser
+from xsdata.models.inspect import ClassVar
+from xsdata.models.inspect import Tag
 
 
 class JsonParserTests(TestCase):
@@ -72,7 +72,7 @@ class JsonParserTests(TestCase):
 
         foo_field = ClassVar(name="foo", qname=QName("foo"), types=[str], tag=Tag.TEXT)
         bar_field = ClassVar(
-            name="bar", qname=QName("bar"), types=[str], is_list=True, tag=Tag.ELEMENT,
+            name="bar", qname=QName("bar"), types=[str], default=list, tag=Tag.ELEMENT,
         )
 
         self.assertEqual("bar", JsonParser.get_value(data, foo_field))

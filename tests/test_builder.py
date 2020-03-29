@@ -120,6 +120,7 @@ class ClassBuilderTests(FactoryTestCase):
     @patch.object(ClassBuilder, "element_namespace")
     @patch.object(ClassBuilder, "build_class_attributes")
     @patch.object(ClassBuilder, "build_class_extensions")
+    @patch.object(Element, "substitutions", new_callable=PropertyMock)
     @patch.object(Element, "is_abstract", new_callable=PropertyMock)
     @patch.object(Element, "is_nillable", new_callable=PropertyMock)
     @patch.object(Element, "display_help", new_callable=PropertyMock)
@@ -130,6 +131,7 @@ class ClassBuilderTests(FactoryTestCase):
         mock_display_help,
         mock_is_nillable,
         mock_is_abstract,
+        mock_substitutions,
         mock_build_class_extensions,
         mock_build_class_attributes,
         mock_element_namespace,
@@ -138,6 +140,7 @@ class ClassBuilderTests(FactoryTestCase):
         mock_display_help.return_value = "sos"
         mock_is_abstract.return_value = True
         mock_is_nillable.return_value = True
+        mock_substitutions.return_value = ["foo", "bar"]
         mock_element_namespace.return_value = "foo:name"
 
         element = Element.create()
@@ -158,6 +161,7 @@ class ClassBuilderTests(FactoryTestCase):
             package=self.builder.package,
             module=self.schema.module,
             source_namespace=self.schema.target_namespace,
+            substitutions=["foo", "bar"],
         )
         self.assertEqual(expected, result)
 

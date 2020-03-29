@@ -73,6 +73,7 @@ class ClassBuilder:
             source_namespace=self.schema.target_namespace,
             module=self.schema.module,
             package=self.package,
+            substitutions=obj.substitutions,
         )
 
         self.build_class_extensions(obj, instance)

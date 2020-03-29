@@ -169,7 +169,7 @@ class Attr:
     def is_optional(self):
         return self.restrictions.is_optional
 
-    def clone(self, **kwargs):
+    def clone(self, **kwargs) -> "Attr":
         return replace(
             self,
             types=[type.clone() for type in self.types],
@@ -201,6 +201,7 @@ class Class:
     namespace: Optional[str] = field(default=None)
     local_name: str = field(init=False)
     help: Optional[str] = field(default=None)
+    substitutions: List[str] = field(default_factory=list)
     extensions: List[Extension] = field(default_factory=list)
     attrs: List[Attr] = field(default_factory=list)
     inner: List["Class"] = field(default_factory=list)
@@ -244,6 +245,12 @@ class Class:
 
     def source_qname(self, name: Optional[str] = None) -> QName:
         return qname(name or self.name, self.nsmap, self.source_namespace)
+
+    def prefix(self, lookup) -> Optional[str]:
+        for prefix, namespace in self.nsmap.items():
+            if namespace == lookup:
+                return prefix
+        return None
 
     def dependencies(self) -> Set[QName]:
         """

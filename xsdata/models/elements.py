@@ -1111,7 +1111,7 @@ class Element(AnnotationBase):
     id: Optional[str] = attribute()
     ref: Optional[str] = attribute()
     type: Optional[str] = attribute()
-    substitution_group: Optional[str] = attribute()
+    substitution_group: Optional[str] = attribute(name="substitutionGroup")
     default: Optional[str] = attribute()
     fixed: Optional[str] = attribute()
     form: Optional[FormType] = attribute()
@@ -1165,6 +1165,12 @@ class Element(AnnotationBase):
             types.add(self.simple_type.real_type)
 
         return " ".join(sorted(types)) or None
+
+    @property
+    def substitutions(self) -> Array[str]:
+        if self.substitution_group:
+            return list(filter(None, self.substitution_group.split(" ")))
+        return list()
 
     def get_restrictions(self) -> Dict[str, Anything]:
         restrictions = {"min_occurs": self.min_occurs, "max_occurs": self.max_occurs}

@@ -129,21 +129,21 @@ class ElementBaseTests(TestCase):
         element.ref = "foo:bar"
         self.assertEqual("foo", element.prefix)
 
-    def test_raw_namespace(self):
+    def test_property_raw_namespace(self):
         element = ElementBase()
         self.assertIsNone(element.raw_namespace)
 
         element.target_namespace = "tns"
         self.assertEqual("tns", element.raw_namespace)
 
-    def test_raw_type(self):
+    def test_property_raw_type(self):
         element = ElementBase()
         self.assertIsNone(element.raw_namespace)
 
         element.type = "xs:int"
         self.assertEqual("xs:int", element.raw_type)
 
-    def test_real_name(self):
+    def test_property_real_name(self):
         element = ElementBase()
 
         with self.assertRaises(SchemaValueError):
@@ -155,7 +155,11 @@ class ElementBaseTests(TestCase):
         element.name = "bar"
         self.assertEqual("bar", element.real_name)
 
-    def test_real_type(self):
+    def test_property_real_type(self):
         element = ElementBase()
         with self.assertRaises(SchemaValueError):
             element.real_type
+
+    def test_property_substitutions(self):
+        element = ElementBase()
+        self.assertEqual([], element.substitutions)

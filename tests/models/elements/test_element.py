@@ -73,6 +73,13 @@ class ElementTests(TestCase):
         obj.complex_type.mixed = True
         self.assertTrue(obj.is_mixed)
 
+    def test_property_substitutions(self):
+        obj = Element.create()
+        self.assertEqual([], obj.substitutions)
+
+        obj.substitution_group = "foo   bar xs:any"
+        self.assertEqual(["foo", "bar", "xs:any"], obj.substitutions)
+
     def test_get_restrictions(self):
         obj = Element.create(min_occurs=1, max_occurs=1)
         expected = {"min_occurs": 1, "max_occurs": 1}

@@ -4,6 +4,7 @@ from dataclasses import fields
 from typing import Any
 from typing import Dict
 from typing import Iterator
+from typing import List
 from typing import Optional
 from typing import Type
 from typing import TypeVar
@@ -137,6 +138,10 @@ class ElementBase(BaseModel):
     @property
     def real_type(self) -> Optional[str]:
         raise SchemaValueError(f"Schema class `{self.class_name}` unknown real type.")
+
+    @property
+    def substitutions(self) -> List[str]:
+        return []
 
     def get_restrictions(self) -> Dict[str, Any]:
         return dict()

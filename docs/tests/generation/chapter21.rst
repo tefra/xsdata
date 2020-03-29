@@ -151,18 +151,6 @@ Example 21-22 Application information
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter21/example2122.py
    :language: python
 
-Example 21-23 Non-native attributes
------------------------------------
-
-.. literalinclude:: /../tests/fixtures/defxmlschema/chapter21/example2123.xsd
-   :language: xml
-   :lines: 3-
-
-.. warning::
-
-    Unsupported feature!
-
-
 Example 21-3 Schema for Venetian Blind approach
 -----------------------------------------------
 

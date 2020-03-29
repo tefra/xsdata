@@ -1,18 +1,6 @@
 Chapter 17: Identity constraints
 ================================
 
-Example 17-12 Referencing an identity constraint
-------------------------------------------------
-
-.. literalinclude:: /../tests/fixtures/defxmlschema/chapter17/example1712.xsd
-   :language: xml
-   :lines: 3-
-
-.. warning::
-
-    Unsupported feature!
-
-
 Example 17-13 Referencing an identity constraint in a restriction
 -----------------------------------------------------------------
 

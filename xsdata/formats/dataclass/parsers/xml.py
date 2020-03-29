@@ -203,13 +203,15 @@ class XmlParser(AbstractXmlParser, ModelInspect):
                 continue
             if value is None:
                 value = ""
+
             if arg.name in params and not arg.is_list:
 
                 if isinstance(value, AnyElement):
                     qname = QName(value.qname)
 
-                wild_iter = item.meta.get_wild_vars(qname)
-                wild_var = next((x for x in wild_iter if x.name not in params), None)
+                wild_var = item.meta.get_matching_wild_var(
+                    qname, condition=lambda x: x.name not in params or x.is_list
+                )
 
                 if wild_var is None:
                     logger.warning("Unassigned parsed object %s", qname)

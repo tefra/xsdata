@@ -116,6 +116,9 @@ class ClassMeta:
     def get_wild_var(self, qname: QName) -> Optional[ClassVar]:
         return next((var for var in self.get_wild_vars(qname)), None)
 
+    def get_matching_wild_var(self, qname: QName, condition):
+        return next((x for x in self.get_wild_vars(qname) if condition(x)), None)
+
     def get_wild_vars(self, qname: QName):
         for var in self.vars.values():
             if self.matches(var.wild_ns, qname):

@@ -14,9 +14,6 @@ from tests.fixtures.defxmlschema.chapter04.example04052 import OrderSummary
 from tests.fixtures.defxmlschema.chapter08.example0803 import DressSize
 from tests.fixtures.defxmlschema.chapter11.example1101 import TextType
 from tests.fixtures.defxmlschema.chapter12.chapter12 import ProductType
-from xsdata.formats.dataclass.mixins import ClassMeta
-from xsdata.formats.dataclass.mixins import ClassVar
-from xsdata.formats.dataclass.mixins import Tag
 from xsdata.formats.dataclass.models import AnyElement
 from xsdata.formats.dataclass.models import AnyText
 from xsdata.formats.dataclass.parsers.xml import ClassQueueItem
@@ -26,6 +23,9 @@ from xsdata.formats.dataclass.parsers.xml import WildcardQueueItem
 from xsdata.formats.dataclass.parsers.xml import XmlParser
 from xsdata.models.enums import EventType
 from xsdata.models.enums import Namespace
+from xsdata.models.inspect import ClassMeta
+from xsdata.models.inspect import ClassVar
+from xsdata.models.inspect import Tag
 
 
 class XmlParserTests(TestCase):
@@ -210,7 +210,7 @@ class XmlParserTests(TestCase):
         class_var = ClassVar(
             qname="author",
             types=[BookForm],
-            is_dataclass=True,
+            dataclass=True,
             name="",
             tag="",
             default=10,

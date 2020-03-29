@@ -2,7 +2,6 @@ from dataclasses import dataclass
 from dataclasses import field
 from dataclasses import is_dataclass
 from typing import Any
-from typing import List
 from typing import Optional
 
 from lxml.etree import cleanup_namespaces
@@ -13,12 +12,13 @@ from lxml.etree import tostring
 
 from xsdata.formats.bindings import AbstractSerializer
 from xsdata.formats.converters import to_xml
-from xsdata.formats.dataclass.mixins import ClassVar
 from xsdata.formats.dataclass.mixins import ModelInspect
 from xsdata.formats.dataclass.models import AnyElement
 from xsdata.formats.dataclass.models import AnyText
 from xsdata.formats.dataclass.models import Namespaces
 from xsdata.models.enums import Namespace
+from xsdata.models.inspect import ClassMeta
+from xsdata.models.inspect import ClassVar
 
 XSI_NIL_QNAME = QName(Namespace.XSI.uri, "nil")
 
@@ -76,7 +76,7 @@ class XmlSerializer(AbstractSerializer, ModelInspect):
             return parent
 
         meta = self.class_meta(obj.__class__, QName(parent).namespace)
-        for var, value in self.next_value(list(meta.vars.values()), obj):
+        for var, value in self.next_value(meta, obj):
             if value is not None:
                 if not var.is_any_element and not var.is_any_attribute:
                     namespaces.add(var.namespace)
@@ -93,33 +93,6 @@ class XmlSerializer(AbstractSerializer, ModelInspect):
         self.set_nil_attribute(parent, meta.nillable, namespaces)
         return parent
 
-    def next_value(self, vars: List[ClassVar], obj: Any):
-        index = 0
-        stop = len(vars)
-        while index < stop:
-            var = vars[index]
-            if not var.sequential:
-                yield var, getattr(obj, var.name)
-                index += 1
-                continue
-
-            end = next(
-                (i for i in range(index + 1, stop) if not vars[i].sequential), stop
-            )
-            sequence = vars[index:end]
-            index = end
-            j = 0
-
-            rolling = True
-            while rolling:
-                rolling = False
-                for var in sequence:
-                    values = getattr(obj, var.name)
-                    if j < len(values):
-                        rolling = True
-                        yield var, values[j]
-                j += 1
-
     def render_sub_nodes(
         self, parent, values: Any, var: ClassVar, namespaces: Namespaces
     ):
@@ -134,7 +107,7 @@ class XmlSerializer(AbstractSerializer, ModelInspect):
             elif not is_wildcard:
                 sub_element = SubElement(parent, var.qname)
                 self.render_node(value, sub_element, namespaces)
-                self.set_nil_attribute(sub_element, var.is_nillable, namespaces)
+                self.set_nil_attribute(sub_element, var.nillable, namespaces)
             elif isinstance(value, str):
                 if parent.text:
                     self.set_tail(parent, value)
@@ -154,11 +127,11 @@ class XmlSerializer(AbstractSerializer, ModelInspect):
                 self.set_attributes(sub_element, value.attributes)
                 for child in value.children:
                     self.render_sub_nodes(sub_element, child, var, namespaces)
-                    self.set_nil_attribute(parent, var.is_nillable, namespaces)
+                    self.set_nil_attribute(parent, var.nillable, namespaces)
             else:
                 sub_element = SubElement(parent, value.qname)
                 self.render_node(value, sub_element, namespaces)
-                self.set_nil_attribute(sub_element, var.is_nillable, namespaces)
+                self.set_nil_attribute(sub_element, var.nillable, namespaces)
 
     @classmethod
     def set_attribute(cls, parent: Element, key: Any, value: Any):
@@ -181,8 +154,40 @@ class XmlSerializer(AbstractSerializer, ModelInspect):
     def set_tail(cls, parent: Element, value: Any):
         parent.tail = to_xml(value)
 
-    @staticmethod
-    def set_nil_attribute(element: Element, is_nillable: bool, namespaces: Namespaces):
-        if is_nillable and element.text is None and len(element) == 0:
+    @classmethod
+    def set_nil_attribute(
+        cls, element: Element, nillable: bool, namespaces: Namespaces
+    ):
+        if nillable and element.text is None and len(element) == 0:
             namespaces.add(Namespace.XSI.uri, Namespace.XSI.prefix)
             element.set(XSI_NIL_QNAME, "true")
+
+    @classmethod
+    def next_value(cls, meta: ClassMeta, obj: Any):
+
+        index = 0
+        attrs = list(meta.vars.values())
+        stop = len(attrs)
+        while index < stop:
+            var = attrs[index]
+            if not var.sequential:
+                yield var, getattr(obj, var.name)
+                index += 1
+                continue
+
+            end = next(
+                (i for i in range(index + 1, stop) if not attrs[i].sequential), stop
+            )
+            sequence = attrs[index:end]
+            index = end
+            j = 0
+
+            rolling = True
+            while rolling:
+                rolling = False
+                for var in sequence:
+                    values = getattr(obj, var.name)
+                    if j < len(values):
+                        rolling = True
+                        yield var, values[j]
+                j += 1

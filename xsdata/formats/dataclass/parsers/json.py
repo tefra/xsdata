@@ -8,9 +8,9 @@ from typing import TypeVar
 
 from xsdata.exceptions import ParserError
 from xsdata.formats.bindings import AbstractParser
-from xsdata.formats.dataclass.mixins import ClassVar
 from xsdata.formats.dataclass.mixins import ModelInspect
 from xsdata.formats.dataclass.models import AnyElement
+from xsdata.models.inspect import ClassVar
 
 T = TypeVar("T")
 
@@ -59,7 +59,7 @@ class JsonParser(AbstractParser, ModelInspect):
         - an enumeration
         - a primitive value
         """
-        if var.is_dataclass:
+        if var.dataclass:
             return self.parse_context(value, var.clazz)
         elif var.is_any_attribute:
             return dict(value)

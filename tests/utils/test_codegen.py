@@ -49,6 +49,7 @@ class ClassUtilsTests(FactoryTestCase):
         ClassUtils.sanitize_attributes(target)
         ClassUtils.sanitize_attributes(ClassFactory.create())
 
+        self.assertEqual(5, mock_sanitize_attribute.call_count)
         mock_sanitize_attribute.assert_has_calls(
             [
                 mock.call(target.attrs[0]),
@@ -111,9 +112,9 @@ class ClassUtilsTests(FactoryTestCase):
             {"max_occurs": 2, "min_occurs": 2},
         ]
 
-        for idx, input in enumerate(restrictions):
-            ClassUtils.sanitize_restrictions(input)
-            self.assertEqual(expected[idx], input.asdict())
+        for idx, res in enumerate(restrictions):
+            ClassUtils.sanitize_restrictions(res)
+            self.assertEqual(expected[idx], res.asdict())
 
     def test_sanitize_sequential(self):
         def len_sequential(target):

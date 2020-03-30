@@ -2,6 +2,7 @@ from typing import List
 from typing import Optional
 
 from xsdata.models.codegen import Attr
+from xsdata.models.codegen import AttrType
 from xsdata.models.codegen import Class
 from xsdata.models.codegen import Extension
 from xsdata.models.codegen import Restrictions
@@ -182,3 +183,15 @@ class ClassUtils:
 
         item.attrs.insert(0, attr)
         item.extensions.remove(extension)
+
+    @classmethod
+    def create_reference_attribute(cls, source: Class):
+        prefix = source.prefix
+        reference = f"{prefix}:{source.name}" if prefix else source.name
+        return Attr(
+            name=source.name,
+            index=0,
+            default=None,
+            types=[AttrType(name=reference)],
+            local_type=source.type.__name__,
+        )

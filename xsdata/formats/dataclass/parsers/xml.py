@@ -214,6 +214,11 @@ class XmlParser(AbstractXmlParser, ModelInspect):
                 )
 
                 if wild_var is None:
+                    wild_var = item.meta.get_matching_wild_var(
+                        qname, condition=lambda x: x.name in params and not x.is_list
+                    )
+
+                if wild_var is None:
                     logger.warning("Unassigned parsed object %s", qname)
                     continue
 
@@ -229,6 +234,11 @@ class XmlParser(AbstractXmlParser, ModelInspect):
                 params[arg.name].append(value)
             elif arg.name not in params:
                 params[arg.name] = value
+            elif arg.is_any_element:
+                if params[arg.name].qname:
+                    params[arg.name] = AnyElement(children=[params[arg.name], value])
+                else:
+                    params[arg.name].children.append(value)
 
         if item.meta.mixed and item.meta.any_element:
             var = item.meta.any_element

@@ -41,3 +41,20 @@ class ClassTests(FactoryTestCase):
             QName("{xsdata}foo"),
         }
         self.assertEqual(expected, obj.dependencies())
+
+    def test_source_qname(self):
+        obj = ClassFactory.create()
+        self.assertEqual(QName(obj.source_namespace, obj.name), obj.source_qname())
+
+        self.assertEqual(QName("x", "x").text, obj.source_qname("x:x").text)
+        self.assertNotIn("x", obj.nsmap)
+
+        obj.nsmap["foo"] = "bar"
+        self.assertEqual(QName("bar", "foo"), obj.source_qname("foo:foo"))
+
+    def test_property_prefix(self):
+        obj = ClassFactory.create()
+        self.assertEqual("xsdata", obj.prefix)
+
+        obj.nsmap["foo"] = "xsdata"
+        self.assertEqual("foo", obj.prefix)

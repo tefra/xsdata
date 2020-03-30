@@ -35,6 +35,9 @@ class ClassAnalyzer(ClassUtils):
     class_index: Dict[QName, List[Class]] = field(
         default_factory=lambda: defaultdict(list)
     )
+    substitutions_index: Dict[QName, List[Attr]] = field(
+        default_factory=lambda: defaultdict(list)
+    )
 
     def process(self, classes: List[Class]) -> List[Class]:
         """
@@ -42,7 +45,8 @@ class ClassAnalyzer(ClassUtils):
 
         Steps:
             * Merge redefined classes
-            * Create a class qname index
+            * Create a class index
+            * Create a substitution index
             * Mark as abstract classes with the same qname
             * Flatten classes
             * Return a final class list for code generators.
@@ -50,7 +54,9 @@ class ClassAnalyzer(ClassUtils):
 
         self.merge_redefined_classes(classes)
 
-        self.create_class_qname_index(classes)
+        self.create_class_index(classes)
+
+        self.create_substitutions_index(classes)
 
         self.mark_abstract_duplicate_classes()
 
@@ -83,11 +89,21 @@ class ClassAnalyzer(ClassUtils):
 
         return classes
 
-    def create_class_qname_index(self, classes: List[Class]):
+    def create_class_index(self, classes: List[Class]):
+        """Group classes by their fully qualified name."""
         self.class_index.clear()
-        self.processed.clear()
         for item in classes:
             self.class_index[item.source_qname()].append(item)
+
+    def create_substitutions_index(self, classes: List[Class]):
+        """Create reference attributes for all the classes substitutions and
+        group them by their fully qualified name."""
+        for item in classes:
+            for substitution in item.substitutions:
+                item.abstract = False
+                qname = item.source_qname(substitution)
+                attr = self.create_reference_attribute(item)
+                self.substitutions_index[qname].append(attr)
 
     def find_class(self, qname: QName, condition=simple_type) -> Optional[Class]:
         candidates = list(filter(condition, self.class_index.get(qname, [])))
@@ -184,6 +200,9 @@ class ClassAnalyzer(ClassUtils):
 
         for attr in list(target.attrs):
             self.flatten_attribute_types(target, attr)
+
+        for attr in list(target.attrs):
+            self.add_substitution_attrs(target, attr)
 
         self.merge_duplicate_attributes(target)
 
@@ -343,6 +362,24 @@ class ClassAnalyzer(ClassUtils):
                 logger.warning("Missing type implementation: %s", source.type.__name__)
 
         attr.types = types
+
+    def add_substitution_attrs(self, target: Class, attr: Attr):
+        """
+        Find all the substitution attributes for the given attribute and add
+        them to the target class.
+
+        Exclude enumerations and wildcard attributes.
+        """
+        if attr.is_enumeration or attr.wildcard:
+            return
+
+        index = target.attrs.index(attr)
+        qname = target.source_qname(attr.name)
+        for substitution in self.substitutions_index[qname]:
+            index += 1
+            clone = substitution.clone()
+            clone.restrictions.merge(attr.restrictions)
+            target.attrs.insert(index, clone)
 
     def class_depends_on(self, source: Class, target: Class) -> bool:
         """Check if any source dependencies recursively match the target

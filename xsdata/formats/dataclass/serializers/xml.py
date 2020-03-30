@@ -117,7 +117,7 @@ class XmlSerializer(AbstractSerializer, ModelInspect):
                 namespaces.add_all(value.nsmap)
                 self.set_text(parent, value.text)
                 self.set_attributes(parent, value.attributes)
-            elif isinstance(value, AnyElement):
+            elif isinstance(value, AnyElement) and value.qname:
                 qname = QName(value.qname)
                 namespaces.add(qname.namespace)
 
@@ -128,6 +128,9 @@ class XmlSerializer(AbstractSerializer, ModelInspect):
                 for child in value.children:
                     self.render_sub_nodes(sub_element, child, var, namespaces)
                     self.set_nil_attribute(parent, var.nillable, namespaces)
+            elif isinstance(value, AnyElement) and not value.qname:
+                for child in value.children:
+                    self.render_sub_nodes(parent, child, var, namespaces)
             else:
                 sub_element = SubElement(parent, value.qname)
                 self.render_node(value, sub_element, namespaces)

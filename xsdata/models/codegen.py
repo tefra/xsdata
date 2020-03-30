@@ -19,13 +19,13 @@ from xsdata.models.mixins import ElementBase
 from xsdata.utils import text
 
 
-def qname(name: str, nsmap, default_namespace: Optional[str] = None) -> str:
+def qname(name: str, ns_map: Dict, default_namespace: Optional[str] = None) -> str:
     prefix, suffix = text.split(name)
     namespace = default_namespace
 
     if prefix:
         name = suffix
-        namespace = nsmap.get(prefix)
+        namespace = ns_map.get(prefix, prefix)
 
     return QName(namespace, name)
 
@@ -212,16 +212,16 @@ class Class:
         self.local_name = self.name
 
     @property
-    def key(self) -> str:
-        return f"{self.source_namespace}::{self.type.__name__}::{self.name}"
+    def is_common(self):
+        return self.type not in [Element, ComplexType]
+
+    @property
+    def is_element(self):
+        return self.type is Element
 
     @property
     def is_enumeration(self) -> bool:
         return len(self.attrs) > 0 and self.attrs[0].is_enumeration
-
-    @property
-    def is_common(self):
-        return self.type not in [Element, ComplexType]
 
     @property
     def is_nillable(self) -> bool:
@@ -230,27 +230,25 @@ class Class:
         )
 
     @property
-    def target_module(self):
-        return f"{self.package}.{self.module}"
+    def key(self) -> str:
+        return f"{self.source_namespace}::{self.type.__name__}::{self.name}"
 
     @property
-    def is_element(self):
-        return self.type is Element
+    def prefix(self) -> Optional[str]:
+        for prefix, namespace in self.nsmap.items():
+            if namespace == self.source_namespace:
+                return prefix
+        return self.source_namespace
+
+    @property
+    def target_module(self):
+        return f"{self.package}.{self.module}"
 
     def clone(self):
         inners = [inner.clone() for inner in self.inner]
         extensions = [extension.clone() for extension in self.extensions]
         attrs = [attr.clone() for attr in self.attrs]
         return replace(self, inner=inners, extensions=extensions, attrs=attrs)
-
-    def source_qname(self, name: Optional[str] = None) -> QName:
-        return qname(name or self.name, self.nsmap, self.source_namespace)
-
-    def prefix(self, lookup) -> Optional[str]:
-        for prefix, namespace in self.nsmap.items():
-            if namespace == lookup:
-                return prefix
-        return None
 
     def dependencies(self) -> Set[QName]:
         """
@@ -288,6 +286,9 @@ class Class:
             deps.update(inner.dependencies())
 
         return deps
+
+    def source_qname(self, name: Optional[str] = None) -> QName:
+        return qname(name or self.name, self.nsmap, self.source_namespace)
 
 
 @dataclass

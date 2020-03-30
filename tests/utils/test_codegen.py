@@ -6,6 +6,7 @@ from tests.factories import ClassFactory
 from tests.factories import ExtensionFactory
 from tests.factories import FactoryTestCase
 from tests.factories import RestrictionsFactory
+from xsdata.models.codegen import AttrType
 from xsdata.models.codegen import Restrictions
 from xsdata.models.enums import TagType
 from xsdata.utils.codegen import ClassUtils
@@ -278,3 +279,21 @@ class ClassUtilsTests(FactoryTestCase):
         self.assertEqual(1, len(item.attrs))
         self.assertEqual(0, len(item.extensions))
         self.assertEqual(expected, item.attrs[0])
+
+    def test_create_reference_attribute(self):
+        item = ClassFactory.elements(1)
+        actual = ClassUtils.create_reference_attribute(item)
+
+        expected = AttrFactory.create(
+            name=item.name,
+            index=0,
+            default=None,
+            types=[AttrType(name=f"{item.prefix}:{item.name}")],
+            local_type=item.type.__name__,
+        )
+
+        self.assertEqual(expected, actual)
+
+        item.source_namespace = None
+        actual = ClassUtils.create_reference_attribute(item)
+        self.assertEqual(item.name, actual.types[0].name)

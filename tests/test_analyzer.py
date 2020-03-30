@@ -29,12 +29,14 @@ class ClassAnalyzerTests(FactoryTestCase):
     @mock.patch.object(ClassAnalyzer, "fetch_classes_for_generation")
     @mock.patch.object(ClassAnalyzer, "flatten_classes")
     @mock.patch.object(ClassAnalyzer, "mark_abstract_duplicate_classes")
-    @mock.patch.object(ClassAnalyzer, "create_class_qname_index")
+    @mock.patch.object(ClassAnalyzer, "create_substitutions_index")
+    @mock.patch.object(ClassAnalyzer, "create_class_index")
     @mock.patch.object(ClassAnalyzer, "merge_redefined_classes")
     def test_process(
         self,
         mock_merge_redefined_classes,
-        mock_create_class_qname_index,
+        mock_create_class_index,
+        mock_create_substitutions_index,
         mock_mark_abstract_duplicate_classes,
         mock_flatten_classes,
         mock_fetch_classes_for_generation,
@@ -46,12 +48,13 @@ class ClassAnalyzerTests(FactoryTestCase):
         self.assertEqual(gen_classes, self.analyzer.process(classes))
 
         mock_merge_redefined_classes.assert_called_once_with(classes)
-        mock_create_class_qname_index.assert_called_once_with(classes)
+        mock_create_substitutions_index.assert_called_once_with(classes)
+        mock_create_class_index.assert_called_once_with(classes)
         mock_mark_abstract_duplicate_classes.assert_called_once()
         mock_flatten_classes.assert_called_once_with()
         mock_fetch_classes_for_generation.assert_called_once_with()
 
-    def test_create_class_qname_index(self):
+    def test_create_class_index(self):
         classes = [
             ClassFactory.create(type=Element, name="foo"),
             ClassFactory.create(type=ComplexType, name="foo"),
@@ -63,9 +66,30 @@ class ClassAnalyzerTests(FactoryTestCase):
             "{xsdata}foobar": classes[2:],
         }
 
-        self.analyzer.create_class_qname_index(classes)
+        self.analyzer.create_class_index(classes)
         self.assertEqual(2, len(self.analyzer.class_index))
         self.assertEqual(expected, self.analyzer.class_index)
+
+    @mock.patch.object(ClassAnalyzer, "create_reference_attribute")
+    def test_create_substitutions_index(self, mock_create_reference_attribute):
+        classes = [
+            ClassFactory.create(substitutions=["foo", "bar"], abstract=True),
+            ClassFactory.create(substitutions=["foo"], abstract=True),
+        ]
+
+        namespace = classes[0].source_namespace
+        reference_attrs = AttrFactory.list(3)
+        mock_create_reference_attribute.side_effect = reference_attrs
+
+        self.analyzer.create_substitutions_index(classes)
+
+        expected = {
+            QName(namespace, "foo"): [reference_attrs[0], reference_attrs[2]],
+            QName(namespace, "bar"): [reference_attrs[1]],
+        }
+        self.assertEqual(expected, self.analyzer.substitutions_index)
+        self.assertFalse(classes[0].abstract)
+        self.assertFalse(classes[1].abstract)
 
     def test_mark_abstract_duplicate_classes(self):
         one = ClassFactory.create(name="foo", abstract=True, type=Element)
@@ -77,9 +101,7 @@ class ClassAnalyzerTests(FactoryTestCase):
         six = ClassFactory.create(name="bar", type=ComplexType)
         seven = ClassFactory.create(name="opa", type=ComplexType)
 
-        self.analyzer.create_class_qname_index(
-            [one, two, three, four, five, six, seven]
-        )
+        self.analyzer.create_class_index([one, two, three, four, five, six, seven])
         self.analyzer.mark_abstract_duplicate_classes()
 
         self.assertTrue(one.abstract)  # Was abstract already
@@ -99,7 +121,7 @@ class ClassAnalyzerTests(FactoryTestCase):
             ClassFactory.create(type=SimpleType),
             ClassFactory.enumeration(2),
         ]
-        self.analyzer.create_class_qname_index(classes)
+        self.analyzer.create_class_index(classes)
 
         expected = [
             classes[1],
@@ -116,7 +138,7 @@ class ClassAnalyzerTests(FactoryTestCase):
         self, mock_sanitize_attributes
     ):
         classes = ClassFactory.list(2, type=SimpleType)
-        self.analyzer.create_class_qname_index(classes)
+        self.analyzer.create_class_index(classes)
 
         actual = self.analyzer.fetch_classes_for_generation()
         self.assertEqual(classes, actual)
@@ -125,7 +147,7 @@ class ClassAnalyzerTests(FactoryTestCase):
     @mock.patch.object(ClassAnalyzer, "flatten_class")
     def test_flatten_classes(self, mock_flatten_class):
         classes = ClassFactory.list(2)
-        self.analyzer.create_class_qname_index(classes)
+        self.analyzer.create_class_index(classes)
         self.analyzer.flatten_classes()
         mock_flatten_class.assert_has_calls(list(map(mock.call, classes)))
 
@@ -150,6 +172,7 @@ class ClassAnalyzerTests(FactoryTestCase):
         mock_flatten_class.assert_called_once_with(class_a)
 
     @mock.patch.object(ClassAnalyzer, "merge_duplicate_attributes")
+    @mock.patch.object(ClassAnalyzer, "add_substitution_attrs")
     @mock.patch.object(ClassAnalyzer, "flatten_attribute_types")
     @mock.patch.object(ClassAnalyzer, "flatten_extension")
     @mock.patch.object(ClassAnalyzer, "expand_attribute_group")
@@ -160,6 +183,7 @@ class ClassAnalyzerTests(FactoryTestCase):
         mock_expand_attribute_group,
         mock_flatten_extension,
         mock_flatten_attribute_types,
+        mock_add_substitution_attrs,
         mock_merge_duplicate_attributes,
     ):
         inner = ClassFactory.list(2)
@@ -184,6 +208,10 @@ class ClassAnalyzerTests(FactoryTestCase):
         )
 
         mock_flatten_attribute_types.assert_has_calls(
+            [mock.call(target, target.attrs[0]), mock.call(target, target.attrs[1])]
+        )
+
+        mock_add_substitution_attrs.assert_has_calls(
             [mock.call(target, target.attrs[0]), mock.call(target, target.attrs[1])]
         )
 
@@ -378,7 +406,7 @@ class ClassAnalyzerTests(FactoryTestCase):
 
     @mock.patch.object(ClassAnalyzer, "attr_depends_on", return_value=False)
     @mock.patch.object(ClassAnalyzer, "find_class")
-    def test_flatten_attribute_when_no_source_is_found(
+    def test_flatten_attribute_types_when_no_source_is_found(
         self, mock_find_class, mock_attr_depends_on
     ):
         mock_find_class.return_value = None
@@ -395,7 +423,7 @@ class ClassAnalyzerTests(FactoryTestCase):
 
     @mock.patch.object(ClassAnalyzer, "attr_depends_on", return_value=True)
     @mock.patch.object(ClassAnalyzer, "find_class", return_value=None)
-    def test_flatten_attribute_when_attribute_self_reference(self, *args):
+    def test_flatten_attribute_types_when_attribute_self_reference(self, *args):
         parent = ClassFactory.create()
         type_a = AttrTypeFactory.create()
         attr = AttrFactory.create(name="a", types=[type_a])
@@ -405,7 +433,7 @@ class ClassAnalyzerTests(FactoryTestCase):
         self.assertTrue(type_a.self_ref)
 
     @mock.patch.object(ClassAnalyzer, "find_class")
-    def test_flatten_attribute_when_source_is_enumeration(self, mock_find_class):
+    def test_flatten_attribute_types_when_source_is_enumeration(self, mock_find_class):
         mock_find_class.return_value = ClassFactory.enumeration(1)
 
         parent = ClassFactory.create()
@@ -418,7 +446,7 @@ class ClassAnalyzerTests(FactoryTestCase):
 
     @mock.patch.object(ClassAnalyzer, "copy_inner_classes")
     @mock.patch.object(ClassAnalyzer, "find_class")
-    def test_flatten_attribute_when_source_has_only_one_attribute(
+    def test_flatten_attribute_types_when_source_has_only_one_attribute(
         self, mock_find_class, mock_copy_inner_classes
     ):
         type_a = AttrTypeFactory.create(name="a")
@@ -453,7 +481,7 @@ class ClassAnalyzerTests(FactoryTestCase):
 
     @mock.patch("xsdata.analyzer.logger.warning")
     @mock.patch.object(ClassAnalyzer, "find_class")
-    def test_flatten_attribute_when_source_has_more_than_one_attribute(
+    def test_flatten_attribute_types_when_source_has_more_than_one_attribute(
         self, mock_find_class, mock_logger_warning
     ):
         type_a = AttrTypeFactory.create(name="a")
@@ -470,6 +498,36 @@ class ClassAnalyzerTests(FactoryTestCase):
         mock_logger_warning.assert_called_once_with(
             "Missing type implementation: %s", common.type.__name__
         )
+
+    def test_add_substitution_attrs(self):
+        target = ClassFactory.elements(2)
+
+        first_attr = target.attrs[0]
+        second_attr = target.attrs[1]
+        first_attr.restrictions.max_occurs = 2
+
+        attr_name = first_attr.name
+        attr_qname = target.source_qname(attr_name)
+        reference_attrs = AttrFactory.list(2)
+
+        self.analyzer.substitutions_index[attr_qname] = reference_attrs
+        self.analyzer.add_substitution_attrs(target, first_attr)
+
+        self.assertEqual(4, len(target.attrs))
+
+        self.assertEqual(reference_attrs[0], target.attrs[1])
+        self.assertIsNot(reference_attrs[0], target.attrs[1])
+        self.assertEqual(reference_attrs[1], target.attrs[2])
+        self.assertIsNot(reference_attrs[1], target.attrs[2])
+        self.assertEqual(2, target.attrs[1].restrictions.max_occurs)
+        self.assertEqual(2, target.attrs[2].restrictions.max_occurs)
+
+        second_attr.wildcard = True
+        self.analyzer.add_substitution_attrs(target, second_attr)
+        self.assertEqual(4, len(target.attrs))
+
+        self.analyzer.add_substitution_attrs(target, AttrFactory.enumeration())
+        self.assertEqual(4, len(target.attrs))
 
     @mock.patch.object(ClassAnalyzer, "find_class")
     def test_flatten_enumeration_unions(self, mock_find_class):

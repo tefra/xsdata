@@ -108,8 +108,9 @@ def teardown_module():
 
     fixtures.joinpath("defxmlschema/binding.results.rst").write_text("\n".join(results))
 
-    for rst in here.parent.joinpath(f"").glob("docs/tests/binding/*.rst"):
-        rst.unlink()
+    if len(xmls) > 1:
+        for rst in here.parent.joinpath(f"").glob("docs/tests/binding/*.rst"):
+            rst.unlink()
 
     for xml in xmls:
         json = xml.with_suffix(".json")

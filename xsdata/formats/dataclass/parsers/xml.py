@@ -201,58 +201,21 @@ class XmlParser(AbstractXmlParser, ModelInspect):
 
             if not arg.init:
                 continue
+
             if value is None:
                 value = ""
 
-            if arg.name in params and not arg.is_list:
+            if not self.bind_element_param(params, arg, value):
+                lookup = QName(value.qname) if isinstance(value, AnyElement) else qname
+                wild = self.find_eligible_wildcard(item.meta, lookup, params)
 
-                if isinstance(value, AnyElement):
-                    qname = QName(value.qname)
-
-                wild_var = item.meta.get_matching_wild_var(
-                    qname, condition=lambda x: x.name not in params or x.is_list
-                )
-
-                if wild_var is None:
-                    wild_var = item.meta.get_matching_wild_var(
-                        qname, condition=lambda x: x.name in params and not x.is_list
-                    )
-
-                if wild_var is None:
+                if not wild:
                     logger.warning("Unassigned parsed object %s", qname)
-                    continue
-
-                if isinstance(value, AnyElement):
-                    pass
-                elif is_dataclass(value):
-                    value.qname = qname
                 else:
-                    value = AnyElement(qname=qname, text=value)
-                arg = wild_var
+                    self.bind_element_wildcard_param(params, wild, qname, value)
 
-            if arg.is_list:
-                params[arg.name].append(value)
-            elif arg.name not in params:
-                params[arg.name] = value
-            elif arg.is_any_element:
-                if params[arg.name].qname:
-                    params[arg.name] = AnyElement(children=[params[arg.name], value])
-                else:
-                    params[arg.name].children.append(value)
-
-        if item.meta.mixed and item.meta.any_element:
-            var = item.meta.any_element
-            txt, tail = self.element_text_and_tail(element)
-            if var.is_list:
-                if text:
-                    params[var.name].insert(0, txt)
-                if tail:
-                    params[var.name].append(tail)
-            elif var.name in params:
-                if text:
-                    params[var.name].text = txt
-                if tail:
-                    params[var.name].tail = tail
+        if item.meta.mixed:
+            self.bind_element_mixed_param(params, item.meta, element)
 
         return params
 
@@ -262,6 +225,54 @@ class XmlParser(AbstractXmlParser, ModelInspect):
             _, value = self.objects.pop(item.position)
             children.append(value)
         return children
+
+    @classmethod
+    def bind_element_param(cls, params: Dict, var: ClassVar, value: Any):
+        if var.is_list:
+            params[var.name].append(value)
+        elif var.name not in params:
+            params[var.name] = value
+        else:
+            return False
+
+        return True
+
+    @classmethod
+    def bind_element_wildcard_param(
+        cls, params: Dict, var: ClassVar, qname: QName, value: Any
+    ):
+        if is_dataclass(value):
+            if not isinstance(value, AnyElement):
+                value.qname = qname
+        else:
+            value = AnyElement(qname=qname, text=value)
+
+        if var.name in params:
+            previous = params[var.name]
+            if previous.qname:
+                params[var.name] = AnyElement(children=[previous])
+
+            params[var.name].children.append(value)
+        else:
+            params[var.name] = value
+
+    @classmethod
+    def bind_element_mixed_param(cls, params: Dict, meta: ClassMeta, element: Element):
+        var = meta.any_element
+        if not var:
+            return
+
+        txt, tail = cls.element_text_and_tail(element)
+        if var.is_list:
+            if text:
+                params[var.name].insert(0, txt)
+            if tail:
+                params[var.name].append(tail)
+        elif var.name in params:
+            if text:
+                params[var.name].text = txt
+            if tail:
+                params[var.name].tail = tail
 
     def bind_element_attrs(self, metadata: ClassMeta, element: Element) -> Dict:
         """Parse the given element's attributes and any text content and return
@@ -283,16 +294,17 @@ class XmlParser(AbstractXmlParser, ModelInspect):
 
         return params
 
-    def bind_element_text(self, metadata: ClassMeta, element: Element):
+    @classmethod
+    def bind_element_text(cls, metadata: ClassMeta, element: Element):
         if len(element):
             return dict()
 
         var = metadata.any_text
         if var and element.text is not None and var.init:
-            return {var.name: self.parse_value(var.types, element.text, var.default)}
+            return {var.name: cls.parse_value(var.types, element.text, var.default)}
         var = metadata.any_element
         if var and element.text is not None and not var.is_list:
-            return {var.name: self.parse_any_text(element)}
+            return {var.name: cls.parse_any_text(element)}
         return {}
 
     @classmethod
@@ -332,3 +344,19 @@ class XmlParser(AbstractXmlParser, ModelInspect):
         tail = element.tail.strip() if element.tail else None
 
         return txt or None, tail or None
+
+    @classmethod
+    def find_eligible_wildcard(
+        cls, meta: ClassMeta, qname: QName, params: Dict
+    ) -> Optional[ClassVar]:
+        conditions = [
+            lambda x: x.name not in params or x.is_list,
+            lambda x: x.name in params and not x.is_list,
+        ]
+
+        for condition in conditions:
+            wild = meta.get_matching_wild_var(qname, condition)
+            if wild:
+                return wild
+
+        return None

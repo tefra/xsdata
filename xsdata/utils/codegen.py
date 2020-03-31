@@ -186,7 +186,7 @@ class ClassUtils:
 
     @classmethod
     def create_reference_attribute(cls, source: Class):
-        prefix = source.prefix
+        prefix = source.source_prefix
         reference = f"{prefix}:{source.name}" if prefix else source.name
         return Attr(
             name=source.name,

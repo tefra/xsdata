@@ -288,7 +288,7 @@ class ClassUtilsTests(FactoryTestCase):
             name=item.name,
             index=0,
             default=None,
-            types=[AttrType(name=f"{item.prefix}:{item.name}")],
+            types=[AttrType(name=f"{item.source_prefix}:{item.name}")],
             local_type=item.type.__name__,
         )
 

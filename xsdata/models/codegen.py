@@ -227,10 +227,6 @@ class Class:
         )
 
     @property
-    def key(self) -> str:
-        return f"{self.source_namespace}::{self.type.__name__}::{self.name}"
-
-    @property
     def source_prefix(self) -> Optional[str]:
         if not self.source_namespace:
             return None

@@ -31,7 +31,7 @@ class ClassAnalyzer(ClassUtils):
     classes to be used as common types for future runs.
     """
 
-    processed: Dict = field(default_factory=dict)
+    processed: List = field(default_factory=list)
     class_index: Dict[QName, List[Class]] = field(
         default_factory=lambda: defaultdict(list)
     )
@@ -112,7 +112,7 @@ class ClassAnalyzer(ClassUtils):
             if candidates:
                 logger.warning("More than one candidate found for %s", qname)
 
-            if candidate.key not in self.processed:
+            if id(candidate) not in self.processed:
                 self.flatten_class(candidate)
             return candidate
 
@@ -171,7 +171,7 @@ class ClassAnalyzer(ClassUtils):
     def flatten_classes(self):
         for classes in self.class_index.values():
             for obj in classes:
-                if obj.key not in self.processed:
+                if id(obj) not in self.processed:
                     self.flatten_class(obj)
 
     def flatten_class(self, target: Class):
@@ -188,7 +188,7 @@ class ClassAnalyzer(ClassUtils):
             * Unset sequential attributes
             * Flatten inner classes
         """
-        self.processed[target.key] = True
+        self.processed.append(id(target))
 
         self.flatten_enumeration_unions(target)
 
@@ -207,7 +207,8 @@ class ClassAnalyzer(ClassUtils):
         self.merge_duplicate_attributes(target)
 
         for inner in target.inner:
-            self.flatten_class(inner)
+            if id(inner) not in self.processed:
+                self.flatten_class(inner)
 
     def flatten_enumeration_unions(self, target: Class):
         if not target.is_common:

@@ -165,7 +165,7 @@ class ClassAnalyzerTests(FactoryTestCase):
         class_a = ClassFactory.create()
         class_b = ClassFactory.create()
         self.analyzer.class_index[qname] = [class_a, class_b]
-        self.analyzer.processed[class_b.key] = True
+        self.analyzer.processed.append(id(class_b))
 
         self.assertIsNone(self.analyzer.find_class("b"))
 

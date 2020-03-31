@@ -122,7 +122,7 @@ class AttrType:
 @dataclass
 class Attr:
     name: str
-    local_name: str = field(init=False)
+    local_name: str
     local_type: str
     index: int = field(compare=False)
     default: Any = field(default=None, compare=False)
@@ -133,9 +133,6 @@ class Attr:
     namespace: Optional[str] = field(default=None)
     help: Optional[str] = field(default=None)
     restrictions: Restrictions = field(default_factory=Restrictions, compare=False)
-
-    def __post_init__(self):
-        self.local_name = self.name
 
     @property
     def is_attribute(self) -> bool:

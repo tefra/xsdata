@@ -102,7 +102,7 @@ class ClassAnalyzer(ClassUtils):
             for substitution in item.substitutions:
                 item.abstract = False
                 qname = item.source_qname(substitution)
-                attr = self.create_reference_attribute(item)
+                attr = self.create_reference_attribute(item, qname)
                 self.substitutions_index[qname].append(attr)
 
     def find_class(self, qname: QName, condition=simple_type) -> Optional[Class]:
@@ -376,10 +376,14 @@ class ClassAnalyzer(ClassUtils):
         index = target.attrs.index(attr)
         qname = target.source_qname(attr.name)
         for substitution in self.substitutions_index[qname]:
-            index += 1
+            pos = self.find_attribute(target.attrs, substitution)
+            index = pos + 1 if pos > -1 else index
+
             clone = substitution.clone()
             clone.restrictions.merge(attr.restrictions)
             target.attrs.insert(index, clone)
+
+            self.add_substitution_attrs(target, clone)
 
     def class_depends_on(self, source: Class, target: Class) -> bool:
         """Check if any source dependencies recursively match the target

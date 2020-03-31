@@ -844,7 +844,7 @@ class Restriction(AnnotationBase):
     enumerations: Array[Enumeration] = array_element(name="enumeration")
     asserts: Array[Assertion] = array_element(name="assert")
     assertions: Array[Assertion] = array_element(name="assertion")
-
+    any_element: Array[object] = array_any_element()
     min_exclusive: Optional[MinExclusive] = element()
     min_inclusive: Optional[MinInclusive] = element()
     min_length: Optional[MinLength] = element()

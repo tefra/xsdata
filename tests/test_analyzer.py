@@ -91,6 +91,14 @@ class ClassAnalyzerTests(FactoryTestCase):
         self.assertFalse(classes[0].abstract)
         self.assertFalse(classes[1].abstract)
 
+        mock_create_reference_attribute.assert_has_calls(
+            [
+                mock.call(classes[0], classes[0].source_qname("foo")),
+                mock.call(classes[0], classes[0].source_qname("bar")),
+                mock.call(classes[1], classes[1].source_qname("foo")),
+            ]
+        )
+
     def test_mark_abstract_duplicate_classes(self):
         one = ClassFactory.create(name="foo", abstract=True, type=Element)
         two = ClassFactory.create(name="foo", type=Element)
@@ -499,8 +507,10 @@ class ClassAnalyzerTests(FactoryTestCase):
             "Missing type implementation: %s", common.type.__name__
         )
 
-    def test_add_substitution_attrs(self):
+    @mock.patch.object(ClassAnalyzer, "find_attribute")
+    def test_add_substitution_attrs(self, mock_find_attribute):
         target = ClassFactory.elements(2)
+        mock_find_attribute.side_effect = [-1, 2]
 
         first_attr = target.attrs[0]
         second_attr = target.attrs[1]
@@ -515,12 +525,12 @@ class ClassAnalyzerTests(FactoryTestCase):
 
         self.assertEqual(4, len(target.attrs))
 
-        self.assertEqual(reference_attrs[0], target.attrs[1])
-        self.assertIsNot(reference_attrs[0], target.attrs[1])
-        self.assertEqual(reference_attrs[1], target.attrs[2])
-        self.assertIsNot(reference_attrs[1], target.attrs[2])
-        self.assertEqual(2, target.attrs[1].restrictions.max_occurs)
-        self.assertEqual(2, target.attrs[2].restrictions.max_occurs)
+        self.assertEqual(reference_attrs[0], target.attrs[0])
+        self.assertIsNot(reference_attrs[0], target.attrs[0])
+        self.assertEqual(reference_attrs[1], target.attrs[3])
+        self.assertIsNot(reference_attrs[1], target.attrs[3])
+        self.assertEqual(2, target.attrs[0].restrictions.max_occurs)
+        self.assertEqual(2, target.attrs[3].restrictions.max_occurs)
 
         second_attr.wildcard = True
         self.analyzer.add_substitution_attrs(target, second_attr)

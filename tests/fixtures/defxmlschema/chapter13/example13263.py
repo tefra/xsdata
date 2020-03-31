@@ -6,7 +6,7 @@ from typing import Optional
 class IlegalDerivedType:
     """
     :ivar any_element:
-    :ivar datypic_com_prod_http_datypic_com_ord_element:
+    :ivar datypic_com_ord_element:
     :ivar a:
     """
     any_element: Optional[object] = field(
@@ -17,7 +17,7 @@ class IlegalDerivedType:
             required=True
         )
     )
-    datypic_com_prod_http_datypic_com_ord_element: Optional[object] = field(
+    datypic_com_ord_element: Optional[object] = field(
         default=None,
         metadata=dict(
             type="Any",

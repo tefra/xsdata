@@ -18,10 +18,8 @@ Example 16-10 Using block to prevent substitution group use
    :language: xml
    :lines: 3-
 
-.. warning::
-
-    substitution groups
-
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter16/example1610.py
+   :language: python
 
 Example 16-2 Members of a substitution group
 --------------------------------------------
@@ -30,10 +28,8 @@ Example 16-2 Members of a substitution group
    :language: xml
    :lines: 3-
 
-.. warning::
-
-    substitution groups
-
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter16/example1602.py
+   :language: python
 
 Example 16-4 Substitution group with simple types
 -------------------------------------------------
@@ -42,10 +38,8 @@ Example 16-4 Substitution group with simple types
    :language: xml
    :lines: 3-
 
-.. warning::
-
-    substitution groups
-
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter16/example1604.py
+   :language: python
 
 Example 16-5 A member of two substitution groups
 ------------------------------------------------
@@ -54,10 +48,8 @@ Example 16-5 A member of two substitution groups
    :language: xml
    :lines: 3-
 
-.. warning::
-
-    substitution groups
-
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter16/example1605.py
+   :language: python
 
 Example 16-6 Using a choice group
 ---------------------------------
@@ -86,10 +78,8 @@ Example 16-9 Using final to control substitution group declaration
    :language: xml
    :lines: 3-
 
-.. warning::
-
-    substitution groups
-
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter16/example1609.py
+   :language: python
 
 .. admonition:: Samples Source
     :class: hint

@@ -57,9 +57,3 @@ class ItemsType:
             max_occurs=9223372036854775807
         )
     )
-
-
-@dataclass
-class Items(ItemsType):
-    class Meta:
-        name = "items"

@@ -1,7 +1,7 @@
 <!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
 <!-- Example 16-2 Members of a substitution group -->
-<!-- SKIPTEST: substitution groups -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:include schemaLocation="chapter16.xsd" />
   <xs:element name="shirt" type="ShirtType" substitutionGroup="product" />
   <xs:complexType name="ShirtType">
     <xs:complexContent>

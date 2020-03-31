@@ -1,5 +1,10 @@
 from dataclasses import dataclass, field
 from typing import List, Optional
+from tests.fixtures.defxmlschema.chapter16.example1602 import (
+    Hat,
+    Shirt,
+    Umbrella,
+)
 
 
 @dataclass
@@ -87,78 +92,9 @@ class ShirtSizeType:
 
 
 @dataclass
-class Umbrella:
-    """
-    :ivar any_element:
-    """
-    class Meta:
-        name = "umbrella"
-
-    any_element: Optional[object] = field(
-        default=None,
-        metadata=dict(
-            type="Any",
-            required=True
-        )
-    )
-
-
-@dataclass
-class ShirtType(ProductType):
-    """
-    :ivar size:
-    :ivar color:
-    """
-    size: Optional[ShirtSizeType] = field(
-        default=None,
-        metadata=dict(
-            name="size",
-            type="Element",
-            namespace="",
-            required=True
-        )
-    )
-    color: Optional[ColorType] = field(
-        default=None,
-        metadata=dict(
-            name="color",
-            type="Element",
-            namespace="",
-            required=True
-        )
-    )
-
-
-@dataclass
-class Hat(ProductType):
-    """
-    :ivar size:
-    """
-    class Meta:
-        name = "hat"
-
-    size: Optional[HatSizeType] = field(
-        default=None,
-        metadata=dict(
-            name="size",
-            type="Element",
-            namespace="",
-            required=True
-        )
-    )
-
-
-@dataclass
 class Product(ProductType):
     class Meta:
         name = "product"
-
-
-
-@dataclass
-class Shirt(ShirtType):
-    class Meta:
-        name = "shirt"
 
 
 

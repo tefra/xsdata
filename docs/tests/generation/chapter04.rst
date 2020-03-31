@@ -113,42 +113,6 @@ Example 4-6.2 Proxy schema to avoid multiple imports
     Illegal definition
 
 
-Example 4-7 Illegal duplication of element names
-------------------------------------------------
-
-.. literalinclude:: /../tests/fixtures/defxmlschema/chapter04/example04071.xsd
-   :language: xml
-   :lines: 3-
-
-.. warning::
-
-    Illegal definition
-
-
-Example 4-7.2 Illegal duplication of element names
---------------------------------------------------
-
-.. literalinclude:: /../tests/fixtures/defxmlschema/chapter04/example04072.xsd
-   :language: xml
-   :lines: 3-
-
-.. warning::
-
-    Illegal definition
-
-
-Example 4-8 Illegal Missing component
--------------------------------------
-
-.. literalinclude:: /../tests/fixtures/defxmlschema/chapter04/example0408.xsd
-   :language: xml
-   :lines: 3-
-
-.. warning::
-
-    Illegal definition
-
-
 .. admonition:: Samples Source
     :class: hint
 

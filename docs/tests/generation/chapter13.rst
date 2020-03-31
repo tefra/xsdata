@@ -151,18 +151,6 @@ Example 13-30 Legal restrictions of attributes
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter13/example1330.py
    :language: python
 
-Example 13-31 Illegal attribute restrictions
---------------------------------------------
-
-.. literalinclude:: /../tests/fixtures/defxmlschema/chapter13/example1331.xsd
-   :language: xml
-   :lines: 3-
-
-.. warning::
-
-    Illegal definition
-
-
 Example 13-32 Restricting an attribute wildcard
 -----------------------------------------------
 

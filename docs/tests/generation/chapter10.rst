@@ -28,10 +28,8 @@ Example 10-12 Enumeration applied inappropriately to a list type
    :language: xml
    :lines: 3-
 
-.. warning::
-
-    Should fail
-
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter10/example1012.py
+   :language: python
 
 Example 10-13 Enumeration applied to the item type of a list
 ------------------------------------------------------------
@@ -92,18 +90,6 @@ Example 10-2 Using the memberTypes attribute
 
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter10/example1002.py
    :language: python
-
-Example 10-20 Illegal list of lists
------------------------------------
-
-.. literalinclude:: /../tests/fixtures/defxmlschema/chapter10/example1020.xsd
-   :language: xml
-   :lines: 3-
-
-.. warning::
-
-    Should fail
-
 
 Example 10-21 An array using markup
 -----------------------------------

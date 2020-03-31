@@ -28,10 +28,8 @@ Example 12-13 Legal duplication of element names
    :language: xml
    :lines: 3-
 
-.. warning::
-
-    Should fail
-
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1213.py
+   :language: python
 
 Example 12-15 A sequence group
 ------------------------------
@@ -102,18 +100,6 @@ Example 12-24 An all group
 
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1224.py
    :language: python
-
-Example 12-26 An illegal all group
-----------------------------------
-
-.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1226.xsd
-   :language: xml
-   :lines: 3-
-
-.. warning::
-
-    Illegal definition
-
 
 Example 12-27 Complex type with a named model group reference
 -------------------------------------------------------------

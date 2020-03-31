@@ -21,18 +21,6 @@ Example 8-10 Restricting an enumeration
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter08/example0810.py
    :language: python
 
-Example 8-11 Illegal attempt to extend an enumeration
------------------------------------------------------
-
-.. literalinclude:: /../tests/fixtures/defxmlschema/chapter08/example0811.xsd
-   :language: xml
-   :lines: 3-
-
-.. warning::
-
-    Illegal definition
-
-
 Example 8-12 Using a union to extend an enumeration
 ---------------------------------------------------
 
@@ -72,18 +60,6 @@ Example 8-15 Restricting a pattern
 
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter08/example0815.py
    :language: python
-
-Example 8-16 Illegal attempt to extend a pattern
-------------------------------------------------
-
-.. literalinclude:: /../tests/fixtures/defxmlschema/chapter08/example0816.xsd
-   :language: xml
-   :lines: 3-
-
-.. warning::
-
-    Should fail
-
 
 Example 8-17 Simple type assertion
 ----------------------------------
@@ -132,10 +108,8 @@ Example 8-23 Using the Saxon preprocess facet
    :language: xml
    :lines: 3-
 
-.. warning::
-
-    XML Schema 1.1
-
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter08/example0823.py
+   :language: python
 
 Example 8-3 Deriving a simple type from a built-in simple type
 --------------------------------------------------------------
@@ -166,18 +140,6 @@ Example 8-5 Effective definition of MediumDressSizeType
 
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter08/example0805.py
    :language: python
-
-Example 8-6 Illegal attempt to extend a simple type
----------------------------------------------------
-
-.. literalinclude:: /../tests/fixtures/defxmlschema/chapter08/example0806.xsd
-   :language: xml
-   :lines: 3-
-
-.. warning::
-
-    Should fail
-
 
 Example 8-7 Fixed facets
 ------------------------

@@ -234,11 +234,19 @@ class Class:
         return f"{self.source_namespace}::{self.type.__name__}::{self.name}"
 
     @property
-    def prefix(self) -> Optional[str]:
+    def source_prefix(self) -> Optional[str]:
+        if not self.source_namespace:
+            return None
+
         for prefix, namespace in self.nsmap.items():
-            if namespace == self.source_namespace:
+            if namespace == self.source_namespace and prefix:
                 return prefix
-        return self.source_namespace
+
+        return (
+            None
+            if self.source_namespace.startswith("http://")
+            else self.source_namespace
+        )
 
     @property
     def target_module(self):

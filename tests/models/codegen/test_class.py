@@ -52,9 +52,18 @@ class ClassTests(FactoryTestCase):
         obj.nsmap["foo"] = "bar"
         self.assertEqual(QName("bar", "foo"), obj.source_qname("foo:foo"))
 
-    def test_property_prefix(self):
-        obj = ClassFactory.create()
-        self.assertEqual("xsdata", obj.prefix)
+    def test_property_source_prefix(self):
+        namespace = "http://xsdata.foo"
+        obj = ClassFactory.create(nsmap={None: namespace}, source_namespace=namespace)
 
-        obj.nsmap["foo"] = "xsdata"
-        self.assertEqual("foo", obj.prefix)
+        self.assertIsNone(obj.source_prefix)
+
+        obj.source_namespace = None
+        self.assertIsNone(obj.source_prefix)
+
+        obj.source_namespace = "tns"
+        self.assertEqual("tns", obj.source_prefix)
+
+        obj.nsmap["foo"] = namespace
+        obj.source_namespace = namespace
+        self.assertEqual("foo", obj.source_prefix)

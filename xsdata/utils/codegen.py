@@ -1,6 +1,8 @@
 from typing import List
 from typing import Optional
 
+from lxml.etree import QName
+
 from xsdata.models.codegen import Attr
 from xsdata.models.codegen import AttrType
 from xsdata.models.codegen import Class
@@ -103,7 +105,8 @@ class ClassUtils:
 
         result: List[Attr] = []
         for attr in target.attrs:
-            existing = next((item for item in result if attr == item), None)
+            pos = cls.find_attribute(result, attr)
+            existing = result[pos] if pos > -1 else None
 
             if not existing:
                 result.append(attr)
@@ -164,6 +167,7 @@ class ClassUtils:
         if extension.type.native_code == DataType.ANY_TYPE.code:
             attr = Attr(
                 name="##any_element",
+                local_name="##any_element",
                 index=0,
                 wildcard=True,
                 default=list if extension.restrictions.is_list else None,
@@ -174,6 +178,7 @@ class ClassUtils:
         else:
             attr = Attr(
                 name="value",
+                local_name="value",
                 index=0,
                 default=None,
                 types=[extension.type.clone()],
@@ -185,13 +190,25 @@ class ClassUtils:
         item.extensions.remove(extension)
 
     @classmethod
-    def create_reference_attribute(cls, source: Class):
-        prefix = source.source_prefix
+    def create_reference_attribute(cls, source: Class, qname: QName):
+        prefix = None
+        if qname.namespace != source.source_namespace:
+            prefix = source.source_prefix
+
         reference = f"{prefix}:{source.name}" if prefix else source.name
         return Attr(
             name=source.name,
+            local_name=source.name,
             index=0,
             default=None,
             types=[AttrType(name=reference)],
             local_type=source.type.__name__,
+            namespace=source.namespace,
         )
+
+    @classmethod
+    def find_attribute(cls, attrs: List[Attr], attr: Attr):
+        try:
+            return attrs.index(attr)
+        except ValueError:
+            return -1

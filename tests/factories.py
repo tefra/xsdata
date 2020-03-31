@@ -232,9 +232,10 @@ class AttrFactory(Factory):
         wildcard=False,
         restrictions=None,
     ):
-
+        name = name or f"attr_{cls.next_letter()}"
         return cls.model(
-            name=name or f"attr_{cls.next_letter()}",
+            name=name,
+            local_name=name,
             index=cls.counter if index is None else index,
             types=types or [AttrTypeFactory.xs_string()],
             local_type=local_type or random.choice(cls.types).__name__,

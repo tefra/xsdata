@@ -165,24 +165,15 @@ class Shirt(ShirtType):
 @dataclass
 class ItemsType:
     """
-    :ivar product:
-    :ivar shirt:
-    :ivar hat:
     :ivar umbrella:
+    :ivar hat:
+    :ivar shirt:
+    :ivar product:
     """
-    product: List[Product] = field(
+    umbrella: List[Umbrella] = field(
         default_factory=list,
         metadata=dict(
-            name="product",
-            type="Element",
-            min_occurs=1,
-            max_occurs=9223372036854775807
-        )
-    )
-    shirt: List[Shirt] = field(
-        default_factory=list,
-        metadata=dict(
-            name="shirt",
+            name="umbrella",
             type="Element",
             min_occurs=1,
             max_occurs=9223372036854775807
@@ -197,10 +188,19 @@ class ItemsType:
             max_occurs=9223372036854775807
         )
     )
-    umbrella: List[Umbrella] = field(
+    shirt: List[Shirt] = field(
         default_factory=list,
         metadata=dict(
-            name="umbrella",
+            name="shirt",
+            type="Element",
+            min_occurs=1,
+            max_occurs=9223372036854775807
+        )
+    )
+    product: List[Product] = field(
+        default_factory=list,
+        metadata=dict(
+            name="product",
             type="Element",
             min_occurs=1,
             max_occurs=9223372036854775807

@@ -1,14 +1,9 @@
 from tests.factories import AttrFactory
 from tests.factories import FactoryTestCase
-from xsdata.models.codegen import Attr
 from xsdata.models.codegen import Restrictions
 
 
 class AttrTests(FactoryTestCase):
-    def test__post_init__(self):
-        attr = Attr(name="foo", local_type="bar", index=0)
-        self.assertEqual("foo", attr.local_name)
-
     def test__eq__(self):
         attr = AttrFactory.element()
         clone = attr.clone()

@@ -208,11 +208,14 @@ class ClassBuilder:
         if restrictions.prohibited:
             return
 
+        name = obj.real_name
         target.nsmap.update(obj.nsmap)
+
         target.attrs.append(
             Attr(
                 index=obj.index,
-                name=obj.real_name,
+                name=name,
+                local_name=name,
                 default=obj.default_value,
                 fixed=obj.is_fixed,
                 wildcard=obj.is_wildcard,

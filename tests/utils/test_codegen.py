@@ -1,5 +1,7 @@
 from unittest import mock
 
+from lxml.etree import QName
+
 from tests.factories import AttrFactory
 from tests.factories import AttrTypeFactory
 from tests.factories import ClassFactory
@@ -282,7 +284,7 @@ class ClassUtilsTests(FactoryTestCase):
 
     def test_create_reference_attribute(self):
         item = ClassFactory.elements(1)
-        actual = ClassUtils.create_reference_attribute(item)
+        actual = ClassUtils.create_reference_attribute(item, QName("foo"))
 
         expected = AttrFactory.create(
             name=item.name,
@@ -294,6 +296,9 @@ class ClassUtilsTests(FactoryTestCase):
 
         self.assertEqual(expected, actual)
 
+        actual = ClassUtils.create_reference_attribute(item, item.source_qname("foo"))
+        self.assertEqual(item.name, actual.types[0].name)
+
         item.source_namespace = None
-        actual = ClassUtils.create_reference_attribute(item)
+        actual = ClassUtils.create_reference_attribute(item, QName("foo"))
         self.assertEqual(item.name, actual.types[0].name)

@@ -1,33 +1,4 @@
 {
-    "product": [
-        {
-            "number": 999,
-            "name": "Special Seasonal"
-        }
-    ],
-    "shirt": [
-        {
-            "number": 557,
-            "name": "Short-Sleeved Linen Blouse",
-            "size": {
-                "value": 10,
-                "system": null
-            },
-            "color": {
-                "value": "blue"
-            }
-        }
-    ],
-    "hat": [
-        {
-            "number": 563,
-            "name": "Ten-Gallon Hat",
-            "size": {
-                "value": "L",
-                "system": null
-            }
-        }
-    ],
     "umbrella": [
         {
             "any_element": {
@@ -52,6 +23,35 @@
                 ],
                 "attributes": {}
             }
+        }
+    ],
+    "hat": [
+        {
+            "number": 563,
+            "name": "Ten-Gallon Hat",
+            "size": {
+                "value": "L",
+                "system": null
+            }
+        }
+    ],
+    "shirt": [
+        {
+            "number": 557,
+            "name": "Short-Sleeved Linen Blouse",
+            "size": {
+                "value": 10,
+                "system": null
+            },
+            "color": {
+                "value": "blue"
+            }
+        }
+    ],
+    "product": [
+        {
+            "number": 999,
+            "name": "Special Seasonal"
         }
     ]
 }

@@ -60,9 +60,11 @@ class ClassBuilder:
 
     def build_class(self, obj: BaseElement) -> Class:
         """Build and return a class instance."""
+        name = obj.real_name
         namespace = self.element_namespace(obj)
         instance = Class(
-            name=obj.real_name,
+            name=name,
+            local_name=name,
             abstract=obj.is_abstract,
             namespace=namespace,
             mixed=obj.is_mixed,

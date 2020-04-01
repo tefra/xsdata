@@ -30,7 +30,7 @@ Naive XML Bindings for python
 Features
 --------
 
-- Code generation for XML Schema definitions
+- Generate data models from XML Schema 1.0 and 1.1 definitions.
 - Supports qualified/unqualified elements and attributes
 - Supports enumerations and inner classes
 - Flattening strategies to keep the code as simple as possible.

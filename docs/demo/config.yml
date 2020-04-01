@@ -2,7 +2,7 @@
 # like `/bin/bash -l`, `ls`, or any other commands
 # the default is bash for Linux
 # or powershell.exe for Windows
-command: ./demo.sh -w 1
+command: ./docs/demo/demo.sh -w 1
 
 # Specify the current working directory path
 # the default is the current working directory path
@@ -39,7 +39,7 @@ frameDelay: auto
 # Maximum delay between frames in ms
 # Ignored if the `frameDelay` isn't save to `auto`
 # Set to `auto` to prevent limiting the max idle time
-maxIdleTime: 5000
+maxIdleTime: 2000
 
 # The surrounding frame box
 # The `type` can be null, window, floating, or solid`

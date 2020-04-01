@@ -6,6 +6,7 @@ recursive-include xsdata *
 
 prune docs/_build
 prune docs/_static
+prune docs/reference/*.rst
 prune docs/demo
 exclude .travis.yml
 exclude .readthedocs.yml

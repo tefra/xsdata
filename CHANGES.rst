@@ -1,3 +1,23 @@
+20.4 (2020-04-01)
+-----------------
+- Added support for sequential fields.
+- Added support for open content.
+- Added support multiple redefined elements.
+- Updated support for wildcards to be aware of generic namespaces.
+- Updated support for wildcards to be aware of non generic objects.
+- Updated codegen to run after fully parsing all the definitions.
+- Updated codegen to skip unresolved schema locations.
+- Updated xml parser to ignore comments.
+- Updated xml parser to retain a copy of the input namespaces.
+- Fixed issues with nillable fields being ignored.
+- Fixed multiple issues with wrong restrictions being applied.
+- Fixed binding issues when there are naming conflicts.
+- Fixed serialization for inf/nan/exponential float and decimal values.
+- Fixed naming conflicts with class/package names.
+- Fixed multiple circular import issues during parsing and code generation.
+- Pass more than 98% of the `W3C XML Schema 1.1 test cases <https://travis-ci.org/tefra/xsdata-w3c-tests>`_
+
+
 20.3 (2020-03-01)
 -----------------
 - Added copies of common schemas xlink, xsi, xml.

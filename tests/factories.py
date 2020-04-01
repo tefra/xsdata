@@ -78,8 +78,10 @@ class ClassFactory(Factory):
         package="foo",
         module="tests",
     ):
+        name = name or f"class_{cls.next_letter()}"
         return cls.model(
-            name=name or f"class_{cls.next_letter()}",
+            name=name,
+            local_name=name,
             namespace=namespace,
             source_namespace=source_namespace,
             abstract=abstract,

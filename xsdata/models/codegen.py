@@ -189,6 +189,7 @@ class Extension:
 @dataclass
 class Class:
     name: str
+    local_name: str
     type: Type
     module: str
     package: str
@@ -196,7 +197,6 @@ class Class:
     abstract: bool
     nillable: bool
     namespace: Optional[str] = field(default=None)
-    local_name: str = field(init=False)
     help: Optional[str] = field(default=None)
     substitutions: List[str] = field(default_factory=list)
     extensions: List[Extension] = field(default_factory=list)
@@ -204,9 +204,6 @@ class Class:
     inner: List["Class"] = field(default_factory=list)
     nsmap: Dict = field(default_factory=dict)
     source_namespace: Optional[str] = field(default=None)
-
-    def __post_init__(self):
-        self.local_name = self.name
 
     @property
     def is_common(self):

@@ -1,3 +1,4 @@
+import sys
 from typing import List
 from typing import Optional
 
@@ -153,6 +154,11 @@ class ClassUtils:
         for attr in source.attrs:
             if text.suffix(attr.name) not in target_attr_names:
                 clone = cls.clone_attribute(attr, extension.restrictions, prefix)
+
+                if attr.index == sys.maxsize:
+                    target.attrs.append(clone)
+                    continue
+
                 target.attrs.insert(index, clone)
             index += 1
 

@@ -38,12 +38,33 @@ class ProductType:
 
 
 @dataclass
-class ShirtType(ProductType):
+class ShirtType:
     """
+    :ivar number:
+    :ivar name:
     :ivar size:
     :ivar color:
     :ivar any_element:
+    :ivar other_element:
     """
+    number: Optional[int] = field(
+        default=None,
+        metadata=dict(
+            name="number",
+            type="Element",
+            namespace="",
+            required=True
+        )
+    )
+    name: Optional[str] = field(
+        default=None,
+        metadata=dict(
+            name="name",
+            type="Element",
+            namespace="",
+            required=True
+        )
+    )
     size: Optional[int] = field(
         default=None,
         metadata=dict(
@@ -67,6 +88,14 @@ class ShirtType(ProductType):
         metadata=dict(
             type="Any",
             namespace="##any",
+            required=True
+        )
+    )
+    other_element: Optional[object] = field(
+        default=None,
+        metadata=dict(
+            type="Any",
+            namespace="##other",
             required=True
         )
     )

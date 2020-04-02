@@ -286,18 +286,23 @@ class ClassAnalyzer(ClassUtils):
         Complex flatten extension handler for primary classes eg ComplexType,
         Element.
 
-        Steps:
-            1. If source includes all target attributes: drop the extension
-            2. If source includes some of the target attributes copy attributes
-            3. If source depends on target class copy all attributes
-            4. Otherwise maintain the extension.
+        Drop extension when:
+            - source includes all target attributes
+        Copy all attributes when:
+            - source includes some of the target attributes
+            - source has suffix attribute and target has at least one attribute
+            - target has at least one suffix attribute
+            - source depends on target class copy all attributes
         """
         res = self.compare_attributes(source, target)
         if res == self.INCLUDES_ALL:
             target.extensions.remove(ext)
-        elif res == self.INCLUDES_SOME:
-            self.copy_attributes(source, target, ext)
-        elif self.class_depends_on(source, target):
+        elif (
+            res == self.INCLUDES_SOME
+            or (source.has_suffix_attr and target.attrs)
+            or target.has_suffix_attr
+            or self.class_depends_on(source, target)
+        ):
             self.copy_attributes(source, target, ext)
 
     def expand_attribute_group(self, target: Class, attr: Attr):

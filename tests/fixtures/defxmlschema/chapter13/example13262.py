@@ -6,8 +6,8 @@ from typing import Optional
 class LegalDerivedType:
     """
     :ivar a:
-    :ivar datypic_com_ord_element:
     :ivar datypic_com_prod_element:
+    :ivar datypic_com_ord_element:
     """
     a: Optional[str] = field(
         default=None,
@@ -17,19 +17,19 @@ class LegalDerivedType:
             namespace=""
         )
     )
-    datypic_com_ord_element: Optional[object] = field(
-        default=None,
-        metadata=dict(
-            type="Any",
-            namespace="http://datypic.com/prod http://datypic.com/ord",
-            required=True
-        )
-    )
     datypic_com_prod_element: Optional[object] = field(
         default=None,
         metadata=dict(
             type="Any",
             namespace="http://datypic.com/prod",
+            required=True
+        )
+    )
+    datypic_com_ord_element: Optional[object] = field(
+        default=None,
+        metadata=dict(
+            type="Any",
+            namespace="http://datypic.com/prod http://datypic.com/ord",
             required=True
         )
     )

@@ -1,3 +1,5 @@
+import sys
+
 from tests.factories import AttrFactory
 from tests.factories import FactoryTestCase
 from xsdata.models.codegen import Restrictions
@@ -60,6 +62,13 @@ class AttrTests(FactoryTestCase):
 
         attr.restrictions.min_occurs = 1
         self.assertFalse(attr.is_optional)
+
+    def test_property_is_suffix(self):
+        attr = AttrFactory.create()
+        self.assertFalse(attr.is_suffix)
+
+        attr.index = sys.maxsize
+        self.assertTrue(attr.is_suffix)
 
     def test_property_is_xsi_type(self):
 

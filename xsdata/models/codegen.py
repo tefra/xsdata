@@ -1,3 +1,4 @@
+import sys
 from dataclasses import asdict
 from dataclasses import dataclass
 from dataclasses import field
@@ -168,6 +169,10 @@ class Attr:
         return self.restrictions.is_optional
 
     @property
+    def is_suffix(self):
+        return self.index == sys.maxsize
+
+    @property
     def is_xsi_type(self):
         return (
             QNames.XSI_TYPE.namespace == self.namespace
@@ -212,6 +217,10 @@ class Class:
     inner: List["Class"] = field(default_factory=list)
     nsmap: Dict = field(default_factory=dict)
     source_namespace: Optional[str] = field(default=None)
+
+    @property
+    def has_suffix_attr(self):
+        return any(attr.is_suffix for attr in self.attrs)
 
     @property
     def is_common(self):

@@ -14,6 +14,7 @@ from lxml.etree import QName
 from xsdata.models.elements import ComplexType
 from xsdata.models.elements import Element
 from xsdata.models.enums import DataType
+from xsdata.models.enums import QNames
 from xsdata.models.enums import TagType
 from xsdata.models.mixins import ElementBase
 from xsdata.utils import text
@@ -165,6 +166,13 @@ class Attr:
     @property
     def is_optional(self):
         return self.restrictions.is_optional
+
+    @property
+    def is_xsi_type(self):
+        return (
+            QNames.XSI_TYPE.namespace == self.namespace
+            and QNames.XSI_TYPE.localname == text.suffix(self.name).lower()
+        )
 
     def clone(self, **kwargs) -> "Attr":
         return replace(

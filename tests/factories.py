@@ -16,6 +16,7 @@ from xsdata.models.elements import Restriction
 from xsdata.models.elements import SimpleType
 from xsdata.models.enums import DataType
 from xsdata.models.enums import Namespace
+from xsdata.models.enums import QNames
 from xsdata.models.enums import TagType
 
 NSMAP = {ns.prefix: ns.uri for ns in Namespace}
@@ -282,6 +283,13 @@ class AttrFactory(Factory):
     @classmethod
     def group(cls, **kwargs) -> Attr:
         return cls.create(local_type=TagType.GROUP, **kwargs)
+
+    @classmethod
+    def xsi_type(cls, **kwargs):
+        kwargs.update(
+            dict(name=QNames.XSI_TYPE.localname, namespace=QNames.XSI_TYPE.namespace)
+        )
+        return cls.attribute(**kwargs)
 
 
 class PackageFactory(Factory):

@@ -57,7 +57,7 @@ class ClassUtils:
         else:
             attr.restrictions.sequential = False
 
-        if attr.is_optional:
+        if attr.is_optional or attr.is_xsi_type:
             attr.fixed = False
             attr.default = None
 

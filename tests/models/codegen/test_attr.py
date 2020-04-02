@@ -1,6 +1,7 @@
 from tests.factories import AttrFactory
 from tests.factories import FactoryTestCase
 from xsdata.models.codegen import Restrictions
+from xsdata.models.enums import Namespace
 
 
 class AttrTests(FactoryTestCase):
@@ -59,3 +60,20 @@ class AttrTests(FactoryTestCase):
 
         attr.restrictions.min_occurs = 1
         self.assertFalse(attr.is_optional)
+
+    def test_property_is_xsi_type(self):
+
+        attr = AttrFactory.create()
+        self.assertFalse(attr.is_xsi_type)
+
+        attr.namespace = Namespace.XSI.value
+        self.assertFalse(attr.is_xsi_type)
+
+        attr.name = "xsi:type"
+        self.assertTrue(attr.is_xsi_type)
+
+        attr.name = "type"
+        self.assertTrue(attr.is_xsi_type)
+
+        attr.name = "TYPE"
+        self.assertTrue(attr.is_xsi_type)

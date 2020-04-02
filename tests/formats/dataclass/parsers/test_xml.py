@@ -6,13 +6,10 @@ from unittest.case import TestCase
 from lxml.etree import Comment
 from lxml.etree import Element
 from lxml.etree import QName
-from lxml.etree import SubElement
 
 from tests.fixtures.books import BookForm
 from tests.fixtures.books import Books
-from tests.fixtures.defxmlschema.chapter04.example04052 import OrderSummary
 from tests.fixtures.defxmlschema.chapter08.example0803 import DressSize
-from tests.fixtures.defxmlschema.chapter11.example1101 import TextType
 from tests.fixtures.defxmlschema.chapter12.chapter12 import ProductType
 from xsdata.formats.dataclass.models import AnyElement
 from xsdata.formats.dataclass.models import AnyText
@@ -299,20 +296,34 @@ class XmlParserTests(TestCase):
         )
 
     @mock.patch.object(XmlParser, "emit_event")
-    @mock.patch.object(XmlParser, "fetch_class_children")
+    @mock.patch.object(XmlParser, "bind_element_wild_text")
+    @mock.patch.object(XmlParser, "bind_element_children")
     @mock.patch.object(XmlParser, "bind_element_text")
     @mock.patch.object(XmlParser, "bind_element_attrs")
     def test_dequeue_node_with_class_item(
         self,
         mock_bind_element_attrs,
         mock_bind_element_text,
-        mock_fetch_class_children,
+        mock_bind_element_children,
+        mock_bind_element_wild_text,
         mock_emit_event,
     ):
-        mock_bind_element_attrs.return_value = {"a": 1}
-        mock_bind_element_text.return_value = {"b": 2}
-        mock_fetch_class_children.return_value = {"c": 3}
+        def bind_element_attrs(x, y, z):
+            x["a"] = 1
 
+        def bind_element_text(x, y, z):
+            x["b"] = 2
+
+        def bind_element_children(x, y, z):
+            x["c"] = 3
+
+        def bind_element_wild_text(x, y, z):
+            x["d"] = 4
+
+        mock_bind_element_attrs.side_effect = bind_element_attrs
+        mock_bind_element_text.side_effect = bind_element_text
+        mock_bind_element_children.side_effect = bind_element_children
+        mock_bind_element_wild_text.side_effect = bind_element_wild_text
         element = Element("author", nsmap={"prefix": "uri"})
 
         @dataclass
@@ -320,21 +331,22 @@ class XmlParserTests(TestCase):
             a: int
             b: int
             c: int
+            d: int
 
-        queue_item = ClassQueueItem(
-            index=0, position=0, meta=self.parser.class_meta(Foo)
-        )
-        self.parser.queue.append(queue_item)
+        meta = self.parser.class_meta(Foo)
+        item = ClassQueueItem(index=0, position=0, meta=meta)
+        self.parser.queue.append(item)
 
         result = self.parser.dequeue_node(element)
-        self.assertEqual(Foo(1, 2, 3), result)
+        self.assertEqual(Foo(1, 2, 3, 4), result)
         self.assertEqual(0, len(self.parser.queue))
         self.assertEqual((QName(element.tag), result), self.parser.objects[-1])
         self.assertEqual({"prefix": "uri"}, self.parser.namespaces.ns_map)
 
-        mock_bind_element_attrs.assert_called_once_with(queue_item.meta, element)
-        mock_bind_element_text.assert_called_once_with(queue_item.meta, element)
-        mock_fetch_class_children.assert_called_once_with(queue_item, element)
+        mock_bind_element_attrs.assert_called_once_with(mock.ANY, meta, element)
+        mock_bind_element_text.assert_called_once_with(mock.ANY, meta, element)
+        mock_bind_element_children.assert_called_once_with(mock.ANY, item, element)
+        mock_bind_element_wild_text.assert_called_once_with(mock.ANY, meta, element)
         mock_emit_event.assert_called_once_with(
             EventType.END, element.tag, obj=result, element=element
         )
@@ -366,9 +378,10 @@ class XmlParserTests(TestCase):
         element.set("effDate", "2020-03-01")
         element.set("whatever", "foo")
 
-        actual = self.parser.bind_element_attrs(metadata, element)
+        params = dict()
+        self.parser.bind_element_attrs(params, metadata, element)
         expected = {"eff_date": "2020-03-02", "other_attributes": {"whatever": "foo"}}
-        self.assertEqual(expected, actual)
+        self.assertEqual(expected, params)
         mock_parse_value.assert_called_once_with(
             eff_date.types, "2020-03-01", eff_date.default,
         )
@@ -379,48 +392,33 @@ class XmlParserTests(TestCase):
         element = Element("foo")
         element.set("effDate", "2020-03-01")
 
-        actual = self.parser.bind_element_attrs(metadata, element)
-        self.assertEqual({}, actual)
+        params = dict()
+        self.parser.bind_element_attrs(params, metadata, element)
+        self.assertEqual({}, params)
 
-    def test_bind_element_text_with_no_text_and_any_var(self):
+    def test_bind_element_text_with_no_text_var(self):
         element = Element("foo")
         element.text = "foo"
 
+        params = dict()
         metadata = self.parser.class_meta(Books)
-        result = self.parser.bind_element_text(metadata, element)
-        self.assertEqual({}, result)
-
-        SubElement(element, "bar")  # skip with children
-        metadata = self.parser.class_meta(DressSize)
-        result = self.parser.bind_element_text(metadata, element)
-        self.assertEqual({}, result)
+        self.parser.bind_element_text(params, metadata, element)
+        self.assertEqual({}, params)
 
     @mock.patch.object(XmlParser, "parse_value", return_value="yes!")
     def test_bind_element_text_with_text_var(self, mock_parse_value):
         element = Element("foo")
-
+        params = dict()
         metadata = self.parser.class_meta(DressSize)
-        result = self.parser.bind_element_text(metadata, element)
-        self.assertEqual({}, result)
+        self.parser.bind_element_text(params, metadata, element)
+        self.assertEqual({}, params)
 
         element.text = "foo"
-        result = self.parser.bind_element_text(metadata, element)
-        self.assertEqual({"value": "yes!"}, result)
+        self.parser.bind_element_text(params, metadata, element)
+        self.assertEqual({"value": "yes!"}, params)
         mock_parse_value.assert_called_once_with(
             metadata.any_text.types, element.text, metadata.any_text.default
         )
-
-    def test_bind_element_text_with_any_var(self):
-        element = Element("foo")
-        element.text = "foo"
-
-        metadata = self.parser.class_meta(TextType)  # is list and will be ignored
-        result = self.parser.bind_element_text(metadata, element)
-        self.assertEqual({}, result)
-
-        metadata = self.parser.class_meta(OrderSummary)
-        result = self.parser.bind_element_text(metadata, element)
-        self.assertEqual({"any_element": AnyText(text="foo")}, result)
 
     def test_parse_any_element(self):
         comment = Comment("foo")

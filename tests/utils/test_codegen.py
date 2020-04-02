@@ -1,3 +1,4 @@
+import sys
 from unittest import mock
 
 from lxml.etree import QName
@@ -228,7 +229,7 @@ class ClassUtilsTests(FactoryTestCase):
         )
         source = ClassFactory.create(
             attrs=[
-                AttrFactory.create(name="c"),
+                AttrFactory.create(name="c", index=sys.maxsize),
                 AttrFactory.create(name="a"),
                 AttrFactory.create(name="boo:b"),
                 AttrFactory.create(name="d"),
@@ -239,7 +240,7 @@ class ClassUtilsTests(FactoryTestCase):
 
         ClassUtils.copy_attributes(source, target, extension)
 
-        self.assertEqual(["c", "foo:a", "b", "d"], [attr.name for attr in target.attrs])
+        self.assertEqual(["foo:a", "b", "d", "c"], [attr.name for attr in target.attrs])
         mock_copy_inner_classes.assert_called_once_with(source, target)
         mock_clone_attribute.assert_has_calls(
             [

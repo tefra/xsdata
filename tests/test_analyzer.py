@@ -1,3 +1,4 @@
+import sys
 from unittest import mock
 
 from lxml.etree import QName
@@ -382,6 +383,40 @@ class ClassAnalyzerTests(FactoryTestCase):
         extension = ExtensionFactory.create()
         target = ClassFactory.create()
         source = ClassFactory.create()
+
+        self.analyzer.flatten_extension_complex(source, target, extension)
+        mock_compare_attributes.assert_called_once_with(source, target)
+        mock_copy_attributes.assert_called_once_with(source, target, extension)
+
+    @mock.patch.object(ClassAnalyzer, "copy_attributes")
+    @mock.patch.object(ClassAnalyzer, "class_depends_on")
+    @mock.patch.object(ClassAnalyzer, "compare_attributes")
+    def test_flatten_extension_complex_when_source_has_suffix_attr(
+        self, mock_compare_attributes, mock_class_depends_on_class, mock_copy_attributes
+    ):
+        mock_compare_attributes.return_value = self.analyzer.INCLUDES_SOME
+        mock_class_depends_on_class.return_value = False
+        extension = ExtensionFactory.create()
+        target = ClassFactory.create()
+        source = ClassFactory.create()
+        source.attrs.append(AttrFactory.create(index=sys.maxsize))
+
+        self.analyzer.flatten_extension_complex(source, target, extension)
+        mock_compare_attributes.assert_called_once_with(source, target)
+        mock_copy_attributes.assert_called_once_with(source, target, extension)
+
+    @mock.patch.object(ClassAnalyzer, "copy_attributes")
+    @mock.patch.object(ClassAnalyzer, "class_depends_on")
+    @mock.patch.object(ClassAnalyzer, "compare_attributes")
+    def test_flatten_extension_complex_when_target_has_suffix_attr(
+        self, mock_compare_attributes, mock_class_depends_on_class, mock_copy_attributes
+    ):
+        mock_compare_attributes.return_value = self.analyzer.INCLUDES_SOME
+        mock_class_depends_on_class.return_value = False
+        extension = ExtensionFactory.create()
+        target = ClassFactory.create()
+        source = ClassFactory.create()
+        target.attrs.append(AttrFactory.create(index=sys.maxsize))
 
         self.analyzer.flatten_extension_complex(source, target, extension)
         mock_compare_attributes.assert_called_once_with(source, target)

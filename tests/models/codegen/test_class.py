@@ -1,3 +1,5 @@
+import sys
+
 from lxml.etree import QName
 
 from tests.factories import AttrFactory
@@ -51,6 +53,18 @@ class ClassTests(FactoryTestCase):
 
         obj.nsmap["foo"] = "bar"
         self.assertEqual(QName("bar", "foo"), obj.source_qname("foo:foo"))
+
+    def test_property_has_suffix_attr(self):
+        obj = ClassFactory.create()
+
+        self.assertFalse(obj.has_suffix_attr)
+
+        obj.attrs.append(AttrFactory.create())
+        obj.attrs.append(AttrFactory.create())
+        self.assertFalse(obj.has_suffix_attr)
+
+        obj.attrs[1].index = sys.maxsize
+        self.assertTrue(obj.has_suffix_attr)
 
     def test_property_source_prefix(self):
         namespace = "http://xsdata.foo"

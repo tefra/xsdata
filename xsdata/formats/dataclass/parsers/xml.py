@@ -1,4 +1,3 @@
-from collections import defaultdict
 from dataclasses import dataclass
 from dataclasses import field
 from dataclasses import is_dataclass
@@ -170,11 +169,14 @@ class XmlParser(AbstractXmlParser, ModelInspect):
             obj.children = self.fetch_any_children(item)
             qname = item.qname
         elif isinstance(item, ClassQueueItem):
-            attr_params = self.bind_element_attrs(item.meta, element)
-            text_params = self.bind_element_text(item.meta, element)
-            child_params = self.fetch_class_children(item, element)
+            params: Dict = dict()
+            self.bind_element_attrs(params, item.meta, element)
+            self.bind_element_text(params, item.meta, element)
+            self.bind_element_children(params, item, element)
+            self.bind_element_wild_text(params, item.meta, element)
+
             qname = QName(element.tag)
-            obj = item.meta.clazz(**attr_params, **text_params, **child_params)
+            obj = item.meta.clazz(**params)
         else:  # unknown :)
             raise ParserError(f"Failed to create object from {element.tag}")
 
@@ -190,11 +192,12 @@ class XmlParser(AbstractXmlParser, ModelInspect):
         if hasattr(self, method_name):
             getattr(self, method_name)(**kwargs)
 
-    def fetch_class_children(self, item: ClassQueueItem, element: Element) -> Dict:
+    def bind_element_children(
+        self, params: Dict, item: ClassQueueItem, element: Element
+    ):
         """Return a dictionary of qualified object names and their values for
         the given queue item."""
 
-        params: Dict[str, Any] = defaultdict(list)
         while len(self.objects) > item.position:
             qname, value = self.objects.pop(item.position)
             arg = item.meta.vars[qname]
@@ -214,11 +217,6 @@ class XmlParser(AbstractXmlParser, ModelInspect):
                 else:
                     self.bind_element_wildcard_param(params, wild, qname, value)
 
-        if item.meta.mixed:
-            self.bind_element_mixed_param(params, item.meta, element)
-
-        return params
-
     def fetch_any_children(self, item: WildcardQueueItem) -> List[object]:
         children = []
         while len(self.objects) > item.position:
@@ -229,6 +227,8 @@ class XmlParser(AbstractXmlParser, ModelInspect):
     @classmethod
     def bind_element_param(cls, params: Dict, var: ClassVar, value: Any):
         if var.is_list:
+            if var.name not in params:
+                params[var.name] = list()
             params[var.name].append(value)
         elif var.name not in params:
             params[var.name] = value
@@ -257,29 +257,33 @@ class XmlParser(AbstractXmlParser, ModelInspect):
             params[var.name] = value
 
     @classmethod
-    def bind_element_mixed_param(cls, params: Dict, meta: ClassMeta, element: Element):
+    def bind_element_wild_text(cls, params, meta: ClassMeta, element: Element):
         var = meta.any_element
         if not var:
             return
 
         txt, tail = cls.element_text_and_tail(element)
+        if not txt and not tail:
+            return
+
         if var.is_list:
+            if var.name not in params:
+                params[var.name] = list()
             if text:
                 params[var.name].insert(0, txt)
             if tail:
                 params[var.name].append(tail)
         elif var.name in params:
-            if text:
-                params[var.name].text = txt
-            if tail:
-                params[var.name].tail = tail
+            params[var.name].text = txt
+            params[var.name].tail = tail
+        else:
+            params[var.name] = cls.parse_any_text(element)
 
-    def bind_element_attrs(self, metadata: ClassMeta, element: Element) -> Dict:
+    def bind_element_attrs(self, params: Dict, metadata: ClassMeta, element: Element):
         """Parse the given element's attributes and any text content and return
         a dictionary of field names and values based on the given class
         metadata."""
 
-        params: Dict = defaultdict(dict)
         wildcard = metadata.any_attribute
         for qname, value in element.attrib.items():
             var = None
@@ -288,24 +292,17 @@ class XmlParser(AbstractXmlParser, ModelInspect):
                 var = None if var.name in params or not var.is_attribute else var
 
             if not var and wildcard:
+                if wildcard.name not in params:
+                    params[wildcard.name] = dict()
                 params[wildcard.name][qname] = value
             elif var and var.init:
                 params[var.name] = self.parse_value(var.types, value, var.default)
 
-        return params
-
     @classmethod
-    def bind_element_text(cls, metadata: ClassMeta, element: Element):
-        if len(element):
-            return dict()
-
+    def bind_element_text(cls, params: Dict, metadata: ClassMeta, element: Element):
         var = metadata.any_text
         if var and element.text is not None and var.init:
-            return {var.name: cls.parse_value(var.types, element.text, var.default)}
-        var = metadata.any_element
-        if var and element.text is not None and not var.is_list:
-            return {var.name: cls.parse_any_text(element)}
-        return {}
+            params[var.name] = cls.parse_value(var.types, element.text, var.default)
 
     @classmethod
     def parse_any_element(cls, element: Element) -> Optional[AnyElement]:

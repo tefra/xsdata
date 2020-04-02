@@ -102,6 +102,11 @@ class ClassUtilsTests(FactoryTestCase):
         self.assertFalse(attr.fixed)
         self.assertIsNone(attr.default)
 
+        xsi_attr = AttrFactory.xsi_type(default="xsi:integer", fixed=True)
+        ClassUtils.sanitize_attribute(xsi_attr)
+        self.assertFalse(attr.fixed)
+        self.assertIsNone(attr.default)
+
     def test_sanitize_restrictions(self):
         restrictions = [
             Restrictions(min_occurs=0, max_occurs=0, required=True),

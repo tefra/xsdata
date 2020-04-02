@@ -37,6 +37,11 @@ class Namespace(Enum):
 __STANDARD_NAMESPACES__ = {ns.uri: ns for ns in Namespace}
 
 
+class QNames:
+    XSI_NIL = QName(Namespace.XSI.uri, "nil")
+    XSI_TYPE = QName(Namespace.XSI.uri, "type")
+
+
 class NamespaceType(Enum):
     """
     :cvar ANY: elements from any namespace is allowed

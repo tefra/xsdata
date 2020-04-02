@@ -17,10 +17,9 @@ from xsdata.formats.dataclass.models import AnyElement
 from xsdata.formats.dataclass.models import AnyText
 from xsdata.formats.dataclass.models import Namespaces
 from xsdata.models.enums import Namespace
+from xsdata.models.enums import QNames
 from xsdata.models.inspect import ClassMeta
 from xsdata.models.inspect import ClassVar
-
-XSI_NIL_QNAME = QName(Namespace.XSI.uri, "nil")
 
 
 @dataclass
@@ -138,7 +137,7 @@ class XmlSerializer(AbstractSerializer, ModelInspect):
 
     @classmethod
     def set_attribute(cls, parent: Element, key: Any, value: Any):
-        if key != XSI_NIL_QNAME or (not parent.text and len(parent) == 0):
+        if key != QNames.XSI_NIL or (not parent.text and len(parent) == 0):
             parent.set(to_xml(key), to_xml(value))
 
     @classmethod
@@ -163,7 +162,7 @@ class XmlSerializer(AbstractSerializer, ModelInspect):
     ):
         if nillable and element.text is None and len(element) == 0:
             namespaces.add(Namespace.XSI.uri, Namespace.XSI.prefix)
-            element.set(XSI_NIL_QNAME, "true")
+            element.set(QNames.XSI_NIL, "true")
 
     @classmethod
     def next_value(cls, meta: ClassMeta, obj: Any):

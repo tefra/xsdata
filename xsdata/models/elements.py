@@ -161,7 +161,13 @@ class AnyAttribute(AnnotationBase):
 
     @property
     def real_name(self) -> str:
-        return f"{self.namespace}_attributes"
+        if self.namespace is None:
+            raise SchemaValueError("Wildcards namespace can't be None.")
+
+        namespace = (
+            self.namespace[2:] if self.namespace.startswith("##") else self.namespace
+        )
+        return f"{namespace}_attributes"
 
     @property
     def real_type(self) -> Optional[str]:
@@ -424,7 +430,13 @@ class Any(AnnotationBase):
 
     @property
     def real_name(self) -> str:
-        return f"{self.namespace}_element"
+        if self.namespace is None:
+            raise SchemaValueError("Wildcards namespace can't be None.")
+
+        namespace = (
+            self.namespace[2:] if self.namespace.startswith("##") else self.namespace
+        )
+        return f"{namespace}_element"
 
     @property
     def raw_namespace(self) -> Optional[str]:

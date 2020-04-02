@@ -29,7 +29,7 @@ class AnyTests(TestCase):
 
     def test_property_real_name(self):
         obj = Any.create()
-        self.assertEqual("##any_element", obj.real_name)
+        self.assertEqual("any_element", obj.real_name)
 
         obj.namespace = "foo"
         self.assertEqual("foo_element", obj.real_name)

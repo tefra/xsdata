@@ -13,7 +13,7 @@ from xsdata.resolver import DependenciesResolver
 
 
 class DependenciesResolverTest(FactoryTestCase):
-    def setUp(self) -> None:
+    def setUp(self):
         super(DependenciesResolverTest, self).setUp()
         self.resolver = DependenciesResolver()
 

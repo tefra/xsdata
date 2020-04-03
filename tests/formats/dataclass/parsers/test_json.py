@@ -11,7 +11,7 @@ from xsdata.models.inspect import Tag
 
 
 class JsonParserTests(TestCase):
-    def setUp(self) -> None:
+    def setUp(self):
         self.data = {
             "book": [
                 {

@@ -219,7 +219,7 @@ class Class:
     extensions: List[Extension] = field(default_factory=list)
     attrs: List[Attr] = field(default_factory=list)
     inner: List["Class"] = field(default_factory=list)
-    nsmap: Dict = field(default_factory=dict)
+    ns_map: Dict = field(default_factory=dict)
     source_namespace: Optional[str] = field(default=None)
 
     @property
@@ -253,7 +253,7 @@ class Class:
         if not self.source_namespace:
             return None
 
-        for prefix, namespace in self.nsmap.items():
+        for prefix, namespace in self.ns_map.items():
             if namespace == self.source_namespace and prefix:
                 return prefix
 
@@ -311,7 +311,7 @@ class Class:
         return deps
 
     def source_qname(self, name: Optional[str] = None) -> QName:
-        return qname(name or self.name, self.nsmap, self.source_namespace)
+        return qname(name or self.name, self.ns_map, self.source_namespace)
 
 
 @dataclass

@@ -24,7 +24,7 @@
                             "tail": "shirt in\n      our catalog!",
                             "children": [],
                             "attributes": {},
-                            "nsmap": {
+                            "ns_map": {
                                 "xsi": "http://www.w3.org/2001/XMLSchema-instance",
                                 "xhtml": "http://www.w3.org/1999/xhtml",
                                 "oth": "http://example.org/oth"
@@ -36,7 +36,7 @@
                             "tail": "Note: runs large.",
                             "children": [],
                             "attributes": {},
-                            "nsmap": {
+                            "ns_map": {
                                 "xsi": "http://www.w3.org/2001/XMLSchema-instance",
                                 "xhtml": "http://www.w3.org/1999/xhtml",
                                 "oth": "http://example.org/oth"

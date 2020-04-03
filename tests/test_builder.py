@@ -31,7 +31,7 @@ from xsdata.models.enums import FormType
 
 
 class ClassBuilderTests(FactoryTestCase):
-    def setUp(self) -> None:
+    def setUp(self):
         super(ClassBuilderTests, self).setUp()
         self.schema = Schema.create(location=Path(__file__), target_namespace="builder")
         self.builder = ClassBuilder(schema=self.schema, package="tests")
@@ -98,7 +98,7 @@ class ClassBuilderTests(FactoryTestCase):
         self.schema.target_namespace = "foobar"
 
         element = Element.create(ref="foo:something")
-        element.nsmap["foo"] = "bar"
+        element.ns_map["foo"] = "bar"
 
         self.assertEqual("bar", self.builder.element_namespace(element))
 
@@ -157,7 +157,7 @@ class ClassBuilderTests(FactoryTestCase):
             abstract=True,
             nillable=True,
             namespace="foo:name",
-            nsmap=element.nsmap,
+            ns_map=element.ns_map,
             package=self.builder.package,
             module=self.schema.module,
             source_namespace=self.schema.target_namespace,
@@ -267,7 +267,7 @@ class ClassBuilderTests(FactoryTestCase):
         mock_element_namespace,
         mock_build_class_attribute_types,
     ):
-        item = ClassFactory.create(nsmap={"bar": "foo"})
+        item = ClassFactory.create(ns_map={"bar": "foo"})
 
         mock_build_class_attribute_types.return_value = AttrTypeFactory.list(
             1, name="xs:int"
@@ -281,7 +281,7 @@ class ClassBuilderTests(FactoryTestCase):
         mock_element_namespace.return_value = "http://something/common"
         mock_get_restrictions.return_value = {"required": True}
 
-        attribute = Attribute.create(default="false", index=66, nsmap={"foo": "bar"})
+        attribute = Attribute.create(default="false", index=66, ns_map={"foo": "bar"})
 
         self.builder.build_class_attribute(item, attribute, Restrictions())
         expected = AttrFactory.create(
@@ -297,7 +297,7 @@ class ClassBuilderTests(FactoryTestCase):
             restrictions=Restrictions(required=True),
         )
         self.assertEqual(expected, item.attrs[0])
-        self.assertEqual({"bar": "foo", "foo": "bar"}, item.nsmap)
+        self.assertEqual({"bar": "foo", "foo": "bar"}, item.ns_map)
         mock_build_class_attribute_types.assert_called_once_with(item, attribute)
         mock_element_namespace.assert_called_once_with(attribute)
 

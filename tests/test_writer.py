@@ -36,7 +36,7 @@ class FakeGenerator(AbstractGenerator):
 class CodeWriterTests(FactoryTestCase):
     FAKE_NAME = "fake"
 
-    def tearDown(self) -> None:
+    def tearDown(self):
         writer.generators.pop(self.FAKE_NAME, False)
 
     def test_formats(self):

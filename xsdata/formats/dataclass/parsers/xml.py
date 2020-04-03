@@ -160,7 +160,9 @@ class XmlParser(AbstractXmlParser, ModelInspect):
             return None
         elif isinstance(item, PrimitiveQueueItem):
             qname = QName(element.tag)
-            obj = self.parse_value(item.types, element.text, item.default)
+            value = element.text
+            ns_map = element.nsmap
+            obj = self.parse_value(item.types, value, item.default, ns_map)
         elif isinstance(item, WildcardQueueItem):
             obj = self.parse_any_element(element)
             if not obj:
@@ -295,13 +297,17 @@ class XmlParser(AbstractXmlParser, ModelInspect):
                     params[wildcard.name] = dict()
                 params[wildcard.name][qname] = value
             elif var and var.init:
-                params[var.name] = self.parse_value(var.types, value, var.default)
+                params[var.name] = self.parse_value(
+                    var.types, value, var.default, element.nsmap
+                )
 
     @classmethod
     def bind_element_text(cls, params: Dict, metadata: ClassMeta, element: Element):
         var = metadata.any_text
         if var and element.text is not None and var.init:
-            params[var.name] = cls.parse_value(var.types, element.text, var.default)
+            params[var.name] = cls.parse_value(
+                var.types, element.text, var.default, element.nsmap
+            )
 
     @classmethod
     def parse_any_element(cls, element: Element, qname=True) -> Optional[AnyElement]:
@@ -313,7 +319,7 @@ class XmlParser(AbstractXmlParser, ModelInspect):
                 qname=element.tag if qname else None,
                 text=txt,
                 tail=tail,
-                nsmap=element.nsmap,
+                ns_map=element.nsmap,
                 attributes=cls.parse_any_attributes(element),
             )
 

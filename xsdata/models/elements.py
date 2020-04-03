@@ -1368,7 +1368,7 @@ class Schema(SchemaLocation):
         return next(
             (
                 prefix
-                for prefix, namespace in self.nsmap.items()
+                for prefix, namespace in self.ns_map.items()
                 if namespace == self.target_namespace
             ),
             None,

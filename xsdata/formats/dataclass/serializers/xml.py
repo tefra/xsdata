@@ -117,7 +117,7 @@ class XmlSerializer(AbstractSerializer, ModelInspect):
                 else:
                     sub_element = parent
 
-                namespaces.add_all(value.nsmap)
+                namespaces.add_all(value.ns_map)
                 self.set_text(sub_element, value.text)
                 self.set_tail(sub_element, value.tail)
                 self.set_attributes(sub_element, value.attributes)
@@ -142,7 +142,7 @@ class XmlSerializer(AbstractSerializer, ModelInspect):
     @classmethod
     def set_text(cls, parent: Element, value: Any):
         value = to_xml(value)
-        if value is not None and len(value) == 0:
+        if isinstance(value, str) and len(value) == 0:
             value = None
         parent.text = value
 

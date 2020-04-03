@@ -16,6 +16,7 @@ from xml.sax.saxutils import quoteattr
 from jinja2 import Environment
 from jinja2 import FileSystemLoader
 from jinja2 import Template
+from lxml.etree import QName
 
 from xsdata.formats.converters import to_python
 from xsdata.formats.dataclass.utils import safe_snake
@@ -81,7 +82,7 @@ class PythonAbstractGenerator(AbstractGenerator, ABC):
         names = set()
         for attr in obj.attrs:
             attr.types.extend(attr_types.values())
-            attr.default = cls.attribute_default(attr)
+            attr.default = cls.attribute_default(attr, obj.ns_map)
             attr.name = cls.enumeration_name(str(attr.default).strip("\"'"))
             names.add(attr.name)
 
@@ -101,7 +102,7 @@ class PythonAbstractGenerator(AbstractGenerator, ABC):
 
         seen.clear()
         for attr in obj.attrs:
-            cls.process_attribute(attr, parents_list)
+            cls.process_attribute(obj, attr, parents_list)
             seen.add(attr.name)
 
         if len(seen) != len(obj.attrs):
@@ -114,12 +115,12 @@ class PythonAbstractGenerator(AbstractGenerator, ABC):
         extension.type.name = cls.type_name(extension.type)
 
     @classmethod
-    def process_attribute(cls, attr: Attr, parents: List[str]) -> None:
+    def process_attribute(cls, target: Class, attr: Attr, parents: List[str]):
         """Normalize attribute properties."""
         attr.name = cls.attribute_name(attr.name)
         attr.display_type = cls.attribute_display_type(attr, parents)
         attr.local_name = text.suffix(attr.local_name)
-        attr.default = cls.attribute_default(attr)
+        attr.default = cls.attribute_default(attr, target.ns_map)
 
     @classmethod
     def process_import(cls, package: Package) -> Package:
@@ -218,7 +219,7 @@ class PythonAbstractGenerator(AbstractGenerator, ABC):
         return result
 
     @classmethod
-    def attribute_default(cls, attr: Attr) -> Optional[Any]:
+    def attribute_default(cls, attr: Attr, ns_map=None) -> Optional[Any]:
         """Normalize default value/factory by the attribute type."""
         if attr.is_list:
             return "list"
@@ -234,7 +235,7 @@ class PythonAbstractGenerator(AbstractGenerator, ABC):
         }
 
         local_types = list(set(data_types.values()))
-        default_value = to_python(local_types, attr.default, in_order=False)
+        default_value = to_python(local_types, attr.default, ns_map, in_order=False)
 
         if isinstance(default_value, str):
             if DataType.NMTOKENS.code in data_types:
@@ -247,5 +248,8 @@ class PythonAbstractGenerator(AbstractGenerator, ABC):
             default_value = f"float('{default_value}')"
         elif isinstance(default_value, Decimal):
             default_value = repr(default_value)
-
+        elif isinstance(default_value, QName):
+            default_value = (
+                f'QName("{default_value.namespace}", "{default_value.localname}")'
+            )
         return default_value

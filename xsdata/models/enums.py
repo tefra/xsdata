@@ -124,7 +124,7 @@ class DataType(Enum):
     NORMALIZED_STRING = ("normalizedString", str)
     NOTATION = ("NOTATION", str)
     POSITIVE_INTEGER = ("positiveInteger", int)
-    QNAME = ("QName", str)
+    QNAME = ("QName", QName)
     SHORT = ("short", int)
     SIMPLE_DERIVATION_SET = ("simpleDerivationSet", str)
     STRING = ("string", str)

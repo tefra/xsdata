@@ -20,7 +20,7 @@ from xsdata.utils import text
 
 
 class ModelInspectTests(TestCase):
-    def setUp(self) -> None:
+    def setUp(self):
         self.inspect = ModelInspect()
         super().setUp()
 

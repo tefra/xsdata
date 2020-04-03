@@ -7,9 +7,6 @@ class DescriptionType:
     """
     :ivar www_w3_org_1999_xhtml_element:
     """
-    class Meta:
-        mixed = True
-
     www_w3_org_1999_xhtml_element: List[object] = field(
         default_factory=list,
         metadata=dict(

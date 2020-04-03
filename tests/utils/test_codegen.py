@@ -11,6 +11,7 @@ from tests.factories import FactoryTestCase
 from tests.factories import RestrictionsFactory
 from xsdata.models.codegen import AttrType
 from xsdata.models.codegen import Restrictions
+from xsdata.models.enums import DataType
 from xsdata.models.enums import TagType
 from xsdata.utils.codegen import ClassUtils
 
@@ -267,6 +268,28 @@ class ClassUtilsTests(FactoryTestCase):
         self.assertEqual(2, clone.restrictions.length)
         self.assertIsNot(attr, clone)
 
+    def test_create_mixed_attribute(self):
+        item = ClassFactory.create()
+        ClassUtils.create_mixed_attribute(item)
+        self.assertEqual(0, len(item.attrs))
+
+        item = ClassFactory.elements(2, mixed=True)
+        ClassUtils.create_mixed_attribute(item)
+        expected = AttrFactory.create(
+            name="content",
+            index=0,
+            wildcard=True,
+            types=[AttrType(name=DataType.ANY_TYPE.code, native=True)],
+            local_type=TagType.ANY,
+            namespace="##any",
+        )
+
+        self.assertEqual(expected, item.attrs[0])
+        self.assertEqual(3, len(item.attrs))
+
+        ClassUtils.create_mixed_attribute(item)
+        self.assertEqual(3, len(item.attrs))
+
     def test_create_default_attribute(self):
         extension = ExtensionFactory.create()
         item = ClassFactory.create(extensions=[extension])
@@ -293,12 +316,13 @@ class ClassUtilsTests(FactoryTestCase):
 
         ClassUtils.create_default_attribute(item, extension)
         expected = AttrFactory.create(
-            name="##any_element",
+            name="any_element",
             index=0,
             wildcard=True,
             default=None,
             types=[extension.type.clone()],
             local_type=TagType.ANY,
+            namespace="##any",
             restrictions=Restrictions(min_occurs=1, max_occurs=1, required=True),
         )
 

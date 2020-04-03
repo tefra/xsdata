@@ -8,9 +8,6 @@ class TextType:
     :ivar any_element:
     :ivar lang:
     """
-    class Meta:
-        mixed = True
-
     any_element: List[object] = field(
         default_factory=list,
         metadata=dict(

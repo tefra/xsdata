@@ -7,13 +7,10 @@ class {{ obj.name }}{{"({})".format(obj.extensions|join(', ', attribute="type.na
 {%- if help %}
 {{ help|indent(4, first=True) }}
 {%- endif -%}
-{%- if level == 0 and (obj.local_name != obj.name or obj.namespace or obj.mixed or obj.is_nillable) %}
+{%- if level == 0 and (obj.local_name != obj.name or obj.namespace or obj.is_nillable) %}
     class Meta:
         {%- if obj.local_name != obj.name %}
         name = "{{ obj.local_name }}"
-        {%- endif -%}
-        {%- if obj.mixed %}
-        mixed = True
         {%- endif -%}
         {%- if obj.is_nillable %}
         nillable = True

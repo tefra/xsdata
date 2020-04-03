@@ -36,7 +36,6 @@ class ModelInspectTests(TestCase):
             name="ItemsType",
             clazz=ItemsType,
             qname=QName("ItemsType"),
-            mixed=False,
             nillable=False,
             vars={var.qname: var},
         )
@@ -78,7 +77,6 @@ class ModelInspectTests(TestCase):
 
         result = self.inspect.class_meta(Foo)
         self.assertEqual("Foo", result.name)
-        self.assertFalse(result.mixed)
         self.assertIsNone(result.namespace)
 
     @mock.patch.object(ModelInspect, "get_type_hints", return_value=dict())

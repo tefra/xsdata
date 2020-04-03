@@ -5,13 +5,18 @@ from typing import Optional
 @dataclass
 class LetterType:
     """
+    :ivar content:
     :ivar cust_name:
     :ivar prod_name:
     :ivar prod_size:
     """
-    class Meta:
-        mixed = True
-
+    content: Optional[object] = field(
+        default=None,
+        metadata=dict(
+            type="Any",
+            namespace="##any"
+        )
+    )
     cust_name: Optional[str] = field(
         default=None,
         metadata=dict(
@@ -44,11 +49,16 @@ class LetterType:
 @dataclass
 class ExtendedLetterType(LetterType):
     """
+    :ivar content:
     :ivar prod_num:
     """
-    class Meta:
-        mixed = True
-
+    content: Optional[object] = field(
+        default=None,
+        metadata=dict(
+            type="Any",
+            namespace="##any"
+        )
+    )
     prod_num: Optional[str] = field(
         default=None,
         metadata=dict(

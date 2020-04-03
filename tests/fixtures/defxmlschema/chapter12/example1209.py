@@ -1,17 +1,22 @@
 from dataclasses import dataclass, field
-from typing import List
+from typing import List, Optional
 
 
 @dataclass
 class DescType:
     """
+    :ivar content:
     :ivar i:
     :ivar b:
     :ivar u:
     """
-    class Meta:
-        mixed = True
-
+    content: Optional[object] = field(
+        default=None,
+        metadata=dict(
+            type="Any",
+            namespace="##any"
+        )
+    )
     i: List[str] = field(
         default_factory=list,
         metadata=dict(

@@ -12,7 +12,7 @@
                         "tail": null,
                         "children": [],
                         "attributes": {},
-                        "nsmap": {
+                        "ns_map": {
                             "xsi": "http://www.w3.org/2001/XMLSchema-instance"
                         }
                     },
@@ -22,13 +22,13 @@
                         "tail": null,
                         "children": [],
                         "attributes": {},
-                        "nsmap": {
+                        "ns_map": {
                             "xsi": "http://www.w3.org/2001/XMLSchema-instance"
                         }
                     }
                 ],
                 "attributes": {},
-                "nsmap": {}
+                "ns_map": {}
             }
         }
     ],

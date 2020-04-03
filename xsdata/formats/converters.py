@@ -6,11 +6,13 @@ from typing import Any
 from typing import Callable
 from typing import Dict
 from typing import List
+from typing import Optional
 from typing import Type
 
 from lxml.etree import QName
 
 from xsdata.exceptions import ConverterError
+from xsdata.utils import text
 
 
 def sort_types(types: List[Type]):
@@ -26,7 +28,7 @@ def sort_types(types: List[Type]):
     return types
 
 
-def to_python(types: List[Type], value: Any, in_order=True) -> Any:
+def to_python(types: List[Type], value: Any, ns_map=None, in_order=True) -> Any:
     if not isinstance(value, str):
         return value
 
@@ -38,18 +40,26 @@ def to_python(types: List[Type], value: Any, in_order=True) -> Any:
             if clazz.__name__ in func_map:
                 return func_map[clazz.__name__](value)
             else:
-                return to_class(clazz, value)
+                return to_class(clazz, value, ns_map)
         except ValueError:
             pass
 
     return value
 
 
-def to_class(clazz: Any, value: Any) -> Any:
+def to_qname(value, ns_map):
+    prefix, suffix = text.split(value)
+    namespace = ns_map[prefix]
+    return QName(namespace, suffix)
+
+
+def to_class(clazz: Any, value: Any, ns_map: Optional[Dict]) -> Any:
     try:
+        if clazz is QName:
+            return to_qname(value, ns_map)
         if issubclass(clazz, Enum):
             return to_enum(clazz, value)
-        elif is_dataclass(clazz):
+        if is_dataclass(clazz):
             return clazz(value)
     except KeyError:
         raise ConverterError(f"Unhandled class type {clazz.__name__}")

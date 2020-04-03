@@ -26,8 +26,8 @@ class BaseModel:
 
     @classmethod
     def create(cls: Type[T], **kwargs) -> T:
-        if not kwargs.get("nsmap"):
-            kwargs.update({"nsmap": {"xs": Namespace.XS.uri}})
+        if not kwargs.get("ns_map"):
+            kwargs.update({"ns_map": {"xs": Namespace.XS.uri}})
 
         kwargs = {
             text.snake_case(etree.QName(key).localname): value
@@ -46,7 +46,7 @@ class BaseModel:
 class ElementBase(BaseModel):
     index: int = field(default_factory=int)
     id: Optional[str] = None
-    nsmap: Dict = field(default_factory=dict)
+    ns_map: Dict = field(default_factory=dict)
 
     @property
     def class_name(self):
@@ -150,7 +150,7 @@ class ElementBase(BaseModel):
         return next(
             (
                 prefix
-                for prefix, namespace in self.nsmap.items()
+                for prefix, namespace in self.ns_map.items()
                 if namespace == Namespace.XS.uri
             ),
             None,

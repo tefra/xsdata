@@ -8,7 +8,7 @@ from xsdata.formats.dataclass.serializers import XmlSerializer
 
 
 class XmlSerializerTests(TestCase):
-    def setUp(self) -> None:
+    def setUp(self):
         super(XmlSerializerTests, self).setUp()
         self.books = Books(
             book=[

@@ -71,7 +71,7 @@ class ClassBuilder:
             nillable=obj.is_nillable,
             type=type(obj),
             help=obj.display_help,
-            nsmap=obj.nsmap,
+            ns_map=obj.ns_map,
             source_namespace=self.schema.target_namespace,
             module=self.schema.module,
             package=self.package,
@@ -112,7 +112,7 @@ class ClassBuilder:
         prefix, suffix = text.split(name)
         native = False
         self_ref = False
-        namespace = target.nsmap.get(prefix)
+        namespace = target.ns_map.get(prefix)
 
         if Namespace.get_enum(namespace) and DataType.get_enum(suffix):
             name = suffix
@@ -148,7 +148,7 @@ class ClassBuilder:
 
         In order:
             - elements/attributes with specific target namespace
-            - prefixed elements returns the namespace from schema nsmap
+            - prefixed elements returns the namespace from schema ns_map
             - qualified elements returns the schema target namespace
             - unqualified elements return an empty string
             - unqualified attributes return None
@@ -160,7 +160,7 @@ class ClassBuilder:
 
         prefix = obj.prefix
         if prefix:
-            return obj.nsmap.get(prefix)
+            return obj.ns_map.get(prefix)
 
         if obj.is_qualified:
             return self.schema.target_namespace
@@ -211,7 +211,7 @@ class ClassBuilder:
             return
 
         name = obj.real_name
-        target.nsmap.update(obj.nsmap)
+        target.ns_map.update(obj.ns_map)
 
         target.attrs.append(
             Attr(

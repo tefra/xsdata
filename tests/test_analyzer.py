@@ -18,10 +18,10 @@ from xsdata.models.elements import SimpleType
 
 
 class ClassAnalyzerTests(FactoryTestCase):
-    def setUp(self) -> None:
+    def setUp(self):
         super(ClassAnalyzerTests, self).setUp()
         self.target_namespace = "http://namespace/target"
-        self.nsmap = {
+        self.ns_map = {
             None: "http://namespace/foobar",
             "common": "http://namespace/common",
         }

@@ -26,7 +26,7 @@ from xsdata.parser import SchemaParser
 
 
 class SchemaParserTests(TestCase):
-    def setUp(self) -> None:
+    def setUp(self):
         self.parser = SchemaParser()
         super(SchemaParserTests, self).setUp()
 
@@ -52,7 +52,7 @@ class SchemaParserTests(TestCase):
 
         self.assertIsInstance(schema, Schema)
 
-        self.assertEqual(expected_namespaces, schema.simple_types[0].nsmap)
+        self.assertEqual(expected_namespaces, schema.simple_types[0].ns_map)
         self.assertEqual(1, schema.simple_types[0].index)
         self.assertEqual(2, schema.simple_types[0].annotation.index)
         self.assertEqual(3, schema.simple_types[0].annotation.documentations[0].index)
@@ -148,7 +148,7 @@ class SchemaParserTests(TestCase):
             "xs": "http://www.w3.org/2001/XMLSchema",
             "xsi": "http://www.w3.org/2001/XMLSchema-instance",
         }
-        self.assertEqual(expected, schema.nsmap)
+        self.assertEqual(expected, schema.ns_map)
 
         element = etree.Element(
             "schema", nsmap={"foo": "bar", "not": "http://www.w3.org/2001/XMLSchema"}
@@ -163,7 +163,7 @@ class SchemaParserTests(TestCase):
         }
 
         self.parser.set_namespace_map(element, schema)
-        self.assertEqual(expected, schema.nsmap)
+        self.assertEqual(expected, schema.ns_map)
 
     def test_add_default_imports(self):
         schema = Schema.create()
@@ -173,7 +173,7 @@ class SchemaParserTests(TestCase):
         self.assertEqual(1, len(schema.imports))
 
         xsi = Namespace.XSI.value
-        schema.nsmap["foo"] = xsi
+        schema.ns_map["foo"] = xsi
         self.parser.add_default_imports(schema)
         self.assertEqual(2, len(schema.imports))
         self.assertEqual(Import.create(namespace=xsi), schema.imports[0])

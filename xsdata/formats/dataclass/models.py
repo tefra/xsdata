@@ -19,7 +19,7 @@ class AnyElement:
     attributes: Dict = field(
         default_factory=dict, metadata=dict(name="attributes", type="AnyAttribute")
     )
-    nsmap: Dict = field(default_factory=dict)
+    ns_map: Dict = field(default_factory=dict)
 
 
 @dataclass

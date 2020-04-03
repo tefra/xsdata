@@ -356,6 +356,8 @@ class ClassAnalyzer(ClassUtils):
             if source is None:
                 attr_type.self_ref = self.attr_depends_on(attr_type, target)
                 types.append(attr_type)
+            elif self.is_qname(source):
+                types.append(source.extensions[0].type.clone())
             elif source.is_enumeration:
                 types.append(attr_type)
             elif len(source.attrs) == 1:

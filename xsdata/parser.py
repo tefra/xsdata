@@ -4,6 +4,7 @@ from dataclasses import field
 from pathlib import Path
 from typing import Any
 from typing import Callable
+from typing import Dict
 from typing import List
 from typing import Optional
 from typing import Type
@@ -17,6 +18,7 @@ from xsdata.models import elements as xsd
 from xsdata.models.enums import FormType
 from xsdata.models.enums import Mode
 from xsdata.models.enums import Namespace
+from xsdata.models.mixins import ElementBase
 from xsdata.utils import text
 
 T = TypeVar("T")
@@ -94,12 +96,12 @@ class SchemaParser(XmlParser):
         self.set_namespace_map(element, obj)
 
     @staticmethod
-    def set_namespace_map(element, obj):
-        obj.nsmap = element.nsmap
-        namespaces = obj.nsmap.values()
+    def set_namespace_map(element: etree.Element, obj: ElementBase):
+        obj.ns_map = element.nsmap
+        namespaces = obj.ns_map.values()
         for namespace in Namespace:
             if namespace.uri not in namespaces:
-                obj.nsmap[namespace.prefix] = namespace.uri
+                obj.ns_map[namespace.prefix] = namespace.uri
 
     @staticmethod
     def add_default_imports(obj: xsd.Schema):
@@ -107,7 +109,7 @@ class SchemaParser(XmlParser):
         declared and."""
         imp_namespaces = [imp.namespace for imp in obj.imports]
         xsi_ns = Namespace.XSI.value
-        if xsi_ns in obj.nsmap.values() and xsi_ns not in imp_namespaces:
+        if xsi_ns in obj.ns_map.values() and xsi_ns not in imp_namespaces:
             obj.imports.insert(0, xsd.Import.create(namespace=xsi_ns))
 
     def resolve_schemas_locations(self, obj: xsd.Schema):
@@ -201,10 +203,16 @@ class SchemaParser(XmlParser):
             self.resolve_schemas_locations(obj)
 
     @classmethod
-    def parse_value(cls, types: List[Type], value: Any, default: Any = None) -> Any:
+    def parse_value(
+        cls,
+        types: List[Type],
+        value: Any,
+        default: Any = None,
+        ns_map: Optional[Dict] = None,
+    ) -> Any:
         if int in types and value == "unbounded":
             return sys.maxsize
         try:
-            return super().parse_value(types, value, default)
+            return super().parse_value(types, value, default, ns_map)
         except ValueError:
             return str(value)

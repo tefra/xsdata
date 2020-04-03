@@ -8,6 +8,7 @@ from tests.factories import FactoryTestCase
 from tests.factories import PackageFactory
 from xsdata.formats.generators import AbstractGenerator
 from xsdata.formats.generators import PythonAbstractGenerator as generator
+from xsdata.models.enums import Namespace
 from xsdata.models.enums import TagType
 
 
@@ -125,7 +126,7 @@ class PythonAbstractGeneratorTests(FactoryTestCase):
         obj = ClassFactory.elements(3)
         generator.process_attributes(obj, ["a", "b"])
         mock_process_attribute.assert_has_calls(
-            [mock.call(attr, ["a", "b"]) for attr in obj.attrs]
+            [mock.call(obj, attr, ["a", "b"]) for attr in obj.attrs]
         )
 
     def test_process_attributes_prevent_duplicates(self):
@@ -165,24 +166,29 @@ class PythonAbstractGeneratorTests(FactoryTestCase):
     @mock.patch.object(generator, "attribute_display_type", return_value="rab")
     @mock.patch.object(generator, "attribute_name", return_value="oof")
     def test_process_attribute(
-        self, mock_name, mock_display_type, mock_default, mock_suffix
+        self,
+        mock_attribute_name,
+        mock_attribute_display_type,
+        mock_attribute_default,
+        mock_text_suffix,
     ):
         type_bar = AttrTypeFactory.create(name="bar")
+        target = ClassFactory.create()
         attr = AttrFactory.create(name="foo", types=[type_bar], default="thug")
 
         self.assertIsNone(attr.display_type)
 
-        generator.process_attribute(attr, ["a", "b"])
+        generator.process_attribute(target, attr, ["a", "b"])
 
         self.assertEqual("oof", attr.name)
         self.assertEqual("rab", attr.display_type)
         self.assertEqual("nope", attr.local_name)
         self.assertEqual("life", attr.default)
 
-        mock_name.assert_called_once_with("foo")
-        mock_display_type.assert_called_once_with(attr, ["a", "b"])
-        mock_default.assert_called_once_with(attr)
-        mock_suffix.assert_called_once_with("foo")
+        mock_attribute_name.assert_called_once_with("foo")
+        mock_attribute_display_type.assert_called_once_with(attr, ["a", "b"])
+        mock_attribute_default.assert_called_once_with(attr, target.ns_map)
+        mock_text_suffix.assert_called_once_with("foo")
 
     def test_process_import(self):
         package = PackageFactory.create(
@@ -276,6 +282,7 @@ class PythonAbstractGeneratorTests(FactoryTestCase):
         type_float = AttrTypeFactory.xs_float()
         type_decimal = AttrTypeFactory.xs_decimal()
         type_bool = AttrTypeFactory.xs_bool()
+        type_qname = AttrTypeFactory.xs_qname()
 
         attr = AttrFactory.create(name="foo", types=[type_str])
         self.assertEqual(None, generator.attribute_default(attr))
@@ -321,3 +328,11 @@ class PythonAbstractGeneratorTests(FactoryTestCase):
 
         attr.default = "inf"
         self.assertEqual("Decimal('Infinity')", generator.attribute_default(attr))
+
+        ns_map = {"xs": Namespace.XS.uri}
+        attr.default = "xs:anyType"
+        attr.types = [type_qname]
+        self.assertEqual(
+            'QName("http://www.w3.org/2001/XMLSchema", "anyType")',
+            generator.attribute_default(attr, ns_map),
+        )

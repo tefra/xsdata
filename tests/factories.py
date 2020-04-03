@@ -23,7 +23,7 @@ NSMAP = {ns.prefix: ns.uri for ns in Namespace}
 
 
 class FactoryTestCase(unittest.TestCase):
-    def setUp(self) -> None:
+    def setUp(self):
         super(FactoryTestCase, self).setUp()
         ClassFactory.reset()
         AttrFactory.reset()
@@ -75,7 +75,7 @@ class ClassFactory(Factory):
         substitutions=None,
         attrs=None,
         inner=None,
-        nsmap=None,
+        ns_map=None,
         package="foo",
         module="tests",
     ):
@@ -96,7 +96,7 @@ class ClassFactory(Factory):
             help=help,
             package=package,
             module=module,
-            nsmap=nsmap if isinstance(nsmap, dict) else NSMAP,
+            ns_map=ns_map if isinstance(ns_map, dict) else NSMAP,
         )
 
     @classmethod
@@ -214,6 +214,10 @@ class AttrTypeFactory(Factory):
     @classmethod
     def xs_qmap(cls):
         return cls.create(name=DataType.QMAP.code, native=True)
+
+    @classmethod
+    def xs_qname(cls):
+        return cls.create(name=DataType.QNAME.code, native=True)
 
 
 class AttrFactory(Factory):

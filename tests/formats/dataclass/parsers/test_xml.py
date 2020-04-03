@@ -25,7 +25,7 @@ from xsdata.models.inspect import Tag
 
 
 class XmlParserTests(TestCase):
-    def setUp(self) -> None:
+    def setUp(self):
         self.parser = XmlParser()
         self.parser.index = 10
         self.parser.objects = [(QName(x), x) for x in "abcde"]
@@ -261,7 +261,7 @@ class XmlParserTests(TestCase):
         self.assertEqual((QName(element.tag), result), self.parser.objects[-1])
         self.assertEqual({"prefix": "uri"}, self.parser.namespaces.ns_map)
         mock_parse_value.assert_called_once_with(
-            queue_item.types, element.text, queue_item.default
+            queue_item.types, element.text, queue_item.default, element.nsmap
         )
         mock_emit_event.assert_called_once_with(
             EventType.END, element.tag, obj=result, element=element
@@ -382,7 +382,7 @@ class XmlParserTests(TestCase):
         expected = {"eff_date": "2020-03-02", "other_attributes": {"whatever": "foo"}}
         self.assertEqual(expected, params)
         mock_parse_value.assert_called_once_with(
-            eff_date.types, "2020-03-01", eff_date.default,
+            eff_date.types, "2020-03-01", eff_date.default, element.nsmap
         )
 
     def test_bind_elements_attrs_ignore_init_false_vars(self):
@@ -416,7 +416,10 @@ class XmlParserTests(TestCase):
         self.parser.bind_element_text(params, metadata, element)
         self.assertEqual({"value": "yes!"}, params)
         mock_parse_value.assert_called_once_with(
-            metadata.any_text.types, element.text, metadata.any_text.default
+            metadata.any_text.types,
+            element.text,
+            metadata.any_text.default,
+            element.nsmap,
         )
 
     def test_parse_any_element(self):
@@ -442,7 +445,7 @@ class XmlParserTests(TestCase):
                 "b": "2",
                 QName(Namespace.XSI.uri, "type"): QName(Namespace.XS.uri, "float"),
             },
-            nsmap=element.nsmap,
+            ns_map=element.nsmap,
         )
         self.assertEqual(expected, actual)
         actual = XmlParser.parse_any_element(element, False)
@@ -469,7 +472,7 @@ class XmlParserTests(TestCase):
 
 
 class XmlParserIntegrationTest(TestCase):
-    def setUp(self) -> None:
+    def setUp(self):
         super(XmlParserIntegrationTest, self).setUp()
         self.books = Books(
             book=[

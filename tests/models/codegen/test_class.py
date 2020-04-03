@@ -49,9 +49,9 @@ class ClassTests(FactoryTestCase):
         self.assertEqual(QName(obj.source_namespace, obj.name), obj.source_qname())
 
         self.assertEqual(QName("x", "x").text, obj.source_qname("x:x").text)
-        self.assertNotIn("x", obj.nsmap)
+        self.assertNotIn("x", obj.ns_map)
 
-        obj.nsmap["foo"] = "bar"
+        obj.ns_map["foo"] = "bar"
         self.assertEqual(QName("bar", "foo"), obj.source_qname("foo:foo"))
 
     def test_property_has_suffix_attr(self):
@@ -79,7 +79,7 @@ class ClassTests(FactoryTestCase):
 
     def test_property_source_prefix(self):
         namespace = "http://xsdata.foo"
-        obj = ClassFactory.create(nsmap={None: namespace}, source_namespace=namespace)
+        obj = ClassFactory.create(ns_map={None: namespace}, source_namespace=namespace)
 
         self.assertIsNone(obj.source_prefix)
 
@@ -89,6 +89,6 @@ class ClassTests(FactoryTestCase):
         obj.source_namespace = "tns"
         self.assertEqual("tns", obj.source_prefix)
 
-        obj.nsmap["foo"] = namespace
+        obj.ns_map["foo"] = namespace
         obj.source_namespace = namespace
         self.assertEqual("foo", obj.source_prefix)

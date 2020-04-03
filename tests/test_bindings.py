@@ -18,7 +18,7 @@ class AbstractParserTests(TestCase):
         self.assertIsNone(AbstractParser.parse_value([int], None, lambda: 1))
 
         self.assertTrue(2, AbstractParser.parse_value([int], "1", None))
-        mock_to_python.assert_called_once_with([int], "1")
+        mock_to_python.assert_called_once_with([int], "1", None)
 
 
 class XmlParser(AbstractXmlParser):

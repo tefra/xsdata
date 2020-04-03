@@ -87,7 +87,6 @@ class ClassMeta:
     name: str
     clazz: Type
     qname: QName
-    mixed: bool
     nillable: bool
     vars: Dict[QName, ClassVar]
 

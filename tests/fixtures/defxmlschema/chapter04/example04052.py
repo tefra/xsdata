@@ -15,6 +15,7 @@ class OrderSummary:
         default=None,
         metadata=dict(
             type="Any",
+            namespace="##any",
             required=True
         )
     )

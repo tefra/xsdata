@@ -38,7 +38,6 @@ class ModelInspect:
                 meta = None
 
             name = getattr(meta, "name", self.name_generator(clazz.__name__))
-            mixed = getattr(meta, "mixed", False)
             nillable = getattr(meta, "nillable", False)
             namespace = getattr(meta, "namespace", parent_ns)
 
@@ -46,7 +45,6 @@ class ModelInspect:
                 name=name,
                 clazz=clazz,
                 qname=QName(namespace, name),
-                mixed=mixed,
                 nillable=nillable,
                 vars={arg.qname: arg for arg in self.get_type_hints(clazz, namespace)},
             )

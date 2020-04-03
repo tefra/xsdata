@@ -70,6 +70,13 @@ class AttrTests(FactoryTestCase):
         attr.index = sys.maxsize
         self.assertTrue(attr.is_suffix)
 
+    def test_property_is_wild_attr(self):
+        attr = AttrFactory.create()
+        self.assertFalse(attr.is_wild)
+
+        attr = AttrFactory.any()
+        self.assertTrue(attr.is_wild)
+
     def test_property_is_xsi_type(self):
 
         attr = AttrFactory.create()

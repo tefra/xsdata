@@ -181,6 +181,7 @@ class ClassAnalyzerTests(FactoryTestCase):
         mock_flatten_class.assert_called_once_with(class_a)
 
     @mock.patch.object(ClassAnalyzer, "merge_duplicate_attributes")
+    @mock.patch.object(ClassAnalyzer, "create_mixed_attribute")
     @mock.patch.object(ClassAnalyzer, "add_substitution_attrs")
     @mock.patch.object(ClassAnalyzer, "flatten_attribute_types")
     @mock.patch.object(ClassAnalyzer, "flatten_extension")
@@ -193,6 +194,7 @@ class ClassAnalyzerTests(FactoryTestCase):
         mock_flatten_extension,
         mock_flatten_attribute_types,
         mock_add_substitution_attrs,
+        mock_create_mixed_attribute,
         mock_merge_duplicate_attributes,
     ):
         inner = ClassFactory.list(2)
@@ -222,6 +224,10 @@ class ClassAnalyzerTests(FactoryTestCase):
 
         mock_add_substitution_attrs.assert_has_calls(
             [mock.call(target, target.attrs[0]), mock.call(target, target.attrs[1])]
+        )
+
+        mock_create_mixed_attribute.assert_has_calls(
+            [mock.call(target), mock.call(inner[0]), mock.call(inner[1])]
         )
 
         mock_merge_duplicate_attributes.assert_has_calls(

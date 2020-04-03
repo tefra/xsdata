@@ -173,6 +173,10 @@ class Attr:
         return self.index == sys.maxsize
 
     @property
+    def is_wild(self):
+        return self.local_type in (TagType.ANY_ATTRIBUTE, TagType.ANY)
+
+    @property
     def is_xsi_type(self):
         return (
             QNames.XSI_TYPE.namespace == self.namespace
@@ -221,6 +225,10 @@ class Class:
     @property
     def has_suffix_attr(self):
         return any(attr.is_suffix for attr in self.attrs)
+
+    @property
+    def has_wild_attr(self):
+        return any(attr.is_wild for attr in self.attrs)
 
     @property
     def is_common(self):

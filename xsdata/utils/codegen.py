@@ -10,6 +10,7 @@ from xsdata.models.codegen import Class
 from xsdata.models.codegen import Extension
 from xsdata.models.codegen import Restrictions
 from xsdata.models.enums import DataType
+from xsdata.models.enums import NamespaceType
 from xsdata.models.enums import TagType
 from xsdata.utils import text
 
@@ -187,16 +188,33 @@ class ClassUtils:
                 target.inner.append(inner)
 
     @classmethod
+    def create_mixed_attribute(cls, target: Class):
+        if not target.mixed or target.has_wild_attr:
+            return
+
+        attr = Attr(
+            name="content",
+            local_name="content",
+            index=0,
+            wildcard=True,
+            types=[AttrType(name=DataType.ANY_TYPE.code, native=True)],
+            local_type=TagType.ANY,
+            namespace=NamespaceType.ANY.value,
+        )
+        target.attrs.insert(0, attr)
+
+    @classmethod
     def create_default_attribute(cls, item: Class, extension: Extension):
         if extension.type.native_code == DataType.ANY_TYPE.code:
             attr = Attr(
-                name="##any_element",
-                local_name="##any_element",
+                name="any_element",
+                local_name="any_element",
                 index=0,
                 wildcard=True,
                 default=list if extension.restrictions.is_list else None,
                 types=[extension.type.clone()],
                 local_type=TagType.ANY,
+                namespace=NamespaceType.ANY.value,
                 restrictions=extension.restrictions.clone(),
             )
         else:

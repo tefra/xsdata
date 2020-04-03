@@ -206,6 +206,8 @@ class ClassAnalyzer(ClassUtils):
 
         self.merge_duplicate_attributes(target)
 
+        self.create_mixed_attribute(target)
+
         for inner in target.inner:
             if id(inner) not in self.processed:
                 self.flatten_class(inner)

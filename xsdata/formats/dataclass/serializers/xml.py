@@ -14,7 +14,6 @@ from xsdata.formats.bindings import AbstractSerializer
 from xsdata.formats.converters import to_xml
 from xsdata.formats.dataclass.mixins import ModelInspect
 from xsdata.formats.dataclass.models import AnyElement
-from xsdata.formats.dataclass.models import AnyText
 from xsdata.formats.dataclass.models import Namespaces
 from xsdata.models.enums import Namespace
 from xsdata.models.enums import QNames
@@ -112,24 +111,19 @@ class XmlSerializer(AbstractSerializer, ModelInspect):
                     self.set_tail(parent, value)
                 else:
                     self.set_text(parent, value)
-            elif isinstance(value, AnyText):
-                namespaces.add_all(value.nsmap)
-                self.set_text(parent, value.text)
-                self.set_attributes(parent, value.attributes)
-            elif isinstance(value, AnyElement) and value.qname:
-                qname = QName(value.qname)
-                namespaces.add(qname.namespace)
+            elif isinstance(value, AnyElement):
+                if value.qname:
+                    sub_element = SubElement(parent, value.qname)
+                else:
+                    sub_element = parent
 
-                sub_element = SubElement(parent, qname)
+                namespaces.add_all(value.nsmap)
                 self.set_text(sub_element, value.text)
                 self.set_tail(sub_element, value.tail)
                 self.set_attributes(sub_element, value.attributes)
                 for child in value.children:
                     self.render_sub_nodes(sub_element, child, var, namespaces)
                     self.set_nil_attribute(parent, var.nillable, namespaces)
-            elif isinstance(value, AnyElement) and not value.qname:
-                for child in value.children:
-                    self.render_sub_nodes(parent, child, var, namespaces)
             else:
                 sub_element = SubElement(parent, value.qname)
                 self.render_node(value, sub_element, namespaces)

@@ -16,7 +16,6 @@ from xsdata.exceptions import ParserError
 from xsdata.formats.bindings import AbstractXmlParser
 from xsdata.formats.dataclass.mixins import ModelInspect
 from xsdata.formats.dataclass.models import AnyElement
-from xsdata.formats.dataclass.models import AnyText
 from xsdata.formats.dataclass.models import Namespaces
 from xsdata.formats.dataclass.parsers.json import T
 from xsdata.logger import logger
@@ -277,7 +276,7 @@ class XmlParser(AbstractXmlParser, ModelInspect):
             params[var.name].text = txt
             params[var.name].tail = tail
         else:
-            params[var.name] = cls.parse_any_text(element)
+            params[var.name] = cls.parse_any_element(element, False)
 
     def bind_element_attrs(self, params: Dict, metadata: ClassMeta, element: Element):
         """Parse the given element's attributes and any text content and return
@@ -305,25 +304,18 @@ class XmlParser(AbstractXmlParser, ModelInspect):
             params[var.name] = cls.parse_value(var.types, element.text, var.default)
 
     @classmethod
-    def parse_any_element(cls, element: Element) -> Optional[AnyElement]:
+    def parse_any_element(cls, element: Element, qname=True) -> Optional[AnyElement]:
         if not isinstance(element.tag, str):
             return None
         else:
             txt, tail = cls.element_text_and_tail(element)
             return AnyElement(
-                qname=element.tag,
+                qname=element.tag if qname else None,
                 text=txt,
                 tail=tail,
+                nsmap=element.nsmap,
                 attributes=cls.parse_any_attributes(element),
             )
-
-    @classmethod
-    def parse_any_text(cls, element: Element) -> Optional[AnyText]:
-        return AnyText(
-            text=element.text or None,
-            nsmap=element.nsmap,
-            attributes=cls.parse_any_attributes(element),
-        )
 
     @classmethod
     def parse_any_attributes(cls, element: Element):

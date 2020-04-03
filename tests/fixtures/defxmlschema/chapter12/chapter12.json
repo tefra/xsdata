@@ -23,14 +23,24 @@
                             "text": "best-selling",
                             "tail": "shirt in\n      our catalog!",
                             "children": [],
-                            "attributes": {}
+                            "attributes": {},
+                            "nsmap": {
+                                "xsi": "http://www.w3.org/2001/XMLSchema-instance",
+                                "xhtml": "http://www.w3.org/1999/xhtml",
+                                "oth": "http://example.org/oth"
+                            }
                         },
                         {
                             "qname": "{http://www.w3.org/1999/xhtml}br",
                             "text": null,
                             "tail": "Note: runs large.",
                             "children": [],
-                            "attributes": {}
+                            "attributes": {},
+                            "nsmap": {
+                                "xsi": "http://www.w3.org/2001/XMLSchema-instance",
+                                "xhtml": "http://www.w3.org/1999/xhtml",
+                                "oth": "http://example.org/oth"
+                            }
                         }
                     ]
                 }

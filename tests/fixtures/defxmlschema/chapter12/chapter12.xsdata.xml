@@ -1,14 +1,14 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<items xmlns:ns0="http://www.w3.org/1999/xhtml">
+<items xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:oth="http://example.org/oth">
   <shirt effDate="2002-04-02">
     <number>557</number>
     <name>Short-Sleeved Linen Blouse</name>
     <size system="US-DRESS">10</size>
     <color value="blue"/>
-    <description>This shirt is the<ns0:b>best-selling</ns0:b>shirt in
-      our catalog!<ns0:br/>Note: runs large.</description>
+    <description>This shirt is the<xhtml:b>best-selling</xhtml:b>shirt in
+      our catalog!<xhtml:br/>Note: runs large.</description>
   </shirt>
-  <hat xmlns:ns0="http://example.org/oth" effDate="1900-01-01" ns0:custom="12">
+  <hat effDate="1900-01-01" oth:custom="12">
     <number>557</number>
     <name>Ten-Gallon Hat</name>
     <color value="red"/>

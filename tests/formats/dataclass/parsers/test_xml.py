@@ -12,7 +12,6 @@ from tests.fixtures.books import Books
 from tests.fixtures.defxmlschema.chapter08.example0803 import DressSize
 from tests.fixtures.defxmlschema.chapter12.chapter12 import ProductType
 from xsdata.formats.dataclass.models import AnyElement
-from xsdata.formats.dataclass.models import AnyText
 from xsdata.formats.dataclass.parsers.xml import ClassQueueItem
 from xsdata.formats.dataclass.parsers.xml import PrimitiveQueueItem
 from xsdata.formats.dataclass.parsers.xml import SkipQueueItem
@@ -443,30 +442,11 @@ class XmlParserTests(TestCase):
                 "b": "2",
                 QName(Namespace.XSI.uri, "type"): QName(Namespace.XS.uri, "float"),
             },
-        )
-        self.assertEqual(expected, actual)
-
-    def test_parse_any_text(self):
-        element = Element("foo")
-        element.set("a", "1")
-        element.set("b", "2")
-        element.set(
-            QName(Namespace.XSI.uri, "type").text, QName(Namespace.XS.uri, "float").text
-        )
-        element.text = "yes"
-        element.tail = "no"
-
-        actual = XmlParser.parse_any_text(element)
-        expected = AnyText(
-            text="yes",
             nsmap=element.nsmap,
-            attributes={
-                "a": "1",
-                "b": "2",
-                QName(Namespace.XSI.uri, "type"): QName(Namespace.XS.uri, "float"),
-            },
         )
         self.assertEqual(expected, actual)
+        actual = XmlParser.parse_any_element(element, False)
+        self.assertIsNone(actual.qname)
 
     def test_element_text_and_tail(self):
         element = Element("foo")

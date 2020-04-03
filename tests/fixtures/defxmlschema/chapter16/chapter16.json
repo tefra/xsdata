@@ -11,17 +11,24 @@
                         "text": "443",
                         "tail": null,
                         "children": [],
-                        "attributes": {}
+                        "attributes": {},
+                        "nsmap": {
+                            "xsi": "http://www.w3.org/2001/XMLSchema-instance"
+                        }
                     },
                     {
                         "qname": "name",
                         "text": "Deluxe Golf Umbrella",
                         "tail": null,
                         "children": [],
-                        "attributes": {}
+                        "attributes": {},
+                        "nsmap": {
+                            "xsi": "http://www.w3.org/2001/XMLSchema-instance"
+                        }
                     }
                 ],
-                "attributes": {}
+                "attributes": {},
+                "nsmap": {}
             }
         }
     ],

@@ -29,7 +29,7 @@ class ClassAnalyzerTests(FactoryTestCase):
 
     @mock.patch.object(ClassAnalyzer, "fetch_classes_for_generation")
     @mock.patch.object(ClassAnalyzer, "flatten_classes")
-    @mock.patch.object(ClassAnalyzer, "mark_abstract_duplicate_classes")
+    @mock.patch.object(ClassAnalyzer, "update_abstract_classes")
     @mock.patch.object(ClassAnalyzer, "create_substitutions_index")
     @mock.patch.object(ClassAnalyzer, "create_class_index")
     @mock.patch.object(ClassAnalyzer, "merge_redefined_classes")
@@ -38,7 +38,7 @@ class ClassAnalyzerTests(FactoryTestCase):
         mock_merge_redefined_classes,
         mock_create_class_index,
         mock_create_substitutions_index,
-        mock_mark_abstract_duplicate_classes,
+        mock_update_abstract_classes,
         mock_flatten_classes,
         mock_fetch_classes_for_generation,
     ):
@@ -51,7 +51,7 @@ class ClassAnalyzerTests(FactoryTestCase):
         mock_merge_redefined_classes.assert_called_once_with(classes)
         mock_create_substitutions_index.assert_called_once_with(classes)
         mock_create_class_index.assert_called_once_with(classes)
-        mock_mark_abstract_duplicate_classes.assert_called_once()
+        mock_update_abstract_classes.assert_called_once()
         mock_flatten_classes.assert_called_once_with()
         mock_fetch_classes_for_generation.assert_called_once_with()
 
@@ -111,7 +111,7 @@ class ClassAnalyzerTests(FactoryTestCase):
         seven = ClassFactory.create(name="opa", type=ComplexType)
 
         self.analyzer.create_class_index([one, two, three, four, five, six, seven])
-        self.analyzer.mark_abstract_duplicate_classes()
+        self.analyzer.update_abstract_classes()
 
         self.assertTrue(one.abstract)  # Was abstract already
         self.assertFalse(two.abstract)  # Is an element

@@ -58,7 +58,7 @@ class ClassAnalyzer(ClassUtils):
 
         self.create_substitutions_index(classes)
 
-        self.mark_abstract_duplicate_classes()
+        self.update_abstract_classes()
 
         self.flatten_classes()
 
@@ -150,9 +150,9 @@ class ClassAnalyzer(ClassUtils):
                     new_ext.restrictions.merge(self_extension.restrictions)
                     winner.extensions.append(new_ext)
 
-    def mark_abstract_duplicate_classes(self):
-        """Search for groups with more than one class and mark as abstract any
-        complex type with the same name as an element."""
+    def update_abstract_classes(self):
+        """Explicitly update classes to mark them as abstract when it's
+        implied."""
         for classes in self.class_index.values():
             if len(classes) == 1:
                 continue

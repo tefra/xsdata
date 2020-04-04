@@ -100,7 +100,7 @@ class XmlParser(AbstractXmlParser, ModelInspect):
             queue_item = self.create_wildcard_queue_item(item.qname)
         elif isinstance(item, ClassQueueItem):
 
-            if item.meta.qname == qname and self.index == 0:
+            if self.index == 0:
                 queue_item = self.queue.pop()
             else:
                 var = item.meta.get_var(qname)

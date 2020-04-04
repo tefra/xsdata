@@ -13,7 +13,7 @@ from xsdata.models.codegen import AttrType
 from xsdata.models.codegen import Restrictions
 from xsdata.models.enums import DataType
 from xsdata.models.enums import TagType
-from xsdata.utils.codegen import ClassUtils
+from xsdata.utils.classes import ClassUtils
 
 
 class ClassUtilsTests(FactoryTestCase):

@@ -14,7 +14,7 @@ from xsdata.models.codegen import Class
 from xsdata.models.codegen import Extension
 from xsdata.models.enums import DataType
 from xsdata.utils import text
-from xsdata.utils.codegen import ClassUtils
+from xsdata.utils.classes import ClassUtils
 
 
 def simple_type(item: Class):

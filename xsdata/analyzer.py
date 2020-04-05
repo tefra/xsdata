@@ -242,25 +242,29 @@ class ClassAnalyzer(ClassUtils):
 
     def flatten_extension(self, target: Class, extension: Extension):
         """
-        Remove if possible the given extension for the target class.
+        Flatten target class extension based on the extension type.
 
-        If extension type is xsd native and target is not enumeration
-        create a default value attribute otherwise delegate the task to
-        the responsible handler based on the extension source type
-        complex or simple.
+        Types:
+            1. Native primitive type (int, str, float, etc)
+            2. Simple source type (simpleType, Extension)
+            3. Complex source type (ComplexType, Element)
         """
-        if extension.type.native and not target.is_enumeration:
-            return self.create_default_attribute(target, extension)
+        if extension.type.native:
+            return self.flatten_extension_native(target, extension)
 
         type_qname = target.source_qname(extension.type.name)
-        simple_source = self.find_class(type_qname)
 
+        simple_source = self.find_class(type_qname)
         if simple_source:
             return self.flatten_extension_simple(simple_source, target, extension)
 
         complex_source = self.find_class(type_qname, condition=None)
         if complex_source:
             return self.flatten_extension_complex(complex_source, target, extension)
+
+    def flatten_extension_native(self, target: Class, ext: Extension):
+        if not target.is_enumeration:
+            return self.create_default_attribute(target, ext)
 
     def flatten_extension_simple(self, source: Class, target: Class, ext: Extension):
         """

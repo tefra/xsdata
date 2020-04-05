@@ -186,10 +186,8 @@ class ClassAnalyzerTests(FactoryTestCase):
     @mock.patch.object(ClassAnalyzer, "flatten_attribute_types")
     @mock.patch.object(ClassAnalyzer, "flatten_extension")
     @mock.patch.object(ClassAnalyzer, "expand_attribute_group")
-    @mock.patch.object(ClassAnalyzer, "flatten_enumeration_unions")
     def test_flatten_class(
         self,
-        mock_flatten_enumeration_unions,
         mock_expand_attribute_group,
         mock_flatten_extension,
         mock_flatten_attribute_types,
@@ -202,10 +200,6 @@ class ClassAnalyzerTests(FactoryTestCase):
         target = ClassFactory.elements(2, inner=inner, extensions=extensions)
 
         self.analyzer.flatten_class(target)
-
-        mock_flatten_enumeration_unions.assert_has_calls(
-            [mock.call(target), mock.call(inner[0]), mock.call(inner[1])]
-        )
 
         mock_expand_attribute_group.assert_has_calls(
             [mock.call(target, target.attrs[0]), mock.call(target, target.attrs[1])]
@@ -597,37 +591,6 @@ class ClassAnalyzerTests(FactoryTestCase):
 
         self.analyzer.add_substitution_attrs(target, AttrFactory.enumeration())
         self.assertEqual(4, len(target.attrs))
-
-    @mock.patch.object(ClassAnalyzer, "find_class")
-    def test_flatten_enumeration_unions(self, mock_find_class):
-        enum_a = ClassFactory.enumeration(2)
-        enum_b = ClassFactory.enumeration(3)
-
-        mock_find_class.return_value = enum_b
-
-        obj = ClassFactory.create(
-            type=SimpleType,
-            attrs=[
-                AttrFactory.create(
-                    name="value",
-                    types=[
-                        AttrTypeFactory.create(name=enum_a.name, forward_ref=True),
-                        AttrTypeFactory.create(name=enum_b.name),
-                    ],
-                )
-            ],
-            inner=[enum_a],
-        )
-
-        self.assertFalse(obj.is_enumeration)
-
-        self.analyzer.flatten_enumeration_unions(obj)
-        self.assertTrue(obj.is_enumeration)
-        self.assertEqual(5, len(obj.attrs))
-        self.assertEqual(
-            ["attr_B", "attr_C", "attr_D", "attr_E", "attr_F"],
-            [attr.name for attr in obj.attrs],
-        )
 
     def test_merge_redefined_classes_with_unique_classes(self):
         classes = ClassFactory.list(2)

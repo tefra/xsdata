@@ -180,17 +180,15 @@ class ClassAnalyzer(ClassUtils):
         inner classes.
 
         Steps:
-            * Merge enum unions
             * Expand attribute groups
-            * Copy extensions attributes
+            * Flatten extensions
             * Flatten attribute types
+            * Add substitution attributes
             * Merge duplicate attributes
-            * Unset sequential attributes
+            * Create mixed content attribute
             * Flatten inner classes
         """
         self.processed.append(id(target))
-
-        self.flatten_enumeration_unions(target)
 
         for attr in list(target.attrs):
             self.expand_attribute_group(target, attr)
@@ -211,34 +209,6 @@ class ClassAnalyzer(ClassUtils):
         for inner in target.inner:
             if id(inner) not in self.processed:
                 self.flatten_class(inner)
-
-    def flatten_enumeration_unions(self, target: Class):
-        if not target.is_common:
-            return
-
-        if len(target.attrs) == 1 and target.attrs[0].name == "value":
-            all_enums = True
-            attrs = []
-            for attr_type in target.attrs[0].types:
-                is_enumeration = False
-                if attr_type.forward_ref and len(target.inner) == 1:
-                    if target.inner[0].is_enumeration:
-                        is_enumeration = True
-                        attrs.extend(target.inner[0].attrs)
-
-                elif not attr_type.forward_ref and not attr_type.native:
-                    type_qname = target.source_qname(attr_type.name)
-                    source = self.find_class(type_qname)
-
-                    if source is not None and source.is_enumeration:
-                        is_enumeration = True
-                        attrs.extend(source.attrs)
-
-                if not is_enumeration:
-                    all_enums = False
-
-            if all_enums:
-                target.attrs = attrs
 
     def flatten_extension(self, target: Class, extension: Extension):
         """

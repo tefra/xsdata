@@ -188,10 +188,8 @@ Example 18-6 Redefining an attribute group as a subset
    :language: xml
    :lines: 3-
 
-.. warning::
-
-    Illegal definition
-
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter18/example18061.py
+   :language: python
 
 Example 18-6.2 Redefining an attribute group as a subset
 --------------------------------------------------------
@@ -200,10 +198,8 @@ Example 18-6.2 Redefining an attribute group as a subset
    :language: xml
    :lines: 3-
 
-.. warning::
-
-    Illegal definition
-
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter18/example18062.py
+   :language: python
 
 Example 18-7 Redefining an attribute group as a superset
 --------------------------------------------------------
@@ -212,10 +208,8 @@ Example 18-7 Redefining an attribute group as a superset
    :language: xml
    :lines: 3-
 
-.. warning::
-
-    Illegal definition
-
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter18/example18071.py
+   :language: python
 
 Example 18-7.2 Redefining an attribute group as a superset
 ----------------------------------------------------------
@@ -224,10 +218,8 @@ Example 18-7.2 Redefining an attribute group as a superset
    :language: xml
    :lines: 3-
 
-.. warning::
-
-    Illegal definition
-
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter18/example18072.py
+   :language: python
 
 Example 18-8 A simple override
 ------------------------------

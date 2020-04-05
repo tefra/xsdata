@@ -3,13 +3,6 @@ from dataclasses import dataclass, field
 from typing import Optional
 
 
-class System(Enum):
-    """
-    :cvar US_DRESS:
-    """
-    US_DRESS = "US-DRESS"
-
-
 @dataclass
 class Attributes:
     """
@@ -42,10 +35,16 @@ class Attributes:
             type="Attribute"
         )
     )
-    system: Optional[System] = field(
+    system: Optional["Attributes.Type"] = field(
         default=None,
         metadata=dict(
             name="system",
             type="Attribute"
         )
     )
+
+    class Type(Enum):
+        """
+        :cvar US_DRESS:
+        """
+        US_DRESS = "US-DRESS"

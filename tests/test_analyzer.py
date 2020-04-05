@@ -234,15 +234,33 @@ class ClassAnalyzerTests(FactoryTestCase):
             [mock.call(target), mock.call(inner[0]), mock.call(inner[1])]
         )
 
-    @mock.patch.object(ClassAnalyzer, "create_default_attribute")
-    def test_flatten_extension_with_native_type_and_target_not_enumeration(
-        self, mock_create_default_attribute
-    ):
+    @mock.patch.object(ClassAnalyzer, "flatten_extension_native")
+    def test_flatten_extension_with_native_type(self, mock_flatten_extension_native):
         extension = ExtensionFactory.create(type=AttrTypeFactory.xs_string())
         target = ClassFactory.elements(1, extensions=[extension])
 
         self.analyzer.flatten_extension(target, extension)
+        mock_flatten_extension_native.assert_called_once_with(target, extension)
+
+    @mock.patch.object(ClassAnalyzer, "create_default_attribute")
+    def test_flatten_extension_native_and_target_no_enumeration(
+        self, mock_create_default_attribute
+    ):
+        extension = ExtensionFactory.create()
+        target = ClassFactory.elements(1)
+
+        self.analyzer.flatten_extension_native(target, extension)
         mock_create_default_attribute.assert_called_once_with(target, extension)
+
+    @mock.patch.object(ClassAnalyzer, "create_default_attribute")
+    def test_flatten_extension_native_and_target_enumeration(
+        self, mock_create_default_attribute
+    ):
+        extension = ExtensionFactory.create()
+        target = ClassFactory.enumeration(1)
+
+        self.analyzer.flatten_extension_native(target, extension)
+        self.assertEqual(0, mock_create_default_attribute.call_count)
 
     @mock.patch.object(ClassAnalyzer, "flatten_extension_simple")
     @mock.patch.object(ClassAnalyzer, "find_class")

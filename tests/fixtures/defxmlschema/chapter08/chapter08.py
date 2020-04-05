@@ -1,6 +1,6 @@
 from enum import Enum
 from dataclasses import dataclass, field
-from typing import List
+from typing import List, Union
 
 
 class SmlxsizeType(Enum):
@@ -11,21 +11,6 @@ class SmlxsizeType(Enum):
     :cvar SMALL:
     """
     EXTRA_LARGE = "extra large"
-    LARGE = "large"
-    MEDIUM = "medium"
-    SMALL = "small"
-
-
-class XsmlxsizeType(Enum):
-    """
-    :cvar EXTRA_LARGE:
-    :cvar EXTRA_SMALL:
-    :cvar LARGE:
-    :cvar MEDIUM:
-    :cvar SMALL:
-    """
-    EXTRA_LARGE = "extra large"
-    EXTRA_SMALL = "extra small"
     LARGE = "large"
     MEDIUM = "medium"
     SMALL = "small"
@@ -89,7 +74,7 @@ class SizesType:
             max_occurs=9223372036854775807
         )
     )
-    xsmlx_size: List[XsmlxsizeType] = field(
+    xsmlx_size: List[Union[SmlxsizeType, "SizesType.Value"]] = field(
         default_factory=list,
         metadata=dict(
             name="xsmlxSize",
@@ -99,6 +84,12 @@ class SizesType:
             max_occurs=9223372036854775807
         )
     )
+
+    class Value(Enum):
+        """
+        :cvar EXTRA_SMALL:
+        """
+        EXTRA_SMALL = "extra small"
 
 
 @dataclass

@@ -3,7 +3,6 @@ from dataclasses import dataclass
 from dataclasses import field
 from pathlib import Path
 from typing import Any
-from typing import Callable
 from typing import Dict
 from typing import List
 from typing import Optional
@@ -19,7 +18,6 @@ from xsdata.models.enums import FormType
 from xsdata.models.enums import Mode
 from xsdata.models.enums import Namespace
 from xsdata.models.mixins import ElementBase
-from xsdata.utils import text
 
 T = TypeVar("T")
 
@@ -40,7 +38,6 @@ class SchemaParser(XmlParser):
     default_attributes: Optional[str] = field(default=None)
     default_open_content: Optional[xsd.DefaultOpenContent] = field(default=None)
     schema_location: Optional[Path] = field(default=None)
-    name_generator: Callable = field(default=text.camel_case)
 
     def from_xsd_string(self, source: str) -> xsd.Schema:
         return super().from_string(source, xsd.Schema)

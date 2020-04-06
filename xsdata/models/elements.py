@@ -93,7 +93,7 @@ class Appinfo(ElementBase):
 
     source: Optional[str] = attribute()
     elements: Array[object] = array_any_element()
-    any_attribute: Optional["AnyAttribute"] = element()
+    any_attribute: Optional["AnyAttribute"] = element(name="anyAttribute")
 
 
 @dataclass
@@ -108,7 +108,7 @@ class Annotation(ElementBase):
 
     appinfo: Optional[Appinfo] = element()
     documentations: Array[Documentation] = array_element(name="documentation")
-    any_attribute: Optional["AnyAttribute"] = element()
+    any_attribute: Optional["AnyAttribute"] = element(name="anyAttribute")
 
 
 @dataclass
@@ -116,7 +116,7 @@ class AnnotationBase(ElementBase):
     """Base Class for elements that can contain annotations."""
 
     annotation: Optional[Annotation] = element()
-    any_attribute: Optional["AnyAttribute"] = element()
+    any_attribute: Optional["AnyAttribute"] = element(name="anyAttribute")
 
     @property
     def display_help(self) -> Optional[str]:
@@ -142,7 +142,7 @@ class AnyAttribute(AnnotationBase):
     """
 
     namespace: Optional[str] = attribute(default="##any")
-    process_contents: Optional[ProcessType] = attribute()
+    process_contents: Optional[ProcessType] = attribute(name="processContents")
 
     def __post_init__(self):
         self.namespace = collapse_whitespace(self.namespace)
@@ -247,8 +247,8 @@ class List(AnnotationBase):
     </list>
     """
 
-    simple_type: Optional[SimpleType] = element()
-    item_type: Optional[str] = attribute()
+    simple_type: Optional[SimpleType] = element(name="simpleType")
+    item_type: Optional[str] = attribute(name="itemType")
 
     @property
     def is_attribute(self) -> bool:
@@ -274,7 +274,7 @@ class Union(AnnotationBase):
     </union>
     """
 
-    member_types: Optional[str] = attribute()
+    member_types: Optional[str] = attribute(name="memberTypes")
     simple_types: Array[SimpleType] = array_element(name="simpleType")
 
     @property
@@ -340,7 +340,7 @@ class Attribute(AnnotationBase):
     ref: Optional[str] = attribute()
     type: Optional[str] = attribute()
     target_namespace: Optional[str] = attribute(name="targetNamespace")
-    simple_type: Optional[SimpleType] = element()
+    simple_type: Optional[SimpleType] = element(name="simpleType")
     use: Optional[UseType] = attribute(default=UseType.OPTIONAL)
 
     @property
@@ -412,10 +412,10 @@ class Any(AnnotationBase):
     </any>
     """
 
-    min_occurs: int = attribute(default=1)
-    max_occurs: int = attribute(default=1)
+    min_occurs: int = attribute(default=1, name="minOccurs")
+    max_occurs: int = attribute(default=1, name="maxOccurs")
     namespace: Optional[str] = attribute(default="##any")
-    process_contents: Optional[ProcessType] = attribute()
+    process_contents: Optional[ProcessType] = attribute(name="processContents")
 
     def __post_init__(self):
         self.namespace = collapse_whitespace(self.namespace)
@@ -464,8 +464,8 @@ class All(AnnotationBase):
     </all>
     """
 
-    min_occurs: int = attribute(default=1)
-    max_occurs: int = attribute(default=1)
+    min_occurs: int = attribute(default=1, name="minOccurs")
+    max_occurs: int = attribute(default=1, name="maxOccurs")
     any: Array[Any] = array_element(name="any")
     elements: Array["Element"] = array_element(name="element")
     groups: Array["Group"] = array_element(name="group")
@@ -486,8 +486,8 @@ class Sequence(AnnotationBase):
     </sequence>
     """
 
-    min_occurs: int = attribute(default=1)
-    max_occurs: int = attribute(default=1)
+    min_occurs: int = attribute(default=1, name="minOccurs")
+    max_occurs: int = attribute(default=1, name="maxOccurs")
     elements: Array["Element"] = array_element(name="element")
     groups: Array["Group"] = array_element(name="group")
     choices: Array["Choice"] = array_element(name="choice")
@@ -514,8 +514,8 @@ class Choice(AnnotationBase):
     </choice>
     """
 
-    min_occurs: int = attribute(default=1)
-    max_occurs: int = attribute(default=1)
+    min_occurs: int = attribute(default=1, name="minOccurs")
+    max_occurs: int = attribute(default=1, name="maxOccurs")
     elements: Array["Element"] = array_element(name="element")
     groups: Array["Group"] = array_element(name="group")
     choices: Array["Choice"] = array_element(name="choice")
@@ -545,8 +545,8 @@ class Group(AnnotationBase):
 
     name: Optional[str] = attribute()
     ref: Optional[str] = attribute()
-    min_occurs: int = attribute(default=1)
-    max_occurs: int = attribute(default=1)
+    min_occurs: int = attribute(default=1, name="minOccurs")
+    max_occurs: int = attribute(default=1, name="maxOccurs")
     all: Optional[All] = element()
     choice: Optional[Choice] = element()
     sequence: Optional[Sequence] = element()
@@ -608,7 +608,7 @@ class Extension(AnnotationBase):
     all: Optional[All] = element()
     choice: Optional[Choice] = element()
     sequence: Optional[Sequence] = element()
-    any_attribute: Optional[AnyAttribute] = element()
+    any_attribute: Optional[AnyAttribute] = element(name="anyAttribute")
     open_content: Optional[OpenContent] = element(name="openContent")
     attributes: Array[Attribute] = array_element(name="attribute")
     attribute_groups: Array[AttributeGroup] = array_element(name="attributeGroup")
@@ -857,19 +857,19 @@ class Restriction(AnnotationBase):
     asserts: Array[Assertion] = array_element(name="assert")
     assertions: Array[Assertion] = array_element(name="assertion")
     any_element: Array[object] = array_any_element()
-    min_exclusive: Optional[MinExclusive] = element()
-    min_inclusive: Optional[MinInclusive] = element()
-    min_length: Optional[MinLength] = element()
-    max_exclusive: Optional[MaxExclusive] = element()
-    max_inclusive: Optional[MaxInclusive] = element()
-    max_length: Optional[MaxLength] = element()
-    total_digits: Optional[TotalDigits] = element()
-    fraction_digits: Optional[FractionDigits] = element()
+    min_exclusive: Optional[MinExclusive] = element(name="minExclusive")
+    min_inclusive: Optional[MinInclusive] = element(name="minInclusive")
+    min_length: Optional[MinLength] = element(name="minLength")
+    max_exclusive: Optional[MaxExclusive] = element(name="maxExclusive")
+    max_inclusive: Optional[MaxInclusive] = element(name="maxInclusive")
+    max_length: Optional[MaxLength] = element(name="maxLength")
+    total_digits: Optional[TotalDigits] = element(name="totalDigits")
+    fraction_digits: Optional[FractionDigits] = element(name="fractionDigits")
     length: Optional[Length] = element()
-    white_space: Optional[WhiteSpace] = element()
+    white_space: Optional[WhiteSpace] = element(name="whiteSpace")
     patterns: Array[Pattern] = array_element(name="pattern")
-    explicit_timezone: Optional[ExplicitTimezone] = element()
-    simple_type: Optional[SimpleType] = element()
+    explicit_timezone: Optional[ExplicitTimezone] = element(name="explicitTimezone")
+    simple_type: Optional[SimpleType] = element(name="simpleType")
 
     @property
     def real_type(self) -> Optional[str]:
@@ -964,13 +964,13 @@ class ComplexType(AnnotationBase):
     name: Optional[str] = attribute()
     block: Optional[str] = attribute()
     final: Optional[str] = attribute()
-    simple_content: Optional[SimpleContent] = element()
-    complex_content: Optional[ComplexContent] = element()
+    simple_content: Optional[SimpleContent] = element(name="simpleContent")
+    complex_content: Optional[ComplexContent] = element(name="complexContent")
     group: Optional[Group] = element()
     all: Optional[All] = element()
     choice: Optional[Choice] = element()
     sequence: Optional[Sequence] = element()
-    any_attribute: Optional[AnyAttribute] = element()
+    any_attribute: Optional[AnyAttribute] = element(name="anyAttribute")
     open_content: Optional[OpenContent] = element(name="openContent")
     attributes: Array[Attribute] = array_element(name="attribute")
     attribute_groups: Array[AttributeGroup] = array_element(name="attributeGroup")
@@ -1090,8 +1090,8 @@ class Alternative(AnnotationBase):
 
     type: Optional[str] = attribute()
     test: Optional[str] = attribute()
-    simple_type: Optional[SimpleType] = element()
-    complex_type: Optional[ComplexType] = element()
+    simple_type: Optional[SimpleType] = element(name="simpleType")
+    complex_type: Optional[ComplexType] = element(name="complexType")
 
 
 @dataclass
@@ -1130,14 +1130,14 @@ class Element(AnnotationBase):
     block: Optional[str] = attribute()
     final: Optional[str] = attribute()
     target_namespace: Optional[str] = attribute(name="targetNamespace")
-    simple_type: Optional[SimpleType] = element()
-    complex_type: Optional[ComplexType] = element()
+    simple_type: Optional[SimpleType] = element(name="simpleType")
+    complex_type: Optional[ComplexType] = element(name="complexType")
     alternatives: Array[Alternative] = array_element(name="alternative")
     uniques: Array[Unique] = array_element(name="unique")
     keys: Array[Key] = array_element(name="key")
     keyrefs: Array[Keyref] = array_element(name="keyref")
-    min_occurs: int = attribute(default=1)
-    max_occurs: int = attribute(default=1)
+    min_occurs: int = attribute(default=1, name="minOccurs")
+    max_occurs: int = attribute(default=1, name="maxOccurs")
     nillable: bool = attribute(default=False)
     abstract: bool = attribute(default=False)
 
@@ -1229,7 +1229,7 @@ class Import(SchemaLocation):
     """
 
     namespace: Optional[str] = attribute()
-    schema_location: Optional[str] = attribute()
+    schema_location: Optional[str] = attribute(name="schemaLocation")
 
 
 @dataclass
@@ -1243,7 +1243,7 @@ class Include(SchemaLocation):
     </include>
     """
 
-    schema_location: Optional[str] = attribute()
+    schema_location: Optional[str] = attribute(name="schemaLocation")
 
 
 @dataclass
@@ -1257,7 +1257,7 @@ class Redefine(SchemaLocation):
     </redefine>
     """
 
-    schema_location: Optional[str] = attribute()
+    schema_location: Optional[str] = attribute(name="schemaLocation")
     simple_types: Array[SimpleType] = array_element(name="simpleType")
     complex_types: Array[ComplexType] = array_element(name="complexType")
     groups: Array[Group] = array_element(name="group")
@@ -1278,7 +1278,7 @@ class Override(SchemaLocation):
     </override>
     """
 
-    schema_location: Optional[str] = attribute()
+    schema_location: Optional[str] = attribute(name="schemaLocation")
     simple_types: Array[SimpleType] = array_element(name="simpleType")
     complex_types: Array[ComplexType] = array_element(name="complexType")
     groups: Array[Group] = array_element(name="group")
@@ -1316,14 +1316,18 @@ class Schema(SchemaLocation):
         namespace = Namespace.XS.uri
 
     target: Optional[str] = attribute()
-    block_default: Optional[str] = attribute()
+    block_default: Optional[str] = attribute(name="blockDefault")
     default_attributes: Optional[str] = attribute(name="defaultAttributes")
-    final_default: Optional[str] = attribute()
-    target_namespace: Optional[str] = attribute()
+    final_default: Optional[str] = attribute(name="finalDefault")
+    target_namespace: Optional[str] = attribute(name="targetNamespace")
     version: Optional[str] = attribute()
     xmlns: Optional[str] = attribute()
-    element_form_default: FormType = attribute(default=FormType.UNQUALIFIED)
-    attribute_form_default: FormType = attribute(default=FormType.UNQUALIFIED)
+    element_form_default: FormType = attribute(
+        default=FormType.UNQUALIFIED, name="elementFormDefault"
+    )
+    attribute_form_default: FormType = attribute(
+        default=FormType.UNQUALIFIED, name="attributeFormDefault"
+    )
     default_open_content: Optional[DefaultOpenContent] = element(
         name="defaultOpenContent"
     )

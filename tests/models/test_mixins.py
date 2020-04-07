@@ -5,6 +5,7 @@ from unittest import TestCase
 from xsdata.exceptions import SchemaValueError
 from xsdata.models.elements import ComplexType
 from xsdata.models.elements import Element
+from xsdata.models.enums import DataType
 from xsdata.models.enums import FormType
 from xsdata.models.mixins import ElementBase
 
@@ -15,6 +16,10 @@ class ElementBaseTests(TestCase):
             pass
 
         self.assertEqual("Foo", Foo().class_name)
+
+    def test_property_default_type(self):
+        element = ElementBase()
+        self.assertEqual(DataType.STRING, element.default_type)
 
     def test_property_default_value(self):
         element = ElementBase()

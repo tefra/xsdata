@@ -12,6 +12,7 @@ from typing import TypeVar
 from lxml import etree
 
 from xsdata.exceptions import SchemaValueError
+from xsdata.models.enums import DataType
 from xsdata.models.enums import FormType
 from xsdata.models.enums import Namespace
 from xsdata.utils import text
@@ -51,6 +52,10 @@ class ElementBase(BaseModel):
     @property
     def class_name(self):
         return self.__class__.__name__
+
+    @property
+    def default_type(self) -> DataType:
+        return DataType.STRING
 
     @property
     def default_value(self):

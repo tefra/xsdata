@@ -7,12 +7,17 @@ from xsdata.models.elements import Element
 from xsdata.models.elements import Length
 from xsdata.models.elements import Restriction
 from xsdata.models.elements import SimpleType
+from xsdata.models.enums import DataType
 
 
 class ElementTests(TestCase):
     def test_property_is_attribute(self):
         obj = Element.create()
         self.assertTrue(obj)
+
+    def test_property_default_type(self):
+        obj = Element.create()
+        self.assertEqual(DataType.ANY_TYPE, obj.default_type)
 
     def test_property_raw_type(self):
         obj = Element.create()

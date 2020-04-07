@@ -128,7 +128,6 @@ class Attr:
     local_type: str
     index: int = field(compare=False)
     default: Any = field(default=None, compare=False)
-    wildcard: bool = field(default=False)
     fixed: bool = field(default=False, compare=False)
     types: List[AttrType] = field(default_factory=list)
     display_type: Optional[str] = field(default=None)
@@ -173,15 +172,15 @@ class Attr:
         return self.index == sys.maxsize
 
     @property
-    def is_wild(self):
-        return self.local_type in (TagType.ANY_ATTRIBUTE, TagType.ANY)
-
-    @property
     def is_xsi_type(self):
         return (
             QNames.XSI_TYPE.namespace == self.namespace
             and QNames.XSI_TYPE.localname == text.suffix(self.name).lower()
         )
+
+    @property
+    def is_wildcard(self):
+        return self.local_type in (TagType.ANY_ATTRIBUTE, TagType.ANY)
 
     def clone(self, **kwargs) -> "Attr":
         return replace(
@@ -228,7 +227,7 @@ class Class:
 
     @property
     def has_wild_attr(self):
-        return any(attr.is_wild for attr in self.attrs)
+        return any(attr.is_wildcard for attr in self.attrs)
 
     @property
     def is_common(self):

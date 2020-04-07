@@ -585,7 +585,6 @@ class ClassAnalyzerTests(FactoryTestCase):
         self.assertEqual(2, target.attrs[0].restrictions.max_occurs)
         self.assertEqual(2, target.attrs[3].restrictions.max_occurs)
 
-        second_attr.wildcard = True
         self.analyzer.add_substitution_attrs(target, second_attr)
         self.assertEqual(4, len(target.attrs))
 

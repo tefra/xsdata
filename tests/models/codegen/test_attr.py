@@ -72,10 +72,10 @@ class AttrTests(FactoryTestCase):
 
     def test_property_is_wild_attr(self):
         attr = AttrFactory.create()
-        self.assertFalse(attr.is_wild)
+        self.assertFalse(attr.is_wildcard)
 
         attr = AttrFactory.any()
-        self.assertTrue(attr.is_wild)
+        self.assertTrue(attr.is_wildcard)
 
     def test_property_is_xsi_type(self):
 

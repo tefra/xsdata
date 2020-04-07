@@ -9,10 +9,6 @@ class AnyTests(TestCase):
         obj = Any.create()
         self.assertTrue(obj.is_attribute)
 
-    def test_property_is_wildcard(self):
-        obj = Any.create()
-        self.assertTrue(obj.is_wildcard)
-
     def test_property_real_type(self):
         obj = Any.create()
         self.assertEqual("xs:object", obj.real_type)

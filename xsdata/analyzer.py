@@ -354,7 +354,7 @@ class ClassAnalyzer(ClassUtils):
 
         Exclude enumerations and wildcard attributes.
         """
-        if attr.is_enumeration or attr.wildcard:
+        if attr.is_enumeration or attr.is_wildcard:
             return
 
         index = target.attrs.index(attr)

@@ -152,10 +152,6 @@ class AnyAttribute(AnnotationBase):
         return True
 
     @property
-    def is_wildcard(self) -> bool:
-        return True
-
-    @property
     def raw_namespace(self) -> Optional[str]:
         return self.namespace
 
@@ -422,10 +418,6 @@ class Any(AnnotationBase):
 
     @property
     def is_attribute(self) -> bool:
-        return True
-
-    @property
-    def is_wildcard(self) -> bool:
         return True
 
     @property

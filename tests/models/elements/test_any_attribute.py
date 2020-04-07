@@ -9,10 +9,6 @@ class AnyAttributeTests(TestCase):
         obj = AnyAttribute.create()
         self.assertTrue(obj.is_attribute)
 
-    def test_property_is_wildcard(self):
-        obj = AnyAttribute.create()
-        self.assertTrue(obj.is_wildcard)
-
     def test_property_raw_namespace(self):
         obj = AnyAttribute.create()
         self.assertEqual(NamespaceType.ANY.value, obj.raw_namespace)

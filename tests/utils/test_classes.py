@@ -278,7 +278,6 @@ class ClassUtilsTests(FactoryTestCase):
         expected = AttrFactory.create(
             name="content",
             index=0,
-            wildcard=True,
             types=[AttrType(name=DataType.ANY_TYPE.code, native=True)],
             local_type=TagType.ANY,
             namespace="##any",
@@ -318,7 +317,6 @@ class ClassUtilsTests(FactoryTestCase):
         expected = AttrFactory.create(
             name="any_element",
             index=0,
-            wildcard=True,
             default=None,
             types=[extension.type.clone()],
             local_type=TagType.ANY,

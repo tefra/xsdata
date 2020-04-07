@@ -83,8 +83,6 @@ class XmlSerializer(AbstractSerializer, ModelContext):
                     self.set_attribute(parent, var.qname, value)
                 elif var.is_any_attribute:
                     self.set_attributes(parent, value)
-                elif var.is_text:
-                    self.set_text(parent, value)
                 else:
                     self.render_sub_nodes(parent, value, var, namespaces)
 
@@ -102,16 +100,8 @@ class XmlSerializer(AbstractSerializer, ModelContext):
         for value in values:
             if value is None:
                 continue
-            elif not is_wildcard:
-                sub_element = SubElement(parent, var.qname)
-                self.render_node(value, sub_element, namespaces)
-                self.set_nil_attribute(sub_element, var.nillable, namespaces)
-            elif isinstance(value, str):
-                if parent.text:
-                    self.set_tail(parent, value)
-                else:
-                    self.set_text(parent, value)
-            elif isinstance(value, AnyElement):
+
+            if isinstance(value, AnyElement):
                 if value.qname:
                     sub_element = SubElement(parent, value.qname)
                 else:
@@ -124,10 +114,15 @@ class XmlSerializer(AbstractSerializer, ModelContext):
                 for child in value.children:
                     self.render_sub_nodes(sub_element, child, var, namespaces)
                     self.set_nil_attribute(parent, var.nillable, namespaces)
-            else:
-                sub_element = SubElement(parent, value.qname)
+            elif var.is_element or is_dataclass(value):
+                qname = var.qname if not is_wildcard else value.qname
+                sub_element = SubElement(parent, qname)
                 self.render_node(value, sub_element, namespaces)
                 self.set_nil_attribute(sub_element, var.nillable, namespaces)
+            elif not parent.text or var.is_text:
+                self.set_text(parent, value)
+            else:
+                self.set_tail(parent, value)
 
     @classmethod
     def set_attribute(cls, parent: Element, key: Any, value: Any):

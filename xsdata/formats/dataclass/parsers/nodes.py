@@ -48,21 +48,23 @@ class ElementNode(BaseNode):
 
     def next_node(self, qname: QName, index: int, position: int, context: ModelContext):
         var = self.meta.get_var(qname)
-        if var and var.dataclass:
+        if not var:
+            return None
+        elif var.dataclass:
             return ElementNode(
                 index=index,
                 position=position,
                 meta=context.class_meta(var.clazz, self.meta.namespace),
                 default=var.default,
             )
-        elif var and var.is_any_element:
+        elif var.is_any_element:
             return WildcardNode(index=index, position=position, qname=var.qname)
-        elif var:
+        elif var.types[0] is object:
+            return WildcardNode(index=index, position=position, qname=var.qname)
+        else:
             return PrimitiveNode(
                 index=index, position=position, types=var.types, default=var.default,
             )
-        else:
-            return None
 
 
 @dataclass(frozen=True)

@@ -98,7 +98,8 @@ class XmlParser(AbstractParser):
         item = self.queue.pop()
         qname, obj = item.parse_element(element, self.objects)
 
-        self.objects.append((qname, obj))
+        if qname:
+            self.objects.append((qname, obj))
         self.emit_event(EventType.END, element.tag, obj=obj, element=element)
         self.namespaces.add_all(element.nsmap)
         return obj

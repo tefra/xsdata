@@ -12,7 +12,7 @@ from lxml.etree import tostring
 
 from xsdata.formats.bindings import AbstractSerializer
 from xsdata.formats.converters import to_xml
-from xsdata.formats.dataclass.mixins import ModelInspect
+from xsdata.formats.dataclass.context import ModelContext
 from xsdata.formats.dataclass.models import AnyElement
 from xsdata.formats.dataclass.models import Namespaces
 from xsdata.models.enums import Namespace
@@ -22,7 +22,7 @@ from xsdata.models.inspect import ClassVar
 
 
 @dataclass
-class XmlSerializer(AbstractSerializer, ModelInspect):
+class XmlSerializer(AbstractSerializer, ModelContext):
     """
     :ivar xml_declaration: Add xml declaration
     :ivar encoding: Result text encoding

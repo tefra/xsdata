@@ -8,15 +8,16 @@ from typing import TypeVar
 
 from xsdata.exceptions import ParserError
 from xsdata.formats.bindings import AbstractParser
-from xsdata.formats.dataclass.mixins import ModelInspect
+from xsdata.formats.dataclass.context import ModelContext
 from xsdata.formats.dataclass.models import AnyElement
+from xsdata.formats.dataclass.parsers.utils import ParserUtils
 from xsdata.models.inspect import ClassVar
 
 T = TypeVar("T")
 
 
 @dataclass
-class JsonParser(AbstractParser, ModelInspect):
+class JsonParser(AbstractParser, ModelContext):
     def parse(self, source: io.BytesIO, clazz: Type[T]) -> T:
         """Parse the JSON input stream and return the resulting object tree."""
         ctx = json.load(source)
@@ -70,7 +71,7 @@ class JsonParser(AbstractParser, ModelInspect):
                 else self.parse_context(value, AnyElement)
             )
         else:
-            return self.parse_value(var.types, value, var.default)
+            return ParserUtils.parse_value(var.types, value, var.default)
 
     @staticmethod
     def get_value(data: Dict, field: ClassVar):

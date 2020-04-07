@@ -1153,6 +1153,10 @@ class Element(AnnotationBase):
             return False
 
     @property
+    def default_type(self) -> DataType:
+        return DataType.ANY_TYPE
+
+    @property
     def raw_type(self) -> Optional[str]:
         if self.type:
             return self.type

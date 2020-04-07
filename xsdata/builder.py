@@ -247,7 +247,7 @@ class ClassBuilder:
             types.append(AttrType(name=inner_class.name, forward_ref=True))
 
         if len(types) == 0:
-            types.append(AttrType(name=DataType.STRING.code, native=True))
+            types.append(AttrType(name=obj.default_type.code, native=True))
 
         return types
 

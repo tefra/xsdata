@@ -27,6 +27,7 @@ from xsdata.models.elements import Sequence
 from xsdata.models.elements import SimpleContent
 from xsdata.models.elements import SimpleType
 from xsdata.models.elements import Union
+from xsdata.models.enums import DataType
 from xsdata.models.enums import FormType
 
 
@@ -337,13 +338,15 @@ class ClassBuilderTests(FactoryTestCase):
         self.assertEqual(expected, actual)
         self.assertEqual([inner_class], item.inner)
 
+    @patch.object(Attribute, "default_type", new_callable=PropertyMock)
     @patch.object(Attribute, "real_type", new_callable=PropertyMock)
     @patch.object(ClassBuilder, "build_inner_class")
     def test_build_class_attribute_types_when_obj_has_no_types(
-        self, mock_build_inner_class, mock_real_type
+        self, mock_build_inner_class, mock_real_type, mock_default_type
     ):
         mock_real_type.return_value = None
         mock_build_inner_class.return_value = None
+        mock_default_type.return_value = DataType.STRING
 
         item = ClassFactory.create()
         attribute = Attribute.create(default="false", index=66, name="attr")

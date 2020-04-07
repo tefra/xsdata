@@ -6,12 +6,10 @@ from xsdata.models.enums import NamespaceType
 
 class AnyTests(TestCase):
     def test_property_is_attribute(self):
-        obj = Any.create()
-        self.assertTrue(obj.is_attribute)
+        self.assertTrue(Any.create().is_attribute)
 
     def test_property_real_type(self):
-        obj = Any.create()
-        self.assertEqual("xs:object", obj.real_type)
+        self.assertEqual("xs:object", Any.create().real_type)
 
     def test_property_raw_namespace(self):
         obj = Any.create()

@@ -2,16 +2,12 @@ import sys
 from dataclasses import dataclass
 from dataclasses import field
 from pathlib import Path
-from typing import Any
-from typing import Dict
-from typing import List
 from typing import Optional
-from typing import Type
 from typing import TypeVar
 
 from lxml import etree
 
-from xsdata.formats.dataclass.parsers.xml import QueueItem
+from xsdata.formats.dataclass.parsers.nodes import BaseNode
 from xsdata.formats.dataclass.parsers.xml import XmlParser
 from xsdata.models import elements as xsd
 from xsdata.models.enums import FormType
@@ -60,7 +56,7 @@ class SchemaParser(XmlParser):
         self.set_namespace_map(element, obj)
         return obj
 
-    def start_schema(self, element: etree.Element, item: QueueItem):
+    def start_schema(self, element: etree.Element, item: BaseNode):
         """Collect the schema's default form for attributes and elements for
         later usage."""
 
@@ -198,18 +194,3 @@ class SchemaParser(XmlParser):
             self.set_schema_namespaces(obj, element)
             self.add_default_imports(obj)
             self.resolve_schemas_locations(obj)
-
-    @classmethod
-    def parse_value(
-        cls,
-        types: List[Type],
-        value: Any,
-        default: Any = None,
-        ns_map: Optional[Dict] = None,
-    ) -> Any:
-        if int in types and value == "unbounded":
-            return sys.maxsize
-        try:
-            return super().parse_value(types, value, default, ns_map)
-        except ValueError:
-            return str(value)

@@ -1,3 +1,4 @@
+import sys
 from dataclasses import dataclass
 from dataclasses import field
 from pathlib import Path
@@ -40,6 +41,11 @@ def array_element(init=True, **kwargs):
 def array_any_element(init=True, **kwargs):
     kwargs.update(type=TagType.ANY, namespace=NamespaceType.ANY.value)
     return field(init=init, default_factory=list, metadata=kwargs)
+
+
+def occurrences(min_value: int, max_value: UnionType[int, str]) -> Dict[str, int]:
+    max_value = sys.maxsize if max_value == "unbounded" else int(max_value)
+    return dict(min_occurs=min_value, max_occurs=max_value)
 
 
 @dataclass(frozen=True)
@@ -409,7 +415,7 @@ class Any(AnnotationBase):
     """
 
     min_occurs: int = attribute(default=1, name="minOccurs")
-    max_occurs: int = attribute(default=1, name="maxOccurs")
+    max_occurs: UnionType[int, str] = attribute(default=1, name="maxOccurs")
     namespace: Optional[str] = attribute(default="##any")
     process_contents: Optional[ProcessType] = attribute(name="processContents")
 
@@ -441,7 +447,7 @@ class Any(AnnotationBase):
         return f"{prefix}:{suffix}" if prefix else suffix
 
     def get_restrictions(self) -> Dict[str, Anything]:
-        return {"min_occurs": self.min_occurs, "max_occurs": self.max_occurs}
+        return occurrences(self.min_occurs, self.max_occurs)
 
 
 @dataclass
@@ -457,13 +463,13 @@ class All(AnnotationBase):
     """
 
     min_occurs: int = attribute(default=1, name="minOccurs")
-    max_occurs: int = attribute(default=1, name="maxOccurs")
+    max_occurs: UnionType[int, str] = attribute(default=1, name="maxOccurs")
     any: Array[Any] = array_element(name="any")
     elements: Array["Element"] = array_element(name="element")
     groups: Array["Group"] = array_element(name="group")
 
     def get_restrictions(self) -> Dict[str, Anything]:
-        return {"min_occurs": self.min_occurs, "max_occurs": self.max_occurs}
+        return occurrences(self.min_occurs, self.max_occurs)
 
 
 @dataclass
@@ -479,7 +485,7 @@ class Sequence(AnnotationBase):
     """
 
     min_occurs: int = attribute(default=1, name="minOccurs")
-    max_occurs: int = attribute(default=1, name="maxOccurs")
+    max_occurs: UnionType[int, str] = attribute(default=1, name="maxOccurs")
     elements: Array["Element"] = array_element(name="element")
     groups: Array["Group"] = array_element(name="group")
     choices: Array["Choice"] = array_element(name="choice")
@@ -487,11 +493,9 @@ class Sequence(AnnotationBase):
     any: Array["Any"] = array_element()
 
     def get_restrictions(self) -> Dict[str, Anything]:
-        return {
-            "min_occurs": self.min_occurs,
-            "max_occurs": self.max_occurs,
-            "sequential": True,
-        }
+        restrictions = occurrences(self.min_occurs, self.max_occurs)
+        restrictions.update(dict(sequential=True))
+        return restrictions
 
 
 @dataclass
@@ -507,7 +511,7 @@ class Choice(AnnotationBase):
     """
 
     min_occurs: int = attribute(default=1, name="minOccurs")
-    max_occurs: int = attribute(default=1, name="maxOccurs")
+    max_occurs: UnionType[int, str] = attribute(default=1, name="maxOccurs")
     elements: Array["Element"] = array_element(name="element")
     groups: Array["Group"] = array_element(name="group")
     choices: Array["Choice"] = array_element(name="choice")
@@ -515,10 +519,9 @@ class Choice(AnnotationBase):
     any: Array["Any"] = array_element()
 
     def get_restrictions(self) -> Dict[str, Anything]:
-        return {
-            "min_occurs": self.min_occurs if self.min_occurs > 1 else 0,
-            "max_occurs": self.max_occurs,
-        }
+        return occurrences(
+            self.min_occurs if self.min_occurs > 1 else 0, self.max_occurs
+        )
 
 
 @dataclass
@@ -538,7 +541,7 @@ class Group(AnnotationBase):
     name: Optional[str] = attribute()
     ref: Optional[str] = attribute()
     min_occurs: int = attribute(default=1, name="minOccurs")
-    max_occurs: int = attribute(default=1, name="maxOccurs")
+    max_occurs: UnionType[int, str] = attribute(default=1, name="maxOccurs")
     all: Optional[All] = element()
     choice: Optional[Choice] = element()
     sequence: Optional[Sequence] = element()
@@ -552,7 +555,7 @@ class Group(AnnotationBase):
         return self.ref
 
     def get_restrictions(self) -> Dict[str, Anything]:
-        return {"min_occurs": self.min_occurs, "max_occurs": self.max_occurs}
+        return occurrences(self.min_occurs, self.max_occurs)
 
 
 @dataclass
@@ -1129,7 +1132,7 @@ class Element(AnnotationBase):
     keys: Array[Key] = array_element(name="key")
     keyrefs: Array[Keyref] = array_element(name="keyref")
     min_occurs: int = attribute(default=1, name="minOccurs")
-    max_occurs: int = attribute(default=1, name="maxOccurs")
+    max_occurs: UnionType[int, str] = attribute(default=1, name="maxOccurs")
     nillable: bool = attribute(default=False)
     abstract: bool = attribute(default=False)
 
@@ -1181,7 +1184,7 @@ class Element(AnnotationBase):
         return list()
 
     def get_restrictions(self) -> Dict[str, Anything]:
-        restrictions = {"min_occurs": self.min_occurs, "max_occurs": self.max_occurs}
+        restrictions = occurrences(self.min_occurs, self.max_occurs)
         if self.simple_type:
             restrictions.update(self.simple_type.get_restrictions())
         if self.nillable:

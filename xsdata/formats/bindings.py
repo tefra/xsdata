@@ -2,19 +2,8 @@ import io
 import pathlib
 from abc import ABC
 from abc import abstractmethod
-from typing import Any
-from typing import Dict
-from typing import List
-from typing import Optional
 from typing import Type
 from typing import TypeVar
-
-from lxml.etree import Element
-from lxml.etree import iterparse
-
-from xsdata.exceptions import ParserError
-from xsdata.formats.converters import to_python
-from xsdata.models.enums import EventType
 
 
 class AbstractSerializer(ABC):
@@ -42,58 +31,3 @@ class AbstractParser(ABC):
     @abstractmethod
     def parse(self, source: io.BytesIO, clazz: Type[T]) -> T:
         """Parse the input stream and return the resulting object tree."""
-
-    @classmethod
-    def parse_value(
-        cls,
-        types: List[Type],
-        value: Any,
-        default: Any = None,
-        ns_map: Optional[Dict] = None,
-    ) -> Any:
-        """Convert xml string values to s python primitive type."""
-
-        if value is None:
-            return None if callable(default) else default
-
-        return to_python(types, value, ns_map)
-
-
-class AbstractXmlParser(AbstractParser):
-    def parse(self, source: io.BytesIO, clazz: Type[T]) -> T:
-        """Parse the XML input stream and return the resulting object tree."""
-        ctx = iterparse(
-            source=source,
-            events=(EventType.START, EventType.END),
-            recover=True,
-            remove_comments=True,
-        )
-        return self.parse_context(ctx, clazz)
-
-    def parse_context(self, context: iterparse, clazz: Type[T]) -> T:
-        """
-        Dispatch elements to handlers as they arrive and are fully parsed.
-
-        :raises ValueError: When the requested type doesn't match the result object
-        """
-        obj = None
-        for event, element in context:
-            if event == EventType.START:
-                self.queue_node(element)
-            elif event == EventType.END:
-                obj = self.dequeue_node(element)
-                if obj is not None:
-                    element.clear()
-
-        if not obj or not isinstance(obj, clazz):
-            raise ParserError(f"Failed to create target class `{clazz.__name__}`")
-
-        return obj
-
-    @abstractmethod
-    def queue_node(self, element: Element):
-        """Prepare to create an object tree from the given starting element."""
-
-    @abstractmethod
-    def dequeue_node(self, element: Element) -> Optional[Type]:
-        """Create an object tree from the given fully parsed element."""

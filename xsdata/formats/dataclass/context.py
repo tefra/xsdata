@@ -24,7 +24,7 @@ from xsdata.models.inspect import Tag
 
 
 @dataclass
-class ModelInspect:
+class ModelContext:
     name_generator: Callable = field(default=lambda x: x)
     cache: Dict[Type, ClassMeta] = field(default_factory=dict)
 

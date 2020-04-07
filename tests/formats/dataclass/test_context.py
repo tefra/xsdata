@@ -12,19 +12,19 @@ from tests.fixtures.defxmlschema.chapter05.chapter05prod import ProductType
 from tests.fixtures.defxmlschema.chapter11.example1101 import TextType
 from tests.fixtures.defxmlschema.chapter13.chapter13 import ItemsType
 from xsdata.exceptions import ModelInspectionError
-from xsdata.formats.dataclass.mixins import ModelInspect
+from xsdata.formats.dataclass.context import ModelContext
 from xsdata.models.inspect import ClassMeta
 from xsdata.models.inspect import ClassVar
 from xsdata.models.inspect import Tag
 from xsdata.utils import text
 
 
-class ModelInspectTests(TestCase):
+class ModelContextTests(TestCase):
     def setUp(self):
-        self.inspect = ModelInspect()
+        self.inspect = ModelContext()
         super().setUp()
 
-    @mock.patch.object(ModelInspect, "get_type_hints")
+    @mock.patch.object(ModelContext, "get_type_hints")
     def test_class_meta_build_vars(self, mock_get_type_hints):
         var = ClassVar(
             name="foo", qname=QName("foo", "bar"), types=[int], tag=Tag.ELEMENT
@@ -43,7 +43,7 @@ class ModelInspectTests(TestCase):
         self.assertEqual(expected, result)
         mock_get_type_hints.assert_called_once_with(ItemsType, None)
 
-    @mock.patch.object(ModelInspect, "get_type_hints", return_value=dict())
+    @mock.patch.object(ModelContext, "get_type_hints", return_value=dict())
     def test_class_meta_with_meta_namespace(self, mock_get_type_hints):
         namespace = Product.Meta.namespace
         result = self.inspect.class_meta(Product, None)
@@ -51,16 +51,16 @@ class ModelInspectTests(TestCase):
         self.assertEqual(QName(namespace, "product"), result.qname)
         mock_get_type_hints.assert_called_once_with(Product, namespace)
 
-    @mock.patch.object(ModelInspect, "get_type_hints", return_value=dict())
+    @mock.patch.object(ModelContext, "get_type_hints", return_value=dict())
     def test_class_meta_with_parent_ns(self, mock_get_type_hints):
         result = self.inspect.class_meta(ProductType, "http://xsdata")
 
         self.assertEqual(QName("http://xsdata", "ProductType"), str(result.qname))
         mock_get_type_hints.assert_called_once_with(ProductType, "http://xsdata")
 
-    @mock.patch.object(ModelInspect, "get_type_hints", return_value=dict())
+    @mock.patch.object(ModelContext, "get_type_hints", return_value=dict())
     def test_class_meta_with_no_meta_name_and_name_generator(self, *args):
-        inspect = ModelInspect(name_generator=lambda x: text.snake_case(x))
+        inspect = ModelContext(name_generator=lambda x: text.snake_case(x))
         result = inspect.class_meta(ItemsType)
 
         self.assertEqual(QName("items_type"), str(result.qname))
@@ -79,7 +79,7 @@ class ModelInspectTests(TestCase):
         self.assertEqual("Foo", result.name)
         self.assertIsNone(result.namespace)
 
-    @mock.patch.object(ModelInspect, "get_type_hints", return_value=dict())
+    @mock.patch.object(ModelContext, "get_type_hints", return_value=dict())
     def test_class_meta_with_no_dataclass_raises_exception(self, *args):
         with self.assertRaises(ModelInspectionError) as cm:
             self.inspect.class_meta(int)

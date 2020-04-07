@@ -386,10 +386,3 @@ class SchemaParserTests(TestCase):
         mock_set_schema_namespaces.assert_called_once_with(schema, element)
         mock_add_default_imports.assert_called_once_with(schema)
         mock_resolve_schemas_locations.assert_called_once_with(schema)
-
-    def test_parse_value(self):
-        types = [int]
-        self.assertEqual(1, self.parser.parse_value(types, "1", None))
-        self.assertEqual(1, self.parser.parse_value(types, None, 1))
-        self.assertEqual("foo", self.parser.parse_value(types, "foo", 1))
-        self.assertEqual(sys.maxsize, self.parser.parse_value(types, "unbounded", 1))

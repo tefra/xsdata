@@ -36,9 +36,7 @@ class ElementNode(BaseNode):
         params: Dict = dict()
         ParserUtils.bind_element_attrs(params, self.meta, element)
         ParserUtils.bind_element_text(params, self.meta, element)
-        ParserUtils.bind_element_children(
-            params, self.meta, element, self.position, objects
-        )
+        ParserUtils.bind_element_children(params, self.meta, self.position, objects)
         ParserUtils.bind_element_wild_text(params, self.meta, element)
 
         qname = QName(element.tag)

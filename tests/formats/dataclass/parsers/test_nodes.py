@@ -70,7 +70,7 @@ class ElementNodeTests(TestCase):
 
         mock_bind_element_attrs.assert_called_once_with(mock.ANY, meta, ele)
         mock_bind_element_text.assert_called_once_with(mock.ANY, meta, ele)
-        mock_bind_element_children.assert_called_once_with(mock.ANY, meta, ele, 0, pool)
+        mock_bind_element_children.assert_called_once_with(mock.ANY, meta, 0, pool)
         mock_bind_element_wild_text.assert_called_once_with(mock.ANY, meta, ele)
 
     @mock.patch.object(ModelContext, "class_meta")

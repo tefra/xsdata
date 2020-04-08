@@ -35,12 +35,7 @@ class ParserUtils:
 
     @classmethod
     def bind_element_children(
-        cls,
-        params: Dict,
-        meta: ClassMeta,
-        element: Element,
-        position: int,
-        objects: List,
+        cls, params: Dict, meta: ClassMeta, position: int, objects: List,
     ):
         """Return a dictionary of qualified object names and their values for
         the given queue item."""

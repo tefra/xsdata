@@ -9,9 +9,9 @@ from typing import TypeVar
 from xsdata.exceptions import ParserError
 from xsdata.formats.bindings import AbstractParser
 from xsdata.formats.dataclass.context import ModelContext
-from xsdata.formats.dataclass.models import AnyElement
+from xsdata.formats.dataclass.models.context import ClassVar
+from xsdata.formats.dataclass.models.generics import AnyElement
 from xsdata.formats.dataclass.parsers.utils import ParserUtils
-from xsdata.models.inspect import ClassVar
 
 T = TypeVar("T")
 
@@ -34,7 +34,7 @@ class JsonParser(AbstractParser, ModelContext):
         if isinstance(data, list) and len(data) == 1:
             data = data[0]
 
-        for var in self.class_meta(clazz).vars.values():
+        for var in self.class_meta(clazz).vars:
             value = self.get_value(data, var)
 
             if value is None:

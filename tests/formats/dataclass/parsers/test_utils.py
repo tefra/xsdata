@@ -9,7 +9,7 @@ from tests.fixtures.books import Books
 from tests.fixtures.defxmlschema.chapter08.example0803 import DressSize
 from tests.fixtures.defxmlschema.chapter12.chapter12 import ProductType
 from xsdata.formats.dataclass.context import ModelContext
-from xsdata.formats.dataclass.models import AnyElement
+from xsdata.formats.dataclass.models.generics import AnyElement
 from xsdata.formats.dataclass.parsers.utils import ParserUtils
 from xsdata.models.enums import Namespace
 

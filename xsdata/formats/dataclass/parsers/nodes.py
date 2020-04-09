@@ -11,8 +11,8 @@ from lxml.etree import QName
 
 from xsdata.exceptions import ModelInspectionError
 from xsdata.formats.dataclass.context import ModelContext
+from xsdata.formats.dataclass.models.context import ClassMeta
 from xsdata.formats.dataclass.parsers.utils import ParserUtils
-from xsdata.models.inspect import ClassMeta
 
 
 @dataclass(frozen=True)
@@ -45,7 +45,7 @@ class ElementNode(BaseNode):
         return qname, obj
 
     def next_node(self, qname: QName, index: int, position: int, context: ModelContext):
-        var = self.meta.get_var(qname)
+        var = self.meta.find_var(qname)
         if not var:
             return None
         elif var.dataclass:

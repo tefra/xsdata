@@ -3,7 +3,7 @@ from unittest.case import TestCase
 from tests.fixtures.books import BookForm
 from tests.fixtures.books import Books
 from xsdata.exceptions import ModelInspectionError
-from xsdata.formats.dataclass.models import Namespaces
+from xsdata.formats.dataclass.models.generics import Namespaces
 from xsdata.formats.dataclass.serializers import XmlSerializer
 
 

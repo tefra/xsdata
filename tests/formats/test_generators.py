@@ -9,7 +9,7 @@ from tests.factories import PackageFactory
 from xsdata.formats.generators import AbstractGenerator
 from xsdata.formats.generators import PythonAbstractGenerator as generator
 from xsdata.models.enums import Namespace
-from xsdata.models.enums import TagType
+from xsdata.models.enums import Tag
 
 
 class AbstractGeneratorTests(FactoryTestCase):
@@ -41,13 +41,11 @@ class PythonAbstractGeneratorTests(FactoryTestCase):
         a = ClassFactory.create(
             name="a",
             extensions=[type_m, type_n],
-            attrs=AttrFactory.list(2, local_type=TagType.EXTENSION),
+            attrs=AttrFactory.list(2, tag=Tag.EXTENSION),
         )
         e = ClassFactory.enumeration(2, name="e")
         i = ClassFactory.create(
-            name="i",
-            extensions=[type_o],
-            attrs=AttrFactory.list(2, local_type=TagType.EXTENSION),
+            name="i", extensions=[type_o], attrs=AttrFactory.list(2, tag=Tag.EXTENSION),
         )
         a.inner = [e, i]
 

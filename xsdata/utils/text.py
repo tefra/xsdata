@@ -11,12 +11,12 @@ def strip_prefix(string: str, prefix: Optional[str]):
     )
 
 
-def prefix(string: str, sep: str = ":"):
-    return split(string, sep)[0]
+def prefix(string: Optional[str], sep: str = ":"):
+    return split(string, sep)[0] if string else string
 
 
-def suffix(string: str, sep: str = ":"):
-    return split(string, sep)[1]
+def suffix(string: Optional[str], sep: str = ":"):
+    return split(string, sep)[1] if string else string
 
 
 def split(string: str, sep: str = ":") -> Tuple:

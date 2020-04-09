@@ -143,10 +143,6 @@ class SizeType:
     """
     value: Optional[int] = field(
         default=None,
-        metadata=dict(
-            name="value",
-            type="Extension"
-        )
     )
     system: Optional[str] = field(
         default=None,
@@ -166,8 +162,6 @@ class SmallSizeType:
     value: Optional[int] = field(
         default=None,
         metadata=dict(
-            name="value",
-            type="Extension",
             min_inclusive=2.0,
             max_inclusive=6.0
         )

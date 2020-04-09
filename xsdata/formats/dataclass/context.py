@@ -17,9 +17,9 @@ from lxml.etree import QName
 
 from xsdata.exceptions import ModelInspectionError
 from xsdata.formats.converters import sort_types
+from xsdata.formats.dataclass.models.constants import XmlType
 from xsdata.formats.dataclass.models.context import ClassMeta
 from xsdata.formats.dataclass.models.context import ClassVar
-from xsdata.formats.dataclass.models.context import Tag
 from xsdata.models.enums import NamespaceType
 
 
@@ -57,9 +57,13 @@ class ModelContext:
             type_hint = type_hints[var.name]
             types = self.real_types(type_hint)
 
-            tag = Tag.from_metadata_type(var.metadata.get("type"))
+            xml_type = var.metadata.get("type")
+            xml_clazz = XmlType.to_xml_class(xml_type)
+            if not xml_clazz:
+                continue
+
             namespace = var.metadata.get("namespace")
-            namespaces = self.resolve_namespaces(tag, namespace, parent_ns)
+            namespaces = self.resolve_namespaces(xml_type, namespace, parent_ns)
             local_name = var.metadata.get("name") or self.name_generator(var.name)
             is_class = next((False for clazz in types if not is_dataclass(clazz)), True)
 
@@ -69,11 +73,10 @@ class ModelContext:
                 else None
             )
 
-            yield ClassVar(
+            yield xml_clazz(
                 name=var.name,
                 qname=QName(first_namespace, local_name),
                 namespaces=namespaces,
-                tag=tag,
                 init=var.init,
                 nillable=var.metadata.get("nillable", False),
                 dataclass=is_class,
@@ -83,9 +86,9 @@ class ModelContext:
             )
 
     @staticmethod
-    def resolve_namespaces(tag: Tag, namespace, parent_namespace):
+    def resolve_namespaces(xml_type, namespace, parent_namespace):
 
-        if tag in (Tag.ELEMENT, Tag.ANY_ELEMENT) and namespace is None:
+        if xml_type in (XmlType.ELEMENT, XmlType.WILDCARD) and namespace is None:
             namespace = parent_namespace
 
         if not namespace:

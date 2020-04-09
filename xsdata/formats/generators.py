@@ -119,8 +119,9 @@ class PythonAbstractGenerator(AbstractGenerator, ABC):
         """Normalize attribute properties."""
         attr.name = cls.attribute_name(attr.name)
         attr.display_type = cls.attribute_display_type(attr, parents)
-        attr.local_name = text.suffix(attr.local_name)
         attr.default = cls.attribute_default(attr, target.ns_map)
+        if attr.local_name:
+            attr.local_name = text.suffix(attr.local_name)
 
     @classmethod
     def process_import(cls, package: Package) -> Package:

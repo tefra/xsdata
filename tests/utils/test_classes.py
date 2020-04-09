@@ -12,7 +12,7 @@ from tests.factories import RestrictionsFactory
 from xsdata.models.codegen import AttrType
 from xsdata.models.codegen import Restrictions
 from xsdata.models.enums import DataType
-from xsdata.models.enums import TagType
+from xsdata.models.enums import Tag
 from xsdata.utils.classes import ClassUtils
 
 
@@ -279,7 +279,7 @@ class ClassUtilsTests(FactoryTestCase):
             name="content",
             index=0,
             types=[AttrType(name=DataType.ANY_TYPE.code, native=True)],
-            local_type=TagType.ANY,
+            tag=Tag.ANY,
             namespace="##any",
         )
 
@@ -299,7 +299,7 @@ class ClassUtilsTests(FactoryTestCase):
             index=0,
             default=None,
             types=[extension.type],
-            local_type=TagType.EXTENSION,
+            tag=Tag.EXTENSION,
         )
 
         self.assertEqual(1, len(item.attrs))
@@ -319,7 +319,7 @@ class ClassUtilsTests(FactoryTestCase):
             index=0,
             default=None,
             types=[extension.type.clone()],
-            local_type=TagType.ANY,
+            tag=Tag.ANY,
             namespace="##any",
             restrictions=Restrictions(min_occurs=1, max_occurs=1, required=True),
         )
@@ -337,7 +337,7 @@ class ClassUtilsTests(FactoryTestCase):
             index=0,
             default=None,
             types=[AttrType(name=f"{item.source_prefix}:{item.name}")],
-            local_type=item.type.__name__,
+            tag=item.type.__name__,
         )
 
         self.assertEqual(expected, actual)

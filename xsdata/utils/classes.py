@@ -11,7 +11,7 @@ from xsdata.models.codegen import Extension
 from xsdata.models.codegen import Restrictions
 from xsdata.models.enums import DataType
 from xsdata.models.enums import NamespaceType
-from xsdata.models.enums import TagType
+from xsdata.models.enums import Tag
 from xsdata.utils import text
 
 
@@ -197,7 +197,7 @@ class ClassUtils:
             local_name="content",
             index=0,
             types=[AttrType(name=DataType.ANY_TYPE.code, native=True)],
-            local_type=TagType.ANY,
+            tag=Tag.ANY,
             namespace=NamespaceType.ANY.value,
         )
         target.attrs.insert(0, attr)
@@ -211,7 +211,7 @@ class ClassUtils:
                 index=0,
                 default=list if extension.restrictions.is_list else None,
                 types=[extension.type.clone()],
-                local_type=TagType.ANY,
+                tag=Tag.ANY,
                 namespace=NamespaceType.ANY.value,
                 restrictions=extension.restrictions.clone(),
             )
@@ -222,7 +222,7 @@ class ClassUtils:
                 index=0,
                 default=None,
                 types=[extension.type.clone()],
-                local_type=TagType.EXTENSION,
+                tag=Tag.EXTENSION,
                 restrictions=extension.restrictions.clone(),
             )
 
@@ -242,7 +242,7 @@ class ClassUtils:
             index=0,
             default=None,
             types=[AttrType(name=reference)],
-            local_type=source.type.__name__,
+            tag=source.type.__name__,
             namespace=source.namespace,
         )
 

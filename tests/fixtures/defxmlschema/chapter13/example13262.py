@@ -20,7 +20,7 @@ class LegalDerivedType:
     datypic_com_prod_element: Optional[object] = field(
         default=None,
         metadata=dict(
-            type="Any",
+            type="Wildcard",
             namespace="http://datypic.com/prod",
             required=True
         )
@@ -28,7 +28,7 @@ class LegalDerivedType:
     datypic_com_ord_element: Optional[object] = field(
         default=None,
         metadata=dict(
-            type="Any",
+            type="Wildcard",
             namespace="http://datypic.com/prod http://datypic.com/ord",
             required=True
         )

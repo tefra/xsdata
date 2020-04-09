@@ -186,8 +186,8 @@ class ParserUtils:
         cls, meta: ClassMeta, qname: QName, params: Dict
     ) -> Optional[ClassVar]:
         conditions = [
-            lambda x: x.is_any_element and (x.name not in params or x.is_list),
-            lambda x: x.is_any_element and (x.name in params and not x.is_list),
+            lambda x: x.is_wildcard and (x.name not in params or x.is_list),
+            lambda x: x.is_wildcard and (x.name in params and not x.is_list),
         ]
 
         for condition in conditions:

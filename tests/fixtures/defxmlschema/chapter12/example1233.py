@@ -30,7 +30,7 @@ class ProductType:
     any_element: List[object] = field(
         default_factory=list,
         metadata=dict(
-            type="Any",
+            type="Wildcard",
             namespace="##any",
             min_occurs=0,
             max_occurs=9223372036854775807
@@ -49,8 +49,6 @@ class Color:
     value: Optional[str] = field(
         default=None,
         metadata=dict(
-            name="value",
-            type="Extension",
             required=True
         )
     )
@@ -67,8 +65,6 @@ class Desc:
     value: Optional[str] = field(
         default=None,
         metadata=dict(
-            name="value",
-            type="Extension",
             required=True
         )
     )
@@ -85,8 +81,6 @@ class Size:
     value: Optional[int] = field(
         default=None,
         metadata=dict(
-            name="value",
-            type="Extension",
             required=True
         )
     )

@@ -55,7 +55,7 @@ class ElementNode(BaseNode):
                 meta=context.class_meta(var.clazz, self.meta.namespace),
                 default=var.default,
             )
-        elif var.is_any_element:
+        elif var.is_wildcard:
             return WildcardNode(index=index, position=position, qname=var.qname)
         elif var.types[0] is object:
             return WildcardNode(index=index, position=position, qname=var.qname)

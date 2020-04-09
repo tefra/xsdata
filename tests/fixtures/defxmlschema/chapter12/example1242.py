@@ -30,7 +30,7 @@ class OpenProductType:
     local_element: Optional[object] = field(
         default=None,
         metadata=dict(
-            type="Any",
+            type="Wildcard",
             namespace="##local",
             required=True
         )
@@ -48,8 +48,6 @@ class Something:
     value: Optional[str] = field(
         default=None,
         metadata=dict(
-            name="value",
-            type="Extension",
             required=True
         )
     )

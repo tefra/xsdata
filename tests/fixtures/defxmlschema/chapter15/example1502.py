@@ -13,8 +13,6 @@ class Comment:
     value: Optional[str] = field(
         default=None,
         metadata=dict(
-            name="value",
-            type="Extension",
             required=True
         )
     )
@@ -31,8 +29,6 @@ class Description:
     value: Optional[str] = field(
         default=None,
         metadata=dict(
-            name="value",
-            type="Extension",
             required=True
         )
     )

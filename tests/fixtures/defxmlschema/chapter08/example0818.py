@@ -10,8 +10,6 @@ class SpecificTime:
     value: Optional[str] = field(
         default=None,
         metadata=dict(
-            name="value",
-            type="Extension",
             required=True,
             explicit_timezone="required"
         )

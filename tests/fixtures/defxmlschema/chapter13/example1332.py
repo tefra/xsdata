@@ -11,7 +11,7 @@ class BaseType:
     any_attributes: Dict[QName, str] = field(
         default_factory=dict,
         metadata=dict(
-            type="AnyAttribute",
+            type="Attributes",
             namespace="##any"
         )
     )
@@ -25,7 +25,7 @@ class DerivedType(BaseType):
     www_w3_org_1999_xhtml_attributes: Dict[QName, str] = field(
         default_factory=dict,
         metadata=dict(
-            type="AnyAttribute",
+            type="Attributes",
             namespace="##targetNamespace http://www.w3.org/1999/xhtml"
         )
     )

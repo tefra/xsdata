@@ -30,7 +30,7 @@ class ProductType:
     local_element: Optional[object] = field(
         default=None,
         metadata=dict(
-            type="Any",
+            type="Wildcard",
             namespace="##local",
             required=True
         )

@@ -18,7 +18,7 @@ class Umbrella:
     any_element: Optional[object] = field(
         default=None,
         metadata=dict(
-            type="Any",
+            type="Wildcard",
             namespace="##any",
             required=True
         )

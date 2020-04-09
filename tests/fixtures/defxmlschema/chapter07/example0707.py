@@ -10,10 +10,6 @@ class ParaType:
     """
     value: Optional[str] = field(
         default=None,
-        metadata=dict(
-            name="value",
-            type="Extension"
-        )
     )
     language: Optional[str] = field(
         default=None,

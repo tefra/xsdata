@@ -13,7 +13,7 @@ class Number:
     any_element: Optional[object] = field(
         default=None,
         metadata=dict(
-            type="Any",
+            type="Wildcard",
             namespace="##any",
             required=True
         )
@@ -31,8 +31,6 @@ class ProductId:
     value: Optional[int] = field(
         default=None,
         metadata=dict(
-            name="value",
-            type="Extension",
             required=True
         )
     )
@@ -49,8 +47,6 @@ class SkuNumber:
     value: Optional[str] = field(
         default=None,
         metadata=dict(
-            name="value",
-            type="Extension",
             required=True
         )
     )

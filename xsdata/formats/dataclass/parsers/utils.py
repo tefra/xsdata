@@ -10,10 +10,10 @@ from lxml.etree import Element
 from lxml.etree import QName
 
 from xsdata.formats.converters import to_python
-from xsdata.formats.dataclass.models import AnyElement
+from xsdata.formats.dataclass.models.context import ClassMeta
+from xsdata.formats.dataclass.models.context import ClassVar
+from xsdata.formats.dataclass.models.generics import AnyElement
 from xsdata.logger import logger
-from xsdata.models.inspect import ClassMeta
-from xsdata.models.inspect import ClassVar
 from xsdata.utils import text
 
 
@@ -42,7 +42,7 @@ class ParserUtils:
 
         while len(objects) > position:
             qname, value = objects.pop(position)
-            arg = meta.vars[qname]
+            arg = meta.find_var(qname)
 
             if not arg.init:
                 continue
@@ -165,16 +165,17 @@ class ParserUtils:
         metadata."""
 
         wildcard = metadata.any_attribute
-        for qname, value in element.attrib.items():
-            var = None
-            if qname in metadata.vars:
-                var = metadata.vars[qname]
-                var = None if var.name in params or not var.is_attribute else var
+        for key, value in element.attrib.items():
+            qname = QName(key)
+
+            var = metadata.find_var(qname)
+            if var and (var.name in params or not var.is_attribute):
+                var = None
 
             if not var and wildcard:
                 if wildcard.name not in params:
                     params[wildcard.name] = dict()
-                params[wildcard.name][qname] = value
+                params[wildcard.name][key] = value
             elif var and var.init:
                 params[var.name] = cls.parse_value(
                     var.types, value, var.default, element.nsmap
@@ -185,12 +186,12 @@ class ParserUtils:
         cls, meta: ClassMeta, qname: QName, params: Dict
     ) -> Optional[ClassVar]:
         conditions = [
-            lambda x: x.name not in params or x.is_list,
-            lambda x: x.name in params and not x.is_list,
+            lambda x: x.is_any_element and (x.name not in params or x.is_list),
+            lambda x: x.is_any_element and (x.name in params and not x.is_list),
         ]
 
         for condition in conditions:
-            wild = meta.get_matching_wild_var(qname, condition)
+            wild = meta.find_var(qname, condition)
             if wild:
                 return wild
 

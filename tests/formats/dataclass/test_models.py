@@ -2,7 +2,7 @@ from unittest.case import TestCase
 
 from lxml.etree import Element
 
-from xsdata.formats.dataclass.models import Namespaces
+from xsdata.formats.dataclass.models.generics import Namespaces
 from xsdata.models.enums import Namespace
 
 

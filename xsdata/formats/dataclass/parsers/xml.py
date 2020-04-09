@@ -14,7 +14,7 @@ from lxml.etree import QName
 from xsdata.exceptions import ParserError
 from xsdata.formats.bindings import AbstractParser
 from xsdata.formats.dataclass.context import ModelContext
-from xsdata.formats.dataclass.models import Namespaces
+from xsdata.formats.dataclass.models.generics import Namespaces
 from xsdata.formats.dataclass.parsers.json import T
 from xsdata.formats.dataclass.parsers.nodes import BaseNode
 from xsdata.formats.dataclass.parsers.nodes import ElementNode

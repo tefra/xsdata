@@ -7,16 +7,16 @@ from lxml.etree import Element
 from lxml.etree import QName
 
 from xsdata.formats.dataclass.context import ModelContext
-from xsdata.formats.dataclass.models import AnyElement
+from xsdata.formats.dataclass.models.context import ClassMeta
+from xsdata.formats.dataclass.models.context import ClassVar
+from xsdata.formats.dataclass.models.context import Tag
+from xsdata.formats.dataclass.models.generics import AnyElement
 from xsdata.formats.dataclass.parsers.nodes import ElementNode
 from xsdata.formats.dataclass.parsers.nodes import PrimitiveNode
 from xsdata.formats.dataclass.parsers.nodes import RootNode
 from xsdata.formats.dataclass.parsers.nodes import SkipNode
 from xsdata.formats.dataclass.parsers.nodes import WildcardNode
 from xsdata.formats.dataclass.parsers.utils import ParserUtils
-from xsdata.models.inspect import ClassMeta
-from xsdata.models.inspect import ClassVar
-from xsdata.models.inspect import Tag
 
 
 @dataclass

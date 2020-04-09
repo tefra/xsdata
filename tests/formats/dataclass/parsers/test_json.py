@@ -5,9 +5,9 @@ from lxml.etree import QName
 
 from tests.fixtures.books import BookForm
 from tests.fixtures.books import Books
+from xsdata.formats.dataclass.models.context import ClassVar
+from xsdata.formats.dataclass.models.context import Tag
 from xsdata.formats.dataclass.parsers.json import JsonParser
-from xsdata.models.inspect import ClassVar
-from xsdata.models.inspect import Tag
 
 
 class JsonParserTests(TestCase):

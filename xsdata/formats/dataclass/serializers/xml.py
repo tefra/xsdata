@@ -13,12 +13,12 @@ from lxml.etree import tostring
 from xsdata.formats.bindings import AbstractSerializer
 from xsdata.formats.converters import to_xml
 from xsdata.formats.dataclass.context import ModelContext
-from xsdata.formats.dataclass.models import AnyElement
-from xsdata.formats.dataclass.models import Namespaces
+from xsdata.formats.dataclass.models.context import ClassMeta
+from xsdata.formats.dataclass.models.context import ClassVar
+from xsdata.formats.dataclass.models.generics import AnyElement
+from xsdata.formats.dataclass.models.generics import Namespaces
 from xsdata.models.enums import Namespace
 from xsdata.models.enums import QNames
-from xsdata.models.inspect import ClassMeta
-from xsdata.models.inspect import ClassVar
 
 
 @dataclass
@@ -157,7 +157,7 @@ class XmlSerializer(AbstractSerializer, ModelContext):
     def next_value(cls, meta: ClassMeta, obj: Any):
 
         index = 0
-        attrs = list(meta.vars.values())
+        attrs = meta.vars
         stop = len(attrs)
         while index < stop:
             var = attrs[index]

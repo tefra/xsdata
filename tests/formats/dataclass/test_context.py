@@ -13,9 +13,9 @@ from tests.fixtures.defxmlschema.chapter11.example1101 import TextType
 from tests.fixtures.defxmlschema.chapter13.chapter13 import ItemsType
 from xsdata.exceptions import ModelInspectionError
 from xsdata.formats.dataclass.context import ModelContext
-from xsdata.models.inspect import ClassMeta
-from xsdata.models.inspect import ClassVar
-from xsdata.models.inspect import Tag
+from xsdata.formats.dataclass.models.context import ClassMeta
+from xsdata.formats.dataclass.models.context import ClassVar
+from xsdata.formats.dataclass.models.context import Tag
 from xsdata.utils import text
 
 

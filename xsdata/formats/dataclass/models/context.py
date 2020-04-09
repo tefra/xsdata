@@ -1,8 +1,6 @@
 from dataclasses import dataclass
-from dataclasses import field
 from enum import IntEnum
 from typing import Any
-from typing import Dict
 from typing import List
 from typing import Optional
 from typing import Type
@@ -40,6 +38,7 @@ __tag_type_map__ = {
 class ClassVar:
     name: str
     qname: QName
+    namespaces: List[str]
     types: List[Type]
     tag: Tag
     init: bool = True
@@ -47,7 +46,6 @@ class ClassVar:
     dataclass: bool = False
     sequential: bool = False
     default: Any = None
-    wild_ns: List[str] = field(default_factory=list)
 
     @property
     def clazz(self):
@@ -81,6 +79,29 @@ class ClassVar:
     def namespace(self):
         return self.qname.namespace
 
+    def matches(self, qname: QName, condition=None):
+        if condition and not condition(self):
+            return False
+
+        if not self.is_any_element and qname.localname != self.qname.localname:
+            return False
+
+        if not self.namespaces and qname.namespace is None:
+            return True
+
+        for namespace in self.namespaces:
+
+            if not namespace and qname.namespace is None:
+                return True
+            if namespace == qname.namespace:
+                return True
+            if namespace == NamespaceType.ANY.value:
+                return True
+            if namespace and namespace[0] == "!" and namespace[1:] != qname.namespace:
+                return True
+
+        return False
+
 
 @dataclass(frozen=True)
 class ClassMeta:
@@ -88,7 +109,7 @@ class ClassMeta:
     clazz: Type
     qname: QName
     nillable: bool
-    vars: Dict[QName, ClassVar]
+    vars: List[ClassVar]
 
     @property
     def namespace(self):
@@ -96,47 +117,21 @@ class ClassMeta:
 
     @property
     def any_text(self) -> Optional[ClassVar]:
-        return next((var for var in self.vars.values() if var.is_text), None)
+        return next((var for var in self.vars if var.is_text), None)
 
     @property
     def any_attribute(self) -> Optional[ClassVar]:
-        return next((var for var in self.vars.values() if var.is_any_attribute), None)
+        return next((var for var in self.vars if var.is_any_attribute), None)
 
     @property
     def any_element(self) -> Optional[ClassVar]:
-        return next((var for var in self.vars.values() if var.is_any_element), None)
+        return next((var for var in self.vars if var.is_any_element), None)
 
-    def get_var(self, qname: QName) -> Optional[ClassVar]:
-        if qname in self.vars:
-            return self.vars[qname]
-        else:
-            return self.get_wild_var(qname)
+    def find_var(self, qname: QName, condition=None):
+        for var in self.vars:
+            if not var.is_any_element and var.matches(qname, condition):
+                return var
 
-    def get_wild_var(self, qname: QName) -> Optional[ClassVar]:
-        return next((var for var in self.get_wild_vars(qname)), None)
-
-    def get_matching_wild_var(self, qname: QName, condition):
-        return next((x for x in self.get_wild_vars(qname) if condition(x)), None)
-
-    def get_wild_vars(self, qname: QName):
-        for var in self.vars.values():
-            if self.matches(var.wild_ns, qname):
-                yield var
-
-    @classmethod
-    def matches(cls, namespaces: List[str], qname: QName) -> bool:
-        return next(
-            (True for namespace in namespaces if cls.match(namespace, qname)), False
-        )
-
-    @classmethod
-    def match(cls, namespace: str, qname: QName):
-        return (
-            namespace
-            and (
-                namespace == qname.namespace
-                or namespace == NamespaceType.ANY.value
-                or namespace[0] == "!"
-                and namespace[1:] != qname.namespace
-            )
-        ) or (not namespace and qname.namespace is None)
+        for var in self.vars:
+            if var.is_any_element and var.matches(qname, condition):
+                return var

@@ -163,7 +163,7 @@ class EventType:
     END = "end"
 
 
-class TagType:
+class Tag:
     ALL = "All"
     ANNOTATION = "Annotation"
     ANY = "Any"

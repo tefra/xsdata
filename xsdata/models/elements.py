@@ -10,6 +10,7 @@ from typing import Optional
 from typing import Union as UnionType
 
 from xsdata.exceptions import SchemaValueError
+from xsdata.formats.dataclass.models.constants import XmlType
 from xsdata.formats.dataclass.serializers import XmlSerializer
 from xsdata.models.enums import DataType
 from xsdata.models.enums import FormType
@@ -17,29 +18,28 @@ from xsdata.models.enums import Mode
 from xsdata.models.enums import Namespace
 from xsdata.models.enums import NamespaceType
 from xsdata.models.enums import ProcessType
-from xsdata.models.enums import TagType
 from xsdata.models.enums import UseType
 from xsdata.models.mixins import ElementBase
 from xsdata.utils.text import collapse_whitespace
 
 
 def attribute(default=None, init=True, **kwargs):
-    kwargs.update(type=TagType.ATTRIBUTE)
+    kwargs.update(type=XmlType.ATTRIBUTE)
     return field(init=init, default=default, metadata=kwargs)
 
 
 def element(init=True, **kwargs):
-    kwargs.update(type=TagType.ELEMENT)
+    kwargs.update(type=XmlType.ELEMENT)
     return field(init=init, default=None, metadata=kwargs)
 
 
 def array_element(init=True, **kwargs):
-    kwargs.update(type=TagType.ELEMENT)
+    kwargs.update(type=XmlType.ELEMENT)
     return field(init=init, default_factory=list, metadata=kwargs)
 
 
 def array_any_element(init=True, **kwargs):
-    kwargs.update(type=TagType.ANY, namespace=NamespaceType.ANY.value)
+    kwargs.update(type=XmlType.WILDCARD, namespace=NamespaceType.ANY.value)
     return field(init=init, default_factory=list, metadata=kwargs)
 
 

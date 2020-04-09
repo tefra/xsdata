@@ -25,7 +25,7 @@ class DescriptionType:
     www_w3_org_1999_xhtml_element: List[object] = field(
         default_factory=list,
         metadata=dict(
-            type="Any",
+            type="Wildcard",
             namespace="http://www.w3.org/1999/xhtml",
             min_occurs=0,
             max_occurs=9223372036854775807
@@ -41,10 +41,6 @@ class SizeType:
     """
     value: Optional[int] = field(
         default=None,
-        metadata=dict(
-            name="value",
-            type="Extension"
-        )
     )
     system: Optional[str] = field(
         default=None,
@@ -124,7 +120,7 @@ class ProductType:
     other_attributes: Dict[QName, str] = field(
         default_factory=dict,
         metadata=dict(
-            type="AnyAttribute",
+            type="Attributes",
             namespace="##other"
         )
     )

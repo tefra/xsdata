@@ -29,6 +29,7 @@ from xsdata.models.elements import SimpleType
 from xsdata.models.elements import Union
 from xsdata.models.enums import DataType
 from xsdata.models.enums import FormType
+from xsdata.models.enums import Tag
 
 
 class ClassBuilderTests(FactoryTestCase):
@@ -285,7 +286,7 @@ class ClassBuilderTests(FactoryTestCase):
         expected = AttrFactory.create(
             name=mock_real_name.return_value,
             types=mock_build_class_attribute_types.return_value,
-            local_type=Attribute.__name__,
+            tag=Tag.ATTRIBUTE,
             namespace=mock_element_namespace.return_value,
             help=mock_display_help.return_value,
             default=mock_default_value.return_value,

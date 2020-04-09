@@ -62,9 +62,9 @@ class JsonParser(AbstractParser, ModelContext):
         """
         if var.dataclass:
             return self.parse_context(value, var.clazz)
-        elif var.is_any_attribute:
+        elif var.is_attributes:
             return dict(value)
-        elif var.is_any_element:
+        elif var.is_wildcard:
             return (
                 value
                 if isinstance(value, str)

@@ -15,9 +15,9 @@ class AnyElement:
     qname: Optional[str] = field(default=None)
     text: Optional[str] = field(default=None)
     tail: Optional[str] = field(default=None)
-    children: List[object] = field(default_factory=list, metadata=dict(type="Any"))
+    children: List[object] = field(default_factory=list, metadata=dict(type="Wildcard"))
     attributes: Dict = field(
-        default_factory=dict, metadata=dict(name="attributes", type="AnyAttribute")
+        default_factory=dict, metadata=dict(name="attributes", type="Attributes")
     )
     ns_map: Dict = field(default_factory=dict)
 

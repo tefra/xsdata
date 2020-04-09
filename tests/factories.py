@@ -17,7 +17,7 @@ from xsdata.models.elements import SimpleType
 from xsdata.models.enums import DataType
 from xsdata.models.enums import Namespace
 from xsdata.models.enums import QNames
-from xsdata.models.enums import TagType
+from xsdata.models.enums import Tag
 
 NSMAP = {ns.prefix: ns.uri for ns in Namespace}
 
@@ -103,7 +103,7 @@ class ClassFactory(Factory):
     def enumeration(cls, attributes: int, **kwargs) -> Class:
         return ClassFactory.create(
             type=SimpleType,
-            attrs=AttrFactory.list(attributes, local_type=TagType.ENUMERATION),
+            attrs=AttrFactory.list(attributes, tag=Tag.ENUMERATION),
             **kwargs,
         )
 
@@ -111,7 +111,7 @@ class ClassFactory(Factory):
     def elements(cls, attributes: int, **kwargs) -> Class:
         return ClassFactory.create(
             type=ComplexType,
-            attrs=AttrFactory.list(attributes, local_type=TagType.ELEMENT),
+            attrs=AttrFactory.list(attributes, tag=Tag.ELEMENT),
             **kwargs,
         )
 
@@ -231,7 +231,7 @@ class AttrFactory(Factory):
         name=None,
         index=None,
         types=None,
-        local_type=None,
+        tag=None,
         namespace=None,
         help=None,
         default=None,
@@ -244,7 +244,7 @@ class AttrFactory(Factory):
             local_name=name,
             index=cls.counter if index is None else index,
             types=types or [AttrTypeFactory.xs_string()],
-            local_type=local_type or random.choice(cls.types).__name__,
+            tag=tag or random.choice(cls.types).__name__,
             namespace=namespace or None,
             help=help or None,
             default=default or None,
@@ -254,37 +254,33 @@ class AttrFactory(Factory):
 
     @classmethod
     def enumeration(cls, **kwargs) -> Attr:
-        return cls.create(local_type=TagType.ENUMERATION, **kwargs)
+        return cls.create(tag=Tag.ENUMERATION, **kwargs)
 
     @classmethod
     def element(cls, **kwargs) -> Attr:
-        return cls.create(local_type=TagType.ELEMENT, **kwargs)
+        return cls.create(tag=Tag.ELEMENT, **kwargs)
 
     @classmethod
     def any(cls, **kwargs) -> Attr:
-        return cls.create(
-            local_type=TagType.ANY, types=[AttrTypeFactory.xs_any()], **kwargs
-        )
+        return cls.create(tag=Tag.ANY, types=[AttrTypeFactory.xs_any()], **kwargs)
 
     @classmethod
     def any_attribute(cls, **kwargs) -> Attr:
         return cls.create(
-            local_type=TagType.ANY_ATTRIBUTE,
-            types=[AttrTypeFactory.xs_qmap()],
-            **kwargs,
+            tag=Tag.ANY_ATTRIBUTE, types=[AttrTypeFactory.xs_qmap()], **kwargs,
         )
 
     @classmethod
     def attribute(cls, **kwargs) -> Attr:
-        return cls.create(local_type=TagType.ATTRIBUTE, **kwargs)
+        return cls.create(tag=Tag.ATTRIBUTE, **kwargs)
 
     @classmethod
     def attribute_group(cls, **kwargs) -> Attr:
-        return cls.create(local_type=TagType.ATTRIBUTE_GROUP, **kwargs)
+        return cls.create(tag=Tag.ATTRIBUTE_GROUP, **kwargs)
 
     @classmethod
     def group(cls, **kwargs) -> Attr:
-        return cls.create(local_type=TagType.GROUP, **kwargs)
+        return cls.create(tag=Tag.GROUP, **kwargs)
 
     @classmethod
     def xsi_type(cls, **kwargs):

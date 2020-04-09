@@ -11,8 +11,6 @@ class InternationalSizeType:
     value: Optional[Union[int, "InternationalSizeType.Value"]] = field(
         default=None,
         metadata=dict(
-            name="value",
-            type="Union",
             required=True,
             min_inclusive=24.0,
             max_inclusive=54.0

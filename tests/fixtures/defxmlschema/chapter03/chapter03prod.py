@@ -13,10 +13,6 @@ class ProdNumType:
     """
     value: Optional[int] = field(
         default=None,
-        metadata=dict(
-            name="value",
-            type="Extension"
-        )
     )
     id: Optional[str] = field(
         default=None,
@@ -37,10 +33,6 @@ class SizeType:
     """
     value: Optional[int] = field(
         default=None,
-        metadata=dict(
-            name="value",
-            type="Extension"
-        )
     )
     system: Optional[str] = field(
         default=None,

@@ -14,8 +14,6 @@ class Size:
     value: Optional[int] = field(
         default=None,
         metadata=dict(
-            name="value",
-            type="Extension",
             required=True,
             nillable=True
         )

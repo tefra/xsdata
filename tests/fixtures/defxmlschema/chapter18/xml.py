@@ -14,10 +14,6 @@ class Base:
 
     value: Optional[str] = field(
         default=None,
-        metadata=dict(
-            name="value",
-            type="Extension"
-        )
     )
 
 
@@ -32,10 +28,6 @@ class Id:
 
     value: Optional[str] = field(
         default=None,
-        metadata=dict(
-            name="value",
-            type="Extension"
-        )
     )
 
 
@@ -50,10 +42,6 @@ class Lang:
 
     value: Optional[Union[str, "Lang.Value"]] = field(
         default=None,
-        metadata=dict(
-            name="value",
-            type="Union"
-        )
     )
 
     class Value(Enum):
@@ -74,10 +62,6 @@ class Space:
 
     value: Optional["Space.Type"] = field(
         default=None,
-        metadata=dict(
-            name="value",
-            type="SimpleType"
-        )
     )
 
     class Type(Enum):

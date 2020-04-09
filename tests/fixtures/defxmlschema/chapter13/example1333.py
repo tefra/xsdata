@@ -11,7 +11,7 @@ class BaseType:
     any_attributes: Dict[QName, str] = field(
         default_factory=dict,
         metadata=dict(
-            type="AnyAttribute",
+            type="Attributes",
             namespace="##any"
         )
     )

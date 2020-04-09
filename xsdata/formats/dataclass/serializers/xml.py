@@ -76,12 +76,12 @@ class XmlSerializer(AbstractSerializer, ModelContext):
         meta = self.class_meta(obj.__class__, QName(parent).namespace)
         for var, value in self.next_value(meta, obj):
             if value is not None:
-                if not var.is_any_element and not var.is_any_attribute:
+                if not var.is_wildcard and not var.is_attributes:
                     namespaces.add(var.namespace)
 
                 if var.is_attribute:
                     self.set_attribute(parent, var.qname, value)
-                elif var.is_any_attribute:
+                elif var.is_attributes:
                     self.set_attributes(parent, value)
                 else:
                     self.render_sub_nodes(parent, value, var, namespaces)
@@ -95,13 +95,10 @@ class XmlSerializer(AbstractSerializer, ModelContext):
         if not isinstance(values, list):
             values = [values]
 
-        is_wildcard = var.is_any_element
-
         for value in values:
             if value is None:
                 continue
-
-            if isinstance(value, AnyElement):
+            elif isinstance(value, AnyElement):
                 if value.qname:
                     sub_element = SubElement(parent, value.qname)
                 else:
@@ -115,7 +112,7 @@ class XmlSerializer(AbstractSerializer, ModelContext):
                     self.render_sub_nodes(sub_element, child, var, namespaces)
                     self.set_nil_attribute(parent, var.nillable, namespaces)
             elif var.is_element or is_dataclass(value):
-                qname = var.qname if not is_wildcard else value.qname
+                qname = value.qname if hasattr(value, "qname") else var.qname
                 sub_element = SubElement(parent, qname)
                 self.render_node(value, sub_element, namespaces)
                 self.set_nil_attribute(sub_element, var.nillable, namespaces)

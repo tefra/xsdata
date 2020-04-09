@@ -29,10 +29,6 @@ class HatSizeType:
     """
     value: Optional[str] = field(
         default=None,
-        metadata=dict(
-            name="value",
-            type="Extension"
-        )
     )
     system: Optional[str] = field(
         default=None,
@@ -77,10 +73,6 @@ class ShirtSizeType:
     """
     value: Optional[int] = field(
         default=None,
-        metadata=dict(
-            name="value",
-            type="Extension"
-        )
     )
     system: Optional[str] = field(
         default=None,

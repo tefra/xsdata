@@ -1,7 +1,28 @@
+from typing import Dict
+from typing import Optional
+
 from docformatter import format_code
 
+from xsdata.models.codegen import Attr
 from xsdata.models.codegen import Class
 from xsdata.models.enums import UseType
+
+
+def attr_metadata(attr: Attr, parent_namespace: Optional[str]) -> Dict:
+    metadata = dict(
+        name=attr.local_name,
+        type=attr.xml_type,
+        namespace=attr.namespace
+        if parent_namespace != attr.namespace or attr.is_attribute
+        else None,
+    )
+    metadata.update(attr.restrictions.asdict())
+
+    return {
+        key: value
+        for key, value in metadata.items()
+        if value is not None and value is not False
+    }
 
 
 def arguments(data: dict):
@@ -14,13 +35,7 @@ def arguments(data: dict):
                 value = f"r{value}"
         return f"{key}={value}"
 
-    return ",\n".join(
-        [
-            prep(key, value)
-            for key, value in data.items()
-            if value is not None and value is not False
-        ]
-    )
+    return ",\n".join([prep(key, value) for key, value in data.items()])
 
 
 def docstring(obj: Class, enum=False):
@@ -72,4 +87,9 @@ def has_quotes(string: str):
     return False
 
 
-filters = {"arguments": arguments, "docstring": docstring, "lib_imports": lib_imports}
+filters = {
+    "arguments": arguments,
+    "docstring": docstring,
+    "lib_imports": lib_imports,
+    "attr_metadata": attr_metadata,
+}

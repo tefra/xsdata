@@ -54,7 +54,7 @@ class IdentifierGroup:
     other_attributes: Dict[QName, str] = field(
         default_factory=dict,
         metadata=dict(
-            type="AnyAttribute",
+            type="Attributes",
             namespace="##other"
         )
     )

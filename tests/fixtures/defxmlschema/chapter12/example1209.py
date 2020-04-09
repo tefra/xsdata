@@ -13,7 +13,7 @@ class DescType:
     content: Optional[object] = field(
         default=None,
         metadata=dict(
-            type="Any",
+            type="Wildcard",
             namespace="##any"
         )
     )

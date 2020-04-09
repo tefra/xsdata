@@ -24,7 +24,7 @@ from xsdata.models.elements import SimpleType
 from xsdata.models.elements import Union as UnionElement
 from xsdata.models.enums import DataType
 from xsdata.models.enums import Namespace
-from xsdata.models.enums import TagType
+from xsdata.models.enums import Tag
 from xsdata.models.mixins import ElementBase
 from xsdata.utils import text
 
@@ -204,7 +204,7 @@ class ClassBuilder:
         types = self.build_class_attribute_types(target, obj)
         restrictions = Restrictions.from_element(obj)
 
-        if obj.class_name in (TagType.ELEMENT, TagType.ANY):
+        if obj.class_name in (Tag.ELEMENT, Tag.ANY):
             restrictions.merge(parent_restrictions)
 
         if restrictions.prohibited:
@@ -221,7 +221,7 @@ class ClassBuilder:
                 default=obj.default_value,
                 fixed=obj.is_fixed,
                 types=types,
-                local_type=obj.class_name,
+                tag=obj.class_name,
                 help=obj.display_help,
                 namespace=self.element_namespace(obj),
                 restrictions=restrictions,

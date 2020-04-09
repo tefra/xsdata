@@ -13,31 +13,31 @@ from tests.fixtures.defxmlschema.chapter11.example1101 import TextType
 from tests.fixtures.defxmlschema.chapter13.chapter13 import ItemsType
 from xsdata.exceptions import ModelInspectionError
 from xsdata.formats.dataclass.context import ModelContext
+from xsdata.formats.dataclass.models.constants import XmlType
 from xsdata.formats.dataclass.models.context import ClassMeta
-from xsdata.formats.dataclass.models.context import ClassVar
-from xsdata.formats.dataclass.models.context import Tag
+from xsdata.formats.dataclass.models.context import XmlAttribute
+from xsdata.formats.dataclass.models.context import XmlElement
+from xsdata.formats.dataclass.models.context import XmlWildcard
 from xsdata.utils import text
 
 
 class ModelContextTests(TestCase):
     def setUp(self):
-        self.inspect = ModelContext()
+        self.ctx = ModelContext()
         super().setUp()
 
     @mock.patch.object(ModelContext, "get_type_hints")
     def test_class_meta_build_vars(self, mock_get_type_hints):
-        var = ClassVar(
-            name="foo", qname=QName("foo", "bar"), types=[int], tag=Tag.ELEMENT
-        )
+        var = XmlElement(name="foo", qname=QName("foo", "bar"), types=[int])
         mock_get_type_hints.return_value = [var]
 
-        result = self.inspect.class_meta(ItemsType, None)
+        result = self.ctx.class_meta(ItemsType, None)
         expected = ClassMeta(
             name="ItemsType",
             clazz=ItemsType,
             qname=QName("ItemsType"),
             nillable=False,
-            vars={var.qname: var},
+            vars=[var],
         )
 
         self.assertEqual(expected, result)
@@ -46,14 +46,14 @@ class ModelContextTests(TestCase):
     @mock.patch.object(ModelContext, "get_type_hints", return_value=dict())
     def test_class_meta_with_meta_namespace(self, mock_get_type_hints):
         namespace = Product.Meta.namespace
-        result = self.inspect.class_meta(Product, None)
+        result = self.ctx.class_meta(Product, None)
 
         self.assertEqual(QName(namespace, "product"), result.qname)
         mock_get_type_hints.assert_called_once_with(Product, namespace)
 
     @mock.patch.object(ModelContext, "get_type_hints", return_value=dict())
     def test_class_meta_with_parent_ns(self, mock_get_type_hints):
-        result = self.inspect.class_meta(ProductType, "http://xsdata")
+        result = self.ctx.class_meta(ProductType, "http://xsdata")
 
         self.assertEqual(QName("http://xsdata", "ProductType"), str(result.qname))
         mock_get_type_hints.assert_called_once_with(ProductType, "http://xsdata")
@@ -75,44 +75,31 @@ class ModelContextTests(TestCase):
         class Foo(Bar):
             pass
 
-        result = self.inspect.class_meta(Foo)
+        result = self.ctx.class_meta(Foo)
         self.assertEqual("Foo", result.name)
         self.assertIsNone(result.namespace)
 
     @mock.patch.object(ModelContext, "get_type_hints", return_value=dict())
     def test_class_meta_with_no_dataclass_raises_exception(self, *args):
         with self.assertRaises(ModelInspectionError) as cm:
-            self.inspect.class_meta(int)
+            self.ctx.class_meta(int)
 
         self.assertEqual(f"Object {int} is not a dataclass.", str(cm.exception))
 
     def test_get_type_hints(self):
-        result = self.inspect.get_type_hints(BookForm, None)
+        result = self.ctx.get_type_hints(BookForm, None)
         self.assertIsInstance(result, Iterator)
 
         expected = [
-            ClassVar(
-                name="author", qname=QName("author"), types=[str], tag=Tag.ELEMENT,
-            ),
-            ClassVar(name="title", qname=QName("title"), types=[str], tag=Tag.ELEMENT),
-            ClassVar(name="genre", qname=QName("genre"), types=[str], tag=Tag.ELEMENT),
-            ClassVar(
-                name="price", qname=QName("price"), types=[float], tag=Tag.ELEMENT,
-            ),
-            ClassVar(
-                name="pub_date", qname=QName("pub_date"), types=[str], tag=Tag.ELEMENT,
-            ),
-            ClassVar(
-                name="review", qname=QName("review"), types=[str], tag=Tag.ELEMENT,
-            ),
-            ClassVar(name="id", qname=QName("id"), types=[str], tag=Tag.ATTRIBUTE),
-            ClassVar(
-                name="lang",
-                qname=QName("lang"),
-                types=[str],
-                tag=Tag.ATTRIBUTE,
-                init=False,
-                default="en",
+            XmlElement(name="author", qname=QName("author"), types=[str],),
+            XmlElement(name="title", qname=QName("title"), types=[str]),
+            XmlElement(name="genre", qname=QName("genre"), types=[str]),
+            XmlElement(name="price", qname=QName("price"), types=[float],),
+            XmlElement(name="pub_date", qname=QName("pub_date"), types=[str],),
+            XmlElement(name="review", qname=QName("review"), types=[str],),
+            XmlAttribute(name="id", qname=QName("id"), types=[str]),
+            XmlAttribute(
+                name="lang", qname=QName("lang"), types=[str], init=False, default="en",
             ),
         ]
 
@@ -123,15 +110,14 @@ class ModelContextTests(TestCase):
             self.assertIsNone(var.clazz)
 
     def test_get_type_hints_with_dataclass_list(self):
-        result = list(self.inspect.get_type_hints(Books, None))
+        result = list(self.ctx.get_type_hints(Books, None))
 
-        expected = ClassVar(
+        expected = XmlElement(
             name="book",
             qname=QName("book"),
             types=[BookForm],
             dataclass=True,
             default=list,
-            tag=Tag.ELEMENT,
         )
 
         self.assertTrue(expected.is_list)
@@ -141,18 +127,17 @@ class ModelContextTests(TestCase):
         self.assertEqual(BookForm, result[0].clazz)
 
     def test_get_type_hints_with_wildcard_element(self):
-        result = list(self.inspect.get_type_hints(TextType, None))
+        result = list(self.ctx.get_type_hints(TextType, None))
 
-        expected = ClassVar(
+        expected = XmlWildcard(
             name="any_element",
             qname=QName(None, "any_element"),
             types=[object],
-            tag=Tag.ANY_ELEMENT,
             init=True,
             nillable=False,
             dataclass=False,
             default=list,
-            wild_ns=["##any"],
+            namespaces=["##any"],
         )
 
         self.assertEqual(2, len(result))
@@ -160,53 +145,66 @@ class ModelContextTests(TestCase):
 
     def test_get_type_hints_with_no_dataclass(self):
         with self.assertRaises(TypeError):
-            list(self.inspect.get_type_hints(self.__class__, None))
+            list(self.ctx.get_type_hints(self.__class__, None))
 
-    def test_resolve_namespace(self):
-        actual = self.inspect.resolve_namespace("##any", Tag.ANY_ELEMENT, "foo")
-        self.assertIsNone(actual)
+    def test_resolve_namespaces(self):
+        self.assertEqual(
+            ["foo"], self.ctx.resolve_namespaces(XmlType.ELEMENT, "foo", "bar")
+        )
 
-        actual = self.inspect.resolve_namespace("foo", Tag.ELEMENT, "bar")
-        self.assertEqual("foo", actual)
+        self.assertEqual([], self.ctx.resolve_namespaces(XmlType.ELEMENT, "", "bar"))
 
-        actual = self.inspect.resolve_namespace("", Tag.ELEMENT, "bar")
-        self.assertIsNone(actual)
+        self.assertEqual(
+            ["bar"], self.ctx.resolve_namespaces(XmlType.ELEMENT, None, "bar")
+        )
 
-        actual = self.inspect.resolve_namespace(None, Tag.ELEMENT, "bar")
-        self.assertEqual("bar", actual)
+        self.assertEqual(
+            [], self.ctx.resolve_namespaces(XmlType.ATTRIBUTE, None, "bar")
+        )
 
-        actual = self.inspect.resolve_namespace(None, Tag.ATTRIBUTE, "bar")
-        self.assertIsNone(actual)
+        self.assertEqual(
+            ["p"], self.ctx.resolve_namespaces(XmlType.WILDCARD, None, "p")
+        )
 
-    def test_wild_namespaces(self):
-        tag = Tag.ATTRIBUTE
-        actual = self.inspect.wild_namespaces(None, tag, "p")
-        self.assertEqual([], actual)
+        self.assertEqual(
+            ["##any"], self.ctx.resolve_namespaces(XmlType.WILDCARD, "##any", "p")
+        )
 
-        tag = Tag.ANY_ELEMENT
-        actual = self.inspect.wild_namespaces(None, tag, "p")
-        self.assertEqual(["##any"], actual)
+        self.assertEqual(
+            ["##any"],
+            self.ctx.resolve_namespaces(XmlType.WILDCARD, "##targetNamespace", ""),
+        )
 
-        actual = self.inspect.wild_namespaces("##any", tag, "p")
-        self.assertEqual(["##any"], actual)
+        self.assertEqual(
+            ["##any"],
+            self.ctx.resolve_namespaces(XmlType.WILDCARD, "##targetNamespace", None),
+        )
 
-        actual = self.inspect.wild_namespaces("##targetNamespace", tag, "")
-        self.assertEqual(["##any"], actual)
+        self.assertEqual(
+            ["p"],
+            self.ctx.resolve_namespaces(XmlType.WILDCARD, "##targetNamespace", "p"),
+        )
 
-        actual = self.inspect.wild_namespaces("##targetNamespace", tag, None)
-        self.assertEqual(["##any"], actual)
+        self.assertEqual(
+            [""], self.ctx.resolve_namespaces(XmlType.WILDCARD, "##local", "p")
+        )
 
-        actual = self.inspect.wild_namespaces("##targetNamespace", tag, "p")
-        self.assertEqual(["p"], actual)
+        self.assertEqual(
+            ["!p"], self.ctx.resolve_namespaces(XmlType.WILDCARD, "##other", "p")
+        )
 
-        actual = self.inspect.wild_namespaces("##local", tag, "p")
-        self.assertEqual([""], actual)
+        self.assertEqual(
+            ["", "!p"],
+            sorted(
+                self.ctx.resolve_namespaces(XmlType.WILDCARD, "##other   ##local", "p")
+            ),
+        )
 
-        actual = self.inspect.wild_namespaces("##other", tag, "p")
-        self.assertEqual(["!p"], actual)
-
-        actual = self.inspect.wild_namespaces("##other   ##local", tag, "p")
-        self.assertEqual(["", "!p"], sorted(actual))
-
-        actual = self.inspect.wild_namespaces("##targetNamespace   foo", tag, "p")
-        self.assertEqual(["foo", "p"], sorted(actual))
+        self.assertEqual(
+            ["foo", "p"],
+            sorted(
+                self.ctx.resolve_namespaces(
+                    XmlType.WILDCARD, "##targetNamespace   foo", "p"
+                )
+            ),
+        )

@@ -14,8 +14,6 @@ class NewSize:
     value: Optional[int] = field(
         default=None,
         metadata=dict(
-            name="value",
-            type="Extension",
             required=True,
             min_inclusive=2.0,
             max_inclusive=16.0

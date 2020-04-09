@@ -25,10 +25,6 @@ class PriceType:
     """
     value: Optional[Decimal] = field(
         default=None,
-        metadata=dict(
-            name="value",
-            type="Extension"
-        )
     )
     currency: Optional[str] = field(
         default=None,

@@ -13,7 +13,7 @@ class LetterType:
     content: Optional[object] = field(
         default=None,
         metadata=dict(
-            type="Any",
+            type="Wildcard",
             namespace="##any"
         )
     )
@@ -50,8 +50,4 @@ class RestrictedLetterType(LetterType):
     """
     value: Optional[str] = field(
         default=None,
-        metadata=dict(
-            name="value",
-            type="Extension"
-        )
     )

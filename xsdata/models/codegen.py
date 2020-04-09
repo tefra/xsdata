@@ -16,7 +16,7 @@ from xsdata.models.elements import ComplexType
 from xsdata.models.elements import Element
 from xsdata.models.enums import DataType
 from xsdata.models.enums import QNames
-from xsdata.models.enums import TagType
+from xsdata.models.enums import Tag
 from xsdata.models.mixins import ElementBase
 from xsdata.utils import text
 
@@ -123,13 +123,14 @@ class AttrType:
 
 @dataclass
 class Attr:
+    tag: str
     name: str
-    local_name: str
-    local_type: str
     index: int = field(compare=False)
+    local_name: Optional[str] = field(default=None)
     default: Any = field(default=None, compare=False)
     fixed: bool = field(default=False, compare=False)
     types: List[AttrType] = field(default_factory=list)
+    xml_type: Optional[str] = field(default=None)
     display_type: Optional[str] = field(default=None)
     namespace: Optional[str] = field(default=None)
     help: Optional[str] = field(default=None)
@@ -137,11 +138,11 @@ class Attr:
 
     @property
     def is_attribute(self) -> bool:
-        return self.local_type in (TagType.ATTRIBUTE, TagType.ANY_ATTRIBUTE)
+        return self.tag in (Tag.ATTRIBUTE, Tag.ANY_ATTRIBUTE)
 
     @property
     def is_enumeration(self) -> bool:
-        return self.local_type == TagType.ENUMERATION
+        return self.tag == Tag.ENUMERATION
 
     @property
     def is_factory(self):
@@ -149,7 +150,7 @@ class Attr:
 
     @property
     def is_group(self):
-        return self.local_type in (TagType.ATTRIBUTE_GROUP, TagType.GROUP)
+        return self.tag in (Tag.ATTRIBUTE_GROUP, Tag.GROUP)
 
     @property
     def is_map(self) -> bool:
@@ -180,7 +181,7 @@ class Attr:
 
     @property
     def is_wildcard(self):
-        return self.local_type in (TagType.ANY_ATTRIBUTE, TagType.ANY)
+        return self.tag in (Tag.ANY_ATTRIBUTE, Tag.ANY)
 
     def clone(self, **kwargs) -> "Attr":
         return replace(

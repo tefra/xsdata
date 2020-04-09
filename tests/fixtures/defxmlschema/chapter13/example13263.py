@@ -12,7 +12,7 @@ class IlegalDerivedType:
     any_element: Optional[object] = field(
         default=None,
         metadata=dict(
-            type="Any",
+            type="Wildcard",
             namespace="##any",
             required=True
         )
@@ -28,7 +28,7 @@ class IlegalDerivedType:
     datypic_com_ord_element: Optional[object] = field(
         default=None,
         metadata=dict(
-            type="Any",
+            type="Wildcard",
             namespace="http://datypic.com/prod http://datypic.com/ord",
             required=True
         )

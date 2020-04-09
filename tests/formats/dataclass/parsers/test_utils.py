@@ -34,7 +34,7 @@ class ParserUtilsTests(TestCase):
     def test_bind_element_attrs(self, mock_parse_value):
         mock_parse_value.return_value = "2020-03-02"
         metadata = self.ctx.class_meta(ProductType)
-        eff_date = metadata.vars["effDate"]
+        eff_date = metadata.find_var("effDate")
         element = Element("foo")
         element.set("effDate", "2020-03-01")
         element.set("whatever", "foo")
@@ -49,7 +49,10 @@ class ParserUtilsTests(TestCase):
 
     def test_bind_elements_attrs_ignore_init_false_vars(self):
         metadata = self.ctx.class_meta(ProductType)
-        metadata.vars["effDate"] = replace(metadata.vars["effDate"], init=False)
+        eff_date = metadata.find_var("effDate")
+        metadata.vars.remove(eff_date)
+        metadata.vars.append(replace(eff_date, init=False))
+
         element = Element("foo")
         element.set("effDate", "2020-03-01")
 

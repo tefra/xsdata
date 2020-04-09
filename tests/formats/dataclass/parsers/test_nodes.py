@@ -8,8 +8,9 @@ from lxml.etree import QName
 
 from xsdata.formats.dataclass.context import ModelContext
 from xsdata.formats.dataclass.models.context import ClassMeta
-from xsdata.formats.dataclass.models.context import ClassVar
-from xsdata.formats.dataclass.models.context import Tag
+from xsdata.formats.dataclass.models.context import XmlElement
+from xsdata.formats.dataclass.models.context import XmlText
+from xsdata.formats.dataclass.models.context import XmlWildcard
 from xsdata.formats.dataclass.models.generics import AnyElement
 from xsdata.formats.dataclass.parsers.nodes import ElementNode
 from xsdata.formats.dataclass.parsers.nodes import PrimitiveNode
@@ -77,20 +78,11 @@ class ElementNodeTests(TestCase):
     def test_next_node_when_given_qname_matches_dataclass_var(self, mock_class_meta):
 
         ctx = ModelContext()
-        var = ClassVar(
-            name="a",
-            qname=QName("a"),
-            types=[Foo],
-            tag=Tag.ELEMENT,
-            dataclass=True,
-            default=Foo,
+        var = XmlElement(
+            name="a", qname=QName("a"), types=[Foo], dataclass=True, default=Foo,
         )
         meta = ClassMeta(
-            name="foo",
-            clazz=None,
-            qname=QName("foo"),
-            nillable=False,
-            vars={var.qname: var},
+            name="foo", clazz=None, qname=QName("foo"), nillable=False, vars=[var],
         )
         mock_class_meta.return_value = replace(meta)
         node = ElementNode(index=0, position=0, meta=meta, default=None)
@@ -104,15 +96,9 @@ class ElementNodeTests(TestCase):
 
     def test_next_node_when_given_qname_matches_any_element_var(self):
         ctx = ModelContext()
-        var = ClassVar(
-            name="a", qname=QName("a"), types=[], tag=Tag.ANY_ELEMENT, dataclass=False,
-        )
+        var = XmlWildcard(name="a", qname=QName("a"), types=[], dataclass=False,)
         meta = ClassMeta(
-            name="foo",
-            clazz=None,
-            qname=QName("foo"),
-            nillable=False,
-            vars={var.qname: var},
+            name="foo", clazz=None, qname=QName("foo"), nillable=False, vars=[var],
         )
         node = ElementNode(index=0, position=0, meta=meta, default=None)
 
@@ -124,15 +110,9 @@ class ElementNodeTests(TestCase):
 
     def test_next_node_when_given_qname_matches_primitive_var(self):
         ctx = ModelContext()
-        var = ClassVar(
-            name="a", qname=QName("a"), types=[int], tag=Tag.TEXT, default=100
-        )
+        var = XmlText(name="a", qname=QName("a"), types=[int], default=100)
         meta = ClassMeta(
-            name="foo",
-            clazz=None,
-            qname=QName("foo"),
-            nillable=False,
-            vars={var.qname: var},
+            name="foo", clazz=None, qname=QName("foo"), nillable=False, vars=[var]
         )
         node = ElementNode(index=0, position=0, meta=meta, default=None)
 
@@ -145,9 +125,7 @@ class ElementNodeTests(TestCase):
 
     def test_next_node_when_given_qname_does_not_match_any_var(self):
         ctx = ModelContext()
-        meta = ClassMeta(
-            name="foo", clazz=None, qname=QName("foo"), nillable=False, vars={}
-        )
+        meta = ClassMeta(name="foo", clazz=None, qname=QName("foo"), nillable=False)
         node = ElementNode(index=0, position=0, meta=meta, default=None)
 
         actual = node.next_node("nope", 1, 10, ctx)

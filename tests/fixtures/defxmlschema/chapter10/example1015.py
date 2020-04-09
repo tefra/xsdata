@@ -10,8 +10,6 @@ class VectorType:
     value: Optional[str] = field(
         default=None,
         metadata=dict(
-            name="value",
-            type="List",
             required=True
         )
     )

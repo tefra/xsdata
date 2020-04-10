@@ -4,8 +4,8 @@
 Naive XML Bindings for python
 =============================
 
-.. image:: https://travis-ci.org/tefra/xsdata.svg?branch=master
-        :target: https://travis-ci.org/tefra/xsdata
+.. image:: https://travis-ci.com/tefra/xsdata.svg?branch=master
+    :target: https://travis-ci.com/tefra/xsdata
 
 .. image:: https://readthedocs.org/projects/xsdata/badge
     :target: https://xsdata.readthedocs.io/

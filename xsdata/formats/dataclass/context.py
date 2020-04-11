@@ -56,17 +56,12 @@ class ModelContext:
         for var in fields(clazz):
             type_hint = type_hints[var.name]
             types = self.real_types(type_hint)
-
             xml_type = var.metadata.get("type")
             xml_clazz = XmlType.to_xml_class(xml_type)
-            if not xml_clazz:
-                continue
-
             namespace = var.metadata.get("namespace")
             namespaces = self.resolve_namespaces(xml_type, namespace, parent_ns)
             local_name = var.metadata.get("name") or self.name_generator(var.name)
-            is_class = next((False for clazz in types if not is_dataclass(clazz)), True)
-
+            is_class = any(is_dataclass(clazz) for clazz in types)
             first_namespace = (
                 namespaces[0]
                 if len(namespaces) > 0 and namespaces[0] and namespaces[0][0] != "#"

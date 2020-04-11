@@ -72,7 +72,7 @@ class JsonParser(AbstractParser, ModelContext):
             )
         else:
             return ParserUtils.parse_value(
-                var.types, value, var.default, is_list=var.is_list
+                var.types, value, var.default, tokens=var.is_tokens
             )
 
     @staticmethod

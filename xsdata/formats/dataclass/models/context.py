@@ -47,6 +47,10 @@ class ClassVar:
         return self.default is list
 
     @property
+    def is_tokens(self):
+        return self.is_text and self.is_list
+
+    @property
     def is_text(self):
         return False
 

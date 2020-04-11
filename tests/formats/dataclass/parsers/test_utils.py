@@ -26,7 +26,7 @@ class ParserUtilsTests(TestCase):
         self.assertTrue(2, ParserUtils.parse_value([int], "1", None))
         mock_to_python.assert_called_once_with([int], "1", None)
 
-    def test_parse_value_with_is_list_true(self):
+    def test_parse_value_with_tokens_true(self):
         actual = ParserUtils.parse_value([int], " 1 2 3", list, None, True)
         self.assertEqual([1, 2, 3], actual)
 

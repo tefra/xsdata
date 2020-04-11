@@ -64,7 +64,7 @@ class ElementNode(BaseNode):
                 position=position,
                 types=var.types,
                 default=var.default,
-                list=var.is_list,
+                tokens=var.is_tokens,
             )
 
 
@@ -104,7 +104,7 @@ class SkipNode(BaseNode):
 @dataclass(frozen=True)
 class PrimitiveNode(BaseNode):
     types: List[Type]
-    list: bool = False
+    tokens: bool = False
     default: Any = None
 
     def parse_element(self, element: Element, objects: List) -> Tuple:
@@ -112,7 +112,7 @@ class PrimitiveNode(BaseNode):
         value = element.text
         ns_map = element.nsmap
         obj = ParserUtils.parse_value(
-            self.types, value, self.default, ns_map, self.list
+            self.types, value, self.default, ns_map, self.tokens
         )
 
         return qname, obj

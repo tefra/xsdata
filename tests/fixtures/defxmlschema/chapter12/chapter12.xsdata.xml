@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<items xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:oth="http://example.org/oth">
+<items xmlns:oth="http://example.org/oth" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <shirt effDate="2002-04-02">
     <number>557</number>
     <name>Short-Sleeved Linen Blouse</name>

@@ -39,6 +39,7 @@ class ParserUtilsTests(TestCase):
         ParserUtils.parse_value([int], " 1 2 3", list, ns_map, True)
         ParserUtils.parse_value([str], " 1 2 3", None, ns_map, False)
 
+        self.assertEqual(4, mock_to_python.call_count)
         mock_to_python.assert_has_calls(
             [
                 mock.call([int], "1", ns_map),

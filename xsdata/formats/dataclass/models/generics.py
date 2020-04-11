@@ -24,8 +24,10 @@ class AnyElement:
 
 @dataclass
 class Namespaces:
-    items: Dict = field(default_factory=lambda: defaultdict(set), init=False)
+    data: Dict = field(default_factory=lambda: defaultdict(set), init=False)
     auto_ns: int = field(default_factory=int, init=False)
+    dirty: bool = field(default=False, init=True)
+    _ns_map: Optional[Dict] = field(init=False, default=None)
 
     @property
     def prefixes(self):
@@ -33,24 +35,21 @@ class Namespaces:
 
     @property
     def ns_map(self):
-        return {
-            prefix: uri for uri, prefixes in self.items.items() for prefix in prefixes
-        }
+        if self._ns_map is None:
+            self._ns_map = {
+                prefix: uri
+                for uri, prefixes in sorted(self.data.items())
+                for prefix in sorted(prefixes)
+            }
+        return self._ns_map
 
     def prefix(self, namespace: str) -> Optional[str]:
         return next(
-            (
-                prefix
-                for uri, prefixes in self.items.items()
-                if uri == namespace
-                for prefix in prefixes
-                if prefix
-            ),
-            None,
+            (prefix for prefix, uri in self.ns_map.items() if uri == namespace), None
         )
 
     def add(self, uri: Optional[str], prefix: Optional[str] = None):
-        if not uri or uri in self.items and not prefix:
+        if not uri or uri in self.data and not prefix:
             return
 
         namespace = Namespace.get_enum(uri)
@@ -59,14 +58,16 @@ class Namespaces:
             prefix = f"ns{self.auto_ns}"
             self.auto_ns += 1
 
-        self.items[uri].add(prefix)
+        self._ns_map = None
+        self.data[uri].add(prefix)
 
     def add_all(self, ns_map: Dict):
         for prefix, uri in ns_map.items():
             self.add(uri, prefix)
 
     def clear(self):
-        self.items.clear()
+        self._ns_map = None
+        self.data.clear()
 
     def register(self):
         for prefix, uri in self.ns_map.items():

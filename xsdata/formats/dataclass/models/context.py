@@ -143,7 +143,7 @@ class ClassMeta:
     def any_element(self) -> Optional[ClassVar]:
         return next((var for var in self.vars if var.is_wildcard), None)
 
-    def find_var(self, qname: QName, condition=None):
+    def find_var(self, qname: QName, condition=None) -> Optional[ClassVar]:
         for var in self.vars:
             if not var.is_wildcard and var.matches(qname, condition):
                 return var
@@ -151,3 +151,5 @@ class ClassMeta:
         for var in self.vars:
             if var.is_wildcard and var.matches(qname, condition):
                 return var
+
+        return None

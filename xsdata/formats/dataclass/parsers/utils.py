@@ -9,6 +9,7 @@ from typing import Type
 from lxml.etree import Element
 from lxml.etree import QName
 
+from xsdata.exceptions import ParserError
 from xsdata.formats.converters import to_python
 from xsdata.formats.dataclass.models.context import ClassMeta
 from xsdata.formats.dataclass.models.context import ClassVar
@@ -48,6 +49,9 @@ class ParserUtils:
         while len(objects) > position:
             qname, value = objects.pop(position)
             arg = meta.find_var(qname)
+
+            if not arg:
+                raise ParserError("Impossible exception!")
 
             if not arg.init:
                 continue

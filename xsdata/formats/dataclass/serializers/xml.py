@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from dataclasses import field
 from dataclasses import is_dataclass
 from typing import Any
+from typing import List
 from typing import Optional
 
 from lxml.etree import cleanup_namespaces
@@ -11,14 +12,12 @@ from lxml.etree import SubElement
 from lxml.etree import tostring
 
 from xsdata.formats.bindings import AbstractSerializer
-from xsdata.formats.converters import to_xml
 from xsdata.formats.dataclass.context import ModelContext
 from xsdata.formats.dataclass.models.context import ClassMeta
 from xsdata.formats.dataclass.models.context import ClassVar
 from xsdata.formats.dataclass.models.generics import AnyElement
 from xsdata.formats.dataclass.models.generics import Namespaces
-from xsdata.models.enums import Namespace
-from xsdata.models.enums import QNames
+from xsdata.formats.dataclass.serializers.utils import SerializeUtils
 
 
 @dataclass
@@ -70,91 +69,74 @@ class XmlSerializer(AbstractSerializer, ModelContext):
         """Recursively traverse the given dataclass instance fields and build
         the lxml Element structure."""
         if not is_dataclass(obj):
-            self.set_text(parent, obj, namespaces)
+            SerializeUtils.set_text(parent, obj, namespaces)
             return parent
 
         meta = self.class_meta(obj.__class__, QName(parent).namespace)
         for var, value in self.next_value(meta, obj):
-            if value is not None:
-                if not var.is_wildcard and not var.is_attributes:
-                    namespaces.add(var.namespace)
+            if value is None:
+                continue
+            elif var.is_attribute:
+                SerializeUtils.set_attribute(parent, var.qname, value, namespaces)
+            elif var.is_attributes:
+                SerializeUtils.set_attributes(parent, value, namespaces)
+            elif var.is_text:
+                namespaces.add(var.namespace)
+                SerializeUtils.set_text(parent, value, namespaces)
+            elif isinstance(value, list):
+                self.render_sub_nodes(parent, value, var, namespaces)
+            else:
+                self.render_sub_node(parent, value, var, namespaces)
 
-                if var.is_attribute:
-                    self.set_attribute(parent, var.qname, value, namespaces)
-                elif var.is_attributes:
-                    self.set_attributes(parent, value, namespaces)
-                elif var.is_text:
-                    self.set_text(parent, value, namespaces)
-                else:
-                    self.render_sub_nodes(parent, value, var, namespaces)
-
-        self.set_nil_attribute(parent, meta.nillable, namespaces)
+        SerializeUtils.set_nil_attribute(parent, meta.nillable, namespaces)
         return parent
 
     def render_sub_nodes(
-        self, parent, values: Any, var: ClassVar, namespaces: Namespaces
+        self, parent: Element, values: List, var: ClassVar, namespaces: Namespaces
     ):
-        if not isinstance(values, list):
-            values = [values]
-
         for value in values:
-            if value is None:
-                continue
-            elif isinstance(value, AnyElement):
-                if value.qname:
-                    sub_element = SubElement(parent, value.qname)
-                else:
-                    sub_element = parent
+            self.render_sub_node(parent, value, var, namespaces)
 
-                namespaces.add_all(value.ns_map)
-                self.set_text(sub_element, value.text, namespaces)
-                self.set_tail(sub_element, value.tail, namespaces)
-                self.set_attributes(sub_element, value.attributes, namespaces)
-                for child in value.children:
-                    self.render_sub_nodes(sub_element, child, var, namespaces)
-                    self.set_nil_attribute(parent, var.nillable, namespaces)
-            elif var.is_element or is_dataclass(value):
-                qname = value.qname if hasattr(value, "qname") else var.qname
-                sub_element = SubElement(parent, qname)
-                self.render_node(value, sub_element, namespaces)
-                self.set_nil_attribute(sub_element, var.nillable, namespaces)
-            elif not parent.text or var.is_text:
-                self.set_text(parent, value, namespaces)
-            else:
-                self.set_tail(parent, value, namespaces)
-
-    @classmethod
-    def set_attribute(
-        cls, parent: Element, key: Any, value: Any, namespaces: Namespaces
+    def render_sub_node(
+        self, parent: Element, value: Any, var: ClassVar, namespaces: Namespaces
     ):
-        if key != QNames.XSI_NIL or (not parent.text and len(parent) == 0):
-            value = to_xml(value, namespaces)
-            if value:
-                parent.set(key, to_xml(value, namespaces))
+        if isinstance(value, AnyElement):
+            self.render_wildcard_node(parent, value, var, namespaces)
+        elif var.is_element or is_dataclass(value):
+            self.render_element_node(parent, value, var, namespaces)
+        elif not parent.text:
+            SerializeUtils.set_text(parent, value, namespaces)
+        else:
+            SerializeUtils.set_tail(parent, value, namespaces)
 
-    @classmethod
-    def set_attributes(cls, parent: Element, values: Any, namespaces: Namespaces):
-        for key, value in values.items():
-            cls.set_attribute(parent, key, value, namespaces)
-
-    @classmethod
-    def set_text(cls, parent: Element, value: Any, namespaces: Namespaces):
-        value = to_xml(value, namespaces)
-        if isinstance(value, str) and len(value) == 0:
-            value = None
-        parent.text = value
-
-    @classmethod
-    def set_tail(cls, parent: Element, value: Any, namespaces: Namespaces):
-        parent.tail = to_xml(value, namespaces)
-
-    @classmethod
-    def set_nil_attribute(
-        cls, element: Element, nillable: bool, namespaces: Namespaces
+    def render_element_node(
+        self, parent: Element, value: Any, var: ClassVar, namespaces: Namespaces
     ):
-        if nillable and element.text is None and len(element) == 0:
-            namespaces.add(Namespace.XSI.uri, Namespace.XSI.prefix)
-            element.set(QNames.XSI_NIL, "true")
+        qname = value.qname if hasattr(value, "qname") else var.qname
+
+        if isinstance(qname, QName):
+            namespaces.add(qname.namespace)
+
+        sub_element = SubElement(parent, qname)
+        self.render_node(value, sub_element, namespaces)
+        SerializeUtils.set_nil_attribute(sub_element, var.nillable, namespaces)
+
+    def render_wildcard_node(
+        self, parent: Element, value: Any, var: ClassVar, namespaces: Namespaces
+    ):
+        if value.qname:
+            sub_element = SubElement(parent, value.qname)
+        else:
+            sub_element = parent
+
+        namespaces.add_all(value.ns_map)
+        SerializeUtils.set_text(sub_element, value.text, namespaces)
+        SerializeUtils.set_tail(sub_element, value.tail, namespaces)
+        SerializeUtils.set_attributes(sub_element, value.attributes, namespaces)
+        for child in value.children:
+            self.render_sub_node(sub_element, child, var, namespaces)
+
+        SerializeUtils.set_nil_attribute(sub_element, var.nillable, namespaces)
 
     @classmethod
     def next_value(cls, meta: ClassMeta, obj: Any):

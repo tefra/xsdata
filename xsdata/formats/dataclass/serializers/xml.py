@@ -128,7 +128,9 @@ class XmlSerializer(AbstractSerializer, ModelContext):
         cls, parent: Element, key: Any, value: Any, namespaces: Namespaces
     ):
         if key != QNames.XSI_NIL or (not parent.text and len(parent) == 0):
-            parent.set(key, to_xml(value, namespaces))
+            value = to_xml(value, namespaces)
+            if value:
+                parent.set(key, to_xml(value, namespaces))
 
     @classmethod
     def set_attributes(cls, parent: Element, values: Any, namespaces: Namespaces):

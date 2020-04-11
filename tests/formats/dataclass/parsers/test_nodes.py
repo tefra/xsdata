@@ -122,7 +122,7 @@ class ElementNodeTests(TestCase):
         self.assertEqual(10, actual.position)
         self.assertEqual([int], actual.types)
         self.assertEqual(100, actual.default)
-        self.assertEqual(var.is_list, actual.list)
+        self.assertEqual(var.is_tokens, actual.tokens)
 
     def test_next_node_when_given_qname_does_not_match_any_var(self):
         ctx = ModelContext()
@@ -203,9 +203,9 @@ class PrimitiveNodeTests(TestCase):
         ele.text = "13"
 
         self.assertEqual((QName("foo"), 13), node.parse_element(ele, []))
-        self.assertFalse(node.list)
+        self.assertFalse(node.tokens)
         mock_parse_value.assert_called_once_with(
-            node.types, ele.text, 100, ele.nsmap, node.list
+            node.types, ele.text, 100, ele.nsmap, node.tokens
         )
 
     def test_next_node(self):

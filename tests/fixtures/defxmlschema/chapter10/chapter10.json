@@ -1,43 +1,21 @@
 {
     "size": [
-        [
-            12
-        ],
-        [
-            "medium"
-        ]
+        12,
+        "medium"
     ],
     "small_size": [
-        [
-            "6"
-        ],
-        [
-            "small"
-        ]
+        "6",
+        "small"
     ],
     "international_size": [
-        [
-            12
-        ],
-        [
-            24
-        ],
-        [
-            "large"
-        ]
+        12,
+        24,
+        "large"
     ],
     "available_sizes": [
-        [
-            10,
-            "large",
-            2
-        ]
+        "10 large 2"
     ],
     "applicable_sizes": [
-        [
-            "small",
-            "medium",
-            "large"
-        ]
+        "small medium large"
     ]
 }

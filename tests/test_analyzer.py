@@ -465,6 +465,19 @@ class ClassAnalyzerTests(FactoryTestCase):
             ]
         )
 
+    def test_flatten_attribute_types_when_type_is_native_and_has_pattern(self):
+        xs_bool = AttrTypeFactory.xs_bool()
+        xs_decimal = AttrTypeFactory.xs_decimal()
+        attr = AttrFactory.create(types=[xs_bool, xs_decimal])
+        target = ClassFactory.create()
+        self.analyzer.flatten_attribute_types(target, attr)
+
+        self.assertEqual([xs_bool, xs_decimal], attr.types)
+
+        attr.restrictions.pattern = r"[0-1]"
+        self.analyzer.flatten_attribute_types(target, attr)
+        self.assertEqual([AttrTypeFactory.xs_string()], attr.types)
+
     @mock.patch.object(ClassAnalyzer, "attr_depends_on", return_value=False)
     @mock.patch.object(ClassAnalyzer, "find_class")
     def test_flatten_attribute_types_when_no_source_is_found(

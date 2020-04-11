@@ -15,6 +15,7 @@ from xsdata.models.codegen import Extension
 from xsdata.models.enums import DataType
 from xsdata.utils import text
 from xsdata.utils.classes import ClassUtils
+from xsdata.utils.collections import unique_sequence
 
 
 def simple_type(item: Class):
@@ -326,6 +327,8 @@ class ClassAnalyzer(ClassUtils):
             if not attr_type.native:
                 type_qname = target.source_qname(attr_type.name)
                 source = self.find_class(type_qname)
+            elif attr.restrictions.pattern:
+                attr_type = AttrType(name=DataType.STRING.code, native=True)
 
             if source is None:
                 attr_type.self_ref = self.attr_depends_on(attr_type, target)
@@ -345,7 +348,7 @@ class ClassAnalyzer(ClassUtils):
                 types.append(AttrType(name=DataType.STRING.code, native=True))
                 logger.warning("Missing type implementation: %s", source.type.__name__)
 
-        attr.types = types
+        attr.types = unique_sequence(types, key="name")
 
     def add_substitution_attrs(self, target: Class, attr: Attr):
         """

@@ -8,7 +8,7 @@ class Size:
     """
     :ivar value:
     """
-    value: Optional[Union[int, "Size.Value"]] = field(
+    value: Optional[Union[str, "Size.Value"]] = field(
         default=None,
         metadata=dict(
             required=True,

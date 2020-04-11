@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-from dataclasses import field
 from typing import Any
 from typing import Dict
 from typing import List
@@ -61,7 +60,11 @@ class ElementNode(BaseNode):
             return WildcardNode(index=index, position=position, qname=var.qname)
         else:
             return PrimitiveNode(
-                index=index, position=position, types=var.types, default=var.default,
+                index=index,
+                position=position,
+                types=var.types,
+                default=var.default,
+                list=var.is_list,
             )
 
 
@@ -101,13 +104,16 @@ class SkipNode(BaseNode):
 @dataclass(frozen=True)
 class PrimitiveNode(BaseNode):
     types: List[Type]
-    default: Any = field(default=None)
+    list: bool = False
+    default: Any = None
 
     def parse_element(self, element: Element, objects: List) -> Tuple:
         qname = QName(element.tag)
         value = element.text
         ns_map = element.nsmap
-        obj = ParserUtils.parse_value(self.types, value, self.default, ns_map)
+        obj = ParserUtils.parse_value(
+            self.types, value, self.default, ns_map, self.list
+        )
 
         return qname, obj
 

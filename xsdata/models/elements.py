@@ -262,7 +262,10 @@ class List(AnnotationBase):
 
     @property
     def real_type(self) -> Optional[str]:
-        return None
+        return self.item_type
+
+    def get_restrictions(self) -> Dict[str, Anything]:
+        return occurrences(0, sys.maxsize)
 
 
 @dataclass

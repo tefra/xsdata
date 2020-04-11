@@ -52,6 +52,9 @@ class NamespacesTests(TestCase):
             }
         )
         self.assertEqual(["b", "xs", "xsi"], namespaces.prefixes)
+        self.assertEqual("b", namespaces.prefix("bar"))
+        self.assertEqual("xs", namespaces.prefix("http://www.w3.org/2001/XMLSchema"))
+        self.assertIsNone(namespaces.prefix("http://xsdata"))
 
     def test_property_ns_map(self):
         namespaces = Namespaces()

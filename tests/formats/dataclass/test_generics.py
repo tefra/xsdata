@@ -24,7 +24,7 @@ class NamespacesTests(TestCase):
             "http://www.w3.org/2001/XMLSchema": {"xs"},
             "http://www.w3.org/2001/XMLSchema-instance": {"xsi"},
         }
-        self.assertEqual(expected, namespaces.items)
+        self.assertEqual(expected, namespaces.data)
 
     def test_add_all(self):
         namespaces = Namespaces()
@@ -40,7 +40,7 @@ class NamespacesTests(TestCase):
             "http://www.w3.org/2001/XMLSchema": {"xs"},
             "http://www.w3.org/2001/XMLSchema-instance": {"xsi"},
         }
-        self.assertEqual(expected, namespaces.items)
+        self.assertEqual(expected, namespaces.data)
 
     def test_property_prefixes(self):
         namespaces = Namespaces()
@@ -60,9 +60,9 @@ class NamespacesTests(TestCase):
         namespaces = Namespaces()
         namespaces.add_all(
             {
-                "b": "bar",
                 None: "http://www.w3.org/2001/XMLSchema",
                 "foo": "http://www.w3.org/2001/XMLSchema-instance",
+                "b": "bar",
             }
         )
         namespaces.add("bar", "again")

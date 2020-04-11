@@ -1,3 +1,4 @@
+import sys
 from unittest import TestCase
 
 from xsdata.models.elements import List
@@ -16,6 +17,10 @@ class ListTests(TestCase):
         obj = List.create()
         self.assertIsNone(obj.real_type)
 
+        obj.item_type = "foo"
+        self.assertEqual("foo", obj.real_type)
+
     def test_get_restrictions(self):
         obj = List.create()
-        self.assertEqual(dict(), obj.get_restrictions())
+        expected = dict(min_occurs=0, max_occurs=sys.maxsize)
+        self.assertEqual(expected, obj.get_restrictions())

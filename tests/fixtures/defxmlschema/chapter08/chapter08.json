@@ -1,17 +1,29 @@
 {
     "dress_size": [
-        6
+        [
+            "06"
+        ]
     ],
     "medium_dress_size": [
-        12
+        [
+            "12"
+        ]
     ],
     "small_dress_size": [
-        6
+        [
+            "6"
+        ]
     ],
     "smlx_size": [
-        "extra large"
+        [
+            "extra",
+            "large"
+        ]
     ],
     "xsmlx_size": [
-        "extra small"
+        [
+            "extra",
+            "small"
+        ]
     ]
 }

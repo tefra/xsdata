@@ -1,5 +1,8 @@
 from dataclasses import dataclass, field
-from typing import Optional
+from typing import List, Union
+from tests.fixtures.defxmlschema.chapter08.example0810 import (
+    SmlsizeType,
+)
 
 
 @dataclass
@@ -9,10 +12,13 @@ class ApplicableSizesType:
     :ivar small_medium_large:
     :ivar value_2_4_6_8_10_12_14_16_18:
     """
-    value: Optional[str] = field(
-        default=None,
+    value: List[Union[int, SmlsizeType]] = field(
+        default_factory=list,
         metadata=dict(
-            required=True
+            min_occurs=0,
+            max_occurs=9223372036854775807,
+            min_inclusive=2.0,
+            max_inclusive=18.0
         )
     )
     small_medium_large: str = field(

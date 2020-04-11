@@ -12,6 +12,7 @@ from typing import Type
 from lxml.etree import QName
 
 from xsdata.exceptions import ConverterError
+from xsdata.formats.dataclass.models.generics import Namespaces
 from xsdata.utils import text
 
 
@@ -80,9 +81,11 @@ def to_bool(value: Any) -> bool:
     raise ConverterError(f"Invalid bool literal '{value}'")
 
 
-def to_xml(value: Any) -> Any:
+def to_xml(value: Any, namespaces: Optional[Namespaces] = None) -> Any:
     if value is None:
         return None
+    if isinstance(value, list):
+        return " ".join(map(lambda x: to_xml(x, namespaces), value))
     if isinstance(value, bool):
         return "true" if value else "false"
     if isinstance(value, Enum):
@@ -92,11 +95,20 @@ def to_xml(value: Any) -> Any:
     if isinstance(value, Decimal) and value.is_infinite():
         return str(value).replace("Infinity", "INF")
     if isinstance(value, QName):
-        return value
+        return qname_to_xml(value, namespaces) if namespaces else value.text
     if is_dataclass(value):
         raise ConverterError("Text nodes can't be dataclasses!")
-
     return str(value)
+
+
+def qname_to_xml(qname: QName, namespaces: Namespaces) -> str:
+    namespaces.add(qname.namespace)
+
+    prefix = namespaces.prefix(qname.namespace)
+    if not prefix:
+        return qname.localname
+    else:
+        return f"{prefix}:{qname.localname}"
 
 
 func_map: Dict[str, Callable] = {

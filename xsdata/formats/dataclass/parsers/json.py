@@ -71,7 +71,9 @@ class JsonParser(AbstractParser, ModelContext):
                 else self.parse_context(value, AnyElement)
             )
         else:
-            return ParserUtils.parse_value(var.types, value, var.default)
+            return ParserUtils.parse_value(
+                var.types, value, var.default, is_list=var.is_list
+            )
 
     @staticmethod
     def get_value(data: Dict, field: ClassVar):

@@ -31,7 +31,7 @@ class SimpleTypeTests(TestCase):
         self.assertEqual("thug", obj.real_type)
 
         obj.list = List.create(item_type="foo")
-        self.assertIsNone(obj.real_type)
+        self.assertEqual("foo", obj.real_type)
 
         obj.restriction = Restriction.create(base="bar")
         self.assertEqual("bar", obj.real_type)

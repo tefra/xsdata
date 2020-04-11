@@ -8,6 +8,7 @@ from tests.fixtures.books import BookForm
 from xsdata.exceptions import ConverterError
 from xsdata.formats.converters import to_python
 from xsdata.formats.converters import to_xml
+from xsdata.formats.dataclass.models.generics import Namespaces
 from xsdata.models.enums import UseType
 
 
@@ -28,7 +29,12 @@ class ConvertersTestCases(TestCase):
         self.assertEqual("-INF", to_xml(Decimal("-inf")))
         self.assertEqual("8.77683E-8", to_xml(Decimal("8.77683E-8")))
         self.assertEqual("8.77683E-08", to_xml(float("8.77683E-8")))
-        self.assertEqual(QName("a"), to_xml(QName("a")))
+        self.assertEqual("a", to_xml(QName("a")))
+        self.assertEqual("{a}b", to_xml(QName("a", "b")))
+
+        namespaces = Namespaces()
+        namespaces.add("a", "aa")
+        self.assertEqual("aa:b", to_xml(QName("a", "b"), namespaces))
 
         with self.assertRaises(ConverterError):
             to_xml(BookForm())

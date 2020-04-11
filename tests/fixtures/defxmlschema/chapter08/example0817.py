@@ -7,7 +7,7 @@ class EvenDress:
     """
     :ivar value:
     """
-    value: Optional[int] = field(
+    value: Optional[str] = field(
         default=None,
         metadata=dict(
             required=True,

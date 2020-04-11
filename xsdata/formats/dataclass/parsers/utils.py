@@ -25,13 +25,18 @@ class ParserUtils:
         value: Any,
         default: Any = None,
         ns_map: Optional[Dict] = None,
+        is_list: bool = False,
     ) -> Any:
         """Convert xml string values to s python primitive type."""
 
         if value is None:
             return None if callable(default) else default
 
-        return to_python(types, value, ns_map)
+        if is_list:
+            value = value if isinstance(value, list) else filter(None, value.split(" "))
+            return list(map(lambda x: to_python(types, x, ns_map), value))
+        else:
+            return to_python(types, value, ns_map)
 
     @classmethod
     def bind_element_children(
@@ -155,7 +160,7 @@ class ParserUtils:
         var = metadata.any_text
         if var and element.text is not None and var.init:
             params[var.name] = cls.parse_value(
-                var.types, element.text, var.default, element.nsmap
+                var.types, element.text, var.default, element.nsmap, var.is_list
             )
 
     @classmethod
@@ -178,7 +183,7 @@ class ParserUtils:
                 params[wildcard.name][key] = value
             elif var and var.init:
                 params[var.name] = cls.parse_value(
-                    var.types, value, var.default, element.nsmap
+                    var.types, value, var.default, element.nsmap, var.is_list
                 )
 
     @classmethod

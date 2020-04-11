@@ -26,6 +26,28 @@ class ParserUtilsTests(TestCase):
         self.assertTrue(2, ParserUtils.parse_value([int], "1", None))
         mock_to_python.assert_called_once_with([int], "1", None)
 
+    def test_parse_value_with_is_list_true(self):
+        actual = ParserUtils.parse_value([int], " 1 2 3", list, None, True)
+        self.assertEqual([1, 2, 3], actual)
+
+        actual = ParserUtils.parse_value([int], ["1", "2", "3"], list, None, True)
+        self.assertEqual([1, 2, 3], actual)
+
+    @mock.patch("xsdata.formats.dataclass.parsers.utils.to_python", return_value=2)
+    def test_parse_value_with_ns_map(self, mock_to_python):
+        ns_map = dict(a=1)
+        ParserUtils.parse_value([int], " 1 2 3", list, ns_map, True)
+        ParserUtils.parse_value([str], " 1 2 3", None, ns_map, False)
+
+        mock_to_python.assert_has_calls(
+            [
+                mock.call([int], "1", ns_map),
+                mock.call([int], "2", ns_map),
+                mock.call([int], "3", ns_map),
+                mock.call([str], " 1 2 3", ns_map),
+            ]
+        )
+
     def test_fetch_any_children(self):
         objects = [(x, x) for x in "abc"]
         self.assertEqual(["b", "c"], ParserUtils.fetch_any_children(1, objects))
@@ -44,7 +66,11 @@ class ParserUtilsTests(TestCase):
         expected = {"eff_date": "2020-03-02", "other_attributes": {"whatever": "foo"}}
         self.assertEqual(expected, params)
         mock_parse_value.assert_called_once_with(
-            eff_date.types, "2020-03-01", eff_date.default, element.nsmap
+            eff_date.types,
+            "2020-03-01",
+            eff_date.default,
+            element.nsmap,
+            eff_date.is_list,
         )
 
     def test_bind_elements_attrs_ignore_init_false_vars(self):
@@ -74,6 +100,7 @@ class ParserUtilsTests(TestCase):
         element = Element("foo")
         params = dict()
         metadata = self.ctx.class_meta(DressSize)
+        var = metadata.any_text
         ParserUtils.bind_element_text(params, metadata, element)
         self.assertEqual({}, params)
 
@@ -85,6 +112,7 @@ class ParserUtilsTests(TestCase):
             element.text,
             metadata.any_text.default,
             element.nsmap,
+            var.is_list,
         )
 
     def test_parse_any_element(self):

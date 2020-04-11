@@ -70,7 +70,7 @@ class XmlSerializer(AbstractSerializer, ModelContext):
         """Recursively traverse the given dataclass instance fields and build
         the lxml Element structure."""
         if not is_dataclass(obj):
-            self.set_text(parent, obj)
+            self.set_text(parent, obj, namespaces)
             return parent
 
         meta = self.class_meta(obj.__class__, QName(parent).namespace)
@@ -80,9 +80,11 @@ class XmlSerializer(AbstractSerializer, ModelContext):
                     namespaces.add(var.namespace)
 
                 if var.is_attribute:
-                    self.set_attribute(parent, var.qname, value)
+                    self.set_attribute(parent, var.qname, value, namespaces)
                 elif var.is_attributes:
-                    self.set_attributes(parent, value)
+                    self.set_attributes(parent, value, namespaces)
+                elif var.is_text:
+                    self.set_text(parent, value, namespaces)
                 else:
                     self.render_sub_nodes(parent, value, var, namespaces)
 
@@ -105,9 +107,9 @@ class XmlSerializer(AbstractSerializer, ModelContext):
                     sub_element = parent
 
                 namespaces.add_all(value.ns_map)
-                self.set_text(sub_element, value.text)
-                self.set_tail(sub_element, value.tail)
-                self.set_attributes(sub_element, value.attributes)
+                self.set_text(sub_element, value.text, namespaces)
+                self.set_tail(sub_element, value.tail, namespaces)
+                self.set_attributes(sub_element, value.attributes, namespaces)
                 for child in value.children:
                     self.render_sub_nodes(sub_element, child, var, namespaces)
                     self.set_nil_attribute(parent, var.nillable, namespaces)
@@ -117,30 +119,32 @@ class XmlSerializer(AbstractSerializer, ModelContext):
                 self.render_node(value, sub_element, namespaces)
                 self.set_nil_attribute(sub_element, var.nillable, namespaces)
             elif not parent.text or var.is_text:
-                self.set_text(parent, value)
+                self.set_text(parent, value, namespaces)
             else:
-                self.set_tail(parent, value)
+                self.set_tail(parent, value, namespaces)
 
     @classmethod
-    def set_attribute(cls, parent: Element, key: Any, value: Any):
+    def set_attribute(
+        cls, parent: Element, key: Any, value: Any, namespaces: Namespaces
+    ):
         if key != QNames.XSI_NIL or (not parent.text and len(parent) == 0):
-            parent.set(to_xml(key), to_xml(value))
+            parent.set(key, to_xml(value, namespaces))
 
     @classmethod
-    def set_attributes(cls, parent: Element, values: Any):
+    def set_attributes(cls, parent: Element, values: Any, namespaces: Namespaces):
         for key, value in values.items():
-            cls.set_attribute(parent, key, value)
+            cls.set_attribute(parent, key, value, namespaces)
 
     @classmethod
-    def set_text(cls, parent: Element, value: Any):
-        value = to_xml(value)
+    def set_text(cls, parent: Element, value: Any, namespaces: Namespaces):
+        value = to_xml(value, namespaces)
         if isinstance(value, str) and len(value) == 0:
             value = None
         parent.text = value
 
     @classmethod
-    def set_tail(cls, parent: Element, value: Any):
-        parent.tail = to_xml(value)
+    def set_tail(cls, parent: Element, value: Any, namespaces: Namespaces):
+        parent.tail = to_xml(value, namespaces)
 
     @classmethod
     def set_nil_attribute(

@@ -25,7 +25,7 @@ class SizesType:
     :ivar smlx_size:
     :ivar xsmlx_size:
     """
-    dress_size: List[int] = field(
+    dress_size: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="dressSize",
@@ -38,7 +38,7 @@ class SizesType:
             pattern=r"\d{1,2}"
         )
     )
-    medium_dress_size: List[int] = field(
+    medium_dress_size: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="mediumDressSize",
@@ -51,7 +51,7 @@ class SizesType:
             pattern=r"\d{1,2}"
         )
     )
-    small_dress_size: List[int] = field(
+    small_dress_size: List[str] = field(
         default_factory=list,
         metadata=dict(
             name="smallDressSize",

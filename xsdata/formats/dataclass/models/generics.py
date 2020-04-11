@@ -37,6 +37,18 @@ class Namespaces:
             prefix: uri for uri, prefixes in self.items.items() for prefix in prefixes
         }
 
+    def prefix(self, namespace: str) -> Optional[str]:
+        return next(
+            (
+                prefix
+                for uri, prefixes in self.items.items()
+                if uri == namespace
+                for prefix in prefixes
+                if prefix
+            ),
+            None,
+        )
+
     def add(self, uri: Optional[str], prefix: Optional[str] = None):
         if not uri or uri in self.items and not prefix:
             return

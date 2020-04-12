@@ -8,8 +8,8 @@ from typing import TypeVar
 
 from xsdata.exceptions import ParserError
 from xsdata.formats.bindings import AbstractParser
-from xsdata.formats.dataclass.context import ModelContext
-from xsdata.formats.dataclass.models.context import ClassVar
+from xsdata.formats.dataclass.context import XmlContext
+from xsdata.formats.dataclass.models.elements import XmlVar
 from xsdata.formats.dataclass.models.generics import AnyElement
 from xsdata.formats.dataclass.parsers.utils import ParserUtils
 
@@ -17,7 +17,7 @@ T = TypeVar("T")
 
 
 @dataclass
-class JsonParser(AbstractParser, ModelContext):
+class JsonParser(AbstractParser, XmlContext):
     def parse(self, source: io.BytesIO, clazz: Type[T]) -> T:
         """Parse the JSON input stream and return the resulting object tree."""
         ctx = json.load(source)
@@ -34,7 +34,7 @@ class JsonParser(AbstractParser, ModelContext):
         if isinstance(data, list) and len(data) == 1:
             data = data[0]
 
-        for var in self.class_meta(clazz).vars:
+        for var in self.build(clazz).vars:
             value = self.get_value(data, var)
 
             if value is None:
@@ -49,7 +49,7 @@ class JsonParser(AbstractParser, ModelContext):
         except Exception:
             raise ParserError("Parsing failed")
 
-    def bind_value(self, var: ClassVar, value) -> Any:
+    def bind_value(self, var: XmlVar, value) -> Any:
         """
         Bind value according to the class var.
 
@@ -76,7 +76,7 @@ class JsonParser(AbstractParser, ModelContext):
             )
 
     @staticmethod
-    def get_value(data: Dict, field: ClassVar):
+    def get_value(data: Dict, field: XmlVar):
         """Find the field value in the given dictionary or return the default
         field value."""
         if field.qname.localname in data:

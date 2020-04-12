@@ -13,12 +13,11 @@ from lxml.etree import QName
 
 from xsdata.exceptions import ParserError
 from xsdata.formats.bindings import AbstractParser
-from xsdata.formats.dataclass.context import ModelContext
+from xsdata.formats.dataclass.context import XmlContext
 from xsdata.formats.dataclass.models.generics import Namespaces
 from xsdata.formats.dataclass.parsers.json import T
-from xsdata.formats.dataclass.parsers.nodes import BaseNode
-from xsdata.formats.dataclass.parsers.nodes import ElementNode
 from xsdata.formats.dataclass.parsers.nodes import RootNode
+from xsdata.formats.dataclass.parsers.nodes import XmlNode
 from xsdata.models.enums import EventType
 from xsdata.utils import text
 
@@ -26,10 +25,10 @@ from xsdata.utils import text
 @dataclass
 class XmlParser(AbstractParser):
     index: int = field(default_factory=int)
-    queue: List[BaseNode] = field(init=False, default_factory=list)
+    queue: List[XmlNode] = field(init=False, default_factory=list)
     namespaces: Namespaces = field(init=False, default_factory=Namespaces)
     objects: List[Tuple[QName, Any]] = field(init=False, default_factory=list)
-    context: ModelContext = field(default_factory=ModelContext)
+    context: XmlContext = field(default_factory=XmlContext)
 
     def parse(self, source: io.BytesIO, clazz: Type[T]) -> T:
         """Parse the XML input stream and return the resulting object tree."""
@@ -48,7 +47,7 @@ class XmlParser(AbstractParser):
         :raises ValueError: When the requested type doesn't match the result object
         """
         obj = None
-        meta = self.context.class_meta(clazz)
+        meta = self.context.build(clazz)
         self.objects = []
         self.index = 0
         self.namespaces.clear()
@@ -79,10 +78,6 @@ class XmlParser(AbstractParser):
         position = len(self.objects)
 
         queue_item = item.next_node(qname, self.index, position, self.context)
-
-        if queue_item is None:
-            parent = item.meta.qname if isinstance(item, ElementNode) else "unknown"
-            raise ParserError(f"{parent} does not support mixed content: {qname}")
 
         self.index += 1
         self.queue.append(queue_item)

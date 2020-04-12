@@ -1,8 +1,8 @@
-from xsdata.formats.dataclass.models.context import XmlAttribute
-from xsdata.formats.dataclass.models.context import XmlAttributes
-from xsdata.formats.dataclass.models.context import XmlElement
-from xsdata.formats.dataclass.models.context import XmlText
-from xsdata.formats.dataclass.models.context import XmlWildcard
+from xsdata.formats.dataclass.models.elements import XmlAttribute
+from xsdata.formats.dataclass.models.elements import XmlAttributes
+from xsdata.formats.dataclass.models.elements import XmlElement
+from xsdata.formats.dataclass.models.elements import XmlText
+from xsdata.formats.dataclass.models.elements import XmlWildcard
 
 
 class XmlType:

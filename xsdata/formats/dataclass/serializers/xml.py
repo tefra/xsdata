@@ -12,25 +12,27 @@ from lxml.etree import SubElement
 from lxml.etree import tostring
 
 from xsdata.formats.bindings import AbstractSerializer
-from xsdata.formats.dataclass.context import ModelContext
-from xsdata.formats.dataclass.models.context import ClassMeta
-from xsdata.formats.dataclass.models.context import ClassVar
+from xsdata.formats.dataclass.context import XmlContext
+from xsdata.formats.dataclass.models.elements import XmlMeta
+from xsdata.formats.dataclass.models.elements import XmlVar
 from xsdata.formats.dataclass.models.generics import AnyElement
 from xsdata.formats.dataclass.models.generics import Namespaces
 from xsdata.formats.dataclass.serializers.utils import SerializeUtils
 
 
 @dataclass
-class XmlSerializer(AbstractSerializer, ModelContext):
+class XmlSerializer(AbstractSerializer):
     """
     :ivar xml_declaration: Add xml declaration
     :ivar encoding: Result text encoding
     :ivar pretty_print: Enable pretty output
+    :ivar context: XmlContext instance
     """
 
     xml_declaration: bool = field(default=True)
     encoding: str = field(default="UTF-8")
     pretty_print: bool = field(default=False)
+    context: XmlContext = field(default_factory=XmlContext)
 
     def render(self, obj: Any, namespaces: Optional[Namespaces] = None) -> str:
         """
@@ -54,10 +56,10 @@ class XmlSerializer(AbstractSerializer, ModelContext):
         Optionally provide a namespaces instance with a predefined list
         of namespace uris and prefixes.
         """
-        meta = self.class_meta(obj.__class__)
+        meta = self.context.build(obj.__class__)
         namespaces = namespaces or Namespaces()
         namespaces.register()
-        namespaces.add(meta.namespace)
+        namespaces.add(meta.qname.namespace)
 
         root = self.render_node(obj, Element(meta.qname), namespaces)
         cleanup_namespaces(
@@ -72,7 +74,7 @@ class XmlSerializer(AbstractSerializer, ModelContext):
             SerializeUtils.set_text(parent, obj, namespaces)
             return parent
 
-        meta = self.class_meta(obj.__class__, QName(parent).namespace)
+        meta = self.context.build(obj.__class__, QName(parent).namespace)
         for var, value in self.next_value(meta, obj):
             if value is None:
                 continue
@@ -81,7 +83,7 @@ class XmlSerializer(AbstractSerializer, ModelContext):
             elif var.is_attributes:
                 SerializeUtils.set_attributes(parent, value, namespaces)
             elif var.is_text:
-                namespaces.add(var.namespace)
+                namespaces.add(var.qname.namespace)
                 SerializeUtils.set_text(parent, value, namespaces)
             elif isinstance(value, list):
                 self.render_sub_nodes(parent, value, var, namespaces)
@@ -92,13 +94,13 @@ class XmlSerializer(AbstractSerializer, ModelContext):
         return parent
 
     def render_sub_nodes(
-        self, parent: Element, values: List, var: ClassVar, namespaces: Namespaces
+        self, parent: Element, values: List, var: XmlVar, namespaces: Namespaces
     ):
         for value in values:
             self.render_sub_node(parent, value, var, namespaces)
 
     def render_sub_node(
-        self, parent: Element, value: Any, var: ClassVar, namespaces: Namespaces
+        self, parent: Element, value: Any, var: XmlVar, namespaces: Namespaces
     ):
         if isinstance(value, AnyElement):
             self.render_wildcard_node(parent, value, var, namespaces)
@@ -110,7 +112,7 @@ class XmlSerializer(AbstractSerializer, ModelContext):
             SerializeUtils.set_tail(parent, value, namespaces)
 
     def render_element_node(
-        self, parent: Element, value: Any, var: ClassVar, namespaces: Namespaces
+        self, parent: Element, value: Any, var: XmlVar, namespaces: Namespaces
     ):
         qname = value.qname if hasattr(value, "qname") else var.qname
 
@@ -122,7 +124,7 @@ class XmlSerializer(AbstractSerializer, ModelContext):
         SerializeUtils.set_nil_attribute(sub_element, var.nillable, namespaces)
 
     def render_wildcard_node(
-        self, parent: Element, value: Any, var: ClassVar, namespaces: Namespaces
+        self, parent: Element, value: Any, var: XmlVar, namespaces: Namespaces
     ):
         if value.qname:
             sub_element = SubElement(parent, value.qname)
@@ -139,7 +141,7 @@ class XmlSerializer(AbstractSerializer, ModelContext):
         SerializeUtils.set_nil_attribute(sub_element, var.nillable, namespaces)
 
     @classmethod
-    def next_value(cls, meta: ClassMeta, obj: Any):
+    def next_value(cls, meta: XmlMeta, obj: Any):
 
         index = 0
         attrs = meta.vars

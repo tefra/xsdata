@@ -103,12 +103,9 @@ def to_xml(value: Any, namespaces: Optional[Namespaces] = None) -> Any:
 
 def qname_to_xml(qname: QName, namespaces: Namespaces) -> str:
     namespaces.add(qname.namespace)
-
     prefix = namespaces.prefix(qname.namespace)
-    if not prefix:
-        return qname.localname
-    else:
-        return f"{prefix}:{qname.localname}"
+
+    return f"{prefix}:{qname.localname}"
 
 
 func_map: Dict[str, Callable] = {

@@ -18,7 +18,7 @@ class SerializerError(ValueError):
     pass
 
 
-class ModelInspectionError(ValueError):
+class XmlContextError(ValueError):
     pass
 
 

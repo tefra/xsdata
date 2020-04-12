@@ -11,8 +11,8 @@ from lxml.etree import QName
 
 from xsdata.exceptions import ParserError
 from xsdata.formats.converters import to_python
-from xsdata.formats.dataclass.models.context import ClassMeta
-from xsdata.formats.dataclass.models.context import ClassVar
+from xsdata.formats.dataclass.models.elements import XmlMeta
+from xsdata.formats.dataclass.models.elements import XmlVar
 from xsdata.formats.dataclass.models.generics import AnyElement
 from xsdata.logger import logger
 from xsdata.utils import text
@@ -41,7 +41,7 @@ class ParserUtils:
 
     @classmethod
     def bind_element_children(
-        cls, params: Dict, meta: ClassMeta, position: int, objects: List,
+        cls, params: Dict, meta: XmlMeta, position: int, objects: List,
     ):
         """Return a dictionary of qualified object names and their values for
         the given queue item."""
@@ -77,7 +77,7 @@ class ParserUtils:
         return children
 
     @classmethod
-    def bind_element_param(cls, params: Dict, var: ClassVar, value: Any):
+    def bind_element_param(cls, params: Dict, var: XmlVar, value: Any):
         if var.is_list:
             if var.name not in params:
                 params[var.name] = list()
@@ -91,7 +91,7 @@ class ParserUtils:
 
     @classmethod
     def bind_element_wildcard_param(
-        cls, params: Dict, var: ClassVar, qname: QName, value: Any
+        cls, params: Dict, var: XmlVar, qname: QName, value: Any
     ):
         if is_dataclass(value):
             if not isinstance(value, AnyElement):
@@ -109,8 +109,8 @@ class ParserUtils:
             params[var.name] = value
 
     @classmethod
-    def bind_element_wild_text(cls, params, meta: ClassMeta, element: Element):
-        var = meta.any_element
+    def bind_element_wild_text(cls, params, meta: XmlMeta, element: Element):
+        var = meta.find_var(condition=lambda x: x.is_wildcard)
         if not var:
             return
 
@@ -151,35 +151,35 @@ class ParserUtils:
 
     @classmethod
     def parse_any_attributes(cls, element: Element):
-        def qname(name):
-            prefix, suffix = text.split(name)
+        def qname(value):
+            prefix, suffix = text.split(value)
             if prefix and prefix in element.nsmap:
                 return QName(element.nsmap[prefix], suffix)
-            return name
+            return value
 
-        return {qname(key): qname(value) for key, value in element.attrib.items()}
+        return {QName(key): qname(value) for key, value in element.attrib.items()}
 
     @classmethod
-    def bind_element_text(cls, params: Dict, metadata: ClassMeta, element: Element):
-        var = metadata.any_text
+    def bind_element_text(cls, params: Dict, metadata: XmlMeta, element: Element):
+        var = metadata.find_var(condition=lambda x: x.is_text)
         if var and element.text is not None and var.init:
             params[var.name] = cls.parse_value(
                 var.types, element.text, var.default, element.nsmap, var.is_tokens
             )
 
     @classmethod
-    def bind_element_attrs(cls, params: Dict, metadata: ClassMeta, element: Element):
+    def bind_element_attrs(cls, params: Dict, metadata: XmlMeta, element: Element):
         """Parse the given element's attributes and any text content and return
         a dictionary of field names and values based on the given class
         metadata."""
 
-        wildcard = metadata.any_attribute
+        wildcard = metadata.find_var(condition=lambda x: x.is_attributes)
         for key, value in element.attrib.items():
             qname = QName(key)
 
-            var = metadata.find_var(qname)
-            if var and (var.name in params or not var.is_attribute):
-                var = None
+            var = metadata.find_var(
+                qname, condition=lambda x: x.is_attribute and x.name not in params
+            )
 
             if not var and wildcard:
                 if wildcard.name not in params:
@@ -192,8 +192,8 @@ class ParserUtils:
 
     @classmethod
     def find_eligible_wildcard(
-        cls, meta: ClassMeta, qname: QName, params: Dict
-    ) -> Optional[ClassVar]:
+        cls, meta: XmlMeta, qname: QName, params: Dict
+    ) -> Optional[XmlVar]:
         conditions = [
             lambda x: x.is_wildcard and (x.name not in params or x.is_list),
             lambda x: x.is_wildcard and (x.name in params and not x.is_list),

@@ -7,6 +7,7 @@ from typing import Optional
 
 from lxml.etree import register_namespace
 
+from xsdata.formats.dataclass.models.constants import XmlType
 from xsdata.models.enums import Namespace
 
 
@@ -15,11 +16,13 @@ class AnyElement:
     qname: Optional[str] = field(default=None)
     text: Optional[str] = field(default=None)
     tail: Optional[str] = field(default=None)
-    children: List[object] = field(default_factory=list, metadata=dict(type="Wildcard"))
-    attributes: Dict = field(
-        default_factory=dict, metadata=dict(name="attributes", type="Attributes")
-    )
     ns_map: Dict = field(default_factory=dict)
+    children: List[object] = field(
+        default_factory=list, metadata=dict(type=XmlType.WILDCARD)
+    )
+    attributes: Dict = field(
+        default_factory=dict, metadata=dict(type=XmlType.ATTRIBUTES)
+    )
 
 
 @dataclass

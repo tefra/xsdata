@@ -11,28 +11,28 @@ from tests.fixtures.defxmlschema.chapter02.example0210 import Product
 from tests.fixtures.defxmlschema.chapter05.chapter05prod import ProductType
 from tests.fixtures.defxmlschema.chapter11.example1101 import TextType
 from tests.fixtures.defxmlschema.chapter13.chapter13 import ItemsType
-from xsdata.exceptions import ModelInspectionError
-from xsdata.formats.dataclass.context import ModelContext
+from xsdata.exceptions import XmlContextError
+from xsdata.formats.dataclass.context import XmlContext
 from xsdata.formats.dataclass.models.constants import XmlType
-from xsdata.formats.dataclass.models.context import ClassMeta
-from xsdata.formats.dataclass.models.context import XmlAttribute
-from xsdata.formats.dataclass.models.context import XmlElement
-from xsdata.formats.dataclass.models.context import XmlWildcard
+from xsdata.formats.dataclass.models.elements import XmlAttribute
+from xsdata.formats.dataclass.models.elements import XmlElement
+from xsdata.formats.dataclass.models.elements import XmlMeta
+from xsdata.formats.dataclass.models.elements import XmlWildcard
 from xsdata.utils import text
 
 
-class ModelContextTests(TestCase):
+class XmlContextTests(TestCase):
     def setUp(self):
-        self.ctx = ModelContext()
+        self.ctx = XmlContext()
         super().setUp()
 
-    @mock.patch.object(ModelContext, "get_type_hints")
-    def test_class_meta_build_vars(self, mock_get_type_hints):
+    @mock.patch.object(XmlContext, "get_type_hints")
+    def test_build_build_vars(self, mock_get_type_hints):
         var = XmlElement(name="foo", qname=QName("foo", "bar"), types=[int])
         mock_get_type_hints.return_value = [var]
 
-        result = self.ctx.class_meta(ItemsType, None)
-        expected = ClassMeta(
+        result = self.ctx.build(ItemsType, None)
+        expected = XmlMeta(
             name="ItemsType",
             clazz=ItemsType,
             qname=QName("ItemsType"),
@@ -43,29 +43,29 @@ class ModelContextTests(TestCase):
         self.assertEqual(expected, result)
         mock_get_type_hints.assert_called_once_with(ItemsType, None)
 
-    @mock.patch.object(ModelContext, "get_type_hints", return_value=dict())
-    def test_class_meta_with_meta_namespace(self, mock_get_type_hints):
+    @mock.patch.object(XmlContext, "get_type_hints", return_value=dict())
+    def test_build_with_meta_namespace(self, mock_get_type_hints):
         namespace = Product.Meta.namespace
-        result = self.ctx.class_meta(Product, None)
+        result = self.ctx.build(Product, None)
 
         self.assertEqual(QName(namespace, "product"), result.qname)
         mock_get_type_hints.assert_called_once_with(Product, namespace)
 
-    @mock.patch.object(ModelContext, "get_type_hints", return_value=dict())
-    def test_class_meta_with_parent_ns(self, mock_get_type_hints):
-        result = self.ctx.class_meta(ProductType, "http://xsdata")
+    @mock.patch.object(XmlContext, "get_type_hints", return_value=dict())
+    def test_build_with_parent_ns(self, mock_get_type_hints):
+        result = self.ctx.build(ProductType, "http://xsdata")
 
         self.assertEqual(QName("http://xsdata", "ProductType"), str(result.qname))
         mock_get_type_hints.assert_called_once_with(ProductType, "http://xsdata")
 
-    @mock.patch.object(ModelContext, "get_type_hints", return_value=dict())
-    def test_class_meta_with_no_meta_name_and_name_generator(self, *args):
-        inspect = ModelContext(name_generator=lambda x: text.snake_case(x))
-        result = inspect.class_meta(ItemsType)
+    @mock.patch.object(XmlContext, "get_type_hints", return_value=dict())
+    def test_build_with_no_meta_name_and_name_generator(self, *args):
+        inspect = XmlContext(name_generator=lambda x: text.snake_case(x))
+        result = inspect.build(ItemsType)
 
         self.assertEqual(QName("items_type"), str(result.qname))
 
-    def test_class_meta_with_no_meta_not_inherit_from_parent(self):
+    def test_build_with_no_meta_not_inherit_from_parent(self):
         @dataclass
         class Bar:
             class Meta:
@@ -75,14 +75,14 @@ class ModelContextTests(TestCase):
         class Foo(Bar):
             pass
 
-        result = self.ctx.class_meta(Foo)
+        result = self.ctx.build(Foo)
         self.assertEqual("Foo", result.name)
-        self.assertIsNone(result.namespace)
+        self.assertIsNone(result.qname.namespace)
 
-    @mock.patch.object(ModelContext, "get_type_hints", return_value=dict())
-    def test_class_meta_with_no_dataclass_raises_exception(self, *args):
-        with self.assertRaises(ModelInspectionError) as cm:
-            self.ctx.class_meta(int)
+    @mock.patch.object(XmlContext, "get_type_hints", return_value=dict())
+    def test_build_with_no_dataclass_raises_exception(self, *args):
+        with self.assertRaises(XmlContextError) as cm:
+            self.ctx.build(int)
 
         self.assertEqual(f"Object {int} is not a dataclass.", str(cm.exception))
 

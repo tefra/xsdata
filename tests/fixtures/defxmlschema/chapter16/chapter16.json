@@ -5,30 +5,30 @@
                 "qname": null,
                 "text": null,
                 "tail": null,
+                "ns_map": {},
                 "children": [
                     {
                         "qname": "number",
                         "text": "443",
                         "tail": null,
-                        "children": [],
-                        "attributes": {},
                         "ns_map": {
                             "xsi": "http://www.w3.org/2001/XMLSchema-instance"
-                        }
+                        },
+                        "children": [],
+                        "attributes": {}
                     },
                     {
                         "qname": "name",
                         "text": "Deluxe Golf Umbrella",
                         "tail": null,
-                        "children": [],
-                        "attributes": {},
                         "ns_map": {
                             "xsi": "http://www.w3.org/2001/XMLSchema-instance"
-                        }
+                        },
+                        "children": [],
+                        "attributes": {}
                     }
                 ],
-                "attributes": {},
-                "ns_map": {}
+                "attributes": {}
             }
         }
     ],

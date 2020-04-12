@@ -5,8 +5,8 @@ from lxml.etree import QName
 
 from tests.fixtures.books import BookForm
 from tests.fixtures.books import Books
-from xsdata.formats.dataclass.models.context import XmlElement
-from xsdata.formats.dataclass.models.context import XmlText
+from xsdata.formats.dataclass.models.elements import XmlElement
+from xsdata.formats.dataclass.models.elements import XmlText
 from xsdata.formats.dataclass.parsers.json import JsonParser
 
 

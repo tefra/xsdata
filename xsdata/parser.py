@@ -7,7 +7,7 @@ from typing import TypeVar
 
 from lxml import etree
 
-from xsdata.formats.dataclass.parsers.nodes import BaseNode
+from xsdata.formats.dataclass.parsers.nodes import XmlNode
 from xsdata.formats.dataclass.parsers.xml import XmlParser
 from xsdata.models import elements as xsd
 from xsdata.models.enums import FormType
@@ -48,15 +48,13 @@ class SchemaParser(XmlParser):
         item = self.queue[-1]
         obj = super(SchemaParser, self).dequeue_node(element)
 
-        # Make sure queue item is not part of mixed content
-        if obj is None or item is None:
-            return None
+        if obj:
+            obj.index = item.index
+            self.set_namespace_map(element, obj)
 
-        obj.index = item.index
-        self.set_namespace_map(element, obj)
         return obj
 
-    def start_schema(self, element: etree.Element, item: BaseNode):
+    def start_schema(self, element: etree.Element, item: XmlNode):
         """Collect the schema's default form for attributes and elements for
         later usage."""
 

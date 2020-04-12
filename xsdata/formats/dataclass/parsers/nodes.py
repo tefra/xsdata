@@ -8,27 +8,29 @@ from typing import Type
 from lxml.etree import Element
 from lxml.etree import QName
 
-from xsdata.exceptions import ModelInspectionError
-from xsdata.formats.dataclass.context import ModelContext
-from xsdata.formats.dataclass.models.context import ClassMeta
+from xsdata.exceptions import XmlContextError
+from xsdata.formats.dataclass.context import XmlContext
+from xsdata.formats.dataclass.models.elements import XmlMeta
 from xsdata.formats.dataclass.parsers.utils import ParserUtils
 
 
 @dataclass(frozen=True)
-class BaseNode:
+class XmlNode:
     index: int
     position: int
 
-    def next_node(self, qname: QName, index: int, position: int, context: ModelContext):
-        raise ModelInspectionError(f"Not Implemented {qname}.")
+    def next_node(
+        self, qname: QName, index: int, position: int, context: XmlContext
+    ) -> "XmlNode":
+        raise NotImplementedError(f"Not Implemented")
 
     def parse_element(self, element: Element, objects: List[Any]) -> Tuple:
-        raise ModelInspectionError(f"Not Implemented {element.tag}.")
+        raise NotImplementedError(f"Not Implemented {element.tag}.")
 
 
 @dataclass(frozen=True)
-class ElementNode(BaseNode):
-    meta: ClassMeta
+class ElementNode(XmlNode):
+    meta: XmlMeta
     default: Any
 
     def parse_element(self, element: Element, objects: List[Any]) -> Tuple:
@@ -43,20 +45,22 @@ class ElementNode(BaseNode):
 
         return qname, obj
 
-    def next_node(self, qname: QName, index: int, position: int, context: ModelContext):
+    def next_node(
+        self, qname: QName, index: int, position: int, context: XmlContext
+    ) -> XmlNode:
         var = self.meta.find_var(qname)
         if not var:
-            return None
+            raise XmlContextError(
+                f"{self.meta.qname} does not support mixed content: {qname}"
+            )
         elif var.dataclass:
             return ElementNode(
                 index=index,
                 position=position,
-                meta=context.class_meta(var.clazz, self.meta.namespace),
+                meta=context.build(var.clazz, self.meta.qname.namespace),
                 default=var.default,
             )
-        elif var.is_wildcard:
-            return WildcardNode(index=index, position=position, qname=var.qname)
-        elif var.types[0] is object:
+        elif var.is_any_type:
             return WildcardNode(index=index, position=position, qname=var.qname)
         else:
             return PrimitiveNode(
@@ -70,7 +74,9 @@ class ElementNode(BaseNode):
 
 @dataclass(frozen=True)
 class RootNode(ElementNode):
-    def next_node(self, qname: QName, index: int, position: int, context: ModelContext):
+    def next_node(
+        self, qname: QName, index: int, position: int, context: XmlContext
+    ) -> XmlNode:
         if index == 0:
             return self
         else:
@@ -78,7 +84,7 @@ class RootNode(ElementNode):
 
 
 @dataclass(frozen=True)
-class WildcardNode(BaseNode):
+class WildcardNode(XmlNode):
     qname: str
 
     def parse_element(self, element: Element, objects: List[Any]) -> Tuple:
@@ -87,22 +93,26 @@ class WildcardNode(BaseNode):
 
         return self.qname, obj
 
-    def next_node(self, qname: QName, index: int, position: int, context: ModelContext):
+    def next_node(
+        self, qname: QName, index: int, position: int, context: XmlContext
+    ) -> XmlNode:
         return WildcardNode(index=index, position=position, qname=self.qname)
 
 
 @dataclass(frozen=True)
-class SkipNode(BaseNode):
+class SkipNode(XmlNode):
     def parse_element(self, element: Element, objects: List) -> Tuple:
         return None, None
 
     @classmethod
-    def next_node(cls, qname: QName, index: int, position: int, context: ModelContext):
+    def next_node(
+        cls, qname: QName, index: int, position: int, context: XmlContext
+    ) -> XmlNode:
         return SkipNode(index=index, position=position)
 
 
 @dataclass(frozen=True)
-class PrimitiveNode(BaseNode):
+class PrimitiveNode(XmlNode):
     types: List[Type]
     tokens: bool = False
     default: Any = None
@@ -117,5 +127,7 @@ class PrimitiveNode(BaseNode):
 
         return qname, obj
 
-    def next_node(self, qname: QName, index: int, position: int, context: ModelContext):
+    def next_node(
+        self, qname: QName, index: int, position: int, context: XmlContext
+    ) -> XmlNode:
         return SkipNode(index=index, position=position)

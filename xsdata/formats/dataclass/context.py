@@ -15,23 +15,23 @@ from typing import Type
 
 from lxml.etree import QName
 
-from xsdata.exceptions import ModelInspectionError
+from xsdata.exceptions import XmlContextError
 from xsdata.formats.converters import sort_types
 from xsdata.formats.dataclass.models.constants import XmlType
-from xsdata.formats.dataclass.models.context import ClassMeta
-from xsdata.formats.dataclass.models.context import ClassVar
+from xsdata.formats.dataclass.models.elements import XmlMeta
+from xsdata.formats.dataclass.models.elements import XmlVar
 from xsdata.models.enums import NamespaceType
 
 
 @dataclass
-class ModelContext:
+class XmlContext:
     name_generator: Callable = field(default=lambda x: x)
-    cache: Dict[Type, ClassMeta] = field(default_factory=dict)
+    cache: Dict[Type, XmlMeta] = field(default_factory=dict)
 
-    def class_meta(self, clazz: Type, parent_ns: Optional[str] = None) -> ClassMeta:
+    def build(self, clazz: Type, parent_ns: Optional[str] = None) -> XmlMeta:
         if clazz not in self.cache:
             if not is_dataclass(clazz):
-                raise ModelInspectionError(f"Object {clazz} is not a dataclass.")
+                raise XmlContextError(f"Object {clazz} is not a dataclass.")
 
             meta = getattr(clazz, "Meta", None)
             if meta and meta.__qualname__ != f"{clazz.__name__}.Meta":
@@ -41,7 +41,7 @@ class ModelContext:
             nillable = getattr(meta, "nillable", False)
             namespace = getattr(meta, "namespace", parent_ns)
 
-            self.cache[clazz] = ClassMeta(
+            self.cache[clazz] = XmlMeta(
                 name=name,
                 clazz=clazz,
                 qname=QName(namespace, name),
@@ -50,7 +50,7 @@ class ModelContext:
             )
         return self.cache[clazz]
 
-    def get_type_hints(self, clazz, parent_ns: Optional[str]) -> Iterator[ClassVar]:
+    def get_type_hints(self, clazz, parent_ns: Optional[str]) -> Iterator[XmlVar]:
         type_hints = get_type_hints(clazz)
 
         for var in fields(clazz):

@@ -1,3 +1,5 @@
+from dataclasses import dataclass
+from dataclasses import field
 from dataclasses import replace
 from unittest import mock
 from unittest.case import TestCase
@@ -8,7 +10,8 @@ from lxml.etree import QName
 from tests.fixtures.books import Books
 from tests.fixtures.defxmlschema.chapter08.example0803 import DressSize
 from tests.fixtures.defxmlschema.chapter12.chapter12 import ProductType
-from xsdata.formats.dataclass.context import ModelContext
+from xsdata.formats.dataclass.context import XmlContext
+from xsdata.formats.dataclass.models.constants import XmlType
 from xsdata.formats.dataclass.models.generics import AnyElement
 from xsdata.formats.dataclass.parsers.utils import ParserUtils
 from xsdata.models.enums import Namespace
@@ -16,7 +19,7 @@ from xsdata.models.enums import Namespace
 
 class ParserUtilsTests(TestCase):
     def setUp(self) -> None:
-        self.ctx = ModelContext()
+        self.ctx = XmlContext()
 
     @mock.patch("xsdata.formats.dataclass.parsers.utils.to_python", return_value=2)
     def test_parse_value(self, mock_to_python):
@@ -49,6 +52,57 @@ class ParserUtilsTests(TestCase):
             ]
         )
 
+    @mock.patch.object(ParserUtils, "bind_element_wildcard_param")
+    @mock.patch.object(ParserUtils, "find_eligible_wildcard")
+    @mock.patch.object(ParserUtils, "bind_element_param")
+    def test_bind_elements(
+        self,
+        mock_bind_element_param,
+        mock_find_eligible_wildcard,
+        mock_bind_element_wildcard_param,
+    ):
+        @dataclass
+        class A:
+            x: int
+            y: int = field(init=False)
+            w: object = field(metadata=dict(type=XmlType.WILDCARD))
+
+        ctx = XmlContext()
+        meta = ctx.build(A)
+        x = meta.find_var(QName("x"))
+        y = meta.find_var(QName("y"))
+        w = meta.find_var(QName("wild"))
+        wild_element = AnyElement(qname="foo")
+
+        objects = [
+            ("foo", 0),
+            (x.qname, 1),
+            (y.qname, 2),
+            (w.qname, None),
+            (w.qname, wild_element),
+        ]
+
+        mock_bind_element_param.side_effect = [True, False, False]
+        mock_find_eligible_wildcard.side_effect = [None, w]
+
+        params = dict()
+        ParserUtils.bind_element_children(params, meta, 1, objects)
+
+        mock_bind_element_param.assert_has_calls(
+            [
+                mock.call(params, x, 1),
+                mock.call(params, w, ""),
+                mock.call(params, w, wild_element),
+            ]
+        )
+        mock_find_eligible_wildcard.assert_has_calls(
+            [mock.call(meta, w.qname, params), mock.call(meta, QName("foo"), params)]
+        )
+
+        mock_bind_element_wildcard_param.assert_called_once_with(
+            params, w, w.qname, wild_element
+        )
+
     def test_fetch_any_children(self):
         objects = [(x, x) for x in "abc"]
         self.assertEqual(["b", "c"], ParserUtils.fetch_any_children(1, objects))
@@ -56,7 +110,7 @@ class ParserUtilsTests(TestCase):
     @mock.patch.object(ParserUtils, "parse_value")
     def test_bind_element_attrs(self, mock_parse_value):
         mock_parse_value.return_value = "2020-03-02"
-        metadata = self.ctx.class_meta(ProductType)
+        metadata = self.ctx.build(ProductType)
         eff_date = metadata.find_var("effDate")
         element = Element("foo")
         element.set("effDate", "2020-03-01")
@@ -75,7 +129,7 @@ class ParserUtilsTests(TestCase):
         )
 
     def test_bind_elements_attrs_ignore_init_false_vars(self):
-        metadata = self.ctx.class_meta(ProductType)
+        metadata = self.ctx.build(ProductType)
         eff_date = metadata.find_var("effDate")
         metadata.vars.remove(eff_date)
         metadata.vars.append(replace(eff_date, init=False))
@@ -92,7 +146,7 @@ class ParserUtilsTests(TestCase):
         element.text = "foo"
 
         params = dict()
-        metadata = self.ctx.class_meta(Books)
+        metadata = self.ctx.build(Books)
         ParserUtils.bind_element_text(params, metadata, element)
         self.assertEqual({}, params)
 
@@ -100,8 +154,8 @@ class ParserUtilsTests(TestCase):
     def test_bind_element_text_with_text_var(self, mock_parse_value):
         element = Element("foo")
         params = dict()
-        metadata = self.ctx.class_meta(DressSize)
-        var = metadata.any_text
+        metadata = self.ctx.build(DressSize)
+        var = metadata.find_var(condition=lambda x: x.is_text)
         ParserUtils.bind_element_text(params, metadata, element)
         self.assertEqual({}, params)
 
@@ -109,11 +163,7 @@ class ParserUtilsTests(TestCase):
         ParserUtils.bind_element_text(params, metadata, element)
         self.assertEqual({"value": "yes!"}, params)
         mock_parse_value.assert_called_once_with(
-            metadata.any_text.types,
-            element.text,
-            metadata.any_text.default,
-            element.nsmap,
-            var.is_list,
+            var.types, element.text, var.default, element.nsmap, var.is_list,
         )
 
     def test_parse_any_element(self):
@@ -141,6 +191,22 @@ class ParserUtilsTests(TestCase):
         self.assertEqual(expected, actual)
         actual = ParserUtils.parse_any_element(element, False)
         self.assertIsNone(actual.qname)
+
+    def test_parse_any_attributes(self):
+        element = Element("foo", nsmap=dict(foo="bar"))
+        element.set("a", QName("bar", "val"))
+        element.set("b", "2")
+        element.set("c", "what:3")
+
+        actual = ParserUtils.parse_any_attributes(element)
+        expected = {
+            QName("a"): QName("bar", "val"),
+            QName("b"): "2",
+            QName("c"): "what:3",
+        }
+
+        self.assertEqual("foo:val", element.attrib["a"])
+        self.assertEqual(expected, actual)
 
     def test_element_text_and_tail(self):
         element = Element("foo")

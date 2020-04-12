@@ -1,4 +1,9 @@
+from dataclasses import dataclass
+from dataclasses import field
 from dataclasses import replace
+from typing import Iterator
+from typing import List
+from typing import Optional
 from unittest import mock
 from unittest.case import TestCase
 
@@ -10,7 +15,7 @@ from tests.fixtures.books import Books
 from tests.fixtures.defxmlschema.chapter12.chapter12 import DescriptionType
 from tests.fixtures.defxmlschema.chapter12.chapter12 import ProductType
 from tests.fixtures.defxmlschema.chapter12.chapter12 import SizeType
-from xsdata.exceptions import ModelInspectionError
+from xsdata.exceptions import XmlContextError
 from xsdata.formats.dataclass.models.generics import AnyElement
 from xsdata.formats.dataclass.models.generics import Namespaces
 from xsdata.formats.dataclass.serializers import XmlSerializer
@@ -93,7 +98,7 @@ class XmlSerializerTests(TestCase):
         self.assertEqual(expected, actual)
 
     def test_render_no_dataclass(self):
-        with self.assertRaises(ModelInspectionError) as cm:
+        with self.assertRaises(XmlContextError) as cm:
             self.serializer.render(self)
         self.assertEqual(
             f"Object {self.__class__} is not a dataclass.", str(cm.exception)
@@ -115,8 +120,8 @@ class XmlSerializerTests(TestCase):
         mock_set_nil_attribute,
     ):
         root = Element("root")
-        prod_meta = self.serializer.class_meta(ProductType)
-        size_meta = self.serializer.class_meta(SizeType)
+        prod_meta = self.serializer.context.build(ProductType)
+        size_meta = self.serializer.context.build(SizeType)
         obj = ProductType()
 
         attribute = prod_meta.find_var("effDate")
@@ -157,7 +162,7 @@ class XmlSerializerTests(TestCase):
     @mock.patch.object(XmlSerializer, "render_sub_node")
     def test_render_sub_nodes(self, mock_render_sub_node):
         root = Element("root")
-        meta = self.serializer.class_meta(ProductType)
+        meta = self.serializer.context.build(ProductType)
         var = meta.find_var("number")
 
         self.serializer.render_sub_nodes(root, [1, 2, 3], var, self.namespaces)
@@ -174,8 +179,8 @@ class XmlSerializerTests(TestCase):
     def test_render_sub_node_with_generic_object(self, mock_render_wildcard_node):
         root = Element("root")
         value = AnyElement()
-        meta = self.serializer.class_meta(DescriptionType)
-        var = meta.any_element
+        meta = self.serializer.context.build(DescriptionType)
+        var = meta.find_var(condition=lambda x: x.is_wildcard)
 
         self.serializer.render_sub_node(root, value, var, self.namespaces)
         self.assertEqual(1, mock_render_wildcard_node.call_count)
@@ -187,7 +192,7 @@ class XmlSerializerTests(TestCase):
     def test_render_sub_node_with_xml_element(self, mock_render_element_node):
         root = Element("root")
         value = 1
-        meta = self.serializer.class_meta(ProductType)
+        meta = self.serializer.context.build(ProductType)
         var = meta.find_var("number")
 
         self.serializer.render_sub_node(root, value, var, self.namespaces)
@@ -200,8 +205,8 @@ class XmlSerializerTests(TestCase):
     def test_render_sub_node_with_dataclass_object(self, mock_render_element_node):
         root = Element("root")
         value = SizeType()
-        meta = self.serializer.class_meta(DescriptionType)
-        var = meta.any_element
+        meta = self.serializer.context.build(DescriptionType)
+        var = meta.find_var(condition=lambda x: x.is_wildcard)
 
         self.serializer.render_sub_node(root, value, var, self.namespaces)
         self.assertEqual(1, mock_render_element_node.call_count)
@@ -216,8 +221,8 @@ class XmlSerializerTests(TestCase):
     ):
         root = Element("root")
         value = 1
-        meta = self.serializer.class_meta(DescriptionType)
-        var = meta.any_element
+        meta = self.serializer.context.build(DescriptionType)
+        var = meta.find_var(condition=lambda x: x.is_wildcard)
 
         self.serializer.render_sub_node(root, value, var, self.namespaces)
         self.assertEqual(1, mock_set_text.call_count)
@@ -233,8 +238,8 @@ class XmlSerializerTests(TestCase):
     def test_render_element_node(self, mock_render_node, mock_set_nil_attribute):
         root = Element("root")
         value = SizeType()
-        meta = self.serializer.class_meta(DescriptionType)
-        var = meta.any_element
+        meta = self.serializer.context.build(DescriptionType)
+        var = meta.find_var(condition=lambda x: x.is_wildcard)
 
         self.serializer.render_element_node(root, value, var, self.namespaces)
 
@@ -257,8 +262,8 @@ class XmlSerializerTests(TestCase):
         root = Element("root")
         value = SizeType()
         value.qname = "foo"
-        meta = self.serializer.class_meta(DescriptionType)
-        var = meta.any_element
+        meta = self.serializer.context.build(DescriptionType)
+        var = meta.find_var(condition=lambda x: x.is_wildcard)
 
         self.serializer.render_element_node(root, value, var, self.namespaces)
 
@@ -293,8 +298,8 @@ class XmlSerializerTests(TestCase):
             ns_map={"foo": "bar"},
             qname="foo",
         )
-        meta = self.serializer.class_meta(DescriptionType)
-        var = meta.any_element
+        meta = self.serializer.context.build(DescriptionType)
+        var = meta.find_var(condition=lambda x: x.is_wildcard)
 
         self.serializer.render_wildcard_node(root, value, var, self.namespaces)
 
@@ -334,8 +339,8 @@ class XmlSerializerTests(TestCase):
         value = AnyElement(
             text="foo", tail="bar", attributes=dict(a=1), children=[AnyElement()]
         )
-        meta = self.serializer.class_meta(DescriptionType)
-        var = meta.any_element
+        meta = self.serializer.context.build(DescriptionType)
+        var = meta.find_var(condition=lambda x: x.is_wildcard)
 
         self.serializer.render_wildcard_node(root, value, var, self.namespaces)
 
@@ -353,3 +358,36 @@ class XmlSerializerTests(TestCase):
         mock_set_nil_attribute.assert_called_once_with(
             root, var.nillable, self.namespaces
         )
+
+    def test_next_value(self):
+        @dataclass
+        class A:
+            x0: Optional[int] = field(default=None)
+            x1: List[int] = field(
+                default_factory=list, metadata=dict(type="Element", sequential=True)
+            )
+            x2: List[int] = field(
+                default_factory=list, metadata=dict(type="Element", sequential=True)
+            )
+            x3: Optional[int] = field(default=None)
+
+        obj = A(x0=1, x1=[2, 3, 4], x2=[6, 7], x3=8)
+        meta = self.serializer.context.build(A)
+        x0 = meta.find_var("x0")
+        x1 = meta.find_var("x1")
+        x2 = meta.find_var("x2")
+        x3 = meta.find_var("x3")
+
+        actual = self.serializer.next_value(meta, obj)
+        expected = [
+            (x0, 1),
+            (x1, 2),
+            (x2, 6),
+            (x1, 3),
+            (x2, 7),
+            (x1, 4),
+            (x3, 8),
+        ]
+
+        self.assertIsInstance(actual, Iterator)
+        self.assertEqual(expected, list(actual))

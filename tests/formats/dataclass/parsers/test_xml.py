@@ -6,7 +6,6 @@ from lxml.etree import QName
 
 from tests.fixtures.books import BookForm
 from tests.fixtures.books import Books
-from xsdata.exceptions import ParserError
 from xsdata.formats.dataclass.parsers.nodes import PrimitiveNode
 from xsdata.formats.dataclass.parsers.nodes import RootNode
 from xsdata.formats.dataclass.parsers.nodes import SkipNode
@@ -27,10 +26,7 @@ class XmlParserTests(TestCase):
         mock_next_node.return_value = skip_node
         element = Element("{urn:books}books")
         root_queue_item = RootNode(
-            index=0,
-            position=0,
-            meta=self.parser.context.class_meta(Books),
-            default=None,
+            index=0, position=0, meta=self.parser.context.build(Books), default=None,
         )
 
         self.parser.index = 0
@@ -44,26 +40,6 @@ class XmlParserTests(TestCase):
 
         mock_emit_event.assert_called_once_with(
             EventType.START, element.tag, item=root_queue_item, element=element
-        )
-
-    @mock.patch.object(RootNode, "next_node")
-    def test_queue_node_raises_exception(self, mock_next_node):
-        mock_next_node.return_value = None
-        element = Element("foo")
-        root_queue_item = RootNode(
-            index=0,
-            position=0,
-            meta=self.parser.context.class_meta(Books),
-            default=None,
-        )
-
-        self.parser.index = 0
-        self.parser.queue.append(root_queue_item)
-        with self.assertRaises(ParserError) as cm:
-            self.parser.queue_node(element)
-
-        self.assertEqual(
-            "{urn:books}books does not support mixed content: foo", str(cm.exception)
         )
 
     @mock.patch.object(XmlParser, "emit_event")

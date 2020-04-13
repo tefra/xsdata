@@ -1,3 +1,13 @@
+20.4.1 (2020-04-13)
+-----------------
+- Fixed open content attribute with mode suffix to be generated last.
+- Fixed issues with wildcard and mixed content parsing.
+- Updated xs:qname mapping to lxml.QName
+- Updated support for xs:list.
+- Updated parser to ignore xsi:type attributes default/fixed values.
+- Refactored code components.
+- Pass more than 99% of the `W3C XML Schema 1.1 test cases <https://travis-ci.org/tefra/xsdata-w3c-tests>`_
+
 20.4 (2020-04-01)
 -----------------
 - Added support for sequential fields.

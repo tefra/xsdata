@@ -297,7 +297,8 @@ class ClassAnalyzer(ClassUtils):
 
         if not source:
             raise AnalyzerError(f"Group attribute not found: `{attr_qname}`")
-        elif source is target:
+
+        if source is target:
             target.attrs.remove(attr)
         else:
             index = target.attrs.index(attr)
@@ -390,7 +391,7 @@ class ClassAnalyzer(ClassUtils):
 
         if source is None:
             return False
-        elif source is target:
+        if source is target:
             return True
-        else:
-            return self.class_depends_on(source, target)
+
+        return self.class_depends_on(source, target)

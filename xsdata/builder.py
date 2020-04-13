@@ -164,10 +164,8 @@ class ClassBuilder:
 
         if obj.is_qualified:
             return self.schema.target_namespace
-        elif isinstance(obj, Element):
-            return ""
 
-        return None
+        return "" if isinstance(obj, Element) else None
 
     def children_extensions(
         self, obj: ElementBase, target: Class

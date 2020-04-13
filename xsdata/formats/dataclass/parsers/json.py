@@ -62,18 +62,20 @@ class JsonParser(AbstractParser, XmlContext):
         """
         if var.dataclass:
             return self.parse_context(value, var.clazz)
-        elif var.is_attributes:
+
+        if var.is_attributes:
             return dict(value)
-        elif var.is_wildcard:
+
+        if var.is_wildcard:
             return (
                 value
                 if isinstance(value, str)
                 else self.parse_context(value, AnyElement)
             )
-        else:
-            return ParserUtils.parse_value(
-                var.types, value, var.default, tokens=var.is_tokens
-            )
+
+        return ParserUtils.parse_value(
+            var.types, value, var.default, tokens=var.is_tokens
+        )
 
     @staticmethod
     def get_value(data: Dict, field: XmlVar):

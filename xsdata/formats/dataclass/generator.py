@@ -48,8 +48,8 @@ class DataclassGenerator(PythonAbstractGenerator):
         for obj in classes:
             groups[obj.target_module].append(obj)
 
-        for target_module, classes in groups.items():
-            resolver.process(classes)
+        for target_module, cluster in groups.items():
+            resolver.process(cluster)
             imports = self.prepare_imports(resolver.sorted_imports())
             output = self.render_classes(resolver.sorted_classes())
             file_path = Path.cwd().joinpath(target_module.replace(".", "/") + ".py")

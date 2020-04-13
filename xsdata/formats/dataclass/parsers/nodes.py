@@ -53,23 +53,25 @@ class ElementNode(XmlNode):
             raise XmlContextError(
                 f"{self.meta.qname} does not support mixed content: {qname}"
             )
-        elif var.dataclass:
+
+        if var.dataclass:
             return ElementNode(
                 index=index,
                 position=position,
                 meta=context.build(var.clazz, self.meta.qname.namespace),
                 default=var.default,
             )
-        elif var.is_any_type:
+
+        if var.is_any_type:
             return WildcardNode(index=index, position=position, qname=var.qname)
-        else:
-            return PrimitiveNode(
-                index=index,
-                position=position,
-                types=var.types,
-                default=var.default,
-                tokens=var.is_tokens,
-            )
+
+        return PrimitiveNode(
+            index=index,
+            position=position,
+            types=var.types,
+            default=var.default,
+            tokens=var.is_tokens,
+        )
 
 
 @dataclass(frozen=True)
@@ -79,8 +81,8 @@ class RootNode(ElementNode):
     ) -> XmlNode:
         if index == 0:
             return self
-        else:
-            return super(RootNode, self).next_node(qname, index, position, context)
+
+        return super(RootNode, self).next_node(qname, index, position, context)
 
 
 @dataclass(frozen=True)

@@ -36,8 +36,8 @@ class ParserUtils:
         if tokens:
             value = value if isinstance(value, list) else filter(None, value.split(" "))
             return list(map(lambda x: to_python(types, x, ns_map), value))
-        else:
-            return to_python(types, value, ns_map)
+
+        return to_python(types, value, ns_map)
 
     @classmethod
     def bind_element_children(
@@ -121,7 +121,7 @@ class ParserUtils:
         if var.is_list:
             if var.name not in params:
                 params[var.name] = list()
-            if text:
+            if txt:
                 params[var.name].insert(0, txt)
             if tail:
                 params[var.name].append(tail)

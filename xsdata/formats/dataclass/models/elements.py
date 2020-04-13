@@ -62,10 +62,8 @@ class XmlVar:
     def matches(self, qname: QName, condition=None):
         if condition and not condition(self):
             return False
-        elif qname == QNames.ALL:
-            return True
-        else:
-            return qname == self.qname
+
+        return qname in (self.qname, QNames.ALL)
 
 
 @dataclass(frozen=True)
@@ -93,7 +91,8 @@ class XmlWildcard(XmlVar):
     def matches(self, qname: QName, condition=None):
         if condition and not condition(self):
             return False
-        elif qname == QNames.ALL:
+
+        if qname == QNames.ALL:
             return True
 
         if not self.namespaces and qname.namespace is None:
@@ -102,11 +101,11 @@ class XmlWildcard(XmlVar):
         for namespace in self.namespaces:
             if not namespace and qname.namespace is None:
                 return True
-            elif namespace == qname.namespace:
+            if namespace == qname.namespace:
                 return True
-            elif namespace == NamespaceType.ANY.value:
+            if namespace == NamespaceType.ANY.value:
                 return True
-            elif namespace and namespace[0] == "!" and namespace[1:] != qname.namespace:
+            if namespace and namespace[0] == "!" and namespace[1:] != qname.namespace:
                 return True
 
         return False

@@ -110,10 +110,11 @@ class XmlContext:
     def default_value(var: Field) -> Any:
         if var.default_factory is not MISSING:  # type: ignore
             return var.default_factory  # type: ignore
-        elif var.default is not MISSING:
+
+        if var.default is not MISSING:
             return var.default
-        else:
-            return None
+
+        return None
 
     @staticmethod
     def real_types(type_hint) -> List:

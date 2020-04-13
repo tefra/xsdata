@@ -14,13 +14,12 @@ class XmlType:
 
     @classmethod
     def to_xml_class(cls, name):
-        if name == XmlType.ELEMENT:
-            return XmlElement
-        elif name == XmlType.WILDCARD:
-            return XmlWildcard
-        elif name == XmlType.ATTRIBUTE:
-            return XmlAttribute
-        elif name == XmlType.ATTRIBUTES:
-            return XmlAttributes
-        else:
-            return XmlText
+        return __mapped_xml_type_vars__.get(name, XmlText)
+
+
+__mapped_xml_type_vars__ = {
+    XmlType.ELEMENT: XmlElement,
+    XmlType.WILDCARD: XmlWildcard,
+    XmlType.ATTRIBUTE: XmlAttribute,
+    XmlType.ATTRIBUTES: XmlAttributes,
+}

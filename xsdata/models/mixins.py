@@ -17,7 +17,6 @@ from xsdata.models.enums import FormType
 from xsdata.models.enums import Namespace
 from xsdata.utils import text
 
-
 T = TypeVar("T", bound="BaseModel")
 
 
@@ -166,7 +165,7 @@ class ElementBase(BaseModel):
             value = getattr(self, attribute.name)
             if (
                 isinstance(value, list)
-                and len(value)
+                and len(value) > 0
                 and isinstance(value[0], ElementBase)
             ):
                 for v in value:

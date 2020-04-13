@@ -78,10 +78,7 @@ class Documentation(ElementBase):
     attributes: Optional["AnyAttribute"] = element()
 
     def tostring(self) -> Optional[str]:
-        if self.elements:
-            return XmlString(self.elements).render()
-        else:
-            return None
+        return XmlString(self.elements).render() if self.elements else None
 
 
 @dataclass
@@ -126,7 +123,7 @@ class AnnotationBase(ElementBase):
 
     @property
     def display_help(self) -> Optional[str]:
-        if self.annotation and len(self.annotation.documentations):
+        if self.annotation and len(self.annotation.documentations) > 0:
             return "\n".join(
                 filter(None, [doc.tostring() for doc in self.annotation.documentations])
             )
@@ -983,10 +980,11 @@ class ComplexType(AnnotationBase):
     def is_mixed(self) -> bool:
         if self.mixed:
             return True
-        elif self.complex_content and self.complex_content.mixed:
+
+        if self.complex_content and self.complex_content.mixed:
             return True
-        else:
-            return False
+
+        return False
 
 
 @dataclass
@@ -1145,10 +1143,7 @@ class Element(AnnotationBase):
 
     @property
     def is_mixed(self) -> bool:
-        if self.complex_type:
-            return self.complex_type.is_mixed
-        else:
-            return False
+        return self.complex_type.is_mixed if self.complex_type else False
 
     @property
     def default_type(self) -> DataType:
@@ -1158,12 +1153,13 @@ class Element(AnnotationBase):
     def raw_type(self) -> Optional[str]:
         if self.type:
             return self.type
-        elif self.has_children:
+
+        if self.has_children:
             return None
-        else:
-            prefix = self.schema_prefix()
-            suffix = DataType.ANY_TYPE.code
-            return f"{prefix}:{suffix}" if prefix else suffix
+
+        prefix = self.schema_prefix()
+        suffix = DataType.ANY_TYPE.code
+        return f"{prefix}:{suffix}" if prefix else suffix
 
     @property
     def real_type(self) -> Optional[str]:
@@ -1184,6 +1180,7 @@ class Element(AnnotationBase):
     def substitutions(self) -> Array[str]:
         if self.substitution_group:
             return list(filter(None, self.substitution_group.split(" ")))
+
         return list()
 
     def get_restrictions(self) -> Dict[str, Anything]:
@@ -1192,6 +1189,7 @@ class Element(AnnotationBase):
             restrictions.update(self.simple_type.get_restrictions())
         if self.nillable:
             restrictions.update({"nillable": True})
+
         return restrictions
 
 

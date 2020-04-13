@@ -33,7 +33,9 @@ class AbstractGenerator(ABC):
     templates_dir: Optional[Path] = None
 
     def __init__(self):
-        self.env = Environment(loader=FileSystemLoader(str(self.templates_dir)))
+        self.env = Environment(
+            loader=FileSystemLoader(str(self.templates_dir)), autoescape=False
+        )
 
     def template(self, name: str) -> Template:
         return self.env.get_template("{}.jinja2".format(name))
@@ -226,7 +228,7 @@ class PythonAbstractGenerator(AbstractGenerator, ABC):
             return "list"
         if attr.is_map:
             return "dict"
-        elif not isinstance(attr.default, str):
+        if not isinstance(attr.default, str):
             return attr.default
 
         data_types = {

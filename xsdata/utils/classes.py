@@ -25,7 +25,8 @@ class ClassUtils:
     def compare_attributes(cls, source: Class, target: Class):
         if source is target:
             return cls.INCLUDES_ALL
-        elif not target.attrs:
+
+        if not target.attrs:
             return cls.INCLUDES_NONE
 
         source_attrs = {attr.name for attr in source.attrs}
@@ -34,10 +35,10 @@ class ClassUtils:
 
         if not difference:
             return cls.INCLUDES_ALL
-        elif len(difference) != len(source_attrs):
+        if len(difference) != len(source_attrs):
             return cls.INCLUDES_SOME
-        else:
-            return cls.INCLUDES_NONE
+
+        return cls.INCLUDES_NONE
 
     @classmethod
     def sanitize_attributes(cls, target: Class):

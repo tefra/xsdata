@@ -23,8 +23,8 @@ def split(string: str, sep: str = ":") -> Tuple:
     index = string.find(sep)
     if index == -1:
         return None, string
-    else:
-        return string[:index], string[index + len(sep) :]
+
+    return string[:index], string[index + len(sep) :]
 
 
 def collapse_whitespace(string: str):

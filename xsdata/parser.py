@@ -136,8 +136,8 @@ class SchemaParser(XmlParser):
         if not location or location.startswith("http"):
             ns = Namespace.get_enum(namespace)
             return ns.location if ns else None
-        else:
-            return self.resolve_path(location)
+
+        return self.resolve_path(location)
 
     def end_attribute(self, obj: T, element: etree.Element):
         """Assign the schema's default form for attributes if the given

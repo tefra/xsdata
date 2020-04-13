@@ -40,8 +40,8 @@ def to_python(types: List[Type], value: Any, ns_map=None, in_order=True) -> Any:
         try:
             if clazz.__name__ in func_map:
                 return func_map[clazz.__name__](value)
-            else:
-                return to_class(clazz, value, ns_map)
+
+            return to_class(clazz, value, ns_map)
         except ValueError:
             pass
 

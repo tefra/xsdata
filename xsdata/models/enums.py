@@ -148,8 +148,8 @@ class DataType(Enum):
     def local_name(self) -> str:
         if isinstance(self.local, Iterable):
             return ", ".join([local.__name__ for local in self.local])
-        else:
-            return self.local.__name__
+
+        return self.local.__name__
 
     @classmethod
     def get_enum(cls, code: str) -> Optional["DataType"]:

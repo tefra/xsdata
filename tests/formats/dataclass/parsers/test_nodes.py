@@ -37,9 +37,9 @@ class XmlNodeTests(TestCase):
             XmlNode(0, 0).next_node(QName("foo"), 1, 0, ctx)
 
     def test_parse_element(self):
-        element = Element("foo")
+        ele = Element("foo")
         with self.assertRaises(NotImplementedError):
-            XmlNode(0, 0).parse_element(element, [])
+            XmlNode(0, 0).parse_element(ele, [])
 
 
 class ElementNodeTests(TestCase):
@@ -90,7 +90,7 @@ class ElementNodeTests(TestCase):
 
     @mock.patch.object(XmlContext, "build")
     def test_next_node_when_given_qname_matches_dataclass_var(self, mock_ctx_build):
-
+        ele = Element("a")
         ctx = XmlContext()
         var = XmlElement(
             name="a", qname=QName("a"), types=[Foo], dataclass=True, default=Foo,
@@ -101,7 +101,7 @@ class ElementNodeTests(TestCase):
         mock_ctx_build.return_value = replace(meta)
         node = ElementNode(index=0, position=0, meta=meta, default=None)
 
-        actual = node.next_node(var.qname, 1, 10, ctx)
+        actual = node.next_node(ele, 1, 10, ctx)
         self.assertIsInstance(actual, ElementNode)
         self.assertEqual(1, actual.index)
         self.assertEqual(10, actual.position)
@@ -109,6 +109,7 @@ class ElementNodeTests(TestCase):
         self.assertEqual(Foo, actual.default)
 
     def test_next_node_when_given_qname_matches_any_element_var(self):
+        ele = Element("a")
         ctx = XmlContext()
         var = XmlWildcard(name="a", qname=QName("a"), types=[], dataclass=False,)
         meta = XmlMeta(
@@ -116,13 +117,14 @@ class ElementNodeTests(TestCase):
         )
         node = ElementNode(index=0, position=0, meta=meta, default=None)
 
-        actual = node.next_node(var.qname, 1, 10, ctx)
+        actual = node.next_node(ele, 1, 10, ctx)
         self.assertIsInstance(actual, WildcardNode)
         self.assertEqual(1, actual.index)
         self.assertEqual(10, actual.position)
         self.assertEqual(var.qname, actual.qname)
 
     def test_next_node_when_given_qname_matches_primitive_var(self):
+        ele = Element("a")
         ctx = XmlContext()
         var = XmlText(name="a", qname=QName("a"), types=[int], default=100)
         meta = XmlMeta(
@@ -130,7 +132,7 @@ class ElementNodeTests(TestCase):
         )
         node = ElementNode(index=0, position=0, meta=meta, default=None)
 
-        actual = node.next_node(var.qname, 1, 10, ctx)
+        actual = node.next_node(ele, 1, 10, ctx)
         self.assertIsInstance(actual, PrimitiveNode)
         self.assertEqual(1, actual.index)
         self.assertEqual(10, actual.position)
@@ -139,28 +141,31 @@ class ElementNodeTests(TestCase):
         self.assertEqual(var.is_tokens, actual.tokens)
 
     def test_next_node_when_given_qname_does_not_match_any_var(self):
+        ele = Element("nope")
         ctx = XmlContext()
         meta = XmlMeta(name="foo", clazz=None, qname=QName("foo"), nillable=False)
         node = ElementNode(index=0, position=0, meta=meta, default=None)
 
         with self.assertRaises(XmlContextError) as cm:
-            node.next_node("nope", 1, 10, ctx)
+            node.next_node(ele, 1, 10, ctx)
 
         self.assertEqual("foo does not support mixed content: nope", str(cm.exception))
 
 
 class RootNodeTests(TestCase):
     def test_next_node_return_self_on_zero_index(self):
+        ele = Element("foo")
         ctx = XmlContext()
         meta = ctx.build(Foo)
         node = RootNode(index=0, position=0, meta=meta, default=None)
-        self.assertIs(node, node.next_node("foo", 0, 0, ctx))
+        self.assertIs(node, node.next_node(ele, 0, 0, ctx))
 
     def test_next_node_return_next_node(self):
+        ele = Element("a")
         ctx = XmlContext()
         meta = ctx.build(Foo)
         node = RootNode(index=0, position=0, meta=meta, default=None)
-        actual = node.next_node("a", 1, 0, ctx)
+        actual = node.next_node(ele, 1, 0, ctx)
 
         self.assertIsInstance(actual, PrimitiveNode)
         self.assertIsNot(actual, node)
@@ -184,8 +189,9 @@ class WildcardNodeTests(TestCase):
         mock_fetch_any_children.assert_called_once_with(0, [1, 2, 3])
 
     def test_next_node(self):
+        ele = Element("foo")
         node = WildcardNode(index=0, position=0, qname="a")
-        actual = node.next_node("b", 2, 10, XmlContext())
+        actual = node.next_node(ele, 2, 10, XmlContext())
 
         self.assertIsInstance(actual, WildcardNode)
         self.assertEqual(2, actual.index)
@@ -195,15 +201,16 @@ class WildcardNodeTests(TestCase):
 
 class SkipNodeTests(TestCase):
     def test_parse_element(self):
-        node = SkipNode(index=0, position=0)
         ele = Element("foo")
+        node = SkipNode(index=0, position=0)
 
         actual = node.parse_element(ele, [])
         self.assertEqual((None, None), actual)
 
     def test_next_node(self):
+        ele = Element("foo")
         node = SkipNode(index=0, position=0)
-        actual = node.next_node("b", 2, 10, XmlContext())
+        actual = node.next_node(ele, 2, 10, XmlContext())
 
         self.assertIsInstance(actual, SkipNode)
         self.assertEqual(2, actual.index)
@@ -225,8 +232,9 @@ class PrimitiveNodeTests(TestCase):
         )
 
     def test_next_node(self):
+        ele = Element("foo")
         node = PrimitiveNode(index=0, position=0, types=[])
-        actual = node.next_node("b", 2, 10, XmlContext())
+        actual = node.next_node(ele, 2, 10, XmlContext())
 
         self.assertIsInstance(actual, SkipNode)
         self.assertEqual(2, actual.index)

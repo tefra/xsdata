@@ -73,11 +73,10 @@ class XmlParser(AbstractParser):
 
         :raises ParserError: When the parser doesn't know how to proceed.
         """
-        qname = QName(element.tag)
         item = self.queue[-1]
         position = len(self.objects)
 
-        queue_item = item.next_node(qname, self.index, position, self.context)
+        queue_item = item.next_node(element, self.index, position, self.context)
 
         self.index += 1
         self.queue.append(queue_item)

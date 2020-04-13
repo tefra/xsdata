@@ -1,2 +1,3 @@
 [bandit]
-tests: B410
+exclude: tests/,docs/
+skips: B701

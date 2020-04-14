@@ -161,6 +161,7 @@ __XSDType__ = {xsd.code: xsd for xsd in DataType}
 
 class EventType:
     START = "start"
+    START_NS = "start-ns"
     END = "end"
 
 

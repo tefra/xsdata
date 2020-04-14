@@ -19,6 +19,10 @@ class XmlParserTests(TestCase):
         self.parser.index = 10
         self.parser.objects = [(QName(x), x) for x in "abcde"]
 
+    def test_add_namespace(self):
+        self.parser.add_namespace(("foo", "bar"))
+        self.assertEqual({"foo": "bar"}, self.parser.namespaces.ns_map)
+
     @mock.patch.object(RootNode, "next_node")
     @mock.patch.object(XmlParser, "emit_event")
     def test_queue_node(self, mock_emit_event, mock_next_node):
@@ -57,7 +61,6 @@ class XmlParserTests(TestCase):
         self.assertEqual("result", result)
         self.assertEqual(0, len(self.parser.queue))
         self.assertEqual(("q", result), self.parser.objects[-1])
-        self.assertEqual({"prefix": "uri"}, self.parser.namespaces.ns_map)
         mock_parse_element.assert_called_once_with(element, self.parser.objects)
         mock_emit_event.assert_called_once_with(
             EventType.END, element.tag, obj=result, element=element
@@ -115,5 +118,8 @@ class XmlParserIntegrationTest(TestCase):
             "  </book>\n"
             "</brk:books>\n"
         )
-        actual = XmlParser().from_string(xml, Books)
+
+        parser = XmlParser()
+        actual = parser.from_string(xml, Books)
         self.assertEqual(self.books, actual)
+        self.assertEqual({"brk": "urn:books"}, parser.namespaces.ns_map)

@@ -28,6 +28,46 @@ class XmlContext:
     name_generator: Callable = field(default=lambda x: x)
     cache: Dict[Type, XmlMeta] = field(default_factory=dict)
 
+    def fetch(
+        self,
+        clazz: Type,
+        parent_ns: Optional[str] = None,
+        xsi_type: Optional[str] = None,
+    ) -> XmlMeta:
+        meta = self.build(clazz, parent_ns)
+
+        subclass = self.find_subclass(clazz, xsi_type) if xsi_type else None
+        if subclass:
+            meta = self.build(subclass, parent_ns)
+
+        return meta
+
+    def find_subclass(self, clazz: Type, xsi_type: str):
+        for subclass in clazz.__subclasses__():
+            if self.match_class_name(subclass, xsi_type):
+                return subclass
+
+        for base in clazz.__bases__:
+            if not is_dataclass(base):
+                continue
+
+            if self.match_class_name(base, xsi_type):
+                return base
+
+            subclass = self.find_subclass(base, xsi_type)
+            if subclass:
+                return subclass
+
+        return None
+
+    def match_class_name(self, clazz: Type, xsi_type: str) -> bool:
+        result = False
+        if is_dataclass(clazz):
+            meta = getattr(clazz, "Meta", None)
+            name = getattr(meta, "name", self.name_generator(clazz.__name__))
+            result = name == xsi_type
+        return result
+
     def build(self, clazz: Type, parent_ns: Optional[str] = None) -> XmlMeta:
         if clazz not in self.cache:
             if not is_dataclass(clazz):
@@ -134,3 +174,9 @@ class XmlContext:
             types.append(type_hint)
 
         return sort_types(types)
+
+    @classmethod
+    def is_derived(cls, obj: Any, clazz: Type):
+        return isinstance(obj, clazz) or any(
+            isinstance(obj, base) for base in clazz.__bases__ if base is not object
+        )

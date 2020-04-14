@@ -12,6 +12,7 @@ from xsdata.exceptions import XmlContextError
 from xsdata.formats.dataclass.context import XmlContext
 from xsdata.formats.dataclass.models.elements import XmlMeta
 from xsdata.formats.dataclass.parsers.utils import ParserUtils
+from xsdata.models.enums import QNames
 
 
 @dataclass(frozen=True)
@@ -49,6 +50,8 @@ class ElementNode(XmlNode):
         self, element: Element, index: int, position: int, context: XmlContext
     ) -> XmlNode:
         qname = QName(element.tag)
+        xsi_type = element.attrib.get(QNames.XSI_TYPE)
+
         var = self.meta.find_var(qname)
         if not var:
             raise XmlContextError(
@@ -59,7 +62,7 @@ class ElementNode(XmlNode):
             return ElementNode(
                 index=index,
                 position=position,
-                meta=context.build(var.clazz, self.meta.qname.namespace),
+                meta=context.fetch(var.clazz, self.meta.qname.namespace, xsi_type),
                 default=var.default,
             )
 

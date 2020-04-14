@@ -11,6 +11,7 @@ from lxml.etree import QName
 from lxml.etree import SubElement
 from lxml.etree import tostring
 
+from xsdata.exceptions import SerializerError
 from xsdata.formats.bindings import AbstractSerializer
 from xsdata.formats.dataclass.context import XmlContext
 from xsdata.formats.dataclass.models.elements import XmlMeta
@@ -18,6 +19,7 @@ from xsdata.formats.dataclass.models.elements import XmlVar
 from xsdata.formats.dataclass.models.generics import AnyElement
 from xsdata.formats.dataclass.models.generics import Namespaces
 from xsdata.formats.dataclass.serializers.utils import SerializeUtils
+from xsdata.models.enums import QNames
 
 
 @dataclass
@@ -60,20 +62,22 @@ class XmlSerializer(AbstractSerializer):
         namespaces = namespaces or Namespaces()
         namespaces.register()
         namespaces.add(meta.qname.namespace)
+        root = Element(meta.qname)
 
-        root = self.render_node(obj, Element(meta.qname), namespaces)
+        self.render_node(root, obj, namespaces)
         cleanup_namespaces(
             root, top_nsmap=namespaces.ns_map, keep_ns_prefixes=namespaces.prefixes
         )
         return root
 
-    def render_node(self, obj, parent, namespaces: Namespaces) -> Element:
-        """Recursively traverse the given dataclass instance fields and build
-        the lxml Element structure."""
-        if not is_dataclass(obj):
+    def render_node(self, parent: Element, obj: Any, namespaces: Namespaces):
+        """Recursively traverse the given object and build the xml tree."""
+        if is_dataclass(obj):
+            self.render_complex_node(parent, obj, namespaces)
+        else:
             SerializeUtils.set_text(parent, obj, namespaces)
-            return parent
 
+    def render_complex_node(self, parent: Element, obj: Any, namespaces: Namespaces):
         meta = self.context.build(obj.__class__, QName(parent).namespace)
         for var, value in self.next_value(meta, obj):
             if value is None:
@@ -91,7 +95,6 @@ class XmlSerializer(AbstractSerializer):
                 self.render_sub_node(parent, value, var, namespaces)
 
         SerializeUtils.set_nil_attribute(parent, meta.nillable, namespaces)
-        return parent
 
     def render_sub_nodes(
         self, parent: Element, values: List, var: XmlVar, namespaces: Namespaces
@@ -120,7 +123,8 @@ class XmlSerializer(AbstractSerializer):
             namespaces.add(qname.namespace)
 
         sub_element = SubElement(parent, qname)
-        self.render_node(value, sub_element, namespaces)
+        self.render_node(sub_element, value, namespaces)
+        self.set_xsi_type(sub_element, value, var, namespaces)
         SerializeUtils.set_nil_attribute(sub_element, var.nillable, namespaces)
 
     def render_wildcard_node(
@@ -139,6 +143,20 @@ class XmlSerializer(AbstractSerializer):
             self.render_sub_node(sub_element, child, var, namespaces)
 
         SerializeUtils.set_nil_attribute(sub_element, var.nillable, namespaces)
+
+    def set_xsi_type(
+        self, parent: Element, value: Any, var: XmlVar, namespaces: Namespaces
+    ):
+        if not var.dataclass or value.__class__ is var.clazz:
+            return
+
+        if self.context.is_derived(value, var.clazz):
+            meta = self.context.fetch(value.__class__, QName(parent.tag).namespace)
+            SerializeUtils.set_attribute(parent, QNames.XSI_TYPE, meta.name, namespaces)
+        else:
+            raise SerializerError(
+                f"{value.__class__.__name__} is not derived from {var.clazz.__name__}"
+            )
 
     @classmethod
     def next_value(cls, meta: XmlMeta, obj: Any):

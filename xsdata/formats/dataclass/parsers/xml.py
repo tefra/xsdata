@@ -90,12 +90,12 @@ class XmlParser(AbstractParser):
         :returns object: A dataclass object or a python primitive value.
         """
         item = self.queue.pop()
+        self.namespaces.add_all(element.nsmap)
         qname, obj = item.parse_element(element, self.objects)
 
         if qname:
             self.objects.append((qname, obj))
         self.emit_event(EventType.END, element.tag, obj=obj, element=element)
-        self.namespaces.add_all(element.nsmap)
         return obj
 
     def emit_event(self, event: str, name: str, **kwargs):

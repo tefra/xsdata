@@ -1,4 +1,6 @@
 from dataclasses import dataclass
+from dataclasses import make_dataclass
+from dataclasses import replace
 from typing import Iterator
 from unittest import mock
 from unittest import TestCase
@@ -25,6 +27,73 @@ class XmlContextTests(TestCase):
     def setUp(self):
         self.ctx = XmlContext()
         super().setUp()
+
+    @mock.patch.object(XmlContext, "find_subclass")
+    @mock.patch.object(XmlContext, "build")
+    def test_fetch(self, mock_build, mock_find_subclass):
+        meta = XmlMeta(
+            name="ItemsType", clazz=ItemsType, qname=QName("ItemsType"), nillable=False
+        )
+        mock_build.return_value = meta
+        actual = self.ctx.fetch(ItemsType, "foo")
+        self.assertEqual(meta, actual)
+        self.assertEqual(0, mock_find_subclass.call_count)
+        mock_build.assert_called_once_with(ItemsType, "foo")
+
+    @mock.patch.object(XmlContext, "find_subclass")
+    @mock.patch.object(XmlContext, "build")
+    def test_fetch_with_xsi_type_and_subclass_not_found(
+        self, mock_build, mock_find_subclass
+    ):
+        meta = XmlMeta(
+            name="ItemsType", clazz=ItemsType, qname=QName("ItemsType"), nillable=False
+        )
+
+        mock_build.return_value = meta
+        mock_find_subclass.return_value = None
+        actual = self.ctx.fetch(ItemsType, xsi_type="foo")
+        self.assertEqual(meta, actual)
+        mock_find_subclass.assert_called_once_with(ItemsType, "foo")
+
+    @mock.patch.object(XmlContext, "find_subclass")
+    @mock.patch.object(XmlContext, "build")
+    def test_fetch_with_xsi_type_and_subclass_found(
+        self, mock_build, mock_find_subclass
+    ):
+        meta = XmlMeta(
+            name="ItemsType", clazz=ItemsType, qname=QName("ItemsType"), nillable=False
+        )
+        xsi_meta = replace(meta, name="XsiType")
+
+        mock_build.side_effect = [meta, xsi_meta]
+        mock_find_subclass.return_value = xsi_meta
+        actual = self.ctx.fetch(ItemsType, xsi_type="foo")
+        self.assertEqual(xsi_meta, actual)
+        mock_find_subclass.assert_called_once_with(ItemsType, "foo")
+
+    def test_find_subclass(self):
+        a = make_dataclass("A", fields=[])
+        b = make_dataclass("B", fields=[], bases=(a,))
+        c = make_dataclass("C", fields=[], bases=(a,))
+
+        self.assertEqual(b, self.ctx.find_subclass(a, "B"))
+        self.assertEqual(b, self.ctx.find_subclass(c, "B"))
+        self.assertEqual(a, self.ctx.find_subclass(b, "A"))
+        self.assertEqual(a, self.ctx.find_subclass(c, "A"))
+        self.assertIsNone(self.ctx.find_subclass(c, "What"))
+
+    def test_match_class_name(self):
+        # no meta name
+        self.assertFalse(self.ctx.match_class_name(ItemsType, "foo"))
+        self.assertTrue(self.ctx.match_class_name(ItemsType, "ItemsType"))
+
+        # with meta name
+        self.assertFalse(self.ctx.match_class_name(Product, "Product"))
+        self.assertTrue(self.ctx.match_class_name(Product, "product"))
+
+        # not dataclass
+        self.assertFalse(self.ctx.match_class_name(object, "object"))
+        self.assertFalse(self.ctx.match_class_name(int, "int"))
 
     @mock.patch.object(XmlContext, "get_type_hints")
     def test_build_build_vars(self, mock_get_type_hints):
@@ -208,3 +277,15 @@ class XmlContextTests(TestCase):
                 )
             ),
         )
+
+    def test_is_derived(self):
+        a = make_dataclass("A", fields=[])
+        b = make_dataclass("B", fields=[], bases=(a,))
+        c = make_dataclass("C", fields=[], bases=(a,))
+        d = make_dataclass("D", fields=[])
+
+        self.assertTrue(self.ctx.is_derived(c(), b))
+        self.assertTrue(self.ctx.is_derived(b(), c))
+        self.assertTrue(self.ctx.is_derived(a(), b))
+        self.assertTrue(self.ctx.is_derived(a(), c))
+        self.assertFalse(self.ctx.is_derived(a(), d))

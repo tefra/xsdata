@@ -401,10 +401,11 @@ class XmlSerializerTests(TestCase):
         elem = Element("foo")
         value = Items()
         meta = self.serializer.context.build(ProductType)
+        items_meta = self.serializer.context.build(Items)
         var = meta.find_var("size")
 
         self.serializer.set_xsi_type(elem, value, var, self.namespaces)
-        self.assertEqual(Items.Meta.name, elem.attrib[QNames.XSI_TYPE])
+        self.assertEqual(items_meta.qname, elem.attrib[QNames.XSI_TYPE])
 
     def test_next_value(self):
         @dataclass

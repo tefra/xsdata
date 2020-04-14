@@ -30,6 +30,7 @@ class ConvertersTestCases(TestCase):
         self.assertEqual("8.77683E-8", to_xml(Decimal("8.77683E-8")))
         self.assertEqual("8.77683E-08", to_xml(float("8.77683E-8")))
         self.assertEqual("a", to_xml(QName("a")))
+        self.assertEqual("a", to_xml(QName("a")))
         self.assertEqual("{a}b", to_xml(QName("a", "b")))
         self.assertEqual("1 2", to_xml([1, 2]))
         self.assertEqual("INF optional", to_xml([float("inf"), UseType.OPTIONAL]))
@@ -37,6 +38,7 @@ class ConvertersTestCases(TestCase):
         namespaces = Namespaces()
         namespaces.add("a", "aa")
         self.assertEqual("aa:b", to_xml(QName("a", "b"), namespaces))
+        self.assertEqual("b", to_xml(QName("b"), namespaces))
 
         with self.assertRaises(ConverterError):
             to_xml(BookForm())

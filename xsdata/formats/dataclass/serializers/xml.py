@@ -152,7 +152,9 @@ class XmlSerializer(AbstractSerializer):
 
         if self.context.is_derived(value, var.clazz):
             meta = self.context.fetch(value.__class__, QName(parent.tag).namespace)
-            SerializeUtils.set_attribute(parent, QNames.XSI_TYPE, meta.name, namespaces)
+            SerializeUtils.set_attribute(
+                parent, QNames.XSI_TYPE, meta.qname, namespaces
+            )
         else:
             raise SerializerError(
                 f"{value.__class__.__name__} is not derived from {var.clazz.__name__}"

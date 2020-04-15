@@ -1,6 +1,7 @@
 from collections import defaultdict
 from dataclasses import dataclass
 from dataclasses import field
+from typing import Callable
 from typing import Dict
 from typing import List
 from typing import Optional
@@ -16,10 +17,6 @@ from xsdata.models.enums import DataType
 from xsdata.utils import text
 from xsdata.utils.classes import ClassUtils
 from xsdata.utils.collections import unique_sequence
-
-
-def simple_type(item: Class):
-    return item.is_enumeration or item.abstract or item.is_common
 
 
 @dataclass
@@ -78,9 +75,7 @@ class ClassAnalyzer(ClassUtils):
         """
         all_classes = [item for values in self.class_index.values() for item in values]
         primary_classes = [
-            item
-            for item in all_classes
-            if item.is_enumeration or not (item.abstract or item.is_common)
+            item for item in all_classes if item.is_enumeration or item.is_complex
         ]
 
         classes = primary_classes or all_classes
@@ -106,7 +101,19 @@ class ClassAnalyzer(ClassUtils):
                 attr = self.create_reference_attribute(item, qname)
                 self.substitutions_index[qname].append(attr)
 
-    def find_class(self, qname: QName, condition=simple_type) -> Optional[Class]:
+    def find_common_class(self, qname: QName) -> Optional[Class]:
+        return self.find_class(
+            qname, condition=lambda x: x.is_enumeration or not x.is_complex
+        )
+
+    def find_simple_class(self, qname: QName) -> Optional[Class]:
+        return self.find_class(
+            qname, condition=lambda x: x.is_enumeration or x.is_simple,
+        )
+
+    def find_class(
+        self, qname: QName, condition: Optional[Callable] = None
+    ) -> Optional[Class]:
         candidates = list(filter(condition, self.class_index.get(qname, [])))
         if candidates:
             candidate = candidates.pop(0)
@@ -158,15 +165,12 @@ class ClassAnalyzer(ClassUtils):
             if len(classes) == 1:
                 continue
 
-            element = next(
-                (obj for obj in classes if obj.is_element and not obj.abstract), None
-            )
-
+            element = next((obj for obj in classes if obj.is_element), None)
             if not element:
                 continue
 
             for obj in classes:
-                if obj is not element and not obj.is_common:
+                if obj is not element and obj.is_complex:
                     obj.abstract = True
 
     def flatten_classes(self):
@@ -225,11 +229,11 @@ class ClassAnalyzer(ClassUtils):
 
         type_qname = target.source_qname(extension.type.name)
 
-        simple_source = self.find_class(type_qname)
+        simple_source = self.find_simple_class(type_qname)
         if simple_source:
             return self.flatten_extension_simple(simple_source, target, extension)
 
-        complex_source = self.find_class(type_qname, condition=None)
+        complex_source = self.find_class(type_qname)
         if complex_source:
             return self.flatten_extension_complex(complex_source, target, extension)
 
@@ -293,7 +297,7 @@ class ClassAnalyzer(ClassUtils):
             return
 
         attr_qname = target.source_qname(attr.name)
-        source = self.find_class(attr_qname, condition=None)
+        source = self.find_class(attr_qname)
 
         if not source:
             raise AnalyzerError(f"Group attribute not found: `{attr_qname}`")
@@ -327,7 +331,7 @@ class ClassAnalyzer(ClassUtils):
             source = None
             if not attr_type.native:
                 type_qname = target.source_qname(attr_type.name)
-                source = self.find_class(type_qname)
+                source = self.find_common_class(type_qname)
             elif attr.restrictions.pattern:
                 attr_type = AttrType(name=DataType.STRING.code, native=True)
 
@@ -377,7 +381,7 @@ class ClassAnalyzer(ClassUtils):
         """Check if any source dependencies recursively match the target
         class."""
         for qname in source.dependencies():
-            check = self.find_class(qname, condition=None)
+            check = self.find_class(qname)
             if check is target or (check and self.class_depends_on(check, target)):
                 return True
 
@@ -387,7 +391,7 @@ class ClassAnalyzer(ClassUtils):
         """Check if dependency or any of its dependencies match the target
         class."""
         qname = target.source_qname(dependency.name)
-        source = self.find_class(qname, condition=None)
+        source = self.find_class(qname)
 
         if source is None:
             return False

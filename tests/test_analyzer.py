@@ -180,6 +180,30 @@ class ClassAnalyzerTests(FactoryTestCase):
 
         mock_flatten_class.assert_called_once_with(class_a)
 
+    def test_find_common_class(self):
+        a = ClassFactory.enumeration(1, name="a")
+        b = ClassFactory.elements(1, name="b", abstract=True)
+        c = ClassFactory.elements(1, name="c")
+
+        self.analyzer.create_class_index([a, b, c])
+
+        self.assertEqual(a, self.analyzer.find_common_class(a.source_qname()))
+        self.assertEqual(b, self.analyzer.find_common_class(b.source_qname()))
+        self.assertIsNone(self.analyzer.find_common_class(c.source_qname()))
+
+    def test_find_simple_class(self):
+        a = ClassFactory.enumeration(1, name="a")
+        b = ClassFactory.create(name="b", type=SimpleType)
+        c = ClassFactory.elements(1, name="c", abstract=True)
+        d = ClassFactory.elements(1, name="d")
+
+        self.analyzer.create_class_index([a, b, c, d])
+
+        self.assertEqual(a, self.analyzer.find_common_class(a.source_qname()))
+        self.assertEqual(b, self.analyzer.find_common_class(b.source_qname()))
+        self.assertEqual(c, self.analyzer.find_common_class(c.source_qname()))
+        self.assertIsNone(self.analyzer.find_common_class(d.source_qname()))
+
     @mock.patch.object(ClassAnalyzer, "merge_duplicate_attributes")
     @mock.patch.object(ClassAnalyzer, "create_mixed_attribute")
     @mock.patch.object(ClassAnalyzer, "add_substitution_attrs")
@@ -257,36 +281,37 @@ class ClassAnalyzerTests(FactoryTestCase):
         self.assertEqual(0, mock_create_default_attribute.call_count)
 
     @mock.patch.object(ClassAnalyzer, "flatten_extension_simple")
-    @mock.patch.object(ClassAnalyzer, "find_class")
+    @mock.patch.object(ClassAnalyzer, "find_simple_class")
     def test_flatten_extension_with_simple_source_extension(
-        self, mock_find_class, mock_flatten_extension_simple
+        self, mock_find_simple_class, mock_flatten_extension_simple
     ):
         extension = ExtensionFactory.create()
         target = ClassFactory.create(extensions=[extension])
         source = ClassFactory.create()
-        mock_find_class.return_value = source
+        mock_find_simple_class.return_value = source
 
         self.analyzer.flatten_extension(target, extension)
 
         type_qname = target.source_qname(extension.type.name)
-        mock_find_class.assert_called_once_with(type_qname)
+        mock_find_simple_class.assert_called_once_with(type_qname)
         mock_flatten_extension_simple.assert_called_once_with(source, target, extension)
 
     @mock.patch.object(ClassAnalyzer, "flatten_extension_complex")
+    @mock.patch.object(ClassAnalyzer, "find_simple_class")
     @mock.patch.object(ClassAnalyzer, "find_class")
     def test_flatten_extension_with_complex_source_extension(
-        self, mock_find_class, mock_flatten_extension_complex
+        self, mock_find_class, mock_find_simple_class, mock_flatten_extension_complex
     ):
         extension = ExtensionFactory.create()
         target = ClassFactory.create(extensions=[extension])
         source = ClassFactory.create()
-        mock_find_class.side_effect = [None, source]
+        mock_find_simple_class.return_value = None
+        mock_find_class.return_value = source
 
         self.analyzer.flatten_extension(target, extension)
         type_qname = target.source_qname(extension.type.name)
-        mock_find_class.assert_has_calls(
-            [mock.call(type_qname), mock.call(type_qname, condition=None)]
-        )
+        mock_find_simple_class.assert_called_once_with(type_qname)
+        mock_find_class.assert_called_once_with(type_qname)
         mock_flatten_extension_complex.assert_called_once_with(
             source, target, extension
         )
@@ -479,11 +504,11 @@ class ClassAnalyzerTests(FactoryTestCase):
         self.assertEqual([AttrTypeFactory.xs_string()], attr.types)
 
     @mock.patch.object(ClassAnalyzer, "attr_depends_on", return_value=False)
-    @mock.patch.object(ClassAnalyzer, "find_class")
+    @mock.patch.object(ClassAnalyzer, "find_common_class")
     def test_flatten_attribute_types_when_no_source_is_found(
-        self, mock_find_class, mock_attr_depends_on
+        self, mock_find_common_class, mock_attr_depends_on
     ):
-        mock_find_class.return_value = None
+        mock_find_common_class.return_value = None
 
         parent = ClassFactory.create()
         type_a = AttrTypeFactory.create()
@@ -492,11 +517,11 @@ class ClassAnalyzerTests(FactoryTestCase):
 
         self.assertEqual([type_a], attr.types)
         self.assertFalse(type_a.self_ref)
-        mock_find_class.assert_called_once_with(parent.source_qname(type_a.name))
+        mock_find_common_class.assert_called_once_with(parent.source_qname(type_a.name))
         mock_attr_depends_on.assert_called_once_with(type_a, parent)
 
     @mock.patch.object(ClassAnalyzer, "attr_depends_on", return_value=True)
-    @mock.patch.object(ClassAnalyzer, "find_class", return_value=None)
+    @mock.patch.object(ClassAnalyzer, "find_common_class", return_value=None)
     def test_flatten_attribute_types_when_attribute_self_reference(self, *args):
         parent = ClassFactory.create()
         type_a = AttrTypeFactory.create()
@@ -506,9 +531,11 @@ class ClassAnalyzerTests(FactoryTestCase):
         self.assertEqual([type_a], attr.types)
         self.assertTrue(type_a.self_ref)
 
-    @mock.patch.object(ClassAnalyzer, "find_class")
-    def test_flatten_attribute_types_when_source_is_enumeration(self, mock_find_class):
-        mock_find_class.return_value = ClassFactory.enumeration(1)
+    @mock.patch.object(ClassAnalyzer, "find_common_class")
+    def test_flatten_attribute_types_when_source_is_enumeration(
+        self, mock_find_common_class
+    ):
+        mock_find_common_class.return_value = ClassFactory.enumeration(1)
 
         parent = ClassFactory.create()
         type_a = AttrTypeFactory.create(name="a")
@@ -516,12 +543,12 @@ class ClassAnalyzerTests(FactoryTestCase):
         self.analyzer.flatten_attribute_types(parent, attr)
 
         self.assertEqual([type_a], attr.types)
-        mock_find_class.assert_called_once_with(parent.source_qname(type_a.name))
+        mock_find_common_class.assert_called_once_with(parent.source_qname(type_a.name))
 
     @mock.patch.object(ClassAnalyzer, "copy_inner_classes")
-    @mock.patch.object(ClassAnalyzer, "find_class")
+    @mock.patch.object(ClassAnalyzer, "find_common_class")
     def test_flatten_attribute_types_when_source_has_only_one_attribute(
-        self, mock_find_class, mock_copy_inner_classes
+        self, mock_find_common_class, mock_copy_inner_classes
     ):
         type_a = AttrTypeFactory.create(name="a")
         type_b = AttrTypeFactory.create(name="b")
@@ -535,7 +562,7 @@ class ClassAnalyzerTests(FactoryTestCase):
             ),
         )
 
-        mock_find_class.return_value = common
+        mock_find_common_class.return_value = common
 
         parent = ClassFactory.create()
         attr = AttrFactory.create(
@@ -550,7 +577,7 @@ class ClassAnalyzerTests(FactoryTestCase):
         self.assertEqual(
             {"required": True, "min_occurs": 2}, attr.restrictions.asdict()
         )
-        mock_find_class.assert_called_once_with(parent.source_qname(type_a.name))
+        mock_find_common_class.assert_called_once_with(parent.source_qname(type_a.name))
         mock_copy_inner_classes.assert_called_once_with(common, parent)
 
     @mock.patch("xsdata.analyzer.logger.warning")
@@ -660,7 +687,7 @@ class ClassAnalyzerTests(FactoryTestCase):
 
         find_classes = {QName("a"): another, QName("b"): target}
 
-        mock_find_class.side_effect = lambda x, condition: find_classes.get(x)
+        mock_find_class.side_effect = lambda x: find_classes.get(x)
         mock_dependencies.side_effect = [
             [QName(x) for x in "cde"],
             [QName(x) for x in "abc"],
@@ -672,13 +699,13 @@ class ClassAnalyzerTests(FactoryTestCase):
 
         mock_find_class.assert_has_calls(
             [
-                mock.call(QName("c"), condition=None),
-                mock.call(QName("d"), condition=None),
-                mock.call(QName("e"), condition=None),
-                mock.call(QName("a"), condition=None),
-                mock.call(QName("x"), condition=None),
-                mock.call(QName("y"), condition=None),
-                mock.call(QName("b"), condition=None),
+                mock.call(QName("c")),
+                mock.call(QName("d")),
+                mock.call(QName("e")),
+                mock.call(QName("a")),
+                mock.call(QName("x")),
+                mock.call(QName("y")),
+                mock.call(QName("b")),
             ]
         )
 

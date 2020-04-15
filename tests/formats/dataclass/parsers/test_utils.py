@@ -15,11 +15,23 @@ from xsdata.formats.dataclass.models.constants import XmlType
 from xsdata.formats.dataclass.models.generics import AnyElement
 from xsdata.formats.dataclass.parsers.utils import ParserUtils
 from xsdata.models.enums import Namespace
+from xsdata.models.enums import QNames
 
 
 class ParserUtilsTests(TestCase):
     def setUp(self) -> None:
         self.ctx = XmlContext()
+
+    def test_parse_xsi_type(self):
+        ele = Element("foo")
+        self.assertIsNone(ParserUtils.parse_xsi_type(ele))
+
+        ele.set(QNames.XSI_TYPE, "foo")
+        self.assertEqual(QName("foo"), ParserUtils.parse_xsi_type(ele))
+
+        ele = Element("foo", nsmap=dict(bar="xsdata"))
+        ele.set(QNames.XSI_TYPE, "bar:foo")
+        self.assertEqual(QName("xsdata", "foo"), ParserUtils.parse_xsi_type(ele))
 
     @mock.patch("xsdata.formats.dataclass.parsers.utils.to_python", return_value=2)
     def test_parse_value(self, mock_to_python):

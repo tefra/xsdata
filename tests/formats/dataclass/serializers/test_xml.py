@@ -405,7 +405,7 @@ class XmlSerializerTests(TestCase):
         var = meta.find_var("size")
 
         self.serializer.set_xsi_type(elem, value, var, self.namespaces)
-        self.assertEqual(items_meta.qname, elem.attrib[QNames.XSI_TYPE])
+        self.assertEqual(items_meta.source_qname, elem.attrib[QNames.XSI_TYPE])
 
     def test_next_value(self):
         @dataclass

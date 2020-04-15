@@ -15,10 +15,20 @@ from xsdata.formats.dataclass.models.elements import XmlMeta
 from xsdata.formats.dataclass.models.elements import XmlVar
 from xsdata.formats.dataclass.models.generics import AnyElement
 from xsdata.logger import logger
+from xsdata.models.enums import QNames
 from xsdata.utils import text
 
 
 class ParserUtils:
+    @classmethod
+    def parse_xsi_type(cls, element: Element) -> Optional[QName]:
+        if QNames.XSI_TYPE not in element.attrib:
+            return None
+
+        return cls.parse_value(
+            [QName], element.attrib[QNames.XSI_TYPE], None, element.nsmap
+        )
+
     @classmethod
     def parse_value(
         cls,

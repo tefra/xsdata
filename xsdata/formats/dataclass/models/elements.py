@@ -141,6 +141,7 @@ class XmlMeta:
     name: str
     clazz: Type
     qname: QName
+    source_qname: QName
     nillable: bool
     vars: List[XmlVar] = field(default_factory=list)
 

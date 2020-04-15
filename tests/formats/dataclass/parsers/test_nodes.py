@@ -88,32 +88,49 @@ class ElementNodeTests(TestCase):
         mock_bind_element_children.assert_called_once_with(mock.ANY, meta, 0, pool)
         mock_bind_element_wild_text.assert_called_once_with(mock.ANY, meta, ele)
 
-    @mock.patch.object(XmlContext, "build")
-    def test_next_node_when_given_qname_matches_dataclass_var(self, mock_ctx_build):
+    @mock.patch.object(ParserUtils, "parse_xsi_type", return_value=QName("foo"))
+    @mock.patch.object(XmlContext, "fetch")
+    def test_next_node_when_given_qname_matches_dataclass_var(
+        self, mock_ctx_fetch, mock_element_xsi_type
+    ):
         ele = Element("a")
         ctx = XmlContext()
         var = XmlElement(
             name="a", qname=QName("a"), types=[Foo], dataclass=True, default=Foo,
         )
         meta = XmlMeta(
-            name="foo", clazz=None, qname=QName("foo"), nillable=False, vars=[var],
+            name="foo",
+            clazz=None,
+            qname=QName("foo"),
+            source_qname=QName("foo"),
+            nillable=False,
+            vars=[var],
         )
-        mock_ctx_build.return_value = replace(meta)
+        xsi_type = QName("foo")
+        namespace = meta.qname.namespace
+        mock_ctx_fetch.return_value = replace(meta)
+        mock_element_xsi_type.return_value = xsi_type
         node = ElementNode(index=0, position=0, meta=meta, default=None)
 
         actual = node.next_node(ele, 1, 10, ctx)
         self.assertIsInstance(actual, ElementNode)
         self.assertEqual(1, actual.index)
         self.assertEqual(10, actual.position)
-        self.assertIs(mock_ctx_build.return_value, actual.meta)
+        self.assertIs(mock_ctx_fetch.return_value, actual.meta)
         self.assertEqual(Foo, actual.default)
+        mock_ctx_fetch.assert_called_once_with(var.clazz, namespace, xsi_type)
 
     def test_next_node_when_given_qname_matches_any_element_var(self):
         ele = Element("a")
         ctx = XmlContext()
         var = XmlWildcard(name="a", qname=QName("a"), types=[], dataclass=False,)
         meta = XmlMeta(
-            name="foo", clazz=None, qname=QName("foo"), nillable=False, vars=[var],
+            name="foo",
+            clazz=None,
+            qname=QName("foo"),
+            source_qname=QName("foo"),
+            nillable=False,
+            vars=[var],
         )
         node = ElementNode(index=0, position=0, meta=meta, default=None)
 
@@ -128,7 +145,12 @@ class ElementNodeTests(TestCase):
         ctx = XmlContext()
         var = XmlText(name="a", qname=QName("a"), types=[int], default=100)
         meta = XmlMeta(
-            name="foo", clazz=None, qname=QName("foo"), nillable=False, vars=[var]
+            name="foo",
+            clazz=None,
+            qname=QName("foo"),
+            source_qname=QName("foo"),
+            nillable=False,
+            vars=[var],
         )
         node = ElementNode(index=0, position=0, meta=meta, default=None)
 
@@ -143,7 +165,13 @@ class ElementNodeTests(TestCase):
     def test_next_node_when_given_qname_does_not_match_any_var(self):
         ele = Element("nope")
         ctx = XmlContext()
-        meta = XmlMeta(name="foo", clazz=None, qname=QName("foo"), nillable=False)
+        meta = XmlMeta(
+            name="foo",
+            clazz=None,
+            qname=QName("foo"),
+            source_qname=QName("foo"),
+            nillable=False,
+        )
         node = ElementNode(index=0, position=0, meta=meta, default=None)
 
         with self.assertRaises(XmlContextError) as cm:

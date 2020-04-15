@@ -1,3 +1,4 @@
+import sys
 from dataclasses import dataclass
 from dataclasses import Field
 from dataclasses import field
@@ -32,7 +33,7 @@ class XmlContext:
         self,
         clazz: Type,
         parent_ns: Optional[str] = None,
-        xsi_type: Optional[str] = None,
+        xsi_type: Optional[QName] = None,
     ) -> XmlMeta:
         meta = self.build(clazz, parent_ns)
 
@@ -42,16 +43,16 @@ class XmlContext:
 
         return meta
 
-    def find_subclass(self, clazz: Type, xsi_type: str):
+    def find_subclass(self, clazz: Type, xsi_type: QName):
         for subclass in clazz.__subclasses__():
-            if self.match_class_name(subclass, xsi_type):
+            if self.match_class_source_qname(subclass, xsi_type):
                 return subclass
 
         for base in clazz.__bases__:
             if not is_dataclass(base):
                 continue
 
-            if self.match_class_name(base, xsi_type):
+            if self.match_class_source_qname(base, xsi_type):
                 return base
 
             subclass = self.find_subclass(base, xsi_type)
@@ -60,13 +61,12 @@ class XmlContext:
 
         return None
 
-    def match_class_name(self, clazz: Type, xsi_type: str) -> bool:
-        result = False
+    def match_class_source_qname(self, clazz: Type, xsi_type: QName) -> bool:
         if is_dataclass(clazz):
-            meta = getattr(clazz, "Meta", None)
-            name = getattr(meta, "name", self.name_generator(clazz.__name__))
-            result = name == xsi_type
-        return result
+            meta = self.build(clazz)
+            return meta.source_qname == xsi_type
+
+        return False
 
     def build(self, clazz: Type, parent_ns: Optional[str] = None) -> XmlMeta:
         if clazz not in self.cache:
@@ -80,11 +80,14 @@ class XmlContext:
             name = getattr(meta, "name", self.name_generator(clazz.__name__))
             nillable = getattr(meta, "nillable", False)
             namespace = getattr(meta, "namespace", parent_ns)
+            module = sys.modules[clazz.__module__]
+            source_namespace = getattr(module, "__NAMESPACE__", None)
 
             self.cache[clazz] = XmlMeta(
                 name=name,
                 clazz=clazz,
                 qname=QName(namespace, name),
+                source_qname=QName(source_namespace, name),
                 nillable=nillable,
                 vars=list(self.get_type_hints(clazz, namespace)),
             )

@@ -15,6 +15,7 @@ from xsdata.models.enums import EventType
 
 class XmlParserTests(TestCase):
     def setUp(self):
+        super(XmlParserTests, self).setUp()
         self.parser = XmlParser()
         self.parser.index = 10
         self.parser.objects = [(QName(x), x) for x in "abcde"]
@@ -48,9 +49,7 @@ class XmlParserTests(TestCase):
 
     @mock.patch.object(XmlParser, "emit_event")
     @mock.patch.object(PrimitiveNode, "parse_element", return_value=("q", "result"))
-    def test_dequeue_node_with_primitive_item(
-        self, mock_parse_element, mock_emit_event
-    ):
+    def test_dequeue_node(self, mock_parse_element, mock_emit_event):
         element = Element("author", nsmap={"prefix": "uri"})
         element.text = "foobar"
 
@@ -65,6 +64,23 @@ class XmlParserTests(TestCase):
         mock_emit_event.assert_called_once_with(
             EventType.END, element.tag, obj=result, element=element
         )
+
+    @mock.patch.object(XmlParser, "emit_event")
+    @mock.patch.object(PrimitiveNode, "parse_element", return_value=(None, None))
+    def test_dequeue_node_with_no_result(self, mock_parse_element, mock_emit_event):
+        element = Element("author", nsmap={"prefix": "uri"})
+        element.text = "foobar"
+
+        queue_item = PrimitiveNode(index=0, position=0, types=[str], default=None)
+        self.parser.queue.append(queue_item)
+        total_objects = len(self.parser.objects)
+
+        result = self.parser.dequeue_node(element)
+        self.assertIsNone(result)
+        self.assertEqual(0, len(self.parser.queue))
+        self.assertEqual(total_objects, len(self.parser.objects))
+        self.assertEqual(0, mock_emit_event.call_count)
+        mock_parse_element.assert_called_once_with(element, self.parser.objects)
 
     def test_emit_event(self):
         mock_func = mock.Mock()

@@ -53,9 +53,9 @@ class SchemaParserTests(TestCase):
         self.assertIsInstance(schema, Schema)
 
         self.assertEqual(expected_namespaces, schema.simple_types[0].ns_map)
-        self.assertEqual(1, schema.simple_types[0].index)
-        self.assertEqual(2, schema.simple_types[0].annotation.index)
-        self.assertEqual(3, schema.simple_types[0].annotation.documentations[0].index)
+        self.assertEqual(3, schema.simple_types[0].index)
+        self.assertEqual(4, schema.simple_types[0].annotation.index)
+        self.assertEqual(5, schema.simple_types[0].annotation.documentations[0].index)
 
     def test_start_schema(self):
         element = etree.Element("schema")

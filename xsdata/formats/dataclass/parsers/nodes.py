@@ -16,12 +16,9 @@ from xsdata.formats.dataclass.parsers.utils import ParserUtils
 
 @dataclass(frozen=True)
 class XmlNode:
-    index: int
     position: int
 
-    def next_node(
-        self, qname: QName, index: int, position: int, context: XmlContext
-    ) -> "XmlNode":
+    def next_node(self, element: Element, position: int, ctx: XmlContext) -> "XmlNode":
         raise NotImplementedError(f"Not Implemented")
 
     def parse_element(self, element: Element, objects: List[Any]) -> Tuple:
@@ -45,9 +42,7 @@ class ElementNode(XmlNode):
 
         return qname, obj
 
-    def next_node(
-        self, element: Element, index: int, position: int, context: XmlContext
-    ) -> XmlNode:
+    def next_node(self, element: Element, position: int, ctx: XmlContext) -> XmlNode:
         qname = QName(element.tag)
         var = self.meta.find_var(qname)
         if not var:
@@ -59,17 +54,15 @@ class ElementNode(XmlNode):
             xsi_type = ParserUtils.parse_xsi_type(element)
 
             return ElementNode(
-                index=index,
                 position=position,
-                meta=context.fetch(var.clazz, self.meta.qname.namespace, xsi_type),
+                meta=ctx.fetch(var.clazz, self.meta.qname.namespace, xsi_type),
                 default=var.default,
             )
 
         if var.is_any_type:
-            return WildcardNode(index=index, position=position, qname=var.qname)
+            return WildcardNode(position=position, qname=var.qname)
 
         return PrimitiveNode(
-            index=index,
             position=position,
             types=var.types,
             default=var.default,
@@ -79,13 +72,11 @@ class ElementNode(XmlNode):
 
 @dataclass(frozen=True)
 class RootNode(ElementNode):
-    def next_node(
-        self, element: Element, index: int, position: int, context: XmlContext
-    ) -> XmlNode:
-        if index == 0:
-            return self
+    def next_node(self, element: Element, position: int, ctx: XmlContext) -> XmlNode:
 
-        return super(RootNode, self).next_node(element, index, position, context)
+        if element.getparent() is None:
+            return self
+        return super(RootNode, self).next_node(element, position, ctx)
 
 
 @dataclass(frozen=True)
@@ -98,10 +89,8 @@ class WildcardNode(XmlNode):
 
         return self.qname, obj
 
-    def next_node(
-        self, element: Element, index: int, position: int, context: XmlContext
-    ) -> XmlNode:
-        return WildcardNode(index=index, position=position, qname=self.qname)
+    def next_node(self, element: Element, position: int, ctx: XmlContext) -> XmlNode:
+        return WildcardNode(position=position, qname=self.qname)
 
 
 @dataclass(frozen=True)
@@ -109,11 +98,8 @@ class SkipNode(XmlNode):
     def parse_element(self, element: Element, objects: List) -> Tuple:
         return None, None
 
-    @classmethod
-    def next_node(
-        cls, element: Element, index: int, position: int, context: XmlContext
-    ) -> XmlNode:
-        return SkipNode(index=index, position=position)
+    def next_node(self, element: Element, position: int, ctx: XmlContext) -> XmlNode:
+        return SkipNode(position=position)
 
 
 @dataclass(frozen=True)
@@ -132,7 +118,5 @@ class PrimitiveNode(XmlNode):
 
         return qname, obj
 
-    def next_node(
-        self, element: Element, index: int, position: int, context: XmlContext
-    ) -> XmlNode:
-        return SkipNode(index=index, position=position)
+    def next_node(self, element: Element, position: int, ctx: XmlContext) -> XmlNode:
+        return SkipNode(position=position)

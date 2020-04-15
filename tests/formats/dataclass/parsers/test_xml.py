@@ -27,18 +27,17 @@ class XmlParserTests(TestCase):
     @mock.patch.object(RootNode, "next_node")
     @mock.patch.object(XmlParser, "emit_event")
     def test_queue_node(self, mock_emit_event, mock_next_node):
-        skip_node = SkipNode(index=1, position=1)
+        skip_node = SkipNode(position=1)
         mock_next_node.return_value = skip_node
         element = Element("{urn:books}books")
         root_queue_item = RootNode(
-            index=0, position=0, meta=self.parser.context.build(Books), default=None,
+            position=0, meta=self.parser.context.build(Books), default=None,
         )
 
         self.parser.index = 0
         self.parser.queue.append(root_queue_item)
         self.parser.queue_node(element)
 
-        self.assertEqual(1, self.parser.index)
         self.assertEqual(2, len(self.parser.queue))
         self.assertEqual(root_queue_item, self.parser.queue[0])
         self.assertEqual(skip_node, self.parser.queue[1])
@@ -53,7 +52,7 @@ class XmlParserTests(TestCase):
         element = Element("author", nsmap={"prefix": "uri"})
         element.text = "foobar"
 
-        queue_item = PrimitiveNode(index=0, position=0, types=[str], default=None)
+        queue_item = PrimitiveNode(position=0, types=[str], default=None)
         self.parser.queue.append(queue_item)
 
         result = self.parser.dequeue_node(element)
@@ -71,7 +70,7 @@ class XmlParserTests(TestCase):
         element = Element("author", nsmap={"prefix": "uri"})
         element.text = "foobar"
 
-        queue_item = PrimitiveNode(index=0, position=0, types=[str], default=None)
+        queue_item = PrimitiveNode(position=0, types=[str], default=None)
         self.parser.queue.append(queue_item)
         total_objects = len(self.parser.objects)
 

@@ -1,6 +1,8 @@
 from dataclasses import dataclass, field
 from typing import Optional
 
+__NAMESPACE__ = "http://example.org/prod2"
+
 
 @dataclass
 class ColorType:

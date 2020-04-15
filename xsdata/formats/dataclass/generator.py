@@ -30,13 +30,6 @@ class DataclassGenerator(PythonAbstractGenerator):
         super(DataclassGenerator, self).__init__()
         self.env.filters.update(filters)
 
-    def render_module(self, output: str, imports: Dict[str, List[Package]]) -> str:
-        return self.template("module").render(output=output, imports=imports)
-
-    def render_class(self, obj: Class) -> str:
-        template = "enum" if obj.is_enumeration else "class"
-        return self.template(template).render(obj=obj)
-
     def render(self, classes: List[Class]) -> Iterator[Tuple[Path, str, str]]:
         """Given  a list of classes return to the writer factory the target
         file path full module path and the rendered code."""
@@ -48,17 +41,32 @@ class DataclassGenerator(PythonAbstractGenerator):
             yield target_package, "init", self.render_package(cluster)
 
         for target_module, cluster in self.group_by_module(classes).items():
-            resolver.process(cluster)
-            imports = self.prepare_imports(resolver.sorted_imports())
-            output = self.render_classes(resolver.sorted_classes())
             file_path = Path.cwd().joinpath(target_module.replace(".", "/") + ".py")
+            yield file_path, target_module, self.render_module(resolver, cluster)
 
-            yield file_path, target_module, self.render_module(
-                imports=imports, output=output
-            )
+    def render_package(self, classes: List[Class]) -> str:
+        class_names = [
+            (obj.target_module, self.class_name(obj.name))
+            for obj in sorted(classes, key=lambda x: x.name)
+        ]
+        return self.template("package").render(class_names=class_names)
+
+    def render_module(self, resolver: DependenciesResolver, classes: List[Class]):
+        resolver.process(classes)
+        imports = self.prepare_imports(resolver.sorted_imports())
+        output = self.render_classes(resolver.sorted_classes())
+        namespace = classes[0].source_namespace
+
+        return self.template("module").render(
+            output=output, imports=imports, namespace=namespace
+        )
+
+    def render_class(self, obj: Class) -> str:
+        template = "enum" if obj.is_enumeration else "class"
+        return self.template(template).render(obj=obj)
 
     @classmethod
-    def group_by_package(cls, classes: List[Class]):
+    def group_by_package(cls, classes: List[Class]) -> Dict[Path, List[Class]]:
         groups: Dict[Path, List] = defaultdict(list)
         init_paths: Dict = dict()
         for obj in classes:
@@ -74,19 +82,12 @@ class DataclassGenerator(PythonAbstractGenerator):
         return groups
 
     @classmethod
-    def group_by_module(cls, classes: List[Class]):
+    def group_by_module(cls, classes: List[Class]) -> Dict[str, List[Class]]:
         groups: Dict[str, List] = defaultdict(list)
         for obj in classes:
             groups[obj.target_module].append(obj)
 
         return groups
-
-    def render_package(self, classes: List[Class]) -> str:
-        class_names = [
-            (obj.target_module, self.class_name(obj.name))
-            for obj in sorted(classes, key=lambda x: x.name)
-        ]
-        return self.template("package").render(class_names=class_names)
 
     def render_classes(self, classes: List[Class]) -> str:
         """Get a list of sorted classes from the imports resolver, apply the

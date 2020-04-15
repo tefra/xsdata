@@ -2,6 +2,8 @@ from enum import Enum
 from dataclasses import dataclass, field
 from typing import Optional, Union
 
+__NAMESPACE__ = "http://www.w3.org/XML/1998/namespace"
+
 
 @dataclass
 class Base:

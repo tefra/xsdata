@@ -7,6 +7,9 @@ from tests.factories import AttrTypeFactory
 from tests.factories import ClassFactory
 from tests.factories import ExtensionFactory
 from tests.factories import FactoryTestCase
+from xsdata.models.elements import ComplexType
+from xsdata.models.elements import Element
+from xsdata.models.elements import SimpleType
 
 
 class ClassTests(FactoryTestCase):
@@ -92,3 +95,30 @@ class ClassTests(FactoryTestCase):
         obj.ns_map["foo"] = namespace
         obj.source_namespace = namespace
         self.assertEqual("foo", obj.source_prefix)
+
+    def test_property_is_simple(self):
+
+        obj = ClassFactory.create(type=Element)
+        self.assertFalse(obj.is_simple)
+
+        obj.abstract = True
+        self.assertTrue(obj.is_simple)
+
+        obj = ClassFactory.create(type=SimpleType)
+        self.assertTrue(obj.is_simple)
+
+    def test_property_is_complex(self):
+        obj = ClassFactory.create(type=SimpleType)
+        self.assertFalse(obj.is_complex)
+
+        obj = ClassFactory.create(type=Element)
+        self.assertTrue(obj.is_complex)
+
+        obj.abstract = True
+        self.assertFalse(obj.is_complex)
+
+        obj = ClassFactory.create(type=ComplexType)
+        self.assertTrue(obj.is_complex)
+
+        obj.abstract = True
+        self.assertFalse(obj.is_complex)

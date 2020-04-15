@@ -14,6 +14,7 @@ from lxml.etree import QName
 
 from xsdata.models.elements import ComplexType
 from xsdata.models.elements import Element
+from xsdata.models.elements import SimpleType
 from xsdata.models.enums import DataType
 from xsdata.models.enums import QNames
 from xsdata.models.enums import Tag
@@ -231,12 +232,14 @@ class Class:
         return any(attr.is_wildcard for attr in self.attrs)
 
     @property
-    def is_common(self):
-        return self.type not in [Element, ComplexType]
+    def is_complex(self):
+        return (
+            True if self.type in [Element, ComplexType] and not self.abstract else False
+        )
 
     @property
     def is_element(self):
-        return self.type is Element
+        return self.type is Element and not self.abstract
 
     @property
     def is_enumeration(self) -> bool:
@@ -247,6 +250,10 @@ class Class:
         return self.nillable or next(
             (True for ext in self.extensions if ext.restrictions.nillable), False
         )
+
+    @property
+    def is_simple(self):
+        return self.type == SimpleType or self.abstract
 
     @property
     def source_prefix(self) -> Optional[str]:

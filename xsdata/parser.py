@@ -45,11 +45,10 @@ class SchemaParser(XmlParser):
     def dequeue_node(self, element: etree.Element) -> Optional[T]:
         """Override parent method to skip empty elements and to set the object
         index."""
-        item = self.queue[-1]
         obj = super(SchemaParser, self).dequeue_node(element)
 
         if obj:
-            obj.index = item.index
+            obj.index = element.sourceline
             self.set_namespace_map(element, obj)
 
         return obj

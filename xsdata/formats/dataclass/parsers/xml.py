@@ -24,7 +24,6 @@ from xsdata.utils import text
 
 @dataclass
 class XmlParser(AbstractParser):
-    index: int = field(default_factory=int)
     queue: List[XmlNode] = field(init=False, default_factory=list)
     namespaces: Namespaces = field(init=False, default_factory=Namespaces)
     objects: List[Tuple[QName, Any]] = field(init=False, default_factory=list)
@@ -49,9 +48,8 @@ class XmlParser(AbstractParser):
         obj = None
         meta = self.context.build(clazz)
         self.objects = []
-        self.index = 0
         self.namespaces.clear()
-        self.queue = [RootNode(index=0, position=0, meta=meta, default=None)]
+        self.queue = [RootNode(position=0, meta=meta, default=None)]
 
         for event, element in context:
             if event == EventType.START_NS:
@@ -81,9 +79,8 @@ class XmlParser(AbstractParser):
         item = self.queue[-1]
         position = len(self.objects)
 
-        queue_item = item.next_node(element, self.index, position, self.context)
+        queue_item = item.next_node(element, position, self.context)
 
-        self.index += 1
         self.queue.append(queue_item)
         self.emit_event(EventType.START, element.tag, item=item, element=element)
 

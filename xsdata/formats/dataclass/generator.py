@@ -44,11 +44,10 @@ class DataclassGenerator(PythonAbstractGenerator):
         packages = {obj.source_qname(): obj.target_module for obj in classes}
         resolver = DependenciesResolver(packages=packages)
 
-        groups: Dict[str, List] = defaultdict(list)
-        for obj in classes:
-            groups[obj.target_module].append(obj)
+        for target_package, cluster in self.group_by_package(classes).items():
+            yield target_package, "init", self.render_package(cluster)
 
-        for target_module, cluster in groups.items():
+        for target_module, cluster in self.group_by_module(classes).items():
             resolver.process(cluster)
             imports = self.prepare_imports(resolver.sorted_imports())
             output = self.render_classes(resolver.sorted_classes())
@@ -57,6 +56,37 @@ class DataclassGenerator(PythonAbstractGenerator):
             yield file_path, target_module, self.render_module(
                 imports=imports, output=output
             )
+
+    @classmethod
+    def group_by_package(cls, classes: List[Class]):
+        groups: Dict[Path, List] = defaultdict(list)
+        init_paths: Dict = dict()
+        for obj in classes:
+            if obj.target_module not in init_paths:
+                init_paths[obj.target_module] = (
+                    Path.cwd()
+                    .joinpath(obj.target_module.replace(".", "/"))
+                    .parent.joinpath("__init__.py")
+                )
+            key = init_paths[obj.target_module]
+            groups[key].append(obj)
+
+        return groups
+
+    @classmethod
+    def group_by_module(cls, classes: List[Class]):
+        groups: Dict[str, List] = defaultdict(list)
+        for obj in classes:
+            groups[obj.target_module].append(obj)
+
+        return groups
+
+    def render_package(self, classes: List[Class]) -> str:
+        class_names = [
+            (obj.target_module, self.class_name(obj.name))
+            for obj in sorted(classes, key=lambda x: x.name)
+        ]
+        return self.template("package").render(class_names=class_names)
 
     def render_classes(self, classes: List[Class]) -> str:
         """Get a list of sorted classes from the imports resolver, apply the

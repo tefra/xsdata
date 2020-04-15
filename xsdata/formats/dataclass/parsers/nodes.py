@@ -46,8 +46,9 @@ class ElementNode(XmlNode):
         return qname, obj
 
     def next_node(
-        self, qname: QName, index: int, position: int, context: XmlContext
+        self, element: Element, index: int, position: int, context: XmlContext
     ) -> XmlNode:
+        qname = QName(element.tag)
         var = self.meta.find_var(qname)
         if not var:
             raise XmlContextError(
@@ -55,10 +56,12 @@ class ElementNode(XmlNode):
             )
 
         if var.dataclass:
+            xsi_type = ParserUtils.parse_xsi_type(element)
+
             return ElementNode(
                 index=index,
                 position=position,
-                meta=context.build(var.clazz, self.meta.qname.namespace),
+                meta=context.fetch(var.clazz, self.meta.qname.namespace, xsi_type),
                 default=var.default,
             )
 
@@ -77,12 +80,12 @@ class ElementNode(XmlNode):
 @dataclass(frozen=True)
 class RootNode(ElementNode):
     def next_node(
-        self, qname: QName, index: int, position: int, context: XmlContext
+        self, element: Element, index: int, position: int, context: XmlContext
     ) -> XmlNode:
         if index == 0:
             return self
 
-        return super(RootNode, self).next_node(qname, index, position, context)
+        return super(RootNode, self).next_node(element, index, position, context)
 
 
 @dataclass(frozen=True)
@@ -96,7 +99,7 @@ class WildcardNode(XmlNode):
         return self.qname, obj
 
     def next_node(
-        self, qname: QName, index: int, position: int, context: XmlContext
+        self, element: Element, index: int, position: int, context: XmlContext
     ) -> XmlNode:
         return WildcardNode(index=index, position=position, qname=self.qname)
 
@@ -108,7 +111,7 @@ class SkipNode(XmlNode):
 
     @classmethod
     def next_node(
-        cls, qname: QName, index: int, position: int, context: XmlContext
+        cls, element: Element, index: int, position: int, context: XmlContext
     ) -> XmlNode:
         return SkipNode(index=index, position=position)
 
@@ -130,6 +133,6 @@ class PrimitiveNode(XmlNode):
         return qname, obj
 
     def next_node(
-        self, qname: QName, index: int, position: int, context: XmlContext
+        self, element: Element, index: int, position: int, context: XmlContext
     ) -> XmlNode:
         return SkipNode(index=index, position=position)

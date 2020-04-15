@@ -1,6 +1,8 @@
 from dataclasses import dataclass, field
 from typing import List, Optional
 
+__NAMESPACE__ = "urn:books"
+
 
 @dataclass
 class BookForm:

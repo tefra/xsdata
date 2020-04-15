@@ -34,7 +34,7 @@ class XmlParser(AbstractParser):
         """Parse the XML input stream and return the resulting object tree."""
         ctx = iterparse(
             source=source,
-            events=(EventType.START, EventType.END),
+            events=(EventType.START, EventType.END, EventType.START_NS),
             recover=True,
             remove_comments=True,
         )
@@ -54,17 +54,22 @@ class XmlParser(AbstractParser):
         self.queue = [RootNode(index=0, position=0, meta=meta, default=None)]
 
         for event, element in context:
+            if event == EventType.START_NS:
+                self.add_namespace(element)
             if event == EventType.START:
                 self.queue_node(element)
             elif event == EventType.END:
                 obj = self.dequeue_node(element)
-                if obj is not None:
-                    element.clear()
 
         if not obj or not isinstance(obj, clazz):
             raise ParserError(f"Failed to create target class `{clazz.__name__}`")
 
         return obj
+
+    def add_namespace(self, namespace: Tuple):
+        """Add the given namespace in the registry."""
+        prefix, uri = namespace
+        self.namespaces.add(uri, prefix)
 
     def queue_node(self, element: Element):
         """
@@ -73,11 +78,10 @@ class XmlParser(AbstractParser):
 
         :raises ParserError: When the parser doesn't know how to proceed.
         """
-        qname = QName(element.tag)
         item = self.queue[-1]
         position = len(self.objects)
 
-        queue_item = item.next_node(qname, self.index, position, self.context)
+        queue_item = item.next_node(element, self.index, position, self.context)
 
         self.index += 1
         self.queue.append(queue_item)
@@ -95,8 +99,11 @@ class XmlParser(AbstractParser):
 
         if qname:
             self.objects.append((qname, obj))
-        self.emit_event(EventType.END, element.tag, obj=obj, element=element)
-        self.namespaces.add_all(element.nsmap)
+
+        if obj is not None:
+            self.emit_event(EventType.END, element.tag, obj=obj, element=element)
+            element.clear()
+
         return obj
 
     def emit_event(self, event: str, name: str, **kwargs):

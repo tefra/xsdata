@@ -3,6 +3,8 @@ from dataclasses import dataclass, field
 from lxml.etree import QName
 from typing import Dict, Optional
 
+__NAMESPACE__ = "http://datypic.com/prod"
+
 
 @dataclass
 class DescriptionGroup:

@@ -7,6 +7,8 @@ from tests.fixtures.defxmlschema.chapter04.example04052 import (
     OrderSummary,
 )
 
+__NAMESPACE__ = "http://datypic.com/root"
+
 
 @dataclass
 class RootType:

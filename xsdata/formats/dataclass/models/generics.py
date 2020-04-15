@@ -76,3 +76,8 @@ class Namespaces:
         for prefix, uri in self.ns_map.items():
             if prefix and not prefix.startswith("ns"):
                 register_namespace(prefix, uri)
+
+    def unregister(self):
+        for prefix, uri in self.ns_map.items():
+            if prefix and not prefix.startswith("ns") and not Namespace.get_enum(uri):
+                register_namespace(prefix, "")

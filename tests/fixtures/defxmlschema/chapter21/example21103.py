@@ -1,6 +1,8 @@
 from dataclasses import dataclass, field
 from typing import Optional
 
+__NAMESPACE__ = "http://datypic.com/cust"
+
 
 @dataclass
 class CustomerType:

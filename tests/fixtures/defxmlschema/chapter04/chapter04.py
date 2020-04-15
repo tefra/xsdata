@@ -7,6 +7,8 @@ from tests.fixtures.defxmlschema.chapter04.chapter04prod import (
     ItemsType,
 )
 
+__NAMESPACE__ = "http://example.org/ord"
+
 
 @dataclass
 class OrderType:

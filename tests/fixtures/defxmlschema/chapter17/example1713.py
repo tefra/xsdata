@@ -4,6 +4,8 @@ from tests.fixtures.defxmlschema.chapter15.example1515 import (
     CatalogType,
 )
 
+__NAMESPACE__ = "http://datypic.com/prod"
+
 
 @dataclass
 class CatalogListType:

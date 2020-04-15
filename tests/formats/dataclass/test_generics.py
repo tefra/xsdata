@@ -90,6 +90,7 @@ class NamespacesTests(TestCase):
 
     def test_register(self):
         namespaces = Namespaces()
+        namespaces.add(Namespace.XML.uri)
         namespaces.add("http://komposta.net", "bar")
         namespaces.add("http://foobar", "ns2")  # ns{\d} are not registered
 
@@ -102,3 +103,7 @@ class NamespacesTests(TestCase):
 
         element = Element("{http://foobar}root")
         self.assertEqual({"ns0": "http://foobar"}, element.nsmap)
+
+        namespaces.unregister()
+        element = Element("{http://komposta.net}root")
+        self.assertEqual({"ns0": "http://komposta.net"}, element.nsmap)

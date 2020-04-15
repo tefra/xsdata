@@ -6,6 +6,8 @@ from tests.fixtures.defxmlschema.chapter13.example13341 import (
     Size,
 )
 
+__NAMESPACE__ = "http://datypic.com/ord"
+
 
 @dataclass
 class RestrictedProductType:

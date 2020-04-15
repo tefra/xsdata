@@ -4,6 +4,8 @@ from tests.fixtures.defxmlschema.chapter02.example0210 import (
     ProductType,
 )
 
+__NAMESPACE__ = "http://datypic.com/prod"
+
 
 @dataclass
 class ItemsType:

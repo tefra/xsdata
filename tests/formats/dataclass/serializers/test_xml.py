@@ -12,14 +12,19 @@ from lxml.etree import QName
 
 from tests.fixtures.books import BookForm
 from tests.fixtures.books import Books
+from tests.fixtures.defxmlschema.chapter12.chapter12 import ColorType
 from tests.fixtures.defxmlschema.chapter12.chapter12 import DescriptionType
+from tests.fixtures.defxmlschema.chapter12.chapter12 import Items
 from tests.fixtures.defxmlschema.chapter12.chapter12 import ProductType
 from tests.fixtures.defxmlschema.chapter12.chapter12 import SizeType
+from xsdata.exceptions import SerializerError
 from xsdata.exceptions import XmlContextError
+from xsdata.formats.dataclass.context import XmlContext
 from xsdata.formats.dataclass.models.generics import AnyElement
 from xsdata.formats.dataclass.models.generics import Namespaces
 from xsdata.formats.dataclass.serializers import XmlSerializer
 from xsdata.formats.dataclass.serializers.utils import SerializeUtils
+from xsdata.models.enums import QNames
 
 
 class XmlSerializerTests(TestCase):
@@ -138,7 +143,7 @@ class XmlSerializerTests(TestCase):
             (sub_node, [2, 3]),
         ]
 
-        self.serializer.render_node(obj, root, self.namespaces)
+        self.serializer.render_node(root, obj, self.namespaces)
         self.assertEqual({"ns0": "foo"}, self.namespaces.ns_map)
         mock_set_attribute.assert_called_once_with(
             root, attribute.qname, 1, self.namespaces
@@ -156,7 +161,7 @@ class XmlSerializerTests(TestCase):
 
     def test_render_node_without_dataclass(self):
         root = Element("root")
-        self.serializer.render_node(1, root, self.namespaces)
+        self.serializer.render_node(root, 1, self.namespaces)
         self.assertEqual("1", root.text)
 
     @mock.patch.object(XmlSerializer, "render_sub_node")
@@ -234,8 +239,11 @@ class XmlSerializerTests(TestCase):
         mock_set_tail.assert_called_once_with(root, value, self.namespaces)
 
     @mock.patch.object(SerializeUtils, "set_nil_attribute")
+    @mock.patch.object(XmlSerializer, "set_xsi_type")
     @mock.patch.object(XmlSerializer, "render_node")
-    def test_render_element_node(self, mock_render_node, mock_set_nil_attribute):
+    def test_render_element_node(
+        self, mock_render_node, mock_set_xsi_type, mock_set_nil_attribute
+    ):
         root = Element("root")
         value = SizeType()
         meta = self.serializer.context.build(DescriptionType)
@@ -244,7 +252,8 @@ class XmlSerializerTests(TestCase):
         self.serializer.render_element_node(root, value, var, self.namespaces)
 
         child = root[0]
-        mock_render_node.assert_called_once_with(value, child, self.namespaces)
+        mock_render_node.assert_called_once_with(child, value, self.namespaces)
+        mock_set_xsi_type.assert_called_once_with(child, value, var, self.namespaces)
         mock_set_nil_attribute.assert_called_once_with(
             child, var.nillable, self.namespaces
         )
@@ -268,7 +277,7 @@ class XmlSerializerTests(TestCase):
         self.serializer.render_element_node(root, value, var, self.namespaces)
 
         child = root[0]
-        mock_render_node.assert_called_once_with(value, child, self.namespaces)
+        mock_render_node.assert_called_once_with(child, value, self.namespaces)
         mock_set_nil_attribute.assert_called_once_with(
             child, var.nillable, self.namespaces
         )
@@ -358,6 +367,45 @@ class XmlSerializerTests(TestCase):
         mock_set_nil_attribute.assert_called_once_with(
             root, var.nillable, self.namespaces
         )
+
+    def test_set_xsi_type_with_non_dataclass(self):
+        elem = Element("foo")
+        value = 1
+        meta = self.serializer.context.build(ProductType)
+        var = meta.find_var("number")
+        self.serializer.set_xsi_type(elem, value, var, self.namespaces)
+        self.assertNotIn(QNames.XSI_TYPE, elem.attrib)
+
+    def test_set_xsi_type_when_value_type_matches_var_clazz(self):
+        elem = Element("foo")
+        value = SizeType()
+        meta = self.serializer.context.build(ProductType)
+        var = meta.find_var("size")
+
+        self.serializer.set_xsi_type(elem, value, var, self.namespaces)
+        self.assertNotIn(QNames.XSI_TYPE, elem.attrib)
+
+    def test_set_xsi_type_when_value_is_not_derived_from_var_clazz(self):
+        elem = Element("foo")
+        value = ColorType()
+        meta = self.serializer.context.build(ProductType)
+        var = meta.find_var("size")
+
+        with self.assertRaises(SerializerError) as cm:
+            self.serializer.set_xsi_type(elem, value, var, self.namespaces)
+
+        self.assertEqual("ColorType is not derived from SizeType", str(cm.exception))
+
+    @mock.patch.object(XmlContext, "is_derived", return_value=True)
+    def test_set_xsi_type_when_value_is_derived_from_var_clazz(self, *args):
+        elem = Element("foo")
+        value = Items()
+        meta = self.serializer.context.build(ProductType)
+        items_meta = self.serializer.context.build(Items)
+        var = meta.find_var("size")
+
+        self.serializer.set_xsi_type(elem, value, var, self.namespaces)
+        self.assertEqual(items_meta.source_qname, elem.attrib[QNames.XSI_TYPE])
 
     def test_next_value(self):
         @dataclass

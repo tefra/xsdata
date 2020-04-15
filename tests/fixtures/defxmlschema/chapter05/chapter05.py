@@ -4,6 +4,8 @@ from tests.fixtures.defxmlschema.chapter05.chapter05prod import (
     Product,
 )
 
+__NAMESPACE__ = "http://example.org/ord"
+
 
 @dataclass
 class ItemsType:

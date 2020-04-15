@@ -4,6 +4,8 @@ from tests.fixtures.defxmlschema.chapter04.example04032 import (
     ItemsType,
 )
 
+__NAMESPACE__ = "http://datypic.com/ord"
+
 
 @dataclass
 class OrderType:

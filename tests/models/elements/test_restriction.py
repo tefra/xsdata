@@ -11,6 +11,7 @@ from xsdata.models.elements import MinInclusive
 from xsdata.models.elements import MinLength
 from xsdata.models.elements import Pattern
 from xsdata.models.elements import Restriction
+from xsdata.models.elements import SimpleType
 from xsdata.models.elements import TotalDigits
 from xsdata.models.elements import WhiteSpace
 
@@ -19,6 +20,10 @@ class RestrictionTests(TestCase):
     def test_property_real_type(self):
         obj = Restriction.create(base="foo")
         self.assertEqual(obj.base, obj.real_type)
+
+        obj.simple_type = SimpleType.create(restriction=Restriction.create(base="bar"))
+
+        self.assertEqual("bar", obj.real_type)
 
     def test_property_real_name(self):
         obj = Restriction.create()

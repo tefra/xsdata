@@ -1,5 +1,6 @@
 from unittest import TestCase
 
+from xsdata.exceptions import SchemaValueError
 from xsdata.models.elements import AnyAttribute
 from xsdata.models.enums import NamespaceType
 
@@ -25,6 +26,10 @@ class AnyAttributeTests(TestCase):
 
         obj.namespace = "foo"
         self.assertEqual("foo_attributes", obj.real_name)
+
+        obj.namespace = None
+        with self.assertRaises(SchemaValueError):
+            obj.real_name
 
     def test_property_real_type(self):
         obj = AnyAttribute.create()

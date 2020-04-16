@@ -981,8 +981,8 @@ class ComplexType(AnnotationBase):
         if self.mixed:
             return True
 
-        if self.complex_content and self.complex_content.mixed:
-            return True
+        if self.complex_content:
+            return self.complex_content.mixed
 
         return False
 
@@ -1365,15 +1365,4 @@ class Schema(SchemaLocation):
         if self.target_namespace:
             return Path(self.target_namespace).stem
 
-        raise SchemaValueError("Unknown schema module")
-
-    @property
-    def target_prefix(self):
-        return next(
-            (
-                prefix
-                for prefix, namespace in self.ns_map.items()
-                if namespace == self.target_namespace
-            ),
-            None,
-        )
+        raise SchemaValueError("Unknown schema module.")

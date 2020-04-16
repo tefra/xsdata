@@ -141,10 +141,6 @@ class DataType(Enum):
         self.local = local
 
     @property
-    def xml_prefixed(self):
-        return f"xml:{self.code}"
-
-    @property
     def local_name(self) -> str:
         if isinstance(self.local, Iterable):
             return ", ".join([local.__name__ for local in self.local])

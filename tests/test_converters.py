@@ -96,3 +96,9 @@ class ConvertersTestCases(TestCase):
         self.assertEqual(Foo("1"), to_python([Foo], "1"))
         self.assertEqual(1.0, to_python([float, UseType], "1"))
         self.assertEqual(Foo("1"), to_python([Foo], "1", in_order=False))
+
+    def test_to_python_unhandled_type(self):
+        class Foo:
+            pass
+
+        self.assertEqual("1", to_python([Foo], "1"))

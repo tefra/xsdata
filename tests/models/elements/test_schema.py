@@ -1,6 +1,8 @@
+from pathlib import Path
 from typing import Iterator
 from unittest import TestCase
 
+from xsdata.exceptions import SchemaValueError
 from xsdata.models.elements import Import
 from xsdata.models.elements import Include
 from xsdata.models.elements import Override
@@ -34,3 +36,22 @@ class SchemaTests(TestCase):
         expected = imports + includes + redefines + overrides
         self.assertIsInstance(actual, Iterator)
         self.assertEqual(expected, list(actual))
+
+        schema = Schema.create()
+        self.assertEqual([], list(schema.included()))
+
+    def test_module(self):
+        schema = Schema.create(
+            location=Path(__file__), target_namespace="http://xsdata/foo"
+        )
+
+        self.assertEqual("test_schema.py", schema.module)
+
+        schema.location = None
+        self.assertEqual("foo", schema.module)
+
+        schema.target_namespace = None
+        with self.assertRaises(SchemaValueError) as cm:
+            schema.module
+
+        self.assertEqual("Unknown schema module.", str(cm.exception))

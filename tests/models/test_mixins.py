@@ -7,6 +7,7 @@ from xsdata.models.elements import ComplexType
 from xsdata.models.elements import Element
 from xsdata.models.enums import DataType
 from xsdata.models.enums import FormType
+from xsdata.models.enums import Namespace
 from xsdata.models.mixins import ElementBase
 
 
@@ -168,3 +169,11 @@ class ElementBaseTests(TestCase):
     def test_property_substitutions(self):
         element = ElementBase()
         self.assertEqual([], element.substitutions)
+
+    def test_schema_prefix(self):
+        element = ElementBase()
+
+        self.assertIsNone(element.schema_prefix())
+
+        element = ElementBase(ns_map=dict(a="b", c=Namespace.XS.uri))
+        self.assertEqual("c", element.schema_prefix())

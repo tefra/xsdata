@@ -13,9 +13,6 @@ from xsdata.models.codegen import Class
 @dataclass
 class CodeWriter:
     generators: Dict[str, AbstractGenerator] = field(default_factory=dict)
-    modules: Dict = field(default_factory=dict)
-    packages: Dict = field(default_factory=dict)
-    module_names: Dict = field(default_factory=dict)
 
     @property
     def formats(self):
@@ -42,30 +39,27 @@ class CodeWriter:
             print(buffer, end="")
 
     def designate(self, classes: List[Class], output: str):
+        modules = dict()
+        packages = dict()
+
         for obj in classes:
-            obj.module = self.unique_module_name(obj.module, output)
-            obj.package = self.unique_package_name(obj.package, output)
+            if obj.module not in modules:
+                modules[obj.module] = self.module_name(obj.module, output)
 
-    def unique_module_name(self, module: str, output: str):
-        if module not in self.modules:
-            engine = self.get_format(output)
-            name = module[:-4] if module.endswith(".xsd") else module
-            name = engine.module_name(name)
-            if name in self.module_names:
-                self.module_names[name] += 1
-                name = engine.module_name(f"{name}_{self.module_names[name] - 1}")
-            else:
-                self.module_names[name] = 1
+            if obj.package not in packages:
+                packages[obj.package] = self.package_name(obj.package, output)
 
-            self.modules[module] = name
+            obj.module = modules[obj.module]
+            obj.package = packages[obj.package]
 
-        return self.modules[module]
+    def module_name(self, module: str, output: str):
+        engine = self.get_format(output)
+        name = module[:-4] if module.endswith(".xsd") else module
+        return engine.module_name(name)
 
-    def unique_package_name(self, package: str, output: str):
-        if package not in self.packages:
-            engine = self.get_format(output)
-            self.packages[package] = engine.package_name(package)
-        return self.packages[package]
+    def package_name(self, package: str, output: str):
+        engine = self.get_format(output)
+        return engine.package_name(package)
 
 
 writer = CodeWriter()

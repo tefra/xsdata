@@ -80,4 +80,4 @@ class CodeWriterTests(FactoryTestCase):
 
         self.assertEqual("tests", classes[0].module)
         self.assertEqual("tests", classes[1].module)
-        self.assertEqual("tests_1", classes[2].module)
+        self.assertEqual("tests", classes[2].module)

@@ -1,5 +1,6 @@
 from unittest import TestCase
 
+from xsdata.exceptions import SchemaValueError
 from xsdata.models.elements import Any
 from xsdata.models.enums import NamespaceType
 
@@ -27,6 +28,10 @@ class AnyTests(TestCase):
 
         obj.namespace = "foo"
         self.assertEqual("foo_element", obj.real_name)
+
+        obj.namespace = None
+        with self.assertRaises(SchemaValueError):
+            obj.real_name
 
     def test_get_restrictions(self):
         obj = Any.create(min_occurs=1, max_occurs=2)

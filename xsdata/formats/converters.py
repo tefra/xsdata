@@ -50,20 +50,19 @@ def to_python(types: List[Type], value: Any, ns_map=None, in_order=True) -> Any:
 
 def to_qname(value, ns_map):
     prefix, suffix = text.split(value)
-    namespace = ns_map[prefix]
+    namespace = ns_map.get(prefix)
     return QName(namespace, suffix)
 
 
 def to_class(clazz: Any, value: Any, ns_map: Optional[Dict]) -> Any:
-    try:
-        if clazz is QName:
-            return to_qname(value, ns_map)
-        if issubclass(clazz, Enum):
-            return to_enum(clazz, value)
-        if is_dataclass(clazz):
-            return clazz(value)
-    except KeyError:
-        raise ConverterError(f"Unhandled class type {clazz.__name__}")
+    if clazz is QName:
+        return to_qname(value, ns_map)
+    if issubclass(clazz, Enum):
+        return to_enum(clazz, value)
+    if is_dataclass(clazz):
+        return clazz(value)
+
+    raise ConverterError(f"Unhandled class type {clazz.__name__}")
 
 
 def to_enum(clazz: Type[Enum], value: Any) -> Enum:

@@ -130,3 +130,4 @@ class DataclassGeneratorTests(FactoryTestCase):
         generator = DataclassGenerator()
         self.assertEqual("foo_bar", generator.module_name("fooBar"))
         self.assertEqual("foo_bar_wtf", generator.module_name("fooBar.wtf"))
+        self.assertEqual("mod_1111", generator.module_name("1111"))

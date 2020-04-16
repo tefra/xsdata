@@ -17,7 +17,6 @@ from xsdata.formats.dataclass.models.generics import AnyElement
 from xsdata.formats.dataclass.parsers.nodes import ElementNode
 from xsdata.formats.dataclass.parsers.nodes import PrimitiveNode
 from xsdata.formats.dataclass.parsers.nodes import RootNode
-from xsdata.formats.dataclass.parsers.nodes import SkipNode
 from xsdata.formats.dataclass.parsers.nodes import WildcardNode
 from xsdata.formats.dataclass.parsers.nodes import XmlNode
 from xsdata.formats.dataclass.parsers.utils import ParserUtils
@@ -226,23 +225,6 @@ class WildcardNodeTests(TestCase):
         self.assertEqual("a", actual.qname)
 
 
-class SkipNodeTests(TestCase):
-    def test_parse_element(self):
-        ele = Element("foo")
-        node = SkipNode(position=0)
-
-        actual = node.parse_element(ele, [])
-        self.assertEqual((None, None), actual)
-
-    def test_next_node(self):
-        ele = Element("foo")
-        node = SkipNode(position=0)
-        actual = node.next_node(ele, 10, XmlContext())
-
-        self.assertIsInstance(actual, SkipNode)
-        self.assertEqual(10, actual.position)
-
-
 class PrimitiveNodeTests(TestCase):
     @mock.patch.object(ParserUtils, "parse_value")
     def test_parse_element(self, mock_parse_value):
@@ -260,7 +242,6 @@ class PrimitiveNodeTests(TestCase):
     def test_next_node(self):
         ele = Element("foo")
         node = PrimitiveNode(position=0, types=[])
-        actual = node.next_node(ele, 10, XmlContext())
 
-        self.assertIsInstance(actual, SkipNode)
-        self.assertEqual(10, actual.position)
+        with self.assertRaises(XmlContextError):
+            node.next_node(ele, 10, XmlContext())

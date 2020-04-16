@@ -8,7 +8,6 @@ from tests.fixtures.books import BookForm
 from tests.fixtures.books import Books
 from xsdata.formats.dataclass.parsers.nodes import PrimitiveNode
 from xsdata.formats.dataclass.parsers.nodes import RootNode
-from xsdata.formats.dataclass.parsers.nodes import SkipNode
 from xsdata.formats.dataclass.parsers.xml import XmlParser
 from xsdata.models.enums import EventType
 
@@ -27,8 +26,8 @@ class XmlParserTests(TestCase):
     @mock.patch.object(RootNode, "next_node")
     @mock.patch.object(XmlParser, "emit_event")
     def test_queue_node(self, mock_emit_event, mock_next_node):
-        skip_node = SkipNode(position=1)
-        mock_next_node.return_value = skip_node
+        primitive_node = PrimitiveNode(position=1, types=[int])
+        mock_next_node.return_value = primitive_node
         element = Element("{urn:books}books")
         root_queue_item = RootNode(
             position=0, meta=self.parser.context.build(Books), default=None,
@@ -40,7 +39,7 @@ class XmlParserTests(TestCase):
 
         self.assertEqual(2, len(self.parser.queue))
         self.assertEqual(root_queue_item, self.parser.queue[0])
-        self.assertEqual(skip_node, self.parser.queue[1])
+        self.assertEqual(primitive_node, self.parser.queue[1])
 
         mock_emit_event.assert_called_once_with(
             EventType.START, element.tag, item=root_queue_item, element=element
@@ -63,23 +62,6 @@ class XmlParserTests(TestCase):
         mock_emit_event.assert_called_once_with(
             EventType.END, element.tag, obj=result, element=element
         )
-
-    @mock.patch.object(XmlParser, "emit_event")
-    @mock.patch.object(PrimitiveNode, "parse_element", return_value=(None, None))
-    def test_dequeue_node_with_no_result(self, mock_parse_element, mock_emit_event):
-        element = Element("author", nsmap={"prefix": "uri"})
-        element.text = "foobar"
-
-        queue_item = PrimitiveNode(position=0, types=[str], default=None)
-        self.parser.queue.append(queue_item)
-        total_objects = len(self.parser.objects)
-
-        result = self.parser.dequeue_node(element)
-        self.assertIsNone(result)
-        self.assertEqual(0, len(self.parser.queue))
-        self.assertEqual(total_objects, len(self.parser.objects))
-        self.assertEqual(0, mock_emit_event.call_count)
-        mock_parse_element.assert_called_once_with(element, self.parser.objects)
 
     def test_emit_event(self):
         mock_func = mock.Mock()

@@ -3,7 +3,6 @@ from dataclasses import dataclass
 from dataclasses import field
 from typing import Any
 from typing import List
-from typing import Optional
 from typing import Tuple
 from typing import Type
 
@@ -84,7 +83,7 @@ class XmlParser(AbstractParser):
         self.queue.append(queue_item)
         self.emit_event(EventType.START, element.tag, item=item, element=element)
 
-    def dequeue_node(self, element: Element) -> Optional[T]:
+    def dequeue_node(self, element: Element) -> T:
         """
         Use the last xml node to parse the given element and bind any child
         objects.
@@ -94,12 +93,10 @@ class XmlParser(AbstractParser):
         item = self.queue.pop()
         qname, obj = item.parse_element(element, self.objects)
 
-        if qname:
-            self.objects.append((qname, obj))
+        self.objects.append((qname, obj))
+        self.emit_event(EventType.END, element.tag, obj=obj, element=element)
 
-        if obj is not None:
-            self.emit_event(EventType.END, element.tag, obj=obj, element=element)
-            element.clear()
+        element.clear()
 
         return obj
 

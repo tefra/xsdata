@@ -52,12 +52,8 @@ class ElementNode(XmlNode):
 
         if var.dataclass:
             xsi_type = ParserUtils.parse_xsi_type(element)
-
-            return ElementNode(
-                position=position,
-                meta=ctx.fetch(var.clazz, self.meta.qname.namespace, xsi_type),
-                default=var.default,
-            )
+            meta = ctx.fetch(var.clazz, self.meta.qname.namespace, xsi_type)
+            return ElementNode(position=position, meta=meta, default=var.default)
 
         if var.is_any_type:
             return WildcardNode(position=position, qname=var.qname)
@@ -73,7 +69,6 @@ class ElementNode(XmlNode):
 @dataclass(frozen=True)
 class RootNode(ElementNode):
     def next_node(self, element: Element, position: int, ctx: XmlContext) -> XmlNode:
-
         if element.getparent() is None:
             return self
         return super(RootNode, self).next_node(element, position, ctx)
@@ -94,15 +89,6 @@ class WildcardNode(XmlNode):
 
 
 @dataclass(frozen=True)
-class SkipNode(XmlNode):
-    def parse_element(self, element: Element, objects: List) -> Tuple:
-        return None, None
-
-    def next_node(self, element: Element, position: int, ctx: XmlContext) -> XmlNode:
-        return SkipNode(position=position)
-
-
-@dataclass(frozen=True)
 class PrimitiveNode(XmlNode):
     types: List[Type]
     tokens: bool = False
@@ -119,4 +105,4 @@ class PrimitiveNode(XmlNode):
         return qname, obj
 
     def next_node(self, element: Element, position: int, ctx: XmlContext) -> XmlNode:
-        return SkipNode(position=position)
+        raise XmlContextError("Primitive node doesn't support child nodes!")

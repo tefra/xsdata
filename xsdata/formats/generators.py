@@ -136,7 +136,7 @@ class PythonAbstractGenerator(AbstractGenerator, ABC):
 
     @classmethod
     def module_name(cls, name: str) -> str:
-        return text.snake_case(name)
+        return text.snake_case(safe_snake(name, default="mod"))
 
     @classmethod
     def package_name(cls, name: str) -> str:

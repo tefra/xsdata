@@ -253,11 +253,3 @@ class ClassUtils:
             return attrs.index(attr)
         except ValueError:
             return -1
-
-    @classmethod
-    def is_qname(cls, source: Class):
-        return (
-            source.is_enumeration
-            and source.extensions
-            and source.extensions[0].type.name == DataType.QNAME.code
-        )

@@ -6,6 +6,7 @@ from lxml.etree import QName
 
 from tests.fixtures.books import BookForm
 from tests.fixtures.books import Books
+from xsdata.exceptions import ParserError
 from xsdata.formats.dataclass.parsers.nodes import PrimitiveNode
 from xsdata.formats.dataclass.parsers.nodes import RootNode
 from xsdata.formats.dataclass.parsers.xml import XmlParser
@@ -18,6 +19,12 @@ class XmlParserTests(TestCase):
         self.parser = XmlParser()
         self.parser.index = 10
         self.parser.objects = [(QName(x), x) for x in "abcde"]
+
+    def test_parse_context_raises_exception(self):
+        with self.assertRaises(ParserError) as cm:
+            self.parser.parse_context([], Books)
+
+        self.assertEqual("Failed to create target class `Books`", str(cm.exception))
 
     def test_add_namespace(self):
         self.parser.add_namespace(("foo", "bar"))

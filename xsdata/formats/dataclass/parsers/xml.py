@@ -58,7 +58,7 @@ class XmlParser(AbstractParser):
             elif event == EventType.END:
                 obj = self.dequeue_node(element)
 
-        if not obj or not isinstance(obj, clazz):
+        if not obj:
             raise ParserError(f"Failed to create target class `{clazz.__name__}`")
 
         return obj

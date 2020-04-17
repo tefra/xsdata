@@ -10,6 +10,7 @@ from tests.factories import ExtensionFactory
 from tests.factories import FactoryTestCase
 from tests.factories import RestrictionsFactory
 from xsdata.analyzer import ClassAnalyzer
+from xsdata.exceptions import AnalyzerError
 from xsdata.models.codegen import Class
 from xsdata.models.codegen import Restrictions
 from xsdata.models.elements import ComplexType
@@ -316,6 +317,15 @@ class ClassAnalyzerTests(FactoryTestCase):
             source, target, extension
         )
 
+    def test_flatten_extension_with_unknown_extension(self):
+        extension = ExtensionFactory.create()
+        target = ClassFactory.create(extensions=[extension])
+
+        with self.assertRaises(AnalyzerError) as cm:
+            self.analyzer.flatten_extension(target, extension)
+
+        self.assertEqual("Extension not found `attr_B`", str(cm.exception))
+
     def test_flatten_extension_simple_when_target_is_source(self):
         extension = ExtensionFactory.create()
         target = ClassFactory.create(extensions=[extension])
@@ -489,6 +499,16 @@ class ClassAnalyzerTests(FactoryTestCase):
                 mock.call(source.attrs[1], group_attr.restrictions, "foo"),
             ]
         )
+
+    def test_expand_attribute_group_with_unknown_source(self):
+        group_attr = AttrFactory.attribute_group(name="foo:bar")
+        target = ClassFactory.create()
+        target.attrs.append(group_attr)
+
+        with self.assertRaises(AnalyzerError) as cm:
+            self.analyzer.expand_attribute_group(target, group_attr)
+
+        self.assertEqual("Group attribute not found: `{foo}bar`", str(cm.exception))
 
     def test_flatten_attribute_types_when_type_is_native_and_has_pattern(self):
         xs_bool = AttrTypeFactory.xs_bool()

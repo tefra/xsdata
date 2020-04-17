@@ -58,15 +58,19 @@ def to_class(clazz: Any, value: Any, ns_map: Optional[Dict]) -> Any:
     if clazz is QName:
         return to_qname(value, ns_map)
     if issubclass(clazz, Enum):
-        return to_enum(clazz, value)
+        return to_enum(clazz, value, ns_map)
     if is_dataclass(clazz):
         return clazz(value)
 
     raise ConverterError(f"Unhandled class type {clazz.__name__}")
 
 
-def to_enum(clazz: Type[Enum], value: Any) -> Enum:
+def to_enum(clazz: Type[Enum], value: Any, ns_map: Optional[Dict]) -> Enum:
     enumeration = next(enumeration for enumeration in clazz)
+
+    if isinstance(enumeration.value, QName):
+        value = to_qname(value, ns_map)
+
     return clazz(type(enumeration.value)(value))
 
 
@@ -88,7 +92,7 @@ def to_xml(value: Any, namespaces: Optional[Namespaces] = None) -> Any:
     if isinstance(value, bool):
         return "true" if value else "false"
     if isinstance(value, Enum):
-        return str(value.value)
+        return to_xml(value.value, namespaces)
     if isinstance(value, float):
         return "NaN" if math.isnan(value) else str(value).upper()
     if isinstance(value, Decimal) and value.is_infinite():

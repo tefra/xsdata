@@ -237,6 +237,8 @@ class ClassAnalyzer(ClassUtils):
         if complex_source:
             return self.flatten_extension_complex(complex_source, target, extension)
 
+        raise AnalyzerError(f"Extension not found `{extension.type.name}`")
+
     def flatten_extension_native(self, target: Class, ext: Extension):
         if not target.is_enumeration:
             return self.create_default_attribute(target, ext)
@@ -259,7 +261,7 @@ class ClassAnalyzer(ClassUtils):
             self.create_default_attribute(target, ext)
         elif source.is_enumeration == target.is_enumeration:
             self.copy_attributes(source, target, ext)
-        elif target.is_enumeration:
+        else:  # this is an enumeration
             target.extensions.remove(ext)
 
     def flatten_extension_complex(self, source: Class, target: Class, ext: Extension):
@@ -338,8 +340,6 @@ class ClassAnalyzer(ClassUtils):
             if source is None:
                 attr_type.self_ref = self.attr_depends_on(attr_type, target)
                 types.append(attr_type)
-            elif self.is_qname(source):
-                types.append(source.extensions[0].type.clone())
             elif source.is_enumeration:
                 types.append(attr_type)
             elif len(source.attrs) == 1:

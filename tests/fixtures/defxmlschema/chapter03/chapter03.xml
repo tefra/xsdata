@@ -1,5 +1,4 @@
 <!--Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
-<!-- model: chapter03.chapter03.Envelope -->
 <envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:noNamespaceSchemaLocation="chapter03.xsd">
   <order  xmlns="http://example.org/ord"

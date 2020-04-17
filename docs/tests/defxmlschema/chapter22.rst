@@ -1,8 +1,12 @@
-Chapter 22: Extensibility and reuse
-===================================
+**********
+Chapter 22
+**********
+
+Extensibility and reuse
+=======================
 
 Example 22-7 Original type
---------------------------
+**************************
 
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter22/example2207.xsd
    :language: xml

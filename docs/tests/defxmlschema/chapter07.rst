@@ -1,8 +1,12 @@
-Chapter 07: Attribute declarations
-==================================
+**********
+Chapter 07
+**********
+
+Attribute declarations
+======================
 
 Example 7-1 Global attribute declarations
------------------------------------------
+*****************************************
 
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter07/example0701.xsd
    :language: xml
@@ -12,7 +16,7 @@ Example 7-1 Global attribute declarations
    :language: python
 
 Example 7-2 Local attribute declarations
-----------------------------------------
+****************************************
 
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter07/example0702.xsd
    :language: xml
@@ -22,7 +26,7 @@ Example 7-2 Local attribute declarations
    :language: python
 
 Example 7-3 Declaring the types of attributes
----------------------------------------------
+*********************************************
 
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter07/example0703.xsd
    :language: xml
@@ -32,7 +36,7 @@ Example 7-3 Declaring the types of attributes
    :language: python
 
 Example 7-4 Qualified and unqualified attribute names
------------------------------------------------------
+*****************************************************
 
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter07/example07041.xsd
    :language: xml
@@ -42,7 +46,7 @@ Example 7-4 Qualified and unqualified attribute names
    :language: python
 
 Example 7-5 Declaring a default value for an attribute
-------------------------------------------------------
+******************************************************
 
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter07/example0705.xsd
    :language: xml
@@ -52,7 +56,7 @@ Example 7-5 Declaring a default value for an attribute
    :language: python
 
 Example 7-7 Declaring an inheritable attribute
-----------------------------------------------
+**********************************************
 
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter07/example0707.xsd
    :language: xml

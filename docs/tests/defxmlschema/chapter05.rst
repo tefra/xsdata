@@ -1,5 +1,12 @@
-Chapter 05: Instances and schemas
-=================================
+**********
+Chapter 05
+**********
+
+Instances and schemas
+=====================
+
+Binding Test
+************
 
 **Schema**
 
@@ -11,7 +18,7 @@ Chapter 05: Instances and schemas
 
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter05/chapter05.xml
    :language: xml
-   :lines: 3-
+   :lines: 2-
 
 **xsData XML Document**
 

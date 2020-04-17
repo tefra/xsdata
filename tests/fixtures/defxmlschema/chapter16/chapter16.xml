@@ -1,5 +1,4 @@
 <!--Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
-<!-- model: chapter16.chapter16.Items -->
 <items xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:noNamespaceSchemaLocation="chapter16.xsd">
   <product>

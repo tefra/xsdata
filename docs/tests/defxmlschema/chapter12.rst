@@ -1,68 +1,37 @@
-Chapter 12: Complex types
-=========================
+**********
+Chapter 12
+**********
 
-Example 12-11 Complex type with empty content
----------------------------------------------
+Complex types
+=============
 
-.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1211.xsd
+Binding Test
+************
+
+**Schema**
+
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/chapter12.xsd
    :language: xml
-   :lines: 3-
+   :lines: 1-
 
-.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1211.py
-   :language: python
+**XML Document**
 
-Example 12-12 Element references
---------------------------------
-
-.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1212.xsd
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/chapter12.xml
    :language: xml
-   :lines: 3-
+   :lines: 2-
 
-.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1212.py
-   :language: python
+**xsData XML Document**
 
-Example 12-13 Legal duplication of element names
-------------------------------------------------
-
-.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1213.xsd
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/chapter12.xsdata.xml
    :language: xml
-   :lines: 3-
 
-.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1213.py
-   :language: python
+**xsData JSON**
 
-Example 12-15 A sequence group
-------------------------------
-
-.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1215.xsd
-   :language: xml
-   :lines: 3-
-
-.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1215.py
-   :language: python
-
-Example 12-18 Enforcing order for better constraints
-----------------------------------------------------
-
-.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1218.xsd
-   :language: xml
-   :lines: 3-
-
-.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1218.py
-   :language: python
-
-Example 12-19 A choice group
-----------------------------
-
-.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1219.xsd
-   :language: xml
-   :lines: 3-
-
-.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1219.py
-   :language: python
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/chapter12.json
+   :language: json
 
 Example 12-2 Named complex type
--------------------------------
+*******************************
 
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1202.xsd
    :language: xml
@@ -71,58 +40,8 @@ Example 12-2 Named complex type
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1202.py
    :language: python
 
-Example 12-21 A repeating choice group
---------------------------------------
-
-.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1221.xsd
-   :language: xml
-   :lines: 3-
-
-.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1221.py
-   :language: python
-
-Example 12-23 Multiple nested groups
-------------------------------------
-
-.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1223.xsd
-   :language: xml
-   :lines: 3-
-
-.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1223.py
-   :language: python
-
-Example 12-24 An all group
---------------------------
-
-.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1224.xsd
-   :language: xml
-   :lines: 3-
-
-.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1224.py
-   :language: python
-
-Example 12-27 Complex type with a named model group reference
--------------------------------------------------------------
-
-.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1227.xsd
-   :language: xml
-   :lines: 3-
-
-.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1227.py
-   :language: python
-
-Example 12-29 Deterministic content model
------------------------------------------
-
-.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1229.xsd
-   :language: xml
-   :lines: 3-
-
-.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1229.py
-   :language: python
-
 Example 12-3 Anonymous complex type
------------------------------------
+***********************************
 
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1203.xsd
    :language: xml
@@ -131,118 +50,8 @@ Example 12-3 Anonymous complex type
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1203.py
    :language: python
 
-Example 12-30 Local attribute declaration
------------------------------------------
-
-.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1230.xsd
-   :language: xml
-   :lines: 3-
-
-.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1230.py
-   :language: python
-
-Example 12-31 Attribute reference
----------------------------------
-
-.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1231.xsd
-   :language: xml
-   :lines: 3-
-
-.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1231.py
-   :language: python
-
-Example 12-32 Complex type with attribute group reference
----------------------------------------------------------
-
-.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1232.xsd
-   :language: xml
-   :lines: 3-
-
-.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1232.py
-   :language: python
-
-Example 12-33 Using an element wildcard
----------------------------------------
-
-.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1233.xsd
-   :language: xml
-   :lines: 3-
-
-.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1233.py
-   :language: python
-
-Example 12-35 Complex type with element wildcard
-------------------------------------------------
-
-.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1235.xsd
-   :language: xml
-   :lines: 3-
-
-.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1235.py
-   :language: python
-
-Example 12-37 Negative wildcards
---------------------------------
-
-.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1237.xsd
-   :language: xml
-   :lines: 3-
-
-.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1237.py
-   :language: python
-
-Example 12-40 Defining an interleaved open content model
---------------------------------------------------------
-
-.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1240.xsd
-   :language: xml
-   :lines: 3-
-
-.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1240.py
-   :language: python
-
-Example 12-42 Defining a suffix open content model
---------------------------------------------------
-
-.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1242.xsd
-   :language: xml
-   :lines: 3-
-
-.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1242.py
-   :language: python
-
-Example 12-44 Defining a default open content model
----------------------------------------------------
-
-.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1244.xsd
-   :language: xml
-   :lines: 3-
-
-.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1244.py
-   :language: python
-
-Example 12-46 Overriding a default open content model
------------------------------------------------------
-
-.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1246.xsd
-   :language: xml
-   :lines: 3-
-
-.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1246.py
-   :language: python
-
-Example 12-47 Complex type with attribute wildcard
---------------------------------------------------
-
-.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1247.xsd
-   :language: xml
-   :lines: 3-
-
-.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1247.py
-   :language: python
-
 Example 12-5 Complex type with simple content
----------------------------------------------
+*********************************************
 
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1205.xsd
    :language: xml
@@ -252,7 +61,7 @@ Example 12-5 Complex type with simple content
    :language: python
 
 Example 12-7 Complex type with element-only content
----------------------------------------------------
+***************************************************
 
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1207.xsd
    :language: xml
@@ -262,13 +71,233 @@ Example 12-7 Complex type with element-only content
    :language: python
 
 Example 12-9 Complex type with mixed content
---------------------------------------------
+********************************************
 
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1209.xsd
    :language: xml
    :lines: 3-
 
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1209.py
+   :language: python
+
+Example 12-11 Complex type with empty content
+*********************************************
+
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1211.xsd
+   :language: xml
+   :lines: 3-
+
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1211.py
+   :language: python
+
+Example 12-12 Element references
+********************************
+
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1212.xsd
+   :language: xml
+   :lines: 3-
+
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1212.py
+   :language: python
+
+Example 12-13 Legal duplication of element names
+************************************************
+
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1213.xsd
+   :language: xml
+   :lines: 3-
+
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1213.py
+   :language: python
+
+Example 12-15 A sequence group
+******************************
+
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1215.xsd
+   :language: xml
+   :lines: 3-
+
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1215.py
+   :language: python
+
+Example 12-18 Enforcing order for better constraints
+****************************************************
+
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1218.xsd
+   :language: xml
+   :lines: 3-
+
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1218.py
+   :language: python
+
+Example 12-19 A choice group
+****************************
+
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1219.xsd
+   :language: xml
+   :lines: 3-
+
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1219.py
+   :language: python
+
+Example 12-21 A repeating choice group
+**************************************
+
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1221.xsd
+   :language: xml
+   :lines: 3-
+
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1221.py
+   :language: python
+
+Example 12-23 Multiple nested groups
+************************************
+
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1223.xsd
+   :language: xml
+   :lines: 3-
+
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1223.py
+   :language: python
+
+Example 12-24 An all group
+**************************
+
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1224.xsd
+   :language: xml
+   :lines: 3-
+
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1224.py
+   :language: python
+
+Example 12-27 Complex type with a named model group reference
+*************************************************************
+
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1227.xsd
+   :language: xml
+   :lines: 3-
+
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1227.py
+   :language: python
+
+Example 12-29 Deterministic content model
+*****************************************
+
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1229.xsd
+   :language: xml
+   :lines: 3-
+
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1229.py
+   :language: python
+
+Example 12-30 Local attribute declaration
+*****************************************
+
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1230.xsd
+   :language: xml
+   :lines: 3-
+
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1230.py
+   :language: python
+
+Example 12-31 Attribute reference
+*********************************
+
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1231.xsd
+   :language: xml
+   :lines: 3-
+
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1231.py
+   :language: python
+
+Example 12-32 Complex type with attribute group reference
+*********************************************************
+
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1232.xsd
+   :language: xml
+   :lines: 3-
+
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1232.py
+   :language: python
+
+Example 12-33 Using an element wildcard
+***************************************
+
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1233.xsd
+   :language: xml
+   :lines: 3-
+
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1233.py
+   :language: python
+
+Example 12-35 Complex type with element wildcard
+************************************************
+
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1235.xsd
+   :language: xml
+   :lines: 3-
+
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1235.py
+   :language: python
+
+Example 12-37 Negative wildcards
+********************************
+
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1237.xsd
+   :language: xml
+   :lines: 3-
+
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1237.py
+   :language: python
+
+Example 12-40 Defining an interleaved open content model
+********************************************************
+
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1240.xsd
+   :language: xml
+   :lines: 3-
+
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1240.py
+   :language: python
+
+Example 12-42 Defining a suffix open content model
+**************************************************
+
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1242.xsd
+   :language: xml
+   :lines: 3-
+
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1242.py
+   :language: python
+
+Example 12-44 Defining a default open content model
+***************************************************
+
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1244.xsd
+   :language: xml
+   :lines: 3-
+
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1244.py
+   :language: python
+
+Example 12-46 Overriding a default open content model
+*****************************************************
+
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1246.xsd
+   :language: xml
+   :lines: 3-
+
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1246.py
+   :language: python
+
+Example 12-47 Complex type with attribute wildcard
+**************************************************
+
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1247.xsd
+   :language: xml
+   :lines: 3-
+
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/example1247.py
    :language: python
 
 .. admonition:: Samples Source

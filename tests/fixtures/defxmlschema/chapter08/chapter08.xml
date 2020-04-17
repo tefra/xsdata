@@ -1,5 +1,4 @@
 <!--Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
-<!-- model: chapter08.chapter08.Sizes -->
 <sizes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:noNamespaceSchemaLocation="chapter09.xsd">
   <dressSize>06</dressSize>

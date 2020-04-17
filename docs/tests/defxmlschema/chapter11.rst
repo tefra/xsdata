@@ -1,8 +1,12 @@
-Chapter 11: Built-in simple types
-=================================
+**********
+Chapter 11
+**********
+
+Built-in simple types
+=====================
 
 Example 11-1 Extensible mixed content
--------------------------------------
+*************************************
 
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter11/example1101.xsd
    :language: xml
@@ -12,7 +16,7 @@ Example 11-1 Extensible mixed content
    :language: python
 
 Example 11-5 Using IDREF
-------------------------
+************************
 
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter11/example11051.xsd
    :language: xml
@@ -22,7 +26,7 @@ Example 11-5 Using IDREF
    :language: python
 
 Example 11-6 Using IDREFS
--------------------------
+*************************
 
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter11/example11061.xsd
    :language: xml
@@ -32,7 +36,7 @@ Example 11-6 Using IDREFS
    :language: python
 
 Example 11-7 Using an unparsed entity
--------------------------------------
+*************************************
 
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter11/example11071.xsd
    :language: xml
@@ -42,7 +46,7 @@ Example 11-7 Using an unparsed entity
    :language: python
 
 Example 11-8 Using ENTITIES
----------------------------
+***************************
 
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter11/example11081.xsd
    :language: xml

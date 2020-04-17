@@ -1,5 +1,12 @@
-Chapter 01: Schemas: An introduction
-====================================
+**********
+Chapter 01
+**********
+
+Schemas: An introduction
+========================
+
+Binding Test
+************
 
 **Schema**
 
@@ -11,7 +18,7 @@ Chapter 01: Schemas: An introduction
 
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter01/chapter01.xml
    :language: xml
-   :lines: 3-
+   :lines: 2-
 
 **xsData XML Document**
 
@@ -22,6 +29,16 @@ Chapter 01: Schemas: An introduction
 
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter01/chapter01.json
    :language: json
+
+Example 1-2 Product schema in XSD schema language
+*************************************************
+
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter01/example0102.xsd
+   :language: xml
+   :lines: 3-
+
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter01/example0102.py
+   :language: python
 
 .. admonition:: Samples Source
     :class: hint

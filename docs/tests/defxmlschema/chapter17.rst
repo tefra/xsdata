@@ -1,5 +1,12 @@
-Chapter 17: Identity constraints
-================================
+**********
+Chapter 17
+**********
+
+Identity constraints
+====================
+
+Binding Test
+************
 
 **Schema**
 
@@ -11,7 +18,7 @@ Chapter 17: Identity constraints
 
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter17/chapter17.xml
    :language: xml
-   :lines: 3-
+   :lines: 2-
 
 **xsData XML Document**
 
@@ -22,6 +29,16 @@ Chapter 17: Identity constraints
 
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter17/chapter17.json
    :language: json
+
+Example 17-13 Referencing an identity constraint in a restriction
+*****************************************************************
+
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter17/example1713.xsd
+   :language: xml
+   :lines: 3-
+
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter17/example1713.py
+   :language: python
 
 .. admonition:: Samples Source
     :class: hint

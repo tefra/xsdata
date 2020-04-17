@@ -1,5 +1,4 @@
 <!--Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
-<!-- model: chapter17.chapter17.Order -->
 <order xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:noNamespaceSchemaLocation="chapter17.xsd">
   <number>123ABBCC123</number>

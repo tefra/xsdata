@@ -1,5 +1,4 @@
 <!--Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
-<!-- model: chapter05.chapter05.Order -->
 <ord:order xmlns:ord="http://example.org/ord"
            xmlns:prod="http://example.org/prod"
            xmlns:xsd="http://www.w3.org/2001/XMLSchema"

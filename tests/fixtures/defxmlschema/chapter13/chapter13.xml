@@ -1,5 +1,4 @@
 <!--Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
-<!-- model: chapter13.chapter13.Items -->
 <items xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="chapter14.xsd">
   <hat routingNum="123456" effDate="2002-04-02" lang="en-US">
     <number>557</number>

@@ -1,5 +1,5 @@
-W3C XML Schema 1.1 Suite
-========================
+W3C XML Schema Suite
+====================
 
 xsdata is constantly tested and measured against the `W3C XML Schema 1.1 test suite <https://github.com/w3c/xsdtests>`_.
 
@@ -14,19 +14,16 @@ The suite is quite extensible and consist of more than 26k tests cases for both 
 
 Report
 ------
-
-**821** failed, **25416** passed, **87** skipped, **12** warnings @ `travis-ci <https://travis-ci.org/tefra/xsdata-w3c-tests>`_
+**60** failed, **26102** passed, **162** skipped @ `travis-ci <https://travis-ci.com/tefra/xsdata-w3c-tests>`_
 
 ✨✨✨✨
 
 Methodology
 -----------
 
-For XML Schema 1.1 definitions we use the `xmlschema <https://pypi.org/project/xmlschema/>`_ package and `lxml <https://pypi.org/project/lxml/>`_ schema validator for the rest.
+For all XML Schema definitions we use the `xmlschema <https://pypi.org/project/xmlschema/>`_ to validate results.
 
-The lxml validator is consistent and produces less false positives that's why xmlschema isn't used in all tests.
-
-The definitions that failed to be parsed by either library are automatically skipped.
+The definitions that failed to be parsed by are automatically skipped.
 
 The known invalid schemas are also skipped alongside the test cases that come without any xml instance tests.
 

@@ -1,5 +1,12 @@
-Chapter 03: Namespaces
-======================
+**********
+Chapter 03
+**********
+
+Namespaces
+==========
+
+Binding Test
+************
 
 **Schema**
 
@@ -11,7 +18,7 @@ Chapter 03: Namespaces
 
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter03/chapter03.xml
    :language: xml
-   :lines: 3-
+   :lines: 2-
 
 **xsData XML Document**
 

@@ -3,8 +3,8 @@ from pathlib import Path
 
 from click.testing import CliRunner
 
-from tests import load_class
-from tests import validate_bindings
+from tests.conftest import load_class
+from tests.conftest import validate_bindings
 from xsdata import cli
 
 os.chdir(Path(__file__).parent.parent.parent)

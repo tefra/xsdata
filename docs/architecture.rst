@@ -23,12 +23,6 @@ The schema parser objectifies the xml data to simple python dataclass instances 
 
 
 
-.. warning::
-
-    All the XML Schema 1.0 `element <https://www.w3schools.com/xml/schema_elements_ref.asp>`_ are supported but the parser doesn't work with unknown attributes or elements.
-
-    :class:`xsdata.models.elements`
-
 Class Builder
 --------------
 
@@ -50,7 +44,7 @@ The builder goes through all the root elements of a schema to create a list of c
 
 
 Class Analyzer
--------------
+--------------
 
 :class:`xsdata.analyzer.ClassAnalyzer`
 

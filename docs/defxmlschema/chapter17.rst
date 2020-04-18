@@ -12,7 +12,7 @@ Binding Test
 
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter17/chapter17.xsd
    :language: xml
-   :lines: 1-
+   :lines: 2-
 
 **XML Document**
 
@@ -24,6 +24,7 @@ Binding Test
 
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter17/chapter17.xsdata.xml
    :language: xml
+   :lines: 2-
 
 **xsData JSON**
 
@@ -43,4 +44,5 @@ Example 17-13 Referencing an identity constraint in a restriction
 .. admonition:: Samples Source
     :class: hint
 
-    `Definitive XML Schema <http://www.datypic.com/books/defxmlschema/>`_ by Priscilla Walmsley (c) 2012 Prentice Hall PTR
+    `Definitive XML Schema <http://www.datypic.com/books/defxmlschema/>`_
+    by Priscilla Walmsley (c) 2012 Prentice Hall PTR

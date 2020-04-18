@@ -1,3 +1,36 @@
+=====
+Demos
+=====
+
+Definitive XML Schema
+=====================
+
+Historically this was the first integration test suite of xsdata and is still used to
+make sure things still work between minor code changes.
+
+It's based on the samples from the book
+`Definitive XML Schema <http://www.datypic.com/books/defxmlschema/>`_ by Priscilla Walmsley.
+
+The samples cover most of the XML Schema language traits and the test suite is using the
+:mod:`~xsdata.cli` with the :mod:`~xsdata.formats.dataclass` format to generate code and
+demonstrate the current data binding capabilities for the
+:mod:`~xsdata.formats.dataclass` by deserializing XML data to python content trees and
+then converting them back to JSON and XML documents.
+
+
+.. admonition:: Samples Source
+    :class: hint
+
+    `Definitive XML Schema <http://www.datypic.com/books/defxmlschema/>`_ by Priscilla Walmsley (c) 2012 Prentice Hall PTR
+
+.. toctree::
+    :maxdepth: 1
+    :glob:
+
+
+    defxmlschema/*
+
+
 W3C XML Schema Suite
 ====================
 
@@ -9,7 +42,7 @@ The suite is quite extensible and consist of more than 26k tests cases for both 
 
     Because of the size and time it takes to run the test runner is on it's own `repo <https://github.com/tefra/xsdata-w3c-tests>`_.
 
-    At least until I can manage to reduce the total run time which is about 9 minutes without coverage.
+    At least until I can manage to reduce the total run time which is about 8 minutes without coverage.
 
 
 Report

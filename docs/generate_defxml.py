@@ -47,7 +47,7 @@ bind_tpl = """{title}
 
 .. literalinclude:: /../{input}
    :language: xml
-   :lines: 1-
+   :lines: 2-
 
 **XML Document**
 
@@ -59,6 +59,7 @@ bind_tpl = """{title}
 
 .. literalinclude:: /../{xsdata_instance}
    :language: xml
+   :lines: 2-
 
 **xsData JSON**
 
@@ -74,7 +75,8 @@ chapter_tpl = """{title}
 .. admonition:: Samples Source
     :class: hint
 
-    `Definitive XML Schema <http://www.datypic.com/books/defxmlschema/>`_ by Priscilla Walmsley (c) 2012 Prentice Hall PTR
+    `Definitive XML Schema <http://www.datypic.com/books/defxmlschema/>`_
+    by Priscilla Walmsley (c) 2012 Prentice Hall PTR
 """
 
 
@@ -118,7 +120,7 @@ def generate():
         subtitle = subtitles[chapter]
         subtitle = "{title}\n{line}".format(line="=" * len(subtitle), title=subtitle)
 
-        file = here.joinpath(f"tests/defxmlschema/{chapter}.rst")
+        file = here.joinpath(f"defxmlschema/{chapter}.rst")
         file.write_text(
             chapter_tpl.format(
                 title=title, subtitle=subtitle, output="\n\n".join(buffer)

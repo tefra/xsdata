@@ -44,7 +44,7 @@ class XmlParser(AbstractParser):
         """
         Dispatch elements to handlers as they arrive and are fully parsed.
 
-        :raises ValueError: When the requested type doesn't match the result object
+        :raises ParserError: When the requested type doesn't match the result object
         """
         obj = None
         meta = self.context.build(clazz)
@@ -71,12 +71,8 @@ class XmlParser(AbstractParser):
         self.namespaces.add(uri, prefix)
 
     def queue_node(self, element: Element):
-        """
-        Queue the next xml node for parsing based on the given element
-        qualified name.
-
-        :raises ParserError: When the parser doesn't know how to proceed.
-        """
+        """Queue the next xml node for parsing based on the given element
+        qualified name."""
         item = self.queue[-1]
         position = len(self.objects)
 

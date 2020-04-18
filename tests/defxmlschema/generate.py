@@ -1,7 +1,7 @@
 from collections import defaultdict
 from pathlib import Path
 
-from tests import read_root_name
+from tests.conftest import read_root_name
 
 here = Path(__file__).parent
 tests = here.parent.parent
@@ -36,8 +36,8 @@ from pathlib import Path
 
 from click.testing import CliRunner
 
-from tests import load_class
-from tests import validate_bindings
+from tests.conftest import load_class
+from tests.conftest import validate_bindings
 from xsdata import cli
 
 os.chdir(Path(__file__).parent.parent.parent)

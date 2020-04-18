@@ -3,6 +3,8 @@ from unittest.case import TestCase
 
 from lxml.etree import QName
 
+from tests.fixtures import BookForm
+from xsdata.formats.dataclass.context import XmlContext
 from xsdata.formats.dataclass.models.elements import XmlAttribute
 from xsdata.formats.dataclass.models.elements import XmlAttributes
 from xsdata.formats.dataclass.models.elements import XmlElement
@@ -44,11 +46,8 @@ class XmlValTests(TestCase):
 
     def test_matches(self):
         var = XmlVar(name="foo", qname=QName("foo"))
-        self.assertFalse(var.matches(QNames.ALL, condition=lambda x: False))
-        self.assertTrue(var.matches(QNames.ALL, condition=lambda x: True))
-
-        self.assertTrue(var.matches(var.qname, condition=lambda x: True))
-        self.assertFalse(var.matches(var.qname, condition=lambda x: x.is_text))
+        self.assertTrue(var.matches(QNames.ALL))
+        self.assertTrue(var.matches(var.qname))
         self.assertFalse(var.matches(QName("bar")))
 
 
@@ -83,8 +82,7 @@ class XmlWildcardTests(TestCase):
 
     def test_matches(self):
         var = XmlWildcard(name="foo", qname=QName("foo"))
-        self.assertFalse(var.matches(QNames.ALL, condition=lambda x: False))
-        self.assertTrue(var.matches(QNames.ALL, condition=lambda x: True))
+        self.assertTrue(var.matches(QNames.ALL))
         self.assertTrue(var.matches(QName("a")))
 
         var = XmlWildcard(name="foo", qname=QName("foo"), namespaces=["tns"])
@@ -133,3 +131,14 @@ class XmlTextTests(TestCase):
 
         var = XmlText(name="foo", qname=QName("foo"), default=list)
         self.assertTrue(var.is_tokens)
+
+
+class XmlMeta(TestCase):
+    def test_find_var(self):
+        ctx = XmlContext()
+        meta = ctx.build(BookForm)
+        author = QName("author")
+
+        self.assertIsInstance(meta.find_var(author), XmlElement)
+        self.assertIsNone(meta.find_var(author, lambda x: not x.is_element))
+        self.assertIsNone(meta.find_var(QName("nope")))

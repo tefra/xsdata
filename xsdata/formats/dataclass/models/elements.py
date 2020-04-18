@@ -59,10 +59,7 @@ class XmlVar:
     def is_wildcard(self):
         return False
 
-    def matches(self, qname: QName, condition=None):
-        if condition and not condition(self):
-            return False
-
+    def matches(self, qname: QName):
         return qname in (self.qname, QNames.ALL)
 
 
@@ -88,10 +85,7 @@ class XmlWildcard(XmlVar):
     def is_any_type(self):
         return True
 
-    def matches(self, qname: QName, condition=None):
-        if condition and not condition(self):
-            return False
-
+    def matches(self, qname: QName):
         if qname == QNames.ALL:
             return True
 
@@ -147,11 +141,10 @@ class XmlMeta:
 
     def find_var(self, qname: QName = QNames.ALL, condition=None) -> Optional[XmlVar]:
         for var in self.vars:
-            if not var.is_wildcard and var.matches(qname, condition):
-                return var
+            if condition and not condition(var):
+                continue
 
-        for var in self.vars:
-            if var.is_wildcard and var.matches(qname, condition):
+            if var.matches(qname):
                 return var
 
         return None

@@ -58,7 +58,9 @@ class ParserUtils:
 
         while len(objects) > position:
             qname, value = objects.pop(position)
-            arg = meta.find_var(qname)
+            arg = meta.find_var(
+                qname, condition=lambda x: not x.is_wildcard
+            ) or meta.find_var(qname, condition=lambda x: x.is_wildcard)
 
             if not arg:
                 raise ParserError("Impossible exception!")

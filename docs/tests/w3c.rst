@@ -14,39 +14,30 @@ The suite is quite extensible and consist of more than 26k tests cases for both 
 
 Report
 ------
-**60** failed, **26102** passed, **162** skipped @ `travis-ci <https://travis-ci.com/tefra/xsdata-w3c-tests>`_
+
+**55** failed, **14517** passed, **103** skipped @ `travis-ci <https://travis-ci.com/tefra/xsdata-w3c-tests>`_
 
 ✨✨✨✨
 
 Methodology
 -----------
 
+- Invalid schema tests or no schema tests are ignored (~12k tests)
+- Generate dataclasses for given schema.
+  - **Fail** when cli raises exception or expected module::class is not found.
+- Parse the given xml instance.
+  - **Fail** when parser raises exception.
+- Serialize to xml and validate against the schema.
+  - **Fail** if final output is invalid.
+  - **Skip** if original instance or schema also fail validation.
+
+
 For all XML Schema definitions we use the `xmlschema <https://pypi.org/project/xmlschema/>`_ to validate results.
 
-The definitions that failed to be parsed by are automatically skipped.
-
-The known invalid schemas are also skipped alongside the test cases that come without any xml instance tests.
 
 .. hint::
 
     xsdata is an xml binding library not a schema validator.
-
-**Steps**
-
-- Generate dataclasses for given schema.
-- **Fail** when cli raises exception or expected module::class is not found.
-- Parse the given xml instance.
-- **Fail** when parser raises exception and xml instance is valid.
-- Serialize to xml and validate against the schema.
-- **Fail** if xml instance is valid and final output is invalid.
-
-**Test runner info**
-
-- Generate tests instead of using pytest parametrizing.
-- Use pytest cache to generate the xfail decorators for ci.
-- Cache code generation runs.
-- Cache xml validator instances.
-- Output directory remains after each build.
 
 
 **Try it out**

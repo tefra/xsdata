@@ -44,7 +44,10 @@ class ElementNode(XmlNode):
 
     def next_node(self, element: Element, position: int, ctx: XmlContext) -> XmlNode:
         qname = QName(element.tag)
-        var = self.meta.find_var(qname)
+        var = self.meta.find_var(
+            qname, condition=lambda x: not x.is_wildcard
+        ) or self.meta.find_var(qname, condition=lambda x: x.is_wildcard)
+
         if not var:
             raise XmlContextError(
                 f"{self.meta.qname} does not support mixed content: {qname}"

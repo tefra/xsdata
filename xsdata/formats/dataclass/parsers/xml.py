@@ -2,6 +2,7 @@ import io
 from dataclasses import dataclass
 from dataclasses import field
 from typing import Any
+from typing import Dict
 from typing import List
 from typing import Tuple
 from typing import Type
@@ -27,6 +28,7 @@ class XmlParser(AbstractParser):
     namespaces: Namespaces = field(init=False, default_factory=Namespaces)
     objects: List[Tuple[QName, Any]] = field(init=False, default_factory=list)
     context: XmlContext = field(default_factory=XmlContext)
+    event_names: Dict = field(default_factory=dict)
 
     def parse(self, source: io.BytesIO, clazz: Type[T]) -> T:
         """Parse the XML input stream and return the resulting object tree."""
@@ -102,7 +104,10 @@ class XmlParser(AbstractParser):
 
     def emit_event(self, event: str, name: str, **kwargs):
         """Call if exist the parser's hook for the given element and event."""
-        local_name = text.snake_case(QName(name).localname)
-        method_name = f"{event}_{local_name}"
+
+        if name not in self.event_names:
+            self.event_names[name] = text.snake_case(QName(name).localname)
+
+        method_name = f"{event}_{self.event_names[name]}"
         if hasattr(self, method_name):
             getattr(self, method_name)(**kwargs)

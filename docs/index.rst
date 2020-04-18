@@ -8,13 +8,14 @@
 
 
 .. toctree::
-    :maxdepth: 2
+    :maxdepth: 1
 
     installation
     codegen
     architecture
-    formats
-    tests
+    dataclasses
+    plantuml
+    demos
     changelog
     about
     api

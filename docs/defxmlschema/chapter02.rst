@@ -68,4 +68,5 @@ Example 2-14 Annotation
 .. admonition:: Samples Source
     :class: hint
 
-    `Definitive XML Schema <http://www.datypic.com/books/defxmlschema/>`_ by Priscilla Walmsley (c) 2012 Prentice Hall PTR
+    `Definitive XML Schema <http://www.datypic.com/books/defxmlschema/>`_
+    by Priscilla Walmsley (c) 2012 Prentice Hall PTR

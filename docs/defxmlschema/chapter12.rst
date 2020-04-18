@@ -12,7 +12,7 @@ Binding Test
 
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/chapter12.xsd
    :language: xml
-   :lines: 1-
+   :lines: 2-
 
 **XML Document**
 
@@ -24,6 +24,7 @@ Binding Test
 
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter12/chapter12.xsdata.xml
    :language: xml
+   :lines: 2-
 
 **xsData JSON**
 
@@ -303,4 +304,5 @@ Example 12-47 Complex type with attribute wildcard
 .. admonition:: Samples Source
     :class: hint
 
-    `Definitive XML Schema <http://www.datypic.com/books/defxmlschema/>`_ by Priscilla Walmsley (c) 2012 Prentice Hall PTR
+    `Definitive XML Schema <http://www.datypic.com/books/defxmlschema/>`_
+    by Priscilla Walmsley (c) 2012 Prentice Hall PTR

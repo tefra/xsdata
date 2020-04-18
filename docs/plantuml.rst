@@ -1,13 +1,13 @@
-PlantUML: plantuml
-==================
+PlantUML
+========
 
 Generate `PlantUML <https://plantuml.com/class-diagram>`_ class diagram
 
-.. literalinclude:: ../examples/primer.pu
+.. literalinclude:: examples/primer.pu
 
 Which is translated to this nice svg
 
-.. image:: ../examples/primer.svg
+.. image:: examples/primer.svg
 
 .. hint::
 

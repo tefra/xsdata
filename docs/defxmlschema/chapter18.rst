@@ -268,4 +268,5 @@ Example 18-13 Risks of overriding types
 .. admonition:: Samples Source
     :class: hint
 
-    `Definitive XML Schema <http://www.datypic.com/books/defxmlschema/>`_ by Priscilla Walmsley (c) 2012 Prentice Hall PTR
+    `Definitive XML Schema <http://www.datypic.com/books/defxmlschema/>`_
+    by Priscilla Walmsley (c) 2012 Prentice Hall PTR

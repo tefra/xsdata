@@ -12,7 +12,7 @@ Binding Test
 
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter04/chapter04.xsd
    :language: xml
-   :lines: 1-
+   :lines: 2-
 
 **XML Document**
 
@@ -24,6 +24,7 @@ Binding Test
 
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter04/chapter04.xsdata.xml
    :language: xml
+   :lines: 2-
 
 **xsData JSON**
 
@@ -133,4 +134,5 @@ Example 4-6 Proxy schema to avoid multiple imports
 .. admonition:: Samples Source
     :class: hint
 
-    `Definitive XML Schema <http://www.datypic.com/books/defxmlschema/>`_ by Priscilla Walmsley (c) 2012 Prentice Hall PTR
+    `Definitive XML Schema <http://www.datypic.com/books/defxmlschema/>`_
+    by Priscilla Walmsley (c) 2012 Prentice Hall PTR

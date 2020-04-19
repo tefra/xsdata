@@ -2,12 +2,13 @@
 Dataclasses
 ***********
 
-Dataclasses is the default ouput format for the code generator and ships with its own
-xml/json modules. If your api doesn't come with a definition you can create these models
-easily on your own.
+Dataclasses is the default output format for the code generator and ships with its own
+modules for xml and json marshalling. The generated models are simple python
+`dataclasses <https://docs.python.org/3/library/dataclasses.html>`_ with some optional
+metadata to control how the data structures are transferred during data binding.
 
-The models are simple python `dataclasses <https://docs.python.org/3/library/dataclasses.html>`_
-with some optional metadata properties used for marshalling data.
+If you are working with xml documents that don't have any schema definition you can
+create these models manually.
 
 
 Basic Model
@@ -73,6 +74,13 @@ Field Typing
 
 Simply follow the Python lib `dataclasses <https://docs.python.org/3/library/dataclasses.html>`_ documentation.
 
+.. admonition:: Notes
+    :class: warning
+
+    A TypeError will be raised if a field without a default value follows a field with a
+    default value. If field ordering is important you need to set all fields to Optional
+    with ``default=None`` or ``default_factory=list``.
+
 
 Field Metadata
 ==============
@@ -82,16 +90,18 @@ Field Metadata
    :widths: 20, 10, 300
 
    "name", "str", "The real name of the element or attribute this field represents."
+   "type", "str", "The field type: Text | Element | Attribute | Wildcard | Attributes, default: Text"
    "nillable", "bool", "Enable of disable rendering with an empty value."
    "sequential", "bool", "Enable rendering group of lists values in sequence. eg ``<a /><b /><a /><b />``"
    "namespace", "str", "The element/attribute xml namespace."
-   "type", "str", "The field type: Text | Element | Attribute | Wildcard | Attributes, default: Text"
 
-It's a common practice in schema definitions to require elements to be qualified and attributes to be unqualified.
+It's a common practice in schema definitions to require elements to be qualified and
+attributes to be unqualified. ``Element`` fields with an omitted namespace inherit the
+namespace from the parent class/element and ``Attribute`` fields don't.
 
-In regards to that when an ``Element`` field has namespace set to ``None`` it will
-inherit the class namespace, to override this behaviour set the namespace to an empty
-string.
+If you need to break the namespace inheritance for ``Element`` fields set the namespace
+to an empty string ``namespace=""``.
+
 
 Type: Element
 ~~~~~~~~~~~~~
@@ -140,8 +150,7 @@ This type represents a traditional xml attribute.
 Type: Wildcard
 ~~~~~~~~~~~~~~
 
-This type is used to represent  ``xs:any`` elements or elements with type ``xs:AnyType``.
-
+This type is represents ``xs:any`` elements or elements with type ``xs:AnyType``.
 Wildcards can have normal uri namespace or use one of xml schema generics.
 
 
@@ -172,7 +181,7 @@ generic :class:`~xsdata.formats.dataclass.models.generics.AnyElement` instance.
 Type: Attributes
 ~~~~~~~~~~~~~~~~
 
-This type is used to represent ``xs:anyAttribute`` elements. It needs to be defined as
+This type represents ``xs:anyAttribute`` elements. It needs to be defined as
 a dictionary with key an :class:`lxml.etree.QName` and string values. The wildcard
 namespace features also apply.
 
@@ -189,8 +198,8 @@ namespace features also apply.
 Type: Text
 ~~~~~~~~~~
 
-This is the default xsdata field type and represents any atomic value. The value of
-this field is directly assign as text to elements.
+This is the default field type and represents any atomic value. The value of this field
+is directly assigned as text to elements.
 
 
 
@@ -204,7 +213,7 @@ this field is directly assign as text to elements.
         value: Optional[int] = field(default=None)
 
 
-.. code-block:: p
+.. code-block:: xml
 
     <root>2020</root>
 
@@ -277,9 +286,8 @@ The :class:`~xsdata.formats.dataclass.serializers.XmlSerializer`
 JSON Format
 ===========
 
-JSON format is mostly used internally for tests because I had a lot of json fixtures.
-
-It's a bit behind in features and maturity compared to the xml format.
+JSON format is mostly used internally for tests because I had a lot of json fixtures
+but it lacks maturity and test coverage.
 
 
 :class:`xsdata.formats.dataclass.serializers.JsonSerializer`

@@ -1,3 +1,4 @@
+from decimal import Decimal
 from dataclasses import dataclass, field
 from typing import List, Optional
 
@@ -51,7 +52,7 @@ class Usaddress:
             required=True
         )
     )
-    zip: Optional[float] = field(
+    zip: Optional[Decimal] = field(
         default=None,
         metadata=dict(
             name="zip",
@@ -60,8 +61,9 @@ class Usaddress:
             required=True
         )
     )
-    country: Optional[str] = field(
-        default=None,
+    country: str = field(
+        init=False,
+        default="US",
         metadata=dict(
             name="country",
             type="Attribute"
@@ -80,8 +82,7 @@ class Comment:
     value: Optional[str] = field(
         default=None,
         metadata=dict(
-            name="value",
-            type="Extension"
+            required=True
         )
     )
 
@@ -131,7 +132,7 @@ class Items:
                 max_exclusive=100.0
             )
         )
-        usprice: Optional[float] = field(
+        usprice: Optional[Decimal] = field(
             default=None,
             metadata=dict(
                 name="USPrice",
@@ -144,8 +145,7 @@ class Items:
             default=None,
             metadata=dict(
                 name="comment",
-                type="Element",
-                namespace=""
+                type="Element"
             )
         )
         ship_date: Optional[str] = field(
@@ -198,8 +198,7 @@ class PurchaseOrderType:
         default=None,
         metadata=dict(
             name="comment",
-            type="Element",
-            namespace=""
+            type="Element"
         )
     )
     items: Optional[Items] = field(

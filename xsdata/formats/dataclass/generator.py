@@ -7,24 +7,14 @@ from typing import List
 from typing import Tuple
 
 from xsdata.formats.dataclass.filters import filters
-from xsdata.formats.dataclass.models.constants import XmlType
 from xsdata.formats.generators import PythonAbstractGenerator
-from xsdata.models.codegen import Attr
 from xsdata.models.codegen import Class
 from xsdata.models.codegen import Package
-from xsdata.models.enums import Tag
 from xsdata.resolver import DependenciesResolver
 
 
 class DataclassGenerator(PythonAbstractGenerator):
     templates_dir = Path(__file__).parent.joinpath("templates")
-    xml_type_map = {
-        Tag.ELEMENT: XmlType.ELEMENT,
-        Tag.ANY: XmlType.WILDCARD,
-        Tag.ANY_ATTRIBUTE: XmlType.ATTRIBUTES,
-        Tag.ATTRIBUTE: XmlType.ATTRIBUTE,
-        None: XmlType.TEXT,
-    }
 
     def __init__(self):
         super(DataclassGenerator, self).__init__()
@@ -109,10 +99,3 @@ class DataclassGenerator(PythonAbstractGenerator):
         for obj in imports:
             result[obj.source].append(self.process_import(obj))
         return result
-
-    @classmethod
-    def process_attribute(cls, target: Class, attr: Attr, parents: List[str]):
-        super(DataclassGenerator, cls).process_attribute(target, attr, parents)
-        attr.xml_type = cls.xml_type_map.get(attr.tag)
-        if attr.xml_type in (XmlType.ATTRIBUTES, XmlType.WILDCARD, None):
-            attr.local_name = None

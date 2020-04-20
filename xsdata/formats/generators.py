@@ -9,7 +9,6 @@ from typing import Any
 from typing import Iterator
 from typing import List
 from typing import Optional
-from typing import Set
 from typing import Tuple
 from xml.sax.saxutils import quoteattr
 
@@ -19,6 +18,7 @@ from jinja2 import Template
 from lxml.etree import QName
 
 from xsdata.formats.converters import to_python
+from xsdata.formats.dataclass.models.constants import XmlType
 from xsdata.formats.dataclass.utils import safe_snake
 from xsdata.models.codegen import Attr
 from xsdata.models.codegen import AttrType
@@ -26,6 +26,7 @@ from xsdata.models.codegen import Class
 from xsdata.models.codegen import Extension
 from xsdata.models.codegen import Package
 from xsdata.models.enums import DataType
+from xsdata.models.enums import Tag
 from xsdata.utils import text
 
 
@@ -54,6 +55,15 @@ class AbstractGenerator(ABC):
 
 
 class PythonAbstractGenerator(AbstractGenerator, ABC):
+
+    xml_type_map = {
+        Tag.ELEMENT: XmlType.ELEMENT,
+        Tag.ANY: XmlType.WILDCARD,
+        Tag.ANY_ATTRIBUTE: XmlType.ATTRIBUTES,
+        Tag.ATTRIBUTE: XmlType.ATTRIBUTE,
+        None: XmlType.TEXT,
+    }
+
     @classmethod
     def process_class(cls, obj: Class, parents: List[str] = None) -> Class:
         """Normalize all class instance fields, extends, name and the inner
@@ -95,22 +105,70 @@ class PythonAbstractGenerator(AbstractGenerator, ABC):
 
     @classmethod
     def process_attributes(cls, obj: Class, parents_list: List[str]):
-        seen: Set[str] = set()
-        obj.attrs = [
-            attr
-            for attr in obj.attrs
-            if attr.name not in seen and seen.add(attr.name) is None  # type: ignore
-        ]
-
-        seen.clear()
+        """Process class attributes and prevent duplicate attribute names."""
         for attr in obj.attrs:
             cls.process_attribute(obj, attr, parents_list)
-            seen.add(attr.name)
 
-        if len(seen) != len(obj.attrs):
-            for attr in obj.attrs:
-                safe_name = urlsafe_b64encode(str(attr.local_name).encode()).decode()
-                attr.name = cls.attribute_name(safe_name)
+        if cls.has_duplicate_attrs(obj):
+            cls.sanitize_attribute_names(obj)
+
+        if cls.has_duplicate_attrs(obj):
+            cls.hash_attributes_names(obj)
+
+        cls.unset_attributes_local_names(obj)
+
+    @classmethod
+    def sanitize_attribute_names(cls, obj: Class):
+        """
+        Append xml type to attribute name if it's not unique in the list.
+
+        Prefer keeping intact element attributes.
+        """
+        for attr in obj.attrs:
+            dup = next(
+                (dup for dup in obj.attrs if dup is not attr and dup.name == attr.name),
+                None,
+            )
+            if not dup:
+                continue
+            if attr.xml_type == XmlType.ELEMENT:
+                dup.name = cls.attribute_name(f"{dup.name}_{dup.xml_type}")
+            else:
+                attr.name = cls.attribute_name(f"{attr.name}_{attr.xml_type}")
+
+    @classmethod
+    def hash_attributes_names(cls, obj: Class):
+        """
+        Replace attribute names with b64 hash of the local name.
+
+        This is a last resort to create unique class attribute names.
+        """
+        for attr in obj.attrs:
+            safe_name = urlsafe_b64encode(str(attr.local_name).encode()).decode()
+            attr.name = cls.attribute_name(safe_name)
+
+    @classmethod
+    def has_duplicate_attrs(cls, obj: Class) -> bool:
+        """Check if given class includes duplicate attribute names."""
+        names = set([attr.name for attr in obj.attrs])
+        return len(names) < len(obj.attrs)
+
+    @classmethod
+    def unset_attributes_local_names(cls, obj: Class):
+        """
+        Unset attribute local name when it's not necessary.
+
+        Examples:
+            - xs:any
+            - xs:anyAttribute
+            - field name is equal to local name
+        """
+        for attr in obj.attrs:
+            if (
+                attr.xml_type in (XmlType.ATTRIBUTES, XmlType.WILDCARD, None)
+                or attr.name == attr.local_name
+            ):
+                attr.local_name = None
 
     @classmethod
     def process_extension(cls, extension: Extension):
@@ -122,8 +180,8 @@ class PythonAbstractGenerator(AbstractGenerator, ABC):
         attr.name = cls.attribute_name(attr.name)
         attr.display_type = cls.attribute_display_type(attr, parents)
         attr.default = cls.attribute_default(attr, target.ns_map)
-        if attr.local_name:
-            attr.local_name = text.suffix(attr.local_name)
+        attr.local_name = text.suffix(attr.local_name)
+        attr.xml_type = cls.xml_type_map.get(attr.tag)
 
     @classmethod
     def process_import(cls, package: Package) -> Package:

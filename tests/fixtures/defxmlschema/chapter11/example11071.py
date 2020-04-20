@@ -13,7 +13,6 @@ class Picture:
     location: Optional[int] = field(
         default=None,
         metadata=dict(
-            name="location",
             type="Attribute"
         )
     )

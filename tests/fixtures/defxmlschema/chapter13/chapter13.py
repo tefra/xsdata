@@ -10,7 +10,6 @@ class ColorType:
     value: Optional[str] = field(
         default=None,
         metadata=dict(
-            name="value",
             type="Attribute"
         )
     )
@@ -36,7 +35,6 @@ class ProductType:
     number: Optional[int] = field(
         default=None,
         metadata=dict(
-            name="number",
             type="Element",
             namespace="",
             required=True
@@ -45,7 +43,6 @@ class ProductType:
     name: Optional[str] = field(
         default=None,
         metadata=dict(
-            name="name",
             type="Element",
             namespace="",
             required=True
@@ -54,7 +51,6 @@ class ProductType:
     description: Optional[str] = field(
         default=None,
         metadata=dict(
-            name="description",
             type="Element",
             namespace=""
         )
@@ -69,7 +65,6 @@ class ProductType:
     lang: Optional[str] = field(
         default=None,
         metadata=dict(
-            name="lang",
             type="Attribute"
         )
     )
@@ -88,7 +83,6 @@ class RestrictedProductType:
     number: Optional[int] = field(
         default=None,
         metadata=dict(
-            name="number",
             type="Element",
             namespace="",
             required=True
@@ -97,7 +91,6 @@ class RestrictedProductType:
     name: Optional[str] = field(
         default=None,
         metadata=dict(
-            name="name",
             type="Element",
             namespace="",
             required=True
@@ -114,7 +107,6 @@ class RestrictedProductType:
     description: Optional[str] = field(
         default=None,
         metadata=dict(
-            name="description",
             type="Element",
             namespace=""
         )
@@ -129,7 +121,6 @@ class RestrictedProductType:
     lang: Optional[str] = field(
         default=None,
         metadata=dict(
-            name="lang",
             type="Attribute"
         )
     )
@@ -147,7 +138,6 @@ class SizeType:
     system: Optional[str] = field(
         default=None,
         metadata=dict(
-            name="system",
             type="Attribute"
         )
     )
@@ -169,7 +159,6 @@ class SmallSizeType:
     system: Optional[str] = field(
         default=None,
         metadata=dict(
-            name="system",
             type="Attribute",
             required=True
         )
@@ -186,7 +175,6 @@ class ShirtType(RestrictedProductType):
     size: List[SmallSizeType] = field(
         default_factory=list,
         metadata=dict(
-            name="size",
             type="Element",
             namespace="",
             min_occurs=0,
@@ -196,7 +184,6 @@ class ShirtType(RestrictedProductType):
     color: List[ColorType] = field(
         default_factory=list,
         metadata=dict(
-            name="color",
             type="Element",
             namespace="",
             min_occurs=0,
@@ -206,7 +193,6 @@ class ShirtType(RestrictedProductType):
     sleeve: Optional[int] = field(
         default=None,
         metadata=dict(
-            name="sleeve",
             type="Attribute"
         )
     )
@@ -222,7 +208,6 @@ class ItemsType:
     hat: List[ProductType] = field(
         default_factory=list,
         metadata=dict(
-            name="hat",
             type="Element",
             namespace="",
             min_occurs=0,
@@ -232,7 +217,6 @@ class ItemsType:
     umbrella: List[RestrictedProductType] = field(
         default_factory=list,
         metadata=dict(
-            name="umbrella",
             type="Element",
             namespace="",
             min_occurs=0,
@@ -242,7 +226,6 @@ class ItemsType:
     shirt: List[ShirtType] = field(
         default_factory=list,
         metadata=dict(
-            name="shirt",
             type="Element",
             namespace="",
             min_occurs=0,

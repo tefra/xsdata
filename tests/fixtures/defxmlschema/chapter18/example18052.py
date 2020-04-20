@@ -10,7 +10,6 @@ class DescriptionGroup:
     notes: Optional[str] = field(
         default=None,
         metadata=dict(
-            name="notes",
             type="Element",
             namespace="",
             required=True

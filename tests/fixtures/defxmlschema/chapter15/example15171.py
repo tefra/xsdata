@@ -18,7 +18,6 @@ class PurchaseOrderType:
     description: Optional[str] = field(
         default=None,
         metadata=dict(
-            name="description",
             type="Element",
             namespace="http://datypic.com/prod"
         )
@@ -26,7 +25,6 @@ class PurchaseOrderType:
     comment: Optional[str] = field(
         default=None,
         metadata=dict(
-            name="comment",
             type="Element",
             namespace="http://datypic.com/prod"
         )
@@ -34,7 +32,6 @@ class PurchaseOrderType:
     id: Optional[str] = field(
         default=None,
         metadata=dict(
-            name="id",
             type="Attribute",
             required=True
         )
@@ -42,7 +39,6 @@ class PurchaseOrderType:
     version: Optional[Decimal] = field(
         default=None,
         metadata=dict(
-            name="version",
             type="Attribute"
         )
     )

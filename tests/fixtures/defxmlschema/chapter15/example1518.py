@@ -15,7 +15,6 @@ class DescribedType:
     description: Optional[str] = field(
         default=None,
         metadata=dict(
-            name="description",
             type="Element",
             namespace="",
             required=True
@@ -24,7 +23,6 @@ class DescribedType:
     comment: Optional[str] = field(
         default=None,
         metadata=dict(
-            name="comment",
             type="Element",
             namespace=""
         )
@@ -39,7 +37,6 @@ class ItemsType(DescribedType):
     product: List[Product] = field(
         default_factory=list,
         metadata=dict(
-            name="product",
             type="Element",
             min_occurs=1,
             max_occurs=9223372036854775807
@@ -55,7 +52,6 @@ class PurchaseOrderType(DescribedType):
     items: Optional[Items] = field(
         default=None,
         metadata=dict(
-            name="items",
             type="Element",
             required=True
         )

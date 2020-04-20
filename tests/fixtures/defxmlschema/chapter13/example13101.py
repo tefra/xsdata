@@ -11,7 +11,6 @@ class ItemType:
     id: Optional[str] = field(
         default=None,
         metadata=dict(
-            name="id",
             type="Attribute",
             required=True
         )
@@ -19,7 +18,6 @@ class ItemType:
     lang: Optional[str] = field(
         default=None,
         metadata=dict(
-            name="lang",
             type="Attribute",
             namespace="http://www.w3.org/XML/1998/namespace"
         )
@@ -42,7 +40,6 @@ class ProductType(ItemType):
     lang: Optional[str] = field(
         default=None,
         metadata=dict(
-            name="lang",
             type="Attribute"
         )
     )

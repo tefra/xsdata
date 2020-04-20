@@ -20,7 +20,6 @@ class OrderType:
     number: Optional[str] = field(
         default=None,
         metadata=dict(
-            name="number",
             type="Element",
             namespace="",
             required=True
@@ -29,7 +28,6 @@ class OrderType:
     customer: Optional[CustomerType] = field(
         default=None,
         metadata=dict(
-            name="customer",
             type="Element",
             namespace="",
             required=True
@@ -38,7 +36,6 @@ class OrderType:
     items: Optional[ItemsType] = field(
         default=None,
         metadata=dict(
-            name="items",
             type="Element",
             namespace="",
             required=True

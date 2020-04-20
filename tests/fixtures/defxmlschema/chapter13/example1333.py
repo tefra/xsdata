@@ -26,7 +26,6 @@ class DerivedType(BaseType):
     id: Optional[str] = field(
         default=None,
         metadata=dict(
-            name="id",
             type="Attribute",
             required=True
         )
@@ -34,7 +33,6 @@ class DerivedType(BaseType):
     name: Optional[str] = field(
         default=None,
         metadata=dict(
-            name="name",
             type="Attribute"
         )
     )

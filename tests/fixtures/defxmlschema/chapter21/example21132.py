@@ -10,7 +10,6 @@ class ProductType:
     number: Optional[int] = field(
         default=None,
         metadata=dict(
-            name="number",
             type="Element",
             required=True
         )
@@ -25,7 +24,6 @@ class ItemsType:
     product: List[ProductType] = field(
         default_factory=list,
         metadata=dict(
-            name="product",
             type="Element",
             min_occurs=1,
             max_occurs=9223372036854775807

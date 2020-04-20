@@ -11,7 +11,6 @@ class BaseType:
     a: Optional[str] = field(
         default=None,
         metadata=dict(
-            name="a",
             type="Element",
             namespace=""
         )

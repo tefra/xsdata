@@ -13,7 +13,6 @@ class SizeType:
     system: Optional[str] = field(
         default=None,
         metadata=dict(
-            name="system",
             type="Attribute",
             required=True
         )
@@ -21,7 +20,6 @@ class SizeType:
     dim: Optional[int] = field(
         default=None,
         metadata=dict(
-            name="dim",
             type="Attribute"
         )
     )

@@ -13,7 +13,6 @@ class ProductType:
     number: Optional[int] = field(
         default=None,
         metadata=dict(
-            name="number",
             type="Element",
             namespace="",
             required=True
@@ -22,7 +21,6 @@ class ProductType:
     name: Optional[str] = field(
         default=None,
         metadata=dict(
-            name="name",
             type="Element",
             namespace="",
             required=True
@@ -31,7 +29,6 @@ class ProductType:
     size: Optional[int] = field(
         default=None,
         metadata=dict(
-            name="size",
             type="Element",
             namespace=""
         )
@@ -39,7 +36,6 @@ class ProductType:
     color: Optional[str] = field(
         default=None,
         metadata=dict(
-            name="color",
             type="Element",
             namespace=""
         )
@@ -57,7 +53,6 @@ class RestrictedProductType:
     number: Optional[int] = field(
         default=None,
         metadata=dict(
-            name="number",
             type="Element",
             namespace="",
             required=True
@@ -66,7 +61,6 @@ class RestrictedProductType:
     name: Optional[str] = field(
         default=None,
         metadata=dict(
-            name="name",
             type="Element",
             namespace="",
             required=True
@@ -75,7 +69,6 @@ class RestrictedProductType:
     size: Optional[int] = field(
         default=None,
         metadata=dict(
-            name="size",
             type="Element",
             namespace=""
         )
@@ -83,7 +76,6 @@ class RestrictedProductType:
     color: Optional[str] = field(
         default=None,
         metadata=dict(
-            name="color",
             type="Element",
             namespace=""
         )

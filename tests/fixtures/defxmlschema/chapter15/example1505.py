@@ -12,7 +12,6 @@ class DescriptionType:
     description: Optional[str] = field(
         default=None,
         metadata=dict(
-            name="description",
             type="Element",
             namespace="",
             required=True
@@ -21,7 +20,6 @@ class DescriptionType:
     comment: Optional[str] = field(
         default=None,
         metadata=dict(
-            name="comment",
             type="Element",
             namespace=""
         )
@@ -29,7 +27,6 @@ class DescriptionType:
     lang: Optional[str] = field(
         default=None,
         metadata=dict(
-            name="lang",
             type="Attribute"
         )
     )

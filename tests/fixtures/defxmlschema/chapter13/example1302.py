@@ -11,7 +11,6 @@ class ProductType:
     number: Optional[int] = field(
         default=None,
         metadata=dict(
-            name="number",
             type="Element",
             namespace="",
             required=True
@@ -20,7 +19,6 @@ class ProductType:
     name: Optional[str] = field(
         default=None,
         metadata=dict(
-            name="name",
             type="Element",
             namespace="",
             required=True
@@ -37,7 +35,6 @@ class ShirtType(ProductType):
     size: List[int] = field(
         default_factory=list,
         metadata=dict(
-            name="size",
             type="Element",
             namespace="",
             min_occurs=0,
@@ -47,7 +44,6 @@ class ShirtType(ProductType):
     color: List[str] = field(
         default_factory=list,
         metadata=dict(
-            name="color",
             type="Element",
             namespace="",
             min_occurs=0,

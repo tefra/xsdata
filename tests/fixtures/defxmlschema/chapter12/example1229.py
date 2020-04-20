@@ -14,7 +14,6 @@ class AorBorBothType:
     a: Optional[str] = field(
         default=None,
         metadata=dict(
-            name="a",
             type="Element",
             namespace="",
             required=True
@@ -23,7 +22,6 @@ class AorBorBothType:
     b: List[str] = field(
         default_factory=list,
         metadata=dict(
-            name="b",
             type="Element",
             namespace="",
             min_occurs=0,

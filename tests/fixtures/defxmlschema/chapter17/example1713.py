@@ -15,7 +15,6 @@ class CatalogListType:
     catalog: List[CatalogType] = field(
         default_factory=list,
         metadata=dict(
-            name="catalog",
             type="Element",
             namespace="",
             min_occurs=1,
@@ -32,7 +31,6 @@ class RestrictedCatalogListType:
     catalog: Optional[CatalogType] = field(
         default=None,
         metadata=dict(
-            name="catalog",
             type="Element",
             namespace="",
             required=True

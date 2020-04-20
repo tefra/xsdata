@@ -90,7 +90,6 @@ class ProductType:
     number: Optional[Number] = field(
         default=None,
         metadata=dict(
-            name="number",
             type="Element",
             required=True
         )
@@ -98,7 +97,6 @@ class ProductType:
     name: Optional[Name] = field(
         default=None,
         metadata=dict(
-            name="name",
             type="Element",
             required=True
         )
@@ -106,14 +104,12 @@ class ProductType:
     size: Optional[Size] = field(
         default=None,
         metadata=dict(
-            name="size",
             type="Element"
         )
     )
     color: Optional[Color] = field(
         default=None,
         metadata=dict(
-            name="color",
             type="Element"
         )
     )

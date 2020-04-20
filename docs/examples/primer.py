@@ -19,7 +19,6 @@ class Usaddress:
     name: Optional[str] = field(
         default=None,
         metadata=dict(
-            name="name",
             type="Element",
             namespace="",
             required=True
@@ -28,7 +27,6 @@ class Usaddress:
     street: Optional[str] = field(
         default=None,
         metadata=dict(
-            name="street",
             type="Element",
             namespace="",
             required=True
@@ -37,7 +35,6 @@ class Usaddress:
     city: Optional[str] = field(
         default=None,
         metadata=dict(
-            name="city",
             type="Element",
             namespace="",
             required=True
@@ -46,7 +43,6 @@ class Usaddress:
     state: Optional[str] = field(
         default=None,
         metadata=dict(
-            name="state",
             type="Element",
             namespace="",
             required=True
@@ -55,7 +51,6 @@ class Usaddress:
     zip: Optional[Decimal] = field(
         default=None,
         metadata=dict(
-            name="zip",
             type="Element",
             namespace="",
             required=True
@@ -65,7 +60,6 @@ class Usaddress:
         init=False,
         default="US",
         metadata=dict(
-            name="country",
             type="Attribute"
         )
     )
@@ -95,7 +89,6 @@ class Items:
     item: List["Items.Item"] = field(
         default_factory=list,
         metadata=dict(
-            name="item",
             type="Element",
             namespace="",
             min_occurs=0,
@@ -125,7 +118,6 @@ class Items:
         quantity: Optional[int] = field(
             default=None,
             metadata=dict(
-                name="quantity",
                 type="Element",
                 namespace="",
                 required=True,
@@ -144,7 +136,6 @@ class Items:
         comment: Optional[Comment] = field(
             default=None,
             metadata=dict(
-                name="comment",
                 type="Element"
             )
         )
@@ -197,14 +188,12 @@ class PurchaseOrderType:
     comment: Optional[Comment] = field(
         default=None,
         metadata=dict(
-            name="comment",
             type="Element"
         )
     )
     items: Optional[Items] = field(
         default=None,
         metadata=dict(
-            name="items",
             type="Element",
             namespace="",
             required=True

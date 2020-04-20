@@ -13,7 +13,6 @@ class EnvelopeType:
     order: List[Order] = field(
         default_factory=list,
         metadata=dict(
-            name="order",
             type="Element",
             namespace="http://example.org/ord",
             min_occurs=1,

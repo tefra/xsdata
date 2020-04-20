@@ -18,7 +18,6 @@ class SmallSizeType:
     system: Optional[str] = field(
         default=None,
         metadata=dict(
-            name="system",
             type="Attribute",
             required=True
         )

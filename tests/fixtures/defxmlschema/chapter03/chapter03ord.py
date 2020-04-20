@@ -15,7 +15,6 @@ class ItemsType:
     product: List[Product] = field(
         default_factory=list,
         metadata=dict(
-            name="product",
             type="Element",
             namespace="http://example.org/prod",
             min_occurs=1,
@@ -33,7 +32,6 @@ class OrderType:
     number: Optional[str] = field(
         default=None,
         metadata=dict(
-            name="number",
             type="Element",
             namespace="http://example.org/ord",
             required=True
@@ -42,7 +40,6 @@ class OrderType:
     items: Optional[ItemsType] = field(
         default=None,
         metadata=dict(
-            name="items",
             type="Element",
             namespace="http://example.org/ord",
             required=True

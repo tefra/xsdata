@@ -13,7 +13,6 @@ class Footnote:
     id: Optional[str] = field(
         default=None,
         metadata=dict(
-            name="id",
             type="Attribute",
             required=True
         )
@@ -31,7 +30,6 @@ class Quote:
     refs: Optional[str] = field(
         default=None,
         metadata=dict(
-            name="refs",
             type="Attribute"
         )
     )

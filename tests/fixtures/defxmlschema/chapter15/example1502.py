@@ -43,7 +43,6 @@ class DescriptionGroup:
     description: Optional[Description] = field(
         default=None,
         metadata=dict(
-            name="description",
             type="Element",
             required=True
         )
@@ -51,7 +50,6 @@ class DescriptionGroup:
     comment: Optional[Comment] = field(
         default=None,
         metadata=dict(
-            name="comment",
             type="Element"
         )
     )

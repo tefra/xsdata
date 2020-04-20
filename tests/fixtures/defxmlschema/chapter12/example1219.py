@@ -17,7 +17,6 @@ class ItemsType:
     shirt: Optional[ShirtType] = field(
         default=None,
         metadata=dict(
-            name="shirt",
             type="Element",
             namespace=""
         )
@@ -25,7 +24,6 @@ class ItemsType:
     hat: Optional[HatType] = field(
         default=None,
         metadata=dict(
-            name="hat",
             type="Element",
             namespace=""
         )
@@ -33,7 +31,6 @@ class ItemsType:
     umbrella: Optional[UmbrellaType] = field(
         default=None,
         metadata=dict(
-            name="umbrella",
             type="Element",
             namespace=""
         )

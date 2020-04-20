@@ -20,7 +20,6 @@ class IlegalDerivedType:
     a: Optional[str] = field(
         default=None,
         metadata=dict(
-            name="a",
             type="Element",
             namespace=""
         )

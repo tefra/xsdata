@@ -17,28 +17,24 @@ class Attributes:
     anything: Optional[str] = field(
         default=None,
         metadata=dict(
-            name="anything",
             type="Attribute"
         )
     )
     color: Optional[str] = field(
         default=None,
         metadata=dict(
-            name="color",
             type="Attribute"
         )
     )
     dim: Optional[int] = field(
         default=None,
         metadata=dict(
-            name="dim",
             type="Attribute"
         )
     )
     system: Optional["Attributes.Type"] = field(
         default=None,
         metadata=dict(
-            name="system",
             type="Attribute"
         )
     )

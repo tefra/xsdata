@@ -10,7 +10,6 @@ class ColorType:
     value: Optional[str] = field(
         default=None,
         metadata=dict(
-            name="value",
             type="Attribute"
         )
     )

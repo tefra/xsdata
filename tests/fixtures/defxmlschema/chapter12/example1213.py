@@ -11,7 +11,6 @@ class ProductType:
     number: Optional[int] = field(
         default=None,
         metadata=dict(
-            name="number",
             type="Element",
             namespace="",
             required=True
@@ -20,7 +19,6 @@ class ProductType:
     name: List[str] = field(
         default_factory=list,
         metadata=dict(
-            name="name",
             type="Element",
             namespace="",
             min_occurs=0,

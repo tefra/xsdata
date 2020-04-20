@@ -19,7 +19,6 @@ class OrderType:
     customer: Optional[CustomerType] = field(
         default=None,
         metadata=dict(
-            name="customer",
             type="Element",
             namespace="http://datypic.com/all",
             required=True
@@ -28,7 +27,6 @@ class OrderType:
     items: Optional[ItemsType] = field(
         default=None,
         metadata=dict(
-            name="items",
             type="Element",
             namespace="http://datypic.com/all",
             required=True

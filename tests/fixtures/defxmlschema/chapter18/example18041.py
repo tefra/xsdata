@@ -11,7 +11,6 @@ class DescriptionGroup:
     description: Optional[str] = field(
         default=None,
         metadata=dict(
-            name="description",
             type="Element",
             namespace="",
             required=True
@@ -20,7 +19,6 @@ class DescriptionGroup:
     comment: Optional[str] = field(
         default=None,
         metadata=dict(
-            name="comment",
             type="Element",
             namespace=""
         )

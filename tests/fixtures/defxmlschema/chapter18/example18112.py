@@ -11,7 +11,6 @@ class DescriptionType:
     source: Optional[str] = field(
         default=None,
         metadata=dict(
-            name="source",
             type="Element",
             namespace="",
             required=True
@@ -20,7 +19,6 @@ class DescriptionType:
     content: Optional[str] = field(
         default=None,
         metadata=dict(
-            name="content",
             type="Element",
             namespace="",
             required=True

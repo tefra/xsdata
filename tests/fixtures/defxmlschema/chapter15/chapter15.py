@@ -15,7 +15,6 @@ class SizeType:
     system: Optional[str] = field(
         default=None,
         metadata=dict(
-            name="system",
             type="Attribute"
         )
     )
@@ -36,7 +35,6 @@ class ShirtType:
     description: Optional[str] = field(
         default=None,
         metadata=dict(
-            name="description",
             type="Element",
             namespace=""
         )
@@ -44,7 +42,6 @@ class ShirtType:
     comment: Optional[str] = field(
         default=None,
         metadata=dict(
-            name="comment",
             type="Element",
             namespace=""
         )
@@ -52,7 +49,6 @@ class ShirtType:
     number: Optional[int] = field(
         default=None,
         metadata=dict(
-            name="number",
             type="Element",
             namespace=""
         )
@@ -60,7 +56,6 @@ class ShirtType:
     name: Optional[str] = field(
         default=None,
         metadata=dict(
-            name="name",
             type="Element",
             namespace=""
         )
@@ -68,7 +63,6 @@ class ShirtType:
     size: Optional[SizeType] = field(
         default=None,
         metadata=dict(
-            name="size",
             type="Element",
             namespace="",
             required=True
@@ -77,7 +71,6 @@ class ShirtType:
     id: Optional[str] = field(
         default=None,
         metadata=dict(
-            name="id",
             type="Attribute",
             required=True
         )
@@ -85,7 +78,6 @@ class ShirtType:
     version: Optional[Decimal] = field(
         default=None,
         metadata=dict(
-            name="version",
             type="Attribute"
         )
     )

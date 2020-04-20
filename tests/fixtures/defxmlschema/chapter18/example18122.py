@@ -10,7 +10,6 @@ class DescriptionGroup:
     description: Optional[str] = field(
         default=None,
         metadata=dict(
-            name="description",
             type="Element",
             namespace="",
             required=True
@@ -34,7 +33,6 @@ class IdentifierGroup:
     id: Optional[str] = field(
         default=None,
         metadata=dict(
-            name="id",
             type="Attribute"
         )
     )

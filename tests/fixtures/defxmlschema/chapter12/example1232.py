@@ -13,7 +13,6 @@ class ProductType:
     id: Optional[str] = field(
         default=None,
         metadata=dict(
-            name="id",
             type="Attribute",
             required=True
         )
@@ -21,7 +20,6 @@ class ProductType:
     version: Optional[Decimal] = field(
         default=None,
         metadata=dict(
-            name="version",
             type="Attribute"
         )
     )

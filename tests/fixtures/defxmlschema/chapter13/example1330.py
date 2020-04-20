@@ -17,28 +17,24 @@ class BaseType:
     a: Optional[int] = field(
         default=None,
         metadata=dict(
-            name="a",
             type="Attribute"
         )
     )
     b: Optional[str] = field(
         default=None,
         metadata=dict(
-            name="b",
             type="Attribute"
         )
     )
     c: str = field(
         default="c",
         metadata=dict(
-            name="c",
             type="Attribute"
         )
     )
     d: Optional[str] = field(
         default=None,
         metadata=dict(
-            name="d",
             type="Attribute"
         )
     )
@@ -46,28 +42,24 @@ class BaseType:
         init=False,
         default="e",
         metadata=dict(
-            name="e",
             type="Attribute"
         )
     )
     f: Optional[str] = field(
         default=None,
         metadata=dict(
-            name="f",
             type="Attribute"
         )
     )
     g: Optional[str] = field(
         default=None,
         metadata=dict(
-            name="g",
             type="Attribute"
         )
     )
     x: Optional[str] = field(
         default=None,
         metadata=dict(
-            name="x",
             type="Attribute"
         )
     )
@@ -88,21 +80,18 @@ class DerivedType:
     a: Optional[int] = field(
         default=None,
         metadata=dict(
-            name="a",
             type="Attribute"
         )
     )
     b: str = field(
         default="b",
         metadata=dict(
-            name="b",
             type="Attribute"
         )
     )
     c: str = field(
         default="c2",
         metadata=dict(
-            name="c",
             type="Attribute"
         )
     )
@@ -110,7 +99,6 @@ class DerivedType:
         init=False,
         default="d",
         metadata=dict(
-            name="d",
             type="Attribute"
         )
     )
@@ -118,14 +106,12 @@ class DerivedType:
         init=False,
         default="e",
         metadata=dict(
-            name="e",
             type="Attribute"
         )
     )
     f: Optional[str] = field(
         default=None,
         metadata=dict(
-            name="f",
             type="Attribute",
             required=True
         )
@@ -133,14 +119,12 @@ class DerivedType:
     g: Optional[str] = field(
         default=None,
         metadata=dict(
-            name="g",
             type="Attribute"
         )
     )
     x: Optional[str] = field(
         default=None,
         metadata=dict(
-            name="x",
             type="Attribute"
         )
     )

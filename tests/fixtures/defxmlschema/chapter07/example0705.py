@@ -12,7 +12,6 @@ class Size:
     dim: int = field(
         default=1,
         metadata=dict(
-            name="dim",
             type="Attribute"
         )
     )

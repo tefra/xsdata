@@ -11,7 +11,6 @@ class ColorType:
     value: Optional[str] = field(
         default=None,
         metadata=dict(
-            name="value",
             type="Attribute"
         )
     )
@@ -45,7 +44,6 @@ class SizeType:
     system: Optional[str] = field(
         default=None,
         metadata=dict(
-            name="system",
             type="Attribute"
         )
     )
@@ -65,7 +63,6 @@ class ProductType:
     number: Optional[int] = field(
         default=None,
         metadata=dict(
-            name="number",
             type="Element",
             namespace="",
             required=True
@@ -74,7 +71,6 @@ class ProductType:
     name: Optional[str] = field(
         default=None,
         metadata=dict(
-            name="name",
             type="Element",
             namespace="",
             required=True
@@ -83,7 +79,6 @@ class ProductType:
     size: List[SizeType] = field(
         default_factory=list,
         metadata=dict(
-            name="size",
             type="Element",
             namespace="",
             min_occurs=0,
@@ -93,7 +88,6 @@ class ProductType:
     color: List[ColorType] = field(
         default_factory=list,
         metadata=dict(
-            name="color",
             type="Element",
             namespace="",
             min_occurs=0,
@@ -103,7 +97,6 @@ class ProductType:
     description: List[DescriptionType] = field(
         default_factory=list,
         metadata=dict(
-            name="description",
             type="Element",
             namespace="",
             min_occurs=0,
@@ -136,7 +129,6 @@ class ItemsType:
     shirt: List[ProductType] = field(
         default_factory=list,
         metadata=dict(
-            name="shirt",
             type="Element",
             namespace="",
             min_occurs=0,
@@ -146,7 +138,6 @@ class ItemsType:
     hat: List[ProductType] = field(
         default_factory=list,
         metadata=dict(
-            name="hat",
             type="Element",
             namespace="",
             min_occurs=0,
@@ -156,7 +147,6 @@ class ItemsType:
     umbrella: List[ProductType] = field(
         default_factory=list,
         metadata=dict(
-            name="umbrella",
             type="Element",
             namespace="",
             min_occurs=0,

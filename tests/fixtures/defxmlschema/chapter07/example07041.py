@@ -23,14 +23,12 @@ class SizeType:
     unqual: Optional[str] = field(
         default=None,
         metadata=dict(
-            name="unqual",
             type="Attribute"
         )
     )
     qual: Optional[str] = field(
         default=None,
         metadata=dict(
-            name="qual",
             type="Attribute",
             namespace="http://datypic.com/prod"
         )
@@ -38,7 +36,6 @@ class SizeType:
     unspec: Optional[str] = field(
         default=None,
         metadata=dict(
-            name="unspec",
             type="Attribute"
         )
     )

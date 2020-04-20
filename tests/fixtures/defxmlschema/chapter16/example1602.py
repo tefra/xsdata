@@ -34,7 +34,6 @@ class ShirtType(ProductType):
     size: Optional[ShirtSizeType] = field(
         default=None,
         metadata=dict(
-            name="size",
             type="Element",
             namespace="",
             required=True
@@ -43,7 +42,6 @@ class ShirtType(ProductType):
     color: Optional[str] = field(
         default=None,
         metadata=dict(
-            name="color",
             type="Element",
             namespace="",
             required=True
@@ -62,7 +60,6 @@ class Hat(ProductType):
     size: Optional[HatSizeType] = field(
         default=None,
         metadata=dict(
-            name="size",
             type="Element",
             namespace="",
             required=True

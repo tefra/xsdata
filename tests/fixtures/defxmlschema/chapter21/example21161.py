@@ -16,7 +16,6 @@ class OrderType:
     number: Optional[int] = field(
         default=None,
         metadata=dict(
-            name="number",
             type="Element",
             namespace="http://datypic.com/ord",
             required=True
@@ -25,7 +24,6 @@ class OrderType:
     items: Optional[ItemsType] = field(
         default=None,
         metadata=dict(
-            name="items",
             type="Element",
             namespace="http://datypic.com/ord",
             required=True

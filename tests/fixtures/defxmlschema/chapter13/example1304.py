@@ -12,7 +12,6 @@ class ProductType:
     number: Optional[int] = field(
         default=None,
         metadata=dict(
-            name="number",
             type="Element",
             namespace="",
             required=True
@@ -21,7 +20,6 @@ class ProductType:
     name: Optional[str] = field(
         default=None,
         metadata=dict(
-            name="name",
             type="Element",
             namespace="",
             required=True
@@ -30,7 +28,6 @@ class ProductType:
     size: Optional[int] = field(
         default=None,
         metadata=dict(
-            name="size",
             type="Element",
             namespace="",
             required=True
@@ -90,7 +87,6 @@ class ItemsType:
     shirt: List[Shirt] = field(
         default_factory=list,
         metadata=dict(
-            name="shirt",
             type="Element",
             min_occurs=0,
             max_occurs=9223372036854775807
@@ -99,7 +95,6 @@ class ItemsType:
     hat: List[Hat] = field(
         default_factory=list,
         metadata=dict(
-            name="hat",
             type="Element",
             min_occurs=0,
             max_occurs=9223372036854775807
@@ -108,7 +103,6 @@ class ItemsType:
     umbrella: List[Umbrella] = field(
         default_factory=list,
         metadata=dict(
-            name="umbrella",
             type="Element",
             min_occurs=0,
             max_occurs=9223372036854775807
@@ -125,7 +119,6 @@ class ExpandedItemsType(ItemsType):
     sweater: List[Sweater] = field(
         default_factory=list,
         metadata=dict(
-            name="sweater",
             type="Element",
             min_occurs=0,
             max_occurs=9223372036854775807
@@ -134,7 +127,6 @@ class ExpandedItemsType(ItemsType):
     suit: List[Suit] = field(
         default_factory=list,
         metadata=dict(
-            name="suit",
             type="Element",
             min_occurs=0,
             max_occurs=9223372036854775807

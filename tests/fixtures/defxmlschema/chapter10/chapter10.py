@@ -28,7 +28,6 @@ class SizesType:
     size: List[Union[int, "SizesType.Value"]] = field(
         default_factory=list,
         metadata=dict(
-            name="size",
             type="Element",
             namespace="",
             min_occurs=0,

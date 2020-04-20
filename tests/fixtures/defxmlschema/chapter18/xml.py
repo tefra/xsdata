@@ -89,7 +89,6 @@ class SpecialAttrs:
     base: Optional[str] = field(
         default=None,
         metadata=dict(
-            name="base",
             type="Attribute",
             namespace="http://www.w3.org/XML/1998/namespace"
         )
@@ -97,7 +96,6 @@ class SpecialAttrs:
     lang: Optional[str] = field(
         default=None,
         metadata=dict(
-            name="lang",
             type="Attribute",
             namespace="http://www.w3.org/XML/1998/namespace"
         )
@@ -105,7 +103,6 @@ class SpecialAttrs:
     space: Optional["SpecialAttrs.Type"] = field(
         default=None,
         metadata=dict(
-            name="space",
             type="Attribute",
             namespace="http://www.w3.org/XML/1998/namespace"
         )
@@ -113,7 +110,6 @@ class SpecialAttrs:
     id: Optional[str] = field(
         default=None,
         metadata=dict(
-            name="id",
             type="Attribute",
             namespace="http://www.w3.org/XML/1998/namespace"
         )

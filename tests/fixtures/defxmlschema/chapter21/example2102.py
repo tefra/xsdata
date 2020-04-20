@@ -71,7 +71,6 @@ class Product:
     number: Optional[Number] = field(
         default=None,
         metadata=dict(
-            name="number",
             type="Element",
             required=True
         )
@@ -79,7 +78,6 @@ class Product:
     name: Optional[Name] = field(
         default=None,
         metadata=dict(
-            name="name",
             type="Element",
             required=True
         )
@@ -87,7 +85,6 @@ class Product:
     size: Optional[Size] = field(
         default=None,
         metadata=dict(
-            name="size",
             type="Element",
             required=True
         )
@@ -95,7 +92,6 @@ class Product:
     dept: Optional[str] = field(
         default=None,
         metadata=dict(
-            name="dept",
             type="Attribute"
         )
     )
@@ -113,7 +109,6 @@ class Catalog:
     product: List[Product] = field(
         default_factory=list,
         metadata=dict(
-            name="product",
             type="Element",
             min_occurs=1,
             max_occurs=9223372036854775807

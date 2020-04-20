@@ -12,7 +12,6 @@ class LegalDerivedType:
     a: Optional[str] = field(
         default=None,
         metadata=dict(
-            name="a",
             type="Element",
             namespace=""
         )

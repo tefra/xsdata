@@ -11,7 +11,6 @@ class PurchaseOrderType:
     description: Optional[str] = field(
         default=None,
         metadata=dict(
-            name="description",
             type="Element",
             namespace=""
         )
@@ -19,7 +18,6 @@ class PurchaseOrderType:
     comment: Optional[str] = field(
         default=None,
         metadata=dict(
-            name="comment",
             type="Element",
             namespace=""
         )

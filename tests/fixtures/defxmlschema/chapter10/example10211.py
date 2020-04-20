@@ -10,7 +10,6 @@ class VectorType:
     e: List[int] = field(
         default_factory=list,
         metadata=dict(
-            name="e",
             type="Element",
             namespace="",
             min_occurs=1,
@@ -27,7 +26,6 @@ class ArrayType:
     r: List[VectorType] = field(
         default_factory=list,
         metadata=dict(
-            name="r",
             type="Element",
             namespace="",
             min_occurs=1,

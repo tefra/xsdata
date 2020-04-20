@@ -15,7 +15,6 @@ class Product:
     number: Optional[int] = field(
         default=None,
         metadata=dict(
-            name="number",
             type="Element",
             namespace="",
             required=True
@@ -24,7 +23,6 @@ class Product:
     name: Optional[str] = field(
         default=None,
         metadata=dict(
-            name="name",
             type="Element",
             namespace="",
             required=True
@@ -33,7 +31,6 @@ class Product:
     size: Optional[int] = field(
         default=None,
         metadata=dict(
-            name="size",
             type="Element",
             namespace="",
             required=True

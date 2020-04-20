@@ -15,7 +15,6 @@ class ItemsType:
     product: Optional[ProductType] = field(
         default=None,
         metadata=dict(
-            name="product",
             type="Element",
             namespace="",
             required=True

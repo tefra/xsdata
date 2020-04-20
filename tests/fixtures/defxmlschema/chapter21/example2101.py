@@ -16,7 +16,6 @@ class Catalog:
     product: List["Catalog.Product"] = field(
         default_factory=list,
         metadata=dict(
-            name="product",
             type="Element",
             min_occurs=1,
             max_occurs=9223372036854775807
@@ -34,7 +33,6 @@ class Catalog:
         number: Optional[int] = field(
             default=None,
             metadata=dict(
-                name="number",
                 type="Element",
                 required=True
             )
@@ -42,7 +40,6 @@ class Catalog:
         name: Optional[str] = field(
             default=None,
             metadata=dict(
-                name="name",
                 type="Element",
                 required=True
             )
@@ -50,7 +47,6 @@ class Catalog:
         size: Optional[int] = field(
             default=None,
             metadata=dict(
-                name="size",
                 type="Element",
                 required=True,
                 min_inclusive=2.0,
@@ -60,7 +56,6 @@ class Catalog:
         dept: Optional[str] = field(
             default=None,
             metadata=dict(
-                name="dept",
                 type="Attribute"
             )
         )

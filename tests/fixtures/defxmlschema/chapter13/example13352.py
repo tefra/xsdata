@@ -15,7 +15,6 @@ class RestrictedProductType:
     number: Optional[str] = field(
         default=None,
         metadata=dict(
-            name="number",
             type="Element",
             namespace="http://datypic.com/prod",
             required=True
@@ -24,7 +23,6 @@ class RestrictedProductType:
     name: Optional[str] = field(
         default=None,
         metadata=dict(
-            name="name",
             type="Element",
             namespace="http://datypic.com/prod",
             required=True
@@ -33,7 +31,6 @@ class RestrictedProductType:
     size: Optional[int] = field(
         default=None,
         metadata=dict(
-            name="size",
             type="Element",
             namespace="http://datypic.com/prod"
         )
@@ -41,7 +38,6 @@ class RestrictedProductType:
     dept: Optional[str] = field(
         default=None,
         metadata=dict(
-            name="dept",
             type="Attribute",
             namespace="http://datypic.com/prod",
             required=True

@@ -13,7 +13,6 @@ class SizeType:
     system: Optional[str] = field(
         default=None,
         metadata=dict(
-            name="system",
             type="Attribute",
             namespace="http://datypic.com/prod",
             required=True
@@ -22,7 +21,6 @@ class SizeType:
     dim: Optional[int] = field(
         default=None,
         metadata=dict(
-            name="dim",
             type="Attribute",
             namespace="http://datypic.com/prod"
         )

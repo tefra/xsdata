@@ -11,7 +11,6 @@ class ColorType:
     value: Optional[str] = field(
         default=None,
         metadata=dict(
-            name="value",
             type="Attribute"
         )
     )
@@ -29,7 +28,6 @@ class PriceType:
     currency: Optional[str] = field(
         default=None,
         metadata=dict(
-            name="currency",
             type="Attribute"
         )
     )
@@ -45,7 +43,6 @@ class ProductOrderType:
     quantity: Optional[int] = field(
         default=None,
         metadata=dict(
-            name="quantity",
             type="Element",
             namespace="",
             required=True
@@ -54,7 +51,6 @@ class ProductOrderType:
     color: Optional[ColorType] = field(
         default=None,
         metadata=dict(
-            name="color",
             type="Element",
             namespace=""
         )
@@ -62,7 +58,6 @@ class ProductOrderType:
     number: Optional[int] = field(
         default=None,
         metadata=dict(
-            name="number",
             type="Attribute"
         )
     )
@@ -78,7 +73,6 @@ class ProductType:
     number: Optional[int] = field(
         default=None,
         metadata=dict(
-            name="number",
             type="Element",
             namespace="",
             required=True
@@ -87,7 +81,6 @@ class ProductType:
     name: Optional[str] = field(
         default=None,
         metadata=dict(
-            name="name",
             type="Element",
             namespace="",
             required=True
@@ -96,7 +89,6 @@ class ProductType:
     price: Optional[PriceType] = field(
         default=None,
         metadata=dict(
-            name="price",
             type="Element",
             namespace="",
             required=True
@@ -113,7 +105,6 @@ class ItemsType:
     shirt: List[ProductOrderType] = field(
         default_factory=list,
         metadata=dict(
-            name="shirt",
             type="Element",
             namespace="",
             min_occurs=0,
@@ -123,7 +114,6 @@ class ItemsType:
     hat: List[ProductOrderType] = field(
         default_factory=list,
         metadata=dict(
-            name="hat",
             type="Element",
             namespace="",
             min_occurs=0,
@@ -140,7 +130,6 @@ class ProductsType:
     product: List[ProductType] = field(
         default_factory=list,
         metadata=dict(
-            name="product",
             type="Element",
             namespace="",
             min_occurs=1,
@@ -159,7 +148,6 @@ class OrderType:
     number: Optional[str] = field(
         default=None,
         metadata=dict(
-            name="number",
             type="Element",
             namespace="",
             required=True
@@ -168,7 +156,6 @@ class OrderType:
     items: Optional[ItemsType] = field(
         default=None,
         metadata=dict(
-            name="items",
             type="Element",
             namespace="",
             required=True
@@ -177,7 +164,6 @@ class OrderType:
     products: Optional[ProductsType] = field(
         default=None,
         metadata=dict(
-            name="products",
             type="Element",
             namespace="",
             required=True

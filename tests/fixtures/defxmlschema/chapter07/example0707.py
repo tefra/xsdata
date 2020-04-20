@@ -14,7 +14,6 @@ class ParaType:
     language: Optional[str] = field(
         default=None,
         metadata=dict(
-            name="language",
             type="Attribute"
         )
     )
@@ -29,7 +28,6 @@ class ChapterType:
     p: List[ParaType] = field(
         default_factory=list,
         metadata=dict(
-            name="p",
             type="Element",
             namespace="",
             min_occurs=1,
@@ -39,7 +37,6 @@ class ChapterType:
     language: Optional[str] = field(
         default=None,
         metadata=dict(
-            name="language",
             type="Attribute"
         )
     )

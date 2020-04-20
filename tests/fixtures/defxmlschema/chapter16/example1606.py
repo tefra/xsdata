@@ -20,7 +20,6 @@ class ItemsType:
     product: List[ProductType] = field(
         default_factory=list,
         metadata=dict(
-            name="product",
             type="Element",
             namespace="",
             min_occurs=0,
@@ -30,7 +29,6 @@ class ItemsType:
     shirt: List[ShirtType] = field(
         default_factory=list,
         metadata=dict(
-            name="shirt",
             type="Element",
             namespace="",
             min_occurs=0,
@@ -40,7 +38,6 @@ class ItemsType:
     hat: List[HatType] = field(
         default_factory=list,
         metadata=dict(
-            name="hat",
             type="Element",
             namespace="",
             min_occurs=0,
@@ -50,7 +47,6 @@ class ItemsType:
     umbrella: List[ProductType] = field(
         default_factory=list,
         metadata=dict(
-            name="umbrella",
             type="Element",
             namespace="",
             min_occurs=0,

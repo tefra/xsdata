@@ -50,3 +50,15 @@ Features
 .. image:: https://github.com/tefra/xsdata/raw/master/docs/_static/demo.gif
 
 Check the documentation `test suites <https://xsdata.readthedocs.io/>`_ or our `W3C XML Schema 1.1  <https://github.com/tefra/xsdata-w3c-tests>`_ test runner and the `samples repo <https://github.com/tefra/xsdata-samples>`_ for more ✨✨✨
+
+
+Changelog: 20.4.2
+-----------------
+- Added support for abstract xsi:types in XmlParser.
+- Added cache for event names in XmlParser.
+- Added sanitization for generated module names.
+- Fixed not flattening abstract extension.
+- Fixed extension name conflicts between simple and complex types.
+- Fixed possible memory leak in CodeWriter.
+- Fixed looping variables twice to find next node in XmlParser.
+- Fixed CodeWriter adding unnecessary new lines.

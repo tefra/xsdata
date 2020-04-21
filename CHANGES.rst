@@ -1,5 +1,17 @@
+20.4.2 (2020-04-21)
+-------------------
+- Added support for abstract xsi:types in XmlParser.
+- Added cache for event names in XmlParser.
+- Added sanitization for generated module names.
+- Fixed not flattening abstract extension.
+- Fixed extension name conflicts between simple and complex types.
+- Fixed possible memory leak in CodeWriter.
+- Fixed looping variables twice to find next node in XmlParser.
+- Fixed CodeWriter adding unnecessary new lines.
+
+
 20.4.1 (2020-04-13)
------------------
+-------------------
 - Fixed open content attribute with mode suffix to be generated last.
 - Fixed issues with wildcard and mixed content parsing.
 - Updated xs:qname mapping to lxml.QName

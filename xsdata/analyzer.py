@@ -275,16 +275,17 @@ class ClassAnalyzer(ClassUtils):
             - source includes some of the target attributes
             - source has suffix attribute and target has at least one attribute
             - target has at least one suffix attribute
-            - source depends on target class copy all attributes
+            - source or target class is abstract
         """
         res = self.compare_attributes(source, target)
         if res == self.INCLUDES_ALL:
             target.extensions.remove(ext)
         elif (
             res == self.INCLUDES_SOME
-            or (source.has_suffix_attr and target.attrs)
+            or source.abstract
+            or target.abstract
+            or (source.has_suffix_attr and len(target.attrs) > 0)
             or target.has_suffix_attr
-            or self.class_depends_on(source, target)
         ):
             self.copy_attributes(source, target, ext)
 

@@ -426,15 +426,27 @@ class ClassAnalyzerTests(FactoryTestCase):
         self.assertEqual(1, len(target.extensions))
 
     @mock.patch.object(ClassAnalyzer, "copy_attributes")
-    @mock.patch.object(ClassAnalyzer, "class_depends_on")
     @mock.patch.object(ClassAnalyzer, "compare_attributes")
-    def test_flatten_extension_complex_when_source_depends_on_target(
-        self, mock_compare_attributes, mock_class_depends_on_class, mock_copy_attributes
+    def test_flatten_extension_complex_when_source_is_abstract(
+        self, mock_compare_attributes, mock_copy_attributes
     ):
-        mock_compare_attributes.return_value = self.analyzer.INCLUDES_SOME
-        mock_class_depends_on_class.return_value = True
+        mock_compare_attributes.return_value = self.analyzer.INCLUDES_NONE
         extension = ExtensionFactory.create()
         target = ClassFactory.create()
+        source = ClassFactory.create(abstract=True)
+
+        self.analyzer.flatten_extension_complex(source, target, extension)
+        mock_compare_attributes.assert_called_once_with(source, target)
+        mock_copy_attributes.assert_called_once_with(source, target, extension)
+
+    @mock.patch.object(ClassAnalyzer, "copy_attributes")
+    @mock.patch.object(ClassAnalyzer, "compare_attributes")
+    def test_flatten_extension_complex_when_target_is_abstract(
+        self, mock_compare_attributes, mock_copy_attributes
+    ):
+        mock_compare_attributes.return_value = self.analyzer.INCLUDES_NONE
+        extension = ExtensionFactory.create()
+        target = ClassFactory.create(abstract=True)
         source = ClassFactory.create()
 
         self.analyzer.flatten_extension_complex(source, target, extension)
@@ -447,7 +459,7 @@ class ClassAnalyzerTests(FactoryTestCase):
     def test_flatten_extension_complex_when_source_has_suffix_attr(
         self, mock_compare_attributes, mock_class_depends_on_class, mock_copy_attributes
     ):
-        mock_compare_attributes.return_value = self.analyzer.INCLUDES_SOME
+        mock_compare_attributes.return_value = self.analyzer.INCLUDES_NONE
         mock_class_depends_on_class.return_value = False
         extension = ExtensionFactory.create()
         target = ClassFactory.create()
@@ -455,7 +467,12 @@ class ClassAnalyzerTests(FactoryTestCase):
         source.attrs.append(AttrFactory.create(index=sys.maxsize))
 
         self.analyzer.flatten_extension_complex(source, target, extension)
-        mock_compare_attributes.assert_called_once_with(source, target)
+        self.assertEqual(0, len(target.attrs))
+
+        target.attrs.append(AttrFactory.create())
+        self.analyzer.flatten_extension_complex(source, target, extension)
+
+        self.assertEqual(2, mock_compare_attributes.call_count)
         mock_copy_attributes.assert_called_once_with(source, target, extension)
 
     @mock.patch.object(ClassAnalyzer, "copy_attributes")
@@ -464,7 +481,7 @@ class ClassAnalyzerTests(FactoryTestCase):
     def test_flatten_extension_complex_when_target_has_suffix_attr(
         self, mock_compare_attributes, mock_class_depends_on_class, mock_copy_attributes
     ):
-        mock_compare_attributes.return_value = self.analyzer.INCLUDES_SOME
+        mock_compare_attributes.return_value = self.analyzer.INCLUDES_NONE
         mock_class_depends_on_class.return_value = False
         extension = ExtensionFactory.create()
         target = ClassFactory.create()

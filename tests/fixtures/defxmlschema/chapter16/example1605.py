@@ -15,12 +15,10 @@ class DiscontinuedProduct(ProductType):
         name = "discontinuedProduct"
 
 
-
 @dataclass
 class Hat(HatType):
     class Meta:
         name = "hat"
-
 
 
 @dataclass
@@ -29,12 +27,10 @@ class Product(ProductType):
         name = "product"
 
 
-
 @dataclass
 class Shirt(ShirtType):
     class Meta:
         name = "shirt"
-
 
 
 @dataclass

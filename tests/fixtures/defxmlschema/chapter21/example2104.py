@@ -104,7 +104,6 @@ class Product(ProductType):
         namespace = "http://datypic.com/prod"
 
 
-
 @dataclass
 class CatalogType:
     """

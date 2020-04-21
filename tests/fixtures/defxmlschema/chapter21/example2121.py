@@ -31,12 +31,10 @@ class Items(ItemsType):
         name = "items"
 
 
-
 @dataclass
 class Order(OrderType):
     class Meta:
         name = "order"
-
 
 
 @dataclass

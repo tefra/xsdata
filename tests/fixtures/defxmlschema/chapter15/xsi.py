@@ -10,7 +10,6 @@ class Nil:
         namespace = "http://www.w3.org/2001/XMLSchema-instance"
 
 
-
 @dataclass
 class NoNamespaceSchemaLocation:
     class Meta:
@@ -18,13 +17,11 @@ class NoNamespaceSchemaLocation:
         namespace = "http://www.w3.org/2001/XMLSchema-instance"
 
 
-
 @dataclass
 class SchemaLocation:
     class Meta:
         name = "schemaLocation"
         namespace = "http://www.w3.org/2001/XMLSchema-instance"
-
 
 
 @dataclass

@@ -33,12 +33,10 @@ class Items(ItemsType):
         name = "items"
 
 
-
 @dataclass
 class Product(ProductType):
     class Meta:
         name = "product"
-
 
 
 @dataclass

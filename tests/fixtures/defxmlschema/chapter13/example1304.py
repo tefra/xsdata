@@ -41,12 +41,10 @@ class Hat(ProductType):
         name = "hat"
 
 
-
 @dataclass
 class Product(ProductType):
     class Meta:
         name = "product"
-
 
 
 @dataclass
@@ -55,12 +53,10 @@ class Shirt(ProductType):
         name = "shirt"
 
 
-
 @dataclass
 class Suit(ProductType):
     class Meta:
         name = "suit"
-
 
 
 @dataclass
@@ -69,12 +65,10 @@ class Sweater(ProductType):
         name = "sweater"
 
 
-
 @dataclass
 class Umbrella(ProductType):
     class Meta:
         name = "umbrella"
-
 
 
 @dataclass

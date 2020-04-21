@@ -82,10 +82,8 @@ class DataclassGenerator(PythonAbstractGenerator):
     def render_classes(self, classes: List[Class]) -> str:
         """Get a list of sorted classes from the imports resolver, apply the
         python code conventions and return the rendered output."""
-        output = "\n".join(
-            map(self.render_class, self.prepare_classes(classes))
-        ).strip()
-        return f"\n\n{output}\n"
+        output = map(str.strip, map(self.render_class, self.prepare_classes(classes)))
+        return "\n\n\n".join(output) + "\n"
 
     def prepare_classes(self, classes: List[Class]):
         for obj in classes:

@@ -32,7 +32,6 @@ class Product(ProductType):
         name = "product"
 
 
-
 @dataclass
 class ItemsType:
     """

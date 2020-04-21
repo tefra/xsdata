@@ -94,18 +94,6 @@ class DataclassGeneratorTests(FactoryTestCase):
         )
         self.assertEqual(expected, actual)
 
-    @mock.patch.object(DataclassGenerator, "render_class")
-    @mock.patch.object(DataclassGenerator, "process_class")
-    def test_render_classes(self, mock_process_class, mock_render_class):
-        renders = [" does it matter?", " white space "]
-        classes = ClassFactory.list(2)
-        mock_process_class.side_effect = ClassFactory.list(2)
-        mock_render_class.side_effect = renders
-        output = "\n".join(renders).strip()
-
-        actual = DataclassGenerator().render_classes(classes)
-        self.assertEqual(f"\n\n{output}\n", actual)
-
     @mock.patch.object(DataclassGenerator, "process_import")
     def test_prepare_imports(self, mock_process_import):
         packages = [

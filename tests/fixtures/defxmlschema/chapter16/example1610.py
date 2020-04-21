@@ -13,7 +13,6 @@ class Hat(HatType):
         name = "hat"
 
 
-
 @dataclass
 class Product(ProductType):
     class Meta:

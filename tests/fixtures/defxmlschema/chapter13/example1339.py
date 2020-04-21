@@ -58,7 +58,6 @@ class Product(ProductType):
         name = "product"
 
 
-
 @dataclass
 class Shirt(ShirtType):
     class Meta:

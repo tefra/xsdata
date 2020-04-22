@@ -48,10 +48,9 @@ class SchemaParser(XmlParser):
         self.schema_location = path
         return super().from_path(path, xsd.Schema)
 
-    def dequeue(self, element: Element, queue: XmlNodes, objects: ParsedObjects) -> T:
-        """Override parent method to skip empty elements and to set the object
-        index."""
-        obj: T = super(SchemaParser, self).dequeue(element, queue, objects)
+    def dequeue(self, element: Element, queue: XmlNodes, objects: ParsedObjects) -> Any:
+        """Override parent method to set element index and namespaces map."""
+        obj: Any = super(SchemaParser, self).dequeue(element, queue, objects)
 
         if isinstance(obj, ElementBase):
             obj.index = element.sourceline

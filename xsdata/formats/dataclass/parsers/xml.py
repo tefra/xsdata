@@ -15,12 +15,12 @@ from xsdata.exceptions import ParserError
 from xsdata.formats.bindings import AbstractParser
 from xsdata.formats.dataclass.context import XmlContext
 from xsdata.formats.dataclass.models.generics import Namespaces
+from xsdata.formats.dataclass.parsers.config import ParserConfig
 from xsdata.formats.dataclass.parsers.json import T
 from xsdata.formats.dataclass.parsers.nodes import RootNode
 from xsdata.formats.dataclass.parsers.nodes import XmlNode
 from xsdata.models.enums import EventType
 from xsdata.utils import text
-
 
 ParsedObjects = List[Tuple[QName, Any]]
 XmlNodes = List[XmlNode]
@@ -31,6 +31,7 @@ class XmlParser(AbstractParser):
     namespaces: Namespaces = field(init=False, default_factory=Namespaces)
     context: XmlContext = field(default_factory=XmlContext)
     event_names: Dict = field(default_factory=dict)
+    config: ParserConfig = field(default_factory=ParserConfig)
 
     def parse(self, source: io.BytesIO, clazz: Type[T]) -> T:
         """Parse the XML input stream and return the resulting object tree."""
@@ -52,7 +53,9 @@ class XmlParser(AbstractParser):
         meta = self.context.build(clazz)
         self.namespaces.clear()
         objects: ParsedObjects = []
-        queue: XmlNodes = [RootNode(position=0, meta=meta, default=None)]
+        queue: XmlNodes = [
+            RootNode(position=0, meta=meta, default=None, config=self.config)
+        ]
 
         for event, element in context:
             if event == EventType.START_NS:
@@ -83,18 +86,19 @@ class XmlParser(AbstractParser):
         queue.append(queue_item)
         self.emit_event(EventType.START, element.tag, item=item, element=element)
 
-    def dequeue(self, element: Element, queue: XmlNodes, objects: ParsedObjects) -> T:
+    def dequeue(self, element: Element, queue: XmlNodes, objects: ParsedObjects) -> Any:
         """
         Use the last xml node to parse the given element and bind any child
         objects.
 
-        :returns object: A dataclass object or a python primitive value.
+        :returns Any: A dataclass instance or a python primitive value or None
         """
         item = queue.pop()
         qname, obj = item.parse_element(element, objects)
 
-        objects.append((qname, obj))
-        self.emit_event(EventType.END, element.tag, obj=obj, element=element)
+        if qname:
+            objects.append((qname, obj))
+            self.emit_event(EventType.END, element.tag, obj=obj, element=element)
 
         element.clear()
 

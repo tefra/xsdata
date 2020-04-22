@@ -11,6 +11,7 @@ from lxml.etree import QName
 from xsdata.exceptions import XmlContextError
 from xsdata.formats.dataclass.context import XmlContext
 from xsdata.formats.dataclass.models.elements import XmlMeta
+from xsdata.formats.dataclass.parsers.config import ParserConfig
 from xsdata.formats.dataclass.parsers.utils import ParserUtils
 
 
@@ -29,6 +30,7 @@ class XmlNode:
 class ElementNode(XmlNode):
     meta: XmlMeta
     default: Any
+    config: ParserConfig
 
     def parse_element(self, element: Element, objects: List[Any]) -> Tuple:
         params: Dict = dict()
@@ -49,14 +51,18 @@ class ElementNode(XmlNode):
         ) or self.meta.find_var(qname, condition=lambda x: x.is_wildcard)
 
         if not var:
-            raise XmlContextError(
-                f"{self.meta.qname} does not support mixed content: {qname}"
-            )
+            if self.config.fail_on_unknown_properties:
+                raise XmlContextError(
+                    f"{self.meta.qname} does not support mixed content: {qname}"
+                )
+            return SkipNode(position=position)
 
         if var.dataclass:
             xsi_type = ParserUtils.parse_xsi_type(element)
             meta = ctx.fetch(var.clazz, self.meta.qname.namespace, xsi_type)
-            return ElementNode(position=position, meta=meta, default=var.default)
+            return ElementNode(
+                position=position, meta=meta, default=var.default, config=self.config
+            )
 
         if var.is_any_type:
             return WildcardNode(position=position, qname=var.qname)
@@ -109,3 +115,12 @@ class PrimitiveNode(XmlNode):
 
     def next_node(self, element: Element, position: int, ctx: XmlContext) -> XmlNode:
         raise XmlContextError("Primitive node doesn't support child nodes!")
+
+
+@dataclass(frozen=True)
+class SkipNode(XmlNode):
+    def next_node(self, element: Element, position: int, ctx: XmlContext) -> XmlNode:
+        return SkipNode(position=position)
+
+    def parse_element(self, element: Element, objects: List[Any]) -> Tuple:
+        return None, None

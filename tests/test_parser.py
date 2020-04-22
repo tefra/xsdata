@@ -5,6 +5,7 @@ from unittest import TestCase
 
 from lxml import etree
 
+from xsdata.formats.dataclass.parsers.nodes import SkipNode
 from xsdata.models.elements import Any
 from xsdata.models.elements import Attribute
 from xsdata.models.elements import AttributeGroup
@@ -56,6 +57,16 @@ class SchemaParserTests(TestCase):
         self.assertEqual(3, schema.simple_types[0].index)
         self.assertEqual(4, schema.simple_types[0].annotation.index)
         self.assertEqual(5, schema.simple_types[0].annotation.documentations[0].index)
+
+    @mock.patch.object(SchemaParser, "set_namespace_map")
+    def test_dequeue_with_skip_node(self, mock_set_namespace_map):
+        objects = list()
+        queue = [SkipNode(position=0)]
+        element = etree.Element("foo")
+
+        result = self.parser.dequeue(element, queue, objects)
+        self.assertIsNone(result)
+        self.assertEqual(0, mock_set_namespace_map.call_count)
 
     def test_start_schema(self):
         element = etree.Element("schema")

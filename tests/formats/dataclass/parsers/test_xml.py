@@ -32,7 +32,7 @@ class XmlParserTests(TestCase):
 
     @mock.patch.object(RootNode, "next_node")
     @mock.patch.object(XmlParser, "emit_event")
-    def test_queue_node(self, mock_emit_event, mock_next_node):
+    def test_queue(self, mock_emit_event, mock_next_node):
         primitive_node = PrimitiveNode(position=1, types=[int])
         mock_next_node.return_value = primitive_node
         element = Element("{urn:books}books")
@@ -40,13 +40,14 @@ class XmlParserTests(TestCase):
             position=0, meta=self.parser.context.build(Books), default=None,
         )
 
-        self.parser.index = 0
-        self.parser.queue.append(root_queue_item)
-        self.parser.queue_node(element)
+        objects = list()
+        queue = list()
+        queue.append(root_queue_item)
+        self.parser.queue(element, queue, objects)
 
-        self.assertEqual(2, len(self.parser.queue))
-        self.assertEqual(root_queue_item, self.parser.queue[0])
-        self.assertEqual(primitive_node, self.parser.queue[1])
+        self.assertEqual(2, len(queue))
+        self.assertEqual(root_queue_item, queue[0])
+        self.assertEqual(primitive_node, queue[1])
 
         mock_emit_event.assert_called_once_with(
             EventType.START, element.tag, item=root_queue_item, element=element
@@ -54,18 +55,19 @@ class XmlParserTests(TestCase):
 
     @mock.patch.object(XmlParser, "emit_event")
     @mock.patch.object(PrimitiveNode, "parse_element", return_value=("q", "result"))
-    def test_dequeue_node(self, mock_parse_element, mock_emit_event):
+    def test_dequeue(self, mock_parse_element, mock_emit_event):
         element = Element("author", nsmap={"prefix": "uri"})
         element.text = "foobar"
 
-        queue_item = PrimitiveNode(position=0, types=[str], default=None)
-        self.parser.queue.append(queue_item)
+        objects = list()
+        queue = list()
+        queue.append(PrimitiveNode(position=0, types=[str], default=None))
 
-        result = self.parser.dequeue_node(element)
+        result = self.parser.dequeue(element, queue, objects)
         self.assertEqual("result", result)
-        self.assertEqual(0, len(self.parser.queue))
-        self.assertEqual(("q", result), self.parser.objects[-1])
-        mock_parse_element.assert_called_once_with(element, self.parser.objects)
+        self.assertEqual(0, len(queue))
+        self.assertEqual(("q", result), objects[-1])
+        mock_parse_element.assert_called_once_with(element, objects)
         mock_emit_event.assert_called_once_with(
             EventType.END, element.tag, obj=result, element=element
         )

@@ -2,10 +2,14 @@ import sys
 from dataclasses import dataclass
 from dataclasses import field
 from pathlib import Path
+from typing import Any
+from typing import List
 from typing import Optional
+from typing import Tuple
 from typing import TypeVar
 
-from lxml import etree
+from lxml.etree import Element
+from lxml.etree import QName
 
 from xsdata.formats.dataclass.parsers.nodes import XmlNode
 from xsdata.formats.dataclass.parsers.xml import XmlParser
@@ -16,6 +20,8 @@ from xsdata.models.enums import Namespace
 from xsdata.models.mixins import ElementBase
 
 T = TypeVar("T")
+ParsedObjects = List[Tuple[QName, Any]]
+XmlNodes = List[XmlNode]
 
 
 @dataclass
@@ -42,17 +48,17 @@ class SchemaParser(XmlParser):
         self.schema_location = path
         return super().from_path(path, xsd.Schema)
 
-    def dequeue_node(self, element: etree.Element) -> T:
+    def dequeue(self, element: Element, queue: XmlNodes, objects: ParsedObjects) -> T:
         """Override parent method to skip empty elements and to set the object
         index."""
-        obj: T = super(SchemaParser, self).dequeue_node(element)
+        obj: T = super(SchemaParser, self).dequeue(element, queue, objects)
 
         if isinstance(obj, ElementBase):
             obj.index = element.sourceline
             self.set_namespace_map(element, obj)
         return obj
 
-    def start_schema(self, element: etree.Element, item: XmlNode):
+    def start_schema(self, element: Element, item: XmlNode):
         """Collect the schema's default form for attributes and elements for
         later usage."""
 
@@ -77,7 +83,7 @@ class SchemaParser(XmlParser):
         for child_attribute in obj.attributes:
             child_attribute.form = FormType.QUALIFIED
 
-    def set_schema_namespaces(self, obj: xsd.Schema, element: etree.Element):
+    def set_schema_namespaces(self, obj: xsd.Schema, element: Element):
         """Set the given schema's target namespace and add the default
         namespaces if the are missing xsi, xlink, xml, xs."""
         obj.target_namespace = obj.target_namespace or self.target_namespace
@@ -85,7 +91,7 @@ class SchemaParser(XmlParser):
         self.set_namespace_map(element, obj)
 
     @staticmethod
-    def set_namespace_map(element: etree.Element, obj: ElementBase):
+    def set_namespace_map(element: Element, obj: ElementBase):
         obj.ns_map = element.nsmap
         namespaces = obj.ns_map.values()
         for namespace in Namespace:
@@ -137,13 +143,13 @@ class SchemaParser(XmlParser):
 
         return self.resolve_path(location)
 
-    def end_attribute(self, obj: T, element: etree.Element):
+    def end_attribute(self, obj: T, element: Element):
         """Assign the schema's default form for attributes if the given
         attribute form is None."""
         if isinstance(obj, xsd.Attribute) and obj.form is None and self.attribute_form:
             obj.form = FormType(self.attribute_form)
 
-    def end_complex_type(self, obj: T, element: etree.Element):
+    def end_complex_type(self, obj: T, element: Element):
         """Prepend an attribute group reference when default attributes
         apply."""
         if not isinstance(obj, xsd.ComplexType):
@@ -156,34 +162,34 @@ class SchemaParser(XmlParser):
         if not obj.open_content:
             obj.open_content = self.default_open_content
 
-    def end_default_open_content(self, obj: T, element: etree.Element):
+    def end_default_open_content(self, obj: T, element: Element):
         if isinstance(obj, xsd.DefaultOpenContent):
             if obj.any and obj.mode == Mode.SUFFIX:
                 obj.any.index = sys.maxsize
 
             self.default_open_content = obj
 
-    def end_element(self, obj: T, element: etree.Element):
+    def end_element(self, obj: T, element: Element):
         """Assign the schema's default form for elements if the given element
         form is None."""
         if isinstance(obj, xsd.Element) and obj.form is None and self.element_form:
             obj.form = FormType(self.element_form)
 
-    def end_extension(self, obj: T, element: etree.Element):
+    def end_extension(self, obj: T, element: Element):
         if isinstance(obj, xsd.Extension) and not obj.open_content:
             obj.open_content = self.default_open_content
 
     @classmethod
-    def end_open_content(cls, obj: T, element: etree.Element):
+    def end_open_content(cls, obj: T, element: Element):
         if isinstance(obj, xsd.OpenContent):
             if obj.any and obj.mode == Mode.SUFFIX:
                 obj.any.index = sys.maxsize
 
-    def end_restriction(self, obj: T, element: etree.Element):
+    def end_restriction(self, obj: T, element: Element):
         if isinstance(obj, xsd.Restriction) and not obj.open_content:
             obj.open_content = self.default_open_content
 
-    def end_schema(self, obj: T, element: etree.Element):
+    def end_schema(self, obj: T, element: Element):
         """Normalize various properties for the schema and it's children."""
         if isinstance(obj, xsd.Schema):
             self.set_schema_forms(obj)

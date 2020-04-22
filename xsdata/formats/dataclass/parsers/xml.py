@@ -22,11 +22,13 @@ from xsdata.models.enums import EventType
 from xsdata.utils import text
 
 
+ParsedObjects = List[Tuple[QName, Any]]
+XmlNodes = List[XmlNode]
+
+
 @dataclass
 class XmlParser(AbstractParser):
-    queue: List[XmlNode] = field(init=False, default_factory=list)
     namespaces: Namespaces = field(init=False, default_factory=Namespaces)
-    objects: List[Tuple[QName, Any]] = field(init=False, default_factory=list)
     context: XmlContext = field(default_factory=XmlContext)
     event_names: Dict = field(default_factory=dict)
 
@@ -48,17 +50,17 @@ class XmlParser(AbstractParser):
         """
         obj = None
         meta = self.context.build(clazz)
-        self.objects = []
         self.namespaces.clear()
-        self.queue = [RootNode(position=0, meta=meta, default=None)]
+        objects: ParsedObjects = []
+        queue: XmlNodes = [RootNode(position=0, meta=meta, default=None)]
 
         for event, element in context:
             if event == EventType.START_NS:
                 self.add_namespace(element)
             if event == EventType.START:
-                self.queue_node(element)
+                self.queue(element, queue, objects)
             elif event == EventType.END:
-                obj = self.dequeue_node(element)
+                obj = self.dequeue(element, queue, objects)
 
         if not obj:
             raise ParserError(f"Failed to create target class `{clazz.__name__}`")
@@ -70,28 +72,28 @@ class XmlParser(AbstractParser):
         prefix, uri = namespace
         self.namespaces.add(uri, prefix)
 
-    def queue_node(self, element: Element):
+    def queue(self, element: Element, queue: XmlNodes, objects: ParsedObjects):
         """Queue the next xml node for parsing based on the given element
         qualified name."""
-        item = self.queue[-1]
-        position = len(self.objects)
+        item = queue[-1]
+        position = len(objects)
 
         queue_item = item.next_node(element, position, self.context)
 
-        self.queue.append(queue_item)
+        queue.append(queue_item)
         self.emit_event(EventType.START, element.tag, item=item, element=element)
 
-    def dequeue_node(self, element: Element) -> T:
+    def dequeue(self, element: Element, queue: XmlNodes, objects: ParsedObjects) -> T:
         """
         Use the last xml node to parse the given element and bind any child
         objects.
 
         :returns object: A dataclass object or a python primitive value.
         """
-        item = self.queue.pop()
-        qname, obj = item.parse_element(element, self.objects)
+        item = queue.pop()
+        qname, obj = item.parse_element(element, objects)
 
-        self.objects.append((qname, obj))
+        objects.append((qname, obj))
         self.emit_event(EventType.END, element.tag, obj=obj, element=element)
 
         element.clear()

@@ -18,7 +18,6 @@ from xsdata.models.elements import Element
 from xsdata.models.elements import Enumeration
 from xsdata.models.elements import Group
 from xsdata.models.elements import List as ListElement
-from xsdata.models.elements import Restriction
 from xsdata.models.elements import Schema
 from xsdata.models.elements import SimpleType
 from xsdata.models.elements import Union as UnionElement
@@ -30,7 +29,7 @@ from xsdata.utils import text
 
 BaseElement = Union[Attribute, AttributeGroup, Element, ComplexType, SimpleType, Group]
 AttributeElement = Union[
-    Attribute, Element, Restriction, Enumeration, UnionElement, ListElement, SimpleType
+    Attribute, Element, Enumeration, UnionElement, ListElement, SimpleType
 ]
 
 
@@ -229,74 +228,33 @@ class ClassBuilder:
     def build_class_attribute_types(
         self, target: Class, obj: AttributeElement
     ) -> List[AttrType]:
-        """Convert real type and anonymous inner elements to an attribute type
+        """Convert real type and anonymous inner types to an attribute type
         list."""
-        inner_class = self.build_inner_class(obj)
-
         types = [
             self.build_data_type(target, name)
             for name in (obj.real_type or "").split(" ")
             if name
         ]
 
-        if inner_class:
-            target.inner.append(inner_class)
-            types.append(AttrType(name=inner_class.name, forward_ref=True))
+        for inner in self.build_inner_classes(obj):
+            target.inner.append(inner)
+            types.append(AttrType(name=inner.name, forward_ref=True))
 
         if len(types) == 0:
             types.append(AttrType(name=obj.default_type.code, native=True))
 
         return types
 
-    def build_inner_class(self, obj: AttributeElement) -> Optional[Class]:
-        """Find and convert anonymous types to a class instance."""
-        if self.has_anonymous_class(obj):
-            complex_type = obj.complex_type  # type: ignore
-            complex_type.name = obj.name  # type: ignore
-            obj.complex_type = None  # type: ignore
-            return self.build_class(complex_type)  # type: ignore
-
-        if self.has_anonymous_enumeration(obj):
-            simple_type = obj.simple_type  # type: ignore
-            simple_type.name = obj.real_name  # type: ignore
-            obj.type = None  # type: ignore
-            obj.simple_type = None  # type: ignore
-            return self.build_class(simple_type)  # type: ignore
-
+    def build_inner_classes(self, obj: AttributeElement) -> Iterator[Class]:
+        """Find and convert anonymous types to a class instances."""
         if isinstance(obj, SimpleType) and obj.is_enumeration:
-            obj.name = "type"
-            inner = self.build_class(obj)
-            obj.name = "value"
-            obj.restriction = None
-            return inner
-
-        if isinstance(obj, UnionElement) and obj.simple_types:
-            # Only the last occurrence will be converted. It doesn't make sense
-            # to have a union with two anonymous enumerations.
-            for i in range(len(obj.simple_types) - 1, -1, -1):
-                if obj.simple_types[i].is_enumeration:
-                    simple_type = obj.simple_types.pop(i)
-                    simple_type.name = obj.real_name
-                    return self.build_class(simple_type)
-
-        return None
-
-    @staticmethod
-    def has_anonymous_class(obj: AttributeElement) -> bool:
-        """Check if the attribute element contains anonymous complex type."""
-        return (
-            isinstance(obj, Element)
-            and obj.real_type is None
-            and obj.complex_type is not None
-        )
-
-    @staticmethod
-    def has_anonymous_enumeration(obj: AttributeElement) -> bool:
-        """Check if the attribute element contains anonymous restriction with
-        enumeration facet."""
-        return (
-            isinstance(obj, (Attribute, Element))
-            and obj.type is None
-            and obj.simple_type is not None
-            and obj.simple_type.is_enumeration
-        )
+            yield self.build_class(obj)
+        else:
+            for child in obj.children():
+                if isinstance(child, ComplexType) or (
+                    isinstance(child, SimpleType) and child.is_enumeration
+                ):
+                    child.name = obj.real_name
+                    yield self.build_class(child)
+                else:
+                    yield from self.build_inner_classes(child)

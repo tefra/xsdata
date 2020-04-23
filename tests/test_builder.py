@@ -1,8 +1,7 @@
 from pathlib import Path
 from types import GeneratorType
-from unittest.mock import call
-from unittest.mock import patch
-from unittest.mock import PropertyMock
+from typing import Iterator
+from unittest import mock
 
 from tests.factories import AttrFactory
 from tests.factories import AttrTypeFactory
@@ -11,6 +10,7 @@ from tests.factories import ExtensionFactory
 from tests.factories import FactoryTestCase
 from xsdata.builder import ClassBuilder
 from xsdata.models.codegen import Restrictions
+from xsdata.models.elements import Alternative
 from xsdata.models.elements import Attribute
 from xsdata.models.elements import AttributeGroup
 from xsdata.models.elements import ComplexContent
@@ -26,7 +26,6 @@ from xsdata.models.elements import Schema
 from xsdata.models.elements import Sequence
 from xsdata.models.elements import SimpleContent
 from xsdata.models.elements import SimpleType
-from xsdata.models.elements import Union
 from xsdata.models.enums import DataType
 from xsdata.models.enums import FormType
 from xsdata.models.enums import Tag
@@ -38,9 +37,9 @@ class ClassBuilderTests(FactoryTestCase):
         self.schema = Schema.create(location=Path(__file__), target_namespace="builder")
         self.builder = ClassBuilder(schema=self.schema, package="tests")
 
-    @patch.object(Redefine, "children")
-    @patch.object(Override, "children")
-    @patch.object(ClassBuilder, "build_class")
+    @mock.patch.object(Redefine, "children")
+    @mock.patch.object(Override, "children")
+    @mock.patch.object(ClassBuilder, "build_class")
     def test_build(
         self, mock_build_class, mock_override_children, mock_redefine_children
     ):
@@ -75,24 +74,24 @@ class ClassBuilderTests(FactoryTestCase):
         self.assertEqual(classes, self.builder.build())
         mock_build_class.assert_has_calls(
             [
-                call(override_element),
-                call(override_attribute),
-                call(override_complex_type),
-                call(redefine_simple_type),
-                call(redefine_group),
-                call(redefine_attribute_group),
-                call(self.schema.simple_types[0]),
-                call(self.schema.simple_types[1]),
-                call(self.schema.attribute_groups[0]),
-                call(self.schema.attribute_groups[1]),
-                call(self.schema.groups[0]),
-                call(self.schema.groups[1]),
-                call(self.schema.attributes[0]),
-                call(self.schema.attributes[1]),
-                call(self.schema.complex_types[0]),
-                call(self.schema.complex_types[1]),
-                call(self.schema.elements[0]),
-                call(self.schema.elements[1]),
+                mock.call(override_element),
+                mock.call(override_attribute),
+                mock.call(override_complex_type),
+                mock.call(redefine_simple_type),
+                mock.call(redefine_group),
+                mock.call(redefine_attribute_group),
+                mock.call(self.schema.simple_types[0]),
+                mock.call(self.schema.simple_types[1]),
+                mock.call(self.schema.attribute_groups[0]),
+                mock.call(self.schema.attribute_groups[1]),
+                mock.call(self.schema.groups[0]),
+                mock.call(self.schema.groups[1]),
+                mock.call(self.schema.attributes[0]),
+                mock.call(self.schema.attributes[1]),
+                mock.call(self.schema.complex_types[0]),
+                mock.call(self.schema.complex_types[1]),
+                mock.call(self.schema.elements[0]),
+                mock.call(self.schema.elements[1]),
             ]
         )
 
@@ -119,14 +118,14 @@ class ClassBuilderTests(FactoryTestCase):
         attribute.target_namespace = "tns"
         self.assertEqual("tns", self.builder.element_namespace(attribute))
 
-    @patch.object(ClassBuilder, "element_namespace")
-    @patch.object(ClassBuilder, "build_class_attributes")
-    @patch.object(ClassBuilder, "build_class_extensions")
-    @patch.object(Element, "substitutions", new_callable=PropertyMock)
-    @patch.object(Element, "is_abstract", new_callable=PropertyMock)
-    @patch.object(Element, "is_nillable", new_callable=PropertyMock)
-    @patch.object(Element, "display_help", new_callable=PropertyMock)
-    @patch.object(Element, "real_name", new_callable=PropertyMock)
+    @mock.patch.object(ClassBuilder, "element_namespace")
+    @mock.patch.object(ClassBuilder, "build_class_attributes")
+    @mock.patch.object(ClassBuilder, "build_class_extensions")
+    @mock.patch.object(Element, "substitutions", new_callable=mock.PropertyMock)
+    @mock.patch.object(Element, "is_abstract", new_callable=mock.PropertyMock)
+    @mock.patch.object(Element, "is_nillable", new_callable=mock.PropertyMock)
+    @mock.patch.object(Element, "display_help", new_callable=mock.PropertyMock)
+    @mock.patch.object(Element, "real_name", new_callable=mock.PropertyMock)
     def test_build_class(
         self,
         mock_real_name,
@@ -167,7 +166,7 @@ class ClassBuilderTests(FactoryTestCase):
         )
         self.assertEqual(expected, result)
 
-    @patch.object(ClassBuilder, "children_extensions")
+    @mock.patch.object(ClassBuilder, "children_extensions")
     def test_build_class_extensions(self, mock_children_extensions):
         bar_type = AttrTypeFactory.create(name="bar", index=3)
         foo_type = AttrTypeFactory.create(name="foo", index=1)
@@ -248,14 +247,14 @@ class ClassBuilderTests(FactoryTestCase):
         self.assertIsInstance(children, GeneratorType)
         self.assertEqual(expected, list(children))
 
-    @patch.object(ClassBuilder, "build_class_attribute_types")
-    @patch.object(ClassBuilder, "element_namespace")
-    @patch.object(Attribute, "get_restrictions")
-    @patch.object(Attribute, "is_fixed", new_callable=PropertyMock)
-    @patch.object(Attribute, "default_value", new_callable=PropertyMock)
-    @patch.object(Attribute, "prefix", new_callable=PropertyMock)
-    @patch.object(Attribute, "display_help", new_callable=PropertyMock)
-    @patch.object(Attribute, "real_name", new_callable=PropertyMock)
+    @mock.patch.object(ClassBuilder, "build_class_attribute_types")
+    @mock.patch.object(ClassBuilder, "element_namespace")
+    @mock.patch.object(Attribute, "get_restrictions")
+    @mock.patch.object(Attribute, "is_fixed", new_callable=mock.PropertyMock)
+    @mock.patch.object(Attribute, "default_value", new_callable=mock.PropertyMock)
+    @mock.patch.object(Attribute, "prefix", new_callable=mock.PropertyMock)
+    @mock.patch.object(Attribute, "display_help", new_callable=mock.PropertyMock)
+    @mock.patch.object(Attribute, "real_name", new_callable=mock.PropertyMock)
     def test_build_class_attribute(
         self,
         mock_real_name,
@@ -299,11 +298,13 @@ class ClassBuilderTests(FactoryTestCase):
         mock_build_class_attribute_types.assert_called_once_with(item, attribute)
         mock_element_namespace.assert_called_once_with(attribute)
 
-    @patch.object(Attribute, "real_type", new_callable=PropertyMock)
-    @patch.object(ClassBuilder, "build_inner_class")
-    def test_build_class_attribute_types(self, mock_build_inner_class, mock_real_type):
+    @mock.patch.object(Attribute, "real_type", new_callable=mock.PropertyMock)
+    @mock.patch.object(ClassBuilder, "build_inner_classes")
+    def test_build_class_attribute_types(
+        self, mock_build_inner_classes, mock_real_type
+    ):
         mock_real_type.return_value = " xs:integer  xs:string "
-        mock_build_inner_class.return_value = None
+        mock_build_inner_classes.return_value = []
 
         item = ClassFactory.create()
         attribute = Attribute.create(default="false", index=66)
@@ -313,14 +314,14 @@ class ClassBuilderTests(FactoryTestCase):
 
         self.assertEqual(expected, actual)
 
-    @patch.object(Attribute, "real_type", new_callable=PropertyMock)
-    @patch.object(ClassBuilder, "build_inner_class")
+    @mock.patch.object(Attribute, "real_type", new_callable=mock.PropertyMock)
+    @mock.patch.object(ClassBuilder, "build_inner_classes")
     def test_build_class_attribute_types_when_obj_has_inner_class(
-        self, mock_build_inner_class, mock_real_type
+        self, mock_build_inner_classes, mock_real_type
     ):
         inner_class = ClassFactory.create(name="foo")
         mock_real_type.return_value = " xs:integer  xs:string "
-        mock_build_inner_class.return_value = inner_class
+        mock_build_inner_classes.return_value = [inner_class]
 
         item = ClassFactory.create()
         attribute = Attribute.create(default="false", index=66)
@@ -335,14 +336,14 @@ class ClassBuilderTests(FactoryTestCase):
         self.assertEqual(expected, actual)
         self.assertEqual([inner_class], item.inner)
 
-    @patch.object(Attribute, "default_type", new_callable=PropertyMock)
-    @patch.object(Attribute, "real_type", new_callable=PropertyMock)
-    @patch.object(ClassBuilder, "build_inner_class")
+    @mock.patch.object(Attribute, "default_type", new_callable=mock.PropertyMock)
+    @mock.patch.object(Attribute, "real_type", new_callable=mock.PropertyMock)
+    @mock.patch.object(ClassBuilder, "build_inner_classes")
     def test_build_class_attribute_types_when_obj_has_no_types(
-        self, mock_build_inner_class, mock_real_type, mock_default_type
+        self, mock_build_inner_classes, mock_real_type, mock_default_type
     ):
         mock_real_type.return_value = None
-        mock_build_inner_class.return_value = None
+        mock_build_inner_classes.return_value = []
         mock_default_type.return_value = DataType.STRING
 
         item = ClassFactory.create()
@@ -352,109 +353,44 @@ class ClassBuilderTests(FactoryTestCase):
         self.assertEqual(1, len(actual))
         self.assertEqual(AttrTypeFactory.xs_string(), actual[0])
 
-    @patch.object(ClassBuilder, "build_class")
-    @patch.object(ClassBuilder, "has_anonymous_class")
-    def test_build_inner_class_when_has_anonymous_class(
-        self, mock_has_anonymous_class, mock_build_class
-    ):
-        inner_class = ClassFactory.create()
-        mock_build_class.return_value = inner_class
-        mock_has_anonymous_class.return_value = True
-
-        complex_type = ComplexType.create()
-        element = Element.create(name="foo", complex_type=complex_type)
-
-        self.assertEqual(inner_class, self.builder.build_inner_class(element))
-        self.assertIsNone(element.complex_type)
-        self.assertEqual("foo", complex_type.name)
-
-    @patch.object(ClassBuilder, "build_class")
-    @patch.object(ClassBuilder, "has_anonymous_enumeration")
-    @patch.object(ClassBuilder, "has_anonymous_class")
-    def test_build_inner_class_when_has_anonymous_enumeration(
-        self, mock_has_anonymous_class, mock_has_anonymous_enumeration, mock_build_class
-    ):
-        inner_class = ClassFactory.create()
-        mock_build_class.return_value = inner_class
-        mock_has_anonymous_class.return_value = False
-        mock_has_anonymous_enumeration.return_value = True
+    @mock.patch.object(ClassBuilder, "build_class")
+    def test_build_inner_classes(self, mock_build_class):
+        inner_classes = ClassFactory.list(2)
+        mock_build_class.side_effect = inner_classes
 
         simple_type = SimpleType.create()
-        element = Element.create(name="foo", simple_type=simple_type, type="xs:int")
-
-        self.assertEqual(inner_class, self.builder.build_inner_class(element))
-        self.assertIsNone(element.simple_type)
-        self.assertIsNone(element.type)
-        self.assertEqual("foo", simple_type.name)
-
-    @patch.object(ClassBuilder, "build_class")
-    @patch.object(ClassBuilder, "has_anonymous_enumeration")
-    @patch.object(ClassBuilder, "has_anonymous_class")
-    def test_build_inner_class_when_is_anonymous_enumeration(
-        self, mock_has_anonymous_class, mock_has_anonymous_enumeration, mock_build_class
-    ):
-        inner_class = ClassFactory.create()
-        mock_build_class.return_value = inner_class
-        mock_has_anonymous_class.return_value = False
-        mock_has_anonymous_enumeration.return_value = False
-
-        simple_type = SimpleType.create(restriction=Restriction.create())
-        simple_type.restriction.enumerations.append(Enumeration.create())
-
-        self.assertEqual(inner_class, self.builder.build_inner_class(simple_type))
-        self.assertEqual("value", simple_type.name)
-        self.assertIsNone(simple_type.restriction)
-
-    @patch.object(ClassBuilder, "build_class")
-    @patch.object(ClassBuilder, "has_anonymous_enumeration")
-    @patch.object(ClassBuilder, "has_anonymous_class")
-    def test_build_inner_class_when_union_has_anonymous_enumeration(
-        self, mock_has_anonymous_class, mock_has_anonymous_enumeration, mock_build_class
-    ):
-        inner_class = ClassFactory.create()
-        mock_build_class.return_value = inner_class
-        mock_has_anonymous_class.return_value = False
-        mock_has_anonymous_enumeration.return_value = False
-
-        union = Union.create(name="foo", type="xs:int")
-        simple_type_a = SimpleType.create(
+        complex_type = ComplexType.create()
+        enumeration = SimpleType.create(
             restriction=Restriction.create(enumerations=[Enumeration.create(value="a")])
         )
-        simple_type_b = SimpleType.create(
-            restriction=Restriction.create(enumerations=[Enumeration.create(value="b")])
+
+        element = Element.create(
+            alternatives=[
+                Alternative.create(complex_type=complex_type, id="a"),
+                Alternative.create(simple_type=simple_type, id="b"),
+                Alternative.create(simple_type=enumeration, id="c"),
+            ]
         )
-        union.simple_types = [simple_type_a, simple_type_b]
+        result = self.builder.build_inner_classes(element)
+        self.assertIsInstance(result, Iterator)
+        self.assertEqual(inner_classes, list(result))
+        self.assertEqual("a", complex_type.name)
+        self.assertEqual("c", enumeration.name)
 
-        self.assertEqual(inner_class, self.builder.build_inner_class(union))
-        self.assertEqual([simple_type_a], union.simple_types)
-        mock_build_class.assert_called_once_with(simple_type_b)
+        mock_build_class.assert_has_calls(
+            [mock.call(complex_type), mock.call(enumeration)]
+        )
 
-    def test_has_anonymous_class(self):
-        obj = Element.create()
-        self.assertFalse(self.builder.has_anonymous_class(obj))
+    @mock.patch.object(ClassBuilder, "build_class")
+    def test_build_inner_classes_with_enumeration(self, mock_build_class):
+        inner = ClassFactory.enumeration(2)
+        mock_build_class.return_value = inner
 
-        obj = Element.create(type="foo")
-        self.assertFalse(self.builder.has_anonymous_class(obj))
+        enumeration = SimpleType.create(
+            restriction=Restriction.create(enumerations=[Enumeration.create(value="a")])
+        )
 
-        obj = Element.create(complex_type=ComplexType.create())
-        self.assertTrue(self.builder.has_anonymous_class(obj))
-
-        obj = Attribute.create()
-        self.assertFalse(self.builder.has_anonymous_class(obj))
-
-    def test_has_anonymous_enumeration(self):
-        for clazz in [Element, Attribute]:
-            obj = clazz.create()
-            self.assertFalse(self.builder.has_anonymous_enumeration(obj))
-
-            obj = clazz.create(simple_type=SimpleType.create())
-            self.assertFalse(self.builder.has_anonymous_enumeration(obj))
-
-            obj.simple_type.restriction = Restriction.create()
-            self.assertFalse(self.builder.has_anonymous_enumeration(obj))
-
-            obj.simple_type.restriction.enumerations.append(Enumeration.create())
-            self.assertTrue(self.builder.has_anonymous_enumeration(obj))
-
-            obj.type = "foo"
-            self.assertFalse(self.builder.has_anonymous_enumeration(obj))
+        result = self.builder.build_inner_classes(enumeration)
+        self.assertIsInstance(result, Iterator)
+        self.assertEqual([inner], list(result))
+        self.assertIsNone(enumeration.name)

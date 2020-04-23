@@ -21,7 +21,12 @@ class RestrictionTests(TestCase):
         obj = Restriction.create(base="foo")
         self.assertEqual(obj.base, obj.real_type)
 
-        obj.simple_type = SimpleType.create(restriction=Restriction.create(base="bar"))
+        obj.enumerations.append(Enumeration.create())
+        self.assertIsNone(obj.real_type)
+
+        obj = Restriction.create(
+            simple_type=SimpleType.create(restriction=Restriction.create(base="bar"))
+        )
 
         self.assertEqual("bar", obj.real_type)
 

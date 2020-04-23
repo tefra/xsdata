@@ -20,6 +20,7 @@ from xsdata.models.enums import NamespaceType
 from xsdata.models.enums import ProcessType
 from xsdata.models.enums import UseType
 from xsdata.models.mixins import ElementBase
+from xsdata.utils import text
 from xsdata.utils.text import collapse_whitespace
 
 
@@ -118,6 +119,7 @@ class Annotation(ElementBase):
 class AnnotationBase(ElementBase):
     """Base Class for elements that can contain annotations."""
 
+    id: Optional[str] = attribute()
     annotation: Optional[Annotation] = element()
     any_attribute: Optional["AnyAttribute"] = element(name="anyAttribute")
 
@@ -209,16 +211,22 @@ class SimpleType(AnnotationBase):
     union: Optional["Union"] = element()
 
     @property
+    def is_attribute(self) -> bool:
+        return True
+
+    @property
     def is_enumeration(self):
         return self.restriction and len(self.restriction.enumerations) > 0
 
     @property
-    def is_attribute(self) -> bool:
-        return self.is_enumeration
+    def real_name(self) -> str:
+        if self.name:
+            return self.name
+        return "value"
 
     @property
     def real_type(self) -> Optional[str]:
-        if self.restriction:
+        if not self.is_enumeration and self.restriction:
             return self.restriction.real_type
         if self.list:
             return self.list.real_type
@@ -290,6 +298,10 @@ class Union(AnnotationBase):
         return True
 
     @property
+    def real_name(self) -> str:
+        return "value"
+
+    @property
     def real_type(self) -> Optional[str]:
         types = []
         if self.simple_types:
@@ -304,10 +316,6 @@ class Union(AnnotationBase):
             types.extend([member for member in self.member_types.split(" ") if member])
 
         return " ".join(types) if types else None
-
-    @property
-    def real_name(self) -> str:
-        return "value"
 
     def get_restrictions(self) -> Dict[str, Anything]:
         restrictions = dict()
@@ -870,6 +878,8 @@ class Restriction(AnnotationBase):
     def real_type(self) -> Optional[str]:
         if self.simple_type:
             return self.simple_type.real_type
+        if self.enumerations:
+            return None
         return self.base
 
     @property
@@ -1089,6 +1099,14 @@ class Alternative(AnnotationBase):
     simple_type: Optional[SimpleType] = element(name="simpleType")
     complex_type: Optional[ComplexType] = element(name="complexType")
 
+    @property
+    def real_name(self) -> str:
+        if self.test:
+            return text.snake_case(self.test)
+        if self.id:
+            return self.id
+        return "value"
+
 
 @dataclass
 class Element(AnnotationBase):
@@ -1116,7 +1134,6 @@ class Element(AnnotationBase):
     """
 
     name: Optional[str] = attribute()
-    id: Optional[str] = attribute()
     ref: Optional[str] = attribute()
     type: Optional[str] = attribute()
     substitution_group: Optional[str] = attribute(name="substitutionGroup")

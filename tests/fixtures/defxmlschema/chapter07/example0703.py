@@ -32,14 +32,14 @@ class Attributes:
             type="Attribute"
         )
     )
-    system: Optional["Attributes.Type"] = field(
+    system: Optional["Attributes.Value"] = field(
         default=None,
         metadata=dict(
             type="Attribute"
         )
     )
 
-    class Type(Enum):
+    class Value(Enum):
         """
         :cvar US_DRESS:
         """

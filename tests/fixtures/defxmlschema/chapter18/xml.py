@@ -62,11 +62,11 @@ class Space:
         name = "space"
         namespace = "http://www.w3.org/XML/1998/namespace"
 
-    value: Optional["Space.Type"] = field(
+    value: Optional["Space.Value"] = field(
         default=None,
     )
 
-    class Type(Enum):
+    class Value(Enum):
         """
         :cvar DEFAULT:
         :cvar PRESERVE:
@@ -100,7 +100,7 @@ class SpecialAttrs:
             namespace="http://www.w3.org/XML/1998/namespace"
         )
     )
-    space: Optional["SpecialAttrs.Type"] = field(
+    space: Optional["SpecialAttrs.Value"] = field(
         default=None,
         metadata=dict(
             type="Attribute",
@@ -115,7 +115,7 @@ class SpecialAttrs:
         )
     )
 
-    class Type(Enum):
+    class Value(Enum):
         """
         :cvar DEFAULT:
         :cvar PRESERVE:

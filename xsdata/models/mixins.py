@@ -45,7 +45,6 @@ class BaseModel:
 @dataclass
 class ElementBase(BaseModel):
     index: int = field(default_factory=int)
-    id: Optional[str] = None
     ns_map: Dict = field(default_factory=dict)
 
     @property

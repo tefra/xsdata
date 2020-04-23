@@ -1,6 +1,5 @@
 from unittest import TestCase
 
-from xsdata.exceptions import SchemaValueError
 from xsdata.models.elements import Enumeration
 from xsdata.models.elements import Length
 from xsdata.models.elements import List
@@ -11,13 +10,11 @@ from xsdata.models.elements import Union
 
 class SimpleTypeTests(TestCase):
     def test_property_real_name(self):
-        obj = SimpleType.create(name="foo")
-        self.assertEqual("foo", obj.real_name)
+        obj = SimpleType.create()
+        self.assertEqual("value", obj.real_name)
 
-        with self.assertRaises(SchemaValueError):
-            obj = SimpleType.create()
-            self.assertFalse(hasattr(obj, "ref"))
-            obj.real_name
+        obj.name = "foo"
+        self.assertEqual("foo", obj.real_name)
 
     def test_property_extends(self):
         obj = SimpleType.create()
@@ -36,18 +33,23 @@ class SimpleTypeTests(TestCase):
         obj.restriction = Restriction.create(base="bar")
         self.assertEqual("bar", obj.real_type)
 
+        obj = SimpleType.create(restriction=Restriction.create())
+        obj.restriction.enumerations.append(Enumeration.create())
+        self.assertIsNone(obj.real_type)
+
+    def test_property_is_attribute(self):
+        obj = SimpleType.create()
+        self.assertTrue(obj.is_attribute)
+
     def test_property_is_enumeration(self):
         obj = SimpleType.create()
         self.assertFalse(obj.is_enumeration)
-        self.assertFalse(obj.is_attribute)
 
         obj.restriction = Restriction.create()
         self.assertFalse(obj.is_enumeration)
-        self.assertFalse(obj.is_attribute)
 
         obj.restriction.enumerations.append(Enumeration.create())
         self.assertTrue(obj.is_enumeration)
-        self.assertTrue(obj.is_attribute)
 
     def test_get_restrictions(self):
         obj = SimpleType.create()

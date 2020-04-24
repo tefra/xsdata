@@ -891,6 +891,10 @@ class Restriction(AnnotationBase):
         return self.base
 
     def get_restrictions(self) -> Dict[str, Anything]:
+        restrictions = dict()
+        if self.simple_type:
+            restrictions.update(self.simple_type.get_restrictions())
+
         keys = (
             "min_exclusive",
             "min_inclusive",
@@ -904,11 +908,13 @@ class Restriction(AnnotationBase):
             "white_space",
             "explicit_timezone",
         )
-        restrictions = {
-            key: getattr(self, key).value
-            for key in keys
-            if getattr(self, key) is not None
-        }
+        restrictions.update(
+            {
+                key: getattr(self, key).value
+                for key in keys
+                if getattr(self, key) is not None
+            }
+        )
 
         if self.patterns:
             restrictions["pattern"] = "|".join(

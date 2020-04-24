@@ -8,7 +8,6 @@ from tests.factories import AttrTypeFactory
 from tests.factories import ClassFactory
 from tests.factories import ExtensionFactory
 from tests.factories import FactoryTestCase
-from tests.factories import RestrictionsFactory
 from xsdata.analyzer import ClassAnalyzer
 from xsdata.exceptions import AnalyzerError
 from xsdata.models.codegen import Class
@@ -181,16 +180,20 @@ class ClassAnalyzerTests(FactoryTestCase):
 
         mock_flatten_class.assert_called_once_with(class_a)
 
-    def test_find_common_class(self):
+    def test_find_attr_type(self):
         a = ClassFactory.enumeration(1, name="a")
         b = ClassFactory.elements(1, name="b", abstract=True)
         c = ClassFactory.elements(1, name="c")
+        type_a = AttrTypeFactory.create(name="a")
+        type_b = AttrTypeFactory.create(name="b")
+        type_c = AttrTypeFactory.create(name="c")
 
         self.analyzer.create_class_index([a, b, c])
 
-        self.assertEqual(a, self.analyzer.find_common_class(a.source_qname()))
-        self.assertEqual(b, self.analyzer.find_common_class(b.source_qname()))
-        self.assertIsNone(self.analyzer.find_common_class(c.source_qname()))
+        self.assertIsNone(self.analyzer.find_attr_type(a, type_a))  # Enumeration
+        self.assertIsNone(self.analyzer.find_attr_type(a, type_c))  # Complex
+        self.assertIsNone(self.analyzer.find_attr_type(b, type_b))  # Source is target
+        self.assertEqual(b, self.analyzer.find_attr_type(a, type_b))
 
     def test_find_simple_class(self):
         a = ClassFactory.enumeration(1, name="a")
@@ -200,10 +203,10 @@ class ClassAnalyzerTests(FactoryTestCase):
 
         self.analyzer.create_class_index([a, b, c, d])
 
-        self.assertEqual(a, self.analyzer.find_common_class(a.source_qname()))
-        self.assertEqual(b, self.analyzer.find_common_class(b.source_qname()))
-        self.assertEqual(c, self.analyzer.find_common_class(c.source_qname()))
-        self.assertIsNone(self.analyzer.find_common_class(d.source_qname()))
+        self.assertEqual(a, self.analyzer.find_simple_class(a.source_qname()))
+        self.assertEqual(b, self.analyzer.find_simple_class(b.source_qname()))
+        self.assertEqual(c, self.analyzer.find_simple_class(c.source_qname()))
+        self.assertIsNone(self.analyzer.find_simple_class(d.source_qname()))
 
     @mock.patch.object(ClassAnalyzer, "merge_duplicate_attributes")
     @mock.patch.object(ClassAnalyzer, "create_mixed_attribute")
@@ -527,7 +530,19 @@ class ClassAnalyzerTests(FactoryTestCase):
 
         self.assertEqual("Group attribute not found: `{foo}bar`", str(cm.exception))
 
-    def test_flatten_attribute_types_when_type_is_native_and_has_pattern(self):
+    def test_flatten_attribute_types_when_type_is_native(self):
+        xs_bool = AttrTypeFactory.xs_bool()
+        xs_decimal = AttrTypeFactory.xs_decimal()
+        attr = AttrFactory.create(types=[xs_bool, xs_decimal])
+        target = ClassFactory.create()
+        self.analyzer.flatten_attribute_types(target, attr)
+
+        self.assertEqual([xs_bool, xs_decimal], attr.types)
+
+        self.analyzer.flatten_attribute_types(target, attr)
+        self.assertEqual([xs_bool, xs_decimal], attr.types)
+
+    def test_flatten_attribute_types_with_restriction_pattern(self):
         xs_bool = AttrTypeFactory.xs_bool()
         xs_decimal = AttrTypeFactory.xs_decimal()
         attr = AttrFactory.create(types=[xs_bool, xs_decimal])
@@ -540,26 +555,13 @@ class ClassAnalyzerTests(FactoryTestCase):
         self.analyzer.flatten_attribute_types(target, attr)
         self.assertEqual([AttrTypeFactory.xs_string()], attr.types)
 
-    @mock.patch.object(ClassAnalyzer, "attr_depends_on", return_value=False)
-    @mock.patch.object(ClassAnalyzer, "find_common_class")
-    def test_flatten_attribute_types_when_no_source_is_found(
-        self, mock_find_common_class, mock_attr_depends_on
-    ):
-        mock_find_common_class.return_value = None
-
-        parent = ClassFactory.create()
-        type_a = AttrTypeFactory.create()
-        attr = AttrFactory.create(name="a", types=[type_a])
-        self.analyzer.flatten_attribute_types(parent, attr)
-
-        self.assertEqual([type_a], attr.types)
-        self.assertFalse(type_a.self_ref)
-        mock_find_common_class.assert_called_once_with(parent.source_qname(type_a.name))
-        mock_attr_depends_on.assert_called_once_with(type_a, parent)
-
     @mock.patch.object(ClassAnalyzer, "attr_depends_on", return_value=True)
-    @mock.patch.object(ClassAnalyzer, "find_common_class", return_value=None)
-    def test_flatten_attribute_types_when_attribute_self_reference(self, *args):
+    @mock.patch.object(ClassAnalyzer, "find_attr_type")
+    def test_flatten_attribute_types_when_source_is_none(
+        self, mock_find_attr_type, mock_attr_depends_on
+    ):
+        mock_find_attr_type.return_value = None
+
         parent = ClassFactory.create()
         type_a = AttrTypeFactory.create()
         attr = AttrFactory.create(name="a", types=[type_a])
@@ -567,65 +569,35 @@ class ClassAnalyzerTests(FactoryTestCase):
 
         self.assertEqual([type_a], attr.types)
         self.assertTrue(type_a.self_ref)
+        mock_find_attr_type.assert_called_once_with(parent, type_a)
+        mock_attr_depends_on.assert_called_once_with(type_a, parent)
 
-    @mock.patch.object(ClassAnalyzer, "find_common_class")
-    def test_flatten_attribute_types_when_source_is_enumeration(
-        self, mock_find_common_class
-    ):
-        mock_find_common_class.return_value = ClassFactory.enumeration(1)
-
-        parent = ClassFactory.create()
-        type_a = AttrTypeFactory.create(name="a")
-        attr = AttrFactory.create(name="a", types=[type_a])
-        self.analyzer.flatten_attribute_types(parent, attr)
-
-        self.assertEqual([type_a], attr.types)
-        mock_find_common_class.assert_called_once_with(parent.source_qname(type_a.name))
-
-    @mock.patch.object(ClassAnalyzer, "copy_inner_classes")
-    @mock.patch.object(ClassAnalyzer, "find_common_class")
+    @mock.patch.object(ClassAnalyzer, "merge_attribute_type")
+    @mock.patch.object(ClassAnalyzer, "find_attr_type")
     def test_flatten_attribute_types_when_source_has_only_one_attribute(
-        self, mock_find_common_class, mock_copy_inner_classes
+        self, mock_find_attr_type, mock_merge_attribute_type
     ):
         type_a = AttrTypeFactory.create(name="a")
-        type_b = AttrTypeFactory.create(name="b")
-        common = ClassFactory.create(
-            name="bar",
-            attrs=AttrFactory.list(
-                1,
-                name="b",
-                types=[type_b],
-                restrictions=RestrictionsFactory.create(required=True, min_occurs=2),
-            ),
-        )
+        source = ClassFactory.elements(1)
+        mock_find_attr_type.return_value = source
 
-        mock_find_common_class.return_value = common
+        target = ClassFactory.create()
+        attr = AttrFactory.create(types=[type_a])
 
-        parent = ClassFactory.create()
-        attr = AttrFactory.create(
-            name="a",
-            types=[type_a],
-            restrictions=RestrictionsFactory.create(min_occurs=1),
-        )
+        self.analyzer.flatten_attribute_types(target, attr)
 
-        self.analyzer.flatten_attribute_types(parent, attr)
-
-        self.assertEqual([type_b], attr.types)
-        self.assertEqual(
-            {"required": True, "min_occurs": 2}, attr.restrictions.asdict()
-        )
-        mock_find_common_class.assert_called_once_with(parent.source_qname(type_a.name))
-        mock_copy_inner_classes.assert_called_once_with(common, parent)
+        mock_find_attr_type.assert_called_once_with(target, type_a)
+        mock_merge_attribute_type.assert_called_once_with(source, target, attr, type_a)
 
     @mock.patch("xsdata.analyzer.logger.warning")
-    @mock.patch.object(ClassAnalyzer, "find_class")
+    @mock.patch.object(ClassAnalyzer, "find_attr_type")
     def test_flatten_attribute_types_when_source_has_more_than_one_attribute(
-        self, mock_find_class, mock_logger_warning
+        self, mock_find_attr_type, mock_logger_warning
     ):
         type_a = AttrTypeFactory.create(name="a")
         type_str = AttrTypeFactory.xs_string()
         common = ClassFactory.create(name="bar", attrs=AttrFactory.list(2))
-        mock_find_class.return_value = common
+        mock_find_attr_type.return_value = common
 
         parent = ClassFactory.create()
         attr = AttrFactory.create(name="a", types=[type_a])
@@ -634,8 +606,23 @@ class ClassAnalyzerTests(FactoryTestCase):
 
         self.assertEqual([type_str], attr.types)
         mock_logger_warning.assert_called_once_with(
-            "Missing type implementation: %s", common.type.__name__
+            "Missing implementation: %s", common.type.__name__
         )
+
+    def test_flatten_attribute_types_filters_duplicate_types(self):
+        target = ClassFactory.create(
+            attrs=[
+                AttrFactory.create(
+                    types=[
+                        AttrTypeFactory.xs_string(),
+                        AttrTypeFactory.xs_string(),
+                        AttrTypeFactory.xs_bool(),
+                    ]
+                )
+            ]
+        )
+        self.analyzer.flatten_attribute_types(target, target.attrs[0])
+        self.assertEqual(["string", "boolean"], [x.name for x in target.attrs[0].types])
 
     @mock.patch.object(ClassAnalyzer, "find_attribute")
     def test_add_substitution_attrs(self, mock_find_attribute):

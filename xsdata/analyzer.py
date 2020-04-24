@@ -13,7 +13,6 @@ from xsdata.models.codegen import Attr
 from xsdata.models.codegen import AttrType
 from xsdata.models.codegen import Class
 from xsdata.models.codegen import Extension
-from xsdata.models.enums import DataType
 from xsdata.utils import text
 from xsdata.utils.classes import ClassUtils
 from xsdata.utils.collections import unique_sequence
@@ -101,9 +100,13 @@ class ClassAnalyzer(ClassUtils):
                 attr = self.create_reference_attribute(item, qname)
                 self.substitutions_index[qname].append(attr)
 
-    def find_common_class(self, qname: QName) -> Optional[Class]:
+    def find_attr_type(self, source: Class, attr_type: AttrType) -> Optional[Class]:
+        qname = source.source_qname(attr_type.name)
         return self.find_class(
-            qname, condition=lambda x: x.is_enumeration or not x.is_complex
+            qname,
+            condition=lambda x: not x.is_enumeration
+            and not x.is_complex
+            and x is not source,
         )
 
     def find_simple_class(self, qname: QName) -> Optional[Class]:
@@ -321,40 +324,29 @@ class ClassAnalyzer(ClassUtils):
 
     def flatten_attribute_types(self, target: Class, attr: Attr):
         """
-        Flatten attribute types by using the source attribute type.
+        Flatten attribute types when possible.
 
         Steps:
-            * Skip xsd native types
+            * Reset native types with pattern restriction
             * Detect circular references if no source is found
-            * Skip enumeration types
-            * Overwrite attribute type from source
+            * Merge attribute type with source
+            * Reset type to string with a warning
         """
-        types = []
-        for attr_type in attr.types:
-            source = None
-            if not attr_type.native:
-                type_qname = target.source_qname(attr_type.name)
-                source = self.find_common_class(type_qname)
-            elif attr.restrictions.pattern:
-                attr_type = AttrType(name=DataType.STRING.code, native=True)
-
-            if source is None:
-                attr_type.self_ref = self.attr_depends_on(attr_type, target)
-                types.append(attr_type)
-            elif source.is_enumeration:
-                types.append(attr_type)
-            elif len(source.attrs) == 1:
-                source_attr = source.attrs[0]
-                types.extend(source_attr.types)
-                restrictions = source_attr.restrictions.clone()
-                restrictions.merge(attr.restrictions)
-                attr.restrictions = restrictions
-                self.copy_inner_classes(source, target)
+        for current_type in list(attr.types):
+            if current_type.native:
+                if attr.restrictions.pattern:
+                    self.reset_attribute_type(current_type)
             else:
-                types.append(AttrType(name=DataType.STRING.code, native=True))
-                logger.warning("Missing type implementation: %s", source.type.__name__)
+                source = self.find_attr_type(target, current_type)
+                if source is None:
+                    current_type.self_ref = self.attr_depends_on(current_type, target)
+                elif len(source.attrs) == 1:
+                    self.merge_attribute_type(source, target, attr, current_type)
+                else:
+                    logger.warning("Missing implementation: %s", source.type.__name__)
+                    self.reset_attribute_type(current_type)
 
-        attr.types = unique_sequence(types, key="name")
+        attr.types = unique_sequence(attr.types, key="name")
 
     def add_substitution_attrs(self, target: Class, attr: Attr):
         """

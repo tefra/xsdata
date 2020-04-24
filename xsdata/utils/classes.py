@@ -180,12 +180,32 @@ class ClassUtils:
         return clone
 
     @classmethod
+    def merge_attribute_type(
+        cls, source: Class, target: Class, attr: Attr, attr_type: AttrType
+    ):
+        source_attr = source.attrs[0]
+        index = attr.types.index(attr_type)
+        attr.types.pop(index)
+
+        for source_attr_type in source_attr.types:
+            clone_type = source_attr_type.clone()
+            attr.types.insert(index, clone_type)
+            index += 1
+
+        restrictions = source_attr.restrictions.clone()
+        restrictions.merge(attr.restrictions)
+        attr.restrictions = restrictions
+        cls.copy_inner_classes(source, target)
+
+    @classmethod
     def copy_inner_classes(cls, source: Class, target: Class):
+        """
+        Copy inner classes from source to target class.
+
+        Check for duplicates by name and skip if it already exists.
+        """
         for inner in source.inner:
-            exists = next(
-                (found for found in target.inner if found.name == inner.name), None
-            )
-            if not exists:
+            if not any(existing.name == inner.name for existing in target.inner):
                 target.inner.append(inner)
 
     @classmethod
@@ -253,3 +273,10 @@ class ClassUtils:
             return attrs.index(attr)
         except ValueError:
             return -1
+
+    @classmethod
+    def reset_attribute_type(cls, attr_type: AttrType):
+        attr_type.name = DataType.STRING.code
+        attr_type.native = True
+        attr_type.self_ref = False
+        attr_type.forward_ref = False

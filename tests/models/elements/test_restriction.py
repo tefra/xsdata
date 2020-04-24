@@ -70,3 +70,17 @@ class RestrictionTests(TestCase):
         }
 
         self.assertEqual(expected, obj.get_restrictions())
+
+    def test_get_restrictions_with_nested_simple_type(self):
+        obj = Restriction.create(
+            min_length=MinLength.create(value=2),
+            simple_type=SimpleType.create(
+                restriction=Restriction.create(
+                    max_length=MaxLength.create(value=10),
+                    min_length=MinLength.create(value=5),
+                )
+            ),
+        )
+
+        expected = {"max_length": 10, "min_length": 2}
+        self.assertEqual(expected, obj.get_restrictions())

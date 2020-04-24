@@ -110,22 +110,13 @@ class ClassBuilder:
     ) -> AttrType:
         prefix, suffix = text.split(name)
         native = False
-        self_ref = False
         namespace = target.ns_map.get(prefix)
 
         if Namespace.get_enum(namespace) and DataType.get_enum(suffix):
             name = suffix
             native = True
-        elif namespace == self.schema.target_namespace and suffix == target.name:
-            self_ref = True
 
-        return AttrType(
-            name=name,
-            index=index,
-            native=native,
-            forward_ref=forward_ref,
-            self_ref=self_ref,
-        )
+        return AttrType(name=name, index=index, native=native, forward_ref=forward_ref,)
 
     def element_children(
         self, obj: ElementBase, restrictions: Optional[Restrictions] = None

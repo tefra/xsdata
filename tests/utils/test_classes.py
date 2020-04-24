@@ -348,3 +348,22 @@ class ClassUtilsTests(FactoryTestCase):
         item.source_namespace = None
         actual = ClassUtils.create_reference_attribute(item, QName("foo"))
         self.assertEqual(item.name, actual.types[0].name)
+
+    @mock.patch.object(ClassUtils, "copy_inner_classes")
+    def test_merge_attribute_type(self, mock_copy_inner_classes):
+        source = ClassFactory.elements(1, name="Foobar")
+        source.attrs[0].restrictions.max_length = 100
+        source.attrs[0].restrictions.min_length = 1
+
+        target = ClassFactory.elements(1)
+        attr = target.attrs[0]
+        attr.restrictions.min_length = 2
+        attr.types.clear()
+        attr.types.append(AttrTypeFactory.create(name=source.name))
+
+        self.assertEqual("Foobar", attr.types[0].name)
+        ClassUtils.merge_attribute_type(source, target, attr, attr.types[0])
+
+        self.assertEqual("string", attr.types[0].name)
+        self.assertEqual(Restrictions(min_length=2, max_length=100), attr.restrictions)
+        mock_copy_inner_classes.assert_called_once_with(source, target)

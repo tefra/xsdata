@@ -1,14 +1,13 @@
 from typing import List
-from typing import Optional
 from typing import Tuple
 
 
-def prefix(string: Optional[str], sep: str = ":"):
-    return split(string, sep)[0] if string else string
+def prefix(string: str, sep: str = ":") -> str:
+    return split(string, sep)[0]
 
 
-def suffix(string: Optional[str], sep: str = ":"):
-    return split(string, sep)[1] if string else string
+def suffix(string: str, sep: str = ":") -> str:
+    return split(string, sep)[1]
 
 
 def split(string: str, sep: str = ":") -> Tuple:
@@ -19,7 +18,7 @@ def split(string: str, sep: str = ":") -> Tuple:
     return parts[0], parts[1]
 
 
-def collapse_whitespace(string: str):
+def collapse_whitespace(string: str) -> str:
     return " ".join([part for part in string.split(" ") if part.strip()])
 
 

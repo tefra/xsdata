@@ -4,33 +4,21 @@ from typing import Iterator
 from typing import List
 from typing import Optional
 from typing import Tuple
-from typing import Union
 
 from xsdata.models.codegen import Attr
 from xsdata.models.codegen import AttrType
 from xsdata.models.codegen import Class
 from xsdata.models.codegen import Extension
 from xsdata.models.codegen import Restrictions
-from xsdata.models.elements import Attribute
-from xsdata.models.elements import AttributeGroup
 from xsdata.models.elements import ComplexType
 from xsdata.models.elements import Element
-from xsdata.models.elements import Enumeration
-from xsdata.models.elements import Group
-from xsdata.models.elements import List as ListElement
 from xsdata.models.elements import Schema
 from xsdata.models.elements import SimpleType
-from xsdata.models.elements import Union as UnionElement
 from xsdata.models.enums import DataType
 from xsdata.models.enums import Namespace
 from xsdata.models.enums import Tag
 from xsdata.models.mixins import ElementBase
 from xsdata.utils import text
-
-BaseElement = Union[Attribute, AttributeGroup, Element, ComplexType, SimpleType, Group]
-AttributeElement = Union[
-    Attribute, Element, Enumeration, UnionElement, ListElement, SimpleType
-]
 
 
 @dataclass
@@ -57,7 +45,7 @@ class ClassBuilder:
 
         return classes
 
-    def build_class(self, obj: BaseElement) -> Class:
+    def build_class(self, obj: ElementBase) -> Class:
         """Build and return a class instance."""
         name = obj.real_name
         namespace = self.element_namespace(obj)
@@ -81,7 +69,7 @@ class ClassBuilder:
         self.build_class_attributes(obj, instance)
         return instance
 
-    def build_class_attributes(self, obj: BaseElement, target: Class):
+    def build_class_attributes(self, obj: ElementBase, target: Class):
         """Build the target class attributes from the given ElementBase
         children."""
         for child, restrictions in self.element_children(obj):
@@ -89,7 +77,7 @@ class ClassBuilder:
 
         target.attrs.sort(key=lambda x: x.index)
 
-    def build_class_extensions(self, obj: BaseElement, target: Class):
+    def build_class_extensions(self, obj: ElementBase, target: Class):
         """Build the item class extensions from the given ElementBase
         children."""
         extensions = dict()
@@ -100,7 +88,6 @@ class ClassBuilder:
             extensions[raw_type] = extension
 
         for extension in self.children_extensions(obj, target):
-            extension.forward_ref = False
             extensions[extension.type.name] = extension
 
         target.extensions = sorted(extensions.values(), key=lambda x: x.type.index)
@@ -120,7 +107,7 @@ class ClassBuilder:
 
     def element_children(
         self, obj: ElementBase, restrictions: Optional[Restrictions] = None
-    ) -> Iterator[Tuple[AttributeElement, Restrictions]]:
+    ) -> Iterator[Tuple[ElementBase, Restrictions]]:
         """Recursively find and return all child elements that are qualified to
         be class attributes."""
 
@@ -179,14 +166,14 @@ class ClassBuilder:
 
     def build_class_extension(
         self, target: Class, name: str, index: int, restrictions: Dict
-    ):
+    ) -> Extension:
         return Extension(
             type=self.build_data_type(target, name, index=index),
             restrictions=Restrictions(**restrictions),
         )
 
     def build_class_attribute(
-        self, target: Class, obj: AttributeElement, parent_restrictions: Restrictions
+        self, target: Class, obj: ElementBase, parent_restrictions: Restrictions
     ):
         """Generate and append an attribute target to the target class."""
         types = self.build_class_attribute_types(target, obj)
@@ -217,7 +204,7 @@ class ClassBuilder:
         )
 
     def build_class_attribute_types(
-        self, target: Class, obj: AttributeElement
+        self, target: Class, obj: ElementBase
     ) -> List[AttrType]:
         """Convert real type and anonymous inner types to an attribute type
         list."""
@@ -236,7 +223,7 @@ class ClassBuilder:
 
         return types
 
-    def build_inner_classes(self, obj: AttributeElement) -> Iterator[Class]:
+    def build_inner_classes(self, obj: ElementBase) -> Iterator[Class]:
         """Find and convert anonymous types to a class instances."""
         if isinstance(obj, SimpleType) and obj.is_enumeration:
             yield self.build_class(obj)

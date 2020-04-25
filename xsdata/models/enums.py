@@ -14,15 +14,15 @@ class Namespace(Enum):
     XLINK = "http://www.w3.org/1999/xlink"
 
     @property
-    def uri(self):
+    def uri(self) -> str:
         return self.value
 
     @property
-    def prefix(self):
+    def prefix(self) -> str:
         return self.name.lower()
 
     @property
-    def location(self):
+    def location(self) -> Path:
         return (
             Path(__file__)
             .absolute()

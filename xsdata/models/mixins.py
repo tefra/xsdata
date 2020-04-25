@@ -21,11 +21,11 @@ T = TypeVar("T", bound="BaseModel")
 
 
 class BaseModel:
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: Any, **kwargs: Any):
         pass
 
     @classmethod
-    def create(cls: Type[T], **kwargs) -> T:
+    def create(cls: Type[T], **kwargs: Any) -> T:
         if not kwargs.get("ns_map"):
             kwargs.update({"ns_map": {"xs": Namespace.XS.uri}})
 
@@ -48,7 +48,7 @@ class ElementBase(BaseModel):
     ns_map: Dict = field(default_factory=dict)
 
     @property
-    def class_name(self):
+    def class_name(self) -> str:
         return self.__class__.__name__
 
     @property
@@ -56,11 +56,15 @@ class ElementBase(BaseModel):
         return DataType.STRING
 
     @property
-    def default_value(self):
+    def default_value(self) -> Any:
         default = getattr(self, "default", None)
         if default is None and hasattr(self, "fixed"):
             default = getattr(self, "fixed", None)
         return default
+
+    @property
+    def display_help(self) -> Optional[str]:
+        return None
 
     @property
     def extends(self) -> Optional[str]:
@@ -88,19 +92,19 @@ class ElementBase(BaseModel):
         return False
 
     @property
-    def is_fixed(self):
+    def is_fixed(self) -> bool:
         return getattr(self, "fixed", None) is not None
 
     @property
-    def is_mixed(self):
+    def is_mixed(self) -> bool:
         return False
 
     @property
-    def is_nillable(self):
+    def is_nillable(self) -> bool:
         return getattr(self, "nillable", False)
 
     @property
-    def is_qualified(self):
+    def is_qualified(self) -> bool:
         if self.has_form:
             if getattr(self, "form", FormType.UNQUALIFIED) == FormType.QUALIFIED:
                 return True
@@ -111,7 +115,7 @@ class ElementBase(BaseModel):
         return False
 
     @property
-    def is_ref(self):
+    def is_ref(self) -> bool:
         return getattr(self, "ref", None) is not None
 
     @property
@@ -119,8 +123,9 @@ class ElementBase(BaseModel):
         return False
 
     @property
-    def prefix(self):
-        return text.prefix(self.ref) if self.is_ref else None
+    def prefix(self) -> Optional[str]:
+        ref = getattr(self, "ref", None)
+        return None if ref is None else text.prefix(ref)
 
     @property
     def raw_namespace(self) -> Optional[str]:
@@ -149,7 +154,7 @@ class ElementBase(BaseModel):
     def get_restrictions(self) -> Dict[str, Any]:
         return dict()
 
-    def schema_prefix(self):
+    def schema_prefix(self) -> Optional[str]:
         return next(
             (
                 prefix
@@ -159,7 +164,7 @@ class ElementBase(BaseModel):
             None,
         )
 
-    def children(self):
+    def children(self) -> Iterator["ElementBase"]:
         for attribute in fields(self):
             value = getattr(self, attribute.name)
             if (

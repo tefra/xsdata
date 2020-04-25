@@ -41,7 +41,9 @@ class DataclassGenerator(PythonAbstractGenerator):
         ]
         return self.template("package").render(class_names=class_names)
 
-    def render_module(self, resolver: DependenciesResolver, classes: List[Class]):
+    def render_module(
+        self, resolver: DependenciesResolver, classes: List[Class]
+    ) -> str:
         resolver.process(classes)
         imports = self.prepare_imports(resolver.sorted_imports())
         output = self.render_classes(resolver.sorted_classes())

@@ -89,7 +89,7 @@ class ParserUtils:
         return children
 
     @classmethod
-    def bind_element_param(cls, params: Dict, var: XmlVar, value: Any):
+    def bind_element_param(cls, params: Dict, var: XmlVar, value: Any) -> bool:
         if var.is_list:
             if var.name not in params:
                 params[var.name] = list()
@@ -121,7 +121,7 @@ class ParserUtils:
             params[var.name] = value
 
     @classmethod
-    def bind_element_wild_text(cls, params, meta: XmlMeta, element: Element):
+    def bind_element_wild_text(cls, params: Dict, meta: XmlMeta, element: Element):
         var = meta.find_var(condition=lambda x: x.is_wildcard)
         if not var:
             return
@@ -151,7 +151,7 @@ class ParserUtils:
         return txt or None, tail or None
 
     @classmethod
-    def parse_any_element(cls, element: Element, qname=True) -> AnyElement:
+    def parse_any_element(cls, element: Element, qname: bool = True) -> AnyElement:
         txt, tail = cls.element_text_and_tail(element)
         return AnyElement(
             qname=element.tag if qname else None,
@@ -162,8 +162,8 @@ class ParserUtils:
         )
 
     @classmethod
-    def parse_any_attributes(cls, element: Element):
-        def qname(value):
+    def parse_any_attributes(cls, element: Element) -> Dict[QName, Any]:
+        def qname(value: Any) -> Any:
             prefix, suffix = text.split(value)
             if prefix and prefix in element.nsmap:
                 return QName(element.nsmap[prefix], suffix)

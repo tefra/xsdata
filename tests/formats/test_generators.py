@@ -306,6 +306,17 @@ class PythonAbstractGeneratorTests(FactoryTestCase):
         mock_attribute_default.assert_called_once_with(attr, target.ns_map)
         mock_text_suffix.assert_called_once_with("foo")
 
+    def test_process_attribute_with_empty_local_name(self):
+        target = ClassFactory.create()
+        attr = AttrFactory.create()
+        attr.local_name = None
+        generator.process_attribute(target, attr, [])
+        self.assertIsNone(attr.local_name)
+
+        attr.local_name = ""
+        generator.process_attribute(target, attr, [])
+        self.assertEqual("", attr.local_name)
+
     def test_process_import(self):
         package = PackageFactory.create(
             name="bar", alias="foo:bar", source="some.foo.bar"

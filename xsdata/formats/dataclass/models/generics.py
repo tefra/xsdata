@@ -33,11 +33,11 @@ class Namespaces:
     _ns_map: Optional[Dict] = field(init=False, default=None)
 
     @property
-    def prefixes(self):
+    def prefixes(self) -> List[str]:
         return list(filter(None, self.ns_map.keys()))
 
     @property
-    def ns_map(self):
+    def ns_map(self) -> Dict:
         if self._ns_map is None:
             self._ns_map = {
                 prefix: uri

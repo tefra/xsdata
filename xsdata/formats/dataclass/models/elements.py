@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from dataclasses import field
 from typing import Any
+from typing import Callable
 from typing import List
 from typing import Optional
 from typing import Type
@@ -24,53 +25,53 @@ class XmlVar:
     namespaces: List[str] = field(default_factory=list)
 
     @property
-    def clazz(self):
+    def clazz(self) -> Optional[Type]:
         return self.types[0] if self.dataclass else None
 
     @property
-    def is_any_type(self):
+    def is_any_type(self) -> bool:
         return False
 
     @property
-    def is_attribute(self):
+    def is_attribute(self) -> bool:
         return False
 
     @property
-    def is_attributes(self):
+    def is_attributes(self) -> bool:
         return False
 
     @property
-    def is_element(self):
+    def is_element(self) -> bool:
         return False
 
     @property
-    def is_list(self):
+    def is_list(self) -> bool:
         return self.default is list
 
     @property
-    def is_text(self):
+    def is_text(self) -> bool:
         return False
 
     @property
-    def is_tokens(self):
+    def is_tokens(self) -> bool:
         return False
 
     @property
-    def is_wildcard(self):
+    def is_wildcard(self) -> bool:
         return False
 
-    def matches(self, qname: QName):
+    def matches(self, qname: QName) -> bool:
         return qname in (self.qname, QNames.ALL)
 
 
 @dataclass(frozen=True)
 class XmlElement(XmlVar):
     @property
-    def is_element(self):
+    def is_element(self) -> bool:
         return True
 
     @property
-    def is_any_type(self):
+    def is_any_type(self) -> bool:
         """xs:element with type anyType."""
         return len(self.types) == 1 and self.types[0] is object
 
@@ -78,14 +79,14 @@ class XmlElement(XmlVar):
 @dataclass(frozen=True)
 class XmlWildcard(XmlVar):
     @property
-    def is_wildcard(self):
+    def is_wildcard(self) -> bool:
         return True
 
     @property
-    def is_any_type(self):
+    def is_any_type(self) -> bool:
         return True
 
-    def matches(self, qname: QName):
+    def matches(self, qname: QName) -> bool:
         if qname == QNames.ALL:
             return True
 
@@ -108,25 +109,25 @@ class XmlWildcard(XmlVar):
 @dataclass(frozen=True)
 class XmlAttribute(XmlVar):
     @property
-    def is_attribute(self):
+    def is_attribute(self) -> bool:
         return True
 
 
 @dataclass(frozen=True)
 class XmlAttributes(XmlVar):
     @property
-    def is_attributes(self):
+    def is_attributes(self) -> bool:
         return True
 
 
 @dataclass(frozen=True)
 class XmlText(XmlVar):
     @property
-    def is_tokens(self):
+    def is_tokens(self) -> bool:
         return self.is_list
 
     @property
-    def is_text(self):
+    def is_text(self) -> bool:
         return True
 
 
@@ -139,7 +140,9 @@ class XmlMeta:
     nillable: bool
     vars: List[XmlVar] = field(default_factory=list)
 
-    def find_var(self, qname: QName = QNames.ALL, condition=None) -> Optional[XmlVar]:
+    def find_var(
+        self, qname: QName = QNames.ALL, condition: Optional[Callable] = None
+    ) -> Optional[XmlVar]:
         for var in self.vars:
             if condition and not condition(var):
                 continue

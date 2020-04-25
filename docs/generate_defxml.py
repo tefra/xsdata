@@ -132,7 +132,7 @@ def generate():
 section_titles: Dict[str, int] = defaultdict(int)
 
 
-def parse_title(source):
+def parse_title(source: str) -> str:
     pos = source.find("<!-- Example ")
     if pos == -1:
         raise Exception("title not found.")

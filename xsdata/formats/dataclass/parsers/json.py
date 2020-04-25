@@ -49,7 +49,7 @@ class JsonParser(AbstractParser, XmlContext):
         except Exception:
             raise ParserError("Parsing failed")
 
-    def bind_value(self, var: XmlVar, value) -> Any:
+    def bind_value(self, var: XmlVar, value: Any) -> Any:
         """
         Bind value according to the class var.
 
@@ -60,7 +60,7 @@ class JsonParser(AbstractParser, XmlContext):
         - an enumeration
         - a primitive value
         """
-        if var.dataclass:
+        if var.dataclass and var.clazz:
             return self.parse_context(value, var.clazz)
 
         if var.is_attributes:
@@ -78,7 +78,7 @@ class JsonParser(AbstractParser, XmlContext):
         )
 
     @staticmethod
-    def get_value(data: Dict, field: XmlVar):
+    def get_value(data: Dict, field: XmlVar) -> Any:
         """Find the field value in the given dictionary or return the default
         field value."""
         if field.qname.localname in data:

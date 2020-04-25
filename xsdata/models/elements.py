@@ -24,22 +24,22 @@ from xsdata.utils import text
 from xsdata.utils.text import collapse_whitespace
 
 
-def attribute(default=None, init=True, **kwargs):
+def attribute(default: Anything = None, init: bool = True, **kwargs: str) -> Anything:
     kwargs.update(type=XmlType.ATTRIBUTE)
     return field(init=init, default=default, metadata=kwargs)
 
 
-def element(init=True, **kwargs):
+def element(init: bool = True, **kwargs: str) -> Anything:
     kwargs.update(type=XmlType.ELEMENT)
     return field(init=init, default=None, metadata=kwargs)
 
 
-def array_element(init=True, **kwargs):
+def array_element(init: bool = True, **kwargs: str) -> Anything:
     kwargs.update(type=XmlType.ELEMENT)
     return field(init=init, default_factory=list, metadata=kwargs)
 
 
-def array_any_element(init=True, **kwargs):
+def array_any_element(init: bool = True, **kwargs: str) -> Anything:
     kwargs.update(type=XmlType.WILDCARD, namespace=NamespaceType.ANY.value)
     return field(init=init, default_factory=list, metadata=kwargs)
 
@@ -53,7 +53,7 @@ def occurrences(min_value: int, max_value: UnionType[int, str]) -> Dict[str, int
 class XmlString:
     elements: Array[object] = array_any_element()
 
-    def render(self):
+    def render(self) -> str:
         name = self.__class__.__name__
         xml = XmlSerializer(pretty_print=True, xml_declaration=False).render(self)
         start = xml.find(">") + 1
@@ -216,8 +216,12 @@ class SimpleType(AnnotationBase):
         return True
 
     @property
-    def is_enumeration(self):
-        return self.restriction and len(self.restriction.enumerations) > 0
+    def is_enumeration(self) -> bool:
+        return (
+            True
+            if self.restriction and len(self.restriction.enumerations) > 0
+            else False
+        )
 
     @property
     def real_name(self) -> str:
@@ -641,15 +645,15 @@ class Enumeration(AnnotationBase):
         return True
 
     @property
-    def real_type(self):
+    def real_type(self) -> None:
         return None
 
     @property
-    def real_name(self):
+    def real_name(self) -> str:
         return self.value
 
     @property
-    def default(self):
+    def default(self) -> str:
         return self.value
 
 

@@ -6,6 +6,7 @@ from base64 import urlsafe_b64encode
 from decimal import Decimal
 from pathlib import Path
 from typing import Any
+from typing import Dict
 from typing import Iterator
 from typing import List
 from typing import Optional
@@ -180,8 +181,10 @@ class PythonAbstractGenerator(AbstractGenerator, ABC):
         attr.name = cls.attribute_name(attr.name)
         attr.display_type = cls.attribute_display_type(attr, parents)
         attr.default = cls.attribute_default(attr, target.ns_map)
-        attr.local_name = text.suffix(attr.local_name)
         attr.xml_type = cls.xml_type_map.get(attr.tag)
+
+        if attr.local_name:
+            attr.local_name = text.suffix(attr.local_name)
 
     @classmethod
     def process_import(cls, package: Package) -> Package:
@@ -280,7 +283,7 @@ class PythonAbstractGenerator(AbstractGenerator, ABC):
         return result
 
     @classmethod
-    def attribute_default(cls, attr: Attr, ns_map=None) -> Optional[Any]:
+    def attribute_default(cls, attr: Attr, ns_map: Optional[Dict] = None) -> Any:
         """Normalize default value/factory by the attribute type."""
         if attr.is_list:
             return "list"

@@ -39,6 +39,10 @@ class ElementBaseTests(TestCase):
         element.fixed = ""
         self.assertEqual("", element.default_value)
 
+    def test_property_display_help(self):
+        element = ElementBase()
+        self.assertIsNone(element.display_help)
+
     def test_property_extends(self):
         element = ElementBase()
         self.assertIsNone(element.extends)

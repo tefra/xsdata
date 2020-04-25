@@ -1,3 +1,4 @@
+from typing import Any
 from typing import Dict
 from typing import Optional
 
@@ -24,8 +25,8 @@ def attr_metadata(attr: Attr, parent_namespace: Optional[str]) -> Dict:
     }
 
 
-def arguments(data: dict):
-    def prep(key, value):
+def arguments(data: Dict) -> str:
+    def prep(key: str, value: Any) -> str:
         if isinstance(value, str) and not has_quotes(value):
             value = '"{}"'.format(value.replace('"', "'"))
             if key == "pattern":
@@ -35,7 +36,7 @@ def arguments(data: dict):
     return ",\n".join([prep(key, value) for key, value in data.items()])
 
 
-def docstring(obj: Class, enum=False):
+def docstring(obj: Class, enum: bool = False) -> str:
     lines = []
     if obj.help:
         lines.append(obj.help)
@@ -48,7 +49,7 @@ def docstring(obj: Class, enum=False):
     return format_code('"""\n{}\n"""'.format("\n".join(lines))) if lines else ""
 
 
-def lib_imports(output: str):
+def lib_imports(output: str) -> str:
     result = []
 
     if "Decimal" in output:
@@ -76,7 +77,7 @@ def lib_imports(output: str):
     return "\n".join(result)
 
 
-def has_quotes(string: str):
+def has_quotes(string: str) -> bool:
     quote_types = ["'''", '"""', "'", '"']
     for quote in quote_types:
         if string.startswith(quote) and string.endswith(quote):

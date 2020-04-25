@@ -56,7 +56,8 @@ class XmlString:
     def render(self):
         name = self.__class__.__name__
         xml = XmlSerializer(pretty_print=True, xml_declaration=False).render(self)
-        return xml[xml.find(">") + 1 :].replace(f"</{name}>", "").strip()
+        start = xml.find(">") + 1
+        return xml[start:].replace(f"</{name}>", "").strip()
 
 
 @dataclass

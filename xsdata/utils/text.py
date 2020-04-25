@@ -3,14 +3,6 @@ from typing import Optional
 from typing import Tuple
 
 
-def strip_prefix(string: str, prefix: Optional[str]):
-    return (
-        string[len(prefix) + 1 :]
-        if prefix and string.startswith(f"{prefix}:", 0)
-        else string
-    )
-
-
 def prefix(string: Optional[str], sep: str = ":"):
     return split(string, sep)[0] if string else string
 
@@ -20,11 +12,11 @@ def suffix(string: Optional[str], sep: str = ":"):
 
 
 def split(string: str, sep: str = ":") -> Tuple:
-    index = string.find(sep)
-    if index == -1:
+    parts = string.split(sep, 1)
+    if len(parts) == 1:
         return None, string
 
-    return string[:index], string[index + len(sep) :]
+    return parts[0], parts[1]
 
 
 def collapse_whitespace(string: str):

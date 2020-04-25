@@ -137,7 +137,8 @@ def parse_title(source):
     if pos == -1:
         raise Exception("title not found.")
     end = source.find("-->", pos)
-    title = source[pos + 5 : end].strip()
+    start = pos + 5
+    title = source[start:end].strip()
 
     if title in section_titles:
         parts = title.split(" ")

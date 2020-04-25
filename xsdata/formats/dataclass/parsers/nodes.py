@@ -20,7 +20,7 @@ class XmlNode:
     position: int
 
     def next_node(self, element: Element, position: int, ctx: XmlContext) -> "XmlNode":
-        raise NotImplementedError(f"Not Implemented")
+        raise NotImplementedError("Not Implemented")
 
     def parse_element(self, element: Element, objects: List[Any]) -> Tuple:
         raise NotImplementedError(f"Not Implemented {element.tag}.")

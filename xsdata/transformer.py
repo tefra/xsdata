@@ -3,6 +3,7 @@ from dataclasses import field
 from pathlib import Path
 from typing import List
 from typing import Optional
+from typing import Tuple
 from typing import Union
 
 from xsdata.analyzer import ClassAnalyzer
@@ -24,21 +25,21 @@ class SchemaTransformer:
     output: str
     processed: List[Path] = field(init=False, default_factory=list)
 
-    def process(self, schema_path: Path, package: str):
+    def process(self, schema_path: Path, package: str) -> None:
         classes = self.process_schema(schema_path, package)
         classes = self.analyze_classes(classes)
         class_num, inner_num = self.count_classes(classes)
 
-        if not class_num:
-            return logger.warning("Analyzer returned zero classes!")
+        if class_num:
+            logger.info("Analyzer: %d main and %d inner classes", class_num, inner_num)
 
-        logger.info("Analyzer: %d main and %d inner classes", class_num, inner_num)
-
-        writer.designate(classes, self.output)
-        if self.print:
-            writer.print(classes, self.output)
+            writer.designate(classes, self.output)
+            if self.print:
+                writer.print(classes, self.output)
+            else:
+                writer.write(classes, self.output)
         else:
-            writer.write(classes, self.output)
+            logger.warning("Analyzer returned zero classes!")
 
     def process_schema(
         self, schema_path: Path, package: str, target_namespace: Optional[str] = None,
@@ -86,7 +87,7 @@ class SchemaTransformer:
             classes = self.process_schema(included.location, package, target_namespace)
         return classes
 
-    def generate_classes(self, schema: Schema, package: str):
+    def generate_classes(self, schema: Schema, package: str) -> List[Class]:
         """Convert the given schema tree to codegen classes and use the writer
         factory to either generate or print the result code."""
         logger.info("Compiling schema...")
@@ -110,7 +111,7 @@ class SchemaTransformer:
         return parser.from_xsd_path(schema_path)
 
     @staticmethod
-    def analyze_classes(classes: List[Class]):
+    def analyze_classes(classes: List[Class]) -> List[Class]:
         """Analyzer the given class list and simplify attributes and
         extensions."""
         analyzer = ClassAnalyzer()
@@ -135,7 +136,7 @@ class SchemaTransformer:
                 return ".".join(pp)
         return package
 
-    def count_classes(self, classes: List[Class]):
+    def count_classes(self, classes: List[Class]) -> Tuple[int, int]:
         """Return a tuple of counters for the main and inner classes."""
         main = len(classes)
         inner = 0

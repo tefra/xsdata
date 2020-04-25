@@ -90,6 +90,3 @@ class AttrTests(FactoryTestCase):
 
         attr.name = "type"
         self.assertTrue(attr.is_xsi_type)
-
-        attr.name = "TYPE"
-        self.assertTrue(attr.is_xsi_type)

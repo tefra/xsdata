@@ -16,7 +16,7 @@ from xsdata.formats.dataclass.models.generics import Namespaces
 from xsdata.utils import text
 
 
-def sort_types(types: List[Type]):
+def sort_types(types: List[Type]) -> List[Type]:
     in_order = (bool, int, str, float, Decimal)
 
     sorted_types = []
@@ -29,7 +29,9 @@ def sort_types(types: List[Type]):
     return types
 
 
-def to_python(types: List[Type], value: Any, ns_map=None, in_order=True) -> Any:
+def to_python(
+    types: List[Type], value: Any, ns_map: Optional[Dict] = None, in_order: bool = True
+) -> Any:
     if not isinstance(value, str):
         return value
 
@@ -48,7 +50,10 @@ def to_python(types: List[Type], value: Any, ns_map=None, in_order=True) -> Any:
     return value
 
 
-def to_qname(value, ns_map):
+def to_qname(value: str, ns_map: Optional[Dict]) -> QName:
+    if ns_map is None:
+        return QName(value)
+
     prefix, suffix = text.split(value)
     namespace = ns_map.get(prefix)
     return QName(namespace, suffix)

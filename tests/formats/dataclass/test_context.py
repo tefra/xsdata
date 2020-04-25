@@ -308,4 +308,5 @@ class XmlContextTests(TestCase):
         self.assertTrue(self.ctx.is_derived(b(), c))
         self.assertTrue(self.ctx.is_derived(a(), b))
         self.assertTrue(self.ctx.is_derived(a(), c))
+        self.assertTrue(self.ctx.is_derived(a(), a))
         self.assertFalse(self.ctx.is_derived(a(), d))

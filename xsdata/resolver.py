@@ -98,14 +98,14 @@ class DependenciesResolver:
         return [qname for qname in self.class_list if qname not in self.class_map]
 
     @staticmethod
-    def create_class_list(classes: List[Class]):
+    def create_class_list(classes: List[Class]) -> List[Class]:
         """Use topology sort to return a flat list for all the dependencies."""
         return toposort_flatten(
             {obj.source_qname(): obj.dependencies() for obj in classes}
         )
 
     @staticmethod
-    def create_class_map(classes: List[Class]):
+    def create_class_map(classes: List[Class]) -> Dict[QName, Class]:
         """Index the list of classes by name."""
 
         result: Dict[QName, Class] = dict()

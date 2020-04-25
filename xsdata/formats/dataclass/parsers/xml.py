@@ -104,7 +104,7 @@ class XmlParser(AbstractParser):
 
         return obj
 
-    def emit_event(self, event: str, name: str, **kwargs):
+    def emit_event(self, event: str, name: str, **kwargs: Any):
         """Call if exist the parser's hook for the given element and event."""
 
         if name not in self.event_names:

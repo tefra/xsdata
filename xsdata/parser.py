@@ -133,7 +133,9 @@ class SchemaParser(XmlParser):
             path = self.schema_location.parent.joinpath(location).resolve()
         return path if path and path.exists() else None
 
-    def resolve_local_path(self, location, namespace):
+    def resolve_local_path(
+        self, location: Optional[str], namespace: Optional[str]
+    ) -> Optional[Path]:
         """Resolve the given namespace to one of the local standard schemas or
         fallback to the external file path."""
         if not location or location.startswith("http"):

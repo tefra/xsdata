@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from dataclasses import field
 from decimal import Decimal
 from enum import Enum
+from typing import Any
 from typing import Callable
 from typing import Dict
 from typing import Optional
@@ -13,7 +14,7 @@ from typing import Type
 from xsdata.formats.bindings import AbstractSerializer
 
 
-def filter_none(x: Tuple):
+def filter_none(x: Tuple) -> Dict:
     return dict((k, v) for k, v in x if v is not None)
 
 
@@ -22,7 +23,7 @@ class DictFactory:
 
 
 class JsonEncoder(json.JSONEncoder):
-    def default(self, obj):
+    def default(self, obj: Any) -> Any:
         if isinstance(obj, Enum):
             return obj.value
         if isinstance(obj, Decimal):

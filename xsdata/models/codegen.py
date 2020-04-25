@@ -55,17 +55,17 @@ class Restrictions:
     sequential: Optional[bool] = field(default=None)
 
     @property
-    def is_list(self):
-        return self.max_occurs and self.max_occurs > 1
+    def is_list(self) -> bool:
+        return self.max_occurs is not None and self.max_occurs > 1
 
     @property
-    def is_optional(self):
+    def is_optional(self) -> bool:
         return self.min_occurs == 0
 
     def merge(self, source: "Restrictions"):
         self.update(source.asdict())
 
-    def update(self, data):
+    def update(self, data: Dict):
         min_occurs = data.pop("min_occurs", None)
         max_occurs = data.pop("max_occurs", None)
         sequential = data.pop("sequential", False)
@@ -86,7 +86,7 @@ class Restrictions:
     def asdict(self) -> Dict:
         return {k: v for k, v in asdict(self).items() if v is not None}
 
-    def clone(self):
+    def clone(self) -> "Restrictions":
         return replace(self)
 
     @classmethod
@@ -114,11 +114,11 @@ class AttrType:
         return data_type.code if data_type else None
 
     @property
-    def native_type(self):
+    def native_type(self) -> Any:
         data_type = DataType.get_enum(self.name) if self.native else None
         return data_type.local if data_type else None
 
-    def clone(self):
+    def clone(self) -> "AttrType":
         return replace(self)
 
 
@@ -146,11 +146,11 @@ class Attr:
         return self.tag == Tag.ENUMERATION
 
     @property
-    def is_factory(self):
+    def is_factory(self) -> bool:
         return self.is_list or self.is_map
 
     @property
-    def is_group(self):
+    def is_group(self) -> bool:
         return self.tag in (Tag.ATTRIBUTE_GROUP, Tag.GROUP)
 
     @property
@@ -162,34 +162,33 @@ class Attr:
         )
 
     @property
-    def is_list(self):
+    def is_list(self) -> bool:
         return self.restrictions.is_list
 
     @property
-    def is_optional(self):
+    def is_optional(self) -> bool:
         return self.restrictions.is_optional
 
     @property
-    def is_suffix(self):
+    def is_suffix(self) -> bool:
         return self.index == sys.maxsize
 
     @property
-    def is_xsi_type(self):
+    def is_xsi_type(self) -> bool:
         return (
             QNames.XSI_TYPE.namespace == self.namespace
-            and QNames.XSI_TYPE.localname == text.suffix(self.name).lower()
+            and QNames.XSI_TYPE.localname == text.suffix(self.name)
         )
 
     @property
-    def is_wildcard(self):
+    def is_wildcard(self) -> bool:
         return self.tag in (Tag.ANY_ATTRIBUTE, Tag.ANY)
 
-    def clone(self, **kwargs) -> "Attr":
+    def clone(self) -> "Attr":
         return replace(
             self,
             types=[type.clone() for type in self.types],
             restrictions=self.restrictions.clone(),
-            **kwargs,
         )
 
 
@@ -198,7 +197,7 @@ class Extension:
     type: AttrType
     restrictions: Restrictions
 
-    def clone(self):
+    def clone(self) -> "Extension":
         return replace(
             self, type=self.type.clone(), restrictions=self.restrictions.clone()
         )
@@ -224,21 +223,21 @@ class Class:
     source_namespace: Optional[str] = field(default=None)
 
     @property
-    def has_suffix_attr(self):
+    def has_suffix_attr(self) -> bool:
         return any(attr.is_suffix for attr in self.attrs)
 
     @property
-    def has_wild_attr(self):
+    def has_wild_attr(self) -> bool:
         return any(attr.is_wildcard for attr in self.attrs)
 
     @property
-    def is_complex(self):
+    def is_complex(self) -> bool:
         return (
             True if self.type in [Element, ComplexType] and not self.abstract else False
         )
 
     @property
-    def is_element(self):
+    def is_element(self) -> bool:
         return self.type is Element and not self.abstract
 
     @property
@@ -252,7 +251,7 @@ class Class:
         )
 
     @property
-    def is_simple(self):
+    def is_simple(self) -> bool:
         return self.type == SimpleType or self.abstract
 
     @property
@@ -271,10 +270,10 @@ class Class:
         )
 
     @property
-    def target_module(self):
+    def target_module(self) -> str:
         return f"{self.package}.{self.module}"
 
-    def clone(self):
+    def clone(self) -> "Class":
         inners = [inner.clone() for inner in self.inner]
         extensions = [extension.clone() for extension in self.extensions]
         attrs = [attr.clone() for attr in self.attrs]

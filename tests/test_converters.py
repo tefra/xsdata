@@ -87,6 +87,7 @@ class ConvertersTestCases(TestCase):
         ns_map = {"foo": "bar"}
         self.assertIsNone(to_python([QName], None, ns_map))
         self.assertEqual(QName("bar", "x"), to_python([QName], "foo:x", ns_map))
+        self.assertEqual(QName("bar"), to_python([QName], "bar", None))
 
     def test_to_python_single_value_dataclass(self):
         @dataclass

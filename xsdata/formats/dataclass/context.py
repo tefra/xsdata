@@ -43,7 +43,7 @@ class XmlContext:
 
         return meta
 
-    def find_subclass(self, clazz: Type, xsi_type: QName):
+    def find_subclass(self, clazz: Type, xsi_type: QName) -> Optional[Type]:
         for subclass in clazz.__subclasses__():
             if self.match_class_source_qname(subclass, xsi_type):
                 return subclass
@@ -55,9 +55,9 @@ class XmlContext:
             if self.match_class_source_qname(base, xsi_type):
                 return base
 
-            subclass = self.find_subclass(base, xsi_type)
-            if subclass:
-                return subclass
+            sibling = self.find_subclass(base, xsi_type)
+            if sibling:
+                return sibling
 
         return None
 
@@ -93,7 +93,7 @@ class XmlContext:
             )
         return self.cache[clazz]
 
-    def get_type_hints(self, clazz, parent_ns: Optional[str]) -> Iterator[XmlVar]:
+    def get_type_hints(self, clazz: Type, parent_ns: Optional[str]) -> Iterator[XmlVar]:
         type_hints = get_type_hints(clazz)
 
         for var in fields(clazz):
@@ -124,7 +124,11 @@ class XmlContext:
             )
 
     @staticmethod
-    def resolve_namespaces(xml_type, namespace, parent_namespace):
+    def resolve_namespaces(
+        xml_type: Optional[str],
+        namespace: Optional[str],
+        parent_namespace: Optional[str],
+    ) -> List[str]:
 
         if xml_type in (XmlType.ELEMENT, XmlType.WILDCARD) and namespace is None:
             namespace = parent_namespace
@@ -160,7 +164,7 @@ class XmlContext:
         return None
 
     @staticmethod
-    def real_types(type_hint) -> List:
+    def real_types(type_hint: Any) -> List:
         types = []
         if type_hint is Dict:
             types.append(type_hint)
@@ -179,7 +183,10 @@ class XmlContext:
         return sort_types(types)
 
     @classmethod
-    def is_derived(cls, obj: Any, clazz: Type):
-        return isinstance(obj, clazz) or any(
-            isinstance(obj, base) for base in clazz.__bases__ if base is not object
+    def is_derived(cls, obj: Any, clazz: Type) -> bool:
+        if isinstance(obj, clazz):
+            return True
+
+        return any(
+            base is not object and isinstance(obj, base) for base in clazz.__bases__
         )

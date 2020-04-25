@@ -218,7 +218,7 @@ class ClassAnalyzer(ClassUtils):
             if id(inner) not in self.processed:
                 self.flatten_class(inner)
 
-    def flatten_extension(self, target: Class, extension: Extension):
+    def flatten_extension(self, target: Class, extension: Extension) -> None:
         """
         Flatten target class extension based on the extension type.
 
@@ -242,7 +242,7 @@ class ClassAnalyzer(ClassUtils):
 
         raise AnalyzerError(f"Extension not found `{extension.type.name}`")
 
-    def flatten_extension_native(self, target: Class, ext: Extension):
+    def flatten_extension_native(self, target: Class, ext: Extension) -> None:
         if not target.is_enumeration:
             return self.create_default_attribute(target, ext)
 

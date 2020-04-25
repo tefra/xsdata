@@ -15,13 +15,13 @@ class CodeWriter:
     generators: Dict[str, AbstractGenerator] = field(default_factory=dict)
 
     @property
-    def formats(self):
+    def formats(self) -> List[str]:
         return list(self.generators.keys())
 
-    def register_format(self, name, generator: AbstractGenerator):
+    def register_format(self, name: str, generator: AbstractGenerator):
         self.generators[name] = generator
 
-    def get_format(self, name) -> AbstractGenerator:
+    def get_format(self, name: str) -> AbstractGenerator:
         return self.generators[name]
 
     def write(self, classes: List[Class], output: str):
@@ -52,12 +52,12 @@ class CodeWriter:
             obj.module = modules[obj.module]
             obj.package = packages[obj.package]
 
-    def module_name(self, module: str, output: str):
+    def module_name(self, module: str, output: str) -> str:
         engine = self.get_format(output)
         name = module[:-4] if module.endswith(".xsd") else module
         return engine.module_name(name)
 
-    def package_name(self, package: str, output: str):
+    def package_name(self, package: str, output: str) -> str:
         engine = self.get_format(output)
         return engine.package_name(package)
 

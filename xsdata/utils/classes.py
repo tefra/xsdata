@@ -22,7 +22,7 @@ class ClassUtils:
     INCLUDES_ALL = 2
 
     @classmethod
-    def compare_attributes(cls, source: Class, target: Class):
+    def compare_attributes(cls, source: Class, target: Class) -> int:
         if source is target:
             return cls.INCLUDES_ALL
 
@@ -103,10 +103,8 @@ class ClassUtils:
         current = attrs[index]
         current.name = text.suffix(current.name)
         exists = any(
-            [
-                attr is not current and current.name == text.suffix(attr.name)
-                for attr in attrs
-            ]
+            attr is not current and current.name == text.suffix(attr.name)
+            for attr in attrs
         )
 
         if exists and current.namespace:
@@ -169,7 +167,7 @@ class ClassUtils:
     @classmethod
     def clone_attribute(
         cls, attr: Attr, restrictions: Restrictions, prefix: Optional[str] = None
-    ):
+    ) -> Attr:
         clone = attr.clone()
         clone.restrictions.merge(restrictions)
         if prefix:
@@ -251,7 +249,7 @@ class ClassUtils:
         item.extensions.remove(extension)
 
     @classmethod
-    def create_reference_attribute(cls, source: Class, qname: QName):
+    def create_reference_attribute(cls, source: Class, qname: QName) -> Attr:
         prefix = None
         if qname.namespace != source.source_namespace:
             prefix = source.source_prefix
@@ -268,7 +266,7 @@ class ClassUtils:
         )
 
     @classmethod
-    def find_attribute(cls, attrs: List[Attr], attr: Attr):
+    def find_attribute(cls, attrs: List[Attr], attr: Attr) -> int:
         try:
             return attrs.index(attr)
         except ValueError:

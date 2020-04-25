@@ -57,7 +57,7 @@ class ElementNode(XmlNode):
                 )
             return SkipNode(position=position)
 
-        if var.dataclass:
+        if var.clazz:
             xsi_type = ParserUtils.parse_xsi_type(element)
             meta = ctx.fetch(var.clazz, self.meta.qname.namespace, xsi_type)
             return ElementNode(

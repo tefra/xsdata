@@ -147,7 +147,7 @@ class XmlSerializer(AbstractSerializer):
     def set_xsi_type(
         self, parent: Element, value: Any, var: XmlVar, namespaces: Namespaces
     ):
-        if not var.dataclass or value.__class__ is var.clazz:
+        if not var.clazz or value.__class__ is var.clazz:
             return
 
         if self.context.is_derived(value, var.clazz):

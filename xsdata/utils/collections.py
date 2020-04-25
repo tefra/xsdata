@@ -1,7 +1,16 @@
-def unique_sequence(items, key):
+from typing import Any
+from typing import List
+from typing import Sequence
+
+
+def unique_sequence(items: Sequence, key: str) -> List:
     seen = set()
-    return [
-        item
-        for item in items
-        if getattr(item, key) not in seen and not seen.add(getattr(item, key))
-    ]
+
+    def is_new(val: Any) -> bool:
+        if val in seen:
+            return False
+
+        seen.add(val)
+        return True
+
+    return [item for item in items if is_new(getattr(item, key))]

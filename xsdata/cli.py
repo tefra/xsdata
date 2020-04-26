@@ -1,4 +1,6 @@
+import logging
 from pathlib import Path
+from typing import List
 
 import click
 import click_log
@@ -9,7 +11,7 @@ from xsdata.writer import writer
 
 
 @click.command("generate")
-@click.argument("XSD-Path", type=click.Path(exists=True), required=True)
+@click.argument("sources", required=True, nargs=-1)
 @click.option("--package", required=True, help="Target Package")
 @click.option(
     "--output",
@@ -21,12 +23,26 @@ from xsdata.writer import writer
     "--print", is_flag=True, default=False, help="Preview the resulting classes."
 )
 @click_log.simple_verbosity_option(logger)
-def cli(xsd_path: str, package: str, output: str, print: bool):
+def cli(sources: List, package: str, output: str, print: bool):
+    """
+    Convert schema definitions to code.
+
+    SOURCES can be one or more files or directories.
+    """
     if print:
-        logger.setLevel("ERROR")
+        logger.setLevel(logging.ERROR)
+
+    schemas: List[Path] = list()
+    for source in sources:
+        src_path = Path(source).resolve()
+
+        if src_path.is_dir():
+            schemas.extend(src_path.glob("*.xsd"))
+        else:
+            schemas.append(src_path)
 
     transformer = SchemaTransformer(output=output, print=print)
-    transformer.process(Path(xsd_path).resolve(), package)
+    transformer.process(schemas, package)
 
 
 if __name__ == "__main__":

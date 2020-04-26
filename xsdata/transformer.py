@@ -25,8 +25,8 @@ class SchemaTransformer:
     output: str
     processed: List[Path] = field(init=False, default_factory=list)
 
-    def process(self, schema_path: Path, package: str) -> None:
-        classes = self.process_schema(schema_path, package)
+    def process(self, schemas: List[Path], package: str):
+        classes = self.process_schemas(schemas, package)
         classes = self.analyze_classes(classes)
         class_num, inner_num = self.count_classes(classes)
 
@@ -40,6 +40,12 @@ class SchemaTransformer:
                 writer.write(classes, self.output)
         else:
             logger.warning("Analyzer returned zero classes!")
+
+    def process_schemas(self, schemas: List[Path], package: str) -> List[Class]:
+        classes = list()
+        for schema in schemas:
+            classes.extend(self.process_schema(schema, package))
+        return classes
 
     def process_schema(
         self, schema_path: Path, package: str, target_namespace: Optional[str] = None,

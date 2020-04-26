@@ -7,12 +7,18 @@ CLI Entry Point
 
 .. command-output:: xsdata --help
 
-XSD Path
+SOURCES
 --------
 
-The generator doesn't work with urls only with local files, if the given schema includes other schemas with urls the generator will fail. Every schema is evaluated once and in the order they are defined.
+You can pass a list of definitions or a directory which includes the xml schemas you
+want to process.
 
-Circular dependencies will probably work just fine :)
+
+.. warning::
+
+    The generator works only with local files, if the given schema includes other
+    schemas with urls the generator will skip them.
+
 
 Package
 -------

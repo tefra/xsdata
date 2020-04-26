@@ -20,10 +20,10 @@ class SchemaTransformerTests(FactoryTestCase):
     @mock.patch.object(CodeWriter, "designate")
     @mock.patch.object(SchemaTransformer, "count_classes")
     @mock.patch.object(SchemaTransformer, "analyze_classes")
-    @mock.patch.object(SchemaTransformer, "process_schema")
+    @mock.patch.object(SchemaTransformer, "process_schemas")
     def test_process_with_print_true(
         self,
-        mock_process_schema,
+        mock_process_schemas,
         mock_analyze_classes,
         mock_count_classes,
         mock_writer_designate,
@@ -35,11 +35,11 @@ class SchemaTransformerTests(FactoryTestCase):
         schema_classes = ClassFactory.list(2)
         analyzer_classes = ClassFactory.list(2)
         mock_count_classes.return_value = 1, 2
-        mock_process_schema.return_value = schema_classes
+        mock_process_schemas.return_value = schema_classes
         mock_analyze_classes.return_value = analyzer_classes
 
         self.transformer.process(path, package)
-        mock_process_schema.assert_called_once_with(path, package)
+        mock_process_schemas.assert_called_once_with(path, package)
         mock_analyze_classes.assert_called_once_with(schema_classes)
         mock_count_classes.assert_called_once_with(analyzer_classes)
         mock_writer_designate.assert_called_once_with(analyzer_classes, "pydata")
@@ -53,10 +53,10 @@ class SchemaTransformerTests(FactoryTestCase):
     @mock.patch.object(CodeWriter, "designate")
     @mock.patch.object(SchemaTransformer, "count_classes")
     @mock.patch.object(SchemaTransformer, "analyze_classes")
-    @mock.patch.object(SchemaTransformer, "process_schema")
+    @mock.patch.object(SchemaTransformer, "process_schemas")
     def test_process_with_print_false(
         self,
-        mock_process_schema,
+        mock_process_schemas,
         mock_analyze_classes,
         mock_count_classes,
         mock_writer_designate,
@@ -68,12 +68,12 @@ class SchemaTransformerTests(FactoryTestCase):
         schema_classes = ClassFactory.list(2)
         analyzer_classes = ClassFactory.list(2)
         mock_count_classes.return_value = 1, 2
-        mock_process_schema.return_value = schema_classes
+        mock_process_schemas.return_value = schema_classes
         mock_analyze_classes.return_value = analyzer_classes
 
         self.transformer.print = False
         self.transformer.process(path, package)
-        mock_process_schema.assert_called_once_with(path, package)
+        mock_process_schemas.assert_called_once_with(path, package)
         mock_analyze_classes.assert_called_once_with(schema_classes)
         mock_count_classes.assert_called_once_with(analyzer_classes)
         mock_writer_designate.assert_called_once_with(analyzer_classes, "pydata")
@@ -85,10 +85,10 @@ class SchemaTransformerTests(FactoryTestCase):
     @mock.patch("xsdata.transformer.logger.warning")
     @mock.patch.object(SchemaTransformer, "count_classes")
     @mock.patch.object(SchemaTransformer, "analyze_classes")
-    @mock.patch.object(SchemaTransformer, "process_schema")
+    @mock.patch.object(SchemaTransformer, "process_schemas")
     def test_process_with_zero_classes_after_analyze(
         self,
-        mock_process_schema,
+        mock_process_schemas,
         mock_analyze_classes,
         mock_count_classes,
         mock_logger_warning,
@@ -98,14 +98,26 @@ class SchemaTransformerTests(FactoryTestCase):
         schema_classes = ClassFactory.list(2)
         analyzer_classes = []
         mock_count_classes.return_value = 0, 0
-        mock_process_schema.return_value = schema_classes
+        mock_process_schemas.return_value = schema_classes
         mock_analyze_classes.return_value = analyzer_classes
 
         self.transformer.process(path, package)
-        mock_process_schema.assert_called_once_with(path, package)
+        mock_process_schemas.assert_called_once_with(path, package)
         mock_analyze_classes.assert_called_once_with(schema_classes)
         mock_count_classes.assert_called_once_with(analyzer_classes)
         mock_logger_warning.assert_called_once_with("Analyzer returned zero classes!")
+
+    @mock.patch.object(SchemaTransformer, "process_schema")
+    def test_process_schemas(self, mock_process_schema):
+        classes = ClassFactory.list(5)
+        mock_process_schema.side_effect = [classes[:2], classes[2:]]
+        schemas = [Path(), Path()]
+
+        result = self.transformer.process_schemas(schemas, "foo")
+        self.assertEqual(classes, result)
+        mock_process_schema.assert_has_calls(
+            [mock.call(schemas[0], "foo"), mock.call(schemas[1], "foo"),]
+        )
 
     @mock.patch("xsdata.transformer.logger.info")
     @mock.patch.object(SchemaTransformer, "generate_classes")

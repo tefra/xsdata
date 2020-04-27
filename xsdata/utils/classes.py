@@ -4,6 +4,7 @@ from typing import Optional
 
 from lxml.etree import QName
 
+from xsdata.logger import logger
 from xsdata.models.codegen import Attr
 from xsdata.models.codegen import AttrType
 from xsdata.models.codegen import Class
@@ -181,19 +182,23 @@ class ClassUtils:
     def merge_attribute_type(
         cls, source: Class, target: Class, attr: Attr, attr_type: AttrType
     ):
-        source_attr = source.attrs[0]
-        index = attr.types.index(attr_type)
-        attr.types.pop(index)
+        if len(source.attrs) != 1:
+            logger.warning("Missing implementation: %s", source.type.__name__)
+            cls.reset_attribute_type(attr_type)
+        else:
+            source_attr = source.attrs[0]
+            index = attr.types.index(attr_type)
+            attr.types.pop(index)
 
-        for source_attr_type in source_attr.types:
-            clone_type = source_attr_type.clone()
-            attr.types.insert(index, clone_type)
-            index += 1
+            for source_attr_type in source_attr.types:
+                clone_type = source_attr_type.clone()
+                attr.types.insert(index, clone_type)
+                index += 1
 
-        restrictions = source_attr.restrictions.clone()
-        restrictions.merge(attr.restrictions)
-        attr.restrictions = restrictions
-        cls.copy_inner_classes(source, target)
+            restrictions = source_attr.restrictions.clone()
+            restrictions.merge(attr.restrictions)
+            attr.restrictions = restrictions
+            cls.copy_inner_classes(source, target)
 
     @classmethod
     def copy_inner_classes(cls, source: Class, target: Class):

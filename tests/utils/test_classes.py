@@ -367,3 +367,22 @@ class ClassUtilsTests(FactoryTestCase):
         self.assertEqual("string", attr.types[0].name)
         self.assertEqual(Restrictions(min_length=2, max_length=100), attr.restrictions)
         mock_copy_inner_classes.assert_called_once_with(source, target)
+
+    @mock.patch("xsdata.analyzer.logger.warning")
+    def test_merge_attribute_type_when_source_attrs_is_not_one(
+        self, mock_logger_warning
+    ):
+        source = ClassFactory.create()
+        target = ClassFactory.elements(1)
+        attr = target.attrs[0]
+        ClassUtils.merge_attribute_type(source, target, attr, attr.types[0])
+
+        self.assertEqual("string", attr.types[0].name)
+        mock_logger_warning.assert_called_once_with(
+            "Missing implementation: %s", source.type.__name__
+        )
+
+        attr.types = [AttrTypeFactory.create(name="foo")]
+        source.attrs = AttrFactory.list(2)
+        ClassUtils.merge_attribute_type(source, target, attr, attr.types[0])
+        self.assertEqual("string", attr.types[0].name)

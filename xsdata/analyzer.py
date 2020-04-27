@@ -102,6 +102,12 @@ class ClassAnalyzer(ClassUtils):
 
     def find_attr_type(self, source: Class, attr_type: AttrType) -> Optional[Class]:
         qname = source.source_qname(attr_type.name)
+        return self.find_class(qname)
+
+    def find_attr_simple_type(
+        self, source: Class, attr_type: AttrType
+    ) -> Optional[Class]:
+        qname = source.source_qname(attr_type.name)
         return self.find_class(
             qname,
             condition=lambda x: not x.is_enumeration
@@ -218,7 +224,7 @@ class ClassAnalyzer(ClassUtils):
             if id(inner) not in self.processed:
                 self.flatten_class(inner)
 
-    def flatten_extension(self, target: Class, extension: Extension) -> None:
+    def flatten_extension(self, target: Class, extension: Extension):
         """
         Flatten target class extension based on the extension type.
 
@@ -226,21 +232,22 @@ class ClassAnalyzer(ClassUtils):
             1. Native primitive type (int, str, float, etc)
             2. Simple source type (simpleType, Extension)
             3. Complex source type (ComplexType, Element)
+            4. Unknown type
         """
         if extension.type.native:
-            return self.flatten_extension_native(target, extension)
+            self.flatten_extension_native(target, extension)
+        else:
+            qname = target.source_qname(extension.type.name)
+            simple_source = self.find_simple_class(qname)
+            complex_source = None if simple_source else self.find_class(qname)
 
-        type_qname = target.source_qname(extension.type.name)
-
-        simple_source = self.find_simple_class(type_qname)
-        if simple_source:
-            return self.flatten_extension_simple(simple_source, target, extension)
-
-        complex_source = self.find_class(type_qname)
-        if complex_source:
-            return self.flatten_extension_complex(complex_source, target, extension)
-
-        raise AnalyzerError(f"Extension not found `{extension.type.name}`")
+            if simple_source:
+                self.flatten_extension_simple(simple_source, target, extension)
+            elif complex_source:
+                self.flatten_extension_complex(complex_source, target, extension)
+            else:
+                logger.warning("Missing extension type: %s", extension.type.name)
+                target.extensions.remove(extension)
 
     def flatten_extension_native(self, target: Class, ext: Extension) -> None:
         if not target.is_enumeration:
@@ -324,29 +331,34 @@ class ClassAnalyzer(ClassUtils):
 
     def flatten_attribute_types(self, target: Class, attr: Attr):
         """
-        Flatten attribute types when possible.
+        Loop over the the given attribute types to flatten simple definitions.
 
-        Steps:
-            * Reset native types with pattern restriction
-            * Detect circular references if no source is found
-            * Merge attribute type with source
-            * Reset type to string with a warning
+        Notes:
+            * xs:pattern is not yet supported reset all native types to xs:string.
+            * skip over forward references aka inner classes
         """
         for current_type in list(attr.types):
             if current_type.native:
                 if attr.restrictions.pattern:
                     self.reset_attribute_type(current_type)
-            else:
-                source = self.find_attr_type(target, current_type)
-                if source is None:
-                    current_type.self_ref = self.attr_depends_on(current_type, target)
-                elif len(source.attrs) == 1:
-                    self.merge_attribute_type(source, target, attr, current_type)
-                else:
-                    logger.warning("Missing implementation: %s", source.type.__name__)
-                    self.reset_attribute_type(current_type)
+            elif not current_type.forward_ref:
+                self.flatten_attribute_type(target, attr, current_type)
 
         attr.types = unique_sequence(attr.types, key="name")
+
+    def flatten_attribute_type(self, target: Class, attr: Attr, attr_type: AttrType):
+        """Flatten attribute type if it's a simple type otherwise check for
+        circular reference or missing type."""
+        simple_source = self.find_attr_simple_type(target, attr_type)
+        if simple_source:
+            self.merge_attribute_type(simple_source, target, attr, attr_type)
+        else:
+            complex_source = self.find_attr_type(target, attr_type)
+            if complex_source:
+                attr_type.self_ref = self.class_depends_on(complex_source, target)
+            else:
+                logger.warning("Missing type: %s", attr_type.name)
+                self.reset_attribute_type(attr_type)
 
     def add_substitution_attrs(self, target: Class, attr: Attr):
         """
@@ -373,22 +385,12 @@ class ClassAnalyzer(ClassUtils):
     def class_depends_on(self, source: Class, target: Class) -> bool:
         """Check if any source dependencies recursively match the target
         class."""
+        if source is target:
+            return True
+
         for qname in source.dependencies():
             check = self.find_class(qname)
             if check is target or (check and self.class_depends_on(check, target)):
                 return True
 
         return False
-
-    def attr_depends_on(self, dependency: AttrType, target: Class) -> bool:
-        """Check if dependency or any of its dependencies match the target
-        class."""
-        qname = target.source_qname(dependency.name)
-        source = self.find_class(qname)
-
-        if source is None:
-            return False
-        if source is target:
-            return True
-
-        return self.class_depends_on(source, target)

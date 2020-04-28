@@ -1,7 +1,9 @@
 from dataclasses import dataclass
 from dataclasses import field
+from enum import auto
+from enum import IntEnum
 from typing import Any
-from typing import Callable
+from typing import Dict
 from typing import List
 from typing import Optional
 from typing import Type
@@ -131,6 +133,31 @@ class XmlText(XmlVar):
         return True
 
 
+class FindMode(IntEnum):
+    ALL = auto()
+    ATTRIBUTE = auto()
+    ATTRIBUTES = auto()
+    ELEMENT = auto()
+    TEXT = auto()
+    WILDCARD = auto()
+    NOT_WILDCARD = auto()
+    LIST = auto()
+    NOT_LIST = auto()
+
+
+find_lambdas = {
+    FindMode.ALL: lambda x: True,
+    FindMode.ATTRIBUTE: lambda x: x.is_attribute,
+    FindMode.ATTRIBUTES: lambda x: x.is_attributes,
+    FindMode.ELEMENT: lambda x: x.is_element,
+    FindMode.TEXT: lambda x: x.is_text,
+    FindMode.WILDCARD: lambda x: x.is_wildcard,
+    FindMode.NOT_WILDCARD: lambda x: not x.is_wildcard,
+    FindMode.LIST: lambda x: x.is_list,
+    FindMode.NOT_LIST: lambda x: not x.is_list,
+}
+
+
 @dataclass(frozen=True)
 class XmlMeta:
     name: str
@@ -139,15 +166,27 @@ class XmlMeta:
     source_qname: QName
     nillable: bool
     vars: List[XmlVar] = field(default_factory=list)
+    cache: Dict = field(default_factory=dict)
 
     def find_var(
-        self, qname: QName = QNames.ALL, condition: Optional[Callable] = None
+        self, qname: QName = QNames.ALL, mode: FindMode = FindMode.ALL
     ) -> Optional[XmlVar]:
-        for var in self.vars:
-            if condition and not condition(var):
-                continue
 
-            if var.matches(qname):
-                return var
+        key = (
+            hash(qname),
+            hash(mode),
+        )
+        if key not in self.cache:
+            self.cache[key] = self._find_var(qname, mode)
 
-        return None
+        return self.cache[key]
+
+    def _find_var(
+        self, qname: QName = QNames.ALL, mode: FindMode = FindMode.ALL,
+    ) -> Optional[XmlVar]:
+
+        find_func = find_lambdas[mode]
+
+        return next(
+            (var for var in self.vars if find_func(var) and var.matches(qname)), None,
+        )

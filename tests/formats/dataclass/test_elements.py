@@ -5,6 +5,7 @@ from lxml.etree import QName
 
 from tests.fixtures import BookForm
 from xsdata.formats.dataclass.context import XmlContext
+from xsdata.formats.dataclass.models.elements import FindMode
 from xsdata.formats.dataclass.models.elements import XmlAttribute
 from xsdata.formats.dataclass.models.elements import XmlAttributes
 from xsdata.formats.dataclass.models.elements import XmlElement
@@ -138,7 +139,22 @@ class XmlMeta(TestCase):
         ctx = XmlContext()
         meta = ctx.build(BookForm)
         author = QName("author")
+        excluded = set()
+        excluded.add("author")
 
         self.assertIsInstance(meta.find_var(author), XmlElement)
-        self.assertIsNone(meta.find_var(author, lambda x: not x.is_element))
+        self.assertIsNone(meta.find_var(author, FindMode.ATTRIBUTE))
         self.assertIsNone(meta.find_var(QName("nope")))
+
+    def test_find_var_uses_cache(self):
+        ctx = XmlContext()
+        meta = ctx.build(BookForm)
+        author = QName("author")
+        title = QName("title")
+
+        self.assertEqual("author", meta.find_var(author).name)
+        self.assertEqual(1, len(meta.cache))
+        key = tuple(meta.cache.keys())[0]
+
+        meta.cache[key] = meta._find_var(title)
+        self.assertEqual("title", meta.find_var(author).name)

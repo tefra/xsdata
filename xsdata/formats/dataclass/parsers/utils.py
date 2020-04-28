@@ -11,6 +11,7 @@ from lxml.etree import QName
 
 from xsdata.exceptions import ParserError
 from xsdata.formats.converters import to_python
+from xsdata.formats.dataclass.models.elements import FindMode
 from xsdata.formats.dataclass.models.elements import XmlMeta
 from xsdata.formats.dataclass.models.elements import XmlVar
 from xsdata.formats.dataclass.models.generics import AnyElement
@@ -58,9 +59,9 @@ class ParserUtils:
 
         while len(objects) > position:
             qname, value = objects.pop(position)
-            arg = meta.find_var(
-                qname, condition=lambda x: not x.is_wildcard
-            ) or meta.find_var(qname, condition=lambda x: x.is_wildcard)
+            arg = meta.find_var(qname, FindMode.NOT_WILDCARD) or meta.find_var(
+                qname, FindMode.WILDCARD
+            )
 
             if not arg:
                 raise ParserError("Impossible exception!")
@@ -122,7 +123,7 @@ class ParserUtils:
 
     @classmethod
     def bind_element_wild_text(cls, params: Dict, meta: XmlMeta, element: Element):
-        var = meta.find_var(condition=lambda x: x.is_wildcard)
+        var = meta.find_var(mode=FindMode.WILDCARD)
         if not var:
             return
 
@@ -173,7 +174,7 @@ class ParserUtils:
 
     @classmethod
     def bind_element_text(cls, params: Dict, metadata: XmlMeta, element: Element):
-        var = metadata.find_var(condition=lambda x: x.is_text)
+        var = metadata.find_var(mode=FindMode.TEXT)
         if var and element.text is not None and var.init:
             params[var.name] = cls.parse_value(
                 var.types, element.text, var.default, element.nsmap, var.is_tokens
@@ -185,35 +186,38 @@ class ParserUtils:
         a dictionary of field names and values based on the given class
         metadata."""
 
-        wildcard = metadata.find_var(condition=lambda x: x.is_attributes)
+        if not element.attrib:
+            return
+
+        wildcard = metadata.find_var(mode=FindMode.ATTRIBUTES)
         for key, value in element.attrib.items():
-            qname = QName(key)
+            var = metadata.find_var(QName(key), FindMode.ATTRIBUTE)
 
-            var = metadata.find_var(
-                qname, condition=lambda x: x.is_attribute and x.name not in params
-            )
-
-            if not var and wildcard:
+            if var and var.name not in params:
+                if var.init:
+                    params[var.name] = cls.parse_value(
+                        var.types, value, var.default, element.nsmap, var.is_tokens
+                    )
+            elif wildcard:
                 if wildcard.name not in params:
-                    params[wildcard.name] = dict()
+                    params[wildcard.name] = {}
                 params[wildcard.name][key] = value
-            elif var and var.init:
-                params[var.name] = cls.parse_value(
-                    var.types, value, var.default, element.nsmap, var.is_tokens
-                )
 
     @classmethod
     def find_eligible_wildcard(
         cls, meta: XmlMeta, qname: QName, params: Dict
     ) -> Optional[XmlVar]:
-        conditions = [
-            lambda x: x.is_wildcard and (x.name not in params or x.is_list),
-            lambda x: x.is_wildcard and (x.name in params and not x.is_list),
-        ]
 
-        for condition in conditions:
-            wild = meta.find_var(qname, condition)
-            if wild:
-                return wild
-
-        return None
+        return next(
+            (
+                var
+                for var in meta.vars
+                if var.is_wildcard
+                and var.matches(qname)
+                and (
+                    (var.is_list or var.name not in params)
+                    or (not var.is_list and var.name in params)
+                )
+            ),
+            None,
+        )

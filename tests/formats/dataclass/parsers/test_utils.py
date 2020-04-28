@@ -14,6 +14,7 @@ from tests.fixtures.defxmlschema.chapter08.example0803 import DressSize
 from tests.fixtures.defxmlschema.chapter12.chapter12 import ProductType
 from xsdata.formats.dataclass.context import XmlContext
 from xsdata.formats.dataclass.models.constants import XmlType
+from xsdata.formats.dataclass.models.elements import FindMode
 from xsdata.formats.dataclass.models.elements import XmlMeta
 from xsdata.formats.dataclass.models.elements import XmlVar
 from xsdata.formats.dataclass.models.generics import AnyElement
@@ -144,6 +145,17 @@ class ParserUtilsTests(TestCase):
             eff_date.is_list,
         )
 
+    def test_bind_element_attrs_doesnt_overwrite_values(self):
+        metadata = self.ctx.build(ProductType)
+        element = Element("foo")
+        element.set("effDate", "2020-03-01")
+
+        params = dict(eff_date="foo")
+
+        ParserUtils.bind_element_attrs(params, metadata, element)
+        expected = {"eff_date": "foo", "other_attributes": {"effDate": "2020-03-01"}}
+        self.assertEqual(expected, params)
+
     def test_bind_elements_attrs_ignore_init_false_vars(self):
         metadata = self.ctx.build(ProductType)
         eff_date = metadata.find_var("effDate")
@@ -171,7 +183,7 @@ class ParserUtilsTests(TestCase):
         element = Element("foo")
         params = dict()
         metadata = self.ctx.build(DressSize)
-        var = metadata.find_var(condition=lambda x: x.is_text)
+        var = metadata.find_var(mode=FindMode.TEXT)
         ParserUtils.bind_element_text(params, metadata, element)
         self.assertEqual({}, params)
 

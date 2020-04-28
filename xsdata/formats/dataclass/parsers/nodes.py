@@ -10,6 +10,7 @@ from lxml.etree import QName
 
 from xsdata.exceptions import XmlContextError
 from xsdata.formats.dataclass.context import XmlContext
+from xsdata.formats.dataclass.models.elements import FindMode
 from xsdata.formats.dataclass.models.elements import XmlMeta
 from xsdata.formats.dataclass.parsers.config import ParserConfig
 from xsdata.formats.dataclass.parsers.utils import ParserUtils
@@ -46,9 +47,9 @@ class ElementNode(XmlNode):
 
     def next_node(self, element: Element, position: int, ctx: XmlContext) -> XmlNode:
         qname = QName(element.tag)
-        var = self.meta.find_var(
-            qname, condition=lambda x: not x.is_wildcard
-        ) or self.meta.find_var(qname, condition=lambda x: x.is_wildcard)
+        var = self.meta.find_var(qname, FindMode.NOT_WILDCARD)
+        if not var:
+            var = self.meta.find_var(qname, FindMode.WILDCARD)
 
         if not var:
             if self.config.fail_on_unknown_properties:

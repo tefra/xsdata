@@ -20,6 +20,7 @@ from tests.fixtures.defxmlschema.chapter12.chapter12 import SizeType
 from xsdata.exceptions import SerializerError
 from xsdata.exceptions import XmlContextError
 from xsdata.formats.dataclass.context import XmlContext
+from xsdata.formats.dataclass.models.elements import FindMode
 from xsdata.formats.dataclass.models.generics import AnyElement
 from xsdata.formats.dataclass.models.generics import Namespaces
 from xsdata.formats.dataclass.serializers import XmlSerializer
@@ -185,7 +186,7 @@ class XmlSerializerTests(TestCase):
         root = Element("root")
         value = AnyElement()
         meta = self.serializer.context.build(DescriptionType)
-        var = meta.find_var(condition=lambda x: x.is_wildcard)
+        var = meta.find_var(mode=FindMode.WILDCARD)
 
         self.serializer.render_sub_node(root, value, var, self.namespaces)
         self.assertEqual(1, mock_render_wildcard_node.call_count)
@@ -211,7 +212,7 @@ class XmlSerializerTests(TestCase):
         root = Element("root")
         value = SizeType()
         meta = self.serializer.context.build(DescriptionType)
-        var = meta.find_var(condition=lambda x: x.is_wildcard)
+        var = meta.find_var(mode=FindMode.WILDCARD)
 
         self.serializer.render_sub_node(root, value, var, self.namespaces)
         self.assertEqual(1, mock_render_element_node.call_count)
@@ -227,7 +228,7 @@ class XmlSerializerTests(TestCase):
         root = Element("root")
         value = 1
         meta = self.serializer.context.build(DescriptionType)
-        var = meta.find_var(condition=lambda x: x.is_wildcard)
+        var = meta.find_var(mode=FindMode.WILDCARD)
 
         self.serializer.render_sub_node(root, value, var, self.namespaces)
         self.assertEqual(1, mock_set_text.call_count)
@@ -247,7 +248,7 @@ class XmlSerializerTests(TestCase):
         root = Element("root")
         value = SizeType()
         meta = self.serializer.context.build(DescriptionType)
-        var = meta.find_var(condition=lambda x: x.is_wildcard)
+        var = meta.find_var(mode=FindMode.WILDCARD)
 
         self.serializer.render_element_node(root, value, var, self.namespaces)
 
@@ -272,7 +273,7 @@ class XmlSerializerTests(TestCase):
         value = SizeType()
         value.qname = "foo"
         meta = self.serializer.context.build(DescriptionType)
-        var = meta.find_var(condition=lambda x: x.is_wildcard)
+        var = meta.find_var(mode=FindMode.WILDCARD)
 
         self.serializer.render_element_node(root, value, var, self.namespaces)
 
@@ -308,7 +309,7 @@ class XmlSerializerTests(TestCase):
             qname="foo",
         )
         meta = self.serializer.context.build(DescriptionType)
-        var = meta.find_var(condition=lambda x: x.is_wildcard)
+        var = meta.find_var(mode=FindMode.WILDCARD)
 
         self.serializer.render_wildcard_node(root, value, var, self.namespaces)
 
@@ -349,7 +350,7 @@ class XmlSerializerTests(TestCase):
             text="foo", tail="bar", attributes=dict(a=1), children=[AnyElement()]
         )
         meta = self.serializer.context.build(DescriptionType)
-        var = meta.find_var(condition=lambda x: x.is_wildcard)
+        var = meta.find_var(mode=FindMode.WILDCARD)
 
         self.serializer.render_wildcard_node(root, value, var, self.namespaces)
 

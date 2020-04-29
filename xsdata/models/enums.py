@@ -83,7 +83,7 @@ class DataType(Enum):
     # xsd and xml data types
     ANY_ATOMIC_TYPE = ("anyAtomicType", str)
     ANY_URI = ("anyURI", str)
-    ANY_SIMPLE_TYPE = ("anySimpleType", str)
+    ANY_SIMPLE_TYPE = ("anySimpleType", object)
     ANY_TYPE = ("anyType", object)
     BASE = ("base", str)
     BASE64_BINARY = ("base64Binary", str)

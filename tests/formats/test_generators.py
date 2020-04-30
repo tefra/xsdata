@@ -9,6 +9,7 @@ from tests.factories import PackageFactory
 from xsdata.formats.dataclass.models.constants import XmlType
 from xsdata.formats.generators import AbstractGenerator
 from xsdata.formats.generators import PythonAbstractGenerator as generator
+from xsdata.models.enums import DataType
 from xsdata.models.enums import Namespace
 from xsdata.models.enums import Tag
 
@@ -403,6 +404,10 @@ class PythonAbstractGeneratorTests(FactoryTestCase):
         actual = generator.attribute_display_type(attr, parents)
         self.assertEqual("Dict[QName, str]", actual)
 
+        attr.types = [AttrTypeFactory.xs_int(), AttrTypeFactory.xs_positive_int()]
+        actual = generator.attribute_display_type(attr, parents)
+        self.assertEqual("Optional[int]", actual)
+
     def test_attribute_default(self):
         type_str = AttrTypeFactory.xs_string()
         type_int = AttrTypeFactory.xs_int()
@@ -410,6 +415,7 @@ class PythonAbstractGeneratorTests(FactoryTestCase):
         type_decimal = AttrTypeFactory.xs_decimal()
         type_bool = AttrTypeFactory.xs_bool()
         type_qname = AttrTypeFactory.xs_qname()
+        type_tokens = AttrTypeFactory.xs_tokens()
 
         attr = AttrFactory.create(name="foo", types=[type_str])
         self.assertEqual(None, generator.attribute_default(attr))
@@ -463,3 +469,7 @@ class PythonAbstractGeneratorTests(FactoryTestCase):
             'QName("http://www.w3.org/2001/XMLSchema", "anyType")',
             generator.attribute_default(attr, ns_map),
         )
+
+        attr.default = "foo  bar  \n"
+        attr.types = [type_tokens]
+        self.assertEqual('"foo bar"', generator.attribute_default(attr))

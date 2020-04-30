@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from decimal import Decimal
+from enum import Enum
 from unittest import TestCase
 
 from lxml.etree import QName
@@ -77,11 +78,16 @@ class ConvertersTestCases(TestCase):
         self.assertEqual(False, to_python([bool], "false "))
 
     def test_to_python_enum(self):
+        class QNameType(Enum):
+            a = QName("a")
+            b = QName("b")
+
         self.assertEqual(UseType.OPTIONAL, to_python([UseType], "optional"))
         self.assertEqual("optional", to_python([str, UseType], "optional"))
         self.assertEqual(
             UseType.OPTIONAL, to_python([str, UseType], "optional", in_order=False)
         )
+        self.assertEqual(QNameType.a, to_python([QNameType], "a"))
 
     def test_to_python_qname(self):
         ns_map = {"foo": "bar"}

@@ -58,6 +58,15 @@ class CodeWriterTests(FactoryTestCase):
             for obj in classes:
                 self.assertEqual(obj.name, Path(f"{tmpdir}/{obj.name}.txt").read_text())
 
+    def test_write_skip_empty_output(self):
+        cls = ClassFactory.create()
+        cls.name = ""
+        with TemporaryDirectory() as tmpdir:
+            writer.register_format(self.FAKE_NAME, FakeGenerator(tmpdir))
+            writer.write([cls], "fake")
+
+            self.assertFalse(Path(f"{tmpdir}/{cls.name}.txt").exists())
+
     @mock.patch("builtins.print")
     def test_print(self, mock_print):
         classes = ClassFactory.list(2)

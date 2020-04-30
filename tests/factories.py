@@ -196,6 +196,10 @@ class AttrTypeFactory(Factory):
         return cls.create(name=DataType.INTEGER.code, native=True)
 
     @classmethod
+    def xs_positive_int(cls):
+        return cls.create(name=DataType.POSITIVE_INTEGER.code, native=True)
+
+    @classmethod
     def xs_float(cls):
         return cls.create(name=DataType.FLOAT.code, native=True)
 
@@ -218,6 +222,10 @@ class AttrTypeFactory(Factory):
     @classmethod
     def xs_qname(cls):
         return cls.create(name=DataType.QNAME.code, native=True)
+
+    @classmethod
+    def xs_tokens(cls):
+        return cls.create(name=DataType.NMTOKENS.code, native=True)
 
 
 class AttrFactory(Factory):

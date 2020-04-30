@@ -9,13 +9,10 @@ from xsdata.models.codegen import Class
 
 
 def attr_metadata(attr: Attr, parent_namespace: Optional[str]) -> Dict:
-    metadata = dict(
-        name=attr.local_name,
-        type=attr.xml_type,
-        namespace=attr.namespace
-        if parent_namespace != attr.namespace or attr.is_attribute
-        else None,
-    )
+    metadata = dict(name=attr.local_name, type=attr.xml_type)
+    if parent_namespace != attr.namespace or attr.is_attribute:
+        metadata["namespace"] = attr.namespace
+
     metadata.update(attr.restrictions.asdict())
 
     return {
@@ -27,8 +24,8 @@ def attr_metadata(attr: Attr, parent_namespace: Optional[str]) -> Dict:
 
 def arguments(data: Dict) -> str:
     def prep(key: str, value: Any) -> str:
-        if isinstance(value, str) and not has_quotes(value):
-            value = '"{}"'.format(value.replace('"', "'"))
+        if isinstance(value, str):
+            value = f'''"{value.replace('"', "'")}"'''
             if key == "pattern":
                 value = f"r{value}"
         return f"{key}={value}"
@@ -75,14 +72,6 @@ def lib_imports(output: str) -> str:
         result.append(f"from typing import {', '.join(types)}")
 
     return "\n".join(result)
-
-
-def has_quotes(string: str) -> bool:
-    quote_types = ["'''", '"""', "'", '"']
-    for quote in quote_types:
-        if string.startswith(quote) and string.endswith(quote):
-            return True
-    return False
 
 
 filters = {

@@ -175,6 +175,13 @@ class DependenciesResolverTest(FactoryTestCase):
         expected = {obj.source_qname(): obj for obj in classes}
         self.assertEqual(expected, self.resolver.create_class_map(classes))
 
+    def test_create_class_map_for_duplicate_classes(self):
+        classes = ClassFactory.list(2, name="a")
+        with self.assertRaises(ResolverValueError) as cm:
+            self.resolver.create_class_map(classes)
+
+        self.assertEqual("Duplicate class: `a`", str(cm.exception))
+
     @mock.patch.object(Class, "dependencies")
     def test_create_class_list(self, mock_dependencies):
         classes = ClassFactory.list(3)

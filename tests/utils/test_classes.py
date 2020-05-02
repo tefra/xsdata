@@ -11,6 +11,9 @@ from tests.factories import FactoryTestCase
 from tests.factories import RestrictionsFactory
 from xsdata.models.codegen import AttrType
 from xsdata.models.codegen import Restrictions
+from xsdata.models.elements import ComplexType
+from xsdata.models.elements import Element
+from xsdata.models.elements import SimpleType
 from xsdata.models.enums import DataType
 from xsdata.models.enums import Tag
 from xsdata.utils.classes import ClassUtils
@@ -386,3 +389,63 @@ class ClassUtilsTests(FactoryTestCase):
         source.attrs = AttrFactory.list(2)
         ClassUtils.merge_attribute_type(source, target, attr, attr.types[0])
         self.assertEqual("string", attr.types[0].name)
+
+    def test_merge_redefined_classes_with_unique_classes(self):
+        classes = ClassFactory.list(2)
+        ClassUtils.merge_redefined_classes(classes)
+        self.assertEqual(2, len(classes))
+
+    @mock.patch.object(ClassUtils, "copy_attributes")
+    def test_merge_redefined_classes_copies_attributes(self, mock_copy_attributes):
+        class_a = ClassFactory.create()
+        class_b = ClassFactory.create()
+        class_c = class_a.clone()
+
+        ext_a = ExtensionFactory.create(type=AttrTypeFactory.create(name=class_a.name))
+        ext_str = ExtensionFactory.create(type=AttrTypeFactory.create(name="foo"))
+        class_c.extensions.append(ext_a)
+        class_c.extensions.append(ext_str)
+        classes = [class_a, class_b, class_c]
+
+        ClassUtils.merge_redefined_classes(classes)
+        self.assertEqual(2, len(classes))
+
+        mock_copy_attributes.assert_called_once_with(class_a, class_c, ext_a)
+
+    def test_merge_redefined_classes_copies_extensions(self):
+        class_a = ClassFactory.create()
+        class_c = class_a.clone()
+
+        type_int = AttrTypeFactory.xs_int()
+
+        ext_a = ExtensionFactory.create(
+            type=type_int,
+            restrictions=Restrictions(max_inclusive=10, min_inclusive=1, required=True),
+        )
+        ext_c = ExtensionFactory.create(
+            type=AttrTypeFactory.create(name=class_a.name),
+            restrictions=Restrictions(max_inclusive=0, min_inclusive=-10),
+        )
+
+        class_a.extensions.append(ext_a)
+        class_c.extensions.append(ext_c)
+        classes = [class_a, class_c]
+        expected = {"max_inclusive": 0, "min_inclusive": -10, "required": True}
+
+        ClassUtils.merge_redefined_classes(classes)
+        self.assertEqual(1, len(classes))
+        self.assertEqual(1, len(classes[0].extensions))
+        self.assertEqual(expected, classes[0].extensions[0].restrictions.asdict())
+
+    def test_mark_abstract_duplicate_classes(self):
+        one = ClassFactory.create(name="foo", abstract=True, type=Element)
+        two = ClassFactory.create(name="foo", type=Element)
+        three = ClassFactory.create(name="foo", type=ComplexType)
+        four = ClassFactory.create(name="foo", type=SimpleType)
+
+        ClassUtils.update_abstract_classes([one, two, three, four])
+
+        self.assertTrue(one.abstract)  # Was abstract already
+        self.assertFalse(two.abstract)  # Is an element
+        self.assertTrue(three.abstract)  # Marked as abstract
+        self.assertFalse(four.abstract)  # Is common

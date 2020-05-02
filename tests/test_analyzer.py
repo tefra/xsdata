@@ -11,7 +11,6 @@ from tests.factories import FactoryTestCase
 from xsdata.analyzer import ClassAnalyzer
 from xsdata.exceptions import AnalyzerError
 from xsdata.models.codegen import Class
-from xsdata.models.codegen import Restrictions
 from xsdata.models.elements import ComplexType
 from xsdata.models.elements import Element
 from xsdata.models.elements import SimpleType
@@ -30,16 +29,14 @@ class ClassAnalyzerTests(FactoryTestCase):
 
     @mock.patch.object(ClassAnalyzer, "fetch_classes_for_generation")
     @mock.patch.object(ClassAnalyzer, "flatten_classes")
-    @mock.patch.object(ClassAnalyzer, "update_abstract_classes")
     @mock.patch.object(ClassAnalyzer, "create_substitutions_index")
+    @mock.patch.object(ClassAnalyzer, "handle_duplicate_classes")
     @mock.patch.object(ClassAnalyzer, "create_class_index")
-    @mock.patch.object(ClassAnalyzer, "merge_redefined_classes")
     def test_process(
         self,
-        mock_merge_redefined_classes,
         mock_create_class_index,
+        mock_handle_duplicates,
         mock_create_substitutions_index,
-        mock_update_abstract_classes,
         mock_flatten_classes,
         mock_fetch_classes_for_generation,
     ):
@@ -49,12 +46,49 @@ class ClassAnalyzerTests(FactoryTestCase):
 
         self.assertEqual(gen_classes, self.analyzer.process(classes))
 
-        mock_merge_redefined_classes.assert_called_once_with(classes)
-        mock_create_substitutions_index.assert_called_once_with(classes)
         mock_create_class_index.assert_called_once_with(classes)
-        mock_update_abstract_classes.assert_called_once()
+        mock_handle_duplicates.assert_called_once()
+        mock_create_substitutions_index.assert_called_once_with()
         mock_flatten_classes.assert_called_once_with()
         mock_fetch_classes_for_generation.assert_called_once_with()
+
+    @mock.patch.object(ClassAnalyzer, "update_abstract_classes")
+    @mock.patch.object(ClassAnalyzer, "merge_redefined_classes")
+    @mock.patch.object(ClassAnalyzer, "remove_invalid_classes")
+    def test_handle_duplicate_classes(
+        self,
+        mock_remove_invalid_classes,
+        mock_merge_redefined_classes,
+        mock_update_abstract_classes,
+    ):
+        first = ClassFactory.create()
+        second = first.clone()
+        third = ClassFactory.create()
+
+        self.analyzer.create_class_index([first, second, third])
+        self.analyzer.handle_duplicate_classes()
+
+        mock_remove_invalid_classes.assert_called_once_with([first, second])
+        mock_merge_redefined_classes.assert_called_once_with([first, second])
+        mock_update_abstract_classes.assert_called_once_with([first, second])
+
+    def test_remove_invalid_classes(self):
+        first = ClassFactory.create(
+            extensions=[
+                ExtensionFactory.create(type=AttrTypeFactory.xs_bool()),
+                ExtensionFactory.create(type=AttrTypeFactory.create(name="foo")),
+            ]
+        )
+        second = ClassFactory.create(
+            extensions=[ExtensionFactory.create(type=AttrTypeFactory.xs_bool()),]
+        )
+        third = ClassFactory.create()
+
+        self.analyzer.create_class_index([first, second, third])
+
+        classes = [first, second, third]
+        self.analyzer.remove_invalid_classes(classes)
+        self.assertEqual([second, third], classes)
 
     def test_create_class_index(self):
         classes = [
@@ -83,7 +117,8 @@ class ClassAnalyzerTests(FactoryTestCase):
         reference_attrs = AttrFactory.list(3)
         mock_create_reference_attribute.side_effect = reference_attrs
 
-        self.analyzer.create_substitutions_index(classes)
+        self.analyzer.create_class_index(classes)
+        self.analyzer.create_substitutions_index()
 
         expected = {
             QName(namespace, "foo"): [reference_attrs[0], reference_attrs[2]],
@@ -100,27 +135,6 @@ class ClassAnalyzerTests(FactoryTestCase):
                 mock.call(classes[1], classes[1].source_qname("foo")),
             ]
         )
-
-    def test_mark_abstract_duplicate_classes(self):
-        one = ClassFactory.create(name="foo", abstract=True, type=Element)
-        two = ClassFactory.create(name="foo", type=Element)
-        three = ClassFactory.create(name="foo", type=ComplexType)
-        four = ClassFactory.create(name="foo", type=SimpleType)
-
-        five = ClassFactory.create(name="bar", abstract=True, type=Element)
-        six = ClassFactory.create(name="bar", type=ComplexType)
-        seven = ClassFactory.create(name="opa", type=ComplexType)
-
-        self.analyzer.create_class_index([one, two, three, four, five, six, seven])
-        self.analyzer.update_abstract_classes()
-
-        self.assertTrue(one.abstract)  # Was abstract already
-        self.assertFalse(two.abstract)  # Is an element
-        self.assertTrue(three.abstract)  # Marked as abstract
-        self.assertFalse(four.abstract)  # Is common
-        self.assertTrue(five.abstract)  # Was abstract already
-        self.assertFalse(six.abstract)  # No element in group
-        self.assertFalse(seven.abstract)  # Alone
 
     @mock.patch.object(ClassAnalyzer, "sanitize_attributes")
     def test_fetch_classes_for_generation(self, mock_sanitize_attributes):
@@ -689,53 +703,6 @@ class ClassAnalyzerTests(FactoryTestCase):
 
         self.analyzer.add_substitution_attrs(target, AttrFactory.enumeration())
         self.assertEqual(4, len(target.attrs))
-
-    def test_merge_redefined_classes_with_unique_classes(self):
-        classes = ClassFactory.list(2)
-        self.analyzer.merge_redefined_classes(classes)
-        self.assertEqual(2, len(classes))
-
-    @mock.patch.object(ClassAnalyzer, "copy_attributes")
-    def test_merge_redefined_classes_copies_attributes(self, mock_copy_attributes):
-        class_a = ClassFactory.create()
-        class_b = ClassFactory.create()
-        class_c = class_a.clone()
-
-        ext_a = ExtensionFactory.create(type=AttrTypeFactory.create(name=class_a.name))
-        ext_str = ExtensionFactory.create(type=AttrTypeFactory.create(name="foo"))
-        class_c.extensions.append(ext_a)
-        class_c.extensions.append(ext_str)
-        classes = [class_a, class_b, class_c]
-
-        self.analyzer.merge_redefined_classes(classes)
-        self.assertEqual(2, len(classes))
-
-        mock_copy_attributes.assert_called_once_with(class_a, class_c, ext_a)
-
-    def test_merge_redefined_classes_copies_extensions(self):
-        class_a = ClassFactory.create()
-        class_c = class_a.clone()
-
-        type_int = AttrTypeFactory.xs_int()
-
-        ext_a = ExtensionFactory.create(
-            type=type_int,
-            restrictions=Restrictions(max_inclusive=10, min_inclusive=1, required=True),
-        )
-        ext_c = ExtensionFactory.create(
-            type=AttrTypeFactory.create(name=class_a.name),
-            restrictions=Restrictions(max_inclusive=0, min_inclusive=-10),
-        )
-
-        class_a.extensions.append(ext_a)
-        class_c.extensions.append(ext_c)
-        classes = [class_a, class_c]
-        expected = {"max_inclusive": 0, "min_inclusive": -10, "required": True}
-
-        self.analyzer.merge_redefined_classes(classes)
-        self.assertEqual(1, len(classes))
-        self.assertEqual(1, len(classes[0].extensions))
-        self.assertEqual(expected, classes[0].extensions[0].restrictions.asdict())
 
     @mock.patch.object(ClassAnalyzer, "find_class")
     @mock.patch.object(Class, "dependencies")

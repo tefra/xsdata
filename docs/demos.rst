@@ -48,7 +48,7 @@ The suite is quite extensible and consist of more than 26k tests cases for both 
 Report
 ------
 
-**55** failed, **14517** passed, **103** skipped @ `travis-ci <https://travis-ci.com/tefra/xsdata-w3c-tests>`_
+**46** failed, **14520** passed, **110** skipped @ `travis-ci <https://travis-ci.com/tefra/xsdata-w3c-tests>`_
 
 ✨✨✨✨
 

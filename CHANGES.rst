@@ -1,3 +1,14 @@
+20.5 (2020-05-02)
+-------------------
+- Updated codegen cli to accept multiple definitions or directories as argument.
+- Update ClassBuilder to recursively search for anonymous types.
+- Updated XmlParser to be thread-safe.
+- Added performance tweaks on XmlParser.
+- Added parser config to fail or not on unknown properties.
+- Fixed primitive types being marked as forward references.
+- Fixed nested restrictions on xs:simpleType.
+- Fixed ClassAnalyzer to recover/ignore missing types.
+
 20.4.2 (2020-04-21)
 -------------------
 - Added support for abstract xsi:types in XmlParser.

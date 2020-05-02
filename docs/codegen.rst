@@ -14,6 +14,13 @@ You can pass a list of definitions or a directory which includes the xml schemas
 want to process.
 
 
+.. code-block:: console
+
+    $ xsdata amadeus/schemas --package amadeus.models
+
+    $ xsdata air_v48_0/AirReqRsp.xsd rail_v48_0/RailReqRsp.xsd --package travelport.models
+
+
 .. warning::
 
     The generator works only with local files, if the given schema includes other

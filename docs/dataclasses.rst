@@ -228,18 +228,29 @@ data.
 The parser internally depends on lxml's iterparse event stream to bind the raw input
 data to dataclasses and primitive types.
 
+The parser also accepts optionally a custom config instance.
+
 .. code-block:: python
 
     >>> from xsdata.formats.dataclass.parsers import XmlParser
+    >>> from xsdata.formats.dataclass.parsers.config import ParserConfig
 
-    >>> parser = XmlParser()
+    >>> config = ParserConfig(fail_on_unknown_properties=True)
+    >>> parser = XmlParser(config=config)
     >>> order = parser.from_path("docs/examples/primer.xml", PurchaseOrder)
     >>> order.bill_to
     Usaddress(name='Robert Smith', street='8 Oak Avenue', city='Old Town', state='PA', zip=95819.0, country='US')
 
 
+:class:`~xsdata.formats.dataclass.parsers.config.ParserConfig`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The :class:`~xsdata.formats.dataclass.serializers.XmlSerializer`
+.. csv-table::
+   :header: "Name", "Type", "Description"
+   :widths: 20, 10, 200
+
+    "fail_on_unknown_properties", "bool", "Should fail on unknown properties that can't be mapped to any wildcard field, default: ``True``"
+
 
 .. code-block:: python
 

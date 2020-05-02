@@ -1,4 +1,6 @@
 import sys
+from collections import defaultdict
+from typing import Dict
 from typing import List
 from typing import Optional
 
@@ -210,6 +212,55 @@ class ClassUtils:
         for inner in source.inner:
             if not any(existing.name == inner.name for existing in target.inner):
                 target.inner.append(inner)
+
+    @classmethod
+    def merge_redefined_classes(cls, classes: List[Class]):
+        """Merge original and redefined classes."""
+        grouped: Dict[str, List[Class]] = defaultdict(list)
+        for item in classes:
+            grouped[f"{item.type.__name__}{item.source_qname()}"].append(item)
+
+        for items in grouped.values():
+            if len(items) == 1:
+                continue
+
+            winner: Class = items.pop()
+            for item in items:
+                classes.remove(item)
+
+                self_extension = next(
+                    (
+                        ext
+                        for ext in winner.extensions
+                        if text.suffix(ext.type.name) == winner.name
+                    ),
+                    None,
+                )
+
+                if not self_extension:
+                    continue
+
+                cls.copy_attributes(item, winner, self_extension)
+                for looser_ext in item.extensions:
+                    new_ext = looser_ext.clone()
+                    new_ext.restrictions.merge(self_extension.restrictions)
+                    winner.extensions.append(new_ext)
+
+    @classmethod
+    def update_abstract_classes(cls, classes: List[Class]):
+        """
+        Update classes with the same qualified name to set implied abstract
+        flags.
+
+        If a non abstract xs:element exists in the list mark the rest
+        xs:complexType(s) as abstract.
+        """
+
+        element = next((obj for obj in classes if obj.is_element), None)
+        if element:
+            for obj in classes:
+                if obj is not element and obj.is_complex:
+                    obj.abstract = True
 
     @classmethod
     def create_mixed_attribute(cls, target: Class):

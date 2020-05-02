@@ -97,3 +97,5 @@ apidoc_module_dir = "../xsdata"
 apidoc_output_dir = "reference"
 apidoc_excluded_paths = ["tests"]
 apidoc_separate_modules = True
+set_type_checking_flag = True
+always_document_param_types = True

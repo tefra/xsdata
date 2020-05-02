@@ -5,7 +5,8 @@ from typing import Callable
 from typing import Dict
 from typing import List
 from typing import Optional
-from xml.etree.ElementTree import QName
+
+from lxml.etree import QName
 
 from xsdata.exceptions import AnalyzerError
 from xsdata.logger import logger
@@ -41,27 +42,52 @@ class ClassAnalyzer(ClassUtils):
         Process class list in steps.
 
         Steps:
-            * Merge redefined classes
-            * Create a class index
-            * Create a substitution index
-            * Mark as abstract classes with the same qname
-            * Flatten classes
+            * Create a class index.
+            * Handle duplicate types.
+            * Create a substitution index.
+            * Flatten classes.
             * Return a final class list for code generators.
         """
 
-        self.merge_redefined_classes(classes)
-
         self.create_class_index(classes)
 
-        self.create_substitutions_index(classes)
+        self.handle_duplicate_classes()
 
-        self.update_abstract_classes()
+        self.create_substitutions_index()
 
         self.flatten_classes()
 
-        gen_classes = self.fetch_classes_for_generation()
+        return self.fetch_classes_for_generation()
 
-        return gen_classes
+    def handle_duplicate_classes(self):
+        """
+        Remove if possible classes with the same qualified name.
+
+        Steps:
+            1. Remove classes with missing extension type.
+            2. Merge redefined classes.
+            3. Fix implied abstract flags.
+        """
+        for classes in self.class_index.values():
+
+            if len(classes) > 1:
+                self.remove_invalid_classes(classes)
+
+            if len(classes) > 1:
+                self.merge_redefined_classes(classes)
+
+            if len(classes) > 1:
+                self.update_abstract_classes(classes)
+
+    def remove_invalid_classes(self, classes: List[Class]):
+        """Remove from the given class list any class with missing extension
+        type."""
+        for target in list(classes):
+            if any(
+                self.attr_type_is_missing(target, extension.type)
+                for extension in target.extensions
+            ):
+                classes.remove(target)
 
     def fetch_classes_for_generation(self) -> List[Class]:
         """
@@ -90,19 +116,29 @@ class ClassAnalyzer(ClassUtils):
         for item in classes:
             self.class_index[item.source_qname()].append(item)
 
-    def create_substitutions_index(self, classes: List[Class]):
+    def create_substitutions_index(self):
         """Create reference attributes for all the classes substitutions and
         group them by their fully qualified name."""
-        for item in classes:
-            for substitution in item.substitutions:
-                item.abstract = False
-                qname = item.source_qname(substitution)
-                attr = self.create_reference_attribute(item, qname)
-                self.substitutions_index[qname].append(attr)
+
+        for classes in self.class_index.values():
+            for item in classes:
+                for substitution in item.substitutions:
+                    item.abstract = False
+                    qname = item.source_qname(substitution)
+                    attr = self.create_reference_attribute(item, qname)
+                    self.substitutions_index[qname].append(attr)
 
     def find_attr_type(self, source: Class, attr_type: AttrType) -> Optional[Class]:
         qname = source.source_qname(attr_type.name)
         return self.find_class(qname)
+
+    def attr_type_is_missing(self, source: Class, attr_type: AttrType) -> bool:
+        """Check if given type declaration is not native and is missing."""
+        if attr_type.native:
+            return False
+
+        qname = source.source_qname(attr_type.name)
+        return qname not in self.class_index
 
     def find_attr_simple_type(
         self, source: Class, attr_type: AttrType
@@ -134,53 +170,6 @@ class ClassAnalyzer(ClassUtils):
             return candidate
 
         return None
-
-    def merge_redefined_classes(self, classes: List[Class]):
-        """Merge original and redefined classes."""
-        grouped: Dict[str, List[Class]] = defaultdict(list)
-        for item in classes:
-            grouped[f"{item.type.__name__}{item.source_qname()}"].append(item)
-
-        for items in grouped.values():
-            if len(items) == 1:
-                continue
-
-            winner: Class = items.pop()
-            for item in items:
-                classes.remove(item)
-
-                self_extension = next(
-                    (
-                        ext
-                        for ext in winner.extensions
-                        if text.suffix(ext.type.name) == winner.name
-                    ),
-                    None,
-                )
-
-                if not self_extension:
-                    continue
-
-                self.copy_attributes(item, winner, self_extension)
-                for looser_ext in item.extensions:
-                    new_ext = looser_ext.clone()
-                    new_ext.restrictions.merge(self_extension.restrictions)
-                    winner.extensions.append(new_ext)
-
-    def update_abstract_classes(self):
-        """Explicitly update classes to mark them as abstract when it's
-        implied."""
-        for classes in self.class_index.values():
-            if len(classes) == 1:
-                continue
-
-            element = next((obj for obj in classes if obj.is_element), None)
-            if not element:
-                continue
-
-            for obj in classes:
-                if obj is not element and obj.is_complex:
-                    obj.abstract = True
 
     def flatten_classes(self):
         for classes in self.class_index.values():

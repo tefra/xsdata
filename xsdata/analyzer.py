@@ -100,7 +100,7 @@ class ClassAnalyzer(ClassUtils):
         """
         all_classes = [item for values in self.class_index.values() for item in values]
         primary_classes = [
-            item for item in all_classes if item.is_enumeration or item.is_complex
+            item for item in all_classes if item.is_enumeration or item.is_complex or item.inner
         ]
 
         classes = primary_classes or all_classes

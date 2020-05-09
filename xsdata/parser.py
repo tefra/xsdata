@@ -1,7 +1,7 @@
 import sys
+import urllib
 from dataclasses import dataclass
 from dataclasses import field
-from pathlib import Path
 from typing import Any
 from typing import List
 from typing import Optional
@@ -39,14 +39,7 @@ class SchemaParser(XmlParser):
     target_namespace: Optional[str] = field(default=None)
     default_attributes: Optional[str] = field(default=None)
     default_open_content: Optional[xsd.DefaultOpenContent] = field(default=None)
-    schema_location: Optional[Path] = field(default=None)
-
-    def from_xsd_string(self, source: str) -> xsd.Schema:
-        return super().from_string(source, xsd.Schema)
-
-    def from_xsd_path(self, path: Path) -> xsd.Schema:
-        self.schema_location = path
-        return super().from_path(path, xsd.Schema)
+    schema_location: Optional[str] = field(default=None)
 
     def dequeue(self, element: Element, queue: XmlNodes, objects: ParsedObjects) -> Any:
         """Override parent method to set element index and namespaces map."""
@@ -125,22 +118,25 @@ class SchemaParser(XmlParser):
         for imp in obj.imports:
             imp.location = self.resolve_local_path(imp.schema_location, imp.namespace)
 
-    def resolve_path(self, location: Optional[str]) -> Optional[Path]:
+    def resolve_path(self, location: Optional[str]) -> Optional[str]:
         """Resolve the given location string relatively the schema location
         path."""
-        path = None
-        if self.schema_location and location:
-            path = self.schema_location.parent.joinpath(location).resolve()
-        return path if path and path.exists() else None
+
+        return (
+            urllib.parse.urljoin(self.schema_location, location)
+            if self.schema_location and location
+            else None
+        )
 
     def resolve_local_path(
         self, location: Optional[str], namespace: Optional[str]
-    ) -> Optional[Path]:
+    ) -> Optional[str]:
         """Resolve the given namespace to one of the local standard schemas or
         fallback to the external file path."""
-        if not location or location.startswith("http"):
-            ns = Namespace.get_enum(namespace)
-            return ns.location if ns else None
+
+        common_ns = Namespace.get_enum(namespace)
+        if common_ns:
+            return common_ns.location
 
         return self.resolve_path(location)
 

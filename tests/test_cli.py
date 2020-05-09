@@ -48,31 +48,33 @@ class CliTests(TestCase):
         self.assertEqual(logging.ERROR, logger.getEffectiveLevel())
 
     @mock.patch.object(SchemaTransformer, "process")
-    def test_with_single_definition(self, mock_transformer_process):
+    def test_with_single_source(self, mock_transformer_process):
         source = fixtures.joinpath("chapter02/example0202.xsd")
         result = self.runner.invoke(
             cli, [str(source.relative_to(root)), "--package", "foo"]
         )
         self.assertIsNone(result.exception)
-        mock_transformer_process.assert_called_once_with([source], "foo")
+        mock_transformer_process.assert_called_once_with([source.as_uri()], "foo")
 
     @mock.patch.object(SchemaTransformer, "process")
-    def test_with_multiple_definitions(self, mock_transformer_process):
+    def test_with_multiple_source(self, mock_transformer_process):
         first_source = fixtures.joinpath("chapter02/example0202.xsd")
         second_source = fixtures.joinpath("chapter02/example0206.xsd")
+        third_source = "http://foo/bar.xsd"
 
         result = self.runner.invoke(
             cli,
             [
                 str(first_source.relative_to(root)),
                 str(second_source.relative_to(root)),
+                third_source,
                 "--package",
                 "foo",
             ],
         )
         self.assertIsNone(result.exception)
         mock_transformer_process.assert_called_once_with(
-            [first_source, second_source], "foo"
+            [first_source.as_uri(), second_source.as_uri(), third_source], "foo"
         )
 
     @mock.patch.object(SchemaTransformer, "process")
@@ -85,7 +87,7 @@ class CliTests(TestCase):
         )
         self.assertIsNone(result.exception)
 
-        schemas = list(first_source.glob("*.xsd"))
-        schemas.append(second_source)
+        schemas = [x.as_uri() for x in first_source.glob("*.xsd")]
+        schemas.append(second_source.as_uri())
 
         mock_transformer_process.assert_called_once_with(schemas, "foo")

@@ -22,11 +22,12 @@ class Namespace(Enum):
         return self.name.lower()
 
     @property
-    def location(self) -> Path:
+    def location(self) -> str:
         return (
             Path(__file__)
             .absolute()
             .parent.parent.joinpath(f"schemas/{self.prefix}.xsd")
+            .as_uri()
         )
 
     @classmethod

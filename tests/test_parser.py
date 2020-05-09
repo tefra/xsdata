@@ -43,7 +43,7 @@ class SchemaParserTests(TestCase):
               </xs:simpleType>
             </xs:schema>"""
 
-        schema = self.parser.from_xsd_string(xsd)
+        schema = self.parser.from_string(xsd, Schema)
         expected_namespaces = {
             "xlink": "http://www.w3.org/1999/xlink",
             "xml": "http://www.w3.org/XML/1998/namespace",
@@ -235,13 +235,12 @@ class SchemaParserTests(TestCase):
         self.assertIsNone(self.parser.resolve_path("foo"))
         iam = Path(__file__)
 
-        self.parser.schema_location = iam
+        self.parser.schema_location = iam.as_uri()
         self.assertIsNone(self.parser.resolve_path(""))
         self.assertIsNone(self.parser.resolve_path(None))
-        self.assertIsNone(self.parser.resolve_path("a"))
 
         actual = self.parser.resolve_path(iam.name)
-        self.assertEqual(iam, actual)
+        self.assertEqual(iam.as_uri(), actual)
 
     def test_resolve_local_path(self):
         self.assertIsNone(self.parser.resolve_local_path("foo", "bar"))
@@ -259,10 +258,8 @@ class SchemaParserTests(TestCase):
             self.parser.resolve_local_path("http://something", Namespace.XSI.value),
         )
         iam = Path(__file__)
-        self.parser.schema_location = iam
-        self.assertEqual(
-            iam, self.parser.resolve_local_path(iam.name, Namespace.XSI.value)
-        )
+        self.parser.schema_location = iam.as_uri()
+        self.assertEqual(iam.as_uri(), self.parser.resolve_local_path(iam.name, None))
 
     def test_end_attribute(self):
         attribute = Attribute()

@@ -54,8 +54,7 @@ class CodeWriter:
 
     def module_name(self, module: str, output: str) -> str:
         engine = self.get_format(output)
-        name = module[:-4] if module.endswith(".xsd") else module
-        return engine.module_name(name)
+        return engine.module_name(module)
 
     def package_name(self, package: str, output: str) -> str:
         engine = self.get_format(output)

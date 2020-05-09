@@ -20,11 +20,7 @@ want to process.
 
     $ xsdata air_v48_0/AirReqRsp.xsd rail_v48_0/RailReqRsp.xsd --package travelport.models
 
-
-.. warning::
-
-    The generator works only with local files, if the given schema includes other
-    schemas with urls the generator will skip them.
+    $ xsdata http://www.gstatic.com/localfeed/local_feed.xsd --package feeds --print
 
 
 Package

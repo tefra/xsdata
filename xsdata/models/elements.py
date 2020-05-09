@@ -1,7 +1,6 @@
 import sys
 from dataclasses import dataclass
 from dataclasses import field
-from pathlib import Path
 from typing import Any as Anything
 from typing import Dict
 from typing import Iterator
@@ -1241,7 +1240,7 @@ class Notation(AnnotationBase):
 
 @dataclass
 class SchemaLocation(AnnotationBase):
-    location: Optional[Path] = field(default=None)
+    location: Optional[str] = field(default=None)
 
 
 @dataclass
@@ -1387,10 +1386,9 @@ class Schema(SchemaLocation):
 
     @property
     def module(self) -> str:
-        if self.location:
-            return self.location.name
+        origin = self.location or self.target_namespace
+        if not origin:
+            raise SchemaValueError("Unknown schema module.")
 
-        if self.target_namespace:
-            return Path(self.target_namespace).stem
-
-        raise SchemaValueError("Unknown schema module.")
+        module = origin.split("/")[-1]
+        return module[:-4] if module.endswith(".xsd") else module

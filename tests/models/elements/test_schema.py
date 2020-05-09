@@ -42,10 +42,12 @@ class SchemaTests(TestCase):
 
     def test_module(self):
         schema = Schema.create(
-            location=Path(__file__), target_namespace="http://xsdata/foo"
+            location="foo/bar.xsd", target_namespace="http://xsdata/foo"
         )
 
-        self.assertEqual("test_schema.py", schema.module)
+        self.assertEqual("bar", schema.module)
+        schema.location = "foo/bar.noext"
+        self.assertEqual("bar.noext", schema.module)
 
         schema.location = None
         self.assertEqual("foo", schema.module)

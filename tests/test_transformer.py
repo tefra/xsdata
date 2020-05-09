@@ -141,9 +141,7 @@ class SchemaTransformerTests(FactoryTestCase):
         mock_parse_schema.return_value = schema
 
         path = Path(__file__)
-        result = self.transformer.process_schema(
-            path, package="foo.bar", target_namespace="foo-bar"
-        )
+        result = self.transformer.process_schema(path, "foo.bar", "foo-bar")
 
         self.assertEqual(9, len(result))
         self.assertTrue(path in self.transformer.processed)
@@ -164,14 +162,24 @@ class SchemaTransformerTests(FactoryTestCase):
     def test_process_schema_avoid_circular_imports(
         self, mock_parse_schema, mock_logger_debug
     ):
-        path = Path(__file__)
+        path = Path(__file__).as_uri()
         self.transformer.processed.append(path)
         self.transformer.process_schema(path, "foo.bar", None)
 
         self.assertEqual(0, mock_parse_schema.call_count)
         mock_logger_debug.assert_called_once_with(
-            "Already processed skipping: %s", path.name
+            "Already processed skipping: %s", path
         )
+
+    @mock.patch.object(SchemaTransformer, "parse_schema")
+    def test_process_schema_skip_when_parse_schema_returns_none(
+        self, mock_parse_schema
+    ):
+        path = Path(__file__).as_uri()
+        mock_parse_schema.return_value = None
+        result = self.transformer.process_schema(path, "foo.bar", "ns")
+        self.assertEqual(0, len(result))
+        mock_parse_schema.assert_called_once_with(path, "ns")
 
     @mock.patch.object(SchemaTransformer, "process_schema")
     @mock.patch.object(SchemaTransformer, "adjust_package")
@@ -246,10 +254,20 @@ class SchemaTransformerTests(FactoryTestCase):
         )
 
     def test_parse_schema(self):
-        path = Path(__file__).parent.joinpath("fixtures/books.xsd")
-        schema = self.transformer.parse_schema(path, target_namespace="foo.bar")
+        path = Path(__file__).parent.joinpath("fixtures/books.xsd").as_uri()
+        schema = self.transformer.parse_schema(path, "foo.bar")
         self.assertIsInstance(schema, Schema)
         self.assertEqual(2, len(schema.complex_types))
+
+    @mock.patch("xsdata.transformer.logger.warning")
+    @mock.patch("xsdata.transformer.urlopen")
+    def test_parse_schema_with_os_exception(self, mock_urlopen, mock_logger_warning):
+        mock_urlopen.side_effect = FileNotFoundError
+
+        path = Path(__file__).parent.joinpath("fixtures/books.xsd").as_uri()
+        schema = self.transformer.parse_schema(path, "foo.bar")
+        self.assertIsNone(schema)
+        mock_logger_warning.assert_called_once_with("Schema not found %s", path)
 
     def test_adjust_package(self):
         actual = self.transformer.adjust_package("foo.bar", "../common.xsd")

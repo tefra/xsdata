@@ -5,6 +5,7 @@ from typing import List
 from typing import Optional
 from typing import Tuple
 from typing import Union
+from urllib.request import urlopen
 
 from xsdata.analyzer import ClassAnalyzer
 from xsdata.builder import ClassBuilder
@@ -23,10 +24,10 @@ from xsdata.writer import writer
 class SchemaTransformer:
     print: bool
     output: str
-    processed: List[Path] = field(init=False, default_factory=list)
+    processed: List[str] = field(init=False, default_factory=list)
 
-    def process(self, schemas: List[Path], package: str):
-        classes = self.process_schemas(schemas, package)
+    def process(self, urls: List[str], package: str):
+        classes = self.process_schemas(urls, package)
         classes = self.analyze_classes(classes)
         class_num, inner_num = self.count_classes(classes)
 
@@ -41,30 +42,31 @@ class SchemaTransformer:
         else:
             logger.warning("Analyzer returned zero classes!")
 
-    def process_schemas(self, schemas: List[Path], package: str) -> List[Class]:
+    def process_schemas(self, urls: List[str], package: str) -> List[Class]:
         classes = list()
-        for schema in schemas:
-            classes.extend(self.process_schema(schema, package))
+        for url in urls:
+            classes.extend(self.process_schema(url, package))
         return classes
 
     def process_schema(
-        self, schema_path: Path, package: str, target_namespace: Optional[str] = None,
+        self, url: str, package: str, namespace: Optional[str] = None,
     ) -> List[Class]:
-        """Recursively parse the given schema and all it's included schemas and
+        """Recursively parse the given schema url and the included schemas and
         generate a list of classes."""
         classes = []
-        if schema_path not in self.processed:
-            self.processed.append(schema_path)
+        if url not in self.processed:
+            self.processed.append(url)
             logger.info("Parsing schema...")
-            schema = self.parse_schema(schema_path, target_namespace)
-            target_namespace = schema.target_namespace
-            for sub in schema.included():
-                included_classes = self.process_included(sub, package, target_namespace)
-                classes.extend(included_classes)
+            schema = self.parse_schema(url, namespace)
+            if schema:
+                namespace = schema.target_namespace
+                for sub in schema.included():
+                    included_classes = self.process_included(sub, package, namespace)
+                    classes.extend(included_classes)
 
-            classes.extend(self.generate_classes(schema, package))
+                classes.extend(self.generate_classes(schema, package))
         else:
-            logger.debug("Already processed skipping: %s", schema_path.name)
+            logger.debug("Already processed skipping: %s", url)
         return classes
 
     def process_included(
@@ -106,15 +108,23 @@ class SchemaTransformer:
         return classes
 
     @staticmethod
-    def parse_schema(schema_path: Path, target_namespace: Optional[str]) -> Schema:
+    def parse_schema(url: str, namespace: Optional[str]) -> Optional[Schema]:
         """
-        Parse the given schema path and return the schema tree object.
+        Parse the given schema url and return the schema tree object.
 
         Optionally add the target namespace if the schema is included
         and is missing a target namespace.
         """
-        parser = SchemaParser(target_namespace=target_namespace)
-        return parser.from_xsd_path(schema_path)
+
+        try:
+            schema = urlopen(url).read()
+        except OSError:
+            logger.warning("Schema not found %s", url)
+        else:
+            parser = SchemaParser(target_namespace=namespace, schema_location=url)
+            return parser.from_bytes(schema, Schema)
+
+        return None
 
     @staticmethod
     def analyze_classes(classes: List[Class]) -> List[Class]:

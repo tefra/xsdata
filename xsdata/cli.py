@@ -27,22 +27,27 @@ def cli(sources: List, package: str, output: str, print: bool):
     """
     Convert schema definitions to code.
 
-    SOURCES can be one or more files or directories.
+    SOURCES can be one or more files or directories or urls.
     """
     if print:
         logger.setLevel(logging.ERROR)
 
-    schemas: List[Path] = list()
-    for source in sources:
-        src_path = Path(source).resolve()
-
-        if src_path.is_dir():
-            schemas.extend(src_path.glob("*.xsd"))
-        else:
-            schemas.append(src_path)
-
+    urls = process_sources(sources)
     transformer = SchemaTransformer(output=output, print=print)
-    transformer.process(schemas, package)
+    transformer.process(urls, package)
+
+
+def process_sources(sources: List[str]) -> List[str]:
+    result: List[str] = list()
+    for source in sources:
+        path = Path(source).resolve()
+        if path.is_dir():
+            result.extend((x.as_uri() for x in path.glob("*.xsd")))
+        elif path.is_file():
+            result.append(path.as_uri())
+        else:
+            result.append(source)
+    return result
 
 
 if __name__ == "__main__":

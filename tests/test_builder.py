@@ -1,4 +1,3 @@
-from pathlib import Path
 from types import GeneratorType
 from typing import Iterator
 from unittest import mock
@@ -34,7 +33,7 @@ from xsdata.models.enums import Tag
 class ClassBuilderTests(FactoryTestCase):
     def setUp(self):
         super(ClassBuilderTests, self).setUp()
-        self.schema = Schema.create(location=Path(__file__), target_namespace="builder")
+        self.schema = Schema.create(location="file://foo.xsd")
         self.builder = ClassBuilder(schema=self.schema, package="tests")
 
     @mock.patch.object(Redefine, "children")

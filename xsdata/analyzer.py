@@ -92,18 +92,16 @@ class ClassAnalyzer(ClassUtils):
     def fetch_classes_for_generation(self) -> List[Class]:
         """
         Return the qualified classes to continue for code generation. Return
-        all if there are not primary classes.
+        all of them if there are no classes derived from xs:element or
+        xs:complexType.
 
         Qualifications:
             * not an abstract
             * type: element | complexType | simpleType with enumerations
         """
-        all_classes = [item for values in self.class_index.values() for item in values]
-        primary_classes = [
-            item for item in all_classes if item.is_enumeration or item.is_complex
-        ]
-
-        classes = primary_classes or all_classes
+        classes = [item for values in self.class_index.values() for item in values]
+        if any(item.is_complex for item in classes):
+            classes = list(filter(lambda x: x.is_enumeration or x.is_complex, classes))
 
         for target in classes:
             self.sanitize_attributes(target)

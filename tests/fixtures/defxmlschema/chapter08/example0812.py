@@ -1,16 +1,25 @@
 from enum import Enum
+from dataclasses import dataclass, field
+from typing import Optional, Union
+from tests.fixtures.defxmlschema.chapter08.example0809 import (
+    SmlxsizeType,
+)
 
 
-class XsmlxsizeType(Enum):
+@dataclass
+class XsmlxsizeType:
     """
-    :cvar EXTRA_LARGE:
-    :cvar EXTRA_SMALL:
-    :cvar LARGE:
-    :cvar MEDIUM:
-    :cvar SMALL:
+    :ivar value:
     """
-    EXTRA_LARGE = "extra large"
-    EXTRA_SMALL = "extra small"
-    LARGE = "large"
-    MEDIUM = "medium"
-    SMALL = "small"
+    class Meta:
+        name = "XSMLXSizeType"
+
+    value: Optional[Union[SmlxsizeType, "XsmlxsizeType.Value"]] = field(
+        default=None,
+    )
+
+    class Value(Enum):
+        """
+        :cvar EXTRA_SMALL:
+        """
+        EXTRA_SMALL = "extra small"

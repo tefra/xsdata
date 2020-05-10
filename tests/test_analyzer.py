@@ -158,10 +158,10 @@ class ClassAnalyzerTests(FactoryTestCase):
         mock_sanitize_attributes.assert_has_calls([mock.call(x) for x in expected])
 
     @mock.patch.object(ClassAnalyzer, "sanitize_attributes")
-    def test_fetch_classes_for_generation_return_simple_when_no_complex_types(
+    def test_fetch_classes_for_generation_when_no_complex_class_available(
         self, mock_sanitize_attributes
     ):
-        classes = ClassFactory.list(2, type=SimpleType)
+        classes = [ClassFactory.enumeration(2), ClassFactory.create(type=SimpleType)]
         self.analyzer.create_class_index(classes)
 
         actual = self.analyzer.fetch_classes_for_generation()

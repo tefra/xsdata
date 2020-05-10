@@ -735,3 +735,24 @@ class ClassAnalyzerTests(FactoryTestCase):
                 mock.call(QName("b")),
             ]
         )
+
+    @mock.patch.object(ClassAnalyzer, "flatten_class")
+    def test_class_depends_on_has_a_depth_limit(self, *args):
+        one = ClassFactory.create(extensions=ExtensionFactory.list(1))
+        two = ClassFactory.create(extensions=ExtensionFactory.list(1))
+        three = ClassFactory.create(extensions=ExtensionFactory.list(1))
+        four = ClassFactory.create(extensions=ExtensionFactory.list(1))
+        five = ClassFactory.create(extensions=ExtensionFactory.list(1))
+
+        one.extensions[0].type.name = two.name
+        two.extensions[0].type.name = three.name
+        three.extensions[0].type.name = four.name
+        four.extensions[0].type.name = five.name
+        five.extensions[0].type.name = one.name
+
+        self.analyzer.create_class_index([one, two, three, four, five])
+        self.assertTrue(self.analyzer.class_depends_on(five, one))
+        self.assertTrue(self.analyzer.class_depends_on(two, one))
+
+        self.assertFalse(self.analyzer.class_depends_on(two, one, depth=3))
+        self.assertEqual(5, ClassAnalyzer.MAX_DEPENDENCY_CHECK_DEPTH)

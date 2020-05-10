@@ -28,11 +28,17 @@ class SchemaTransformer:
 
     def process(self, urls: List[str], package: str):
         classes = self.process_schemas(urls, package)
-        classes = self.analyze_classes(classes)
         class_num, inner_num = self.count_classes(classes)
-
         if class_num:
-            logger.info("Analyzer: %d main and %d inner classes", class_num, inner_num)
+            logger.info(
+                "Analyzer input: %d main and %d inner classes", class_num, inner_num
+            )
+
+            classes = self.analyze_classes(classes)
+            class_num, inner_num = self.count_classes(classes)
+            logger.info(
+                "Analyzer output: %d main and %d inner classes", class_num, inner_num
+            )
 
             writer.designate(classes, self.output)
             if self.print:

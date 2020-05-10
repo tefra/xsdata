@@ -29,6 +29,8 @@ class ClassAnalyzer(ClassUtils):
     classes to be used as common types for future runs.
     """
 
+    MAX_DEPENDENCY_CHECK_DEPTH = 5
+
     processed: List = field(default_factory=list)
     class_index: Dict[QName, List[Class]] = field(
         default_factory=lambda: defaultdict(list)
@@ -369,15 +371,19 @@ class ClassAnalyzer(ClassUtils):
 
             self.add_substitution_attrs(target, clone)
 
-    def class_depends_on(self, source: Class, target: Class) -> bool:
+    def class_depends_on(self, source: Class, target: Class, depth: int = 1) -> bool:
         """Check if any source dependencies recursively match the target
         class."""
+
         if source is target:
             return True
 
+        if depth > self.MAX_DEPENDENCY_CHECK_DEPTH:
+            return False
+
         for qname in source.dependencies():
             check = self.find_class(qname)
-            if check is target or (check and self.class_depends_on(check, target)):
+            if check and self.class_depends_on(check, target, depth + 1):
                 return True
 
         return False

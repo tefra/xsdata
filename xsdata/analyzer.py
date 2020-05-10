@@ -345,7 +345,7 @@ class ClassAnalyzer(ClassUtils):
             complex_source = self.find_attr_type(target, attr_type)
             if complex_source:
                 attr_type.self_ref = self.class_depends_on(complex_source, target)
-            else:
+            elif not attr_type.self_ref:
                 logger.warning("Missing type: %s", attr_type.name)
                 self.reset_attribute_type(attr_type)
 

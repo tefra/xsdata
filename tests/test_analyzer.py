@@ -673,6 +673,14 @@ class ClassAnalyzerTests(FactoryTestCase):
         self.assertFalse(attr_type.forward_ref)
         mock_logger_warning.assert_called_once_with("Missing type: %s", "foo")
 
+    def test_flatten_attribute_type_with_self_reference(self):
+        target = ClassFactory.create()
+        attr = AttrFactory.create()
+        attr_type = AttrTypeFactory.create(name="foo", self_ref=True)
+
+        self.analyzer.flatten_attribute_type(target, attr, attr_type)
+        self.assertEqual("foo", attr_type.name)
+
     @mock.patch.object(ClassAnalyzer, "find_attribute")
     def test_add_substitution_attrs(self, mock_find_attribute):
         target = ClassFactory.elements(2)

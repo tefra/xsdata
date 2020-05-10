@@ -449,3 +449,30 @@ class ClassUtilsTests(FactoryTestCase):
         self.assertFalse(two.abstract)  # Is an element
         self.assertTrue(three.abstract)  # Marked as abstract
         self.assertFalse(four.abstract)  # Is common
+
+    def test_copy_inner_classes(self):
+        source = ClassFactory.create(inner=ClassFactory.list(2))
+        target = ClassFactory.create()
+
+        ClassUtils.copy_inner_classes(source, target)  # All good copy all
+        self.assertEqual(source.inner, target.inner)
+
+        ClassUtils.copy_inner_classes(source, target)  # Inner classes exist skip
+        self.assertEqual(2, len(target.inner))
+
+        source.inner.append(target)
+
+        attr = AttrFactory.create(
+            types=[
+                AttrTypeFactory.create(name=target.name, forward_ref=True),
+                AttrTypeFactory.create(name=target.name, forward_ref=False),
+                AttrTypeFactory.create(name="foobar"),
+            ]
+        )
+        target.attrs.append(attr)
+
+        ClassUtils.copy_inner_classes(source, target)  # Inner class matches target
+        self.assertEqual(2, len(target.inner))
+        self.assertTrue(attr.types[0].self_ref)
+        self.assertFalse(attr.types[1].self_ref)
+        self.assertFalse(attr.types[2].self_ref)

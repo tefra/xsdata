@@ -260,7 +260,11 @@ class PythonAbstractGenerator(AbstractGenerator, ABC):
                 if attr_type.alias
                 else cls.type_name(attr_type)
             )
-            if attr_type.forward_ref:
+
+            if attr_type.forward_ref and attr_type.self_ref:
+                outer_str = ".".join(parents)
+                type_name = f'"{outer_str}"'
+            elif attr_type.forward_ref:
                 outer_str = ".".join(parents)
                 type_name = f'"{outer_str}.{type_name}"'
             elif attr_type.self_ref:

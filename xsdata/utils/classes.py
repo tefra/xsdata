@@ -205,12 +205,19 @@ class ClassUtils:
     @classmethod
     def copy_inner_classes(cls, source: Class, target: Class):
         """
-        Copy inner classes from source to target class.
+        Copy safely inner classes from source to target class.
 
-        Check for duplicates by name and skip if it already exists.
+        Checks:
+            1. Inner is the target class, skip and mark as self reference
+            2. Inner with same name exists, skip
         """
         for inner in source.inner:
-            if not any(existing.name == inner.name for existing in target.inner):
+            if inner is target:
+                for attr in target.attrs:
+                    for attr_type in attr.types:
+                        if attr_type.forward_ref and attr_type.name == inner.name:
+                            attr_type.self_ref = True
+            elif not any(existing.name == inner.name for existing in target.inner):
                 target.inner.append(inner)
 
     @classmethod

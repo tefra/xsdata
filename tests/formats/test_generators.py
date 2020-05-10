@@ -9,7 +9,6 @@ from tests.factories import PackageFactory
 from xsdata.formats.dataclass.models.constants import XmlType
 from xsdata.formats.generators import AbstractGenerator
 from xsdata.formats.generators import PythonAbstractGenerator as generator
-from xsdata.models.enums import DataType
 from xsdata.models.enums import Namespace
 from xsdata.models.enums import Tag
 
@@ -377,11 +376,13 @@ class PythonAbstractGeneratorTests(FactoryTestCase):
         actual = generator.attribute_display_type(attr, parents)
         self.assertEqual('Optional["FooBar"]', actual)
 
+        parents = ["Parent", "Inner"]
         attr.types[0].forward_ref = True
         actual = generator.attribute_display_type(attr, parents)
-        self.assertEqual('Optional["Parent.FooBar"]', actual)
+        self.assertEqual('Optional["Parent.Inner"]', actual)
 
         parents = ["A", "Parent"]
+        attr.types[0].self_ref = False
         attr.restrictions.max_occurs = 2
         actual = generator.attribute_display_type(attr, parents)
         self.assertEqual('List["A.Parent.FooBar"]', actual)
@@ -415,6 +416,7 @@ class PythonAbstractGeneratorTests(FactoryTestCase):
         type_decimal = AttrTypeFactory.xs_decimal()
         type_bool = AttrTypeFactory.xs_bool()
         type_qname = AttrTypeFactory.xs_qname()
+        type_qmap = AttrTypeFactory.xs_qmap()
         type_tokens = AttrTypeFactory.xs_tokens()
 
         attr = AttrFactory.create(name="foo", types=[type_str])
@@ -430,6 +432,9 @@ class PythonAbstractGeneratorTests(FactoryTestCase):
         attr.default = "1"
         attr.types[0] = type_int
         self.assertEqual(1, generator.attribute_default(attr))
+
+        attr.types[0] = type_qmap
+        self.assertEqual("dict", generator.attribute_default(attr))
 
         attr.default = "true"
         attr.types[0] = type_bool

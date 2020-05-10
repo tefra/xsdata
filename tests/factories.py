@@ -177,13 +177,22 @@ class AttrTypeFactory(Factory):
     counter = 65
 
     @classmethod
-    def create(cls, name=None, index=None, alias=None, native=False, forward_ref=False):
+    def create(
+        cls,
+        name=None,
+        index=None,
+        alias=None,
+        native=False,
+        forward_ref=False,
+        self_ref=False,
+    ):
 
         return cls.model(
             name=name or f"attr_{cls.next_letter()}",
             index=index or 0,
             alias=alias,
             native=native,
+            self_ref=self_ref,
             forward_ref=forward_ref,
         )
 

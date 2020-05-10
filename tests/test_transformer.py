@@ -18,56 +18,52 @@ class SchemaTransformerTests(FactoryTestCase):
     @mock.patch("xsdata.transformer.logger.info")
     @mock.patch.object(CodeWriter, "print")
     @mock.patch.object(CodeWriter, "designate")
-    @mock.patch.object(SchemaTransformer, "count_classes")
     @mock.patch.object(SchemaTransformer, "analyze_classes")
     @mock.patch.object(SchemaTransformer, "process_schemas")
     def test_process_with_print_true(
         self,
         mock_process_schemas,
         mock_analyze_classes,
-        mock_count_classes,
         mock_writer_designate,
         mock_writer_print,
         mock_logger_into,
     ):
         path = Path(__file__)
         package = "test"
-        schema_classes = ClassFactory.list(2)
+        schema_classes = ClassFactory.list(3)
         analyzer_classes = ClassFactory.list(2)
-        mock_count_classes.return_value = 1, 2
         mock_process_schemas.return_value = schema_classes
         mock_analyze_classes.return_value = analyzer_classes
 
         self.transformer.process(path, package)
         mock_process_schemas.assert_called_once_with(path, package)
         mock_analyze_classes.assert_called_once_with(schema_classes)
-        mock_count_classes.assert_called_once_with(analyzer_classes)
         mock_writer_designate.assert_called_once_with(analyzer_classes, "pydata")
         mock_writer_print.assert_called_once_with(analyzer_classes, "pydata")
-        mock_logger_into.assert_called_once_with(
-            "Analyzer: %d main and %d inner classes", 1, 2
+        mock_logger_into.assert_has_calls(
+            [
+                mock.call("Analyzer input: %d main and %d inner classes", 3, 0),
+                mock.call("Analyzer output: %d main and %d inner classes", 2, 0),
+            ]
         )
 
     @mock.patch("xsdata.transformer.logger.info")
     @mock.patch.object(CodeWriter, "write")
     @mock.patch.object(CodeWriter, "designate")
-    @mock.patch.object(SchemaTransformer, "count_classes")
     @mock.patch.object(SchemaTransformer, "analyze_classes")
     @mock.patch.object(SchemaTransformer, "process_schemas")
     def test_process_with_print_false(
         self,
         mock_process_schemas,
         mock_analyze_classes,
-        mock_count_classes,
         mock_writer_designate,
         mock_writer_write,
         mock_logger_into,
     ):
         path = Path(__file__)
         package = "test"
-        schema_classes = ClassFactory.list(2)
+        schema_classes = ClassFactory.list(3)
         analyzer_classes = ClassFactory.list(2)
-        mock_count_classes.return_value = 1, 2
         mock_process_schemas.return_value = schema_classes
         mock_analyze_classes.return_value = analyzer_classes
 
@@ -75,36 +71,29 @@ class SchemaTransformerTests(FactoryTestCase):
         self.transformer.process(path, package)
         mock_process_schemas.assert_called_once_with(path, package)
         mock_analyze_classes.assert_called_once_with(schema_classes)
-        mock_count_classes.assert_called_once_with(analyzer_classes)
         mock_writer_designate.assert_called_once_with(analyzer_classes, "pydata")
         mock_writer_write.assert_called_once_with(analyzer_classes, "pydata")
-        mock_logger_into.assert_called_once_with(
-            "Analyzer: %d main and %d inner classes", 1, 2
+        mock_logger_into.assert_has_calls(
+            [
+                mock.call("Analyzer input: %d main and %d inner classes", 3, 0),
+                mock.call("Analyzer output: %d main and %d inner classes", 2, 0),
+            ]
         )
 
     @mock.patch("xsdata.transformer.logger.warning")
-    @mock.patch.object(SchemaTransformer, "count_classes")
     @mock.patch.object(SchemaTransformer, "analyze_classes")
     @mock.patch.object(SchemaTransformer, "process_schemas")
     def test_process_with_zero_classes_after_analyze(
-        self,
-        mock_process_schemas,
-        mock_analyze_classes,
-        mock_count_classes,
-        mock_logger_warning,
+        self, mock_process_schemas, mock_analyze_classes, mock_logger_warning,
     ):
         path = Path(__file__)
         package = "test"
-        schema_classes = ClassFactory.list(2)
-        analyzer_classes = []
-        mock_count_classes.return_value = 0, 0
+        schema_classes = []
         mock_process_schemas.return_value = schema_classes
-        mock_analyze_classes.return_value = analyzer_classes
 
         self.transformer.process(path, package)
+        self.assertEqual(0, mock_analyze_classes.call_count)
         mock_process_schemas.assert_called_once_with(path, package)
-        mock_analyze_classes.assert_called_once_with(schema_classes)
-        mock_count_classes.assert_called_once_with(analyzer_classes)
         mock_logger_warning.assert_called_once_with("Analyzer returned zero classes!")
 
     @mock.patch.object(SchemaTransformer, "process_schema")

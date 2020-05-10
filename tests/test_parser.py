@@ -29,7 +29,7 @@ from xsdata.parser import SchemaParser
 class SchemaParserTests(TestCase):
     def setUp(self):
         self.parser = SchemaParser()
-        super(SchemaParserTests, self).setUp()
+        super().setUp()
 
     def test_complete(self):
         xsd = """<?xml version="1.0" encoding="utf-8"?>

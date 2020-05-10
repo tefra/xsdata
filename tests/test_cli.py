@@ -18,7 +18,7 @@ os.chdir(root)
 class CliTests(TestCase):
     def setUp(self):
         self.runner = CliRunner()
-        super(CliTests, self).setUp()
+        super().setUp()
 
     @mock.patch.object(SchemaTransformer, "process")
     @mock.patch.object(SchemaTransformer, "__init__", return_value=None)

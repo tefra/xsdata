@@ -172,7 +172,6 @@ class ElementBase(BaseModel):
                 and len(value) > 0
                 and isinstance(value[0], ElementBase)
             ):
-                for v in value:
-                    yield v
+                yield from value
             elif isinstance(value, ElementBase):
                 yield value

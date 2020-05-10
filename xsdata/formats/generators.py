@@ -40,7 +40,7 @@ class AbstractGenerator(ABC):
         )
 
     def template(self, name: str) -> Template:
-        return self.env.get_template("{}.jinja2".format(name))
+        return self.env.get_template(f"{name}.jinja2")
 
     @abstractmethod
     def render(self, classes: List[Class]) -> Iterator[Tuple[Path, str, str]]:
@@ -151,7 +151,7 @@ class PythonAbstractGenerator(AbstractGenerator, ABC):
     @classmethod
     def has_duplicate_attrs(cls, obj: Class) -> bool:
         """Check if given class includes duplicate attribute names."""
-        names = set([attr.name for attr in obj.attrs])
+        names = {attr.name for attr in obj.attrs}
         return len(names) < len(obj.attrs)
 
     @classmethod

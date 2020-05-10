@@ -24,7 +24,7 @@ NSMAP = {ns.prefix: ns.uri for ns in Namespace}
 
 class FactoryTestCase(unittest.TestCase):
     def setUp(self):
-        super(FactoryTestCase, self).setUp()
+        super().setUp()
         ClassFactory.reset()
         AttrFactory.reset()
         AttrTypeFactory.reset()

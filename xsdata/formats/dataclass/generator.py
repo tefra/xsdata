@@ -17,7 +17,7 @@ class DataclassGenerator(PythonAbstractGenerator):
     templates_dir = Path(__file__).parent.joinpath("templates")
 
     def __init__(self):
-        super(DataclassGenerator, self).__init__()
+        super().__init__()
         self.env.filters.update(filters)
 
     def render(self, classes: List[Class]) -> Iterator[Tuple[Path, str, str]]:

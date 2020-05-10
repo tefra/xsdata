@@ -81,7 +81,7 @@ class RootNode(ElementNode):
     def next_node(self, element: Element, position: int, ctx: XmlContext) -> XmlNode:
         if element.getparent() is None:
             return self
-        return super(RootNode, self).next_node(element, position, ctx)
+        return super().next_node(element, position, ctx)
 
 
 @dataclass(frozen=True)

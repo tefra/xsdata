@@ -42,7 +42,7 @@ def process_sources(sources: List[str]) -> List[str]:
     for source in sources:
         path = Path(source).resolve()
         if path.is_dir():
-            result.extend((x.as_uri() for x in path.glob("*.xsd")))
+            result.extend(x.as_uri() for x in path.glob("*.xsd"))
         elif path.is_file():
             result.append(path.as_uri())
         else:

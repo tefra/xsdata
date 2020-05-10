@@ -14,7 +14,7 @@ from xsdata.resolver import DependenciesResolver
 
 class DependenciesResolverTest(FactoryTestCase):
     def setUp(self):
-        super(DependenciesResolverTest, self).setUp()
+        super().setUp()
         self.resolver = DependenciesResolver()
 
     @mock.patch.object(DependenciesResolver, "resolve_imports")

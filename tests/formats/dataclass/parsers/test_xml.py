@@ -21,7 +21,7 @@ from xsdata.models.enums import EventType
 
 class XmlParserTests(TestCase):
     def setUp(self):
-        super(XmlParserTests, self).setUp()
+        super().setUp()
         self.parser = XmlParser()
         self.parser.index = 10
         self.parser.objects = [(QName(x), x) for x in "abcde"]
@@ -109,7 +109,7 @@ class XmlParserTests(TestCase):
 
 class XmlParserIntegrationTest(TestCase):
     def setUp(self):
-        super(XmlParserIntegrationTest, self).setUp()
+        super().setUp()
         self.books = Books(
             book=[
                 BookForm(

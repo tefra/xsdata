@@ -19,7 +19,7 @@ from xsdata.models.enums import DataType
 
 class ClassAnalyzerTests(FactoryTestCase):
     def setUp(self):
-        super(ClassAnalyzerTests, self).setUp()
+        super().setUp()
         self.target_namespace = "http://namespace/target"
         self.ns_map = {
             None: "http://namespace/foobar",

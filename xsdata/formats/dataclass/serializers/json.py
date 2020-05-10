@@ -15,7 +15,7 @@ from xsdata.formats.bindings import AbstractSerializer
 
 
 def filter_none(x: Tuple) -> Dict:
-    return dict((k, v) for k, v in x if v is not None)
+    return {k: v for k, v in x if v is not None}
 
 
 class DictFactory:
@@ -29,7 +29,7 @@ class JsonEncoder(json.JSONEncoder):
         if isinstance(obj, Decimal):
             return str(obj)
 
-        return super(JsonEncoder, self).default(obj)
+        return super().default(obj)
 
 
 @dataclass

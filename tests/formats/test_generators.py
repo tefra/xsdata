@@ -15,10 +15,10 @@ from xsdata.models.enums import Tag
 
 class AbstractGeneratorTests(FactoryTestCase):
     def test_module_name(self):
-        self.assertEqual("a", AbstractGenerator.module_name(("a")))
+        self.assertEqual("a", AbstractGenerator.module_name("a"))
 
     def test_package_name(self):
-        self.assertEqual("a", AbstractGenerator.package_name(("a")))
+        self.assertEqual("a", AbstractGenerator.package_name("a"))
 
 
 class PythonAbstractGeneratorTests(FactoryTestCase):

@@ -1191,9 +1191,9 @@ class Element(AnnotationBase):
     @property
     def real_type(self) -> Optional[str]:
 
-        types = set(
+        types = {
             alternative.type for alternative in self.alternatives if alternative.type
-        )
+        }
         if self.type:
             types.add(self.type)
         elif self.ref:
@@ -1372,17 +1372,13 @@ class Schema(SchemaLocation):
     notations: Array[Notation] = array_element(name="notation")
 
     def included(self) -> Iterator[UnionType[Import, Include, Redefine, Override]]:
-        for imp in self.imports:
-            yield imp
+        yield from self.imports
 
-        for inc in self.includes:
-            yield inc
+        yield from self.includes
 
-        for red in self.redefines:
-            yield red
+        yield from self.redefines
 
-        for over in self.overrides:
-            yield over
+        yield from self.overrides
 
     @property
     def module(self) -> str:

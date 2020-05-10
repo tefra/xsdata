@@ -1,5 +1,4 @@
 import sys
-import urllib
 from dataclasses import dataclass
 from dataclasses import field
 from typing import Any
@@ -7,6 +6,7 @@ from typing import List
 from typing import Optional
 from typing import Tuple
 from typing import TypeVar
+from urllib.parse import urljoin
 
 from lxml.etree import Element
 from lxml.etree import QName
@@ -43,7 +43,7 @@ class SchemaParser(XmlParser):
 
     def dequeue(self, element: Element, queue: XmlNodes, objects: ParsedObjects) -> Any:
         """Override parent method to set element index and namespaces map."""
-        obj: Any = super(SchemaParser, self).dequeue(element, queue, objects)
+        obj: Any = super().dequeue(element, queue, objects)
 
         if isinstance(obj, ElementBase):
             obj.index = element.sourceline
@@ -123,7 +123,7 @@ class SchemaParser(XmlParser):
         path."""
 
         return (
-            urllib.parse.urljoin(self.schema_location, location)
+            urljoin(self.schema_location, location)
             if self.schema_location and location
             else None
         )

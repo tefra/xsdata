@@ -30,7 +30,7 @@ from xsdata.models.enums import QNames
 
 class XmlSerializerTests(TestCase):
     def setUp(self):
-        super(XmlSerializerTests, self).setUp()
+        super().setUp()
         self.serializer = XmlSerializer(pretty_print=True)
         self.namespaces = Namespaces()
         self.books = Books(

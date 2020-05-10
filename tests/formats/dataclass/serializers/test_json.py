@@ -8,7 +8,7 @@ from xsdata.formats.dataclass.serializers import DictSerializer
 
 class DictSerializerTests(TestCase):
     def setUp(self):
-        super(DictSerializerTests, self).setUp()
+        super().setUp()
         self.books = Books(
             book=[
                 BookForm(

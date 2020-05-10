@@ -12,7 +12,7 @@ from xsdata.models.enums import QNames
 
 class SerializeUtilsTests(TestCase):
     def setUp(self) -> None:
-        super(SerializeUtilsTests, self).setUp()
+        super().setUp()
         self.namespaces = Namespaces()
         self.element = Element("root")
 

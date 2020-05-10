@@ -1,6 +1,11 @@
 exclude: tests/fixtures|docs/examples
 
 repos:
+  - repo: https://github.com/asottile/pyupgrade
+    rev: v2.4.1
+    hooks:
+      - id: pyupgrade
+        args: [--py37-plus]
   - repo: https://github.com/asottile/reorder_python_imports
     rev: v2.3.0
     hooks:

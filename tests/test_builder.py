@@ -32,7 +32,7 @@ from xsdata.models.enums import Tag
 
 class ClassBuilderTests(FactoryTestCase):
     def setUp(self):
-        super(ClassBuilderTests, self).setUp()
+        super().setUp()
         self.schema = Schema.create(location="file://foo.xsd")
         self.builder = ClassBuilder(schema=self.schema, package="tests")
 

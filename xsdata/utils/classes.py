@@ -51,7 +51,6 @@ class ClassUtils:
 
         for i in range(len(target.attrs)):
             cls.sanitize_attribute_sequence(target.attrs, i)
-            cls.sanitize_attribute_name(target.attrs, i)
 
         for inner in target.inner:
             cls.sanitize_attributes(inner)
@@ -97,21 +96,6 @@ class ClassUtils:
             return
 
         attrs[index].restrictions.sequential = False
-
-    @classmethod
-    def sanitize_attribute_name(cls, attrs: List[Attr], index: int):
-        """Check if the attribute at the given index has a duplicate name and
-        prepend if exists the attribute namespace."""
-
-        current = attrs[index]
-        current.name = text.suffix(current.name)
-        exists = any(
-            attr is not current and current.name == text.suffix(attr.name)
-            for attr in attrs
-        )
-
-        if exists and current.namespace:
-            current.name = f"{current.namespace}_{current.name}"
 
     @classmethod
     def merge_duplicate_attributes(cls, target: Class):

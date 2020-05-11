@@ -1,6 +1,8 @@
 from typing import List
 from typing import Tuple
 
+from xsdata.utils.collections import unique_sequence
+
 
 def prefix(string: str, sep: str = ":") -> str:
     return split(string, sep)[0]
@@ -19,7 +21,9 @@ def split(string: str, sep: str = ":") -> Tuple:
 
 
 def collapse_whitespace(string: str) -> str:
-    return " ".join([part for part in string.split(" ") if part.strip()])
+    return " ".join(
+        unique_sequence([part for part in string.split(" ") if part.strip()])
+    )
 
 
 def capitalize(string: str) -> str:

@@ -19,7 +19,7 @@ class AnyTests(TestCase):
         obj.namespace = "foo"
         self.assertEqual("foo", obj.raw_namespace)
 
-        obj = Any.create(namespace="    foo  \n    \t  \r  bar")
+        obj = Any.create(namespace="    foo  \n    \t  \r  bar foo ")
         self.assertEqual("foo bar", obj.raw_namespace)
 
     def test_property_real_name(self):

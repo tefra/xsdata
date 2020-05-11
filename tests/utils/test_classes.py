@@ -40,7 +40,6 @@ class ClassUtilsTests(FactoryTestCase):
         self.assertEqual(1, ClassUtils.INCLUDES_SOME)
         self.assertEqual(2, ClassUtils.INCLUDES_ALL)
 
-    @mock.patch.object(ClassUtils, "sanitize_attribute_name")
     @mock.patch.object(ClassUtils, "sanitize_attribute_sequence")
     @mock.patch.object(ClassUtils, "sanitize_restrictions")
     @mock.patch.object(ClassUtils, "sanitize_attribute")
@@ -49,7 +48,6 @@ class ClassUtilsTests(FactoryTestCase):
         mock_sanitize_attribute,
         mock_sanitize_restrictions,
         mock_sanitize_attribute_sequence,
-        mock_sanitize_attribute_name,
     ):
 
         target = ClassFactory.elements(3)
@@ -87,7 +85,6 @@ class ClassUtilsTests(FactoryTestCase):
             mock.call(target.inner[0].attrs, 1),
         ]
         mock_sanitize_attribute_sequence.assert_has_calls(expected_second)
-        mock_sanitize_attribute_name.assert_has_calls(expected_second)
 
     def test_sanitize_attribute(self):
         attr = AttrFactory.create(fixed=True)
@@ -156,21 +153,6 @@ class ClassUtilsTests(FactoryTestCase):
         attrs_clone[1].restrictions.sequential = False
         ClassUtils.sanitize_attribute_sequence(attrs_clone, 0)
         self.assertEqual(0, len_sequential(attrs_clone))
-
-    def test_sanitize_attribute_name(self):
-        attr_a = AttrFactory.create(name="kou:bar")
-        attr_b = attr_a.clone()
-        attr_a.namespace = "foo"
-
-        ClassUtils.sanitize_attribute_name([attr_a, attr_b], 0)
-        self.assertEqual("foo_bar", attr_a.name)
-
-        ClassUtils.sanitize_attribute_name([attr_a, attr_b], 1)
-        self.assertEqual("bar", attr_b.name)
-
-        attr_c = attr_b.clone()
-        ClassUtils.sanitize_attribute_name([attr_a, attr_b, attr_c], 2)
-        self.assertEqual("bar", attr_b.name)
 
     def test_merge_duplicate_attributes(self):
         one = AttrFactory.attribute(fixed=True)

@@ -56,7 +56,6 @@ class AbstractGenerator(ABC):
 
 
 class PythonAbstractGenerator(AbstractGenerator, ABC):
-
     xml_type_map = {
         Tag.ELEMENT: XmlType.ELEMENT,
         Tag.ANY: XmlType.WILDCARD,
@@ -121,9 +120,15 @@ class PythonAbstractGenerator(AbstractGenerator, ABC):
     @classmethod
     def sanitize_attribute_names(cls, obj: Class):
         """
-        Append xml type to attribute name if it's not unique in the list.
+        Sanitize duplicate attribute names.
 
-        Prefer keeping intact element attributes.
+        Steps:
+            1. Search for duplicate attribute by name
+            2. Same xml type
+                2.1 Duplicate has a namespace: prepend namespace
+                2.2 Current has a namespace: prepend namespace
+            3. xml element: append the xml type to the duplicate attr name
+            4. Append the xml type to the current attr name
         """
         for attr in obj.attrs:
             dup = next(
@@ -132,7 +137,13 @@ class PythonAbstractGenerator(AbstractGenerator, ABC):
             )
             if not dup:
                 continue
-            if attr.xml_type == XmlType.ELEMENT:
+
+            if dup.xml_type == attr.xml_type and any((dup.namespace, attr.namespace)):
+                if dup.namespace:
+                    dup.name = cls.attribute_name(f"{dup.namespace}_{dup.name}")
+                else:
+                    attr.name = cls.attribute_name(f"{attr.namespace}_{attr.name}")
+            elif attr.xml_type == XmlType.ELEMENT:
                 dup.name = cls.attribute_name(f"{dup.name}_{dup.xml_type}")
             else:
                 attr.name = cls.attribute_name(f"{attr.name}_{attr.xml_type}")

@@ -201,7 +201,7 @@ class PythonAbstractGeneratorTests(FactoryTestCase):
         obj.attrs.append(AttrFactory.create(name="a"))
         self.assertTrue(generator.has_duplicate_attrs(obj))
 
-    def test_sanitize_attribute_names(self):
+    def test_sanitize_attribute_names_same_name_diff_xml_type(self):
         obj = ClassFactory.create(
             attrs=[
                 AttrFactory.create(name="a", xml_type=XmlType.ELEMENT),
@@ -217,6 +217,17 @@ class PythonAbstractGeneratorTests(FactoryTestCase):
 
         obj = ClassFactory.create(
             attrs=[
+                AttrFactory.create(name="a", xml_type=XmlType.ATTRIBUTE),
+                AttrFactory.create(name="a", xml_type=XmlType.ELEMENT),
+            ]
+        )
+        generator.sanitize_attribute_names(obj)
+        self.assertEqual("a_attribute", obj.attrs[0].name)
+        self.assertEqual("a", obj.attrs[1].name)
+
+    def test_sanitize_attribute_names_same_name_and_xml_type(self):
+        obj = ClassFactory.create(
+            attrs=[
                 AttrFactory.create(name="a", xml_type=XmlType.ELEMENT),
                 AttrFactory.create(name="a", xml_type=XmlType.ELEMENT),
             ]
@@ -226,16 +237,21 @@ class PythonAbstractGeneratorTests(FactoryTestCase):
         self.assertEqual("a", obj.attrs[0].name)
         self.assertEqual("a_element", obj.attrs[1].name)
 
+    def test_sanitize_attribute_names_same_name_and_xml_type_with_namespaces(self):
         obj = ClassFactory.create(
             attrs=[
-                AttrFactory.create(name="a", xml_type=XmlType.ATTRIBUTE),
-                AttrFactory.create(name="a", xml_type=XmlType.ATTRIBUTE),
+                AttrFactory.create(name="a", xml_type=XmlType.ELEMENT, namespace="b"),
+                AttrFactory.create(name="a", xml_type=XmlType.ELEMENT),
+                AttrFactory.create(name="b", xml_type=XmlType.ELEMENT),
+                AttrFactory.create(name="b", xml_type=XmlType.ELEMENT, namespace="a"),
             ]
         )
 
         generator.sanitize_attribute_names(obj)
-        self.assertEqual("a_attribute", obj.attrs[0].name)
+        self.assertEqual("b_a", obj.attrs[0].name)
         self.assertEqual("a", obj.attrs[1].name)
+        self.assertEqual("b", obj.attrs[2].name)
+        self.assertEqual("a_b", obj.attrs[3].name)
 
     def test_hash_attributes_names(self):
         obj = ClassFactory.create(

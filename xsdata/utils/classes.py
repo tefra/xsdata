@@ -1,3 +1,4 @@
+import re
 import sys
 from collections import defaultdict
 from typing import Dict
@@ -47,10 +48,13 @@ class ClassUtils:
     def sanitize_attributes(cls, target: Class):
         for attr in target.attrs:
             cls.sanitize_attribute(attr)
-            cls.sanitize_restrictions(attr.restrictions)
+            cls.sanitize_attribute_restrictions(attr)
+            cls.sanitize_attribute_name(attr)
 
         for i in range(len(target.attrs)):
             cls.sanitize_attribute_sequence(target.attrs, i)
+
+        cls.rename_duplicate_attribute_names(target.attrs)
 
         for inner in target.inner:
             cls.sanitize_attributes(inner)
@@ -67,7 +71,8 @@ class ClassUtils:
             attr.default = None
 
     @classmethod
-    def sanitize_restrictions(cls, restrictions: Restrictions):
+    def sanitize_attribute_restrictions(cls, attr: Attr):
+        restrictions = attr.restrictions
         min_occurs = restrictions.min_occurs or 0
         max_occurs = restrictions.max_occurs or 0
 
@@ -96,6 +101,51 @@ class ClassUtils:
             return
 
         attrs[index].restrictions.sequential = False
+
+    @classmethod
+    def sanitize_attribute_name(cls, attr: Attr):
+        if attr.is_enumeration:
+            attr.name = attr.default
+            if re.match(r"^-\d*\.?\d+$", attr.name):
+                attr.name = f"value_minus_{attr.name}"
+            else:
+                attr.name = re.sub("[^0-9a-zA-Z]", " ", attr.name).strip()
+        else:
+            attr.name = re.sub("[^0-9a-zA-Z]", " ", text.suffix(attr.name)).strip()
+
+        if not attr.name:
+            attr.name = "value"
+        elif not attr.name[0].isalpha():
+            attr.name = f"value_{attr.name}"
+
+    @classmethod
+    def rename_duplicate_attribute_names(cls, attrs: List[Attr]) -> None:
+
+        grouped: Dict[str, List[Attr]] = dict()
+        for attr in attrs:
+            grouped.setdefault(attr.name.lower(), []).append(attr)
+
+        for items in grouped.values():
+            if len(items) == 1:
+                continue
+
+            if len(items) > 2 or items[0].is_enumeration:
+                for index in range(1, len(items)):
+                    num = 1
+                    name = items[index].name
+
+                    while any(attr for attr in attrs if attr.name == f"{name}_{num}"):
+                        num += 1
+
+                    items[index].name = f"{name}_{num}"
+            else:
+                first, second = items
+                if first.tag == second.tag and any((first.namespace, second.namespace)):
+                    change = second if second.namespace else first
+                    change.name = f"{change.namespace}_{change.name}"
+                else:
+                    change = second if second.is_attribute else first
+                    change.name = f"{change.name}_{change.tag}"
 
     @classmethod
     def merge_duplicate_attributes(cls, target: Class):

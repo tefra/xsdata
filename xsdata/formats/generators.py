@@ -2,7 +2,6 @@ import math
 import re
 from abc import ABC
 from abc import abstractmethod
-from base64 import urlsafe_b64encode
 from decimal import Decimal
 from pathlib import Path
 from typing import Any
@@ -88,20 +87,12 @@ class PythonAbstractGenerator(AbstractGenerator, ABC):
     @classmethod
     def process_enumerations(cls, obj: Class):
         attr_types = {ext.type.name: ext.type for ext in obj.extensions}
-        attrs = {str(attr.default): attr for attr in obj.attrs}
-        obj.attrs = sorted(attrs.values(), key=lambda x: str(x.default))
-
-        names = set()
         for attr in obj.attrs:
             attr.types.extend(attr_types.values())
             attr.default = cls.attribute_default(attr, obj.ns_map)
-            attr.name = cls.enumeration_name(str(attr.default).strip("\"'"))
-            names.add(attr.name)
+            attr.name = cls.enumeration_name(attr.name)
 
-        if len(names) != len(obj.attrs):
-            for attr in obj.attrs:
-                safe_name = urlsafe_b64encode(str(attr.default).encode()).decode()
-                attr.name = cls.enumeration_name(safe_name)
+        obj.attrs.sort(key=lambda x: x.name)
 
     @classmethod
     def process_attributes(cls, obj: Class, parents_list: List[str]):
@@ -109,61 +100,7 @@ class PythonAbstractGenerator(AbstractGenerator, ABC):
         for attr in obj.attrs:
             cls.process_attribute(obj, attr, parents_list)
 
-        if cls.has_duplicate_attrs(obj):
-            cls.sanitize_attribute_names(obj)
-
-        if cls.has_duplicate_attrs(obj):
-            cls.hash_attributes_names(obj)
-
         cls.unset_attributes_local_names(obj)
-
-    @classmethod
-    def sanitize_attribute_names(cls, obj: Class):
-        """
-        Sanitize duplicate attribute names.
-
-        Steps:
-            1. Search for duplicate attribute by name
-            2. Same xml type
-                2.1 Duplicate has a namespace: prepend namespace
-                2.2 Current has a namespace: prepend namespace
-            3. xml element: append the xml type to the duplicate attr name
-            4. Append the xml type to the current attr name
-        """
-        for attr in obj.attrs:
-            dup = next(
-                (dup for dup in obj.attrs if dup is not attr and dup.name == attr.name),
-                None,
-            )
-            if not dup:
-                continue
-
-            if dup.xml_type == attr.xml_type and any((dup.namespace, attr.namespace)):
-                if dup.namespace:
-                    dup.name = cls.attribute_name(f"{dup.namespace}_{dup.name}")
-                else:
-                    attr.name = cls.attribute_name(f"{attr.namespace}_{attr.name}")
-            elif attr.xml_type == XmlType.ELEMENT:
-                dup.name = cls.attribute_name(f"{dup.name}_{dup.xml_type}")
-            else:
-                attr.name = cls.attribute_name(f"{attr.name}_{attr.xml_type}")
-
-    @classmethod
-    def hash_attributes_names(cls, obj: Class):
-        """
-        Replace attribute names with b64 hash of the local name.
-
-        This is a last resort to create unique class attribute names.
-        """
-        for attr in obj.attrs:
-            safe_name = urlsafe_b64encode(str(attr.local_name).encode()).decode()
-            attr.name = cls.attribute_name(safe_name)
-
-    @classmethod
-    def has_duplicate_attrs(cls, obj: Class) -> bool:
-        """Check if given class includes duplicate attribute names."""
-        names = {attr.name for attr in obj.attrs}
-        return len(names) < len(obj.attrs)
 
     @classmethod
     def unset_attributes_local_names(cls, obj: Class):

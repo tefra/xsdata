@@ -45,32 +45,6 @@ class ClassUtils:
         return cls.INCLUDES_NONE
 
     @classmethod
-    def sanitize_attributes(cls, target: Class):
-        for attr in target.attrs:
-            cls.sanitize_attribute(attr)
-            cls.sanitize_attribute_restrictions(attr)
-            cls.sanitize_attribute_name(attr)
-
-        for i in range(len(target.attrs)):
-            cls.sanitize_attribute_sequence(target.attrs, i)
-
-        cls.rename_duplicate_attribute_names(target.attrs)
-
-        for inner in target.inner:
-            cls.sanitize_attributes(inner)
-
-    @classmethod
-    def sanitize_attribute(cls, attr: Attr):
-        if attr.is_list:
-            attr.fixed = False
-        else:
-            attr.restrictions.sequential = False
-
-        if attr.is_optional or attr.is_xsi_type:
-            attr.fixed = False
-            attr.default = None
-
-    @classmethod
     def sanitize_attribute_restrictions(cls, attr: Attr):
         restrictions = attr.restrictions
         min_occurs = restrictions.min_occurs or 0
@@ -93,14 +67,21 @@ class ClassUtils:
         """Reset the attribute at the given index if it has no siblings with
         the sequential restriction."""
 
+        attr = attrs[index]
+        before = attrs[index - 1] if index - 1 >= 0 else None
+        after = attrs[index + 1] if index + 1 < len(attrs) else None
+
+        if not attr.is_list:
+            attr.restrictions.sequential = False
+
         if (
-            not attrs[index].restrictions.sequential
-            or (index - 1 >= 0 and attrs[index - 1].restrictions.sequential)
-            or (index + 1 < len(attrs) and attrs[index + 1].restrictions.sequential)
+            not attr.restrictions.sequential
+            or (before and before.restrictions.sequential)
+            or (after and after.restrictions.sequential and after.is_list)
         ):
             return
 
-        attrs[index].restrictions.sequential = False
+        attr.restrictions.sequential = False
 
     @classmethod
     def sanitize_attribute_name(cls, attr: Attr):
@@ -119,8 +100,7 @@ class ClassUtils:
             attr.name = f"value_{attr.name}"
 
     @classmethod
-    def rename_duplicate_attribute_names(cls, attrs: List[Attr]) -> None:
-
+    def sanitize_duplicate_attribute_names(cls, attrs: List[Attr]) -> None:
         grouped: Dict[str, List[Attr]] = dict()
         for attr in attrs:
             grouped.setdefault(attr.name.lower(), []).append(attr)

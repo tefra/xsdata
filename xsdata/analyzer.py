@@ -59,6 +59,8 @@ class ClassAnalyzer(ClassUtils):
 
         self.flatten_classes()
 
+        self.sanitize_classes()
+
         return self.fetch_classes_for_generation()
 
     def handle_duplicate_classes(self):
@@ -104,9 +106,6 @@ class ClassAnalyzer(ClassUtils):
         classes = [item for values in self.class_index.values() for item in values]
         if any(item.is_complex for item in classes):
             classes = list(filter(lambda x: x.is_enumeration or x.is_complex, classes))
-
-        for target in classes:
-            self.sanitize_attributes(target)
 
         return classes
 
@@ -370,6 +369,54 @@ class ClassAnalyzer(ClassUtils):
             target.attrs.insert(index, clone)
 
             self.add_substitution_attrs(target, clone)
+
+    def sanitize_classes(self):
+        for classes in self.class_index.values():
+            for target in classes:
+                self.sanitize_class(target)
+
+    def sanitize_class(self, target: Class):
+        for inner in target.inner:
+            self.sanitize_class(inner)
+
+        for attr in target.attrs:
+            self.sanitize_attribute_default_value(target, attr)
+            self.sanitize_attribute_restrictions(attr)
+            self.sanitize_attribute_name(attr)
+
+        for i in range(len(target.attrs)):
+            self.sanitize_attribute_sequence(target.attrs, i)
+
+        self.sanitize_duplicate_attribute_names(target.attrs)
+
+    def sanitize_attribute_default_value(self, target: Class, attr: Attr):
+        if attr.is_list:
+            attr.fixed = False
+
+        if attr.is_optional or attr.is_xsi_type:
+            attr.fixed = False
+            attr.default = None
+
+        if attr.default:
+            for attr_type in attr.types:
+                if attr_type.native:
+                    continue
+
+                source = None
+                if attr_type.forward_ref:
+                    attr.default = None
+                else:
+                    source = self.find_class(
+                        target.source_qname(attr_type.name),
+                        condition=lambda x: x.is_enumeration,
+                    )
+
+                if source:
+                    enumeration = next(
+                        (x.name for x in source.attrs if x.default == attr.default),
+                        None,
+                    )
+                    attr.default = f"@enum@{source.name}.{enumeration}"
 
     def class_depends_on(self, source: Class, target: Class, depth: int = 1) -> bool:
         """Check if any source dependencies recursively match the target

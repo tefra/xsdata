@@ -40,14 +40,18 @@ class ClassUtilsTests(FactoryTestCase):
         self.assertEqual(1, ClassUtils.INCLUDES_SOME)
         self.assertEqual(2, ClassUtils.INCLUDES_ALL)
 
+    @mock.patch.object(ClassUtils, "rename_duplicate_attribute_names")
     @mock.patch.object(ClassUtils, "sanitize_attribute_sequence")
-    @mock.patch.object(ClassUtils, "sanitize_restrictions")
+    @mock.patch.object(ClassUtils, "sanitize_attribute_name")
+    @mock.patch.object(ClassUtils, "sanitize_attribute_restrictions")
     @mock.patch.object(ClassUtils, "sanitize_attribute")
     def test_sanitize_attributes(
         self,
         mock_sanitize_attribute,
-        mock_sanitize_restrictions,
+        mock_sanitize_attribute_restrictions,
+        mock_sanitize_attribute_name,
         mock_sanitize_attribute_sequence,
+        mock_rename_duplicate_attribute_names,
     ):
 
         target = ClassFactory.elements(3)
@@ -58,33 +62,31 @@ class ClassUtilsTests(FactoryTestCase):
         ClassUtils.sanitize_attributes(ClassFactory.create())
 
         self.assertEqual(5, mock_sanitize_attribute.call_count)
-        mock_sanitize_attribute.assert_has_calls(
-            [
-                mock.call(target.attrs[0]),
-                mock.call(target.attrs[1]),
-                mock.call(target.attrs[2]),
-                mock.call(target.inner[0].attrs[0]),
-                mock.call(target.inner[0].attrs[1]),
-            ]
-        )
-        mock_sanitize_restrictions.assert_has_calls(
-            [
-                mock.call(target.attrs[0].restrictions),
-                mock.call(target.attrs[1].restrictions),
-                mock.call(target.attrs[2].restrictions),
-                mock.call(target.inner[0].attrs[0].restrictions),
-                mock.call(target.inner[0].attrs[1].restrictions),
-            ]
-        )
 
-        expected_second = [
+        first_iteration = [
+            mock.call(target.attrs[0]),
+            mock.call(target.attrs[1]),
+            mock.call(target.attrs[2]),
+            mock.call(target.inner[0].attrs[0]),
+            mock.call(target.inner[0].attrs[1]),
+        ]
+
+        mock_sanitize_attribute.assert_has_calls(first_iteration)
+        mock_sanitize_attribute_restrictions.assert_has_calls(first_iteration)
+        mock_sanitize_attribute_name.assert_has_calls(first_iteration)
+
+        second_iteration = [
             mock.call(target.attrs, 0),
             mock.call(target.attrs, 1),
             mock.call(target.attrs, 2),
             mock.call(target.inner[0].attrs, 0),
             mock.call(target.inner[0].attrs, 1),
         ]
-        mock_sanitize_attribute_sequence.assert_has_calls(expected_second)
+
+        mock_sanitize_attribute_sequence.assert_has_calls(second_iteration)
+        mock_rename_duplicate_attribute_names.assert_has_calls(
+            [mock.call(target.attrs), mock.call(target.inner[0].attrs),]
+        )
 
     def test_sanitize_attribute(self):
         attr = AttrFactory.create(fixed=True)
@@ -109,7 +111,7 @@ class ClassUtilsTests(FactoryTestCase):
         self.assertFalse(attr.fixed)
         self.assertIsNone(attr.default)
 
-    def test_sanitize_restrictions(self):
+    def test_sanitize_attribute_restrictions(self):
         restrictions = [
             Restrictions(min_occurs=0, max_occurs=0, required=True),
             Restrictions(min_occurs=0, max_occurs=1, required=True),
@@ -126,8 +128,82 @@ class ClassUtilsTests(FactoryTestCase):
         ]
 
         for idx, res in enumerate(restrictions):
-            ClassUtils.sanitize_restrictions(res)
+            attr = AttrFactory.create(restrictions=res)
+            ClassUtils.sanitize_attribute_restrictions(attr)
             self.assertEqual(expected[idx], res.asdict())
+
+    def test_sanitize_attribute_name(self):
+        attr = AttrFactory.create(name="foo:a")
+
+        ClassUtils.sanitize_attribute_name(attr)
+        self.assertEqual("a", attr.name)
+
+        attr.name = "1"
+        ClassUtils.sanitize_attribute_name(attr)
+        self.assertEqual("value_1", attr.name)
+
+        attr.name = "foo_+-bar"
+        ClassUtils.sanitize_attribute_name(attr)
+        self.assertEqual("foo   bar", attr.name)
+
+        attr.name = "+ -  *"
+        ClassUtils.sanitize_attribute_name(attr)
+        self.assertEqual("value", attr.name)
+
+    def test_sanitize_attribute_name_with_enumeration(self):
+        attr = AttrFactory.enumeration(default="a")
+
+        ClassUtils.sanitize_attribute_name(attr)
+        self.assertEqual("a", attr.name)
+
+        attr.default = "1"
+        ClassUtils.sanitize_attribute_name(attr)
+        self.assertEqual("value_1", attr.name)
+
+        attr.default = "-1"
+        ClassUtils.sanitize_attribute_name(attr)
+        self.assertEqual("value_minus_-1", attr.name)
+
+        attr.default = "*"
+        ClassUtils.sanitize_attribute_name(attr)
+        self.assertEqual("value", attr.name)
+
+    def test_sanitize_attribute_names_same_name_diff_xml_type(self):
+        attrs = [
+            AttrFactory.create(name="a", tag=Tag.ELEMENT),
+            AttrFactory.create(name="a", tag=Tag.ATTRIBUTE),
+            AttrFactory.create(name="b", tag=Tag.ATTRIBUTE),
+            AttrFactory.create(name="c", tag=Tag.ATTRIBUTE),
+            AttrFactory.create(name="c", tag=Tag.ELEMENT),
+            AttrFactory.create(name="d", tag=Tag.ELEMENT),
+            AttrFactory.create(name="d", tag=Tag.ELEMENT),
+            AttrFactory.create(name="e", tag=Tag.ELEMENT, namespace="b"),
+            AttrFactory.create(name="e", tag=Tag.ELEMENT),
+            AttrFactory.create(name="f", tag=Tag.ELEMENT),
+            AttrFactory.create(name="f", tag=Tag.ELEMENT, namespace="a"),
+            AttrFactory.create(name="g", tag=Tag.ENUMERATION),
+            AttrFactory.create(name="g", tag=Tag.ENUMERATION),
+            AttrFactory.create(name="g_1", tag=Tag.ENUMERATION),
+        ]
+
+        ClassUtils.rename_duplicate_attribute_names(attrs)
+        expected = [
+            "a",
+            "a_Attribute",
+            "b",
+            "c_Attribute",
+            "c",
+            "d_Element",
+            "d",
+            "b_e",
+            "e",
+            "f",
+            "a_f",
+            "g",
+            "g_2",
+            "g_1",
+        ]
+        self.assertEqual(expected, [x.name for x in attrs])
 
     def test_sanitize_attribute_sequence(self):
         def len_sequential(target):

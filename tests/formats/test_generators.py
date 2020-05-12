@@ -68,17 +68,14 @@ class PythonAbstractGeneratorTests(FactoryTestCase):
     def test_process_enumerations(self):
         obj = ClassFactory.create(
             attrs=[
-                AttrFactory.create(default="2020-12-13"),
-                AttrFactory.create(default="2020-12-14"),
+                AttrFactory.create(name="b", default="2020-12-13"),
+                AttrFactory.create(name="a", default="2020-12-14"),
             ]
         )
 
         generator.process_enumerations(obj)
         actual = [(attr.name, attr.default) for attr in obj.attrs]
-        expected = [
-            ("VALUE_2020_12_13", '"2020-12-13"'),
-            ("VALUE_2020_12_14", '"2020-12-14"'),
-        ]
+        expected = [("A", '"2020-12-14"'), ("B", '"2020-12-13"')]
 
         self.assertEqual(expected, actual)
 
@@ -92,48 +89,15 @@ class PythonAbstractGeneratorTests(FactoryTestCase):
 
         generator.process_enumerations(obj)
         actual = [(attr.name, attr.default) for attr in obj.attrs]
-        expected = [("VALUE_1", 1), ("AA_BB", '"aaBB"')]
-
-        self.assertEqual(expected, actual)
-
-    def test_process_enumerations_with_duplicate_names(self):
-        obj = ClassFactory.create(
-            attrs=[
-                AttrFactory.create(default=3),
-                AttrFactory.create(default=2),
-                AttrFactory.create(default=1),
-                AttrFactory.create(default=1),  # this is removed
-                AttrFactory.create(default="the"),
-                AttrFactory.create(default="The"),  # this is the duplicate
-            ]
-        )
-
-        generator.process_enumerations(obj)
-        actual = [(attr.name, attr.default) for attr in obj.attrs]
-        expected = [
-            ("MQ", 1),
-            ("MG", 2),
-            ("MW", 3),
-            ("IL_RO_ZSI", '"The"'),
-            ("IN_RO_ZSI", '"the"'),
-        ]
+        expected = [("ATTR_B", '"aaBB"'), ("ATTR_C", 1)]
 
         self.assertEqual(expected, actual)
 
     @mock.patch.object(generator, "unset_attributes_local_names")
-    @mock.patch.object(generator, "hash_attributes_names")
-    @mock.patch.object(generator, "sanitize_attribute_names")
-    @mock.patch.object(generator, "has_duplicate_attrs")
     @mock.patch.object(generator, "process_attribute")
     def test_process_attributes(
-        self,
-        mock_process_attribute,
-        mock_has_duplicate_attrs,
-        mock_sanitize_attribute_names,
-        mock_hash_attributes_names,
-        mock_unset_attributes_local_names,
+        self, mock_process_attribute, mock_unset_attributes_local_names,
     ):
-        mock_has_duplicate_attrs.return_value = False
         obj = ClassFactory.elements(3)
         generator.process_attributes(obj, ["a", "b"])
         mock_process_attribute.assert_has_calls(
@@ -141,128 +105,6 @@ class PythonAbstractGeneratorTests(FactoryTestCase):
         )
 
         mock_unset_attributes_local_names.assert_called_once_with(obj)
-        self.assertEqual(0, mock_sanitize_attribute_names.call_count)
-        self.assertEqual(0, mock_hash_attributes_names.call_count)
-
-    @mock.patch.object(generator, "unset_attributes_local_names")
-    @mock.patch.object(generator, "hash_attributes_names")
-    @mock.patch.object(generator, "sanitize_attribute_names")
-    @mock.patch.object(generator, "has_duplicate_attrs")
-    @mock.patch.object(generator, "process_attribute")
-    def test_process_attributes_with_duplicate_names(
-        self,
-        mock_process_attribute,
-        mock_has_duplicate_attrs,
-        mock_sanitize_attribute_names,
-        mock_hash_attributes_names,
-        mock_unset_attributes_local_names,
-    ):
-        obj = ClassFactory.elements(3)
-        mock_has_duplicate_attrs.side_effect = [True, False]
-        generator.process_attributes(obj, ["a", "b"])
-        mock_process_attribute.assert_has_calls(
-            [mock.call(obj, attr, ["a", "b"]) for attr in obj.attrs]
-        )
-
-        mock_sanitize_attribute_names.assert_called_once_with(obj)
-        mock_unset_attributes_local_names.assert_called_once_with(obj)
-        self.assertEqual(0, mock_hash_attributes_names.call_count)
-
-    @mock.patch.object(generator, "unset_attributes_local_names")
-    @mock.patch.object(generator, "hash_attributes_names")
-    @mock.patch.object(generator, "sanitize_attribute_names")
-    @mock.patch.object(generator, "has_duplicate_attrs")
-    @mock.patch.object(generator, "process_attribute")
-    def test_process_attributes_with_exploit_names(
-        self,
-        mock_process_attribute,
-        mock_has_duplicate_attrs,
-        mock_sanitize_attribute_names,
-        mock_hash_attributes_names,
-        mock_unset_attributes_local_names,
-    ):
-        obj = ClassFactory.elements(3)
-        mock_has_duplicate_attrs.return_value = True
-        generator.process_attributes(obj, ["a", "b"])
-        mock_process_attribute.assert_has_calls(
-            [mock.call(obj, attr, ["a", "b"]) for attr in obj.attrs]
-        )
-
-        mock_sanitize_attribute_names.assert_called_once_with(obj)
-        mock_unset_attributes_local_names.assert_called_once_with(obj)
-        mock_hash_attributes_names.assert_called_once_with(obj)
-
-    def test_has_duplicate_attribute_names(self):
-        obj = ClassFactory.create()
-        obj.attrs.append(AttrFactory.create(name="a"))
-
-        self.assertFalse(generator.has_duplicate_attrs(obj))
-
-        obj.attrs.append(AttrFactory.create(name="a"))
-        self.assertTrue(generator.has_duplicate_attrs(obj))
-
-    def test_sanitize_attribute_names_same_name_diff_xml_type(self):
-        obj = ClassFactory.create(
-            attrs=[
-                AttrFactory.create(name="a", xml_type=XmlType.ELEMENT),
-                AttrFactory.create(name="a", xml_type=XmlType.ATTRIBUTE),
-                AttrFactory.create(name="b", xml_type=XmlType.ATTRIBUTE),
-            ]
-        )
-
-        generator.sanitize_attribute_names(obj)
-        self.assertEqual("a", obj.attrs[0].name)
-        self.assertEqual("a_attribute", obj.attrs[1].name)
-        self.assertEqual("b", obj.attrs[2].name)
-
-        obj = ClassFactory.create(
-            attrs=[
-                AttrFactory.create(name="a", xml_type=XmlType.ATTRIBUTE),
-                AttrFactory.create(name="a", xml_type=XmlType.ELEMENT),
-            ]
-        )
-        generator.sanitize_attribute_names(obj)
-        self.assertEqual("a_attribute", obj.attrs[0].name)
-        self.assertEqual("a", obj.attrs[1].name)
-
-    def test_sanitize_attribute_names_same_name_and_xml_type(self):
-        obj = ClassFactory.create(
-            attrs=[
-                AttrFactory.create(name="a", xml_type=XmlType.ELEMENT),
-                AttrFactory.create(name="a", xml_type=XmlType.ELEMENT),
-            ]
-        )
-
-        generator.sanitize_attribute_names(obj)
-        self.assertEqual("a", obj.attrs[0].name)
-        self.assertEqual("a_element", obj.attrs[1].name)
-
-    def test_sanitize_attribute_names_same_name_and_xml_type_with_namespaces(self):
-        obj = ClassFactory.create(
-            attrs=[
-                AttrFactory.create(name="a", xml_type=XmlType.ELEMENT, namespace="b"),
-                AttrFactory.create(name="a", xml_type=XmlType.ELEMENT),
-                AttrFactory.create(name="b", xml_type=XmlType.ELEMENT),
-                AttrFactory.create(name="b", xml_type=XmlType.ELEMENT, namespace="a"),
-            ]
-        )
-
-        generator.sanitize_attribute_names(obj)
-        self.assertEqual("b_a", obj.attrs[0].name)
-        self.assertEqual("a", obj.attrs[1].name)
-        self.assertEqual("b", obj.attrs[2].name)
-        self.assertEqual("a_b", obj.attrs[3].name)
-
-    def test_hash_attributes_names(self):
-        obj = ClassFactory.create(
-            attrs=[
-                AttrFactory.create(name="a", local_name="-"),
-                AttrFactory.create(name="a", local_name="_"),
-            ]
-        )
-        generator.hash_attributes_names(obj)
-        self.assertEqual("lq", obj.attrs[0].name)
-        self.assertEqual("xw", obj.attrs[1].name)
 
     def test_unset_attributes_local_names(self):
         obj = ClassFactory.create(

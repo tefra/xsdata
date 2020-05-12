@@ -66,9 +66,11 @@ class DataclassGeneratorTests(FactoryTestCase):
             '__NAMESPACE__ = "xsdata"\n\n\n'
             "class ClassB(Enum):\n"
             '    """\n'
-            "    :cvar NONE_VALUE:\n"
+            "    :cvar ATTR_B:\n"
+            "    :cvar ATTR_C:\n"
             '    """\n'
-            "    NONE_VALUE = None\n\n\n"
+            "    ATTR_B = None\n"
+            "    ATTR_C = None\n\n\n"
             "@dataclass\n"
             "class ClassC:\n"
             '    """\n'

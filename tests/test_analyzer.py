@@ -15,6 +15,7 @@ from xsdata.models.elements import ComplexType
 from xsdata.models.elements import Element
 from xsdata.models.elements import SimpleType
 from xsdata.models.enums import DataType
+from xsdata.models.enums import Namespace
 
 
 class ClassAnalyzerTests(FactoryTestCase):
@@ -28,6 +29,7 @@ class ClassAnalyzerTests(FactoryTestCase):
         self.analyzer = ClassAnalyzer()
 
     @mock.patch.object(ClassAnalyzer, "fetch_classes_for_generation")
+    @mock.patch.object(ClassAnalyzer, "sanitize_classes")
     @mock.patch.object(ClassAnalyzer, "flatten_classes")
     @mock.patch.object(ClassAnalyzer, "create_substitutions_index")
     @mock.patch.object(ClassAnalyzer, "handle_duplicate_classes")
@@ -38,6 +40,7 @@ class ClassAnalyzerTests(FactoryTestCase):
         mock_handle_duplicates,
         mock_create_substitutions_index,
         mock_flatten_classes,
+        mock_sanitize_classes,
         mock_fetch_classes_for_generation,
     ):
         gen_classes = ClassFactory.list(2)
@@ -50,6 +53,7 @@ class ClassAnalyzerTests(FactoryTestCase):
         mock_handle_duplicates.assert_called_once()
         mock_create_substitutions_index.assert_called_once_with()
         mock_flatten_classes.assert_called_once_with()
+        mock_sanitize_classes.assert_called_once_with()
         mock_fetch_classes_for_generation.assert_called_once_with()
 
     @mock.patch.object(ClassAnalyzer, "update_abstract_classes")
@@ -136,8 +140,7 @@ class ClassAnalyzerTests(FactoryTestCase):
             ]
         )
 
-    @mock.patch.object(ClassAnalyzer, "sanitize_attributes")
-    def test_fetch_classes_for_generation(self, mock_sanitize_attributes):
+    def test_fetch_classes_for_generation(self):
         classes = [
             ClassFactory.create(abstract=True, type=Element),
             ClassFactory.create(type=Element),
@@ -155,18 +158,13 @@ class ClassAnalyzerTests(FactoryTestCase):
 
         result = self.analyzer.fetch_classes_for_generation()
         self.assertEqual(expected, result)
-        mock_sanitize_attributes.assert_has_calls([mock.call(x) for x in expected])
 
-    @mock.patch.object(ClassAnalyzer, "sanitize_attributes")
-    def test_fetch_classes_for_generation_when_no_complex_class_available(
-        self, mock_sanitize_attributes
-    ):
+    def test_fetch_classes_for_generation_when_no_complex_class_available(self):
         classes = [ClassFactory.enumeration(2), ClassFactory.create(type=SimpleType)]
         self.analyzer.create_class_index(classes)
 
         actual = self.analyzer.fetch_classes_for_generation()
         self.assertEqual(classes, actual)
-        mock_sanitize_attributes.assert_has_calls([mock.call(x) for x in classes])
 
     @mock.patch.object(ClassAnalyzer, "flatten_class")
     def test_flatten_classes(self, mock_flatten_class):
@@ -743,6 +741,127 @@ class ClassAnalyzerTests(FactoryTestCase):
                 mock.call(QName("b")),
             ]
         )
+
+    @mock.patch.object(ClassAnalyzer, "sanitize_class")
+    def test_sanitize_classes(self, mock_sanitize_class):
+        classes = ClassFactory.list(2)
+        self.analyzer.create_class_index(classes)
+        self.analyzer.sanitize_classes()
+        mock_sanitize_class.assert_has_calls(list(map(mock.call, classes)))
+
+    @mock.patch.object(ClassAnalyzer, "sanitize_duplicate_attribute_names")
+    @mock.patch.object(ClassAnalyzer, "sanitize_attribute_sequence")
+    @mock.patch.object(ClassAnalyzer, "sanitize_attribute_name")
+    @mock.patch.object(ClassAnalyzer, "sanitize_attribute_restrictions")
+    @mock.patch.object(ClassAnalyzer, "sanitize_attribute_default_value")
+    def test_sanitize_class(
+        self,
+        mock_sanitize_attribute_default_value,
+        mock_sanitize_attribute_restrictions,
+        mock_sanitize_attribute_name,
+        mock_sanitize_attribute_sequence,
+        mock_sanitize_duplicate_attribute_names,
+    ):
+
+        target = ClassFactory.elements(2)
+        inner = ClassFactory.elements(1)
+        target.inner.append(inner)
+
+        self.analyzer.sanitize_class(target)
+        mock_sanitize_attribute_default_value.assert_has_calls(
+            [
+                mock.call(target.inner[0], target.inner[0].attrs[0]),
+                mock.call(target, target.attrs[0]),
+                mock.call(target, target.attrs[1]),
+            ]
+        )
+        mock_sanitize_attribute_restrictions.assert_has_calls(
+            [
+                mock.call(target.inner[0].attrs[0]),
+                mock.call(target.attrs[0]),
+                mock.call(target.attrs[1]),
+            ]
+        )
+        mock_sanitize_attribute_name.assert_has_calls(
+            [
+                mock.call(target.inner[0].attrs[0]),
+                mock.call(target.attrs[0]),
+                mock.call(target.attrs[1]),
+            ]
+        )
+        mock_sanitize_attribute_sequence.assert_has_calls(
+            [
+                mock.call(target.inner[0].attrs, 0),
+                mock.call(target.attrs, 0),
+                mock.call(target.attrs, 1),
+            ]
+        )
+        mock_sanitize_duplicate_attribute_names.assert_has_calls(
+            [mock.call(target.inner[0].attrs), mock.call(target.attrs)]
+        )
+
+    def test_sanitize_attribute_default_value_with_list_field(self):
+        target = ClassFactory.create()
+        attr = AttrFactory.create(fixed=True)
+        attr.restrictions.max_occurs = 2
+        self.analyzer.sanitize_attribute_default_value(target, attr)
+        self.assertFalse(attr.fixed)
+
+    def test_sanitize_attribute_default_value_with_optional_field(self):
+        target = ClassFactory.create()
+        attr = AttrFactory.create(fixed=True, default=2)
+        attr.restrictions.min_occurs = 0
+        self.analyzer.sanitize_attribute_default_value(target, attr)
+        self.assertFalse(attr.fixed)
+        self.assertIsNone(attr.default)
+
+    def test_sanitize_attribute_default_value_with_xsi_type(self):
+        target = ClassFactory.create()
+        attr = AttrFactory.create(
+            fixed=True, default=2, name="xsi:type", namespace=Namespace.XSI.uri
+        )
+        self.analyzer.sanitize_attribute_default_value(target, attr)
+        self.assertFalse(attr.fixed)
+        self.assertIsNone(attr.default)
+
+    def test_sanitize_attribute_default_value_with_valid_case(self):
+        target = ClassFactory.create()
+        attr = AttrFactory.create(fixed=True, default=2)
+        self.analyzer.sanitize_attribute_default_value(target, attr)
+        self.assertTrue(attr.fixed)
+        self.assertEqual(2, attr.default)
+
+    def test_sanitize_attribute_default_value_with_enumeration(self):
+        miss = ClassFactory.elements(3, name="miss")
+        hit = ClassFactory.enumeration(3, name="hit")
+        hit.attrs[2].default = 2
+        hit.attrs[2].name = "winner"
+
+        self.analyzer.create_class_index([miss, hit])
+
+        target = ClassFactory.create(
+            attrs=[
+                AttrFactory.create(),
+                AttrFactory.create(default=2),
+                AttrFactory.create(
+                    default=2, types=[AttrTypeFactory.create("foo", forward_ref=True)]
+                ),
+                AttrFactory.create(
+                    default=2,
+                    types=[
+                        AttrTypeFactory.create("miss"),
+                        AttrTypeFactory.create("hit"),
+                    ],
+                ),
+            ]
+        )
+
+        actual = list()
+        for attr in target.attrs:
+            self.analyzer.sanitize_attribute_default_value(target, attr)
+            actual.append(attr.default)
+
+        self.assertEqual([None, 2, None, "@enum@hit.winner"], actual)
 
     @mock.patch.object(ClassAnalyzer, "flatten_class")
     def test_class_depends_on_has_a_depth_limit(self, *args):

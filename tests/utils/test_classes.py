@@ -40,77 +40,6 @@ class ClassUtilsTests(FactoryTestCase):
         self.assertEqual(1, ClassUtils.INCLUDES_SOME)
         self.assertEqual(2, ClassUtils.INCLUDES_ALL)
 
-    @mock.patch.object(ClassUtils, "rename_duplicate_attribute_names")
-    @mock.patch.object(ClassUtils, "sanitize_attribute_sequence")
-    @mock.patch.object(ClassUtils, "sanitize_attribute_name")
-    @mock.patch.object(ClassUtils, "sanitize_attribute_restrictions")
-    @mock.patch.object(ClassUtils, "sanitize_attribute")
-    def test_sanitize_attributes(
-        self,
-        mock_sanitize_attribute,
-        mock_sanitize_attribute_restrictions,
-        mock_sanitize_attribute_name,
-        mock_sanitize_attribute_sequence,
-        mock_rename_duplicate_attribute_names,
-    ):
-
-        target = ClassFactory.elements(3)
-        inner = ClassFactory.elements(2)
-        target.inner.append(inner)
-
-        ClassUtils.sanitize_attributes(target)
-        ClassUtils.sanitize_attributes(ClassFactory.create())
-
-        self.assertEqual(5, mock_sanitize_attribute.call_count)
-
-        first_iteration = [
-            mock.call(target.attrs[0]),
-            mock.call(target.attrs[1]),
-            mock.call(target.attrs[2]),
-            mock.call(target.inner[0].attrs[0]),
-            mock.call(target.inner[0].attrs[1]),
-        ]
-
-        mock_sanitize_attribute.assert_has_calls(first_iteration)
-        mock_sanitize_attribute_restrictions.assert_has_calls(first_iteration)
-        mock_sanitize_attribute_name.assert_has_calls(first_iteration)
-
-        second_iteration = [
-            mock.call(target.attrs, 0),
-            mock.call(target.attrs, 1),
-            mock.call(target.attrs, 2),
-            mock.call(target.inner[0].attrs, 0),
-            mock.call(target.inner[0].attrs, 1),
-        ]
-
-        mock_sanitize_attribute_sequence.assert_has_calls(second_iteration)
-        mock_rename_duplicate_attribute_names.assert_has_calls(
-            [mock.call(target.attrs), mock.call(target.inner[0].attrs),]
-        )
-
-    def test_sanitize_attribute(self):
-        attr = AttrFactory.create(fixed=True)
-
-        ClassUtils.sanitize_attribute(attr)
-        self.assertTrue(attr.fixed)
-
-        attr.restrictions.max_occurs = 2
-        ClassUtils.sanitize_attribute(attr)
-        self.assertFalse(attr.fixed)
-
-        attr.restrictions.max_occurs = 1
-        attr.restrictions.min_occurs = 0
-        attr.fixed = True
-        attr.default = "foo"
-        ClassUtils.sanitize_attribute(attr)
-        self.assertFalse(attr.fixed)
-        self.assertIsNone(attr.default)
-
-        xsi_attr = AttrFactory.xsi_type(default="xsi:integer", fixed=True)
-        ClassUtils.sanitize_attribute(xsi_attr)
-        self.assertFalse(attr.fixed)
-        self.assertIsNone(attr.default)
-
     def test_sanitize_attribute_restrictions(self):
         restrictions = [
             Restrictions(min_occurs=0, max_occurs=0, required=True),
@@ -168,7 +97,7 @@ class ClassUtilsTests(FactoryTestCase):
         ClassUtils.sanitize_attribute_name(attr)
         self.assertEqual("value", attr.name)
 
-    def test_sanitize_attribute_names_same_name_diff_xml_type(self):
+    def test_sanitize_duplicate_attribute_names(self):
         attrs = [
             AttrFactory.create(name="a", tag=Tag.ELEMENT),
             AttrFactory.create(name="a", tag=Tag.ATTRIBUTE),
@@ -186,7 +115,7 @@ class ClassUtilsTests(FactoryTestCase):
             AttrFactory.create(name="g_1", tag=Tag.ENUMERATION),
         ]
 
-        ClassUtils.rename_duplicate_attribute_names(attrs)
+        ClassUtils.sanitize_duplicate_attribute_names(attrs)
         expected = [
             "a",
             "a_Attribute",
@@ -227,6 +156,11 @@ class ClassUtilsTests(FactoryTestCase):
         self.assertEqual(0, len_sequential(attrs))
 
         attrs_clone[1].restrictions.sequential = False
+        ClassUtils.sanitize_attribute_sequence(attrs_clone, 0)
+        self.assertEqual(0, len_sequential(attrs_clone))
+
+        attrs_clone = [attr.clone() for attr in attrs]
+        attrs_clone[0].restrictions.max_occurs = 0
         ClassUtils.sanitize_attribute_sequence(attrs_clone, 0)
         self.assertEqual(0, len_sequential(attrs_clone))
 

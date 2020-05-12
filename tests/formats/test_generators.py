@@ -336,3 +336,7 @@ class PythonAbstractGeneratorTests(FactoryTestCase):
         attr.default = "foo  bar  \n"
         attr.types = [type_tokens]
         self.assertEqual('"foo bar"', generator.attribute_default(attr))
+
+        attr.default = "@enum@foo.bar"
+        attr.types = []
+        self.assertEqual("Foo.BAR", generator.attribute_default(attr))

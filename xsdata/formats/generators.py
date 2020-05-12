@@ -255,11 +255,18 @@ class PythonAbstractGenerator(AbstractGenerator, ABC):
 
         if isinstance(default_value, str):
             if DataType.NMTOKENS.code in data_types:
-                default_value = " ".join(
-                    filter(None, map(str.strip, re.split(r"\s+", default_value)))
+                default_value = quoteattr(
+                    " ".join(
+                        filter(None, map(str.strip, re.split(r"\s+", default_value)))
+                    )
                 )
-
-            default_value = quoteattr(default_value)
+            elif not data_types and default_value.startswith("@enum@"):
+                source, enumeration = default_value[6:].split(".")
+                default_value = (
+                    f"{cls.class_name(source)}.{cls.enumeration_name(enumeration)}"
+                )
+            else:
+                default_value = quoteattr(default_value)
         elif isinstance(default_value, float) and math.isinf(default_value):
             default_value = f"float('{default_value}')"
         elif isinstance(default_value, Decimal):

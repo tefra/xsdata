@@ -51,7 +51,6 @@ class ClassBuilder:
         namespace = self.element_namespace(obj)
         instance = Class(
             name=name,
-            local_name=name,
             abstract=obj.is_abstract,
             namespace=namespace,
             mixed=obj.is_mixed,
@@ -192,7 +191,7 @@ class ClassBuilder:
             Attr(
                 index=obj.index,
                 name=name,
-                local_name=name,
+                local_name=text.suffix(name),
                 default=obj.default_value,
                 fixed=obj.is_fixed,
                 types=types,

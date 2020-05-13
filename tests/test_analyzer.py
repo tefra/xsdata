@@ -597,6 +597,20 @@ class ClassAnalyzerTests(FactoryTestCase):
 
         mock_flatten_attribute_type.assert_called_once_with(parent, attr, type_a)
 
+    def test_flatten_attribute_types_with_enumeration_target(self):
+        target = ClassFactory.enumeration(
+            1,
+            extensions=[
+                ExtensionFactory.create(type=AttrTypeFactory.xs_bool()),
+                ExtensionFactory.create(type=AttrTypeFactory.xs_int()),
+            ],
+        )
+
+        self.assertEqual(1, len(target.attrs[0].types))
+
+        self.analyzer.flatten_attribute_types(target, target.attrs[0])
+        self.assertEqual(3, len(target.attrs[0].types))
+
     def test_flatten_attribute_types_filters_duplicate_types(self):
         target = ClassFactory.create(
             attrs=[

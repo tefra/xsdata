@@ -4,7 +4,7 @@ from typing import Dict
 from typing import List
 
 from xsdata.formats.dataclass.generator import DataclassGenerator
-from xsdata.formats.generators import AbstractGenerator
+from xsdata.formats.mixins import AbstractGenerator
 from xsdata.formats.plantuml.generator import PlantUmlGenerator
 from xsdata.logger import logger
 from xsdata.models.codegen import Class

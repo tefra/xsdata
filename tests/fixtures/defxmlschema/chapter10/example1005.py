@@ -19,10 +19,10 @@ class InternationalSizeType:
 
     class Value(Enum):
         """
-        :cvar LARGE:
-        :cvar MEDIUM:
         :cvar SMALL:
+        :cvar MEDIUM:
+        :cvar LARGE:
         """
-        LARGE = "large"
-        MEDIUM = "medium"
         SMALL = "small"
+        MEDIUM = "medium"
+        LARGE = "large"

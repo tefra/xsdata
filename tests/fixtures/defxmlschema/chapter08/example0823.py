@@ -3,12 +3,12 @@ from enum import Enum
 
 class SmlxsizeType(Enum):
     """
-    :cvar EXTRA_LARGE:
-    :cvar LARGE:
-    :cvar MEDIUM:
     :cvar SMALL:
+    :cvar MEDIUM:
+    :cvar LARGE:
+    :cvar EXTRA_LARGE:
     """
-    EXTRA_LARGE = "EXTRA LARGE"
-    LARGE = "LARGE"
-    MEDIUM = "MEDIUM"
     SMALL = "SMALL"
+    MEDIUM = "MEDIUM"
+    LARGE = "LARGE"
+    EXTRA_LARGE = "EXTRA LARGE"

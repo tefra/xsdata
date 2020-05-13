@@ -3,7 +3,7 @@
 {%- for source, packages in imports.items() %}
 from {{ source }} import (
     {%- for package in packages %}
-    {{ "{} as {}".format(package.name, package.alias) if package.alias else package.name }},
+    {{ "{} as {}".format(package.name|class_name, package.alias|class_name) if package.alias else package.name|class_name }},
     {%- endfor %}
 )
 {%- endfor %}

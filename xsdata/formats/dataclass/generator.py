@@ -1,19 +1,20 @@
 from collections import defaultdict
 from pathlib import Path
-from typing import DefaultDict
 from typing import Dict
 from typing import Iterator
 from typing import List
 from typing import Tuple
 
+from xsdata.formats.dataclass import utils
 from xsdata.formats.dataclass.filters import filters
-from xsdata.formats.generators import PythonAbstractGenerator
+from xsdata.formats.mixins import AbstractGenerator
 from xsdata.models.codegen import Class
 from xsdata.models.codegen import Package
 from xsdata.resolver import DependenciesResolver
+from xsdata.utils import text
 
 
-class DataclassGenerator(PythonAbstractGenerator):
+class DataclassGenerator(AbstractGenerator):
     templates_dir = Path(__file__).parent.joinpath("templates")
 
     def __init__(self):
@@ -36,7 +37,7 @@ class DataclassGenerator(PythonAbstractGenerator):
 
     def render_package(self, classes: List[Class]) -> str:
         class_names = [
-            (obj.target_module, self.class_name(obj.name))
+            (obj.target_module, obj.name)
             for obj in sorted(classes, key=lambda x: x.name)
         ]
         return self.template("package").render(class_names=class_names)
@@ -84,18 +85,27 @@ class DataclassGenerator(PythonAbstractGenerator):
     def render_classes(self, classes: List[Class]) -> str:
         """Get a list of sorted classes from the imports resolver, apply the
         python code conventions and return the rendered output."""
-        output = map(str.strip, map(self.render_class, self.prepare_classes(classes)))
+        output = map(str.strip, map(self.render_class, classes))
         return "\n\n\n".join(output) + "\n"
-
-    def prepare_classes(self, classes: List[Class]):
-        for obj in classes:
-            yield self.process_class(obj.clone())
 
     def prepare_imports(self, imports: List[Package]) -> Dict[str, List[Package]]:
         """Get a list of sorted packages from the imports resolver apply the
         python code conventions, group them by the source package and return
         them."""
-        result: DefaultDict[str, List[Package]] = defaultdict(list)
+        result: Dict[str, List[Package]] = dict()
         for obj in imports:
-            result[obj.source].append(self.process_import(obj))
+            result.setdefault(obj.source, []).append(obj)
         return result
+
+    @classmethod
+    def module_name(cls, name: str) -> str:
+        return text.snake_case(utils.safe_snake(name, default="mod"))
+
+    @classmethod
+    def package_name(cls, name: str) -> str:
+        return ".".join(
+            map(
+                lambda x: text.snake_case(utils.safe_snake(x, default="pkg")),
+                name.split("."),
+            )
+        )

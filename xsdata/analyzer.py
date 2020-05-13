@@ -323,7 +323,8 @@ class ClassAnalyzer(ClassUtils):
 
         Notes:
             * xs:pattern is not yet supported reset all native types to xs:string.
-            * skip over forward references aka inner classes
+            * skip over forward references aka inner classes.
+            * Copy all parent extensions if class is enumeration.
         """
         for current_type in list(attr.types):
             if current_type.native:
@@ -331,6 +332,9 @@ class ClassAnalyzer(ClassUtils):
                     self.reset_attribute_type(current_type)
             elif not current_type.forward_ref:
                 self.flatten_attribute_type(target, attr, current_type)
+
+        if target.is_enumeration:
+            attr.types.extend(ext.type for ext in target.extensions)
 
         attr.types = unique_sequence(attr.types, key="name")
 

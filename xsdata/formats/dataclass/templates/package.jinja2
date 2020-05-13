@@ -1,3 +1,3 @@
 {%- for module, class in class_names -%}
-from {{ module }} import {{ class }}
+from {{ module }} import {{ class|class_name }}
 {% endfor %}

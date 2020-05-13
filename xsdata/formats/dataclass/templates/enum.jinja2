@@ -1,9 +1,9 @@
 {% set help = obj|docstring(enum=True)|trim %}
 
-class {{ obj.name }}(Enum):
+class {{ obj.name|class_name }}(Enum):
 {%- if help %}
 {{ help|indent(4, first=True) }}
 {%- endif -%}
 {%- for attr in obj.attrs %}
-    {{ attr.name }} = {{ attr.default }}
+    {{ attr.name|constant_name }} = {{ attr|attribute_default(obj.ns_map) }}
 {%- endfor -%}

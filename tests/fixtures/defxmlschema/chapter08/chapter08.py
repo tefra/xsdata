@@ -5,15 +5,15 @@ from typing import List, Union
 
 class SmlxsizeType(Enum):
     """
-    :cvar EXTRA_LARGE:
-    :cvar LARGE:
-    :cvar MEDIUM:
     :cvar SMALL:
+    :cvar MEDIUM:
+    :cvar LARGE:
+    :cvar EXTRA_LARGE:
     """
-    EXTRA_LARGE = "extra large"
-    LARGE = "large"
-    MEDIUM = "medium"
     SMALL = "small"
+    MEDIUM = "medium"
+    LARGE = "large"
+    EXTRA_LARGE = "extra large"
 
 
 @dataclass

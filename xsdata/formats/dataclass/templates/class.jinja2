@@ -1,16 +1,18 @@
 {% set help = obj|docstring|trim -%}
 {% set level = level|default(0)-%}
-{% set namespace = obj.namespace or namespace|default(None) %}
+{% set namespace = obj.namespace or namespace|default(None) -%}
+{% set class_name =  obj.name|class_name -%}
+{% set parents = parents|default([obj.name]) %}
 
 @dataclass
-class {{ obj.name }}{{"({})".format(obj.extensions|join(', ', attribute="type.name")) if obj.extensions }}:
+class {{ class_name }}{{"({})".format(obj.extensions|map(attribute='type')|map('type_name')|join(', ')) if obj.extensions }}:
 {%- if help %}
 {{ help|indent(4, first=True) }}
 {%- endif -%}
-{%- if level == 0 and (obj.local_name != obj.name or obj.namespace or obj.is_nillable) %}
+{%- if parents|length == 1 and (class_name != obj.name or obj.namespace or obj.is_nillable) %}
     class Meta:
-        {%- if obj.local_name != obj.name %}
-        name = "{{ obj.local_name }}"
+        {%- if class_name != obj.name %}
+        name = "{{ obj.name }}"
         {%- endif -%}
         {%- if obj.is_nillable %}
         nillable = True
@@ -23,11 +25,11 @@ class {{ obj.name }}{{"({})".format(obj.extensions|join(', ', attribute="type.na
 {%- endif -%}
 {%- for attr in obj.attrs %}
     {%- set metadata = attr|attr_metadata(namespace) %}
-    {{ attr.name }}: {{ attr.display_type }} = field(
+    {{ attr.name|attribute_name }}: {{ attr|attribute_type(parents) }} = field(
         {% if attr.fixed -%}
         init=False,
         {% endif -%}
-        {{ "default_factory" if attr.is_factory else "default" }}={{ attr.default }},
+        {{ "default_factory" if attr.is_factory else "default" }}={{ attr|attribute_default(obj.ns_map) }},
         {%- if metadata %}
         metadata=dict(
             {{ metadata|arguments|indent(12) }}
@@ -38,7 +40,7 @@ class {{ obj.name }}{{"({})".format(obj.extensions|join(', ', attribute="type.na
 {%- for inner in obj.inner %}
     {%- set tpl = "enum.jinja2" if inner.is_enumeration else "class.jinja2" -%}
     {%- filter indent(4) -%}
-        {%- with obj=inner, namespace=obj.namespace or namespace, level=level + 1 -%}
+        {%- with obj=inner, namespace=obj.namespace or namespace, parents=parents + [inner.name] -%}
             {% include tpl %}
         {%- endwith -%}
     {%- endfilter -%}

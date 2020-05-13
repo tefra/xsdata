@@ -96,28 +96,25 @@ class DataclassGeneratorTests(FactoryTestCase):
         )
         self.assertEqual(expected, actual)
 
-    @mock.patch.object(DataclassGenerator, "process_import")
-    def test_prepare_imports(self, mock_process_import):
+    def test_prepare_imports(self):
         packages = [
             PackageFactory.create(name="foo", source="omg"),
             PackageFactory.create(name="bar", source="omg"),
             PackageFactory.create(name="thug", source="life"),
         ]
-        processed = [
-            PackageFactory.create(name="aaa", source="a"),
-            PackageFactory.create(name="bbb", source="b"),
-            PackageFactory.create(name="ccc", source="c"),
-        ]
-
-        mock_process_import.side_effect = processed
-
-        expected = {"omg": processed[:2], "life": processed[2:]}
+        expected = {"omg": packages[:2], "life": packages[2:]}
 
         actual = DataclassGenerator().prepare_imports(packages)
         self.assertEqual(expected, actual)
 
     def test_module_name(self):
-        generator = DataclassGenerator()
-        self.assertEqual("foo_bar", generator.module_name("fooBar"))
-        self.assertEqual("foo_bar_wtf", generator.module_name("fooBar.wtf"))
-        self.assertEqual("mod_1111", generator.module_name("1111"))
+        self.assertEqual("foo_bar", DataclassGenerator.module_name("fooBar"))
+        self.assertEqual("foo_bar_wtf", DataclassGenerator.module_name("fooBar.wtf"))
+        self.assertEqual("mod_1111", DataclassGenerator.module_name("1111"))
+        self.assertEqual("xs_string", DataclassGenerator.module_name("xs:string"))
+        self.assertEqual("foo_bar_bam", DataclassGenerator.module_name("foo:bar_bam"))
+
+    def test_package_name(self):
+        self.assertEqual(
+            "foo.bar_bar.pkg_1", DataclassGenerator.package_name("Foo.BAR_bar.1")
+        )

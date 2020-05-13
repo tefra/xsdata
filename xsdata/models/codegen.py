@@ -12,6 +12,7 @@ from typing import Type
 
 from lxml.etree import QName
 
+from xsdata.formats.dataclass.models.constants import XmlType
 from xsdata.models.elements import ComplexType
 from xsdata.models.elements import Element
 from xsdata.models.elements import SimpleType
@@ -31,6 +32,15 @@ def qname(name: str, ns_map: Dict, default_namespace: Optional[str] = None) -> s
         namespace = ns_map.get(prefix, prefix)
 
     return QName(namespace, name)
+
+
+xml_type_map = {
+    Tag.ELEMENT: XmlType.ELEMENT,
+    Tag.ANY: XmlType.WILDCARD,
+    Tag.ANY_ATTRIBUTE: XmlType.ATTRIBUTES,
+    Tag.ATTRIBUTE: XmlType.ATTRIBUTE,
+    None: XmlType.TEXT,
+}
 
 
 @dataclass
@@ -131,7 +141,6 @@ class Attr:
     default: Any = field(default=None, compare=False)
     fixed: bool = field(default=False, compare=False)
     types: List[AttrType] = field(default_factory=list)
-    xml_type: Optional[str] = field(default=None)
     display_type: Optional[str] = field(default=None)
     namespace: Optional[str] = field(default=None)
     help: Optional[str] = field(default=None)
@@ -184,6 +193,10 @@ class Attr:
     def is_wildcard(self) -> bool:
         return self.tag in (Tag.ANY_ATTRIBUTE, Tag.ANY)
 
+    @property
+    def xml_type(self) -> Optional[str]:
+        return xml_type_map.get(self.tag)
+
     def clone(self) -> "Attr":
         return replace(
             self,
@@ -206,7 +219,6 @@ class Extension:
 @dataclass
 class Class:
     name: str
-    local_name: str
     type: Type
     module: str
     package: str

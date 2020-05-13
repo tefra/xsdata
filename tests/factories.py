@@ -82,7 +82,6 @@ class ClassFactory(Factory):
         name = name or f"class_{cls.next_letter()}"
         return cls.model(
             name=name,
-            local_name=name,
             namespace=namespace,
             source_namespace=source_namespace,
             abstract=abstract,
@@ -250,7 +249,6 @@ class AttrFactory(Factory):
         index=None,
         types=None,
         tag=None,
-        xml_type=None,
         namespace=None,
         help=None,
         default=None,
@@ -263,7 +261,6 @@ class AttrFactory(Factory):
             local_name=local_name or name,
             index=cls.counter if index is None else index,
             types=types or [AttrTypeFactory.xs_string()],
-            xml_type=xml_type,
             tag=tag or random.choice(cls.types).__name__,
             namespace=namespace or None,
             help=help or None,

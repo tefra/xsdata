@@ -4,11 +4,11 @@ from typing import Type
 
 from lxml import etree
 
+from xsdata.formats.dataclass.filters import class_name
 from xsdata.formats.dataclass.parsers import JsonParser
 from xsdata.formats.dataclass.parsers import XmlParser
 from xsdata.formats.dataclass.serializers import JsonSerializer
 from xsdata.formats.dataclass.serializers import XmlSerializer
-from xsdata.formats.generators import PythonAbstractGenerator
 
 
 def load_class(output, clazz_name):
@@ -31,7 +31,7 @@ def read_root_name(path: Path) -> str:
         recovering_parser = etree.XMLParser(recover=True)
         tree = etree.parse(str(path), parser=recovering_parser)
         root = tree.getroot()
-        return PythonAbstractGenerator.class_name(etree.QName(root.tag).localname)
+        return class_name(etree.QName(root.tag).localname)
     except etree.XMLSyntaxError:
         return ""
     except OSError:

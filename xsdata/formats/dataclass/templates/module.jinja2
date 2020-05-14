@@ -1,4 +1,4 @@
-{{ output|lib_imports }}
+{{ output|default_imports }}
 
 {%- for source, packages in imports.items() %}
 from {{ source }} import (

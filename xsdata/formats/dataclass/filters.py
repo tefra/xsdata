@@ -13,7 +13,6 @@ from lxml.etree import QName
 
 from xsdata.formats.converters import to_python
 from xsdata.formats.dataclass import utils
-from xsdata.formats.dataclass.models.constants import XmlType
 from xsdata.models.codegen import Attr
 from xsdata.models.codegen import AttrType
 from xsdata.models.codegen import Class
@@ -40,21 +39,17 @@ def type_name(attr_type: AttrType) -> str:
     return attr_type.native_name or class_name(text.suffix(attr_type.name))
 
 
-def attr_metadata(attr: Attr, parent_namespace: Optional[str]) -> Dict:
-    metadata = dict()
-    if attr.xml_type not in (
-        XmlType.WILDCARD,
-        XmlType.ATTRIBUTES,
-        None,
-    ) and attr.local_name != attribute_name(attr.name):
-        metadata["name"] = attr.local_name
-
-    metadata["type"] = attr.xml_type
-
-    if parent_namespace != attr.namespace or attr.is_attribute:
-        metadata["namespace"] = attr.namespace
-
-    metadata.update(attr.restrictions.asdict())
+def attribute_metadata(attr: Attr, parent_namespace: Optional[str]) -> Dict:
+    metadata = dict(
+        name=None
+        if attr.is_nameless or attr.local_name == attribute_name(attr.name)
+        else attr.local_name,
+        type=attr.xml_type,
+        namespace=attr.namespace
+        if parent_namespace != attr.namespace or attr.is_attribute
+        else None,
+        **attr.restrictions.asdict(),
+    )
 
     return {
         key: value
@@ -63,7 +58,7 @@ def attr_metadata(attr: Attr, parent_namespace: Optional[str]) -> Dict:
     }
 
 
-def arguments(data: Dict) -> str:
+def format_arguments(data: Dict) -> str:
     def prep(key: str, value: Any) -> str:
         if isinstance(value, str):
             value = f'''"{value.replace('"', "'")}"'''
@@ -74,7 +69,7 @@ def arguments(data: Dict) -> str:
     return ",\n".join([prep(key, value) for key, value in data.items()])
 
 
-def docstring(obj: Class, enum: bool = False) -> str:
+def class_docstring(obj: Class, enum: bool = False) -> str:
     lines = []
     if obj.help:
         lines.append(obj.help)
@@ -89,7 +84,7 @@ def docstring(obj: Class, enum: bool = False) -> str:
     return format_code('"""\n{}\n"""'.format("\n".join(lines))) if lines else ""
 
 
-def lib_imports(output: str) -> str:
+def default_imports(output: str) -> str:
     result = []
 
     if "Decimal" in output:
@@ -207,14 +202,14 @@ def attribute_type(attr: Attr, parents: List[str]) -> str:
 
 
 filters = {
-    "class_name": class_name,
-    "constant_name": constant_name,
-    "type_name": type_name,
     "attribute_name": attribute_name,
-    "attribute_type": attribute_type,
     "attribute_default": attribute_default,
-    "arguments": arguments,
-    "docstring": docstring,
-    "lib_imports": lib_imports,
-    "attr_metadata": attr_metadata,
+    "attribute_metadata": attribute_metadata,
+    "attribute_type": attribute_type,
+    "class_name": class_name,
+    "class_docstring": class_docstring,
+    "constant_name": constant_name,
+    "default_imports": default_imports,
+    "format_arguments": format_arguments,
+    "type_name": type_name,
 }

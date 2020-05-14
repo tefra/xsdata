@@ -1,9 +1,13 @@
 import sys
+from unittest import mock
 
 from tests.factories import AttrFactory
 from tests.factories import FactoryTestCase
+from xsdata.formats.dataclass.models.constants import XmlType
+from xsdata.models.codegen import Attr
 from xsdata.models.codegen import Restrictions
 from xsdata.models.enums import Namespace
+from xsdata.models.enums import Tag
 
 
 class AttrTests(FactoryTestCase):
@@ -78,7 +82,6 @@ class AttrTests(FactoryTestCase):
         self.assertTrue(attr.is_wildcard)
 
     def test_property_is_xsi_type(self):
-
         attr = AttrFactory.create()
         self.assertFalse(attr.is_xsi_type)
 
@@ -90,3 +93,36 @@ class AttrTests(FactoryTestCase):
 
         attr.name = "type"
         self.assertTrue(attr.is_xsi_type)
+
+    @mock.patch.object(Attr, "xml_type", new_callable=mock.PropertyMock)
+    def test_property_is_nameless(self, mock_xml_type):
+        mock_xml_type.side_effect = [
+            XmlType.WILDCARD,
+            XmlType.ATTRIBUTES,
+            XmlType.ELEMENT,
+            XmlType.ATTRIBUTE,
+            XmlType.TEXT,
+        ]
+        attr = AttrFactory.any_attribute()
+
+        self.assertTrue(attr.is_nameless)
+        self.assertTrue(attr.is_nameless)
+        self.assertFalse(attr.is_nameless)
+        self.assertFalse(attr.is_nameless)
+        self.assertFalse(attr.is_nameless)
+
+    def test_property_xml_type(self):
+        attr = AttrFactory.create(tag=Tag.ELEMENT)
+        self.assertEqual("Element", attr.xml_type)
+
+        attr = AttrFactory.create(tag=Tag.ATTRIBUTE)
+        self.assertEqual("Attribute", attr.xml_type)
+
+        attr = AttrFactory.create(tag=Tag.ANY_ATTRIBUTE)
+        self.assertEqual("Attributes", attr.xml_type)
+
+        attr = AttrFactory.create(tag=Tag.ANY)
+        self.assertEqual("Wildcard", attr.xml_type)
+
+        attr = AttrFactory.create(tag=Tag.RESTRICTION)
+        self.assertIsNone(attr.xml_type)

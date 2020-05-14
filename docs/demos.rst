@@ -21,7 +21,8 @@ then converting them back to JSON and XML documents.
 .. admonition:: Samples Source
     :class: hint
 
-    `Definitive XML Schema <http://www.datypic.com/books/defxmlschema/>`_ by Priscilla Walmsley (c) 2012 Prentice Hall PTR
+    `Definitive XML Schema <http://www.datypic.com/books/defxmlschema/>`_ by Priscilla
+    Walmsley (c) 2012 Prentice Hall PTR
 
 .. toctree::
     :maxdepth: 1
@@ -34,21 +35,26 @@ then converting them back to JSON and XML documents.
 W3C XML Schema Suite
 ====================
 
-xsdata is constantly tested and measured against the `W3C XML Schema 1.1 test suite <https://github.com/w3c/xsdtests>`_.
+xsdata is constantly tested and measured against the
+`W3C XML Schema 1.1 test suite <https://github.com/w3c/xsdtests>`_.
 
-The suite is quite extensible and consist of more than 26k tests cases for both XML Schema 1.0 and 1.1.
+The suite is quite extensible and consist of more than 26k tests cases for both XML
+Schema 1.0 and 1.1.
 
 .. hint::
 
-    Because of the size and time it takes to run the test runner is on it's own `repo <https://github.com/tefra/xsdata-w3c-tests>`_.
+    Because of the size and time it takes to run the test runner is on it's own
+    `repo <https://github.com/tefra/xsdata-w3c-tests>`_.
 
-    At least until I can manage to reduce the total run time which is about 8 minutes without coverage.
+    At least until I can manage to reduce the total run time which is about 8 minutes
+    without coverage.
 
 
 Report
 ------
 
-**46** failed, **14520** passed, **110** skipped @ `travis-ci <https://travis-ci.com/tefra/xsdata-w3c-tests>`_
+**45** failed, **14521** passed, **110** skipped @
+`travis-ci <https://travis-ci.com/tefra/xsdata-w3c-tests>`_
 
 ✨✨✨✨
 
@@ -65,7 +71,8 @@ Methodology
   - **Skip** if original instance or schema also fail validation.
 
 
-For all XML Schema definitions we use the `xmlschema <https://pypi.org/project/xmlschema/>`_ to validate results.
+For all XML Schema definitions we use the
+`xmlschema <https://pypi.org/project/xmlschema/>`_ to validate results.
 
 
 .. hint::

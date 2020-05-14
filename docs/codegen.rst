@@ -26,7 +26,8 @@ want to process.
 Package
 -------
 
-The package option defines where the target module(s) will be created inside the current working directory.
+The package option defines where the target module(s) will be created inside the
+current working directory.
 
 If the main xsd has any parent include or import you should adjust the target package.
 
@@ -55,7 +56,8 @@ Available options: ``CRITICAL``, ``ERROR``, ``WARNING``, ``INFO`` or ``DEBUG``
 Print
 -----
 
-The print flag overwrites the verbosity level to `Error` and print to stdOut the output result without writing to the target file.
+The print flag overwrites the verbosity level to `Error` and print to stdOut the output
+result without writing to the target file.
 
 
 .. admonition:: Examples

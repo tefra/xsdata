@@ -4,7 +4,9 @@
 
 echo -e "\e[35m# Hi, welcome to xsdata demo!"
 pe "xsdata --help"
-pe "clear"
+
+sleep 1
+clear
 
 cd ../xsdata-samples
 

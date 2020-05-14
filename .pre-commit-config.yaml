@@ -41,3 +41,7 @@ repos:
     rev: v1.9.0
     hooks:
       - id: setup-cfg-fmt
+  - repo: https://github.com/PyCQA/doc8
+    rev: 0.8.1rc3
+    hooks:
+      - id: doc8

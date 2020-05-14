@@ -19,7 +19,8 @@ Schema Parser
 
 :class:`xsdata.parser.SchemaParser`
 
-The schema parser objectifies the xml data to simple python dataclass instances that are easy to work and extract all the relevant information.
+The schema parser objectifies the xml data to simple python dataclass instances that
+are easy to work and extract all the relevant information.
 
 
 
@@ -28,7 +29,8 @@ Class Builder
 
 :class:`xsdata.builder.ClassBuilder`
 
-The builder goes through all the root elements of a schema to create a list of class candidates.
+The builder goes through all the root elements of a schema to create a list of class
+candidates.
 
 * All root elements are considered class candidates
 * Traverse the root elements object tree
@@ -36,11 +38,13 @@ The builder goes through all the root elements of a schema to create a list of c
 * Detect inner classes
 * Assign namespaces and default ``value`` fields
 
-**Root elements**: ``simpleType``, ``attributeGroup``, ``group``, ``attribute``, ``complexType``, ``element``
+**Root elements**: ``simpleType``, ``attributeGroup``, ``group``, ``attribute``,
+``complexType``, ``element``
 
 **Field elements**: ``attribute``, ``enumeration``, ``restiction``, ``element``
 
-**Extension elements**: ``union``, ``attributeGroup``, ``group``, ``extension``, ``restriction``
+**Extension elements**: ``union``, ``attributeGroup``, ``group``, ``extension``,
+``restriction``
 
 
 Class Analyzer
@@ -48,7 +52,8 @@ Class Analyzer
 
 :class:`xsdata.analyzer.ClassAnalyzer`
 
-The analyzer goes through all class candidates and flattens attributes and extensions based on certain criteria.
+The analyzer goes through all class candidates and flattens attributes and extensions
+based on certain criteria.
 
 Promote for generation:
 
@@ -56,11 +61,13 @@ Promote for generation:
 * Classes derived from xsd ``complexType`` with ``abstract`` flag set to ``False``
 * Classes derived from xsd ``restiction`` with ``enumeration`` fields
 
-The rest of the classes are marked as common and are used to flatten attributes and extensions of the promoted classes in the current schema and any upcoming sub-schemas.
+The rest of the classes are marked as common and are used to flatten attributes and
+extensions of the promoted classes in the current schema and any upcoming sub-schemas.
 
 Code Writer
 ------------
 
 :class:`xsdata.writer.CodeWriter`
 
-Code writer is a factory that delegates the code generation with any language and library conventions to the given format.
+Code writer is a factory that delegates the code generation with any language and
+library conventions to the given format.

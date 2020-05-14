@@ -1,5 +1,15 @@
-20.5 (2020-05-02)
+20.5.1 (2020-05-14)
 -------------------
+- Added support to fetch remote schemas.
+- Updated duplicate attribute names handling.
+- Updated code generation for enum type fields and default values.
+- Fixed issue not generating classes derived from simple types.
+- Fixed analyzer reaching the maximum recursion depth.
+- Fixed analyzer to flatten properly inner self referencing classes.
+- Moved dataclasses python conventions to jinja filters.
+
+20.5 (2020-05-02)
+-----------------
 - Updated codegen cli to accept multiple definitions or directories as argument.
 - Update ClassBuilder to recursively search for anonymous types.
 - Updated XmlParser to be thread-safe.

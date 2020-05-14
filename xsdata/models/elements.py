@@ -62,12 +62,12 @@ class XmlString:
 @dataclass
 class Documentation(ElementBase):
     """
-    <documentation
-      source = anyURI
-      xml:lang = language
-      {any attributes with non-schema namespace . . .}>
-      Content: ({any})*
-    </documentation>
+    Schema Model.
+
+    :param lang: language
+    :param source: anyURI
+    :param elements: ({any})*
+    :param attributes: any attributes with non-schema namespace
     """
 
     class Meta:
@@ -85,11 +85,11 @@ class Documentation(ElementBase):
 @dataclass
 class Appinfo(ElementBase):
     """
-    <appinfo
-      source = anyURI
-      {any attributes with non-schema namespace . . .}>
-      Content: ({any})*
-    </appinfo>
+    Schema Model.
+
+    :param lang: language
+    :param source: anyURI
+    :param attributes: any attributes with non-schema namespace
     """
 
     class Meta:
@@ -103,11 +103,11 @@ class Appinfo(ElementBase):
 @dataclass
 class Annotation(ElementBase):
     """
-    <annotation
-      id = ID
-      {any attributes with non-schema namespace . . .}>
-      Content: (appinfo | documentation)*
-    </annotation>
+    Schema Model.
+
+    :param appinfo:
+    :param documentations:
+    :param any_attribute: any attributes with non-schema namespace
     """
 
     appinfo: Optional[Appinfo] = element()
@@ -117,7 +117,13 @@ class Annotation(ElementBase):
 
 @dataclass
 class AnnotationBase(ElementBase):
-    """Base Class for elements that can contain annotations."""
+    """
+    Base Class for elements that can contain annotations.
+
+    :param id: ID
+    :param annotation:
+    :param any_attribute: any attributes with non-schema namespace
+    """
 
     id: Optional[str] = attribute()
     annotation: Optional[Annotation] = element()
@@ -135,15 +141,10 @@ class AnnotationBase(ElementBase):
 @dataclass
 class AnyAttribute(AnnotationBase):
     """
-    <anyAttribute
-      id = ID
-      namespace = ((##any | ##other) | List of (anyURI | (##targetNamespace | ##local)))
-      notNamespace = List of (anyURI | (##targetNamespace | ##local))
-      notQName = List of (QName | ##defined)
-      processContents = (lax | skip | strict) : strict
-      {any attributes with non-schema namespace . . .}>
-      Content: (annotation?)
-    </anyAttribute>
+    Schema Model.
+
+    :param namespace: ##any | ##other) | List of anyURI | (##targetNamespace | ##local)
+    :param process_contents: (lax | skip | strict) : strict
     """
 
     namespace: Optional[str] = attribute(default="##any")
@@ -180,14 +181,9 @@ class AnyAttribute(AnnotationBase):
 @dataclass
 class Assertion(AnnotationBase):
     """
-    <assertion
-      id = ID
-      test = an XPath expression
-      xpathDefaultNamespace =
-        (anyURI | (##defaultNamespace | ##targetNamespace | ##local))
-      {any attributes with non-schema namespace . . .}>
-      Content: (annotation?)
-    </assertion>
+    Schema Model.
+
+    :param test: an XPath expression
     """
 
     test: Optional[str] = attribute()
@@ -196,13 +192,12 @@ class Assertion(AnnotationBase):
 @dataclass
 class SimpleType(AnnotationBase):
     """
-    <simpleType
-      final = (#all | List of (list | union | restriction | extension))
-      id = ID
-      name = NCName
-      {any attributes with non-schema namespace . . .}>
-      Content: (annotation?, (restriction | list | union))
-    </simpleType>
+    Schema Model.
+
+    :param name: NCName
+    :param restriction:
+    :param list:
+    :param union:
     """
 
     name: Optional[str] = attribute()
@@ -250,12 +245,10 @@ class SimpleType(AnnotationBase):
 @dataclass
 class List(AnnotationBase):
     """
-    <list
-      id = ID
-      itemType = QName
-      {any attributes with non-schema namespace . . .}>
-      Content: (annotation?, simpleType?)
-    </list>
+    Schema Model.
+
+    :param simple_type:
+    :param item_type: QName
     """
 
     simple_type: Optional[SimpleType] = element(name="simpleType")
@@ -280,12 +273,10 @@ class List(AnnotationBase):
 @dataclass
 class Union(AnnotationBase):
     """
-    <union
-      id = ID
-      memberTypes = List of QName
-      {any attributes with non-schema namespace . . .}>
-      Content: (annotation?, simpleType*)
-    </union>
+    Schema Model.
+
+    :param member_types: List of QName
+    :param simple_types:
     """
 
     member_types: Optional[str] = attribute(name="memberTypes")
@@ -331,20 +322,17 @@ class Union(AnnotationBase):
 @dataclass
 class Attribute(AnnotationBase):
     """
-    <attribute
-      default = string
-      fixed = string
-      form = (qualified | unqualified)
-      id = ID
-      name = NCName
-      ref = QName
-      targetNamespace = anyURI
-      type = QName
-      use = (optional | prohibited | required) : optional
-      inheritable = boolean
-      {any attributes with non-schema namespace . . .}>
-      Content: (annotation?, simpleType?)
-    </attribute>
+    Schema Model.
+
+    :param default: string
+    :param fixed: string
+    :param form: qualified | unqualified
+    :param name: NCName
+    :param ref: QName
+    :param type: QName
+    :param target_namespace: anyURI
+    :param simple_type:
+    :param use: (optional | prohibited | required) : optional
     """
 
     default: Optional[str] = attribute()
@@ -388,12 +376,12 @@ class Attribute(AnnotationBase):
 @dataclass
 class AttributeGroup(AnnotationBase):
     """
-    <attributeGroup
-      id = ID
-      ref = QName
-      {any attributes with non-schema namespace . . .}>
-      Content: (annotation?)
-    </attributeGroup>
+    Schema Model.
+
+    :param name: NCName
+    :param ref: QName
+    :param attributes: any attributes with non-schema namespace
+    :param attribute_groups:
     """
 
     name: Optional[str] = attribute()
@@ -413,17 +401,12 @@ class AttributeGroup(AnnotationBase):
 @dataclass
 class Any(AnnotationBase):
     """
-    <any
-      id = ID
-      maxOccurs = (nonNegativeInteger | unbounded)  : 1
-      minOccurs = nonNegativeInteger : 1
-      namespace = ((##any | ##other) | List of (anyURI | (##targetNamespace | ##local)))
-      notNamespace = List of (anyURI | (##targetNamespace | ##local))
-      notQName = List of (QName | (##defined | ##definedSibling))
-      processContents = (lax | skip | strict) : strict
-      {any attributes with non-schema namespace . . .}>
-      Content: (annotation?)
-    </any>
+    Schema Model.
+
+    :param min_occurs: nonNegativeInteger : 1
+    :param max_occurs: (nonNegativeInteger | unbounded)  : 1
+    :param namespace: List of (anyURI | (##targetNamespace | ##local))
+    :param process_contents: (lax | skip | strict) : strict
     """
 
     min_occurs: int = attribute(default=1, name="minOccurs")
@@ -465,13 +448,13 @@ class Any(AnnotationBase):
 @dataclass
 class All(AnnotationBase):
     """
-    <all
-      id = ID
-      maxOccurs = (0 | 1) : 1
-      minOccurs = (0 | 1) : 1
-      {any attributes with non-schema namespace . . .}>
-      Content: (annotation?, (element | any | group)*)
-    </all>
+    Schema Model.
+
+    :param min_occurs: nonNegativeInteger : 1
+    :param max_occurs: (nonNegativeInteger | unbounded)  : 1
+    :param any:
+    :param elements:
+    :param groups:
     """
 
     min_occurs: int = attribute(default=1, name="minOccurs")
@@ -487,13 +470,15 @@ class All(AnnotationBase):
 @dataclass
 class Sequence(AnnotationBase):
     """
-    <sequence
-      id = ID
-      maxOccurs = (nonNegativeInteger | unbounded)  : 1
-      minOccurs = nonNegativeInteger : 1
-      {any attributes with non-schema namespace . . .}>
-      Content: (annotation?, (element | group | choice | sequence | any)*)
-    </sequence>
+    Schema Model.
+
+    :param min_occurs: nonNegativeInteger : 1
+    :param max_occurs: (nonNegativeInteger | unbounded)  : 1
+    :param elements:
+    :param groups:
+    :param choices:
+    :param sequences:
+    :param any:
     """
 
     min_occurs: int = attribute(default=1, name="minOccurs")
@@ -513,13 +498,15 @@ class Sequence(AnnotationBase):
 @dataclass
 class Choice(AnnotationBase):
     """
-    <choice
-      id = ID
-      maxOccurs = (nonNegativeInteger | unbounded)  : 1
-      minOccurs = nonNegativeInteger : 1
-      {any attributes with non-schema namespace . . .}>
-      Content: (annotation?, (element | group | choice | sequence | any)*)
-    </choice>
+    Schema Model.
+
+    :param min_occurs: nonNegativeInteger : 1
+    :param max_occurs: (nonNegativeInteger | unbounded)  : 1
+    :param elements:
+    :param groups:
+    :param choices:
+    :param sequences:
+    :param any:
     """
 
     min_occurs: int = attribute(default=1, name="minOccurs")
@@ -539,15 +526,15 @@ class Choice(AnnotationBase):
 @dataclass
 class Group(AnnotationBase):
     """
-    <group
-      id = ID
-      maxOccurs = (nonNegativeInteger | unbounded)  : 1
-      minOccurs = nonNegativeInteger : 1
-      name = NCName
-      ref = QName
-      {any attributes with non-schema namespace . . .}>
-      Content: (annotation?, (all | choice | sequence)?)
-    </group>
+    Schema Model.
+
+    :param name: NCName
+    :param ref: QName
+    :param min_occurs: nonNegativeInteger : 1
+    :param max_occurs: (nonNegativeInteger | unbounded)  : 1
+    :param all:
+    :param choice:
+    :param sequence:
     """
 
     name: Optional[str] = attribute()
@@ -573,12 +560,11 @@ class Group(AnnotationBase):
 @dataclass
 class OpenContent(AnnotationBase):
     """
-    <openContent
-      id = ID
-      mode = (none | interleave | suffix) : interleave
-      {any attributes with non-schema namespace . . .}>
-      Content: (annotation?, any?)
-    </openContent>
+    Schema Model.
+
+    :param applies_to_empty: default false
+    :param mode: (none | interleave | suffix) : interleave
+    :param any:
     """
 
     applies_to_empty: bool = attribute(default=False, name="appliesToEmpty")
@@ -588,26 +574,24 @@ class OpenContent(AnnotationBase):
 
 @dataclass
 class DefaultOpenContent(OpenContent):
-    """
-    <defaultOpenContent
-      appliesToEmpty = boolean : false
-      id = ID
-      mode = (interleave | suffix) : interleave
-      {any attributes with non-schema namespace . . .}>
-      Content: (annotation?, any)
-    </defaultOpenContent>
-    """
+    """Schema Model."""
 
 
 @dataclass
 class Extension(AnnotationBase):
     """
-    <extension
-      base = QName
-      id = ID
-      {any attributes with non-schema namespace . . .}>
-      Content: (annotation?, ((attribute | attributeGroup)*, anyAttribute?), assert*)
-    </extension>
+    Schema Model.
+
+    :param base: QName
+    :param group:
+    :param all:
+    :param choice:
+    :param sequence:
+    :param any_attribute: any attributes with non-schema namespace
+    :param open_content:
+    :param attributes:
+    :param attribute_groups:
+    :param assertions:
     """
 
     base: Optional[str] = attribute()
@@ -629,12 +613,9 @@ class Extension(AnnotationBase):
 @dataclass
 class Enumeration(AnnotationBase):
     """
-    <enumeration
-      id = ID
-      value = anySimpleType
-      {any attributes with non-schema namespace . . .}>
-      Content: (annotation?)
-    </enumeration>
+    Schema Model.
+
+    :param value: anySimpleType
     """
 
     value: str = attribute()
@@ -659,13 +640,9 @@ class Enumeration(AnnotationBase):
 @dataclass
 class FractionDigits(AnnotationBase):
     """
-    <fractionDigits
-      fixed = boolean : false
-      id = ID
-      value = nonNegativeInteger
-      {any attributes with non-schema namespace . . .}>
-      Content: (annotation?)
-    </fractionDigits>
+    Schema Model.
+
+    :param value: nonNegativeInteger
     """
 
     value: int = attribute()
@@ -674,13 +651,9 @@ class FractionDigits(AnnotationBase):
 @dataclass
 class Length(AnnotationBase):
     """
-    <length
-      fixed = boolean : false
-      id = ID
-      value = nonNegativeInteger
-      {any attributes with non-schema namespace . . .}>
-      Content: (annotation?)
-    </length>
+    Schema Model.
+
+    :param value: nonNegativeInteger
     """
 
     value: int = attribute()
@@ -689,13 +662,9 @@ class Length(AnnotationBase):
 @dataclass
 class MaxExclusive(AnnotationBase):
     """
-    <maxExclusive
-      fixed = boolean : false
-      id = ID
-      value = anySimpleType
-      {any attributes with non-schema namespace . . .}>
-      Content: (annotation?)
-    </maxExclusive>
+    Schema Model.
+
+    :param value: anySimpleType
     """
 
     value: float = attribute()
@@ -704,13 +673,9 @@ class MaxExclusive(AnnotationBase):
 @dataclass
 class MaxInclusive(AnnotationBase):
     """
-    <maxInclusive
-      fixed = boolean : false
-      id = ID
-      value = anySimpleType
-      {any attributes with non-schema namespace . . .}>
-      Content: (annotation?)
-    </maxInclusive>
+    Schema Model.
+
+    :param value: anySimpleType
     """
 
     value: float = attribute()
@@ -719,13 +684,9 @@ class MaxInclusive(AnnotationBase):
 @dataclass
 class MaxLength(AnnotationBase):
     """
-    <maxLength
-      fixed = boolean : false
-      id = ID
-      value = nonNegativeInteger
-      {any attributes with non-schema namespace . . .}>
-      Content: (annotation?)
-    </maxLength>
+    Schema Model.
+
+    :param value: nonNegativeInteger
     """
 
     value: float = attribute()
@@ -734,13 +695,9 @@ class MaxLength(AnnotationBase):
 @dataclass
 class MinExclusive(AnnotationBase):
     """
-    <minExclusive
-      fixed = boolean : false
-      id = ID
-      value = anySimpleType
-      {any attributes with non-schema namespace . . .}>
-      Content: (annotation?)
-    </minExclusive>
+    Schema Model.
+
+    :param value: anySimpleType
     """
 
     value: float = attribute()
@@ -749,13 +706,9 @@ class MinExclusive(AnnotationBase):
 @dataclass
 class MinInclusive(AnnotationBase):
     """
-    <minInclusive
-      fixed = boolean : false
-      id = ID
-      value = anySimpleType
-      {any attributes with non-schema namespace . . .}>
-      Content: (annotation?)
-    </minInclusive>
+    Schema Model.
+
+    :param value: anySimpleType
     """
 
     value: float = attribute()
@@ -764,13 +717,9 @@ class MinInclusive(AnnotationBase):
 @dataclass
 class MinLength(AnnotationBase):
     """
-    <minLength
-      fixed = boolean : false
-      id = ID
-      value = nonNegativeInteger
-      {any attributes with non-schema namespace . . .}>
-      Content: (annotation?)
-    </minLength>
+    Schema Model.
+
+    :param value: nonNegativeInteger
     """
 
     value: float = attribute()
@@ -779,12 +728,9 @@ class MinLength(AnnotationBase):
 @dataclass
 class Pattern(AnnotationBase):
     """
-    <pattern
-      id = ID
-      value = string
-      {any attributes with non-schema namespace . . .}>
-      Content: (annotation?)
-    </pattern>
+    Schema Model.
+
+    :param value: string
     """
 
     value: str = attribute()
@@ -793,13 +739,9 @@ class Pattern(AnnotationBase):
 @dataclass
 class TotalDigits(AnnotationBase):
     """
-    <totalDigits
-      fixed = boolean : false
-      id = ID
-      value = positiveInteger
-      {any attributes with non-schema namespace . . .}>
-      Content: (annotation?)
-    </totalDigits>
+    Schema Model.
+
+    :param value: positiveInteger
     """
 
     value: int = attribute()
@@ -808,28 +750,21 @@ class TotalDigits(AnnotationBase):
 @dataclass
 class WhiteSpace(AnnotationBase):
     """
-    <whiteSpace
-      fixed = boolean : false
-      id = ID
-      value = (collapse | preserve | replace)
-      {any attributes with non-schema namespace . . .}>
-      Content: (annotation?)
-    </whiteSpace>
+    Schema Model.
+
+    :param value: (collapse | preserve | replace)
     """
 
-    value: str = attribute()  # preserve, collapse, replace
+    value: str = attribute()
 
 
 @dataclass
 class ExplicitTimezone(AnnotationBase):
     """
-    <explicitTimezone
-      fixed = boolean : false
-      id = ID
-      value = NCName
-      {any attributes with non-schema namespace . . .}>
-      Content: (annotation?)
-    </explicitTimezone>
+    Schema Model.
+
+    :param value: NCName
+    :param fixed: default false
     """
 
     value: str = attribute()
@@ -839,17 +774,33 @@ class ExplicitTimezone(AnnotationBase):
 @dataclass
 class Restriction(AnnotationBase):
     """
-    <restriction
-      base = QName
-      id = ID
-      {any attributes with non-schema namespace . . .}>
-      Content: (annotation?, (simpleType?, (
-        minExclusive | minInclusive | maxExclusive | maxInclusive |
-        totalDigits | fractionDigits | length | minLength | maxLength |
-        enumeration | whiteSpace | pattern | assertion | explicitTimezone |
-        {any with namespace: ##other})*)
-      )
-    </restriction>
+    Schema Model.
+
+    :param base: QName
+    :param group:
+    :param all:
+    :param choice:
+    :param sequence:
+    :param open_content:
+    :param attributes:
+    :param attribute_groups:
+    :param enumerations:
+    :param asserts:
+    :param assertions:
+    :param any_element:
+    :param min_exclusive:
+    :param min_inclusive:
+    :param min_length:
+    :param max_exclusive:
+    :param max_inclusive:
+    :param max_length:
+    :param total_digits:
+    :param fraction_digits:
+    :param length:
+    :param white_space:
+    :param patterns:
+    :param explicit_timezone:
+    :param simple_type:
     """
 
     base: Optional[str] = attribute()
@@ -931,11 +882,10 @@ class Restriction(AnnotationBase):
 @dataclass
 class SimpleContent(AnnotationBase):
     """
-    <simpleContent
-      id = ID
-      {any attributes with non-schema namespace . . .}>
-      Content: (annotation?, (restriction | extension))
-    </simpleContent>
+    Schema Model.
+
+    :param restriction:
+    :param extension:
     """
 
     restriction: Optional[Restriction] = element()
@@ -945,12 +895,9 @@ class SimpleContent(AnnotationBase):
 @dataclass
 class ComplexContent(SimpleContent):
     """
-    <complexContent
-      id = ID
-      mixed = boolean
-      {any attributes with non-schema namespace . . .}>
-      Content: (annotation?, (restriction | extension))
-    </complexContent>
+    Schema Model.
+
+    :param fixed:
     """
 
     mixed: bool = attribute(default=False)
@@ -959,21 +906,25 @@ class ComplexContent(SimpleContent):
 @dataclass
 class ComplexType(AnnotationBase):
     """
-    <complexType
-      abstract = boolean : false
-      block = (#all | List of (extension | restriction))
-      final = (#all | List of (extension | restriction))
-      id = ID
-      mixed = boolean
-      name = NCName
-      defaultAttributesApply = boolean : true
-      {any attributes with non-schema namespace . . .}>
-      Content: (annotation?, (
-        simpleContent | complexContent |
-        (openContent?, (group | all | choice | sequence)?,
-        ((attribute | attributeGroup)*, anyAttribute?), assert*))
-      )
-    </complexType>
+    Schema Model.
+
+    :param name: NCName
+    :param block: (#all | List of (extension | restriction))
+    :param final: (#all | List of (extension | restriction))
+    :param simple_content:
+    :param complex_content:
+    :param group:
+    :param all:
+    :param choice:
+    :param sequence:
+    :param any_attribute:
+    :param open_content:
+    :param attributes:
+    :param attribute_groups:
+    :param assertion:
+    :param abstract:
+    :param mixed:
+    :param default_attributes_apply:
     """
 
     name: Optional[str] = attribute()
@@ -1010,14 +961,9 @@ class ComplexType(AnnotationBase):
 @dataclass
 class Field(AnnotationBase):
     """
-    <field
-      id = ID
-      xpath = a subset of XPath expression, see below
-      xpathDefaultNamespace =
-        (anyURI | (##defaultNamespace | ##targetNamespace | ##local))
-      {any attributes with non-schema namespace . . .}>
-      Content: (annotation?)
-    </field>
+    Schema Model.
+
+    :param xpath: a subset of XPath expression
     """
 
     xpath: Optional[str] = attribute()
@@ -1025,31 +971,22 @@ class Field(AnnotationBase):
 
 @dataclass
 class Selector(Field):
-    """
-    <selector
-      id = ID
-      xpath = a subset of XPath expression, see below
-      xpathDefaultNamespace =
-        (anyURI | (##defaultNamespace | ##targetNamespace | ##local))
-      {any attributes with non-schema namespace . . .}>
-      Content: (annotation?)
-    </selector>
-    """
+    """Schema Model."""
 
 
 @dataclass
 class Unique(AnnotationBase):
     """
-    <unique
-      id = ID
-      name = NCName
-      ref = QName
-      {any attributes with non-schema namespace . . .}>
-      Content: (annotation?, (selector, field+)?)
-    </unique>
+    Schema Model.
+
+    :param name: NCName
+    :param ref: QName
+    :param selector:
+    :param fields:
     """
 
     name: Optional[str] = attribute()
+    ref: Optional[str] = attribute()
     selector: Optional[Selector] = element()
     fields: Array[Field] = array_element(name="field")
 
@@ -1057,16 +994,16 @@ class Unique(AnnotationBase):
 @dataclass
 class Key(AnnotationBase):
     """
-    <key
-      id = ID
-      name = NCName
-      ref = QName
-      {any attributes with non-schema namespace . . .}>
-      Content: (annotation?, (selector, field+)?)
-    </key>
+    Schema Model.
+
+    :param name: NCName
+    :param ref: QName
+    :param selector:
+    :param fields:
     """
 
     name: Optional[str] = attribute()
+    ref: Optional[str] = attribute()
     selector: Optional[Selector] = element()
     fields: Array[Selector] = array_element(name="field")
 
@@ -1074,17 +1011,17 @@ class Key(AnnotationBase):
 @dataclass
 class Keyref(AnnotationBase):
     """
-    <keyref
-      id = ID
-      name = NCName
-      ref = QName
-      refer = QName
-      {any attributes with non-schema namespace . . .}>
-      Content: (annotation?, (selector, field+)?)
-    </keyref>
+    Schema Model.
+
+    :param name: NCName
+    :param ref: QName
+    :param refer: QName
+    :param selector:
+    :param fields:
     """
 
     name: Optional[str] = attribute()
+    ref: Optional[str] = attribute()
     refer: Optional[str] = attribute()
     selector: Optional[Selector] = element()
     fields: Array[Selector] = array_element(name="field")
@@ -1093,15 +1030,12 @@ class Keyref(AnnotationBase):
 @dataclass
 class Alternative(AnnotationBase):
     """
-    <alternative
-      id = ID
-      test = an XPath expression
-      type = QName
-      xpathDefaultNamespace =
-        (anyURI | (##defaultNamespace | ##targetNamespace | ##local))
-      {any attributes with non-schema namespace . . .}>
-      Content: (annotation?, (simpleType | complexType)?)
-    </alternative>
+    Schema Model.
+
+    :param type: QName
+    :param test: an XPath expression
+    :param simple_type:
+    :param complex_type:
     """
 
     type: Optional[str] = attribute()
@@ -1121,26 +1055,28 @@ class Alternative(AnnotationBase):
 @dataclass
 class Element(AnnotationBase):
     """
-    <element
-      abstract = boolean : false
-      block = (#all | List of (extension | restriction | substitution))
-      default = string
-      final = (#all | List of (extension | restriction))
-      fixed = string
-      form = (qualified | unqualified)
-      id = ID
-      maxOccurs = (nonNegativeInteger | unbounded)  : 1
-      minOccurs = nonNegativeInteger : 1
-      name = NCName
-      nillable = boolean : false
-      ref = QName
-      substitutionGroup = List of QName
-      targetNamespace = anyURI
-      type = QName
-      {any attributes with non-schema namespace . . .}>
-      Content: (annotation?,
-        ((simpleType | complexType)?, alternative*, (unique | key | keyref)*))
-    </element>
+    Schema Model.
+
+    :param name: NCName
+    :param ref: QName
+    :param type: QName
+    :param substitution_group: List of QName
+    :param default:
+    :param fixed:
+    :param form: qualified | unqualified
+    :param block: (#all | List of (extension | restriction | substitution))
+    :param final: (#all | List of (extension | restriction))
+    :param target_namespace: anyURI
+    :param simple_type:
+    :param complex_type:
+    :param alternatives:
+    :param uniques:
+    :param keys:
+    :param keyrefs:
+    :param min_occurs: nonNegativeInteger : 1
+    :param max_occurs: (nonNegativeInteger | unbounded)  : 1
+    :param nillable:
+    :param abstract:
     """
 
     name: Optional[str] = attribute()
@@ -1223,14 +1159,11 @@ class Element(AnnotationBase):
 @dataclass
 class Notation(AnnotationBase):
     """
-    <notation
-      id = ID
-      name = NCName
-      public = token
-      system = anyURI
-      {any attributes with non-schema namespace . . .}>
-      Content: (annotation?)
-    </notation>
+    Schema Model.
+
+    :param name: NCName
+    :param public: token
+    :param system: anyURI
     """
 
     name: Optional[str] = attribute()
@@ -1240,19 +1173,22 @@ class Notation(AnnotationBase):
 
 @dataclass
 class SchemaLocation(AnnotationBase):
+    """
+    Base schema location.
+
+    :param location: any url with a urllib supported scheme file: http:
+    """
+
     location: Optional[str] = field(default=None)
 
 
 @dataclass
 class Import(SchemaLocation):
     """
-    <import
-      id = ID
-      namespace = anyURI
-      schemaLocation = anyURI
-      {any attributes with non-schema namespace . . .}>
-      Content: (annotation?)
-    </import>
+    Schema Model.
+
+    :param namespace: anyURI
+    :param schema_location: anyURI
     """
 
     namespace: Optional[str] = attribute()
@@ -1262,12 +1198,9 @@ class Import(SchemaLocation):
 @dataclass
 class Include(SchemaLocation):
     """
-    <include
-      id = ID
-      schemaLocation = anyURI
-      {any attributes with non-schema namespace . . .}>
-      Content: (annotation?)
-    </include>
+    Schema Model.
+
+    :param schema_location: anyURI
     """
 
     schema_location: Optional[str] = attribute(name="schemaLocation")
@@ -1276,12 +1209,13 @@ class Include(SchemaLocation):
 @dataclass
 class Redefine(SchemaLocation):
     """
-    <redefine
-      id = ID
-      schemaLocation = anyURI
-      {any attributes with non-schema namespace . . .}>
-      Content: (annotation | (simpleType | complexType | group | attributeGroup))*
-    </redefine>
+    Schema Model.
+
+    :param schema_location: anyURI
+    :param simple_types:
+    :param complex_types:
+    :param groups:
+    :param attribute_groups:
     """
 
     schema_location: Optional[str] = attribute(name="schemaLocation")
@@ -1294,15 +1228,16 @@ class Redefine(SchemaLocation):
 @dataclass
 class Override(SchemaLocation):
     """
-    <override
-      id = ID
-      schemaLocation = anyURI
-      {any attributes with non-schema namespace . . .}>
-      Content: (
-        annotation | (simpleType | complexType | group |
-        attributeGroup | element | attribute | notation)
-      )*
-    </override>
+    Schema Model.
+
+    :param schema_location: anyURI
+    :param simple_types:
+    :param complex_types:
+    :param groups:
+    :param attribute_groups:
+    :param elements:
+    :param attributes:
+    :param notations:
     """
 
     schema_location: Optional[str] = attribute(name="schemaLocation")
@@ -1318,25 +1253,29 @@ class Override(SchemaLocation):
 @dataclass
 class Schema(SchemaLocation):
     """
-    <schema
-      attributeFormDefault = (qualified | unqualified) : unqualified
-      blockDefault = (#all | List of (extension | restriction | substitution))  : ''
-      defaultAttributes = QName
-      xpathDefaultNamespace =
-      (anyURI | (##defaultNamespace | ##targetNamespace | ##local)) : ##local
-      elementFormDefault = (qualified | unqualified) : unqualified
-      finalDefault = (#all | List of (extension | restriction | list | union))  : ''
-      id = ID
-      targetNamespace = anyURI
-      version = token
-      xml:lang = language
-      {any attributes with non-schema namespace . . .}>
-      Content: (
-        (include | import | redefine | override | annotation)*,
-        (defaultOpenContent, annotation*)?,
-        ((simpleType | complexType | group | attributeGroup |
-         element | attribute | notation), annotation*)*)
-    </schema>
+    Schema Model.
+
+    :param target:
+    :param block_default: (#all | List of (extension | restriction | substitution))
+    :param default_attributes: QName
+    :param final_default: (#all | List of extension | restriction | list | union) : ''
+    :param target_namespace: anyURI
+    :param version: token
+    :param xmlns:
+    :param element_form_default: (qualified | unqualified) : unqualified
+    :param attribute_form_default:  (qualified | unqualified) : unqualified
+    :param default_open_content:
+    :param imports:
+    :param redefines:
+    :param overrides:
+    :param annotations:
+    :param simple_types:
+    :param complex_types:
+    :param groups:
+    :param attribute_groups:
+    :param elements:
+    :param attributes:
+    :param notations:
     """
 
     class Meta:

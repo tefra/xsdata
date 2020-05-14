@@ -72,7 +72,8 @@ Class Meta
 Field Typing
 ============
 
-Simply follow the Python lib `dataclasses <https://docs.python.org/3/library/dataclasses.html>`_ documentation.
+Simply follow the Python lib
+`dataclasses <https://docs.python.org/3/library/dataclasses.html>`_ documentation.
 
 .. admonition:: Notes
     :class: warning
@@ -319,45 +320,3 @@ but it lacks maturity and test coverage.
     from xsdata.formats.dataclass.parsers import JsonParser
 
     obj = parser.from_path("/some.json, PurchaseOrder)
-
-
-
-Data Types
-==========
-
-In table below you case find all the xml schema data types and their mapping to
-primitive python types.
-
-+---------+------------------------------------------------------------------------------------+
-| Python  | XML Schema Types                                                                   |
-+---------+----------------------+-----------------+----------------------+--------------------+
-| str     |               anyURI |   anySimpleType |                 base |       base64Binary |
-+---------+----------------------+-----------------+----------------------+--------------------+
-|         |                 date |        dateTime |    derivationControl |           duration |
-+---------+----------------------+-----------------+----------------------+--------------------+
-|         |                 gDay |          gMonth |            gMonthDay |              gYear |
-+---------+----------------------+-----------------+----------------------+--------------------+
-|         |          gYearMonth  |              ID |                IDREF |          hexBinary |
-+---------+----------------------+-----------------+----------------------+--------------------+
-|         |               IDREFS |            lang |             language |               Name |
-+---------+----------------------+-----------------+----------------------+--------------------+
-|         |               NCName |         NMTOKEN |             NMTOKENS |   normalizedString |
-+---------+----------------------+-----------------+----------------------+--------------------+
-|         |             NOTATION |           QName | simpleDerivationSet  |             string |
-+---------+----------------------+-----------------+----------------------+--------------------+
-|         |                 time |           token |                      |                    |
-+---------+----------------------+-----------------+----------------------+--------------------+
-| bool    |              boolean |                 |                      |                    |
-+---------+----------------------+-----------------+----------------------+--------------------+
-| int     |                 byte |        ENTITIES |               ENTITY |                int |
-+---------+----------------------+-----------------+----------------------+--------------------+
-|         |              integer |            long |     negativeInteger  | nonNegativeInteger |
-+---------+----------------------+-----------------+----------------------+--------------------+
-|         | nonPositiveInteger   | positiveInteger |                short |       unsignedByte |
-+---------+----------------------+-----------------+----------------------+--------------------+
-| float   |               double |           float |                      |                    |
-+---------+----------------------+-----------------+----------------------+--------------------+
-| Decimal |              decimal |                 |                      |                    |
-+---------+----------------------+-----------------+----------------------+--------------------+
-|         |                      |                 |                      |                    |
-+---------+----------------------+-----------------+----------------------+--------------------+

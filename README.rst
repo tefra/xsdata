@@ -27,38 +27,49 @@ Naive XML Bindings for python
 
 --------
 
+xsData is a complete XML data binding library for python allowing developers to access
+and use XML documents as simple objects rather than using DOM.
+
+xsData comes with a code generator that can convert XML Schema 1.0 and 1.1 definitions
+to simple dataclasses with type hints and as minimum footprint as possible. The
+generated packages have no dependency on the library itself. So simple that you can
+write the models on your own if you happen to use an XML document with no schema
+available.
+
+The XML Parser is highly optimized and uses lxml iterparse to bind the document data to
+the target models. The parser accepts a configuration instance with various options
+like `fail on unknown properties` and is also thread safe which means you can take
+advantage of the internal model inspection caching context for even faster parsing.
+
+The parser and serializer are constantly tested against the
+`W3C XML Schema 1.1 test suite <https://github.com/tefra/xsdata-w3c-tests>`_ and
+passes more than 99% of the valid instance cases.
+
+.. image:: https://github.com/tefra/xsdata/raw/master/docs/_static/demo.svg
+
+Check the documentation `demos <https://xsdata.readthedocs.io/demos.html>`_ or
+our `W3C XML Schema 1.1  <https://github.com/tefra/xsdata-w3c-tests>`_ test runner and
+the `samples repo <https://github.com/tefra/xsdata-samples>`_ for more ✨✨✨
+
+
 Features
 --------
 
 - Generate data models from XML Schema 1.0 and 1.1 definitions.
-- Supports qualified/unqualified elements and attributes
-- Supports enumerations and inner classes
+- Supports qualified elements/attributes.
+- Supports enumerations and inner classes.
 - Flattening strategies to keep the code as simple as possible.
 - Preserve embedded documentation and references
 - Pluggable code writer that supports different formats
 - Output: Python Data Classes
-
-  - PEP8 naming conventions and code output
-  - Full support for type hints even with forward references
-  - XML Parser & Serializer based on lxml
-  - JSON Parser & Serializer
-
 - Output: PlantUML class diagram
 
--------
-
-.. image:: https://github.com/tefra/xsdata/raw/master/docs/_static/demo.svg
-
-Check the documentation `test suites <https://xsdata.readthedocs.io/>`_ or our `W3C XML Schema 1.1  <https://github.com/tefra/xsdata-w3c-tests>`_ test runner and the `samples repo <https://github.com/tefra/xsdata-samples>`_ for more ✨✨✨
-
-
-Changelog: 20.5 (2020-05-02)
-----------------------------
-- Updated codegen cli to accept multiple definitions or directories as argument.
-- Update ClassBuilder to recursively search for anonymous types.
-- Updated XmlParser to be thread-safe.
-- Added performance tweaks on XmlParser.
-- Added parser config to fail or not on unknown properties.
-- Fixed primitive types being marked as forward references.
-- Fixed nested restrictions on xs:simpleType.
-- Fixed ClassAnalyzer to recover/ignore missing types.
+Changelog: 20.5.1 (2020-05-14)
+------------------------------
+- Added support to fetch remote schemas.
+- Updated duplicate attribute names handling.
+- Updated code generation for enum type fields and default values.
+- Fixed issue not generating classes derived from simple types.
+- Fixed analyzer reaching the maximum recursion depth.
+- Fixed analyzer to flatten properly inner self referencing classes.
+- Moved dataclasses python conventions to jinja filters.

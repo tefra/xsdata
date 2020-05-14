@@ -1,4 +1,4 @@
-{% set help = obj|docstring|trim -%}
+{% set help = obj|class_docstring|trim -%}
 {% set level = level|default(0)-%}
 {% set namespace = obj.namespace or namespace|default(None) -%}
 {% set class_name =  obj.name|class_name -%}
@@ -24,7 +24,7 @@ class {{ class_name }}{{"({})".format(obj.extensions|map(attribute='type')|map('
     pass
 {%- endif -%}
 {%- for attr in obj.attrs %}
-    {%- set metadata = attr|attr_metadata(namespace) %}
+    {%- set metadata = attr|attribute_metadata(namespace) %}
     {{ attr.name|attribute_name }}: {{ attr|attribute_type(parents) }} = field(
         {% if attr.fixed -%}
         init=False,
@@ -32,7 +32,7 @@ class {{ class_name }}{{"({})".format(obj.extensions|map(attribute='type')|map('
         {{ "default_factory" if attr.is_factory else "default" }}={{ attr|attribute_default(obj.ns_map) }},
         {%- if metadata %}
         metadata=dict(
-            {{ metadata|arguments|indent(12) }}
+            {{ metadata|format_arguments|indent(12) }}
         )
         {%- endif %}
     )

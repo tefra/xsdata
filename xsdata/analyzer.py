@@ -402,25 +402,34 @@ class ClassAnalyzer(ClassUtils):
             attr.default = None
 
         if attr.default:
-            for attr_type in attr.types:
-                if attr_type.native:
-                    continue
+            self.sanitize_attribute_default_enum(target, attr)
 
-                source = None
-                if attr_type.forward_ref:
-                    attr.default = None
-                else:
-                    source = self.find_class(
-                        target.source_qname(attr_type.name),
-                        condition=lambda x: x.is_enumeration,
-                    )
+    def sanitize_attribute_default_enum(self, target: Class, attr: Attr):
+        for attr_type in attr.types:
+            if attr_type.native:
+                continue
+            if attr_type.forward_ref:
+                attr.default = None
+                continue
 
-                if source:
-                    enumeration = next(
-                        (x.name for x in source.attrs if x.default == attr.default),
-                        None,
-                    )
-                    attr.default = f"@enum@{source.name}.{enumeration}"
+            source = self.find_class(
+                target.source_qname(attr_type.name),
+                condition=lambda x: x.is_enumeration,
+            )
+
+            if not source:
+                continue
+
+            enumeration = next(
+                (x.name for x in source.attrs if x.default == attr.default), None,
+            )
+
+            if not enumeration:
+                raise AnalyzerError(
+                    f"Unknown enumeration {source.name}: {attr.default}"
+                )
+
+            attr.default = f"@enum@{source.name}.{enumeration}"
 
     def class_depends_on(self, source: Class, target: Class, depth: int = 1) -> bool:
         """Check if any source dependencies recursively match the target

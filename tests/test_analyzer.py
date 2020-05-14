@@ -776,7 +776,6 @@ class ClassAnalyzerTests(FactoryTestCase):
         mock_sanitize_attribute_sequence,
         mock_sanitize_duplicate_attribute_names,
     ):
-
         target = ClassFactory.elements(2)
         inner = ClassFactory.elements(1)
         target.inner.append(inner)
@@ -876,6 +875,15 @@ class ClassAnalyzerTests(FactoryTestCase):
             actual.append(attr.default)
 
         self.assertEqual([None, 2, None, "@enum@hit.winner"], actual)
+
+        attr = AttrFactory.create(
+            default="missing", types=AttrTypeFactory.list(1, name="hit")
+        )
+
+        with self.assertRaises(AnalyzerError) as cm:
+            self.analyzer.sanitize_attribute_default_value(target, attr)
+
+        self.assertEqual("Unknown enumeration hit: missing", str(cm.exception))
 
     @mock.patch.object(ClassAnalyzer, "flatten_class")
     def test_class_depends_on_has_a_depth_limit(self, *args):

@@ -104,7 +104,7 @@ class Restrictions:
         return cls(**element.get_restrictions())
 
 
-@dataclass
+@dataclass(unsafe_hash=True)
 class AttrType:
     name: str
     index: int = field(default_factory=int)
@@ -169,6 +169,10 @@ class Attr:
             and self.types[0].native
             and isinstance(self.types[0].native_type, tuple)
         )
+
+    @property
+    def is_nameless(self) -> bool:
+        return self.xml_type in (XmlType.WILDCARD, XmlType.ATTRIBUTES, None)
 
     @property
     def is_list(self) -> bool:

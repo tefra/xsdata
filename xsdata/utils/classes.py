@@ -27,6 +27,8 @@ class ClassUtils:
 
     @classmethod
     def compare_attributes(cls, source: Class, target: Class) -> int:
+        """Compare the attributes of the two classes and return whether the
+        source includes all, some or none of the target attributes."""
         if source is target:
             return cls.INCLUDES_ALL
 
@@ -46,6 +48,8 @@ class ClassUtils:
 
     @classmethod
     def sanitize_attribute_restrictions(cls, attr: Attr):
+        """Sanitize attribute required flag by comparing the min/max
+        occurrences restrictions."""
         restrictions = attr.restrictions
         min_occurs = restrictions.min_occurs or 0
         max_occurs = restrictions.max_occurs or 0
@@ -85,6 +89,17 @@ class ClassUtils:
 
     @classmethod
     def sanitize_attribute_name(cls, attr: Attr):
+        """
+        Sanitize attribute name in preparation for duplicate attrbute names
+        handler.
+
+        Steps:
+            1. Remove non alpha numerical values
+            2. Handle Enum negative numerical values
+            2. Remove namespaces prefixes
+            3. Ensure name not empty
+            4. Ensure name starts with a letter
+        """
         if attr.is_enumeration:
             attr.name = attr.default
             if re.match(r"^-\d*\.?\d+$", attr.name):
@@ -101,6 +116,18 @@ class ClassUtils:
 
     @classmethod
     def sanitize_duplicate_attribute_names(cls, attrs: List[Attr]) -> None:
+        """
+        Sanitize duplicate attribute names that might exist by applying rename
+        strategies.
+
+        Steps:
+            1. If more than two attributes share the same name or if they are
+            enumerations append a numerical index to the attribute names.
+            2. If one of the two fields has a specific namespace prepend it to the
+            name. If possible rename the second field.
+            3. Append the xml type to the name of one of the two attributes. if
+            possible rename the second field or the field with xml type `attribute`.
+        """
         grouped: Dict[str, List[Attr]] = dict()
         for attr in attrs:
             grouped.setdefault(attr.name.lower(), []).append(attr)
@@ -133,7 +160,8 @@ class ClassUtils:
         Flatten duplicate attributes.
 
         Remove duplicate fields in case of attributes or enumerations
-        otherwise convert fields to lists.
+        otherwise convert fields to lists. Two attributes are considered
+        equal if they have the same name and types and namespace.
         """
 
         if not target.attrs:
@@ -163,6 +191,13 @@ class ClassUtils:
 
     @classmethod
     def copy_attributes(cls, source: Class, target: Class, extension: Extension):
+        """
+        Copy the attributes from the source class to the target class and
+        remove the extension that links the two classes together.
+
+        The new attributes are prepended in the list unless if they are
+        supposed to be last in a sequence.
+        """
         prefix = text.prefix(extension.type.name)
         target.extensions.remove(extension)
         target_attr_names = {text.suffix(attr.name) for attr in target.attrs}
@@ -185,6 +220,13 @@ class ClassUtils:
     def clone_attribute(
         cls, attr: Attr, restrictions: Restrictions, prefix: Optional[str] = None
     ) -> Attr:
+        """
+        Clone the given attribute and merge its restrictions with the given
+        instance.
+
+        Prepend the given namespace prefix to the attribute name if
+        available.
+        """
         clone = attr.clone()
         clone.restrictions.merge(restrictions)
         if prefix:
@@ -198,6 +240,14 @@ class ClassUtils:
     def merge_attribute_type(
         cls, source: Class, target: Class, attr: Attr, attr_type: AttrType
     ):
+        """
+        Replace the given attribute type with the types of the single field
+        source class.
+
+        If the source class has more than one or no fields a warning
+        will be logged and the target attribute type will change to
+        simple string.
+        """
         if len(source.attrs) != 1:
             logger.warning("Missing implementation: %s", source.type.__name__)
             cls.reset_attribute_type(attr_type)
@@ -233,6 +283,15 @@ class ClassUtils:
                             attr_type.self_ref = True
             elif not any(existing.name == inner.name for existing in target.inner):
                 target.inner.append(inner)
+
+    @classmethod
+    def copy_extension_type(cls, target: Class, extension: Extension):
+        """Add the given extension type to all target attributes types and
+        remove it from the target class extensions."""
+
+        for attr in target.attrs:
+            attr.types.append(extension.type)
+        target.extensions.remove(extension)
 
     @classmethod
     def merge_redefined_classes(cls, classes: List[Class]):
@@ -285,6 +344,8 @@ class ClassUtils:
 
     @classmethod
     def create_mixed_attribute(cls, target: Class):
+        """Add an xs:anyType attribute to the given class if it supports mixed
+        content and doesn't have a wildcard attribute yet."""
         if not target.mixed or target.has_wild_attr:
             return
 
@@ -300,6 +361,8 @@ class ClassUtils:
 
     @classmethod
     def create_default_attribute(cls, item: Class, extension: Extension):
+        """Add a default value field to the given class based on the extension
+        type."""
         if extension.type.native_code == DataType.ANY_TYPE.code:
             attr = Attr(
                 name="any_element",
@@ -327,6 +390,8 @@ class ClassUtils:
 
     @classmethod
     def create_reference_attribute(cls, source: Class, qname: QName) -> Attr:
+        """Create an attribute with type that refers to the given source class
+        and namespaced qualified name."""
         prefix = None
         if qname.namespace != source.source_namespace:
             prefix = source.source_prefix
@@ -344,6 +409,7 @@ class ClassUtils:
 
     @classmethod
     def find_attribute(cls, attrs: List[Attr], attr: Attr) -> int:
+        """Return the position of the given attribute in the list."""
         try:
             return attrs.index(attr)
         except ValueError:
@@ -351,6 +417,7 @@ class ClassUtils:
 
     @classmethod
     def reset_attribute_type(cls, attr_type: AttrType):
+        """Reset the attribute type to native string."""
         attr_type.name = DataType.STRING.code
         attr_type.native = True
         attr_type.self_ref = False

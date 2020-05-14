@@ -468,3 +468,14 @@ class ClassUtilsTests(FactoryTestCase):
         self.assertTrue(attr.types[0].self_ref)
         self.assertFalse(attr.types[1].self_ref)
         self.assertFalse(attr.types[2].self_ref)
+
+    def test_copy_extension_type(self):
+        extension = ExtensionFactory.create()
+        target = ClassFactory.elements(2)
+        target.extensions.append(extension)
+
+        ClassUtils.copy_extension_type(target, extension)
+
+        self.assertEqual(extension.type, target.attrs[0].types[1])
+        self.assertEqual(extension.type, target.attrs[1].types[1])
+        self.assertEqual(0, len(target.extensions))

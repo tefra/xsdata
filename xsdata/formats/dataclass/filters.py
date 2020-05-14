@@ -22,24 +22,29 @@ from xsdata.utils import text
 
 @functools.lru_cache(maxsize=50)
 def class_name(name: str) -> str:
+    """Apply python conventions for class names."""
     return text.pascal_case(utils.safe_snake(name, "type"))
 
 
 @functools.lru_cache(maxsize=50)
 def attribute_name(name: str) -> str:
+    """Apply python conventions for instance variable names."""
     return text.snake_case(utils.safe_snake(text.suffix(name)))
 
 
 @functools.lru_cache(maxsize=50)
 def constant_name(name: str) -> str:
+    """Apply python conventions for constant names."""
     return text.snake_case(utils.safe_snake(name)).upper()
 
 
 def type_name(attr_type: AttrType) -> str:
+    """Return native python type name or apply class name conventions."""
     return attr_type.native_name or class_name(text.suffix(attr_type.name))
 
 
 def attribute_metadata(attr: Attr, parent_namespace: Optional[str]) -> Dict:
+    """Return a metadata dictionary for the given attribute."""
     metadata = dict(
         name=None
         if attr.is_nameless or attr.local_name == attribute_name(attr.name)
@@ -59,6 +64,8 @@ def attribute_metadata(attr: Attr, parent_namespace: Optional[str]) -> Dict:
 
 
 def format_arguments(data: Dict) -> str:
+    """Format given dictionary as keyword arguments."""
+
     def prep(key: str, value: Any) -> str:
         if isinstance(value, str):
             value = f'''"{value.replace('"', "'")}"'''
@@ -70,6 +77,7 @@ def format_arguments(data: Dict) -> str:
 
 
 def class_docstring(obj: Class, enum: bool = False) -> str:
+    """Generate docstring for the given class and the constructor arguments."""
     lines = []
     if obj.help:
         lines.append(obj.help)
@@ -85,6 +93,7 @@ def class_docstring(obj: Class, enum: bool = False) -> str:
 
 
 def default_imports(output: str) -> str:
+    """Generate the default imports for the given package output."""
     result = []
 
     if "Decimal" in output:
@@ -113,7 +122,7 @@ def default_imports(output: str) -> str:
 
 
 def attribute_default(attr: Attr, ns_map: Optional[Dict] = None) -> Any:
-    """Normalize default value/factory by the attribute type."""
+    """Generate the field default value/factory for the given attribute."""
     if attr.is_list:
         return "list"
     if attr.is_map:
@@ -160,16 +169,7 @@ def attribute_default(attr: Attr, ns_map: Optional[Dict] = None) -> Any:
 
 
 def attribute_type(attr: Attr, parents: List[str]) -> str:
-    """
-    Normalize attribute type.
-
-    Steps:
-        * If type alias is present use class name normalization
-        * Otherwise use the type name normalization
-        * Prepend outer class names and quote result for forward references
-        * Wrap the result with List if the field accepts a list of values
-        * Wrap the result with Optional if the field default value is None
-    """
+    """Generate type hints for the given attribute."""
 
     type_names: List[str] = []
     for attr_type in attr.types:

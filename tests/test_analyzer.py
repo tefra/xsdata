@@ -292,24 +292,22 @@ class ClassAnalyzerTests(FactoryTestCase):
         mock_flatten_extension_native.assert_called_once_with(target, extension)
 
     @mock.patch.object(ClassAnalyzer, "create_default_attribute")
-    def test_flatten_extension_native_and_target_no_enumeration(
-        self, mock_create_default_attribute
-    ):
+    def test_flatten_extension_native(self, mock_create_default_attribute):
         extension = ExtensionFactory.create()
         target = ClassFactory.elements(1)
 
         self.analyzer.flatten_extension_native(target, extension)
         mock_create_default_attribute.assert_called_once_with(target, extension)
 
-    @mock.patch.object(ClassAnalyzer, "create_default_attribute")
+    @mock.patch.object(ClassAnalyzer, "copy_extension_type")
     def test_flatten_extension_native_and_target_enumeration(
-        self, mock_create_default_attribute
+        self, mock_copy_extension_type
     ):
         extension = ExtensionFactory.create()
         target = ClassFactory.enumeration(1)
 
         self.analyzer.flatten_extension_native(target, extension)
-        self.assertEqual(0, mock_create_default_attribute.call_count)
+        mock_copy_extension_type.assert_called_once_with(target, extension)
 
     @mock.patch.object(ClassAnalyzer, "flatten_extension_simple")
     @mock.patch.object(ClassAnalyzer, "find_simple_class")
@@ -596,20 +594,6 @@ class ClassAnalyzerTests(FactoryTestCase):
         self.analyzer.flatten_attribute_types(parent, attr)
 
         mock_flatten_attribute_type.assert_called_once_with(parent, attr, type_a)
-
-    def test_flatten_attribute_types_with_enumeration_target(self):
-        target = ClassFactory.enumeration(
-            1,
-            extensions=[
-                ExtensionFactory.create(type=AttrTypeFactory.xs_bool()),
-                ExtensionFactory.create(type=AttrTypeFactory.xs_int()),
-            ],
-        )
-
-        self.assertEqual(1, len(target.attrs[0].types))
-
-        self.analyzer.flatten_attribute_types(target, target.attrs[0])
-        self.assertEqual(3, len(target.attrs[0].types))
 
     def test_flatten_attribute_types_filters_duplicate_types(self):
         target = ClassFactory.create(

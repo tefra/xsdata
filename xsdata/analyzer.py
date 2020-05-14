@@ -95,13 +95,10 @@ class ClassAnalyzer(ClassUtils):
 
     def fetch_classes_for_generation(self) -> List[Class]:
         """
-        Return the qualified classes to continue for code generation. Return
-        all of them if there are no classes derived from xs:element or
-        xs:complexType.
+        Return the qualified classes for code generation.
 
-        Qualifications:
-            * not an abstract
-            * type: element | complexType | simpleType with enumerations
+        Return all if no classes are derived from xs:element or
+        xs:complexType.
         """
         classes = [item for values in self.class_index.values() for item in values]
         if any(item.is_complex for item in classes):
@@ -128,6 +125,7 @@ class ClassAnalyzer(ClassUtils):
                     self.substitutions_index[qname].append(attr)
 
     def find_attr_type(self, source: Class, attr_type: AttrType) -> Optional[Class]:
+        """Find the source class for the given class and attribute type."""
         qname = source.source_qname(attr_type.name)
         return self.find_class(qname)
 
@@ -142,6 +140,8 @@ class ClassAnalyzer(ClassUtils):
     def find_attr_simple_type(
         self, source: Class, attr_type: AttrType
     ) -> Optional[Class]:
+        """Find the source class for the given class and attribute type,
+        excluding enumerations, complex types and self references."""
         qname = source.source_qname(attr_type.name)
         return self.find_class(
             qname,
@@ -151,6 +151,8 @@ class ClassAnalyzer(ClassUtils):
         )
 
     def find_simple_class(self, qname: QName) -> Optional[Class]:
+        """Find an enumeration or simple type source class for the given
+        qualified name."""
         return self.find_class(
             qname, condition=lambda x: x.is_enumeration or x.is_simple,
         )
@@ -158,6 +160,7 @@ class ClassAnalyzer(ClassUtils):
     def find_class(
         self, qname: QName, condition: Optional[Callable] = None
     ) -> Optional[Class]:
+        """Find the flattened source class for the given qualified name."""
         candidates = list(filter(condition, self.class_index.get(qname, [])))
         if candidates:
             candidate = candidates.pop(0)
@@ -171,6 +174,7 @@ class ClassAnalyzer(ClassUtils):
         return None
 
     def flatten_classes(self):
+        """Flatten the class index objects once."""
         for classes in self.class_index.values():
             for obj in classes:
                 if id(obj) not in self.processed:
@@ -237,9 +241,12 @@ class ClassAnalyzer(ClassUtils):
                 logger.warning("Missing extension type: %s", extension.type.name)
                 target.extensions.remove(extension)
 
-    def flatten_extension_native(self, target: Class, ext: Extension) -> None:
-        if not target.is_enumeration:
-            return self.create_default_attribute(target, ext)
+    def flatten_extension_native(self, target: Class, extension: Extension):
+        """Native type flatten extension handler, ignore enumerations."""
+        if target.is_enumeration:
+            self.copy_extension_type(target, extension)
+        else:
+            self.create_default_attribute(target, extension)
 
     def flatten_extension_simple(self, source: Class, target: Class, ext: Extension):
         """
@@ -333,9 +340,6 @@ class ClassAnalyzer(ClassUtils):
             elif not current_type.forward_ref:
                 self.flatten_attribute_type(target, attr, current_type)
 
-        if target.is_enumeration:
-            attr.types.extend(ext.type for ext in target.extensions)
-
         attr.types = unique_sequence(attr.types, key="name")
 
     def flatten_attribute_type(self, target: Class, attr: Attr, attr_type: AttrType):
@@ -375,11 +379,24 @@ class ClassAnalyzer(ClassUtils):
             self.add_substitution_attrs(target, clone)
 
     def sanitize_classes(self):
+        """Sanitize the class index objects."""
         for classes in self.class_index.values():
             for target in classes:
                 self.sanitize_class(target)
 
     def sanitize_class(self, target: Class):
+        """
+        Sanitize the attributes of the given class. After applying all the
+        flattening handlers the attributes need to be further sanitized to
+        squash common issues like duplicate attribute names.
+
+        Steps:
+            1. Sanitize inner classes
+            2. Sanitize attributes default value
+            3. Sanitize attributes name
+            4. Sanitize attributes sequential flag
+            5. Sanitize duplicate attribute names
+        """
         for inner in target.inner:
             self.sanitize_class(inner)
 
@@ -394,6 +411,14 @@ class ClassAnalyzer(ClassUtils):
         self.sanitize_duplicate_attribute_names(target.attrs)
 
     def sanitize_attribute_default_value(self, target: Class, attr: Attr):
+        """
+        Sanitize attribute default value.
+
+        Cases:
+            1. List fields can not have a fixed value.
+            2. Optional fields or xsi:type can not have a default or fixed value.
+            3. Convert string literal default value for enum fields.
+        """
         if attr.is_list:
             attr.fixed = False
 
@@ -405,6 +430,13 @@ class ClassAnalyzer(ClassUtils):
             self.sanitize_attribute_default_enum(target, attr)
 
     def sanitize_attribute_default_enum(self, target: Class, attr: Attr):
+        """
+        Convert string literal default value for enum fields.
+
+        Loop through all attributes types and search for enum sources.
+        If an enum source exist map the default string literal value to
+        a qualified name. Inner enum references are ignored.
+        """
         for attr_type in attr.types:
             if attr_type.native:
                 continue

@@ -1,4 +1,3 @@
-from collections import defaultdict
 from pathlib import Path
 from typing import Dict
 from typing import Iterator
@@ -12,6 +11,7 @@ from xsdata.models.codegen import Class
 from xsdata.models.codegen import Package
 from xsdata.resolver import DependenciesResolver
 from xsdata.utils import text
+from xsdata.utils.collections import group_by
 
 
 class DataclassGenerator(AbstractGenerator):
@@ -28,12 +28,15 @@ class DataclassGenerator(AbstractGenerator):
         packages = {obj.source_qname(): obj.target_module for obj in classes}
         resolver = DependenciesResolver(packages=packages)
 
-        for target_package, cluster in self.group_by_package(classes).items():
-            yield target_package, "init", self.render_package(cluster)
+        for package, cluster in self.group_by_package(classes).items():
+            output = self.render_package(cluster)
+            pck = "init"
+            yield package.joinpath("__init__.py"), pck, output
 
-        for target_module, cluster in self.group_by_module(classes).items():
-            file_path = Path.cwd().joinpath(target_module.replace(".", "/") + ".py")
-            yield file_path, target_module, self.render_module(resolver, cluster)
+        for module, cluster in self.group_by_module(classes).items():
+            output = self.render_module(resolver, cluster)
+            pck = cluster[0].target_module
+            yield module.with_suffix(".py"), pck, output
 
     def render_package(self, classes: List[Class]) -> str:
         class_names = [
@@ -46,7 +49,7 @@ class DataclassGenerator(AbstractGenerator):
         self, resolver: DependenciesResolver, classes: List[Class]
     ) -> str:
         resolver.process(classes)
-        imports = self.prepare_imports(resolver.sorted_imports())
+        imports = self.group_imports(resolver.sorted_imports())
         output = self.render_classes(resolver.sorted_classes())
         namespace = classes[0].source_namespace
 
@@ -54,48 +57,16 @@ class DataclassGenerator(AbstractGenerator):
             output=output, imports=imports, namespace=namespace
         )
 
+    def render_classes(self, classes: List[Class]) -> str:
+        return "\n\n\n".join(map(str.strip, map(self.render_class, classes))) + "\n"
+
     def render_class(self, obj: Class) -> str:
         template = "enum" if obj.is_enumeration else "class"
         return self.template(template).render(obj=obj)
 
     @classmethod
-    def group_by_package(cls, classes: List[Class]) -> Dict[Path, List[Class]]:
-        groups: Dict[Path, List] = defaultdict(list)
-        init_paths: Dict = dict()
-        for obj in classes:
-            if obj.target_module not in init_paths:
-                init_paths[obj.target_module] = (
-                    Path.cwd()
-                    .joinpath(obj.target_module.replace(".", "/"))
-                    .parent.joinpath("__init__.py")
-                )
-            key = init_paths[obj.target_module]
-            groups[key].append(obj)
-
-        return groups
-
-    @classmethod
-    def group_by_module(cls, classes: List[Class]) -> Dict[str, List[Class]]:
-        groups: Dict[str, List] = defaultdict(list)
-        for obj in classes:
-            groups[obj.target_module].append(obj)
-
-        return groups
-
-    def render_classes(self, classes: List[Class]) -> str:
-        """Get a list of sorted classes from the imports resolver, apply the
-        python code conventions and return the rendered output."""
-        output = map(str.strip, map(self.render_class, classes))
-        return "\n\n\n".join(output) + "\n"
-
-    def prepare_imports(self, imports: List[Package]) -> Dict[str, List[Package]]:
-        """Get a list of sorted packages from the imports resolver apply the
-        python code conventions, group them by the source package and return
-        them."""
-        result: Dict[str, List[Package]] = dict()
-        for obj in imports:
-            result.setdefault(obj.source, []).append(obj)
-        return result
+    def group_imports(cls, imports: List[Package]) -> Dict[str, List[Package]]:
+        return group_by(imports, lambda x: x.source)
 
     @classmethod
     def module_name(cls, name: str) -> str:

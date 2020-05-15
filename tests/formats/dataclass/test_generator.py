@@ -96,17 +96,6 @@ class DataclassGeneratorTests(FactoryTestCase):
         )
         self.assertEqual(expected, actual)
 
-    def test_prepare_imports(self):
-        packages = [
-            PackageFactory.create(name="foo", source="omg"),
-            PackageFactory.create(name="bar", source="omg"),
-            PackageFactory.create(name="thug", source="life"),
-        ]
-        expected = {"omg": packages[:2], "life": packages[2:]}
-
-        actual = DataclassGenerator().prepare_imports(packages)
-        self.assertEqual(expected, actual)
-
     def test_module_name(self):
         self.assertEqual("foo_bar", DataclassGenerator.module_name("fooBar"))
         self.assertEqual("foo_bar_wtf", DataclassGenerator.module_name("fooBar.wtf"))

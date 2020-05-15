@@ -64,12 +64,6 @@ Features
 - Output: Python Data Classes
 - Output: PlantUML class diagram
 
-Changelog: 20.5.1 (2020-05-14)
+Changelog: 20.5.2 (2020-05-15)
 ------------------------------
-- Added support to fetch remote schemas.
-- Updated duplicate attribute names handling.
-- Updated code generation for enum type fields and default values.
-- Fixed issue not generating classes derived from simple types.
-- Fixed analyzer reaching the maximum recursion depth.
-- Fixed analyzer to flatten properly inner self referencing classes.
-- Moved dataclasses python conventions to jinja filters.
+- Fix flattening enumeration unions.

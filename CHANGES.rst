@@ -1,3 +1,7 @@
+20.5.2 (2020-05-15)
+-------------------
+- Fix flattening enumeration unions.
+
 20.5.1 (2020-05-14)
 -------------------
 - Added support to fetch remote schemas.

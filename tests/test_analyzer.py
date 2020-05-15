@@ -239,12 +239,14 @@ class ClassAnalyzerTests(FactoryTestCase):
     @mock.patch.object(ClassAnalyzer, "create_mixed_attribute")
     @mock.patch.object(ClassAnalyzer, "add_substitution_attrs")
     @mock.patch.object(ClassAnalyzer, "flatten_attribute_types")
+    @mock.patch.object(ClassAnalyzer, "flatten_enumeration_unions")
     @mock.patch.object(ClassAnalyzer, "flatten_extension")
     @mock.patch.object(ClassAnalyzer, "expand_attribute_group")
     def test_flatten_class(
         self,
         mock_expand_attribute_group,
         mock_flatten_extension,
+        mock_flatten_enumeration_unions,
         mock_flatten_attribute_types,
         mock_add_substitution_attrs,
         mock_create_mixed_attribute,
@@ -265,6 +267,10 @@ class ClassAnalyzerTests(FactoryTestCase):
                 mock.call(target, target.extensions[1]),
                 mock.call(target, target.extensions[0]),
             ]
+        )
+
+        mock_flatten_enumeration_unions.assert_has_calls(
+            [mock.call(target), mock.call(target.inner[0]),]
         )
 
         mock_flatten_attribute_types.assert_has_calls(
@@ -556,6 +562,48 @@ class ClassAnalyzerTests(FactoryTestCase):
             self.analyzer.expand_attribute_group(target, group_attr)
 
         self.assertEqual("Group attribute not found: `{foo}bar`", str(cm.exception))
+
+    def test_flatten_enumeration_unions(self):
+        root_enum = ClassFactory.enumeration(2)
+        inner_enum = ClassFactory.enumeration(2)
+        target = ClassFactory.create(
+            type=Element,
+            attrs=[
+                AttrFactory.create(
+                    name="value",
+                    types=[
+                        AttrTypeFactory.create(name=root_enum.name),
+                        AttrTypeFactory.create(name=inner_enum.name, forward_ref=True),
+                        AttrTypeFactory.xs_int(),
+                    ],
+                ),
+                AttrFactory.create(),
+            ],
+        )
+        target.inner.append(inner_enum)
+        self.analyzer.create_class_index([root_enum, target])
+
+        # Target has more than one attribute
+        self.analyzer.flatten_enumeration_unions(target)
+        self.assertFalse(target.is_enumeration)
+
+        # Target has one attribute but is not a simple type
+        target.attrs.pop()
+        self.analyzer.flatten_enumeration_unions(target)
+        self.assertFalse(target.is_enumeration)
+
+        # Attribute is not a union of enumerations only
+        target.type = SimpleType
+        self.analyzer.flatten_enumeration_unions(target)
+        self.assertFalse(target.is_enumeration)
+
+        # Winner: single attr named with a union of enum types
+        target.attrs[0].types.pop()
+        self.analyzer.flatten_enumeration_unions(target)
+        self.assertTrue(target.is_enumeration)
+
+        self.assertEqual(root_enum.attrs + inner_enum.attrs, target.attrs)
+        self.assertEqual(0, len(target.inner))
 
     def test_flatten_attribute_types_when_type_is_native(self):
         xs_bool = AttrTypeFactory.xs_bool()

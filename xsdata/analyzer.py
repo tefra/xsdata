@@ -1,6 +1,7 @@
 from collections import defaultdict
 from dataclasses import dataclass
 from dataclasses import field
+from typing import Any
 from typing import Callable
 from typing import Dict
 from typing import List
@@ -202,6 +203,8 @@ class ClassAnalyzer(ClassUtils):
         for extension in reversed(target.extensions):
             self.flatten_extension(target, extension)
 
+        self.flatten_enumeration_unions(target)
+
         for attr in list(target.attrs):
             self.flatten_attribute_types(target, attr)
 
@@ -215,6 +218,27 @@ class ClassAnalyzer(ClassUtils):
         for inner in target.inner:
             if id(inner) not in self.processed:
                 self.flatten_class(inner)
+
+    def flatten_enumeration_unions(self, target: Class):
+        """Convert simple types with a single field which is a union of enums
+        to a standalone enumeration."""
+        if len(target.attrs) == 1 and target.is_simple:
+            enums: List[Any] = list()
+            attr = target.attrs[0]
+            for attr_type in attr.types:
+                if attr_type.forward_ref:
+                    enums.extend(target.inner)
+                elif not attr_type.native:
+                    enums.append(self.find_attr_type(target, attr_type))
+                else:
+                    enums.append(None)
+
+            merge = all(isinstance(x, Class) and x.is_enumeration for x in enums)
+            if merge:
+                target.attrs.clear()
+                target.inner.clear()
+                for enum in enums:
+                    target.attrs.extend(enum.attrs)
 
     def flatten_extension(self, target: Class, extension: Extension):
         """

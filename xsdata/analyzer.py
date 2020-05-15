@@ -17,6 +17,7 @@ from xsdata.models.codegen import Class
 from xsdata.models.codegen import Extension
 from xsdata.utils import text
 from xsdata.utils.classes import ClassUtils
+from xsdata.utils.collections import group_by
 from xsdata.utils.collections import unique_sequence
 
 
@@ -33,9 +34,7 @@ class ClassAnalyzer(ClassUtils):
     MAX_DEPENDENCY_CHECK_DEPTH = 5
 
     processed: List = field(default_factory=list)
-    class_index: Dict[QName, List[Class]] = field(
-        default_factory=lambda: defaultdict(list)
-    )
+    class_index: Dict[QName, List[Class]] = field(default_factory=dict)
     substitutions_index: Dict[QName, List[Attr]] = field(
         default_factory=lambda: defaultdict(list)
     )
@@ -109,9 +108,7 @@ class ClassAnalyzer(ClassUtils):
 
     def create_class_index(self, classes: List[Class]):
         """Group classes by their fully qualified name."""
-        self.class_index.clear()
-        for item in classes:
-            self.class_index[item.source_qname()].append(item)
+        self.class_index = group_by(classes, lambda x: x.source_qname())
 
     def create_substitutions_index(self):
         """Create reference attributes for all the classes substitutions and

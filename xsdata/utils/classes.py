@@ -1,6 +1,5 @@
 import re
 import sys
-from collections import defaultdict
 from typing import Dict
 from typing import List
 from typing import Optional
@@ -17,6 +16,7 @@ from xsdata.models.enums import DataType
 from xsdata.models.enums import NamespaceType
 from xsdata.models.enums import Tag
 from xsdata.utils import text
+from xsdata.utils.collections import group_by
 
 
 class ClassUtils:
@@ -296,10 +296,7 @@ class ClassUtils:
     @classmethod
     def merge_redefined_classes(cls, classes: List[Class]):
         """Merge original and redefined classes."""
-        grouped: Dict[str, List[Class]] = defaultdict(list)
-        for item in classes:
-            grouped[f"{item.type.__name__}{item.source_qname()}"].append(item)
-
+        grouped = group_by(classes, lambda x: f"{x.type.__name__}{x.source_qname()}")
         for items in grouped.values():
             if len(items) == 1:
                 continue

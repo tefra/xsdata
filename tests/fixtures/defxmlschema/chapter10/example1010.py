@@ -1,19 +1,14 @@
-from dataclasses import dataclass, field
-from typing import List
-from tests.fixtures.defxmlschema.chapter08.example0810 import (
-    SmlsizeType,
-)
+from enum import Enum
 
 
-@dataclass
-class AvailableSizesType:
+class AvailableSizesType(Enum):
     """
-    :ivar value:
+    :cvar SMALL:
+    :cvar MEDIUM:
+    :cvar LARGE:
+    :cvar EXTRA_LARGE:
     """
-    value: List[SmlsizeType] = field(
-        default_factory=list,
-        metadata=dict(
-            min_occurs=0,
-            max_occurs=9223372036854775807
-        )
-    )
+    SMALL = "small"
+    MEDIUM = "medium"
+    LARGE = "large"
+    EXTRA_LARGE = "extra large"

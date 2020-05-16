@@ -6,6 +6,7 @@ from typing import Optional
 
 from lxml.etree import QName
 
+from xsdata.exceptions import AnalyzerError
 from xsdata.logger import logger
 from xsdata.models.codegen import Attr
 from xsdata.models.codegen import AttrType
@@ -284,7 +285,10 @@ class ClassUtils:
                         if attr_type.forward_ref and attr_type.name == inner.name:
                             attr_type.self_ref = True
             elif not any(existing.name == inner.name for existing in target.inner):
-                target.inner.append(inner)
+                clone = inner.clone()
+                clone.package = target.package
+                clone.module = target.module
+                target.inner.append(clone)
 
     @classmethod
     def copy_extension_type(cls, target: Class, extension: Extension):
@@ -292,7 +296,7 @@ class ClassUtils:
         remove it from the target class extensions."""
 
         for attr in target.attrs:
-            attr.types.append(extension.type)
+            attr.types.append(extension.type.clone())
         target.extensions.remove(extension)
 
     @classmethod
@@ -421,3 +425,29 @@ class ClassUtils:
         attr_type.native = True
         attr_type.self_ref = False
         attr_type.forward_ref = False
+
+    @classmethod
+    def class_references(cls, target: Class) -> List:
+        result = [id(target)]
+        for attr in target.attrs:
+            result.append(id(attr))
+            result.extend(id(attr_type) for attr_type in attr.types)
+
+        for extension in target.extensions:
+            result.append(id(extension))
+            result.append(id(extension.type))
+
+        for inner in target.inner:
+            result.extend(cls.class_references(inner))
+
+        return result
+
+    @classmethod
+    def validate_cross_references(cls, classes: List[Class]):
+        """Validate all code gen objects are not cross referenced."""
+        references = list()
+        for target in classes:
+            references.extend(cls.class_references(target))
+
+        if len(references) != len(set(references)):
+            raise AnalyzerError("Cross references detected!")

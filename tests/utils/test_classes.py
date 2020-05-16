@@ -9,6 +9,7 @@ from tests.factories import ClassFactory
 from tests.factories import ExtensionFactory
 from tests.factories import FactoryTestCase
 from tests.factories import RestrictionsFactory
+from xsdata.exceptions import AnalyzerError
 from xsdata.models.codegen import AttrType
 from xsdata.models.codegen import Restrictions
 from xsdata.models.elements import ComplexType
@@ -445,11 +446,13 @@ class ClassUtilsTests(FactoryTestCase):
         self.assertFalse(four.abstract)  # Is common
 
     def test_copy_inner_classes(self):
-        source = ClassFactory.create(inner=ClassFactory.list(2))
+        source = ClassFactory.create(
+            inner=ClassFactory.list(2, package="a", module="b")
+        )
         target = ClassFactory.create()
 
         ClassUtils.copy_inner_classes(source, target)  # All good copy all
-        self.assertEqual(source.inner, target.inner)
+        self.assertEqual(2, len(target.inner))
 
         ClassUtils.copy_inner_classes(source, target)  # Inner classes exist skip
         self.assertEqual(2, len(target.inner))
@@ -467,6 +470,11 @@ class ClassUtilsTests(FactoryTestCase):
 
         ClassUtils.copy_inner_classes(source, target)  # Inner class matches target
         self.assertEqual(2, len(target.inner))
+
+        for inner in target.inner:
+            self.assertEqual(target.package, inner.package)
+            self.assertEqual(target.module, inner.module)
+
         self.assertTrue(attr.types[0].self_ref)
         self.assertFalse(attr.types[1].self_ref)
         self.assertFalse(attr.types[2].self_ref)
@@ -481,3 +489,32 @@ class ClassUtilsTests(FactoryTestCase):
         self.assertEqual(extension.type, target.attrs[0].types[1])
         self.assertEqual(extension.type, target.attrs[1].types[1])
         self.assertEqual(0, len(target.extensions))
+
+    def test_class_references(self):
+        target = ClassFactory.elements(
+            2,
+            inner=ClassFactory.list(2, attrs=AttrFactory.list(1)),
+            extensions=ExtensionFactory.list(1),
+        )
+        actual = ClassUtils.class_references(target)
+        # +1 target
+        # +2 attrs
+        # +2 attr types
+        # +1 extension
+        # +1 extension type
+        # +2 inner classes
+        # +2 inner classes attrs
+        # +2 inner classes attr types
+        self.assertEqual(13, len(actual))
+        self.assertEqual(id(target), actual[0])
+
+    def test_validate_cross_references(self):
+        first = ClassFactory.elements(2)
+        second = ClassFactory.create(attrs=first.attrs)
+
+        ClassUtils.validate_cross_references([first])
+
+        with self.assertRaises(AnalyzerError) as cm:
+            ClassUtils.validate_cross_references([first, second])
+
+        self.assertEqual("Cross references detected!", str(cm.exception))

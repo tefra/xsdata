@@ -140,7 +140,8 @@ class ClassAnalyzerTests(FactoryTestCase):
             ]
         )
 
-    def test_fetch_classes_for_generation(self):
+    @mock.patch.object(ClassAnalyzer, "validate_cross_references")
+    def test_fetch_classes_for_generation(self, mock_validate_cross_references):
         classes = [
             ClassFactory.create(abstract=True, type=Element),
             ClassFactory.create(type=Element),
@@ -158,6 +159,7 @@ class ClassAnalyzerTests(FactoryTestCase):
 
         result = self.analyzer.fetch_classes_for_generation()
         self.assertEqual(expected, result)
+        mock_validate_cross_references.assert_called_once_with(result)
 
     def test_fetch_classes_for_generation_when_no_complex_class_available(self):
         classes = [ClassFactory.enumeration(2), ClassFactory.create(type=SimpleType)]

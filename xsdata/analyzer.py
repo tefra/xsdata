@@ -235,7 +235,7 @@ class ClassAnalyzer(ClassUtils):
                 target.attrs.clear()
                 target.inner.clear()
                 for enum in enums:
-                    target.attrs.extend(enum.attrs)
+                    target.attrs.extend(x.clone() for x in enum.attrs)
 
     def flatten_extension(self, target: Class, extension: Extension):
         """
@@ -447,7 +447,7 @@ class ClassAnalyzer(ClassUtils):
             attr.fixed = False
             attr.default = None
 
-        if attr.default:
+        if attr.default and not attr.is_enumeration:
             self.sanitize_attribute_default_enum(target, attr)
 
     def sanitize_attribute_default_enum(self, target: Class, attr: Attr):
@@ -459,30 +459,20 @@ class ClassAnalyzer(ClassUtils):
         a qualified name. Inner enum references are ignored.
         """
         for attr_type in attr.types:
-            if attr_type.native:
-                continue
-            if attr_type.forward_ref:
-                attr.default = None
+            if attr_type.native or attr_type.forward_ref:
                 continue
 
             source = self.find_class(
                 target.source_qname(attr_type.name),
                 condition=lambda x: x.is_enumeration,
             )
-
             if not source:
                 continue
 
-            enumeration = next(
-                (x.name for x in source.attrs if x.default == attr.default), None,
-            )
-
-            if not enumeration:
-                raise AnalyzerError(
-                    f"Unknown enumeration {source.name}: {attr.default}"
-                )
-
-            attr.default = f"@enum@{source.name}.{enumeration}"
+            for source_attr in source.attrs:
+                if source_attr.default == attr.default:
+                    attr.default = f"@enum@{source.name}.{source_attr.name}"
+                    return
 
     def class_depends_on(self, source: Class, target: Class, depth: int = 1) -> bool:
         """Check if any source dependencies recursively match the target

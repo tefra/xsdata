@@ -1,6 +1,8 @@
-20.5.2 (2020-05-15)
+20.5.4 (2020-05-15)
 -------------------
 - Fix flattening enumeration unions.
+- Fix generation for enum fields with default/fixed value.
+- Fix duplicate attribute names handler to be case insensitive.
 
 20.5.1 (2020-05-14)
 -------------------

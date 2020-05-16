@@ -518,3 +518,22 @@ class ClassUtilsTests(FactoryTestCase):
             ClassUtils.validate_cross_references([first, second])
 
         self.assertEqual("Cross references detected!", str(cm.exception))
+
+    def test_find_inner_class(self):
+        inner_a = ClassFactory.create(name="a")
+        inner_b = ClassFactory.enumeration(2)
+        target = ClassFactory.create(inner=[inner_a, inner_b])
+
+        self.assertEqual(
+            inner_a,
+            ClassUtils.find_inner_class(target, condition=lambda x: x.name == "a"),
+        )
+        self.assertEqual(
+            inner_b,
+            ClassUtils.find_inner_class(target, condition=lambda x: x.is_enumeration),
+        )
+        self.assertIsNone(
+            ClassUtils.find_inner_class(
+                target, condition=lambda x: x.name == "a" and x.is_enumeration
+            )
+        )

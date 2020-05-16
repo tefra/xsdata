@@ -32,6 +32,13 @@ class ElementBaseTests(TestCase):
         element.default = "bar"
         self.assertEqual("bar", element.default_value)
 
+        element.default = " bar "
+        self.assertEqual("bar", element.default_value)
+
+        element.fixed = " bar "
+        element.default = None
+        self.assertEqual("bar", element.default_value)
+
         element.default = ""
         self.assertEqual("", element.default_value)
 

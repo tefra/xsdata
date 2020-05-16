@@ -1,5 +1,6 @@
 import re
 import sys
+from typing import Callable
 from typing import Dict
 from typing import List
 from typing import Optional
@@ -417,6 +418,11 @@ class ClassUtils:
             return attrs.index(attr)
         except ValueError:
             return -1
+
+    @classmethod
+    def find_inner_class(cls, target: Class, condition: Callable) -> Optional[Class]:
+        """Find the first inner class that matches the given condition."""
+        return next((inner for inner in target.inner if condition(inner)), None)
 
     @classmethod
     def reset_attribute_type(cls, attr_type: AttrType):

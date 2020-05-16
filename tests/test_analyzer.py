@@ -908,7 +908,7 @@ class ClassAnalyzerTests(FactoryTestCase):
             self.analyzer.sanitize_attribute_default_value(target, attr)
             actual.append(attr.default)
 
-        self.assertEqual([None, 2, 2, "@enum@hit.winner"], actual)
+        self.assertEqual([None, 2, 2, "@enum@hit::winner"], actual)
 
         attr = AttrFactory.create(
             default="missing", types=AttrTypeFactory.list(1, name="hit")
@@ -916,6 +916,35 @@ class ClassAnalyzerTests(FactoryTestCase):
 
         self.analyzer.sanitize_attribute_default_value(target, attr)
         self.assertEqual("missing", attr.default)
+
+    def test_sanitize_attribute_default_value_with_inner_enumeration(self):
+        inner = ClassFactory.enumeration(3, name="hit")
+        another_inner = ClassFactory.create()
+        inner.attrs[2].default = 2
+        inner.attrs[2].name = "winner"
+        attr_type = AttrTypeFactory.create(name="hit", forward_ref=True)
+
+        target = ClassFactory.create(
+            name="Target",
+            attrs=[
+                AttrFactory.create(types=[attr_type], default=2),
+                AttrFactory.create(types=[attr_type]),
+            ],
+            inner=[inner, another_inner],
+        )
+
+        self.analyzer.sanitize_attribute_default_value(target, target.attrs[0])
+        self.assertEqual([inner], self.analyzer.class_index[inner.source_qname()])
+
+        actual_default_values = ["@enum@Target_hit::winner", None]
+        self.assertEqual(actual_default_values, [x.default for x in target.attrs])
+
+        self.assertEqual("Target_hit", target.attrs[0].types[0].name)
+        self.assertFalse(target.attrs[0].types[0].forward_ref)
+        self.assertEqual("Target_hit", target.attrs[1].types[0].name)
+        self.assertFalse(target.attrs[1].types[0].forward_ref)
+        self.assertEqual("Target_hit", inner.name)
+        self.assertEqual([another_inner], target.inner)
 
     @mock.patch.object(ClassAnalyzer, "flatten_class")
     def test_class_depends_on_has_a_depth_limit(self, *args):

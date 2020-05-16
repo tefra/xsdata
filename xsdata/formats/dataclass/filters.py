@@ -145,7 +145,7 @@ def attribute_default(attr: Attr, ns_map: Optional[Dict] = None) -> Any:
                 " ".join(filter(None, map(str.strip, re.split(r"\s+", default_value))))
             )
         elif default_value.startswith("@enum@"):
-            source, enumeration = default_value[6:].split(".", 1)
+            source, enumeration = default_value[6:].split("::", 1)
             attr_type = next(
                 attr_type
                 for attr_type in attr.types

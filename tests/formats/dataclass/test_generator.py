@@ -23,20 +23,23 @@ class DataclassGeneratorTests(FactoryTestCase):
         iterator = DataclassGenerator().render(classes)
 
         actual = [out for out in iterator]
-        self.assertEqual(2, len(actual))
+        self.assertEqual(3, len(actual))
 
-        self.assertEqual(3, len(actual[0]))
         self.assertEqual("init", actual[0][1])
         self.assertEqual("foo/__init__.py", str(actual[0][0].relative_to(Path.cwd())))
-        self.assertEqual(mock_render_package.return_value, actual[0][2])
+        self.assertEqual("# nothing here\n", actual[0][2])
+
+        self.assertEqual("init", actual[1][1])
+        self.assertEqual("foo/__init__.py", str(actual[1][0].relative_to(Path.cwd())))
+        self.assertEqual(mock_render_package.return_value, actual[1][2])
         mock_render_package.assert_called_once_with(classes)
 
-        self.assertEqual(3, len(actual[1]))
-        self.assertIsInstance(actual[1][0], Path)
-        self.assertTrue(actual[1][0].is_absolute())
-        self.assertEqual("foo.tests", actual[1][1])
-        self.assertEqual("foo/tests.py", str(actual[1][0].relative_to(Path.cwd())))
-        self.assertEqual(mock_render_module.return_value, actual[1][2])
+        self.assertEqual(3, len(actual[2]))
+        self.assertIsInstance(actual[2][0], Path)
+        self.assertTrue(actual[2][0].is_absolute())
+        self.assertEqual("foo.tests", actual[2][1])
+        self.assertEqual("foo/tests.py", str(actual[2][0].relative_to(Path.cwd())))
+        self.assertEqual(mock_render_module.return_value, actual[2][2])
         mock_render_module.assert_called_once_with(mock.ANY, classes)
 
     def test_render_package(self):

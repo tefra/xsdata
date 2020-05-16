@@ -28,11 +28,22 @@ class DataclassGenerator(AbstractGenerator):
         packages = {obj.source_qname(): obj.target_module for obj in classes}
         resolver = DependenciesResolver(packages=packages)
 
+        # Generate all packages
+        pck_name = classes[0].package if classes else ""
+        cwd = Path.cwd()
+        for part in pck_name.split("."):
+            cwd = cwd.joinpath(part)
+            init = cwd.joinpath("__init__.py")
+            if not init.exists():
+                yield init, "init", "# nothing here\n"
+
+        # Generate package catalogues
         for package, cluster in self.group_by_package(classes).items():
             output = self.render_package(cluster)
             pck = "init"
             yield package.joinpath("__init__.py"), pck, output
 
+        # Generate modules
         for module, cluster in self.group_by_module(classes).items():
             output = self.render_module(resolver, cluster)
             pck = cluster[0].target_module

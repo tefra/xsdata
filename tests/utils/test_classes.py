@@ -112,6 +112,7 @@ class ClassUtilsTests(FactoryTestCase):
             AttrFactory.create(name="f", tag=Tag.ELEMENT, namespace="a"),
             AttrFactory.create(name="g", tag=Tag.ENUMERATION),
             AttrFactory.create(name="g", tag=Tag.ENUMERATION),
+            AttrFactory.create(name="G", tag=Tag.ENUMERATION),
             AttrFactory.create(name="g_1", tag=Tag.ENUMERATION),
         ]
 
@@ -130,6 +131,7 @@ class ClassUtilsTests(FactoryTestCase):
             "a_f",
             "g",
             "g_2",
+            "g_3",
             "g_1",
         ]
         self.assertEqual(expected, [x.name for x in attrs])

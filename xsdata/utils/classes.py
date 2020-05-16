@@ -139,9 +139,11 @@ class ClassUtils:
             if len(items) > 2 or items[0].is_enumeration:
                 for index in range(1, len(items)):
                     num = 1
-                    name = items[index].name
+                    name = items[index].name.lower()
 
-                    while any(attr for attr in attrs if attr.name == f"{name}_{num}"):
+                    while any(
+                        attr for attr in attrs if attr.name.lower() == f"{name}_{num}"
+                    ):
                         num += 1
 
                     items[index].name = f"{name}_{num}"

@@ -24,7 +24,7 @@ from xsdata.utils.collections import unique_sequence
 @dataclass
 class ClassAnalyzer(ClassUtils):
     """
-    Class analyzer is responsible to minize the final classes footprint by
+    Class analyzer is responsible to minimize the final classes footprint by
     merging and flattening extensions and attributes.
 
     Also promotes the classes necessary for generation and demotes the
@@ -161,17 +161,22 @@ class ClassAnalyzer(ClassUtils):
         self, qname: QName, condition: Optional[Callable] = None
     ) -> Optional[Class]:
         """Find the flattened source class for the given qualified name."""
-        candidates = list(filter(condition, self.class_index.get(qname, [])))
-        if candidates:
-            candidate = candidates.pop(0)
-            if candidates:
-                logger.warning("More than one candidate found for %s", qname)
 
-            if id(candidate) not in self.processed:
-                self.flatten_class(candidate)
-            return candidate
+        source = next(
+            (
+                source
+                for source in self.class_index.get(qname, [])
+                if not condition or condition(source)
+            ),
+            None,
+        )
+        if not source:
+            return None
 
-        return None
+        if id(source) not in self.processed:
+            self.flatten_class(source)
+
+        return source
 
     def flatten_classes(self):
         """Flatten the class index objects once."""
@@ -403,7 +408,7 @@ class ClassAnalyzer(ClassUtils):
 
     def sanitize_classes(self):
         """Sanitize the class index objects."""
-        for classes in self.class_index.values():
+        for classes in list(self.class_index.values()):
             for target in classes:
                 self.sanitize_class(target)
 
@@ -458,23 +463,57 @@ class ClassAnalyzer(ClassUtils):
 
         Loop through all attributes types and search for enum sources.
         If an enum source exist map the default string literal value to
-        a qualified name. Inner enum references are ignored.
+        a qualified name. If the source class in inner promote it to
+        root classes.
         """
+
         for attr_type in attr.types:
-            if attr_type.native or attr_type.forward_ref:
+            if attr_type.native:
                 continue
 
-            source = self.find_class(
-                target.source_qname(attr_type.name),
-                condition=lambda x: x.is_enumeration,
-            )
+            if attr_type.forward_ref:
+                source = self.find_inner_class(
+                    target,
+                    condition=lambda x: x.is_enumeration and x.name == attr_type.name,
+                )
+            else:
+                qname = target.source_qname(attr_type.name)
+                source = self.find_class(qname, condition=lambda x: x.is_enumeration)
+
             if not source:
                 continue
 
-            for source_attr in source.attrs:
-                if source_attr.default == attr.default:
-                    attr.default = f"@enum@{source.name}.{source_attr.name}"
-                    return
+            source_attr = next(
+                (x for x in source.attrs if x.default == attr.default), None
+            )
+            if source_attr:
+                if attr_type.forward_ref:
+                    self.promote_inner_class(target, source)
+
+                attr.default = f"@enum@{source.name}::{source_attr.name}"
+                return
+
+    def promote_inner_class(self, parent: Class, inner: Class):
+        """
+        Convert inner class to root class.
+
+        Steps:
+            1. Remove inner class from parent
+            2. Prepend parent name to inner class name.
+            3. Search and replace all matching attribute types.
+            4. Add inner class to the global class index.
+        """
+        name = f"{parent.name}_{inner.name}"
+        parent.inner.remove(inner)
+
+        for attr in parent.attrs:
+            for attr_type in attr.types:
+                if attr_type.name == inner.name:
+                    attr_type.forward_ref = False
+                    attr_type.name = name
+
+        inner.name = name
+        self.class_index[inner.source_qname()] = [inner]
 
     def class_depends_on(self, source: Class, target: Class, depth: int = 1) -> bool:
         """Check if any source dependencies recursively match the target

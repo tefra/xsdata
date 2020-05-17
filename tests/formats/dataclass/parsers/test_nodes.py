@@ -12,6 +12,7 @@ from xsdata.formats.dataclass.context import XmlContext
 from xsdata.formats.dataclass.models.elements import XmlElement
 from xsdata.formats.dataclass.models.elements import XmlMeta
 from xsdata.formats.dataclass.models.elements import XmlText
+from xsdata.formats.dataclass.models.elements import XmlVar
 from xsdata.formats.dataclass.models.elements import XmlWildcard
 from xsdata.formats.dataclass.models.generics import AnyElement
 from xsdata.formats.dataclass.parsers.config import ParserConfig
@@ -79,7 +80,7 @@ class ElementNodeTests(TestCase):
         ele = Element("foo")
         pool = [1, 2, 3]
 
-        node = ElementNode(position=0, meta=meta, default=None, config=ParserConfig())
+        node = ElementNode(position=0, meta=meta, config=ParserConfig())
         qname, obj = node.parse_element(ele, pool)
 
         self.assertEqual(QName(ele.tag), qname)
@@ -98,9 +99,7 @@ class ElementNodeTests(TestCase):
         ele = Element("a")
         ctx = XmlContext()
         cfg = ParserConfig()
-        var = XmlElement(
-            name="a", qname=QName("a"), types=[Foo], dataclass=True, default=Foo
-        )
+        var = XmlElement(name="a", qname=QName("a"), types=[Foo], dataclass=True)
         meta = XmlMeta(
             name="foo",
             clazz=None,
@@ -113,13 +112,12 @@ class ElementNodeTests(TestCase):
         namespace = meta.qname.namespace
         mock_ctx_fetch.return_value = replace(meta)
         mock_element_xsi_type.return_value = xsi_type
-        node = ElementNode(position=0, meta=meta, default=None, config=cfg)
+        node = ElementNode(position=0, meta=meta, config=cfg)
 
         actual = node.next_node(ele, 10, ctx)
         self.assertIsInstance(actual, ElementNode)
         self.assertEqual(10, actual.position)
         self.assertIs(mock_ctx_fetch.return_value, actual.meta)
-        self.assertEqual(Foo, actual.default)
         mock_ctx_fetch.assert_called_once_with(var.clazz, namespace, xsi_type)
 
     def test_next_node_when_given_qname_matches_any_element_var(self):
@@ -135,7 +133,7 @@ class ElementNodeTests(TestCase):
             nillable=False,
             vars=[var],
         )
-        node = ElementNode(position=0, meta=meta, default=None, config=cfg)
+        node = ElementNode(position=0, meta=meta, config=cfg)
 
         actual = node.next_node(ele, 10, ctx)
         self.assertIsInstance(actual, WildcardNode)
@@ -155,14 +153,12 @@ class ElementNodeTests(TestCase):
             nillable=False,
             vars=[var],
         )
-        node = ElementNode(position=0, meta=meta, default=None, config=cfg)
+        node = ElementNode(position=0, meta=meta, config=cfg)
 
         actual = node.next_node(ele, 10, ctx)
         self.assertIsInstance(actual, PrimitiveNode)
         self.assertEqual(10, actual.position)
-        self.assertEqual([int], actual.types)
-        self.assertEqual(100, actual.default)
-        self.assertEqual(var.is_tokens, actual.tokens)
+        self.assertEqual(var, actual.var)
 
     def test_next_node_when_given_qname_does_not_match_any_var(self):
         ele = Element("nope")
@@ -175,7 +171,7 @@ class ElementNodeTests(TestCase):
             source_qname=QName("foo"),
             nillable=False,
         )
-        node = ElementNode(position=0, meta=meta, default=None, config=cfg)
+        node = ElementNode(position=0, meta=meta, config=cfg)
 
         with self.assertRaises(XmlContextError) as cm:
             node.next_node(ele, 10, ctx)
@@ -193,7 +189,7 @@ class ElementNodeTests(TestCase):
             source_qname=QName("foo"),
             nillable=False,
         )
-        node = ElementNode(position=0, meta=meta, default=None, config=cfg)
+        node = ElementNode(position=0, meta=meta, config=cfg)
         actual = node.next_node(ele, 10, ctx)
         self.assertEqual(SkipNode(position=10), actual)
 
@@ -204,7 +200,7 @@ class RootNodeTests(TestCase):
         ctx = XmlContext()
         cfg = ParserConfig()
         meta = ctx.build(Foo)
-        node = RootNode(position=0, meta=meta, default=None, config=cfg)
+        node = RootNode(position=0, meta=meta, config=cfg)
         self.assertIs(node, node.next_node(ele, 0, ctx))
 
     def test_next_node_return_next_node(self):
@@ -214,7 +210,7 @@ class RootNodeTests(TestCase):
         ctx = XmlContext()
         cfg = ParserConfig()
         meta = ctx.build(Foo)
-        node = RootNode(position=0, meta=meta, default=None, config=cfg)
+        node = RootNode(position=0, meta=meta, config=cfg)
         actual = node.next_node(ele, 0, ctx)
 
         self.assertIsInstance(actual, PrimitiveNode)
@@ -252,19 +248,19 @@ class PrimitiveNodeTests(TestCase):
     @mock.patch.object(ParserUtils, "parse_value")
     def test_parse_element(self, mock_parse_value):
         mock_parse_value.return_value = 13
-        node = PrimitiveNode(position=0, types=[int], default=100)
+        var = XmlText(name="foo", qname=QName("foo"), default=100)
+        node = PrimitiveNode(position=0, var=var)
         ele = Element("foo", nsmap={"foo": "bar"})
         ele.text = "13"
 
         self.assertEqual((QName("foo"), 13), node.parse_element(ele, []))
-        self.assertFalse(node.tokens)
         mock_parse_value.assert_called_once_with(
-            node.types, ele.text, 100, ele.nsmap, node.tokens
+            var.types, ele.text, var.default, ele.nsmap, var.is_tokens
         )
 
     def test_next_node(self):
         ele = Element("foo")
-        node = PrimitiveNode(position=0, types=[])
+        node = PrimitiveNode(position=0, var=XmlText(name="foo", qname=QName("foo")))
 
         with self.assertRaises(XmlContextError):
             node.next_node(ele, 10, XmlContext())

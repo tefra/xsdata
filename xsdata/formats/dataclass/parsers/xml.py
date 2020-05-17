@@ -53,9 +53,7 @@ class XmlParser(AbstractParser):
         meta = self.context.build(clazz)
         self.namespaces.clear()
         objects: ParsedObjects = []
-        queue: XmlNodes = [
-            RootNode(position=0, meta=meta, default=None, config=self.config)
-        ]
+        queue: XmlNodes = [RootNode(position=0, meta=meta, config=self.config)]
 
         for event, element in context:
             if event == EventType.START_NS:
@@ -91,7 +89,7 @@ class XmlParser(AbstractParser):
         Use the last xml node to parse the given element and bind any child
         objects.
 
-        :returns Any: A dataclass instance or a python primitive value or None
+        :return: Any: A dataclass instance or a python primitive value or None
         """
         item = queue.pop()
         qname, obj = item.parse_element(element, objects)

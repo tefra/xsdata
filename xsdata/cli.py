@@ -4,6 +4,7 @@ from typing import List
 
 import click
 import click_log
+from pkg_resources import get_distribution
 
 from xsdata.logger import logger
 from xsdata.transformer import SchemaTransformer
@@ -22,6 +23,7 @@ from xsdata.writer import writer
 @click.option(
     "--print", is_flag=True, default=False, help="Preview the resulting classes."
 )
+@click.version_option(get_distribution("xsdata").version)
 @click_log.simple_verbosity_option(logger)
 def cli(sources: List, package: str, output: str, print: bool):
     """

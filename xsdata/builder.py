@@ -10,8 +10,11 @@ from xsdata.models.codegen import AttrType
 from xsdata.models.codegen import Class
 from xsdata.models.codegen import Extension
 from xsdata.models.codegen import Restrictions
+from xsdata.models.elements import Attribute
+from xsdata.models.elements import AttributeGroup
 from xsdata.models.elements import ComplexType
 from xsdata.models.elements import Element
+from xsdata.models.elements import Group
 from xsdata.models.elements import Schema
 from xsdata.models.elements import SimpleType
 from xsdata.models.enums import DataType
@@ -30,11 +33,17 @@ class ClassBuilder:
         """Generate classes from schema and redefined elements."""
         classes: List[Class] = []
 
+        def is_valid(item: ElementBase) -> bool:
+            return isinstance(
+                item,
+                (SimpleType, ComplexType, Group, AttributeGroup, Element, Attribute),
+            )
+
         for override in self.schema.overrides:
-            classes.extend(map(self.build_class, override.children()))
+            classes.extend(map(self.build_class, filter(is_valid, override.children())))
 
         for redefine in self.schema.redefines:
-            classes.extend(map(self.build_class, redefine.children()))
+            classes.extend(map(self.build_class, filter(is_valid, redefine.children())))
 
         classes.extend(map(self.build_class, self.schema.simple_types))
         classes.extend(map(self.build_class, self.schema.attribute_groups))

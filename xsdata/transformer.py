@@ -104,7 +104,7 @@ class SchemaTransformer:
     def generate_classes(self, schema: Schema, package: str) -> List[Class]:
         """Convert the given schema tree to codegen classes and use the writer
         factory to either generate or print the result code."""
-        logger.info("Compiling schema...")
+        logger.info("Compiling schema %s", schema.location)
         classes = ClassBuilder(schema=schema, package=package).build()
 
         class_num, inner_num = self.count_classes(classes)

@@ -10,6 +10,7 @@ from tests.factories import FactoryTestCase
 from xsdata.builder import ClassBuilder
 from xsdata.models.codegen import Restrictions
 from xsdata.models.elements import Alternative
+from xsdata.models.elements import Annotation
 from xsdata.models.elements import Attribute
 from xsdata.models.elements import AttributeGroup
 from xsdata.models.elements import ComplexContent
@@ -60,13 +61,13 @@ class ClassBuilderTests(FactoryTestCase):
         redefine_group = Group.create()
         redefine_attribute_group = AttributeGroup.create()
         mock_redefine_children.side_effect = [
-            [redefine_simple_type, redefine_group],
-            [redefine_attribute_group],
+            [redefine_simple_type, redefine_group, Annotation.create()],
+            [redefine_attribute_group, Annotation.create()],
         ]
 
         mock_override_children.side_effect = [
-            [override_element, override_attribute],
-            [override_complex_type],
+            [override_element, Annotation.create(), override_attribute],
+            [Annotation.create(), override_complex_type],
         ]
         mock_build_class.side_effect = classes = ClassFactory.list(18)
 

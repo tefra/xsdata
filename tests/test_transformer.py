@@ -226,7 +226,7 @@ class SchemaTransformerTests(FactoryTestCase):
         mock_count_classes,
         mock_logger_info,
     ):
-        schema = Schema.create()
+        schema = Schema.create(location="edo.xsd")
         classes = ClassFactory.list(2)
 
         mock_builder_build.return_value = classes
@@ -237,7 +237,7 @@ class SchemaTransformerTests(FactoryTestCase):
         mock_builder_build.assert_called_once_with()
         mock_logger_info.assert_has_calls(
             [
-                mock.call("Compiling schema..."),
+                mock.call("Compiling schema %s", schema.location),
                 mock.call("Builder: %d main and %d inner classes", 2, 4),
             ]
         )

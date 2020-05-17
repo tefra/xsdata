@@ -219,10 +219,11 @@ class ClassAnalyzerTests(FactoryTestCase):
 
         self.assertIsNone(self.analyzer.find_attr_simple_type(a, type_a))  # Enumeration
         self.assertIsNone(self.analyzer.find_attr_simple_type(a, type_c))  # Complex
-        self.assertIsNone(
-            self.analyzer.find_attr_simple_type(b, type_b)
-        )  # Source is target
+        self.assertIsNone(self.analyzer.find_attr_simple_type(b, type_b))  # Self
         self.assertEqual(b, self.analyzer.find_attr_simple_type(a, type_b))
+
+        b.attrs.append(AttrFactory.create())  # More than 1 attributes
+        self.assertIsNone(self.analyzer.find_attr_simple_type(a, type_b))
 
     def test_find_simple_class(self):
         a = ClassFactory.enumeration(1, name="a")

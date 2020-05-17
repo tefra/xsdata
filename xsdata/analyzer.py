@@ -141,13 +141,15 @@ class ClassAnalyzer(ClassUtils):
         self, source: Class, attr_type: AttrType
     ) -> Optional[Class]:
         """Find the source class for the given class and attribute type,
-        excluding enumerations, complex types and self references."""
+        excluding enumerations, complex types, self references and classes with
+        more than one attributes."""
         qname = source.source_qname(attr_type.name)
         return self.find_class(
             qname,
             condition=lambda x: not x.is_enumeration
             and not x.is_complex
-            and x is not source,
+            and x is not source
+            and len(x.attrs) < 2,
         )
 
     def find_attr_enum_type(

@@ -150,6 +150,27 @@ class ClassAnalyzer(ClassUtils):
             and x is not source,
         )
 
+    def find_attr_enum_type(
+        self, source: Class, attr_type: AttrType
+    ) -> Optional[Class]:
+        """
+        Find the enumeration source class for the given class and attribute
+        type.
+
+        Search in root classes an inner class and exclude native types.
+        """
+        if attr_type.native:
+            return None
+
+        if attr_type.forward_ref:
+            return self.find_inner_class(
+                source,
+                condition=lambda x: x.is_enumeration and x.name == attr_type.name,
+            )
+
+        qname = source.source_qname(attr_type.name)
+        return self.find_class(qname, condition=lambda x: x.is_enumeration)
+
     def find_simple_class(self, qname: QName) -> Optional[Class]:
         """Find an enumeration or simple type source class for the given
         qualified name."""
@@ -467,22 +488,13 @@ class ClassAnalyzer(ClassUtils):
         root classes.
         """
 
+        source_found = False
         for attr_type in attr.types:
-            if attr_type.native:
-                continue
-
-            if attr_type.forward_ref:
-                source = self.find_inner_class(
-                    target,
-                    condition=lambda x: x.is_enumeration and x.name == attr_type.name,
-                )
-            else:
-                qname = target.source_qname(attr_type.name)
-                source = self.find_class(qname, condition=lambda x: x.is_enumeration)
-
+            source = self.find_attr_enum_type(target, attr_type)
             if not source:
                 continue
 
+            source_found = True
             source_attr = next(
                 (x for x in source.attrs if x.default == attr.default), None
             )
@@ -492,6 +504,15 @@ class ClassAnalyzer(ClassUtils):
 
                 attr.default = f"@enum@{source.name}::{source_attr.name}"
                 return
+
+        if source_found:
+            logger.warning(
+                "No enumeration member matched %s.%s default value `%s`",
+                target.name,
+                attr.local_name,
+                attr.default,
+            )
+            attr.default = None
 
     def promote_inner_class(self, parent: Class, inner: Class):
         """

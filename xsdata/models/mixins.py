@@ -61,7 +61,7 @@ class ElementBase(BaseModel):
         if default is None and hasattr(self, "fixed"):
             default = getattr(self, "fixed", None)
 
-        return default.strip() if default else default
+        return default
 
     @property
     def display_help(self) -> Optional[str]:

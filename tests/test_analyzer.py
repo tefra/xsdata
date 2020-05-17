@@ -878,29 +878,84 @@ class ClassAnalyzerTests(FactoryTestCase):
         self.assertTrue(attr.fixed)
         self.assertEqual(2, attr.default)
 
-    def test_sanitize_attribute_default_value_with_enumeration(self):
-        miss = ClassFactory.elements(3, name="miss")
-        hit = ClassFactory.enumeration(3, name="hit")
-        hit.attrs[2].default = 2
-        hit.attrs[2].name = "winner"
-
-        self.analyzer.create_class_index([miss, hit])
+    def test_find_attr_enum_type(self):
+        native_type = AttrTypeFactory.create()
+        matching_external = AttrTypeFactory.create("foo")
+        missing_external = AttrTypeFactory.create("bar")
+        matching_inner = AttrTypeFactory.create("foobar", forward_ref=True)
+        missing_inner = AttrTypeFactory.create("barfoo", forward_ref=True)
+        enumeration = ClassFactory.enumeration(1, name="foo")
+        inner = ClassFactory.enumeration(1, name="foobar")
 
         target = ClassFactory.create(
             attrs=[
-                AttrFactory.create(),
-                AttrFactory.create(default=2),
                 AttrFactory.create(
-                    default=2, types=[AttrTypeFactory.create("foo", forward_ref=True)]
-                ),
-                AttrFactory.create(
-                    default=2,
                     types=[
-                        AttrTypeFactory.create("miss"),
-                        AttrTypeFactory.create("hit"),
+                        native_type,
+                        matching_external,
+                        missing_external,
+                        matching_inner,
+                        missing_inner,
+                    ]
+                )
+            ],
+            inner=[inner],
+        )
+        self.analyzer.create_class_index([target, enumeration])
+
+        self.assertIsNone(self.analyzer.find_attr_enum_type(target, native_type))
+
+        self.assertEqual(
+            enumeration, self.analyzer.find_attr_enum_type(target, matching_external)
+        )
+        self.assertIsNone(self.analyzer.find_attr_enum_type(target, missing_external))
+
+        self.assertEqual(
+            inner, self.analyzer.find_attr_enum_type(target, matching_inner)
+        )
+        self.assertIsNone(self.analyzer.find_attr_enum_type(target, missing_inner))
+
+    @mock.patch("xsdata.analyzer.logger.warning")
+    @mock.patch.object(ClassAnalyzer, "promote_inner_class")
+    @mock.patch.object(ClassAnalyzer, "find_attr_enum_type")
+    def test_sanitize_attribute_default_enum(
+        self, mock_find_attr_enum_type, mock_promote_inner_class, mock_logger_warning
+    ):
+        enum_one = ClassFactory.enumeration(1, name="root")
+        enum_one.attrs[0].default = "1"
+        enum_one.attrs[0].name = "one"
+        enum_two = ClassFactory.enumeration(1, name="inner")
+        enum_two.attrs[0].default = "2"
+        enum_two.attrs[0].name = "two"
+        enum_three = ClassFactory.enumeration(1, name="missing_member")
+
+        mock_find_attr_enum_type.side_effect = [
+            None,
+            enum_one,
+            None,
+            enum_two,
+            enum_three,
+        ]
+
+        target = ClassFactory.create(
+            name="target",
+            attrs=[
+                AttrFactory.create(
+                    types=[
+                        AttrTypeFactory.create(),
+                        AttrTypeFactory.create(name="foo"),
                     ],
+                    default="1",
                 ),
-            ]
+                AttrFactory.create(
+                    types=[
+                        AttrTypeFactory.create(),
+                        AttrTypeFactory.create(name="bar", forward_ref=True),
+                    ],
+                    default="2",
+                ),
+                AttrFactory.create(default="3"),
+            ],
         )
 
         actual = list()
@@ -908,43 +963,14 @@ class ClassAnalyzerTests(FactoryTestCase):
             self.analyzer.sanitize_attribute_default_value(target, attr)
             actual.append(attr.default)
 
-        self.assertEqual([None, 2, 2, "@enum@hit::winner"], actual)
-
-        attr = AttrFactory.create(
-            default="missing", types=AttrTypeFactory.list(1, name="hit")
+        self.assertEqual(["@enum@root::one", "@enum@inner::two", None], actual)
+        mock_promote_inner_class.assert_called_once_with(target, enum_two)
+        mock_logger_warning.assert_called_once_with(
+            "No enumeration member matched %s.%s default value `%s`",
+            target.name,
+            target.attrs[2].local_name,
+            "3",
         )
-
-        self.analyzer.sanitize_attribute_default_value(target, attr)
-        self.assertEqual("missing", attr.default)
-
-    def test_sanitize_attribute_default_value_with_inner_enumeration(self):
-        inner = ClassFactory.enumeration(3, name="hit")
-        another_inner = ClassFactory.create()
-        inner.attrs[2].default = 2
-        inner.attrs[2].name = "winner"
-        attr_type = AttrTypeFactory.create(name="hit", forward_ref=True)
-
-        target = ClassFactory.create(
-            name="Target",
-            attrs=[
-                AttrFactory.create(types=[attr_type], default=2),
-                AttrFactory.create(types=[attr_type]),
-            ],
-            inner=[inner, another_inner],
-        )
-
-        self.analyzer.sanitize_attribute_default_value(target, target.attrs[0])
-        self.assertEqual([inner], self.analyzer.class_index[inner.source_qname()])
-
-        actual_default_values = ["@enum@Target_hit::winner", None]
-        self.assertEqual(actual_default_values, [x.default for x in target.attrs])
-
-        self.assertEqual("Target_hit", target.attrs[0].types[0].name)
-        self.assertFalse(target.attrs[0].types[0].forward_ref)
-        self.assertEqual("Target_hit", target.attrs[1].types[0].name)
-        self.assertFalse(target.attrs[1].types[0].forward_ref)
-        self.assertEqual("Target_hit", inner.name)
-        self.assertEqual([another_inner], target.inner)
 
     @mock.patch.object(ClassAnalyzer, "flatten_class")
     def test_class_depends_on_has_a_depth_limit(self, *args):

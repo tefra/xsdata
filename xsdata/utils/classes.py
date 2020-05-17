@@ -92,7 +92,7 @@ class ClassUtils:
     @classmethod
     def sanitize_attribute_name(cls, attr: Attr):
         """
-        Sanitize attribute name in preparation for duplicate attrbute names
+        Sanitize attribute name in preparation for duplicate attribute names
         handler.
 
         Steps:

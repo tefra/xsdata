@@ -86,7 +86,7 @@ class RootNode(ElementNode):
 
 @dataclass(frozen=True)
 class WildcardNode(XmlNode):
-    qname: str
+    qname: QName
 
     def parse_element(self, element: Element, objects: List[Any]) -> Tuple:
         obj = ParserUtils.parse_any_element(element)

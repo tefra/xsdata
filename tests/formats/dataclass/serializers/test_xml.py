@@ -259,10 +259,8 @@ class XmlSerializerTests(TestCase):
             child, var.nillable, self.namespaces
         )
 
-        self.assertEqual(var.qname, child.tag)
-        self.assertEqual(
-            {"ns0": "http://www.w3.org/1999/xhtml"}, self.namespaces.ns_map
-        )
+        self.assertEqual("SizeType", child.tag)
+        self.assertEqual(0, len(self.namespaces.ns_map))
 
     @mock.patch.object(SerializeUtils, "set_nil_attribute")
     @mock.patch.object(XmlSerializer, "render_node")
@@ -271,7 +269,7 @@ class XmlSerializerTests(TestCase):
     ):
         root = Element("root")
         value = SizeType()
-        value.qname = "foo"
+        value.qname = QName("foo")
         meta = self.serializer.context.build(DescriptionType)
         var = meta.find_var(mode=FindMode.WILDCARD)
 

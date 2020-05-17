@@ -92,9 +92,7 @@ class ParserUtils:
     @classmethod
     def bind_element_param(cls, params: Dict, var: XmlVar, value: Any) -> bool:
         if var.is_list:
-            if var.name not in params:
-                params[var.name] = list()
-            params[var.name].append(value)
+            params.setdefault(var.name, []).append(value)
         elif var.name not in params:
             params[var.name] = value
         else:

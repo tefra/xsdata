@@ -117,11 +117,15 @@ class XmlSerializer(AbstractSerializer):
     def render_element_node(
         self, parent: Element, value: Any, var: XmlVar, namespaces: Namespaces
     ):
-        qname = value.qname if hasattr(value, "qname") else var.qname
+        if hasattr(value, "qname"):
+            qname = value.qname
+        elif var.is_wildcard:
+            meta = self.context.fetch(value.__class__, QName(parent).namespace)
+            qname = meta.qname
+        else:
+            qname = var.qname
 
-        if isinstance(qname, QName):
-            namespaces.add(qname.namespace)
-
+        namespaces.add(qname.namespace)
         sub_element = SubElement(parent, qname)
         self.render_node(sub_element, value, namespaces)
         self.set_xsi_type(sub_element, value, var, namespaces)

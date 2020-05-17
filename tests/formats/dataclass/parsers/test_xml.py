@@ -11,6 +11,7 @@ from lxml.etree import QName
 from tests.fixtures.books import BookForm
 from tests.fixtures.books import Books
 from xsdata.exceptions import ParserError
+from xsdata.formats.dataclass.models.elements import XmlText
 from xsdata.formats.dataclass.parsers.config import ParserConfig
 from xsdata.formats.dataclass.parsers.nodes import PrimitiveNode
 from xsdata.formats.dataclass.parsers.nodes import RootNode
@@ -39,15 +40,13 @@ class XmlParserTests(TestCase):
     @mock.patch.object(RootNode, "next_node")
     @mock.patch.object(XmlParser, "emit_event")
     def test_queue(self, mock_emit_event, mock_next_node):
-        primitive_node = PrimitiveNode(position=1, types=[int])
+        var = XmlText(name="foo", qname=QName("foo"))
+        primitive_node = PrimitiveNode(position=1, var=var)
         mock_next_node.return_value = primitive_node
         element = Element("{urn:books}books")
         config = ParserConfig()
         root_queue_item = RootNode(
-            position=0,
-            meta=self.parser.context.build(Books),
-            default=None,
-            config=config,
+            position=0, meta=self.parser.context.build(Books), config=config,
         )
 
         objects = list()
@@ -71,7 +70,8 @@ class XmlParserTests(TestCase):
 
         objects = list()
         queue = list()
-        queue.append(PrimitiveNode(position=0, types=[str], default=None))
+        var = XmlText(name="foo", qname=QName("foo"))
+        queue.append(PrimitiveNode(position=0, var=var))
 
         result = self.parser.dequeue(element, queue, objects)
         self.assertEqual("result", result)

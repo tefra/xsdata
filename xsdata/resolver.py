@@ -98,7 +98,7 @@ class DependenciesResolver:
         return [qname for qname in self.class_list if qname not in self.class_map]
 
     @staticmethod
-    def create_class_list(classes: List[Class]) -> List[Class]:
+    def create_class_list(classes: List[Class]) -> List[str]:
         """Use topology sort to return a flat list for all the dependencies."""
         return toposort_flatten(
             {obj.source_qname(): obj.dependencies() for obj in classes}

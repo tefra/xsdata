@@ -23,7 +23,7 @@ from xsdata.models.mixins import ElementBase
 from xsdata.utils import text
 
 
-def qname(name: str, ns_map: Dict, default_namespace: Optional[str] = None) -> str:
+def qname(name: str, ns_map: Dict, default_namespace: Optional[str] = None) -> QName:
     prefix, suffix = text.split(name)
     namespace = default_namespace
 

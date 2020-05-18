@@ -10,6 +10,7 @@ from tests.factories import ExtensionFactory
 from tests.factories import FactoryTestCase
 from xsdata.analyzer import ClassAnalyzer
 from xsdata.exceptions import AnalyzerError
+from xsdata.models.codegen import Attr
 from xsdata.models.codegen import Class
 from xsdata.models.elements import ComplexType
 from xsdata.models.elements import Element
@@ -244,10 +245,10 @@ class ClassAnalyzerTests(FactoryTestCase):
     @mock.patch.object(ClassAnalyzer, "flatten_attribute_types")
     @mock.patch.object(ClassAnalyzer, "flatten_enumeration_unions")
     @mock.patch.object(ClassAnalyzer, "flatten_extension")
-    @mock.patch.object(ClassAnalyzer, "expand_attribute_group")
+    @mock.patch.object(ClassAnalyzer, "expand_attribute_groups")
     def test_flatten_class(
         self,
-        mock_expand_attribute_group,
+        mock_expand_attribute_groups,
         mock_flatten_extension,
         mock_flatten_enumeration_unions,
         mock_flatten_attribute_types,
@@ -261,8 +262,8 @@ class ClassAnalyzerTests(FactoryTestCase):
 
         self.analyzer.flatten_class(target)
 
-        mock_expand_attribute_group.assert_has_calls(
-            [mock.call(target, target.attrs[0]), mock.call(target, target.attrs[1])]
+        mock_expand_attribute_groups.assert_has_calls(
+            [mock.call(target), mock.call(inner[0]), mock.call(inner[1])]
         )
 
         mock_flatten_extension.assert_has_calls(
@@ -530,6 +531,28 @@ class ClassAnalyzerTests(FactoryTestCase):
         self.analyzer.flatten_extension_complex(source, target, extension)
         mock_compare_attributes.assert_called_once_with(source, target)
         mock_copy_attributes.assert_called_once_with(source, target, extension)
+
+    @mock.patch.object(Attr, "is_group", new_callable=mock.PropertyMock)
+    @mock.patch.object(ClassAnalyzer, "expand_attribute_group")
+    def test_expand_attribute_groups(self, mock_expand_attribute_group, mock_is_group):
+        mock_is_group.side_effect = [
+            False,
+            True,
+            False,
+            True,
+            True,
+            True,
+            False,
+            False,
+            False,
+        ]
+        target = ClassFactory.elements(2)
+        self.analyzer.expand_attribute_groups(target)
+        self.assertEqual(9, mock_is_group.call_count)
+
+        mock_expand_attribute_group.assert_has_calls(
+            [mock.call(target, target.attrs[1]), mock.call(target, target.attrs[0]),]
+        )
 
     @mock.patch.object(ClassAnalyzer, "clone_attribute")
     @mock.patch.object(ClassAnalyzer, "find_class")

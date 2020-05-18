@@ -239,6 +239,7 @@ class ClassAnalyzerTests(FactoryTestCase):
         self.assertEqual(c, self.analyzer.find_simple_class(c.source_qname()))
         self.assertIsNone(self.analyzer.find_simple_class(d.source_qname()))
 
+    @mock.patch.object(ClassAnalyzer, "merge_mixed_enumerations")
     @mock.patch.object(ClassAnalyzer, "merge_duplicate_attributes")
     @mock.patch.object(ClassAnalyzer, "create_mixed_attribute")
     @mock.patch.object(ClassAnalyzer, "add_substitution_attrs")
@@ -255,6 +256,7 @@ class ClassAnalyzerTests(FactoryTestCase):
         mock_add_substitution_attrs,
         mock_create_mixed_attribute,
         mock_merge_duplicate_attributes,
+        mock_merge_mixed_enumerations,
     ):
         inner = ClassFactory.list(2)
         extensions = ExtensionFactory.list(2)
@@ -290,6 +292,10 @@ class ClassAnalyzerTests(FactoryTestCase):
         )
 
         mock_merge_duplicate_attributes.assert_has_calls(
+            [mock.call(target), mock.call(inner[0]), mock.call(inner[1])]
+        )
+
+        mock_merge_mixed_enumerations.assert_has_calls(
             [mock.call(target), mock.call(inner[0]), mock.call(inner[1])]
         )
 

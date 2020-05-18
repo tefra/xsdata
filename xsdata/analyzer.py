@@ -241,6 +241,8 @@ class ClassAnalyzer(ClassUtils):
 
         self.create_mixed_attribute(target)
 
+        self.merge_mixed_enumerations(target)
+
         for inner in target.inner:
             if id(inner) not in self.processed:
                 self.flatten_class(inner)

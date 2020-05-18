@@ -1,37 +1,27 @@
+from enum import Enum
 from dataclasses import dataclass, field
-from typing import List
+from typing import List, Union
 
 
 @dataclass
 class AvailableSizesType:
     """
     :ivar value:
-    :ivar small:
-    :ivar medium:
-    :ivar large:
     """
-    value: List[str] = field(
+    value: List[Union[str, "AvailableSizesType.Value"]] = field(
         default_factory=list,
         metadata=dict(
             min_occurs=0,
             max_occurs=9223372036854775807
         )
     )
-    small: str = field(
-        default="small",
-        metadata=dict(
-            required=True
-        )
-    )
-    medium: str = field(
-        default="medium",
-        metadata=dict(
-            required=True
-        )
-    )
-    large: str = field(
-        default="large",
-        metadata=dict(
-            required=True
-        )
-    )
+
+    class Value(Enum):
+        """
+        :cvar SMALL:
+        :cvar MEDIUM:
+        :cvar LARGE:
+        """
+        SMALL = "small"
+        MEDIUM = "medium"
+        LARGE = "large"

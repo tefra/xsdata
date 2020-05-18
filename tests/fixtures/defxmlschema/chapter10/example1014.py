@@ -1,3 +1,4 @@
+from enum import Enum
 from dataclasses import dataclass, field
 from typing import List, Union
 from tests.fixtures.defxmlschema.chapter08.example0810 import (
@@ -9,10 +10,8 @@ from tests.fixtures.defxmlschema.chapter08.example0810 import (
 class ApplicableSizesType:
     """
     :ivar value:
-    :ivar small_medium_large:
-    :ivar value_2_4_6_8_10_12_14_16_18:
     """
-    value: List[Union[int, SmlsizeType]] = field(
+    value: List[Union[int, SmlsizeType, "ApplicableSizesType.Value"]] = field(
         default_factory=list,
         metadata=dict(
             min_occurs=0,
@@ -21,15 +20,11 @@ class ApplicableSizesType:
             max_inclusive=18.0
         )
     )
-    small_medium_large: str = field(
-        default="small medium large",
-        metadata=dict(
-            required=True
-        )
-    )
-    value_2_4_6_8_10_12_14_16_18: str = field(
-        default="2 4 6 8 10 12 14 16 18",
-        metadata=dict(
-            required=True
-        )
-    )
+
+    class Value(Enum):
+        """
+        :cvar SMALL_MEDIUM_LARGE:
+        :cvar VALUE_2_4_6_8_10_12_14_16_18:
+        """
+        SMALL_MEDIUM_LARGE = "small medium large"
+        VALUE_2_4_6_8_10_12_14_16_18 = "2 4 6 8 10 12 14 16 18"

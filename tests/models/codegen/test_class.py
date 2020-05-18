@@ -122,3 +122,13 @@ class ClassTests(FactoryTestCase):
 
         obj.abstract = True
         self.assertFalse(obj.is_complex)
+
+    def test_property_is_enumeration(self):
+        obj = ClassFactory.enumeration(2)
+        self.assertTrue(obj.is_enumeration)
+
+        obj.attrs.append(AttrFactory.element())
+        self.assertFalse(obj.is_enumeration)
+
+        obj.attrs.clear()
+        self.assertFalse(obj.is_enumeration)

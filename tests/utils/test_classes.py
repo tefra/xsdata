@@ -347,6 +347,48 @@ class ClassUtilsTests(FactoryTestCase):
         actual = ClassUtils.create_reference_attribute(item, QName("foo"))
         self.assertEqual(item.name, actual.types[0].name)
 
+    def test_merge_mixed_enumerations(self):
+        target = ClassFactory.elements(2)
+        ClassUtils.merge_mixed_enumerations(target)
+
+        self.assertEqual(2, len(target.attrs))
+        self.assertEqual(0, len(target.inner))
+
+        target = ClassFactory.enumeration(2)
+        ClassUtils.merge_mixed_enumerations(target)
+
+        self.assertEqual(2, len(target.attrs))
+        self.assertEqual(0, len(target.inner))
+
+        enumerations = list(target.attrs)
+        target.attrs.append(AttrFactory.element())
+        ClassUtils.merge_mixed_enumerations(target)
+
+        self.assertEqual(1, len(target.attrs))
+        self.assertEqual(1, len(target.inner))
+        self.assertEqual(enumerations, target.inner[0].attrs)
+
+        target.attrs.append(AttrFactory.enumeration())
+        ClassUtils.merge_mixed_enumerations(target)
+        self.assertEqual(1, len(target.attrs))
+        self.assertEqual(1, len(target.inner))
+        self.assertEqual(3, len(target.inner[0].attrs))
+
+        target.attrs.append(AttrFactory.element())
+        ClassUtils.merge_mixed_enumerations(target)
+        self.assertEqual(2, len(target.attrs))
+        self.assertEqual(1, len(target.inner))
+        self.assertEqual(3, len(target.inner[0].attrs))
+
+        target.attrs.append(AttrFactory.enumeration())
+
+        with self.assertRaises(AnalyzerError) as cm:
+            ClassUtils.merge_mixed_enumerations(target)
+
+        self.assertEqual(
+            "Mixed enumeration with more than one normal field.", str(cm.exception)
+        )
+
     @mock.patch.object(ClassUtils, "copy_inner_classes")
     def test_merge_attribute_type(self, mock_copy_inner_classes):
         source = ClassFactory.elements(1, name="Foobar")

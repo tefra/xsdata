@@ -14,6 +14,7 @@ from xsdata.models.codegen import AttrType
 from xsdata.models.codegen import Class
 from xsdata.models.codegen import Extension
 from xsdata.models.codegen import Restrictions
+from xsdata.models.elements import SimpleType
 from xsdata.models.enums import DataType
 from xsdata.models.enums import NamespaceType
 from xsdata.models.enums import Tag
@@ -299,6 +300,50 @@ class ClassUtils:
         for attr in target.attrs:
             attr.types.append(extension.type.clone())
         target.extensions.remove(extension)
+
+    @classmethod
+    def merge_mixed_enumerations(cls, target: Class):
+        """
+        Sanitize classes that contain both enumerations and any other type
+        attribute.
+
+        Steps:
+            1. Validate that only one attribute with tag not equal enumeration exists.
+            2. Find the first inner enum class or create a new one.
+            3. Move attributes from target to inner enum class.
+        """
+
+        if target.is_enumeration or not any(
+            attr.is_enumeration for attr in target.attrs
+        ):
+            return
+
+        enumerations = []
+        for attr in list(target.attrs):
+            if attr.is_enumeration:
+                target.attrs.remove(attr)
+                enumerations.append(attr)
+
+        if len(target.attrs) > 1:
+            raise AnalyzerError("Mixed enumeration with more than one normal field.")
+
+        enum_inner = next(
+            (inner for inner in target.inner if inner.is_enumeration), None
+        )
+        if not enum_inner:
+            enum_inner = Class(
+                name="value",
+                type=SimpleType,
+                module=target.module,
+                package=target.package,
+                mixed=False,
+                abstract=False,
+                nillable=False,
+            )
+            target.attrs[0].types.append(AttrType(name="value", forward_ref=True))
+            target.inner.append(enum_inner)
+
+        enum_inner.attrs.extend(enumerations)
 
     @classmethod
     def merge_redefined_classes(cls, classes: List[Class]):

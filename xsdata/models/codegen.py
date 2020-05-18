@@ -258,7 +258,7 @@ class Class:
 
     @property
     def is_enumeration(self) -> bool:
-        return len(self.attrs) > 0 and self.attrs[0].is_enumeration
+        return len(self.attrs) > 0 and all(attr.is_enumeration for attr in self.attrs)
 
     @property
     def is_nillable(self) -> bool:

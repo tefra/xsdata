@@ -70,14 +70,16 @@ class SizesType:
             max_inclusive=18.0
         )
     )
-    applicable_sizes: List[str] = field(
+    applicable_sizes: List[Union[int, "SizesType.Value"]] = field(
         default_factory=list,
         metadata=dict(
             name="applicableSizes",
             type="Element",
             namespace="",
             min_occurs=0,
-            max_occurs=9223372036854775807
+            max_occurs=9223372036854775807,
+            min_inclusive=2.0,
+            max_inclusive=18.0
         )
     )
 

@@ -224,8 +224,7 @@ class ClassAnalyzer(ClassUtils):
         """
         self.processed.append(id(target))
 
-        for attr in list(target.attrs):
-            self.expand_attribute_group(target, attr)
+        self.expand_attribute_groups(target)
 
         for extension in reversed(target.extensions):
             self.flatten_extension(target, extension)
@@ -345,16 +344,18 @@ class ClassAnalyzer(ClassUtils):
         ):
             self.copy_attributes(source, target, ext)
 
+    def expand_attribute_groups(self, target: Class):
+        while any(attr.is_group for attr in target.attrs):
+            for attr in list(target.attrs):
+                if attr.is_group:
+                    self.expand_attribute_group(target, attr)
+
     def expand_attribute_group(self, target: Class, attr: Attr):
         """
         Expand a group attribute with the source class attributes.
 
         Clone the attributes and apply the group restrictions as well.
         """
-
-        if not attr.is_group:
-            return
-
         attr_qname = target.source_qname(attr.name)
         source = self.find_class(attr_qname)
 

@@ -39,13 +39,13 @@ class ClassTests(FactoryTestCase):
             ],
         )
 
-        expected = {
+        expected = [
+            QName("{http://www.w3.org/2001/XMLSchema}openAttrs"),
             QName("{http://www.w3.org/2001/XMLSchema}localAttribute"),
             QName("{http://www.w3.org/2001/XMLSchema}localElement"),
-            QName("{http://www.w3.org/2001/XMLSchema}openAttrs"),
             QName("{xsdata}foo"),
-        }
-        self.assertEqual(expected, obj.dependencies())
+        ]
+        self.assertEqual(expected, list(obj.dependencies()))
 
     def test_source_qname(self):
         obj = ClassFactory.create()

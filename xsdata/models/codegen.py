@@ -5,9 +5,9 @@ from dataclasses import field
 from dataclasses import replace
 from typing import Any
 from typing import Dict
+from typing import Iterator
 from typing import List
 from typing import Optional
-from typing import Set
 from typing import Type
 
 from lxml.etree import QName
@@ -295,7 +295,7 @@ class Class:
         attrs = [attr.clone() for attr in self.attrs]
         return replace(self, inner=inners, extensions=extensions, attrs=attrs)
 
-    def dependencies(self) -> Set[QName]:
+    def dependencies(self) -> Iterator[QName]:
         """
         Return a set of dependencies for the given class.
 
@@ -307,30 +307,24 @@ class Class:
             * Ignore native types.
         """
 
-        deps: Set[QName] = set()
-        for attr in self.attrs:
-            deps.update(
-                [
-                    self.source_qname(attr_type.name)
-                    for attr_type in attr.types
-                    if not attr_type.forward_ref
-                    and not attr_type.native
-                    and not attr_type.self_ref
-                ]
-            )
+        seen = list()
 
-        deps.update(
-            self.source_qname(ext.type.name)
-            for ext in self.extensions
-            if not ext.type.forward_ref
-            and not ext.type.native
-            and not ext.type.self_ref
-        )
+        def is_excluded(x: AttrType) -> bool:
+            return x.forward_ref or x.native or x.self_ref or x.name in seen
+
+        for attr in self.attrs:
+            for attr_type in attr.types:
+                if not is_excluded(attr_type):
+                    yield self.source_qname(attr_type.name)
+                    seen.append(attr_type.name)
+
+        for ext in self.extensions:
+            if not is_excluded(ext.type):
+                yield self.source_qname(ext.type.name)
+                seen.append(ext.type.name)
 
         for inner in self.inner:
-            deps.update(inner.dependencies())
-
-        return deps
+            yield from inner.dependencies()
 
     def source_qname(self, name: Optional[str] = None) -> QName:
         return qname(name or self.name, self.ns_map, self.source_namespace)

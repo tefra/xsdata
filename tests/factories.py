@@ -78,6 +78,7 @@ class ClassFactory(Factory):
         ns_map=None,
         package="foo",
         module="tests",
+        processed=False,
     ):
         name = name or f"class_{cls.next_letter()}"
         return cls.model(
@@ -96,6 +97,7 @@ class ClassFactory(Factory):
             package=package,
             module=module,
             ns_map=ns_map if isinstance(ns_map, dict) else NSMAP,
+            processed=processed,
         )
 
     @classmethod

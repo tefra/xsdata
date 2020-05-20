@@ -6,6 +6,7 @@ from xsdata.codegen.container import ClassContainer
 from xsdata.codegen.handlers import AttributeEnumUnionHandler
 from xsdata.models.elements import Element
 from xsdata.models.elements import SimpleType
+from xsdata.models.enums import Tag
 
 
 class AttributeEnumUnionHandlerTests(FactoryTestCase):
@@ -15,14 +16,13 @@ class AttributeEnumUnionHandlerTests(FactoryTestCase):
         self.root_enum = ClassFactory.enumeration(2)
         self.inner_enum = ClassFactory.enumeration(2)
         self.target = ClassFactory.create(
-            type=SimpleType,
             attrs=[
                 AttrFactory.create(
                     name="value",
+                    tag=Tag.UNION,
                     types=[
                         AttrTypeFactory.create(name=self.root_enum.name),
                         AttrTypeFactory.create(name=self.inner_enum.name, forward=True),
-                        AttrTypeFactory.xs_int(),
                     ],
                 ),
             ],
@@ -32,23 +32,23 @@ class AttributeEnumUnionHandlerTests(FactoryTestCase):
         container = ClassContainer.from_list([self.target, self.root_enum])
         self.processor = AttributeEnumUnionHandler(container=container)
 
-    def test_process_skip_class_with_more_than_one_attribute(self):
+    def test_process_skip_when_class_has_more_than_one_attribute(self):
         self.target.attrs.append(AttrFactory.create())
         self.processor.process(self.target)
         self.assertFalse(self.target.is_enumeration)
         self.assertEqual(2, len(self.target.attrs))
 
-    def test_process_skip_class_with_a_non_simple_type(self):
-        self.target.type = Element
+    def test_process_skip_when_attribute_tag_is_not_union(self):
+        self.target.attrs[0].tag = Tag.ELEMENT
         self.processor.process(self.target)
         self.assertFalse(self.target.is_enumeration)
 
-    def test_process_skip_class_with_non_enumerations_union(self):
+    def test_process_skip_when_types_is_not_enumeration_union(self):
+        self.target.attrs[0].types.append(AttrTypeFactory.xs_int())
         self.processor.process(self.target)
         self.assertFalse(self.target.is_enumeration)
 
     def test_process_merges_enumeration_unions(self):
-        self.target.attrs[0].types.pop()
         self.processor.process(self.target)
         self.assertTrue(self.target.is_enumeration)
 

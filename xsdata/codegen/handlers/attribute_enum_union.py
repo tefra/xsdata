@@ -5,6 +5,7 @@ from typing import List
 from xsdata.codegen.mixins import ContainerInterface
 from xsdata.codegen.mixins import HandlerInterface
 from xsdata.models.codegen import Class
+from xsdata.models.enums import Tag
 
 
 @dataclass
@@ -16,7 +17,7 @@ class AttributeEnumUnionHandler(HandlerInterface):
 
     def process(self, target: Class):
 
-        if len(target.attrs) == 1 and target.is_simple:
+        if len(target.attrs) == 1 and target.attrs[0].tag == Tag.UNION:
             enums: List[Any] = list()
             attr = target.attrs[0]
             for attr_type in attr.types:

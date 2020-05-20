@@ -6,6 +6,7 @@ from lxml.etree import QName
 from tests.factories import ClassFactory
 from tests.factories import FactoryTestCase
 from xsdata.codegen.container import ClassContainer
+from xsdata.models.codegen import Class
 from xsdata.models.elements import ComplexType
 
 
@@ -47,3 +48,21 @@ class ClassContainerTests(FactoryTestCase):
             self.container.find(class_b.source_qname(), lambda x: x.is_enumeration),
         )
         mock_process_class.assert_called_once_with(class_a)
+
+    @mock.patch.object(ClassContainer, "process_class")
+    def test_find_repeat_on_condition_and_not_processed(self, mock_process_class):
+        first = ClassFactory.elements(2, name="a")
+        second = ClassFactory.elements(2, name="a")
+        self.container.extend([first, second])
+
+        def process_class(x: Class):
+            x.processed = True
+            if x is first:
+                first.attrs.clear()
+
+        mock_process_class.side_effect = process_class
+
+        self.assertEqual(
+            second,
+            self.container.find(first.source_qname(), lambda x: len(x.attrs) == 2),
+        )

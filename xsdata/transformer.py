@@ -136,8 +136,7 @@ class SchemaTransformer:
     def analyze_classes(classes: List[Class]) -> List[Class]:
         """Analyzer the given class list and simplify attributes and
         extensions."""
-        analyzer = ClassAnalyzer()
-        return analyzer.process(classes)
+        return ClassAnalyzer(classes).process()
 
     @staticmethod
     def adjust_package(package: str, location: Optional[str]) -> str:

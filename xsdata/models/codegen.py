@@ -229,6 +229,7 @@ class Class:
     mixed: bool
     abstract: bool
     nillable: bool
+    processed: bool = False
     namespace: Optional[str] = field(default=None)
     help: Optional[str] = field(default=None)
     substitutions: List[str] = field(default_factory=list)

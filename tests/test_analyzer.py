@@ -605,7 +605,7 @@ class ClassAnalyzerTests(FactoryTestCase):
                     name="value",
                     types=[
                         AttrTypeFactory.create(name=root_enum.name),
-                        AttrTypeFactory.create(name=inner_enum.name, forward_ref=True),
+                        AttrTypeFactory.create(name=inner_enum.name, forward=True),
                         AttrTypeFactory.xs_int(),
                     ],
                 ),
@@ -668,7 +668,7 @@ class ClassAnalyzerTests(FactoryTestCase):
     ):
         parent = ClassFactory.create()
         type_a = AttrTypeFactory.create()
-        type_b = AttrTypeFactory.create(forward_ref=True)
+        type_b = AttrTypeFactory.create(forward=True)
 
         attr = AttrFactory.create(name="a", types=[type_a, type_b])
         self.analyzer.flatten_attribute_types(parent, attr)
@@ -731,7 +731,7 @@ class ClassAnalyzerTests(FactoryTestCase):
         mock_class_depends_on.return_value = True
 
         self.analyzer.flatten_attribute_type(target, attr, attr_type)
-        self.assertTrue(attr_type.self_ref)
+        self.assertTrue(attr_type.circular)
         self.assertEqual(0, mock_merge_attribute_type.call_count)
         mock_find_attr_simple_type.assert_called_once_with(target, attr_type)
         mock_class_depends_on.assert_called_once_with(source, target)
@@ -745,14 +745,14 @@ class ClassAnalyzerTests(FactoryTestCase):
         self.analyzer.flatten_attribute_type(target, attr, attr_type)
         self.assertEqual(DataType.STRING.code, attr_type.name)
         self.assertTrue(attr_type.native)
-        self.assertFalse(attr_type.self_ref)
-        self.assertFalse(attr_type.forward_ref)
+        self.assertFalse(attr_type.circular)
+        self.assertFalse(attr_type.forward)
         mock_logger_warning.assert_called_once_with("Missing type: %s", "foo")
 
-    def test_flatten_attribute_type_with_self_reference(self):
+    def test_flatten_attribute_type_with_circularerence(self):
         target = ClassFactory.create()
         attr = AttrFactory.create()
-        attr_type = AttrTypeFactory.create(name="foo", self_ref=True)
+        attr_type = AttrTypeFactory.create(name="foo", circular=True)
 
         self.analyzer.flatten_attribute_type(target, attr, attr_type)
         self.assertEqual("foo", attr_type.name)
@@ -912,8 +912,8 @@ class ClassAnalyzerTests(FactoryTestCase):
         native_type = AttrTypeFactory.create()
         matching_external = AttrTypeFactory.create("foo")
         missing_external = AttrTypeFactory.create("bar")
-        matching_inner = AttrTypeFactory.create("foobar", forward_ref=True)
-        missing_inner = AttrTypeFactory.create("barfoo", forward_ref=True)
+        matching_inner = AttrTypeFactory.create("foobar", forward=True)
+        missing_inner = AttrTypeFactory.create("barfoo", forward=True)
         enumeration = ClassFactory.enumeration(1, name="foo")
         inner = ClassFactory.enumeration(1, name="foobar")
 
@@ -980,7 +980,7 @@ class ClassAnalyzerTests(FactoryTestCase):
                 AttrFactory.create(
                     types=[
                         AttrTypeFactory.create(),
-                        AttrTypeFactory.create(name="bar", forward_ref=True),
+                        AttrTypeFactory.create(name="bar", forward=True),
                     ],
                     default="2",
                 ),

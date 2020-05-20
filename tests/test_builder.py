@@ -330,7 +330,7 @@ class ClassBuilderTests(FactoryTestCase):
         expected = [
             AttrTypeFactory.xs_int(),
             AttrTypeFactory.xs_string(),
-            AttrTypeFactory.create(name="foo", forward_ref=True),
+            AttrTypeFactory.create(name="foo", forward=True),
         ]
 
         self.assertEqual(expected, actual)

@@ -18,9 +18,7 @@ class ClassTests(FactoryTestCase):
             attrs=[
                 AttrFactory.create(types=[AttrTypeFactory.xs_decimal()]),
                 AttrFactory.create(
-                    types=[
-                        AttrTypeFactory.create(name="xs:annotated", forward_ref=True)
-                    ]
+                    types=[AttrTypeFactory.create(name="xs:annotated", forward=True)]
                 ),
                 AttrFactory.create(
                     types=[

@@ -182,8 +182,8 @@ class AttrTypeFactory(Factory):
         index=None,
         alias=None,
         native=False,
-        forward_ref=False,
-        self_ref=False,
+        forward=False,
+        circular=False,
     ):
 
         return cls.model(
@@ -191,8 +191,8 @@ class AttrTypeFactory(Factory):
             index=index or 0,
             alias=alias,
             native=native,
-            self_ref=self_ref,
-            forward_ref=forward_ref,
+            circular=circular,
+            forward=forward,
         )
 
     @classmethod

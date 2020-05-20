@@ -101,7 +101,7 @@ class ClassBuilder:
         target.extensions = sorted(extensions.values(), key=lambda x: x.type.index)
 
     def build_data_type(
-        self, target: Class, name: str, index: int = 0, forward_ref: bool = False
+        self, target: Class, name: str, index: int = 0, forward: bool = False
     ) -> AttrType:
         prefix, suffix = text.split(name)
         native = False
@@ -111,7 +111,7 @@ class ClassBuilder:
             name = suffix
             native = True
 
-        return AttrType(name=name, index=index, native=native, forward_ref=forward_ref,)
+        return AttrType(name=name, index=index, native=native, forward=forward,)
 
     def element_children(
         self, obj: ElementBase, restrictions: Optional[Restrictions] = None
@@ -224,7 +224,7 @@ class ClassBuilder:
 
         for inner in self.build_inner_classes(obj):
             target.inner.append(inner)
-            types.append(AttrType(name=inner.name, forward_ref=True))
+            types.append(AttrType(name=inner.name, forward=True))
 
         if len(types) == 0:
             types.append(AttrType(name=obj.default_type.code, native=True))

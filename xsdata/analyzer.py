@@ -164,7 +164,7 @@ class ClassAnalyzer(ClassUtils):
         if attr_type.native:
             return None
 
-        if attr_type.forward_ref:
+        if attr_type.forward:
             return self.find_inner_class(
                 source,
                 condition=lambda x: x.is_enumeration and x.name == attr_type.name,
@@ -254,7 +254,7 @@ class ClassAnalyzer(ClassUtils):
             enums: List[Any] = list()
             attr = target.attrs[0]
             for attr_type in attr.types:
-                if attr_type.forward_ref:
+                if attr_type.forward:
                     enums.extend(target.inner)
                 elif not attr_type.native:
                     enums.append(self.find_attr_type(target, attr_type))
@@ -391,7 +391,7 @@ class ClassAnalyzer(ClassUtils):
             if current_type.native:
                 if attr.restrictions.pattern:
                     self.reset_attribute_type(current_type)
-            elif not current_type.forward_ref:
+            elif not current_type.forward:
                 self.flatten_attribute_type(target, attr, current_type)
 
         attr.types = unique_sequence(attr.types, key="name")
@@ -405,8 +405,8 @@ class ClassAnalyzer(ClassUtils):
         else:
             complex_source = self.find_attr_type(target, attr_type)
             if complex_source:
-                attr_type.self_ref = self.class_depends_on(complex_source, target)
-            elif not attr_type.self_ref:
+                attr_type.circular = self.class_depends_on(complex_source, target)
+            elif not attr_type.circular:
                 logger.warning("Missing type: %s", attr_type.name)
                 self.reset_attribute_type(attr_type)
 
@@ -504,7 +504,7 @@ class ClassAnalyzer(ClassUtils):
                 (x for x in source.attrs if x.default == attr.default), None
             )
             if source_attr:
-                if attr_type.forward_ref:
+                if attr_type.forward:
                     self.promote_inner_class(target, source)
 
                 attr.default = f"@enum@{source.name}::{source_attr.name}"
@@ -535,7 +535,7 @@ class ClassAnalyzer(ClassUtils):
         for attr in parent.attrs:
             for attr_type in attr.types:
                 if attr_type.name == inner.name:
-                    attr_type.forward_ref = False
+                    attr_type.forward = False
                     attr_type.name = name
 
         inner.name = name

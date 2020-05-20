@@ -54,6 +54,9 @@ class ClassContainer(UserDict, ContainerInterface):
                 if not row.processed:
                     self.process_class(row)
 
+                    if condition:
+                        return self.find(qname, condition)
+
                 return row
         return None
 

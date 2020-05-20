@@ -2,8 +2,8 @@ from dataclasses import dataclass
 from typing import Optional
 from typing import Set
 
-from xsdata.codegen.mixins import ClassHandlerInterface
 from xsdata.codegen.mixins import ContainerInterface
+from xsdata.codegen.mixins import HandlerInterface
 from xsdata.logger import logger
 from xsdata.models.codegen import Attr
 from xsdata.models.codegen import AttrType
@@ -21,7 +21,7 @@ def simple_cond(candidate: Class) -> bool:
 
 
 @dataclass
-class AttributeTypeClassHandler(ClassHandlerInterface):
+class AttributeTypeHandler(HandlerInterface):
     """
     Reduce attribute types by merging simple types in order to reduce
     complexity at the cost of repeating definitions.

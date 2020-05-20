@@ -8,7 +8,7 @@ from tests.factories import ClassFactory
 from tests.factories import ExtensionFactory
 from tests.factories import FactoryTestCase
 from xsdata.codegen.container import ClassContainer
-from xsdata.codegen.handlers import AttributeTypeClassHandler
+from xsdata.codegen.handlers import AttributeTypeHandler
 from xsdata.codegen.handlers.attribute_type import simple_cond
 from xsdata.models.codegen import Class
 from xsdata.models.codegen import Restrictions
@@ -21,7 +21,7 @@ class AttributeTypeHandlerTests(FactoryTestCase):
         super().setUp()
 
         container = ClassContainer()
-        self.processor = AttributeTypeClassHandler(container=container)
+        self.processor = AttributeTypeHandler(container=container)
 
     def test_process_attribute_when_type_is_native(self):
         xs_bool = AttrTypeFactory.xs_bool()
@@ -48,7 +48,7 @@ class AttributeTypeHandlerTests(FactoryTestCase):
         self.processor.process_attribute(target, attr)
         self.assertEqual([AttrTypeFactory.xs_string()], attr.types)
 
-    @mock.patch.object(AttributeTypeClassHandler, "process_attribute_type")
+    @mock.patch.object(AttributeTypeHandler, "process_attribute_type")
     def test_process_attribute_ignores_forward_types(self, mock_flatten_attribute_type):
         parent = ClassFactory.create()
         type_a = AttrTypeFactory.create()
@@ -74,7 +74,7 @@ class AttributeTypeHandlerTests(FactoryTestCase):
         self.processor.process_attribute(target, target.attrs[0])
         self.assertEqual(["string", "boolean"], [x.name for x in target.attrs[0].types])
 
-    @mock.patch.object(AttributeTypeClassHandler, "merge_attribute_type")
+    @mock.patch.object(AttributeTypeHandler, "merge_attribute_type")
     @mock.patch.object(ClassContainer, "find")
     def test_process_attribute_type_with_simple_source(
         self, mock_container_find, mock_merge_attribute_type
@@ -94,8 +94,8 @@ class AttributeTypeHandlerTests(FactoryTestCase):
             source, target, attr, attr_type
         )
 
-    @mock.patch.object(AttributeTypeClassHandler, "is_circular_dependency")
-    @mock.patch.object(AttributeTypeClassHandler, "merge_attribute_type")
+    @mock.patch.object(AttributeTypeHandler, "is_circular_dependency")
+    @mock.patch.object(AttributeTypeHandler, "merge_attribute_type")
     @mock.patch.object(ClassContainer, "find")
     def test_process_attribute_type_with_complex_source(
         self,
@@ -121,8 +121,8 @@ class AttributeTypeHandlerTests(FactoryTestCase):
         )
         mock_is_circular_dependency.assert_called_once_with(source, target)
 
-    @mock.patch.object(AttributeTypeClassHandler, "is_circular_dependency")
-    @mock.patch.object(AttributeTypeClassHandler, "merge_attribute_type")
+    @mock.patch.object(AttributeTypeHandler, "is_circular_dependency")
+    @mock.patch.object(AttributeTypeHandler, "merge_attribute_type")
     @mock.patch.object(ClassContainer, "find")
     def test_process_attribute_type_with_circularerence(
         self,

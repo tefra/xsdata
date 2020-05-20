@@ -3,7 +3,7 @@ from tests.factories import AttrTypeFactory
 from tests.factories import ClassFactory
 from tests.factories import FactoryTestCase
 from xsdata.codegen.container import ClassContainer
-from xsdata.codegen.handlers import AttributeEnumUnionClassHandler
+from xsdata.codegen.handlers import AttributeEnumUnionHandler
 from xsdata.models.elements import Element
 from xsdata.models.elements import SimpleType
 
@@ -30,7 +30,7 @@ class AttributeEnumUnionHandlerTests(FactoryTestCase):
         self.target.inner.append(self.inner_enum)
 
         container = ClassContainer.from_list([self.target, self.root_enum])
-        self.processor = AttributeEnumUnionClassHandler(container=container)
+        self.processor = AttributeEnumUnionHandler(container=container)
 
     def test_process_skip_class_with_more_than_one_attribute(self):
         self.target.attrs.append(AttrFactory.create())

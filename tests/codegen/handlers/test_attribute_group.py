@@ -4,7 +4,7 @@ from tests.factories import AttrFactory
 from tests.factories import ClassFactory
 from tests.factories import FactoryTestCase
 from xsdata.codegen.container import ClassContainer
-from xsdata.codegen.handlers import AttributeGroupClassHandler
+from xsdata.codegen.handlers import AttributeGroupHandler
 from xsdata.exceptions import AnalyzerError
 from xsdata.models.codegen import Attr
 from xsdata.utils.classes import ClassUtils
@@ -15,10 +15,10 @@ class AttributeGroupHandlerTests(FactoryTestCase):
         super().setUp()
 
         container = ClassContainer()
-        self.processor = AttributeGroupClassHandler(container=container)
+        self.processor = AttributeGroupHandler(container=container)
 
     @mock.patch.object(Attr, "is_group", new_callable=mock.PropertyMock)
-    @mock.patch.object(AttributeGroupClassHandler, "process_attribute")
+    @mock.patch.object(AttributeGroupHandler, "process_attribute")
     def test_process(self, mock_process_attribute, mock_is_group):
         mock_is_group.side_effect = [
             False,

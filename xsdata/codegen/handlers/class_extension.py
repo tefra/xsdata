@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
-from xsdata.codegen.mixins import ClassHandlerInterface
 from xsdata.codegen.mixins import ContainerInterface
+from xsdata.codegen.mixins import HandlerInterface
 from xsdata.logger import logger
 from xsdata.models.codegen import Class
 from xsdata.models.codegen import Extension
@@ -13,7 +13,7 @@ def simple_cond(candidate: Class) -> bool:
 
 
 @dataclass
-class ClassExtensionClassHandler(ClassHandlerInterface):
+class ClassExtensionHandler(HandlerInterface):
     """Reduce class extensions by copying or creating new attributes."""
 
     container: ContainerInterface

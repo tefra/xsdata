@@ -8,14 +8,14 @@ from typing import Optional
 
 from lxml.etree import QName
 
-from xsdata.codegen.handlers import AttributeEnumUnionClassHandler
-from xsdata.codegen.handlers import AttributeGroupClassHandler
-from xsdata.codegen.handlers import AttributeImpliedClassHandler
-from xsdata.codegen.handlers import AttributeMergeClassHandler
-from xsdata.codegen.handlers import AttributeMismatchClassHandler
+from xsdata.codegen.handlers import AttributeEnumUnionHandler
+from xsdata.codegen.handlers import AttributeGroupHandler
+from xsdata.codegen.handlers import AttributeImpliedHandler
+from xsdata.codegen.handlers import AttributeMergeHandler
+from xsdata.codegen.handlers import AttributeMismatchHandler
 from xsdata.codegen.handlers import AttributeSubstitutionHandler
-from xsdata.codegen.handlers import AttributeTypeClassHandler
-from xsdata.codegen.handlers import ClassExtensionClassHandler
+from xsdata.codegen.handlers import AttributeTypeHandler
+from xsdata.codegen.handlers import ClassExtensionHandler
 from xsdata.codegen.mixins import ContainerInterface
 from xsdata.models.codegen import Class
 from xsdata.utils.collections import group_by
@@ -30,14 +30,14 @@ class ClassContainer(UserDict, ContainerInterface):
         super().__init__(data)
 
         self.processors = [
-            AttributeGroupClassHandler(self),
-            ClassExtensionClassHandler(self),
-            AttributeEnumUnionClassHandler(self),
-            AttributeTypeClassHandler(self),
+            AttributeGroupHandler(self),
+            ClassExtensionHandler(self),
+            AttributeEnumUnionHandler(self),
+            AttributeTypeHandler(self),
             AttributeSubstitutionHandler(self),
-            AttributeMergeClassHandler(),
-            AttributeImpliedClassHandler(),
-            AttributeMismatchClassHandler(),
+            AttributeMergeHandler(),
+            AttributeImpliedHandler(),
+            AttributeMismatchHandler(),
         ]
 
     @classmethod

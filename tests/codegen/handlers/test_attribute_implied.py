@@ -2,7 +2,7 @@ from tests.factories import AttrFactory
 from tests.factories import ClassFactory
 from tests.factories import FactoryTestCase
 from xsdata.codegen.container import ClassContainer
-from xsdata.codegen.handlers import AttributeImpliedClassHandler
+from xsdata.codegen.handlers import AttributeImpliedHandler
 from xsdata.models.codegen import AttrType
 from xsdata.models.enums import DataType
 from xsdata.models.enums import Tag
@@ -11,7 +11,7 @@ from xsdata.models.enums import Tag
 class AttributeImpliedTests(FactoryTestCase):
     def setUp(self):
         super().setUp()
-        self.processor = AttributeImpliedClassHandler
+        self.processor = AttributeImpliedHandler
 
     def test_process(self):
         item = ClassFactory.create()

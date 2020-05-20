@@ -1,7 +1,7 @@
 from tests.factories import AttrFactory
 from tests.factories import ClassFactory
 from tests.factories import FactoryTestCase
-from xsdata.codegen.handlers import AttributeMismatchClassHandler
+from xsdata.codegen.handlers import AttributeMismatchHandler
 from xsdata.exceptions import AnalyzerError
 
 
@@ -9,7 +9,7 @@ class AttributeMismatchHandlerTests(FactoryTestCase):
     def setUp(self):
         super().setUp()
 
-        self.processor = AttributeMismatchClassHandler
+        self.processor = AttributeMismatchHandler
 
     def test_process(self):
         target = ClassFactory.elements(2)

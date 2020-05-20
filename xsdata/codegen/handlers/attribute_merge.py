@@ -1,12 +1,12 @@
 from typing import List
 
-from xsdata.codegen.mixins import ClassHandlerInterface
+from xsdata.codegen.mixins import HandlerInterface
 from xsdata.models.codegen import Attr
 from xsdata.models.codegen import Class
 from xsdata.utils.classes import ClassUtils
 
 
-class AttributeMergeClassHandler(ClassHandlerInterface):
+class AttributeMergeHandler(HandlerInterface):
     """
     Merge same type attributes and their restrictions.
 

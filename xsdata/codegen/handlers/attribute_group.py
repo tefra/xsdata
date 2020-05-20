@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
-from xsdata.codegen.mixins import ClassHandlerInterface
 from xsdata.codegen.mixins import ContainerInterface
+from xsdata.codegen.mixins import HandlerInterface
 from xsdata.exceptions import AnalyzerError
 from xsdata.models.codegen import Attr
 from xsdata.models.codegen import Class
@@ -10,7 +10,7 @@ from xsdata.utils.classes import ClassUtils
 
 
 @dataclass
-class AttributeGroupClassHandler(ClassHandlerInterface):
+class AttributeGroupHandler(HandlerInterface):
     """Expand attribute groups with all source class attributes recursively."""
 
     container: ContainerInterface

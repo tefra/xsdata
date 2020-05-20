@@ -7,7 +7,7 @@ from tests.factories import ClassFactory
 from tests.factories import ExtensionFactory
 from tests.factories import FactoryTestCase
 from xsdata.codegen.container import ClassContainer
-from xsdata.codegen.handlers import ClassExtensionClassHandler
+from xsdata.codegen.handlers import ClassExtensionHandler
 from xsdata.codegen.handlers.class_extension import simple_cond
 from xsdata.utils.classes import ClassUtils
 
@@ -17,9 +17,9 @@ class ClassExtensionHandlerTests(FactoryTestCase):
         super().setUp()
 
         container = ClassContainer()
-        self.processor = ClassExtensionClassHandler(container=container)
+        self.processor = ClassExtensionHandler(container=container)
 
-    @mock.patch.object(ClassExtensionClassHandler, "process_native_extension")
+    @mock.patch.object(ClassExtensionHandler, "process_native_extension")
     def test_process_extension_with_native_type(self, mock_flatten_extension_native):
         extension = ExtensionFactory.create(type=AttrTypeFactory.xs_string())
         target = ClassFactory.elements(1, extensions=[extension])
@@ -27,7 +27,7 @@ class ClassExtensionHandlerTests(FactoryTestCase):
         self.processor.process_extension(target, extension)
         mock_flatten_extension_native.assert_called_once_with(target, extension)
 
-    @mock.patch.object(ClassExtensionClassHandler, "process_simple_extension")
+    @mock.patch.object(ClassExtensionHandler, "process_simple_extension")
     @mock.patch.object(ClassContainer, "find")
     def test_process_extension_with_simple_source_extension(
         self, mock_container_find, mock_process_simple_extension
@@ -43,7 +43,7 @@ class ClassExtensionHandlerTests(FactoryTestCase):
         mock_container_find.assert_called_once_with(type_qname, simple_cond)
         mock_process_simple_extension.assert_called_once_with(source, target, extension)
 
-    @mock.patch.object(ClassExtensionClassHandler, "process_complex_extension")
+    @mock.patch.object(ClassExtensionHandler, "process_complex_extension")
     @mock.patch.object(ClassContainer, "find")
     def test_process_extension_with_complex_source_extension(
         self, mock_container_find, mock_process_complex_extension

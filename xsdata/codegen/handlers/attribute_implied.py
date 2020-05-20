@@ -1,4 +1,4 @@
-from xsdata.codegen.mixins import ClassHandlerInterface
+from xsdata.codegen.mixins import HandlerInterface
 from xsdata.models.codegen import Attr
 from xsdata.models.codegen import AttrType
 from xsdata.models.codegen import Class
@@ -7,7 +7,7 @@ from xsdata.models.enums import NamespaceType
 from xsdata.models.enums import Tag
 
 
-class AttributeImpliedClassHandler(ClassHandlerInterface):
+class AttributeImpliedHandler(HandlerInterface):
     """
     Add implied attributes.
 

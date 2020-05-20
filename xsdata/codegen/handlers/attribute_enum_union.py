@@ -2,13 +2,13 @@ from dataclasses import dataclass
 from typing import Any
 from typing import List
 
-from xsdata.codegen.mixins import ClassHandlerInterface
 from xsdata.codegen.mixins import ContainerInterface
+from xsdata.codegen.mixins import HandlerInterface
 from xsdata.models.codegen import Class
 
 
 @dataclass
-class AttributeEnumUnionClassHandler(ClassHandlerInterface):
+class AttributeEnumUnionHandler(HandlerInterface):
     """Convert simple types with a single field which is a union of enums to a
     standalone enumeration."""
 

@@ -1,14 +1,14 @@
 from tests.factories import AttrFactory
 from tests.factories import ClassFactory
 from tests.factories import FactoryTestCase
-from xsdata.codegen.handlers import AttributeMergeClassHandler
+from xsdata.codegen.handlers import AttributeMergeHandler
 from xsdata.models.codegen import Restrictions
 
 
 class AttributeMergeHandlerTests(FactoryTestCase):
     def setUp(self):
         super().setUp()
-        self.processor = AttributeMergeClassHandler
+        self.processor = AttributeMergeHandler
 
     def test_process(self):
         one = AttrFactory.attribute(fixed=True)

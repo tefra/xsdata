@@ -29,7 +29,7 @@ class ContainerInterface(metaclass=abc.ABCMeta):
         raise NotImplementedError
 
 
-class ClassHandlerInterface(metaclass=abc.ABCMeta):
+class HandlerInterface(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def process(self, target: Class):
         raise NotImplementedError

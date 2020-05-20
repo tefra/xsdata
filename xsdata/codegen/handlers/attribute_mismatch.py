@@ -1,11 +1,11 @@
-from xsdata.codegen.mixins import ClassHandlerInterface
+from xsdata.codegen.mixins import HandlerInterface
 from xsdata.exceptions import AnalyzerError
 from xsdata.models.codegen import AttrType
 from xsdata.models.codegen import Class
 from xsdata.models.elements import SimpleType
 
 
-class AttributeMismatchClassHandler(ClassHandlerInterface):
+class AttributeMismatchHandler(HandlerInterface):
     """Normalize attributes that can not coexist together in the same class by
     moving them to an existing inner class or to a new one."""
 

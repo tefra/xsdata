@@ -7,8 +7,8 @@ from typing import Optional
 
 from lxml.etree import QName
 
-from xsdata.codegen.mixins import ClassHandlerInterface
 from xsdata.codegen.mixins import ContainerInterface
+from xsdata.codegen.mixins import HandlerInterface
 from xsdata.models.codegen import Attr
 from xsdata.models.codegen import AttrType
 from xsdata.models.codegen import Class
@@ -19,7 +19,7 @@ Substitutions = Optional[Dict[QName, List[Attr]]]
 
 
 @dataclass
-class AttributeSubstitutionHandler(ClassHandlerInterface):
+class AttributeSubstitutionHandler(HandlerInterface):
     """
     Apply substitution attributes to the given class recursively.
 

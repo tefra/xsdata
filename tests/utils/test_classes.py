@@ -503,8 +503,8 @@ class ClassUtilsTests(FactoryTestCase):
 
         attr = AttrFactory.create(
             types=[
-                AttrTypeFactory.create(name=target.name, forward_ref=True),
-                AttrTypeFactory.create(name=target.name, forward_ref=False),
+                AttrTypeFactory.create(name=target.name, forward=True),
+                AttrTypeFactory.create(name=target.name, forward=False),
                 AttrTypeFactory.create(name="foobar"),
             ]
         )
@@ -517,9 +517,9 @@ class ClassUtilsTests(FactoryTestCase):
             self.assertEqual(target.package, inner.package)
             self.assertEqual(target.module, inner.module)
 
-        self.assertTrue(attr.types[0].self_ref)
-        self.assertFalse(attr.types[1].self_ref)
-        self.assertFalse(attr.types[2].self_ref)
+        self.assertTrue(attr.types[0].circular)
+        self.assertFalse(attr.types[1].circular)
+        self.assertFalse(attr.types[2].circular)
 
     def test_copy_extension_type(self):
         extension = ExtensionFactory.create()

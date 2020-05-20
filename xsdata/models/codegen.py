@@ -110,8 +110,8 @@ class AttrType:
     index: int = field(default_factory=int)
     alias: Optional[str] = field(default=None)
     native: bool = field(default=False)
-    forward_ref: bool = field(default=False)
-    self_ref: bool = field(default=False)
+    forward: bool = field(default=False)
+    circular: bool = field(default=False)
 
     @property
     def native_name(self) -> Optional[str]:
@@ -310,7 +310,7 @@ class Class:
         seen = list()
 
         def is_excluded(x: AttrType) -> bool:
-            return x.forward_ref or x.native or x.self_ref or x.name in seen
+            return x.forward or x.native or x.circular or x.name in seen
 
         for attr in self.attrs:
             for attr_type in attr.types:

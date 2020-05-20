@@ -18,26 +18,24 @@ class AttributeTypeTests(TestCase):
 
         self.assertEqual("Optional[FooBar]", attribute_type(attr, []))
 
-    def test_attribute_type_with_self_reference(self):
+    def test_attribute_type_with_circularerence(self):
         attr = AttrFactory.create(
-            types=AttrTypeFactory.list(1, name="foo_bar", self_ref=True)
+            types=AttrTypeFactory.list(1, name="foo_bar", circular=True)
         )
 
         self.assertEqual('Optional["FooBar"]', attribute_type(attr, ["Parent"]))
 
-    def test_attribute_type_with_forward_reference(self):
+    def test_attribute_type_with_forwarderence(self):
         attr = AttrFactory.create(
-            types=AttrTypeFactory.list(1, name="foo_bar", forward_ref=True)
+            types=AttrTypeFactory.list(1, name="foo_bar", forward=True)
         )
         self.assertEqual(
             'Optional["Parent.Inner.FooBar"]', attribute_type(attr, ["Parent", "Inner"])
         )
 
-    def test_attribute_type_with_forward_and_self_reference(self):
+    def test_attribute_type_with_forward_and_circularerence(self):
         attr = AttrFactory.create(
-            types=AttrTypeFactory.list(
-                1, name="foo_bar", forward_ref=True, self_ref=True
-            )
+            types=AttrTypeFactory.list(1, name="foo_bar", forward=True, circular=True)
         )
 
         self.assertEqual(
@@ -46,7 +44,7 @@ class AttributeTypeTests(TestCase):
 
     def test_attribute_type_with_list_type(self):
         attr = AttrFactory.create(
-            types=AttrTypeFactory.list(1, name="foo_bar", forward_ref=True)
+            types=AttrTypeFactory.list(1, name="foo_bar", forward=True)
         )
         attr.restrictions.max_occurs = 2
         self.assertEqual(
@@ -56,7 +54,7 @@ class AttributeTypeTests(TestCase):
     def test_attribute_type_with_alias(self):
         attr = AttrFactory.create(
             types=AttrTypeFactory.list(
-                1, name="foo_bar", forward_ref=True, alias="Boss:Life"
+                1, name="foo_bar", forward=True, alias="Boss:Life"
             )
         )
         attr.restrictions.max_occurs = 2
@@ -68,7 +66,7 @@ class AttributeTypeTests(TestCase):
         attr = AttrFactory.create(
             types=[
                 AttrTypeFactory.create(
-                    name="thug:life", alias="Boss:Life", forward_ref=True
+                    name="thug:life", alias="Boss:Life", forward=True
                 ),
                 AttrTypeFactory.xs_int(),
             ]

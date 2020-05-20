@@ -175,13 +175,13 @@ def attribute_type(attr: Attr, parents: List[str]) -> str:
     for attr_type in attr.types:
         name = class_name(attr_type.alias) if attr_type.alias else type_name(attr_type)
 
-        if attr_type.forward_ref and attr_type.self_ref:
+        if attr_type.forward and attr_type.circular:
             outer_str = ".".join(map(class_name, parents))
             name = f'"{outer_str}"'
-        elif attr_type.forward_ref:
+        elif attr_type.forward:
             outer_str = ".".join(map(class_name, parents))
             name = f'"{outer_str}.{name}"'
-        elif attr_type.self_ref:
+        elif attr_type.circular:
             name = f'"{name}"'
 
         if name not in type_names:

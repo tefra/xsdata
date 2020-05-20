@@ -284,8 +284,8 @@ class ClassUtils:
             if inner is target:
                 for attr in target.attrs:
                     for attr_type in attr.types:
-                        if attr_type.forward_ref and attr_type.name == inner.name:
-                            attr_type.self_ref = True
+                        if attr_type.forward and attr_type.name == inner.name:
+                            attr_type.circular = True
             elif not any(existing.name == inner.name for existing in target.inner):
                 clone = inner.clone()
                 clone.package = target.package
@@ -340,7 +340,7 @@ class ClassUtils:
                 abstract=False,
                 nillable=False,
             )
-            target.attrs[0].types.append(AttrType(name="value", forward_ref=True))
+            target.attrs[0].types.append(AttrType(name="value", forward=True))
             target.inner.append(enum_inner)
 
         enum_inner.attrs.extend(enumerations)
@@ -474,8 +474,8 @@ class ClassUtils:
         """Reset the attribute type to native string."""
         attr_type.name = DataType.STRING.code
         attr_type.native = True
-        attr_type.self_ref = False
-        attr_type.forward_ref = False
+        attr_type.circular = False
+        attr_type.forward = False
 
     @classmethod
     def class_references(cls, target: Class) -> List:

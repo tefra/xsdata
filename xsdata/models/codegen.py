@@ -114,6 +114,10 @@ class AttrType:
     circular: bool = field(default=False)
 
     @property
+    def is_dependency(self) -> bool:
+        return not (self.forward or self.native or self.circular)
+
+    @property
     def native_name(self) -> Optional[str]:
         data_type = DataType.get_enum(self.name) if self.native else None
         return data_type.local_name if data_type else None
@@ -308,21 +312,17 @@ class Class:
             * Ignore native types.
         """
 
-        seen = list()
-
-        def is_excluded(x: AttrType) -> bool:
-            return x.forward or x.native or x.circular or x.name in seen
-
+        seen = set()
         for attr in self.attrs:
             for attr_type in attr.types:
-                if not is_excluded(attr_type):
+                if attr_type.is_dependency and attr_type.name not in seen:
                     yield self.source_qname(attr_type.name)
-                    seen.append(attr_type.name)
+                    seen.add(attr_type.name)
 
         for ext in self.extensions:
-            if not is_excluded(ext.type):
+            if ext.type.is_dependency and ext.type.name not in seen:
                 yield self.source_qname(ext.type.name)
-                seen.append(ext.type.name)
+                seen.add(ext.type.name)
 
         for inner in self.inner:
             yield from inner.dependencies()

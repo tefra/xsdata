@@ -27,9 +27,10 @@ class ClassTests(FactoryTestCase):
                     ]
                 ),
             ],
-            extensions=ExtensionFactory.list(
-                1, type=AttrTypeFactory.create(name="xs:localElement")
-            ),
+            extensions=[
+                ExtensionFactory.create(type=AttrTypeFactory.create(name="xs:foobar")),
+                ExtensionFactory.create(type=AttrTypeFactory.create(name="xs:foobar")),
+            ],
             inner=[
                 ClassFactory.create(
                     attrs=AttrFactory.list(2, types=AttrTypeFactory.list(1, name="foo"))
@@ -40,7 +41,7 @@ class ClassTests(FactoryTestCase):
         expected = [
             QName("{http://www.w3.org/2001/XMLSchema}openAttrs"),
             QName("{http://www.w3.org/2001/XMLSchema}localAttribute"),
-            QName("{http://www.w3.org/2001/XMLSchema}localElement"),
+            QName("{http://www.w3.org/2001/XMLSchema}foobar"),
             QName("{xsdata}foo"),
         ]
         self.assertEqual(expected, list(obj.dependencies()))

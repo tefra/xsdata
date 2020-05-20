@@ -9,7 +9,6 @@ from tests.factories import ExtensionFactory
 from tests.factories import FactoryTestCase
 from xsdata.codegen.container import ClassContainer
 from xsdata.codegen.handlers import AttributeTypeClassHandler
-from xsdata.codegen.handlers.attribute_type import MAX_DEPENDENCY_CHECK_DEPTH
 from xsdata.codegen.handlers.attribute_type import simple_cond
 from xsdata.models.codegen import Class
 from xsdata.models.codegen import Restrictions
@@ -95,11 +94,14 @@ class AttributeTypeHandlerTests(FactoryTestCase):
             source, target, attr, attr_type
         )
 
-    @mock.patch.object(AttributeTypeClassHandler, "class_depends_on")
+    @mock.patch.object(AttributeTypeClassHandler, "is_circular_dependency")
     @mock.patch.object(AttributeTypeClassHandler, "merge_attribute_type")
     @mock.patch.object(ClassContainer, "find")
     def test_process_attribute_type_with_complex_source(
-        self, mock_container_find, mock_merge_attribute_type, mock_class_depends_on,
+        self,
+        mock_container_find,
+        mock_merge_attribute_type,
+        mock_is_circular_dependency,
     ):
         target = ClassFactory.create()
         attr = AttrFactory.create()
@@ -107,7 +109,7 @@ class AttributeTypeHandlerTests(FactoryTestCase):
         source = ClassFactory.create()
 
         mock_container_find.side_effect = [None, source]
-        mock_class_depends_on.return_value = True
+        mock_is_circular_dependency.return_value = True
 
         self.processor.process_attribute_type(target, attr, attr_type)
         self.assertTrue(attr_type.circular)
@@ -117,19 +119,22 @@ class AttributeTypeHandlerTests(FactoryTestCase):
         mock_container_find.assert_has_calls(
             [mock.call(qname, simple_cond), mock.call(qname)]
         )
-        mock_class_depends_on.assert_called_once_with(source, target)
+        mock_is_circular_dependency.assert_called_once_with(source, target)
 
-    @mock.patch.object(AttributeTypeClassHandler, "class_depends_on")
+    @mock.patch.object(AttributeTypeClassHandler, "is_circular_dependency")
     @mock.patch.object(AttributeTypeClassHandler, "merge_attribute_type")
     @mock.patch.object(ClassContainer, "find")
     def test_process_attribute_type_with_circularerence(
-        self, mock_container_find, mock_merge_attribute_type, mock_class_depends_on,
+        self,
+        mock_container_find,
+        mock_merge_attribute_type,
+        mock_is_circular_dependency,
     ):
         source = ClassFactory.create()
         target = ClassFactory.create()
         attr = AttrFactory.create()
         attr_type = AttrTypeFactory.create(name="foo", circular=True)
-        mock_class_depends_on.return_value = False
+        mock_is_circular_dependency.return_value = False
         mock_container_find.return_value = source
 
         self.processor.process_attribute_type(target, attr, attr_type)
@@ -137,7 +142,7 @@ class AttributeTypeHandlerTests(FactoryTestCase):
 
         qname = target.source_qname(attr_type.name)
         mock_container_find.assert_called_once_with(qname)
-        mock_class_depends_on.assert_called_once_with(source, target)
+        mock_is_circular_dependency.assert_called_once_with(source, target)
 
     @mock.patch("xsdata.codegen.handlers.attribute_type.logger.warning")
     def test_process_attribute_type_with_missing_source(self, mock_logger_warning):
@@ -154,7 +159,7 @@ class AttributeTypeHandlerTests(FactoryTestCase):
 
     @mock.patch.object(ClassContainer, "find")
     @mock.patch.object(Class, "dependencies")
-    def test_class_depends_on(self, mock_dependencies, mock_container_find):
+    def test_is_circular_dependency(self, mock_dependencies, mock_container_find):
         source = ClassFactory.create()
         target = ClassFactory.create()
         another = ClassFactory.create()
@@ -163,14 +168,14 @@ class AttributeTypeHandlerTests(FactoryTestCase):
 
         mock_container_find.side_effect = lambda x: find_classes.get(x)
         mock_dependencies.side_effect = [
-            [QName(x) for x in "cde"],
+            [QName(x) for x in "ccde"],
             [QName(x) for x in "abc"],
             [QName(x) for x in "xy"],
         ]
 
-        self.assertFalse(self.processor.class_depends_on(source, target))
-        self.assertTrue(self.processor.class_depends_on(source, target))
-        self.assertTrue(self.processor.class_depends_on(source, source))
+        self.assertFalse(self.processor.is_circular_dependency(source, target))
+        self.assertTrue(self.processor.is_circular_dependency(source, target))
+        self.assertTrue(self.processor.is_circular_dependency(source, source))
 
         mock_container_find.assert_has_calls(
             [
@@ -183,28 +188,6 @@ class AttributeTypeHandlerTests(FactoryTestCase):
                 mock.call(QName("b")),
             ]
         )
-
-    @mock.patch.object(ClassContainer, "process_class")
-    def test_class_depends_on_has_a_depth_limit(self, *args):
-        one = ClassFactory.create(extensions=ExtensionFactory.list(1))
-        two = ClassFactory.create(extensions=ExtensionFactory.list(1))
-        three = ClassFactory.create(extensions=ExtensionFactory.list(1))
-        four = ClassFactory.create(extensions=ExtensionFactory.list(1))
-        five = ClassFactory.create(extensions=ExtensionFactory.list(1))
-
-        one.extensions[0].type.name = two.name
-        two.extensions[0].type.name = three.name
-        three.extensions[0].type.name = four.name
-        four.extensions[0].type.name = five.name
-        five.extensions[0].type.name = one.name
-
-        self.processor.container.extend([one, two, three, four, five])
-
-        self.assertTrue(self.processor.class_depends_on(five, one))
-        self.assertTrue(self.processor.class_depends_on(two, one))
-
-        self.assertFalse(self.processor.class_depends_on(two, one, depth=3))
-        self.assertEqual(5, MAX_DEPENDENCY_CHECK_DEPTH)
 
     @mock.patch.object(ClassUtils, "copy_inner_classes")
     def test_merge_attribute_type(self, mock_copy_inner_classes):

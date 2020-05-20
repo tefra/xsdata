@@ -1,4 +1,6 @@
 from dataclasses import dataclass
+from typing import Optional
+from typing import Set
 
 from xsdata.codegen.mixins import ClassHandlerInterface
 from xsdata.codegen.mixins import ContainerInterface
@@ -8,8 +10,6 @@ from xsdata.models.codegen import AttrType
 from xsdata.models.codegen import Class
 from xsdata.utils.classes import ClassUtils
 from xsdata.utils.collections import unique_sequence
-
-MAX_DEPENDENCY_CHECK_DEPTH = 5
 
 
 def simple_cond(candidate: Class) -> bool:
@@ -73,24 +73,29 @@ class AttributeTypeClassHandler(ClassHandlerInterface):
         if simple_source:
             self.merge_attribute_type(simple_source, target, attr, attr_type)
         elif complex_source:
-            attr_type.circular = self.class_depends_on(complex_source, target)
+            attr_type.circular = self.is_circular_dependency(complex_source, target)
         elif not circular:
             logger.warning("Missing type: %s", attr_type.name)
             ClassUtils.reset_attribute_type(attr_type)
 
-    def class_depends_on(self, source: Class, target: Class, depth: int = 1) -> bool:
+    def is_circular_dependency(
+        self, source: Class, target: Class, seen: Optional[Set] = None
+    ) -> bool:
         """Check if any source dependencies recursively match the target
         class."""
 
         if source is target:
             return True
 
-        if depth > MAX_DEPENDENCY_CHECK_DEPTH:
-            return False
-
+        seen = seen or set()
         for qname in source.dependencies():
+
+            if qname in seen:
+                continue
+
+            seen.add(qname)
             check = self.container.find(qname)
-            if check and self.class_depends_on(check, target, depth + 1):
+            if check and self.is_circular_dependency(check, target, seen):
                 return True
 
         return False

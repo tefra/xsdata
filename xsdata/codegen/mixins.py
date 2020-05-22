@@ -8,6 +8,8 @@ from lxml.etree import QName
 
 from xsdata.models.codegen import Class
 
+Condition = Optional[Callable]
+
 
 class ContainerInterface(metaclass=abc.ABCMeta):
     @abc.abstractmethod
@@ -15,9 +17,7 @@ class ContainerInterface(metaclass=abc.ABCMeta):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def find(
-        self, qname: QName, condition: Optional[Callable] = None
-    ) -> Optional[Class]:
+    def find(self, qname: QName, condition: Condition = None) -> Optional[Class]:
         raise NotImplementedError
 
     @abc.abstractmethod

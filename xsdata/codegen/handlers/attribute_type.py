@@ -9,8 +9,6 @@ from xsdata.logger import logger
 from xsdata.models.codegen import Attr
 from xsdata.models.codegen import AttrType
 from xsdata.models.codegen import Class
-from xsdata.models.elements import ComplexType
-from xsdata.models.elements import Element
 from xsdata.models.enums import DataType
 from xsdata.utils.classes import ClassUtils
 from xsdata.utils.collections import unique_sequence
@@ -66,13 +64,11 @@ class AttributeTypeHandler(HandlerInterface):
             3. anything
         """
         qname = target.source_qname(attr_type.name)
-        result = self.container.find(
-            qname, condition=lambda obj: obj.type not in [Element, ComplexType]
-        )
+        result = self.container.find(qname, condition=lambda obj: not obj.is_complex)
         if result:
             return result
 
-        result = self.container.find(qname, lambda x: not x.abstract)
+        result = self.container.find(qname, condition=lambda x: not x.abstract)
         if result:
             return result
 
@@ -93,7 +89,7 @@ class AttributeTypeHandler(HandlerInterface):
         if not source:
             logger.warning("Missing type: %s", attr_type.name)
             self.reset_attribute_type(attr_type)
-        elif source.type in [Element, ComplexType]:
+        elif source.is_complex and not source.is_enumeration:
             self.process_complex_dependency(source, target, attr, attr_type)
         else:
             self.process_simple_dependency(source, target, attr, attr_type)
@@ -179,10 +175,6 @@ class AttributeTypeHandler(HandlerInterface):
                 return True
 
         return False
-
-    @classmethod
-    def is_simple(cls, obj: Class) -> bool:
-        return obj.type not in [Element, ComplexType]
 
     @classmethod
     def reset_attribute_type(cls, attr_type: AttrType):

@@ -15,7 +15,6 @@ from lxml.etree import QName
 from xsdata.formats.dataclass.models.constants import XmlType
 from xsdata.models.elements import ComplexType
 from xsdata.models.elements import Element
-from xsdata.models.elements import SimpleType
 from xsdata.models.enums import DataType
 from xsdata.models.enums import QNames
 from xsdata.models.enums import Tag
@@ -253,9 +252,7 @@ class Class:
 
     @property
     def is_complex(self) -> bool:
-        return (
-            True if self.type in [Element, ComplexType] and not self.abstract else False
-        )
+        return self.type in (Element, ComplexType)
 
     @property
     def is_element(self) -> bool:
@@ -270,10 +267,6 @@ class Class:
         return self.nillable or next(
             (True for ext in self.extensions if ext.restrictions.nillable), False
         )
-
-    @property
-    def is_simple(self) -> bool:
-        return self.type == SimpleType or self.abstract
 
     @property
     def source_prefix(self) -> Optional[str]:

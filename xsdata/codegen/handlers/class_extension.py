@@ -1,15 +1,15 @@
 from dataclasses import dataclass
+from typing import Optional
 
 from xsdata.codegen.mixins import ContainerInterface
 from xsdata.codegen.mixins import HandlerInterface
 from xsdata.logger import logger
+from xsdata.models.codegen import AttrType
 from xsdata.models.codegen import Class
 from xsdata.models.codegen import Extension
+from xsdata.models.elements import ComplexType
+from xsdata.models.elements import SimpleType
 from xsdata.utils.classes import ClassUtils
-
-
-def simple_cond(candidate: Class) -> bool:
-    return candidate.is_enumeration or candidate.is_simple
 
 
 @dataclass
@@ -26,17 +26,7 @@ class ClassExtensionHandler(HandlerInterface):
         if extension.type.native:
             self.process_native_extension(target, extension)
         else:
-            qname = target.source_qname(extension.type.name)
-            simple_source = self.container.find(qname, simple_cond)
-            complex_source = None if simple_source else self.container.find(qname)
-
-            if simple_source:
-                self.process_simple_extension(simple_source, target, extension)
-            elif complex_source:
-                self.process_complex_extension(complex_source, target, extension)
-            else:
-                logger.warning("Missing extension type: %s", extension.type.name)
-                target.extensions.remove(extension)
+            self.process_dependency_extension(target, extension)
 
     @classmethod
     def process_native_extension(cls, target: Class, extension: Extension):
@@ -45,6 +35,16 @@ class ClassExtensionHandler(HandlerInterface):
             ClassUtils.copy_extension_type(target, extension)
         else:
             ClassUtils.create_default_attribute(target, extension)
+
+    def process_dependency_extension(self, target: Class, extension: Extension):
+        source = self.find_dependency(target, extension.type)
+        if not source:
+            logger.warning("Missing extension type: %s", extension.type.name)
+            target.extensions.remove(extension)
+        elif not source.is_complex or source.is_enumeration:
+            self.process_simple_extension(source, target, extension)
+        else:
+            self.process_complex_extension(source, target, extension)
 
     @classmethod
     def process_simple_extension(cls, source: Class, target: Class, ext: Extension):
@@ -92,3 +92,23 @@ class ClassExtensionHandler(HandlerInterface):
             or target.has_suffix_attr
         ):
             ClassUtils.copy_attributes(source, target, ext)
+
+    def find_dependency(self, target: Class, attr_type: AttrType) -> Optional[Class]:
+        """
+        Find dependency for the given extension type with priority.
+
+        Search priority: xs:SimpleType >  xs:ComplexType
+        """
+
+        conditions = (
+            lambda x: x.type is SimpleType,
+            lambda x: x.type is ComplexType,
+        )
+
+        qname = target.source_qname(attr_type.name)
+        for condition in conditions:
+            result = self.container.find(qname, condition=condition)
+            if result:
+                return result
+
+        return None

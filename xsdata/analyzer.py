@@ -37,8 +37,13 @@ class ClassAnalyzer:
         """
 
         classes = list(self.container.iterate())
-        if any(item.is_complex for item in classes):
-            classes = list(filter(lambda x: x.is_enumeration or x.is_complex, classes))
+        if any(item.is_complex for item in classes if not item.abstract):
+            classes = list(
+                filter(
+                    lambda x: x.is_enumeration or (x.is_complex and not x.abstract),
+                    classes,
+                )
+            )
 
         self.validate_references(classes)
 

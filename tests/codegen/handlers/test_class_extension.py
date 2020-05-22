@@ -8,7 +8,9 @@ from tests.factories import ExtensionFactory
 from tests.factories import FactoryTestCase
 from xsdata.codegen.container import ClassContainer
 from xsdata.codegen.handlers import ClassExtensionHandler
-from xsdata.codegen.handlers.class_extension import simple_cond
+from xsdata.models.elements import Attribute
+from xsdata.models.elements import ComplexType
+from xsdata.models.elements import SimpleType
 from xsdata.utils.classes import ClassUtils
 
 
@@ -27,50 +29,92 @@ class ClassExtensionHandlerTests(FactoryTestCase):
         self.processor.process_extension(target, extension)
         mock_flatten_extension_native.assert_called_once_with(target, extension)
 
-    @mock.patch.object(ClassExtensionHandler, "process_simple_extension")
-    @mock.patch.object(ClassContainer, "find")
-    def test_process_extension_with_simple_source_extension(
-        self, mock_container_find, mock_process_simple_extension
+    @mock.patch.object(ClassExtensionHandler, "process_dependency_extension")
+    def test_process_extension_with_dependency_type(
+        self, mock_process_dependency_extension
     ):
-        extension = ExtensionFactory.create()
-        target = ClassFactory.create(extensions=[extension])
-        source = ClassFactory.create()
-        mock_container_find.return_value = source
+        extension = ExtensionFactory.create(type=AttrTypeFactory.create("foo"))
+        target = ClassFactory.elements(1, extensions=[extension])
 
         self.processor.process_extension(target, extension)
-
-        type_qname = target.source_qname(extension.type.name)
-        mock_container_find.assert_called_once_with(type_qname, simple_cond)
-        mock_process_simple_extension.assert_called_once_with(source, target, extension)
+        mock_process_dependency_extension.assert_called_once_with(target, extension)
 
     @mock.patch.object(ClassExtensionHandler, "process_complex_extension")
-    @mock.patch.object(ClassContainer, "find")
-    def test_process_extension_with_complex_source_extension(
-        self, mock_container_find, mock_process_complex_extension
+    @mock.patch.object(ClassExtensionHandler, "process_simple_extension")
+    @mock.patch.object(ClassExtensionHandler, "find_dependency")
+    def test_process_dependency_extension_with_absent_type(
+        self,
+        mock_find_dependency,
+        mock_process_simple_extension,
+        mock_process_complex_extension,
     ):
         extension = ExtensionFactory.create()
         target = ClassFactory.create(extensions=[extension])
-        source = ClassFactory.create()
-        mock_container_find.side_effect = [None, source]
-
-        self.processor.process_extension(target, extension)
-        type_qname = target.source_qname(extension.type.name)
-        mock_container_find.assert_has_calls(
-            [mock.call(type_qname, simple_cond), mock.call(type_qname),]
-        )
-        mock_process_complex_extension.assert_called_once_with(
-            source, target, extension
-        )
-
-    @mock.patch("xsdata.codegen.handlers.class_extension.logger.warning")
-    def test_process_extension_with_unknown_extension_type(self, mock_logger_warning):
-        extension = ExtensionFactory.create()
-        target = ClassFactory.create(extensions=[extension])
+        mock_find_dependency.return_value = None
 
         self.processor.process_extension(target, extension)
         self.assertEqual(0, len(target.extensions))
-        mock_logger_warning.assert_called_once_with(
-            "Missing extension type: %s", extension.type.name
+        self.assertEqual(0, mock_process_simple_extension.call_count)
+        self.assertEqual(0, mock_process_complex_extension.call_count)
+
+    @mock.patch.object(ClassExtensionHandler, "process_complex_extension")
+    @mock.patch.object(ClassExtensionHandler, "process_simple_extension")
+    @mock.patch.object(ClassExtensionHandler, "find_dependency")
+    def test_process_dependency_extension_with_simple_type(
+        self,
+        mock_find_dependency,
+        mock_process_simple_extension,
+        mock_process_complex_extension,
+    ):
+        extension = ExtensionFactory.create()
+        target = ClassFactory.create(extensions=[extension])
+        source = ClassFactory.create(type=SimpleType)
+        mock_find_dependency.return_value = source
+
+        self.processor.process_extension(target, extension)
+        self.assertEqual(0, mock_process_complex_extension.call_count)
+
+        mock_process_simple_extension.assert_called_once_with(source, target, extension)
+
+    @mock.patch.object(ClassExtensionHandler, "process_complex_extension")
+    @mock.patch.object(ClassExtensionHandler, "process_simple_extension")
+    @mock.patch.object(ClassExtensionHandler, "find_dependency")
+    def test_process_dependency_extension_with_enum_type(
+        self,
+        mock_find_dependency,
+        mock_process_simple_extension,
+        mock_process_complex_extension,
+    ):
+        extension = ExtensionFactory.create()
+        target = ClassFactory.create(extensions=[extension])
+        source = ClassFactory.create(type=ComplexType)
+        source.attrs.append(AttrFactory.enumeration())
+        mock_find_dependency.return_value = source
+
+        self.processor.process_extension(target, extension)
+        self.assertEqual(0, mock_process_complex_extension.call_count)
+
+        mock_process_simple_extension.assert_called_once_with(source, target, extension)
+
+    @mock.patch.object(ClassExtensionHandler, "process_complex_extension")
+    @mock.patch.object(ClassExtensionHandler, "process_simple_extension")
+    @mock.patch.object(ClassExtensionHandler, "find_dependency")
+    def test_process_dependency_extension_with_complex_type(
+        self,
+        mock_find_dependency,
+        mock_process_simple_extension,
+        mock_process_complex_extension,
+    ):
+        extension = ExtensionFactory.create()
+        target = ClassFactory.create(extensions=[extension])
+        source = ClassFactory.create(type=ComplexType)
+        mock_find_dependency.return_value = source
+
+        self.processor.process_extension(target, extension)
+        self.assertEqual(0, mock_process_simple_extension.call_count)
+
+        mock_process_complex_extension.assert_called_once_with(
+            source, target, extension
         )
 
     @mock.patch.object(ClassUtils, "create_default_attribute")
@@ -91,7 +135,7 @@ class ClassExtensionHandlerTests(FactoryTestCase):
         self.processor.process_native_extension(target, extension)
         mock_copy_extension_type.assert_called_once_with(target, extension)
 
-    def test_process_simple_extension_with_circularerences(self):
+    def test_process_simple_extension_with_circular_refence(self):
         extension = ExtensionFactory.create()
         target = ClassFactory.create(extensions=[extension])
         self.processor.process_simple_extension(target, target, extension)
@@ -252,3 +296,17 @@ class ClassExtensionHandlerTests(FactoryTestCase):
         self.processor.process_complex_extension(source, target, extension)
         mock_compare_attributes.assert_called_once_with(source, target)
         mock_copy_attributes.assert_called_once_with(source, target, extension)
+
+    def test_find_dependency(self):
+        target = ClassFactory.create()
+        attr_type = AttrTypeFactory.create(name="a")
+
+        self.assertIsNone(self.processor.find_dependency(target, attr_type))
+
+        complex = ClassFactory.create(name="a", type=ComplexType)
+        self.processor.container.add(complex)
+        self.assertEqual(complex, self.processor.find_dependency(target, attr_type))
+
+        simple = ClassFactory.create(name="a", type=SimpleType)
+        self.processor.container.add(simple)
+        self.assertEqual(simple, self.processor.find_dependency(target, attr_type))

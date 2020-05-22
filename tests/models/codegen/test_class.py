@@ -95,17 +95,6 @@ class ClassTests(FactoryTestCase):
         obj.source_namespace = namespace
         self.assertEqual("foo", obj.source_prefix)
 
-    def test_property_is_simple(self):
-
-        obj = ClassFactory.create(type=Element)
-        self.assertFalse(obj.is_simple)
-
-        obj.abstract = True
-        self.assertTrue(obj.is_simple)
-
-        obj = ClassFactory.create(type=SimpleType)
-        self.assertTrue(obj.is_simple)
-
     def test_property_is_complex(self):
         obj = ClassFactory.create(type=SimpleType)
         self.assertFalse(obj.is_complex)
@@ -113,14 +102,8 @@ class ClassTests(FactoryTestCase):
         obj = ClassFactory.create(type=Element)
         self.assertTrue(obj.is_complex)
 
-        obj.abstract = True
-        self.assertFalse(obj.is_complex)
-
         obj = ClassFactory.create(type=ComplexType)
         self.assertTrue(obj.is_complex)
-
-        obj.abstract = True
-        self.assertFalse(obj.is_complex)
 
     def test_property_is_enumeration(self):
         obj = ClassFactory.enumeration(2)

@@ -88,7 +88,6 @@ class ClassExtensionHandler(HandlerInterface):
         elif (
             res == ClassUtils.INCLUDES_SOME
             or source.abstract
-            or target.abstract
             or (source.has_suffix_attr and len(target.attrs) > 0)
             or target.has_suffix_attr
         ):

@@ -3,7 +3,6 @@ from typing import List
 from typing import Optional
 
 from xsdata.models.codegen import Attr
-from xsdata.models.codegen import AttrType
 from xsdata.models.codegen import Class
 from xsdata.models.codegen import Extension
 from xsdata.models.codegen import Restrictions
@@ -153,11 +152,3 @@ class ClassUtils:
             return attrs.index(attr)
         except ValueError:
             return -1
-
-    @classmethod
-    def reset_attribute_type(cls, attr_type: AttrType):
-        """Reset the attribute type to native string."""
-        attr_type.name = DataType.STRING.code
-        attr_type.native = True
-        attr_type.circular = False
-        attr_type.forward = False

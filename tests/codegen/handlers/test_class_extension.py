@@ -216,7 +216,7 @@ class ClassExtensionHandlerTests(FactoryTestCase):
 
         self.processor.process_complex_extension(source, target, extension)
         mock_compare_attributes.assert_called_once_with(source, target)
-        mock_copy_attributes.assert_called_once_with(source, target, extension)
+        self.assertEqual(0, mock_copy_attributes.call_count)
 
     @mock.patch.object(ClassUtils, "copy_attributes")
     @mock.patch.object(ClassUtils, "compare_attributes")

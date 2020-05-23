@@ -63,4 +63,4 @@ result without writing to the target file.
 .. admonition:: Examples
     :class: hint
 
-    Check the :doc:`tests` and the `samples repo <https://github.com/tefra/xsdata-samples>`_ for more ✨✨✨
+    Check the :doc:`demos` and the `samples repo <https://github.com/tefra/xsdata-samples>`_ for more ✨✨✨

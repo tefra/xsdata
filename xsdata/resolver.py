@@ -7,9 +7,9 @@ from typing import List
 from lxml.etree import QName
 from toposort import toposort_flatten
 
+from xsdata.codegen.models import Class
+from xsdata.codegen.models import Package
 from xsdata.exceptions import ResolverValueError
-from xsdata.models.codegen import Class
-from xsdata.models.codegen import Package
 
 logger = logging.getLogger(__name__)
 

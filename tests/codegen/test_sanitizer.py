@@ -5,9 +5,9 @@ from tests.factories import AttrTypeFactory
 from tests.factories import ClassFactory
 from tests.factories import FactoryTestCase
 from xsdata.codegen.container import ClassContainer
+from xsdata.codegen.models import Class
+from xsdata.codegen.models import Restrictions
 from xsdata.codegen.sanitizer import ClassSanitizer
-from xsdata.models.codegen import Class
-from xsdata.models.codegen import Restrictions
 from xsdata.models.enums import Namespace
 from xsdata.models.enums import Tag
 

@@ -1,9 +1,9 @@
 from typing import List
 
 from xsdata.codegen.mixins import HandlerInterface
-from xsdata.models.codegen import Attr
-from xsdata.models.codegen import Class
-from xsdata.utils.classes import ClassUtils
+from xsdata.codegen.models import Attr
+from xsdata.codegen.models import Class
+from xsdata.codegen.utils import ClassUtils
 
 
 class AttributeMergeHandler(HandlerInterface):

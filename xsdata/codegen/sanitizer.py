@@ -6,10 +6,10 @@ from typing import List
 from typing import Optional
 
 from xsdata.codegen.container import ClassContainer
+from xsdata.codegen.models import Attr
+from xsdata.codegen.models import AttrType
+from xsdata.codegen.models import Class
 from xsdata.logger import logger
-from xsdata.models.codegen import Attr
-from xsdata.models.codegen import AttrType
-from xsdata.models.codegen import Class
 from xsdata.utils import text
 
 

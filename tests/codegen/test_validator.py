@@ -5,12 +5,12 @@ from tests.factories import ClassFactory
 from tests.factories import ExtensionFactory
 from tests.factories import FactoryTestCase
 from xsdata.codegen.container import ClassContainer
+from xsdata.codegen.models import Restrictions
+from xsdata.codegen.utils import ClassUtils
 from xsdata.codegen.validator import ClassValidator
-from xsdata.models.codegen import Restrictions
 from xsdata.models.elements import ComplexType
 from xsdata.models.elements import Element
 from xsdata.models.elements import SimpleType
-from xsdata.utils.classes import ClassUtils
 
 
 class ClassValidatorTests(FactoryTestCase):

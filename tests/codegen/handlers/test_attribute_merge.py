@@ -2,7 +2,7 @@ from tests.factories import AttrFactory
 from tests.factories import ClassFactory
 from tests.factories import FactoryTestCase
 from xsdata.codegen.handlers import AttributeMergeHandler
-from xsdata.models.codegen import Restrictions
+from xsdata.codegen.models import Restrictions
 
 
 class AttributeMergeHandlerTests(FactoryTestCase):

@@ -7,32 +7,10 @@ from tests.factories import ClassFactory
 from tests.factories import ExtensionFactory
 from tests.factories import FactoryTestCase
 from tests.factories import RestrictionsFactory
-from xsdata.models.codegen import Restrictions
-from xsdata.models.enums import Tag
-from xsdata.utils.classes import ClassUtils
+from xsdata.codegen.utils import ClassUtils
 
 
 class ClassUtilsTests(FactoryTestCase):
-    def test_compare_attributes(self):
-        source = ClassFactory.elements(2)
-        self.assertEqual(2, ClassUtils.compare_attributes(source, source))
-
-        target = ClassFactory.create()
-        self.assertEqual(0, ClassUtils.compare_attributes(source, target))
-
-        target.attrs = [attr.clone() for attr in source.attrs]
-        self.assertEqual(2, ClassUtils.compare_attributes(source, target))
-
-        source.attrs.append(AttrFactory.element())
-        self.assertEqual(1, ClassUtils.compare_attributes(source, target))
-
-        source.attrs = AttrFactory.list(3)
-        self.assertEqual(0, ClassUtils.compare_attributes(source, target))
-
-        self.assertEqual(0, ClassUtils.INCLUDES_NONE)
-        self.assertEqual(1, ClassUtils.INCLUDES_SOME)
-        self.assertEqual(2, ClassUtils.INCLUDES_ALL)
-
     @mock.patch.object(ClassUtils, "copy_inner_classes")
     @mock.patch.object(ClassUtils, "clone_attribute")
     def test_copy_attributes(self, mock_clone_attribute, mock_copy_inner_classes):
@@ -80,45 +58,6 @@ class ClassUtilsTests(FactoryTestCase):
         self.assertEqual(2, clone.restrictions.length)
         self.assertIsNot(attr, clone)
 
-    def test_create_default_attribute(self):
-        extension = ExtensionFactory.create()
-        item = ClassFactory.create(extensions=[extension])
-
-        ClassUtils.create_default_attribute(item, extension)
-        expected = AttrFactory.create(
-            name="value",
-            index=0,
-            default=None,
-            types=[extension.type],
-            tag=Tag.EXTENSION,
-        )
-
-        self.assertEqual(1, len(item.attrs))
-        self.assertEqual(0, len(item.extensions))
-        self.assertEqual(expected, item.attrs[0])
-
-    def test_create_default_attribute_with_any_type(self):
-        extension = ExtensionFactory.create(
-            type=AttrTypeFactory.xs_any(),
-            restrictions=Restrictions(min_occurs=1, max_occurs=1, required=True),
-        )
-        item = ClassFactory.create(extensions=[extension])
-
-        ClassUtils.create_default_attribute(item, extension)
-        expected = AttrFactory.create(
-            name="any_element",
-            index=0,
-            default=None,
-            types=[extension.type.clone()],
-            tag=Tag.ANY,
-            namespace="##any",
-            restrictions=Restrictions(min_occurs=1, max_occurs=1, required=True),
-        )
-
-        self.assertEqual(1, len(item.attrs))
-        self.assertEqual(0, len(item.extensions))
-        self.assertEqual(expected, item.attrs[0])
-
     def test_copy_inner_classes(self):
         source = ClassFactory.create(
             inner=ClassFactory.list(2, package="a", module="b")
@@ -152,14 +91,3 @@ class ClassUtilsTests(FactoryTestCase):
         self.assertTrue(attr.types[0].circular)
         self.assertFalse(attr.types[1].circular)
         self.assertFalse(attr.types[2].circular)
-
-    def test_copy_extension_type(self):
-        extension = ExtensionFactory.create()
-        target = ClassFactory.elements(2)
-        target.extensions.append(extension)
-
-        ClassUtils.copy_extension_type(target, extension)
-
-        self.assertEqual(extension.type, target.attrs[0].types[1])
-        self.assertEqual(extension.type, target.attrs[1].types[1])
-        self.assertEqual(0, len(target.extensions))

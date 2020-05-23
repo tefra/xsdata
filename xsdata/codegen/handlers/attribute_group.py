@@ -2,11 +2,11 @@ from dataclasses import dataclass
 
 from xsdata.codegen.mixins import ContainerInterface
 from xsdata.codegen.mixins import HandlerInterface
+from xsdata.codegen.models import Attr
+from xsdata.codegen.models import Class
+from xsdata.codegen.utils import ClassUtils
 from xsdata.exceptions import AnalyzerError
-from xsdata.models.codegen import Attr
-from xsdata.models.codegen import Class
 from xsdata.utils import text
-from xsdata.utils.classes import ClassUtils
 
 
 @dataclass

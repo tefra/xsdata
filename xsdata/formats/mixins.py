@@ -11,7 +11,7 @@ from jinja2 import Environment
 from jinja2 import FileSystemLoader
 from jinja2 import Template
 
-from xsdata.models.codegen import Class
+from xsdata.codegen.models import Class
 from xsdata.utils.collections import group_by
 from xsdata.utils.package import module_path
 from xsdata.utils.package import package_path

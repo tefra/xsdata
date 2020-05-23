@@ -3,12 +3,12 @@ import unittest
 from abc import ABC
 from abc import abstractmethod
 
-from xsdata.models.codegen import Attr
-from xsdata.models.codegen import AttrType
-from xsdata.models.codegen import Class
-from xsdata.models.codegen import Extension
-from xsdata.models.codegen import Package
-from xsdata.models.codegen import Restrictions
+from xsdata.codegen.models import Attr
+from xsdata.codegen.models import AttrType
+from xsdata.codegen.models import Class
+from xsdata.codegen.models import Extension
+from xsdata.codegen.models import Package
+from xsdata.codegen.models import Restrictions
 from xsdata.models.elements import Attribute
 from xsdata.models.elements import ComplexType
 from xsdata.models.elements import Element

@@ -5,9 +5,9 @@ from tests.factories import ClassFactory
 from tests.factories import FactoryTestCase
 from xsdata.codegen.container import ClassContainer
 from xsdata.codegen.handlers import AttributeGroupHandler
+from xsdata.codegen.models import Attr
+from xsdata.codegen.utils import ClassUtils
 from xsdata.exceptions import AnalyzerError
-from xsdata.models.codegen import Attr
-from xsdata.utils.classes import ClassUtils
 
 
 class AttributeGroupHandlerTests(FactoryTestCase):

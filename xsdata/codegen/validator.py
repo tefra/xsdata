@@ -2,10 +2,10 @@ from dataclasses import dataclass
 from typing import List
 
 from xsdata.codegen.container import ClassContainer
-from xsdata.models.codegen import Class
-from xsdata.models.codegen import Extension
+from xsdata.codegen.models import Class
+from xsdata.codegen.models import Extension
+from xsdata.codegen.utils import ClassUtils
 from xsdata.utils import text
-from xsdata.utils.classes import ClassUtils
 from xsdata.utils.collections import group_by
 
 

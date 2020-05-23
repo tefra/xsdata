@@ -4,13 +4,13 @@ from typing import Set
 
 from xsdata.codegen.mixins import ContainerInterface
 from xsdata.codegen.mixins import HandlerInterface
+from xsdata.codegen.models import Attr
+from xsdata.codegen.models import AttrType
+from xsdata.codegen.models import Class
+from xsdata.codegen.utils import ClassUtils
 from xsdata.exceptions import AnalyzerValueError
 from xsdata.logger import logger
-from xsdata.models.codegen import Attr
-from xsdata.models.codegen import AttrType
-from xsdata.models.codegen import Class
 from xsdata.models.enums import DataType
-from xsdata.utils.classes import ClassUtils
 from xsdata.utils.collections import unique_sequence
 
 

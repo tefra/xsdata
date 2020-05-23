@@ -3,8 +3,8 @@ from typing import Iterator
 from typing import List
 from typing import Tuple
 
+from xsdata.codegen.models import Class
 from xsdata.formats.mixins import AbstractGenerator
-from xsdata.models.codegen import Class
 from xsdata.resolver import DependenciesResolver
 
 

@@ -6,7 +6,7 @@ from typing import Optional
 
 from lxml.etree import QName
 
-from xsdata.models.codegen import Class
+from xsdata.codegen.models import Class
 
 Condition = Optional[Callable]
 

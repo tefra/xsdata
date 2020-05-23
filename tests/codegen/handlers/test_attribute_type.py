@@ -10,13 +10,13 @@ from tests.factories import FactoryTestCase
 from tests.factories import RestrictionsFactory
 from xsdata.codegen.container import ClassContainer
 from xsdata.codegen.handlers import AttributeTypeHandler
+from xsdata.codegen.models import Class
+from xsdata.codegen.models import Restrictions
+from xsdata.codegen.utils import ClassUtils
 from xsdata.exceptions import AnalyzerValueError
-from xsdata.models.codegen import Class
-from xsdata.models.codegen import Restrictions
 from xsdata.models.elements import ComplexType
 from xsdata.models.elements import Element
 from xsdata.models.elements import SimpleType
-from xsdata.utils.classes import ClassUtils
 
 
 class AttributeTypeHandlerTests(FactoryTestCase):

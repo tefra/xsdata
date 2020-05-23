@@ -61,13 +61,11 @@ Promote for generation:
 * Classes derived from xsd ``complexType`` with ``abstract`` flag set to ``False``
 * Classes derived from xsd ``restiction`` with ``enumeration`` fields
 
-The rest of the classes are marked as common and are used to flatten attributes and
-extensions of the promoted classes in the current schema and any upcoming sub-schemas.
 
 Code Writer
 ------------
 
 :class:`xsdata.writer.CodeWriter`
 
-Code writer is a factory that delegates the code generation with any language and
-library conventions to the given format.
+Code writer is a factory that delegates the code generation to the formats with their
+language conventions.

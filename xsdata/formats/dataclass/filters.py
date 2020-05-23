@@ -11,11 +11,11 @@ from xml.sax.saxutils import quoteattr
 from docformatter import format_code
 from lxml.etree import QName
 
+from xsdata.codegen.models import Attr
+from xsdata.codegen.models import AttrType
+from xsdata.codegen.models import Class
 from xsdata.formats.converters import to_python
 from xsdata.formats.dataclass import utils
-from xsdata.models.codegen import Attr
-from xsdata.models.codegen import AttrType
-from xsdata.models.codegen import Class
 from xsdata.models.enums import DataType
 from xsdata.utils import text
 

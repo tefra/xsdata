@@ -5,14 +5,10 @@ from lxml.etree import QName
 from tests.factories import AttrFactory
 from tests.factories import ClassFactory
 from tests.factories import FactoryTestCase
-from xsdata.analyzer import ClassAnalyzer
 from xsdata.codegen.container import ClassContainer
-from xsdata.codegen.handlers import AttributeGroupHandler
 from xsdata.codegen.handlers import AttributeSubstitutionHandler
-from xsdata.exceptions import AnalyzerError
-from xsdata.models.codegen import Attr
-from xsdata.models.codegen import AttrType
-from xsdata.utils.classes import ClassUtils
+from xsdata.codegen.models import AttrType
+from xsdata.codegen.utils import ClassUtils
 
 
 class AttributeSubstitutionHandlerTests(FactoryTestCase):

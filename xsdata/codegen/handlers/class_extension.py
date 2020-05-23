@@ -3,18 +3,26 @@ from typing import Optional
 
 from xsdata.codegen.mixins import ContainerInterface
 from xsdata.codegen.mixins import HandlerInterface
+from xsdata.codegen.models import Attr
+from xsdata.codegen.models import AttrType
+from xsdata.codegen.models import Class
+from xsdata.codegen.models import Extension
+from xsdata.codegen.utils import ClassUtils
 from xsdata.logger import logger
-from xsdata.models.codegen import AttrType
-from xsdata.models.codegen import Class
-from xsdata.models.codegen import Extension
 from xsdata.models.elements import ComplexType
 from xsdata.models.elements import SimpleType
-from xsdata.utils.classes import ClassUtils
+from xsdata.models.enums import DataType
+from xsdata.models.enums import NamespaceType
+from xsdata.models.enums import Tag
 
 
 @dataclass
 class ClassExtensionHandler(HandlerInterface):
     """Reduce class extensions by copying or creating new attributes."""
+
+    INCLUDES_NONE = 0
+    INCLUDES_SOME = 1
+    INCLUDES_ALL = 2
 
     container: ContainerInterface
 
@@ -32,9 +40,9 @@ class ClassExtensionHandler(HandlerInterface):
     def process_native_extension(cls, target: Class, extension: Extension):
         """Native type flatten extension handler, ignore enumerations."""
         if target.is_enumeration:
-            ClassUtils.copy_extension_type(target, extension)
+            cls.copy_extension_type(target, extension)
         else:
-            ClassUtils.create_default_attribute(target, extension)
+            cls.create_default_attribute(target, extension)
 
     def process_dependency_extension(self, target: Class, extension: Extension):
         source = self.find_dependency(target, extension.type)
@@ -62,7 +70,7 @@ class ClassExtensionHandler(HandlerInterface):
         if source is target:
             target.extensions.remove(ext)
         elif source.is_enumeration and not target.is_enumeration:
-            ClassUtils.create_default_attribute(target, ext)
+            cls.create_default_attribute(target, ext)
         elif source.is_enumeration == target.is_enumeration:
             ClassUtils.copy_attributes(source, target, ext)
         else:  # this is an enumeration
@@ -82,11 +90,11 @@ class ClassExtensionHandler(HandlerInterface):
             - target has at least one suffix attribute
             - source or target class is abstract
         """
-        res = ClassUtils.compare_attributes(source, target)
-        if res == ClassUtils.INCLUDES_ALL:
+        res = cls.compare_attributes(source, target)
+        if res == cls.INCLUDES_ALL:
             target.extensions.remove(ext)
         elif (
-            res == ClassUtils.INCLUDES_SOME
+            res == cls.INCLUDES_SOME
             or source.abstract
             or (source.has_suffix_attr and len(target.attrs) > 0)
             or target.has_suffix_attr
@@ -112,3 +120,62 @@ class ClassExtensionHandler(HandlerInterface):
                 return result
 
         return None
+
+    @classmethod
+    def compare_attributes(cls, source: Class, target: Class) -> int:
+        """Compare the attributes of the two classes and return whether the
+        source includes all, some or none of the target attributes."""
+        if source is target:
+            return cls.INCLUDES_ALL
+
+        if not target.attrs:
+            return cls.INCLUDES_NONE
+
+        source_attrs = {attr.name for attr in source.attrs}
+        target_attrs = {attr.name for attr in target.attrs}
+        difference = source_attrs - target_attrs
+
+        if not difference:
+            return cls.INCLUDES_ALL
+        if len(difference) != len(source_attrs):
+            return cls.INCLUDES_SOME
+
+        return cls.INCLUDES_NONE
+
+    @classmethod
+    def copy_extension_type(cls, target: Class, extension: Extension):
+        """Add the given extension type to all target attributes types and
+        remove it from the target class extensions."""
+
+        for attr in target.attrs:
+            attr.types.append(extension.type.clone())
+        target.extensions.remove(extension)
+
+    @classmethod
+    def create_default_attribute(cls, item: Class, extension: Extension):
+        """Add a default value field to the given class based on the extension
+        type."""
+        if extension.type.native_code == DataType.ANY_TYPE.code:
+            attr = Attr(
+                name="any_element",
+                local_name="any_element",
+                index=0,
+                default=list if extension.restrictions.is_list else None,
+                types=[extension.type.clone()],
+                tag=Tag.ANY,
+                namespace=NamespaceType.ANY.value,
+                restrictions=extension.restrictions.clone(),
+            )
+        else:
+            attr = Attr(
+                name="value",
+                local_name="value",
+                index=0,
+                default=None,
+                types=[extension.type.clone()],
+                tag=Tag.EXTENSION,
+                restrictions=extension.restrictions.clone(),
+            )
+
+        item.attrs.insert(0, attr)
+        item.extensions.remove(extension)

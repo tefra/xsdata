@@ -6,7 +6,7 @@ from lxml.etree import QName
 from tests.factories import ClassFactory
 from tests.factories import FactoryTestCase
 from xsdata.codegen.container import ClassContainer
-from xsdata.models.codegen import Class
+from xsdata.codegen.models import Class
 from xsdata.models.elements import ComplexType
 
 

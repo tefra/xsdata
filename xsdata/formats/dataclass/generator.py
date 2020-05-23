@@ -4,11 +4,11 @@ from typing import Iterator
 from typing import List
 from typing import Tuple
 
+from xsdata.codegen.models import Class
+from xsdata.codegen.models import Package
 from xsdata.formats.dataclass import utils
 from xsdata.formats.dataclass.filters import filters
 from xsdata.formats.mixins import AbstractGenerator
-from xsdata.models.codegen import Class
-from xsdata.models.codegen import Package
 from xsdata.resolver import DependenciesResolver
 from xsdata.utils import text
 from xsdata.utils.collections import group_by

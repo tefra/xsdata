@@ -2,43 +2,14 @@ import sys
 from typing import List
 from typing import Optional
 
-from xsdata.models.codegen import Attr
-from xsdata.models.codegen import Class
-from xsdata.models.codegen import Extension
-from xsdata.models.codegen import Restrictions
-from xsdata.models.enums import DataType
-from xsdata.models.enums import NamespaceType
-from xsdata.models.enums import Tag
+from xsdata.codegen.models import Attr
+from xsdata.codegen.models import Class
+from xsdata.codegen.models import Extension
+from xsdata.codegen.models import Restrictions
 from xsdata.utils import text
 
 
 class ClassUtils:
-
-    INCLUDES_NONE = 0
-    INCLUDES_SOME = 1
-    INCLUDES_ALL = 2
-
-    @classmethod
-    def compare_attributes(cls, source: Class, target: Class) -> int:
-        """Compare the attributes of the two classes and return whether the
-        source includes all, some or none of the target attributes."""
-        if source is target:
-            return cls.INCLUDES_ALL
-
-        if not target.attrs:
-            return cls.INCLUDES_NONE
-
-        source_attrs = {attr.name for attr in source.attrs}
-        target_attrs = {attr.name for attr in target.attrs}
-        difference = source_attrs - target_attrs
-
-        if not difference:
-            return cls.INCLUDES_ALL
-        if len(difference) != len(source_attrs):
-            return cls.INCLUDES_SOME
-
-        return cls.INCLUDES_NONE
-
     @classmethod
     def copy_attributes(cls, source: Class, target: Class, extension: Extension):
         """
@@ -106,44 +77,6 @@ class ClassUtils:
                 clone.package = target.package
                 clone.module = target.module
                 target.inner.append(clone)
-
-    @classmethod
-    def copy_extension_type(cls, target: Class, extension: Extension):
-        """Add the given extension type to all target attributes types and
-        remove it from the target class extensions."""
-
-        for attr in target.attrs:
-            attr.types.append(extension.type.clone())
-        target.extensions.remove(extension)
-
-    @classmethod
-    def create_default_attribute(cls, item: Class, extension: Extension):
-        """Add a default value field to the given class based on the extension
-        type."""
-        if extension.type.native_code == DataType.ANY_TYPE.code:
-            attr = Attr(
-                name="any_element",
-                local_name="any_element",
-                index=0,
-                default=list if extension.restrictions.is_list else None,
-                types=[extension.type.clone()],
-                tag=Tag.ANY,
-                namespace=NamespaceType.ANY.value,
-                restrictions=extension.restrictions.clone(),
-            )
-        else:
-            attr = Attr(
-                name="value",
-                local_name="value",
-                index=0,
-                default=None,
-                types=[extension.type.clone()],
-                tag=Tag.EXTENSION,
-                restrictions=extension.restrictions.clone(),
-            )
-
-        item.attrs.insert(0, attr)
-        item.extensions.remove(extension)
 
     @classmethod
     def find_attribute(cls, attrs: List[Attr], attr: Attr) -> int:

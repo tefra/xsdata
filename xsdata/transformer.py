@@ -9,8 +9,8 @@ from urllib.request import urlopen
 
 from xsdata.analyzer import ClassAnalyzer
 from xsdata.builder import ClassBuilder
+from xsdata.codegen.models import Class
 from xsdata.logger import logger
-from xsdata.models.codegen import Class
 from xsdata.models.elements import Import
 from xsdata.models.elements import Include
 from xsdata.models.elements import Override

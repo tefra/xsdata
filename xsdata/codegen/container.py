@@ -17,7 +17,7 @@ from xsdata.codegen.handlers import AttributeSubstitutionHandler
 from xsdata.codegen.handlers import AttributeTypeHandler
 from xsdata.codegen.handlers import ClassExtensionHandler
 from xsdata.codegen.mixins import ContainerInterface
-from xsdata.models.codegen import Class
+from xsdata.codegen.models import Class
 from xsdata.utils.collections import group_by
 
 methodcaller("source_qname")

@@ -9,9 +9,9 @@ from unittest import mock
 
 from tests.factories import ClassFactory
 from tests.factories import FactoryTestCase
+from xsdata.codegen.models import Class
 from xsdata.formats.dataclass.generator import DataclassGenerator
 from xsdata.formats.mixins import AbstractGenerator
-from xsdata.models.codegen import Class
 from xsdata.utils import text
 from xsdata.writer import writer
 

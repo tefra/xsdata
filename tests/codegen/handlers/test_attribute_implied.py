@@ -1,9 +1,8 @@
 from tests.factories import AttrFactory
 from tests.factories import ClassFactory
 from tests.factories import FactoryTestCase
-from xsdata.codegen.container import ClassContainer
 from xsdata.codegen.handlers import AttributeImpliedHandler
-from xsdata.models.codegen import AttrType
+from xsdata.codegen.models import AttrType
 from xsdata.models.enums import DataType
 from xsdata.models.enums import Tag
 

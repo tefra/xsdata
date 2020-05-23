@@ -5,11 +5,11 @@ from typing import List
 from typing import Optional
 from typing import Tuple
 
-from xsdata.models.codegen import Attr
-from xsdata.models.codegen import AttrType
-from xsdata.models.codegen import Class
-from xsdata.models.codegen import Extension
-from xsdata.models.codegen import Restrictions
+from xsdata.codegen.models import Attr
+from xsdata.codegen.models import AttrType
+from xsdata.codegen.models import Class
+from xsdata.codegen.models import Extension
+from xsdata.codegen.models import Restrictions
 from xsdata.models.elements import Attribute
 from xsdata.models.elements import AttributeGroup
 from xsdata.models.elements import ComplexType

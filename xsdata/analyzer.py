@@ -1,10 +1,10 @@
 from typing import List
 
 from xsdata.codegen.container import ClassContainer
+from xsdata.codegen.models import Class
 from xsdata.codegen.sanitizer import ClassSanitizer
 from xsdata.codegen.validator import ClassValidator
 from xsdata.exceptions import AnalyzerError
-from xsdata.models.codegen import Class
 
 
 class ClassAnalyzer:

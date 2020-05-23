@@ -1,7 +1,7 @@
 from xsdata.codegen.mixins import HandlerInterface
+from xsdata.codegen.models import AttrType
+from xsdata.codegen.models import Class
 from xsdata.exceptions import AnalyzerError
-from xsdata.models.codegen import AttrType
-from xsdata.models.codegen import Class
 from xsdata.models.elements import SimpleType
 
 

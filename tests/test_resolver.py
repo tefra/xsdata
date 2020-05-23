@@ -7,8 +7,8 @@ from tests.factories import AttrTypeFactory
 from tests.factories import ClassFactory
 from tests.factories import FactoryTestCase
 from tests.factories import PackageFactory
+from xsdata.codegen.models import Class
 from xsdata.exceptions import ResolverValueError
-from xsdata.models.codegen import Class
 from xsdata.resolver import DependenciesResolver
 
 

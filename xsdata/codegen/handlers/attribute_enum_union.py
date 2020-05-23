@@ -4,7 +4,7 @@ from typing import List
 
 from xsdata.codegen.mixins import ContainerInterface
 from xsdata.codegen.mixins import HandlerInterface
-from xsdata.models.codegen import Class
+from xsdata.codegen.models import Class
 from xsdata.models.enums import Tag
 
 

@@ -8,7 +8,7 @@ from tests.factories import ClassFactory
 from tests.factories import ExtensionFactory
 from tests.factories import FactoryTestCase
 from xsdata.builder import ClassBuilder
-from xsdata.models.codegen import Restrictions
+from xsdata.codegen.models import Restrictions
 from xsdata.models.elements import Alternative
 from xsdata.models.elements import Annotation
 from xsdata.models.elements import Attribute

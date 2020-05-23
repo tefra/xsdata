@@ -8,10 +8,11 @@ from tests.factories import ExtensionFactory
 from tests.factories import FactoryTestCase
 from xsdata.codegen.container import ClassContainer
 from xsdata.codegen.handlers import ClassExtensionHandler
-from xsdata.models.elements import Attribute
+from xsdata.codegen.models import Restrictions
+from xsdata.codegen.utils import ClassUtils
 from xsdata.models.elements import ComplexType
 from xsdata.models.elements import SimpleType
-from xsdata.utils.classes import ClassUtils
+from xsdata.models.enums import Tag
 
 
 class ClassExtensionHandlerTests(FactoryTestCase):
@@ -117,7 +118,7 @@ class ClassExtensionHandlerTests(FactoryTestCase):
             source, target, extension
         )
 
-    @mock.patch.object(ClassUtils, "create_default_attribute")
+    @mock.patch.object(ClassExtensionHandler, "create_default_attribute")
     def test_process_extension_native(self, mock_create_default_attribute):
         extension = ExtensionFactory.create()
         target = ClassFactory.elements(1)
@@ -125,7 +126,7 @@ class ClassExtensionHandlerTests(FactoryTestCase):
         self.processor.process_native_extension(target, extension)
         mock_create_default_attribute.assert_called_once_with(target, extension)
 
-    @mock.patch.object(ClassUtils, "copy_extension_type")
+    @mock.patch.object(ClassExtensionHandler, "copy_extension_type")
     def test_process_native_extension_with_enumeration_target(
         self, mock_copy_extension_type
     ):
@@ -141,7 +142,7 @@ class ClassExtensionHandlerTests(FactoryTestCase):
         self.processor.process_simple_extension(target, target, extension)
         self.assertEqual(0, len(target.extensions))
 
-    @mock.patch.object(ClassUtils, "create_default_attribute")
+    @mock.patch.object(ClassExtensionHandler, "create_default_attribute")
     def test_process_simple_extension_when_source_is_enumeration_and_target_is_not(
         self, mock_create_default_attribute
     ):
@@ -153,7 +154,7 @@ class ClassExtensionHandlerTests(FactoryTestCase):
         mock_create_default_attribute.assert_called_once_with(target, extension)
 
     @mock.patch.object(ClassUtils, "copy_attributes")
-    @mock.patch.object(ClassUtils, "create_default_attribute")
+    @mock.patch.object(ClassExtensionHandler, "create_default_attribute")
     def test_process_simple_extension_when_target_is_enumeration_and_source_is_not(
         self, mock_create_default_attribute, mock_copy_attributes
     ):
@@ -189,11 +190,11 @@ class ClassExtensionHandlerTests(FactoryTestCase):
         mock_copy_attributes.assert_called_once_with(source, target, extension)
 
     @mock.patch.object(ClassUtils, "copy_attributes")
-    @mock.patch.object(ClassUtils, "compare_attributes")
+    @mock.patch.object(ClassExtensionHandler, "compare_attributes")
     def test_process_complex_extension_when_target_includes_all_source_attrs(
         self, mock_compare_attributes, mock_copy_attributes
     ):
-        mock_compare_attributes.return_value = ClassUtils.INCLUDES_ALL
+        mock_compare_attributes.return_value = ClassExtensionHandler.INCLUDES_ALL
         extension = ExtensionFactory.create()
         target = ClassFactory.create(extensions=[extension])
         source = ClassFactory.create()
@@ -206,11 +207,11 @@ class ClassExtensionHandlerTests(FactoryTestCase):
         self.assertEqual(0, mock_copy_attributes.call_count)
 
     @mock.patch.object(ClassUtils, "copy_attributes")
-    @mock.patch.object(ClassUtils, "compare_attributes")
+    @mock.patch.object(ClassExtensionHandler, "compare_attributes")
     def test_process_complex_extension_when_target_includes_some_source_attrs(
         self, mock_compare_attributes, mock_copy_attributes
     ):
-        mock_compare_attributes.return_value = ClassUtils.INCLUDES_SOME
+        mock_compare_attributes.return_value = ClassExtensionHandler.INCLUDES_SOME
         extension = ExtensionFactory.create()
         target = ClassFactory.create()
         source = ClassFactory.create()
@@ -220,11 +221,11 @@ class ClassExtensionHandlerTests(FactoryTestCase):
         mock_copy_attributes.assert_called_once_with(source, target, extension)
 
     @mock.patch.object(ClassUtils, "copy_attributes")
-    @mock.patch.object(ClassUtils, "compare_attributes")
+    @mock.patch.object(ClassExtensionHandler, "compare_attributes")
     def test_process_complex_extension_when_target_includes_no_source_attrs(
         self, mock_compare_attributes, mock_copy_attributes
     ):
-        mock_compare_attributes.return_value = ClassUtils.INCLUDES_NONE
+        mock_compare_attributes.return_value = ClassExtensionHandler.INCLUDES_NONE
         extension = ExtensionFactory.create()
         target = ClassFactory.create(extensions=[extension])
         source = ClassFactory.create()
@@ -235,11 +236,11 @@ class ClassExtensionHandlerTests(FactoryTestCase):
         self.assertEqual(1, len(target.extensions))
 
     @mock.patch.object(ClassUtils, "copy_attributes")
-    @mock.patch.object(ClassUtils, "compare_attributes")
+    @mock.patch.object(ClassExtensionHandler, "compare_attributes")
     def test_process_complex_extension_when_source_is_abstract(
         self, mock_compare_attributes, mock_copy_attributes
     ):
-        mock_compare_attributes.return_value = ClassUtils.INCLUDES_NONE
+        mock_compare_attributes.return_value = ClassExtensionHandler.INCLUDES_NONE
         extension = ExtensionFactory.create()
         target = ClassFactory.create()
         source = ClassFactory.create(abstract=True)
@@ -249,11 +250,11 @@ class ClassExtensionHandlerTests(FactoryTestCase):
         mock_copy_attributes.assert_called_once_with(source, target, extension)
 
     @mock.patch.object(ClassUtils, "copy_attributes")
-    @mock.patch.object(ClassUtils, "compare_attributes")
+    @mock.patch.object(ClassExtensionHandler, "compare_attributes")
     def test_process_complex_extension_when_target_is_abstract(
         self, mock_compare_attributes, mock_copy_attributes
     ):
-        mock_compare_attributes.return_value = ClassUtils.INCLUDES_NONE
+        mock_compare_attributes.return_value = ClassExtensionHandler.INCLUDES_NONE
         extension = ExtensionFactory.create()
         target = ClassFactory.create(abstract=True)
         source = ClassFactory.create()
@@ -263,11 +264,11 @@ class ClassExtensionHandlerTests(FactoryTestCase):
         self.assertEqual(0, mock_copy_attributes.call_count)
 
     @mock.patch.object(ClassUtils, "copy_attributes")
-    @mock.patch.object(ClassUtils, "compare_attributes")
+    @mock.patch.object(ClassExtensionHandler, "compare_attributes")
     def test_process_complex_extension_when_source_has_suffix_attr(
         self, mock_compare_attributes, mock_copy_attributes
     ):
-        mock_compare_attributes.return_value = ClassUtils.INCLUDES_NONE
+        mock_compare_attributes.return_value = ClassExtensionHandler.INCLUDES_NONE
         extension = ExtensionFactory.create()
         target = ClassFactory.create()
         source = ClassFactory.create()
@@ -283,11 +284,11 @@ class ClassExtensionHandlerTests(FactoryTestCase):
         mock_copy_attributes.assert_called_once_with(source, target, extension)
 
     @mock.patch.object(ClassUtils, "copy_attributes")
-    @mock.patch.object(ClassUtils, "compare_attributes")
+    @mock.patch.object(ClassExtensionHandler, "compare_attributes")
     def test_process_complex_extension_when_target_has_suffix_attr(
         self, mock_compare_attributes, mock_copy_attributes
     ):
-        mock_compare_attributes.return_value = ClassUtils.INCLUDES_NONE
+        mock_compare_attributes.return_value = ClassExtensionHandler.INCLUDES_NONE
         extension = ExtensionFactory.create()
         target = ClassFactory.create()
         source = ClassFactory.create()
@@ -310,3 +311,73 @@ class ClassExtensionHandlerTests(FactoryTestCase):
         simple = ClassFactory.create(name="a", type=SimpleType)
         self.processor.container.add(simple)
         self.assertEqual(simple, self.processor.find_dependency(target, attr_type))
+
+    def test_compare_attributes(self):
+        source = ClassFactory.elements(2)
+        self.assertEqual(2, self.processor.compare_attributes(source, source))
+
+        target = ClassFactory.create()
+        self.assertEqual(0, ClassExtensionHandler.compare_attributes(source, target))
+
+        target.attrs = [attr.clone() for attr in source.attrs]
+        self.assertEqual(2, ClassExtensionHandler.compare_attributes(source, target))
+
+        source.attrs.append(AttrFactory.element())
+        self.assertEqual(1, ClassExtensionHandler.compare_attributes(source, target))
+
+        source.attrs = AttrFactory.list(3)
+        self.assertEqual(0, ClassExtensionHandler.compare_attributes(source, target))
+
+        self.assertEqual(0, ClassExtensionHandler.INCLUDES_NONE)
+        self.assertEqual(1, ClassExtensionHandler.INCLUDES_SOME)
+        self.assertEqual(2, ClassExtensionHandler.INCLUDES_ALL)
+
+    def test_copy_extension_type(self):
+        extension = ExtensionFactory.create()
+        target = ClassFactory.elements(2)
+        target.extensions.append(extension)
+
+        ClassExtensionHandler.copy_extension_type(target, extension)
+
+        self.assertEqual(extension.type, target.attrs[0].types[1])
+        self.assertEqual(extension.type, target.attrs[1].types[1])
+        self.assertEqual(0, len(target.extensions))
+
+    def test_create_default_attribute(self):
+        extension = ExtensionFactory.create()
+        item = ClassFactory.create(extensions=[extension])
+
+        ClassExtensionHandler.create_default_attribute(item, extension)
+        expected = AttrFactory.create(
+            name="value",
+            index=0,
+            default=None,
+            types=[extension.type],
+            tag=Tag.EXTENSION,
+        )
+
+        self.assertEqual(1, len(item.attrs))
+        self.assertEqual(0, len(item.extensions))
+        self.assertEqual(expected, item.attrs[0])
+
+    def test_create_default_attribute_with_any_type(self):
+        extension = ExtensionFactory.create(
+            type=AttrTypeFactory.xs_any(),
+            restrictions=Restrictions(min_occurs=1, max_occurs=1, required=True),
+        )
+        item = ClassFactory.create(extensions=[extension])
+
+        ClassExtensionHandler.create_default_attribute(item, extension)
+        expected = AttrFactory.create(
+            name="any_element",
+            index=0,
+            default=None,
+            types=[extension.type.clone()],
+            tag=Tag.ANY,
+            namespace="##any",
+            restrictions=Restrictions(min_occurs=1, max_occurs=1, required=True),
+        )
+
+        self.assertEqual(1, len(item.attrs))
+        self.assertEqual(0, len(item.extensions))
+        self.assertEqual(expected, item.attrs[0])

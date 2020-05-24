@@ -35,7 +35,7 @@ class ClassBuilderTests(FactoryTestCase):
     def setUp(self):
         super().setUp()
         self.schema = Schema.create(location="file://foo.xsd")
-        self.builder = ClassBuilder(schema=self.schema, package="tests")
+        self.builder = ClassBuilder(schema=self.schema)
 
     @mock.patch.object(Redefine, "children")
     @mock.patch.object(Override, "children")
@@ -159,7 +159,7 @@ class ClassBuilderTests(FactoryTestCase):
             nillable=True,
             namespace="foo:name",
             ns_map=element.ns_map,
-            package=self.builder.package,
+            package=None,
             module=self.schema.module,
             source_namespace=self.schema.target_namespace,
             substitutions=["foo", "bar"],

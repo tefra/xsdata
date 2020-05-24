@@ -10,6 +10,7 @@ from unittest import mock
 from tests.factories import ClassFactory
 from tests.factories import FactoryTestCase
 from xsdata.codegen.models import Class
+from xsdata.exceptions import CodeWriterError
 from xsdata.formats.dataclass.generator import DataclassGenerator
 from xsdata.formats.mixins import AbstractGenerator
 from xsdata.utils import text
@@ -22,6 +23,7 @@ class FakeGenerator(AbstractGenerator):
 
     def render(self, classes: List[Class]) -> Iterator[Tuple[Path, str, str]]:
         for obj in classes:
+            assert obj.package is not None
             yield Path(f"{self.dir}/{obj.name}.txt"), obj.package, obj.name
 
     @classmethod
@@ -90,3 +92,11 @@ class CodeWriterTests(FactoryTestCase):
         self.assertEqual("tests", classes[0].module)
         self.assertEqual("tests", classes[1].module)
         self.assertEqual("tests", classes[2].module)
+
+        classes = ClassFactory.list(1, package=None)
+        with self.assertRaises(CodeWriterError) as cm:
+            writer.designate(classes, "fake")
+
+        self.assertEqual(
+            "Class `class_E` has not been assign to a package.", str(cm.exception)
+        )

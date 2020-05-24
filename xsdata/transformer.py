@@ -1,10 +1,14 @@
+import os
+from collections import defaultdict
 from dataclasses import dataclass
 from dataclasses import field
 from pathlib import Path
+from typing import Dict
 from typing import List
 from typing import Optional
 from typing import Tuple
 from typing import Union
+from urllib.parse import urlparse
 from urllib.request import urlopen
 
 from xsdata.analyzer import ClassAnalyzer
@@ -16,8 +20,15 @@ from xsdata.models.elements import Include
 from xsdata.models.elements import Override
 from xsdata.models.elements import Redefine
 from xsdata.models.elements import Schema
+from xsdata.models.enums import COMMON_SCHEMA_DIR
 from xsdata.parser import SchemaParser
 from xsdata.writer import writer
+
+
+Included = Union[Import, Include, Redefine, Override]
+String = Optional[str]
+Classes = List[Class]
+ClassMap = Dict[str, Classes]
 
 
 @dataclass
@@ -48,18 +59,23 @@ class SchemaTransformer:
         else:
             logger.warning("Analyzer returned zero classes!")
 
-    def process_schemas(self, urls: List[str], package: str) -> List[Class]:
-        classes = list()
+    def process_schemas(self, urls: List[str], package: str) -> Classes:
+        class_map = dict()
         for url in urls:
-            classes.extend(self.process_schema(url, package))
+            class_map.update(self.process_schema(url))
+
+        self.assign_packages(class_map, package)
+
+        classes = list()
+        for items in class_map.values():
+            classes.extend(items)
+
         return classes
 
-    def process_schema(
-        self, url: str, package: str, namespace: Optional[str] = None,
-    ) -> List[Class]:
+    def process_schema(self, url: str, namespace: String = None) -> ClassMap:
         """Recursively parse the given schema url and the included schemas and
         generate a list of classes."""
-        classes = []
+        classes = dict()
         if url not in self.processed:
             self.processed.append(url)
             logger.info("Parsing schema...")
@@ -67,23 +83,17 @@ class SchemaTransformer:
             if schema:
                 namespace = schema.target_namespace
                 for sub in schema.included():
-                    included_classes = self.process_included(sub, package, namespace)
-                    classes.extend(included_classes)
+                    classes.update(self.process_included(sub, namespace))
 
-                classes.extend(self.generate_classes(schema, package))
+                classes[url] = self.generate_classes(schema)
         else:
             logger.debug("Already processed skipping: %s", url)
         return classes
 
-    def process_included(
-        self,
-        included: Union[Import, Include, Redefine, Override],
-        package: str,
-        target_namespace: Optional[str],
-    ) -> List[Class]:
+    def process_included(self, included: Included, namespace: String) -> ClassMap:
         """Prepare the given included schema location and send it for
         processing."""
-        classes = []
+        classes = dict()
         if not included.location:
             logger.warning(
                 "%s: %s unresolved schema location..",
@@ -97,15 +107,15 @@ class SchemaTransformer:
                 included.schema_location,
             )
         else:
-            package = self.adjust_package(package, included.schema_location)
-            classes = self.process_schema(included.location, package, target_namespace)
+            classes = self.process_schema(included.location, namespace)
+
         return classes
 
-    def generate_classes(self, schema: Schema, package: str) -> List[Class]:
+    def generate_classes(self, schema: Schema) -> Classes:
         """Convert the given schema tree to codegen classes and use the writer
         factory to either generate or print the result code."""
         logger.info("Compiling schema %s", schema.location)
-        classes = ClassBuilder(schema=schema, package=package).build()
+        classes = ClassBuilder(schema=schema).build()
 
         class_num, inner_num = self.count_classes(classes)
         if class_num > 0:
@@ -114,7 +124,7 @@ class SchemaTransformer:
         return classes
 
     @staticmethod
-    def parse_schema(url: str, namespace: Optional[str]) -> Optional[Schema]:
+    def parse_schema(url: str, namespace: String) -> Optional[Schema]:
         """
         Parse the given schema url and return the schema tree object.
 
@@ -133,31 +143,12 @@ class SchemaTransformer:
         return None
 
     @staticmethod
-    def analyze_classes(classes: List[Class]) -> List[Class]:
+    def analyze_classes(classes: Classes) -> Classes:
         """Analyzer the given class list and simplify attributes and
         extensions."""
         return ClassAnalyzer(classes).process()
 
-    @staticmethod
-    def adjust_package(package: str, location: Optional[str]) -> str:
-        """
-        Adjust if possible the package name relatively to the schema location
-        to make sense.
-
-        eg. foo.bar, ../common/schema.xsd -> foo.common
-        """
-        if location and not location.startswith("http"):
-            pp = package.split(".")
-            for part in Path(location).parent.parts:
-                if part == "..":
-                    pp.pop()
-                else:
-                    pp.append(part)
-            if pp:
-                return ".".join(pp)
-        return package
-
-    def count_classes(self, classes: List[Class]) -> Tuple[int, int]:
+    def count_classes(self, classes: Classes) -> Tuple[int, int]:
         """Return a tuple of counters for the main and inner classes."""
         main = len(classes)
         inner = 0
@@ -165,3 +156,39 @@ class SchemaTransformer:
             inner += sum(self.count_classes(cls.inner))
 
         return main, inner
+
+    @classmethod
+    def assign_packages(cls, class_map: ClassMap, package: str):
+        """Group uris by common path and auto assign package names to all
+        classes."""
+        prev = ""
+        index = 0
+        groups = defaultdict(list)
+        common_schemas_dir = COMMON_SCHEMA_DIR.as_uri()
+        for key in sorted(class_map.keys()):
+            if key.startswith(common_schemas_dir):
+                groups[0].append(key)
+            else:
+                key_parsed = urlparse(key)
+                common_path = os.path.commonpath((prev, key))
+                if not common_path or common_path == key_parsed.scheme:
+                    index += 1
+
+                prev = key
+                groups[index].append(key)
+
+        for keys in groups.values():
+            common_path = (
+                os.path.dirname(keys[0]) if len(keys) == 1 else os.path.commonpath(keys)
+            )
+            for key in keys:
+                items = class_map[key]
+                suffix = ".".join(Path(key).parent.relative_to(common_path).parts)
+                package_name = f"{package}.{suffix}" if suffix else package
+                cls.assign_package(items, package_name)
+
+    @classmethod
+    def assign_package(cls, classes: Classes, package: str):
+        for obj in classes:
+            obj.package = package
+            cls.assign_package(obj.inner, package)

@@ -7,6 +7,7 @@ from xsdata.builder import ClassBuilder
 from xsdata.models.elements import Include
 from xsdata.models.elements import Override
 from xsdata.models.elements import Schema
+from xsdata.models.enums import Namespace
 from xsdata.transformer import SchemaTransformer
 from xsdata.writer import CodeWriter
 
@@ -96,16 +97,20 @@ class SchemaTransformerTests(FactoryTestCase):
         mock_process_schemas.assert_called_once_with(path, package)
         mock_logger_warning.assert_called_once_with("Analyzer returned zero classes!")
 
+    @mock.patch.object(SchemaTransformer, "assign_packages")
     @mock.patch.object(SchemaTransformer, "process_schema")
-    def test_process_schemas(self, mock_process_schema):
+    def test_process_schemas(self, mock_process_schema, mock_assign_packages):
         classes = ClassFactory.list(5)
-        mock_process_schema.side_effect = [classes[:2], classes[2:]]
+        mock_process_schema.side_effect = [dict(foo=classes[:2]), dict(bar=classes[2:])]
         schemas = [Path(), Path()]
 
         result = self.transformer.process_schemas(schemas, "foo")
         self.assertEqual(classes, result)
         mock_process_schema.assert_has_calls(
-            [mock.call(schemas[0], "foo"), mock.call(schemas[1], "foo"),]
+            [mock.call(schemas[0]), mock.call(schemas[1])]
+        )
+        mock_assign_packages.assert_called_once_with(
+            dict(foo=classes[:2], bar=classes[2:]), "foo"
         )
 
     @mock.patch("xsdata.transformer.logger.info")
@@ -124,26 +129,32 @@ class SchemaTransformerTests(FactoryTestCase):
         schema = Schema.create(target_namespace="thug")
         schema.includes.append(include)
         schema.overrides.append(override)
-        mock_process_included.side_effect = [ClassFactory.list(2), ClassFactory.list(3)]
+        mock_process_included.side_effect = [
+            dict(foo=ClassFactory.list(2)),
+            dict(bar=ClassFactory.list(3)),
+        ]
         mock_generate_classes.return_value = ClassFactory.list(4)
 
         mock_parse_schema.return_value = schema
 
         path = Path(__file__)
-        result = self.transformer.process_schema(path, "foo.bar", "foo-bar")
+        result = self.transformer.process_schema(path, "foo-bar")
+        self.assertEqual(3, len(result))
+        self.assertEqual(2, len(result["foo"]))
+        self.assertEqual(3, len(result["bar"]))
+        self.assertEqual(4, len(result[path]))
 
-        self.assertEqual(9, len(result))
         self.assertTrue(path in self.transformer.processed)
 
         mock_parse_schema.assert_called_once_with(path, "foo-bar")
         mock_process_included.assert_has_calls(
             [
-                mock.call(include, "foo.bar", schema.target_namespace),
-                mock.call(override, "foo.bar", schema.target_namespace),
+                mock.call(include, schema.target_namespace),
+                mock.call(override, schema.target_namespace),
             ]
         )
 
-        self.transformer.process_schema(path, None, None)
+        self.transformer.process_schema(path, None)
         mock_logger_info.assert_called_once_with("Parsing schema...")
 
     @mock.patch("xsdata.transformer.logger.debug")
@@ -153,7 +164,7 @@ class SchemaTransformerTests(FactoryTestCase):
     ):
         path = Path(__file__).as_uri()
         self.transformer.processed.append(path)
-        self.transformer.process_schema(path, "foo.bar", None)
+        self.transformer.process_schema(path, None)
 
         self.assertEqual(0, mock_parse_schema.call_count)
         mock_logger_debug.assert_called_once_with(
@@ -166,23 +177,20 @@ class SchemaTransformerTests(FactoryTestCase):
     ):
         path = Path(__file__).as_uri()
         mock_parse_schema.return_value = None
-        result = self.transformer.process_schema(path, "foo.bar", "ns")
+        result = self.transformer.process_schema(path, "ns")
         self.assertEqual(0, len(result))
         mock_parse_schema.assert_called_once_with(path, "ns")
 
     @mock.patch.object(SchemaTransformer, "process_schema")
-    @mock.patch.object(SchemaTransformer, "adjust_package")
-    def test_process_included(self, mock_adjust_package, mock_process_schema):
+    def test_process_included(self, mock_process_schema):
         path = Path(__file__)
         include = Include.create(location=path, schema_location="foo.xsd")
-        mock_adjust_package.return_value = "adjusted.foo.bar"
         mock_process_schema.return_value = ClassFactory.list(2)
 
-        result = self.transformer.process_included(include, "foo.bar", "thug")
+        result = self.transformer.process_included(include, "thug")
 
         self.assertEqual(2, len(result))
-        mock_adjust_package.assert_called_once_with("foo.bar", include.schema_location)
-        mock_process_schema.assert_called_once_with(path, "adjusted.foo.bar", "thug")
+        mock_process_schema.assert_called_once_with(path, "thug")
 
     @mock.patch("xsdata.transformer.logger.debug")
     def test_process_included_skip_when_location_already_imported(
@@ -192,9 +200,9 @@ class SchemaTransformerTests(FactoryTestCase):
         include = Include.create(location=path)
         self.transformer.processed.append(path)
 
-        result = self.transformer.process_included(include, "foo.bar", "thug")
+        result = self.transformer.process_included(include, "thug")
 
-        self.assertIsInstance(result, list)
+        self.assertIsInstance(result, dict)
         self.assertEqual(0, len(result))
         mock_logger_debug.assert_called_once_with(
             "%s: %s already included skipping..",
@@ -205,9 +213,9 @@ class SchemaTransformerTests(FactoryTestCase):
     @mock.patch("xsdata.transformer.logger.warning")
     def test_process_included_skip_when_location_is_missing(self, mock_logger_warning):
         include = Include.create()
-        result = self.transformer.process_included(include, "foo.bar", "thug")
+        result = self.transformer.process_included(include, "thug")
 
-        self.assertIsInstance(result, list)
+        self.assertIsInstance(result, dict)
         self.assertEqual(0, len(result))
         mock_logger_warning.assert_called_once_with(
             "%s: %s unresolved schema location..",
@@ -231,9 +239,9 @@ class SchemaTransformerTests(FactoryTestCase):
 
         mock_builder_build.return_value = classes
         mock_count_classes.return_value = 2, 4
-        self.transformer.generate_classes(schema, "foo.bar")
+        self.transformer.generate_classes(schema)
 
-        mock_builder_init.assert_called_once_with(schema=schema, package="foo.bar")
+        mock_builder_init.assert_called_once_with(schema=schema)
         mock_builder_build.assert_called_once_with()
         mock_logger_info.assert_has_calls(
             [
@@ -254,22 +262,9 @@ class SchemaTransformerTests(FactoryTestCase):
         mock_urlopen.side_effect = FileNotFoundError
 
         path = Path(__file__).parent.joinpath("fixtures/books.xsd").as_uri()
-        schema = self.transformer.parse_schema(path, "foo.bar")
+        schema = self.transformer.parse_schema(path, "foo")
         self.assertIsNone(schema)
         mock_logger_warning.assert_called_once_with("Schema not found %s", path)
-
-    def test_adjust_package(self):
-        actual = self.transformer.adjust_package("foo.bar", "../common.xsd")
-        self.assertEqual("foo", actual)
-
-        actual = self.transformer.adjust_package("foo.bar", "../common/bar.xsd")
-        self.assertEqual("foo.common", actual)
-
-        actual = self.transformer.adjust_package("foo.bar", "")
-        self.assertEqual("foo.bar", actual)
-
-        actual = self.transformer.adjust_package("foo.bar", "http://www.yes.no")
-        self.assertEqual("foo.bar", actual)
 
     def test_count_classes(self):
         classes = ClassFactory.list(
@@ -277,3 +272,34 @@ class SchemaTransformerTests(FactoryTestCase):
         )
 
         self.assertEqual((2, 16), self.transformer.count_classes(classes))
+
+    def test_assign_packages(self):
+        core = "file://HL7V3/NE2008/coreschemas/voc.xsd"
+        multi_one = "file://HL7V3/NE2008/multicacheschemas/PRPA_MT201307UV02.xsd"
+        multi_two = "file://HL7V3/NE2008/multicacheschemas/COCT_MT080000UV.xsd"
+        http_one = "http://xsdata/foo/bar/schema.xsd"
+        http_two = "http://xsdata/foo/common.xsd"
+        local_one = Namespace.XSI.location
+        local_two = Namespace.XLINK.location
+
+        class_map = {
+            core: ClassFactory.list(1, inner=[ClassFactory.create()]),
+            multi_one: ClassFactory.list(2),
+            multi_two: ClassFactory.list(1),
+            http_one: ClassFactory.list(1),
+            http_two: ClassFactory.list(1),
+            local_one: ClassFactory.list(1),
+            local_two: ClassFactory.list(1),
+        }
+
+        self.transformer.assign_packages(class_map, "foo.bar")
+
+        self.assertEqual("foo.bar.coreschemas", class_map[core][0].package)
+        self.assertEqual("foo.bar.coreschemas", class_map[core][0].inner[0].package)
+        self.assertEqual("foo.bar.multicacheschemas", class_map[multi_one][0].package)
+        self.assertEqual("foo.bar.multicacheschemas", class_map[multi_one][1].package)
+        self.assertEqual("foo.bar.multicacheschemas", class_map[multi_two][0].package)
+        self.assertEqual("foo.bar.bar", class_map[http_one][0].package)
+        self.assertEqual("foo.bar", class_map[http_two][0].package)
+        self.assertEqual("foo.bar", class_map[local_one][0].package)
+        self.assertEqual("foo.bar", class_map[local_two][0].package)

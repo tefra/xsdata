@@ -27,7 +27,6 @@ from xsdata.utils import text
 @dataclass
 class ClassBuilder:
     schema: Schema
-    package: str
 
     def build(self) -> List[Class]:
         """Generate classes from schema and redefined elements."""
@@ -69,7 +68,6 @@ class ClassBuilder:
             ns_map=obj.ns_map,
             source_namespace=self.schema.target_namespace,
             module=self.schema.module,
-            package=self.package,
             substitutions=obj.substitutions,
         )
 

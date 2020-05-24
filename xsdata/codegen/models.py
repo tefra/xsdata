@@ -228,11 +228,11 @@ class Class:
     name: str
     type: Type
     module: str
-    package: str
     mixed: bool
     abstract: bool
     nillable: bool
     processed: bool = False
+    package: Optional[str] = field(default=None)
     namespace: Optional[str] = field(default=None)
     help: Optional[str] = field(default=None)
     substitutions: List[str] = field(default_factory=list)

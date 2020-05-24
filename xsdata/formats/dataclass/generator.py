@@ -29,7 +29,7 @@ class DataclassGenerator(AbstractGenerator):
         resolver = DependenciesResolver(packages=packages)
 
         # Generate all packages
-        pck_name = classes[0].package if classes else ""
+        pck_name = classes[0].package if classes and classes[0].package else ""
         cwd = Path.cwd()
         for part in pck_name.split("."):
             cwd = cwd.joinpath(part)

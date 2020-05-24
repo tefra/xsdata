@@ -6,6 +6,8 @@ from typing import Optional
 
 from lxml.etree import QName
 
+COMMON_SCHEMA_DIR = Path(__file__).absolute().parent.parent.joinpath("schemas/")
+
 
 class Namespace(Enum):
     XS = "http://www.w3.org/2001/XMLSchema"
@@ -23,12 +25,7 @@ class Namespace(Enum):
 
     @property
     def location(self) -> str:
-        return (
-            Path(__file__)
-            .absolute()
-            .parent.parent.joinpath(f"schemas/{self.prefix}.xsd")
-            .as_uri()
-        )
+        return COMMON_SCHEMA_DIR.joinpath(f"{self.prefix}.xsd").as_uri()
 
     @classmethod
     def get_enum(cls, uri: Optional[str]) -> Optional["Namespace"]:

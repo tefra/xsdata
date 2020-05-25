@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns="urn:hl7-org:v3" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:nccommon="urn:gov:hhs:fha:nhinc:common:nhinccommon" targetNamespace="urn:hl7-org:v3" elementFormDefault="qualified">
+
+	<xsd:include schemaLocation="../../HL7V3/NE2008/multicacheschemas/PRPA_IN201304UV02.xsd"/>
+	<xsd:include schemaLocation="../../HL7V3/NE2008/multicacheschemas/PRPA_IN201309UV02.xsd"/>
+	<xsd:include schemaLocation="../../HL7V3/NE2008/multicacheschemas/PRPA_IN201310UV02.xsd"/>
+	<xsd:include schemaLocation="../../HL7V3/NE2008/multicacheschemas/MCCI_IN000002UV01.xsd"/>
+	<xsd:include schemaLocation="../../HL7V3/NE2008/multicacheschemas/PRPA_MT201307UV02.xsd"/>
+    <xsd:include schemaLocation="../../HL7V3/NE2008/multicacheschemas/PRPA_MT201301UV02.xsd"/>
+    <xsd:include schemaLocation="../../HL7V3/NE2008/multicacheschemas/PRPA_MT201310UV02.xsd"/>
+	<xsd:include schemaLocation="../../HL7V3/NE2008/multicacheschemas/CDA.xsd"/>
+	<xsd:import namespace="urn:gov:hhs:fha:nhinc:common:nhinccommon" schemaLocation="../common/NhincCommon.xsd"/>
+
+	<xsd:complexType name="PIXConsumer_PRPA_IN201304UVRequestType">
+		<xsd:sequence>
+			<xsd:element ref="PRPA_IN201304UV02"/>
+			<xsd:element name="assertion" type="nccommon:AssertionType"/>
+			<xsd:element name="NhinTargetCommunities" type="nccommon:NhinTargetCommunitiesType" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="PIXConsumer_PRPA_IN201304UVRequest" type="PIXConsumer_PRPA_IN201304UVRequestType"/>
+	<xsd:complexType name="PIXConsumer_PRPA_IN201304UVSecuredRequestType">
+		<xsd:sequence>
+			<xsd:element ref="PRPA_IN201304UV02"/>
+			<xsd:element name="NhinTargetCommunities" type="nccommon:NhinTargetCommunitiesType" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="PIXConsumer_PRPA_IN201304UVSecuredRequest" type="PIXConsumer_PRPA_IN201304UVSecuredRequestType"/>
+
+	<xsd:complexType name="PIXConsumer_PRPA_IN201309UVRequestType">
+		<xsd:sequence>
+			<xsd:element ref="PRPA_IN201309UV02"/>
+			<xsd:element name="assertion" type="nccommon:AssertionType"/>
+			<xsd:element name="NhinTargetCommunities" type="nccommon:NhinTargetCommunitiesType" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="PIXConsumer_PRPA_IN201309UVRequest" type="PIXConsumer_PRPA_IN201309UVRequestType"/>
+	<xsd:complexType name="PIXConsumer_PRPA_IN201309UVSecuredRequestType">
+		<xsd:sequence>
+			<xsd:element ref="PRPA_IN201309UV02"/>
+			<xsd:element name="NhinTargetCommunities" type="nccommon:NhinTargetCommunitiesType" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="PIXConsumer_PRPA_IN201309UVSecuredRequest" type="PIXConsumer_PRPA_IN201309UVSecuredRequestType"/>
+	<xsd:complexType name="PIXConsumer_PRPA_IN201309UVResponseType">
+		<xsd:sequence>
+			<xsd:element ref="PRPA_IN201310UV02"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="PIXConsumer_PRPA_IN201309UVResponse" type="PIXConsumer_PRPA_IN201309UVResponseType"/>
+
+	<xsd:complexType name="PIXConsumer_PRPA_IN201310UVRequestType">
+		<xsd:sequence>
+			<xsd:element ref="PRPA_IN201310UV02"/>
+			<xsd:element name="assertion" type="nccommon:AssertionType"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="PIXConsumer_PRPA_IN201310UVRequest" type="PIXConsumer_PRPA_IN201310UVRequestType"/>
+	<xsd:complexType name="PIXConsumer_PRPA_IN201310UVSecuredRequestType">
+		<xsd:sequence>
+			<xsd:element ref="PRPA_IN201310UV02"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="PIXConsumer_PRPA_IN201310UVSecuredRequest" type="PIXConsumer_PRPA_IN201310UVSecuredRequestType"/>
+        
+	<xsd:complexType name="CreateAckMsgRequestType">
+		<xsd:sequence>
+			<xsd:element name="localDeviceId" type="xsd:string"/>
+			<xsd:element name="origMsgId" type="II"/>
+			<xsd:element name="msgText" type="xsd:string"/>
+			<xsd:element name="senderOID" type="xsd:string"/>
+			<xsd:element name="receiverOID" type="xsd:string"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="CreateAckMsgRequest" type="CreateAckMsgRequestType"/>
+	<xsd:complexType name="Create201305RequestType">
+		<xsd:sequence>
+			<xsd:element name="PRPA201301Patient" type="PRPA_MT201301UV02.Patient"/>
+			<xsd:element name="localDeviceId" type="xsd:string"/>
+			<xsd:element name="senderOID" type="xsd:string"/>
+			<xsd:element name="receiverOID" type="xsd:string"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="Create201305Request" type="Create201305RequestType"/>
+	<xsd:complexType name="Create201302RequestType">
+		<xsd:sequence>
+			<xsd:choice>
+				<xsd:element name="PRPA201310Patient" type="PRPA_MT201310UV02.Patient"/>
+				<xsd:element name="PRPA201301Patient" type="PRPA_MT201301UV02.Patient"/>
+			</xsd:choice>
+			<xsd:element name="remotePatientId" type="xsd:string"/>
+			<xsd:element name="remoteDeviceId" type="xsd:string"/>
+			<xsd:element name="senderOID" type="xsd:string"/>
+			<xsd:element name="receiverOID" type="xsd:string"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="Create201302Request" type="Create201302RequestType"/>
+	<xsd:complexType name="CreateFault201310RequestType">
+		<xsd:sequence>
+			<xsd:element name="senderOID" type="xsd:string"/>
+			<xsd:element name="receiverOID" type="xsd:string"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="CreateFault201310Request" type="CreateFault201310RequestType"/>
+	<xsd:complexType name="Create201310RequestType">
+		<xsd:sequence>
+			<xsd:element name="pseudoPatientId" type="xsd:string"/>
+			<xsd:element name="pseudoAssigningAuthorityId" type="xsd:string"/>
+			<xsd:element name="localDeviceId" type="xsd:string"/>
+			<xsd:element name="senderOID" type="xsd:string"/>
+			<xsd:element name="receiverOID" type="xsd:string"/>
+			<xsd:element name="PRPA201307QueryByParameter" type="PRPA_MT201307UV02.QueryByParameter"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="Create201310Request" type="Create201310RequestType"/>
+	<xsd:complexType name="PIXConsumer_MCCI_IN000002UV01RequestType">
+		<xsd:sequence>
+			<xsd:element ref="MCCI_IN000002UV01"/>
+			<xsd:element name="assertion" type="nccommon:AssertionType"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="PIXConsumer_MCCI_IN000002UV01Request" type="PIXConsumer_MCCI_IN000002UV01RequestType"/>
+
+        
+</xsd:schema>

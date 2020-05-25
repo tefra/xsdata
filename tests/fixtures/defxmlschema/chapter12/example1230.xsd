@@ -1,7 +1,0 @@
-<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
-<!-- Example 12-30 Local attribute declaration -->
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
-  <xs:complexType name="ProductType">
-    <xs:attribute name="effDate" type="xs:date" default="1900-01-01" />
-  </xs:complexType>
-</xs:schema>

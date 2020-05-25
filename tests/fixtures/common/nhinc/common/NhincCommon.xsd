@@ -1,0 +1,333 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tns="urn:gov:hhs:fha:nhinc:common:nhinccommon"
+    xmlns:addr="http://www.w3.org/2005/08/addressing" targetNamespace="urn:gov:hhs:fha:nhinc:common:nhinccommon" elementFormDefault="qualified">
+    <xsd:import namespace="http://www.w3.org/2005/08/addressing" schemaLocation="../../www.w3.org/2005/08/addressing/ws-addr.xsd" />
+
+    <xsd:complexType name="QualifiedSubjectIdentifierType">
+        <xsd:sequence>
+            <xsd:element name="SubjectIdentifier" type="xsd:string"/>
+            <xsd:element name="AssigningAuthorityIdentifier" type="xsd:string"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:element name="QualifiedSubjectIdentifier" type="tns:QualifiedSubjectIdentifierType"/>
+    <xsd:complexType name="AcknowledgementType">
+        <xsd:sequence>
+            <xsd:element name="message" type="xsd:string" minOccurs="0"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:element name="Acknowledgement" type="tns:AcknowledgementType"/>
+    <xsd:complexType name="QualifiedSubjectIdentifiersType">
+        <xsd:sequence>
+            <xsd:element name="QualifiedSubjectIdentifier" type="tns:QualifiedSubjectIdentifierType" minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:element name="QualifiedSubjectIdentifiers" type="tns:QualifiedSubjectIdentifiersType"/>
+    <xsd:complexType name="AssertionType">
+        <xsd:sequence>
+            <xsd:element name="address" type="tns:AddressType" minOccurs="0"/>
+            <xsd:element name="dateOfBirth" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="explanationNonClaimantSignature" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="haveSecondWitnessSignature" type="xsd:boolean" minOccurs="0"/>
+            <xsd:element name="haveSignature" type="xsd:boolean" minOccurs="0"/>
+            <xsd:element name="haveWitnessSignature" type="xsd:boolean" minOccurs="0"/>
+            <xsd:element name="homeCommunity" type="tns:HomeCommunityType"/>
+            <xsd:element name="nationalProviderId" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="personName" type="tns:PersonNameType" minOccurs="0"/>
+            <xsd:element name="phoneNumber" type="tns:PhoneType" minOccurs="0"/>
+            <xsd:element name="secondWitnessAddress" type="tns:AddressType" minOccurs="0"/>
+            <xsd:element name="secondWitnessName" type="tns:PersonNameType" minOccurs="0"/>
+            <xsd:element name="secondWitnessPhone" type="tns:PhoneType" minOccurs="0"/>
+            <xsd:element name="SSN" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="uniquePatientId" type="xsd:string" maxOccurs="unbounded" minOccurs="0"/>
+            <xsd:element name="witnessAddress" type="tns:AddressType" minOccurs="0"/>
+            <xsd:element name="witnessName" type="tns:PersonNameType" minOccurs="0"/>
+            <xsd:element name="witnessPhone" type="tns:PhoneType" minOccurs="0"/>
+            <xsd:element name="userInfo" type="tns:UserType"/>
+            <xsd:element name="authorized" type="xsd:boolean"/>
+            <xsd:element name="purposeOfDisclosureCoded" type="tns:CeType"/>
+            <xsd:element name="acpAttribute" type="xsd:anyURI" minOccurs="0"/>
+            <xsd:element name="instanceAcpAttribute" type="xsd:anyURI" minOccurs="0"/>
+            <xsd:element name="samlConditions" type="tns:SamlConditionsType" minOccurs="0"/>
+            <xsd:element name="samlAuthnStatement" type="tns:SamlAuthnStatementType" minOccurs="0"/>
+            <xsd:element name="samlAuthzDecisionStatement" type="tns:SamlAuthzDecisionStatementType" minOccurs="0"/>
+            <xsd:element name="samlSignature" type="tns:SamlSignatureType" minOccurs="0"/>
+            <xsd:element name="samlIssuer" type="tns:SamlIssuerType" minOccurs="0"/>
+            <xsd:element name="samlSubjectConfirmations" type="tns:SamlSubjectConfirmationType" minOccurs="0" maxOccurs="unbounded"/>
+            <xsd:element name="messageId" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="relatesToList" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+            <xsd:element name="implementsSpecVersion" type="xsd:string" minOccurs="0" />
+            <xsd:element name="transactionTimeout" type="xsd:int" minOccurs="0" default="-1" />
+            <xsd:element name="keepAlive" type="xsd:string" minOccurs="0" />
+            <xsd:element name="CONNECTCustomHttpHeaders" type="tns:CONNECTCustomHttpHeadersType" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:element name="signatureAlgorithm" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="digestAlgorithm" type="xsd:string" minOccurs="0"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:element name="SamlConditions" type="tns:SamlConditionsType"/>
+    <xsd:complexType name="SamlConditionsType">
+        <xsd:sequence>
+            <xsd:element name="notBefore" type="xsd:string"/>
+            <xsd:element name="notOnOrAfter" type="xsd:string"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:element name="Assertion" type="tns:AssertionType"/>
+    <xsd:complexType name="SamlAuthnStatementType">
+        <xsd:sequence>
+            <xsd:element name="authInstant" type="xsd:string" />
+            <xsd:element name="sessionIndex" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="authContextClassRef" type="xsd:string" />
+            <xsd:element name="subjectLocalityAddress" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="subjectLocalityDNSName" type="xsd:string" minOccurs="0"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:element name="SamlAuthnStatement" type="tns:SamlAuthnStatementType"/>
+    <xsd:complexType name="SamlAuthzDecisionStatementType">
+        <xsd:sequence>
+            <xsd:element name="decision" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="resource" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="action" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="evidence" type="tns:SamlAuthzDecisionStatementEvidenceType" minOccurs="0"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:element name="SamlAuthzDecisionStatement" type="tns:SamlAuthzDecisionStatementType"/>
+    <xsd:complexType name="SamlAuthzDecisionStatementEvidenceType">
+        <xsd:sequence>
+            <xsd:element name="assertion" type="tns:SamlAuthzDecisionStatementEvidenceAssertionType" minOccurs="0"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:element name="SamlAuthzDecisionStatementEvidence" type="tns:SamlAuthzDecisionStatementEvidenceType"/>
+    <xsd:complexType name="SamlAuthzDecisionStatementEvidenceAssertionType">
+        <xsd:sequence>
+            <xsd:element name="id" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="issueInstant" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="version" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="issuer" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="issuerFormat" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="subject" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="conditions" type="tns:SamlAuthzDecisionStatementEvidenceConditionsType" minOccurs="0"/>
+            <xsd:element name="accessConsentPolicy" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+            <xsd:element name="instanceAccessConsentPolicy" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:element name="SamlAuthzDecisionStatementEvidenceAssertion" type="tns:SamlAuthzDecisionStatementEvidenceAssertionType"/>
+    <xsd:complexType name="SamlAuthzDecisionStatementEvidenceConditionsType">
+        <xsd:sequence>
+            <xsd:element name="notBefore" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="notOnOrAfter" type="xsd:string" minOccurs="0"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:element name="SamlAuthzDecisionStatementEvidenceConditions" type="tns:SamlAuthzDecisionStatementEvidenceConditionsType"/>
+    <xsd:complexType name="SamlIssuerType">
+        <xsd:sequence>
+            <xsd:element name="issuer" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="issuerFormat" type="xsd:string" minOccurs="0"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:element name="SamlIssuer" type="tns:SamlIssuerType"/>
+    <xsd:complexType name="SamlSignatureType">
+        <xsd:sequence>
+            <xsd:element name="keyInfo" type="tns:SamlSignatureKeyInfoType" minOccurs="0"/>
+            <xsd:element name="signatureValue" type="xsd:base64Binary" minOccurs="0"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:element name="SamlSignature" type="tns:SamlSignatureType"/>
+    <xsd:complexType name="SamlSignatureKeyInfoType">
+        <xsd:sequence>
+            <xsd:element name="rsaKeyValueModulus" type="xsd:base64Binary" minOccurs="0"/>
+            <xsd:element name="rsaKeyValueExponent" type="xsd:base64Binary" minOccurs="0"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:element name="SamlSignatureKeyInfo" type="tns:SamlSignatureKeyInfoType"/>
+    <xsd:complexType name="AddressType">
+        <xsd:sequence>
+            <xsd:element name="addressType" type="tns:CeType"/>
+            <xsd:element name="city" type="xsd:string"/>
+            <xsd:element name="country" type="xsd:string"/>
+            <xsd:element name="state" type="xsd:string"/>
+            <xsd:element name="streetAddress" type="xsd:string"/>
+            <xsd:element name="zipCode" type="xsd:string"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:element name="Address" type="tns:AddressType"/>
+    <xsd:complexType name="AddressesType">
+        <xsd:sequence>
+            <xsd:element name="address" type="tns:AddressType" maxOccurs="unbounded"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:element name="Addresses" type="tns:AddressesType"/>
+    <xsd:complexType name="CeType">
+        <xsd:sequence>
+            <xsd:element name="code" type="xsd:string"/>
+            <xsd:element name="codeSystem" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="codeSystemName" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="codeSystemVersion" type="xsd:string"/>
+            <xsd:element name="displayName" type="xsd:string"/>
+            <xsd:element name="originalText" type="xsd:string"/>
+            <xsd:element name="translation" type="tns:CeType" minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:element name="Ce" type="tns:CeType"/>
+    <xsd:complexType name="HomeCommunityType">
+        <xsd:sequence>
+            <xsd:element name="description" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="homeCommunityId" type="xsd:string"/>
+            <xsd:element name="name" type="xsd:string" minOccurs="0"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:element name="HomeCommunity" type="tns:HomeCommunityType"/>
+    <xsd:complexType name="HomeCommunitiesType">
+        <xsd:sequence>
+            <xsd:element name="homeCommunity" type="tns:HomeCommunityType" minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:element name="HomeCommunities" type="tns:HomeCommunitiesType"/>
+    <xsd:complexType name="PersonNameType">
+        <xsd:sequence>
+            <xsd:element name="familyName" type="xsd:string"/>
+            <xsd:element name="givenName" type="xsd:string"/>
+            <xsd:element name="nameType" type="tns:CeType"/>
+            <xsd:element name="secondNameOrInitials" type="xsd:string"/>
+            <xsd:element name="fullName" type="xsd:string"/>
+            <xsd:element name="prefix" type="xsd:string" />
+            <xsd:element name="suffix" type="xsd:string" />
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:element name="PersonName" type="tns:PersonNameType"/>
+    <xsd:complexType name="PhoneType">
+        <xsd:sequence>
+            <xsd:element name="areaCode" type="xsd:string"/>
+            <xsd:element name="countryCode" type="xsd:string"/>
+            <xsd:element name="extension" type="xsd:string"/>
+            <xsd:element name="localNumber" type="xsd:string"/>
+            <xsd:element name="phoneNumberType" type="tns:CeType"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:element name="Phone" type="tns:PhoneType"/>
+    <xsd:complexType name="UserType">
+        <xsd:sequence>
+            <xsd:element name="personName" type="tns:PersonNameType"/>
+            <xsd:element name="userName" type="xsd:string"/>
+            <xsd:element name="org" type="tns:HomeCommunityType"/>
+            <xsd:element name="roleCoded" type="tns:CeType"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:element name="User" type="tns:UserType"/>
+    <!--
+    <xsd:complexType name="EPRType">
+        <xsd:sequence>
+            <xsd:element name="EndpointReference" type="addr:EndpointReferenceType"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    -->
+    <xsd:element name="EPR" type="addr:EndpointReferenceType"/>
+    <xsd:complexType name="CreateEPRRequestType">
+        <xsd:sequence>
+            <xsd:element name="endpointURL" type="xsd:string"/>
+            <xsd:element name="namespaceURI" type="xsd:string"/>
+            <xsd:element name="namespacePrefix" type="xsd:string"/>
+            <xsd:element name="serviceName" type="xsd:string"/>
+            <xsd:element name="portName" type="xsd:string"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:element name="CreateEPRRequest" type="tns:CreateEPRRequestType"/>
+    <xsd:complexType name="NhinTargetSystemType">
+        <xsd:sequence>
+            <xsd:choice>
+                <xsd:element name="epr" type="addr:EndpointReferenceType"/>
+                <xsd:element name="homeCommunity" type="tns:HomeCommunityType"/>
+                <xsd:element name="url" type="xsd:string"/>
+                <xsd:element name="exchangeName" type="xsd:string" minOccurs="0"/>
+            </xsd:choice>
+            <xsd:element name="useSpecVersion" type="xsd:string" minOccurs="0"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:element name="NhinTargetSystem" type="tns:NhinTargetSystemType"/>
+    <xsd:complexType name="ResponseType">
+        <xsd:sequence>
+            <xsd:element name="status" type="xsd:boolean"/>
+            <xsd:element name="message" type="xsd:string"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:element name="Response" type="tns:ResponseType"/>
+    <xsd:complexType name="TokenCreationInfoType">
+        <xsd:sequence>
+            <xsd:element name="assertion" type="tns:AssertionType"/>
+            <xsd:element name="actionName" type="xsd:string"/>
+            <xsd:element name="resourceName" type="xsd:string"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:element name="TokenCreationInfo" type="tns:TokenCreationInfoType"/>
+    <xsd:complexType name="TokenRetrieveInfoType">
+        <xsd:sequence>
+            <xsd:element name="request" type="xsd:string"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:element name="TokenRetrieveInfo" type="tns:TokenRetrieveInfoType"/>
+    <xsd:complexType name="AssigningAuthorityType">
+        <xsd:sequence>
+            <xsd:element name="assigningAuthorityId" type="xsd:string"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:element name="AssigningAuthority" type="tns:AssigningAuthorityType"/>
+    <xsd:complexType name="AssigningAuthoritiesType">
+        <xsd:sequence>
+            <xsd:element name="assigningAuthority" type="tns:AssigningAuthorityType" minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:element name="assigningAuthorites" type="tns:AssigningAuthoritiesType"/>
+    <xsd:complexType name="NhinTargetCommunityType">
+        <xsd:sequence>
+            <xsd:element name="homeCommunity" type="tns:HomeCommunityType"/>
+            <xsd:element name="list" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="region" type="xsd:string" minOccurs="0"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:complexType name="NhinTargetCommunitiesType">
+        <xsd:sequence>
+            <xsd:element name="nhinTargetCommunity" type="tns:NhinTargetCommunityType" maxOccurs="unbounded"/>
+            <xsd:element name="useSpecVersion" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="exchangeName" type="xsd:string" minOccurs="0"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:element name="NhinTargetCommunities" type="tns:NhinTargetCommunitiesType"/>
+    <xsd:element name="NhinTargetCommunity" type="tns:NhinTargetCommunityType"/>
+    <xsd:complexType name="UrlSetType">
+        <xsd:sequence>
+            <xsd:element name="url" type="xsd:string" minOccurs="0" maxOccurs="unbounded"></xsd:element>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:element name="UrlSet" type="tns:UrlSetType"/>
+    <xsd:complexType name="UrlInfoType">
+        <xsd:sequence>
+            <xsd:element name="url" type="xsd:string"></xsd:element>
+            <xsd:element name="id" type="xsd:string"></xsd:element>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:element name="UrlInfo" type="tns:UrlInfoType"></xsd:element>
+    <xsd:complexType name="CONNECTCustomHttpHeadersType">
+        <xsd:sequence>
+            <xsd:element name="headerName" type="xsd:string"/>
+            <xsd:element name="headerValue" type="xsd:string"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:element name="CONNECTCustomHttpHeaders" type="tns:CONNECTCustomHttpHeadersType" />
+    <xsd:complexType name="SamlSubjectConfirmationType">
+        <xsd:sequence>
+            <xsd:element name="method" type="xsd:string" minOccurs="1"/>
+            <xsd:element name="subjectCondition" type="tns:SamlConditionsType" minOccurs="0"/>
+            <xsd:element name="recipient" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="inResponseTo" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="address" type="xsd:string" minOccurs="0"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:complexType name="ConfigAssertionType">
+        <xsd:sequence>
+            <xsd:element name="userInfo" type="tns:UserType" />
+            <xsd:element name="configInstance" type="xsd:string" />
+            <xsd:element name="authMethod" type="xsd:string" />
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:element name="ConfigAssertion" type="tns:ConfigAssertionType" />
+</xsd:schema>
+
+

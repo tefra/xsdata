@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            targetNamespace="urn:gov:hhs:fha:nhinc:gateway:samltokendata"
+            xmlns:tns="urn:gov:hhs:fha:nhinc:gateway:samltokendata"
+            elementFormDefault="qualified">
+    <xsd:complexType name="SamlTokenDataType">
+        <xsd:sequence>
+            <xsd:element name="action" type="xsd:string">
+            </xsd:element>
+            <xsd:element name="resource" type="xsd:string">
+            </xsd:element>
+            <xsd:element name="purposeOfUseRoleCode" type="xsd:string">
+            </xsd:element>
+            <xsd:element name="purposeOfUseCodeSystem" type="xsd:string">
+            </xsd:element>
+            <xsd:element name="purposeOfUseCodeSystemName" type="xsd:string">
+            </xsd:element>
+            <xsd:element name="purposeOfUseDisplayName" type="xsd:string">
+            </xsd:element>
+            <xsd:element name="userFirstName" type="xsd:string">
+            </xsd:element>
+            <xsd:element name="userMiddleName" type="xsd:string">
+            </xsd:element>
+            <xsd:element name="userLastName" type="xsd:string">
+            </xsd:element>
+            <xsd:element name="userName" type="xsd:string">
+            </xsd:element>
+            <xsd:element name="userOrganization" type="xsd:string">
+            </xsd:element>
+            <xsd:element name="userRoleCode" type="xsd:string">
+            </xsd:element>
+            <xsd:element name="userRoleCodeSystem" type="xsd:string">
+            </xsd:element>
+            <xsd:element name="userRoleCodeSystemName" type="xsd:string">
+            </xsd:element>
+            <xsd:element name="userRoleCodeDisplayName" type="xsd:string">
+            </xsd:element>
+            <xsd:element name="expirationDate" type="xsd:string">
+            </xsd:element>
+            <xsd:element name="signDate" type="xsd:string">
+            </xsd:element>
+            <xsd:element name="contentReference" type="xsd:string">
+            </xsd:element>
+            <xsd:element name="content" type="xsd:base64Binary">
+            </xsd:element>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:element name="SamlTokenData" type="tns:SamlTokenDataType"/>
+</xsd:schema>

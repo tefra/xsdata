@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns="urn:hl7-org:v3" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:mif="urn:hl7-org:v3/mif" xmlns:nccommon="urn:gov:hhs:fha:nhinc:common:nhinccommon" targetNamespace="urn:hl7-org:v3" elementFormDefault="qualified">
+	<!-- =========================================================================
+        This schema is a helper schema.  It is required because XML Schemas
+        do not allow you to import multiple schemas that use the same namespace.
+        The only way to do it is to use include to get them all into one file and
+        then import only the one file.  Since HL7 has broken apart their messages
+        into separate files but uses the same namespace, we need to compbine them
+        together so that we can access them.
+        
+        NOTE:  All schemas that contain references to multiple HL7 files must
+               be defined in this schema.
+        ========================================================================= -->
+	<xsd:include schemaLocation="../../HL7V3/NE2008/multicacheschemas/PRPA_IN201301UV02.xsd"/>
+	<xsd:include schemaLocation="../../HL7V3/NE2008/multicacheschemas/PRPA_IN201302UV02.xsd"/>
+	<xsd:include schemaLocation="../../HL7V3/NE2008/multicacheschemas/PRPA_IN201304UV02.xsd"/>
+	<xsd:include schemaLocation="../../HL7V3/NE2008/multicacheschemas/PRPA_IN201305UV02.xsd"/>
+	<xsd:include schemaLocation="../../HL7V3/NE2008/multicacheschemas/PRPA_IN201306UV02.xsd"/>
+	<xsd:include schemaLocation="../../HL7V3/NE2008/multicacheschemas/PRPA_IN201309UV02.xsd"/>
+	<xsd:include schemaLocation="../../HL7V3/NE2008/multicacheschemas/MCCI_IN000002UV01.xsd"/>
+	<xsd:import namespace="urn:gov:hhs:fha:nhinc:common:nhinccommon" schemaLocation="../common/NhincCommon.xsd"/>
+	<!-- ====================================================================
+         Patient Discovery Schemas.
+         ==================================================================== -->
+	<xsd:complexType name="PIXConsumer_PRPA_IN201301UVProxyRequestType">
+		<xsd:sequence>
+			<xsd:element ref="PRPA_IN201301UV02"/>
+			<xsd:element name="assertion" type="nccommon:AssertionType"/>
+			<xsd:element name="nhinTargetSystem" type="nccommon:NhinTargetSystemType"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="PIXConsumer_PRPA_IN201301UVProxyRequest" type="PIXConsumer_PRPA_IN201301UVProxyRequestType"/>
+	<xsd:complexType name="PIXConsumer_PRPA_IN201301UVProxySecuredRequestType">
+		<xsd:sequence>
+			<xsd:element ref="PRPA_IN201301UV02"/>
+			<xsd:element name="nhinTargetSystem" type="nccommon:NhinTargetSystemType"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="PIXConsumer_PRPA_IN201301UVProxySecuredRequest" type="PIXConsumer_PRPA_IN201301UVProxySecuredRequestType"/>
+	<xsd:complexType name="PIXConsumer_PRPA_IN201302UVProxyRequestType">
+		<xsd:sequence>
+			<xsd:element ref="PRPA_IN201302UV02"/>
+			<xsd:element name="assertion" type="nccommon:AssertionType"/>
+			<xsd:element name="nhinTargetSystem" type="nccommon:NhinTargetSystemType"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="PIXConsumer_PRPA_IN201302UVProxyRequest" type="PIXConsumer_PRPA_IN201302UVProxyRequestType"/>
+	<xsd:complexType name="PIXConsumer_PRPA_IN201302UVProxySecuredRequestType">
+		<xsd:sequence>
+			<xsd:element ref="PRPA_IN201302UV02"/>
+			<xsd:element name="nhinTargetSystem" type="nccommon:NhinTargetSystemType"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="PIXConsumer_PRPA_IN201302UVProxySecuredRequest" type="PIXConsumer_PRPA_IN201302UVProxySecuredRequestType"/>
+	<xsd:complexType name="PIXConsumer_PRPA_IN201304UVProxyRequestType">
+		<xsd:sequence>
+			<xsd:element ref="PRPA_IN201304UV02"/>
+			<xsd:element name="assertion" type="nccommon:AssertionType"/>
+			<xsd:element name="nhinTargetSystem" type="nccommon:NhinTargetSystemType"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="PIXConsumer_PRPA_IN201304UVProxyRequest" type="PIXConsumer_PRPA_IN201304UVProxyRequestType"/>
+	<xsd:complexType name="PIXConsumer_PRPA_IN201304UVProxySecuredRequestType">
+		<xsd:sequence>
+			<xsd:element ref="PRPA_IN201304UV02"/>
+			<xsd:element name="nhinTargetSystem" type="nccommon:NhinTargetSystemType"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="PIXConsumer_PRPA_IN201304UVProxySecuredRequest" type="PIXConsumer_PRPA_IN201304UVProxySecuredRequestType"/>
+
+    <xsd:import namespace="urn:hl7-org:v3" schemaLocation="Proxy_PRPA_IN201305UVProxyRequest.xsd"/>
+    <xsd:import namespace="urn:hl7-org:v3" schemaLocation="Proxy_PRPA_IN201306UVProxyRequest.xsd"/>
+	
+    <xsd:complexType name="PIXConsumer_PRPA_IN201309UVProxyRequestType">
+		<xsd:sequence>
+			<xsd:element ref="PRPA_IN201309UV02"/>
+			<xsd:element name="assertion" type="nccommon:AssertionType"/>
+			<xsd:element name="nhinTargetSystem" type="nccommon:NhinTargetSystemType"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="PIXConsumer_PRPA_IN201309UVProxyRequest" type="PIXConsumer_PRPA_IN201309UVProxyRequestType"/>
+	<xsd:complexType name="PIXConsumer_PRPA_IN201309UVProxySecuredRequestType">
+		<xsd:sequence>
+			<xsd:element ref="PRPA_IN201309UV02"/>
+			<xsd:element name="nhinTargetSystem" type="nccommon:NhinTargetSystemType"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="PIXConsumer_PRPA_IN201309UVProxySecuredRequest" type="PIXConsumer_PRPA_IN201309UVProxySecuredRequestType"/>
+</xsd:schema>

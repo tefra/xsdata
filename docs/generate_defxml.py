@@ -49,6 +49,9 @@ bind_tpl = """{title}
    :language: xml
    :lines: 2-
 
+.. literalinclude:: /../{output}
+   :language: python
+
 **XML Document**
 
 .. literalinclude:: /../{instance}
@@ -81,40 +84,35 @@ chapter_tpl = """{title}
 
 
 def generate():
-    schemas = defaultdict(list)
-    for xsd in fixtures.glob("defxmlschema/*/*.xsd"):
-        schemas[xsd.parent.name].append(xsd)
+    for xsd in fixtures.glob("defxmlschema/chapter*.xsd"):
 
-    for chapter, xsds in schemas.items():
+        if len(xsd.stem) != 9:
+            continue
+
         buffer = list()
         section_titles.clear()
 
-        for xsd in sorted(xsds):
-            if not xsd.with_suffix(".py").exists():
-                continue
+        if not xsd.with_suffix(".py").exists():
+            continue
 
-            input = xsd.relative_to(root)
-            output = input.with_suffix(".py")
+        input = xsd.relative_to(root)
+        output = input.with_suffix(".py")
 
-            if xsd.stem.startswith("example"):
-                title = parse_title(xsd.read_text())
-                title = "{title}\n{line}".format(title=title, line="*" * len(title))
-                buffer.append(tpl.format(title=title, input=input, output=output))
-            elif xsd.stem.startswith("chapter"):
-                if xsd.with_suffix(".xml").exists():
-                    title = "Binding Test"
-                    title = "{title}\n{line}".format(title=title, line="*" * len(title))
-                    buffer.append(
-                        bind_tpl.format(
-                            title=title,
-                            input=input,
-                            output=output,
-                            instance=input.with_suffix(".xml"),
-                            xsdata_instance=input.with_suffix(".xsdata.xml"),
-                            xsdata_json=input.with_suffix(".json"),
-                        )
-                    )
+        if xsd.with_suffix(".xml").exists():
+            title = "Binding Test"
+            title = "{title}\n{line}".format(title=title, line="*" * len(title))
+            buffer.append(
+                bind_tpl.format(
+                    title=title,
+                    input=input,
+                    output=output,
+                    instance=input.with_suffix(".xml"),
+                    xsdata_instance=input.with_suffix(".xsdata.xml"),
+                    xsdata_json=input.with_suffix(".json"),
+                )
+            )
 
+        chapter = xsd.stem
         title = chapter.replace("chapter", "Chapter ")
         title = "{line}\n{title}\n{line}".format(line="*" * len(title), title=title)
         subtitle = subtitles[chapter]

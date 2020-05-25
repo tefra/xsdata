@@ -1,8 +1,0 @@
-<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
-<!-- Example 12-31 Attribute reference -->
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
-  <xs:attribute name="effDate" type="xs:date" default="1900-01-01" />
-  <xs:complexType name="ProductType">
-    <xs:attribute ref="effDate" default="2000-12-31" />
-  </xs:complexType>
-</xs:schema>

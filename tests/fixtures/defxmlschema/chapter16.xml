@@ -1,0 +1,23 @@
+<!--Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<items xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="chapter16.xsd">
+  <product>
+    <number>999</number>
+    <name>Special Seasonal</name>
+  </product>
+  <shirt>
+    <number>557</number>
+    <name>Short-Sleeved Linen Blouse</name>
+    <size>10</size>
+    <color value="blue"/>
+  </shirt>
+  <hat>
+    <number>563</number>
+    <name>Ten-Gallon Hat</name>
+    <size>L</size>
+  </hat>
+  <umbrella>
+    <number>443</number>
+    <name>Deluxe Golf Umbrella</name>
+  </umbrella>
+</items>

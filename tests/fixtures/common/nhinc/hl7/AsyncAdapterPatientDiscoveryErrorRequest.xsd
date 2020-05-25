@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns="urn:hl7-org:v3" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:nccommon="urn:gov:hhs:fha:nhinc:common:nhinccommon" targetNamespace="urn:hl7-org:v3" elementFormDefault="qualified">
+	
+	<xsd:include schemaLocation="../../HL7V3/NE2008/multicacheschemas/PRPA_IN201305UV02.xsd"/>
+	<xsd:include schemaLocation="../../HL7V3/NE2008/multicacheschemas/PRPA_IN201306UV02.xsd"/>
+	<xsd:import namespace="urn:gov:hhs:fha:nhinc:common:nhinccommon" schemaLocation="../common/NhincCommon.xsd"/>
+	
+    <xsd:complexType name="AsyncAdapterPatientDiscoveryErrorRequestType">
+		<xsd:sequence>
+			<xsd:element ref="PRPA_IN201305UV02"/>
+                        <xsd:element ref="PRPA_IN201306UV02"/>
+			<xsd:element name="assertion" type="nccommon:AssertionType"/>
+			<xsd:element name="NhinTargetCommunities" type="nccommon:NhinTargetCommunitiesType"/>
+                        <xsd:element name="errorMsg" type="xsd:string"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="AsyncAdapterPatientDiscoveryErrorRequest" type="AsyncAdapterPatientDiscoveryErrorRequestType"/>
+	<xsd:complexType name="AsyncAdapterPatientDiscoveryErrorSecuredRequestType">
+		<xsd:sequence>
+			<xsd:element ref="PRPA_IN201305UV02"/>
+                        <xsd:element ref="PRPA_IN201306UV02"/>
+			<xsd:element name="NhinTargetCommunities" type="nccommon:NhinTargetCommunitiesType"/>
+                        <xsd:element name="errorMsg" type="xsd:string"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="AsyncAdapterPatientDiscoveryErrorSecuredRequest" type="AsyncAdapterPatientDiscoveryErrorSecuredRequestType"/>
+</xsd:schema>

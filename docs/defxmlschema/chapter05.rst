@@ -10,25 +10,28 @@ Binding Test
 
 **Schema**
 
-.. literalinclude:: /../tests/fixtures/defxmlschema/chapter05/chapter05.xsd
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter05.xsd
    :language: xml
    :lines: 2-
 
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter05.py
+   :language: python
+
 **XML Document**
 
-.. literalinclude:: /../tests/fixtures/defxmlschema/chapter05/chapter05.xml
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter05.xml
    :language: xml
    :lines: 2-
 
 **xsData XML Document**
 
-.. literalinclude:: /../tests/fixtures/defxmlschema/chapter05/chapter05.xsdata.xml
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter05.xsdata.xml
    :language: xml
    :lines: 2-
 
 **xsData JSON**
 
-.. literalinclude:: /../tests/fixtures/defxmlschema/chapter05/chapter05.json
+.. literalinclude:: /../tests/fixtures/defxmlschema/chapter05.json
    :language: json
 
 .. admonition:: Samples Source

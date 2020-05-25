@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns="urn:ihe:iti:xcpd:2009" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:hl7="urn:hl7-org:v3"
+	targetNamespace="urn:ihe:iti:xcpd:2009"
+	elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:import namespace="urn:hl7-org:v3" schemaLocation="../coreschemas/infrastructureRoot.xsd"/>
+	<xs:element name="CorrelationTimeToLive" type="xs:duration"/>
+	<xs:complexType name="PatientLocationQueryRequestType">
+		<xs:sequence>
+			<xs:element name="RequestedPatientId" type="hl7:II" maxOccurs="1" minOccurs="1">
+				<xs:annotation>
+					<xs:documentation>The Patient Identifier known by the responder</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="PatientLocationQueryResponseType">
+		<xs:sequence>
+			<xs:element name="PatientLocationResponse" minOccurs="0" maxOccurs="unbounded">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="HomeCommunityId" type="xs:anyURI">
+							<xs:annotation>
+								<xs:documentation>This is the unique identifier of the community
+									that knows of the patient</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="CorrespondingPatientId" type="hl7:II">
+							<xs:annotation>
+								<xs:documentation>This is the patient identifier as known in the
+									community identified by homeCommunityId</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="RequestedPatientId" type="hl7:II">
+							<xs:annotation>
+								<xs:documentation>This is the patient identifier from the pation
+									location request</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="PatientLocationQueryRequest" type="PatientLocationQueryRequestType"/>
+	<xs:element name="PatientLocationQueryResponse" type="PatientLocationQueryResponseType"/>
+</xs:schema>

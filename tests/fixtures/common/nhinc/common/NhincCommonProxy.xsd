@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tns="urn:gov:hhs:fha:nhinc:common:nhinccommonproxy" xmlns:hl7="urn:hl7-org:v3" xmlns:query="urn:oasis:names:tc:ebxml-regrep:xsd:query:3.0" xmlns:rs="urn:oasis:names:tc:ebxml-regrep:xsd:rs:3.0" xmlns:ihe="urn:ihe:iti:xds-b:2007"  xmlns:nccommon="urn:gov:hhs:fha:nhinc:common:nhinccommon"  xmlns:edxlde="urn:oasis:names:tc:emergency:EDXL:DE:1.0" targetNamespace="urn:gov:hhs:fha:nhinc:common:nhinccommonproxy" elementFormDefault="qualified">
+	<xsd:import namespace="urn:gov:hhs:fha:nhinc:common:nhinccommon" schemaLocation="NhincCommon.xsd"/>
+	<xsd:import namespace="urn:oasis:names:tc:ebxml-regrep:xsd:query:3.0" schemaLocation="../../ebRS/query.xsd"/>
+	<xsd:import namespace="urn:oasis:names:tc:ebxml-regrep:xsd:rs:3.0" schemaLocation="../../ebRS/rs.xsd"/>
+	<xsd:import namespace="urn:ihe:iti:xds-b:2007" schemaLocation="../../ihe/XDS.b_DocumentRepository.xsd"/>
+	<xsd:import namespace="urn:oasis:names:tc:emergency:EDXL:DE:1.0" schemaLocation="../../../schemas/ebRS/edxl-de.xsd"/>
+	<!-- ====================================================================
+         Document Query Schemas.
+         ==================================================================== -->
+	<xsd:complexType name="RespondingGateway_CrossGatewayQueryRequestType">
+		<xsd:sequence>
+			<xsd:element ref="query:AdhocQueryRequest"/>
+			<xsd:element name="assertion" type="nccommon:AssertionType"/>
+			<xsd:element name="nhinTargetSystem" type="nccommon:NhinTargetSystemType"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="RespondingGateway_CrossGatewayQueryRequest" type="tns:RespondingGateway_CrossGatewayQueryRequestType"/>
+	<xsd:complexType name="RespondingGateway_CrossGatewayQuerySecuredRequestType">
+		<xsd:sequence>
+			<xsd:element ref="query:AdhocQueryRequest"/>
+			<xsd:element name="nhinTargetSystem" type="nccommon:NhinTargetSystemType"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="RespondingGateway_CrossGatewayQuerySecuredRequest" type="tns:RespondingGateway_CrossGatewayQuerySecuredRequestType"/>
+	<xsd:complexType name="RespondingGateway_CrossGatewayQueryResponseType">
+		<xsd:sequence>
+			<xsd:element ref="query:AdhocQueryResponse"/>
+			<xsd:element name="assertion" type="nccommon:AssertionType"/>
+			<xsd:element name="nhinTargetSystem" type="nccommon:NhinTargetSystemType" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="RespondingGateway_CrossGatewayQueryResponse" type="tns:RespondingGateway_CrossGatewayQueryResponseType"/>
+	<xsd:complexType name="RespondingGateway_CrossGatewayQueryResponseSecuredType">
+		<xsd:sequence>
+			<xsd:element ref="query:AdhocQueryResponse"/>
+			<xsd:element name="nhinTargetSystem" type="nccommon:NhinTargetSystemType" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="RespondingGateway_CrossGatewayQueryResponseSecured" type="tns:RespondingGateway_CrossGatewayQueryResponseSecuredType"/>
+	<!-- ====================================================================
+         Document Retrieve Schemas.
+         ==================================================================== -->
+	<xsd:complexType name="RespondingGateway_CrossGatewayRetrieveRequestType">
+		<xsd:sequence>
+			<xsd:element ref="ihe:RetrieveDocumentSetRequest"/>
+			<xsd:element name="assertion" type="nccommon:AssertionType"/>
+			<xsd:element name="nhinTargetSystem" type="nccommon:NhinTargetSystemType"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="RespondingGateway_CrossGatewayRetrieveRequest" type="tns:RespondingGateway_CrossGatewayRetrieveRequestType"/>
+	<xsd:complexType name="RespondingGateway_CrossGatewayRetrieveSecuredRequestType">
+		<xsd:sequence>
+			<xsd:element ref="ihe:RetrieveDocumentSetRequest"/>
+			<xsd:element name="nhinTargetSystem" type="nccommon:NhinTargetSystemType"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="RespondingGateway_CrossGatewayRetrieveSecuredRequest" type="tns:RespondingGateway_CrossGatewayRetrieveSecuredRequestType"/>
+	<xsd:complexType name="RespondingGateway_CrossGatewayRetrieveResponseType">
+		<xsd:sequence>
+			<xsd:element ref="ihe:RetrieveDocumentSetResponse"/>
+			<xsd:element name="assertion" type="nccommon:AssertionType"/>
+			<xsd:element name="nhinTargetSystem" type="nccommon:NhinTargetSystemType"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="RespondingGateway_CrossGatewayRetrieveResponse" type="tns:RespondingGateway_CrossGatewayRetrieveResponseType"/>
+	<xsd:complexType name="RespondingGateway_CrossGatewayRetrieveSecuredResponseType">
+		<xsd:sequence>
+			<xsd:element ref="ihe:RetrieveDocumentSetResponse"/>
+			<xsd:element name="nhinTargetSystem" type="nccommon:NhinTargetSystemType"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="RespondingGateway_CrossGatewayRetrieveSecuredResponse" type="tns:RespondingGateway_CrossGatewayRetrieveSecuredResponseType"/>
+	<!-- ====================================================================
+         XDR Schemas.
+         ==================================================================== -->
+	<xsd:complexType name="RespondingGateway_ProvideAndRegisterDocumentSetRequestType">
+		<xsd:sequence>
+			<xsd:element name="assertion" type="nccommon:AssertionType"/>
+			<xsd:element name="nhinTargetSystem" type="nccommon:NhinTargetSystemType"/>
+			<xsd:element name="ProvideAndRegisterDocumentSetRequest" type="ihe:ProvideAndRegisterDocumentSetRequestType"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="RespondingGateway_ProvideAndRegisterDocumentSetRequest" type="tns:RespondingGateway_ProvideAndRegisterDocumentSetRequestType"/>
+	<xsd:complexType name="RespondingGateway_ProvideAndRegisterDocumentSetSecuredRequestType">
+		<xsd:sequence>
+			<xsd:element name="nhinTargetSystem" type="nccommon:NhinTargetSystemType"/>
+			<xsd:element name="ProvideAndRegisterDocumentSetRequest" type="ihe:ProvideAndRegisterDocumentSetRequestType"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="RespondingGateway_ProvideAndRegisterDocumentSetSecuredRequest" type="tns:RespondingGateway_ProvideAndRegisterDocumentSetSecuredRequestType"/>
+	<xsd:complexType name="RespondingGateway_ProvideAndRegisterDocumentSetResponseRequestType">
+		<xsd:sequence>
+			<xsd:element name="assertion" type="nccommon:AssertionType"/>
+			<xsd:element name="nhinTargetSystem" type="nccommon:NhinTargetSystemType"/>
+			<xsd:element name="RegistryResponse" type="rs:RegistryResponseType"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="RespondingGateway_ProvideAndRegisterDocumentSetResponseRequest" type="tns:RespondingGateway_ProvideAndRegisterDocumentSetResponseRequestType"/>
+	<xsd:complexType name="RespondingGateway_ProvideAndRegisterDocumentSetSecuredResponseRequestType">
+		<xsd:sequence>
+			<xsd:element name="nhinTargetSystem" type="nccommon:NhinTargetSystemType"/>
+			<xsd:element name="RegistryResponse" type="rs:RegistryResponseType"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="RespondingGateway_ProvideAndRegisterDocumentSetSecuredResponseRequest" type="tns:RespondingGateway_ProvideAndRegisterDocumentSetSecuredResponseRequestType"/>
+	<xsd:complexType name="RespondingGateway_SendAlertMessageType">
+		<xsd:sequence>
+			<xsd:element name="assertion" type="nccommon:AssertionType"/>
+			<xsd:element name="nhinTargetSystem" type="nccommon:NhinTargetSystemType" minOccurs="0"/>
+			<xsd:element ref="edxlde:EDXLDistribution"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="RespondingGateway_SendAlertMessage" type="tns:RespondingGateway_SendAlertMessageType"/>
+	<xsd:complexType name="RespondingGateway_SendAlertMessageSecuredType">
+		<xsd:sequence>
+			<xsd:element ref="edxlde:EDXLDistribution"/>
+			<xsd:element name="nhinTargetSystem" type="nccommon:NhinTargetSystemType" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="RespondingGateway_SendAlertMessageSecured" type="tns:RespondingGateway_SendAlertMessageSecuredType"/>
+</xsd:schema>

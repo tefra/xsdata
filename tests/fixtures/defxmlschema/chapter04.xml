@@ -1,0 +1,18 @@
+<!--Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<ord:order  xmlns:ord="http://example.org/ord"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:schemaLocation="http://example.org/ord chapter04.xsd">
+  <number>123ABBCC123</number>
+  <customer>
+    <name>Priscilla Walmsley</name>
+    <number>15466</number>
+  </customer>
+  <items>
+    <product>
+      <number>557</number>
+      <name>Short-Sleeved Linen Blouse</name>
+      <size system="US-DRESS">10</size>
+      <color value="blue"/>
+    </product>
+  </items>
+</ord:order>

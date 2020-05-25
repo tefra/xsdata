@@ -1,0 +1,30 @@
+<!--Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<order xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="chapter17.xsd">
+  <number>123ABBCC123</number>
+  <items>
+    <shirt number="557">
+      <quantity>1</quantity>
+      <color value="blue"/>
+    </shirt>
+    <shirt number="557">
+      <quantity>1</quantity>
+      <color value="sage"/>
+    </shirt>
+    <hat number="563">
+      <quantity>1</quantity>
+    </hat>
+  </items>
+  <products>
+    <product>
+      <number>557</number>
+      <name>Short-Sleeved Linen Blouse</name>
+      <price currency="USD">29.99</price>
+    </product>
+    <product>
+      <number>563</number>
+      <name>Ten-Gallon Hat</name>
+      <price currency="USD">69.99</price>
+    </product>
+  </products>
+</order>

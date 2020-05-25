@@ -1,0 +1,30 @@
+<!--Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns="http://example.org/prod"
+            targetNamespace="http://example.org/prod"
+            elementFormDefault="qualified">
+
+  <xsd:annotation>
+    <xsd:documentation>
+      This example illustrates various element declarations.  It contains global and local element
+      declarations, named and anonymous types, and fixed and default values (which will be applied
+      in this case.)
+    </xsd:documentation>
+  </xsd:annotation>
+
+  <xsd:element name="product" type="ProductType"/>
+  <xsd:element name="size" type="xsd:integer" fixed="10"/>
+
+  <xsd:complexType name="ProductType">
+    <xsd:sequence>
+      <xsd:element name="name" default="N/A">
+        <xsd:simpleType>
+          <xsd:restriction base="xsd:string">
+            <xsd:minLength value="1"/>
+          </xsd:restriction>
+        </xsd:simpleType>
+      </xsd:element>
+      <xsd:element ref="size" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+</xsd:schema>

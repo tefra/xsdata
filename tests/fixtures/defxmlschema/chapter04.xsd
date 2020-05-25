@@ -1,0 +1,29 @@
+<!--Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            targetNamespace="http://example.org/ord"
+            xmlns="http://example.org/ord"
+            xmlns:prod="http://example.org/prod">
+
+  <xsd:annotation>
+    <xsd:documentation>
+      This pulls together examples 4-3, 4-4 and 4-5, illustrating include, chameleon include,
+      and import, respectively.  Note that only the root element of the instance is prefixed,
+      because all elements in all schema documents are declared locally and no
+      elementFormDefault is specified.
+    </xsd:documentation>
+  </xsd:annotation>
+
+  <xsd:include schemaLocation="chapter04ord2.xsd"/>
+  <xsd:include schemaLocation="chapter04cust.xsd"/>
+  <xsd:import namespace="http://example.org/prod" schemaLocation="chapter04prod.xsd"/>
+
+  <xsd:element name="order" type="OrderType"/>
+  <xsd:complexType name="OrderType">
+    <xsd:sequence>
+      <xsd:element name="number" type="OrderNumType"/>
+      <xsd:element name="customer" type="CustomerType"/>
+      <xsd:element name="items" type="prod:ItemsType"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+</xsd:schema>

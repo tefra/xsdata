@@ -9,10 +9,10 @@ from lxml.etree import QName
 
 from tests.fixtures.books import BookForm
 from tests.fixtures.books import Books
-from tests.fixtures.defxmlschema.chapter02.example0210 import Product
-from tests.fixtures.defxmlschema.chapter05.chapter05prod import ProductType
-from tests.fixtures.defxmlschema.chapter11.example1101 import TextType
-from tests.fixtures.defxmlschema.chapter13.chapter13 import ItemsType
+from tests.fixtures.defxmlschema.chapter03prod import Product
+from tests.fixtures.defxmlschema.chapter05prod import ProductType
+from tests.fixtures.defxmlschema.chapter13 import ItemsType
+from tests.fixtures.defxmlschema.chapter16 import Umbrella
 from xsdata.exceptions import XmlContextError
 from xsdata.formats.dataclass.context import XmlContext
 from xsdata.formats.dataclass.models.constants import XmlType
@@ -97,7 +97,7 @@ class XmlContextTests(TestCase):
     def test_match_class_name(self):
         qname_foo = QName("qname_foo")
         qname_items = QName("ItemsType")
-        qname_product = QName("http://datypic.com/prod", "product")
+        qname_product = QName("http://example.org/prod", "product")
         qname_object = QName("object")
         qname_int = QName("int")
 
@@ -216,7 +216,7 @@ class XmlContextTests(TestCase):
         self.assertEqual(BookForm, result[0].clazz)
 
     def test_get_type_hints_with_wildcard_element(self):
-        result = list(self.ctx.get_type_hints(TextType, None))
+        result = list(self.ctx.get_type_hints(Umbrella, None))
 
         expected = XmlWildcard(
             name="any_element",
@@ -225,11 +225,11 @@ class XmlContextTests(TestCase):
             init=True,
             nillable=False,
             dataclass=False,
-            default=list,
+            default=None,
             namespaces=["##any"],
         )
 
-        self.assertEqual(2, len(result))
+        self.assertEqual(1, len(result))
         self.assertEqual(expected, result[0])
 
     def test_get_type_hints_with_no_dataclass(self):

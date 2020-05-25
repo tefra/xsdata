@@ -1,0 +1,21 @@
+<!--Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<items xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="chapter13.xsd"
+       xmlns:xhtml="http://www.w3.org/1999/xhtml"
+       xmlns:oth="http://example.org/oth">
+  <shirt effDate="2002-04-02">
+    <number>557</number>
+    <name>Short-Sleeved Linen Blouse</name>
+    <size system="US-DRESS">10</size>
+    <color value="blue"/>
+    <description>
+      This shirt is the <xhtml:b>best-selling</xhtml:b> shirt in
+      our catalog! <xhtml:br/> Note: runs large.
+    </description>
+  </shirt>
+  <hat oth:custom="12">
+    <number>557</number>
+    <name>Ten-Gallon Hat</name>
+    <color value="red"/>
+  </hat>
+</items>

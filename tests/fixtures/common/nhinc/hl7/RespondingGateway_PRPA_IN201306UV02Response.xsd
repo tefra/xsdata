@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns="urn:hl7-org:v3" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:nccommon="urn:gov:hhs:fha:nhinc:common:nhinccommon" targetNamespace="urn:hl7-org:v3" elementFormDefault="qualified">
+
+	<xsd:include schemaLocation="../../HL7V3/NE2008/multicacheschemas/PRPA_IN201306UV02.xsd"/>
+	<xsd:import namespace="urn:gov:hhs:fha:nhinc:common:nhinccommon" schemaLocation="../common/NhincCommon.xsd"/>
+	
+	<xsd:complexType name="RespondingGateway_PRPA_IN201306UV02ResponseType">
+			<xsd:sequence>
+			<xsd:element name="communityResponse" type="Community_PRPA_IN201306UV02ResponseType" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="Community_PRPA_IN201306UV02ResponseType">
+		<xsd:sequence>
+			<xsd:element ref="PRPA_IN201306UV02"/>
+			<xsd:element name="nhinTargetCommunity" type="nccommon:NhinTargetCommunityType" />
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="RespondingGateway_PRPA_IN201306UV02Response" type="RespondingGateway_PRPA_IN201306UV02ResponseType"/>
+	
+</xsd:schema>

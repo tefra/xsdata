@@ -12,11 +12,11 @@ from lxml.etree import QName
 
 from tests.fixtures.books import BookForm
 from tests.fixtures.books import Books
-from tests.fixtures.defxmlschema.chapter12.chapter12 import ColorType
-from tests.fixtures.defxmlschema.chapter12.chapter12 import DescriptionType
-from tests.fixtures.defxmlschema.chapter12.chapter12 import Items
-from tests.fixtures.defxmlschema.chapter12.chapter12 import ProductType
-from tests.fixtures.defxmlschema.chapter12.chapter12 import SizeType
+from tests.fixtures.defxmlschema.chapter12 import ColorType
+from tests.fixtures.defxmlschema.chapter12 import DescriptionType
+from tests.fixtures.defxmlschema.chapter12 import Items
+from tests.fixtures.defxmlschema.chapter12 import ProductType
+from tests.fixtures.defxmlschema.chapter12 import SizeType
 from xsdata.exceptions import SerializerError
 from xsdata.exceptions import XmlContextError
 from xsdata.formats.dataclass.context import XmlContext

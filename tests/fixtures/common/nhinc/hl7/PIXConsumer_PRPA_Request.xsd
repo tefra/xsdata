@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns="urn:hl7-org:v3" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:nccommon="urn:gov:hhs:fha:nhinc:common:nhinccommon" targetNamespace="urn:hl7-org:v3" elementFormDefault="qualified">
+
+	<xsd:include schemaLocation="../../HL7V3/NE2008/multicacheschemas/PRPA_IN201301UV02.xsd"/>
+	<xsd:include schemaLocation="../../HL7V3/NE2008/multicacheschemas/PRPA_IN201302UV02.xsd"/>
+	<xsd:include schemaLocation="../../HL7V3/NE2008/multicacheschemas/PRPA_IN201306UV02.xsd"/>
+	
+	<xsd:import namespace="urn:gov:hhs:fha:nhinc:common:nhinccommon" schemaLocation="../common/NhincCommon.xsd"/>
+
+	<xsd:complexType name="PIXConsumer_PRPA_IN201301UVRequestType">
+		<xsd:sequence>
+			<xsd:element ref="PRPA_IN201301UV02"/>
+			<xsd:element name="assertion" type="nccommon:AssertionType"/>
+			<xsd:element name="NhinTargetCommunities" type="nccommon:NhinTargetCommunitiesType" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="PIXConsumer_PRPA_IN201301UVRequest" type="PIXConsumer_PRPA_IN201301UVRequestType"/>
+		<xsd:complexType name="PIXConsumer_PRPA_IN201301UVSecuredRequestType">
+		<xsd:sequence>
+			<xsd:element ref="PRPA_IN201301UV02"/>
+			<xsd:element name="NhinTargetCommunities" type="nccommon:NhinTargetCommunitiesType" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="PIXConsumer_PRPA_IN201301UVSecuredRequest" type="PIXConsumer_PRPA_IN201301UVSecuredRequestType"/>
+
+    <xsd:complexType name="PIXConsumer_PRPA_IN201302UVRequestType">
+		<xsd:sequence>
+			<xsd:element ref="PRPA_IN201302UV02"/>
+			<xsd:element name="assertion" type="nccommon:AssertionType"/>
+			<xsd:element name="NhinTargetCommunities" type="nccommon:NhinTargetCommunitiesType" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="PIXConsumer_PRPA_IN201302UVRequest" type="PIXConsumer_PRPA_IN201302UVRequestType"/>
+	<xsd:complexType name="PIXConsumer_PRPA_IN201302UVSecuredRequestType">
+		<xsd:sequence>
+			<xsd:element ref="PRPA_IN201302UV02"/>
+			<xsd:element name="NhinTargetCommunities" type="nccommon:NhinTargetCommunitiesType" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="PIXConsumer_PRPA_IN201302UVSecuredRequest" type="PIXConsumer_PRPA_IN201302UVSecuredRequestType"/>
+	
+</xsd:schema>

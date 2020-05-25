@@ -47,7 +47,7 @@ passes more than 99% of the valid instance cases.
 
 .. image:: https://github.com/tefra/xsdata/raw/master/docs/_static/demo.svg
 
-Check the documentation `demos <https://xsdata.readthedocs.io/demos.html>`_ or
+Check the documentation `demos <https://xsdata.readthedocs.io/en/latest/demos.html>`_ or
 our `W3C XML Schema 1.1  <https://github.com/tefra/xsdata-w3c-tests>`_ test runner and
 the `samples repo <https://github.com/tefra/xsdata-samples>`_ for more ✨✨✨
 

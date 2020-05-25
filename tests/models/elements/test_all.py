@@ -1,0 +1,9 @@
+from unittest import TestCase
+
+from xsdata.models.elements import All
+
+
+class AllTests(TestCase):
+    def test_get_restrictions(self):
+        obj = All.create(min_occurs=1, max_occurs=2)
+        self.assertEqual({"max_occurs": 2, "min_occurs": 1}, obj.get_restrictions())

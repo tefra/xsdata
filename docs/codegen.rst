@@ -23,6 +23,10 @@ want to process.
     $ xsdata http://www.gstatic.com/localfeed/local_feed.xsd --package feeds --print
 
 
+Although you can pass multiple sources, I am advising against that unless if you are
+sure your sources are well written clean without namespace or naming conflicts.
+
+
 Package
 -------
 
@@ -31,12 +35,13 @@ current working directory.
 
 If the main xsd has any parent include or import you should adjust the target package.
 
-.. admonition:: Example
-    :class: warning
+.. admonition:: Note
+    :class: hint
 
-    * Output directory ``./api/models``
-    * Main xsd ``./api/air/AirReqRsp.xsd`` that includes ``../common/CommonReqRsp.xsd``
-    * Adjust the package from ``api.models`` to ``api.models.air`` because the generator has to also create the ``common.common_req_rsp`` module.
+    The cli is relying on the `os.path.commonpath` to create the package structure and
+    doesn't do any conflict resolution, which shouldn't be an issue if you use the cli
+    with a single source (directory or remote/local file).
+
 
 Output
 ------

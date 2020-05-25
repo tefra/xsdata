@@ -65,6 +65,16 @@ class AttributeGroupHandlerTests(FactoryTestCase):
             ]
         )
 
+    @mock.patch.object(ClassContainer, "find")
+    def test_process_attribute_with_circular_reference(self, mock_container_find):
+        group_attr = AttrFactory.attribute_group(name="foo:bar")
+        target = ClassFactory.create()
+        target.attrs.append(group_attr)
+        mock_container_find.return_value = target
+
+        self.processor.process_attribute(target, group_attr)
+        self.assertFalse(group_attr in target.attrs)
+
     def test_process_attribute_with_unknown_source(self):
         group_attr = AttrFactory.attribute_group(name="foo:bar")
         target = ClassFactory.create()

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns="urn:hl7-org:v3" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:nccommon="urn:gov:hhs:fha:nhinc:common:nhinccommon" targetNamespace="urn:hl7-org:v3" elementFormDefault="qualified">
+
+	<xsd:include schemaLocation="../../HL7V3/NE2008/multicacheschemas/PRPA_IN201306UV02.xsd"/>
+	<xsd:import namespace="urn:gov:hhs:fha:nhinc:common:nhinccommon" schemaLocation="../common/NhincCommon.xsd"/>
+	        
+    <xsd:complexType name="RespondingGateway_PRPA_IN201306UV02RequestType">
+		<xsd:sequence>
+			<xsd:element ref="PRPA_IN201306UV02"/>
+			<xsd:element name="assertion" type="nccommon:AssertionType"/>
+			<xsd:element name="NhinTargetCommunities" type="nccommon:NhinTargetCommunitiesType" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="RespondingGateway_PRPA_IN201306UV02Request" type="RespondingGateway_PRPA_IN201306UV02RequestType"/>
+	<xsd:complexType name="RespondingGateway_PRPA_IN201306UV02SecuredRequestType">
+		<xsd:sequence>
+			<xsd:element ref="PRPA_IN201306UV02"/>
+			<xsd:element name="NhinTargetCommunities" type="nccommon:NhinTargetCommunitiesType" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="RespondingGateway_PRPA_IN201306UV02SecuredRequest" type="RespondingGateway_PRPA_IN201306UV02SecuredRequestType"/>
+
+</xsd:schema>

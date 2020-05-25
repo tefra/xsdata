@@ -1,0 +1,13 @@
+<!--Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<sizes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="chapter11.xsd">
+  <size>12</size>
+  <size>medium</size>
+  <smallSize>6</smallSize>
+  <smallSize>small</smallSize>
+  <internationalSize>12</internationalSize>
+  <internationalSize>24</internationalSize>
+  <internationalSize>large</internationalSize>
+  <availableSizes>10 large 2</availableSizes>
+  <applicableSizes>small medium large</applicableSizes>
+</sizes>

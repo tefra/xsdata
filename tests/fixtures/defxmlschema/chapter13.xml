@@ -1,0 +1,19 @@
+<!--Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<items xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="chapter14.xsd">
+  <hat routingNum="123456" effDate="2002-04-02" lang="en-US">
+    <number>557</number>
+    <name>Ten-Gallon Hat</name>
+    <description>This is a great hat!</description>
+  </hat>
+  <umbrella routingNum="123" effDate="2002-04-02">
+    <number>557</number>
+    <name>Ten-Gallon Hat</name>
+  </umbrella>
+  <shirt routingNum="124" effDate="2002-04-02" sleeve="17">
+    <number>557</number>
+    <name>Short-Sleeved Linen Blouse</name>
+    <color value="blue"/>
+    <size system="US-DRESS">6</size>
+  </shirt>
+</items>

@@ -1,0 +1,7 @@
+<!--Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<product effDate="2001-04-02"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="chapter01.xsd">
+  <number>557</number>
+  <size>10</size>
+</product>

@@ -1,0 +1,32 @@
+<!--Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns="http://example.org/prod"
+            targetNamespace="http://example.org/prod"
+            elementFormDefault="qualified">
+
+  <xsd:annotation>
+    <xsd:documentation>
+      This example illustrates various attribute declarations.  It contains global and local attribute
+      declarations, named and anonymous types, and fixed and default values (which will be applied
+      in this case.)
+    </xsd:documentation>
+  </xsd:annotation>
+
+  <xsd:element name="size" type="SizeType"/>
+  <xsd:complexType name="SizeType">
+    <xsd:attribute name="system" type="xsd:string" use="required"/>
+    <xsd:attribute ref="dim"/>
+    <xsd:attribute name="value" default="10">
+      <xsd:simpleType>
+        <xsd:restriction base="xsd:integer">
+          <xsd:minInclusive value="2"/>
+          <xsd:maxInclusive value="20"/>
+        </xsd:restriction>
+      </xsd:simpleType>
+    </xsd:attribute>
+
+  </xsd:complexType>
+
+  <xsd:attribute name="dim" type="xsd:integer" fixed="1"/>
+
+</xsd:schema>

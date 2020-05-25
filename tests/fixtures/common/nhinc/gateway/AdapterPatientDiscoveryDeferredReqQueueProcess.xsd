@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+    xmlns:tns="urn:gov:hhs:fha:nhinc:gateway:adapterpatientdiscoveryreqqueueprocess" 
+    xmlns:nccommon="urn:gov:hhs:fha:nhinc:common:nhinccommon" 
+    targetNamespace="urn:gov:hhs:fha:nhinc:gateway:adapterpatientdiscoveryreqqueueprocess" 
+    elementFormDefault="qualified">
+
+    <xsd:import schemaLocation="../common/NhincCommon.xsd" namespace="urn:gov:hhs:fha:nhinc:common:nhinccommon"/>
+
+    <!--  The following schema is used in the EntityPatientDiscoveryDeferredReqQueueProcess wsdl. -->
+
+    <!--  Inner schema definitions. -->
+
+    <xsd:complexType name="SuccessOrFailType">
+        <xsd:sequence>
+            <xsd:element name="success" type="xsd:boolean" minOccurs="0" />
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:element name="SuccessOrFail" type="tns:SuccessOrFailType"/>
+
+    <!--  Request and Response Types schema definitions. -->
+
+    <xsd:complexType name="PatientDiscoveryDeferredReqQueueProcessRequestType">
+        <xsd:sequence>
+            <xsd:element name="messageId" type="xsd:string" maxOccurs="1" />
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:element name="PatientDiscoveryDeferredReqQueueProcessRequest" type="tns:PatientDiscoveryDeferredReqQueueProcessRequestType"/>
+
+    <xsd:complexType name="PatientDiscoveryDeferredReqQueueProcessResponseType">
+        <xsd:sequence>
+            <xsd:element name="response" type="xsd:string" maxOccurs="1" />
+            <xsd:element name="successOrFail" type="tns:SuccessOrFailType" maxOccurs="1" />
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:element name="PatientDiscoveryDeferredReqQueueProcessResponse" type="tns:PatientDiscoveryDeferredReqQueueProcessResponseType"/>
+
+</xsd:schema>

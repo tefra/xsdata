@@ -23,7 +23,7 @@ class CliTests(TestCase):
     @mock.patch.object(SchemaTransformer, "process")
     @mock.patch.object(SchemaTransformer, "__init__", return_value=None)
     def test_default_output(self, mock_transformer_init, *args):
-        source = fixtures.joinpath("chapter02/example0202.xsd")
+        source = fixtures.joinpath("chapter02.xsd")
         result = self.runner.invoke(cli, [str(source), "--package", "foo"])
         self.assertIsNone(result.exception)
         mock_transformer_init.assert_called_once_with(output="pydata", print=False)
@@ -31,7 +31,7 @@ class CliTests(TestCase):
     @mock.patch.object(SchemaTransformer, "process")
     @mock.patch.object(SchemaTransformer, "__init__", return_value=None)
     def test_custom_output(self, mock_transformer_init, *args):
-        source = fixtures.joinpath("chapter02/example0202.xsd")
+        source = fixtures.joinpath("chapter02.xsd")
         result = self.runner.invoke(
             cli, [str(source), "--package", "foo", "--output", "plantuml"]
         )
@@ -41,7 +41,7 @@ class CliTests(TestCase):
     @mock.patch.object(SchemaTransformer, "process")
     @mock.patch.object(SchemaTransformer, "__init__", return_value=None)
     def test_print_mode(self, mock_transformer_init, *args):
-        source = fixtures.joinpath("chapter02/example0202.xsd")
+        source = fixtures.joinpath("chapter02.xsd")
         result = self.runner.invoke(cli, [str(source), "--package", "foo", "--print"])
         self.assertIsNone(result.exception)
         mock_transformer_init.assert_called_once_with(output="pydata", print=True)
@@ -49,7 +49,7 @@ class CliTests(TestCase):
 
     @mock.patch.object(SchemaTransformer, "process")
     def test_with_single_source(self, mock_transformer_process):
-        source = fixtures.joinpath("chapter02/example0202.xsd")
+        source = fixtures.joinpath("chapter01.xsd")
         result = self.runner.invoke(
             cli, [str(source.relative_to(root)), "--package", "foo"]
         )
@@ -58,8 +58,8 @@ class CliTests(TestCase):
 
     @mock.patch.object(SchemaTransformer, "process")
     def test_with_multiple_source(self, mock_transformer_process):
-        first_source = fixtures.joinpath("chapter02/example0202.xsd")
-        second_source = fixtures.joinpath("chapter02/example0206.xsd")
+        first_source = fixtures.joinpath("chapter03.xsd")
+        second_source = fixtures.joinpath("chapter04.xsd")
         third_source = "http://foo/bar.xsd"
 
         result = self.runner.invoke(
@@ -79,15 +79,9 @@ class CliTests(TestCase):
 
     @mock.patch.object(SchemaTransformer, "process")
     def test_with_directory(self, mock_transformer_process):
-        first_source = fixtures.joinpath("chapter01")
-        second_source = fixtures.joinpath("chapter02/example0206.xsd")
 
-        result = self.runner.invoke(
-            cli, [str(first_source), str(second_source), "--package", "foo"]
-        )
+        result = self.runner.invoke(cli, [str(fixtures), "--package", "foo"])
         self.assertIsNone(result.exception)
 
-        schemas = [x.as_uri() for x in first_source.glob("*.xsd")]
-        schemas.append(second_source.as_uri())
-
+        schemas = [x.as_uri() for x in fixtures.glob("*.xsd")]
         mock_transformer_process.assert_called_once_with(schemas, "foo")

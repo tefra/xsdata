@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            targetNamespace="urn:gov:hhs:fha:nhinc:common:patientcorrelationfacade"
+            xmlns:tns="urn:gov:hhs:fha:nhinc:common:patientcorrelationfacade"
+            elementFormDefault="qualified" 
+            xmlns:nccommon="urn:gov:hhs:fha:nhinc:common:nhinccommon"
+            >
+
+    <xsd:import schemaLocation="../../../schemas/nhinc/common/NhincCommon.xsd" namespace="urn:gov:hhs:fha:nhinc:common:nhinccommon"/>
+
+    <xsd:complexType name="RetrievePatientCorrelationsRequestType">
+        <xsd:sequence>
+            <xsd:element name="QualifiedPatientIdentifier" type="nccommon:QualifiedSubjectIdentifierType" maxOccurs="1" minOccurs="1" />
+            <xsd:element name="TargetAssigningAuthority" type="xsd:string" maxOccurs="unbounded" minOccurs="0" />
+            
+            <xsd:element name="TargetHomeCommunity" type="xsd:string" maxOccurs="unbounded" minOccurs="0" />
+            <xsd:element name="assertion" type="nccommon:AssertionType"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:element name="RetrievePatientCorrelationsRequest" type="tns:RetrievePatientCorrelationsRequestType" />
+
+    <xsd:complexType name="RetrievePatientCorrelationsResponseType">
+        <xsd:sequence>
+            <xsd:element name="QualifiedPatientIdentifier" type="nccommon:QualifiedSubjectIdentifierType" maxOccurs="unbounded" minOccurs="0" />
+            <xsd:element name="assertion" type="nccommon:AssertionType"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:element name="RetrievePatientCorrelationsResponse" type="tns:RetrievePatientCorrelationsResponseType" />
+
+    <xsd:complexType name="AddPatientCorrelationRequestType">
+        <xsd:sequence>
+            <xsd:element name="QualifiedPatientIdentifier" type="nccommon:QualifiedSubjectIdentifierType" maxOccurs="2" minOccurs="2" />
+            <xsd:element name="assertion" type="nccommon:AssertionType"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:element name="AddPatientCorrelationRequest" type="tns:AddPatientCorrelationRequestType" />
+
+    <xsd:complexType name="AddPatientCorrelationResponseType">
+        <xsd:sequence>
+            <xsd:element name="Ack" type="nccommon:AcknowledgementType" />
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:element name="AddPatientCorrelationResponse" type="tns:AddPatientCorrelationResponseType" />
+
+    <xsd:complexType name="RemovePatientCorrelationRequestType">
+        <xsd:sequence>
+            <xsd:element name="QualifiedPatientIdentifier" type="nccommon:QualifiedSubjectIdentifierType" maxOccurs="2" minOccurs="2" />
+            <xsd:element name="assertion" type="nccommon:AssertionType"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:element name="RemovePatientCorrelationRequest" type="tns:RemovePatientCorrelationRequestType" />
+
+    <xsd:complexType name="RemovePatientCorrelationResponseType">
+        <xsd:sequence>
+            <xsd:element name="Ack" type="nccommon:AcknowledgementType" />
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:element name="RemovePatientCorrelationResponse" type="tns:RemovePatientCorrelationResponseType" />
+
+</xsd:schema>

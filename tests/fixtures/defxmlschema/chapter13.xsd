@@ -1,0 +1,98 @@
+<!--Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+
+  <xsd:annotation>
+    <xsd:documentation>
+      This example illustrates complex types that are derived from other specified types.
+    </xsd:documentation>
+  </xsd:annotation>
+
+  <xsd:element name="items" type="ItemsType"/>
+
+  <xsd:complexType name="ItemsType">
+    <xsd:choice minOccurs="0" maxOccurs="unbounded">
+      <xsd:element name="hat" type="ProductType"/>
+      <xsd:element name="umbrella" type="RestrictedProductType"/>
+      <xsd:element name="shirt" type="ShirtType"/>
+    </xsd:choice>
+  </xsd:complexType>
+
+  <!--Empty Content Type-->
+  <xsd:complexType name="ItemType" abstract="true">
+    <xsd:attribute name="routingNum" type="xsd:integer"/>
+  </xsd:complexType>
+
+  <!--Empty Content Extension (with Attribute Extension)-->
+  <xsd:complexType name="ProductType">
+    <xsd:complexContent>
+      <xsd:extension base="ItemType">
+        <xsd:sequence>
+          <xsd:element name="number" type="xsd:integer"/>
+          <xsd:element name="name" type="xsd:string"/>
+          <xsd:element name="description" type="xsd:string" minOccurs="0"/>
+        </xsd:sequence>
+        <xsd:attribute name="effDate" type="xsd:date"/>
+        <xsd:attribute name="lang" type="xsd:language"/>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+
+  <!--Complex Content Restriction-->
+  <xsd:complexType name="RestrictedProductType">
+    <xsd:complexContent>
+      <xsd:restriction base="ProductType">
+        <xsd:sequence>
+          <xsd:element name="number" type="xsd:integer"/>
+          <xsd:element name="name" type="xsd:token"/>
+        </xsd:sequence>
+        <xsd:attribute name="routingNum" type="xsd:short" use="required"/>
+        <xsd:attribute name="effDate" type="xsd:date" default="1900-01-01"/>
+        <xsd:attribute name="lang" use="prohibited"/>
+      </xsd:restriction>
+    </xsd:complexContent>
+  </xsd:complexType>
+
+  <!--Complex Content Extension-->
+  <xsd:complexType name="ShirtType">
+    <xsd:complexContent>
+      <xsd:extension base="RestrictedProductType">
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="size" type="SmallSizeType"/>
+          <xsd:element name="color" type="ColorType"/>
+        </xsd:choice>
+        <xsd:attribute name="sleeve" type="xsd:integer"/>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+
+  <!--Simple Content Extension-->
+  <xsd:complexType name="SizeType">
+    <xsd:simpleContent>
+      <xsd:extension base="xsd:integer">
+        <xsd:attribute name="system" type="xsd:token"/>
+      </xsd:extension>
+    </xsd:simpleContent>
+  </xsd:complexType>
+
+  <!--Simple Content Restriction-->
+  <xsd:complexType name="SmallSizeType">
+    <xsd:simpleContent>
+      <xsd:restriction base="SizeType">
+        <xsd:minInclusive value="2"/>
+        <xsd:maxInclusive value="6"/>
+        <xsd:attribute  name="system" type="xsd:token"
+                        use="required"/>
+      </xsd:restriction>
+    </xsd:simpleContent>
+  </xsd:complexType>
+
+  <xsd:complexType name="ColorType">
+    <xsd:attribute name="value" type="xsd:string"/>
+  </xsd:complexType>
+
+</xsd:schema>
+
+
+
+
+

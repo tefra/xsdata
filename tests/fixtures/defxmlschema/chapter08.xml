@@ -1,0 +1,10 @@
+<!--Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<sizes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="chapter09.xsd">
+  <dressSize>06</dressSize>
+  <mediumDressSize>12</mediumDressSize>
+  <smallDressSize>6</smallDressSize>
+  <smlxSize>extra
+  large</smlxSize>
+  <xsmlxSize>extra    small</xsmlxSize>
+</sizes>

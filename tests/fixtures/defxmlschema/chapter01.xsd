@@ -1,0 +1,17 @@
+<!--Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <xsd:element name="product" type="ProductType"/>
+  <xsd:complexType name="ProductType">
+    <xsd:sequence>
+      <xsd:element name="number" type="xsd:integer"/>
+      <xsd:element name="size" type="SizeType"/>
+    </xsd:sequence>
+    <xsd:attribute name="effDate" type="xsd:date"/>
+  </xsd:complexType>
+  <xsd:simpleType name="SizeType">
+    <xsd:restriction base="xsd:integer">
+      <xsd:minInclusive value="2"/>
+      <xsd:maxInclusive value="18"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+</xsd:schema>

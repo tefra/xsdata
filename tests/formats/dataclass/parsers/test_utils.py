@@ -10,8 +10,8 @@ from lxml.etree import Element
 from lxml.etree import QName
 
 from tests.fixtures.books import Books
-from tests.fixtures.defxmlschema.chapter08.example0803 import DressSize
-from tests.fixtures.defxmlschema.chapter12.chapter12 import ProductType
+from tests.fixtures.defxmlschema.chapter12 import ProductType
+from tests.fixtures.defxmlschema.chapter12 import SizeType
 from xsdata.formats.dataclass.context import XmlContext
 from xsdata.formats.dataclass.models.constants import XmlType
 from xsdata.formats.dataclass.models.elements import FindMode
@@ -182,7 +182,7 @@ class ParserUtilsTests(TestCase):
     def test_bind_element_text_with_text_var(self, mock_parse_value):
         element = Element("foo")
         params = dict()
-        metadata = self.ctx.build(DressSize)
+        metadata = self.ctx.build(SizeType)
         var = metadata.find_var(mode=FindMode.TEXT)
         ParserUtils.bind_element_text(params, metadata, element)
         self.assertEqual({}, params)

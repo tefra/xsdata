@@ -1,0 +1,67 @@
+<!--Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+
+  <xsd:annotation>
+    <xsd:documentation>
+      This example illustrates various simple type restrictions using bounds facets,
+      patterns, and enumerations. White space is used in the instance to illustrate
+      that white space processing takes place before validation.
+    </xsd:documentation>
+  </xsd:annotation>
+
+
+  <xsd:element name="sizes" type="SizesType"/>
+
+  <xsd:complexType name="SizesType">
+    <xsd:choice maxOccurs="unbounded">
+      <xsd:element name="dressSize" type="DressSizeType"/>
+      <xsd:element name="mediumDressSize" type="MediumDressSizeType"/>
+      <xsd:element name="smallDressSize" type="SmallDressSizeType"/>
+      <xsd:element name="smlxSize" type="SMLXSizeType"/>
+      <xsd:element name="xsmlxSize" type="XSMLXSizeType"/>
+    </xsd:choice>
+  </xsd:complexType>
+
+  <xsd:simpleType name="DressSizeType">
+    <xsd:restriction base="xsd:integer">
+      <xsd:minInclusive value="2"/>
+      <xsd:maxInclusive value="18"/>
+      <xsd:pattern value="\d{1,2}"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <xsd:simpleType name="MediumDressSizeType">
+    <xsd:restriction base="DressSizeType">
+      <xsd:minInclusive value="8"/>
+      <xsd:maxInclusive value="12"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <xsd:simpleType name="SmallDressSizeType">
+    <xsd:restriction base="DressSizeType">
+      <xsd:minInclusive value="2"/>
+      <xsd:maxInclusive value="6"/>
+      <xsd:pattern value="\d{1}"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <xsd:simpleType name="SMLXSizeType">
+    <xsd:restriction base="xsd:token">
+      <xsd:enumeration value="small"/>
+      <xsd:enumeration value="medium"/>
+      <xsd:enumeration value="large"/>
+      <xsd:enumeration value="extra large"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <xsd:simpleType name="XSMLXSizeType">
+    <xsd:union memberTypes="SMLXSizeType">
+      <xsd:simpleType>
+        <xsd:restriction base="xsd:token">
+          <xsd:enumeration value="extra small"/>
+        </xsd:restriction>
+      </xsd:simpleType>
+    </xsd:union>
+  </xsd:simpleType>
+
+</xsd:schema>

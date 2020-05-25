@@ -1,0 +1,9 @@
+<!--Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<shirt xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="chapter15.xsd"
+       id="P557" version="100">
+  <description>This is a great shirt.</description>
+  <number>557</number>
+  <name>Short-Sleeved Linen Blouse</name>
+  <size system="US-DRESS">6</size>
+</shirt>

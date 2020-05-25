@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  Extensions created for CCD include:
+  
+  •	AssignedPerson / id
+  •	AssociatedPerson / id
+  •	GuardianPerson / id
+  •	InformationRecipient / id
+  •	MaintainingPerson / id
+  •	RelatedPerson / id
+  •	asPatientRelationship
+  •	asPatientRelationship / @classCode
+  •	asPatientRelationship / code
+  •	Subject / id 
+  •	Subject / deceasedInd 
+  •	Subject / deceasedTime 
+  
+  Extensions created for QRDA include:
+  
+  •	code/@valueSet
+  •	code/@valueSetVersion
+-->
+<xs:schema targetNamespace="urn:hl7-org:sdtc" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="urn:hl7-org:sdtc" elementFormDefault="qualified"
+  xmlns:hl7="urn:hl7-org:v3">
+  <xs:annotation>
+    <xs:documentation>SDTC Schema Extensions, July 2012</xs:documentation>
+    
+  </xs:annotation>
+  <xs:import namespace="urn:hl7-org:v3" schemaLocation="../multicacheschemas/POCD_MT000040.xsd" />
+
+  <xs:attribute name="valueSet" type="hl7:oid"/>
+  <xs:attribute name="valueSetVersion" type="hl7:st"/>
+   
+<!--  <xs:element name="raceCode" type="hl7:CE"/> -->
+  
+  <xs:element name="dischargeDispositionCode" type="hl7:CE"/>
+  
+  <xs:element name="id" type="hl7:II"/>
+  
+  <xs:element name="deceasedInd" type="hl7:BL"/>
+  <xs:element name="deceasedTime" type="hl7:TS"/>
+  
+  <xs:element name="birthTime" type="hl7:TS"/>
+  
+
+</xs:schema>

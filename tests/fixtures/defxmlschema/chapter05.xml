@@ -1,0 +1,15 @@
+<!--Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<ord:order xmlns:ord="http://example.org/ord"
+           xmlns:prod="http://example.org/prod"
+           xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://example.org/prod chapter05prod.xsd
+                               http://example.org/ord chapter05.xsd">
+  <items>
+    <prod:product>
+      <number xsi:type="xsd:short">557</number>
+      <name>Short-Sleeved Linen Blouse</name>
+      <size xsi:nil="true"></size>
+    </prod:product>
+  </items>
+</ord:order>

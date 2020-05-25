@@ -1,6 +1,0 @@
-<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
-<!-- Example 4-6 Proxy schema to avoid multiple imports -->
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://datypic.com/ord" targetNamespace="http://datypic.com/ord">
-  <xs:include namespace="http://datypic.com/ord" schemaLocation="example04052.xsd" />
-  <xs:include namespace="http://datypic.com/ord" schemaLocation="example04053.xsd" />
-</xs:schema>

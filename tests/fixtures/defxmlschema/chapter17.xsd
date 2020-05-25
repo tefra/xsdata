@@ -1,0 +1,75 @@
+<!--Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+
+  <xsd:annotation>
+    <xsd:documentation>
+      This example illustrates identity constraints.  Each child of items must have a number attribute whose value is unique within order.  All product descendents of order must have a number child whose value matches one of these unique product numbers.
+    </xsd:documentation>
+  </xsd:annotation>
+
+  <xsd:element name="order" type="OrderType">
+    <xsd:keyref name="prodNumKeyRef" refer="prodNumKey">
+      <xsd:selector xpath="items/*"/>
+      <xsd:field xpath="@number"/>
+    </xsd:keyref>
+    <xsd:key name="prodNumKey">
+      <xsd:selector xpath=".//product"/>
+      <xsd:field xpath="number"/>
+    </xsd:key>
+  </xsd:element>
+
+  <xsd:complexType name="OrderType">
+    <xsd:sequence>
+      <xsd:element name="number" type="xsd:string"/>
+      <xsd:element name="items" type="ItemsType"/>
+      <xsd:element name="products" type="ProductsType"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="ItemsType">
+    <xsd:choice maxOccurs="unbounded">
+      <xsd:element name="shirt" type="ProductOrderType"/>
+      <xsd:element name="hat" type="ProductOrderType"/>
+    </xsd:choice>
+  </xsd:complexType>
+
+  <xsd:complexType name="ProductOrderType">
+    <xsd:sequence>
+      <xsd:element name="quantity" type="xsd:integer"/>
+      <xsd:element name="color" type="ColorType" minOccurs="0"/>
+    </xsd:sequence>
+    <xsd:attribute name="number" type="xsd:integer"/>
+  </xsd:complexType>
+
+  <xsd:complexType name="ProductsType">
+    <xsd:sequence>
+      <xsd:element name="product" type="ProductType" maxOccurs="unbounded"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="ProductType">
+    <xsd:sequence>
+      <xsd:element name="number" type="xsd:integer"/>
+      <xsd:element name="name" type="xsd:string"/>
+      <xsd:element name="price" type="PriceType"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="ColorType">
+    <xsd:attribute name="value" type="xsd:string"/>
+  </xsd:complexType>
+
+  <xsd:complexType name="PriceType">
+    <xsd:simpleContent>
+      <xsd:extension base="xsd:decimal">
+        <xsd:attribute name="currency" type="xsd:token"/>
+      </xsd:extension>
+    </xsd:simpleContent>
+  </xsd:complexType>
+
+</xsd:schema>
+
+
+
+
+

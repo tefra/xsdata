@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:auditlog="urn:gov:hhs:fha:nhinc:common:auditlog"  xmlns:nccommon="urn:gov:hhs:fha:nhinc:common:nhinccommon" xmlns:auditmessage="http://nhinc.services.com/schema/auditmessage" targetNamespace="urn:gov:hhs:fha:nhinc:common:auditlog" elementFormDefault="qualified">
+    <xsd:import namespace="urn:gov:hhs:fha:nhinc:common:nhinccommon" schemaLocation="NhincCommon.xsd"/>
+    <xsd:import namespace="http://nhinc.services.com/schema/auditmessage" schemaLocation="../../ihe/auditmessage.xsd"/>
+    <xsd:simpleType name="directionSimpleType">
+        <xsd:restriction base="xsd:string"/>
+    </xsd:simpleType>
+    <xsd:element name="direction" type="auditlog:directionSimpleType"/>
+    <xsd:simpleType name="communityIdSimpleType">
+        <xsd:restriction base="xsd:string"/>
+    </xsd:simpleType>
+    <xsd:element name="LogEventResponse" type="nccommon:AcknowledgementType"/>
+    <!-- end common -->
+    <!-- begin generic log message -->
+    <xsd:complexType name="LogEventRequestType">
+        <xsd:sequence>
+            <xsd:element ref="auditmessage:AuditMessage"/>
+            <xsd:element ref="auditlog:direction"/>
+            <xsd:element name="assertion" type="nccommon:AssertionType"/>
+            <xsd:element name="EventTimestamp" maxOccurs="1" type="xsd:dateTime"/>
+            <xsd:element name="EventID" maxOccurs="1" type="xsd:string"/>
+            <xsd:element name="EventType" maxOccurs="1" type="xsd:string"/>
+            <xsd:element name="EventOutcomeIndicator" maxOccurs="1" type="xsd:integer"/>
+            <xsd:element name="RemoteHCID" minOccurs="0" type="xsd:string"/>
+            <xsd:element name="RequestMessageId" minOccurs="0" type="xsd:string"/>
+            <xsd:element name="RelatesTo" minOccurs="0" type="xsd:string"/>
+            <xsd:element name="UserId" minOccurs="0" type="xsd:string"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:element name="LogEventRequest" type="auditlog:LogEventRequestType"/>
+    <xsd:complexType name="LogEventSecureRequestType">
+        <xsd:sequence>
+            <xsd:element ref="auditmessage:AuditMessage"/>
+            <xsd:element ref="auditlog:direction"/>
+            <xsd:element name="EventTimestamp" maxOccurs="1" type="xsd:dateTime"/>
+            <xsd:element name="EventID" maxOccurs="1" type="xsd:string"/>
+            <xsd:element name="EventType" maxOccurs="1" type="xsd:string"/>
+            <xsd:element name="EventOutcomeIndicator" maxOccurs="1" type="xsd:integer"/>
+            <xsd:element name="RemoteHCID" minOccurs="0" type="xsd:string"/>
+            <xsd:element name="RequestMessageId" minOccurs="0" type="xsd:string"/>
+            <xsd:element name="RelatesTo" minOccurs="0" type="xsd:string"/>
+            <xsd:element name="UserId" minOccurs="0" type="xsd:string"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:element name="LogEventSecureRequest" type="auditlog:LogEventSecureRequestType"/>
+    <!-- end generic log message -->
+</xsd:schema>

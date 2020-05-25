@@ -1,0 +1,33 @@
+<!--Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns="http://example.org/prod"
+            targetNamespace="http://example.org/prod">
+
+  <xsd:complexType name="ItemsType">
+    <xsd:sequence>
+      <xsd:element name="product" type="ProductType"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="ProductType">
+    <xsd:sequence>
+      <xsd:element name="number" type="xsd:integer"/>
+      <xsd:element name="name" type="xsd:string"/>
+      <xsd:element name="size" type="SizeType"/>
+      <xsd:element name="color" type="ColorType"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="SizeType">
+    <xsd:simpleContent>
+      <xsd:extension base="xsd:integer">
+        <xsd:attribute name="system" type="xsd:string"/>
+      </xsd:extension>
+    </xsd:simpleContent>
+  </xsd:complexType>
+
+  <xsd:complexType name="ColorType">
+    <xsd:attribute name="value" type="xsd:string"/>
+  </xsd:complexType>
+
+</xsd:schema>

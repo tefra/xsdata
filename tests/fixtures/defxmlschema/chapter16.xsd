@@ -1,0 +1,77 @@
+<!--Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+
+  <xsd:annotation>
+    <xsd:documentation>
+      This example illustrates substitution groups.
+    </xsd:documentation>
+  </xsd:annotation>
+
+  <xsd:element name="items" type="ItemsType"/>
+  <xsd:complexType name="ItemsType">
+    <xsd:sequence>
+      <xsd:element ref="product" maxOccurs="unbounded"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:element name="product" type="ProductType"/>
+  <xsd:complexType name="ProductType">
+    <xsd:sequence>
+      <xsd:element name="number" type="xsd:integer"/>
+      <xsd:element name="name" type="xsd:string"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:element name="shirt" type="ShirtType"
+                substitutionGroup="product"/>
+  <xsd:complexType name="ShirtType">
+    <xsd:complexContent>
+      <xsd:extension base="ProductType">
+        <xsd:sequence>
+          <xsd:element name="size" type="ShirtSizeType"/>
+          <xsd:element name="color" type="ColorType"/>
+        </xsd:sequence>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+
+  <xsd:element name="hat" substitutionGroup="product">
+  <xsd:complexType>
+    <xsd:complexContent>
+      <xsd:extension base="ProductType">
+        <xsd:sequence>
+          <xsd:element name="size" type="HatSizeType"/>
+        </xsd:sequence>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="umbrella" substitutionGroup="product"/>
+
+  <xsd:complexType name="ShirtSizeType">
+    <xsd:simpleContent>
+      <xsd:extension base="xsd:integer">
+        <xsd:attribute name="system" type="xsd:token"/>
+      </xsd:extension>
+    </xsd:simpleContent>
+  </xsd:complexType>
+
+  <xsd:complexType name="HatSizeType">
+    <xsd:simpleContent>
+      <xsd:extension base="xsd:token">
+        <xsd:attribute name="system" type="xsd:token"/>
+      </xsd:extension>
+    </xsd:simpleContent>
+  </xsd:complexType>
+
+  <xsd:complexType name="ColorType">
+    <xsd:attribute name="value" type="xsd:string"/>
+  </xsd:complexType>
+
+</xsd:schema>
+
+
+
+
+

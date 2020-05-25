@@ -1,0 +1,8 @@
+<!--Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
+<product xmlns="http://example.org/prod"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://example.org/prod chapter07.xsd">
+  <name/>
+  <size/>
+</product>
+

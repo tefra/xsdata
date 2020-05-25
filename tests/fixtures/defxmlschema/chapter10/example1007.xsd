@@ -1,9 +1,0 @@
-<!-- Definitive XML Schema by Priscilla Walmsley (c) 2012 Prentice Hall PTR -->
-<!-- Example 10-7 Defining a list type using an itemType attribute -->
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
-  <xs:import schemaLocation="../chapter08/example0808.xsd" />
-  <xs:simpleType name="AvailableSizesType">
-    <xs:list itemType="DressSizeType" />
-  </xs:simpleType>
-  <xs:element name="AvailableSizesType" type="AvailableSizesType" />
-</xs:schema>

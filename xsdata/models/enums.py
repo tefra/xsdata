@@ -43,10 +43,10 @@ class QNames:
 
 class NamespaceType(Enum):
     """
-    :cvar ANY: elements from any namespace is allowed
-    :cvar OTHER: elements from any namespace other than the parent element's namespace
-    :cvar LOCAL: elements must come from no namespace
-    :cvar TARGET: elements from the namespace of the parent element can be present
+    :param ANY: elements from any namespace is allowed
+    :param OTHER: elements from any namespace other than the parent element's namespace
+    :param LOCAL: elements must come from no namespace
+    :param TARGET: elements from the namespace of the parent element can be present
     """
 
     ANY = "##any"

@@ -34,6 +34,10 @@ class JsonEncoder(json.JSONEncoder):
 
 @dataclass
 class DictSerializer(AbstractSerializer):
+    """
+    :param dict_factory: Override default dict factory.
+    """
+
     dict_factory: Callable = field(default=dict)
 
     def render(self, obj: object) -> Dict:
@@ -45,9 +49,9 @@ class DictSerializer(AbstractSerializer):
 @dataclass
 class JsonSerializer(AbstractSerializer):
     """
-    :ivar dict_factory: Callable to generate dictionary
-    :ivar encoder: Value encoder
-    :ivar indent: Pretty print indent
+    :param dict_factory: Callable to generate dictionary
+    :param encoder: Value encoder
+    :param indent: Pretty print indent
     """
 
     dict_factory: Callable = field(default=dict)

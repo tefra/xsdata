@@ -173,9 +173,9 @@ class ClassSanitizer:
         Steps:
             1. Remove non alpha numerical values
             2. Handle Enum negative numerical values
-            2. Remove namespaces prefixes
-            3. Ensure name not empty
-            4. Ensure name starts with a letter
+            3. Remove namespaces prefixes
+            4. Ensure name not empty
+            5. Ensure name starts with a letter
         """
         if attr.is_enumeration:
             attr.name = attr.default

@@ -64,15 +64,14 @@ class AttributeTypeHandler(HandlerInterface):
             3. anything
         """
         qname = target.source_qname(attr_type.name)
-        result = self.container.find(qname, condition=lambda obj: not obj.is_complex)
-        if result:
-            return result
+        conditions = (lambda obj: not obj.is_complex, lambda x: not x.abstract, None)
 
-        result = self.container.find(qname, condition=lambda x: not x.abstract)
-        if result:
-            return result
+        for condition in conditions:
+            result = self.container.find(qname, condition=condition)
+            if result:
+                return result
 
-        return self.container.find(qname)
+        return None
 
     def process_dependency_type(self, target: Class, attr: Attr, attr_type: AttrType):
         """
@@ -165,14 +164,11 @@ class AttributeTypeHandler(HandlerInterface):
 
         seen = seen or set()
         for qname in source.dependencies():
-
-            if qname in seen:
-                continue
-
-            seen.add(qname)
-            check = self.container.find(qname)
-            if check and self.is_circular_dependency(check, target, seen):
-                return True
+            if qname not in seen:
+                seen.add(qname)
+                check = self.container.find(qname)
+                if check and self.is_circular_dependency(check, target, seen):
+                    return True
 
         return False
 

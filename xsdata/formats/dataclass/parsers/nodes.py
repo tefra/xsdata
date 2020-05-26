@@ -146,7 +146,7 @@ class WildcardNode(XmlNode):
         and mixed content and initialize a new generic element instance.
 
         :return: A tuple of the object's qualified name and a new
-        :class:`xsdata.formats.dataclass.models.generics.AnyElement` instance.
+            :class:`xsdata.formats.dataclass.models.generics.AnyElement` instance.
         """
         obj = ParserUtils.parse_any_element(element)
         obj.children = ParserUtils.fetch_any_children(self.position, objects)

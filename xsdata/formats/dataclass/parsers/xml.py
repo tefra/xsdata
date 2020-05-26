@@ -28,6 +28,13 @@ XmlNodes = List[XmlNode]
 
 @dataclass
 class XmlParser(AbstractParser):
+    """
+    :param namespaces:
+    :param context:
+    :param event_names:
+    :param config:
+    """
+
     namespaces: Namespaces = field(init=False, default_factory=Namespaces)
     context: XmlContext = field(default_factory=XmlContext)
     event_names: Dict = field(default_factory=dict)

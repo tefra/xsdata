@@ -25,10 +25,10 @@ from xsdata.models.enums import QNames
 @dataclass
 class XmlSerializer(AbstractSerializer):
     """
-    :ivar xml_declaration: Add xml declaration
-    :ivar encoding: Result text encoding
-    :ivar pretty_print: Enable pretty output
-    :ivar context: XmlContext instance
+    :param xml_declaration: Add xml declaration
+    :param encoding: Result text encoding
+    :param pretty_print: Enable pretty output
+    :param context: XmlContext instance
     """
 
     xml_declaration: bool = field(default=True)

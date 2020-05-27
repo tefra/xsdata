@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from xsdata.models.elements import Extension
+from xsdata.models.xsd import Extension
 
 
 class ExtensionTests(TestCase):

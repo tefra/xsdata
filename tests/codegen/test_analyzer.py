@@ -9,9 +9,9 @@ from xsdata.codegen.container import ClassContainer
 from xsdata.codegen.sanitizer import ClassSanitizer
 from xsdata.codegen.validator import ClassValidator
 from xsdata.exceptions import AnalyzerError
-from xsdata.models.elements import ComplexType
-from xsdata.models.elements import Element
-from xsdata.models.elements import SimpleType
+from xsdata.models.xsd import ComplexType
+from xsdata.models.xsd import Element
+from xsdata.models.xsd import SimpleType
 
 
 class ClassAnalyzerTests(FactoryTestCase):

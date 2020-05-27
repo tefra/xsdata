@@ -14,9 +14,9 @@ from xsdata.codegen.models import Class
 from xsdata.codegen.models import Restrictions
 from xsdata.codegen.utils import ClassUtils
 from xsdata.exceptions import AnalyzerValueError
-from xsdata.models.elements import ComplexType
-from xsdata.models.elements import Element
-from xsdata.models.elements import SimpleType
+from xsdata.models.xsd import ComplexType
+from xsdata.models.xsd import Element
+from xsdata.models.xsd import SimpleType
 
 
 class AttributeTypeHandlerTests(FactoryTestCase):

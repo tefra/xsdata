@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from xsdata.models.elements import All
+from xsdata.models.xsd import All
 
 
 class AllTests(TestCase):

@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from xsdata.models.elements import Enumeration
+from xsdata.models.xsd import Enumeration
 
 
 class EnumerationTests(TestCase):

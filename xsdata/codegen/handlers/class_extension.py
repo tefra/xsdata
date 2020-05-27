@@ -9,11 +9,11 @@ from xsdata.codegen.models import Class
 from xsdata.codegen.models import Extension
 from xsdata.codegen.utils import ClassUtils
 from xsdata.logger import logger
-from xsdata.models.elements import ComplexType
-from xsdata.models.elements import SimpleType
 from xsdata.models.enums import DataType
 from xsdata.models.enums import NamespaceType
 from xsdata.models.enums import Tag
+from xsdata.models.xsd import ComplexType
+from xsdata.models.xsd import SimpleType
 
 
 @dataclass

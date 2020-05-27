@@ -4,9 +4,9 @@ from tests.factories import ClassFactory
 from tests.factories import FactoryTestCase
 from xsdata.codegen.container import ClassContainer
 from xsdata.codegen.handlers import AttributeEnumUnionHandler
-from xsdata.models.elements import Element
-from xsdata.models.elements import SimpleType
 from xsdata.models.enums import Tag
+from xsdata.models.xsd import Element
+from xsdata.models.xsd import SimpleType
 
 
 class AttributeEnumUnionHandlerTests(FactoryTestCase):

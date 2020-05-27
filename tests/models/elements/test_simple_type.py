@@ -1,11 +1,11 @@
 from unittest import TestCase
 
-from xsdata.models.elements import Enumeration
-from xsdata.models.elements import Length
-from xsdata.models.elements import List
-from xsdata.models.elements import Restriction
-from xsdata.models.elements import SimpleType
-from xsdata.models.elements import Union
+from xsdata.models.xsd import Enumeration
+from xsdata.models.xsd import Length
+from xsdata.models.xsd import List
+from xsdata.models.xsd import Restriction
+from xsdata.models.xsd import SimpleType
+from xsdata.models.xsd import Union
 
 
 class SimpleTypeTests(TestCase):

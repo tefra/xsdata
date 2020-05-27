@@ -3,11 +3,11 @@ from typing import Iterator
 from unittest import TestCase
 
 from xsdata.exceptions import SchemaValueError
-from xsdata.models.elements import Import
-from xsdata.models.elements import Include
-from xsdata.models.elements import Override
-from xsdata.models.elements import Redefine
-from xsdata.models.elements import Schema
+from xsdata.models.xsd import Import
+from xsdata.models.xsd import Include
+from xsdata.models.xsd import Override
+from xsdata.models.xsd import Redefine
+from xsdata.models.xsd import Schema
 
 
 class SchemaTests(TestCase):

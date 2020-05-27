@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from xsdata.models.elements import AttributeGroup
+from xsdata.models.xsd import AttributeGroup
 
 
 class AttributeGroupTests(TestCase):

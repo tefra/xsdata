@@ -1,11 +1,11 @@
 from unittest import TestCase
 
 from xsdata.exceptions import SchemaValueError
-from xsdata.models.elements import Attribute
-from xsdata.models.elements import Length
-from xsdata.models.elements import Restriction
-from xsdata.models.elements import SimpleType
 from xsdata.models.enums import UseType
+from xsdata.models.xsd import Attribute
+from xsdata.models.xsd import Length
+from xsdata.models.xsd import Restriction
+from xsdata.models.xsd import SimpleType
 
 
 class AttributeTests(TestCase):

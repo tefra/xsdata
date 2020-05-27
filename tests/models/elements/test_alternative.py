@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from xsdata.models.elements import Alternative
+from xsdata.models.xsd import Alternative
 
 
 class AlternativeTests(TestCase):

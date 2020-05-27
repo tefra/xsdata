@@ -6,9 +6,9 @@ import click
 import click_log
 from pkg_resources import get_distribution
 
+from xsdata.codegen.transformer import SchemaTransformer
+from xsdata.codegen.writer import writer
 from xsdata.logger import logger
-from xsdata.transformer import SchemaTransformer
-from xsdata.writer import writer
 
 
 @click.command("generate")

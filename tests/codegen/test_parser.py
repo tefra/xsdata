@@ -5,6 +5,7 @@ from unittest import TestCase
 
 from lxml import etree
 
+from xsdata.codegen.parser import SchemaParser
 from xsdata.formats.dataclass.parsers.nodes import SkipNode
 from xsdata.models.elements import Any
 from xsdata.models.elements import Attribute
@@ -23,7 +24,6 @@ from xsdata.models.elements import Schema
 from xsdata.models.enums import FormType
 from xsdata.models.enums import Mode
 from xsdata.models.enums import Namespace
-from xsdata.parser import SchemaParser
 
 
 class SchemaParserTests(TestCase):

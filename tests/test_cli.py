@@ -7,8 +7,8 @@ from unittest import TestCase
 from click.testing import CliRunner
 
 from xsdata import cli
+from xsdata.codegen.transformer import SchemaTransformer
 from xsdata.logger import logger
-from xsdata.transformer import SchemaTransformer
 
 root = Path(__file__).parent.parent
 fixtures = root.joinpath("tests/fixtures/defxmlschema")

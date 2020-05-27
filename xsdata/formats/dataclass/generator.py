@@ -6,10 +6,10 @@ from typing import Tuple
 
 from xsdata.codegen.models import Class
 from xsdata.codegen.models import Package
+from xsdata.codegen.resolver import DependenciesResolver
 from xsdata.formats.dataclass import utils
 from xsdata.formats.dataclass.filters import filters
 from xsdata.formats.mixins import AbstractGenerator
-from xsdata.resolver import DependenciesResolver
 from xsdata.utils import text
 from xsdata.utils.collections import group_by
 

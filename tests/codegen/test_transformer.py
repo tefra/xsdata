@@ -3,20 +3,20 @@ from unittest import mock
 
 from tests.factories import ClassFactory
 from tests.factories import FactoryTestCase
-from xsdata.builder import ClassBuilder
+from xsdata.codegen.builder import ClassBuilder
+from xsdata.codegen.transformer import SchemaTransformer
+from xsdata.codegen.writer import CodeWriter
 from xsdata.models.elements import Include
 from xsdata.models.elements import Override
 from xsdata.models.elements import Schema
 from xsdata.models.enums import Namespace
-from xsdata.transformer import SchemaTransformer
-from xsdata.writer import CodeWriter
 
 
 class SchemaTransformerTests(FactoryTestCase):
     def setUp(self):
         self.transformer = SchemaTransformer(print=True, output="pydata")
 
-    @mock.patch("xsdata.transformer.logger.info")
+    @mock.patch("xsdata.codegen.transformer.logger.info")
     @mock.patch.object(CodeWriter, "print")
     @mock.patch.object(CodeWriter, "designate")
     @mock.patch.object(SchemaTransformer, "analyze_classes")
@@ -48,7 +48,7 @@ class SchemaTransformerTests(FactoryTestCase):
             ]
         )
 
-    @mock.patch("xsdata.transformer.logger.info")
+    @mock.patch("xsdata.codegen.transformer.logger.info")
     @mock.patch.object(CodeWriter, "write")
     @mock.patch.object(CodeWriter, "designate")
     @mock.patch.object(SchemaTransformer, "analyze_classes")
@@ -81,7 +81,7 @@ class SchemaTransformerTests(FactoryTestCase):
             ]
         )
 
-    @mock.patch("xsdata.transformer.logger.warning")
+    @mock.patch("xsdata.codegen.transformer.logger.warning")
     @mock.patch.object(SchemaTransformer, "analyze_classes")
     @mock.patch.object(SchemaTransformer, "process_schemas")
     def test_process_with_zero_classes_after_analyze(
@@ -113,7 +113,7 @@ class SchemaTransformerTests(FactoryTestCase):
             dict(foo=classes[:2], bar=classes[2:]), "foo"
         )
 
-    @mock.patch("xsdata.transformer.logger.info")
+    @mock.patch("xsdata.codegen.transformer.logger.info")
     @mock.patch.object(SchemaTransformer, "generate_classes")
     @mock.patch.object(SchemaTransformer, "process_included")
     @mock.patch.object(SchemaTransformer, "parse_schema")
@@ -157,7 +157,7 @@ class SchemaTransformerTests(FactoryTestCase):
         self.transformer.process_schema(path, None)
         mock_logger_info.assert_called_once_with("Parsing schema...")
 
-    @mock.patch("xsdata.transformer.logger.debug")
+    @mock.patch("xsdata.codegen.transformer.logger.debug")
     @mock.patch.object(SchemaTransformer, "parse_schema")
     def test_process_schema_avoid_circular_imports(
         self, mock_parse_schema, mock_logger_debug
@@ -192,7 +192,7 @@ class SchemaTransformerTests(FactoryTestCase):
         self.assertEqual(2, len(result))
         mock_process_schema.assert_called_once_with(path, "thug")
 
-    @mock.patch("xsdata.transformer.logger.debug")
+    @mock.patch("xsdata.codegen.transformer.logger.debug")
     def test_process_included_skip_when_location_already_imported(
         self, mock_logger_debug
     ):
@@ -210,7 +210,7 @@ class SchemaTransformerTests(FactoryTestCase):
             include.schema_location,
         )
 
-    @mock.patch("xsdata.transformer.logger.warning")
+    @mock.patch("xsdata.codegen.transformer.logger.warning")
     def test_process_included_skip_when_location_is_missing(self, mock_logger_warning):
         include = Include.create()
         result = self.transformer.process_included(include, "thug")
@@ -223,7 +223,7 @@ class SchemaTransformerTests(FactoryTestCase):
             include.schema_location,
         )
 
-    @mock.patch("xsdata.transformer.logger.info")
+    @mock.patch("xsdata.codegen.transformer.logger.info")
     @mock.patch.object(SchemaTransformer, "count_classes")
     @mock.patch.object(ClassBuilder, "build")
     @mock.patch.object(ClassBuilder, "__init__", return_value=None)
@@ -251,13 +251,13 @@ class SchemaTransformerTests(FactoryTestCase):
         )
 
     def test_parse_schema(self):
-        path = Path(__file__).parent.joinpath("fixtures/books.xsd").as_uri()
+        path = Path(__file__).parent.joinpath("../fixtures/books.xsd").as_uri()
         schema = self.transformer.parse_schema(path, "foo.bar")
         self.assertIsInstance(schema, Schema)
         self.assertEqual(2, len(schema.complex_types))
 
-    @mock.patch("xsdata.transformer.logger.warning")
-    @mock.patch("xsdata.transformer.urlopen")
+    @mock.patch("xsdata.codegen.transformer.logger.warning")
+    @mock.patch("xsdata.codegen.transformer.urlopen")
     def test_parse_schema_with_os_exception(self, mock_urlopen, mock_logger_warning):
         mock_urlopen.side_effect = FileNotFoundError
 

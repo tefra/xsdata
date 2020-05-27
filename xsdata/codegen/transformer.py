@@ -11,9 +11,11 @@ from typing import Union
 from urllib.parse import urlparse
 from urllib.request import urlopen
 
-from xsdata.analyzer import ClassAnalyzer
-from xsdata.builder import ClassBuilder
+from xsdata.codegen.analyzer import ClassAnalyzer
+from xsdata.codegen.builder import ClassBuilder
 from xsdata.codegen.models import Class
+from xsdata.codegen.parser import SchemaParser
+from xsdata.codegen.writer import writer
 from xsdata.logger import logger
 from xsdata.models.elements import Import
 from xsdata.models.elements import Include
@@ -21,8 +23,6 @@ from xsdata.models.elements import Override
 from xsdata.models.elements import Redefine
 from xsdata.models.elements import Schema
 from xsdata.models.enums import COMMON_SCHEMA_DIR
-from xsdata.parser import SchemaParser
-from xsdata.writer import writer
 
 
 Included = Union[Import, Include, Redefine, Override]

@@ -4,8 +4,8 @@ from typing import List
 from typing import Tuple
 
 from xsdata.codegen.models import Class
+from xsdata.codegen.resolver import DependenciesResolver
 from xsdata.formats.mixins import AbstractGenerator
-from xsdata.resolver import DependenciesResolver
 
 
 class PlantUmlGenerator(AbstractGenerator):

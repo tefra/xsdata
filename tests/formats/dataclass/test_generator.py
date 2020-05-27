@@ -4,9 +4,8 @@ from unittest import mock
 
 from tests.factories import ClassFactory
 from tests.factories import FactoryTestCase
-from tests.factories import PackageFactory
+from xsdata.codegen.resolver import DependenciesResolver
 from xsdata.formats.dataclass.generator import DataclassGenerator
-from xsdata.resolver import DependenciesResolver
 
 
 class DataclassGeneratorTests(FactoryTestCase):

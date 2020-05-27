@@ -2,7 +2,7 @@ from xsdata.codegen.mixins import HandlerInterface
 from xsdata.codegen.models import AttrType
 from xsdata.codegen.models import Class
 from xsdata.exceptions import AnalyzerError
-from xsdata.models.elements import SimpleType
+from xsdata.models.xsd import SimpleType
 
 
 class AttributeMismatchHandler(HandlerInterface):

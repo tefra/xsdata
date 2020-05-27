@@ -7,7 +7,7 @@ from tests.factories import ClassFactory
 from tests.factories import FactoryTestCase
 from xsdata.codegen.container import ClassContainer
 from xsdata.codegen.models import Class
-from xsdata.models.elements import ComplexType
+from xsdata.models.xsd import ComplexType
 
 
 class ClassContainerTests(FactoryTestCase):

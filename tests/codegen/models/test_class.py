@@ -7,9 +7,9 @@ from tests.factories import AttrTypeFactory
 from tests.factories import ClassFactory
 from tests.factories import ExtensionFactory
 from tests.factories import FactoryTestCase
-from xsdata.models.elements import ComplexType
-from xsdata.models.elements import Element
-from xsdata.models.elements import SimpleType
+from xsdata.models.xsd import ComplexType
+from xsdata.models.xsd import Element
+from xsdata.models.xsd import SimpleType
 
 
 class ClassTests(FactoryTestCase):

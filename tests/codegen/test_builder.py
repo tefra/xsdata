@@ -9,26 +9,26 @@ from tests.factories import ExtensionFactory
 from tests.factories import FactoryTestCase
 from xsdata.codegen.builder import ClassBuilder
 from xsdata.codegen.models import Restrictions
-from xsdata.models.elements import Alternative
-from xsdata.models.elements import Annotation
-from xsdata.models.elements import Attribute
-from xsdata.models.elements import AttributeGroup
-from xsdata.models.elements import ComplexContent
-from xsdata.models.elements import ComplexType
-from xsdata.models.elements import Element
-from xsdata.models.elements import Enumeration
-from xsdata.models.elements import Extension
-from xsdata.models.elements import Group
-from xsdata.models.elements import Override
-from xsdata.models.elements import Redefine
-from xsdata.models.elements import Restriction
-from xsdata.models.elements import Schema
-from xsdata.models.elements import Sequence
-from xsdata.models.elements import SimpleContent
-from xsdata.models.elements import SimpleType
 from xsdata.models.enums import DataType
 from xsdata.models.enums import FormType
 from xsdata.models.enums import Tag
+from xsdata.models.xsd import Alternative
+from xsdata.models.xsd import Annotation
+from xsdata.models.xsd import Attribute
+from xsdata.models.xsd import AttributeGroup
+from xsdata.models.xsd import ComplexContent
+from xsdata.models.xsd import ComplexType
+from xsdata.models.xsd import Element
+from xsdata.models.xsd import Enumeration
+from xsdata.models.xsd import Extension
+from xsdata.models.xsd import Group
+from xsdata.models.xsd import Override
+from xsdata.models.xsd import Redefine
+from xsdata.models.xsd import Restriction
+from xsdata.models.xsd import Schema
+from xsdata.models.xsd import Sequence
+from xsdata.models.xsd import SimpleContent
+from xsdata.models.xsd import SimpleType
 
 
 class ClassBuilderTests(FactoryTestCase):

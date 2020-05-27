@@ -9,15 +9,15 @@ from xsdata.codegen.models import Class
 from xsdata.codegen.models import Extension
 from xsdata.codegen.models import Package
 from xsdata.codegen.models import Restrictions
-from xsdata.models.elements import Attribute
-from xsdata.models.elements import ComplexType
-from xsdata.models.elements import Element
-from xsdata.models.elements import Restriction
-from xsdata.models.elements import SimpleType
 from xsdata.models.enums import DataType
 from xsdata.models.enums import Namespace
 from xsdata.models.enums import QNames
 from xsdata.models.enums import Tag
+from xsdata.models.xsd import Attribute
+from xsdata.models.xsd import ComplexType
+from xsdata.models.xsd import Element
+from xsdata.models.xsd import Restriction
+from xsdata.models.xsd import SimpleType
 
 NSMAP = {ns.prefix: ns.uri for ns in Namespace}
 

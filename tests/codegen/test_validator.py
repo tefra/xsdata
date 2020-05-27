@@ -8,9 +8,9 @@ from xsdata.codegen.container import ClassContainer
 from xsdata.codegen.models import Restrictions
 from xsdata.codegen.utils import ClassUtils
 from xsdata.codegen.validator import ClassValidator
-from xsdata.models.elements import ComplexType
-from xsdata.models.elements import Element
-from xsdata.models.elements import SimpleType
+from xsdata.models.xsd import ComplexType
+from xsdata.models.xsd import Element
+from xsdata.models.xsd import SimpleType
 
 
 class ClassValidatorTests(FactoryTestCase):

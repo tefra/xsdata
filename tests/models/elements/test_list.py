@@ -1,7 +1,7 @@
 import sys
 from unittest import TestCase
 
-from xsdata.models.elements import List
+from xsdata.models.xsd import List
 
 
 class ListTests(TestCase):

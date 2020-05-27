@@ -7,23 +7,23 @@ from lxml import etree
 
 from xsdata.codegen.parser import SchemaParser
 from xsdata.formats.dataclass.parsers.nodes import SkipNode
-from xsdata.models.elements import Any
-from xsdata.models.elements import Attribute
-from xsdata.models.elements import AttributeGroup
-from xsdata.models.elements import ComplexType
-from xsdata.models.elements import DefaultOpenContent
-from xsdata.models.elements import Element
-from xsdata.models.elements import Extension
-from xsdata.models.elements import Import
-from xsdata.models.elements import Include
-from xsdata.models.elements import OpenContent
-from xsdata.models.elements import Override
-from xsdata.models.elements import Redefine
-from xsdata.models.elements import Restriction
-from xsdata.models.elements import Schema
 from xsdata.models.enums import FormType
 from xsdata.models.enums import Mode
 from xsdata.models.enums import Namespace
+from xsdata.models.xsd import Any
+from xsdata.models.xsd import Attribute
+from xsdata.models.xsd import AttributeGroup
+from xsdata.models.xsd import ComplexType
+from xsdata.models.xsd import DefaultOpenContent
+from xsdata.models.xsd import Element
+from xsdata.models.xsd import Extension
+from xsdata.models.xsd import Import
+from xsdata.models.xsd import Include
+from xsdata.models.xsd import OpenContent
+from xsdata.models.xsd import Override
+from xsdata.models.xsd import Redefine
+from xsdata.models.xsd import Restriction
+from xsdata.models.xsd import Schema
 
 
 class SchemaParserTests(TestCase):

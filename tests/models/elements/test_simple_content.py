@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from xsdata.models.elements import SimpleContent
+from xsdata.models.xsd import SimpleContent
 
 
 class SimpleContentTests(TestCase):

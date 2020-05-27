@@ -6,10 +6,10 @@ from tests.factories import FactoryTestCase
 from xsdata.codegen.builder import ClassBuilder
 from xsdata.codegen.transformer import SchemaTransformer
 from xsdata.codegen.writer import CodeWriter
-from xsdata.models.elements import Include
-from xsdata.models.elements import Override
-from xsdata.models.elements import Schema
 from xsdata.models.enums import Namespace
+from xsdata.models.xsd import Include
+from xsdata.models.xsd import Override
+from xsdata.models.xsd import Schema
 
 
 class SchemaTransformerTests(FactoryTestCase):

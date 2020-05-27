@@ -10,9 +10,9 @@ from xsdata.codegen.container import ClassContainer
 from xsdata.codegen.handlers import ClassExtensionHandler
 from xsdata.codegen.models import Restrictions
 from xsdata.codegen.utils import ClassUtils
-from xsdata.models.elements import ComplexType
-from xsdata.models.elements import SimpleType
 from xsdata.models.enums import Tag
+from xsdata.models.xsd import ComplexType
+from xsdata.models.xsd import SimpleType
 
 
 class ClassExtensionHandlerTests(FactoryTestCase):

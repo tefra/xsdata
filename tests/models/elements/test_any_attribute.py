@@ -1,8 +1,8 @@
 from unittest import TestCase
 
 from xsdata.exceptions import SchemaValueError
-from xsdata.models.elements import AnyAttribute
 from xsdata.models.enums import NamespaceType
+from xsdata.models.xsd import AnyAttribute
 
 
 class AnyAttributeTests(TestCase):

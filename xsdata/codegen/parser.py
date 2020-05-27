@@ -13,7 +13,7 @@ from lxml.etree import QName
 
 from xsdata.formats.dataclass.parsers.nodes import XmlNode
 from xsdata.formats.dataclass.parsers.xml import XmlParser
-from xsdata.models import elements as xsd
+from xsdata.models import xsd
 from xsdata.models.enums import FormType
 from xsdata.models.enums import Mode
 from xsdata.models.enums import Namespace

@@ -3,12 +3,12 @@ from typing import Optional
 from unittest import TestCase
 
 from xsdata.exceptions import SchemaValueError
-from xsdata.models.elements import ComplexType
-from xsdata.models.elements import Element
 from xsdata.models.enums import DataType
 from xsdata.models.enums import FormType
 from xsdata.models.enums import Namespace
 from xsdata.models.mixins import ElementBase
+from xsdata.models.xsd import ComplexType
+from xsdata.models.xsd import Element
 
 
 class ElementBaseTests(TestCase):

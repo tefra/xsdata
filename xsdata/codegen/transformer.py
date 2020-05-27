@@ -17,12 +17,12 @@ from xsdata.codegen.models import Class
 from xsdata.codegen.parser import SchemaParser
 from xsdata.codegen.writer import writer
 from xsdata.logger import logger
-from xsdata.models.elements import Import
-from xsdata.models.elements import Include
-from xsdata.models.elements import Override
-from xsdata.models.elements import Redefine
-from xsdata.models.elements import Schema
 from xsdata.models.enums import COMMON_SCHEMA_DIR
+from xsdata.models.xsd import Import
+from xsdata.models.xsd import Include
+from xsdata.models.xsd import Override
+from xsdata.models.xsd import Redefine
+from xsdata.models.xsd import Schema
 
 
 Included = Union[Import, Include, Redefine, Override]

@@ -28,20 +28,12 @@ class DataclassGenerator(AbstractGenerator):
         packages = {obj.source_qname(): obj.target_module for obj in classes}
         resolver = DependenciesResolver(packages=packages)
 
-        # Generate all packages
-        pck_name = classes[0].package if classes and classes[0].package else ""
-        cwd = Path.cwd()
-        for part in pck_name.split("."):
-            cwd = cwd.joinpath(part)
-            init = cwd.joinpath("__init__.py")
-            if not init.exists():
-                yield init, "init", "# nothing here\n"
-
-        # Generate package catalogues
+        # Generate packages
         for package, cluster in self.group_by_package(classes).items():
             output = self.render_package(cluster)
             pck = "init"
             yield package.joinpath("__init__.py"), pck, output
+            yield from self.ensure_packages(package.parent)
 
         # Generate modules
         for module, cluster in self.group_by_module(classes).items():
@@ -74,6 +66,16 @@ class DataclassGenerator(AbstractGenerator):
     def render_class(self, obj: Class) -> str:
         template = "enum" if obj.is_enumeration else "class"
         return self.template(template).render(obj=obj)
+
+    @classmethod
+    def ensure_packages(cls, package: Path):
+        cwd = Path.cwd()
+        while cwd != package:
+            init = package.joinpath("__init__.py")
+            if not init.exists():
+                yield init, "init", "# nothing here\n"
+
+            package = package.parent
 
     @classmethod
     def group_imports(cls, imports: List[Package]) -> Dict[str, List[Package]]:

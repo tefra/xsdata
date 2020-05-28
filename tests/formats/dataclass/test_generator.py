@@ -14,32 +14,33 @@ class DataclassGeneratorTests(FactoryTestCase):
     def test_render(
         self, mock_render_module, mock_render_package,
     ):
-        classes = ClassFactory.list(3)
+        classes = [
+            ClassFactory.create(package="foo.bar"),
+            ClassFactory.create(package="bar.foo"),
+            ClassFactory.create(package="thug.life"),
+        ]
 
         mock_render_module.return_value = "module"
         mock_render_package.return_value = "package"
 
         iterator = DataclassGenerator().render(classes)
 
+        cwd = Path.cwd()
         actual = [out for out in iterator]
-        self.assertEqual(3, len(actual))
-
-        self.assertEqual("init", actual[0][1])
-        self.assertEqual("foo/__init__.py", str(actual[0][0].relative_to(Path.cwd())))
-        self.assertEqual("# nothing here\n", actual[0][2])
-
-        self.assertEqual("init", actual[1][1])
-        self.assertEqual("foo/__init__.py", str(actual[1][0].relative_to(Path.cwd())))
-        self.assertEqual(mock_render_package.return_value, actual[1][2])
-        mock_render_package.assert_called_once_with(classes)
-
-        self.assertEqual(3, len(actual[2]))
-        self.assertIsInstance(actual[2][0], Path)
-        self.assertTrue(actual[2][0].is_absolute())
-        self.assertEqual("foo.tests", actual[2][1])
-        self.assertEqual("foo/tests.py", str(actual[2][0].relative_to(Path.cwd())))
-        self.assertEqual(mock_render_module.return_value, actual[2][2])
-        mock_render_module.assert_called_once_with(mock.ANY, classes)
+        expected = [
+            (cwd.joinpath("foo/bar/__init__.py"), "init", "package"),
+            (cwd.joinpath("foo/__init__.py"), "init", "# nothing here\n"),
+            (cwd.joinpath("bar/foo/__init__.py"), "init", "package"),
+            (cwd.joinpath("bar/__init__.py"), "init", "# nothing here\n"),
+            (cwd.joinpath("thug/life/__init__.py"), "init", "package"),
+            (cwd.joinpath("thug/__init__.py"), "init", "# nothing here\n"),
+            (cwd.joinpath("foo/bar/tests.py"), "foo.bar.tests", "module"),
+            (cwd.joinpath("bar/foo/tests.py"), "bar.foo.tests", "module"),
+            (cwd.joinpath("thug/life/tests.py"), "thug.life.tests", "module"),
+        ]
+        self.assertEqual(expected, actual)
+        mock_render_package.assert_has_calls([mock.call([x]) for x in classes])
+        mock_render_module.assert_has_calls([mock.call(mock.ANY, [x]) for x in classes])
 
     def test_render_package(self):
         classes = ClassFactory.list(3)

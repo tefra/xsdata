@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from dataclasses import replace
 from unittest.case import TestCase
 
 from lxml.etree import QName
@@ -9,9 +10,11 @@ from xsdata.formats.dataclass.models.elements import FindMode
 from xsdata.formats.dataclass.models.elements import XmlAttribute
 from xsdata.formats.dataclass.models.elements import XmlAttributes
 from xsdata.formats.dataclass.models.elements import XmlElement
+from xsdata.formats.dataclass.models.elements import XmlMeta
 from xsdata.formats.dataclass.models.elements import XmlText
 from xsdata.formats.dataclass.models.elements import XmlVar
 from xsdata.formats.dataclass.models.elements import XmlWildcard
+from xsdata.models.enums import FormType
 from xsdata.models.enums import QNames
 
 
@@ -134,7 +137,29 @@ class XmlTextTests(TestCase):
         self.assertTrue(var.is_tokens)
 
 
-class XmlMeta(TestCase):
+class XmlMetaTests(TestCase):
+    def test_property_element_form(self):
+        meta = XmlMeta(
+            name="foo",
+            clazz=BookForm,
+            qname=QName("foo"),
+            source_qname=QName("foo"),
+            nillable=False,
+        )
+        self.assertEqual(FormType.UNQUALIFIED, meta.element_form)
+
+        meta = replace(meta, qname=QName("bar", "foo"))
+        self.assertEqual(FormType.QUALIFIED, meta.element_form)
+
+        meta.vars.append(XmlElement(name="a", qname=QName("a")))
+        self.assertEqual(FormType.UNQUALIFIED, meta.element_form)
+
+        meta.vars.append(XmlElement(name="b", qname=QName("b"), namespaces=["bar"]))
+        self.assertEqual(FormType.UNQUALIFIED, meta.element_form)
+
+        meta.vars.pop(0)
+        self.assertEqual(FormType.QUALIFIED, meta.element_form)
+
     def test_find_var(self):
         ctx = XmlContext()
         meta = ctx.build(BookForm)

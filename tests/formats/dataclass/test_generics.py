@@ -9,6 +9,7 @@ from xsdata.models.enums import Namespace
 class NamespacesTests(TestCase):
     def test_add(self):
         namespaces = Namespaces()
+        namespaces.add("default", "")
         namespaces.add("foo")
         namespaces.add("foo")
         namespaces.add("bar", "one")
@@ -17,12 +18,15 @@ class NamespacesTests(TestCase):
         namespaces.add(Namespace.XSI.uri, "b")
         namespaces.add(Namespace.XS.uri, "c")
         namespaces.add(Namespace.XS.uri, "d")
+        namespaces.add("thug")
 
         expected = {
+            "default": {""},
             "bar": {"one", "two"},
-            "foo": {"ns0"},
+            "foo": {"ns1"},
             "http://www.w3.org/2001/XMLSchema": {"xs"},
             "http://www.w3.org/2001/XMLSchema-instance": {"xsi"},
+            "thug": {"ns8"},
         }
         self.assertEqual(expected, namespaces.data)
 
@@ -30,13 +34,15 @@ class NamespacesTests(TestCase):
         namespaces = Namespaces()
         namespaces.add_all(
             {
+                None: "default",
                 "b": "bar",
-                None: "http://www.w3.org/2001/XMLSchema",
+                "bar": "http://www.w3.org/2001/XMLSchema",
                 "foo": "http://www.w3.org/2001/XMLSchema-instance",
             }
         )
         expected = {
             "bar": {"b"},
+            "default": {""},
             "http://www.w3.org/2001/XMLSchema": {"xs"},
             "http://www.w3.org/2001/XMLSchema-instance": {"xsi"},
         }
@@ -60,7 +66,7 @@ class NamespacesTests(TestCase):
         namespaces = Namespaces()
         namespaces.add_all(
             {
-                None: "http://www.w3.org/2001/XMLSchema",
+                "": "xsdata",
                 "foo": "http://www.w3.org/2001/XMLSchema-instance",
                 "b": "bar",
             }
@@ -70,11 +76,11 @@ class NamespacesTests(TestCase):
         namespaces.add("two")
 
         expected = {
+            None: "xsdata",
             "b": "bar",
             "again": "bar",
-            "ns0": "one",
-            "ns1": "two",
-            "xs": "http://www.w3.org/2001/XMLSchema",
+            "ns4": "one",
+            "ns5": "two",
             "xsi": "http://www.w3.org/2001/XMLSchema-instance",
         }
         self.assertEqual(expected, namespaces.ns_map)

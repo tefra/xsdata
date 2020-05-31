@@ -10,6 +10,7 @@ from typing import Type
 
 from lxml.etree import QName
 
+from xsdata.models.enums import FormType
 from xsdata.models.enums import NamespaceType
 from xsdata.models.enums import QNames
 
@@ -167,6 +168,15 @@ class XmlMeta:
     nillable: bool
     vars: List[XmlVar] = field(default_factory=list)
     cache: Dict = field(default_factory=dict)
+
+    @property
+    def element_form(self) -> FormType:
+        return (
+            FormType.UNQUALIFIED
+            if not self.qname.namespace
+            or any(var.is_element and not var.namespaces for var in self.vars)
+            else FormType.QUALIFIED
+        )
 
     def find_var(
         self, qname: QName = QNames.ALL, mode: FindMode = FindMode.ALL

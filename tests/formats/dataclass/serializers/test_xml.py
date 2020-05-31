@@ -12,6 +12,7 @@ from lxml.etree import QName
 
 from tests.fixtures.books import BookForm
 from tests.fixtures.books import Books
+from tests.fixtures.common.models.nhinc.common import TokenCreationInfo
 from tests.fixtures.defxmlschema.chapter12 import ColorType
 from tests.fixtures.defxmlschema.chapter12 import DescriptionType
 from tests.fixtures.defxmlschema.chapter12 import Items
@@ -100,6 +101,19 @@ class XmlSerializerTests(TestCase):
             "    <review>A masterpiece of the fine art of gossiping.</review>\n"
             "  </book>\n"
             "</burn:books>\n"
+        )
+        self.assertEqual(expected, actual)
+
+    def test_render_with_qualified_element_form(self):
+        create_token = TokenCreationInfo(action_name="foo", resource_name="bar")
+        actual = self.serializer.render(create_token)
+
+        expected = (
+            "<?xml version='1.0' encoding='UTF-8'?>\n"
+            '<TokenCreationInfo xmlns="urn:gov:hhs:fha:nhinc:common:nhinccommon">\n'
+            "  <actionName>foo</actionName>\n"
+            "  <resourceName>bar</resourceName>\n"
+            "</TokenCreationInfo>\n"
         )
         self.assertEqual(expected, actual)
 

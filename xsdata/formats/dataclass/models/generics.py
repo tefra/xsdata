@@ -41,7 +41,7 @@ class Namespaces:
     def ns_map(self) -> Dict:
         if self._ns_map is None:
             self._ns_map = {
-                prefix: uri
+                (prefix or None): uri
                 for uri, prefixes in sorted(self.data.items())
                 for prefix in sorted(prefixes)
             }
@@ -53,21 +53,21 @@ class Namespaces:
         )
 
     def add(self, uri: Optional[str], prefix: Optional[str] = None):
-        if not uri or uri in self.data and not prefix:
+        if not uri or uri in self.data and prefix is None:
             return
 
         namespace = Namespace.get_enum(uri)
         prefix = namespace.prefix if namespace else prefix
-        if not prefix:
+        if prefix is None:
             prefix = f"ns{self.auto_ns}"
-            self.auto_ns += 1
 
+        self.auto_ns += 1
         self._ns_map = None
         self.data[uri].add(prefix)
 
     def add_all(self, ns_map: Dict):
         for prefix, uri in ns_map.items():
-            self.add(uri, prefix)
+            self.add(uri, prefix or "")
 
     def clear(self):
         self._ns_map = None

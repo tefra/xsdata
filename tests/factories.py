@@ -9,6 +9,7 @@ from xsdata.codegen.models import Class
 from xsdata.codegen.models import Extension
 from xsdata.codegen.models import Package
 from xsdata.codegen.models import Restrictions
+from xsdata.codegen.models import Status
 from xsdata.models.enums import DataType
 from xsdata.models.enums import Namespace
 from xsdata.models.enums import QNames
@@ -78,7 +79,7 @@ class ClassFactory(Factory):
         ns_map=None,
         package="foo",
         module="tests",
-        processed=False,
+        status=Status.RAW,
     ):
         name = name or f"class_{cls.next_letter()}"
         return cls.model(
@@ -97,7 +98,7 @@ class ClassFactory(Factory):
             package=package,
             module=module,
             ns_map=ns_map if isinstance(ns_map, dict) else NSMAP,
-            processed=processed,
+            status=status,
         )
 
     @classmethod

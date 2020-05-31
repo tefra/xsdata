@@ -3,6 +3,7 @@ from dataclasses import asdict
 from dataclasses import dataclass
 from dataclasses import field
 from dataclasses import replace
+from enum import IntEnum
 from typing import Any
 from typing import Dict
 from typing import Iterator
@@ -223,6 +224,12 @@ class Extension:
         )
 
 
+class Status(IntEnum):
+    RAW = 0
+    PROCESSING = 1
+    PROCESSED = 2
+
+
 @dataclass
 class Class:
     name: str
@@ -231,7 +238,7 @@ class Class:
     mixed: bool
     abstract: bool
     nillable: bool
-    processed: bool = False
+    status: Status = field(default=Status.RAW)
     package: Optional[str] = field(default=None)
     namespace: Optional[str] = field(default=None)
     help: Optional[str] = field(default=None)

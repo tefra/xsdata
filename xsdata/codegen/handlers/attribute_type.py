@@ -1,12 +1,18 @@
 from dataclasses import dataclass
+from dataclasses import field
+from typing import Dict
 from typing import Optional
 from typing import Set
+from typing import Tuple
+
+from lxml.etree import QName
 
 from xsdata.codegen.mixins import ContainerInterface
 from xsdata.codegen.mixins import HandlerInterface
 from xsdata.codegen.models import Attr
 from xsdata.codegen.models import AttrType
 from xsdata.codegen.models import Class
+from xsdata.codegen.models import Status
 from xsdata.codegen.utils import ClassUtils
 from xsdata.exceptions import AnalyzerValueError
 from xsdata.logger import logger
@@ -20,6 +26,7 @@ class AttributeTypeHandler(HandlerInterface):
     types."""
 
     container: ContainerInterface
+    dependencies: Dict = field(default_factory=dict)
 
     def process(self, target: Class):
         """
@@ -159,11 +166,11 @@ class AttributeTypeHandler(HandlerInterface):
         """Check if any source dependencies recursively match the target
         class."""
 
-        if source is target:
+        if source is target or source.status == Status.PROCESSING:
             return True
 
         seen = seen or set()
-        for qname in source.dependencies():
+        for qname in self.cached_dependencies(source):
             if qname not in seen:
                 seen.add(qname)
                 check = self.container.find(qname)
@@ -171,6 +178,13 @@ class AttributeTypeHandler(HandlerInterface):
                     return True
 
         return False
+
+    def cached_dependencies(self, source: Class) -> Tuple[QName]:
+        cache_key = id(source)
+        if cache_key not in self.dependencies:
+            self.dependencies[cache_key] = tuple(source.dependencies())
+
+        return self.dependencies[cache_key]
 
     @classmethod
     def reset_attribute_type(cls, attr_type: AttrType):

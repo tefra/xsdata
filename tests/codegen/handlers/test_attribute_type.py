@@ -12,6 +12,7 @@ from xsdata.codegen.container import ClassContainer
 from xsdata.codegen.handlers import AttributeTypeHandler
 from xsdata.codegen.models import Class
 from xsdata.codegen.models import Restrictions
+from xsdata.codegen.models import Status
 from xsdata.codegen.utils import ClassUtils
 from xsdata.exceptions import AnalyzerValueError
 from xsdata.models.xsd import ComplexType
@@ -269,6 +270,7 @@ class AttributeTypeHandlerTests(FactoryTestCase):
         source = ClassFactory.create()
         target = ClassFactory.create()
         another = ClassFactory.create()
+        processing = ClassFactory.create(status=Status.PROCESSING)
 
         find_classes = {QName("a"): another, QName("b"): target}
 
@@ -279,8 +281,15 @@ class AttributeTypeHandlerTests(FactoryTestCase):
             [QName(x) for x in "xy"],
         ]
 
+        self.assertTrue(self.processor.is_circular_dependency(processing, target))
+
+        self.processor.dependencies.clear()
         self.assertFalse(self.processor.is_circular_dependency(source, target))
+
+        self.processor.dependencies.clear()
         self.assertTrue(self.processor.is_circular_dependency(source, target))
+
+        self.processor.dependencies.clear()
         self.assertTrue(self.processor.is_circular_dependency(source, source))
 
         mock_container_find.assert_has_calls(
@@ -312,3 +321,21 @@ class AttributeTypeHandlerTests(FactoryTestCase):
         simple = ClassFactory.create(name="a", type=SimpleType)
         self.processor.container.add(simple)
         self.assertEqual(simple, self.processor.find_dependency(target, attr_type))
+
+    @mock.patch.object(Class, "dependencies")
+    def test_cached_dependencies(self, mock_class_dependencies):
+        a_qname = QName("a")
+        b_qname = QName("b")
+
+        mock_class_dependencies.return_value = [a_qname, b_qname]
+
+        source = ClassFactory.create()
+        self.processor.dependencies[id(source)] = (a_qname,)
+
+        actual = self.processor.cached_dependencies(source)
+        self.assertEqual((a_qname,), actual)
+
+        self.processor.dependencies.clear()
+        actual = self.processor.cached_dependencies(source)
+        self.assertEqual((a_qname, b_qname), actual)
+        mock_class_dependencies.assert_called_once_with()

@@ -19,7 +19,10 @@ from xsdata.formats.dataclass.models.elements import XmlVar
 from xsdata.formats.dataclass.models.generics import AnyElement
 from xsdata.formats.dataclass.models.generics import Namespaces
 from xsdata.formats.dataclass.serializers.utils import SerializeUtils
+from xsdata.models.enums import FormType
 from xsdata.models.enums import QNames
+
+DEFAULT_NS_PREFIX = ""
 
 
 @dataclass
@@ -61,9 +64,10 @@ class XmlSerializer(AbstractSerializer):
         meta = self.context.build(obj.__class__)
         namespaces = namespaces or Namespaces()
         namespaces.register()
-        namespaces.add(meta.qname.namespace)
-        root = Element(meta.qname)
+        prefix = DEFAULT_NS_PREFIX if meta.element_form == FormType.QUALIFIED else None
+        namespaces.add(meta.qname.namespace, prefix=prefix)
 
+        root = Element(meta.qname, nsmap=namespaces.ns_map)
         self.render_node(root, obj, namespaces)
         cleanup_namespaces(
             root, top_nsmap=namespaces.ns_map, keep_ns_prefixes=namespaces.prefixes

@@ -18,6 +18,7 @@ from xsdata.codegen.handlers import AttributeTypeHandler
 from xsdata.codegen.handlers import ClassExtensionHandler
 from xsdata.codegen.mixins import ContainerInterface
 from xsdata.codegen.models import Class
+from xsdata.codegen.models import Status
 from xsdata.utils.collections import group_by
 
 methodcaller("source_qname")
@@ -51,7 +52,7 @@ class ClassContainer(UserDict, ContainerInterface):
     def find(self, qname: QName, condition: Condition = None) -> Optional[Class]:
         for row in self.data.get(qname, []):
             if not condition or condition(row):
-                if not row.processed:
+                if row.status == Status.RAW:
                     self.process_class(row)
 
                     if condition:
@@ -62,18 +63,20 @@ class ClassContainer(UserDict, ContainerInterface):
 
     def process(self):
         for obj in self.iterate():
-            if not obj.processed:
+            if obj.status == Status.RAW:
                 self.process_class(obj)
 
     def process_class(self, target: Class):
-        target.processed = True
+        target.status = Status.PROCESSING
 
         for processor in self.processors:
             processor.process(target)
 
         for inner in target.inner:
-            if not inner.processed:
+            if inner.status == Status.RAW:
                 self.process_class(inner)
+
+        target.status = Status.PROCESSED
 
     def add(self, item: Class):
         self.data.setdefault(item.source_qname(), []).append(item)

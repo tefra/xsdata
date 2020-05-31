@@ -7,6 +7,7 @@ from tests.factories import ClassFactory
 from tests.factories import FactoryTestCase
 from xsdata.codegen.container import ClassContainer
 from xsdata.codegen.models import Class
+from xsdata.codegen.models import Status
 from xsdata.models.xsd import ComplexType
 
 
@@ -35,8 +36,8 @@ class ClassContainerTests(FactoryTestCase):
     @mock.patch.object(ClassContainer, "process_class")
     def test_find(self, mock_process_class):
         class_a = ClassFactory.create(name="a")
-        class_b = ClassFactory.create(name="b", processed=True)
-        class_c = ClassFactory.enumeration(2, name="b", processed=True)
+        class_b = ClassFactory.create(name="b", status=Status.PROCESSED)
+        class_c = ClassFactory.enumeration(2, name="b", status=Status.PROCESSING)
 
         self.container.extend([class_a, class_b, class_c])
 
@@ -56,7 +57,7 @@ class ClassContainerTests(FactoryTestCase):
         self.container.extend([first, second])
 
         def process_class(x: Class):
-            x.processed = True
+            x.status = Status.PROCESSED
             if x is first:
                 first.attrs.clear()
 

@@ -7,7 +7,7 @@ from xsdata.codegen.container import ClassContainer
 from xsdata.codegen.handlers import AttributeGroupHandler
 from xsdata.codegen.models import Attr
 from xsdata.codegen.utils import ClassUtils
-from xsdata.exceptions import AnalyzerError
+from xsdata.exceptions import AnalyzerValueError
 
 
 class AttributeGroupHandlerTests(FactoryTestCase):
@@ -80,7 +80,7 @@ class AttributeGroupHandlerTests(FactoryTestCase):
         target = ClassFactory.create()
         target.attrs.append(group_attr)
 
-        with self.assertRaises(AnalyzerError) as cm:
+        with self.assertRaises(AnalyzerValueError) as cm:
             self.processor.process_attribute(target, group_attr)
 
         self.assertEqual("Group attribute not found: `{foo}bar`", str(cm.exception))

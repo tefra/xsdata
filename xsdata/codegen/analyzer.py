@@ -4,7 +4,7 @@ from xsdata.codegen.container import ClassContainer
 from xsdata.codegen.models import Class
 from xsdata.codegen.sanitizer import ClassSanitizer
 from xsdata.codegen.validator import ClassValidator
-from xsdata.exceptions import AnalyzerError
+from xsdata.exceptions import AnalyzerValueError
 
 
 class ClassAnalyzer:
@@ -70,4 +70,4 @@ class ClassAnalyzer:
         """Validate all code gen objects are not cross referenced."""
         references = [ref for obj in classes for ref in cls.class_references(obj)]
         if len(references) != len(set(references)):
-            raise AnalyzerError("Cross references detected!")
+            raise AnalyzerValueError("Cross references detected!")

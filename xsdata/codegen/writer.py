@@ -4,7 +4,7 @@ from typing import Dict
 from typing import List
 
 from xsdata.codegen.models import Class
-from xsdata.exceptions import CodeWriterError
+from xsdata.exceptions import CodeGenerationError
 from xsdata.formats.dataclass.generator import DataclassGenerator
 from xsdata.formats.mixins import AbstractGenerator
 from xsdata.formats.plantuml.generator import PlantUmlGenerator
@@ -46,7 +46,7 @@ class CodeWriter:
         for obj in classes:
 
             if obj.package is None:
-                raise CodeWriterError(
+                raise CodeGenerationError(
                     f"Class `{obj.name}` has not been assign to a package."
                 )
 

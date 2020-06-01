@@ -1,42 +1,30 @@
-class CodeWriterError(TypeError):
-    pass
+class CodeGenerationError(TypeError):
+    """Unexpected state during code generation related errors."""
 
 
 class ConverterError(ValueError):
-    pass
-
-
-class CodeGeneratorError(ValueError):
-    pass
+    """Converting values between document/python types related errors."""
 
 
 class ParserError(ValueError):
-    pass
+    """Parsing related errors."""
 
 
 class SerializerError(ValueError):
-    pass
+    """Serializing related errors."""
 
 
 class XmlContextError(ValueError):
-    pass
+    """Unhandled behaviour during data binding."""
 
 
 class SchemaValueError(ValueError):
-    pass
+    """Schema definitions related errors."""
 
 
 class AnalyzerValueError(ValueError):
-    pass
+    """Unhandled behaviour during class analyze process.."""
 
 
 class ResolverValueError(ValueError):
-    pass
-
-
-class GeneratorValueError(ValueError):
-    pass
-
-
-class AnalyzerError(ValueError):
-    pass
+    """Dependencies related errors."""

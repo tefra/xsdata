@@ -11,7 +11,7 @@ from tests.factories import ClassFactory
 from tests.factories import FactoryTestCase
 from xsdata.codegen.models import Class
 from xsdata.codegen.writer import writer
-from xsdata.exceptions import CodeWriterError
+from xsdata.exceptions import CodeGenerationError
 from xsdata.formats.dataclass.generator import DataclassGenerator
 from xsdata.formats.mixins import AbstractGenerator
 from xsdata.utils import text
@@ -94,7 +94,7 @@ class CodeWriterTests(FactoryTestCase):
         self.assertEqual("tests", classes[2].module)
 
         classes = ClassFactory.list(1, package=None)
-        with self.assertRaises(CodeWriterError) as cm:
+        with self.assertRaises(CodeGenerationError) as cm:
             writer.designate(classes, "fake")
 
         self.assertEqual(

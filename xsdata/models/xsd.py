@@ -63,7 +63,7 @@ class XmlString:
 @dataclass
 class Documentation(ElementBase):
     """
-    Schema Model.
+    Model representation of a schema xs:documentation element.
 
     :param lang: language
     :param source: anyURI
@@ -86,7 +86,7 @@ class Documentation(ElementBase):
 @dataclass
 class Appinfo(ElementBase):
     """
-    Schema Model.
+    Model representation of a schema xs:appinfo element.
 
     :param lang: language
     :param source: anyURI
@@ -104,7 +104,7 @@ class Appinfo(ElementBase):
 @dataclass
 class Annotation(ElementBase):
     """
-    Schema Model.
+    Model representation of a schema xs:annotation element.
 
     :param appinfo:
     :param documentations:
@@ -143,7 +143,7 @@ class AnnotationBase(ElementBase):
 @dataclass
 class AnyAttribute(AnnotationBase):
     """
-    Schema Model.
+    Model representation of a schema xs:anyAttribute element.
 
     :param namespace: ##any | ##other) | List of anyURI | (##targetNamespace | ##local)
     :param process_contents: (lax | skip | strict) : strict
@@ -183,7 +183,7 @@ class AnyAttribute(AnnotationBase):
 @dataclass
 class Assertion(AnnotationBase):
     """
-    Schema Model.
+    Model representation of a schema xs:assertion element.
 
     :param test: an XPath expression
     """
@@ -194,7 +194,7 @@ class Assertion(AnnotationBase):
 @dataclass
 class SimpleType(AnnotationBase):
     """
-    Schema Model.
+    Model representation of a schema xs:simpleType element.
 
     :param name: NCName
     :param restriction:
@@ -247,7 +247,7 @@ class SimpleType(AnnotationBase):
 @dataclass
 class List(AnnotationBase):
     """
-    Schema Model.
+    Model representation of a schema xs:list element.
 
     :param simple_type:
     :param item_type: QName
@@ -275,7 +275,7 @@ class List(AnnotationBase):
 @dataclass
 class Union(AnnotationBase):
     """
-    Schema Model.
+    Model representation of a schema xs:union element.
 
     :param member_types: List of QName
     :param simple_types:
@@ -285,10 +285,9 @@ class Union(AnnotationBase):
     simple_types: Array[SimpleType] = array_element(name="simpleType")
 
     @property
-    def extends(self) -> Optional[str]:
+    def extensions(self) -> Iterator[str]:
         if self.member_types:
-            return self.member_types
-        return None
+            yield from filter(None, self.member_types.split(" "))
 
     @property
     def is_attribute(self) -> bool:
@@ -324,7 +323,7 @@ class Union(AnnotationBase):
 @dataclass
 class Attribute(AnnotationBase):
     """
-    Schema Model.
+    Model representation of a schema xs:attribute element.
 
     :param default: string
     :param fixed: string
@@ -378,7 +377,7 @@ class Attribute(AnnotationBase):
 @dataclass
 class AttributeGroup(AnnotationBase):
     """
-    Schema Model.
+    Model representation of a schema xs:attributeGroup element.
 
     :param name: NCName
     :param ref: QName
@@ -403,7 +402,7 @@ class AttributeGroup(AnnotationBase):
 @dataclass
 class Any(AnnotationBase):
     """
-    Schema Model.
+    Model representation of a schema xs:any element.
 
     :param min_occurs: nonNegativeInteger : 1
     :param max_occurs: (nonNegativeInteger | unbounded)  : 1
@@ -450,7 +449,7 @@ class Any(AnnotationBase):
 @dataclass
 class All(AnnotationBase):
     """
-    Schema Model.
+    Model representation of a schema xs:all element.
 
     :param min_occurs: nonNegativeInteger : 1
     :param max_occurs: (nonNegativeInteger | unbounded)  : 1
@@ -472,7 +471,7 @@ class All(AnnotationBase):
 @dataclass
 class Sequence(AnnotationBase):
     """
-    Schema Model.
+    Model representation of a schema xs:sequence element.
 
     :param min_occurs: nonNegativeInteger : 1
     :param max_occurs: (nonNegativeInteger | unbounded)  : 1
@@ -500,7 +499,7 @@ class Sequence(AnnotationBase):
 @dataclass
 class Choice(AnnotationBase):
     """
-    Schema Model.
+    Model representation of a schema xs:choice element.
 
     :param min_occurs: nonNegativeInteger : 1
     :param max_occurs: (nonNegativeInteger | unbounded)  : 1
@@ -528,7 +527,7 @@ class Choice(AnnotationBase):
 @dataclass
 class Group(AnnotationBase):
     """
-    Schema Model.
+    Model representation of a schema xs:group element.
 
     :param name: NCName
     :param ref: QName
@@ -562,7 +561,7 @@ class Group(AnnotationBase):
 @dataclass
 class OpenContent(AnnotationBase):
     """
-    Schema Model.
+    Model representation of a schema xs:openContent element.
 
     :param applies_to_empty: default false
     :param mode: (none | interleave | suffix) : interleave
@@ -576,13 +575,13 @@ class OpenContent(AnnotationBase):
 
 @dataclass
 class DefaultOpenContent(OpenContent):
-    """Schema Model."""
+    """Model representation of a schema xs:defaultOpenContent element."""
 
 
 @dataclass
 class Extension(AnnotationBase):
     """
-    Schema Model.
+    Model representation of a schema xs:extension element.
 
     :param base: QName
     :param group:
@@ -608,14 +607,15 @@ class Extension(AnnotationBase):
     assertions: Array[Assertion] = array_element(name="assert")
 
     @property
-    def extends(self) -> Optional[str]:
-        return self.base
+    def extensions(self) -> Iterator[str]:
+        if self.base:
+            yield self.base
 
 
 @dataclass
 class Enumeration(AnnotationBase):
     """
-    Schema Model.
+    Model representation of a schema xs:enumeration element.
 
     :param value: anySimpleType
     """
@@ -642,7 +642,7 @@ class Enumeration(AnnotationBase):
 @dataclass
 class FractionDigits(AnnotationBase):
     """
-    Schema Model.
+    Model representation of a schema xs:fractionDigits element.
 
     :param value: nonNegativeInteger
     """
@@ -653,7 +653,7 @@ class FractionDigits(AnnotationBase):
 @dataclass
 class Length(AnnotationBase):
     """
-    Schema Model.
+    Model representation of a schema xs:length element.
 
     :param value: nonNegativeInteger
     """
@@ -664,7 +664,7 @@ class Length(AnnotationBase):
 @dataclass
 class MaxExclusive(AnnotationBase):
     """
-    Schema Model.
+    Model representation of a schema xs:maxExclusive element.
 
     :param value: anySimpleType
     """
@@ -675,7 +675,7 @@ class MaxExclusive(AnnotationBase):
 @dataclass
 class MaxInclusive(AnnotationBase):
     """
-    Schema Model.
+    Model representation of a schema xs:maxInclusive element.
 
     :param value: anySimpleType
     """
@@ -686,7 +686,7 @@ class MaxInclusive(AnnotationBase):
 @dataclass
 class MaxLength(AnnotationBase):
     """
-    Schema Model.
+    Model representation of a schema xs:maxLength element.
 
     :param value: nonNegativeInteger
     """
@@ -697,7 +697,7 @@ class MaxLength(AnnotationBase):
 @dataclass
 class MinExclusive(AnnotationBase):
     """
-    Schema Model.
+    Model representation of a schema xs:minExclusive element.
 
     :param value: anySimpleType
     """
@@ -708,7 +708,7 @@ class MinExclusive(AnnotationBase):
 @dataclass
 class MinInclusive(AnnotationBase):
     """
-    Schema Model.
+    Model representation of a schema xs:minInclusive element.
 
     :param value: anySimpleType
     """
@@ -719,7 +719,7 @@ class MinInclusive(AnnotationBase):
 @dataclass
 class MinLength(AnnotationBase):
     """
-    Schema Model.
+    Model representation of a schema xs:minLength element.
 
     :param value: nonNegativeInteger
     """
@@ -730,7 +730,7 @@ class MinLength(AnnotationBase):
 @dataclass
 class Pattern(AnnotationBase):
     """
-    Schema Model.
+    Model representation of a schema xs:pattern element.
 
     :param value: string
     """
@@ -741,7 +741,7 @@ class Pattern(AnnotationBase):
 @dataclass
 class TotalDigits(AnnotationBase):
     """
-    Schema Model.
+    Model representation of a schema xs:totalDigits element.
 
     :param value: positiveInteger
     """
@@ -752,7 +752,7 @@ class TotalDigits(AnnotationBase):
 @dataclass
 class WhiteSpace(AnnotationBase):
     """
-    Schema Model.
+    Model representation of a schema xs:whiteSpace element.
 
     :param value: (collapse | preserve | replace)
     """
@@ -763,7 +763,7 @@ class WhiteSpace(AnnotationBase):
 @dataclass
 class ExplicitTimezone(AnnotationBase):
     """
-    Schema Model.
+    Model representation of a schema xs:explicitTimezone element.
 
     :param value: NCName
     :param fixed: default false
@@ -776,7 +776,7 @@ class ExplicitTimezone(AnnotationBase):
 @dataclass
 class Restriction(AnnotationBase):
     """
-    Schema Model.
+    Model representation of a schema xs:restriction element.
 
     :param base: QName
     :param group:
@@ -844,8 +844,9 @@ class Restriction(AnnotationBase):
         return "value"
 
     @property
-    def extends(self) -> Optional[str]:
-        return self.base
+    def extensions(self) -> Iterator[str]:
+        if self.base:
+            yield self.base
 
     def get_restrictions(self) -> Dict[str, Anything]:
         restrictions = {}
@@ -884,7 +885,7 @@ class Restriction(AnnotationBase):
 @dataclass
 class SimpleContent(AnnotationBase):
     """
-    Schema Model.
+    Model representation of a schema xs:simpleContent element.
 
     :param restriction:
     :param extension:
@@ -897,7 +898,7 @@ class SimpleContent(AnnotationBase):
 @dataclass
 class ComplexContent(SimpleContent):
     """
-    Schema Model.
+    Model representation of a schema xs:complexContent element.
 
     :param fixed:
     """
@@ -908,7 +909,7 @@ class ComplexContent(SimpleContent):
 @dataclass
 class ComplexType(AnnotationBase):
     """
-    Schema Model.
+    Model representation of a schema xs:complexType element.
 
     :param name: NCName
     :param block: (#all | List of (extension | restriction))
@@ -963,7 +964,7 @@ class ComplexType(AnnotationBase):
 @dataclass
 class Field(AnnotationBase):
     """
-    Schema Model.
+    Model representation of a schema xs:field element.
 
     :param xpath: a subset of XPath expression
     """
@@ -973,13 +974,13 @@ class Field(AnnotationBase):
 
 @dataclass
 class Selector(Field):
-    """Schema Model."""
+    """Schema Model representation of a schema xs:selectorModel element.."""
 
 
 @dataclass
 class Unique(AnnotationBase):
     """
-    Schema Model.
+    Model representation of a schema xs:unique element.
 
     :param name: NCName
     :param ref: QName
@@ -996,7 +997,7 @@ class Unique(AnnotationBase):
 @dataclass
 class Key(AnnotationBase):
     """
-    Schema Model.
+    Model representation of a schema xs:key element.
 
     :param name: NCName
     :param ref: QName
@@ -1013,7 +1014,7 @@ class Key(AnnotationBase):
 @dataclass
 class Keyref(AnnotationBase):
     """
-    Schema Model.
+    Model representation of a schema xs:keyref element.
 
     :param name: NCName
     :param ref: QName
@@ -1032,7 +1033,7 @@ class Keyref(AnnotationBase):
 @dataclass
 class Alternative(AnnotationBase):
     """
-    Schema Model.
+    Model representation of a schema xs:alternative element.
 
     :param type: QName
     :param test: an XPath expression
@@ -1057,7 +1058,7 @@ class Alternative(AnnotationBase):
 @dataclass
 class Element(AnnotationBase):
     """
-    Schema Model.
+    Model representation of a schema xs:element element.
 
     :param name: NCName
     :param ref: QName
@@ -1161,7 +1162,7 @@ class Element(AnnotationBase):
 @dataclass
 class Notation(AnnotationBase):
     """
-    Schema Model.
+    Model representation of a schema xs:notation element.
 
     :param name: NCName
     :param public: token
@@ -1176,7 +1177,8 @@ class Notation(AnnotationBase):
 @dataclass
 class SchemaLocation(AnnotationBase):
     """
-    Base schema location.
+    Model representation of a schema xs:schemaLocation element. Base schema
+    location.
 
     :param location: any url with a urllib supported scheme file: http:
     """
@@ -1187,7 +1189,7 @@ class SchemaLocation(AnnotationBase):
 @dataclass
 class Import(SchemaLocation):
     """
-    Schema Model.
+    Model representation of a schema xs:import element.
 
     :param namespace: anyURI
     :param schema_location: anyURI
@@ -1200,7 +1202,7 @@ class Import(SchemaLocation):
 @dataclass
 class Include(SchemaLocation):
     """
-    Schema Model.
+    Model representation of a schema xs:include element.
 
     :param schema_location: anyURI
     """
@@ -1211,7 +1213,7 @@ class Include(SchemaLocation):
 @dataclass
 class Redefine(SchemaLocation):
     """
-    Schema Model.
+    Model representation of a schema xs:redefine element.
 
     :param schema_location: anyURI
     :param simple_types:
@@ -1230,7 +1232,7 @@ class Redefine(SchemaLocation):
 @dataclass
 class Override(SchemaLocation):
     """
-    Schema Model.
+    Model representation of a schema xs:override element.
 
     :param schema_location: anyURI
     :param simple_types:
@@ -1255,7 +1257,7 @@ class Override(SchemaLocation):
 @dataclass
 class Schema(SchemaLocation):
     """
-    Schema Model.
+    Model representation of a schema xs:chema element.
 
     :param target:
     :param block_default: (#all | List of (extension | restriction | substitution))

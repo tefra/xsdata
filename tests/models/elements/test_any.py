@@ -1,29 +1,31 @@
 from unittest import TestCase
 
 from xsdata.exceptions import SchemaValueError
+from xsdata.models.enums import Namespace
 from xsdata.models.enums import NamespaceType
 from xsdata.models.xsd import Any
 
 
 class AnyTests(TestCase):
     def test_property_is_attribute(self):
-        self.assertTrue(Any.create().is_attribute)
+        self.assertTrue(Any().is_attribute)
 
     def test_property_real_type(self):
-        self.assertEqual("xs:object", Any.create().real_type)
+        obj = Any(ns_map={"xs": Namespace.XS.uri})
+        self.assertEqual("xs:object", obj.real_type)
 
     def test_property_raw_namespace(self):
-        obj = Any.create()
+        obj = Any()
         self.assertEqual(NamespaceType.ANY.value, obj.raw_namespace)
 
         obj.namespace = "foo"
         self.assertEqual("foo", obj.raw_namespace)
 
-        obj = Any.create(namespace="    foo  \n    \t  \r  bar foo ")
+        obj = Any(namespace="    foo  \n    \t  \r  bar foo ")
         self.assertEqual("foo bar", obj.raw_namespace)
 
     def test_property_real_name(self):
-        obj = Any.create()
+        obj = Any()
         self.assertEqual("any_element", obj.real_name)
 
         obj.namespace = "foo"
@@ -34,5 +36,5 @@ class AnyTests(TestCase):
             obj.real_name
 
     def test_get_restrictions(self):
-        obj = Any.create(min_occurs=1, max_occurs=2)
+        obj = Any(min_occurs=1, max_occurs=2)
         self.assertEqual({"max_occurs": 2, "min_occurs": 1}, obj.get_restrictions())

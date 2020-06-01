@@ -1,3 +1,4 @@
+from typing import Iterator
 from unittest import TestCase
 
 from xsdata.models.xsd import Enumeration
@@ -18,42 +19,41 @@ from xsdata.models.xsd import WhiteSpace
 
 class RestrictionTests(TestCase):
     def test_property_real_type(self):
-        obj = Restriction.create(base="foo")
+        obj = Restriction(base="foo")
         self.assertEqual(obj.base, obj.real_type)
 
-        obj.enumerations.append(Enumeration.create())
+        obj.enumerations.append(Enumeration())
         self.assertIsNone(obj.real_type)
 
-        obj = Restriction.create(
-            simple_type=SimpleType.create(restriction=Restriction.create(base="bar"))
-        )
+        obj = Restriction(simple_type=SimpleType(restriction=Restriction(base="bar")))
 
         self.assertEqual("bar", obj.real_type)
 
     def test_property_real_name(self):
-        obj = Restriction.create()
+        obj = Restriction()
         self.assertEqual("value", obj.real_name)
 
-    def test_property_extends(self):
-        obj = Restriction.create(base="foo")
-        self.assertEqual("foo", obj.extends)
+    def test_property_extensions(self):
+        obj = Restriction(base="foo")
+        self.assertIsInstance(obj.extensions, Iterator)
+        self.assertEqual(["foo"], list(obj.extensions))
 
     def test_get_restrictions(self):
-        self.assertEqual({}, Restriction.create().get_restrictions())
+        self.assertEqual({}, Restriction().get_restrictions())
 
-        obj = Restriction.create(
-            min_exclusive=MinExclusive.create(value=1),
-            min_inclusive=MinInclusive.create(value=2),
-            min_length=MinLength.create(value=3),
-            max_exclusive=MaxExclusive.create(value=4),
-            max_inclusive=MaxInclusive.create(value=5),
-            max_length=MaxLength.create(value=6),
-            total_digits=TotalDigits.create(value=7),
-            fraction_digits=FractionDigits.create(value=8),
-            length=Length.create(value=9),
-            white_space=WhiteSpace.create(value="collapse"),
-            patterns=[Pattern.create(value="[0-9]"), Pattern.create(value="[A-Z]")],
-            enumerations=[Enumeration.create(value="str")],
+        obj = Restriction(
+            min_exclusive=MinExclusive(value=1),
+            min_inclusive=MinInclusive(value=2),
+            min_length=MinLength(value=3),
+            max_exclusive=MaxExclusive(value=4),
+            max_inclusive=MaxInclusive(value=5),
+            max_length=MaxLength(value=6),
+            total_digits=TotalDigits(value=7),
+            fraction_digits=FractionDigits(value=8),
+            length=Length(value=9),
+            white_space=WhiteSpace(value="collapse"),
+            patterns=[Pattern(value="[0-9]"), Pattern(value="[A-Z]")],
+            enumerations=[Enumeration(value="str")],
         )
         expected = {
             "fraction_digits": 8,
@@ -72,12 +72,11 @@ class RestrictionTests(TestCase):
         self.assertEqual(expected, obj.get_restrictions())
 
     def test_get_restrictions_with_nested_simple_type(self):
-        obj = Restriction.create(
-            min_length=MinLength.create(value=2),
-            simple_type=SimpleType.create(
-                restriction=Restriction.create(
-                    max_length=MaxLength.create(value=10),
-                    min_length=MinLength.create(value=5),
+        obj = Restriction(
+            min_length=MinLength(value=2),
+            simple_type=SimpleType(
+                restriction=Restriction(
+                    max_length=MaxLength(value=10), min_length=MinLength(value=5),
                 )
             ),
         )

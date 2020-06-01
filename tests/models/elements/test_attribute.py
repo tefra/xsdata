@@ -10,11 +10,11 @@ from xsdata.models.xsd import SimpleType
 
 class AttributeTests(TestCase):
     def test_property_is_attribute(self):
-        obj = Attribute.create()
+        obj = Attribute()
         self.assertTrue(obj)
 
     def test_property_real_type(self):
-        obj = Attribute.create()
+        obj = Attribute()
         self.assertIsNone(obj.real_type)
 
         obj.ref = "foo"
@@ -23,36 +23,34 @@ class AttributeTests(TestCase):
         obj.type = "bar"
         self.assertEqual(obj.type, obj.real_type)
 
-        obj.simple_type = SimpleType.create()
+        obj.simple_type = SimpleType()
         self.assertIsNone(obj.real_type)
 
-        obj.simple_type.restriction = Restriction.create(base="thug")
+        obj.simple_type.restriction = Restriction(base="thug")
         self.assertEqual(obj.simple_type.restriction.base, obj.real_type)
 
     def test_property_real_name(self):
-        obj = Attribute.create(ref="bar")
+        obj = Attribute(ref="bar")
         self.assertEqual("bar", obj.real_name)
 
         obj.name = "foo"
         self.assertEqual("foo", obj.real_name)
 
         with self.assertRaises(SchemaValueError):
-            Attribute.create().real_name
+            Attribute().real_name
 
     def test_get_restrictions(self):
-        obj = Attribute.create()
+        obj = Attribute()
         self.assertEqual({}, obj.get_restrictions())
 
         obj.use = UseType.REQUIRED
         expected = {"max_occurs": 1, "min_occurs": 1, "required": True}
         self.assertEqual(expected, obj.get_restrictions())
 
-        obj.simple_type = SimpleType.create(
-            restriction=Restriction.create(length=Length.create(value=1))
-        )
+        obj.simple_type = SimpleType(restriction=Restriction(length=Length(value=1)))
         expected.update(dict(length=1))
         self.assertEqual(expected, obj.get_restrictions())
 
-    def test_property_extends(self):
-        obj = Attribute.create()
-        self.assertIsNone(obj.extends)
+    def test_property_extensions(self):
+        obj = Attribute()
+        self.assertEqual([], list(obj.extensions))

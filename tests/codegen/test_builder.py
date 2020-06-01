@@ -34,7 +34,7 @@ from xsdata.models.xsd import SimpleType
 class ClassBuilderTests(FactoryTestCase):
     def setUp(self):
         super().setUp()
-        self.schema = Schema.create(location="file://foo.xsd")
+        self.schema = Schema(location="file://foo.xsd")
         self.builder = ClassBuilder(schema=self.schema)
 
     @mock.patch.object(Redefine, "children")
@@ -45,29 +45,29 @@ class ClassBuilderTests(FactoryTestCase):
     ):
 
         for _ in range(2):
-            self.schema.simple_types.append(SimpleType.create())
-            self.schema.attribute_groups.append(AttributeGroup.create())
-            self.schema.groups.append(Group.create())
-            self.schema.attributes.append(Attribute.create())
-            self.schema.complex_types.append(ComplexType.create())
-            self.schema.elements.append(Element.create())
-            self.schema.redefines.append(Redefine.create())
-            self.schema.overrides.append(Override.create())
+            self.schema.simple_types.append(SimpleType())
+            self.schema.attribute_groups.append(AttributeGroup())
+            self.schema.groups.append(Group())
+            self.schema.attributes.append(Attribute())
+            self.schema.complex_types.append(ComplexType())
+            self.schema.elements.append(Element())
+            self.schema.redefines.append(Redefine())
+            self.schema.overrides.append(Override())
 
-        override_element = Element.create()
-        override_attribute = Attribute.create()
-        override_complex_type = ComplexType.create()
-        redefine_simple_type = SimpleType.create()
-        redefine_group = Group.create()
-        redefine_attribute_group = AttributeGroup.create()
+        override_element = Element()
+        override_attribute = Attribute()
+        override_complex_type = ComplexType()
+        redefine_simple_type = SimpleType()
+        redefine_group = Group()
+        redefine_attribute_group = AttributeGroup()
         mock_redefine_children.side_effect = [
-            [redefine_simple_type, redefine_group, Annotation.create()],
-            [redefine_attribute_group, Annotation.create()],
+            [redefine_simple_type, redefine_group, Annotation()],
+            [redefine_attribute_group, Annotation()],
         ]
 
         mock_override_children.side_effect = [
-            [override_element, Annotation.create(), override_attribute],
-            [Annotation.create(), override_complex_type],
+            [override_element, Annotation(), override_attribute],
+            [Annotation(), override_complex_type],
         ]
         mock_build_class.side_effect = classes = ClassFactory.list(18)
 
@@ -98,21 +98,21 @@ class ClassBuilderTests(FactoryTestCase):
     def test_element_namespace(self):
         self.schema.target_namespace = "foobar"
 
-        element = Element.create(ref="foo:something")
+        element = Element(ref="foo:something")
         element.ns_map["foo"] = "bar"
 
         self.assertEqual("bar", self.builder.element_namespace(element))
 
-        element = Element.create(form=FormType.QUALIFIED)
+        element = Element(form=FormType.QUALIFIED)
         self.assertEqual("foobar", self.builder.element_namespace(element))
 
-        element = Element.create()
+        element = Element()
         self.assertEqual("", self.builder.element_namespace(element))
 
         element.target_namespace = "tns"
         self.assertEqual("tns", self.builder.element_namespace(element))
 
-        attribute = Attribute.create()
+        attribute = Attribute()
         self.assertIsNone(self.builder.element_namespace(attribute))
 
         attribute.target_namespace = "tns"
@@ -144,7 +144,7 @@ class ClassBuilderTests(FactoryTestCase):
         mock_substitutions.return_value = ["foo", "bar"]
         mock_element_namespace.return_value = "foo:name"
 
-        element = Element.create()
+        element = Element()
         result = self.builder.build_class(element)
 
         mock_build_class_attributes.assert_called_once_with(element, result)
@@ -182,7 +182,7 @@ class ClassBuilderTests(FactoryTestCase):
         )
 
         item = ClassFactory.create()
-        element = Element.create(type="something")
+        element = Element(type="something")
         self.builder.build_class_extensions(element, item)
 
         self.assertEqual(3, len(item.extensions))
@@ -191,19 +191,16 @@ class ClassBuilderTests(FactoryTestCase):
         self.assertIs(double, item.extensions[2])
 
     def test_element_children(self):
-        sequence_one = Sequence.create(elements=[Element.create(), Element.create()])
-        sequence_two = Sequence.create(
-            max_occurs=2, elements=[Element.create(), Element.create()]
+        sequence_one = Sequence(elements=[Element(), Element()])
+        sequence_two = Sequence(max_occurs=2, elements=[Element(), Element()])
+        restriction = Restriction(
+            enumerations=[Enumeration(value=x) for x in "abc"], sequence=sequence_two,
         )
-        restriction = Restriction.create(
-            enumerations=[Enumeration.create(value=x) for x in "abc"],
-            sequence=sequence_two,
-        )
-        complex_type = ComplexType.create(
-            attributes=[Attribute.create(), Attribute.create()],
+        complex_type = ComplexType(
+            attributes=[Attribute(), Attribute()],
             sequence=sequence_one,
-            simple_content=SimpleContent.create(restriction=Restriction.create()),
-            complex_content=ComplexContent.create(restriction=restriction,),
+            simple_content=SimpleContent(restriction=Restriction()),
+            complex_content=ComplexContent(restriction=restriction,),
         )
 
         children = self.builder.element_children(complex_type)
@@ -222,14 +219,10 @@ class ClassBuilderTests(FactoryTestCase):
         self.assertEqual(expected, list(children))
 
     def test_children_extensions(self):
-        complex_type = ComplexType.create(
-            attributes=[Attribute.create(index=i) for i in range(2)],
-            simple_content=SimpleContent.create(
-                restriction=Restriction.create(base="bk:b", index=4)
-            ),
-            complex_content=ComplexContent.create(
-                extension=Extension.create(base="bk:ext", index=7)
-            ),
+        complex_type = ComplexType(
+            attributes=[Attribute(index=i) for i in range(2)],
+            simple_content=SimpleContent(restriction=Restriction(base="bk:b", index=4)),
+            complex_content=ComplexContent(extension=Extension(base="bk:ext", index=7)),
         )
 
         item = ClassFactory.create()
@@ -279,7 +272,7 @@ class ClassBuilderTests(FactoryTestCase):
         mock_element_namespace.return_value = "http://something/common"
         mock_get_restrictions.return_value = {"required": True}
 
-        attribute = Attribute.create(default="false", index=66, ns_map={"foo": "bar"})
+        attribute = Attribute(default="false", index=66, ns_map={"foo": "bar"})
 
         self.builder.build_class_attribute(item, attribute, Restrictions())
         expected = AttrFactory.create(
@@ -307,7 +300,7 @@ class ClassBuilderTests(FactoryTestCase):
         mock_build_inner_classes.return_value = []
 
         item = ClassFactory.create()
-        attribute = Attribute.create(default="false", index=66)
+        attribute = Attribute(default="false", index=66)
         actual = self.builder.build_class_attribute_types(item, attribute)
 
         expected = [AttrTypeFactory.xs_int(), AttrTypeFactory.xs_string()]
@@ -324,7 +317,7 @@ class ClassBuilderTests(FactoryTestCase):
         mock_build_inner_classes.return_value = [inner_class]
 
         item = ClassFactory.create()
-        attribute = Attribute.create(default="false", index=66)
+        attribute = Attribute(default="false", index=66)
         actual = self.builder.build_class_attribute_types(item, attribute)
 
         expected = [
@@ -347,7 +340,7 @@ class ClassBuilderTests(FactoryTestCase):
         mock_default_type.return_value = DataType.STRING
 
         item = ClassFactory.create()
-        attribute = Attribute.create(default="false", index=66, name="attr")
+        attribute = Attribute(default="false", index=66, name="attr")
         actual = self.builder.build_class_attribute_types(item, attribute)
 
         self.assertEqual(1, len(actual))
@@ -358,17 +351,17 @@ class ClassBuilderTests(FactoryTestCase):
         inner_classes = ClassFactory.list(2)
         mock_build_class.side_effect = inner_classes
 
-        simple_type = SimpleType.create()
-        complex_type = ComplexType.create()
-        enumeration = SimpleType.create(
-            restriction=Restriction.create(enumerations=[Enumeration.create(value="a")])
+        simple_type = SimpleType()
+        complex_type = ComplexType()
+        enumeration = SimpleType(
+            restriction=Restriction(enumerations=[Enumeration(value="a")])
         )
 
-        element = Element.create(
+        element = Element(
             alternatives=[
-                Alternative.create(complex_type=complex_type, id="a"),
-                Alternative.create(simple_type=simple_type, id="b"),
-                Alternative.create(simple_type=enumeration, id="c"),
+                Alternative(complex_type=complex_type, id="a"),
+                Alternative(simple_type=simple_type, id="b"),
+                Alternative(simple_type=enumeration, id="c"),
             ]
         )
         result = self.builder.build_inner_classes(element)
@@ -386,8 +379,8 @@ class ClassBuilderTests(FactoryTestCase):
         inner = ClassFactory.enumeration(2)
         mock_build_class.return_value = inner
 
-        enumeration = SimpleType.create(
-            restriction=Restriction.create(enumerations=[Enumeration.create(value="a")])
+        enumeration = SimpleType(
+            restriction=Restriction(enumerations=[Enumeration(value="a")])
         )
 
         result = self.builder.build_inner_classes(enumeration)

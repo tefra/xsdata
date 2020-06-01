@@ -1,7 +1,7 @@
 from xsdata.codegen.mixins import HandlerInterface
 from xsdata.codegen.models import AttrType
 from xsdata.codegen.models import Class
-from xsdata.exceptions import AnalyzerError
+from xsdata.exceptions import AnalyzerValueError
 from xsdata.models.xsd import SimpleType
 
 
@@ -23,7 +23,9 @@ class AttributeMismatchHandler(HandlerInterface):
                 enumerations.append(attr)
 
         if len(target.attrs) > 1:
-            raise AnalyzerError("Mixed enumeration with more than one normal field.")
+            raise AnalyzerValueError(
+                "Mixed enumeration with more than one normal field."
+            )
 
         enum_inner = next(
             (inner for inner in target.inner if inner.is_enumeration), None

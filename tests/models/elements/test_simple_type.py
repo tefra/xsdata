@@ -10,51 +10,51 @@ from xsdata.models.xsd import Union
 
 class SimpleTypeTests(TestCase):
     def test_property_real_name(self):
-        obj = SimpleType.create()
+        obj = SimpleType()
         self.assertEqual("value", obj.real_name)
 
         obj.name = "foo"
         self.assertEqual("foo", obj.real_name)
 
-    def test_property_extends(self):
-        obj = SimpleType.create()
-        self.assertIsNone(obj.extends)
+    def test_property_extensions(self):
+        obj = SimpleType()
+        self.assertEqual([], list(obj.extensions))
 
     def test_property_real_type(self):
-        obj = SimpleType.create()
+        obj = SimpleType()
         self.assertIsNone(obj.real_type)
 
-        obj.union = Union.create(member_types="thug")
+        obj.union = Union(member_types="thug")
         self.assertEqual("thug", obj.real_type)
 
-        obj.list = List.create(item_type="foo")
+        obj.list = List(item_type="foo")
         self.assertEqual("foo", obj.real_type)
 
-        obj.restriction = Restriction.create(base="bar")
+        obj.restriction = Restriction(base="bar")
         self.assertEqual("bar", obj.real_type)
 
-        obj = SimpleType.create(restriction=Restriction.create())
-        obj.restriction.enumerations.append(Enumeration.create())
+        obj = SimpleType(restriction=Restriction())
+        obj.restriction.enumerations.append(Enumeration())
         self.assertIsNone(obj.real_type)
 
     def test_property_is_attribute(self):
-        obj = SimpleType.create()
+        obj = SimpleType()
         self.assertTrue(obj.is_attribute)
 
     def test_property_is_enumeration(self):
-        obj = SimpleType.create()
+        obj = SimpleType()
         self.assertFalse(obj.is_enumeration)
 
-        obj.restriction = Restriction.create()
+        obj.restriction = Restriction()
         self.assertFalse(obj.is_enumeration)
 
-        obj.restriction.enumerations.append(Enumeration.create())
+        obj.restriction.enumerations.append(Enumeration())
         self.assertTrue(obj.is_enumeration)
 
     def test_get_restrictions(self):
-        obj = SimpleType.create()
+        obj = SimpleType()
         self.assertEqual({}, obj.get_restrictions())
 
         expected = dict(length=2)
-        obj.restriction = Restriction.create(length=Length.create(value=2))
+        obj.restriction = Restriction(length=Length(value=2))
         self.assertEqual(expected, obj.get_restrictions())

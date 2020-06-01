@@ -8,7 +8,7 @@ from xsdata.codegen.analyzer import ClassAnalyzer
 from xsdata.codegen.container import ClassContainer
 from xsdata.codegen.sanitizer import ClassSanitizer
 from xsdata.codegen.validator import ClassValidator
-from xsdata.exceptions import AnalyzerError
+from xsdata.exceptions import AnalyzerValueError
 from xsdata.models.xsd import ComplexType
 from xsdata.models.xsd import Element
 from xsdata.models.xsd import SimpleType
@@ -109,7 +109,7 @@ class ClassAnalyzerTests(FactoryTestCase):
         analyzer = ClassAnalyzer([])
         analyzer.validate_references([first])
 
-        with self.assertRaises(AnalyzerError) as cm:
+        with self.assertRaises(AnalyzerValueError) as cm:
             analyzer.validate_references([first, second])
 
         self.assertEqual("Cross references detected!", str(cm.exception))

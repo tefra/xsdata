@@ -5,16 +5,16 @@ from xsdata.models.xsd import ComplexType
 
 
 class ComplexTypeTests(TestCase):
-    def test_property_extends(self):
-        obj = ComplexType.create()
-        self.assertIsNone(obj.extends)
+    def test_property_extensions(self):
+        obj = ComplexType()
+        self.assertEqual([], list(obj.extensions))
 
     def test_property_is_mixed(self):
-        obj = ComplexType.create()
+        obj = ComplexType()
 
         self.assertFalse(obj.is_mixed)
 
-        obj.complex_content = ComplexContent.create()
+        obj.complex_content = ComplexContent()
         self.assertFalse(obj.is_mixed)
 
         obj.complex_content.mixed = True

@@ -29,7 +29,7 @@ def cli(sources: List, package: str, output: str, print: bool):
     """
     Convert schema definitions to code.
 
-    SOURCES can be one or more files or directories or urls.
+    SOURCES can be one or more files, directories and urls.
     """
     if print:
         logger.setLevel(logging.ERROR)

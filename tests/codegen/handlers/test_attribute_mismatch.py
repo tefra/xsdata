@@ -2,7 +2,7 @@ from tests.factories import AttrFactory
 from tests.factories import ClassFactory
 from tests.factories import FactoryTestCase
 from xsdata.codegen.handlers import AttributeMismatchHandler
-from xsdata.exceptions import AnalyzerError
+from xsdata.exceptions import AnalyzerValueError
 
 
 class AttributeMismatchHandlerTests(FactoryTestCase):
@@ -46,7 +46,7 @@ class AttributeMismatchHandlerTests(FactoryTestCase):
 
         target.attrs.append(AttrFactory.enumeration())
 
-        with self.assertRaises(AnalyzerError) as cm:
+        with self.assertRaises(AnalyzerValueError) as cm:
             self.processor.process(target)
 
         self.assertEqual(

@@ -87,10 +87,10 @@ class SchemaParserTests(TestCase):
 
     def test_set_schema_forms_default(self):
         schema = Schema()
-        schema.elements.append(Element.create())
-        schema.elements.append(Element.create())
-        schema.attributes.append(Element.create())
-        schema.attributes.append(Element.create())
+        schema.elements.append(Element())
+        schema.elements.append(Element())
+        schema.attributes.append(Element())
+        schema.attributes.append(Element())
 
         self.parser.set_schema_forms(schema)
 
@@ -105,10 +105,10 @@ class SchemaParserTests(TestCase):
 
     def test_set_schema_forms(self):
         schema = Schema()
-        schema.elements.append(Element.create())
-        schema.elements.append(Element.create())
-        schema.attributes.append(Element.create())
-        schema.attributes.append(Element.create())
+        schema.elements.append(Element())
+        schema.elements.append(Element())
+        schema.attributes.append(Element())
+        schema.attributes.append(Element())
 
         self.parser.element_form = "unqualified"
         self.parser.attribute_form = "qualified"
@@ -177,8 +177,8 @@ class SchemaParserTests(TestCase):
         self.assertEqual(expected, schema.ns_map)
 
     def test_add_default_imports(self):
-        schema = Schema.create()
-        schema.imports.append(Import.create(namespace="foo"))
+        schema = Schema()
+        schema.imports.append(Import(namespace="foo"))
 
         self.parser.add_default_imports(schema)
         self.assertEqual(1, len(schema.imports))
@@ -187,14 +187,14 @@ class SchemaParserTests(TestCase):
         schema.ns_map["foo"] = xsi
         self.parser.add_default_imports(schema)
         self.assertEqual(2, len(schema.imports))
-        self.assertEqual(Import.create(namespace=xsi), schema.imports[0])
+        self.assertEqual(Import(namespace=xsi), schema.imports[0])
 
     @mock.patch.object(SchemaParser, "resolve_local_path")
     @mock.patch.object(SchemaParser, "resolve_path")
     def test_resolve_schemas_locations(
         self, mock_resolve_path, mock_resolve_local_path
     ):
-        schema = Schema.create()
+        schema = Schema()
         self.parser.resolve_schemas_locations(schema)
 
         self.parser.schema_location = Path.cwd()
@@ -202,14 +202,14 @@ class SchemaParserTests(TestCase):
         mock_resolve_path.side_effect = lambda x: Path.cwd().joinpath(x)
         mock_resolve_local_path.side_effect = lambda x, y: Path.cwd().joinpath(x)
 
-        schema.overrides.append(Override.create(schema_location="o1"))
-        schema.overrides.append(Override.create(schema_location="o2"))
-        schema.redefines.append(Redefine.create(schema_location="r1"))
-        schema.redefines.append(Redefine.create(schema_location="r2"))
-        schema.includes.append(Include.create(schema_location="i1"))
-        schema.includes.append(Include.create(schema_location="i2"))
-        schema.imports.append(Import.create(schema_location="i3", namespace="ns_i3"))
-        schema.imports.append(Import.create(schema_location="i4", namespace="ns_i4"))
+        schema.overrides.append(Override(schema_location="o1"))
+        schema.overrides.append(Override(schema_location="o2"))
+        schema.redefines.append(Redefine(schema_location="r1"))
+        schema.redefines.append(Redefine(schema_location="r2"))
+        schema.includes.append(Include(schema_location="i1"))
+        schema.includes.append(Include(schema_location="i2"))
+        schema.imports.append(Import(schema_location="i3", namespace="ns_i3"))
+        schema.imports.append(Import(schema_location="i4", namespace="ns_i4"))
 
         self.parser.resolve_schemas_locations(schema)
 
@@ -286,7 +286,7 @@ class SchemaParserTests(TestCase):
         self.parser.default_attributes = "tns:attrs"
         self.parser.end_complex_type(complex_type, element)
 
-        expected = AttributeGroup.create(ref="tns:attrs")
+        expected = AttributeGroup(ref="tns:attrs")
         self.assertEqual([expected], complex_type.attribute_groups)
         self.assertIsNone(complex_type.open_content)
 
@@ -303,7 +303,7 @@ class SchemaParserTests(TestCase):
 
     def test_end_default_open_content(self):
         default_open_content = DefaultOpenContent()
-        default_open_content.any = Any.create()
+        default_open_content.any = Any()
         element = etree.Element("uno")
 
         self.parser.end_default_open_content(default_open_content, element)
@@ -346,7 +346,7 @@ class SchemaParserTests(TestCase):
 
     def test_end_open_content(self):
         open_content = OpenContent()
-        open_content.any = Any.create()
+        open_content.any = Any()
         element = etree.Element("uno")
 
         self.parser.end_open_content(open_content, element)
@@ -386,7 +386,7 @@ class SchemaParserTests(TestCase):
         mock_add_default_imports,
         mock_resolve_schemas_locations,
     ):
-        schema = Schema.create()
+        schema = Schema()
         element = Element("schema")
 
         self.parser.end_schema(schema, element)

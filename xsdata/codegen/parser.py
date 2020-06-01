@@ -97,7 +97,7 @@ class SchemaParser(XmlParser):
         imp_namespaces = [imp.namespace for imp in obj.imports]
         xsi_ns = Namespace.XSI.value
         if xsi_ns in obj.ns_map.values() and xsi_ns not in imp_namespaces:
-            obj.imports.insert(0, xsd.Import.create(namespace=xsi_ns))
+            obj.imports.insert(0, xsd.Import(namespace=xsi_ns))
 
     def resolve_schemas_locations(self, obj: xsd.Schema):
         """Resolve the locations of the schema overrides, redefines, includes
@@ -153,7 +153,7 @@ class SchemaParser(XmlParser):
             return
 
         if obj.default_attributes_apply and self.default_attributes:
-            attribute_group = xsd.AttributeGroup.create(ref=self.default_attributes)
+            attribute_group = xsd.AttributeGroup(ref=self.default_attributes)
             obj.attribute_groups.insert(0, attribute_group)
 
         if not obj.open_content:

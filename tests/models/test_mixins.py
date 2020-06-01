@@ -43,30 +43,19 @@ class ElementBaseTests(TestCase):
         element = ElementBase()
         self.assertIsNone(element.display_help)
 
-    def test_property_extends(self):
-        element = ElementBase()
-        self.assertIsNone(element.extends)
-
     def test_property_extensions(self):
         element = ElementBase()
         self.assertIsInstance(element.extensions, Iterator)
         self.assertEqual([], list(element.extensions))
 
-        class Foo(ElementBase):
-            @property
-            def extends(self) -> Optional[str]:
-                return "a b   c"
-
-        self.assertEqual(["a", "b", "c"], list(Foo().extensions))
-
     def test_property_has_children(self):
         element = ElementBase()
         self.assertFalse(element.has_children)
 
-        element = Element.create()
+        element = Element()
         self.assertFalse(element.has_children)
 
-        element.complex_type = ComplexType.create()
+        element.complex_type = ComplexType()
         self.assertTrue(element.has_children)
 
     def test_property_has_form(self):

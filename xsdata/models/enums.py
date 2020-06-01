@@ -10,6 +10,8 @@ COMMON_SCHEMA_DIR = Path(__file__).absolute().parent.parent.joinpath("schemas/")
 
 
 class Namespace(Enum):
+    """Common namespaces."""
+
     XS = "http://www.w3.org/2001/XMLSchema"
     XML = "http://www.w3.org/XML/1998/namespace"
     XSI = "http://www.w3.org/2001/XMLSchema-instance"
@@ -36,6 +38,8 @@ __STANDARD_NAMESPACES__ = {ns.uri: ns for ns in Namespace}
 
 
 class QNames:
+    """Common qualified names."""
+
     ALL = QName("__all__")
     XSI_NIL = QName(Namespace.XSI.uri, "nil")
     XSI_TYPE = QName(Namespace.XSI.uri, "type")
@@ -43,6 +47,8 @@ class QNames:
 
 class NamespaceType(Enum):
     """
+    Wildcard elements/attributes namespace types.
+
     :param ANY: elements from any namespace is allowed
     :param OTHER: elements from any namespace other than the parent element's namespace
     :param LOCAL: elements must come from no namespace
@@ -63,17 +69,23 @@ class NamespaceType(Enum):
 
 
 class FormType(Enum):
+    """Element/Attribute form types."""
+
     QUALIFIED = "qualified"
     UNQUALIFIED = "unqualified"
 
 
 class Mode(Enum):
+    """OpenContent mode types."""
+
     NONE = "none"
     SUFFIX = "suffix"
     INTERLEAVE = "interleave"
 
 
 class DataType(Enum):
+    """Xml data types to native python."""
+
     # xsdata custom any type
     QMAP = ("qmap", (QName, str))
     OBJECT = ("object", object)
@@ -154,12 +166,16 @@ __XSDType__ = {xsd.code: xsd for xsd in DataType}
 
 
 class EventType:
+    """XmlParsing event types."""
+
     START = "start"
     START_NS = "start-ns"
     END = "end"
 
 
 class Tag:
+    """Xml Schema tag names."""
+
     ALL = "All"
     ANNOTATION = "Annotation"
     ANY = "Any"
@@ -208,12 +224,16 @@ class Tag:
 
 
 class UseType(Enum):
+    """Attribute use types."""
+
     OPTIONAL = "optional"
     PROHIBITED = "prohibited"
     REQUIRED = "required"
 
 
 class ProcessType(Enum):
+    """Wildcard process types."""
+
     LAX = "lax"
     SKIP = "skip"
     STRICT = "strict"

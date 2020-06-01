@@ -124,9 +124,9 @@ class SchemaTransformerTests(FactoryTestCase):
         mock_generate_classes,
         mock_logger_info,
     ):
-        include = Include.create()
-        override = Override.create()
-        schema = Schema.create(target_namespace="thug")
+        include = Include()
+        override = Override()
+        schema = Schema(target_namespace="thug")
         schema.includes.append(include)
         schema.overrides.append(override)
         mock_process_included.side_effect = [
@@ -184,7 +184,7 @@ class SchemaTransformerTests(FactoryTestCase):
     @mock.patch.object(SchemaTransformer, "process_schema")
     def test_process_included(self, mock_process_schema):
         path = Path(__file__)
-        include = Include.create(location=path, schema_location="foo.xsd")
+        include = Include(location=path, schema_location="foo.xsd")
         mock_process_schema.return_value = ClassFactory.list(2)
 
         result = self.transformer.process_included(include, "thug")
@@ -197,7 +197,7 @@ class SchemaTransformerTests(FactoryTestCase):
         self, mock_logger_debug
     ):
         path = Path(__file__)
-        include = Include.create(location=path)
+        include = Include(location=path)
         self.transformer.processed.append(path)
 
         result = self.transformer.process_included(include, "thug")
@@ -212,7 +212,7 @@ class SchemaTransformerTests(FactoryTestCase):
 
     @mock.patch("xsdata.codegen.transformer.logger.warning")
     def test_process_included_skip_when_location_is_missing(self, mock_logger_warning):
-        include = Include.create()
+        include = Include()
         result = self.transformer.process_included(include, "thug")
 
         self.assertIsInstance(result, dict)
@@ -234,7 +234,7 @@ class SchemaTransformerTests(FactoryTestCase):
         mock_count_classes,
         mock_logger_info,
     ):
-        schema = Schema.create(location="edo.xsd")
+        schema = Schema(location="edo.xsd")
         classes = ClassFactory.list(2)
 
         mock_builder_build.return_value = classes

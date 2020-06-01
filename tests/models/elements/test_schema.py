@@ -13,22 +13,22 @@ from xsdata.models.xsd import Schema
 class SchemaTests(TestCase):
     def test_sub_schemas(self):
         imports = [
-            Import.create(schema_location="../foo.xsd"),
-            Import.create(schema_location="../bar.xsd"),
+            Import(schema_location="../foo.xsd"),
+            Import(schema_location="../bar.xsd"),
         ]
         includes = [
-            Include.create(schema_location="common.xsd"),
-            Include.create(schema_location="uncommon.xsd"),
+            Include(schema_location="common.xsd"),
+            Include(schema_location="uncommon.xsd"),
         ]
         redefines = [
-            Redefine.create(schema_location="a.xsd"),
-            Redefine.create(schema_location="b.xsd"),
+            Redefine(schema_location="a.xsd"),
+            Redefine(schema_location="b.xsd"),
         ]
         overrides = [
-            Override.create(schema_location="a.xsd"),
-            Override.create(schema_location="b.xsd"),
+            Override(schema_location="a.xsd"),
+            Override(schema_location="b.xsd"),
         ]
-        schema = Schema.create(
+        schema = Schema(
             imports=imports, includes=includes, redefines=redefines, overrides=overrides
         )
 
@@ -37,13 +37,11 @@ class SchemaTests(TestCase):
         self.assertIsInstance(actual, Iterator)
         self.assertEqual(expected, list(actual))
 
-        schema = Schema.create()
+        schema = Schema()
         self.assertEqual([], list(schema.included()))
 
     def test_module(self):
-        schema = Schema.create(
-            location="foo/bar.xsd", target_namespace="http://xsdata/foo"
-        )
+        schema = Schema(location="foo/bar.xsd", target_namespace="http://xsdata/foo")
 
         self.assertEqual("bar", schema.module)
         schema.location = "foo/bar.noext"

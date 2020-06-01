@@ -5,7 +5,7 @@ from xsdata.codegen.mixins import HandlerInterface
 from xsdata.codegen.models import Attr
 from xsdata.codegen.models import Class
 from xsdata.codegen.utils import ClassUtils
-from xsdata.exceptions import AnalyzerError
+from xsdata.exceptions import AnalyzerValueError
 from xsdata.utils import text
 
 
@@ -26,7 +26,7 @@ class AttributeGroupHandler(HandlerInterface):
         source = self.container.find(qname)
 
         if not source:
-            raise AnalyzerError(f"Group attribute not found: `{qname}`")
+            raise AnalyzerValueError(f"Group attribute not found: `{qname}`")
 
         if source is target:
             target.attrs.remove(attr)

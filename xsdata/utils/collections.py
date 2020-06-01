@@ -8,6 +8,12 @@ from typing import Sequence
 
 
 def unique_sequence(items: Sequence, key: Optional[str] = None) -> List:
+    """
+    Return a new list with the unique values from the sequence.
+
+    Optionally you can also provide a lambda to generate the unique key
+    of each item in the sequence.
+    """
     seen = set()
 
     def is_new(val: Any) -> bool:
@@ -24,6 +30,7 @@ def unique_sequence(items: Sequence, key: Optional[str] = None) -> List:
 
 
 def group_by(items: Sequence, key: Callable) -> Dict[Any, List]:
+    """Group the items of a sequence by the result of the callable."""
     result = defaultdict(list)
     for item in items:
         result[key(item)].append(item)

@@ -139,7 +139,7 @@ class ClassSanitizerTest(FactoryTestCase):
             ],
         )
 
-        actual = list()
+        actual = []
         for attr in target.attrs:
             self.sanitizer.process_attribute_default(target, attr)
             actual.append(attr.default)
@@ -231,6 +231,10 @@ class ClassSanitizerTest(FactoryTestCase):
         attr.name = "+ -  *"
         self.sanitizer.process_attribute_name(attr)
         self.assertEqual("value", attr.name)
+
+        attr = AttrFactory.enumeration(default="-20.55")
+        self.sanitizer.process_attribute_name(attr)
+        self.assertEqual("value_minus_-20.55", attr.name)
 
     def test_sanitize_duplicate_attribute_names(self):
         attrs = [

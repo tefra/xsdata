@@ -19,10 +19,10 @@ class AnyElement:
     tail: Optional[str] = field(default=None)
     ns_map: Dict = field(default_factory=dict)
     children: List[object] = field(
-        default_factory=list, metadata=dict(type=XmlType.WILDCARD)
+        default_factory=list, metadata={"type": XmlType.WILDCARD}
     )
     attributes: Dict = field(
-        default_factory=dict, metadata=dict(type=XmlType.ATTRIBUTES)
+        default_factory=dict, metadata={"type": XmlType.ATTRIBUTES}
     )
 
 

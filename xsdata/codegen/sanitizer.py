@@ -1,7 +1,6 @@
 import re
 from dataclasses import dataclass
 from typing import Callable
-from typing import Dict
 from typing import List
 from typing import Optional
 
@@ -11,6 +10,7 @@ from xsdata.codegen.models import AttrType
 from xsdata.codegen.models import Class
 from xsdata.logger import logger
 from xsdata.utils import text
+from xsdata.utils.collections import group_by
 
 
 @dataclass
@@ -205,10 +205,7 @@ class ClassSanitizer:
             3. Append the xml type to the name of one of the two attributes. if
             possible rename the second field or the field with xml type `attribute`.
         """
-        grouped: Dict[str, List[Attr]] = dict()
-        for attr in attrs:
-            grouped.setdefault(attr.name.lower(), []).append(attr)
-
+        grouped = group_by(attrs, lambda attr: attr.name.lower())
         for items in grouped.values():
             if len(items) == 1:
                 continue

@@ -86,7 +86,7 @@ class ClassBuilder:
     def build_class_extensions(self, obj: ElementBase, target: Class):
         """Build the item class extensions from the given ElementBase
         children."""
-        extensions = dict()
+        extensions = {}
         raw_type = obj.raw_type
         if raw_type:
             restrictions = obj.get_restrictions()

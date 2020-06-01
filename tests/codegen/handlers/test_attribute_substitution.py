@@ -22,7 +22,7 @@ class AttributeSubstitutionHandlerTests(FactoryTestCase):
     @mock.patch.object(AttributeSubstitutionHandler, "create_substitutions")
     def test_process(self, mock_create_substitutions, mock_process_attribute):
         def init_substitutions():
-            self.processor.substitutions = dict()
+            self.processor.substitutions = {}
 
         mock_create_substitutions.side_effect = init_substitutions
 

@@ -153,7 +153,7 @@ class ElementBase(BaseModel):
         return []
 
     def get_restrictions(self) -> Dict[str, Any]:
-        return dict()
+        return {}
 
     def schema_prefix(self) -> Optional[str]:
         return next(

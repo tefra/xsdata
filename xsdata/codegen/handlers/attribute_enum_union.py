@@ -18,7 +18,7 @@ class AttributeEnumUnionHandler(HandlerInterface):
     def process(self, target: Class):
 
         if len(target.attrs) == 1 and target.attrs[0].tag == Tag.UNION:
-            enums: List[Any] = list()
+            enums: List[Any] = []
             attr = target.attrs[0]
             for attr_type in attr.types:
                 if attr_type.forward:

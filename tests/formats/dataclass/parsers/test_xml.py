@@ -49,8 +49,8 @@ class XmlParserTests(TestCase):
             position=0, meta=self.parser.context.build(Books), config=config,
         )
 
-        objects = list()
-        queue = list()
+        objects = []
+        queue = []
         queue.append(root_queue_item)
         self.parser.queue(element, queue, objects)
 
@@ -68,8 +68,8 @@ class XmlParserTests(TestCase):
         element = Element("author", nsmap={"prefix": "uri"})
         element.text = "foobar"
 
-        objects = list()
-        queue = list()
+        objects = []
+        queue = []
         var = XmlText(name="foo", qname=QName("foo"))
         queue.append(PrimitiveNode(position=0, var=var))
 
@@ -87,8 +87,8 @@ class XmlParserTests(TestCase):
         element = Element("author", nsmap={"prefix": "uri"})
         element.text = "foobar"
 
-        objects = list()
-        queue = list()
+        objects = []
+        queue = []
         queue.append(SkipNode(position=0))
 
         result = self.parser.dequeue(element, queue, objects)

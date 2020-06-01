@@ -40,8 +40,8 @@ class CodeWriter:
             print(buffer, end="")
 
     def designate(self, classes: List[Class], output: str):
-        modules = dict()
-        packages = dict()
+        modules = {}
+        packages = {}
 
         for obj in classes:
 

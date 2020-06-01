@@ -1,6 +1,7 @@
 import sys
 from dataclasses import dataclass
 from dataclasses import field
+from operator import methodcaller
 from typing import Any as Anything
 from typing import Dict
 from typing import Iterator
@@ -45,7 +46,7 @@ def array_any_element(init: bool = True, **kwargs: str) -> Anything:
 
 def occurrences(min_value: int, max_value: UnionType[int, str]) -> Dict[str, int]:
     max_value = sys.maxsize if max_value == "unbounded" else int(max_value)
-    return dict(min_occurs=min_value, max_occurs=max_value)
+    return {"min_occurs": min_value, "max_occurs": max_value}
 
 
 @dataclass(frozen=True)
@@ -132,8 +133,9 @@ class AnnotationBase(ElementBase):
     @property
     def display_help(self) -> Optional[str]:
         if self.annotation and len(self.annotation.documentations) > 0:
+            to_string = methodcaller("tostring")
             return "\n".join(
-                filter(None, [doc.tostring() for doc in self.annotation.documentations])
+                filter(None, map(to_string, self.annotation.documentations))
             )
         return None
 
@@ -239,7 +241,7 @@ class SimpleType(AnnotationBase):
             return self.restriction.get_restrictions()
         if self.list:
             return self.list.get_restrictions()
-        return dict()
+        return {}
 
 
 @dataclass
@@ -313,7 +315,7 @@ class Union(AnnotationBase):
         return " ".join(types) if types else None
 
     def get_restrictions(self) -> Dict[str, Anything]:
-        restrictions = dict()
+        restrictions = {}
         for simple_type in self.simple_types:
             restrictions.update(simple_type.get_restrictions())
         return restrictions
@@ -361,7 +363,7 @@ class Attribute(AnnotationBase):
         return None
 
     def get_restrictions(self) -> Dict[str, Anything]:
-        restrictions = dict()
+        restrictions = {}
         if self.use == UseType.REQUIRED:
             restrictions.update({"min_occurs": 1, "max_occurs": 1, "required": True})
         elif self.use == UseType.PROHIBITED:
@@ -491,7 +493,7 @@ class Sequence(AnnotationBase):
 
     def get_restrictions(self) -> Dict[str, Anything]:
         restrictions = occurrences(self.min_occurs, self.max_occurs)
-        restrictions.update(dict(sequential=True))
+        restrictions.update(sequential=True)
         return restrictions
 
 
@@ -846,7 +848,7 @@ class Restriction(AnnotationBase):
         return self.base
 
     def get_restrictions(self) -> Dict[str, Anything]:
-        restrictions = dict()
+        restrictions = {}
         if self.simple_type:
             restrictions.update(self.simple_type.get_restrictions())
 
@@ -1144,7 +1146,7 @@ class Element(AnnotationBase):
         if self.substitution_group:
             return list(filter(None, self.substitution_group.split(" ")))
 
-        return list()
+        return []
 
     def get_restrictions(self) -> Dict[str, Anything]:
         restrictions = occurrences(self.min_occurs, self.max_occurs)

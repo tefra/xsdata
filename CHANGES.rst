@@ -1,3 +1,10 @@
+20.6 (2020-06-01)
+-----------------
+- Updated XmlSerializer to render default namespace whenever possible.
+- Fixed issue generating modules outside the target package.
+- Fixed issue not creating nested package __init__ files.
+- Code cleanup & docstrings
+
 20.5.5 (2020-05-23)
 -------------------
 - Added version option in the xsdata cli.

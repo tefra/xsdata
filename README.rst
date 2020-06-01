@@ -64,17 +64,9 @@ Features
 - Output: Python Data Classes
 - Output: PlantUML class diagram
 
-Changelog: 20.5.5 (2020-05-23)
-------------------------------
-
-- Added version option in the xsdata cli.
-- Added generation of missing python __init__ files.
-- Added support for default values to inner enum classes.
-- Fixed multiple issues with abstract classes and attributes/extension flattening.
-- Fixed instance cross references causing codegen unpredictable results.
-- Fixed xml serialization of wildcard attributes with user defined model values.
-- Fixed issue with redefined/override elements with annotations.
-- Fixed expand attribute groups recursively.
-- Fixed false positive circular references.
-- Fixed enumeration unions detection.
-- Refactored ClassAnalyzer to smaller components.
+Changelog: 20.6 (2020-06-01)
+----------------------------
+- Updated XmlSerializer to render default namespace whenever possible.
+- Fixed issue generating modules outside the target package.
+- Fixed issue not creating nested package __init__ files.
+- Code cleanup & docstrings

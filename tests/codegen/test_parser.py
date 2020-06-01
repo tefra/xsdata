@@ -60,7 +60,7 @@ class SchemaParserTests(TestCase):
 
     @mock.patch.object(SchemaParser, "set_namespace_map")
     def test_dequeue_with_skip_node(self, mock_set_namespace_map):
-        objects = list()
+        objects = []
         queue = [SkipNode(position=0)]
         element = etree.Element("foo")
 

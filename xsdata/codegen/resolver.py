@@ -108,7 +108,7 @@ class DependenciesResolver:
     def create_class_map(classes: List[Class]) -> Dict[QName, Class]:
         """Index the list of classes by name."""
 
-        result: Dict[QName, Class] = dict()
+        result: Dict[QName, Class] = {}
         for obj in classes:
             qname = obj.source_qname()
             if qname in result:

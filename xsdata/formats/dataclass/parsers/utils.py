@@ -131,7 +131,7 @@ class ParserUtils:
 
         if var.is_list:
             if var.name not in params:
-                params[var.name] = list()
+                params[var.name] = []
             if txt:
                 params[var.name].insert(0, txt)
             if tail:

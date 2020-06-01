@@ -89,7 +89,7 @@ def generate():
         if len(xsd.stem) != 9:
             continue
 
-        buffer = list()
+        buffer = []
         section_titles.clear()
 
         if not xsd.with_suffix(".py").exists():

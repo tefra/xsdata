@@ -40,7 +40,7 @@ def cli(sources: List, package: str, output: str, print: bool):
 
 
 def process_sources(sources: List[str]) -> List[str]:
-    result: List[str] = list()
+    result: List[str] = []
     for source in sources:
         path = Path(source).resolve()
         if path.is_dir():

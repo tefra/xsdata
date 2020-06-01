@@ -37,4 +37,4 @@ class AnyAttributeTests(TestCase):
 
     def get_restrictions(self):
         obj = AnyAttribute.create()
-        self.assertEqual(dict(), obj.get_restrictions())
+        self.assertEqual({}, obj.get_restrictions())

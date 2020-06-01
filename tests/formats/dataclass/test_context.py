@@ -131,7 +131,7 @@ class XmlContextTests(TestCase):
         self.assertEqual(expected, result)
         mock_get_type_hints.assert_called_once_with(ItemsType, None)
 
-    @mock.patch.object(XmlContext, "get_type_hints", return_value=dict())
+    @mock.patch.object(XmlContext, "get_type_hints", return_value={})
     def test_build_with_meta_namespace(self, mock_get_type_hints):
         namespace = Product.Meta.namespace
         result = self.ctx.build(Product, None)
@@ -140,14 +140,14 @@ class XmlContextTests(TestCase):
         self.assertEqual(QName(namespace, "product"), result.source_qname)
         mock_get_type_hints.assert_called_once_with(Product, namespace)
 
-    @mock.patch.object(XmlContext, "get_type_hints", return_value=dict())
+    @mock.patch.object(XmlContext, "get_type_hints", return_value={})
     def test_build_with_parent_ns(self, mock_get_type_hints):
         result = self.ctx.build(ProductType, "http://xsdata")
 
         self.assertEqual(QName("http://xsdata", "ProductType"), str(result.qname))
         mock_get_type_hints.assert_called_once_with(ProductType, "http://xsdata")
 
-    @mock.patch.object(XmlContext, "get_type_hints", return_value=dict())
+    @mock.patch.object(XmlContext, "get_type_hints", return_value={})
     def test_build_with_no_meta_name_and_name_generator(self, *args):
         inspect = XmlContext(name_generator=lambda x: text.snake_case(x))
         result = inspect.build(ItemsType)
@@ -168,7 +168,7 @@ class XmlContextTests(TestCase):
         self.assertEqual("Foo", result.name)
         self.assertIsNone(result.qname.namespace)
 
-    @mock.patch.object(XmlContext, "get_type_hints", return_value=dict())
+    @mock.patch.object(XmlContext, "get_type_hints", return_value={})
     def test_build_with_no_dataclass_raises_exception(self, *args):
         with self.assertRaises(XmlContextError) as cm:
             self.ctx.build(int)

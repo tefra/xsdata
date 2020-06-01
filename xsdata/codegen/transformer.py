@@ -60,13 +60,13 @@ class SchemaTransformer:
             logger.warning("Analyzer returned zero classes!")
 
     def process_schemas(self, urls: List[str], package: str) -> Classes:
-        class_map = dict()
+        class_map = {}
         for url in urls:
             class_map.update(self.process_schema(url))
 
         self.assign_packages(class_map, package)
 
-        classes = list()
+        classes = []
         for items in class_map.values():
             classes.extend(items)
 
@@ -75,7 +75,7 @@ class SchemaTransformer:
     def process_schema(self, url: str, namespace: String = None) -> ClassMap:
         """Recursively parse the given schema url and the included schemas and
         generate a list of classes."""
-        classes = dict()
+        classes = {}
         if url not in self.processed:
             self.processed.append(url)
             logger.info("Parsing schema...")
@@ -93,7 +93,7 @@ class SchemaTransformer:
     def process_included(self, included: Included, namespace: String) -> ClassMap:
         """Prepare the given included schema location and send it for
         processing."""
-        classes = dict()
+        classes = {}
         if not included.location:
             logger.warning(
                 "%s: %s unresolved schema location..",

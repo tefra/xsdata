@@ -72,7 +72,7 @@ class ElementNode(XmlNode):
 
         :return: A tuple of the object's qualified name and the new object.
         """
-        params: Dict = dict()
+        params: Dict = {}
         ParserUtils.bind_element_attrs(params, self.meta, element)
         ParserUtils.bind_element_text(params, self.meta, element)
         ParserUtils.bind_element_children(params, self.meta, self.position, objects)

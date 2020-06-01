@@ -68,9 +68,6 @@ class ClassAnalyzer:
     @classmethod
     def validate_references(cls, classes: List[Class]):
         """Validate all code gen objects are not cross referenced."""
-        references = list()
-        for target in classes:
-            references.extend(cls.class_references(target))
-
+        references = [ref for obj in classes for ref in cls.class_references(obj)]
         if len(references) != len(set(references)):
             raise AnalyzerError("Cross references detected!")

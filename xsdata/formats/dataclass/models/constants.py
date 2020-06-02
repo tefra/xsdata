@@ -10,6 +10,8 @@ from xsdata.formats.dataclass.models.elements import XmlWildcard
 
 
 class XmlType:
+    """Xml node types."""
+
     TEXT = "Text"
     ELEMENT = "Element"
     WILDCARD = "Wildcard"

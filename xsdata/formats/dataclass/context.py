@@ -26,6 +26,15 @@ from xsdata.models.enums import NamespaceType
 
 @dataclass
 class XmlContext:
+    """
+    Generate and cache the necessary metadata to bind an xml document data to a
+    dataclass model.
+
+    :param name_generator: Callable to convert attribute names to local document names
+                            if the model fields metadata name is missing.
+    :param cache: Local storage to store and reuse models' bind metadata.
+    """
+
     name_generator: Callable = field(default=lambda x: x)
     cache: Dict[Type, XmlMeta] = field(default_factory=dict)
 
@@ -35,6 +44,16 @@ class XmlContext:
         parent_ns: Optional[str] = None,
         xsi_type: Optional[QName] = None,
     ) -> XmlMeta:
+        """
+        Fetch the model metadata of the given dataclass type, namespace and xsi
+        type.
+
+        :param clazz: A dataclass model
+        :param parent_ns: The parent dataclass namespace if present.
+        :param xsi_type: if present it means that the given clazz is derived and the
+        lookup procedure needs to check and match a dataclass model to the qualified
+        name instead.
+        """
         meta = self.build(clazz, parent_ns)
 
         subclass = self.find_subclass(clazz, xsi_type) if xsi_type else None
@@ -44,6 +63,13 @@ class XmlContext:
         return meta
 
     def find_subclass(self, clazz: Type, xsi_type: QName) -> Optional[Type]:
+        """
+        Find a derived class of the given clazz that matches the given
+        qualified xsi type.
+
+        The derived class is either a subclass or shares the same parent
+        class as the given class.
+        """
         for subclass in clazz.__subclasses__():
             if self.match_class_source_qname(subclass, xsi_type):
                 return subclass
@@ -62,6 +88,7 @@ class XmlContext:
         return None
 
     def match_class_source_qname(self, clazz: Type, xsi_type: QName) -> bool:
+        """Match a given source qualified name with the given xsi type."""
         if is_dataclass(clazz):
             meta = self.build(clazz)
             return meta.source_qname == xsi_type
@@ -69,10 +96,17 @@ class XmlContext:
         return False
 
     def build(self, clazz: Type, parent_ns: Optional[str] = None) -> XmlMeta:
+        """Fetch from cache or build the metadata object for the given class
+        and parent namespace."""
+
         if clazz not in self.cache:
+
+            # Ensure the given type is a dataclass.
             if not is_dataclass(clazz):
                 raise XmlContextError(f"Object {clazz} is not a dataclass.")
 
+            # Fetch the dataclass meta settings and make sure we don't inherit
+            # the parent class meta.
             meta = getattr(clazz, "Meta", None)
             if meta and meta.__qualname__ != f"{clazz.__name__}.Meta":
                 meta = None
@@ -94,6 +128,7 @@ class XmlContext:
         return self.cache[clazz]
 
     def get_type_hints(self, clazz: Type, parent_ns: Optional[str]) -> Iterator[XmlVar]:
+        """Build the model class fields metadata."""
         type_hints = get_type_hints(clazz)
 
         for var in fields(clazz):
@@ -129,7 +164,15 @@ class XmlContext:
         namespace: Optional[str],
         parent_namespace: Optional[str],
     ) -> List[str]:
+        """
+        Resolve the namespace(s) for the given xml type and the parent
+        namespace.
 
+        Only elements and wildcards are allowed to inherit the parent namespace if
+        the given namespace is empty.
+
+        In case of wildcard try to decode the ##any, ##other, ##local, ##target.
+        """
         if xml_type in (XmlType.ELEMENT, XmlType.WILDCARD) and namespace is None:
             namespace = parent_namespace
 
@@ -155,6 +198,8 @@ class XmlContext:
 
     @staticmethod
     def default_value(var: Field) -> Any:
+        """Return the default value/factory for the given field."""
+
         if var.default_factory is not MISSING:  # type: ignore
             return var.default_factory  # type: ignore
 
@@ -165,6 +210,8 @@ class XmlContext:
 
     @staticmethod
     def real_types(type_hint: Any) -> List:
+        """Return a list of real types that can be used to bind or cast
+        data."""
         types = []
         if type_hint is Dict:
             types.append(type_hint)
@@ -184,6 +231,8 @@ class XmlContext:
 
     @classmethod
     def is_derived(cls, obj: Any, clazz: Type) -> bool:
+        """Return whether the given obj is derived from the given dataclass
+        type."""
         if isinstance(obj, clazz):
             return True
 

@@ -29,10 +29,12 @@ XmlNodes = List[XmlNode]
 @dataclass
 class XmlParser(AbstractParser):
     """
-    :param namespaces:
-    :param context:
-    :param event_names:
-    :param config:
+    Xml parsing and binding for dataclasses.
+
+    :param namespaces: Store the prefix/namespace as they are parsed.
+    :param context: Model metadata builder
+    :param event_names: Cache for event names for each element
+    :param config: Parser configuration
     """
 
     namespaces: Namespaces = field(init=False, default_factory=Namespaces)

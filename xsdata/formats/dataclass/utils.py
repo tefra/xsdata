@@ -45,6 +45,12 @@ stop_words = [
 
 
 def safe_snake(string: str, default: str = "value") -> str:
+    """
+    Normalize the given string to make it safe for python source code.
+
+    Return or prepend the default value if after all filters the result
+    is invalid.
+    """
     if not string:
         return default
 

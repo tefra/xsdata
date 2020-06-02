@@ -9,12 +9,11 @@ from xsdata.formats.mixins import AbstractGenerator
 
 
 class PlantUmlGenerator(AbstractGenerator):
-    templates_dir = Path(__file__).parent.joinpath("templates")
+    def __init__(self):
+        tpl_dir = Path(__file__).parent.joinpath("templates")
+        super().__init__(str(tpl_dir))
 
     def render(self, classes: List[Class]) -> Iterator[Tuple[Path, str, str]]:
-        """Given  a list of classes return to the writer factory the target
-        file path full module path and the rendered code."""
-
         packages = {obj.source_qname(): obj.target_module for obj in classes}
         resolver = DependenciesResolver(packages=packages)
 
@@ -26,15 +25,20 @@ class PlantUmlGenerator(AbstractGenerator):
     def render_module(
         self, resolver: DependenciesResolver, classes: List[Class]
     ) -> str:
+        """Render the source code for the target module of the given class
+        list."""
         resolver.process(classes)
         output = self.render_classes(resolver.sorted_classes())
         return self.template("module").render(output=output)
 
     def render_classes(self, classes: List[Class]) -> str:
+        """Render the source code of the classes."""
+        load = self.template
         classes = sorted(classes, key=lambda x: x.name)
-        output = "\n".join(map(self.render_class, classes)).strip()
-        return f"\n{output}\n"
 
-    def render_class(self, obj: Class) -> str:
-        template = "enum" if obj.is_enumeration else "class"
-        return self.template(template).render(obj=obj)
+        def render_class(obj: Class) -> str:
+            template = "enum" if obj.is_enumeration else "class"
+            return load(template).render(obj=obj).strip()
+
+        output = "\n".join(map(render_class, classes))
+        return f"\n{output}\n"

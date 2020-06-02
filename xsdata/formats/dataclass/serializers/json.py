@@ -19,13 +19,20 @@ def filter_none(x: Tuple) -> Dict:
 
 
 class DictFactory:
+    """Dictionary factory types."""
+
     FILTER_NONE = filter_none
 
 
 class JsonEncoder(json.JSONEncoder):
+    """Custom Json encoder to support additional python build-in types."""
+
     def default(self, obj: Any) -> Any:
+        """Override parent method to handle enumerations and decimals."""
+
         if isinstance(obj, Enum):
             return obj.value
+
         if isinstance(obj, Decimal):
             return str(obj)
 
@@ -35,7 +42,9 @@ class JsonEncoder(json.JSONEncoder):
 @dataclass
 class DictSerializer(AbstractSerializer):
     """
-    :param dict_factory: Override default dict factory.
+    Simple dictionary serializer with access to the dict factory.
+
+    :param dict_factory: Override default dict factory to add further logic.
     """
 
     dict_factory: Callable = field(default=dict)
@@ -49,9 +58,11 @@ class DictSerializer(AbstractSerializer):
 @dataclass
 class JsonSerializer(AbstractSerializer):
     """
-    :param dict_factory: Callable to generate dictionary
-    :param encoder: Value encoder
-    :param indent: Pretty print indent
+    Simple json.dumps wrapper.
+
+    :param dict_factory: Callable to generate dictionary.
+    :param encoder: Value encoder.
+    :param indent: output indentation.
     """
 
     dict_factory: Callable = field(default=dict)

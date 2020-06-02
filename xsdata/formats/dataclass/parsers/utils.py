@@ -23,11 +23,12 @@ from xsdata.utils import text
 class ParserUtils:
     @classmethod
     def parse_xsi_type(cls, element: Element) -> Optional[QName]:
-        if QNames.XSI_TYPE not in element.attrib:
-            return None
-
-        return cls.parse_value(
-            [QName], element.attrib[QNames.XSI_TYPE], None, element.nsmap
+        """Parse the elements xsi:type attribute if present."""
+        xsi_type = element.attrib.get(QNames.XSI_TYPE)
+        return (
+            cls.parse_value([QName], xsi_type, None, element.nsmap)
+            if xsi_type
+            else None
         )
 
     @classmethod
@@ -83,6 +84,7 @@ class ParserUtils:
 
     @classmethod
     def fetch_any_children(cls, position: int, objects: List) -> List[object]:
+        """Fetch the children of a wildcard node."""
         children = []
         while len(objects) > position:
             _, value = objects.pop(position)
@@ -91,6 +93,15 @@ class ParserUtils:
 
     @classmethod
     def bind_element_param(cls, params: Dict, var: XmlVar, value: Any) -> bool:
+        """
+        Add the given value to the params dictionary with the var name as key.
+
+        Wrap the value to a list if var is a list. If the var name already exists it
+        means we have a name conflict and the parser needs to lookup for any available
+        wildcard fields.
+
+        :return: Whether the binding process was successful or not.
+        """
         if var.is_list:
             params.setdefault(var.name, []).append(value)
         elif var.name not in params:
@@ -104,6 +115,14 @@ class ParserUtils:
     def bind_element_wildcard_param(
         cls, params: Dict, var: XmlVar, qname: QName, value: Any
     ):
+        """
+        Add the given value to the params dictionary with the wildcard var name
+        as key.
+
+        If the key is already present wrap the previous value into a
+        generic AnyElement instance. If the previous value is already a
+        generic instance add the current value as a child object.
+        """
         if is_dataclass(value):
             if not isinstance(value, AnyElement):
                 value.qname = qname
@@ -121,6 +140,15 @@ class ParserUtils:
 
     @classmethod
     def bind_element_wild_text(cls, params: Dict, meta: XmlMeta, element: Element):
+        """
+        Extract the text and tail content and bind it accordingly in the params
+        dictionary.
+
+        - If the var is a list prepend the text and append the tail.
+        - If the var name is present in the params assign the text and tail to the
+        generic object.
+        - Otherwise bind the given element to a new generic object.
+        """
         var = meta.find_var(mode=FindMode.WILDCARD)
         if not var:
             return
@@ -144,6 +172,7 @@ class ParserUtils:
 
     @classmethod
     def element_text_and_tail(cls, element: Element) -> Tuple:
+        """Extract the text and tail content if any and return them both."""
         txt = element.text.strip() if element.text else None
         tail = element.tail.strip() if element.tail else None
 
@@ -151,6 +180,7 @@ class ParserUtils:
 
     @classmethod
     def parse_any_element(cls, element: Element, qname: bool = True) -> AnyElement:
+        """Bind the given element content to a new generic object."""
         txt, tail = cls.element_text_and_tail(element)
         return AnyElement(
             qname=element.tag if qname else None,
@@ -162,6 +192,9 @@ class ParserUtils:
 
     @classmethod
     def parse_any_attributes(cls, element: Element) -> Dict[QName, Any]:
+        """Extract the given element's attributes into the dictionary with keys
+        the fully qualified attribute names."""
+
         def qname(value: Any) -> Any:
             prefix, suffix = text.split(value)
             if prefix and prefix in element.nsmap:
@@ -172,6 +205,8 @@ class ParserUtils:
 
     @classmethod
     def bind_element_text(cls, params: Dict, metadata: XmlMeta, element: Element):
+        """Add the given element's text content if any to the params dictionary
+        with the text var name as key."""
         var = metadata.find_var(mode=FindMode.TEXT)
         if var and element.text is not None and var.init:
             params[var.name] = cls.parse_value(
@@ -205,7 +240,12 @@ class ParserUtils:
     def find_eligible_wildcard(
         cls, meta: XmlMeta, qname: QName, params: Dict
     ) -> Optional[XmlVar]:
+        """
+        Last resort lookup for a suitable wildcard var.
 
+        Search for a list wildcard or a wildcard that already exists in
+        the params dictionary.
+        """
         return next(
             (
                 var

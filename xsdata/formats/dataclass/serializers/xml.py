@@ -2,8 +2,10 @@ from dataclasses import dataclass
 from dataclasses import field
 from dataclasses import is_dataclass
 from typing import Any
+from typing import Iterator
 from typing import List
 from typing import Optional
+from typing import Tuple
 
 from lxml.etree import cleanup_namespaces
 from lxml.etree import Element
@@ -28,10 +30,12 @@ DEFAULT_NS_PREFIX = ""
 @dataclass
 class XmlSerializer(AbstractSerializer):
     """
-    :param xml_declaration: Add xml declaration
-    :param encoding: Result text encoding
-    :param pretty_print: Enable pretty output
-    :param context: XmlContext instance
+    Xml serialize for dataclasses.
+
+    :param xml_declaration: Add xml declaration.
+    :param encoding: Result text encoding.
+    :param pretty_print: Enable pretty output.
+    :param context: XmlContext instance.
     """
 
     xml_declaration: bool = field(default=True)
@@ -82,6 +86,8 @@ class XmlSerializer(AbstractSerializer):
             SerializeUtils.set_text(parent, obj, namespaces)
 
     def render_complex_node(self, parent: Element, obj: Any, namespaces: Namespaces):
+        """Iterate over the dataclass fields and values and create the element
+        tree."""
         meta = self.context.build(obj.__class__, QName(parent).namespace)
         for var, value in self.next_value(meta, obj):
             if value is None:
@@ -103,12 +109,15 @@ class XmlSerializer(AbstractSerializer):
     def render_sub_nodes(
         self, parent: Element, values: List, var: XmlVar, namespaces: Namespaces
     ):
+        """Iterate of a list of values to render the children of the given
+        parent element."""
         for value in values:
             self.render_sub_node(parent, value, var, namespaces)
 
     def render_sub_node(
         self, parent: Element, value: Any, var: XmlVar, namespaces: Namespaces
     ):
+        """Render a child element or text content for the given parent."""
         if isinstance(value, AnyElement):
             self.render_wildcard_node(parent, value, var, namespaces)
         elif var.is_element or is_dataclass(value):
@@ -121,6 +130,8 @@ class XmlSerializer(AbstractSerializer):
     def render_element_node(
         self, parent: Element, value: Any, var: XmlVar, namespaces: Namespaces
     ):
+        """Render a child element for the given parent according to the field
+        xml metadata."""
         if hasattr(value, "qname"):
             qname = value.qname
         elif var.is_wildcard:
@@ -138,6 +149,8 @@ class XmlSerializer(AbstractSerializer):
     def render_wildcard_node(
         self, parent: Element, value: Any, var: XmlVar, namespaces: Namespaces
     ):
+        """Render a child element for the given parent according to the
+        wildcard field metadata."""
         if value.qname:
             sub_element = SubElement(parent, value.qname)
         else:
@@ -155,6 +168,8 @@ class XmlSerializer(AbstractSerializer):
     def set_xsi_type(
         self, parent: Element, value: Any, var: XmlVar, namespaces: Namespaces
     ):
+        """Set the element's xsi:type if the given value is a derived
+        instance."""
         if not var.clazz or value.__class__ is var.clazz:
             return
 
@@ -169,7 +184,14 @@ class XmlSerializer(AbstractSerializer):
             )
 
     @classmethod
-    def next_value(cls, meta: XmlMeta, obj: Any):
+    def next_value(cls, meta: XmlMeta, obj: Any) -> Iterator[Tuple[XmlVar, Any]]:
+        """
+        Return the fields and their values in the correct order according to
+        their definition and sequential metadata.
+
+        Sequential fields need to be rendered together in parallel order
+        eg: <a1/><a2/><a1/><a/2></a1>
+        """
 
         index = 0
         attrs = meta.vars

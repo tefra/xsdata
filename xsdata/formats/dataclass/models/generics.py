@@ -14,6 +14,17 @@ from xsdata.models.enums import Namespace
 
 @dataclass
 class AnyElement:
+    """
+    Generic ElementNode dataclass to bind xml document data to wildcard fields.
+
+    :param qname: qualified name with namespace.
+    :param text: text content.
+    :param tail: tail content.
+    :param ns_map: prefix to namespace map.
+    :param children: children element.
+    :param attributes: element attributes.
+    """
+
     qname: Optional[QName] = field(default=None)
     text: Optional[str] = field(default=None)
     tail: Optional[str] = field(default=None)
@@ -28,17 +39,26 @@ class AnyElement:
 
 @dataclass
 class Namespaces:
+    """
+    Namespaces container used during parsing or generating xml documents.
+
+    :param data: Namespace to prefixes map
+    :param auto_ns: Current auto increment prefix id
+    :param _ns_map: Prefix to namespace cache auto generated if the data change.
+    """
+
     data: Dict = field(default_factory=lambda: defaultdict(set), init=False)
     auto_ns: int = field(default_factory=int, init=False)
-    dirty: bool = field(default=False, init=True)
     _ns_map: Optional[Dict] = field(init=False, default=None)
 
     @property
     def prefixes(self) -> List[str]:
+        """Return the list of prefixes."""
         return list(filter(None, self.ns_map.keys()))
 
     @property
     def ns_map(self) -> Dict:
+        """Return the prefix to namespace map."""
         if self._ns_map is None:
             self._ns_map = {
                 (prefix or None): uri
@@ -48,11 +68,22 @@ class Namespaces:
         return self._ns_map
 
     def prefix(self, namespace: str) -> Optional[str]:
+        """Return the prefix for the given namespace."""
         return next(
             (prefix for prefix, uri in self.ns_map.items() if uri == namespace), None
         )
 
     def add(self, uri: Optional[str], prefix: Optional[str] = None):
+        """
+        Add the given uri and optional prefix to the data storage.
+
+        If the prefix is missing and the uri exists in the storage skip the process.
+
+        If the namespace is one of the common use the predefined prefix to
+        follow the lxml convention.
+
+        If the prefix is none assign the next auto increment prefix ns0,ns1,ns2 ...
+        """
         if not uri or uri in self.data and prefix is None:
             return
 
@@ -66,19 +97,28 @@ class Namespaces:
         self.data[uri].add(prefix)
 
     def add_all(self, ns_map: Dict):
+        """
+        Shortcut method to all multiple namespaces/prefixes.
+
+        If prefix is none set the prefix to an empty string as it's the
+        convention for the default namespace.
+        """
         for prefix, uri in ns_map.items():
             self.add(uri, prefix or "")
 
     def clear(self):
+        """Clear the data storage and ns map cache."""
         self._ns_map = None
         self.data.clear()
 
     def register(self):
+        """Register the current namespaces map to lxml global registry."""
         for prefix, uri in self.ns_map.items():
             if prefix and not prefix.startswith("ns"):
                 register_namespace(prefix, uri)
 
     def unregister(self):
+        """Remove from lxml global registry the current namespaces map."""
         for prefix, uri in self.ns_map.items():
             if prefix and not prefix.startswith("ns") and not Namespace.get_enum(uri):
                 register_namespace(prefix, "")

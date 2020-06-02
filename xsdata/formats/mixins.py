@@ -1,5 +1,4 @@
 import abc
-from abc import abstractmethod
 from pathlib import Path
 from typing import Dict
 from typing import Iterator
@@ -30,11 +29,10 @@ class AbstractGenerator(metaclass=abc.ABCMeta):
         """Return the named template from the initialized environment."""
         return self.env.get_template(f"{name}.jinja2")
 
-    @abstractmethod
+    @abc.abstractmethod
     def render(self, classes: List[Class]) -> Iterator[Tuple[Path, str, str]]:
         """Return a tuple iterator that consists of the target filepath, module
         name and the rendered source code for the given list of classes."""
-        raise NotImplementedError
 
     @classmethod
     def module_name(cls, module: str) -> str:

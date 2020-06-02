@@ -6,6 +6,8 @@ from xsdata.models.xsd import Extension
 
 class ExtensionTests(TestCase):
     def test_property_extensions(self):
-        obj = Extension(base="xs:string")
+        obj = Extension()
         self.assertIsInstance(obj.extensions, Iterator)
-        self.assertEqual(["xs:string"], list(obj.extensions))
+        self.assertEqual([], list(obj.extensions))
+        obj.base = "a b c"
+        self.assertEqual(["a b c"], list(obj.extensions))

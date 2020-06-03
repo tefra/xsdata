@@ -14,6 +14,7 @@ from xsdata.codegen.writer import writer
 from xsdata.exceptions import CodeGenerationError
 from xsdata.formats.dataclass.generator import DataclassGenerator
 from xsdata.formats.mixins import AbstractGenerator
+from xsdata.formats.mixins import GeneratorResult
 from xsdata.utils import text
 
 
@@ -21,10 +22,14 @@ from xsdata.utils import text
 class FakeGenerator(AbstractGenerator):
     dir: Optional[TemporaryDirectory] = None
 
-    def render(self, classes: List[Class]) -> Iterator[Tuple[Path, str, str]]:
+    def render(self, classes: List[Class]) -> Iterator[GeneratorResult]:
         for obj in classes:
             assert obj.package is not None
-            yield Path(f"{self.dir}/{obj.name}.txt"), obj.package, obj.name
+            yield GeneratorResult(
+                path=Path(f"{self.dir}/{obj.name}.txt"),
+                title=obj.package,
+                source=obj.name,
+            )
 
     @classmethod
     def module_name(cls, name):

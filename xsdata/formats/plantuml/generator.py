@@ -1,26 +1,31 @@
 from pathlib import Path
 from typing import Iterator
 from typing import List
-from typing import Tuple
 
 from xsdata.codegen.models import Class
 from xsdata.codegen.resolver import DependenciesResolver
 from xsdata.formats.mixins import AbstractGenerator
+from xsdata.formats.mixins import GeneratorResult
 
 
 class PlantUmlGenerator(AbstractGenerator):
+    """PlantUML generator."""
+
     def __init__(self):
         tpl_dir = Path(__file__).parent.joinpath("templates")
         super().__init__(str(tpl_dir))
 
-    def render(self, classes: List[Class]) -> Iterator[Tuple[Path, str, str]]:
+    def render(self, classes: List[Class]) -> Iterator[GeneratorResult]:
+        """Return a iterator of the generated results."""
         packages = {obj.source_qname(): obj.target_module for obj in classes}
         resolver = DependenciesResolver(packages=packages)
 
         for module, cluster in self.group_by_module(classes).items():
-            output = self.render_module(resolver, cluster)
-            pck = cluster[0].target_module
-            yield module.with_suffix(".pu"), pck, output
+            yield GeneratorResult(
+                path=module.with_suffix(".pu"),
+                title=cluster[0].target_module,
+                source=self.render_module(resolver, cluster),
+            )
 
     def render_module(
         self, resolver: DependenciesResolver, classes: List[Class]
@@ -37,6 +42,7 @@ class PlantUmlGenerator(AbstractGenerator):
         classes = sorted(classes, key=lambda x: x.name)
 
         def render_class(obj: Class) -> str:
+            """Render class or enumeration."""
             template = "enum" if obj.is_enumeration else "class"
             return load(template).render(obj=obj).strip()
 

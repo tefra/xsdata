@@ -1,9 +1,9 @@
 import abc
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Dict
 from typing import Iterator
 from typing import List
-from typing import Tuple
 
 from jinja2 import Environment
 from jinja2 import FileSystemLoader
@@ -15,6 +15,21 @@ from xsdata.utils.package import module_path
 from xsdata.utils.package import package_path
 
 
+@dataclass(frozen=True)
+class GeneratorResult:
+    """
+    Generator easy access output wrapper.
+
+    :param path: file path to be written
+    :param title: result title for misc usage
+    :param source: source code/output to be written
+    """
+
+    path: Path
+    title: str
+    source: str
+
+
 class AbstractGenerator(metaclass=abc.ABCMeta):
     """
     Abstract code generator class.
@@ -23,6 +38,11 @@ class AbstractGenerator(metaclass=abc.ABCMeta):
     """
 
     def __init__(self, tpl_dir: str):
+        """
+        Generator constructor.
+
+        Initialize jinja2 environment.
+        """
         self.env = Environment(loader=FileSystemLoader(tpl_dir), autoescape=False)
 
     def template(self, name: str) -> Template:
@@ -30,9 +50,8 @@ class AbstractGenerator(metaclass=abc.ABCMeta):
         return self.env.get_template(f"{name}.jinja2")
 
     @abc.abstractmethod
-    def render(self, classes: List[Class]) -> Iterator[Tuple[Path, str, str]]:
-        """Return a tuple iterator that consists of the target filepath, module
-        name and the rendered source code for the given list of classes."""
+    def render(self, classes: List[Class]) -> Iterator[GeneratorResult]:
+        """Return a iterator of the generated results."""
 
     @classmethod
     def module_name(cls, module: str) -> str:

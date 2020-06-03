@@ -32,6 +32,13 @@ class SchemaParser(XmlParser):
 
     The parser is a dummy as possible but it will try to normalize
     certain things like apply parent properties to children.
+
+    :param element_form:
+    :param attribute_form:
+    :param target_namespace:
+    :param default_attributes:
+    :param default_open_content:
+    :param schema_location:
     """
 
     element_form: Optional[FormType] = field(init=False, default=None)
@@ -84,6 +91,7 @@ class SchemaParser(XmlParser):
 
     @staticmethod
     def set_namespace_map(element: Element, obj: ElementBase):
+        """Add common namespaces like xml, xsi, xlink if they are missing."""
         obj.ns_map = element.nsmap
         namespaces = obj.ns_map.values()
         for namespace in Namespace:
@@ -160,6 +168,8 @@ class SchemaParser(XmlParser):
             obj.open_content = self.default_open_content
 
     def end_default_open_content(self, obj: T, element: Element):
+        """Set the instance default open content to be used later as a property
+        for all extensions and restrictions."""
         if isinstance(obj, xsd.DefaultOpenContent):
             if obj.any and obj.mode == Mode.SUFFIX:
                 obj.any.index = sys.maxsize
@@ -173,16 +183,20 @@ class SchemaParser(XmlParser):
             obj.form = FormType(self.element_form)
 
     def end_extension(self, obj: T, element: Element):
+        """Set the open content if any to the given extension."""
         if isinstance(obj, xsd.Extension) and not obj.open_content:
             obj.open_content = self.default_open_content
 
     @classmethod
     def end_open_content(cls, obj: T, element: Element):
+        """Adjust the index to trick later processors into putting attributes
+        derived from this open content last in classes."""
         if isinstance(obj, xsd.OpenContent):
             if obj.any and obj.mode == Mode.SUFFIX:
                 obj.any.index = sys.maxsize
 
     def end_restriction(self, obj: T, element: Element):
+        """Set the open content if any to the given restriction."""
         if isinstance(obj, xsd.Restriction) and not obj.open_content:
             obj.open_content = self.default_open_content
 

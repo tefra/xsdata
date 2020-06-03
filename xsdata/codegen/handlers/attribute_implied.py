@@ -8,18 +8,14 @@ from xsdata.models.enums import Tag
 
 
 class AttributeImpliedHandler(HandlerInterface):
-    """
-    Add implied attributes.
-
-    Scenarios:
-        1. Mixed content class with missing wildcard attribute
-
-    Add an xs:anyType attribute to the given class if it supports mixed
-    content and doesn't have a wildcard attribute yet.
-    """
+    """Add attributes to classes that are implied from the class other
+    properties."""
 
     @classmethod
     def process(cls, target: Class):
+        """Add an xs:anyType attribute to the given class if it supports mixed
+        content and doesn't have a wildcard attribute yet."""
+
         if not target.mixed or target.has_wild_attr:
             return
 

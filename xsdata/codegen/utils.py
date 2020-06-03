@@ -10,6 +10,8 @@ from xsdata.utils import text
 
 
 class ClassUtils:
+    """General reusable utils methods that didn't fit anywhere else."""
+
     @classmethod
     def copy_attributes(cls, source: Class, target: Class, extension: Extension):
         """

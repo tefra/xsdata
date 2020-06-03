@@ -15,9 +15,13 @@ from xsdata.utils.collections import group_by
 
 @dataclass
 class ClassSanitizer:
+    """Prepare all the classes attributes for code generation and cleanup after
+    the analyzer processors."""
+
     container: ClassContainer
 
     def process(self):
+        """Iterate through all classes and run the sanitizing procedure."""
         for obj in self.container.iterate():
             self.process_class(obj)
 

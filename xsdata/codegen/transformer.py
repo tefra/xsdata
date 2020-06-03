@@ -33,11 +33,20 @@ ClassMap = Dict[str, Classes]
 
 @dataclass
 class SchemaTransformer:
+    """
+    Orchestrate the code generation from a list of sources to output format.
+
+    :param print:
+    :param output:
+    :param processed:
+    """
+
     print: bool
     output: str
     processed: List[str] = field(init=False, default_factory=list)
 
     def process(self, urls: List[str], package: str):
+        """Run main processes."""
         classes = self.process_schemas(urls, package)
         class_num, inner_num = self.count_classes(classes)
         if class_num:
@@ -60,6 +69,8 @@ class SchemaTransformer:
             logger.warning("Analyzer returned zero classes!")
 
     def process_schemas(self, urls: List[str], package: str) -> Classes:
+        """Iterate over the list of source and collect the list of generated
+        classes."""
         class_map = {}
         for url in urls:
             class_map.update(self.process_schema(url))
@@ -146,7 +157,7 @@ class SchemaTransformer:
     def analyze_classes(classes: Classes) -> Classes:
         """Analyzer the given class list and simplify attributes and
         extensions."""
-        return ClassAnalyzer(classes).process()
+        return ClassAnalyzer.from_classes(classes).process()
 
     def count_classes(self, classes: Classes) -> Tuple[int, int]:
         """Return a tuple of counters for the main and inner classes."""
@@ -189,6 +200,7 @@ class SchemaTransformer:
 
     @classmethod
     def assign_package(cls, classes: Classes, package: str):
+        """Assign the given package to all the classes and their inners."""
         for obj in classes:
             obj.package = package
             cls.assign_package(obj.inner, package)

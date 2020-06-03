@@ -11,6 +11,8 @@ from xsdata.utils.collections import group_by
 
 @dataclass
 class ClassValidator:
+    """Run validations against the class container in order to remove or merge
+    invalid or redefined types."""
 
     container: ClassContainer
 

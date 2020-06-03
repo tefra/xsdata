@@ -11,6 +11,9 @@ class AttributeMismatchHandler(HandlerInterface):
 
     @classmethod
     def process(cls, target: Class):
+        """Process classes that contain attributes derived from xs:enumeration
+        and any other xs element."""
+
         if target.is_enumeration or not any(
             attr.is_enumeration for attr in target.attrs
         ):

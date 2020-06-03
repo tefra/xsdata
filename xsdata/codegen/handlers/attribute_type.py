@@ -147,7 +147,7 @@ class AttributeTypeHandler(HandlerInterface):
         Non abstract: check for circular references.
         """
         if not source.abstract:
-            attr_type.circular = self.is_circular_dependency(source, target)
+            attr_type.circular = self.is_circular_dependency(source, target, set())
         elif not source.extensions or source.attrs:
             source.abstract = False
         else:
@@ -160,16 +160,13 @@ class AttributeTypeHandler(HandlerInterface):
 
                 attr.restrictions.merge(extension.restrictions)
 
-    def is_circular_dependency(
-        self, source: Class, target: Class, seen: Optional[Set] = None
-    ) -> bool:
+    def is_circular_dependency(self, source: Class, target: Class, seen: Set) -> bool:
         """Check if any source dependencies recursively match the target
         class."""
 
         if source is target or source.status == Status.PROCESSING:
             return True
 
-        seen = seen or set()
         for qname in self.cached_dependencies(source):
             if qname not in seen:
                 seen.add(qname)
@@ -180,6 +177,8 @@ class AttributeTypeHandler(HandlerInterface):
         return False
 
     def cached_dependencies(self, source: Class) -> Tuple[QName]:
+        """Returns from cache the source class dependencies as a collection of
+        qualified names."""
         cache_key = id(source)
         if cache_key not in self.dependencies:
             self.dependencies[cache_key] = tuple(source.dependencies())

@@ -12,24 +12,30 @@ Condition = Optional[Callable]
 
 
 class ContainerInterface(metaclass=abc.ABCMeta):
+    """Wrap a list of classes and expose a simple api for easy access and
+    process."""
+
     @abc.abstractmethod
     def iterate(self) -> Iterator[Class]:
-        raise NotImplementedError
+        """Create an iterator for the class map values."""
 
     @abc.abstractmethod
     def find(self, qname: QName, condition: Condition = None) -> Optional[Class]:
-        raise NotImplementedError
+        """Search by qualified name for a specific class with an optional
+        condition callable."""
 
     @abc.abstractmethod
     def add(self, item: Class):
-        raise NotImplementedError
+        """Add class item to the container."""
 
     @abc.abstractmethod
     def extend(self, items: List[Class]):
-        raise NotImplementedError
+        """Add a list of classes the container."""
 
 
 class HandlerInterface(metaclass=abc.ABCMeta):
+    """Class handler interface."""
+
     @abc.abstractmethod
     def process(self, target: Class):
-        raise NotImplementedError
+        """Process the given target class."""

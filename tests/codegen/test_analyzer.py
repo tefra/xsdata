@@ -15,9 +15,9 @@ from xsdata.models.xsd import SimpleType
 
 
 class ClassAnalyzerTests(FactoryTestCase):
-    def test__init__(self):
+    def test_from_classes(self):
         classes = ClassFactory.list(2)
-        analyzer = ClassAnalyzer(classes)
+        analyzer = ClassAnalyzer.from_classes(classes)
         self.assertEqual(classes, list(analyzer.container.iterate()))
 
     @mock.patch.object(ClassAnalyzer, "select_classes")
@@ -29,7 +29,7 @@ class ClassAnalyzerTests(FactoryTestCase):
     ):
         classes = ClassFactory.list(1)
         mock_select_classes.return_value = classes
-        analyzer = ClassAnalyzer([])
+        analyzer = ClassAnalyzer()
 
         self.assertEqual(classes, analyzer.process())
         mock_pre_process.assert_called_once_with()
@@ -65,7 +65,7 @@ class ClassAnalyzerTests(FactoryTestCase):
             ClassFactory.enumeration(2),
         ]
 
-        analyzer = ClassAnalyzer(classes)
+        analyzer = ClassAnalyzer.from_classes(classes)
 
         expected = [
             classes[1],
@@ -79,7 +79,7 @@ class ClassAnalyzerTests(FactoryTestCase):
 
     def test_select_classes_when_no_complex_class_available(self):
         classes = [ClassFactory.enumeration(2), ClassFactory.create(type=SimpleType)]
-        analyzer = ClassAnalyzer(classes)
+        analyzer = ClassAnalyzer.from_classes(classes)
 
         self.assertEqual(classes, analyzer.select_classes())
 

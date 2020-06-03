@@ -10,13 +10,18 @@ from xsdata.models.enums import Tag
 
 @dataclass
 class AttributeEnumUnionHandler(HandlerInterface):
-    """Convert simple types with a single field which is a union of enums to a
-    standalone enumeration."""
+    """Convert classes with a single attribute derived from xs:union where all
+    types are enumerations to standalone enumeration."""
 
     container: ContainerInterface
 
     def process(self, target: Class):
+        """
+        Merge enumeration unions attributes.
 
+        Lookup for the source class in the local namespace or inner
+        class list.
+        """
         if len(target.attrs) == 1 and target.attrs[0].tag == Tag.UNION:
             enums: List[Any] = []
             attr = target.attrs[0]

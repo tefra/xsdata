@@ -1,3 +1,5 @@
+from dataclasses import dataclass
+from dataclasses import field
 from typing import List
 
 from xsdata.codegen.container import ClassContainer
@@ -7,15 +9,15 @@ from xsdata.codegen.validator import ClassValidator
 from xsdata.exceptions import AnalyzerValueError
 
 
+@dataclass
 class ClassAnalyzer:
-    """Analyzer main responsibility is to orchestrate the processing of the
-    class list and the selection of the final list of classes that need to be
+    """Validate, analyze, sanitize and select the final class list to be
     generated."""
 
-    def __init__(self, classes: List[Class]):
-        self.container = ClassContainer.from_list(classes)
+    container: ClassContainer = field(default_factory=ClassContainer)
 
     def process(self) -> List[Class]:
+        """Run all the processes."""
         self.pre_process()
         self.container.process()
         self.post_process()
@@ -23,9 +25,12 @@ class ClassAnalyzer:
         return self.select_classes()
 
     def pre_process(self):
+        """Run validation checks for duplicate, invalid and redefined types."""
         ClassValidator(self.container).process()
 
     def post_process(self):
+        """Sanitize class attributes after merging and flattening types and
+        extensions."""
         ClassSanitizer(self.container).process()
 
     def select_classes(self) -> List[Class]:
@@ -50,7 +55,14 @@ class ClassAnalyzer:
         return classes
 
     @classmethod
+    def from_classes(cls, classes: List[Class]) -> "ClassAnalyzer":
+        """Instantiate from a list of classes."""
+        container = ClassContainer.from_list(classes)
+        return cls(container)
+
+    @classmethod
     def class_references(cls, target: Class) -> List:
+        """Produce a list of instance references for the given class."""
         result = [id(target)]
         for attr in target.attrs:
             result.append(id(attr))

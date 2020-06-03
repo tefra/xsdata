@@ -13,19 +13,30 @@ from xsdata.logger import logger
 
 @dataclass
 class CodeWriter:
+    """
+    Proxy to format generators and files structure creation.
+
+    :param generators:
+    """
+
     generators: Dict[str, AbstractGenerator] = field(default_factory=dict)
 
     @property
     def formats(self) -> List[str]:
+        """Return a list of the registered generator names."""
         return list(self.generators.keys())
 
     def register_format(self, name: str, generator: AbstractGenerator):
+        """Register a new generator by name."""
         self.generators[name] = generator
 
     def get_format(self, name: str) -> AbstractGenerator:
+        """Get a generator by name."""
         return self.generators[name]
 
     def write(self, classes: List[Class], output: str):
+        """Iterate over the designated generator outputs and create the
+        necessary directories and files."""
         engine = self.get_format(output)
         for file, package, buffer in engine.render(classes):
             if len(buffer.strip()) > 0:
@@ -35,11 +46,15 @@ class CodeWriter:
                 file.write_text(buffer)
 
     def print(self, classes: List[Class], output: str):
+        """Iterate over the designated generator outputs and print them to the
+        console."""
         engine = self.get_format(output)
         for _, _, buffer in engine.render(classes):
             print(buffer, end="")
 
     def designate(self, classes: List[Class], output: str):
+        """Normalize the target package and module names by the given output
+        generator."""
         modules = {}
         packages = {}
 
@@ -60,10 +75,12 @@ class CodeWriter:
             obj.package = packages[obj.package]
 
     def module_name(self, module: str, output: str) -> str:
+        """Proxy method for the format generator."""
         engine = self.get_format(output)
         return engine.module_name(module)
 
     def package_name(self, package: str, output: str) -> str:
+        """Proxy method for the format generator."""
         engine = self.get_format(output)
         return engine.package_name(package)
 

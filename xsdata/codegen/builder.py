@@ -26,6 +26,13 @@ from xsdata.utils import text
 
 @dataclass
 class ClassBuilder:
+    """
+    Extract a list of classes from a schema instance by mapping types to
+    classes, attributes and extensions.
+
+    :param schema: schema objects tree
+    """
+
     schema: Schema
 
     def build(self) -> List[Class]:
@@ -78,7 +85,9 @@ class ClassBuilder:
     def build_class_attributes(self, obj: ElementBase, target: Class):
         """Build the target class attributes from the given ElementBase
         children."""
-        for child, restrictions in self.element_children(obj):
+
+        restrictions = Restrictions.from_element(obj)
+        for child, restrictions in self.element_children(obj, restrictions):
             self.build_class_attribute(target, child, restrictions)
 
         target.attrs.sort(key=lambda x: x.index)
@@ -98,9 +107,11 @@ class ClassBuilder:
 
         target.extensions = sorted(extensions.values(), key=lambda x: x.type.index)
 
+    @classmethod
     def build_data_type(
-        self, target: Class, name: str, index: int = 0, forward: bool = False
+        cls, target: Class, name: str, index: int = 0, forward: bool = False
     ) -> AttrType:
+        """Create an attribute type for the target class."""
         prefix, suffix = text.split(name)
         native = False
         namespace = target.ns_map.get(prefix)
@@ -112,14 +123,14 @@ class ClassBuilder:
         return AttrType(name=name, index=index, native=native, forward=forward,)
 
     def element_children(
-        self, obj: ElementBase, restrictions: Optional[Restrictions] = None
+        self, obj: ElementBase, restrictions: Restrictions
     ) -> Iterator[Tuple[ElementBase, Restrictions]]:
         """Recursively find and return all child elements that are qualified to
         be class attributes."""
 
         for child in obj.children():
             if child.is_attribute:
-                yield child, restrictions or Restrictions()
+                yield child, restrictions
             else:
                 yield from self.element_children(
                     child, restrictions=Restrictions.from_element(child)
@@ -173,6 +184,7 @@ class ClassBuilder:
     def build_class_extension(
         self, target: Class, name: str, index: int, restrictions: Dict
     ) -> Extension:
+        """Create an extension for the target class."""
         return Extension(
             type=self.build_data_type(target, name, index=index),
             restrictions=Restrictions(**restrictions),
@@ -181,7 +193,7 @@ class ClassBuilder:
     def build_class_attribute(
         self, target: Class, obj: ElementBase, parent_restrictions: Restrictions
     ):
-        """Generate and append an attribute target to the target class."""
+        """Generate and append an attribute field to the target class."""
         types = self.build_class_attribute_types(target, obj)
         restrictions = Restrictions.from_element(obj)
 

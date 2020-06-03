@@ -20,18 +20,19 @@ Substitutions = Optional[Dict[QName, List[Attr]]]
 
 @dataclass
 class AttributeSubstitutionHandler(HandlerInterface):
-    """
-    Apply substitution attributes to the given class recursively.
-
-    Substitution attributes are placed below the attribute the are
-    supposed to substitute. Exclude enumerations and wildcard attributes
-    from the process.
-    """
+    """Apply substitution attributes to the given class recursively."""
 
     container: ContainerInterface
     substitutions: Substitutions = field(init=False, default=None)
 
     def process(self, target: Class):
+        """
+        Search and process attributes not derived from xs:enumeration or
+        xs:any.
+
+        Build the substitutions map if it's not initialized yet.
+        """
+
         if self.substitutions is None:
             self.create_substitutions()
 
@@ -40,6 +41,13 @@ class AttributeSubstitutionHandler(HandlerInterface):
                 self.process_attribute(target, attr)
 
     def process_attribute(self, target: Class, attr: Attr):
+        """
+        Check if the given attribute matches any substitution class in order to
+        clone it's attributes to the target class.
+
+        The cloned attributes are placed below the attribute the are
+        supposed to substitute.
+        """
         index = target.attrs.index(attr)
         qname = target.source_qname(attr.name)
 

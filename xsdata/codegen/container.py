@@ -28,6 +28,11 @@ Condition = Optional[Callable]
 
 class ClassContainer(UserDict, ContainerInterface):
     def __init__(self, data: Dict[QName, List[Class]] = None) -> None:
+        """
+        Initialize container structure and the list of process handlers.
+
+        :params data: class map indexed by their source qualified name.
+        """
         super().__init__(data)
 
         self.processors = [
@@ -43,13 +48,17 @@ class ClassContainer(UserDict, ContainerInterface):
 
     @classmethod
     def from_list(cls, items: List[Class]) -> "ClassContainer":
+        """Static constructor from a list of classes."""
         return cls(group_by(items, methodcaller("source_qname")))
 
     def iterate(self) -> Iterator[Class]:
+        """Create an iterator for the class map values."""
         for items in list(self.data.values()):
             yield from items
 
     def find(self, qname: QName, condition: Condition = None) -> Optional[Class]:
+        """Search by qualified name for a specific class with an optional
+        condition callable."""
         for row in self.data.get(qname, []):
             if not condition or condition(row):
                 if row.status == Status.RAW:
@@ -62,11 +71,13 @@ class ClassContainer(UserDict, ContainerInterface):
         return None
 
     def process(self):
+        """Run the process handlers for ever non processed class."""
         for obj in self.iterate():
             if obj.status == Status.RAW:
                 self.process_class(obj)
 
     def process_class(self, target: Class):
+        """Run the process handlers for the target class."""
         target.status = Status.PROCESSING
 
         for processor in self.processors:
@@ -79,8 +90,10 @@ class ClassContainer(UserDict, ContainerInterface):
         target.status = Status.PROCESSED
 
     def add(self, item: Class):
+        """Add class item to the container."""
         self.data.setdefault(item.source_qname(), []).append(item)
 
     def extend(self, items: List[Class]):
+        """Add a list of classes the container."""
         for item in items:
             self.add(item)

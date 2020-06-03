@@ -223,7 +223,7 @@ class AttributeTypeHandlerTests(FactoryTestCase):
         self.processor.process_complex_dependency(source, target, attr, attr_type)
         self.assertTrue(attr_type.circular)
 
-        mock_is_circular_dependency.assert_called_once_with(source, target)
+        mock_is_circular_dependency.assert_called_once_with(source, target, set())
 
     def test_process_complex_dependency_with_abstract_that_needs_override(self):
         source = ClassFactory.elements(2, abstract=True)
@@ -281,16 +281,18 @@ class AttributeTypeHandlerTests(FactoryTestCase):
             [QName(x) for x in "xy"],
         ]
 
-        self.assertTrue(self.processor.is_circular_dependency(processing, target))
+        self.assertTrue(
+            self.processor.is_circular_dependency(processing, target, set())
+        )
 
         self.processor.dependencies.clear()
-        self.assertFalse(self.processor.is_circular_dependency(source, target))
+        self.assertFalse(self.processor.is_circular_dependency(source, target, set()))
 
         self.processor.dependencies.clear()
-        self.assertTrue(self.processor.is_circular_dependency(source, target))
+        self.assertTrue(self.processor.is_circular_dependency(source, target, set()))
 
         self.processor.dependencies.clear()
-        self.assertTrue(self.processor.is_circular_dependency(source, source))
+        self.assertTrue(self.processor.is_circular_dependency(source, source, set()))
 
         mock_container_find.assert_has_calls(
             [

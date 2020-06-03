@@ -7,15 +7,17 @@ from xsdata.codegen.utils import ClassUtils
 
 
 class AttributeMergeHandler(HandlerInterface):
-    """
-    Merge same type attributes and their restrictions.
-
-    Two attributes are considered equal if they have the same name,
-    types and namespace.
-    """
+    """Merge same type attributes and their restrictions."""
 
     @classmethod
     def process(cls, target: Class):
+        """
+        Detect same type attributes in order to merge them together with their
+        restrictions.
+
+        Two attributes are considered equal if they have the same name,
+        types and namespace.
+        """
         result: List[Attr] = []
         for attr in target.attrs:
             pos = ClassUtils.find_attribute(result, attr)

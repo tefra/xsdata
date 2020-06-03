@@ -24,6 +24,11 @@ from xsdata.utils import text
 
 
 def qname(name: str, ns_map: Dict, default_namespace: Optional[str] = None) -> QName:
+    """
+    Create an :class:`lxml.etree.QName` for the given name and namespaces map.
+
+    Use the default namespace if the prefix is not in the ns_map.
+    """
     prefix, suffix = text.split(name)
     namespace = default_namespace
 
@@ -45,6 +50,29 @@ xml_type_map = {
 
 @dataclass
 class Restrictions:
+    """
+    Model representation of a dataclass field validation and type metadata.
+
+    :param required:
+    :param prohibited:
+    :param min_occurs:
+    :param max_occurs:
+    :param min_exclusive:
+    :param min_inclusive:
+    :param min_length:
+    :param max_exclusive:
+    :param max_inclusive:
+    :param max_length:
+    :param total_digits:
+    :param fraction_digits:
+    :param length:
+    :param white_space:
+    :param pattern:
+    :param explicit_timezone:
+    :param nillable:
+    :param sequential:
+    """
+
     required: Optional[bool] = field(default=None)
     prohibited: Optional[bool] = field(default=None)
     min_occurs: Optional[int] = field(default=None)
@@ -66,16 +94,20 @@ class Restrictions:
 
     @property
     def is_list(self) -> bool:
+        """Return true if max occurs property is larger than one."""
         return self.max_occurs is not None and self.max_occurs > 1
 
     @property
     def is_optional(self) -> bool:
+        """Return true if min occurs property equals zero."""
         return self.min_occurs == 0
 
     def merge(self, source: "Restrictions"):
+        """Merge the source properties to the current instance."""
         self.update(source.asdict())
 
     def update(self, data: Dict):
+        """Update the instance properties from the given data dictionary."""
         min_occurs = data.pop("min_occurs", None)
         max_occurs = data.pop("max_occurs", None)
         sequential = data.pop("sequential", False)
@@ -94,18 +126,32 @@ class Restrictions:
             self.max_occurs = max_occurs
 
     def asdict(self) -> Dict:
+        """Return the initialized only properties as a dictionary."""
         return {k: v for k, v in asdict(self).items() if v is not None}
 
     def clone(self) -> "Restrictions":
+        """Return a deep cloned instance."""
         return replace(self)
 
     @classmethod
     def from_element(cls, element: ElementBase) -> "Restrictions":
+        """Static constructor from an xsd model."""
         return cls(**element.get_restrictions())
 
 
 @dataclass(unsafe_hash=True)
 class AttrType:
+    """
+    Model representation for the typing information for fields and extensions.
+
+    :param name:
+    :param index:
+    :param alias:
+    :param native:
+    :param forward:
+    :param circular:
+    """
+
     name: str
     index: int = field(default_factory=int)
     alias: Optional[str] = field(default=None)
@@ -115,29 +161,52 @@ class AttrType:
 
     @property
     def is_dependency(self) -> bool:
+        """Return true if attribute is not a forward/circular references and
+        it's not a native python time."""
         return not (self.forward or self.native or self.circular)
 
     @property
     def native_name(self) -> Optional[str]:
+        """Return the python build-in type name: `'str'`, `'int'` if it's
+        native type."""
         data_type = DataType.get_enum(self.name) if self.native else None
         return data_type.local_name if data_type else None
 
     @property
     def native_code(self) -> Optional[str]:
+        """Return the xml data type if it's native type."""
         data_type = DataType.get_enum(self.name) if self.native else None
         return data_type.code if data_type else None
 
     @property
     def native_type(self) -> Any:
+        """Return the python build-in type if it's a native type."""
         data_type = DataType.get_enum(self.name) if self.native else None
         return data_type.local if data_type else None
 
     def clone(self) -> "AttrType":
+        """Return a deep cloned instance."""
         return replace(self)
 
 
 @dataclass
 class Attr:
+    """
+    Model representation for a dataclass field.
+
+    :param tag:
+    :param name:
+    :param index:
+    :param local_name:
+    :param default:
+    :param fixed:
+    :param types:
+    :param display_type:
+    :param namespace:
+    :param help:
+    :param restrictions:
+    """
+
     tag: str
     name: str
     index: int = field(compare=False)
@@ -152,22 +221,29 @@ class Attr:
 
     @property
     def is_attribute(self) -> bool:
+        """Return whether this attribute is derived from an xs:attribute or
+        xs:anyAttribute."""
         return self.tag in (Tag.ATTRIBUTE, Tag.ANY_ATTRIBUTE)
 
     @property
     def is_enumeration(self) -> bool:
+        """Return whether this attribute is derived from an xs:enumeration."""
         return self.tag == Tag.ENUMERATION
 
     @property
     def is_factory(self) -> bool:
+        """Return whether this attribute is a list of items or a mapping."""
         return self.is_list or self.is_map
 
     @property
     def is_group(self) -> bool:
+        """Return whether this attribute is derived from an xs:group or
+        xs:attributeGroup."""
         return self.tag in (Tag.ATTRIBUTE_GROUP, Tag.GROUP)
 
     @property
     def is_map(self) -> bool:
+        """Return whether this attribute is a mapping of values."""
         return (
             len(self.types) == 1
             and self.types[0].native
@@ -176,22 +252,30 @@ class Attr:
 
     @property
     def is_nameless(self) -> bool:
+        """Return whether this attribute has a local name that will be used
+        during parsing/serialization."""
         return self.xml_type in (XmlType.WILDCARD, XmlType.ATTRIBUTES, None)
 
     @property
     def is_list(self) -> bool:
+        """Return whether this attribute is a list of values."""
         return self.restrictions.is_list
 
     @property
     def is_optional(self) -> bool:
+        """Return whether this attribute is not required."""
         return self.restrictions.is_optional
 
     @property
     def is_suffix(self) -> bool:
+        """Return whether this attribute is not derived from an xs element with
+        mode suffix."""
         return self.index == sys.maxsize
 
     @property
     def is_xsi_type(self) -> bool:
+        """Return whether this attribute qualified name is equal to
+        xsi:type."""
         return (
             QNames.XSI_TYPE.namespace == self.namespace
             and QNames.XSI_TYPE.localname == text.suffix(self.name)
@@ -199,13 +283,17 @@ class Attr:
 
     @property
     def is_wildcard(self) -> bool:
+        """Return whether this attribute is derived from xs:anyAttribute or
+        xs:any."""
         return self.tag in (Tag.ANY_ATTRIBUTE, Tag.ANY)
 
     @property
     def xml_type(self) -> Optional[str]:
+        """Return the xml node type this attribute is mapped to."""
         return xml_type_map.get(self.tag)
 
     def clone(self) -> "Attr":
+        """Return a deep cloned instance."""
         return replace(
             self,
             types=[type.clone() for type in self.types],
@@ -215,10 +303,18 @@ class Attr:
 
 @dataclass
 class Extension:
+    """
+    Model representation of a dataclass base class.
+
+    :param type:
+    :restrictions type:
+    """
+
     type: AttrType
     restrictions: Restrictions
 
     def clone(self) -> "Extension":
+        """Return a deep cloned instance."""
         return replace(
             self, type=self.type.clone(), restrictions=self.restrictions.clone()
         )
@@ -232,6 +328,28 @@ class Status(IntEnum):
 
 @dataclass
 class Class:
+    """
+    Model representation of a dataclass with fields, base/inner classes and
+    additional metadata settings.
+
+    :param name:
+    :param type:
+    :param module:
+    :param mixed:
+    :param abstract:
+    :param nillable:
+    :param status:
+    :param package:
+    :param namespace:
+    :param help:
+    :param substitutions:
+    :param extensions:
+    :param attrs:
+    :param inner:
+    :param ns_map:
+    :param source_namespace:
+    """
+
     name: str
     type: Type
     module: str
@@ -251,32 +369,42 @@ class Class:
 
     @property
     def has_suffix_attr(self) -> bool:
+        """Return whether or not it includes a suffix attribute."""
         return any(attr.is_suffix for attr in self.attrs)
 
     @property
     def has_wild_attr(self) -> bool:
+        """Return whether or not it includes a wildcard attribute."""
         return any(attr.is_wildcard for attr in self.attrs)
 
     @property
     def is_complex(self) -> bool:
+        """Return whether or not this instance is derived from an xs:element or
+        xs:complexType."""
         return self.type in (Element, ComplexType)
 
     @property
     def is_element(self) -> bool:
+        """Return whether or not this instance is derived from an non abstract
+        xs:element."""
         return self.type is Element and not self.abstract
 
     @property
     def is_enumeration(self) -> bool:
+        """Return whether all attributes are derived from xs:enumeration."""
         return len(self.attrs) > 0 and all(attr.is_enumeration for attr in self.attrs)
 
     @property
     def is_nillable(self) -> bool:
+        """Return whether this class represents a nillable xml element."""
         return self.nillable or next(
             (True for ext in self.extensions if ext.restrictions.nillable), False
         )
 
     @property
     def source_prefix(self) -> Optional[str]:
+        """Return the source namespace prefix as it was defined in the schema
+        definition."""
         if not self.source_namespace:
             return None
 
@@ -292,9 +420,11 @@ class Class:
 
     @property
     def target_module(self) -> str:
+        """Return the target module this class is assigned to."""
         return f"{self.package}.{self.module}"
 
     def clone(self) -> "Class":
+        """Return a deep cloned instance."""
         inners = [inner.clone() for inner in self.inner]
         extensions = [extension.clone() for extension in self.extensions]
         attrs = [attr.clone() for attr in self.attrs]
@@ -333,6 +463,14 @@ class Class:
 
 @dataclass
 class Package:
+    """
+    Model representation of a python import statement.
+
+    :param name:
+    :param source:
+    :param alias:
+    """
+
     name: str
     source: str
     alias: Optional[str] = field(default=None)

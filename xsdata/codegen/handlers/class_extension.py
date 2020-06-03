@@ -27,10 +27,18 @@ class ClassExtensionHandler(HandlerInterface):
     container: ContainerInterface
 
     def process(self, target: Class):
+        """
+        Iterate and process the target class's extensions in reverser order.
+
+        The reverse order is necessary in order to maintain the correct
+        attributes ordering during cloning.
+        """
         for extension in reversed(target.extensions):
             self.process_extension(target, extension)
 
     def process_extension(self, target: Class, extension: Extension):
+        """Slit the process of extension into schema data types and user
+        defined types."""
         if extension.type.native:
             self.process_native_extension(target, extension)
         else:
@@ -38,13 +46,20 @@ class ClassExtensionHandler(HandlerInterface):
 
     @classmethod
     def process_native_extension(cls, target: Class, extension: Extension):
-        """Native type flatten extension handler, ignore enumerations."""
+        """
+        Native type flatten handler.
+
+        In case of enumerations copy the native data type to all enum
+        members, otherwise create a default text value with the
+        extension attributes.
+        """
         if target.is_enumeration:
             cls.copy_extension_type(target, extension)
         else:
             cls.create_default_attribute(target, extension)
 
     def process_dependency_extension(self, target: Class, extension: Extension):
+        """User defined type flatten handler."""
         source = self.find_dependency(target, extension.type)
         if not source:
             logger.warning("Missing extension type: %s", extension.type.name)

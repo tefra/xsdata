@@ -202,8 +202,8 @@ class ClassBuilderTests(FactoryTestCase):
             simple_content=SimpleContent(restriction=Restriction()),
             complex_content=ComplexContent(restriction=restriction,),
         )
-
-        children = self.builder.element_children(complex_type)
+        restrictions = Restrictions.from_element(complex_type)
+        children = self.builder.element_children(complex_type, restrictions)
         expected = [
             (sequence_two.elements[0], Restrictions.from_element(sequence_two)),
             (sequence_two.elements[1], Restrictions.from_element(sequence_two)),

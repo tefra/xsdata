@@ -26,7 +26,7 @@ class DataclassGeneratorTests(FactoryTestCase):
         iterator = DataclassGenerator().render(classes)
 
         cwd = Path.cwd()
-        actual = [out for out in iterator]
+        actual = [(out.path, out.title, out.source) for out in iterator]
         expected = [
             (cwd.joinpath("foo/bar/__init__.py"), "init", "package"),
             (cwd.joinpath("foo/__init__.py"), "init", "# nothing here\n"),

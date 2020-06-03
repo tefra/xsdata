@@ -1,5 +1,6 @@
 import re
 
+# python allocated strings
 stop_words = [
     "and",
     "except",

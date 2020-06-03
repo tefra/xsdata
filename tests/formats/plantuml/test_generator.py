@@ -14,7 +14,7 @@ class PlantUmlGeneratorTests(FactoryTestCase):
 
         iterator = PlantUmlGenerator().render(classes)
 
-        actual = [out for out in iterator]
+        actual = [(out.path, out.title, out.source) for out in iterator]
         self.assertEqual(1, len(actual))
         self.assertEqual(3, len(actual[0]))
         self.assertIsInstance(actual[0][0], Path)

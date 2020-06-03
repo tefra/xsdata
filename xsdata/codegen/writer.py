@@ -38,19 +38,19 @@ class CodeWriter:
         """Iterate over the designated generator outputs and create the
         necessary directories and files."""
         engine = self.get_format(output)
-        for file, package, buffer in engine.render(classes):
-            if len(buffer.strip()) > 0:
-                logger.info("Generating package: %s", package)
+        for result in engine.render(classes):
+            if len(result.source.strip()) > 0:
+                logger.info("Generating package: %s", result.title)
 
-                file.parent.mkdir(parents=True, exist_ok=True)
-                file.write_text(buffer)
+                result.path.parent.mkdir(parents=True, exist_ok=True)
+                result.path.write_text(result.source)
 
     def print(self, classes: List[Class], output: str):
         """Iterate over the designated generator outputs and print them to the
         console."""
         engine = self.get_format(output)
-        for _, _, buffer in engine.render(classes):
-            print(buffer, end="")
+        for result in engine.render(classes):
+            print(result.source, end="")
 
     def designate(self, classes: List[Class], output: str):
         """Normalize the target package and module names by the given output

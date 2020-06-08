@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from dataclasses import field
 from dataclasses import fields
 from typing import Any
+from typing import Callable
 from typing import Dict
 from typing import Iterator
 from typing import List
@@ -15,6 +16,8 @@ from xsdata.models.enums import Namespace
 from xsdata.utils import text
 
 T = TypeVar("T", bound="ElementBase")
+
+Condition = Optional[Callable]
 
 
 @dataclass
@@ -182,7 +185,7 @@ class ElementBase:
             None,
         )
 
-    def children(self) -> Iterator["ElementBase"]:
+    def children(self, condition: Condition = None) -> Iterator["ElementBase"]:
         """Iterate over all the ElementBase childrent of this element."""
         for attribute in fields(self):
             value = getattr(self, attribute.name)
@@ -191,6 +194,7 @@ class ElementBase:
                 and len(value) > 0
                 and isinstance(value[0], ElementBase)
             ):
-                yield from value
+                yield from (val for val in value if not condition or condition(val))
             elif isinstance(value, ElementBase):
-                yield value
+                if not condition or condition(value):
+                    yield value

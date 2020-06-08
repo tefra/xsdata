@@ -37,61 +37,41 @@ class ClassBuilderTests(FactoryTestCase):
         self.schema = Schema(location="file://foo.xsd")
         self.builder = ClassBuilder(schema=self.schema)
 
-    @mock.patch.object(Redefine, "children")
-    @mock.patch.object(Override, "children")
     @mock.patch.object(ClassBuilder, "build_class")
-    def test_build(
-        self, mock_build_class, mock_override_children, mock_redefine_children
-    ):
+    def test_build(self, mock_build_class):
+        schema = self.schema
+        override = Override()
+        redefine = Redefine()
 
-        for _ in range(2):
-            self.schema.simple_types.append(SimpleType())
-            self.schema.attribute_groups.append(AttributeGroup())
-            self.schema.groups.append(Group())
-            self.schema.attributes.append(Attribute())
-            self.schema.complex_types.append(ComplexType())
-            self.schema.elements.append(Element())
-            self.schema.redefines.append(Redefine())
-            self.schema.overrides.append(Override())
+        redefine.annotation = Annotation()
+        redefine.complex_types.append(ComplexType())
 
-        override_element = Element()
-        override_attribute = Attribute()
-        override_complex_type = ComplexType()
-        redefine_simple_type = SimpleType()
-        redefine_group = Group()
-        redefine_attribute_group = AttributeGroup()
-        mock_redefine_children.side_effect = [
-            [redefine_simple_type, redefine_group, Annotation()],
-            [redefine_attribute_group, Annotation()],
-        ]
+        override.annotation = Annotation()
+        override.groups.append(Group())
+        override.simple_types.append(SimpleType())
 
-        mock_override_children.side_effect = [
-            [override_element, Annotation(), override_attribute],
-            [Annotation(), override_complex_type],
-        ]
-        mock_build_class.side_effect = classes = ClassFactory.list(18)
+        schema.simple_types.append(SimpleType())
+        schema.attribute_groups.append(AttributeGroup())
+        schema.groups.append(Group())
+        schema.attributes.append(Attribute())
+        schema.complex_types.append(ComplexType())
+        schema.elements.append(Element())
+        schema.redefines.append(redefine)
+        schema.overrides.append(override)
 
-        self.assertEqual(classes, self.builder.build())
+        self.builder.build()
+
         mock_build_class.assert_has_calls(
             [
-                mock.call(override_element),
-                mock.call(override_attribute),
-                mock.call(override_complex_type),
-                mock.call(redefine_simple_type),
-                mock.call(redefine_group),
-                mock.call(redefine_attribute_group),
-                mock.call(self.schema.simple_types[0]),
-                mock.call(self.schema.simple_types[1]),
-                mock.call(self.schema.attribute_groups[0]),
-                mock.call(self.schema.attribute_groups[1]),
-                mock.call(self.schema.groups[0]),
-                mock.call(self.schema.groups[1]),
-                mock.call(self.schema.attributes[0]),
-                mock.call(self.schema.attributes[1]),
-                mock.call(self.schema.complex_types[0]),
-                mock.call(self.schema.complex_types[1]),
-                mock.call(self.schema.elements[0]),
-                mock.call(self.schema.elements[1]),
+                mock.call(override.simple_types[0], container=override.class_name),
+                mock.call(override.groups[0], container=override.class_name),
+                mock.call(redefine.complex_types[0], container=redefine.class_name),
+                mock.call(schema.simple_types[0], container=schema.class_name),
+                mock.call(schema.complex_types[0], container=schema.class_name),
+                mock.call(schema.groups[0], container=schema.class_name),
+                mock.call(schema.attribute_groups[0], container=schema.class_name),
+                mock.call(schema.elements[0], container=schema.class_name),
+                mock.call(schema.attributes[0], container=schema.class_name),
             ]
         )
 
@@ -145,7 +125,7 @@ class ClassBuilderTests(FactoryTestCase):
         mock_element_namespace.return_value = "foo:name"
 
         element = Element()
-        result = self.builder.build_class(element)
+        result = self.builder.build_class(element, container="foo")
 
         mock_build_class_attributes.assert_called_once_with(element, result)
         mock_build_class_extensions.assert_called_once_with(element, result)
@@ -163,6 +143,7 @@ class ClassBuilderTests(FactoryTestCase):
             module=self.schema.module,
             source_namespace=self.schema.target_namespace,
             substitutions=["foo", "bar"],
+            container="foo",
         )
         self.assertEqual(expected, result)
 

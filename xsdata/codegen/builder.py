@@ -39,28 +39,35 @@ class ClassBuilder:
         """Generate classes from schema and redefined elements."""
         classes: List[Class] = []
 
-        def is_valid(item: ElementBase) -> bool:
-            return isinstance(
-                item,
-                (SimpleType, ComplexType, Group, AttributeGroup, Element, Attribute),
+        for override in self.schema.overrides:
+            container = override.class_name
+            classes.extend(
+                map(
+                    lambda element: self.build_class(element, container=container),
+                    override.children(condition=self.is_class),
+                )
             )
 
-        for override in self.schema.overrides:
-            classes.extend(map(self.build_class, filter(is_valid, override.children())))
-
         for redefine in self.schema.redefines:
-            classes.extend(map(self.build_class, filter(is_valid, redefine.children())))
+            container = redefine.class_name
+            classes.extend(
+                map(
+                    lambda element: self.build_class(element, container=container),
+                    redefine.children(condition=self.is_class),
+                )
+            )
 
-        classes.extend(map(self.build_class, self.schema.simple_types))
-        classes.extend(map(self.build_class, self.schema.attribute_groups))
-        classes.extend(map(self.build_class, self.schema.groups))
-        classes.extend(map(self.build_class, self.schema.attributes))
-        classes.extend(map(self.build_class, self.schema.complex_types))
-        classes.extend(map(self.build_class, self.schema.elements))
+        container = self.schema.class_name
+        classes.extend(
+            map(
+                lambda element: self.build_class(element, container=container),
+                self.schema.children(condition=self.is_class),
+            )
+        )
 
         return classes
 
-    def build_class(self, obj: ElementBase) -> Class:
+    def build_class(self, obj: ElementBase, container: Optional[str] = None) -> Class:
         """Build and return a class instance."""
         name = obj.real_name
         namespace = self.element_namespace(obj)
@@ -71,6 +78,7 @@ class ClassBuilder:
             mixed=obj.is_mixed,
             nillable=obj.is_nillable,
             type=type(obj),
+            container=container,
             help=obj.display_help,
             ns_map=obj.ns_map,
             source_namespace=self.schema.target_namespace,
@@ -254,3 +262,9 @@ class ClassBuilder:
                     yield self.build_class(child)
                 else:
                     yield from self.build_inner_classes(child)
+
+    @classmethod
+    def is_class(cls, item: ElementBase) -> bool:
+        return isinstance(
+            item, (SimpleType, ComplexType, Group, AttributeGroup, Element, Attribute),
+        )

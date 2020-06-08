@@ -25,7 +25,7 @@ class ClassValidator:
 
         Steps:
             1. Remove classes with missing extension type.
-            2. Merge redefined classes.
+            2. Handle duplicate types.
             3. Fix implied abstract flags.
         """
         for classes in self.container.values():
@@ -34,7 +34,7 @@ class ClassValidator:
                 self.remove_invalid_classes(classes)
 
             if len(classes) > 1:
-                self.merge_redefined_classes(classes)
+                self.handle_duplicate_types(classes)
 
             if len(classes) > 1:
                 self.update_abstract_classes(classes)
@@ -56,38 +56,59 @@ class ClassValidator:
                 classes.remove(target)
 
     @classmethod
-    def merge_redefined_classes(cls, classes: List[Class]):
-        """Merge original and redefined classes."""
+    def handle_duplicate_types(cls, classes: List[Class]):
+        """Handle classes with same namespace, name that are derived from the
+        same xs type."""
 
         grouped = group_by(classes, lambda x: f"{x.type.__name__}{x.source_qname()}")
         for items in grouped.values():
             if len(items) == 1:
                 continue
 
-            index = next(
-                (
-                    index
-                    for index, item in enumerate(items)
-                    if item.container in (Tag.OVERRIDE, Tag.REDEFINE)
-                ),
-                -1,
-            )
+            index = cls.select_winner(list(items))
             winner = items.pop(index)
 
             for item in items:
                 classes.remove(item)
 
                 if winner.container == Tag.REDEFINE:
+                    cls.merge_redefined_type(item, winner)
 
-                    circular_extension = cls.find_circular_extension(winner)
-                    circular_group = cls.find_circular_group(winner)
+    @classmethod
+    def merge_redefined_type(cls, source: Class, target: Class):
+        """
+        Copy any attributes and extensions to redefined types from the original
+        definitions.
 
-                    if circular_extension:
-                        ClassUtils.copy_attributes(item, winner, circular_extension)
-                        ClassUtils.copy_extensions(item, winner, circular_extension)
+        Redefined inheritance is optional search for self references in
+        extensions and attribute groups.
+        """
+        circular_extension = cls.find_circular_extension(target)
+        circular_group = cls.find_circular_group(target)
 
-                    if circular_group:
-                        ClassUtils.copy_group_attributes(item, winner, circular_group)
+        if circular_extension:
+            ClassUtils.copy_attributes(source, target, circular_extension)
+            ClassUtils.copy_extensions(source, target, circular_extension)
+
+        if circular_group:
+            ClassUtils.copy_group_attributes(source, target, circular_group)
+
+    @classmethod
+    def select_winner(cls, candidates: List[Class]) -> int:
+        """
+        Returns the index of the class that will survive the duplicate process.
+
+        Classes that were extracted from in xs:override/xs:redefined
+        containers have priority, otherwise pick the last in the list.
+        """
+        return next(
+            (
+                index
+                for index, item in enumerate(candidates)
+                if item.container in (Tag.OVERRIDE, Tag.REDEFINE)
+            ),
+            -1,
+        )
 
     @classmethod
     def find_circular_extension(cls, target: Class) -> Optional[Extension]:

@@ -6,8 +6,12 @@ from tests.factories import FactoryTestCase
 from xsdata.codegen.container import ClassContainer
 from xsdata.codegen.handlers import AttributeGroupHandler
 from xsdata.codegen.models import Attr
+from xsdata.codegen.models import Status
 from xsdata.codegen.utils import ClassUtils
 from xsdata.exceptions import AnalyzerValueError
+from xsdata.models.xsd import AttributeGroup
+from xsdata.models.xsd import ComplexType
+from xsdata.models.xsd import Group
 
 
 class AttributeGroupHandlerTests(FactoryTestCase):
@@ -40,37 +44,47 @@ class AttributeGroupHandlerTests(FactoryTestCase):
             [mock.call(target, target.attrs[1]), mock.call(target, target.attrs[0]),]
         )
 
-    @mock.patch.object(ClassUtils, "clone_attribute")
-    @mock.patch.object(ClassContainer, "find")
-    def test_process_attribute(self, mock_container_find, mock_clone_attribute):
-        source = ClassFactory.elements(2)
-        group_attr = AttrFactory.attribute_group(name="foo:bar")
+    @mock.patch.object(ClassUtils, "copy_group_attributes")
+    def test_process_attribute_with_group(self, mock_copy_group_attributes):
+        complex_bar = ClassFactory.create(type=ComplexType, name="bar")
+        group_bar = ClassFactory.create(type=Group, name="bar")
+        group_attr = AttrFactory.attribute_group(name="bar")
         target = ClassFactory.create()
         target.attrs.append(group_attr)
 
-        mock_container_find.return_value = source
-        mock_clone_attribute.side_effect = lambda x, y, z: x.clone()
+        self.processor.container.add(complex_bar)
+        self.processor.container.add(group_bar)
+        self.processor.container.add(target)
 
         self.processor.process_attribute(target, group_attr)
-
-        self.assertEqual(2, len(target.attrs))
-        self.assertIsNot(source.attrs[0], target.attrs[0])
-        self.assertIsNot(source.attrs[1], target.attrs[1])
-        self.assertNotIn(group_attr, target.attrs)
-
-        mock_clone_attribute.assert_has_calls(
-            [
-                mock.call(source.attrs[0], group_attr.restrictions, "foo"),
-                mock.call(source.attrs[1], group_attr.restrictions, "foo"),
-            ]
+        mock_copy_group_attributes.assert_called_once_with(
+            group_bar, target, group_attr
         )
 
-    @mock.patch.object(ClassContainer, "find")
-    def test_process_attribute_with_circular_reference(self, mock_container_find):
-        group_attr = AttrFactory.attribute_group(name="foo:bar")
+    @mock.patch.object(ClassUtils, "copy_group_attributes")
+    def test_process_attribute_with_attribute_group(self, mock_copy_group_attributes):
+        complex_bar = ClassFactory.create(type=ComplexType, name="bar")
+        group_bar = ClassFactory.create(type=AttributeGroup, name="bar")
+        group_attr = AttrFactory.attribute_group(name="bar")
         target = ClassFactory.create()
         target.attrs.append(group_attr)
-        mock_container_find.return_value = target
+
+        self.processor.container.add(complex_bar)
+        self.processor.container.add(group_bar)
+        self.processor.container.add(target)
+
+        self.processor.process_attribute(target, group_attr)
+        mock_copy_group_attributes.assert_called_once_with(
+            group_bar, target, group_attr
+        )
+
+    def test_process_attribute_with_circular_reference(self):
+        group_attr = AttrFactory.attribute_group(name="bar")
+        target = ClassFactory.create(name="bar", type=Group)
+        target.attrs.append(group_attr)
+
+        target.status = Status.PROCESSING
+        self.processor.container.add(target)
 
         self.processor.process_attribute(target, group_attr)
         self.assertFalse(group_attr in target.attrs)

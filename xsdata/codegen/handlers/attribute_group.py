@@ -6,7 +6,8 @@ from xsdata.codegen.models import Attr
 from xsdata.codegen.models import Class
 from xsdata.codegen.utils import ClassUtils
 from xsdata.exceptions import AnalyzerValueError
-from xsdata.utils import text
+from xsdata.models.xsd import AttributeGroup
+from xsdata.models.xsd import Group
 
 
 @dataclass
@@ -37,7 +38,9 @@ class AttributeGroupHandler(HandlerInterface):
         attribute.
         """
         qname = target.source_qname(attr.name)
-        source = self.container.find(qname)
+        source = self.container.find(
+            qname, condition=lambda x: x.type in (AttributeGroup, Group)
+        )
 
         if not source:
             raise AnalyzerValueError(f"Group attribute not found: `{qname}`")
@@ -45,15 +48,4 @@ class AttributeGroupHandler(HandlerInterface):
         if source is target:
             target.attrs.remove(attr)
         else:
-            index = target.attrs.index(attr)
-            target.attrs.pop(index)
-            prefix = text.prefix(attr.name)
-
-            for source_attr in source.attrs:
-                clone = ClassUtils.clone_attribute(
-                    source_attr, attr.restrictions, prefix
-                )
-                target.attrs.insert(index, clone)
-                index += 1
-
-            ClassUtils.copy_inner_classes(source, target)
+            ClassUtils.copy_group_attributes(source, target, attr)

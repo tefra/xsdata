@@ -15,8 +15,9 @@ class ClassUtils:
     @classmethod
     def copy_attributes(cls, source: Class, target: Class, extension: Extension):
         """
-        Copy the attributes from the source class to the target class and
-        remove the extension that links the two classes together.
+        Copy the attributes and inner classes from the source class to the
+        target class and remove the extension that links the two classes
+        together.
 
         The new attributes are prepended in the list unless if they are
         supposed to be last in a sequence.
@@ -38,6 +39,32 @@ class ClassUtils:
             index += 1
 
         cls.copy_inner_classes(source, target)
+
+    @classmethod
+    def copy_group_attributes(cls, source: Class, target: Class, attr: Attr):
+        """Copy the attributes and inner classes from the source class to the
+        target class and remove the group attribute that links the two classes
+        together."""
+        index = target.attrs.index(attr)
+        target.attrs.pop(index)
+        prefix = text.prefix(attr.name)
+
+        for source_attr in source.attrs:
+            clone = cls.clone_attribute(source_attr, attr.restrictions, prefix)
+            target.attrs.insert(index, clone)
+            index += 1
+
+        cls.copy_inner_classes(source, target)
+
+    @classmethod
+    def copy_extensions(cls, source: Class, target: Class, extension: Extension):
+        """Copy the extensions from the source class to the target class and
+        merge the restrictions from the extension that linked the two classes
+        together."""
+        for ext in source.extensions:
+            clone = ext.clone()
+            clone.restrictions.merge(extension.restrictions)
+            target.extensions.append(clone)
 
     @classmethod
     def clone_attribute(

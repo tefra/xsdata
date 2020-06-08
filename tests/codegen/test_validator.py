@@ -1,11 +1,11 @@
 from unittest import mock
 
+from tests.factories import AttrFactory
 from tests.factories import AttrTypeFactory
 from tests.factories import ClassFactory
 from tests.factories import ExtensionFactory
 from tests.factories import FactoryTestCase
 from xsdata.codegen.container import ClassContainer
-from xsdata.codegen.models import Restrictions
 from xsdata.codegen.utils import ClassUtils
 from xsdata.codegen.validator import ClassValidator
 from xsdata.models.xsd import ComplexType
@@ -71,44 +71,52 @@ class ClassValidatorTests(FactoryTestCase):
         self.assertTrue(three.abstract)  # Marked as abstract
         self.assertFalse(four.abstract)  # Is common
 
+    def test_merge_redefined_classes_selects_last_defined_class(self):
+        class_a = ClassFactory.create()
+        class_b = ClassFactory.create()
+        class_c = class_a.clone()
+        classes = [class_a, class_b, class_c]
+
+        self.validator.merge_redefined_classes(classes)
+        self.assertEqual(2, len(classes))
+        self.assertIn(class_b, classes)
+        self.assertIn(class_c, classes)
+
+    @mock.patch.object(ClassUtils, "copy_extensions")
     @mock.patch.object(ClassUtils, "copy_attributes")
-    def test_merge_redefined_classes_copies_attributes(self, mock_copy_attributes):
+    def test_merge_redefined_classes_with_circular_extension(
+        self, mock_copy_attributes, mock_copy_extensions
+    ):
         class_a = ClassFactory.create()
         class_b = ClassFactory.create()
         class_c = class_a.clone()
 
         ext_a = ExtensionFactory.create(type=AttrTypeFactory.create(name=class_a.name))
         ext_str = ExtensionFactory.create(type=AttrTypeFactory.create(name="foo"))
-        class_c.extensions.append(ext_a)
         class_c.extensions.append(ext_str)
+        class_c.extensions.append(ext_a)
         classes = [class_a, class_b, class_c]
 
         self.validator.merge_redefined_classes(classes)
         self.assertEqual(2, len(classes))
 
         mock_copy_attributes.assert_called_once_with(class_a, class_c, ext_a)
+        mock_copy_extensions.assert_called_once_with(class_a, class_c, ext_a)
 
-    def test_merge_redefined_classes_copies_extensions(self):
+    @mock.patch.object(ClassUtils, "copy_group_attributes")
+    def test_merge_redefined_classes_with_circular_group(
+        self, mock_copy_group_attributes
+    ):
         class_a = ClassFactory.create()
         class_c = class_a.clone()
+        first_attr = AttrFactory.create()
+        second_attr = AttrFactory.create(name=class_a.name)
+        class_c.attrs.extend((first_attr, second_attr))
 
-        type_int = AttrTypeFactory.xs_int()
-
-        ext_a = ExtensionFactory.create(
-            type=type_int,
-            restrictions=Restrictions(max_inclusive=10, min_inclusive=1, required=True),
-        )
-        ext_c = ExtensionFactory.create(
-            type=AttrTypeFactory.create(name=class_a.name),
-            restrictions=Restrictions(max_inclusive=0, min_inclusive=-10),
-        )
-
-        class_a.extensions.append(ext_a)
-        class_c.extensions.append(ext_c)
         classes = [class_a, class_c]
-        expected = {"max_inclusive": 0, "min_inclusive": -10, "required": True}
-
         self.validator.merge_redefined_classes(classes)
         self.assertEqual(1, len(classes))
-        self.assertEqual(1, len(classes[0].extensions))
-        self.assertEqual(expected, classes[0].extensions[0].restrictions.asdict())
+
+        mock_copy_group_attributes.assert_called_once_with(
+            class_a, class_c, second_attr
+        )

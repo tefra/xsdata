@@ -40,6 +40,41 @@ class ClassUtilsTests(FactoryTestCase):
             ]
         )
 
+    @mock.patch.object(ClassUtils, "copy_inner_classes")
+    @mock.patch.object(ClassUtils, "clone_attribute")
+    def test_copy_group_attributes(self, mock_clone_attribute, mock_copy_inner_classes):
+        mock_clone_attribute.side_effect = lambda x, y, z: x.clone()
+        source = ClassFactory.elements(2)
+        source.inner.append(ClassFactory.create())
+        target = ClassFactory.elements(3)
+        attrs = list(target.attrs)
+        attrs[1].name = "foo:bar"
+
+        ClassUtils.copy_group_attributes(source, target, target.attrs[1])
+
+        self.assertEqual(4, len(target.attrs))
+        self.assertEqual(source.attrs[0], target.attrs[1])
+        self.assertEqual(source.attrs[1], target.attrs[2])
+        mock_copy_inner_classes.assert_called_once_with(source, target)
+        mock_clone_attribute.assert_has_calls(
+            [
+                mock.call(source.attrs[0], attrs[1].restrictions, "foo"),
+                mock.call(source.attrs[1], attrs[1].restrictions, "foo"),
+            ]
+        )
+
+    def test_copy_extensions(self):
+        target = ClassFactory.create(extensions=ExtensionFactory.list(1))
+        source = ClassFactory.create(extensions=ExtensionFactory.list(2))
+        link_extension = ExtensionFactory.create()
+        link_extension.restrictions.max_occurs = 2
+
+        ClassUtils.copy_extensions(source, target, link_extension)
+
+        self.assertEqual(3, len(target.extensions))
+        self.assertEqual(2, target.extensions[1].restrictions.max_occurs)
+        self.assertEqual(2, target.extensions[2].restrictions.max_occurs)
+
     def test_clone_attribute(self):
         attr = AttrFactory.create(
             restrictions=RestrictionsFactory.create(length=1),

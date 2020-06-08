@@ -8,6 +8,7 @@ from tests.factories import FactoryTestCase
 from xsdata.codegen.container import ClassContainer
 from xsdata.codegen.utils import ClassUtils
 from xsdata.codegen.validator import ClassValidator
+from xsdata.models.enums import Tag
 from xsdata.models.xsd import ComplexType
 from xsdata.models.xsd import Element
 from xsdata.models.xsd import SimpleType
@@ -21,12 +22,12 @@ class ClassValidatorTests(FactoryTestCase):
         self.validator = ClassValidator(container=container)
 
     @mock.patch.object(ClassValidator, "update_abstract_classes")
-    @mock.patch.object(ClassValidator, "merge_redefined_classes")
+    @mock.patch.object(ClassValidator, "handle_duplicate_types")
     @mock.patch.object(ClassValidator, "remove_invalid_classes")
-    def test_handle_duplicate_classes(
+    def test_process(
         self,
         mock_remove_invalid_classes,
-        mock_merge_redefined_classes,
+        mock_handle_duplicate_types,
         mock_update_abstract_classes,
     ):
         first = ClassFactory.create()
@@ -37,7 +38,7 @@ class ClassValidatorTests(FactoryTestCase):
         self.validator.process()
 
         mock_remove_invalid_classes.assert_called_once_with([first, second])
-        mock_merge_redefined_classes.assert_called_once_with([first, second])
+        mock_handle_duplicate_types.assert_called_once_with([first, second])
         mock_update_abstract_classes.assert_called_once_with([first, second])
 
     def test_remove_invalid_classes(self):
@@ -58,6 +59,45 @@ class ClassValidatorTests(FactoryTestCase):
         self.validator.remove_invalid_classes(classes)
         self.assertEqual([second, third], classes)
 
+    @mock.patch.object(ClassValidator, "select_winner")
+    def test_handle_duplicate_types(self, mock_select_winner):
+
+        one = ClassFactory.create()
+        two = one.clone()
+        three = one.clone()
+        four = ClassFactory.create()
+
+        mock_select_winner.return_value = 0
+
+        classes = [one, two, three, four]
+
+        self.validator.handle_duplicate_types(classes)
+        self.assertEqual([one, four], classes)
+        mock_select_winner.assert_called_once_with([one, two, three])
+
+    @mock.patch.object(ClassValidator, "merge_redefined_type")
+    @mock.patch.object(ClassValidator, "select_winner")
+    def test_handle_duplicate_types_with_redefined_type(
+        self, mock_select_winner, mock_merge_redefined_type
+    ):
+
+        one = ClassFactory.create()
+        two = one.clone()
+        three = one.clone()
+        four = ClassFactory.create()
+
+        mock_select_winner.return_value = 0
+        one.container = Tag.REDEFINE
+
+        classes = [one, two, three, four]
+
+        self.validator.handle_duplicate_types(classes)
+        self.assertEqual([one, four], classes)
+        mock_select_winner.assert_called_once_with([one, two, three])
+        mock_merge_redefined_type.assert_has_calls(
+            [mock.call(two, one), mock.call(three, one),]
+        )
+
     def test_update_abstract_classes(self):
         one = ClassFactory.create(name="foo", abstract=True, type=Element)
         two = ClassFactory.create(name="foo", type=Element)
@@ -71,52 +111,33 @@ class ClassValidatorTests(FactoryTestCase):
         self.assertTrue(three.abstract)  # Marked as abstract
         self.assertFalse(four.abstract)  # Is common
 
-    def test_merge_redefined_classes_selects_last_defined_class(self):
-        class_a = ClassFactory.create()
-        class_b = ClassFactory.create()
-        class_c = class_a.clone()
-        classes = [class_a, class_b, class_c]
-
-        self.validator.merge_redefined_classes(classes)
-        self.assertEqual(2, len(classes))
-        self.assertIn(class_b, classes)
-        self.assertIn(class_c, classes)
-
     @mock.patch.object(ClassUtils, "copy_extensions")
     @mock.patch.object(ClassUtils, "copy_attributes")
-    def test_merge_redefined_classes_with_circular_extension(
+    def test_merge_redefined_type_with_circular_extension(
         self, mock_copy_attributes, mock_copy_extensions
     ):
-        class_a = ClassFactory.create()
-        class_b = ClassFactory.create()
-        class_c = class_a.clone()
+        source = ClassFactory.create()
+        target = source.clone()
 
-        ext_a = ExtensionFactory.create(type=AttrTypeFactory.create(name=class_a.name))
+        ext_a = ExtensionFactory.create(type=AttrTypeFactory.create(name=source.name))
         ext_str = ExtensionFactory.create(type=AttrTypeFactory.create(name="foo"))
-        class_c.extensions.append(ext_str)
-        class_c.extensions.append(ext_a)
-        classes = [class_a, class_b, class_c]
+        target.extensions.append(ext_str)
+        target.extensions.append(ext_a)
 
-        self.validator.merge_redefined_classes(classes)
-        self.assertEqual(2, len(classes))
+        self.validator.merge_redefined_type(source, target)
 
-        mock_copy_attributes.assert_called_once_with(class_a, class_c, ext_a)
-        mock_copy_extensions.assert_called_once_with(class_a, class_c, ext_a)
+        mock_copy_attributes.assert_called_once_with(source, target, ext_a)
+        mock_copy_extensions.assert_called_once_with(source, target, ext_a)
 
     @mock.patch.object(ClassUtils, "copy_group_attributes")
-    def test_merge_redefined_classes_with_circular_group(
-        self, mock_copy_group_attributes
-    ):
-        class_a = ClassFactory.create()
-        class_c = class_a.clone()
+    def test_merge_redefined_type_with_circular_group(self, mock_copy_group_attributes):
+        source = ClassFactory.create()
+        target = source.clone()
+        target.container = Tag.REDEFINE
         first_attr = AttrFactory.create()
-        second_attr = AttrFactory.create(name=class_a.name)
-        class_c.attrs.extend((first_attr, second_attr))
+        second_attr = AttrFactory.create(name=source.name)
+        target.attrs.extend((first_attr, second_attr))
 
-        classes = [class_a, class_c]
-        self.validator.merge_redefined_classes(classes)
-        self.assertEqual(1, len(classes))
+        self.validator.merge_redefined_type(source, target)
 
-        mock_copy_group_attributes.assert_called_once_with(
-            class_a, class_c, second_attr
-        )
+        mock_copy_group_attributes.assert_called_once_with(source, target, second_attr)

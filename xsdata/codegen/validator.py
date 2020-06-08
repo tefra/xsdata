@@ -1,7 +1,9 @@
 from dataclasses import dataclass
 from typing import List
+from typing import Optional
 
 from xsdata.codegen.container import ClassContainer
+from xsdata.codegen.models import Attr
 from xsdata.codegen.models import Class
 from xsdata.codegen.models import Extension
 from xsdata.codegen.utils import ClassUtils
@@ -65,23 +67,35 @@ class ClassValidator:
             for item in items:
                 classes.remove(item)
 
-                self_extension = next(
-                    (
-                        ext
-                        for ext in winner.extensions
-                        if text.suffix(ext.type.name) == winner.name
-                    ),
-                    None,
-                )
+                circular_extension = cls.find_circular_extension(winner)
+                circular_group = cls.find_circular_group(winner)
 
-                if not self_extension:
-                    continue
+                if circular_extension:
+                    ClassUtils.copy_attributes(item, winner, circular_extension)
+                    ClassUtils.copy_extensions(item, winner, circular_extension)
 
-                ClassUtils.copy_attributes(item, winner, self_extension)
-                for looser_ext in item.extensions:
-                    new_ext = looser_ext.clone()
-                    new_ext.restrictions.merge(self_extension.restrictions)
-                    winner.extensions.append(new_ext)
+                if circular_group:
+                    ClassUtils.copy_group_attributes(item, winner, circular_group)
+
+    @classmethod
+    def find_circular_extension(cls, target: Class) -> Optional[Extension]:
+        """Search for any target class extensions that is a circular
+        reference."""
+        for ext in target.extensions:
+            if text.suffix(ext.type.name) == target.name:
+                return ext
+
+        return None
+
+    @classmethod
+    def find_circular_group(cls, target: Class) -> Optional[Attr]:
+        """Search for any target class attributes that is a circular
+        reference."""
+        for attr in target.attrs:
+            if text.suffix(attr.name) == target.name:
+                return attr
+
+        return None
 
     @classmethod
     def update_abstract_classes(cls, classes: List[Class]):

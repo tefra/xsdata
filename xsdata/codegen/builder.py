@@ -40,27 +40,24 @@ class ClassBuilder:
         classes: List[Class] = []
 
         for override in self.schema.overrides:
-            container = override.class_name
             classes.extend(
                 map(
-                    lambda element: self.build_class(element, container=container),
+                    lambda element: self.build_class(element, container=Tag.OVERRIDE),
                     override.children(condition=self.is_class),
                 )
             )
 
         for redefine in self.schema.redefines:
-            container = redefine.class_name
             classes.extend(
                 map(
-                    lambda element: self.build_class(element, container=container),
+                    lambda element: self.build_class(element, container=Tag.REDEFINE),
                     redefine.children(condition=self.is_class),
                 )
             )
 
-        container = self.schema.class_name
         classes.extend(
             map(
-                lambda element: self.build_class(element, container=container),
+                lambda element: self.build_class(element, container=Tag.SCHEMA),
                 self.schema.children(condition=self.is_class),
             )
         )

@@ -339,6 +339,7 @@ class Class:
     :param abstract:
     :param nillable:
     :param status:
+    :param container:
     :param package:
     :param namespace:
     :param help:
@@ -357,6 +358,7 @@ class Class:
     abstract: bool
     nillable: bool
     status: Status = field(default=Status.RAW)
+    container: Optional[str] = field(default=None)
     package: Optional[str] = field(default=None)
     namespace: Optional[str] = field(default=None)
     help: Optional[str] = field(default=None)

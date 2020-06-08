@@ -80,6 +80,7 @@ class ClassFactory(Factory):
         package="foo",
         module="tests",
         status=Status.RAW,
+        container=None,
     ):
         name = name or f"class_{cls.next_letter()}"
         return cls.model(
@@ -99,6 +100,7 @@ class ClassFactory(Factory):
             module=module,
             ns_map=ns_map if isinstance(ns_map, dict) else NSMAP,
             status=status,
+            container=container,
         )
 
     @classmethod

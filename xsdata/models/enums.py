@@ -198,6 +198,7 @@ class Tag:
     KEYREF = "Keyref"
     LIST = "List"
     NOTATION = "Notation"
+    OVERRIDE = "Override"
     REDEFINE = "Redefine"
     RESTRICTION = "Restriction"
     SCHEMA = "Schema"

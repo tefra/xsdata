@@ -186,7 +186,8 @@ class ElementBase:
         )
 
     def children(self, condition: Condition = None) -> Iterator["ElementBase"]:
-        """Iterate over all the ElementBase childrent of this element."""
+        """Iterate over all the ElementBase children of this element that match
+        the given condition if any."""
         for attribute in fields(self):
             value = getattr(self, attribute.name)
             if (

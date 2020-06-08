@@ -7,6 +7,7 @@ from xsdata.codegen.models import Attr
 from xsdata.codegen.models import Class
 from xsdata.codegen.models import Extension
 from xsdata.codegen.utils import ClassUtils
+from xsdata.models.enums import Tag
 from xsdata.utils import text
 from xsdata.utils.collections import group_by
 
@@ -63,19 +64,30 @@ class ClassValidator:
             if len(items) == 1:
                 continue
 
-            winner: Class = items.pop()
+            index = next(
+                (
+                    index
+                    for index, item in enumerate(items)
+                    if item.container in (Tag.OVERRIDE, Tag.REDEFINE)
+                ),
+                -1,
+            )
+            winner = items.pop(index)
+
             for item in items:
                 classes.remove(item)
 
-                circular_extension = cls.find_circular_extension(winner)
-                circular_group = cls.find_circular_group(winner)
+                if winner.container == Tag.REDEFINE:
 
-                if circular_extension:
-                    ClassUtils.copy_attributes(item, winner, circular_extension)
-                    ClassUtils.copy_extensions(item, winner, circular_extension)
+                    circular_extension = cls.find_circular_extension(winner)
+                    circular_group = cls.find_circular_group(winner)
 
-                if circular_group:
-                    ClassUtils.copy_group_attributes(item, winner, circular_group)
+                    if circular_extension:
+                        ClassUtils.copy_attributes(item, winner, circular_extension)
+                        ClassUtils.copy_extensions(item, winner, circular_extension)
+
+                    if circular_group:
+                        ClassUtils.copy_group_attributes(item, winner, circular_group)
 
     @classmethod
     def find_circular_extension(cls, target: Class) -> Optional[Extension]:

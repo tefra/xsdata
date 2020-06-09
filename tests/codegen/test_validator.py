@@ -9,6 +9,8 @@ from xsdata.codegen.container import ClassContainer
 from xsdata.codegen.utils import ClassUtils
 from xsdata.codegen.validator import ClassValidator
 from xsdata.models.enums import Tag
+from xsdata.models.xsd import Attribute
+from xsdata.models.xsd import AttributeGroup
 from xsdata.models.xsd import ComplexType
 from xsdata.models.xsd import Element
 from xsdata.models.xsd import SimpleType
@@ -21,14 +23,14 @@ class ClassValidatorTests(FactoryTestCase):
         container = ClassContainer()
         self.validator = ClassValidator(container=container)
 
-    @mock.patch.object(ClassValidator, "update_abstract_classes")
+    @mock.patch.object(ClassValidator, "mark_strict_types")
     @mock.patch.object(ClassValidator, "handle_duplicate_types")
     @mock.patch.object(ClassValidator, "remove_invalid_classes")
     def test_process(
         self,
         mock_remove_invalid_classes,
         mock_handle_duplicate_types,
-        mock_update_abstract_classes,
+        mock_mark_strict_types,
     ):
         first = ClassFactory.create()
         second = first.clone()
@@ -39,7 +41,7 @@ class ClassValidatorTests(FactoryTestCase):
 
         mock_remove_invalid_classes.assert_called_once_with([first, second])
         mock_handle_duplicate_types.assert_called_once_with([first, second])
-        mock_update_abstract_classes.assert_called_once_with([first, second])
+        mock_mark_strict_types.assert_called_once_with([first, second])
 
     def test_remove_invalid_classes(self):
         first = ClassFactory.create(
@@ -98,18 +100,22 @@ class ClassValidatorTests(FactoryTestCase):
             [mock.call(two, one), mock.call(three, one),]
         )
 
-    def test_update_abstract_classes(self):
-        one = ClassFactory.create(name="foo", abstract=True, type=Element)
-        two = ClassFactory.create(name="foo", type=Element)
-        three = ClassFactory.create(name="foo", type=ComplexType)
-        four = ClassFactory.create(name="foo", type=SimpleType)
+    def test_mark_strict_types(self):
+        one = ClassFactory.create(name="foo", type=Element)
+        two = ClassFactory.create(name="foo", type=ComplexType)
+        three = ClassFactory.create(name="foo", type=SimpleType)
 
-        self.validator.update_abstract_classes([one, two, three, four])
+        self.validator.mark_strict_types([one, two, three])
 
-        self.assertTrue(one.abstract)  # Was abstract already
-        self.assertFalse(two.abstract)  # Is an element
-        self.assertTrue(three.abstract)  # Marked as abstract
-        self.assertFalse(four.abstract)  # Is common
+        self.assertFalse(one.strict_type)  # Is an element
+        self.assertTrue(two.strict_type)  # Marked as abstract
+        self.assertFalse(three.strict_type)  # Is common
+
+        four = ClassFactory.create(name="bar", type=Attribute)
+        five = ClassFactory.create(name="bar", type=AttributeGroup)
+        self.validator.mark_strict_types([four, five])
+        self.assertFalse(four.strict_type)  # No element in group
+        self.assertFalse(five.strict_type)  # No element in group
 
     @mock.patch.object(ClassUtils, "copy_extensions")
     @mock.patch.object(ClassUtils, "copy_attributes")

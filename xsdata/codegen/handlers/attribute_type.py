@@ -96,7 +96,7 @@ class AttributeTypeHandler(HandlerInterface):
             logger.warning("Missing type: %s", attr_type.name)
             self.reset_attribute_type(attr_type)
         elif source.is_complex and not source.is_enumeration:
-            self.process_complex_dependency(source, target, attr, attr_type)
+            self.process_complex_dependency(source, target, attr_type)
         else:
             self.process_simple_dependency(source, target, attr, attr_type)
 
@@ -138,27 +138,10 @@ class AttributeTypeHandler(HandlerInterface):
             )
 
     def process_complex_dependency(
-        self, source: Class, target: Class, attr: Attr, attr_type: AttrType
+        self, source: Class, target: Class, attr_type: AttrType
     ):
-        """
-        Process complex attribute type.
-
-        Abstract: If it can not be flattened remove abstract flag
-        Non abstract: check for circular references.
-        """
-        if not source.abstract:
-            attr_type.circular = self.is_circular_dependency(source, target, set())
-        elif not source.extensions or source.attrs:
-            source.abstract = False
-        else:
-            index = attr.types.index(attr_type)
-            attr.types.pop(index)
-            for extension in source.extensions:
-                clone_type = extension.type.clone()
-                attr.types.insert(index, clone_type)
-                index += 1
-
-                attr.restrictions.merge(extension.restrictions)
+        """Update circular reference flag."""
+        attr_type.circular = self.is_circular_dependency(source, target, set())
 
     def is_circular_dependency(self, source: Class, target: Class, seen: Set) -> bool:
         """Check if any source dependencies recursively match the target

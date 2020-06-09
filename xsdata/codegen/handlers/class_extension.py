@@ -103,14 +103,14 @@ class ClassExtensionHandler(HandlerInterface):
             - source includes some of the target attributes
             - source has suffix attribute and target has at least one attribute
             - target has at least one suffix attribute
-            - source or target class is abstract
+            - source is marked as strict type
         """
         res = cls.compare_attributes(source, target)
         if res == cls.INCLUDES_ALL:
             target.extensions.remove(ext)
         elif (
             res == cls.INCLUDES_SOME
-            or source.abstract
+            or source.strict_type
             or (source.has_suffix_attr and len(target.attrs) > 0)
             or target.has_suffix_attr
         ):
@@ -143,7 +143,7 @@ class ClassExtensionHandler(HandlerInterface):
         if source is target:
             return cls.INCLUDES_ALL
 
-        if not target.attrs:
+        if not target.attrs or not source.attrs:
             return cls.INCLUDES_NONE
 
         source_attrs = {attr.name for attr in source.attrs}

@@ -26,7 +26,7 @@ class ClassValidator:
         Steps:
             1. Remove classes with missing extension type.
             2. Handle duplicate types.
-            3. Fix implied abstract flags.
+            3. Mark strict types.
         """
         for classes in self.container.values():
 
@@ -37,7 +37,7 @@ class ClassValidator:
                 self.handle_duplicate_types(classes)
 
             if len(classes) > 1:
-                self.update_abstract_classes(classes)
+                self.mark_strict_types(classes)
 
     def remove_invalid_classes(self, classes: List[Class]):
         """Remove from the given class list any class with missing extension
@@ -131,17 +131,12 @@ class ClassValidator:
         return None
 
     @classmethod
-    def update_abstract_classes(cls, classes: List[Class]):
-        """
-        Update classes with the same qualified name to set implied abstract
-        flags.
-
-        If a non abstract xs:element exists in the list mark the rest
-        xs:complexType(s) as abstract.
-        """
+    def mark_strict_types(cls, classes: List[Class]):
+        """If there is a class derived from xs:element update all
+        xs:complexTypes derived classes as strict types."""
 
         element = next((obj for obj in classes if obj.is_element), None)
         if element:
             for obj in classes:
                 if obj is not element and obj.is_complex:
-                    obj.abstract = True
+                    obj.strict_type = True

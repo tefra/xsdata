@@ -83,8 +83,6 @@ class AttributeSubstitutionHandlerTests(FactoryTestCase):
             QName(namespace, "bar"): [reference_attrs[1]],
         }
         self.assertEqual(expected, self.processor.substitutions)
-        self.assertFalse(classes[0].abstract)
-        self.assertFalse(classes[1].abstract)
 
         mock_create_substitution.assert_has_calls(
             [

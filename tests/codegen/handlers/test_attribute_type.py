@@ -154,8 +154,8 @@ class AttributeTypeHandlerTests(FactoryTestCase):
 
         mock_process_complex_dependency.assert_has_calls(
             [
-                mock.call(complex, target, attr, attr_type),
-                mock.call(element, target, attr, attr_type),
+                mock.call(complex, target, attr_type),
+                mock.call(element, target, attr_type),
             ]
         )
 
@@ -210,9 +210,7 @@ class AttributeTypeHandlerTests(FactoryTestCase):
         self.assertEqual(expected, attr_type)
 
     @mock.patch.object(AttributeTypeHandler, "is_circular_dependency")
-    def test_process_complex_dependency_with_non_abstract(
-        self, mock_is_circular_dependency
-    ):
+    def test_process_complex_dependency(self, mock_is_circular_dependency):
         source = ClassFactory.create()
         target = ClassFactory.create()
         attr = AttrFactory.create()
@@ -220,49 +218,10 @@ class AttributeTypeHandlerTests(FactoryTestCase):
 
         mock_is_circular_dependency.return_value = True
 
-        self.processor.process_complex_dependency(source, target, attr, attr_type)
+        self.processor.process_complex_dependency(source, target, attr_type)
         self.assertTrue(attr_type.circular)
 
         mock_is_circular_dependency.assert_called_once_with(source, target, set())
-
-    def test_process_complex_dependency_with_abstract_that_needs_override(self):
-        source = ClassFactory.elements(2, abstract=True)
-        target = ClassFactory.create()
-        attr = AttrFactory.create()
-        attr_type = attr.types[0]
-
-        self.processor.process_complex_dependency(source, target, attr, attr_type)
-        self.assertFalse(source.abstract)
-
-        source = ClassFactory.create(abstract=True)
-        self.processor.process_complex_dependency(source, target, attr, attr_type)
-        self.assertFalse(source.abstract)
-
-    def test_process_complex_dependency_with_derived_abstract(self):
-        source = ClassFactory.create(
-            abstract=True,
-            extensions=[
-                ExtensionFactory.create(
-                    restrictions=RestrictionsFactory.create(max_length=3)
-                ),
-                ExtensionFactory.create(
-                    restrictions=RestrictionsFactory.create(min_length=2)
-                ),
-            ],
-        )
-        target = ClassFactory.create()
-        attr = AttrFactory.create(restrictions=RestrictionsFactory.create(min_length=1))
-        attr_type = attr.types[0]
-
-        self.processor.process_complex_dependency(source, target, attr, attr_type)
-        self.assertTrue(source.abstract)
-
-        self.assertEqual(source.extensions[0].type, attr.types[0])
-        self.assertIsNot(source.extensions[0].type, attr.types[0])
-        self.assertEqual(source.extensions[1].type, attr.types[1])
-        self.assertIsNot(source.extensions[1].type, attr.types[1])
-
-        self.assertEqual({"max_length": 3, "min_length": 2}, attr.restrictions.asdict())
 
     @mock.patch.object(ClassContainer, "find")
     @mock.patch.object(Class, "dependencies")

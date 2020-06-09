@@ -16,55 +16,14 @@ class ColorType:
 
 
 @dataclass
-class ProductType:
+class ItemType:
     """
     :ivar routing_num:
-    :ivar number:
-    :ivar name:
-    :ivar description:
-    :ivar eff_date:
-    :ivar lang:
     """
     routing_num: Optional[int] = field(
         default=None,
         metadata=dict(
             name="routingNum",
-            type="Attribute"
-        )
-    )
-    number: Optional[int] = field(
-        default=None,
-        metadata=dict(
-            type="Element",
-            namespace="",
-            required=True
-        )
-    )
-    name: Optional[str] = field(
-        default=None,
-        metadata=dict(
-            type="Element",
-            namespace="",
-            required=True
-        )
-    )
-    description: Optional[str] = field(
-        default=None,
-        metadata=dict(
-            type="Element",
-            namespace=""
-        )
-    )
-    eff_date: Optional[str] = field(
-        default=None,
-        metadata=dict(
-            name="effDate",
-            type="Attribute"
-        )
-    )
-    lang: Optional[str] = field(
-        default=None,
-        metadata=dict(
             type="Attribute"
         )
     )
@@ -75,10 +34,10 @@ class RestrictedProductType:
     """
     :ivar number:
     :ivar name:
-    :ivar routing_num:
     :ivar description:
-    :ivar eff_date:
+    :ivar routing_num:
     :ivar lang:
+    :ivar eff_date:
     """
     number: Optional[int] = field(
         default=None,
@@ -96,6 +55,13 @@ class RestrictedProductType:
             required=True
         )
     )
+    description: Optional[str] = field(
+        default=None,
+        metadata=dict(
+            type="Element",
+            namespace=""
+        )
+    )
     routing_num: Optional[int] = field(
         default=None,
         metadata=dict(
@@ -104,23 +70,16 @@ class RestrictedProductType:
             required=True
         )
     )
-    description: Optional[str] = field(
+    lang: Optional[str] = field(
         default=None,
         metadata=dict(
-            type="Element",
-            namespace=""
+            type="Attribute"
         )
     )
     eff_date: str = field(
         default="1900-01-01",
         metadata=dict(
             name="effDate",
-            type="Attribute"
-        )
-    )
-    lang: Optional[str] = field(
-        default=None,
-        metadata=dict(
             type="Attribute"
         )
     )
@@ -161,6 +120,53 @@ class SmallSizeType:
         metadata=dict(
             type="Attribute",
             required=True
+        )
+    )
+
+
+@dataclass
+class ProductType(ItemType):
+    """
+    :ivar number:
+    :ivar name:
+    :ivar description:
+    :ivar eff_date:
+    :ivar lang:
+    """
+    number: Optional[int] = field(
+        default=None,
+        metadata=dict(
+            type="Element",
+            namespace="",
+            required=True
+        )
+    )
+    name: Optional[str] = field(
+        default=None,
+        metadata=dict(
+            type="Element",
+            namespace="",
+            required=True
+        )
+    )
+    description: Optional[str] = field(
+        default=None,
+        metadata=dict(
+            type="Element",
+            namespace=""
+        )
+    )
+    eff_date: Optional[str] = field(
+        default=None,
+        metadata=dict(
+            name="effDate",
+            type="Attribute"
+        )
+    )
+    lang: Optional[str] = field(
+        default=None,
+        metadata=dict(
+            type="Attribute"
         )
     )
 

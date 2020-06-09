@@ -58,7 +58,7 @@ class ClassAnalyzerTests(FactoryTestCase):
     @mock.patch.object(ClassAnalyzer, "validate_references")
     def test_select_classes(self, mock_validate_references):
         classes = [
-            ClassFactory.create(abstract=True, type=Element),
+            ClassFactory.create(strict_type=True, type=ComplexType),
             ClassFactory.create(type=Element),
             ClassFactory.create(type=ComplexType),
             ClassFactory.create(type=SimpleType),

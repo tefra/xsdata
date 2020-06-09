@@ -42,10 +42,10 @@ class ClassAnalyzer:
         """
 
         classes = list(self.container.iterate())
-        if any(item.is_complex for item in classes if not item.abstract):
+        if any(item.is_complex for item in classes):
             classes = list(
                 filter(
-                    lambda x: x.is_enumeration or (x.is_complex and not x.abstract),
+                    lambda x: x.is_enumeration or (x.is_complex and not x.strict_type),
                     classes,
                 )
             )

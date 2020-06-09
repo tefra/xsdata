@@ -237,31 +237,17 @@ class ClassExtensionHandlerTests(FactoryTestCase):
 
     @mock.patch.object(ClassUtils, "copy_attributes")
     @mock.patch.object(ClassExtensionHandler, "compare_attributes")
-    def test_process_complex_extension_when_source_is_abstract(
+    def test_process_complex_extension_when_source_is_strict_type(
         self, mock_compare_attributes, mock_copy_attributes
     ):
         mock_compare_attributes.return_value = ClassExtensionHandler.INCLUDES_NONE
         extension = ExtensionFactory.create()
         target = ClassFactory.create()
-        source = ClassFactory.create(abstract=True)
+        source = ClassFactory.create(strict_type=True)
 
         self.processor.process_complex_extension(source, target, extension)
         mock_compare_attributes.assert_called_once_with(source, target)
         mock_copy_attributes.assert_called_once_with(source, target, extension)
-
-    @mock.patch.object(ClassUtils, "copy_attributes")
-    @mock.patch.object(ClassExtensionHandler, "compare_attributes")
-    def test_process_complex_extension_when_target_is_abstract(
-        self, mock_compare_attributes, mock_copy_attributes
-    ):
-        mock_compare_attributes.return_value = ClassExtensionHandler.INCLUDES_NONE
-        extension = ExtensionFactory.create()
-        target = ClassFactory.create(abstract=True)
-        source = ClassFactory.create()
-
-        self.processor.process_complex_extension(source, target, extension)
-        mock_compare_attributes.assert_called_once_with(source, target)
-        self.assertEqual(0, mock_copy_attributes.call_count)
 
     @mock.patch.object(ClassUtils, "copy_attributes")
     @mock.patch.object(ClassExtensionHandler, "compare_attributes")

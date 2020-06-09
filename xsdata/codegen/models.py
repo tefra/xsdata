@@ -338,6 +338,7 @@ class Class:
     :param mixed:
     :param abstract:
     :param nillable:
+    :param strict_type:
     :param status:
     :param container:
     :param package:
@@ -357,6 +358,7 @@ class Class:
     mixed: bool
     abstract: bool
     nillable: bool
+    strict_type: bool = field(default=False)
     status: Status = field(default=Status.RAW)
     container: Optional[str] = field(default=None)
     package: Optional[str] = field(default=None)
@@ -389,7 +391,7 @@ class Class:
     def is_element(self) -> bool:
         """Return whether or not this instance is derived from an non abstract
         xs:element."""
-        return self.type is Element and not self.abstract
+        return self.type is Element
 
     @property
     def is_enumeration(self) -> bool:

@@ -179,6 +179,7 @@ from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.voc import AudioMedi
 from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.voc import AudiologistProviderCodes
 from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.voc import AuthorizationIssueManagementCode
 from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.voc import AutomobileInsurancePolicy
+from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.datatypes_base import Bin
 from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.datatypes_base import Bl
 from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.datatypes_base import Bn
 from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.datatypes import BxitCd
@@ -1283,6 +1284,7 @@ from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.voc import Transtymp
 from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.voc import TribalEntityUs
 from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.voc import Tsamosan
 from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.voc import Tsimshianic
+from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.datatypes_base import Url
 from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.voc import Urlscheme
 from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.datatypes import UvpTs
 from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.voc import UnderwriterParticipationFunction

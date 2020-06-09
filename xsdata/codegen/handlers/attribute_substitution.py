@@ -70,7 +70,6 @@ class AttributeSubstitutionHandler(HandlerInterface):
         self.substitutions = defaultdict(list)
         for obj in self.container.iterate():
             for substitution in obj.substitutions:
-                obj.abstract = False
                 qname = obj.source_qname(substitution)
                 attr = self.create_substitution(obj, qname)
                 self.substitutions[qname].append(attr)

@@ -151,6 +151,59 @@ class PocdMt000040AuthorizationValue(Enum):
     SUMM = "SUMM"
 
 
+@dataclass
+class PocdMt000040InfrastructureRootTypeId:
+    """
+    :ivar root:
+    :ivar extension:
+    :ivar assigning_authority_name: A human readable name or mnemonic for the assigning
+                         authority. This name may be provided solely for the
+                         convenience of unaided humans interpreting an  value
+                         and can have no computational meaning. Note: no
+                         automated processing must depend on the assigning
+                         authority name to be present in any form.
+    :ivar displayable: Specifies if the identifier is intended for human
+                         display and data entry (displayable = true) as
+                         opposed to pure machine interoperation (displayable
+                         = false).
+    """
+    class Meta:
+        name = "POCD_MT000040.InfrastructureRoot.typeId"
+
+    root: str = field(
+        init=False,
+        default="2.16.840.1.113883.1.3",
+        metadata=dict(
+            type="Attribute",
+            required=True,
+            pattern=r"[0-2](\.(0|[1-9][0-9]*))*"
+        )
+    )
+    extension: Optional[str] = field(
+        default=None,
+        metadata=dict(
+            type="Attribute",
+            required=True,
+            min_length=1.0
+        )
+    )
+    assigning_authority_name: Optional[str] = field(
+        default=None,
+        metadata=dict(
+            name="assigningAuthorityName",
+            type="Attribute",
+            min_length=1.0
+        )
+    )
+    displayable: Optional[str] = field(
+        default=None,
+        metadata=dict(
+            type="Attribute",
+            pattern=r"true|false"
+        )
+    )
+
+
 class PocdMt000040ParticipantRoleValue(Enum):
     """
     :cvar ROL:
@@ -195,84 +248,6 @@ class PocdMt000040ReferenceRangeValue(Enum):
     EVID = "EVID"
     REFR = "REFR"
     SUMM = "SUMM"
-
-
-@dataclass
-class PocdMt000040InfrastructureRootTypeId:
-    """
-    :ivar null_flavor: An exceptional value expressing missing information
-                   and possibly the reason why the information is missing.
-    :ivar root:
-    :ivar extension:
-    :ivar assigning_authority_name: A human readable name or mnemonic for the assigning
-                         authority. This name may be provided solely for the
-                         convenience of unaided humans interpreting an  value
-                         and can have no computational meaning. Note: no
-                         automated processing must depend on the assigning
-                         authority name to be present in any form.
-    :ivar displayable: Specifies if the identifier is intended for human
-                         display and data entry (displayable = true) as
-                         opposed to pure machine interoperation (displayable
-                         = false).
-    """
-    class Meta:
-        name = "POCD_MT000040.InfrastructureRoot.typeId"
-
-    null_flavor: Optional[NullFlavor] = field(
-        default=None,
-        metadata=dict(
-            name="nullFlavor",
-            type="Attribute"
-        )
-    )
-    root: str = field(
-        init=False,
-        default="2.16.840.1.113883.1.3",
-        metadata=dict(
-            type="Attribute",
-            required=True,
-            pattern=r"[0-2](\.(0|[1-9][0-9]*))*"
-        )
-    )
-    extension: Optional[str] = field(
-        default=None,
-        metadata=dict(
-            type="Attribute",
-            required=True,
-            min_length=1.0
-        )
-    )
-    assigning_authority_name: Optional[str] = field(
-        default=None,
-        metadata=dict(
-            name="assigningAuthorityName",
-            type="Attribute",
-            min_length=1.0
-        )
-    )
-    displayable: Optional[str] = field(
-        default=None,
-        metadata=dict(
-            type="Attribute",
-            pattern=r"true|false"
-        )
-    )
-
-
-@dataclass
-class PocdMt000040RegionOfInterestValue(IntType):
-    """
-    :ivar unsorted:
-    """
-    class Meta:
-        name = "POCD_MT000040.RegionOfInterest.value"
-
-    unsorted: bool = field(
-        default=False,
-        metadata=dict(
-            type="Attribute"
-        )
-    )
 
 
 @dataclass
@@ -2221,6 +2196,22 @@ class PocdMt000040PlayingEntity:
         default=EntityDeterminer.INSTANCE,
         metadata=dict(
             name="determinerCode",
+            type="Attribute"
+        )
+    )
+
+
+@dataclass
+class PocdMt000040RegionOfInterestValue(IntType):
+    """
+    :ivar unsorted:
+    """
+    class Meta:
+        name = "POCD_MT000040.RegionOfInterest.value"
+
+    unsorted: bool = field(
+        default=False,
+        metadata=dict(
             type="Attribute"
         )
     )

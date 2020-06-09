@@ -19,25 +19,6 @@ from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.voc import (
 __NAMESPACE__ = "urn:hl7-org:v3"
 
 
-@dataclass
-class Bn:
-    """The BooleanNonNull type is used where a Boolean cannot have a null value. A
-    Boolean value can be either true or false.
-
-    :ivar value:
-    """
-    class Meta:
-        name = "BN"
-
-    value: Optional[str] = field(
-        default=None,
-        metadata=dict(
-            type="Attribute",
-            pattern=r"true|false"
-        )
-    )
-
-
 class BinaryDataEncoding(Enum):
     """
     :cvar B64:
@@ -104,98 +85,6 @@ class Any:
 
 
 @dataclass
-class Bl:
-    """The Boolean type stands for the values of two-valued logic. A Boolean value
-    can be either true or false, or, as any other value may be NULL.
-
-    :ivar null_flavor: An exceptional value expressing missing information
-                   and possibly the reason why the information is missing.
-    :ivar value:
-    """
-    class Meta:
-        name = "BL"
-
-    null_flavor: Optional[NullFlavor] = field(
-        default=None,
-        metadata=dict(
-            name="nullFlavor",
-            type="Attribute"
-        )
-    )
-    value: Optional[str] = field(
-        default=None,
-        metadata=dict(
-            type="Attribute",
-            pattern=r"true|false"
-        )
-    )
-
-
-@dataclass
-class Cr:
-    """A concept qualifier code with optionally named role. Both qualifier role and
-    value codes must be defined by the coding system.  For example, if SNOMED RT
-    defines a concept "leg", a role relation "has-laterality", and another concept
-    "left", the concept role relation allows to add the qualifier "has-laterality:
-    left" to a primary code "leg" to construct the meaning "left leg".
-
-    :ivar null_flavor: An exceptional value expressing missing information
-                   and possibly the reason why the information is missing.
-    :ivar name: Specifies the manner in which the concept role value
-                            contributes to the meaning of a code phrase.  For
-                            example, if SNOMED RT defines a concept "leg", a role
-                            relation "has-laterality", and another concept "left",
-                            the concept role relation allows to add the qualifier
-                            "has-laterality: left" to a primary code "leg" to
-                            construct the meaning "left leg".  In this example
-                            "has-laterality" is .
-    :ivar value: The concept that modifies the primary code of a code
-                            phrase through the role relation.  For example, if
-                            SNOMED RT defines a concept "leg", a role relation
-                            "has-laterality", and another concept "left", the
-                            concept role relation allows adding the qualifier
-                            "has-laterality: left" to a primary code "leg" to
-                            construct the meaning "left leg".  In this example
-                            "left" is .
-    :ivar inverted: Indicates if the sense of the role name is inverted.
-                         This can be used in cases where the underlying code
-                         system defines inversion but does not provide reciprocal
-                         pairs of role names. By default, inverted is false.
-    """
-    class Meta:
-        name = "CR"
-
-    null_flavor: Optional[NullFlavor] = field(
-        default=None,
-        metadata=dict(
-            name="nullFlavor",
-            type="Attribute"
-        )
-    )
-    name: Optional["Cv"] = field(
-        default=None,
-        metadata=dict(
-            type="Element",
-            namespace="urn:hl7-org:v3"
-        )
-    )
-    value: Optional["Cd"] = field(
-        default=None,
-        metadata=dict(
-            type="Element",
-            namespace="urn:hl7-org:v3"
-        )
-    )
-    inverted: str = field(
-        default="false",
-        metadata=dict(
-            type="Attribute",
-            pattern=r"true|false"
-        )
-    )
-
-
-@dataclass
 class EnxpExplicit:
     """A character string token representing a part of a name. May have a type code
     signifying the role of the part in the whole entity name, and a qualifier code
@@ -239,102 +128,6 @@ class EnxpExplicit:
 
 
 @dataclass
-class Ii:
-    """An identifier that uniquely identifies a thing or object. Examples are
-    object identifier for HL7 RIM objects, medical record number, order id, service
-    catalog item id, Vehicle Identification Number (VIN), etc. Instance identifiers
-    are defined based on ISO object identifiers.
-
-    :ivar null_flavor: An exceptional value expressing missing information
-                   and possibly the reason why the information is missing.
-    :ivar root: A unique identifier that guarantees the global uniqueness
-                         of the instance identifier. The root alone may be the
-                         entire instance identifier.
-    :ivar extension: A character string as a unique identifier within the
-                         scope of the identifier root.
-    :ivar assigning_authority_name: A human readable name or mnemonic for the assigning
-                         authority. This name may be provided solely for the
-                         convenience of unaided humans interpreting an  value
-                         and can have no computational meaning. Note: no
-                         automated processing must depend on the assigning
-                         authority name to be present in any form.
-    :ivar displayable: Specifies if the identifier is intended for human
-                         display and data entry (displayable = true) as
-                         opposed to pure machine interoperation (displayable
-                         = false).
-    """
-    class Meta:
-        name = "II"
-
-    null_flavor: Optional[NullFlavor] = field(
-        default=None,
-        metadata=dict(
-            name="nullFlavor",
-            type="Attribute"
-        )
-    )
-    root: Optional[str] = field(
-        default=None,
-        metadata=dict(
-            type="Attribute",
-            pattern=r"[0-2](\.(0|[1-9][0-9]*))*"
-        )
-    )
-    extension: Optional[str] = field(
-        default=None,
-        metadata=dict(
-            type="Attribute",
-            min_length=1.0
-        )
-    )
-    assigning_authority_name: Optional[str] = field(
-        default=None,
-        metadata=dict(
-            name="assigningAuthorityName",
-            type="Attribute",
-            min_length=1.0
-        )
-    )
-    displayable: Optional[str] = field(
-        default=None,
-        metadata=dict(
-            type="Attribute",
-            pattern=r"true|false"
-        )
-    )
-
-
-@dataclass
-class IntType:
-    """Integer numbers (-1,0,1,2, 100, 3398129, etc.) are precise numbers that are
-    results of counting and enumerating. Integer numbers are discrete, the set of
-    integers is infinite but countable.  No arbitrary limit is imposed on the range
-    of integer numbers. Two NULL flavors are defined for the positive and negative
-    infinity.
-
-    :ivar null_flavor: An exceptional value expressing missing information
-                   and possibly the reason why the information is missing.
-    :ivar value:
-    """
-    class Meta:
-        name = "INT"
-
-    null_flavor: Optional[NullFlavor] = field(
-        default=None,
-        metadata=dict(
-            name="nullFlavor",
-            type="Attribute"
-        )
-    )
-    value: Optional[int] = field(
-        default=None,
-        metadata=dict(
-            type="Attribute"
-        )
-    )
-
-
-@dataclass
 class IvxbTsExplicit:
     """
     :ivar null_flavor: An exceptional value expressing missing information
@@ -366,102 +159,6 @@ class IvxbTsExplicit:
         metadata=dict(
             type="Attribute",
             pattern=r"true|false"
-        )
-    )
-
-
-@dataclass
-class Mo:
-    """A monetary amount is a quantity expressing the amount of money in some
-    currency. Currencies are the units in which monetary amounts are denominated in
-    different economic regions. While the monetary amount is a single kind of
-    quantity (money) the exchange rates between the different units are variable.
-    This is the principle difference between physical quantity and monetary
-    amounts, and the reason why currency units are not physical units.
-
-    :ivar null_flavor: An exceptional value expressing missing information
-                   and possibly the reason why the information is missing.
-    :ivar value: The magnitude of the monetary amount in terms of the
-                         currency unit.
-    :ivar currency: The currency unit as defined in ISO 4217.
-    """
-    class Meta:
-        name = "MO"
-
-    null_flavor: Optional[NullFlavor] = field(
-        default=None,
-        metadata=dict(
-            name="nullFlavor",
-            type="Attribute"
-        )
-    )
-    value: Optional[Decimal] = field(
-        default=None,
-        metadata=dict(
-            type="Attribute"
-        )
-    )
-    currency: Optional[str] = field(
-        default=None,
-        metadata=dict(
-            type="Attribute",
-            pattern=r"[^\s]+"
-        )
-    )
-
-
-@dataclass
-class Qty:
-    """is an abstract generalization for all data types (1) whose value set has an
-    order relation (less-or-equal) and (2) where difference is defined in all of
-    the data type's totally ordered value subsets.  The quantity type abstraction
-    is needed in defining certain other types, such as the interval and the
-    probability distribution.
-
-    :ivar null_flavor: An exceptional value expressing missing information
-                   and possibly the reason why the information is missing.
-    """
-    class Meta:
-        name = "QTY"
-
-    null_flavor: Optional[NullFlavor] = field(
-        default=None,
-        metadata=dict(
-            name="nullFlavor",
-            type="Attribute"
-        )
-    )
-
-
-@dataclass
-class Real:
-    """Fractional numbers. Typically used whenever quantities are measured,
-    estimated, or computed from other real numbers.  The typical representation is
-    decimal, where the number of significant decimal digits is known as the
-    precision. Real numbers are needed beyond integers whenever quantities of the
-    real world are measured, estimated, or computed from other real numbers. The
-    term "Real number" in this specification is used to mean that fractional values
-    are covered without necessarily implying the full set of the mathematical real
-    numbers.
-
-    :ivar null_flavor: An exceptional value expressing missing information
-                   and possibly the reason why the information is missing.
-    :ivar value:
-    """
-    class Meta:
-        name = "REAL"
-
-    null_flavor: Optional[NullFlavor] = field(
-        default=None,
-        metadata=dict(
-            name="nullFlavor",
-            type="Attribute"
-        )
-    )
-    value: Optional[Decimal] = field(
-        default=None,
-        metadata=dict(
-            type="Attribute"
         )
     )
 
@@ -499,34 +196,6 @@ class SxcmTsExplicit:
         default=SetOperator.I,
         metadata=dict(
             type="Attribute"
-        )
-    )
-
-
-@dataclass
-class Ts:
-    """A quantity specifying a point on the axis of natural time. A point in time
-    is most often represented as a calendar expression.
-
-    :ivar null_flavor: An exceptional value expressing missing information
-                   and possibly the reason why the information is missing.
-    :ivar value:
-    """
-    class Meta:
-        name = "TS"
-
-    null_flavor: Optional[NullFlavor] = field(
-        default=None,
-        metadata=dict(
-            name="nullFlavor",
-            type="Attribute"
-        )
-    )
-    value: Optional[str] = field(
-        default=None,
-        metadata=dict(
-            type="Attribute",
-            pattern=r"[0-9]{1,8}|([0-9]{9,14}|[0-9]{14,14}\.[0-9]+)([+\-][0-9]{1,4})?"
         )
     )
 
@@ -2701,17 +2370,44 @@ class AnynonNull(Any):
 
 
 @dataclass
-class IvxbTs(Ts):
-    """
-    :ivar inclusive: Specifies whether the limit is included in the
-                         interval (interval is closed) or excluded from the
-                         interval (interval is open).
+class Bin(Any):
+    """Binary data is a raw block of bits. Binary data is a protected type that
+    MUST not be used outside the data type specification.
+
+    :ivar content:
+    :ivar representation: Specifies the representation of the binary data that
+                         is the content of the binary data value.
     """
     class Meta:
-        name = "IVXB_TS"
+        name = "BIN"
 
-    inclusive: str = field(
-        default="true",
+    content: Optional[object] = field(
+        default=None,
+        metadata=dict(
+            type="Wildcard",
+            namespace="##any"
+        )
+    )
+    representation: BinaryDataEncoding = field(
+        default=BinaryDataEncoding.TXT,
+        metadata=dict(
+            type="Attribute"
+        )
+    )
+
+
+@dataclass
+class Bl(Any):
+    """The Boolean type stands for the values of two-valued logic. A Boolean value
+    can be either true or false, or, as any other value may be NULL.
+
+    :ivar value:
+    """
+    class Meta:
+        name = "BL"
+
+    value: Optional[str] = field(
+        default=None,
         metadata=dict(
             type="Attribute",
             pattern=r"true|false"
@@ -2720,62 +2416,128 @@ class IvxbTs(Ts):
 
 
 @dataclass
-class RtoQtyQty:
-    """
-    :ivar null_flavor: An exceptional value expressing missing information
-                   and possibly the reason why the information is missing.
-    :ivar numerator: The quantity that is being divided in the ratio.  The
-                            default is the integer number 1 (one).
-    :ivar denominator: The quantity that devides the numerator in the ratio.
-                            The default is the integer number 1 (one).
-                            The denominator must not be zero.
+class Cr(Any):
+    """A concept qualifier code with optionally named role. Both qualifier role and
+    value codes must be defined by the coding system.  For example, if SNOMED RT
+    defines a concept "leg", a role relation "has-laterality", and another concept
+    "left", the concept role relation allows to add the qualifier "has-laterality:
+    left" to a primary code "leg" to construct the meaning "left leg".
+
+    :ivar name: Specifies the manner in which the concept role value
+                            contributes to the meaning of a code phrase.  For
+                            example, if SNOMED RT defines a concept "leg", a role
+                            relation "has-laterality", and another concept "left",
+                            the concept role relation allows to add the qualifier
+                            "has-laterality: left" to a primary code "leg" to
+                            construct the meaning "left leg".  In this example
+                            "has-laterality" is .
+    :ivar value: The concept that modifies the primary code of a code
+                            phrase through the role relation.  For example, if
+                            SNOMED RT defines a concept "leg", a role relation
+                            "has-laterality", and another concept "left", the
+                            concept role relation allows adding the qualifier
+                            "has-laterality: left" to a primary code "leg" to
+                            construct the meaning "left leg".  In this example
+                            "left" is .
+    :ivar inverted: Indicates if the sense of the role name is inverted.
+                         This can be used in cases where the underlying code
+                         system defines inversion but does not provide reciprocal
+                         pairs of role names. By default, inverted is false.
     """
     class Meta:
-        name = "RTO_QTY_QTY"
+        name = "CR"
 
-    null_flavor: Optional[NullFlavor] = field(
-        default=None,
-        metadata=dict(
-            name="nullFlavor",
-            type="Attribute"
-        )
-    )
-    numerator: Optional[Qty] = field(
+    name: Optional["Cv"] = field(
         default=None,
         metadata=dict(
             type="Element",
-            namespace="urn:hl7-org:v3",
-            required=True
+            namespace="urn:hl7-org:v3"
         )
     )
-    denominator: Optional[Qty] = field(
+    value: Optional["Cd"] = field(
         default=None,
         metadata=dict(
             type="Element",
-            namespace="urn:hl7-org:v3",
-            required=True
+            namespace="urn:hl7-org:v3"
+        )
+    )
+    inverted: str = field(
+        default="false",
+        metadata=dict(
+            type="Attribute",
+            pattern=r"true|false"
         )
     )
 
 
 @dataclass
-class SxcmTs(Ts):
-    """
-    :ivar operator: A code specifying whether the set component is included
-                         (union) or excluded (set-difference) from the set, or
-                         other set operations with the current set component and
-                         the set as constructed from the representation stream
-                         up to the current point.
+class Ii(Any):
+    """An identifier that uniquely identifies a thing or object. Examples are
+    object identifier for HL7 RIM objects, medical record number, order id, service
+    catalog item id, Vehicle Identification Number (VIN), etc. Instance identifiers
+    are defined based on ISO object identifiers.
+
+    :ivar root: A unique identifier that guarantees the global uniqueness
+                         of the instance identifier. The root alone may be the
+                         entire instance identifier.
+    :ivar extension: A character string as a unique identifier within the
+                         scope of the identifier root.
+    :ivar assigning_authority_name: A human readable name or mnemonic for the assigning
+                         authority. This name may be provided solely for the
+                         convenience of unaided humans interpreting an  value
+                         and can have no computational meaning. Note: no
+                         automated processing must depend on the assigning
+                         authority name to be present in any form.
+    :ivar displayable: Specifies if the identifier is intended for human
+                         display and data entry (displayable = true) as
+                         opposed to pure machine interoperation (displayable
+                         = false).
     """
     class Meta:
-        name = "SXCM_TS"
+        name = "II"
 
-    operator: SetOperator = field(
-        default=SetOperator.I,
+    root: Optional[str] = field(
+        default=None,
         metadata=dict(
-            type="Attribute"
+            type="Attribute",
+            pattern=r"[0-2](\.(0|[1-9][0-9]*))*"
         )
     )
+    extension: Optional[str] = field(
+        default=None,
+        metadata=dict(
+            type="Attribute",
+            min_length=1.0
+        )
+    )
+    assigning_authority_name: Optional[str] = field(
+        default=None,
+        metadata=dict(
+            name="assigningAuthorityName",
+            type="Attribute",
+            min_length=1.0
+        )
+    )
+    displayable: Optional[str] = field(
+        default=None,
+        metadata=dict(
+            type="Attribute",
+            pattern=r"true|false"
+        )
+    )
+
+
+@dataclass
+class Qty(Any):
+    """is an abstract generalization for all data types (1) whose value set has an
+    order relation (less-or-equal) and (2) where difference is defined in all of
+    the data type's totally ordered value subsets.
+
+    The quantity type abstraction is needed in defining certain other types,
+    such as the interval and the probability distribution.
+    """
+    class Meta:
+        name = "QTY"
 
 
 @dataclass
@@ -2831,6 +2593,685 @@ class TelExplicit:
             type="Attribute",
             min_occurs=0,
             max_occurs=9223372036854775807
+        )
+    )
+
+
+@dataclass
+class Url(Any):
+    """A telecommunications address  specified according to Internet standard RFC
+    1738.
+
+                [http://www.ietf.org/rfc/rfc1738.txt]. The
+                URL specifies the protocol and the contact point defined
+                by that protocol for the resource.  Notable uses of the
+                telecommunication address data type are for telephone and
+                telefax numbers, e-mail addresses, Hypertext references,
+                FTP references, etc.
+    :ivar value:
+    """
+    class Meta:
+        name = "URL"
+
+    value: Optional[str] = field(
+        default=None,
+        metadata=dict(
+            type="Attribute"
+        )
+    )
+
+
+@dataclass
+class Bn(AnynonNull):
+    """The BooleanNonNull type is used where a Boolean cannot have a null value. A
+    Boolean value can be either true or false.
+
+    :ivar value:
+    """
+    class Meta:
+        name = "BN"
+
+    value: Optional[str] = field(
+        default=None,
+        metadata=dict(
+            type="Attribute",
+            pattern=r"true|false"
+        )
+    )
+
+
+@dataclass
+class IntType(Qty):
+    """Integer numbers (-1,0,1,2, 100, 3398129, etc.) are precise numbers that are
+    results of counting and enumerating. Integer numbers are discrete, the set of
+    integers is infinite but countable.  No arbitrary limit is imposed on the range
+    of integer numbers. Two NULL flavors are defined for the positive and negative
+    infinity.
+
+    :ivar value:
+    """
+    class Meta:
+        name = "INT"
+
+    value: Optional[int] = field(
+        default=None,
+        metadata=dict(
+            type="Attribute"
+        )
+    )
+
+
+@dataclass
+class Mo(Qty):
+    """A monetary amount is a quantity expressing the amount of money in some
+    currency. Currencies are the units in which monetary amounts are denominated in
+    different economic regions. While the monetary amount is a single kind of
+    quantity (money) the exchange rates between the different units are variable.
+    This is the principle difference between physical quantity and monetary
+    amounts, and the reason why currency units are not physical units.
+
+    :ivar value: The magnitude of the monetary amount in terms of the
+                         currency unit.
+    :ivar currency: The currency unit as defined in ISO 4217.
+    """
+    class Meta:
+        name = "MO"
+
+    value: Optional[Decimal] = field(
+        default=None,
+        metadata=dict(
+            type="Attribute"
+        )
+    )
+    currency: Optional[str] = field(
+        default=None,
+        metadata=dict(
+            type="Attribute",
+            pattern=r"[^\s]+"
+        )
+    )
+
+
+@dataclass
+class Real(Qty):
+    """Fractional numbers. Typically used whenever quantities are measured,
+    estimated, or computed from other real numbers.  The typical representation is
+    decimal, where the number of significant decimal digits is known as the
+    precision. Real numbers are needed beyond integers whenever quantities of the
+    real world are measured, estimated, or computed from other real numbers. The
+    term "Real number" in this specification is used to mean that fractional values
+    are covered without necessarily implying the full set of the mathematical real
+    numbers.
+
+    :ivar value:
+    """
+    class Meta:
+        name = "REAL"
+
+    value: Optional[Decimal] = field(
+        default=None,
+        metadata=dict(
+            type="Attribute"
+        )
+    )
+
+
+@dataclass
+class RtoQtyQty(Qty):
+    """
+    :ivar numerator: The quantity that is being divided in the ratio.  The
+                            default is the integer number 1 (one).
+    :ivar denominator: The quantity that devides the numerator in the ratio.
+                            The default is the integer number 1 (one).
+                            The denominator must not be zero.
+    """
+    class Meta:
+        name = "RTO_QTY_QTY"
+
+    numerator: Optional[Qty] = field(
+        default=None,
+        metadata=dict(
+            type="Element",
+            namespace="urn:hl7-org:v3",
+            required=True
+        )
+    )
+    denominator: Optional[Qty] = field(
+        default=None,
+        metadata=dict(
+            type="Element",
+            namespace="urn:hl7-org:v3",
+            required=True
+        )
+    )
+
+
+@dataclass
+class Ts(Qty):
+    """A quantity specifying a point on the axis of natural time. A point in time
+    is most often represented as a calendar expression.
+
+    :ivar value:
+    """
+    class Meta:
+        name = "TS"
+
+    value: Optional[str] = field(
+        default=None,
+        metadata=dict(
+            type="Attribute",
+            pattern=r"[0-9]{1,8}|([0-9]{9,14}|[0-9]{14,14}\.[0-9]+)([+\-][0-9]{1,4})?"
+        )
+    )
+
+
+@dataclass
+class ThumbnailExplicit:
+    """A thumbnail is an abbreviated rendition of the full data. A thumbnail
+    requires significantly fewer resources than the full data, while still
+    maintaining some distinctive similarity with the full data. A thumbnail is
+    typically used with by-reference encapsulated data. It allows a user to select
+    data more efficiently before actually downloading through the reference.
+
+    :ivar content:
+    :ivar reference:
+    :ivar null_flavor: An exceptional value expressing missing information
+                        and possibly the reason why the information is missing.
+    :ivar representation: Specifies the representation of the binary data that
+                 is the content of the binary data value.
+    :ivar media_type: Identifies the type of the encapsulated data and
+                 identifies a method to interpret or render the data.
+    :ivar language: For character based information the language property
+                 specifies the human language of the text.
+    :ivar compression: Indicates whether the raw byte data is compressed,
+                 and what compression algorithm was used.
+    :ivar integrity_check: The integrity check is a short binary value representing
+                 a cryptographically strong checksum that is calculated
+                 over the binary data. The purpose of this property, when
+                 communicated with a reference is for anyone to validate
+                 later whether the reference still resolved to the same
+                 data that the reference resolved to when the encapsulated
+                 data value with reference was created.
+    :ivar integrity_check_algorithm: Specifies the algorithm used to compute the
+                 integrityCheck value.
+    """
+    class Meta:
+        name = "thumbnail_explicit"
+
+    content: Optional[object] = field(
+        default=None,
+        metadata=dict(
+            type="Wildcard",
+            namespace="##any"
+        )
+    )
+    reference: Optional[TelExplicit] = field(
+        default=None,
+        metadata=dict(
+            type="Element",
+            namespace="urn:hl7-org:v3"
+        )
+    )
+    null_flavor: Optional[NullFlavor] = field(
+        default=None,
+        metadata=dict(
+            name="nullFlavor",
+            type="Attribute"
+        )
+    )
+    representation: BinaryDataEncoding = field(
+        default=BinaryDataEncoding.TXT,
+        metadata=dict(
+            type="Attribute"
+        )
+    )
+    media_type: str = field(
+        default="text/plain",
+        metadata=dict(
+            name="mediaType",
+            type="Attribute",
+            pattern=r"[^\s]+"
+        )
+    )
+    language: Optional[str] = field(
+        default=None,
+        metadata=dict(
+            type="Attribute",
+            pattern=r"[^\s]+"
+        )
+    )
+    compression: Optional[CompressionAlgorithm] = field(
+        default=None,
+        metadata=dict(
+            type="Attribute"
+        )
+    )
+    integrity_check: Optional[str] = field(
+        default=None,
+        metadata=dict(
+            name="integrityCheck",
+            type="Attribute"
+        )
+    )
+    integrity_check_algorithm: IntegrityCheckAlgorithm = field(
+        default=IntegrityCheckAlgorithm.SHA_1,
+        metadata=dict(
+            name="integrityCheckAlgorithm",
+            type="Attribute"
+        )
+    )
+
+
+@dataclass
+class EdExplicit:
+    """Data that is primarily intended for human interpretation or for further
+    machine processing is outside the scope of HL7. This includes unformatted or
+    formatted written language, multimedia data, or structured information as
+    defined by a different standard (e.g., XML-signatures.)  Instead of the data
+    itself, an ED may contain only a reference (see TEL.) Note that the ST data
+    type is a specialization of when the  is text/plain.
+
+    :ivar content:
+    :ivar reference: A telecommunication address (TEL), such as a URL
+                    for HTTP or FTP, which will resolve to precisely
+                    the same binary data that could as well have been
+                    provided as inline data.
+    :ivar thumbnail:
+    :ivar null_flavor: An exceptional value expressing missing information
+                        and possibly the reason why the information is missing.
+    :ivar representation: Specifies the representation of the binary data that
+                 is the content of the binary data value.
+    :ivar media_type: Identifies the type of the encapsulated data and
+                 identifies a method to interpret or render the data.
+    :ivar language: For character based information the language property
+                 specifies the human language of the text.
+    :ivar compression: Indicates whether the raw byte data is compressed,
+                 and what compression algorithm was used.
+    :ivar integrity_check: The integrity check is a short binary value representing
+                 a cryptographically strong checksum that is calculated
+                 over the binary data. The purpose of this property, when
+                 communicated with a reference is for anyone to validate
+                 later whether the reference still resolved to the same
+                 data that the reference resolved to when the encapsulated
+                 data value with reference was created.
+    :ivar integrity_check_algorithm: Specifies the algorithm used to compute the
+                 integrityCheck value.
+    """
+    class Meta:
+        name = "ED_explicit"
+
+    content: Optional[object] = field(
+        default=None,
+        metadata=dict(
+            type="Wildcard",
+            namespace="##any"
+        )
+    )
+    reference: Optional[TelExplicit] = field(
+        default=None,
+        metadata=dict(
+            type="Element",
+            namespace="urn:hl7-org:v3"
+        )
+    )
+    thumbnail: Optional[ThumbnailExplicit] = field(
+        default=None,
+        metadata=dict(
+            type="Element",
+            namespace="urn:hl7-org:v3"
+        )
+    )
+    null_flavor: Optional[NullFlavor] = field(
+        default=None,
+        metadata=dict(
+            name="nullFlavor",
+            type="Attribute"
+        )
+    )
+    representation: BinaryDataEncoding = field(
+        default=BinaryDataEncoding.TXT,
+        metadata=dict(
+            type="Attribute"
+        )
+    )
+    media_type: str = field(
+        default="text/plain",
+        metadata=dict(
+            name="mediaType",
+            type="Attribute",
+            pattern=r"[^\s]+"
+        )
+    )
+    language: Optional[str] = field(
+        default=None,
+        metadata=dict(
+            type="Attribute",
+            pattern=r"[^\s]+"
+        )
+    )
+    compression: Optional[CompressionAlgorithm] = field(
+        default=None,
+        metadata=dict(
+            type="Attribute"
+        )
+    )
+    integrity_check: Optional[str] = field(
+        default=None,
+        metadata=dict(
+            name="integrityCheck",
+            type="Attribute"
+        )
+    )
+    integrity_check_algorithm: IntegrityCheckAlgorithm = field(
+        default=IntegrityCheckAlgorithm.SHA_1,
+        metadata=dict(
+            name="integrityCheckAlgorithm",
+            type="Attribute"
+        )
+    )
+
+
+@dataclass
+class IvxbTs(Ts):
+    """
+    :ivar inclusive: Specifies whether the limit is included in the
+                         interval (interval is closed) or excluded from the
+                         interval (interval is open).
+    """
+    class Meta:
+        name = "IVXB_TS"
+
+    inclusive: str = field(
+        default="true",
+        metadata=dict(
+            type="Attribute",
+            pattern=r"true|false"
+        )
+    )
+
+
+@dataclass
+class Rto(RtoQtyQty):
+    """A quantity constructed as the quotient of a numerator quantity divided by a
+    denominator quantity.
+
+    Common factors in the numerator and denominator are not automatically
+    cancelled out.   supports titers (e.g., "1:128") and other quantities
+    produced by laboratories that truly represent ratios. Ratios are not
+    simply "structured numerics", particularly blood pressure measurements
+    (e.g. "120/60") are not ratios. In many cases REAL should be used
+    instead of .
+    """
+    class Meta:
+        name = "RTO"
+
+
+@dataclass
+class ScExplicit:
+    """An ST that optionally may have a code attached. The text must always be
+    present if a code is present. The code is often a local code.
+
+    :ivar content:
+    :ivar reference: A telecommunication address (TEL), such as a URL
+                    for HTTP or FTP, which will resolve to precisely
+                    the same binary data that could as well have been
+                    provided as inline data.
+    :ivar thumbnail:
+    :ivar null_flavor: An exceptional value expressing missing information
+                   and possibly the reason why the information is missing.
+    :ivar representation: Specifies the representation of the binary data that
+                 is the content of the binary data value.
+    :ivar media_type: Identifies the type of the encapsulated data and
+                 identifies a method to interpret or render the data.
+    :ivar language: For character based information the language property
+                 specifies the human language of the text.
+    :ivar compression: Indicates whether the raw byte data is compressed,
+                 and what compression algorithm was used.
+    :ivar integrity_check: The integrity check is a short binary value representing
+                 a cryptographically strong checksum that is calculated
+                 over the binary data. The purpose of this property, when
+                 communicated with a reference is for anyone to validate
+                 later whether the reference still resolved to the same
+                 data that the reference resolved to when the encapsulated
+                 data value with reference was created.
+    :ivar integrity_check_algorithm: Specifies the algorithm used to compute the
+                 integrityCheck value.
+    :ivar code: The plain code symbol defined by the code system.
+                             For example, "784.0" is the code symbol of the ICD-9
+                             code "784.0" for headache.
+    :ivar code_system: Specifies the code system that defines the code.
+    :ivar code_system_name: A common name of the coding system.
+    :ivar code_system_version: If applicable, a version descriptor defined
+                             specifically for the given code system.
+    :ivar display_name: A name or title for the code, under which the sending
+                             system shows the code value to its users.
+    """
+    class Meta:
+        name = "SC_explicit"
+
+    content: Optional[object] = field(
+        default=None,
+        metadata=dict(
+            type="Wildcard",
+            namespace="##any"
+        )
+    )
+    reference: Optional[TelExplicit] = field(
+        default=None,
+        metadata=dict(
+            type="Element",
+            namespace="urn:hl7-org:v3"
+        )
+    )
+    thumbnail: Optional[ThumbnailExplicit] = field(
+        default=None,
+        metadata=dict(
+            type="Element",
+            namespace="urn:hl7-org:v3"
+        )
+    )
+    null_flavor: Optional[NullFlavor] = field(
+        default=None,
+        metadata=dict(
+            name="nullFlavor",
+            type="Attribute"
+        )
+    )
+    representation: BinaryDataEncoding = field(
+        default=BinaryDataEncoding.TXT,
+        metadata=dict(
+            type="Attribute"
+        )
+    )
+    media_type: str = field(
+        default="text/plain",
+        metadata=dict(
+            name="mediaType",
+            type="Attribute",
+            pattern=r"[^\s]+"
+        )
+    )
+    language: Optional[str] = field(
+        default=None,
+        metadata=dict(
+            type="Attribute",
+            pattern=r"[^\s]+"
+        )
+    )
+    compression: Optional[CompressionAlgorithm] = field(
+        default=None,
+        metadata=dict(
+            type="Attribute"
+        )
+    )
+    integrity_check: Optional[str] = field(
+        default=None,
+        metadata=dict(
+            name="integrityCheck",
+            type="Attribute"
+        )
+    )
+    integrity_check_algorithm: IntegrityCheckAlgorithm = field(
+        default=IntegrityCheckAlgorithm.SHA_1,
+        metadata=dict(
+            name="integrityCheckAlgorithm",
+            type="Attribute"
+        )
+    )
+    code: Optional[str] = field(
+        default=None,
+        metadata=dict(
+            type="Attribute",
+            pattern=r"[^\s]+"
+        )
+    )
+    code_system: Optional[str] = field(
+        default=None,
+        metadata=dict(
+            name="codeSystem",
+            type="Attribute",
+            pattern=r"[0-2](\.(0|[1-9][0-9]*))*"
+        )
+    )
+    code_system_name: Optional[str] = field(
+        default=None,
+        metadata=dict(
+            name="codeSystemName",
+            type="Attribute",
+            min_length=1.0
+        )
+    )
+    code_system_version: Optional[str] = field(
+        default=None,
+        metadata=dict(
+            name="codeSystemVersion",
+            type="Attribute",
+            min_length=1.0
+        )
+    )
+    display_name: Optional[str] = field(
+        default=None,
+        metadata=dict(
+            name="displayName",
+            type="Attribute",
+            min_length=1.0
+        )
+    )
+
+
+@dataclass
+class StExplicit:
+    """The character string data type stands for text data, primarily intended for
+    machine processing (e.g., sorting, querying, indexing, etc.) Used for names,
+    symbols, and formal expressions.
+
+    :ivar content:
+    :ivar reference: A telecommunication address (TEL), such as a URL
+                    for HTTP or FTP, which will resolve to precisely
+                    the same binary data that could as well have been
+                    provided as inline data.
+    :ivar thumbnail:
+    :ivar representation: Specifies the representation of the binary data that
+                 is the content of the binary data value.
+    :ivar media_type: Identifies the type of the encapsulated data and
+                 identifies a method to interpret or render the data.
+    :ivar language: For character based information the language property
+                 specifies the human language of the text.
+    :ivar compression: Indicates whether the raw byte data is compressed,
+                 and what compression algorithm was used.
+    :ivar integrity_check: The integrity check is a short binary value representing
+                 a cryptographically strong checksum that is calculated
+                 over the binary data. The purpose of this property, when
+                 communicated with a reference is for anyone to validate
+                 later whether the reference still resolved to the same
+                 data that the reference resolved to when the encapsulated
+                 data value with reference was created.
+    :ivar integrity_check_algorithm: Specifies the algorithm used to compute the
+                 integrityCheck value.
+    """
+    class Meta:
+        name = "ST_explicit"
+
+    content: Optional[object] = field(
+        default=None,
+        metadata=dict(
+            type="Wildcard",
+            namespace="##any"
+        )
+    )
+    reference: Optional[TelExplicit] = field(
+        default=None,
+        metadata=dict(
+            type="Element",
+            namespace="urn:hl7-org:v3"
+        )
+    )
+    thumbnail: Optional[ThumbnailExplicit] = field(
+        default=None,
+        metadata=dict(
+            type="Element",
+            namespace="urn:hl7-org:v3"
+        )
+    )
+    representation: BinaryDataEncoding = field(
+        default=BinaryDataEncoding.TXT,
+        metadata=dict(
+            type="Attribute"
+        )
+    )
+    media_type: str = field(
+        default="text/plain",
+        metadata=dict(
+            name="mediaType",
+            type="Attribute",
+            pattern=r"[^\s]+"
+        )
+    )
+    language: Optional[str] = field(
+        default=None,
+        metadata=dict(
+            type="Attribute",
+            pattern=r"[^\s]+"
+        )
+    )
+    compression: Optional[CompressionAlgorithm] = field(
+        default=None,
+        metadata=dict(
+            type="Attribute"
+        )
+    )
+    integrity_check: Optional[str] = field(
+        default=None,
+        metadata=dict(
+            name="integrityCheck",
+            type="Attribute"
+        )
+    )
+    integrity_check_algorithm: IntegrityCheckAlgorithm = field(
+        default=IntegrityCheckAlgorithm.SHA_1,
+        metadata=dict(
+            name="integrityCheckAlgorithm",
+            type="Attribute"
+        )
+    )
+
+
+@dataclass
+class SxcmTs(Ts):
+    """
+    :ivar operator: A code specifying whether the set component is included
+                         (union) or excluded (set-difference) from the set, or
+                         other set operations with the current set component and
+                         the set as constructed from the representation stream
+                         up to the current point.
+    """
+    class Meta:
+        name = "SXCM_TS"
+
+    operator: SetOperator = field(
+        default=SetOperator.I,
+        metadata=dict(
+            type="Attribute"
         )
     )
 
@@ -3184,749 +3625,6 @@ class Ad(Any):
 
 
 @dataclass
-class Rto(RtoQtyQty):
-    """A quantity constructed as the quotient of a numerator quantity divided by a
-    denominator quantity.
-
-    Common factors in the numerator and denominator are not automatically
-    cancelled out.   supports titers (e.g., "1:128") and other quantities
-    produced by laboratories that truly represent ratios. Ratios are not
-    simply "structured numerics", particularly blood pressure measurements
-    (e.g. "120/60") are not ratios. In many cases REAL should be used
-    instead of .
-    """
-    class Meta:
-        name = "RTO"
-
-
-@dataclass
-class Tel:
-    """A telephone number (voice or fax), e-mail address, or other locator for a
-    resource (information or service) mediated by telecommunication equipment. The
-    address is specified as a URL qualified by time specification and use codes
-    that help in deciding which address to use for a given time and purpose.
-
-    :ivar null_flavor: An exceptional value expressing missing information
-                   and possibly the reason why the information is missing.
-    :ivar value:
-    :ivar useable_period: Specifies the periods of time during which the
-                         telecommunication address can be used.  For a
-                         telephone number, this can indicate the time of day
-                         in which the party can be reached on that telephone.
-                         For a web address, it may specify a time range in
-                         which the web content is promised to be available
-                         under the given address.
-    :ivar use: One or more codes advising a system or user which
-                         telecommunication address in a set of like addresses
-                         to select for a given telecommunication need.
-    """
-    class Meta:
-        name = "TEL"
-
-    null_flavor: Optional[NullFlavor] = field(
-        default=None,
-        metadata=dict(
-            name="nullFlavor",
-            type="Attribute"
-        )
-    )
-    value: Optional[str] = field(
-        default=None,
-        metadata=dict(
-            type="Attribute"
-        )
-    )
-    useable_period: List[SxcmTs] = field(
-        default_factory=list,
-        metadata=dict(
-            name="useablePeriod",
-            type="Element",
-            namespace="urn:hl7-org:v3",
-            min_occurs=0,
-            max_occurs=9223372036854775807
-        )
-    )
-    use: List[TelecommunicationAddressUse] = field(
-        default_factory=list,
-        metadata=dict(
-            type="Attribute",
-            min_occurs=0,
-            max_occurs=9223372036854775807
-        )
-    )
-
-
-@dataclass
-class ThumbnailExplicit:
-    """A thumbnail is an abbreviated rendition of the full data. A thumbnail
-    requires significantly fewer resources than the full data, while still
-    maintaining some distinctive similarity with the full data. A thumbnail is
-    typically used with by-reference encapsulated data. It allows a user to select
-    data more efficiently before actually downloading through the reference.
-
-    :ivar content:
-    :ivar reference:
-    :ivar null_flavor: An exceptional value expressing missing information
-                        and possibly the reason why the information is missing.
-    :ivar representation: Specifies the representation of the binary data that
-                 is the content of the binary data value.
-    :ivar media_type: Identifies the type of the encapsulated data and
-                 identifies a method to interpret or render the data.
-    :ivar language: For character based information the language property
-                 specifies the human language of the text.
-    :ivar compression: Indicates whether the raw byte data is compressed,
-                 and what compression algorithm was used.
-    :ivar integrity_check: The integrity check is a short binary value representing
-                 a cryptographically strong checksum that is calculated
-                 over the binary data. The purpose of this property, when
-                 communicated with a reference is for anyone to validate
-                 later whether the reference still resolved to the same
-                 data that the reference resolved to when the encapsulated
-                 data value with reference was created.
-    :ivar integrity_check_algorithm: Specifies the algorithm used to compute the
-                 integrityCheck value.
-    """
-    class Meta:
-        name = "thumbnail_explicit"
-
-    content: Optional[object] = field(
-        default=None,
-        metadata=dict(
-            type="Wildcard",
-            namespace="##any"
-        )
-    )
-    reference: Optional[TelExplicit] = field(
-        default=None,
-        metadata=dict(
-            type="Element",
-            namespace="urn:hl7-org:v3"
-        )
-    )
-    null_flavor: Optional[NullFlavor] = field(
-        default=None,
-        metadata=dict(
-            name="nullFlavor",
-            type="Attribute"
-        )
-    )
-    representation: BinaryDataEncoding = field(
-        default=BinaryDataEncoding.TXT,
-        metadata=dict(
-            type="Attribute"
-        )
-    )
-    media_type: str = field(
-        default="text/plain",
-        metadata=dict(
-            name="mediaType",
-            type="Attribute",
-            pattern=r"[^\s]+"
-        )
-    )
-    language: Optional[str] = field(
-        default=None,
-        metadata=dict(
-            type="Attribute",
-            pattern=r"[^\s]+"
-        )
-    )
-    compression: Optional[CompressionAlgorithm] = field(
-        default=None,
-        metadata=dict(
-            type="Attribute"
-        )
-    )
-    integrity_check: Optional[str] = field(
-        default=None,
-        metadata=dict(
-            name="integrityCheck",
-            type="Attribute"
-        )
-    )
-    integrity_check_algorithm: IntegrityCheckAlgorithm = field(
-        default=IntegrityCheckAlgorithm.SHA_1,
-        metadata=dict(
-            name="integrityCheckAlgorithm",
-            type="Attribute"
-        )
-    )
-
-
-@dataclass
-class EdExplicit:
-    """Data that is primarily intended for human interpretation or for further
-    machine processing is outside the scope of HL7. This includes unformatted or
-    formatted written language, multimedia data, or structured information as
-    defined by a different standard (e.g., XML-signatures.)  Instead of the data
-    itself, an ED may contain only a reference (see TEL.) Note that the ST data
-    type is a specialization of when the  is text/plain.
-
-    :ivar content:
-    :ivar reference: A telecommunication address (TEL), such as a URL
-                    for HTTP or FTP, which will resolve to precisely
-                    the same binary data that could as well have been
-                    provided as inline data.
-    :ivar thumbnail:
-    :ivar null_flavor: An exceptional value expressing missing information
-                        and possibly the reason why the information is missing.
-    :ivar representation: Specifies the representation of the binary data that
-                 is the content of the binary data value.
-    :ivar media_type: Identifies the type of the encapsulated data and
-                 identifies a method to interpret or render the data.
-    :ivar language: For character based information the language property
-                 specifies the human language of the text.
-    :ivar compression: Indicates whether the raw byte data is compressed,
-                 and what compression algorithm was used.
-    :ivar integrity_check: The integrity check is a short binary value representing
-                 a cryptographically strong checksum that is calculated
-                 over the binary data. The purpose of this property, when
-                 communicated with a reference is for anyone to validate
-                 later whether the reference still resolved to the same
-                 data that the reference resolved to when the encapsulated
-                 data value with reference was created.
-    :ivar integrity_check_algorithm: Specifies the algorithm used to compute the
-                 integrityCheck value.
-    """
-    class Meta:
-        name = "ED_explicit"
-
-    content: Optional[object] = field(
-        default=None,
-        metadata=dict(
-            type="Wildcard",
-            namespace="##any"
-        )
-    )
-    reference: Optional[TelExplicit] = field(
-        default=None,
-        metadata=dict(
-            type="Element",
-            namespace="urn:hl7-org:v3"
-        )
-    )
-    thumbnail: Optional[ThumbnailExplicit] = field(
-        default=None,
-        metadata=dict(
-            type="Element",
-            namespace="urn:hl7-org:v3"
-        )
-    )
-    null_flavor: Optional[NullFlavor] = field(
-        default=None,
-        metadata=dict(
-            name="nullFlavor",
-            type="Attribute"
-        )
-    )
-    representation: BinaryDataEncoding = field(
-        default=BinaryDataEncoding.TXT,
-        metadata=dict(
-            type="Attribute"
-        )
-    )
-    media_type: str = field(
-        default="text/plain",
-        metadata=dict(
-            name="mediaType",
-            type="Attribute",
-            pattern=r"[^\s]+"
-        )
-    )
-    language: Optional[str] = field(
-        default=None,
-        metadata=dict(
-            type="Attribute",
-            pattern=r"[^\s]+"
-        )
-    )
-    compression: Optional[CompressionAlgorithm] = field(
-        default=None,
-        metadata=dict(
-            type="Attribute"
-        )
-    )
-    integrity_check: Optional[str] = field(
-        default=None,
-        metadata=dict(
-            name="integrityCheck",
-            type="Attribute"
-        )
-    )
-    integrity_check_algorithm: IntegrityCheckAlgorithm = field(
-        default=IntegrityCheckAlgorithm.SHA_1,
-        metadata=dict(
-            name="integrityCheckAlgorithm",
-            type="Attribute"
-        )
-    )
-
-
-@dataclass
-class ScExplicit:
-    """An ST that optionally may have a code attached. The text must always be
-    present if a code is present. The code is often a local code.
-
-    :ivar content:
-    :ivar reference: A telecommunication address (TEL), such as a URL
-                    for HTTP or FTP, which will resolve to precisely
-                    the same binary data that could as well have been
-                    provided as inline data.
-    :ivar thumbnail:
-    :ivar null_flavor: An exceptional value expressing missing information
-                   and possibly the reason why the information is missing.
-    :ivar representation: Specifies the representation of the binary data that
-                 is the content of the binary data value.
-    :ivar media_type: Identifies the type of the encapsulated data and
-                 identifies a method to interpret or render the data.
-    :ivar language: For character based information the language property
-                 specifies the human language of the text.
-    :ivar compression: Indicates whether the raw byte data is compressed,
-                 and what compression algorithm was used.
-    :ivar integrity_check: The integrity check is a short binary value representing
-                 a cryptographically strong checksum that is calculated
-                 over the binary data. The purpose of this property, when
-                 communicated with a reference is for anyone to validate
-                 later whether the reference still resolved to the same
-                 data that the reference resolved to when the encapsulated
-                 data value with reference was created.
-    :ivar integrity_check_algorithm: Specifies the algorithm used to compute the
-                 integrityCheck value.
-    :ivar code: The plain code symbol defined by the code system.
-                             For example, "784.0" is the code symbol of the ICD-9
-                             code "784.0" for headache.
-    :ivar code_system: Specifies the code system that defines the code.
-    :ivar code_system_name: A common name of the coding system.
-    :ivar code_system_version: If applicable, a version descriptor defined
-                             specifically for the given code system.
-    :ivar display_name: A name or title for the code, under which the sending
-                             system shows the code value to its users.
-    """
-    class Meta:
-        name = "SC_explicit"
-
-    content: Optional[object] = field(
-        default=None,
-        metadata=dict(
-            type="Wildcard",
-            namespace="##any"
-        )
-    )
-    reference: Optional[TelExplicit] = field(
-        default=None,
-        metadata=dict(
-            type="Element",
-            namespace="urn:hl7-org:v3"
-        )
-    )
-    thumbnail: Optional[ThumbnailExplicit] = field(
-        default=None,
-        metadata=dict(
-            type="Element",
-            namespace="urn:hl7-org:v3"
-        )
-    )
-    null_flavor: Optional[NullFlavor] = field(
-        default=None,
-        metadata=dict(
-            name="nullFlavor",
-            type="Attribute"
-        )
-    )
-    representation: BinaryDataEncoding = field(
-        default=BinaryDataEncoding.TXT,
-        metadata=dict(
-            type="Attribute"
-        )
-    )
-    media_type: str = field(
-        default="text/plain",
-        metadata=dict(
-            name="mediaType",
-            type="Attribute",
-            pattern=r"[^\s]+"
-        )
-    )
-    language: Optional[str] = field(
-        default=None,
-        metadata=dict(
-            type="Attribute",
-            pattern=r"[^\s]+"
-        )
-    )
-    compression: Optional[CompressionAlgorithm] = field(
-        default=None,
-        metadata=dict(
-            type="Attribute"
-        )
-    )
-    integrity_check: Optional[str] = field(
-        default=None,
-        metadata=dict(
-            name="integrityCheck",
-            type="Attribute"
-        )
-    )
-    integrity_check_algorithm: IntegrityCheckAlgorithm = field(
-        default=IntegrityCheckAlgorithm.SHA_1,
-        metadata=dict(
-            name="integrityCheckAlgorithm",
-            type="Attribute"
-        )
-    )
-    code: Optional[str] = field(
-        default=None,
-        metadata=dict(
-            type="Attribute",
-            pattern=r"[^\s]+"
-        )
-    )
-    code_system: Optional[str] = field(
-        default=None,
-        metadata=dict(
-            name="codeSystem",
-            type="Attribute",
-            pattern=r"[0-2](\.(0|[1-9][0-9]*))*"
-        )
-    )
-    code_system_name: Optional[str] = field(
-        default=None,
-        metadata=dict(
-            name="codeSystemName",
-            type="Attribute",
-            min_length=1.0
-        )
-    )
-    code_system_version: Optional[str] = field(
-        default=None,
-        metadata=dict(
-            name="codeSystemVersion",
-            type="Attribute",
-            min_length=1.0
-        )
-    )
-    display_name: Optional[str] = field(
-        default=None,
-        metadata=dict(
-            name="displayName",
-            type="Attribute",
-            min_length=1.0
-        )
-    )
-
-
-@dataclass
-class StExplicit:
-    """The character string data type stands for text data, primarily intended for
-    machine processing (e.g., sorting, querying, indexing, etc.) Used for names,
-    symbols, and formal expressions.
-
-    :ivar content:
-    :ivar reference: A telecommunication address (TEL), such as a URL
-                    for HTTP or FTP, which will resolve to precisely
-                    the same binary data that could as well have been
-                    provided as inline data.
-    :ivar thumbnail:
-    :ivar representation: Specifies the representation of the binary data that
-                 is the content of the binary data value.
-    :ivar media_type: Identifies the type of the encapsulated data and
-                 identifies a method to interpret or render the data.
-    :ivar language: For character based information the language property
-                 specifies the human language of the text.
-    :ivar compression: Indicates whether the raw byte data is compressed,
-                 and what compression algorithm was used.
-    :ivar integrity_check: The integrity check is a short binary value representing
-                 a cryptographically strong checksum that is calculated
-                 over the binary data. The purpose of this property, when
-                 communicated with a reference is for anyone to validate
-                 later whether the reference still resolved to the same
-                 data that the reference resolved to when the encapsulated
-                 data value with reference was created.
-    :ivar integrity_check_algorithm: Specifies the algorithm used to compute the
-                 integrityCheck value.
-    """
-    class Meta:
-        name = "ST_explicit"
-
-    content: Optional[object] = field(
-        default=None,
-        metadata=dict(
-            type="Wildcard",
-            namespace="##any"
-        )
-    )
-    reference: Optional[TelExplicit] = field(
-        default=None,
-        metadata=dict(
-            type="Element",
-            namespace="urn:hl7-org:v3"
-        )
-    )
-    thumbnail: Optional[ThumbnailExplicit] = field(
-        default=None,
-        metadata=dict(
-            type="Element",
-            namespace="urn:hl7-org:v3"
-        )
-    )
-    representation: BinaryDataEncoding = field(
-        default=BinaryDataEncoding.TXT,
-        metadata=dict(
-            type="Attribute"
-        )
-    )
-    media_type: str = field(
-        default="text/plain",
-        metadata=dict(
-            name="mediaType",
-            type="Attribute",
-            pattern=r"[^\s]+"
-        )
-    )
-    language: Optional[str] = field(
-        default=None,
-        metadata=dict(
-            type="Attribute",
-            pattern=r"[^\s]+"
-        )
-    )
-    compression: Optional[CompressionAlgorithm] = field(
-        default=None,
-        metadata=dict(
-            type="Attribute"
-        )
-    )
-    integrity_check: Optional[str] = field(
-        default=None,
-        metadata=dict(
-            name="integrityCheck",
-            type="Attribute"
-        )
-    )
-    integrity_check_algorithm: IntegrityCheckAlgorithm = field(
-        default=IntegrityCheckAlgorithm.SHA_1,
-        metadata=dict(
-            name="integrityCheckAlgorithm",
-            type="Attribute"
-        )
-    )
-
-
-@dataclass
-class Thumbnail:
-    """A thumbnail is an abbreviated rendition of the full data. A thumbnail
-    requires significantly fewer resources than the full data, while still
-    maintaining some distinctive similarity with the full data. A thumbnail is
-    typically used with by-reference encapsulated data. It allows a user to select
-    data more efficiently before actually downloading through the reference.
-
-    :ivar content:
-    :ivar null_flavor: An exceptional value expressing missing information
-                   and possibly the reason why the information is missing.
-    :ivar representation: Specifies the representation of the binary data that
-                         is the content of the binary data value.
-    :ivar reference:
-    :ivar thumbnail:
-    :ivar media_type: Identifies the type of the encapsulated data and
-                         identifies a method to interpret or render the data.
-    :ivar language: For character based information the language property
-                         specifies the human language of the text.
-    :ivar compression: Indicates whether the raw byte data is compressed,
-                         and what compression algorithm was used.
-    :ivar integrity_check: The integrity check is a short binary value representing
-                         a cryptographically strong checksum that is calculated
-                         over the binary data. The purpose of this property, when
-                         communicated with a reference is for anyone to validate
-                         later whether the reference still resolved to the same
-                         data that the reference resolved to when the encapsulated
-                         data value with reference was created.
-    :ivar integrity_check_algorithm: Specifies the algorithm used to compute the
-                         integrityCheck value.
-    """
-    class Meta:
-        name = "thumbnail"
-
-    content: Optional[object] = field(
-        default=None,
-        metadata=dict(
-            type="Wildcard",
-            namespace="##any"
-        )
-    )
-    null_flavor: Optional[NullFlavor] = field(
-        default=None,
-        metadata=dict(
-            name="nullFlavor",
-            type="Attribute"
-        )
-    )
-    representation: BinaryDataEncoding = field(
-        default=BinaryDataEncoding.TXT,
-        metadata=dict(
-            type="Attribute"
-        )
-    )
-    reference: Optional[Tel] = field(
-        default=None,
-        metadata=dict(
-            type="Element",
-            namespace="urn:hl7-org:v3"
-        )
-    )
-    thumbnail: Optional["Thumbnail"] = field(
-        default=None,
-        metadata=dict(
-            type="Element",
-            namespace="urn:hl7-org:v3"
-        )
-    )
-    media_type: str = field(
-        default="text/plain",
-        metadata=dict(
-            name="mediaType",
-            type="Attribute",
-            pattern=r"[^\s]+"
-        )
-    )
-    language: Optional[str] = field(
-        default=None,
-        metadata=dict(
-            type="Attribute",
-            pattern=r"[^\s]+"
-        )
-    )
-    compression: Optional[CompressionAlgorithm] = field(
-        default=None,
-        metadata=dict(
-            type="Attribute"
-        )
-    )
-    integrity_check: Optional[str] = field(
-        default=None,
-        metadata=dict(
-            name="integrityCheck",
-            type="Attribute"
-        )
-    )
-    integrity_check_algorithm: IntegrityCheckAlgorithm = field(
-        default=IntegrityCheckAlgorithm.SHA_1,
-        metadata=dict(
-            name="integrityCheckAlgorithm",
-            type="Attribute"
-        )
-    )
-
-
-@dataclass
-class Ed:
-    """Data that is primarily intended for human interpretation or for further
-    machine processing is outside the scope of HL7. This includes unformatted or
-    formatted written language, multimedia data, or structured information as
-    defined by a different standard (e.g., XML-signatures.)  Instead of the data
-    itself, an ED may contain only a reference (see TEL.) Note that the ST data
-    type is a specialization of when the  is text/plain.
-
-    :ivar content:
-    :ivar null_flavor: An exceptional value expressing missing information
-                   and possibly the reason why the information is missing.
-    :ivar representation: Specifies the representation of the binary data that
-                         is the content of the binary data value.
-    :ivar reference: A telecommunication address (TEL), such as a URL
-                            for HTTP or FTP, which will resolve to precisely
-                            the same binary data that could as well have been
-                            provided as inline data.
-    :ivar thumbnail:
-    :ivar media_type: Identifies the type of the encapsulated data and
-                         identifies a method to interpret or render the data.
-    :ivar language: For character based information the language property
-                         specifies the human language of the text.
-    :ivar compression: Indicates whether the raw byte data is compressed,
-                         and what compression algorithm was used.
-    :ivar integrity_check: The integrity check is a short binary value representing
-                         a cryptographically strong checksum that is calculated
-                         over the binary data. The purpose of this property, when
-                         communicated with a reference is for anyone to validate
-                         later whether the reference still resolved to the same
-                         data that the reference resolved to when the encapsulated
-                         data value with reference was created.
-    :ivar integrity_check_algorithm: Specifies the algorithm used to compute the
-                         integrityCheck value.
-    """
-    class Meta:
-        name = "ED"
-
-    content: Optional[object] = field(
-        default=None,
-        metadata=dict(
-            type="Wildcard",
-            namespace="##any"
-        )
-    )
-    null_flavor: Optional[NullFlavor] = field(
-        default=None,
-        metadata=dict(
-            name="nullFlavor",
-            type="Attribute"
-        )
-    )
-    representation: BinaryDataEncoding = field(
-        default=BinaryDataEncoding.TXT,
-        metadata=dict(
-            type="Attribute"
-        )
-    )
-    reference: Optional[Tel] = field(
-        default=None,
-        metadata=dict(
-            type="Element",
-            namespace="urn:hl7-org:v3"
-        )
-    )
-    thumbnail: Optional[Thumbnail] = field(
-        default=None,
-        metadata=dict(
-            type="Element",
-            namespace="urn:hl7-org:v3"
-        )
-    )
-    media_type: str = field(
-        default="text/plain",
-        metadata=dict(
-            name="mediaType",
-            type="Attribute",
-            pattern=r"[^\s]+"
-        )
-    )
-    language: Optional[str] = field(
-        default=None,
-        metadata=dict(
-            type="Attribute",
-            pattern=r"[^\s]+"
-        )
-    )
-    compression: Optional[CompressionAlgorithm] = field(
-        default=None,
-        metadata=dict(
-            type="Attribute"
-        )
-    )
-    integrity_check: Optional[str] = field(
-        default=None,
-        metadata=dict(
-            name="integrityCheck",
-            type="Attribute"
-        )
-    )
-    integrity_check_algorithm: IntegrityCheckAlgorithm = field(
-        default=IntegrityCheckAlgorithm.SHA_1,
-        metadata=dict(
-            name="integrityCheckAlgorithm",
-            type="Attribute"
-        )
-    )
-
-
-@dataclass
 class PqrExplicit:
     """A representation of a physical quantity in a unit from any code system. Used
     to show alternative representation for a physical quantity.
@@ -4012,126 +3710,42 @@ class PqrExplicit:
 
 
 @dataclass
-class Cd:
-    """A concept descriptor represents any kind of concept usually by giving a code
-    defined in a code system.  A concept descriptor can contain the original text
-    or phrase that served as the basis of the coding and one or more translations
-    into different coding systems. A concept descriptor can also contain qualifiers
-    to describe, e.g., the concept of a "left foot" as a postcoordinated term built
-    from the primary code "FOOT" and the qualifier "LEFT". In exceptional cases,
-    the concept descriptor need not contain a code but only the original text
-    describing that concept.
+class Tel(Url):
+    """A telephone number (voice or fax), e-mail address, or other locator for a
+    resource (information or service) mediated by telecommunication equipment. The
+    address is specified as a URL qualified by time specification and use codes
+    that help in deciding which address to use for a given time and purpose.
 
-    :ivar null_flavor: An exceptional value expressing missing information
-                   and possibly the reason why the information is missing.
-    :ivar original_text: The text or phrase used as the basis for the coding.
-    :ivar qualifier: Specifies additional codes that increase the
-                            specificity of the primary code.
-    :ivar translation: A set of other concept descriptors that translate
-                            this concept descriptor into other code systems.
-    :ivar code: The plain code symbol defined by the code system.
-                         For example, "784.0" is the code symbol of the ICD-9
-                         code "784.0" for headache.
-    :ivar code_system: Specifies the code system that defines the code.
-    :ivar code_system_name: A common name of the coding system.
-    :ivar code_system_version: If applicable, a version descriptor defined
-                         specifically for the given code system.
-    :ivar display_name: A name or title for the code, under which the sending
-                         system shows the code value to its users.
-    :ivar value_set:
-    :ivar value_set_version:
+    :ivar useable_period: Specifies the periods of time during which the
+                         telecommunication address can be used.  For a
+                         telephone number, this can indicate the time of day
+                         in which the party can be reached on that telephone.
+                         For a web address, it may specify a time range in
+                         which the web content is promised to be available
+                         under the given address.
+    :ivar use: One or more codes advising a system or user which
+                         telecommunication address in a set of like addresses
+                         to select for a given telecommunication need.
     """
     class Meta:
-        name = "CD"
+        name = "TEL"
 
-    null_flavor: Optional[NullFlavor] = field(
-        default=None,
-        metadata=dict(
-            name="nullFlavor",
-            type="Attribute"
-        )
-    )
-    original_text: Optional[Ed] = field(
-        default=None,
-        metadata=dict(
-            name="originalText",
-            type="Element",
-            namespace="urn:hl7-org:v3"
-        )
-    )
-    qualifier: List[Cr] = field(
+    useable_period: List[SxcmTs] = field(
         default_factory=list,
         metadata=dict(
+            name="useablePeriod",
             type="Element",
             namespace="urn:hl7-org:v3",
             min_occurs=0,
             max_occurs=9223372036854775807
         )
     )
-    translation: List["Cd"] = field(
+    use: List[TelecommunicationAddressUse] = field(
         default_factory=list,
         metadata=dict(
-            type="Element",
-            namespace="urn:hl7-org:v3",
+            type="Attribute",
             min_occurs=0,
             max_occurs=9223372036854775807
-        )
-    )
-    code: Optional[str] = field(
-        default=None,
-        metadata=dict(
-            type="Attribute",
-            pattern=r"[^\s]+"
-        )
-    )
-    code_system: Optional[str] = field(
-        default=None,
-        metadata=dict(
-            name="codeSystem",
-            type="Attribute",
-            pattern=r"[0-2](\.(0|[1-9][0-9]*))*"
-        )
-    )
-    code_system_name: Optional[str] = field(
-        default=None,
-        metadata=dict(
-            name="codeSystemName",
-            type="Attribute",
-            min_length=1.0
-        )
-    )
-    code_system_version: Optional[str] = field(
-        default=None,
-        metadata=dict(
-            name="codeSystemVersion",
-            type="Attribute",
-            min_length=1.0
-        )
-    )
-    display_name: Optional[str] = field(
-        default=None,
-        metadata=dict(
-            name="displayName",
-            type="Attribute",
-            min_length=1.0
-        )
-    )
-    value_set: Optional[str] = field(
-        default=None,
-        metadata=dict(
-            name="valueSet",
-            type="Attribute",
-            namespace="urn:hl7-org:sdtc",
-            pattern=r"[0-2](\.(0|[1-9][0-9]*))*"
-        )
-    )
-    value_set_version: Optional[str] = field(
-        default=None,
-        metadata=dict(
-            name="valueSetVersion",
-            type="Attribute",
-            namespace="urn:hl7-org:sdtc",
-            min_length=1.0
         )
     )
 
@@ -4186,19 +3800,20 @@ class PqExplicit:
 
 
 @dataclass
-class St:
-    """The character string data type stands for text data, primarily intended for
-    machine processing (e.g., sorting, querying, indexing, etc.) Used for names,
-    symbols, and formal expressions.
+class Thumbnail:
+    """A thumbnail is an abbreviated rendition of the full data. A thumbnail
+    requires significantly fewer resources than the full data, while still
+    maintaining some distinctive similarity with the full data. A thumbnail is
+    typically used with by-reference encapsulated data. It allows a user to select
+    data more efficiently before actually downloading through the reference.
 
     :ivar content:
-    :ivar null_flavor: An exceptional value expressing missing information
-                   and possibly the reason why the information is missing.
     :ivar reference:
     :ivar thumbnail:
-    :ivar representation:
-    :ivar media_type:
-    :ivar language:
+    :ivar media_type: Identifies the type of the encapsulated data and
+                         identifies a method to interpret or render the data.
+    :ivar language: For character based information the language property
+                         specifies the human language of the text.
     :ivar compression: Indicates whether the raw byte data is compressed,
                          and what compression algorithm was used.
     :ivar integrity_check: The integrity check is a short binary value representing
@@ -4212,20 +3827,13 @@ class St:
                          integrityCheck value.
     """
     class Meta:
-        name = "ST"
+        name = "thumbnail"
 
     content: Optional[object] = field(
         default=None,
         metadata=dict(
             type="Wildcard",
             namespace="##any"
-        )
-    )
-    null_flavor: Optional[NullFlavor] = field(
-        default=None,
-        metadata=dict(
-            name="nullFlavor",
-            type="Attribute"
         )
     )
     reference: Optional[Tel] = field(
@@ -4235,22 +3843,14 @@ class St:
             namespace="urn:hl7-org:v3"
         )
     )
-    thumbnail: Optional[Ed] = field(
+    thumbnail: Optional["Thumbnail"] = field(
         default=None,
         metadata=dict(
             type="Element",
             namespace="urn:hl7-org:v3"
         )
     )
-    representation: BinaryDataEncoding = field(
-        init=False,
-        default=BinaryDataEncoding.TXT,
-        metadata=dict(
-            type="Attribute"
-        )
-    )
     media_type: str = field(
-        init=False,
         default="text/plain",
         metadata=dict(
             name="mediaType",
@@ -4288,22 +3888,38 @@ class St:
 
 
 @dataclass
-class Adxp(St):
-    """A character string that may have a type-tag signifying its role in the
-    address. Typical parts that exist in about every address are street, house
-    number, or post box, postal code, city, country but other roles may be defined
-    regionally, nationally, or on an enterprise level (e.g. in military addresses).
-    Addresses are usually broken up into lines, which are indicated by special
-    line-breaking delimiter elements (e.g., DEL).
+class Ed(Bin):
+    """Data that is primarily intended for human interpretation or for further
+    machine processing is outside the scope of HL7. This includes unformatted or
+    formatted written language, multimedia data, or structured information as
+    defined by a different standard (e.g., XML-signatures.)  Instead of the data
+    itself, an ED may contain only a reference (see TEL.) Note that the ST data
+    type is a specialization of when the  is text/plain.
 
     :ivar content:
-    :ivar part_type: Specifies whether an address part names the street,
-                         city, country, postal code, post box, etc. If the type
-                         is NULL the address part is unclassified and would
-                         simply appear on an address label as is.
+    :ivar reference: A telecommunication address (TEL), such as a URL
+                            for HTTP or FTP, which will resolve to precisely
+                            the same binary data that could as well have been
+                            provided as inline data.
+    :ivar thumbnail:
+    :ivar media_type: Identifies the type of the encapsulated data and
+                         identifies a method to interpret or render the data.
+    :ivar language: For character based information the language property
+                         specifies the human language of the text.
+    :ivar compression: Indicates whether the raw byte data is compressed,
+                         and what compression algorithm was used.
+    :ivar integrity_check: The integrity check is a short binary value representing
+                         a cryptographically strong checksum that is calculated
+                         over the binary data. The purpose of this property, when
+                         communicated with a reference is for anyone to validate
+                         later whether the reference still resolved to the same
+                         data that the reference resolved to when the encapsulated
+                         data value with reference was created.
+    :ivar integrity_check_algorithm: Specifies the algorithm used to compute the
+                         integrityCheck value.
     """
     class Meta:
-        name = "ADXP"
+        name = "ED"
 
     content: Optional[object] = field(
         default=None,
@@ -4312,754 +3928,53 @@ class Adxp(St):
             namespace="##any"
         )
     )
-    part_type: Optional[AddressPartType] = field(
+    reference: Optional[Tel] = field(
         default=None,
         metadata=dict(
-            name="partType",
-            type="Attribute"
-        )
-    )
-
-
-@dataclass
-class CdExplicit:
-    """A concept descriptor represents any kind of concept usually by giving a code
-    defined in a code system.  A concept descriptor can contain the original text
-    or phrase that served as the basis of the coding and one or more translations
-    into different coding systems. A concept descriptor can also contain qualifiers
-    to describe, e.g., the concept of a "left foot" as a postcoordinated term built
-    from the primary code "FOOT" and the qualifier "LEFT". In exceptional cases,
-    the concept descriptor need not contain a code but only the original text
-    describing that concept.
-
-    :ivar null_flavor: An exceptional value expressing missing information
-                   and possibly the reason why the information is missing.
-    :ivar original_text: The text or phrase used as the basis for the coding.
-    :ivar qualifier: Specifies additional codes that increase the
-                            specificity of the primary code.
-    :ivar translation: A set of other concept descriptors that translate
-                            this concept descriptor into other code systems.
-    :ivar code: The plain code symbol defined by the code system.
-                         For example, "784.0" is the code symbol of the ICD-9
-                         code "784.0" for headache.
-    :ivar code_system: Specifies the code system that defines the code.
-    :ivar code_system_name: A common name of the coding system.
-    :ivar code_system_version: If applicable, a version descriptor defined
-                         specifically for the given code system.
-    :ivar display_name: A name or title for the code, under which the sending
-                         system shows the code value to its users.
-    :ivar value_set:
-    :ivar value_set_version:
-    """
-    class Meta:
-        name = "CD_explicit"
-
-    null_flavor: Optional[NullFlavor] = field(
-        default=None,
-        metadata=dict(
-            name="nullFlavor",
-            type="Attribute"
-        )
-    )
-    original_text: Optional[EdExplicit] = field(
-        default=None,
-        metadata=dict(
-            name="originalText",
             type="Element",
             namespace="urn:hl7-org:v3"
         )
     )
-    qualifier: List[Cr] = field(
-        default_factory=list,
+    thumbnail: Optional[Thumbnail] = field(
+        default=None,
         metadata=dict(
             type="Element",
-            namespace="urn:hl7-org:v3",
-            min_occurs=0,
-            max_occurs=9223372036854775807
+            namespace="urn:hl7-org:v3"
         )
     )
-    translation: List[Cd] = field(
-        default_factory=list,
+    media_type: str = field(
+        default="text/plain",
         metadata=dict(
-            type="Element",
-            namespace="urn:hl7-org:v3",
-            min_occurs=0,
-            max_occurs=9223372036854775807
+            name="mediaType",
+            type="Attribute",
+            pattern=r"[^\s]+"
         )
     )
-    code: Optional[str] = field(
+    language: Optional[str] = field(
         default=None,
         metadata=dict(
             type="Attribute",
             pattern=r"[^\s]+"
         )
     )
-    code_system: Optional[str] = field(
-        default=None,
-        metadata=dict(
-            name="codeSystem",
-            type="Attribute",
-            pattern=r"[0-2](\.(0|[1-9][0-9]*))*"
-        )
-    )
-    code_system_name: Optional[str] = field(
-        default=None,
-        metadata=dict(
-            name="codeSystemName",
-            type="Attribute",
-            min_length=1.0
-        )
-    )
-    code_system_version: Optional[str] = field(
-        default=None,
-        metadata=dict(
-            name="codeSystemVersion",
-            type="Attribute",
-            min_length=1.0
-        )
-    )
-    display_name: Optional[str] = field(
-        default=None,
-        metadata=dict(
-            name="displayName",
-            type="Attribute",
-            min_length=1.0
-        )
-    )
-    value_set: Optional[str] = field(
-        default=None,
-        metadata=dict(
-            name="valueSet",
-            type="Attribute",
-            namespace="urn:hl7-org:sdtc",
-            pattern=r"[0-2](\.(0|[1-9][0-9]*))*"
-        )
-    )
-    value_set_version: Optional[str] = field(
-        default=None,
-        metadata=dict(
-            name="valueSetVersion",
-            type="Attribute",
-            namespace="urn:hl7-org:sdtc",
-            min_length=1.0
-        )
-    )
-
-
-@dataclass
-class Ce:
-    """Coded data, consists of a coded value (CV) and, optionally, coded value(s)
-    from other coding systems that identify the same concept. Used when alternative
-    codes may exist.
-
-    :ivar null_flavor: An exceptional value expressing missing information
-                   and possibly the reason why the information is missing.
-    :ivar original_text: The text or phrase used as the basis for the coding.
-    :ivar qualifier:
-    :ivar translation: A set of other concept descriptors that translate
-                            this concept descriptor into other code systems.
-    :ivar code: The plain code symbol defined by the code system.
-                         For example, "784.0" is the code symbol of the ICD-9
-                         code "784.0" for headache.
-    :ivar code_system: Specifies the code system that defines the code.
-    :ivar code_system_name: A common name of the coding system.
-    :ivar code_system_version: If applicable, a version descriptor defined
-                         specifically for the given code system.
-    :ivar display_name: A name or title for the code, under which the sending
-                         system shows the code value to its users.
-    :ivar value_set:
-    :ivar value_set_version:
-    """
-    class Meta:
-        name = "CE"
-
-    null_flavor: Optional[NullFlavor] = field(
-        default=None,
-        metadata=dict(
-            name="nullFlavor",
-            type="Attribute"
-        )
-    )
-    original_text: Optional[Ed] = field(
-        default=None,
-        metadata=dict(
-            name="originalText",
-            type="Element",
-            namespace="urn:hl7-org:v3"
-        )
-    )
-    qualifier: Optional[Cr] = field(
-        default=None,
-        metadata=dict(
-            type="Element",
-            namespace="urn:hl7-org:v3"
-        )
-    )
-    translation: List[Cd] = field(
-        default_factory=list,
-        metadata=dict(
-            type="Element",
-            namespace="urn:hl7-org:v3",
-            min_occurs=0,
-            max_occurs=9223372036854775807
-        )
-    )
-    code: Optional[str] = field(
-        default=None,
-        metadata=dict(
-            type="Attribute",
-            pattern=r"[^\s]+"
-        )
-    )
-    code_system: Optional[str] = field(
-        default=None,
-        metadata=dict(
-            name="codeSystem",
-            type="Attribute",
-            pattern=r"[0-2](\.(0|[1-9][0-9]*))*"
-        )
-    )
-    code_system_name: Optional[str] = field(
-        default=None,
-        metadata=dict(
-            name="codeSystemName",
-            type="Attribute",
-            min_length=1.0
-        )
-    )
-    code_system_version: Optional[str] = field(
-        default=None,
-        metadata=dict(
-            name="codeSystemVersion",
-            type="Attribute",
-            min_length=1.0
-        )
-    )
-    display_name: Optional[str] = field(
-        default=None,
-        metadata=dict(
-            name="displayName",
-            type="Attribute",
-            min_length=1.0
-        )
-    )
-    value_set: Optional[str] = field(
-        default=None,
-        metadata=dict(
-            name="valueSet",
-            type="Attribute",
-            namespace="urn:hl7-org:sdtc",
-            pattern=r"[0-2](\.(0|[1-9][0-9]*))*"
-        )
-    )
-    value_set_version: Optional[str] = field(
-        default=None,
-        metadata=dict(
-            name="valueSetVersion",
-            type="Attribute",
-            namespace="urn:hl7-org:sdtc",
-            min_length=1.0
-        )
-    )
-
-
-@dataclass
-class CeExplicit:
-    """Coded data, consists of a coded value (CV) and, optionally, coded value(s)
-    from other coding systems that identify the same concept. Used when alternative
-    codes may exist.
-
-    :ivar null_flavor: An exceptional value expressing missing information
-                   and possibly the reason why the information is missing.
-    :ivar original_text: The text or phrase used as the basis for the coding.
-    :ivar qualifier:
-    :ivar translation: A set of other concept descriptors that translate
-                            this concept descriptor into other code systems.
-    :ivar code: The plain code symbol defined by the code system.
-                         For example, "784.0" is the code symbol of the ICD-9
-                         code "784.0" for headache.
-    :ivar code_system: Specifies the code system that defines the code.
-    :ivar code_system_name: A common name of the coding system.
-    :ivar code_system_version: If applicable, a version descriptor defined
-                         specifically for the given code system.
-    :ivar display_name: A name or title for the code, under which the sending
-                         system shows the code value to its users.
-    :ivar value_set:
-    :ivar value_set_version:
-    """
-    class Meta:
-        name = "CE_explicit"
-
-    null_flavor: Optional[NullFlavor] = field(
-        default=None,
-        metadata=dict(
-            name="nullFlavor",
-            type="Attribute"
-        )
-    )
-    original_text: Optional[EdExplicit] = field(
-        default=None,
-        metadata=dict(
-            name="originalText",
-            type="Element",
-            namespace="urn:hl7-org:v3"
-        )
-    )
-    qualifier: Optional[Cr] = field(
-        default=None,
-        metadata=dict(
-            type="Element",
-            namespace="urn:hl7-org:v3"
-        )
-    )
-    translation: List[Cd] = field(
-        default_factory=list,
-        metadata=dict(
-            type="Element",
-            namespace="urn:hl7-org:v3",
-            min_occurs=0,
-            max_occurs=9223372036854775807
-        )
-    )
-    code: Optional[str] = field(
-        default=None,
-        metadata=dict(
-            type="Attribute",
-            pattern=r"[^\s]+"
-        )
-    )
-    code_system: Optional[str] = field(
-        default=None,
-        metadata=dict(
-            name="codeSystem",
-            type="Attribute",
-            pattern=r"[0-2](\.(0|[1-9][0-9]*))*"
-        )
-    )
-    code_system_name: Optional[str] = field(
-        default=None,
-        metadata=dict(
-            name="codeSystemName",
-            type="Attribute",
-            min_length=1.0
-        )
-    )
-    code_system_version: Optional[str] = field(
-        default=None,
-        metadata=dict(
-            name="codeSystemVersion",
-            type="Attribute",
-            min_length=1.0
-        )
-    )
-    display_name: Optional[str] = field(
-        default=None,
-        metadata=dict(
-            name="displayName",
-            type="Attribute",
-            min_length=1.0
-        )
-    )
-    value_set: Optional[str] = field(
-        default=None,
-        metadata=dict(
-            name="valueSet",
-            type="Attribute",
-            namespace="urn:hl7-org:sdtc",
-            pattern=r"[0-2](\.(0|[1-9][0-9]*))*"
-        )
-    )
-    value_set_version: Optional[str] = field(
-        default=None,
-        metadata=dict(
-            name="valueSetVersion",
-            type="Attribute",
-            namespace="urn:hl7-org:sdtc",
-            min_length=1.0
-        )
-    )
-
-
-@dataclass
-class Cs:
-    """Coded data, consists of a code, display name, code system, and original
-    text. Used when a single code value must be sent.
-
-    :ivar null_flavor: An exceptional value expressing missing information
-                   and possibly the reason why the information is missing.
-    :ivar original_text: The text or phrase used as the basis for the coding.
-    :ivar qualifier:
-    :ivar translation:
-    :ivar code: The plain code symbol defined by the code system.
-                         For example, "784.0" is the code symbol of the ICD-9
-                         code "784.0" for headache.
-    :ivar code_system: Specifies the code system that defines the code.
-    :ivar code_system_name: A common name of the coding system.
-    :ivar code_system_version: If applicable, a version descriptor defined
-                         specifically for the given code system.
-    :ivar display_name: A name or title for the code, under which the sending
-                         system shows the code value to its users.
-    :ivar value_set:
-    :ivar value_set_version:
-    """
-    class Meta:
-        name = "CS"
-
-    null_flavor: Optional[NullFlavor] = field(
-        default=None,
-        metadata=dict(
-            name="nullFlavor",
-            type="Attribute"
-        )
-    )
-    original_text: Optional[Ed] = field(
-        default=None,
-        metadata=dict(
-            name="originalText",
-            type="Element",
-            namespace="urn:hl7-org:v3"
-        )
-    )
-    qualifier: Optional[Cr] = field(
-        default=None,
-        metadata=dict(
-            type="Element",
-            namespace="urn:hl7-org:v3"
-        )
-    )
-    translation: Optional[Cd] = field(
-        default=None,
-        metadata=dict(
-            type="Element",
-            namespace="urn:hl7-org:v3"
-        )
-    )
-    code: Optional[str] = field(
-        default=None,
-        metadata=dict(
-            type="Attribute",
-            pattern=r"[^\s]+"
-        )
-    )
-    code_system: Optional[str] = field(
-        default=None,
-        metadata=dict(
-            name="codeSystem",
-            type="Attribute",
-            pattern=r"[0-2](\.(0|[1-9][0-9]*))*"
-        )
-    )
-    code_system_name: Optional[str] = field(
-        default=None,
-        metadata=dict(
-            name="codeSystemName",
-            type="Attribute",
-            min_length=1.0
-        )
-    )
-    code_system_version: Optional[str] = field(
-        default=None,
-        metadata=dict(
-            name="codeSystemVersion",
-            type="Attribute",
-            min_length=1.0
-        )
-    )
-    display_name: Optional[str] = field(
-        default=None,
-        metadata=dict(
-            name="displayName",
-            type="Attribute",
-            min_length=1.0
-        )
-    )
-    value_set: Optional[str] = field(
-        default=None,
-        metadata=dict(
-            name="valueSet",
-            type="Attribute",
-            namespace="urn:hl7-org:sdtc",
-            pattern=r"[0-2](\.(0|[1-9][0-9]*))*"
-        )
-    )
-    value_set_version: Optional[str] = field(
-        default=None,
-        metadata=dict(
-            name="valueSetVersion",
-            type="Attribute",
-            namespace="urn:hl7-org:sdtc",
-            min_length=1.0
-        )
-    )
-
-
-@dataclass
-class Cv:
-    """Coded data, consists of a code, display name, code system, and original
-    text. Used when a single code value must be sent.
-
-    :ivar null_flavor: An exceptional value expressing missing information
-                   and possibly the reason why the information is missing.
-    :ivar original_text: The text or phrase used as the basis for the coding.
-    :ivar qualifier:
-    :ivar translation:
-    :ivar code: The plain code symbol defined by the code system.
-                         For example, "784.0" is the code symbol of the ICD-9
-                         code "784.0" for headache.
-    :ivar code_system: Specifies the code system that defines the code.
-    :ivar code_system_name: A common name of the coding system.
-    :ivar code_system_version: If applicable, a version descriptor defined
-                         specifically for the given code system.
-    :ivar display_name: A name or title for the code, under which the sending
-                         system shows the code value to its users.
-    :ivar value_set:
-    :ivar value_set_version:
-    """
-    class Meta:
-        name = "CV"
-
-    null_flavor: Optional[NullFlavor] = field(
-        default=None,
-        metadata=dict(
-            name="nullFlavor",
-            type="Attribute"
-        )
-    )
-    original_text: Optional[Ed] = field(
-        default=None,
-        metadata=dict(
-            name="originalText",
-            type="Element",
-            namespace="urn:hl7-org:v3"
-        )
-    )
-    qualifier: Optional[Cr] = field(
-        default=None,
-        metadata=dict(
-            type="Element",
-            namespace="urn:hl7-org:v3"
-        )
-    )
-    translation: Optional[Cd] = field(
-        default=None,
-        metadata=dict(
-            type="Element",
-            namespace="urn:hl7-org:v3"
-        )
-    )
-    code: Optional[str] = field(
-        default=None,
-        metadata=dict(
-            type="Attribute",
-            pattern=r"[^\s]+"
-        )
-    )
-    code_system: Optional[str] = field(
-        default=None,
-        metadata=dict(
-            name="codeSystem",
-            type="Attribute",
-            pattern=r"[0-2](\.(0|[1-9][0-9]*))*"
-        )
-    )
-    code_system_name: Optional[str] = field(
-        default=None,
-        metadata=dict(
-            name="codeSystemName",
-            type="Attribute",
-            min_length=1.0
-        )
-    )
-    code_system_version: Optional[str] = field(
-        default=None,
-        metadata=dict(
-            name="codeSystemVersion",
-            type="Attribute",
-            min_length=1.0
-        )
-    )
-    display_name: Optional[str] = field(
-        default=None,
-        metadata=dict(
-            name="displayName",
-            type="Attribute",
-            min_length=1.0
-        )
-    )
-    value_set: Optional[str] = field(
-        default=None,
-        metadata=dict(
-            name="valueSet",
-            type="Attribute",
-            namespace="urn:hl7-org:sdtc",
-            pattern=r"[0-2](\.(0|[1-9][0-9]*))*"
-        )
-    )
-    value_set_version: Optional[str] = field(
-        default=None,
-        metadata=dict(
-            name="valueSetVersion",
-            type="Attribute",
-            namespace="urn:hl7-org:sdtc",
-            min_length=1.0
-        )
-    )
-
-
-@dataclass
-class EivlEvent:
-    """A code for a common (periodical) activity of daily living based on which the
-    event related periodic interval is specified.
-
-    :ivar null_flavor: An exceptional value expressing missing information
-                   and possibly the reason why the information is missing.
-    :ivar original_text: The text or phrase used as the basis for the coding.
-    :ivar qualifier:
-    :ivar translation: A set of other concept descriptors that translate
-                            this concept descriptor into other code systems.
-    :ivar code:
-    :ivar code_system:
-    :ivar code_system_name:
-    :ivar code_system_version: If applicable, a version descriptor defined
-                         specifically for the given code system.
-    :ivar display_name: A name or title for the code, under which the sending
-                         system shows the code value to its users.
-    :ivar value_set:
-    :ivar value_set_version:
-    """
-    class Meta:
-        name = "EIVL.event"
-
-    null_flavor: Optional[NullFlavor] = field(
-        default=None,
-        metadata=dict(
-            name="nullFlavor",
-            type="Attribute"
-        )
-    )
-    original_text: Optional[Ed] = field(
-        default=None,
-        metadata=dict(
-            name="originalText",
-            type="Element",
-            namespace="urn:hl7-org:v3"
-        )
-    )
-    qualifier: Optional[Cr] = field(
-        default=None,
-        metadata=dict(
-            type="Element",
-            namespace="urn:hl7-org:v3"
-        )
-    )
-    translation: List[Cd] = field(
-        default_factory=list,
-        metadata=dict(
-            type="Element",
-            namespace="urn:hl7-org:v3",
-            min_occurs=0,
-            max_occurs=9223372036854775807
-        )
-    )
-    code: Optional[TimingEvent] = field(
+    compression: Optional[CompressionAlgorithm] = field(
         default=None,
         metadata=dict(
             type="Attribute"
         )
     )
-    code_system: str = field(
-        init=False,
-        default="2.16.840.1.113883.5.139",
-        metadata=dict(
-            name="codeSystem",
-            type="Attribute",
-            pattern=r"[0-2](\.(0|[1-9][0-9]*))*"
-        )
-    )
-    code_system_name: str = field(
-        init=False,
-        default="TimingEvent",
-        metadata=dict(
-            name="codeSystemName",
-            type="Attribute",
-            min_length=1.0
-        )
-    )
-    code_system_version: Optional[str] = field(
+    integrity_check: Optional[str] = field(
         default=None,
         metadata=dict(
-            name="codeSystemVersion",
-            type="Attribute",
-            min_length=1.0
-        )
-    )
-    display_name: Optional[str] = field(
-        default=None,
-        metadata=dict(
-            name="displayName",
-            type="Attribute",
-            min_length=1.0
-        )
-    )
-    value_set: Optional[str] = field(
-        default=None,
-        metadata=dict(
-            name="valueSet",
-            type="Attribute",
-            namespace="urn:hl7-org:sdtc",
-            pattern=r"[0-2](\.(0|[1-9][0-9]*))*"
-        )
-    )
-    value_set_version: Optional[str] = field(
-        default=None,
-        metadata=dict(
-            name="valueSetVersion",
-            type="Attribute",
-            namespace="urn:hl7-org:sdtc",
-            min_length=1.0
-        )
-    )
-
-
-@dataclass
-class Enxp(St):
-    """A character string token representing a part of a name. May have a type code
-    signifying the role of the part in the whole entity name, and a qualifier code
-    for more detail about the name part type. Typical name parts for person names
-    are given names, and family names, titles, etc.
-
-    :ivar content:
-    :ivar part_type: Indicates whether the name part is a given name, family
-                         name, prefix, suffix, etc.
-    :ivar qualifier: is a set of codes each of which specifies
-                         a certain subcategory of the name part in addition to
-                         the main name part type. For example, a given name may
-                         be flagged as a nickname, a family name may be a
-                         pseudonym or a name of public records.
-    """
-    class Meta:
-        name = "ENXP"
-
-    content: Optional[object] = field(
-        default=None,
-        metadata=dict(
-            type="Wildcard",
-            namespace="##any"
-        )
-    )
-    part_type: Optional[EntityNamePartType] = field(
-        default=None,
-        metadata=dict(
-            name="partType",
+            name="integrityCheck",
             type="Attribute"
         )
     )
-    qualifier: List[EntityNamePartQualifier] = field(
-        default_factory=list,
+    integrity_check_algorithm: IntegrityCheckAlgorithm = field(
+        default=IntegrityCheckAlgorithm.SHA_1,
         metadata=dict(
-            type="Attribute",
-            min_occurs=0,
-            max_occurs=9223372036854775807
+            name="integrityCheckAlgorithm",
+            type="Attribute"
         )
     )
 
@@ -5171,11 +4086,21 @@ class IvlTsExplicit:
 
 
 @dataclass
-class Sc(St):
-    """An ST that optionally may have a code attached. The text must always be
-    present if a code is present. The code is often a local code.
+class Cd(Any):
+    """A concept descriptor represents any kind of concept usually by giving a code
+    defined in a code system.  A concept descriptor can contain the original text
+    or phrase that served as the basis of the coding and one or more translations
+    into different coding systems. A concept descriptor can also contain qualifiers
+    to describe, e.g., the concept of a "left foot" as a postcoordinated term built
+    from the primary code "FOOT" and the qualifier "LEFT". In exceptional cases,
+    the concept descriptor need not contain a code but only the original text
+    describing that concept.
 
-    :ivar content:
+    :ivar original_text: The text or phrase used as the basis for the coding.
+    :ivar qualifier: Specifies additional codes that increase the
+                            specificity of the primary code.
+    :ivar translation: A set of other concept descriptors that translate
+                            this concept descriptor into other code systems.
     :ivar code: The plain code symbol defined by the code system.
                          For example, "784.0" is the code symbol of the ICD-9
                          code "784.0" for headache.
@@ -5185,15 +4110,36 @@ class Sc(St):
                          specifically for the given code system.
     :ivar display_name: A name or title for the code, under which the sending
                          system shows the code value to its users.
+    :ivar value_set:
+    :ivar value_set_version:
     """
     class Meta:
-        name = "SC"
+        name = "CD"
 
-    content: Optional[object] = field(
+    original_text: Optional[Ed] = field(
         default=None,
         metadata=dict(
-            type="Wildcard",
-            namespace="##any"
+            name="originalText",
+            type="Element",
+            namespace="urn:hl7-org:v3"
+        )
+    )
+    qualifier: List[Cr] = field(
+        default_factory=list,
+        metadata=dict(
+            type="Element",
+            namespace="urn:hl7-org:v3",
+            min_occurs=0,
+            max_occurs=9223372036854775807
+        )
+    )
+    translation: List["Cd"] = field(
+        default_factory=list,
+        metadata=dict(
+            type="Element",
+            namespace="urn:hl7-org:v3",
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )
     code: Optional[str] = field(
@@ -5235,18 +4181,24 @@ class Sc(St):
             min_length=1.0
         )
     )
-
-
-@dataclass
-class Co(Cv):
-    """Coded data, where the domain from which the codeset comes is ordered.
-
-    The Coded Ordinal data type adds semantics related to ordering so that
-    models that make use of such domains may introduce model elements that
-    involve statements about the order of the terms in a domain.
-    """
-    class Meta:
-        name = "CO"
+    value_set: Optional[str] = field(
+        default=None,
+        metadata=dict(
+            name="valueSet",
+            type="Attribute",
+            namespace="urn:hl7-org:sdtc",
+            pattern=r"[0-2](\.(0|[1-9][0-9]*))*"
+        )
+    )
+    value_set_version: Optional[str] = field(
+        default=None,
+        metadata=dict(
+            name="valueSetVersion",
+            type="Attribute",
+            namespace="urn:hl7-org:sdtc",
+            min_length=1.0
+        )
+    )
 
 
 @dataclass
@@ -5542,6 +4494,901 @@ class PnExplicit:
 
 
 @dataclass
+class St:
+    """The character string data type stands for text data, primarily intended for
+    machine processing (e.g., sorting, querying, indexing, etc.) Used for names,
+    symbols, and formal expressions.
+
+    :ivar content:
+    :ivar reference:
+    :ivar thumbnail:
+    :ivar representation:
+    :ivar media_type:
+    :ivar compression: Indicates whether the raw byte data is compressed,
+                         and what compression algorithm was used.
+    :ivar integrity_check: The integrity check is a short binary value representing
+                         a cryptographically strong checksum that is calculated
+                         over the binary data. The purpose of this property, when
+                         communicated with a reference is for anyone to validate
+                         later whether the reference still resolved to the same
+                         data that the reference resolved to when the encapsulated
+                         data value with reference was created.
+    :ivar integrity_check_algorithm: Specifies the algorithm used to compute the
+                         integrityCheck value.
+    :ivar language:
+    """
+    class Meta:
+        name = "ST"
+
+    content: Optional[object] = field(
+        default=None,
+        metadata=dict(
+            type="Wildcard",
+            namespace="##any"
+        )
+    )
+    reference: Optional[Tel] = field(
+        default=None,
+        metadata=dict(
+            type="Element",
+            namespace="urn:hl7-org:v3"
+        )
+    )
+    thumbnail: Optional[Ed] = field(
+        default=None,
+        metadata=dict(
+            type="Element",
+            namespace="urn:hl7-org:v3"
+        )
+    )
+    representation: BinaryDataEncoding = field(
+        init=False,
+        default=BinaryDataEncoding.TXT,
+        metadata=dict(
+            type="Attribute"
+        )
+    )
+    media_type: str = field(
+        init=False,
+        default="text/plain",
+        metadata=dict(
+            name="mediaType",
+            type="Attribute",
+            pattern=r"[^\s]+"
+        )
+    )
+    compression: Optional[CompressionAlgorithm] = field(
+        default=None,
+        metadata=dict(
+            type="Attribute"
+        )
+    )
+    integrity_check: Optional[str] = field(
+        default=None,
+        metadata=dict(
+            name="integrityCheck",
+            type="Attribute"
+        )
+    )
+    integrity_check_algorithm: IntegrityCheckAlgorithm = field(
+        default=IntegrityCheckAlgorithm.SHA_1,
+        metadata=dict(
+            name="integrityCheckAlgorithm",
+            type="Attribute"
+        )
+    )
+    language: Optional[str] = field(
+        default=None,
+        metadata=dict(
+            type="Attribute",
+            pattern=r"[^\s]+"
+        )
+    )
+
+
+@dataclass
+class Adxp(St):
+    """A character string that may have a type-tag signifying its role in the
+    address. Typical parts that exist in about every address are street, house
+    number, or post box, postal code, city, country but other roles may be defined
+    regionally, nationally, or on an enterprise level (e.g. in military addresses).
+    Addresses are usually broken up into lines, which are indicated by special
+    line-breaking delimiter elements (e.g., DEL).
+
+    :ivar content:
+    :ivar part_type: Specifies whether an address part names the street,
+                         city, country, postal code, post box, etc. If the type
+                         is NULL the address part is unclassified and would
+                         simply appear on an address label as is.
+    """
+    class Meta:
+        name = "ADXP"
+
+    content: Optional[object] = field(
+        default=None,
+        metadata=dict(
+            type="Wildcard",
+            namespace="##any"
+        )
+    )
+    part_type: Optional[AddressPartType] = field(
+        default=None,
+        metadata=dict(
+            name="partType",
+            type="Attribute"
+        )
+    )
+
+
+@dataclass
+class CdExplicit(Any):
+    """A concept descriptor represents any kind of concept usually by giving a code
+    defined in a code system.  A concept descriptor can contain the original text
+    or phrase that served as the basis of the coding and one or more translations
+    into different coding systems. A concept descriptor can also contain qualifiers
+    to describe, e.g., the concept of a "left foot" as a postcoordinated term built
+    from the primary code "FOOT" and the qualifier "LEFT". In exceptional cases,
+    the concept descriptor need not contain a code but only the original text
+    describing that concept.
+
+    :ivar original_text: The text or phrase used as the basis for the coding.
+    :ivar qualifier: Specifies additional codes that increase the
+                            specificity of the primary code.
+    :ivar translation: A set of other concept descriptors that translate
+                            this concept descriptor into other code systems.
+    :ivar code: The plain code symbol defined by the code system.
+                         For example, "784.0" is the code symbol of the ICD-9
+                         code "784.0" for headache.
+    :ivar code_system: Specifies the code system that defines the code.
+    :ivar code_system_name: A common name of the coding system.
+    :ivar code_system_version: If applicable, a version descriptor defined
+                         specifically for the given code system.
+    :ivar display_name: A name or title for the code, under which the sending
+                         system shows the code value to its users.
+    :ivar value_set:
+    :ivar value_set_version:
+    """
+    class Meta:
+        name = "CD_explicit"
+
+    original_text: Optional[EdExplicit] = field(
+        default=None,
+        metadata=dict(
+            name="originalText",
+            type="Element",
+            namespace="urn:hl7-org:v3"
+        )
+    )
+    qualifier: List[Cr] = field(
+        default_factory=list,
+        metadata=dict(
+            type="Element",
+            namespace="urn:hl7-org:v3",
+            min_occurs=0,
+            max_occurs=9223372036854775807
+        )
+    )
+    translation: List[Cd] = field(
+        default_factory=list,
+        metadata=dict(
+            type="Element",
+            namespace="urn:hl7-org:v3",
+            min_occurs=0,
+            max_occurs=9223372036854775807
+        )
+    )
+    code: Optional[str] = field(
+        default=None,
+        metadata=dict(
+            type="Attribute",
+            pattern=r"[^\s]+"
+        )
+    )
+    code_system: Optional[str] = field(
+        default=None,
+        metadata=dict(
+            name="codeSystem",
+            type="Attribute",
+            pattern=r"[0-2](\.(0|[1-9][0-9]*))*"
+        )
+    )
+    code_system_name: Optional[str] = field(
+        default=None,
+        metadata=dict(
+            name="codeSystemName",
+            type="Attribute",
+            min_length=1.0
+        )
+    )
+    code_system_version: Optional[str] = field(
+        default=None,
+        metadata=dict(
+            name="codeSystemVersion",
+            type="Attribute",
+            min_length=1.0
+        )
+    )
+    display_name: Optional[str] = field(
+        default=None,
+        metadata=dict(
+            name="displayName",
+            type="Attribute",
+            min_length=1.0
+        )
+    )
+    value_set: Optional[str] = field(
+        default=None,
+        metadata=dict(
+            name="valueSet",
+            type="Attribute",
+            namespace="urn:hl7-org:sdtc",
+            pattern=r"[0-2](\.(0|[1-9][0-9]*))*"
+        )
+    )
+    value_set_version: Optional[str] = field(
+        default=None,
+        metadata=dict(
+            name="valueSetVersion",
+            type="Attribute",
+            namespace="urn:hl7-org:sdtc",
+            min_length=1.0
+        )
+    )
+
+
+@dataclass
+class Ce:
+    """Coded data, consists of a coded value (CV) and, optionally, coded value(s)
+    from other coding systems that identify the same concept. Used when alternative
+    codes may exist.
+
+    :ivar original_text: The text or phrase used as the basis for the coding.
+    :ivar qualifier:
+    :ivar translation: A set of other concept descriptors that translate
+                            this concept descriptor into other code systems.
+    :ivar code: The plain code symbol defined by the code system.
+                         For example, "784.0" is the code symbol of the ICD-9
+                         code "784.0" for headache.
+    :ivar code_system: Specifies the code system that defines the code.
+    :ivar code_system_name: A common name of the coding system.
+    :ivar code_system_version: If applicable, a version descriptor defined
+                         specifically for the given code system.
+    :ivar display_name: A name or title for the code, under which the sending
+                         system shows the code value to its users.
+    :ivar value_set:
+    :ivar value_set_version:
+    """
+    class Meta:
+        name = "CE"
+
+    original_text: Optional[Ed] = field(
+        default=None,
+        metadata=dict(
+            name="originalText",
+            type="Element",
+            namespace="urn:hl7-org:v3"
+        )
+    )
+    qualifier: Optional[Cr] = field(
+        default=None,
+        metadata=dict(
+            type="Element",
+            namespace="urn:hl7-org:v3"
+        )
+    )
+    translation: List[Cd] = field(
+        default_factory=list,
+        metadata=dict(
+            type="Element",
+            namespace="urn:hl7-org:v3",
+            min_occurs=0,
+            max_occurs=9223372036854775807
+        )
+    )
+    code: Optional[str] = field(
+        default=None,
+        metadata=dict(
+            type="Attribute",
+            pattern=r"[^\s]+"
+        )
+    )
+    code_system: Optional[str] = field(
+        default=None,
+        metadata=dict(
+            name="codeSystem",
+            type="Attribute",
+            pattern=r"[0-2](\.(0|[1-9][0-9]*))*"
+        )
+    )
+    code_system_name: Optional[str] = field(
+        default=None,
+        metadata=dict(
+            name="codeSystemName",
+            type="Attribute",
+            min_length=1.0
+        )
+    )
+    code_system_version: Optional[str] = field(
+        default=None,
+        metadata=dict(
+            name="codeSystemVersion",
+            type="Attribute",
+            min_length=1.0
+        )
+    )
+    display_name: Optional[str] = field(
+        default=None,
+        metadata=dict(
+            name="displayName",
+            type="Attribute",
+            min_length=1.0
+        )
+    )
+    value_set: Optional[str] = field(
+        default=None,
+        metadata=dict(
+            name="valueSet",
+            type="Attribute",
+            namespace="urn:hl7-org:sdtc",
+            pattern=r"[0-2](\.(0|[1-9][0-9]*))*"
+        )
+    )
+    value_set_version: Optional[str] = field(
+        default=None,
+        metadata=dict(
+            name="valueSetVersion",
+            type="Attribute",
+            namespace="urn:hl7-org:sdtc",
+            min_length=1.0
+        )
+    )
+
+
+@dataclass
+class CeExplicit:
+    """Coded data, consists of a coded value (CV) and, optionally, coded value(s)
+    from other coding systems that identify the same concept. Used when alternative
+    codes may exist.
+
+    :ivar original_text: The text or phrase used as the basis for the coding.
+    :ivar qualifier:
+    :ivar translation: A set of other concept descriptors that translate
+                            this concept descriptor into other code systems.
+    :ivar code: The plain code symbol defined by the code system.
+                         For example, "784.0" is the code symbol of the ICD-9
+                         code "784.0" for headache.
+    :ivar code_system: Specifies the code system that defines the code.
+    :ivar code_system_name: A common name of the coding system.
+    :ivar code_system_version: If applicable, a version descriptor defined
+                         specifically for the given code system.
+    :ivar display_name: A name or title for the code, under which the sending
+                         system shows the code value to its users.
+    :ivar value_set:
+    :ivar value_set_version:
+    """
+    class Meta:
+        name = "CE_explicit"
+
+    original_text: Optional[EdExplicit] = field(
+        default=None,
+        metadata=dict(
+            name="originalText",
+            type="Element",
+            namespace="urn:hl7-org:v3"
+        )
+    )
+    qualifier: Optional[Cr] = field(
+        default=None,
+        metadata=dict(
+            type="Element",
+            namespace="urn:hl7-org:v3"
+        )
+    )
+    translation: List[Cd] = field(
+        default_factory=list,
+        metadata=dict(
+            type="Element",
+            namespace="urn:hl7-org:v3",
+            min_occurs=0,
+            max_occurs=9223372036854775807
+        )
+    )
+    code: Optional[str] = field(
+        default=None,
+        metadata=dict(
+            type="Attribute",
+            pattern=r"[^\s]+"
+        )
+    )
+    code_system: Optional[str] = field(
+        default=None,
+        metadata=dict(
+            name="codeSystem",
+            type="Attribute",
+            pattern=r"[0-2](\.(0|[1-9][0-9]*))*"
+        )
+    )
+    code_system_name: Optional[str] = field(
+        default=None,
+        metadata=dict(
+            name="codeSystemName",
+            type="Attribute",
+            min_length=1.0
+        )
+    )
+    code_system_version: Optional[str] = field(
+        default=None,
+        metadata=dict(
+            name="codeSystemVersion",
+            type="Attribute",
+            min_length=1.0
+        )
+    )
+    display_name: Optional[str] = field(
+        default=None,
+        metadata=dict(
+            name="displayName",
+            type="Attribute",
+            min_length=1.0
+        )
+    )
+    value_set: Optional[str] = field(
+        default=None,
+        metadata=dict(
+            name="valueSet",
+            type="Attribute",
+            namespace="urn:hl7-org:sdtc",
+            pattern=r"[0-2](\.(0|[1-9][0-9]*))*"
+        )
+    )
+    value_set_version: Optional[str] = field(
+        default=None,
+        metadata=dict(
+            name="valueSetVersion",
+            type="Attribute",
+            namespace="urn:hl7-org:sdtc",
+            min_length=1.0
+        )
+    )
+
+
+@dataclass
+class Cs:
+    """Coded data, consists of a code, display name, code system, and original
+    text. Used when a single code value must be sent.
+
+    :ivar original_text: The text or phrase used as the basis for the coding.
+    :ivar qualifier:
+    :ivar translation:
+    :ivar code: The plain code symbol defined by the code system.
+                         For example, "784.0" is the code symbol of the ICD-9
+                         code "784.0" for headache.
+    :ivar code_system: Specifies the code system that defines the code.
+    :ivar code_system_name: A common name of the coding system.
+    :ivar code_system_version: If applicable, a version descriptor defined
+                         specifically for the given code system.
+    :ivar display_name: A name or title for the code, under which the sending
+                         system shows the code value to its users.
+    :ivar value_set:
+    :ivar value_set_version:
+    """
+    class Meta:
+        name = "CS"
+
+    original_text: Optional[Ed] = field(
+        default=None,
+        metadata=dict(
+            name="originalText",
+            type="Element",
+            namespace="urn:hl7-org:v3"
+        )
+    )
+    qualifier: Optional[Cr] = field(
+        default=None,
+        metadata=dict(
+            type="Element",
+            namespace="urn:hl7-org:v3"
+        )
+    )
+    translation: Optional[Cd] = field(
+        default=None,
+        metadata=dict(
+            type="Element",
+            namespace="urn:hl7-org:v3"
+        )
+    )
+    code: Optional[str] = field(
+        default=None,
+        metadata=dict(
+            type="Attribute",
+            pattern=r"[^\s]+"
+        )
+    )
+    code_system: Optional[str] = field(
+        default=None,
+        metadata=dict(
+            name="codeSystem",
+            type="Attribute",
+            pattern=r"[0-2](\.(0|[1-9][0-9]*))*"
+        )
+    )
+    code_system_name: Optional[str] = field(
+        default=None,
+        metadata=dict(
+            name="codeSystemName",
+            type="Attribute",
+            min_length=1.0
+        )
+    )
+    code_system_version: Optional[str] = field(
+        default=None,
+        metadata=dict(
+            name="codeSystemVersion",
+            type="Attribute",
+            min_length=1.0
+        )
+    )
+    display_name: Optional[str] = field(
+        default=None,
+        metadata=dict(
+            name="displayName",
+            type="Attribute",
+            min_length=1.0
+        )
+    )
+    value_set: Optional[str] = field(
+        default=None,
+        metadata=dict(
+            name="valueSet",
+            type="Attribute",
+            namespace="urn:hl7-org:sdtc",
+            pattern=r"[0-2](\.(0|[1-9][0-9]*))*"
+        )
+    )
+    value_set_version: Optional[str] = field(
+        default=None,
+        metadata=dict(
+            name="valueSetVersion",
+            type="Attribute",
+            namespace="urn:hl7-org:sdtc",
+            min_length=1.0
+        )
+    )
+
+
+@dataclass
+class Cv:
+    """Coded data, consists of a code, display name, code system, and original
+    text. Used when a single code value must be sent.
+
+    :ivar original_text: The text or phrase used as the basis for the coding.
+    :ivar qualifier:
+    :ivar translation:
+    :ivar code: The plain code symbol defined by the code system.
+                         For example, "784.0" is the code symbol of the ICD-9
+                         code "784.0" for headache.
+    :ivar code_system: Specifies the code system that defines the code.
+    :ivar code_system_name: A common name of the coding system.
+    :ivar code_system_version: If applicable, a version descriptor defined
+                         specifically for the given code system.
+    :ivar display_name: A name or title for the code, under which the sending
+                         system shows the code value to its users.
+    :ivar value_set:
+    :ivar value_set_version:
+    """
+    class Meta:
+        name = "CV"
+
+    original_text: Optional[Ed] = field(
+        default=None,
+        metadata=dict(
+            name="originalText",
+            type="Element",
+            namespace="urn:hl7-org:v3"
+        )
+    )
+    qualifier: Optional[Cr] = field(
+        default=None,
+        metadata=dict(
+            type="Element",
+            namespace="urn:hl7-org:v3"
+        )
+    )
+    translation: Optional[Cd] = field(
+        default=None,
+        metadata=dict(
+            type="Element",
+            namespace="urn:hl7-org:v3"
+        )
+    )
+    code: Optional[str] = field(
+        default=None,
+        metadata=dict(
+            type="Attribute",
+            pattern=r"[^\s]+"
+        )
+    )
+    code_system: Optional[str] = field(
+        default=None,
+        metadata=dict(
+            name="codeSystem",
+            type="Attribute",
+            pattern=r"[0-2](\.(0|[1-9][0-9]*))*"
+        )
+    )
+    code_system_name: Optional[str] = field(
+        default=None,
+        metadata=dict(
+            name="codeSystemName",
+            type="Attribute",
+            min_length=1.0
+        )
+    )
+    code_system_version: Optional[str] = field(
+        default=None,
+        metadata=dict(
+            name="codeSystemVersion",
+            type="Attribute",
+            min_length=1.0
+        )
+    )
+    display_name: Optional[str] = field(
+        default=None,
+        metadata=dict(
+            name="displayName",
+            type="Attribute",
+            min_length=1.0
+        )
+    )
+    value_set: Optional[str] = field(
+        default=None,
+        metadata=dict(
+            name="valueSet",
+            type="Attribute",
+            namespace="urn:hl7-org:sdtc",
+            pattern=r"[0-2](\.(0|[1-9][0-9]*))*"
+        )
+    )
+    value_set_version: Optional[str] = field(
+        default=None,
+        metadata=dict(
+            name="valueSetVersion",
+            type="Attribute",
+            namespace="urn:hl7-org:sdtc",
+            min_length=1.0
+        )
+    )
+
+
+@dataclass
+class EivlEvent:
+    """A code for a common (periodical) activity of daily living based on which the
+    event related periodic interval is specified.
+
+    :ivar original_text: The text or phrase used as the basis for the coding.
+    :ivar qualifier:
+    :ivar translation: A set of other concept descriptors that translate
+                            this concept descriptor into other code systems.
+    :ivar code:
+    :ivar code_system:
+    :ivar code_system_name:
+    :ivar code_system_version: If applicable, a version descriptor defined
+                         specifically for the given code system.
+    :ivar display_name: A name or title for the code, under which the sending
+                         system shows the code value to its users.
+    :ivar value_set:
+    :ivar value_set_version:
+    """
+    class Meta:
+        name = "EIVL.event"
+
+    original_text: Optional[Ed] = field(
+        default=None,
+        metadata=dict(
+            name="originalText",
+            type="Element",
+            namespace="urn:hl7-org:v3"
+        )
+    )
+    qualifier: Optional[Cr] = field(
+        default=None,
+        metadata=dict(
+            type="Element",
+            namespace="urn:hl7-org:v3"
+        )
+    )
+    translation: List[Cd] = field(
+        default_factory=list,
+        metadata=dict(
+            type="Element",
+            namespace="urn:hl7-org:v3",
+            min_occurs=0,
+            max_occurs=9223372036854775807
+        )
+    )
+    code: Optional[TimingEvent] = field(
+        default=None,
+        metadata=dict(
+            type="Attribute"
+        )
+    )
+    code_system: str = field(
+        init=False,
+        default="2.16.840.1.113883.5.139",
+        metadata=dict(
+            name="codeSystem",
+            type="Attribute",
+            pattern=r"[0-2](\.(0|[1-9][0-9]*))*"
+        )
+    )
+    code_system_name: str = field(
+        init=False,
+        default="TimingEvent",
+        metadata=dict(
+            name="codeSystemName",
+            type="Attribute",
+            min_length=1.0
+        )
+    )
+    code_system_version: Optional[str] = field(
+        default=None,
+        metadata=dict(
+            name="codeSystemVersion",
+            type="Attribute",
+            min_length=1.0
+        )
+    )
+    display_name: Optional[str] = field(
+        default=None,
+        metadata=dict(
+            name="displayName",
+            type="Attribute",
+            min_length=1.0
+        )
+    )
+    value_set: Optional[str] = field(
+        default=None,
+        metadata=dict(
+            name="valueSet",
+            type="Attribute",
+            namespace="urn:hl7-org:sdtc",
+            pattern=r"[0-2](\.(0|[1-9][0-9]*))*"
+        )
+    )
+    value_set_version: Optional[str] = field(
+        default=None,
+        metadata=dict(
+            name="valueSetVersion",
+            type="Attribute",
+            namespace="urn:hl7-org:sdtc",
+            min_length=1.0
+        )
+    )
+
+
+@dataclass
+class Enxp(St):
+    """A character string token representing a part of a name. May have a type code
+    signifying the role of the part in the whole entity name, and a qualifier code
+    for more detail about the name part type. Typical name parts for person names
+    are given names, and family names, titles, etc.
+
+    :ivar content:
+    :ivar part_type: Indicates whether the name part is a given name, family
+                         name, prefix, suffix, etc.
+    :ivar qualifier: is a set of codes each of which specifies
+                         a certain subcategory of the name part in addition to
+                         the main name part type. For example, a given name may
+                         be flagged as a nickname, a family name may be a
+                         pseudonym or a name of public records.
+    """
+    class Meta:
+        name = "ENXP"
+
+    content: Optional[object] = field(
+        default=None,
+        metadata=dict(
+            type="Wildcard",
+            namespace="##any"
+        )
+    )
+    part_type: Optional[EntityNamePartType] = field(
+        default=None,
+        metadata=dict(
+            name="partType",
+            type="Attribute"
+        )
+    )
+    qualifier: List[EntityNamePartQualifier] = field(
+        default_factory=list,
+        metadata=dict(
+            type="Attribute",
+            min_occurs=0,
+            max_occurs=9223372036854775807
+        )
+    )
+
+
+@dataclass
+class Sc(St):
+    """An ST that optionally may have a code attached. The text must always be
+    present if a code is present. The code is often a local code.
+
+    :ivar content:
+    :ivar code: The plain code symbol defined by the code system.
+                         For example, "784.0" is the code symbol of the ICD-9
+                         code "784.0" for headache.
+    :ivar code_system: Specifies the code system that defines the code.
+    :ivar code_system_name: A common name of the coding system.
+    :ivar code_system_version: If applicable, a version descriptor defined
+                         specifically for the given code system.
+    :ivar display_name: A name or title for the code, under which the sending
+                         system shows the code value to its users.
+    """
+    class Meta:
+        name = "SC"
+
+    content: Optional[object] = field(
+        default=None,
+        metadata=dict(
+            type="Wildcard",
+            namespace="##any"
+        )
+    )
+    code: Optional[str] = field(
+        default=None,
+        metadata=dict(
+            type="Attribute",
+            pattern=r"[^\s]+"
+        )
+    )
+    code_system: Optional[str] = field(
+        default=None,
+        metadata=dict(
+            name="codeSystem",
+            type="Attribute",
+            pattern=r"[0-2](\.(0|[1-9][0-9]*))*"
+        )
+    )
+    code_system_name: Optional[str] = field(
+        default=None,
+        metadata=dict(
+            name="codeSystemName",
+            type="Attribute",
+            min_length=1.0
+        )
+    )
+    code_system_version: Optional[str] = field(
+        default=None,
+        metadata=dict(
+            name="codeSystemVersion",
+            type="Attribute",
+            min_length=1.0
+        )
+    )
+    display_name: Optional[str] = field(
+        default=None,
+        metadata=dict(
+            name="displayName",
+            type="Attribute",
+            min_length=1.0
+        )
+    )
+
+
+@dataclass
+class Co(Cv):
+    """Coded data, where the domain from which the codeset comes is ordered.
+
+    The Coded Ordinal data type adds semantics related to ordering so that
+    models that make use of such domains may introduce model elements that
+    involve statements about the order of the terms in a domain.
+    """
+    class Meta:
+        name = "CO"
+
+
+@dataclass
 class Pqr(Cv):
     """A representation of a physical quantity in a unit from any code system. Used
     to show alternative representation for a physical quantity.
@@ -5561,11 +5408,9 @@ class Pqr(Cv):
 
 
 @dataclass
-class Pq:
+class Pq(Qty):
     """A dimensioned quantity expressing the result of a measurement act.
 
-    :ivar null_flavor: An exceptional value expressing missing information
-                   and possibly the reason why the information is missing.
     :ivar translation: An alternative representation of the same physical
                             quantity expressed in a different unit, of a different
                             unit code system and possibly with a different value.
@@ -5578,13 +5423,6 @@ class Pq:
     class Meta:
         name = "PQ"
 
-    null_flavor: Optional[NullFlavor] = field(
-        default=None,
-        metadata=dict(
-            name="nullFlavor",
-            type="Attribute"
-        )
-    )
     translation: List[Pqr] = field(
         default_factory=list,
         metadata=dict(

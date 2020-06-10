@@ -35,3 +35,9 @@ def group_by(items: Sequence, key: Callable) -> Dict[Any, List]:
     for item in items:
         result[key(item)].append(item)
     return result
+
+
+def apply(items: Sequence, func: Callable):
+    """Apply the given function to each item of the sequence."""
+    for item in items:
+        func(item)

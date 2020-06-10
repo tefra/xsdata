@@ -24,18 +24,21 @@ class AttributeGroupHandler(HandlerInterface):
         attributes, repeat until there is no group attribute left.
         """
 
-        while any(attr.is_group for attr in target.attrs):
-            for attr in list(target.attrs):
-                if attr.is_group:
-                    self.process_attribute(target, attr)
+        repeat = False
+        for attr in list(target.attrs):
+            if attr.is_group:
+                repeat = True
+                self.process_attribute(target, attr)
+
+        if repeat:
+            self.process(target)
 
     def process_attribute(self, target: Class, attr: Attr):
         """
-        Find the source class the attribute refers to and clone its attributes
+        Find the source class the attribute refers to and copy its attributes
         to the target class.
 
-        The new attributes are placed in the position of original group
-        attribute.
+        :raises AnalyzerValueError: if source class is not found.
         """
         qname = target.source_qname(attr.name)
         source = self.container.find(

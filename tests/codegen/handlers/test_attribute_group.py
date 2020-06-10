@@ -25,23 +25,24 @@ class AttributeGroupHandlerTests(FactoryTestCase):
     @mock.patch.object(AttributeGroupHandler, "process_attribute")
     def test_process(self, mock_process_attribute, mock_is_group):
         mock_is_group.side_effect = [
-            False,
             True,
             False,
             True,
             True,
-            True,
-            False,
             False,
             False,
         ]
         target = ClassFactory.elements(2)
 
         self.processor.process(target)
-        self.assertEqual(9, mock_is_group.call_count)
+        self.assertEqual(6, mock_is_group.call_count)
 
         mock_process_attribute.assert_has_calls(
-            [mock.call(target, target.attrs[1]), mock.call(target, target.attrs[0]),]
+            [
+                mock.call(target, target.attrs[0]),
+                mock.call(target, target.attrs[0]),
+                mock.call(target, target.attrs[1]),
+            ]
         )
 
     @mock.patch.object(ClassUtils, "copy_group_attributes")

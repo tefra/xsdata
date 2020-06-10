@@ -145,8 +145,7 @@ class ElementBase:
         Return the real name for this element by looking by looking either to
         the name or ref attribute value.
 
-        :raises: SchemaValueError if this property is accessed by any elements that
-        don't have either name/ref properties present.
+        :raises SchemaValueError: when instance has no name/ref attribute.
         """
         name = getattr(self, "name", None) or getattr(self, "ref", None)
         if name:
@@ -159,8 +158,7 @@ class ElementBase:
         """
         Return the real type for this element.
 
-        :raises: SchemaValueError if this property is accessed by any element that
-        doesn't have any type lookup algorithm.
+        :raises SchemaValueError: when attribute instance is missing implementation.
         """
         raise SchemaValueError(f"Schema class `{self.class_name}` unknown real type.")
 

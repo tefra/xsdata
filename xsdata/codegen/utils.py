@@ -1,5 +1,4 @@
 import sys
-from typing import List
 from typing import Optional
 
 from xsdata.codegen.models import Attr
@@ -106,11 +105,3 @@ class ClassUtils:
                 clone.package = target.package
                 clone.module = target.module
                 target.inner.append(clone)
-
-    @classmethod
-    def find_attribute(cls, attrs: List[Attr], attr: Attr) -> int:
-        """Return the position of the given attribute in the list."""
-        try:
-            return attrs.index(attr)
-        except ValueError:
-            return -1

@@ -35,10 +35,10 @@ class AttributeSubstitutionHandlerTests(FactoryTestCase):
         mock_process_attribute.assert_called_once_with(target, target.attrs[2])
         mock_create_substitutions.assert_called_once()
 
-    @mock.patch.object(ClassUtils, "find_attribute")
-    def test_process_attribute(self, mock_find_attribute):
+    @mock.patch("xsdata.utils.collections.find")
+    def test_process_attribute(self, mock_find):
         target = ClassFactory.elements(2)
-        mock_find_attribute.side_effect = [-1, 2]
+        mock_find.side_effect = [-1, 2]
 
         first_attr = target.attrs[0]
         second_attr = target.attrs[1]

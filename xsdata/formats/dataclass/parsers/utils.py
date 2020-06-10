@@ -144,9 +144,8 @@ class ParserUtils:
         Extract the text and tail content and bind it accordingly in the params
         dictionary.
 
-        - If the var is a list prepend the text and append the tail.
-        - If the var name is present in the params assign the text and tail to the
-        generic object.
+        - var is a list prepend the text and append the tail.
+        - var is present in the params assign the text and tail to the generic object.
         - Otherwise bind the given element to a new generic object.
         """
         var = meta.find_var(mode=FindMode.WILDCARD)

@@ -147,3 +147,14 @@ class ClassValidatorTests(FactoryTestCase):
         self.validator.merge_redefined_type(source, target)
 
         mock_copy_group_attributes.assert_called_once_with(source, target, second_attr)
+
+    def test_select_winner(self):
+        classes = ClassFactory.list(2)
+        self.assertEqual(-1, self.validator.select_winner(classes))
+
+        classes[0].container = Tag.OVERRIDE
+        self.assertEqual(0, self.validator.select_winner(classes))
+
+        classes[0].container = Tag.SCHEMA
+        classes[1].container = Tag.REDEFINE
+        self.assertEqual(1, self.validator.select_winner(classes))

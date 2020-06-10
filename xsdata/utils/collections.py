@@ -41,3 +41,12 @@ def apply(items: Sequence, func: Callable):
     """Apply the given function to each item of the sequence."""
     for item in items:
         func(item)
+
+
+def find(items: Sequence, value: Any) -> int:
+    """Return the index of the value in the given sequence without raising
+    exception in case of failure."""
+    try:
+        return items.index(value)
+    except ValueError:
+        return -1

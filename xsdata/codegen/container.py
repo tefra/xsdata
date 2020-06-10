@@ -19,6 +19,7 @@ from xsdata.codegen.handlers import ClassExtensionHandler
 from xsdata.codegen.mixins import ContainerInterface
 from xsdata.codegen.models import Class
 from xsdata.codegen.models import Status
+from xsdata.utils import collections
 from xsdata.utils.collections import group_by
 
 methodcaller("source_qname")
@@ -95,5 +96,4 @@ class ClassContainer(UserDict, ContainerInterface):
 
     def extend(self, items: List[Class]):
         """Add a list of classes the container."""
-        for item in items:
-            self.add(item)
+        collections.apply(items, self.add)

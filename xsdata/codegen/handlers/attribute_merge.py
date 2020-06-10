@@ -3,7 +3,7 @@ from typing import List
 from xsdata.codegen.mixins import HandlerInterface
 from xsdata.codegen.models import Attr
 from xsdata.codegen.models import Class
-from xsdata.codegen.utils import ClassUtils
+from xsdata.utils import collections
 
 
 class AttributeMergeHandler(HandlerInterface):
@@ -20,7 +20,7 @@ class AttributeMergeHandler(HandlerInterface):
         """
         result: List[Attr] = []
         for attr in target.attrs:
-            pos = ClassUtils.find_attribute(result, attr)
+            pos = collections.find(result, attr)
             existing = result[pos] if pos > -1 else None
 
             if not existing:

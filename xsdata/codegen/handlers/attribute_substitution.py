@@ -12,8 +12,7 @@ from xsdata.codegen.mixins import HandlerInterface
 from xsdata.codegen.models import Attr
 from xsdata.codegen.models import AttrType
 from xsdata.codegen.models import Class
-from xsdata.codegen.utils import ClassUtils
-
+from xsdata.utils import collections
 
 Substitutions = Optional[Dict[QName, List[Attr]]]
 
@@ -54,7 +53,7 @@ class AttributeSubstitutionHandler(HandlerInterface):
         assert self.substitutions is not None
 
         for substitution in self.substitutions.get(qname, []):
-            pos = ClassUtils.find_attribute(target.attrs, substitution)
+            pos = collections.find(target.attrs, substitution)
             index = pos + 1 if pos > -1 else index
 
             clone = substitution.clone()

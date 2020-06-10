@@ -103,25 +103,45 @@ class Restrictions:
         return self.min_occurs == 0
 
     def merge(self, source: "Restrictions"):
-        """Merge the source properties to the current instance."""
-        self.update(source.asdict())
+        """Update properties from another instance."""
 
-    def update(self, data: Dict):
-        """Update the instance properties from the given data dictionary."""
-        min_occurs = data.pop("min_occurs", None)
-        max_occurs = data.pop("max_occurs", None)
-        sequential = data.pop("sequential", False)
+        keys = (
+            "required",
+            "prohibited",
+            "min_exclusive",
+            "min_inclusive",
+            "min_length",
+            "max_exclusive",
+            "max_inclusive",
+            "max_length",
+            "total_digits",
+            "fraction_digits",
+            "length",
+            "white_space",
+            "pattern",
+            "explicit_timezone",
+            "nillable",
+        )
 
-        for key, value in data.items():
-            setattr(self, key, value)
+        for key in keys:
+            value = getattr(source, key)
+            if value is not None:
+                setattr(self, key, value)
 
+        min_occurs = source.min_occurs
+        max_occurs = source.max_occurs
         is_list = max_occurs is not None and max_occurs > 1
-        if sequential and (is_list or not self.is_list):
-            self.sequential = sequential
 
+        # Update the sequential flag if new value is true and restrictions indicate
+        # the field was and still is a list.
+        if source.sequential and (is_list or not self.is_list):
+            self.sequential = source.sequential
+
+        # Update min occurs if current value is None and the new value is more than one.
         if self.min_occurs is None or (min_occurs is not None and min_occurs != 1):
             self.min_occurs = min_occurs
 
+        # Update max occurs if current value is None and the new value is more than one.
         if self.max_occurs is None or (max_occurs is not None and max_occurs != 1):
             self.max_occurs = max_occurs
 

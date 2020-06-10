@@ -9,6 +9,7 @@ from xsdata.codegen.models import Attr
 from xsdata.codegen.models import AttrType
 from xsdata.codegen.models import Class
 from xsdata.logger import logger
+from xsdata.utils import collections
 from xsdata.utils import text
 from xsdata.utils.collections import group_by
 
@@ -22,8 +23,8 @@ class ClassSanitizer:
 
     def process(self):
         """Iterate through all classes and run the sanitizing procedure."""
-        for obj in self.container.iterate():
-            self.process_class(obj)
+
+        collections.apply(self.container.iterate(), self.process_class)
 
     def process_class(self, target: Class):
         """
@@ -38,8 +39,7 @@ class ClassSanitizer:
             4. Sanitize attributes sequential flag
             5. Sanitize duplicate attribute names
         """
-        for inner in target.inner:
-            self.process_class(inner)
+        collections.apply(target.inner, self.process_class)
 
         for attr in target.attrs:
             self.process_attribute_default(target, attr)

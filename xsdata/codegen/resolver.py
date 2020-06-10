@@ -10,6 +10,7 @@ from toposort import toposort_flatten
 from xsdata.codegen.models import Class
 from xsdata.codegen.models import Package
 from xsdata.exceptions import ResolverValueError
+from xsdata.utils import collections
 
 logger = logging.getLogger(__name__)
 
@@ -60,8 +61,7 @@ class DependenciesResolver:
                 attr_type_qname = obj.source_qname(attr_type.name)
                 attr_type.alias = self.aliases.get(attr_type_qname)
 
-        for inner in obj.inner:
-            self.apply_aliases(inner)
+        collections.apply(obj.inner, self.apply_aliases)
 
     def resolve_imports(self):
         """Walk the import qualified names, check for naming collisions and add

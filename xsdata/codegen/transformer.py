@@ -45,10 +45,15 @@ class SchemaTransformer:
     class_map: Dict[str, List[Class]] = field(init=False, default_factory=dict)
     processed: List[str] = field(init=False, default_factory=list)
 
-    def process(self, urls: List[str], package: str):
-        """Run main processes."""
+    def process(self, uris: List[str], package: str):
+        """
+        Run main processes.
 
-        collections.apply(urls, self.process_schema)
+        :param uris: list of uris to process
+        :param package: package name eg foo.bar.xxx
+        """
+
+        collections.apply(uris, self.process_schema)
 
         classes = [cls for classes in self.class_map.values() for cls in classes]
         class_num, inner_num = self.count_classes(classes)
@@ -72,16 +77,16 @@ class SchemaTransformer:
         else:
             logger.warning("Analyzer returned zero classes!")
 
-    def process_schema(self, url: str, namespace: Optional[str] = None):
-        """Recursively parse the given schema url and all the imports and
-        generate a class map indexed with the schema url."""
-        if url in self.processed:
-            logger.debug("Already processed skipping: %s", url)
+    def process_schema(self, uri: str, namespace: Optional[str] = None):
+        """Recursively parse the given schema uri and all the imports and
+        generate a class map indexed with the schema uri."""
+        if uri in self.processed:
+            logger.debug("Already processed skipping: %s", uri)
             return
 
-        logger.info("Parsing schema %s", os.path.basename(url))
-        self.processed.append(url)
-        schema = self.parse_schema(url, namespace)
+        logger.info("Parsing schema %s", os.path.basename(uri))
+        self.processed.append(uri)
+        schema = self.parse_schema(uri, namespace)
         if schema is None:
             return
 
@@ -89,7 +94,7 @@ class SchemaTransformer:
             if sub.location:
                 self.process_schema(sub.location, schema.target_namespace)
 
-        self.class_map[url] = self.generate_classes(schema)
+        self.class_map[uri] = self.generate_classes(schema)
 
     def generate_classes(self, schema: Schema) -> List[Class]:
         """Convert and return the given schema tree to classes."""
@@ -104,20 +109,20 @@ class SchemaTransformer:
         return classes
 
     @staticmethod
-    def parse_schema(url: str, namespace: Optional[str] = None) -> Optional[Schema]:
+    def parse_schema(uri: str, namespace: Optional[str] = None) -> Optional[Schema]:
         """
-        Parse the given schema url and return the schema tree object.
+        Parse the given schema uri and return the schema tree object.
 
         Optionally add the target namespace if the schema is included
         and is missing a target namespace.
         """
 
         try:
-            schema = urlopen(url).read()
+            schema = urlopen(uri).read()
         except OSError:
-            logger.warning("Schema not found %s", url)
+            logger.warning("Schema not found %s", uri)
         else:
-            parser = SchemaParser(target_namespace=namespace, schema_location=url)
+            parser = SchemaParser(target_namespace=namespace, schema_location=uri)
             return parser.from_bytes(schema, Schema)
 
         return None

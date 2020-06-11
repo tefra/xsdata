@@ -7,11 +7,11 @@ CLI Entry Point
 
 .. command-output:: xsdata --help
 
-SOURCES
---------
+SOURCE
+------
 
-You can pass a list of definitions or a directory which includes the xml schemas you
-want to process.
+You can pass the file path or uri to a schema or a whole directory with multiple
+definitions.
 
 
 .. code-block:: console
@@ -21,10 +21,6 @@ want to process.
     $ xsdata air_v48_0/AirReqRsp.xsd rail_v48_0/RailReqRsp.xsd --package travelport.models
 
     $ xsdata http://www.gstatic.com/localfeed/local_feed.xsd --package feeds --print
-
-
-Although you can pass multiple sources, I am advising against that unless if you are
-sure your sources are well written clean without namespace or naming conflicts.
 
 
 Package

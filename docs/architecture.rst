@@ -17,17 +17,17 @@ xsData is trying to convert schema definitions by making a few assumptions about
 Schema Parser
 -------------
 
-:class:`xsdata.parser.SchemaParser`
+:class:`xsdata.codegen.parser.SchemaParser`
 
 The schema parser objectifies the xml data to simple python dataclass instances that
 are easy to work and extract all the relevant information.
 
 
 
-Class Builder
---------------
+Schema Mapper
+-------------
 
-:class:`xsdata.builder.ClassBuilder`
+:class:`xsdata.codegen.mappers.schema.SchemaMapper`
 
 The builder goes through all the root elements of a schema to create a list of class
 candidates.
@@ -50,7 +50,7 @@ candidates.
 Class Analyzer
 --------------
 
-:class:`xsdata.analyzer.ClassAnalyzer`
+:class:`xsdata.codegen.analyzer.ClassAnalyzer`
 
 The analyzer goes through all class candidates and flattens attributes and extensions
 based on certain criteria.
@@ -65,7 +65,7 @@ Promote for generation:
 Code Writer
 ------------
 
-:class:`xsdata.writer.CodeWriter`
+:class:`xsdata.codegen.writer.CodeWriter`
 
 Code writer is a factory that delegates the code generation to the formats with their
 language conventions.

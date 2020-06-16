@@ -1,4 +1,3 @@
-from dataclasses import dataclass
 from typing import Dict
 from typing import Iterator
 from typing import List
@@ -24,90 +23,85 @@ from xsdata.models.xsd import SimpleType
 from xsdata.utils import text
 
 
-@dataclass
-class ClassBuilder:
-    """
-    Extract a list of classes from a schema instance by mapping types to
-    classes, attributes and extensions.
+class SchemaMapper:
+    """Map a schema instance to classes, extensions and attributes."""
 
-    :param schema: schema objects tree
-    """
+    @classmethod
+    def map(cls, schema: Schema) -> List[Class]:
+        """Map schema children elements to classes."""
 
-    schema: Schema
+        return [
+            cls.build_class(element, container, schema.module, schema.target_namespace)
+            for container, element in cls.root_elements(schema)
+        ]
 
-    def build(self) -> List[Class]:
-        """Generate classes from schema and redefined elements."""
-        classes: List[Class] = []
+    @classmethod
+    def root_elements(cls, schema: Schema):
+        """Return all valid schema elements that can be converted to
+        classes."""
 
-        for override in self.schema.overrides:
-            classes.extend(
-                map(
-                    lambda element: self.build_class(element, container=Tag.OVERRIDE),
-                    override.children(condition=self.is_class),
-                )
-            )
+        for override in schema.overrides:
+            for child in override.children(condition=cls.is_class):
+                yield Tag.OVERRIDE, child
 
-        for redefine in self.schema.redefines:
-            classes.extend(
-                map(
-                    lambda element: self.build_class(element, container=Tag.REDEFINE),
-                    redefine.children(condition=self.is_class),
-                )
-            )
+        for redefine in schema.redefines:
+            for child in redefine.children(condition=cls.is_class):
+                yield Tag.REDEFINE, child
 
-        classes.extend(
-            map(
-                lambda element: self.build_class(element, container=Tag.SCHEMA),
-                self.schema.children(condition=self.is_class),
-            )
-        )
+        for child in schema.children(condition=cls.is_class):
+            yield Tag.SCHEMA, child
 
-        return classes
-
-    def build_class(self, obj: ElementBase, container: Optional[str] = None) -> Class:
+    @classmethod
+    def build_class(
+        cls,
+        obj: ElementBase,
+        container: str,
+        module: str,
+        target_namespace: Optional[str],
+    ) -> Class:
         """Build and return a class instance."""
-        name = obj.real_name
-        namespace = self.element_namespace(obj)
         instance = Class(
-            name=name,
+            name=obj.real_name,
             abstract=obj.is_abstract,
-            namespace=namespace,
+            namespace=cls.element_namespace(obj, target_namespace),
             mixed=obj.is_mixed,
             nillable=obj.is_nillable,
             type=type(obj),
             container=container,
             help=obj.display_help,
             ns_map=obj.ns_map,
-            source_namespace=self.schema.target_namespace,
-            module=self.schema.module,
+            source_namespace=target_namespace,
+            module=module,
             substitutions=obj.substitutions,
         )
 
-        self.build_class_extensions(obj, instance)
-        self.build_class_attributes(obj, instance)
+        cls.build_class_extensions(obj, instance)
+        cls.build_class_attributes(obj, instance)
         return instance
 
-    def build_class_attributes(self, obj: ElementBase, target: Class):
+    @classmethod
+    def build_class_attributes(cls, obj: ElementBase, target: Class):
         """Build the target class attributes from the given ElementBase
         children."""
 
         restrictions = Restrictions.from_element(obj)
-        for child, restrictions in self.element_children(obj, restrictions):
-            self.build_class_attribute(target, child, restrictions)
+        for child, restrictions in cls.element_children(obj, restrictions):
+            cls.build_class_attribute(target, child, restrictions)
 
         target.attrs.sort(key=lambda x: x.index)
 
-    def build_class_extensions(self, obj: ElementBase, target: Class):
+    @classmethod
+    def build_class_extensions(cls, obj: ElementBase, target: Class):
         """Build the item class extensions from the given ElementBase
         children."""
         extensions = {}
         raw_type = obj.raw_type
         if raw_type:
             restrictions = obj.get_restrictions()
-            extension = self.build_class_extension(target, raw_type, 0, restrictions)
+            extension = cls.build_class_extension(target, raw_type, 0, restrictions)
             extensions[raw_type] = extension
 
-        for extension in self.children_extensions(obj, target):
+        for extension in cls.children_extensions(obj, target):
             extensions[extension.type.name] = extension
 
         target.extensions = sorted(extensions.values(), key=lambda x: x.type.index)
@@ -127,8 +121,9 @@ class ClassBuilder:
 
         return AttrType(name=name, index=index, native=native, forward=forward,)
 
+    @classmethod
     def element_children(
-        self, obj: ElementBase, restrictions: Restrictions
+        cls, obj: ElementBase, restrictions: Restrictions
     ) -> Iterator[Tuple[ElementBase, Restrictions]]:
         """Recursively find and return all child elements that are qualified to
         be class attributes."""
@@ -137,11 +132,14 @@ class ClassBuilder:
             if child.is_attribute:
                 yield child, restrictions
             else:
-                yield from self.element_children(
+                yield from cls.element_children(
                     child, restrictions=Restrictions.from_element(child)
                 )
 
-    def element_namespace(self, obj: ElementBase) -> Optional[str]:
+    @classmethod
+    def element_namespace(
+        cls, obj: ElementBase, target_namespace: Optional[str]
+    ) -> Optional[str]:
         """
         Return the target namespace for the given schema element.
 
@@ -162,12 +160,13 @@ class ClassBuilder:
             return obj.ns_map.get(prefix)
 
         if obj.is_qualified:
-            return self.schema.target_namespace
+            return target_namespace
 
         return "" if isinstance(obj, Element) else None
 
+    @classmethod
     def children_extensions(
-        self, obj: ElementBase, target: Class
+        cls, obj: ElementBase, target: Class
     ) -> Iterator[Extension]:
         """
         Recursively find and return all target's Extension classes.
@@ -180,26 +179,28 @@ class ClassBuilder:
                 continue
 
             for ext in child.extensions:
-                yield self.build_class_extension(
+                yield cls.build_class_extension(
                     target, ext, child.index, child.get_restrictions()
                 )
 
-            yield from self.children_extensions(child, target)
+            yield from cls.children_extensions(child, target)
 
+    @classmethod
     def build_class_extension(
-        self, target: Class, name: str, index: int, restrictions: Dict
+        cls, target: Class, name: str, index: int, restrictions: Dict
     ) -> Extension:
         """Create an extension for the target class."""
         return Extension(
-            type=self.build_data_type(target, name, index=index),
+            type=cls.build_data_type(target, name, index=index),
             restrictions=Restrictions(**restrictions),
         )
 
+    @classmethod
     def build_class_attribute(
-        self, target: Class, obj: ElementBase, parent_restrictions: Restrictions
+        cls, target: Class, obj: ElementBase, parent_restrictions: Restrictions
     ):
         """Generate and append an attribute field to the target class."""
-        types = self.build_class_attribute_types(target, obj)
+        types = cls.build_class_attribute_types(target, obj)
         restrictions = Restrictions.from_element(obj)
 
         if obj.class_name in (Tag.ELEMENT, Tag.ANY):
@@ -221,23 +222,26 @@ class ClassBuilder:
                 types=types,
                 tag=obj.class_name,
                 help=obj.display_help,
-                namespace=self.element_namespace(obj),
+                namespace=cls.element_namespace(obj, target.source_namespace),
                 restrictions=restrictions,
             )
         )
 
+    @classmethod
     def build_class_attribute_types(
-        self, target: Class, obj: ElementBase
+        cls, target: Class, obj: ElementBase
     ) -> List[AttrType]:
         """Convert real type and anonymous inner types to an attribute type
         list."""
         types = [
-            self.build_data_type(target, name)
+            cls.build_data_type(target, name)
             for name in (obj.real_type or "").split(" ")
             if name
         ]
 
-        for inner in self.build_inner_classes(obj):
+        for inner in cls.build_inner_classes(
+            obj, target.module, target.source_namespace
+        ):
             target.inner.append(inner)
             types.append(AttrType(name=inner.name, forward=True))
 
@@ -246,19 +250,22 @@ class ClassBuilder:
 
         return types
 
-    def build_inner_classes(self, obj: ElementBase) -> Iterator[Class]:
+    @classmethod
+    def build_inner_classes(
+        cls, obj: ElementBase, module: str, namespace: Optional[str]
+    ) -> Iterator[Class]:
         """Find and convert anonymous types to a class instances."""
         if isinstance(obj, SimpleType) and obj.is_enumeration:
-            yield self.build_class(obj)
+            yield cls.build_class(obj, obj.class_name, module, namespace)
         else:
             for child in obj.children():
                 if isinstance(child, ComplexType) or (
                     isinstance(child, SimpleType) and child.is_enumeration
                 ):
                     child.name = obj.real_name
-                    yield self.build_class(child)
+                    yield cls.build_class(child, obj.class_name, module, namespace)
                 else:
-                    yield from self.build_inner_classes(child)
+                    yield from cls.build_inner_classes(child, module, namespace)
 
     @classmethod
     def is_class(cls, item: ElementBase) -> bool:

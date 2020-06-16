@@ -4,7 +4,7 @@ from unittest import mock
 from tests.factories import ClassFactory
 from tests.factories import FactoryTestCase
 from xsdata.codegen.analyzer import ClassAnalyzer
-from xsdata.codegen.builder import ClassBuilder
+from xsdata.codegen.mappers.schema import SchemaMapper
 from xsdata.codegen.transformer import SchemaTransformer
 from xsdata.codegen.writer import CodeWriter
 from xsdata.models.enums import Namespace
@@ -176,24 +176,18 @@ class SchemaTransformerTests(FactoryTestCase):
 
     @mock.patch("xsdata.codegen.transformer.logger.info")
     @mock.patch.object(SchemaTransformer, "count_classes")
-    @mock.patch.object(ClassBuilder, "build")
-    @mock.patch.object(ClassBuilder, "__init__", return_value=None)
+    @mock.patch.object(SchemaMapper, "map")
     def test_generate_classes(
-        self,
-        mock_builder_init,
-        mock_builder_build,
-        mock_count_classes,
-        mock_logger_info,
+        self, mock_mapper_map, mock_count_classes, mock_logger_info,
     ):
         schema = Schema(location="edo.xsd")
         classes = ClassFactory.list(2)
 
-        mock_builder_build.return_value = classes
+        mock_mapper_map.return_value = classes
         mock_count_classes.return_value = 2, 4
         self.transformer.generate_classes(schema)
 
-        mock_builder_init.assert_called_once_with(schema=schema)
-        mock_builder_build.assert_called_once_with()
+        mock_mapper_map.assert_called_once_with(schema)
         mock_logger_info.assert_has_calls(
             [
                 mock.call("Compiling schema %s", schema.location),

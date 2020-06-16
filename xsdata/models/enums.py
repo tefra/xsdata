@@ -182,6 +182,7 @@ class Tag:
     ANY_ATTRIBUTE = "AnyAttribute"
     APPINFO = "Appinfo"
     ASSERTION = "Assertion"
+    ALTERNATIVE = "Alternative"
     ATTRIBUTE = "Attribute"
     ATTRIBUTE_GROUP = "AttributeGroup"
     CHOICE = "Choice"

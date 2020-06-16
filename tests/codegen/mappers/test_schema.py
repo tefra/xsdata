@@ -7,7 +7,8 @@ from tests.factories import AttrTypeFactory
 from tests.factories import ClassFactory
 from tests.factories import ExtensionFactory
 from tests.factories import FactoryTestCase
-from xsdata.codegen.builder import ClassBuilder
+from xsdata.codegen.mappers.schema import SchemaMapper
+from xsdata.codegen.models import Class
 from xsdata.codegen.models import Restrictions
 from xsdata.models.enums import DataType
 from xsdata.models.enums import FormType
@@ -31,15 +32,28 @@ from xsdata.models.xsd import SimpleContent
 from xsdata.models.xsd import SimpleType
 
 
-class ClassBuilderTests(FactoryTestCase):
-    def setUp(self):
-        super().setUp()
-        self.schema = Schema(location="file://foo.xsd")
-        self.builder = ClassBuilder(schema=self.schema)
+class SchemaMapperTests(FactoryTestCase):
+    @mock.patch.object(SchemaMapper, "build_class")
+    @mock.patch.object(SchemaMapper, "root_elements")
+    def test_map(self, mock_root_elements, mock_build_class):
+        simple_type = ComplexType()
+        complex_type = ComplexType()
+        schema = Schema(target_namespace="foo")
 
-    @mock.patch.object(ClassBuilder, "build_class")
-    def test_build(self, mock_build_class):
-        schema = self.schema
+        mock_build_class.side_effect = ClassFactory.list(3)
+        mock_root_elements.return_value = [
+            (Tag.SCHEMA, Group),
+            (Tag.OVERRIDE, simple_type),
+            (Tag.REDEFINE, complex_type),
+        ]
+
+        actual = SchemaMapper.map(schema)
+        self.assertEqual(3, len(actual))
+        self.assertIsInstance(actual[0], Class)
+
+        mock_root_elements.assert_called_once_with(schema)
+
+    def test_root_elements(self):
         override = Override()
         redefine = Redefine()
 
@@ -50,6 +64,7 @@ class ClassBuilderTests(FactoryTestCase):
         override.groups.append(Group())
         override.simple_types.append(SimpleType())
 
+        schema = Schema()
         schema.simple_types.append(SimpleType())
         schema.attribute_groups.append(AttributeGroup())
         schema.groups.append(Group())
@@ -59,48 +74,46 @@ class ClassBuilderTests(FactoryTestCase):
         schema.redefines.append(redefine)
         schema.overrides.append(override)
 
-        self.builder.build()
-
-        mock_build_class.assert_has_calls(
-            [
-                mock.call(override.simple_types[0], container=override.class_name),
-                mock.call(override.groups[0], container=override.class_name),
-                mock.call(redefine.complex_types[0], container=redefine.class_name),
-                mock.call(schema.simple_types[0], container=schema.class_name),
-                mock.call(schema.complex_types[0], container=schema.class_name),
-                mock.call(schema.groups[0], container=schema.class_name),
-                mock.call(schema.attribute_groups[0], container=schema.class_name),
-                mock.call(schema.elements[0], container=schema.class_name),
-                mock.call(schema.attributes[0], container=schema.class_name),
-            ]
-        )
+        iterator = SchemaMapper.root_elements(schema)
+        expected = [
+            ("Override", override.simple_types[0]),
+            ("Override", override.groups[0]),
+            ("Redefine", redefine.complex_types[0]),
+            ("Schema", schema.simple_types[0]),
+            ("Schema", schema.complex_types[0]),
+            ("Schema", schema.groups[0]),
+            ("Schema", schema.attribute_groups[0]),
+            ("Schema", schema.elements[0]),
+            ("Schema", schema.attributes[0]),
+        ]
+        self.assertEqual(expected, list(iterator))
 
     def test_element_namespace(self):
-        self.schema.target_namespace = "foobar"
+        target_ns = "foobar"
 
         element = Element(ref="foo:something")
         element.ns_map["foo"] = "bar"
 
-        self.assertEqual("bar", self.builder.element_namespace(element))
+        self.assertEqual("bar", SchemaMapper.element_namespace(element, target_ns))
 
         element = Element(form=FormType.QUALIFIED)
-        self.assertEqual("foobar", self.builder.element_namespace(element))
+        self.assertEqual("foobar", SchemaMapper.element_namespace(element, target_ns))
 
         element = Element()
-        self.assertEqual("", self.builder.element_namespace(element))
+        self.assertEqual("", SchemaMapper.element_namespace(element, target_ns))
 
         element.target_namespace = "tns"
-        self.assertEqual("tns", self.builder.element_namespace(element))
+        self.assertEqual("tns", SchemaMapper.element_namespace(element, target_ns))
 
         attribute = Attribute()
-        self.assertIsNone(self.builder.element_namespace(attribute))
+        self.assertIsNone(SchemaMapper.element_namespace(attribute, target_ns))
 
         attribute.target_namespace = "tns"
-        self.assertEqual("tns", self.builder.element_namespace(attribute))
+        self.assertEqual("tns", SchemaMapper.element_namespace(attribute, target_ns))
 
-    @mock.patch.object(ClassBuilder, "element_namespace")
-    @mock.patch.object(ClassBuilder, "build_class_attributes")
-    @mock.patch.object(ClassBuilder, "build_class_extensions")
+    @mock.patch.object(SchemaMapper, "element_namespace")
+    @mock.patch.object(SchemaMapper, "build_class_attributes")
+    @mock.patch.object(SchemaMapper, "build_class_extensions")
     @mock.patch.object(Element, "substitutions", new_callable=mock.PropertyMock)
     @mock.patch.object(Element, "is_abstract", new_callable=mock.PropertyMock)
     @mock.patch.object(Element, "is_nillable", new_callable=mock.PropertyMock)
@@ -125,11 +138,11 @@ class ClassBuilderTests(FactoryTestCase):
         mock_element_namespace.return_value = "foo:name"
 
         element = Element()
-        result = self.builder.build_class(element, container="foo")
+        result = SchemaMapper.build_class(element, "container", "module", "target_ns")
 
         mock_build_class_attributes.assert_called_once_with(element, result)
         mock_build_class_extensions.assert_called_once_with(element, result)
-        mock_element_namespace.assert_called_once_with(element)
+        mock_element_namespace.assert_called_once_with(element, "target_ns")
 
         expected = ClassFactory.create(
             name="name",
@@ -140,14 +153,14 @@ class ClassBuilderTests(FactoryTestCase):
             namespace="foo:name",
             ns_map=element.ns_map,
             package=None,
-            module=self.schema.module,
-            source_namespace=self.schema.target_namespace,
+            module="module",
+            source_namespace="target_ns",
             substitutions=["foo", "bar"],
-            container="foo",
+            container="container",
         )
         self.assertEqual(expected, result)
 
-    @mock.patch.object(ClassBuilder, "children_extensions")
+    @mock.patch.object(SchemaMapper, "children_extensions")
     def test_build_class_extensions(self, mock_children_extensions):
         bar_type = AttrTypeFactory.create(name="bar", index=3)
         foo_type = AttrTypeFactory.create(name="foo", index=1)
@@ -164,7 +177,7 @@ class ClassBuilderTests(FactoryTestCase):
 
         item = ClassFactory.create()
         element = Element(type="something")
-        self.builder.build_class_extensions(element, item)
+        SchemaMapper.build_class_extensions(element, item)
 
         self.assertEqual(3, len(item.extensions))
         self.assertEqual(self_ext, item.extensions[0])
@@ -184,7 +197,7 @@ class ClassBuilderTests(FactoryTestCase):
             complex_content=ComplexContent(restriction=restriction,),
         )
         restrictions = Restrictions.from_element(complex_type)
-        children = self.builder.element_children(complex_type, restrictions)
+        children = SchemaMapper.element_children(complex_type, restrictions)
         expected = [
             (sequence_two.elements[0], Restrictions.from_element(sequence_two)),
             (sequence_two.elements[1], Restrictions.from_element(sequence_two)),
@@ -207,7 +220,7 @@ class ClassBuilderTests(FactoryTestCase):
         )
 
         item = ClassFactory.create()
-        children = self.builder.children_extensions(complex_type, item)
+        children = SchemaMapper.children_extensions(complex_type, item)
         expected = list(
             map(
                 ExtensionFactory.create,
@@ -221,8 +234,8 @@ class ClassBuilderTests(FactoryTestCase):
         self.assertIsInstance(children, GeneratorType)
         self.assertEqual(expected, list(children))
 
-    @mock.patch.object(ClassBuilder, "build_class_attribute_types")
-    @mock.patch.object(ClassBuilder, "element_namespace")
+    @mock.patch.object(SchemaMapper, "build_class_attribute_types")
+    @mock.patch.object(SchemaMapper, "element_namespace")
     @mock.patch.object(Attribute, "get_restrictions")
     @mock.patch.object(Attribute, "is_fixed", new_callable=mock.PropertyMock)
     @mock.patch.object(Attribute, "default_value", new_callable=mock.PropertyMock)
@@ -255,7 +268,7 @@ class ClassBuilderTests(FactoryTestCase):
 
         attribute = Attribute(default="false", index=66, ns_map={"foo": "bar"})
 
-        self.builder.build_class_attribute(item, attribute, Restrictions())
+        SchemaMapper.build_class_attribute(item, attribute, Restrictions())
         expected = AttrFactory.create(
             name=mock_real_name.return_value,
             types=mock_build_class_attribute_types.return_value,
@@ -270,10 +283,10 @@ class ClassBuilderTests(FactoryTestCase):
         self.assertEqual(expected, item.attrs[0])
         self.assertEqual({"bar": "foo", "foo": "bar"}, item.ns_map)
         mock_build_class_attribute_types.assert_called_once_with(item, attribute)
-        mock_element_namespace.assert_called_once_with(attribute)
+        mock_element_namespace.assert_called_once_with(attribute, item.source_namespace)
 
     @mock.patch.object(Attribute, "real_type", new_callable=mock.PropertyMock)
-    @mock.patch.object(ClassBuilder, "build_inner_classes")
+    @mock.patch.object(SchemaMapper, "build_inner_classes")
     def test_build_class_attribute_types(
         self, mock_build_inner_classes, mock_real_type
     ):
@@ -282,14 +295,14 @@ class ClassBuilderTests(FactoryTestCase):
 
         item = ClassFactory.create()
         attribute = Attribute(default="false", index=66)
-        actual = self.builder.build_class_attribute_types(item, attribute)
+        actual = SchemaMapper.build_class_attribute_types(item, attribute)
 
         expected = [AttrTypeFactory.xs_int(), AttrTypeFactory.xs_string()]
 
         self.assertEqual(expected, actual)
 
     @mock.patch.object(Attribute, "real_type", new_callable=mock.PropertyMock)
-    @mock.patch.object(ClassBuilder, "build_inner_classes")
+    @mock.patch.object(SchemaMapper, "build_inner_classes")
     def test_build_class_attribute_types_when_obj_has_inner_class(
         self, mock_build_inner_classes, mock_real_type
     ):
@@ -299,7 +312,7 @@ class ClassBuilderTests(FactoryTestCase):
 
         item = ClassFactory.create()
         attribute = Attribute(default="false", index=66)
-        actual = self.builder.build_class_attribute_types(item, attribute)
+        actual = SchemaMapper.build_class_attribute_types(item, attribute)
 
         expected = [
             AttrTypeFactory.xs_int(),
@@ -312,7 +325,7 @@ class ClassBuilderTests(FactoryTestCase):
 
     @mock.patch.object(Attribute, "default_type", new_callable=mock.PropertyMock)
     @mock.patch.object(Attribute, "real_type", new_callable=mock.PropertyMock)
-    @mock.patch.object(ClassBuilder, "build_inner_classes")
+    @mock.patch.object(SchemaMapper, "build_inner_classes")
     def test_build_class_attribute_types_when_obj_has_no_types(
         self, mock_build_inner_classes, mock_real_type, mock_default_type
     ):
@@ -322,12 +335,12 @@ class ClassBuilderTests(FactoryTestCase):
 
         item = ClassFactory.create()
         attribute = Attribute(default="false", index=66, name="attr")
-        actual = self.builder.build_class_attribute_types(item, attribute)
+        actual = SchemaMapper.build_class_attribute_types(item, attribute)
 
         self.assertEqual(1, len(actual))
         self.assertEqual(AttrTypeFactory.xs_string(), actual[0])
 
-    @mock.patch.object(ClassBuilder, "build_class")
+    @mock.patch.object(SchemaMapper, "build_class")
     def test_build_inner_classes(self, mock_build_class):
         inner_classes = ClassFactory.list(2)
         mock_build_class.side_effect = inner_classes
@@ -345,17 +358,20 @@ class ClassBuilderTests(FactoryTestCase):
                 Alternative(simple_type=enumeration, id="c"),
             ]
         )
-        result = self.builder.build_inner_classes(element)
+        result = SchemaMapper.build_inner_classes(element, "module", "target_ns")
         self.assertIsInstance(result, Iterator)
         self.assertEqual(inner_classes, list(result))
         self.assertEqual("a", complex_type.name)
         self.assertEqual("c", enumeration.name)
 
         mock_build_class.assert_has_calls(
-            [mock.call(complex_type), mock.call(enumeration)]
+            [
+                mock.call(complex_type, Tag.ALTERNATIVE, "module", "target_ns"),
+                mock.call(enumeration, Tag.ALTERNATIVE, "module", "target_ns"),
+            ]
         )
 
-    @mock.patch.object(ClassBuilder, "build_class")
+    @mock.patch.object(SchemaMapper, "build_class")
     def test_build_inner_classes_with_enumeration(self, mock_build_class):
         inner = ClassFactory.enumeration(2)
         mock_build_class.return_value = inner
@@ -364,7 +380,11 @@ class ClassBuilderTests(FactoryTestCase):
             restriction=Restriction(enumerations=[Enumeration(value="a")])
         )
 
-        result = self.builder.build_inner_classes(enumeration)
+        result = SchemaMapper.build_inner_classes(enumeration, "module", "target_ns")
         self.assertIsInstance(result, Iterator)
         self.assertEqual([inner], list(result))
         self.assertIsNone(enumeration.name)
+
+        mock_build_class.assert_called_once_with(
+            enumeration, Tag.SIMPLE_TYPE, "module", "target_ns",
+        )

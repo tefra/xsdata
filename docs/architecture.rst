@@ -17,7 +17,7 @@ xsData is trying to convert schema definitions by making a few assumptions about
 Schema Parser
 -------------
 
-:class:`xsdata.codegen.parser.SchemaParser`
+:class:`xsdata.codegen.parsers.schema.SchemaParser`
 
 The schema parser objectifies the xml data to simple python dataclass instances that
 are easy to work and extract all the relevant information.

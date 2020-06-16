@@ -33,20 +33,20 @@ class SchemaParser(XmlParser):
     The parser is a dummy as possible but it will try to normalize
     certain things like apply parent properties to children.
 
+    :param schema_location:
     :param element_form:
     :param attribute_form:
     :param target_namespace:
     :param default_attributes:
     :param default_open_content:
-    :param schema_location:
     """
 
+    location: Optional[str] = field(default=None)
     element_form: Optional[FormType] = field(init=False, default=None)
     attribute_form: Optional[FormType] = field(init=False, default=None)
     target_namespace: Optional[str] = field(default=None)
     default_attributes: Optional[str] = field(default=None)
     default_open_content: Optional[xsd.DefaultOpenContent] = field(default=None)
-    schema_location: Optional[str] = field(default=None)
 
     def dequeue(self, element: Element, queue: XmlNodes, objects: ParsedObjects) -> Any:
         """Override parent method to set element index and namespaces map."""
@@ -110,10 +110,10 @@ class SchemaParser(XmlParser):
     def resolve_schemas_locations(self, obj: xsd.Schema):
         """Resolve the locations of the schema overrides, redefines, includes
         and imports relatively to the schema location."""
-        if not self.schema_location:
+        if not self.location:
             return
 
-        obj.location = self.schema_location
+        obj.location = self.location
         for over in obj.overrides:
             over.location = self.resolve_path(over.schema_location)
 
@@ -130,11 +130,7 @@ class SchemaParser(XmlParser):
         """Resolve the given location string relatively the schema location
         path."""
 
-        return (
-            urljoin(self.schema_location, location)
-            if self.schema_location and location
-            else None
-        )
+        return urljoin(self.location, location) if self.location and location else None
 
     def resolve_local_path(
         self, location: Optional[str], namespace: Optional[str]

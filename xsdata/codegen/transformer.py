@@ -14,7 +14,7 @@ from urllib.request import urlopen
 from xsdata.codegen.analyzer import ClassAnalyzer
 from xsdata.codegen.mappers.schema import SchemaMapper
 from xsdata.codegen.models import Class
-from xsdata.codegen.parser import SchemaParser
+from xsdata.codegen.parsers.schema import SchemaParser
 from xsdata.codegen.writer import writer
 from xsdata.logger import logger
 from xsdata.models.enums import COMMON_SCHEMA_DIR
@@ -122,7 +122,7 @@ class SchemaTransformer:
         except OSError:
             logger.warning("Schema not found %s", uri)
         else:
-            parser = SchemaParser(target_namespace=namespace, schema_location=uri)
+            parser = SchemaParser(target_namespace=namespace, location=uri)
             return parser.from_bytes(schema, Schema)
 
         return None

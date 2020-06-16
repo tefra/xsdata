@@ -12,7 +12,7 @@ from urllib.parse import urlparse
 from urllib.request import urlopen
 
 from xsdata.codegen.analyzer import ClassAnalyzer
-from xsdata.codegen.builder import ClassBuilder
+from xsdata.codegen.mappers.schema import SchemaMapper
 from xsdata.codegen.models import Class
 from xsdata.codegen.parser import SchemaParser
 from xsdata.codegen.writer import writer
@@ -100,7 +100,7 @@ class SchemaTransformer:
         """Convert and return the given schema tree to classes."""
         uri = schema.location
         logger.info("Compiling schema %s", "..." if not uri else os.path.basename(uri))
-        classes = ClassBuilder(schema=schema).build()
+        classes = SchemaMapper.map(schema)
 
         class_num, inner_num = self.count_classes(classes)
         if class_num > 0:

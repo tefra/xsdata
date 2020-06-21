@@ -2,6 +2,7 @@ from collections import defaultdict
 from typing import Any
 from typing import Callable
 from typing import Dict
+from typing import Iterable
 from typing import List
 from typing import Optional
 from typing import Sequence
@@ -37,7 +38,7 @@ def group_by(items: Sequence, key: Callable) -> Dict[Any, List]:
     return result
 
 
-def apply(items: Sequence, func: Callable):
+def apply(items: Iterable, func: Callable):
     """Apply the given function to each item of the sequence."""
     for item in items:
         func(item)

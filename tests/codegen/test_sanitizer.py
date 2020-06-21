@@ -16,14 +16,16 @@ class ClassSanitizerTest(FactoryTestCase):
     def setUp(self):
         super().setUp()
 
-        container = ClassContainer()
-        self.sanitizer = ClassSanitizer(container=container)
+        self.container = ClassContainer()
+        self.sanitizer = ClassSanitizer(container=self.container)
 
     @mock.patch.object(ClassSanitizer, "process_class")
-    def test_sanitize_classes(self, mock_process_class):
+    def test_process(self, mock_process_class):
         classes = ClassFactory.list(2)
+
         self.sanitizer.container.extend(classes)
-        self.sanitizer.process()
+        ClassSanitizer.process(self.container)
+
         mock_process_class.assert_has_calls(list(map(mock.call, classes)))
 
     @mock.patch.object(ClassSanitizer, "process_duplicate_attribute_names")

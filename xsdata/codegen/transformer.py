@@ -131,7 +131,7 @@ class SchemaTransformer:
     def analyze_classes(classes: List[Class]) -> List[Class]:
         """Analyzer the given class list and simplify attributes and
         extensions."""
-        return ClassAnalyzer.from_classes(classes).process()
+        return ClassAnalyzer.process(classes)
 
     def count_classes(self, classes: List[Class]) -> Tuple[int, int]:
         """Return a tuple of counters for the main and inner classes."""

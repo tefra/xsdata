@@ -21,10 +21,13 @@ class ClassSanitizer:
 
     container: ClassContainer
 
-    def process(self):
-        """Iterate through all classes and run the sanitizing procedure."""
+    @classmethod
+    def process(cls, container: ClassContainer):
+        """Iterate through all classes and run the sanitizer procedure."""
 
-        collections.apply(self.container.iterate(), self.process_class)
+        sanitizer = cls(container)
+
+        collections.apply(container.iterate(), sanitizer.process_class)
 
     def process_class(self, target: Class):
         """

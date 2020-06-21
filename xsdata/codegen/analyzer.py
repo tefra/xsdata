@@ -1,5 +1,3 @@
-from dataclasses import dataclass
-from dataclasses import field
 from typing import List
 
 from xsdata.codegen.container import ClassContainer
@@ -9,31 +7,31 @@ from xsdata.codegen.validator import ClassValidator
 from xsdata.exceptions import AnalyzerValueError
 
 
-@dataclass
 class ClassAnalyzer:
     """Validate, analyze, sanitize and select the final class list to be
     generated."""
 
-    container: ClassContainer = field(default_factory=ClassContainer)
-
-    def process(self) -> List[Class]:
+    @classmethod
+    def process(cls, classes: List[Class]) -> List[Class]:
         """Run all the processes."""
-        self.pre_process()
-        self.container.process()
-        self.post_process()
 
-        return self.select_classes()
+        # Wrap classes with container for easy access.
+        container = ClassContainer.from_list(classes)
 
-    def pre_process(self):
-        """Run validation checks for duplicate, invalid and redefined types."""
-        ClassValidator(self.container).process()
+        # Run validation checks for duplicate, invalid and redefined types.
+        ClassValidator.process(container)
 
-    def post_process(self):
-        """Sanitize class attributes after merging and flattening types and
-        extensions."""
-        ClassSanitizer(self.container).process()
+        # Run analyzer handlers
+        container.process()
 
-    def select_classes(self) -> List[Class]:
+        # Sanitize class attributes after merging and flattening types and extensions.
+        ClassSanitizer.process(container)
+
+        # Select final list of classes to be generated.
+        return cls.select_classes(container)
+
+    @classmethod
+    def select_classes(cls, container: ClassContainer) -> List[Class]:
         """
         Return the qualified classes for code generation.
 
@@ -41,7 +39,7 @@ class ClassAnalyzer:
         xs:complexType.
         """
 
-        classes = list(self.container.iterate())
+        classes = list(container.iterate())
         if any(item.is_complex for item in classes):
             classes = list(
                 filter(
@@ -50,15 +48,9 @@ class ClassAnalyzer:
                 )
             )
 
-        self.validate_references(classes)
+        cls.validate_references(classes)
 
         return classes
-
-    @classmethod
-    def from_classes(cls, classes: List[Class]) -> "ClassAnalyzer":
-        """Instantiate from a list of classes."""
-        container = ClassContainer.from_list(classes)
-        return cls(container)
 
     @classmethod
     def class_references(cls, target: Class) -> List:

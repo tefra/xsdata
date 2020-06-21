@@ -19,7 +19,12 @@ class ClassValidator:
 
     container: ClassContainer
 
-    def process(self):
+    @classmethod
+    def process(cls, container: ClassContainer):
+        """Static entry point for container validation."""
+        cls(container).validate()
+
+    def validate(self):
         """
         Remove if possible classes with the same qualified name.
 

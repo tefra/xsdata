@@ -20,8 +20,8 @@ class ClassValidatorTests(FactoryTestCase):
     def setUp(self):
         super().setUp()
 
-        container = ClassContainer()
-        self.validator = ClassValidator(container=container)
+        self.container = ClassContainer()
+        self.validator = ClassValidator(container=self.container)
 
     @mock.patch.object(ClassValidator, "mark_strict_types")
     @mock.patch.object(ClassValidator, "handle_duplicate_types")
@@ -36,8 +36,8 @@ class ClassValidatorTests(FactoryTestCase):
         second = first.clone()
         third = ClassFactory.create()
 
-        self.validator.container.extend([first, second, third])
-        self.validator.process()
+        self.container.extend([first, second, third])
+        ClassValidator.process(self.container)
 
         mock_remove_invalid_classes.assert_called_once_with([first, second])
         mock_handle_duplicate_types.assert_called_once_with([first, second])

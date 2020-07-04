@@ -64,9 +64,11 @@ Features
 - Output: Python Data Classes
 - Output: PlantUML class diagram
 
-Changelog: 20.6 (2020-06-01)
+Changelog: 20.7 (2020-07-04)
 ----------------------------
-- Updated XmlSerializer to render default namespace whenever possible.
-- Fixed issue generating modules outside the target package.
-- Fixed issue not creating nested package __init__ files.
-- Code cleanup & docstrings
+- Updated analyzer to allow abstract types to be generated. `#199 <https://github.com/tefra/xsdata/issues/199>`_
+- Removed support to generate code from multiple sources. `#172 <https://github.com/tefra/xsdata/issues/172>`_
+- Fixed naming conflict with AttributeGroup analyzer handler. `#194 <https://github.com/tefra/xsdata/issues/194>`_
+- Fixed analyzer to merge redefined attribute groups. `#196 <https://github.com/tefra/xsdata/issues/196>`_
+- Fixed analyzer to block inheritance on xs:override derived types. `#198 <https://github.com/tefra/xsdata/issues/198>`_
+- Refactored code to prepare for wsdl support.

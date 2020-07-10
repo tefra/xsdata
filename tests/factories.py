@@ -66,7 +66,6 @@ class ClassFactory(Factory):
     @classmethod
     def create(
         cls,
-        name=None,
         qname=None,
         namespace=None,
         type=None,
@@ -85,10 +84,14 @@ class ClassFactory(Factory):
         status=Status.RAW,
         container=None,
     ):
-        name = name or f"class_{cls.next_letter()}"
+        if not qname:
+            qname = QName("xsdata", f"class_{cls.next_letter()}")
+
+        if not isinstance(qname, QName):
+            qname = QName("xsdata", qname)
+
         return cls.model(
-            name=name,
-            qname=qname or QName("xsdata", name),
+            qname=qname,
             namespace=namespace,
             abstract=abstract,
             mixed=mixed,

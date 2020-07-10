@@ -340,7 +340,7 @@ class Class:
     Model representation of a dataclass with fields, base/inner classes and
     additional metadata settings.
 
-    :param name:
+    :param qname:
     :param type:
     :param module:
     :param mixed:
@@ -360,7 +360,6 @@ class Class:
     :param source_namespace:
     """
 
-    name: str
     qname: QName
     type: Type
     module: str
@@ -378,6 +377,11 @@ class Class:
     attrs: List[Attr] = field(default_factory=list)
     inner: List["Class"] = field(default_factory=list)
     ns_map: Dict = field(default_factory=dict)
+
+    @property
+    def name(self) -> str:
+        """Shortcut for qname local name."""
+        return self.qname.localname
 
     @property
     def has_suffix_attr(self) -> bool:

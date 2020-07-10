@@ -101,9 +101,9 @@ class ClassValidatorTests(FactoryTestCase):
         )
 
     def test_mark_strict_types(self):
-        one = ClassFactory.create(name="foo", type=Element)
-        two = ClassFactory.create(name="foo", type=ComplexType)
-        three = ClassFactory.create(name="foo", type=SimpleType)
+        one = ClassFactory.create(qname="foo", type=Element)
+        two = ClassFactory.create(qname="foo", type=ComplexType)
+        three = ClassFactory.create(qname="foo", type=SimpleType)
 
         self.validator.mark_strict_types([one, two, three])
 
@@ -111,8 +111,8 @@ class ClassValidatorTests(FactoryTestCase):
         self.assertTrue(two.strict_type)  # Marked as abstract
         self.assertFalse(three.strict_type)  # Is common
 
-        four = ClassFactory.create(name="bar", type=Attribute)
-        five = ClassFactory.create(name="bar", type=AttributeGroup)
+        four = ClassFactory.create(qname="bar", type=Attribute)
+        five = ClassFactory.create(qname="bar", type=AttributeGroup)
         self.validator.mark_strict_types([four, five])
         self.assertFalse(four.strict_type)  # No element in group
         self.assertFalse(five.strict_type)  # No element in group

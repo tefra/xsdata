@@ -128,7 +128,6 @@ class ClassSanitizer:
                     attr_type.forward = False
                     attr_type.qname = QName(inner.qname.namespace, name)
 
-        inner.name = name
         inner.qname = QName(inner.qname.namespace, name)
 
         self.container.add(inner)

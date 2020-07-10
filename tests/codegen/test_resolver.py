@@ -58,7 +58,7 @@ class DependenciesResolverTest(FactoryTestCase):
         mock_apply_aliases.side_effect = lambda x: x
 
         self.resolver.class_list = ["a", "b", "c", "d"]
-        self.resolver.class_map = {x: ClassFactory.create(name=x) for x in "ca"}
+        self.resolver.class_map = {x: ClassFactory.create(qname=x) for x in "ca"}
 
         result = self.resolver.sorted_classes()
         expected = [self.resolver.class_map[x] for x in "ac"]
@@ -77,7 +77,7 @@ class DependenciesResolverTest(FactoryTestCase):
         type_d = AttrTypeFactory.create(qname="d")
 
         obj = ClassFactory.create(
-            name="a",
+            qname="a",
             attrs=[
                 AttrFactory.create(name="a", types=[type_a]),
                 AttrFactory.create(name="b", types=[type_b]),
@@ -85,7 +85,7 @@ class DependenciesResolverTest(FactoryTestCase):
             ],
             inner=[
                 ClassFactory.create(
-                    name="b",
+                    qname="b",
                     attrs=[
                         AttrFactory.create(name="c", types=[type_c]),
                         AttrFactory.create(name="d", types=[type_d]),
@@ -119,7 +119,7 @@ class DependenciesResolverTest(FactoryTestCase):
     def test_resolve_imports(
         self, mock_import_classes, mock_find_package, mock_add_import
     ):
-        class_life = ClassFactory.create(name="life")
+        class_life = ClassFactory.create(qname="life")
         import_names = [
             QName("foo"),  # cool
             QName("bar"),  # cool
@@ -172,12 +172,12 @@ class DependenciesResolverTest(FactoryTestCase):
         self.assertEqual(["a", "c", "e", "f"], self.resolver.import_classes())
 
     def test_create_class_map(self):
-        classes = [ClassFactory.create(name=name) for name in "ab"]
+        classes = [ClassFactory.create(qname=name) for name in "ab"]
         expected = {obj.qname: obj for obj in classes}
         self.assertEqual(expected, self.resolver.create_class_map(classes))
 
     def test_create_class_map_for_duplicate_classes(self):
-        classes = ClassFactory.list(2, name="a")
+        classes = ClassFactory.list(2, qname="a")
         with self.assertRaises(ResolverValueError) as cm:
             self.resolver.create_class_map(classes)
 

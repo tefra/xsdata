@@ -104,13 +104,13 @@ class ClassSanitizerTest(FactoryTestCase):
     def test_process_attribute_default_enum(
         self, mock_find_enum, mock_promote_inner_class, mock_logger_warning
     ):
-        enum_one = ClassFactory.enumeration(1, name="root")
+        enum_one = ClassFactory.enumeration(1, qname="root")
         enum_one.attrs[0].default = "1"
         enum_one.attrs[0].name = "one"
-        enum_two = ClassFactory.enumeration(1, name="inner")
+        enum_two = ClassFactory.enumeration(1, qname="inner")
         enum_two.attrs[0].default = "2"
         enum_two.attrs[0].name = "two"
-        enum_three = ClassFactory.enumeration(1, name="missing_member")
+        enum_three = ClassFactory.enumeration(1, qname="missing_member")
 
         mock_find_enum.side_effect = [
             None,
@@ -121,7 +121,7 @@ class ClassSanitizerTest(FactoryTestCase):
         ]
 
         target = ClassFactory.create(
-            name="target",
+            qname="target",
             attrs=[
                 AttrFactory.create(
                     types=[
@@ -161,8 +161,8 @@ class ClassSanitizerTest(FactoryTestCase):
         missing_external = AttrTypeFactory.create("bar")
         matching_inner = AttrTypeFactory.create("foobar", forward=True)
         missing_inner = AttrTypeFactory.create("barfoo", forward=True)
-        enumeration = ClassFactory.enumeration(1, name="foo")
-        inner = ClassFactory.enumeration(1, name="foobar")
+        enumeration = ClassFactory.enumeration(1, qname="foo")
+        inner = ClassFactory.enumeration(1, qname="foobar")
 
         target = ClassFactory.create(
             attrs=[
@@ -313,7 +313,7 @@ class ClassSanitizerTest(FactoryTestCase):
         self.assertEqual(1, len_sequential(target))
 
     def test_find_inner(self):
-        inner_a = ClassFactory.create(name="a")
+        inner_a = ClassFactory.create(qname="a")
         inner_b = ClassFactory.enumeration(2)
         target = ClassFactory.create(inner=[inner_a, inner_b])
 

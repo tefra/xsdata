@@ -53,7 +53,7 @@ class ClassValidator:
             if ext.type.native:
                 return False
 
-            qname = source.source_qname(ext.type.name)
+            qname = ext.type.qname
             return qname not in self.container
 
         for target in list(classes):
@@ -65,7 +65,7 @@ class ClassValidator:
         """Handle classes with same namespace, name that are derived from the
         same xs type."""
 
-        grouped = group_by(classes, lambda x: f"{x.type.__name__}{x.source_qname()}")
+        grouped = group_by(classes, lambda x: f"{x.type.__name__}{x.qname}")
         for items in grouped.values():
             if len(items) == 1:
                 continue

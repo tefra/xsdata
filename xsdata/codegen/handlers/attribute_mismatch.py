@@ -1,3 +1,5 @@
+from lxml.etree import QName
+
 from xsdata.codegen.mixins import HandlerInterface
 from xsdata.codegen.models import AttrType
 from xsdata.codegen.models import Class
@@ -36,6 +38,7 @@ class AttributeMismatchHandler(HandlerInterface):
         if not enum_inner:
             enum_inner = Class(
                 name="value",
+                qname=QName(target.qname.namespace, "value"),
                 type=SimpleType,
                 module=target.module,
                 package=target.package,
@@ -43,7 +46,9 @@ class AttributeMismatchHandler(HandlerInterface):
                 abstract=False,
                 nillable=False,
             )
-            target.attrs[0].types.append(AttrType(name="value", forward=True))
+            target.attrs[0].types.append(
+                AttrType(qname=QName(target.qname.namespace, "value"), forward=True,)
+            )
             target.inner.append(enum_inner)
 
         enum_inner.attrs.extend(enumerations)

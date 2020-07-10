@@ -38,10 +38,12 @@ class ElementBase:
         return self.__class__.__name__
 
     @property
-    def default_type(self) -> DataType:
+    def default_type(self) -> str:
         """Return the default type if the given element has not specific
         type."""
-        return DataType.STRING
+        prefix = self.schema_prefix()
+        suffix = DataType.STRING.code
+        return f"{prefix}:{suffix}" if prefix else suffix
 
     @property
     def default_value(self) -> Any:

@@ -1,4 +1,5 @@
 from collections import UserDict
+from operator import attrgetter
 from operator import methodcaller
 from typing import Callable
 from typing import Dict
@@ -50,7 +51,7 @@ class ClassContainer(UserDict, ContainerInterface):
     @classmethod
     def from_list(cls, items: List[Class]) -> "ClassContainer":
         """Static constructor from a list of classes."""
-        return cls(group_by(items, methodcaller("source_qname")))
+        return cls(group_by(items, attrgetter("qname")))
 
     def iterate(self) -> Iterator[Class]:
         """Create an iterator for the class map values."""
@@ -92,7 +93,7 @@ class ClassContainer(UserDict, ContainerInterface):
 
     def add(self, item: Class):
         """Add class item to the container."""
-        self.data.setdefault(item.source_qname(), []).append(item)
+        self.data.setdefault(item.qname, []).append(item)
 
     def extend(self, items: List[Class]):
         """Add a list of classes the container."""

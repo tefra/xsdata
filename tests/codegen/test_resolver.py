@@ -67,11 +67,14 @@ class DependenciesResolverTest(FactoryTestCase):
         mock_apply_aliases.assert_has_calls([mock.call(x) for x in expected])
 
     def test_apply_aliases(self):
-        self.resolver.aliases = {QName("d"): "IamD", QName("a"): "IamA"}
-        type_a = AttrTypeFactory.create(name="a")
-        type_b = AttrTypeFactory.create(name="b")
-        type_c = AttrTypeFactory.create(name="c")
-        type_d = AttrTypeFactory.create(name="d")
+        self.resolver.aliases = {
+            QName("xsdata", "d"): "IamD",
+            QName("xsdata", "a"): "IamA",
+        }
+        type_a = AttrTypeFactory.create(qname="a")
+        type_b = AttrTypeFactory.create(qname="b")
+        type_c = AttrTypeFactory.create(qname="c")
+        type_d = AttrTypeFactory.create(qname="d")
 
         obj = ClassFactory.create(
             name="a",
@@ -80,11 +83,9 @@ class DependenciesResolverTest(FactoryTestCase):
                 AttrFactory.create(name="b", types=[type_b]),
                 AttrFactory.create(name="c", types=[type_a, type_d]),
             ],
-            source_namespace=None,
             inner=[
                 ClassFactory.create(
                     name="b",
-                    source_namespace=None,
                     attrs=[
                         AttrFactory.create(name="c", types=[type_c]),
                         AttrFactory.create(name="d", types=[type_d]),
@@ -125,7 +126,7 @@ class DependenciesResolverTest(FactoryTestCase):
             QName("{thug}life"),  # life class exists add alias
             QName("{common}type"),  # type class doesn't exist add just the name
         ]
-        self.resolver.class_map = {class_life.source_qname(): class_life}
+        self.resolver.class_map = {class_life.qname: class_life}
         mock_import_classes.return_value = import_names
         mock_find_package.side_effect = ["first", "second", "third", "forth"]
 
@@ -159,9 +160,9 @@ class DependenciesResolverTest(FactoryTestCase):
 
     def test_find_package(self):
         class_a = ClassFactory.create()
-        self.resolver.packages[class_a.source_qname()] = "foo.bar"
+        self.resolver.packages[class_a.qname] = "foo.bar"
 
-        self.assertEqual("foo.bar", self.resolver.find_package(class_a.source_qname()))
+        self.assertEqual("foo.bar", self.resolver.find_package(class_a.qname))
         with self.assertRaises(ResolverValueError):
             self.resolver.find_package(QName("nope"))
 
@@ -172,7 +173,7 @@ class DependenciesResolverTest(FactoryTestCase):
 
     def test_create_class_map(self):
         classes = [ClassFactory.create(name=name) for name in "ab"]
-        expected = {obj.source_qname(): obj for obj in classes}
+        expected = {obj.qname: obj for obj in classes}
         self.assertEqual(expected, self.resolver.create_class_map(classes))
 
     def test_create_class_map_for_duplicate_classes(self):

@@ -3,6 +3,8 @@ import unittest
 from abc import ABC
 from abc import abstractmethod
 
+from lxml.etree import QName
+
 from xsdata.codegen.models import Attr
 from xsdata.codegen.models import AttrType
 from xsdata.codegen.models import Class
@@ -65,8 +67,8 @@ class ClassFactory(Factory):
     def create(
         cls,
         name=None,
+        qname=None,
         namespace=None,
-        source_namespace="xsdata",
         type=None,
         abstract=False,
         mixed=False,
@@ -86,8 +88,8 @@ class ClassFactory(Factory):
         name = name or f"class_{cls.next_letter()}"
         return cls.model(
             name=name,
+            qname=qname or QName("xsdata", name),
             namespace=namespace,
-            source_namespace=source_namespace,
             abstract=abstract,
             mixed=mixed,
             nillable=nillable,
@@ -185,16 +187,21 @@ class AttrTypeFactory(Factory):
     @classmethod
     def create(
         cls,
-        name=None,
+        qname=None,
         index=None,
         alias=None,
         native=False,
         forward=False,
         circular=False,
     ):
+        if not qname:
+            qname = QName("xsdata", f"attr_{cls.next_letter()}")
+
+        if not isinstance(qname, QName):
+            qname = QName("xsdata", qname)
 
         return cls.model(
-            name=name or f"attr_{cls.next_letter()}",
+            qname=qname,
             index=index or 0,
             alias=alias,
             native=native,
@@ -204,43 +211,53 @@ class AttrTypeFactory(Factory):
 
     @classmethod
     def xs_string(cls):
-        return cls.create(name=DataType.STRING.code, native=True)
+        qname = QName(Namespace.XS.uri, DataType.STRING.code)
+        return cls.create(qname=qname, native=True)
 
     @classmethod
     def xs_int(cls):
-        return cls.create(name=DataType.INTEGER.code, native=True)
+        qname = QName(Namespace.XS.uri, DataType.INTEGER.code)
+        return cls.create(qname=qname, native=True)
 
     @classmethod
     def xs_positive_int(cls):
-        return cls.create(name=DataType.POSITIVE_INTEGER.code, native=True)
+        qname = QName(Namespace.XS.uri, DataType.POSITIVE_INTEGER.code)
+        return cls.create(qname=qname, native=True)
 
     @classmethod
     def xs_float(cls):
-        return cls.create(name=DataType.FLOAT.code, native=True)
+        qname = QName(Namespace.XS.uri, DataType.FLOAT.code)
+        return cls.create(qname=qname, native=True)
 
     @classmethod
     def xs_decimal(cls):
-        return cls.create(name=DataType.DECIMAL.code, native=True)
+        qname = QName(Namespace.XS.uri, DataType.DECIMAL.code)
+        return cls.create(qname=qname, native=True)
 
     @classmethod
     def xs_bool(cls):
-        return cls.create(name=DataType.BOOLEAN.code, native=True)
+        qname = QName(Namespace.XS.uri, DataType.BOOLEAN.code)
+        return cls.create(qname=qname, native=True)
 
     @classmethod
     def xs_any(cls):
-        return cls.create(name=DataType.ANY_TYPE.code, native=True)
+        qname = QName(Namespace.XS.uri, DataType.ANY_TYPE.code)
+        return cls.create(qname=qname, native=True)
 
     @classmethod
     def xs_qmap(cls):
-        return cls.create(name=DataType.QMAP.code, native=True)
+        qname = QName(Namespace.XS.uri, DataType.QMAP.code)
+        return cls.create(qname=qname, native=True)
 
     @classmethod
     def xs_qname(cls):
-        return cls.create(name=DataType.QNAME.code, native=True)
+        qname = QName(Namespace.XS.uri, DataType.QNAME.code)
+        return cls.create(qname=qname, native=True)
 
     @classmethod
     def xs_tokens(cls):
-        return cls.create(name=DataType.NMTOKENS.code, native=True)
+        qname = QName(Namespace.XS.uri, DataType.NMTOKENS.code)
+        return cls.create(qname=qname, native=True)
 
 
 class AttrFactory(Factory):
@@ -300,7 +317,11 @@ class AttrFactory(Factory):
 
     @classmethod
     def attribute_group(cls, **kwargs) -> Attr:
-        return cls.create(tag=Tag.ATTRIBUTE_GROUP, **kwargs)
+        return cls.create(
+            tag=Tag.ATTRIBUTE_GROUP,
+            types=[AttrTypeFactory.create(qname=kwargs.get("name"))],
+            **kwargs,
+        )
 
     @classmethod
     def group(cls, **kwargs) -> Attr:

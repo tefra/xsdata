@@ -4,6 +4,8 @@ from typing import List
 from typing import Optional
 from typing import Tuple
 
+from lxml.etree import QName
+
 from xsdata.codegen.models import Attr
 from xsdata.codegen.models import AttrType
 from xsdata.codegen.models import Class
@@ -62,6 +64,7 @@ class SchemaMapper:
         """Build and return a class instance."""
         instance = Class(
             name=obj.real_name,
+            qname=QName(target_namespace, obj.real_name),
             abstract=obj.is_abstract,
             namespace=cls.element_namespace(obj, target_namespace),
             mixed=obj.is_mixed,
@@ -70,14 +73,22 @@ class SchemaMapper:
             container=container,
             help=obj.display_help,
             ns_map=obj.ns_map,
-            source_namespace=target_namespace,
             module=module,
-            substitutions=obj.substitutions,
+            substitutions=cls.build_substitutions(obj, target_namespace),
         )
 
         cls.build_class_extensions(obj, instance)
         cls.build_class_attributes(obj, instance)
         return instance
+
+    @classmethod
+    def build_substitutions(
+        cls, obj: ElementBase, target_namespace: Optional[str]
+    ) -> List[QName]:
+        return [
+            QName(obj.ns_map.get(prefix, target_namespace), suffix)
+            for prefix, suffix in map(text.split, obj.substitutions)
+        ]
 
     @classmethod
     def build_class_attributes(cls, obj: ElementBase, target: Class):
@@ -112,14 +123,15 @@ class SchemaMapper:
     ) -> AttrType:
         """Create an attribute type for the target class."""
         prefix, suffix = text.split(name)
-        native = False
-        namespace = target.ns_map.get(prefix)
+        namespace = target.ns_map.get(prefix, target.qname.namespace)
+        native = (
+            Namespace.get_enum(namespace) is not None
+            and DataType.get_enum(suffix) is not None
+        )
 
-        if Namespace.get_enum(namespace) and DataType.get_enum(suffix):
-            name = suffix
-            native = True
-
-        return AttrType(name=name, index=index, native=native, forward=forward,)
+        return AttrType(
+            qname=QName(namespace, suffix), index=index, native=native, forward=forward,
+        )
 
     @classmethod
     def element_children(
@@ -200,6 +212,8 @@ class SchemaMapper:
         cls, target: Class, obj: ElementBase, parent_restrictions: Restrictions
     ):
         """Generate and append an attribute field to the target class."""
+
+        target.ns_map.update(obj.ns_map)
         types = cls.build_class_attribute_types(target, obj)
         restrictions = Restrictions.from_element(obj)
 
@@ -222,7 +236,7 @@ class SchemaMapper:
                 types=types,
                 tag=obj.class_name,
                 help=obj.display_help,
-                namespace=cls.element_namespace(obj, target.source_namespace),
+                namespace=cls.element_namespace(obj, target.qname.namespace),
                 restrictions=restrictions,
             )
         )
@@ -240,13 +254,13 @@ class SchemaMapper:
         ]
 
         for inner in cls.build_inner_classes(
-            obj, target.module, target.source_namespace
+            obj, target.module, target.qname.namespace
         ):
             target.inner.append(inner)
-            types.append(AttrType(name=inner.name, forward=True))
+            types.append(cls.build_data_type(target, name=inner.name, forward=True))
 
         if len(types) == 0:
-            types.append(AttrType(name=obj.default_type.code, native=True))
+            types.append(cls.build_data_type(target, name=obj.default_type))
 
         return types
 

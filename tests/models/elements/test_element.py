@@ -18,7 +18,10 @@ class ElementTests(TestCase):
 
     def test_property_default_type(self):
         obj = Element()
-        self.assertEqual(DataType.ANY_TYPE, obj.default_type)
+        self.assertEqual("anyType", obj.default_type)
+
+        obj = Element(ns_map={"foo": Namespace.XS.uri})
+        self.assertEqual("foo:anyType", obj.default_type)
 
     def test_property_raw_type(self):
         obj = Element(ns_map={"xs": Namespace.XS.uri})

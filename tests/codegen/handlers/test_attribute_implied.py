@@ -1,4 +1,5 @@
 from tests.factories import AttrFactory
+from tests.factories import AttrTypeFactory
 from tests.factories import ClassFactory
 from tests.factories import FactoryTestCase
 from xsdata.codegen.handlers import AttributeImpliedHandler
@@ -7,7 +8,7 @@ from xsdata.models.enums import DataType
 from xsdata.models.enums import Tag
 
 
-class AttributeImpliedTests(FactoryTestCase):
+class AttributeImpliedHandlerTests(FactoryTestCase):
     def setUp(self):
         super().setUp()
         self.processor = AttributeImpliedHandler
@@ -22,7 +23,7 @@ class AttributeImpliedTests(FactoryTestCase):
         expected = AttrFactory.create(
             name="content",
             index=0,
-            types=[AttrType(name=DataType.ANY_TYPE.code, native=True)],
+            types=[AttrTypeFactory.xs_any()],
             tag=Tag.ANY,
             namespace="##any",
         )

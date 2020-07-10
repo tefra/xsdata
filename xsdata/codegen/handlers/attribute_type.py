@@ -17,6 +17,7 @@ from xsdata.codegen.utils import ClassUtils
 from xsdata.exceptions import AnalyzerValueError
 from xsdata.logger import logger
 from xsdata.models.enums import DataType
+from xsdata.models.enums import Namespace
 from xsdata.utils.collections import unique_sequence
 
 
@@ -61,7 +62,7 @@ class AttributeTypeHandler(HandlerInterface):
         if attr.restrictions.pattern:
             cls.reset_attribute_type(attr_type)
 
-    def find_dependency(self, target: Class, attr_type: AttrType) -> Optional[Class]:
+    def find_dependency(self, attr_type: AttrType) -> Optional[Class]:
         """
         Find dependency for the given attribute.
 
@@ -70,11 +71,10 @@ class AttributeTypeHandler(HandlerInterface):
             2. Non abstract
             3. anything
         """
-        qname = target.source_qname(attr_type.name)
         conditions = (lambda obj: not obj.is_complex, lambda x: not x.abstract, None)
 
         for condition in conditions:
-            result = self.container.find(qname, condition=condition)
+            result = self.container.find(attr_type.qname, condition=condition)
             if result:
                 return result
 
@@ -91,7 +91,7 @@ class AttributeTypeHandler(HandlerInterface):
         Simple stype: the rest
         """
 
-        source = self.find_dependency(target, attr_type)
+        source = self.find_dependency(attr_type)
         if not source:
             logger.warning("Missing type: %s", attr_type.name)
             self.reset_attribute_type(attr_type)
@@ -171,7 +171,7 @@ class AttributeTypeHandler(HandlerInterface):
     @classmethod
     def reset_attribute_type(cls, attr_type: AttrType):
         """Reset the attribute type to native string."""
-        attr_type.name = DataType.STRING.code
+        attr_type.qname = QName(Namespace.XS.uri, DataType.STRING.code)
         attr_type.native = True
         attr_type.circular = False
         attr_type.forward = False

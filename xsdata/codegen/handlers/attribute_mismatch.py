@@ -37,7 +37,6 @@ class AttributeMismatchHandler(HandlerInterface):
         )
         if not enum_inner:
             enum_inner = Class(
-                name="value",
                 qname=QName(target.qname.namespace, "value"),
                 type=SimpleType,
                 module=target.module,

@@ -47,8 +47,8 @@ class AttributeGroupHandlerTests(FactoryTestCase):
 
     @mock.patch.object(ClassUtils, "copy_group_attributes")
     def test_process_attribute_with_group(self, mock_copy_group_attributes):
-        complex_bar = ClassFactory.create(type=ComplexType, name="bar")
-        group_bar = ClassFactory.create(type=Group, name="bar")
+        complex_bar = ClassFactory.create(qname="bar", type=ComplexType)
+        group_bar = ClassFactory.create(qname="bar", type=Group)
         group_attr = AttrFactory.attribute_group(name="bar")
         target = ClassFactory.create()
         target.attrs.append(group_attr)
@@ -64,8 +64,8 @@ class AttributeGroupHandlerTests(FactoryTestCase):
 
     @mock.patch.object(ClassUtils, "copy_group_attributes")
     def test_process_attribute_with_attribute_group(self, mock_copy_group_attributes):
-        complex_bar = ClassFactory.create(type=ComplexType, name="bar")
-        group_bar = ClassFactory.create(type=AttributeGroup, name="bar")
+        complex_bar = ClassFactory.create(qname="bar", type=ComplexType)
+        group_bar = ClassFactory.create(qname="bar", type=AttributeGroup)
         group_attr = AttrFactory.attribute_group(name="bar")
         target = ClassFactory.create()
         target.attrs.append(group_attr)
@@ -81,7 +81,7 @@ class AttributeGroupHandlerTests(FactoryTestCase):
 
     def test_process_attribute_with_circular_reference(self):
         group_attr = AttrFactory.attribute_group(name="bar")
-        target = ClassFactory.create(name="bar", type=Group)
+        target = ClassFactory.create(qname="bar", type=Group)
         target.attrs.append(group_attr)
 
         target.status = Status.PROCESSING

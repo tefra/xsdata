@@ -96,7 +96,7 @@ class AttributeSubstitutionHandlerTests(FactoryTestCase):
         )
 
     def test_create_substitution(self):
-        item = ClassFactory.elements(1, name="bar", qname=QName("foo", "bar"))
+        item = ClassFactory.elements(1, qname=QName("foo", "bar"))
         actual = self.processor.create_substitution(item)
 
         expected = AttrFactory.create(

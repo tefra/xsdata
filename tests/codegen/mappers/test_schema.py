@@ -12,7 +12,6 @@ from tests.factories import FactoryTestCase
 from xsdata.codegen.mappers.schema import SchemaMapper
 from xsdata.codegen.models import Class
 from xsdata.codegen.models import Restrictions
-from xsdata.models.enums import DataType
 from xsdata.models.enums import FormType
 from xsdata.models.enums import Tag
 from xsdata.models.xsd import Alternative
@@ -147,7 +146,6 @@ class SchemaMapperTests(FactoryTestCase):
         mock_element_namespace.assert_called_once_with(element, "target_ns")
 
         expected = ClassFactory.create(
-            name="name",
             qname=QName("target_ns", "name"),
             type=Element,
             help="sos",
@@ -308,7 +306,7 @@ class SchemaMapperTests(FactoryTestCase):
     def test_build_class_attribute_types_when_obj_has_inner_class(
         self, mock_build_inner_classes, mock_real_type
     ):
-        inner_class = ClassFactory.create(name="foo")
+        inner_class = ClassFactory.create(qname="foo")
         mock_real_type.return_value = " xs:integer  xs:string "
         mock_build_inner_classes.return_value = [inner_class]
 

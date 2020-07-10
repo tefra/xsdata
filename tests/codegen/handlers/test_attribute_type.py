@@ -161,7 +161,7 @@ class AttributeTypeHandlerTests(FactoryTestCase):
 
     @mock.patch.object(ClassUtils, "copy_inner_classes")
     def test_process_simple_dependency(self, mock_copy_inner_classes):
-        source = ClassFactory.elements(1, name="Foobar")
+        source = ClassFactory.elements(1, qname="Foobar")
         source.attrs[0].restrictions.max_length = 100
         source.attrs[0].restrictions.min_length = 1
 
@@ -270,15 +270,15 @@ class AttributeTypeHandlerTests(FactoryTestCase):
 
         self.assertIsNone(self.processor.find_dependency(attr_type))
 
-        abstract = ClassFactory.create(name="a", type=ComplexType, abstract=True)
+        abstract = ClassFactory.create(qname="a", type=ComplexType, abstract=True)
         self.processor.container.add(abstract)
         self.assertEqual(abstract, self.processor.find_dependency(attr_type))
 
-        element = ClassFactory.create(name="a", type=Element)
+        element = ClassFactory.create(qname="a", type=Element)
         self.processor.container.add(element)
         self.assertEqual(element, self.processor.find_dependency(attr_type))
 
-        simple = ClassFactory.create(name="a", type=SimpleType)
+        simple = ClassFactory.create(qname="a", type=SimpleType)
         self.processor.container.add(simple)
         self.assertEqual(simple, self.processor.find_dependency(attr_type))
 

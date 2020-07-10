@@ -289,11 +289,11 @@ class ClassExtensionHandlerTests(FactoryTestCase):
 
         self.assertIsNone(self.processor.find_dependency(attr_type))
 
-        complex = ClassFactory.create(name="a", type=ComplexType)
+        complex = ClassFactory.create(qname="a", type=ComplexType)
         self.processor.container.add(complex)
         self.assertEqual(complex, self.processor.find_dependency(attr_type))
 
-        simple = ClassFactory.create(name="a", type=SimpleType)
+        simple = ClassFactory.create(qname="a", type=SimpleType)
         self.processor.container.add(simple)
         self.assertEqual(simple, self.processor.find_dependency(attr_type))
 

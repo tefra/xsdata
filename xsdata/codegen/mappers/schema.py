@@ -63,7 +63,6 @@ class SchemaMapper:
     ) -> Class:
         """Build and return a class instance."""
         instance = Class(
-            name=obj.real_name,
             qname=QName(target_namespace, obj.real_name),
             abstract=obj.is_abstract,
             namespace=cls.element_namespace(obj, target_namespace),

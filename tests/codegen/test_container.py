@@ -19,9 +19,9 @@ class ClassContainerTests(FactoryTestCase):
 
     def test_from_list(self):
         classes = [
-            ClassFactory.create(type=Element, name="foo"),
-            ClassFactory.create(type=ComplexType, name="foo"),
-            ClassFactory.create(type=ComplexType, name="foobar"),
+            ClassFactory.create(qname="foo", type=Element),
+            ClassFactory.create(qname="foo", type=ComplexType),
+            ClassFactory.create(qname="foobar", type=ComplexType),
         ]
         container = ClassContainer.from_list(classes)
 
@@ -35,9 +35,9 @@ class ClassContainerTests(FactoryTestCase):
 
     @mock.patch.object(ClassContainer, "process_class")
     def test_find(self, mock_process_class):
-        class_a = ClassFactory.create(name="a")
-        class_b = ClassFactory.create(name="b", status=Status.PROCESSED)
-        class_c = ClassFactory.enumeration(2, name="b", status=Status.PROCESSING)
+        class_a = ClassFactory.create(qname="a")
+        class_b = ClassFactory.create(qname="b", status=Status.PROCESSED)
+        class_c = ClassFactory.enumeration(2, qname="b", status=Status.PROCESSING)
 
         self.container.extend([class_a, class_b, class_c])
 
@@ -51,8 +51,8 @@ class ClassContainerTests(FactoryTestCase):
 
     @mock.patch.object(ClassContainer, "process_class")
     def test_find_repeat_on_condition_and_not_processed(self, mock_process_class):
-        first = ClassFactory.elements(2, name="a")
-        second = ClassFactory.elements(2, name="a")
+        first = ClassFactory.elements(2, qname="a")
+        second = ClassFactory.elements(2, qname="a")
         self.container.extend([first, second])
 
         def process_class(x: Class):

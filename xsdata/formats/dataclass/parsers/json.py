@@ -27,13 +27,9 @@ class JsonParser(AbstractParser, XmlContext):
         """
         Recursively build the given model from the input dict data.
 
-        :raise TypeError: When parsing fails for any reason
+        :raise ParserError: When parsing fails for any reason
         """
         params = {}
-
-        if isinstance(data, list) and len(data) == 1:
-            data = data[0]
-
         for var in self.build(clazz).vars:
             value = self.get_value(data, var)
 

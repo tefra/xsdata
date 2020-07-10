@@ -52,13 +52,33 @@ class CodeWriter:
         for result in engine.render(classes):
             print(result.source, end="")
 
-    def designate(self, classes: List[Class], output: str):
-        """Normalize the target package and module names by the given output
-        generator."""
+    def designate(
+        self, classes: List[Class], output: str, package: str, ns_struct: bool
+    ):
+        """
+        Normalize the target package and module names by the given output
+        generator.
+
+        :param classes: a list of codegen class instances
+        :param output: target output format
+        :param package: the original user provided package name
+        :param ns_struct: use the target namespaces to group the classes in the same
+            module.
+        """
         modules = {}
         packages = {}
 
         for obj in classes:
+
+            if ns_struct:
+                if not obj.qname.namespace:
+                    raise CodeGenerationError(
+                        f"Class `{obj.name}` target namespace "
+                        f"is empty, avoid option `--ns-struct`"
+                    )
+
+                obj.package = package
+                obj.module = obj.qname.namespace
 
             if obj.package is None:
                 raise CodeGenerationError(

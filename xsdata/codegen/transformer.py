@@ -42,6 +42,7 @@ class SchemaTransformer:
 
     print: bool
     output: str
+    ns_struct: bool
     class_map: Dict[str, List[Class]] = field(init=False, default_factory=dict)
     processed: List[str] = field(init=False, default_factory=list)
 
@@ -69,7 +70,7 @@ class SchemaTransformer:
                 "Analyzer output: %d main and %d inner classes", class_num, inner_num
             )
 
-            writer.designate(classes, self.output)
+            writer.designate(classes, self.output, package, self.ns_struct)
             if self.print:
                 writer.print(classes, self.output)
             else:

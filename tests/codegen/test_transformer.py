@@ -16,7 +16,9 @@ from xsdata.models.xsd import Schema
 
 class SchemaTransformerTests(FactoryTestCase):
     def setUp(self):
-        self.transformer = SchemaTransformer(print=True, output="pydata")
+        self.transformer = SchemaTransformer(
+            print=True, output="pydata", ns_struct=False
+        )
         super().setUp()
 
     @mock.patch("xsdata.codegen.transformer.logger.info")
@@ -50,7 +52,9 @@ class SchemaTransformerTests(FactoryTestCase):
         mock_process_schema.assert_has_calls(list(map(mock.call, urls)))
         mock_assign_packages.assert_called_once_with(package)
         mock_analyze_classes.assert_called_once_with(schema_classes)
-        mock_writer_designate.assert_called_once_with(analyzer_classes, "pydata")
+        mock_writer_designate.assert_called_once_with(
+            analyzer_classes, "pydata", package, self.transformer.ns_struct
+        )
         mock_writer_print.assert_called_once_with(analyzer_classes, "pydata")
         mock_logger_into.assert_has_calls(
             [
@@ -91,7 +95,9 @@ class SchemaTransformerTests(FactoryTestCase):
         mock_process_schema.assert_has_calls(list(map(mock.call, urls)))
         mock_assign_packages.assert_called_once_with(package)
         mock_analyze_classes.assert_called_once_with(schema_classes)
-        mock_writer_designate.assert_called_once_with(analyzer_classes, "pydata")
+        mock_writer_designate.assert_called_once_with(
+            analyzer_classes, "pydata", package, self.transformer.ns_struct
+        )
         mock_writer_write.assert_called_once_with(analyzer_classes, "pydata")
         mock_logger_into.assert_has_calls(
             [

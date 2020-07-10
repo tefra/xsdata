@@ -1,6 +1,7 @@
 from unittest import TestCase
 
 from xsdata.utils.text import capitalize
+from xsdata.utils.text import clean_uri
 from xsdata.utils.text import pascal_case
 from xsdata.utils.text import snake_case
 
@@ -31,3 +32,10 @@ class TextTests(TestCase):
     def test_capitalize(self):
         self.assertEqual("UserName", capitalize("userName"))
         self.assertEqual(".userName", capitalize(".userName"))
+
+    def test_clean_uri(self):
+        self.assertEqual("a", clean_uri("urn:a"))
+        self.assertEqual("a_com/b", clean_uri("http://a.com/b.xsd"))
+        self.assertEqual("a_com/b", clean_uri("http://www.a.com/b.xsd"))
+        self.assertEqual("a_com/b", clean_uri("https://a.com/b.wsdl"))
+        self.assertEqual("a_com/b", clean_uri("https://www.a.com/b.xsd"))

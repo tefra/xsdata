@@ -34,5 +34,5 @@ class NameTests(TestCase):
         type_str = AttrTypeFactory.xs_string()
         self.assertEqual("str", type_name(type_str))
 
-        type_foo_bar_bam = AttrTypeFactory.create(name="foo:bar_bam")
+        type_foo_bar_bam = AttrTypeFactory.create(qname="bar_bam")
         self.assertEqual("BarBam", type_name(type_foo_bar_bam))

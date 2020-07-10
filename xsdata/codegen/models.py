@@ -22,23 +22,6 @@ from xsdata.models.xsd import ComplexType
 from xsdata.models.xsd import Element
 from xsdata.utils import text
 
-
-def qname(name: str, ns_map: Dict, default_namespace: Optional[str] = None) -> QName:
-    """
-    Create an :class:`lxml.etree.QName` for the given name and namespaces map.
-
-    Use the default namespace if the prefix is not in the ns_map.
-    """
-    prefix, suffix = text.split(name)
-    namespace = default_namespace
-
-    if prefix:
-        name = suffix
-        namespace = ns_map.get(prefix, prefix)
-
-    return QName(namespace, name)
-
-
 xml_type_map = {
     Tag.ELEMENT: XmlType.ELEMENT,
     Tag.ANY: XmlType.WILDCARD,
@@ -164,7 +147,7 @@ class AttrType:
     """
     Model representation for the typing information for fields and extensions.
 
-    :param name:
+    :param qname:
     :param index:
     :param alias:
     :param native:
@@ -172,12 +155,17 @@ class AttrType:
     :param circular:
     """
 
-    name: str
+    qname: QName
     index: int = field(default_factory=int)
     alias: Optional[str] = field(default=None)
     native: bool = field(default=False)
     forward: bool = field(default=False)
     circular: bool = field(default=False)
+
+    @property
+    def name(self) -> str:
+        """Shortcut for qname local name."""
+        return self.qname.localname
 
     @property
     def is_dependency(self) -> bool:
@@ -373,6 +361,7 @@ class Class:
     """
 
     name: str
+    qname: QName
     type: Type
     module: str
     mixed: bool
@@ -384,12 +373,11 @@ class Class:
     package: Optional[str] = field(default=None)
     namespace: Optional[str] = field(default=None)
     help: Optional[str] = field(default=None)
-    substitutions: List[str] = field(default_factory=list)
+    substitutions: List[QName] = field(default_factory=list)
     extensions: List[Extension] = field(default_factory=list)
     attrs: List[Attr] = field(default_factory=list)
     inner: List["Class"] = field(default_factory=list)
     ns_map: Dict = field(default_factory=dict)
-    source_namespace: Optional[str] = field(default=None)
 
     @property
     def has_suffix_attr(self) -> bool:
@@ -426,23 +414,6 @@ class Class:
         )
 
     @property
-    def source_prefix(self) -> Optional[str]:
-        """Return the source namespace prefix as it was defined in the schema
-        definition."""
-        if not self.source_namespace:
-            return None
-
-        for prefix, namespace in self.ns_map.items():
-            if namespace == self.source_namespace and prefix:
-                return prefix
-
-        return (
-            None
-            if self.source_namespace.startswith("http://")
-            else self.source_namespace
-        )
-
-    @property
     def target_module(self) -> str:
         """Return the target module this class is assigned to."""
         return f"{self.package}.{self.module}"
@@ -470,19 +441,16 @@ class Class:
         for attr in self.attrs:
             for attr_type in attr.types:
                 if attr_type.is_dependency and attr_type.name not in seen:
-                    yield self.source_qname(attr_type.name)
+                    yield attr_type.qname
                     seen.add(attr_type.name)
 
         for ext in self.extensions:
             if ext.type.is_dependency and ext.type.name not in seen:
-                yield self.source_qname(ext.type.name)
+                yield ext.type.qname
                 seen.add(ext.type.name)
 
         for inner in self.inner:
             yield from inner.dependencies()
-
-    def source_qname(self, name: Optional[str] = None) -> QName:
-        return qname(name or self.name, self.ns_map, self.source_namespace)
 
 
 @dataclass

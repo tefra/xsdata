@@ -12,7 +12,9 @@ from xsdata.codegen.mixins import HandlerInterface
 from xsdata.codegen.models import Attr
 from xsdata.codegen.models import AttrType
 from xsdata.codegen.models import Class
+from xsdata.codegen.utils import ClassUtils
 from xsdata.utils import collections
+from xsdata.utils import text
 
 Substitutions = Optional[Dict[QName, List[Attr]]]
 
@@ -48,19 +50,17 @@ class AttributeSubstitutionHandler(HandlerInterface):
         supposed to substitute.
         """
         index = target.attrs.index(attr)
-        qname = target.source_qname(attr.name)
-
         assert self.substitutions is not None
 
-        for substitution in self.substitutions.get(qname, []):
-            pos = collections.find(target.attrs, substitution)
-            index = pos + 1 if pos > -1 else index
+        for attr_type in attr.types:
+            for substitution in self.substitutions.get(attr_type.qname, []):
+                clone = ClassUtils.clone_attribute(substitution, attr.restrictions)
 
-            clone = substitution.clone()
-            clone.restrictions.merge(attr.restrictions)
-            target.attrs.insert(index, clone)
+                pos = collections.find(target.attrs, clone)
+                index = pos + 1 if pos > -1 else index
+                target.attrs.insert(index, clone)
 
-            self.process_attribute(target, clone)
+                self.process_attribute(target, clone)
 
     def create_substitutions(self):
         """Create reference attributes for all the classes substitutions and
@@ -68,26 +68,21 @@ class AttributeSubstitutionHandler(HandlerInterface):
 
         self.substitutions = defaultdict(list)
         for obj in self.container.iterate():
-            for substitution in obj.substitutions:
-                qname = obj.source_qname(substitution)
-                attr = self.create_substitution(obj, qname)
+            for qname in obj.substitutions:
+                attr = self.create_substitution(obj)
                 self.substitutions[qname].append(attr)
 
     @classmethod
-    def create_substitution(cls, source: Class, qname: QName) -> Attr:
+    def create_substitution(cls, source: Class) -> Attr:
         """Create an attribute with type that refers to the given source class
         and namespaced qualified name."""
-        prefix = None
-        if qname.namespace != source.source_namespace:
-            prefix = source.source_prefix
 
-        reference = f"{prefix}:{source.name}" if prefix else source.name
+        name = text.suffix(source.name)
         return Attr(
-            name=source.name,
-            local_name=source.name,
+            name=name,
+            local_name=name,
             index=0,
-            default=None,
-            types=[AttrType(name=reference)],
+            types=[AttrType(qname=QName(source.qname.namespace, name))],
             tag=source.type.__name__,
             namespace=source.namespace,
         )

@@ -31,7 +31,7 @@ class DataclassGenerator(AbstractGenerator):
         Group classes into modules and yield an output per module and
         per package __init__.py file.
         """
-        packages = {obj.source_qname(): obj.target_module for obj in classes}
+        packages = {obj.qname: obj.target_module for obj in classes}
         resolver = DependenciesResolver(packages=packages)
 
         # Generate packages
@@ -68,7 +68,7 @@ class DataclassGenerator(AbstractGenerator):
         resolver.process(classes)
         imports = self.group_imports(resolver.sorted_imports())
         output = self.render_classes(resolver.sorted_classes())
-        namespace = classes[0].source_namespace
+        namespace = classes[0].qname.namespace
 
         return self.template("module").render(
             output=output, imports=imports, namespace=namespace

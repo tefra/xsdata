@@ -20,7 +20,10 @@ class ElementBaseTests(TestCase):
 
     def test_property_default_type(self):
         element = ElementBase()
-        self.assertEqual(DataType.STRING, element.default_type)
+        self.assertEqual("string", element.default_type)
+
+        element = ElementBase(ns_map={"xsd": Namespace.XS.uri})
+        self.assertEqual("xsd:string", element.default_type)
 
     def test_property_default_value(self):
         element = ElementBase()

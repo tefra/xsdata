@@ -3,6 +3,7 @@ from unittest import mock
 from lxml.etree import QName
 
 from tests.factories import AttrFactory
+from tests.factories import AttrTypeFactory
 from tests.factories import ClassFactory
 from tests.factories import FactoryTestCase
 from xsdata.codegen.container import ClassContainer
@@ -37,15 +38,19 @@ class AttributeSubstitutionHandlerTests(FactoryTestCase):
 
     @mock.patch("xsdata.utils.collections.find")
     def test_process_attribute(self, mock_find):
-        target = ClassFactory.elements(2)
+        target = ClassFactory.create(
+            attrs=[
+                AttrFactory.create(types=[AttrTypeFactory.create("foo")]),
+                AttrFactory.create(types=[AttrTypeFactory.create("bar")]),
+            ]
+        )
         mock_find.side_effect = [-1, 2]
 
         first_attr = target.attrs[0]
         second_attr = target.attrs[1]
         first_attr.restrictions.max_occurs = 2
 
-        attr_name = first_attr.name
-        attr_qname = target.source_qname(attr_name)
+        attr_qname = first_attr.types[0].qname
         reference_attrs = AttrFactory.list(2)
 
         self.processor.create_substitutions()
@@ -66,12 +71,14 @@ class AttributeSubstitutionHandlerTests(FactoryTestCase):
 
     @mock.patch.object(AttributeSubstitutionHandler, "create_substitution")
     def test_create_substitutions(self, mock_create_substitution):
+        ns = "xsdata"
         classes = [
-            ClassFactory.create(substitutions=["foo", "bar"], abstract=True),
-            ClassFactory.create(substitutions=["foo"], abstract=True),
+            ClassFactory.create(
+                substitutions=[QName(ns, "foo"), QName(ns, "bar")], abstract=True
+            ),
+            ClassFactory.create(substitutions=[QName(ns, "foo")], abstract=True),
         ]
 
-        namespace = classes[0].source_namespace
         reference_attrs = AttrFactory.list(3)
         mock_create_substitution.side_effect = reference_attrs
 
@@ -79,36 +86,25 @@ class AttributeSubstitutionHandlerTests(FactoryTestCase):
         self.processor.create_substitutions()
 
         expected = {
-            QName(namespace, "foo"): [reference_attrs[0], reference_attrs[2]],
-            QName(namespace, "bar"): [reference_attrs[1]],
+            QName(ns, "foo"): [reference_attrs[0], reference_attrs[2]],
+            QName(ns, "bar"): [reference_attrs[1]],
         }
         self.assertEqual(expected, self.processor.substitutions)
 
         mock_create_substitution.assert_has_calls(
-            [
-                mock.call(classes[0], classes[0].source_qname("foo")),
-                mock.call(classes[0], classes[0].source_qname("bar")),
-                mock.call(classes[1], classes[1].source_qname("foo")),
-            ]
+            [mock.call(classes[0]), mock.call(classes[0]), mock.call(classes[1]),]
         )
 
     def test_create_substitution(self):
-        item = ClassFactory.elements(1)
-        actual = self.processor.create_substitution(item, QName("foo"))
+        item = ClassFactory.elements(1, name="bar", qname=QName("foo", "bar"))
+        actual = self.processor.create_substitution(item)
 
         expected = AttrFactory.create(
-            name=item.name,
+            name="bar",
             index=0,
             default=None,
-            types=[AttrType(name=f"{item.source_prefix}:{item.name}")],
+            types=[AttrType(qname=QName("foo", "bar"))],
             tag=item.type.__name__,
         )
 
         self.assertEqual(expected, actual)
-
-        actual = self.processor.create_substitution(item, item.source_qname("foo"))
-        self.assertEqual(item.name, actual.types[0].name)
-
-        item.source_namespace = None
-        actual = self.processor.create_substitution(item, QName("foo"))
-        self.assertEqual(item.name, actual.types[0].name)

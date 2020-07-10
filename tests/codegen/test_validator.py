@@ -47,7 +47,7 @@ class ClassValidatorTests(FactoryTestCase):
         first = ClassFactory.create(
             extensions=[
                 ExtensionFactory.create(type=AttrTypeFactory.xs_bool()),
-                ExtensionFactory.create(type=AttrTypeFactory.create(name="foo")),
+                ExtensionFactory.create(type=AttrTypeFactory.create(qname="foo")),
             ]
         )
         second = ClassFactory.create(
@@ -125,8 +125,8 @@ class ClassValidatorTests(FactoryTestCase):
         source = ClassFactory.create()
         target = source.clone()
 
-        ext_a = ExtensionFactory.create(type=AttrTypeFactory.create(name=source.name))
-        ext_str = ExtensionFactory.create(type=AttrTypeFactory.create(name="foo"))
+        ext_a = ExtensionFactory.create(type=AttrTypeFactory.create(qname=source.name))
+        ext_str = ExtensionFactory.create(type=AttrTypeFactory.create(qname="foo"))
         target.extensions.append(ext_str)
         target.extensions.append(ext_a)
 

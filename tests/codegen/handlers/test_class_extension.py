@@ -285,18 +285,17 @@ class ClassExtensionHandlerTests(FactoryTestCase):
         mock_copy_attributes.assert_called_once_with(source, target, extension)
 
     def test_find_dependency(self):
-        target = ClassFactory.create()
-        attr_type = AttrTypeFactory.create(name="a")
+        attr_type = AttrTypeFactory.create(qname="a")
 
-        self.assertIsNone(self.processor.find_dependency(target, attr_type))
+        self.assertIsNone(self.processor.find_dependency(attr_type))
 
         complex = ClassFactory.create(name="a", type=ComplexType)
         self.processor.container.add(complex)
-        self.assertEqual(complex, self.processor.find_dependency(target, attr_type))
+        self.assertEqual(complex, self.processor.find_dependency(attr_type))
 
         simple = ClassFactory.create(name="a", type=SimpleType)
         self.processor.container.add(simple)
-        self.assertEqual(simple, self.processor.find_dependency(target, attr_type))
+        self.assertEqual(simple, self.processor.find_dependency(attr_type))
 
     def test_compare_attributes(self):
         source = ClassFactory.elements(2)

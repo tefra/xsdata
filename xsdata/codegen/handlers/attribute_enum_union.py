@@ -30,8 +30,7 @@ class AttributeEnumUnionHandler(HandlerInterface):
             if attr_type.forward:
                 enums.extend(target.inner)
             elif not attr_type.native:
-                qname = target.source_qname(attr_type.name)
-                enums.append(self.container.find(qname))
+                enums.append(self.container.find(attr_type.qname))
             else:
                 enums.append(None)
 

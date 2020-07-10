@@ -60,7 +60,7 @@ class ClassExtensionHandler(HandlerInterface):
 
     def process_dependency_extension(self, target: Class, extension: Extension):
         """User defined type flatten handler."""
-        source = self.find_dependency(target, extension.type)
+        source = self.find_dependency(extension.type)
         if not source:
             logger.warning("Missing extension type: %s", extension.type.name)
             target.extensions.remove(extension)
@@ -116,7 +116,7 @@ class ClassExtensionHandler(HandlerInterface):
         ):
             ClassUtils.copy_attributes(source, target, ext)
 
-    def find_dependency(self, target: Class, attr_type: AttrType) -> Optional[Class]:
+    def find_dependency(self, attr_type: AttrType) -> Optional[Class]:
         """
         Find dependency for the given extension type with priority.
 
@@ -128,9 +128,8 @@ class ClassExtensionHandler(HandlerInterface):
             lambda x: x.type is ComplexType,
         )
 
-        qname = target.source_qname(attr_type.name)
         for condition in conditions:
-            result = self.container.find(qname, condition=condition)
+            result = self.container.find(attr_type.qname, condition=condition)
             if result:
                 return result
 

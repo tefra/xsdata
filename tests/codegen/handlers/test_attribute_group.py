@@ -91,11 +91,11 @@ class AttributeGroupHandlerTests(FactoryTestCase):
         self.assertFalse(group_attr in target.attrs)
 
     def test_process_attribute_with_unknown_source(self):
-        group_attr = AttrFactory.attribute_group(name="foo:bar")
+        group_attr = AttrFactory.attribute_group(name="bar")
         target = ClassFactory.create()
         target.attrs.append(group_attr)
 
         with self.assertRaises(AnalyzerValueError) as cm:
             self.processor.process_attribute(target, group_attr)
 
-        self.assertEqual("Group attribute not found: `{foo}bar`", str(cm.exception))
+        self.assertEqual("Group attribute not found: `{xsdata}bar`", str(cm.exception))

@@ -1,5 +1,4 @@
 import sys
-from typing import Optional
 
 from xsdata.codegen.models import Attr
 from xsdata.codegen.models import Class
@@ -21,14 +20,13 @@ class ClassUtils:
         The new attributes are prepended in the list unless if they are
         supposed to be last in a sequence.
         """
-        prefix = text.prefix(extension.type.name)
         target.extensions.remove(extension)
         target_attr_names = {text.suffix(attr.name) for attr in target.attrs}
 
         index = 0
         for attr in source.attrs:
             if text.suffix(attr.name) not in target_attr_names:
-                clone = cls.clone_attribute(attr, extension.restrictions, prefix)
+                clone = cls.clone_attribute(attr, extension.restrictions)
 
                 if attr.index == sys.maxsize:
                     target.attrs.append(clone)
@@ -46,10 +44,9 @@ class ClassUtils:
         together."""
         index = target.attrs.index(attr)
         target.attrs.pop(index)
-        prefix = text.prefix(attr.name)
 
         for source_attr in source.attrs:
-            clone = cls.clone_attribute(source_attr, attr.restrictions, prefix)
+            clone = cls.clone_attribute(source_attr, attr.restrictions)
             target.attrs.insert(index, clone)
             index += 1
 
@@ -66,23 +63,11 @@ class ClassUtils:
             target.extensions.append(clone)
 
     @classmethod
-    def clone_attribute(
-        cls, attr: Attr, restrictions: Restrictions, prefix: Optional[str] = None
-    ) -> Attr:
-        """
-        Clone the given attribute and merge its restrictions with the given
-        instance.
-
-        Prepend the given namespace prefix to the attribute name if
-        available.
-        """
+    def clone_attribute(cls, attr: Attr, restrictions: Restrictions) -> Attr:
+        """Clone the given attribute and merge its restrictions with the given
+        instance."""
         clone = attr.clone()
         clone.restrictions.merge(restrictions)
-        if prefix:
-            for attr_type in clone.types:
-                if not attr_type.native and attr_type.name.find(":") == -1:
-                    attr_type.name = f"{prefix}:{attr_type.name}"
-
         return clone
 
     @classmethod

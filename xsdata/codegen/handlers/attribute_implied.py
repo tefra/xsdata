@@ -1,8 +1,11 @@
+from lxml.etree import QName
+
 from xsdata.codegen.mixins import HandlerInterface
 from xsdata.codegen.models import Attr
 from xsdata.codegen.models import AttrType
 from xsdata.codegen.models import Class
 from xsdata.models.enums import DataType
+from xsdata.models.enums import Namespace
 from xsdata.models.enums import NamespaceType
 from xsdata.models.enums import Tag
 
@@ -23,7 +26,11 @@ class AttributeImpliedHandler(HandlerInterface):
             name="content",
             local_name="content",
             index=0,
-            types=[AttrType(name=DataType.ANY_TYPE.code, native=True)],
+            types=[
+                AttrType(
+                    qname=QName(Namespace.XS.uri, DataType.ANY_TYPE.code), native=True,
+                )
+            ],
             tag=Tag.ANY,
             namespace=NamespaceType.ANY.value,
         )

@@ -14,41 +14,41 @@ class ClassUtilsTests(FactoryTestCase):
     @mock.patch.object(ClassUtils, "copy_inner_classes")
     @mock.patch.object(ClassUtils, "clone_attribute")
     def test_copy_attributes(self, mock_clone_attribute, mock_copy_inner_classes):
-        mock_clone_attribute.side_effect = lambda x, y, z: x.clone()
+        mock_clone_attribute.side_effect = lambda x, y: x.clone()
         target = ClassFactory.create(
-            attrs=[AttrFactory.create(name="foo:a"), AttrFactory.create(name="b")]
+            attrs=[AttrFactory.create(name="a"), AttrFactory.create(name="b")]
         )
         source = ClassFactory.create(
             attrs=[
                 AttrFactory.create(name="c", index=sys.maxsize),
                 AttrFactory.create(name="a"),
-                AttrFactory.create(name="boo:b"),
+                AttrFactory.create(name="b"),
                 AttrFactory.create(name="d"),
             ]
         )
-        extension = ExtensionFactory.create(type=AttrTypeFactory.create(name="foo:foo"))
+        extension = ExtensionFactory.create(type=AttrTypeFactory.create(qname="foo"))
         target.extensions.append(extension)
 
         ClassUtils.copy_attributes(source, target, extension)
 
-        self.assertEqual(["foo:a", "b", "d", "c"], [attr.name for attr in target.attrs])
+        self.assertEqual(["a", "b", "d", "c"], [attr.name for attr in target.attrs])
         mock_copy_inner_classes.assert_called_once_with(source, target)
         mock_clone_attribute.assert_has_calls(
             [
-                mock.call(source.attrs[0], extension.restrictions, "foo"),
-                mock.call(source.attrs[3], extension.restrictions, "foo"),
+                mock.call(source.attrs[0], extension.restrictions),
+                mock.call(source.attrs[3], extension.restrictions),
             ]
         )
 
     @mock.patch.object(ClassUtils, "copy_inner_classes")
     @mock.patch.object(ClassUtils, "clone_attribute")
     def test_copy_group_attributes(self, mock_clone_attribute, mock_copy_inner_classes):
-        mock_clone_attribute.side_effect = lambda x, y, z: x.clone()
+        mock_clone_attribute.side_effect = lambda x, y: x.clone()
         source = ClassFactory.elements(2)
         source.inner.append(ClassFactory.create())
         target = ClassFactory.elements(3)
         attrs = list(target.attrs)
-        attrs[1].name = "foo:bar"
+        attrs[1].name = "bar"
 
         ClassUtils.copy_group_attributes(source, target, target.attrs[1])
 
@@ -58,8 +58,8 @@ class ClassUtilsTests(FactoryTestCase):
         mock_copy_inner_classes.assert_called_once_with(source, target)
         mock_clone_attribute.assert_has_calls(
             [
-                mock.call(source.attrs[0], attrs[1].restrictions, "foo"),
-                mock.call(source.attrs[1], attrs[1].restrictions, "foo"),
+                mock.call(source.attrs[0], attrs[1].restrictions),
+                mock.call(source.attrs[1], attrs[1].restrictions),
             ]
         )
 
@@ -79,17 +79,15 @@ class ClassUtilsTests(FactoryTestCase):
         attr = AttrFactory.create(
             restrictions=RestrictionsFactory.create(length=1),
             types=[
-                AttrTypeFactory.create(name="foo:x"),
-                AttrTypeFactory.create(name="y"),
+                AttrTypeFactory.create(qname="x"),
+                AttrTypeFactory.create(qname="y"),
                 AttrTypeFactory.xs_int(),
             ],
         )
         restrictions = RestrictionsFactory.create(length=2)
-        prefix = "foo"
 
-        clone = ClassUtils.clone_attribute(attr, restrictions, prefix)
+        clone = ClassUtils.clone_attribute(attr, restrictions)
 
-        self.assertEqual(["foo:x", "foo:y", "integer"], [x.name for x in clone.types])
         self.assertEqual(2, clone.restrictions.length)
         self.assertIsNot(attr, clone)
 
@@ -109,9 +107,9 @@ class ClassUtilsTests(FactoryTestCase):
 
         attr = AttrFactory.create(
             types=[
-                AttrTypeFactory.create(name=target.name, forward=True),
-                AttrTypeFactory.create(name=target.name, forward=False),
-                AttrTypeFactory.create(name="foobar"),
+                AttrTypeFactory.create(qname=target.name, forward=True),
+                AttrTypeFactory.create(qname=target.name, forward=False),
+                AttrTypeFactory.create(qname="foobar"),
             ]
         )
         target.attrs.append(attr)

@@ -5,8 +5,6 @@ from tests.factories import FactoryTestCase
 from xsdata.codegen.container import ClassContainer
 from xsdata.codegen.handlers import AttributeEnumUnionHandler
 from xsdata.models.enums import Tag
-from xsdata.models.xsd import Element
-from xsdata.models.xsd import SimpleType
 
 
 class AttributeEnumUnionHandlerTests(FactoryTestCase):
@@ -21,8 +19,10 @@ class AttributeEnumUnionHandlerTests(FactoryTestCase):
                     name="value",
                     tag=Tag.UNION,
                     types=[
-                        AttrTypeFactory.create(name=self.root_enum.name),
-                        AttrTypeFactory.create(name=self.inner_enum.name, forward=True),
+                        AttrTypeFactory.create(qname=self.root_enum.name),
+                        AttrTypeFactory.create(
+                            qname=self.inner_enum.name, forward=True
+                        ),
                     ],
                 ),
             ],

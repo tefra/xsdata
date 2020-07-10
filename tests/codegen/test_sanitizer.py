@@ -126,14 +126,14 @@ class ClassSanitizerTest(FactoryTestCase):
                 AttrFactory.create(
                     types=[
                         AttrTypeFactory.create(),
-                        AttrTypeFactory.create(name="foo"),
+                        AttrTypeFactory.create(qname="foo"),
                     ],
                     default="1",
                 ),
                 AttrFactory.create(
                     types=[
                         AttrTypeFactory.create(),
-                        AttrTypeFactory.create(name="bar", forward=True),
+                        AttrTypeFactory.create(qname="bar", forward=True),
                     ],
                     default="2",
                 ),

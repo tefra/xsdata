@@ -1112,8 +1112,10 @@ class Element(AnnotationBase):
         return self.complex_type.is_mixed if self.complex_type else False
 
     @property
-    def default_type(self) -> DataType:
-        return DataType.ANY_TYPE
+    def default_type(self) -> str:
+        prefix = self.schema_prefix()
+        suffix = DataType.ANY_TYPE.code
+        return f"{prefix}:{suffix}" if prefix else suffix
 
     @property
     def raw_type(self) -> Optional[str]:

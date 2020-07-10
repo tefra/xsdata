@@ -58,8 +58,7 @@ class DependenciesResolver:
         """Walk the attributes tree and set the type aliases."""
         for attr in obj.attrs:
             for attr_type in attr.types:
-                attr_type_qname = obj.source_qname(attr_type.name)
-                attr_type.alias = self.aliases.get(attr_type_qname)
+                attr_type.alias = self.aliases.get(attr_type.qname)
 
         collections.apply(obj.inner, self.apply_aliases)
 
@@ -100,9 +99,7 @@ class DependenciesResolver:
     @staticmethod
     def create_class_list(classes: List[Class]) -> List[str]:
         """Use topology sort to return a flat list for all the dependencies."""
-        return toposort_flatten(
-            {obj.source_qname(): set(obj.dependencies()) for obj in classes}
-        )
+        return toposort_flatten({obj.qname: set(obj.dependencies()) for obj in classes})
 
     @staticmethod
     def create_class_map(classes: List[Class]) -> Dict[QName, Class]:
@@ -110,9 +107,8 @@ class DependenciesResolver:
 
         result: Dict[QName, Class] = {}
         for obj in classes:
-            qname = obj.source_qname()
-            if qname in result:
+            if obj.qname in result:
                 raise ResolverValueError(f"Duplicate class: `{obj.name}`")
-            result[qname] = obj
+            result[obj.qname] = obj
 
         return result

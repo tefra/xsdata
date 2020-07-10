@@ -59,7 +59,7 @@ class AttributeDefaultTests(TestCase):
 
     def test_attribute_default_with_type_enum(self):
         attr = AttrFactory.create(
-            types=AttrTypeFactory.list(1, name="foo"), default="@enum@foo::bar"
+            types=AttrTypeFactory.list(1, qname="foo"), default="@enum@foo::bar"
         )
         self.assertEqual("Foo.BAR", attribute_default(attr))
 

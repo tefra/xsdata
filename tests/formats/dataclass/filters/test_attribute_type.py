@@ -8,26 +8,26 @@ from xsdata.formats.dataclass.filters import attribute_type
 class AttributeTypeTests(TestCase):
     def test_attribute_type_with_default_value(self):
         attr = AttrFactory.create(
-            default="foo", types=AttrTypeFactory.list(1, name="foo_bar")
+            default="foo", types=AttrTypeFactory.list(1, qname="foo_bar")
         )
 
         self.assertEqual("FooBar", attribute_type(attr, []))
 
     def test_attribute_type_with_optional_value(self):
-        attr = AttrFactory.create(types=AttrTypeFactory.list(1, name="foo_bar"))
+        attr = AttrFactory.create(types=AttrTypeFactory.list(1, qname="foo_bar"))
 
         self.assertEqual("Optional[FooBar]", attribute_type(attr, []))
 
     def test_attribute_type_with_circularerence(self):
         attr = AttrFactory.create(
-            types=AttrTypeFactory.list(1, name="foo_bar", circular=True)
+            types=AttrTypeFactory.list(1, qname="foo_bar", circular=True)
         )
 
         self.assertEqual('Optional["FooBar"]', attribute_type(attr, ["Parent"]))
 
     def test_attribute_type_with_forwarderence(self):
         attr = AttrFactory.create(
-            types=AttrTypeFactory.list(1, name="foo_bar", forward=True)
+            types=AttrTypeFactory.list(1, qname="foo_bar", forward=True)
         )
         self.assertEqual(
             'Optional["Parent.Inner.FooBar"]', attribute_type(attr, ["Parent", "Inner"])
@@ -35,7 +35,7 @@ class AttributeTypeTests(TestCase):
 
     def test_attribute_type_with_forward_and_circularerence(self):
         attr = AttrFactory.create(
-            types=AttrTypeFactory.list(1, name="foo_bar", forward=True, circular=True)
+            types=AttrTypeFactory.list(1, qname="foo_bar", forward=True, circular=True)
         )
 
         self.assertEqual(
@@ -44,7 +44,7 @@ class AttributeTypeTests(TestCase):
 
     def test_attribute_type_with_list_type(self):
         attr = AttrFactory.create(
-            types=AttrTypeFactory.list(1, name="foo_bar", forward=True)
+            types=AttrTypeFactory.list(1, qname="foo_bar", forward=True)
         )
         attr.restrictions.max_occurs = 2
         self.assertEqual(
@@ -54,7 +54,7 @@ class AttributeTypeTests(TestCase):
     def test_attribute_type_with_alias(self):
         attr = AttrFactory.create(
             types=AttrTypeFactory.list(
-                1, name="foo_bar", forward=True, alias="Boss:Life"
+                1, qname="foo_bar", forward=True, alias="Boss:Life"
             )
         )
         attr.restrictions.max_occurs = 2
@@ -65,9 +65,7 @@ class AttributeTypeTests(TestCase):
     def test_attribute_type_with_multiple_types(self):
         attr = AttrFactory.create(
             types=[
-                AttrTypeFactory.create(
-                    name="thug:life", alias="Boss:Life", forward=True
-                ),
+                AttrTypeFactory.create(qname="life", alias="Boss:Life", forward=True),
                 AttrTypeFactory.xs_int(),
             ]
         )

@@ -17,7 +17,7 @@ class PlantUmlGenerator(AbstractGenerator):
 
     def render(self, classes: List[Class]) -> Iterator[GeneratorResult]:
         """Return a iterator of the generated results."""
-        packages = {obj.source_qname(): obj.target_module for obj in classes}
+        packages = {obj.qname: obj.target_module for obj in classes}
         resolver = DependenciesResolver(packages=packages)
 
         for module, cluster in self.group_by_module(classes).items():

@@ -4,6 +4,8 @@ from typing import Callable
 from typing import List
 from typing import Optional
 
+from lxml.etree import QName
+
 from xsdata.codegen.container import ClassContainer
 from xsdata.codegen.models import Attr
 from xsdata.codegen.models import AttrType
@@ -124,9 +126,10 @@ class ClassSanitizer:
             for attr_type in attr.types:
                 if attr_type.name == inner.name:
                     attr_type.forward = False
-                    attr_type.name = name
+                    attr_type.qname = QName(inner.qname.namespace, name)
 
         inner.name = name
+        inner.qname = QName(inner.qname.namespace, name)
 
         self.container.add(inner)
 
@@ -253,7 +256,7 @@ class ClassSanitizer:
                 condition=lambda x: x.is_enumeration and x.name == attr_type.name,
             )
 
-        qname = source.source_qname(attr_type.name)
+        qname = attr_type.qname
         return self.container.find(qname, condition=lambda x: x.is_enumeration)
 
     @classmethod

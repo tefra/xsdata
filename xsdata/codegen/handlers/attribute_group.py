@@ -40,7 +40,7 @@ class AttributeGroupHandler(HandlerInterface):
 
         :raises AnalyzerValueError: if source class is not found.
         """
-        qname = target.source_qname(attr.name)
+        qname = attr.types[0].qname  # group attributes have one type only.
         source = self.container.find(
             qname, condition=lambda x: x.type in (AttributeGroup, Group)
         )

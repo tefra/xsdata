@@ -2,6 +2,8 @@ from types import GeneratorType
 from typing import Iterator
 from unittest import mock
 
+from lxml.etree import QName
+
 from tests.factories import AttrFactory
 from tests.factories import AttrTypeFactory
 from tests.factories import ClassFactory
@@ -134,10 +136,10 @@ class SchemaMapperTests(FactoryTestCase):
         mock_display_help.return_value = "sos"
         mock_is_abstract.return_value = True
         mock_is_nillable.return_value = True
-        mock_substitutions.return_value = ["foo", "bar"]
+        mock_substitutions.return_value = ["foo", "sm:bar"]
         mock_element_namespace.return_value = "foo:name"
 
-        element = Element()
+        element = Element(ns_map={"sm": "sm_ns"})
         result = SchemaMapper.build_class(element, "container", "module", "target_ns")
 
         mock_build_class_attributes.assert_called_once_with(element, result)
@@ -146,6 +148,7 @@ class SchemaMapperTests(FactoryTestCase):
 
         expected = ClassFactory.create(
             name="name",
+            qname=QName("target_ns", "name"),
             type=Element,
             help="sos",
             abstract=True,
@@ -154,17 +157,16 @@ class SchemaMapperTests(FactoryTestCase):
             ns_map=element.ns_map,
             package=None,
             module="module",
-            source_namespace="target_ns",
-            substitutions=["foo", "bar"],
+            substitutions=[QName("target_ns", "foo"), QName("sm_ns", "bar")],
             container="container",
         )
         self.assertEqual(expected, result)
 
     @mock.patch.object(SchemaMapper, "children_extensions")
     def test_build_class_extensions(self, mock_children_extensions):
-        bar_type = AttrTypeFactory.create(name="bar", index=3)
-        foo_type = AttrTypeFactory.create(name="foo", index=1)
-        some_type = AttrTypeFactory.create(name="something", index=0)
+        bar_type = AttrTypeFactory.create(qname="bar", index=3)
+        foo_type = AttrTypeFactory.create(qname="foo", index=1)
+        some_type = AttrTypeFactory.create(qname="something", index=0)
 
         bar = ExtensionFactory.create(type=bar_type)
         double = ExtensionFactory.create(type=bar_type)
@@ -216,17 +218,17 @@ class SchemaMapperTests(FactoryTestCase):
         complex_type = ComplexType(
             attributes=[Attribute(index=i) for i in range(2)],
             simple_content=SimpleContent(restriction=Restriction(base="bk:b", index=4)),
-            complex_content=ComplexContent(extension=Extension(base="bk:ext", index=7)),
+            complex_content=ComplexContent(extension=Extension(base="bk:c", index=7)),
         )
 
-        item = ClassFactory.create()
+        item = ClassFactory.create(ns_map={"bk": "book"})
         children = SchemaMapper.children_extensions(complex_type, item)
         expected = list(
             map(
                 ExtensionFactory.create,
                 [
-                    AttrTypeFactory.create(name="bk:b", index=4),
-                    AttrTypeFactory.create(name="bk:ext", index=7),
+                    AttrTypeFactory.create(qname=QName("book", "b"), index=4),
+                    AttrTypeFactory.create(qname=QName("book", "c"), index=7),
                 ],
             )
         )
@@ -256,7 +258,7 @@ class SchemaMapperTests(FactoryTestCase):
         item = ClassFactory.create(ns_map={"bar": "foo"})
 
         mock_build_class_attribute_types.return_value = AttrTypeFactory.list(
-            1, name="xs:int"
+            1, qname="int"
         )
         mock_real_name.return_value = item.name
         mock_display_help.return_value = "sos"
@@ -283,7 +285,7 @@ class SchemaMapperTests(FactoryTestCase):
         self.assertEqual(expected, item.attrs[0])
         self.assertEqual({"bar": "foo", "foo": "bar"}, item.ns_map)
         mock_build_class_attribute_types.assert_called_once_with(item, attribute)
-        mock_element_namespace.assert_called_once_with(attribute, item.source_namespace)
+        mock_element_namespace.assert_called_once_with(attribute, item.qname.namespace)
 
     @mock.patch.object(Attribute, "real_type", new_callable=mock.PropertyMock)
     @mock.patch.object(SchemaMapper, "build_inner_classes")
@@ -317,7 +319,9 @@ class SchemaMapperTests(FactoryTestCase):
         expected = [
             AttrTypeFactory.xs_int(),
             AttrTypeFactory.xs_string(),
-            AttrTypeFactory.create(name="foo", forward=True),
+            AttrTypeFactory.create(
+                qname=QName(item.qname.namespace, "foo"), forward=True
+            ),
         ]
 
         self.assertEqual(expected, actual)
@@ -331,7 +335,7 @@ class SchemaMapperTests(FactoryTestCase):
     ):
         mock_real_type.return_value = None
         mock_build_inner_classes.return_value = []
-        mock_default_type.return_value = DataType.STRING
+        mock_default_type.return_value = "xs:string"
 
         item = ClassFactory.create()
         attribute = Attribute(default="false", index=66, name="attr")

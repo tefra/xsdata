@@ -169,7 +169,7 @@ class AttributeTypeHandlerTests(FactoryTestCase):
         attr = target.attrs[0]
         attr.restrictions.min_length = 2
         attr.types.clear()
-        attr.types.append(AttrTypeFactory.create(name=source.name))
+        attr.types.append(AttrTypeFactory.create(qname=source.name))
 
         self.assertEqual("Foobar", attr.types[0].name)
         self.processor.process_simple_dependency(source, target, attr, attr.types[0])
@@ -266,22 +266,21 @@ class AttributeTypeHandlerTests(FactoryTestCase):
         )
 
     def test_find_dependency(self):
-        target = ClassFactory.create()
-        attr_type = AttrTypeFactory.create(name="a")
+        attr_type = AttrTypeFactory.create(qname="a")
 
-        self.assertIsNone(self.processor.find_dependency(target, attr_type))
+        self.assertIsNone(self.processor.find_dependency(attr_type))
 
         abstract = ClassFactory.create(name="a", type=ComplexType, abstract=True)
         self.processor.container.add(abstract)
-        self.assertEqual(abstract, self.processor.find_dependency(target, attr_type))
+        self.assertEqual(abstract, self.processor.find_dependency(attr_type))
 
         element = ClassFactory.create(name="a", type=Element)
         self.processor.container.add(element)
-        self.assertEqual(element, self.processor.find_dependency(target, attr_type))
+        self.assertEqual(element, self.processor.find_dependency(attr_type))
 
         simple = ClassFactory.create(name="a", type=SimpleType)
         self.processor.container.add(simple)
-        self.assertEqual(simple, self.processor.find_dependency(target, attr_type))
+        self.assertEqual(simple, self.processor.find_dependency(attr_type))
 
     @mock.patch.object(Class, "dependencies")
     def test_cached_dependencies(self, mock_class_dependencies):

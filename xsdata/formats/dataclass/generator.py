@@ -107,7 +107,7 @@ class DataclassGenerator(AbstractGenerator):
     @classmethod
     def module_name(cls, module: str) -> str:
         """Convert the given module name to safe snake case."""
-        return text.snake_case(utils.safe_snake(module, default="mod"))
+        return text.snake_case(utils.safe_snake(text.clean_uri(module), default="mod"))
 
     @classmethod
     def package_name(cls, package: str) -> str:

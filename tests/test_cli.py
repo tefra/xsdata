@@ -27,7 +27,7 @@ class CliTests(TestCase):
         source = fixtures.joinpath("chapter03.xsd")
         result = self.runner.invoke(cli, [str(source), "--package", "foo"])
         self.assertIsNone(result.exception)
-        mock_init.assert_called_once_with(output="pydata", print=False)
+        mock_init.assert_called_once_with(output="pydata", print=False, ns_struct=False)
 
         self.assertEqual([source.as_uri()], mock_process.call_args[0][0])
         self.assertEqual("foo", mock_process.call_args[0][1])
@@ -43,7 +43,9 @@ class CliTests(TestCase):
         self.assertEqual([source.as_uri()], mock_process.call_args[0][0])
         self.assertEqual("foo", mock_process.call_args[0][1])
 
-        mock_init.assert_called_once_with(output="plantuml", print=False)
+        mock_init.assert_called_once_with(
+            output="plantuml", print=False, ns_struct=False
+        )
 
     @mock.patch.object(SchemaTransformer, "process")
     @mock.patch.object(SchemaTransformer, "__init__", return_value=None)
@@ -56,7 +58,21 @@ class CliTests(TestCase):
         self.assertEqual("foo", mock_process.call_args[0][1])
         self.assertEqual(logging.ERROR, logger.getEffectiveLevel())
 
-        mock_init.assert_called_once_with(output="pydata", print=True)
+        mock_init.assert_called_once_with(output="pydata", print=True, ns_struct=False)
+
+    @mock.patch.object(SchemaTransformer, "process")
+    @mock.patch.object(SchemaTransformer, "__init__", return_value=None)
+    def test_ns_struct_mode(self, mock_init, mock_process):
+        source = fixtures.joinpath("chapter03.xsd")
+        result = self.runner.invoke(
+            cli, [str(source), "--package", "foo", "--ns-struct"]
+        )
+
+        self.assertIsNone(result.exception)
+        self.assertEqual([source.as_uri()], mock_process.call_args[0][0])
+        self.assertEqual("foo", mock_process.call_args[0][1])
+
+        mock_init.assert_called_once_with(output="pydata", print=False, ns_struct=True)
 
     def test_resolve_source(self):
         file = fixtures.joinpath("chapter03.xsd")

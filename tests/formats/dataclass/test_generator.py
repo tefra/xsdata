@@ -105,6 +105,7 @@ class DataclassGeneratorTests(FactoryTestCase):
         self.assertEqual("mod_1111", DataclassGenerator.module_name("1111"))
         self.assertEqual("xs_string", DataclassGenerator.module_name("xs:string"))
         self.assertEqual("foo_bar_bam", DataclassGenerator.module_name("foo:bar_bam"))
+        self.assertEqual("bar_bam", DataclassGenerator.module_name("urn:bar_bam"))
 
     def test_package_name(self):
         self.assertEqual(

@@ -7,6 +7,8 @@ from typing import Optional
 from typing import Tuple
 from unittest import mock
 
+from lxml.etree import QName
+
 from tests.factories import ClassFactory
 from tests.factories import FactoryTestCase
 from xsdata.codegen.models import Class
@@ -40,6 +42,15 @@ class FakeGenerator(AbstractGenerator):
         return text.snake_case(name)
 
 
+@dataclass
+class EmptyGenerator(FakeGenerator):
+    def render(self, classes: List[Class]) -> Iterator[GeneratorResult]:
+        for obj in classes:
+            yield GeneratorResult(
+                path=Path(f"{self.dir}/{obj.name}.txt"), title="Empty", source="",
+            )
+
+
 class CodeWriterTests(FactoryTestCase):
     FAKE_NAME = "fake"
 
@@ -67,9 +78,8 @@ class CodeWriterTests(FactoryTestCase):
 
     def test_write_skip_empty_output(self):
         cls = ClassFactory.create()
-        cls.name = ""
         with TemporaryDirectory() as tmpdir:
-            writer.register_format(self.FAKE_NAME, FakeGenerator(tmpdir))
+            writer.register_format(self.FAKE_NAME, EmptyGenerator(tmpdir))
             writer.write([cls], "fake")
 
             self.assertFalse(Path(f"{tmpdir}/{cls.name}.txt").exists())
@@ -88,7 +98,7 @@ class CodeWriterTests(FactoryTestCase):
         classes[2].module = "tests!"
 
         writer.register_format(self.FAKE_NAME, FakeGenerator())
-        writer.designate(classes, "fake")
+        writer.designate(classes, "fake", "", False)
 
         self.assertEqual("foo", classes[0].package)
         self.assertEqual("foo", classes[1].package)
@@ -100,8 +110,25 @@ class CodeWriterTests(FactoryTestCase):
 
         classes = ClassFactory.list(1, package=None)
         with self.assertRaises(CodeGenerationError) as cm:
-            writer.designate(classes, "fake")
+            writer.designate(classes, "fake", "", False)
 
         self.assertEqual(
             "Class `class_E` has not been assign to a package.", str(cm.exception)
+        )
+
+        classes = ClassFactory.list(2, package=None)
+        writer.designate(classes, "fake", "bar", True)
+        self.assertEqual("bar", classes[0].package)
+        self.assertEqual("bar", classes[1].package)
+
+        self.assertEqual("xsdata", classes[0].module)
+        self.assertEqual("xsdata", classes[1].module)
+
+        classes = ClassFactory.list(1, qname=QName("foo"))
+        with self.assertRaises(CodeGenerationError) as cm:
+            writer.designate(classes, "fake", "foo", True)
+
+        self.assertEqual(
+            ("Class `foo` target namespace is empty, " "avoid option `--ns-struct`"),
+            str(cm.exception),
         )

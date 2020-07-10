@@ -18,9 +18,18 @@ outputs = click.Choice(writer.formats)
 @click.option("--package", required=True, help="Target Package")
 @click.option("--output", type=outputs, help="Output Format", default="pydata")
 @click.option("--print", is_flag=True, default=False, help="Print output")
+@click.option(
+    "--ns-struct",
+    is_flag=True,
+    default=False,
+    help=(
+        "Use namespaces to group classes in the same module. "
+        "Useful against circular import errors."
+    ),
+)
 @click.version_option(get_distribution("xsdata").version)
 @click_log.simple_verbosity_option(logger)
-def cli(source: str, package: str, output: str, print: bool):
+def cli(source: str, package: str, output: str, print: bool, ns_struct: bool):
     """
     Convert schema definitions to code.
 
@@ -30,7 +39,7 @@ def cli(source: str, package: str, output: str, print: bool):
         logger.setLevel(logging.ERROR)
 
     uris = resolve_source(source)
-    transformer = SchemaTransformer(output=output, print=print)
+    transformer = SchemaTransformer(output=output, print=print, ns_struct=ns_struct)
     transformer.process(list(uris), package)
 
 

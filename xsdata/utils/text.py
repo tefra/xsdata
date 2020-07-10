@@ -64,3 +64,17 @@ def snake_case(string: str) -> str:
             if result and result[-1] != "_":
                 result.append("_")
     return "".join(result).strip("_")
+
+
+def clean_uri(namespace: str) -> str:
+    """Remove common prefixes and suffixes from a uri string."""
+    prefix, suffix = split(namespace)
+
+    if prefix == "urn":
+        namespace = suffix
+    elif prefix in ("http", "https"):
+        namespace = suffix[2:]
+
+    return "_".join(
+        [part for part in namespace.split(".") if part not in ("www", "xsd", "wsdl")]
+    )

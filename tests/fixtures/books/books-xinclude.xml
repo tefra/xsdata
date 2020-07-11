@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<brk:books xmlns:brk="urn:books" xmlns:xi="http://www.w3.org/2001/XInclude">
+  <xi:include href="bk001.xml"/>
+  <xi:include href="bk002.xml"/>
+</brk:books>

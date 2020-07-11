@@ -1,3 +1,3 @@
-from tests.fixtures.books import BookForm
-from tests.fixtures.books import BooksForm
-from tests.fixtures.books import Books
+from pathlib import Path
+
+fixtures_dir = Path(__file__).parent

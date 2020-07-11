@@ -29,7 +29,7 @@ def class_name(name: str) -> str:
 @functools.lru_cache(maxsize=50)
 def attribute_name(name: str) -> str:
     """Apply python conventions for instance variable names."""
-    return text.snake_case(utils.safe_snake(text.suffix(name)))
+    return text.snake_case(utils.safe_snake(name))
 
 
 @functools.lru_cache(maxsize=50)
@@ -40,7 +40,7 @@ def constant_name(name: str) -> str:
 
 def type_name(attr_type: AttrType) -> str:
     """Return native python type name or apply class name conventions."""
-    return attr_type.native_name or class_name(text.suffix(attr_type.name))
+    return attr_type.native_name or class_name(attr_type.name)
 
 
 def attribute_metadata(attr: Attr, parent_namespace: Optional[str]) -> Dict:
@@ -147,9 +147,7 @@ def attribute_default(attr: Attr, ns_map: Optional[Dict] = None) -> Any:
         elif default_value.startswith("@enum@"):
             source, enumeration = default_value[6:].split("::", 1)
             attr_type = next(
-                attr_type
-                for attr_type in attr.types
-                if text.suffix(attr_type.name) == source
+                attr_type for attr_type in attr.types if attr_type.name == source
             )
             if attr_type.alias:
                 source = attr_type.alias

@@ -3990,13 +3990,6 @@ class IvlTsExplicit:
                                     two of the three properties high, low, and width need
                                     to be stated and the third can be derived.
     :ivar high: The high limit of the interval.
-    :ivar hl7_org_v3_high:
-    :ivar hl7_org_v3_width: The difference between high and low boundary. The
-                                purpose of distinguishing a width property is to
-                                handle all cases of incomplete information
-                                symmetrically. In any interval representation only
-                                two of the three properties high, low, and width need
-                                to be stated and the third can be derived.
     :ivar center: The arithmetic mean of the interval (low plus high
                                 divided by 2). The purpose of distinguishing the center
                                 as a semantic property is for conversions of intervals
@@ -4021,11 +4014,14 @@ class IvlTsExplicit:
             required=True
         )
     )
-    width: Optional[PqExplicit] = field(
-        default=None,
+    width: List[PqExplicit] = field(
+        default_factory=list,
         metadata=dict(
             type="Element",
-            namespace="urn:hl7-org:v3"
+            namespace="urn:hl7-org:v3",
+            min_occurs=0,
+            max_occurs=3,
+            sequential=True
         )
     )
     high: List[IvxbTsExplicit] = field(
@@ -4034,25 +4030,8 @@ class IvlTsExplicit:
             type="Element",
             namespace="urn:hl7-org:v3",
             min_occurs=0,
-            max_occurs=2
-        )
-    )
-    hl7_org_v3_high: Optional[IvxbTsExplicit] = field(
-        default=None,
-        metadata=dict(
-            name="high",
-            type="Element",
-            namespace="urn:hl7-org:v3"
-        )
-    )
-    hl7_org_v3_width: List[PqExplicit] = field(
-        default_factory=list,
-        metadata=dict(
-            name="width",
-            type="Element",
-            namespace="urn:hl7-org:v3",
-            min_occurs=0,
-            max_occurs=2
+            max_occurs=3,
+            sequential=True
         )
     )
     center: Optional[TsExplicit] = field(
@@ -5458,7 +5437,6 @@ class IvlTs(SxcmTs):
                                two of the three properties high, low, and width need
                                to be stated and the third can be derived.
     :ivar high: The high limit of the interval.
-    :ivar hl7_org_v3_high:
     :ivar center: The arithmetic mean of the interval (low plus high
                                divided by 2). The purpose of distinguishing the center
                                as a semantic property is for conversions of intervals
@@ -5491,16 +5469,8 @@ class IvlTs(SxcmTs):
             type="Element",
             namespace="urn:hl7-org:v3",
             min_occurs=0,
-            max_occurs=2,
+            max_occurs=3,
             sequential=True
-        )
-    )
-    hl7_org_v3_high: Optional[IvxbTs] = field(
-        default=None,
-        metadata=dict(
-            name="high",
-            type="Element",
-            namespace="urn:hl7-org:v3"
         )
     )
     center: Optional[Ts] = field(

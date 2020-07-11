@@ -19,9 +19,9 @@ class ColorType:
 @dataclass
 class DescriptionType:
     """
-    :ivar www_w3_org_1999_xhtml_element:
+    :ivar w3_org_1999_xhtml_element:
     """
-    www_w3_org_1999_xhtml_element: List[object] = field(
+    w3_org_1999_xhtml_element: List[object] = field(
         default_factory=list,
         metadata=dict(
             type="Wildcard",

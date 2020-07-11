@@ -16,7 +16,7 @@ class NameTests(TestCase):
 
     def test_attribute_name(self):
         self.assertEqual("foo", attribute_name("foo"))
-        self.assertEqual("bar", attribute_name("foo:bar"))
+        self.assertEqual("foo_bar", attribute_name("foo:bar"))
         self.assertEqual("foo_bar", attribute_name("FooBar"))
         self.assertEqual("none_value", attribute_name("None"))
         self.assertEqual("br_eak_value", attribute_name("BrEak"))

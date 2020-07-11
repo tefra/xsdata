@@ -151,7 +151,7 @@ class ElementBase:
         """
         name = getattr(self, "name", None) or getattr(self, "ref", None)
         if name:
-            return name
+            return text.suffix(name)
 
         raise SchemaValueError(f"Schema class `{self.class_name}` unknown real name.")
 

@@ -85,7 +85,7 @@ class ClassSanitizerTest(FactoryTestCase):
     def test_process_attribute_default_with_xsi_type(self):
         target = ClassFactory.create()
         attr = AttrFactory.create(
-            fixed=True, default=2, name="xsi:type", namespace=Namespace.XSI.uri
+            fixed=True, default=2, name="type", namespace=Namespace.XSI.uri
         )
         self.sanitizer.process_attribute_default(target, attr)
         self.assertFalse(attr.fixed)
@@ -217,7 +217,7 @@ class ClassSanitizerTest(FactoryTestCase):
             self.assertEqual(expected[idx], res.asdict())
 
     def test_process_attribute_name(self):
-        attr = AttrFactory.create(name="foo:a")
+        attr = AttrFactory.create(name="a")
 
         self.sanitizer.process_attribute_name(attr)
         self.assertEqual("a", attr.name)

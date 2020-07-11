@@ -14,7 +14,6 @@ from xsdata.codegen.models import AttrType
 from xsdata.codegen.models import Class
 from xsdata.codegen.utils import ClassUtils
 from xsdata.utils import collections
-from xsdata.utils import text
 
 Substitutions = Optional[Dict[QName, List[Attr]]]
 
@@ -77,12 +76,11 @@ class AttributeSubstitutionHandler(HandlerInterface):
         """Create an attribute with type that refers to the given source class
         and namespaced qualified name."""
 
-        name = text.suffix(source.name)
         return Attr(
-            name=name,
-            local_name=name,
+            name=source.name,
+            local_name=source.name,
             index=0,
-            types=[AttrType(qname=QName(source.qname.namespace, name))],
+            types=[AttrType(qname=QName(source.qname.namespace, source.name))],
             tag=source.type.__name__,
             namespace=source.namespace,
         )

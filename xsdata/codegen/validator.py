@@ -8,7 +8,6 @@ from xsdata.codegen.models import Class
 from xsdata.codegen.models import Extension
 from xsdata.codegen.utils import ClassUtils
 from xsdata.models.enums import Tag
-from xsdata.utils import text
 from xsdata.utils.collections import group_by
 
 
@@ -120,7 +119,7 @@ class ClassValidator:
         """Search for any target class extensions that is a circular
         reference."""
         for ext in target.extensions:
-            if text.suffix(ext.type.name) == target.name:
+            if ext.type.name == target.name:
                 return ext
 
         return None
@@ -130,7 +129,7 @@ class ClassValidator:
         """Search for any target class attributes that is a circular
         reference."""
         for attr in target.attrs:
-            if text.suffix(attr.name) == target.name:
+            if attr.name == target.name:
                 return attr
 
         return None

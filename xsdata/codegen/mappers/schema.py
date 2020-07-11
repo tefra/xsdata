@@ -223,13 +223,11 @@ class SchemaMapper:
             return
 
         name = obj.real_name
-        target.ns_map.update(obj.ns_map)
-
         target.attrs.append(
             Attr(
                 index=obj.index,
                 name=name,
-                local_name=text.suffix(name),
+                local_name=name,
                 default=obj.default_value,
                 fixed=obj.is_fixed,
                 types=types,

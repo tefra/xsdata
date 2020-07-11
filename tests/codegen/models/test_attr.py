@@ -88,9 +88,6 @@ class AttrTests(FactoryTestCase):
         attr.namespace = Namespace.XSI.value
         self.assertFalse(attr.is_xsi_type)
 
-        attr.name = "xsi:type"
-        self.assertTrue(attr.is_xsi_type)
-
         attr.name = "type"
         self.assertTrue(attr.is_xsi_type)
 

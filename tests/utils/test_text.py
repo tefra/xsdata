@@ -34,6 +34,7 @@ class TextTests(TestCase):
         self.assertEqual(".userName", capitalize(".userName"))
 
     def test_clean_uri(self):
+        self.assertEqual("any", clean_uri("##any"))
         self.assertEqual("a", clean_uri("urn:a"))
         self.assertEqual("a_com/b", clean_uri("http://a.com/b.xsd"))
         self.assertEqual("a_com/b", clean_uri("http://www.a.com/b.xsd"))

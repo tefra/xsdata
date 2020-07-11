@@ -23,7 +23,7 @@ definitions.
     $ xsdata http://www.gstatic.com/localfeed/local_feed.xsd --package feeds --print
 
 
-Package
+package
 -------
 
 The package option defines where the target module(s) will be created inside the
@@ -34,12 +34,12 @@ If the main xsd has any parent include or import you should adjust the target pa
 .. admonition:: Note
     :class: hint
 
-    The cli is relying on the `os.path.commonpath` to create the package structure and
-    doesn't do any conflict resolution, which shouldn't be an issue if you use the cli
-    with a single source (directory or remote/local file).
+    The cli is relying on the `os.path.commonpath` of the schemas locations to
+    create the final package structure. If you prefer a more flat structure or
+    you have circular import errors check the option :ref:`ns-struct`.
 
 
-Output
+output
 ------
 
 The output option changes the generation format.
@@ -47,18 +47,26 @@ The output option changes the generation format.
 * ``pydata``: Python lib `dataclasses <https://docs.python.org/3/library/dataclasses.html>`_
 * ``plantuml``: `PlantUML <https://plantuml.com/class-diagram>`_ class diagram
 
-Verbosity
+verbosity
 ---------
 
 The verbosity option changes what messages will be printed.
 
 Available options: ``CRITICAL``, ``ERROR``, ``WARNING``, ``INFO`` or ``DEBUG``
 
-Print
+print
 -----
 
 The print flag overwrites the verbosity level to `Error` and print to stdOut the output
 result without writing to the target file.
+
+
+ns-struct
+---------
+
+The ns-struct flag bypasses the default behavior and groups classes by the target
+namespace they were defined. This option creates a more flat package structure and
+solves any circular import errors.
 
 
 .. admonition:: Examples

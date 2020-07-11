@@ -19,7 +19,6 @@ class BookForm:
     author: Optional[str] = field(
         default=None,
         metadata=dict(
-            name="author",
             type="Element",
             namespace="",
             required=True
@@ -28,7 +27,6 @@ class BookForm:
     title: Optional[str] = field(
         default=None,
         metadata=dict(
-            name="title",
             type="Element",
             namespace="",
             required=True
@@ -37,7 +35,6 @@ class BookForm:
     genre: Optional[str] = field(
         default=None,
         metadata=dict(
-            name="genre",
             type="Element",
             namespace="",
             required=True
@@ -46,7 +43,6 @@ class BookForm:
     price: Optional[float] = field(
         default=None,
         metadata=dict(
-            name="price",
             type="Element",
             namespace="",
             required=True
@@ -55,7 +51,6 @@ class BookForm:
     pub_date: Optional[str] = field(
         default=None,
         metadata=dict(
-            name="pub_date",
             type="Element",
             namespace="",
             required=True
@@ -64,7 +59,6 @@ class BookForm:
     review: Optional[str] = field(
         default=None,
         metadata=dict(
-            name="review",
             type="Element",
             namespace="",
             required=True
@@ -73,7 +67,6 @@ class BookForm:
     id: Optional[str] = field(
         default=None,
         metadata=dict(
-            name="id",
             type="Attribute"
         )
     )
@@ -81,7 +74,6 @@ class BookForm:
         init=False,
         default="en",
         metadata=dict(
-            name="lang",
             type="Attribute"
         )
     )
@@ -95,7 +87,6 @@ class BooksForm:
     book: List[BookForm] = field(
         default_factory=list,
         metadata=dict(
-            name="book",
             type="Element",
             namespace="",
             min_occurs=0,

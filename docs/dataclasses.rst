@@ -250,6 +250,8 @@ The parser also accepts optionally a custom config instance.
    :header: "Name", "Type", "Description"
    :widths: 20, 10, 200
 
+    "base_url", "str", "A base URL for when parsing from memory and you want support for relative links eg xinclude, default: ``None``"
+    "process_xinclude", "bool", "Process xinclude statements. , default: ``False``"
     "fail_on_unknown_properties", "bool", "Should fail on unknown properties that can't be mapped to any wildcard field, default: ``True``"
 
 

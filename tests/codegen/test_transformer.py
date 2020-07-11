@@ -203,7 +203,7 @@ class SchemaTransformerTests(FactoryTestCase):
         )
 
     def test_parse_schema(self):
-        path = Path(__file__).parent.joinpath("../fixtures/books.xsd").as_uri()
+        path = Path(__file__).parent.joinpath("../fixtures/books/schema.xsd").as_uri()
         schema = self.transformer.parse_schema(path, "foo.bar")
         self.assertIsInstance(schema, Schema)
         self.assertEqual(2, len(schema.complex_types))
@@ -213,7 +213,7 @@ class SchemaTransformerTests(FactoryTestCase):
     def test_parse_schema_with_os_exception(self, mock_urlopen, mock_logger_warning):
         mock_urlopen.side_effect = FileNotFoundError
 
-        path = Path(__file__).parent.joinpath("fixtures/books.xsd").as_uri()
+        path = Path(__file__).parent.joinpath("fixtures/books/schema.xsd").as_uri()
         schema = self.transformer.parse_schema(path, "foo")
         self.assertIsNone(schema)
         mock_logger_warning.assert_called_once_with("Schema not found %s", path)

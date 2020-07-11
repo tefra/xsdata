@@ -1,6 +1,7 @@
 from dataclasses import asdict
 from dataclasses import dataclass
 from dataclasses import field
+from pathlib import Path
 from typing import List
 from unittest import mock
 from unittest.case import TestCase
@@ -8,6 +9,7 @@ from unittest.case import TestCase
 from lxml.etree import Element
 from lxml.etree import QName
 
+from tests.fixtures import fixtures_dir
 from tests.fixtures.books import BookForm
 from tests.fixtures.books import Books
 from xsdata.exceptions import ParserError
@@ -88,8 +90,7 @@ class XmlParserTests(TestCase):
         element.text = "foobar"
 
         objects = []
-        queue = []
-        queue.append(SkipNode(position=0))
+        queue = [SkipNode(position=0)]
 
         result = self.parser.dequeue(element, queue, objects)
         self.assertIsNone(result)
@@ -126,51 +127,36 @@ class XmlParserIntegrationTest(TestCase):
                     author="Nagata, Suanne",
                     title="Becoming Somebody",
                     genre="Biography",
+                    price=33.95,
+                    pub_date="2001-01-10",
                     review="A masterpiece of the fine art of gossiping.",
                 ),
             ]
         )
 
     def test_parse(self):
-        xml = (
-            '<?xml version="1.0" encoding="UTF-8"?>\n'
-            '<brk:books xmlns:brk="urn:books">\n'
-            '  <book id="bk001">\n'
-            "    <author>Hightower, Kim</author>\n"
-            "    <title>The First Book</title>\n"
-            "    <genre>Fiction</genre>\n"
-            "    <price>44.95</price>\n"
-            "    <pub_date>2000-10-01</pub_date>\n"
-            "    <review>An amazing story of nothing.</review>\n"
-            "  </book>\n"
-            '  <book id="bk002">\n'
-            "    <author>Nagata, Suanne</author>\n"
-            "    <title>Becoming Somebody</title>\n"
-            "    <genre>Biography</genre>\n"
-            "    <review>A masterpiece of the fine art of gossiping.</review>\n"
-            "  </book>\n"
-            "</brk:books>\n"
-        )
-
+        path = fixtures_dir.joinpath("books/books.xml")
         parser = XmlParser()
-        actual = parser.from_string(xml, Books)
+        actual = parser.from_path(path, Books)
         self.assertEqual(self.books, actual)
         self.assertEqual({"brk": "urn:books"}, parser.namespaces.ns_map)
 
+    def test_parse_with_process_xinclude_true(self):
+        path = fixtures_dir.joinpath("books/books-xinclude.xml")
+        config = ParserConfig(process_xinclude=True)
+        parser = XmlParser(config=config)
+        actual = parser.from_path(path, Books)
+        self.assertEqual(self.books, actual)
+
+    def test_parse_from_memory_with_process_xinclude_true(self):
+        path = fixtures_dir.joinpath("books/books-xinclude.xml")
+        config = ParserConfig(process_xinclude=True, base_url=path.as_uri())
+        parser = XmlParser(config=config)
+        actual = parser.from_bytes(path.read_bytes(), Books)
+        self.assertEqual(self.books, actual)
+
     def test_parse_with_fail_on_unknown_properties_false(self):
-        xml = (
-            '<?xml version="1.0" encoding="UTF-8"?>\n'
-            "<books>\n"
-            '  <book id="bk001">\n'
-            "    <author>Hightower, Kim</author>\n"
-            "    <title>The First Book</title>\n"
-            "  </book>\n"
-            '  <book id="bk002">\n'
-            "    <author>Nagata, Suanne</author>\n"
-            "    <title>Becoming Somebody</title>\n"
-            "  </book>\n"
-            "</books>\n"
-        )
+        path = fixtures_dir.joinpath("books/books.xml")
 
         @dataclass
         class Book:
@@ -187,7 +173,7 @@ class XmlParserIntegrationTest(TestCase):
 
         config = ParserConfig(fail_on_unknown_properties=False)
         parser = XmlParser(config=config)
-        actual = parser.from_string(xml, MyBooks)
+        actual = parser.from_path(path, MyBooks)
         expected = {
             "book": [{"author": "Hightower, Kim"}, {"author": "Nagata, Suanne"}]
         }

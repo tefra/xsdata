@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<book id="bk001">
+    <author>Hightower, Kim</author>
+    <title>The First Book</title>
+    <genre>Fiction</genre>
+    <price>44.95</price>
+    <pub_date>2000-10-01</pub_date>
+    <review>An amazing story of nothing.</review>
+</book>

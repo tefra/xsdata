@@ -4,7 +4,7 @@ from unittest.case import TestCase
 
 from lxml.etree import QName
 
-from tests.fixtures import BookForm
+from tests.fixtures.books.books import BookForm
 from xsdata.formats.dataclass.context import XmlContext
 from xsdata.formats.dataclass.models.elements import FindMode
 from xsdata.formats.dataclass.models.elements import XmlAttribute

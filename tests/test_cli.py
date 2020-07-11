@@ -6,6 +6,7 @@ from unittest import TestCase
 
 from click.testing import CliRunner
 
+from tests.conftest import load_class
 from xsdata import cli
 from xsdata.cli import resolve_source
 from xsdata.codegen.transformer import SchemaTransformer
@@ -20,6 +21,19 @@ class CliTests(TestCase):
     def setUp(self):
         self.runner = CliRunner()
         super().setUp()
+
+    def test_schema_integration(self):
+        schema = Path("tests/fixtures/books/schema.xsd")
+        package = "tests.fixtures.books"
+        runner = CliRunner()
+        result = runner.invoke(cli, [str(schema), "--package", package, "--ns-struct"])
+
+        if result.exception:
+            raise result.exception
+
+        clazz = load_class(result.output, "Books")
+        self.assertEqual("books", clazz.Meta.name)
+        self.assertEqual("urn:books", clazz.Meta.namespace)
 
     @mock.patch.object(SchemaTransformer, "process")
     @mock.patch.object(SchemaTransformer, "__init__", return_value=None)

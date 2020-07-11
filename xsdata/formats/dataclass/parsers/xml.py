@@ -1,4 +1,3 @@
-import io
 from dataclasses import dataclass
 from dataclasses import field
 from typing import Any
@@ -9,6 +8,8 @@ from typing import Type
 
 from lxml.etree import Element
 from lxml.etree import iterparse
+from lxml.etree import iterwalk
+from lxml.etree import parse
 from lxml.etree import QName
 
 from xsdata.exceptions import ParserError
@@ -42,14 +43,17 @@ class XmlParser(AbstractParser):
     event_names: Dict = field(default_factory=dict)
     config: ParserConfig = field(default_factory=ParserConfig)
 
-    def parse(self, source: io.BytesIO, clazz: Type[T]) -> T:
+    def parse(self, source: Any, clazz: Type[T]) -> T:
         """Parse the XML input stream and return the resulting object tree."""
-        ctx = iterparse(
-            source=source,
-            events=(EventType.START, EventType.END, EventType.START_NS),
-            recover=True,
-            remove_comments=True,
-        )
+
+        events = EventType.START, EventType.END, EventType.START_NS
+        if self.config.process_xinclude:
+            tree = parse(source, base_url=self.config.base_url)  # nosec
+            tree.xinclude()
+            ctx = iterwalk(tree, events=events)
+        else:
+            ctx = iterparse(source, events=events, recover=True, remove_comments=True)
+
         return self.parse_context(ctx, clazz)
 
     def parse_context(self, context: iterparse, clazz: Type[T]) -> T:

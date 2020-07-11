@@ -4,7 +4,6 @@ from xsdata.codegen.models import Attr
 from xsdata.codegen.models import Class
 from xsdata.codegen.models import Extension
 from xsdata.codegen.models import Restrictions
-from xsdata.utils import text
 
 
 class ClassUtils:
@@ -21,11 +20,11 @@ class ClassUtils:
         supposed to be last in a sequence.
         """
         target.extensions.remove(extension)
-        target_attr_names = {text.suffix(attr.name) for attr in target.attrs}
+        target_attr_names = {attr.name for attr in target.attrs}
 
         index = 0
         for attr in source.attrs:
-            if text.suffix(attr.name) not in target_attr_names:
+            if attr.name not in target_attr_names:
                 clone = cls.clone_attribute(attr, extension.restrictions)
 
                 if attr.index == sys.maxsize:

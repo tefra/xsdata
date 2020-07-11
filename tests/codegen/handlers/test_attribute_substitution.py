@@ -9,7 +9,6 @@ from tests.factories import FactoryTestCase
 from xsdata.codegen.container import ClassContainer
 from xsdata.codegen.handlers import AttributeSubstitutionHandler
 from xsdata.codegen.models import AttrType
-from xsdata.codegen.utils import ClassUtils
 
 
 class AttributeSubstitutionHandlerTests(FactoryTestCase):

@@ -31,9 +31,11 @@ class AnyTests(TestCase):
         obj.namespace = "foo"
         self.assertEqual("foo_element", obj.real_name)
 
-        obj.namespace = None
-        with self.assertRaises(SchemaValueError):
-            obj.real_name
+        obj.namespace = "http://www.xsdata.com/somewhere.xsd"
+        self.assertEqual("xsdata_com/somewhere_element", obj.real_name)
+
+        obj.namespace = "http://foo http://bar"
+        self.assertEqual("foo_bar_element", obj.real_name)
 
     def test_get_restrictions(self):
         obj = Any(min_occurs=1, max_occurs=2)

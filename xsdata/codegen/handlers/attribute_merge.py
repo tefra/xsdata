@@ -26,6 +26,8 @@ class AttributeMergeHandler(HandlerInterface):
             if not existing:
                 result.append(attr)
             elif not (attr.is_attribute or attr.is_enumeration):
+                existing.help = existing.help or attr.help
+
                 min_occurs = existing.restrictions.min_occurs or 0
                 max_occurs = existing.restrictions.max_occurs or 1
                 attr_min_occurs = attr.restrictions.min_occurs or 0

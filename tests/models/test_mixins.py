@@ -151,10 +151,10 @@ class ElementBaseTests(TestCase):
         with self.assertRaises(SchemaValueError):
             element.real_name
 
-        element.ref = "foo"
+        element.ref = "bar:foo"
         self.assertEqual("foo", element.real_name)
 
-        element.name = "bar"
+        element.name = "foo:bar"
         self.assertEqual("bar", element.real_name)
 
     def test_property_real_type(self):

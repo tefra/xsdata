@@ -149,7 +149,7 @@ class AnyAttribute(AnnotationBase):
     :param process_contents: (lax | skip | strict) : strict
     """
 
-    namespace: Optional[str] = attribute(default="##any")
+    namespace: str = attribute(default="##any")
     process_contents: Optional[ProcessType] = attribute(name="processContents")
 
     def __post_init__(self):
@@ -165,13 +165,8 @@ class AnyAttribute(AnnotationBase):
 
     @property
     def real_name(self) -> str:
-        if self.namespace is None:
-            raise SchemaValueError("Wildcards namespace can't be None.")
-
-        namespace = (
-            self.namespace[2:] if self.namespace.startswith("##") else self.namespace
-        )
-        return f"{namespace}_attributes"
+        clean_ns = "_".join(map(text.clean_uri, self.namespace.split(" ")))
+        return f"{clean_ns}_attributes"
 
     @property
     def real_type(self) -> Optional[str]:
@@ -410,9 +405,9 @@ class Any(AnnotationBase):
     :param process_contents: (lax | skip | strict) : strict
     """
 
+    namespace: str = attribute(default="##any")
     min_occurs: int = attribute(default=1, name="minOccurs")
     max_occurs: UnionType[int, str] = attribute(default=1, name="maxOccurs")
-    namespace: Optional[str] = attribute(default="##any")
     process_contents: Optional[ProcessType] = attribute(name="processContents")
 
     def __post_init__(self):
@@ -424,13 +419,8 @@ class Any(AnnotationBase):
 
     @property
     def real_name(self) -> str:
-        if self.namespace is None:
-            raise SchemaValueError("Wildcards namespace can't be None.")
-
-        namespace = (
-            self.namespace[2:] if self.namespace.startswith("##") else self.namespace
-        )
-        return f"{namespace}_element"
+        clean_ns = "_".join(map(text.clean_uri, self.namespace.split(" ")))
+        return f"{clean_ns}_element"
 
     @property
     def raw_namespace(self) -> Optional[str]:

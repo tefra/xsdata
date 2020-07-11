@@ -68,6 +68,9 @@ def snake_case(string: str) -> str:
 
 def clean_uri(namespace: str) -> str:
     """Remove common prefixes and suffixes from a uri string."""
+    if namespace[:2] == "##":
+        namespace = namespace[2:]
+
     prefix, suffix = split(namespace)
 
     if prefix == "urn":

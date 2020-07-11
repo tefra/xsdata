@@ -28,9 +28,11 @@ class AnyAttributeTests(TestCase):
         obj.namespace = "foo"
         self.assertEqual("foo_attributes", obj.real_name)
 
-        obj.namespace = None
-        with self.assertRaises(SchemaValueError):
-            obj.real_name
+        obj.namespace = "http://www.xsdata.com/somewhere.xsd"
+        self.assertEqual("xsdata_com/somewhere_attributes", obj.real_name)
+
+        obj.namespace = "http://foo http://bar"
+        self.assertEqual("foo_bar_attributes", obj.real_name)
 
     def test_property_real_type(self):
         obj = AnyAttribute(ns_map={"xs": Namespace.XS.uri})

@@ -2,7 +2,7 @@ exclude: tests/fixtures|docs/examples
 
 repos:
   - repo: https://github.com/asottile/pyupgrade
-    rev: v2.6.1
+    rev: v2.7.0
     hooks:
       - id: pyupgrade
         args: [--py37-plus]
@@ -37,12 +37,12 @@ repos:
       - id: docformatter
         args: ["--in-place", "--pre-summary-newline"]
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v0.781
+    rev: v0.782
     hooks:
       - id: mypy
         additional_dependencies: [tokenize-rt]
   - repo: https://github.com/asottile/setup-cfg-fmt
-    rev: v1.9.0
+    rev: v1.10.0
     hooks:
       - id: setup-cfg-fmt
   - repo: https://github.com/PyCQA/doc8

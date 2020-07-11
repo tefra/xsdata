@@ -20,7 +20,6 @@ from xsdata.models.enums import Tag
 from xsdata.models.mixins import ElementBase
 from xsdata.models.xsd import ComplexType
 from xsdata.models.xsd import Element
-from xsdata.utils import text
 
 xml_type_map = {
     Tag.ELEMENT: XmlType.ELEMENT,
@@ -224,7 +223,7 @@ class Attr:
     types: List[AttrType] = field(default_factory=list)
     display_type: Optional[str] = field(default=None)
     namespace: Optional[str] = field(default=None)
-    help: Optional[str] = field(default=None)
+    help: Optional[str] = field(default=None, compare=False)
     restrictions: Restrictions = field(default_factory=Restrictions, compare=False)
 
     @property
@@ -286,7 +285,7 @@ class Attr:
         xsi:type."""
         return (
             QNames.XSI_TYPE.namespace == self.namespace
-            and QNames.XSI_TYPE.localname == text.suffix(self.name)
+            and QNames.XSI_TYPE.localname == self.name
         )
 
     @property

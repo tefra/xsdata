@@ -193,7 +193,7 @@ class ClassSanitizer:
             else:
                 attr.name = re.sub("[^0-9a-zA-Z]", " ", attr.name).strip()
         else:
-            attr.name = re.sub("[^0-9a-zA-Z]", " ", text.suffix(attr.name)).strip()
+            attr.name = re.sub("[^0-9a-zA-Z]", " ", attr.name).strip()
 
         if not attr.name:
             attr.name = "value"
@@ -234,7 +234,7 @@ class ClassSanitizer:
                 first, second = items
                 if first.tag == second.tag and any((first.namespace, second.namespace)):
                     change = second if second.namespace else first
-                    change.name = f"{change.namespace}_{change.name}"
+                    change.name = f"{text.clean_uri(change.namespace)}_{change.name}"
                 else:
                     change = second if second.is_attribute else first
                     change.name = f"{change.name}_{change.tag}"

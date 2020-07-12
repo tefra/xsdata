@@ -16,6 +16,7 @@ from xsdata.models.enums import DataType
 from xsdata.models.enums import Namespace
 from xsdata.models.enums import QNames
 from xsdata.models.enums import Tag
+from xsdata.models.wsdl import BindingOperation
 from xsdata.models.xsd import Attribute
 from xsdata.models.xsd import ComplexType
 from xsdata.models.xsd import Element
@@ -67,6 +68,7 @@ class ClassFactory(Factory):
     def create(
         cls,
         qname=None,
+        meta_name=None,
         namespace=None,
         type=None,
         abstract=False,
@@ -92,6 +94,7 @@ class ClassFactory(Factory):
 
         return cls.model(
             qname=qname,
+            meta_name=meta_name,
             namespace=namespace,
             abstract=abstract,
             mixed=mixed,
@@ -124,6 +127,12 @@ class ClassFactory(Factory):
             type=ComplexType,
             attrs=AttrFactory.list(attributes, tag=Tag.ELEMENT),
             **kwargs,
+        )
+
+    @classmethod
+    def service(cls, attributes: int, **kwargs) -> Class:
+        return ClassFactory.create(
+            type=BindingOperation, attrs=AttrFactory.list(attributes, tag=Tag.ELEMENT)
         )
 
 
@@ -214,53 +223,43 @@ class AttrTypeFactory(Factory):
 
     @classmethod
     def xs_string(cls):
-        qname = QName(Namespace.XS.uri, DataType.STRING.code)
-        return cls.create(qname=qname, native=True)
+        return cls.create(qname=DataType.STRING.qname, native=True)
 
     @classmethod
     def xs_int(cls):
-        qname = QName(Namespace.XS.uri, DataType.INTEGER.code)
-        return cls.create(qname=qname, native=True)
+        return cls.create(qname=DataType.INTEGER.qname, native=True)
 
     @classmethod
     def xs_positive_int(cls):
-        qname = QName(Namespace.XS.uri, DataType.POSITIVE_INTEGER.code)
-        return cls.create(qname=qname, native=True)
+        return cls.create(qname=DataType.POSITIVE_INTEGER.qname, native=True)
 
     @classmethod
     def xs_float(cls):
-        qname = QName(Namespace.XS.uri, DataType.FLOAT.code)
-        return cls.create(qname=qname, native=True)
+        return cls.create(qname=DataType.FLOAT.qname, native=True)
 
     @classmethod
     def xs_decimal(cls):
-        qname = QName(Namespace.XS.uri, DataType.DECIMAL.code)
-        return cls.create(qname=qname, native=True)
+        return cls.create(qname=DataType.DECIMAL.qname, native=True)
 
     @classmethod
     def xs_bool(cls):
-        qname = QName(Namespace.XS.uri, DataType.BOOLEAN.code)
-        return cls.create(qname=qname, native=True)
+        return cls.create(qname=DataType.BOOLEAN.qname, native=True)
 
     @classmethod
     def xs_any(cls):
-        qname = QName(Namespace.XS.uri, DataType.ANY_TYPE.code)
-        return cls.create(qname=qname, native=True)
+        return cls.create(qname=DataType.ANY_TYPE.qname, native=True)
 
     @classmethod
     def xs_qmap(cls):
-        qname = QName(Namespace.XS.uri, DataType.QMAP.code)
-        return cls.create(qname=qname, native=True)
+        return cls.create(qname=DataType.QMAP.qname, native=True)
 
     @classmethod
     def xs_qname(cls):
-        qname = QName(Namespace.XS.uri, DataType.QNAME.code)
-        return cls.create(qname=qname, native=True)
+        return cls.create(qname=DataType.QNAME.qname, native=True)
 
     @classmethod
     def xs_tokens(cls):
-        qname = QName(Namespace.XS.uri, DataType.NMTOKENS.code)
-        return cls.create(qname=qname, native=True)
+        return cls.create(qname=DataType.NMTOKENS.qname, native=True)
 
 
 class AttrFactory(Factory):

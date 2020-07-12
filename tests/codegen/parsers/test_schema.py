@@ -58,16 +58,6 @@ class SchemaParserTests(TestCase):
         self.assertEqual(4, schema.simple_types[0].annotation.index)
         self.assertEqual(5, schema.simple_types[0].annotation.documentations[0].index)
 
-    @mock.patch.object(SchemaParser, "set_namespace_map")
-    def test_dequeue_with_skip_node(self, mock_set_namespace_map):
-        objects = []
-        queue = [SkipNode(position=0)]
-        element = etree.Element("foo")
-
-        result = self.parser.dequeue(element, queue, objects)
-        self.assertIsNone(result)
-        self.assertEqual(0, mock_set_namespace_map.call_count)
-
     def test_start_schema(self):
         element = etree.Element("schema")
         self.parser.start_schema(element, None)
@@ -175,6 +165,10 @@ class SchemaParserTests(TestCase):
 
         self.parser.set_namespace_map(element, schema)
         self.assertEqual(expected, schema.ns_map)
+
+        foo = []
+        self.parser.set_namespace_map(element, foo)
+        self.assertFalse(hasattr(foo, "ns_map"))
 
     def test_add_default_imports(self):
         schema = Schema()

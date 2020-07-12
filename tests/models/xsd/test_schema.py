@@ -39,19 +39,3 @@ class SchemaTests(TestCase):
 
         schema = Schema()
         self.assertEqual([], list(schema.included()))
-
-    def test_module(self):
-        schema = Schema(location="foo/bar.xsd", target_namespace="http://xsdata/foo")
-
-        self.assertEqual("bar", schema.module)
-        schema.location = "foo/bar.noext"
-        self.assertEqual("bar.noext", schema.module)
-
-        schema.location = None
-        self.assertEqual("foo", schema.module)
-
-        schema.target_namespace = None
-        with self.assertRaises(SchemaValueError) as cm:
-            schema.module
-
-        self.assertEqual("Unknown schema module.", str(cm.exception))

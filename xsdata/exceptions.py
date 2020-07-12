@@ -22,9 +22,17 @@ class SchemaValueError(ValueError):
     """Schema definitions related errors."""
 
 
+class DefinitionsValueError(ValueError):
+    """Service definitions related errors."""
+
+
 class AnalyzerValueError(ValueError):
     """Unhandled behaviour during class analyze process.."""
 
 
 class ResolverValueError(ValueError):
     """Dependencies related errors."""
+
+
+class ClientValueError(ValueError):
+    """Client related errors."""

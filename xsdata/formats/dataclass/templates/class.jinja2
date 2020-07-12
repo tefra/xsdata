@@ -9,10 +9,10 @@ class {{ class_name }}{{"({})".format(obj.extensions|map(attribute='type')|map('
 {%- if help %}
 {{ help|indent(4, first=True) }}
 {%- endif -%}
-{%- if parents|length == 1 and (class_name != obj.name or obj.namespace or obj.is_nillable) %}
+{%- if parents|length == 1 and (class_name != obj.name or obj.meta_name or obj.namespace or obj.is_nillable) %}
     class Meta:
-        {%- if class_name != obj.name %}
-        name = "{{ obj.name }}"
+        {%- if class_name != obj.name or obj.meta_name %}
+        name = "{{ obj.meta_name or obj.name }}"
         {%- endif -%}
         {%- if obj.is_nillable %}
         nillable = True

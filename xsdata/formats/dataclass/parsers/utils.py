@@ -214,7 +214,7 @@ class ParserUtils:
 
         def qname(value: Any) -> Any:
             prefix, suffix = text.split(value)
-            if prefix and prefix in element.nsmap:
+            if prefix and prefix in element.nsmap and not suffix.startswith("//"):
                 return QName(element.nsmap[prefix], suffix)
             return value
 
@@ -227,7 +227,7 @@ class ParserUtils:
         var = metadata.find_var(mode=FindMode.TEXT)
         wildcard = None if var else metadata.find_var(mode=FindMode.WILDCARD)
 
-        if var and element.text is not None and var.init:
+        if var and element.text is not None and len(element) == 0 and var.init:
             params[var.name] = cls.parse_value(
                 var.types, element.text, var.default, element.nsmap, var.is_tokens
             )

@@ -101,3 +101,9 @@ class JsonParser(AbstractParser):
             value = [value]
 
         return value
+
+
+@dataclass
+class DictConverter(JsonParser):
+    def convert(self, data: Dict, clazz: Type[T]) -> T:
+        return self.parse_context(data, clazz)

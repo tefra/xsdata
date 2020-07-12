@@ -1,7 +1,6 @@
 from dataclasses import asdict
 from dataclasses import dataclass
 from dataclasses import field
-from pathlib import Path
 from typing import List
 from unittest import mock
 from unittest.case import TestCase
@@ -9,7 +8,7 @@ from unittest.case import TestCase
 from lxml.etree import Element
 from lxml.etree import QName
 
-from tests.fixtures import fixtures_dir
+from tests import fixtures_dir
 from tests.fixtures.books import BookForm
 from tests.fixtures.books import Books
 from xsdata.exceptions import ParserError

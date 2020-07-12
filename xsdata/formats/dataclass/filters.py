@@ -205,6 +205,15 @@ def attribute_type(attr: Attr, parents: List[str]) -> str:
     return result
 
 
+def constant_value(attr: Attr) -> str:
+    """Return the attr default value or type as constant value."""
+    attr_type = attr.types[0]
+    if attr_type.native:
+        return f'"{attr.default}"'
+
+    return class_name(attr_type.alias) if attr_type.alias else type_name(attr_type)
+
+
 filters = {
     "attribute_name": attribute_name,
     "attribute_default": attribute_default,
@@ -213,6 +222,7 @@ filters = {
     "class_name": class_name,
     "class_docstring": class_docstring,
     "constant_name": constant_name,
+    "constant_value": constant_value,
     "default_imports": default_imports,
     "format_arguments": format_arguments,
     "type_name": type_name,

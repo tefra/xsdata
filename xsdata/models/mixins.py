@@ -237,5 +237,5 @@ def array_element(init: bool = True, **kwargs: str) -> Any:
 
 def array_any_element(init: bool = True, **kwargs: str) -> Any:
     """Shortcut method for list wildcard fields."""
-    kwargs.update(type=XmlType.WILDCARD, namespace=NamespaceType.ANY.value)
+    kwargs.update(type=XmlType.WILDCARD, namespace=NamespaceType.ANY)
     return field(init=init, default_factory=list, metadata=kwargs)

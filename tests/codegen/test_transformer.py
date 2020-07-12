@@ -4,10 +4,15 @@ from unittest import mock
 from tests.factories import ClassFactory
 from tests.factories import FactoryTestCase
 from xsdata.codegen.analyzer import ClassAnalyzer
+from xsdata.codegen.mappers.defintions import DefinitionsMapper
 from xsdata.codegen.mappers.schema import SchemaMapper
+from xsdata.codegen.parsers import DefinitionsParser
 from xsdata.codegen.transformer import SchemaTransformer
 from xsdata.codegen.writer import CodeWriter
+from xsdata.exceptions import CodeGenerationError
 from xsdata.models.enums import Namespace
+from xsdata.models.wsdl import Definitions
+from xsdata.models.wsdl import Types
 from xsdata.models.xsd import Import
 from xsdata.models.xsd import Include
 from xsdata.models.xsd import Override
@@ -21,22 +26,57 @@ class SchemaTransformerTests(FactoryTestCase):
         )
         super().setUp()
 
+    @mock.patch.object(SchemaTransformer, "process_classes")
+    @mock.patch.object(SchemaTransformer, "convert_schema")
+    @mock.patch.object(SchemaTransformer, "convert_definitions")
+    @mock.patch.object(SchemaTransformer, "parse_definitions")
+    def test_process_definitions(
+        self,
+        mock_parse_definitions,
+        mock_convert_definitions,
+        mock_convert_schema,
+        mock_process_classes,
+    ):
+
+        uri = "http://xsdata/services.xsd"
+        package = "package.foo"
+        definitions = Definitions(types=Types(schemas=[Schema(), Schema()]))
+
+        mock_parse_definitions.return_value = definitions
+
+        self.transformer.process_definitions(uri, package)
+
+        mock_convert_schema.assert_has_calls(
+            [mock.call(x) for x in definitions.schemas]
+        )
+        mock_parse_definitions.assert_called_once_with(uri, namespace=None)
+        mock_convert_definitions.assert_called_once_with(definitions)
+        mock_process_classes.assert_called_once_with(package)
+
+    @mock.patch.object(SchemaTransformer, "process_classes")
+    @mock.patch.object(SchemaTransformer, "process_schema")
+    def test_process_schemas(self, mock_process_schema, mock_process_classes):
+
+        uris = ["http://xsdata/foo.xsd", "http://xsdata/bar.xsd"]
+        package = "package.foo"
+
+        self.transformer.process_schemas(uris, package)
+        mock_process_schema.assert_has_calls([mock.call(uri) for uri in uris])
+        mock_process_classes.assert_called_once_with(package)
+
     @mock.patch("xsdata.codegen.transformer.logger.info")
     @mock.patch.object(CodeWriter, "print")
     @mock.patch.object(CodeWriter, "designate")
     @mock.patch.object(SchemaTransformer, "analyze_classes")
     @mock.patch.object(SchemaTransformer, "assign_packages")
-    @mock.patch.object(SchemaTransformer, "process_schema")
-    def test_process_with_print_true(
+    def test_process_classes_with_print_true(
         self,
-        mock_process_schema,
         mock_assign_packages,
         mock_analyze_classes,
         mock_writer_designate,
         mock_writer_print,
         mock_logger_into,
     ):
-        urls = ["http://xsdata/foo.xsd", "http://xsdata/bar.xsd"]
         package = "test"
         schema_classes = ClassFactory.list(3)
         analyzer_classes = ClassFactory.list(2)
@@ -47,9 +87,8 @@ class SchemaTransformerTests(FactoryTestCase):
             "http://xsdata/bar.xsd": schema_classes[1:],
         }
 
-        self.transformer.process(urls, package)
+        self.transformer.process_classes(package)
 
-        mock_process_schema.assert_has_calls(list(map(mock.call, urls)))
         mock_assign_packages.assert_called_once_with(package)
         mock_analyze_classes.assert_called_once_with(schema_classes)
         mock_writer_designate.assert_called_once_with(
@@ -68,17 +107,14 @@ class SchemaTransformerTests(FactoryTestCase):
     @mock.patch.object(CodeWriter, "designate")
     @mock.patch.object(SchemaTransformer, "analyze_classes")
     @mock.patch.object(SchemaTransformer, "assign_packages")
-    @mock.patch.object(SchemaTransformer, "process_schema")
-    def test_process_with_print_false(
+    def test_process_classes_with_print_false(
         self,
-        mock_process_schema,
         mock_assign_packages,
         mock_analyze_classes,
         mock_writer_designate,
         mock_writer_write,
         mock_logger_into,
     ):
-        urls = ["http://xsdata/foo.xsd", "http://xsdata/bar.xsd"]
         package = "test"
         schema_classes = ClassFactory.list(3)
         analyzer_classes = ClassFactory.list(2)
@@ -90,9 +126,8 @@ class SchemaTransformerTests(FactoryTestCase):
             "http://xsdata/bar.xsd": schema_classes[1:],
         }
 
-        self.transformer.process(urls, package)
+        self.transformer.process_classes(package)
 
-        mock_process_schema.assert_has_calls(list(map(mock.call, urls)))
         mock_assign_packages.assert_called_once_with(package)
         mock_analyze_classes.assert_called_once_with(schema_classes)
         mock_writer_designate.assert_called_once_with(
@@ -109,77 +144,77 @@ class SchemaTransformerTests(FactoryTestCase):
     @mock.patch("xsdata.codegen.transformer.logger.warning")
     @mock.patch.object(SchemaTransformer, "analyze_classes")
     @mock.patch.object(SchemaTransformer, "assign_packages")
-    @mock.patch.object(SchemaTransformer, "process_schema")
-    def test_process_with_zero_classes_after_analyze(
-        self,
-        mock_process_schema,
-        mock_assign_packages,
-        mock_analyze_classes,
-        mock_logger_warning,
+    def test_process_classes_with_zero_classes_after_analyze(
+        self, mock_assign_packages, mock_analyze_classes, mock_logger_warning,
     ):
-        urls = ["http://xsdata/foo.xsd", "http://xsdata/bar.xsd"]
         package = "test"
-
-        self.transformer.process(urls, package)
+        self.transformer.process_classes(package)
         self.assertEqual(0, mock_analyze_classes.call_count)
         self.assertEqual(0, mock_assign_packages.call_count)
 
-        mock_process_schema.assert_has_calls(list(map(mock.call, urls)))
         mock_logger_warning.assert_called_once_with("Analyzer returned zero classes!")
 
+    @mock.patch("xsdata.codegen.transformer.logger.debug")
     @mock.patch("xsdata.codegen.transformer.logger.info")
-    @mock.patch.object(SchemaTransformer, "generate_classes")
+    @mock.patch.object(SchemaTransformer, "convert_schema")
     @mock.patch.object(SchemaTransformer, "parse_schema")
     def test_process_schema(
-        self, mock_parse_schema, mock_generate_classes, mock_logger_info,
+        self,
+        mock_parse_schema,
+        mock_convert_schema,
+        mock_logger_info,
+        mock_logger_debug,
     ):
-        schema = Schema(target_namespace="thug")
+        schema = Schema()
+
+        mock_parse_schema.return_value = schema
+        uri = "http://xsdata/services.xsd"
+        namespace = "fooNS"
+
+        self.transformer.process_schema(uri, namespace)
+        self.transformer.process_schema(uri, namespace)
+
+        self.assertEqual([uri], self.transformer.processed)
+
+        mock_convert_schema.assert_called_once_with(schema)
+        mock_logger_info.assert_called_once_with("Parsing schema %s", "services.xsd")
+        mock_logger_debug.assert_called_once_with(
+            "Skipping already processed: %s", "services.xsd"
+        )
+
+    @mock.patch.object(SchemaTransformer, "generate_classes")
+    @mock.patch.object(SchemaTransformer, "process_schema")
+    def test_convert_schema(
+        self, mock_process_schema, mock_generate_classes,
+    ):
+        schema = Schema(target_namespace="thug", location="main")
         schema.includes.append(Include(location="foo"))
         schema.overrides.append(Override())
         schema.imports.append(Import(location="bar"))
         schema.imports.append(Import(location="fails"))
-        schema_foo = Schema()
-        schema_bar = Schema()
 
-        mock_generate_classes.side_effect = [
-            ClassFactory.list(1),
-            ClassFactory.list(2),
-            ClassFactory.list(3),
-        ]
+        mock_generate_classes.return_value = ClassFactory.list(2)
 
-        mock_parse_schema.side_effect = [schema, schema_bar, None, schema_foo]
+        self.transformer.convert_schema(schema)
 
-        self.transformer.process_schema("main", "foo-bar")
-
-        self.assertEqual(["main", "bar", "fails", "foo"], self.transformer.processed)
-
-        self.assertEqual(3, len(self.transformer.class_map))
-        self.assertEqual(3, len(self.transformer.class_map["main"]))
-        self.assertEqual(2, len(self.transformer.class_map["foo"]))
-        self.assertEqual(1, len(self.transformer.class_map["bar"]))
-
-        mock_logger_info.assert_has_calls(
+        self.assertEqual(1, len(self.transformer.class_map))
+        self.assertEqual(2, len(self.transformer.class_map["main"]))
+        mock_process_schema.assert_has_calls(
             [
-                mock.call("Parsing schema %s", "main"),
-                mock.call("Parsing schema %s", "bar"),
-                mock.call("Parsing schema %s", "fails"),
-                mock.call("Parsing schema %s", "foo"),
+                mock.call("bar", "thug"),
+                mock.call("fails", "thug"),
+                mock.call("foo", "thug"),
             ]
         )
 
-    @mock.patch("xsdata.codegen.transformer.logger.debug")
-    @mock.patch.object(SchemaTransformer, "parse_schema")
-    def test_process_schema_avoid_circular_imports(
-        self, mock_parse_schema, mock_logger_debug
-    ):
-        path = Path(__file__).as_uri()
-        self.transformer.processed.append(path)
-        self.transformer.process_schema(path, None)
+    @mock.patch.object(DefinitionsMapper, "map")
+    def test_convert_definitions(self, mock_definitions_map):
+        classes = ClassFactory.list(2)
+        mock_definitions_map.return_value = classes
+        definitions = Definitions(location="foo")
 
-        self.assertEqual(0, mock_parse_schema.call_count)
-        mock_logger_debug.assert_called_once_with(
-            "Already processed skipping: %s", path
-        )
+        self.transformer.convert_definitions(definitions)
+        self.assertEqual(classes, self.transformer.class_map[definitions.location])
 
     @mock.patch("xsdata.codegen.transformer.logger.info")
     @mock.patch.object(SchemaTransformer, "count_classes")
@@ -217,6 +252,40 @@ class SchemaTransformerTests(FactoryTestCase):
         schema = self.transformer.parse_schema(path, "foo")
         self.assertIsNone(schema)
         mock_logger_warning.assert_called_once_with("Schema not found %s", path)
+
+    @mock.patch.object(SchemaTransformer, "process_schema")
+    @mock.patch.object(Definitions, "merge")
+    @mock.patch.object(DefinitionsParser, "from_bytes")
+    @mock.patch.object(SchemaTransformer, "load_resource")
+    def test_parse_definitions(
+        self,
+        mock_load_resource,
+        mock_definitions_parser,
+        mock_definitions_merge,
+        mock_process_schema,
+    ):
+        def_one = Definitions(
+            imports=[
+                Import(),
+                Import(location="file://sub.wsdl"),
+                Import(location="file://types.xsd"),
+            ]
+        )
+        def_two = Definitions()
+
+        mock_load_resource.side_effect = ["a", "b"]
+
+        mock_definitions_parser.side_effect = [def_one, def_two]
+        actual = self.transformer.parse_definitions("main.wsdl", "fooNS")
+        self.assertEqual(def_one, actual)
+        mock_definitions_merge.assert_called_once_with(def_two)
+        mock_process_schema.assert_called_once_with("file://types.xsd")
+
+    def test_load_resource(self):
+        path = Path(__file__).as_uri()
+
+        result = self.transformer.load_resource(path)
+        self.assertTrue(len(result) > 0)
 
     def test_count_classes(self):
         classes = ClassFactory.list(

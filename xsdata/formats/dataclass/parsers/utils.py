@@ -46,7 +46,7 @@ class ParserUtils:
             return None if callable(default) else default
 
         if tokens:
-            value = value if isinstance(value, list) else filter(None, value.split(" "))
+            value = value if isinstance(value, list) else value.split()
             return list(map(lambda x: to_python(types, x, ns_map), value))
 
         return to_python(types, value, ns_map)

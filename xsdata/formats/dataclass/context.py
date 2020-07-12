@@ -180,11 +180,7 @@ class XmlContext:
             return []
 
         result = set()
-        for ns in namespace.split(" "):
-            ns = ns.strip()
-            if not ns:
-                continue
-
+        for ns in namespace.split():
             ns_type = NamespaceType.get_enum(ns)
             if ns_type == NamespaceType.TARGET:
                 result.add(parent_namespace or NamespaceType.ANY.value)

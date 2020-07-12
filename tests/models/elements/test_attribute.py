@@ -15,7 +15,7 @@ class AttributeTests(TestCase):
 
     def test_property_real_type(self):
         obj = Attribute()
-        self.assertIsNone(obj.real_type)
+        self.assertEqual("", obj.real_type)
 
         obj.ref = "foo"
         self.assertEqual(obj.ref, obj.real_type)
@@ -24,7 +24,7 @@ class AttributeTests(TestCase):
         self.assertEqual(obj.type, obj.real_type)
 
         obj.simple_type = SimpleType()
-        self.assertIsNone(obj.real_type)
+        self.assertEqual("", obj.real_type)
 
         obj.simple_type.restriction = Restriction(base="thug")
         self.assertEqual(obj.simple_type.restriction.base, obj.real_type)

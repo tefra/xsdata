@@ -19,11 +19,14 @@ from xsdata.models.xsd import WhiteSpace
 
 class RestrictionTests(TestCase):
     def test_property_real_type(self):
+        obj = Restriction()
+        self.assertEqual("", obj.real_type)
+
         obj = Restriction(base="foo")
         self.assertEqual(obj.base, obj.real_type)
 
         obj.enumerations.append(Enumeration())
-        self.assertIsNone(obj.real_type)
+        self.assertEqual("", obj.real_type)
 
         obj = Restriction(simple_type=SimpleType(restriction=Restriction(base="bar")))
 

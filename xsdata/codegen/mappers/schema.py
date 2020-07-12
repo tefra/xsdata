@@ -244,11 +244,7 @@ class SchemaMapper:
     ) -> List[AttrType]:
         """Convert real type and anonymous inner types to an attribute type
         list."""
-        types = [
-            cls.build_data_type(target, name)
-            for name in (obj.real_type or "").split(" ")
-            if name
-        ]
+        types = [cls.build_data_type(target, name) for name in obj.real_type.split()]
 
         for inner in cls.build_inner_classes(
             obj, target.module, target.qname.namespace

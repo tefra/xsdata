@@ -7,7 +7,6 @@ from tests.fixtures.books import Books
 from xsdata.formats.dataclass.serializers import DictFactory
 from xsdata.formats.dataclass.serializers import DictSerializer
 from xsdata.formats.dataclass.serializers.json import JsonEncoder
-from xsdata.models.enums import DataType
 from xsdata.models.enums import Namespace
 
 
@@ -72,3 +71,7 @@ class JsonEncoderTests(TestCase):
     def test_encode_decimal(self):
         actual = json.dumps({"decimal": Decimal(10.5)}, cls=JsonEncoder)
         self.assertEqual('{"decimal": "10.5"}', actual)
+
+    def test_default_raises_exceptions(self):
+        with self.assertRaises(TypeError):
+            json.dumps({"string": object()}, cls=JsonEncoder)

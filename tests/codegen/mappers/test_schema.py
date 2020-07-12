@@ -331,7 +331,7 @@ class SchemaMapperTests(FactoryTestCase):
     def test_build_class_attribute_types_when_obj_has_no_types(
         self, mock_build_inner_classes, mock_real_type, mock_default_type
     ):
-        mock_real_type.return_value = None
+        mock_real_type.return_value = ""
         mock_build_inner_classes.return_value = []
         mock_default_type.return_value = "xs:string"
 

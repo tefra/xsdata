@@ -165,11 +165,11 @@ class AnyAttribute(AnnotationBase):
 
     @property
     def real_name(self) -> str:
-        clean_ns = "_".join(map(text.clean_uri, self.namespace.split(" ")))
+        clean_ns = "_".join(map(text.clean_uri, self.namespace.split()))
         return f"{clean_ns}_attributes"
 
     @property
-    def real_type(self) -> Optional[str]:
+    def real_type(self) -> str:
         prefix = self.schema_prefix()
         suffix = DataType.QMAP.code
         return f"{prefix}:{suffix}" if prefix else suffix
@@ -221,15 +221,15 @@ class SimpleType(AnnotationBase):
         return "value"
 
     @property
-    def real_type(self) -> Optional[str]:
+    def real_type(self) -> str:
         if not self.is_enumeration and self.restriction:
             return self.restriction.real_type
         if self.list:
             return self.list.real_type
-        if self.union:
+        if self.union and self.union.member_types:
             return self.union.member_types
 
-        return None
+        return ""
 
     def get_restrictions(self) -> Dict[str, Anything]:
         if self.restriction:
@@ -249,7 +249,7 @@ class List(AnnotationBase):
     """
 
     simple_type: Optional[SimpleType] = element(name="simpleType")
-    item_type: Optional[str] = attribute(name="itemType")
+    item_type: str = attribute(name="itemType", default="")
 
     @property
     def is_attribute(self) -> bool:
@@ -260,7 +260,7 @@ class List(AnnotationBase):
         return "value"
 
     @property
-    def real_type(self) -> Optional[str]:
+    def real_type(self) -> str:
         return self.item_type
 
     def get_restrictions(self) -> Dict[str, Anything]:
@@ -282,7 +282,7 @@ class Union(AnnotationBase):
     @property
     def extensions(self) -> Iterator[str]:
         if self.member_types:
-            yield from filter(None, self.member_types.split(" "))
+            yield from self.member_types.split()
 
     @property
     def is_attribute(self) -> bool:
@@ -293,7 +293,7 @@ class Union(AnnotationBase):
         return "value"
 
     @property
-    def real_type(self) -> Optional[str]:
+    def real_type(self) -> str:
         types = []
         if self.simple_types:
             types.extend(
@@ -304,9 +304,9 @@ class Union(AnnotationBase):
                 ]
             )
         if self.member_types:
-            types.extend([member for member in self.member_types.split(" ") if member])
+            types.extend(self.member_types.split())
 
-        return " ".join(types) if types else None
+        return " ".join(types)
 
     def get_restrictions(self) -> Dict[str, Anything]:
         restrictions = {}
@@ -346,7 +346,7 @@ class Attribute(AnnotationBase):
         return True
 
     @property
-    def real_type(self) -> Optional[str]:
+    def real_type(self) -> str:
         if self.simple_type:
             return self.simple_type.real_type
         if self.type:
@@ -354,7 +354,7 @@ class Attribute(AnnotationBase):
         if self.ref:
             return self.ref
 
-        return None
+        return ""
 
     def get_restrictions(self) -> Dict[str, Anything]:
         restrictions = {}
@@ -380,8 +380,8 @@ class AttributeGroup(AnnotationBase):
     :param attribute_groups:
     """
 
+    ref: str = attribute(default="")
     name: Optional[str] = attribute()
-    ref: Optional[str] = attribute()
     attributes: Array[Attribute] = array_element(name="attribute")
     attribute_groups: Array["AttributeGroup"] = array_element(name="attributeGroup")
 
@@ -390,7 +390,7 @@ class AttributeGroup(AnnotationBase):
         return True
 
     @property
-    def real_type(self) -> Optional[str]:
+    def real_type(self) -> str:
         return self.ref
 
 
@@ -419,7 +419,7 @@ class Any(AnnotationBase):
 
     @property
     def real_name(self) -> str:
-        clean_ns = "_".join(map(text.clean_uri, self.namespace.split(" ")))
+        clean_ns = "_".join(map(text.clean_uri, self.namespace.split()))
         return f"{clean_ns}_element"
 
     @property
@@ -427,7 +427,7 @@ class Any(AnnotationBase):
         return self.namespace
 
     @property
-    def real_type(self) -> Optional[str]:
+    def real_type(self) -> str:
         prefix = self.schema_prefix()
         suffix = DataType.OBJECT.code
         return f"{prefix}:{suffix}" if prefix else suffix
@@ -529,7 +529,7 @@ class Group(AnnotationBase):
     """
 
     name: Optional[str] = attribute()
-    ref: Optional[str] = attribute()
+    ref: str = attribute(default="")
     min_occurs: int = attribute(default=1, name="minOccurs")
     max_occurs: UnionType[int, str] = attribute(default=1, name="maxOccurs")
     all: Optional[All] = element()
@@ -541,7 +541,7 @@ class Group(AnnotationBase):
         return True
 
     @property
-    def real_type(self) -> Optional[str]:
+    def real_type(self) -> str:
         return self.ref
 
     def get_restrictions(self) -> Dict[str, Anything]:
@@ -617,8 +617,8 @@ class Enumeration(AnnotationBase):
         return True
 
     @property
-    def real_type(self) -> None:
-        return None
+    def real_type(self) -> str:
+        return ""
 
     @property
     def real_name(self) -> str:
@@ -822,12 +822,15 @@ class Restriction(AnnotationBase):
     simple_type: Optional[SimpleType] = element(name="simpleType")
 
     @property
-    def real_type(self) -> Optional[str]:
+    def real_type(self) -> str:
         if self.simple_type:
             return self.simple_type.real_type
         if self.enumerations:
-            return None
-        return self.base
+            return ""
+        if self.base:
+            return self.base
+
+        return ""
 
     @property
     def real_name(self) -> str:
@@ -1120,7 +1123,7 @@ class Element(AnnotationBase):
         return f"{prefix}:{suffix}" if prefix else suffix
 
     @property
-    def real_type(self) -> Optional[str]:
+    def real_type(self) -> str:
 
         types = {
             alternative.type for alternative in self.alternatives if alternative.type
@@ -1132,14 +1135,11 @@ class Element(AnnotationBase):
         elif self.simple_type and self.simple_type.real_type:
             types.add(self.simple_type.real_type)
 
-        return " ".join(sorted(types)) or None
+        return " ".join(sorted(types))
 
     @property
     def substitutions(self) -> Array[str]:
-        if self.substitution_group:
-            return list(filter(None, self.substitution_group.split(" ")))
-
-        return []
+        return self.substitution_group.split() if self.substitution_group else []
 
     def get_restrictions(self) -> Dict[str, Anything]:
         restrictions = occurrences(self.min_occurs, self.max_occurs)

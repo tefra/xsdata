@@ -22,7 +22,7 @@ class SimpleTypeTests(TestCase):
 
     def test_property_real_type(self):
         obj = SimpleType()
-        self.assertIsNone(obj.real_type)
+        self.assertEqual("", obj.real_type)
 
         obj.union = Union(member_types="thug")
         self.assertEqual("thug", obj.real_type)
@@ -35,7 +35,7 @@ class SimpleTypeTests(TestCase):
 
         obj = SimpleType(restriction=Restriction())
         obj.restriction.enumerations.append(Enumeration())
-        self.assertIsNone(obj.real_type)
+        self.assertEqual("", obj.real_type)
 
     def test_property_is_attribute(self):
         obj = SimpleType()

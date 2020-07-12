@@ -85,6 +85,7 @@ class DefinitionsTests(TestCase):
         self.assertEqual(1, len(target.extended))
 
         target.merge(source_two)
+        target.merge(Definitions())
         self.assertEqual(1, len(target.types.schemas))
         self.assertEqual(2, len(target.messages))
         self.assertEqual(2, len(target.port_types))

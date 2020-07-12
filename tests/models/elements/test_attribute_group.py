@@ -10,7 +10,7 @@ class AttributeGroupTests(TestCase):
 
     def test_property_real_type(self):
         obj = AttributeGroup()
-        self.assertIsNone(obj.real_type)
+        self.assertEqual("", obj.real_type)
 
         obj.ref = "foo"
         self.assertEqual("foo", obj.real_type)

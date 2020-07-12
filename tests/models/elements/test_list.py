@@ -15,7 +15,7 @@ class ListTests(TestCase):
 
     def test_real_type(self):
         obj = List()
-        self.assertIsNone(obj.real_type)
+        self.assertEqual("", obj.real_type)
 
         obj.item_type = "foo"
         self.assertEqual("foo", obj.real_type)

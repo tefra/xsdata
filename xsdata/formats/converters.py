@@ -71,7 +71,7 @@ def to_class(clazz: Any, value: Any, ns_map: Optional[Dict]) -> Any:
 
 
 def to_enum(clazz: Type[Enum], value: Any, ns_map: Optional[Dict]) -> Enum:
-    enumeration = next(enumeration for enumeration in clazz)
+    enumeration: Enum = list(clazz)[0]
 
     if isinstance(enumeration.value, QName):
         value = to_qname(value, ns_map)

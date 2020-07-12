@@ -10,7 +10,11 @@ class GroupTests(TestCase):
 
     def test_property_real_type(self):
         obj = Group()
-        self.assertIsNone(obj.real_type)
+        self.assertEqual("", obj.real_type)
 
         obj.ref = "foo"
         self.assertEqual("foo", obj.real_type)
+
+    def test_get_restrictions(self):
+        obj = Group(min_occurs=1, max_occurs=2)
+        self.assertEqual({"max_occurs": 2, "min_occurs": 1}, obj.get_restrictions())

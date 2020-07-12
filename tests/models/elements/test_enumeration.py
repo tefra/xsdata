@@ -6,7 +6,7 @@ from xsdata.models.xsd import Enumeration
 class EnumerationTests(TestCase):
     def test_property_is_attribute(self):
         obj = Enumeration()
-        self.assertTrue(obj)
+        self.assertTrue(obj.is_attribute)
 
     def test_property_real_name(self):
         obj = Enumeration(value="foo")
@@ -14,7 +14,7 @@ class EnumerationTests(TestCase):
 
     def test_property_real_type(self):
         obj = Enumeration()
-        self.assertIsNone(obj.real_type)
+        self.assertEqual("", obj.real_type)
 
     def test_property_default(self):
         obj = Enumeration(value="foo")

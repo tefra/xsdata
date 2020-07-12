@@ -47,11 +47,11 @@ class ElementTests(TestCase):
 
     def test_property_real_type(self):
         obj = Element()
-        self.assertIsNone(obj.real_type)
+        self.assertEqual("", obj.real_type)
 
         # Inner classes depend on the this to be None
         obj.complex_type = ComplexType()
-        self.assertIsNone(obj.real_type)
+        self.assertEqual("", obj.real_type)
 
         restriction = Restriction(base="xs:int")
         obj.simple_type = SimpleType(restriction=restriction)

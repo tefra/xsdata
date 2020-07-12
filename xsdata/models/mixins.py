@@ -156,7 +156,7 @@ class ElementBase:
         raise SchemaValueError(f"Schema class `{self.class_name}` unknown real name.")
 
     @property
-    def real_type(self) -> Optional[str]:
+    def real_type(self) -> str:
         """
         Return the real type for this element.
 

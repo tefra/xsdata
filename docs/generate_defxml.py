@@ -139,7 +139,7 @@ def parse_title(source: str) -> str:
     title = source[start:end].strip()
 
     if title in section_titles:
-        parts = title.split(" ")
+        parts = title.split()
         for i in range(len(parts)):
             if parts[i][0].isdigit():
                 parts[i] += f".{section_titles[title]}"

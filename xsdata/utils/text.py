@@ -21,18 +21,13 @@ def split(string: str, sep: str = ":") -> Tuple:
 
     If the separator isn't present in the string return None as prefix.
     """
-    parts = string.split(sep, 1)
-    if len(parts) == 1:
-        return None, string
-
-    return parts[0], parts[1]
+    before, _, after = string.partition(sep)
+    return (before, after) if after else (None, before)
 
 
 def collapse_whitespace(string: str) -> str:
     """Remove excess whitespace and duplicate words."""
-    return " ".join(
-        unique_sequence([part for part in string.split(" ") if part.strip()])
-    )
+    return " ".join(unique_sequence(string.split()))
 
 
 def capitalize(string: str) -> str:

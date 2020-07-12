@@ -173,7 +173,6 @@ class ClassExtensionHandler(HandlerInterface):
             attr = Attr(
                 name="any_element",
                 local_name="any_element",
-                index=0,
                 default=list if extension.restrictions.is_list else None,
                 types=[extension.type.clone()],
                 tag=Tag.ANY,
@@ -184,7 +183,6 @@ class ClassExtensionHandler(HandlerInterface):
             attr = Attr(
                 name="value",
                 local_name="value",
-                index=0,
                 default=None,
                 types=[extension.type.clone()],
                 tag=Tag.EXTENSION,

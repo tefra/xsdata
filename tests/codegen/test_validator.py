@@ -51,7 +51,7 @@ class ClassValidatorTests(FactoryTestCase):
             ]
         )
         second = ClassFactory.create(
-            extensions=[ExtensionFactory.create(type=AttrTypeFactory.xs_bool()),]
+            extensions=[ExtensionFactory.create(type=AttrTypeFactory.xs_bool())]
         )
         third = ClassFactory.create()
 
@@ -97,7 +97,7 @@ class ClassValidatorTests(FactoryTestCase):
         self.assertEqual([one, four], classes)
         mock_select_winner.assert_called_once_with([one, two, three])
         mock_merge_redefined_type.assert_has_calls(
-            [mock.call(two, one), mock.call(three, one),]
+            [mock.call(two, one), mock.call(three, one)]
         )
 
     def test_mark_strict_types(self):

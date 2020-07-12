@@ -22,7 +22,6 @@ class AttributeMixedContentHandlerTests(FactoryTestCase):
         self.processor.process(item)
         expected = AttrFactory.create(
             name="content",
-            index=0,
             types=[AttrTypeFactory.xs_any()],
             tag=Tag.ANY,
             namespace="##any",

@@ -27,7 +27,7 @@ class AttributeSubstitutionHandlerTests(FactoryTestCase):
         mock_create_substitutions.side_effect = init_substitutions
 
         target = ClassFactory.create(
-            attrs=[AttrFactory.enumeration(), AttrFactory.any(), AttrFactory.element(),]
+            attrs=[AttrFactory.enumeration(), AttrFactory.any(), AttrFactory.element()]
         )
 
         self.processor.process(target)
@@ -99,8 +99,7 @@ class AttributeSubstitutionHandlerTests(FactoryTestCase):
         actual = self.processor.create_substitution(item)
 
         expected = AttrFactory.create(
-            name="bar",
-            index=0,
+            name=item.name,
             default=None,
             types=[AttrType(qname=QName("foo", "bar"))],
             tag=item.type.__name__,

@@ -18,6 +18,8 @@ from xsdata.models.enums import DataType
 from xsdata.models.enums import QNames
 from xsdata.models.enums import Tag
 from xsdata.models.mixins import ElementBase
+from xsdata.models.wsdl import BindingMessage
+from xsdata.models.wsdl import BindingOperation
 from xsdata.models.xsd import ComplexType
 from xsdata.models.xsd import Element
 
@@ -217,7 +219,7 @@ class Attr:
     tag: str
     name: str
     local_name: str
-    index: int = field(compare=False)
+    index: int = field(compare=False, default_factory=int)
     default: Any = field(default=None, compare=False)
     fixed: bool = field(default=False, compare=False)
     mixed: bool = field(default=False, compare=False)
@@ -351,6 +353,7 @@ class Class:
     :param package:
     :param namespace:
     :param help:
+    :param meta_name:
     :param substitutions:
     :param extensions:
     :param attrs:
@@ -362,15 +365,16 @@ class Class:
     qname: QName
     type: Type
     module: str
-    mixed: bool
-    abstract: bool
-    nillable: bool
+    mixed: bool = field(default=False)
+    abstract: bool = field(default=False)
+    nillable: bool = field(default=False)
     strict_type: bool = field(default=False)
     status: Status = field(default=Status.RAW)
     container: Optional[str] = field(default=None)
     package: Optional[str] = field(default=None)
     namespace: Optional[str] = field(default=None)
     help: Optional[str] = field(default=None)
+    meta_name: Optional[str] = field(default=None)
     substitutions: List[QName] = field(default_factory=list)
     extensions: List[Extension] = field(default_factory=list)
     attrs: List[Attr] = field(default_factory=list)
@@ -410,6 +414,23 @@ class Class:
         return self.nillable or next(
             (True for ext in self.extensions if ext.restrictions.nillable), False
         )
+
+    @property
+    def is_service(self) -> bool:
+        """Return whether or not this instance is derived from
+        wsdl:operation."""
+        return self.type is BindingOperation
+
+    @property
+    def should_generate(self) -> bool:
+        """Return whether or not this instance should be generated."""
+        if self.strict_type:
+            return False
+
+        if self.type in (Element, ComplexType, BindingOperation, BindingMessage):
+            return True
+
+        return self.is_enumeration
 
     @property
     def target_module(self) -> str:

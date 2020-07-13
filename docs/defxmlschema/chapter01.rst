@@ -1,18 +1,16 @@
-**********
-Chapter 01
-**********
+******************************
+#01 - Schemas: An introduction
+******************************
 
-Schemas: An introduction
-========================
 
-Binding Test
-************
 
 **Schema**
 
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter01.xsd
    :language: xml
    :lines: 2-
+
+**Models**
 
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter01.py
    :language: python

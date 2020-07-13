@@ -1,18 +1,16 @@
-**********
-Chapter 13
-**********
+****************************
+#13 - Deriving complex types
+****************************
 
-Deriving complex types
-======================
 
-Binding Test
-************
 
 **Schema**
 
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter13.xsd
    :language: xml
    :lines: 2-
+
+**Models**
 
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter13.py
    :language: python

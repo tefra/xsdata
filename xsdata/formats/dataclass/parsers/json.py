@@ -1,6 +1,8 @@
 import io
 import json
+import pathlib
 from dataclasses import dataclass
+from dataclasses import field
 from typing import Any
 from typing import Dict
 from typing import Type
@@ -17,7 +19,18 @@ T = TypeVar("T")
 
 
 @dataclass
-class JsonParser(AbstractParser, XmlContext):
+class JsonParser(AbstractParser):
+    """
+    Json parsing and binding for dataclasses.
+
+    :param context: Model metadata builder
+    """
+
+    context: XmlContext = field(default_factory=XmlContext)
+
+    def from_path(self, path: pathlib.Path, clazz: Type[T]) -> T:
+        return self.from_bytes(path.read_bytes(), clazz)
+
     def parse(self, source: io.BytesIO, clazz: Type[T]) -> T:
         """Parse the JSON input stream and return the resulting object tree."""
         ctx = json.load(source)
@@ -30,7 +43,7 @@ class JsonParser(AbstractParser, XmlContext):
         :raise ParserError: When parsing fails for any reason
         """
         params = {}
-        for var in self.build(clazz).vars:
+        for var in self.context.build(clazz).vars:
             value = self.get_value(data, var)
 
             if value is None:

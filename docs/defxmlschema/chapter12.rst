@@ -1,18 +1,16 @@
-**********
-Chapter 12
-**********
+*******************
+#12 - Complex types
+*******************
 
-Complex types
-=============
 
-Binding Test
-************
 
 **Schema**
 
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter12.xsd
    :language: xml
    :lines: 2-
+
+**Models**
 
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter12.py
    :language: python

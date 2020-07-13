@@ -32,22 +32,15 @@ subtitles = {
     "chapter23": "Versioning",
 }
 
-tpl = """{title}
-
-.. literalinclude:: /../{input}
-   :language: xml
-   :lines: 3-
-
-.. literalinclude:: /../{output}
-   :language: python"""
-
-bind_tpl = """{title}
+bind_tpl = """
 
 **Schema**
 
 .. literalinclude:: /../{input}
    :language: xml
    :lines: 2-
+
+**Models**
 
 .. literalinclude:: /../{output}
    :language: python
@@ -70,8 +63,6 @@ bind_tpl = """{title}
    :language: json"""
 
 chapter_tpl = """{title}
-
-{subtitle}
 
 {output}
 
@@ -99,11 +90,8 @@ def generate():
         output = input.with_suffix(".py")
 
         if xsd.with_suffix(".xml").exists():
-            title = "Binding Test"
-            title = "{title}\n{line}".format(title=title, line="*" * len(title))
             buffer.append(
                 bind_tpl.format(
-                    title=title,
                     input=input,
                     output=output,
                     instance=input.with_suffix(".xml"),
@@ -113,17 +101,12 @@ def generate():
             )
 
         chapter = xsd.stem
-        title = chapter.replace("chapter", "Chapter ")
+        number = chapter.replace("chapter", "#")
+        title = "{number} - {topic}".format(number=number, topic=subtitles[chapter])
         title = "{line}\n{title}\n{line}".format(line="*" * len(title), title=title)
-        subtitle = subtitles[chapter]
-        subtitle = "{title}\n{line}".format(line="=" * len(subtitle), title=subtitle)
 
         file = here.joinpath(f"defxmlschema/{chapter}.rst")
-        file.write_text(
-            chapter_tpl.format(
-                title=title, subtitle=subtitle, output="\n\n".join(buffer)
-            )
-        )
+        file.write_text(chapter_tpl.format(title=title, output="\n\n".join(buffer)))
         print(f"Writing: {file}")
 
 

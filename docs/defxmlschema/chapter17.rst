@@ -1,18 +1,16 @@
-**********
-Chapter 17
-**********
+**************************
+#17 - Identity constraints
+**************************
 
-Identity constraints
-====================
 
-Binding Test
-************
 
 **Schema**
 
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter17.xsd
    :language: xml
    :lines: 2-
+
+**Models**
 
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter17.py
    :language: python

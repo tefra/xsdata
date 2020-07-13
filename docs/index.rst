@@ -12,10 +12,12 @@
 
     installation
     codegen
-    architecture
-    dataclasses
+    models
+    xml
+    json
     plantuml
     demos
     changelog
+    architecture
     about
     api

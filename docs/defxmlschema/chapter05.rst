@@ -1,18 +1,16 @@
-**********
-Chapter 05
-**********
+***************************
+#05 - Instances and schemas
+***************************
 
-Instances and schemas
-=====================
 
-Binding Test
-************
 
 **Schema**
 
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter05.xsd
    :language: xml
    :lines: 2-
+
+**Models**
 
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter05.py
    :language: python

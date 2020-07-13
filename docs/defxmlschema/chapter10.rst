@@ -1,18 +1,16 @@
-**********
-Chapter 10
-**********
+**************************
+#10 - Union and list types
+**************************
 
-Union and list types
-====================
 
-Binding Test
-************
 
 **Schema**
 
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter10.xsd
    :language: xml
    :lines: 2-
+
+**Models**
 
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter10.py
    :language: python

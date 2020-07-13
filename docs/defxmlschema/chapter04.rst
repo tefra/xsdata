@@ -1,18 +1,16 @@
-**********
-Chapter 04
-**********
+************************
+#04 - Schema composition
+************************
 
-Schema composition
-==================
 
-Binding Test
-************
 
 **Schema**
 
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter04.xsd
    :language: xml
    :lines: 2-
+
+**Models**
 
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter04.py
    :language: python

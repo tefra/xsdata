@@ -1,18 +1,16 @@
-**********
-Chapter 03
-**********
+****************
+#03 - Namespaces
+****************
 
-Namespaces
-==========
 
-Binding Test
-************
 
 **Schema**
 
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter03.xsd
    :language: xml
    :lines: 2-
+
+**Models**
 
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter03.py
    :language: python

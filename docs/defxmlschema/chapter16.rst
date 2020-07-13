@@ -1,18 +1,16 @@
-**********
-Chapter 16
-**********
+*************************
+#16 - Substitution groups
+*************************
 
-Substitution groups
-===================
 
-Binding Test
-************
 
 **Schema**
 
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter16.xsd
    :language: xml
    :lines: 2-
+
+**Models**
 
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter16.py
    :language: python

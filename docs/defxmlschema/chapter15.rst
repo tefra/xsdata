@@ -1,18 +1,16 @@
-**********
-Chapter 15
-**********
+******************
+#15 - Named groups
+******************
 
-Named groups
-============
 
-Binding Test
-************
 
 **Schema**
 
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter15.xsd
    :language: xml
    :lines: 2-
+
+**Models**
 
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter15.py
    :language: python

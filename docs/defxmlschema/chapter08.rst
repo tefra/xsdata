@@ -1,18 +1,16 @@
-**********
-Chapter 08
-**********
+******************
+#08 - Simple types
+******************
 
-Simple types
-============
 
-Binding Test
-************
 
 **Schema**
 
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter08.xsd
    :language: xml
    :lines: 2-
+
+**Models**
 
 .. literalinclude:: /../tests/fixtures/defxmlschema/chapter08.py
    :language: python

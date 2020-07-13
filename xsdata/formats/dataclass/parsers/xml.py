@@ -32,16 +32,16 @@ class XmlParser(AbstractParser):
     """
     Xml parsing and binding for dataclasses.
 
-    :param namespaces: Store the prefix/namespace as they are parsed.
-    :param context: Model metadata builder
-    :param event_names: Cache for event names for each element
     :param config: Parser configuration
+    :param context: Model metadata builder
+    :param namespaces: Store the prefix/namespace as they are parsed.
+    :param event_names: Cache for event names for each element
     """
 
-    namespaces: Namespaces = field(init=False, default_factory=Namespaces)
-    context: XmlContext = field(default_factory=XmlContext)
-    event_names: Dict = field(default_factory=dict)
     config: ParserConfig = field(default_factory=ParserConfig)
+    context: XmlContext = field(default_factory=XmlContext)
+    namespaces: Namespaces = field(init=False, default_factory=Namespaces)
+    event_names: Dict = field(init=False, default_factory=dict)
 
     def parse(self, source: Any, clazz: Type[T]) -> T:
         """Parse the XML input stream and return the resulting object tree."""

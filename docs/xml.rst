@@ -6,11 +6,11 @@ XML Binding
 :class:`~xsdata.formats.dataclass.parsers.XmlParser`
 ====================================================
 
-You may initialize the alter the default parser behaviour with a config and xml
-context instances.
+You can alter the default behaviour by initializing with a custom configuration
+and xml context instance.
 
-The :class:`~xsdata.formats.dataclass.context.XmlContext` is a cache layer for the
-models and the field definitions and how they should be mapped to xml document elements
+The :class:`~xsdata.formats.dataclass.context.XmlContext` is a cache layer for
+models and field definitions and the mapping instructions to xml document elements
 and attributes. You can share this between xml parser instances to avoid compiling the
 models metadata more than once. Although it makes for sense to have a static instance
 of the parser per document type.

@@ -151,6 +151,7 @@ class XmlContext:
                 qname=QName(first_namespace, local_name),
                 namespaces=namespaces,
                 init=var.init,
+                mixed=var.metadata.get("mixed", False),
                 nillable=var.metadata.get("nillable", False),
                 dataclass=is_class,
                 sequential=var.metadata.get("sequential", False),

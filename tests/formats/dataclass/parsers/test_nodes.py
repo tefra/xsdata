@@ -1,5 +1,7 @@
 from dataclasses import dataclass
+from dataclasses import field
 from dataclasses import replace
+from typing import List
 from unittest import mock
 from unittest.case import TestCase
 
@@ -30,7 +32,22 @@ class Foo:
     a: int
     b: int
     c: int
-    d: int
+
+
+@dataclass
+class FooMixed:
+    a: int
+    b: int
+    content: List[object] = field(
+        default_factory=list,
+        metadata=dict(
+            type="Wildcard",
+            namespace="##any",
+            mixed=True,
+            min_occurs=0,
+            max_occurs=9223372036854775807,
+        ),
+    )
 
 
 class XmlNodeTests(TestCase):
@@ -46,7 +63,6 @@ class XmlNodeTests(TestCase):
 
 
 class ElementNodeTests(TestCase):
-    @mock.patch.object(ParserUtils, "bind_element_wild_text")
     @mock.patch.object(ParserUtils, "bind_element_children")
     @mock.patch.object(ParserUtils, "bind_element_text")
     @mock.patch.object(ParserUtils, "bind_element_attrs")
@@ -55,7 +71,6 @@ class ElementNodeTests(TestCase):
         mock_bind_element_attrs,
         mock_bind_element_text,
         mock_bind_element_children,
-        mock_bind_element_wild_text,
     ):
         def add_attr(x, *args):
             x["a"] = 1
@@ -66,13 +81,9 @@ class ElementNodeTests(TestCase):
         def add_child(x, *args):
             x["c"] = 3
 
-        def add_wild_text(x, *args):
-            x["d"] = 4
-
         mock_bind_element_attrs.side_effect = add_attr
         mock_bind_element_text.side_effect = add_text
         mock_bind_element_children.side_effect = add_child
-        mock_bind_element_wild_text.side_effect = add_wild_text
 
         ctx = XmlContext()
         meta = ctx.build(Foo)
@@ -84,12 +95,46 @@ class ElementNodeTests(TestCase):
         qname, obj = node.parse_element(ele, pool)
 
         self.assertEqual(QName(ele.tag), qname)
-        self.assertEqual(Foo(1, 2, 3, 4), obj)
+        self.assertEqual(Foo(1, 2, 3), obj)
 
         mock_bind_element_attrs.assert_called_once_with(mock.ANY, meta, ele)
         mock_bind_element_text.assert_called_once_with(mock.ANY, meta, ele)
         mock_bind_element_children.assert_called_once_with(mock.ANY, meta, 0, pool)
-        mock_bind_element_wild_text.assert_called_once_with(mock.ANY, meta, ele)
+
+    @mock.patch.object(ParserUtils, "bind_mixed_content")
+    @mock.patch.object(ParserUtils, "bind_wildcard_text")
+    @mock.patch.object(ParserUtils, "bind_element_attrs")
+    def test_parse_element_with_mixed_content(
+        self, mock_bind_element_attrs, mock_bind_wildcard_text, mock_bind_mixed_content,
+    ):
+        def add_attr(x, *args):
+            x["a"] = 1
+
+        def add_text(x, *args):
+            x["b"] = 2
+
+        def add_child(x, *args):
+            x["content"] = 3
+
+        mock_bind_element_attrs.side_effect = add_attr
+        mock_bind_wildcard_text.side_effect = add_text
+        mock_bind_mixed_content.side_effect = add_child
+
+        ctx = XmlContext()
+        meta = ctx.build(FooMixed)
+
+        ele = Element("foo")
+        pool = [1, 2, 3]
+
+        node = ElementNode(position=0, meta=meta, config=ParserConfig())
+        qname, obj = node.parse_element(ele, pool)
+
+        self.assertEqual(QName(ele.tag), qname)
+        self.assertEqual(FooMixed(1, 2, 3), obj)
+
+        mock_bind_element_attrs.assert_called_once_with(mock.ANY, meta, ele)
+        mock_bind_wildcard_text.assert_called_once_with(mock.ANY, meta.vars[2], ele)
+        mock_bind_mixed_content.assert_called_once_with(mock.ANY, meta.vars[2], 0, pool)
 
     @mock.patch.object(ParserUtils, "parse_xsi_type", return_value=QName("foo"))
     @mock.patch.object(XmlContext, "fetch")

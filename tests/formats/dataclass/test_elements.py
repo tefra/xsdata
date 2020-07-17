@@ -47,6 +47,7 @@ class XmlValTests(TestCase):
         self.assertFalse(var.is_element)
         self.assertFalse(var.is_text)
         self.assertFalse(var.is_tokens)
+        self.assertFalse(var.is_mixed_content)
 
     def test_matches(self):
         var = XmlVar(name="foo", qname=QName("foo"))
@@ -74,6 +75,15 @@ class XmlElementTests(TestCase):
 
 
 class XmlWildcardTests(TestCase):
+    def test_property_is_mixed_content(self):
+        var = XmlWildcard(name="foo", qname=QName("foo"))
+
+        self.assertIsInstance(var, XmlVar)
+        self.assertFalse(var.is_mixed_content)
+
+        var = replace(var, mixed=True)
+        self.assertTrue(var.is_mixed_content)
+
     def test_property_is_wildcard(self):
         var = XmlWildcard(name="foo", qname=QName("foo"))
 

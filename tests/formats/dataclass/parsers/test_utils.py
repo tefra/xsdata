@@ -4,7 +4,6 @@ from dataclasses import make_dataclass
 from dataclasses import replace
 from unittest import mock
 from unittest.case import TestCase
-from unittest.mock import MagicMock
 
 from lxml.etree import Element
 from lxml.etree import QName
@@ -12,11 +11,12 @@ from lxml.etree import QName
 from tests.fixtures.books import Books
 from tests.fixtures.defxmlschema.chapter12 import ProductType
 from tests.fixtures.defxmlschema.chapter12 import SizeType
+from tests.fixtures.defxmlschema.chapter16 import Umbrella
 from xsdata.formats.dataclass.context import XmlContext
 from xsdata.formats.dataclass.models.constants import XmlType
 from xsdata.formats.dataclass.models.elements import FindMode
-from xsdata.formats.dataclass.models.elements import XmlMeta
 from xsdata.formats.dataclass.models.elements import XmlVar
+from xsdata.formats.dataclass.models.elements import XmlWildcard
 from xsdata.formats.dataclass.models.generics import AnyElement
 from xsdata.formats.dataclass.parsers.utils import ParserUtils
 from xsdata.models.enums import Namespace
@@ -72,7 +72,7 @@ class ParserUtilsTests(TestCase):
     @mock.patch.object(ParserUtils, "bind_element_wildcard_param")
     @mock.patch.object(ParserUtils, "find_eligible_wildcard")
     @mock.patch.object(ParserUtils, "bind_element_param")
-    def test_bind_elements(
+    def test_bind_element_children(
         self,
         mock_bind_element_param,
         mock_find_eligible_wildcard,
@@ -119,6 +119,26 @@ class ParserUtilsTests(TestCase):
         mock_bind_element_wildcard_param.assert_called_once_with(
             params, w, w.qname, wild_element
         )
+
+    def test_bind_mixed_content(self):
+        generic = AnyElement(qname="foo")
+        data_class = make_dataclass("A", fields=[])
+        objects = [
+            (QName("a"), 1),
+            (QName("b"), None),
+            (QName("d"), data_class),
+            (QName("foo"), generic),
+        ]
+
+        var = XmlWildcard(name="foo", qname=QName("any", "foo"))
+        params = {}
+        ParserUtils.bind_mixed_content(params, var, 1, objects)
+
+        expected = {
+            var.name: [AnyElement(qname=QName("b"), text=""), data_class, generic]
+        }
+        self.assertEqual(expected, params)
+        self.assertEqual(QName("d"), data_class.qname)
 
     def test_fetch_any_children(self):
         objects = [(x, x) for x in "abc"]
@@ -194,6 +214,17 @@ class ParserUtilsTests(TestCase):
             var.types, element.text, var.default, element.nsmap, var.is_list,
         )
 
+    def test_bind_element_text_with_wildcard_var(self):
+        element = Element("foo")
+        params = {}
+        metadata = self.ctx.build(Umbrella)
+        ParserUtils.bind_element_text(params, metadata, element)
+        self.assertEqual({}, params)
+
+        element.text = "foo"
+        ParserUtils.bind_element_text(params, metadata, element)
+        self.assertEqual({"any_element": AnyElement(text="foo")}, params)
+
     def test_bind_element_param(self):
         var = XmlVar(name="a", qname=QName("a"))
         params = {}
@@ -235,79 +266,44 @@ class ParserUtilsTests(TestCase):
         ParserUtils.bind_element_wildcard_param(params, var, qname, "three")
         self.assertEqual(dict(a=AnyElement(children=[one, two, three])), params)
 
-    def test_bind_element_wildcard_param_with_dataclass(self):
-        params = {}
+    def test_bind_wildcard_text(self):
         var = XmlVar(name="a", qname=QName("a"))
-        qname = QName("b")
-        value = AnyElement()
-        clazz = make_dataclass("Foo", fields=[])
-        foo = clazz()
-
-        ParserUtils.bind_element_wildcard_param(params, var, qname, value)
-        self.assertEqual(dict(a=value), params)
-        self.assertIsNone(value.qname)
-
-        params.clear()
-        ParserUtils.bind_element_wildcard_param(params, var, qname, foo)
-        self.assertEqual(dict(a=foo), params)
-        self.assertEqual(qname, foo.qname)
-
-    def test_bind_element_wild_text_when_find_var_returns_none(self):
-        meta = mock.Mock(XmlMeta)
-        meta.find_var = MagicMock(return_value=None)
-        elem = Element("foo")
-        params = {}
-        ParserUtils.bind_element_wild_text(params, meta, elem)
-        self.assertEqual(0, len(params))
-
-    def test_bind_element_wild_text_when_element_has_no_text_and_tail(self):
-        var = XmlVar(name="a", qname=QName("a"))
-        meta = mock.Mock(XmlMeta)
-        meta.find_var = MagicMock(return_value=var)
         elem = Element("foo")
         params = {}
 
-        ParserUtils.bind_element_wild_text(params, meta, elem)
+        ParserUtils.bind_wildcard_text(params, var, elem)
         self.assertEqual(0, len(params))
 
-    def test_bind_element_wild_text(self):
-        var = XmlVar(name="a", qname=QName("a"))
-        meta = mock.Mock(XmlMeta)
-        meta.find_var = MagicMock(return_value=var)
         elem = Element("foo")
         elem.text = "txt"
         elem.tail = "tail"
         params = {}
 
-        ParserUtils.bind_element_wild_text(params, meta, elem)
+        ParserUtils.bind_wildcard_text(params, var, elem)
         expected = AnyElement(text="txt", tail="tail")
         self.assertEqual(dict(a=expected), params)
 
-        elem.text = "a"
-        elem.tail = "b"
-        expected = AnyElement(text="a", tail="b")
-        ParserUtils.bind_element_wild_text(params, meta, elem)
+        ParserUtils.bind_wildcard_text(params, var, elem)
+        expected = AnyElement(text="txt", tail="tail", children=[expected])
         self.assertEqual(dict(a=expected), params)
 
-    def test_bind_element_wild_text_when_var_is_list(self):
+    def test_bind_wildcard_text_when_var_is_list(self):
         var = XmlVar(name="a", qname=QName("a"), default=list)
-        meta = mock.Mock(XmlMeta)
-        meta.find_var = MagicMock(return_value=var)
         elem = Element("foo")
         elem.text = "txt"
         elem.tail = "tail"
         params = {}
 
-        ParserUtils.bind_element_wild_text(params, meta, elem)
+        ParserUtils.bind_wildcard_text(params, var, elem)
         self.assertEqual(dict(a=["txt", "tail"]), params)
 
         elem.text = None
-        ParserUtils.bind_element_wild_text(params, meta, elem)
+        ParserUtils.bind_wildcard_text(params, var, elem)
         self.assertEqual(dict(a=["txt", "tail", "tail"]), params)
 
         elem.tail = None
         elem.text = "first"
-        ParserUtils.bind_element_wild_text(params, meta, elem)
+        ParserUtils.bind_wildcard_text(params, var, elem)
         self.assertEqual(dict(a=["first", "txt", "tail", "tail"]), params)
 
     def test_parse_any_element(self):

@@ -1,3 +1,4 @@
+import inspect
 import sys
 
 from lxml.etree import QName
@@ -7,10 +8,10 @@ from tests.factories import AttrTypeFactory
 from tests.factories import ClassFactory
 from tests.factories import ExtensionFactory
 from tests.factories import FactoryTestCase
+from xsdata.codegen.models import Class
+from xsdata.models import wsdl
+from xsdata.models import xsd
 from xsdata.models.enums import Namespace
-from xsdata.models.xsd import ComplexType
-from xsdata.models.xsd import Element
-from xsdata.models.xsd import SimpleType
 
 
 class ClassTests(FactoryTestCase):
@@ -74,14 +75,14 @@ class ClassTests(FactoryTestCase):
         self.assertTrue(obj.has_suffix_attr)
 
     def test_property_is_complex(self):
-        obj = ClassFactory.create(type=SimpleType)
+        obj = ClassFactory.create(type=xsd.Element)
+        self.assertTrue(obj.is_complex)
+
+        obj = ClassFactory.create(type=xsd.ComplexType)
+        self.assertTrue(obj.is_complex)
+
+        obj = ClassFactory.create(type=xsd.SimpleType)
         self.assertFalse(obj.is_complex)
-
-        obj = ClassFactory.create(type=Element)
-        self.assertTrue(obj.is_complex)
-
-        obj = ClassFactory.create(type=ComplexType)
-        self.assertTrue(obj.is_complex)
 
     def test_property_is_enumeration(self):
         obj = ClassFactory.enumeration(2)
@@ -92,3 +93,25 @@ class ClassTests(FactoryTestCase):
 
         obj.attrs.clear()
         self.assertFalse(obj.is_enumeration)
+
+    def test_property_should_generate(self):
+        obj = ClassFactory.create(type=xsd.Element)
+        self.assertTrue(obj.should_generate)
+
+        obj = ClassFactory.create(type=xsd.ComplexType)
+        self.assertTrue(obj.should_generate)
+
+        obj = ClassFactory.create(type=wsdl.BindingOperation)
+        self.assertTrue(obj.should_generate)
+
+        obj = ClassFactory.create(type=wsdl.BindingMessage)
+        self.assertTrue(obj.should_generate)
+
+        obj = ClassFactory.enumeration(2)
+        self.assertTrue(obj.should_generate)
+
+        obj = ClassFactory.create(type=xsd.SimpleType)
+        self.assertFalse(obj.should_generate)
+
+        obj = ClassFactory.create(type=wsdl.BindingMessage, strict_type=True)
+        self.assertFalse(obj.should_generate)

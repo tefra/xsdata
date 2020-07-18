@@ -1,9 +1,11 @@
 from unittest import TestCase
 
+from tests.factories import AttrFactory
 from tests.factories import AttrTypeFactory
 from xsdata.formats.dataclass.filters import attribute_name
 from xsdata.formats.dataclass.filters import class_name
 from xsdata.formats.dataclass.filters import constant_name
+from xsdata.formats.dataclass.filters import constant_value
 from xsdata.formats.dataclass.filters import type_name
 
 
@@ -36,3 +38,10 @@ class NameTests(TestCase):
 
         type_foo_bar_bam = AttrTypeFactory.create(qname="bar_bam")
         self.assertEqual("BarBam", type_name(type_foo_bar_bam))
+
+    def test_constant_value(self):
+        attr = AttrFactory.create(types=[AttrTypeFactory.xs_string()], default="foo")
+        self.assertEqual('"foo"', constant_value(attr))
+
+        attr = AttrFactory.create(types=[AttrTypeFactory.create(qname="foo")])
+        self.assertEqual("Foo", constant_value(attr))

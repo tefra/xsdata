@@ -39,7 +39,7 @@ class SchemaMapperTests(FactoryTestCase):
     def test_map(self, mock_root_elements, mock_build_class):
         simple_type = ComplexType()
         complex_type = ComplexType()
-        schema = Schema(target_namespace="foo")
+        schema = Schema(target_namespace="fooNS", location="foo.xsd")
 
         mock_build_class.side_effect = ClassFactory.list(3)
         mock_root_elements.return_value = [

@@ -17,7 +17,6 @@ from xsdata.codegen.utils import ClassUtils
 from xsdata.exceptions import AnalyzerValueError
 from xsdata.logger import logger
 from xsdata.models.enums import DataType
-from xsdata.models.enums import Namespace
 from xsdata.utils.collections import unique_sequence
 
 
@@ -171,7 +170,7 @@ class AttributeTypeHandler(HandlerInterface):
     @classmethod
     def reset_attribute_type(cls, attr_type: AttrType):
         """Reset the attribute type to native string."""
-        attr_type.qname = QName(Namespace.XS.uri, DataType.STRING.code)
+        attr_type.qname = DataType.STRING.qname
         attr_type.native = True
         attr_type.circular = False
         attr_type.forward = False

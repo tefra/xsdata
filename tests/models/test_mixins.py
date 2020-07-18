@@ -7,6 +7,7 @@ from xsdata.models.enums import DataType
 from xsdata.models.enums import FormType
 from xsdata.models.enums import Namespace
 from xsdata.models.mixins import ElementBase
+from xsdata.models.wsdl import Definitions
 from xsdata.models.xsd import ComplexType
 from xsdata.models.xsd import Element
 
@@ -173,3 +174,19 @@ class ElementBaseTests(TestCase):
 
         element = ElementBase(ns_map=dict(a="b", c=Namespace.XS.uri))
         self.assertEqual("c", element.schema_prefix())
+
+
+class ModuleMixinTests(TestCase):
+    def test_property_module(self):
+        obj = Definitions()
+
+        with self.assertRaises(SchemaValueError) as cm:
+            obj.module
+
+        self.assertEqual("Definitions empty location.", str(cm.exception))
+
+        obj.location = "a/b/c/d/foo.services"
+        self.assertEqual("foo.services", obj.module)
+
+        obj.location = "a/b/c/d/foo.services.wsdl"
+        self.assertEqual("foo.services", obj.module)

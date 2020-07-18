@@ -58,7 +58,11 @@ class DataclassGeneratorTests(FactoryTestCase):
         self.assertEqual(expected, actual)
 
     def test_render_module(self):
-        classes = [ClassFactory.enumeration(2), ClassFactory.elements(2)]
+        classes = [
+            ClassFactory.enumeration(2),
+            ClassFactory.elements(2),
+            ClassFactory.service(2),
+        ]
         resolver = DependenciesResolver()
 
         actual = DataclassGenerator().render_module(resolver, classes)
@@ -95,8 +99,12 @@ class DataclassGeneratorTests(FactoryTestCase):
             '            name="attr_E",\n'
             '            type="Element"\n'
             "        )\n"
-            "    )\n"
+            "    )\n\n\n"
+            "class ClassD:\n"
+            '    attr_f = "None"\n'
+            '    attr_g = "None"\n'
         )
+
         self.assertEqual(expected, actual)
 
     def test_module_name(self):

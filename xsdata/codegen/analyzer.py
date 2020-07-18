@@ -41,12 +41,7 @@ class ClassAnalyzer:
 
         classes = list(container.iterate())
         if any(item.is_complex for item in classes):
-            classes = list(
-                filter(
-                    lambda x: x.is_enumeration or (x.is_complex and not x.strict_type),
-                    classes,
-                )
-            )
+            classes = list(filter(lambda x: x.should_generate, classes))
 
         cls.validate_references(classes)
 

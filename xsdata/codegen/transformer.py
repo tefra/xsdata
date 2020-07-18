@@ -12,12 +12,15 @@ from urllib.parse import urlparse
 from urllib.request import urlopen
 
 from xsdata.codegen.analyzer import ClassAnalyzer
+from xsdata.codegen.mappers.defintions import DefinitionsMapper
 from xsdata.codegen.mappers.schema import SchemaMapper
 from xsdata.codegen.models import Class
+from xsdata.codegen.parsers.definitions import DefinitionsParser
 from xsdata.codegen.parsers.schema import SchemaParser
 from xsdata.codegen.writer import writer
 from xsdata.logger import logger
 from xsdata.models.enums import COMMON_SCHEMA_DIR
+from xsdata.models.wsdl import Definitions
 from xsdata.models.xsd import Import
 from xsdata.models.xsd import Include
 from xsdata.models.xsd import Override
@@ -46,7 +49,16 @@ class SchemaTransformer:
     class_map: Dict[str, List[Class]] = field(init=False, default_factory=dict)
     processed: List[str] = field(init=False, default_factory=list)
 
-    def process(self, uris: List[str], package: str):
+    def process_definitions(self, uri: str, package: str):
+        """Process a single wsdl resource."""
+        definitions = self.parse_definitions(uri, namespace=None)
+
+        collections.apply(definitions.schemas, self.convert_schema)
+
+        self.convert_definitions(definitions)
+        self.process_classes(package)
+
+    def process_schemas(self, uris: List[str], package: str):
         """
         Run main processes.
 
@@ -56,6 +68,11 @@ class SchemaTransformer:
 
         collections.apply(uris, self.process_schema)
 
+        self.process_classes(package)
+
+    def process_classes(self, package: str):
+        """Process the generated classes and write or print the final
+        output."""
         classes = [cls for classes in self.class_map.values() for cls in classes]
         class_num, inner_num = self.count_classes(classes)
         if class_num:
@@ -79,23 +96,41 @@ class SchemaTransformer:
             logger.warning("Analyzer returned zero classes!")
 
     def process_schema(self, uri: str, namespace: Optional[str] = None):
-        """Recursively parse the given schema uri and all the imports and
-        generate a class map indexed with the schema uri."""
+        """
+        Parse and convert schema to codegen models.
+
+        Avoid processing the same uri twice and fail silently if
+        anything goes wrong with fetching and parsing the schema
+        document.
+        """
         if uri in self.processed:
-            logger.debug("Already processed skipping: %s", uri)
-            return
+            logger.debug("Skipping already processed: %s", os.path.basename(uri))
+        else:
+            logger.info("Parsing schema %s", os.path.basename(uri))
+            self.processed.append(uri)
 
-        logger.info("Parsing schema %s", os.path.basename(uri))
-        self.processed.append(uri)
-        schema = self.parse_schema(uri, namespace)
-        if schema is None:
-            return
+            schema = self.parse_schema(uri, namespace)
+            if schema:
+                self.convert_schema(schema)
 
+    def convert_schema(self, schema: Schema):
+        """Convert a schema instance to codegen classes and process imports to
+        other schemas."""
         for sub in schema.included():
             if sub.location:
                 self.process_schema(sub.location, schema.target_namespace)
 
-        self.class_map[uri] = self.generate_classes(schema)
+        assert schema.location is not None
+
+        self.class_map[schema.location] = self.generate_classes(schema)
+
+    def convert_definitions(self, definitions: Definitions):
+        """Convert a definitions instance to codegen classes."""
+        assert definitions.location is not None
+
+        key = definitions.location
+        classes = DefinitionsMapper.map(definitions)
+        self.class_map.setdefault(key, []).extend(classes)
 
     def generate_classes(self, schema: Schema) -> List[Class]:
         """Convert and return the given schema tree to classes."""
@@ -109,8 +144,8 @@ class SchemaTransformer:
 
         return classes
 
-    @staticmethod
-    def parse_schema(uri: str, namespace: Optional[str] = None) -> Optional[Schema]:
+    @classmethod
+    def parse_schema(cls, uri: str, namespace: Optional[str]) -> Optional[Schema]:
         """
         Parse the given schema uri and return the schema tree object.
 
@@ -119,17 +154,53 @@ class SchemaTransformer:
         """
 
         try:
-            schema = urlopen(uri).read()
+            input_stream = cls.load_resource(uri)
         except OSError:
             logger.warning("Schema not found %s", uri)
         else:
             parser = SchemaParser(target_namespace=namespace, location=uri)
-            return parser.from_bytes(schema, Schema)
+            return parser.from_bytes(input_stream, Schema)
 
         return None
 
-    @staticmethod
-    def analyze_classes(classes: List[Class]) -> List[Class]:
+    def parse_definitions(self, uri: str, namespace: Optional[str]) -> Definitions:
+        """
+        Parse recursively the given wsdl uri and return the definitions tree
+        object.
+
+        :raises OSError: if it fails to load the definition uri.
+        """
+
+        input_stream = self.load_resource(uri)
+        parser = DefinitionsParser(target_namespace=namespace, location=uri)
+        definitions = parser.from_bytes(input_stream, Definitions)
+        namespace = definitions.target_namespace
+
+        for imp in definitions.imports:
+            if not imp.location:
+                continue
+
+            _, extension = os.path.splitext(imp.location)
+
+            if extension == ".wsdl":
+                sub_definition = self.parse_definitions(imp.location, namespace)
+                definitions.merge(sub_definition)
+            else:
+                self.process_schema(imp.location)
+
+        return definitions
+
+    @classmethod
+    def load_resource(cls, uri: str) -> bytes:
+        """
+        Read and return the contents of the given uri.
+
+        :raises OSError: if it fails during open/read .
+        """
+        return urlopen(uri).read()  # nosec
+
+    @classmethod
+    def analyze_classes(cls, classes: List[Class]) -> List[Class]:
         """Analyzer the given class list and simplify attributes and
         extensions."""
         return ClassAnalyzer.process(classes)

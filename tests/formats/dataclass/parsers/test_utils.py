@@ -7,6 +7,7 @@ from unittest.case import TestCase
 
 from lxml.etree import Element
 from lxml.etree import QName
+from lxml.etree import SubElement
 
 from tests.fixtures.books import Books
 from tests.fixtures.defxmlschema.chapter12 import ProductType
@@ -213,6 +214,11 @@ class ParserUtilsTests(TestCase):
         mock_parse_value.assert_called_once_with(
             var.types, element.text, var.default, element.nsmap, var.is_list,
         )
+
+        params.clear()
+        SubElement(element, "foo")  # Element with children
+        ParserUtils.bind_element_text(params, metadata, element)
+        self.assertEqual({}, params)
 
     def test_bind_element_text_with_wildcard_var(self):
         element = Element("foo")

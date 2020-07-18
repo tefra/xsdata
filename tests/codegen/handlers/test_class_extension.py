@@ -334,11 +334,7 @@ class ClassExtensionHandlerTests(FactoryTestCase):
 
         ClassExtensionHandler.create_default_attribute(item, extension)
         expected = AttrFactory.create(
-            name="value",
-            index=0,
-            default=None,
-            types=[extension.type],
-            tag=Tag.EXTENSION,
+            name="value", default=None, types=[extension.type], tag=Tag.EXTENSION,
         )
 
         self.assertEqual(1, len(item.attrs))
@@ -355,7 +351,6 @@ class ClassExtensionHandlerTests(FactoryTestCase):
         ClassExtensionHandler.create_default_attribute(item, extension)
         expected = AttrFactory.create(
             name="any_element",
-            index=0,
             default=None,
             types=[extension.type.clone()],
             tag=Tag.ANY,

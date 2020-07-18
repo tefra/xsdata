@@ -17,7 +17,6 @@ from xsdata.models import xsd
 from xsdata.models.enums import FormType
 from xsdata.models.enums import Mode
 from xsdata.models.enums import Namespace
-from xsdata.models.mixins import ElementBase
 
 T = TypeVar("T")
 ParsedObjects = List[Tuple[QName, Any]]
@@ -33,7 +32,7 @@ class SchemaParser(XmlParser):
     The parser is a dummy as possible but it will try to normalize
     certain things like apply parent properties to children.
 
-    :param schema_location:
+    :param location:
     :param element_form:
     :param attribute_form:
     :param target_namespace:
@@ -52,9 +51,9 @@ class SchemaParser(XmlParser):
         """Override parent method to set element index and namespaces map."""
         obj: Any = super().dequeue(element, queue, objects)
 
-        if isinstance(obj, ElementBase):
-            obj.index = element.sourceline
-            self.set_namespace_map(element, obj)
+        self.set_index(element, obj)
+        self.set_namespace_map(element, obj)
+
         return obj
 
     def start_schema(self, element: Element, item: XmlNode):
@@ -90,20 +89,25 @@ class SchemaParser(XmlParser):
         self.set_namespace_map(element, obj)
 
     @staticmethod
-    def set_namespace_map(element: Element, obj: ElementBase):
+    def set_namespace_map(element: Element, obj: Any):
         """Add common namespaces like xml, xsi, xlink if they are missing."""
-        obj.ns_map = {prefix: uri for prefix, uri in element.nsmap.items() if uri}
-        namespaces = obj.ns_map.values()
-        common_namespaces = (
-            Namespace.XS,
-            Namespace.XSI,
-            Namespace.XML,
-            Namespace.XLINK,
-        )
+        if hasattr(obj, "ns_map"):
+            obj.ns_map = {prefix: uri for prefix, uri in element.nsmap.items() if uri}
+            ns_list = obj.ns_map.values()
+            ns_common = (
+                Namespace.XS,
+                Namespace.XSI,
+                Namespace.XML,
+                Namespace.XLINK,
+            )
+            obj.ns_map.update(
+                {ns.prefix: ns.uri for ns in ns_common if ns.uri not in ns_list}
+            )
 
-        for namespace in common_namespaces:
-            if namespace.uri not in namespaces:
-                obj.ns_map[namespace.prefix] = namespace.uri
+    @staticmethod
+    def set_index(element: Element, obj: Any):
+        if hasattr(obj, "index"):
+            obj.index = element.sourceline
 
     @staticmethod
     def add_default_imports(obj: xsd.Schema):

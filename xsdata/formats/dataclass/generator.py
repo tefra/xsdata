@@ -80,7 +80,14 @@ class DataclassGenerator(AbstractGenerator):
 
         def render_class(obj: Class) -> str:
             """Render class or enumeration."""
-            template = "enum" if obj.is_enumeration else "class"
+
+            if obj.is_enumeration:
+                template = "enum"
+            elif obj.is_service:
+                template = "service"
+            else:
+                template = "class"
+
             return load(template).render(obj=obj).strip()
 
         return "\n\n\n".join(map(render_class, classes)) + "\n"

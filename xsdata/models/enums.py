@@ -17,6 +17,8 @@ class Namespace(Enum):
     XSI = "http://www.w3.org/2001/XMLSchema-instance"
     XLINK = "http://www.w3.org/1999/xlink"
     XHTML = "http://www.w3.org/1999/xhtml"
+    SOAP11 = "http://schemas.xmlsoap.org/wsdl/soap/"
+    SOAP12 = "http://schemas.xmlsoap.org/wsdl/soap12/"
 
     @property
     def uri(self) -> str:
@@ -238,3 +240,13 @@ class ProcessType(Enum):
     LAX = "lax"
     SKIP = "skip"
     STRICT = "strict"
+
+
+class BindingStyle(Enum):
+    RPC = "rpc"
+    DOCUMENT = "document"
+
+
+class UseChoice(Enum):
+    LITERAL = "literal"
+    ENCODED = "encoded"

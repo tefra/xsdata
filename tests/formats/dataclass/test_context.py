@@ -223,6 +223,7 @@ class XmlContextTests(TestCase):
             qname=QName(None, "any_element"),
             types=[object],
             init=True,
+            mixed=False,
             nillable=False,
             dataclass=False,
             default=None,

@@ -53,7 +53,7 @@ class ParserUtils:
 
     @classmethod
     def bind_element_children(
-        cls, params: Dict, meta: XmlMeta, position: int, objects: List,
+        cls, params: Dict, meta: XmlMeta, position: int, objects: List
     ):
         """Return a dictionary of qualified object names and their values for
         the given queue item."""
@@ -81,6 +81,20 @@ class ParserUtils:
                     logger.warning("Unassigned parsed object %s", qname)
                 else:
                     cls.bind_element_wildcard_param(params, wild, qname, value)
+
+    @classmethod
+    def bind_mixed_content(cls, params: Dict, var: XmlVar, pos: int, objects: List):
+        """Return a dictionary of qualified object names and their values for
+        the given mixed content xml var."""
+
+        params.setdefault(var.name, [])
+        while len(objects) > pos:
+            qname, value = objects.pop(pos)
+
+            if value is None:
+                value = ""
+
+            params[var.name].append(cls.prepare_generic_value(qname, value))
 
     @classmethod
     def fetch_any_children(cls, position: int, objects: List) -> List[object]:
@@ -112,6 +126,16 @@ class ParserUtils:
         return True
 
     @classmethod
+    def prepare_generic_value(cls, qname: QName, value: Any) -> Any:
+        """Prepare parsed value before binding to a wildcard field."""
+        if not is_dataclass(value):
+            value = AnyElement(qname=qname, text=value)
+        elif not isinstance(value, AnyElement):
+            value.qname = qname
+
+        return value
+
+    @classmethod
     def bind_element_wildcard_param(
         cls, params: Dict, var: XmlVar, qname: QName, value: Any
     ):
@@ -123,11 +147,8 @@ class ParserUtils:
         generic AnyElement instance. If the previous value is already a
         generic instance add the current value as a child object.
         """
-        if is_dataclass(value):
-            if not isinstance(value, AnyElement):
-                value.qname = qname
-        else:
-            value = AnyElement(qname=qname, text=value)
+
+        value = cls.prepare_generic_value(qname, value)
 
         if var.name in params:
             previous = params[var.name]
@@ -139,7 +160,7 @@ class ParserUtils:
             params[var.name] = value
 
     @classmethod
-    def bind_element_wild_text(cls, params: Dict, meta: XmlMeta, element: Element):
+    def bind_wildcard_text(cls, params: Dict, var: XmlVar, element: Element):
         """
         Extract the text and tail content and bind it accordingly in the params
         dictionary.
@@ -148,26 +169,23 @@ class ParserUtils:
         - var is present in the params assign the text and tail to the generic object.
         - Otherwise bind the given element to a new generic object.
         """
-        var = meta.find_var(mode=FindMode.WILDCARD)
-        if not var:
-            return
-
         txt, tail = cls.element_text_and_tail(element)
         if not txt and not tail:
             return
 
         if var.is_list:
-            if var.name not in params:
-                params[var.name] = []
+            params.setdefault(var.name, [])
             if txt:
                 params[var.name].insert(0, txt)
             if tail:
                 params[var.name].append(tail)
-        elif var.name in params:
-            params[var.name].text = txt
-            params[var.name].tail = tail
         else:
-            params[var.name] = cls.parse_any_element(element, False)
+            previous = params.get(var.name, None)
+            generic = cls.parse_any_element(element, False)
+            if previous:
+                generic.children.append(previous)
+
+            params[var.name] = generic
 
     @classmethod
     def element_text_and_tail(cls, element: Element) -> Tuple:
@@ -207,10 +225,14 @@ class ParserUtils:
         """Add the given element's text content if any to the params dictionary
         with the text var name as key."""
         var = metadata.find_var(mode=FindMode.TEXT)
+        wildcard = None if var else metadata.find_var(mode=FindMode.WILDCARD)
+
         if var and element.text is not None and var.init:
             params[var.name] = cls.parse_value(
                 var.types, element.text, var.default, element.nsmap, var.is_tokens
             )
+        elif wildcard:
+            cls.bind_wildcard_text(params, wildcard, element)
 
     @classmethod
     def bind_element_attrs(cls, params: Dict, metadata: XmlMeta, element: Element):

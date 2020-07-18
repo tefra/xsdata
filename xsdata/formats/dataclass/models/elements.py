@@ -23,6 +23,7 @@ class XmlVar:
     :param name: field name,
     :param qname: qualified local name,
     :param init:  field is present in the constructor arguments.
+    :param mixed:  field supports mixed content.
     :param nillable: allow to render empty nillable elements,
     :param dataclass: field type is a dataclass or a primitive type.
     :param sequential: switch to sequential rendering with other sequential siblings,
@@ -34,6 +35,7 @@ class XmlVar:
     name: str
     qname: QName
     init: bool = True
+    mixed: bool = False
     nillable: bool = False
     dataclass: bool = False
     sequential: bool = False
@@ -48,42 +50,47 @@ class XmlVar:
 
     @property
     def is_any_type(self) -> bool:
-        """Return whether or not the field type is xs:anyType."""
+        """Return whether the field type is xs:anyType."""
         return False
 
     @property
     def is_attribute(self) -> bool:
-        """Return whether or not the field is derived from xs:attribute."""
+        """Return whether the field is derived from xs:attribute."""
         return False
 
     @property
     def is_attributes(self) -> bool:
-        """Return whether or not the field is derived from xs:anyAttributes."""
+        """Return whether the field is derived from xs:anyAttributes."""
         return False
 
     @property
     def is_element(self) -> bool:
-        """Return whether or not the field is derived from xs:element."""
+        """Return whether the field is derived from xs:element."""
         return False
 
     @property
     def is_list(self) -> bool:
-        """Return whether or not the field is a list of elements."""
+        """Return whether the field is a list of elements."""
         return self.default is list
 
     @property
+    def is_mixed_content(self) -> bool:
+        """Return whether the field is a mixed content list of of elements."""
+        return False
+
+    @property
     def is_text(self) -> bool:
-        """Return whether or not the field is a text element."""
+        """Return whether the field is a text element."""
         return False
 
     @property
     def is_tokens(self) -> bool:
-        """Return whether or not the field is a list of tokens."""
+        """Return whether the field is a list of tokens."""
         return False
 
     @property
     def is_wildcard(self) -> bool:
-        """Return whether or not the field is a text element."""
+        """Return whether the field is a text element."""
         return False
 
     def matches(self, qname: QName) -> bool:
@@ -113,6 +120,10 @@ class XmlWildcard(XmlVar):
     """Dataclass field bind metadata for xml wildcard elements."""
 
     @property
+    def is_mixed_content(self) -> bool:
+        return self.mixed
+
+    @property
     def is_wildcard(self) -> bool:
         return True
 
@@ -134,7 +145,7 @@ class XmlWildcard(XmlVar):
                 return True
             if namespace == qname.namespace:
                 return True
-            if namespace == NamespaceType.ANY.value:
+            if namespace == NamespaceType.ANY:
                 return True
             if namespace and namespace[0] == "!" and namespace[1:] != qname.namespace:
                 return True
@@ -182,6 +193,7 @@ class FindMode(IntEnum):
     ELEMENT = auto()
     TEXT = auto()
     WILDCARD = auto()
+    MIXED_CONTENT = ()
     NOT_WILDCARD = auto()
     LIST = auto()
     NOT_LIST = auto()
@@ -194,6 +206,7 @@ find_lambdas = {
     FindMode.ELEMENT: lambda x: x.is_element,
     FindMode.TEXT: lambda x: x.is_text,
     FindMode.WILDCARD: lambda x: x.is_wildcard,
+    FindMode.MIXED_CONTENT: lambda x: x.is_mixed_content,
     FindMode.NOT_WILDCARD: lambda x: not x.is_wildcard,
     FindMode.LIST: lambda x: x.is_list,
     FindMode.NOT_LIST: lambda x: not x.is_list,

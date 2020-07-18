@@ -74,9 +74,14 @@ class ElementNode(XmlNode):
         """
         params: Dict = {}
         ParserUtils.bind_element_attrs(params, self.meta, element)
-        ParserUtils.bind_element_text(params, self.meta, element)
-        ParserUtils.bind_element_children(params, self.meta, self.position, objects)
-        ParserUtils.bind_element_wild_text(params, self.meta, element)
+
+        var = self.meta.find_var(mode=FindMode.MIXED_CONTENT)
+        if var:
+            ParserUtils.bind_mixed_content(params, var, self.position, objects)
+            ParserUtils.bind_wildcard_text(params, var, element)
+        else:
+            ParserUtils.bind_element_children(params, self.meta, self.position, objects)
+            ParserUtils.bind_element_text(params, self.meta, element)
 
         qname = QName(element.tag)
         obj = self.meta.clazz(**params)

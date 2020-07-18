@@ -16,6 +16,7 @@ class Namespace(Enum):
     XML = "http://www.w3.org/XML/1998/namespace"
     XSI = "http://www.w3.org/2001/XMLSchema-instance"
     XLINK = "http://www.w3.org/1999/xlink"
+    XHTML = "http://www.w3.org/1999/xhtml"
 
     @property
     def uri(self) -> str:
@@ -26,8 +27,9 @@ class Namespace(Enum):
         return self.name.lower()
 
     @property
-    def location(self) -> str:
-        return COMMON_SCHEMA_DIR.joinpath(f"{self.prefix}.xsd").as_uri()
+    def location(self) -> Optional[str]:
+        local_path = COMMON_SCHEMA_DIR.joinpath(f"{self.prefix}.xsd")
+        return local_path.as_uri() if local_path.exists() else None
 
     @classmethod
     def get_enum(cls, uri: Optional[str]) -> Optional["Namespace"]:
@@ -45,27 +47,20 @@ class QNames:
     XSI_TYPE = QName(Namespace.XSI.uri, "type")
 
 
-class NamespaceType(Enum):
+class NamespaceType:
     """
     Wildcard elements/attributes namespace types.
 
-    :param ANY: elements from any namespace is allowed
-    :param OTHER: elements from any namespace other than the parent element's namespace
-    :param LOCAL: elements must come from no namespace
-    :param TARGET: elements from the namespace of the parent element can be present
+    :cvar ANY: elements from any namespace is allowed
+    :cvar OTHER: elements from any namespace other than the parent element's namespace
+    :cvar LOCAL: elements must come from no namespace
+    :cvar TARGET: elements from the namespace of the parent element can be present
     """
 
     ANY = "##any"
     OTHER = "##other"
     LOCAL = "##local"
     TARGET = "##targetNamespace"
-
-    @classmethod
-    def get_enum(cls, value: str) -> Optional["NamespaceType"]:
-        try:
-            return NamespaceType(value)
-        except ValueError:
-            return None
 
 
 class FormType(Enum):
@@ -149,6 +144,10 @@ class DataType(Enum):
     def __init__(self, code: str, local: type):
         self.code = code
         self.local = local
+
+    @property
+    def qname(self) -> QName:
+        return QName(Namespace.XS.uri, self.code)
 
     @property
     def local_name(self) -> str:

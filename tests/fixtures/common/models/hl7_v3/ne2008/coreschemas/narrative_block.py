@@ -169,11 +169,14 @@ class StrucDocSub:
     class Meta:
         name = "StrucDoc.Sub"
 
-    content: Optional[object] = field(
-        default=None,
+    content: List[object] = field(
+        default_factory=list,
         metadata=dict(
             type="Wildcard",
-            namespace="##any"
+            namespace="##any",
+            mixed=True,
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )
 
@@ -186,11 +189,14 @@ class StrucDocSup:
     class Meta:
         name = "StrucDoc.Sup"
 
-    content: Optional[object] = field(
-        default=None,
+    content: List[object] = field(
+        default_factory=list,
         metadata=dict(
             type="Wildcard",
-            namespace="##any"
+            namespace="##any",
+            mixed=True,
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )
 
@@ -211,11 +217,14 @@ class StrucDocCaption:
     class Meta:
         name = "StrucDoc.Caption"
 
-    content: Optional[object] = field(
-        default=None,
+    content: List[object] = field(
+        default_factory=list,
         metadata=dict(
             type="Wildcard",
-            namespace="##any"
+            namespace="##any",
+            mixed=True,
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )
     link_html: List["StrucDocLinkHtml"] = field(
@@ -412,11 +421,14 @@ class StrucDocTitleFootnote:
     class Meta:
         name = "StrucDoc.TitleFootnote"
 
-    content_any: Optional[object] = field(
-        default=None,
+    content_any: List[object] = field(
+        default_factory=list,
         metadata=dict(
             type="Wildcard",
-            namespace="##any"
+            namespace="##any",
+            mixed=True,
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )
     content: List["StrucDocTitleContent"] = field(
@@ -543,11 +555,14 @@ class StrucDocTitleContent:
     class Meta:
         name = "StrucDoc.TitleContent"
 
-    content_any: Optional[object] = field(
-        default=None,
+    content_any: List[object] = field(
+        default_factory=list,
         metadata=dict(
             type="Wildcard",
-            namespace="##any"
+            namespace="##any",
+            mixed=True,
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )
     content: List["StrucDocTitleContent"] = field(
@@ -647,11 +662,14 @@ class StrucDocParagraph:
     class Meta:
         name = "StrucDoc.Paragraph"
 
-    content_any: Optional[object] = field(
-        default=None,
+    content_any: List[object] = field(
+        default_factory=list,
         metadata=dict(
             type="Wildcard",
-            namespace="##any"
+            namespace="##any",
+            mixed=True,
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )
     caption: Optional[StrucDocCaption] = field(
@@ -787,11 +805,14 @@ class StrucDocTh:
     class Meta:
         name = "StrucDoc.Th"
 
-    content_any: Optional[object] = field(
-        default=None,
+    content_any: List[object] = field(
+        default_factory=list,
         metadata=dict(
             type="Wildcard",
-            namespace="##any"
+            namespace="##any",
+            mixed=True,
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )
     content: List["StrucDocContent"] = field(
@@ -1007,11 +1028,14 @@ class StrucDocTitle:
     class Meta:
         name = "StrucDoc.Title"
 
-    content_any: Optional[object] = field(
-        default=None,
+    content_any: List[object] = field(
+        default_factory=list,
         metadata=dict(
             type="Wildcard",
-            namespace="##any"
+            namespace="##any",
+            mixed=True,
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )
     content: List[StrucDocTitleContent] = field(
@@ -1130,11 +1154,14 @@ class StrucDocTd:
     class Meta:
         name = "StrucDoc.Td"
 
-    content_any: Optional[object] = field(
-        default=None,
+    content_any: List[object] = field(
+        default_factory=list,
         metadata=dict(
             type="Wildcard",
-            namespace="##any"
+            namespace="##any",
+            mixed=True,
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )
     content: List["StrucDocContent"] = field(
@@ -1939,11 +1966,14 @@ class StrucDocItem:
     class Meta:
         name = "StrucDoc.Item"
 
-    content_any: Optional[object] = field(
-        default=None,
+    content_any: List[object] = field(
+        default_factory=list,
         metadata=dict(
             type="Wildcard",
-            namespace="##any"
+            namespace="##any",
+            mixed=True,
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )
     caption: Optional[StrucDocCaption] = field(
@@ -2156,11 +2186,14 @@ class StrucDocFootnote:
     class Meta:
         name = "StrucDoc.Footnote"
 
-    content_any: Optional[object] = field(
-        default=None,
+    content_any: List[object] = field(
+        default_factory=list,
         metadata=dict(
             type="Wildcard",
-            namespace="##any"
+            namespace="##any",
+            mixed=True,
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )
     content: List["StrucDocContent"] = field(
@@ -2287,11 +2320,14 @@ class StrucDocLinkHtml:
     class Meta:
         name = "StrucDoc.LinkHtml"
 
-    content: Optional[object] = field(
-        default=None,
+    content: List[object] = field(
+        default_factory=list,
         metadata=dict(
             type="Wildcard",
-            namespace="##any"
+            namespace="##any",
+            mixed=True,
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )
     footnote: List[StrucDocFootnote] = field(
@@ -2385,11 +2421,14 @@ class StrucDocContent:
     class Meta:
         name = "StrucDoc.Content"
 
-    content_any: Optional[object] = field(
-        default=None,
+    content_any: List[object] = field(
+        default_factory=list,
         metadata=dict(
             type="Wildcard",
-            namespace="##any"
+            namespace="##any",
+            mixed=True,
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )
     content: List["StrucDocContent"] = field(
@@ -2526,11 +2565,14 @@ class StrucDocText:
     class Meta:
         name = "StrucDoc.Text"
 
-    content_any: Optional[object] = field(
-        default=None,
+    content_any: List[object] = field(
+        default_factory=list,
         metadata=dict(
             type="Wildcard",
-            namespace="##any"
+            namespace="##any",
+            mixed=True,
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )
     content: List[StrucDocContent] = field(

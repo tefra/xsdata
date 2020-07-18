@@ -44,3 +44,8 @@ class AttributeMetadataTests(FactoryTestCase):
 
         expected = {"max_occurs": 2}
         self.assertEqual(expected, attribute_metadata(attr, None))
+
+    def test_attribute_metadata_mixed(self):
+        attr = AttrFactory.element(mixed=True)
+        expected = {"mixed": True, "name": "attr_B", "type": "Element"}
+        self.assertEqual(expected, attribute_metadata(attr, "foo"))

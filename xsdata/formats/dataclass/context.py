@@ -151,6 +151,7 @@ class XmlContext:
                 qname=QName(first_namespace, local_name),
                 namespaces=namespaces,
                 init=var.init,
+                mixed=var.metadata.get("mixed", False),
                 nillable=var.metadata.get("nillable", False),
                 dataclass=is_class,
                 sequential=var.metadata.get("sequential", False),
@@ -181,12 +182,11 @@ class XmlContext:
 
         result = set()
         for ns in namespace.split():
-            ns_type = NamespaceType.get_enum(ns)
-            if ns_type == NamespaceType.TARGET:
-                result.add(parent_namespace or NamespaceType.ANY.value)
-            elif ns_type == NamespaceType.LOCAL:
+            if ns == NamespaceType.TARGET:
+                result.add(parent_namespace or NamespaceType.ANY)
+            elif ns == NamespaceType.LOCAL:
                 result.add("")
-            elif ns_type == NamespaceType.OTHER:
+            elif ns == NamespaceType.OTHER:
                 result.add(f"!{parent_namespace or ''}")
             else:
                 result.add(ns)

@@ -11,9 +11,9 @@ from lxml.etree import QName
 
 from xsdata.codegen.handlers import AttributeEnumUnionHandler
 from xsdata.codegen.handlers import AttributeGroupHandler
-from xsdata.codegen.handlers import AttributeImpliedHandler
 from xsdata.codegen.handlers import AttributeMergeHandler
 from xsdata.codegen.handlers import AttributeMismatchHandler
+from xsdata.codegen.handlers import AttributeMixedContentHandler
 from xsdata.codegen.handlers import AttributeSubstitutionHandler
 from xsdata.codegen.handlers import AttributeTypeHandler
 from xsdata.codegen.handlers import ClassExtensionHandler
@@ -44,7 +44,7 @@ class ClassContainer(UserDict, ContainerInterface):
             AttributeTypeHandler(self),
             AttributeSubstitutionHandler(self),
             AttributeMergeHandler(),
-            AttributeImpliedHandler(),
+            AttributeMixedContentHandler(),
             AttributeMismatchHandler(),
         ]
 

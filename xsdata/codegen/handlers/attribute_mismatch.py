@@ -46,7 +46,7 @@ class AttributeMismatchHandler(HandlerInterface):
                 nillable=False,
             )
             target.attrs[0].types.append(
-                AttrType(qname=QName(target.qname.namespace, "value"), forward=True,)
+                AttrType(qname=QName(target.qname.namespace, "value"), forward=True)
             )
             target.inner.append(enum_inner)
 

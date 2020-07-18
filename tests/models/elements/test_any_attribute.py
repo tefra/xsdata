@@ -13,7 +13,7 @@ class AnyAttributeTests(TestCase):
 
     def test_property_raw_namespace(self):
         obj = AnyAttribute()
-        self.assertEqual(NamespaceType.ANY.value, obj.raw_namespace)
+        self.assertEqual(NamespaceType.ANY, obj.raw_namespace)
 
         obj.namespace = "foo"
         self.assertEqual("foo", obj.raw_namespace)

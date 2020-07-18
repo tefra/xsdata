@@ -280,6 +280,7 @@ class AttrFactory(Factory):
         help=None,
         default=None,
         fixed=False,
+        mixed=False,
         restrictions=None,
     ):
         name = name or f"attr_{cls.next_letter()}"
@@ -293,6 +294,7 @@ class AttrFactory(Factory):
             help=help or None,
             default=default or None,
             fixed=fixed,
+            mixed=mixed,
             restrictions=restrictions or RestrictionsFactory.create(),
         )
 

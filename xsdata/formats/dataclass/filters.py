@@ -45,14 +45,20 @@ def type_name(attr_type: AttrType) -> str:
 
 def attribute_metadata(attr: Attr, parent_namespace: Optional[str]) -> Dict:
     """Return a metadata dictionary for the given attribute."""
+
+    name = namespace = None
+
+    if not attr.is_nameless and attr.local_name != attribute_name(attr.name):
+        name = attr.local_name
+
+    if parent_namespace != attr.namespace or attr.is_attribute:
+        namespace = attr.namespace
+
     metadata = dict(
-        name=None
-        if attr.is_nameless or attr.local_name == attribute_name(attr.name)
-        else attr.local_name,
+        name=name,
         type=attr.xml_type,
-        namespace=attr.namespace
-        if parent_namespace != attr.namespace or attr.is_attribute
-        else None,
+        namespace=namespace,
+        mixed=attr.mixed,
         **attr.restrictions.asdict(),
     )
 

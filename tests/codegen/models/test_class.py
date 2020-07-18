@@ -73,17 +73,6 @@ class ClassTests(FactoryTestCase):
         obj.attrs[1].index = sys.maxsize
         self.assertTrue(obj.has_suffix_attr)
 
-    def test_property_has_wild_attr(self):
-        obj = ClassFactory.create()
-        self.assertFalse(obj.has_wild_attr)
-
-        obj.attrs.append(AttrFactory.create())
-        obj.attrs.append(AttrFactory.create())
-        self.assertFalse(obj.has_wild_attr)
-
-        obj.attrs.append(AttrFactory.any())
-        self.assertTrue(obj.has_wild_attr)
-
     def test_property_is_complex(self):
         obj = ClassFactory.create(type=SimpleType)
         self.assertFalse(obj.is_complex)

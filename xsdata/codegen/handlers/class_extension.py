@@ -177,7 +177,7 @@ class ClassExtensionHandler(HandlerInterface):
                 default=list if extension.restrictions.is_list else None,
                 types=[extension.type.clone()],
                 tag=Tag.ANY,
-                namespace=NamespaceType.ANY.value,
+                namespace=NamespaceType.ANY,
                 restrictions=extension.restrictions.clone(),
             )
         else:

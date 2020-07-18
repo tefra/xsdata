@@ -134,7 +134,7 @@ class XmlWildcard(XmlVar):
                 return True
             if namespace == qname.namespace:
                 return True
-            if namespace == NamespaceType.ANY.value:
+            if namespace == NamespaceType.ANY:
                 return True
             if namespace and namespace[0] == "!" and namespace[1:] != qname.namespace:
                 return True

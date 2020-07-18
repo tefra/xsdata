@@ -203,12 +203,12 @@ class Attr:
 
     :param tag:
     :param name:
-    :param index:
     :param local_name:
+    :param index:
     :param default:
     :param fixed:
+    :param mixed:
     :param types:
-    :param display_type:
     :param namespace:
     :param help:
     :param restrictions:
@@ -216,12 +216,12 @@ class Attr:
 
     tag: str
     name: str
+    local_name: str
     index: int = field(compare=False)
-    local_name: Optional[str] = field(default=None)
     default: Any = field(default=None, compare=False)
     fixed: bool = field(default=False, compare=False)
+    mixed: bool = field(default=False, compare=False)
     types: List[AttrType] = field(default_factory=list)
-    display_type: Optional[str] = field(default=None)
     namespace: Optional[str] = field(default=None)
     help: Optional[str] = field(default=None, compare=False)
     restrictions: Restrictions = field(default_factory=Restrictions, compare=False)
@@ -386,11 +386,6 @@ class Class:
     def has_suffix_attr(self) -> bool:
         """Return whether or not it includes a suffix attribute."""
         return any(attr.is_suffix for attr in self.attrs)
-
-    @property
-    def has_wild_attr(self) -> bool:
-        """Return whether or not it includes a wildcard attribute."""
-        return any(attr.is_wildcard for attr in self.attrs)
 
     @property
     def is_complex(self) -> bool:

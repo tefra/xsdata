@@ -23,7 +23,12 @@ from xsdata.models.xsd import Element
 from xsdata.models.xsd import Restriction
 from xsdata.models.xsd import SimpleType
 
-NSMAP = {ns.prefix: ns.uri for ns in Namespace}
+DEFAULT_NS_MAP = {
+    Namespace.XS.prefix: Namespace.XS.uri,
+    Namespace.XSI.prefix: Namespace.XSI.uri,
+    Namespace.XML.prefix: Namespace.XML.uri,
+    Namespace.XLINK.prefix: Namespace.XLINK.uri,
+}
 
 
 class FactoryTestCase(unittest.TestCase):
@@ -108,7 +113,7 @@ class ClassFactory(Factory):
             help=help,
             package=package,
             module=module,
-            ns_map=ns_map if isinstance(ns_map, dict) else NSMAP,
+            ns_map=ns_map if isinstance(ns_map, dict) else DEFAULT_NS_MAP,
             status=status,
             container=container,
         )

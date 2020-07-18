@@ -217,25 +217,25 @@ class ModuleMixin:
         return name if extension in (".xsd", ".wsdl") else module
 
 
-def attribute(default: Any = None, init: bool = True, **kwargs: str) -> Any:
+def attribute(default: Any = None, init: bool = True, **kwargs: Any) -> Any:
     """Shortcut method for attribute fields."""
     kwargs.update(type=XmlType.ATTRIBUTE)
     return field(init=init, default=default, metadata=kwargs)
 
 
-def element(init: bool = True, **kwargs: str) -> Any:
+def element(init: bool = True, **kwargs: Any) -> Any:
     """Shortcut method for element fields."""
     kwargs.update(type=XmlType.ELEMENT)
     return field(init=init, default=None, metadata=kwargs)
 
 
-def array_element(init: bool = True, **kwargs: str) -> Any:
+def array_element(init: bool = True, **kwargs: Any) -> Any:
     """Shortcut method for list element fields."""
     kwargs.update(type=XmlType.ELEMENT)
     return field(init=init, default_factory=list, metadata=kwargs)
 
 
-def array_any_element(init: bool = True, **kwargs: str) -> Any:
+def array_any_element(init: bool = True, **kwargs: Any) -> Any:
     """Shortcut method for list wildcard fields."""
     kwargs.update(type=XmlType.WILDCARD, namespace=NamespaceType.ANY)
     return field(init=init, default_factory=list, metadata=kwargs)

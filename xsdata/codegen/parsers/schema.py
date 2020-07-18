@@ -93,18 +93,16 @@ class SchemaParser(XmlParser):
         """Add common namespaces like xml, xsi, xlink if they are missing."""
         if hasattr(obj, "ns_map"):
             obj.ns_map = {prefix: uri for prefix, uri in element.nsmap.items() if uri}
-            namespaces = obj.ns_map.values()
-
-            obj.ns_map.update({
-                namespace.prefix: namespace.uri
-                for namespace in (
-                    Namespace.XS,
-                    Namespace.XSI,
-                    Namespace.XML,
-                    Namespace.XLINK,
-                )
-                if namespace.uri not in namespaces
-            })
+            ns_list = obj.ns_map.values()
+            ns_common = (
+                Namespace.XS,
+                Namespace.XSI,
+                Namespace.XML,
+                Namespace.XLINK,
+            )
+            obj.ns_map.update(
+                {ns.prefix: ns.uri for ns in ns_common if ns.uri not in ns_list}
+            )
 
     @staticmethod
     def set_index(element: Element, obj: Any):

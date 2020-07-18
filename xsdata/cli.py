@@ -19,7 +19,7 @@ outputs = click.Choice(writer.formats)
 @click.argument("source", required=True)
 @click.option("--package", required=True, help="Target Package")
 @click.option("--output", type=outputs, help="Output Format", default="pydata")
-@click.option("--wsdl", is_flag=True, default=False, help="WSDL Mode")
+@click.option("--wsdl", is_flag=True, default=False, help="WSDL Mode (experimental)")
 @click.option("--print", is_flag=True, default=False, help="Print output")
 @click.option(
     "--ns-struct",

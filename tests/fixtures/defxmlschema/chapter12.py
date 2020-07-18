@@ -26,6 +26,7 @@ class DescriptionType:
         metadata=dict(
             type="Wildcard",
             namespace="http://www.w3.org/1999/xhtml",
+            mixed=True,
             min_occurs=0,
             max_occurs=9223372036854775807
         )

@@ -46,11 +46,14 @@ class AdxpExplicit:
     class Meta:
         name = "ADXP_explicit"
 
-    content: Optional[object] = field(
-        default=None,
+    content: List[object] = field(
+        default_factory=list,
         metadata=dict(
             type="Wildcard",
-            namespace="##any"
+            namespace="##any",
+            mixed=True,
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )
     part_type: Optional[AddressPartType] = field(
@@ -103,11 +106,14 @@ class EnxpExplicit:
     class Meta:
         name = "ENXP_explicit"
 
-    content: Optional[object] = field(
-        default=None,
+    content: List[object] = field(
+        default_factory=list,
         metadata=dict(
             type="Wildcard",
-            namespace="##any"
+            namespace="##any",
+            mixed=True,
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )
     part_type: Optional[EntityNamePartType] = field(
@@ -237,11 +243,14 @@ class AdxpAdditionalLocator:
     class Meta:
         name = "adxp.additionalLocator"
 
-    content: Optional[object] = field(
-        default=None,
+    content: List[object] = field(
+        default_factory=list,
         metadata=dict(
             type="Wildcard",
-            namespace="##any"
+            namespace="##any",
+            mixed=True,
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )
     part_type: AddressPartType = field(
@@ -263,11 +272,14 @@ class AdxpBuildingNumberSuffix:
     class Meta:
         name = "adxp.buildingNumberSuffix"
 
-    content: Optional[object] = field(
-        default=None,
+    content: List[object] = field(
+        default_factory=list,
         metadata=dict(
             type="Wildcard",
-            namespace="##any"
+            namespace="##any",
+            mixed=True,
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )
     part_type: AddressPartType = field(
@@ -289,11 +301,14 @@ class AdxpCareOf:
     class Meta:
         name = "adxp.careOf"
 
-    content: Optional[object] = field(
-        default=None,
+    content: List[object] = field(
+        default_factory=list,
         metadata=dict(
             type="Wildcard",
-            namespace="##any"
+            namespace="##any",
+            mixed=True,
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )
     part_type: AddressPartType = field(
@@ -315,11 +330,14 @@ class AdxpCensusTract:
     class Meta:
         name = "adxp.censusTract"
 
-    content: Optional[object] = field(
-        default=None,
+    content: List[object] = field(
+        default_factory=list,
         metadata=dict(
             type="Wildcard",
-            namespace="##any"
+            namespace="##any",
+            mixed=True,
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )
     part_type: AddressPartType = field(
@@ -341,11 +359,14 @@ class AdxpCity:
     class Meta:
         name = "adxp.city"
 
-    content: Optional[object] = field(
-        default=None,
+    content: List[object] = field(
+        default_factory=list,
         metadata=dict(
             type="Wildcard",
-            namespace="##any"
+            namespace="##any",
+            mixed=True,
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )
     part_type: AddressPartType = field(
@@ -367,11 +388,14 @@ class AdxpCountry:
     class Meta:
         name = "adxp.country"
 
-    content: Optional[object] = field(
-        default=None,
+    content: List[object] = field(
+        default_factory=list,
         metadata=dict(
             type="Wildcard",
-            namespace="##any"
+            namespace="##any",
+            mixed=True,
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )
     part_type: AddressPartType = field(
@@ -393,11 +417,14 @@ class AdxpCounty:
     class Meta:
         name = "adxp.county"
 
-    content: Optional[object] = field(
-        default=None,
+    content: List[object] = field(
+        default_factory=list,
         metadata=dict(
             type="Wildcard",
-            namespace="##any"
+            namespace="##any",
+            mixed=True,
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )
     part_type: AddressPartType = field(
@@ -419,11 +446,14 @@ class AdxpDelimiter:
     class Meta:
         name = "adxp.delimiter"
 
-    content: Optional[object] = field(
-        default=None,
+    content: List[object] = field(
+        default_factory=list,
         metadata=dict(
             type="Wildcard",
-            namespace="##any"
+            namespace="##any",
+            mixed=True,
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )
     part_type: AddressPartType = field(
@@ -445,11 +475,14 @@ class AdxpDeliveryAddressLine:
     class Meta:
         name = "adxp.deliveryAddressLine"
 
-    content: Optional[object] = field(
-        default=None,
+    content: List[object] = field(
+        default_factory=list,
         metadata=dict(
             type="Wildcard",
-            namespace="##any"
+            namespace="##any",
+            mixed=True,
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )
     part_type: AddressPartType = field(
@@ -471,11 +504,14 @@ class AdxpDeliveryInstallationArea:
     class Meta:
         name = "adxp.deliveryInstallationArea"
 
-    content: Optional[object] = field(
-        default=None,
+    content: List[object] = field(
+        default_factory=list,
         metadata=dict(
             type="Wildcard",
-            namespace="##any"
+            namespace="##any",
+            mixed=True,
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )
     part_type: AddressPartType = field(
@@ -497,11 +533,14 @@ class AdxpDeliveryInstallationQualifier:
     class Meta:
         name = "adxp.deliveryInstallationQualifier"
 
-    content: Optional[object] = field(
-        default=None,
+    content: List[object] = field(
+        default_factory=list,
         metadata=dict(
             type="Wildcard",
-            namespace="##any"
+            namespace="##any",
+            mixed=True,
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )
     part_type: AddressPartType = field(
@@ -523,11 +562,14 @@ class AdxpDeliveryInstallationType:
     class Meta:
         name = "adxp.deliveryInstallationType"
 
-    content: Optional[object] = field(
-        default=None,
+    content: List[object] = field(
+        default_factory=list,
         metadata=dict(
             type="Wildcard",
-            namespace="##any"
+            namespace="##any",
+            mixed=True,
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )
     part_type: AddressPartType = field(
@@ -549,11 +591,14 @@ class AdxpDeliveryMode:
     class Meta:
         name = "adxp.deliveryMode"
 
-    content: Optional[object] = field(
-        default=None,
+    content: List[object] = field(
+        default_factory=list,
         metadata=dict(
             type="Wildcard",
-            namespace="##any"
+            namespace="##any",
+            mixed=True,
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )
     part_type: AddressPartType = field(
@@ -575,11 +620,14 @@ class AdxpDeliveryModeIdentifier:
     class Meta:
         name = "adxp.deliveryModeIdentifier"
 
-    content: Optional[object] = field(
-        default=None,
+    content: List[object] = field(
+        default_factory=list,
         metadata=dict(
             type="Wildcard",
-            namespace="##any"
+            namespace="##any",
+            mixed=True,
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )
     part_type: AddressPartType = field(
@@ -601,11 +649,14 @@ class AdxpDirection:
     class Meta:
         name = "adxp.direction"
 
-    content: Optional[object] = field(
-        default=None,
+    content: List[object] = field(
+        default_factory=list,
         metadata=dict(
             type="Wildcard",
-            namespace="##any"
+            namespace="##any",
+            mixed=True,
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )
     part_type: AddressPartType = field(
@@ -627,11 +678,14 @@ class AdxpHouseNumber:
     class Meta:
         name = "adxp.houseNumber"
 
-    content: Optional[object] = field(
-        default=None,
+    content: List[object] = field(
+        default_factory=list,
         metadata=dict(
             type="Wildcard",
-            namespace="##any"
+            namespace="##any",
+            mixed=True,
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )
     part_type: AddressPartType = field(
@@ -653,11 +707,14 @@ class AdxpHouseNumberNumeric:
     class Meta:
         name = "adxp.houseNumberNumeric"
 
-    content: Optional[object] = field(
-        default=None,
+    content: List[object] = field(
+        default_factory=list,
         metadata=dict(
             type="Wildcard",
-            namespace="##any"
+            namespace="##any",
+            mixed=True,
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )
     part_type: AddressPartType = field(
@@ -679,11 +736,14 @@ class AdxpPostBox:
     class Meta:
         name = "adxp.postBox"
 
-    content: Optional[object] = field(
-        default=None,
+    content: List[object] = field(
+        default_factory=list,
         metadata=dict(
             type="Wildcard",
-            namespace="##any"
+            namespace="##any",
+            mixed=True,
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )
     part_type: AddressPartType = field(
@@ -705,11 +765,14 @@ class AdxpPostalCode:
     class Meta:
         name = "adxp.postalCode"
 
-    content: Optional[object] = field(
-        default=None,
+    content: List[object] = field(
+        default_factory=list,
         metadata=dict(
             type="Wildcard",
-            namespace="##any"
+            namespace="##any",
+            mixed=True,
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )
     part_type: AddressPartType = field(
@@ -731,11 +794,14 @@ class AdxpPrecinct:
     class Meta:
         name = "adxp.precinct"
 
-    content: Optional[object] = field(
-        default=None,
+    content: List[object] = field(
+        default_factory=list,
         metadata=dict(
             type="Wildcard",
-            namespace="##any"
+            namespace="##any",
+            mixed=True,
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )
     part_type: AddressPartType = field(
@@ -757,11 +823,14 @@ class AdxpState:
     class Meta:
         name = "adxp.state"
 
-    content: Optional[object] = field(
-        default=None,
+    content: List[object] = field(
+        default_factory=list,
         metadata=dict(
             type="Wildcard",
-            namespace="##any"
+            namespace="##any",
+            mixed=True,
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )
     part_type: AddressPartType = field(
@@ -783,11 +852,14 @@ class AdxpStreetAddressLine:
     class Meta:
         name = "adxp.streetAddressLine"
 
-    content: Optional[object] = field(
-        default=None,
+    content: List[object] = field(
+        default_factory=list,
         metadata=dict(
             type="Wildcard",
-            namespace="##any"
+            namespace="##any",
+            mixed=True,
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )
     part_type: AddressPartType = field(
@@ -809,11 +881,14 @@ class AdxpStreetName:
     class Meta:
         name = "adxp.streetName"
 
-    content: Optional[object] = field(
-        default=None,
+    content: List[object] = field(
+        default_factory=list,
         metadata=dict(
             type="Wildcard",
-            namespace="##any"
+            namespace="##any",
+            mixed=True,
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )
     part_type: AddressPartType = field(
@@ -835,11 +910,14 @@ class AdxpStreetNameBase:
     class Meta:
         name = "adxp.streetNameBase"
 
-    content: Optional[object] = field(
-        default=None,
+    content: List[object] = field(
+        default_factory=list,
         metadata=dict(
             type="Wildcard",
-            namespace="##any"
+            namespace="##any",
+            mixed=True,
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )
     part_type: AddressPartType = field(
@@ -861,11 +939,14 @@ class AdxpStreetNameType:
     class Meta:
         name = "adxp.streetNameType"
 
-    content: Optional[object] = field(
-        default=None,
+    content: List[object] = field(
+        default_factory=list,
         metadata=dict(
             type="Wildcard",
-            namespace="##any"
+            namespace="##any",
+            mixed=True,
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )
     part_type: AddressPartType = field(
@@ -887,11 +968,14 @@ class AdxpUnitId:
     class Meta:
         name = "adxp.unitID"
 
-    content: Optional[object] = field(
-        default=None,
+    content: List[object] = field(
+        default_factory=list,
         metadata=dict(
             type="Wildcard",
-            namespace="##any"
+            namespace="##any",
+            mixed=True,
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )
     part_type: AddressPartType = field(
@@ -913,11 +997,14 @@ class AdxpUnitType:
     class Meta:
         name = "adxp.unitType"
 
-    content: Optional[object] = field(
-        default=None,
+    content: List[object] = field(
+        default_factory=list,
         metadata=dict(
             type="Wildcard",
-            namespace="##any"
+            namespace="##any",
+            mixed=True,
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )
     part_type: AddressPartType = field(
@@ -939,11 +1026,14 @@ class AdxpExplicitAdditionalLocator:
     class Meta:
         name = "adxp_explicit.additionalLocator"
 
-    content: Optional[object] = field(
-        default=None,
+    content: List[object] = field(
+        default_factory=list,
         metadata=dict(
             type="Wildcard",
-            namespace="##any"
+            namespace="##any",
+            mixed=True,
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )
     part_type: AddressPartType = field(
@@ -965,11 +1055,14 @@ class AdxpExplicitBuildingNumberSuffix:
     class Meta:
         name = "adxp_explicit.buildingNumberSuffix"
 
-    content: Optional[object] = field(
-        default=None,
+    content: List[object] = field(
+        default_factory=list,
         metadata=dict(
             type="Wildcard",
-            namespace="##any"
+            namespace="##any",
+            mixed=True,
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )
     part_type: AddressPartType = field(
@@ -991,11 +1084,14 @@ class AdxpExplicitCareOf:
     class Meta:
         name = "adxp_explicit.careOf"
 
-    content: Optional[object] = field(
-        default=None,
+    content: List[object] = field(
+        default_factory=list,
         metadata=dict(
             type="Wildcard",
-            namespace="##any"
+            namespace="##any",
+            mixed=True,
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )
     part_type: AddressPartType = field(
@@ -1017,11 +1113,14 @@ class AdxpExplicitCensusTract:
     class Meta:
         name = "adxp_explicit.censusTract"
 
-    content: Optional[object] = field(
-        default=None,
+    content: List[object] = field(
+        default_factory=list,
         metadata=dict(
             type="Wildcard",
-            namespace="##any"
+            namespace="##any",
+            mixed=True,
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )
     part_type: AddressPartType = field(
@@ -1043,11 +1142,14 @@ class AdxpExplicitCity:
     class Meta:
         name = "adxp_explicit.city"
 
-    content: Optional[object] = field(
-        default=None,
+    content: List[object] = field(
+        default_factory=list,
         metadata=dict(
             type="Wildcard",
-            namespace="##any"
+            namespace="##any",
+            mixed=True,
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )
     part_type: AddressPartType = field(
@@ -1069,11 +1171,14 @@ class AdxpExplicitCountry:
     class Meta:
         name = "adxp_explicit.country"
 
-    content: Optional[object] = field(
-        default=None,
+    content: List[object] = field(
+        default_factory=list,
         metadata=dict(
             type="Wildcard",
-            namespace="##any"
+            namespace="##any",
+            mixed=True,
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )
     part_type: AddressPartType = field(
@@ -1095,11 +1200,14 @@ class AdxpExplicitCounty:
     class Meta:
         name = "adxp_explicit.county"
 
-    content: Optional[object] = field(
-        default=None,
+    content: List[object] = field(
+        default_factory=list,
         metadata=dict(
             type="Wildcard",
-            namespace="##any"
+            namespace="##any",
+            mixed=True,
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )
     part_type: AddressPartType = field(
@@ -1121,11 +1229,14 @@ class AdxpExplicitDelimiter:
     class Meta:
         name = "adxp_explicit.delimiter"
 
-    content: Optional[object] = field(
-        default=None,
+    content: List[object] = field(
+        default_factory=list,
         metadata=dict(
             type="Wildcard",
-            namespace="##any"
+            namespace="##any",
+            mixed=True,
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )
     part_type: AddressPartType = field(
@@ -1147,11 +1258,14 @@ class AdxpExplicitDeliveryAddressLine:
     class Meta:
         name = "adxp_explicit.deliveryAddressLine"
 
-    content: Optional[object] = field(
-        default=None,
+    content: List[object] = field(
+        default_factory=list,
         metadata=dict(
             type="Wildcard",
-            namespace="##any"
+            namespace="##any",
+            mixed=True,
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )
     part_type: AddressPartType = field(
@@ -1173,11 +1287,14 @@ class AdxpExplicitDeliveryInstallationArea:
     class Meta:
         name = "adxp_explicit.deliveryInstallationArea"
 
-    content: Optional[object] = field(
-        default=None,
+    content: List[object] = field(
+        default_factory=list,
         metadata=dict(
             type="Wildcard",
-            namespace="##any"
+            namespace="##any",
+            mixed=True,
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )
     part_type: AddressPartType = field(
@@ -1199,11 +1316,14 @@ class AdxpExplicitDeliveryInstallationQualifier:
     class Meta:
         name = "adxp_explicit.deliveryInstallationQualifier"
 
-    content: Optional[object] = field(
-        default=None,
+    content: List[object] = field(
+        default_factory=list,
         metadata=dict(
             type="Wildcard",
-            namespace="##any"
+            namespace="##any",
+            mixed=True,
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )
     part_type: AddressPartType = field(
@@ -1225,11 +1345,14 @@ class AdxpExplicitDeliveryInstallationType:
     class Meta:
         name = "adxp_explicit.deliveryInstallationType"
 
-    content: Optional[object] = field(
-        default=None,
+    content: List[object] = field(
+        default_factory=list,
         metadata=dict(
             type="Wildcard",
-            namespace="##any"
+            namespace="##any",
+            mixed=True,
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )
     part_type: AddressPartType = field(
@@ -1251,11 +1374,14 @@ class AdxpExplicitDeliveryMode:
     class Meta:
         name = "adxp_explicit.deliveryMode"
 
-    content: Optional[object] = field(
-        default=None,
+    content: List[object] = field(
+        default_factory=list,
         metadata=dict(
             type="Wildcard",
-            namespace="##any"
+            namespace="##any",
+            mixed=True,
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )
     part_type: AddressPartType = field(
@@ -1277,11 +1403,14 @@ class AdxpExplicitDeliveryModeIdentifier:
     class Meta:
         name = "adxp_explicit.deliveryModeIdentifier"
 
-    content: Optional[object] = field(
-        default=None,
+    content: List[object] = field(
+        default_factory=list,
         metadata=dict(
             type="Wildcard",
-            namespace="##any"
+            namespace="##any",
+            mixed=True,
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )
     part_type: AddressPartType = field(
@@ -1303,11 +1432,14 @@ class AdxpExplicitDirection:
     class Meta:
         name = "adxp_explicit.direction"
 
-    content: Optional[object] = field(
-        default=None,
+    content: List[object] = field(
+        default_factory=list,
         metadata=dict(
             type="Wildcard",
-            namespace="##any"
+            namespace="##any",
+            mixed=True,
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )
     part_type: AddressPartType = field(
@@ -1329,11 +1461,14 @@ class AdxpExplicitHouseNumber:
     class Meta:
         name = "adxp_explicit.houseNumber"
 
-    content: Optional[object] = field(
-        default=None,
+    content: List[object] = field(
+        default_factory=list,
         metadata=dict(
             type="Wildcard",
-            namespace="##any"
+            namespace="##any",
+            mixed=True,
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )
     part_type: AddressPartType = field(
@@ -1355,11 +1490,14 @@ class AdxpExplicitHouseNumberNumeric:
     class Meta:
         name = "adxp_explicit.houseNumberNumeric"
 
-    content: Optional[object] = field(
-        default=None,
+    content: List[object] = field(
+        default_factory=list,
         metadata=dict(
             type="Wildcard",
-            namespace="##any"
+            namespace="##any",
+            mixed=True,
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )
     part_type: AddressPartType = field(
@@ -1381,11 +1519,14 @@ class AdxpExplicitPostBox:
     class Meta:
         name = "adxp_explicit.postBox"
 
-    content: Optional[object] = field(
-        default=None,
+    content: List[object] = field(
+        default_factory=list,
         metadata=dict(
             type="Wildcard",
-            namespace="##any"
+            namespace="##any",
+            mixed=True,
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )
     part_type: AddressPartType = field(
@@ -1407,11 +1548,14 @@ class AdxpExplicitPostalCode:
     class Meta:
         name = "adxp_explicit.postalCode"
 
-    content: Optional[object] = field(
-        default=None,
+    content: List[object] = field(
+        default_factory=list,
         metadata=dict(
             type="Wildcard",
-            namespace="##any"
+            namespace="##any",
+            mixed=True,
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )
     part_type: AddressPartType = field(
@@ -1433,11 +1577,14 @@ class AdxpExplicitPrecinct:
     class Meta:
         name = "adxp_explicit.precinct"
 
-    content: Optional[object] = field(
-        default=None,
+    content: List[object] = field(
+        default_factory=list,
         metadata=dict(
             type="Wildcard",
-            namespace="##any"
+            namespace="##any",
+            mixed=True,
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )
     part_type: AddressPartType = field(
@@ -1459,11 +1606,14 @@ class AdxpExplicitState:
     class Meta:
         name = "adxp_explicit.state"
 
-    content: Optional[object] = field(
-        default=None,
+    content: List[object] = field(
+        default_factory=list,
         metadata=dict(
             type="Wildcard",
-            namespace="##any"
+            namespace="##any",
+            mixed=True,
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )
     part_type: AddressPartType = field(
@@ -1485,11 +1635,14 @@ class AdxpExplicitStreetAddressLine:
     class Meta:
         name = "adxp_explicit.streetAddressLine"
 
-    content: Optional[object] = field(
-        default=None,
+    content: List[object] = field(
+        default_factory=list,
         metadata=dict(
             type="Wildcard",
-            namespace="##any"
+            namespace="##any",
+            mixed=True,
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )
     part_type: AddressPartType = field(
@@ -1511,11 +1664,14 @@ class AdxpExplicitStreetName:
     class Meta:
         name = "adxp_explicit.streetName"
 
-    content: Optional[object] = field(
-        default=None,
+    content: List[object] = field(
+        default_factory=list,
         metadata=dict(
             type="Wildcard",
-            namespace="##any"
+            namespace="##any",
+            mixed=True,
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )
     part_type: AddressPartType = field(
@@ -1537,11 +1693,14 @@ class AdxpExplicitStreetNameBase:
     class Meta:
         name = "adxp_explicit.streetNameBase"
 
-    content: Optional[object] = field(
-        default=None,
+    content: List[object] = field(
+        default_factory=list,
         metadata=dict(
             type="Wildcard",
-            namespace="##any"
+            namespace="##any",
+            mixed=True,
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )
     part_type: AddressPartType = field(
@@ -1563,11 +1722,14 @@ class AdxpExplicitStreetNameType1:
     class Meta:
         name = "adxp_explicit.streetNameType1"
 
-    content: Optional[object] = field(
-        default=None,
+    content: List[object] = field(
+        default_factory=list,
         metadata=dict(
             type="Wildcard",
-            namespace="##any"
+            namespace="##any",
+            mixed=True,
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )
     part_type: AddressPartType = field(
@@ -1589,11 +1751,14 @@ class AdxpExplicitUnitId:
     class Meta:
         name = "adxp_explicit.unitID"
 
-    content: Optional[object] = field(
-        default=None,
+    content: List[object] = field(
+        default_factory=list,
         metadata=dict(
             type="Wildcard",
-            namespace="##any"
+            namespace="##any",
+            mixed=True,
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )
     part_type: AddressPartType = field(
@@ -1615,11 +1780,14 @@ class AdxpExplicitUnitType:
     class Meta:
         name = "adxp_explicit.unitType"
 
-    content: Optional[object] = field(
-        default=None,
+    content: List[object] = field(
+        default_factory=list,
         metadata=dict(
             type="Wildcard",
-            namespace="##any"
+            namespace="##any",
+            mixed=True,
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )
     part_type: AddressPartType = field(
@@ -1646,11 +1814,14 @@ class EnDelimiter:
     class Meta:
         name = "en.delimiter"
 
-    content: Optional[object] = field(
-        default=None,
+    content: List[object] = field(
+        default_factory=list,
         metadata=dict(
             type="Wildcard",
-            namespace="##any"
+            namespace="##any",
+            mixed=True,
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )
     part_type: EntityNamePartType = field(
@@ -1685,11 +1856,14 @@ class EnFamily:
     class Meta:
         name = "en.family"
 
-    content: Optional[object] = field(
-        default=None,
+    content: List[object] = field(
+        default_factory=list,
         metadata=dict(
             type="Wildcard",
-            namespace="##any"
+            namespace="##any",
+            mixed=True,
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )
     part_type: EntityNamePartType = field(
@@ -1724,11 +1898,14 @@ class EnGiven:
     class Meta:
         name = "en.given"
 
-    content: Optional[object] = field(
-        default=None,
+    content: List[object] = field(
+        default_factory=list,
         metadata=dict(
             type="Wildcard",
-            namespace="##any"
+            namespace="##any",
+            mixed=True,
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )
     part_type: EntityNamePartType = field(
@@ -1763,11 +1940,14 @@ class EnPrefix:
     class Meta:
         name = "en.prefix"
 
-    content: Optional[object] = field(
-        default=None,
+    content: List[object] = field(
+        default_factory=list,
         metadata=dict(
             type="Wildcard",
-            namespace="##any"
+            namespace="##any",
+            mixed=True,
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )
     part_type: EntityNamePartType = field(
@@ -1802,11 +1982,14 @@ class EnSuffix:
     class Meta:
         name = "en.suffix"
 
-    content: Optional[object] = field(
-        default=None,
+    content: List[object] = field(
+        default_factory=list,
         metadata=dict(
             type="Wildcard",
-            namespace="##any"
+            namespace="##any",
+            mixed=True,
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )
     part_type: EntityNamePartType = field(
@@ -1837,11 +2020,14 @@ class EnExplicitDelimiter:
     class Meta:
         name = "en_explicit.delimiter"
 
-    content: Optional[object] = field(
-        default=None,
+    content: List[object] = field(
+        default_factory=list,
         metadata=dict(
             type="Wildcard",
-            namespace="##any"
+            namespace="##any",
+            mixed=True,
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )
     part_type: EntityNamePartType = field(
@@ -1872,11 +2058,14 @@ class EnExplicitFamily:
     class Meta:
         name = "en_explicit.family"
 
-    content: Optional[object] = field(
-        default=None,
+    content: List[object] = field(
+        default_factory=list,
         metadata=dict(
             type="Wildcard",
-            namespace="##any"
+            namespace="##any",
+            mixed=True,
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )
     part_type: EntityNamePartType = field(
@@ -1907,11 +2096,14 @@ class EnExplicitGiven:
     class Meta:
         name = "en_explicit.given"
 
-    content: Optional[object] = field(
-        default=None,
+    content: List[object] = field(
+        default_factory=list,
         metadata=dict(
             type="Wildcard",
-            namespace="##any"
+            namespace="##any",
+            mixed=True,
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )
     part_type: EntityNamePartType = field(
@@ -1942,11 +2134,14 @@ class EnExplicitPrefix:
     class Meta:
         name = "en_explicit.prefix"
 
-    content: Optional[object] = field(
-        default=None,
+    content: List[object] = field(
+        default_factory=list,
         metadata=dict(
             type="Wildcard",
-            namespace="##any"
+            namespace="##any",
+            mixed=True,
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )
     part_type: EntityNamePartType = field(
@@ -1977,11 +2172,14 @@ class EnExplicitSuffix:
     class Meta:
         name = "en_explicit.suffix"
 
-    content: Optional[object] = field(
-        default=None,
+    content: List[object] = field(
+        default_factory=list,
         metadata=dict(
             type="Wildcard",
-            namespace="##any"
+            namespace="##any",
+            mixed=True,
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )
     part_type: EntityNamePartType = field(
@@ -2054,11 +2252,14 @@ class AdExplicit:
     class Meta:
         name = "AD_explicit"
 
-    content: Optional[object] = field(
-        default=None,
+    content: List[object] = field(
+        default_factory=list,
         metadata=dict(
             type="Wildcard",
-            namespace="##any"
+            namespace="##any",
+            mixed=True,
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )
     delimiter: List[AdxpExplicitDelimiter] = field(
@@ -2381,11 +2582,14 @@ class Bin(Any):
     class Meta:
         name = "BIN"
 
-    content: Optional[object] = field(
-        default=None,
+    content: List[object] = field(
+        default_factory=list,
         metadata=dict(
             type="Wildcard",
-            namespace="##any"
+            namespace="##any",
+            mixed=True,
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )
     representation: BinaryDataEncoding = field(
@@ -2798,11 +3002,14 @@ class ThumbnailExplicit:
     class Meta:
         name = "thumbnail_explicit"
 
-    content: Optional[object] = field(
-        default=None,
+    content: List[object] = field(
+        default_factory=list,
         metadata=dict(
             type="Wildcard",
-            namespace="##any"
+            namespace="##any",
+            mixed=True,
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )
     reference: Optional[TelExplicit] = field(
@@ -2900,11 +3107,14 @@ class EdExplicit:
     class Meta:
         name = "ED_explicit"
 
-    content: Optional[object] = field(
-        default=None,
+    content: List[object] = field(
+        default_factory=list,
         metadata=dict(
             type="Wildcard",
-            namespace="##any"
+            namespace="##any",
+            mixed=True,
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )
     reference: Optional[TelExplicit] = field(
@@ -3049,11 +3259,14 @@ class ScExplicit:
     class Meta:
         name = "SC_explicit"
 
-    content: Optional[object] = field(
-        default=None,
+    content: List[object] = field(
+        default_factory=list,
         metadata=dict(
             type="Wildcard",
-            namespace="##any"
+            namespace="##any",
+            mixed=True,
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )
     reference: Optional[TelExplicit] = field(
@@ -3192,11 +3405,14 @@ class StExplicit:
     class Meta:
         name = "ST_explicit"
 
-    content: Optional[object] = field(
-        default=None,
+    content: List[object] = field(
+        default_factory=list,
         metadata=dict(
             type="Wildcard",
-            namespace="##any"
+            namespace="##any",
+            mixed=True,
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )
     reference: Optional[TelExplicit] = field(
@@ -3326,11 +3542,14 @@ class Ad(Any):
     class Meta:
         name = "AD"
 
-    content: Optional[object] = field(
-        default=None,
+    content: List[object] = field(
+        default_factory=list,
         metadata=dict(
             type="Wildcard",
-            namespace="##any"
+            namespace="##any",
+            mixed=True,
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )
     delimiter: List[AdxpDelimiter] = field(
@@ -3829,11 +4048,14 @@ class Thumbnail:
     class Meta:
         name = "thumbnail"
 
-    content: Optional[object] = field(
-        default=None,
+    content: List[object] = field(
+        default_factory=list,
         metadata=dict(
             type="Wildcard",
-            namespace="##any"
+            namespace="##any",
+            mixed=True,
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )
     reference: Optional[Tel] = field(
@@ -3921,11 +4143,14 @@ class Ed(Bin):
     class Meta:
         name = "ED"
 
-    content: Optional[object] = field(
-        default=None,
+    content: List[object] = field(
+        default_factory=list,
         metadata=dict(
             type="Wildcard",
-            namespace="##any"
+            namespace="##any",
+            mixed=True,
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )
     reference: Optional[Tel] = field(
@@ -4207,11 +4432,14 @@ class EnExplicit:
     class Meta:
         name = "EN_explicit"
 
-    content: Optional[object] = field(
-        default=None,
+    content: List[object] = field(
+        default_factory=list,
         metadata=dict(
             type="Wildcard",
-            namespace="##any"
+            namespace="##any",
+            mixed=True,
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )
     delimiter: List[EnExplicitDelimiter] = field(
@@ -4309,11 +4537,14 @@ class OnExplicit:
     class Meta:
         name = "ON_explicit"
 
-    content: Optional[object] = field(
-        default=None,
+    content: List[object] = field(
+        default_factory=list,
         metadata=dict(
             type="Wildcard",
-            namespace="##any"
+            namespace="##any",
+            mixed=True,
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )
     delimiter: List[EnExplicitDelimiter] = field(
@@ -4395,11 +4626,14 @@ class PnExplicit:
     class Meta:
         name = "PN_explicit"
 
-    content: Optional[object] = field(
-        default=None,
+    content: List[object] = field(
+        default_factory=list,
         metadata=dict(
             type="Wildcard",
-            namespace="##any"
+            namespace="##any",
+            mixed=True,
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )
     delimiter: List[EnExplicitDelimiter] = field(
@@ -4499,11 +4733,14 @@ class St:
     class Meta:
         name = "ST"
 
-    content: Optional[object] = field(
-        default=None,
+    content: List[object] = field(
+        default_factory=list,
         metadata=dict(
             type="Wildcard",
-            namespace="##any"
+            namespace="##any",
+            mixed=True,
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )
     reference: Optional[Tel] = field(
@@ -4583,11 +4820,14 @@ class Adxp(St):
     class Meta:
         name = "ADXP"
 
-    content: Optional[object] = field(
-        default=None,
+    content: List[object] = field(
+        default_factory=list,
         metadata=dict(
             type="Wildcard",
-            namespace="##any"
+            namespace="##any",
+            mixed=True,
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )
     part_type: Optional[AddressPartType] = field(
@@ -5264,11 +5504,14 @@ class Enxp(St):
     class Meta:
         name = "ENXP"
 
-    content: Optional[object] = field(
-        default=None,
+    content: List[object] = field(
+        default_factory=list,
         metadata=dict(
             type="Wildcard",
-            namespace="##any"
+            namespace="##any",
+            mixed=True,
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )
     part_type: Optional[EntityNamePartType] = field(
@@ -5307,11 +5550,14 @@ class Sc(St):
     class Meta:
         name = "SC"
 
-    content: Optional[object] = field(
-        default=None,
+    content: List[object] = field(
+        default_factory=list,
         metadata=dict(
             type="Wildcard",
-            namespace="##any"
+            namespace="##any",
+            mixed=True,
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )
     code: Optional[str] = field(
@@ -5511,11 +5757,14 @@ class En(Any):
     class Meta:
         name = "EN"
 
-    content: Optional[object] = field(
-        default=None,
+    content: List[object] = field(
+        default_factory=list,
         metadata=dict(
             type="Wildcard",
-            namespace="##any"
+            namespace="##any",
+            mixed=True,
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )
     delimiter: List[EnDelimiter] = field(
@@ -5604,11 +5853,14 @@ class On:
     class Meta:
         name = "ON"
 
-    content: Optional[object] = field(
-        default=None,
+    content: List[object] = field(
+        default_factory=list,
         metadata=dict(
             type="Wildcard",
-            namespace="##any"
+            namespace="##any",
+            mixed=True,
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )
     delimiter: List[EnDelimiter] = field(
@@ -5698,11 +5950,14 @@ class Tn:
     class Meta:
         name = "TN"
 
-    content: Optional[object] = field(
-        default=None,
+    content: List[object] = field(
+        default_factory=list,
         metadata=dict(
             type="Wildcard",
-            namespace="##any"
+            namespace="##any",
+            mixed=True,
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )
     delimiter: List[EnDelimiter] = field(
@@ -5779,10 +6034,13 @@ class Pn(En):
     class Meta:
         name = "PN"
 
-    content: Optional[object] = field(
-        default=None,
+    content: List[object] = field(
+        default_factory=list,
         metadata=dict(
             type="Wildcard",
-            namespace="##any"
+            namespace="##any",
+            mixed=True,
+            min_occurs=0,
+            max_occurs=9223372036854775807
         )
     )

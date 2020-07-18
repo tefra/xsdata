@@ -94,7 +94,14 @@ class SchemaParser(XmlParser):
         """Add common namespaces like xml, xsi, xlink if they are missing."""
         obj.ns_map = {prefix: uri for prefix, uri in element.nsmap.items() if uri}
         namespaces = obj.ns_map.values()
-        for namespace in Namespace:
+        common_namespaces = (
+            Namespace.XS,
+            Namespace.XSI,
+            Namespace.XML,
+            Namespace.XLINK,
+        )
+
+        for namespace in common_namespaces:
             if namespace.uri not in namespaces:
                 obj.ns_map[namespace.prefix] = namespace.uri
 
@@ -139,10 +146,8 @@ class SchemaParser(XmlParser):
         fallback to the external file path."""
 
         common_ns = Namespace.get_enum(namespace)
-        if common_ns:
-            return common_ns.location
-
-        return self.resolve_path(location)
+        local_path = common_ns.location if common_ns else None
+        return local_path if local_path else self.resolve_path(location)
 
     def end_attribute(self, obj: T, element: Element):
         """Assign the schema's default form for attributes if the given

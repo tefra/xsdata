@@ -9,6 +9,8 @@ from typing import List as Array
 from typing import Optional
 from typing import Union as UnionType
 
+from lxml.html.clean import clean_html
+
 from xsdata.exceptions import SchemaValueError
 from xsdata.formats.dataclass.models.constants import XmlType
 from xsdata.formats.dataclass.serializers import XmlSerializer
@@ -39,7 +41,7 @@ def array_element(init: bool = True, **kwargs: str) -> Anything:
     return field(init=init, default_factory=list, metadata=kwargs)
 
 
-def array_any_element(init: bool = True, **kwargs: str) -> Anything:
+def array_any_element(init: bool = True, **kwargs: Anything) -> Anything:
     kwargs.update(type=XmlType.WILDCARD, namespace=NamespaceType.ANY)
     return field(init=init, default_factory=list, metadata=kwargs)
 
@@ -49,15 +51,12 @@ def occurrences(min_value: int, max_value: UnionType[int, str]) -> Dict[str, int
     return {"min_occurs": min_value, "max_occurs": max_value}
 
 
-@dataclass(frozen=True)
-class XmlString:
-    elements: Array[object] = array_any_element()
+docstring_serializer = XmlSerializer(xml_declaration=False, pretty_print=True)
 
-    def render(self) -> str:
-        name = self.__class__.__name__
-        xml = XmlSerializer(pretty_print=True, xml_declaration=False).render(self)
-        start = xml.find(">") + 1
-        return xml[start:].replace(f"</{name}>", "").strip()
+
+@dataclass(frozen=True)
+class Docstring:
+    elements: Array[object] = array_any_element()
 
 
 @dataclass
@@ -71,16 +70,14 @@ class Documentation(ElementBase):
     :param attributes: any attributes with non-schema namespace
     """
 
-    class Meta:
-        mixed = True
-
     lang: Optional[str] = attribute()
     source: Optional[str] = attribute()
-    elements: Array[object] = array_any_element()
+    elements: Array[object] = array_any_element(mixed=True)
     attributes: Optional["AnyAttribute"] = element()
 
     def tostring(self) -> Optional[str]:
-        return XmlString(self.elements).render() if self.elements else None
+        xml = docstring_serializer.render(Docstring(self.elements))
+        return clean_html(xml)[5:-7].strip()
 
 
 @dataclass

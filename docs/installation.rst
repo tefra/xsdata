@@ -33,6 +33,7 @@ Verify installation using the cli entry point.
     :class: hint
 
     * `lxml <https://lxml.de/>`_ - XML parsing
+    * `requests <https://requests.readthedocs.io/>`_ - Webservice Default Transport
     * `click <https://click.palletsprojects.com/>`_ - CLI entry point
     * `toposort <https://pypi.org/project/toposort/>`_ - Resolve class ordering
     * `jinja2 <https://jinja.palletsprojects.com/>`_ -  Code generation

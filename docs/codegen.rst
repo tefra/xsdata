@@ -26,10 +26,8 @@ definitions.
 package
 -------
 
-The package option defines where the target module(s) will be created inside the
+The package option specifies where the target module(s) will be created inside the
 current working directory.
-
-If the main xsd has any parent include or import you should adjust the target package.
 
 .. admonition:: Note
     :class: hint
@@ -47,12 +45,27 @@ The output option changes the generation format.
 * ``pydata``: Python lib `dataclasses <https://docs.python.org/3/library/dataclasses.html>`_
 * ``plantuml``: `PlantUML <https://plantuml.com/class-diagram>`_ class diagram
 
+
 verbosity
 ---------
 
 The verbosity option changes what messages will be printed.
 
 Available options: ``CRITICAL``, ``ERROR``, ``WARNING``, ``INFO`` or ``DEBUG``
+
+
+wsdl
+----
+
+Generate models and services from a wsdl source.
+
+
+.. admonition:: Experimental
+    :class: danger
+
+    This feature is experimental and only a small subset of features has been
+    implemented, WSDL 1.1 & SOAP 1.1 bindings.
+
 
 print
 -----

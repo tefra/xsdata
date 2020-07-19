@@ -65,7 +65,7 @@ Class Meta
    :widths: 20, 10, 300
 
    "name", "str", "The real name of the element this class represents."
-   "nillable", "bool", "Enable of disable rendering empty elements, default: False"
+   "nillable", "bool", "Specifies whether an explicit empty value can be assigned, default: False"
    "namespace", "str", "The element xml namespace."
 
 
@@ -85,9 +85,10 @@ Field Metadata
 
    "name", "str", "The real name of the element or attribute this field represents."
    "type", "str", "The field type: Text | Element | Attribute | Wildcard | Attributes, default: Text"
-   "nillable", "bool", "Enable of disable rendering with an empty value."
-   "sequential", "bool", "Enable rendering group of lists values in sequence. eg ``<a /><b /><a /><b />``"
-   "namespace", "str", "The element/attribute xml namespace."
+   "nillable", "bool", "Specifies whether an explicit empty value can be assigned."
+   "mixed", "bool", "Specifies whether the field supports `mixed content <https://www.w3schools.com/xml/schema_complex_mixed.asp>`_."
+   "sequential", "bool", "Specifies whether the field value(s) must appear in sequence with other sequential sibling fields. eg ``<a /><b /><a /><b />``"
+   "namespace", "str", "Specifies the field xml namespace."
 
 It's a common practice in schema definitions to require elements to be qualified and
 attributes to be unqualified. ``Element`` fields with an omitted namespace inherit the
@@ -95,6 +96,8 @@ namespace from the parent class/element and ``Attribute`` fields don't.
 
 If you need to break the namespace inheritance for ``Element`` fields set the namespace
 to an empty string ``namespace=""``.
+
+Mixed content must be combined ``Wildcard`` fields with type ``List[object]``.
 
 
 Type: Element

@@ -77,9 +77,9 @@ class Client:
 
         Is equivalent with:
 
-        >>> subtract = CalculatorSoapAddInput(
+        >>> object = CalculatorSoapAddInput(
         >>> body=CalculatorSoapAddInput.Body(add=Add(3, 4)))
-        >>> res = client.send(subtract)
+        >>> res = client.send(object)
 
         :param obj: a params dictionary or the input type instance
         :param headers: a dictionary of any additional headers.

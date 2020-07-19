@@ -15,6 +15,7 @@
     models
     xml
     json
+    wsdl
     plantuml
     demos
     changelog

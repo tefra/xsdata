@@ -4,7 +4,7 @@ from unittest import mock
 from tests.factories import ClassFactory
 from tests.factories import FactoryTestCase
 from xsdata.codegen.analyzer import ClassAnalyzer
-from xsdata.codegen.mappers.defintions import DefinitionsMapper
+from xsdata.codegen.mappers.definitions import DefinitionsMapper
 from xsdata.codegen.mappers.schema import SchemaMapper
 from xsdata.codegen.parsers import DefinitionsParser
 from xsdata.codegen.transformer import SchemaTransformer

@@ -218,13 +218,12 @@ class XmlMeta:
     """
     Dataclass model bind metadata.
 
-    :param name: local name
-    :param clazz: dataclass type
-    :param qname: local name qualified with target namespace.
-    :param source_qname: local name qualified with source namespace.
-    :param nillable: allow render as empty element.
-    :param vars: list of field metadata
-    :param cache: field lookup cache
+    :param name: The local name
+    :param clazz: The dataclass type
+    :param qname: The namespace qualified name.
+    :param source_qname: The source namespace qualified name.
+    :param nillable: Specifies whether an explicit empty value can be assigned.
+    :param vars: The list of field metadata
     """
 
     name: str
@@ -233,7 +232,7 @@ class XmlMeta:
     source_qname: QName
     nillable: bool
     vars: List[XmlVar] = field(default_factory=list)
-    cache: Dict = field(default_factory=dict)
+    cache: Dict = field(default_factory=dict, init=False)
 
     @property
     def element_form(self) -> FormType:

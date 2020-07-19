@@ -6,7 +6,7 @@ from lxml.etree import QName
 from tests.factories import AttrFactory
 from tests.factories import ClassFactory
 from tests.factories import FactoryTestCase
-from xsdata.codegen.mappers.defintions import DefinitionsMapper
+from xsdata.codegen.mappers.definitions import DefinitionsMapper
 from xsdata.codegen.models import Class
 from xsdata.codegen.models import Status
 from xsdata.formats.dataclass.models.generics import AnyElement

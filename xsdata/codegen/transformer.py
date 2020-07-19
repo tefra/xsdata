@@ -12,7 +12,7 @@ from urllib.parse import urlparse
 from urllib.request import urlopen
 
 from xsdata.codegen.analyzer import ClassAnalyzer
-from xsdata.codegen.mappers.defintions import DefinitionsMapper
+from xsdata.codegen.mappers.definitions import DefinitionsMapper
 from xsdata.codegen.mappers.schema import SchemaMapper
 from xsdata.codegen.models import Class
 from xsdata.codegen.parsers.definitions import DefinitionsParser

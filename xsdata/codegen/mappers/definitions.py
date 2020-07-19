@@ -191,9 +191,7 @@ class DefinitionsMapper:
             parts.append(extended.attributes["part"])
             message_name = QName(extended.attributes["message"]).localname
         elif "parts" in extended.attributes:
-            parts.extend(
-                filter(None, map(str.strip, extended.attributes["parts"].split(" ")))
-            )
+            parts.extend(extended.attributes["parts"].split())
 
         all_parts = len(parts) == 0
         definition_message = definitions.find_message(message_name)

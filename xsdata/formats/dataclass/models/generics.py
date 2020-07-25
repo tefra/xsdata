@@ -88,7 +88,7 @@ class Namespaces:
             return
 
         namespace = Namespace.get_enum(uri)
-        prefix = namespace.prefix if namespace else prefix
+        prefix = namespace.prefix.replace("_", "-") if namespace else prefix
         if prefix is None:
             prefix = f"ns{self.auto_ns}"
 

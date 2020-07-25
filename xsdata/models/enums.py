@@ -12,21 +12,18 @@ COMMON_SCHEMA_DIR = Path(__file__).absolute().parent.parent.joinpath("schemas/")
 class Namespace(Enum):
     """Common namespaces."""
 
-    XS = "http://www.w3.org/2001/XMLSchema"
-    XML = "http://www.w3.org/XML/1998/namespace"
-    XSI = "http://www.w3.org/2001/XMLSchema-instance"
-    XLINK = "http://www.w3.org/1999/xlink"
-    XHTML = "http://www.w3.org/1999/xhtml"
-    SOAP11 = "http://schemas.xmlsoap.org/wsdl/soap/"
-    SOAP12 = "http://schemas.xmlsoap.org/wsdl/soap12/"
+    XS = ("http://www.w3.org/2001/XMLSchema", "xs")
+    XML = ("http://www.w3.org/XML/1998/namespace", "xml")
+    XSI = ("http://www.w3.org/2001/XMLSchema-instance", "xsi")
+    XLINK = ("http://www.w3.org/1999/xlink", "xlink")
+    XHTML = ("http://www.w3.org/1999/xhtml", "xhtml")
+    SOAP11 = ("http://schemas.xmlsoap.org/wsdl/soap/", "soap")
+    SOAP12 = ("http://schemas.xmlsoap.org/wsdl/soap12/", "soap12")
+    SOAP_ENV = ("http://schemas.xmlsoap.org/soap/envelope/", "soap-env")
 
-    @property
-    def uri(self) -> str:
-        return self.value
-
-    @property
-    def prefix(self) -> str:
-        return self.name.lower()
+    def __init__(self, uri: str, prefix: str):
+        self.uri = uri
+        self.prefix = prefix
 
     @property
     def location(self) -> Optional[str]:

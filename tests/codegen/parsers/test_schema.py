@@ -177,7 +177,7 @@ class SchemaParserTests(TestCase):
         self.parser.add_default_imports(schema)
         self.assertEqual(1, len(schema.imports))
 
-        xsi = Namespace.XSI.value
+        xsi = Namespace.XSI.uri
         schema.ns_map["foo"] = xsi
         self.parser.add_default_imports(schema)
         self.assertEqual(2, len(schema.imports))
@@ -244,12 +244,12 @@ class SchemaParserTests(TestCase):
 
         self.assertEqual(
             Namespace.XSI.location,
-            self.parser.resolve_local_path(None, Namespace.XSI.value),
+            self.parser.resolve_local_path(None, Namespace.XSI.uri),
         )
 
         self.assertEqual(
             Namespace.XSI.location,
-            self.parser.resolve_local_path("http://something", Namespace.XSI.value),
+            self.parser.resolve_local_path("http://something", Namespace.XSI.uri),
         )
         iam = Path(__file__)
         self.parser.location = iam.as_uri()

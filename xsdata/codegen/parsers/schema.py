@@ -114,7 +114,7 @@ class SchemaParser(XmlParser):
         """Add missing imports to the standard schemas if the namespace is
         declared and."""
         imp_namespaces = [imp.namespace for imp in obj.imports]
-        xsi_ns = Namespace.XSI.value
+        xsi_ns = Namespace.XSI.uri
         if xsi_ns in obj.ns_map.values() and xsi_ns not in imp_namespaces:
             obj.imports.insert(0, xsd.Import(namespace=xsi_ns))
 

@@ -8,6 +8,7 @@ from typing import Optional
 from typing import TypeVar
 
 from xsdata.exceptions import DefinitionsValueError
+from xsdata.formats.dataclass.models.generics import AnyElement
 from xsdata.models.enums import Namespace
 from xsdata.models.mixins import array_any_element
 from xsdata.models.mixins import array_element
@@ -37,6 +38,19 @@ class WsdlElement:
     name: str = attribute()
     documentation: Optional[Documentation] = element()
     ns_map: Dict = field(default_factory=dict)
+
+
+@dataclass
+class ExtensibleElement(WsdlElement):
+    """
+    :param extended:
+    """
+
+    extended: List[object] = array_any_element()
+
+    @property
+    def extended_elements(self) -> Iterator[AnyElement]:
+        yield from (ext for ext in self.extended if isinstance(ext, AnyElement))
 
 
 @dataclass
@@ -104,44 +118,37 @@ class PortTypeOperation(WsdlElement):
 
 
 @dataclass
-class PortType(WsdlElement):
+class PortType(ExtensibleElement):
     """
     :param operations:
     """
 
     operations: List[PortTypeOperation] = array_element(name="operation")
-    extended: List[object] = array_any_element()
 
     def find_operation(self, name: str) -> PortTypeOperation:
         return find_or_die(self.operations, name, "PortTypeOperation")
 
 
 @dataclass
-class BindingMessage(WsdlElement):
-    """
-    :param extended:
-    """
-
-    extended: List[object] = array_any_element()
+class BindingMessage(ExtensibleElement):
+    pass
 
 
 @dataclass
-class BindingOperation(WsdlElement):
+class BindingOperation(ExtensibleElement):
     """
     :param input:
     :param output:
     :param faults:
-    :param extended:
     """
 
     input: BindingMessage = element()
     output: BindingMessage = element()
     faults: List[BindingMessage] = array_element(name="fault")
-    extended: List[object] = array_any_element()
 
 
 @dataclass
-class Binding(WsdlElement):
+class Binding(ExtensibleElement):
     """
     :param type:
     :param operations:
@@ -150,7 +157,6 @@ class Binding(WsdlElement):
 
     type: str = attribute()
     operations: List[BindingOperation] = array_element(name="operation")
-    extended: List[object] = array_any_element()
 
     def unique_operations(self) -> Iterator[BindingOperation]:
         name_attr = operator.attrgetter("name")
@@ -161,14 +167,12 @@ class Binding(WsdlElement):
 
 
 @dataclass
-class ServicePort(WsdlElement):
+class ServicePort(ExtensibleElement):
     """
     :param binding:
-    :param extended:
     """
 
     binding: str = attribute()
-    extended: List[object] = array_any_element()
 
 
 @dataclass
@@ -181,7 +185,7 @@ class Service(WsdlElement):
 
 
 @dataclass
-class Definitions(WsdlElement, ModuleMixin):
+class Definitions(ExtensibleElement, ModuleMixin):
     """
     :param types:
     :param imports:
@@ -203,7 +207,6 @@ class Definitions(WsdlElement, ModuleMixin):
     port_types: List[PortType] = array_element(name="portType")
     bindings: List[Binding] = array_element(name="binding")
     services: List[Service] = array_element(name="service")
-    extended: List[object] = array_any_element()
     location: Optional[str] = field(default=None)
 
     @property

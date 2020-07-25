@@ -20,6 +20,7 @@ from xsdata.models.enums import Tag
 from xsdata.models.mixins import ElementBase
 from xsdata.models.wsdl import BindingMessage
 from xsdata.models.wsdl import BindingOperation
+from xsdata.models.wsdl import Message
 from xsdata.models.xsd import ComplexType
 from xsdata.models.xsd import Element
 
@@ -427,7 +428,13 @@ class Class:
         if self.strict_type:
             return False
 
-        if self.type in (Element, ComplexType, BindingOperation, BindingMessage):
+        if self.type in (
+            Element,
+            ComplexType,
+            BindingOperation,
+            BindingMessage,
+            Message,
+        ):
             return True
 
         return self.is_enumeration

@@ -1,52 +1,21 @@
 import logging
-import os
-from pathlib import Path
 from unittest import mock
 from unittest import TestCase
 
 from click.testing import CliRunner
 
 from tests import fixtures_dir
-from tests import root
-from tests.conftest import load_class
 from xsdata import cli
 from xsdata.cli import resolve_source
 from xsdata.codegen.transformer import SchemaTransformer
 from xsdata.exceptions import CodeGenerationError
 from xsdata.logger import logger
 
-os.chdir(root)
-
 
 class CliTests(TestCase):
     def setUp(self):
         self.runner = CliRunner()
         super().setUp()
-
-    def test_schema_integration(self):
-        schema = fixtures_dir.joinpath("books/schema.xsd")
-        package = "tests.fixtures.books"
-        runner = CliRunner()
-        result = runner.invoke(cli, [str(schema), "--package", package, "--ns-struct"])
-
-        if result.exception:
-            raise result.exception
-
-        clazz = load_class(result.output, "Books")
-        self.assertEqual("books", clazz.Meta.name)
-        self.assertEqual("urn:books", clazz.Meta.namespace)
-
-    def test_definitions_integration(self):
-        schema = fixtures_dir.joinpath("calculator/services.wsdl")
-        package = "tests.fixtures.calculator"
-        runner = CliRunner()
-        result = runner.invoke(cli, [str(schema), "--package", package, "--wsdl"])
-
-        if result.exception:
-            raise result.exception
-
-        clazz = load_class(result.output, "CalculatorSoapMultiplyOutput")
-        self.assertEqual("Envelope", clazz.Meta.name)
 
     @mock.patch.object(SchemaTransformer, "process_schemas")
     @mock.patch.object(SchemaTransformer, "__init__", return_value=None)

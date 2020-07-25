@@ -1,0 +1,8 @@
+<?xml version="1.0" ?>
+<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+    <S:Body>
+        <ns2:getHelloAsStringResponse xmlns:ns2="http://hello/">
+            <return>Hello chris</return>
+        </ns2:getHelloAsStringResponse>
+    </S:Body>
+</S:Envelope>

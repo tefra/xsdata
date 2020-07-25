@@ -7,7 +7,7 @@ from tests.fixtures.books import Books
 from xsdata.formats.dataclass.serializers import DictFactory
 from xsdata.formats.dataclass.serializers import DictSerializer
 from xsdata.formats.dataclass.serializers.json import JsonEncoder
-from xsdata.models.enums import Namespace
+from xsdata.models.enums import FormType
 
 
 class DictSerializerTests(TestCase):
@@ -65,8 +65,8 @@ class DictSerializerTests(TestCase):
 
 class JsonEncoderTests(TestCase):
     def test_encode_enum(self):
-        actual = json.dumps({"enum": Namespace.XS}, cls=JsonEncoder)
-        self.assertEqual('{"enum": "http://www.w3.org/2001/XMLSchema"}', actual)
+        actual = json.dumps({"enum": FormType.QUALIFIED}, cls=JsonEncoder)
+        self.assertEqual('{"enum": "qualified"}', actual)
 
     def test_encode_decimal(self):
         actual = json.dumps({"decimal": Decimal(10.5)}, cls=JsonEncoder)

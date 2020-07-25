@@ -1,0 +1,8 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<soap-env:Envelope xmlns:soap-env="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="http://hello/">
+  <soap-env:Body>
+    <ns1:getHelloAsString>
+      <arg0>chris</arg0>
+    </ns1:getHelloAsString>
+  </soap-env:Body>
+</soap-env:Envelope>

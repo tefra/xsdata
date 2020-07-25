@@ -11,16 +11,21 @@ from xsdata.codegen.models import AttrType
 from xsdata.codegen.models import Class
 from xsdata.codegen.models import Status
 from xsdata.formats.dataclass.models.generics import AnyElement
+from xsdata.logger import logger
 from xsdata.models.enums import DataType
+from xsdata.models.enums import Namespace
 from xsdata.models.enums import Tag
 from xsdata.models.wsdl import Binding
 from xsdata.models.wsdl import BindingMessage
 from xsdata.models.wsdl import BindingOperation
 from xsdata.models.wsdl import Definitions
+from xsdata.models.wsdl import Part
 from xsdata.models.wsdl import PortType
 from xsdata.models.wsdl import PortTypeMessage
 from xsdata.models.wsdl import PortTypeOperation
 from xsdata.models.wsdl import ServicePort
+from xsdata.models.xsd import Element
+from xsdata.utils import collections
 from xsdata.utils import text
 
 
@@ -29,7 +34,7 @@ class DefinitionsMapper:
 
     @classmethod
     def map(cls, definitions: Definitions) -> List[Class]:
-        """Main mapper entry point."""
+        """Step 1: Main mapper entry point."""
         return [
             obj
             for service in definitions.services
@@ -39,13 +44,14 @@ class DefinitionsMapper:
 
     @classmethod
     def map_port(cls, definitions: Definitions, port: ServicePort) -> Iterator[Class]:
-        """Match a ServicePort to a Binding and PortType object and delegate
-        the process to the next entry point."""
+        """Step 2: Match a ServicePort to a Binding and PortType object and
+        delegate the process to the next entry point."""
 
         binding = definitions.find_binding(text.suffix(port.binding))
         port_type = definitions.find_port_type(text.suffix(binding.type))
-        config = cls.attributes(binding.extended)
-        config.update(cls.attributes(port.extended))
+
+        elements = collections.concat(binding.extended_elements, port.extended_elements)
+        config = cls.attributes(elements)
 
         yield from cls.map_binding(definitions, binding, port_type, config)
 
@@ -57,11 +63,11 @@ class DefinitionsMapper:
         port_type: PortType,
         config: Dict,
     ) -> Iterator[Class]:
-        """Match every BindingOperation to a PortTypeOperation and delegate the
-        process for each operation to the next entry point."""
+        """Step 3: Match every BindingOperation to a PortTypeOperation and
+        delegate the process for each operation to the next entry point."""
         for operation in binding.unique_operations():
             cfg = config.copy()
-            cfg.update(cls.attributes(operation.extended))
+            cfg.update(cls.attributes(operation.extended_elements))
             port_operation = port_type.find_operation(operation.name)
 
             yield from cls.map_binding_operation(
@@ -77,8 +83,8 @@ class DefinitionsMapper:
         config: Dict,
         name: str,
     ) -> Iterator[Class]:
-        """Convert a BindingOperation to a service class and delegate the
-        process of all the message classes to the next entry point."""
+        """Step 4: Convert a BindingOperation to a service class and delegate
+        the process of all the message classes to the next entry point."""
 
         attrs = [
             cls.build_attr(key, DataType.STRING.qname, native=True, default=config[key])
@@ -86,14 +92,18 @@ class DefinitionsMapper:
             if config[key]
         ]
 
+        style = config.get("style", "document")
         name = f"{name}_{binding_operation.name}"
         namespace = cls.operation_namespace(config)
         operation_messages = cls.map_binding_operation_messages(
-            definitions, binding_operation, port_type_operation, name, namespace
+            definitions, binding_operation, port_type_operation, name, style, namespace
         )
-        for message_name, message_class in operation_messages:
+        for message_class in operation_messages:
             yield message_class
-            attrs.append(cls.build_attr(message_name, message_class.qname))
+            # Only Envelope classes need to be added in service input/output
+            if message_class.meta_name:
+                message_type = message_class.name.split("_")[-1]
+                attrs.append(cls.build_attr(message_type, message_class.qname))
 
         yield Class(
             qname=QName(definitions.target_namespace, name),
@@ -111,9 +121,10 @@ class DefinitionsMapper:
         operation: BindingOperation,
         port_type_operation: PortTypeOperation,
         name: str,
+        style: str,
         namespace: Optional[str],
-    ) -> Iterator[Tuple[str, Class]]:
-        """Map the BindingOperation messages to classes."""
+    ) -> Iterator[Class]:
+        """Step 5: Map the BindingOperation messages to classes."""
 
         messages: List[Tuple[str, BindingMessage, PortTypeMessage]] = []
 
@@ -125,24 +136,31 @@ class DefinitionsMapper:
 
         # todo: faults
         for suffix, binding_message, port_type_message in messages:
-            yield suffix, cls.map_binding_operation_message(
+
+            if style == "rpc":
+                yield cls.build_message_class(definitions, port_type_message)
+
+            yield cls.build_envelope_class(
                 definitions,
                 binding_message,
                 port_type_message,
-                name=f"{name}_{suffix}",
-                namespace=namespace,
+                f"{name}_{suffix}",
+                style,
+                namespace,
             )
 
     @classmethod
-    def map_binding_operation_message(
+    def build_envelope_class(
         cls,
         definitions: Definitions,
         binding_message: BindingMessage,
         port_type_message: PortTypeMessage,
         name: str,
+        style: str,
         namespace: Optional[str],
     ) -> Class:
-        """Map a BindingMessage to class instance."""
+        """Step 6.1: Build Envelope class for the given binding message with
+        attributes from the port type message."""
 
         target = Class(
             qname=QName(definitions.target_namespace, name),
@@ -152,58 +170,129 @@ class DefinitionsMapper:
             ns_map=binding_message.ns_map,
             namespace=namespace,
         )
-
         message = port_type_message.message
-        for ext in binding_message.extended:
-            if not isinstance(ext, AnyElement):
-                continue
 
+        for ext in binding_message.extended_elements:
             local_name = QName(ext.qname).localname.title()
-            inner = next(
-                (inner for inner in target.inner if inner.name == local_name), None
-            )
-            if not inner:
-                inner = Class(
-                    qname=QName(local_name),
-                    type=BindingMessage,
-                    module=definitions.module,
-                    ns_map=binding_message.ns_map.copy(),
+            inner = cls.build_inner_class(target, local_name)
+
+            if style == "rpc" and local_name == "Body":
+                namespace = ext.attributes.get("namespace")
+                attrs = cls.map_port_type_message(port_type_message, namespace)
+            else:
+                attrs = cls.map_binding_message_parts(
+                    definitions, message, ext, inner.ns_map
                 )
-                attr = cls.build_attr(local_name, inner.qname, forward=True)
 
-                target.inner.append(inner)
-                target.attrs.append(attr)
-
-            attrs = cls.map_message_parts(definitions, message, ext, inner.ns_map)
             inner.attrs.extend(attrs)
 
         return target
 
     @classmethod
-    def map_message_parts(
+    def build_message_class(
+        cls, definitions: Definitions, port_type_message: PortTypeMessage
+    ) -> Class:
+        """Step 6.2: Build the input/output message class of an rpc style
+        operation."""
+        message_name = text.suffix(port_type_message.message)
+        definition_message = definitions.find_message(message_name)
+        ns_map = definition_message.ns_map.copy()
+
+        return Class(
+            qname=QName(definitions.target_namespace, message_name),
+            status=Status.PROCESSED,
+            type=Element,
+            module=definitions.module,
+            ns_map=ns_map,
+            attrs=list(cls.build_parts_attributes(definition_message.parts, ns_map)),
+        )
+
+    @classmethod
+    def build_inner_class(cls, target: Class, name: str) -> Class:
+        """
+        Build or retrieve an inner class for the given target class by the
+        given name.
+
+        This helper will also create a forward reference attribute for
+        the parent class.
+        """
+        inner = next((inner for inner in target.inner if inner.name == name), None)
+        if not inner:
+            inner = Class(
+                qname=QName(name),
+                type=BindingMessage,
+                module=target.module,
+                ns_map=target.ns_map.copy(),
+            )
+            attr = cls.build_attr(name, inner.qname, forward=True)
+
+            target.inner.append(inner)
+            target.attrs.append(attr)
+
+        return inner
+
+    @classmethod
+    def map_port_type_message(
+        cls, message: PortTypeMessage, namespace: Optional[str]
+    ) -> Iterator[Attr]:
+        """Build an attribute for the given port type message."""
+        prefix, name = text.split(message.message)
+        source_namespace = message.ns_map.get(prefix)
+        yield cls.build_attr(
+            name, qname=QName(source_namespace, name), namespace=namespace
+        )
+
+    @classmethod
+    def map_binding_message_parts(
         cls, definitions: Definitions, message: str, extended: AnyElement, ns_map: Dict
     ) -> Iterator[Attr]:
-        """Find a Message instance and map its parts to attributes."""
+        """Find a Message instance and map its parts to attributes according to
+        the the extensible element.."""
         parts = []
-        message_name = text.suffix(message)
-
         if "part" in extended.attributes:
             parts.append(extended.attributes["part"])
-            message_name = QName(extended.attributes["message"]).localname
         elif "parts" in extended.attributes:
             parts.extend(extended.attributes["parts"].split())
 
-        all_parts = len(parts) == 0
-        definition_message = definitions.find_message(message_name)
+        if "message" in extended.attributes:
+            message_name = QName(extended.attributes["message"]).localname
+        else:
+            message_name = text.suffix(message)
 
-        for part in definition_message.parts:
-            if all_parts or part.name in parts:
-                type_name = part.element or part.type or ""
-                prefix, name = text.split(type_name)
-                namespace = part.ns_map.get(prefix)
-                ns_map.update(part.ns_map)
-                qname = QName(namespace, name)
-                yield cls.build_attr(name, qname, namespace=namespace)
+        definition_message = definitions.find_message(message_name)
+        message_parts = definition_message.parts
+
+        if len(parts) > 0:
+            message_parts = [part for part in message_parts if part.name in parts]
+
+        yield from cls.build_parts_attributes(message_parts, ns_map)
+
+    @classmethod
+    def build_parts_attributes(cls, parts: List[Part], ns_map: Dict) -> Iterator[Attr]:
+        """
+        Build attributes for the given list of parts.
+
+        :param parts: List of parts
+        :param ns_map: Namespaces dictionary of the parent class
+        """
+        for part in parts:
+            if part.element:
+                prefix, type_name = text.split(part.element)
+                name = type_name
+            elif part.type:
+                prefix, type_name = text.split(part.type)
+                name = part.name
+            else:
+                logger.warning("Skip untyped message part %s", part.name)
+                continue
+
+            ns_map.update(part.ns_map)
+            namespace = part.ns_map.get(prefix)
+            type_qname = QName(namespace, type_name)
+            native = namespace == Namespace.XS.uri
+            namespace = "" if part.type else namespace
+
+            yield cls.build_attr(name, type_qname, namespace=namespace, native=native)
 
     @classmethod
     def operation_namespace(cls, config: Dict) -> Optional[str]:
@@ -215,7 +304,7 @@ class DefinitionsMapper:
         return namespace
 
     @classmethod
-    def attributes(cls, elements: List) -> Dict:
+    def attributes(cls, elements: Iterator[AnyElement]) -> Dict:
         """Return all attributes from all extended elements as a dictionary."""
         return {
             QName(qname).localname: value

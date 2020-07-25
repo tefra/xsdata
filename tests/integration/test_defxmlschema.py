@@ -3,21 +3,12 @@ from pathlib import Path
 
 from click.testing import CliRunner
 
+from tests import root
 from tests.conftest import load_class
 from tests.conftest import validate_bindings
 from xsdata import cli
 
-os.chdir(Path(__file__).parent.parent)
-
-
-def test_common_types():
-    source = Path("tests/fixtures/common/nhinc/hl7").resolve()
-    package = "tests.fixtures.common.models"
-    runner = CliRunner()
-    result = runner.invoke(cli, [str(source), "--package", package])
-
-    if result.exception:
-        raise result.exception
+os.chdir(root)
 
 
 def test_definitive_xml_schema_chapter_01():

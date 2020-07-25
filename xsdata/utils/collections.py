@@ -3,6 +3,7 @@ from typing import Any
 from typing import Callable
 from typing import Dict
 from typing import Iterable
+from typing import Iterator
 from typing import List
 from typing import Optional
 from typing import Sequence
@@ -51,3 +52,9 @@ def find(items: Sequence, value: Any) -> int:
         return items.index(value)
     except ValueError:
         return -1
+
+
+def concat(*args: Iterable) -> Iterator:
+    """Concatenate iterables into a single iterator."""
+    for arg in args:
+        yield from arg

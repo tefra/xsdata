@@ -45,6 +45,7 @@ repos:
     rev: v1.11.0
     hooks:
       - id: setup-cfg-fmt
+        args: ["--max-py-version=3.9"]
   - repo: https://github.com/PyCQA/doc8
     rev: 0.8.1rc3
     hooks:

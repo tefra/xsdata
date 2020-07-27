@@ -183,7 +183,7 @@ class ElementNodeTests(TestCase):
         actual = node.next_node(ele, 10, ctx)
         self.assertIsInstance(actual, WildcardNode)
         self.assertEqual(10, actual.position)
-        self.assertEqual(var.qname, actual.qname)
+        self.assertEqual(var, actual.var)
 
     def test_next_node_when_given_qname_matches_primitive_var(self):
         ele = Element("a")
@@ -270,23 +270,25 @@ class WildcardNodeTests(TestCase):
         mock_parse_any_element.return_value = generic
         mock_fetch_any_children.return_value = ["a", "b"]
 
-        node = WildcardNode(position=0, qname="a")
         ele = Element("foo")
+        var = XmlText(name="foo", qname=QName("a"))
+        node = WildcardNode(position=0, var=var)
         actual = node.parse_element(ele, [1, 2, 3])
 
-        self.assertEqual(("a", generic), actual)
+        self.assertEqual((var.qname, generic), actual)
         self.assertEqual(["a", "b"], generic.children)
         mock_parse_any_element.assert_called_once_with(ele)
         mock_fetch_any_children.assert_called_once_with(0, [1, 2, 3])
 
     def test_next_node(self):
         ele = Element("foo")
-        node = WildcardNode(position=0, qname="a")
+        var = XmlText(name="foo", qname=QName("foo"))
+        node = WildcardNode(position=0, var=var)
         actual = node.next_node(ele, 10, XmlContext())
 
         self.assertIsInstance(actual, WildcardNode)
         self.assertEqual(10, actual.position)
-        self.assertEqual("a", actual.qname)
+        self.assertEqual(var, actual.var)
 
 
 class PrimitiveNodeTests(TestCase):

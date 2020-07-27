@@ -116,7 +116,7 @@ class ElementNode(XmlNode):
             return ElementNode(position=position, meta=meta, config=self.config)
 
         if var.is_any_type:
-            return WildcardNode(position=position, qname=var.qname)
+            return WildcardNode(position=position, var=var)
 
         return PrimitiveNode(position=position, var=var)
 
@@ -140,10 +140,10 @@ class WildcardNode(XmlNode):
         In the future this node should check all known user defined models in the
         target namespace and use that instead of the generic.
 
-    :param qname: xml element tag
+    :param var: xml var instance
     """
 
-    qname: QName
+    var: XmlVar
 
     def parse_element(self, element: Element, objects: List[Any]) -> Tuple:
         """
@@ -156,7 +156,7 @@ class WildcardNode(XmlNode):
         obj = ParserUtils.parse_any_element(element)
         obj.children = ParserUtils.fetch_any_children(self.position, objects)
 
-        return self.qname, obj
+        return self.var.qname, obj
 
     def next_node(self, element: Element, position: int, ctx: XmlContext) -> XmlNode:
         """
@@ -165,11 +165,17 @@ class WildcardNode(XmlNode):
 
         Notes:     Wildcard nodes can only queue other wildcard nodes.
         """
-        return WildcardNode(position=position, qname=self.qname)
+        return WildcardNode(position=position, var=self.var)
 
 
 @dataclass(frozen=True)
 class PrimitiveNode(XmlNode):
+    """
+    XmlNode for text elements with primitive values eg str, int, float.
+
+    :param var: xml var instance
+    """
+
     var: XmlVar
 
     def parse_element(self, element: Element, objects: List) -> Tuple:

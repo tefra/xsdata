@@ -1,19 +1,10 @@
 from dataclasses import dataclass
-from typing import Any
-from typing import List
-from typing import Tuple
-from typing import TypeVar
 
 from lxml.etree import Element
-from lxml.etree import QName
 
 from xsdata.codegen.parsers.schema import SchemaParser
-from xsdata.formats.dataclass.parsers.nodes import XmlNode
+from xsdata.formats.bindings import T
 from xsdata.models import wsdl
-
-T = TypeVar("T")
-ParsedObjects = List[Tuple[QName, Any]]
-XmlNodes = List[XmlNode]
 
 
 @dataclass

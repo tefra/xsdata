@@ -6,10 +6,13 @@ from typing import Union
 from unittest import mock
 from unittest.case import TestCase
 
+from lxml import etree
 from lxml.etree import Element
 from lxml.etree import QName
 from lxml.etree import SubElement
 
+from tests import fixtures_dir
+from tests.fixtures.books import Books
 from xsdata.exceptions import ParserError
 from xsdata.exceptions import XmlContextError
 from xsdata.formats.dataclass.context import XmlContext
@@ -20,6 +23,7 @@ from xsdata.formats.dataclass.models.elements import XmlWildcard
 from xsdata.formats.dataclass.models.generics import AnyElement
 from xsdata.formats.dataclass.parsers.config import ParserConfig
 from xsdata.formats.dataclass.parsers.nodes import ElementNode
+from xsdata.formats.dataclass.parsers.nodes import NodeParser
 from xsdata.formats.dataclass.parsers.nodes import PrimitiveNode
 from xsdata.formats.dataclass.parsers.nodes import RootNode
 from xsdata.formats.dataclass.parsers.nodes import SkipNode
@@ -27,7 +31,6 @@ from xsdata.formats.dataclass.parsers.nodes import UnionNode
 from xsdata.formats.dataclass.parsers.nodes import WildcardNode
 from xsdata.formats.dataclass.parsers.nodes import XmlNode
 from xsdata.formats.dataclass.parsers.utils import ParserUtils
-from xsdata.models.mixins import array_element
 from xsdata.models.mixins import attribute
 from xsdata.models.mixins import element
 
@@ -360,7 +363,6 @@ class UnionNodeTests(TestCase):
 
     def test_parse_element_raises_parser_error_on_failure(self):
         root = Element("root")
-        item = SubElement(root, "item")
 
         @dataclass
         class Item:
@@ -376,7 +378,7 @@ class UnionNodeTests(TestCase):
         node = UnionNode(position=0, var=meta.vars[0], ctx=ctx)
 
         with self.assertRaises(ParserError) as cm:
-            node.parse_element(item, [])
+            node.parse_element(root, [])
 
         self.assertEqual("Failed to parse union node: item", str(cm.exception))
 
@@ -418,3 +420,16 @@ class SKipNodeTests(TestCase):
 
         self.assertEqual((None, None), node.parse_element(ele, objects))
         self.assertEqual(0, len(objects))
+
+
+class NodeParserTests(TestCase):
+    def test_parse_from_tree(self):
+        path = fixtures_dir.joinpath("books/books.xml")
+        tree = etree.parse(path.resolve().as_uri())
+
+        parser = NodeParser()
+        actual = parser.parse(tree, Books)
+        self.assertEqual(2, len(actual.book))
+
+        # The tree will not be modified
+        self.assertEqual(2, len(tree.getroot()))

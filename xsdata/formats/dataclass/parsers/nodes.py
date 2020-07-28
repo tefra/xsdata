@@ -1,14 +1,19 @@
-from copy import deepcopy
 from dataclasses import dataclass
+from dataclasses import field
 from dataclasses import fields
 from typing import Any
 from typing import Dict
+from typing import Iterable
 from typing import List
 from typing import Optional
 from typing import Tuple
 from typing import Type
+from typing import Union
 
+from lxml.etree import _Element
+from lxml.etree import _ElementTree
 from lxml.etree import Element
+from lxml.etree import iterwalk
 from lxml.etree import QName
 
 from xsdata.exceptions import ParserError
@@ -18,11 +23,15 @@ from xsdata.formats.dataclass.context import XmlContext
 from xsdata.formats.dataclass.models.elements import FindMode
 from xsdata.formats.dataclass.models.elements import XmlMeta
 from xsdata.formats.dataclass.models.elements import XmlVar
+from xsdata.formats.dataclass.models.generics import Namespaces
 from xsdata.formats.dataclass.parsers.config import ParserConfig
 from xsdata.formats.dataclass.parsers.utils import ParserUtils
 from xsdata.logger import logger
+from xsdata.models.enums import EventType
 
 Parsed = Tuple[Optional[QName], Any]
+ParsedObjects = List[Tuple[QName, Any]]
+XmlNodes = List["XmlNode"]
 
 
 @dataclass(frozen=True)
@@ -202,10 +211,15 @@ class UnionNode(XmlNode):
         :raise ParserError: When all attempts fail
         :return: A tuple of the object's qualified name and the new object.
         """
+
+        parent = element.getparent()
+        if parent is not None:
+            parent.remove(element)  # detach element from parent
+
         obj = None
         max_score = -1
         for clazz in self.var.types:
-            candidate = self.parse_class(deepcopy(element), clazz)
+            candidate = self.parse_class(element, clazz)
             score = self.score_object(candidate)
             if score > max_score:
                 max_score = score
@@ -219,9 +233,7 @@ class UnionNode(XmlNode):
     def parse_class(self, element: Element, clazz: Type[T]) -> Optional[T]:
         """Initialize a new XmlParser and try to parse the given element."""
         try:
-            from xsdata.formats.dataclass.parsers import XmlParser
-
-            parser = XmlParser(context=self.ctx)
+            parser = NodeParser(context=self.ctx)
             return parser.parse(element, clazz)
         except Exception:
             logger.debug(
@@ -283,3 +295,77 @@ class SkipNode(XmlNode):
     def parse_element(self, element: Element, objects: List[Any]) -> Parsed:
         """Skip parsing the current element."""
         return None, None
+
+
+@dataclass
+class NodeParser:
+    """
+    Xml parsing and binding for dataclasses.
+
+    :param config: Parser configuration
+    :param context: Model metadata builder
+    :param namespaces: Store the prefix/namespace as they are parsed.
+    :param event_names: Cache for event names for each element
+    """
+
+    config: ParserConfig = field(default_factory=ParserConfig)
+    context: XmlContext = field(default_factory=XmlContext)
+    namespaces: Namespaces = field(init=False, default_factory=Namespaces)
+
+    def parse(self, source: Union[_Element, _ElementTree], clazz: Type[T]) -> T:
+        events = EventType.START, EventType.END, EventType.START_NS
+        context = iterwalk(source, events=events)
+        return self.parse_context(context, clazz)
+
+    def parse_context(self, context: Iterable, clazz: Type[T]) -> T:
+        """
+        Dispatch elements to handlers as they arrive and are fully parsed.
+
+        :raises ParserError: When the requested type doesn't match the result object
+        """
+        obj = None
+        meta = self.context.build(clazz)
+        objects: ParsedObjects = []
+        queue: XmlNodes = [RootNode(position=0, meta=meta, config=self.config)]
+
+        self.namespaces.clear()
+
+        for event, element in context:
+            if event == EventType.START_NS:
+                self.add_namespace(element)
+            if event == EventType.START:
+                self.queue(element, queue, objects)
+            elif event == EventType.END:
+                obj = self.dequeue(element, queue, objects)
+
+        if not obj:
+            raise ParserError(f"Failed to create target class `{clazz.__name__}`")
+
+        return obj
+
+    def add_namespace(self, namespace: Tuple):
+        """Add the given namespace in the registry."""
+        prefix, uri = namespace
+        self.namespaces.add(uri, prefix)
+
+    def queue(self, element: Element, queue: XmlNodes, objects: ParsedObjects):
+        """Queue the next xml node for parsing based on the given element
+        qualified name."""
+        item = queue[-1]
+        position = len(objects)
+        queue.append(item.next_node(element, position, self.context))
+
+    def dequeue(self, element: Element, queue: XmlNodes, objects: ParsedObjects) -> Any:
+        """
+        Use the last xml node to parse the given element and bind any child
+        objects.
+
+        :return: Any: A dataclass instance or a python primitive value or None
+        """
+        item = queue.pop()
+        result = item.parse_element(element, objects)
+
+        if not isinstance(item, SkipNode):
+            objects.append(result)
+
+        return result[1]

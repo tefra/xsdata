@@ -60,7 +60,7 @@ class SchemaParserTests(TestCase):
 
     def test_start_schema(self):
         element = etree.Element("schema")
-        self.parser.start_schema(element, None)
+        self.parser.start_schema(element)
 
         self.assertIsNone(self.parser.element_form)
         self.assertIsNone(self.parser.attribute_form)
@@ -69,7 +69,7 @@ class SchemaParserTests(TestCase):
         element.set("elementFormDefault", "qualified")
         element.set("attributeFormDefault", "unqualified")
         element.set("defaultAttributes", "tns:attr")
-        self.parser.start_schema(element, None)
+        self.parser.start_schema(element)
 
         self.assertEqual("qualified", self.parser.element_form)
         self.assertEqual("unqualified", self.parser.attribute_form)

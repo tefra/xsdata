@@ -2,25 +2,19 @@ import sys
 from dataclasses import dataclass
 from dataclasses import field
 from typing import Any
-from typing import List
 from typing import Optional
-from typing import Tuple
-from typing import TypeVar
 from urllib.parse import urljoin
 
 from lxml.etree import Element
-from lxml.etree import QName
 
-from xsdata.formats.dataclass.parsers.nodes import XmlNode
+from xsdata.formats.bindings import T
+from xsdata.formats.dataclass.parsers.nodes import ParsedObjects
+from xsdata.formats.dataclass.parsers.nodes import XmlNodes
 from xsdata.formats.dataclass.parsers.xml import XmlParser
 from xsdata.models import xsd
 from xsdata.models.enums import FormType
 from xsdata.models.enums import Mode
 from xsdata.models.enums import Namespace
-
-T = TypeVar("T")
-ParsedObjects = List[Tuple[QName, Any]]
-XmlNodes = List[XmlNode]
 
 
 @dataclass
@@ -56,7 +50,7 @@ class SchemaParser(XmlParser):
 
         return obj
 
-    def start_schema(self, element: Element, item: XmlNode):
+    def start_schema(self, element: Element):
         """Collect the schema's default form for attributes and elements for
         later usage."""
 

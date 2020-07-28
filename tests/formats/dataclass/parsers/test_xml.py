@@ -5,6 +5,7 @@ from typing import List
 from unittest import mock
 from unittest.case import TestCase
 
+from lxml import etree
 from lxml.etree import Element
 from lxml.etree import QName
 
@@ -51,8 +52,7 @@ class XmlParserTests(TestCase):
         )
 
         objects = []
-        queue = []
-        queue.append(root_queue_item)
+        queue = [root_queue_item]
         self.parser.queue(element, queue, objects)
 
         self.assertEqual(2, len(queue))
@@ -60,7 +60,7 @@ class XmlParserTests(TestCase):
         self.assertEqual(primitive_node, queue[1])
 
         mock_emit_event.assert_called_once_with(
-            EventType.START, element.tag, item=root_queue_item, element=element
+            EventType.START, element.tag, element=element
         )
 
     @mock.patch.object(XmlParser, "emit_event")
@@ -78,13 +78,14 @@ class XmlParserTests(TestCase):
         self.assertEqual("result", result)
         self.assertEqual(0, len(queue))
         self.assertEqual(("q", result), objects[-1])
+        self.assertIsNone(element.text)  # element is cleared!
         mock_parse_element.assert_called_once_with(element, objects)
         mock_emit_event.assert_called_once_with(
             EventType.END, element.tag, obj=result, element=element
         )
 
     @mock.patch.object(XmlParser, "emit_event")
-    def test_dequeue_with_none_qname(self, mock_emit_event):
+    def test_dequeue_with_no_result(self, mock_emit_event):
         element = Element("author", nsmap={"prefix": "uri"})
         element.text = "foobar"
 
@@ -96,6 +97,7 @@ class XmlParserTests(TestCase):
         self.assertEqual(0, len(queue))
         self.assertEqual(0, len(objects))
         self.assertEqual(0, mock_emit_event.call_count)
+        self.assertEqual("foobar", element.text)  # no result, skip clear
 
     def test_emit_event(self):
         mock_func = mock.Mock()

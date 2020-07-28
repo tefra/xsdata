@@ -170,7 +170,7 @@ class XmlSerializer(AbstractSerializer):
     ):
         """Set the element's xsi:type if the given value is a derived
         instance."""
-        if not var.clazz or value.__class__ is var.clazz:
+        if not var.clazz or value.__class__ in var.types:
             return
 
         if self.context.is_derived(value, var.clazz):

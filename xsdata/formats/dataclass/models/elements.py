@@ -79,6 +79,10 @@ class XmlVar:
         return False
 
     @property
+    def is_clazz_union(self) -> bool:
+        return self.dataclass and len(self.types) > 1
+
+    @property
     def is_text(self) -> bool:
         """Return whether the field is a text element."""
         return False

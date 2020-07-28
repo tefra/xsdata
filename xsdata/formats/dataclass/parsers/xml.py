@@ -6,6 +6,8 @@ from typing import List
 from typing import Tuple
 from typing import Type
 
+from lxml.etree import _Element
+from lxml.etree import _ElementTree
 from lxml.etree import Element
 from lxml.etree import iterparse
 from lxml.etree import iterwalk
@@ -47,7 +49,9 @@ class XmlParser(AbstractParser):
         """Parse the XML input stream and return the resulting object tree."""
 
         events = EventType.START, EventType.END, EventType.START_NS
-        if self.config.process_xinclude:
+        if isinstance(source, (_Element, _ElementTree)):
+            ctx = iterwalk(source, events=events)
+        elif self.config.process_xinclude:
             tree = parse(source, base_url=self.config.base_url)  # nosec
             tree.xinclude()
             ctx = iterwalk(tree, events=events)
@@ -111,7 +115,8 @@ class XmlParser(AbstractParser):
             objects.append((qname, obj))
             self.emit_event(EventType.END, element.tag, obj=obj, element=element)
 
-        element.clear()
+        if obj:
+            element.clear()
 
         return obj
 

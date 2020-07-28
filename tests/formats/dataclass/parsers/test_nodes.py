@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from dataclasses import field
 from dataclasses import replace
 from typing import List
+from typing import Union
 from unittest import mock
 from unittest.case import TestCase
 
@@ -9,12 +10,12 @@ from lxml.etree import Element
 from lxml.etree import QName
 from lxml.etree import SubElement
 
+from xsdata.exceptions import ParserError
 from xsdata.exceptions import XmlContextError
 from xsdata.formats.dataclass.context import XmlContext
 from xsdata.formats.dataclass.models.elements import XmlElement
 from xsdata.formats.dataclass.models.elements import XmlMeta
 from xsdata.formats.dataclass.models.elements import XmlText
-from xsdata.formats.dataclass.models.elements import XmlVar
 from xsdata.formats.dataclass.models.elements import XmlWildcard
 from xsdata.formats.dataclass.models.generics import AnyElement
 from xsdata.formats.dataclass.parsers.config import ParserConfig
@@ -22,9 +23,13 @@ from xsdata.formats.dataclass.parsers.nodes import ElementNode
 from xsdata.formats.dataclass.parsers.nodes import PrimitiveNode
 from xsdata.formats.dataclass.parsers.nodes import RootNode
 from xsdata.formats.dataclass.parsers.nodes import SkipNode
+from xsdata.formats.dataclass.parsers.nodes import UnionNode
 from xsdata.formats.dataclass.parsers.nodes import WildcardNode
 from xsdata.formats.dataclass.parsers.nodes import XmlNode
 from xsdata.formats.dataclass.parsers.utils import ParserUtils
+from xsdata.models.mixins import array_element
+from xsdata.models.mixins import attribute
+from xsdata.models.mixins import element
 
 
 @dataclass
@@ -165,6 +170,29 @@ class ElementNodeTests(TestCase):
         self.assertIs(mock_ctx_fetch.return_value, actual.meta)
         mock_ctx_fetch.assert_called_once_with(var.clazz, namespace, xsi_type)
 
+    def test_next_node_when_given_qname_matches_var_clazz_union(self):
+        ele = Element("a")
+        ctx = XmlContext()
+        cfg = ParserConfig()
+        var = XmlElement(
+            name="a", qname=QName("a"), types=[Foo, FooMixed], dataclass=True
+        )
+        meta = XmlMeta(
+            name="foo",
+            clazz=None,
+            qname=QName("foo"),
+            source_qname=QName("foo"),
+            nillable=False,
+            vars=[var],
+        )
+        node = ElementNode(position=0, meta=meta, config=cfg)
+        actual = node.next_node(ele, 10, ctx)
+
+        self.assertIsInstance(actual, UnionNode)
+        self.assertEqual(10, actual.position)
+        self.assertIs(var, actual.var)
+        self.assertIs(ctx, actual.ctx)
+
     def test_next_node_when_given_qname_matches_any_element_var(self):
         ele = Element("a")
         ctx = XmlContext()
@@ -218,10 +246,10 @@ class ElementNodeTests(TestCase):
         )
         node = ElementNode(position=0, meta=meta, config=cfg)
 
-        with self.assertRaises(XmlContextError) as cm:
+        with self.assertRaises(ParserError) as cm:
             node.next_node(ele, 10, ctx)
 
-        self.assertEqual("foo does not support mixed content: nope", str(cm.exception))
+        self.assertEqual("Unknown property foo:nope", str(cm.exception))
 
     def test_next_node_when_config_fail_on_unknown_properties_is_false(self):
         ele = Element("nope")
@@ -289,6 +317,68 @@ class WildcardNodeTests(TestCase):
         self.assertIsInstance(actual, WildcardNode)
         self.assertEqual(10, actual.position)
         self.assertEqual(var, actual.var)
+
+
+class UnionNodeTests(TestCase):
+    def test_next_node(self):
+        ele = Element("foo")
+        ctx = XmlContext()
+        var = XmlText(name="foo", qname=QName("foo"))
+        node = UnionNode(position=0, var=var, ctx=ctx)
+        self.assertEqual(SkipNode(position=2), node.next_node(ele, 2, ctx))
+
+    def test_parse_element_returns_best_matching_dataclass(self):
+        root = Element("root")
+        item = SubElement(root, "item")
+        item.set("a", "1")
+        item.set("b", "2")
+        item.text = "foo"
+
+        @dataclass
+        class Item:
+            value: str = field()
+            a: int = attribute()
+            b: int = attribute()
+
+        @dataclass
+        class Item2:
+            a: int = attribute()
+
+        @dataclass
+        class Root:
+            item: Union[str, int, Item2, Item] = element()
+
+        ctx = XmlContext()
+        meta = ctx.build(Root)
+
+        node = UnionNode(position=0, var=meta.vars[0], ctx=ctx)
+        qname, obj = node.parse_element(item, [])
+        self.assertIsInstance(obj, Item)
+        self.assertEqual(1, obj.a)
+        self.assertEqual(2, obj.b)
+        self.assertEqual("foo", obj.value)
+
+    def test_parse_element_raises_parser_error_on_failure(self):
+        root = Element("root")
+        item = SubElement(root, "item")
+
+        @dataclass
+        class Item:
+            value: str = field()
+
+        @dataclass
+        class Root:
+            item: Union[int, Item] = element()
+
+        ctx = XmlContext()
+        meta = ctx.build(Root)
+
+        node = UnionNode(position=0, var=meta.vars[0], ctx=ctx)
+
+        with self.assertRaises(ParserError) as cm:
+            node.parse_element(item, [])
+
+        self.assertEqual("Failed to parse union node: item", str(cm.exception))
 
 
 class PrimitiveNodeTests(TestCase):

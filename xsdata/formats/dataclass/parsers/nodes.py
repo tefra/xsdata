@@ -1,19 +1,28 @@
+from copy import deepcopy
 from dataclasses import dataclass
+from dataclasses import fields
 from typing import Any
 from typing import Dict
 from typing import List
+from typing import Optional
 from typing import Tuple
+from typing import Type
 
 from lxml.etree import Element
 from lxml.etree import QName
 
+from xsdata.exceptions import ParserError
 from xsdata.exceptions import XmlContextError
+from xsdata.formats.bindings import T
 from xsdata.formats.dataclass.context import XmlContext
 from xsdata.formats.dataclass.models.elements import FindMode
 from xsdata.formats.dataclass.models.elements import XmlMeta
 from xsdata.formats.dataclass.models.elements import XmlVar
 from xsdata.formats.dataclass.parsers.config import ParserConfig
 from xsdata.formats.dataclass.parsers.utils import ParserUtils
+from xsdata.logger import logger
+
+Parsed = Tuple[Optional[QName], Any]
 
 
 @dataclass(frozen=True)
@@ -39,7 +48,7 @@ class XmlNode:
         """
         raise NotImplementedError("Not Implemented")
 
-    def parse_element(self, element: Element, objects: List[Any]) -> Tuple:
+    def parse_element(self, element: Element, objects: List[Any]) -> Parsed:
         """
         Parse the current element bind child objects and return the result.
 
@@ -65,7 +74,7 @@ class ElementNode(XmlNode):
     meta: XmlMeta
     config: ParserConfig
 
-    def parse_element(self, element: Element, objects: List[Any]) -> Tuple:
+    def parse_element(self, element: Element, objects: List[Any]) -> Parsed:
         """
         Parse the given element attributes/text, find all child objects and
         mixed content and initialize a new dataclass instance.
@@ -105,10 +114,11 @@ class ElementNode(XmlNode):
 
         if not var:
             if self.config.fail_on_unknown_properties:
-                raise XmlContextError(
-                    f"{self.meta.qname} does not support mixed content: {qname}"
-                )
+                raise ParserError(f"Unknown property {self.meta.qname}:{qname}")
             return SkipNode(position=position)
+
+        if var.is_clazz_union:
+            return UnionNode(position=position, var=var, ctx=ctx)
 
         if var.clazz:
             xsi_type = ParserUtils.parse_xsi_type(element)
@@ -145,7 +155,7 @@ class WildcardNode(XmlNode):
 
     var: XmlVar
 
-    def parse_element(self, element: Element, objects: List[Any]) -> Tuple:
+    def parse_element(self, element: Element, objects: List[Any]) -> Parsed:
         """
         Parse the given element attributes/text/tail, find all child objects
         and mixed content and initialize a new generic element instance.
@@ -169,6 +179,70 @@ class WildcardNode(XmlNode):
 
 
 @dataclass(frozen=True)
+class UnionNode(XmlNode):
+    """Union nodes are used for variables with more than one possible types
+    where at least one of them is a dataclass."""
+
+    var: XmlVar
+    ctx: XmlContext
+
+    def next_node(self, element: Element, position: int, ctx: XmlContext) -> XmlNode:
+        """Skip all child nodes as we are going to parse the complete element
+        tree."""
+        return SkipNode(position=position)
+
+    def parse_element(self, element: Element, objects: List[Any]) -> Parsed:
+        """
+        The handler will make multiple tries to bind the given element to one
+        of the available dataclass var types convert it to one of the available
+        primitive types.
+
+        The first shoe that fits wins!
+
+        :raise ParserError: When all attempts fail
+        :return: A tuple of the object's qualified name and the new object.
+        """
+        obj = None
+        max_score = -1
+        for clazz in self.var.types:
+            candidate = self.parse_class(deepcopy(element), clazz)
+            score = self.score_object(candidate)
+            if score > max_score:
+                max_score = score
+                obj = candidate
+
+        if obj:
+            return self.var.qname, obj
+
+        raise ParserError(f"Failed to parse union node: {self.var.qname}")
+
+    def parse_class(self, element: Element, clazz: Type[T]) -> Optional[T]:
+        """Initialize a new XmlParser and try to parse the given element."""
+        try:
+            from xsdata.formats.dataclass.parsers import XmlParser
+
+            parser = XmlParser(context=self.ctx)
+            return parser.parse(element, clazz)
+        except Exception:
+            logger.debug(
+                "Element %s does't match clazz %s",
+                element.tag,
+                clazz.__name__,
+                exc_info=True,
+            )
+        return None
+
+    @classmethod
+    def score_object(cls, obj: Any) -> int:
+        """Sum all not None field values for the given object."""
+        return (
+            sum(1 for var in fields(obj) if getattr(obj, var.name) is not None)
+            if obj
+            else -1
+        )
+
+
+@dataclass(frozen=True)
 class PrimitiveNode(XmlNode):
     """
     XmlNode for text elements with primitive values eg str, int, float.
@@ -178,7 +252,7 @@ class PrimitiveNode(XmlNode):
 
     var: XmlVar
 
-    def parse_element(self, element: Element, objects: List) -> Tuple:
+    def parse_element(self, element: Element, objects: List) -> Parsed:
         """
         Parse the given element text according to the node possible types.
 
@@ -199,16 +273,13 @@ class PrimitiveNode(XmlNode):
 
 @dataclass(frozen=True)
 class SkipNode(XmlNode):
-    """
-    This node is used by the parser to skip unknown elements and their
-    children.
-
-    The result of the next_node is always another SkipNode and the
-    result of parse_element is always a tuple of None values.
-    """
+    """The skip node should be used when we want to skip parsing child
+    elements."""
 
     def next_node(self, element: Element, position: int, ctx: XmlContext) -> XmlNode:
+        """Skip the current child."""
         return SkipNode(position=position)
 
-    def parse_element(self, element: Element, objects: List[Any]) -> Tuple:
+    def parse_element(self, element: Element, objects: List[Any]) -> Parsed:
+        """Skip parsing the current element."""
         return None, None

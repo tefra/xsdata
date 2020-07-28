@@ -5,6 +5,7 @@ from typing import List
 from unittest import mock
 from unittest.case import TestCase
 
+from lxml import etree
 from lxml.etree import Element
 from lxml.etree import QName
 
@@ -139,6 +140,14 @@ class XmlParserIntegrationTest(TestCase):
         actual = parser.from_path(path, Books)
         self.assertEqual(self.books, actual)
         self.assertEqual({"brk": "urn:books"}, parser.namespaces.ns_map)
+
+    def test_parse_from_tree(self):
+        path = fixtures_dir.joinpath("books/books.xml")
+        tree = etree.parse(path.resolve().as_uri())
+
+        parser = XmlParser()
+        actual = parser.parse(tree.getroot(), Books)
+        self.assertEqual(self.books, actual)
 
     def test_parse_with_process_xinclude_true(self):
         path = fixtures_dir.joinpath("books/books-xinclude.xml")

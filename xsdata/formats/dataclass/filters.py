@@ -135,6 +135,10 @@ def attribute_default(attr: Attr, ns_map: Optional[Dict] = None) -> Any:
         return "dict"
     if not isinstance(attr.default, str):
         return attr.default
+    if attr.default.startswith("@enum@"):
+        source, enumeration = attr.default[6:].split("::", 1)
+        source = next(x.alias for x in attr.types if x.name == source) or source
+        return f"{class_name(source)}.{constant_name(enumeration)}"
 
     data_types = {
         attr_type.native_code: attr_type.native_type
@@ -150,15 +154,6 @@ def attribute_default(attr: Attr, ns_map: Optional[Dict] = None) -> Any:
             default_value = quoteattr(
                 " ".join(filter(None, map(str.strip, re.split(r"\s+", default_value))))
             )
-        elif default_value.startswith("@enum@"):
-            source, enumeration = default_value[6:].split("::", 1)
-            attr_type = next(
-                attr_type for attr_type in attr.types if attr_type.name == source
-            )
-            if attr_type.alias:
-                source = attr_type.alias
-
-            default_value = f"{class_name(source)}.{constant_name(enumeration)}"
         else:
             default_value = quoteattr(default_value)
     elif isinstance(default_value, float) and math.isinf(default_value):

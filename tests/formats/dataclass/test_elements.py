@@ -123,6 +123,13 @@ class XmlAttributeTests(TestCase):
         self.assertIsInstance(var, XmlVar)
         self.assertTrue(var.is_attribute)
 
+    def test_property_is_tokens(self):
+        var = XmlAttribute(name="foo", qname=QName("foo"))
+        self.assertFalse(var.is_tokens)
+
+        var = XmlAttribute(name="foo", qname=QName("foo"), default=list)
+        self.assertTrue(var.is_tokens)
+
 
 class XmlAttributesTests(TestCase):
     def test_property_is_attributes(self):

@@ -21,7 +21,8 @@ class ElementBaseTests(TestCase):
         element = ElementBase()
         self.assertEqual("string", element.default_type)
 
-        element = ElementBase(ns_map={"xsd": Namespace.XS.uri})
+        element = ElementBase()
+        element.ns_map["xsd"] = Namespace.XS.uri
         self.assertEqual("xsd:string", element.default_type)
 
     def test_property_default_value(self):
@@ -170,7 +171,8 @@ class ElementBaseTests(TestCase):
 
         self.assertIsNone(element.schema_prefix())
 
-        element = ElementBase(ns_map=dict(a="b", c=Namespace.XS.uri))
+        element = ElementBase()
+        element.ns_map.update({"a": "b", "c": Namespace.XS.uri})
         self.assertEqual("c", element.schema_prefix())
 
 

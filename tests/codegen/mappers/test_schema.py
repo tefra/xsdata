@@ -138,7 +138,8 @@ class SchemaMapperTests(FactoryTestCase):
         mock_substitutions.return_value = ["foo", "sm:bar"]
         mock_element_namespace.return_value = "foo:name"
 
-        element = Element(ns_map={"sm": "sm_ns"})
+        element = Element()
+        element.ns_map["sm"] = "sm_ns"
         result = SchemaMapper.build_class(element, "container", "module", "target_ns")
 
         mock_build_class_attributes.assert_called_once_with(element, result)
@@ -214,10 +215,12 @@ class SchemaMapperTests(FactoryTestCase):
 
     def test_children_extensions(self):
         complex_type = ComplexType(
-            attributes=[Attribute(index=i) for i in range(2)],
-            simple_content=SimpleContent(restriction=Restriction(base="bk:b", index=4)),
-            complex_content=ComplexContent(extension=Extension(base="bk:c", index=7)),
+            attributes=[Attribute() for _ in range(2)],
+            simple_content=SimpleContent(restriction=Restriction(base="bk:b")),
+            complex_content=ComplexContent(extension=Extension(base="bk:c")),
         )
+        complex_type.simple_content.restriction.index = 4
+        complex_type.complex_content.extension.index = 7
 
         item = ClassFactory.create(ns_map={"bk": "book"})
         children = SchemaMapper.children_extensions(complex_type, item)
@@ -266,7 +269,9 @@ class SchemaMapperTests(FactoryTestCase):
         mock_element_namespace.return_value = "http://something/common"
         mock_get_restrictions.return_value = {"required": True}
 
-        attribute = Attribute(default="false", index=66, ns_map={"foo": "bar"})
+        attribute = Attribute(default="false")
+        attribute.index = 66
+        attribute.ns_map["foo"] = "bar"
 
         SchemaMapper.build_class_attribute(item, attribute, Restrictions())
         expected = AttrFactory.create(
@@ -294,7 +299,7 @@ class SchemaMapperTests(FactoryTestCase):
         mock_build_inner_classes.return_value = []
 
         item = ClassFactory.create()
-        attribute = Attribute(default="false", index=66)
+        attribute = Attribute(default="false")
         actual = SchemaMapper.build_class_attribute_types(item, attribute)
 
         expected = [AttrTypeFactory.xs_int(), AttrTypeFactory.xs_string()]
@@ -311,7 +316,7 @@ class SchemaMapperTests(FactoryTestCase):
         mock_build_inner_classes.return_value = [inner_class]
 
         item = ClassFactory.create()
-        attribute = Attribute(default="false", index=66)
+        attribute = Attribute(default="false")
         actual = SchemaMapper.build_class_attribute_types(item, attribute)
 
         expected = [
@@ -336,7 +341,7 @@ class SchemaMapperTests(FactoryTestCase):
         mock_default_type.return_value = "xs:string"
 
         item = ClassFactory.create()
-        attribute = Attribute(default="false", index=66, name="attr")
+        attribute = Attribute(default="false", name="attr")
         actual = SchemaMapper.build_class_attribute_types(item, attribute)
 
         self.assertEqual(1, len(actual))

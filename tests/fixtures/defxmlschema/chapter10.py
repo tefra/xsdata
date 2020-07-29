@@ -32,8 +32,8 @@ class SizesType:
             namespace="",
             min_occurs=0,
             max_occurs=9223372036854775807,
-            min_inclusive=2.0,
-            max_inclusive=18.0
+            min_inclusive=2,
+            max_inclusive=18
         )
     )
     small_size: List[SmallSizeType] = field(
@@ -54,8 +54,8 @@ class SizesType:
             namespace="",
             min_occurs=0,
             max_occurs=9223372036854775807,
-            min_inclusive=24.0,
-            max_inclusive=54.0
+            min_inclusive=24,
+            max_inclusive=54
         )
     )
     available_sizes: List[Union[int, "SizesType.Value"]] = field(
@@ -66,8 +66,8 @@ class SizesType:
             namespace="",
             min_occurs=0,
             max_occurs=9223372036854775807,
-            min_inclusive=2.0,
-            max_inclusive=18.0
+            min_inclusive=2,
+            max_inclusive=18
         )
     )
     applicable_sizes: List[Union[int, "SizesType.Value"]] = field(
@@ -78,8 +78,8 @@ class SizesType:
             namespace="",
             min_occurs=0,
             max_occurs=9223372036854775807,
-            min_inclusive=2.0,
-            max_inclusive=18.0
+            min_inclusive=2,
+            max_inclusive=18
         )
     )
 

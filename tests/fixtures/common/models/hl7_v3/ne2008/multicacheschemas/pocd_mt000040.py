@@ -184,7 +184,7 @@ class PocdMt000040InfrastructureRootTypeId:
         metadata=dict(
             type="Attribute",
             required=True,
-            min_length=1.0
+            min_length=1
         )
     )
     assigning_authority_name: Optional[str] = field(
@@ -192,7 +192,7 @@ class PocdMt000040InfrastructureRootTypeId:
         metadata=dict(
             name="assigningAuthorityName",
             type="Attribute",
-            min_length=1.0
+            min_length=1
         )
     )
     displayable: Optional[str] = field(

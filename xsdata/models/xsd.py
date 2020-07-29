@@ -656,7 +656,7 @@ class MaxExclusive(AnnotationBase):
     :param value: anySimpleType
     """
 
-    value: float = attribute()
+    value: str = attribute()
 
 
 @dataclass
@@ -667,7 +667,7 @@ class MaxInclusive(AnnotationBase):
     :param value: anySimpleType
     """
 
-    value: float = attribute()
+    value: str = attribute()
 
 
 @dataclass
@@ -678,7 +678,7 @@ class MaxLength(AnnotationBase):
     :param value: nonNegativeInteger
     """
 
-    value: float = attribute()
+    value: int = attribute()
 
 
 @dataclass
@@ -689,7 +689,7 @@ class MinExclusive(AnnotationBase):
     :param value: anySimpleType
     """
 
-    value: float = attribute()
+    value: str = attribute()
 
 
 @dataclass
@@ -700,7 +700,7 @@ class MinInclusive(AnnotationBase):
     :param value: anySimpleType
     """
 
-    value: float = attribute()
+    value: str = attribute()
 
 
 @dataclass
@@ -711,7 +711,7 @@ class MinLength(AnnotationBase):
     :param value: nonNegativeInteger
     """
 
-    value: float = attribute()
+    value: int = attribute()
 
 
 @dataclass

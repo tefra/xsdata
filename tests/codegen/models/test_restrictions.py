@@ -30,11 +30,11 @@ class RestrictionsTests(TestCase):
             prohibited=None,
             min_occurs=1,
             max_occurs=1,
-            min_exclusive=1.1,
-            min_inclusive=1,
+            min_exclusive="1.1",
+            min_inclusive="1",
             min_length=1,
-            max_exclusive=1,
-            max_inclusive=1.1,
+            max_exclusive="1",
+            max_inclusive="1.1",
             max_length=10,
             total_digits=333,
             fraction_digits=2,
@@ -49,12 +49,12 @@ class RestrictionsTests(TestCase):
             "explicit_timezone": "+1",
             "fraction_digits": 2,
             "length": 5,
-            "max_exclusive": 1,
-            "max_inclusive": 1.1,
+            "max_exclusive": "1",
+            "max_inclusive": "1.1",
             "max_length": 10,
             "max_occurs": 1,
-            "min_exclusive": 1.1,
-            "min_inclusive": 1,
+            "min_exclusive": "1.1",
+            "min_inclusive": "1",
             "min_length": 1,
             "min_occurs": 1,
             "nillable": True,
@@ -64,6 +64,47 @@ class RestrictionsTests(TestCase):
             "white_space": "collapse",
         }
         self.assertEqual(expected, restrictions.asdict())
+
+    def test_asdict_with_types(self):
+        restrictions = Restrictions(
+            required=True,
+            prohibited=None,
+            min_occurs=1,
+            max_occurs=1,
+            min_exclusive="1.1",
+            min_inclusive="1",
+            min_length=1,
+            max_exclusive="1",
+            max_inclusive="1.1",
+            max_length=10,
+            total_digits=333,
+            fraction_digits=2,
+            length=5,
+            white_space="collapse",
+            pattern=r"[A-Z]",
+            explicit_timezone="+1",
+            nillable=True,
+        )
+
+        expected = {
+            "explicit_timezone": "+1",
+            "fraction_digits": 2,
+            "length": 5,
+            "max_exclusive": 1.0,  # str -> float
+            "max_inclusive": 1.1,  # str -> float
+            "max_length": 10,
+            "max_occurs": 1,
+            "min_exclusive": 1.1,  # str -> float
+            "min_inclusive": 1.0,  # str -> float
+            "min_length": 1,
+            "min_occurs": 1,
+            "nillable": True,
+            "pattern": "[A-Z]",
+            "required": True,
+            "total_digits": 333,
+            "white_space": "collapse",
+        }
+        self.assertEqual(expected, restrictions.asdict(types=[float]))
 
     def test_clone(self):
         restrictions = Restrictions(max_occurs=2)

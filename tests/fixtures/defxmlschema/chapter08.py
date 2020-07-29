@@ -48,8 +48,8 @@ class SizesType:
             namespace="",
             min_occurs=0,
             max_occurs=9223372036854775807,
-            min_inclusive=2.0,
-            max_inclusive=18.0,
+            min_inclusive="2",
+            max_inclusive="18",
             pattern=r"\d{1,2}"
         )
     )
@@ -61,8 +61,8 @@ class SizesType:
             namespace="",
             min_occurs=0,
             max_occurs=9223372036854775807,
-            min_inclusive=8.0,
-            max_inclusive=12.0,
+            min_inclusive="8",
+            max_inclusive="12",
             pattern=r"\d{1,2}"
         )
     )
@@ -74,8 +74,8 @@ class SizesType:
             namespace="",
             min_occurs=0,
             max_occurs=9223372036854775807,
-            min_inclusive=2.0,
-            max_inclusive=6.0,
+            min_inclusive="2",
+            max_inclusive="6",
             pattern=r"\d{1}"
         )
     )

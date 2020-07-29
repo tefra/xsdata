@@ -2711,7 +2711,7 @@ class Ii(Any):
         default=None,
         metadata=dict(
             type="Attribute",
-            min_length=1.0
+            min_length=1
         )
     )
     assigning_authority_name: Optional[str] = field(
@@ -2719,7 +2719,7 @@ class Ii(Any):
         metadata=dict(
             name="assigningAuthorityName",
             type="Attribute",
-            min_length=1.0
+            min_length=1
         )
     )
     displayable: Optional[str] = field(
@@ -3351,7 +3351,7 @@ class ScExplicit:
         metadata=dict(
             name="codeSystemName",
             type="Attribute",
-            min_length=1.0
+            min_length=1
         )
     )
     code_system_version: Optional[str] = field(
@@ -3359,7 +3359,7 @@ class ScExplicit:
         metadata=dict(
             name="codeSystemVersion",
             type="Attribute",
-            min_length=1.0
+            min_length=1
         )
     )
     display_name: Optional[str] = field(
@@ -3367,7 +3367,7 @@ class ScExplicit:
         metadata=dict(
             name="displayName",
             type="Attribute",
-            min_length=1.0
+            min_length=1
         )
     )
 
@@ -3901,7 +3901,7 @@ class PqrExplicit:
         metadata=dict(
             name="codeSystemName",
             type="Attribute",
-            min_length=1.0
+            min_length=1
         )
     )
     code_system_version: Optional[str] = field(
@@ -3909,7 +3909,7 @@ class PqrExplicit:
         metadata=dict(
             name="codeSystemVersion",
             type="Attribute",
-            min_length=1.0
+            min_length=1
         )
     )
     display_name: Optional[str] = field(
@@ -3917,7 +3917,7 @@ class PqrExplicit:
         metadata=dict(
             name="displayName",
             type="Attribute",
-            min_length=1.0
+            min_length=1
         )
     )
     value: Optional[Decimal] = field(
@@ -4366,7 +4366,7 @@ class Cd(Any):
         metadata=dict(
             name="codeSystemName",
             type="Attribute",
-            min_length=1.0
+            min_length=1
         )
     )
     code_system_version: Optional[str] = field(
@@ -4374,7 +4374,7 @@ class Cd(Any):
         metadata=dict(
             name="codeSystemVersion",
             type="Attribute",
-            min_length=1.0
+            min_length=1
         )
     )
     display_name: Optional[str] = field(
@@ -4382,7 +4382,7 @@ class Cd(Any):
         metadata=dict(
             name="displayName",
             type="Attribute",
-            min_length=1.0
+            min_length=1
         )
     )
     value_set: Optional[str] = field(
@@ -4400,7 +4400,7 @@ class Cd(Any):
             name="valueSetVersion",
             type="Attribute",
             namespace="urn:hl7-org:sdtc",
-            min_length=1.0
+            min_length=1
         )
     )
 
@@ -4916,7 +4916,7 @@ class CdExplicit(Any):
         metadata=dict(
             name="codeSystemName",
             type="Attribute",
-            min_length=1.0
+            min_length=1
         )
     )
     code_system_version: Optional[str] = field(
@@ -4924,7 +4924,7 @@ class CdExplicit(Any):
         metadata=dict(
             name="codeSystemVersion",
             type="Attribute",
-            min_length=1.0
+            min_length=1
         )
     )
     display_name: Optional[str] = field(
@@ -4932,7 +4932,7 @@ class CdExplicit(Any):
         metadata=dict(
             name="displayName",
             type="Attribute",
-            min_length=1.0
+            min_length=1
         )
     )
     value_set: Optional[str] = field(
@@ -4950,7 +4950,7 @@ class CdExplicit(Any):
             name="valueSetVersion",
             type="Attribute",
             namespace="urn:hl7-org:sdtc",
-            min_length=1.0
+            min_length=1
         )
     )
 
@@ -5024,7 +5024,7 @@ class Ce:
         metadata=dict(
             name="codeSystemName",
             type="Attribute",
-            min_length=1.0
+            min_length=1
         )
     )
     code_system_version: Optional[str] = field(
@@ -5032,7 +5032,7 @@ class Ce:
         metadata=dict(
             name="codeSystemVersion",
             type="Attribute",
-            min_length=1.0
+            min_length=1
         )
     )
     display_name: Optional[str] = field(
@@ -5040,7 +5040,7 @@ class Ce:
         metadata=dict(
             name="displayName",
             type="Attribute",
-            min_length=1.0
+            min_length=1
         )
     )
     value_set: Optional[str] = field(
@@ -5058,7 +5058,7 @@ class Ce:
             name="valueSetVersion",
             type="Attribute",
             namespace="urn:hl7-org:sdtc",
-            min_length=1.0
+            min_length=1
         )
     )
 
@@ -5132,7 +5132,7 @@ class CeExplicit:
         metadata=dict(
             name="codeSystemName",
             type="Attribute",
-            min_length=1.0
+            min_length=1
         )
     )
     code_system_version: Optional[str] = field(
@@ -5140,7 +5140,7 @@ class CeExplicit:
         metadata=dict(
             name="codeSystemVersion",
             type="Attribute",
-            min_length=1.0
+            min_length=1
         )
     )
     display_name: Optional[str] = field(
@@ -5148,7 +5148,7 @@ class CeExplicit:
         metadata=dict(
             name="displayName",
             type="Attribute",
-            min_length=1.0
+            min_length=1
         )
     )
     value_set: Optional[str] = field(
@@ -5166,7 +5166,7 @@ class CeExplicit:
             name="valueSetVersion",
             type="Attribute",
             namespace="urn:hl7-org:sdtc",
-            min_length=1.0
+            min_length=1
         )
     )
 
@@ -5236,7 +5236,7 @@ class Cs:
         metadata=dict(
             name="codeSystemName",
             type="Attribute",
-            min_length=1.0
+            min_length=1
         )
     )
     code_system_version: Optional[str] = field(
@@ -5244,7 +5244,7 @@ class Cs:
         metadata=dict(
             name="codeSystemVersion",
             type="Attribute",
-            min_length=1.0
+            min_length=1
         )
     )
     display_name: Optional[str] = field(
@@ -5252,7 +5252,7 @@ class Cs:
         metadata=dict(
             name="displayName",
             type="Attribute",
-            min_length=1.0
+            min_length=1
         )
     )
     value_set: Optional[str] = field(
@@ -5270,7 +5270,7 @@ class Cs:
             name="valueSetVersion",
             type="Attribute",
             namespace="urn:hl7-org:sdtc",
-            min_length=1.0
+            min_length=1
         )
     )
 
@@ -5340,7 +5340,7 @@ class Cv:
         metadata=dict(
             name="codeSystemName",
             type="Attribute",
-            min_length=1.0
+            min_length=1
         )
     )
     code_system_version: Optional[str] = field(
@@ -5348,7 +5348,7 @@ class Cv:
         metadata=dict(
             name="codeSystemVersion",
             type="Attribute",
-            min_length=1.0
+            min_length=1
         )
     )
     display_name: Optional[str] = field(
@@ -5356,7 +5356,7 @@ class Cv:
         metadata=dict(
             name="displayName",
             type="Attribute",
-            min_length=1.0
+            min_length=1
         )
     )
     value_set: Optional[str] = field(
@@ -5374,7 +5374,7 @@ class Cv:
             name="valueSetVersion",
             type="Attribute",
             namespace="urn:hl7-org:sdtc",
-            min_length=1.0
+            min_length=1
         )
     )
 
@@ -5446,7 +5446,7 @@ class EivlEvent:
         metadata=dict(
             name="codeSystemName",
             type="Attribute",
-            min_length=1.0
+            min_length=1
         )
     )
     code_system_version: Optional[str] = field(
@@ -5454,7 +5454,7 @@ class EivlEvent:
         metadata=dict(
             name="codeSystemVersion",
             type="Attribute",
-            min_length=1.0
+            min_length=1
         )
     )
     display_name: Optional[str] = field(
@@ -5462,7 +5462,7 @@ class EivlEvent:
         metadata=dict(
             name="displayName",
             type="Attribute",
-            min_length=1.0
+            min_length=1
         )
     )
     value_set: Optional[str] = field(
@@ -5480,7 +5480,7 @@ class EivlEvent:
             name="valueSetVersion",
             type="Attribute",
             namespace="urn:hl7-org:sdtc",
-            min_length=1.0
+            min_length=1
         )
     )
 
@@ -5580,7 +5580,7 @@ class Sc(St):
         metadata=dict(
             name="codeSystemName",
             type="Attribute",
-            min_length=1.0
+            min_length=1
         )
     )
     code_system_version: Optional[str] = field(
@@ -5588,7 +5588,7 @@ class Sc(St):
         metadata=dict(
             name="codeSystemVersion",
             type="Attribute",
-            min_length=1.0
+            min_length=1
         )
     )
     display_name: Optional[str] = field(
@@ -5596,7 +5596,7 @@ class Sc(St):
         metadata=dict(
             name="displayName",
             type="Attribute",
-            min_length=1.0
+            min_length=1
         )
     )
 

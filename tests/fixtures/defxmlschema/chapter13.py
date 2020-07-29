@@ -111,8 +111,8 @@ class SmallSizeType:
     value: Optional[int] = field(
         default=None,
         metadata=dict(
-            min_inclusive=2.0,
-            max_inclusive=6.0
+            min_inclusive=2,
+            max_inclusive=6
         )
     )
     system: Optional[str] = field(

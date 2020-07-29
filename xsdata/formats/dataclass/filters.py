@@ -54,12 +54,14 @@ def attribute_metadata(attr: Attr, parent_namespace: Optional[str]) -> Dict:
     if parent_namespace != attr.namespace or attr.is_attribute:
         namespace = attr.namespace
 
+    types = list({type.native_type for type in attr.types if type.native})
+
     metadata = dict(
         name=name,
         type=attr.xml_type,
         namespace=namespace,
         mixed=attr.mixed,
-        **attr.restrictions.asdict(),
+        **attr.restrictions.asdict(types),
     )
 
     return {

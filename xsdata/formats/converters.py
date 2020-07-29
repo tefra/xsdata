@@ -2,6 +2,7 @@ import contextlib
 import math
 from dataclasses import is_dataclass
 from decimal import Decimal
+from decimal import InvalidOperation
 from enum import Enum
 from typing import Any
 from typing import Callable
@@ -18,7 +19,7 @@ from xsdata.utils import text
 
 
 def sort_types(types: List[Type]) -> List[Type]:
-    in_order = (bool, int, str, float, Decimal)
+    in_order = (bool, int, float, Decimal, str)
 
     sorted_types = []
     for ordered in in_order:
@@ -41,7 +42,7 @@ def to_python(
         types = sort_types(list(types))
 
     for clazz in types:
-        with contextlib.suppress(ValueError):
+        with contextlib.suppress(ValueError, InvalidOperation):
             func = func_map.get(clazz.__name__)
             return func(value) if func else to_class(clazz, value, ns_map)
 
@@ -57,18 +58,18 @@ def to_qname(value: str, ns_map: Optional[Dict]) -> QName:
     return QName(namespace, suffix)
 
 
-def to_class(clazz: Any, value: Any, ns_map: Optional[Dict]) -> Any:
+def to_class(clazz: Any, value: str, ns_map: Optional[Dict]) -> Any:
     if clazz is QName:
-        return to_qname(value, ns_map)
+        return to_qname(value.strip(), ns_map)
     if issubclass(clazz, Enum):
-        return to_enum(clazz, value, ns_map)
+        return to_enum(clazz, value.strip(), ns_map)
     if is_dataclass(clazz):
         return clazz(value)
 
     raise ConverterError(f"Unhandled class type {clazz.__name__}")
 
 
-def to_enum(clazz: Type[Enum], value: Any, ns_map: Optional[Dict]) -> Enum:
+def to_enum(clazz: Type[Enum], value: str, ns_map: Optional[Dict]) -> Enum:
     enumeration: Enum = list(clazz)[0]
 
     if isinstance(enumeration.value, QName):

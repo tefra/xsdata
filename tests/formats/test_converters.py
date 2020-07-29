@@ -52,12 +52,18 @@ class ConvertersTestCases(TestCase):
         self.assertEqual("a", to_python("a", [int]))
 
     def test_to_python_float(self):
-        """str > float in the ordering for now :("""
         self.assertEqual(1.0, to_python("1", [float]))
         self.assertEqual(1.0, to_python("1", [float, str]))
         self.assertEqual("1", to_python("1", [str, float]))
-        self.assertEqual("1", to_python("1", [str, float], in_order=False))
+        self.assertEqual(1.0, to_python("1", [str, float], in_order=False))
         self.assertEqual("a", to_python("a", [float]))
+
+    def test_to_python_decimal(self):
+        self.assertEqual(1.0, to_python("1", [Decimal]))
+        self.assertEqual(1.0, to_python("1", [Decimal, str]))
+        self.assertEqual("1", to_python("1", [str, Decimal]))
+        self.assertEqual(1.0, to_python("1", [str, Decimal], in_order=False))
+        self.assertEqual("a", to_python("a", [Decimal]))
 
     def test_to_python_boolean(self):
         """str > float in the ordering for now :("""
@@ -105,6 +111,4 @@ class ConvertersTestCases(TestCase):
         self.assertEqual(Foo("1"), to_python("1", [Foo], in_order=False))
 
     def test_to_python_unhandled_type(self):
-        types = [int, QName]
-
-        self.assertEqual("1.0", to_python("1.0", types))
+        self.assertEqual("1", to_python("1", [object]))

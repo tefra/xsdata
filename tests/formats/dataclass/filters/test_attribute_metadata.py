@@ -1,5 +1,3 @@
-from unittest import TestCase
-
 from tests.factories import AttrFactory
 from tests.factories import FactoryTestCase
 from xsdata.formats.dataclass.filters import attribute_metadata

@@ -1,7 +1,6 @@
 from unittest import TestCase
 
 from xsdata.exceptions import SchemaValueError
-from xsdata.models.enums import DataType
 from xsdata.models.enums import Namespace
 from xsdata.models.xsd import Alternative
 from xsdata.models.xsd import ComplexType

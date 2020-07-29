@@ -1,8 +1,6 @@
-from pathlib import Path
 from typing import Iterator
 from unittest import TestCase
 
-from xsdata.exceptions import SchemaValueError
 from xsdata.models.xsd import Import
 from xsdata.models.xsd import Include
 from xsdata.models.xsd import Override

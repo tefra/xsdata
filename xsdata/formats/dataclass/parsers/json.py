@@ -83,7 +83,7 @@ class JsonParser(AbstractParser):
             )
 
         return ParserUtils.parse_value(
-            var.types, value, var.default, tokens=var.is_tokens
+            value, var.types, var.default, tokens=var.is_tokens
         )
 
     @staticmethod

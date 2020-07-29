@@ -45,67 +45,66 @@ class ConvertersTestCases(TestCase):
             to_xml(BookForm())
 
     def test_to_python_integer(self):
-        self.assertEqual(1, to_python([int], "1"))
-        self.assertEqual(1, to_python([int, str], "1"))
-        self.assertEqual("1", to_python([str, int], "1"))
-        self.assertEqual(1, to_python([str, int], "1", in_order=False))
-        self.assertEqual("a", to_python([int], "a"))
+        self.assertEqual(1, to_python("1", [int]))
+        self.assertEqual(1, to_python("1", [int, str]))
+        self.assertEqual("1", to_python("1", [str, int]))
+        self.assertEqual(1, to_python("1", [str, int], in_order=False))
+        self.assertEqual("a", to_python("a", [int]))
 
     def test_to_python_float(self):
         """str > float in the ordering for now :("""
-        self.assertEqual(1.0, to_python([float], "1"))
-        self.assertEqual(1.0, to_python([float, str], "1"))
-        self.assertEqual("1", to_python([str, float], "1"))
-        self.assertEqual("1", to_python([str, float], "1", in_order=False))
-        self.assertEqual("a", to_python([float], "a"))
+        self.assertEqual(1.0, to_python("1", [float]))
+        self.assertEqual(1.0, to_python("1", [float, str]))
+        self.assertEqual("1", to_python("1", [str, float]))
+        self.assertEqual("1", to_python("1", [str, float], in_order=False))
+        self.assertEqual("a", to_python("a", [float]))
 
     def test_to_python_boolean(self):
         """str > float in the ordering for now :("""
         for val in ("1", "true"):
-            self.assertEqual(True, to_python([bool], val))
-            self.assertEqual(True, to_python([bool, str], val))
-            self.assertEqual(val, to_python([str, bool], val))
-            self.assertEqual(True, to_python([str, bool], val, in_order=False))
+            self.assertEqual(True, to_python(val, [bool]))
+            self.assertEqual(True, to_python(val, [bool, str]))
+            self.assertEqual(val, to_python(val, [str, bool]))
+            self.assertEqual(True, to_python(val, [str, bool], in_order=False))
 
         for val in ("0", "false"):
-            self.assertEqual(False, to_python([bool], val))
-            self.assertEqual(False, to_python([bool, str], val))
-            self.assertEqual(val, to_python([str, bool], val))
-            self.assertEqual(False, to_python([str, bool], val, in_order=False))
+            self.assertEqual(False, to_python(val, [bool]))
+            self.assertEqual(False, to_python(val, [bool, str]))
+            self.assertEqual(val, to_python(val, [str, bool]))
+            self.assertEqual(False, to_python(val, [str, bool], in_order=False))
 
-        self.assertEqual("a", to_python([bool], "a"))
-        self.assertEqual(True, to_python([bool], "1 "))
-        self.assertEqual(False, to_python([bool], "false "))
+        self.assertEqual("a", to_python("a", [bool]))
+        self.assertEqual(True, to_python("1 ", [bool]))
+        self.assertEqual(False, to_python("false ", [bool]))
 
     def test_to_python_enum(self):
         class QNameType(Enum):
             a = QName("a")
             b = QName("b")
 
-        self.assertEqual(UseType.OPTIONAL, to_python([UseType], "optional"))
-        self.assertEqual("optional", to_python([str, UseType], "optional"))
+        self.assertEqual(UseType.OPTIONAL, to_python("optional", [UseType]))
+        self.assertEqual("optional", to_python("optional", [str, UseType]))
         self.assertEqual(
-            UseType.OPTIONAL, to_python([str, UseType], "optional", in_order=False)
+            UseType.OPTIONAL, to_python("optional", [str, UseType], in_order=False)
         )
-        self.assertEqual(QNameType.a, to_python([QNameType], "a"))
+        self.assertEqual(QNameType.a, to_python("a", [QNameType]))
 
     def test_to_python_qname(self):
         ns_map = {"foo": "bar"}
-        self.assertIsNone(to_python([QName], None, ns_map))
-        self.assertEqual(QName("bar", "x"), to_python([QName], "foo:x", ns_map))
-        self.assertEqual(QName("bar"), to_python([QName], "bar", None))
+        self.assertIsNone(to_python(None, [QName], ns_map))
+        self.assertEqual(QName("bar", "x"), to_python("foo:x", [QName], ns_map))
+        self.assertEqual(QName("bar"), to_python("bar", [QName], None))
 
     def test_to_python_single_value_dataclass(self):
         @dataclass
         class Foo:
             value: int
 
-        self.assertEqual(Foo("1"), to_python([Foo], "1"))
-        self.assertEqual(1.0, to_python([float, UseType], "1"))
-        self.assertEqual(Foo("1"), to_python([Foo], "1", in_order=False))
+        self.assertEqual(Foo("1"), to_python("1", [Foo]))
+        self.assertEqual(1.0, to_python("1", [float, UseType]))
+        self.assertEqual(Foo("1"), to_python("1", [Foo], in_order=False))
 
     def test_to_python_unhandled_type(self):
-        class Foo:
-            pass
+        types = [int, QName]
 
-        self.assertEqual("1", to_python([Foo], "1"))
+        self.assertEqual("1.0", to_python("1.0", types))

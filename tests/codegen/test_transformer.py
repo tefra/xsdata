@@ -9,7 +9,6 @@ from xsdata.codegen.mappers.schema import SchemaMapper
 from xsdata.codegen.parsers import DefinitionsParser
 from xsdata.codegen.transformer import SchemaTransformer
 from xsdata.codegen.writer import CodeWriter
-from xsdata.exceptions import CodeGenerationError
 from xsdata.models.enums import Namespace
 from xsdata.models.wsdl import Definitions
 from xsdata.models.wsdl import Types

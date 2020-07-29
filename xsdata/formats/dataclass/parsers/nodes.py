@@ -274,7 +274,7 @@ class PrimitiveNode(XmlNode):
         value = element.text
         ns_map = element.nsmap
         obj = ParserUtils.parse_value(
-            self.var.types, value, self.var.default, ns_map, self.var.is_tokens
+            value, self.var.types, self.var.default, ns_map, self.var.is_tokens
         )
 
         return qname, obj

@@ -143,7 +143,7 @@ def attribute_default(attr: Attr, ns_map: Optional[Dict] = None) -> Any:
     }
 
     local_types = list(set(data_types.values()))
-    default_value = to_python(local_types, attr.default, ns_map, in_order=False)
+    default_value = to_python(attr.default, local_types, ns_map, in_order=False)
 
     if isinstance(default_value, str):
         if DataType.NMTOKENS.code in data_types:

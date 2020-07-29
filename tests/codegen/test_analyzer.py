@@ -10,8 +10,6 @@ from xsdata.codegen.models import Class
 from xsdata.codegen.sanitizer import ClassSanitizer
 from xsdata.codegen.validator import ClassValidator
 from xsdata.exceptions import AnalyzerValueError
-from xsdata.models.xsd import ComplexType
-from xsdata.models.xsd import Element
 from xsdata.models.xsd import SimpleType
 
 

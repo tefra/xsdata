@@ -1,3 +1,4 @@
+import contextlib
 import math
 from dataclasses import is_dataclass
 from decimal import Decimal
@@ -30,8 +31,9 @@ def sort_types(types: List[Type]) -> List[Type]:
 
 
 def to_python(
-    types: List[Type], value: Any, ns_map: Optional[Dict] = None, in_order: bool = True
+    value: Any, types: List[Type], ns_map: Optional[Dict] = None, in_order: bool = True
 ) -> Any:
+
     if not isinstance(value, str):
         return value
 
@@ -39,13 +41,9 @@ def to_python(
         types = sort_types(list(types))
 
     for clazz in types:
-        try:
-            if clazz.__name__ in func_map:
-                return func_map[clazz.__name__](value)
-
-            return to_class(clazz, value, ns_map)
-        except ValueError:
-            pass
+        with contextlib.suppress(ValueError):
+            func = func_map.get(clazz.__name__)
+            return func(value) if func else to_class(clazz, value, ns_map)
 
     return value
 

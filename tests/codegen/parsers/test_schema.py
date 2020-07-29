@@ -6,7 +6,6 @@ from unittest import TestCase
 from lxml import etree
 
 from xsdata.codegen.parsers.schema import SchemaParser
-from xsdata.formats.dataclass.parsers.nodes import SkipNode
 from xsdata.models.enums import FormType
 from xsdata.models.enums import Mode
 from xsdata.models.enums import Namespace

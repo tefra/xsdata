@@ -9,7 +9,6 @@ from typing import Type
 from lxml.etree import Element
 from lxml.etree import QName
 
-from xsdata.exceptions import ParserError
 from xsdata.formats.converters import to_python
 from xsdata.formats.dataclass.models.elements import FindMode
 from xsdata.formats.dataclass.models.elements import XmlMeta
@@ -26,7 +25,7 @@ class ParserUtils:
         """Parse the elements xsi:type attribute if present."""
         xsi_type = element.attrib.get(QNames.XSI_TYPE)
         return (
-            cls.parse_value([QName], xsi_type, None, element.nsmap)
+            cls.parse_value(xsi_type, [QName], None, element.nsmap)
             if xsi_type
             else None
         )
@@ -34,8 +33,8 @@ class ParserUtils:
     @classmethod
     def parse_value(
         cls,
-        types: List[Type],
         value: Any,
+        types: List[Type],
         default: Any = None,
         ns_map: Optional[Dict] = None,
         tokens: bool = False,
@@ -47,9 +46,9 @@ class ParserUtils:
 
         if tokens:
             value = value if isinstance(value, list) else value.split()
-            return list(map(lambda x: to_python(types, x, ns_map), value))
+            return [to_python(val, types, ns_map) for val in value]
 
-        return to_python(types, value, ns_map)
+        return to_python(value, types, ns_map)
 
     @classmethod
     def bind_element_children(
@@ -64,8 +63,7 @@ class ParserUtils:
                 qname, FindMode.WILDCARD
             )
 
-            if not arg:
-                raise ParserError("Impossible exception!")
+            assert arg is not None
 
             if not arg.init:
                 continue
@@ -229,7 +227,7 @@ class ParserUtils:
 
         if var and element.text is not None and len(element) == 0 and var.init:
             params[var.name] = cls.parse_value(
-                var.types, element.text, var.default, element.nsmap, var.is_tokens
+                element.text, var.types, var.default, element.nsmap, var.is_tokens
             )
         elif wildcard:
             cls.bind_wildcard_text(params, wildcard, element)
@@ -244,17 +242,17 @@ class ParserUtils:
             return
 
         wildcard = metadata.find_var(mode=FindMode.ATTRIBUTES)
+        if wildcard:
+            params[wildcard.name] = {}
+
         for key, value in element.attrib.items():
             var = metadata.find_var(QName(key), FindMode.ATTRIBUTE)
-
             if var and var.name not in params:
                 if var.init:
                     params[var.name] = cls.parse_value(
-                        var.types, value, var.default, element.nsmap, var.is_tokens
+                        value, var.types, var.default, element.nsmap, var.is_tokens
                     )
             elif wildcard:
-                if wildcard.name not in params:
-                    params[wildcard.name] = {}
                 params[wildcard.name][key] = value
 
     @classmethod

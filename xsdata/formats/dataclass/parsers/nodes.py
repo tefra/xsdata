@@ -26,7 +26,6 @@ from xsdata.formats.dataclass.models.elements import XmlVar
 from xsdata.formats.dataclass.models.generics import Namespaces
 from xsdata.formats.dataclass.parsers.config import ParserConfig
 from xsdata.formats.dataclass.parsers.utils import ParserUtils
-from xsdata.logger import logger
 from xsdata.models.enums import EventType
 
 Parsed = Tuple[Optional[QName], Any]
@@ -236,13 +235,7 @@ class UnionNode(XmlNode):
             parser = NodeParser(context=self.ctx)
             return parser.parse(element, clazz)
         except Exception:
-            logger.debug(
-                "Element %s does't match clazz %s",
-                element.tag,
-                clazz.__name__,
-                exc_info=True,
-            )
-        return None
+            return None
 
     @classmethod
     def score_object(cls, obj: Any) -> int:
@@ -274,7 +267,7 @@ class PrimitiveNode(XmlNode):
         value = element.text
         ns_map = element.nsmap
         obj = ParserUtils.parse_value(
-            self.var.types, value, self.var.default, ns_map, self.var.is_tokens
+            value, self.var.types, self.var.default, ns_map, self.var.is_tokens
         )
 
         return qname, obj

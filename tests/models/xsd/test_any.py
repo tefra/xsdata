@@ -1,6 +1,5 @@
 from unittest import TestCase
 
-from xsdata.exceptions import SchemaValueError
 from xsdata.models.enums import Namespace
 from xsdata.models.enums import NamespaceType
 from xsdata.models.xsd import Any
@@ -11,7 +10,8 @@ class AnyTests(TestCase):
         self.assertTrue(Any().is_attribute)
 
     def test_property_real_type(self):
-        obj = Any(ns_map={"xs": Namespace.XS.uri})
+        obj = Any()
+        obj.ns_map["xs"] = Namespace.XS.uri
         self.assertEqual("xs:object", obj.real_type)
 
     def test_property_raw_namespace(self):

@@ -32,8 +32,8 @@ class ElementBase:
     :param ns_map: Namespaces map to prefixes.
     """
 
-    index: int = field(default_factory=int)
-    ns_map: Dict = field(default_factory=dict)
+    index: int = field(default_factory=int, init=False)
+    ns_map: Dict = field(default_factory=dict, init=False)
 
     @property
     def class_name(self) -> str:

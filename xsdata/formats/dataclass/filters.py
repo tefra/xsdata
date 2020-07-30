@@ -54,12 +54,14 @@ def attribute_metadata(attr: Attr, parent_namespace: Optional[str]) -> Dict:
     if parent_namespace != attr.namespace or attr.is_attribute:
         namespace = attr.namespace
 
+    types = list({type.native_type for type in attr.types if type.native})
+
     metadata = dict(
         name=name,
         type=attr.xml_type,
         namespace=namespace,
         mixed=attr.mixed,
-        **attr.restrictions.asdict(),
+        **attr.restrictions.asdict(types),
     )
 
     return {
@@ -135,6 +137,10 @@ def attribute_default(attr: Attr, ns_map: Optional[Dict] = None) -> Any:
         return "dict"
     if not isinstance(attr.default, str):
         return attr.default
+    if attr.default.startswith("@enum@"):
+        source, enumeration = attr.default[6:].split("::", 1)
+        source = next(x.alias or source for x in attr.types if x.name == source)
+        return f"{class_name(source)}.{constant_name(enumeration)}"
 
     data_types = {
         attr_type.native_code: attr_type.native_type
@@ -143,22 +149,13 @@ def attribute_default(attr: Attr, ns_map: Optional[Dict] = None) -> Any:
     }
 
     local_types = list(set(data_types.values()))
-    default_value = to_python(local_types, attr.default, ns_map, in_order=False)
+    default_value = to_python(attr.default, local_types, ns_map, in_order=False)
 
     if isinstance(default_value, str):
         if DataType.NMTOKENS.code in data_types:
             default_value = quoteattr(
                 " ".join(filter(None, map(str.strip, re.split(r"\s+", default_value))))
             )
-        elif default_value.startswith("@enum@"):
-            source, enumeration = default_value[6:].split("::", 1)
-            attr_type = next(
-                attr_type for attr_type in attr.types if attr_type.name == source
-            )
-            if attr_type.alias:
-                source = attr_type.alias
-
-            default_value = f"{class_name(source)}.{constant_name(enumeration)}"
         else:
             default_value = quoteattr(default_value)
     elif isinstance(default_value, float) and math.isinf(default_value):

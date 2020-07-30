@@ -13,6 +13,7 @@ from typing import Type
 
 from lxml.etree import QName
 
+from xsdata.formats.converters import to_python
 from xsdata.formats.dataclass.models.constants import XmlType
 from xsdata.models.enums import DataType
 from xsdata.models.enums import QNames
@@ -62,12 +63,12 @@ class Restrictions:
     prohibited: Optional[bool] = field(default=None)
     min_occurs: Optional[int] = field(default=None)
     max_occurs: Optional[int] = field(default=None)
-    min_exclusive: Optional[float] = field(default=None)
-    min_inclusive: Optional[float] = field(default=None)
-    min_length: Optional[float] = field(default=None)
-    max_exclusive: Optional[float] = field(default=None)
-    max_inclusive: Optional[float] = field(default=None)
-    max_length: Optional[float] = field(default=None)
+    min_exclusive: Optional[str] = field(default=None)
+    min_inclusive: Optional[str] = field(default=None)
+    min_length: Optional[int] = field(default=None)
+    max_exclusive: Optional[str] = field(default=None)
+    max_inclusive: Optional[str] = field(default=None)
+    max_length: Optional[int] = field(default=None)
     total_digits: Optional[int] = field(default=None)
     fraction_digits: Optional[int] = field(default=None)
     length: Optional[int] = field(default=None)
@@ -130,9 +131,20 @@ class Restrictions:
         if self.max_occurs is None or (max_occurs is not None and max_occurs != 1):
             self.max_occurs = max_occurs
 
-    def asdict(self) -> Dict:
-        """Return the initialized only properties as a dictionary."""
-        return {k: v for k, v in asdict(self).items() if v is not None}
+    def asdict(self, types: Optional[List[Type]] = None) -> Dict:
+        """
+        Return the initialized only properties as a dictionary.
+
+        Optionally convert min/max inclusive/exclusive values by
+        providing the parent attribute types.
+        """
+
+        def clean(key: str, value: Any) -> Any:
+            if types and key.endswith("clusive"):
+                return to_python(value, types, in_order=False)
+            return value
+
+        return {k: clean(k, v) for k, v in asdict(self).items() if v is not None}
 
     def clone(self) -> "Restrictions":
         """Return a deep cloned instance."""

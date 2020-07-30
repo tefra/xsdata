@@ -6,6 +6,10 @@ class ConverterError(ValueError):
     """Converting values between document/python types related errors."""
 
 
+class ConverterWarning(Warning):
+    """Converting values between document/python types recovered errors."""
+
+
 class ParserError(ValueError):
     """Parsing related errors."""
 

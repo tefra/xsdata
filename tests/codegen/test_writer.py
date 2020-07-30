@@ -4,7 +4,6 @@ from tempfile import TemporaryDirectory
 from typing import Iterator
 from typing import List
 from typing import Optional
-from typing import Tuple
 from unittest import mock
 
 from lxml.etree import QName

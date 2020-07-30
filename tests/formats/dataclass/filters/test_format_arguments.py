@@ -1,10 +1,6 @@
 from unittest import TestCase
 
-from tests.factories import AttrFactory
-from tests.factories import FactoryTestCase
-from xsdata.formats.dataclass.filters import attribute_metadata
 from xsdata.formats.dataclass.filters import format_arguments
-from xsdata.models.enums import Tag
 
 
 class AttributeMetadataTests(TestCase):

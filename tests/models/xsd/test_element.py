@@ -1,7 +1,6 @@
 from unittest import TestCase
 
 from xsdata.exceptions import SchemaValueError
-from xsdata.models.enums import DataType
 from xsdata.models.enums import Namespace
 from xsdata.models.xsd import Alternative
 from xsdata.models.xsd import ComplexType
@@ -20,11 +19,13 @@ class ElementTests(TestCase):
         obj = Element()
         self.assertEqual("anyType", obj.default_type)
 
-        obj = Element(ns_map={"foo": Namespace.XS.uri})
+        obj = Element()
+        obj.ns_map["foo"] = Namespace.XS.uri
         self.assertEqual("foo:anyType", obj.default_type)
 
     def test_property_raw_type(self):
-        obj = Element(ns_map={"xs": Namespace.XS.uri})
+        obj = Element()
+        obj.ns_map["xs"] = Namespace.XS.uri
         self.assertEqual("xs:anyType", obj.raw_type)
 
         obj.type = "foo"

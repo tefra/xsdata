@@ -1,4 +1,3 @@
-import inspect
 import sys
 
 from lxml.etree import QName
@@ -8,7 +7,6 @@ from tests.factories import AttrTypeFactory
 from tests.factories import ClassFactory
 from tests.factories import ExtensionFactory
 from tests.factories import FactoryTestCase
-from xsdata.codegen.models import Class
 from xsdata.models import wsdl
 from xsdata.models import xsd
 from xsdata.models.enums import Namespace

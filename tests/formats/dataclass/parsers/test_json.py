@@ -1,43 +1,21 @@
-import json
 from unittest.case import TestCase
 
 from lxml.etree import QName
 
+from tests import fixtures_dir
 from tests.fixtures.books import BookForm
 from tests.fixtures.books import Books
+from xsdata.exceptions import ParserError
 from xsdata.formats.dataclass.models.elements import XmlElement
 from xsdata.formats.dataclass.models.elements import XmlText
 from xsdata.formats.dataclass.parsers.json import JsonParser
 
 
 class JsonParserTests(TestCase):
-    def setUp(self):
-        self.data = {
-            "book": [
-                {
-                    "author": "Hightower, Kim",
-                    "title": "The First Book",
-                    "genre": "Fiction",
-                    "price": 44.95,
-                    "pub_date": "2000-10-01",
-                    "review": "An amazing story of nothing.",
-                    "id": "bk001",
-                },
-                {
-                    "author": "Nagata, Suanne",
-                    "title": "Becoming Somebody",
-                    "genre": "Biography",
-                    "price": None,
-                    "pub_date": None,
-                    "review": "A masterpiece of the fine art of gossiping.",
-                    "id": "bk002",
-                },
-            ]
-        }
-
     def test_parser(self):
+        path = fixtures_dir.joinpath("books/books.json")
         parser = JsonParser()
-        books = parser.from_string(json.dumps(self.data), Books)
+        books = parser.from_path(path, Books)
 
         self.assertIsInstance(books, Books)
 

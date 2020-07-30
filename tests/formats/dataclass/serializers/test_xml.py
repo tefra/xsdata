@@ -430,9 +430,11 @@ class XmlSerializerTests(TestCase):
             x2: List[int] = field(
                 default_factory=list, metadata=dict(type="Element", sequential=True)
             )
-            x3: Optional[int] = field(default=None)
+            x3: List[int] = field(
+                default_factory=list, metadata=dict(type="Element", sequential=True)
+            )
 
-        obj = A(x0=1, x1=[2, 3, 4], x2=[6, 7], x3=8)
+        obj = A(x0=1, x1=[2, 3, 4], x2=[6, 7], x3=[9])
         meta = self.serializer.context.build(A)
         x0 = meta.find_var("x0")
         x1 = meta.find_var("x1")
@@ -444,10 +446,10 @@ class XmlSerializerTests(TestCase):
             (x0, 1),
             (x1, 2),
             (x2, 6),
+            (x3, 9),
             (x1, 3),
             (x2, 7),
             (x1, 4),
-            (x3, 8),
         ]
 
         self.assertIsInstance(actual, Iterator)

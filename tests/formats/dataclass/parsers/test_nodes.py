@@ -394,7 +394,7 @@ class PrimitiveNodeTests(TestCase):
 
         self.assertEqual((QName("foo"), 13), node.parse_element(ele, []))
         mock_parse_value.assert_called_once_with(
-            var.types, ele.text, var.default, ele.nsmap, var.is_tokens
+            ele.text, var.types, var.default, ele.nsmap, var.is_tokens
         )
 
     def test_next_node(self):

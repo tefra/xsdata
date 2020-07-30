@@ -1,6 +1,5 @@
-from unittest import TestCase
-
 from tests.factories import AttrFactory
+from tests.factories import AttrTypeFactory
 from tests.factories import FactoryTestCase
 from xsdata.formats.dataclass.filters import attribute_metadata
 from xsdata.models.enums import Tag
@@ -39,10 +38,12 @@ class AttributeMetadataTests(FactoryTestCase):
 
     def test_attribute_metadata_restrictions(self):
         attr = AttrFactory.create(tag=Tag.RESTRICTION)
+        attr.types.append(AttrTypeFactory.xs_int())
         attr.restrictions.max_occurs = 2
+        attr.restrictions.max_inclusive = "2"
         attr.restrictions.required = False
 
-        expected = {"max_occurs": 2}
+        expected = {"max_occurs": 2, "max_inclusive": 2}
         self.assertEqual(expected, attribute_metadata(attr, None))
 
     def test_attribute_metadata_mixed(self):

@@ -5,7 +5,6 @@ from typing import List
 from unittest import mock
 from unittest.case import TestCase
 
-from lxml import etree
 from lxml.etree import Element
 from lxml.etree import QName
 

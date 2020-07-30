@@ -1,6 +1,9 @@
+import contextlib
 import math
+import warnings
 from dataclasses import is_dataclass
 from decimal import Decimal
+from decimal import InvalidOperation
 from enum import Enum
 from typing import Any
 from typing import Callable
@@ -12,12 +15,13 @@ from typing import Type
 from lxml.etree import QName
 
 from xsdata.exceptions import ConverterError
+from xsdata.exceptions import ConverterWarning
 from xsdata.formats.dataclass.models.generics import Namespaces
 from xsdata.utils import text
 
 
 def sort_types(types: List[Type]) -> List[Type]:
-    in_order = (bool, int, str, float, Decimal)
+    in_order = (bool, int, float, Decimal, str)
 
     sorted_types = []
     for ordered in in_order:
@@ -30,8 +34,9 @@ def sort_types(types: List[Type]) -> List[Type]:
 
 
 def to_python(
-    types: List[Type], value: Any, ns_map: Optional[Dict] = None, in_order: bool = True
+    value: Any, types: List[Type], ns_map: Optional[Dict] = None, in_order: bool = True
 ) -> Any:
+
     if not isinstance(value, str):
         return value
 
@@ -39,14 +44,13 @@ def to_python(
         types = sort_types(list(types))
 
     for clazz in types:
-        try:
-            if clazz.__name__ in func_map:
-                return func_map[clazz.__name__](value)
+        with contextlib.suppress(ValueError, InvalidOperation, TypeError):
+            func = func_map.get(clazz.__name__)
+            return func(value) if func else to_class(clazz, value, ns_map)
 
-            return to_class(clazz, value, ns_map)
-        except ValueError:
-            pass
-
+    warnings.warn(
+        f"Failed to convert value `{value}` to one of {types}", ConverterWarning
+    )
     return value
 
 
@@ -59,18 +63,18 @@ def to_qname(value: str, ns_map: Optional[Dict]) -> QName:
     return QName(namespace, suffix)
 
 
-def to_class(clazz: Any, value: Any, ns_map: Optional[Dict]) -> Any:
+def to_class(clazz: Any, value: str, ns_map: Optional[Dict]) -> Any:
     if clazz is QName:
-        return to_qname(value, ns_map)
+        return to_qname(value.strip(), ns_map)
     if issubclass(clazz, Enum):
-        return to_enum(clazz, value, ns_map)
+        return to_enum(clazz, value.strip(), ns_map)
     if is_dataclass(clazz):
         return clazz(value)
 
     raise ConverterError(f"Unhandled class type {clazz.__name__}")
 
 
-def to_enum(clazz: Type[Enum], value: Any, ns_map: Optional[Dict]) -> Enum:
+def to_enum(clazz: Type[Enum], value: str, ns_map: Optional[Dict]) -> Enum:
     enumeration: Enum = list(clazz)[0]
 
     if isinstance(enumeration.value, QName):

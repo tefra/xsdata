@@ -16,6 +16,7 @@ from tests.fixtures.defxmlschema.chapter16 import Umbrella
 from xsdata.formats.dataclass.context import XmlContext
 from xsdata.formats.dataclass.models.constants import XmlType
 from xsdata.formats.dataclass.models.elements import FindMode
+from xsdata.formats.dataclass.models.elements import XmlMeta
 from xsdata.formats.dataclass.models.elements import XmlVar
 from xsdata.formats.dataclass.models.elements import XmlWildcard
 from xsdata.formats.dataclass.models.generics import AnyElement
@@ -41,32 +42,32 @@ class ParserUtilsTests(TestCase):
 
     @mock.patch("xsdata.formats.dataclass.parsers.utils.to_python", return_value=2)
     def test_parse_value(self, mock_to_python):
-        self.assertEqual(1, ParserUtils.parse_value([int], None, 1))
-        self.assertIsNone(ParserUtils.parse_value([int], None, lambda: 1))
+        self.assertEqual(1, ParserUtils.parse_value(None, [int], 1))
+        self.assertIsNone(ParserUtils.parse_value(None, [int], lambda: 1))
 
-        self.assertTrue(2, ParserUtils.parse_value([int], "1", None))
-        mock_to_python.assert_called_once_with([int], "1", None)
+        self.assertTrue(2, ParserUtils.parse_value("1", [int], None))
+        mock_to_python.assert_called_once_with("1", [int], None)
 
     def test_parse_value_with_tokens_true(self):
-        actual = ParserUtils.parse_value([int], " 1 2 3", list, None, True)
+        actual = ParserUtils.parse_value(" 1 2 3", [int], list, None, True)
         self.assertEqual([1, 2, 3], actual)
 
-        actual = ParserUtils.parse_value([int], ["1", "2", "3"], list, None, True)
+        actual = ParserUtils.parse_value(["1", "2", "3"], [int], list, None, True)
         self.assertEqual([1, 2, 3], actual)
 
     @mock.patch("xsdata.formats.dataclass.parsers.utils.to_python", return_value=2)
     def test_parse_value_with_ns_map(self, mock_to_python):
         ns_map = dict(a=1)
-        ParserUtils.parse_value([int], " 1 2 3", list, ns_map, True)
-        ParserUtils.parse_value([str], " 1 2 3", None, ns_map, False)
+        ParserUtils.parse_value(" 1 2 3", [int], list, ns_map, True)
+        ParserUtils.parse_value(" 1 2 3", [str], None, ns_map, False)
 
         self.assertEqual(4, mock_to_python.call_count)
         mock_to_python.assert_has_calls(
             [
-                mock.call([int], "1", ns_map),
-                mock.call([int], "2", ns_map),
-                mock.call([int], "3", ns_map),
-                mock.call([str], " 1 2 3", ns_map),
+                mock.call("1", [int], ns_map),
+                mock.call("2", [int], ns_map),
+                mock.call("3", [int], ns_map),
+                mock.call(" 1 2 3", [str], ns_map),
             ]
         )
 
@@ -159,8 +160,8 @@ class ParserUtilsTests(TestCase):
         expected = {"eff_date": "2020-03-02", "other_attributes": {"whatever": "foo"}}
         self.assertEqual(expected, params)
         mock_parse_value.assert_called_once_with(
-            eff_date.types,
             "2020-03-01",
+            eff_date.types,
             eff_date.default,
             element.nsmap,
             eff_date.is_list,
@@ -188,7 +189,17 @@ class ParserUtilsTests(TestCase):
 
         params = {}
         ParserUtils.bind_element_attrs(params, metadata, element)
-        self.assertEqual({}, params)
+        self.assertEqual({"other_attributes": {}}, params)
+
+    @mock.patch.object(XmlMeta, "find_var")
+    def test_bind_element_attrs_skip_element_without_attributes(self, mock_find_var):
+        metadata = self.ctx.build(ProductType)
+        element = Element("foo")
+
+        params = {}
+        ParserUtils.bind_element_attrs(params, metadata, element)
+        self.assertEqual(0, len(params))
+        self.assertEqual(0, mock_find_var.call_count)
 
     def test_bind_element_text_with_no_text_var(self):
         element = Element("foo")
@@ -212,7 +223,7 @@ class ParserUtilsTests(TestCase):
         ParserUtils.bind_element_text(params, metadata, element)
         self.assertEqual({"value": "yes!"}, params)
         mock_parse_value.assert_called_once_with(
-            var.types, element.text, var.default, element.nsmap, var.is_list,
+            element.text, var.types, var.default, element.nsmap, var.is_list,
         )
 
         params.clear()

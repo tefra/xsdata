@@ -165,6 +165,10 @@ class XmlAttribute(XmlVar):
     def is_attribute(self) -> bool:
         return True
 
+    @property
+    def is_tokens(self) -> bool:
+        return self.is_list
+
 
 @dataclass(frozen=True)
 class XmlAttributes(XmlVar):

@@ -5,9 +5,7 @@ from lxml.etree import QName
 from tests.factories import AttrFactory
 from tests.factories import AttrTypeFactory
 from tests.factories import ClassFactory
-from tests.factories import ExtensionFactory
 from tests.factories import FactoryTestCase
-from tests.factories import RestrictionsFactory
 from xsdata.codegen.container import ClassContainer
 from xsdata.codegen.handlers import AttributeTypeHandler
 from xsdata.codegen.models import Class

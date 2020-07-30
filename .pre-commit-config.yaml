@@ -7,7 +7,7 @@ repos:
       - id: pyupgrade
         args: [--py37-plus]
   - repo: https://github.com/asottile/reorder_python_imports
-    rev: v2.3.2
+    rev: v2.3.5
     hooks:
       - id: reorder-python-imports
   - repo: https://github.com/ambv/black
@@ -26,7 +26,7 @@ repos:
         args: ["--suppress-none-returning"]
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v3.1.0
+    rev: v3.2.0
     hooks:
       - id: trailing-whitespace
       - id: end-of-file-fixer

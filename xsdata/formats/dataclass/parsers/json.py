@@ -8,7 +8,6 @@ from typing import Dict
 from typing import Type
 from typing import TypeVar
 
-from xsdata.exceptions import ParserError
 from xsdata.formats.bindings import AbstractParser
 from xsdata.formats.dataclass.context import XmlContext
 from xsdata.formats.dataclass.models.elements import XmlVar
@@ -53,10 +52,7 @@ class JsonParser(AbstractParser):
             else:
                 params[var.name] = self.bind_value(var, value)
 
-        try:
-            return clazz(**params)  # type: ignore
-        except Exception:
-            raise ParserError("Parsing failed")
+        return clazz(**params)  # type: ignore
 
     def bind_value(self, var: XmlVar, value: Any) -> Any:
         """

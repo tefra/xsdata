@@ -1,0 +1,22 @@
+{
+  "book": [
+    {
+      "author": "Hightower, Kim",
+      "title": "The First Book",
+      "genre": "Fiction",
+      "price": 44.95,
+      "pub_date": "2000-10-01",
+      "review": "An amazing story of nothing.",
+      "id": "bk001"
+    },
+    {
+      "author": "Nagata, Suanne",
+      "title": "Becoming Somebody",
+      "genre": "Biography",
+      "price": null,
+      "pub_date": null,
+      "review": "A masterpiece of the fine art of gossiping.",
+      "id": "bk002"
+    }
+  ]
+}

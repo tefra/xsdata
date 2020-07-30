@@ -139,7 +139,7 @@ def attribute_default(attr: Attr, ns_map: Optional[Dict] = None) -> Any:
         return attr.default
     if attr.default.startswith("@enum@"):
         source, enumeration = attr.default[6:].split("::", 1)
-        source = next(x.alias for x in attr.types if x.name == source) or source
+        source = next(x.alias or source for x in attr.types if x.name == source)
         return f"{class_name(source)}.{constant_name(enumeration)}"
 
     data_types = {

@@ -9,6 +9,7 @@ from xsdata.codegen.parsers.schema import SchemaParser
 from xsdata.models.enums import FormType
 from xsdata.models.enums import Mode
 from xsdata.models.enums import Namespace
+from xsdata.models.xsd import All
 from xsdata.models.xsd import Any
 from xsdata.models.xsd import Attribute
 from xsdata.models.xsd import AttributeGroup
@@ -265,6 +266,10 @@ class SchemaParserTests(TestCase):
         self.parser.end_attribute(attribute, element)
         self.assertEqual(FormType.QUALIFIED, attribute.form)
 
+        obj = Element()
+        self.parser.end_attribute(obj, element)
+        self.assertIsNone(obj.form)
+
     def test_end_complex_type(self):
         complex_type = ComplexType()
         not_complex_type = Element()
@@ -294,6 +299,10 @@ class SchemaParserTests(TestCase):
         self.parser.end_complex_type(complex_type, element)
         self.assertIs(open_content, complex_type.open_content)
 
+        obj = Extension()
+        self.parser.end_complex_type(obj, element)
+        self.assertIsNone(obj.open_content)
+
     def test_end_default_open_content(self):
         default_open_content = DefaultOpenContent()
         default_open_content.any = Any()
@@ -307,6 +316,10 @@ class SchemaParserTests(TestCase):
         self.parser.end_default_open_content(default_open_content, element)
         self.assertEqual(sys.maxsize, default_open_content.any.index)
 
+        obj = ComplexType()
+        self.parser.end_default_open_content(obj, element)
+        self.assertIsNone(obj.open_content)
+
     def test_end_Element(self):
         obj = Element()
         element = etree.Element("uno")
@@ -317,6 +330,10 @@ class SchemaParserTests(TestCase):
         self.parser.element_form = "qualified"
         self.parser.end_element(obj, element)
         self.assertEqual(FormType.QUALIFIED, obj.form)
+
+        obj = Attribute()
+        self.parser.end_element(obj, element)
+        self.assertIsNone(obj.form)
 
     def test_end_extension(self):
         extension = Extension()
@@ -337,6 +354,10 @@ class SchemaParserTests(TestCase):
         self.parser.end_extension(extension, element)
         self.assertIs(open_content, extension.open_content)
 
+        obj = ComplexType()
+        self.parser.end_extension(obj, element)
+        self.assertIsNone(obj.open_content)
+
     def test_end_open_content(self):
         open_content = OpenContent()
         open_content.any = Any()
@@ -348,6 +369,10 @@ class SchemaParserTests(TestCase):
         open_content.mode = Mode.SUFFIX
         self.parser.end_open_content(open_content, element)
         self.assertEqual(sys.maxsize, open_content.any.index)
+
+        obj = All(any=Any())
+        self.parser.end_open_content(obj, element)
+        self.assertEqual(0, obj.any.index)
 
     def test_end_restriction(self):
         restriction = Restriction()
@@ -368,6 +393,10 @@ class SchemaParserTests(TestCase):
         self.parser.end_restriction(restriction, element)
         self.assertIs(open_content, restriction.open_content)
 
+        obj = ComplexType()
+        self.parser.end_open_content(obj, element)
+        self.assertIsNone(obj.open_content)
+
     @mock.patch.object(SchemaParser, "resolve_schemas_locations")
     @mock.patch.object(SchemaParser, "add_default_imports")
     @mock.patch.object(SchemaParser, "set_schema_namespaces")
@@ -383,6 +412,8 @@ class SchemaParserTests(TestCase):
         element = Element("schema")
 
         self.parser.end_schema(schema, element)
+        self.parser.end_schema(ComplexType(), element)
+
         mock_set_schema_forms.assert_called_once_with(schema)
         mock_set_schema_namespaces.assert_called_once_with(schema, element)
         mock_add_default_imports.assert_called_once_with(schema)

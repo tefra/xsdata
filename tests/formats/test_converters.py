@@ -121,7 +121,6 @@ class ConvertersTestCases(TestCase):
         self.assertEqual(Foo("1"), to_python("1", [Foo], in_order=False))
 
     def test_to_python_unhandled_type(self):
-        @dataclass
         class Foo:
             pass
 

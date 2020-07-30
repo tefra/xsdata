@@ -9,7 +9,6 @@ from typing import Type
 from lxml.etree import Element
 from lxml.etree import QName
 
-from xsdata.exceptions import ParserError
 from xsdata.formats.converters import to_python
 from xsdata.formats.dataclass.models.elements import FindMode
 from xsdata.formats.dataclass.models.elements import XmlMeta
@@ -64,8 +63,7 @@ class ParserUtils:
                 qname, FindMode.WILDCARD
             )
 
-            if not arg:
-                raise ParserError("Impossible exception!")
+            assert arg is not None
 
             if not arg.init:
                 continue
@@ -244,17 +242,17 @@ class ParserUtils:
             return
 
         wildcard = metadata.find_var(mode=FindMode.ATTRIBUTES)
+        if wildcard:
+            params[wildcard.name] = {}
+
         for key, value in element.attrib.items():
             var = metadata.find_var(QName(key), FindMode.ATTRIBUTE)
-
             if var and var.name not in params:
                 if var.init:
                     params[var.name] = cls.parse_value(
                         value, var.types, var.default, element.nsmap, var.is_tokens
                     )
             elif wildcard:
-                if wildcard.name not in params:
-                    params[wildcard.name] = {}
                 params[wildcard.name][key] = value
 
     @classmethod

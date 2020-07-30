@@ -16,6 +16,7 @@ from tests.fixtures.defxmlschema.chapter16 import Umbrella
 from xsdata.formats.dataclass.context import XmlContext
 from xsdata.formats.dataclass.models.constants import XmlType
 from xsdata.formats.dataclass.models.elements import FindMode
+from xsdata.formats.dataclass.models.elements import XmlMeta
 from xsdata.formats.dataclass.models.elements import XmlVar
 from xsdata.formats.dataclass.models.elements import XmlWildcard
 from xsdata.formats.dataclass.models.generics import AnyElement
@@ -188,7 +189,17 @@ class ParserUtilsTests(TestCase):
 
         params = {}
         ParserUtils.bind_element_attrs(params, metadata, element)
-        self.assertEqual({}, params)
+        self.assertEqual({"other_attributes": {}}, params)
+
+    @mock.patch.object(XmlMeta, "find_var")
+    def test_bind_element_attrs_skip_element_without_attributes(self, mock_find_var):
+        metadata = self.ctx.build(ProductType)
+        element = Element("foo")
+
+        params = {}
+        ParserUtils.bind_element_attrs(params, metadata, element)
+        self.assertEqual(0, len(params))
+        self.assertEqual(0, mock_find_var.call_count)
 
     def test_bind_element_text_with_no_text_var(self):
         element = Element("foo")

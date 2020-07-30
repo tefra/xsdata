@@ -1,5 +1,6 @@
 import contextlib
 import math
+import warnings
 from dataclasses import is_dataclass
 from decimal import Decimal
 from decimal import InvalidOperation
@@ -14,6 +15,7 @@ from typing import Type
 from lxml.etree import QName
 
 from xsdata.exceptions import ConverterError
+from xsdata.exceptions import ConverterWarning
 from xsdata.formats.dataclass.models.generics import Namespaces
 from xsdata.utils import text
 
@@ -42,10 +44,13 @@ def to_python(
         types = sort_types(list(types))
 
     for clazz in types:
-        with contextlib.suppress(ValueError, InvalidOperation):
+        with contextlib.suppress(ValueError, InvalidOperation, TypeError):
             func = func_map.get(clazz.__name__)
             return func(value) if func else to_class(clazz, value, ns_map)
 
+    warnings.warn(
+        f"Failed to convert value `{value}` to one of {types}", ConverterWarning
+    )
     return value
 
 

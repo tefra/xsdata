@@ -1,6 +1,8 @@
+import warnings
 from dataclasses import dataclass
 from decimal import Decimal
 from enum import Enum
+from unittest import mock
 from unittest import TestCase
 
 from lxml.etree import QName
@@ -49,21 +51,27 @@ class ConvertersTestCases(TestCase):
         self.assertEqual(1, to_python("1", [int, str]))
         self.assertEqual("1", to_python("1", [str, int]))
         self.assertEqual(1, to_python("1", [str, int], in_order=False))
-        self.assertEqual("a", to_python("a", [int]))
+
+        with warnings.catch_warnings(record=True):
+            self.assertEqual("a", to_python("a", [int]))
 
     def test_to_python_float(self):
         self.assertEqual(1.0, to_python("1", [float]))
         self.assertEqual(1.0, to_python("1", [float, str]))
         self.assertEqual("1", to_python("1", [str, float]))
         self.assertEqual(1.0, to_python("1", [str, float], in_order=False))
-        self.assertEqual("a", to_python("a", [float]))
+
+        with warnings.catch_warnings(record=True):
+            self.assertEqual("a", to_python("a", [float]))
 
     def test_to_python_decimal(self):
         self.assertEqual(1.0, to_python("1", [Decimal]))
         self.assertEqual(1.0, to_python("1", [Decimal, str]))
         self.assertEqual("1", to_python("1", [str, Decimal]))
         self.assertEqual(1.0, to_python("1", [str, Decimal], in_order=False))
-        self.assertEqual("a", to_python("a", [Decimal]))
+
+        with warnings.catch_warnings(record=True):
+            self.assertEqual("a", to_python("a", [Decimal]))
 
     def test_to_python_boolean(self):
         """str > float in the ordering for now :("""
@@ -79,9 +87,11 @@ class ConvertersTestCases(TestCase):
             self.assertEqual(val, to_python(val, [str, bool]))
             self.assertEqual(False, to_python(val, [str, bool], in_order=False))
 
-        self.assertEqual("a", to_python("a", [bool]))
         self.assertEqual(True, to_python("1 ", [bool]))
         self.assertEqual(False, to_python("false ", [bool]))
+
+        with warnings.catch_warnings(record=True):
+            self.assertEqual("a", to_python("a", [bool]))
 
     def test_to_python_enum(self):
         class QNameType(Enum):
@@ -111,4 +121,13 @@ class ConvertersTestCases(TestCase):
         self.assertEqual(Foo("1"), to_python("1", [Foo], in_order=False))
 
     def test_to_python_unhandled_type(self):
-        self.assertEqual("1", to_python("1", [object]))
+        @dataclass
+        class Foo:
+            pass
+
+        with warnings.catch_warnings(record=True) as w:
+            self.assertEqual("1", to_python("1", [Foo]))
+
+            self.assertEqual(
+                f"Failed to convert value `1` to one of {[Foo]}", str(w[-1].message)
+            )

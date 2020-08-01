@@ -5,18 +5,15 @@ Demos
 Definitive XML Schema
 =====================
 
-Historically this was the first integration test suite of xsdata and is still used to
-make sure things still work between minor code changes.
+Historically this was the first integration test suite of xsdata and is still being
+used to make sure things still work between minor code changes.
 
 It's based on the samples from the book
-`Definitive XML Schema <http://www.datypic.com/books/defxmlschema/>`_ by Priscilla Walmsley.
+`Definitive XML Schema <http://www.datypic.com/books/defxmlschema/>`_
+by Priscilla Walmsley that cover most of the basic XML Schema language traits
 
-The samples cover most of the XML Schema language traits and the test suite is using the
-:mod:`~xsdata.cli` with the :mod:`~xsdata.formats.dataclass` format to generate code and
-demonstrate the current data binding capabilities for the
-:mod:`~xsdata.formats.dataclass` by deserializing XML data to python content trees and
-then converting them back to JSON and XML documents.
-
+The test suite is using the auto generated models to parse the sample documents
+and serializes them back to JSON and XML documents.
 
 .. admonition:: Samples Source
     :class: hint
@@ -53,7 +50,7 @@ Schema 1.0 and 1.1.
 Report
 ------
 
-**45** failed, **14521** passed, **110** skipped @
+**27** failed, **14547** passed, **102** skipped @
 `travis-ci <https://travis-ci.com/tefra/xsdata-w3c-tests>`_
 
 ✨✨✨✨

@@ -6,18 +6,48 @@ XML Binding
 :class:`~xsdata.formats.dataclass.parsers.XmlParser`
 ====================================================
 
-You can alter the default behaviour by initializing with a custom configuration
-and xml context instance.
-
-The :class:`~xsdata.formats.dataclass.context.XmlContext` is a cache layer for
-models and field definitions and the mapping instructions to xml document elements
-and attributes. You can share this between xml parser instances to avoid compiling the
-models metadata more than once. Although it makes for sense to have a static instance
-of the parser per document type.
-
-The parser instance has three input methods `from_string`, `from_bytes` and `from_path`,
-to parse from memory or to let the parser load the input document, All of them require
+The parser has three instance methods `from_string`, `from_bytes` and `from_path`,
+to parse from memory or to let the parser load the input document. All of them require
 the target class Type to bind the input data.
+
+
+Parameters
+----------
+
+**config** (:class:`~xsdata.formats.dataclass.parsers.config.ParserConfig`)
+
+.. list-table::
+   :widths: 20 10 220
+   :header-rows: 1
+   :align: left
+
+   * - Namespace
+     - Type
+     - Description
+   * - base_url
+     - str
+     - A base URL for when parsing from memory and you want support for relative links
+       eg xinclude, default: ``None``
+   * - process_xinclude
+     - bool
+     - Process xinclude statements. , default: ``False``
+   * - fail_on_unknown_properties
+     - bool
+     - Should fail on unknown properties that can't be mapped to any wildcard field,
+       default: ``True``
+
+
+**context** (:class:`~xsdata.formats.dataclass.context.XmlContext`)
+
+It's the cache layer for the binding directives of models and their fields. You may
+share a context instance between parser/serializer instances to avoid compiling the
+cache more than once.
+
+.. hint::
+
+    it's recommended to use a static or global instance of your parser or serializer
+    per document type.
+
 
 Example: from path
 ------------------
@@ -47,23 +77,10 @@ With support for `XML Inclusions <https://www.w3.org/TR/xinclude-11/>`_
     >>> actual = parser.from_bytes(path.read_bytes(), Books)
 
 
-
-:class:`~xsdata.formats.dataclass.parsers.config.ParserConfig`
---------------------------------------------------------------
-
-.. csv-table::
-   :header: "Name", "Type", "Description"
-   :widths: 20, 10, 200
-
-    "base_url", "str", "A base URL for when parsing from memory and you want support for relative links eg xinclude, default: ``None``"
-    "process_xinclude", "bool", "Process xinclude statements. , default: ``False``"
-    "fail_on_unknown_properties", "bool", "Should fail on unknown properties that can't be mapped to any wildcard field, default: ``True``"
-
-
 :class:`~xsdata.formats.dataclass.serializers.XmlSerializer`
 ============================================================
 
-The serializer can also me initialized with a xml context instance, if your use case
+The serializer can also be initialized with a xml context instance, if your use case
 needs to parse and serialize the same type of objects you could share the same xml
 context instance between them to save on memory and processing.
 

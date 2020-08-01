@@ -26,8 +26,8 @@ definitions.
 package
 -------
 
-The package option specifies where the target module(s) will be created inside the
-current working directory.
+Specify where the target module(s) will be created inside the current working directory.
+eg `--package api.models`
 
 .. admonition:: Note
     :class: hint
@@ -40,7 +40,7 @@ current working directory.
 output
 ------
 
-The output option changes the generation format.
+Specify the output format
 
 * ``pydata``: Python lib `dataclasses <https://docs.python.org/3/library/dataclasses.html>`_
 * ``plantuml``: `PlantUML <https://plantuml.com/class-diagram>`_ class diagram
@@ -49,7 +49,7 @@ The output option changes the generation format.
 verbosity
 ---------
 
-The verbosity option changes what messages will be printed.
+Specify the log level, default is ``INFO``
 
 Available options: ``CRITICAL``, ``ERROR``, ``WARNING``, ``INFO`` or ``DEBUG``
 
@@ -63,23 +63,21 @@ Generate models and services from a wsdl source.
 .. admonition:: Experimental
     :class: danger
 
-    This feature is experimental and only a small subset of features has been
+    This feature is experimental and only a small subset of features have been
     implemented, WSDL 1.1 & SOAP 1.1 bindings.
 
 
 print
 -----
 
-The print flag overwrites the verbosity level to `Error` and print to stdOut the output
-result without writing to the target file.
+Redirect generated code to stdOut instead of writing the output to the target files.
 
 
 ns-struct
 ---------
 
-The ns-struct flag bypasses the default behavior and groups classes by the target
-namespace they were defined. This option creates a more flat package structure and
-solves any circular import errors.
+Group classes by the target namespace they were defined. This option creates a more
+flat package structure and solves many circular import errors.
 
 
 .. admonition:: Examples

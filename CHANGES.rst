@@ -1,3 +1,17 @@
+20.8 (2020-08-01)
+-----------------
+- Added codegen support for **WSDL 1.1 and SOAP 1.1** bindings.
+- Added experimental web services client.
+- Added cli flag ``--ns-struct`` to group classes by target namespaces. `#206 <https://github.com/tefra/xsdata/issues/206>`_
+- Added parser config to support xinclude statements. `#207 <https://github.com/tefra/xsdata/issues/207>`_
+- Added new xml union node to improve bindings for fields with union type. `#207 <https://github.com/tefra/xsdata/issues/207>`_
+- Fixed class resolve issue with mixed namespaces. `#204 <https://github.com/tefra/xsdata/issues/204>`_
+- Fixed attribute comparison issue. `#209 <https://github.com/tefra/xsdata/issues/209>`_
+- Fixed data type mapping for various schema elements. `#221 <https://github.com/tefra/xsdata/issues/221>`_
+- Fixed mixed content handling. `#213 <https://github.com/tefra/xsdata/issues/213>`_
+- Code cleanup & 100% coverage.
+
+
 20.7 (2020-07-04)
 -----------------
 - Updated analyzer to allow abstract types to be generated. `#199 <https://github.com/tefra/xsdata/issues/199>`_

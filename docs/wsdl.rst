@@ -47,10 +47,11 @@ requests and responses.
 
 **Optionally you can also provide and override**
 
-- the default transport implementation :class:`~xsdata.formats.dataclass.transports.Transport`
+- the default transport implementation
+  :class:`~xsdata.formats.dataclass.transports.Transport`
 - the :class:`~xsdata.formats.dataclass.parsers.XmlParser` with your custom config
-- the :class:`~xsdata.formats.dataclass.serializers.XmlSerializer` with your custom config
-
+- the :class:`~xsdata.formats.dataclass.serializers.XmlSerializer` with your custom
+  config
 
 
 Creating instances

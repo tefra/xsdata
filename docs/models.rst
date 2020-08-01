@@ -60,13 +60,22 @@ Basic Model
 Class Meta
 ==========
 
-.. csv-table::
-   :header: "Property", "Type", "Description"
-   :widths: 20, 10, 300
+.. list-table::
+   :widths: 20 10 300
+   :header-rows: 1
 
-   "name", "str", "The real name of the element this class represents."
-   "nillable", "bool", "Specifies whether an explicit empty value can be assigned, default: False"
-   "namespace", "str", "The element xml namespace."
+   * - Property
+     - Type
+     - Description
+   * - name
+     - str
+     - The real name of the element this class represents.
+   * - nillable
+     - bool
+     - Specifies whether an explicit empty value can be assigned, default: False
+   * - namespace
+     - str
+     - The element xml namespace.
 
 
 Field Typing
@@ -79,25 +88,48 @@ Simply follow the Python lib
 Field Metadata
 ==============
 
-.. csv-table::
-   :header: "Property", "Type", "Description"
-   :widths: 20, 10, 300
+.. list-table::
+   :widths: 20 10 250
+   :header-rows: 1
 
-   "name", "str", "The real name of the element or attribute this field represents."
-   "type", "str", "The field type: Text | Element | Attribute | Wildcard | Attributes, default: Text"
-   "nillable", "bool", "Specifies whether an explicit empty value can be assigned."
-   "mixed", "bool", "Specifies whether the field supports `mixed content <https://www.w3schools.com/xml/schema_complex_mixed.asp>`_."
-   "sequential", "bool", "Specifies whether the field value(s) must appear in sequence with other sequential sibling fields. eg ``<a /><b /><a /><b />``"
-   "namespace", "str", "Specifies the field xml namespace."
+   * - Property
+     - Type
+     - Description
+   * - name
+     - str
+     - The real name of the element or attribute this field represents.
+   * - type
+     - str
+     - The field type: Text | Element | Attribute | Wildcard | Attributes, default: Text
+   * - nillable
+     - bool
+     - Specifies whether an explicit empty value can be assigned.
+   * - mixed
+     - bool
+     - Specifies whether the field supports mixed content. ([#M1]_)
+   * - sequential
+     - bool
+     - Specifies whether the field value(s) must appear in sequence with other
+       sequential sibling fields. eg ``<a /><b /><a /><b />``
+   * - namespace
+     - str
+     - Specifies the field xml namespace. ([#M2]_)
 
-It's a common practice in schema definitions to require elements to be qualified and
-attributes to be unqualified. ``Element`` fields with an omitted namespace inherit the
-namespace from the parent class/element and ``Attribute`` fields don't.
 
-If you need to break the namespace inheritance for ``Element`` fields set the namespace
-to an empty string ``namespace=""``.
+The code generator adds also the field restrictions like `minLength` or `required` flag
+but currently they are only used to troubleshoot the code generator.
 
-Mixed content must be combined ``Wildcard`` fields with type ``List[object]``.
+.. [#M1] Mixed content must be combined ``Wildcard`` fields with type ``List[object]``.
+    `w3schools <https://www.w3schools.com/xml/schema_complex_mixed.asp>`_
+
+.. [#M2] It's a common practice in schema definitions to require elements to be
+    qualified and attributes to be unqualified.
+
+    ``Element`` fields with an omitted namespace inherit the namespace from the parent
+    class/element and ``Attribute`` fields don't.
+
+    If you need to break the namespace inheritance for ``Element`` fields set the
+    namespace to an empty string ``namespace=""``.
 
 
 Type: Element
@@ -144,21 +176,27 @@ This type represents a traditional xml attribute.
 
     <root xmlns:xml="http://www.w3.org/XML/1998/namespace" xml:lang="en">
 
+
 Type: Wildcard
 ~~~~~~~~~~~~~~
 
-This type is represents ``xs:any`` elements or elements with type ``xs:AnyType``.
-Wildcards can have normal uri namespace or use one of xml schema generics.
+This type represents ``xs:any`` elements or elements with type ``xs:AnyType``.
+Wildcards can have a normal uri namespace or use one of xml schema generics.
 
+.. list-table::
+   :widths: 25 220
+   :header-rows: 1
 
-.. csv-table::
-   :header: "Namespace", "Description"
-   :widths: 20, 200
-
-    "##any", "element from any namespace is allowed"
-    "##other", "element from any namespace other than the parent element's namespace"
-    "##local", "element must come from no namespace"
-    "##targetNamespace", "element from the namespace of the parent element can be present"
+   * - Namespace
+     - Description
+   * - ##any
+     - element from any namespace is allowed
+   * - ##other
+     - element from any namespace other than the parent's namespace
+   * - ##local
+     - element must come from no namespace
+   * - ##targetNamespace
+     - element from the namespace of the parent can be present
 
 
 .. code-block:: python
@@ -192,13 +230,12 @@ namespace features also apply.
         )
     )
 
+
 Type: Text
 ~~~~~~~~~~
 
 This is the default field type and represents any atomic value. The value of this field
 is directly assigned as text to elements.
-
-
 
 .. code-block:: python
 

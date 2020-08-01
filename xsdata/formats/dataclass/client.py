@@ -77,9 +77,9 @@ class Client:
 
         Is equivalent with:
 
-        >>> object = CalculatorSoapAddInput(
+        >>> req = CalculatorSoapAddInput(
         >>> body=CalculatorSoapAddInput.Body(add=Add(3, 4)))
-        >>> res = client.send(object)
+        >>> res = client.send(req)
 
         :param obj: a params dictionary or the input type instance
         :param headers: a dictionary of any additional headers.

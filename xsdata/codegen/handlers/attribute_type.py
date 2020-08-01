@@ -84,10 +84,10 @@ class AttributeTypeHandler(HandlerInterface):
         Process user defined attribute types, split process between complex and
         simple types.
 
-        Reset absent attribute types with a warning.
-
-        Complex Type: xs:Element and xs:ComplexType
-        Simple stype: the rest
+        Steps:
+            1. Reset absent attribute types with a warning.
+            2. Complex type: xs:Element and xs:ComplexType
+            3. Simple type: the rest
         """
 
         source = self.find_dependency(attr_type)

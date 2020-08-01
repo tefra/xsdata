@@ -236,7 +236,7 @@ class Definitions(ExtensibleElement, ModuleMixin):
         self.extended.extend(source.extended)
 
 
-T = TypeVar("T", bound="WsdlElement")
+T = TypeVar("T", bound=WsdlElement)
 
 
 def find_or_die(items: List[T], name: str, type_name: str) -> T:

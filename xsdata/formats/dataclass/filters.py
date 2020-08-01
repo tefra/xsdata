@@ -1,6 +1,5 @@
 import functools
 import math
-import re
 from decimal import Decimal
 from typing import Any
 from typing import Dict
@@ -54,7 +53,7 @@ def attribute_metadata(attr: Attr, parent_namespace: Optional[str]) -> Dict:
     if parent_namespace != attr.namespace or attr.is_attribute:
         namespace = attr.namespace
 
-    types = list({type.native_type for type in attr.types if type.native})
+    types = list({x.native_type for x in attr.types if x.native})
 
     metadata = dict(
         name=name,
@@ -153,9 +152,7 @@ def attribute_default(attr: Attr, ns_map: Optional[Dict] = None) -> Any:
 
     if isinstance(default_value, str):
         if DataType.NMTOKENS.code in data_types:
-            default_value = quoteattr(
-                " ".join(filter(None, map(str.strip, re.split(r"\s+", default_value))))
-            )
+            default_value = quoteattr(" ".join(default_value.split()))
         else:
             default_value = quoteattr(default_value)
     elif isinstance(default_value, float) and math.isinf(default_value):

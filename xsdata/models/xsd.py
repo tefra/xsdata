@@ -1253,7 +1253,7 @@ class Override(SchemaLocation):
 @dataclass
 class Schema(SchemaLocation, ModuleMixin):
     """
-    Model representation of a schema xs:chema element.
+    Model representation of a schema xs:schema element.
 
     :param target:
     :param block_default: (#all | List of (extension | restriction | substitution))

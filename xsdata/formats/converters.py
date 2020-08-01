@@ -80,7 +80,11 @@ def to_enum(clazz: Type[Enum], value: str, ns_map: Optional[Dict]) -> Enum:
     if isinstance(enumeration.value, QName):
         value = to_qname(value, ns_map)
 
-    return clazz(type(enumeration.value)(value))
+    try:
+        return clazz(type(enumeration.value)(value))
+    except ValueError:
+        # restriction base="xsd:token"
+        return clazz(" ".join(value.split()))
 
 
 def to_bool(value: Any) -> bool:

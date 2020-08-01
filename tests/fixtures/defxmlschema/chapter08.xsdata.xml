@@ -3,7 +3,6 @@
   <dressSize>06</dressSize>
   <mediumDressSize>12</mediumDressSize>
   <smallDressSize>6</smallDressSize>
-  <smlxSize>extra
-  large</smlxSize>
-  <xsmlxSize>extra    small</xsmlxSize>
+  <smlxSize>extra large</smlxSize>
+  <xsmlxSize>extra small</xsmlxSize>
 </sizes>

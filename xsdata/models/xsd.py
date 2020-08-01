@@ -25,8 +25,7 @@ from xsdata.models.mixins import element
 from xsdata.models.mixins import ElementBase
 from xsdata.models.mixins import ModuleMixin
 from xsdata.utils import text
-from xsdata.utils.text import collapse_whitespace
-
+from xsdata.utils.collections import unique_sequence
 
 docstring_serializer = XmlSerializer(xml_declaration=False, pretty_print=True)
 
@@ -127,7 +126,7 @@ class AnyAttribute(AnnotationBase):
     process_contents: Optional[ProcessType] = attribute(name="processContents")
 
     def __post_init__(self):
-        self.namespace = collapse_whitespace(self.namespace)
+        self.namespace = " ".join(unique_sequence(self.namespace.split()))
 
     @property
     def is_attribute(self) -> bool:
@@ -385,7 +384,7 @@ class Any(AnnotationBase):
     process_contents: Optional[ProcessType] = attribute(name="processContents")
 
     def __post_init__(self):
-        self.namespace = collapse_whitespace(self.namespace)
+        self.namespace = " ".join(unique_sequence(self.namespace.split()))
 
     @property
     def is_attribute(self) -> bool:

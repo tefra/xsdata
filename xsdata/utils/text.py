@@ -1,8 +1,6 @@
 from typing import List
 from typing import Tuple
 
-from xsdata.utils.collections import unique_sequence
-
 
 def prefix(string: str, sep: str = ":") -> str:
     """Return the first part of the string before the separator."""
@@ -23,11 +21,6 @@ def split(string: str, sep: str = ":") -> Tuple:
     """
     left, _, right = string.partition(sep)
     return (left, right) if right else (None, left)
-
-
-def collapse_whitespace(string: str) -> str:
-    """Remove excess whitespace and duplicate words."""
-    return " ".join(unique_sequence(string.split()))
 
 
 def capitalize(string: str) -> str:

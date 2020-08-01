@@ -94,16 +94,24 @@ class ConvertersTestCases(TestCase):
             self.assertEqual("a", to_python("a", [bool]))
 
     def test_to_python_enum(self):
-        class QNameType(Enum):
-            a = QName("a")
-            b = QName("b")
-
         self.assertEqual(UseType.OPTIONAL, to_python("optional", [UseType]))
         self.assertEqual("optional", to_python("optional", [str, UseType]))
         self.assertEqual(
             UseType.OPTIONAL, to_python("optional", [str, UseType], in_order=False)
         )
+
+    def test_to_python_enum_qname(self):
+        class QNameType(Enum):
+            a = QName("a")
+            b = QName("b")
+
         self.assertEqual(QNameType.a, to_python("a", [QNameType]))
+
+    def test_to_python_enum_tokens(self):
+        class Tokens(Enum):
+            a = "a a a"
+
+        self.assertEqual(Tokens.a, to_python("a   a  \n a", [Tokens]))
 
     def test_to_python_qname(self):
         ns_map = {"foo": "bar"}

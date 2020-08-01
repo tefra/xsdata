@@ -2,8 +2,8 @@
 JSON Binding
 ============
 
-The json implementation lacks a bit in maturity and code coverage but it has a similar
-interface to the xml implementation.
+The json implementation lacks a bit in maturity but it has a similar interface to the
+xml implementation.
 
 
 :class:`~xsdata.formats.dataclass.parsers.JsonParser`
@@ -29,7 +29,7 @@ for model metadata caching which can be shared across instances.
 =============================================================
 
 The serializer besides the `indent` option can be initialized with a custom encoder
-that needs to extends :py:class:`json.JSONEncoder` and a dict_factory with any custom
+that needs to extends :py:class:`json.JSONEncoder` and a dict_factory with your custom
 logic.
 
 

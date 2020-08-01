@@ -21,8 +21,8 @@ def split(string: str, sep: str = ":") -> Tuple:
 
     If the separator isn't present in the string return None as prefix.
     """
-    before, _, after = string.partition(sep)
-    return (before, after) if after else (None, before)
+    left, _, right = string.partition(sep)
+    return (left, right) if right else (None, left)
 
 
 def collapse_whitespace(string: str) -> str:
@@ -66,12 +66,12 @@ def clean_uri(namespace: str) -> str:
     if namespace[:2] == "##":
         namespace = namespace[2:]
 
-    prefix, suffix = split(namespace)
+    left, right = split(namespace)
 
-    if prefix == "urn":
-        namespace = suffix
-    elif prefix in ("http", "https"):
-        namespace = suffix[2:]
+    if left == "urn":
+        namespace = right
+    elif left in ("http", "https"):
+        namespace = right[2:]
 
     return "_".join(
         [part for part in namespace.split(".") if part not in ("www", "xsd", "wsdl")]

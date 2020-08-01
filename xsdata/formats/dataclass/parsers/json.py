@@ -83,17 +83,17 @@ class JsonParser(AbstractParser):
         )
 
     @staticmethod
-    def get_value(data: Dict, field: XmlVar) -> Any:
-        """Find the field value in the given dictionary or return the default
-        field value."""
-        if field.qname.localname in data:
-            value = data[field.qname.localname]
-        elif field.name in data:
-            value = data[field.name]
+    def get_value(data: Dict, var: XmlVar) -> Any:
+        """Find the var value in the given dictionary or return the default var
+        value."""
+        if var.qname.localname in data:
+            value = data[var.qname.localname]
+        elif var.name in data:
+            value = data[var.name]
         else:
             return None
 
-        if field.is_list and not isinstance(value, list):
+        if var.is_list and not isinstance(value, list):
             value = [value]
 
         return value

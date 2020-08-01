@@ -298,7 +298,6 @@ class NodeParser:
     :param config: Parser configuration
     :param context: Model metadata builder
     :param namespaces: Store the prefix/namespace as they are parsed.
-    :param event_names: Cache for event names for each element
     """
 
     config: ParserConfig = field(default_factory=ParserConfig)

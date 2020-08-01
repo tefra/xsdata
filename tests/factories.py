@@ -61,7 +61,7 @@ class Factory(ABC):
 
     @classmethod
     def list(cls, number: int, **kwargs):
-        return [cls.create(**kwargs) for i in range(number)]
+        return [cls.create(**kwargs) for _ in range(number)]
 
 
 class ClassFactory(Factory):

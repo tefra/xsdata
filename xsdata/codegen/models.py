@@ -318,7 +318,7 @@ class Attr:
         """Return a deep cloned instance."""
         return replace(
             self,
-            types=[type.clone() for type in self.types],
+            types=[x.clone() for x in self.types],
             restrictions=self.restrictions.clone(),
         )
 

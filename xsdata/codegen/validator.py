@@ -47,16 +47,12 @@ class ClassValidator:
         """Remove from the given class list any class with missing extension
         type."""
 
-        def is_invalid(source: Class, ext: Extension) -> bool:
+        def is_invalid(ext: Extension) -> bool:
             """Check if given type declaration is not native and is missing."""
-            if ext.type.native:
-                return False
-
-            qname = ext.type.qname
-            return qname not in self.container
+            return not ext.type.native and ext.type.qname not in self.container
 
         for target in list(classes):
-            if any(is_invalid(target, extension) for extension in target.extensions):
+            if any(is_invalid(extension) for extension in target.extensions):
                 classes.remove(target)
 
     @classmethod

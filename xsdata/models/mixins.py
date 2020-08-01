@@ -8,7 +8,6 @@ from typing import Dict
 from typing import Iterator
 from typing import List
 from typing import Optional
-from typing import TypeVar
 
 from xsdata.exceptions import SchemaValueError
 from xsdata.formats.dataclass.models.constants import XmlType
@@ -17,8 +16,6 @@ from xsdata.models.enums import FormType
 from xsdata.models.enums import Namespace
 from xsdata.models.enums import NamespaceType
 from xsdata.utils import text
-
-T = TypeVar("T", bound="ElementBase")
 
 Condition = Optional[Callable]
 
@@ -191,8 +188,8 @@ class ElementBase:
     def children(self, condition: Condition = None) -> Iterator["ElementBase"]:
         """Iterate over all the ElementBase children of this element that match
         the given condition if any."""
-        for attribute in fields(self):
-            value = getattr(self, attribute.name)
+        for f in fields(self):
+            value = getattr(self, f.name)
             if (
                 isinstance(value, list)
                 and len(value) > 0

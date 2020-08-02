@@ -5,7 +5,6 @@ from typing import List
 from typing import Optional
 from typing import Tuple
 from typing import Type
-from typing import Union
 
 from lxml.etree import Element
 from lxml.etree import QName
@@ -204,17 +203,18 @@ class ParserUtils:
             tail=tail,
             ns_map=element.nsmap,
             attributes={
-                QName(key): cls.parse_any_type(value, element.nsmap)
+                key: cls.parse_any_attribute(value, element.nsmap)
                 for key, value in element.attrib.items()
             },
         )
 
     @classmethod
-    def parse_any_type(cls, value: str, ns_map: Dict) -> Union[QName, str]:
-        """Attempt to parse the given value as a qualified name."""
+    def parse_any_attribute(cls, value: str, ns_map: Dict) -> str:
+        """Attempt to parse any attribute."""
         prefix, suffix = text.split(value)
         if prefix and prefix in ns_map and not suffix.startswith("//"):
-            return QName(ns_map[prefix], suffix)
+            value = QName(ns_map[prefix], suffix).text
+
         return value
 
     @classmethod
@@ -253,7 +253,9 @@ class ParserUtils:
                         value, var.types, var.default, element.nsmap, var.is_tokens
                     )
             elif wildcard:
-                params[wildcard.name][qname] = cls.parse_any_type(value, element.nsmap)
+                params[wildcard.name][key] = cls.parse_any_attribute(
+                    value, element.nsmap
+                )
 
     @classmethod
     def find_eligible_wildcard(

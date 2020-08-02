@@ -34,36 +34,37 @@ class SerializeUtilsTests(TestCase):
         self.assertEqual(0, len(self.namespaces.ns_map))
         mock_to_xml.assert_called_once_with("value", self.namespaces)
 
+    @mock.patch("xsdata.formats.dataclass.serializers.utils.to_xml", return_value="val")
+    def test_set_attribute_with_qualified_names(self, mock_to_xml):
+        SerializeUtils.set_attribute(
+            self.element, "{a}key", "{b}value", self.namespaces
+        )
+        self.assertEqual("val", self.element.attrib["{a}key"])
+        self.assertEqual(2, len(self.namespaces.ns_map))
+        mock_to_xml.assert_called_once_with(QName("b", "value"), self.namespaces)
+
     @mock.patch("xsdata.formats.dataclass.serializers.utils.to_xml", return_value="")
-    def test_set_attribute_when_value_empty(self, mock_to_xml):
+    def test_set_attribute_with_empty_value(self, mock_to_xml):
         SerializeUtils.set_attribute(self.element, "key", "value", self.namespaces)
         self.assertNotIn("key", self.element.attrib)
         self.assertEqual(0, len(self.namespaces.ns_map))
         mock_to_xml.assert_called_once_with("value", self.namespaces)
 
-    @mock.patch("xsdata.formats.dataclass.serializers.utils.to_xml", return_value="val")
-    def test_set_attribute_with_qname_key(self, mock_to_xml):
-        key = QName("foo", "bar")
-        SerializeUtils.set_attribute(self.element, key, "value", self.namespaces)
-        self.assertEqual("val", self.element.attrib[key])
-        self.assertEqual({"ns0": "foo"}, self.namespaces.ns_map)
-        mock_to_xml.assert_called_once_with("value", self.namespaces)
-
-    def test_set_attribute_with_qname_xsi_nil(self):
+    def test_set_attribute_xsi_nil(self):
         SerializeUtils.set_attribute(
-            self.element, QNames.XSI_NIL, True, self.namespaces
+            self.element, QNames.XSI_NIL.text, True, self.namespaces
         )
         self.assertEqual("true", self.element.attrib[QNames.XSI_NIL])
 
-    def test_set_attribute_with_qname_xsi_nil_and_element_has_text(self):
+    def test_set_attribute_xsi_nil_and_element_has_text(self):
         self.element.text = "foo"
 
         SerializeUtils.set_attribute(
-            self.element, QNames.XSI_NIL, True, self.namespaces
+            self.element, QNames.XSI_NIL.text, True, self.namespaces
         )
-        self.assertNotIn(QNames.XSI_NIL, self.element.attrib)
+        self.assertNotIn(QNames.XSI_NIL.text, self.element.attrib)
 
-    def test_set_attribute_with_qname_xsi_nil_and_element_has_children(self):
+    def test_set_attribute_xsi_nil_and_element_has_children(self):
         SubElement(self.element, "bar")
 
         SerializeUtils.set_attribute(

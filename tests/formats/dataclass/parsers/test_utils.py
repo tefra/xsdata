@@ -146,25 +146,25 @@ class ParserUtilsTests(TestCase):
         objects = [(x, x) for x in "abc"]
         self.assertEqual(["b", "c"], ParserUtils.fetch_any_children(1, objects))
 
-    @mock.patch.object(ParserUtils, "parse_any_type")
+    @mock.patch.object(ParserUtils, "parse_any_attribute")
     @mock.patch.object(ParserUtils, "parse_value")
-    def test_bind_element_attrs(self, mock_parse_value, mock_parse_any_type):
+    def test_bind_element_attrs(self, mock_parse_value, mock_parse_any_attribute):
         mock_parse_value.return_value = "2020-03-02"
-        mock_parse_any_type.return_value = "bar"
+        mock_parse_any_attribute.return_value = "foobar"
         metadata = self.ctx.build(ProductType)
         eff_date = metadata.find_var("effDate")
         element = Element("foo")
         element.set("effDate", "2020-03-01")
-        element.set("whatever", "foo")
+        element.set("foo", "bar")
 
         params = {}
         ParserUtils.bind_element_attrs(params, metadata, element)
         expected = {
             "eff_date": "2020-03-02",
-            "other_attributes": {QName("whatever"): "bar"},
+            "other_attributes": {"foo": "foobar"},
         }
         self.assertEqual(expected, params)
-        mock_parse_any_type.assert_called_once_with("foo", element.nsmap)
+        mock_parse_any_attribute.assert_called_once_with("bar", element.nsmap)
         mock_parse_value.assert_called_once_with(
             "2020-03-01",
             eff_date.types,
@@ -173,14 +173,14 @@ class ParserUtilsTests(TestCase):
             eff_date.is_list,
         )
 
-    def test_parse_any_type(self):
-        self.assertEqual(
-            "http://foo", ParserUtils.parse_any_type("http://foo", {"http": "h"})
-        )
-        self.assertEqual("a:foo", ParserUtils.parse_any_type("a:foo", {}))
-        self.assertEqual(
-            QName("b", "foo"), ParserUtils.parse_any_type("a:foo", {"a": "b"})
-        )
+    def test_parse_any_attribute(self):
+        ns_map = {"xsi": Namespace.XSI.uri, "xsd": Namespace.XS.uri}
+        value = ParserUtils.parse_any_attribute("xsd:string", ns_map)
+        self.assertEqual("{http://www.w3.org/2001/XMLSchema}string", value)
+
+        ns_map["http"] = "happens"
+        value = ParserUtils.parse_any_attribute("http://www.com", ns_map)
+        self.assertEqual("http://www.com", value)
 
     def test_bind_element_attrs_doesnt_overwrite_values(self):
         metadata = self.ctx.build(ProductType)

@@ -76,10 +76,10 @@ class AttributeTypeTests(TestCase):
             attribute_type(attr, ["A", "Parent"]),
         )
 
-    def test_attribute_type_with_type_qmap(self):
-        attr = AttrFactory.create(types=[AttrTypeFactory.xs_qmap()])
+    def test_attribute_type_with_any_attribute(self):
+        attr = AttrFactory.any_attribute()
 
-        self.assertEqual("Dict[QName, str]", attribute_type(attr, ["a", "b"]))
+        self.assertEqual("Dict", attribute_type(attr, ["a", "b"]))
 
     def test_attribute_type_with_native_type(self):
         attr = AttrFactory.create(

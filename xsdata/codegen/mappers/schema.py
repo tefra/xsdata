@@ -229,6 +229,7 @@ class SchemaMapper:
                 name=name,
                 local_name=name,
                 default=obj.default_value,
+                factory=obj.factory,
                 fixed=obj.is_fixed,
                 types=types,
                 tag=obj.class_name,

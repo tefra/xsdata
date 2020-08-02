@@ -36,7 +36,11 @@ class AnyAttributeTests(TestCase):
     def test_property_real_type(self):
         obj = AnyAttribute()
         obj.ns_map["xs"] = Namespace.XS.uri
-        self.assertEqual("xs:qmap", obj.real_type)
+        self.assertEqual("xs:anyType", obj.real_type)
+
+    def test_property_factory(self):
+        obj = AnyAttribute()
+        self.assertEqual(dict, obj.factory)
 
     def get_restrictions(self):
         obj = AnyAttribute()

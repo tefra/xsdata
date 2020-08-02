@@ -121,7 +121,18 @@ def default_imports(output: str) -> str:
     if "QName" in output:
         result.append("from lxml.etree import QName")
 
-    types = [tp for tp in ["Dict", "List", "Optional", "Union"] if f"{tp}[" in output]
+    typing_patterns = {
+        "Dict": [": Dict"],
+        "List": [": List["],
+        "Optional": ["Optional["],
+        "Union": ["Union["],
+    }
+
+    types = [
+        name
+        for name, patterns in typing_patterns.items()
+        if any(pattern in output for pattern in patterns)
+    ]
     if types:
         result.append(f"from typing import {', '.join(types)}")
 
@@ -132,7 +143,7 @@ def attribute_default(attr: Attr, ns_map: Optional[Dict] = None) -> Any:
     """Generate the field default value/factory for the given attribute."""
     if attr.is_list:
         return "list"
-    if attr.is_map:
+    if attr.factory is dict:
         return "dict"
     if not isinstance(attr.default, str):
         return attr.default
@@ -191,8 +202,8 @@ def attribute_type(attr: Attr, parents: List[str]) -> str:
 
     if attr.is_list:
         result = f"List[{result}]"
-    elif attr.is_map:
-        result = f"Dict[{result}]"
+    elif attr.is_dict:
+        result = "Dict"
     elif attr.default is None and "Dict" not in result:
         result = f"Optional[{result}]"
 

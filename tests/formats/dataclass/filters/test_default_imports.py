@@ -37,29 +37,20 @@ class DefaultImportsTests(TestCase):
         self.assertIn(expected, default_imports(output))
 
     def test_default_imports_with_typing(self):
-        output = " Dict[ "
-
+        output = ": Dict["
         expected = "from typing import Dict"
         self.assertIn(expected, default_imports(output))
 
-        output = " List[ "
-
+        output = ": List["
         expected = "from typing import List"
         self.assertIn(expected, default_imports(output))
 
-        output = " Optional[ "
-
+        output = "Optional[ "
         expected = "from typing import Optional"
         self.assertIn(expected, default_imports(output))
 
         output = " Union[ "
-
         expected = "from typing import Union"
-        self.assertIn(expected, default_imports(output))
-
-        output = " Optional[Union[Dict[ "
-
-        expected = "from typing import Dict, Optional, Union"
         self.assertIn(expected, default_imports(output))
 
     def test_default_imports_combo(self):

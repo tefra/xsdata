@@ -13,7 +13,6 @@ type_float = AttrTypeFactory.xs_float()
 type_decimal = AttrTypeFactory.xs_decimal()
 type_bool = AttrTypeFactory.xs_bool()
 type_qname = AttrTypeFactory.xs_qname()
-type_qmap = AttrTypeFactory.xs_qmap()
 type_tokens = AttrTypeFactory.xs_tokens()
 
 
@@ -80,8 +79,8 @@ class AttributeDefaultTests(TestCase):
             attribute_default(attr, ns_map),
         )
 
-    def test_attribute_default_with_type_qmap(self):
-        attr = AttrFactory.create(types=[type_qmap])
+    def test_attribute_default_with_any_attribute(self):
+        attr = AttrFactory.any_attribute()
         self.assertEqual("dict", attribute_default(attr))
 
     def test_attribute_default_with_type_list(self):

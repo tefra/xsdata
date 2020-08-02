@@ -12,7 +12,7 @@ class AnyTests(TestCase):
     def test_property_real_type(self):
         obj = Any()
         obj.ns_map["xs"] = Namespace.XS.uri
-        self.assertEqual("xs:object", obj.real_type)
+        self.assertEqual("xs:anyType", obj.real_type)
 
     def test_property_raw_namespace(self):
         obj = Any()

@@ -255,8 +255,8 @@ class AttrTypeFactory(Factory):
         return cls.create(qname=DataType.ANY_TYPE.qname, native=True)
 
     @classmethod
-    def xs_qmap(cls):
-        return cls.create(qname=DataType.QMAP.qname, native=True)
+    def xs_any_attribute(cls):
+        return cls.create(qname=DataType.ANY_TYPE.qname, native=True, factory=dict)
 
     @classmethod
     def xs_qname(cls):
@@ -283,6 +283,7 @@ class AttrFactory(Factory):
         namespace=None,
         help=None,
         default=None,
+        factory=None,
         fixed=False,
         mixed=False,
         restrictions=None,
@@ -297,6 +298,7 @@ class AttrFactory(Factory):
             namespace=namespace or None,
             help=help or None,
             default=default or None,
+            factory=factory,
             fixed=fixed,
             mixed=mixed,
             restrictions=restrictions or RestrictionsFactory.create(),
@@ -317,7 +319,10 @@ class AttrFactory(Factory):
     @classmethod
     def any_attribute(cls, **kwargs) -> Attr:
         return cls.create(
-            tag=Tag.ANY_ATTRIBUTE, types=[AttrTypeFactory.xs_qmap()], **kwargs,
+            tag=Tag.ANY_ATTRIBUTE,
+            types=[AttrTypeFactory.xs_any()],
+            factory=dict,
+            **kwargs,
         )
 
     @classmethod

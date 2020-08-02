@@ -7,6 +7,7 @@ from typing import Dict
 from typing import Iterator
 from typing import List as Array
 from typing import Optional
+from typing import Type
 from typing import Union as UnionType
 
 from lxml.html.clean import clean_html
@@ -144,8 +145,12 @@ class AnyAttribute(AnnotationBase):
     @property
     def real_type(self) -> str:
         prefix = self.schema_prefix()
-        suffix = DataType.QMAP.code
+        suffix = DataType.ANY_TYPE.code
         return f"{prefix}:{suffix}" if prefix else suffix
+
+    @property
+    def factory(self) -> Optional[Type]:
+        return dict
 
 
 @dataclass
@@ -402,7 +407,7 @@ class Any(AnnotationBase):
     @property
     def real_type(self) -> str:
         prefix = self.schema_prefix()
-        suffix = DataType.OBJECT.code
+        suffix = DataType.ANY_TYPE.code
         return f"{prefix}:{suffix}" if prefix else suffix
 
     def get_restrictions(self) -> Dict[str, Anything]:

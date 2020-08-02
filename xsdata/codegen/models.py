@@ -221,6 +221,7 @@ class Attr:
     :param local_name:
     :param index:
     :param default:
+    :param factory:
     :param fixed:
     :param mixed:
     :param types:
@@ -234,6 +235,7 @@ class Attr:
     local_name: str
     index: int = field(compare=False, default_factory=int)
     default: Any = field(default=None, compare=False)
+    factory: Any = field(default=None, compare=False)
     fixed: bool = field(default=False, compare=False)
     mixed: bool = field(default=False, compare=False)
     types: List[AttrType] = field(default_factory=list)
@@ -255,7 +257,7 @@ class Attr:
     @property
     def is_factory(self) -> bool:
         """Return whether this attribute is a list of items or a mapping."""
-        return self.is_list or self.is_map
+        return self.is_list or self.is_dict
 
     @property
     def is_group(self) -> bool:
@@ -264,13 +266,9 @@ class Attr:
         return self.tag in (Tag.ATTRIBUTE_GROUP, Tag.GROUP)
 
     @property
-    def is_map(self) -> bool:
+    def is_dict(self) -> bool:
         """Return whether this attribute is a mapping of values."""
-        return (
-            len(self.types) == 1
-            and self.types[0].native
-            and isinstance(self.types[0].native_type, tuple)
-        )
+        return self.factory is dict
 
     @property
     def is_nameless(self) -> bool:

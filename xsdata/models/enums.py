@@ -1,7 +1,6 @@
 from decimal import Decimal
 from enum import Enum
 from pathlib import Path
-from typing import Iterable
 from typing import Optional
 
 from lxml.etree import QName
@@ -78,13 +77,8 @@ class Mode(Enum):
 
 
 class DataType(Enum):
-    """Xml data types to native python."""
+    """Xml and Schema data types to native python."""
 
-    # xsdata custom any type
-    QMAP = ("qmap", (QName, str))
-    OBJECT = ("object", object)
-
-    # xsd and xml data types
     ANY_ATOMIC_TYPE = ("anyAtomicType", str)
     ANY_URI = ("anyURI", str)
     ANY_SIMPLE_TYPE = ("anySimpleType", object)
@@ -150,9 +144,6 @@ class DataType(Enum):
 
     @property
     def local_name(self) -> str:
-        if isinstance(self.local, Iterable):
-            return ", ".join([local.__name__ for local in self.local])
-
         return self.local.__name__
 
     @classmethod

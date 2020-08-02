@@ -1,7 +1,9 @@
+import copy
 import json
-from dataclasses import asdict
 from dataclasses import dataclass
 from dataclasses import field
+from dataclasses import fields
+from dataclasses import is_dataclass
 from decimal import Decimal
 from enum import Enum
 from typing import Any
@@ -10,6 +12,8 @@ from typing import Dict
 from typing import Optional
 from typing import Tuple
 from typing import Type
+
+from lxml.etree import QName
 
 from xsdata.formats.bindings import AbstractSerializer
 
@@ -36,23 +40,32 @@ class JsonEncoder(json.JSONEncoder):
         if isinstance(obj, Decimal):
             return str(obj)
 
+        if isinstance(obj, QName):
+            return str(obj)
+
         return super().default(obj)
 
 
-@dataclass
-class DictSerializer(AbstractSerializer):
-    """
-    Simple dictionary serializer with access to the dict factory.
+def asdict(obj: Any, dict_factory: Callable = dict) -> Any:
+    """Clone dataclasses implementation to support pickling lxml.etree.QName
+    objects."""
+    if is_dataclass(obj):
+        return dict_factory(
+            [(f.name, asdict(getattr(obj, f.name), dict_factory)) for f in fields(obj)]
+        )
 
-    :param dict_factory: Override default dict factory to add further logic.
-    """
+    if isinstance(obj, (list, tuple)):
+        return type(obj)(asdict(v, dict_factory) for v in obj)
 
-    dict_factory: Callable = field(default=dict)
+    if isinstance(obj, dict):
+        return type(obj)(
+            (asdict(k, dict_factory), asdict(v, dict_factory)) for k, v in obj.items()
+        )
 
-    def render(self, obj: object) -> Dict:
-        """Convert the given object tree to dictionary with primitive
-        values."""
-        return asdict(obj, dict_factory=self.dict_factory)
+    if isinstance(obj, QName):
+        return obj.text  # QNames are readonly anyway!
+
+    return copy.deepcopy(obj)
 
 
 @dataclass
@@ -60,14 +73,14 @@ class JsonSerializer(AbstractSerializer):
     """
     Simple json.dumps wrapper.
 
-    :param dict_factory: Callable to generate dictionary.
-    :param encoder: Value encoder.
     :param indent: output indentation.
+    :param encoder: Value encoder.
+    :param dict_factory: Override default dict factory to add further logic.
     """
 
-    dict_factory: Callable = field(default=dict)
-    encoder: Type[json.JSONEncoder] = field(default=JsonEncoder)
     indent: Optional[int] = field(default=None)
+    encoder: Type[json.JSONEncoder] = field(default=JsonEncoder)
+    dict_factory: Callable = field(default=dict)
 
     def render(self, obj: object) -> str:
         """Convert the given object tree to json string."""

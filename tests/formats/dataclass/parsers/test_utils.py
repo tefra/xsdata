@@ -146,9 +146,11 @@ class ParserUtilsTests(TestCase):
         objects = [(x, x) for x in "abc"]
         self.assertEqual(["b", "c"], ParserUtils.fetch_any_children(1, objects))
 
+    @mock.patch.object(ParserUtils, "parse_any_type")
     @mock.patch.object(ParserUtils, "parse_value")
-    def test_bind_element_attrs(self, mock_parse_value):
+    def test_bind_element_attrs(self, mock_parse_value, mock_parse_any_type):
         mock_parse_value.return_value = "2020-03-02"
+        mock_parse_any_type.return_value = "bar"
         metadata = self.ctx.build(ProductType)
         eff_date = metadata.find_var("effDate")
         element = Element("foo")
@@ -157,14 +159,27 @@ class ParserUtilsTests(TestCase):
 
         params = {}
         ParserUtils.bind_element_attrs(params, metadata, element)
-        expected = {"eff_date": "2020-03-02", "other_attributes": {"whatever": "foo"}}
+        expected = {
+            "eff_date": "2020-03-02",
+            "other_attributes": {QName("whatever"): "bar"},
+        }
         self.assertEqual(expected, params)
+        mock_parse_any_type.assert_called_once_with("foo", element.nsmap)
         mock_parse_value.assert_called_once_with(
             "2020-03-01",
             eff_date.types,
             eff_date.default,
             element.nsmap,
             eff_date.is_list,
+        )
+
+    def test_parse_any_type(self):
+        self.assertEqual(
+            "http://foo", ParserUtils.parse_any_type("http://foo", {"http": "h"})
+        )
+        self.assertEqual("a:foo", ParserUtils.parse_any_type("a:foo", {}))
+        self.assertEqual(
+            QName("b", "foo"), ParserUtils.parse_any_type("a:foo", {"a": "b"})
         )
 
     def test_bind_element_attrs_doesnt_overwrite_values(self):
@@ -339,8 +354,8 @@ class ParserUtilsTests(TestCase):
             text="yes",
             tail="no",
             attributes={
-                "a": "1",
-                "b": "2",
+                QName("a"): "1",
+                QName("b"): "2",
                 QName(Namespace.XSI.uri, "type"): QName(Namespace.XS.uri, "float"),
             },
             ns_map=element.nsmap,
@@ -348,22 +363,6 @@ class ParserUtilsTests(TestCase):
         self.assertEqual(expected, actual)
         actual = ParserUtils.parse_any_element(element, False)
         self.assertIsNone(actual.qname)
-
-    def test_parse_any_attributes(self):
-        element = Element("foo", nsmap=dict(foo="bar"))
-        element.set("a", QName("bar", "val"))
-        element.set("b", "2")
-        element.set("c", "what:3")
-
-        actual = ParserUtils.parse_any_attributes(element)
-        expected = {
-            QName("a"): QName("bar", "val"),
-            QName("b"): "2",
-            QName("c"): "what:3",
-        }
-
-        self.assertEqual("foo:val", element.attrib["a"])
-        self.assertEqual(expected, actual)
 
     def test_element_text_and_tail(self):
         element = Element("foo")

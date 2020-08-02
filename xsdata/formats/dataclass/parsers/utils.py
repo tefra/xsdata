@@ -5,6 +5,7 @@ from typing import List
 from typing import Optional
 from typing import Tuple
 from typing import Type
+from typing import Union
 
 from lxml.etree import Element
 from lxml.etree import QName
@@ -202,21 +203,19 @@ class ParserUtils:
             text=txt,
             tail=tail,
             ns_map=element.nsmap,
-            attributes=cls.parse_any_attributes(element),
+            attributes={
+                QName(key): cls.parse_any_type(value, element.nsmap)
+                for key, value in element.attrib.items()
+            },
         )
 
     @classmethod
-    def parse_any_attributes(cls, element: Element) -> Dict[QName, Any]:
-        """Extract the given element's attributes into the dictionary with keys
-        the fully qualified attribute names."""
-
-        def qname(value: Any) -> Any:
-            prefix, suffix = text.split(value)
-            if prefix and prefix in element.nsmap and not suffix.startswith("//"):
-                return QName(element.nsmap[prefix], suffix)
-            return value
-
-        return {QName(key): qname(value) for key, value in element.attrib.items()}
+    def parse_any_type(cls, value: str, ns_map: Dict) -> Union[QName, str]:
+        """Attempt to parse the given value as a qualified name."""
+        prefix, suffix = text.split(value)
+        if prefix and prefix in ns_map and not suffix.startswith("//"):
+            return QName(ns_map[prefix], suffix)
+        return value
 
     @classmethod
     def bind_element_text(cls, params: Dict, metadata: XmlMeta, element: Element):
@@ -246,14 +245,15 @@ class ParserUtils:
             params[wildcard.name] = {}
 
         for key, value in element.attrib.items():
-            var = metadata.find_var(QName(key), FindMode.ATTRIBUTE)
+            qname = QName(key)
+            var = metadata.find_var(qname, FindMode.ATTRIBUTE)
             if var and var.name not in params:
                 if var.init:
                     params[var.name] = cls.parse_value(
                         value, var.types, var.default, element.nsmap, var.is_tokens
                     )
             elif wildcard:
-                params[wildcard.name][key] = value
+                params[wildcard.name][qname] = cls.parse_any_type(value, element.nsmap)
 
     @classmethod
     def find_eligible_wildcard(

@@ -22,14 +22,24 @@ class SerializeUtils:
         if key == QNames.XSI_NIL and (element.text or len(element) > 0):
             return
 
-        if isinstance(key, QName):
-            namespaces.add(key.namespace)
-
+        key = SerializeUtils.resolve_qname(key, namespaces)
+        value = SerializeUtils.resolve_qname(value, namespaces)
         value = to_xml(value, namespaces)
-        if not value:
-            return
 
-        element.set(key, value)
+        if value:
+            element.set(key, value)
+
+    @staticmethod
+    def resolve_qname(value: Any, namespaces: Namespaces) -> Any:
+        if not isinstance(value, str) or not value or value[0] != "{":
+            return value
+
+        try:
+            qname = QName(value)
+            namespaces.add(qname.namespace)
+            return qname
+        except ValueError:
+            return value
 
     @staticmethod
     def set_nil_attribute(element: Element, nillable: bool, namespaces: Namespaces):

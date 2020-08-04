@@ -226,7 +226,7 @@ class ParserUtils:
 
         if var and element.text is not None and len(element) == 0 and var.init:
             params[var.name] = cls.parse_value(
-                element.text, var.types, var.default, element.nsmap, var.is_tokens
+                element.text, var.types, var.default, element.nsmap, var.tokens
             )
         elif wildcard:
             cls.bind_wildcard_text(params, wildcard, element)
@@ -250,7 +250,7 @@ class ParserUtils:
             if var and var.name not in params:
                 if var.init:
                     params[var.name] = cls.parse_value(
-                        value, var.types, var.default, element.nsmap, var.is_tokens
+                        value, var.types, var.default, element.nsmap, var.tokens
                     )
             elif wildcard:
                 params[wildcard.name][key] = cls.parse_any_attribute(

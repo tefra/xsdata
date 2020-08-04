@@ -168,8 +168,7 @@ class XmlSerializerTests(TestCase):
         mock_render_sub_node.assert_has_calls(
             [
                 mock.call(root, 1, sub_node, self.namespaces),
-                mock.call(root, 2, sub_node, self.namespaces),
-                mock.call(root, 3, sub_node, self.namespaces),
+                mock.call(root, [2, 3], sub_node, self.namespaces),
             ]
         )
         mock_set_nil_attribute.assert_called_once_with(root, False, self.namespaces)

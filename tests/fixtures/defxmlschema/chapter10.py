@@ -67,7 +67,7 @@ class SizesType:
             max_inclusive=54
         )
     )
-    available_sizes: List[Union[int, "SizesType.Value"]] = field(
+    available_sizes: List[List[Union[int, "SizesType.Value"]]] = field(
         default_factory=list,
         metadata=dict(
             name="availableSizes",
@@ -76,7 +76,8 @@ class SizesType:
             min_occurs=0,
             max_occurs=9223372036854775807,
             min_inclusive=2,
-            max_inclusive=18
+            max_inclusive=18,
+            tokens=True
         )
     )
     applicable_sizes: List[ApplicableSizesType] = field(

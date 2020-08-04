@@ -270,7 +270,7 @@ class ParserUtilsTests(TestCase):
         self.assertEqual({"a": 1}, params)
 
     def test_bind_element_param_with_list_var(self):
-        var = XmlVar(name="a", qname=QName("a"), default=list)
+        var = XmlVar(name="a", qname=QName("a"), list_element=True)
         params = {}
 
         status = ParserUtils.bind_element_param(params, var, 1)
@@ -320,7 +320,7 @@ class ParserUtilsTests(TestCase):
         self.assertEqual(dict(a=expected), params)
 
     def test_bind_wildcard_text_when_var_is_list(self):
-        var = XmlVar(name="a", qname=QName("a"), default=list)
+        var = XmlVar(name="a", qname=QName("a"), default=list, list_element=True)
         elem = Element("foo")
         elem.text = "txt"
         elem.tail = "tail"

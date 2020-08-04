@@ -2,6 +2,7 @@ from unittest import TestCase
 
 from tests.factories import AttrFactory
 from tests.factories import AttrTypeFactory
+from xsdata.codegen.models import Restrictions
 from xsdata.formats.dataclass.filters import attribute_type
 
 
@@ -25,7 +26,7 @@ class AttributeTypeTests(TestCase):
 
         self.assertEqual('Optional["FooBar"]', attribute_type(attr, ["Parent"]))
 
-    def test_attribute_type_with_forwarderence(self):
+    def test_attribute_type_with_forward_reference(self):
         attr = AttrFactory.create(
             types=AttrTypeFactory.list(1, qname="foo_bar", forward=True)
         )
@@ -33,7 +34,7 @@ class AttributeTypeTests(TestCase):
             'Optional["Parent.Inner.FooBar"]', attribute_type(attr, ["Parent", "Inner"])
         )
 
-    def test_attribute_type_with_forward_and_circularerence(self):
+    def test_attribute_type_with_forward_and_circular_reference(self):
         attr = AttrFactory.create(
             types=AttrTypeFactory.list(1, qname="foo_bar", forward=True, circular=True)
         )
@@ -50,6 +51,16 @@ class AttributeTypeTests(TestCase):
         self.assertEqual(
             'List["A.Parent.FooBar"]', attribute_type(attr, ["A", "Parent"])
         )
+
+    def test_attribute_type_with_token_attr(self):
+        attr = AttrFactory.create(
+            types=AttrTypeFactory.list(1, qname="foo_bar"),
+            restrictions=Restrictions(tokens=True),
+        )
+        self.assertEqual("List[FooBar]", attribute_type(attr, []))
+
+        attr.restrictions.max_occurs = 2
+        self.assertEqual("List[List[FooBar]]", attribute_type(attr, []))
 
     def test_attribute_type_with_alias(self):
         attr = AttrFactory.create(

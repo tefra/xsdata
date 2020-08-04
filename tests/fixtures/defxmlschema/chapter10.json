@@ -13,7 +13,11 @@
         "large"
     ],
     "available_sizes": [
-        "10 large 2"
+        [
+            10,
+            "large",
+            2
+        ]
     ],
     "applicable_sizes": [
         "small medium large"

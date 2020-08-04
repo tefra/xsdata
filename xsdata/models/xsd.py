@@ -7,7 +7,6 @@ from typing import Dict
 from typing import Iterator
 from typing import List as Array
 from typing import Optional
-from typing import Type
 from typing import Union as UnionType
 
 from lxml.html.clean import clean_html
@@ -148,10 +147,6 @@ class AnyAttribute(AnnotationBase):
         suffix = DataType.ANY_TYPE.code
         return f"{prefix}:{suffix}" if prefix else suffix
 
-    @property
-    def factory(self) -> Optional[Type]:
-        return dict
-
 
 @dataclass
 class Assertion(AnnotationBase):
@@ -242,7 +237,7 @@ class List(AnnotationBase):
         return self.item_type
 
     def get_restrictions(self) -> Dict[str, Anything]:
-        return {"min_occurs": 0, "max_occurs": sys.maxsize}
+        return {"tokens": True}
 
 
 @dataclass

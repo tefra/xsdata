@@ -78,9 +78,7 @@ class JsonParser(AbstractParser):
                 else self.parse_context(value, AnyElement)
             )
 
-        return ParserUtils.parse_value(
-            value, var.types, var.default, tokens=var.is_tokens
-        )
+        return ParserUtils.parse_value(value, var.types, var.default, tokens=var.tokens)
 
     @staticmethod
     def get_value(data: Dict, var: XmlVar) -> Any:

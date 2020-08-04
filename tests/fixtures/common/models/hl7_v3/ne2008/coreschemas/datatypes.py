@@ -536,8 +536,8 @@ class SlistPq(Any):
         metadata=dict(
             type="Element",
             namespace="urn:hl7-org:v3",
-            min_occurs=0,
-            max_occurs=9223372036854775807
+            required=True,
+            tokens=True
         )
     )
 
@@ -577,8 +577,8 @@ class SlistTs(Any):
         metadata=dict(
             type="Element",
             namespace="urn:hl7-org:v3",
-            min_occurs=0,
-            max_occurs=9223372036854775807
+            required=True,
+            tokens=True
         )
     )
 

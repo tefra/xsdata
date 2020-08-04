@@ -22,5 +22,4 @@ class ListTests(TestCase):
 
     def test_get_restrictions(self):
         obj = List()
-        expected = dict(min_occurs=0, max_occurs=sys.maxsize)
-        self.assertEqual(expected, obj.get_restrictions())
+        self.assertEqual({"tokens": True}, obj.get_restrictions())

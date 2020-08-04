@@ -24,9 +24,11 @@ class XmlVar:
     :param qname: qualified local name,
     :param init:  field is present in the constructor arguments.
     :param mixed:  field supports mixed content.
+    :param tokens: use a list to map primitive values.
     :param nillable: allow to render empty nillable elements,
     :param dataclass: field type is a dataclass or a primitive type.
-    :param sequential: switch to sequential rendering with other sequential siblings,
+    :param sequential: switch to sequential rendering with other sequential siblings.
+    :param list_element: field represents a list of elements.
     :param default: default value or factory
     :param types: field bind or cast types.
     :param namespaces: a list of the all the possible namespaces.
@@ -36,9 +38,11 @@ class XmlVar:
     qname: QName
     init: bool = True
     mixed: bool = False
+    tokens: bool = False
     nillable: bool = False
     dataclass: bool = False
     sequential: bool = False
+    list_element: bool = False
     default: Any = None
     types: List[Type] = field(default_factory=list)
     namespaces: List[str] = field(default_factory=list)
@@ -71,7 +75,7 @@ class XmlVar:
     @property
     def is_list(self) -> bool:
         """Return whether the field is a list of elements."""
-        return self.default is list
+        return self.list_element
 
     @property
     def is_mixed_content(self) -> bool:
@@ -85,11 +89,6 @@ class XmlVar:
     @property
     def is_text(self) -> bool:
         """Return whether the field is a text element."""
-        return False
-
-    @property
-    def is_tokens(self) -> bool:
-        """Return whether the field is a list of tokens."""
         return False
 
     @property
@@ -165,10 +164,6 @@ class XmlAttribute(XmlVar):
     def is_attribute(self) -> bool:
         return True
 
-    @property
-    def is_tokens(self) -> bool:
-        return self.is_list
-
 
 @dataclass(frozen=True)
 class XmlAttributes(XmlVar):
@@ -182,10 +177,6 @@ class XmlAttributes(XmlVar):
 @dataclass(frozen=True)
 class XmlText(XmlVar):
     """Dataclass field bind metadata for xml text content."""
-
-    @property
-    def is_tokens(self) -> bool:
-        return self.is_list
 
     @property
     def is_text(self) -> bool:

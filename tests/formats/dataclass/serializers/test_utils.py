@@ -102,3 +102,19 @@ class SerializeUtilsTests(TestCase):
 
         SerializeUtils.set_tail(self.element, "", self.namespaces)
         self.assertIsNone(self.element.tail)
+
+    def test_resolve_qname(self):
+        ns = Namespaces()
+
+        actual = SerializeUtils.resolve_qname("a", ns)
+        self.assertIsInstance(actual, str)
+        self.assertEqual("a", actual)
+
+        actual = SerializeUtils.resolve_qname("{b}a", ns)
+        self.assertIsInstance(actual, QName)
+        self.assertEqual(QName("b", "a"), actual)
+        self.assertEqual("ns0", ns.prefix("b"))
+
+        actual = SerializeUtils.resolve_qname("{aw}", ns)
+        self.assertEqual("{aw}", actual)
+        self.assertIsInstance(actual, str)

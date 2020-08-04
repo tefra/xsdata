@@ -99,7 +99,7 @@ class XmlSerializer(AbstractSerializer):
             elif var.is_text:
                 namespaces.add(var.qname.namespace)
                 SerializeUtils.set_text(parent, value, namespaces)
-            elif isinstance(value, list):
+            elif var.is_list and isinstance(value, list):
                 self.render_sub_nodes(parent, value, var, namespaces)
             else:
                 self.render_sub_node(parent, value, var, namespaces)

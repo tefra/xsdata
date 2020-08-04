@@ -134,6 +134,8 @@ class XmlContext:
         for var in fields(clazz):
             type_hint = type_hints[var.name]
             types = self.real_types(type_hint)
+            is_tokens = var.metadata.get("tokens", False)
+            is_element_list = self.is_element_list(type_hint, is_tokens)
             xml_type = var.metadata.get("type")
             xml_clazz = XmlType.to_xml_class(xml_type)
             namespace = var.metadata.get("namespace")
@@ -155,6 +157,8 @@ class XmlContext:
                 nillable=var.metadata.get("nillable", False),
                 dataclass=is_class,
                 sequential=var.metadata.get("sequential", False),
+                tokens=is_tokens,
+                list_element=is_element_list,
                 types=types,
                 default=self.default_value(var),
             )
@@ -235,3 +239,15 @@ class XmlContext:
         return any(
             base is not object and isinstance(obj, base) for base in clazz.__bases__
         )
+
+    @staticmethod
+    def is_element_list(type_hint: Any, is_tokens: bool) -> bool:
+        if getattr(type_hint, "__origin__", None) is list:
+            if not is_tokens:
+                return True
+
+            type_hint = type_hint.__args__[0]
+            if getattr(type_hint, "__origin__", None) is list:
+                return True
+
+        return False

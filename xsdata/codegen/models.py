@@ -57,6 +57,7 @@ class Restrictions:
     :param explicit_timezone:
     :param nillable:
     :param sequential:
+    :param list:
     """
 
     required: Optional[bool] = field(default=None)
@@ -77,6 +78,7 @@ class Restrictions:
     explicit_timezone: Optional[str] = field(default=None)
     nillable: Optional[bool] = field(default=None)
     sequential: Optional[bool] = field(default=None)
+    tokens: Optional[bool] = field(default=None)
 
     @property
     def is_list(self) -> bool:
@@ -122,6 +124,9 @@ class Restrictions:
         # the field was and still is a list.
         if source.sequential and (is_list or not self.is_list):
             self.sequential = source.sequential
+
+        if not self.tokens and source.tokens:
+            self.tokens = True
 
         # Update min occurs if current value is None and the new value is more than one.
         if self.min_occurs is None or (min_occurs is not None and min_occurs != 1):
@@ -221,7 +226,6 @@ class Attr:
     :param local_name:
     :param index:
     :param default:
-    :param factory:
     :param fixed:
     :param mixed:
     :param types:
@@ -235,7 +239,6 @@ class Attr:
     local_name: str
     index: int = field(compare=False, default_factory=int)
     default: Any = field(default=None, compare=False)
-    factory: Any = field(default=None, compare=False)
     fixed: bool = field(default=False, compare=False)
     mixed: bool = field(default=False, compare=False)
     types: List[AttrType] = field(default_factory=list)
@@ -257,7 +260,7 @@ class Attr:
     @property
     def is_factory(self) -> bool:
         """Return whether this attribute is a list of items or a mapping."""
-        return self.is_list or self.is_dict
+        return self.is_list or self.is_dict or self.is_tokens
 
     @property
     def is_group(self) -> bool:
@@ -268,7 +271,7 @@ class Attr:
     @property
     def is_dict(self) -> bool:
         """Return whether this attribute is a mapping of values."""
-        return self.factory is dict
+        return self.tag == Tag.ANY_ATTRIBUTE
 
     @property
     def is_nameless(self) -> bool:
@@ -280,6 +283,11 @@ class Attr:
     def is_list(self) -> bool:
         """Return whether this attribute is a list of values."""
         return self.restrictions.is_list
+
+    @property
+    def is_tokens(self) -> bool:
+        """Return whether this attribute is a list of values."""
+        return self.restrictions.tokens is True
 
     @property
     def is_optional(self) -> bool:

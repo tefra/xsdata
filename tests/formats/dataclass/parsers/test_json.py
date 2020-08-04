@@ -50,7 +50,7 @@ class JsonParserTests(TestCase):
 
         foo_field = XmlText(name="foo", qname=QName("foo"), types=[str])
         bar_field = XmlElement(
-            name="bar", qname=QName("bar"), types=[str], default=list
+            name="bar", qname=QName("bar"), types=[str], list_element=True
         )
 
         self.assertEqual("bar", JsonParser.get_value(data, foo_field))

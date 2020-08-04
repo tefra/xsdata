@@ -8,7 +8,6 @@ from typing import Dict
 from typing import Iterator
 from typing import List
 from typing import Optional
-from typing import Type
 
 from xsdata.exceptions import SchemaValueError
 from xsdata.formats.dataclass.models.constants import XmlType
@@ -54,11 +53,6 @@ class ElementBase:
             default = getattr(self, "fixed", None)
 
         return default
-
-    @property
-    def factory(self) -> Optional[Type]:
-        """Return the factory function for values of this element."""
-        return None
 
     @property
     def display_help(self) -> Optional[str]:

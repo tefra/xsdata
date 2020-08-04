@@ -127,8 +127,7 @@ class EnxpExplicit:
         default_factory=list,
         metadata=dict(
             type="Attribute",
-            min_occurs=0,
-            max_occurs=9223372036854775807
+            tokens=True
         )
     )
 
@@ -1836,8 +1835,7 @@ class EnDelimiter:
         default_factory=list,
         metadata=dict(
             type="Attribute",
-            min_occurs=0,
-            max_occurs=9223372036854775807
+            tokens=True
         )
     )
 
@@ -1878,8 +1876,7 @@ class EnFamily:
         default_factory=list,
         metadata=dict(
             type="Attribute",
-            min_occurs=0,
-            max_occurs=9223372036854775807
+            tokens=True
         )
     )
 
@@ -1920,8 +1917,7 @@ class EnGiven:
         default_factory=list,
         metadata=dict(
             type="Attribute",
-            min_occurs=0,
-            max_occurs=9223372036854775807
+            tokens=True
         )
     )
 
@@ -1962,8 +1958,7 @@ class EnPrefix:
         default_factory=list,
         metadata=dict(
             type="Attribute",
-            min_occurs=0,
-            max_occurs=9223372036854775807
+            tokens=True
         )
     )
 
@@ -2004,8 +1999,7 @@ class EnSuffix:
         default_factory=list,
         metadata=dict(
             type="Attribute",
-            min_occurs=0,
-            max_occurs=9223372036854775807
+            tokens=True
         )
     )
 
@@ -2042,8 +2036,7 @@ class EnExplicitDelimiter:
         default_factory=list,
         metadata=dict(
             type="Attribute",
-            min_occurs=0,
-            max_occurs=9223372036854775807
+            tokens=True
         )
     )
 
@@ -2080,8 +2073,7 @@ class EnExplicitFamily:
         default_factory=list,
         metadata=dict(
             type="Attribute",
-            min_occurs=0,
-            max_occurs=9223372036854775807
+            tokens=True
         )
     )
 
@@ -2118,8 +2110,7 @@ class EnExplicitGiven:
         default_factory=list,
         metadata=dict(
             type="Attribute",
-            min_occurs=0,
-            max_occurs=9223372036854775807
+            tokens=True
         )
     )
 
@@ -2156,8 +2147,7 @@ class EnExplicitPrefix:
         default_factory=list,
         metadata=dict(
             type="Attribute",
-            min_occurs=0,
-            max_occurs=9223372036854775807
+            tokens=True
         )
     )
 
@@ -2194,8 +2184,7 @@ class EnExplicitSuffix:
         default_factory=list,
         metadata=dict(
             type="Attribute",
-            min_occurs=0,
-            max_occurs=9223372036854775807
+            tokens=True
         )
     )
 
@@ -2546,8 +2535,7 @@ class AdExplicit:
         default_factory=list,
         metadata=dict(
             type="Attribute",
-            min_occurs=0,
-            max_occurs=9223372036854775807
+            tokens=True
         )
     )
     is_not_ordered: Optional[str] = field(
@@ -2795,8 +2783,7 @@ class TelExplicit:
         default_factory=list,
         metadata=dict(
             type="Attribute",
-            min_occurs=0,
-            max_occurs=9223372036854775807
+            tokens=True
         )
     )
 
@@ -3829,8 +3816,7 @@ class Ad(Any):
         default_factory=list,
         metadata=dict(
             type="Attribute",
-            min_occurs=0,
-            max_occurs=9223372036854775807
+            tokens=True
         )
     )
     is_not_ordered: Optional[str] = field(
@@ -3963,8 +3949,7 @@ class Tel(Url):
         default_factory=list,
         metadata=dict(
             type="Attribute",
-            min_occurs=0,
-            max_occurs=9223372036854775807
+            tokens=True
         )
     )
 
@@ -4506,8 +4491,7 @@ class EnExplicit:
         default_factory=list,
         metadata=dict(
             type="Attribute",
-            min_occurs=0,
-            max_occurs=9223372036854775807
+            tokens=True
         )
     )
 
@@ -4593,8 +4577,7 @@ class OnExplicit:
         default_factory=list,
         metadata=dict(
             type="Attribute",
-            min_occurs=0,
-            max_occurs=9223372036854775807
+            tokens=True
         )
     )
 
@@ -4700,8 +4683,7 @@ class PnExplicit:
         default_factory=list,
         metadata=dict(
             type="Attribute",
-            min_occurs=0,
-            max_occurs=9223372036854775807
+            tokens=True
         )
     )
 
@@ -5525,8 +5507,7 @@ class Enxp(St):
         default_factory=list,
         metadata=dict(
             type="Attribute",
-            min_occurs=0,
-            max_occurs=9223372036854775807
+            tokens=True
         )
     )
 
@@ -5824,8 +5805,7 @@ class En(Any):
         default_factory=list,
         metadata=dict(
             type="Attribute",
-            min_occurs=0,
-            max_occurs=9223372036854775807
+            tokens=True
         )
     )
 
@@ -5920,8 +5900,7 @@ class On:
         default_factory=list,
         metadata=dict(
             type="Attribute",
-            min_occurs=0,
-            max_occurs=9223372036854775807
+            tokens=True
         )
     )
 
@@ -6017,8 +5996,7 @@ class Tn:
         default_factory=list,
         metadata=dict(
             type="Attribute",
-            min_occurs=0,
-            max_occurs=9223372036854775807
+            tokens=True
         )
     )
 

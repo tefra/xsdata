@@ -3,6 +3,15 @@ from dataclasses import dataclass, field
 from typing import List, Union
 
 
+class ApplicableSizesType(Enum):
+    """
+    :cvar SMALL_MEDIUM_LARGE:
+    :cvar VALUE_2_4_6_8_10_12_14_16_18:
+    """
+    SMALL_MEDIUM_LARGE = "small medium large"
+    VALUE_2_4_6_8_10_12_14_16_18 = "2 4 6 8 10 12 14 16 18"
+
+
 class SmallSizeType(Enum):
     """
     :cvar VALUE_2:
@@ -70,16 +79,14 @@ class SizesType:
             max_inclusive=18
         )
     )
-    applicable_sizes: List[Union[int, "SizesType.Value"]] = field(
+    applicable_sizes: List[ApplicableSizesType] = field(
         default_factory=list,
         metadata=dict(
             name="applicableSizes",
             type="Element",
             namespace="",
             min_occurs=0,
-            max_occurs=9223372036854775807,
-            min_inclusive=2,
-            max_inclusive=18
+            max_occurs=9223372036854775807
         )
     )
 

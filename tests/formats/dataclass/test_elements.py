@@ -31,11 +31,18 @@ class XmlValTests(TestCase):
         var = XmlVar(name="foo", qname=QName("foo"), dataclass=True, types=[Fixture])
         self.assertEqual(Fixture, var.clazz)
 
+    def test_property_is_clazz_union(self):
+        var = XmlVar(name="foo", qname=QName("foo"), dataclass=True, types=[Fixture])
+        self.assertFalse(var.is_clazz_union)
+
+        var.types.append(Fixture)
+        self.assertTrue(var.is_clazz_union)
+
     def test_property_is_list(self):
         var = XmlVar(name="foo", qname=QName("foo"))
         self.assertFalse(var.is_list)
 
-        var = XmlVar(name="foo", qname=QName("foo"), types=[int], default=list)
+        var = XmlVar(name="foo", qname=QName("foo"), types=[int], list_element=True)
         self.assertTrue(var.is_list)
 
     def test_default_properties(self):
@@ -46,7 +53,6 @@ class XmlValTests(TestCase):
         self.assertFalse(var.is_wildcard)
         self.assertFalse(var.is_element)
         self.assertFalse(var.is_text)
-        self.assertFalse(var.is_tokens)
         self.assertFalse(var.is_mixed_content)
 
     def test_matches(self):
@@ -123,13 +129,6 @@ class XmlAttributeTests(TestCase):
         self.assertIsInstance(var, XmlVar)
         self.assertTrue(var.is_attribute)
 
-    def test_property_is_tokens(self):
-        var = XmlAttribute(name="foo", qname=QName("foo"))
-        self.assertFalse(var.is_tokens)
-
-        var = XmlAttribute(name="foo", qname=QName("foo"), default=list)
-        self.assertTrue(var.is_tokens)
-
 
 class XmlAttributesTests(TestCase):
     def test_property_is_attributes(self):
@@ -145,13 +144,6 @@ class XmlTextTests(TestCase):
 
         self.assertIsInstance(var, XmlVar)
         self.assertTrue(var.is_text)
-
-    def test_property_is_tokens(self):
-        var = XmlText(name="foo", qname=QName("foo"))
-        self.assertFalse(var.is_tokens)
-
-        var = XmlText(name="foo", qname=QName("foo"), default=list)
-        self.assertTrue(var.is_tokens)
 
 
 class XmlMetaTests(TestCase):

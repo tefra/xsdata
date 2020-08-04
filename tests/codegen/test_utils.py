@@ -6,7 +6,7 @@ from tests.factories import AttrTypeFactory
 from tests.factories import ClassFactory
 from tests.factories import ExtensionFactory
 from tests.factories import FactoryTestCase
-from tests.factories import RestrictionsFactory
+from xsdata.codegen.models import Restrictions
 from xsdata.codegen.utils import ClassUtils
 
 
@@ -77,14 +77,14 @@ class ClassUtilsTests(FactoryTestCase):
 
     def test_clone_attribute(self):
         attr = AttrFactory.create(
-            restrictions=RestrictionsFactory.create(length=1),
+            restrictions=Restrictions(length=1),
             types=[
                 AttrTypeFactory.create(qname="x"),
                 AttrTypeFactory.create(qname="y"),
                 AttrTypeFactory.xs_int(),
             ],
         )
-        restrictions = RestrictionsFactory.create(length=2)
+        restrictions = Restrictions(length=2)
 
         clone = ClassUtils.clone_attribute(attr, restrictions)
 

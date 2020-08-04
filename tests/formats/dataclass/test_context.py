@@ -1,7 +1,9 @@
 from dataclasses import dataclass
 from dataclasses import make_dataclass
 from dataclasses import replace
+from typing import get_type_hints
 from typing import Iterator
+from typing import List
 from unittest import mock
 from unittest import TestCase
 
@@ -207,6 +209,7 @@ class XmlContextTests(TestCase):
             types=[BookForm],
             dataclass=True,
             default=list,
+            list_element=True,
         )
 
         self.assertTrue(expected.is_list)
@@ -311,3 +314,17 @@ class XmlContextTests(TestCase):
         self.assertTrue(self.ctx.is_derived(a(), c))
         self.assertTrue(self.ctx.is_derived(a(), a))
         self.assertFalse(self.ctx.is_derived(a(), d))
+
+    def test_is_element_list(self):
+        @dataclass
+        class Fixture:
+            list_int: List[int]
+            list_list_int: List[List[int]]
+
+        type_hints = get_type_hints(Fixture)
+
+        self.assertTrue(self.ctx.is_element_list(type_hints["list_int"], False))
+        self.assertFalse(self.ctx.is_element_list(type_hints["list_int"], True))
+
+        self.assertTrue(self.ctx.is_element_list(type_hints["list_list_int"], False))
+        self.assertTrue(self.ctx.is_element_list(type_hints["list_list_int"], True))

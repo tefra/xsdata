@@ -141,9 +141,9 @@ def default_imports(output: str) -> str:
 
 def attribute_default(attr: Attr, ns_map: Optional[Dict] = None) -> Any:
     """Generate the field default value/factory for the given attribute."""
-    if attr.is_list:
+    if attr.is_list or attr.is_tokens:
         return "list"
-    if attr.factory is dict:
+    if attr.is_dict:
         return "dict"
     if not isinstance(attr.default, str):
         return attr.default
@@ -200,11 +200,14 @@ def attribute_type(attr: Attr, parents: List[str]) -> str:
     if len(type_names) > 1:
         result = f"Union[{result}]"
 
+    if attr.is_tokens:
+        result = f"List[{result}]"
+
     if attr.is_list:
         result = f"List[{result}]"
     elif attr.is_dict:
         result = "Dict"
-    elif attr.default is None and "Dict" not in result:
+    elif attr.default is None and not attr.is_factory:
         result = f"Optional[{result}]"
 
     return result

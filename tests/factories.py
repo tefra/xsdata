@@ -38,7 +38,6 @@ class FactoryTestCase(unittest.TestCase):
         AttrFactory.reset()
         AttrTypeFactory.reset()
         ExtensionFactory.reset()
-        RestrictionsFactory.reset()
         PackageFactory.reset()
 
 
@@ -141,50 +140,6 @@ class ClassFactory(Factory):
         )
 
 
-class RestrictionsFactory(Factory):
-    model = Restrictions
-    counter = 65
-
-    @classmethod
-    def create(
-        cls,
-        required=None,
-        min_occurs=None,
-        max_occurs=None,
-        min_exclusive=None,
-        min_inclusive=None,
-        min_length=None,
-        max_exclusive=None,
-        max_inclusive=None,
-        max_length=None,
-        total_digits=None,
-        fraction_digits=None,
-        length=None,
-        white_space=None,
-        pattern=None,
-        explicit_timezone=None,
-        nillable=None,
-    ):
-        return cls.model(
-            required=required,
-            min_occurs=min_occurs,
-            max_occurs=max_occurs,
-            min_exclusive=min_exclusive,
-            min_inclusive=min_inclusive,
-            min_length=min_length,
-            max_exclusive=max_exclusive,
-            max_inclusive=max_inclusive,
-            max_length=max_length,
-            total_digits=total_digits,
-            fraction_digits=fraction_digits,
-            length=length,
-            white_space=white_space,
-            pattern=pattern,
-            explicit_timezone=explicit_timezone,
-            nillable=nillable,
-        )
-
-
 class ExtensionFactory(Factory):
     model = Extension
     counter = 65
@@ -193,7 +148,7 @@ class ExtensionFactory(Factory):
     def create(cls, type=None, restrictions=None):
         return cls.model(
             type=type or AttrTypeFactory.create(),
-            restrictions=restrictions or RestrictionsFactory.create(),
+            restrictions=restrictions or Restrictions(),
         )
 
 
@@ -255,10 +210,6 @@ class AttrTypeFactory(Factory):
         return cls.create(qname=DataType.ANY_TYPE.qname, native=True)
 
     @classmethod
-    def xs_any_attribute(cls):
-        return cls.create(qname=DataType.ANY_TYPE.qname, native=True, factory=dict)
-
-    @classmethod
     def xs_qname(cls):
         return cls.create(qname=DataType.QNAME.qname, native=True)
 
@@ -283,7 +234,6 @@ class AttrFactory(Factory):
         namespace=None,
         help=None,
         default=None,
-        factory=None,
         fixed=False,
         mixed=False,
         restrictions=None,
@@ -298,10 +248,9 @@ class AttrFactory(Factory):
             namespace=namespace or None,
             help=help or None,
             default=default or None,
-            factory=factory,
             fixed=fixed,
             mixed=mixed,
-            restrictions=restrictions or RestrictionsFactory.create(),
+            restrictions=restrictions or Restrictions(),
         )
 
     @classmethod
@@ -319,10 +268,7 @@ class AttrFactory(Factory):
     @classmethod
     def any_attribute(cls, **kwargs) -> Attr:
         return cls.create(
-            tag=Tag.ANY_ATTRIBUTE,
-            types=[AttrTypeFactory.xs_any()],
-            factory=dict,
-            **kwargs,
+            tag=Tag.ANY_ATTRIBUTE, types=[AttrTypeFactory.xs_any()], **kwargs,
         )
 
     @classmethod

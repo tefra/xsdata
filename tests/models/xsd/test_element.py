@@ -96,12 +96,16 @@ class ElementTests(TestCase):
         self.assertEqual(expected, obj.get_restrictions())
 
         obj.simple_type = SimpleType(restriction=Restriction(length=Length(value=9)))
-        expected.update({"length": 9})
+        expected["length"] = 9
         self.assertEqual(expected, obj.get_restrictions())
 
         obj.nillable = False
         self.assertEqual(expected, obj.get_restrictions())
 
         obj.nillable = True
-        expected.update({"nillable": True})
+        expected["nillable"] = True
+        self.assertEqual(expected, obj.get_restrictions())
+
+        obj.type = "NMTOKENS"
+        expected["tokens"] = True
         self.assertEqual(expected, obj.get_restrictions())

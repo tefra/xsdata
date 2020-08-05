@@ -2,6 +2,7 @@ from typing import Iterator
 from unittest import TestCase
 
 from xsdata.exceptions import SchemaValueError
+from xsdata.models.enums import DataType
 from xsdata.models.enums import FormType
 from xsdata.models.enums import Namespace
 from xsdata.models.mixins import ElementBase
@@ -166,14 +167,12 @@ class ElementBaseTests(TestCase):
         element = ElementBase()
         self.assertEqual([], element.substitutions)
 
-    def test_schema_prefix(self):
+    def test_data_type_ref(self):
         element = ElementBase()
+        self.assertEqual("string", element.data_type_ref(DataType.STRING))
 
-        self.assertIsNone(element.schema_prefix())
-
-        element = ElementBase()
-        element.ns_map.update({"a": "b", "c": Namespace.XS.uri})
-        self.assertEqual("c", element.schema_prefix())
+        element.ns_map["foo"] = Namespace.XS.uri
+        self.assertEqual("foo:string", element.data_type_ref(DataType.STRING))
 
 
 class ModuleMixinTests(TestCase):

@@ -33,15 +33,10 @@ def sort_types(types: List[Type]) -> List[Type]:
     return types
 
 
-def to_python(
-    value: Any, types: List[Type], ns_map: Optional[Dict] = None, in_order: bool = True
-) -> Any:
+def to_python(value: Any, types: List[Type], ns_map: Optional[Dict] = None) -> Any:
 
     if not isinstance(value, str):
         return value
-
-    if not in_order and len(types) > 1:
-        types = sort_types(list(types))
 
     for clazz in types:
         with contextlib.suppress(ValueError, InvalidOperation, TypeError):

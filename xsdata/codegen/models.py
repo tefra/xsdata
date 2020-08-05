@@ -13,6 +13,7 @@ from typing import Type
 
 from lxml.etree import QName
 
+from xsdata.formats.converters import sort_types
 from xsdata.formats.converters import to_python
 from xsdata.formats.dataclass.models.constants import XmlType
 from xsdata.models.enums import DataType
@@ -144,9 +145,11 @@ class Restrictions:
         providing the parent attribute types.
         """
 
+        sorted_types = sort_types(types) if types else []
+
         def clean(key: str, value: Any) -> Any:
             if types and key.endswith("clusive"):
-                return to_python(value, types, in_order=False)
+                return to_python(value, sorted_types)
             return value
 
         return {k: clean(k, v) for k, v in asdict(self).items() if v is not None}

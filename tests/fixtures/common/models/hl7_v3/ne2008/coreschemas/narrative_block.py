@@ -40,11 +40,12 @@ class StrucDocCol:
             type="Attribute"
         )
     )
-    style_code: Optional[str] = field(
-        default=None,
+    style_code: List[str] = field(
+        default_factory=list,
         metadata=dict(
             name="styleCode",
-            type="Attribute"
+            type="Attribute",
+            tokens=True
         )
     )
     span: str = field(
@@ -135,11 +136,12 @@ class StrucDocFootnoteRef:
             type="Attribute"
         )
     )
-    style_code: Optional[str] = field(
-        default=None,
+    style_code: List[str] = field(
+        default_factory=list,
         metadata=dict(
             name="styleCode",
-            type="Attribute"
+            type="Attribute",
+            tokens=True
         )
     )
     idref: Optional[str] = field(
@@ -287,11 +289,12 @@ class StrucDocCaption:
             type="Attribute"
         )
     )
-    style_code: Optional[str] = field(
-        default=None,
+    style_code: List[str] = field(
+        default_factory=list,
         metadata=dict(
             name="styleCode",
-            type="Attribute"
+            type="Attribute",
+            tokens=True
         )
     )
 
@@ -335,11 +338,12 @@ class StrucDocColgroup:
             type="Attribute"
         )
     )
-    style_code: Optional[str] = field(
-        default=None,
+    style_code: List[str] = field(
+        default_factory=list,
         metadata=dict(
             name="styleCode",
-            type="Attribute"
+            type="Attribute",
+            tokens=True
         )
     )
     span: str = field(
@@ -480,11 +484,12 @@ class StrucDocTitleFootnote:
             type="Attribute"
         )
     )
-    style_code: Optional[str] = field(
-        default=None,
+    style_code: List[str] = field(
+        default_factory=list,
         metadata=dict(
             name="styleCode",
-            type="Attribute"
+            type="Attribute",
+            tokens=True
         )
     )
 
@@ -529,11 +534,12 @@ class StrucDocRenderMultiMedia:
             type="Attribute"
         )
     )
-    style_code: Optional[str] = field(
-        default=None,
+    style_code: List[str] = field(
+        default_factory=list,
         metadata=dict(
             name="styleCode",
-            type="Attribute"
+            type="Attribute",
+            tokens=True
         )
     )
 
@@ -633,11 +639,12 @@ class StrucDocTitleContent:
             type="Attribute"
         )
     )
-    style_code: Optional[str] = field(
-        default=None,
+    style_code: List[str] = field(
+        default_factory=list,
         metadata=dict(
             name="styleCode",
-            type="Attribute"
+            type="Attribute",
+            tokens=True
         )
     )
 
@@ -767,11 +774,12 @@ class StrucDocParagraph:
             type="Attribute"
         )
     )
-    style_code: Optional[str] = field(
-        default=None,
+    style_code: List[str] = field(
+        default_factory=list,
         metadata=dict(
             name="styleCode",
-            type="Attribute"
+            type="Attribute",
+            tokens=True
         )
     )
 
@@ -903,11 +911,12 @@ class StrucDocTh:
             type="Attribute"
         )
     )
-    style_code: Optional[str] = field(
-        default=None,
+    style_code: List[str] = field(
+        default_factory=list,
         metadata=dict(
             name="styleCode",
-            type="Attribute"
+            type="Attribute",
+            tokens=True
         )
     )
     abbr: Optional[str] = field(
@@ -1106,11 +1115,12 @@ class StrucDocTitle:
             type="Attribute"
         )
     )
-    style_code: Optional[str] = field(
-        default=None,
+    style_code: List[str] = field(
+        default_factory=list,
         metadata=dict(
             name="styleCode",
-            type="Attribute"
+            type="Attribute",
+            tokens=True
         )
     )
     media_type: str = field(
@@ -1271,11 +1281,12 @@ class StrucDocTd:
             type="Attribute"
         )
     )
-    style_code: Optional[str] = field(
-        default=None,
+    style_code: List[str] = field(
+        default_factory=list,
         metadata=dict(
             name="styleCode",
-            type="Attribute"
+            type="Attribute",
+            tokens=True
         )
     )
     abbr: Optional[str] = field(
@@ -1425,11 +1436,12 @@ class StrucDocTr:
             type="Attribute"
         )
     )
-    style_code: Optional[str] = field(
-        default=None,
+    style_code: List[str] = field(
+        default_factory=list,
         metadata=dict(
             name="styleCode",
-            type="Attribute"
+            type="Attribute",
+            tokens=True
         )
     )
     align: Optional["StrucDocTr.Align"] = field(
@@ -1521,11 +1533,12 @@ class StrucDocTbody:
             type="Attribute"
         )
     )
-    style_code: Optional[str] = field(
-        default=None,
+    style_code: List[str] = field(
+        default_factory=list,
         metadata=dict(
             name="styleCode",
-            type="Attribute"
+            type="Attribute",
+            tokens=True
         )
     )
     align: Optional["StrucDocTbody.Align"] = field(
@@ -1617,11 +1630,12 @@ class StrucDocTfoot:
             type="Attribute"
         )
     )
-    style_code: Optional[str] = field(
-        default=None,
+    style_code: List[str] = field(
+        default_factory=list,
         metadata=dict(
             name="styleCode",
-            type="Attribute"
+            type="Attribute",
+            tokens=True
         )
     )
     align: Optional["StrucDocTfoot.Align"] = field(
@@ -1713,11 +1727,12 @@ class StrucDocThead:
             type="Attribute"
         )
     )
-    style_code: Optional[str] = field(
-        default=None,
+    style_code: List[str] = field(
+        default_factory=list,
         metadata=dict(
             name="styleCode",
-            type="Attribute"
+            type="Attribute",
+            tokens=True
         )
     )
     align: Optional["StrucDocThead.Align"] = field(
@@ -1856,11 +1871,12 @@ class StrucDocTable:
             type="Attribute"
         )
     )
-    style_code: Optional[str] = field(
-        default=None,
+    style_code: List[str] = field(
+        default_factory=list,
         metadata=dict(
             name="styleCode",
-            type="Attribute"
+            type="Attribute",
+            tokens=True
         )
     )
     summary: Optional[str] = field(
@@ -2099,11 +2115,12 @@ class StrucDocItem:
             type="Attribute"
         )
     )
-    style_code: Optional[str] = field(
-        default=None,
+    style_code: List[str] = field(
+        default_factory=list,
         metadata=dict(
             name="styleCode",
-            type="Attribute"
+            type="Attribute",
+            tokens=True
         )
     )
 
@@ -2150,11 +2167,12 @@ class StrucDocList:
             type="Attribute"
         )
     )
-    style_code: Optional[str] = field(
-        default=None,
+    style_code: List[str] = field(
+        default_factory=list,
         metadata=dict(
             name="styleCode",
-            type="Attribute"
+            type="Attribute",
+            tokens=True
         )
     )
     list_type: StrucDocListListType = field(
@@ -2293,11 +2311,12 @@ class StrucDocFootnote:
             type="Attribute"
         )
     )
-    style_code: Optional[str] = field(
-        default=None,
+    style_code: List[str] = field(
+        default_factory=list,
         metadata=dict(
             name="styleCode",
-            type="Attribute"
+            type="Attribute",
+            tokens=True
         )
     )
 
@@ -2392,11 +2411,12 @@ class StrucDocLinkHtml:
             type="Attribute"
         )
     )
-    style_code: Optional[str] = field(
-        default=None,
+    style_code: List[str] = field(
+        default_factory=list,
         metadata=dict(
             name="styleCode",
-            type="Attribute"
+            type="Attribute",
+            tokens=True
         )
     )
 
@@ -2519,11 +2539,12 @@ class StrucDocContent:
             type="Attribute"
         )
     )
-    style_code: Optional[str] = field(
-        default=None,
+    style_code: List[str] = field(
+        default_factory=list,
         metadata=dict(
             name="styleCode",
-            type="Attribute"
+            type="Attribute",
+            tokens=True
         )
     )
     revised: Optional["StrucDocContent.Revised"] = field(
@@ -2691,11 +2712,12 @@ class StrucDocText:
             type="Attribute"
         )
     )
-    style_code: Optional[str] = field(
-        default=None,
+    style_code: List[str] = field(
+        default_factory=list,
         metadata=dict(
             name="styleCode",
-            type="Attribute"
+            type="Attribute",
+            tokens=True
         )
     )
     media_type: str = field(

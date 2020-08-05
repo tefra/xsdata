@@ -15,6 +15,7 @@ from xsdata.models.enums import DataType
 from xsdata.models.enums import FormType
 from xsdata.models.enums import Namespace
 from xsdata.models.enums import NamespaceType
+from xsdata.utils import collections
 from xsdata.utils import text
 
 Condition = Optional[Callable]
@@ -41,9 +42,7 @@ class ElementBase:
     def default_type(self) -> str:
         """Return the default type if the given element has not specific
         type."""
-        prefix = self.schema_prefix()
-        suffix = DataType.STRING.code
-        return f"{prefix}:{suffix}" if prefix else suffix
+        return self.data_type_ref(DataType.STRING)
 
     @property
     def default_value(self) -> Any:
@@ -169,21 +168,15 @@ class ElementBase:
         """Return the substitution groups of this element."""
         return []
 
+    def data_type_ref(self, data_type: DataType) -> str:
+        """Return the given data type code with the xml schema namespace prefix
+        if any."""
+        prefix = collections.map_key(self.ns_map, Namespace.XS.uri)
+        return f"{prefix}:{data_type.code}" if prefix else data_type.code
+
     def get_restrictions(self) -> Dict[str, Any]:
         """Return the restrictions dictionary of this element."""
         return {}
-
-    def schema_prefix(self) -> Optional[str]:
-        """Return the target namespace prefix used in the schema definition if
-        any."""
-        return next(
-            (
-                prefix
-                for prefix, namespace in self.ns_map.items()
-                if namespace == Namespace.XS.uri
-            ),
-            None,
-        )
 
     def children(self, condition: Condition = None) -> Iterator["ElementBase"]:
         """Iterate over all the ElementBase children of this element that match

@@ -18,3 +18,9 @@ class CollectionsTests(TestCase):
         result = collections.concat((1, 2, 3), [4, 5, 6], generator())
         self.assertIsInstance(result, Generator)
         self.assertEqual(list(range(1, 10)), list(result))
+
+    def test_map_key(self):
+        dictionary = {"a": "b"}
+
+        self.assertIsNone(collections.map_key(dictionary, "x"))
+        self.assertEqual("a", collections.map_key(dictionary, "b"))

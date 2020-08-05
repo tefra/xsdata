@@ -50,7 +50,6 @@ class ConvertersTestCases(TestCase):
         self.assertEqual(1, to_python("1", [int]))
         self.assertEqual(1, to_python("1", [int, str]))
         self.assertEqual("1", to_python("1", [str, int]))
-        self.assertEqual(1, to_python("1", [str, int], in_order=False))
 
         with warnings.catch_warnings(record=True):
             self.assertEqual("a", to_python("a", [int]))
@@ -59,7 +58,6 @@ class ConvertersTestCases(TestCase):
         self.assertEqual(1.0, to_python("1", [float]))
         self.assertEqual(1.0, to_python("1", [float, str]))
         self.assertEqual("1", to_python("1", [str, float]))
-        self.assertEqual(1.0, to_python("1", [str, float], in_order=False))
 
         with warnings.catch_warnings(record=True):
             self.assertEqual("a", to_python("a", [float]))
@@ -68,7 +66,6 @@ class ConvertersTestCases(TestCase):
         self.assertEqual(1.0, to_python("1", [Decimal]))
         self.assertEqual(1.0, to_python("1", [Decimal, str]))
         self.assertEqual("1", to_python("1", [str, Decimal]))
-        self.assertEqual(1.0, to_python("1", [str, Decimal], in_order=False))
 
         with warnings.catch_warnings(record=True):
             self.assertEqual("a", to_python("a", [Decimal]))
@@ -79,13 +76,11 @@ class ConvertersTestCases(TestCase):
             self.assertEqual(True, to_python(val, [bool]))
             self.assertEqual(True, to_python(val, [bool, str]))
             self.assertEqual(val, to_python(val, [str, bool]))
-            self.assertEqual(True, to_python(val, [str, bool], in_order=False))
 
         for val in ("0", "false"):
             self.assertEqual(False, to_python(val, [bool]))
             self.assertEqual(False, to_python(val, [bool, str]))
             self.assertEqual(val, to_python(val, [str, bool]))
-            self.assertEqual(False, to_python(val, [str, bool], in_order=False))
 
         self.assertEqual(True, to_python("1 ", [bool]))
         self.assertEqual(False, to_python("false ", [bool]))
@@ -96,9 +91,6 @@ class ConvertersTestCases(TestCase):
     def test_to_python_enum(self):
         self.assertEqual(UseType.OPTIONAL, to_python("optional", [UseType]))
         self.assertEqual("optional", to_python("optional", [str, UseType]))
-        self.assertEqual(
-            UseType.OPTIONAL, to_python("optional", [str, UseType], in_order=False)
-        )
 
     def test_to_python_enum_qname(self):
         class QNameType(Enum):
@@ -126,7 +118,6 @@ class ConvertersTestCases(TestCase):
 
         self.assertEqual(Foo("1"), to_python("1", [Foo]))
         self.assertEqual(1.0, to_python("1", [float, UseType]))
-        self.assertEqual(Foo("1"), to_python("1", [Foo], in_order=False))
 
     def test_to_python_unhandled_type(self):
         class Foo:

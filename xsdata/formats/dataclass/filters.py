@@ -5,6 +5,7 @@ from typing import Any
 from typing import Dict
 from typing import List
 from typing import Optional
+from typing import Type
 from xml.sax.saxutils import quoteattr
 
 from docformatter import format_code
@@ -13,9 +14,9 @@ from lxml.etree import QName
 from xsdata.codegen.models import Attr
 from xsdata.codegen.models import AttrType
 from xsdata.codegen.models import Class
+from xsdata.formats.converters import sort_types
 from xsdata.formats.converters import to_python
 from xsdata.formats.dataclass import utils
-from xsdata.models.enums import DataType
 from xsdata.utils import text
 
 
@@ -141,40 +142,57 @@ def default_imports(output: str) -> str:
 
 def attribute_default(attr: Attr, ns_map: Optional[Dict] = None) -> Any:
     """Generate the field default value/factory for the given attribute."""
-    if attr.is_list or attr.is_tokens:
+    if attr.is_list or (attr.is_tokens and not attr.default):
         return "list"
     if attr.is_dict:
         return "dict"
     if not isinstance(attr.default, str):
         return attr.default
     if attr.default.startswith("@enum@"):
-        source, enumeration = attr.default[6:].split("::", 1)
-        source = next(x.alias or source for x in attr.types if x.name == source)
-        return f"{class_name(source)}.{constant_name(enumeration)}"
+        return attribute_default_enum(attr)
 
-    data_types = {
-        attr_type.native_code: attr_type.native_type
-        for attr_type in attr.types
-        if attr_type.native
-    }
+    types = sort_types(
+        list({attr_type.native_type for attr_type in attr.types if attr_type.native})
+    )
 
-    local_types = list(set(data_types.values()))
-    default_value = to_python(attr.default, local_types, ns_map, in_order=False)
+    if attr.is_tokens:
+        return attribute_default_tokens(attr, types)
 
-    if isinstance(default_value, str):
-        if DataType.NMTOKENS.code in data_types:
-            default_value = quoteattr(" ".join(default_value.split()))
-        else:
-            default_value = quoteattr(default_value)
-    elif isinstance(default_value, float) and math.isinf(default_value):
-        default_value = f"float('{default_value}')"
-    elif isinstance(default_value, Decimal):
-        default_value = repr(default_value)
-    elif isinstance(default_value, QName):
-        default_value = (
-            f'QName("{default_value.namespace}", "{default_value.localname}")'
-        )
-    return default_value
+    return prepare_attribute_default(to_python(attr.default, types, ns_map))
+
+
+def attribute_default_enum(attr: Attr) -> str:
+    source, enumeration = attr.default[6:].split("::", 1)
+    source = next(x.alias or source for x in attr.types if x.name == source)
+    return f"{class_name(source)}.{constant_name(enumeration)}"
+
+
+def attribute_default_tokens(attr: Attr, types: List[Type]) -> str:
+    assert isinstance(attr.default, str)
+
+    tokens = ", ".join(
+        [
+            str(prepare_attribute_default(to_python(val, types)))
+            for val in attr.default.split()
+        ]
+    )
+    return f"lambda: [{tokens}]"
+
+
+def prepare_attribute_default(value: Any) -> Any:
+    if isinstance(value, str):
+        return quoteattr(value)
+
+    if isinstance(value, float):
+        return f"float('{value}')" if math.isinf(value) else value
+
+    if isinstance(value, Decimal):
+        return repr(value)
+
+    if isinstance(value, QName):
+        return f'QName("{value.namespace}", "{value.localname}")'
+
+    return value
 
 
 def attribute_type(attr: Attr, parents: List[str]) -> str:

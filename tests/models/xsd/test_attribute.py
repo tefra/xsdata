@@ -48,7 +48,11 @@ class AttributeTests(TestCase):
         self.assertEqual(expected, obj.get_restrictions())
 
         obj.simple_type = SimpleType(restriction=Restriction(length=Length(value=1)))
-        expected.update(dict(length=1))
+        expected["length"] = 1
+        self.assertEqual(expected, obj.get_restrictions())
+
+        obj.type = "NMTOKENS"
+        expected["tokens"] = True
         self.assertEqual(expected, obj.get_restrictions())
 
     def test_property_extensions(self):

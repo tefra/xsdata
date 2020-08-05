@@ -38,6 +38,7 @@ class ParserUtils:
         default: Any = None,
         ns_map: Optional[Dict] = None,
         tokens: bool = False,
+        in_order: bool = True,
     ) -> Any:
         """Convert xml string values to s python primitive type."""
 

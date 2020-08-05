@@ -143,9 +143,7 @@ class AnyAttribute(AnnotationBase):
 
     @property
     def real_type(self) -> str:
-        prefix = self.schema_prefix()
-        suffix = DataType.ANY_TYPE.code
-        return f"{prefix}:{suffix}" if prefix else suffix
+        return self.data_type_ref(DataType.ANY_TYPE)
 
 
 @dataclass
@@ -339,6 +337,9 @@ class Attribute(AnnotationBase):
         if self.simple_type:
             restrictions.update(self.simple_type.get_restrictions())
 
+        if self.type and self.type == self.data_type_ref(DataType.NMTOKENS):
+            restrictions["tokens"] = True
+
         return restrictions
 
 
@@ -401,9 +402,7 @@ class Any(AnnotationBase):
 
     @property
     def real_type(self) -> str:
-        prefix = self.schema_prefix()
-        suffix = DataType.ANY_TYPE.code
-        return f"{prefix}:{suffix}" if prefix else suffix
+        return self.data_type_ref(DataType.ANY_TYPE)
 
     def get_restrictions(self) -> Dict[str, Anything]:
         max_occurs = sys.maxsize if self.max_occurs == "unbounded" else self.max_occurs
@@ -868,6 +867,9 @@ class Restriction(AnnotationBase):
                 [pattern.value for pattern in self.patterns]
             )
 
+        if self.base and self.base == self.data_type_ref(DataType.NMTOKENS):
+            restrictions["tokens"] = True
+
         return restrictions
 
 
@@ -1102,9 +1104,7 @@ class Element(AnnotationBase):
 
     @property
     def default_type(self) -> str:
-        prefix = self.schema_prefix()
-        suffix = DataType.ANY_TYPE.code
-        return f"{prefix}:{suffix}" if prefix else suffix
+        return self.data_type_ref(DataType.ANY_TYPE)
 
     @property
     def raw_type(self) -> Optional[str]:
@@ -1114,9 +1114,7 @@ class Element(AnnotationBase):
         if self.has_children:
             return None
 
-        prefix = self.schema_prefix()
-        suffix = DataType.ANY_TYPE.code
-        return f"{prefix}:{suffix}" if prefix else suffix
+        return self.data_type_ref(DataType.ANY_TYPE)
 
     @property
     def real_type(self) -> str:
@@ -1150,6 +1148,9 @@ class Element(AnnotationBase):
 
         if self.nillable:
             restrictions.update(nillable=True)
+
+        if self.type and self.type == self.data_type_ref(DataType.NMTOKENS):
+            restrictions["tokens"] = True
 
         return restrictions
 

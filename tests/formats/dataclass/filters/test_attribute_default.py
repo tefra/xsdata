@@ -26,8 +26,9 @@ class AttributeDefaultTests(TestCase):
         self.assertEqual('"foo"', attribute_default(attr))
 
     def test_attribute_default_with_type_tokens(self):
-        attr = AttrFactory.create(types=[type_tokens], default="foo  bar  \n")
-        self.assertEqual('"foo bar"', attribute_default(attr))
+        attr = AttrFactory.create(types=[type_int, type_str], default="1  \n bar")
+        attr.restrictions.tokens = True
+        self.assertEqual('lambda: [1, "bar"]', attribute_default(attr))
 
     def test_attribute_default_with_type_float(self):
         attr = AttrFactory.create(types=[type_float], default="1.5")

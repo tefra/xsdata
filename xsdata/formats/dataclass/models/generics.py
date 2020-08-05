@@ -10,6 +10,7 @@ from lxml.etree import register_namespace
 
 from xsdata.formats.dataclass.models.constants import XmlType
 from xsdata.models.enums import Namespace
+from xsdata.utils import collections
 
 
 @dataclass
@@ -69,9 +70,7 @@ class Namespaces:
 
     def prefix(self, namespace: str) -> Optional[str]:
         """Return the prefix for the given namespace."""
-        return next(
-            (prefix for prefix, uri in self.ns_map.items() if uri == namespace), None
-        )
+        return collections.map_key(self.ns_map, namespace)
 
     def add(self, uri: Optional[str], prefix: Optional[str] = None):
         """

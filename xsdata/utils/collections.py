@@ -58,3 +58,7 @@ def concat(*args: Iterable) -> Iterator:
     """Concatenate iterables into a single iterator."""
     for arg in args:
         yield from arg
+
+
+def map_key(dictionary: Dict, search: Any) -> Any:
+    return next((key for key, val in dictionary.items() if val == search), None)

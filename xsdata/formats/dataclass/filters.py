@@ -18,6 +18,7 @@ from xsdata.formats.converters import sort_types
 from xsdata.formats.converters import to_python
 from xsdata.formats.dataclass import utils
 from xsdata.utils import text
+from xsdata.utils.collections import unique_sequence
 
 
 @functools.lru_cache(maxsize=50)
@@ -81,7 +82,7 @@ def format_arguments(data: Dict) -> str:
                 value = f"r{value}"
         return f"{key}={value}"
 
-    return ",\n".join([prep(key, value) for key, value in data.items()])
+    return ",\n".join(prep(key, value) for key, value in data.items())
 
 
 def class_docstring(obj: Class, enum: bool = False) -> str:
@@ -198,21 +199,7 @@ def prepare_attribute_default(value: Any) -> Any:
 def attribute_type(attr: Attr, parents: List[str]) -> str:
     """Generate type hints for the given attribute."""
 
-    type_names: List[str] = []
-    for attr_type in attr.types:
-        name = class_name(attr_type.alias) if attr_type.alias else type_name(attr_type)
-
-        if attr_type.forward and attr_type.circular:
-            outer_str = ".".join(map(class_name, parents))
-            name = f'"{outer_str}"'
-        elif attr_type.forward:
-            outer_str = ".".join(map(class_name, parents))
-            name = f'"{outer_str}.{name}"'
-        elif attr_type.circular:
-            name = f'"{name}"'
-
-        if name not in type_names:
-            type_names.append(name)
+    type_names = unique_sequence(attribute_type_name(x, parents) for x in attr.types)
 
     result = ", ".join(type_names)
     if len(type_names) > 1:
@@ -231,13 +218,31 @@ def attribute_type(attr: Attr, parents: List[str]) -> str:
     return result
 
 
+def attribute_type_name(attr_type: AttrType, parents: List[str]) -> str:
+    name = class_name(attr_type.alias) if attr_type.alias else type_name(attr_type)
+
+    if attr_type.forward and attr_type.circular:
+        outer_str = ".".join(map(class_name, parents))
+        name = f'"{outer_str}"'
+    elif attr_type.forward:
+        outer_str = ".".join(map(class_name, parents))
+        name = f'"{outer_str}.{name}"'
+    elif attr_type.circular:
+        name = f'"{name}"'
+
+    return name
+
+
 def constant_value(attr: Attr) -> str:
     """Return the attr default value or type as constant value."""
     attr_type = attr.types[0]
     if attr_type.native:
         return f'"{attr.default}"'
 
-    return class_name(attr_type.alias) if attr_type.alias else type_name(attr_type)
+    if attr_type.alias:
+        return class_name(attr_type.alias)
+
+    return type_name(attr_type)
 
 
 filters = {

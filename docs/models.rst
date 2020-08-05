@@ -111,6 +111,12 @@ Field Metadata
      - bool
      - Specifies whether the field value(s) must appear in sequence with other
        sequential sibling fields. eg ``<a /><b /><a /><b />``
+   * - tokens
+     - bool
+     - Use a list to map simple values.
+
+       eg ``element: Union[int, bool, str]
+       -> <element>1 a true</element> -> [1, "a", True]``
    * - namespace
      - str
      - Specifies the field xml namespace. ([#M2]_)
@@ -217,12 +223,11 @@ Type: Attributes
 ~~~~~~~~~~~~~~~~
 
 This type represents ``xs:anyAttribute`` elements. It needs to be defined as
-a dictionary with key an :class:`lxml.etree.QName` and string values. The wildcard
-namespace features also apply.
+a dictionary of. The wildcard namespace features also apply.
 
 .. code-block:: python
 
-    any_attributes: Dict[lxml.etree.QName, str] = field(
+    any_attributes: Dict = field(
         default_factory=dict,
         metadata=dict(
             type="Attributes",

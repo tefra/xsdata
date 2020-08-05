@@ -9,7 +9,7 @@ from typing import Optional
 from typing import Sequence
 
 
-def unique_sequence(items: Sequence, key: Optional[str] = None) -> List:
+def unique_sequence(items: Iterable, key: Optional[str] = None) -> List:
     """
     Return a new list with the unique values from the sequence.
 

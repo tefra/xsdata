@@ -45,3 +45,6 @@ class NameTests(TestCase):
 
         attr = AttrFactory.create(types=[AttrTypeFactory.create(qname="foo")])
         self.assertEqual("Foo", constant_value(attr))
+
+        attr = AttrFactory.create(types=[AttrTypeFactory.create(alias="alias")])
+        self.assertEqual("Alias", constant_value(attr))

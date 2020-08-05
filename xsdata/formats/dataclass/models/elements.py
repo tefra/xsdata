@@ -20,18 +20,18 @@ class XmlVar:
     """
     Dataclass field bind metadata.
 
-    :param name: field name,
-    :param qname: qualified local name,
-    :param init:  field is present in the constructor arguments.
-    :param mixed:  field supports mixed content.
-    :param tokens: use a list to map primitive values.
-    :param nillable: allow to render empty nillable elements,
-    :param dataclass: field type is a dataclass or a primitive type.
-    :param sequential: switch to sequential rendering with other sequential siblings.
-    :param list_element: field represents a list of elements.
-    :param default: default value or factory
-    :param types: field bind or cast types.
-    :param namespaces: a list of the all the possible namespaces.
+    :param name: Field name.
+    :param qname: Namespace qualified local name.
+    :param init:  Field is present in the constructor parameters.
+    :param mixed:  Field supports mixed content.
+    :param tokens: Use a list to map simple values.
+    :param nillable: Allow empty content elements rendering.
+    :param dataclass: Specify whether the field type is a dataclass.
+    :param sequential: Switch to sequential rendering with other sequential siblings
+    :param list_element: Specify whether the field represents a list of elements
+    :param default: Field default value or factory
+    :param types: Field simple types.
+    :param namespaces: Field list of the all the possible namespaces.
     """
 
     name: str

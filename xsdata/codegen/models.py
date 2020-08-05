@@ -58,7 +58,7 @@ class Restrictions:
     :param explicit_timezone:
     :param nillable:
     :param sequential:
-    :param list:
+    :param tokens:
     """
 
     required: Optional[bool] = field(default=None)
@@ -338,7 +338,7 @@ class Extension:
     Model representation of a dataclass base class.
 
     :param type:
-    :restrictions type:
+    :param restrictions:
     """
 
     type: AttrType
@@ -381,7 +381,6 @@ class Class:
     :param attrs:
     :param inner:
     :param ns_map:
-    :param source_namespace:
     """
 
     qname: QName

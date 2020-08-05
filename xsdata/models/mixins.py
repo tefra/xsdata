@@ -168,6 +168,15 @@ class ElementBase:
         """Return the substitution groups of this element."""
         return []
 
+    @property
+    def token_types(self) -> List[str]:
+        """Return a list of the token style data type names with the xml schema
+        prefix."""
+        prefix = collections.map_key(self.ns_map, Namespace.XS.uri)
+        prefix = f"{prefix}:" if prefix else ""
+        codes = [DataType.NMTOKENS.code, DataType.IDREFS.code]
+        return [f"{prefix}{code}" for code in codes]
+
     def data_type_ref(self, data_type: DataType) -> str:
         """Return the given data type code with the xml schema namespace prefix
         if any."""

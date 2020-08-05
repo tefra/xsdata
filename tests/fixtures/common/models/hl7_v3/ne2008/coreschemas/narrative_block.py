@@ -513,12 +513,13 @@ class StrucDocRenderMultiMedia:
             namespace="urn:hl7-org:v3"
         )
     )
-    referenced_object: Optional[str] = field(
-        default=None,
+    referenced_object: List[str] = field(
+        default_factory=list,
         metadata=dict(
             name="referencedObject",
             type="Attribute",
-            required=True
+            required=True,
+            tokens=True
         )
     )
     id: Optional[str] = field(
@@ -931,10 +932,11 @@ class StrucDocTh:
             type="Attribute"
         )
     )
-    headers: Optional[str] = field(
-        default=None,
+    headers: List[str] = field(
+        default_factory=list,
         metadata=dict(
-            type="Attribute"
+            type="Attribute",
+            tokens=True
         )
     )
     scope: Optional["StrucDocTh.Scope"] = field(
@@ -1301,10 +1303,11 @@ class StrucDocTd:
             type="Attribute"
         )
     )
-    headers: Optional[str] = field(
-        default=None,
+    headers: List[str] = field(
+        default_factory=list,
         metadata=dict(
-            type="Attribute"
+            type="Attribute",
+            tokens=True
         )
     )
     scope: Optional["StrucDocTd.Scope"] = field(

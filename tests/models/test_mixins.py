@@ -167,6 +167,12 @@ class ElementBaseTests(TestCase):
         element = ElementBase()
         self.assertEqual([], element.substitutions)
 
+    def test_token_types(self):
+        element = ElementBase()
+        element.ns_map["xs"] = Namespace.XS.uri
+
+        self.assertEqual(["xs:NMTOKENS", "xs:IDREFS"], element.token_types)
+
     def test_data_type_ref(self):
         element = ElementBase()
         self.assertEqual("string", element.data_type_ref(DataType.STRING))

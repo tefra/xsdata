@@ -1,8 +1,6 @@
 from dataclasses import dataclass, field
 from typing import List
-from tests.fixtures.defxmlschema.chapter03ord import (
-    Order,
-)
+from tests.fixtures.defxmlschema.chapter03ord import Order
 
 
 @dataclass

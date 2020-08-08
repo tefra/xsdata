@@ -1,6 +1,13 @@
 from enum import Enum
 from dataclasses import dataclass, field
 from typing import List, Optional, Union
+from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.datatypes_base import (
+    Cs,
+    Ii,
+    IvlTsExplicit,
+    PnExplicit,
+    TsExplicit,
+)
 from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.voc import (
     ActClass,
     ActClassObservation,
@@ -19,16 +26,7 @@ from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.voc import (
     XActMoodIntentEvent,
     XRoleClassAccommodationRequestor,
 )
-from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt240003_uv02 import (
-    CoctMt240003Uv02ServiceDeliveryLocation,
-)
-from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.datatypes_base import (
-    Cs,
-    Ii,
-    IvlTsExplicit,
-    PnExplicit,
-    TsExplicit,
-)
+from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt240003_uv02 import CoctMt240003Uv02ServiceDeliveryLocation
 
 __NAMESPACE__ = "urn:hl7-org:v3"
 

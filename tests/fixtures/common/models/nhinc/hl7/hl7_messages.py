@@ -1,32 +1,16 @@
 from dataclasses import dataclass, field
 from typing import Optional
+from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.datatypes_base import Ii
+from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.mcci_in000002_uv01 import McciIn000002Uv01
+from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.prpa_in201304_uv02 import PrpaIn201304Uv02
+from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.prpa_in201309_uv02 import PrpaIn201309Uv02
+from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.prpa_in201310_uv02 import PrpaIn201310Uv02
+from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.prpa_mt201301_uv02 import PrpaMt201301Uv02Patient
+from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.prpa_mt201307_uv02 import PrpaMt201307Uv02QueryByParameter
+from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.prpa_mt201310_uv02 import PrpaMt201310Uv02Patient
 from tests.fixtures.common.models.nhinc.common.nhinc_common import (
     AssertionType,
     NhinTargetCommunitiesType,
-)
-from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.datatypes_base import (
-    Ii,
-)
-from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.mcci_in000002_uv01 import (
-    McciIn000002Uv01,
-)
-from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.prpa_in201304_uv02 import (
-    PrpaIn201304Uv02,
-)
-from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.prpa_in201309_uv02 import (
-    PrpaIn201309Uv02,
-)
-from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.prpa_in201310_uv02 import (
-    PrpaIn201310Uv02,
-)
-from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.prpa_mt201301_uv02 import (
-    PrpaMt201301Uv02Patient,
-)
-from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.prpa_mt201307_uv02 import (
-    PrpaMt201307Uv02QueryByParameter,
-)
-from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.prpa_mt201310_uv02 import (
-    PrpaMt201310Uv02Patient,
 )
 
 __NAMESPACE__ = "urn:hl7-org:v3"

@@ -1,6 +1,16 @@
 from enum import Enum
 from dataclasses import dataclass, field
 from typing import List, Optional, Union
+from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.datatypes_base import (
+    Cd,
+    Ce,
+    Cs,
+    EdExplicit,
+    EnExplicit,
+    Ii,
+    IvlTsExplicit,
+    SxcmTsExplicit,
+)
 from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.voc import (
     ActClass,
     EntityClassRoot,
@@ -16,22 +26,8 @@ from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.voc import (
     RoleClassPassive,
     XActMoodIntentEvent,
 )
-from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.datatypes_base import (
-    Cd,
-    Ce,
-    Cs,
-    EdExplicit,
-    EnExplicit,
-    Ii,
-    IvlTsExplicit,
-    SxcmTsExplicit,
-)
-from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt070000_uv01 import (
-    CoctMt070000Uv01LocatedEntity,
-)
-from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt090100_uv01 import (
-    CoctMt090100Uv01AssignedPerson,
-)
+from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt070000_uv01 import CoctMt070000Uv01LocatedEntity
+from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt090100_uv01 import CoctMt090100Uv01AssignedPerson
 
 __NAMESPACE__ = "urn:hl7-org:v3"
 

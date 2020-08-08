@@ -1,29 +1,13 @@
 from dataclasses import dataclass, field
 from typing import List, Optional
-from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.prpa_in201305_uv02 import (
-    PrpaIn201305Uv02McciMt000100Uv01Message,
-)
-from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.prpa_in201307_uv02 import (
-    PrpaIn201307Uv02McciMt000100Uv01Message,
-)
-from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.prpa_in900300_uv02 import (
-    PrpaIn900300Uv02McciMt000100Uv01Message,
-)
-from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.prpa_mt201303_uv02 import (
-    PrpaMt201303Uv02Patient,
-)
-from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.prpa_mt201310_uv02 import (
-    PrpaMt201310Uv02Patient,
-)
-from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.prpa_mt900350_uv02 import (
-    PrpaMt900350Uv02EncounterEvent,
-)
-from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.qupc_in043100_uv01 import (
-    QupcIn043100Uv01McciMt000100Uv01Message,
-)
-from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.qupc_in043200_uv01 import (
-    QupcIn043200Uv01MfmiMt700712Uv01Subject1,
-)
+from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.prpa_in201305_uv02 import PrpaIn201305Uv02McciMt000100Uv01Message
+from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.prpa_in201307_uv02 import PrpaIn201307Uv02McciMt000100Uv01Message
+from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.prpa_in900300_uv02 import PrpaIn900300Uv02McciMt000100Uv01Message
+from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.prpa_mt201303_uv02 import PrpaMt201303Uv02Patient
+from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.prpa_mt201310_uv02 import PrpaMt201310Uv02Patient
+from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.prpa_mt900350_uv02 import PrpaMt900350Uv02EncounterEvent
+from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.qupc_in043100_uv01 import QupcIn043100Uv01McciMt000100Uv01Message
+from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.qupc_in043200_uv01 import QupcIn043200Uv01MfmiMt700712Uv01Subject1
 
 __NAMESPACE__ = "urn:hl7-org:v3"
 

@@ -1,6 +1,11 @@
 from enum import Enum
 from dataclasses import dataclass, field
 from typing import List, Optional, Union
+from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.datatypes import (
+    IvlInt,
+    IvlPq,
+    RtoPqPq,
+)
 from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.datatypes_base import (
     AdExplicit,
     Any,
@@ -83,38 +88,19 @@ from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.voc import (
     XRoleClassPayeePolicyRelationship,
     XSuccReplPrev,
 )
-from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt040200_uv01 import (
-    CoctMt040200Uv01ResponsibleParty,
-)
-from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt050000_uv01 import (
-    CoctMt050000Uv01Patient,
-)
-from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt080000_uv import (
-    CoctMt080000UvSpecimen,
-)
-from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt090000_uv01 import (
-    CoctMt090000Uv01AssignedEntity,
-)
-from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt220300_uv import (
-    CoctMt220300UvContent,
-)
-from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt230100_uv import (
-    CoctMt230100UvMedication,
-)
+from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt040200_uv01 import CoctMt040200Uv01ResponsibleParty
+from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt050000_uv01 import CoctMt050000Uv01Patient
+from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt080000_uv import CoctMt080000UvSpecimen
+from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt090000_uv01 import CoctMt090000Uv01AssignedEntity
+from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt220300_uv import CoctMt220300UvContent
+from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt230100_uv import CoctMt230100UvMedication
 from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt910000_uv import (
     CoctMt910000UvCareGiver,
     CoctMt910000UvEmployee,
     CoctMt910000UvPersonalRelationship,
     CoctMt910000UvStudent,
 )
-from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.datatypes import (
-    IvlInt,
-    IvlPq,
-    RtoPqPq,
-)
-from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.repc_mt000700_uv01 import (
-    RepcMt000700Uv01MaintainedEntity,
-)
+from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.repc_mt000700_uv01 import RepcMt000700Uv01MaintainedEntity
 
 __NAMESPACE__ = "urn:hl7-org:v3"
 

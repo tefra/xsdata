@@ -7,13 +7,11 @@ from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.datatypes_base impor
     IvlTsExplicit,
     TelExplicit,
 )
-from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt710000_uv01 import (
-    CoctMt710000Uv01Place,
-)
 from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.voc import (
     NullFlavor,
     RoleClassLocatedEntity,
 )
+from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt710000_uv01 import CoctMt710000Uv01Place
 
 __NAMESPACE__ = "urn:hl7-org:v3"
 

@@ -1,6 +1,16 @@
 from enum import Enum
 from dataclasses import dataclass, field
 from typing import List, Optional, Union
+from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.datatypes_base import (
+    Cd,
+    Ce,
+    Cs,
+    EdExplicit,
+    Ii,
+    IntType,
+    IvlTs,
+    IvlTsExplicit,
+)
 from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.voc import (
     ActClass,
     ActClassRoot,
@@ -37,28 +47,10 @@ from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.voc import (
     XParticipationVrfRespSprfWit,
     XSuccReplPrev,
 )
-from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.datatypes_base import (
-    Cd,
-    Ce,
-    Cs,
-    EdExplicit,
-    Ii,
-    IntType,
-    IvlTs,
-    IvlTsExplicit,
-)
-from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt090003_uv import (
-    CoctMt090003UvAssignedEntity,
-)
-from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt090100_uv01 import (
-    CoctMt090100Uv01AssignedPerson,
-)
-from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt090300_uv01 import (
-    CoctMt090300Uv01AssignedDevice,
-)
-from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.mcai_mt900001_uv01 import (
-    McaiMt900001Uv01DetectedIssueEvent,
-)
+from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt090003_uv import CoctMt090003UvAssignedEntity
+from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt090100_uv01 import CoctMt090100Uv01AssignedPerson
+from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt090300_uv01 import CoctMt090300Uv01AssignedDevice
+from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.mcai_mt900001_uv01 import McaiMt900001Uv01DetectedIssueEvent
 
 __NAMESPACE__ = "urn:hl7-org:v3"
 

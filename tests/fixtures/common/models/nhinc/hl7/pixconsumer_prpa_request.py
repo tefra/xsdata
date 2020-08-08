@@ -1,14 +1,10 @@
 from dataclasses import dataclass, field
 from typing import Optional
+from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.prpa_in201301_uv02 import PrpaIn201301Uv02
+from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.prpa_in201302_uv02 import PrpaIn201302Uv02
 from tests.fixtures.common.models.nhinc.common.nhinc_common import (
     AssertionType,
     NhinTargetCommunitiesType,
-)
-from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.prpa_in201301_uv02 import (
-    PrpaIn201301Uv02,
-)
-from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.prpa_in201302_uv02 import (
-    PrpaIn201302Uv02,
 )
 
 __NAMESPACE__ = "urn:hl7-org:v3"

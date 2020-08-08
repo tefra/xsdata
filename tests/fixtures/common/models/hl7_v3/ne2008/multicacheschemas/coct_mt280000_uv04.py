@@ -1,13 +1,13 @@
 from dataclasses import dataclass, field
 from typing import List, Optional
+from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.datatypes_base import (
+    Cs,
+    Ii,
+)
 from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.voc import (
     ActClassRoot,
     ActMood,
     NullFlavor,
-)
-from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.datatypes_base import (
-    Cs,
-    Ii,
 )
 
 __NAMESPACE__ = "urn:hl7-org:v3"

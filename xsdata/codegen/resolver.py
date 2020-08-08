@@ -8,7 +8,7 @@ from lxml.etree import QName
 from toposort import toposort_flatten
 
 from xsdata.codegen.models import Class
-from xsdata.codegen.models import Package
+from xsdata.codegen.models import Import
 from xsdata.exceptions import ResolverValueError
 from xsdata.utils import collections
 
@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 class DependenciesResolver:
     packages: Dict[QName, str] = field(default_factory=dict)
     aliases: Dict[QName, str] = field(default_factory=dict)
-    imports: List[Package] = field(default_factory=list)
+    imports: List[Import] = field(default_factory=list)
     class_list: List[QName] = field(init=False, default_factory=list)
     class_map: Dict[QName, Class] = field(init=False, default_factory=dict)
     package: str = field(init=False)
@@ -38,7 +38,7 @@ class DependenciesResolver:
         self.class_list = self.create_class_list(classes)
         self.resolve_imports()
 
-    def sorted_imports(self) -> List[Package]:
+    def sorted_imports(self) -> List[Import]:
         """Return a new sorted by name list of import packages."""
         return sorted(self.imports, key=lambda x: x.name)
 
@@ -80,7 +80,7 @@ class DependenciesResolver:
             alias = f"{module}:{qname.localname}"
             self.aliases[qname] = alias
 
-        self.imports.append(Package(name=qname.localname, source=package, alias=alias))
+        self.imports.append(Import(name=qname.localname, source=package, alias=alias))
 
     def find_package(self, qname: QName) -> str:
         """

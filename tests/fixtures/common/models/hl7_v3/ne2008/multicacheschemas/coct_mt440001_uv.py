@@ -1,9 +1,8 @@
 from dataclasses import dataclass, field
 from typing import List, Optional
-from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.voc import (
-    ActClass,
-    ActMood,
-    NullFlavor,
+from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.datatypes import (
+    RtoMoPq,
+    RtoPqPq,
 )
 from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.datatypes_base import (
     Cd,
@@ -12,9 +11,10 @@ from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.datatypes_base impor
     IvlTsExplicit,
     Mo,
 )
-from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.datatypes import (
-    RtoMoPq,
-    RtoPqPq,
+from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.voc import (
+    ActClass,
+    ActMood,
+    NullFlavor,
 )
 
 __NAMESPACE__ = "urn:hl7-org:v3"

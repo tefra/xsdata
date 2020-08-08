@@ -1,7 +1,5 @@
 from dataclasses import dataclass, field
-from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.mcci_mt000200_uv01 import (
-    McciMt000200Uv01Message,
-)
+from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.mcci_mt000200_uv01 import McciMt000200Uv01Message
 
 __NAMESPACE__ = "urn:hl7-org:v3"
 

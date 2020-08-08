@@ -500,7 +500,7 @@ class Class:
 
 
 @dataclass
-class Package:
+class Import:
     """
     Model representation of a python import statement.
 

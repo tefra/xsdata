@@ -1,6 +1,15 @@
 from enum import Enum
 from dataclasses import dataclass, field
 from typing import List, Optional, Union
+from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.datatypes_base import (
+    Ce,
+    Cs,
+    Ii,
+    IvlTsExplicit,
+    PqExplicit,
+    TelExplicit,
+    TsExplicit,
+)
 from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.voc import (
     ActClass,
     ActClassObservation,
@@ -45,15 +54,6 @@ from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.voc import (
     XRoleClassCredentialedEntity,
     XRoleClassPayeePolicyRelationship,
     XSuccReplPrev,
-)
-from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.datatypes_base import (
-    Ce,
-    Cs,
-    Ii,
-    IvlTsExplicit,
-    PqExplicit,
-    TelExplicit,
-    TsExplicit,
 )
 
 __NAMESPACE__ = "urn:hl7-org:v3"

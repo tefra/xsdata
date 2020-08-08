@@ -1,6 +1,11 @@
 from enum import Enum
 from dataclasses import dataclass, field
 from typing import List, Optional, Union
+from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.datatypes import (
+    IvlInt,
+    IvlPq,
+    RtoPqPq,
+)
 from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.datatypes_base import (
     Any,
     Bl,
@@ -66,26 +71,11 @@ from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.voc import (
     XRoleClassPayeePolicyRelationship,
     XSuccReplPrev,
 )
-from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt050000_uv01 import (
-    CoctMt050000Uv01Patient,
-)
-from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt090000_uv01 import (
-    CoctMt090000Uv01AssignedEntity,
-)
-from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt090100_uv01 import (
-    CoctMt090100Uv01AssignedPerson,
-)
-from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt090400_uv import (
-    CoctMt090400UvAssignedParty,
-)
-from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt230100_uv import (
-    CoctMt230100UvMedication,
-)
-from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.datatypes import (
-    IvlInt,
-    IvlPq,
-    RtoPqPq,
-)
+from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt050000_uv01 import CoctMt050000Uv01Patient
+from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt090000_uv01 import CoctMt090000Uv01AssignedEntity
+from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt090100_uv01 import CoctMt090100Uv01AssignedPerson
+from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt090400_uv import CoctMt090400UvAssignedParty
+from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt230100_uv import CoctMt230100UvMedication
 from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.repc_mt000100_uv01 import (
     RepcMt000100Uv01Act,
     RepcMt000100Uv01ActReference,
@@ -96,9 +86,7 @@ from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.repc_mt000100_
     RepcMt000100Uv01SubstanceAdministration,
     RepcMt000100Uv01Supply,
 )
-from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.repc_mt000300_uv01 import (
-    RepcMt000300Uv01Concern,
-)
+from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.repc_mt000300_uv01 import RepcMt000300Uv01Concern
 
 __NAMESPACE__ = "urn:hl7-org:v3"
 

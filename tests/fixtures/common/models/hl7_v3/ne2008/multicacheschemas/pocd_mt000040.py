@@ -1,6 +1,11 @@
 from enum import Enum
 from dataclasses import dataclass, field
 from typing import List, Optional, Union
+from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.datatypes import (
+    IvlInt,
+    IvlPq,
+    RtoPqPq,
+)
 from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.datatypes_base import (
     AdExplicit,
     Any,
@@ -24,6 +29,14 @@ from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.datatypes_base impor
     TelExplicit,
     Ts,
     TsExplicit,
+)
+from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.narrative_block import StrucDocText
+from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.sdtc import (
+    BirthTime,
+    DeceasedInd,
+    DeceasedTime,
+    DischargeDispositionCode,
+    Id,
 )
 from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.voc import (
     ActClass,
@@ -92,21 +105,6 @@ from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.voc import (
     XRoleClassPayeePolicyRelationship,
     XSuccReplPrev,
     XServiceEventPerformer,
-)
-from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.datatypes import (
-    IvlInt,
-    IvlPq,
-    RtoPqPq,
-)
-from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.narrative_block import (
-    StrucDocText,
-)
-from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.sdtc import (
-    BirthTime,
-    DeceasedInd,
-    DeceasedTime,
-    DischargeDispositionCode,
-    Id,
 )
 
 __NAMESPACE__ = "urn:hl7-org:v3"

@@ -1,12 +1,5 @@
 from dataclasses import dataclass, field
 from typing import List, Optional
-from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.voc import (
-    ActClass,
-    ActMood,
-    ActRelationshipHasComponent,
-    NullFlavor,
-    ParticipationType,
-)
 from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.datatypes_base import (
     Cd,
     Ce,
@@ -18,12 +11,15 @@ from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.datatypes_base impor
     St,
     TsExplicit,
 )
-from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt040200_uv01 import (
-    CoctMt040200Uv01ResponsibleParty,
+from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.voc import (
+    ActClass,
+    ActMood,
+    ActRelationshipHasComponent,
+    NullFlavor,
+    ParticipationType,
 )
-from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt090100_uv01 import (
-    CoctMt090100Uv01AssignedPerson,
-)
+from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt040200_uv01 import CoctMt040200Uv01ResponsibleParty
+from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt090100_uv01 import CoctMt090100Uv01AssignedPerson
 from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.repc_mt000100_uv01 import (
     RepcMt000100Uv01Act,
     RepcMt000100Uv01ActReference,

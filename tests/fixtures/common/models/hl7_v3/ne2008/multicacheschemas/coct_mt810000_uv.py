@@ -1,5 +1,13 @@
 from dataclasses import dataclass, field
 from typing import List, Optional
+from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.datatypes_base import (
+    Cd,
+    Ce,
+    Cs,
+    EdExplicit,
+    Ii,
+    TsExplicit,
+)
 from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.voc import (
     ActClass,
     ActClassObservation,
@@ -10,20 +18,8 @@ from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.voc import (
     ParticipationPhysicalPerformer,
     ParticipationType,
 )
-from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.datatypes_base import (
-    Cd,
-    Ce,
-    Cs,
-    EdExplicit,
-    Ii,
-    TsExplicit,
-)
-from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt040008_uv import (
-    CoctMt040008UvResponsible,
-)
-from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt090002_uv01 import (
-    CoctMt090002Uv01AssignedEntity,
-)
+from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt040008_uv import CoctMt040008UvResponsible
+from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt090002_uv01 import CoctMt090002Uv01AssignedEntity
 
 __NAMESPACE__ = "urn:hl7-org:v3"
 

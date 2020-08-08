@@ -12,9 +12,6 @@ from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.datatypes_base impor
     OnExplicit,
     TelExplicit,
 )
-from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt070000_uv01 import (
-    CoctMt070000Uv01LocatedEntity,
-)
 from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.voc import (
     EntityClass,
     EntityClassOrganization,
@@ -23,6 +20,7 @@ from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.voc import (
     RoleClassContact,
     RoleClassPartitivePartByBot,
 )
+from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt070000_uv01 import CoctMt070000Uv01LocatedEntity
 
 __NAMESPACE__ = "urn:hl7-org:v3"
 

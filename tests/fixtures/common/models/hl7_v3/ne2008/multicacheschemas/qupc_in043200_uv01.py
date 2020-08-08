@@ -1,6 +1,16 @@
 from enum import Enum
 from dataclasses import dataclass, field
 from typing import List, Optional, Union
+from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.datatypes_base import (
+    Cd,
+    Ce,
+    Cs,
+    EdExplicit,
+    Ii,
+    IvlTsExplicit,
+    St,
+    TsExplicit,
+)
 from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.voc import (
     ActClass,
     ActClassControlAct,
@@ -25,16 +35,6 @@ from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.voc import (
     XActReplaceOrRevise,
     XSuccReplPrev,
 )
-from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.datatypes_base import (
-    Cd,
-    Ce,
-    Cs,
-    EdExplicit,
-    Ii,
-    IvlTsExplicit,
-    St,
-    TsExplicit,
-)
 from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.mcci_mt000300_uv01 import (
     McciMt000300Uv01Acknowledgement,
     McciMt000300Uv01AttentionLine,
@@ -55,12 +55,8 @@ from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.mfmi_mt700712_
     MfmiMt700712Uv01Reason,
     MfmiMt700712Uv01ReplacementOf,
 )
-from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.qupc_mt040300_uv01 import (
-    QupcMt040300Uv01ParameterList,
-)
-from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.repc_mt004000_uv01 import (
-    RepcMt004000Uv01CareProvisionEvent,
-)
+from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.qupc_mt040300_uv01 import QupcMt040300Uv01ParameterList
+from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.repc_mt004000_uv01 import RepcMt004000Uv01CareProvisionEvent
 
 __NAMESPACE__ = "urn:hl7-org:v3"
 

@@ -1,8 +1,6 @@
 from dataclasses import dataclass, field
 from typing import Optional
-from tests.fixtures.defxmlschema.chapter03prod2 import (
-    Color,
-)
+from tests.fixtures.defxmlschema.chapter03prod2 import Color
 
 __NAMESPACE__ = "http://example.org/prod"
 

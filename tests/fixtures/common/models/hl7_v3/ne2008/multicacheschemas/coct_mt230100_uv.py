@@ -54,9 +54,7 @@ from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.voc import (
     XRoleClassCredentialedEntity,
     XRoleClassPayeePolicyRelationship,
 )
-from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt440001_uv import (
-    CoctMt440001UvValuedItem,
-)
+from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt440001_uv import CoctMt440001UvValuedItem
 
 __NAMESPACE__ = "urn:hl7-org:v3"
 

@@ -15,18 +15,6 @@ from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.datatypes_base impor
     TelExplicit,
     TsExplicit,
 )
-from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt030202_uv01 import (
-    CoctMt030202Uv01Person,
-)
-from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt150000_uv02 import (
-    CoctMt150000Uv02Organization,
-)
-from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt500000_uv import (
-    CoctMt500000UvCoveredParty,
-)
-from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt710000_uv01 import (
-    CoctMt710000Uv01Place,
-)
 from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.voc import (
     EntityClass,
     EntityClassRoot,
@@ -48,6 +36,10 @@ from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.voc import (
     XRoleClassCredentialedEntity,
     XRoleClassPayeePolicyRelationship,
 )
+from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt030202_uv01 import CoctMt030202Uv01Person
+from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt150000_uv02 import CoctMt150000Uv02Organization
+from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt500000_uv import CoctMt500000UvCoveredParty
+from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt710000_uv01 import CoctMt710000Uv01Place
 
 __NAMESPACE__ = "urn:hl7-org:v3"
 

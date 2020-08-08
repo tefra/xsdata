@@ -1,6 +1,21 @@
 from enum import Enum
 from dataclasses import dataclass, field
 from typing import List, Optional, Union
+from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.datatypes import (
+    IvlInt,
+    RtoPqPq,
+)
+from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.datatypes_base import (
+    Ce,
+    Cs,
+    Ii,
+    IvlTs,
+    IvlTsExplicit,
+    PnExplicit,
+    PqExplicit,
+    TelExplicit,
+    TsExplicit,
+)
 from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.voc import (
     ActClass,
     ActClassSupply,
@@ -49,27 +64,8 @@ from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.voc import (
     XRoleClassPayeePolicyRelationship,
     XSuccReplPrev,
 )
-from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.datatypes_base import (
-    Ce,
-    Cs,
-    Ii,
-    IvlTs,
-    IvlTsExplicit,
-    PnExplicit,
-    PqExplicit,
-    TelExplicit,
-    TsExplicit,
-)
-from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt240003_uv02 import (
-    CoctMt240003Uv02ServiceDeliveryLocation,
-)
-from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt260003_uv import (
-    CoctMt260003UvDetectedMedicationIssue,
-)
-from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.datatypes import (
-    IvlInt,
-    RtoPqPq,
-)
+from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt240003_uv02 import CoctMt240003Uv02ServiceDeliveryLocation
+from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt260003_uv import CoctMt260003UvDetectedMedicationIssue
 
 __NAMESPACE__ = "urn:hl7-org:v3"
 

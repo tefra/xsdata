@@ -9,7 +9,7 @@ from xsdata.codegen.models import Attr
 from xsdata.codegen.models import AttrType
 from xsdata.codegen.models import Class
 from xsdata.codegen.models import Extension
-from xsdata.codegen.models import Package
+from xsdata.codegen.models import Import
 from xsdata.codegen.models import Restrictions
 from xsdata.codegen.models import Status
 from xsdata.models.enums import DataType
@@ -296,7 +296,7 @@ class AttrFactory(Factory):
 
 
 class PackageFactory(Factory):
-    model = Package
+    model = Import
     counter = 65
 
     @classmethod

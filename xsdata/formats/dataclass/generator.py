@@ -1,10 +1,10 @@
+import re
 from pathlib import Path
-from typing import Dict
 from typing import Iterator
 from typing import List
 
 from xsdata.codegen.models import Class
-from xsdata.codegen.models import Package
+from xsdata.codegen.models import Import
 from xsdata.codegen.resolver import DependenciesResolver
 from xsdata.formats.dataclass import utils
 from xsdata.formats.dataclass.filters import filters
@@ -54,11 +54,25 @@ class DataclassGenerator(AbstractGenerator):
     def render_package(self, classes: List[Class]) -> str:
         """Render the source code for the __init__.py with all the imports of
         the generated class names."""
-        class_names = [
-            (obj.target_module, obj.name)
+
+        imports = [
+            Import(name=obj.name, source=obj.target_module)
             for obj in sorted(classes, key=lambda x: x.name)
         ]
-        return self.template("package").render(class_names=class_names)
+
+        for group in group_by(imports, key=lambda x: x.name).values():
+            if len(group) == 1:
+                continue
+
+            for index, cur in enumerate(group):
+                cmp = group[index + 1] if index == 0 else group[index - 1]
+                parts = re.split("[_.]", cur.source)
+                diff = set(parts) - set(re.split("[_.]", cmp.source))
+
+                add = "_".join(part for part in parts if part in diff)
+                cur.alias = f"{add}:{cur.name}"
+
+        return self.template("imports").render(imports=imports)
 
     def render_module(
         self, resolver: DependenciesResolver, classes: List[Class]
@@ -66,7 +80,7 @@ class DataclassGenerator(AbstractGenerator):
         """Render the source code for the target module of the given class
         list."""
         resolver.process(classes)
-        imports = self.group_imports(resolver.sorted_imports())
+        imports = resolver.sorted_imports()
         output = self.render_classes(resolver.sorted_classes())
         namespace = classes[0].qname.namespace
 
@@ -107,11 +121,6 @@ class DataclassGenerator(AbstractGenerator):
             package = package.parent
 
     @classmethod
-    def group_imports(cls, imports: List[Package]) -> Dict[str, List[Package]]:
-        """Group the given list of packages by the source path."""
-        return group_by(imports, lambda x: x.source)
-
-    @classmethod
     def module_name(cls, module: str) -> str:
         """Convert the given module name to safe snake case."""
         return text.snake_case(utils.safe_snake(text.clean_uri(module), default="mod"))
@@ -120,8 +129,6 @@ class DataclassGenerator(AbstractGenerator):
     def package_name(cls, package: str) -> str:
         """Convert the given package name to safe snake case."""
         return ".".join(
-            map(
-                lambda x: text.snake_case(utils.safe_snake(x, default="pkg")),
-                package.split("."),
-            )
+            text.snake_case(utils.safe_snake(part, default="pkg"))
+            for part in package.split(".")
         )

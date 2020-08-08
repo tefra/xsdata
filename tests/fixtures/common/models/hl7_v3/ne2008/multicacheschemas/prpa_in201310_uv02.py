@@ -1,6 +1,16 @@
 from enum import Enum
 from dataclasses import dataclass, field
 from typing import List, Optional, Union
+from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.datatypes_base import (
+    Cd,
+    Ce,
+    Cs,
+    EdExplicit,
+    Ii,
+    IvlTsExplicit,
+    St,
+    TsExplicit,
+)
 from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.voc import (
     ActClass,
     ActClassControlAct,
@@ -26,16 +36,6 @@ from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.voc import (
     XActReplaceOrRevise,
     XSuccReplPrev,
 )
-from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.datatypes_base import (
-    Cd,
-    Ce,
-    Cs,
-    EdExplicit,
-    Ii,
-    IvlTsExplicit,
-    St,
-    TsExplicit,
-)
 from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.mcci_mt000300_uv01 import (
     McciMt000300Uv01Acknowledgement,
     McciMt000300Uv01AttentionLine,
@@ -56,12 +56,8 @@ from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.mfmi_mt700711_
     MfmiMt700711Uv01Reason,
     MfmiMt700711Uv01ReplacementOf,
 )
-from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.prpa_mt201304_uv02 import (
-    PrpaMt201304Uv02Patient,
-)
-from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.prpa_mt201307_uv02 import (
-    PrpaMt201307Uv02QueryByParameter,
-)
+from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.prpa_mt201304_uv02 import PrpaMt201304Uv02Patient
+from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.prpa_mt201307_uv02 import PrpaMt201307Uv02QueryByParameter
 
 __NAMESPACE__ = "urn:hl7-org:v3"
 

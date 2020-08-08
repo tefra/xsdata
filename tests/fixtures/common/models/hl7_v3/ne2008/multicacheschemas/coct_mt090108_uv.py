@@ -8,15 +8,13 @@ from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.datatypes_base impor
     PnExplicit,
     TelExplicit,
 )
-from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt150007_uv import (
-    CoctMt150007UvOrganization,
-)
 from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.voc import (
     EntityClass,
     EntityDeterminer,
     NullFlavor,
     RoleClassAssignedEntity,
 )
+from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt150007_uv import CoctMt150007UvOrganization
 
 __NAMESPACE__ = "urn:hl7-org:v3"
 

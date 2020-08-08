@@ -1,12 +1,5 @@
 from dataclasses import dataclass, field
 from typing import List, Optional
-from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.voc import (
-    ActClassObservation,
-    ActMood,
-    ContextControl,
-    NullFlavor,
-    ParticipationType,
-)
 from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.datatypes_base import (
     Cd,
     Ce,
@@ -14,9 +7,14 @@ from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.datatypes_base impor
     Ii,
     IvlTsExplicit,
 )
-from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt090001_uv01 import (
-    CoctMt090001Uv01AssignedEntity,
+from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.voc import (
+    ActClassObservation,
+    ActMood,
+    ContextControl,
+    NullFlavor,
+    ParticipationType,
 )
+from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt090001_uv01 import CoctMt090001Uv01AssignedEntity
 
 __NAMESPACE__ = "urn:hl7-org:v3"
 

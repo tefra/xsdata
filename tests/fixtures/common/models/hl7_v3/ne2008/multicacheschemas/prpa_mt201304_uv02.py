@@ -12,21 +12,6 @@ from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.datatypes_base impor
     On,
     PnExplicit,
 )
-from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt150002_uv01 import (
-    CoctMt150002Uv01Organization,
-)
-from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt150003_uv03 import (
-    CoctMt150003Uv03Organization,
-)
-from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt150007_uv import (
-    CoctMt150007UvOrganization,
-)
-from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt510000_uv06 import (
-    CoctMt510000Uv06CoverageRecord,
-)
-from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt820000_uv import (
-    CoctMt820000UvCareProvision,
-)
 from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.voc import (
     EntityClass,
     EntityClassNonPersonLivingSubject,
@@ -50,6 +35,11 @@ from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.voc import (
     XRoleClassCredentialedEntity,
     XRoleClassPayeePolicyRelationship,
 )
+from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt150002_uv01 import CoctMt150002Uv01Organization
+from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt150003_uv03 import CoctMt150003Uv03Organization
+from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt150007_uv import CoctMt150007UvOrganization
+from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt510000_uv06 import CoctMt510000Uv06CoverageRecord
+from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt820000_uv import CoctMt820000UvCareProvision
 
 __NAMESPACE__ = "urn:hl7-org:v3"
 

@@ -11,9 +11,7 @@ from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.datatypes_base impor
     Sc,
     St,
 )
-from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.voc import (
-    NullFlavor,
-)
+from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.voc import NullFlavor
 
 __NAMESPACE__ = "urn:hl7-org:v3"
 

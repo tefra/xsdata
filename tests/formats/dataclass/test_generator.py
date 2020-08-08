@@ -43,15 +43,24 @@ class DataclassGeneratorTests(FactoryTestCase):
         mock_render_module.assert_has_calls([mock.call(mock.ANY, [x]) for x in classes])
 
     def test_render_package(self):
-        classes = ClassFactory.list(3)
+        classes = [
+            ClassFactory.create(qname="a"),
+            ClassFactory.create(qname="b"),
+            ClassFactory.create(qname="c"),
+            ClassFactory.create(qname="a", module="bar"),
+        ]
+
         random.shuffle(classes)
 
         actual = DataclassGenerator().render_package(classes)
         expected = "\n".join(
             [
-                "from foo.tests import ClassB",
-                "from foo.tests import ClassC",
-                "from foo.tests import ClassD",
+                "from foo.bar import A as BarA",
+                "from foo.tests import (",
+                "    A as TestsA,",
+                "    B,",
+                "    C,",
+                ")",
                 "",
             ]
         )

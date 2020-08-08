@@ -50,15 +50,9 @@ from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.voc import (
     XActReplaceOrRevise,
     XSuccReplPrev,
 )
-from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt040200_uv01 import (
-    CoctMt040200Uv01ResponsibleParty,
-)
-from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt050000_uv01 import (
-    CoctMt050000Uv01Patient,
-)
-from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt090102_uv02 import (
-    CoctMt090102Uv02AssignedPerson,
-)
+from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt040200_uv01 import CoctMt040200Uv01ResponsibleParty
+from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt050000_uv01 import CoctMt050000Uv01Patient
+from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt090102_uv02 import CoctMt090102Uv02AssignedPerson
 from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt910000_uv import (
     CoctMt910000UvCareGiver,
     CoctMt910000UvEmployee,
@@ -75,9 +69,7 @@ from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.repc_mt000100_
     RepcMt000100Uv01SubstanceAdministration,
     RepcMt000100Uv01Supply,
 )
-from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.repc_mt000700_uv01 import (
-    RepcMt000700Uv01MaintainedEntity,
-)
+from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.repc_mt000700_uv01 import RepcMt000700Uv01MaintainedEntity
 
 __NAMESPACE__ = "urn:hl7-org:v3"
 

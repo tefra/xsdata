@@ -73,15 +73,9 @@ from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.voc import (
     XRoleClassPayeePolicyRelationship,
     XSuccReplPrev,
 )
-from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt070000_uv01 import (
-    CoctMt070000Uv01LocatedEntity,
-)
-from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt090000_uv01 import (
-    CoctMt090000Uv01AssignedEntity,
-)
-from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt150000_uv02 import (
-    CoctMt150000Uv02Organization,
-)
+from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt070000_uv01 import CoctMt070000Uv01LocatedEntity
+from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt090000_uv01 import CoctMt090000Uv01AssignedEntity
+from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt150000_uv02 import CoctMt150000Uv02Organization
 
 __NAMESPACE__ = "urn:hl7-org:v3"
 

@@ -1,12 +1,5 @@
 from dataclasses import dataclass, field
 from typing import List, Optional
-from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.voc import (
-    ActClass,
-    ActMood,
-    NullFlavor,
-    ParticipationTargetSubject,
-    ParticipationType,
-)
 from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.datatypes_base import (
     Cd,
     Cs,
@@ -14,15 +7,16 @@ from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.datatypes_base impor
     IntType,
     IvlTsExplicit,
 )
-from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt050002_uv04 import (
-    CoctMt050002Uv04Patient,
+from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.voc import (
+    ActClass,
+    ActMood,
+    NullFlavor,
+    ParticipationTargetSubject,
+    ParticipationType,
 )
-from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt090100_uv01 import (
-    CoctMt090100Uv01AssignedPerson,
-)
-from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt090200_uv01 import (
-    CoctMt090200Uv01AssignedOrganization,
-)
+from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt050002_uv04 import CoctMt050002Uv04Patient
+from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt090100_uv01 import CoctMt090100Uv01AssignedPerson
+from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt090200_uv01 import CoctMt090200Uv01AssignedOrganization
 
 __NAMESPACE__ = "urn:hl7-org:v3"
 

@@ -1,6 +1,10 @@
 from enum import Enum
 from dataclasses import dataclass, field
 from typing import List, Optional, Union
+from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.datatypes import (
+    RtoMoPq,
+    RtoPqPq,
+)
 from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.datatypes_base import (
     AdExplicit,
     Cd,
@@ -70,30 +74,14 @@ from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt030007_
     CoctMt030007UvNonPersonLivingSubject,
     CoctMt030007UvPerson,
 )
-from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt050000_uv01 import (
-    CoctMt050000Uv01Patient,
-)
-from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt060000_uv01 import (
-    CoctMt060000Uv01Transportation,
-)
-from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt150000_uv02 import (
-    CoctMt150000Uv02Organization,
-)
-from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt280000_uv04 import (
-    CoctMt280000Uv04CrossReference,
-)
-from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt290000_uv06 import (
-    CoctMt290000Uv06BillableClinicalService,
-)
-from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt300000_uv04 import (
-    CoctMt300000Uv04SupplyEvent,
-)
-from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt310000_uv04 import (
-    CoctMt310000Uv04AccomodationSupplied,
-)
-from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt490000_uv04 import (
-    CoctMt490000Uv04BillableClinicalProduct,
-)
+from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt050000_uv01 import CoctMt050000Uv01Patient
+from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt060000_uv01 import CoctMt060000Uv01Transportation
+from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt150000_uv02 import CoctMt150000Uv02Organization
+from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt280000_uv04 import CoctMt280000Uv04CrossReference
+from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt290000_uv06 import CoctMt290000Uv06BillableClinicalService
+from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt300000_uv04 import CoctMt300000Uv04SupplyEvent
+from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt310000_uv04 import CoctMt310000Uv04AccomodationSupplied
+from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt490000_uv04 import CoctMt490000Uv04BillableClinicalProduct
 from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt530000_uv import (
     CoctMt530000UvAct,
     CoctMt530000UvActReference,
@@ -104,19 +92,9 @@ from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt530000_
     CoctMt530000UvSubstanceAdministration,
     CoctMt530000UvSupply,
 )
-from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt600000_uv06 import (
-    CoctMt600000Uv06SupplyEvent,
-)
-from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt740000_uv04 import (
-    CoctMt740000Uv04OralHealthService,
-)
-from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt810000_uv import (
-    CoctMt810000UvVerification,
-)
-from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.datatypes import (
-    RtoMoPq,
-    RtoPqPq,
-)
+from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt600000_uv06 import CoctMt600000Uv06SupplyEvent
+from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt740000_uv04 import CoctMt740000Uv04OralHealthService
+from tests.fixtures.common.models.hl7_v3.ne2008.multicacheschemas.coct_mt810000_uv import CoctMt810000UvVerification
 
 __NAMESPACE__ = "urn:hl7-org:v3"
 

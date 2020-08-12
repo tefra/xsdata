@@ -19,15 +19,16 @@ class SerializeUtils:
     @staticmethod
     def set_attribute(element: Element, key: Any, value: Any, namespaces: Namespaces):
         """Set element attribute from the given key and value."""
-        if key == QNames.XSI_NIL and (element.text or len(element) > 0):
+        if (
+            value is None
+            or (key == QNames.XSI_NIL and (element.text or len(element) > 0))
+            or (isinstance(value, list) and len(value) == 0)
+        ):
             return
 
         key = SerializeUtils.resolve_qname(key, namespaces)
         value = SerializeUtils.resolve_qname(value, namespaces)
-        value = to_xml(value, namespaces)
-
-        if value:
-            element.set(key, value)
+        element.set(key, to_xml(value, namespaces))
 
     @staticmethod
     def resolve_qname(value: Any, namespaces: Namespaces) -> Any:

@@ -44,11 +44,25 @@ class SerializeUtilsTests(TestCase):
         mock_to_xml.assert_called_once_with(QName("b", "value"), self.namespaces)
 
     @mock.patch("xsdata.formats.dataclass.serializers.utils.to_xml", return_value="")
-    def test_set_attribute_with_empty_value(self, mock_to_xml):
+    def test_set_attribute_with_empty_string_value(self, mock_to_xml):
         SerializeUtils.set_attribute(self.element, "key", "value", self.namespaces)
-        self.assertNotIn("key", self.element.attrib)
+        self.assertEqual("", self.element.attrib["key"])
         self.assertEqual(0, len(self.namespaces.ns_map))
         mock_to_xml.assert_called_once_with("value", self.namespaces)
+
+    @mock.patch("xsdata.formats.dataclass.serializers.utils.to_xml")
+    def test_set_attribute_with_empty_token_list(self, mock_to_xml):
+        SerializeUtils.set_attribute(self.element, "key", [], self.namespaces)
+        self.assertNotIn("key", self.element.attrib)
+        self.assertEqual(0, len(self.namespaces.ns_map))
+        self.assertEqual(0, mock_to_xml.call_count)
+
+    @mock.patch("xsdata.formats.dataclass.serializers.utils.to_xml")
+    def test_set_attribute_with_value_none(self, mock_to_xml):
+        SerializeUtils.set_attribute(self.element, "key", None, self.namespaces)
+        self.assertNotIn("key", self.element.attrib)
+        self.assertEqual(0, len(self.namespaces.ns_map))
+        self.assertEqual(0, mock_to_xml.call_count)
 
     def test_set_attribute_xsi_nil(self):
         SerializeUtils.set_attribute(

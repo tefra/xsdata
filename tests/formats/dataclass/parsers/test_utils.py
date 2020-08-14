@@ -13,6 +13,7 @@ from tests.fixtures.books import Books
 from tests.fixtures.defxmlschema.chapter12 import ProductType
 from tests.fixtures.defxmlschema.chapter12 import SizeType
 from tests.fixtures.defxmlschema.chapter16 import Umbrella
+from xsdata.formats.converter import ConverterAdapter
 from xsdata.formats.dataclass.context import XmlContext
 from xsdata.formats.dataclass.models.constants import XmlType
 from xsdata.formats.dataclass.models.elements import FindMode
@@ -40,13 +41,13 @@ class ParserUtilsTests(TestCase):
         ele.set(QNames.XSI_TYPE, "bar:foo")
         self.assertEqual(QName("xsdata", "foo"), ParserUtils.parse_xsi_type(ele))
 
-    @mock.patch("xsdata.formats.dataclass.parsers.utils.to_python", return_value=2)
-    def test_parse_value(self, mock_to_python):
+    @mock.patch.object(ConverterAdapter, "from_string", return_value=2)
+    def test_parse_value(self, mock_from_string):
         self.assertEqual(1, ParserUtils.parse_value(None, [int], 1))
         self.assertIsNone(ParserUtils.parse_value(None, [int], lambda: 1))
 
         self.assertTrue(2, ParserUtils.parse_value("1", [int], None))
-        mock_to_python.assert_called_once_with("1", [int], None)
+        mock_from_string.assert_called_once_with("1", [int], ns_map=None)
 
     def test_parse_value_with_tokens_true(self):
         actual = ParserUtils.parse_value(" 1 2 3", [int], list, None, True)
@@ -55,7 +56,7 @@ class ParserUtilsTests(TestCase):
         actual = ParserUtils.parse_value(["1", "2", "3"], [int], list, None, True)
         self.assertEqual([1, 2, 3], actual)
 
-    @mock.patch("xsdata.formats.dataclass.parsers.utils.to_python", return_value=2)
+    @mock.patch.object(ConverterAdapter, "from_string", return_value=2)
     def test_parse_value_with_ns_map(self, mock_to_python):
         ns_map = dict(a=1)
         ParserUtils.parse_value(" 1 2 3", [int], list, ns_map, True)
@@ -64,10 +65,10 @@ class ParserUtilsTests(TestCase):
         self.assertEqual(4, mock_to_python.call_count)
         mock_to_python.assert_has_calls(
             [
-                mock.call("1", [int], ns_map),
-                mock.call("2", [int], ns_map),
-                mock.call("3", [int], ns_map),
-                mock.call(" 1 2 3", [str], ns_map),
+                mock.call("1", [int], ns_map=ns_map),
+                mock.call("2", [int], ns_map=ns_map),
+                mock.call("3", [int], ns_map=ns_map),
+                mock.call(" 1 2 3", [str], ns_map=ns_map),
             ]
         )
 

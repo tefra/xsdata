@@ -14,8 +14,7 @@ from lxml.etree import QName
 from xsdata.codegen.models import Attr
 from xsdata.codegen.models import AttrType
 from xsdata.codegen.models import Class
-from xsdata.formats.converters import sort_types
-from xsdata.formats.converters import to_python
+from xsdata.formats.converter import converter
 from xsdata.formats.dataclass import utils
 from xsdata.utils import text
 from xsdata.utils.collections import unique_sequence
@@ -152,14 +151,16 @@ def attribute_default(attr: Attr, ns_map: Optional[Dict] = None) -> Any:
     if attr.default.startswith("@enum@"):
         return attribute_default_enum(attr)
 
-    types = sort_types(
+    types = converter.sort_types(
         list({attr_type.native_type for attr_type in attr.types if attr_type.native})
     )
 
     if attr.is_tokens:
         return attribute_default_tokens(attr, types)
 
-    return prepare_attribute_default(to_python(attr.default, types, ns_map))
+    return prepare_attribute_default(
+        converter.from_string(attr.default, types, ns_map=ns_map)
+    )
 
 
 def attribute_default_enum(attr: Attr) -> str:
@@ -173,7 +174,7 @@ def attribute_default_tokens(attr: Attr, types: List[Type]) -> str:
 
     tokens = ", ".join(
         [
-            str(prepare_attribute_default(to_python(val, types)))
+            str(prepare_attribute_default(converter.from_string(val, types)))
             for val in attr.default.split()
         ]
     )

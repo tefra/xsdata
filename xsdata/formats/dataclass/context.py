@@ -17,7 +17,7 @@ from typing import Type
 from lxml.etree import QName
 
 from xsdata.exceptions import XmlContextError
-from xsdata.formats.converters import sort_types
+from xsdata.formats.converter import converter
 from xsdata.formats.dataclass.models.constants import XmlType
 from xsdata.formats.dataclass.models.elements import XmlMeta
 from xsdata.formats.dataclass.models.elements import XmlVar
@@ -227,7 +227,7 @@ class XmlContext:
         else:
             types.append(type_hint)
 
-        return sort_types(types)
+        return converter.sort_types(types)
 
     @classmethod
     def is_derived(cls, obj: Any, clazz: Type) -> bool:

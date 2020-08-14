@@ -3,7 +3,7 @@ from typing import Any
 from lxml.etree import Element
 from lxml.etree import QName
 
-from xsdata.formats.converters import to_xml
+from xsdata.formats.converter import converter
 from xsdata.formats.dataclass.models.generics import Namespaces
 from xsdata.models.enums import Namespace
 from xsdata.models.enums import QNames
@@ -28,7 +28,7 @@ class SerializeUtils:
 
         key = SerializeUtils.resolve_qname(key, namespaces)
         value = SerializeUtils.resolve_qname(value, namespaces)
-        element.set(key, to_xml(value, namespaces))
+        element.set(key, converter.to_string(value, namespaces=namespaces))
 
     @staticmethod
     def resolve_qname(value: Any, namespaces: Namespaces) -> Any:
@@ -52,7 +52,7 @@ class SerializeUtils:
     @staticmethod
     def set_text(element: Element, value: Any, namespaces: Namespaces):
         """Set element text optional content from the given value."""
-        value = to_xml(value, namespaces)
+        value = converter.to_string(value, namespaces=namespaces)
         if isinstance(value, str) and len(value) == 0:
             value = None
         element.text = value
@@ -60,7 +60,7 @@ class SerializeUtils:
     @staticmethod
     def set_tail(element: Element, value: Any, namespaces: Namespaces):
         """Set element tail optional content from the given value."""
-        value = to_xml(value, namespaces)
+        value = converter.to_string(value, namespaces=namespaces)
         if isinstance(value, str) and len(value) == 0:
             value = None
-        element.tail = to_xml(value, namespaces)
+        element.tail = converter.to_string(value, namespaces=namespaces)

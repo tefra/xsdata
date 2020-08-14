@@ -9,7 +9,7 @@ from typing import Type
 from lxml.etree import Element
 from lxml.etree import QName
 
-from xsdata.formats.converters import to_python
+from xsdata.formats.converter import converter
 from xsdata.formats.dataclass.models.elements import FindMode
 from xsdata.formats.dataclass.models.elements import XmlMeta
 from xsdata.formats.dataclass.models.elements import XmlVar
@@ -38,7 +38,6 @@ class ParserUtils:
         default: Any = None,
         ns_map: Optional[Dict] = None,
         tokens: bool = False,
-        in_order: bool = True,
     ) -> Any:
         """Convert xml string values to s python primitive type."""
 
@@ -47,9 +46,9 @@ class ParserUtils:
 
         if tokens:
             value = value if isinstance(value, list) else value.split()
-            return [to_python(val, types, ns_map) for val in value]
+            return [converter.from_string(val, types, ns_map=ns_map) for val in value]
 
-        return to_python(value, types, ns_map)
+        return converter.from_string(value, types, ns_map=ns_map)
 
     @classmethod
     def bind_element_children(

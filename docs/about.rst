@@ -4,15 +4,24 @@ About
 Why
 ---
 
-Python soap clients are either dead or all of them follow the all-in-one pattern that
+Python soap clients are either dead or follow the all-in-one pattern that
 hides all the complexity of the api from the end-user.
 
 Python XML Binding libraries exist but either they never worked for the schemas I was
 working with or generated code that was very hard to read and understand.
 
-xsData is inspired by the Java XML Binding JaxB and with the rise of python model
-classes like attrs, dataclasses or pydantic and the native python type hints, I felt it
-was time to create something similar for python.
+
+Concept
+-------
+
+xsData is trying to work with schema definitions by making a few assumptions about them:
+
+* They are opinionated
+* They are too abstract
+* There are more than one way to achieve the same result
+* There are no best practices
+* In the end Elements are classes and Attributes are class fields
+* The rest is noise or metadata :)
 
 
 Compare

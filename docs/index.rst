@@ -15,6 +15,7 @@
     models
     xml
     json
+    data_types
     wsdl
     plantuml
     demos

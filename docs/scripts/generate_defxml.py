@@ -2,9 +2,9 @@ from collections import defaultdict
 from pathlib import Path
 from typing import Dict
 
-here = Path(__file__).parent
-root = here.parent
-fixtures = here.parent.joinpath("tests/fixtures")
+docs_root = Path(__file__).parent.parent
+docs_root.joinpath("defxmlschema").mkdir(parents=True, exist_ok=True)
+fixtures = docs_root.joinpath("../tests/fixtures")
 
 subtitles = {
     "chapter01": "Schemas: An introduction",
@@ -36,30 +36,30 @@ bind_tpl = """
 
 **Schema**
 
-.. literalinclude:: /../{input}
+.. literalinclude:: /{input}
    :language: xml
    :lines: 2-
 
 **Models**
 
-.. literalinclude:: /../{output}
+.. literalinclude:: /{output}
    :language: python
 
 **XML Document**
 
-.. literalinclude:: /../{instance}
+.. literalinclude:: /{instance}
    :language: xml
    :lines: 2-
 
 **xsData XML Document**
 
-.. literalinclude:: /../{xsdata_instance}
+.. literalinclude:: /{xsdata_instance}
    :language: xml
    :lines: 2-
 
 **xsData JSON**
 
-.. literalinclude:: /../{xsdata_json}
+.. literalinclude:: /{xsdata_json}
    :language: json"""
 
 chapter_tpl = """{title}
@@ -75,7 +75,11 @@ chapter_tpl = """{title}
 
 
 def generate():
-    for xsd in fixtures.glob("defxmlschema/chapter*.xsd"):
+    schemas = list(fixtures.glob("defxmlschema/chapter*.xsd"))
+    if len(schemas) == 0:
+        raise Exception(fixtures.as_uri())
+
+    for xsd in schemas:
 
         if len(xsd.stem) != 9:
             continue
@@ -86,7 +90,7 @@ def generate():
         if not xsd.with_suffix(".py").exists():
             continue
 
-        input = xsd.relative_to(root)
+        input = xsd.relative_to(docs_root)
         output = input.with_suffix(".py")
 
         if xsd.with_suffix(".xml").exists():
@@ -105,7 +109,7 @@ def generate():
         title = "{number} - {topic}".format(number=number, topic=subtitles[chapter])
         title = "{line}\n{title}\n{line}".format(line="*" * len(title), title=title)
 
-        file = here.joinpath(f"defxmlschema/{chapter}.rst")
+        file = docs_root.joinpath(f"defxmlschema/{chapter}.rst")
         file.write_text(chapter_tpl.format(title=title, output="\n\n".join(buffer)))
         print(f"Writing: {file}")
 
@@ -131,5 +135,4 @@ def parse_title(source: str) -> str:
     return title
 
 
-if __name__ == "__main__":
-    generate()
+generate()

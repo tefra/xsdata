@@ -115,7 +115,7 @@ Field Metadata
      - bool
      - Use a list to map simple values.
 
-       eg ``element: Union[int, bool, str]
+       eg ``element: List[Union[int, bool, str]]
        -> <element>1 a true</element> -> [1, "a", True]``
    * - namespace
      - str

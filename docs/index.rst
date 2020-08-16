@@ -20,6 +20,5 @@
     plantuml
     demos
     changelog
-    architecture
     about
     api

@@ -90,7 +90,7 @@ html_theme_options = {
     "base_url": "https://xsdata.readthedocs.io/en/latest/",
 }
 
-intersphinx_mapping = {"https://docs.python.org/": None}
+intersphinx_mapping = {"python": ("https://docs.python.org/3", None)}
 autodoc_member_order = "bysource"
 
 apidoc_module_dir = "../xsdata"

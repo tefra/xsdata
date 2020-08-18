@@ -24,3 +24,10 @@ class CollectionsTests(TestCase):
 
         self.assertIsNone(collections.map_key(dictionary, "x"))
         self.assertEqual("a", collections.map_key(dictionary, "b"))
+
+    def test_prepend(self):
+        target = [1, 2, 3]
+        prepend_values = [4, 5, 6]
+        collections.prepend(target, *prepend_values)
+
+        self.assertEqual([4, 5, 6, 1, 2, 3], target)

@@ -204,8 +204,11 @@ class DefinitionsMapperTests(FactoryTestCase):
             definitions, operation, port_operation, service.name, "rpc", namespace
         )
 
+    @mock.patch.object(DefinitionsMapper, "build_envelope_fault")
     @mock.patch.object(DefinitionsMapper, "build_envelope_class")
-    def test_map_binding_operation_messages(self, mock_build_envelope_class):
+    def test_map_binding_operation_messages(
+        self, mock_build_envelope_class, mock_build_envelope_fault
+    ):
         definitions = Definitions()
         operation = BindingOperation()
         port_operation = PortTypeOperation()
@@ -267,6 +270,9 @@ class DefinitionsMapperTests(FactoryTestCase):
                     namespace,
                 ),
             ]
+        )
+        mock_build_envelope_fault.assert_called_once_with(
+            definitions, port_operation, target
         )
 
     @mock.patch.object(DefinitionsMapper, "build_message_class")
@@ -385,7 +391,7 @@ class DefinitionsMapperTests(FactoryTestCase):
     @mock.patch.object(DefinitionsMapper, "map_port_type_message")
     @mock.patch.object(DefinitionsMapper, "map_binding_message_parts")
     @mock.patch.object(DefinitionsMapper, "build_inner_class")
-    def test_create_envelope_class_with_style_rpc(
+    def test_build_envelope_class_with_style_rpc(
         self,
         mock_get_or_create_inner_class,
         mock_map_binding_message_parts,
@@ -453,6 +459,77 @@ class DefinitionsMapperTests(FactoryTestCase):
 
         result.inner.clear()
         self.assertEqual(expected, result)
+
+    def test_build_envelope_fault(self):
+        body = ClassFactory.create(qname="Body")
+        target = ClassFactory.create()
+        target.inner.append(body)
+
+        port_type_operation = PortTypeOperation()
+        definitions = Definitions()
+
+        DefinitionsMapper.build_envelope_fault(definitions, port_type_operation, target)
+        expected_fault_attr = DefinitionsMapper.build_attr(
+            "Fault", body.inner[0].qname, forward=True, namespace=target.namespace
+        )
+        str_qname = DataType.STRING.qname
+        expected_fault_attrs = [
+            DefinitionsMapper.build_attr(name, str_qname, native=True, namespace="")
+            for name in ["faultcode", "faultstring", "faultactor", "detail"]
+        ]
+
+        self.assertEqual(1, len(body.attrs))
+        self.assertEqual(expected_fault_attr, body.attrs[0])
+        self.assertEqual(expected_fault_attrs, body.inner[0].attrs)
+
+    def test_build_envelope_fault_with_detail_messages(self):
+        body = ClassFactory.create(qname="Body")
+        target = ClassFactory.create()
+        target.inner.append(body)
+
+        port_type_operation = PortTypeOperation()
+        port_type_operation.faults.append(PortTypeMessage(message="x:foo"))
+        port_type_operation.faults.append(PortTypeMessage(message="x:bar"))
+
+        definitions = Definitions()
+        definitions.messages.append(Message(name="foo", parts=[Part(element="fooEl")]))
+        definitions.messages.append(Message(name="bar", parts=[Part(element="barEl")]))
+
+        DefinitionsMapper.build_envelope_fault(definitions, port_type_operation, target)
+        expected_fault_attr = DefinitionsMapper.build_attr(
+            "Fault", body.inner[0].qname, forward=True, namespace=target.namespace
+        )
+        str_qname = DataType.STRING.qname
+        expected_fault_attrs = [
+            DefinitionsMapper.build_attr(name, str_qname, native=True, namespace="")
+            for name in ["faultcode", "faultstring", "faultactor"]
+        ]
+
+        expected_fault_attrs.append(
+            DefinitionsMapper.build_attr(
+                "detail", body.inner[0].inner[0].qname, forward=True, namespace=""
+            )
+        )
+
+        expected_fault_detail_attrs = [
+            DefinitionsMapper.build_attr(
+                name, QName(name), namespace=target.namespace, native=False
+            )
+            for name in ["fooEl", "barEl"]
+        ]
+
+        self.assertEqual(1, len(body.attrs))
+        self.assertEqual(expected_fault_attr, body.attrs[0])
+        self.assertEqual(expected_fault_attrs, body.inner[0].attrs)
+        self.assertEqual(expected_fault_detail_attrs, body.inner[0].inner[0].attrs)
+
+    def test_build_envelope_fault_raises_error_if_missing_inner_body(self):
+        target = ClassFactory.create()
+        operation = PortTypeOperation()
+        definitions = Definitions()
+
+        with self.assertRaises(StopIteration):
+            DefinitionsMapper.build_envelope_fault(definitions, operation, target)
 
     @mock.patch.object(DefinitionsMapper, "build_parts_attributes")
     @mock.patch.object(Definitions, "find_message")

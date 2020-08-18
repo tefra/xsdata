@@ -1,0 +1,14 @@
+<?xml version="1.0" ?>
+<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+    <S:Body>
+        <S:Fault xmlns:ns4="http://www.w3.org/2003/05/soap-envelope">
+            <faultcode>S:Server</faultcode>
+            <faultstring>foobar</faultstring>
+            <detail>
+                <ns2:HelloError xmlns:ns2="http://hello/">
+                    <message>foobar</message>
+                </ns2:HelloError>
+            </detail>
+        </S:Fault>
+    </S:Body>
+</S:Envelope>

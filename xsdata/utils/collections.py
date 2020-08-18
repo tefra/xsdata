@@ -61,4 +61,10 @@ def concat(*args: Iterable) -> Iterator:
 
 
 def map_key(dictionary: Dict, search: Any) -> Any:
+    """Find and return they key for given search value."""
     return next((key for key, val in dictionary.items() if val == search), None)
+
+
+def prepend(target: List, *args: Any):
+    """Prepend items to the target list."""
+    target[:0] = args

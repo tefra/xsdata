@@ -5,6 +5,40 @@ __NAMESPACE__ = "http://hello/"
 
 
 @dataclass
+class HelloByeError:
+    """
+    :ivar message:
+    """
+    class Meta:
+        namespace = "http://hello/"
+
+    message: Optional[str] = field(
+        default=None,
+        metadata=dict(
+            type="Element",
+            namespace=""
+        )
+    )
+
+
+@dataclass
+class HelloError:
+    """
+    :ivar message:
+    """
+    class Meta:
+        namespace = "http://hello/"
+
+    message: Optional[str] = field(
+        default=None,
+        metadata=dict(
+            type="Element",
+            namespace=""
+        )
+    )
+
+
+@dataclass
 class GetHelloAsString:
     """
     :ivar arg0:
@@ -92,6 +126,7 @@ class HelloGetHelloAsStringOutput:
     class Body:
         """
         :ivar get_hello_as_string_response:
+        :ivar fault:
         """
         get_hello_as_string_response: Optional[GetHelloAsStringResponse] = field(
             default=None,
@@ -101,6 +136,73 @@ class HelloGetHelloAsStringOutput:
                 namespace="http://hello/"
             )
         )
+        fault: Optional["HelloGetHelloAsStringOutput.Body.Fault"] = field(
+            default=None,
+            metadata=dict(
+                name="Fault",
+                type="Element"
+            )
+        )
+
+        @dataclass
+        class Fault:
+            """
+            :ivar faultcode:
+            :ivar faultstring:
+            :ivar faultactor:
+            :ivar detail:
+            """
+            faultcode: Optional[str] = field(
+                default=None,
+                metadata=dict(
+                    type="Element",
+                    namespace=""
+                )
+            )
+            faultstring: Optional[str] = field(
+                default=None,
+                metadata=dict(
+                    type="Element",
+                    namespace=""
+                )
+            )
+            faultactor: Optional[str] = field(
+                default=None,
+                metadata=dict(
+                    type="Element",
+                    namespace=""
+                )
+            )
+            detail: Optional["HelloGetHelloAsStringOutput.Body.Fault.Detail"] = field(
+                default=None,
+                metadata=dict(
+                    type="Element",
+                    namespace=""
+                )
+            )
+
+            @dataclass
+            class Detail:
+                """
+                :ivar hello_error:
+                :ivar hello_bye_error:
+                """
+                hello_error: Optional[HelloError] = field(
+                    default=None,
+                    metadata=dict(
+                        name="HelloError",
+                        type="Element",
+                        namespace="http://hello/"
+                    )
+                )
+                hello_bye_error: Optional[HelloByeError] = field(
+                    default=None,
+                    metadata=dict(
+                        name="HelloByeError",
+                        type="Element",
+                        namespace="http://hello/"
+                    )
+                )
 
 
 class HelloGetHelloAsString:

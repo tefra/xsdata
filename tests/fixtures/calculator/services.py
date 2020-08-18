@@ -237,6 +237,7 @@ class CalculatorSoapAddOutput:
     class Body:
         """
         :ivar add_response:
+        :ivar fault:
         """
         add_response: Optional[AddResponse] = field(
             default=None,
@@ -246,6 +247,50 @@ class CalculatorSoapAddOutput:
                 namespace="http://tempuri.org/"
             )
         )
+        fault: Optional["CalculatorSoapAddOutput.Body.Fault"] = field(
+            default=None,
+            metadata=dict(
+                name="Fault",
+                type="Element"
+            )
+        )
+
+        @dataclass
+        class Fault:
+            """
+            :ivar faultcode:
+            :ivar faultstring:
+            :ivar faultactor:
+            :ivar detail:
+            """
+            faultcode: Optional[str] = field(
+                default=None,
+                metadata=dict(
+                    type="Element",
+                    namespace=""
+                )
+            )
+            faultstring: Optional[str] = field(
+                default=None,
+                metadata=dict(
+                    type="Element",
+                    namespace=""
+                )
+            )
+            faultactor: Optional[str] = field(
+                default=None,
+                metadata=dict(
+                    type="Element",
+                    namespace=""
+                )
+            )
+            detail: Optional[str] = field(
+                default=None,
+                metadata=dict(
+                    type="Element",
+                    namespace=""
+                )
+            )
 
 
 @dataclass
@@ -301,6 +346,7 @@ class CalculatorSoapDivideOutput:
     class Body:
         """
         :ivar divide_response:
+        :ivar fault:
         """
         divide_response: Optional[DivideResponse] = field(
             default=None,
@@ -310,6 +356,50 @@ class CalculatorSoapDivideOutput:
                 namespace="http://tempuri.org/"
             )
         )
+        fault: Optional["CalculatorSoapDivideOutput.Body.Fault"] = field(
+            default=None,
+            metadata=dict(
+                name="Fault",
+                type="Element"
+            )
+        )
+
+        @dataclass
+        class Fault:
+            """
+            :ivar faultcode:
+            :ivar faultstring:
+            :ivar faultactor:
+            :ivar detail:
+            """
+            faultcode: Optional[str] = field(
+                default=None,
+                metadata=dict(
+                    type="Element",
+                    namespace=""
+                )
+            )
+            faultstring: Optional[str] = field(
+                default=None,
+                metadata=dict(
+                    type="Element",
+                    namespace=""
+                )
+            )
+            faultactor: Optional[str] = field(
+                default=None,
+                metadata=dict(
+                    type="Element",
+                    namespace=""
+                )
+            )
+            detail: Optional[str] = field(
+                default=None,
+                metadata=dict(
+                    type="Element",
+                    namespace=""
+                )
+            )
 
 
 @dataclass
@@ -365,6 +455,7 @@ class CalculatorSoapMultiplyOutput:
     class Body:
         """
         :ivar multiply_response:
+        :ivar fault:
         """
         multiply_response: Optional[MultiplyResponse] = field(
             default=None,
@@ -374,6 +465,50 @@ class CalculatorSoapMultiplyOutput:
                 namespace="http://tempuri.org/"
             )
         )
+        fault: Optional["CalculatorSoapMultiplyOutput.Body.Fault"] = field(
+            default=None,
+            metadata=dict(
+                name="Fault",
+                type="Element"
+            )
+        )
+
+        @dataclass
+        class Fault:
+            """
+            :ivar faultcode:
+            :ivar faultstring:
+            :ivar faultactor:
+            :ivar detail:
+            """
+            faultcode: Optional[str] = field(
+                default=None,
+                metadata=dict(
+                    type="Element",
+                    namespace=""
+                )
+            )
+            faultstring: Optional[str] = field(
+                default=None,
+                metadata=dict(
+                    type="Element",
+                    namespace=""
+                )
+            )
+            faultactor: Optional[str] = field(
+                default=None,
+                metadata=dict(
+                    type="Element",
+                    namespace=""
+                )
+            )
+            detail: Optional[str] = field(
+                default=None,
+                metadata=dict(
+                    type="Element",
+                    namespace=""
+                )
+            )
 
 
 @dataclass
@@ -429,6 +564,7 @@ class CalculatorSoapSubtractOutput:
     class Body:
         """
         :ivar subtract_response:
+        :ivar fault:
         """
         subtract_response: Optional[SubtractResponse] = field(
             default=None,
@@ -438,6 +574,50 @@ class CalculatorSoapSubtractOutput:
                 namespace="http://tempuri.org/"
             )
         )
+        fault: Optional["CalculatorSoapSubtractOutput.Body.Fault"] = field(
+            default=None,
+            metadata=dict(
+                name="Fault",
+                type="Element"
+            )
+        )
+
+        @dataclass
+        class Fault:
+            """
+            :ivar faultcode:
+            :ivar faultstring:
+            :ivar faultactor:
+            :ivar detail:
+            """
+            faultcode: Optional[str] = field(
+                default=None,
+                metadata=dict(
+                    type="Element",
+                    namespace=""
+                )
+            )
+            faultstring: Optional[str] = field(
+                default=None,
+                metadata=dict(
+                    type="Element",
+                    namespace=""
+                )
+            )
+            faultactor: Optional[str] = field(
+                default=None,
+                metadata=dict(
+                    type="Element",
+                    namespace=""
+                )
+            )
+            detail: Optional[str] = field(
+                default=None,
+                metadata=dict(
+                    type="Element",
+                    namespace=""
+                )
+            )
 
 
 class CalculatorSoapAdd:

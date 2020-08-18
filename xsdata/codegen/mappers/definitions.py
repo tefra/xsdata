@@ -30,7 +30,12 @@ from xsdata.utils import text
 
 
 class DefinitionsMapper:
-    """Map a definitions instance to message and service classes."""
+    """
+    Map a definitions instance to message and service classes.
+
+    Currently only SOAP 1.1 bindings with rpc/document style is
+    supported.
+    """
 
     @classmethod
     def map(cls, definitions: Definitions) -> List[Class]:
@@ -134,13 +139,12 @@ class DefinitionsMapper:
         if operation.output:
             messages.append(("output", operation.output, port_type_operation.output))
 
-        # todo: faults
         for suffix, binding_message, port_type_message in messages:
 
             if style == "rpc":
                 yield cls.build_message_class(definitions, port_type_message)
 
-            yield cls.build_envelope_class(
+            target = cls.build_envelope_class(
                 definitions,
                 binding_message,
                 port_type_message,
@@ -148,6 +152,43 @@ class DefinitionsMapper:
                 style,
                 namespace,
             )
+
+            if suffix == "output":
+                cls.build_envelope_fault(definitions, port_type_operation, target)
+
+            yield target
+
+    @classmethod
+    def build_envelope_fault(
+        cls,
+        definitions: Definitions,
+        port_type_operation: PortTypeOperation,
+        target: Class,
+    ):
+        """Build inner fault class with default fields."""
+        ns_map: Dict = {}
+        body = next(inner for inner in target.inner if inner.name == "Body")
+        fault_class = cls.build_inner_class(body, "Fault", target.namespace)
+
+        detail_attrs: List[Attr] = []
+        for fault in port_type_operation.faults:
+            message = definitions.find_message(text.suffix(fault.message))
+            detail_attrs.extend(cls.build_parts_attributes(message.parts, ns_map))
+
+        default_fields = ["faultcode", "faultstring", "faultactor"]
+        if detail_attrs:
+            detail = cls.build_inner_class(fault_class, "detail", namespace="")
+            detail.attrs.extend(detail_attrs)
+        else:
+            default_fields.append("detail")
+
+        collections.prepend(
+            fault_class.attrs,
+            *[
+                cls.build_attr(f, DataType.STRING.qname, native=True, namespace="")
+                for f in default_fields
+            ],
+        )
 
     @classmethod
     def build_envelope_class(
@@ -208,7 +249,9 @@ class DefinitionsMapper:
         )
 
     @classmethod
-    def build_inner_class(cls, target: Class, name: str) -> Class:
+    def build_inner_class(
+        cls, target: Class, name: str, namespace: Optional[str] = None
+    ) -> Class:
         """
         Build or retrieve an inner class for the given target class by the
         given name.
@@ -224,7 +267,7 @@ class DefinitionsMapper:
                 module=target.module,
                 ns_map=target.ns_map.copy(),
             )
-            attr = cls.build_attr(name, inner.qname, forward=True)
+            attr = cls.build_attr(name, inner.qname, forward=True, namespace=namespace)
 
             target.inner.append(inner)
             target.attrs.append(attr)

@@ -5,8 +5,6 @@ from typing import Optional
 from typing import Set
 from typing import Tuple
 
-from lxml.etree import QName
-
 from xsdata.codegen.mixins import ContainerInterface
 from xsdata.codegen.mixins import HandlerInterface
 from xsdata.codegen.models import Attr
@@ -158,7 +156,7 @@ class AttributeTypeHandler(HandlerInterface):
 
         return False
 
-    def cached_dependencies(self, source: Class) -> Tuple[QName]:
+    def cached_dependencies(self, source: Class) -> Tuple[str]:
         """Returns from cache the source class dependencies as a collection of
         qualified names."""
         cache_key = id(source)

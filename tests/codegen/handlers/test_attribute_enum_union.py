@@ -19,9 +19,9 @@ class AttributeEnumUnionHandlerTests(FactoryTestCase):
                     name="value",
                     tag=Tag.UNION,
                     types=[
-                        AttrTypeFactory.create(qname=self.root_enum.name),
+                        AttrTypeFactory.create(qname=self.root_enum.qname),
                         AttrTypeFactory.create(
-                            qname=self.inner_enum.name, forward=True
+                            qname=self.inner_enum.qname, forward=True
                         ),
                     ],
                 ),

@@ -1,7 +1,5 @@
 from unittest import TestCase
 
-from lxml.etree import QName
-
 from tests.factories import AttrFactory
 from tests.factories import AttrTypeFactory
 from xsdata.formats.dataclass.filters import attribute_default
@@ -68,7 +66,7 @@ class AttributeDefaultTests(TestCase):
         attr.types[0].alias = "foo_bar"
         self.assertEqual("FooBar.BAR", attribute_default(attr))
 
-        attr.types[0].qname = QName("nomatch")  # impossible
+        attr.types[0].qname = "nomatch"  # impossible
         with self.assertRaises(Exception):
             attribute_default(attr)
 

@@ -3,8 +3,6 @@ import unittest
 from abc import ABC
 from abc import abstractmethod
 
-from lxml.etree import QName
-
 from xsdata.codegen.models import Attr
 from xsdata.codegen.models import AttrType
 from xsdata.codegen.models import Class
@@ -22,6 +20,7 @@ from xsdata.models.xsd import ComplexType
 from xsdata.models.xsd import Element
 from xsdata.models.xsd import Restriction
 from xsdata.models.xsd import SimpleType
+from xsdata.utils import text
 
 DEFAULT_NS_MAP = {
     Namespace.XS.prefix: Namespace.XS.uri,
@@ -91,10 +90,7 @@ class ClassFactory(Factory):
         container=None,
     ):
         if not qname:
-            qname = QName("xsdata", f"class_{cls.next_letter()}")
-
-        if not isinstance(qname, QName):
-            qname = QName("xsdata", qname)
+            qname = text.qname("xsdata", f"class_{cls.next_letter()}")
 
         return cls.model(
             qname=qname,
@@ -167,10 +163,7 @@ class AttrTypeFactory(Factory):
         circular=False,
     ):
         if not qname:
-            qname = QName("xsdata", f"attr_{cls.next_letter()}")
-
-        if not isinstance(qname, QName):
-            qname = QName("xsdata", qname)
+            qname = text.qname("xsdata", f"attr_{cls.next_letter()}")
 
         return cls.model(
             qname=qname,

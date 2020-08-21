@@ -1,7 +1,5 @@
 from unittest import mock
 
-from lxml.etree import QName
-
 from tests.factories import AttrFactory
 from tests.factories import AttrTypeFactory
 from tests.factories import ClassFactory
@@ -9,6 +7,7 @@ from tests.factories import FactoryTestCase
 from xsdata.codegen.container import ClassContainer
 from xsdata.codegen.handlers import AttributeSubstitutionHandler
 from xsdata.codegen.models import AttrType
+from xsdata.utils import text
 
 
 class AttributeSubstitutionHandlerTests(FactoryTestCase):
@@ -73,9 +72,10 @@ class AttributeSubstitutionHandlerTests(FactoryTestCase):
         ns = "xsdata"
         classes = [
             ClassFactory.create(
-                substitutions=[QName(ns, "foo"), QName(ns, "bar")], abstract=True
+                substitutions=[text.qname(ns, "foo"), text.qname(ns, "bar")],
+                abstract=True,
             ),
-            ClassFactory.create(substitutions=[QName(ns, "foo")], abstract=True),
+            ClassFactory.create(substitutions=[text.qname(ns, "foo")], abstract=True),
         ]
 
         reference_attrs = AttrFactory.list(3)
@@ -85,8 +85,8 @@ class AttributeSubstitutionHandlerTests(FactoryTestCase):
         self.processor.create_substitutions()
 
         expected = {
-            QName(ns, "foo"): [reference_attrs[0], reference_attrs[2]],
-            QName(ns, "bar"): [reference_attrs[1]],
+            text.qname(ns, "foo"): [reference_attrs[0], reference_attrs[2]],
+            text.qname(ns, "bar"): [reference_attrs[1]],
         }
         self.assertEqual(expected, self.processor.substitutions)
 
@@ -95,13 +95,13 @@ class AttributeSubstitutionHandlerTests(FactoryTestCase):
         )
 
     def test_create_substitution(self):
-        item = ClassFactory.elements(1, qname=QName("foo", "bar"))
+        item = ClassFactory.elements(1, qname=text.qname("foo", "bar"))
         actual = self.processor.create_substitution(item)
 
         expected = AttrFactory.create(
             name=item.name,
             default=None,
-            types=[AttrType(qname=QName("foo", "bar"))],
+            types=[AttrType(qname=text.qname("foo", "bar"))],
             tag=item.type.__name__,
         )
 

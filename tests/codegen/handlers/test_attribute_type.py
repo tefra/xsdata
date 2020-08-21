@@ -1,7 +1,5 @@
 from unittest import mock
 
-from lxml.etree import QName
-
 from tests.factories import AttrFactory
 from tests.factories import AttrTypeFactory
 from tests.factories import ClassFactory
@@ -229,13 +227,13 @@ class AttributeTypeHandlerTests(FactoryTestCase):
         another = ClassFactory.create()
         processing = ClassFactory.create(status=Status.PROCESSING)
 
-        find_classes = {QName("a"): another, QName("b"): target}
+        find_classes = {"a": another, "b": target}
 
         mock_container_find.side_effect = lambda x: find_classes.get(x)
         mock_dependencies.side_effect = [
-            [QName(x) for x in "ccde"],
-            [QName(x) for x in "abc"],
-            [QName(x) for x in "xy"],
+            list("ccde"),
+            list("abc"),
+            list("xy"),
         ]
 
         self.assertTrue(
@@ -253,13 +251,13 @@ class AttributeTypeHandlerTests(FactoryTestCase):
 
         mock_container_find.assert_has_calls(
             [
-                mock.call(QName("c")),
-                mock.call(QName("d")),
-                mock.call(QName("e")),
-                mock.call(QName("a")),
-                mock.call(QName("x")),
-                mock.call(QName("y")),
-                mock.call(QName("b")),
+                mock.call("c"),
+                mock.call("d"),
+                mock.call("e"),
+                mock.call("a"),
+                mock.call("x"),
+                mock.call("y"),
+                mock.call("b"),
             ]
         )
 
@@ -282,18 +280,15 @@ class AttributeTypeHandlerTests(FactoryTestCase):
 
     @mock.patch.object(Class, "dependencies")
     def test_cached_dependencies(self, mock_class_dependencies):
-        a_qname = QName("a")
-        b_qname = QName("b")
-
-        mock_class_dependencies.return_value = [a_qname, b_qname]
+        mock_class_dependencies.return_value = ["a", "b"]
 
         source = ClassFactory.create()
-        self.processor.dependencies[id(source)] = (a_qname,)
+        self.processor.dependencies[id(source)] = ("a",)
 
         actual = self.processor.cached_dependencies(source)
-        self.assertEqual((a_qname,), actual)
+        self.assertEqual(("a",), actual)
 
         self.processor.dependencies.clear()
         actual = self.processor.cached_dependencies(source)
-        self.assertEqual((a_qname, b_qname), actual)
+        self.assertEqual(("a", "b"), actual)
         mock_class_dependencies.assert_called_once_with()

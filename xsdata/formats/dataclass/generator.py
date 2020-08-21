@@ -82,7 +82,7 @@ class DataclassGenerator(AbstractGenerator):
         resolver.process(classes)
         imports = resolver.sorted_imports()
         output = self.render_classes(resolver.sorted_classes())
-        namespace = classes[0].qname.namespace
+        namespace = classes[0].target_namespace
 
         return self.template("module").render(
             output=output, imports=imports, namespace=namespace

@@ -4,8 +4,6 @@ from typing import Iterator
 from typing import List
 from typing import Optional
 
-from lxml.etree import QName
-
 from xsdata.codegen.models import Class
 
 Condition = Optional[Callable]
@@ -20,7 +18,7 @@ class ContainerInterface(metaclass=abc.ABCMeta):
         """Create an iterator for the class map values."""
 
     @abc.abstractmethod
-    def find(self, qname: QName, condition: Condition = None) -> Optional[Class]:
+    def find(self, qname: str, condition: Condition = None) -> Optional[Class]:
         """Search by qualified name for a specific class with an optional
         condition callable."""
 

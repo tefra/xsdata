@@ -6,8 +6,6 @@ from typing import List
 from typing import Optional
 from unittest import mock
 
-from lxml.etree import QName
-
 from tests.factories import ClassFactory
 from tests.factories import FactoryTestCase
 from xsdata.codegen.models import Class
@@ -123,7 +121,7 @@ class CodeWriterTests(FactoryTestCase):
         self.assertEqual("xsdata", classes[0].module)
         self.assertEqual("xsdata", classes[1].module)
 
-        classes = ClassFactory.list(1, qname=QName("foo"))
+        classes = ClassFactory.list(1, qname="foo")
         with self.assertRaises(CodeGenerationError) as cm:
             writer.designate(classes, "fake", "foo", True)
 

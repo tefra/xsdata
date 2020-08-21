@@ -4,24 +4,24 @@ from dataclasses import field
 from typing import Dict
 from typing import List
 
-from lxml.etree import QName
 from toposort import toposort_flatten
 
 from xsdata.codegen.models import Class
 from xsdata.codegen.models import Import
 from xsdata.exceptions import ResolverValueError
 from xsdata.utils import collections
+from xsdata.utils import text
 
 logger = logging.getLogger(__name__)
 
 
 @dataclass
 class DependenciesResolver:
-    packages: Dict[QName, str] = field(default_factory=dict)
-    aliases: Dict[QName, str] = field(default_factory=dict)
+    packages: Dict[str, str] = field(default_factory=dict)
+    aliases: Dict[str, str] = field(default_factory=dict)
     imports: List[Import] = field(default_factory=list)
-    class_list: List[QName] = field(init=False, default_factory=list)
-    class_map: Dict[QName, Class] = field(init=False, default_factory=dict)
+    class_list: List[str] = field(init=False, default_factory=list)
+    class_map: Dict[str, Class] = field(init=False, default_factory=dict)
     package: str = field(init=False)
 
     def process(self, classes: List[Class]):
@@ -65,47 +65,48 @@ class DependenciesResolver:
     def resolve_imports(self):
         """Walk the import qualified names, check for naming collisions and add
         the necessary code generator import instance."""
-        local_names = [qname.localname for qname in self.class_map.keys()]
+        local_names = [text.split_qname(qname)[1] for qname in self.class_map.keys()]
         for qname in self.import_classes():
             package = self.find_package(qname)
-            exists = qname.localname in local_names
+            exists = text.split_qname(qname)[1] in local_names
             self.add_import(qname=qname, package=package, exists=exists)
 
-    def add_import(self, qname: QName, package: str, exists: bool = False):
+    def add_import(self, qname: str, package: str, exists: bool = False):
         """Append an import package to the list of imports with any if
         necessary aliases if the import name exists in the local module."""
         alias = None
+        local_name = text.split_qname(qname)[1]
         if exists:
             module = package.split(".")[-1]
-            alias = f"{module}:{qname.localname}"
+            alias = f"{module}:{local_name}"
             self.aliases[qname] = alias
 
-        self.imports.append(Import(name=qname.localname, source=package, alias=alias))
+        self.imports.append(Import(name=local_name, source=package, alias=alias))
 
-    def find_package(self, qname: QName) -> str:
+    def find_package(self, qname: str) -> str:
         """
         Return the package name for the given qualified class name.
 
         :raises ResolverValueError: if name doesn't exist.
         """
         if qname not in self.packages:
-            raise ResolverValueError(f"Unknown dependency: {qname.text}")
+            raise ResolverValueError(f"Unknown dependency: {qname}")
         return self.packages[qname]
 
-    def import_classes(self) -> List[QName]:
+    def import_classes(self) -> List[str]:
         """Return a list of class that need to be imported."""
         return [qname for qname in self.class_list if qname not in self.class_map]
 
     @staticmethod
-    def create_class_list(classes: List[Class]) -> List[QName]:
+    def create_class_list(classes: List[Class]) -> List[str]:
         """Use topology sort to return a flat list for all the dependencies."""
         return toposort_flatten({obj.qname: set(obj.dependencies()) for obj in classes})
 
     @staticmethod
-    def create_class_map(classes: List[Class]) -> Dict[QName, Class]:
+    def create_class_map(classes: List[Class]) -> Dict[str, Class]:
         """Index the list of classes by name."""
 
-        result: Dict[QName, Class] = {}
+        result: Dict[str, Class] = {}
         for obj in classes:
             if obj.qname in result:
                 raise ResolverValueError(f"Duplicate class: `{obj.name}`")

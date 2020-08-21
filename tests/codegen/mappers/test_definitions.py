@@ -1,8 +1,6 @@
 from typing import Generator
 from unittest import mock
 
-from lxml.etree import QName
-
 from tests.factories import AttrFactory
 from tests.factories import ClassFactory
 from tests.factories import FactoryTestCase
@@ -24,6 +22,7 @@ from xsdata.models.wsdl import PortTypeOperation
 from xsdata.models.wsdl import Service
 from xsdata.models.wsdl import ServicePort
 from xsdata.models.xsd import Element
+from xsdata.utils import text
 
 
 def mock_create_inner(target: Class, name: str):
@@ -169,7 +168,7 @@ class DefinitionsMapperTests(FactoryTestCase):
         second = ClassFactory.create(qname="some_name_second", meta_name="Envelope")
         other = ClassFactory.create()
         service = ClassFactory.create(
-            qname=QName("xsdata", "Calc_Add"),
+            qname=text.qname("xsdata", "Calc_Add"),
             status=Status.PROCESSED,
             type=BindingOperation,
             module="foo",
@@ -344,7 +343,7 @@ class DefinitionsMapperTests(FactoryTestCase):
         )
 
         expected = Class(
-            qname=QName("bar", name),
+            qname=text.qname("bar", name),
             meta_name="Envelope",
             type=BindingMessage,
             module="foo",
@@ -420,7 +419,7 @@ class DefinitionsMapperTests(FactoryTestCase):
         )
 
         expected = Class(
-            qname=QName("bar", name),
+            qname=text.qname("bar", name),
             meta_name="Envelope",
             type=BindingMessage,
             module="foo",
@@ -513,7 +512,7 @@ class DefinitionsMapperTests(FactoryTestCase):
 
         expected_fault_detail_attrs = [
             DefinitionsMapper.build_attr(
-                name, QName(name), namespace=target.namespace, native=False
+                name, qname=name, namespace=target.namespace, native=False
             )
             for name in ["fooEl", "barEl"]
         ]
@@ -666,13 +665,13 @@ class DefinitionsMapperTests(FactoryTestCase):
         result = DefinitionsMapper.build_parts_attributes(parts, ns_map)
         expected = [
             DefinitionsMapper.build_attr(
-                "bar", QName("great", "bar"), namespace="great", native=False
+                "bar", text.qname("great", "bar"), namespace="great", native=False
             ),
             DefinitionsMapper.build_attr(
-                "arg0", QName(Namespace.XS.uri, "string"), namespace="", native=True
+                "arg0", DataType.STRING.qname, namespace="", native=True
             ),
             DefinitionsMapper.build_attr(
-                "arg1", QName("boo", "cafe"), namespace="", native=False
+                "arg1", text.qname("boo", "cafe"), namespace="", native=False
             ),
         ]
         self.assertIsInstance(result, Generator)
@@ -691,7 +690,7 @@ class DefinitionsMapperTests(FactoryTestCase):
         mock_create_message_attributes.return_value = attrs
         actual = DefinitionsMapper.build_message_class(definitions, port_type_message)
         expected = Class(
-            qname=QName("xsdata", "bar"),
+            qname=text.qname("xsdata", "bar"),
             status=Status.PROCESSED,
             type=Element,
             module="foo",
@@ -706,7 +705,7 @@ class DefinitionsMapperTests(FactoryTestCase):
 
         actual = DefinitionsMapper.build_inner_class(target, "body")
         expected = ClassFactory.create(
-            qname=QName("body"),
+            qname="body",
             type=BindingMessage,
             module=target.module,
             package=None,
@@ -717,9 +716,7 @@ class DefinitionsMapperTests(FactoryTestCase):
 
         self.assertIsNot(actual.ns_map, target.ns_map)
 
-        expected_attr = DefinitionsMapper.build_attr(
-            "body", QName("body"), forward=True
-        )
+        expected_attr = DefinitionsMapper.build_attr("body", "body", forward=True)
         self.assertEqual(expected_attr, target.attrs[0])
 
         repeat = DefinitionsMapper.build_inner_class(target, "body")
@@ -733,7 +730,7 @@ class DefinitionsMapperTests(FactoryTestCase):
             port_type_message, target_namespace
         )
         expected = DefinitionsMapper.build_attr(
-            "bar", qname=QName("foobar", "bar"), namespace=target_namespace
+            "bar", qname=text.qname("foobar", "bar"), namespace=target_namespace
         )
 
         self.assertIsInstance(actual, Generator)

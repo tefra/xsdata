@@ -7,8 +7,6 @@ from typing import Iterator
 from typing import List
 from typing import Optional
 
-from lxml.etree import QName
-
 from xsdata.codegen.handlers import AttributeEnumUnionHandler
 from xsdata.codegen.handlers import AttributeGroupHandler
 from xsdata.codegen.handlers import AttributeMergeHandler
@@ -29,7 +27,7 @@ Condition = Optional[Callable]
 
 
 class ClassContainer(UserDict, ContainerInterface):
-    def __init__(self, data: Dict[QName, List[Class]] = None) -> None:
+    def __init__(self, data: Dict[str, List[Class]] = None) -> None:
         """
         Initialize container structure and the list of process handlers.
 
@@ -58,7 +56,7 @@ class ClassContainer(UserDict, ContainerInterface):
         for items in list(self.data.values()):
             yield from items
 
-    def find(self, qname: QName, condition: Condition = None) -> Optional[Class]:
+    def find(self, qname: str, condition: Condition = None) -> Optional[Class]:
         """Search by qualified name for a specific class with an optional
         condition callable."""
         for row in self.data.get(qname, []):

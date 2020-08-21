@@ -8,7 +8,6 @@ from lxml.etree import Element
 from lxml.etree import iterparse
 from lxml.etree import iterwalk
 from lxml.etree import parse
-from lxml.etree import QName
 
 from xsdata.formats.bindings import AbstractParser
 from xsdata.formats.bindings import T
@@ -63,7 +62,7 @@ class XmlParser(NodeParser, AbstractParser):
         """Call if exist the parser's hook for the given element and event."""
 
         if name not in self.event_names:
-            self.event_names[name] = text.snake_case(QName(name).localname)
+            self.event_names[name] = text.snake_case(text.split_qname(name)[1])
 
         method_name = f"{event}_{self.event_names[name]}"
         if hasattr(self, method_name):

@@ -11,8 +11,6 @@ from typing import List
 from typing import Optional
 from typing import Type
 
-from lxml.etree import QName
-
 from xsdata.formats.converter import converter
 from xsdata.formats.dataclass.models.constants import XmlType
 from xsdata.models.enums import DataType
@@ -24,6 +22,7 @@ from xsdata.models.wsdl import BindingOperation
 from xsdata.models.wsdl import Message
 from xsdata.models.xsd import ComplexType
 from xsdata.models.xsd import Element
+from xsdata.utils import text
 
 xml_type_map = {
     Tag.ELEMENT: XmlType.ELEMENT,
@@ -176,7 +175,7 @@ class AttrType:
     :param circular:
     """
 
-    qname: QName
+    qname: str
     index: int = field(default_factory=int)
     alias: Optional[str] = field(default=None)
     native: bool = field(default=False)
@@ -186,7 +185,7 @@ class AttrType:
     @property
     def name(self) -> str:
         """Shortcut for qname local name."""
-        return self.qname.localname
+        return text.split_qname(self.qname)[1]
 
     @property
     def is_dependency(self) -> bool:
@@ -306,10 +305,7 @@ class Attr:
     def is_xsi_type(self) -> bool:
         """Return whether this attribute qualified name is equal to
         xsi:type."""
-        return (
-            QNames.XSI_TYPE.namespace == self.namespace
-            and QNames.XSI_TYPE.localname == self.name
-        )
+        return QNames.XSI_TYPE == text.qname(self.namespace, self.name)
 
     @property
     def is_wildcard(self) -> bool:
@@ -382,7 +378,7 @@ class Class:
     :param ns_map:
     """
 
-    qname: QName
+    qname: str
     type: Type
     module: str
     mixed: bool = field(default=False)
@@ -395,7 +391,7 @@ class Class:
     namespace: Optional[str] = field(default=None)
     help: Optional[str] = field(default=None)
     meta_name: Optional[str] = field(default=None)
-    substitutions: List[QName] = field(default_factory=list)
+    substitutions: List[str] = field(default_factory=list)
     extensions: List[Extension] = field(default_factory=list)
     attrs: List[Attr] = field(default_factory=list)
     inner: List["Class"] = field(default_factory=list)
@@ -404,7 +400,11 @@ class Class:
     @property
     def name(self) -> str:
         """Shortcut for qname local name."""
-        return self.qname.localname
+        return text.split_qname(self.qname)[1]
+
+    @property
+    def target_namespace(self) -> Optional[str]:
+        return text.split_qname(self.qname)[0]
 
     @property
     def has_suffix_attr(self) -> bool:
@@ -470,7 +470,7 @@ class Class:
         attrs = [attr.clone() for attr in self.attrs]
         return replace(self, inner=inners, extensions=extensions, attrs=attrs)
 
-    def dependencies(self) -> Iterator[QName]:
+    def dependencies(self) -> Iterator[str]:
         """
         Return a set of dependencies for the given class.
 

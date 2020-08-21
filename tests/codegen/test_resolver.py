@@ -1,7 +1,5 @@
 from unittest import mock
 
-from lxml.etree import QName
-
 from tests.factories import AttrFactory
 from tests.factories import AttrTypeFactory
 from tests.factories import ClassFactory
@@ -10,6 +8,7 @@ from tests.factories import PackageFactory
 from xsdata.codegen.models import Class
 from xsdata.codegen.resolver import DependenciesResolver
 from xsdata.exceptions import ResolverValueError
+from xsdata.utils import text
 
 
 class DependenciesResolverTest(FactoryTestCase):
@@ -25,11 +24,11 @@ class DependenciesResolverTest(FactoryTestCase):
     ):
         classes = ClassFactory.list(3)
 
-        mock_create_class_map.return_value = {QName("b"): classes[0]}
+        mock_create_class_map.return_value = {"b": classes[0]}
         create_class_list.return_value = classes[::-1]
 
         self.resolver.imports.append(PackageFactory.create(name="foo", source="bar"))
-        self.resolver.aliases = {QName("a"): "a"}
+        self.resolver.aliases = {"a": "a"}
 
         self.resolver.process(classes)
         self.assertEqual([], self.resolver.imports)
@@ -68,13 +67,13 @@ class DependenciesResolverTest(FactoryTestCase):
 
     def test_apply_aliases(self):
         self.resolver.aliases = {
-            QName("xsdata", "d"): "IamD",
-            QName("xsdata", "a"): "IamA",
+            text.qname("xsdata", "d"): "IamD",
+            text.qname("xsdata", "a"): "IamA",
         }
-        type_a = AttrTypeFactory.create(qname="a")
-        type_b = AttrTypeFactory.create(qname="b")
-        type_c = AttrTypeFactory.create(qname="c")
-        type_d = AttrTypeFactory.create(qname="d")
+        type_a = AttrTypeFactory.create(qname="{xsdata}a")
+        type_b = AttrTypeFactory.create(qname="{xsdata}b")
+        type_c = AttrTypeFactory.create(qname="{xsdata}c")
+        type_d = AttrTypeFactory.create(qname="{xsdata}d")
 
         obj = ClassFactory.create(
             qname="a",
@@ -121,10 +120,10 @@ class DependenciesResolverTest(FactoryTestCase):
     ):
         class_life = ClassFactory.create(qname="life")
         import_names = [
-            QName("foo"),  # cool
-            QName("bar"),  # cool
-            QName("{thug}life"),  # life class exists add alias
-            QName("{common}type"),  # type class doesn't exist add just the name
+            "foo",  # cool
+            "bar",  # cool
+            "{thug}life",  # life class exists add alias
+            "{common}type",  # type class doesn't exist add just the name
         ]
         self.resolver.class_map = {class_life.qname: class_life}
         mock_import_classes.return_value = import_names
@@ -144,8 +143,8 @@ class DependenciesResolverTest(FactoryTestCase):
         self.assertEqual(0, len(self.resolver.imports))
 
         package = "here.there"
-        foo_qname = QName("foo")
-        bar_qname = QName("bar")
+        foo_qname = "foo"
+        bar_qname = "bar"
 
         self.resolver.add_import(foo_qname, package, False)
         self.resolver.add_import(bar_qname, package, True)
@@ -164,7 +163,7 @@ class DependenciesResolverTest(FactoryTestCase):
 
         self.assertEqual("foo.bar", self.resolver.find_package(class_a.qname))
         with self.assertRaises(ResolverValueError):
-            self.resolver.find_package(QName("nope"))
+            self.resolver.find_package("nope")
 
     def test_import_classes(self):
         self.resolver.class_list = [x for x in "abcdefg"]
@@ -187,9 +186,9 @@ class DependenciesResolverTest(FactoryTestCase):
     def test_create_class_list(self, mock_dependencies):
         classes = ClassFactory.list(3)
         mock_dependencies.side_effect = [
-            {QName("xsdata", "class_C"), QName("b")},
-            {QName("c"), QName("d")},
-            {QName("e"), QName("d")},
+            {text.qname("xsdata", "class_C"), "b"},
+            {"c", "d"},
+            {"e", "d"},
         ]
 
         actual = self.resolver.create_class_list(classes)

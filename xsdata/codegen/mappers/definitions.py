@@ -4,8 +4,6 @@ from typing import List
 from typing import Optional
 from typing import Tuple
 
-from lxml.etree import QName
-
 from xsdata.codegen.models import Attr
 from xsdata.codegen.models import AttrType
 from xsdata.codegen.models import Class
@@ -111,7 +109,7 @@ class DefinitionsMapper:
                 attrs.append(cls.build_attr(message_type, message_class.qname))
 
         yield Class(
-            qname=QName(definitions.target_namespace, name),
+            qname=text.qname(definitions.target_namespace, name),
             status=Status.PROCESSED,
             type=type(binding_operation),
             module=definitions.module,
@@ -204,7 +202,7 @@ class DefinitionsMapper:
         attributes from the port type message."""
 
         target = Class(
-            qname=QName(definitions.target_namespace, name),
+            qname=text.qname(definitions.target_namespace, name),
             meta_name="Envelope",
             type=type(binding_message),
             module=definitions.module,
@@ -214,7 +212,8 @@ class DefinitionsMapper:
         message = port_type_message.message
 
         for ext in binding_message.extended_elements:
-            local_name = QName(ext.qname).localname.title()
+            assert ext.qname is not None
+            local_name = text.split_qname(ext.qname)[1].title()
             inner = cls.build_inner_class(target, local_name)
 
             if style == "rpc" and local_name == "Body":
@@ -240,7 +239,7 @@ class DefinitionsMapper:
         ns_map = definition_message.ns_map.copy()
 
         return Class(
-            qname=QName(definitions.target_namespace, message_name),
+            qname=text.qname(definitions.target_namespace, message_name),
             status=Status.PROCESSED,
             type=Element,
             module=definitions.module,
@@ -262,7 +261,7 @@ class DefinitionsMapper:
         inner = next((inner for inner in target.inner if inner.name == name), None)
         if not inner:
             inner = Class(
-                qname=QName(name),
+                qname=text.qname(name),
                 type=BindingMessage,
                 module=target.module,
                 ns_map=target.ns_map.copy(),
@@ -282,7 +281,7 @@ class DefinitionsMapper:
         prefix, name = text.split(message.message)
         source_namespace = message.ns_map.get(prefix)
         yield cls.build_attr(
-            name, qname=QName(source_namespace, name), namespace=namespace
+            name, qname=text.qname(source_namespace, name), namespace=namespace
         )
 
     @classmethod
@@ -298,7 +297,7 @@ class DefinitionsMapper:
             parts.extend(extended.attributes["parts"].split())
 
         if "message" in extended.attributes:
-            message_name = QName(extended.attributes["message"]).localname
+            message_name = text.split_qname(extended.attributes["message"])[1]
         else:
             message_name = text.suffix(message)
 
@@ -331,7 +330,7 @@ class DefinitionsMapper:
 
             ns_map.update(part.ns_map)
             namespace = part.ns_map.get(prefix)
-            type_qname = QName(namespace, type_name)
+            type_qname = text.qname(namespace, type_name)
             native = namespace == Namespace.XS.uri
             namespace = "" if part.type else namespace
 
@@ -350,7 +349,7 @@ class DefinitionsMapper:
     def attributes(cls, elements: Iterator[AnyElement]) -> Dict:
         """Return all attributes from all extended elements as a dictionary."""
         return {
-            QName(qname).localname: value
+            text.split_qname(qname)[1]: value
             for element in elements
             if isinstance(element, AnyElement)
             for qname, value in element.attributes.items()
@@ -360,7 +359,7 @@ class DefinitionsMapper:
     def build_attr(
         cls,
         name: str,
-        qname: QName,
+        qname: str,
         native: bool = False,
         forward: bool = False,
         namespace: Optional[str] = None,

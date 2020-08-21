@@ -4,8 +4,6 @@ from typing import Callable
 from typing import List
 from typing import Optional
 
-from lxml.etree import QName
-
 from xsdata.codegen.container import ClassContainer
 from xsdata.codegen.models import Attr
 from xsdata.codegen.models import AttrType
@@ -59,10 +57,15 @@ class ClassSanitizer:
         Sanitize attribute default value.
 
         Cases:
-            1. List fields can not have a fixed value.
-            2. Optional fields or xsi:type can not have a default or fixed value.
-            3. Convert string literal default value for enum fields.
+            1. Ignore enumerations.
+            2. List fields can not have a fixed value.
+            3. Optional fields or xsi:type can not have a default or fixed value.
+            4. Convert string literal default value for enum fields.
         """
+
+        if attr.is_enumeration:
+            return
+
         if attr.is_list:
             attr.fixed = False
 
@@ -70,7 +73,7 @@ class ClassSanitizer:
             attr.fixed = False
             attr.default = None
 
-        if attr.default and not attr.is_enumeration:
+        if attr.default:
             self.process_attribute_default_enum(target, attr)
 
     def process_attribute_default_enum(self, target: Class, attr: Attr):
@@ -126,9 +129,9 @@ class ClassSanitizer:
             for attr_type in attr.types:
                 if attr_type.name == inner.name:
                     attr_type.forward = False
-                    attr_type.qname = QName(inner.qname.namespace, name)
+                    attr_type.qname = text.qname(inner.target_namespace, name)
 
-        inner.qname = QName(inner.qname.namespace, name)
+        inner.qname = text.qname(inner.target_namespace, name)
 
         self.container.add(inner)
 

@@ -2,8 +2,6 @@ from types import GeneratorType
 from typing import Iterator
 from unittest import mock
 
-from lxml.etree import QName
-
 from tests.factories import AttrFactory
 from tests.factories import AttrTypeFactory
 from tests.factories import ClassFactory
@@ -31,6 +29,7 @@ from xsdata.models.xsd import Schema
 from xsdata.models.xsd import Sequence
 from xsdata.models.xsd import SimpleContent
 from xsdata.models.xsd import SimpleType
+from xsdata.utils import text
 
 
 class SchemaMapperTests(FactoryTestCase):
@@ -147,7 +146,7 @@ class SchemaMapperTests(FactoryTestCase):
         mock_element_namespace.assert_called_once_with(element, "target_ns")
 
         expected = ClassFactory.create(
-            qname=QName("target_ns", "name"),
+            qname=text.qname("target_ns", "name"),
             type=Element,
             help="sos",
             abstract=True,
@@ -156,7 +155,7 @@ class SchemaMapperTests(FactoryTestCase):
             ns_map=element.ns_map,
             package=None,
             module="module",
-            substitutions=[QName("target_ns", "foo"), QName("sm_ns", "bar")],
+            substitutions=[text.qname("target_ns", "foo"), text.qname("sm_ns", "bar")],
             container="container",
         )
         self.assertEqual(expected, result)
@@ -165,7 +164,7 @@ class SchemaMapperTests(FactoryTestCase):
     def test_build_class_extensions(self, mock_children_extensions):
         bar_type = AttrTypeFactory.create(qname="bar", index=3)
         foo_type = AttrTypeFactory.create(qname="foo", index=1)
-        some_type = AttrTypeFactory.create(qname="something", index=0)
+        some_type = AttrTypeFactory.create(qname="{xsdata}something", index=0)
 
         bar = ExtensionFactory.create(type=bar_type)
         double = ExtensionFactory.create(type=bar_type)
@@ -228,8 +227,8 @@ class SchemaMapperTests(FactoryTestCase):
             map(
                 ExtensionFactory.create,
                 [
-                    AttrTypeFactory.create(qname=QName("book", "b"), index=4),
-                    AttrTypeFactory.create(qname=QName("book", "c"), index=7),
+                    AttrTypeFactory.create(qname=text.qname("book", "b"), index=4),
+                    AttrTypeFactory.create(qname=text.qname("book", "c"), index=7),
                 ],
             )
         )
@@ -288,7 +287,7 @@ class SchemaMapperTests(FactoryTestCase):
         self.assertEqual(expected, item.attrs[0])
         self.assertEqual({"bar": "foo", "foo": "bar"}, item.ns_map)
         mock_build_class_attribute_types.assert_called_once_with(item, attribute)
-        mock_element_namespace.assert_called_once_with(attribute, item.qname.namespace)
+        mock_element_namespace.assert_called_once_with(attribute, item.target_namespace)
 
     @mock.patch.object(Attribute, "real_type", new_callable=mock.PropertyMock)
     @mock.patch.object(SchemaMapper, "build_inner_classes")
@@ -323,7 +322,7 @@ class SchemaMapperTests(FactoryTestCase):
             AttrTypeFactory.xs_int(),
             AttrTypeFactory.xs_string(),
             AttrTypeFactory.create(
-                qname=QName(item.qname.namespace, "foo"), forward=True
+                qname=text.qname(item.target_namespace, "foo"), forward=True
             ),
         ]
 

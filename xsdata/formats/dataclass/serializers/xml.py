@@ -9,7 +9,6 @@ from typing import Tuple
 
 from lxml.etree import cleanup_namespaces
 from lxml.etree import Element
-from lxml.etree import QName
 from lxml.etree import SubElement
 from lxml.etree import tostring
 
@@ -23,6 +22,7 @@ from xsdata.formats.dataclass.models.generics import Namespaces
 from xsdata.formats.dataclass.serializers.utils import SerializeUtils
 from xsdata.models.enums import FormType
 from xsdata.models.enums import QNames
+from xsdata.utils import text
 
 DEFAULT_NS_PREFIX = ""
 
@@ -69,7 +69,7 @@ class XmlSerializer(AbstractSerializer):
         namespaces = namespaces or Namespaces()
         namespaces.register()
         prefix = DEFAULT_NS_PREFIX if meta.element_form == FormType.QUALIFIED else None
-        namespaces.add(meta.qname.namespace, prefix=prefix)
+        namespaces.add(meta.namespace, prefix=prefix)
 
         root = Element(meta.qname, nsmap=namespaces.ns_map)
         self.render_node(root, obj, namespaces)
@@ -88,7 +88,9 @@ class XmlSerializer(AbstractSerializer):
     def render_complex_node(self, parent: Element, obj: Any, namespaces: Namespaces):
         """Iterate over the dataclass fields and values and create the element
         tree."""
-        meta = self.context.build(obj.__class__, QName(parent).namespace)
+
+        parent_ns, name = text.split_qname(parent.tag)
+        meta = self.context.build(obj.__class__, parent_ns)
         for var, value in self.next_value(meta, obj):
             if value is None:
                 continue
@@ -97,7 +99,7 @@ class XmlSerializer(AbstractSerializer):
             elif var.is_attributes:
                 SerializeUtils.set_attributes(parent, value, namespaces)
             elif var.is_text:
-                namespaces.add(var.qname.namespace)
+                namespaces.add(var.namespace)
                 SerializeUtils.set_text(parent, value, namespaces)
             elif var.is_list and isinstance(value, list):
                 self.render_sub_nodes(parent, value, var, namespaces)
@@ -135,12 +137,15 @@ class XmlSerializer(AbstractSerializer):
         if hasattr(value, "qname"):
             qname = value.qname
         elif var.is_wildcard:
-            meta = self.context.fetch(value.__class__, QName(parent).namespace)
+            parent_ns, _ = text.split_qname(parent.tag)
+            meta = self.context.fetch(value.__class__, parent_ns)
             qname = meta.qname
         else:
             qname = var.qname
 
-        namespaces.add(qname.namespace)
+        namespace, tag = text.split_qname(qname)
+
+        namespaces.add(namespace)
         sub_element = SubElement(parent, qname)
         self.render_node(sub_element, value, namespaces)
         self.set_xsi_type(sub_element, value, var, namespaces)
@@ -174,7 +179,8 @@ class XmlSerializer(AbstractSerializer):
             return
 
         if self.context.is_derived(value, var.clazz):
-            meta = self.context.fetch(value.__class__, QName(parent.tag).namespace)
+            parent_ns, _ = text.split_qname(parent.tag)
+            meta = self.context.fetch(value.__class__, parent_ns)
             SerializeUtils.set_attribute(
                 parent, QNames.XSI_TYPE, meta.source_qname, namespaces
             )

@@ -3,7 +3,9 @@ from unittest import TestCase
 from xsdata.utils.text import capitalize
 from xsdata.utils.text import clean_uri
 from xsdata.utils.text import pascal_case
+from xsdata.utils.text import qname
 from xsdata.utils.text import snake_case
+from xsdata.utils.text import split_qname
 
 
 class TextTests(TestCase):
@@ -40,3 +42,22 @@ class TextTests(TestCase):
         self.assertEqual("a_com/b", clean_uri("http://www.a.com/b.xsd"))
         self.assertEqual("a_com/b", clean_uri("https://a.com/b.wsdl"))
         self.assertEqual("a_com/b", clean_uri("https://www.a.com/b.xsd"))
+
+    def test_qname(self):
+        self.assertEqual("{a}b", qname("a", "b"))
+        self.assertEqual("b", qname("", "b"))
+        self.assertEqual("b", qname(None, "b"))
+
+        self.assertEqual("b", qname("b", ""))
+        self.assertEqual("b", qname("b"))
+        self.assertEqual("b", qname("b", None))
+
+        with self.assertRaises(ValueError):
+            qname(None, None)
+
+    def test_split_qname(self):
+        self.assertEqual(("a", "b"), split_qname("{a}b"))
+        self.assertEqual((None, "b"), split_qname("b"))
+
+        with self.assertRaises(IndexError):
+            split_qname("")

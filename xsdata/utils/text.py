@@ -1,4 +1,5 @@
 from typing import List
+from typing import Optional
 from typing import Tuple
 
 
@@ -69,3 +70,23 @@ def clean_uri(namespace: str) -> str:
     return "_".join(
         [part for part in namespace.split(".") if part not in ("www", "xsd", "wsdl")]
     )
+
+
+def qname(tag_or_uri: Optional[str], tag: Optional[str] = None) -> str:
+    """Create namespace qualified strings."""
+
+    if not tag_or_uri:
+        if not tag:
+            raise ValueError("Invalid input both uri and tag are empty.")
+
+        return tag
+
+    return f"{{{tag_or_uri}}}{tag}" if tag else tag_or_uri
+
+
+def split_qname(tag: str) -> Tuple:
+    """Split namespace qualified strings."""
+    if tag[0] == "{":
+        return tuple(tag[1:].split("}", 1))
+    else:
+        return None, tag

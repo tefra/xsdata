@@ -5,7 +5,6 @@ from typing import Dict
 from typing import List
 from typing import Optional
 
-from lxml.etree import QName
 from lxml.etree import register_namespace
 
 from xsdata.formats.dataclass.models.constants import XmlType
@@ -26,7 +25,7 @@ class AnyElement:
     :param attributes: element attributes.
     """
 
-    qname: Optional[QName] = field(default=None)
+    qname: Optional[str] = field(default=None)
     text: Optional[str] = field(default=None)
     tail: Optional[str] = field(default=None)
     ns_map: Dict = field(default_factory=dict)

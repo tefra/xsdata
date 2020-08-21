@@ -2,8 +2,6 @@ from dataclasses import dataclass
 from dataclasses import replace
 from unittest.case import TestCase
 
-from lxml.etree import QName
-
 from tests.fixtures.books.books import BookForm
 from xsdata.formats.dataclass.context import XmlContext
 from xsdata.formats.dataclass.models.elements import FindMode
@@ -15,7 +13,6 @@ from xsdata.formats.dataclass.models.elements import XmlText
 from xsdata.formats.dataclass.models.elements import XmlVar
 from xsdata.formats.dataclass.models.elements import XmlWildcard
 from xsdata.models.enums import FormType
-from xsdata.models.enums import QNames
 
 
 @dataclass
@@ -25,28 +22,28 @@ class Fixture:
 
 class XmlValTests(TestCase):
     def test_property_clazz(self):
-        var = XmlVar(name="foo", qname=QName("foo"))
+        var = XmlVar(name="foo", qname="foo")
         self.assertIsNone(var.clazz)
 
-        var = XmlVar(name="foo", qname=QName("foo"), dataclass=True, types=[Fixture])
+        var = XmlVar(name="foo", qname="foo", dataclass=True, types=[Fixture])
         self.assertEqual(Fixture, var.clazz)
 
     def test_property_is_clazz_union(self):
-        var = XmlVar(name="foo", qname=QName("foo"), dataclass=True, types=[Fixture])
+        var = XmlVar(name="foo", qname="foo", dataclass=True, types=[Fixture])
         self.assertFalse(var.is_clazz_union)
 
         var.types.append(Fixture)
         self.assertTrue(var.is_clazz_union)
 
     def test_property_is_list(self):
-        var = XmlVar(name="foo", qname=QName("foo"))
+        var = XmlVar(name="foo", qname="foo")
         self.assertFalse(var.is_list)
 
-        var = XmlVar(name="foo", qname=QName("foo"), types=[int], list_element=True)
+        var = XmlVar(name="foo", qname="foo", types=[int], list_element=True)
         self.assertTrue(var.is_list)
 
     def test_default_properties(self):
-        var = XmlVar(name="foo", qname=QName("foo"))
+        var = XmlVar(name="foo", qname="foo")
         self.assertFalse(var.is_any_type)
         self.assertFalse(var.is_attribute)
         self.assertFalse(var.is_attributes)
@@ -56,33 +53,33 @@ class XmlValTests(TestCase):
         self.assertFalse(var.is_mixed_content)
 
     def test_matches(self):
-        var = XmlVar(name="foo", qname=QName("foo"))
-        self.assertTrue(var.matches(QNames.ALL))
+        var = XmlVar(name="foo", qname="foo")
+        self.assertTrue(var.matches("*"))
         self.assertTrue(var.matches(var.qname))
-        self.assertFalse(var.matches(QName("bar")))
+        self.assertFalse(var.matches("bar"))
 
 
 class XmlElementTests(TestCase):
     def test_property_is_element(self):
-        var = XmlElement(name="foo", qname=QName("foo"))
+        var = XmlElement(name="foo", qname="foo")
 
         self.assertIsInstance(var, XmlVar)
         self.assertTrue(var.is_element)
 
     def test_property_is_any_type(self):
-        var = XmlElement(name="foo", qname=QName("foo"))
+        var = XmlElement(name="foo", qname="foo")
         self.assertFalse(var.is_any_type)
 
-        var = XmlElement(name="foo", qname=QName("foo"), types=[int, object])
+        var = XmlElement(name="foo", qname="foo", types=[int, object])
         self.assertFalse(var.is_any_type)
 
-        var = XmlElement(name="foo", qname=QName("foo"), types=[object])
+        var = XmlElement(name="foo", qname="foo", types=[object])
         self.assertTrue(var.is_any_type)
 
 
 class XmlWildcardTests(TestCase):
     def test_property_is_mixed_content(self):
-        var = XmlWildcard(name="foo", qname=QName("foo"))
+        var = XmlWildcard(name="foo", qname="foo")
 
         self.assertIsInstance(var, XmlVar)
         self.assertFalse(var.is_mixed_content)
@@ -91,40 +88,40 @@ class XmlWildcardTests(TestCase):
         self.assertTrue(var.is_mixed_content)
 
     def test_property_is_wildcard(self):
-        var = XmlWildcard(name="foo", qname=QName("foo"))
+        var = XmlWildcard(name="foo", qname="foo")
 
         self.assertIsInstance(var, XmlVar)
         self.assertTrue(var.is_wildcard)
 
     def test_property_is_any_type(self):
-        var = XmlWildcard(name="foo", qname=QName("foo"))
+        var = XmlWildcard(name="foo", qname="foo")
         self.assertTrue(var.is_any_type)
 
     def test_matches(self):
-        var = XmlWildcard(name="foo", qname=QName("foo"))
-        self.assertTrue(var.matches(QNames.ALL))
-        self.assertTrue(var.matches(QName("a")))
+        var = XmlWildcard(name="foo", qname="foo")
+        self.assertTrue(var.matches("*"))
+        self.assertTrue(var.matches("a"))
 
-        var = XmlWildcard(name="foo", qname=QName("foo"), namespaces=["tns"])
-        self.assertFalse(var.matches(QName("a")))
-        self.assertTrue(var.matches(QName("tns", "a")))
+        var = XmlWildcard(name="foo", qname="foo", namespaces=["tns"])
+        self.assertFalse(var.matches("a"))
+        self.assertTrue(var.matches("{tns}a"))
 
-        var = XmlWildcard(name="foo", qname=QName("foo"), namespaces=["##any"])
-        self.assertTrue(var.matches(QName("a")))
-        self.assertTrue(var.matches(QName("tns", "a")))
+        var = XmlWildcard(name="foo", qname="foo", namespaces=["##any"])
+        self.assertTrue(var.matches("a"))
+        self.assertTrue(var.matches("{tns}a"))
 
-        var = XmlWildcard(name="foo", qname=QName("foo"), namespaces=[""])
-        self.assertTrue(var.matches(QName("a")))
-        self.assertFalse(var.matches(QName("tns", "a")))
+        var = XmlWildcard(name="foo", qname="foo", namespaces=[""])
+        self.assertTrue(var.matches("a"))
+        self.assertFalse(var.matches("{tns}a"))
 
-        var = XmlWildcard(name="foo", qname=QName("foo"), namespaces=["!tns"])
-        self.assertTrue(var.matches(QName("foo", "a")))
-        self.assertFalse(var.matches(QName("tns", "a")))
+        var = XmlWildcard(name="foo", qname="foo", namespaces=["!tns"])
+        self.assertTrue(var.matches("{foo}a"))
+        self.assertFalse(var.matches("{tns}a"))
 
 
 class XmlAttributeTests(TestCase):
     def test_property_is_attribute(self):
-        var = XmlAttribute(name="foo", qname=QName("foo"))
+        var = XmlAttribute(name="foo", qname="foo")
 
         self.assertIsInstance(var, XmlVar)
         self.assertTrue(var.is_attribute)
@@ -132,7 +129,7 @@ class XmlAttributeTests(TestCase):
 
 class XmlAttributesTests(TestCase):
     def test_property_is_attributes(self):
-        var = XmlAttributes(name="foo", qname=QName("foo"))
+        var = XmlAttributes(name="foo", qname="foo")
 
         self.assertIsInstance(var, XmlVar)
         self.assertTrue(var.is_attributes)
@@ -140,7 +137,7 @@ class XmlAttributesTests(TestCase):
 
 class XmlTextTests(TestCase):
     def test_property_is_text(self):
-        var = XmlText(name="foo", qname=QName("foo"))
+        var = XmlText(name="foo", qname="foo")
 
         self.assertIsInstance(var, XmlVar)
         self.assertTrue(var.is_text)
@@ -149,21 +146,17 @@ class XmlTextTests(TestCase):
 class XmlMetaTests(TestCase):
     def test_property_element_form(self):
         meta = XmlMeta(
-            name="foo",
-            clazz=BookForm,
-            qname=QName("foo"),
-            source_qname=QName("foo"),
-            nillable=False,
+            name="foo", clazz=BookForm, qname="foo", source_qname="foo", nillable=False,
         )
         self.assertEqual(FormType.UNQUALIFIED, meta.element_form)
 
-        meta = replace(meta, qname=QName("bar", "foo"))
+        meta = replace(meta, qname="{bar}foo")
         self.assertEqual(FormType.QUALIFIED, meta.element_form)
 
-        meta.vars.append(XmlElement(name="a", qname=QName("a")))
+        meta.vars.append(XmlElement(name="a", qname="a"))
         self.assertEqual(FormType.UNQUALIFIED, meta.element_form)
 
-        meta.vars.append(XmlElement(name="b", qname=QName("b"), namespaces=["bar"]))
+        meta.vars.append(XmlElement(name="b", qname="b", namespaces=["bar"]))
         self.assertEqual(FormType.UNQUALIFIED, meta.element_form)
 
         meta.vars.pop(0)
@@ -172,22 +165,18 @@ class XmlMetaTests(TestCase):
     def test_find_var(self):
         ctx = XmlContext()
         meta = ctx.build(BookForm)
-        author = QName("author")
-        excluded = set()
-        excluded.add("author")
 
-        self.assertIsInstance(meta.find_var(author), XmlElement)
-        self.assertIsNone(meta.find_var(author, FindMode.ATTRIBUTE))
-        self.assertIsNone(meta.find_var(QName("nope")))
+        self.assertIsInstance(meta.find_var("author"), XmlElement)
+        self.assertIsNone(meta.find_var("author", FindMode.ATTRIBUTE))
+        self.assertIsNone(meta.find_var("nope"))
 
     def test_find_var_uses_cache(self):
         ctx = XmlContext()
         meta = ctx.build(BookForm)
-        author = QName("author")
 
-        self.assertEqual("author", meta.find_var(author).name)
+        self.assertEqual("author", meta.find_var("author").name)
         self.assertEqual(1, len(meta.cache))
         key = tuple(meta.cache.keys())[0]
 
         meta.cache[key] = 1
-        self.assertEqual("title", meta.find_var(author).name)
+        self.assertEqual("title", meta.find_var("author").name)

@@ -21,11 +21,11 @@ from xsdata.utils import text
 
 class ParserUtils:
     @classmethod
-    def parse_xsi_type(cls, element: Element) -> Optional[QName]:
+    def parse_xsi_type(cls, element: Element) -> Optional[str]:
         """Parse the elements xsi:type attribute if present."""
         xsi_type = element.attrib.get(QNames.XSI_TYPE)
         return (
-            cls.parse_value(xsi_type, [QName], None, element.nsmap)
+            cls.parse_value(xsi_type, [QName], None, element.nsmap).text
             if xsi_type
             else None
         )
@@ -72,7 +72,10 @@ class ParserUtils:
                 value = ""
 
             if not cls.bind_element_param(params, arg, value):
-                lookup = QName(value.qname) if isinstance(value, AnyElement) else qname
+                lookup = qname
+                if isinstance(value, AnyElement) and value.qname:
+                    lookup = value.qname
+
                 wild = cls.find_eligible_wildcard(meta, lookup, params)
 
                 if not wild:
@@ -124,7 +127,7 @@ class ParserUtils:
         return True
 
     @classmethod
-    def prepare_generic_value(cls, qname: QName, value: Any) -> Any:
+    def prepare_generic_value(cls, qname: str, value: Any) -> Any:
         """Prepare parsed value before binding to a wildcard field."""
         if not is_dataclass(value):
             value = AnyElement(qname=qname, text=value)
@@ -135,7 +138,7 @@ class ParserUtils:
 
     @classmethod
     def bind_element_wildcard_param(
-        cls, params: Dict, var: XmlVar, qname: QName, value: Any
+        cls, params: Dict, var: XmlVar, qname: str, value: Any
     ):
         """
         Add the given value to the params dictionary with the wildcard var name
@@ -213,7 +216,7 @@ class ParserUtils:
         """Attempt to parse any attribute."""
         prefix, suffix = text.split(value)
         if prefix and prefix in ns_map and not suffix.startswith("//"):
-            value = QName(ns_map[prefix], suffix).text
+            value = text.qname(ns_map[prefix], suffix)
 
         return value
 
@@ -244,8 +247,7 @@ class ParserUtils:
         if wildcard:
             params[wildcard.name] = {}
 
-        for key, value in element.attrib.items():
-            qname = QName(key)
+        for qname, value in element.attrib.items():
             var = metadata.find_var(qname, FindMode.ATTRIBUTE)
             if var and var.name not in params:
                 if var.init:
@@ -253,13 +255,13 @@ class ParserUtils:
                         value, var.types, var.default, element.nsmap, var.tokens
                     )
             elif wildcard:
-                params[wildcard.name][key] = cls.parse_any_attribute(
+                params[wildcard.name][qname] = cls.parse_any_attribute(
                     value, element.nsmap
                 )
 
     @classmethod
     def find_eligible_wildcard(
-        cls, meta: XmlMeta, qname: QName, params: Dict
+        cls, meta: XmlMeta, qname: str, params: Dict
     ) -> Optional[XmlVar]:
         """
         Last resort lookup for a suitable wildcard var.

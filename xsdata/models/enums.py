@@ -40,7 +40,6 @@ __STANDARD_NAMESPACES__ = {ns.uri: ns for ns in Namespace}
 class QNames:
     """Common qualified names."""
 
-    ALL = QName("__all__")
     XSI_NIL = QName(Namespace.XSI.uri, "nil")
     XSI_TYPE = QName(Namespace.XSI.uri, "type")
 

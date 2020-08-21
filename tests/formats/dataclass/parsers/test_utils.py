@@ -6,7 +6,6 @@ from unittest import mock
 from unittest.case import TestCase
 
 from lxml.etree import Element
-from lxml.etree import QName
 from lxml.etree import SubElement
 
 from tests.fixtures.books import Books
@@ -24,6 +23,7 @@ from xsdata.formats.dataclass.models.generics import AnyElement
 from xsdata.formats.dataclass.parsers.utils import ParserUtils
 from xsdata.models.enums import Namespace
 from xsdata.models.enums import QNames
+from xsdata.utils import text
 
 
 class ParserUtilsTests(TestCase):
@@ -35,11 +35,11 @@ class ParserUtilsTests(TestCase):
         self.assertIsNone(ParserUtils.parse_xsi_type(ele))
 
         ele.set(QNames.XSI_TYPE, "foo")
-        self.assertEqual(QName("foo"), ParserUtils.parse_xsi_type(ele))
+        self.assertEqual("foo", ParserUtils.parse_xsi_type(ele))
 
         ele = Element("foo", nsmap=dict(bar="xsdata"))
         ele.set(QNames.XSI_TYPE, "bar:foo")
-        self.assertEqual(QName("xsdata", "foo"), ParserUtils.parse_xsi_type(ele))
+        self.assertEqual("{xsdata}foo", ParserUtils.parse_xsi_type(ele))
 
     @mock.patch.object(ConverterAdapter, "from_string", return_value=2)
     def test_parse_value(self, mock_from_string):
@@ -89,9 +89,9 @@ class ParserUtilsTests(TestCase):
 
         ctx = XmlContext()
         meta = ctx.build(A)
-        x = meta.find_var(QName("x"))
-        y = meta.find_var(QName("y"))
-        w = meta.find_var(QName("wild"))
+        x = meta.find_var("x")
+        y = meta.find_var("y")
+        w = meta.find_var("wild")
         wild_element = AnyElement(qname="foo")
 
         objects = [
@@ -116,7 +116,7 @@ class ParserUtilsTests(TestCase):
             ]
         )
         mock_find_eligible_wildcard.assert_has_calls(
-            [mock.call(meta, w.qname, params), mock.call(meta, QName("foo"), params)]
+            [mock.call(meta, w.qname, params), mock.call(meta, "foo", params)]
         )
 
         mock_bind_element_wildcard_param.assert_called_once_with(
@@ -127,21 +127,19 @@ class ParserUtilsTests(TestCase):
         generic = AnyElement(qname="foo")
         data_class = make_dataclass("A", fields=[])
         objects = [
-            (QName("a"), 1),
-            (QName("b"), None),
-            (QName("d"), data_class),
-            (QName("foo"), generic),
+            ("a", 1),
+            ("b", None),
+            ("d", data_class),
+            ("foo", generic),
         ]
 
-        var = XmlWildcard(name="foo", qname=QName("any", "foo"))
+        var = XmlWildcard(name="foo", qname="{any}foo")
         params = {}
         ParserUtils.bind_mixed_content(params, var, 1, objects)
 
-        expected = {
-            var.name: [AnyElement(qname=QName("b"), text=""), data_class, generic]
-        }
+        expected = {var.name: [AnyElement(qname="b", text=""), data_class, generic]}
         self.assertEqual(expected, params)
-        self.assertEqual(QName("d"), data_class.qname)
+        self.assertEqual("d", data_class.qname)
 
     def test_fetch_any_children(self):
         objects = [(x, x) for x in "abc"]
@@ -259,7 +257,7 @@ class ParserUtilsTests(TestCase):
         self.assertEqual({"any_element": AnyElement(text="foo")}, params)
 
     def test_bind_element_param(self):
-        var = XmlVar(name="a", qname=QName("a"))
+        var = XmlVar(name="a", qname="a")
         params = {}
 
         status = ParserUtils.bind_element_param(params, var, 1)
@@ -271,7 +269,7 @@ class ParserUtilsTests(TestCase):
         self.assertEqual({"a": 1}, params)
 
     def test_bind_element_param_with_list_var(self):
-        var = XmlVar(name="a", qname=QName("a"), list_element=True)
+        var = XmlVar(name="a", qname="a", list_element=True)
         params = {}
 
         status = ParserUtils.bind_element_param(params, var, 1)
@@ -284,8 +282,8 @@ class ParserUtilsTests(TestCase):
 
     def test_bind_element_wildcard_param(self):
         params = {}
-        var = XmlVar(name="a", qname=QName("a"))
-        qname = QName("b")
+        var = XmlVar(name="a", qname="a")
+        qname = "b"
         one = AnyElement(qname=qname, text="one")
         two = AnyElement(qname=qname, text="two")
         three = AnyElement(qname=qname, text="three")
@@ -300,7 +298,7 @@ class ParserUtilsTests(TestCase):
         self.assertEqual(dict(a=AnyElement(children=[one, two, three])), params)
 
     def test_bind_wildcard_text(self):
-        var = XmlVar(name="a", qname=QName("a"))
+        var = XmlVar(name="a", qname="a")
         elem = Element("foo")
         params = {}
 
@@ -321,7 +319,7 @@ class ParserUtilsTests(TestCase):
         self.assertEqual(dict(a=expected), params)
 
     def test_bind_wildcard_text_when_var_is_list(self):
-        var = XmlVar(name="a", qname=QName("a"), default=list, list_element=True)
+        var = XmlVar(name="a", qname="a", default=list, list_element=True)
         elem = Element("foo")
         elem.text = "txt"
         elem.tail = "tail"
@@ -344,7 +342,7 @@ class ParserUtilsTests(TestCase):
         element.set("a", "1")
         element.set("b", "2")
         element.set(
-            QName(Namespace.XSI.uri, "type").text, QName(Namespace.XS.uri, "float").text
+            text.qname(Namespace.XSI.uri, "type"), text.qname(Namespace.XS.uri, "float")
         )
         element.text = "yes"
         element.tail = "no"
@@ -355,9 +353,11 @@ class ParserUtilsTests(TestCase):
             text="yes",
             tail="no",
             attributes={
-                QName("a"): "1",
-                QName("b"): "2",
-                QName(Namespace.XSI.uri, "type"): QName(Namespace.XS.uri, "float"),
+                "a": "1",
+                "b": "2",
+                text.qname(Namespace.XSI.uri, "type"): text.qname(
+                    Namespace.XS.uri, "float"
+                ),
             },
             ns_map=element.nsmap,
         )

@@ -14,7 +14,6 @@ from lxml.etree import _Element
 from lxml.etree import _ElementTree
 from lxml.etree import Element
 from lxml.etree import iterwalk
-from lxml.etree import QName
 
 from xsdata.exceptions import ParserError
 from xsdata.exceptions import XmlContextError
@@ -28,8 +27,8 @@ from xsdata.formats.dataclass.parsers.config import ParserConfig
 from xsdata.formats.dataclass.parsers.utils import ParserUtils
 from xsdata.models.enums import EventType
 
-Parsed = Tuple[Optional[QName], Any]
-ParsedObjects = List[Tuple[QName, Any]]
+Parsed = Tuple[Optional[str], Any]
+ParsedObjects = List[Parsed]
 XmlNodes = List["XmlNode"]
 
 
@@ -100,10 +99,9 @@ class ElementNode(XmlNode):
             ParserUtils.bind_element_children(params, self.meta, self.position, objects)
             ParserUtils.bind_element_text(params, self.meta, element)
 
-        qname = QName(element.tag)
         obj = self.meta.clazz(**params)
 
-        return qname, obj
+        return element.tag, obj
 
     def next_node(self, element: Element, position: int, ctx: XmlContext) -> XmlNode:
         """
@@ -115,7 +113,7 @@ class ElementNode(XmlNode):
         :return: The next node to be queued.
         :raises: XmlContextError if the element is unknown and parser config is strict.
         """
-        qname = QName(element.tag)
+        qname = element.tag
         var = self.meta.find_var(qname, FindMode.NOT_WILDCARD)
         if not var:
             var = self.meta.find_var(qname, FindMode.WILDCARD)
@@ -130,7 +128,7 @@ class ElementNode(XmlNode):
 
         if var.clazz:
             xsi_type = ParserUtils.parse_xsi_type(element)
-            meta = ctx.fetch(var.clazz, self.meta.qname.namespace, xsi_type)
+            meta = ctx.fetch(var.clazz, self.meta.namespace, xsi_type)
             return ElementNode(position=position, meta=meta, config=self.config)
 
         if var.is_any_type:
@@ -263,14 +261,13 @@ class PrimitiveNode(XmlNode):
 
         :return: A tuple of the object's qualified name and the new object.
         """
-        qname = QName(element.tag)
         value = element.text
         ns_map = element.nsmap
         obj = ParserUtils.parse_value(
             value, self.var.types, self.var.default, ns_map, self.var.tokens
         )
 
-        return qname, obj
+        return element.tag, obj
 
     def next_node(self, element: Element, position: int, ctx: XmlContext) -> XmlNode:
         raise XmlContextError("Primitive node doesn't support child nodes!")

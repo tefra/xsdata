@@ -7,8 +7,6 @@ from typing import List
 from unittest import mock
 from unittest import TestCase
 
-from lxml.etree import QName
-
 from tests.fixtures.books import BookForm
 from tests.fixtures.books import Books
 from tests.fixtures.defxmlschema.chapter03prod import Product
@@ -36,8 +34,8 @@ class XmlContextTests(TestCase):
         meta = XmlMeta(
             name="ItemsType",
             clazz=ItemsType,
-            qname=QName("ItemsType"),
-            source_qname=QName("ItemsType"),
+            qname="ItemsType",
+            source_qname="ItemsType",
             nillable=False,
         )
         mock_build.return_value = meta
@@ -54,8 +52,8 @@ class XmlContextTests(TestCase):
         meta = XmlMeta(
             name="ItemsType",
             clazz=ItemsType,
-            qname=QName("ItemsType"),
-            source_qname=QName("ItemsType"),
+            qname="ItemsType",
+            source_qname="ItemsType",
             nillable=False,
         )
 
@@ -73,8 +71,8 @@ class XmlContextTests(TestCase):
         meta = XmlMeta(
             name="ItemsType",
             clazz=ItemsType,
-            qname=QName("ItemsType"),
-            source_qname=QName("ItemsType"),
+            qname="ItemsType",
+            source_qname="ItemsType",
             nillable=False,
         )
         xsi_meta = replace(meta, name="XsiType")
@@ -97,35 +95,30 @@ class XmlContextTests(TestCase):
         self.assertIsNone(self.ctx.find_subclass(c, "What"))
 
     def test_match_class_name(self):
-        qname_foo = QName("qname_foo")
-        qname_items = QName("ItemsType")
-        qname_product = QName("http://example.org/prod", "product")
-        qname_object = QName("object")
-        qname_int = QName("int")
-
         # no meta name
-        self.assertFalse(self.ctx.match_class_source_qname(ItemsType, qname_foo))
-        self.assertTrue(self.ctx.match_class_source_qname(ItemsType, qname_items))
+        self.assertFalse(self.ctx.match_class_source_qname(ItemsType, "qname_foo"))
+        self.assertTrue(self.ctx.match_class_source_qname(ItemsType, "ItemsType"))
 
         # with meta name
-        self.assertFalse(self.ctx.match_class_source_qname(Product, qname_items))
-        self.assertTrue(self.ctx.match_class_source_qname(Product, qname_product))
+        product_qname = "{http://example.org/prod}product"
+        self.assertFalse(self.ctx.match_class_source_qname(Product, "ItemsType"))
+        self.assertTrue(self.ctx.match_class_source_qname(Product, product_qname))
 
         # not dataclass
-        self.assertFalse(self.ctx.match_class_source_qname(object, qname_object))
-        self.assertFalse(self.ctx.match_class_source_qname(int, qname_int))
+        self.assertFalse(self.ctx.match_class_source_qname(object, "object"))
+        self.assertFalse(self.ctx.match_class_source_qname(int, "int"))
 
     @mock.patch.object(XmlContext, "get_type_hints")
     def test_build_build_vars(self, mock_get_type_hints):
-        var = XmlElement(name="foo", qname=QName("foo", "bar"), types=[int])
+        var = XmlElement(name="foo", qname="{foo}bar", types=[int])
         mock_get_type_hints.return_value = [var]
 
         result = self.ctx.build(ItemsType, None)
         expected = XmlMeta(
             name="ItemsType",
             clazz=ItemsType,
-            qname=QName("ItemsType"),
-            source_qname=QName("ItemsType"),
+            qname="ItemsType",
+            source_qname="ItemsType",
             nillable=False,
             vars=[var],
         )
@@ -138,15 +131,15 @@ class XmlContextTests(TestCase):
         namespace = Product.Meta.namespace
         result = self.ctx.build(Product, None)
 
-        self.assertEqual(QName(namespace, "product"), result.qname)
-        self.assertEqual(QName(namespace, "product"), result.source_qname)
+        self.assertEqual(text.qname(namespace, "product"), result.qname)
+        self.assertEqual(text.qname(namespace, "product"), result.source_qname)
         mock_get_type_hints.assert_called_once_with(Product, namespace)
 
     @mock.patch.object(XmlContext, "get_type_hints", return_value={})
     def test_build_with_parent_ns(self, mock_get_type_hints):
         result = self.ctx.build(ProductType, "http://xsdata")
 
-        self.assertEqual(QName("http://xsdata", "ProductType"), str(result.qname))
+        self.assertEqual(text.qname("http://xsdata", "ProductType"), str(result.qname))
         mock_get_type_hints.assert_called_once_with(ProductType, "http://xsdata")
 
     @mock.patch.object(XmlContext, "get_type_hints", return_value={})
@@ -154,7 +147,7 @@ class XmlContextTests(TestCase):
         inspect = XmlContext(name_generator=lambda x: text.snake_case(x))
         result = inspect.build(ItemsType)
 
-        self.assertEqual(QName("items_type"), str(result.qname))
+        self.assertEqual("items_type", result.qname)
 
     def test_build_with_no_meta_not_inherit_from_parent(self):
         @dataclass
@@ -168,7 +161,7 @@ class XmlContextTests(TestCase):
 
         result = self.ctx.build(Foo)
         self.assertEqual("Foo", result.name)
-        self.assertIsNone(result.qname.namespace)
+        self.assertEqual("Foo", result.qname)
 
     @mock.patch.object(XmlContext, "get_type_hints", return_value={})
     def test_build_with_no_dataclass_raises_exception(self, *args):
@@ -182,15 +175,15 @@ class XmlContextTests(TestCase):
         self.assertIsInstance(result, Iterator)
 
         expected = [
-            XmlElement(name="author", qname=QName("author"), types=[str],),
-            XmlElement(name="title", qname=QName("title"), types=[str]),
-            XmlElement(name="genre", qname=QName("genre"), types=[str]),
-            XmlElement(name="price", qname=QName("price"), types=[float],),
-            XmlElement(name="pub_date", qname=QName("pub_date"), types=[str],),
-            XmlElement(name="review", qname=QName("review"), types=[str],),
-            XmlAttribute(name="id", qname=QName("id"), types=[str]),
+            XmlElement(name="author", qname="author", types=[str],),
+            XmlElement(name="title", qname="title", types=[str]),
+            XmlElement(name="genre", qname="genre", types=[str]),
+            XmlElement(name="price", qname="price", types=[float],),
+            XmlElement(name="pub_date", qname="pub_date", types=[str],),
+            XmlElement(name="review", qname="review", types=[str],),
+            XmlAttribute(name="id", qname="id", types=[str]),
             XmlAttribute(
-                name="lang", qname=QName("lang"), types=[str], init=False, default="en",
+                name="lang", qname="lang", types=[str], init=False, default="en",
             ),
         ]
 
@@ -205,7 +198,7 @@ class XmlContextTests(TestCase):
 
         expected = XmlElement(
             name="book",
-            qname=QName("book"),
+            qname="book",
             types=[BookForm],
             dataclass=True,
             default=list,
@@ -223,7 +216,7 @@ class XmlContextTests(TestCase):
 
         expected = XmlWildcard(
             name="any_element",
-            qname=QName(None, "any_element"),
+            qname="any_element",
             types=[object],
             init=True,
             mixed=False,

@@ -8,11 +8,9 @@ from typing import List
 from typing import Optional
 from typing import Type
 
-from lxml.etree import QName
-
 from xsdata.models.enums import FormType
 from xsdata.models.enums import NamespaceType
-from xsdata.models.enums import QNames
+from xsdata.utils import text
 
 
 @dataclass(frozen=True)
@@ -35,7 +33,7 @@ class XmlVar:
     """
 
     name: str
-    qname: QName
+    qname: str
     init: bool = True
     mixed: bool = False
     tokens: bool = False
@@ -96,13 +94,23 @@ class XmlVar:
         """Return whether the field is a text element."""
         return False
 
-    def matches(self, qname: QName) -> bool:
+    @property
+    def local_name(self) -> str:
+        """The element local name."""
+        return text.split_qname(self.qname)[1]
+
+    @property
+    def namespace(self) -> Optional[str]:
+        """The element namespace."""
+        return text.split_qname(self.qname)[0]
+
+    def matches(self, qname: str) -> bool:
         """
         Match the field qualified local name to the given qname.
 
         Return True automatically if the local name is a wildcard.
         """
-        return qname in (self.qname, QNames.ALL)
+        return qname in (self.qname, "*")
 
 
 @dataclass(frozen=True)
@@ -134,24 +142,28 @@ class XmlWildcard(XmlVar):
     def is_any_type(self) -> bool:
         return True
 
-    def matches(self, qname: QName) -> bool:
+    def matches(self, qname: str) -> bool:
         """Match the given qname to the wildcard allowed namespaces."""
 
-        if qname == QNames.ALL:
+        if qname == "*":
             return True
 
-        if not self.namespaces and qname.namespace is None:
+        namespace, tag = text.split_qname(qname)
+        if not self.namespaces and namespace is None:
             return True
 
-        for namespace in self.namespaces:
-            if not namespace and qname.namespace is None:
-                return True
-            if namespace == qname.namespace:
-                return True
-            if namespace == NamespaceType.ANY:
-                return True
-            if namespace and namespace[0] == "!" and namespace[1:] != qname.namespace:
-                return True
+        return any(self.match_namespace(ns, namespace) for ns in self.namespaces)
+
+    @staticmethod
+    def match_namespace(source: Optional[str], cmp: Optional[str]) -> bool:
+        if not source and cmp is None:
+            return True
+        if source == cmp:
+            return True
+        if source == NamespaceType.ANY:
+            return True
+        if source and source[0] == "!" and source[1:] != cmp:
+            return True
 
         return False
 
@@ -227,8 +239,8 @@ class XmlMeta:
 
     name: str
     clazz: Type
-    qname: QName
-    source_qname: QName
+    qname: str
+    source_qname: str
     nillable: bool
     vars: List[XmlVar] = field(default_factory=list)
     cache: Dict = field(default_factory=dict, init=False)
@@ -238,30 +250,28 @@ class XmlMeta:
         """Return element form: qualified/unqualified."""
         return (
             FormType.UNQUALIFIED
-            if not self.qname.namespace
+            if not self.qname.startswith("{")
             or any(var.is_element and not var.namespaces for var in self.vars)
             else FormType.QUALIFIED
         )
 
-    def find_var(
-        self, qname: QName = QNames.ALL, mode: FindMode = FindMode.ALL
-    ) -> Optional[XmlVar]:
-        """
-        Find a field by it's qualified name and the specified type.
+    @property
+    def namespace(self) -> Optional[str]:
+        return text.split_qname(self.qname)[0]
 
-        The lookup process is cached.
-        """
-        key = (
-            hash(qname),
-            hash(mode),
-        )
+    def find_var(
+        self, qname: str = "*", mode: FindMode = FindMode.ALL
+    ) -> Optional[XmlVar]:
+        """Find and cache a field by it's qualified name and the specified
+        mode."""
+        key = (qname, mode.value)
         if key not in self.cache:
             self.cache[key] = self._find_var(qname, mode)
 
         index = self.cache[key]
         return None if index < 0 else self.vars[index]
 
-    def _find_var(self, qname: QName, mode: FindMode) -> int:
+    def _find_var(self, qname: str, mode: FindMode) -> int:
         find_func = find_lambdas[mode]
 
         return next(

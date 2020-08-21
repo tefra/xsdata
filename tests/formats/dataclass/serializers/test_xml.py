@@ -8,7 +8,6 @@ from unittest import mock
 from unittest.case import TestCase
 
 from lxml.etree import Element
-from lxml.etree import QName
 
 from tests.fixtures.books import BookForm
 from tests.fixtures.books import Books
@@ -146,7 +145,7 @@ class XmlSerializerTests(TestCase):
 
         attribute = prod_meta.find_var("effDate")
         attributes = prod_meta.find_var("{!}other_attributes")
-        text = replace(size_meta.find_var("value"), qname=QName("foo", "bar"))
+        text = replace(size_meta.find_var("value"), qname="{foo}bar")
         sub_node = prod_meta.find_var("name")
 
         mock_next_value.return_value = [
@@ -282,7 +281,7 @@ class XmlSerializerTests(TestCase):
     ):
         root = Element("root")
         value = SizeType()
-        value.qname = QName("foo")
+        value.qname = "foo"
         meta = self.serializer.context.build(DescriptionType)
         var = meta.find_var(mode=FindMode.WILDCARD)
 

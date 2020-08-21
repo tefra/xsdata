@@ -5,6 +5,8 @@ from typing import Optional
 
 from lxml.etree import QName
 
+from xsdata.utils import text
+
 COMMON_SCHEMA_DIR = Path(__file__).absolute().parent.parent.joinpath("schemas/")
 
 
@@ -40,8 +42,8 @@ __STANDARD_NAMESPACES__ = {ns.uri: ns for ns in Namespace}
 class QNames:
     """Common qualified names."""
 
-    XSI_NIL = QName(Namespace.XSI.uri, "nil")
-    XSI_TYPE = QName(Namespace.XSI.uri, "type")
+    XSI_NIL = text.qname(Namespace.XSI.uri, "nil")
+    XSI_TYPE = text.qname(Namespace.XSI.uri, "type")
 
 
 class NamespaceType:
@@ -138,8 +140,8 @@ class DataType(Enum):
         self.local = local
 
     @property
-    def qname(self) -> QName:
-        return QName(Namespace.XS.uri, self.code)
+    def qname(self) -> str:
+        return text.qname(Namespace.XS.uri, self.code)
 
     @property
     def local_name(self) -> str:

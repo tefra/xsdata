@@ -4,8 +4,6 @@ from typing import List
 from typing import Optional
 from typing import Tuple
 
-from lxml.etree import QName
-
 from xsdata.codegen.models import Attr
 from xsdata.codegen.models import AttrType
 from xsdata.codegen.models import Class
@@ -63,7 +61,7 @@ class SchemaMapper:
     ) -> Class:
         """Build and return a class instance."""
         instance = Class(
-            qname=QName(target_namespace, obj.real_name),
+            qname=text.qname(target_namespace, obj.real_name),
             abstract=obj.is_abstract,
             namespace=cls.element_namespace(obj, target_namespace),
             mixed=obj.is_mixed,
@@ -83,9 +81,9 @@ class SchemaMapper:
     @classmethod
     def build_substitutions(
         cls, obj: ElementBase, target_namespace: Optional[str]
-    ) -> List[QName]:
+    ) -> List[str]:
         return [
-            QName(obj.ns_map.get(prefix, target_namespace), suffix)
+            text.qname(obj.ns_map.get(prefix, target_namespace), suffix)
             for prefix, suffix in map(text.split, obj.substitutions)
         ]
 
@@ -122,14 +120,17 @@ class SchemaMapper:
     ) -> AttrType:
         """Create an attribute type for the target class."""
         prefix, suffix = text.split(name)
-        namespace = target.ns_map.get(prefix, target.qname.namespace)
+        namespace = target.ns_map.get(prefix, target.target_namespace)
         native = (
             Namespace.get_enum(namespace) is not None
             and DataType.get_enum(suffix) is not None
         )
 
         return AttrType(
-            qname=QName(namespace, suffix), index=index, native=native, forward=forward,
+            qname=text.qname(namespace, suffix),
+            index=index,
+            native=native,
+            forward=forward,
         )
 
     @classmethod
@@ -233,7 +234,7 @@ class SchemaMapper:
                 types=types,
                 tag=obj.class_name,
                 help=obj.display_help,
-                namespace=cls.element_namespace(obj, target.qname.namespace),
+                namespace=cls.element_namespace(obj, target.target_namespace),
                 restrictions=restrictions,
             )
         )
@@ -247,7 +248,7 @@ class SchemaMapper:
         types = [cls.build_data_type(target, name) for name in obj.real_type.split()]
 
         for inner in cls.build_inner_classes(
-            obj, target.module, target.qname.namespace
+            obj, target.module, target.target_namespace
         ):
             target.inner.append(inner)
             types.append(cls.build_data_type(target, name=inner.name, forward=True))

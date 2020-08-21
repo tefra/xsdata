@@ -67,6 +67,15 @@ class ClassSanitizerTest(FactoryTestCase):
             [mock.call(target.inner[0].attrs), mock.call(target.attrs)]
         )
 
+    def test_process_attribute_default_with_enumeration(self):
+        target = ClassFactory.create()
+        attr = AttrFactory.enumeration()
+        attr.restrictions.max_occurs = 2
+        attr.fixed = True
+
+        self.sanitizer.process_attribute_default(target, attr)
+        self.assertTrue(attr.fixed)
+
     def test_process_attribute_default_with_list_field(self):
         target = ClassFactory.create()
         attr = AttrFactory.create(fixed=True)

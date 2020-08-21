@@ -71,14 +71,14 @@ class CodeWriter:
         for obj in classes:
 
             if ns_struct:
-                if not obj.qname.namespace:
+                if not obj.target_namespace:
                     raise CodeGenerationError(
                         f"Class `{obj.name}` target namespace "
                         f"is empty, avoid option `--ns-struct`"
                     )
 
                 obj.package = package
-                obj.module = obj.qname.namespace
+                obj.module = obj.target_namespace
 
             if obj.package is None:
                 raise CodeGenerationError(

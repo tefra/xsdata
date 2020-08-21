@@ -1,7 +1,5 @@
 import sys
 
-from lxml.etree import QName
-
 from tests.factories import AttrFactory
 from tests.factories import AttrTypeFactory
 from tests.factories import ClassFactory
@@ -10,6 +8,7 @@ from tests.factories import FactoryTestCase
 from xsdata.models import wsdl
 from xsdata.models import xsd
 from xsdata.models.enums import Namespace
+from xsdata.utils import text
 
 
 class ClassTests(FactoryTestCase):
@@ -20,43 +19,48 @@ class ClassTests(FactoryTestCase):
                 AttrFactory.create(
                     types=[
                         AttrTypeFactory.create(
-                            qname=QName(Namespace.XS.uri, "annotated"), forward=True
+                            qname=text.qname(Namespace.XS.uri, "annotated"),
+                            forward=True,
                         )
                     ]
                 ),
                 AttrFactory.create(
                     types=[
                         AttrTypeFactory.create(
-                            qname=QName(Namespace.XS.uri, "openAttrs")
+                            qname=text.qname(Namespace.XS.uri, "openAttrs")
                         ),
                         AttrTypeFactory.create(
-                            qname=QName(Namespace.XS.uri, "localAttribute")
+                            qname=text.qname(Namespace.XS.uri, "localAttribute")
                         ),
                     ]
                 ),
             ],
             extensions=[
                 ExtensionFactory.create(
-                    type=AttrTypeFactory.create(qname=QName(Namespace.XS.uri, "foobar"))
+                    type=AttrTypeFactory.create(
+                        qname=text.qname(Namespace.XS.uri, "foobar")
+                    )
                 ),
                 ExtensionFactory.create(
-                    type=AttrTypeFactory.create(qname=QName(Namespace.XS.uri, "foobar"))
+                    type=AttrTypeFactory.create(
+                        qname=text.qname(Namespace.XS.uri, "foobar")
+                    )
                 ),
             ],
             inner=[
                 ClassFactory.create(
                     attrs=AttrFactory.list(
-                        2, types=AttrTypeFactory.list(1, qname="foo")
+                        2, types=AttrTypeFactory.list(1, qname="{xsdata}foo")
                     )
                 )
             ],
         )
 
         expected = [
-            QName("{http://www.w3.org/2001/XMLSchema}openAttrs"),
-            QName("{http://www.w3.org/2001/XMLSchema}localAttribute"),
-            QName("{http://www.w3.org/2001/XMLSchema}foobar"),
-            QName("{xsdata}foo"),
+            text.qname("{http://www.w3.org/2001/XMLSchema}openAttrs"),
+            text.qname("{http://www.w3.org/2001/XMLSchema}localAttribute"),
+            text.qname("{http://www.w3.org/2001/XMLSchema}foobar"),
+            text.qname("{xsdata}foo"),
         ]
         self.assertEqual(expected, list(obj.dependencies()))
 

@@ -1,7 +1,6 @@
 from unittest import mock
 
 from lxml.etree import Element
-from lxml.etree import QName
 
 from tests.factories import ClassFactory
 from tests.factories import FactoryTestCase
@@ -19,9 +18,9 @@ class ClassContainerTests(FactoryTestCase):
 
     def test_from_list(self):
         classes = [
-            ClassFactory.create(qname="foo", type=Element),
-            ClassFactory.create(qname="foo", type=ComplexType),
-            ClassFactory.create(qname="foobar", type=ComplexType),
+            ClassFactory.create(qname="{xsdata}foo", type=Element),
+            ClassFactory.create(qname="{xsdata}foo", type=ComplexType),
+            ClassFactory.create(qname="{xsdata}foobar", type=ComplexType),
         ]
         container = ClassContainer.from_list(classes)
 
@@ -41,7 +40,7 @@ class ClassContainerTests(FactoryTestCase):
 
         self.container.extend([class_a, class_b, class_c])
 
-        self.assertIsNone(self.container.find(QName("nope")))
+        self.assertIsNone(self.container.find("nope"))
         self.assertEqual(class_a, self.container.find(class_a.qname))
         self.assertEqual(class_b, self.container.find(class_b.qname))
         self.assertEqual(

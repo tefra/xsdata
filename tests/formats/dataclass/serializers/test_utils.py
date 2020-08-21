@@ -69,7 +69,7 @@ class SerializeUtilsTests(TestCase):
 
     def test_set_attribute_xsi_nil(self):
         SerializeUtils.set_attribute(
-            self.element, QNames.XSI_NIL.text, True, self.namespaces
+            self.element, QNames.XSI_NIL, True, self.namespaces
         )
         self.assertEqual("true", self.element.attrib[QNames.XSI_NIL])
 
@@ -77,9 +77,9 @@ class SerializeUtilsTests(TestCase):
         self.element.text = "foo"
 
         SerializeUtils.set_attribute(
-            self.element, QNames.XSI_NIL.text, True, self.namespaces
+            self.element, QNames.XSI_NIL, True, self.namespaces
         )
-        self.assertNotIn(QNames.XSI_NIL.text, self.element.attrib)
+        self.assertNotIn(QNames.XSI_NIL, self.element.attrib)
 
     def test_set_attribute_xsi_nil_and_element_has_children(self):
         SubElement(self.element, "bar")

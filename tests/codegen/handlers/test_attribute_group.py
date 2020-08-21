@@ -98,4 +98,4 @@ class AttributeGroupHandlerTests(FactoryTestCase):
         with self.assertRaises(AnalyzerValueError) as cm:
             self.processor.process_attribute(target, group_attr)
 
-        self.assertEqual("Group attribute not found: `{xsdata}bar`", str(cm.exception))
+        self.assertEqual("Group attribute not found: `bar`", str(cm.exception))

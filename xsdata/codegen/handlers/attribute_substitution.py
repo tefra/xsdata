@@ -5,8 +5,6 @@ from typing import Dict
 from typing import List
 from typing import Optional
 
-from lxml.etree import QName
-
 from xsdata.codegen.mixins import ContainerInterface
 from xsdata.codegen.mixins import HandlerInterface
 from xsdata.codegen.models import Attr
@@ -15,7 +13,7 @@ from xsdata.codegen.models import Class
 from xsdata.codegen.utils import ClassUtils
 from xsdata.utils import collections
 
-Substitutions = Optional[Dict[QName, List[Attr]]]
+Substitutions = Optional[Dict[str, List[Attr]]]
 
 
 @dataclass
@@ -79,7 +77,7 @@ class AttributeSubstitutionHandler(HandlerInterface):
         return Attr(
             name=source.name,
             local_name=source.name,
-            types=[AttrType(qname=QName(source.qname.namespace, source.name))],
+            types=[AttrType(qname=source.qname)],
             tag=source.type.__name__,
             namespace=source.namespace,
         )

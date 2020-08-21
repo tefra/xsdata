@@ -184,11 +184,10 @@ class XmlMetaTests(TestCase):
         ctx = XmlContext()
         meta = ctx.build(BookForm)
         author = QName("author")
-        title = QName("title")
 
         self.assertEqual("author", meta.find_var(author).name)
         self.assertEqual(1, len(meta.cache))
         key = tuple(meta.cache.keys())[0]
 
-        meta.cache[key] = meta._find_var(title)
+        meta.cache[key] = 1
         self.assertEqual("title", meta.find_var(author).name)

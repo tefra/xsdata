@@ -8,7 +8,6 @@ from unittest.case import TestCase
 
 from lxml import etree
 from lxml.etree import Element
-from lxml.etree import QName
 from lxml.etree import SubElement
 
 from tests import fixtures_dir
@@ -62,7 +61,7 @@ class XmlNodeTests(TestCase):
     def test_next_node(self):
         ctx = XmlContext()
         with self.assertRaises(NotImplementedError):
-            XmlNode(0).next_node(QName("foo"), 0, ctx)
+            XmlNode(0).next_node("foo", 0, ctx)
 
     def test_parse_element(self):
         ele = Element("foo")
@@ -102,7 +101,7 @@ class ElementNodeTests(TestCase):
         node = ElementNode(position=0, meta=meta, config=ParserConfig())
         qname, obj = node.parse_element(ele, pool)
 
-        self.assertEqual(QName(ele.tag), qname)
+        self.assertEqual(ele.tag, qname)
         self.assertEqual(Foo(1, 2, 3), obj)
 
         mock_bind_element_attrs.assert_called_once_with(mock.ANY, meta, ele)
@@ -137,14 +136,14 @@ class ElementNodeTests(TestCase):
         node = ElementNode(position=0, meta=meta, config=ParserConfig())
         qname, obj = node.parse_element(ele, pool)
 
-        self.assertEqual(QName(ele.tag), qname)
+        self.assertEqual(ele.tag, qname)
         self.assertEqual(FooMixed(1, 2, 3), obj)
 
         mock_bind_element_attrs.assert_called_once_with(mock.ANY, meta, ele)
         mock_bind_wildcard_text.assert_called_once_with(mock.ANY, meta.vars[2], ele)
         mock_bind_mixed_content.assert_called_once_with(mock.ANY, meta.vars[2], 0, pool)
 
-    @mock.patch.object(ParserUtils, "parse_xsi_type", return_value=QName("foo"))
+    @mock.patch.object(ParserUtils, "parse_xsi_type", return_value="foo")
     @mock.patch.object(XmlContext, "fetch")
     def test_next_node_when_given_qname_matches_dataclass_var(
         self, mock_ctx_fetch, mock_element_xsi_type
@@ -152,17 +151,17 @@ class ElementNodeTests(TestCase):
         ele = Element("a")
         ctx = XmlContext()
         cfg = ParserConfig()
-        var = XmlElement(name="a", qname=QName("a"), types=[Foo], dataclass=True)
+        var = XmlElement(name="a", qname="a", types=[Foo], dataclass=True)
         meta = XmlMeta(
             name="foo",
             clazz=None,
-            qname=QName("foo"),
-            source_qname=QName("foo"),
+            qname="foo",
+            source_qname="foo",
             nillable=False,
             vars=[var],
         )
-        xsi_type = QName("foo")
-        namespace = meta.qname.namespace
+        xsi_type = "foo"
+        namespace = meta.namespace
         mock_ctx_fetch.return_value = replace(meta)
         mock_element_xsi_type.return_value = xsi_type
         node = ElementNode(position=0, meta=meta, config=cfg)
@@ -177,14 +176,12 @@ class ElementNodeTests(TestCase):
         ele = Element("a")
         ctx = XmlContext()
         cfg = ParserConfig()
-        var = XmlElement(
-            name="a", qname=QName("a"), types=[Foo, FooMixed], dataclass=True
-        )
+        var = XmlElement(name="a", qname="a", types=[Foo, FooMixed], dataclass=True)
         meta = XmlMeta(
             name="foo",
             clazz=None,
-            qname=QName("foo"),
-            source_qname=QName("foo"),
+            qname="foo",
+            source_qname="foo",
             nillable=False,
             vars=[var],
         )
@@ -200,12 +197,12 @@ class ElementNodeTests(TestCase):
         ele = Element("a")
         ctx = XmlContext()
         cfg = ParserConfig()
-        var = XmlWildcard(name="a", qname=QName("a"), types=[], dataclass=False)
+        var = XmlWildcard(name="a", qname="a", types=[], dataclass=False)
         meta = XmlMeta(
             name="foo",
             clazz=None,
-            qname=QName("foo"),
-            source_qname=QName("foo"),
+            qname="foo",
+            source_qname="foo",
             nillable=False,
             vars=[var],
         )
@@ -220,12 +217,12 @@ class ElementNodeTests(TestCase):
         ele = Element("a")
         ctx = XmlContext()
         cfg = ParserConfig()
-        var = XmlText(name="a", qname=QName("a"), types=[int], default=100)
+        var = XmlText(name="a", qname="a", types=[int], default=100)
         meta = XmlMeta(
             name="foo",
             clazz=None,
-            qname=QName("foo"),
-            source_qname=QName("foo"),
+            qname="foo",
+            source_qname="foo",
             nillable=False,
             vars=[var],
         )
@@ -241,11 +238,7 @@ class ElementNodeTests(TestCase):
         ctx = XmlContext()
         cfg = ParserConfig()
         meta = XmlMeta(
-            name="foo",
-            clazz=None,
-            qname=QName("foo"),
-            source_qname=QName("foo"),
-            nillable=False,
+            name="foo", clazz=None, qname="foo", source_qname="foo", nillable=False,
         )
         node = ElementNode(position=0, meta=meta, config=cfg)
 
@@ -259,11 +252,7 @@ class ElementNodeTests(TestCase):
         ctx = XmlContext()
         cfg = ParserConfig(fail_on_unknown_properties=False)
         meta = XmlMeta(
-            name="foo",
-            clazz=None,
-            qname=QName("foo"),
-            source_qname=QName("foo"),
-            nillable=False,
+            name="foo", clazz=None, qname="foo", source_qname="foo", nillable=False,
         )
         node = ElementNode(position=0, meta=meta, config=cfg)
         actual = node.next_node(ele, 10, ctx)
@@ -302,7 +291,7 @@ class WildcardNodeTests(TestCase):
         mock_fetch_any_children.return_value = ["a", "b"]
 
         ele = Element("foo")
-        var = XmlText(name="foo", qname=QName("a"))
+        var = XmlText(name="foo", qname="a")
         node = WildcardNode(position=0, var=var)
         actual = node.parse_element(ele, [1, 2, 3])
 
@@ -313,7 +302,7 @@ class WildcardNodeTests(TestCase):
 
     def test_next_node(self):
         ele = Element("foo")
-        var = XmlText(name="foo", qname=QName("foo"))
+        var = XmlText(name="foo", qname="foo")
         node = WildcardNode(position=0, var=var)
         actual = node.next_node(ele, 10, XmlContext())
 
@@ -326,7 +315,7 @@ class UnionNodeTests(TestCase):
     def test_next_node(self):
         ele = Element("foo")
         ctx = XmlContext()
-        var = XmlText(name="foo", qname=QName("foo"))
+        var = XmlText(name="foo", qname="foo")
         node = UnionNode(position=0, var=var, ctx=ctx)
         self.assertEqual(SkipNode(position=2), node.next_node(ele, 2, ctx))
 
@@ -387,19 +376,19 @@ class PrimitiveNodeTests(TestCase):
     @mock.patch.object(ParserUtils, "parse_value")
     def test_parse_element(self, mock_parse_value):
         mock_parse_value.return_value = 13
-        var = XmlText(name="foo", qname=QName("foo"), default=100)
+        var = XmlText(name="foo", qname="foo", default=100)
         node = PrimitiveNode(position=0, var=var)
         ele = Element("foo", nsmap={"foo": "bar"})
         ele.text = "13"
 
-        self.assertEqual((QName("foo"), 13), node.parse_element(ele, []))
+        self.assertEqual(("foo", 13), node.parse_element(ele, []))
         mock_parse_value.assert_called_once_with(
             ele.text, var.types, var.default, ele.nsmap, var.tokens
         )
 
     def test_next_node(self):
         ele = Element("foo")
-        node = PrimitiveNode(position=0, var=XmlText(name="foo", qname=QName("foo")))
+        node = PrimitiveNode(position=0, var=XmlText(name="foo", qname="foo"))
 
         with self.assertRaises(XmlContextError):
             node.next_node(ele, 10, XmlContext())

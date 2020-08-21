@@ -1,11 +1,8 @@
 from unittest.case import TestCase
 
-from lxml.etree import QName
-
 from tests import fixtures_dir
 from tests.fixtures.books import BookForm
 from tests.fixtures.books import Books
-from xsdata.exceptions import ParserError
 from xsdata.formats.dataclass.models.elements import XmlElement
 from xsdata.formats.dataclass.models.elements import XmlText
 from xsdata.formats.dataclass.parsers.json import JsonParser
@@ -48,10 +45,8 @@ class JsonParserTests(TestCase):
     def test_get_value(self):
         data = dict(foo="bar", bar="foo")
 
-        foo_field = XmlText(name="foo", qname=QName("foo"), types=[str])
-        bar_field = XmlElement(
-            name="bar", qname=QName("bar"), types=[str], list_element=True
-        )
+        foo_field = XmlText(name="foo", qname="foo", types=[str])
+        bar_field = XmlElement(name="bar", qname="bar", types=[str], list_element=True)
 
         self.assertEqual("bar", JsonParser.get_value(data, foo_field))
         self.assertEqual(["foo"], JsonParser.get_value(data, bar_field))

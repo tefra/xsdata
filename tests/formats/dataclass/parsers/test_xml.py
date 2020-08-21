@@ -6,7 +6,6 @@ from unittest import mock
 from unittest.case import TestCase
 
 from lxml.etree import Element
-from lxml.etree import QName
 
 from tests import fixtures_dir
 from tests.fixtures.books import BookForm
@@ -26,7 +25,7 @@ class XmlParserTests(TestCase):
         super().setUp()
         self.parser = XmlParser()
         self.parser.index = 10
-        self.parser.objects = [(QName(x), x) for x in "abcde"]
+        self.parser.objects = [(x, x) for x in "abcde"]
 
     def test_parse_context_raises_exception(self):
         with self.assertRaises(ParserError) as cm:
@@ -41,7 +40,7 @@ class XmlParserTests(TestCase):
     @mock.patch.object(RootNode, "next_node")
     @mock.patch.object(XmlParser, "emit_event")
     def test_queue(self, mock_emit_event, mock_next_node):
-        var = XmlText(name="foo", qname=QName("foo"))
+        var = XmlText(name="foo", qname="foo")
         primitive_node = PrimitiveNode(position=1, var=var)
         mock_next_node.return_value = primitive_node
         element = Element("{urn:books}books")
@@ -70,7 +69,7 @@ class XmlParserTests(TestCase):
 
         objects = []
         queue = []
-        var = XmlText(name="foo", qname=QName("foo"))
+        var = XmlText(name="foo", qname="foo")
         queue.append(PrimitiveNode(position=0, var=var))
 
         result = self.parser.dequeue(element, queue, objects)

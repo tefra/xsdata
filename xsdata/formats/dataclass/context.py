@@ -14,14 +14,13 @@ from typing import List
 from typing import Optional
 from typing import Type
 
-from lxml.etree import QName
-
 from xsdata.exceptions import XmlContextError
 from xsdata.formats.converter import converter
 from xsdata.formats.dataclass.models.constants import XmlType
 from xsdata.formats.dataclass.models.elements import XmlMeta
 from xsdata.formats.dataclass.models.elements import XmlVar
 from xsdata.models.enums import NamespaceType
+from xsdata.utils import text
 
 
 @dataclass
@@ -42,7 +41,7 @@ class XmlContext:
         self,
         clazz: Type,
         parent_ns: Optional[str] = None,
-        xsi_type: Optional[QName] = None,
+        xsi_type: Optional[str] = None,
     ) -> XmlMeta:
         """
         Fetch the model metadata of the given dataclass type, namespace and xsi
@@ -62,7 +61,7 @@ class XmlContext:
 
         return meta
 
-    def find_subclass(self, clazz: Type, xsi_type: QName) -> Optional[Type]:
+    def find_subclass(self, clazz: Type, xsi_type: str) -> Optional[Type]:
         """
         Find a derived class of the given clazz that matches the given
         qualified xsi type.
@@ -87,7 +86,7 @@ class XmlContext:
 
         return None
 
-    def match_class_source_qname(self, clazz: Type, xsi_type: QName) -> bool:
+    def match_class_source_qname(self, clazz: Type, xsi_type: str) -> bool:
         """Match a given source qualified name with the given xsi type."""
         if is_dataclass(clazz):
             meta = self.build(clazz)
@@ -120,8 +119,8 @@ class XmlContext:
             self.cache[clazz] = XmlMeta(
                 name=name,
                 clazz=clazz,
-                qname=QName(namespace, name),
-                source_qname=QName(source_namespace, name),
+                qname=text.qname(namespace, name),
+                source_qname=text.qname(source_namespace, name),
                 nillable=nillable,
                 vars=list(self.get_type_hints(clazz, namespace)),
             )
@@ -150,7 +149,7 @@ class XmlContext:
 
             yield xml_clazz(
                 name=var.name,
-                qname=QName(first_namespace, local_name),
+                qname=text.qname(first_namespace, local_name),
                 namespaces=namespaces,
                 init=var.init,
                 mixed=var.metadata.get("mixed", False),

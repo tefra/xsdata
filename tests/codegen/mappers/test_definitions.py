@@ -333,9 +333,9 @@ class DefinitionsMapperTests(FactoryTestCase):
         binding_message = BindingMessage(
             ns_map={"foo": "bar"},
             extended=[
-                AnyElement(qname=QName("body")),
-                AnyElement(qname=QName("header")),
-                AnyElement(qname=QName("header")),
+                AnyElement(qname="body"),
+                AnyElement(qname="header"),
+                AnyElement(qname="header"),
             ],
         )
 
@@ -409,9 +409,9 @@ class DefinitionsMapperTests(FactoryTestCase):
         binding_message = BindingMessage(
             ns_map={"foo": "bar"},
             extended=[
-                AnyElement(qname=QName("body"), attributes={"namespace": "bodyns"}),
-                AnyElement(qname=QName("header")),
-                AnyElement(qname=QName("header")),
+                AnyElement(qname="body", attributes={"namespace": "bodyns"}),
+                AnyElement(qname="header"),
+                AnyElement(qname="header"),
             ],
         )
 

@@ -84,8 +84,10 @@ class JsonParser(AbstractParser):
     def get_value(data: Dict, var: XmlVar) -> Any:
         """Find the var value in the given dictionary or return the default var
         value."""
-        if var.qname.localname in data:
-            value = data[var.qname.localname]
+
+        local_name = var.local_name
+        if local_name in data:
+            value = data[local_name]
         elif var.name in data:
             value = data[var.name]
         else:

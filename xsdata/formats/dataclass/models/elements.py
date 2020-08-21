@@ -258,14 +258,17 @@ class XmlMeta:
         if key not in self.cache:
             self.cache[key] = self._find_var(qname, mode)
 
-        return self.cache[key]
+        index = self.cache[key]
+        return None if index < 0 else self.vars[index]
 
-    def _find_var(
-        self, qname: QName = QNames.ALL, mode: FindMode = FindMode.ALL,
-    ) -> Optional[XmlVar]:
-
+    def _find_var(self, qname: QName, mode: FindMode) -> int:
         find_func = find_lambdas[mode]
 
         return next(
-            (var for var in self.vars if find_func(var) and var.matches(qname)), None,
+            (
+                index
+                for index, var in enumerate(self.vars)
+                if find_func(var) and var.matches(qname)
+            ),
+            -1,
         )

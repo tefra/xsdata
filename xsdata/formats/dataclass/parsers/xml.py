@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from dataclasses import field
 from typing import Any
 from typing import Dict
+from typing import List
 from typing import Type
 
 from lxml.etree import Element
@@ -12,7 +13,7 @@ from lxml.etree import parse
 from xsdata.formats.bindings import AbstractParser
 from xsdata.formats.bindings import T
 from xsdata.formats.dataclass.parsers.nodes import NodeParser
-from xsdata.formats.dataclass.parsers.nodes import ParsedObjects
+from xsdata.formats.dataclass.parsers.nodes import Parsed
 from xsdata.formats.dataclass.parsers.nodes import XmlNodes
 from xsdata.models.enums import EventType
 from xsdata.utils import text
@@ -37,13 +38,13 @@ class XmlParser(NodeParser, AbstractParser):
 
         return self.parse_context(ctx, clazz)
 
-    def queue(self, element: Element, queue: XmlNodes, objects: ParsedObjects):
+    def queue(self, element: Element, queue: XmlNodes, objects: List[Parsed]):
         """Queue the next xml node for parsing based on the given element
         qualified name."""
         super().queue(element, queue, objects)
         self.emit_event(EventType.START, element.tag, element=element)
 
-    def dequeue(self, element: Element, queue: XmlNodes, objects: ParsedObjects) -> Any:
+    def dequeue(self, element: Element, queue: XmlNodes, objects: List[Parsed]) -> Any:
         """
         Use the last xml node to parse the given element and bind any child
         objects.

@@ -37,7 +37,7 @@ class WsdlElement:
 
     name: str = attribute()
     documentation: Optional[Documentation] = element()
-    ns_map: Dict = field(default_factory=dict)
+    ns_map: Dict = field(default_factory=dict, init=False)
 
 
 @dataclass

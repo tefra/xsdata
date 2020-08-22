@@ -3,10 +3,8 @@ from typing import Any
 from typing import Dict
 from typing import List
 from typing import Optional
-from typing import Tuple
 from typing import Type
 
-from lxml.etree import Element
 from lxml.etree import QName
 
 from xsdata.formats.converter import converter
@@ -21,14 +19,13 @@ from xsdata.utils import text
 
 class ParserUtils:
     @classmethod
-    def parse_xsi_type(cls, element: Element) -> Optional[str]:
+    def parse_xsi_type(cls, attrs: Dict, ns_map: Dict) -> Optional[str]:
         """Parse the elements xsi:type attribute if present."""
-        xsi_type = element.attrib.get(QNames.XSI_TYPE)
-        return (
-            cls.parse_value(xsi_type, [QName], None, element.nsmap).text
-            if xsi_type
-            else None
-        )
+        xsi_type = attrs.get(QNames.XSI_TYPE)
+        if xsi_type:
+            return cls.parse_value(xsi_type, [QName], None, ns_map).text
+
+        return None
 
     @classmethod
     def parse_value(
@@ -161,7 +158,15 @@ class ParserUtils:
             params[var.name] = value
 
     @classmethod
-    def bind_wildcard_text(cls, params: Dict, var: XmlVar, element: Element):
+    def bind_wildcard_element(
+        cls,
+        params: Dict,
+        var: XmlVar,
+        txt: Optional[str],
+        tail: Optional[str],
+        attrs: Dict,
+        ns_map: Dict,
+    ):
         """
         Extract the text and tail content and bind it accordingly in the params
         dictionary.
@@ -170,7 +175,9 @@ class ParserUtils:
         - var is present in the params assign the text and tail to the generic object.
         - Otherwise bind the given element to a new generic object.
         """
-        txt, tail = cls.element_text_and_tail(element)
+
+        txt = cls.string_value(txt)
+        tail = cls.string_value(tail)
         if not txt and not tail:
             return
 
@@ -182,34 +189,27 @@ class ParserUtils:
                 params[var.name].append(tail)
         else:
             previous = params.get(var.name, None)
-            generic = cls.parse_any_element(element, False)
+            generic = AnyElement(
+                text=txt,
+                tail=tail,
+                ns_map=ns_map,
+                attributes=cls.parse_any_attributes(attrs, ns_map),
+            )
             if previous:
                 generic.children.append(previous)
 
             params[var.name] = generic
 
     @classmethod
-    def element_text_and_tail(cls, element: Element) -> Tuple:
-        """Extract the text and tail content if any and return them both."""
-        txt = element.text.strip() if element.text else None
-        tail = element.tail.strip() if element.tail else None
-
-        return txt or None, tail or None
+    def string_value(cls, value: Optional[str]) -> Optional[str]:
+        value = value.strip() if value else None
+        return value or None
 
     @classmethod
-    def parse_any_element(cls, element: Element, qname: bool = True) -> AnyElement:
-        """Bind the given element content to a new generic object."""
-        txt, tail = cls.element_text_and_tail(element)
-        return AnyElement(
-            qname=element.tag if qname else None,
-            text=txt,
-            tail=tail,
-            ns_map=element.nsmap,
-            attributes={
-                key: cls.parse_any_attribute(value, element.nsmap)
-                for key, value in element.attrib.items()
-            },
-        )
+    def parse_any_attributes(cls, attrs: Dict, ns_map: Dict) -> Dict:
+        return {
+            key: cls.parse_any_attribute(value, ns_map) for key, value in attrs.items()
+        }
 
     @classmethod
     def parse_any_attribute(cls, value: str, ns_map: Dict) -> str:
@@ -221,43 +221,51 @@ class ParserUtils:
         return value
 
     @classmethod
-    def bind_element_text(cls, params: Dict, metadata: XmlMeta, element: Element):
+    def bind_element(
+        cls,
+        params: Dict,
+        metadata: XmlMeta,
+        txt: Optional[str],
+        tail: Optional[str],
+        attrs: Dict,
+        ns_map: Dict,
+    ):
         """Add the given element's text content if any to the params dictionary
         with the text var name as key."""
         var = metadata.find_var(mode=FindMode.TEXT)
         wildcard = None if var else metadata.find_var(mode=FindMode.WILDCARD)
 
-        if var and element.text is not None and len(element) == 0 and var.init:
+        if var and var.init and txt is not None:
             params[var.name] = cls.parse_value(
-                element.text, var.types, var.default, element.nsmap, var.tokens
+                txt, var.types, var.default, ns_map, var.tokens
             )
         elif wildcard:
-            cls.bind_wildcard_text(params, wildcard, element)
+            cls.bind_wildcard_element(params, wildcard, txt, tail, attrs, ns_map)
 
     @classmethod
-    def bind_element_attrs(cls, params: Dict, metadata: XmlMeta, element: Element):
+    def bind_element_attrs(
+        cls, params: Dict, metadata: XmlMeta, attrs: Dict, ns_map: Dict
+    ):
         """Parse the given element's attributes and any text content and return
         a dictionary of field names and values based on the given class
         metadata."""
 
-        if not element.attrib:
+        if not attrs:
             return
 
         wildcard = metadata.find_var(mode=FindMode.ATTRIBUTES)
         if wildcard:
             params[wildcard.name] = {}
 
-        for qname, value in element.attrib.items():
+        for qname, value in attrs.items():
             var = metadata.find_var(qname, FindMode.ATTRIBUTE)
             if var and var.name not in params:
                 if var.init:
                     params[var.name] = cls.parse_value(
-                        value, var.types, var.default, element.nsmap, var.tokens
+                        value, var.types, var.default, ns_map, var.tokens
                     )
             elif wildcard:
-                params[wildcard.name][qname] = cls.parse_any_attribute(
-                    value, element.nsmap
-                )
+                params[wildcard.name][qname] = cls.parse_any_attribute(value, ns_map)
 
     @classmethod
     def find_eligible_wildcard(

@@ -159,7 +159,8 @@ class DefinitionsMapperTests(FactoryTestCase):
         self, mock_operation_namespace, mock_map_binding_operation_messages
     ):
         definitions = Definitions(location="foo.wsdl", target_namespace="xsdata")
-        operation = BindingOperation(name="Add", ns_map={"foo": "bar"})
+        operation = BindingOperation(name="Add")
+        operation.ns_map["foo"] = "bar"
         port_operation = PortTypeOperation()
         config = {"a": "one", "b": "two", "style": "rpc"}
         name = "Calc"
@@ -330,13 +331,13 @@ class DefinitionsMapperTests(FactoryTestCase):
         definitions = Definitions(location="foo.wsdl", target_namespace="bar")
         port_type_message = PortTypeMessage(message="some_operation")
         binding_message = BindingMessage(
-            ns_map={"foo": "bar"},
             extended=[
                 AnyElement(qname="body"),
                 AnyElement(qname="header"),
                 AnyElement(qname="header"),
             ],
         )
+        binding_message.ns_map["foo"] = "bar"
 
         result = DefinitionsMapper.build_envelope_class(
             definitions, binding_message, port_type_message, name, style, namespace
@@ -406,13 +407,13 @@ class DefinitionsMapperTests(FactoryTestCase):
         definitions = Definitions(location="foo.wsdl", target_namespace="bar")
         port_type_message = PortTypeMessage(message="some_operation")
         binding_message = BindingMessage(
-            ns_map={"foo": "bar"},
             extended=[
                 AnyElement(qname="body", attributes={"namespace": "bodyns"}),
                 AnyElement(qname="header"),
                 AnyElement(qname="header"),
             ],
         )
+        binding_message.ns_map["foo"] = "bar"
 
         result = DefinitionsMapper.build_envelope_class(
             definitions, binding_message, port_type_message, name, style, namespace
@@ -535,14 +536,14 @@ class DefinitionsMapperTests(FactoryTestCase):
     def test_map_binding_message_parts_with_part_token(
         self, mock_find_message, mock_create_message_attributes
     ):
-        definitions = Definitions
+        definitions = Definitions()
         message_name = "session"
         ns_map = {}
         message = Message(
             name="session",
             parts=[
-                Part(name="token", element="foo:token", ns_map={"foo": "bar"}),
-                Part(name="messageId", type="id", ns_map={"bar": "foo"}),
+                Part(name="token", element="foo:token"),
+                Part(name="messageId", type="id"),
             ],
         )
         extended = AnyElement(attributes={"part": "token", "message": "{bar}session"})
@@ -565,15 +566,15 @@ class DefinitionsMapperTests(FactoryTestCase):
     def test_map_binding_message_parts_with_token_parts(
         self, mock_find_message, mock_create_message_attributes
     ):
-        definitions = Definitions
+        definitions = Definitions()
         message_name = "session"
         ns_map = {}
         message = Message(
             name="session",
             parts=[
-                Part(name="token", element="foo:token", ns_map={"foo": "bar"}),
-                Part(name="messageId", type="id", ns_map={"bar": "foo"}),
-                Part(name="another", type="id", ns_map={"bar": "foo"}),
+                Part(name="token", element="foo:token"),
+                Part(name="messageId", type="id"),
+                Part(name="another", type="id"),
             ],
         )
         extended = AnyElement(
@@ -598,15 +599,15 @@ class DefinitionsMapperTests(FactoryTestCase):
     def test_map_binding_message_parts_with_all_parts(
         self, mock_find_message, mock_create_message_attributes
     ):
-        definitions = Definitions
+        definitions = Definitions()
         message_name = "session"
         ns_map = {}
         message = Message(
             name="session",
             parts=[
-                Part(name="token", element="foo:token", ns_map={"foo": "bar"}),
-                Part(name="messageId", type="id", ns_map={"bar": "foo"}),
-                Part(name="another", type="id", ns_map={"bar": "foo"}),
+                Part(name="token", element="foo:token"),
+                Part(name="messageId", type="id"),
+                Part(name="another", type="id"),
             ],
         )
         extended = AnyElement(attributes={"message": "{bar}session"})
@@ -634,9 +635,9 @@ class DefinitionsMapperTests(FactoryTestCase):
         message = Message(
             name="session",
             parts=[
-                Part(name="token", element="foo:token", ns_map={"foo": "bar"}),
-                Part(name="messageId", type="id", ns_map={"bar": "foo"}),
-                Part(name="another", type="id", ns_map={"bar": "foo"}),
+                Part(name="token", element="foo:token"),
+                Part(name="messageId", type="id"),
+                Part(name="another", type="id"),
             ],
         )
         extended = AnyElement()
@@ -655,13 +656,16 @@ class DefinitionsMapperTests(FactoryTestCase):
 
     @mock.patch("xsdata.codegen.mappers.definitions.logger.warning")
     def test_build_parts_attributes(self, mock_warning):
-        parts = [
-            Part(element="a:bar", ns_map={"a": "great"}),
-            Part(name="arg0", type="xs:string", ns_map={"xs": Namespace.XS.uri}),
-            Part(name="arg1", type="b:cafe", ns_map={"b": "boo"}),
-            Part(name="arg2"),
-        ]
+        p_one = Part(element="a:bar")
+        p_one.ns_map["a"] = "great"
+        p_two = Part(name="arg0", type="xs:string")
+        p_two.ns_map["xs"] = Namespace.XS.uri
+        p_three = Part(name="arg1", type="b:cafe")
+        p_three.ns_map["b"] = "boo"
+        p_four = Part(name="arg2")
+
         ns_map = {}
+        parts = [p_one, p_two, p_three, p_four]
         result = DefinitionsMapper.build_parts_attributes(parts, ns_map)
         expected = [
             DefinitionsMapper.build_attr(
@@ -680,7 +684,8 @@ class DefinitionsMapperTests(FactoryTestCase):
 
     @mock.patch.object(DefinitionsMapper, "build_parts_attributes")
     def test_build_message_class(self, mock_create_message_attributes):
-        message = Message(name="bar", parts=[Part()], ns_map={"a": "b"})
+        message = Message(name="bar", parts=[Part()])
+        message.ns_map["foo"] = "bar"
         definitions = Definitions(
             messages=[message], target_namespace="xsdata", location="foo.wsdl"
         )
@@ -723,7 +728,8 @@ class DefinitionsMapperTests(FactoryTestCase):
         self.assertIs(repeat, actual)
 
     def test_map_port_type_message(self):
-        port_type_message = PortTypeMessage(message="foo:bar", ns_map={"foo": "foobar"})
+        port_type_message = PortTypeMessage(message="foo:bar")
+        port_type_message.ns_map["foo"] = "foobar"
         target_namespace = "xsdata"
 
         actual = DefinitionsMapper.map_port_type_message(

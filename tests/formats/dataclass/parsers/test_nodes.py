@@ -71,13 +71,10 @@ class XmlNodeTests(TestCase):
 
 class ElementNodeTests(TestCase):
     @mock.patch.object(ParserUtils, "bind_element_children")
-    @mock.patch.object(ParserUtils, "bind_element_text")
+    @mock.patch.object(ParserUtils, "bind_element")
     @mock.patch.object(ParserUtils, "bind_element_attrs")
     def test_parse_element(
-        self,
-        mock_bind_element_attrs,
-        mock_bind_element_text,
-        mock_bind_element_children,
+        self, mock_bind_element_attrs, mock_bind_element, mock_bind_element_children,
     ):
         def add_attr(x, *args):
             x["a"] = 1
@@ -89,7 +86,7 @@ class ElementNodeTests(TestCase):
             x["c"] = 3
 
         mock_bind_element_attrs.side_effect = add_attr
-        mock_bind_element_text.side_effect = add_text
+        mock_bind_element.side_effect = add_text
         mock_bind_element_children.side_effect = add_child
 
         ctx = XmlContext()
@@ -104,15 +101,22 @@ class ElementNodeTests(TestCase):
         self.assertEqual(ele.tag, qname)
         self.assertEqual(Foo(1, 2, 3), obj)
 
-        mock_bind_element_attrs.assert_called_once_with(mock.ANY, meta, ele)
-        mock_bind_element_text.assert_called_once_with(mock.ANY, meta, ele)
+        mock_bind_element_attrs.assert_called_once_with(
+            mock.ANY, meta, ele.attrib, ele.nsmap
+        )
+        mock_bind_element.assert_called_once_with(
+            mock.ANY, meta, ele.text, ele.tail, ele.attrib, ele.nsmap
+        )
         mock_bind_element_children.assert_called_once_with(mock.ANY, meta, 0, pool)
 
     @mock.patch.object(ParserUtils, "bind_mixed_content")
-    @mock.patch.object(ParserUtils, "bind_wildcard_text")
+    @mock.patch.object(ParserUtils, "bind_wildcard_element")
     @mock.patch.object(ParserUtils, "bind_element_attrs")
     def test_parse_element_with_mixed_content(
-        self, mock_bind_element_attrs, mock_bind_wildcard_text, mock_bind_mixed_content,
+        self,
+        mock_bind_element_attrs,
+        mock_bind_wildcard_element,
+        mock_bind_mixed_content,
     ):
         def add_attr(x, *args):
             x["a"] = 1
@@ -124,7 +128,7 @@ class ElementNodeTests(TestCase):
             x["content"] = 3
 
         mock_bind_element_attrs.side_effect = add_attr
-        mock_bind_wildcard_text.side_effect = add_text
+        mock_bind_wildcard_element.side_effect = add_text
         mock_bind_mixed_content.side_effect = add_child
 
         ctx = XmlContext()
@@ -139,14 +143,18 @@ class ElementNodeTests(TestCase):
         self.assertEqual(ele.tag, qname)
         self.assertEqual(FooMixed(1, 2, 3), obj)
 
-        mock_bind_element_attrs.assert_called_once_with(mock.ANY, meta, ele)
-        mock_bind_wildcard_text.assert_called_once_with(mock.ANY, meta.vars[2], ele)
+        mock_bind_element_attrs.assert_called_once_with(
+            mock.ANY, meta, ele.attrib, ele.nsmap
+        )
+        mock_bind_wildcard_element.assert_called_once_with(
+            mock.ANY, meta.vars[2], ele.text, ele.tail, ele.attrib, ele.nsmap
+        )
         mock_bind_mixed_content.assert_called_once_with(mock.ANY, meta.vars[2], 0, pool)
 
     @mock.patch.object(ParserUtils, "parse_xsi_type", return_value="foo")
     @mock.patch.object(XmlContext, "fetch")
     def test_next_node_when_given_qname_matches_dataclass_var(
-        self, mock_ctx_fetch, mock_element_xsi_type
+        self, mock_ctx_fetch, mock_parse_xsi_type
     ):
         ele = Element("a")
         ctx = XmlContext()
@@ -163,13 +171,14 @@ class ElementNodeTests(TestCase):
         xsi_type = "foo"
         namespace = meta.namespace
         mock_ctx_fetch.return_value = replace(meta)
-        mock_element_xsi_type.return_value = xsi_type
+        mock_parse_xsi_type.return_value = xsi_type
         node = ElementNode(position=0, meta=meta, config=cfg)
 
         actual = node.next_node(ele, 10, ctx)
         self.assertIsInstance(actual, ElementNode)
         self.assertEqual(10, actual.position)
         self.assertIs(mock_ctx_fetch.return_value, actual.meta)
+        mock_parse_xsi_type.assert_called_once_with(ele.attrib, ele.nsmap)
         mock_ctx_fetch.assert_called_once_with(var.clazz, namespace, xsi_type)
 
     def test_next_node_when_given_qname_matches_var_clazz_union(self):
@@ -284,20 +293,27 @@ class RootNodeTests(TestCase):
 
 class WildcardNodeTests(TestCase):
     @mock.patch.object(ParserUtils, "fetch_any_children")
-    @mock.patch.object(ParserUtils, "parse_any_element")
-    def test_parse_element(self, mock_parse_any_element, mock_fetch_any_children):
-        generic = AnyElement()
-        mock_parse_any_element.return_value = generic
+    def test_parse_element(self, mock_fetch_any_children):
+        ele = Element("foo")
+        ele.text = "\n "
+        ele.tail = "bar"
+        ele.set("id", "1")
         mock_fetch_any_children.return_value = ["a", "b"]
 
-        ele = Element("foo")
+        generic = AnyElement(
+            qname=ele.tag,
+            text=None,
+            tail="bar",
+            ns_map=ele.nsmap,
+            attributes={"id": "1"},
+            children=["a", "b"],
+        )
+
         var = XmlText(name="foo", qname="a")
         node = WildcardNode(position=0, var=var)
         actual = node.parse_element(ele, [1, 2, 3])
 
         self.assertEqual((var.qname, generic), actual)
-        self.assertEqual(["a", "b"], generic.children)
-        mock_parse_any_element.assert_called_once_with(ele)
         mock_fetch_any_children.assert_called_once_with(0, [1, 2, 3])
 
     def test_next_node(self):

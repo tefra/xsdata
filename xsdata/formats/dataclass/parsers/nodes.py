@@ -22,13 +22,13 @@ from xsdata.formats.dataclass.context import XmlContext
 from xsdata.formats.dataclass.models.elements import FindMode
 from xsdata.formats.dataclass.models.elements import XmlMeta
 from xsdata.formats.dataclass.models.elements import XmlVar
+from xsdata.formats.dataclass.models.generics import AnyElement
 from xsdata.formats.dataclass.models.generics import Namespaces
 from xsdata.formats.dataclass.parsers.config import ParserConfig
 from xsdata.formats.dataclass.parsers.utils import ParserUtils
 from xsdata.models.enums import EventType
 
 Parsed = Tuple[Optional[str], Any]
-ParsedObjects = List[Parsed]
 XmlNodes = List["XmlNode"]
 
 
@@ -89,15 +89,24 @@ class ElementNode(XmlNode):
         :return: A tuple of the object's qualified name and the new object.
         """
         params: Dict = {}
-        ParserUtils.bind_element_attrs(params, self.meta, element)
+        ParserUtils.bind_element_attrs(params, self.meta, element.attrib, element.nsmap)
 
         var = self.meta.find_var(mode=FindMode.MIXED_CONTENT)
         if var:
             ParserUtils.bind_mixed_content(params, var, self.position, objects)
-            ParserUtils.bind_wildcard_text(params, var, element)
+            ParserUtils.bind_wildcard_element(
+                params, var, element.text, element.tail, element.attrib, element.nsmap
+            )
         else:
             ParserUtils.bind_element_children(params, self.meta, self.position, objects)
-            ParserUtils.bind_element_text(params, self.meta, element)
+            ParserUtils.bind_element(
+                params,
+                self.meta,
+                element.text,
+                element.tail,
+                element.attrib,
+                element.nsmap,
+            )
 
         obj = self.meta.clazz(**params)
 
@@ -111,7 +120,7 @@ class ElementNode(XmlNode):
         node by the variable type.
 
         :return: The next node to be queued.
-        :raises: XmlContextError if the element is unknown and parser config is strict.
+        :raises: ParserError if the element is unknown and parser config is strict.
         """
         qname = element.tag
         var = self.meta.find_var(qname, FindMode.NOT_WILDCARD)
@@ -127,7 +136,7 @@ class ElementNode(XmlNode):
             return UnionNode(position=position, var=var, ctx=ctx)
 
         if var.clazz:
-            xsi_type = ParserUtils.parse_xsi_type(element)
+            xsi_type = ParserUtils.parse_xsi_type(element.attrib, element.nsmap)
             meta = ctx.fetch(var.clazz, self.meta.namespace, xsi_type)
             return ElementNode(position=position, meta=meta, config=self.config)
 
@@ -169,9 +178,14 @@ class WildcardNode(XmlNode):
         :return: A tuple of the object's qualified name and a new
             :class:`xsdata.formats.dataclass.models.generics.AnyElement` instance.
         """
-        obj = ParserUtils.parse_any_element(element)
-        obj.children = ParserUtils.fetch_any_children(self.position, objects)
-
+        obj = AnyElement(
+            qname=element.tag,
+            text=ParserUtils.string_value(element.text),
+            tail=ParserUtils.string_value(element.tail),
+            ns_map=element.nsmap,
+            attributes=ParserUtils.parse_any_attributes(element.attrib, element.nsmap),
+            children=ParserUtils.fetch_any_children(self.position, objects),
+        )
         return self.var.qname, obj
 
     def next_node(self, element: Element, position: int, ctx: XmlContext) -> XmlNode:
@@ -314,7 +328,7 @@ class NodeParser:
         """
         obj = None
         meta = self.context.build(clazz)
-        objects: ParsedObjects = []
+        objects: List[Parsed] = []
         queue: XmlNodes = [RootNode(position=0, meta=meta, config=self.config)]
 
         self.namespaces.clear()
@@ -337,14 +351,14 @@ class NodeParser:
         prefix, uri = namespace
         self.namespaces.add(uri, prefix)
 
-    def queue(self, element: Element, queue: XmlNodes, objects: ParsedObjects):
+    def queue(self, element: Element, queue: XmlNodes, objects: List[Parsed]):
         """Queue the next xml node for parsing based on the given element
         qualified name."""
         item = queue[-1]
         position = len(objects)
         queue.append(item.next_node(element, position, self.context))
 
-    def dequeue(self, element: Element, queue: XmlNodes, objects: ParsedObjects) -> Any:
+    def dequeue(self, element: Element, queue: XmlNodes, objects: List[Parsed]) -> Any:
         """
         Use the last xml node to parse the given element and bind any child
         objects.

@@ -5,9 +5,6 @@ from dataclasses import replace
 from unittest import mock
 from unittest.case import TestCase
 
-from lxml.etree import Element
-from lxml.etree import SubElement
-
 from tests.fixtures.books import Books
 from tests.fixtures.defxmlschema.chapter12 import ProductType
 from tests.fixtures.defxmlschema.chapter12 import SizeType
@@ -23,7 +20,6 @@ from xsdata.formats.dataclass.models.generics import AnyElement
 from xsdata.formats.dataclass.parsers.utils import ParserUtils
 from xsdata.models.enums import Namespace
 from xsdata.models.enums import QNames
-from xsdata.utils import text
 
 
 class ParserUtilsTests(TestCase):
@@ -31,15 +27,15 @@ class ParserUtilsTests(TestCase):
         self.ctx = XmlContext()
 
     def test_parse_xsi_type(self):
-        ele = Element("foo")
-        self.assertIsNone(ParserUtils.parse_xsi_type(ele))
+        ns_map = {"bar": "xsdata"}
+        attrs = {}
+        self.assertIsNone(ParserUtils.parse_xsi_type(attrs, ns_map))
 
-        ele.set(QNames.XSI_TYPE, "foo")
-        self.assertEqual("foo", ParserUtils.parse_xsi_type(ele))
+        attrs = {QNames.XSI_TYPE: "foo"}
+        self.assertEqual("foo", ParserUtils.parse_xsi_type(attrs, ns_map))
 
-        ele = Element("foo", nsmap=dict(bar="xsdata"))
-        ele.set(QNames.XSI_TYPE, "bar:foo")
-        self.assertEqual("{xsdata}foo", ParserUtils.parse_xsi_type(ele))
+        attrs = {QNames.XSI_TYPE: "bar:foo"}
+        self.assertEqual("{xsdata}foo", ParserUtils.parse_xsi_type(attrs, ns_map))
 
     @mock.patch.object(ConverterAdapter, "from_string", return_value=2)
     def test_parse_value(self, mock_from_string):
@@ -152,25 +148,32 @@ class ParserUtilsTests(TestCase):
         mock_parse_any_attribute.return_value = "foobar"
         metadata = self.ctx.build(ProductType)
         eff_date = metadata.find_var("effDate")
-        element = Element("foo")
-        element.set("effDate", "2020-03-01")
-        element.set("foo", "bar")
 
         params = {}
-        ParserUtils.bind_element_attrs(params, metadata, element)
+        ns_map = {}
+        attrs = {"effDate": "2020-03-01", "foo": "bar"}
+
+        ParserUtils.bind_element_attrs(params, metadata, attrs, ns_map)
         expected = {
             "eff_date": "2020-03-02",
             "other_attributes": {"foo": "foobar"},
         }
         self.assertEqual(expected, params)
-        mock_parse_any_attribute.assert_called_once_with("bar", element.nsmap)
+        mock_parse_any_attribute.assert_called_once_with("bar", ns_map)
         mock_parse_value.assert_called_once_with(
-            "2020-03-01",
-            eff_date.types,
-            eff_date.default,
-            element.nsmap,
-            eff_date.is_list,
+            "2020-03-01", eff_date.types, eff_date.default, ns_map, eff_date.is_list,
         )
+
+    def test_parse_any_attributes(self):
+        attrs = {QNames.XSI_TYPE: "xsd:string", "a": "b"}
+        ns_map = {"xsi": Namespace.XSI.uri, "xsd": Namespace.XS.uri}
+
+        result = ParserUtils.parse_any_attributes(attrs, ns_map)
+        expected = {
+            QNames.XSI_TYPE: "{http://www.w3.org/2001/XMLSchema}string",
+            "a": "b",
+        }
+        self.assertEqual(expected, result)
 
     def test_parse_any_attribute(self):
         ns_map = {"xsi": Namespace.XSI.uri, "xsd": Namespace.XS.uri}
@@ -183,12 +186,12 @@ class ParserUtilsTests(TestCase):
 
     def test_bind_element_attrs_doesnt_overwrite_values(self):
         metadata = self.ctx.build(ProductType)
-        element = Element("foo")
-        element.set("effDate", "2020-03-01")
-
         params = dict(eff_date="foo")
+        attrs = {"effDate": "2020-03-01"}
+        ns_map = {}
 
-        ParserUtils.bind_element_attrs(params, metadata, element)
+        ParserUtils.bind_element_attrs(params, metadata, attrs, ns_map)
+
         expected = {"eff_date": "foo", "other_attributes": {"effDate": "2020-03-01"}}
         self.assertEqual(expected, params)
 
@@ -198,63 +201,57 @@ class ParserUtilsTests(TestCase):
         metadata.vars.remove(eff_date)
         metadata.vars.append(replace(eff_date, init=False))
 
-        element = Element("foo")
-        element.set("effDate", "2020-03-01")
-
         params = {}
-        ParserUtils.bind_element_attrs(params, metadata, element)
+        attrs = {"effDate": "2020-03-01"}
+        ns_map = {}
+
+        ParserUtils.bind_element_attrs(params, metadata, attrs, ns_map)
         self.assertEqual({"other_attributes": {}}, params)
 
     @mock.patch.object(XmlMeta, "find_var")
-    def test_bind_element_attrs_skip_element_without_attributes(self, mock_find_var):
+    def test_bind_element_attrs_skip_empty_attrs(self, mock_find_var):
         metadata = self.ctx.build(ProductType)
-        element = Element("foo")
 
         params = {}
-        ParserUtils.bind_element_attrs(params, metadata, element)
+        ParserUtils.bind_element_attrs(params, metadata, {}, {})
         self.assertEqual(0, len(params))
         self.assertEqual(0, mock_find_var.call_count)
 
-    def test_bind_element_text_with_no_text_var(self):
-        element = Element("foo")
-        element.text = "foo"
-
+    def test_bind_element_with_no_text_var(self):
         params = {}
         metadata = self.ctx.build(Books)
-        ParserUtils.bind_element_text(params, metadata, element)
+        ParserUtils.bind_element(params, metadata, "foo", None, {}, {})
         self.assertEqual({}, params)
 
     @mock.patch.object(ParserUtils, "parse_value", return_value="yes!")
-    def test_bind_element_text_with_text_var(self, mock_parse_value):
-        element = Element("foo")
-        params = {}
+    def test_bind_element_with_text_var(self, mock_parse_value):
         metadata = self.ctx.build(SizeType)
         var = metadata.find_var(mode=FindMode.TEXT)
-        ParserUtils.bind_element_text(params, metadata, element)
+        params = {}
+        ns_map = {"a": "b"}
+
+        ParserUtils.bind_element(params, metadata, None, None, {}, ns_map)
         self.assertEqual({}, params)
 
-        element.text = "foo"
-        ParserUtils.bind_element_text(params, metadata, element)
+        ParserUtils.bind_element(params, metadata, "foo", None, {}, ns_map)
         self.assertEqual({"value": "yes!"}, params)
         mock_parse_value.assert_called_once_with(
-            element.text, var.types, var.default, element.nsmap, var.is_list,
+            "foo", var.types, var.default, ns_map, var.is_list,
         )
 
-        params.clear()
-        SubElement(element, "foo")  # Element with children
-        ParserUtils.bind_element_text(params, metadata, element)
-        self.assertEqual({}, params)
-
-    def test_bind_element_text_with_wildcard_var(self):
-        element = Element("foo")
-        params = {}
+    def test_bind_element_with_wildcard_var(self):
         metadata = self.ctx.build(Umbrella)
-        ParserUtils.bind_element_text(params, metadata, element)
+        params = {}
+        attrs = {"a": "b"}
+        ns_map = {"a": "b"}
+
+        ParserUtils.bind_element(params, metadata, None, None, attrs, ns_map)
         self.assertEqual({}, params)
 
-        element.text = "foo"
-        ParserUtils.bind_element_text(params, metadata, element)
-        self.assertEqual({"any_element": AnyElement(text="foo")}, params)
+        ParserUtils.bind_element(params, metadata, "foo", "bar", attrs, ns_map)
+
+        expected = AnyElement(text="foo", tail="bar", attributes=attrs, ns_map=ns_map)
+        self.assertEqual(expected, params["any_element"])
 
     def test_bind_element_param(self):
         var = XmlVar(name="a", qname="a")
@@ -297,89 +294,43 @@ class ParserUtilsTests(TestCase):
         ParserUtils.bind_element_wildcard_param(params, var, qname, "three")
         self.assertEqual(dict(a=AnyElement(children=[one, two, three])), params)
 
-    def test_bind_wildcard_text(self):
+    def test_bind_wildcard_element(self):
         var = XmlVar(name="a", qname="a")
-        elem = Element("foo")
         params = {}
+        attrs = {}
+        ns_map = {}
 
-        ParserUtils.bind_wildcard_text(params, var, elem)
+        ParserUtils.bind_wildcard_element(params, var, None, None, attrs, ns_map)
         self.assertEqual(0, len(params))
 
-        elem = Element("foo")
-        elem.text = "txt"
-        elem.tail = "tail"
         params = {}
-
-        ParserUtils.bind_wildcard_text(params, var, elem)
+        ParserUtils.bind_wildcard_element(params, var, "txt", "tail", attrs, ns_map)
         expected = AnyElement(text="txt", tail="tail")
         self.assertEqual(dict(a=expected), params)
 
-        ParserUtils.bind_wildcard_text(params, var, elem)
-        expected = AnyElement(text="txt", tail="tail", children=[expected])
+        attrs = {"a": "b"}
+        ns_map = {"ns0": "a"}
+        ParserUtils.bind_wildcard_element(params, var, "txt", "tail", attrs, ns_map)
+        expected = AnyElement(
+            text="txt",
+            tail="tail",
+            children=[expected],
+            attributes=attrs,
+            ns_map=ns_map,
+        )
         self.assertEqual(dict(a=expected), params)
 
-    def test_bind_wildcard_text_when_var_is_list(self):
+    def test_bind_wildcard_when_var_is_list(self):
         var = XmlVar(name="a", qname="a", default=list, list_element=True)
-        elem = Element("foo")
-        elem.text = "txt"
-        elem.tail = "tail"
         params = {}
+        attrs = {"a", "b"}
+        ns_map = {"ns0", "a"}
 
-        ParserUtils.bind_wildcard_text(params, var, elem)
+        ParserUtils.bind_wildcard_element(params, var, "txt", "tail", attrs, ns_map)
         self.assertEqual(dict(a=["txt", "tail"]), params)
 
-        elem.text = None
-        ParserUtils.bind_wildcard_text(params, var, elem)
+        ParserUtils.bind_wildcard_element(params, var, None, "tail", attrs, ns_map)
         self.assertEqual(dict(a=["txt", "tail", "tail"]), params)
 
-        elem.tail = None
-        elem.text = "first"
-        ParserUtils.bind_wildcard_text(params, var, elem)
+        ParserUtils.bind_wildcard_element(params, var, "first", None, attrs, ns_map)
         self.assertEqual(dict(a=["first", "txt", "tail", "tail"]), params)
-
-    def test_parse_any_element(self):
-        element = Element("foo")
-        element.set("a", "1")
-        element.set("b", "2")
-        element.set(
-            text.qname(Namespace.XSI.uri, "type"), text.qname(Namespace.XS.uri, "float")
-        )
-        element.text = "yes"
-        element.tail = "no"
-
-        actual = ParserUtils.parse_any_element(element)
-        expected = AnyElement(
-            qname=element.tag,
-            text="yes",
-            tail="no",
-            attributes={
-                "a": "1",
-                "b": "2",
-                text.qname(Namespace.XSI.uri, "type"): text.qname(
-                    Namespace.XS.uri, "float"
-                ),
-            },
-            ns_map=element.nsmap,
-        )
-        self.assertEqual(expected, actual)
-        actual = ParserUtils.parse_any_element(element, False)
-        self.assertIsNone(actual.qname)
-
-    def test_element_text_and_tail(self):
-        element = Element("foo")
-
-        text, tail = ParserUtils.element_text_and_tail(element)
-        self.assertIsNone(text)
-        self.assertIsNone(tail)
-
-        element.text = " \n "
-        element.tail = " \n  "
-        text, tail = ParserUtils.element_text_and_tail(element)
-        self.assertIsNone(text)
-        self.assertIsNone(tail)
-
-        element.text = " foo "
-        element.tail = " bar "
-        text, tail = ParserUtils.element_text_and_tail(element)
-        self.assertEqual("foo", text)
-        self.assertEqual("bar", tail)

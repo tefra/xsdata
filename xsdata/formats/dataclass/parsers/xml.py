@@ -38,13 +38,15 @@ class XmlParser(NodeParser, AbstractParser):
 
         return self.parse_context(ctx, clazz)
 
-    def queue(self, element: Element, queue: XmlNodes, objects: List[Parsed]):
+    def start(
+        self, element: Element, queue: XmlNodes, objects: List[Parsed], clazz: Type[T]
+    ):
         """Queue the next xml node for parsing based on the given element
         qualified name."""
-        super().queue(element, queue, objects)
+        super().start(element, queue, objects, clazz)
         self.emit_event(EventType.START, element.tag, element=element)
 
-    def dequeue(self, element: Element, queue: XmlNodes, objects: List[Parsed]) -> Any:
+    def end(self, element: Element, queue: XmlNodes, objects: List[Parsed]) -> Any:
         """
         Use the last xml node to parse the given element and bind any child
         objects.
@@ -52,7 +54,7 @@ class XmlParser(NodeParser, AbstractParser):
         :return: Any: A dataclass instance or a python primitive value or None
         """
 
-        obj = super().dequeue(element, queue, objects)
+        obj = super().end(element, queue, objects)
         if obj:
             self.emit_event(EventType.END, element.tag, obj=obj, element=element)
             element.clear()

@@ -13,8 +13,8 @@ from tests.fixtures.books import Books
 from xsdata.exceptions import ParserError
 from xsdata.formats.dataclass.models.elements import XmlText
 from xsdata.formats.dataclass.parsers.config import ParserConfig
+from xsdata.formats.dataclass.parsers.nodes import ElementNode
 from xsdata.formats.dataclass.parsers.nodes import PrimitiveNode
-from xsdata.formats.dataclass.parsers.nodes import RootNode
 from xsdata.formats.dataclass.parsers.nodes import SkipNode
 from xsdata.formats.dataclass.parsers.xml import XmlParser
 from xsdata.models.enums import EventType
@@ -37,60 +37,73 @@ class XmlParserTests(TestCase):
         self.parser.add_namespace(("foo", "bar"))
         self.assertEqual({"foo": "bar"}, self.parser.namespaces.ns_map)
 
-    @mock.patch.object(RootNode, "next_node")
+    @mock.patch.object(ElementNode, "next_node")
     @mock.patch.object(XmlParser, "emit_event")
-    def test_queue(self, mock_emit_event, mock_next_node):
+    def test_start(self, mock_emit_event, mock_next_node):
         var = XmlText(name="foo", qname="foo")
-        primitive_node = PrimitiveNode(position=1, var=var)
+        primitive_node = PrimitiveNode(var=var, ns_map={})
         mock_next_node.return_value = primitive_node
         element = Element("{urn:books}books")
+        child = Element("child")
         config = ParserConfig()
-        root_queue_item = RootNode(
-            position=0, meta=self.parser.context.build(Books), config=config,
-        )
 
         objects = []
-        queue = [root_queue_item]
-        self.parser.queue(element, queue, objects)
+        queue = []
+        expected_root_node = ElementNode(
+            position=0,
+            context=self.parser.context,
+            meta=self.parser.context.build(Books),
+            config=config,
+            attrs=element.attrib,
+            ns_map=element.nsmap,
+        )
 
+        self.parser.start(element, queue, objects, Books)
+
+        self.assertEqual(1, len(queue))
+        self.assertEqual(expected_root_node, queue[0])
+
+        self.parser.start(child, queue, objects, Books)
         self.assertEqual(2, len(queue))
-        self.assertEqual(root_queue_item, queue[0])
         self.assertEqual(primitive_node, queue[1])
 
-        mock_emit_event.assert_called_once_with(
-            EventType.START, element.tag, element=element
+        mock_emit_event.assert_has_calls(
+            [
+                mock.call(EventType.START, element.tag, element=element),
+                mock.call(EventType.START, child.tag, element=child),
+            ]
         )
 
     @mock.patch.object(XmlParser, "emit_event")
-    @mock.patch.object(PrimitiveNode, "parse_element", return_value=("q", "result"))
-    def test_dequeue(self, mock_parse_element, mock_emit_event):
+    @mock.patch.object(PrimitiveNode, "assemble", return_value=("q", "result"))
+    def test_end(self, mock_assemble, mock_emit_event):
         element = Element("author", nsmap={"prefix": "uri"})
         element.text = "foobar"
 
         objects = []
         queue = []
         var = XmlText(name="foo", qname="foo")
-        queue.append(PrimitiveNode(position=0, var=var))
+        queue.append(PrimitiveNode(var=var, ns_map={}))
 
-        result = self.parser.dequeue(element, queue, objects)
+        result = self.parser.end(element, queue, objects)
         self.assertEqual("result", result)
         self.assertEqual(0, len(queue))
         self.assertEqual(("q", result), objects[-1])
         self.assertIsNone(element.text)  # element is cleared!
-        mock_parse_element.assert_called_once_with(element, objects)
+        mock_assemble.assert_called_once_with("author", "foobar", None, objects)
         mock_emit_event.assert_called_once_with(
             EventType.END, element.tag, obj=result, element=element
         )
 
     @mock.patch.object(XmlParser, "emit_event")
-    def test_dequeue_with_no_result(self, mock_emit_event):
+    def test_end_with_no_result(self, mock_emit_event):
         element = Element("author", nsmap={"prefix": "uri"})
         element.text = "foobar"
 
         objects = []
-        queue = [SkipNode(position=0)]
+        queue = [SkipNode()]
 
-        result = self.parser.dequeue(element, queue, objects)
+        result = self.parser.end(element, queue, objects)
         self.assertIsNone(result)
         self.assertEqual(0, len(queue))
         self.assertEqual(0, len(objects))

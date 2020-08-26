@@ -42,9 +42,9 @@ class SchemaParser(XmlParser):
     default_attributes: Optional[str] = field(default=None)
     default_open_content: Optional[xsd.DefaultOpenContent] = field(default=None)
 
-    def dequeue(self, element: Element, queue: XmlNodes, objects: List[Parsed]) -> Any:
+    def end(self, element: Element, queue: XmlNodes, objects: List[Parsed]) -> Any:
         """Override parent method to set element index and namespaces map."""
-        obj: Any = super().dequeue(element, queue, objects)
+        obj: Any = super().end(element, queue, objects)
 
         self.set_index(element, obj)
         self.set_namespace_map(element, obj)

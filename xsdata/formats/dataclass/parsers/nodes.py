@@ -1,3 +1,4 @@
+import copy
 from dataclasses import dataclass
 from dataclasses import field
 from dataclasses import fields
@@ -32,7 +33,7 @@ Parsed = Tuple[Optional[str], Any]
 XmlNodes = List["XmlNode"]
 
 
-@dataclass(frozen=True)
+@dataclass
 class XmlNode:
     """
     A generic interface for xml nodes that need to implement the two public
@@ -43,9 +44,9 @@ class XmlNode:
     :param position: The current objects size, when the node is created.
     """
 
-    position: int
-
-    def next_node(self, element: Element, position: int, ctx: XmlContext) -> "XmlNode":
+    def next_node(
+        self, qname: str, attrs: Dict, ns_map: Dict, position: int
+    ) -> "XmlNode":
         """
         Initialize the next node to be queued, when a new xml element starts.
 
@@ -55,7 +56,9 @@ class XmlNode:
         """
         raise NotImplementedError("Not Implemented")
 
-    def parse_element(self, element: Element, objects: List[Any]) -> Parsed:
+    def assemble(
+        self, qname: str, text: Optional[str], tail: Optional[str], objects: List[Any]
+    ) -> Parsed:
         """
         Parse the current element bind child objects and return the result.
 
@@ -65,10 +68,10 @@ class XmlNode:
 
         :return: A tuple of the object's qualified name and the new object.
         """
-        raise NotImplementedError(f"Not Implemented {element.tag}.")
+        raise NotImplementedError(f"Not Implemented {qname}.")
 
 
-@dataclass(frozen=True)
+@dataclass
 class ElementNode(XmlNode):
     """
     Element type node is equivalent to xml elements and is used to bind user
@@ -80,8 +83,14 @@ class ElementNode(XmlNode):
 
     meta: XmlMeta
     config: ParserConfig
+    context: XmlContext
+    attrs: Dict
+    ns_map: Dict
+    position: int
 
-    def parse_element(self, element: Element, objects: List[Any]) -> Parsed:
+    def assemble(
+        self, qname: str, text: Optional[str], tail: Optional[str], objects: List[Any]
+    ) -> Parsed:
         """
         Parse the given element attributes/text, find all child objects and
         mixed content and initialize a new dataclass instance.
@@ -89,30 +98,25 @@ class ElementNode(XmlNode):
         :return: A tuple of the object's qualified name and the new object.
         """
         params: Dict = {}
-        ParserUtils.bind_element_attrs(params, self.meta, element.attrib, element.nsmap)
+        ParserUtils.bind_element_attrs(params, self.meta, self.attrs, self.ns_map)
 
         var = self.meta.find_var(mode=FindMode.MIXED_CONTENT)
         if var:
             ParserUtils.bind_mixed_content(params, var, self.position, objects)
             ParserUtils.bind_wildcard_element(
-                params, var, element.text, element.tail, element.attrib, element.nsmap
+                params, var, text, tail, self.attrs, self.ns_map
             )
         else:
             ParserUtils.bind_element_children(params, self.meta, self.position, objects)
             ParserUtils.bind_element(
-                params,
-                self.meta,
-                element.text,
-                element.tail,
-                element.attrib,
-                element.nsmap,
+                params, self.meta, text, tail, self.attrs, self.ns_map,
             )
 
-        obj = self.meta.clazz(**params)
+        return qname, self.meta.clazz(**params)
 
-        return element.tag, obj
-
-    def next_node(self, element: Element, position: int, ctx: XmlContext) -> XmlNode:
+    def next_node(
+        self, qname: str, attrs: Dict, ns_map: Dict, position: int
+    ) -> XmlNode:
         """
         Initialize the next node to be queued for the given starting element.
 
@@ -122,7 +126,6 @@ class ElementNode(XmlNode):
         :return: The next node to be queued.
         :raises: ParserError if the element is unknown and parser config is strict.
         """
-        qname = element.tag
         var = self.meta.find_var(qname, FindMode.NOT_WILDCARD)
         if not var:
             var = self.meta.find_var(qname, FindMode.WILDCARD)
@@ -130,32 +133,36 @@ class ElementNode(XmlNode):
         if not var:
             if self.config.fail_on_unknown_properties:
                 raise ParserError(f"Unknown property {self.meta.qname}:{qname}")
-            return SkipNode(position=position)
+            return SkipNode()
 
         if var.is_clazz_union:
-            return UnionNode(position=position, var=var, ctx=ctx)
+            return UnionNode(
+                var=var,
+                attrs=attrs,
+                ns_map=ns_map,
+                context=self.context,
+                position=position,
+            )
 
         if var.clazz:
-            xsi_type = ParserUtils.parse_xsi_type(element.attrib, element.nsmap)
-            meta = ctx.fetch(var.clazz, self.meta.namespace, xsi_type)
-            return ElementNode(position=position, meta=meta, config=self.config)
+            xsi_type = ParserUtils.parse_xsi_type(attrs, ns_map)
+            meta = self.context.fetch(var.clazz, self.meta.namespace, xsi_type)
+            return ElementNode(
+                meta=meta,
+                config=self.config,
+                attrs=attrs,
+                ns_map=ns_map,
+                context=self.context,
+                position=position,
+            )
 
         if var.is_any_type:
-            return WildcardNode(position=position, var=var)
+            return WildcardNode(var=var, attrs=attrs, ns_map=ns_map, position=position,)
 
-        return PrimitiveNode(position=position, var=var)
-
-
-@dataclass(frozen=True)
-class RootNode(ElementNode):
-    def next_node(self, element: Element, position: int, ctx: XmlContext) -> XmlNode:
-        """Override parent to return itself if the current element is root."""
-        if element.getparent() is None:
-            return self
-        return super().next_node(element, position, ctx)
+        return PrimitiveNode(var=var, ns_map=ns_map)
 
 
-@dataclass(frozen=True)
+@dataclass
 class WildcardNode(XmlNode):
     """
     Wildcard nodes are used for extensible elements that can hold any attribute
@@ -169,8 +176,13 @@ class WildcardNode(XmlNode):
     """
 
     var: XmlVar
+    attrs: Dict
+    ns_map: Dict
+    position: int
 
-    def parse_element(self, element: Element, objects: List[Any]) -> Parsed:
+    def assemble(
+        self, qname: str, text: Optional[str], tail: Optional[str], objects: List[Any]
+    ) -> Parsed:
         """
         Parse the given element attributes/text/tail, find all child objects
         and mixed content and initialize a new generic element instance.
@@ -179,39 +191,56 @@ class WildcardNode(XmlNode):
             :class:`xsdata.formats.dataclass.models.generics.AnyElement` instance.
         """
         obj = AnyElement(
-            qname=element.tag,
-            text=ParserUtils.string_value(element.text),
-            tail=ParserUtils.string_value(element.tail),
-            ns_map=element.nsmap,
-            attributes=ParserUtils.parse_any_attributes(element.attrib, element.nsmap),
+            qname=qname,
+            text=ParserUtils.string_value(text),
+            tail=ParserUtils.string_value(tail),
+            ns_map=self.ns_map,
+            attributes=ParserUtils.parse_any_attributes(self.attrs, self.ns_map),
             children=ParserUtils.fetch_any_children(self.position, objects),
         )
         return self.var.qname, obj
 
-    def next_node(self, element: Element, position: int, ctx: XmlContext) -> XmlNode:
+    def next_node(
+        self, qname: str, attrs: Dict, ns_map: Dict, position: int
+    ) -> XmlNode:
         """
         Initialize the next wildcard node to be queued for the given starting
         element.
 
         Notes:     Wildcard nodes can only queue other wildcard nodes.
         """
-        return WildcardNode(position=position, var=self.var)
+        return WildcardNode(position=position, var=self.var, attrs=attrs, ns_map=ns_map)
 
 
-@dataclass(frozen=True)
+@dataclass
 class UnionNode(XmlNode):
     """Union nodes are used for variables with more than one possible types
     where at least one of them is a dataclass."""
 
     var: XmlVar
-    ctx: XmlContext
+    attrs: Dict
+    ns_map: Dict
+    position: int
+    context: XmlContext
+    level: int = field(default_factory=int)
+    events: List = field(default_factory=list)
 
-    def next_node(self, element: Element, position: int, ctx: XmlContext) -> XmlNode:
+    def __post_init__(self):
+        self.attrs = copy.deepcopy(self.attrs)
+
+    def next_node(
+        self, qname: str, attrs: Dict, ns_map: Dict, position: int
+    ) -> XmlNode:
         """Skip all child nodes as we are going to parse the complete element
         tree."""
-        return SkipNode(position=position)
 
-    def parse_element(self, element: Element, objects: List[Any]) -> Parsed:
+        self.level += 1
+        self.events.append(("start", qname, copy.deepcopy(attrs), ns_map.copy()))
+        return self
+
+    def assemble(
+        self, qname: str, text: Optional[str], tail: Optional[str], objects: List[Any]
+    ) -> Parsed:
         """
         The handler will make multiple tries to bind the given element to one
         of the available dataclass var types convert it to one of the available
@@ -222,15 +251,18 @@ class UnionNode(XmlNode):
         :raise ParserError: When all attempts fail
         :return: A tuple of the object's qualified name and the new object.
         """
+        self.events.append(("end", qname, text, tail))
 
-        parent = element.getparent()
-        if parent is not None:
-            parent.remove(element)  # detach element from parent
+        if self.level > 0:
+            self.level -= 1
+            return None, None
+
+        self.events.insert(0, ("start", qname, self.attrs, self.ns_map))
 
         obj = None
         max_score = -1
         for clazz in self.var.types:
-            candidate = self.parse_class(element, clazz)
+            candidate = self.parse_class(clazz)
             score = self.score_object(candidate)
             if score > max_score:
                 max_score = score
@@ -241,11 +273,11 @@ class UnionNode(XmlNode):
 
         raise ParserError(f"Failed to parse union node: {self.var.qname}")
 
-    def parse_class(self, element: Element, clazz: Type[T]) -> Optional[T]:
+    def parse_class(self, clazz: Type[T]) -> Optional[T]:
         """Initialize a new XmlParser and try to parse the given element."""
         try:
-            parser = NodeParser(context=self.ctx)
-            return parser.parse(element, clazz)
+            parser = ReplayParser(context=self.context)
+            return parser.parse(self.events, clazz)
         except Exception:
             return None
 
@@ -259,7 +291,7 @@ class UnionNode(XmlNode):
         )
 
 
-@dataclass(frozen=True)
+@dataclass
 class PrimitiveNode(XmlNode):
     """
     XmlNode for text elements with primitive values eg str, int, float.
@@ -268,35 +300,43 @@ class PrimitiveNode(XmlNode):
     """
 
     var: XmlVar
+    ns_map: Dict
 
-    def parse_element(self, element: Element, objects: List) -> Parsed:
+    def assemble(
+        self, qname: str, text: Optional[str], tail: Optional[str], objects: List[Any]
+    ) -> Parsed:
         """
         Parse the given element text according to the node possible types.
 
         :return: A tuple of the object's qualified name and the new object.
         """
-        value = element.text
-        ns_map = element.nsmap
-        obj = ParserUtils.parse_value(
-            value, self.var.types, self.var.default, ns_map, self.var.tokens
+        return (
+            qname,
+            ParserUtils.parse_value(
+                text, self.var.types, self.var.default, self.ns_map, self.var.tokens
+            ),
         )
 
-        return element.tag, obj
-
-    def next_node(self, element: Element, position: int, ctx: XmlContext) -> XmlNode:
+    def next_node(
+        self, qname: str, attrs: Dict, ns_map: Dict, position: int
+    ) -> XmlNode:
         raise XmlContextError("Primitive node doesn't support child nodes!")
 
 
-@dataclass(frozen=True)
+@dataclass
 class SkipNode(XmlNode):
     """The skip node should be used when we want to skip parsing child
     elements."""
 
-    def next_node(self, element: Element, position: int, ctx: XmlContext) -> XmlNode:
+    def next_node(
+        self, qname: str, attrs: Dict, ns_map: Dict, position: int
+    ) -> XmlNode:
         """Skip the current child."""
-        return SkipNode(position=position)
+        return self
 
-    def parse_element(self, element: Element, objects: List[Any]) -> Parsed:
+    def assemble(
+        self, qname: str, text: Optional[str], tail: Optional[str], objects: List[Any]
+    ) -> Parsed:
         """Skip parsing the current element."""
         return None, None
 
@@ -327,19 +367,18 @@ class NodeParser:
         :raises ParserError: When the requested type doesn't match the result object
         """
         obj = None
-        meta = self.context.build(clazz)
         objects: List[Parsed] = []
-        queue: XmlNodes = [RootNode(position=0, meta=meta, config=self.config)]
+        queue: XmlNodes = []
 
         self.namespaces.clear()
 
         for event, element in context:
-            if event == EventType.START_NS:
-                self.add_namespace(element)
             if event == EventType.START:
-                self.queue(element, queue, objects)
+                self.start(element, queue, objects, clazz)
             elif event == EventType.END:
-                obj = self.dequeue(element, queue, objects)
+                obj = self.end(element, queue, objects)
+            elif event == EventType.START_NS:
+                self.add_namespace(element)
 
         if not obj:
             raise ParserError(f"Failed to create target class `{clazz.__name__}`")
@@ -351,14 +390,29 @@ class NodeParser:
         prefix, uri = namespace
         self.namespaces.add(uri, prefix)
 
-    def queue(self, element: Element, queue: XmlNodes, objects: List[Parsed]):
+    def start(
+        self, element: Element, queue: XmlNodes, objects: List[Parsed], clazz: Type[T]
+    ):
         """Queue the next xml node for parsing based on the given element
         qualified name."""
-        item = queue[-1]
-        position = len(objects)
-        queue.append(item.next_node(element, position, self.context))
+        try:
+            item = queue[-1]
+            position = len(objects)
+            child = item.next_node(element.tag, element.attrib, element.nsmap, position)
+        except IndexError:
+            meta = self.context.build(clazz)
+            child = ElementNode(
+                position=0,
+                meta=meta,
+                config=self.config,
+                attrs=element.attrib,
+                ns_map=element.nsmap,
+                context=self.context,
+            )
 
-    def dequeue(self, element: Element, queue: XmlNodes, objects: List[Parsed]) -> Any:
+        queue.append(child)
+
+    def end(self, element: Element, queue: XmlNodes, objects: List[Parsed]) -> Any:
         """
         Use the last xml node to parse the given element and bind any child
         objects.
@@ -366,9 +420,88 @@ class NodeParser:
         :return: Any: A dataclass instance or a python primitive value or None
         """
         item = queue.pop()
-        result = item.parse_element(element, objects)
+        qname, obj = item.assemble(element.tag, element.text, element.tail, objects)
 
-        if not isinstance(item, SkipNode):
+        if qname is not None:
+            objects.append((qname, obj))
+
+        return obj
+
+
+@dataclass
+class ReplayParser:
+    """Xml parsing and binding for dataclasses."""
+
+    config: ParserConfig = field(default_factory=ParserConfig)
+    context: XmlContext = field(default_factory=XmlContext)
+    namespaces: Namespaces = field(init=False, default_factory=Namespaces)
+
+    def parse(self, source: List, clazz: Type[T]) -> T:
+        obj = None
+        objects: List[Parsed] = []
+        queue: XmlNodes = []
+
+        self.namespaces.clear()
+
+        for event in source:
+            if event[0] == EventType.START:
+                _, qname, attrs, ns_map = event
+                position = len(objects)
+                self.start(queue, qname, attrs, ns_map, position, clazz)
+            elif event[0] == EventType.END:
+                _, qname, text, tail = event
+                obj = self.end(queue, qname, text, tail, objects)
+
+        if not obj:
+            raise ParserError(f"Failed to create target class `{clazz.__name__}`")
+
+        return obj
+
+    def start(
+        self,
+        queue: XmlNodes,
+        qname: str,
+        attrs: Dict,
+        ns_map: Dict,
+        position: int,
+        clazz: Type[T],
+    ):
+        """Queue the next xml node for parsing based on the given element
+        qualified name."""
+        try:
+            item = queue[-1]
+            child = item.next_node(qname, attrs, ns_map, position)
+        except IndexError:
+            meta = self.context.build(clazz)
+            child = ElementNode(
+                position=0,
+                meta=meta,
+                config=self.config,
+                attrs=attrs,
+                ns_map=ns_map,
+                context=self.context,
+            )
+
+        queue.append(child)
+
+    def end(
+        self,
+        queue: XmlNodes,
+        qname: str,
+        text: Optional[str],
+        tail: Optional[str],
+        objects: List[Parsed],
+    ) -> Any:
+        """
+        Use the last xml node to parse the given element and bind any child
+        objects.
+
+        :return: Any: A dataclass instance or a python primitive value or None
+        """
+        item = queue.pop()
+        result = item.assemble(qname, text, tail, objects)
+
+        if result[0] is not None:
             objects.append(result)
 
         return result[1]

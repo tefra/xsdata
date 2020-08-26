@@ -7,8 +7,6 @@ from unittest import mock
 from unittest.case import TestCase
 
 from lxml import etree
-from lxml.etree import Element
-from lxml.etree import SubElement
 
 from tests import fixtures_dir
 from tests.fixtures.books import Books
@@ -24,7 +22,6 @@ from xsdata.formats.dataclass.parsers.config import ParserConfig
 from xsdata.formats.dataclass.parsers.nodes import ElementNode
 from xsdata.formats.dataclass.parsers.nodes import NodeParser
 from xsdata.formats.dataclass.parsers.nodes import PrimitiveNode
-from xsdata.formats.dataclass.parsers.nodes import RootNode
 from xsdata.formats.dataclass.parsers.nodes import SkipNode
 from xsdata.formats.dataclass.parsers.nodes import UnionNode
 from xsdata.formats.dataclass.parsers.nodes import WildcardNode
@@ -59,21 +56,23 @@ class FooMixed:
 
 class XmlNodeTests(TestCase):
     def test_next_node(self):
-        ctx = XmlContext()
         with self.assertRaises(NotImplementedError):
-            XmlNode(0).next_node("foo", 0, ctx)
+            XmlNode().next_node("foo", {}, {}, 0)
 
-    def test_parse_element(self):
-        ele = Element("foo")
+    def test_assemble(self):
         with self.assertRaises(NotImplementedError):
-            XmlNode(0).parse_element(ele, [])
+            XmlNode().assemble("foo", None, None, [])
 
 
 class ElementNodeTests(TestCase):
+    def setUp(self) -> None:
+        super().setUp()
+        self.context = XmlContext()
+
     @mock.patch.object(ParserUtils, "bind_element_children")
     @mock.patch.object(ParserUtils, "bind_element")
     @mock.patch.object(ParserUtils, "bind_element_attrs")
-    def test_parse_element(
+    def test_assemble(
         self, mock_bind_element_attrs, mock_bind_element, mock_bind_element_children,
     ):
         def add_attr(x, *args):
@@ -89,30 +88,33 @@ class ElementNodeTests(TestCase):
         mock_bind_element.side_effect = add_text
         mock_bind_element_children.side_effect = add_child
 
-        ctx = XmlContext()
-        meta = ctx.build(Foo)
+        node = ElementNode(
+            position=0,
+            meta=self.context.build(Foo),
+            context=self.context,
+            config=ParserConfig(),
+            attrs={"a": "b"},
+            ns_map={"ns0": "xsdata"},
+        )
 
-        ele = Element("foo")
         pool = [1, 2, 3]
+        qname, obj = node.assemble("foo", "text", "tail", pool)
 
-        node = ElementNode(position=0, meta=meta, config=ParserConfig())
-        qname, obj = node.parse_element(ele, pool)
-
-        self.assertEqual(ele.tag, qname)
+        self.assertEqual("foo", qname)
         self.assertEqual(Foo(1, 2, 3), obj)
 
         mock_bind_element_attrs.assert_called_once_with(
-            mock.ANY, meta, ele.attrib, ele.nsmap
+            mock.ANY, node.meta, node.attrs, node.ns_map
         )
         mock_bind_element.assert_called_once_with(
-            mock.ANY, meta, ele.text, ele.tail, ele.attrib, ele.nsmap
+            mock.ANY, node.meta, "text", "tail", node.attrs, node.ns_map
         )
-        mock_bind_element_children.assert_called_once_with(mock.ANY, meta, 0, pool)
+        mock_bind_element_children.assert_called_once_with(mock.ANY, node.meta, 0, pool)
 
     @mock.patch.object(ParserUtils, "bind_mixed_content")
     @mock.patch.object(ParserUtils, "bind_wildcard_element")
     @mock.patch.object(ParserUtils, "bind_element_attrs")
-    def test_parse_element_with_mixed_content(
+    def test_assemble_with_mixed_content(
         self,
         mock_bind_element_attrs,
         mock_bind_wildcard_element,
@@ -131,34 +133,36 @@ class ElementNodeTests(TestCase):
         mock_bind_wildcard_element.side_effect = add_text
         mock_bind_mixed_content.side_effect = add_child
 
-        ctx = XmlContext()
-        meta = ctx.build(FooMixed)
-
-        ele = Element("foo")
+        node = ElementNode(
+            position=0,
+            meta=self.context.build(FooMixed),
+            context=self.context,
+            config=ParserConfig(),
+            attrs={"a": "b"},
+            ns_map={"ns0": "xsdata"},
+        )
         pool = [1, 2, 3]
 
-        node = ElementNode(position=0, meta=meta, config=ParserConfig())
-        qname, obj = node.parse_element(ele, pool)
+        qname, obj = node.assemble("foo", "text", "tail", pool)
 
-        self.assertEqual(ele.tag, qname)
+        self.assertEqual("foo", qname)
         self.assertEqual(FooMixed(1, 2, 3), obj)
 
         mock_bind_element_attrs.assert_called_once_with(
-            mock.ANY, meta, ele.attrib, ele.nsmap
+            mock.ANY, node.meta, node.attrs, node.ns_map
         )
         mock_bind_wildcard_element.assert_called_once_with(
-            mock.ANY, meta.vars[2], ele.text, ele.tail, ele.attrib, ele.nsmap
+            mock.ANY, node.meta.vars[2], "text", "tail", node.attrs, node.ns_map
         )
-        mock_bind_mixed_content.assert_called_once_with(mock.ANY, meta.vars[2], 0, pool)
+        mock_bind_mixed_content.assert_called_once_with(
+            mock.ANY, node.meta.vars[2], 0, pool
+        )
 
     @mock.patch.object(ParserUtils, "parse_xsi_type", return_value="foo")
     @mock.patch.object(XmlContext, "fetch")
     def test_next_node_when_given_qname_matches_dataclass_var(
         self, mock_ctx_fetch, mock_parse_xsi_type
     ):
-        ele = Element("a")
-        ctx = XmlContext()
-        cfg = ParserConfig()
         var = XmlElement(name="a", qname="a", types=[Foo], dataclass=True)
         meta = XmlMeta(
             name="foo",
@@ -172,19 +176,25 @@ class ElementNodeTests(TestCase):
         namespace = meta.namespace
         mock_ctx_fetch.return_value = replace(meta)
         mock_parse_xsi_type.return_value = xsi_type
-        node = ElementNode(position=0, meta=meta, config=cfg)
+        node = ElementNode(
+            position=0,
+            meta=meta,
+            context=self.context,
+            config=ParserConfig(),
+            attrs={},
+            ns_map={},
+        )
 
-        actual = node.next_node(ele, 10, ctx)
+        attrs = {"a": "b"}
+        ns_map = {"ns0": "xsdata"}
+        actual = node.next_node("a", attrs, ns_map, 10)
         self.assertIsInstance(actual, ElementNode)
         self.assertEqual(10, actual.position)
         self.assertIs(mock_ctx_fetch.return_value, actual.meta)
-        mock_parse_xsi_type.assert_called_once_with(ele.attrib, ele.nsmap)
+        mock_parse_xsi_type.assert_called_once_with(attrs, ns_map)
         mock_ctx_fetch.assert_called_once_with(var.clazz, namespace, xsi_type)
 
     def test_next_node_when_given_qname_matches_var_clazz_union(self):
-        ele = Element("a")
-        ctx = XmlContext()
-        cfg = ParserConfig()
         var = XmlElement(name="a", qname="a", types=[Foo, FooMixed], dataclass=True)
         meta = XmlMeta(
             name="foo",
@@ -194,18 +204,24 @@ class ElementNodeTests(TestCase):
             nillable=False,
             vars=[var],
         )
-        node = ElementNode(position=0, meta=meta, config=cfg)
-        actual = node.next_node(ele, 10, ctx)
+        node = ElementNode(
+            position=0,
+            meta=meta,
+            context=self.context,
+            config=ParserConfig(),
+            attrs={},
+            ns_map={},
+        )
+
+        attrs = {"a": "b"}
+        ns_map = {"ns0": "xsdata"}
+        actual = node.next_node("a", attrs, ns_map, 10)
 
         self.assertIsInstance(actual, UnionNode)
         self.assertEqual(10, actual.position)
         self.assertIs(var, actual.var)
-        self.assertIs(ctx, actual.ctx)
 
     def test_next_node_when_given_qname_matches_any_element_var(self):
-        ele = Element("a")
-        ctx = XmlContext()
-        cfg = ParserConfig()
         var = XmlWildcard(name="a", qname="a", types=[], dataclass=False)
         meta = XmlMeta(
             name="foo",
@@ -215,17 +231,24 @@ class ElementNodeTests(TestCase):
             nillable=False,
             vars=[var],
         )
-        node = ElementNode(position=0, meta=meta, config=cfg)
+        node = ElementNode(
+            position=0,
+            meta=meta,
+            context=self.context,
+            config=ParserConfig(),
+            attrs={},
+            ns_map={},
+        )
 
-        actual = node.next_node(ele, 10, ctx)
+        attrs = {"a": "b"}
+        ns_map = {"ns0": "xsdata"}
+        actual = node.next_node("a", attrs, ns_map, 10)
+
         self.assertIsInstance(actual, WildcardNode)
         self.assertEqual(10, actual.position)
         self.assertEqual(var, actual.var)
 
     def test_next_node_when_given_qname_matches_primitive_var(self):
-        ele = Element("a")
-        ctx = XmlContext()
-        cfg = ParserConfig()
         var = XmlText(name="a", qname="a", types=[int], default=100)
         meta = XmlMeta(
             name="foo",
@@ -235,113 +258,136 @@ class ElementNodeTests(TestCase):
             nillable=False,
             vars=[var],
         )
-        node = ElementNode(position=0, meta=meta, config=cfg)
+        node = ElementNode(
+            position=0,
+            meta=meta,
+            context=self.context,
+            config=ParserConfig(),
+            attrs={},
+            ns_map={},
+        )
 
-        actual = node.next_node(ele, 10, ctx)
+        attrs = {"a": "b"}
+        ns_map = {"ns0": "xsdata"}
+        actual = node.next_node("a", attrs, ns_map, 10)
+
         self.assertIsInstance(actual, PrimitiveNode)
-        self.assertEqual(10, actual.position)
         self.assertEqual(var, actual.var)
+        self.assertEqual(ns_map, actual.ns_map)
 
     def test_next_node_when_given_qname_does_not_match_any_var(self):
-        ele = Element("nope")
-        ctx = XmlContext()
-        cfg = ParserConfig()
         meta = XmlMeta(
             name="foo", clazz=None, qname="foo", source_qname="foo", nillable=False,
         )
-        node = ElementNode(position=0, meta=meta, config=cfg)
+        node = ElementNode(
+            position=0,
+            meta=meta,
+            context=self.context,
+            config=ParserConfig(),
+            attrs={},
+            ns_map={},
+        )
+
+        attrs = {"a": "b"}
+        ns_map = {"ns0": "xsdata"}
 
         with self.assertRaises(ParserError) as cm:
-            node.next_node(ele, 10, ctx)
+            node.next_node("unknown", attrs, ns_map, 10)
 
-        self.assertEqual("Unknown property foo:nope", str(cm.exception))
+        self.assertEqual("Unknown property foo:unknown", str(cm.exception))
 
     def test_next_node_when_config_fail_on_unknown_properties_is_false(self):
-        ele = Element("nope")
-        ctx = XmlContext()
-        cfg = ParserConfig(fail_on_unknown_properties=False)
         meta = XmlMeta(
             name="foo", clazz=None, qname="foo", source_qname="foo", nillable=False,
         )
-        node = ElementNode(position=0, meta=meta, config=cfg)
-        actual = node.next_node(ele, 10, ctx)
-        self.assertEqual(SkipNode(position=10), actual)
+        node = ElementNode(
+            position=0,
+            meta=meta,
+            context=self.context,
+            config=ParserConfig(fail_on_unknown_properties=False),
+            attrs={},
+            ns_map={},
+        )
 
-
-class RootNodeTests(TestCase):
-    def test_next_node_return_self_on_root_element(self):
-        ele = Element("foo")
-        ctx = XmlContext()
-        cfg = ParserConfig()
-        meta = ctx.build(Foo)
-        node = RootNode(position=0, meta=meta, config=cfg)
-        self.assertIs(node, node.next_node(ele, 0, ctx))
-
-    def test_next_node_return_next_node(self):
-        root = Element("a")
-        ele = SubElement(root, "b")
-
-        ctx = XmlContext()
-        cfg = ParserConfig()
-        meta = ctx.build(Foo)
-        node = RootNode(position=0, meta=meta, config=cfg)
-        actual = node.next_node(ele, 0, ctx)
-
-        self.assertIsInstance(actual, PrimitiveNode)
-        self.assertIsNot(actual, node)
+        self.assertEqual(SkipNode(), node.next_node("unknown", {}, {}, 10))
 
 
 class WildcardNodeTests(TestCase):
     @mock.patch.object(ParserUtils, "fetch_any_children")
-    def test_parse_element(self, mock_fetch_any_children):
-        ele = Element("foo")
-        ele.text = "\n "
-        ele.tail = "bar"
-        ele.set("id", "1")
+    def test_assemble(self, mock_fetch_any_children):
+        text = "\n "
+        tail = "bar"
+        attrs = {"id": "1"}
+        ns_map = {"ns0": "xsdata"}
         mock_fetch_any_children.return_value = ["a", "b"]
 
         generic = AnyElement(
-            qname=ele.tag,
+            qname="foo",
             text=None,
             tail="bar",
-            ns_map=ele.nsmap,
-            attributes={"id": "1"},
+            ns_map=ns_map,
+            attributes=attrs,
             children=["a", "b"],
         )
 
         var = XmlText(name="foo", qname="a")
-        node = WildcardNode(position=0, var=var)
-        actual = node.parse_element(ele, [1, 2, 3])
+        node = WildcardNode(position=0, var=var, attrs=attrs, ns_map=ns_map)
+        actual = node.assemble("foo", text, tail, [1, 2, 3])
 
         self.assertEqual((var.qname, generic), actual)
         mock_fetch_any_children.assert_called_once_with(0, [1, 2, 3])
 
     def test_next_node(self):
-        ele = Element("foo")
+        attrs = {"id": "1"}
+        ns_map = {"ns0": "xsdata"}
         var = XmlText(name="foo", qname="foo")
-        node = WildcardNode(position=0, var=var)
-        actual = node.next_node(ele, 10, XmlContext())
+        node = WildcardNode(position=0, var=var, attrs={}, ns_map={})
+        actual = node.next_node("foo", attrs, ns_map, 10)
 
         self.assertIsInstance(actual, WildcardNode)
         self.assertEqual(10, actual.position)
         self.assertEqual(var, actual.var)
+        self.assertEqual(ns_map, actual.ns_map)
+        self.assertEqual(attrs, actual.attrs)
 
 
 class UnionNodeTests(TestCase):
-    def test_next_node(self):
-        ele = Element("foo")
+    def test__post_init(self):
+        attrs = {"id": "1"}
+        ns_map = {"ns0": "xsdata"}
         ctx = XmlContext()
         var = XmlText(name="foo", qname="foo")
-        node = UnionNode(position=0, var=var, ctx=ctx)
-        self.assertEqual(SkipNode(position=2), node.next_node(ele, 2, ctx))
+        node = UnionNode(position=0, var=var, context=ctx, attrs=attrs, ns_map=ns_map)
 
-    def test_parse_element_returns_best_matching_dataclass(self):
-        root = Element("root")
-        item = SubElement(root, "item")
-        item.set("a", "1")
-        item.set("b", "2")
-        item.text = "foo"
+        self.assertEqual(0, node.level)
+        self.assertEqual(attrs, node.attrs)
+        self.assertIsNot(attrs, node.attrs)
 
+    def test_next_node(self):
+        attrs = {"id": "1"}
+        ns_map = {"ns0": "xsdata"}
+        ctx = XmlContext()
+        var = XmlText(name="foo", qname="foo")
+        node = UnionNode(position=0, var=var, context=ctx, attrs={}, ns_map={})
+        self.assertEqual(node, node.next_node("foo", attrs, ns_map, 10))
+
+        self.assertEqual(1, node.level)
+        self.assertEqual([("start", "foo", attrs, ns_map)], node.events)
+        self.assertIsNot(attrs, node.events[0][2])
+
+    def test_assemble_appends_end_event_when_level_not_zero(self):
+        ctx = XmlContext()
+        var = XmlText(name="foo", qname="foo")
+        node = UnionNode(position=0, var=var, context=ctx, attrs={}, ns_map={})
+        node.level = 1
+
+        qname, obj = node.assemble("bar", "text", "tail", [])
+        self.assertIsNone(qname)
+        self.assertIsNone(obj)
+        self.assertEqual(0, node.level)
+        self.assertEqual([("end", "bar", "text", "tail")], node.events)
+
+    def test_assemble_returns_best_matching_dataclass(self):
         @dataclass
         class Item:
             value: str = field()
@@ -358,17 +404,18 @@ class UnionNodeTests(TestCase):
 
         ctx = XmlContext()
         meta = ctx.build(Root)
+        var = meta.vars[0]
+        attrs = {"a": "1", "b": 2}
+        ns_map = {}
+        node = UnionNode(position=0, var=var, context=ctx, attrs=attrs, ns_map=ns_map)
 
-        node = UnionNode(position=0, var=meta.vars[0], ctx=ctx)
-        qname, obj = node.parse_element(item, [])
+        qname, obj = node.assemble("item", "foo", None, [])
         self.assertIsInstance(obj, Item)
         self.assertEqual(1, obj.a)
         self.assertEqual(2, obj.b)
         self.assertEqual("foo", obj.value)
 
-    def test_parse_element_raises_parser_error_on_failure(self):
-        root = Element("root")
-
+    def test_assemble_raises_parser_error_on_failure(self):
         @dataclass
         class Item:
             value: str = field()
@@ -379,52 +426,46 @@ class UnionNodeTests(TestCase):
 
         ctx = XmlContext()
         meta = ctx.build(Root)
+        meta.vars[0]
 
-        node = UnionNode(position=0, var=meta.vars[0], ctx=ctx)
+        node = UnionNode(position=0, var=meta.vars[0], context=ctx, attrs={}, ns_map={})
 
         with self.assertRaises(ParserError) as cm:
-            node.parse_element(root, [])
+            node.assemble("item", None, None, [])
 
         self.assertEqual("Failed to parse union node: item", str(cm.exception))
 
 
 class PrimitiveNodeTests(TestCase):
     @mock.patch.object(ParserUtils, "parse_value")
-    def test_parse_element(self, mock_parse_value):
+    def test_assemble(self, mock_parse_value):
         mock_parse_value.return_value = 13
         var = XmlText(name="foo", qname="foo", default=100)
-        node = PrimitiveNode(position=0, var=var)
-        ele = Element("foo", nsmap={"foo": "bar"})
-        ele.text = "13"
+        ns_map = {"foo": "bar"}
+        node = PrimitiveNode(var=var, ns_map=ns_map)
 
-        self.assertEqual(("foo", 13), node.parse_element(ele, []))
+        self.assertEqual(("foo", 13), node.assemble("foo", "13", "Impossible", []))
         mock_parse_value.assert_called_once_with(
-            ele.text, var.types, var.default, ele.nsmap, var.tokens
+            "13", var.types, var.default, ns_map, var.tokens
         )
 
     def test_next_node(self):
-        ele = Element("foo")
-        node = PrimitiveNode(position=0, var=XmlText(name="foo", qname="foo"))
+        node = PrimitiveNode(var=XmlText(name="foo", qname="foo"), ns_map={})
 
         with self.assertRaises(XmlContextError):
-            node.next_node(ele, 10, XmlContext())
+            node.next_node("foo", {}, {}, 0)
 
 
 class SKipNodeTests(TestCase):
     def test_next_node(self):
-        ele = Element("foo")
-        node = SkipNode(position=0)
-        expected = SkipNode(position=1)
+        node = SkipNode()
+        actual = node.next_node("foo", {}, {}, 1)
 
-        self.assertEqual(expected, node.next_node(ele, 1, XmlContext()))
+        self.assertIs(node, actual)
 
-    def test_parse_element(self):
-        ele = Element("foo")
-        node = SkipNode(position=0)
-        objects = []
-
-        self.assertEqual((None, None), node.parse_element(ele, objects))
-        self.assertEqual(0, len(objects))
+    def test_assemble(self):
+        node = SkipNode()
+        self.assertEqual((None, None), node.assemble("foo", None, None, []))
 
 
 class NodeParserTests(TestCase):

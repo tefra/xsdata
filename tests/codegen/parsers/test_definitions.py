@@ -1,7 +1,5 @@
 from unittest import TestCase
 
-from lxml.etree import Element
-
 from tests import fixtures_dir
 from xsdata.codegen.parsers import DefinitionsParser
 from xsdata.models.wsdl import Definitions
@@ -26,19 +24,18 @@ class DefinitionsParserTests(TestCase):
         self.assertEqual(8, len(definitions.messages))
 
     def test_end_definitions(self):
-        el = Element("just")
         parser = DefinitionsParser()
         definitions = Definitions(
             imports=[Import(location="../foo.xsd"), Import(location="bar.xsd")]
         )
 
-        parser.end_definitions(definitions, el)
+        parser.end_definitions(definitions)
         self.assertEqual("bar.xsd", definitions.imports[1].location)
 
         parser.location = "file://a/b/services/parent.wsdl"
-        parser.end_definitions(definitions, el)
+        parser.end_definitions(definitions)
         self.assertEqual("file://a/b/foo.xsd", definitions.imports[0].location)
         self.assertEqual("file://a/b/services/bar.xsd", definitions.imports[1].location)
 
         # Update only Definitions instances
-        parser.end_definitions("foo", el)
+        parser.end_definitions("foo")

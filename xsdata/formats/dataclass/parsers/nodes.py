@@ -9,11 +9,7 @@ from typing import List
 from typing import Optional
 from typing import Tuple
 from typing import Type
-from typing import Union
 
-from lxml.etree import _Element
-from lxml.etree import _ElementTree
-from lxml.etree import Element
 from lxml.etree import iterwalk
 
 from xsdata.exceptions import ParserError
@@ -276,7 +272,7 @@ class UnionNode(XmlNode):
     def parse_class(self, clazz: Type[T]) -> Optional[T]:
         """Initialize a new XmlParser and try to parse the given element."""
         try:
-            parser = ReplayParser(context=self.context)
+            parser = EventParser(context=self.context)
             return parser.parse(self.events, clazz)
         except Exception:
             return None
@@ -342,9 +338,9 @@ class SkipNode(XmlNode):
 
 
 @dataclass
-class NodeParser:
+class NodeParserMixin:
     """
-    Xml parsing and binding for dataclasses.
+    Xml node data binding mixin.
 
     :param config: Parser configuration
     :param context: Model metadata builder
@@ -354,108 +350,6 @@ class NodeParser:
     config: ParserConfig = field(default_factory=ParserConfig)
     context: XmlContext = field(default_factory=XmlContext)
     namespaces: Namespaces = field(init=False, default_factory=Namespaces)
-
-    def parse(self, source: Union[_Element, _ElementTree], clazz: Type[T]) -> T:
-        events = EventType.START, EventType.END, EventType.START_NS
-        context = iterwalk(source, events=events)
-        return self.parse_context(context, clazz)
-
-    def parse_context(self, context: Iterable, clazz: Type[T]) -> T:
-        """
-        Dispatch elements to handlers as they arrive and are fully parsed.
-
-        :raises ParserError: When the requested type doesn't match the result object
-        """
-        obj = None
-        objects: List[Parsed] = []
-        queue: XmlNodes = []
-
-        self.namespaces.clear()
-
-        for event, element in context:
-            if event == EventType.START:
-                self.start(element, queue, objects, clazz)
-            elif event == EventType.END:
-                obj = self.end(element, queue, objects)
-            elif event == EventType.START_NS:
-                self.add_namespace(element)
-
-        if not obj:
-            raise ParserError(f"Failed to create target class `{clazz.__name__}`")
-
-        return obj
-
-    def add_namespace(self, namespace: Tuple):
-        """Add the given namespace in the registry."""
-        prefix, uri = namespace
-        self.namespaces.add(uri, prefix)
-
-    def start(
-        self, element: Element, queue: XmlNodes, objects: List[Parsed], clazz: Type[T]
-    ):
-        """Queue the next xml node for parsing based on the given element
-        qualified name."""
-        try:
-            item = queue[-1]
-            position = len(objects)
-            child = item.next_node(element.tag, element.attrib, element.nsmap, position)
-        except IndexError:
-            meta = self.context.build(clazz)
-            child = ElementNode(
-                position=0,
-                meta=meta,
-                config=self.config,
-                attrs=element.attrib,
-                ns_map=element.nsmap,
-                context=self.context,
-            )
-
-        queue.append(child)
-
-    def end(self, element: Element, queue: XmlNodes, objects: List[Parsed]) -> Any:
-        """
-        Use the last xml node to parse the given element and bind any child
-        objects.
-
-        :return: Any: A dataclass instance or a python primitive value or None
-        """
-        item = queue.pop()
-        qname, obj = item.assemble(element.tag, element.text, element.tail, objects)
-
-        if qname is not None:
-            objects.append((qname, obj))
-
-        return obj
-
-
-@dataclass
-class ReplayParser:
-    """Xml parsing and binding for dataclasses."""
-
-    config: ParserConfig = field(default_factory=ParserConfig)
-    context: XmlContext = field(default_factory=XmlContext)
-    namespaces: Namespaces = field(init=False, default_factory=Namespaces)
-
-    def parse(self, source: List, clazz: Type[T]) -> T:
-        obj = None
-        objects: List[Parsed] = []
-        queue: XmlNodes = []
-
-        self.namespaces.clear()
-
-        for event in source:
-            if event[0] == EventType.START:
-                _, qname, attrs, ns_map = event
-                position = len(objects)
-                self.start(queue, qname, attrs, ns_map, position, clazz)
-            elif event[0] == EventType.END:
-                _, qname, text, tail = event
-                obj = self.end(queue, qname, text, tail, objects)
-
-        if not obj:
-            raise ParserError(f"Failed to create target class `{clazz.__name__}`")
-
-        return obj
 
     def start(
         self,
@@ -505,3 +399,73 @@ class ReplayParser:
             objects.append(result)
 
         return result[1]
+
+
+@dataclass
+class EventParser(NodeParserMixin):
+    """Basic event based parser."""
+
+    def parse(self, source: Iterable, clazz: Type[T]) -> T:
+        obj = None
+        objects: List[Parsed] = []
+        queue: XmlNodes = []
+
+        self.namespaces.clear()
+
+        for event in source:
+            if event[0] == EventType.START:
+                _, qname, attrs, ns_map = event
+                position = len(objects)
+                self.start(queue, qname, attrs, ns_map, position, clazz)
+            elif event[0] == EventType.END:
+                _, qname, text, tail = event
+                obj = self.end(queue, qname, text, tail, objects)
+
+        if not obj:
+            raise ParserError(f"Failed to create target class `{clazz.__name__}`")
+
+        return obj
+
+
+@dataclass
+class ElementParser(NodeParserMixin):
+    """Event based parser for lxml element tree."""
+
+    def parse(self, source: Any, clazz: Type[T]) -> T:
+        events = EventType.START, EventType.END, EventType.START_NS
+        context = iterwalk(source, events=events)
+        return self.parse_context(context, clazz)
+
+    def parse_context(self, context: Iterable, clazz: Type[T]) -> T:
+        """
+        Dispatch elements to handlers as they arrive and are fully parsed.
+
+        :raises ParserError: When the requested type doesn't match the result object
+        """
+        obj = None
+        objects: List[Parsed] = []
+        queue: XmlNodes = []
+
+        self.namespaces.clear()
+
+        for event, element in context:
+            if event == EventType.START:
+                position = len(objects)
+                self.start(
+                    queue, element.tag, element.attrib, element.nsmap, position, clazz
+                )
+            elif event == EventType.END:
+                obj = self.end(queue, element.tag, element.text, element.tail, objects)
+                element.clear()
+            elif event == EventType.START_NS:
+                self.add_namespace(element)
+
+        if not obj:
+            raise ParserError(f"Failed to create target class `{clazz.__name__}`")
+
+        return obj
+
+    def add_namespace(self, namespace: Tuple):
+        """Add the given namespace in the registry."""
+        prefix, uri = namespace
+        self.namespaces.add(uri, prefix)

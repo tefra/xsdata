@@ -54,22 +54,23 @@ class SchemaParserTests(TestCase):
         self.assertIsInstance(schema, Schema)
 
         self.assertEqual(expected_namespaces, schema.simple_types[0].ns_map)
-        self.assertEqual(3, schema.simple_types[0].index)
-        self.assertEqual(4, schema.simple_types[0].annotation.index)
-        self.assertEqual(5, schema.simple_types[0].annotation.documentations[0].index)
+        self.assertEqual(2, schema.simple_types[0].index)
+        self.assertEqual(3, schema.simple_types[0].annotation.index)
+        self.assertEqual(4, schema.simple_types[0].annotation.documentations[0].index)
 
     def test_start_schema(self):
-        element = etree.Element("schema")
-        self.parser.start_schema(element)
+        self.parser.start_schema({})
 
         self.assertIsNone(self.parser.element_form)
         self.assertIsNone(self.parser.attribute_form)
         self.assertIsNone(self.parser.default_attributes)
 
-        element.set("elementFormDefault", "qualified")
-        element.set("attributeFormDefault", "unqualified")
-        element.set("defaultAttributes", "tns:attr")
-        self.parser.start_schema(element)
+        attrs = {
+            "elementFormDefault": "qualified",
+            "attributeFormDefault": "unqualified",
+            "defaultAttributes": "tns:attr",
+        }
+        self.parser.start_schema(attrs)
 
         self.assertEqual("qualified", self.parser.element_form)
         self.assertEqual("unqualified", self.parser.attribute_form)
@@ -113,35 +114,25 @@ class SchemaParserTests(TestCase):
         for child_attribute in schema.attributes:
             self.assertEqual(FormType.QUALIFIED, child_attribute.form)
 
-    @mock.patch.object(SchemaParser, "set_namespace_map")
-    def test_set_schema_namespaces(self, mock_set_namespace_map):
+    def test_set_schema_namespaces(self):
         schema = Schema()
-        element = etree.Element("schema")
 
-        self.parser.set_schema_namespaces(schema, element)
+        self.parser.set_schema_namespaces(schema)
         self.assertIsNone(schema.target_namespace)
 
         self.parser.target_namespace = "bar"
-        self.parser.set_schema_namespaces(schema, element)
+        self.parser.set_schema_namespaces(schema)
         self.assertEqual("bar", schema.target_namespace)
 
         schema.target_namespace = "foo"
-        self.parser.set_schema_namespaces(schema, element)
+        self.parser.set_schema_namespaces(schema)
         self.assertEqual("foo", schema.target_namespace)
-
-        mock_set_namespace_map.assert_has_calls(
-            [
-                mock.call(element, schema),
-                mock.call(element, schema),
-                mock.call(element, schema),
-            ]
-        )
 
     def test_set_namespace_map(self):
         schema = Schema()
-        element = etree.Element("schema")
+        ns_map = {}
 
-        self.parser.set_namespace_map(element, schema)
+        self.parser.set_namespace_map(schema, ns_map)
 
         expected = {
             "xlink": "http://www.w3.org/1999/xlink",
@@ -151,9 +142,10 @@ class SchemaParserTests(TestCase):
         }
         self.assertEqual(expected, schema.ns_map)
 
-        element = etree.Element(
-            "schema", nsmap={"foo": "bar", "not": "http://www.w3.org/2001/XMLSchema"}
-        )
+        self.parser.set_namespace_map(schema, None)
+        self.assertEqual(expected, schema.ns_map)
+
+        ns_map = {"foo": "bar", "not": "http://www.w3.org/2001/XMLSchema"}
         schema = Schema()
         expected = {
             "foo": "bar",
@@ -163,11 +155,11 @@ class SchemaParserTests(TestCase):
             "xsi": "http://www.w3.org/2001/XMLSchema-instance",
         }
 
-        self.parser.set_namespace_map(element, schema)
+        self.parser.set_namespace_map(schema, ns_map)
         self.assertEqual(expected, schema.ns_map)
 
         foo = []
-        self.parser.set_namespace_map(element, foo)
+        self.parser.set_namespace_map(foo, ns_map)
         self.assertFalse(hasattr(foo, "ns_map"))
 
     def test_add_default_imports(self):
@@ -257,32 +249,30 @@ class SchemaParserTests(TestCase):
 
     def test_end_attribute(self):
         attribute = Attribute()
-        element = etree.Element("uno")
 
-        self.parser.end_attribute(attribute, element)
+        self.parser.end_attribute(attribute)
         self.assertIsNone(attribute.form)
 
         self.parser.attribute_form = "qualified"
-        self.parser.end_attribute(attribute, element)
+        self.parser.end_attribute(attribute)
         self.assertEqual(FormType.QUALIFIED, attribute.form)
 
         obj = Element()
-        self.parser.end_attribute(obj, element)
+        self.parser.end_attribute(obj)
         self.assertIsNone(obj.form)
 
     def test_end_complex_type(self):
         complex_type = ComplexType()
         not_complex_type = Element()
-        element = etree.Element("uno")
 
-        self.parser.end_complex_type(not_complex_type, element)
-        self.parser.end_complex_type(complex_type, element)
+        self.parser.end_complex_type(not_complex_type)
+        self.parser.end_complex_type(complex_type)
 
         self.assertEqual(0, len(complex_type.attribute_groups))
         self.assertIsNone(complex_type.open_content)
 
         self.parser.default_attributes = "tns:attrs"
-        self.parser.end_complex_type(complex_type, element)
+        self.parser.end_complex_type(complex_type)
 
         expected = AttributeGroup(ref="tns:attrs")
         self.assertEqual([expected], complex_type.attribute_groups)
@@ -291,110 +281,104 @@ class SchemaParserTests(TestCase):
         default_open_content = DefaultOpenContent()
         self.parser.default_attributes = None
         self.parser.default_open_content = default_open_content
-        self.parser.end_complex_type(complex_type, element)
+        self.parser.end_complex_type(complex_type)
         self.assertIs(default_open_content, complex_type.open_content)
 
         open_content = OpenContent()
         complex_type.open_content = open_content
-        self.parser.end_complex_type(complex_type, element)
+        self.parser.end_complex_type(complex_type)
         self.assertIs(open_content, complex_type.open_content)
 
         obj = Extension()
-        self.parser.end_complex_type(obj, element)
+        self.parser.end_complex_type(obj)
         self.assertIsNone(obj.open_content)
 
     def test_end_default_open_content(self):
         default_open_content = DefaultOpenContent()
         default_open_content.any = Any()
-        element = etree.Element("uno")
 
-        self.parser.end_default_open_content(default_open_content, element)
+        self.parser.end_default_open_content(default_open_content)
         self.assertEqual(default_open_content, self.parser.default_open_content)
         self.assertEqual(0, default_open_content.any.index)
 
         default_open_content.mode = Mode.SUFFIX
-        self.parser.end_default_open_content(default_open_content, element)
+        self.parser.end_default_open_content(default_open_content)
         self.assertEqual(sys.maxsize, default_open_content.any.index)
 
         obj = ComplexType()
-        self.parser.end_default_open_content(obj, element)
+        self.parser.end_default_open_content(obj)
         self.assertIsNone(obj.open_content)
 
     def test_end_Element(self):
         obj = Element()
-        element = etree.Element("uno")
-
-        self.parser.end_element(obj, element)
+        self.parser.end_element(obj)
         self.assertIsNone(obj.form)
 
         self.parser.element_form = "qualified"
-        self.parser.end_element(obj, element)
+        self.parser.end_element(obj)
         self.assertEqual(FormType.QUALIFIED, obj.form)
 
         obj = Attribute()
-        self.parser.end_element(obj, element)
+        self.parser.end_element(obj)
         self.assertIsNone(obj.form)
 
     def test_end_extension(self):
         extension = Extension()
         not_extension = Element()
-        element = etree.Element("uno")
 
-        self.parser.end_extension(not_extension, element)
-        self.parser.end_extension(extension, element)
+        self.parser.end_extension(not_extension)
+        self.parser.end_extension(extension)
 
         default_open_content = DefaultOpenContent()
         self.parser.default_open_content = default_open_content
-        self.parser.end_extension(extension, element)
+        self.parser.end_extension(extension)
 
         self.assertIs(default_open_content, extension.open_content)
 
         open_content = OpenContent()
         extension.open_content = open_content
-        self.parser.end_extension(extension, element)
+        self.parser.end_extension(extension)
         self.assertIs(open_content, extension.open_content)
 
         obj = ComplexType()
-        self.parser.end_extension(obj, element)
+        self.parser.end_extension(obj)
         self.assertIsNone(obj.open_content)
 
     def test_end_open_content(self):
         open_content = OpenContent()
         open_content.any = Any()
-        element = etree.Element("uno")
 
-        self.parser.end_open_content(open_content, element)
+        self.parser.end_open_content(open_content)
         self.assertEqual(0, open_content.any.index)
 
         open_content.mode = Mode.SUFFIX
-        self.parser.end_open_content(open_content, element)
+        self.parser.end_open_content(open_content)
         self.assertEqual(sys.maxsize, open_content.any.index)
 
         obj = All(any=Any())
-        self.parser.end_open_content(obj, element)
+        self.parser.end_open_content(obj)
         self.assertEqual(0, obj.any.index)
 
     def test_end_restriction(self):
         restriction = Restriction()
         not_restriction = Element()
-        element = etree.Element("uno")
 
-        self.parser.end_restriction(not_restriction, element)
-        self.parser.end_restriction(restriction, element)
+        self.parser.end_restriction(not_restriction)
+        self.parser.end_restriction(restriction)
 
         default_open_content = DefaultOpenContent()
         self.parser.default_open_content = default_open_content
-        self.parser.end_restriction(restriction, element)
+        self.parser.end_restriction(restriction)
 
         self.assertIs(default_open_content, restriction.open_content)
 
         open_content = OpenContent()
         restriction.open_content = open_content
-        self.parser.end_restriction(restriction, element)
+        self.parser.end_restriction(restriction)
         self.assertIs(open_content, restriction.open_content)
 
         obj = ComplexType()
-        self.parser.end_open_content(obj, element)
+        self.parser.end_open_content(obj)
         self.assertIsNone(obj.open_content)
 
     @mock.patch.object(SchemaParser, "resolve_schemas_locations")
@@ -409,12 +393,11 @@ class SchemaParserTests(TestCase):
         mock_resolve_schemas_locations,
     ):
         schema = Schema()
-        element = Element("schema")
 
-        self.parser.end_schema(schema, element)
-        self.parser.end_schema(ComplexType(), element)
+        self.parser.end_schema(schema)
+        self.parser.end_schema(ComplexType())
 
         mock_set_schema_forms.assert_called_once_with(schema)
-        mock_set_schema_namespaces.assert_called_once_with(schema, element)
+        mock_set_schema_namespaces.assert_called_once_with(schema)
         mock_add_default_imports.assert_called_once_with(schema)
         mock_resolve_schemas_locations.assert_called_once_with(schema)

@@ -3,16 +3,16 @@ from dataclasses import field
 from typing import Any
 from typing import Dict
 from typing import List
+from typing import Optional
 from typing import Type
 
-from lxml.etree import Element
 from lxml.etree import iterparse
 from lxml.etree import iterwalk
 from lxml.etree import parse
 
 from xsdata.formats.bindings import AbstractParser
 from xsdata.formats.bindings import T
-from xsdata.formats.dataclass.parsers.nodes import NodeParser
+from xsdata.formats.dataclass.parsers.nodes import ElementParser
 from xsdata.formats.dataclass.parsers.nodes import Parsed
 from xsdata.formats.dataclass.parsers.nodes import XmlNodes
 from xsdata.models.enums import EventType
@@ -20,7 +20,7 @@ from xsdata.utils import text
 
 
 @dataclass
-class XmlParser(NodeParser, AbstractParser):
+class XmlParser(ElementParser, AbstractParser):
     """Xml parsing and binding for dataclasses."""
 
     event_names: Dict = field(init=False, default_factory=dict)
@@ -39,14 +39,27 @@ class XmlParser(NodeParser, AbstractParser):
         return self.parse_context(ctx, clazz)
 
     def start(
-        self, element: Element, queue: XmlNodes, objects: List[Parsed], clazz: Type[T]
+        self,
+        queue: XmlNodes,
+        qname: str,
+        attrs: Dict,
+        ns_map: Dict,
+        position: int,
+        clazz: Type[T],
     ):
         """Queue the next xml node for parsing based on the given element
         qualified name."""
-        super().start(element, queue, objects, clazz)
-        self.emit_event(EventType.START, element.tag, element=element)
+        super().start(queue, qname, attrs, ns_map, position, clazz)
+        self.emit_event(EventType.START, qname, attrs=attrs)
 
-    def end(self, element: Element, queue: XmlNodes, objects: List[Parsed]) -> Any:
+    def end(
+        self,
+        queue: XmlNodes,
+        qname: str,
+        text: Optional[str],
+        tail: Optional[str],
+        objects: List[Parsed],
+    ) -> Any:
         """
         Use the last xml node to parse the given element and bind any child
         objects.
@@ -54,10 +67,9 @@ class XmlParser(NodeParser, AbstractParser):
         :return: Any: A dataclass instance or a python primitive value or None
         """
 
-        obj = super().end(element, queue, objects)
+        obj = super().end(queue, qname, text, tail, objects)
         if obj:
-            self.emit_event(EventType.END, element.tag, obj=obj, element=element)
-            element.clear()
+            self.emit_event(EventType.END, qname, obj=obj)
 
         return obj
 

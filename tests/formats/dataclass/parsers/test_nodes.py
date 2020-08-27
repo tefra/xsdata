@@ -20,7 +20,8 @@ from xsdata.formats.dataclass.models.elements import XmlWildcard
 from xsdata.formats.dataclass.models.generics import AnyElement
 from xsdata.formats.dataclass.parsers.config import ParserConfig
 from xsdata.formats.dataclass.parsers.nodes import ElementNode
-from xsdata.formats.dataclass.parsers.nodes import NodeParser
+from xsdata.formats.dataclass.parsers.nodes import ElementParser
+from xsdata.formats.dataclass.parsers.nodes import EventParser
 from xsdata.formats.dataclass.parsers.nodes import PrimitiveNode
 from xsdata.formats.dataclass.parsers.nodes import SkipNode
 from xsdata.formats.dataclass.parsers.nodes import UnionNode
@@ -468,14 +469,28 @@ class SKipNodeTests(TestCase):
         self.assertEqual((None, None), node.assemble("foo", None, None, []))
 
 
-class NodeParserTests(TestCase):
+class ElementParserTests(TestCase):
     def test_parse_from_tree(self):
         path = fixtures_dir.joinpath("books/books.xml")
         tree = etree.parse(path.resolve().as_uri())
 
-        parser = NodeParser()
+        parser = ElementParser()
         actual = parser.parse(tree, Books)
         self.assertEqual(2, len(actual.book))
 
-        # The tree will not be modified
-        self.assertEqual(2, len(tree.getroot()))
+        # The tree will cleared
+        self.assertEqual(0, len(tree.getroot()))
+
+    def test_parse_context_unhandled_event(self):
+        context = [("escape", None)]
+        with self.assertRaises(ParserError):
+            parser = ElementParser()
+            parser.parse_context(context, Books)
+
+
+class EventParserTests(TestCase):
+    def test_parse_unhandled_event(self):
+        source = [("escape", None)]
+        with self.assertRaises(ParserError):
+            parser = EventParser()
+            parser.parse(source, Books)

@@ -2,11 +2,11 @@ import sys
 from dataclasses import dataclass
 from dataclasses import field
 from typing import Any
+from typing import Dict
 from typing import List
 from typing import Optional
+from typing import Type
 from urllib.parse import urljoin
-
-from lxml.etree import Element
 
 from xsdata.formats.bindings import T
 from xsdata.formats.dataclass.parsers.nodes import Parsed
@@ -35,6 +35,8 @@ class SchemaParser(XmlParser):
     :param default_open_content:
     """
 
+    index: int = field(default_factory=int)
+    indices: List[int] = field(default_factory=list)
     location: Optional[str] = field(default=None)
     element_form: Optional[FormType] = field(init=False, default=None)
     attribute_form: Optional[FormType] = field(init=False, default=None)
@@ -42,22 +44,43 @@ class SchemaParser(XmlParser):
     default_attributes: Optional[str] = field(default=None)
     default_open_content: Optional[xsd.DefaultOpenContent] = field(default=None)
 
-    def end(self, element: Element, queue: XmlNodes, objects: List[Parsed]) -> Any:
-        """Override parent method to set element index and namespaces map."""
-        obj: Any = super().end(element, queue, objects)
+    def start(
+        self,
+        queue: XmlNodes,
+        qname: str,
+        attrs: Dict,
+        ns_map: Dict,
+        position: int,
+        clazz: Type[T],
+    ):
+        self.index += 1
+        self.indices.append(self.index)
+        super().start(queue, qname, attrs, ns_map, position, clazz)
 
-        self.set_index(element, obj)
-        self.set_namespace_map(element, obj)
+    def end(
+        self,
+        queue: XmlNodes,
+        qname: str,
+        text: Optional[str],
+        tail: Optional[str],
+        objects: List[Parsed],
+    ) -> Any:
+        """Override parent method to set element index and namespaces map."""
+        item = queue[-1]
+        obj: Any = super().end(queue, qname, text, tail, objects)
+
+        self.set_index(obj, self.indices.pop())
+        self.set_namespace_map(obj, getattr(item, "ns_map", None))
 
         return obj
 
-    def start_schema(self, element: Element):
+    def start_schema(self, attrs: Dict):
         """Collect the schema's default form for attributes and elements for
         later usage."""
 
-        self.element_form = element.attrib.get("elementFormDefault", None)
-        self.attribute_form = element.attrib.get("attributeFormDefault", None)
-        self.default_attributes = element.attrib.get("defaultAttributes", None)
+        self.element_form = attrs.get("elementFormDefault", None)
+        self.attribute_form = attrs.get("attributeFormDefault", None)
+        self.default_attributes = attrs.get("defaultAttributes", None)
 
     def set_schema_forms(self, obj: xsd.Schema):
         """
@@ -76,18 +99,21 @@ class SchemaParser(XmlParser):
         for child_attribute in obj.attributes:
             child_attribute.form = FormType.QUALIFIED
 
-    def set_schema_namespaces(self, obj: xsd.Schema, element: Element):
+    def set_schema_namespaces(self, obj: xsd.Schema):
         """Set the given schema's target namespace and add the default
         namespaces if the are missing xsi, xlink, xml, xs."""
         obj.target_namespace = obj.target_namespace or self.target_namespace
 
-        self.set_namespace_map(element, obj)
-
     @staticmethod
-    def set_namespace_map(element: Element, obj: Any):
+    def set_namespace_map(obj: Any, ns_map: Optional[Dict]):
         """Add common namespaces like xml, xsi, xlink if they are missing."""
         if hasattr(obj, "ns_map"):
-            obj.ns_map = {prefix: uri for prefix, uri in element.nsmap.items() if uri}
+
+            if ns_map:
+                obj.ns_map.update(
+                    {prefix: uri for prefix, uri in ns_map.items() if uri}
+                )
+
             ns_list = obj.ns_map.values()
             ns_common = (
                 Namespace.XS,
@@ -100,9 +126,9 @@ class SchemaParser(XmlParser):
             )
 
     @staticmethod
-    def set_index(element: Element, obj: Any):
+    def set_index(obj: Any, index: int):
         if hasattr(obj, "index"):
-            obj.index = element.sourceline
+            obj.index = index
 
     @staticmethod
     def add_default_imports(obj: xsd.Schema):
@@ -148,13 +174,13 @@ class SchemaParser(XmlParser):
         local_path = common_ns.location if common_ns else None
         return local_path if local_path else self.resolve_path(location)
 
-    def end_attribute(self, obj: T, element: Element):
+    def end_attribute(self, obj: T):
         """Assign the schema's default form for attributes if the given
         attribute form is None."""
         if isinstance(obj, xsd.Attribute) and obj.form is None and self.attribute_form:
             obj.form = FormType(self.attribute_form)
 
-    def end_complex_type(self, obj: T, element: Element):
+    def end_complex_type(self, obj: T):
         """Prepend an attribute group reference when default attributes
         apply."""
         if not isinstance(obj, xsd.ComplexType):
@@ -167,7 +193,7 @@ class SchemaParser(XmlParser):
         if not obj.open_content:
             obj.open_content = self.default_open_content
 
-    def end_default_open_content(self, obj: T, element: Element):
+    def end_default_open_content(self, obj: T):
         """Set the instance default open content to be used later as a property
         for all extensions and restrictions."""
         if isinstance(obj, xsd.DefaultOpenContent):
@@ -176,34 +202,34 @@ class SchemaParser(XmlParser):
 
             self.default_open_content = obj
 
-    def end_element(self, obj: T, element: Element):
+    def end_element(self, obj: T):
         """Assign the schema's default form for elements if the given element
         form is None."""
         if isinstance(obj, xsd.Element) and obj.form is None and self.element_form:
             obj.form = FormType(self.element_form)
 
-    def end_extension(self, obj: T, element: Element):
+    def end_extension(self, obj: T):
         """Set the open content if any to the given extension."""
         if isinstance(obj, xsd.Extension) and not obj.open_content:
             obj.open_content = self.default_open_content
 
     @classmethod
-    def end_open_content(cls, obj: T, element: Element):
+    def end_open_content(cls, obj: T):
         """Adjust the index to trick later processors into putting attributes
         derived from this open content last in classes."""
         if isinstance(obj, xsd.OpenContent):
             if obj.any and obj.mode == Mode.SUFFIX:
                 obj.any.index = sys.maxsize
 
-    def end_restriction(self, obj: T, element: Element):
+    def end_restriction(self, obj: T):
         """Set the open content if any to the given restriction."""
         if isinstance(obj, xsd.Restriction) and not obj.open_content:
             obj.open_content = self.default_open_content
 
-    def end_schema(self, obj: T, element: Element):
+    def end_schema(self, obj: T):
         """Normalize various properties for the schema and it's children."""
         if isinstance(obj, xsd.Schema):
             self.set_schema_forms(obj)
-            self.set_schema_namespaces(obj, element)
+            self.set_schema_namespaces(obj)
             self.add_default_imports(obj)
             self.resolve_schemas_locations(obj)

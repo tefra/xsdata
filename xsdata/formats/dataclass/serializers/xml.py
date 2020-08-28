@@ -101,12 +101,33 @@ class XmlSerializer(AbstractSerializer):
             elif var.is_text:
                 namespaces.add(var.namespace)
                 SerializeUtils.set_text(parent, value, namespaces)
+            elif var.mixed:
+                self.render_mixed_content(parent, value, var, namespaces)
             elif var.is_list and isinstance(value, list):
                 self.render_sub_nodes(parent, value, var, namespaces)
             else:
                 self.render_sub_node(parent, value, var, namespaces)
 
         SerializeUtils.set_nil_attribute(parent, meta.nillable, namespaces)
+
+    def render_mixed_content(
+        self, parent: Element, values: List, var: XmlVar, namespaces: Namespaces
+    ):
+        """Render mixed content list of values."""
+        orig_parent = parent
+        for index, value in enumerate(values):
+            if not is_dataclass(value):
+                if index == 0:
+                    SerializeUtils.set_text(parent, value, namespaces)
+                else:
+                    SerializeUtils.set_tail(parent, value, namespaces)
+            elif isinstance(value, AnyElement):
+                parent = orig_parent
+                self.render_wildcard_node(parent, value, var, namespaces)
+            else:
+                parent = orig_parent
+                self.render_element_node(parent, value, var, namespaces)
+                parent = parent[-1]
 
     def render_sub_nodes(
         self, parent: Element, values: List, var: XmlVar, namespaces: Namespaces

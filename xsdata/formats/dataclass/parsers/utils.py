@@ -124,12 +124,16 @@ class ParserUtils:
         return True
 
     @classmethod
-    def prepare_generic_value(cls, qname: str, value: Any) -> Any:
+    def prepare_generic_value(cls, qname: Optional[str], value: Any) -> Any:
         """Prepare parsed value before binding to a wildcard field."""
+
+        if not qname:
+            return value
+
         if not is_dataclass(value):
             value = AnyElement(qname=qname, text=value)
         elif not isinstance(value, AnyElement):
-            value.qname = qname
+            value.qname = qname  # Deprecate this hack!
 
         return value
 

@@ -334,3 +334,18 @@ class ParserUtilsTests(TestCase):
 
         ParserUtils.bind_wildcard_element(params, var, "first", None, attrs, ns_map)
         self.assertEqual(dict(a=["first", "txt", "tail", "tail"]), params)
+
+    def test_prepare_generic_value(self):
+        @dataclass
+        class Fixture:
+            content: str
+
+        actual = ParserUtils.prepare_generic_value(None, "foo")
+        self.assertEqual("foo", actual)
+
+        actual = ParserUtils.prepare_generic_value("a", "foo")
+        self.assertEqual(AnyElement(qname="a", text="foo"), actual)
+
+        fixture = Fixture("foo")
+        ParserUtils.prepare_generic_value("a", fixture)
+        self.assertEqual("a", fixture.qname)

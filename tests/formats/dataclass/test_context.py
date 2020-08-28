@@ -175,12 +175,12 @@ class XmlContextTests(TestCase):
         self.assertIsInstance(result, Iterator)
 
         expected = [
-            XmlElement(name="author", qname="author", types=[str],),
+            XmlElement(name="author", qname="author", types=[str]),
             XmlElement(name="title", qname="title", types=[str]),
             XmlElement(name="genre", qname="genre", types=[str]),
-            XmlElement(name="price", qname="price", types=[float],),
-            XmlElement(name="pub_date", qname="pub_date", types=[str],),
-            XmlElement(name="review", qname="review", types=[str],),
+            XmlElement(name="price", qname="price", types=[float]),
+            XmlElement(name="pub_date", qname="pub_date", types=[str]),
+            XmlElement(name="review", qname="review", types=[str]),
             XmlAttribute(name="id", qname="id", types=[str]),
             XmlAttribute(
                 name="lang", qname="lang", types=[str], init=False, default="en",

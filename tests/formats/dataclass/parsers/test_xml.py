@@ -35,7 +35,7 @@ class XmlParserTests(TestCase):
         self.parser.add_namespace(("foo", "bar"))
         self.assertEqual({"foo": "bar"}, self.parser.namespaces.ns_map)
 
-    @mock.patch.object(ElementNode, "next_node")
+    @mock.patch.object(ElementNode, "child")
     @mock.patch.object(XmlParser, "emit_event")
     def test_start(self, mock_emit_event, mock_next_node):
         var = XmlText(name="foo", qname="foo")
@@ -72,9 +72,9 @@ class XmlParserTests(TestCase):
         )
 
     @mock.patch.object(XmlParser, "emit_event")
-    @mock.patch.object(PrimitiveNode, "assemble", return_value=("q", "result"))
+    @mock.patch.object(PrimitiveNode, "bind", return_value=True)
     def test_end(self, mock_assemble, mock_emit_event):
-        objects = []
+        objects = [("q", "result")]
         queue = []
         var = XmlText(name="foo", qname="foo")
         queue.append(PrimitiveNode(var=var, ns_map={}))
@@ -88,13 +88,12 @@ class XmlParserTests(TestCase):
 
     @mock.patch.object(XmlParser, "emit_event")
     def test_end_with_no_result(self, mock_emit_event):
-        objects = []
+        objects = [("q", "result")]
         queue = [SkipNode()]
 
         result = self.parser.end(queue, "author", "foobar", None, objects)
         self.assertIsNone(result)
         self.assertEqual(0, len(queue))
-        self.assertEqual(0, len(objects))
         self.assertEqual(0, mock_emit_event.call_count)
 
     def test_emit_event(self):

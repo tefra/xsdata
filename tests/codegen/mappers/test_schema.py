@@ -194,7 +194,7 @@ class SchemaMapperTests(FactoryTestCase):
             attributes=[Attribute(), Attribute()],
             sequence=sequence_one,
             simple_content=SimpleContent(restriction=Restriction()),
-            complex_content=ComplexContent(restriction=restriction,),
+            complex_content=ComplexContent(restriction=restriction),
         )
         restrictions = Restrictions.from_element(complex_type)
         children = SchemaMapper.element_children(complex_type, restrictions)

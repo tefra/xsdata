@@ -452,3 +452,39 @@ class XmlSerializerTests(TestCase):
 
         self.assertIsInstance(actual, Iterator)
         self.assertEqual(expected, list(actual))
+
+    def test_render_mixed_content(self):
+        @dataclass
+        class Span:
+            content: str
+
+        @dataclass
+        class Example:
+            content: List[object] = field(
+                default_factory=list,
+                metadata=dict(
+                    type="Wildcard",
+                    namespace="##any",
+                    mixed=True,
+                    min_occurs=0,
+                    max_occurs=9223372036854775807,
+                ),
+            )
+
+        obj = Example()
+        obj.content.append(AnyElement(qname="b", text="Mr."))
+        obj.content.append(Span("chris"))
+        obj.content.append("!")
+
+        self.serializer.xml_declaration = False
+        self.serializer.pretty_print = False
+        result = self.serializer.render(obj)
+        self.assertEqual("<Example><b>Mr.</b><Span>chris</Span>!</Example>", result)
+
+        obj = Example()
+        obj.content.append("Hi ")
+        obj.content.append(AnyElement(qname="b", text="Mr."))
+        obj.content.append(Span("chris"))
+        obj.content.append("!")
+        result = self.serializer.render(obj)
+        self.assertEqual("<Example>Hi <b>Mr.</b><Span>chris</Span>!</Example>", result)

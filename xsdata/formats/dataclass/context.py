@@ -106,10 +106,7 @@ class XmlContext:
 
             # Fetch the dataclass meta settings and make sure we don't inherit
             # the parent class meta.
-            meta = getattr(clazz, "Meta", None)
-            if meta and meta.__qualname__ != f"{clazz.__name__}.Meta":
-                meta = None
-
+            meta = clazz.Meta if "Meta" in clazz.__dict__ else None
             name = getattr(meta, "name", self.name_generator(clazz.__name__))
             nillable = getattr(meta, "nillable", False)
             namespace = getattr(meta, "namespace", parent_ns)

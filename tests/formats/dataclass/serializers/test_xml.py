@@ -456,10 +456,16 @@ class XmlSerializerTests(TestCase):
     def test_render_mixed_content(self):
         @dataclass
         class Span:
+            class Meta:
+                name = "span"
+
             content: str
 
         @dataclass
         class Example:
+            class Meta:
+                name = "p"
+
             content: List[object] = field(
                 default_factory=list,
                 metadata=dict(
@@ -479,7 +485,7 @@ class XmlSerializerTests(TestCase):
         self.serializer.xml_declaration = False
         self.serializer.pretty_print = False
         result = self.serializer.render(obj)
-        self.assertEqual("<Example><b>Mr.</b><Span>chris</Span>!</Example>", result)
+        self.assertEqual("<p><b>Mr.</b><span>chris</span>!</p>", result)
 
         obj = Example()
         obj.content.append("Hi ")
@@ -487,4 +493,4 @@ class XmlSerializerTests(TestCase):
         obj.content.append(Span("chris"))
         obj.content.append("!")
         result = self.serializer.render(obj)
-        self.assertEqual("<Example>Hi <b>Mr.</b><Span>chris</Span>!</Example>", result)
+        self.assertEqual("<p>Hi <b>Mr.</b><span>chris</span>!</p>", result)

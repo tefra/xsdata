@@ -159,9 +159,18 @@ class XmlContextTests(TestCase):
         class Foo(Bar):
             pass
 
+        @dataclass
+        class Thug(Bar):
+            class Meta:
+                name = "thug"
+
         result = self.ctx.build(Foo)
         self.assertEqual("Foo", result.name)
         self.assertEqual("Foo", result.qname)
+
+        result = self.ctx.build(Thug)
+        self.assertEqual("thug", result.name)
+        self.assertEqual("thug", result.qname)
 
     @mock.patch.object(XmlContext, "get_type_hints", return_value={})
     def test_build_with_no_dataclass_raises_exception(self, *args):

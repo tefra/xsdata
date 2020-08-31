@@ -238,12 +238,12 @@ class XmlContext:
 
     @staticmethod
     def is_element_list(type_hint: Any, is_tokens: bool) -> bool:
-        if getattr(type_hint, "__origin__", None) is list:
+        if getattr(type_hint, "__origin__", None) in (list, List):
             if not is_tokens:
                 return True
 
             type_hint = type_hint.__args__[0]
-            if getattr(type_hint, "__origin__", None) is list:
+            if getattr(type_hint, "__origin__", None) in (list, List):
                 return True
 
         return False

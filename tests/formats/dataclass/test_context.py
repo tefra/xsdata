@@ -1,11 +1,15 @@
+import sys
 from dataclasses import dataclass
 from dataclasses import make_dataclass
 from dataclasses import replace
 from typing import get_type_hints
 from typing import Iterator
 from typing import List
+from typing import Union
 from unittest import mock
 from unittest import TestCase
+
+import pytest
 
 from tests.fixtures.books import BookForm
 from tests.fixtures.books import Books
@@ -19,6 +23,7 @@ from xsdata.formats.dataclass.models.constants import XmlType
 from xsdata.formats.dataclass.models.elements import XmlAttribute
 from xsdata.formats.dataclass.models.elements import XmlElement
 from xsdata.formats.dataclass.models.elements import XmlMeta
+from xsdata.formats.dataclass.models.elements import XmlText
 from xsdata.formats.dataclass.models.elements import XmlWildcard
 from xsdata.utils import text
 
@@ -201,6 +206,23 @@ class XmlContextTests(TestCase):
         for var in result:
             self.assertFalse(var.dataclass)
             self.assertIsNone(var.clazz)
+
+    @pytest.mark.skipif(sys.version_info < (3, 7), reason="requires python >= 3.7")
+    def test_get_type_hints_with_union_types(self):
+        @dataclass
+        class Example:
+            bool: bool
+            int: int
+            union: Union[int, bool]
+
+        result = list(self.ctx.get_type_hints(Example, None))
+        expected = [
+            XmlText(name="bool", qname="bool", types=[bool]),
+            XmlText(name="int", qname="int", types=[int]),
+            XmlText(name="union", qname="union", types=[bool, int]),
+        ]
+
+        self.assertEqual(expected, result)
 
     def test_get_type_hints_with_dataclass_list(self):
         result = list(self.ctx.get_type_hints(Books, None))

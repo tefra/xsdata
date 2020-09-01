@@ -17,12 +17,12 @@ class AnyElement:
     """
     Generic ElementNode dataclass to bind xml document data to wildcard fields.
 
-    :param qname: qualified name with namespace.
-    :param text: text content.
-    :param tail: tail content.
-    :param ns_map: prefix to namespace map.
-    :param children: children element.
-    :param attributes: element attributes.
+    :param qname: The namespace qualified name.
+    :param text: Element text content.
+    :param tail: Element tail content.
+    :param ns_map: The prefix-URI Namespace mapping
+    :param children: A list of child elements.
+    :param attributes: The element key-value attribute mapping.
     """
 
     qname: Optional[str] = field(default=None)

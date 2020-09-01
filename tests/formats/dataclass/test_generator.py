@@ -11,9 +11,7 @@ from xsdata.formats.dataclass.generator import DataclassGenerator
 class DataclassGeneratorTests(FactoryTestCase):
     @mock.patch.object(DataclassGenerator, "render_package")
     @mock.patch.object(DataclassGenerator, "render_module")
-    def test_render(
-        self, mock_render_module, mock_render_package,
-    ):
+    def test_render(self, mock_render_module, mock_render_package):
         classes = [
             ClassFactory.create(package="foo.bar"),
             ClassFactory.create(package="bar.foo"),

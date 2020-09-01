@@ -49,19 +49,99 @@ cache more than once.
     per document type.
 
 
+**handler** (:class:`~xsdata.formats.dataclass.parsers.mixins.XmlHandler`)
+
+The XmlHandler type to use in order to read the xml source and push element events
+to the main parser.
+
+Default: :class:`~xsdata.formats.dataclass.parsers.handlers.LxmlEventHandler`
+
+
+Xml Handlers
+------------
+
+:class:`~xsdata.formats.dataclass.parsers.handlers.LxmlEventHandler`
+
+It's based on `lxml.etree.iterparse` incremental parser and offers the best
+balance between features and performance. If the xinclude parser config is enabled
+the handler will parse the whole tree and then use `iterwalk` to feed the main parser
+with element events.
+
+
+:class:`~xsdata.formats.dataclass.parsers.handlers.LxmlSaxHandler`
+
+It's based on the lxml target parser interface. `xinclude` statements are not supported
+and is quite slower than the iterparse implementation.
+
+
+:class:`~xsdata.formats.dataclass.parsers.handlers.XmlEventHandler`
+
+It's based on the native python xml.etree.ElementTree.interparse incremental parser.
+`xinclude` statements are not supported and it doesn't support the newly allowed
+characters in XML 1.1. Despite it's drawbacks in some cases it's slightly faster than
+the lxml iterparse implementation.
+
+
+:class:`~xsdata.formats.dataclass.parsers.handlers.XmlSaxHandler`
+
+It's based on the native python xml.sax.ContentHandler and doesn't support `xinclude`
+statements and is a lot slower than the iterparse implementation.
+
+
+.. hint::
+
+    Why keep them all? The hard part was the decouple of the parser from a specific
+    implementation. The handlers are quite simple and very easy to test.
+
+    It's also recommended to give all of them a try, based on your use case you
+    might get different results.
+
+    You can also extend one of them if you want to do any optimization like skipping
+    irrelevant events earlier than the binding process when it's instructed
+    to skip unknown properties.
+
+
+Benchmarks
+----------
+
+The benchmarks run with the `test suite <https://travis-ci.com/tefra/xsdata>`_.
+
+
+.. code-block::
+
+    ----------------------------------- benchmark 'size: 53.21 KB': 4 tests -----------------------------------
+    Name (time in ms)                    Min                Max               Mean             Median
+    -----------------------------------------------------------------------------------------------------------
+    test_small[LxmlEventHandler]     11.9252 (1.0)      24.1855 (1.10)     12.6733 (1.0)      12.2927 (1.0)
+    test_small[XmlEventHandler]      11.9761 (1.00)     35.8465 (1.63)     13.7822 (1.09)     12.3014 (1.00)
+    test_small[LxmlSaxHandler]       14.4966 (1.22)     21.9954 (1.0)      15.1298 (1.19)     14.9358 (1.22)
+    test_small[XmlSaxHandler]        16.4111 (1.38)     36.1555 (1.64)     18.2357 (1.44)     16.9312 (1.38)
+    -----------------------------------------------------------------------------------------------------------
+
+    ------------------------------------- benchmark 'size: 531.33 KB': 4 tests -------------------------------------
+    Name (time in ms)                      Min                 Max                Mean              Median
+    ----------------------------------------------------------------------------------------------------------------
+    test_medium[LxmlEventHandler]     122.0357 (1.0)      158.1659 (1.0)      127.5115 (1.0)      123.1530 (1.0)
+    test_medium[XmlEventHandler]      122.1189 (1.00)     165.7320 (1.05)     133.0798 (1.04)     125.3347 (1.02)
+    test_medium[LxmlSaxHandler]       145.2495 (1.19)     165.9502 (1.05)     149.9644 (1.18)     146.5776 (1.19)
+    test_medium[XmlSaxHandler]        166.7054 (1.37)     193.0464 (1.22)     174.3553 (1.37)     172.1119 (1.40)
+    ----------------------------------------------------------------------------------------------------------------
+
+    -------------------------------- benchmark 'size: 5312.58 KB': 4 tests --------------------------------
+    Name (time in s)                    Min               Max              Mean            Median
+    -------------------------------------------------------------------------------------------------------
+    test_large[XmlEventHandler]      1.2444 (1.0)      1.3451 (1.0)      1.2795 (1.0)      1.2740 (1.0)
+    test_large[LxmlEventHandler]     1.2608 (1.01)     1.4284 (1.06)     1.3385 (1.05)     1.3305 (1.04)
+    test_large[LxmlSaxHandler]       1.4625 (1.18)     1.6302 (1.21)     1.5405 (1.20)     1.5478 (1.21)
+    test_large[XmlSaxHandler]        1.7173 (1.38)     1.7610 (1.31)     1.7368 (1.36)     1.7334 (1.36)
+    -------------------------------------------------------------------------------------------------------
+
+
 Example: from path
 ------------------
 
-.. code-block:: python
-
-    >>> from xsdata.formats.dataclass.parsers import XmlParser
-    >>> from xsdata.formats.dataclass.parsers.config import ParserConfig
-
-    >>> config = ParserConfig(fail_on_unknown_properties=True)
-    >>> parser = XmlParser(config=config)
-    >>> order = parser.from_path("docs/examples/primer.xml", PurchaseOrder)
-    >>> order.bill_to
-    Usaddress(name='Robert Smith', street='8 Oak Avenue', city='Old Town', state='PA', zip=95819.0, country='US')
+.. literalinclude:: examples/xml_parser.py
+   :lines: 1,6-8,9-20
 
 
 Example: from memory
@@ -69,12 +149,16 @@ Example: from memory
 
 With support for `XML Inclusions <https://www.w3.org/TR/xinclude-11/>`_
 
-.. code-block:: python
+.. literalinclude:: examples/xml_parser.py
+   :lines: 21-24
 
-    >>> path = fixtures_dir.joinpath("books/books-xinclude.xml")
-    >>> config = ParserConfig(process_xinclude=True, base_url=path.as_uri())
-    >>> parser = XmlParser(config=config)
-    >>> actual = parser.from_bytes(path.read_bytes(), Books)
+
+Example: alternative handler
+----------------------------
+
+.. literalinclude:: examples/xml_parser.py
+   :lines: 26-29
+
 
 
 :class:`~xsdata.formats.dataclass.serializers.XmlSerializer`

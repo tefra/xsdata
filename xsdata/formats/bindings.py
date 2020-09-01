@@ -1,22 +1,20 @@
+import abc
 import io
 import pathlib
-from abc import ABC
-from abc import abstractmethod
 from typing import Any
 from typing import Type
 from typing import TypeVar
 
+T = TypeVar("T")
 
-class AbstractSerializer(ABC):
-    @abstractmethod
+
+class AbstractSerializer(abc.ABC):
+    @abc.abstractmethod
     def render(self, obj: object) -> object:
         """Render the given object to the target output format."""
 
 
-T = TypeVar("T")
-
-
-class AbstractParser(ABC):
+class AbstractParser(abc.ABC):
     def from_path(self, path: pathlib.Path, clazz: Type[T]) -> T:
         """Parse the input file path and return the resulting object tree."""
         return self.parse(str(path.resolve()), clazz)
@@ -29,6 +27,6 @@ class AbstractParser(ABC):
         """Parse the input bytes array return the resulting object tree."""
         return self.parse(io.BytesIO(source), clazz)
 
-    @abstractmethod
+    @abc.abstractmethod
     def parse(self, source: Any, clazz: Type[T]) -> T:
         """Parse the input stream and return the resulting object tree."""

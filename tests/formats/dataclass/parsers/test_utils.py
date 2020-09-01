@@ -161,7 +161,7 @@ class ParserUtilsTests(TestCase):
         self.assertEqual(expected, params)
         mock_parse_any_attribute.assert_called_once_with("bar", ns_map)
         mock_parse_value.assert_called_once_with(
-            "2020-03-01", eff_date.types, eff_date.default, ns_map, eff_date.is_list,
+            "2020-03-01", eff_date.types, eff_date.default, ns_map, eff_date.is_list
         )
 
     def test_parse_any_attributes(self):
@@ -236,7 +236,7 @@ class ParserUtilsTests(TestCase):
         ParserUtils.bind_element(params, metadata, "foo", None, {}, ns_map)
         self.assertEqual({"value": "yes!"}, params)
         mock_parse_value.assert_called_once_with(
-            "foo", var.types, var.default, ns_map, var.is_list,
+            "foo", var.types, var.default, ns_map, var.is_list
         )
 
     def test_bind_element_with_wildcard_var(self):

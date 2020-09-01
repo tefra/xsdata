@@ -1,13 +1,12 @@
 from dataclasses import dataclass
 from dataclasses import field
+from typing import Any
 from typing import List
 from typing import Union
 from unittest import mock
 from unittest.case import TestCase
 
-from lxml import etree
-
-from tests import fixtures_dir
+from tests.fixtures.books import BookForm
 from tests.fixtures.books import Books
 from xsdata.exceptions import ParserError
 from xsdata.exceptions import XmlContextError
@@ -18,14 +17,13 @@ from xsdata.formats.dataclass.models.elements import XmlText
 from xsdata.formats.dataclass.models.elements import XmlWildcard
 from xsdata.formats.dataclass.models.generics import AnyElement
 from xsdata.formats.dataclass.parsers.config import ParserConfig
+from xsdata.formats.dataclass.parsers.mixins import XmlHandler
 from xsdata.formats.dataclass.parsers.nodes import ElementNode
-from xsdata.formats.dataclass.parsers.nodes import ElementParser
-from xsdata.formats.dataclass.parsers.nodes import EventParser
+from xsdata.formats.dataclass.parsers.nodes import NodeParser
 from xsdata.formats.dataclass.parsers.nodes import PrimitiveNode
 from xsdata.formats.dataclass.parsers.nodes import SkipNode
 from xsdata.formats.dataclass.parsers.nodes import UnionNode
 from xsdata.formats.dataclass.parsers.nodes import WildcardNode
-from xsdata.formats.dataclass.parsers.nodes import XmlNode
 from xsdata.formats.dataclass.parsers.utils import ParserUtils
 from xsdata.models.mixins import attribute
 from xsdata.models.mixins import element
@@ -54,22 +52,12 @@ class FooMixed:
     )
 
 
-class XmlNodeTests(TestCase):
-    def test_child(self):
-        with self.assertRaises(NotImplementedError):
-            XmlNode().child("foo", {}, {}, 0)
-
-    def test_bind(self):
-        with self.assertRaises(NotImplementedError):
-            XmlNode().bind("foo", None, None, [])
-
-
 class ElementNodeTests(TestCase):
     def setUp(self) -> None:
         super().setUp()
         self.context = XmlContext()
         self.meta = XmlMeta(
-            name="foo", clazz=Foo, qname="foo", source_qname="foo", nillable=False,
+            name="foo", clazz=Foo, qname="foo", source_qname="foo", nillable=False
         )
         self.node = ElementNode(
             position=0,
@@ -84,7 +72,7 @@ class ElementNodeTests(TestCase):
     @mock.patch.object(ParserUtils, "bind_element")
     @mock.patch.object(ParserUtils, "bind_element_attrs")
     def test_bind(
-        self, mock_bind_element_attrs, mock_bind_element, mock_bind_element_children,
+        self, mock_bind_element_attrs, mock_bind_element, mock_bind_element_children
     ):
         def add_attr(x, *args):
             x["a"] = 1
@@ -128,7 +116,7 @@ class ElementNodeTests(TestCase):
     @mock.patch.object(ParserUtils, "bind_element")
     @mock.patch.object(ParserUtils, "bind_element_attrs")
     def test_bind_with_mixed_flag_true(
-        self, mock_bind_element_attrs, mock_bind_element, mock_bind_element_children,
+        self, mock_bind_element_attrs, mock_bind_element, mock_bind_element_children
     ):
         def add_attr(x, *args):
             x["a"] = 1
@@ -329,17 +317,6 @@ class WildcardNodeTests(TestCase):
 
 
 class UnionNodeTests(TestCase):
-    def test__post_init(self):
-        attrs = {"id": "1"}
-        ns_map = {"ns0": "xsdata"}
-        ctx = XmlContext()
-        var = XmlText(name="foo", qname="foo")
-        node = UnionNode(position=0, var=var, context=ctx, attrs=attrs, ns_map=ns_map)
-
-        self.assertEqual(0, node.level)
-        self.assertEqual(attrs, node.attrs)
-        self.assertIsNot(attrs, node.attrs)
-
     def test_child(self):
         attrs = {"id": "1"}
         ns_map = {"ns0": "xsdata"}
@@ -393,6 +370,12 @@ class UnionNodeTests(TestCase):
         self.assertEqual(2, objects[-1][1].b)
         self.assertEqual("foo", objects[-1][1].value)
         self.assertEqual("item", objects[-1][0])
+
+        self.assertEqual(2, len(node.events))
+        self.assertEqual(("start", "item", attrs, ns_map), node.events[0])
+        self.assertEqual(("end", "item", "foo", None), node.events[1])
+        self.assertIsNot(node.attrs, node.events[0][2])
+        self.assertIs(node.ns_map, node.events[0][3])
 
     def test_bind_raises_parser_error_on_failure(self):
         @dataclass
@@ -450,28 +433,86 @@ class SKipNodeTests(TestCase):
         self.assertEqual(False, node.bind("foo", None, None, []))
 
 
-class ElementParserTests(TestCase):
-    def test_parse_from_tree(self):
-        path = fixtures_dir.joinpath("books/books.xml")
-        tree = etree.parse(path.resolve().as_uri())
+class NodeParserTests(TestCase):
+    def test_parse(self):
+        @dataclass
+        class TestHandler(XmlHandler):
+            def parse(self, source: Any) -> Any:
+                return Books()
 
-        parser = ElementParser()
-        actual = parser.parse(tree, Books)
-        self.assertEqual(2, len(actual.book))
+        parser = NodeParser(handler=TestHandler)
+        result = parser.parse([], Books)
+        self.assertEqual(Books(), result)
 
-        # The tree will cleared
-        self.assertEqual(0, len(tree.getroot()))
+    def test_parse_when_result_type_is_wrong(self):
+        with self.assertRaises(ParserError) as cm:
+            parser = NodeParser()
+            parser.parse([], Books)
 
-    def test_parse_context_unhandled_event(self):
-        context = [("escape", None)]
-        with self.assertRaises(ParserError):
-            parser = ElementParser()
-            parser.parse_context(context, Books)
+        self.assertEqual("Failed to create target class `Books`", str(cm.exception))
 
+    def test_start(self):
+        parser = NodeParser()
+        queue = []
+        objects = []
 
-class EventParserTests(TestCase):
-    def test_parse_unhandled_event(self):
-        source = [("escape", None)]
-        with self.assertRaises(ParserError):
-            parser = EventParser()
-            parser.parse(source, Books)
+        attrs = {"k": "v"}
+        ns_map = {"a": "b"}
+        expected_node = ElementNode(
+            position=0,
+            context=parser.context,
+            meta=parser.context.build(Books),
+            config=parser.config,
+            attrs=attrs,
+            ns_map=ns_map,
+        )
+        parser.start(queue, "{urn:books}books", attrs, ns_map, objects, Books)
+        self.assertEqual(1, len(queue))
+        self.assertEqual(expected_node, queue[0])
+
+        expected_node = ElementNode(
+            position=0,
+            context=parser.context,
+            meta=parser.context.build(BookForm),
+            config=parser.config,
+            attrs={},
+            ns_map={},
+        )
+        parser.start(queue, "book", {}, {}, objects, Books)
+
+        self.assertEqual(2, len(queue))
+        self.assertEqual(expected_node, queue[-1])
+
+    @mock.patch.object(PrimitiveNode, "bind", return_value=True)
+    def test_end(self, mock_assemble):
+        parser = NodeParser()
+        objects = [("q", "result")]
+        queue = []
+        var = XmlText(name="foo", qname="foo")
+        queue.append(PrimitiveNode(var=var, ns_map={}))
+
+        result = parser.end(queue, "author", "foobar", None, objects)
+        self.assertEqual("result", result)
+        self.assertEqual(0, len(queue))
+        self.assertEqual(("q", result), objects[-1])
+        mock_assemble.assert_called_once_with("author", "foobar", None, objects)
+
+    def test_end_with_no_result(self):
+        parser = NodeParser()
+        objects = [("q", "result")]
+        queue = [SkipNode()]
+
+        result = parser.end(queue, "author", "foobar", None, objects)
+        self.assertIsNone(result)
+        self.assertEqual(0, len(queue))
+
+    def test_start_prefix_mapping(self):
+        parser = NodeParser()
+        parser.start_prefix_mapping("bar", "foo")
+        self.assertEqual({"bar": "foo"}, parser.namespaces.ns_map)
+
+        parser.start_prefix_mapping("", "a")
+        self.assertEqual({"bar": "foo", None: "a"}, parser.namespaces.ns_map)
+
+        parser.start_prefix_mapping(None, "b")
+        self.assertEqual({"bar": "foo", None: "b"}, parser.namespaces.ns_map)

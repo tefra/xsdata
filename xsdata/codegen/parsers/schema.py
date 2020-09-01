@@ -50,12 +50,12 @@ class SchemaParser(XmlParser):
         qname: str,
         attrs: Dict,
         ns_map: Dict,
-        position: int,
+        objects: List[Parsed],
         clazz: Type[T],
     ):
         self.index += 1
         self.indices.append(self.index)
-        super().start(queue, qname, attrs, ns_map, position, clazz)
+        super().start(queue, qname, attrs, ns_map, objects, clazz)
 
     def end(
         self,
@@ -115,12 +115,7 @@ class SchemaParser(XmlParser):
                 )
 
             ns_list = obj.ns_map.values()
-            ns_common = (
-                Namespace.XS,
-                Namespace.XSI,
-                Namespace.XML,
-                Namespace.XLINK,
-            )
+            ns_common = (Namespace.XS, Namespace.XSI, Namespace.XML, Namespace.XLINK)
             obj.ns_map.update(
                 {ns.prefix: ns.uri for ns in ns_common if ns.uri not in ns_list}
             )

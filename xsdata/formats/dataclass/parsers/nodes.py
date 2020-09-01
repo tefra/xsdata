@@ -11,8 +11,6 @@ from typing import Optional
 from typing import Tuple
 from typing import Type
 
-from lxml.etree import iterwalk
-
 from xsdata.exceptions import ParserError
 from xsdata.exceptions import XmlContextError
 from xsdata.formats.bindings import T
@@ -23,6 +21,10 @@ from xsdata.formats.dataclass.models.elements import XmlVar
 from xsdata.formats.dataclass.models.generics import AnyElement
 from xsdata.formats.dataclass.models.generics import Namespaces
 from xsdata.formats.dataclass.parsers.config import ParserConfig
+from xsdata.formats.dataclass.parsers.mixins import EventsHandler
+from xsdata.formats.dataclass.parsers.mixins import PushParser
+from xsdata.formats.dataclass.parsers.mixins import XmlHandler
+from xsdata.formats.dataclass.parsers.mixins import XmlNode
 from xsdata.formats.dataclass.parsers.utils import ParserUtils
 from xsdata.models.enums import EventType
 
@@ -32,51 +34,17 @@ NoneStr = Optional[str]
 
 
 @dataclass
-class XmlNode:
-    """
-    A generic interface for xml nodes that need to implement the two public
-    methods to be used in an event based parser with start/end element events.
-
-    The parser needs to maintain a queue for these nodes and a list of
-    objects that these nodes return.
-    """
-
-    def child(self, qname: str, attrs: Dict, ns_map: Dict, position: int) -> "XmlNode":
-        """
-        Initialize the next child node to be queued, when a new xml element
-        starts.
-
-        This entry point is responsible to create the next node type
-        with all the necessary information on how to bind the incoming
-        input data.
-        """
-        raise NotImplementedError("Not Implemented")
-
-    def bind(self, qname: str, text: NoneStr, tail: NoneStr, objects: List) -> bool:
-        """
-        Parse the current element bind child objects and return the result.
-
-        This entry point is called when an xml element ends and is responsible to parse
-        the current element attributes/text, bind any children objects and initialize
-        a new object.
-
-        :return: Whether or not anything was appended in the objects list.
-        """
-        raise NotImplementedError(f"Not Implemented {qname}.")
-
-
-@dataclass
 class ElementNode(XmlNode):
     """
     Element type node is equivalent to xml elements and is used to bind user
     defined dataclasses.
 
-    :param meta: xml metadata of a dataclass model.
-    :param attrs: Map of element attributes.
-    :param ns_map: Map of prefixes to namespaces.
-    :param config: Parser config instance passed down from the root node.
-    :param context: Model metadata builder.
-    :param position: The current objects size, when the node is created.
+    :param meta: Model xml metadata
+    :param attrs: Key-value attribute mapping
+    :param ns_map: Prefix-URI Namespace mapping
+    :param config: Parser configuration
+    :param context: Model xml metadata builder
+    :param position: The node position of objects cache
     """
 
     meta: XmlMeta
@@ -111,7 +79,7 @@ class ElementNode(XmlNode):
         else:
             ParserUtils.bind_element_children(params, self.meta, self.position, objects)
             ParserUtils.bind_element(
-                params, self.meta, text, tail, self.attrs, self.ns_map,
+                params, self.meta, text, tail, self.attrs, self.ns_map
             )
 
         objects.append((qname, self.meta.clazz(**params)))
@@ -188,10 +156,10 @@ class WildcardNode(XmlNode):
         In the future this node should check all known user defined models in the
         target namespace and use that instead of the generic.
 
-    :param var: Xml var instance.
-    :param attrs: Map of element attributes.
-    :param ns_map: Map of prefixes to namespaces.
-    :param position: The current objects size, when the node is created.
+    :param var: Class field xml var instance
+    :param attrs: Key-value attribute mapping
+    :param ns_map: Prefix-URI Namespace mapping
+    :param position: The node position of objects cache
     """
 
     var: XmlVar
@@ -231,13 +199,13 @@ class UnionNode(XmlNode):
     Union nodes are used for variables with more than one possible types where
     at least one of them is a dataclass.
 
-    :param var: Xml var instance.
-    :param attrs: Map of element attributes.
-    :param ns_map: Map of prefixes to namespaces.
-    :param position: The current objects size, when the node is created.
-    :param context: Model metadata builder.
-    :param level: Current node level.
-    :param events: Record node events.
+    :param var: Class field xml var instance
+    :param attrs: Key-value attribute mapping
+    :param ns_map: Prefix-URI Namespace mapping
+    :param position: The node position of objects cache
+    :param context: Model xml context cache
+    :param level: Current node level
+    :param events: Record node events
     """
 
     var: XmlVar
@@ -248,15 +216,12 @@ class UnionNode(XmlNode):
     level: int = field(default_factory=int)
     events: List = field(default_factory=list)
 
-    def __post_init__(self):
-        self.attrs = copy.deepcopy(self.attrs)
-
     def child(self, qname: str, attrs: Dict, ns_map: Dict, position: int) -> XmlNode:
         """Skip all child nodes as we are going to parse the complete element
         tree."""
 
         self.level += 1
-        self.events.append(("start", qname, copy.deepcopy(attrs), ns_map.copy()))
+        self.events.append(("start", qname, copy.deepcopy(attrs), ns_map))
         return self
 
     def bind(self, qname: str, text: NoneStr, tail: NoneStr, objects: List) -> bool:
@@ -276,7 +241,7 @@ class UnionNode(XmlNode):
             self.level -= 1
             return False
 
-        self.events.insert(0, ("start", qname, self.attrs, self.ns_map))
+        self.events.insert(0, ("start", qname, copy.deepcopy(self.attrs), self.ns_map))
 
         obj = None
         max_score = -1
@@ -297,7 +262,7 @@ class UnionNode(XmlNode):
     def parse_class(self, clazz: Type[T]) -> Optional[T]:
         """Initialize a new XmlParser and try to parse the given element."""
         try:
-            parser = EventParser(context=self.context)
+            parser = NodeParser(context=self.context)
             return parser.parse(self.events, clazz)
         except Exception:
             return None
@@ -317,8 +282,8 @@ class PrimitiveNode(XmlNode):
     """
     XmlNode for text elements with primitive values eg str, int, float.
 
-    :param var: xml var instance
-    :param ns_map: Map of prefixes to namespaces.
+    :param var: Class field xml var instance
+    :param ns_map: Prefix-URI Namespace mapping
     """
 
     var: XmlVar
@@ -359,18 +324,30 @@ class SkipNode(XmlNode):
 
 
 @dataclass
-class NodeParserMixin:
+class NodeParser(PushParser):
     """
-    Xml node data binding mixin.
+    Bind xml nodes to dataclasses.
 
     :param config: Parser configuration
     :param context: Model metadata builder
-    :param namespaces: Store the prefix/namespace as they are parsed.
+    :param handler: Override default XmlHandler
+    :param namespaces: Namespace registry for prefix-URI mappings
     """
 
     config: ParserConfig = field(default_factory=ParserConfig)
     context: XmlContext = field(default_factory=XmlContext)
+    handler: Type[XmlHandler] = field(default=EventsHandler)
     namespaces: Namespaces = field(init=False, default_factory=Namespaces)
+
+    def parse(self, source: Any, clazz: Type[T]) -> T:
+        """Parse the XML input stream and return the resulting object tree."""
+        handler = self.handler(clazz=clazz, parser=self)
+        result = handler.parse(source)
+
+        if isinstance(result, clazz):
+            return result
+
+        raise ParserError(f"Failed to create target class `{clazz.__name__}`")
 
     def start(
         self,
@@ -378,14 +355,13 @@ class NodeParserMixin:
         qname: str,
         attrs: Dict,
         ns_map: Dict,
-        position: int,
+        objects: List[Parsed],
         clazz: Type[T],
     ):
-        """Queue the next xml node for parsing based on the given element
-        qualified name."""
+        """Queue the next xml node for parsing."""
         try:
             item = queue[-1]
-            child = item.child(qname, attrs, ns_map, position)
+            child = item.child(qname, attrs, ns_map, len(objects))
         except IndexError:
             meta = self.context.build(clazz)
             child = ElementNode(
@@ -408,83 +384,59 @@ class NodeParserMixin:
         objects: List[Parsed],
     ) -> Any:
         """
-        Use the last xml node to parse the given element and bind any child
-        objects.
+        Parse the last xml node and bind any intermediate objects.
 
-        :return: Any: Return the last obj in the stack If the bind was successful.
+        :return: The result of the binding process.
         """
+        obj = None
         item = queue.pop()
         if item.bind(qname, text, tail, objects):
-            return objects[-1][1]
-
-        return None
-
-
-@dataclass
-class EventParser(NodeParserMixin):
-    """Basic event based parser."""
-
-    def parse(self, source: Iterable, clazz: Type[T]) -> T:
-        obj = None
-        objects: List[Parsed] = []
-        queue: XmlNodes = []
-
-        self.namespaces.clear()
-
-        for event in source:
-            if event[0] == EventType.START:
-                _, qname, attrs, ns_map = event
-                position = len(objects)
-                self.start(queue, qname, attrs, ns_map, position, clazz)
-            elif event[0] == EventType.END:
-                _, qname, text, tail = event
-                obj = self.end(queue, qname, text, tail, objects)
-
-        if not obj:
-            raise ParserError(f"Failed to create target class `{clazz.__name__}`")
+            obj = objects[-1][1]
 
         return obj
 
+    def start_prefix_mapping(self, prefix: Optional[str], uri: str):
+        """
+        Add the given prefix-URI to the namespaces registry.
+
+        Default namespaces have an empty prefix.
+        """
+        self.namespaces.add(uri, prefix or "")
+
 
 @dataclass
-class ElementParser(NodeParserMixin):
-    """Event based parser for lxml element tree."""
+class RecordParser(NodeParser):
+    """
+    Bind xml nodes to dataclasses with an events recorder.
 
-    def parse(self, source: Any, clazz: Type[T]) -> T:
-        events = EventType.START, EventType.END, EventType.START_NS
-        context = iterwalk(source, events=events)
-        return self.parse_context(context, clazz)
+    :param events: List of pushed events
+    """
 
-    def parse_context(self, context: Iterable, clazz: Type[T]) -> T:
-        """
-        Dispatch elements to handlers as they arrive and are fully parsed.
+    events: List = field(default_factory=list)
 
-        :raises ParserError: When the requested type doesn't match the result object
-        """
-        obj = None
-        objects: List[Parsed] = []
-        queue: XmlNodes = []
+    def start(
+        self,
+        queue: XmlNodes,
+        qname: str,
+        attrs: Dict,
+        ns_map: Dict,
+        objects: List[Parsed],
+        clazz: Type[T],
+    ):
+        self.events.append((EventType.START, qname, copy.deepcopy(attrs), ns_map))
+        super().start(queue, qname, attrs, ns_map, objects, clazz)
 
-        self.namespaces.clear()
+    def end(
+        self,
+        queue: XmlNodes,
+        qname: str,
+        text: Optional[str],
+        tail: Optional[str],
+        objects: List[Parsed],
+    ) -> Any:
+        self.events.append((EventType.END, qname, text, tail))
+        return super().end(queue, qname, text, tail, objects)
 
-        for event, element in context:
-            if event == EventType.START:
-                position = len(objects)
-                self.start(
-                    queue, element.tag, element.attrib, element.nsmap, position, clazz
-                )
-            elif event == EventType.END:
-                obj = self.end(queue, element.tag, element.text, element.tail, objects)
-                element.clear()
-            elif event == EventType.START_NS:
-                self.add_namespace(element)
-
-        if not obj:
-            raise ParserError(f"Failed to create target class `{clazz.__name__}`")
-
-        return obj
-
-    def add_namespace(self, namespace: Tuple):
-        """Add the given namespace in the registry."""
-        prefix, uri = namespace
-        self.namespaces.add(uri, prefix)
+    def start_prefix_mapping(self, prefix: Optional[str], uri: str):
+        self.events.append((EventType.START_NS, prefix, uri))
+        super().start_prefix_mapping(prefix, uri)

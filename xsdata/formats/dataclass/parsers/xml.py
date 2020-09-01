@@ -6,37 +6,28 @@ from typing import List
 from typing import Optional
 from typing import Type
 
-from lxml.etree import iterparse
-from lxml.etree import iterwalk
-from lxml.etree import parse
-
-from xsdata.formats.bindings import AbstractParser
 from xsdata.formats.bindings import T
-from xsdata.formats.dataclass.parsers.nodes import ElementParser
+from xsdata.formats.dataclass.parsers.handlers import LxmlEventHandler
+from xsdata.formats.dataclass.parsers.mixins import XmlHandler
+from xsdata.formats.dataclass.parsers.nodes import NodeParser
 from xsdata.formats.dataclass.parsers.nodes import Parsed
 from xsdata.formats.dataclass.parsers.nodes import XmlNodes
 from xsdata.models.enums import EventType
-from xsdata.utils import text
+from xsdata.utils.text import snake_case
+from xsdata.utils.text import split_qname
 
 
 @dataclass
-class XmlParser(ElementParser, AbstractParser):
-    """Xml parsing and binding for dataclasses."""
+class XmlParser(NodeParser):
+    """
+    Bind xml nodes to dataclasses with event hooks.
 
+    :param handler: Xml handler.
+    :param event_names: Cache for qnames to event names.
+    """
+
+    handler: Type[XmlHandler] = field(default=LxmlEventHandler)
     event_names: Dict = field(init=False, default_factory=dict)
-
-    def parse(self, source: Any, clazz: Type[T]) -> T:
-        """Parse the XML input stream and return the resulting object tree."""
-
-        events = EventType.START, EventType.END, EventType.START_NS
-        if self.config.process_xinclude:
-            tree = parse(source, base_url=self.config.base_url)  # nosec
-            tree.xinclude()
-            ctx = iterwalk(tree, events=events)
-        else:
-            ctx = iterparse(source, events=events, recover=True, remove_comments=True)
-
-        return self.parse_context(ctx, clazz)
 
     def start(
         self,
@@ -44,12 +35,16 @@ class XmlParser(ElementParser, AbstractParser):
         qname: str,
         attrs: Dict,
         ns_map: Dict,
-        position: int,
+        objects: List[Parsed],
         clazz: Type[T],
     ):
-        """Queue the next xml node for parsing based on the given element
-        qualified name."""
-        super().start(queue, qname, attrs, ns_map, position, clazz)
+        """
+        Queue the next xml node for parsing.
+
+        Emit a start event with the current element qualified name and
+        attributes.
+        """
+        super().start(queue, qname, attrs, ns_map, objects, clazz)
         self.emit_event(EventType.START, qname, attrs=attrs)
 
     def end(
@@ -61,23 +56,21 @@ class XmlParser(ElementParser, AbstractParser):
         objects: List[Parsed],
     ) -> Any:
         """
-        Use the last xml node to parse the given element and bind any child
-        objects.
+        Parse the last xml node and bind any intermediate objects.
 
-        :return: Any: A dataclass instance or a python primitive value or None
+        Emit an end event with the result object if any.
+
+        :return: The result of the binding process.
         """
-
         obj = super().end(queue, qname, text, tail, objects)
         if obj:
             self.emit_event(EventType.END, qname, obj=obj)
-
         return obj
 
     def emit_event(self, event: str, name: str, **kwargs: Any):
         """Call if exist the parser's hook for the given element and event."""
-
         if name not in self.event_names:
-            self.event_names[name] = text.snake_case(text.split_qname(name)[1])
+            self.event_names[name] = snake_case(split_qname(name)[1])
 
         method_name = f"{event}_{self.event_names[name]}"
         if hasattr(self, method_name):

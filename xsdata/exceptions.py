@@ -14,6 +14,10 @@ class ParserError(ValueError):
     """Parsing related errors."""
 
 
+class XmlHandlerError(ValueError):
+    """Xml handler related errors."""
+
+
 class SerializerError(ValueError):
     """Serializing related errors."""
 

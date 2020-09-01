@@ -278,5 +278,5 @@ class SchemaMapper:
     @classmethod
     def is_class(cls, item: ElementBase) -> bool:
         return isinstance(
-            item, (SimpleType, ComplexType, Group, AttributeGroup, Element, Attribute),
+            item, (SimpleType, ComplexType, Group, AttributeGroup, Element, Attribute)
         )

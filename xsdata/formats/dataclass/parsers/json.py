@@ -6,15 +6,13 @@ from dataclasses import field
 from typing import Any
 from typing import Dict
 from typing import Type
-from typing import TypeVar
 
 from xsdata.formats.bindings import AbstractParser
+from xsdata.formats.bindings import T
 from xsdata.formats.dataclass.context import XmlContext
 from xsdata.formats.dataclass.models.elements import XmlVar
 from xsdata.formats.dataclass.models.generics import AnyElement
 from xsdata.formats.dataclass.parsers.utils import ParserUtils
-
-T = TypeVar("T")
 
 
 @dataclass

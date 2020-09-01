@@ -60,7 +60,7 @@ class ConverterAdapterTests(TestCase):
             self.assertEqual("1", converter.from_string("1", [MinusOneInt]))
 
         self.assertEqual(
-            f"No converter registered for `{MinusOneInt}`", str(w[-1].message),
+            f"No converter registered for `{MinusOneInt}`", str(w[-1].message)
         )
 
         converter.register_converter(MinusOneInt, MinusOneIntConverter())

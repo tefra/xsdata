@@ -91,7 +91,7 @@ class AttributeSubstitutionHandlerTests(FactoryTestCase):
         self.assertEqual(expected, self.processor.substitutions)
 
         mock_create_substitution.assert_has_calls(
-            [mock.call(classes[0]), mock.call(classes[0]), mock.call(classes[1]),]
+            [mock.call(classes[0]), mock.call(classes[0]), mock.call(classes[1])]
         )
 
     def test_create_substitution(self):

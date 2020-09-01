@@ -103,7 +103,7 @@ class AttributeTypeHandlerTests(FactoryTestCase):
     @mock.patch.object(AttributeTypeHandler, "reset_attribute_type")
     @mock.patch.object(AttributeTypeHandler, "find_dependency")
     def test_process_dependency_type_with_absent_type(
-        self, mock_find_dependency, mock_reset_attribute_type,
+        self, mock_find_dependency, mock_reset_attribute_type
     ):
         mock_find_dependency.return_value = None
         target = ClassFactory.create()
@@ -116,7 +116,7 @@ class AttributeTypeHandlerTests(FactoryTestCase):
     @mock.patch.object(AttributeTypeHandler, "process_simple_dependency")
     @mock.patch.object(AttributeTypeHandler, "find_dependency")
     def test_process_dependency_type_with_simple_type(
-        self, mock_find_dependency, mock_process_simple_dependency,
+        self, mock_find_dependency, mock_process_simple_dependency
     ):
         simple = ClassFactory.create(type=SimpleType)
 
@@ -134,7 +134,7 @@ class AttributeTypeHandlerTests(FactoryTestCase):
     @mock.patch.object(AttributeTypeHandler, "process_complex_dependency")
     @mock.patch.object(AttributeTypeHandler, "find_dependency")
     def test_process_dependency_type_with_complex_type(
-        self, mock_find_dependency, mock_process_complex_dependency,
+        self, mock_find_dependency, mock_process_complex_dependency
     ):
         complex = ClassFactory.create(type=ComplexType)
         element = ClassFactory.create(type=Element)

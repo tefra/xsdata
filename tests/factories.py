@@ -261,7 +261,7 @@ class AttrFactory(Factory):
     @classmethod
     def any_attribute(cls, **kwargs) -> Attr:
         return cls.create(
-            tag=Tag.ANY_ATTRIBUTE, types=[AttrTypeFactory.xs_any()], **kwargs,
+            tag=Tag.ANY_ATTRIBUTE, types=[AttrTypeFactory.xs_any()], **kwargs
         )
 
     @classmethod

@@ -3,8 +3,6 @@ from pathlib import Path
 from unittest import mock
 from unittest import TestCase
 
-from lxml import etree
-
 from xsdata.codegen.parsers.schema import SchemaParser
 from xsdata.models.enums import FormType
 from xsdata.models.enums import Mode

@@ -80,7 +80,7 @@ class RestrictionTests(TestCase):
             min_length=MinLength(value=2),
             simple_type=SimpleType(
                 restriction=Restriction(
-                    max_length=MaxLength(value=10), min_length=MinLength(value=5),
+                    max_length=MaxLength(value=10), min_length=MinLength(value=5)
                 )
             ),
         )

@@ -192,7 +192,7 @@ class XmlContextTests(TestCase):
             XmlElement(name="review", qname="review", types=[str]),
             XmlAttribute(name="id", qname="id", types=[str]),
             XmlAttribute(
-                name="lang", qname="lang", types=[str], init=False, default="en",
+                name="lang", qname="lang", types=[str], init=False, default="en"
             ),
         ]
 

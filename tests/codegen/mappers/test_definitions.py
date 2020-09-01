@@ -64,7 +64,7 @@ class DefinitionsMapperTests(FactoryTestCase):
     @mock.patch.object(Definitions, "find_port_type")
     @mock.patch.object(Definitions, "find_binding")
     def test_map_port(
-        self, mock_find_binding, mock_find_port_type, mock_attributes, mock_map_binding,
+        self, mock_find_binding, mock_find_port_type, mock_attributes, mock_map_binding
     ):
         definitions = Definitions()
         service_port = ServicePort(binding="zaa:port", extended=[AnyElement()])
@@ -102,7 +102,7 @@ class DefinitionsMapperTests(FactoryTestCase):
     @mock.patch.object(PortType, "find_operation")
     @mock.patch.object(DefinitionsMapper, "attributes")
     def test_map_binding(
-        self, mock_attributes, mock_find_operation, mock_map_binding_operation,
+        self, mock_attributes, mock_find_operation, mock_map_binding_operation
     ):
         definitions = Definitions()
         port_type = PortType(name="Calc")
@@ -335,7 +335,7 @@ class DefinitionsMapperTests(FactoryTestCase):
                 AnyElement(qname="body"),
                 AnyElement(qname="header"),
                 AnyElement(qname="header"),
-            ],
+            ]
         )
         binding_message.ns_map["foo"] = "bar"
 
@@ -411,7 +411,7 @@ class DefinitionsMapperTests(FactoryTestCase):
                 AnyElement(qname="body", attributes={"namespace": "bodyns"}),
                 AnyElement(qname="header"),
                 AnyElement(qname="header"),
-            ],
+            ]
         )
         binding_message.ns_map["foo"] = "bar"
 

@@ -25,7 +25,7 @@ class AttributeEnumUnionHandlerTests(FactoryTestCase):
                         ),
                     ],
                 ),
-            ],
+            ]
         )
         self.target.inner.append(self.inner_enum)
 

@@ -123,10 +123,7 @@ class ClassExtensionHandler(HandlerInterface):
         Search priority: xs:SimpleType >  xs:ComplexType
         """
 
-        conditions = (
-            lambda x: x.type is SimpleType,
-            lambda x: x.type is ComplexType,
-        )
+        conditions = (lambda x: x.type is SimpleType, lambda x: x.type is ComplexType)
 
         for condition in conditions:
             result = self.container.find(attr_type.qname, condition=condition)

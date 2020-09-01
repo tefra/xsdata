@@ -44,7 +44,7 @@ class EmptyGenerator(FakeGenerator):
     def render(self, classes: List[Class]) -> Iterator[GeneratorResult]:
         for obj in classes:
             yield GeneratorResult(
-                path=Path(f"{self.dir}/{obj.name}.txt"), title="Empty", source="",
+                path=Path(f"{self.dir}/{obj.name}.txt"), title="Empty", source=""
             )
 
 

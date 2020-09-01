@@ -146,7 +146,7 @@ class XmlTextTests(TestCase):
 class XmlMetaTests(TestCase):
     def test_property_element_form(self):
         meta = XmlMeta(
-            name="foo", clazz=BookForm, qname="foo", source_qname="foo", nillable=False,
+            name="foo", clazz=BookForm, qname="foo", source_qname="foo", nillable=False
         )
         self.assertEqual(FormType.UNQUALIFIED, meta.element_form)
 

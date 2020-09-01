@@ -144,7 +144,7 @@ class SchemaTransformerTests(FactoryTestCase):
     @mock.patch.object(SchemaTransformer, "analyze_classes")
     @mock.patch.object(SchemaTransformer, "assign_packages")
     def test_process_classes_with_zero_classes_after_analyze(
-        self, mock_assign_packages, mock_analyze_classes, mock_logger_warning,
+        self, mock_assign_packages, mock_analyze_classes, mock_logger_warning
     ):
         package = "test"
         self.transformer.process_classes(package)
@@ -183,9 +183,7 @@ class SchemaTransformerTests(FactoryTestCase):
 
     @mock.patch.object(SchemaTransformer, "generate_classes")
     @mock.patch.object(SchemaTransformer, "process_schema")
-    def test_convert_schema(
-        self, mock_process_schema, mock_generate_classes,
-    ):
+    def test_convert_schema(self, mock_process_schema, mock_generate_classes):
         schema = Schema(target_namespace="thug", location="main")
         schema.includes.append(Include(location="foo"))
         schema.overrides.append(Override())
@@ -219,7 +217,7 @@ class SchemaTransformerTests(FactoryTestCase):
     @mock.patch.object(SchemaTransformer, "count_classes")
     @mock.patch.object(SchemaMapper, "map")
     def test_generate_classes(
-        self, mock_mapper_map, mock_count_classes, mock_logger_info,
+        self, mock_mapper_map, mock_count_classes, mock_logger_info
     ):
         schema = Schema(location="edo.xsd")
         classes = ClassFactory.list(2)

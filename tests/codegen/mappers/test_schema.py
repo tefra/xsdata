@@ -188,7 +188,7 @@ class SchemaMapperTests(FactoryTestCase):
         sequence_one = Sequence(elements=[Element(), Element()])
         sequence_two = Sequence(max_occurs=2, elements=[Element(), Element()])
         restriction = Restriction(
-            enumerations=[Enumeration(value=x) for x in "abc"], sequence=sequence_two,
+            enumerations=[Enumeration(value=x) for x in "abc"], sequence=sequence_two
         )
         complex_type = ComplexType(
             attributes=[Attribute(), Attribute()],
@@ -392,5 +392,5 @@ class SchemaMapperTests(FactoryTestCase):
         self.assertIsNone(enumeration.name)
 
         mock_build_class.assert_called_once_with(
-            enumeration, Tag.SIMPLE_TYPE, "module", "target_ns",
+            enumeration, Tag.SIMPLE_TYPE, "module", "target_ns"
         )

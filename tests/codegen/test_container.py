@@ -44,7 +44,7 @@ class ClassContainerTests(FactoryTestCase):
         self.assertEqual(class_a, self.container.find(class_a.qname))
         self.assertEqual(class_b, self.container.find(class_b.qname))
         self.assertEqual(
-            class_c, self.container.find(class_b.qname, lambda x: x.is_enumeration),
+            class_c, self.container.find(class_b.qname, lambda x: x.is_enumeration)
         )
         mock_process_class.assert_called_once_with(class_a)
 
@@ -62,5 +62,5 @@ class ClassContainerTests(FactoryTestCase):
         mock_process_class.side_effect = process_class
 
         self.assertEqual(
-            second, self.container.find(first.qname, lambda x: len(x.attrs) == 2),
+            second, self.container.find(first.qname, lambda x: len(x.attrs) == 2)
         )

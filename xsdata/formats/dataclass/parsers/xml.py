@@ -9,9 +9,9 @@ from typing import Type
 from xsdata.formats.bindings import T
 from xsdata.formats.dataclass.parsers.handlers import LxmlEventHandler
 from xsdata.formats.dataclass.parsers.mixins import XmlHandler
+from xsdata.formats.dataclass.parsers.mixins import XmlNode
 from xsdata.formats.dataclass.parsers.nodes import NodeParser
 from xsdata.formats.dataclass.parsers.nodes import Parsed
-from xsdata.formats.dataclass.parsers.nodes import XmlNodes
 from xsdata.models.enums import EventType
 from xsdata.utils.text import snake_case
 from xsdata.utils.text import split_qname
@@ -31,7 +31,7 @@ class XmlParser(NodeParser):
 
     def start(
         self,
-        queue: XmlNodes,
+        queue: List[XmlNode],
         qname: str,
         attrs: Dict,
         ns_map: Dict,
@@ -49,7 +49,7 @@ class XmlParser(NodeParser):
 
     def end(
         self,
-        queue: XmlNodes,
+        queue: List[XmlNode],
         qname: str,
         text: Optional[str],
         tail: Optional[str],

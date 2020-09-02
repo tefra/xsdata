@@ -29,7 +29,6 @@ from xsdata.formats.dataclass.parsers.utils import ParserUtils
 from xsdata.models.enums import EventType
 
 Parsed = Tuple[Optional[str], Any]
-XmlNodes = List["XmlNode"]
 NoneStr = Optional[str]
 
 
@@ -351,7 +350,7 @@ class NodeParser(PushParser):
 
     def start(
         self,
-        queue: XmlNodes,
+        queue: List[XmlNode],
         qname: str,
         attrs: Dict,
         ns_map: Dict,
@@ -377,7 +376,7 @@ class NodeParser(PushParser):
 
     def end(
         self,
-        queue: XmlNodes,
+        queue: List[XmlNode],
         qname: str,
         text: Optional[str],
         tail: Optional[str],
@@ -416,7 +415,7 @@ class RecordParser(NodeParser):
 
     def start(
         self,
-        queue: XmlNodes,
+        queue: List[XmlNode],
         qname: str,
         attrs: Dict,
         ns_map: Dict,
@@ -428,7 +427,7 @@ class RecordParser(NodeParser):
 
     def end(
         self,
-        queue: XmlNodes,
+        queue: List[XmlNode],
         qname: str,
         text: Optional[str],
         tail: Optional[str],

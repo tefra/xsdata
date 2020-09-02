@@ -9,8 +9,8 @@ from typing import Type
 from urllib.parse import urljoin
 
 from xsdata.formats.bindings import T
+from xsdata.formats.dataclass.parsers.mixins import XmlNode
 from xsdata.formats.dataclass.parsers.nodes import Parsed
-from xsdata.formats.dataclass.parsers.nodes import XmlNodes
 from xsdata.formats.dataclass.parsers.xml import XmlParser
 from xsdata.models import xsd
 from xsdata.models.enums import FormType
@@ -46,7 +46,7 @@ class SchemaParser(XmlParser):
 
     def start(
         self,
-        queue: XmlNodes,
+        queue: List[XmlNode],
         qname: str,
         attrs: Dict,
         ns_map: Dict,
@@ -59,7 +59,7 @@ class SchemaParser(XmlParser):
 
     def end(
         self,
-        queue: XmlNodes,
+        queue: List[XmlNode],
         qname: str,
         text: Optional[str],
         tail: Optional[str],

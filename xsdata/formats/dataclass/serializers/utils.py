@@ -63,4 +63,4 @@ class SerializeUtils:
         value = converter.to_string(value, namespaces=namespaces)
         if isinstance(value, str) and len(value) == 0:
             value = None
-        element.tail = converter.to_string(value, namespaces=namespaces)
+        element.tail = value

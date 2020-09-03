@@ -5,8 +5,10 @@
     <name>Short-Sleeved Linen Blouse</name>
     <size system="US-DRESS">10</size>
     <color value="blue"/>
-    <description>This shirt is the<xhtml:b>best-selling</xhtml:b>shirt in
-      our catalog!<xhtml:br/>Note: runs large.</description>
+    <description>
+      This shirt is the <xhtml:b>best-selling</xhtml:b> shirt in
+      our catalog! <xhtml:br/> Note: runs large.
+    </description>
   </shirt>
   <hat effDate="1900-01-01" oth:custom="12">
     <number>557</number>

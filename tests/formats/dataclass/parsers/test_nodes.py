@@ -158,7 +158,7 @@ class ElementNodeTests(TestCase):
         self.assertTrue(node.bind("foo", "text", " tail ", objects))
         self.assertEqual(2, len(objects))
         self.assertEqual(None, objects[-1][0])
-        self.assertEqual("tail", objects[-1][1])
+        self.assertEqual(" tail ", objects[-1][1])
 
     @mock.patch.object(ParserUtils, "bind_mixed_content")
     @mock.patch.object(ParserUtils, "bind_wildcard_element")

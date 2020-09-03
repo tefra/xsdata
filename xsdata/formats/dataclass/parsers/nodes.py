@@ -84,7 +84,7 @@ class ElementNode(XmlNode):
         objects.append((qname, self.meta.clazz(**params)))
 
         if not mixed_var and self.mixed:
-            tail = ParserUtils.string_value(tail)
+            tail = ParserUtils.normalize_content(tail)
             if tail:
                 objects.append((None, tail))
 
@@ -176,8 +176,8 @@ class WildcardNode(XmlNode):
         """
         obj = AnyElement(
             qname=qname,
-            text=ParserUtils.string_value(text),
-            tail=ParserUtils.string_value(tail),
+            text=ParserUtils.normalize_content(text),
+            tail=ParserUtils.normalize_content(tail),
             ns_map=self.ns_map,
             attributes=ParserUtils.parse_any_attributes(self.attrs, self.ns_map),
             children=ParserUtils.fetch_any_children(self.position, objects),

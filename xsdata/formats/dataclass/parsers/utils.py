@@ -180,9 +180,9 @@ class ParserUtils:
         - Otherwise bind the given element to a new generic object.
         """
 
-        txt = cls.string_value(txt)
-        tail = cls.string_value(tail)
-        if not txt and not tail:
+        txt = cls.normalize_content(txt)
+        tail = cls.normalize_content(tail)
+        if txt is None and tail is None:
             return
 
         if var.is_list:
@@ -205,9 +205,19 @@ class ParserUtils:
             params[var.name] = generic
 
     @classmethod
-    def string_value(cls, value: Optional[str]) -> Optional[str]:
-        value = value.strip() if value else None
-        return value or None
+    def normalize_content(cls, value: Optional[str]) -> Optional[str]:
+        """
+        Normalize element text or tail content.
+
+        If content is just whitespace return None, otherwise preserve
+        the original content.
+        """
+        if value is not None:
+            clean_value = value.strip()
+            if not clean_value:
+                value = None
+
+        return value
 
     @classmethod
     def parse_any_attributes(cls, attrs: Dict, ns_map: Dict) -> Dict:

@@ -57,7 +57,7 @@ Features
 - Generate data models for WSDL 1.1 and SOAP 1.1 bindings.
 - Support qualified elements/attributes, enumerations and inner classes.
 - Preserve embedded documentation and references.
-- Data biding for XML and JSON documents.
+- Data binding for XML and JSON documents.
 - Pluggable code writer that supports python dataclasses and PlantUML class diagrams.
 
 

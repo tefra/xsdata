@@ -101,11 +101,11 @@ class XmlSaxHandler(LxmlSaxHandler, sax.handler.ContentHandler):
         Start element notification receiver.
 
         The receiver will flush any previous active element, append a new data frame
-         to collect data content for the next active element and notify the main
-         parser to prepare for next binding instruction.
+        to collect data content for the next active element and notify the main parser
+        to prepare for next binding instruction.
 
-         Converts name and attribute keys to fully qualified tags to respect the
-         main parser api, eg (foo, bar) -> {foo}bar
+        Converts name and attribute keys to fully qualified tags to respect the main
+        parser api, eg (foo, bar) -> {foo}bar
         """
         tag = text.qname(name[0], name[1])
         attrs = {text.qname(key[0], key[1]): value for key, value in attrs.items()}
@@ -116,11 +116,11 @@ class XmlSaxHandler(LxmlSaxHandler, sax.handler.ContentHandler):
         """
         End element notification receiver.
 
-        The receiver will flush any previous active element and set the next
-        element to be flushed.
+        The receiver will flush any previous active element and set the next element
+        to be flushed.
 
         Converts name and attribute keys to fully qualified tags to respect the
-         main parser api, eg (foo, bar) -> {foo}bar
+        main parser api, eg (foo, bar) -> {foo}bar
         """
         self.end(text.qname(name[0], name[1]))
 

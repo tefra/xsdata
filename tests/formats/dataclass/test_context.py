@@ -1,5 +1,6 @@
 import sys
 from dataclasses import dataclass
+from dataclasses import field
 from dataclasses import make_dataclass
 from dataclasses import replace
 from typing import get_type_hints
@@ -8,8 +9,6 @@ from typing import List
 from typing import Union
 from unittest import mock
 from unittest import TestCase
-
-import pytest
 
 from tests.fixtures.books import BookForm
 from tests.fixtures.books import Books
@@ -23,7 +22,6 @@ from xsdata.formats.dataclass.models.constants import XmlType
 from xsdata.formats.dataclass.models.elements import XmlAttribute
 from xsdata.formats.dataclass.models.elements import XmlElement
 from xsdata.formats.dataclass.models.elements import XmlMeta
-from xsdata.formats.dataclass.models.elements import XmlText
 from xsdata.formats.dataclass.models.elements import XmlWildcard
 from xsdata.utils import text
 
@@ -207,7 +205,6 @@ class XmlContextTests(TestCase):
             self.assertFalse(var.dataclass)
             self.assertIsNone(var.clazz)
 
-    @pytest.mark.skipif(sys.version_info < (3, 7), reason="requires python >= 3.7")
     def test_get_type_hints_with_union_types(self):
         @dataclass
         class Example:
@@ -217,10 +214,13 @@ class XmlContextTests(TestCase):
 
         result = list(self.ctx.get_type_hints(Example, None))
         expected = [
-            XmlText(name="bool", qname="bool", types=[bool]),
-            XmlText(name="int", qname="int", types=[int]),
-            XmlText(name="union", qname="union", types=[bool, int]),
+            XmlElement(name="bool", qname="bool", types=[bool]),
+            XmlElement(name="int", qname="int", types=[int]),
+            XmlElement(name="union", qname="union", types=[bool, int]),
         ]
+
+        if sys.version_info < (3, 7):
+            expected[2].types.remove(bool)
 
         self.assertEqual(expected, result)
 
@@ -259,6 +259,38 @@ class XmlContextTests(TestCase):
 
         self.assertEqual(1, len(result))
         self.assertEqual(expected, result[0])
+
+    def test_get_type_hints_with_undefined_types(self):
+        @dataclass
+        class Currency:
+            id: int = field(metadata=dict(type="Attribute", name="ID"))
+            iso_code: str = field(metadata=dict(name="CharCode"))
+            nominal: int = field(metadata=dict(name="Nominal"))
+
+        @dataclass
+        class Currencies:
+            name: str = field(metadata=dict(type="Attribute"))
+            values: List[Currency] = field(default_factory=list)
+
+        expected = [
+            XmlAttribute(name="id", qname="ID", types=[int]),
+            XmlElement(name="iso_code", qname="CharCode", types=[str]),
+            XmlElement(name="nominal", qname="Nominal", types=[int]),
+        ]
+        self.assertEqual(expected, list(self.ctx.get_type_hints(Currency, None)))
+
+        expected = [
+            XmlAttribute(name="name", qname="name", types=[str]),
+            XmlElement(
+                name="values",
+                qname="values",
+                dataclass=True,
+                list_element=True,
+                default=list,
+                types=[Currency],
+            ),
+        ]
+        self.assertEqual(expected, list(self.ctx.get_type_hints(Currencies, None)))
 
     def test_get_type_hints_with_no_dataclass(self):
         with self.assertRaises(TypeError):
@@ -352,3 +384,34 @@ class XmlContextTests(TestCase):
 
         self.assertTrue(self.ctx.is_element_list(type_hints["list_list_int"], False))
         self.assertTrue(self.ctx.is_element_list(type_hints["list_list_int"], True))
+
+    def test_default_xml_type(self):
+        cls = make_dataclass("a", [("x", int)])
+        self.assertEqual(XmlType.TEXT, self.ctx.default_xml_type(cls))
+
+        cls = make_dataclass("b", [("x", int), ("y", int)])
+        self.assertEqual(XmlType.ELEMENT, self.ctx.default_xml_type(cls))
+
+        cls = make_dataclass(
+            "c", [("x", int), ("y", int, field(metadata=dict(type="Text")))]
+        )
+        self.assertEqual(XmlType.ELEMENT, self.ctx.default_xml_type(cls))
+
+        cls = make_dataclass(
+            "d", [("x", int), ("y", int, field(metadata=dict(type="Element")))]
+        )
+        self.assertEqual(XmlType.TEXT, self.ctx.default_xml_type(cls))
+
+        with self.assertRaises(XmlContextError) as cm:
+            cls = make_dataclass(
+                "e",
+                [
+                    ("x", int, field(metadata=dict(type="Text"))),
+                    ("y", int, field(metadata=dict(type="Text"))),
+                ],
+            )
+            self.ctx.default_xml_type(cls)
+
+        self.assertEqual(
+            "Dataclass `e` includes more than one text node!", str(cm.exception)
+        )

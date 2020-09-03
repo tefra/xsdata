@@ -1,4 +1,5 @@
 import sys
+from collections import defaultdict
 from dataclasses import dataclass
 from dataclasses import Field
 from dataclasses import field
@@ -20,7 +21,7 @@ from xsdata.formats.dataclass.models.constants import XmlType
 from xsdata.formats.dataclass.models.elements import XmlMeta
 from xsdata.formats.dataclass.models.elements import XmlVar
 from xsdata.models.enums import NamespaceType
-from xsdata.utils import text
+from xsdata.utils import text as text_utils
 
 
 @dataclass
@@ -116,8 +117,8 @@ class XmlContext:
             self.cache[clazz] = XmlMeta(
                 name=name,
                 clazz=clazz,
-                qname=text.qname(namespace, name),
-                source_qname=text.qname(source_namespace, name),
+                qname=text_utils.qname(namespace, name),
+                source_qname=text_utils.qname(source_namespace, name),
                 nillable=nillable,
                 vars=list(self.get_type_hints(clazz, namespace)),
             )
@@ -126,18 +127,22 @@ class XmlContext:
     def get_type_hints(self, clazz: Type, parent_ns: Optional[str]) -> Iterator[XmlVar]:
         """Build the model class fields metadata."""
         type_hints = get_type_hints(clazz)
+        default_xml_type = self.default_xml_type(clazz)
 
         for var in fields(clazz):
             type_hint = type_hints[var.name]
             types = self.real_types(type_hint)
             is_tokens = var.metadata.get("tokens", False)
             is_element_list = self.is_element_list(type_hint, is_tokens)
-            xml_type = var.metadata.get("type")
+            local_name = var.metadata.get("name") or self.name_generator(var.name)
+            is_class = any(is_dataclass(clazz) for clazz in types)
+
+            xml_type = var.metadata.get(
+                "type", default_xml_type if not is_class else "Element"
+            )
             xml_clazz = XmlType.to_xml_class(xml_type)
             namespace = var.metadata.get("namespace")
             namespaces = self.resolve_namespaces(xml_type, namespace, parent_ns)
-            local_name = var.metadata.get("name") or self.name_generator(var.name)
-            is_class = any(is_dataclass(clazz) for clazz in types)
             first_namespace = (
                 namespaces[0]
                 if len(namespaces) > 0 and namespaces[0] and namespaces[0][0] != "#"
@@ -146,7 +151,7 @@ class XmlContext:
 
             yield xml_clazz(
                 name=var.name,
-                qname=text.qname(first_namespace, local_name),
+                qname=text_utils.qname(first_namespace, local_name),
                 namespaces=namespaces,
                 init=var.init,
                 mixed=var.metadata.get("mixed", False),
@@ -159,8 +164,9 @@ class XmlContext:
                 default=self.default_value(var),
             )
 
-    @staticmethod
+    @classmethod
     def resolve_namespaces(
+        cls,
         xml_type: Optional[str],
         namespace: Optional[str],
         parent_namespace: Optional[str],
@@ -192,8 +198,8 @@ class XmlContext:
                 result.add(ns)
         return list(result)
 
-    @staticmethod
-    def default_value(var: Field) -> Any:
+    @classmethod
+    def default_value(cls, var: Field) -> Any:
         """Return the default value/factory for the given field."""
 
         if var.default_factory is not MISSING:  # type: ignore
@@ -204,8 +210,8 @@ class XmlContext:
 
         return None
 
-    @staticmethod
-    def real_types(type_hint: Any) -> List:
+    @classmethod
+    def real_types(cls, type_hint: Any) -> List:
         """Return a list of real types that can be used to bind or cast
         data."""
         types = []
@@ -236,8 +242,8 @@ class XmlContext:
             base is not object and isinstance(obj, base) for base in clazz.__bases__
         )
 
-    @staticmethod
-    def is_element_list(type_hint: Any, is_tokens: bool) -> bool:
+    @classmethod
+    def is_element_list(cls, type_hint: Any, is_tokens: bool) -> bool:
         if getattr(type_hint, "__origin__", None) in (list, List):
             if not is_tokens:
                 return True
@@ -247,3 +253,22 @@ class XmlContext:
                 return True
 
         return False
+
+    @classmethod
+    def default_xml_type(cls, clazz: Type) -> str:
+        """Return the default xml type for the fields of the given dataclass
+        with an undefined type."""
+        counters: Dict[str, int] = defaultdict(int)
+        for var in fields(clazz):
+            xml_type = var.metadata.get("type")
+            counters[xml_type or "undefined"] += 1
+
+        if counters[XmlType.TEXT] > 1:
+            raise XmlContextError(
+                f"Dataclass `{clazz.__name__}` includes more than one text node!"
+            )
+
+        if counters["undefined"] == 1 and counters[XmlType.TEXT] == 0:
+            return XmlType.TEXT
+
+        return XmlType.ELEMENT

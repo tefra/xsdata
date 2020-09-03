@@ -14,47 +14,14 @@ create these models manually.
 Basic Model
 ===========
 
-.. code-block:: python
+.. literalinclude:: examples/basic_model.py
+    :lines: 9-26
+    :language: python
 
-    @dataclass
-    class Currency:
-        id: int = field(metadata=dict(type="Attribute", name="ID"))
-        name: str = field(metadata=dict(type="Attribute", name="Name"))
-        num_code: int = field(metadata=dict(type="Element", name="NumCode"))
-        iso_code: str = field(metadata=dict(type="Element", name="CharCode"))
-        nominal: int = field(metadata=dict(type="Element", name="Nominal"))
-        value: Decimal = field(metadata=dict(type="Element", name="Value"))
+.. literalinclude:: examples/basic_model.py
+    :lines: 30-45
+    :language: xml
 
-
-    @dataclass
-    class Currencies:
-        class Meta:
-            name = "ValCurs"
-
-        date: str = field(metadata=dict(type="Attribute", name="Date"))
-        name: str = field(metadata=dict(type="Attribute"))
-        values: List[Currency] = field(default_factory=list, metadata=dict(type="Element", name="Valute"))
-
-
-
-.. code-block:: xml
-
-    <ValCurs Date="19.04.2020" name="Official exchange rate">
-        <Valute ID="47">
-            <NumCode>978</NumCode>
-            <CharCode>EUR</CharCode>
-            <Nominal>1</Nominal>
-            <Name>Euro</Name>
-            <Value>19.2743</Value>
-        </Valute>
-        <Valute ID="44">
-            <NumCode>840</NumCode>
-            <CharCode>USD</CharCode>
-            <Nominal>1</Nominal>
-            <Name>US Dollar</Name>
-            <Value>17.7177</Value>
-        </Valute>
-    </ValCurs>
 
 
 Class Meta
@@ -100,7 +67,8 @@ Field Metadata
      - The real name of the element or attribute this field represents.
    * - type
      - str
-     - The field type: Text | Element | Attribute | Wildcard | Attributes, default: Text
+     - The field xml type: ``Text | Element | Attribute | Wildcard | Attributes``,
+       default: ``Text`` or ``Element``
    * - nillable
      - bool
      - Specifies whether an explicit empty value can be assigned.

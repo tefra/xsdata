@@ -1,3 +1,18 @@
+20.9 (2020-09-03)
+-----------------
+- Added field metadata key `tokens` for xs:list or xs:NMTOKENS derived elements.
+- Added datatype factory to register custom converters.
+- Added XmlHandler interface to decouple parsing from lxml.
+- Added lxml based content handlers: LxmlEventHandler, LxmlSaxHandler
+- Added native python xml content handlers: XmlEventHandler, XmlSaxHandler
+- Added support for python >= 3.6 `#241 <https://github.com/tefra/xsdata/issues/241>`_
+- Added codegen for soap 1.1 fault messages.
+- Fixed converting to enum members derived from xs:NMTOKENS.
+- Fixed package level import naming conflicts. `#228 <https://github.com/tefra/xsdata/issues/206>`_
+- Fixed xml serializing to allow empty strings in attribute values. `#230 <https://github.com/tefra/xsdata/issues/230>`_
+- Fixed xml serializing for mixed content with non generics. `#238 <https://github.com/tefra/xsdata/issues/238>`_
+
+
 20.8 (2020-08-01)
 -----------------
 - Added codegen support for **WSDL 1.1 and SOAP 1.1** bindings.

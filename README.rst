@@ -30,16 +30,14 @@ Naive XML Bindings for python
 xsData is a complete XML data binding library for python allowing developers to access
 and use XML documents as simple objects rather than using DOM.
 
-xsData comes with a code generator that can convert XML Schema 1.0 and 1.1 definitions
-to simple dataclasses with type hints and as minimum footprint as possible. The
-generated packages have no dependency on the library itself. So simple that you can
-write the models on your own if you happen to use an XML document with no schema
-available.
+It ships with a code generator for XML Schema definitions and WSDL 1.1 with SOAP 1.1
+bindings. It produces simple dataclasses with type hints that don't depend on the
+library itself in order to reduce the learning curve for users that have to write the
+binding models manually.
 
-The XML Parser is highly optimized and uses lxml iterparse to bind the document data to
-the target models. The parser accepts a configuration instance with various options
-like `fail on unknown properties` and is also thread safe which means you can take
-advantage of the internal model inspection caching context for even faster parsing.
+The included parser is highly optimized and adaptable with 4 available handlers based
+on native python and lxml. The parser configuration offers the ability to skip unknown
+properties and to process xinclude statements.
 
 The parser and serializer are constantly tested against the
 `W3C XML Schema 1.1 test suite <https://github.com/tefra/xsdata-w3c-tests>`_ and
@@ -55,25 +53,24 @@ the `samples repo <https://github.com/tefra/xsdata-samples>`_ for more ✨✨✨
 Features
 --------
 
-- Generate data models from XML Schema 1.0 and 1.1 definitions.
+- Generate data models for XML Schema 1.0 and 1.1 definitions.
 - Generate data models for WSDL 1.1 and SOAP 1.1 bindings.
-- Supports qualified elements/attributes.
-- Supports enumerations and inner classes.
-- Flattening strategies to keep the code as simple as possible.
-- Preserve embedded documentation and references
-- Pluggable code writer that supports different formats
-- Output: Python Data Classes
-- Output: PlantUML class diagram
+- Support qualified elements/attributes, enumerations and inner classes.
+- Preserve embedded documentation and references.
+- Data biding for XML and JSON documents.
+- Pluggable code writer that supports python dataclasses and PlantUML class diagrams.
 
-Changelog: 20.8 (2020-08-01)
+
+Changelog: 20.9 (2020-09-03)
 ----------------------------
-- Added codegen support for **WSDL 1.1 and SOAP 1.1** bindings.
-- Added experimental web services client.
-- Added cli flag ``--ns-struct`` to group classes by target namespaces. `#206 <https://github.com/tefra/xsdata/issues/206>`_
-- Added parser config to support xinclude statements. `#207 <https://github.com/tefra/xsdata/issues/207>`_
-- Added new xml union node to improve bindings for fields with union type. `#207 <https://github.com/tefra/xsdata/issues/207>`_
-- Fixed class resolve issue with mixed namespaces. `#204 <https://github.com/tefra/xsdata/issues/204>`_
-- Fixed attribute comparison issue. `#209 <https://github.com/tefra/xsdata/issues/209>`_
-- Fixed data type mapping for various schema elements. `#221 <https://github.com/tefra/xsdata/issues/221>`_
-- Fixed mixed content handling. `#213 <https://github.com/tefra/xsdata/issues/213>`_
-- Code cleanup & 100% coverage.
+- Added field metadata key `tokens` for xs:list or xs:NMTOKENS derived elements.
+- Added datatype factory to register custom converters.
+- Added XmlHandler interface to decouple parsing from lxml.
+- Added lxml based content handlers: LxmlEventHandler, LxmlSaxHandler
+- Added native python xml content handlers: XmlEventHandler, XmlSaxHandler
+- Added support for python >= 3.6 `#241 <https://github.com/tefra/xsdata/issues/241>`_
+- Added codegen for soap 1.1 fault messages.
+- Fixed converting to enum members derived from xs:NMTOKENS.
+- Fixed package level import naming conflicts. `#228 <https://github.com/tefra/xsdata/issues/206>`_
+- Fixed xml serializing to allow empty strings in attribute values. `#230 <https://github.com/tefra/xsdata/issues/230>`_
+- Fixed xml serializing for mixed content with non generics. `#238 <https://github.com/tefra/xsdata/issues/238>`_

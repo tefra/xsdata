@@ -118,13 +118,13 @@ class ClassExtensionHandlerTests(FactoryTestCase):
             source, target, extension
         )
 
-    @mock.patch.object(ClassExtensionHandler, "create_default_attribute")
-    def test_process_extension_native(self, mock_create_default_attribute):
+    @mock.patch.object(ClassExtensionHandler, "add_default_attribute")
+    def test_process_extension_native(self, mock_add_default_attribute):
         extension = ExtensionFactory.create()
         target = ClassFactory.elements(1)
 
         self.processor.process_native_extension(target, extension)
-        mock_create_default_attribute.assert_called_once_with(target, extension)
+        mock_add_default_attribute.assert_called_once_with(target, extension)
 
     @mock.patch.object(ClassExtensionHandler, "copy_extension_type")
     def test_process_native_extension_with_enumeration_target(
@@ -142,28 +142,28 @@ class ClassExtensionHandlerTests(FactoryTestCase):
         self.processor.process_simple_extension(target, target, extension)
         self.assertEqual(0, len(target.extensions))
 
-    @mock.patch.object(ClassExtensionHandler, "create_default_attribute")
+    @mock.patch.object(ClassExtensionHandler, "add_default_attribute")
     def test_process_simple_extension_when_source_is_enumeration_and_target_is_not(
-        self, mock_create_default_attribute
+        self, mock_add_default_attribute
     ):
         source = ClassFactory.enumeration(2)
         target = ClassFactory.elements(1)
         extension = ExtensionFactory.create()
 
         self.processor.process_simple_extension(source, target, extension)
-        mock_create_default_attribute.assert_called_once_with(target, extension)
+        mock_add_default_attribute.assert_called_once_with(target, extension)
 
     @mock.patch.object(ClassUtils, "copy_attributes")
-    @mock.patch.object(ClassExtensionHandler, "create_default_attribute")
+    @mock.patch.object(ClassExtensionHandler, "add_default_attribute")
     def test_process_simple_extension_when_target_is_enumeration_and_source_is_not(
-        self, mock_create_default_attribute, mock_copy_attributes
+        self, mock_add_default_attribute, mock_copy_attributes
     ):
         extension = ExtensionFactory.create()
         source = ClassFactory.elements(2)
         target = ClassFactory.enumeration(1, extensions=[extension])
 
         self.processor.process_simple_extension(source, target, extension)
-        self.assertEqual(0, mock_create_default_attribute.call_count)
+        self.assertEqual(0, mock_add_default_attribute.call_count)
         self.assertEqual(0, mock_copy_attributes.call_count)
         self.assertEqual(0, len(target.extensions))
 
@@ -328,27 +328,41 @@ class ClassExtensionHandlerTests(FactoryTestCase):
         self.assertEqual(extension.type, target.attrs[1].types[1])
         self.assertEqual(0, len(target.extensions))
 
-    def test_create_default_attribute(self):
-        extension = ExtensionFactory.create()
+    def test_add_default_attribute(self):
+        xs_string = AttrTypeFactory.xs_string()
+        extension = ExtensionFactory.create(xs_string, Restrictions(required=True))
         item = ClassFactory.create(extensions=[extension])
 
-        ClassExtensionHandler.create_default_attribute(item, extension)
+        ClassExtensionHandler.add_default_attribute(item, extension)
         expected = AttrFactory.create(
-            name="value", default=None, types=[extension.type], tag=Tag.EXTENSION
+            name="value", default=None, types=[xs_string], tag=Tag.EXTENSION
         )
 
         self.assertEqual(1, len(item.attrs))
         self.assertEqual(0, len(item.extensions))
         self.assertEqual(expected, item.attrs[0])
 
-    def test_create_default_attribute_with_any_type(self):
+        xs_int = AttrTypeFactory.xs_int()
+        extension = ExtensionFactory.create(xs_int, Restrictions(tokens=True))
+        item.extensions.append(extension)
+        ClassExtensionHandler.add_default_attribute(item, extension)
+
+        expected.types.append(xs_int)
+        expected_restrictions = Restrictions(tokens=True, required=True)
+
+        self.assertEqual(1, len(item.attrs))
+        self.assertEqual(0, len(item.extensions))
+        self.assertEqual(expected, item.attrs[0])
+        self.assertEqual(expected_restrictions, item.attrs[0].restrictions)
+
+    def test_add_default_attribute_with_any_type(self):
         extension = ExtensionFactory.create(
             type=AttrTypeFactory.xs_any(),
             restrictions=Restrictions(min_occurs=1, max_occurs=1, required=True),
         )
         item = ClassFactory.create(extensions=[extension])
 
-        ClassExtensionHandler.create_default_attribute(item, extension)
+        ClassExtensionHandler.add_default_attribute(item, extension)
         expected = AttrFactory.create(
             name="any_element",
             default=None,

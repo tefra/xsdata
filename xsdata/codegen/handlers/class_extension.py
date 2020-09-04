@@ -56,7 +56,7 @@ class ClassExtensionHandler(HandlerInterface):
         if target.is_enumeration:
             cls.copy_extension_type(target, extension)
         else:
-            cls.create_default_attribute(target, extension)
+            cls.add_default_attribute(target, extension)
 
     def process_dependency_extension(self, target: Class, extension: Extension):
         """User defined type flatten handler."""
@@ -85,7 +85,7 @@ class ClassExtensionHandler(HandlerInterface):
         if source is target:
             target.extensions.remove(ext)
         elif source.is_enumeration and not target.is_enumeration:
-            cls.create_default_attribute(target, ext)
+            cls.add_default_attribute(target, ext)
         elif source.is_enumeration == target.is_enumeration:
             ClassUtils.copy_attributes(source, target, ext)
         else:  # this is an enumeration
@@ -163,28 +163,35 @@ class ClassExtensionHandler(HandlerInterface):
         target.extensions.remove(extension)
 
     @classmethod
-    def create_default_attribute(cls, item: Class, extension: Extension):
+    def add_default_attribute(cls, target: Class, extension: Extension):
         """Add a default value field to the given class based on the extension
         type."""
-        if extension.type.native_code == DataType.ANY_TYPE.code:
-            attr = Attr(
-                name="any_element",
-                local_name="any_element",
-                default=list if extension.restrictions.is_list else None,
-                types=[extension.type.clone()],
-                tag=Tag.ANY,
-                namespace=NamespaceType.ANY,
-                restrictions=extension.restrictions.clone(),
-            )
+        if extension.type.native_code != DataType.ANY_TYPE.code:
+            tag = Tag.EXTENSION
+            name = "value"
+            default = None
+            namespace = None
         else:
-            attr = Attr(
-                name="value",
-                local_name="value",
-                default=None,
-                types=[extension.type.clone()],
-                tag=Tag.EXTENSION,
-                restrictions=extension.restrictions.clone(),
-            )
+            tag = Tag.ANY
+            name = "any_element"
+            default = list if extension.restrictions.is_list else None
+            namespace = NamespaceType.ANY
 
-        item.attrs.insert(0, attr)
-        item.extensions.remove(extension)
+        attr = cls.get_or_create_attribute(target, name, tag)
+        attr.types.append(extension.type.clone())
+        attr.restrictions.merge(extension.restrictions)
+        attr.namespace = namespace
+        attr.default = default
+        target.extensions.remove(extension)
+
+    @classmethod
+    def get_or_create_attribute(cls, target: Class, name: str, tag: str) -> Attr:
+        """Find or create for the given parameters an attribute in the target
+        class."""
+        for attr in target.attrs:
+            if attr.name == attr.local_name == name and attr.tag == tag:
+                return attr
+
+        attr = Attr(name=name, local_name=name, tag=tag)
+        target.attrs.insert(0, attr)
+        return attr

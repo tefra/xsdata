@@ -74,7 +74,7 @@ class AttributeDefaultTests(TestCase):
         attr = AttrFactory.create(types=[type_qname], default="xs:anyType")
         ns_map = {"xs": Namespace.XS.uri}
         self.assertEqual(
-            'QName("http://www.w3.org/2001/XMLSchema", "anyType")',
+            'QName("{http://www.w3.org/2001/XMLSchema}anyType")',
             attribute_default(attr, ns_map),
         )
 

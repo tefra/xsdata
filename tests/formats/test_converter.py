@@ -3,8 +3,9 @@ from decimal import Decimal
 from enum import Enum
 from typing import Any
 from unittest import TestCase
+from xml.etree.ElementTree import QName
 
-from lxml.etree import QName
+from lxml import etree
 
 from xsdata.exceptions import ConverterError
 from xsdata.formats.converter import BoolConverter
@@ -14,6 +15,7 @@ from xsdata.formats.converter import DecimalConverter
 from xsdata.formats.converter import EnumConverter
 from xsdata.formats.converter import FloatConverter
 from xsdata.formats.converter import IntConverter
+from xsdata.formats.converter import LxmlQNameConverter
 from xsdata.formats.converter import ProxyConverter
 from xsdata.formats.converter import QNameConverter
 from xsdata.formats.converter import StrConverter
@@ -164,17 +166,52 @@ class DecimalConverterTests(TestCase):
         self.assertEqual("8.77683E-8", self.converter.to_string(Decimal("8.77683E-8")))
 
 
-class QNameConverterTests(TestCase):
+class LxmlQNameConverterTests(TestCase):
     def setUp(self):
-        self.converter = QNameConverter()
+        self.converter = LxmlQNameConverter()
 
     def test_from_string(self):
         convert = self.converter.from_string
         with self.assertRaises(ConverterError):
             convert("a:b")
 
-        self.assertEqual(QName("a"), convert("a"))
-        self.assertEqual(QName("b"), convert("a:b", ns_map={}))
+        with self.assertRaises(ConverterError):
+            self.assertEqual(etree.QName("b"), convert("a:b", ns_map={}))
+
+        self.assertEqual(etree.QName("a"), convert("a", ns_map={}))
+        self.assertEqual(etree.QName("aa", "b"), convert("a:b", ns_map={"a": "aa"}))
+
+    def test_to_string(self):
+        ns = Namespaces()
+        ns.add("c", "c_prefix")
+        convert = self.converter.to_string
+
+        self.assertEqual("a", convert(etree.QName("a"), namespaces=ns))
+        self.assertEqual("a", convert(etree.QName("a")))
+        self.assertEqual("ns1:b", convert(etree.QName("a", "b"), namespaces=ns))
+        self.assertEqual("{a}b", convert(etree.QName("a", "b")))
+        self.assertEqual("c_prefix:c", convert(etree.QName("c", "c"), namespaces=ns))
+        self.assertEqual("{c}c", convert(etree.QName("c", "c")))
+
+
+class QNameConverterTests(TestCase):
+    def setUp(self):
+        self.converter = QNameConverter()
+
+    def test_from_string(self):
+        convert = self.converter.from_string
+        with self.assertRaises(ConverterError) as cm:
+            convert("a:b")
+
+        self.assertEqual(
+            "QName converter needs ns_map to support prefixes", str(cm.exception)
+        )
+
+        with self.assertRaises(ConverterError) as cm:
+            convert("a:b", ns_map={})
+        self.assertEqual("Unknown namespace prefix: `a`", str(cm.exception))
+
+        self.assertEqual(QName("a"), convert("a", ns_map={}))
         self.assertEqual(QName("aa", "b"), convert("a:b", ns_map={"a": "aa"}))
 
     def test_to_string(self):

@@ -33,7 +33,7 @@ class DefaultImportsTests(TestCase):
     def test_default_imports_with_qname(self):
         output = " QName "
 
-        expected = "from lxml.etree import QName"
+        expected = "from xml.etree.ElementTree import QName"
         self.assertIn(expected, default_imports(output))
 
     def test_default_imports_with_typing(self):

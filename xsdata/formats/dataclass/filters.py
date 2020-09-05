@@ -6,10 +6,10 @@ from typing import Dict
 from typing import List
 from typing import Optional
 from typing import Type
+from xml.etree.ElementTree import QName
 from xml.sax.saxutils import quoteattr
 
 from docformatter import format_code
-from lxml.etree import QName
 
 from xsdata.codegen.models import Attr
 from xsdata.codegen.models import AttrType
@@ -120,7 +120,7 @@ def default_imports(output: str) -> str:
         result.append(f"from dataclasses import {', '.join(dataclasses)}")
 
     if "QName" in output:
-        result.append("from lxml.etree import QName")
+        result.append("from xml.etree.ElementTree import QName")
 
     typing_patterns = {
         "Dict": [": Dict"],
@@ -192,7 +192,7 @@ def prepare_attribute_default(value: Any) -> Any:
         return repr(value)
 
     if isinstance(value, QName):
-        return f'QName("{value.namespace}", "{value.localname}")'
+        return f'QName("{value.text}")'
 
     return value
 

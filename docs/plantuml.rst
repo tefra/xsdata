@@ -3,18 +3,18 @@ PlantUML
 
 Generate `PlantUML <https://plantuml.com/class-diagram>`_ class diagram
 
-.. literalinclude:: examples/primer.pu
+.. literalinclude:: /../tests/fixtures/primer/order.pu
 
 Which is translated to this nice svg
 
-.. image:: examples/primer.svg
+.. image:: _static/primer.svg
 
 .. hint::
 
     Then above output was generating by running the following command
 
-        ``xsdata docs/examples/primer.xsd --package docs.examples --output plantuml --print``
+    ``xsdata tests/fixtures/primer/order.xsd --package order --output plantuml --print``
 
     The output was converted to svg with the plantUML cli tool
 
-        ``plantuml docs/examples/primer.pu -tsvg``
+    ``plantuml tests/fixtures/primer/order.pu -tsvg``

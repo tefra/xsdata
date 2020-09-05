@@ -93,7 +93,7 @@
       -
       -
       -
-    * - :class:`lxml.etree.QName`
+    * - :class:`xml.etree.ElementTree`
       - QName
       -
       -

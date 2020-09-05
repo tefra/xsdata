@@ -141,7 +141,7 @@ Example: from path
 ------------------
 
 .. literalinclude:: examples/xml_parser.py
-   :lines: 1,6-8,9-20
+   :lines: 3-6,7-17
 
 
 Example: from memory
@@ -150,14 +150,14 @@ Example: from memory
 With support for `XML Inclusions <https://www.w3.org/TR/xinclude-11/>`_
 
 .. literalinclude:: examples/xml_parser.py
-   :lines: 21-24
+   :lines: 19-22
 
 
 Example: alternative handler
 ----------------------------
 
 .. literalinclude:: examples/xml_parser.py
-   :lines: 26-29
+   :lines: 24-27
 
 
 

@@ -20,5 +20,4 @@
     plantuml
     demos
     changelog
-    about
     api

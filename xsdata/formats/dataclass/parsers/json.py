@@ -41,6 +41,9 @@ class JsonParser(AbstractParser):
         """
         params = {}
         for var in self.context.build(clazz).vars:
+            if not var.init:
+                continue
+
             value = self.get_value(data, var)
 
             if value is None:

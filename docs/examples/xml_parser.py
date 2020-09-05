@@ -1,14 +1,12 @@
-from pathlib import Path
-
-from docs.examples.primer import Usaddress, PurchaseOrder
 from tests import fixtures_dir
 from tests.fixtures.books import Books
+from tests.fixtures.primer import PurchaseOrder, Usaddress
 from xsdata.formats.dataclass.parsers import XmlParser
 from xsdata.formats.dataclass.parsers.config import ParserConfig
 
 config = ParserConfig(fail_on_unknown_properties=True)
 parser = XmlParser(config=config)
-order = parser.from_path(Path("primer.xml"), PurchaseOrder)
+order = parser.from_path(fixtures_dir.joinpath("primer/order.xml"), PurchaseOrder)
 
 assert order.bill_to == Usaddress(
     name='Robert Smith',
@@ -26,4 +24,4 @@ actual = parser.from_bytes(path.read_bytes(), Books)
 from xsdata.formats.dataclass.parsers.handlers import XmlEventHandler
 
 parser = XmlParser(handler=XmlEventHandler)
-order = parser.from_path(Path("primer.xml"), PurchaseOrder)
+order = parser.from_path(fixtures_dir.joinpath("primer/order.xml"), PurchaseOrder)

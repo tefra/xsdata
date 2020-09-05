@@ -104,12 +104,6 @@ def default_imports(output: str) -> str:
     """Generate the default imports for the given package output."""
     result = []
 
-    if "Decimal" in output:
-        result.append("from decimal import Decimal")
-
-    if "(Enum)" in output:
-        result.append("from enum import Enum")
-
     dataclasses = []
     if "@dataclass" in output:
         dataclasses.append("dataclass")
@@ -119,8 +113,11 @@ def default_imports(output: str) -> str:
     if dataclasses:
         result.append(f"from dataclasses import {', '.join(dataclasses)}")
 
-    if "QName" in output:
-        result.append("from xml.etree.ElementTree import QName")
+    if type_is_included(output, "Decimal"):
+        result.append("from decimal import Decimal")
+
+    if "(Enum)" in output:
+        result.append("from enum import Enum")
 
     typing_patterns = {
         "Dict": [": Dict"],
@@ -137,7 +134,19 @@ def default_imports(output: str) -> str:
     if types:
         result.append(f"from typing import {', '.join(types)}")
 
+    if type_is_included(output, "QName"):
+        result.append("from xml.etree.ElementTree import QName")
+
     return "\n".join(result)
+
+
+def type_is_included(output: str, type_name: str) -> bool:
+    return (
+        f": {type_name}" in output
+        or f"[{type_name}" in output
+        or f", {type_name}" in output
+        or f"= {type_name}" in output
+    )
 
 
 def attribute_default(attr: Attr, ns_map: Optional[Dict] = None) -> Any:

@@ -5,10 +5,22 @@ from xsdata.formats.dataclass.filters import default_imports
 
 class DefaultImportsTests(TestCase):
     def test_default_imports_with_decimal(self):
-        output = " Decimal "
-
         expected = "from decimal import Decimal"
-        self.assertIn(expected, default_imports(output))
+
+        self.assertIn(expected, default_imports("Optional[Decimal]"))
+        self.assertIn(expected, default_imports("Union[str, Decimal]"))
+        self.assertIn(expected, default_imports("number: Decimal"))
+        self.assertIn(expected, default_imports(" = Decimal"))
+        self.assertNotIn(expected, default_imports("class fooDecimal"))
+
+    def test_default_imports_with_qname(self):
+        expected = "from xml.etree.ElementTree import QName"
+
+        self.assertIn(expected, default_imports("Optional[QName]"))
+        self.assertIn(expected, default_imports("Union[str, QName]"))
+        self.assertIn(expected, default_imports("qname: QName"))
+        self.assertIn(expected, default_imports(" = QName"))
+        self.assertNotIn(expected, default_imports("class fooQName"))
 
     def test_default_imports_with_enum(self):
         output = " (Enum) "
@@ -28,12 +40,6 @@ class DefaultImportsTests(TestCase):
 
         output = " field( @dataclass "
         expected = "from dataclasses import dataclass, field"
-        self.assertIn(expected, default_imports(output))
-
-    def test_default_imports_with_qname(self):
-        output = " QName "
-
-        expected = "from xml.etree.ElementTree import QName"
         self.assertIn(expected, default_imports(output))
 
     def test_default_imports_with_typing(self):

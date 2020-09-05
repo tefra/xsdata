@@ -2,8 +2,7 @@ from decimal import Decimal
 from enum import Enum
 from pathlib import Path
 from typing import Optional
-
-from lxml.etree import QName
+from xml.etree.ElementTree import QName
 
 from xsdata.utils import text
 

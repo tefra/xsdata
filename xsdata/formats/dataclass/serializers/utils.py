@@ -32,15 +32,12 @@ class SerializeUtils:
 
     @staticmethod
     def resolve_qname(value: Any, namespaces: Namespaces) -> Any:
-        if not isinstance(value, str) or not value or value[0] != "{":
-            return value
-
-        try:
-            qname = QName(value)
+        qname = converter.from_string(value, [QName, str])
+        if isinstance(qname, QName):
             namespaces.add(qname.namespace)
             return qname
-        except ValueError:
-            return value
+
+        return value
 
     @staticmethod
     def set_nil_attribute(element: Element, nillable: bool, namespaces: Namespaces):

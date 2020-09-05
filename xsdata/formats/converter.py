@@ -12,10 +12,12 @@ from typing import Callable
 from typing import Dict
 from typing import List
 from typing import Optional
+from typing import Tuple
 from typing import Type
 from typing import Union
+from xml.etree.ElementTree import QName
 
-from lxml.etree import QName
+from lxml import etree
 
 from xsdata.exceptions import ConverterError
 from xsdata.exceptions import ConverterWarning
@@ -215,17 +217,79 @@ class QNameConverter(Converter):
             - xs:string -> QName("http://www.w3.org/2001/XMLSchema", "string")
             - {foo}bar -> QName("foo", "bar"
         """
-        try:
-            if ns_map is None or value[0] == "{":
-                return QName(value)
 
-            prefix, suffix = text.split(value.strip())
-            return QName(ns_map.get(prefix), suffix)
+        text_or_uri, tag = self.resolve(value, ns_map)
+
+        if text_or_uri:
+            return QName(text_or_uri, tag)
+
+        return QName(tag)
+
+    def to_string(
+        self, value: QName, namespaces: Optional[Namespaces] = None, **kwargs: Any
+    ) -> str:
+        """
+        Convert a QName instance to string either with a namespace prefix if
+        context namespaces are provided or as fully qualified with the
+        namespace uri.
+
+        examples:
+            - QName("http://www.w3.org/2001/XMLSchema", "int") & namespaces -> xs:int
+            - QName("foo, "bar") -> {foo}bar
+        """
+
+        if namespaces is None:
+            return value.text
+
+        prefix = None
+        namespace, tag = text.split_qname(value.text)
+        if namespace:
+            namespaces.add(namespace)
+            prefix = namespaces.prefix(namespace)
+
+        return f"{prefix}:{tag}" if prefix else tag
+
+    @staticmethod
+    def resolve(value: str, ns_map: Optional[Dict]) -> Tuple:
+        if not value:
+            raise ConverterError("Invalid QName")
+
+        if value[0] == "{":
+            return value, None
+
+        if ns_map is None:
+            raise ConverterError("QName converter needs ns_map to support prefixes")
+
+        prefix, suffix = text.split(value.strip())
+        namespace = ns_map.get(prefix)
+
+        if prefix and not namespace:
+            raise ConverterError(f"Unknown namespace prefix: `{prefix}`")
+
+        return namespace, suffix
+
+
+class LxmlQNameConverter(Converter):
+    def from_string(
+        self, value: str, ns_map: Optional[Dict] = None, **kwargs: Any
+    ) -> etree.QName:
+        """
+        Convert namespace prefixed strings, or fully qualified strings to
+        QNames.
+
+        examples:
+            - xs:string -> QName("http://www.w3.org/2001/XMLSchema", "string")
+            - {foo}bar -> QName("foo", "bar"
+        """
+        try:
+
+            text_or_uri, tag = QNameConverter.resolve(value, ns_map)
+            return etree.QName(text_or_uri, tag)
         except ValueError:
             raise ConverterError()
 
     def to_string(
-        self, value: QName, namespaces: Optional[Namespaces] = None, **kwargs: Any
+        self, value: etree.QName, namespaces: Optional[Namespaces] = None, **kwargs: Any
     ) -> str:
         """
         Convert a QName instance to string either with a namespace prefix if
@@ -296,6 +360,7 @@ converter.register_converter(int, IntConverter())
 converter.register_converter(bool, BoolConverter())
 converter.register_converter(float, FloatConverter())
 converter.register_converter(object, StrConverter())
+converter.register_converter(etree.QName, LxmlQNameConverter())
 converter.register_converter(QName, QNameConverter())
 converter.register_converter(Decimal, DecimalConverter())
 converter.register_converter(type(Enum), EnumConverter())

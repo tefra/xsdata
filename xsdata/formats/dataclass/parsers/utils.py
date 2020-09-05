@@ -4,8 +4,7 @@ from typing import Dict
 from typing import List
 from typing import Optional
 from typing import Type
-
-from lxml.etree import QName
+from xml.etree.ElementTree import QName
 
 from xsdata.formats.converter import converter
 from xsdata.formats.dataclass.models.elements import FindMode

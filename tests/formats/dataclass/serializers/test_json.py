@@ -1,8 +1,7 @@
 import json
 from decimal import Decimal
 from unittest.case import TestCase
-
-from lxml.etree import QName
+from xml.etree.ElementTree import QName
 
 from tests.fixtures.books import BookForm
 from tests.fixtures.books import Books

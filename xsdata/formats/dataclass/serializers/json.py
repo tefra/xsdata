@@ -12,8 +12,7 @@ from typing import Dict
 from typing import Optional
 from typing import Tuple
 from typing import Type
-
-from lxml.etree import QName
+from xml.etree.ElementTree import QName
 
 from xsdata.formats.bindings import AbstractSerializer
 

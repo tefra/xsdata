@@ -53,9 +53,9 @@ class XmlParserTests(TestCase):
 
     def test_emit_event(self):
         mock_func = mock.Mock()
-        self.parser.foo_bar_element = mock_func
+        self.parser.foo_bar_el = mock_func
 
-        self.parser.emit_event("foo", "{tns}barElement", a=1, b=2)
+        self.parser.emit_event("foo", "{tns}BarEl", a=1, b=2)
 
         mock_func.assert_called_once_with(a=1, b=2)
-        self.assertEqual({"{tns}barElement": "bar_element"}, self.parser.event_names)
+        self.assertEqual({("foo", "{tns}BarEl"): mock_func}, self.parser.emit_cache)

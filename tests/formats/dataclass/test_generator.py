@@ -74,8 +74,8 @@ class DataclassGeneratorTests(FactoryTestCase):
 
         actual = DataclassGenerator().render_module(resolver, classes)
         expected = (
-            "from enum import Enum\n"
             "from dataclasses import dataclass, field\n"
+            "from enum import Enum\n"
             "from typing import Optional\n\n"
             '__NAMESPACE__ = "xsdata"\n\n\n'
             "class ClassB(Enum):\n"

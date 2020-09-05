@@ -1,6 +1,6 @@
+from dataclasses import dataclass, field
 from decimal import Decimal
 from enum import Enum
-from dataclasses import dataclass, field
 from typing import List, Optional, Union
 from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.datatypes_base import (
     Any,

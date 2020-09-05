@@ -23,11 +23,11 @@ class XmlParser(NodeParser):
     Bind xml nodes to dataclasses with event hooks.
 
     :param handler: Xml handler.
-    :param event_names: Cache for qnames to event names.
+    :param emit_cache: Cache for qnames to event names.
     """
 
     handler: Type[XmlHandler] = field(default=LxmlEventHandler)
-    event_names: Dict = field(init=False, default_factory=dict)
+    emit_cache: Dict = field(init=False, default_factory=dict)
 
     def start(
         self,
@@ -69,9 +69,12 @@ class XmlParser(NodeParser):
 
     def emit_event(self, event: str, name: str, **kwargs: Any):
         """Call if exist the parser's hook for the given element and event."""
-        if name not in self.event_names:
-            self.event_names[name] = snake_case(split_qname(name)[1])
 
-        method_name = f"{event}_{self.event_names[name]}"
-        if hasattr(self, method_name):
-            getattr(self, method_name)(**kwargs)
+        key = (event, name)
+        if key not in self.emit_cache:
+            method_name = f"{event}_{snake_case(split_qname(name)[1])}"
+            self.emit_cache[key] = getattr(self, method_name, None)
+
+        method = self.emit_cache[key]
+        if method:
+            method(**kwargs)

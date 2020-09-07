@@ -4,7 +4,7 @@ import pytest
 
 from tests import xsdata_temp_dir
 from tests.fixtures.books import Books
-from tests.integration.conftest import bench_fixtures
+from tests.integration.benchmarks.conftest import bench_fixtures
 from xsdata.formats.dataclass.context import XmlContext
 from xsdata.formats.dataclass.parsers import handlers
 from xsdata.formats.dataclass.parsers import XmlParser

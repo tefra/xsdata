@@ -508,11 +508,13 @@ class NodeParserTests(TestCase):
 
     def test_start_prefix_mapping(self):
         parser = NodeParser()
-        parser.start_prefix_mapping("bar", "foo")
+        parser.start_prefix_mapping("bar", "foo", True)
         self.assertEqual({"bar": "foo"}, parser.namespaces.ns_map)
 
-        parser.start_prefix_mapping("", "a")
+        parser.start_prefix_mapping("", "a", True)
         self.assertEqual({"bar": "foo", None: "a"}, parser.namespaces.ns_map)
 
-        parser.start_prefix_mapping(None, "b")
-        self.assertEqual({"bar": "foo", None: "b"}, parser.namespaces.ns_map)
+        parser.start_prefix_mapping(None, "b", False)
+        self.assertEqual(
+            {None: "a", "bar": "foo", "ns2": "b"}, parser.namespaces.ns_map
+        )

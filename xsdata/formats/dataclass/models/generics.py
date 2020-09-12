@@ -50,6 +50,7 @@ class Namespaces:
     data: Dict = field(default_factory=lambda: defaultdict(set), init=False)
     auto_ns: int = field(default_factory=int, init=False)
     _ns_map: Optional[Dict] = field(init=False, default=None)
+    _default_exists: bool = field(init=False, default=False)
 
     @property
     def prefixes(self) -> List[str]:
@@ -82,13 +83,19 @@ class Namespaces:
 
         If the prefix is none assign the next auto increment prefix ns0,ns1,ns2 ...
         """
-        if not uri or uri in self.data and prefix is None:
+        if not uri or uri in self.data and not prefix:
             return
 
         namespace = Namespace.get_enum(uri)
         prefix = namespace.prefix.replace("_", "-") if namespace else prefix
+
+        if self._default_exists and prefix == "":
+            prefix = None
+
         if prefix is None:
             prefix = f"ns{self.auto_ns}"
+        elif prefix == "":
+            self._default_exists = True
 
         self.auto_ns += 1
         self._ns_map = None
@@ -102,7 +109,7 @@ class Namespaces:
         convention for the default namespace.
         """
         for prefix, uri in ns_map.items():
-            self.add(uri, prefix or "")
+            self.add(uri, prefix or None)
 
     def clear(self):
         """Clear the data storage and ns map cache."""

@@ -394,13 +394,17 @@ class NodeParser(PushParser):
 
         return obj
 
-    def start_prefix_mapping(self, prefix: Optional[str], uri: str):
+    def start_prefix_mapping(self, prefix: Optional[str], uri: str, root: bool):
         """
         Add the given prefix-URI to the namespaces registry.
 
-        Default namespaces have an empty prefix.
+        Allow empty prefix to mark the default namespace only on root
+        node.
         """
-        self.namespaces.add(uri, prefix or "")
+
+        if not prefix:
+            prefix = "" if root else None
+        self.namespaces.add(uri, prefix)
 
 
 @dataclass
@@ -436,6 +440,6 @@ class RecordParser(NodeParser):
         self.events.append((EventType.END, qname, text, tail))
         return super().end(queue, qname, text, tail, objects)
 
-    def start_prefix_mapping(self, prefix: Optional[str], uri: str):
+    def start_prefix_mapping(self, prefix: Optional[str], uri: str, root: bool):
         self.events.append((EventType.START_NS, prefix, uri))
-        super().start_prefix_mapping(prefix, uri)
+        super().start_prefix_mapping(prefix, uri, root)

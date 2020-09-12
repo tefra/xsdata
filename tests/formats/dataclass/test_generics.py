@@ -19,6 +19,7 @@ class NamespacesTests(TestCase):
         namespaces.add(Namespace.XS.uri, "c")
         namespaces.add(Namespace.XS.uri, "d")
         namespaces.add("thug")
+        namespaces.add("another_default", "")
 
         expected = {
             "default": {""},
@@ -27,6 +28,7 @@ class NamespacesTests(TestCase):
             "http://www.w3.org/2001/XMLSchema": {"xs"},
             "http://www.w3.org/2001/XMLSchema-instance": {"xsi"},
             "thug": {"ns8"},
+            "another_default": {"ns9"},
         }
         self.assertEqual(expected, namespaces.data)
 
@@ -42,7 +44,7 @@ class NamespacesTests(TestCase):
         )
         expected = {
             "bar": {"b"},
-            "default": {""},
+            "default": {"ns0"},
             "http://www.w3.org/2001/XMLSchema": {"xs"},
             "http://www.w3.org/2001/XMLSchema-instance": {"xsi"},
         }
@@ -76,7 +78,7 @@ class NamespacesTests(TestCase):
         namespaces.add("two")
 
         expected = {
-            None: "xsdata",
+            "ns0": "xsdata",
             "b": "bar",
             "again": "bar",
             "ns4": "one",

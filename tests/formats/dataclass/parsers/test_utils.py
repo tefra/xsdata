@@ -217,41 +217,57 @@ class ParserUtilsTests(TestCase):
         self.assertEqual(0, len(params))
         self.assertEqual(0, mock_find_var.call_count)
 
-    def test_bind_element_with_no_text_var(self):
-        params = {}
-        metadata = self.ctx.build(Books)
-        ParserUtils.bind_element(params, metadata, "foo", None, {}, {})
-        self.assertEqual({}, params)
-
     @mock.patch.object(ParserUtils, "parse_value", return_value="yes!")
-    def test_bind_element_with_text_var(self, mock_parse_value):
+    def test_bind_element(self, mock_parse_value):
         metadata = self.ctx.build(SizeType)
         var = metadata.find_var(mode=FindMode.TEXT)
         params = {}
         ns_map = {"a": "b"}
 
-        ParserUtils.bind_element(params, metadata, None, None, {}, ns_map)
+        self.assertFalse(ParserUtils.bind_element(params, metadata, None, ns_map))
         self.assertEqual({}, params)
 
-        ParserUtils.bind_element(params, metadata, "foo", None, {}, ns_map)
+        self.assertTrue(ParserUtils.bind_element(params, metadata, "foo", ns_map))
         self.assertEqual({"value": "yes!"}, params)
         mock_parse_value.assert_called_once_with(
             "foo", var.types, var.default, ns_map, var.is_list
         )
 
-    def test_bind_element_with_wildcard_var(self):
+    def test_bind_element_with_no_text_var(self):
+        params = {}
+        metadata = self.ctx.build(Books)
+        self.assertFalse(ParserUtils.bind_element(params, metadata, "foo", {}))
+        self.assertEqual({}, params)
+
+    def test_bind_wildcard(self):
         metadata = self.ctx.build(Umbrella)
         params = {}
         attrs = {"a": "b"}
         ns_map = {"a": "b"}
 
-        ParserUtils.bind_element(params, metadata, None, None, attrs, ns_map)
+        result = ParserUtils.bind_wildcard(params, metadata, None, None, attrs, ns_map)
+        self.assertFalse(result)
         self.assertEqual({}, params)
 
-        ParserUtils.bind_element(params, metadata, "foo", "bar", attrs, ns_map)
-
-        expected = AnyElement(text="foo", tail="bar", attributes=attrs, ns_map=ns_map)
+        result = ParserUtils.bind_wildcard(params, metadata, None, "bar", attrs, ns_map)
+        expected = AnyElement(text=None, tail="bar", attributes=attrs, ns_map=ns_map)
+        self.assertTrue(result)
         self.assertEqual(expected, params["any_element"])
+
+        params.clear()
+        result = ParserUtils.bind_wildcard(
+            params, metadata, "foo", "bar", attrs, ns_map
+        )
+        expected = AnyElement(text="foo", tail="bar", attributes=attrs, ns_map=ns_map)
+        self.assertTrue(result)
+        self.assertEqual(expected, params["any_element"])
+
+    def test_bind_wildcard_with_no_wildcard_var(self):
+        params = {}
+        metadata = self.ctx.build(Books)
+        result = ParserUtils.bind_wildcard(params, metadata, "foo", "bar", {}, {})
+        self.assertFalse(result)
+        self.assertEqual({}, params)
 
     def test_bind_element_param(self):
         var = XmlVar(name="a", qname="a")

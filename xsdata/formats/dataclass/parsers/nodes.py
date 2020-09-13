@@ -77,13 +77,14 @@ class ElementNode(XmlNode):
             )
         else:
             ParserUtils.bind_element_children(params, self.meta, self.position, objects)
-            ParserUtils.bind_element(
+            text_node = ParserUtils.bind_element(params, self.meta, text, self.ns_map)
+            wild_node = not text_node and ParserUtils.bind_wildcard(
                 params, self.meta, text, tail, self.attrs, self.ns_map
             )
 
         objects.append((qname, self.meta.clazz(**params)))
 
-        if not mixed_var and self.mixed:
+        if not mixed_var and self.mixed and not wild_node:
             tail = ParserUtils.normalize_content(tail)
             if tail:
                 objects.append((None, tail))

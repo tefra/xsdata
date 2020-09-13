@@ -52,6 +52,23 @@ class FooMixed:
     )
 
 
+def add_attr(x, *args):
+    x["a"] = 1
+
+
+def add_text(x, *args):
+    x["b"] = 2
+    return True
+
+
+def add_child(x, *args):
+    x["c"] = 3
+
+
+def add_content(x, *args):
+    x["content"] = 3
+
+
 class ElementNodeTests(TestCase):
     def setUp(self) -> None:
         super().setUp()
@@ -69,20 +86,16 @@ class ElementNodeTests(TestCase):
         )
 
     @mock.patch.object(ParserUtils, "bind_element_children")
+    @mock.patch.object(ParserUtils, "bind_wildcard")
     @mock.patch.object(ParserUtils, "bind_element")
     @mock.patch.object(ParserUtils, "bind_element_attrs")
     def test_bind(
-        self, mock_bind_element_attrs, mock_bind_element, mock_bind_element_children
+        self,
+        mock_bind_element_attrs,
+        mock_bind_element,
+        mock_bind_wildcard,
+        mock_bind_element_children,
     ):
-        def add_attr(x, *args):
-            x["a"] = 1
-
-        def add_text(x, *args):
-            x["b"] = 2
-
-        def add_child(x, *args):
-            x["c"] = 3
-
         mock_bind_element_attrs.side_effect = add_attr
         mock_bind_element.side_effect = add_text
         mock_bind_element_children.side_effect = add_child
@@ -106,29 +119,27 @@ class ElementNodeTests(TestCase):
             mock.ANY, node.meta, node.attrs, node.ns_map
         )
         mock_bind_element.assert_called_once_with(
-            mock.ANY, node.meta, "text", "tail", node.attrs, node.ns_map
+            mock.ANY, node.meta, "text", node.ns_map
         )
         mock_bind_element_children.assert_called_once_with(
             mock.ANY, node.meta, 0, objects
         )
+        self.assertEqual(0, mock_bind_wildcard.call_count)
 
     @mock.patch.object(ParserUtils, "bind_element_children")
+    @mock.patch.object(ParserUtils, "bind_wildcard")
     @mock.patch.object(ParserUtils, "bind_element")
     @mock.patch.object(ParserUtils, "bind_element_attrs")
-    def test_bind_with_mixed_flag_true(
-        self, mock_bind_element_attrs, mock_bind_element, mock_bind_element_children
+    def test_bind_with_wildcard_var(
+        self,
+        mock_bind_element_attrs,
+        mock_bind_element,
+        mock_bind_wildcard,
+        mock_bind_element_children,
     ):
-        def add_attr(x, *args):
-            x["a"] = 1
-
-        def add_text(x, *args):
-            x["b"] = 2
-
-        def add_child(x, *args):
-            x["c"] = 3
-
         mock_bind_element_attrs.side_effect = add_attr
-        mock_bind_element.side_effect = add_text
+        mock_bind_element.return_value = False
+        mock_bind_wildcard.side_effect = add_text
         mock_bind_element_children.side_effect = add_child
 
         node = ElementNode(
@@ -139,6 +150,35 @@ class ElementNodeTests(TestCase):
             attrs={"a": "b"},
             ns_map={"ns0": "xsdata"},
         )
+
+        objects = [1, 2, 3]
+
+        self.assertTrue(node.bind("foo", "text", "tail", objects))
+        self.assertEqual("foo", objects[-1][0])
+        self.assertEqual(Foo(1, 2, 3), objects[-1][1])
+
+        mock_bind_element_attrs.assert_called_once_with(
+            mock.ANY, node.meta, node.attrs, node.ns_map
+        )
+        mock_bind_element.assert_called_once_with(
+            mock.ANY, node.meta, "text", node.ns_map
+        )
+        mock_bind_element_children.assert_called_once_with(
+            mock.ANY, node.meta, 0, objects
+        )
+        mock_bind_wildcard.assert_called_once_with(
+            mock.ANY, node.meta, "text", "tail", node.attrs, node.ns_map
+        )
+
+    @mock.patch.object(ParserUtils, "bind_element_children")
+    @mock.patch.object(ParserUtils, "bind_element")
+    @mock.patch.object(ParserUtils, "bind_element_attrs")
+    def test_bind_with_mixed_flag_true(
+        self, mock_bind_element_attrs, mock_bind_element, mock_bind_element_children
+    ):
+        mock_bind_element_attrs.side_effect = add_attr
+        mock_bind_element.side_effect = add_text
+        mock_bind_element_children.side_effect = add_child
 
         node = ElementNode(
             position=0,
@@ -169,18 +209,10 @@ class ElementNodeTests(TestCase):
         mock_bind_wildcard_element,
         mock_bind_mixed_content,
     ):
-        def add_attr(x, *args):
-            x["a"] = 1
-
-        def add_text(x, *args):
-            x["b"] = 2
-
-        def add_child(x, *args):
-            x["content"] = 3
 
         mock_bind_element_attrs.side_effect = add_attr
         mock_bind_wildcard_element.side_effect = add_text
-        mock_bind_mixed_content.side_effect = add_child
+        mock_bind_mixed_content.side_effect = add_content
 
         node = ElementNode(
             position=0,

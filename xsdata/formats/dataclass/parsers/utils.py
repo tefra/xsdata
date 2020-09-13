@@ -169,10 +169,10 @@ class ParserUtils:
         tail: Optional[str],
         attrs: Dict,
         ns_map: Dict,
-    ):
+    ) -> bool:
         """
         Extract the text and tail content and bind it accordingly in the params
-        dictionary.
+        dictionary. Return if any data was bound.
 
         - var is a list prepend the text and append the tail.
         - var is present in the params assign the text and tail to the generic object.
@@ -182,7 +182,7 @@ class ParserUtils:
         txt = cls.normalize_content(txt)
         tail = cls.normalize_content(tail)
         if txt is None and tail is None:
-            return
+            return False
 
         if var.is_list:
             params.setdefault(var.name, [])
@@ -202,6 +202,8 @@ class ParserUtils:
                 generic.children.append(previous)
 
             params[var.name] = generic
+
+        return True
 
     @classmethod
     def normalize_content(cls, value: Optional[str]) -> Optional[str]:
@@ -239,21 +241,23 @@ class ParserUtils:
         params: Dict,
         metadata: XmlMeta,
         txt: Optional[str],
-        tail: Optional[str],
-        attrs: Dict,
         ns_map: Dict,
-    ):
-        """Add the given element's text content if any to the params dictionary
-        with the text var name as key."""
-        var = metadata.find_var(mode=FindMode.TEXT)
-        wildcard = None if var else metadata.find_var(mode=FindMode.WILDCARD)
+    ) -> bool:
+        """
+        Add the given element's text content if any to the params dictionary
+        with the text var name as key.
 
-        if var and var.init and txt is not None:
-            params[var.name] = cls.parse_value(
-                txt, var.types, var.default, ns_map, var.tokens
-            )
-        elif wildcard:
-            cls.bind_wildcard_element(params, wildcard, txt, tail, attrs, ns_map)
+        Return if any data was bound.
+        """
+
+        if txt is not None:
+            var = metadata.find_var(mode=FindMode.TEXT)
+            if var and var.init and txt is not None:
+                params[var.name] = cls.parse_value(
+                    txt, var.types, var.default, ns_map, var.tokens
+                )
+                return True
+        return False
 
     @classmethod
     def bind_element_attrs(
@@ -303,3 +307,29 @@ class ParserUtils:
             ),
             None,
         )
+
+    @classmethod
+    def bind_wildcard(
+        cls,
+        params: Dict,
+        metadata: XmlMeta,
+        txt: Optional[str],
+        tail: Optional[str],
+        attrs: Dict,
+        ns_map: Dict,
+    ) -> bool:
+        """
+        Add the given element's content and attributes to any available
+        wildcard variable.
+
+        Return if any data was bound.
+        """
+
+        if txt is not None or tail is not None:
+            wildcard = metadata.find_var(mode=FindMode.WILDCARD)
+            if wildcard:
+                return cls.bind_wildcard_element(
+                    params, wildcard, txt, tail, attrs, ns_map
+                )
+
+        return False

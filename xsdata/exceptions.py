@@ -18,6 +18,10 @@ class XmlHandlerError(ValueError):
     """Xml handler related errors."""
 
 
+class XmlWriterError(ValueError):
+    """Xml writer related errors."""
+
+
 class SerializerError(ValueError):
     """Serializing related errors."""
 

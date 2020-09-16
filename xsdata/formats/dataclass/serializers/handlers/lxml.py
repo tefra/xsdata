@@ -17,11 +17,11 @@ class LxmlContentWriter(XmlEventWriter):
     def write(self, events: Generator):
         super().write(events)
 
-        self.output.write(
-            tostring(
-                self.handler.etree,
-                encoding=self.encoding,
-                pretty_print=self.pretty_print,
-                xml_declaration=self.xml_declaration,
-            ).decode()
-        )
+        xml = tostring(
+            self.handler.etree,
+            encoding=self.encoding,
+            pretty_print=self.pretty_print,
+            xml_declaration=self.xml_declaration,
+        ).decode()
+
+        self.output.write(xml)

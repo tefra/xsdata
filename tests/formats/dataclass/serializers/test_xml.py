@@ -5,12 +5,10 @@ from typing import Dict
 from typing import Generator
 from typing import List
 from typing import Optional
+from unittest import TestCase
 from xml.etree.ElementTree import QName
 
-from tests.factories import XmlTestCase
 from tests.fixtures.books import BookForm
-from tests.fixtures.books import Books
-from tests.fixtures.common.models.nhinc.common import TokenCreationInfo
 from xsdata.exceptions import SerializerError
 from xsdata.exceptions import XmlContextError
 from xsdata.formats.dataclass.models.elements import XmlElement
@@ -42,101 +40,9 @@ class A:
     )
 
 
-class XmlSerializerTests(XmlTestCase):
-    def setUp(self):
-        super().setUp()
-        self.serializer = XmlSerializer(pretty_print=True)
-        self.ns_map = {}
-        self.books = Books(
-            book=[
-                BookForm(
-                    id="bk001",
-                    author="Hightower, Kim",
-                    title="The First Book",
-                    genre="Fiction",
-                    price=44.95,
-                    pub_date="2000-10-01",
-                    review="An amazing story of nothing.",
-                ),
-                BookForm(
-                    id="bk002",
-                    author="Nagata, Suanne",
-                    title="Becoming Somebody",
-                    genre="Biography",
-                    review="A masterpiece of the fine art of gossiping.",
-                ),
-            ]
-        )
-
-    def test_render(self):
-        actual = self.serializer.render(self.books)
-
-        expected = (
-            "<?xml version='1.0' encoding='UTF-8'?>\n"
-            '<ns0:books xmlns:ns0="urn:books">\n'
-            '  <book id="bk001" lang="en">\n'
-            "    <author>Hightower, Kim</author>\n"
-            "    <title>The First Book</title>\n"
-            "    <genre>Fiction</genre>\n"
-            "    <price>44.95</price>\n"
-            "    <pub_date>2000-10-01</pub_date>\n"
-            "    <review>An amazing story of nothing.</review>\n"
-            "  </book>\n"
-            '  <book id="bk002" lang="en">\n'
-            "    <author>Nagata, Suanne</author>\n"
-            "    <title>Becoming Somebody</title>\n"
-            "    <genre>Biography</genre>\n"
-            "    <review>A masterpiece of the fine art of gossiping.</review>\n"
-            "  </book>\n"
-            "</ns0:books>\n"
-        )
-
-        self.assertXMLEqual(expected, actual)
-
-    def test_render_with_provided_namespaces(self):
-        actual = self.serializer.render(self.books, {"burn": "urn:books"})
-
-        expected = (
-            "<?xml version='1.0' encoding='UTF-8'?>\n"
-            '<burn:books xmlns:burn="urn:books">\n'
-            '  <book id="bk001" lang="en">\n'
-            "    <author>Hightower, Kim</author>\n"
-            "    <title>The First Book</title>\n"
-            "    <genre>Fiction</genre>\n"
-            "    <price>44.95</price>\n"
-            "    <pub_date>2000-10-01</pub_date>\n"
-            "    <review>An amazing story of nothing.</review>\n"
-            "  </book>\n"
-            '  <book id="bk002" lang="en">\n'
-            "    <author>Nagata, Suanne</author>\n"
-            "    <title>Becoming Somebody</title>\n"
-            "    <genre>Biography</genre>\n"
-            "    <review>A masterpiece of the fine art of gossiping.</review>\n"
-            "  </book>\n"
-            "</burn:books>\n"
-        )
-        self.assertXMLEqual(expected, actual)
-
-    def test_render_with_default_namespace_prefix(self):
-        ns_map = {None: "urn:gov:hhs:fha:nhinc:common:nhinccommon"}
-        create_token = TokenCreationInfo(action_name="foo", resource_name="bar")
-        actual = self.serializer.render(create_token, ns_map)
-
-        expected = (
-            "<?xml version='1.0' encoding='UTF-8'?>\n"
-            '<TokenCreationInfo xmlns="urn:gov:hhs:fha:nhinc:common:nhinccommon">\n'
-            "  <actionName>foo</actionName>\n"
-            "  <resourceName>bar</resourceName>\n"
-            "</TokenCreationInfo>\n"
-        )
-        self.assertXMLEqual(expected, actual)
-
-    def test_render_no_dataclass(self):
-        with self.assertRaises(XmlContextError) as cm:
-            self.serializer.render(self)
-        self.assertEqual(
-            f"Object {self.__class__} is not a dataclass.", str(cm.exception)
-        )
+class XmlSerializerTests(TestCase):
+    def setUp(self) -> None:
+        self.serializer = XmlSerializer()
 
     def test_write_dataclass(self):
         book = BookForm(id="123", title="Misterioso: A Crime Novel", price=19.5)
@@ -177,6 +83,11 @@ class XmlSerializerTests(XmlTestCase):
         ]
         self.assertIsInstance(result, Generator)
         self.assertEqual(expected, list(result))
+
+    def test_write_dataclass_with_no_dataclass(self):
+        with self.assertRaises(XmlContextError) as cm:
+            next(self.serializer.write_dataclass(1))
+        self.assertEqual("Object <class 'int'> is not a dataclass.", str(cm.exception))
 
     def test_write_mixed_content(self):
         var = XmlWildcard(qname="a", name="a", mixed=True)

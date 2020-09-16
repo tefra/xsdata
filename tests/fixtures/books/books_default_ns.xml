@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<brk:books xmlns:brk="urn:books">
-  <book id="bk001" lang="en">
+<books xmlns="urn:books">
+  <book xmlns="" id="bk001" lang="en">
     <author>Hightower, Kim</author>
     <title>The First Book</title>
     <genre>Fiction</genre>
@@ -8,7 +8,7 @@
     <pub_date>2000-10-01</pub_date>
     <review>An amazing story of nothing.</review>
   </book>
-  <book id="bk002" lang="en">
+  <book xmlns="" id="bk002" lang="en">
     <author>Nagata, Suanne</author>
     <title>Becoming Somebody</title>
     <genre>Biography</genre>
@@ -16,4 +16,4 @@
     <pub_date>2001-01-10</pub_date>
     <review>A masterpiece of the fine art of gossiping.</review>
   </book>
-</brk:books>
+</books>

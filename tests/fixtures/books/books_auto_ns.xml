@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<brk:books xmlns:brk="urn:books">
+<ns0:books xmlns:ns0="urn:books">
   <book id="bk001" lang="en">
     <author>Hightower, Kim</author>
     <title>The First Book</title>
@@ -16,4 +16,4 @@
     <pub_date>2001-01-10</pub_date>
     <review>A masterpiece of the fine art of gossiping.</review>
   </book>
-</brk:books>
+</ns0:books>

@@ -27,7 +27,7 @@ class EventsHandlerTests(TestCase):
 
     def test_parse(self):
         self.assertEqual(books, self.parser.parse(events, Books))
-        self.assertEqual({"brk": "urn:books"}, self.parser.namespaces.ns_map)
+        self.assertEqual({"brk": "urn:books"}, self.parser.ns_map)
 
     def test_parse_with_unhandled_event(self):
 

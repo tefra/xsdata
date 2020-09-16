@@ -18,7 +18,7 @@ class XmlEventHandlerTests(TestCase):
 
     def test_parse(self):
         self.assertEqual(books, self.parser.from_path(self.fixture, Books))
-        self.assertEqual({"brk": "urn:books"}, self.parser.namespaces.ns_map)
+        self.assertEqual({"brk": "urn:books"}, self.parser.ns_map)
         self.assertEqual(events, self.parser.events)
 
     def test_parse_with_xinclude_raises_exception(self):
@@ -48,7 +48,7 @@ class SaxHandlerTests(TestCase):
 
     def test_parse(self):
         self.assertEqual(books, self.parser.from_path(self.fixture, Books))
-        self.assertEqual({"brk": "urn:books"}, self.parser.namespaces.ns_map)
+        self.assertEqual({"brk": "urn:books"}, self.parser.ns_map)
         self.assertEqual(events, self.parser.events)
 
     @mock.patch.object(RecordParser, "end")

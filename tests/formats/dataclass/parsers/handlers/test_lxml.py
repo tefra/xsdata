@@ -18,7 +18,7 @@ class LxmlEventHandlerTests(TestCase):
     def test_parse(self):
         path = fixtures_dir.joinpath("books/books.xml")
         self.assertEqual(books, self.parser.from_path(path, Books))
-        self.assertEqual({"brk": "urn:books"}, self.parser.namespaces.ns_map)
+        self.assertEqual({"brk": "urn:books"}, self.parser.ns_map)
         self.assertEqual(events, self.parser.events)
 
     def test_parse_with_xinclude(self):
@@ -27,7 +27,7 @@ class LxmlEventHandlerTests(TestCase):
 
         self.parser.config.process_xinclude = True
         self.assertEqual(books, self.parser.from_path(path, Books))
-        self.assertEqual(ns_map, self.parser.namespaces.ns_map)
+        self.assertEqual(ns_map, self.parser.ns_map)
 
     def test_parse_with_xinclude_from_memory(self):
         path = fixtures_dir.joinpath("books/books-xinclude.xml")
@@ -36,7 +36,7 @@ class LxmlEventHandlerTests(TestCase):
         self.parser.config.process_xinclude = True
         self.parser.config.base_url = path.as_uri()
         self.assertEqual(books, self.parser.from_bytes(path.read_bytes(), Books))
-        self.assertEqual(ns_map, self.parser.namespaces.ns_map)
+        self.assertEqual(ns_map, self.parser.ns_map)
 
     def test_parse_context_with_unhandled_event(self):
         handler = LxmlEventHandler(clazz=Books, parser=self.parser)
@@ -54,13 +54,13 @@ class LxmlSaxHandlerTests(TestCase):
     def test_parse(self):
         path = fixtures_dir.joinpath("books/books.xml")
         self.assertEqual(books, self.parser.from_path(path, Books))
-        self.assertEqual({"brk": "urn:books"}, self.parser.namespaces.ns_map)
+        self.assertEqual({"brk": "urn:books"}, self.parser.ns_map)
         self.assertEqual(events, self.parser.events)
 
     def test_parse_from_memory(self):
         path = fixtures_dir.joinpath("books/books.xml")
         self.assertEqual(books, self.parser.from_bytes(path.read_bytes(), Books))
-        self.assertEqual({"brk": "urn:books"}, self.parser.namespaces.ns_map)
+        self.assertEqual({"brk": "urn:books"}, self.parser.ns_map)
         self.assertEqual(events, self.parser.events)
 
     def test_close_with_no_objects_returns_none(self):

@@ -122,8 +122,9 @@ class XmlHandler:
             root = True
 
         for prefix, uri in ns_map.items():
+            prefix = prefix or None
             self.parser.start_prefix_mapping(prefix, uri, root)
-            result[prefix or None] = uri
+            result[prefix] = uri
 
         return result
 

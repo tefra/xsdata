@@ -19,7 +19,6 @@ from xsdata.formats.converter import LxmlQNameConverter
 from xsdata.formats.converter import ProxyConverter
 from xsdata.formats.converter import QNameConverter
 from xsdata.formats.converter import StrConverter
-from xsdata.formats.dataclass.models.generics import Namespaces
 from xsdata.models.enums import UseType
 
 
@@ -182,15 +181,14 @@ class LxmlQNameConverterTests(TestCase):
         self.assertEqual(etree.QName("aa", "b"), convert("a:b", ns_map={"a": "aa"}))
 
     def test_to_string(self):
-        ns = Namespaces()
-        ns.add("c", "c_prefix")
+        ns_map = {"c_prefix": "c"}
         convert = self.converter.to_string
 
-        self.assertEqual("a", convert(etree.QName("a"), namespaces=ns))
+        self.assertEqual("a", convert(etree.QName("a"), ns_map=ns_map))
         self.assertEqual("a", convert(etree.QName("a")))
-        self.assertEqual("ns1:b", convert(etree.QName("a", "b"), namespaces=ns))
+        self.assertEqual("ns1:b", convert(etree.QName("a", "b"), ns_map=ns_map))
         self.assertEqual("{a}b", convert(etree.QName("a", "b")))
-        self.assertEqual("c_prefix:c", convert(etree.QName("c", "c"), namespaces=ns))
+        self.assertEqual("c_prefix:c", convert(etree.QName("c", "c"), ns_map=ns_map))
         self.assertEqual("{c}c", convert(etree.QName("c", "c")))
 
 
@@ -211,19 +209,23 @@ class QNameConverterTests(TestCase):
             convert("a:b", ns_map={})
         self.assertEqual("Unknown namespace prefix: `a`", str(cm.exception))
 
+        with self.assertRaises(ConverterError) as cm:
+            convert("", ns_map={})
+        self.assertEqual("Invalid QName", str(cm.exception))
+
         self.assertEqual(QName("a"), convert("a", ns_map={}))
         self.assertEqual(QName("aa", "b"), convert("a:b", ns_map={"a": "aa"}))
+        self.assertEqual(QName("{a}b"), convert("{a}b"))
 
     def test_to_string(self):
-        ns = Namespaces()
-        ns.add("c", "c_prefix")
+        ns_map = {"c_prefix": "c"}
         convert = self.converter.to_string
 
-        self.assertEqual("a", convert(QName("a"), namespaces=ns))
+        self.assertEqual("a", convert(QName("a"), ns_map=ns_map))
         self.assertEqual("a", convert(QName("a")))
-        self.assertEqual("ns1:b", convert(QName("a", "b"), namespaces=ns))
+        self.assertEqual("ns1:b", convert(QName("a", "b"), ns_map=ns_map))
         self.assertEqual("{a}b", convert(QName("a", "b")))
-        self.assertEqual("c_prefix:c", convert(QName("c", "c"), namespaces=ns))
+        self.assertEqual("c_prefix:c", convert(QName("c", "c"), ns_map=ns_map))
         self.assertEqual("{c}c", convert(QName("c", "c")))
 
 
@@ -266,8 +268,8 @@ class EnumConverterTests(TestCase):
             b = Decimal("+inf")
             c = 2.1
 
-        ns = Namespaces()
-        self.assertEqual("ns0:b", self.converter.to_string(Fixture.a, namespaces=ns))
+        ns_map = {}
+        self.assertEqual("ns0:b", self.converter.to_string(Fixture.a, ns_map=ns_map))
         self.assertEqual("INF", self.converter.to_string(Fixture.b))
         self.assertEqual("2.1", self.converter.to_string(Fixture.c))
 

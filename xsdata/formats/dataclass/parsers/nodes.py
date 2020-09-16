@@ -19,7 +19,6 @@ from xsdata.formats.dataclass.models.elements import FindMode
 from xsdata.formats.dataclass.models.elements import XmlMeta
 from xsdata.formats.dataclass.models.elements import XmlVar
 from xsdata.formats.dataclass.models.generics import AnyElement
-from xsdata.formats.dataclass.models.generics import Namespaces
 from xsdata.formats.dataclass.parsers.config import ParserConfig
 from xsdata.formats.dataclass.parsers.mixins import EventsHandler
 from xsdata.formats.dataclass.parsers.mixins import PushParser
@@ -331,13 +330,13 @@ class NodeParser(PushParser):
     :param config: Parser configuration
     :param context: Model metadata builder
     :param handler: Override default XmlHandler
-    :param namespaces: Namespace registry for prefix-URI mappings
+    :param ms_map: Namespace registry for prefix-URI mappings
     """
 
     config: ParserConfig = field(default_factory=ParserConfig)
     context: XmlContext = field(default_factory=XmlContext)
     handler: Type[XmlHandler] = field(default=EventsHandler)
-    namespaces: Namespaces = field(init=False, default_factory=Namespaces)
+    ns_map: Dict = field(init=False, default_factory=dict)
 
     def parse(self, source: Any, clazz: Type[T]) -> T:
         """Parse the XML input stream and return the resulting object tree."""
@@ -402,10 +401,9 @@ class NodeParser(PushParser):
         Allow empty prefix to mark the default namespace only on root
         node.
         """
-
-        if not prefix:
-            prefix = "" if root else None
-        self.namespaces.add(uri, prefix)
+        prefix = prefix or None
+        if (root or prefix) and prefix not in self.ns_map:
+            self.ns_map[prefix] = uri
 
 
 @dataclass

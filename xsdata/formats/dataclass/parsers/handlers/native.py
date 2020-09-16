@@ -130,4 +130,4 @@ class XmlSaxHandler(LxmlSaxHandler, sax.handler.ContentHandler):
 
     def startPrefixMapping(self, prefix: str, uri: str):
         """Start element prefix-URI namespace mapping."""
-        self.ns_map[prefix or None] = uri
+        self.ns_map[prefix] = uri

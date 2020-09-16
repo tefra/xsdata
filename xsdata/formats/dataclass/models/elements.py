@@ -99,11 +99,6 @@ class XmlVar:
         """The element local name."""
         return text.split_qname(self.qname)[1]
 
-    @property
-    def namespace(self) -> Optional[str]:
-        """The element namespace."""
-        return text.split_qname(self.qname)[0]
-
     def matches(self, qname: str) -> bool:
         """
         Match the field qualified local name to the given qname.

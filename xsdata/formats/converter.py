@@ -21,8 +21,8 @@ from lxml import etree
 
 from xsdata.exceptions import ConverterError
 from xsdata.exceptions import ConverterWarning
-from xsdata.formats.dataclass.models.generics import Namespaces
 from xsdata.utils import text
+from xsdata.utils.namespaces import load_prefix
 
 
 class Converter(metaclass=abc.ABCMeta):
@@ -226,7 +226,7 @@ class QNameConverter(Converter):
         return QName(tag)
 
     def to_string(
-        self, value: QName, namespaces: Optional[Namespaces] = None, **kwargs: Any
+        self, value: QName, ns_map: Optional[Dict] = None, **kwargs: Any
     ) -> str:
         """
         Convert a QName instance to string either with a namespace prefix if
@@ -238,14 +238,15 @@ class QNameConverter(Converter):
             - QName("foo, "bar") -> {foo}bar
         """
 
-        if namespaces is None:
+        if ns_map is None:
             return value.text
 
-        prefix = None
         namespace, tag = text.split_qname(value.text)
-        if namespace:
-            namespaces.add(namespace)
-            prefix = namespaces.prefix(namespace)
+
+        if not namespace:
+            return tag
+
+        prefix = load_prefix(namespace, ns_map)
 
         return f"{prefix}:{tag}" if prefix else tag
 
@@ -289,7 +290,7 @@ class LxmlQNameConverter(Converter):
             raise ConverterError()
 
     def to_string(
-        self, value: etree.QName, namespaces: Optional[Namespaces] = None, **kwargs: Any
+        self, value: etree.QName, ns_map: Optional[Dict] = None, **kwargs: Any
     ) -> str:
         """
         Convert a QName instance to string either with a namespace prefix if
@@ -301,12 +302,10 @@ class LxmlQNameConverter(Converter):
             - QName("foo, "bar") -> {foo}bar
         """
 
-        if namespaces is None:
+        if ns_map is None or not value.namespace:
             return value.text
 
-        namespaces.add(value.namespace)
-        prefix = namespaces.prefix(value.namespace)
-
+        prefix = load_prefix(value.namespace, ns_map)
         return f"{prefix}:{value.localname}" if prefix else value.localname
 
 

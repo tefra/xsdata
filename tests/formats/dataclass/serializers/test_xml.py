@@ -1,38 +1,52 @@
 from dataclasses import dataclass
 from dataclasses import field
-from dataclasses import replace
-from typing import Iterator
+from dataclasses import make_dataclass
+from typing import Dict
+from typing import Generator
 from typing import List
 from typing import Optional
-from unittest import mock
-from unittest.case import TestCase
+from xml.etree.ElementTree import QName
 
-from lxml.etree import Element
-
+from tests.factories import XmlTestCase
 from tests.fixtures.books import BookForm
 from tests.fixtures.books import Books
 from tests.fixtures.common.models.nhinc.common import TokenCreationInfo
-from tests.fixtures.defxmlschema.chapter12 import ColorType
-from tests.fixtures.defxmlschema.chapter12 import DescriptionType
-from tests.fixtures.defxmlschema.chapter12 import Items
-from tests.fixtures.defxmlschema.chapter12 import ProductType
-from tests.fixtures.defxmlschema.chapter12 import SizeType
 from xsdata.exceptions import SerializerError
 from xsdata.exceptions import XmlContextError
-from xsdata.formats.dataclass.context import XmlContext
-from xsdata.formats.dataclass.models.elements import FindMode
+from xsdata.formats.dataclass.models.elements import XmlElement
+from xsdata.formats.dataclass.models.elements import XmlText
+from xsdata.formats.dataclass.models.elements import XmlVar
+from xsdata.formats.dataclass.models.elements import XmlWildcard
 from xsdata.formats.dataclass.models.generics import AnyElement
-from xsdata.formats.dataclass.models.generics import Namespaces
 from xsdata.formats.dataclass.serializers import XmlSerializer
-from xsdata.formats.dataclass.serializers.utils import SerializeUtils
+from xsdata.formats.dataclass.serializers.mixins import XmlEventWriter
 from xsdata.models.enums import QNames
 
 
-class XmlSerializerTests(TestCase):
+@dataclass
+class A:
+    a0: Optional[str] = field(default=None, metadata=dict(type="Attribute"))
+    a1: Dict = field(default_factory=dict, metadata=dict(type="Attributes"))
+    a2: List[str] = field(
+        default_factory=list, metadata=dict(type="Attribute", tokens=True)
+    )
+    x0: Optional[int] = field(default=None)
+    x1: List[int] = field(
+        default_factory=list, metadata=dict(type="Element", sequential=True)
+    )
+    x2: List[int] = field(
+        default_factory=list, metadata=dict(type="Element", sequential=True)
+    )
+    x3: List[int] = field(
+        default_factory=list, metadata=dict(type="Element", sequential=True)
+    )
+
+
+class XmlSerializerTests(XmlTestCase):
     def setUp(self):
         super().setUp()
         self.serializer = XmlSerializer(pretty_print=True)
-        self.namespaces = Namespaces()
+        self.ns_map = {}
         self.books = Books(
             book=[
                 BookForm(
@@ -76,11 +90,11 @@ class XmlSerializerTests(TestCase):
             "  </book>\n"
             "</ns0:books>\n"
         )
-        self.assertEqual(expected, actual)
+
+        self.assertXMLEqual(expected, actual)
 
     def test_render_with_provided_namespaces(self):
-        self.namespaces.add("urn:books", "burn")
-        actual = self.serializer.render(self.books, self.namespaces)
+        actual = self.serializer.render(self.books, {"burn": "urn:books"})
 
         expected = (
             "<?xml version='1.0' encoding='UTF-8'?>\n"
@@ -101,11 +115,12 @@ class XmlSerializerTests(TestCase):
             "  </book>\n"
             "</burn:books>\n"
         )
-        self.assertEqual(expected, actual)
+        self.assertXMLEqual(expected, actual)
 
-    def test_render_with_qualified_element_form(self):
+    def test_render_with_default_namespace_prefix(self):
+        ns_map = {None: "urn:gov:hhs:fha:nhinc:common:nhinccommon"}
         create_token = TokenCreationInfo(action_name="foo", resource_name="bar")
-        actual = self.serializer.render(create_token)
+        actual = self.serializer.render(create_token, ns_map)
 
         expected = (
             "<?xml version='1.0' encoding='UTF-8'?>\n"
@@ -114,7 +129,7 @@ class XmlSerializerTests(TestCase):
             "  <resourceName>bar</resourceName>\n"
             "</TokenCreationInfo>\n"
         )
-        self.assertEqual(expected, actual)
+        self.assertXMLEqual(expected, actual)
 
     def test_render_no_dataclass(self):
         with self.assertRaises(XmlContextError) as cm:
@@ -123,315 +138,247 @@ class XmlSerializerTests(TestCase):
             f"Object {self.__class__} is not a dataclass.", str(cm.exception)
         )
 
-    @mock.patch.object(SerializeUtils, "set_nil_attribute")
-    @mock.patch.object(SerializeUtils, "set_text")
-    @mock.patch.object(SerializeUtils, "set_attributes")
-    @mock.patch.object(SerializeUtils, "set_attribute")
-    @mock.patch.object(XmlSerializer, "render_sub_node")
-    @mock.patch.object(XmlSerializer, "next_value")
-    def test_render_node(
-        self,
-        mock_next_value,
-        mock_render_sub_node,
-        mock_set_attribute,
-        mock_set_attributes,
-        mock_set_text,
-        mock_set_nil_attribute,
-    ):
-        root = Element("root")
-        prod_meta = self.serializer.context.build(ProductType)
-        size_meta = self.serializer.context.build(SizeType)
-        obj = ProductType()
+    def test_write_dataclass(self):
+        book = BookForm(id="123", title="Misterioso: A Crime Novel", price=19.5)
+        result = self.serializer.write_dataclass(book)
+        expected = [
+            (XmlEventWriter.START_TAG, "BookForm"),
+            (XmlEventWriter.ADD_ATTR, "id", "123"),
+            (XmlEventWriter.ADD_ATTR, "lang", "en"),
+            (XmlEventWriter.START_TAG, "title"),
+            (XmlEventWriter.SET_DATA, "Misterioso: A Crime Novel"),
+            (XmlEventWriter.END_TAG, "title"),
+            (XmlEventWriter.START_TAG, "price"),
+            (XmlEventWriter.SET_DATA, 19.5),
+            (XmlEventWriter.END_TAG, "price"),
+            (XmlEventWriter.END_TAG, "BookForm"),
+        ]
+        self.assertIsInstance(result, Generator)
+        self.assertEqual(expected, list(result))
 
-        attribute = prod_meta.find_var("effDate")
-        attributes = prod_meta.find_var("{!}other_attributes")
-        text = replace(size_meta.find_var("value"), qname="{foo}bar")
-        sub_node = prod_meta.find_var("name")
+    def test_write_dataclass_can_overwrite_params(self):
+        book = BookForm(id="123", title="Misterioso: A Crime Novel", price=19.5)
+        result = self.serializer.write_dataclass(
+            book, "xsdata", "book", True, "foo:book"
+        )
+        expected = [
+            (XmlEventWriter.START_TAG, "book"),
+            (XmlEventWriter.ADD_ATTR, "id", "123"),
+            (XmlEventWriter.ADD_ATTR, "lang", "en"),
+            (XmlEventWriter.ADD_ATTR, QNames.XSI_TYPE, "foo:book"),
+            (XmlEventWriter.ADD_ATTR, QNames.XSI_NIL, "true"),
+            (XmlEventWriter.START_TAG, "title"),
+            (XmlEventWriter.SET_DATA, "Misterioso: A Crime Novel"),
+            (XmlEventWriter.END_TAG, "title"),
+            (XmlEventWriter.START_TAG, "price"),
+            (XmlEventWriter.SET_DATA, 19.5),
+            (XmlEventWriter.END_TAG, "price"),
+            (XmlEventWriter.END_TAG, "book"),
+        ]
+        self.assertIsInstance(result, Generator)
+        self.assertEqual(expected, list(result))
 
-        mock_next_value.return_value = [
-            (attribute, None),
-            (attribute, 1),
-            (attributes, dict(a=1)),
-            (text, "txt"),
-            (sub_node, 1),
-            (sub_node, [2, 3]),
+    def test_write_mixed_content(self):
+        var = XmlWildcard(qname="a", name="a", mixed=True)
+        book = BookForm(id="123")
+        ebook = BookForm(id="123")
+        ebook.qname = "ebook"
+        value = ["text", AnyElement(qname="br"), book, ebook, "tail"]
+        result = self.serializer.write_value(value, var, "xsdata")
+        expected = [
+            (XmlEventWriter.SET_DATA, "text"),
+            (XmlEventWriter.START_TAG, "br"),
+            (XmlEventWriter.SET_DATA, None),
+            (XmlEventWriter.END_TAG, "br"),
+            (XmlEventWriter.SET_DATA, None),
+            (XmlEventWriter.START_TAG, "{xsdata}BookForm"),
+            (XmlEventWriter.ADD_ATTR, "id", "123"),
+            (XmlEventWriter.ADD_ATTR, "lang", "en"),
+            (XmlEventWriter.END_TAG, "{xsdata}BookForm"),
+            (XmlEventWriter.START_TAG, "ebook"),
+            (XmlEventWriter.ADD_ATTR, "id", "123"),
+            (XmlEventWriter.ADD_ATTR, "lang", "en"),
+            (XmlEventWriter.END_TAG, "ebook"),
+            (XmlEventWriter.SET_DATA, "tail"),
         ]
 
-        self.serializer.render_node(root, obj, self.namespaces)
-        self.assertEqual({"ns0": "foo"}, self.namespaces.ns_map)
-        mock_set_attribute.assert_called_once_with(
-            root, attribute.qname, 1, self.namespaces
-        )
-        mock_set_attributes.assert_called_once_with(root, dict(a=1), self.namespaces)
-        mock_set_text.assert_called_once_with(root, "txt", self.namespaces)
-        mock_render_sub_node.assert_has_calls(
-            [
-                mock.call(root, 1, sub_node, self.namespaces),
-                mock.call(root, [2, 3], sub_node, self.namespaces),
-            ]
-        )
-        mock_set_nil_attribute.assert_called_once_with(root, False, self.namespaces)
+        self.assertIsInstance(result, Generator)
+        self.assertEqual(expected, list(result))
 
-    def test_render_node_without_dataclass(self):
-        root = Element("root")
-        self.serializer.render_node(root, 1, self.namespaces)
-        self.assertEqual("1", root.text)
+    def test_write_data(self):
+        var = XmlText(qname="a", name="a")
+        expected = [(XmlEventWriter.SET_DATA, "123")]
 
-    @mock.patch.object(XmlSerializer, "render_sub_node")
-    def test_render_sub_nodes(self, mock_render_sub_node):
-        root = Element("root")
-        meta = self.serializer.context.build(ProductType)
-        var = meta.find_var("number")
+        result = self.serializer.write_value("123", var, "xsdata")
+        self.assertIsInstance(result, Generator)
+        self.assertEqual(expected, list(result))
 
-        self.serializer.render_sub_nodes(root, [1, 2, 3], var, self.namespaces)
-        self.assertEqual(3, mock_render_sub_node.call_count)
-        mock_render_sub_node.assert_has_calls(
-            [
-                mock.call(root, 1, var, self.namespaces),
-                mock.call(root, 2, var, self.namespaces),
-                mock.call(root, 3, var, self.namespaces),
-            ]
-        )
+    def test_write_tokens(self):
+        var = XmlElement(qname="a", name="a", tokens=True)
 
-    @mock.patch.object(XmlSerializer, "render_wildcard_node")
-    def test_render_sub_node_with_generic_object(self, mock_render_wildcard_node):
-        root = Element("root")
-        value = AnyElement()
-        meta = self.serializer.context.build(DescriptionType)
-        var = meta.find_var(mode=FindMode.WILDCARD)
+        result = self.serializer.write_value([], var, "xsdata")
+        self.assertIsInstance(result, Generator)
+        self.assertEqual(0, len(list(result)))
 
-        self.serializer.render_sub_node(root, value, var, self.namespaces)
-        self.assertEqual(1, mock_render_wildcard_node.call_count)
-        mock_render_wildcard_node.assert_called_once_with(
-            root, value, var, self.namespaces
-        )
+        expected = [
+            (XmlEventWriter.START_TAG, "a"),
+            (XmlEventWriter.SET_DATA, [1, 2, 3]),
+            (XmlEventWriter.END_TAG, "a"),
+        ]
+        result = self.serializer.write_value([1, 2, 3], var, "xsdata")
+        self.assertEqual(expected, list(result))
 
-    @mock.patch.object(XmlSerializer, "render_element_node")
-    def test_render_sub_node_with_xml_element(self, mock_render_element_node):
-        root = Element("root")
-        value = 1
-        meta = self.serializer.context.build(ProductType)
-        var = meta.find_var("number")
+        expected = [
+            (XmlEventWriter.START_TAG, "a"),
+            (XmlEventWriter.SET_DATA, [1, 2, 3]),
+            (XmlEventWriter.END_TAG, "a"),
+            (XmlEventWriter.START_TAG, "a"),
+            (XmlEventWriter.SET_DATA, [4, 5, 6]),
+            (XmlEventWriter.END_TAG, "a"),
+        ]
 
-        self.serializer.render_sub_node(root, value, var, self.namespaces)
-        self.assertEqual(1, mock_render_element_node.call_count)
-        mock_render_element_node.assert_called_once_with(
-            root, value, var, self.namespaces
-        )
+        result = self.serializer.write_value([[1, 2, 3], [4, 5, 6]], var, "xsdata")
+        self.assertEqual(expected, list(result))
 
-    @mock.patch.object(XmlSerializer, "render_element_node")
-    def test_render_sub_node_with_dataclass_object(self, mock_render_element_node):
-        root = Element("root")
-        value = SizeType()
-        meta = self.serializer.context.build(DescriptionType)
-        var = meta.find_var(mode=FindMode.WILDCARD)
+    def test_write_any_type_with_primitive(self):
+        var = XmlWildcard(qname="a", name="a")
+        expected = [(XmlEventWriter.SET_DATA, "str")]
 
-        self.serializer.render_sub_node(root, value, var, self.namespaces)
-        self.assertEqual(1, mock_render_element_node.call_count)
-        mock_render_element_node.assert_called_once_with(
-            root, value, var, self.namespaces
-        )
+        result = self.serializer.write_value("str", var, "xsdata")
+        self.assertIsInstance(result, Generator)
+        self.assertEqual(expected, list(result))
 
-    @mock.patch.object(SerializeUtils, "set_tail")
-    @mock.patch.object(SerializeUtils, "set_text")
-    def test_render_sub_node_with_primitive_value_and_not_xml_element(
-        self, mock_set_text, mock_set_tail
-    ):
-        root = Element("root")
-        value = 1
-        meta = self.serializer.context.build(DescriptionType)
-        var = meta.find_var(mode=FindMode.WILDCARD)
+    def test_write_any_type_with_primitive_element(self):
+        var = XmlElement(qname="a", name="a", types=[object])
+        expected = [
+            (XmlEventWriter.START_TAG, "a"),
+            (XmlEventWriter.SET_DATA, "str"),
+            (XmlEventWriter.END_TAG, "a"),
+        ]
 
-        self.serializer.render_sub_node(root, value, var, self.namespaces)
-        self.assertEqual(1, mock_set_text.call_count)
-        mock_set_text.assert_called_once_with(root, value, self.namespaces)
+        result = self.serializer.write_value("str", var, "xsdata")
+        self.assertIsInstance(result, Generator)
+        self.assertEqual(expected, list(result))
 
-        root.text = "foo"
-        self.serializer.render_sub_node(root, value, var, self.namespaces)
-        self.assertEqual(1, mock_set_tail.call_count)
-        mock_set_tail.assert_called_once_with(root, value, self.namespaces)
-
-    @mock.patch.object(SerializeUtils, "set_nil_attribute")
-    @mock.patch.object(XmlSerializer, "set_xsi_type")
-    @mock.patch.object(XmlSerializer, "render_node")
-    def test_render_element_node(
-        self, mock_render_node, mock_set_xsi_type, mock_set_nil_attribute
-    ):
-        root = Element("root")
-        value = SizeType()
-        meta = self.serializer.context.build(DescriptionType)
-        var = meta.find_var(mode=FindMode.WILDCARD)
-
-        self.serializer.render_element_node(root, value, var, self.namespaces)
-
-        child = root[0]
-        mock_render_node.assert_called_once_with(child, value, self.namespaces)
-        mock_set_xsi_type.assert_called_once_with(child, value, var, self.namespaces)
-        mock_set_nil_attribute.assert_called_once_with(
-            child, var.nillable, self.namespaces
-        )
-
-        self.assertEqual("SizeType", child.tag)
-        self.assertEqual(0, len(self.namespaces.ns_map))
-
-    @mock.patch.object(SerializeUtils, "set_nil_attribute")
-    @mock.patch.object(XmlSerializer, "render_node")
-    def test_render_element_node_with_specific_qname(
-        self, mock_render_node, mock_set_nil_attribute
-    ):
-        root = Element("root")
-        value = SizeType()
-        value.qname = "foo"
-        meta = self.serializer.context.build(DescriptionType)
-        var = meta.find_var(mode=FindMode.WILDCARD)
-
-        self.serializer.render_element_node(root, value, var, self.namespaces)
-
-        child = root[0]
-        mock_render_node.assert_called_once_with(child, value, self.namespaces)
-        mock_set_nil_attribute.assert_called_once_with(
-            child, var.nillable, self.namespaces
-        )
-
-        self.assertEqual("foo", child.tag)
-        self.assertEqual(0, len(self.namespaces.ns_map))
-
-    @mock.patch.object(XmlSerializer, "render_sub_node")
-    @mock.patch.object(SerializeUtils, "set_nil_attribute")
-    @mock.patch.object(SerializeUtils, "set_attributes")
-    @mock.patch.object(SerializeUtils, "set_tail")
-    @mock.patch.object(SerializeUtils, "set_text")
-    def test_render_wildcard_node(
-        self,
-        mock_set_text,
-        mock_set_tail,
-        mock_set_attributes,
-        mock_set_nil_attribute,
-        mock_render_sub_node,
-    ):
-        root = Element("root")
+    def test_write_any_type_with_generic_object(self):
+        var = XmlWildcard(qname="a", name="a")
         value = AnyElement(
-            text="foo",
-            tail="bar",
-            attributes=dict(a=1),
-            children=[AnyElement(), AnyElement()],
-            ns_map={"foo": "bar"},
-            qname="foo",
+            qname="a",
+            text="b",
+            tail="c",
+            attributes={"d": 1, "e": 2},
+            children=[AnyElement(text="g"), "h"],
         )
-        meta = self.serializer.context.build(DescriptionType)
-        var = meta.find_var(mode=FindMode.WILDCARD)
+        expected = [
+            (XmlEventWriter.START_TAG, "a"),
+            (XmlEventWriter.ADD_ATTR, "d", 1),
+            (XmlEventWriter.ADD_ATTR, "e", 2),
+            (XmlEventWriter.SET_DATA, "b"),
+            (XmlEventWriter.SET_DATA, "g"),
+            (XmlEventWriter.SET_DATA, None),
+            (XmlEventWriter.SET_DATA, "h"),
+            (XmlEventWriter.END_TAG, "a"),
+            (XmlEventWriter.SET_DATA, "c"),
+        ]
 
-        self.serializer.render_wildcard_node(root, value, var, self.namespaces)
+        result = self.serializer.write_value(value, var, "xsdata")
+        self.assertIsInstance(result, Generator)
+        self.assertEqual(expected, list(result))
 
-        child = root[0]
-        self.assertEqual({"foo": "bar"}, self.namespaces.ns_map)
-        self.assertEqual(value.qname, child.tag)
+    def test_write_xsi_type(self):
+        var = XmlElement(qname="a", name="a", dataclass=True, types=[BookForm])
+        value = BookForm(id="123")
+        expected = [
+            (XmlEventWriter.START_TAG, "a"),
+            (XmlEventWriter.ADD_ATTR, "id", "123"),
+            (XmlEventWriter.ADD_ATTR, "lang", "en"),
+            (XmlEventWriter.END_TAG, "a"),
+        ]
 
-        mock_set_text.assert_called_once_with(child, value.text, self.namespaces)
-        mock_set_tail.assert_called_once_with(child, value.tail, self.namespaces)
-        mock_set_attributes.assert_called_once_with(
-            child, value.attributes, self.namespaces
-        )
-        mock_render_sub_node.assert_has_calls(
-            [
-                mock.call(child, value.children[0], var, self.namespaces),
-                mock.call(child, value.children[1], var, self.namespaces),
-            ]
-        )
-        mock_set_nil_attribute.assert_called_once_with(
-            child, var.nillable, self.namespaces
-        )
+        result = self.serializer.write_value(value, var, "xsdata")
+        self.assertIsInstance(result, Generator)
+        self.assertEqual(expected, list(result))
 
-    @mock.patch.object(XmlSerializer, "render_sub_node")
-    @mock.patch.object(SerializeUtils, "set_nil_attribute")
-    @mock.patch.object(SerializeUtils, "set_attributes")
-    @mock.patch.object(SerializeUtils, "set_tail")
-    @mock.patch.object(SerializeUtils, "set_text")
-    def test_render_wildcard_node_without_qname(
-        self,
-        mock_set_text,
-        mock_set_tail,
-        mock_set_attributes,
-        mock_set_nil_attribute,
-        mock_render_sub_node,
-    ):
-        root = Element("root")
-        value = AnyElement(
-            text="foo", tail="bar", attributes=dict(a=1), children=[AnyElement()]
-        )
-        meta = self.serializer.context.build(DescriptionType)
-        var = meta.find_var(mode=FindMode.WILDCARD)
+    def test_write_xsi_type_with_derived_class(self):
+        var = XmlElement(qname="a", name="a", dataclass=True, types=[BookForm])
+        ebook = make_dataclass("eBook", [], bases=(BookForm,))
 
-        self.serializer.render_wildcard_node(root, value, var, self.namespaces)
+        value = ebook(id="123")
+        expected = [
+            (XmlEventWriter.START_TAG, "a"),
+            (XmlEventWriter.ADD_ATTR, "id", "123"),
+            (XmlEventWriter.ADD_ATTR, "lang", "en"),
+            (XmlEventWriter.ADD_ATTR, QNames.XSI_TYPE, QName("eBook")),
+            (XmlEventWriter.END_TAG, "a"),
+        ]
 
-        self.assertEqual(0, len(self.namespaces.ns_map))
-        self.assertEqual(0, len(root))
+        result = self.serializer.write_value(value, var, "xsdata")
+        self.assertIsInstance(result, Generator)
+        self.assertEqual(expected, list(result))
 
-        mock_set_text.assert_called_once_with(root, value.text, self.namespaces)
-        mock_set_tail.assert_called_once_with(root, value.tail, self.namespaces)
-        mock_set_attributes.assert_called_once_with(
-            root, value.attributes, self.namespaces
-        )
-        mock_render_sub_node.assert_called_once_with(
-            root, value.children[0], var, self.namespaces
-        )
-        mock_set_nil_attribute.assert_called_once_with(
-            root, var.nillable, self.namespaces
-        )
+    def test_write_xsi_type_with_illegal_derived_class(self):
+        var = XmlElement(qname="a", name="a", dataclass=True, types=[BookForm])
+        ebook = make_dataclass("eBook", [])
+        value = ebook()
 
-    def test_set_xsi_type_with_non_dataclass(self):
-        elem = Element("foo")
-        value = 1
-        meta = self.serializer.context.build(ProductType)
-        var = meta.find_var("number")
-        self.serializer.set_xsi_type(elem, value, var, self.namespaces)
-        self.assertNotIn(QNames.XSI_TYPE, elem.attrib)
+        result = self.serializer.write_value(value, var, "xsdata")
+        with self.assertRaises(SerializerError) as cm:
+            list(result)
 
-    def test_set_xsi_type_when_value_type_matches_var_clazz(self):
-        elem = Element("foo")
-        value = SizeType()
-        meta = self.serializer.context.build(ProductType)
-        var = meta.find_var("size")
+        self.assertEqual("eBook is not derived from BookForm", str(cm.exception))
 
-        self.serializer.set_xsi_type(elem, value, var, self.namespaces)
-        self.assertNotIn(QNames.XSI_TYPE, elem.attrib)
+    def test_write_element(self):
+        var = XmlElement(qname="a", name="a")
+        expected = [
+            (XmlEventWriter.START_TAG, "a"),
+            (XmlEventWriter.SET_DATA, "123"),
+            (XmlEventWriter.END_TAG, "a"),
+        ]
 
-    def test_set_xsi_type_when_value_is_not_derived_from_var_clazz(self):
-        elem = Element("foo")
-        value = ColorType()
-        meta = self.serializer.context.build(ProductType)
-        var = meta.find_var("size")
+        result = self.serializer.write_value("123", var, "xsdata")
+        self.assertIsInstance(result, Generator)
+        self.assertEqual(expected, list(result))
+
+    def test_write_element_with_nillable_true(self):
+        var = XmlElement(qname="a", name="a", nillable=True)
+        expected = [
+            (XmlEventWriter.START_TAG, "a"),
+            (XmlEventWriter.ADD_ATTR, QNames.XSI_NIL, "true"),
+            (XmlEventWriter.SET_DATA, "123"),
+            (XmlEventWriter.END_TAG, "a"),
+        ]
+
+        result = self.serializer.write_value("123", var, "xsdata")
+        self.assertIsInstance(result, Generator)
+        self.assertEqual(expected, list(result))
+
+    def test_write_value_with_list_value(self):
+        var = XmlElement(qname="a", name="a", list_element=True)
+        value = [True, False]
+        expected = [
+            (XmlEventWriter.START_TAG, "a"),
+            (XmlEventWriter.SET_DATA, True),
+            (XmlEventWriter.END_TAG, "a"),
+            (XmlEventWriter.START_TAG, "a"),
+            (XmlEventWriter.SET_DATA, False),
+            (XmlEventWriter.END_TAG, "a"),
+        ]
+
+        result = self.serializer.write_value(value, var, "xsdata")
+        self.assertIsInstance(result, Generator)
+        self.assertEqual(expected, list(result))
+
+    def test_write_value_with_unhandled_xml_var(self):
+        foo = make_dataclass("foo", [], bases=(XmlVar,), frozen=True)
+        var = foo(qname="a", name="a", list_element=True)
+        result = self.serializer.write_value("123", var, "xsdata")
 
         with self.assertRaises(SerializerError) as cm:
-            self.serializer.set_xsi_type(elem, value, var, self.namespaces)
+            list(result)
 
-        self.assertEqual("ColorType is not derived from SizeType", str(cm.exception))
-
-    @mock.patch.object(XmlContext, "is_derived", return_value=True)
-    def test_set_xsi_type_when_value_is_derived_from_var_clazz(self, *args):
-        elem = Element("foo")
-        value = Items()
-        meta = self.serializer.context.build(ProductType)
-        items_meta = self.serializer.context.build(Items)
-        var = meta.find_var("size")
-
-        self.serializer.set_xsi_type(elem, value, var, self.namespaces)
-        self.assertEqual(items_meta.source_qname, elem.attrib[QNames.XSI_TYPE])
+        self.assertEqual("Unhandled xml var: `foo`", str(cm.exception))
 
     def test_next_value(self):
-        @dataclass
-        class A:
-            x0: Optional[int] = field(default=None)
-            x1: List[int] = field(
-                default_factory=list, metadata=dict(type="Element", sequential=True)
-            )
-            x2: List[int] = field(
-                default_factory=list, metadata=dict(type="Element", sequential=True)
-            )
-            x3: List[int] = field(
-                default_factory=list, metadata=dict(type="Element", sequential=True)
-            )
-
         obj = A(x0=1, x1=[2, 3, 4], x2=[6, 7], x3=[9])
         meta = self.serializer.context.build(A)
         x0 = meta.find_var("x0")
@@ -439,7 +386,7 @@ class XmlSerializerTests(TestCase):
         x2 = meta.find_var("x2")
         x3 = meta.find_var("x3")
 
-        actual = self.serializer.next_value(meta, obj)
+        actual = self.serializer.next_value(obj, meta)
         expected = [
             (x0, 1),
             (x1, 2),
@@ -450,7 +397,30 @@ class XmlSerializerTests(TestCase):
             (x1, 4),
         ]
 
-        self.assertIsInstance(actual, Iterator)
+        self.assertIsInstance(actual, Generator)
+        self.assertEqual(expected, list(actual))
+
+    def test_next_attribute(self):
+        obj = A(a0="foo", a1={"b": "c", "d": "e"})
+        meta = self.serializer.context.build(A)
+
+        actual = self.serializer.next_attribute(obj, meta, False, None)
+        expected = [
+            ("a0", "foo"),
+            ("b", "c"),
+            ("d", "e"),
+        ]
+
+        self.assertIsInstance(actual, Generator)
+        self.assertEqual(expected, list(actual))
+
+        actual = self.serializer.next_attribute(obj, meta, True, "xs:bool")
+        expected.extend(
+            [
+                (QNames.XSI_TYPE, "xs:bool"),
+                (QNames.XSI_NIL, "true"),
+            ]
+        )
         self.assertEqual(expected, list(actual))
 
     def test_render_mixed_content(self):

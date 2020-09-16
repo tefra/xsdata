@@ -19,10 +19,8 @@ from xsdata.formats.dataclass.models.elements import XmlVar
 from xsdata.formats.dataclass.models.generics import AnyElement
 from xsdata.formats.dataclass.serializers.handlers import LxmlContentWriter
 from xsdata.formats.dataclass.serializers.mixins import XmlEventWriter
-from xsdata.models.enums import FormType
 from xsdata.models.enums import QNames
 from xsdata.utils import text
-from xsdata.utils.namespaces import prefix_exists
 
 DEFAULT_NS_PREFIX = ""
 
@@ -63,19 +61,10 @@ class XmlSerializer(AbstractSerializer):
     def write(self, out: TextIO, obj: Any, ns_map: Optional[Dict] = None):
         """Write the given object tree as xml string to the given text-io
         output."""
-        meta = self.context.fetch(obj.__class__)
-        namespace = meta.namespace if meta.element_form == FormType.QUALIFIED else None
-
-        if ns_map is None:
-            ns_map = {}
-
-        if namespace and not prefix_exists(namespace, ns_map):
-            ns_map[None] = namespace
-
         events = self.write_dataclass(obj)
         handler = self.handler(
             output=out,
-            ns_map=ns_map,
+            ns_map=ns_map or {},
             encoding=self.encoding,
             pretty_print=self.pretty_print,
             xml_declaration=self.xml_declaration,

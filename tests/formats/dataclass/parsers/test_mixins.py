@@ -1,8 +1,8 @@
 from unittest.case import TestCase
 
 from tests.fixtures.books import Books
-from tests.formats.dataclass.parsers.handlers import books
-from tests.formats.dataclass.parsers.handlers import events
+from tests.fixtures.books.fixtures import books
+from tests.fixtures.books.fixtures import events
 from xsdata.exceptions import XmlHandlerError
 from xsdata.formats.dataclass.parsers.mixins import EventsHandler
 from xsdata.formats.dataclass.parsers.mixins import XmlHandler

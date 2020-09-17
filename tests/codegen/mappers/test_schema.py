@@ -16,6 +16,7 @@ from xsdata.models.xsd import Alternative
 from xsdata.models.xsd import Annotation
 from xsdata.models.xsd import Attribute
 from xsdata.models.xsd import AttributeGroup
+from xsdata.models.xsd import Choice
 from xsdata.models.xsd import ComplexContent
 from xsdata.models.xsd import ComplexType
 from xsdata.models.xsd import Element
@@ -211,6 +212,21 @@ class SchemaMapperTests(FactoryTestCase):
         ]
         self.assertIsInstance(children, GeneratorType)
         self.assertEqual(expected, list(children))
+
+    def test_element_children_with_parents_restrictions(self):
+        complex_type = ComplexType(
+            sequence=Sequence(
+                choices=[Choice(elements=[Element(name="elem1")])],
+                min_occurs=0,
+                max_occurs=3,
+            )
+        )
+        parent_restrictions = Restrictions.from_element(complex_type)
+        children = SchemaMapper.element_children(complex_type, parent_restrictions)
+
+        child, restrictions = next(children)
+        expected = Restrictions(min_occurs=0, max_occurs=3, sequential=True)
+        self.assertEqual(expected, restrictions)
 
     def test_children_extensions(self):
         complex_type = ComplexType(

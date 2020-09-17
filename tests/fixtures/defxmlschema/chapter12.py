@@ -82,7 +82,8 @@ class ProductType:
             type="Element",
             namespace="",
             min_occurs=0,
-            max_occurs=9223372036854775807
+            max_occurs=9223372036854775807,
+            sequential=True
         )
     )
     color: List[ColorType] = field(
@@ -91,7 +92,8 @@ class ProductType:
             type="Element",
             namespace="",
             min_occurs=0,
-            max_occurs=9223372036854775807
+            max_occurs=9223372036854775807,
+            sequential=True
         )
     )
     description: List[DescriptionType] = field(
@@ -100,7 +102,8 @@ class ProductType:
             type="Element",
             namespace="",
             min_occurs=0,
-            max_occurs=9223372036854775807
+            max_occurs=9223372036854775807,
+            sequential=True
         )
     )
     eff_date: str = field(

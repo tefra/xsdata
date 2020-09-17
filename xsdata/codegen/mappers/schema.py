@@ -135,18 +135,18 @@ class SchemaMapper:
 
     @classmethod
     def element_children(
-        cls, obj: ElementBase, restrictions: Restrictions
+        cls, obj: ElementBase, parent_restrictions: Restrictions
     ) -> Iterator[Tuple[ElementBase, Restrictions]]:
         """Recursively find and return all child elements that are qualified to
-        be class attributes."""
+        be class attributes, with all their restrictions."""
 
         for child in obj.children():
             if child.is_attribute:
-                yield child, restrictions
+                yield child, parent_restrictions
             else:
-                yield from cls.element_children(
-                    child, restrictions=Restrictions.from_element(child)
-                )
+                restrictions = parent_restrictions.clone()
+                restrictions.merge(Restrictions.from_element(child))
+                yield from cls.element_children(child, restrictions)
 
     @classmethod
     def element_namespace(

@@ -744,8 +744,7 @@ class IvlInt(SxcmInt):
         default=None,
         metadata=dict(
             type="Element",
-            namespace="urn:hl7-org:v3",
-            required=True
+            namespace="urn:hl7-org:v3"
         )
     )
     width: List[IntType] = field(
@@ -772,8 +771,7 @@ class IvlInt(SxcmInt):
         default=None,
         metadata=dict(
             type="Element",
-            namespace="urn:hl7-org:v3",
-            required=True
+            namespace="urn:hl7-org:v3"
         )
     )
 
@@ -801,8 +799,7 @@ class IvlMo(SxcmMo):
         default=None,
         metadata=dict(
             type="Element",
-            namespace="urn:hl7-org:v3",
-            required=True
+            namespace="urn:hl7-org:v3"
         )
     )
     width: List[Mo] = field(
@@ -829,8 +826,7 @@ class IvlMo(SxcmMo):
         default=None,
         metadata=dict(
             type="Element",
-            namespace="urn:hl7-org:v3",
-            required=True
+            namespace="urn:hl7-org:v3"
         )
     )
 
@@ -858,8 +854,7 @@ class IvlPq(SxcmPq):
         default=None,
         metadata=dict(
             type="Element",
-            namespace="urn:hl7-org:v3",
-            required=True
+            namespace="urn:hl7-org:v3"
         )
     )
     width: List[Pq] = field(
@@ -886,8 +881,7 @@ class IvlPq(SxcmPq):
         default=None,
         metadata=dict(
             type="Element",
-            namespace="urn:hl7-org:v3",
-            required=True
+            namespace="urn:hl7-org:v3"
         )
     )
 
@@ -915,8 +909,7 @@ class IvlReal(SxcmReal):
         default=None,
         metadata=dict(
             type="Element",
-            namespace="urn:hl7-org:v3",
-            required=True
+            namespace="urn:hl7-org:v3"
         )
     )
     width: List[Real] = field(
@@ -943,8 +936,7 @@ class IvlReal(SxcmReal):
         default=None,
         metadata=dict(
             type="Element",
-            namespace="urn:hl7-org:v3",
-            required=True
+            namespace="urn:hl7-org:v3"
         )
     )
 
@@ -1105,8 +1097,7 @@ class IvlPpdPq(SxcmPpdPq):
         default=None,
         metadata=dict(
             type="Element",
-            namespace="urn:hl7-org:v3",
-            required=True
+            namespace="urn:hl7-org:v3"
         )
     )
     width: List[PpdPq] = field(
@@ -1133,8 +1124,7 @@ class IvlPpdPq(SxcmPpdPq):
         default=None,
         metadata=dict(
             type="Element",
-            namespace="urn:hl7-org:v3",
-            required=True
+            namespace="urn:hl7-org:v3"
         )
     )
 
@@ -1162,8 +1152,7 @@ class IvlPpdTs(SxcmPpdTs):
         default=None,
         metadata=dict(
             type="Element",
-            namespace="urn:hl7-org:v3",
-            required=True
+            namespace="urn:hl7-org:v3"
         )
     )
     width: List[PpdPq] = field(
@@ -1190,8 +1179,7 @@ class IvlPpdTs(SxcmPpdTs):
         default=None,
         metadata=dict(
             type="Element",
-            namespace="urn:hl7-org:v3",
-            required=True
+            namespace="urn:hl7-org:v3"
         )
     )
 

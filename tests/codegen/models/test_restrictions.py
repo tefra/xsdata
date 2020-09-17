@@ -14,7 +14,7 @@ class RestrictionsTests(TestCase):
         restrictions.max_occurs = 2
         self.assertTrue(restrictions.is_list)
 
-    def test_update(self):
+    def test_merge(self):
         source = Restrictions(min_length=2, max_length=10)
         target = Restrictions(min_length=1, pattern=r"[A-Z]")
 
@@ -23,6 +23,17 @@ class RestrictionsTests(TestCase):
         self.assertEqual(2, target.min_length)
         self.assertEqual(10, target.max_length)
         self.assertEqual(r"[A-Z]", target.pattern)
+
+    def test_merge_ignore_nillable(self):
+        parent = Restrictions(nillable=True)
+        child = Restrictions()
+
+        child.merge(parent)
+        self.assertIsNone(child.nillable)
+
+        child.nillable = False
+        child.merge(parent)
+        self.assertFalse(child.nillable)
 
     def test_asdict(self):
         restrictions = Restrictions(

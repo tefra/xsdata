@@ -2257,7 +2257,8 @@ class AdExplicit:
             type="Element",
             namespace="urn:hl7-org:v3",
             min_occurs=0,
-            max_occurs=9223372036854775807
+            max_occurs=9223372036854775807,
+            sequential=True
         )
     )
     country: List[AdxpExplicitCountry] = field(
@@ -2266,7 +2267,8 @@ class AdExplicit:
             type="Element",
             namespace="urn:hl7-org:v3",
             min_occurs=0,
-            max_occurs=9223372036854775807
+            max_occurs=9223372036854775807,
+            sequential=True
         )
     )
     state: List[AdxpExplicitState] = field(
@@ -2275,7 +2277,8 @@ class AdExplicit:
             type="Element",
             namespace="urn:hl7-org:v3",
             min_occurs=0,
-            max_occurs=9223372036854775807
+            max_occurs=9223372036854775807,
+            sequential=True
         )
     )
     county: List[AdxpExplicitCounty] = field(
@@ -2284,7 +2287,8 @@ class AdExplicit:
             type="Element",
             namespace="urn:hl7-org:v3",
             min_occurs=0,
-            max_occurs=9223372036854775807
+            max_occurs=9223372036854775807,
+            sequential=True
         )
     )
     city: List[AdxpExplicitCity] = field(
@@ -2293,7 +2297,8 @@ class AdExplicit:
             type="Element",
             namespace="urn:hl7-org:v3",
             min_occurs=0,
-            max_occurs=9223372036854775807
+            max_occurs=9223372036854775807,
+            sequential=True
         )
     )
     postal_code: List[AdxpExplicitPostalCode] = field(
@@ -2303,7 +2308,8 @@ class AdExplicit:
             type="Element",
             namespace="urn:hl7-org:v3",
             min_occurs=0,
-            max_occurs=9223372036854775807
+            max_occurs=9223372036854775807,
+            sequential=True
         )
     )
     street_address_line: List[AdxpExplicitStreetAddressLine] = field(
@@ -2313,7 +2319,8 @@ class AdExplicit:
             type="Element",
             namespace="urn:hl7-org:v3",
             min_occurs=0,
-            max_occurs=9223372036854775807
+            max_occurs=9223372036854775807,
+            sequential=True
         )
     )
     house_number: List[AdxpExplicitHouseNumber] = field(
@@ -2323,7 +2330,8 @@ class AdExplicit:
             type="Element",
             namespace="urn:hl7-org:v3",
             min_occurs=0,
-            max_occurs=9223372036854775807
+            max_occurs=9223372036854775807,
+            sequential=True
         )
     )
     house_number_numeric: List[AdxpExplicitHouseNumberNumeric] = field(
@@ -2333,7 +2341,8 @@ class AdExplicit:
             type="Element",
             namespace="urn:hl7-org:v3",
             min_occurs=0,
-            max_occurs=9223372036854775807
+            max_occurs=9223372036854775807,
+            sequential=True
         )
     )
     direction: List[AdxpExplicitDirection] = field(
@@ -2342,7 +2351,8 @@ class AdExplicit:
             type="Element",
             namespace="urn:hl7-org:v3",
             min_occurs=0,
-            max_occurs=9223372036854775807
+            max_occurs=9223372036854775807,
+            sequential=True
         )
     )
     street_name: List[AdxpExplicitStreetName] = field(
@@ -2352,7 +2362,8 @@ class AdExplicit:
             type="Element",
             namespace="urn:hl7-org:v3",
             min_occurs=0,
-            max_occurs=9223372036854775807
+            max_occurs=9223372036854775807,
+            sequential=True
         )
     )
     street_name_base: List[AdxpExplicitStreetNameBase] = field(
@@ -2362,7 +2373,8 @@ class AdExplicit:
             type="Element",
             namespace="urn:hl7-org:v3",
             min_occurs=0,
-            max_occurs=9223372036854775807
+            max_occurs=9223372036854775807,
+            sequential=True
         )
     )
     street_name_type: List[AdxpExplicitStreetNameType1] = field(
@@ -2372,7 +2384,8 @@ class AdExplicit:
             type="Element",
             namespace="urn:hl7-org:v3",
             min_occurs=0,
-            max_occurs=9223372036854775807
+            max_occurs=9223372036854775807,
+            sequential=True
         )
     )
     additional_locator: List[AdxpExplicitAdditionalLocator] = field(
@@ -2382,7 +2395,8 @@ class AdExplicit:
             type="Element",
             namespace="urn:hl7-org:v3",
             min_occurs=0,
-            max_occurs=9223372036854775807
+            max_occurs=9223372036854775807,
+            sequential=True
         )
     )
     unit_id: List[AdxpExplicitUnitId] = field(
@@ -2392,7 +2406,8 @@ class AdExplicit:
             type="Element",
             namespace="urn:hl7-org:v3",
             min_occurs=0,
-            max_occurs=9223372036854775807
+            max_occurs=9223372036854775807,
+            sequential=True
         )
     )
     unit_type: List[AdxpExplicitUnitType] = field(
@@ -2402,7 +2417,8 @@ class AdExplicit:
             type="Element",
             namespace="urn:hl7-org:v3",
             min_occurs=0,
-            max_occurs=9223372036854775807
+            max_occurs=9223372036854775807,
+            sequential=True
         )
     )
     care_of: List[AdxpExplicitCareOf] = field(
@@ -2412,7 +2428,8 @@ class AdExplicit:
             type="Element",
             namespace="urn:hl7-org:v3",
             min_occurs=0,
-            max_occurs=9223372036854775807
+            max_occurs=9223372036854775807,
+            sequential=True
         )
     )
     census_tract: List[AdxpExplicitCensusTract] = field(
@@ -2422,7 +2439,8 @@ class AdExplicit:
             type="Element",
             namespace="urn:hl7-org:v3",
             min_occurs=0,
-            max_occurs=9223372036854775807
+            max_occurs=9223372036854775807,
+            sequential=True
         )
     )
     delivery_address_line: List[AdxpExplicitDeliveryAddressLine] = field(
@@ -2432,7 +2450,8 @@ class AdExplicit:
             type="Element",
             namespace="urn:hl7-org:v3",
             min_occurs=0,
-            max_occurs=9223372036854775807
+            max_occurs=9223372036854775807,
+            sequential=True
         )
     )
     delivery_installation_type: List[AdxpExplicitDeliveryInstallationType] = field(
@@ -2442,7 +2461,8 @@ class AdExplicit:
             type="Element",
             namespace="urn:hl7-org:v3",
             min_occurs=0,
-            max_occurs=9223372036854775807
+            max_occurs=9223372036854775807,
+            sequential=True
         )
     )
     delivery_installation_area: List[AdxpExplicitDeliveryInstallationArea] = field(
@@ -2452,7 +2472,8 @@ class AdExplicit:
             type="Element",
             namespace="urn:hl7-org:v3",
             min_occurs=0,
-            max_occurs=9223372036854775807
+            max_occurs=9223372036854775807,
+            sequential=True
         )
     )
     delivery_installation_qualifier: List[AdxpExplicitDeliveryInstallationQualifier] = field(
@@ -2462,7 +2483,8 @@ class AdExplicit:
             type="Element",
             namespace="urn:hl7-org:v3",
             min_occurs=0,
-            max_occurs=9223372036854775807
+            max_occurs=9223372036854775807,
+            sequential=True
         )
     )
     delivery_mode: List[AdxpExplicitDeliveryMode] = field(
@@ -2472,7 +2494,8 @@ class AdExplicit:
             type="Element",
             namespace="urn:hl7-org:v3",
             min_occurs=0,
-            max_occurs=9223372036854775807
+            max_occurs=9223372036854775807,
+            sequential=True
         )
     )
     delivery_mode_identifier: List[AdxpExplicitDeliveryModeIdentifier] = field(
@@ -2482,7 +2505,8 @@ class AdExplicit:
             type="Element",
             namespace="urn:hl7-org:v3",
             min_occurs=0,
-            max_occurs=9223372036854775807
+            max_occurs=9223372036854775807,
+            sequential=True
         )
     )
     building_number_suffix: List[AdxpExplicitBuildingNumberSuffix] = field(
@@ -2492,7 +2516,8 @@ class AdExplicit:
             type="Element",
             namespace="urn:hl7-org:v3",
             min_occurs=0,
-            max_occurs=9223372036854775807
+            max_occurs=9223372036854775807,
+            sequential=True
         )
     )
     post_box: List[AdxpExplicitPostBox] = field(
@@ -2502,7 +2527,8 @@ class AdExplicit:
             type="Element",
             namespace="urn:hl7-org:v3",
             min_occurs=0,
-            max_occurs=9223372036854775807
+            max_occurs=9223372036854775807,
+            sequential=True
         )
     )
     precinct: List[AdxpExplicitPrecinct] = field(
@@ -2511,7 +2537,8 @@ class AdExplicit:
             type="Element",
             namespace="urn:hl7-org:v3",
             min_occurs=0,
-            max_occurs=9223372036854775807
+            max_occurs=9223372036854775807,
+            sequential=True
         )
     )
     useable_period: List[SxcmTsExplicit] = field(
@@ -3545,7 +3572,8 @@ class Ad(Any):
             type="Element",
             namespace="urn:hl7-org:v3",
             min_occurs=0,
-            max_occurs=9223372036854775807
+            max_occurs=9223372036854775807,
+            sequential=True
         )
     )
     country: List[AdxpCountry] = field(
@@ -3554,7 +3582,8 @@ class Ad(Any):
             type="Element",
             namespace="urn:hl7-org:v3",
             min_occurs=0,
-            max_occurs=9223372036854775807
+            max_occurs=9223372036854775807,
+            sequential=True
         )
     )
     state: List[AdxpState] = field(
@@ -3563,7 +3592,8 @@ class Ad(Any):
             type="Element",
             namespace="urn:hl7-org:v3",
             min_occurs=0,
-            max_occurs=9223372036854775807
+            max_occurs=9223372036854775807,
+            sequential=True
         )
     )
     county: List[AdxpCounty] = field(
@@ -3572,7 +3602,8 @@ class Ad(Any):
             type="Element",
             namespace="urn:hl7-org:v3",
             min_occurs=0,
-            max_occurs=9223372036854775807
+            max_occurs=9223372036854775807,
+            sequential=True
         )
     )
     city: List[AdxpCity] = field(
@@ -3581,7 +3612,8 @@ class Ad(Any):
             type="Element",
             namespace="urn:hl7-org:v3",
             min_occurs=0,
-            max_occurs=9223372036854775807
+            max_occurs=9223372036854775807,
+            sequential=True
         )
     )
     postal_code: List[AdxpPostalCode] = field(
@@ -3591,7 +3623,8 @@ class Ad(Any):
             type="Element",
             namespace="urn:hl7-org:v3",
             min_occurs=0,
-            max_occurs=9223372036854775807
+            max_occurs=9223372036854775807,
+            sequential=True
         )
     )
     street_address_line: List[AdxpStreetAddressLine] = field(
@@ -3601,7 +3634,8 @@ class Ad(Any):
             type="Element",
             namespace="urn:hl7-org:v3",
             min_occurs=0,
-            max_occurs=9223372036854775807
+            max_occurs=9223372036854775807,
+            sequential=True
         )
     )
     house_number: List[AdxpHouseNumber] = field(
@@ -3611,7 +3645,8 @@ class Ad(Any):
             type="Element",
             namespace="urn:hl7-org:v3",
             min_occurs=0,
-            max_occurs=9223372036854775807
+            max_occurs=9223372036854775807,
+            sequential=True
         )
     )
     house_number_numeric: List[AdxpHouseNumberNumeric] = field(
@@ -3621,7 +3656,8 @@ class Ad(Any):
             type="Element",
             namespace="urn:hl7-org:v3",
             min_occurs=0,
-            max_occurs=9223372036854775807
+            max_occurs=9223372036854775807,
+            sequential=True
         )
     )
     direction: List[AdxpDirection] = field(
@@ -3630,7 +3666,8 @@ class Ad(Any):
             type="Element",
             namespace="urn:hl7-org:v3",
             min_occurs=0,
-            max_occurs=9223372036854775807
+            max_occurs=9223372036854775807,
+            sequential=True
         )
     )
     street_name: List[AdxpStreetName] = field(
@@ -3640,7 +3677,8 @@ class Ad(Any):
             type="Element",
             namespace="urn:hl7-org:v3",
             min_occurs=0,
-            max_occurs=9223372036854775807
+            max_occurs=9223372036854775807,
+            sequential=True
         )
     )
     street_name_base: List[AdxpStreetNameBase] = field(
@@ -3650,7 +3688,8 @@ class Ad(Any):
             type="Element",
             namespace="urn:hl7-org:v3",
             min_occurs=0,
-            max_occurs=9223372036854775807
+            max_occurs=9223372036854775807,
+            sequential=True
         )
     )
     street_name_type: List[AdxpStreetNameType] = field(
@@ -3660,7 +3699,8 @@ class Ad(Any):
             type="Element",
             namespace="urn:hl7-org:v3",
             min_occurs=0,
-            max_occurs=9223372036854775807
+            max_occurs=9223372036854775807,
+            sequential=True
         )
     )
     additional_locator: List[AdxpAdditionalLocator] = field(
@@ -3670,7 +3710,8 @@ class Ad(Any):
             type="Element",
             namespace="urn:hl7-org:v3",
             min_occurs=0,
-            max_occurs=9223372036854775807
+            max_occurs=9223372036854775807,
+            sequential=True
         )
     )
     unit_id: List[AdxpUnitId] = field(
@@ -3680,7 +3721,8 @@ class Ad(Any):
             type="Element",
             namespace="urn:hl7-org:v3",
             min_occurs=0,
-            max_occurs=9223372036854775807
+            max_occurs=9223372036854775807,
+            sequential=True
         )
     )
     unit_type: List[AdxpUnitType] = field(
@@ -3690,7 +3732,8 @@ class Ad(Any):
             type="Element",
             namespace="urn:hl7-org:v3",
             min_occurs=0,
-            max_occurs=9223372036854775807
+            max_occurs=9223372036854775807,
+            sequential=True
         )
     )
     care_of: List[AdxpCareOf] = field(
@@ -3700,7 +3743,8 @@ class Ad(Any):
             type="Element",
             namespace="urn:hl7-org:v3",
             min_occurs=0,
-            max_occurs=9223372036854775807
+            max_occurs=9223372036854775807,
+            sequential=True
         )
     )
     census_tract: List[AdxpCensusTract] = field(
@@ -3710,7 +3754,8 @@ class Ad(Any):
             type="Element",
             namespace="urn:hl7-org:v3",
             min_occurs=0,
-            max_occurs=9223372036854775807
+            max_occurs=9223372036854775807,
+            sequential=True
         )
     )
     delivery_address_line: List[AdxpDeliveryAddressLine] = field(
@@ -3720,7 +3765,8 @@ class Ad(Any):
             type="Element",
             namespace="urn:hl7-org:v3",
             min_occurs=0,
-            max_occurs=9223372036854775807
+            max_occurs=9223372036854775807,
+            sequential=True
         )
     )
     delivery_installation_type: List[AdxpDeliveryInstallationType] = field(
@@ -3730,7 +3776,8 @@ class Ad(Any):
             type="Element",
             namespace="urn:hl7-org:v3",
             min_occurs=0,
-            max_occurs=9223372036854775807
+            max_occurs=9223372036854775807,
+            sequential=True
         )
     )
     delivery_installation_area: List[AdxpDeliveryInstallationArea] = field(
@@ -3740,7 +3787,8 @@ class Ad(Any):
             type="Element",
             namespace="urn:hl7-org:v3",
             min_occurs=0,
-            max_occurs=9223372036854775807
+            max_occurs=9223372036854775807,
+            sequential=True
         )
     )
     delivery_installation_qualifier: List[AdxpDeliveryInstallationQualifier] = field(
@@ -3750,7 +3798,8 @@ class Ad(Any):
             type="Element",
             namespace="urn:hl7-org:v3",
             min_occurs=0,
-            max_occurs=9223372036854775807
+            max_occurs=9223372036854775807,
+            sequential=True
         )
     )
     delivery_mode: List[AdxpDeliveryMode] = field(
@@ -3760,7 +3809,8 @@ class Ad(Any):
             type="Element",
             namespace="urn:hl7-org:v3",
             min_occurs=0,
-            max_occurs=9223372036854775807
+            max_occurs=9223372036854775807,
+            sequential=True
         )
     )
     delivery_mode_identifier: List[AdxpDeliveryModeIdentifier] = field(
@@ -3770,7 +3820,8 @@ class Ad(Any):
             type="Element",
             namespace="urn:hl7-org:v3",
             min_occurs=0,
-            max_occurs=9223372036854775807
+            max_occurs=9223372036854775807,
+            sequential=True
         )
     )
     building_number_suffix: List[AdxpBuildingNumberSuffix] = field(
@@ -3780,7 +3831,8 @@ class Ad(Any):
             type="Element",
             namespace="urn:hl7-org:v3",
             min_occurs=0,
-            max_occurs=9223372036854775807
+            max_occurs=9223372036854775807,
+            sequential=True
         )
     )
     post_box: List[AdxpPostBox] = field(
@@ -3790,7 +3842,8 @@ class Ad(Any):
             type="Element",
             namespace="urn:hl7-org:v3",
             min_occurs=0,
-            max_occurs=9223372036854775807
+            max_occurs=9223372036854775807,
+            sequential=True
         )
     )
     precinct: List[AdxpPrecinct] = field(
@@ -3799,7 +3852,8 @@ class Ad(Any):
             type="Element",
             namespace="urn:hl7-org:v3",
             min_occurs=0,
-            max_occurs=9223372036854775807
+            max_occurs=9223372036854775807,
+            sequential=True
         )
     )
     useable_period: List[SxcmTs] = field(
@@ -4220,8 +4274,7 @@ class IvlTsExplicit:
         default=None,
         metadata=dict(
             type="Element",
-            namespace="urn:hl7-org:v3",
-            required=True
+            namespace="urn:hl7-org:v3"
         )
     )
     width: List[PqExplicit] = field(
@@ -4248,8 +4301,7 @@ class IvlTsExplicit:
         default=None,
         metadata=dict(
             type="Element",
-            namespace="urn:hl7-org:v3",
-            required=True
+            namespace="urn:hl7-org:v3"
         )
     )
     null_flavor: Optional[NullFlavor] = field(
@@ -4433,7 +4485,8 @@ class EnExplicit:
             type="Element",
             namespace="urn:hl7-org:v3",
             min_occurs=0,
-            max_occurs=9223372036854775807
+            max_occurs=9223372036854775807,
+            sequential=True
         )
     )
     family: List[EnExplicitFamily] = field(
@@ -4442,7 +4495,8 @@ class EnExplicit:
             type="Element",
             namespace="urn:hl7-org:v3",
             min_occurs=0,
-            max_occurs=9223372036854775807
+            max_occurs=9223372036854775807,
+            sequential=True
         )
     )
     given: List[EnExplicitGiven] = field(
@@ -4451,7 +4505,8 @@ class EnExplicit:
             type="Element",
             namespace="urn:hl7-org:v3",
             min_occurs=0,
-            max_occurs=9223372036854775807
+            max_occurs=9223372036854775807,
+            sequential=True
         )
     )
     prefix: List[EnExplicitPrefix] = field(
@@ -4460,7 +4515,8 @@ class EnExplicit:
             type="Element",
             namespace="urn:hl7-org:v3",
             min_occurs=0,
-            max_occurs=9223372036854775807
+            max_occurs=9223372036854775807,
+            sequential=True
         )
     )
     suffix: List[EnExplicitSuffix] = field(
@@ -4469,7 +4525,8 @@ class EnExplicit:
             type="Element",
             namespace="urn:hl7-org:v3",
             min_occurs=0,
-            max_occurs=9223372036854775807
+            max_occurs=9223372036854775807,
+            sequential=True
         )
     )
     valid_time: Optional[IvlTsExplicit] = field(
@@ -4537,7 +4594,8 @@ class OnExplicit:
             type="Element",
             namespace="urn:hl7-org:v3",
             min_occurs=0,
-            max_occurs=9223372036854775807
+            max_occurs=9223372036854775807,
+            sequential=True
         )
     )
     prefix: List[EnExplicitPrefix] = field(
@@ -4546,7 +4604,8 @@ class OnExplicit:
             type="Element",
             namespace="urn:hl7-org:v3",
             min_occurs=0,
-            max_occurs=9223372036854775807
+            max_occurs=9223372036854775807,
+            sequential=True
         )
     )
     suffix: List[EnExplicitSuffix] = field(
@@ -4555,7 +4614,8 @@ class OnExplicit:
             type="Element",
             namespace="urn:hl7-org:v3",
             min_occurs=0,
-            max_occurs=9223372036854775807
+            max_occurs=9223372036854775807,
+            sequential=True
         )
     )
     valid_time: Optional[IvlTsExplicit] = field(
@@ -4625,7 +4685,8 @@ class PnExplicit:
             type="Element",
             namespace="urn:hl7-org:v3",
             min_occurs=0,
-            max_occurs=9223372036854775807
+            max_occurs=9223372036854775807,
+            sequential=True
         )
     )
     family: List[EnExplicitFamily] = field(
@@ -4634,7 +4695,8 @@ class PnExplicit:
             type="Element",
             namespace="urn:hl7-org:v3",
             min_occurs=0,
-            max_occurs=9223372036854775807
+            max_occurs=9223372036854775807,
+            sequential=True
         )
     )
     given: List[EnExplicitGiven] = field(
@@ -4643,7 +4705,8 @@ class PnExplicit:
             type="Element",
             namespace="urn:hl7-org:v3",
             min_occurs=0,
-            max_occurs=9223372036854775807
+            max_occurs=9223372036854775807,
+            sequential=True
         )
     )
     prefix: List[EnExplicitPrefix] = field(
@@ -4652,7 +4715,8 @@ class PnExplicit:
             type="Element",
             namespace="urn:hl7-org:v3",
             min_occurs=0,
-            max_occurs=9223372036854775807
+            max_occurs=9223372036854775807,
+            sequential=True
         )
     )
     suffix: List[EnExplicitSuffix] = field(
@@ -4661,7 +4725,8 @@ class PnExplicit:
             type="Element",
             namespace="urn:hl7-org:v3",
             min_occurs=0,
-            max_occurs=9223372036854775807
+            max_occurs=9223372036854775807,
+            sequential=True
         )
     )
     valid_time: Optional[IvlTsExplicit] = field(
@@ -5676,8 +5741,7 @@ class IvlTs(SxcmTs):
         default=None,
         metadata=dict(
             type="Element",
-            namespace="urn:hl7-org:v3",
-            required=True
+            namespace="urn:hl7-org:v3"
         )
     )
     width: List[Pq] = field(
@@ -5704,8 +5768,7 @@ class IvlTs(SxcmTs):
         default=None,
         metadata=dict(
             type="Element",
-            namespace="urn:hl7-org:v3",
-            required=True
+            namespace="urn:hl7-org:v3"
         )
     )
 
@@ -5754,7 +5817,8 @@ class En(Any):
             type="Element",
             namespace="urn:hl7-org:v3",
             min_occurs=0,
-            max_occurs=9223372036854775807
+            max_occurs=9223372036854775807,
+            sequential=True
         )
     )
     family: List[EnFamily] = field(
@@ -5763,7 +5827,8 @@ class En(Any):
             type="Element",
             namespace="urn:hl7-org:v3",
             min_occurs=0,
-            max_occurs=9223372036854775807
+            max_occurs=9223372036854775807,
+            sequential=True
         )
     )
     given: List[EnGiven] = field(
@@ -5772,7 +5837,8 @@ class En(Any):
             type="Element",
             namespace="urn:hl7-org:v3",
             min_occurs=0,
-            max_occurs=9223372036854775807
+            max_occurs=9223372036854775807,
+            sequential=True
         )
     )
     prefix: List[EnPrefix] = field(
@@ -5781,7 +5847,8 @@ class En(Any):
             type="Element",
             namespace="urn:hl7-org:v3",
             min_occurs=0,
-            max_occurs=9223372036854775807
+            max_occurs=9223372036854775807,
+            sequential=True
         )
     )
     suffix: List[EnSuffix] = field(
@@ -5790,7 +5857,8 @@ class En(Any):
             type="Element",
             namespace="urn:hl7-org:v3",
             min_occurs=0,
-            max_occurs=9223372036854775807
+            max_occurs=9223372036854775807,
+            sequential=True
         )
     )
     valid_time: Optional[IvlTs] = field(
@@ -5849,7 +5917,8 @@ class On:
             type="Element",
             namespace="urn:hl7-org:v3",
             min_occurs=0,
-            max_occurs=9223372036854775807
+            max_occurs=9223372036854775807,
+            sequential=True
         )
     )
     family: List[EnFamily] = field(
@@ -5858,7 +5927,8 @@ class On:
             type="Element",
             namespace="urn:hl7-org:v3",
             min_occurs=0,
-            max_occurs=9223372036854775807
+            max_occurs=9223372036854775807,
+            sequential=True
         )
     )
     given: List[EnGiven] = field(
@@ -5867,7 +5937,8 @@ class On:
             type="Element",
             namespace="urn:hl7-org:v3",
             min_occurs=0,
-            max_occurs=9223372036854775807
+            max_occurs=9223372036854775807,
+            sequential=True
         )
     )
     prefix: List[EnPrefix] = field(
@@ -5876,7 +5947,8 @@ class On:
             type="Element",
             namespace="urn:hl7-org:v3",
             min_occurs=0,
-            max_occurs=9223372036854775807
+            max_occurs=9223372036854775807,
+            sequential=True
         )
     )
     suffix: List[EnSuffix] = field(
@@ -5885,7 +5957,8 @@ class On:
             type="Element",
             namespace="urn:hl7-org:v3",
             min_occurs=0,
-            max_occurs=9223372036854775807
+            max_occurs=9223372036854775807,
+            sequential=True
         )
     )
     valid_time: Optional[IvlTs] = field(
@@ -5945,7 +6018,8 @@ class Tn:
             type="Element",
             namespace="urn:hl7-org:v3",
             min_occurs=0,
-            max_occurs=9223372036854775807
+            max_occurs=9223372036854775807,
+            sequential=True
         )
     )
     family: List[EnFamily] = field(
@@ -5954,7 +6028,8 @@ class Tn:
             type="Element",
             namespace="urn:hl7-org:v3",
             min_occurs=0,
-            max_occurs=9223372036854775807
+            max_occurs=9223372036854775807,
+            sequential=True
         )
     )
     given: List[EnGiven] = field(
@@ -5963,7 +6038,8 @@ class Tn:
             type="Element",
             namespace="urn:hl7-org:v3",
             min_occurs=0,
-            max_occurs=9223372036854775807
+            max_occurs=9223372036854775807,
+            sequential=True
         )
     )
     prefix: List[EnPrefix] = field(
@@ -5972,7 +6048,8 @@ class Tn:
             type="Element",
             namespace="urn:hl7-org:v3",
             min_occurs=0,
-            max_occurs=9223372036854775807
+            max_occurs=9223372036854775807,
+            sequential=True
         )
     )
     suffix: List[EnSuffix] = field(
@@ -5981,7 +6058,8 @@ class Tn:
             type="Element",
             namespace="urn:hl7-org:v3",
             min_occurs=0,
-            max_occurs=9223372036854775807
+            max_occurs=9223372036854775807,
+            sequential=True
         )
     )
     valid_time: Optional[IvlTs] = field(

@@ -107,7 +107,7 @@ class Restrictions:
             "white_space",
             "pattern",
             "explicit_timezone",
-            "nillable",
+            # "nillable",  Not inheritable
         )
 
         for key in keys:

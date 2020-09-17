@@ -693,7 +693,8 @@ class StrucDocParagraph:
             type="Element",
             namespace="urn:hl7-org:v3",
             min_occurs=0,
-            max_occurs=9223372036854775807
+            max_occurs=9223372036854775807,
+            sequential=True
         )
     )
     link_html: List["StrucDocLinkHtml"] = field(
@@ -703,7 +704,8 @@ class StrucDocParagraph:
             type="Element",
             namespace="urn:hl7-org:v3",
             min_occurs=0,
-            max_occurs=9223372036854775807
+            max_occurs=9223372036854775807,
+            sequential=True
         )
     )
     sub: List[StrucDocSub] = field(
@@ -712,7 +714,8 @@ class StrucDocParagraph:
             type="Element",
             namespace="urn:hl7-org:v3",
             min_occurs=0,
-            max_occurs=9223372036854775807
+            max_occurs=9223372036854775807,
+            sequential=True
         )
     )
     sup: List[StrucDocSup] = field(
@@ -721,7 +724,8 @@ class StrucDocParagraph:
             type="Element",
             namespace="urn:hl7-org:v3",
             min_occurs=0,
-            max_occurs=9223372036854775807
+            max_occurs=9223372036854775807,
+            sequential=True
         )
     )
     br: List[StrucDocBr] = field(
@@ -730,7 +734,8 @@ class StrucDocParagraph:
             type="Element",
             namespace="urn:hl7-org:v3",
             min_occurs=0,
-            max_occurs=9223372036854775807
+            max_occurs=9223372036854775807,
+            sequential=True
         )
     )
     footnote: List["StrucDocFootnote"] = field(
@@ -739,7 +744,8 @@ class StrucDocParagraph:
             type="Element",
             namespace="urn:hl7-org:v3",
             min_occurs=0,
-            max_occurs=9223372036854775807
+            max_occurs=9223372036854775807,
+            sequential=True
         )
     )
     footnote_ref: List[StrucDocFootnoteRef] = field(
@@ -749,7 +755,8 @@ class StrucDocParagraph:
             type="Element",
             namespace="urn:hl7-org:v3",
             min_occurs=0,
-            max_occurs=9223372036854775807
+            max_occurs=9223372036854775807,
+            sequential=True
         )
     )
     render_multi_media: List[StrucDocRenderMultiMedia] = field(
@@ -759,7 +766,8 @@ class StrucDocParagraph:
             type="Element",
             namespace="urn:hl7-org:v3",
             min_occurs=0,
-            max_occurs=9223372036854775807
+            max_occurs=9223372036854775807,
+            sequential=True
         )
     )
     id: Optional[str] = field(
@@ -2008,7 +2016,8 @@ class StrucDocItem:
             type="Element",
             namespace="urn:hl7-org:v3",
             min_occurs=0,
-            max_occurs=9223372036854775807
+            max_occurs=9223372036854775807,
+            sequential=True
         )
     )
     link_html: List["StrucDocLinkHtml"] = field(
@@ -2018,7 +2027,8 @@ class StrucDocItem:
             type="Element",
             namespace="urn:hl7-org:v3",
             min_occurs=0,
-            max_occurs=9223372036854775807
+            max_occurs=9223372036854775807,
+            sequential=True
         )
     )
     sub: List[StrucDocSub] = field(
@@ -2027,7 +2037,8 @@ class StrucDocItem:
             type="Element",
             namespace="urn:hl7-org:v3",
             min_occurs=0,
-            max_occurs=9223372036854775807
+            max_occurs=9223372036854775807,
+            sequential=True
         )
     )
     sup: List[StrucDocSup] = field(
@@ -2036,7 +2047,8 @@ class StrucDocItem:
             type="Element",
             namespace="urn:hl7-org:v3",
             min_occurs=0,
-            max_occurs=9223372036854775807
+            max_occurs=9223372036854775807,
+            sequential=True
         )
     )
     br: List[StrucDocBr] = field(
@@ -2045,7 +2057,8 @@ class StrucDocItem:
             type="Element",
             namespace="urn:hl7-org:v3",
             min_occurs=0,
-            max_occurs=9223372036854775807
+            max_occurs=9223372036854775807,
+            sequential=True
         )
     )
     footnote: List["StrucDocFootnote"] = field(
@@ -2054,7 +2067,8 @@ class StrucDocItem:
             type="Element",
             namespace="urn:hl7-org:v3",
             min_occurs=0,
-            max_occurs=9223372036854775807
+            max_occurs=9223372036854775807,
+            sequential=True
         )
     )
     footnote_ref: List[StrucDocFootnoteRef] = field(
@@ -2064,7 +2078,8 @@ class StrucDocItem:
             type="Element",
             namespace="urn:hl7-org:v3",
             min_occurs=0,
-            max_occurs=9223372036854775807
+            max_occurs=9223372036854775807,
+            sequential=True
         )
     )
     render_multi_media: List[StrucDocRenderMultiMedia] = field(
@@ -2074,7 +2089,8 @@ class StrucDocItem:
             type="Element",
             namespace="urn:hl7-org:v3",
             min_occurs=0,
-            max_occurs=9223372036854775807
+            max_occurs=9223372036854775807,
+            sequential=True
         )
     )
     paragraph: List[StrucDocParagraph] = field(
@@ -2083,7 +2099,8 @@ class StrucDocItem:
             type="Element",
             namespace="urn:hl7-org:v3",
             min_occurs=0,
-            max_occurs=9223372036854775807
+            max_occurs=9223372036854775807,
+            sequential=True
         )
     )
     list_value: List["StrucDocList"] = field(
@@ -2093,7 +2110,8 @@ class StrucDocItem:
             type="Element",
             namespace="urn:hl7-org:v3",
             min_occurs=0,
-            max_occurs=9223372036854775807
+            max_occurs=9223372036854775807,
+            sequential=True
         )
     )
     table: List[StrucDocTable] = field(
@@ -2102,7 +2120,8 @@ class StrucDocItem:
             type="Element",
             namespace="urn:hl7-org:v3",
             min_occurs=0,
-            max_occurs=9223372036854775807
+            max_occurs=9223372036854775807,
+            sequential=True
         )
     )
     id: Optional[str] = field(

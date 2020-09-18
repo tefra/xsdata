@@ -2,6 +2,7 @@ from typing import Dict
 from unittest import TestCase
 
 from xsdata.models.enums import Namespace
+from xsdata.utils.namespaces import clean_prefixes
 from xsdata.utils.namespaces import generate_prefix
 from xsdata.utils.namespaces import prefix_exists
 
@@ -37,7 +38,20 @@ class NamespacesTests(TestCase):
         }
         self.assertEqual(expected, ns_map)
 
-    def prefix_exists(self):
+    def test_prefix_exists(self):
         self.assertFalse(prefix_exists("a", {}))
-        self.assertFalse(prefix_exists("a", {"foo": "a"}))
-        self.assertFalse(prefix_exists("a", {None: "a"}))
+        self.assertTrue(prefix_exists("a", {"foo": "a"}))
+        self.assertTrue(prefix_exists("a", {None: "a"}))
+
+    def test_clean_prefixes(self):
+        ns_map = {"": "a", None: "b"}
+        self.assertEqual({None: "a"}, clean_prefixes(ns_map))
+
+        ns_map = {None: "b", "": "a"}
+        self.assertEqual({None: "b"}, clean_prefixes(ns_map))
+
+        ns_map = {None: "b", "bb": "b", "c": 1}
+        self.assertEqual({"bb": "b", "c": 1}, clean_prefixes(ns_map))
+
+        ns_map = {"bb": "b", None: "b", "c": 1}
+        self.assertEqual({"bb": "b", "c": 1}, clean_prefixes(ns_map))

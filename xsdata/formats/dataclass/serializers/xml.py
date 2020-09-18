@@ -20,6 +20,7 @@ from xsdata.formats.dataclass.models.generics import AnyElement
 from xsdata.formats.dataclass.serializers.handlers import LxmlContentWriter
 from xsdata.formats.dataclass.serializers.mixins import XmlEventWriter
 from xsdata.models.enums import QNames
+from xsdata.utils import namespaces
 from xsdata.utils import text
 
 DEFAULT_NS_PREFIX = ""
@@ -64,7 +65,7 @@ class XmlSerializer(AbstractSerializer):
         events = self.write_dataclass(obj)
         handler = self.handler(
             output=out,
-            ns_map=ns_map or {},
+            ns_map=namespaces.clean_prefixes(ns_map) if ns_map else {},
             encoding=self.encoding,
             pretty_print=self.pretty_print,
             xml_declaration=self.xml_declaration,

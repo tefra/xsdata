@@ -32,3 +32,21 @@ def generate_prefix(uri: str, ns_map: Dict) -> str:
 def prefix_exists(uri: str, ns_map: Dict) -> bool:
     """Check if the uri exists in the prefix-URI namespace mapping."""
     return any(val == uri for val in ns_map.values())
+
+
+def clean_prefixes(ns_map: Dict) -> Dict:
+    """Remove default namespace if it's also assigned to a prefix."""
+    result = {}
+    for prefix, uri in ns_map.items():
+        if uri:
+            prefix = prefix or None
+            if prefix not in result:
+                result[prefix] = uri
+
+    default_prefix = result.get(None)
+    if default_prefix and any(
+        True for prefix, uri in result.items() if prefix and uri == default_prefix
+    ):
+        result.pop(None)
+
+    return result

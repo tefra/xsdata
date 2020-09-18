@@ -54,7 +54,7 @@ class PushParser(AbstractParser):
         """
 
     @abc.abstractmethod
-    def start_prefix_mapping(self, prefix: NoneStr, uri: str, root: bool):
+    def start_prefix_mapping(self, prefix: NoneStr, uri: str):
         """Add the given namespace in the registry."""
 
 
@@ -116,14 +116,12 @@ class XmlHandler:
         prefix-URI mapping that also includes the parent mapping."""
         try:
             result = self.queue[-1].ns_map.copy()
-            root = False
         except (IndexError, AttributeError):
             result = {}
-            root = True
 
         for prefix, uri in ns_map.items():
             prefix = prefix or None
-            self.parser.start_prefix_mapping(prefix, uri, root)
+            self.parser.start_prefix_mapping(prefix, uri)
             result[prefix] = uri
 
         return result
@@ -148,8 +146,7 @@ class EventsHandler(XmlHandler):
                 obj = self.parser.end(self.queue, qname, text, tail, self.objects)
             elif event[0] == EventType.START_NS:
                 _, prefix, uri = event
-                root = len(self.queue) == 0
-                self.parser.start_prefix_mapping(prefix, uri, root)
+                self.parser.start_prefix_mapping(prefix, uri)
             else:
                 raise XmlHandlerError(f"Unhandled event: `{event[0]}`.")
 

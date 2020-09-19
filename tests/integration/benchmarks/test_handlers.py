@@ -8,7 +8,7 @@ from tests.fixtures.books import Books
 from xsdata.formats.dataclass.context import XmlContext
 from xsdata.formats.dataclass.parsers import handlers as readers
 from xsdata.formats.dataclass.parsers import XmlParser
-from xsdata.formats.dataclass.serializers import handlers as writers
+from xsdata.formats.dataclass.serializers import writers
 from xsdata.formats.dataclass.serializers import XmlSerializer
 
 context = XmlContext()
@@ -51,21 +51,21 @@ large_books = make_books(10000)
 
 
 @pytest.mark.benchmark(disable_gc=True, group="Serialize: 100 books")
-@pytest.mark.parametrize("handler", writers_list)
-def test_serialize_small(benchmark, handler):
-    benchmark(write, "small", small_books, getattr(writers, handler))
+@pytest.mark.parametrize("writer", writers_list)
+def test_serialize_small(benchmark, writer):
+    benchmark(write, "small", small_books, getattr(writers, writer))
 
 
 @pytest.mark.benchmark(disable_gc=True, group="Serialize: 1000 books")
-@pytest.mark.parametrize("handler", writers_list)
-def test_serialize_medium(benchmark, handler):
-    benchmark(write, "medium", medium_books, getattr(writers, handler))
+@pytest.mark.parametrize("writer", writers_list)
+def test_serialize_medium(benchmark, writer):
+    benchmark(write, "medium", medium_books, getattr(writers, writer))
 
 
 @pytest.mark.benchmark(disable_gc=True, group="Serialize: 10000 books")
-@pytest.mark.parametrize("handler", writers_list)
-def test_serialize_large(benchmark, handler):
-    benchmark(write, "large", large_books, getattr(writers, handler))
+@pytest.mark.parametrize("writer", writers_list)
+def test_serialize_large(benchmark, writer):
+    benchmark(write, "large", large_books, getattr(writers, writer))
 
 
 @pytest.mark.benchmark(disable_gc=True, group="Parse: 100 books")
@@ -94,7 +94,7 @@ def parse(source, handler):
     parser.from_bytes(source, Books)
 
 
-def write(size, obj, handler):
+def write(size, obj, writer):
     with xsdata_temp_dir.joinpath(f"benchmark_{size}.xml").open("w") as f:
-        serializer = XmlSerializer(handler=handler)
+        serializer = XmlSerializer(writer=writer)
         serializer.write(f, obj)

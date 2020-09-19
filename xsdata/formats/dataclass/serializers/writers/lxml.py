@@ -5,11 +5,11 @@ from typing import Generator
 from lxml.etree import tostring
 from lxml.sax import ElementTreeContentHandler
 
-from xsdata.formats.dataclass.serializers.mixins import XmlEventWriter
+from xsdata.formats.dataclass.serializers.mixins import XmlWriter
 
 
 @dataclass
-class LxmlContentWriter(XmlEventWriter):
+class LxmlEventWriter(XmlWriter):
     handler: ElementTreeContentHandler = field(
         init=False, default_factory=ElementTreeContentHandler
     )
@@ -21,7 +21,7 @@ class LxmlContentWriter(XmlEventWriter):
             self.handler.etree,
             encoding=self.encoding,
             pretty_print=self.pretty_print,
-            xml_declaration=self.xml_declaration,
+            xml_declaration=True,
         ).decode()
 
         self.output.write(xml)

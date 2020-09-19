@@ -17,8 +17,8 @@ from xsdata.formats.dataclass.context import XmlContext
 from xsdata.formats.dataclass.models.elements import XmlMeta
 from xsdata.formats.dataclass.models.elements import XmlVar
 from xsdata.formats.dataclass.models.generics import AnyElement
-from xsdata.formats.dataclass.serializers.handlers import LxmlContentWriter
-from xsdata.formats.dataclass.serializers.mixins import XmlEventWriter
+from xsdata.formats.dataclass.serializers.mixins import XmlWriter
+from xsdata.formats.dataclass.serializers.writers import LxmlEventWriter
 from xsdata.models.enums import QNames
 from xsdata.utils import namespaces
 from xsdata.utils import text
@@ -35,40 +35,39 @@ class XmlSerializer(AbstractSerializer):
     """
     Xml serialize for dataclasses.
 
-    :param xml_declaration: Add xml declaration.
-    :param encoding: Result text encoding.
-    :param pretty_print: Enable pretty output.
-    :param context: XmlContext instance.
+    :param encoding: Text encoding
+    :param pretty_print: Enable pretty output
+    :param context: XmlContext instance
+    :param writer: xml writer type
     """
 
-    xml_declaration: bool = field(default=True)
     encoding: str = field(default="UTF-8")
     pretty_print: bool = field(default=False)
     context: XmlContext = field(default_factory=XmlContext)
-    handler: Type[XmlEventWriter] = field(default=LxmlContentWriter)
+    writer: Type[XmlWriter] = field(default=LxmlEventWriter)
 
     def render(self, obj: Any, ns_map: Optional[Dict] = None) -> str:
         """
-        Convert the given object tree to xml string.
+        Convert and return the given object tree as xml string.
 
-        Optionally provide a namespaces instance with a predefined list
-        of namespace uris and prefixes.
+        Optionally provide a prefix-URI namespaces mapping.
         """
-
         output = StringIO()
         self.write(output, obj, ns_map)
         return output.getvalue()
 
     def write(self, out: TextIO, obj: Any, ns_map: Optional[Dict] = None):
-        """Write the given object tree as xml string to the given text-io
-        output."""
+        """
+        Write the given object tree to output text stream.
+
+        Optionally provide a prefix-URI namespaces mapping.
+        """
         events = self.write_dataclass(obj)
-        handler = self.handler(
+        handler = self.writer(
             output=out,
             ns_map=namespaces.clean_prefixes(ns_map) if ns_map else {},
             encoding=self.encoding,
             pretty_print=self.pretty_print,
-            xml_declaration=self.xml_declaration,
         )
         handler.write(events)
 
@@ -92,16 +91,16 @@ class XmlSerializer(AbstractSerializer):
         nillable = nillable or meta.nillable
         namespace, tag = text.split_qname(qname)
 
-        yield XmlEventWriter.START_TAG, qname
+        yield XmlWriter.START_TAG, qname
 
         for key, value in self.next_attribute(obj, meta, nillable, xsi_type):
-            yield XmlEventWriter.ADD_ATTR, key, value
+            yield XmlWriter.ADD_ATTR, key, value
 
         for var, value in self.next_value(obj, meta):
             if value is not None:
                 yield from self.write_value(value, var, namespace)
 
-        yield XmlEventWriter.END_TAG, qname
+        yield XmlWriter.END_TAG, qname
 
     def write_xsi_type(self, value: Any, var: XmlVar, namespace: NoneStr) -> Generator:
         """Produce an events stream from a dataclass with xsi abstract type
@@ -183,20 +182,20 @@ class XmlSerializer(AbstractSerializer):
         """Produce an element events stream for the given generic object."""
         if value.qname:
             namespace, tag = text.split_qname(value.qname)
-            yield XmlEventWriter.START_TAG, value.qname
+            yield XmlWriter.START_TAG, value.qname
 
         for key, val in value.attributes.items():
-            yield XmlEventWriter.ADD_ATTR, key, val
+            yield XmlWriter.ADD_ATTR, key, val
 
-        yield XmlEventWriter.SET_DATA, value.text
+        yield XmlWriter.SET_DATA, value.text
 
         for child in value.children:
             yield from self.write_any_type(child, var, namespace)
 
         if value.qname:
-            yield XmlEventWriter.END_TAG, value.qname
+            yield XmlWriter.END_TAG, value.qname
 
-        yield XmlEventWriter.SET_DATA, value.tail
+        yield XmlWriter.SET_DATA, value.tail
 
     def xsi_type(self, var: XmlVar, value: Any, namespace: NoneStr) -> Optional[QName]:
         """Get xsi:type if the given value is a derived instance."""
@@ -217,18 +216,18 @@ class XmlSerializer(AbstractSerializer):
     @classmethod
     def write_data(cls, value: Any, var: XmlVar, namespace: NoneStr) -> Generator:
         """Produce a data event for the given value."""
-        yield XmlEventWriter.SET_DATA, value
+        yield XmlWriter.SET_DATA, value
 
     @classmethod
     def write_element(cls, value: Any, var: XmlVar, namespace: NoneStr) -> Generator:
         """Produce an element events stream for the given simple type value."""
-        yield XmlEventWriter.START_TAG, var.qname
+        yield XmlWriter.START_TAG, var.qname
 
         if var.nillable:
-            yield XmlEventWriter.ADD_ATTR, QNames.XSI_NIL, "true"
+            yield XmlWriter.ADD_ATTR, QNames.XSI_NIL, "true"
 
-        yield XmlEventWriter.SET_DATA, value
-        yield XmlEventWriter.END_TAG, var.qname
+        yield XmlWriter.SET_DATA, value
+        yield XmlWriter.END_TAG, var.qname
 
     @classmethod
     def next_value(cls, obj: Any, meta: XmlMeta):

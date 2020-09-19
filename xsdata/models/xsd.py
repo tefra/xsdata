@@ -27,7 +27,7 @@ from xsdata.models.mixins import ModuleMixin
 from xsdata.utils import text
 from xsdata.utils.collections import unique_sequence
 
-docstring_serializer = XmlSerializer(xml_declaration=False, pretty_print=True)
+docstring_serializer = XmlSerializer(pretty_print=True)
 
 
 @dataclass(frozen=True)
@@ -52,8 +52,8 @@ class Documentation(ElementBase):
     attributes: Optional["AnyAttribute"] = element()
 
     def tostring(self) -> Optional[str]:
-        xml = docstring_serializer.render(Docstring(self.elements))
-        return clean_html(xml)[5:-7].strip()
+        xml = docstring_serializer.render(Docstring(self.elements)).split("\n", 1)
+        return clean_html(xml[1])[5:-7].strip()
 
 
 @dataclass

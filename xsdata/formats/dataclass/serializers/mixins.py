@@ -22,10 +22,10 @@ EMPTY_MAP: Dict = {}
 
 
 @dataclass
-class XmlEventWriter:
+class XmlWriter:
     """
-    Xml event writer is an intermediate layer responsible to prepare and buffer
-    the next node information before it's absolutely ready for the sax content
+    Xml writer is an intermediate layer responsible to prepare and buffer the
+    next node information before it's absolutely ready for the sax content
     handlers.
 
     :param output: The file type object to store the result.
@@ -38,7 +38,6 @@ class XmlEventWriter:
     # Config
     encoding: str = field(default="UTF-8")
     pretty_print: bool = field(default=False)
-    xml_declaration: bool = field(default=True)
 
     # Scope vars
     in_tail: bool = field(init=False, default=False)

@@ -17,7 +17,7 @@ from xsdata.formats.dataclass.models.elements import XmlVar
 from xsdata.formats.dataclass.models.elements import XmlWildcard
 from xsdata.formats.dataclass.models.generics import AnyElement
 from xsdata.formats.dataclass.serializers import XmlSerializer
-from xsdata.formats.dataclass.serializers.mixins import XmlEventWriter
+from xsdata.formats.dataclass.serializers.mixins import XmlWriter
 from xsdata.models.enums import QNames
 
 
@@ -48,16 +48,16 @@ class XmlSerializerTests(TestCase):
         book = BookForm(id="123", title="Misterioso: A Crime Novel", price=19.5)
         result = self.serializer.write_dataclass(book)
         expected = [
-            (XmlEventWriter.START_TAG, "BookForm"),
-            (XmlEventWriter.ADD_ATTR, "id", "123"),
-            (XmlEventWriter.ADD_ATTR, "lang", "en"),
-            (XmlEventWriter.START_TAG, "title"),
-            (XmlEventWriter.SET_DATA, "Misterioso: A Crime Novel"),
-            (XmlEventWriter.END_TAG, "title"),
-            (XmlEventWriter.START_TAG, "price"),
-            (XmlEventWriter.SET_DATA, 19.5),
-            (XmlEventWriter.END_TAG, "price"),
-            (XmlEventWriter.END_TAG, "BookForm"),
+            (XmlWriter.START_TAG, "BookForm"),
+            (XmlWriter.ADD_ATTR, "id", "123"),
+            (XmlWriter.ADD_ATTR, "lang", "en"),
+            (XmlWriter.START_TAG, "title"),
+            (XmlWriter.SET_DATA, "Misterioso: A Crime Novel"),
+            (XmlWriter.END_TAG, "title"),
+            (XmlWriter.START_TAG, "price"),
+            (XmlWriter.SET_DATA, 19.5),
+            (XmlWriter.END_TAG, "price"),
+            (XmlWriter.END_TAG, "BookForm"),
         ]
         self.assertIsInstance(result, Generator)
         self.assertEqual(expected, list(result))
@@ -68,18 +68,18 @@ class XmlSerializerTests(TestCase):
             book, "xsdata", "book", True, "foo:book"
         )
         expected = [
-            (XmlEventWriter.START_TAG, "book"),
-            (XmlEventWriter.ADD_ATTR, "id", "123"),
-            (XmlEventWriter.ADD_ATTR, "lang", "en"),
-            (XmlEventWriter.ADD_ATTR, QNames.XSI_TYPE, "foo:book"),
-            (XmlEventWriter.ADD_ATTR, QNames.XSI_NIL, "true"),
-            (XmlEventWriter.START_TAG, "title"),
-            (XmlEventWriter.SET_DATA, "Misterioso: A Crime Novel"),
-            (XmlEventWriter.END_TAG, "title"),
-            (XmlEventWriter.START_TAG, "price"),
-            (XmlEventWriter.SET_DATA, 19.5),
-            (XmlEventWriter.END_TAG, "price"),
-            (XmlEventWriter.END_TAG, "book"),
+            (XmlWriter.START_TAG, "book"),
+            (XmlWriter.ADD_ATTR, "id", "123"),
+            (XmlWriter.ADD_ATTR, "lang", "en"),
+            (XmlWriter.ADD_ATTR, QNames.XSI_TYPE, "foo:book"),
+            (XmlWriter.ADD_ATTR, QNames.XSI_NIL, "true"),
+            (XmlWriter.START_TAG, "title"),
+            (XmlWriter.SET_DATA, "Misterioso: A Crime Novel"),
+            (XmlWriter.END_TAG, "title"),
+            (XmlWriter.START_TAG, "price"),
+            (XmlWriter.SET_DATA, 19.5),
+            (XmlWriter.END_TAG, "price"),
+            (XmlWriter.END_TAG, "book"),
         ]
         self.assertIsInstance(result, Generator)
         self.assertEqual(expected, list(result))
@@ -97,20 +97,20 @@ class XmlSerializerTests(TestCase):
         value = ["text", AnyElement(qname="br"), book, ebook, "tail"]
         result = self.serializer.write_value(value, var, "xsdata")
         expected = [
-            (XmlEventWriter.SET_DATA, "text"),
-            (XmlEventWriter.START_TAG, "br"),
-            (XmlEventWriter.SET_DATA, None),
-            (XmlEventWriter.END_TAG, "br"),
-            (XmlEventWriter.SET_DATA, None),
-            (XmlEventWriter.START_TAG, "{xsdata}BookForm"),
-            (XmlEventWriter.ADD_ATTR, "id", "123"),
-            (XmlEventWriter.ADD_ATTR, "lang", "en"),
-            (XmlEventWriter.END_TAG, "{xsdata}BookForm"),
-            (XmlEventWriter.START_TAG, "ebook"),
-            (XmlEventWriter.ADD_ATTR, "id", "123"),
-            (XmlEventWriter.ADD_ATTR, "lang", "en"),
-            (XmlEventWriter.END_TAG, "ebook"),
-            (XmlEventWriter.SET_DATA, "tail"),
+            (XmlWriter.SET_DATA, "text"),
+            (XmlWriter.START_TAG, "br"),
+            (XmlWriter.SET_DATA, None),
+            (XmlWriter.END_TAG, "br"),
+            (XmlWriter.SET_DATA, None),
+            (XmlWriter.START_TAG, "{xsdata}BookForm"),
+            (XmlWriter.ADD_ATTR, "id", "123"),
+            (XmlWriter.ADD_ATTR, "lang", "en"),
+            (XmlWriter.END_TAG, "{xsdata}BookForm"),
+            (XmlWriter.START_TAG, "ebook"),
+            (XmlWriter.ADD_ATTR, "id", "123"),
+            (XmlWriter.ADD_ATTR, "lang", "en"),
+            (XmlWriter.END_TAG, "ebook"),
+            (XmlWriter.SET_DATA, "tail"),
         ]
 
         self.assertIsInstance(result, Generator)
@@ -118,7 +118,7 @@ class XmlSerializerTests(TestCase):
 
     def test_write_data(self):
         var = XmlText(qname="a", name="a")
-        expected = [(XmlEventWriter.SET_DATA, "123")]
+        expected = [(XmlWriter.SET_DATA, "123")]
 
         result = self.serializer.write_value("123", var, "xsdata")
         self.assertIsInstance(result, Generator)
@@ -132,20 +132,20 @@ class XmlSerializerTests(TestCase):
         self.assertEqual(0, len(list(result)))
 
         expected = [
-            (XmlEventWriter.START_TAG, "a"),
-            (XmlEventWriter.SET_DATA, [1, 2, 3]),
-            (XmlEventWriter.END_TAG, "a"),
+            (XmlWriter.START_TAG, "a"),
+            (XmlWriter.SET_DATA, [1, 2, 3]),
+            (XmlWriter.END_TAG, "a"),
         ]
         result = self.serializer.write_value([1, 2, 3], var, "xsdata")
         self.assertEqual(expected, list(result))
 
         expected = [
-            (XmlEventWriter.START_TAG, "a"),
-            (XmlEventWriter.SET_DATA, [1, 2, 3]),
-            (XmlEventWriter.END_TAG, "a"),
-            (XmlEventWriter.START_TAG, "a"),
-            (XmlEventWriter.SET_DATA, [4, 5, 6]),
-            (XmlEventWriter.END_TAG, "a"),
+            (XmlWriter.START_TAG, "a"),
+            (XmlWriter.SET_DATA, [1, 2, 3]),
+            (XmlWriter.END_TAG, "a"),
+            (XmlWriter.START_TAG, "a"),
+            (XmlWriter.SET_DATA, [4, 5, 6]),
+            (XmlWriter.END_TAG, "a"),
         ]
 
         result = self.serializer.write_value([[1, 2, 3], [4, 5, 6]], var, "xsdata")
@@ -153,7 +153,7 @@ class XmlSerializerTests(TestCase):
 
     def test_write_any_type_with_primitive(self):
         var = XmlWildcard(qname="a", name="a")
-        expected = [(XmlEventWriter.SET_DATA, "str")]
+        expected = [(XmlWriter.SET_DATA, "str")]
 
         result = self.serializer.write_value("str", var, "xsdata")
         self.assertIsInstance(result, Generator)
@@ -162,9 +162,9 @@ class XmlSerializerTests(TestCase):
     def test_write_any_type_with_primitive_element(self):
         var = XmlElement(qname="a", name="a", types=[object])
         expected = [
-            (XmlEventWriter.START_TAG, "a"),
-            (XmlEventWriter.SET_DATA, "str"),
-            (XmlEventWriter.END_TAG, "a"),
+            (XmlWriter.START_TAG, "a"),
+            (XmlWriter.SET_DATA, "str"),
+            (XmlWriter.END_TAG, "a"),
         ]
 
         result = self.serializer.write_value("str", var, "xsdata")
@@ -181,15 +181,15 @@ class XmlSerializerTests(TestCase):
             children=[AnyElement(text="g"), "h"],
         )
         expected = [
-            (XmlEventWriter.START_TAG, "a"),
-            (XmlEventWriter.ADD_ATTR, "d", 1),
-            (XmlEventWriter.ADD_ATTR, "e", 2),
-            (XmlEventWriter.SET_DATA, "b"),
-            (XmlEventWriter.SET_DATA, "g"),
-            (XmlEventWriter.SET_DATA, None),
-            (XmlEventWriter.SET_DATA, "h"),
-            (XmlEventWriter.END_TAG, "a"),
-            (XmlEventWriter.SET_DATA, "c"),
+            (XmlWriter.START_TAG, "a"),
+            (XmlWriter.ADD_ATTR, "d", 1),
+            (XmlWriter.ADD_ATTR, "e", 2),
+            (XmlWriter.SET_DATA, "b"),
+            (XmlWriter.SET_DATA, "g"),
+            (XmlWriter.SET_DATA, None),
+            (XmlWriter.SET_DATA, "h"),
+            (XmlWriter.END_TAG, "a"),
+            (XmlWriter.SET_DATA, "c"),
         ]
 
         result = self.serializer.write_value(value, var, "xsdata")
@@ -200,10 +200,10 @@ class XmlSerializerTests(TestCase):
         var = XmlElement(qname="a", name="a", dataclass=True, types=[BookForm])
         value = BookForm(id="123")
         expected = [
-            (XmlEventWriter.START_TAG, "a"),
-            (XmlEventWriter.ADD_ATTR, "id", "123"),
-            (XmlEventWriter.ADD_ATTR, "lang", "en"),
-            (XmlEventWriter.END_TAG, "a"),
+            (XmlWriter.START_TAG, "a"),
+            (XmlWriter.ADD_ATTR, "id", "123"),
+            (XmlWriter.ADD_ATTR, "lang", "en"),
+            (XmlWriter.END_TAG, "a"),
         ]
 
         result = self.serializer.write_value(value, var, "xsdata")
@@ -216,11 +216,11 @@ class XmlSerializerTests(TestCase):
 
         value = ebook(id="123")
         expected = [
-            (XmlEventWriter.START_TAG, "a"),
-            (XmlEventWriter.ADD_ATTR, "id", "123"),
-            (XmlEventWriter.ADD_ATTR, "lang", "en"),
-            (XmlEventWriter.ADD_ATTR, QNames.XSI_TYPE, QName("eBook")),
-            (XmlEventWriter.END_TAG, "a"),
+            (XmlWriter.START_TAG, "a"),
+            (XmlWriter.ADD_ATTR, "id", "123"),
+            (XmlWriter.ADD_ATTR, "lang", "en"),
+            (XmlWriter.ADD_ATTR, QNames.XSI_TYPE, QName("eBook")),
+            (XmlWriter.END_TAG, "a"),
         ]
 
         result = self.serializer.write_value(value, var, "xsdata")
@@ -241,9 +241,9 @@ class XmlSerializerTests(TestCase):
     def test_write_element(self):
         var = XmlElement(qname="a", name="a")
         expected = [
-            (XmlEventWriter.START_TAG, "a"),
-            (XmlEventWriter.SET_DATA, "123"),
-            (XmlEventWriter.END_TAG, "a"),
+            (XmlWriter.START_TAG, "a"),
+            (XmlWriter.SET_DATA, "123"),
+            (XmlWriter.END_TAG, "a"),
         ]
 
         result = self.serializer.write_value("123", var, "xsdata")
@@ -253,10 +253,10 @@ class XmlSerializerTests(TestCase):
     def test_write_element_with_nillable_true(self):
         var = XmlElement(qname="a", name="a", nillable=True)
         expected = [
-            (XmlEventWriter.START_TAG, "a"),
-            (XmlEventWriter.ADD_ATTR, QNames.XSI_NIL, "true"),
-            (XmlEventWriter.SET_DATA, "123"),
-            (XmlEventWriter.END_TAG, "a"),
+            (XmlWriter.START_TAG, "a"),
+            (XmlWriter.ADD_ATTR, QNames.XSI_NIL, "true"),
+            (XmlWriter.SET_DATA, "123"),
+            (XmlWriter.END_TAG, "a"),
         ]
 
         result = self.serializer.write_value("123", var, "xsdata")
@@ -267,12 +267,12 @@ class XmlSerializerTests(TestCase):
         var = XmlElement(qname="a", name="a", list_element=True)
         value = [True, False]
         expected = [
-            (XmlEventWriter.START_TAG, "a"),
-            (XmlEventWriter.SET_DATA, True),
-            (XmlEventWriter.END_TAG, "a"),
-            (XmlEventWriter.START_TAG, "a"),
-            (XmlEventWriter.SET_DATA, False),
-            (XmlEventWriter.END_TAG, "a"),
+            (XmlWriter.START_TAG, "a"),
+            (XmlWriter.SET_DATA, True),
+            (XmlWriter.END_TAG, "a"),
+            (XmlWriter.START_TAG, "a"),
+            (XmlWriter.SET_DATA, False),
+            (XmlWriter.END_TAG, "a"),
         ]
 
         result = self.serializer.write_value(value, var, "xsdata")
@@ -363,15 +363,14 @@ class XmlSerializerTests(TestCase):
         obj.content.append(Span("chris"))
         obj.content.append("!")
 
-        self.serializer.xml_declaration = False
         self.serializer.pretty_print = False
-        result = self.serializer.render(obj)
-        self.assertEqual("<p><b>Mr.</b><span>chris</span>!</p>", result)
+        result = self.serializer.render(obj).split("\n")
+        self.assertEqual("<p><b>Mr.</b><span>chris</span>!</p>", result[1])
 
         obj = Example()
         obj.content.append("Hi ")
         obj.content.append(AnyElement(qname="b", text="Mr."))
         obj.content.append(Span("chris"))
         obj.content.append("!")
-        result = self.serializer.render(obj)
-        self.assertEqual("<p>Hi <b>Mr.</b><span>chris</span>!</p>", result)
+        result = self.serializer.render(obj).split("\n")
+        self.assertEqual("<p>Hi <b>Mr.</b><span>chris</span>!</p>", result[1])

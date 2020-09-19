@@ -2,11 +2,11 @@ from dataclasses import dataclass
 from dataclasses import field
 from xml.sax.saxutils import XMLGenerator
 
-from xsdata.formats.dataclass.serializers.mixins import XmlEventWriter
+from xsdata.formats.dataclass.serializers.mixins import XmlWriter
 
 
 @dataclass
-class XmlContentWriter(XmlEventWriter):
+class XmlEventWriter(XmlWriter):
     handler: XMLGenerator = field(init=False)
     depth: int = field(default=0, init=False)
     ended: int = field(default=0, init=False)

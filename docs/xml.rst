@@ -39,7 +39,7 @@ Parameters
 
 **context** (:class:`~xsdata.formats.dataclass.context.XmlContext`)
 
-It's the cache layer for the binding directives of models and their fields. You may
+The cache layer for the binding directives of models and their fields. You may
 share a context instance between parser/serializer instances to avoid compiling the
 cache more than once.
 
@@ -49,7 +49,8 @@ cache more than once.
     per document type.
 
 
-**handler** (:class:`~xsdata.formats.dataclass.parsers.mixins.XmlHandler`)
+**handler** (:class:`type` of
+:class:`~xsdata.formats.dataclass.parsers.mixins.XmlHandler`)
 
 The XmlHandler type to use in order to read the xml source and push element events
 to the main parser.
@@ -57,8 +58,8 @@ to the main parser.
 Default: :class:`~xsdata.formats.dataclass.parsers.handlers.LxmlEventHandler`
 
 
-Xml Handlers
-------------
+Handlers
+--------
 
 :class:`~xsdata.formats.dataclass.parsers.handlers.LxmlEventHandler`
 
@@ -101,42 +102,6 @@ statements and is a lot slower than the iterparse implementation.
     to skip unknown properties.
 
 
-Benchmarks
-----------
-
-The benchmarks run with the `test suite <https://travis-ci.com/tefra/xsdata>`_.
-
-
-.. code-block::
-
-    ----------------------------------- benchmark 'size: 53.21 KB': 4 tests -----------------------------------
-    Name (time in ms)                    Min                Max               Mean             Median
-    -----------------------------------------------------------------------------------------------------------
-    test_small[LxmlEventHandler]     11.9252 (1.0)      24.1855 (1.10)     12.6733 (1.0)      12.2927 (1.0)
-    test_small[XmlEventHandler]      11.9761 (1.00)     35.8465 (1.63)     13.7822 (1.09)     12.3014 (1.00)
-    test_small[LxmlSaxHandler]       14.4966 (1.22)     21.9954 (1.0)      15.1298 (1.19)     14.9358 (1.22)
-    test_small[XmlSaxHandler]        16.4111 (1.38)     36.1555 (1.64)     18.2357 (1.44)     16.9312 (1.38)
-    -----------------------------------------------------------------------------------------------------------
-
-    ------------------------------------- benchmark 'size: 531.33 KB': 4 tests -------------------------------------
-    Name (time in ms)                      Min                 Max                Mean              Median
-    ----------------------------------------------------------------------------------------------------------------
-    test_medium[LxmlEventHandler]     122.0357 (1.0)      158.1659 (1.0)      127.5115 (1.0)      123.1530 (1.0)
-    test_medium[XmlEventHandler]      122.1189 (1.00)     165.7320 (1.05)     133.0798 (1.04)     125.3347 (1.02)
-    test_medium[LxmlSaxHandler]       145.2495 (1.19)     165.9502 (1.05)     149.9644 (1.18)     146.5776 (1.19)
-    test_medium[XmlSaxHandler]        166.7054 (1.37)     193.0464 (1.22)     174.3553 (1.37)     172.1119 (1.40)
-    ----------------------------------------------------------------------------------------------------------------
-
-    -------------------------------- benchmark 'size: 5312.58 KB': 4 tests --------------------------------
-    Name (time in s)                    Min               Max              Mean            Median
-    -------------------------------------------------------------------------------------------------------
-    test_large[XmlEventHandler]      1.2444 (1.0)      1.3451 (1.0)      1.2795 (1.0)      1.2740 (1.0)
-    test_large[LxmlEventHandler]     1.2608 (1.01)     1.4284 (1.06)     1.3385 (1.05)     1.3305 (1.04)
-    test_large[LxmlSaxHandler]       1.4625 (1.18)     1.6302 (1.21)     1.5405 (1.20)     1.5478 (1.21)
-    test_large[XmlSaxHandler]        1.7173 (1.38)     1.7610 (1.31)     1.7368 (1.36)     1.7334 (1.36)
-    -------------------------------------------------------------------------------------------------------
-
-
 Example: from path
 ------------------
 
@@ -160,7 +125,6 @@ Example: alternative handler
    :lines: 24-27
 
 
-
 :class:`~xsdata.formats.dataclass.serializers.XmlSerializer`
 ============================================================
 
@@ -168,43 +132,167 @@ The serializer can also be initialized with a xml context instance, if your use 
 needs to parse and serialize the same type of objects you could share the same xml
 context instance between them to save on memory and processing.
 
-.. code-block:: python
+.. hint::
 
-        >>> import pprint
-        >>> from docs.examples.primer import PurchaseOrder, Items, Usaddress
-        >>> from xsdata.formats.dataclass.serializers import XmlSerializer
+    The serializer used to add a default namespace if the root object supported it and
+    moved all the prefixes to the root node with a performance penalty. This behavior
+    was removed in version **20.10** with the new xml writer interface for consistency
+    between implementations.
 
-        >>> item = Items.Item(product_name="duct tape", quantity=99, usprice=19.99)
-        >>> items = Items()
-        >>> items.item.append(item)
-        >>>
-        >>> address = Usaddress(name="Chris", street="Sesame", city="New York", state="New York", zip="123", country="US")
-        >>> order = PurchaseOrder(ship_to=address, bill_to=address, items=items)
+    You can still get the same output if you provide a prefix-URI namespaces mapping,
+    see :ref:`examples <Example: custom prefixes>`
 
-        >>> serializer = XmlSerializer(pretty_print=True)
-        >>> pprint.pprint(serializer.render(order))
-        ("<?xml version='1.0' encoding='UTF-8'?>\n"
-         '<purchaseOrder>\n'
-         '  <shipTo country="US">\n'
-         '    <name>Chris</name>\n'
-         '    <street>Sesame</street>\n'
-         '    <city>New York</city>\n'
-         '    <state>New York</state>\n'
-         '    <zip>123</zip>\n'
-         '  </shipTo>\n'
-         '  <billTo country="US">\n'
-         '    <name>Chris</name>\n'
-         '    <street>Sesame</street>\n'
-         '    <city>New York</city>\n'
-         '    <state>New York</state>\n'
-         '    <zip>123</zip>\n'
-         '  </billTo>\n'
-         '  <items>\n'
-         '    <item>\n'
-         '      <productName>duct tape</productName>\n'
-         '      <quantity>99</quantity>\n'
-         '      <USPrice>19.99</USPrice>\n'
-         '    </item>\n'
-         '  </items>\n'
-         '</purchaseOrder>\n')
-        >>>
+
+Parameters
+----------
+
+**encoding** (:class:`str`)
+
+text encoding, default: `UTF-8`
+
+
+**pretty_print** (:class:`bool`)
+
+Enable pretty output, default: `False`
+
+
+**context** (:class:`~xsdata.formats.dataclass.context.XmlContext`)
+
+The cache layer for the binding directives of models and their fields. You may
+share a context instance between parser/serializer instances to avoid compiling the
+cache more than once.
+
+
+**writer** (:class:`type` of
+:class:`~xsdata.formats.dataclass.serializers.mixins.XmlWriter`)
+
+The XmlWriter type to use for serialization.
+
+Default: :class:`~xsdata.formats.dataclass.serializers.writers.LxmlEventWriter`
+
+
+Writers
+-------
+
+:class:`~xsdata.formats.dataclass.serializers.writers.LxmlEventWriter`
+
+It's based on the lxml `ElementTreeContentHandler`, which means your object tree
+will first be converted to an lxml ElementTree and then to string. Despite that since
+it's lxml it's still pretty fast and supports special characters and encodings a bit
+better than the native python writer.
+
+
+:class:`~xsdata.formats.dataclass.serializers.writers.XmlEventWriter`
+
+It's based on the native python :class:`xml.sax.saxutils.XMLGenrator` with support for
+indentation. The object tree is converted directly to string without any intermediate
+steps, which makes it's slightly faster than the lxml implementation and more memory
+efficient if you write directly to an output stream.
+
+The pretty print output is identical to the lxml's except for some mixed content cases,
+because of the nature of a sax content handler.
+
+Example: render
+---------------
+
+.. literalinclude:: examples/xml_serializer.py
+    :lines: 4-23
+
+.. literalinclude:: examples/xml_serializer.py
+    :lines: 26-36
+    :language: xml
+
+Example: custom prefixes
+------------------------
+
+.. literalinclude:: examples/xml_serializer.py
+    :lines: 40
+
+.. literalinclude:: examples/xml_serializer.py
+    :lines: 43-45
+    :language: xml
+
+Example: default prefix
+-----------------------
+
+.. literalinclude:: examples/xml_serializer.py
+    :lines: 57
+
+.. literalinclude:: examples/xml_serializer.py
+    :lines: 60-63
+    :language: xml
+
+Example: native handler
+-----------------------
+
+.. literalinclude:: examples/xml_serializer.py
+    :lines: 73-75
+
+.. literalinclude:: examples/xml_serializer.py
+    :lines: 78-88
+    :language: xml
+
+Example: write to stream
+------------------------
+
+.. literalinclude:: examples/xml_serializer.py
+    :lines: 91
+
+.. literalinclude:: examples/xml_serializer.py
+    :lines: 93-94
+
+
+Benchmarks
+==========
+
+The benchmarks run with the `test suite <https://travis-ci.com/tefra/xsdata>`_.
+
+.. code-block::
+
+    ------------------------------------- benchmark 'Parse: 100 books': 4 tests -------------------------------------
+    Name (time in ms)                          Min                Max               Mean             Median
+    -----------------------------------------------------------------------------------------------------------------
+    test_parse_small[XmlEventHandler]      11.6160 (1.0)      12.6287 (1.00)     11.8553 (1.0)      11.7856 (1.0)
+    test_parse_small[LxmlEventHandler]     11.7612 (1.01)     12.5831 (1.0)      12.0762 (1.02)     12.0272 (1.02)
+    test_parse_small[LxmlSaxHandler]       12.7282 (1.10)     13.8885 (1.10)     12.9998 (1.10)     12.9255 (1.10)
+    test_parse_small[XmlSaxHandler]        15.7504 (1.36)     17.0763 (1.36)     15.9986 (1.35)     15.9235 (1.35)
+    -----------------------------------------------------------------------------------------------------------------
+
+    --------------------------------------- benchmark 'Parse: 1000 books': 4 tests ---------------------------------------
+    Name (time in ms)                            Min                 Max                Mean              Median
+    ----------------------------------------------------------------------------------------------------------------------
+    test_parse_medium[XmlEventHandler]      111.9098 (1.0)      113.9331 (1.0)      112.5547 (1.0)      112.6175 (1.0)
+    test_parse_medium[LxmlEventHandler]     113.8048 (1.02)     116.0534 (1.02)     114.9485 (1.02)     115.0780 (1.02)
+    test_parse_medium[LxmlSaxHandler]       126.1686 (1.13)     127.6716 (1.12)     126.9943 (1.13)     127.1551 (1.13)
+    test_parse_medium[XmlSaxHandler]        153.4598 (1.37)     155.4510 (1.36)     154.3693 (1.37)     154.2699 (1.37)
+    ----------------------------------------------------------------------------------------------------------------------
+
+    ---------------------------------- benchmark 'Parse: 10000 books': 4 tests ----------------------------------
+    Name (time in s)                          Min               Max              Mean            Median
+    -------------------------------------------------------------------------------------------------------------
+    test_parse_large[XmlEventHandler]      1.1246 (1.0)      1.1373 (1.0)      1.1300 (1.0)      1.1262 (1.0)
+    test_parse_large[LxmlEventHandler]     1.1360 (1.01)     1.1446 (1.01)     1.1391 (1.01)     1.1383 (1.01)
+    test_parse_large[LxmlSaxHandler]       1.2642 (1.12)     1.2809 (1.13)     1.2734 (1.13)     1.2729 (1.13)
+    test_parse_large[XmlSaxHandler]        1.5376 (1.37)     1.5614 (1.37)     1.5473 (1.37)     1.5452 (1.37)
+    -------------------------------------------------------------------------------------------------------------
+
+    ------------------------------------ benchmark 'Serialize: 100 books': 2 tests -------------------------------------
+    Name (time in ms)                             Min                Max               Mean             Median
+    --------------------------------------------------------------------------------------------------------------------
+    test_serialize_small[LxmlEventWriter]     13.2771 (1.0)      15.2824 (1.02)     14.3202 (1.02)     14.2914 (1.02)
+    test_serialize_small[XmlEventWriter]      13.6682 (1.03)     14.9772 (1.0)      14.0417 (1.0)      13.9851 (1.0)
+    --------------------------------------------------------------------------------------------------------------------
+
+    --------------------------------------- benchmark 'Serialize: 1000 books': 2 tests --------------------------------------
+    Name (time in ms)                               Min                 Max                Mean              Median
+    -------------------------------------------------------------------------------------------------------------------------
+    test_serialize_medium[LxmlEventWriter]     126.2678 (1.0)      167.3845 (1.27)     133.7267 (1.03)     128.5200 (1.0)
+    test_serialize_medium[XmlEventWriter]      127.9384 (1.01)     131.6320 (1.0)      129.4039 (1.0)      129.1908 (1.01)
+    -------------------------------------------------------------------------------------------------------------------------
+
+    --------------------------------- benchmark 'Serialize: 10000 books': 2 tests ----------------------------------
+    Name (time in s)                             Min               Max              Mean            Median
+    ----------------------------------------------------------------------------------------------------------------
+    test_serialize_large[XmlEventWriter]      1.2516 (1.0)      1.2590 (1.0)      1.2550 (1.0)      1.2548 (1.0)
+    test_serialize_large[LxmlEventWriter]     1.2762 (1.02)     1.2840 (1.02)     1.2793 (1.02)     1.2766 (1.02)
+    ----------------------------------------------------------------------------------------------------------------

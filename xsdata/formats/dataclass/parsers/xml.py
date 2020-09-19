@@ -22,8 +22,8 @@ class XmlParser(NodeParser):
     """
     Bind xml nodes to dataclasses with event hooks.
 
-    :param handler: Xml handler.
-    :param emit_cache: Cache for qnames to event names.
+    :param handler: Xml handler type
+    :param emit_cache: Cache for qnames to event names
     """
 
     handler: Type[XmlHandler] = field(default=LxmlEventHandler)

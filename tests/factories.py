@@ -2,9 +2,6 @@ import random
 import unittest
 from abc import ABC
 from abc import abstractmethod
-from typing import AnyStr
-
-from lxml import etree
 
 from xsdata.codegen.models import Attr
 from xsdata.codegen.models import AttrType
@@ -13,7 +10,6 @@ from xsdata.codegen.models import Extension
 from xsdata.codegen.models import Import
 from xsdata.codegen.models import Restrictions
 from xsdata.codegen.models import Status
-from xsdata.formats.dataclass.serializers.handlers.utils import pretty_xml
 from xsdata.models.enums import DataType
 from xsdata.models.enums import Namespace
 from xsdata.models.enums import QNames
@@ -42,11 +38,6 @@ class FactoryTestCase(unittest.TestCase):
         AttrTypeFactory.reset()
         ExtensionFactory.reset()
         PackageFactory.reset()
-
-
-class XmlTestCase(unittest.TestCase):
-    def assertXMLEqual(self, first: str, second: str, msg=None):
-        self.assertEqual(pretty_xml(first), pretty_xml(second), msg)
 
 
 class Factory(ABC):

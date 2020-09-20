@@ -13,9 +13,9 @@ from xml.sax.handler import ContentHandler
 from xsdata.exceptions import XmlWriterError
 from xsdata.formats.converter import converter
 from xsdata.models.enums import Namespace
-from xsdata.utils import text
 from xsdata.utils.namespaces import generate_prefix
 from xsdata.utils.namespaces import prefix_exists
+from xsdata.utils.namespaces import split_qname
 
 XSI_NIL = (Namespace.XSI.uri, "nil")
 EMPTY_MAP: Dict = {}
@@ -85,7 +85,7 @@ class XmlWriter:
         self.ns_context.append(self.ns_map.copy())
         self.ns_map = self.ns_context[-1]
 
-        self.pending_tag = text.split_qname(qname)
+        self.pending_tag = split_qname(qname)
         self.add_namespace(self.pending_tag[0])
 
     def add_attribute(self, key: str, value: Any):
@@ -103,7 +103,7 @@ class XmlWriter:
         if isinstance(value, str) and value and value[0] == "{" and len(value) > 1:
             value = QName(value)
 
-        name = text.split_qname(key)
+        name = split_qname(key)
         value = converter.to_string(value, ns_map=self.ns_map)
         self.attrs[name] = value
 
@@ -148,7 +148,7 @@ class XmlWriter:
         and current context.
         """
         self.flush_start(True)
-        self.handler.endElementNS(text.split_qname(qname), None)
+        self.handler.endElementNS(split_qname(qname), None)
 
         if self.tail:
             self.handler.characters(self.tail)

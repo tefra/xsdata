@@ -21,7 +21,7 @@ from xsdata.formats.dataclass.models.constants import XmlType
 from xsdata.formats.dataclass.models.elements import XmlMeta
 from xsdata.formats.dataclass.models.elements import XmlVar
 from xsdata.models.enums import NamespaceType
-from xsdata.utils import text as text_utils
+from xsdata.utils.namespaces import build_qname
 
 
 @dataclass
@@ -117,8 +117,8 @@ class XmlContext:
             self.cache[clazz] = XmlMeta(
                 name=name,
                 clazz=clazz,
-                qname=text_utils.qname(namespace, name),
-                source_qname=text_utils.qname(source_namespace, name),
+                qname=build_qname(namespace, name),
+                source_qname=build_qname(source_namespace, name),
                 nillable=nillable,
                 vars=list(self.get_type_hints(clazz, namespace)),
             )
@@ -145,13 +145,13 @@ class XmlContext:
             namespaces = self.resolve_namespaces(xml_type, namespace, parent_ns)
             first_namespace = (
                 namespaces[0]
-                if len(namespaces) > 0 and namespaces[0] and namespaces[0][0] != "#"
+                if namespaces and namespaces[0] and namespaces[0][0] != "#"
                 else None
             )
 
             yield xml_clazz(
                 name=var.name,
-                qname=text_utils.qname(first_namespace, local_name),
+                qname=build_qname(first_namespace, local_name),
                 namespaces=namespaces,
                 init=var.init,
                 mixed=var.metadata.get("mixed", False),

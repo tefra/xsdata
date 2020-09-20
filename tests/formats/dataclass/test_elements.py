@@ -144,24 +144,6 @@ class XmlTextTests(TestCase):
 
 
 class XmlMetaTests(TestCase):
-    def test_property_element_form(self):
-        meta = XmlMeta(
-            name="foo", clazz=BookForm, qname="foo", source_qname="foo", nillable=False
-        )
-        self.assertEqual(FormType.UNQUALIFIED, meta.element_form)
-
-        meta = replace(meta, qname="{bar}foo")
-        self.assertEqual(FormType.QUALIFIED, meta.element_form)
-
-        meta.vars.append(XmlElement(name="a", qname="a"))
-        self.assertEqual(FormType.UNQUALIFIED, meta.element_form)
-
-        meta.vars.append(XmlElement(name="b", qname="b", namespaces=["bar"]))
-        self.assertEqual(FormType.UNQUALIFIED, meta.element_form)
-
-        meta.vars.pop(0)
-        self.assertEqual(FormType.QUALIFIED, meta.element_form)
-
     def test_find_var(self):
         ctx = XmlContext()
         meta = ctx.build(BookForm)

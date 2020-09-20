@@ -30,7 +30,7 @@ from xsdata.models.xsd import Schema
 from xsdata.models.xsd import Sequence
 from xsdata.models.xsd import SimpleContent
 from xsdata.models.xsd import SimpleType
-from xsdata.utils import text
+from xsdata.utils.namespaces import build_qname
 
 
 class SchemaMapperTests(FactoryTestCase):
@@ -147,7 +147,7 @@ class SchemaMapperTests(FactoryTestCase):
         mock_element_namespace.assert_called_once_with(element, "target_ns")
 
         expected = ClassFactory.create(
-            qname=text.qname("target_ns", "name"),
+            qname=build_qname("target_ns", "name"),
             type=Element,
             help="sos",
             abstract=True,
@@ -156,7 +156,10 @@ class SchemaMapperTests(FactoryTestCase):
             ns_map=element.ns_map,
             package=None,
             module="module",
-            substitutions=[text.qname("target_ns", "foo"), text.qname("sm_ns", "bar")],
+            substitutions=[
+                build_qname("target_ns", "foo"),
+                build_qname("sm_ns", "bar"),
+            ],
             container="container",
         )
         self.assertEqual(expected, result)
@@ -243,8 +246,8 @@ class SchemaMapperTests(FactoryTestCase):
             map(
                 ExtensionFactory.create,
                 [
-                    AttrTypeFactory.create(qname=text.qname("book", "b"), index=4),
-                    AttrTypeFactory.create(qname=text.qname("book", "c"), index=7),
+                    AttrTypeFactory.create(qname=build_qname("book", "b"), index=4),
+                    AttrTypeFactory.create(qname=build_qname("book", "c"), index=7),
                 ],
             )
         )
@@ -338,7 +341,7 @@ class SchemaMapperTests(FactoryTestCase):
             AttrTypeFactory.xs_int(),
             AttrTypeFactory.xs_string(),
             AttrTypeFactory.create(
-                qname=text.qname(item.target_namespace, "foo"), forward=True
+                qname=build_qname(item.target_namespace, "foo"), forward=True
             ),
         ]
 

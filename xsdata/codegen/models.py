@@ -22,7 +22,8 @@ from xsdata.models.wsdl import BindingOperation
 from xsdata.models.wsdl import Message
 from xsdata.models.xsd import ComplexType
 from xsdata.models.xsd import Element
-from xsdata.utils import text
+from xsdata.utils.namespaces import build_qname
+from xsdata.utils.namespaces import split_qname
 
 xml_type_map = {
     Tag.ELEMENT: XmlType.ELEMENT,
@@ -185,7 +186,7 @@ class AttrType:
     @property
     def name(self) -> str:
         """Shortcut for qname local name."""
-        return text.split_qname(self.qname)[1]
+        return split_qname(self.qname)[1]
 
     @property
     def is_dependency(self) -> bool:
@@ -305,7 +306,7 @@ class Attr:
     def is_xsi_type(self) -> bool:
         """Return whether this attribute qualified name is equal to
         xsi:type."""
-        return QNames.XSI_TYPE == text.qname(self.namespace, self.name)
+        return QNames.XSI_TYPE == build_qname(self.namespace, self.name)
 
     @property
     def is_wildcard(self) -> bool:
@@ -400,11 +401,11 @@ class Class:
     @property
     def name(self) -> str:
         """Shortcut for qname local name."""
-        return text.split_qname(self.qname)[1]
+        return split_qname(self.qname)[1]
 
     @property
     def target_namespace(self) -> Optional[str]:
-        return text.split_qname(self.qname)[0]
+        return split_qname(self.qname)[0]
 
     @property
     def has_suffix_attr(self) -> bool:

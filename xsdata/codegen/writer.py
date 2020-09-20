@@ -39,7 +39,7 @@ class CodeWriter:
         necessary directories and files."""
         engine = self.get_format(output)
         for result in engine.render(classes):
-            if len(result.source.strip()) > 0:
+            if result.source.strip():
                 logger.info("Generating package: %s", result.title)
 
                 result.path.parent.mkdir(parents=True, exist_ok=True)

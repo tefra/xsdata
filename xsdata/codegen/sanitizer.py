@@ -10,8 +10,9 @@ from xsdata.codegen.models import AttrType
 from xsdata.codegen.models import Class
 from xsdata.logger import logger
 from xsdata.utils import collections
-from xsdata.utils import text
 from xsdata.utils.collections import group_by
+from xsdata.utils.namespaces import build_qname
+from xsdata.utils.namespaces import clean_uri
 
 
 @dataclass
@@ -129,9 +130,9 @@ class ClassSanitizer:
             for attr_type in attr.types:
                 if attr_type.name == inner.name:
                     attr_type.forward = False
-                    attr_type.qname = text.qname(inner.target_namespace, name)
+                    attr_type.qname = build_qname(inner.target_namespace, name)
 
-        inner.qname = text.qname(inner.target_namespace, name)
+        inner.qname = build_qname(inner.target_namespace, name)
 
         self.container.add(inner)
 
@@ -237,7 +238,7 @@ class ClassSanitizer:
                 first, second = items
                 if first.tag == second.tag and any((first.namespace, second.namespace)):
                     change = second if second.namespace else first
-                    change.name = f"{text.clean_uri(change.namespace)}_{change.name}"
+                    change.name = f"{clean_uri(change.namespace)}_{change.name}"
                 else:
                     change = second if second.is_attribute else first
                     change.name = f"{change.name}_{change.tag}"

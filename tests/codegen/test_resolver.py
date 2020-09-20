@@ -8,7 +8,7 @@ from tests.factories import PackageFactory
 from xsdata.codegen.models import Class
 from xsdata.codegen.resolver import DependenciesResolver
 from xsdata.exceptions import ResolverValueError
-from xsdata.utils import text
+from xsdata.utils.namespaces import build_qname
 
 
 class DependenciesResolverTest(FactoryTestCase):
@@ -67,8 +67,8 @@ class DependenciesResolverTest(FactoryTestCase):
 
     def test_apply_aliases(self):
         self.resolver.aliases = {
-            text.qname("xsdata", "d"): "IamD",
-            text.qname("xsdata", "a"): "IamA",
+            build_qname("xsdata", "d"): "IamD",
+            build_qname("xsdata", "a"): "IamA",
         }
         type_a = AttrTypeFactory.create(qname="{xsdata}a")
         type_b = AttrTypeFactory.create(qname="{xsdata}b")
@@ -186,7 +186,7 @@ class DependenciesResolverTest(FactoryTestCase):
     def test_create_class_list(self, mock_dependencies):
         classes = ClassFactory.list(3)
         mock_dependencies.side_effect = [
-            {text.qname("xsdata", "class_C"), "b"},
+            {build_qname("xsdata", "class_C"), "b"},
             {"c", "d"},
             {"e", "d"},
         ]

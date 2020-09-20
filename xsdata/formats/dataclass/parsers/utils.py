@@ -14,6 +14,7 @@ from xsdata.formats.dataclass.models.generics import AnyElement
 from xsdata.logger import logger
 from xsdata.models.enums import QNames
 from xsdata.utils import text
+from xsdata.utils.namespaces import build_qname
 
 
 class ParserUtils:
@@ -231,7 +232,7 @@ class ParserUtils:
         """Attempt to parse any attribute."""
         prefix, suffix = text.split(value)
         if prefix and prefix in ns_map and not suffix.startswith("//"):
-            value = text.qname(ns_map[prefix], suffix)
+            value = build_qname(ns_map[prefix], suffix)
 
         return value
 

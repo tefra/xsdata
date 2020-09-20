@@ -20,7 +20,7 @@ from xsdata.models.xsd import ComplexType
 from xsdata.models.xsd import Element
 from xsdata.models.xsd import Restriction
 from xsdata.models.xsd import SimpleType
-from xsdata.utils import text
+from xsdata.utils.namespaces import build_qname
 
 DEFAULT_NS_MAP = {
     Namespace.XS.prefix: Namespace.XS.uri,
@@ -90,7 +90,7 @@ class ClassFactory(Factory):
         container=None,
     ):
         if not qname:
-            qname = text.qname("xsdata", f"class_{cls.next_letter()}")
+            qname = build_qname("xsdata", f"class_{cls.next_letter()}")
 
         return cls.model(
             qname=qname,
@@ -163,7 +163,7 @@ class AttrTypeFactory(Factory):
         circular=False,
     ):
         if not qname:
-            qname = text.qname("xsdata", f"attr_{cls.next_letter()}")
+            qname = build_qname("xsdata", f"attr_{cls.next_letter()}")
 
         return cls.model(
             qname=qname,

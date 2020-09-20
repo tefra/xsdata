@@ -1,5 +1,4 @@
 from typing import List
-from typing import Optional
 from typing import Tuple
 
 
@@ -53,40 +52,3 @@ def snake_case(string: str) -> str:
             if result and result[-1] != "_":
                 result.append("_")
     return "".join(result).strip("_")
-
-
-def clean_uri(namespace: str) -> str:
-    """Remove common prefixes and suffixes from a uri string."""
-    if namespace[:2] == "##":
-        namespace = namespace[2:]
-
-    left, right = split(namespace)
-
-    if left == "urn":
-        namespace = right
-    elif left in ("http", "https"):
-        namespace = right[2:]
-
-    return "_".join(
-        [part for part in namespace.split(".") if part not in ("www", "xsd", "wsdl")]
-    )
-
-
-def qname(tag_or_uri: Optional[str], tag: Optional[str] = None) -> str:
-    """Create namespace qualified strings."""
-
-    if not tag_or_uri:
-        if not tag:
-            raise ValueError("Invalid input both uri and tag are empty.")
-
-        return tag
-
-    return f"{{{tag_or_uri}}}{tag}" if tag else tag_or_uri
-
-
-def split_qname(tag: str) -> Tuple:
-    """Split namespace qualified strings."""
-    if tag[0] == "{":
-        return tuple(tag[1:].split("}", 1))
-    else:
-        return None, tag

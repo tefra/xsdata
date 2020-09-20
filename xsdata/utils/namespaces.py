@@ -1,7 +1,9 @@
 from typing import Dict
 from typing import Optional
+from typing import Tuple
 
 from xsdata.models.enums import Namespace
+from xsdata.utils.text import split
 
 
 def load_prefix(uri: str, ns_map: Dict) -> Optional[str]:
@@ -50,3 +52,42 @@ def clean_prefixes(ns_map: Dict) -> Dict:
         result.pop(None)
 
     return result
+
+
+def split_qname(tag: str) -> Tuple:
+    """Split namespace qualified strings."""
+    if tag[0] == "{":
+        left, right = split(tag[1:], "}")
+        if left:
+            return left, right
+
+    return None, tag
+
+
+def clean_uri(namespace: str) -> str:
+    """Remove common prefixes and suffixes from a uri string."""
+    if namespace[:2] == "##":
+        namespace = namespace[2:]
+
+    left, right = split(namespace)
+
+    if left == "urn":
+        namespace = right
+    elif left in ("http", "https"):
+        namespace = right[2:]
+
+    return "_".join(
+        [part for part in namespace.split(".") if part not in ("www", "xsd", "wsdl")]
+    )
+
+
+def build_qname(tag_or_uri: Optional[str], tag: Optional[str] = None) -> str:
+    """Create namespace qualified strings."""
+
+    if not tag_or_uri:
+        if not tag:
+            raise ValueError("Invalid input both uri and tag are empty.")
+
+        return tag
+
+    return f"{{{tag_or_uri}}}{tag}" if tag else tag_or_uri

@@ -24,6 +24,7 @@ from xsdata.formats.dataclass.models.elements import XmlElement
 from xsdata.formats.dataclass.models.elements import XmlMeta
 from xsdata.formats.dataclass.models.elements import XmlWildcard
 from xsdata.utils import text
+from xsdata.utils.namespaces import build_qname
 
 
 class XmlContextTests(TestCase):
@@ -134,15 +135,15 @@ class XmlContextTests(TestCase):
         namespace = Product.Meta.namespace
         result = self.ctx.build(Product, None)
 
-        self.assertEqual(text.qname(namespace, "product"), result.qname)
-        self.assertEqual(text.qname(namespace, "product"), result.source_qname)
+        self.assertEqual(build_qname(namespace, "product"), result.qname)
+        self.assertEqual(build_qname(namespace, "product"), result.source_qname)
         mock_get_type_hints.assert_called_once_with(Product, namespace)
 
     @mock.patch.object(XmlContext, "get_type_hints", return_value={})
     def test_build_with_parent_ns(self, mock_get_type_hints):
         result = self.ctx.build(ProductType, "http://xsdata")
 
-        self.assertEqual(text.qname("http://xsdata", "ProductType"), str(result.qname))
+        self.assertEqual(build_qname("http://xsdata", "ProductType"), str(result.qname))
         mock_get_type_hints.assert_called_once_with(ProductType, "http://xsdata")
 
     @mock.patch.object(XmlContext, "get_type_hints", return_value={})

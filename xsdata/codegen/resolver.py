@@ -10,7 +10,7 @@ from xsdata.codegen.models import Class
 from xsdata.codegen.models import Import
 from xsdata.exceptions import ResolverValueError
 from xsdata.utils import collections
-from xsdata.utils import text
+from xsdata.utils.namespaces import split_qname
 
 logger = logging.getLogger(__name__)
 
@@ -65,17 +65,17 @@ class DependenciesResolver:
     def resolve_imports(self):
         """Walk the import qualified names, check for naming collisions and add
         the necessary code generator import instance."""
-        local_names = [text.split_qname(qname)[1] for qname in self.class_map.keys()]
+        local_names = [split_qname(qname)[1] for qname in self.class_map.keys()]
         for qname in self.import_classes():
             package = self.find_package(qname)
-            exists = text.split_qname(qname)[1] in local_names
+            exists = split_qname(qname)[1] in local_names
             self.add_import(qname=qname, package=package, exists=exists)
 
     def add_import(self, qname: str, package: str, exists: bool = False):
         """Append an import package to the list of imports with any if
         necessary aliases if the import name exists in the local module."""
         alias = None
-        local_name = text.split_qname(qname)[1]
+        local_name = split_qname(qname)[1]
         if exists:
             module = package.split(".")[-1]
             alias = f"{module}:{local_name}"

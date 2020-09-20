@@ -12,6 +12,7 @@ from xsdata.formats.mixins import AbstractGenerator
 from xsdata.formats.mixins import GeneratorResult
 from xsdata.utils import text
 from xsdata.utils.collections import group_by
+from xsdata.utils.namespaces import clean_uri
 
 
 class DataclassGenerator(AbstractGenerator):
@@ -123,7 +124,7 @@ class DataclassGenerator(AbstractGenerator):
     @classmethod
     def module_name(cls, module: str) -> str:
         """Convert the given module name to safe snake case."""
-        return text.snake_case(utils.safe_snake(text.clean_uri(module), default="mod"))
+        return text.snake_case(utils.safe_snake(clean_uri(module), default="mod"))
 
     @classmethod
     def package_name(cls, package: str) -> str:

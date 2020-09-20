@@ -21,6 +21,7 @@ from xsdata.models.xsd import Group
 from xsdata.models.xsd import Schema
 from xsdata.models.xsd import SimpleType
 from xsdata.utils import text
+from xsdata.utils.namespaces import build_qname
 
 
 class SchemaMapper:
@@ -61,7 +62,7 @@ class SchemaMapper:
     ) -> Class:
         """Build and return a class instance."""
         instance = Class(
-            qname=text.qname(target_namespace, obj.real_name),
+            qname=build_qname(target_namespace, obj.real_name),
             abstract=obj.is_abstract,
             namespace=cls.element_namespace(obj, target_namespace),
             mixed=obj.is_mixed,
@@ -83,7 +84,7 @@ class SchemaMapper:
         cls, obj: ElementBase, target_namespace: Optional[str]
     ) -> List[str]:
         return [
-            text.qname(obj.ns_map.get(prefix, target_namespace), suffix)
+            build_qname(obj.ns_map.get(prefix, target_namespace), suffix)
             for prefix, suffix in map(text.split, obj.substitutions)
         ]
 
@@ -127,7 +128,7 @@ class SchemaMapper:
         )
 
         return AttrType(
-            qname=text.qname(namespace, suffix),
+            qname=build_qname(namespace, suffix),
             index=index,
             native=native,
             forward=forward,

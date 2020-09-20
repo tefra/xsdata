@@ -192,11 +192,7 @@ class ElementBase:
         the given condition if any."""
         for f in fields(self):
             value = getattr(self, f.name)
-            if (
-                isinstance(value, list)
-                and len(value) > 0
-                and isinstance(value[0], ElementBase)
-            ):
+            if isinstance(value, list) and value and isinstance(value[0], ElementBase):
                 yield from (val for val in value if not condition or condition(val))
             elif isinstance(value, ElementBase):
                 if not condition or condition(value):

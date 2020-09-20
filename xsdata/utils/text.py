@@ -30,25 +30,58 @@ def capitalize(string: str) -> str:
 
 def pascal_case(string: str) -> str:
     """Convert the given string to pascal case."""
-    return "".join([capitalize(part) for part in snake_case(string).split("_") if part])
+    return "".join(map(str.title, split_words(string)))
 
 
 def snake_case(string: str) -> str:
     """Convert the given string to snake case."""
-    result: List[str] = []
-    was_upper = False
-    for char in string:
+    return "_".join(map(str.lower, split_words(string)))
 
-        if char.isalnum():
-            if char.isupper():
-                if not was_upper and result and result[-1] != "_":
-                    result.append("_")
-                was_upper = True
-            else:
-                was_upper = False
-            result.append(char.lower())
+
+def split_words(string: str) -> List[str]:
+    """Split a string on new capital letters and not alphanumeric
+    characters."""
+    words: List[str] = []
+    buffer: List[str] = []
+    previous = None
+
+    def flush():
+        if buffer:
+            words.append("".join(buffer))
+            buffer.clear()
+
+    for char in string:
+        tp = classify(char)
+        if tp == StringType.OTHER:
+            flush()
+        elif not previous or tp == previous:
+            buffer.append(char)
+        elif tp == StringType.UPPER and previous != StringType.UPPER:
+            flush()
+            buffer.append(char)
         else:
-            was_upper = False
-            if result and result[-1] != "_":
-                result.append("_")
-    return "".join(result).strip("_")
+            buffer.append(char)
+
+        previous = tp
+
+    flush()
+    return words
+
+
+class StringType:
+    UPPER = 1
+    LOWER = 2
+    NUMERIC = 3
+    OTHER = 4
+
+
+def classify(character: str) -> int:
+    """String classifier."""
+    if character.isupper():
+        return StringType.UPPER
+    if character.islower():
+        return StringType.LOWER
+    if character.isnumeric():
+        return StringType.NUMERIC
+
+    return StringType.OTHER

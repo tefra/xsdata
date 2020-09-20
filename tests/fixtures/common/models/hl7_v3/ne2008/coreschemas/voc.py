@@ -37851,7 +37851,7 @@ class Type0272(Enum):
     VALUE_0246 = "0246"
 
 
-class Type0275a(Enum):
+class Type0275A(Enum):
     """
     specDomain: S21449 (C-0-T14079-S21449-cpt)
     :cvar VALUE_0275A:

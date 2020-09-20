@@ -1416,7 +1416,7 @@ from tests.fixtures.common.models.hl7_v3.ne2008.coreschemas.voc import (
     Yokutsan,
     Yukian,
     Type0272,
-    Type0275a,
+    Type0275A,
     Type0280,
     XAccommodationRequestorRole,
     XActClassCareProvisionEncounter,

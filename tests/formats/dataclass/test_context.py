@@ -148,7 +148,7 @@ class XmlContextTests(TestCase):
 
     @mock.patch.object(XmlContext, "get_type_hints", return_value={})
     def test_build_with_no_meta_name_and_name_generator(self, *args):
-        inspect = XmlContext(name_generator=lambda x: text.snake_case(x))
+        inspect = XmlContext(element_name=lambda x: text.snake_case(x))
         result = inspect.build(ItemsType)
 
         self.assertEqual("items_type", result.qname)

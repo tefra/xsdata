@@ -30,12 +30,13 @@ class XmlContext:
     Generate and cache the necessary metadata to bind an xml document data to a
     dataclass model.
 
-    :param name_generator: Callable to convert attribute names to local document names
-                            if the model fields metadata name is missing.
+    :param element_name: Default callable to convert field names to element tags
+    :param attribute_name: Default callable to convert field names to attribute tags
     :param cache: Local storage to store and reuse models' bind metadata.
     """
 
-    name_generator: Callable = field(default=lambda x: x)
+    element_name: Callable = field(default=lambda x: x)
+    attribute_name: Callable = field(default=lambda x: x)
     cache: Dict[Type, XmlMeta] = field(default_factory=dict)
 
     def fetch(
@@ -108,7 +109,7 @@ class XmlContext:
             # Fetch the dataclass meta settings and make sure we don't inherit
             # the parent class meta.
             meta = clazz.Meta if "Meta" in clazz.__dict__ else None
-            name = getattr(meta, "name", self.name_generator(clazz.__name__))
+            name = getattr(meta, "name", None) or self.local_name(clazz.__name__)
             nillable = getattr(meta, "nillable", False)
             namespace = getattr(meta, "namespace", parent_ns)
             module = sys.modules[clazz.__module__]
@@ -134,20 +135,20 @@ class XmlContext:
             types = self.real_types(type_hint)
             is_tokens = var.metadata.get("tokens", False)
             is_element_list = self.is_element_list(type_hint, is_tokens)
-            local_name = var.metadata.get("name") or self.name_generator(var.name)
             is_class = any(is_dataclass(clazz) for clazz in types)
+            xml_type = var.metadata.get("type")
+            local_name = var.metadata.get("name")
 
-            xml_type = var.metadata.get(
-                "type", default_xml_type if not is_class else "Element"
-            )
+            if not xml_type:
+                xml_type = default_xml_type if not is_class else "Element"
+
+            if not local_name:
+                local_name = self.local_name(var.name, xml_type)
+
             xml_clazz = XmlType.to_xml_class(xml_type)
             namespace = var.metadata.get("namespace")
             namespaces = self.resolve_namespaces(xml_type, namespace, parent_ns)
-            first_namespace = (
-                namespaces[0]
-                if namespaces and namespaces[0] and namespaces[0][0] != "#"
-                else None
-            )
+            first_namespace = next((x for x in namespaces if x and x[0] != "#"), None)
 
             yield xml_clazz(
                 name=var.name,
@@ -272,3 +273,9 @@ class XmlContext:
             return XmlType.TEXT
 
         return XmlType.ELEMENT
+
+    def local_name(self, name: str, xml_type: Optional[str] = None) -> str:
+        if xml_type == "Attribute":
+            return self.attribute_name(name)
+
+        return self.element_name(name)

@@ -10,6 +10,9 @@ from jinja2 import FileSystemLoader
 from jinja2 import Template
 
 from xsdata.codegen.models import Class
+from xsdata.exceptions import CodeGenerationError
+from xsdata.models.config import GeneratorConfig
+from xsdata.models.config import OutputStructure
 from xsdata.utils.collections import group_by
 from xsdata.utils.package import module_path
 from xsdata.utils.package import package_path
@@ -35,33 +38,33 @@ class AbstractGenerator(metaclass=abc.ABCMeta):
     Abstract code generator class.
 
     :param tpl_dir: Templates directory
+    :param config: Generator configuration
     """
 
-    def __init__(self, tpl_dir: str):
+    def __init__(self, tpl_dir: str, config: GeneratorConfig):
         """
         Generator constructor.
 
         Initialize jinja2 environment.
         """
         self.env = Environment(loader=FileSystemLoader(tpl_dir), autoescape=False)
+        self.config = config
 
     def template(self, name: str) -> Template:
         """Return the named template from the initialized environment."""
         return self.env.get_template(f"{name}.jinja2")
 
-    @abc.abstractmethod
-    def render(self, classes: List[Class]) -> Iterator[GeneratorResult]:
-        """Return a iterator of the generated results."""
-
-    @classmethod
-    def module_name(cls, module: str) -> str:
+    def module_name(self, module: str) -> str:
         """Convert the given module name to match the generator conventions."""
         return module
 
-    @classmethod
-    def package_name(cls, package: str) -> str:
+    def package_name(self, package: str) -> str:
         """Convert the given module name to match the generator conventions."""
         return package
+
+    @abc.abstractmethod
+    def render(self, classes: List[Class]) -> Iterator[GeneratorResult]:
+        """Return a iterator of the generated results."""
 
     @classmethod
     def group_by_package(cls, classes: List[Class]) -> Dict[Path, List[Class]]:
@@ -72,3 +75,39 @@ class AbstractGenerator(metaclass=abc.ABCMeta):
     def group_by_module(cls, classes: List[Class]) -> Dict[Path, List[Class]]:
         """Group the given list of classes by the target module directory."""
         return group_by(classes, lambda x: module_path(x.target_module))
+
+    def designate(self, classes: List[Class]):
+        """
+        Normalize the target package and module names by the given output
+        generator.
+
+        :param classes: a list of codegen class instances
+        """
+        modules = {}
+        packages = {}
+        ns_struct = self.config.output.structure == OutputStructure.NAMESPACES
+        for obj in classes:
+
+            if ns_struct:
+                if not obj.target_namespace:
+                    raise CodeGenerationError(
+                        f"Class `{obj.name}` target namespace "
+                        f"is empty, avoid option `--ns-struct`"
+                    )
+
+                obj.package = self.config.output.package
+                obj.module = obj.target_namespace
+
+            if obj.package is None:
+                raise CodeGenerationError(
+                    f"Class `{obj.name}` has not been assign to a package."
+                )
+
+            if obj.module not in modules:
+                modules[obj.module] = self.module_name(obj.module)
+
+            if obj.package not in packages:
+                packages[obj.package] = self.package_name(obj.package)
+
+            obj.module = modules[obj.module]
+            obj.package = packages[obj.package]

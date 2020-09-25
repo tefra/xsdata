@@ -2,5 +2,5 @@
 
 class {{ obj.name|class_name }}:
 {%- for attr in obj.attrs %}
-    {{ attr.name|attribute_name }} = {{ attr|constant_value }}
+    {{ attr.name|field_name }} = {{ attr|constant_value }}
 {%- endfor -%}

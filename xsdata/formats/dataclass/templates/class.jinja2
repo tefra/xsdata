@@ -24,12 +24,12 @@ class {{ class_name }}{{"({})".format(obj.extensions|map(attribute='type')|map('
     pass
 {%- endif -%}
 {%- for attr in obj.attrs %}
-    {%- set metadata = attr|attribute_metadata(namespace) %}
-    {{ attr.name|attribute_name }}: {{ attr|attribute_type(parents) }} = field(
+    {%- set metadata = attr|field_metadata(namespace) %}
+    {{ attr.name|field_name }}: {{ attr|field_type(parents) }} = field(
         {% if attr.fixed -%}
         init=False,
         {% endif -%}
-        {{ "default_factory" if attr.is_factory else "default" }}={{ attr|attribute_default(obj.ns_map) }},
+        {{ "default_factory" if attr.is_factory else "default" }}={{ attr|field_default(obj.ns_map) }},
         {%- if metadata %}
         metadata=dict(
             {{ metadata|format_arguments|indent(12) }}

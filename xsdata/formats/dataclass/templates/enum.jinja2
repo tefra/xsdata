@@ -5,5 +5,5 @@ class {{ obj.name|class_name }}(Enum):
 {{ help|indent(4, first=True) }}
 {%- endif -%}
 {%- for attr in obj.attrs %}
-    {{ attr.name|constant_name }} = {{ attr|attribute_default(obj.ns_map) }}
+    {{ attr.name|constant_name }} = {{ attr|field_default(obj.ns_map) }}
 {%- endfor -%}

@@ -33,6 +33,17 @@ def pascal_case(string: str) -> str:
     return "".join(map(str.title, split_words(string)))
 
 
+def camel_case(string: str) -> str:
+    """Convert the given string to camel case."""
+    result = "".join(map(str.title, split_words(string)))
+    return result[0].lower() + result[1:]
+
+
+def mixed_case(string: str) -> str:
+    """Convert the given string to mixed case."""
+    return capitalize("".join(split_words(string)))
+
+
 def snake_case(string: str) -> str:
     """Convert the given string to snake case."""
     return "_".join(map(str.lower, split_words(string)))

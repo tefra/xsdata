@@ -6,9 +6,15 @@ from tests.factories import ClassFactory
 from tests.factories import FactoryTestCase
 from xsdata.codegen.resolver import DependenciesResolver
 from xsdata.formats.dataclass.generator import DataclassGenerator
+from xsdata.models.config import GeneratorConfig
 
 
 class DataclassGeneratorTests(FactoryTestCase):
+    def setUp(self):
+        super().setUp()
+        config = GeneratorConfig()
+        self.generator = DataclassGenerator(config)
+
     @mock.patch.object(DataclassGenerator, "render_package")
     @mock.patch.object(DataclassGenerator, "render_module")
     def test_render(self, mock_render_module, mock_render_package):
@@ -21,7 +27,7 @@ class DataclassGeneratorTests(FactoryTestCase):
         mock_render_module.return_value = "module"
         mock_render_package.return_value = "package"
 
-        iterator = DataclassGenerator().render(classes)
+        iterator = self.generator.render(classes)
 
         cwd = Path.cwd()
         actual = [(out.path, out.title, out.source) for out in iterator]
@@ -50,7 +56,7 @@ class DataclassGeneratorTests(FactoryTestCase):
 
         random.shuffle(classes)
 
-        actual = DataclassGenerator().render_package(classes)
+        actual = self.generator.render_package(classes)
         expected = "\n".join(
             [
                 "from foo.bar import A as BarA",
@@ -72,7 +78,7 @@ class DataclassGeneratorTests(FactoryTestCase):
         ]
         resolver = DependenciesResolver()
 
-        actual = DataclassGenerator().render_module(resolver, classes)
+        actual = self.generator.render_module(resolver, classes)
         expected = (
             "from dataclasses import dataclass, field\n"
             "from enum import Enum\n"
@@ -115,14 +121,14 @@ class DataclassGeneratorTests(FactoryTestCase):
         self.assertEqual(expected, actual)
 
     def test_module_name(self):
-        self.assertEqual("foo_bar", DataclassGenerator.module_name("fooBar"))
-        self.assertEqual("foo_bar_wtf", DataclassGenerator.module_name("fooBar.wtf"))
-        self.assertEqual("mod_1111", DataclassGenerator.module_name("1111"))
-        self.assertEqual("xs_string", DataclassGenerator.module_name("xs:string"))
-        self.assertEqual("foo_bar_bam", DataclassGenerator.module_name("foo:bar_bam"))
-        self.assertEqual("bar_bam", DataclassGenerator.module_name("urn:bar_bam"))
+        self.assertEqual("foo_bar", self.generator.module_name("fooBar"))
+        self.assertEqual("foo_bar_wtf", self.generator.module_name("fooBar.wtf"))
+        self.assertEqual("mod_1111", self.generator.module_name("1111"))
+        self.assertEqual("xs_string", self.generator.module_name("xs:string"))
+        self.assertEqual("foo_bar_bam", self.generator.module_name("foo:bar_bam"))
+        self.assertEqual("bar_bam", self.generator.module_name("urn:bar_bam"))
 
     def test_package_name(self):
         self.assertEqual(
-            "foo.bar_bar.pkg_1", DataclassGenerator.package_name("Foo.BAR_bar.1")
+            "foo.bar_bar.pkg_1", self.generator.package_name("Foo.BAR_bar.1")
         )

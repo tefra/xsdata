@@ -5,11 +5,14 @@ from unittest import TestCase
 from click.testing import CliRunner
 
 from tests import fixtures_dir
-from xsdata import cli
+from xsdata.cli import cli
 from xsdata.cli import resolve_source
 from xsdata.codegen.transformer import SchemaTransformer
 from xsdata.exceptions import CodeGenerationError
 from xsdata.logger import logger
+from xsdata.models.config import GeneratorConfig
+from xsdata.models.config import OutputFormat
+from xsdata.models.config import OutputStructure
 
 
 class CliTests(TestCase):
@@ -22,11 +25,14 @@ class CliTests(TestCase):
     def test_default_output(self, mock_init, mock_process_schemas):
         source = fixtures_dir.joinpath("defxmlschema/chapter03.xsd")
         result = self.runner.invoke(cli, [str(source), "--package", "foo"])
-        self.assertIsNone(result.exception)
-        mock_init.assert_called_once_with(output="pydata", print=False, ns_struct=False)
+        config = mock_init.call_args[1]["config"]
 
+        self.assertIsNone(result.exception)
+        self.assertFalse(mock_init.call_args[1]["print"])
+        self.assertEqual("foo", config.output.package)
+        self.assertEqual(OutputFormat.DATACLASS, config.output.format)
+        self.assertEqual(OutputStructure.FILENAMES, config.output.structure)
         self.assertEqual([source.as_uri()], mock_process_schemas.call_args[0][0])
-        self.assertEqual("foo", mock_process_schemas.call_args[0][1])
 
     @mock.patch.object(SchemaTransformer, "process_schemas")
     @mock.patch.object(SchemaTransformer, "__init__", return_value=None)
@@ -35,13 +41,14 @@ class CliTests(TestCase):
         result = self.runner.invoke(
             cli, [str(source), "--package", "foo", "--output", "plantuml"]
         )
+        config = mock_init.call_args[1]["config"]
+
         self.assertIsNone(result.exception)
         self.assertEqual([source.as_uri()], mock_process_schemas.call_args[0][0])
-        self.assertEqual("foo", mock_process_schemas.call_args[0][1])
-
-        mock_init.assert_called_once_with(
-            output="plantuml", print=False, ns_struct=False
-        )
+        self.assertFalse(mock_init.call_args[1]["print"])
+        self.assertEqual("foo", config.output.package)
+        self.assertEqual(OutputFormat.PLANTUML, config.output.format)
+        self.assertEqual(OutputStructure.FILENAMES, config.output.structure)
 
     @mock.patch.object(SchemaTransformer, "process_schemas")
     @mock.patch.object(SchemaTransformer, "__init__", return_value=None)
@@ -51,10 +58,8 @@ class CliTests(TestCase):
 
         self.assertIsNone(result.exception)
         self.assertEqual([source.as_uri()], mock_process_schemas.call_args[0][0])
-        self.assertEqual("foo", mock_process_schemas.call_args[0][1])
         self.assertEqual(logging.ERROR, logger.getEffectiveLevel())
-
-        mock_init.assert_called_once_with(output="pydata", print=True, ns_struct=False)
+        self.assertTrue(mock_init.call_args[1]["print"])
 
     @mock.patch.object(SchemaTransformer, "process_schemas")
     @mock.patch.object(SchemaTransformer, "__init__", return_value=None)
@@ -63,12 +68,14 @@ class CliTests(TestCase):
         result = self.runner.invoke(
             cli, [str(source), "--package", "foo", "--ns-struct"]
         )
+        config = mock_init.call_args[1]["config"]
 
         self.assertIsNone(result.exception)
         self.assertEqual([source.as_uri()], mock_process_schemas.call_args[0][0])
-        self.assertEqual("foo", mock_process_schemas.call_args[0][1])
-
-        mock_init.assert_called_once_with(output="pydata", print=False, ns_struct=True)
+        self.assertFalse(mock_init.call_args[1]["print"])
+        self.assertEqual("foo", config.output.package)
+        self.assertEqual(OutputFormat.DATACLASS, config.output.format)
+        self.assertEqual(OutputStructure.NAMESPACES, config.output.structure)
 
     @mock.patch.object(SchemaTransformer, "process_definitions")
     @mock.patch.object(SchemaTransformer, "__init__", return_value=None)
@@ -77,8 +84,9 @@ class CliTests(TestCase):
         result = self.runner.invoke(cli, [str(source), "--package", "foo", "--wsdl"])
 
         self.assertIsNone(result.exception)
-        self.assertEqual(source.as_uri(), mock_process_definitions.call_args[0][0])
-        self.assertEqual("foo", mock_process_definitions.call_args[0][1])
+        mock_process_definitions.assert_called_once_with(
+            source.as_uri(),
+        )
 
     def test_resolve_source(self):
         file = fixtures_dir.joinpath("defxmlschema/chapter03.xsd")

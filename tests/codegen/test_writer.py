@@ -1,131 +1,75 @@
-from dataclasses import dataclass
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from typing import Iterator
 from typing import List
-from typing import Optional
 from unittest import mock
 
 from tests.factories import ClassFactory
 from tests.factories import FactoryTestCase
 from xsdata.codegen.models import Class
-from xsdata.codegen.writer import writer
-from xsdata.exceptions import CodeGenerationError
+from xsdata.codegen.writer import CodeWriter
 from xsdata.formats.dataclass.generator import DataclassGenerator
 from xsdata.formats.mixins import AbstractGenerator
 from xsdata.formats.mixins import GeneratorResult
-from xsdata.utils import text
+from xsdata.formats.plantuml.generator import PlantUmlGenerator
+from xsdata.models.config import GeneratorConfig
+from xsdata.models.config import OutputFormat
 
 
-@dataclass
-class FakeGenerator(AbstractGenerator):
-    dir: Optional[TemporaryDirectory] = None
+class NoneGenerator(AbstractGenerator):
+    def __init__(self):
+        pass
 
     def render(self, classes: List[Class]) -> Iterator[GeneratorResult]:
-        for obj in classes:
-            assert obj.package is not None
-            yield GeneratorResult(
-                path=Path(f"{self.dir}/{obj.name}.txt"),
-                title=obj.package,
-                source=obj.name,
-            )
-
-    @classmethod
-    def module_name(cls, name):
-        return text.snake_case(name)
-
-    @classmethod
-    def package_name(cls, name):
-        return text.snake_case(name)
-
-
-@dataclass
-class EmptyGenerator(FakeGenerator):
-    def render(self, classes: List[Class]) -> Iterator[GeneratorResult]:
-        for obj in classes:
-            yield GeneratorResult(
-                path=Path(f"{self.dir}/{obj.name}.txt"), title="Empty", source=""
-            )
+        pass
 
 
 class CodeWriterTests(FactoryTestCase):
-    FAKE_NAME = "fake"
+    def setUp(self):
+        generator = NoneGenerator()
+        self.writer = CodeWriter(generator)
 
-    def tearDown(self):
-        writer.generators.pop(self.FAKE_NAME, False)
-
-    def test_formats(self):
-        expected = ["pydata", "plantuml"]
-        self.assertEqual(expected, writer.formats)
-        self.assertIsInstance(writer.get_format("pydata"), DataclassGenerator)
-
-    def test_register_generator(self):
-        writer.register_format(self.FAKE_NAME, FakeGenerator())
-        self.assertIn("fake", writer.formats)
-        self.assertIsInstance(writer.get_format("fake"), FakeGenerator)
-
-    def test_write(self):
+    @mock.patch.object(NoneGenerator, "render")
+    @mock.patch.object(NoneGenerator, "designate")
+    def test_write(self, mock_designate, mock_render):
         classes = ClassFactory.list(2)
         with TemporaryDirectory() as tmpdir:
-            writer.register_format(self.FAKE_NAME, FakeGenerator(tmpdir))
-            writer.write(classes, "fake")
+            mock_render.return_value = [
+                GeneratorResult(Path(f"{tmpdir}/foo/a.py"), "file", "aAa"),
+                GeneratorResult(Path(f"{tmpdir}/bar/b.py"), "file", "bBb"),
+                GeneratorResult(Path(f"{tmpdir}/c.py"), "file", " "),
+            ]
+            self.writer.write(classes)
 
-            for obj in classes:
-                self.assertEqual(obj.name, Path(f"{tmpdir}/{obj.name}.txt").read_text())
+            self.assertEqual("aAa", Path(f"{tmpdir}/foo/a.py").read_text())
+            self.assertEqual("bBb", Path(f"{tmpdir}/bar/b.py").read_text())
+            self.assertFalse(Path(f"{tmpdir}/c.py").exists())
+            mock_designate.assert_called_once_with(classes)
 
-    def test_write_skip_empty_output(self):
-        cls = ClassFactory.create()
-        with TemporaryDirectory() as tmpdir:
-            writer.register_format(self.FAKE_NAME, EmptyGenerator(tmpdir))
-            writer.write([cls], "fake")
-
-            self.assertFalse(Path(f"{tmpdir}/{cls.name}.txt").exists())
-
+    @mock.patch.object(NoneGenerator, "render")
+    @mock.patch.object(NoneGenerator, "designate")
     @mock.patch("builtins.print")
-    def test_print(self, mock_print):
+    def test_print(self, mock_print, mock_designate, mock_render):
         classes = ClassFactory.list(2)
-        writer.register_format(self.FAKE_NAME, FakeGenerator())
-        writer.print(classes, "fake")
+        mock_render.return_value = [
+            GeneratorResult(Path(f"foo/a.py"), "file", "aAa"),
+            GeneratorResult(Path(f"bar/b.py"), "file", "bBb"),
+            GeneratorResult(Path(f"c.py"), "file", ""),
+        ]
+        self.writer.print(classes)
 
-        mock_print.assert_has_calls([mock.call(obj.name, end="") for obj in classes])
-
-    def test_designate(self):
-        classes = ClassFactory.list(3)
-        classes[2].package = "foo!"
-        classes[2].module = "tests!"
-
-        writer.register_format(self.FAKE_NAME, FakeGenerator())
-        writer.designate(classes, "fake", "", False)
-
-        self.assertEqual("foo", classes[0].package)
-        self.assertEqual("foo", classes[1].package)
-        self.assertEqual("foo", classes[2].package)
-
-        self.assertEqual("tests", classes[0].module)
-        self.assertEqual("tests", classes[1].module)
-        self.assertEqual("tests", classes[2].module)
-
-        classes = ClassFactory.list(1, package=None)
-        with self.assertRaises(CodeGenerationError) as cm:
-            writer.designate(classes, "fake", "", False)
-
-        self.assertEqual(
-            "Class `class_E` has not been assign to a package.", str(cm.exception)
+        mock_designate.assert_called_once_with(classes)
+        mock_print.assert_has_calls(
+            [mock.call("aAa", end=""), mock.call("bBb", end="")]
         )
 
-        classes = ClassFactory.list(2, package=None)
-        writer.designate(classes, "fake", "bar", True)
-        self.assertEqual("bar", classes[0].package)
-        self.assertEqual("bar", classes[1].package)
+    def test_from_config(self):
+        config = GeneratorConfig()
+        config.output.format = OutputFormat.DATACLASS
 
-        self.assertEqual("xsdata", classes[0].module)
-        self.assertEqual("xsdata", classes[1].module)
+        writer = CodeWriter.from_config(config)
+        self.assertIsInstance(writer.generator, DataclassGenerator)
 
-        classes = ClassFactory.list(1, qname="foo")
-        with self.assertRaises(CodeGenerationError) as cm:
-            writer.designate(classes, "fake", "foo", True)
-
-        self.assertEqual(
-            ("Class `foo` target namespace is empty, " "avoid option `--ns-struct`"),
-            str(cm.exception),
-        )
+        config.output.format = OutputFormat.PLANTUML
+        writer = CodeWriter.from_config(config)
+        self.assertIsInstance(writer.generator, PlantUmlGenerator)

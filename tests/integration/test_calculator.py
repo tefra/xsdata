@@ -9,7 +9,7 @@ from tests import root
 from tests.conftest import load_class
 from tests.fixtures.calculator import CalculatorSoapAdd
 from tests.fixtures.calculator import CalculatorSoapAddOutput
-from xsdata import cli
+from xsdata.cli import cli
 from xsdata.formats.dataclass.client import Client
 from xsdata.formats.dataclass.client import Config
 from xsdata.formats.dataclass.serializers import XmlSerializer

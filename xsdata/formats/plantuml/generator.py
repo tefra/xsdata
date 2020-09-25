@@ -6,14 +6,15 @@ from xsdata.codegen.models import Class
 from xsdata.codegen.resolver import DependenciesResolver
 from xsdata.formats.mixins import AbstractGenerator
 from xsdata.formats.mixins import GeneratorResult
+from xsdata.models.config import GeneratorConfig
 
 
 class PlantUmlGenerator(AbstractGenerator):
     """PlantUML generator."""
 
-    def __init__(self):
+    def __init__(self, config: GeneratorConfig):
         tpl_dir = Path(__file__).parent.joinpath("templates")
-        super().__init__(str(tpl_dir))
+        super().__init__(str(tpl_dir), config)
 
     def render(self, classes: List[Class]) -> Iterator[GeneratorResult]:
         """Return a iterator of the generated results."""

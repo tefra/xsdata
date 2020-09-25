@@ -17,8 +17,9 @@ from xsdata.codegen.mappers.schema import SchemaMapper
 from xsdata.codegen.models import Class
 from xsdata.codegen.parsers.definitions import DefinitionsParser
 from xsdata.codegen.parsers.schema import SchemaParser
-from xsdata.codegen.writer import writer
+from xsdata.codegen.writer import CodeWriter
 from xsdata.logger import logger
+from xsdata.models.config import GeneratorConfig
 from xsdata.models.enums import COMMON_SCHEMA_DIR
 from xsdata.models.wsdl import Definitions
 from xsdata.models.xsd import Import
@@ -37,28 +38,25 @@ class SchemaTransformer:
     Orchestrate the code generation from a list of sources to the output
     format.
 
-    :param print: Print to stdout the generated output.
-    :param output: The output type.
-    :param class_map: The classes generated indexed by the source uri.
-    :param processed: Index of the already processed uris.
+    :param print: Print to stdout the generated output
+    :param config: Generator configuration
     """
 
     print: bool
-    output: str
-    ns_struct: bool
+    config: GeneratorConfig
     class_map: Dict[str, List[Class]] = field(init=False, default_factory=dict)
     processed: List[str] = field(init=False, default_factory=list)
 
-    def process_definitions(self, uri: str, package: str):
+    def process_definitions(self, uri: str):
         """Process a single wsdl resource."""
         definitions = self.parse_definitions(uri, namespace=None)
 
         collections.apply(definitions.schemas, self.convert_schema)
 
         self.convert_definitions(definitions)
-        self.process_classes(package)
+        self.process_classes()
 
-    def process_schemas(self, uris: List[str], package: str):
+    def process_schemas(self, uris: List[str]):
         """
         Run main processes.
 
@@ -67,10 +65,9 @@ class SchemaTransformer:
         """
 
         collections.apply(uris, self.process_schema)
+        self.process_classes()
 
-        self.process_classes(package)
-
-    def process_classes(self, package: str):
+    def process_classes(self):
         """Process the generated classes and write or print the final
         output."""
         classes = [cls for classes in self.class_map.values() for cls in classes]
@@ -79,7 +76,7 @@ class SchemaTransformer:
             logger.info(
                 "Analyzer input: %d main and %d inner classes", class_num, inner_num
             )
-            self.assign_packages(package)
+            self.assign_packages()
 
             classes = self.analyze_classes(classes)
             class_num, inner_num = self.count_classes(classes)
@@ -87,11 +84,11 @@ class SchemaTransformer:
                 "Analyzer output: %d main and %d inner classes", class_num, inner_num
             )
 
-            writer.designate(classes, self.output, package, self.ns_struct)
+            writer = CodeWriter.from_config(self.config)
             if self.print:
-                writer.print(classes, self.output)
+                writer.print(classes)
             else:
-                writer.write(classes, self.output)
+                writer.write(classes)
         else:
             logger.warning("Analyzer returned zero classes!")
 
@@ -214,12 +211,13 @@ class SchemaTransformer:
 
         return main, inner
 
-    def assign_packages(self, package: str):
+    def assign_packages(self):
         """Group uris by common path and auto assign package names to all
         classes."""
         prev = ""
         index = 0
         groups = defaultdict(list)
+        package = self.config.output.package
         common_schemas_dir = COMMON_SCHEMA_DIR.as_uri()
         for key in sorted(self.class_map.keys()):
             if key.startswith(common_schemas_dir):

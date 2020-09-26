@@ -1,4 +1,5 @@
 import logging
+import sys
 from pathlib import Path
 from typing import Any
 from typing import Iterator
@@ -26,20 +27,27 @@ def cli():
 
 
 @cli.command("init-config")
-@click.option("--file", required=True, default=".xsdata.xml")
-def init_config(file: str):
+@click.argument("output", type=click.Path(resolve_path=True), default=".xsdata.xml")
+@click.option("--print", is_flag=True, default=False, help="Print output")
+def init_config(*args: Any, **kwargs: Any):
     """Create or update a configuration file."""
 
-    if not file:
-        logger.warn("Invalid file name.")
+    if kwargs["print"]:
+        logger.setLevel(logging.ERROR)
+
+    file_path = Path(kwargs["output"])
+    if file_path.exists():
+        config = GeneratorConfig.read(file_path)
+        logger.info("Updating configuration file %s", kwargs["output"])
     else:
-        file_path = Path(file).resolve()
-        if file_path.exists():
-            logger.info("Updating configuration file %s", file)
-            GeneratorConfig.update(file_path)
-        else:
-            logger.info("Initializing configuration file %s", file)
-            GeneratorConfig.create(file_path)
+        logger.info("Initializing configuration file %s", kwargs["output"])
+        config = GeneratorConfig.create()
+
+    if kwargs["print"]:
+        config.write(sys.stdout, config)
+    else:
+        with file_path.open("w") as fp:
+            config.write(fp, config)
 
 
 @cli.command("generate")
@@ -72,18 +80,14 @@ def generate(*args: Any, **kwargs: Any):
         config = GeneratorConfig.read(config_file)
     else:
         config = GeneratorConfig()
+        config.output.format = OutputFormat(kwargs["output"])
+        config.output.package = kwargs["package"]
 
         if kwargs["wsdl"]:
             config.output.wsdl = kwargs["wsdl"]
 
         if kwargs["ns_struct"]:
             config.output.structure = OutputStructure.NAMESPACES
-
-        if kwargs["output"]:
-            config.output.format = OutputFormat(kwargs["output"])
-
-        if kwargs["package"]:
-            config.output.package = kwargs["package"]
 
     uris = resolve_source(kwargs["source"], wsdl=config.output.wsdl)
     transformer = SchemaTransformer(config=config, print=kwargs["print"])

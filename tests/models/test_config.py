@@ -11,7 +11,9 @@ class GeneratorConfigTests(TestCase):
     def test_create(self):
         file_path = Path(tempfile.mktemp())
         version = get_distribution("xsdata").version
-        GeneratorConfig.create(file_path)
+        obj = GeneratorConfig.create()
+        with file_path.open("w") as fp:
+            obj.write(fp, obj)
 
         expected = (
             "<?xml version='1.0' encoding='UTF-8'?>\n"
@@ -39,7 +41,7 @@ class GeneratorConfigTests(TestCase):
         self.assertEqual(expected, file_path.read_text())
         file_path.unlink()
 
-    def test_update(self):
+    def test_read(self):
         existing = (
             "<?xml version='1.0' encoding='UTF-8'?>\n"
             '<Config xmlns="http://pypi.org/project/xsdata" version="20.8">\n'
@@ -55,8 +57,10 @@ class GeneratorConfigTests(TestCase):
         version = get_distribution("xsdata").version
         file_path = Path(tempfile.mktemp())
         file_path.write_text(existing)
+        config = GeneratorConfig.read(file_path)
+        with file_path.open("w") as fp:
+            GeneratorConfig.write(fp, config)
 
-        GeneratorConfig.update(file_path)
         expected = (
             "<?xml version='1.0' encoding='UTF-8'?>\n"
             f'<Config xmlns="http://pypi.org/project/xsdata" version="{version}">\n'

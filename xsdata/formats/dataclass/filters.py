@@ -20,7 +20,7 @@ from xsdata.codegen.models import AttrType
 from xsdata.codegen.models import Class
 from xsdata.formats.converter import converter
 from xsdata.formats.dataclass import utils
-from xsdata.models.config import Alias
+from xsdata.models.config import GeneratorAlias
 from xsdata.models.config import GeneratorConfig
 from xsdata.utils import text
 from xsdata.utils.collections import unique_sequence
@@ -349,7 +349,7 @@ class Filters:
 
     @classmethod
     def from_config(cls, config: GeneratorConfig) -> "Filters":
-        def index_aliases(aliases: List[Alias]) -> Dict:
+        def index_aliases(aliases: List[GeneratorAlias]) -> Dict:
             return {alias.source: alias.target for alias in aliases}
 
         return cls(

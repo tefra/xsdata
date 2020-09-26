@@ -8,7 +8,7 @@ from xsdata.formats.dataclass.filters import FIELD
 from xsdata.formats.dataclass.filters import Filters
 from xsdata.formats.dataclass.filters import MODULE
 from xsdata.formats.dataclass.filters import PACKAGE
-from xsdata.models.config import Alias
+from xsdata.models.config import GeneratorAlias
 from xsdata.models.config import GeneratorConfig
 from xsdata.models.config import NameCase
 from xsdata.models.enums import Namespace
@@ -457,11 +457,11 @@ class FiltersTests(FactoryTestCase):
         config.conventions.field_name.case = NameCase.PASCAL
         config.conventions.module_name.safe_prefix = "safe_module"
         config.conventions.module_name.case = NameCase.SNAKE
-        config.aliases.class_name.append(Alias("a", "b"))
-        config.aliases.class_name.append(Alias("c", "d"))
-        config.aliases.field_name.append(Alias("e", "f"))
-        config.aliases.package_name.append(Alias("g", "h"))
-        config.aliases.module_name.append(Alias("i", "j"))
+        config.aliases.class_name.append(GeneratorAlias("a", "b"))
+        config.aliases.class_name.append(GeneratorAlias("c", "d"))
+        config.aliases.field_name.append(GeneratorAlias("e", "f"))
+        config.aliases.package_name.append(GeneratorAlias("g", "h"))
+        config.aliases.module_name.append(GeneratorAlias("i", "j"))
 
         filters = Filters.from_config(config)
 

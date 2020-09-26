@@ -3,7 +3,7 @@ from enum import Enum
 from pathlib import Path
 from typing import Callable
 from typing import List
-from typing import Optional
+from typing import TextIO
 
 from pkg_resources import get_distribution
 
@@ -18,35 +18,32 @@ from xsdata.utils import text
 
 
 class OutputFormat(Enum):
+    """Available output formats: pydata (dataclasses), PlantUML class
+    diagram."""
+
     DATACLASS = "pydata"
     PLANTUML = "plantuml"
 
 
 class OutputStructure(Enum):
+    """Available output structure strategies, based on filenames or the target
+    namespaces."""
+
     FILENAMES = "filenames"
     NAMESPACES = "namespaces"
 
 
-class OverrideType(Enum):
-    CLASS = "class"
-    FIELD = "field"
-    MODULE = "module"
-    PACKAGE = "package"
-
-
-class PropertyType(Enum):
-    NAME = "name"
-    HELP = "help"
-
-
 class NameCase(Enum):
+    """Available naming schemes, pascal, snake, camel, mixed."""
+
     PASCAL = "pascalCase"
+    CAMEL = "camelCase"
     SNAKE = "snakeCase"
     MIXED = "mixedCase"
-    CAMEL = "camelCase"
 
     @property
     def func(self) -> Callable:
+        """Return the actual callable of the scheme."""
         return __name_case_func__[self.value]
 
 
@@ -60,6 +57,15 @@ __name_case_func__ = {
 
 @dataclass
 class GeneratorOutput:
+    """
+    Main generator output options.
+
+    :param wsdl: Enable wsdl mode
+    :param package: Package name eg foo.bar.models
+    :param format: Select an output format
+    :param structure: Select an output structure
+    """
+
     wsdl: bool = attribute(default=False)
     package: str = element(default="generated")
     format: OutputFormat = element(default=OutputFormat.DATACLASS)
@@ -68,12 +74,28 @@ class GeneratorOutput:
 
 @dataclass
 class NameConvention:
+    """
+    Name convention model.
+
+    :param case: Naming scheme, eg camelCase, snakeCase
+    :param safe_prefix: A prefix to be prepended into names that match reserved words.
+    """
+
     case: NameCase = attribute(optional=False)
     safe_prefix: str = attribute(optional=False)
 
 
 @dataclass
 class GeneratorConventions:
+    """
+    Generator global naming conventions.
+
+    :param class_name: Class naming conventions.
+    :param field_name: Field naming conventions.
+    :param module_name: Module naming conventions.
+    :param package_name: Package naming conventions.
+    """
+
     class_name: NameConvention = element(
         default_factory=lambda: NameConvention(NameCase.PASCAL, "type")
     )
@@ -89,29 +111,47 @@ class GeneratorConventions:
 
 
 @dataclass
-class Override:
-    type: OverrideType = attribute(required=True)
-    property: PropertyType = attribute(required=True)
+class GeneratorAlias:
+    """
+    Alias definition model.
+
+    :param source: The source name from schema definition
+    :param target: The target name of the object.
+    """
+
     source: str = attribute(required=True)
     target: str = attribute(required=True)
 
 
 @dataclass
-class Alias:
-    source: str = attribute(required=True)
-    target: str = attribute(required=True)
+class GeneratorAliases:
+    """
+    Generator aliases for classes, fields, packages and modules that bypass the
+    global naming conventions.
 
+    :param class_name: list of class name aliases
+    :param field_name: list of field name aliases
+    :param package_name: list of package name aliases
+    :param module_name: list of module name aliases
+    """
 
-@dataclass
-class Aliases:
-    class_name: List[Alias] = array_element()
-    field_name: List[Alias] = array_element()
-    package_name: List[Alias] = array_element()
-    module_name: List[Alias] = array_element()
+    class_name: List[GeneratorAlias] = array_element()
+    field_name: List[GeneratorAlias] = array_element()
+    package_name: List[GeneratorAlias] = array_element()
+    module_name: List[GeneratorAlias] = array_element()
 
 
 @dataclass
 class GeneratorConfig:
+    """
+    Generator configuration binding model.
+
+    :param version: xsdata version number the config was created/updated
+    :param output: output options
+    :param conventions: generator conventions
+    :param aliases: generator aliases
+    """
+
     class Meta:
         name = "Config"
         namespace = "http://pypi.org/project/xsdata"
@@ -119,39 +159,31 @@ class GeneratorConfig:
     version: str = attribute(init=False, default=get_distribution("xsdata").version)
     output: GeneratorOutput = element(default_factory=GeneratorOutput)
     conventions: GeneratorConventions = element(default_factory=GeneratorConventions)
-    aliases: Aliases = element(default_factory=Aliases)
+    aliases: GeneratorAliases = element(default_factory=GeneratorAliases)
 
     @classmethod
-    def read(
-        cls, path: Path, context: Optional[XmlContext] = None
-    ) -> "GeneratorConfig":
-        context = context or cls.context()
+    def create(cls) -> "GeneratorConfig":
+        obj = cls()
+        obj.aliases.class_name.append(GeneratorAlias("fooType", "Foo"))
+        obj.aliases.class_name.append(GeneratorAlias("ABCSomething", "ABCSomething"))
+        obj.aliases.field_name.append(
+            GeneratorAlias("ChangeofGauge", "change_of_gauge")
+        )
+        obj.aliases.package_name.append(
+            GeneratorAlias("http://www.w3.org/1999/xhtml", "xtml")
+        )
+        obj.aliases.module_name.append(GeneratorAlias("2010.1", "2020a"))
+        return obj
+
+    @classmethod
+    def read(cls, path: Path) -> "GeneratorConfig":
+        ctx = XmlContext(element_name=text.pascal_case, attribute_name=text.camel_case)
         config = ParserConfig(fail_on_unknown_properties=False)
-        parser = XmlParser(context=context, config=config)
+        parser = XmlParser(context=ctx, config=config)
         return parser.from_path(path, cls)
 
     @classmethod
-    def create(cls, path: Path):
-        obj = cls()
-        obj.aliases.class_name.append(Alias("fooType", "Foo"))
-        obj.aliases.class_name.append(Alias("ABCSomething", "ABCSomething"))
-        obj.aliases.field_name.append(Alias("ChangeofGauge", "change_of_gauge"))
-        obj.aliases.package_name.append(Alias("http://www.w3.org/1999/xhtml", "xtml"))
-        obj.aliases.module_name.append(Alias("2010.1", "2020a"))
-        cls.write(path, obj, cls.context())
-
-    @classmethod
-    def update(cls, path: Path):
-        context = cls.context()
-        obj = cls.read(path, context)
-        cls.write(path, obj, context)
-
-    @classmethod
-    def write(cls, path: Path, obj: "GeneratorConfig", context: XmlContext):
-        serializer = XmlSerializer(context=context, pretty_print=True)
-        with path.open("w") as fp:
-            serializer.write(fp, obj, ns_map={None: "http://pypi.org/project/xsdata"})
-
-    @classmethod
-    def context(cls) -> XmlContext:
-        return XmlContext(element_name=text.pascal_case, attribute_name=text.camel_case)
+    def write(cls, output: TextIO, obj: "GeneratorConfig"):
+        ctx = XmlContext(element_name=text.pascal_case, attribute_name=text.camel_case)
+        serializer = XmlSerializer(context=ctx, pretty_print=True)
+        serializer.write(output, obj, ns_map={None: "http://pypi.org/project/xsdata"})

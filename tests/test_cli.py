@@ -1,4 +1,7 @@
 import logging
+import sys
+import tempfile
+from pathlib import Path
 from unittest import mock
 from unittest import TestCase
 
@@ -22,7 +25,7 @@ class CliTests(TestCase):
 
     @mock.patch.object(SchemaTransformer, "process_schemas")
     @mock.patch.object(SchemaTransformer, "__init__", return_value=None)
-    def test_default_output(self, mock_init, mock_process_schemas):
+    def test_generate_with_default_output(self, mock_init, mock_process_schemas):
         source = fixtures_dir.joinpath("defxmlschema/chapter03.xsd")
         result = self.runner.invoke(cli, [str(source), "--package", "foo"])
         config = mock_init.call_args[1]["config"]
@@ -36,7 +39,7 @@ class CliTests(TestCase):
 
     @mock.patch.object(SchemaTransformer, "process_schemas")
     @mock.patch.object(SchemaTransformer, "__init__", return_value=None)
-    def test_custom_output(self, mock_init, mock_process_schemas):
+    def test_generate_with_plantuml_output(self, mock_init, mock_process_schemas):
         source = fixtures_dir.joinpath("defxmlschema/chapter03.xsd")
         result = self.runner.invoke(
             cli, [str(source), "--package", "foo", "--output", "plantuml"]
@@ -52,7 +55,7 @@ class CliTests(TestCase):
 
     @mock.patch.object(SchemaTransformer, "process_schemas")
     @mock.patch.object(SchemaTransformer, "__init__", return_value=None)
-    def test_print_mode(self, mock_init, mock_process_schemas):
+    def test_generate_with_print_mode(self, mock_init, mock_process_schemas):
         source = fixtures_dir.joinpath("defxmlschema/chapter03.xsd")
         result = self.runner.invoke(cli, [str(source), "--package", "foo", "--print"])
 
@@ -63,7 +66,7 @@ class CliTests(TestCase):
 
     @mock.patch.object(SchemaTransformer, "process_schemas")
     @mock.patch.object(SchemaTransformer, "__init__", return_value=None)
-    def test_ns_struct_mode(self, mock_init, mock_process_schemas):
+    def test_generate_with_ns_struct_mode(self, mock_init, mock_process_schemas):
         source = fixtures_dir.joinpath("defxmlschema/chapter03.xsd")
         result = self.runner.invoke(
             cli, [str(source), "--package", "foo", "--ns-struct"]
@@ -79,7 +82,7 @@ class CliTests(TestCase):
 
     @mock.patch.object(SchemaTransformer, "process_definitions")
     @mock.patch.object(SchemaTransformer, "__init__", return_value=None)
-    def test_wsdl_mode(self, mock_init, mock_process_definitions):
+    def test_generate_with_wsdl_mode(self, mock_init, mock_process_definitions):
         source = fixtures_dir.joinpath("defxmlschema/chapter03.xsd")
         result = self.runner.invoke(cli, [str(source), "--package", "foo", "--wsdl"])
 
@@ -87,6 +90,63 @@ class CliTests(TestCase):
         mock_process_definitions.assert_called_once_with(
             source.as_uri(),
         )
+
+    @mock.patch.object(SchemaTransformer, "process_schemas")
+    @mock.patch.object(SchemaTransformer, "__init__", return_value=None)
+    def test_generate_with_configuration_file(self, mock_init, mock_process_schemas):
+        file_path = Path(tempfile.mktemp())
+        config = GeneratorConfig()
+        config.output.package = "foo.bar"
+        config.output.structure = OutputStructure.NAMESPACES
+        with file_path.open("w") as fp:
+            config.write(fp, config)
+
+        source = fixtures_dir.joinpath("defxmlschema/chapter03.xsd")
+        result = self.runner.invoke(cli, [str(source), "--config", str(file_path)])
+        config = mock_init.call_args[1]["config"]
+
+        self.assertIsNone(result.exception)
+        self.assertFalse(mock_init.call_args[1]["print"])
+        self.assertEqual("foo.bar", config.output.package)
+        self.assertEqual(OutputFormat.DATACLASS, config.output.format)
+        self.assertEqual(OutputStructure.NAMESPACES, config.output.structure)
+        self.assertEqual([source.as_uri()], mock_process_schemas.call_args[0][0])
+        file_path.unlink()
+
+    @mock.patch("xsdata.cli.logger.info")
+    def test_init_config(self, mock_info):
+        output = tempfile.mktemp()
+        output_path = Path(output)
+        result = self.runner.invoke(cli, ["init-config", str(output)])
+
+        self.assertIsNone(result.exception)
+        self.assertEqual(GeneratorConfig.create(), GeneratorConfig.read(output_path))
+        mock_info.assert_called_once_with("Initializing configuration file %s", output)
+        output_path.unlink()
+
+    @mock.patch("xsdata.cli.logger.info")
+    def test_init_config_when_file_exists(self, mock_info):
+        output = tempfile.mktemp()
+        output_path = Path(output)
+
+        config = GeneratorConfig.create()
+        config.version = "20.8"
+
+        with output_path.open("w") as fp:
+            config.write(fp, config)
+
+        result = self.runner.invoke(cli, ["init-config", str(output)])
+
+        self.assertIsNone(result.exception)
+        self.assertNotEqual("20.8", GeneratorConfig.read(output_path))
+        mock_info.assert_called_once_with("Updating configuration file %s", output)
+        output_path.unlink()
+
+    def test_init_config_with_print_mode(self):
+        result = self.runner.invoke(cli, ["init-config", "--print"])
+
+        self.assertIsNone(result.exception)
+        self.assertIn('<Config xmlns="http://pypi.org/project/xsdata"', result.output)
 
     def test_resolve_source(self):
         file = fixtures_dir.joinpath("defxmlschema/chapter03.xsd")

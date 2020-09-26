@@ -235,11 +235,7 @@ def element(optional: bool = True, **kwargs: Any) -> Any:
 def array_element(**kwargs: Any) -> Any:
     """Shortcut method for list element fields."""
     metadata = extract_metadata(kwargs, type=XmlType.ELEMENT)
-
-    if not has_default(kwargs):
-        kwargs["default_factory"] = list
-
-    return field(metadata=metadata, **kwargs)
+    return field(metadata=metadata, default_factory=list, **kwargs)
 
 
 def array_any_element(**kwargs: Any) -> Any:
@@ -247,11 +243,7 @@ def array_any_element(**kwargs: Any) -> Any:
     metadata = extract_metadata(
         kwargs, type=XmlType.WILDCARD, namespace=NamespaceType.ANY
     )
-
-    if not has_default(kwargs):
-        kwargs["default_factory"] = list
-
-    return field(metadata=metadata, **kwargs)
+    return field(metadata=metadata, default_factory=list, **kwargs)
 
 
 def extract_metadata(params: Dict, **kwargs: Any) -> Dict:

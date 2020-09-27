@@ -24,25 +24,13 @@ class ClassAnalyzer:
         # Run analyzer handlers
         container.process()
 
+        # Filter classes that should be generated.
+        container.filter_classes()
+
         # Sanitize class attributes after merging and flattening types and extensions.
         ClassSanitizer.process(container)
 
-        # Select final list of classes to be generated.
-        return cls.select_classes(container)
-
-    @classmethod
-    def select_classes(cls, container: ClassContainer) -> List[Class]:
-        """
-        Return the qualified classes for code generation.
-
-        Return all if no classes are derived from xs:element or
-        xs:complexType.
-        """
-
-        classes = list(container.iterate())
-        if any(item.is_complex for item in classes):
-            classes = list(filter(lambda x: x.should_generate, classes))
-
+        classes = container.class_list
         cls.validate_references(classes)
 
         return classes

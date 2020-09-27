@@ -4,9 +4,9 @@ from pathlib import Path
 from click.testing import CliRunner
 
 from tests import root
-from tests.conftest import load_class
 from tests.conftest import validate_bindings
 from xsdata.cli import cli
+from xsdata.utils.testing import load_class
 
 os.chdir(root)
 

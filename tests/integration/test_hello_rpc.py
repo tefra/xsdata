@@ -7,7 +7,6 @@ from click.testing import CliRunner
 
 from tests import fixtures_dir
 from tests import root
-from tests.conftest import load_class
 from tests.fixtures.hello import GetHelloAsStringResponse
 from tests.fixtures.hello import HelloError
 from tests.fixtures.hello import HelloGetHelloAsString
@@ -17,6 +16,7 @@ from xsdata.formats.dataclass.client import Client
 from xsdata.formats.dataclass.client import Config
 from xsdata.formats.dataclass.serializers import XmlSerializer
 from xsdata.formats.dataclass.transports import DefaultTransport
+from xsdata.utils.testing import load_class
 
 os.chdir(root)
 

@@ -117,8 +117,8 @@ like naming conventions and aliases.
     The sample output has the default naming conventions and some example aliases.
 
 
-Name Conventions
-----------------
+Conventions
+-----------
 
 
 **Case schemes**

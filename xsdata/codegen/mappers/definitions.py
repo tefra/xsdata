@@ -25,6 +25,8 @@ from xsdata.models.wsdl import ServicePort
 from xsdata.models.xsd import Element
 from xsdata.utils import collections
 from xsdata.utils import text
+from xsdata.utils.namespaces import build_qname
+from xsdata.utils.namespaces import split_qname
 
 
 class DefinitionsMapper:
@@ -109,7 +111,7 @@ class DefinitionsMapper:
                 attrs.append(cls.build_attr(message_type, message_class.qname))
 
         yield Class(
-            qname=text.qname(definitions.target_namespace, name),
+            qname=build_qname(definitions.target_namespace, name),
             status=Status.PROCESSED,
             type=type(binding_operation),
             module=definitions.module,
@@ -202,7 +204,7 @@ class DefinitionsMapper:
         attributes from the port type message."""
 
         target = Class(
-            qname=text.qname(definitions.target_namespace, name),
+            qname=build_qname(definitions.target_namespace, name),
             meta_name="Envelope",
             type=type(binding_message),
             module=definitions.module,
@@ -213,7 +215,7 @@ class DefinitionsMapper:
 
         for ext in binding_message.extended_elements:
             assert ext.qname is not None
-            local_name = text.split_qname(ext.qname)[1].title()
+            local_name = split_qname(ext.qname)[1].title()
             inner = cls.build_inner_class(target, local_name)
 
             if style == "rpc" and local_name == "Body":
@@ -239,7 +241,7 @@ class DefinitionsMapper:
         ns_map = definition_message.ns_map.copy()
 
         return Class(
-            qname=text.qname(definitions.target_namespace, message_name),
+            qname=build_qname(definitions.target_namespace, message_name),
             status=Status.PROCESSED,
             type=Element,
             module=definitions.module,
@@ -261,7 +263,7 @@ class DefinitionsMapper:
         inner = next((inner for inner in target.inner if inner.name == name), None)
         if not inner:
             inner = Class(
-                qname=text.qname(name),
+                qname=build_qname(name),
                 type=BindingMessage,
                 module=target.module,
                 ns_map=target.ns_map.copy(),
@@ -281,7 +283,7 @@ class DefinitionsMapper:
         prefix, name = text.split(message.message)
         source_namespace = message.ns_map.get(prefix)
         yield cls.build_attr(
-            name, qname=text.qname(source_namespace, name), namespace=namespace
+            name, qname=build_qname(source_namespace, name), namespace=namespace
         )
 
     @classmethod
@@ -297,14 +299,14 @@ class DefinitionsMapper:
             parts.extend(extended.attributes["parts"].split())
 
         if "message" in extended.attributes:
-            message_name = text.split_qname(extended.attributes["message"])[1]
+            message_name = split_qname(extended.attributes["message"])[1]
         else:
             message_name = text.suffix(message)
 
         definition_message = definitions.find_message(message_name)
         message_parts = definition_message.parts
 
-        if len(parts) > 0:
+        if parts:
             message_parts = [part for part in message_parts if part.name in parts]
 
         yield from cls.build_parts_attributes(message_parts, ns_map)
@@ -330,7 +332,7 @@ class DefinitionsMapper:
 
             ns_map.update(part.ns_map)
             namespace = part.ns_map.get(prefix)
-            type_qname = text.qname(namespace, type_name)
+            type_qname = build_qname(namespace, type_name)
             native = namespace == Namespace.XS.uri
             namespace = "" if part.type else namespace
 
@@ -349,7 +351,7 @@ class DefinitionsMapper:
     def attributes(cls, elements: Iterator[AnyElement]) -> Dict:
         """Return all attributes from all extended elements as a dictionary."""
         return {
-            text.split_qname(qname)[1]: value
+            split_qname(qname)[1]: value
             for element in elements
             if isinstance(element, AnyElement)
             for qname, value in element.attributes.items()

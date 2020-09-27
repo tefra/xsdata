@@ -26,6 +26,7 @@ from xsdata.models.mixins import ElementBase
 from xsdata.models.mixins import ModuleMixin
 from xsdata.utils import text
 from xsdata.utils.collections import unique_sequence
+from xsdata.utils.namespaces import clean_uri
 
 docstring_serializer = XmlSerializer(pretty_print=True)
 
@@ -105,7 +106,7 @@ class AnnotationBase(ElementBase):
 
     @property
     def display_help(self) -> Optional[str]:
-        if self.annotation and len(self.annotation.documentations) > 0:
+        if self.annotation and self.annotation.documentations:
             to_string = methodcaller("tostring")
             return "\n".join(
                 filter(None, map(to_string, self.annotation.documentations))
@@ -138,7 +139,7 @@ class AnyAttribute(AnnotationBase):
 
     @property
     def real_name(self) -> str:
-        clean_ns = "_".join(map(text.clean_uri, self.namespace.split()))
+        clean_ns = "_".join(map(clean_uri, self.namespace.split()))
         return f"{clean_ns}_attributes"
 
     @property
@@ -179,11 +180,7 @@ class SimpleType(AnnotationBase):
 
     @property
     def is_enumeration(self) -> bool:
-        return (
-            True
-            if self.restriction and len(self.restriction.enumerations) > 0
-            else False
-        )
+        return self.restriction is not None and len(self.restriction.enumerations) > 0
 
     @property
     def real_name(self) -> str:
@@ -393,7 +390,7 @@ class Any(AnnotationBase):
 
     @property
     def real_name(self) -> str:
-        clean_ns = "_".join(map(text.clean_uri, self.namespace.split()))
+        clean_ns = "_".join(map(clean_uri, self.namespace.split()))
         return f"{clean_ns}_element"
 
     @property

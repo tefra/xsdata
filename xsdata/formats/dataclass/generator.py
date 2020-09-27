@@ -6,23 +6,23 @@ from typing import List
 from xsdata.codegen.models import Class
 from xsdata.codegen.models import Import
 from xsdata.codegen.resolver import DependenciesResolver
-from xsdata.formats.dataclass import utils
-from xsdata.formats.dataclass.filters import filters
+from xsdata.formats.dataclass.filters import Filters
 from xsdata.formats.mixins import AbstractGenerator
 from xsdata.formats.mixins import GeneratorResult
-from xsdata.utils import text
+from xsdata.models.config import GeneratorConfig
 from xsdata.utils.collections import group_by
 
 
 class DataclassGenerator(AbstractGenerator):
     """Python dataclasses code generator."""
 
-    def __init__(self):
+    def __init__(self, config: GeneratorConfig):
         """Override generator constructor to set templates directory and
         environment filters."""
         tpl_dir = Path(__file__).parent.joinpath("templates")
-        super().__init__(str(tpl_dir))
-        self.env.filters.update(filters)
+        super().__init__(str(tpl_dir), config)
+        self.filters = Filters.from_config(config)
+        self.filters.register(self.env)
 
     def render(self, classes: List[Class]) -> Iterator[GeneratorResult]:
         """
@@ -120,15 +120,10 @@ class DataclassGenerator(AbstractGenerator):
                 )
             package = package.parent
 
-    @classmethod
-    def module_name(cls, module: str) -> str:
+    def module_name(self, name: str) -> str:
         """Convert the given module name to safe snake case."""
-        return text.snake_case(utils.safe_snake(text.clean_uri(module), default="mod"))
+        return self.filters.module_name(name)
 
-    @classmethod
-    def package_name(cls, package: str) -> str:
+    def package_name(self, name: str) -> str:
         """Convert the given package name to safe snake case."""
-        return ".".join(
-            text.snake_case(utils.safe_snake(part, default="pkg"))
-            for part in package.split(".")
-        )
+        return self.filters.package_name(name)

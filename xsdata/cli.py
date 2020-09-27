@@ -1,23 +1,59 @@
 import logging
+import sys
 from pathlib import Path
 from typing import Any
 from typing import Iterator
 
 import click
 import click_log
+from click_default_group import DefaultGroup
 from pkg_resources import get_distribution
 
 from xsdata.codegen.transformer import SchemaTransformer
-from xsdata.codegen.writer import writer
 from xsdata.exceptions import CodeGenerationError
 from xsdata.logger import logger
+from xsdata.models.config import GeneratorConfig
+from xsdata.models.config import OutputFormat
+from xsdata.models.config import OutputStructure
 
-outputs = click.Choice(writer.formats)
+outputs = click.Choice([x.value for x in OutputFormat])
 
 
-@click.command("generate")
+@click.group(cls=DefaultGroup, default="generate", default_if_no_args=False)
+@click.version_option(get_distribution("xsdata").version)
+@click_log.simple_verbosity_option(logger)
+def cli():
+    pass
+
+
+@cli.command("init-config")
+@click.argument("output", type=click.Path(resolve_path=True), default=".xsdata.xml")
+@click.option("--print", is_flag=True, default=False, help="Print output")
+def init_config(*args: Any, **kwargs: Any):
+    """Create or update a configuration file."""
+
+    if kwargs["print"]:
+        logger.setLevel(logging.ERROR)
+
+    file_path = Path(kwargs["output"])
+    if file_path.exists():
+        config = GeneratorConfig.read(file_path)
+        logger.info("Updating configuration file %s", kwargs["output"])
+    else:
+        logger.info("Initializing configuration file %s", kwargs["output"])
+        config = GeneratorConfig.create()
+
+    if kwargs["print"]:
+        config.write(sys.stdout, config)
+    else:
+        with file_path.open("w") as fp:
+            config.write(fp, config)
+
+
+@cli.command("generate")
 @click.argument("source", required=True)
-@click.option("--package", required=True, help="Target Package")
+@click.option("--config", default=".xsdata.xml", help="Configuration file")
+@click.option("--package", required=False, help="Target Package", default="generated")
 @click.option("--output", type=outputs, help="Output Format", default="pydata")
 @click.option("--wsdl", is_flag=True, default=False, help="WSDL Mode (experimental)")
 @click.option("--print", is_flag=True, default=False, help="Print output")
@@ -30,9 +66,7 @@ outputs = click.Choice(writer.formats)
         "Useful against circular import errors."
     ),
 )
-@click.version_option(get_distribution("xsdata").version)
-@click_log.simple_verbosity_option(logger)
-def cli(*args: Any, **kwargs: Any):
+def generate(*args: Any, **kwargs: Any):
     """
     Convert schema definitions to code.
 
@@ -41,15 +75,27 @@ def cli(*args: Any, **kwargs: Any):
     if kwargs["print"]:
         logger.setLevel(logging.ERROR)
 
-    uris = resolve_source(kwargs["source"], wsdl=kwargs["wsdl"])
-    transformer = SchemaTransformer(
-        output=kwargs["output"], print=kwargs["print"], ns_struct=kwargs["ns_struct"]
-    )
-
-    if kwargs["wsdl"]:
-        transformer.process_definitions(next(uris), kwargs["package"])
+    config_file = Path(kwargs["config"])
+    if config_file.exists():
+        config = GeneratorConfig.read(config_file)
     else:
-        transformer.process_schemas(list(uris), kwargs["package"])
+        config = GeneratorConfig()
+        config.output.format = OutputFormat(kwargs["output"])
+        config.output.package = kwargs["package"]
+
+        if kwargs["wsdl"]:
+            config.output.wsdl = kwargs["wsdl"]
+
+        if kwargs["ns_struct"]:
+            config.output.structure = OutputStructure.NAMESPACES
+
+    uris = resolve_source(kwargs["source"], wsdl=config.output.wsdl)
+    transformer = SchemaTransformer(config=config, print=kwargs["print"])
+
+    if config.output.wsdl:
+        transformer.process_definitions(next(uris))
+    else:
+        transformer.process_schemas(list(uris))
 
 
 def resolve_source(source: str, wsdl: bool) -> Iterator[str]:

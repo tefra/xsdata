@@ -111,7 +111,7 @@ class ClassExtensionHandler(HandlerInterface):
         elif (
             res == cls.INCLUDES_SOME
             or source.strict_type
-            or (source.has_suffix_attr and len(target.attrs) > 0)
+            or (source.has_suffix_attr and target.attrs)
             or target.has_suffix_attr
         ):
             ClassUtils.copy_attributes(source, target, ext)

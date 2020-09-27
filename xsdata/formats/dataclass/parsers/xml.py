@@ -13,8 +13,8 @@ from xsdata.formats.dataclass.parsers.mixins import XmlNode
 from xsdata.formats.dataclass.parsers.nodes import NodeParser
 from xsdata.formats.dataclass.parsers.nodes import Parsed
 from xsdata.models.enums import EventType
+from xsdata.utils.namespaces import split_qname
 from xsdata.utils.text import snake_case
-from xsdata.utils.text import split_qname
 
 
 @dataclass

@@ -2,10 +2,13 @@ from typing import Dict
 from unittest import TestCase
 
 from xsdata.models.enums import Namespace
+from xsdata.utils.namespaces import build_qname
 from xsdata.utils.namespaces import clean_prefixes
+from xsdata.utils.namespaces import clean_uri
 from xsdata.utils.namespaces import generate_prefix
 from xsdata.utils.namespaces import load_prefix
 from xsdata.utils.namespaces import prefix_exists
+from xsdata.utils.namespaces import split_qname
 
 
 class NamespacesTests(TestCase):
@@ -56,3 +59,32 @@ class NamespacesTests(TestCase):
 
         ns_map = {"bb": "b", None: "b", "c": 1}
         self.assertEqual({"bb": "b", "c": 1}, clean_prefixes(ns_map))
+
+    def test_clean_uri(self):
+        self.assertEqual("any", clean_uri("##any"))
+        self.assertEqual("a", clean_uri("urn:a"))
+        self.assertEqual("a_com/b", clean_uri("http://a.com/b.xsd"))
+        self.assertEqual("a_com/b", clean_uri("http://www.a.com/b.xsd"))
+        self.assertEqual("a_com/b", clean_uri("https://a.com/b.wsdl"))
+        self.assertEqual("a_com/b", clean_uri("https://www.a.com/b.xsd"))
+
+    def test_build_qname(self):
+        self.assertEqual("{a}b", build_qname("a", "b"))
+        self.assertEqual("b", build_qname("", "b"))
+        self.assertEqual("b", build_qname(None, "b"))
+
+        self.assertEqual("b", build_qname("b", ""))
+        self.assertEqual("b", build_qname("b"))
+        self.assertEqual("b", build_qname("b", None))
+
+        with self.assertRaises(ValueError):
+            build_qname(None, None)
+
+    def test_split_qname(self):
+        self.assertEqual(("a", "b"), split_qname("{a}b"))
+        self.assertEqual((None, "b"), split_qname("b"))
+        self.assertEqual((None, "{"), split_qname("{"))
+        self.assertEqual((None, "{foobar"), split_qname("{foobar"))
+
+        with self.assertRaises(IndexError):
+            split_qname("")

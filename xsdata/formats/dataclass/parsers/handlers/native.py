@@ -12,7 +12,7 @@ from xsdata.exceptions import XmlHandlerError
 from xsdata.formats.dataclass.parsers.handlers import LxmlSaxHandler
 from xsdata.formats.dataclass.parsers.mixins import XmlHandler
 from xsdata.models.enums import EventType
-from xsdata.utils import text
+from xsdata.utils.namespaces import build_qname
 
 EVENTS = (EventType.START, EventType.END, EventType.START_NS)
 
@@ -107,8 +107,8 @@ class XmlSaxHandler(LxmlSaxHandler, sax.handler.ContentHandler):
         Converts name and attribute keys to fully qualified tags to respect the main
         parser api, eg (foo, bar) -> {foo}bar
         """
-        tag = text.qname(name[0], name[1])
-        attrs = {text.qname(key[0], key[1]): value for key, value in attrs.items()}
+        tag = build_qname(name[0], name[1])
+        attrs = {build_qname(key[0], key[1]): value for key, value in attrs.items()}
         self.start(tag, attrs, self.ns_map)
         self.ns_map = {}
 
@@ -122,7 +122,7 @@ class XmlSaxHandler(LxmlSaxHandler, sax.handler.ContentHandler):
         Converts name and attribute keys to fully qualified tags to respect the
         main parser api, eg (foo, bar) -> {foo}bar
         """
-        self.end(text.qname(name[0], name[1]))
+        self.end(build_qname(name[0], name[1]))
 
     def characters(self, content: str):
         """Proxy for the data notification receiver."""

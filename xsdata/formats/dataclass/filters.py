@@ -1,7 +1,10 @@
-import functools
 import math
+from collections import defaultdict
+from dataclasses import dataclass
+from dataclasses import field
 from decimal import Decimal
 from typing import Any
+from typing import Callable
 from typing import Dict
 from typing import List
 from typing import Optional
@@ -10,261 +13,356 @@ from xml.etree.ElementTree import QName
 from xml.sax.saxutils import quoteattr
 
 from docformatter import format_code
+from jinja2 import Environment
 
 from xsdata.codegen.models import Attr
 from xsdata.codegen.models import AttrType
 from xsdata.codegen.models import Class
 from xsdata.formats.converter import converter
 from xsdata.formats.dataclass import utils
+from xsdata.models.config import GeneratorAlias
+from xsdata.models.config import GeneratorConfig
 from xsdata.utils import text
 from xsdata.utils.collections import unique_sequence
+from xsdata.utils.namespaces import clean_uri
+
+CLASS = 0
+FIELD = 1
+MODULE = 2
+PACKAGE = 3
 
 
-@functools.lru_cache(maxsize=50)
-def class_name(name: str) -> str:
-    """Apply python conventions for class names."""
-    return text.pascal_case(utils.safe_snake(name, "type"))
+@dataclass
+class Filters:
 
+    class_aliases: Dict = field(default_factory=dict)
+    field_aliases: Dict = field(default_factory=dict)
+    package_aliases: Dict = field(default_factory=dict)
+    module_aliases: Dict = field(default_factory=dict)
 
-@functools.lru_cache(maxsize=50)
-def attribute_name(name: str) -> str:
-    """Apply python conventions for instance variable names."""
-    return text.snake_case(utils.safe_snake(name))
+    class_case: Callable = field(default=text.pascal_case)
+    field_case: Callable = field(default=text.snake_case)
+    package_case: Callable = field(default=text.snake_case)
+    module_case: Callable = field(default=text.snake_case)
 
+    class_safe_prefix: str = field(default="type")
+    field_safe_prefix: str = field(default="value")
+    package_safe_prefix: str = field(default="pkg")
+    module_safe_prefix: str = field(default="mod")
 
-@functools.lru_cache(maxsize=50)
-def constant_name(name: str) -> str:
-    """Apply python conventions for constant names."""
-    return text.snake_case(utils.safe_snake(name)).upper()
+    cache: Dict = field(default_factory=lambda: defaultdict(dict), init=False)
 
+    def register(self, env: Environment):
+        env.filters.update(
+            {
+                "field_name": self.field_name,
+                "field_default": self.field_default_value,
+                "field_metadata": self.field_metadata,
+                "field_type": self.field_type,
+                "class_name": self.class_name,
+                "class_docstring": self.class_docstring,
+                "constant_name": self.constant_name,
+                "constant_value": self.constant_value,
+                "default_imports": self.default_imports,
+                "format_arguments": self.format_arguments,
+                "type_name": self.type_name,
+            }
+        )
 
-def type_name(attr_type: AttrType) -> str:
-    """Return native python type name or apply class name conventions."""
-    return attr_type.native_name or class_name(attr_type.name)
+    def class_name(self, name: str) -> str:
+        """Convert the given string to a class name according to the selected
+        conventions or use an existing alias."""
+        cache = self.cache[CLASS]
+        if name not in cache:
+            cache[name] = self.class_aliases.get(name) or self._class_name(name)
 
+        return cache[name]
 
-def attribute_metadata(attr: Attr, parent_namespace: Optional[str]) -> Dict:
-    """Return a metadata dictionary for the given attribute."""
+    def _class_name(self, name: str) -> str:
+        return self.class_case(utils.safe_snake(name, self.class_safe_prefix))
 
-    name = namespace = None
+    def field_name(self, name: str) -> str:
+        """Convert the given string to a field name according to the selected
+        conventions or use an existing alias."""
+        cache = self.cache[FIELD]
+        if name not in cache:
+            cache[name] = self.field_aliases.get(name) or self._attribute_name(name)
 
-    if not attr.is_nameless and attr.local_name != attribute_name(attr.name):
-        name = attr.local_name
+        return cache[name]
 
-    if parent_namespace != attr.namespace or attr.is_attribute:
-        namespace = attr.namespace
+    def _attribute_name(self, name: str) -> str:
+        return self.field_case(utils.safe_snake(name, self.field_safe_prefix))
 
-    types = list({x.native_type for x in attr.types if x.native})
+    def constant_name(self, name: str) -> str:
+        """Apply python conventions for constant names."""
+        return self.field_name(name).upper()
 
-    metadata = dict(
-        name=name,
-        type=attr.xml_type,
-        namespace=namespace,
-        mixed=attr.mixed,
-        **attr.restrictions.asdict(types),
-    )
+    def module_name(self, name: str) -> str:
+        """Convert the given string to a module name according to the selected
+        conventions or use an existing alias."""
+        cache = self.cache[MODULE]
+        if name not in cache:
+            cache[name] = self.module_aliases.get(name) or self._module_name(name)
 
-    return {
-        key: value
-        for key, value in metadata.items()
-        if value is not None and value is not False
-    }
+        return cache[name]
 
+    def _module_name(self, name: str) -> str:
+        return self.module_case(
+            utils.safe_snake(clean_uri(name), self.module_safe_prefix)
+        )
 
-def format_arguments(data: Dict) -> str:
-    """Format given dictionary as keyword arguments."""
+    def package_name(self, name: str) -> str:
+        """Convert the given string to a package name according to the selected
+        conventions or use an existing alias."""
+        cache = self.cache[PACKAGE]
+        if name not in cache:
 
-    def prep(key: str, value: Any) -> str:
+            if name in self.package_aliases:
+                cache[name] = self.package_aliases[name]
+            else:
+                cache[name] = ".".join(
+                    self.package_aliases.get(part) or self._package_name(part)
+                    for part in name.split(".")
+                )
+
+        return cache[name]
+
+    def _package_name(self, part: str) -> str:
+        return self.package_case(utils.safe_snake(part, self.package_safe_prefix))
+
+    def type_name(self, attr_type: AttrType) -> str:
+        """Return native python type name or apply class name conventions."""
+        return attr_type.native_name or self.class_name(attr_type.name)
+
+    def field_metadata(self, attr: Attr, parent_namespace: Optional[str]) -> Dict:
+        """Return a metadata dictionary for the given attribute."""
+
+        name = namespace = None
+
+        if not attr.is_nameless and attr.local_name != self.field_name(attr.name):
+            name = attr.local_name
+
+        if parent_namespace != attr.namespace or attr.is_attribute:
+            namespace = attr.namespace
+
+        types = list({x.native_type for x in attr.types if x.native})
+
+        metadata = dict(
+            name=name,
+            type=attr.xml_type,
+            namespace=namespace,
+            mixed=attr.mixed,
+            **attr.restrictions.asdict(types),
+        )
+
+        return {
+            key: value
+            for key, value in metadata.items()
+            if value is not None and value is not False
+        }
+
+    def class_docstring(self, obj: Class, enum: bool = False) -> str:
+        """Generate docstring for the given class and the constructor
+        arguments."""
+        lines = []
+        if obj.help:
+            lines.append(obj.help)
+
+        var_type = "cvar" if enum else "ivar"
+        name_func = self.constant_name if enum else self.field_name
+
+        for attr in obj.attrs:
+            description = attr.help.strip() if attr.help else ""
+            lines.append(f":{var_type} {name_func(attr.name)}: {description}".strip())
+
+        return format_code('"""\n{}\n"""'.format("\n".join(lines))) if lines else ""
+
+    def field_default_value(self, attr: Attr, ns_map: Optional[Dict] = None) -> Any:
+        """Generate the field default value/factory for the given attribute."""
+        if attr.is_list or (attr.is_tokens and not attr.default):
+            return "list"
+        if attr.is_dict:
+            return "dict"
+        if not isinstance(attr.default, str):
+            return attr.default
+        if attr.default.startswith("@enum@"):
+            return self.field_default_enum(attr)
+
+        types = converter.sort_types(
+            list(
+                {attr_type.native_type for attr_type in attr.types if attr_type.native}
+            )
+        )
+
+        if attr.is_tokens:
+            return self.field_default_tokens(attr, types)
+
+        return self.prepare_default_value(
+            converter.from_string(attr.default, types, ns_map=ns_map)
+        )
+
+    def field_default_enum(self, attr: Attr) -> str:
+        source, enumeration = attr.default[6:].split("::", 1)
+        source = next(x.alias or source for x in attr.types if x.name == source)
+        return f"{self.class_name(source)}.{self.constant_name(enumeration)}"
+
+    def field_default_tokens(self, attr: Attr, types: List[Type]) -> str:
+        assert isinstance(attr.default, str)
+
+        tokens = ", ".join(
+            [
+                str(self.prepare_default_value(converter.from_string(val, types)))
+                for val in attr.default.split()
+            ]
+        )
+        return f"lambda: [{tokens}]"
+
+    def field_type(self, attr: Attr, parents: List[str]) -> str:
+        """Generate type hints for the given attribute."""
+
+        type_names = unique_sequence(
+            self.field_type_name(x, parents) for x in attr.types
+        )
+
+        result = ", ".join(type_names)
+        if len(type_names) > 1:
+            result = f"Union[{result}]"
+
+        if attr.is_tokens:
+            result = f"List[{result}]"
+
+        if attr.is_list:
+            result = f"List[{result}]"
+        elif attr.is_dict:
+            result = "Dict"
+        elif attr.default is None and not attr.is_factory:
+            result = f"Optional[{result}]"
+
+        return result
+
+    def field_type_name(self, attr_type: AttrType, parents: List[str]) -> str:
+        name = (
+            self.class_name(attr_type.alias)
+            if attr_type.alias
+            else self.type_name(attr_type)
+        )
+
+        if attr_type.forward and attr_type.circular:
+            outer_str = ".".join(map(self.class_name, parents))
+            name = f'"{outer_str}"'
+        elif attr_type.forward:
+            outer_str = ".".join(map(self.class_name, parents))
+            name = f'"{outer_str}.{name}"'
+        elif attr_type.circular:
+            name = f'"{name}"'
+
+        return name
+
+    def constant_value(self, attr: Attr) -> str:
+        """Return the attr default value or type as constant value."""
+        attr_type = attr.types[0]
+        if attr_type.native:
+            return f'"{attr.default}"'
+
+        if attr_type.alias:
+            return self.class_name(attr_type.alias)
+
+        return self.type_name(attr_type)
+
+    @classmethod
+    def prepare_default_value(cls, value: Any) -> Any:
         if isinstance(value, str):
-            value = f'''"{value.replace('"', "'")}"'''
-            if key == "pattern":
-                value = f"r{value}"
-        return f"{key}={value}"
+            return quoteattr(value)
 
-    return ",\n".join(prep(key, value) for key, value in data.items())
+        if isinstance(value, float):
+            return f"float('{value}')" if math.isinf(value) else value
 
+        if isinstance(value, Decimal):
+            return repr(value)
 
-def class_docstring(obj: Class, enum: bool = False) -> str:
-    """Generate docstring for the given class and the constructor arguments."""
-    lines = []
-    if obj.help:
-        lines.append(obj.help)
+        if isinstance(value, QName):
+            return f'QName("{value.text}")'
 
-    var_type = "cvar" if enum else "ivar"
-    name_func = constant_name if enum else attribute_name
+        return value
 
-    for attr in obj.attrs:
-        description = attr.help.strip() if attr.help else ""
-        lines.append(f":{var_type} {name_func(attr.name)}: {description}".strip())
+    @classmethod
+    def type_is_included(cls, output: str, type_name: str) -> bool:
+        return (
+            f": {type_name}" in output
+            or f"[{type_name}" in output
+            or f", {type_name}" in output
+            or f"= {type_name}" in output
+        )
 
-    return format_code('"""\n{}\n"""'.format("\n".join(lines))) if lines else ""
+    @classmethod
+    def default_imports(cls, output: str) -> str:
+        """Generate the default imports for the given package output."""
+        result = []
 
+        dataclasses = []
+        if "@dataclass" in output:
+            dataclasses.append("dataclass")
+        if "field(" in output:
+            dataclasses.append("field")
 
-def default_imports(output: str) -> str:
-    """Generate the default imports for the given package output."""
-    result = []
+        if dataclasses:
+            result.append(f"from dataclasses import {', '.join(dataclasses)}")
 
-    dataclasses = []
-    if "@dataclass" in output:
-        dataclasses.append("dataclass")
-    if "field(" in output:
-        dataclasses.append("field")
+        if cls.type_is_included(output, "Decimal"):
+            result.append("from decimal import Decimal")
 
-    if dataclasses:
-        result.append(f"from dataclasses import {', '.join(dataclasses)}")
+        if "(Enum)" in output:
+            result.append("from enum import Enum")
 
-    if type_is_included(output, "Decimal"):
-        result.append("from decimal import Decimal")
+        typing_patterns = {
+            "Dict": [": Dict"],
+            "List": [": List["],
+            "Optional": ["Optional["],
+            "Union": ["Union["],
+        }
 
-    if "(Enum)" in output:
-        result.append("from enum import Enum")
-
-    typing_patterns = {
-        "Dict": [": Dict"],
-        "List": [": List["],
-        "Optional": ["Optional["],
-        "Union": ["Union["],
-    }
-
-    types = [
-        name
-        for name, patterns in typing_patterns.items()
-        if any(pattern in output for pattern in patterns)
-    ]
-    if types:
-        result.append(f"from typing import {', '.join(types)}")
-
-    if type_is_included(output, "QName"):
-        result.append("from xml.etree.ElementTree import QName")
-
-    return "\n".join(result)
-
-
-def type_is_included(output: str, type_name: str) -> bool:
-    return (
-        f": {type_name}" in output
-        or f"[{type_name}" in output
-        or f", {type_name}" in output
-        or f"= {type_name}" in output
-    )
-
-
-def attribute_default(attr: Attr, ns_map: Optional[Dict] = None) -> Any:
-    """Generate the field default value/factory for the given attribute."""
-    if attr.is_list or (attr.is_tokens and not attr.default):
-        return "list"
-    if attr.is_dict:
-        return "dict"
-    if not isinstance(attr.default, str):
-        return attr.default
-    if attr.default.startswith("@enum@"):
-        return attribute_default_enum(attr)
-
-    types = converter.sort_types(
-        list({attr_type.native_type for attr_type in attr.types if attr_type.native})
-    )
-
-    if attr.is_tokens:
-        return attribute_default_tokens(attr, types)
-
-    return prepare_attribute_default(
-        converter.from_string(attr.default, types, ns_map=ns_map)
-    )
-
-
-def attribute_default_enum(attr: Attr) -> str:
-    source, enumeration = attr.default[6:].split("::", 1)
-    source = next(x.alias or source for x in attr.types if x.name == source)
-    return f"{class_name(source)}.{constant_name(enumeration)}"
-
-
-def attribute_default_tokens(attr: Attr, types: List[Type]) -> str:
-    assert isinstance(attr.default, str)
-
-    tokens = ", ".join(
-        [
-            str(prepare_attribute_default(converter.from_string(val, types)))
-            for val in attr.default.split()
+        types = [
+            name
+            for name, patterns in typing_patterns.items()
+            if any(pattern in output for pattern in patterns)
         ]
-    )
-    return f"lambda: [{tokens}]"
+        if types:
+            result.append(f"from typing import {', '.join(types)}")
 
+        if cls.type_is_included(output, "QName"):
+            result.append("from xml.etree.ElementTree import QName")
 
-def prepare_attribute_default(value: Any) -> Any:
-    if isinstance(value, str):
-        return quoteattr(value)
+        return "\n".join(result)
 
-    if isinstance(value, float):
-        return f"float('{value}')" if math.isinf(value) else value
+    @classmethod
+    def format_arguments(cls, data: Dict) -> str:
+        """Format given dictionary as keyword arguments."""
 
-    if isinstance(value, Decimal):
-        return repr(value)
+        def prep(key: str, value: Any) -> str:
+            if isinstance(value, str):
+                value = f'''"{value.replace('"', "'")}"'''
+                if key == "pattern":
+                    value = f"r{value}"
+            return f"{key}={value}"
 
-    if isinstance(value, QName):
-        return f'QName("{value.text}")'
+        return ",\n".join(prep(key, value) for key, value in data.items())
 
-    return value
+    @classmethod
+    def from_config(cls, config: GeneratorConfig) -> "Filters":
+        def index_aliases(aliases: List[GeneratorAlias]) -> Dict:
+            return {alias.source: alias.target for alias in aliases}
 
-
-def attribute_type(attr: Attr, parents: List[str]) -> str:
-    """Generate type hints for the given attribute."""
-
-    type_names = unique_sequence(attribute_type_name(x, parents) for x in attr.types)
-
-    result = ", ".join(type_names)
-    if len(type_names) > 1:
-        result = f"Union[{result}]"
-
-    if attr.is_tokens:
-        result = f"List[{result}]"
-
-    if attr.is_list:
-        result = f"List[{result}]"
-    elif attr.is_dict:
-        result = "Dict"
-    elif attr.default is None and not attr.is_factory:
-        result = f"Optional[{result}]"
-
-    return result
-
-
-def attribute_type_name(attr_type: AttrType, parents: List[str]) -> str:
-    name = class_name(attr_type.alias) if attr_type.alias else type_name(attr_type)
-
-    if attr_type.forward and attr_type.circular:
-        outer_str = ".".join(map(class_name, parents))
-        name = f'"{outer_str}"'
-    elif attr_type.forward:
-        outer_str = ".".join(map(class_name, parents))
-        name = f'"{outer_str}.{name}"'
-    elif attr_type.circular:
-        name = f'"{name}"'
-
-    return name
-
-
-def constant_value(attr: Attr) -> str:
-    """Return the attr default value or type as constant value."""
-    attr_type = attr.types[0]
-    if attr_type.native:
-        return f'"{attr.default}"'
-
-    if attr_type.alias:
-        return class_name(attr_type.alias)
-
-    return type_name(attr_type)
-
-
-filters = {
-    "attribute_name": attribute_name,
-    "attribute_default": attribute_default,
-    "attribute_metadata": attribute_metadata,
-    "attribute_type": attribute_type,
-    "class_name": class_name,
-    "class_docstring": class_docstring,
-    "constant_name": constant_name,
-    "constant_value": constant_value,
-    "default_imports": default_imports,
-    "format_arguments": format_arguments,
-    "type_name": type_name,
-}
+        return cls(
+            class_aliases=index_aliases(config.aliases.class_name),
+            field_aliases=index_aliases(config.aliases.field_name),
+            package_aliases=index_aliases(config.aliases.package_name),
+            module_aliases=index_aliases(config.aliases.module_name),
+            class_case=config.conventions.class_name.case.func,
+            field_case=config.conventions.field_name.case.func,
+            package_case=config.conventions.package_name.case.func,
+            module_case=config.conventions.module_name.case.func,
+            class_safe_prefix=config.conventions.class_name.safe_prefix,
+            field_safe_prefix=config.conventions.field_name.safe_prefix,
+            package_safe_prefix=config.conventions.package_name.safe_prefix,
+            module_safe_prefix=config.conventions.module_name.safe_prefix,
+        )

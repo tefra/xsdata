@@ -1,5 +1,4 @@
 from typing import List
-from typing import Optional
 from typing import Tuple
 
 
@@ -31,62 +30,69 @@ def capitalize(string: str) -> str:
 
 def pascal_case(string: str) -> str:
     """Convert the given string to pascal case."""
-    return "".join([capitalize(part) for part in snake_case(string).split("_") if part])
+    return "".join(map(str.title, split_words(string)))
+
+
+def camel_case(string: str) -> str:
+    """Convert the given string to camel case."""
+    result = "".join(map(str.title, split_words(string)))
+    return result[0].lower() + result[1:]
+
+
+def mixed_case(string: str) -> str:
+    """Convert the given string to mixed case."""
+    return capitalize("".join(split_words(string)))
 
 
 def snake_case(string: str) -> str:
     """Convert the given string to snake case."""
-    result: List[str] = []
-    was_upper = False
+    return "_".join(map(str.lower, split_words(string)))
+
+
+def split_words(string: str) -> List[str]:
+    """Split a string on new capital letters and not alphanumeric
+    characters."""
+    words: List[str] = []
+    buffer: List[str] = []
+    previous = None
+
+    def flush():
+        if buffer:
+            words.append("".join(buffer))
+            buffer.clear()
+
     for char in string:
-
-        if char.isalnum():
-            if char.isupper():
-                if not was_upper and result and result[-1] != "_":
-                    result.append("_")
-                was_upper = True
-            else:
-                was_upper = False
-            result.append(char.lower())
+        tp = classify(char)
+        if tp == StringType.OTHER:
+            flush()
+        elif not previous or tp == previous:
+            buffer.append(char)
+        elif tp == StringType.UPPER and previous != StringType.UPPER:
+            flush()
+            buffer.append(char)
         else:
-            was_upper = False
-            if result and result[-1] != "_":
-                result.append("_")
-    return "".join(result).strip("_")
+            buffer.append(char)
+
+        previous = tp
+
+    flush()
+    return words
 
 
-def clean_uri(namespace: str) -> str:
-    """Remove common prefixes and suffixes from a uri string."""
-    if namespace[:2] == "##":
-        namespace = namespace[2:]
-
-    left, right = split(namespace)
-
-    if left == "urn":
-        namespace = right
-    elif left in ("http", "https"):
-        namespace = right[2:]
-
-    return "_".join(
-        [part for part in namespace.split(".") if part not in ("www", "xsd", "wsdl")]
-    )
+class StringType:
+    UPPER = 1
+    LOWER = 2
+    NUMERIC = 3
+    OTHER = 4
 
 
-def qname(tag_or_uri: Optional[str], tag: Optional[str] = None) -> str:
-    """Create namespace qualified strings."""
+def classify(character: str) -> int:
+    """String classifier."""
+    if character.isupper():
+        return StringType.UPPER
+    if character.islower():
+        return StringType.LOWER
+    if character.isnumeric():
+        return StringType.NUMERIC
 
-    if not tag_or_uri:
-        if not tag:
-            raise ValueError("Invalid input both uri and tag are empty.")
-
-        return tag
-
-    return f"{{{tag_or_uri}}}{tag}" if tag else tag_or_uri
-
-
-def split_qname(tag: str) -> Tuple:
-    """Split namespace qualified strings."""
-    if tag[0] == "{":
-        return tuple(tag[1:].split("}", 1))
-    else:
-        return None, tag
+    return StringType.OTHER

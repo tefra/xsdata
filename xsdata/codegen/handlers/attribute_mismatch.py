@@ -30,5 +30,5 @@ class AttributeMismatchHandler(HandlerInterface):
         """Drop non enum attributes from enum classes."""
 
         enumerations = [attr for attr in target.attrs if attr.is_enumeration]
-        if len(enumerations) > 0:
+        if enumerations:
             target.attrs = enumerations

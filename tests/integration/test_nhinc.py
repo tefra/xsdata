@@ -4,7 +4,7 @@ from pathlib import Path
 from click.testing import CliRunner
 
 from tests import root
-from xsdata import cli
+from xsdata.cli import cli
 
 os.chdir(root)
 

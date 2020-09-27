@@ -9,6 +9,7 @@ from xsdata.codegen.mappers.schema import SchemaMapper
 from xsdata.codegen.parsers import DefinitionsParser
 from xsdata.codegen.transformer import SchemaTransformer
 from xsdata.codegen.writer import CodeWriter
+from xsdata.models.config import GeneratorConfig
 from xsdata.models.enums import Namespace
 from xsdata.models.wsdl import Definitions
 from xsdata.models.wsdl import Types
@@ -20,9 +21,8 @@ from xsdata.models.xsd import Schema
 
 class SchemaTransformerTests(FactoryTestCase):
     def setUp(self):
-        self.transformer = SchemaTransformer(
-            print=True, output="pydata", ns_struct=False
-        )
+        config = GeneratorConfig()
+        self.transformer = SchemaTransformer(print=True, config=config)
         super().setUp()
 
     @mock.patch.object(SchemaTransformer, "process_classes")
@@ -38,41 +38,37 @@ class SchemaTransformerTests(FactoryTestCase):
     ):
 
         uri = "http://xsdata/services.xsd"
-        package = "package.foo"
         definitions = Definitions(types=Types(schemas=[Schema(), Schema()]))
 
         mock_parse_definitions.return_value = definitions
 
-        self.transformer.process_definitions(uri, package)
+        self.transformer.process_definitions(uri)
 
         mock_convert_schema.assert_has_calls(
             [mock.call(x) for x in definitions.schemas]
         )
         mock_parse_definitions.assert_called_once_with(uri, namespace=None)
         mock_convert_definitions.assert_called_once_with(definitions)
-        mock_process_classes.assert_called_once_with(package)
+        mock_process_classes.assert_called_once_with()
 
     @mock.patch.object(SchemaTransformer, "process_classes")
     @mock.patch.object(SchemaTransformer, "process_schema")
     def test_process_schemas(self, mock_process_schema, mock_process_classes):
-
         uris = ["http://xsdata/foo.xsd", "http://xsdata/bar.xsd"]
-        package = "package.foo"
 
-        self.transformer.process_schemas(uris, package)
+        self.transformer.process_schemas(uris)
+
         mock_process_schema.assert_has_calls([mock.call(uri) for uri in uris])
-        mock_process_classes.assert_called_once_with(package)
+        mock_process_classes.assert_called_once_with()
 
     @mock.patch("xsdata.codegen.transformer.logger.info")
     @mock.patch.object(CodeWriter, "print")
-    @mock.patch.object(CodeWriter, "designate")
     @mock.patch.object(SchemaTransformer, "analyze_classes")
     @mock.patch.object(SchemaTransformer, "assign_packages")
     def test_process_classes_with_print_true(
         self,
         mock_assign_packages,
         mock_analyze_classes,
-        mock_writer_designate,
         mock_writer_print,
         mock_logger_into,
     ):
@@ -86,14 +82,11 @@ class SchemaTransformerTests(FactoryTestCase):
             "http://xsdata/bar.xsd": schema_classes[1:],
         }
 
-        self.transformer.process_classes(package)
+        self.transformer.process_classes()
 
-        mock_assign_packages.assert_called_once_with(package)
+        mock_assign_packages.assert_called_once_with()
         mock_analyze_classes.assert_called_once_with(schema_classes)
-        mock_writer_designate.assert_called_once_with(
-            analyzer_classes, "pydata", package, self.transformer.ns_struct
-        )
-        mock_writer_print.assert_called_once_with(analyzer_classes, "pydata")
+        mock_writer_print.assert_called_once_with(analyzer_classes)
         mock_logger_into.assert_has_calls(
             [
                 mock.call("Analyzer input: %d main and %d inner classes", 3, 0),
@@ -103,14 +96,12 @@ class SchemaTransformerTests(FactoryTestCase):
 
     @mock.patch("xsdata.codegen.transformer.logger.info")
     @mock.patch.object(CodeWriter, "write")
-    @mock.patch.object(CodeWriter, "designate")
     @mock.patch.object(SchemaTransformer, "analyze_classes")
     @mock.patch.object(SchemaTransformer, "assign_packages")
     def test_process_classes_with_print_false(
         self,
         mock_assign_packages,
         mock_analyze_classes,
-        mock_writer_designate,
         mock_writer_write,
         mock_logger_into,
     ):
@@ -125,14 +116,11 @@ class SchemaTransformerTests(FactoryTestCase):
             "http://xsdata/bar.xsd": schema_classes[1:],
         }
 
-        self.transformer.process_classes(package)
+        self.transformer.process_classes()
 
-        mock_assign_packages.assert_called_once_with(package)
+        mock_assign_packages.assert_called_once_with()
         mock_analyze_classes.assert_called_once_with(schema_classes)
-        mock_writer_designate.assert_called_once_with(
-            analyzer_classes, "pydata", package, self.transformer.ns_struct
-        )
-        mock_writer_write.assert_called_once_with(analyzer_classes, "pydata")
+        mock_writer_write.assert_called_once_with(analyzer_classes)
         mock_logger_into.assert_has_calls(
             [
                 mock.call("Analyzer input: %d main and %d inner classes", 3, 0),
@@ -146,8 +134,7 @@ class SchemaTransformerTests(FactoryTestCase):
     def test_process_classes_with_zero_classes_after_analyze(
         self, mock_assign_packages, mock_analyze_classes, mock_logger_warning
     ):
-        package = "test"
-        self.transformer.process_classes(package)
+        self.transformer.process_classes()
         self.assertEqual(0, mock_analyze_classes.call_count)
         self.assertEqual(0, mock_assign_packages.call_count)
 
@@ -310,8 +297,9 @@ class SchemaTransformerTests(FactoryTestCase):
             local_two: ClassFactory.list(1),
         }
         self.transformer.class_map = class_map
+        self.transformer.config.output.package = "foo.bar"
 
-        self.transformer.assign_packages("foo.bar")
+        self.transformer.assign_packages()
 
         self.assertEqual("foo.bar.coreschemas", class_map[core][0].package)
         self.assertEqual("foo.bar.coreschemas", class_map[core][0].inner[0].package)

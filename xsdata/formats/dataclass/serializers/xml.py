@@ -21,7 +21,7 @@ from xsdata.formats.dataclass.serializers.mixins import XmlWriter
 from xsdata.formats.dataclass.serializers.writers import LxmlEventWriter
 from xsdata.models.enums import QNames
 from xsdata.utils import namespaces
-from xsdata.utils import text
+from xsdata.utils.namespaces import split_qname
 
 DEFAULT_NS_PREFIX = ""
 
@@ -89,7 +89,7 @@ class XmlSerializer(AbstractSerializer):
         meta = self.context.build(obj.__class__, namespace)
         qname = qname or meta.qname
         nillable = nillable or meta.nillable
-        namespace, tag = text.split_qname(qname)
+        namespace, tag = split_qname(qname)
 
         yield XmlWriter.START_TAG, qname
 
@@ -181,7 +181,7 @@ class XmlSerializer(AbstractSerializer):
     ) -> Generator:
         """Produce an element events stream for the given generic object."""
         if value.qname:
-            namespace, tag = text.split_qname(value.qname)
+            namespace, tag = split_qname(value.qname)
             yield XmlWriter.START_TAG, value.qname
 
         for key, val in value.attributes.items():

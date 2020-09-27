@@ -192,11 +192,7 @@ class ElementBase:
         the given condition if any."""
         for f in fields(self):
             value = getattr(self, f.name)
-            if (
-                isinstance(value, list)
-                and len(value) > 0
-                and isinstance(value[0], ElementBase)
-            ):
+            if isinstance(value, list) and value and isinstance(value[0], ElementBase):
                 yield from (val for val in value if not condition or condition(val))
             elif isinstance(value, ElementBase):
                 if not condition or condition(value):
@@ -216,25 +212,60 @@ class ModuleMixin:
         return name if extension in (".xsd", ".wsdl") else module
 
 
-def attribute(default: Any = None, init: bool = True, **kwargs: Any) -> Any:
+def attribute(optional: bool = True, **kwargs: Any) -> Any:
     """Shortcut method for attribute fields."""
-    kwargs.update(type=XmlType.ATTRIBUTE)
-    return field(init=init, default=default, metadata=kwargs)
+    metadata = extract_metadata(kwargs, type=XmlType.ATTRIBUTE)
+
+    if not has_default(kwargs) and optional:
+        kwargs["default"] = None
+
+    return field(metadata=metadata, **kwargs)
 
 
-def element(init: bool = True, **kwargs: Any) -> Any:
+def element(optional: bool = True, **kwargs: Any) -> Any:
     """Shortcut method for element fields."""
-    kwargs.update(type=XmlType.ELEMENT)
-    return field(init=init, default=None, metadata=kwargs)
+    metadata = extract_metadata(kwargs, type=XmlType.ELEMENT)
+
+    if not has_default(kwargs) and optional:
+        kwargs["default"] = None
+
+    return field(metadata=metadata, **kwargs)
 
 
-def array_element(init: bool = True, **kwargs: Any) -> Any:
+def array_element(**kwargs: Any) -> Any:
     """Shortcut method for list element fields."""
-    kwargs.update(type=XmlType.ELEMENT)
-    return field(init=init, default_factory=list, metadata=kwargs)
+    metadata = extract_metadata(kwargs, type=XmlType.ELEMENT)
+    return field(metadata=metadata, default_factory=list, **kwargs)
 
 
-def array_any_element(init: bool = True, **kwargs: Any) -> Any:
+def array_any_element(**kwargs: Any) -> Any:
     """Shortcut method for list wildcard fields."""
-    kwargs.update(type=XmlType.WILDCARD, namespace=NamespaceType.ANY)
-    return field(init=init, default_factory=list, metadata=kwargs)
+    metadata = extract_metadata(
+        kwargs, type=XmlType.WILDCARD, namespace=NamespaceType.ANY
+    )
+    return field(metadata=metadata, default_factory=list, **kwargs)
+
+
+def extract_metadata(params: Dict, **kwargs: Any) -> Dict:
+    """Extract not standard dataclass field parameters to a new metadata
+    dictionary and merge with any provided keyword arguments."""
+    metadata = {
+        key: params.pop(key) for key in list(params.keys()) if key not in FIELD_PARAMS
+    }
+    metadata.update(kwargs)
+    return metadata
+
+
+def has_default(params: Dict) -> bool:
+    """Chek if default value or factory exists in the given params."""
+    return "default" in params or "default_factory" in params
+
+
+FIELD_PARAMS = (
+    "default",
+    "default_factory",
+    "init",
+    "repr",
+    "hash",
+    "compare",
+)

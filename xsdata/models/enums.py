@@ -4,8 +4,6 @@ from pathlib import Path
 from typing import Optional
 from xml.etree.ElementTree import QName
 
-from xsdata.utils import text
-
 COMMON_SCHEMA_DIR = Path(__file__).absolute().parent.parent.joinpath("schemas/")
 
 
@@ -41,8 +39,8 @@ __STANDARD_NAMESPACES__ = {ns.uri: ns for ns in Namespace}
 class QNames:
     """Common qualified names."""
 
-    XSI_NIL = text.qname(Namespace.XSI.uri, "nil")
-    XSI_TYPE = text.qname(Namespace.XSI.uri, "type")
+    XSI_NIL = f"{{{Namespace.XSI.uri}}}nil"
+    XSI_TYPE = f"{{{Namespace.XSI.uri}}}type"
 
 
 class NamespaceType:
@@ -140,7 +138,7 @@ class DataType(Enum):
 
     @property
     def qname(self) -> str:
-        return text.qname(Namespace.XS.uri, self.code)
+        return f"{{{Namespace.XS.uri}}}{self.code}"
 
     @property
     def local_name(self) -> str:

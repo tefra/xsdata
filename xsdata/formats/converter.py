@@ -23,6 +23,7 @@ from xsdata.exceptions import ConverterError
 from xsdata.exceptions import ConverterWarning
 from xsdata.utils import text
 from xsdata.utils.namespaces import load_prefix
+from xsdata.utils.namespaces import split_qname
 
 
 class Converter(metaclass=abc.ABCMeta):
@@ -241,7 +242,7 @@ class QNameConverter(Converter):
         if ns_map is None:
             return value.text
 
-        namespace, tag = text.split_qname(value.text)
+        namespace, tag = split_qname(value.text)
 
         if not namespace:
             return tag

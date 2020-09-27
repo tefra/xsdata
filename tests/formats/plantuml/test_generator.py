@@ -3,16 +3,22 @@ from pathlib import Path
 from tests.factories import ClassFactory
 from tests.factories import FactoryTestCase
 from xsdata.formats.plantuml.generator import PlantUmlGenerator
+from xsdata.models.config import GeneratorConfig
 
 
 class PlantUmlGeneratorTests(FactoryTestCase):
+    def setUp(self):
+        super().setUp()
+        config = GeneratorConfig()
+        self.generator = PlantUmlGenerator(config)
+
     def test_render(self):
         classes = [
             ClassFactory.elements(2),
             ClassFactory.elements(3),
         ]
 
-        iterator = PlantUmlGenerator().render(classes)
+        iterator = self.generator.render(classes)
 
         actual = [(out.path, out.title, out.source) for out in iterator]
         self.assertEqual(1, len(actual))

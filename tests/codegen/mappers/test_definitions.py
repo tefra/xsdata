@@ -22,7 +22,7 @@ from xsdata.models.wsdl import PortTypeOperation
 from xsdata.models.wsdl import Service
 from xsdata.models.wsdl import ServicePort
 from xsdata.models.xsd import Element
-from xsdata.utils import text
+from xsdata.utils.namespaces import build_qname
 
 
 def mock_create_inner(target: Class, name: str):
@@ -169,7 +169,7 @@ class DefinitionsMapperTests(FactoryTestCase):
         second = ClassFactory.create(qname="some_name_second", meta_name="Envelope")
         other = ClassFactory.create()
         service = ClassFactory.create(
-            qname=text.qname("xsdata", "Calc_Add"),
+            qname=build_qname("xsdata", "Calc_Add"),
             status=Status.PROCESSED,
             type=BindingOperation,
             module="foo",
@@ -344,7 +344,7 @@ class DefinitionsMapperTests(FactoryTestCase):
         )
 
         expected = Class(
-            qname=text.qname("bar", name),
+            qname=build_qname("bar", name),
             meta_name="Envelope",
             type=BindingMessage,
             module="foo",
@@ -420,7 +420,7 @@ class DefinitionsMapperTests(FactoryTestCase):
         )
 
         expected = Class(
-            qname=text.qname("bar", name),
+            qname=build_qname("bar", name),
             meta_name="Envelope",
             type=BindingMessage,
             module="foo",
@@ -669,13 +669,13 @@ class DefinitionsMapperTests(FactoryTestCase):
         result = DefinitionsMapper.build_parts_attributes(parts, ns_map)
         expected = [
             DefinitionsMapper.build_attr(
-                "bar", text.qname("great", "bar"), namespace="great", native=False
+                "bar", build_qname("great", "bar"), namespace="great", native=False
             ),
             DefinitionsMapper.build_attr(
                 "arg0", DataType.STRING.qname, namespace="", native=True
             ),
             DefinitionsMapper.build_attr(
-                "arg1", text.qname("boo", "cafe"), namespace="", native=False
+                "arg1", build_qname("boo", "cafe"), namespace="", native=False
             ),
         ]
         self.assertIsInstance(result, Generator)
@@ -695,7 +695,7 @@ class DefinitionsMapperTests(FactoryTestCase):
         mock_create_message_attributes.return_value = attrs
         actual = DefinitionsMapper.build_message_class(definitions, port_type_message)
         expected = Class(
-            qname=text.qname("xsdata", "bar"),
+            qname=build_qname("xsdata", "bar"),
             status=Status.PROCESSED,
             type=Element,
             module="foo",
@@ -736,7 +736,7 @@ class DefinitionsMapperTests(FactoryTestCase):
             port_type_message, target_namespace
         )
         expected = DefinitionsMapper.build_attr(
-            "bar", qname=text.qname("foobar", "bar"), namespace=target_namespace
+            "bar", qname=build_qname("foobar", "bar"), namespace=target_namespace
         )
 
         self.assertIsInstance(actual, Generator)

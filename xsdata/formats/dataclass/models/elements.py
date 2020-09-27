@@ -8,9 +8,8 @@ from typing import List
 from typing import Optional
 from typing import Type
 
-from xsdata.models.enums import FormType
 from xsdata.models.enums import NamespaceType
-from xsdata.utils import text
+from xsdata.utils.namespaces import split_qname
 
 
 @dataclass(frozen=True)
@@ -97,7 +96,7 @@ class XmlVar:
     @property
     def local_name(self) -> str:
         """The element local name."""
-        return text.split_qname(self.qname)[1]
+        return split_qname(self.qname)[1]
 
     def matches(self, qname: str) -> bool:
         """
@@ -143,7 +142,7 @@ class XmlWildcard(XmlVar):
         if qname == "*":
             return True
 
-        namespace, tag = text.split_qname(qname)
+        namespace, tag = split_qname(qname)
         if not self.namespaces and namespace is None:
             return True
 
@@ -241,18 +240,8 @@ class XmlMeta:
     cache: Dict = field(default_factory=dict, init=False)
 
     @property
-    def element_form(self) -> FormType:
-        """Return element form: qualified/unqualified."""
-        return (
-            FormType.UNQUALIFIED
-            if not self.qname.startswith("{")
-            or any(var.is_element and not var.namespaces for var in self.vars)
-            else FormType.QUALIFIED
-        )
-
-    @property
     def namespace(self) -> Optional[str]:
-        return text.split_qname(self.qname)[0]
+        return split_qname(self.qname)[0]
 
     def find_var(
         self, qname: str = "*", mode: FindMode = FindMode.ALL

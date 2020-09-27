@@ -8,7 +8,7 @@ from tests.factories import FactoryTestCase
 from xsdata.models import wsdl
 from xsdata.models import xsd
 from xsdata.models.enums import Namespace
-from xsdata.utils import text
+from xsdata.utils.namespaces import build_qname
 
 
 class ClassTests(FactoryTestCase):
@@ -19,7 +19,7 @@ class ClassTests(FactoryTestCase):
                 AttrFactory.create(
                     types=[
                         AttrTypeFactory.create(
-                            qname=text.qname(Namespace.XS.uri, "annotated"),
+                            qname=build_qname(Namespace.XS.uri, "annotated"),
                             forward=True,
                         )
                     ]
@@ -27,10 +27,10 @@ class ClassTests(FactoryTestCase):
                 AttrFactory.create(
                     types=[
                         AttrTypeFactory.create(
-                            qname=text.qname(Namespace.XS.uri, "openAttrs")
+                            qname=build_qname(Namespace.XS.uri, "openAttrs")
                         ),
                         AttrTypeFactory.create(
-                            qname=text.qname(Namespace.XS.uri, "localAttribute")
+                            qname=build_qname(Namespace.XS.uri, "localAttribute")
                         ),
                     ]
                 ),
@@ -38,12 +38,12 @@ class ClassTests(FactoryTestCase):
             extensions=[
                 ExtensionFactory.create(
                     type=AttrTypeFactory.create(
-                        qname=text.qname(Namespace.XS.uri, "foobar")
+                        qname=build_qname(Namespace.XS.uri, "foobar")
                     )
                 ),
                 ExtensionFactory.create(
                     type=AttrTypeFactory.create(
-                        qname=text.qname(Namespace.XS.uri, "foobar")
+                        qname=build_qname(Namespace.XS.uri, "foobar")
                     )
                 ),
             ],
@@ -57,10 +57,10 @@ class ClassTests(FactoryTestCase):
         )
 
         expected = [
-            text.qname("{http://www.w3.org/2001/XMLSchema}openAttrs"),
-            text.qname("{http://www.w3.org/2001/XMLSchema}localAttribute"),
-            text.qname("{http://www.w3.org/2001/XMLSchema}foobar"),
-            text.qname("{xsdata}foo"),
+            "{http://www.w3.org/2001/XMLSchema}openAttrs",
+            "{http://www.w3.org/2001/XMLSchema}localAttribute",
+            "{http://www.w3.org/2001/XMLSchema}foobar",
+            "{xsdata}foo",
         ]
         self.assertEqual(expected, list(obj.dependencies()))
 

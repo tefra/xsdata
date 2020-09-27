@@ -7,7 +7,7 @@ from tests.factories import FactoryTestCase
 from xsdata.codegen.container import ClassContainer
 from xsdata.codegen.handlers import AttributeSubstitutionHandler
 from xsdata.codegen.models import AttrType
-from xsdata.utils import text
+from xsdata.utils.namespaces import build_qname
 
 
 class AttributeSubstitutionHandlerTests(FactoryTestCase):
@@ -72,10 +72,10 @@ class AttributeSubstitutionHandlerTests(FactoryTestCase):
         ns = "xsdata"
         classes = [
             ClassFactory.create(
-                substitutions=[text.qname(ns, "foo"), text.qname(ns, "bar")],
+                substitutions=[build_qname(ns, "foo"), build_qname(ns, "bar")],
                 abstract=True,
             ),
-            ClassFactory.create(substitutions=[text.qname(ns, "foo")], abstract=True),
+            ClassFactory.create(substitutions=[build_qname(ns, "foo")], abstract=True),
         ]
 
         reference_attrs = AttrFactory.list(3)
@@ -85,8 +85,8 @@ class AttributeSubstitutionHandlerTests(FactoryTestCase):
         self.processor.create_substitutions()
 
         expected = {
-            text.qname(ns, "foo"): [reference_attrs[0], reference_attrs[2]],
-            text.qname(ns, "bar"): [reference_attrs[1]],
+            build_qname(ns, "foo"): [reference_attrs[0], reference_attrs[2]],
+            build_qname(ns, "bar"): [reference_attrs[1]],
         }
         self.assertEqual(expected, self.processor.substitutions)
 
@@ -95,13 +95,13 @@ class AttributeSubstitutionHandlerTests(FactoryTestCase):
         )
 
     def test_create_substitution(self):
-        item = ClassFactory.elements(1, qname=text.qname("foo", "bar"))
+        item = ClassFactory.elements(1, qname=build_qname("foo", "bar"))
         actual = self.processor.create_substitution(item)
 
         expected = AttrFactory.create(
             name=item.name,
             default=None,
-            types=[AttrType(qname=text.qname("foo", "bar"))],
+            types=[AttrType(qname=build_qname("foo", "bar"))],
             tag=item.type.__name__,
         )
 

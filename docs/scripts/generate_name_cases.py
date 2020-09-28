@@ -18,6 +18,7 @@ output = [
     "      - Camel Case",
     "      - Snake Case",
     "      - Mixed Case",
+    "      - Mixed Snake Case",
 ]
 
 result = {}
@@ -34,6 +35,7 @@ while i < len(result[lookup]):
     output.append(f"      - {result['camel_case'][i][0]}")
     output.append(f"      - {result['snake_case'][i][0]}")
     output.append(f"      - {result['mixed_case'][i][0]}")
+    output.append(f"      - {result['mixed_snake_case'][i][0]}")
 
     i += 1
 

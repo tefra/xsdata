@@ -41,7 +41,12 @@ def camel_case(string: str) -> str:
 
 def mixed_case(string: str) -> str:
     """Convert the given string to mixed case."""
-    return capitalize("".join(split_words(string)))
+    return "".join(split_words(string))
+
+
+def mixed_snake_case(string: str) -> str:
+    """Convert the given string to mixed snake case."""
+    return "_".join(split_words(string))
 
 
 def snake_case(string: str) -> str:

@@ -34,12 +34,14 @@ class OutputStructure(Enum):
 
 
 class NameCase(Enum):
-    """Available naming schemes, pascal, snake, camel, mixed."""
+    """Available naming schemes, pascal, snake, camel, mixed and mixed
+    underscore."""
 
     PASCAL = "pascalCase"
     CAMEL = "camelCase"
     SNAKE = "snakeCase"
     MIXED = "mixedCase"
+    MIXED_SNAKE = "mixedSnakeCase"
 
     @property
     def func(self) -> Callable:
@@ -49,9 +51,10 @@ class NameCase(Enum):
 
 __name_case_func__ = {
     "pascalCase": text.pascal_case,
+    "camelCase": text.camel_case,
     "snakeCase": text.snake_case,
     "mixedCase": text.mixed_case,
-    "camelCase": text.camel_case,
+    "mixedSnakeCase": text.mixed_snake_case,
 }
 
 

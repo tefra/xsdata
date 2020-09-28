@@ -13,28 +13,38 @@
       - p00P
       - p00p
       - P00p
-    * - ADVType
-      - Advtype
-      - advtype
-      - advtype
-      - ADVType
-    * - AgentID
-      - AgentId
-      - agentId
-      - agent_id
-      - AgentID
-    * - OverridePCC
-      - OverridePcc
-      - overridePcc
-      - override_pcc
-      - OverridePCC
-    * - ENXP_explicit
-      - EnxpExplicit
-      - enxpExplicit
-      - enxp_explicit
-      - ENXPexplicit
-    * - TMessageDB
-      - TmessageDb
-      - tmessageDb
-      - tmessage_db
-      - TMessageDB
+    * - USERName
+      - Username
+      - username
+      - username
+      - USERName
+    * - UserNAME
+      - UserName
+      - userName
+      - user_name
+      - UserNAME
+    * - USER_name
+      - UserName
+      - userName
+      - user_name
+      - USERname
+    * - USER-NAME
+      - UserName
+      - userName
+      - user_name
+      - USERNAME
+    * - User_Name
+      - UserName
+      - userName
+      - user_name
+      - UserName
+    * - user_name
+      - UserName
+      - userName
+      - user_name
+      - Username
+    * - SUserNAME
+      - SuserName
+      - suserName
+      - suser_name
+      - SUserNAME

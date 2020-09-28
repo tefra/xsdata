@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from dataclasses import field
+from dataclasses import make_dataclass
 from typing import Any
 from typing import List
 from typing import Union
@@ -16,6 +17,7 @@ from xsdata.formats.dataclass.models.elements import XmlMeta
 from xsdata.formats.dataclass.models.elements import XmlText
 from xsdata.formats.dataclass.models.elements import XmlWildcard
 from xsdata.formats.dataclass.models.generics import AnyElement
+from xsdata.formats.dataclass.models.generics import DerivedElement
 from xsdata.formats.dataclass.parsers.config import ParserConfig
 from xsdata.formats.dataclass.parsers.mixins import XmlHandler
 from xsdata.formats.dataclass.parsers.nodes import ElementNode
@@ -25,6 +27,7 @@ from xsdata.formats.dataclass.parsers.nodes import SkipNode
 from xsdata.formats.dataclass.parsers.nodes import UnionNode
 from xsdata.formats.dataclass.parsers.nodes import WildcardNode
 from xsdata.formats.dataclass.parsers.utils import ParserUtils
+from xsdata.models.enums import QNames
 from xsdata.models.mixins import attribute
 from xsdata.models.mixins import element
 
@@ -125,6 +128,24 @@ class ElementNodeTests(TestCase):
             mock.ANY, node.meta, 0, objects
         )
         self.assertEqual(0, mock_bind_wildcard.call_count)
+
+    def test_bind_with_derived_element(self):
+        a = make_dataclass("A", fields=[])
+        node = ElementNode(
+            position=0,
+            meta=self.context.build(a),
+            context=self.context,
+            config=ParserConfig(),
+            attrs={},
+            ns_map={},
+            derived=True,
+        )
+
+        objects = []
+
+        self.assertTrue(node.bind("foo", None, None, objects))
+        self.assertEqual("foo", objects[-1][0])
+        self.assertEqual(DerivedElement("foo", a()), objects[-1][1])
 
     @mock.patch.object(ParserUtils, "bind_element_children")
     @mock.patch.object(ParserUtils, "bind_wildcard")
@@ -513,6 +534,31 @@ class NodeParserTests(TestCase):
         parser.start(queue, "book", {}, {}, objects, Books)
 
         self.assertEqual(2, len(queue))
+        self.assertEqual(expected_node, queue[-1])
+
+    def test_start_with_derived_class(self):
+        a = make_dataclass("a", fields=[])
+        b = make_dataclass("b", fields=[], bases=(a,))
+
+        parser = NodeParser()
+        queue = []
+        objects = []
+
+        attrs = {QNames.XSI_TYPE: "b"}
+        ns_map = {}
+        parser.start(queue, "a", attrs, ns_map, objects, a)
+
+        expected_node = ElementNode(
+            position=0,
+            context=parser.context,
+            meta=parser.context.build(b),
+            config=parser.config,
+            attrs=attrs,
+            ns_map={},
+            derived=True,
+        )
+
+        self.assertEqual(1, len(queue))
         self.assertEqual(expected_node, queue[-1])
 
     @mock.patch.object(PrimitiveNode, "bind", return_value=True)

@@ -19,6 +19,7 @@ from xsdata.formats.dataclass.models.elements import FindMode
 from xsdata.formats.dataclass.models.elements import XmlMeta
 from xsdata.formats.dataclass.models.elements import XmlVar
 from xsdata.formats.dataclass.models.generics import AnyElement
+from xsdata.formats.dataclass.models.generics import DerivedElement
 from xsdata.formats.dataclass.parsers.config import ParserConfig
 from xsdata.formats.dataclass.parsers.mixins import EventsHandler
 from xsdata.formats.dataclass.parsers.mixins import PushParser
@@ -43,6 +44,7 @@ class ElementNode(XmlNode):
     :param config: Parser configuration
     :param context: Model xml metadata builder
     :param position: The node position of objects cache
+    :param derived: The xml element is derived from a base type
     """
 
     meta: XmlMeta
@@ -52,6 +54,7 @@ class ElementNode(XmlNode):
     context: XmlContext
     position: int
     mixed: bool = False
+    derived: bool = False
 
     FIND_MODES_ORDERED: ClassVar[Iterable[FindMode]] = (
         FindMode.NOT_WILDCARD,
@@ -81,7 +84,11 @@ class ElementNode(XmlNode):
                 params, self.meta, text, tail, self.attrs, self.ns_map
             )
 
-        objects.append((qname, self.meta.clazz(**params)))
+        obj = self.meta.clazz(**params)
+        if self.derived:
+            obj = DerivedElement(qname=qname, value=obj)
+
+        objects.append((qname, obj))
 
         if not mixed_var and self.mixed and not wild_node:
             tail = ParserUtils.normalize_content(tail)
@@ -343,7 +350,7 @@ class NodeParser(PushParser):
         handler = self.handler(clazz=clazz, parser=self)
         result = handler.parse(source)
 
-        if isinstance(result, clazz):
+        if result is not None:
             return result
 
         raise ParserError(f"Failed to create target class `{clazz.__name__}`")
@@ -362,7 +369,10 @@ class NodeParser(PushParser):
             item = queue[-1]
             child = item.child(qname, attrs, ns_map, len(objects))
         except IndexError:
-            meta = self.context.build(clazz)
+            xsi_type = ParserUtils.parse_xsi_type(attrs, ns_map)
+            meta = self.context.fetch(clazz, xsi_type=xsi_type)
+            derived = xsi_type is not None and meta.qname != qname
+
             child = ElementNode(
                 position=0,
                 meta=meta,
@@ -370,6 +380,7 @@ class NodeParser(PushParser):
                 attrs=attrs,
                 ns_map=ns_map,
                 context=self.context,
+                derived=derived,
             )
 
         queue.append(child)

@@ -17,6 +17,7 @@ from xsdata.formats.dataclass.models.elements import XmlMeta
 from xsdata.formats.dataclass.models.elements import XmlVar
 from xsdata.formats.dataclass.models.elements import XmlWildcard
 from xsdata.formats.dataclass.models.generics import AnyElement
+from xsdata.formats.dataclass.models.generics import DerivedElement
 from xsdata.formats.dataclass.parsers.utils import ParserUtils
 from xsdata.models.enums import Namespace
 from xsdata.models.enums import QNames
@@ -122,6 +123,7 @@ class ParserUtilsTests(TestCase):
     def test_bind_mixed_content(self):
         generic = AnyElement(qname="foo")
         data_class = make_dataclass("A", fields=[])
+        derived = DerivedElement(qname="d", value=data_class)
         objects = [
             ("a", 1),
             ("b", None),
@@ -133,9 +135,8 @@ class ParserUtilsTests(TestCase):
         params = {}
         ParserUtils.bind_mixed_content(params, var, 1, objects)
 
-        expected = {var.name: [AnyElement(qname="b", text=""), data_class, generic]}
+        expected = {var.name: [AnyElement(qname="b", text=""), derived, generic]}
         self.assertEqual(expected, params)
-        self.assertEqual("d", data_class.qname)
 
     def test_fetch_any_children(self):
         objects = [(x, x) for x in "abc"]
@@ -363,5 +364,5 @@ class ParserUtilsTests(TestCase):
         self.assertEqual(AnyElement(qname="a", text="foo"), actual)
 
         fixture = Fixture("foo")
-        ParserUtils.prepare_generic_value("a", fixture)
-        self.assertEqual("a", fixture.qname)
+        actual = ParserUtils.prepare_generic_value("a", fixture)
+        self.assertEqual(DerivedElement(qname="a", value=fixture), actual)

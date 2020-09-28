@@ -18,7 +18,7 @@ class XmlVar:
     Dataclass field bind metadata.
 
     :param name: Field name.
-    :param qname: Namespace qualified local name.
+    :param qname: The namespace qualified local name.
     :param init:  Field is present in the constructor parameters.
     :param mixed:  Field supports mixed content.
     :param tokens: Use a list to map simple values.

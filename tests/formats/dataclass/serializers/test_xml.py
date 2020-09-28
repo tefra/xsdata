@@ -16,6 +16,7 @@ from xsdata.formats.dataclass.models.elements import XmlText
 from xsdata.formats.dataclass.models.elements import XmlVar
 from xsdata.formats.dataclass.models.elements import XmlWildcard
 from xsdata.formats.dataclass.models.generics import AnyElement
+from xsdata.formats.dataclass.models.generics import DerivedElement
 from xsdata.formats.dataclass.serializers import XmlSerializer
 from xsdata.formats.dataclass.serializers.mixins import XmlWriter
 from xsdata.models.enums import QNames
@@ -44,9 +45,24 @@ class XmlSerializerTests(TestCase):
     def setUp(self) -> None:
         self.serializer = XmlSerializer()
 
+    def test_write_object_with_derived_element(self):
+        book = BookForm(id="123")
+        obj = DerivedElement(qname="item", value=book)
+
+        result = self.serializer.write_object(obj)
+        expected = [
+            (XmlWriter.START_TAG, "item"),
+            (XmlWriter.ADD_ATTR, "id", "123"),
+            (XmlWriter.ADD_ATTR, "lang", "en"),
+            (XmlWriter.ADD_ATTR, QNames.XSI_TYPE, "{urn:books}BookForm"),
+            (XmlWriter.END_TAG, "item"),
+        ]
+        self.assertIsInstance(result, Generator)
+        self.assertEqual(expected, list(result))
+
     def test_write_dataclass(self):
         book = BookForm(id="123", title="Misterioso: A Crime Novel", price=19.5)
-        result = self.serializer.write_dataclass(book)
+        result = self.serializer.write_object(book)
         expected = [
             (XmlWriter.START_TAG, "BookForm"),
             (XmlWriter.ADD_ATTR, "id", "123"),
@@ -92,8 +108,7 @@ class XmlSerializerTests(TestCase):
     def test_write_mixed_content(self):
         var = XmlWildcard(qname="a", name="a", mixed=True)
         book = BookForm(id="123")
-        ebook = BookForm(id="123")
-        ebook.qname = "ebook"
+        ebook = DerivedElement("ebook", BookForm(id="123"))
         value = ["text", AnyElement(qname="br"), book, ebook, "tail"]
         result = self.serializer.write_value(value, var, "xsdata")
         expected = [

@@ -17,6 +17,7 @@ from xsdata.formats.dataclass.context import XmlContext
 from xsdata.formats.dataclass.models.elements import XmlMeta
 from xsdata.formats.dataclass.models.elements import XmlVar
 from xsdata.formats.dataclass.models.generics import AnyElement
+from xsdata.formats.dataclass.models.generics import DerivedElement
 from xsdata.formats.dataclass.serializers.mixins import XmlWriter
 from xsdata.formats.dataclass.serializers.writers import LxmlEventWriter
 from xsdata.models.enums import QNames
@@ -62,7 +63,7 @@ class XmlSerializer(AbstractSerializer):
 
         Optionally provide a prefix-URI namespaces mapping.
         """
-        events = self.write_dataclass(obj)
+        events = self.write_object(obj)
         handler = self.writer(
             output=out,
             ns_map=namespaces.clean_prefixes(ns_map) if ns_map else {},
@@ -70,6 +71,17 @@ class XmlSerializer(AbstractSerializer):
             pretty_print=self.pretty_print,
         )
         handler.write(events)
+
+    def write_object(self, obj: Any):
+        """Produce an events stream from a dataclass or a derived element."""
+        qname = xsi_type = None
+        if isinstance(obj, DerivedElement):
+            meta = self.context.build(obj.value.__class__)
+            xsi_type = QName(meta.source_qname)
+            qname = obj.qname
+            obj = obj.value
+
+        yield from self.write_dataclass(obj, qname=qname, xsi_type=xsi_type)
 
     def write_dataclass(
         self,
@@ -172,9 +184,10 @@ class XmlSerializer(AbstractSerializer):
                 yield from self.write_data(value, var, namespace)
         elif isinstance(value, AnyElement):
             yield from self.write_wildcard(value, var, namespace)
+        elif isinstance(value, DerivedElement):
+            yield from self.write_dataclass(value.value, namespace, qname=value.qname)
         else:
-            qname = getattr(value, "qname", None)
-            yield from self.write_dataclass(value, namespace, qname)
+            yield from self.write_dataclass(value, namespace)
 
     def write_wildcard(
         self, value: AnyElement, var: XmlVar, namespace: NoneStr

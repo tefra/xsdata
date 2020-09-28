@@ -472,7 +472,7 @@ class FiltersTests(FactoryTestCase):
 
         self.assertEqual("cAb", filters.class_name("cAB"))
         self.assertEqual("CAb", filters.field_name("cAB"))
-        self.assertEqual("CAB", filters.package_name("cAB"))
+        self.assertEqual("cAB", filters.package_name("cAB"))
         self.assertEqual("c_ab", filters.module_name("cAB"))
 
         self.assertEqual({"a": "b", "c": "d"}, filters.class_aliases)

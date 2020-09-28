@@ -131,8 +131,9 @@ non alphanumerical characters or when an upper case letter follows a lower case 
 
 .. hint::
 
-    The mixed case is joining the words without changing the original upper/lower case,
-    except the first letter which is capitalized.
+    The mixed case is joining the words without changing the original upper/lower case
+
+    The mixed underscore case is joining the words with an underscore.
 
     The pascal/camel cases are using python's :func:`str.title` method!
 

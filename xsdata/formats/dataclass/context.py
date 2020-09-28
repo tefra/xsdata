@@ -236,6 +236,10 @@ class XmlContext:
     def is_derived(cls, obj: Any, clazz: Type) -> bool:
         """Return whether the given obj is derived from the given dataclass
         type."""
+
+        if obj is None:
+            return False
+
         if isinstance(obj, clazz):
             return True
 

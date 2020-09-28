@@ -1276,6 +1276,7 @@ class Schema(SchemaLocation, ModuleMixin):
     """
 
     class Meta:
+        name = "schema"
         namespace = Namespace.XS.uri
 
     target: Optional[str] = attribute()

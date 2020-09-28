@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from dataclasses import field
+from typing import Any
 from typing import Dict
 from typing import List
 from typing import Optional
@@ -30,3 +31,16 @@ class AnyElement:
     attributes: Dict = field(
         default_factory=dict, metadata={"type": XmlType.ATTRIBUTES}
     )
+
+
+@dataclass
+class DerivedElement:
+    """
+    Derived element wrapper for base types, eg. <b xsi:type="a">...</b>
+
+    :param qname: The namespace qualified name of the base type.
+    :param value: A dataclass instance
+    """
+
+    qname: str
+    value: Any

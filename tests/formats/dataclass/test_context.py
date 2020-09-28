@@ -371,6 +371,7 @@ class XmlContextTests(TestCase):
         self.assertTrue(self.ctx.is_derived(a(), c))
         self.assertTrue(self.ctx.is_derived(a(), a))
         self.assertFalse(self.ctx.is_derived(a(), d))
+        self.assertFalse(self.ctx.is_derived(None, d))
 
     def test_is_element_list(self):
         @dataclass

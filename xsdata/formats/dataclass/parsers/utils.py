@@ -11,6 +11,7 @@ from xsdata.formats.dataclass.models.elements import FindMode
 from xsdata.formats.dataclass.models.elements import XmlMeta
 from xsdata.formats.dataclass.models.elements import XmlVar
 from xsdata.formats.dataclass.models.generics import AnyElement
+from xsdata.formats.dataclass.models.generics import DerivedElement
 from xsdata.logger import logger
 from xsdata.models.enums import QNames
 from xsdata.utils import text
@@ -133,7 +134,7 @@ class ParserUtils:
         if not is_dataclass(value):
             value = AnyElement(qname=qname, text=value)
         elif not isinstance(value, AnyElement):
-            value.qname = qname  # Deprecate this hack!
+            value = DerivedElement(qname=qname, value=value)
 
         return value
 

@@ -1,6 +1,7 @@
 from typing import Iterator
 from unittest import TestCase
 
+from xsdata.models.enums import Namespace
 from xsdata.models.xsd import Import
 from xsdata.models.xsd import Include
 from xsdata.models.xsd import Override
@@ -9,6 +10,11 @@ from xsdata.models.xsd import Schema
 
 
 class SchemaTests(TestCase):
+    def test_meta(self):
+        schema = Schema()
+        self.assertEqual("schema", schema.Meta.name)
+        self.assertEqual(Namespace.XS.uri, schema.Meta.namespace)
+
     def test_sub_schemas(self):
         imports = [
             Import(schema_location="../foo.xsd"),

@@ -14,14 +14,14 @@ from xsdata.exceptions import AnalyzerValueError
 class ClassAnalyzerTests(FactoryTestCase):
     @mock.patch.object(ClassAnalyzer, "validate_references")
     @mock.patch.object(ClassSanitizer, "process")
-    @mock.patch.object(ClassContainer, "filter_primary_classes")
+    @mock.patch.object(ClassContainer, "filter_classes")
     @mock.patch.object(ClassContainer, "process")
     @mock.patch.object(ClassValidator, "process")
     def test_process(
         self,
         mock_validator_process,
         mock_container_process,
-        mock_container_filter_primary_classes,
+        mock_container_filter_classes,
         mock_sanitizer_process,
         mock_validate_references,
     ):
@@ -34,7 +34,7 @@ class ClassAnalyzerTests(FactoryTestCase):
 
         mock_validator_process.assert_called_once_with(container)
         mock_container_process.assert_called_once_with()
-        mock_container_filter_primary_classes.assert_called_once_with()
+        mock_container_filter_classes.assert_called_once_with()
         mock_sanitizer_process.assert_called_once_with(container)
         mock_validate_references.assert_called_once_with(classes)
 

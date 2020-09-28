@@ -3,7 +3,6 @@ from pathlib import Path
 from typing import TypeVar
 
 from lxml import etree
-from lxml.etree import XMLSyntaxError
 
 from xsdata.formats.dataclass import utils
 from xsdata.utils import text
@@ -30,10 +29,8 @@ def load_class(output: str, clazz_name: str) -> T:
 def read_root_name(path: Path) -> str:
     try:
         recovering_parser = etree.XMLParser(recover=True)
-        tree = etree.parse(str(path), parser=recovering_parser)
+        tree = etree.parse(str(path), parser=recovering_parser)  # nosec
         _, local_name = split_qname(tree.getroot().tag)
         return text.pascal_case(utils.safe_snake(local_name, "Type"))
-    except XMLSyntaxError:
-        return ""
-    except OSError:
+    except Exception:
         return ""

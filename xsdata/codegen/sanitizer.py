@@ -13,6 +13,7 @@ from xsdata.utils import collections
 from xsdata.utils.collections import group_by
 from xsdata.utils.namespaces import build_qname
 from xsdata.utils.namespaces import clean_uri
+from xsdata.utils.namespaces import split_qname
 
 
 @dataclass
@@ -29,6 +30,8 @@ class ClassSanitizer:
         sanitizer = cls(container)
 
         collections.apply(container.iterate(), sanitizer.process_class)
+
+        sanitizer.resolve_conflicts()
 
     def process_class(self, target: Class):
         """
@@ -135,6 +138,67 @@ class ClassSanitizer:
         inner.qname = build_qname(inner.target_namespace, name)
 
         self.container.add(inner)
+
+    def resolve_conflicts(self):
+        """Find classes with the same case insensitive qualified name and
+        rename them."""
+        groups = group_by(self.container.iterate(), lambda x: x.qname.lower())
+        for classes in groups.values():
+            if len(classes) > 1:
+                self.rename_classes(classes)
+
+    def rename_classes(self, classes: List[Class]):
+        """
+        Rename all the classes in the list.
+
+        Protect classes derived from xs:element if there is only one in
+        the list.
+        """
+        total_elements = sum(x.is_element for x in classes)
+        for target in classes:
+            if not target.is_element or total_elements > 1:
+                self.rename_class(target)
+
+    def rename_class(self, target: Class):
+        """Find the next available class identifier, save the original name in
+        the class metadata and update the class qualified name and all classes
+        that depend on the target class."""
+
+        qname = target.qname
+        namespace, name = split_qname(target.qname)
+        target.qname = self.next_qname(namespace, name)
+        target.meta_name = name
+        self.container.reset(target, qname)
+
+        for item in self.container.iterate():
+            self.rename_dependency(item, qname, target.qname)
+
+    def next_qname(self, namespace: str, name: str) -> str:
+        """Append the next available index number for the given namespace and
+        local name."""
+        index = 0
+        reserved = map(str.lower, self.container.keys())
+        while True:
+            index += 1
+            qname = build_qname(namespace, f"{name}_{index}")
+            if qname.lower() not in reserved:
+                return qname
+
+    def rename_dependency(self, target: Class, search: str, replace: str):
+        """Search and replace the old qualified attribute type name with the
+        new one if it exists in the target class attributes, extensions and
+        inner classes."""
+        for attr in target.attrs:
+            for attr_type in attr.types:
+                if attr_type.qname == search:
+                    attr_type.qname = replace
+
+        for ext in target.extensions:
+            if ext.type.qname == search:
+                ext.type.qname = replace
+
+        for inner in target.inner:
+            self.rename_dependency(inner, search, replace)
 
     @classmethod
     def process_attribute_restrictions(cls, attr: Attr):

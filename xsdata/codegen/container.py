@@ -106,6 +106,10 @@ class ClassContainer(UserDict, ContainerInterface):
         """Add class item to the container."""
         self.data.setdefault(item.qname, []).append(item)
 
+    def reset(self, item: Class, qname: str):
+        self.data[qname].remove(item)
+        self.add(item)
+
     def extend(self, items: List[Class]):
         """Add a list of classes the container."""
         collections.apply(items, self.add)

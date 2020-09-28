@@ -3,6 +3,7 @@ from unittest import mock
 from tests.factories import AttrFactory
 from tests.factories import AttrTypeFactory
 from tests.factories import ClassFactory
+from tests.factories import ExtensionFactory
 from tests.factories import FactoryTestCase
 from xsdata.codegen.container import ClassContainer
 from xsdata.codegen.models import Class
@@ -10,6 +11,8 @@ from xsdata.codegen.models import Restrictions
 from xsdata.codegen.sanitizer import ClassSanitizer
 from xsdata.models.enums import Namespace
 from xsdata.models.enums import Tag
+from xsdata.models.xsd import ComplexType
+from xsdata.models.xsd import Element
 
 
 class ClassSanitizerTest(FactoryTestCase):
@@ -19,14 +22,16 @@ class ClassSanitizerTest(FactoryTestCase):
         self.container = ClassContainer()
         self.sanitizer = ClassSanitizer(container=self.container)
 
+    @mock.patch.object(ClassSanitizer, "resolve_conflicts")
     @mock.patch.object(ClassSanitizer, "process_class")
-    def test_process(self, mock_process_class):
+    def test_process(self, mock_process_class, mock_resolve_conflicts):
         classes = ClassFactory.list(2)
 
         self.sanitizer.container.extend(classes)
         ClassSanitizer.process(self.container)
 
         mock_process_class.assert_has_calls(list(map(mock.call, classes)))
+        mock_resolve_conflicts.assert_called_once_with()
 
     @mock.patch.object(ClassSanitizer, "process_duplicate_attribute_names")
     @mock.patch.object(ClassSanitizer, "process_attribute_sequence")
@@ -339,3 +344,99 @@ class ClassSanitizerTest(FactoryTestCase):
                 target, condition=lambda x: x.name == "a" and x.is_enumeration
             )
         )
+
+    @mock.patch.object(ClassSanitizer, "rename_classes")
+    def test_resolve_conflicts(self, mock_rename_classes):
+        classes = [
+            ClassFactory.create(qname="{foo}A"),
+            ClassFactory.create(qname="{foo}a"),
+            ClassFactory.create(qname="a"),
+            ClassFactory.create(qname="b"),
+            ClassFactory.create(qname="b"),
+        ]
+        self.sanitizer.container.extend(classes)
+        self.sanitizer.resolve_conflicts()
+
+        mock_rename_classes.assert_has_calls(
+            [
+                mock.call(classes[:2]),
+                mock.call(classes[3:]),
+            ]
+        )
+
+    @mock.patch.object(ClassSanitizer, "rename_class")
+    def test_rename_classes(self, mock_rename_class):
+        classes = [
+            ClassFactory.create(qname="a", type=Element),
+            ClassFactory.create(qname="A", type=Element),
+            ClassFactory.create(qname="a", type=ComplexType),
+        ]
+        self.sanitizer.rename_classes(classes)
+
+        mock_rename_class.assert_has_calls(
+            [
+                mock.call(classes[0]),
+                mock.call(classes[1]),
+                mock.call(classes[2]),
+            ]
+        )
+
+    @mock.patch.object(ClassSanitizer, "rename_class")
+    def test_rename_classes_protects_single_element(self, mock_rename_class):
+        classes = [
+            ClassFactory.create(qname="a", type=Element),
+            ClassFactory.create(qname="a", type=ComplexType),
+        ]
+        self.sanitizer.rename_classes(classes)
+
+        mock_rename_class.assert_called_once_with(classes[1])
+
+    @mock.patch.object(ClassSanitizer, "rename_dependency")
+    def test_rename_class(self, mock_rename_dependency):
+        target = ClassFactory.create(qname="{foo}a")
+        self.sanitizer.container.add(target)
+        self.sanitizer.container.add(ClassFactory.create())
+        self.sanitizer.container.add(ClassFactory.create(qname="{foo}a_1"))
+        self.sanitizer.container.add(ClassFactory.create(qname="{foo}A_2"))
+        self.sanitizer.rename_class(target)
+
+        self.assertEqual("{foo}a_3", target.qname)
+        self.assertEqual("a", target.meta_name)
+
+        mock_rename_dependency.assert_has_calls(
+            mock.call(item, "{foo}a", "{foo}a_3")
+            for item in self.sanitizer.container.iterate()
+        )
+
+        self.assertEqual([target], self.container.data["{foo}a_3"])
+        self.assertEqual([], self.container.data["{foo}a"])
+
+    def test_rename_dependency(self):
+        attr_type = AttrTypeFactory.create("{foo}bar")
+
+        target = ClassFactory.create(
+            extensions=[
+                ExtensionFactory.create(),
+                ExtensionFactory.create(type=attr_type.clone()),
+            ],
+            attrs=[
+                AttrFactory.create(),
+                AttrFactory.create(types=[AttrTypeFactory.create(), attr_type.clone()]),
+            ],
+            inner=[
+                ClassFactory.create(
+                    extensions=[ExtensionFactory.create(type=attr_type.clone())],
+                    attrs=[
+                        AttrFactory.create(),
+                        AttrFactory.create(
+                            types=[AttrTypeFactory.create(), attr_type.clone()]
+                        ),
+                    ],
+                )
+            ],
+        )
+
+        self.sanitizer.rename_dependency(target, "{foo}bar", "thug")
+        dependencies = set(target.dependencies())
+        self.assertNotIn("{foo}bar", dependencies)
+        self.assertIn("thug", dependencies)

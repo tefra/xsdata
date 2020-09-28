@@ -46,6 +46,10 @@ class ClassContainer(UserDict, ContainerInterface):
             AttributeMismatchHandler(),
         ]
 
+    @property
+    def class_list(self) -> List[Class]:
+        return list(self.iterate())
+
     @classmethod
     def from_list(cls, items: List[Class]) -> "ClassContainer":
         """Static constructor from a list of classes."""
@@ -89,9 +93,22 @@ class ClassContainer(UserDict, ContainerInterface):
 
         target.status = Status.PROCESSED
 
+    def filter_classes(self):
+        """If there is any class derived from complexType or element then
+        filter classes that should be generated, otherwise leave the container
+        as it is."""
+
+        if any(item.is_complex for item in self.iterate()):
+            candidates = filter(lambda x: x.should_generate, self.iterate())
+            self.data = group_by(candidates, attrgetter("qname"))
+
     def add(self, item: Class):
         """Add class item to the container."""
         self.data.setdefault(item.qname, []).append(item)
+
+    def reset(self, item: Class, qname: str):
+        self.data[qname].remove(item)
+        self.add(item)
 
     def extend(self, items: List[Class]):
         """Add a list of classes the container."""

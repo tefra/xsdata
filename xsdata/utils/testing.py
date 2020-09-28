@@ -2,11 +2,9 @@ import importlib
 from pathlib import Path
 from typing import TypeVar
 
-from lxml.etree import iterparse
-from lxml.etree import XMLSyntaxError
+from lxml import etree
 
 from xsdata.formats.dataclass import utils
-from xsdata.models.enums import EventType
 from xsdata.utils import text
 from xsdata.utils.namespaces import split_qname
 
@@ -30,11 +28,9 @@ def load_class(output: str, clazz_name: str) -> T:
 
 def read_root_name(path: Path) -> str:
     try:
-        context = iterparse(str(path), events=(EventType.START,), recover=True)
-        _, root = next(context)
-        _, local_name = split_qname(root.tag)
+        recovering_parser = etree.XMLParser(recover=True)
+        tree = etree.parse(str(path), parser=recovering_parser)  # nosec
+        _, local_name = split_qname(tree.getroot().tag)
         return text.pascal_case(utils.safe_snake(local_name, "Type"))
-    except XMLSyntaxError:
-        return ""
-    except OSError:
+    except Exception:
         return ""

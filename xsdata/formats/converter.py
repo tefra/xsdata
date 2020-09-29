@@ -319,21 +319,32 @@ class EnumConverter(Converter):
 
         # Convert string value to the type of the first enum member first, otherwise
         # more complex types like QName, Decimals will fail.
-        enum_member: Enum = list(data_type)[0]
-        real_value = converter.from_string(value, [type(enum_member.value)], **kwargs)
+        member: Enum = list(data_type)[0]
+        value_type = type(member.value)
 
+        # Suppress warnings
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            real_value = converter.from_string(value, [value_type], **kwargs)
+
+        # Raise exception if the real value doesn't match the expected type.
+        if not isinstance(real_value, value_type):
+            raise ConverterError()
+
+        # Attempt #1 use the enum constructor
         with contextlib.suppress(ValueError):
             return data_type(real_value)
 
         try:
+            # Attempt #2 the enum might be derived from
+            # xs:NMTOKENS or xs:list removing excess whitespace.
             if isinstance(real_value, str):
-                # enums may be derived from xs:NMTOKENS or xs:list
-                # try again after removing excess whitespace.
                 return data_type(" ".join(value.split()))
-            else:
-                # some values are never equal try with repr eg, NaN != NaN
-                repr_value = repr(real_value)
-                return next(x for x in data_type if repr(x.value) == repr_value)
+
+            # Attempt #3 some values are never equal try to match
+            # canonical representations.
+            repr_value = repr(real_value)
+            return next(x for x in data_type if repr(x.value) == repr_value)
         except (ValueError, StopIteration):
             raise ConverterError()
 

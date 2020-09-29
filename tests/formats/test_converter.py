@@ -242,10 +242,7 @@ class EnumConverterTests(TestCase):
             with warnings.catch_warnings(record=True) as w:
                 convert("a", data_type=Fixture)
 
-        self.assertEqual(
-            "Failed to convert value `a` to one of [<class 'float'>]",
-            str(w[-1].message),
-        )
+        self.assertEqual(0, len(w))
 
         self.assertEqual(Fixture.two_point_one, convert("2.1", data_type=Fixture))
 

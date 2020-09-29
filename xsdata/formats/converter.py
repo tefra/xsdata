@@ -230,12 +230,12 @@ class QNameConverter(Converter):
         self, value: QName, ns_map: Optional[Dict] = None, **kwargs: Any
     ) -> str:
         """
-        Convert a QName instance to string either with a namespace prefix if
-        context namespaces are provided or as fully qualified with the
-        namespace uri.
+        Convert a QName instance to string either with a namespace prefix if a
+        prefix-URI namespaces mapping is provided or to a fully qualified name
+        with the namespace.
 
         examples:
-            - QName("http://www.w3.org/2001/XMLSchema", "int") & namespaces -> xs:int
+            - QName("http://www.w3.org/2001/XMLSchema", "int") & ns_map -> xs:int
             - QName("foo, "bar") -> {foo}bar
         """
 
@@ -294,12 +294,12 @@ class LxmlQNameConverter(Converter):
         self, value: etree.QName, ns_map: Optional[Dict] = None, **kwargs: Any
     ) -> str:
         """
-        Convert a QName instance to string either with a namespace prefix if
-        context namespaces are provided or as fully qualified with the
-        namespace uri.
+        Convert a QName instance to string either with a namespace prefix if a
+        prefix-URI namespaces mapping is provided or to a fully qualified name
+        with the namespace.
 
         examples:
-            - QName("http://www.w3.org/2001/XMLSchema", "int") & namespaces -> xs:int
+            - QName("http://www.w3.org/2001/XMLSchema", "int") & ns_map -> xs:int
             - QName("foo, "bar") -> {foo}bar
         """
 
@@ -319,17 +319,33 @@ class EnumConverter(Converter):
 
         # Convert string value to the type of the first enum member first, otherwise
         # more complex types like QName, Decimals will fail.
-        enum_member: Enum = list(data_type)[0]
-        real_value = converter.from_string(value, [type(enum_member.value)], **kwargs)
+        member: Enum = list(data_type)[0]
+        value_type = type(member.value)
+
+        # Suppress warnings
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            real_value = converter.from_string(value, [value_type], **kwargs)
+
+        # Raise exception if the real value doesn't match the expected type.
+        if not isinstance(real_value, value_type):
+            raise ConverterError()
+
+        # Attempt #1 use the enum constructor
+        with contextlib.suppress(ValueError):
+            return data_type(real_value)
 
         try:
-            try:
-                return data_type(real_value)
-            except ValueError:
-                # enums may be derived from xs:NMTOKENS or xs:list
-                # try again after removing excess whitespace.
+            # Attempt #2 the enum might be derived from
+            # xs:NMTOKENS or xs:list removing excess whitespace.
+            if isinstance(real_value, str):
                 return data_type(" ".join(value.split()))
-        except ValueError:
+
+            # Attempt #3 some values are never equal try to match
+            # canonical representations.
+            repr_value = repr(real_value)
+            return next(x for x in data_type if repr(x.value) == repr_value)
+        except (ValueError, StopIteration):
             raise ConverterError()
 
     def to_string(self, value: Enum, **kwargs: Any) -> str:

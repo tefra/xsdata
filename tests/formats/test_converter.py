@@ -242,10 +242,7 @@ class EnumConverterTests(TestCase):
             with warnings.catch_warnings(record=True) as w:
                 convert("a", data_type=Fixture)
 
-        self.assertEqual(
-            "Failed to convert value `a` to one of [<class 'float'>]",
-            str(w[-1].message),
-        )
+        self.assertEqual(0, len(w))
 
         self.assertEqual(Fixture.two_point_one, convert("2.1", data_type=Fixture))
 
@@ -255,6 +252,16 @@ class EnumConverterTests(TestCase):
 
         convert = self.converter.from_string
         self.assertEqual(Fixture.a, convert(" a \na a  ", data_type=Fixture))
+
+    def test_from_string_with_value_never_equal_to_anything(self):
+        class Fixture(Enum):
+            a = Decimal("NaN")
+
+        convert = self.converter.from_string
+        self.assertEqual(Fixture.a, convert("NaN", data_type=Fixture))
+
+        with self.assertRaises(ConverterError):
+            convert("1.0", data_type=Fixture)
 
     def test_from_string_raises_exception_on_missing_data_type(self):
         with self.assertRaises(ConverterError) as cm:

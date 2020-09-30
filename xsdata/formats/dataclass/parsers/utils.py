@@ -15,7 +15,6 @@ from xsdata.formats.dataclass.models.generics import DerivedElement
 from xsdata.logger import logger
 from xsdata.models.enums import QNames
 from xsdata.utils import text
-from xsdata.utils.collections import first
 from xsdata.utils.namespaces import build_qname
 
 
@@ -58,29 +57,19 @@ class ParserUtils:
 
         while len(objects) > position:
             qname, value = objects.pop(position)
-            arg = meta.find_var(qname, FindMode.NOT_WILDCARD) or meta.find_var(
-                qname, FindMode.WILDCARD
-            )
-
-            assert arg is not None
-
-            if not arg.init:
-                continue
 
             if value is None:
                 value = ""
 
-            if not cls.bind_element_param(params, arg, value):
-                lookup = qname
-                if isinstance(value, AnyElement) and value.qname:
-                    lookup = value.qname
+            arg = meta.find_var(qname, FindMode.NOT_WILDCARD)
+            if arg and cls.bind_element_param(params, arg, value):
+                continue
 
-                wild = cls.find_eligible_wildcard(meta, lookup, params)
+            arg = meta.find_var(qname, FindMode.WILDCARD)
+            if arg and cls.bind_element_wildcard_param(params, arg, qname, value):
+                continue
 
-                if not wild:
-                    logger.warning("Unassigned parsed object %s", qname)
-                else:
-                    cls.bind_element_wildcard_param(params, wild, qname, value)
+            logger.warning("Unassigned parsed object %s", qname)
 
     @classmethod
     def bind_mixed_content(cls, params: Dict, var: XmlVar, pos: int, objects: List):
@@ -116,6 +105,8 @@ class ParserUtils:
 
         :return: Whether the binding process was successful or not.
         """
+        if not var.init:
+            return True
         if var.is_list:
             params.setdefault(var.name, []).append(value)
         elif var.name not in params:
@@ -126,11 +117,8 @@ class ParserUtils:
         return True
 
     @classmethod
-    def prepare_generic_value(cls, qname: Optional[str], value: Any) -> Any:
+    def prepare_generic_value(cls, qname: str, value: Any) -> Any:
         """Prepare parsed value before binding to a wildcard field."""
-
-        if not qname:
-            return value
 
         if not is_dataclass(value):
             value = AnyElement(qname=qname, text=value)
@@ -142,7 +130,7 @@ class ParserUtils:
     @classmethod
     def bind_element_wildcard_param(
         cls, params: Dict, var: XmlVar, qname: str, value: Any
-    ):
+    ) -> bool:
         """
         Add the given value to the params dictionary with the wildcard var name
         as key.
@@ -154,7 +142,9 @@ class ParserUtils:
 
         value = cls.prepare_generic_value(qname, value)
 
-        if var.name in params:
+        if var.is_list:
+            params.setdefault(var.name, []).append(value)
+        elif var.name in params:
             previous = params[var.name]
             if previous.qname:
                 params[var.name] = AnyElement(children=[previous])
@@ -162,6 +152,8 @@ class ParserUtils:
             params[var.name].children.append(value)
         else:
             params[var.name] = value
+
+        return True
 
     @classmethod
     def bind_wildcard_element(
@@ -286,27 +278,6 @@ class ParserUtils:
                     )
             elif wildcard:
                 params[wildcard.name][qname] = cls.parse_any_attribute(value, ns_map)
-
-    @classmethod
-    def find_eligible_wildcard(
-        cls, meta: XmlMeta, qname: str, params: Dict
-    ) -> Optional[XmlVar]:
-        """
-        Last resort lookup for a suitable wildcard var.
-
-        Search for a list wildcard or a wildcard that already exists in
-        the params dictionary.
-        """
-        return first(
-            var
-            for var in meta.vars
-            if var.is_wildcard
-            and var.matches(qname)
-            and (
-                (var.is_list or var.name not in params)
-                or (not var.is_list and var.name in params)
-            )
-        )
 
     @classmethod
     def bind_wildcard(

@@ -69,15 +69,7 @@ class ParserUtilsTests(TestCase):
             ]
         )
 
-    @mock.patch.object(ParserUtils, "bind_element_wildcard_param")
-    @mock.patch.object(ParserUtils, "find_eligible_wildcard")
-    @mock.patch.object(ParserUtils, "bind_element_param")
-    def test_bind_element_children(
-        self,
-        mock_bind_element_param,
-        mock_find_eligible_wildcard,
-        mock_bind_element_wildcard_param,
-    ):
+    def test_bind_element_children(self):
         @dataclass
         class A:
             x: int
@@ -99,26 +91,28 @@ class ParserUtilsTests(TestCase):
             (w.qname, wild_element),
         ]
 
-        mock_bind_element_param.side_effect = [True, False, False]
-        mock_find_eligible_wildcard.side_effect = [None, w]
-
         params = {}
         ParserUtils.bind_element_children(params, meta, 1, objects)
+        expected = {
+            "x": 1,
+            "w": AnyElement(
+                children=[AnyElement(qname="w", text=""), AnyElement(qname="foo")]
+            ),
+        }
 
-        mock_bind_element_param.assert_has_calls(
-            [
-                mock.call(params, x, 1),
-                mock.call(params, w, ""),
-                mock.call(params, w, wild_element),
-            ]
-        )
-        mock_find_eligible_wildcard.assert_has_calls(
-            [mock.call(meta, w.qname, params), mock.call(meta, "foo", params)]
-        )
+        self.assertEqual(expected, params)
 
-        mock_bind_element_wildcard_param.assert_called_once_with(
-            params, w, w.qname, wild_element
-        )
+    @mock.patch("xsdata.formats.dataclass.parsers.utils.logger.warning")
+    def test_bind_element_children_with_unassigned_object(self, mock_warning):
+        a = make_dataclass("a", [("x", int)])
+        meta = XmlContext().build(a)
+        params = {}
+        objects = [("x", 1), ("y", 2)]
+
+        ParserUtils.bind_element_children(params, meta, 0, objects)
+
+        self.assertEqual({"x": 1}, params)
+        mock_warning.assert_called_once_with("Unassigned parsed object %s", "y")
 
     def test_bind_mixed_content(self):
         generic = AnyElement(qname="foo")
@@ -301,15 +295,30 @@ class ParserUtilsTests(TestCase):
         one = AnyElement(qname=qname, text="one")
         two = AnyElement(qname=qname, text="two")
         three = AnyElement(qname=qname, text="three")
+        bind = ParserUtils.bind_element_wildcard_param
 
-        ParserUtils.bind_element_wildcard_param(params, var, qname, "one")
+        self.assertTrue(bind(params, var, qname, "one"))
         self.assertEqual(dict(a=one), params)
 
-        ParserUtils.bind_element_wildcard_param(params, var, qname, "two")
+        self.assertTrue(bind(params, var, qname, "two"))
         self.assertEqual(dict(a=AnyElement(children=[one, two])), params)
 
-        ParserUtils.bind_element_wildcard_param(params, var, qname, "three")
+        self.assertTrue(bind(params, var, qname, "three"))
         self.assertEqual(dict(a=AnyElement(children=[one, two, three])), params)
+
+    def test_bind_element_wildcard_param_with_list_var(self):
+        params = {}
+        var = XmlVar(name="a", qname="a", list_element=True)
+        qname = "b"
+        one = AnyElement(qname=qname, text="one")
+        two = AnyElement(qname=qname, text="two")
+        three = AnyElement(qname=qname, text="three")
+        bind = ParserUtils.bind_element_wildcard_param
+
+        self.assertTrue(bind(params, var, qname, "one"))
+        self.assertTrue(bind(params, var, qname, "two"))
+        self.assertTrue(bind(params, var, qname, "three"))
+        self.assertEqual(dict(a=[one, two, three]), params)
 
     def test_bind_wildcard_element(self):
         var = XmlVar(name="a", qname="a")
@@ -356,9 +365,6 @@ class ParserUtilsTests(TestCase):
         @dataclass
         class Fixture:
             content: str
-
-        actual = ParserUtils.prepare_generic_value(None, "foo")
-        self.assertEqual("foo", actual)
 
         actual = ParserUtils.prepare_generic_value("a", "foo")
         self.assertEqual(AnyElement(qname="a", text="foo"), actual)

@@ -8,6 +8,7 @@ from xsdata.codegen.models import Restrictions
 from xsdata.models.enums import DataType
 from xsdata.models.enums import NamespaceType
 from xsdata.models.enums import Tag
+from xsdata.utils.collections import first
 
 
 class AttributeMixedContentHandler(HandlerInterface):
@@ -21,7 +22,7 @@ class AttributeMixedContentHandler(HandlerInterface):
         if not target.mixed:
             return
 
-        wildcard = next((attr for attr in target.attrs if attr.tag == Tag.ANY), None)
+        wildcard = first(attr for attr in target.attrs if attr.tag == Tag.ANY)
 
         if wildcard:
             wildcard.mixed = True

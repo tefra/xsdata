@@ -266,9 +266,8 @@ class XmlSerializer(AbstractSerializer):
                 index += 1
                 continue
 
-            end = next(
-                (i for i in range(index + 1, stop) if not attrs[i].sequential), stop
-            )
+            indices = range(index + 1, stop)
+            end = next((i for i in indices if not attrs[i].sequential), stop)
             sequence = attrs[index:end]
             index = end
             j = 0

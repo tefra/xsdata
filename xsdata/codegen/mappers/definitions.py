@@ -25,6 +25,7 @@ from xsdata.models.wsdl import ServicePort
 from xsdata.models.xsd import Element
 from xsdata.utils import collections
 from xsdata.utils import text
+from xsdata.utils.collections import first
 from xsdata.utils.namespaces import build_qname
 from xsdata.utils.namespaces import split_qname
 
@@ -260,7 +261,7 @@ class DefinitionsMapper:
         This helper will also create a forward reference attribute for
         the parent class.
         """
-        inner = next((inner for inner in target.inner if inner.name == name), None)
+        inner = first(inner for inner in target.inner if inner.name == name)
         if not inner:
             inner = Class(
                 qname=build_qname(name),

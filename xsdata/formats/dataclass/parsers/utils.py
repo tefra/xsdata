@@ -15,6 +15,7 @@ from xsdata.formats.dataclass.models.generics import DerivedElement
 from xsdata.logger import logger
 from xsdata.models.enums import QNames
 from xsdata.utils import text
+from xsdata.utils.collections import first
 from xsdata.utils.namespaces import build_qname
 
 
@@ -296,18 +297,15 @@ class ParserUtils:
         Search for a list wildcard or a wildcard that already exists in
         the params dictionary.
         """
-        return next(
-            (
-                var
-                for var in meta.vars
-                if var.is_wildcard
-                and var.matches(qname)
-                and (
-                    (var.is_list or var.name not in params)
-                    or (not var.is_list and var.name in params)
-                )
-            ),
-            None,
+        return first(
+            var
+            for var in meta.vars
+            if var.is_wildcard
+            and var.matches(qname)
+            and (
+                (var.is_list or var.name not in params)
+                or (not var.is_list and var.name in params)
+            )
         )
 
     @classmethod

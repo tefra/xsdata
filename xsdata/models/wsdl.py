@@ -240,9 +240,8 @@ T = TypeVar("T", bound=WsdlElement)
 
 
 def find_or_die(items: List[T], name: str, type_name: str) -> T:
-    result = next((msg for msg in items if msg.name == name), None)
-
-    if result:
-        return result
+    for msg in items:
+        if msg.name == name:
+            return msg
 
     raise DefinitionsValueError(f"Unknown {type_name} name: {name}")

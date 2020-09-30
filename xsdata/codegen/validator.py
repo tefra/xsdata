@@ -101,14 +101,12 @@ class ClassValidator:
         Classes that were extracted from in xs:override/xs:redefined
         containers have priority, otherwise pick the last in the list.
         """
-        return next(
-            (
-                index
-                for index, item in enumerate(candidates)
-                if item.container in (Tag.OVERRIDE, Tag.REDEFINE)
-            ),
-            -1,
-        )
+
+        for index, item in enumerate(candidates):
+            if item.container in (Tag.OVERRIDE, Tag.REDEFINE):
+                return index
+
+        return -1
 
     @classmethod
     def find_circular_extension(cls, target: Class) -> Optional[Extension]:
@@ -135,8 +133,10 @@ class ClassValidator:
         """If there is a class derived from xs:element update all
         xs:complexTypes derived classes as strict types."""
 
-        element = next((obj for obj in classes if obj.is_element), None)
-        if element:
+        try:
+            element = next(obj for obj in classes if obj.is_element)
             for obj in classes:
                 if obj is not element and obj.is_complex:
                     obj.strict_type = True
+        except StopIteration:
+            pass

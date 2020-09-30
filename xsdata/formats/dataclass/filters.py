@@ -210,10 +210,8 @@ class Filters:
         assert isinstance(attr.default, str)
 
         tokens = ", ".join(
-            [
-                str(self.prepare_default_value(converter.from_string(val, types)))
-                for val in attr.default.split()
-            ]
+            str(self.prepare_default_value(converter.from_string(val, types)))
+            for val in attr.default.split()
         )
         return f"lambda: [{tokens}]"
 

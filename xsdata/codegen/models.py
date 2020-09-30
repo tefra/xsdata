@@ -432,9 +432,7 @@ class Class:
     @property
     def is_nillable(self) -> bool:
         """Return whether this class represents a nillable xml element."""
-        return self.nillable or next(
-            (True for ext in self.extensions if ext.restrictions.nillable), False
-        )
+        return self.nillable or any(x.restrictions.nillable for x in self.extensions)
 
     @property
     def is_service(self) -> bool:

@@ -326,25 +326,6 @@ class ClassSanitizerTest(FactoryTestCase):
         self.sanitizer.process_attribute_sequence(target, target.attrs[0])
         self.assertEqual(1, len_sequential(target))
 
-    def test_find_inner(self):
-        inner_a = ClassFactory.create(qname="a")
-        inner_b = ClassFactory.enumeration(2)
-        target = ClassFactory.create(inner=[inner_a, inner_b])
-
-        self.assertEqual(
-            inner_a,
-            self.sanitizer.find_inner(target, condition=lambda x: x.name == "a"),
-        )
-        self.assertEqual(
-            inner_b,
-            self.sanitizer.find_inner(target, condition=lambda x: x.is_enumeration),
-        )
-        self.assertIsNone(
-            self.sanitizer.find_inner(
-                target, condition=lambda x: x.name == "a" and x.is_enumeration
-            )
-        )
-
     @mock.patch.object(ClassSanitizer, "rename_classes")
     def test_resolve_conflicts(self, mock_rename_classes):
         classes = [

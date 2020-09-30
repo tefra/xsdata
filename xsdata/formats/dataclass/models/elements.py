@@ -204,7 +204,7 @@ class FindMode(IntEnum):
     NOT_LIST = auto()
 
 
-find_lambdas = {
+find_predicates = {
     FindMode.ALL: lambda x: True,
     FindMode.ATTRIBUTE: lambda x: x.is_attribute,
     FindMode.ATTRIBUTES: lambda x: x.is_attributes,
@@ -256,13 +256,9 @@ class XmlMeta:
         return None if index < 0 else self.vars[index]
 
     def _find_var(self, qname: str, mode: FindMode) -> int:
-        find_func = find_lambdas[mode]
+        predicate = find_predicates[mode]
+        for index, var in enumerate(self.vars):
+            if predicate(var) and var.matches(qname):
+                return index
 
-        return next(
-            (
-                index
-                for index, var in enumerate(self.vars)
-                if find_func(var) and var.matches(qname)
-            ),
-            -1,
-        )
+        return -1

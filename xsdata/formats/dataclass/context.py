@@ -21,6 +21,7 @@ from xsdata.formats.dataclass.models.constants import XmlType
 from xsdata.formats.dataclass.models.elements import XmlMeta
 from xsdata.formats.dataclass.models.elements import XmlVar
 from xsdata.models.enums import NamespaceType
+from xsdata.utils.collections import first
 from xsdata.utils.namespaces import build_qname
 
 
@@ -148,7 +149,7 @@ class XmlContext:
             xml_clazz = XmlType.to_xml_class(xml_type)
             namespace = var.metadata.get("namespace")
             namespaces = self.resolve_namespaces(xml_type, namespace, parent_ns)
-            first_namespace = next((x for x in namespaces if x and x[0] != "#"), None)
+            first_namespace = first(x for x in namespaces if x and x[0] != "#")
 
             yield xml_clazz(
                 name=var.name,

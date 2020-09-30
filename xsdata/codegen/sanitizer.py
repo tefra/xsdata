@@ -1,6 +1,5 @@
 import re
 from dataclasses import dataclass
-from typing import Callable
 from typing import List
 from typing import Optional
 
@@ -10,6 +9,7 @@ from xsdata.codegen.models import AttrType
 from xsdata.codegen.models import Class
 from xsdata.logger import logger
 from xsdata.utils import collections
+from xsdata.utils.collections import first
 from xsdata.utils.collections import group_by
 from xsdata.utils.namespaces import build_qname
 from xsdata.utils.namespaces import clean_uri
@@ -97,9 +97,8 @@ class ClassSanitizer:
                 continue
 
             source_found = True
-            source_attr = next(
-                (x for x in source.attrs if x.default == attr.default), None
-            )
+            source_attr = first(x for x in source.attrs if x.default == attr.default)
+
             if source_attr:
                 if attr_type.forward:
                     self.promote_inner_class(target, source)
@@ -318,15 +317,11 @@ class ClassSanitizer:
             return None
 
         if attr_type.forward:
-            return self.find_inner(
-                source,
-                condition=lambda x: x.is_enumeration and x.name == attr_type.name,
-            )
+            for inner in source.inner:
+                if inner.name == attr_type.name and inner.is_enumeration:
+                    return inner
+
+            return None
 
         qname = attr_type.qname
         return self.container.find(qname, condition=lambda x: x.is_enumeration)
-
-    @classmethod
-    def find_inner(cls, target: Class, condition: Callable) -> Optional[Class]:
-        """Find the first inner class that matches the given condition."""
-        return next((inner for inner in target.inner if condition(inner)), None)

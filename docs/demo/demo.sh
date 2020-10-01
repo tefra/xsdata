@@ -3,18 +3,16 @@
 . docs/demo/demo-magic.sh
 
 echo -e "\e[35m# Hi, welcome to xsdata demo!"
-pe "xsdata --help"
+pe "xsdata generate --help"
 
 sleep 1
 clear
 
-cd ../xsdata-samples
+pe "xsdata tests/fixtures/primer/order.xsd --package tests.fixtures.primer"
+pe "bat -n tests/fixtures/primer/__init__.py"
+pe "bat -n tests/fixtures/primer/order.py"
 
-pe "xsdata sabre/schemas --package sabre.models"
-pe "ls -la sabre/models"
-pe "bat sabre/models/bargain_finder_max_common_types_v1_9_7.py"
-
-cd ../xsdata
+ipython
 
 echo -e "\e[35m# See help for more, bye bye :)"
-sleep 2
+sleep 1

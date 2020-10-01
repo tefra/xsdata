@@ -1,7 +1,6 @@
 import sys
 from dataclasses import dataclass
 from dataclasses import field
-from operator import methodcaller
 from typing import Any as Anything
 from typing import Dict
 from typing import Iterator
@@ -96,22 +95,23 @@ class AnnotationBase(ElementBase):
     Base Class for elements that can contain annotations.
 
     :param id: ID
-    :param annotation:
+    :param annotations:
     :param any_attribute: any attributes with non-schema namespace
     """
 
     id: Optional[str] = attribute()
-    annotation: Optional[Annotation] = element()
+    annotations: Array[Annotation] = array_element(name="annotation")
     any_attribute: Optional["AnyAttribute"] = element(name="anyAttribute")
 
     @property
     def display_help(self) -> Optional[str]:
-        if self.annotation and self.annotation.documentations:
-            to_string = methodcaller("tostring")
-            return "\n".join(
-                filter(None, map(to_string, self.annotation.documentations))
-            )
-        return None
+        help_str = "\n".join(
+            documentation.tostring() or ""
+            for annotation in self.annotations
+            for documentation in annotation.documentations
+        ).strip()
+
+        return help_str or None
 
 
 @dataclass

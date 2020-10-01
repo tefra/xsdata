@@ -1,3 +1,5 @@
+from dataclasses import dataclass
+from typing import Generator
 from typing import Iterator
 from unittest import TestCase
 
@@ -7,8 +9,10 @@ from xsdata.models.enums import FormType
 from xsdata.models.enums import Namespace
 from xsdata.models.mixins import ElementBase
 from xsdata.models.wsdl import Definitions
+from xsdata.models.xsd import Alternative
 from xsdata.models.xsd import ComplexType
 from xsdata.models.xsd import Element
+from xsdata.models.xsd import SimpleType
 
 
 class ElementBaseTests(TestCase):
@@ -167,11 +171,38 @@ class ElementBaseTests(TestCase):
         element = ElementBase()
         self.assertEqual([], element.substitutions)
 
-    def test_token_types(self):
+    def test_property_token_types(self):
         element = ElementBase()
         element.ns_map["xs"] = Namespace.XS.uri
 
         self.assertEqual(["xs:NMTOKENS", "xs:IDREFS"], element.token_types)
+
+    def test_children(self):
+        one = SimpleType(id="1")
+        two = ComplexType(id="10")
+        three = Alternative(id="11")
+        four = Alternative(id="12")
+
+        element = Element(
+            name="super",
+            complex_type=two,
+            simple_type=one,
+            alternatives=[three, four],
+        )
+
+        children = element.children()
+
+        self.assertIsInstance(children, Generator)
+        self.assertEqual([one, two, three, four], list(children))
+
+        children = list(element.children(lambda x: x.id == "10"))
+        self.assertEqual([two], children)
+
+        children = list(element.children(lambda x: x.id == "12"))
+        self.assertEqual([four], children)
+
+        children = list(element.children(lambda x: int(x.id) % 2 == 0))
+        self.assertEqual([two, four], children)
 
     def test_data_type_ref(self):
         element = ElementBase()

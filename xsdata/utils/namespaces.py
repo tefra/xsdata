@@ -1,9 +1,13 @@
+import functools
 from typing import Dict
 from typing import Optional
 from typing import Tuple
 
 from xsdata.models.enums import Namespace
 from xsdata.utils.text import split
+
+
+__uri_ignore__ = ("www", "xsd", "wsdl")
 
 
 def load_prefix(uri: str, ns_map: Dict) -> Optional[str]:
@@ -33,7 +37,7 @@ def generate_prefix(uri: str, ns_map: Dict) -> str:
 
 def prefix_exists(uri: str, ns_map: Dict) -> bool:
     """Check if the uri exists in the prefix-URI namespace mapping."""
-    return any(val == uri for val in ns_map.values())
+    return uri in ns_map.values()
 
 
 def clean_prefixes(ns_map: Dict) -> Dict:
@@ -54,16 +58,6 @@ def clean_prefixes(ns_map: Dict) -> Dict:
     return result
 
 
-def split_qname(tag: str) -> Tuple:
-    """Split namespace qualified strings."""
-    if tag[0] == "{":
-        left, right = split(tag[1:], "}")
-        if left:
-            return left, right
-
-    return None, tag
-
-
 def clean_uri(namespace: str) -> str:
     """Remove common prefixes and suffixes from a uri string."""
     if namespace[:2] == "##":
@@ -76,11 +70,10 @@ def clean_uri(namespace: str) -> str:
     elif left in ("http", "https"):
         namespace = right[2:]
 
-    return "_".join(
-        [part for part in namespace.split(".") if part not in ("www", "xsd", "wsdl")]
-    )
+    return "_".join(x for x in namespace.split(".") if x not in __uri_ignore__)
 
 
+@functools.lru_cache(maxsize=50)
 def build_qname(tag_or_uri: Optional[str], tag: Optional[str] = None) -> str:
     """Create namespace qualified strings."""
 
@@ -91,3 +84,14 @@ def build_qname(tag_or_uri: Optional[str], tag: Optional[str] = None) -> str:
         return tag
 
     return f"{{{tag_or_uri}}}{tag}" if tag else tag_or_uri
+
+
+@functools.lru_cache(maxsize=50)
+def split_qname(tag: str) -> Tuple:
+    """Split namespace qualified strings."""
+    if tag[0] == "{":
+        left, right = split(tag[1:], "}")
+        if left:
+            return left, right
+
+    return None, tag

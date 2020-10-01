@@ -53,8 +53,10 @@ class SchemaParserTests(TestCase):
 
         self.assertEqual(expected_namespaces, schema.simple_types[0].ns_map)
         self.assertEqual(2, schema.simple_types[0].index)
-        self.assertEqual(3, schema.simple_types[0].annotation.index)
-        self.assertEqual(4, schema.simple_types[0].annotation.documentations[0].index)
+        self.assertEqual(3, schema.simple_types[0].annotations[0].index)
+        self.assertEqual(
+            4, schema.simple_types[0].annotations[0].documentations[0].index
+        )
 
     def test_start_schema(self):
         self.parser.start_schema({})

@@ -43,16 +43,14 @@ def prefix_exists(uri: str, ns_map: Dict) -> bool:
 def clean_prefixes(ns_map: Dict) -> Dict:
     """Remove default namespace if it's also assigned to a prefix."""
     result = {}
-    for prefix, uri in ns_map.items():
-        if uri:
+    for prefix, ns in ns_map.items():
+        if ns:
             prefix = prefix or None
             if prefix not in result:
-                result[prefix] = uri
+                result[prefix] = ns
 
-    default_prefix = result.get(None)
-    if default_prefix and any(
-        True for prefix, uri in result.items() if prefix and uri == default_prefix
-    ):
+    default_ns = result.get(None)
+    if default_ns and any(prefix and ns == default_ns for prefix, ns in result.items()):
         result.pop(None)
 
     return result

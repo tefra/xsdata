@@ -66,7 +66,7 @@ class ElementBase:
     @property
     def has_children(self) -> bool:
         """Return whether or not this element has any children."""
-        return any(True for _ in self.children())
+        return next(self.children(), None) is not None
 
     @property
     def has_form(self) -> bool:

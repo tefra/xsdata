@@ -291,9 +291,7 @@ class ClassSanitizer:
                     num = 1
                     name = items[index].name.lower()
 
-                    while any(
-                        attr for attr in attrs if attr.name.lower() == f"{name}_{num}"
-                    ):
+                    while any(attr.name.lower() == f"{name}_{num}" for attr in attrs):
                         num += 1
 
                     items[index].name = f"{name}_{num}"

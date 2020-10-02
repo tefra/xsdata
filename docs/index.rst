@@ -21,3 +21,7 @@
     demos
     changelog
     api
+
+
+.. meta::
+   :google-site-verification: VSyrlSSIOrwnZhhAo3dS6hf1efs-8FxF3KezQ-bH_js

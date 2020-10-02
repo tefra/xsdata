@@ -50,7 +50,7 @@ Schema 1.0 and 1.1.
 Report
 ------
 
-**27** failed, **14547** passed, **102** skipped @
+**14** failed, **14573** passed, **88** skipped @
 `travis-ci <https://travis-ci.com/tefra/xsdata-w3c-tests>`_
 
 ✨✨✨✨

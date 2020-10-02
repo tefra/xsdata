@@ -1,3 +1,26 @@
+20.10 (2020-10-02)
+------------------
+- Fixed generator adding multiple default value fields. `#249 <https://github.com/tefra/xsdata/issues/249>`_
+- Fixed generator not applying nested container restrictions. `#263 <https://github.com/tefra/xsdata/issues/253>`_
+- Fixed generator to avoid case insensitive class name conflicts. `#269 <https://github.com/tefra/xsdata/issues/269>`_
+- Fixed generator rendering unused simple types.
+- Fixed generator unsorted libraries imports.
+- Fixed JsonParser trying to parse init=False fields. `#253 <https://github.com/tefra/xsdata/issues/253>`_
+- Fixed NodeParser binding tail content more than once with mixed vars. `#256 <https://github.com/tefra/xsdata/issues/256>`_
+- Added XmlWriter interface to decouple serialize from lxml. `#247 <https://github.com/tefra/xsdata/issues/247>`_
+- Added native python xml content writer XmlEventWriter. ✨✨✨
+- Added lxml based content writer LxmlEventWriter.
+- Added generator config with options to control naming cases and aliases. `#265 <https://github.com/tefra/xsdata/issues/265>`_
+- Updated field xml type auto detection to be more flexible. `#246 <https://github.com/tefra/xsdata/issues/246>`_
+- Updated EnumConverter to resort to canonical form matching as last resort. `#273 <https://github.com/tefra/xsdata/issues/273>`_
+- Updated support for derived elements. `#267 <https://github.com/tefra/xsdata/issues/267>`_
+
+
+This is my favorite release so far, maybe because xsdata reached one year of development
+✨✨✨ or maybe because some of the last original components finally got the rewrite they
+deserved.
+
+
 20.9 (2020-09-03)
 -----------------
 - Added field metadata key `tokens` for xs:list or xs:NMTOKENS derived elements.

@@ -244,9 +244,7 @@ class XmlContext:
         if isinstance(obj, clazz):
             return True
 
-        return any(
-            base is not object and isinstance(obj, base) for base in clazz.__bases__
-        )
+        return any(x is not object and isinstance(obj, x) for x in clazz.__bases__)
 
     @classmethod
     def is_element_list(cls, type_hint: Any, is_tokens: bool) -> bool:

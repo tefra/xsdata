@@ -3,7 +3,7 @@ from pathlib import Path
 
 from xsdata.models.config import NameCase
 
-docs_root = Path(__file__).parent.parent
+docs_root = Path(__file__).parent.parent.resolve()
 source = docs_root.parent.joinpath("tests/utils/test_text.py").read_text()
 
 

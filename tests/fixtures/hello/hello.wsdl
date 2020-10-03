@@ -8,21 +8,10 @@
         xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://hello/"
         xmlns:xsd="http://www.w3.org/2001/XMLSchema"
         xmlns="http://schemas.xmlsoap.org/wsdl/" targetNamespace="http://hello/"
-        name="HelloImplService" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+        name="HelloImplService">
     <types>
-        <xsd:schema xmlns:tns="http://hello/" xmlns:xs="http://www.w3.org/2001/XMLSchema" version="1.0" targetNamespace="http://hello/">
-            <xs:element name="HelloByeError" type="tns:HelloByeError"/>
-            <xs:element name="HelloError" type="tns:HelloError"/>
-            <xs:complexType name="HelloError">
-                <xs:sequence>
-                    <xs:element name="message" type="xs:string" minOccurs="0"/>
-                </xs:sequence>
-            </xs:complexType>
-            <xs:complexType name="HelloByeError">
-                <xs:sequence>
-                    <xs:element name="message" type="xs:string" minOccurs="0"/>
-                </xs:sequence>
-            </xs:complexType>
+        <xsd:schema>
+            <xsd:import namespace="http://hello/" schemaLocation="hello.xsd"/>
         </xsd:schema>
     </types>
     <message name="getHelloAsString">

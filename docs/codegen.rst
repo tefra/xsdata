@@ -1,13 +1,13 @@
-==============
-Code Generator
-==============
+============
+Command Line
+============
 
 
 .. command-output:: xsdata --help
 
 
-Generate
-========
+Code Generator
+==============
 
 
 .. command-output:: xsdata generate --help
@@ -164,6 +164,12 @@ target namespaces depending the output structure strategy selected.
 .. danger::
 
     The generator doesn't validate user defined target names.
+
+
+Download Schemas
+================
+
+.. command-output:: xsdata download --help
 
 
 .. admonition:: Examples

@@ -1,5 +1,4 @@
 import logging
-import sys
 import tempfile
 from pathlib import Path
 from unittest import mock
@@ -16,6 +15,7 @@ from xsdata.logger import logger
 from xsdata.models.config import GeneratorConfig
 from xsdata.models.config import OutputFormat
 from xsdata.models.config import OutputStructure
+from xsdata.utils.downloader import Downloader
 
 
 class CliTests(TestCase):
@@ -147,6 +147,27 @@ class CliTests(TestCase):
 
         self.assertIsNone(result.exception)
         self.assertIn('<Config xmlns="http://pypi.org/project/xsdata"', result.output)
+
+    @mock.patch.object(Downloader, "wget")
+    @mock.patch.object(Downloader, "__init__", return_value=None)
+    def test_download(self, mock_init, mock_wget):
+        uri = "http://www.w3.org/2009/01/xml.xsd"
+        result = self.runner.invoke(cli, ["download", uri])
+
+        self.assertIsNone(result.exception)
+        mock_init.assert_called_once_with(output=Path.cwd())
+        mock_wget.assert_called_once_with(uri)
+
+    @mock.patch.object(Downloader, "wget")
+    @mock.patch.object(Downloader, "__init__", return_value=None)
+    def test_download_with_custom_output(self, mock_init, mock_wget):
+        uri = "http://www.w3.org/2009/01/xml.xsd"
+
+        result = self.runner.invoke(cli, ["download", uri, "--output", "here/schemas"])
+
+        self.assertIsNone(result.exception)
+        mock_init.assert_called_once_with(output=Path("here/schemas").resolve())
+        mock_wget.assert_called_once_with(uri)
 
     def test_resolve_source(self):
         file = fixtures_dir.joinpath("defxmlschema/chapter03.xsd")

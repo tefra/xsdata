@@ -235,6 +235,9 @@ class Definitions(ExtensibleElement, ModuleMixin):
         self.services.extend(source.services)
         self.extended.extend(source.extended)
 
+    def included(self) -> Iterator[Import]:
+        yield from self.imports
+
 
 T = TypeVar("T", bound=WsdlElement)
 

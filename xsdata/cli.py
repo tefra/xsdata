@@ -15,6 +15,7 @@ from xsdata.logger import logger
 from xsdata.models.config import GeneratorConfig
 from xsdata.models.config import OutputFormat
 from xsdata.models.config import OutputStructure
+from xsdata.utils.downloader import Downloader
 
 outputs = click.Choice([x.value for x in OutputFormat])
 
@@ -48,6 +49,20 @@ def init_config(*args: Any, **kwargs: Any):
     else:
         with file_path.open("w") as fp:
             config.write(fp, config)
+
+
+@cli.command("download")
+@click.argument("source", required=True)
+@click.option(
+    "--output",
+    type=click.Path(resolve_path=True),
+    default="./",
+    help="Output directory, default cwd",
+)
+def download(source: str, output: str):
+    """Download a schema or a definition locally with all its dependencies."""
+    downloader = Downloader(output=Path(output).resolve())
+    downloader.wget(source)
 
 
 @cli.command("generate")

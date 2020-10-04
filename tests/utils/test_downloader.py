@@ -2,6 +2,7 @@ import tempfile
 from pathlib import Path
 from unittest import mock
 from unittest import TestCase
+from urllib.request import urlopen
 
 from tests import fixtures_dir
 from xsdata.models.xsd import Import
@@ -33,8 +34,8 @@ class DownloaderTests(TestCase):
         self.downloader.wget(wsdl.as_uri())
         mock_write_file.assert_has_calls(
             [
-                mock.call(xsd.as_uri(), xsd.read_text()),
-                mock.call(wsdl.as_uri(), wsdl.read_text()),
+                mock.call(xsd.as_uri(), urlopen(xsd.as_uri()).read().decode()),
+                mock.call(wsdl.as_uri(), urlopen(wsdl.as_uri()).read().decode()),
             ]
         )
 

@@ -28,7 +28,7 @@ def cli():
 
 
 @cli.command("init-config")
-@click.argument("output", type=click.Path(resolve_path=True), default=".xsdata.xml")
+@click.argument("output", type=click.Path(), default=".xsdata.xml")
 @click.option("--print", is_flag=True, default=False, help="Print output")
 def init_config(*args: Any, **kwargs: Any):
     """Create or update a configuration file."""
@@ -114,17 +114,20 @@ def generate(*args: Any, **kwargs: Any):
 
 
 def resolve_source(source: str, wsdl: bool) -> Iterator[str]:
-    path = Path(source).resolve()
-    if path.is_dir():
-
-        if wsdl:
-            raise CodeGenerationError("WSDL mode doesn't support scanning directories.")
-
-        yield from (x.as_uri() for x in path.glob("*.xsd"))
-    elif path.is_file():
-        yield path.as_uri()
-    else:
+    if source.find("://") > -1 and not source.startswith("file://"):
         yield source
+    else:
+        path = Path(source).resolve()
+        if path.is_dir():
+
+            if wsdl:
+                raise CodeGenerationError(
+                    "WSDL mode doesn't support scanning directories."
+                )
+
+            yield from (x.as_uri() for x in path.glob("*.xsd"))
+        else:  # is file
+            yield path.as_uri()
 
 
 if __name__ == "__main__":  # pragma: no cover

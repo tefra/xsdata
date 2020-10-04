@@ -26,7 +26,9 @@ class PlantUmlGeneratorTests(FactoryTestCase):
         self.assertIsInstance(actual[0][0], Path)
         self.assertTrue(actual[0][0].is_absolute())
         self.assertEqual("foo.tests", actual[0][1])
-        self.assertEqual("foo/tests.pu", str(actual[0][0].relative_to(Path.cwd())))
+        self.assertEqual(
+            str(Path("foo/tests.pu")), str(actual[0][0].relative_to(Path.cwd()))
+        )
 
         output = """@startuml
 

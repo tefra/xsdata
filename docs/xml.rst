@@ -245,7 +245,7 @@ Example: write to stream
 Benchmarks
 ==========
 
-The benchmarks run with the `test suite <https://travis-ci.com/tefra/xsdata>`_.
+The benchmarks run with the `test suite <https://github.com/tefra/xsdata/actions>`_.
 
 .. code-block::
 

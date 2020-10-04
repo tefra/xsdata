@@ -4,14 +4,14 @@
 Naive XML Bindings for python
 =============================
 
-.. image:: https://travis-ci.com/tefra/xsdata.svg?branch=master
-    :target: https://travis-ci.com/tefra/xsdata
+.. image:: https://github.com/tefra/xsdata/workflows/tests/badge.svg
+    :target: https://github.com/tefra/xsdata/actions
 
 .. image:: https://readthedocs.org/projects/xsdata/badge
     :target: https://xsdata.readthedocs.io/
 
 .. image:: https://codecov.io/gh/tefra/xsdata/branch/master/graph/badge.svg
-        :target: https://codecov.io/gh/tefra/xsdata
+    :target: https://codecov.io/gh/tefra/xsdata
 
 .. image:: https://img.shields.io/github/languages/top/tefra/xsdata.svg
     :target: https://xsdata.readthedocs.io/

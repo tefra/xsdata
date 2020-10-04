@@ -92,7 +92,9 @@ class Downloader:
         matches = re.findall(r"ocation=\"(.*)\"", content)
         for match in matches:
             if isinstance(self.downloaded.get(match), Path):
-                replace = str(self.downloaded[match].relative_to(self.output))
+                replace = str(self.downloaded[match].relative_to(self.output)).replace(
+                    "\\", "/"
+                )
                 content = content.replace(f'ocation="{match}"', f'ocation="{replace}"')
 
         return content

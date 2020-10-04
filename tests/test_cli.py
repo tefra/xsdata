@@ -117,17 +117,19 @@ class CliTests(TestCase):
     def test_init_config(self, mock_info):
         output = tempfile.mktemp()
         output_path = Path(output)
-        result = self.runner.invoke(cli, ["init-config", str(output)])
+        result = self.runner.invoke(cli, ["init-config", str(output_path)])
 
         self.assertIsNone(result.exception)
         self.assertEqual(GeneratorConfig.create(), GeneratorConfig.read(output_path))
-        mock_info.assert_called_once_with("Initializing configuration file %s", output)
+        mock_info.assert_called_once_with(
+            "Initializing configuration file %s", str(output_path)
+        )
         output_path.unlink()
 
     @mock.patch("xsdata.cli.logger.info")
     def test_init_config_when_file_exists(self, mock_info):
         output = tempfile.mktemp()
-        output_path = Path(output)
+        output_path = Path(output).resolve()
 
         config = GeneratorConfig.create()
         config.version = "20.8"
@@ -135,11 +137,13 @@ class CliTests(TestCase):
         with output_path.open("w") as fp:
             config.write(fp, config)
 
-        result = self.runner.invoke(cli, ["init-config", str(output)])
+        result = self.runner.invoke(cli, ["init-config", str(output_path)])
 
         self.assertIsNone(result.exception)
         self.assertNotEqual("20.8", GeneratorConfig.read(output_path))
-        mock_info.assert_called_once_with("Updating configuration file %s", output)
+        mock_info.assert_called_once_with(
+            "Updating configuration file %s", str(output_path)
+        )
         output_path.unlink()
 
     def test_init_config_with_print_mode(self):
@@ -166,7 +170,7 @@ class CliTests(TestCase):
         result = self.runner.invoke(cli, ["download", uri, "--output", "here/schemas"])
 
         self.assertIsNone(result.exception)
-        mock_init.assert_called_once_with(output=Path("here/schemas").resolve())
+        mock_init.assert_called_once_with(output=Path.cwd().joinpath("here/schemas"))
         mock_wget.assert_called_once_with(uri)
 
     def test_resolve_source(self):

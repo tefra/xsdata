@@ -1,5 +1,4 @@
 from io import StringIO
-from typing import Dict
 from unittest import TestCase
 from xml.sax.saxutils import XMLGenerator
 
@@ -14,9 +13,12 @@ class XmlEventWriterTests(TestCase):
         super().setUp()
 
         output = StringIO()
-        handler = XMLGenerator(output, encoding="UTF-8", short_empty_elements=True)
         self.writer = XmlWriter(output=output)
-        self.writer.handler = handler
+        self.writer.handler = XMLGenerator(
+            output,  # type: ignore
+            encoding="UTF-8",
+            short_empty_elements=True,
+        )
 
     def test_consume(self):
         events = iter(

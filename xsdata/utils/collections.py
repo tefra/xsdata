@@ -31,6 +31,11 @@ def unique_sequence(items: Iterable, key: Optional[str] = None) -> List:
     return [item for item in items if is_new(item)]
 
 
+def remove(items: Iterable, predicate: Callable) -> List:
+    """Return a new list without the items that match the predicate."""
+    return [x for x in items if not predicate(x)]
+
+
 def group_by(items: Sequence, key: Callable) -> Dict[Any, List]:
     """Group the items of a sequence by the result of the callable."""
     result = defaultdict(list)

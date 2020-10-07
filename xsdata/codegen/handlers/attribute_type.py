@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from dataclasses import field
 from typing import Dict
+from typing import List
 from typing import Optional
 from typing import Set
 from typing import Tuple
@@ -15,7 +16,7 @@ from xsdata.codegen.utils import ClassUtils
 from xsdata.exceptions import AnalyzerValueError
 from xsdata.logger import logger
 from xsdata.models.enums import DataType
-from xsdata.utils.collections import unique_sequence
+from xsdata.utils import collections
 
 
 @dataclass
@@ -36,7 +37,7 @@ class AttributeTypeHandler(HandlerInterface):
             for attr_type in list(attr.types):
                 self.process_type(target, attr, attr_type)
 
-            attr.types = unique_sequence(attr.types, key="name")
+            attr.types = self.filter_types(attr.types)
 
     def process_type(self, target: Class, attr: Attr, attr_type: AttrType):
         """
@@ -172,3 +173,24 @@ class AttributeTypeHandler(HandlerInterface):
         attr_type.native = True
         attr_type.circular = False
         attr_type.forward = False
+
+    @classmethod
+    def filter_types(cls, types: List[AttrType]) -> List[AttrType]:
+        """
+        Remove duplicate and invalid types.
+
+        Invalid:
+            1. xs:error
+            2. xs:anyType and xs:anySimpleType when there are other types present
+        """
+        xs_error = DataType.ERROR.code
+        types = collections.unique_sequence(types, key="name")
+        types = collections.remove(types, lambda x: x.native_code == xs_error)
+
+        if len(types) > 1:
+            types = collections.remove(types, lambda x: x.native_type is object)
+
+        if not types:
+            types.append(AttrType(qname=DataType.STRING.qname, native=True))
+
+        return types

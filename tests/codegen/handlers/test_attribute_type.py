@@ -23,11 +23,13 @@ class AttributeTypeHandlerTests(FactoryTestCase):
         container = ClassContainer()
         self.processor = AttributeTypeHandler(container=container)
 
+    @mock.patch.object(AttributeTypeHandler, "filter_types")
     @mock.patch.object(AttributeTypeHandler, "process_type")
-    def test_process(self, mock_process_type):
+    def test_process(self, mock_process_type, mock_filter_types):
         xs_int = AttrTypeFactory.xs_int()
         xs_bool = AttrTypeFactory.xs_bool()
         xs_string = AttrTypeFactory.xs_string()
+        mock_filter_types.side_effect = lambda x: x
 
         target = ClassFactory.create(
             attrs=[
@@ -38,7 +40,14 @@ class AttributeTypeHandlerTests(FactoryTestCase):
 
         self.processor.process(target)
         self.assertEqual(2, len(target.attrs[0].types))
-        self.assertEqual(1, len(target.attrs[1].types))  # remove duplicate
+        self.assertEqual(2, len(target.attrs[1].types))
+
+        mock_filter_types.assert_has_calls(
+            [
+                mock.call(target.attrs[0].types),
+                mock.call(target.attrs[1].types),
+            ]
+        )
 
         mock_process_type.assert_has_calls(
             [
@@ -292,3 +301,31 @@ class AttributeTypeHandlerTests(FactoryTestCase):
         actual = self.processor.cached_dependencies(source)
         self.assertEqual(("a", "b"), actual)
         mock_class_dependencies.assert_called_once_with()
+
+    def test_filter_types(self):
+        xs_string = AttrTypeFactory.xs_string()
+        xs_error = AttrTypeFactory.xs_error()
+        xs_any = AttrTypeFactory.xs_any()
+
+        types = [
+            xs_string.clone(),
+            xs_string.clone(),
+            xs_string.clone(),
+            xs_error.clone(),
+        ]
+
+        actual = self.processor.filter_types(types)
+
+        self.assertEqual(1, len(actual))
+
+        types.append(xs_any)
+        actual = self.processor.filter_types(types)
+        self.assertEqual(1, len(actual))
+        self.assertEqual(xs_string, actual[0])
+
+        actual = self.processor.filter_types([])
+        self.assertEqual(xs_string, actual[0])
+
+        types = [xs_any]
+        actual = self.processor.filter_types(types)
+        self.assertEqual(1, len(actual))

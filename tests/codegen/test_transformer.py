@@ -9,6 +9,7 @@ from xsdata.codegen.mappers.schema import SchemaMapper
 from xsdata.codegen.parsers import DefinitionsParser
 from xsdata.codegen.transformer import SchemaTransformer
 from xsdata.codegen.writer import CodeWriter
+from xsdata.exceptions import CodeGenerationError
 from xsdata.models.config import GeneratorConfig
 from xsdata.models.enums import Namespace
 from xsdata.models.wsdl import Definitions
@@ -128,17 +129,11 @@ class SchemaTransformerTests(FactoryTestCase):
             ]
         )
 
-    @mock.patch("xsdata.codegen.transformer.logger.warning")
-    @mock.patch.object(SchemaTransformer, "analyze_classes")
-    @mock.patch.object(SchemaTransformer, "assign_packages")
-    def test_process_classes_with_zero_classes_after_analyze(
-        self, mock_assign_packages, mock_analyze_classes, mock_logger_warning
-    ):
-        self.transformer.process_classes()
-        self.assertEqual(0, mock_analyze_classes.call_count)
-        self.assertEqual(0, mock_assign_packages.call_count)
+    def test_process_classes_with_zero_classes_after_analyze(self):
+        with self.assertRaises(CodeGenerationError) as cm:
+            self.transformer.process_classes()
 
-        mock_logger_warning.assert_called_once_with("Analyzer returned zero classes!")
+        self.assertEqual("Nothing to generate.", str(cm.exception))
 
     @mock.patch("xsdata.codegen.transformer.logger.debug")
     @mock.patch("xsdata.codegen.transformer.logger.info")

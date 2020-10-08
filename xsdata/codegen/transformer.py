@@ -18,6 +18,7 @@ from xsdata.codegen.models import Class
 from xsdata.codegen.parsers.definitions import DefinitionsParser
 from xsdata.codegen.parsers.schema import SchemaParser
 from xsdata.codegen.writer import CodeWriter
+from xsdata.exceptions import CodeGenerationError
 from xsdata.logger import logger
 from xsdata.models.config import GeneratorConfig
 from xsdata.models.enums import COMMON_SCHEMA_DIR
@@ -90,7 +91,7 @@ class SchemaTransformer:
             else:
                 writer.write(classes)
         else:
-            logger.warning("Analyzer returned zero classes!")
+            raise CodeGenerationError("Nothing to generate.")
 
     def process_schema(self, uri: str, namespace: Optional[str] = None):
         """

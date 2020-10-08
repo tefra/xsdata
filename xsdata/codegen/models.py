@@ -459,16 +459,12 @@ class Class:
         if self.strict_type:
             return False
 
-        if self.type in (
-            Element,
-            ComplexType,
-            BindingOperation,
-            BindingMessage,
-            Message,
-        ):
-            return True
-
-        return self.is_enumeration
+        return (
+            self.type in (Element, BindingOperation, BindingMessage, Message)
+            or self.type is ComplexType
+            and not self.is_simple_type
+            or self.is_enumeration
+        )
 
     @property
     def target_module(self) -> str:

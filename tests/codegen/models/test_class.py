@@ -127,6 +127,9 @@ class ClassTests(FactoryTestCase):
         obj = ClassFactory.create(type=xsd.ComplexType)
         self.assertTrue(obj.should_generate)
 
+        obj.attrs.append(AttrFactory.create(tag=Tag.EXTENSION))
+        self.assertFalse(obj.should_generate)
+
         obj = ClassFactory.create(type=wsdl.BindingOperation)
         self.assertTrue(obj.should_generate)
 

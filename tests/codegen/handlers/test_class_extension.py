@@ -191,27 +191,28 @@ class ClassExtensionHandlerTests(FactoryTestCase):
 
     @mock.patch.object(ClassUtils, "copy_attributes")
     @mock.patch.object(ClassExtensionHandler, "compare_attributes")
-    def test_process_complex_extension_when_target_includes_all_source_attrs(
+    def test_process_complex_extension_removes_extension(
         self, mock_compare_attributes, mock_copy_attributes
     ):
-        mock_compare_attributes.return_value = ClassExtensionHandler.INCLUDES_ALL
+        mock_compare_attributes.return_value = ClassExtensionHandler.REMOVE_EXTENSION
         extension = ExtensionFactory.create()
-        target = ClassFactory.create(extensions=[extension])
-        source = ClassFactory.create()
+        target = ClassFactory.elements(1, extensions=[extension])
+        source = ClassFactory.elements(5)
 
         self.processor.process_complex_extension(source, target, extension)
 
         self.assertEqual(0, len(target.extensions))
+        self.assertEqual(1, len(target.attrs))
 
         mock_compare_attributes.assert_called_once_with(source, target)
         self.assertEqual(0, mock_copy_attributes.call_count)
 
     @mock.patch.object(ClassUtils, "copy_attributes")
     @mock.patch.object(ClassExtensionHandler, "compare_attributes")
-    def test_process_complex_extension_when_target_includes_some_source_attrs(
+    def test_process_complex_extension_copies_attributes(
         self, mock_compare_attributes, mock_copy_attributes
     ):
-        mock_compare_attributes.return_value = ClassExtensionHandler.INCLUDES_SOME
+        mock_compare_attributes.return_value = ClassExtensionHandler.FLATTEN_EXTENSION
         extension = ExtensionFactory.create()
         target = ClassFactory.create()
         source = ClassFactory.create()
@@ -222,67 +223,17 @@ class ClassExtensionHandlerTests(FactoryTestCase):
 
     @mock.patch.object(ClassUtils, "copy_attributes")
     @mock.patch.object(ClassExtensionHandler, "compare_attributes")
-    def test_process_complex_extension_when_target_includes_no_source_attrs(
+    def test_process_complex_extension_ignores_extension(
         self, mock_compare_attributes, mock_copy_attributes
     ):
-        mock_compare_attributes.return_value = ClassExtensionHandler.INCLUDES_NONE
+        mock_compare_attributes.return_value = ClassExtensionHandler.IGNORE_EXTENSION
         extension = ExtensionFactory.create()
         target = ClassFactory.create(extensions=[extension])
         source = ClassFactory.create()
 
         self.processor.process_complex_extension(source, target, extension)
-        mock_compare_attributes.assert_called_once_with(source, target)
-        self.assertEqual(0, mock_copy_attributes.call_count)
         self.assertEqual(1, len(target.extensions))
-
-    @mock.patch.object(ClassUtils, "copy_attributes")
-    @mock.patch.object(ClassExtensionHandler, "compare_attributes")
-    def test_process_complex_extension_when_source_is_strict_type(
-        self, mock_compare_attributes, mock_copy_attributes
-    ):
-        mock_compare_attributes.return_value = ClassExtensionHandler.INCLUDES_NONE
-        extension = ExtensionFactory.create()
-        target = ClassFactory.create()
-        source = ClassFactory.create(strict_type=True)
-
-        self.processor.process_complex_extension(source, target, extension)
-        mock_compare_attributes.assert_called_once_with(source, target)
-        mock_copy_attributes.assert_called_once_with(source, target, extension)
-
-    @mock.patch.object(ClassUtils, "copy_attributes")
-    @mock.patch.object(ClassExtensionHandler, "compare_attributes")
-    def test_process_complex_extension_when_source_has_suffix_attr(
-        self, mock_compare_attributes, mock_copy_attributes
-    ):
-        mock_compare_attributes.return_value = ClassExtensionHandler.INCLUDES_NONE
-        extension = ExtensionFactory.create()
-        target = ClassFactory.create()
-        source = ClassFactory.create()
-        source.attrs.append(AttrFactory.create(index=sys.maxsize))
-
-        self.processor.process_complex_extension(source, target, extension)
-        self.assertEqual(0, len(target.attrs))
-
-        target.attrs.append(AttrFactory.create())
-        self.processor.process_complex_extension(source, target, extension)
-
-        self.assertEqual(2, mock_compare_attributes.call_count)
-        mock_copy_attributes.assert_called_once_with(source, target, extension)
-
-    @mock.patch.object(ClassUtils, "copy_attributes")
-    @mock.patch.object(ClassExtensionHandler, "compare_attributes")
-    def test_process_complex_extension_when_target_has_suffix_attr(
-        self, mock_compare_attributes, mock_copy_attributes
-    ):
-        mock_compare_attributes.return_value = ClassExtensionHandler.INCLUDES_NONE
-        extension = ExtensionFactory.create()
-        target = ClassFactory.create()
-        source = ClassFactory.create()
-        target.attrs.append(AttrFactory.create(index=sys.maxsize))
-
-        self.processor.process_complex_extension(source, target, extension)
-        mock_compare_attributes.assert_called_once_with(source, target)
-        mock_copy_attributes.assert_called_once_with(source, target, extension)
+        self.assertEqual(0, mock_copy_attributes.call_count)
 
     def test_find_dependency(self):
         attr_type = AttrTypeFactory.create(qname="a")
@@ -298,24 +249,49 @@ class ClassExtensionHandlerTests(FactoryTestCase):
         self.assertEqual(simple, self.processor.find_dependency(attr_type))
 
     def test_compare_attributes(self):
+        remove = ClassExtensionHandler.REMOVE_EXTENSION
+        ignore = ClassExtensionHandler.IGNORE_EXTENSION
+        flatten = ClassExtensionHandler.FLATTEN_EXTENSION
+
+        # source is target
         source = ClassFactory.elements(2)
-        self.assertEqual(2, self.processor.compare_attributes(source, source))
+        self.assertEqual(remove, self.processor.compare_attributes(source, source))
 
+        # target includes None
         target = ClassFactory.create()
-        self.assertEqual(0, ClassExtensionHandler.compare_attributes(source, target))
+        self.assertEqual(ignore, self.processor.compare_attributes(source, target))
 
+        # target includes all
         target.attrs = [attr.clone() for attr in source.attrs]
-        self.assertEqual(2, ClassExtensionHandler.compare_attributes(source, target))
+        self.assertEqual(remove, self.processor.compare_attributes(source, target))
 
+        # target has more
         source.attrs.append(AttrFactory.element())
-        self.assertEqual(1, ClassExtensionHandler.compare_attributes(source, target))
+        self.assertEqual(flatten, self.processor.compare_attributes(source, target))
 
+        # source attrs are all different
         source.attrs = AttrFactory.list(3)
-        self.assertEqual(0, ClassExtensionHandler.compare_attributes(source, target))
+        self.assertEqual(ignore, self.processor.compare_attributes(source, target))
 
-        self.assertEqual(0, ClassExtensionHandler.INCLUDES_NONE)
-        self.assertEqual(1, ClassExtensionHandler.INCLUDES_SOME)
-        self.assertEqual(2, ClassExtensionHandler.INCLUDES_ALL)
+        # source is forced to be flattened
+        clone = source.clone()
+        clone.strict_type = True
+        self.assertEqual(flatten, self.processor.compare_attributes(clone, target))
+
+        # source has an attribute that needs to be last
+        clone = source.clone()
+        clone.attrs[0].index = sys.maxsize
+        self.assertEqual(flatten, self.processor.compare_attributes(clone, target))
+
+        # source is a simple type
+        clone = source.clone()
+        clone.attrs = [AttrFactory.create(tag="Extension")]
+        self.assertEqual(flatten, self.processor.compare_attributes(clone, target))
+
+        # target has an attribute that needs to be last
+        clone = target.clone()
+        clone.attrs[0].index = sys.maxsize
+        self.assertEqual(flatten, self.processor.compare_attributes(source, clone))
 
     def test_copy_extension_type(self):
         extension = ExtensionFactory.create()

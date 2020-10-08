@@ -39,8 +39,8 @@ class ClassContainer(UserDict, ContainerInterface):
             AttributeGroupHandler(self),
             ClassExtensionHandler(self),
             AttributeEnumUnionHandler(self),
-            AttributeTypeHandler(self),
             AttributeSubstitutionHandler(self),
+            AttributeTypeHandler(self),
             AttributeMergeHandler(),
             AttributeMixedContentHandler(),
             AttributeMismatchHandler(),
@@ -98,8 +98,8 @@ class ClassContainer(UserDict, ContainerInterface):
         filter classes that should be generated, otherwise leave the container
         as it is."""
 
-        if any(item.is_complex for item in self.iterate()):
-            candidates = filter(lambda x: x.should_generate, self.iterate())
+        candidates = list(filter(lambda x: x.should_generate, self.iterate()))
+        if candidates:
             self.data = group_by(candidates, attrgetter("qname"))
 
     def add(self, item: Class):

@@ -11,6 +11,7 @@ from xsdata.codegen.models import Restrictions
 from xsdata.codegen.models import Status
 from xsdata.codegen.utils import ClassUtils
 from xsdata.exceptions import AnalyzerValueError
+from xsdata.models.enums import Tag
 from xsdata.models.xsd import ComplexType
 from xsdata.models.xsd import Element
 from xsdata.models.xsd import SimpleType
@@ -23,11 +24,13 @@ class AttributeTypeHandlerTests(FactoryTestCase):
         container = ClassContainer()
         self.processor = AttributeTypeHandler(container=container)
 
+    @mock.patch.object(AttributeTypeHandler, "filter_types")
     @mock.patch.object(AttributeTypeHandler, "process_type")
-    def test_process(self, mock_process_type):
+    def test_process(self, mock_process_type, mock_filter_types):
         xs_int = AttrTypeFactory.xs_int()
         xs_bool = AttrTypeFactory.xs_bool()
         xs_string = AttrTypeFactory.xs_string()
+        mock_filter_types.side_effect = lambda x: x
 
         target = ClassFactory.create(
             attrs=[
@@ -38,7 +41,14 @@ class AttributeTypeHandlerTests(FactoryTestCase):
 
         self.processor.process(target)
         self.assertEqual(2, len(target.attrs[0].types))
-        self.assertEqual(1, len(target.attrs[1].types))  # remove duplicate
+        self.assertEqual(2, len(target.attrs[1].types))
+
+        mock_filter_types.assert_has_calls(
+            [
+                mock.call(target.attrs[0].types),
+                mock.call(target.attrs[1].types),
+            ]
+        )
 
         mock_process_type.assert_has_calls(
             [
@@ -113,12 +123,25 @@ class AttributeTypeHandlerTests(FactoryTestCase):
         self.processor.process_dependency_type(target, attr, attr_type)
         mock_reset_attribute_type.assert_called_once_with(attr_type)
 
-    @mock.patch.object(AttributeTypeHandler, "process_simple_dependency")
+    @mock.patch.object(AttributeTypeHandler, "reset_attribute_type")
+    @mock.patch.object(AttributeTypeHandler, "find_dependency")
+    def test_process_dependency_type_with_dummy_type(
+        self, mock_find_dependency, mock_reset_attribute_type
+    ):
+        mock_find_dependency.return_value = ClassFactory.create()
+        target = ClassFactory.create()
+        attr = AttrFactory.create()
+        attr_type = attr.types[0]
+
+        self.processor.process_dependency_type(target, attr, attr_type)
+        mock_reset_attribute_type.assert_called_once_with(attr_type)
+
+    @mock.patch.object(AttributeTypeHandler, "copy_attribute_properties")
     @mock.patch.object(AttributeTypeHandler, "find_dependency")
     def test_process_dependency_type_with_simple_type(
-        self, mock_find_dependency, mock_process_simple_dependency
+        self, mock_find_dependency, mock_copy_attribute_properties
     ):
-        simple = ClassFactory.create(type=SimpleType)
+        simple = ClassFactory.create(attrs=[AttrFactory.create(tag=Tag.EXTENSION)])
 
         mock_find_dependency.return_value = simple
 
@@ -127,19 +150,19 @@ class AttributeTypeHandlerTests(FactoryTestCase):
         attr_type = attr.types[0]
 
         self.processor.process_dependency_type(target, attr, attr_type)
-        mock_process_simple_dependency.assert_called_once_with(
+        mock_copy_attribute_properties.assert_called_once_with(
             simple, target, attr, attr_type
         )
 
-    @mock.patch.object(AttributeTypeHandler, "process_complex_dependency")
+    @mock.patch.object(AttributeTypeHandler, "set_circular_flag")
     @mock.patch.object(AttributeTypeHandler, "find_dependency")
     def test_process_dependency_type_with_complex_type(
-        self, mock_find_dependency, mock_process_complex_dependency
+        self, mock_find_dependency, mock_set_circular_flag
     ):
-        complex = ClassFactory.create(type=ComplexType)
-        element = ClassFactory.create(type=Element)
+        complex_type = ClassFactory.elements(1)
+        enumeration = ClassFactory.enumeration(1)
 
-        mock_find_dependency.side_effect = [complex, element]
+        mock_find_dependency.side_effect = [complex_type, enumeration]
 
         target = ClassFactory.create()
         attr = AttrFactory.create()
@@ -148,15 +171,10 @@ class AttributeTypeHandlerTests(FactoryTestCase):
         self.processor.process_dependency_type(target, attr, attr_type)
         self.processor.process_dependency_type(target, attr, attr_type)
 
-        mock_process_complex_dependency.assert_has_calls(
-            [
-                mock.call(complex, target, attr_type),
-                mock.call(element, target, attr_type),
-            ]
-        )
+        mock_set_circular_flag.assert_called_once_with(complex_type, target, attr_type)
 
     @mock.patch.object(ClassUtils, "copy_inner_classes")
-    def test_process_simple_dependency(self, mock_copy_inner_classes):
+    def test_copy_attribute_properties(self, mock_copy_inner_classes):
         source = ClassFactory.elements(1, qname="Foobar")
         source.attrs[0].restrictions.max_length = 100
         source.attrs[0].restrictions.min_length = 1
@@ -168,45 +186,22 @@ class AttributeTypeHandlerTests(FactoryTestCase):
         attr.types.append(AttrTypeFactory.create(qname=source.name))
 
         self.assertEqual("Foobar", attr.types[0].name)
-        self.processor.process_simple_dependency(source, target, attr, attr.types[0])
+        self.processor.copy_attribute_properties(source, target, attr, attr.types[0])
 
         self.assertEqual("string", attr.types[0].name)
         self.assertEqual(Restrictions(min_length=2, max_length=100), attr.restrictions)
         mock_copy_inner_classes.assert_called_once_with(source, target)
 
-    def test_process_simple_dependency_no_source_attributes(self):
-        source = ClassFactory.create()
+    def test_copy_attribute_properties_from_nillable_source(self):
+        source = ClassFactory.elements(1, nillable=True)
         target = ClassFactory.elements(1)
         attr = target.attrs[0]
-        self.processor.process_simple_dependency(source, target, attr, attr.types[0])
 
-        self.assertEqual("string", attr.types[0].name)
-
-    def test_process_simple_dependency_with_more_than_one_attribute(self):
-        source = ClassFactory.create(type=SimpleType, attrs=AttrFactory.list(2))
-        target = ClassFactory.elements(1)
-        attr = target.attrs[0]
-        attr_type = attr.types[0]
-
-        with self.assertRaises(AnalyzerValueError) as cm:
-            self.processor.process_simple_dependency(source, target, attr, attr_type)
-
-        self.assertEqual(
-            "SimpleType with more than one attribute: `class_B`", str(cm.exception)
-        )
-
-    def test_process_simple_dependency_with_enumeration(self):
-        source = ClassFactory.enumeration(2)
-        target = ClassFactory.create()
-        attr = AttrFactory.create()
-        attr_type = attr.types[0]
-        expected = attr_type.clone()
-
-        self.processor.process_simple_dependency(source, target, attr, attr_type)
-        self.assertEqual(expected, attr_type)
+        self.processor.copy_attribute_properties(source, target, attr, attr.types[0])
+        self.assertTrue(attr.restrictions.nillable)
 
     @mock.patch.object(AttributeTypeHandler, "is_circular_dependency")
-    def test_process_complex_dependency(self, mock_is_circular_dependency):
+    def test_set_circular_flag(self, mock_is_circular_dependency):
         source = ClassFactory.create()
         target = ClassFactory.create()
         attr = AttrFactory.create()
@@ -214,7 +209,7 @@ class AttributeTypeHandlerTests(FactoryTestCase):
 
         mock_is_circular_dependency.return_value = True
 
-        self.processor.process_complex_dependency(source, target, attr_type)
+        self.processor.set_circular_flag(source, target, attr_type)
         self.assertTrue(attr_type.circular)
 
         mock_is_circular_dependency.assert_called_once_with(source, target, set())
@@ -292,3 +287,31 @@ class AttributeTypeHandlerTests(FactoryTestCase):
         actual = self.processor.cached_dependencies(source)
         self.assertEqual(("a", "b"), actual)
         mock_class_dependencies.assert_called_once_with()
+
+    def test_filter_types(self):
+        xs_string = AttrTypeFactory.xs_string()
+        xs_error = AttrTypeFactory.xs_error()
+        xs_any = AttrTypeFactory.xs_any()
+
+        types = [
+            xs_string.clone(),
+            xs_string.clone(),
+            xs_string.clone(),
+            xs_error.clone(),
+        ]
+
+        actual = self.processor.filter_types(types)
+
+        self.assertEqual(1, len(actual))
+
+        types.append(xs_any)
+        actual = self.processor.filter_types(types)
+        self.assertEqual(1, len(actual))
+        self.assertEqual(xs_string, actual[0])
+
+        actual = self.processor.filter_types([])
+        self.assertEqual(xs_string, actual[0])
+
+        types = [xs_any]
+        actual = self.processor.filter_types(types)
+        self.assertEqual(1, len(actual))

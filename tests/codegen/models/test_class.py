@@ -8,6 +8,7 @@ from tests.factories import FactoryTestCase
 from xsdata.models import wsdl
 from xsdata.models import xsd
 from xsdata.models.enums import Namespace
+from xsdata.models.enums import Tag
 from xsdata.utils.namespaces import build_qname
 
 
@@ -96,12 +97,38 @@ class ClassTests(FactoryTestCase):
         obj.attrs.clear()
         self.assertFalse(obj.is_enumeration)
 
+    def test_is_simple_type(self):
+        obj = ClassFactory.elements(2)
+
+        self.assertFalse(obj.is_simple_type)
+
+        obj.attrs.pop()
+        self.assertFalse(obj.is_simple_type)
+
+        obj.attrs[0].tag = Tag.EXTENSION
+        self.assertTrue(obj.is_simple_type)
+
+        obj.attrs[0].tag = Tag.ENUMERATION
+        self.assertFalse(obj.is_simple_type)
+
+        obj.attrs[0].tag = Tag.ANY
+        self.assertFalse(obj.is_simple_type)
+
+        obj.attrs[0].tag = Tag.ANY_ATTRIBUTE
+        self.assertFalse(obj.is_simple_type)
+
+        obj.attrs[0].tag = Tag.ATTRIBUTE
+        self.assertFalse(obj.is_simple_type)
+
     def test_property_should_generate(self):
         obj = ClassFactory.create(type=xsd.Element)
         self.assertTrue(obj.should_generate)
 
         obj = ClassFactory.create(type=xsd.ComplexType)
         self.assertTrue(obj.should_generate)
+
+        obj.attrs.append(AttrFactory.create(tag=Tag.EXTENSION))
+        self.assertFalse(obj.should_generate)
 
         obj = ClassFactory.create(type=wsdl.BindingOperation)
         self.assertTrue(obj.should_generate)

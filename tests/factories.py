@@ -210,6 +210,10 @@ class AttrTypeFactory(Factory):
     def xs_tokens(cls):
         return cls.create(qname=DataType.NMTOKENS.qname, native=True)
 
+    @classmethod
+    def xs_error(cls):
+        return cls.create(qname=DataType.ERROR.qname, native=True)
+
 
 class AttrFactory(Factory):
     model = Attr

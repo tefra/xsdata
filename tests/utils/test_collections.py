@@ -31,3 +31,10 @@ class CollectionsTests(TestCase):
         collections.prepend(target, *prepend_values)
 
         self.assertEqual([4, 5, 6, 1, 2, 3], target)
+
+    def test_remove(self):
+        self.assertEqual([1, 3], collections.remove([1, 2, 2, 3], lambda x: x == 2))
+
+        self.assertEqual([2, 2, 3], collections.remove([1, 2, 2, 3], lambda x: x == 1))
+
+        self.assertEqual([3], collections.remove([1, 2, 2, 3], lambda x: x < 3))

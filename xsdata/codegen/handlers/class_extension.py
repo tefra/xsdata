@@ -20,9 +20,9 @@ from xsdata.models.xsd import SimpleType
 class ClassExtensionHandler(HandlerInterface):
     """Reduce class extensions by copying or creating new attributes."""
 
-    INCLUDES_NONE = 0
-    INCLUDES_SOME = 1
-    INCLUDES_ALL = 2
+    REMOVE_EXTENSION = 0
+    FLATTEN_EXTENSION = 1
+    IGNORE_EXTENSION = 2
 
     container: ContainerInterface
 
@@ -97,24 +97,17 @@ class ClassExtensionHandler(HandlerInterface):
         Complex flatten extension handler for primary classes eg ComplexType,
         Element.
 
-        Drop extension when:
-            - source includes all target attributes
-        Copy all attributes when:
-            - source includes some of the target attributes
-            - source has suffix attribute and target has at least one attribute
-            - target has at least one suffix attribute
-            - source is marked as strict type
+        Compare source and target classes and either remove the
+        extension completely, copy all source attributes to the target
+        class or leave the extension alone.
         """
         res = cls.compare_attributes(source, target)
-        if res == cls.INCLUDES_ALL:
+        if res == cls.REMOVE_EXTENSION:
             target.extensions.remove(ext)
-        elif (
-            res == cls.INCLUDES_SOME
-            or source.strict_type
-            or (source.has_suffix_attr and target.attrs)
-            or target.has_suffix_attr
-        ):
+        elif res == cls.FLATTEN_EXTENSION:
             ClassUtils.copy_attributes(source, target, ext)
+        else:
+            logger.debug("Ignore extension: %s", ext.type.name)
 
     def find_dependency(self, attr_type: AttrType) -> Optional[Class]:
         """
@@ -134,24 +127,43 @@ class ClassExtensionHandler(HandlerInterface):
 
     @classmethod
     def compare_attributes(cls, source: Class, target: Class) -> int:
-        """Compare the attributes of the two classes and return whether the
-        source includes all, some or none of the target attributes."""
+        """
+        Compare the attributes of the two classes and return whether the source
+        class can and should be flattened.
+
+        Remove:
+            1. Source is the Target
+            2. Target includes all the source attributes
+
+        Flatten:
+            1. Source includes some of the target attributes
+            2. The source class is marked to be forced flattened
+            3. Source class includes an attribute that needs to be last
+            4. Target class includes an attribute that needs to be last
+            5. Source class is a simple type
+        """
         if source is target:
-            return cls.INCLUDES_ALL
+            return cls.REMOVE_EXTENSION
 
-        if not target.attrs or not source.attrs:
-            return cls.INCLUDES_NONE
+        if target.attrs and source.attrs:
+            source_attrs = {attr.name for attr in source.attrs}
+            target_attrs = {attr.name for attr in target.attrs}
+            difference = source_attrs - target_attrs
 
-        source_attrs = {attr.name for attr in source.attrs}
-        target_attrs = {attr.name for attr in target.attrs}
-        difference = source_attrs - target_attrs
+            if not difference:
+                return cls.REMOVE_EXTENSION
+            if len(difference) != len(source_attrs):
+                return cls.FLATTEN_EXTENSION
 
-        if not difference:
-            return cls.INCLUDES_ALL
-        if len(difference) != len(source_attrs):
-            return cls.INCLUDES_SOME
+        if (
+            source.strict_type
+            or (source.has_suffix_attr and target.attrs)
+            or target.has_suffix_attr
+            or source.is_simple_type
+        ):
+            return cls.FLATTEN_EXTENSION
 
-        return cls.INCLUDES_NONE
+        return cls.IGNORE_EXTENSION
 
     @classmethod
     def copy_extension_type(cls, target: Class, extension: Extension):

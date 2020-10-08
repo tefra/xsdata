@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from dataclasses import field
 from typing import Dict
+from typing import List
 from typing import Optional
 from typing import Set
 from typing import Tuple
@@ -12,10 +13,9 @@ from xsdata.codegen.models import AttrType
 from xsdata.codegen.models import Class
 from xsdata.codegen.models import Status
 from xsdata.codegen.utils import ClassUtils
-from xsdata.exceptions import AnalyzerValueError
 from xsdata.logger import logger
 from xsdata.models.enums import DataType
-from xsdata.utils.collections import unique_sequence
+from xsdata.utils import collections
 
 
 @dataclass
@@ -36,7 +36,7 @@ class AttributeTypeHandler(HandlerInterface):
             for attr_type in list(attr.types):
                 self.process_type(target, attr, attr_type)
 
-            attr.types = unique_sequence(attr.types, key="name")
+            attr.types = self.filter_types(attr.types)
 
     def process_type(self, target: Class, attr: Attr, attr_type: AttrType):
         """
@@ -83,22 +83,22 @@ class AttributeTypeHandler(HandlerInterface):
         simple types.
 
         Steps:
-            1. Reset absent attribute types with a warning.
-            2. Complex type: xs:Element and xs:ComplexType
-            3. Simple type: the rest
+            1. Reset absent or dummy attribute types with a warning.
+            2. Copy attribute properties from a simple type.
+            3. Set circular flag for the rest non enumerations.
         """
 
         source = self.find_dependency(attr_type)
-        if not source:
-            logger.warning("Missing type: %s", attr_type.name)
+        if not source or (not source.attrs and not source.extensions):
+            logger.warning("Reset dummy type: %s", attr_type.name)
             self.reset_attribute_type(attr_type)
-        elif source.is_complex and not source.is_enumeration:
-            self.process_complex_dependency(source, target, attr_type)
-        else:
-            self.process_simple_dependency(source, target, attr, attr_type)
+        elif source.is_simple_type:
+            self.copy_attribute_properties(source, target, attr, attr_type)
+        elif not source.is_enumeration:
+            self.set_circular_flag(source, target, attr_type)
 
     @classmethod
-    def process_simple_dependency(
+    def copy_attribute_properties(
         cls, source: Class, target: Class, attr: Attr, attr_type: AttrType
     ):
         """
@@ -109,34 +109,25 @@ class AttributeTypeHandler(HandlerInterface):
 
         :raises: AnalyzerValueError if the source class has more than one attributes
         """
-        if source.is_enumeration:
-            return
+        source_attr = source.attrs[0]
+        index = attr.types.index(attr_type)
+        attr.types.pop(index)
 
-        total = len(source.attrs)
-        if total == 0:
-            cls.reset_attribute_type(attr_type)
-        elif total == 1:
-            source_attr = source.attrs[0]
-            index = attr.types.index(attr_type)
-            attr.types.pop(index)
+        for source_attr_type in source_attr.types:
+            clone_type = source_attr_type.clone()
+            attr.types.insert(index, clone_type)
+            index += 1
 
-            for source_attr_type in source_attr.types:
-                clone_type = source_attr_type.clone()
-                attr.types.insert(index, clone_type)
-                index += 1
+        restrictions = source_attr.restrictions.clone()
+        restrictions.merge(attr.restrictions)
+        attr.restrictions = restrictions
 
-            restrictions = source_attr.restrictions.clone()
-            restrictions.merge(attr.restrictions)
-            attr.restrictions = restrictions
-            ClassUtils.copy_inner_classes(source, target)
-        else:
-            raise AnalyzerValueError(
-                f"{source.type.__name__} with more than one attribute: `{source.name}`"
-            )
+        if source.nillable:
+            restrictions.nillable = True
 
-    def process_complex_dependency(
-        self, source: Class, target: Class, attr_type: AttrType
-    ):
+        ClassUtils.copy_inner_classes(source, target)
+
+    def set_circular_flag(self, source: Class, target: Class, attr_type: AttrType):
         """Update circular reference flag."""
         attr_type.circular = self.is_circular_dependency(source, target, set())
 
@@ -172,3 +163,24 @@ class AttributeTypeHandler(HandlerInterface):
         attr_type.native = True
         attr_type.circular = False
         attr_type.forward = False
+
+    @classmethod
+    def filter_types(cls, types: List[AttrType]) -> List[AttrType]:
+        """
+        Remove duplicate and invalid types.
+
+        Invalid:
+            1. xs:error
+            2. xs:anyType and xs:anySimpleType when there are other types present
+        """
+        xs_error = DataType.ERROR.code
+        types = collections.unique_sequence(types, key="name")
+        types = collections.remove(types, lambda x: x.native_code == xs_error)
+
+        if len(types) > 1:
+            types = collections.remove(types, lambda x: x.native_type is object)
+
+        if not types:
+            types.append(AttrType(qname=DataType.STRING.qname, native=True))
+
+        return types

@@ -96,6 +96,7 @@ class DataType(Enum):
     DURATION = ("duration", str)
     ENTITIES = ("ENTITIES", str)
     ENTITY = ("ENTITY", str)
+    ERROR = ("error", str)
     FLOAT = ("float", float)
     G_DAY = ("gDay", str)
     G_MONTH = ("gMonth", str)

@@ -462,7 +462,7 @@ class StrucDocTitleFootnote:
             max_occurs=9223372036854775807
         )
     )
-    br: List[StrucDocBr] = field(
+    br: List[str] = field(
         default_factory=list,
         metadata=dict(
             type="Element",
@@ -599,7 +599,7 @@ class StrucDocTitleContent:
             max_occurs=9223372036854775807
         )
     )
-    br: List[StrucDocBr] = field(
+    br: List[str] = field(
         default_factory=list,
         metadata=dict(
             type="Element",
@@ -728,7 +728,7 @@ class StrucDocParagraph:
             sequential=True
         )
     )
-    br: List[StrucDocBr] = field(
+    br: List[str] = field(
         default_factory=list,
         metadata=dict(
             type="Element",
@@ -869,7 +869,7 @@ class StrucDocTh:
             max_occurs=9223372036854775807
         )
     )
-    br: List[StrucDocBr] = field(
+    br: List[str] = field(
         default_factory=list,
         metadata=dict(
             type="Element",
@@ -1084,7 +1084,7 @@ class StrucDocTitle:
             max_occurs=9223372036854775807
         )
     )
-    br: List[StrucDocBr] = field(
+    br: List[str] = field(
         default_factory=list,
         metadata=dict(
             type="Element",
@@ -1221,7 +1221,7 @@ class StrucDocTd:
             max_occurs=9223372036854775807
         )
     )
-    br: List[StrucDocBr] = field(
+    br: List[str] = field(
         default_factory=list,
         metadata=dict(
             type="Element",
@@ -2051,7 +2051,7 @@ class StrucDocItem:
             sequential=True
         )
     )
-    br: List[StrucDocBr] = field(
+    br: List[str] = field(
         default_factory=list,
         metadata=dict(
             type="Element",
@@ -2273,7 +2273,7 @@ class StrucDocFootnote:
             max_occurs=9223372036854775807
         )
     )
-    br: List[StrucDocBr] = field(
+    br: List[str] = field(
         default_factory=list,
         metadata=dict(
             type="Element",
@@ -2510,7 +2510,7 @@ class StrucDocContent:
             max_occurs=9223372036854775807
         )
     )
-    br: List[StrucDocBr] = field(
+    br: List[str] = field(
         default_factory=list,
         metadata=dict(
             type="Element",
@@ -2655,7 +2655,7 @@ class StrucDocText:
             max_occurs=9223372036854775807
         )
     )
-    br: List[StrucDocBr] = field(
+    br: List[str] = field(
         default_factory=list,
         metadata=dict(
             type="Element",

@@ -8,14 +8,14 @@ class item {
     +productName : string
     +quantity : positiveInteger
     +USPrice : decimal
-    +comment : comment
+    +comment : string
     +shipDate : date
     +partNum : string
 }
 class PurchaseOrderType {
     +shipTo : USAddress
     +billTo : USAddress
-    +comment : comment
+    +comment : string
     +items : Items
     +orderDate : date
 }

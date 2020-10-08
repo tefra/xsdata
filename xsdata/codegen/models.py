@@ -30,7 +30,6 @@ xml_type_map = {
     Tag.ANY: XmlType.WILDCARD,
     Tag.ANY_ATTRIBUTE: XmlType.ATTRIBUTES,
     Tag.ATTRIBUTE: XmlType.ATTRIBUTE,
-    None: XmlType.TEXT,
 }
 
 
@@ -409,18 +408,18 @@ class Class:
 
     @property
     def has_suffix_attr(self) -> bool:
-        """Return whether or not it includes a suffix attribute."""
+        """Return whether it includes a suffix attribute."""
         return any(attr.is_suffix for attr in self.attrs)
 
     @property
     def is_complex(self) -> bool:
-        """Return whether or not this instance is derived from an xs:element or
+        """Return whether this instance is derived from an xs:element or
         xs:complexType."""
         return self.type in (Element, ComplexType)
 
     @property
     def is_element(self) -> bool:
-        """Return whether or not this instance is derived from an non abstract
+        """Return whether this instance is derived from an non abstract
         xs:element."""
         return self.type is Element
 
@@ -436,13 +435,27 @@ class Class:
 
     @property
     def is_service(self) -> bool:
-        """Return whether or not this instance is derived from
-        wsdl:operation."""
+        """Return whether this instance is derived from wsdl:operation."""
         return self.type is BindingOperation
 
     @property
+    def is_simple_type(self) -> bool:
+        """
+        Return whether the class represents a simple text type.
+
+        :return:
+        """
+        return len(self.attrs) == 1 and self.attrs[0].tag not in (
+            Tag.ELEMENT,
+            Tag.ENUMERATION,
+            Tag.ANY,
+            Tag.ANY_ATTRIBUTE,
+            Tag.ATTRIBUTE,
+        )
+
+    @property
     def should_generate(self) -> bool:
-        """Return whether or not this instance should be generated."""
+        """Return whether this instance should be generated."""
         if self.strict_type:
             return False
 

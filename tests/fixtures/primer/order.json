@@ -15,18 +15,14 @@
         "zip": "95819",
         "country": "US"
     },
-    "comment": {
-        "value": "Hurry, my lawn is going wild!"
-    },
+    "comment": "Hurry, my lawn is going wild!",
     "items": {
         "item": [
             {
                 "product_name": "Lawnmower",
                 "quantity": 1,
                 "usprice": "148.95",
-                "comment": {
-                    "value": "Confirm this is electric"
-                },
+                "comment": "Confirm this is electric",
                 "ship_date": null,
                 "part_num": "872-AA"
             },

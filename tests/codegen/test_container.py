@@ -66,6 +66,39 @@ class ClassContainerTests(FactoryTestCase):
             second, self.container.find(first.qname, lambda x: len(x.attrs) == 2)
         )
 
+    @mock.patch.object(ClassContainer, "process_class")
+    def test_find_inner(self, mock_process_class):
+        obj = ClassFactory.create()
+        first = ClassFactory.create(qname="{a}a")
+        second = ClassFactory.enumeration(2, qname="{a}a")
+        third = ClassFactory.create(qname="{c}c", status=Status.PROCESSED)
+        fourth = ClassFactory.enumeration(2, qname="{d}d", status=Status.PROCESSING)
+        obj.inner.extend((first, second, third, fourth))
+
+        def process_class(x: Class):
+            x.status = Status.PROCESSED
+
+        def is_enum(x: Class):
+            return x.is_enumeration
+
+        mock_process_class.side_effect = process_class
+
+        self.assertIsNone(self.container.find_inner(obj, "nope"))
+        self.assertEqual(first, self.container.find_inner(obj, "a"))
+        self.assertEqual(second, self.container.find_inner(obj, "a", is_enum))
+        self.assertEqual(third, self.container.find_inner(obj, "c"))
+        self.assertEqual(fourth, self.container.find_inner(obj, "d", is_enum))
+        mock_process_class.assert_has_calls([mock.call(first), mock.call(second)])
+
+    def test_process(self):
+        target = ClassFactory.create(inner=ClassFactory.list(2))
+        self.container.add(target)
+
+        self.container.process_class(target)
+        self.assertEqual(Status.PROCESSED, target.status)
+        self.assertEqual(Status.PROCESSED, target.inner[0].status)
+        self.assertEqual(Status.PROCESSED, target.inner[1].status)
+
     @mock.patch.object(Class, "should_generate", new_callable=mock.PropertyMock)
     def test_filter_classes(self, mock_class_should_generate):
         mock_class_should_generate.side_effect = [True, False, False, True, False]

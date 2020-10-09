@@ -32,6 +32,8 @@ xml_type_map = {
     Tag.ATTRIBUTE: XmlType.ATTRIBUTE,
 }
 
+SIMPLE_TYPES = (Tag.EXTENSION, Tag.LIST, Tag.SIMPLE_TYPE, Tag.UNION)
+
 
 @dataclass
 class Restrictions:
@@ -440,18 +442,8 @@ class Class:
 
     @property
     def is_simple_type(self) -> bool:
-        """
-        Return whether the class represents a simple text type.
-
-        :return:
-        """
-        return len(self.attrs) == 1 and self.attrs[0].tag not in (
-            Tag.ELEMENT,
-            Tag.ENUMERATION,
-            Tag.ANY,
-            Tag.ANY_ATTRIBUTE,
-            Tag.ATTRIBUTE,
-        )
+        """Return whether the class represents a simple text type."""
+        return len(self.attrs) == 1 and self.attrs[0].tag in SIMPLE_TYPES
 
     @property
     def should_generate(self) -> bool:

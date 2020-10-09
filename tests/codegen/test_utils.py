@@ -107,8 +107,8 @@ class ClassUtilsTests(FactoryTestCase):
 
         attr = AttrFactory.create(
             types=[
-                AttrTypeFactory.create(qname=target.name, forward=True),
                 AttrTypeFactory.create(qname=target.name, forward=False),
+                AttrTypeFactory.create(qname=target.name, forward=True),
                 AttrTypeFactory.create(qname="foobar"),
             ]
         )
@@ -121,6 +121,6 @@ class ClassUtilsTests(FactoryTestCase):
             self.assertEqual(target.package, inner.package)
             self.assertEqual(target.module, inner.module)
 
-        self.assertTrue(attr.types[0].circular)
-        self.assertFalse(attr.types[1].circular)
+        self.assertFalse(attr.types[0].circular)
+        self.assertTrue(attr.types[1].circular)
         self.assertFalse(attr.types[2].circular)

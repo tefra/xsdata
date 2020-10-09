@@ -19,6 +19,7 @@ from xsdata.formats.dataclass.models.elements import XmlVar
 from xsdata.formats.dataclass.models.generics import AnyElement
 from xsdata.formats.dataclass.models.generics import DerivedElement
 from xsdata.formats.dataclass.serializers.mixins import XmlWriter
+from xsdata.formats.dataclass.serializers.mixins import XmlWriterEvent
 from xsdata.formats.dataclass.serializers.writers import LxmlEventWriter
 from xsdata.models.enums import QNames
 from xsdata.utils import namespaces
@@ -103,16 +104,16 @@ class XmlSerializer(AbstractSerializer):
         nillable = nillable or meta.nillable
         namespace, tag = split_qname(qname)
 
-        yield XmlWriter.START_TAG, qname
+        yield XmlWriterEvent.START, qname
 
         for key, value in self.next_attribute(obj, meta, nillable, xsi_type):
-            yield XmlWriter.ADD_ATTR, key, value
+            yield XmlWriterEvent.ATTR, key, value
 
         for var, value in self.next_value(obj, meta):
             if value is not None:
                 yield from self.write_value(value, var, namespace)
 
-        yield XmlWriter.END_TAG, qname
+        yield XmlWriterEvent.END, qname
 
     def write_xsi_type(self, value: Any, var: XmlVar, namespace: NoneStr) -> Generator:
         """Produce an events stream from a dataclass with xsi abstract type
@@ -195,20 +196,20 @@ class XmlSerializer(AbstractSerializer):
         """Produce an element events stream for the given generic object."""
         if value.qname:
             namespace, tag = split_qname(value.qname)
-            yield XmlWriter.START_TAG, value.qname
+            yield XmlWriterEvent.START, value.qname
 
         for key, val in value.attributes.items():
-            yield XmlWriter.ADD_ATTR, key, val
+            yield XmlWriterEvent.ATTR, key, val
 
-        yield XmlWriter.SET_DATA, value.text
+        yield XmlWriterEvent.DATA, value.text
 
         for child in value.children:
             yield from self.write_any_type(child, var, namespace)
 
         if value.qname:
-            yield XmlWriter.END_TAG, value.qname
+            yield XmlWriterEvent.END, value.qname
 
-        yield XmlWriter.SET_DATA, value.tail
+        yield XmlWriterEvent.DATA, value.tail
 
     def xsi_type(self, var: XmlVar, value: Any, namespace: NoneStr) -> Optional[QName]:
         """Get xsi:type if the given value is a derived instance."""
@@ -229,18 +230,18 @@ class XmlSerializer(AbstractSerializer):
     @classmethod
     def write_data(cls, value: Any, var: XmlVar, namespace: NoneStr) -> Generator:
         """Produce a data event for the given value."""
-        yield XmlWriter.SET_DATA, value
+        yield XmlWriterEvent.DATA, value
 
     @classmethod
     def write_element(cls, value: Any, var: XmlVar, namespace: NoneStr) -> Generator:
         """Produce an element events stream for the given simple type value."""
-        yield XmlWriter.START_TAG, var.qname
+        yield XmlWriterEvent.START, var.qname
 
         if var.nillable:
-            yield XmlWriter.ADD_ATTR, QNames.XSI_NIL, "true"
+            yield XmlWriterEvent.ATTR, QNames.XSI_NIL, "true"
 
-        yield XmlWriter.SET_DATA, value
-        yield XmlWriter.END_TAG, var.qname
+        yield XmlWriterEvent.DATA, value
+        yield XmlWriterEvent.END, var.qname
 
     @classmethod
     def next_value(cls, obj: Any, meta: XmlMeta):

@@ -20,10 +20,9 @@ from xsdata.codegen.models import Class
 from xsdata.codegen.models import Status
 from xsdata.utils import collections
 from xsdata.utils.collections import group_by
+from xsdata.utils.globals import return_true
 
 methodcaller("source_qname")
-
-Condition = Optional[Callable]
 
 
 class ClassContainer(UserDict, ContainerInterface):
@@ -60,28 +59,26 @@ class ClassContainer(UserDict, ContainerInterface):
         for items in list(self.data.values()):
             yield from items
 
-    def find(self, qname: str, condition: Condition = None) -> Optional[Class]:
+    def find(self, qname: str, condition: Callable = return_true) -> Optional[Class]:
         """Search by qualified name for a specific class with an optional
         condition callable."""
         for row in self.data.get(qname, []):
-            if not condition or condition(row):
+            if condition(row):
                 if row.status == Status.RAW:
                     self.process_class(row)
-
-                    if condition:
-                        return self.find(qname, condition)
+                    return self.find(qname, condition)
 
                 return row
         return None
 
     def find_inner(
-        self, source: Class, name: str, condition: Condition = None
+        self, source: Class, name: str, condition: Callable = return_true
     ) -> Optional[Class]:
         for inner in source.inner:
             if inner.status == Status.RAW:
                 self.process_class(inner)
 
-            if inner.name == name and (not condition or condition(inner)):
+            if inner.name == name and condition(inner):
                 return inner
 
         return None

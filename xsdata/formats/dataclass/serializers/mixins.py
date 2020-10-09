@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from dataclasses import field
+from enum import Enum
 from typing import Any
 from typing import Dict
 from typing import Generator
@@ -19,6 +20,13 @@ from xsdata.utils.namespaces import split_qname
 
 XSI_NIL = (Namespace.XSI.uri, "nil")
 EMPTY_MAP: Dict = {}
+
+
+class XmlWriterEvent(Enum):
+    START = 0
+    ATTR = 1
+    DATA = 2
+    END = 3
 
 
 @dataclass
@@ -48,25 +56,19 @@ class XmlWriter:
     pending_tag: Optional[Tuple] = field(init=False, default=None)
     pending_prefixes: List[List] = field(init=False, default_factory=list)
 
-    # Constants
-    START_TAG = 0
-    ADD_ATTR = 1
-    SET_DATA = 2
-    END_TAG = 3
-
     def write(self, events: Generator):
         """Iterate over the generated events and feed the sax content handler
         with the information needed to generate the xml output."""
         self.handler.startDocument()
 
         for event, *args in events:
-            if event == self.START_TAG:
+            if event == XmlWriterEvent.START:
                 self.start_tag(*args)
-            elif event == self.END_TAG:
+            elif event == XmlWriterEvent.END:
                 self.end_tag(*args)
-            elif event == self.ADD_ATTR:
+            elif event == XmlWriterEvent.ATTR:
                 self.add_attribute(*args)
-            elif event == self.SET_DATA:
+            elif event == XmlWriterEvent.DATA:
                 self.set_data(*args)
             else:
                 raise XmlWriterError(f"Unhandled event: `{event}`")

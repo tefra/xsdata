@@ -75,17 +75,24 @@ class ClassUtils:
         Copy safely inner classes from source to target class.
 
         Checks:
-            1. Inner is the target class, skip and mark as self reference
-            2. Inner with same name exists, skip
+            1. Inner is the target class, skip and mark as circular.
+            2. Inner with same name exists, skip.
         """
         for inner in source.inner:
             if inner is target:
-                for attr in target.attrs:
-                    for attr_type in attr.types:
-                        if attr_type.forward and attr_type.name == inner.name:
-                            attr_type.circular = True
+                cls.update_inner_circular(target, inner)
             elif not any(existing.name == inner.name for existing in target.inner):
                 clone = inner.clone()
                 clone.package = target.package
                 clone.module = target.module
                 target.inner.append(clone)
+
+    @classmethod
+    def update_inner_circular(cls, target: Class, inner: Class):
+
+        """Find the target attributes with the inner type and mark them as
+        circular."""
+        for attr in target.attrs:
+            for attr_type in attr.types:
+                if attr_type.forward and attr_type.name == inner.name:
+                    attr_type.circular = True

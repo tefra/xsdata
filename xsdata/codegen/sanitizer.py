@@ -199,6 +199,26 @@ class ClassSanitizer:
         for inner in target.inner:
             self.rename_dependency(inner, search, replace)
 
+    def find_enum(self, source: Class, attr_type: AttrType) -> Optional[Class]:
+        """
+        Find the enumeration source class for the given class and attribute
+        type.
+
+        Search in root classes an inner class and exclude native types.
+        """
+        if attr_type.native:
+            return None
+
+        if attr_type.forward:
+            for inner in source.inner:
+                if inner.name == attr_type.name and inner.is_enumeration:
+                    return inner
+
+            return None
+
+        qname = attr_type.qname
+        return self.container.find(qname, condition=lambda x: x.is_enumeration)
+
     @classmethod
     def process_attribute_restrictions(cls, attr: Attr):
         """Sanitize attribute required flag by comparing the min/max
@@ -269,57 +289,44 @@ class ClassSanitizer:
 
     @classmethod
     def process_duplicate_attribute_names(cls, attrs: List[Attr]) -> None:
-        """
-        Sanitize duplicate attribute names that might exist by applying rename
-        strategies.
-
-        Steps:
-            1. If more than two attributes share the same name or if they are
-            enumerations append a numerical index to the attribute names.
-            2. If one of the two fields has a specific namespace prepend it to the
-            name. If possible rename the second field.
-            3. Append the xml type to the name of one of the two attributes. if
-            possible rename the second field or the field with xml type `attribute`.
-        """
+        """Sanitize duplicate attribute names that might exist by applying
+        rename strategies."""
         grouped = group_by(attrs, lambda attr: attr.name.lower())
         for items in grouped.values():
-            if len(items) == 1:
-                continue
-
             if len(items) > 2 or items[0].is_enumeration:
-                for index in range(1, len(items)):
-                    num = 1
-                    name = items[index].name.lower()
+                cls.rename_attributes_with_index(attrs, items)
+            elif len(items) == 2:
+                cls.rename_attribute_by_preference(*items)
 
-                    while any(attr.name.lower() == f"{name}_{num}" for attr in attrs):
-                        num += 1
+    @classmethod
+    def rename_attributes_with_index(cls, all_attrs: List[Attr], rename: List[Attr]):
+        """Append the next available index number to all the rename attributes
+        names."""
+        for index in range(1, len(rename)):
+            num = 1
+            name = rename[index].name.lower()
 
-                    items[index].name = f"{name}_{num}"
-            else:
-                first, second = items
-                if first.tag == second.tag and any((first.namespace, second.namespace)):
-                    change = second if second.namespace else first
-                    change.name = f"{clean_uri(change.namespace)}_{change.name}"
-                else:
-                    change = second if second.is_attribute else first
-                    change.name = f"{change.name}_{change.tag}"
+            while any(attr.name.lower() == f"{name}_{num}" for attr in all_attrs):
+                num += 1
 
-    def find_enum(self, source: Class, attr_type: AttrType) -> Optional[Class]:
+            rename[index].name = f"{name}_{num}"
+
+    @classmethod
+    def rename_attribute_by_preference(cls, a: Attr, b: Attr):
         """
-        Find the enumeration source class for the given class and attribute
-        type.
+        Decide and rename one of the two given attributes.
 
-        Search in root classes an inner class and exclude native types.
+        When both attributes are derived from the same xs:tag and one of the two fields
+        has a specific namespace prepend it to the name. Preferable rename the second
+        attribute.
+
+        Otherwise append the derived from tag to the name of one of the two attributes.
+        Preferably rename the second field or the field derived from xs:attribute.
         """
-        if attr_type.native:
-            return None
-
-        if attr_type.forward:
-            for inner in source.inner:
-                if inner.name == attr_type.name and inner.is_enumeration:
-                    return inner
-
-            return None
-
-        qname = attr_type.qname
-        return self.container.find(qname, condition=lambda x: x.is_enumeration)
+        if a.tag == b.tag and (a.namespace or b.namespace):
+            change = b if b.namespace else a
+            assert change.namespace is not None
+            change.name = f"{clean_uri(change.namespace)}_{change.name}"
+        else:
+            change = b if b.is_attribute else a
+            change.name = f"{change.name}_{change.tag}"

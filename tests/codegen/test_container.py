@@ -35,10 +35,13 @@ class ClassContainerTests(FactoryTestCase):
 
     @mock.patch.object(ClassContainer, "process_class")
     def test_find(self, mock_process_class):
+        def process_class(x: Class):
+            x.status = Status.PROCESSED
+
         class_a = ClassFactory.create(qname="a")
         class_b = ClassFactory.create(qname="b", status=Status.PROCESSED)
         class_c = ClassFactory.enumeration(2, qname="b", status=Status.PROCESSING)
-
+        mock_process_class.side_effect = process_class
         self.container.extend([class_a, class_b, class_c])
 
         self.assertIsNone(self.container.find("nope"))
@@ -48,23 +51,6 @@ class ClassContainerTests(FactoryTestCase):
             class_c, self.container.find(class_b.qname, lambda x: x.is_enumeration)
         )
         mock_process_class.assert_called_once_with(class_a)
-
-    @mock.patch.object(ClassContainer, "process_class")
-    def test_find_repeat_on_condition_and_not_processed(self, mock_process_class):
-        first = ClassFactory.elements(2, qname="a")
-        second = ClassFactory.elements(2, qname="a")
-        self.container.extend([first, second])
-
-        def process_class(x: Class):
-            x.status = Status.PROCESSED
-            if x is first:
-                first.attrs.clear()
-
-        mock_process_class.side_effect = process_class
-
-        self.assertEqual(
-            second, self.container.find(first.qname, lambda x: len(x.attrs) == 2)
-        )
 
     @mock.patch.object(ClassContainer, "process_class")
     def test_find_inner(self, mock_process_class):

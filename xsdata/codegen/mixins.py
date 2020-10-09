@@ -5,8 +5,7 @@ from typing import List
 from typing import Optional
 
 from xsdata.codegen.models import Class
-
-Condition = Optional[Callable]
+from xsdata.utils.globals import return_true
 
 
 class ContainerInterface(metaclass=abc.ABCMeta):
@@ -18,13 +17,13 @@ class ContainerInterface(metaclass=abc.ABCMeta):
         """Create an iterator for the class map values."""
 
     @abc.abstractmethod
-    def find(self, qname: str, condition: Condition = None) -> Optional[Class]:
+    def find(self, qname: str, condition: Callable = return_true) -> Optional[Class]:
         """Search by qualified name for a specific class with an optional
         condition callable."""
 
     @abc.abstractmethod
     def find_inner(
-        self, source: Class, name: str, condition: Condition = None
+        self, source: Class, name: str, condition: Callable = return_true
     ) -> Optional[Class]:
         """Search by name for a specific inner class with an optional condition
         callable."""

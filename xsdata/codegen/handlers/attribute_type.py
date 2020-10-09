@@ -48,7 +48,7 @@ class AttributeTypeHandler(HandlerInterface):
         if attr_type.native:
             self.process_native_type(attr, attr_type)
         elif attr_type.forward:
-            logger.debug("Skipping attribute type that points to inner class.")
+            self.process_inner_type(target, attr, attr_type)
         else:
             self.process_dependency_type(target, attr, attr_type)
 
@@ -77,10 +77,23 @@ class AttributeTypeHandler(HandlerInterface):
 
         return None
 
+    def process_inner_type(self, target: Class, attr: Attr, attr_type: AttrType):
+        """
+        Process an attributes type that depends on an inner type.
+
+        If there is a matching simple type inner class copy the inner
+        type attribute properties.
+        """
+        inner = self.container.find_inner(
+            target, attr_type.name, lambda x: x.is_simple_type
+        )
+        if inner:
+            self.copy_attribute_properties(inner, target, attr, attr_type)
+            target.inner.remove(inner)
+
     def process_dependency_type(self, target: Class, attr: Attr, attr_type: AttrType):
         """
-        Process user defined attribute types, split process between complex and
-        simple types.
+        Process an attributes type that depends on any global type.
 
         Steps:
             1. Reset absent or dummy attribute types with a warning.

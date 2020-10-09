@@ -5,6 +5,7 @@ from tests.factories import AttrTypeFactory
 from tests.factories import ClassFactory
 from tests.factories import ExtensionFactory
 from tests.factories import FactoryTestCase
+from xsdata.codegen.models import SIMPLE_TYPES
 from xsdata.models import wsdl
 from xsdata.models import xsd
 from xsdata.models.enums import Namespace
@@ -105,20 +106,9 @@ class ClassTests(FactoryTestCase):
         obj.attrs.pop()
         self.assertFalse(obj.is_simple_type)
 
-        obj.attrs[0].tag = Tag.EXTENSION
-        self.assertTrue(obj.is_simple_type)
-
-        obj.attrs[0].tag = Tag.ENUMERATION
-        self.assertFalse(obj.is_simple_type)
-
-        obj.attrs[0].tag = Tag.ANY
-        self.assertFalse(obj.is_simple_type)
-
-        obj.attrs[0].tag = Tag.ANY_ATTRIBUTE
-        self.assertFalse(obj.is_simple_type)
-
-        obj.attrs[0].tag = Tag.ATTRIBUTE
-        self.assertFalse(obj.is_simple_type)
+        for tag in SIMPLE_TYPES:
+            obj.attrs[0].tag = tag
+            self.assertTrue(obj.is_simple_type)
 
     def test_property_should_generate(self):
         obj = ClassFactory.create(type=xsd.Element)

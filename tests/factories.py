@@ -114,6 +114,14 @@ class ClassFactory(Factory):
         )
 
     @classmethod
+    def simple_type(cls, **kwargs) -> Class:
+        return ClassFactory.create(
+            type=SimpleType,
+            attrs=AttrFactory.list(1, tag=Tag.EXTENSION),
+            **kwargs,
+        )
+
+    @classmethod
     def enumeration(cls, attributes: int, **kwargs) -> Class:
         return ClassFactory.create(
             type=SimpleType,

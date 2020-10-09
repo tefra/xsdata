@@ -85,18 +85,14 @@ class AttributeTypeHandlerTests(FactoryTestCase):
         self.assertEqual(0, mock_process_native_type.call_count)
         mock_process_dependency_type.assert_called_once_with(target, attr, attr_type)
 
-    @mock.patch.object(AttributeTypeHandler, "process_dependency_type")
-    @mock.patch.object(AttributeTypeHandler, "process_native_type")
-    def test_process_type_with_inner_type(
-        self, mock_process_native_type, mock_process_dependency_type
-    ):
+    @mock.patch.object(AttributeTypeHandler, "process_inner_type")
+    def test_process_type_with_inner_type(self, mock_process_inner_type):
         attr = AttrFactory.create()
         target = ClassFactory.create()
         attr_type = AttrTypeFactory.create(forward=True)
 
         self.processor.process_type(target, attr, attr_type)
-        self.assertEqual(0, mock_process_native_type.call_count)
-        self.assertEqual(0, mock_process_dependency_type.call_count)
+        mock_process_inner_type.assert_called_once_with(target, attr, attr_type)
 
     def test_process_native_type(self):
         attr = AttrFactory.create()
@@ -141,13 +137,11 @@ class AttributeTypeHandlerTests(FactoryTestCase):
     def test_process_dependency_type_with_simple_type(
         self, mock_find_dependency, mock_copy_attribute_properties
     ):
-        simple = ClassFactory.create(attrs=[AttrFactory.create(tag=Tag.EXTENSION)])
-
-        mock_find_dependency.return_value = simple
-
+        simple = ClassFactory.simple_type()
         target = ClassFactory.create()
         attr = AttrFactory.create()
         attr_type = attr.types[0]
+        mock_find_dependency.return_value = simple
 
         self.processor.process_dependency_type(target, attr, attr_type)
         mock_copy_attribute_properties.assert_called_once_with(
@@ -172,6 +166,31 @@ class AttributeTypeHandlerTests(FactoryTestCase):
         self.processor.process_dependency_type(target, attr, attr_type)
 
         mock_set_circular_flag.assert_called_once_with(complex_type, target, attr_type)
+
+    @mock.patch.object(AttributeTypeHandler, "copy_attribute_properties")
+    def test_process_inner_type(self, mock_copy_attribute_properties):
+        target = ClassFactory.create()
+        enumeration = ClassFactory.enumeration(2, qname="{bar}a")
+        simple_type = ClassFactory.simple_type(qname="{bar}a")
+        attr = AttrFactory.create(types=[AttrTypeFactory.create(qname="{foo}a")])
+
+        target.inner.extend((enumeration, simple_type))
+        self.processor.process_inner_type(target, attr, attr.types[0])
+        self.assertNotIn(simple_type, target.inner)
+        mock_copy_attribute_properties.assert_called_once_with(
+            simple_type, target, attr, attr.types[0]
+        )
+
+    @mock.patch.object(AttributeTypeHandler, "copy_attribute_properties")
+    def test_process_inner_type_with_absent_type(self, mock_copy_attribute_properties):
+        target = ClassFactory.create()
+        simple_type = ClassFactory.simple_type(qname="b")
+        attr = AttrFactory.create(types=[AttrTypeFactory.create(qname="{foo}a")])
+
+        target.inner.append(simple_type)
+        self.processor.process_inner_type(target, attr, attr.types[0])
+        self.assertIn(simple_type, target.inner)
+        self.assertEqual(0, mock_copy_attribute_properties.call_count)
 
     @mock.patch.object(ClassUtils, "copy_inner_classes")
     def test_copy_attribute_properties(self, mock_copy_inner_classes):

@@ -74,6 +74,18 @@ class ClassContainer(UserDict, ContainerInterface):
                 return row
         return None
 
+    def find_inner(
+        self, source: Class, name: str, condition: Condition = None
+    ) -> Optional[Class]:
+        for inner in source.inner:
+            if inner.status == Status.RAW:
+                self.process_class(inner)
+
+            if inner.name == name and (not condition or condition(inner)):
+                return inner
+
+        return None
+
     def process(self):
         """Run the process handlers for ever non processed class."""
         for obj in self.iterate():

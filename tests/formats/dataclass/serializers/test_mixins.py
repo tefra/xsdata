@@ -4,6 +4,7 @@ from xml.sax.saxutils import XMLGenerator
 
 from xsdata.exceptions import XmlWriterError
 from xsdata.formats.dataclass.serializers.mixins import XmlWriter
+from xsdata.formats.dataclass.serializers.mixins import XmlWriterEvent
 from xsdata.models.enums import DataType
 from xsdata.models.enums import QNames
 
@@ -23,13 +24,13 @@ class XmlEventWriterTests(TestCase):
     def test_consume(self):
         events = iter(
             [
-                (XmlWriter.START_TAG, "{http://www.w3.org/1999/xhtml}p"),
-                (XmlWriter.ADD_ATTR, "class", "section"),
-                (XmlWriter.SET_DATA, "total:"),
-                (XmlWriter.SET_DATA, 105.22),
-                (XmlWriter.START_TAG, "{http://www.w3.org/1999/xhtml}br"),
-                (XmlWriter.END_TAG, "{http://www.w3.org/1999/xhtml}br"),
-                (XmlWriter.END_TAG, "{http://www.w3.org/1999/xhtml}p"),
+                (XmlWriterEvent.START, "{http://www.w3.org/1999/xhtml}p"),
+                (XmlWriterEvent.ATTR, "class", "section"),
+                (XmlWriterEvent.DATA, "total:"),
+                (XmlWriterEvent.DATA, 105.22),
+                (XmlWriterEvent.START, "{http://www.w3.org/1999/xhtml}br"),
+                (XmlWriterEvent.END, "{http://www.w3.org/1999/xhtml}br"),
+                (XmlWriterEvent.END, "{http://www.w3.org/1999/xhtml}p"),
             ]
         )
 
@@ -58,27 +59,27 @@ class XmlEventWriterTests(TestCase):
     def test_write_removes_xsi_nil_if_necessary(self):
         events = iter(
             [
-                (XmlWriter.START_TAG, "root"),
-                (XmlWriter.START_TAG, "a"),
-                (XmlWriter.ADD_ATTR, QNames.XSI_NIL, "true"),
-                (XmlWriter.END_TAG, "a"),
-                (XmlWriter.START_TAG, "a"),
-                (XmlWriter.ADD_ATTR, QNames.XSI_NIL, "true"),
-                (XmlWriter.SET_DATA, "0"),
-                (XmlWriter.END_TAG, "a"),
-                (XmlWriter.START_TAG, "a"),
-                (XmlWriter.ADD_ATTR, QNames.XSI_NIL, "true"),
-                (XmlWriter.SET_DATA, ""),
-                (XmlWriter.END_TAG, "a"),
-                (XmlWriter.START_TAG, "a"),
-                (XmlWriter.ADD_ATTR, QNames.XSI_NIL, "true"),
-                (XmlWriter.SET_DATA, None),
-                (XmlWriter.END_TAG, "a"),
-                (XmlWriter.START_TAG, "a"),
-                (XmlWriter.ADD_ATTR, QNames.XSI_NIL, "true"),
-                (XmlWriter.SET_DATA, [""]),
-                (XmlWriter.END_TAG, "a"),
-                (XmlWriter.END_TAG, "root"),
+                (XmlWriterEvent.START, "root"),
+                (XmlWriterEvent.START, "a"),
+                (XmlWriterEvent.ATTR, QNames.XSI_NIL, "true"),
+                (XmlWriterEvent.END, "a"),
+                (XmlWriterEvent.START, "a"),
+                (XmlWriterEvent.ATTR, QNames.XSI_NIL, "true"),
+                (XmlWriterEvent.DATA, "0"),
+                (XmlWriterEvent.END, "a"),
+                (XmlWriterEvent.START, "a"),
+                (XmlWriterEvent.ATTR, QNames.XSI_NIL, "true"),
+                (XmlWriterEvent.DATA, ""),
+                (XmlWriterEvent.END, "a"),
+                (XmlWriterEvent.START, "a"),
+                (XmlWriterEvent.ATTR, QNames.XSI_NIL, "true"),
+                (XmlWriterEvent.DATA, None),
+                (XmlWriterEvent.END, "a"),
+                (XmlWriterEvent.START, "a"),
+                (XmlWriterEvent.ATTR, QNames.XSI_NIL, "true"),
+                (XmlWriterEvent.DATA, [""]),
+                (XmlWriterEvent.END, "a"),
+                (XmlWriterEvent.END, "root"),
             ]
         )
         self.writer.write(events)
@@ -99,11 +100,11 @@ class XmlEventWriterTests(TestCase):
     def test_write_resets_default_namespace_for_unqualified_elements(self):
         events = iter(
             [
-                (XmlWriter.START_TAG, "{a}a"),
-                (XmlWriter.START_TAG, "b"),
-                (XmlWriter.SET_DATA, "foo"),
-                (XmlWriter.START_TAG, "b"),
-                (XmlWriter.END_TAG, "{a}a"),
+                (XmlWriterEvent.START, "{a}a"),
+                (XmlWriterEvent.START, "b"),
+                (XmlWriterEvent.DATA, "foo"),
+                (XmlWriterEvent.START, "b"),
+                (XmlWriterEvent.END, "{a}a"),
             ]
         )
 

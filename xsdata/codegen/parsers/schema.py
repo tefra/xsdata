@@ -212,9 +212,8 @@ class SchemaParser(XmlParser):
     def end_open_content(cls, obj: T):
         """Adjust the index to trick later processors into putting attributes
         derived from this open content last in classes."""
-        if isinstance(obj, xsd.OpenContent):
-            if obj.any and obj.mode == Mode.SUFFIX:
-                obj.any.index = sys.maxsize
+        if isinstance(obj, xsd.OpenContent) and obj.any and obj.mode == Mode.SUFFIX:
+            obj.any.index = sys.maxsize
 
     def end_restriction(self, obj: T):
         """Set the open content if any to the given restriction."""

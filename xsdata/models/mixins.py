@@ -17,8 +17,7 @@ from xsdata.models.enums import Namespace
 from xsdata.models.enums import NamespaceType
 from xsdata.utils import collections
 from xsdata.utils import text
-
-Condition = Optional[Callable]
+from xsdata.utils.globals import return_true
 
 
 @dataclass
@@ -187,16 +186,15 @@ class ElementBase:
         """Return the restrictions dictionary of this element."""
         return {}
 
-    def children(self, condition: Condition = None) -> Iterator["ElementBase"]:
+    def children(self, condition: Callable = return_true) -> Iterator["ElementBase"]:
         """Iterate over all the ElementBase children of this element that match
         the given condition if any."""
         for f in fields(self):
             value = getattr(self, f.name)
             if isinstance(value, list) and value and isinstance(value[0], ElementBase):
-                yield from (val for val in value if not condition or condition(val))
-            elif isinstance(value, ElementBase):
-                if not condition or condition(value):
-                    yield value
+                yield from (val for val in value if condition(val))
+            elif isinstance(value, ElementBase) and condition(value):
+                yield value
 
 
 class ModuleMixin:

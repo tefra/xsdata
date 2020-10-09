@@ -24,7 +24,7 @@ outputs = click.Choice([x.value for x in OutputFormat])
 @click.version_option(get_distribution("xsdata").version)
 @click_log.simple_verbosity_option(logger)
 def cli():
-    pass
+    """xsdata command line interface."""
 
 
 @cli.command("init-config")

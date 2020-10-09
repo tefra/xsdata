@@ -68,7 +68,11 @@ class AttributeTypeHandler(HandlerInterface):
             2. Non abstract
             3. anything
         """
-        conditions = (lambda obj: not obj.is_complex, lambda x: not x.abstract, None)
+        conditions = (
+            lambda obj: not obj.is_complex,
+            lambda x: not x.abstract,
+            lambda x: True,
+        )
 
         for condition in conditions:
             result = self.container.find(attr_type.qname, condition=condition)

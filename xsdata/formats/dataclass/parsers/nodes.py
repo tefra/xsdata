@@ -250,7 +250,7 @@ class UnionNode(XmlNode):
         self.events.insert(0, ("start", qname, copy.deepcopy(self.attrs), self.ns_map))
 
         obj = None
-        max_score = -1
+        max_score = -1.0
         for clazz in self.var.types:
             candidate = self.parse_class(clazz)
             score = self.score_object(candidate)
@@ -274,13 +274,28 @@ class UnionNode(XmlNode):
             return None
 
     @classmethod
-    def score_object(cls, obj: Any) -> int:
-        """Sum all not None field values for the given object."""
-        return (
-            sum(1 for var in fields(obj) if getattr(obj, var.name) is not None)
-            if obj
-            else -1
-        )
+    def score_object(cls, obj: Any) -> float:
+        """
+        Score a dataclass instance by the field values types.
+
+        Weights:
+            1. None: 0
+            2. str: 1
+            3. *: 1.5
+        """
+
+        if not obj:
+            return -1.0
+
+        score = 0.0
+        for var in fields(obj):
+            val = getattr(obj, var.name)
+            if isinstance(val, str):
+                score += 1.0
+            elif val is not None:
+                score += 1.5
+
+        return score
 
 
 @dataclass

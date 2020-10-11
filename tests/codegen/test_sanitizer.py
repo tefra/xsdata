@@ -169,6 +169,29 @@ class ClassSanitizerTest(FactoryTestCase):
             "3",
         )
 
+    def test_promote_inner_class(self):
+        target = ClassFactory.elements(2, qname="parent")
+        inner = ClassFactory.create(qname="{foo}bar")
+
+        target.inner.append(inner)
+        target.attrs[1].types.append(AttrTypeFactory.create(forward=True, qname="bar"))
+
+        clone_target = target.clone()
+
+        self.container.add(target)
+        self.sanitizer.promote_inner_class(target, inner)
+
+        self.assertNotIn(inner, target.inner)
+
+        self.assertEqual("{foo}parent_bar", target.attrs[1].types[1].qname)
+        self.assertFalse(target.attrs[1].types[1].forward)
+        self.assertEqual("{foo}parent_bar", inner.qname)
+        self.assertEqual(2, len(self.container.data))
+        self.assertIn(inner, self.container["{foo}parent_bar"])
+
+        self.assertEqual(clone_target.attrs[0], target.attrs[0])
+        self.assertEqual(clone_target.attrs[1].types[0], target.attrs[1].types[0])
+
     def test_find_enum(self):
         native_type = AttrTypeFactory.create()
         matching_external = AttrTypeFactory.create("foo")

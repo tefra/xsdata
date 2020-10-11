@@ -126,15 +126,16 @@ class ClassSanitizer:
             4. Add inner class to the global class index.
         """
         name = f"{parent.name}_{inner.name}"
+        qname = build_qname(inner.target_namespace, name)
         parent.inner.remove(inner)
 
         for attr in parent.attrs:
             for attr_type in attr.types:
                 if attr_type.name == inner.name:
                     attr_type.forward = False
-                    attr_type.qname = build_qname(inner.target_namespace, name)
+                    attr_type.qname = qname
 
-        inner.qname = build_qname(inner.target_namespace, name)
+        inner.qname = qname
 
         self.container.add(inner)
 

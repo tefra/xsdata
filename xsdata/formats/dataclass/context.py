@@ -225,9 +225,7 @@ class XmlContext:
             ):
                 type_hint = type_hint.__args__[0]
 
-            types = [
-                x for x in type_hint.__args__ if x is not None.__class__  # type: ignore
-            ]
+            types = [x for x in type_hint.__args__ if x is not None.__class__]
         else:
             types.append(type_hint)
 

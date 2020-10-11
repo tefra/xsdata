@@ -16,7 +16,7 @@ class XmlEventWriterTests(TestCase):
         output = StringIO()
         self.writer = XmlWriter(output=output)
         self.writer.handler = XMLGenerator(
-            output,  # type: ignore
+            output,
             encoding="UTF-8",
             short_empty_elements=True,
         )

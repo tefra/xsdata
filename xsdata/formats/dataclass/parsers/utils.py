@@ -29,6 +29,11 @@ class ParserUtils:
         return None
 
     @classmethod
+    def is_nillable(cls, attrs: Dict) -> bool:
+        """Return whether the element attrs has xsi:nil="false"."""
+        return attrs.get(QNames.XSI_NIL) != "false"
+
+    @classmethod
     def parse_value(
         cls,
         value: Any,

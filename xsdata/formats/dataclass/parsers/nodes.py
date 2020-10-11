@@ -6,6 +6,7 @@ from typing import Any
 from typing import ClassVar
 from typing import Dict
 from typing import Iterable
+from typing import Iterator
 from typing import List
 from typing import Optional
 from typing import Tuple
@@ -108,12 +109,18 @@ class ElementNode(XmlNode):
         :raises: ParserError if the element is unknown and parser config is strict.
         """
 
-        var = self.find_var(qname)
-        if not var:
-            if self.config.fail_on_unknown_properties:
-                raise ParserError(f"Unknown property {self.meta.qname}:{qname}")
-            return SkipNode()
+        for var in self.fetch_vars(qname):
+            node = self.build_node(var, attrs, ns_map, position)
+            if node:
+                return node
 
+        if self.config.fail_on_unknown_properties:
+            raise ParserError(f"Unknown property {self.meta.qname}:{qname}")
+        return SkipNode()
+
+    def build_node(
+        self, var: XmlVar, attrs: Dict, ns_map: Dict, position: int
+    ) -> Optional[XmlNode]:
         if var.is_clazz_union:
             return UnionNode(
                 var=var,
@@ -125,8 +132,12 @@ class ElementNode(XmlNode):
 
         if var.clazz:
             xsi_type = ParserUtils.parse_xsi_type(attrs, ns_map)
+            is_nillable = ParserUtils.is_nillable(attrs)
             meta = self.context.fetch(var.clazz, self.meta.namespace, xsi_type)
             mixed = self.meta.find_var(mode=FindMode.MIXED_CONTENT)
+
+            if not is_nillable and meta.nillable:
+                return None
 
             return ElementNode(
                 meta=meta,
@@ -143,13 +154,11 @@ class ElementNode(XmlNode):
 
         return PrimitiveNode(var=var, ns_map=ns_map)
 
-    def find_var(self, qname: str) -> Optional[XmlVar]:
+    def fetch_vars(self, qname: str) -> Iterator[XmlVar]:
         for mode in self.FIND_MODES_ORDERED:
             var = self.meta.find_var(qname, mode)
             if var:
-                return var
-
-        return None
+                yield var
 
 
 @dataclass

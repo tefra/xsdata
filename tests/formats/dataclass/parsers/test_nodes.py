@@ -1,7 +1,9 @@
 from dataclasses import dataclass
 from dataclasses import field
 from dataclasses import make_dataclass
+from dataclasses import replace
 from typing import Any
+from typing import Generator
 from typing import List
 from typing import Union
 from unittest import mock
@@ -230,7 +232,6 @@ class ElementNodeTests(TestCase):
         mock_bind_wildcard_element,
         mock_bind_mixed_content,
     ):
-
         mock_bind_element_attrs.side_effect = add_attr
         mock_bind_wildcard_element.side_effect = add_text
         mock_bind_mixed_content.side_effect = add_content
@@ -260,36 +261,50 @@ class ElementNodeTests(TestCase):
             mock.ANY, node.meta.vars[2], 0, objects
         )
 
-    @mock.patch.object(ParserUtils, "parse_xsi_type", return_value="foo")
-    @mock.patch.object(XmlContext, "fetch")
-    def test_child_when_given_qname_matches_dataclass_var(
-        self, mock_ctx_fetch, mock_parse_xsi_type
-    ):
+    def test_fetch_vars(self):
+        elem = XmlElement(name="a", qname="a", types=[Foo], dataclass=True)
+        wild = XmlWildcard(name="a", qname="a", types=[Foo], dataclass=True)
+        self.meta.vars.extend((wild, elem))
+
+        matching_vars = self.node.fetch_vars("a")
+        self.assertIsInstance(matching_vars, Generator)
+        self.assertEqual([elem, wild], list(matching_vars))
+
+    @mock.patch.object(ElementNode, "fetch_vars")
+    def test_child(self, mock_match_vars):
         var = XmlElement(name="a", qname="a", types=[Foo], dataclass=True)
-        self.meta.vars.append(var)
-        xsi_type = "foo"
-        namespace = self.meta.namespace
-        mock_ctx_fetch.return_value = self.meta
-        mock_parse_xsi_type.return_value = xsi_type
-
         attrs = {"a": "b"}
         ns_map = {"ns0": "xsdata"}
-        actual = self.node.child("a", attrs, ns_map, 10)
+        position = 1
+        mock_match_vars.return_value = [var]
 
+        actual = self.node.child("a", attrs, ns_map, position)
         self.assertIsInstance(actual, ElementNode)
-        self.assertEqual(10, actual.position)
-        self.assertIs(mock_ctx_fetch.return_value, actual.meta)
+        self.assertEqual(attrs, actual.attrs)
+        self.assertEqual(ns_map, actual.ns_map)
+        self.assertEqual(position, actual.position)
 
-        mock_parse_xsi_type.assert_called_once_with(attrs, ns_map)
-        mock_ctx_fetch.assert_called_once_with(var.clazz, namespace, xsi_type)
+    @mock.patch.object(ElementNode, "build_node")
+    def test_child_when_failed_to_build_next_node(self, mock_build_node):
+        mock_build_node.return_value = None
+        self.meta.vars.append(XmlElement(name="a", qname="a"))
+        self.meta.vars.append(XmlWildcard(name="a", qname="a"))
 
-    def test_child_when_given_qname_matches_var_clazz_union(self):
+        with self.assertRaises(ParserError) as cm:
+            self.node.child("a", {}, {}, 0)
+
+        self.assertEqual("Unknown property foo:a", str(cm.exception))
+
+        self.node.config.fail_on_unknown_properties = False
+
+        actual = self.node.child("foobar", {}, {}, 0)
+        self.assertIsInstance(actual, SkipNode)
+
+    def test_build_node_with_dataclass_union_var(self):
         var = XmlElement(name="a", qname="a", types=[Foo, FooMixed], dataclass=True)
-        self.meta.vars.append(var)
-
         attrs = {"a": "b"}
         ns_map = {"ns0": "xsdata"}
-        actual = self.node.child("a", attrs, ns_map, 10)
+        actual = self.node.build_node(var, attrs, ns_map, 10)
 
         self.assertIsInstance(actual, UnionNode)
         self.assertEqual(10, actual.position)
@@ -299,36 +314,60 @@ class ElementNodeTests(TestCase):
         self.assertEqual(0, actual.level)
         self.assertEqual(0, len(actual.events))
 
-    def test_child_when_given_qname_matches_any_element_var(self):
-        var = XmlWildcard(name="a", qname="a", types=[], dataclass=False)
-        self.meta.vars.append(var)
+    @mock.patch.object(ParserUtils, "parse_xsi_type", return_value="foo")
+    @mock.patch.object(XmlContext, "fetch")
+    def test_build_node_with_dataclass_var(self, mock_ctx_fetch, mock_parse_xsi_type):
+        var = XmlElement(name="a", qname="a", types=[Foo], dataclass=True)
+        xsi_type = "foo"
+        namespace = self.meta.namespace
+        mock_ctx_fetch.return_value = self.meta
+        mock_parse_xsi_type.return_value = xsi_type
 
-        actual = self.node.child("a", {}, {}, 10)
+        attrs = {"a": "b"}
+        ns_map = {"ns0": "xsdata"}
+        actual = self.node.build_node(var, attrs, ns_map, 10)
+
+        self.assertIsInstance(actual, ElementNode)
+        self.assertEqual(10, actual.position)
+        self.assertIs(mock_ctx_fetch.return_value, actual.meta)
+
+        mock_parse_xsi_type.assert_called_once_with(attrs, ns_map)
+        mock_ctx_fetch.assert_called_once_with(var.clazz, namespace, xsi_type)
+
+    @mock.patch.object(XmlContext, "fetch")
+    def test_build_node_with_dataclass_var_validates_nillable(self, mock_ctx_fetch):
+        var = XmlElement(name="a", qname="a", types=[Foo], dataclass=True)
+        ns_map = {}
+        nillable_meta = replace(self.meta, nillable=True)
+        mock_ctx_fetch.side_effect = [self.meta, self.meta, nillable_meta]
+        attrs = {QNames.XSI_NIL: "false"}
+
+        self.assertIsNotNone(self.node.build_node(var, attrs, ns_map, 10))
+
+        attrs = {QNames.XSI_NIL: "true"}
+        self.assertIsNotNone(self.node.build_node(var, attrs, ns_map, 10))
+
+        attrs = {QNames.XSI_NIL: "false"}
+        self.assertIsNone(self.node.build_node(var, attrs, ns_map, 10))
+
+    def test_build_node_with_any_type_var(self):
+        var = XmlWildcard(name="a", qname="a", types=[], dataclass=False)
+
+        actual = self.node.build_node(var, {}, {}, 10)
 
         self.assertIsInstance(actual, WildcardNode)
         self.assertEqual(10, actual.position)
         self.assertEqual(var, actual.var)
 
-    def test_child_when_given_qname_matches_primitive_var(self):
+    def test_build_node_with_primitive_var(self):
         var = XmlText(name="a", qname="a", types=[int], default=100)
-        self.meta.vars.append(var)
         attrs = {"a": "b"}
         ns_map = {"ns0": "xsdata"}
-        actual = self.node.child("a", attrs, ns_map, 10)
+        actual = self.node.build_node(var, attrs, ns_map, 10)
 
         self.assertIsInstance(actual, PrimitiveNode)
         self.assertEqual(var, actual.var)
         self.assertEqual(ns_map, actual.ns_map)
-
-    def test_child_when_given_qname_does_not_match_any_var(self):
-        with self.assertRaises(ParserError) as cm:
-            self.node.child("unknown", {}, {}, 10)
-
-        self.assertEqual("Unknown property foo:unknown", str(cm.exception))
-
-    def test_child_when_config_fail_on_unknown_properties_is_false(self):
-        self.node.config.fail_on_unknown_properties = False
-        self.assertEqual(SkipNode(), self.node.child("unknown", {}, {}, 10))
 
 
 class WildcardNodeTests(TestCase):

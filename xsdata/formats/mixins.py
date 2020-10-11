@@ -89,14 +89,8 @@ class AbstractGenerator(metaclass=abc.ABCMeta):
         for obj in classes:
 
             if ns_struct:
-                if not obj.target_namespace:
-                    raise CodeGenerationError(
-                        f"Class `{obj.name}` target namespace "
-                        f"is empty, avoid option `--ns-struct`"
-                    )
-
                 obj.package = self.config.output.package
-                obj.module = obj.target_namespace
+                obj.module = obj.target_namespace or ""
 
             if obj.package is None:
                 raise CodeGenerationError(

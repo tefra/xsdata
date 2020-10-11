@@ -163,6 +163,21 @@ class SchemaTransformerTests(FactoryTestCase):
             "Skipping already processed: %s", "services.xsd"
         )
 
+    @mock.patch.object(SchemaTransformer, "convert_schema")
+    @mock.patch.object(SchemaTransformer, "parse_schema")
+    def test_process_schema_ignores_empty_schema(
+        self,
+        mock_parse_schema,
+        mock_convert_schema,
+    ):
+        mock_parse_schema.return_value = None
+        uri = "http://xsdata/services.xsd"
+        namespace = "fooNS"
+
+        self.transformer.process_schema(uri, namespace)
+        self.assertEqual([uri], self.transformer.processed)
+        self.assertEqual(0, mock_convert_schema.call_count)
+
     @mock.patch.object(SchemaTransformer, "generate_classes")
     @mock.patch.object(SchemaTransformer, "process_schema")
     def test_convert_schema(self, mock_process_schema, mock_generate_classes):

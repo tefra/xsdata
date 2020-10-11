@@ -53,22 +53,19 @@ class AbstractGeneratorTests(FactoryTestCase):
         )
 
     def test_designate_with_namespaces_structure(self):
-        classes = ClassFactory.list(2, package=None)
+        classes = [
+            ClassFactory.create(qname="{a}a", package=None),
+            ClassFactory.create(qname="{a}b", package=None),
+            ClassFactory.create(qname="b", package=None),
+        ]
         self.generator.config.output.structure = OutputStructure.NAMESPACES
         self.generator.config.output.package = "bar"
 
         self.generator.designate(classes)
         self.assertEqual("bar", classes[0].package)
         self.assertEqual("bar", classes[1].package)
+        self.assertEqual("bar", classes[2].package)
 
-        self.assertEqual("xsdata", classes[0].module)
-        self.assertEqual("xsdata", classes[1].module)
-
-        classes = ClassFactory.list(1, qname="foo")
-        with self.assertRaises(CodeGenerationError) as cm:
-            self.generator.designate(classes)
-
-        self.assertEqual(
-            ("Class `foo` target namespace is empty, " "avoid option `--ns-struct`"),
-            str(cm.exception),
-        )
+        self.assertEqual("a", classes[0].module)
+        self.assertEqual("a", classes[1].module)
+        self.assertEqual("", classes[2].module)

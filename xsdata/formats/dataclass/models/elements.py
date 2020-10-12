@@ -195,26 +195,20 @@ class FindMode(IntEnum):
     ALL = auto()
     ATTRIBUTE = auto()
     ATTRIBUTES = auto()
-    ELEMENT = auto()
     TEXT = auto()
     WILDCARD = auto()
     MIXED_CONTENT = ()
     NOT_WILDCARD = auto()
-    LIST = auto()
-    NOT_LIST = auto()
 
 
 find_predicates = {
     FindMode.ALL: lambda x: True,
     FindMode.ATTRIBUTE: lambda x: x.is_attribute,
     FindMode.ATTRIBUTES: lambda x: x.is_attributes,
-    FindMode.ELEMENT: lambda x: x.is_element,
     FindMode.TEXT: lambda x: x.is_text,
     FindMode.WILDCARD: lambda x: x.is_wildcard,
     FindMode.MIXED_CONTENT: lambda x: x.is_mixed_content,
     FindMode.NOT_WILDCARD: lambda x: not x.is_wildcard,
-    FindMode.LIST: lambda x: x.is_list,
-    FindMode.NOT_LIST: lambda x: not x.is_list,
 }
 
 
@@ -223,7 +217,6 @@ class XmlMeta:
     """
     Dataclass model bind metadata.
 
-    :param name: The local name
     :param clazz: The dataclass type
     :param qname: The namespace qualified name.
     :param source_qname: The source namespace qualified name.
@@ -231,7 +224,6 @@ class XmlMeta:
     :param vars: The list of field metadata
     """
 
-    name: str
     clazz: Type
     qname: str
     source_qname: str

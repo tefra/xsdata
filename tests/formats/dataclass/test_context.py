@@ -36,7 +36,6 @@ class XmlContextTests(TestCase):
     @mock.patch.object(XmlContext, "build")
     def test_fetch(self, mock_build, mock_find_subclass):
         meta = XmlMeta(
-            name="ItemsType",
             clazz=ItemsType,
             qname="ItemsType",
             source_qname="ItemsType",
@@ -54,7 +53,6 @@ class XmlContextTests(TestCase):
         self, mock_build, mock_find_subclass
     ):
         meta = XmlMeta(
-            name="ItemsType",
             clazz=ItemsType,
             qname="ItemsType",
             source_qname="ItemsType",
@@ -73,13 +71,12 @@ class XmlContextTests(TestCase):
         self, mock_build, mock_find_subclass
     ):
         meta = XmlMeta(
-            name="ItemsType",
             clazz=ItemsType,
             qname="ItemsType",
             source_qname="ItemsType",
             nillable=False,
         )
-        xsi_meta = replace(meta, name="XsiType")
+        xsi_meta = replace(meta, qname="XsiType")
 
         mock_build.side_effect = [meta, xsi_meta]
         mock_find_subclass.return_value = xsi_meta
@@ -119,7 +116,6 @@ class XmlContextTests(TestCase):
 
         result = self.ctx.build(ItemsType, None)
         expected = XmlMeta(
-            name="ItemsType",
             clazz=ItemsType,
             qname="ItemsType",
             source_qname="ItemsType",
@@ -169,11 +165,9 @@ class XmlContextTests(TestCase):
                 name = "thug"
 
         result = self.ctx.build(Foo)
-        self.assertEqual("Foo", result.name)
         self.assertEqual("Foo", result.qname)
 
         result = self.ctx.build(Thug)
-        self.assertEqual("thug", result.name)
         self.assertEqual("thug", result.qname)
 
     @mock.patch.object(XmlContext, "get_type_hints", return_value={})

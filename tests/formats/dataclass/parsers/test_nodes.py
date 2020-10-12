@@ -78,9 +78,7 @@ class ElementNodeTests(TestCase):
     def setUp(self) -> None:
         super().setUp()
         self.context = XmlContext()
-        self.meta = XmlMeta(
-            name="foo", clazz=Foo, qname="foo", source_qname="foo", nillable=False
-        )
+        self.meta = XmlMeta(clazz=Foo, qname="foo", source_qname="foo", nillable=False)
         self.node = ElementNode(
             position=0,
             meta=self.meta,

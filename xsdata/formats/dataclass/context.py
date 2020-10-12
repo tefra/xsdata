@@ -117,7 +117,6 @@ class XmlContext:
             source_namespace = getattr(module, "__NAMESPACE__", None)
 
             self.cache[clazz] = XmlMeta(
-                name=name,
                 clazz=clazz,
                 qname=build_qname(namespace, name),
                 source_qname=build_qname(source_namespace, name),

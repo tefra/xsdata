@@ -20,7 +20,7 @@ class XmlParserTests(TestCase):
         attrs = {"a": "b"}
         queue = []
 
-        self.parser.start(queue, "{urn:books}books", attrs, {}, [], Books)
+        self.parser.start(Books, queue, [], "{urn:books}books", attrs, {})
         self.assertEqual(1, len(queue))
 
         mock_emit_event.assert_called_once_with(
@@ -34,7 +34,7 @@ class XmlParserTests(TestCase):
         var = XmlText(name="foo", qname="foo", types=[bool])
         queue.append(PrimitiveNode(var=var, ns_map={}))
 
-        result = self.parser.end(queue, "enabled", "true", None, objects)
+        result = self.parser.end(queue, objects, "enabled", "true", None)
         self.assertTrue(result)
         self.assertEqual(0, len(queue))
         self.assertEqual(("enabled", True), objects[-1])

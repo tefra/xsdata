@@ -84,8 +84,8 @@ class LxmlSaxHandlerTests(TestCase):
 
         mock_end.assert_has_calls(
             [
-                mock.call(queue, "value", None, None, objects),
-                mock.call(queue, "value", "ab", "", objects),
+                mock.call(queue, objects, "value", None, None),
+                mock.call(queue, objects, "value", "ab", ""),
             ]
         )
         self.assertEqual(2, mock_end.call_count)

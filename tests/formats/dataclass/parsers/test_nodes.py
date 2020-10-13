@@ -562,7 +562,7 @@ class NodeParserTests(TestCase):
             attrs=attrs,
             ns_map=ns_map,
         )
-        parser.start(queue, "{urn:books}books", attrs, ns_map, objects, Books)
+        parser.start(Books, queue, objects, "{urn:books}books", attrs, ns_map)
         self.assertEqual(1, len(queue))
         self.assertEqual(expected_node, queue[0])
 
@@ -574,7 +574,7 @@ class NodeParserTests(TestCase):
             attrs={},
             ns_map={},
         )
-        parser.start(queue, "book", {}, {}, objects, Books)
+        parser.start(Books, queue, objects, "book", {}, {})
 
         self.assertEqual(2, len(queue))
         self.assertEqual(expected_node, queue[-1])
@@ -589,7 +589,7 @@ class NodeParserTests(TestCase):
 
         attrs = {QNames.XSI_TYPE: "b"}
         ns_map = {}
-        parser.start(queue, "a", attrs, ns_map, objects, a)
+        parser.start(a, queue, objects, "a", attrs, ns_map)
 
         expected_node = ElementNode(
             position=0,
@@ -612,7 +612,7 @@ class NodeParserTests(TestCase):
         var = XmlText(name="foo", qname="foo")
         queue.append(PrimitiveNode(var=var, ns_map={}))
 
-        result = parser.end(queue, "author", "foobar", None, objects)
+        result = parser.end(queue, objects, "author", "foobar", None)
         self.assertEqual("result", result)
         self.assertEqual(0, len(queue))
         self.assertEqual(("q", result), objects[-1])
@@ -623,7 +623,7 @@ class NodeParserTests(TestCase):
         objects = [("q", "result")]
         queue = [SkipNode()]
 
-        result = parser.end(queue, "author", "foobar", None, objects)
+        result = parser.end(queue, objects, "author", "foobar", None)
         self.assertIsNone(result)
         self.assertEqual(0, len(queue))
 

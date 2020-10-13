@@ -62,7 +62,6 @@ class SchemaTransformer:
         Run main processes.
 
         :param uris: list of uris to process
-        :param package: package name eg foo.bar.xxx
         """
 
         collections.apply(uris, self.process_schema)

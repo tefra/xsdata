@@ -42,20 +42,20 @@ class LxmlEventHandler(XmlHandler):
         for event, element in context:
             if event == EventType.START:
                 self.parser.start(
+                    self.clazz,
                     self.queue,
+                    self.objects,
                     element.tag,
                     element.attrib,
                     element.nsmap,
-                    self.objects,
-                    self.clazz,
                 )
             elif event == EventType.END:
                 obj = self.parser.end(
                     self.queue,
+                    self.objects,
                     element.tag,
                     element.text,
                     element.tail,
-                    self.objects,
                 )
                 element.clear()
             elif event == EventType.START_NS:
@@ -113,12 +113,12 @@ class LxmlSaxHandler(XmlHandler):
         self.flush()
         self.data_frames.append(([], []))
         self.parser.start(
+            self.clazz,
             self.queue,
+            self.objects,
             tag,
             attrib,
             self.start_ns_bulk(ns_map),
-            self.objects,
-            self.clazz,
         )
 
     def end(self, tag: str):
@@ -158,7 +158,7 @@ class LxmlSaxHandler(XmlHandler):
             text = "".join(data[0]) if data[0] else None
             tail = "".join(data[1]) if data[1] else None
 
-            self.parser.end(self.queue, self.flush_next, text, tail, self.objects)
+            self.parser.end(self.queue, self.objects, self.flush_next, text, tail)
             self.flush_next = None
 
     def data(self, data: str):

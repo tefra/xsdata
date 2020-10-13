@@ -91,7 +91,7 @@ class ParserUtils:
             params[var.name].append(cls.prepare_generic_value(qname, value))
 
     @classmethod
-    def fetch_any_children(cls, position: int, objects: List) -> List[object]:
+    def fetch_any_children(cls, position: int, objects: List) -> List:
         """Fetch the children of a wildcard node."""
         children = []
         while len(objects) > position:

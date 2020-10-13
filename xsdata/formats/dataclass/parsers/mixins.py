@@ -10,7 +10,6 @@ from typing import Type
 
 from xsdata.exceptions import XmlHandlerError
 from xsdata.formats.bindings import AbstractParser
-from xsdata.formats.bindings import T
 from xsdata.formats.dataclass.parsers.config import ParserConfig
 from xsdata.models.enums import EventType
 
@@ -29,12 +28,12 @@ class PushParser(AbstractParser):
     @abc.abstractmethod
     def start(
         self,
+        clazz: Type,
         queue: List,
+        objects: List,
         qname: str,
         attrs: Dict,
         ns_map: Dict,
-        objects: List,
-        clazz: Type[T],
     ):
         """Queue the next xml node for parsing."""
 
@@ -42,10 +41,10 @@ class PushParser(AbstractParser):
     def end(
         self,
         queue: List,
+        objects: List,
         qname: str,
         text: NoneStr,
         tail: NoneStr,
-        objects: List,
     ) -> Any:
         """
         Parse the last xml node and bind any intermediate objects.
@@ -135,19 +134,14 @@ class EventsHandler(XmlHandler):
         """Forward the pre-recorded events to the main parser."""
 
         obj = None
-        for event in source:
-            if event[0] == EventType.START:
-                _, qname, attrs, ns_map = event
-                self.parser.start(
-                    self.queue, qname, attrs, ns_map, self.objects, self.clazz
-                )
-            elif event[0] == EventType.END:
-                _, qname, text, tail = event
-                obj = self.parser.end(self.queue, qname, text, tail, self.objects)
-            elif event[0] == EventType.START_NS:
-                _, prefix, uri = event
-                self.parser.start_prefix_mapping(prefix, uri)
+        for event, *args in source:
+            if event == EventType.START:
+                self.parser.start(self.clazz, self.queue, self.objects, *args)
+            elif event == EventType.END:
+                obj = self.parser.end(self.queue, self.objects, *args)
+            elif event == EventType.START_NS:
+                self.parser.start_prefix_mapping(*args)
             else:
-                raise XmlHandlerError(f"Unhandled event: `{event[0]}`.")
+                raise XmlHandlerError(f"Unhandled event: `{event}`.")
 
         return obj

@@ -381,12 +381,12 @@ class NodeParser(PushParser):
 
     def start(
         self,
+        clazz: Type,
         queue: List[XmlNode],
+        objects: List[Parsed],
         qname: str,
         attrs: Dict,
         ns_map: Dict,
-        objects: List[Parsed],
-        clazz: Type[T],
     ):
         """Queue the next xml node for parsing."""
         try:
@@ -412,10 +412,10 @@ class NodeParser(PushParser):
     def end(
         self,
         queue: List[XmlNode],
-        qname: str,
-        text: Optional[str],
-        tail: Optional[str],
         objects: List[Parsed],
+        qname: str,
+        text: NoneStr,
+        tail: NoneStr,
     ) -> Any:
         """
         Parse the last xml node and bind any intermediate objects.
@@ -429,7 +429,7 @@ class NodeParser(PushParser):
 
         return obj
 
-    def start_prefix_mapping(self, prefix: Optional[str], uri: str):
+    def start_prefix_mapping(self, prefix: NoneStr, uri: str):
         """Add the given prefix-URI namespaces mapping if the prefix is new."""
         prefix = prefix or None
         if prefix not in self.ns_map:
@@ -448,27 +448,27 @@ class RecordParser(NodeParser):
 
     def start(
         self,
+        clazz: Type,
         queue: List[XmlNode],
+        objects: List[Parsed],
         qname: str,
         attrs: Dict,
         ns_map: Dict,
-        objects: List[Parsed],
-        clazz: Type[T],
     ):
         self.events.append((EventType.START, qname, copy.deepcopy(attrs), ns_map))
-        super().start(queue, qname, attrs, ns_map, objects, clazz)
+        super().start(clazz, queue, objects, qname, attrs, ns_map)
 
     def end(
         self,
         queue: List[XmlNode],
-        qname: str,
-        text: Optional[str],
-        tail: Optional[str],
         objects: List[Parsed],
+        qname: str,
+        text: NoneStr,
+        tail: NoneStr,
     ) -> Any:
         self.events.append((EventType.END, qname, text, tail))
-        return super().end(queue, qname, text, tail, objects)
+        return super().end(queue, objects, qname, text, tail)
 
-    def start_prefix_mapping(self, prefix: Optional[str], uri: str):
+    def start_prefix_mapping(self, prefix: NoneStr, uri: str):
         self.events.append((EventType.START_NS, prefix, uri))
         super().start_prefix_mapping(prefix, uri)

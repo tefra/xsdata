@@ -46,28 +46,28 @@ class SchemaParser(XmlParser):
 
     def start(
         self,
+        clazz: Type,
         queue: List[XmlNode],
+        objects: List[Parsed],
         qname: str,
         attrs: Dict,
         ns_map: Dict,
-        objects: List[Parsed],
-        clazz: Type[T],
     ):
         self.index += 1
         self.indices.append(self.index)
-        super().start(queue, qname, attrs, ns_map, objects, clazz)
+        super().start(clazz, queue, objects, qname, attrs, ns_map)
 
     def end(
         self,
         queue: List[XmlNode],
+        objects: List[Parsed],
         qname: str,
         text: Optional[str],
         tail: Optional[str],
-        objects: List[Parsed],
     ) -> Any:
         """Override parent method to set element index and namespaces map."""
         item = queue[-1]
-        obj: Any = super().end(queue, qname, text, tail, objects)
+        obj: Any = super().end(queue, objects, qname, text, tail)
 
         self.set_index(obj, self.indices.pop())
         self.set_namespace_map(obj, getattr(item, "ns_map", None))

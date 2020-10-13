@@ -43,21 +43,21 @@ class XmlEventHandler(XmlHandler):
         for event, element in context:
             if event == EventType.START:
                 self.parser.start(
+                    self.clazz,
                     self.queue,
+                    self.objects,
                     element.tag,
                     element.attrib,
                     self.start_ns_bulk(self.ns_map),
-                    self.objects,
-                    self.clazz,
                 )
                 self.ns_map = {}
             elif event == EventType.END:
                 obj = self.parser.end(
                     self.queue,
+                    self.objects,
                     element.tag,
                     element.text,
                     element.tail,
-                    self.objects,
                 )
                 element.clear()
             elif event == EventType.START_NS:

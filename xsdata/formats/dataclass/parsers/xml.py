@@ -6,7 +6,6 @@ from typing import List
 from typing import Optional
 from typing import Type
 
-from xsdata.formats.bindings import T
 from xsdata.formats.dataclass.parsers.handlers import LxmlEventHandler
 from xsdata.formats.dataclass.parsers.mixins import XmlHandler
 from xsdata.formats.dataclass.parsers.mixins import XmlNode
@@ -31,12 +30,12 @@ class XmlParser(NodeParser):
 
     def start(
         self,
+        clazz: Type,
         queue: List[XmlNode],
+        objects: List[Parsed],
         qname: str,
         attrs: Dict,
         ns_map: Dict,
-        objects: List[Parsed],
-        clazz: Type[T],
     ):
         """
         Queue the next xml node for parsing.
@@ -44,16 +43,16 @@ class XmlParser(NodeParser):
         Emit a start event with the current element qualified name and
         attributes.
         """
-        super().start(queue, qname, attrs, ns_map, objects, clazz)
+        super().start(clazz, queue, objects, qname, attrs, ns_map)
         self.emit_event(EventType.START, qname, attrs=attrs)
 
     def end(
         self,
         queue: List[XmlNode],
+        objects: List[Parsed],
         qname: str,
         text: Optional[str],
         tail: Optional[str],
-        objects: List[Parsed],
     ) -> Any:
         """
         Parse the last xml node and bind any intermediate objects.
@@ -62,7 +61,7 @@ class XmlParser(NodeParser):
 
         :return: The result of the binding process.
         """
-        obj = super().end(queue, qname, text, tail, objects)
+        obj = super().end(queue, objects, qname, text, tail)
         if obj:
             self.emit_event(EventType.END, qname, obj=obj)
         return obj

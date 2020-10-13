@@ -28,7 +28,9 @@ def load_class(output: str, clazz_name: str) -> T:
 
 def read_root_name(path: Path) -> str:
     try:
-        recovering_parser = etree.XMLParser(recover=True)
+        recovering_parser = etree.XMLParser(
+            recover=True, resolve_entities=False, no_network=True
+        )
         tree = etree.parse(str(path), parser=recovering_parser)  # nosec
         _, local_name = split_qname(tree.getroot().tag)
         return text.pascal_case(utils.safe_snake(local_name, "Type"))

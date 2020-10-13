@@ -97,6 +97,8 @@ class LxmlSaxHandler(XmlHandler):
             recover=True,
             remove_comments=True,
             ns_clean=True,
+            resolve_entities=False,
+            no_network=True,
         )
 
         return etree.parse(source, parser=parser)  # nosec

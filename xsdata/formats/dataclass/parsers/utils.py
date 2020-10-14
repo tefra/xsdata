@@ -20,7 +20,7 @@ from xsdata.utils.namespaces import build_qname
 
 class ParserUtils:
     @classmethod
-    def parse_xsi_type(cls, attrs: Dict, ns_map: Dict) -> Optional[str]:
+    def xsi_type(cls, attrs: Dict, ns_map: Dict) -> Optional[str]:
         """Parse the elements xsi:type attribute if present."""
         xsi_type = attrs.get(QNames.XSI_TYPE)
         if xsi_type:
@@ -54,9 +54,7 @@ class ParserUtils:
         return converter.from_string(value, types, ns_map=ns_map)
 
     @classmethod
-    def bind_element_children(
-        cls, params: Dict, meta: XmlMeta, position: int, objects: List
-    ):
+    def bind_objects(cls, params: Dict, meta: XmlMeta, position: int, objects: List):
         """Return a dictionary of qualified object names and their values for
         the given queue item."""
 
@@ -67,17 +65,17 @@ class ParserUtils:
                 value = ""
 
             arg = meta.find_var(qname, FindMode.NOT_WILDCARD)
-            if arg and cls.bind_element_param(params, arg, value):
+            if arg and cls.bind_var(params, arg, value):
                 continue
 
             arg = meta.find_var(qname, FindMode.WILDCARD)
-            if arg and cls.bind_element_wildcard_param(params, arg, qname, value):
+            if arg and cls.bind_wild_var(params, arg, qname, value):
                 continue
 
             logger.warning("Unassigned parsed object %s", qname)
 
     @classmethod
-    def bind_mixed_content(cls, params: Dict, var: XmlVar, pos: int, objects: List):
+    def bind_mixed_objects(cls, params: Dict, var: XmlVar, pos: int, objects: List):
         """Return a dictionary of qualified object names and their values for
         the given mixed content xml var."""
 
@@ -91,16 +89,7 @@ class ParserUtils:
             params[var.name].append(cls.prepare_generic_value(qname, value))
 
     @classmethod
-    def fetch_any_children(cls, position: int, objects: List) -> List:
-        """Fetch the children of a wildcard node."""
-        children = []
-        while len(objects) > position:
-            _, value = objects.pop(position)
-            children.append(value)
-        return children
-
-    @classmethod
-    def bind_element_param(cls, params: Dict, var: XmlVar, value: Any) -> bool:
+    def bind_var(cls, params: Dict, var: XmlVar, value: Any) -> bool:
         """
         Add the given value to the params dictionary with the var name as key.
 
@@ -122,20 +111,7 @@ class ParserUtils:
         return True
 
     @classmethod
-    def prepare_generic_value(cls, qname: str, value: Any) -> Any:
-        """Prepare parsed value before binding to a wildcard field."""
-
-        if not is_dataclass(value):
-            value = AnyElement(qname=qname, text=value)
-        elif not isinstance(value, AnyElement):
-            value = DerivedElement(qname=qname, value=value)
-
-        return value
-
-    @classmethod
-    def bind_element_wildcard_param(
-        cls, params: Dict, var: XmlVar, qname: str, value: Any
-    ) -> bool:
+    def bind_wild_var(cls, params: Dict, var: XmlVar, qname: str, value: Any) -> bool:
         """
         Add the given value to the params dictionary with the wildcard var name
         as key.
@@ -161,7 +137,7 @@ class ParserUtils:
         return True
 
     @classmethod
-    def bind_wildcard_element(
+    def bind_wild_content(
         cls,
         params: Dict,
         var: XmlVar,
@@ -206,6 +182,64 @@ class ParserUtils:
         return True
 
     @classmethod
+    def bind_content(
+        cls,
+        params: Dict,
+        metadata: XmlMeta,
+        txt: Optional[str],
+        ns_map: Dict,
+    ) -> bool:
+        """
+        Add the given element's text content if any to the params dictionary
+        with the text var name as key.
+
+        Return if any data was bound.
+        """
+
+        if txt is not None:
+            var = metadata.find_var(mode=FindMode.TEXT)
+            if var and var.init and txt is not None:
+                params[var.name] = cls.parse_value(
+                    txt, var.types, var.default, ns_map, var.tokens
+                )
+                return True
+        return False
+
+    @classmethod
+    def bind_attrs(cls, params: Dict, metadata: XmlMeta, attrs: Dict, ns_map: Dict):
+        """Parse the given element's attributes and any text content and return
+        a dictionary of field names and values based on the given class
+        metadata."""
+
+        if not attrs:
+            return
+
+        wildcard = metadata.find_var(mode=FindMode.ATTRIBUTES)
+        if wildcard:
+            params[wildcard.name] = {}
+
+        for qname, value in attrs.items():
+            var = metadata.find_var(qname, FindMode.ATTRIBUTE)
+            if var and var.name not in params:
+                if var.init:
+                    params[var.name] = cls.parse_value(
+                        value, var.types, var.default, ns_map, var.tokens
+                    )
+            elif wildcard:
+                params[wildcard.name][qname] = cls.parse_any_attribute(value, ns_map)
+
+    @classmethod
+    def prepare_generic_value(cls, qname: str, value: Any) -> Any:
+        """Prepare parsed value before binding to a wildcard field."""
+
+        if not is_dataclass(value):
+            value = AnyElement(qname=qname, text=value)
+        elif not isinstance(value, AnyElement):
+            value = DerivedElement(qname=qname, value=value)
+
+        return value
+
+    @classmethod
     def normalize_content(cls, value: Optional[str]) -> Optional[str]:
         """
         Normalize element text or tail content.
@@ -236,76 +270,10 @@ class ParserUtils:
         return value
 
     @classmethod
-    def bind_element(
-        cls,
-        params: Dict,
-        metadata: XmlMeta,
-        txt: Optional[str],
-        ns_map: Dict,
-    ) -> bool:
-        """
-        Add the given element's text content if any to the params dictionary
-        with the text var name as key.
-
-        Return if any data was bound.
-        """
-
-        if txt is not None:
-            var = metadata.find_var(mode=FindMode.TEXT)
-            if var and var.init and txt is not None:
-                params[var.name] = cls.parse_value(
-                    txt, var.types, var.default, ns_map, var.tokens
-                )
-                return True
-        return False
-
-    @classmethod
-    def bind_element_attrs(
-        cls, params: Dict, metadata: XmlMeta, attrs: Dict, ns_map: Dict
-    ):
-        """Parse the given element's attributes and any text content and return
-        a dictionary of field names and values based on the given class
-        metadata."""
-
-        if not attrs:
-            return
-
-        wildcard = metadata.find_var(mode=FindMode.ATTRIBUTES)
-        if wildcard:
-            params[wildcard.name] = {}
-
-        for qname, value in attrs.items():
-            var = metadata.find_var(qname, FindMode.ATTRIBUTE)
-            if var and var.name not in params:
-                if var.init:
-                    params[var.name] = cls.parse_value(
-                        value, var.types, var.default, ns_map, var.tokens
-                    )
-            elif wildcard:
-                params[wildcard.name][qname] = cls.parse_any_attribute(value, ns_map)
-
-    @classmethod
-    def bind_wildcard(
-        cls,
-        params: Dict,
-        metadata: XmlMeta,
-        txt: Optional[str],
-        tail: Optional[str],
-        attrs: Dict,
-        ns_map: Dict,
-    ) -> bool:
-        """
-        Add the given element's content and attributes to any available
-        wildcard variable.
-
-        Return if any data was bound.
-        """
-
-        if txt is not None or tail is not None:
-            wildcard = metadata.find_var(mode=FindMode.WILDCARD)
-            if wildcard:
-                return cls.bind_wildcard_element(
-                    params, wildcard, txt, tail, attrs, ns_map
-                )
-
-        return False
+    def fetch_any_children(cls, position: int, objects: List) -> List:
+        """Fetch the children of a wildcard node."""
+        children = []
+        while len(objects) > position:
+            _, value = objects.pop(position)
+            children.append(value)
+        return children

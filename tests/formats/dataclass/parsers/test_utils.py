@@ -27,16 +27,16 @@ class ParserUtilsTests(TestCase):
     def setUp(self) -> None:
         self.ctx = XmlContext()
 
-    def test_parse_xsi_type(self):
+    def test_xsi_type(self):
         ns_map = {"bar": "xsdata"}
         attrs = {}
-        self.assertIsNone(ParserUtils.parse_xsi_type(attrs, ns_map))
+        self.assertIsNone(ParserUtils.xsi_type(attrs, ns_map))
 
         attrs = {QNames.XSI_TYPE: "foo"}
-        self.assertEqual("foo", ParserUtils.parse_xsi_type(attrs, ns_map))
+        self.assertEqual("foo", ParserUtils.xsi_type(attrs, ns_map))
 
         attrs = {QNames.XSI_TYPE: "bar:foo"}
-        self.assertEqual("{xsdata}foo", ParserUtils.parse_xsi_type(attrs, ns_map))
+        self.assertEqual("{xsdata}foo", ParserUtils.xsi_type(attrs, ns_map))
 
     @mock.patch.object(ConverterAdapter, "from_string", return_value=2)
     def test_parse_value(self, mock_from_string):
@@ -69,7 +69,7 @@ class ParserUtilsTests(TestCase):
             ]
         )
 
-    def test_bind_element_children(self):
+    def test_bind_objects(self):
         @dataclass
         class A:
             x: int
@@ -92,7 +92,7 @@ class ParserUtilsTests(TestCase):
         ]
 
         params = {}
-        ParserUtils.bind_element_children(params, meta, 1, objects)
+        ParserUtils.bind_objects(params, meta, 1, objects)
         expected = {
             "x": 1,
             "w": AnyElement(
@@ -103,18 +103,18 @@ class ParserUtilsTests(TestCase):
         self.assertEqual(expected, params)
 
     @mock.patch("xsdata.formats.dataclass.parsers.utils.logger.warning")
-    def test_bind_element_children_with_unassigned_object(self, mock_warning):
+    def test_bind_objects_with_unassigned_object(self, mock_warning):
         a = make_dataclass("a", [("x", int)])
         meta = XmlContext().build(a)
         params = {}
         objects = [("x", 1), ("y", 2)]
 
-        ParserUtils.bind_element_children(params, meta, 0, objects)
+        ParserUtils.bind_objects(params, meta, 0, objects)
 
         self.assertEqual({"x": 1}, params)
         mock_warning.assert_called_once_with("Unassigned parsed object %s", "y")
 
-    def test_bind_mixed_content(self):
+    def test_bind_mixed_objects(self):
         generic = AnyElement(qname="foo")
         data_class = make_dataclass("A", fields=[])
         derived = DerivedElement(qname="d", value=data_class)
@@ -127,7 +127,7 @@ class ParserUtilsTests(TestCase):
 
         var = XmlWildcard(name="foo", qname="{any}foo")
         params = {}
-        ParserUtils.bind_mixed_content(params, var, 1, objects)
+        ParserUtils.bind_mixed_objects(params, var, 1, objects)
 
         expected = {var.name: [AnyElement(qname="b", text=""), derived, generic]}
         self.assertEqual(expected, params)
@@ -138,7 +138,7 @@ class ParserUtilsTests(TestCase):
 
     @mock.patch.object(ParserUtils, "parse_any_attribute")
     @mock.patch.object(ParserUtils, "parse_value")
-    def test_bind_element_attrs(self, mock_parse_value, mock_parse_any_attribute):
+    def test_bind_attrs(self, mock_parse_value, mock_parse_any_attribute):
         mock_parse_value.return_value = "2020-03-02"
         mock_parse_any_attribute.return_value = "foobar"
         metadata = self.ctx.build(ProductType)
@@ -148,7 +148,7 @@ class ParserUtilsTests(TestCase):
         ns_map = {}
         attrs = {"effDate": "2020-03-01", "foo": "bar"}
 
-        ParserUtils.bind_element_attrs(params, metadata, attrs, ns_map)
+        ParserUtils.bind_attrs(params, metadata, attrs, ns_map)
         expected = {
             "eff_date": "2020-03-02",
             "other_attributes": {"foo": "foobar"},
@@ -179,18 +179,18 @@ class ParserUtilsTests(TestCase):
         value = ParserUtils.parse_any_attribute("http://www.com", ns_map)
         self.assertEqual("http://www.com", value)
 
-    def test_bind_element_attrs_doesnt_overwrite_values(self):
+    def test_bind_attrs_doesnt_overwrite_values(self):
         metadata = self.ctx.build(ProductType)
         params = dict(eff_date="foo")
         attrs = {"effDate": "2020-03-01"}
         ns_map = {}
 
-        ParserUtils.bind_element_attrs(params, metadata, attrs, ns_map)
+        ParserUtils.bind_attrs(params, metadata, attrs, ns_map)
 
         expected = {"eff_date": "foo", "other_attributes": {"effDate": "2020-03-01"}}
         self.assertEqual(expected, params)
 
-    def test_bind_elements_attrs_ignore_init_false_vars(self):
+    def test_bind_attrs_ignore_init_false_vars(self):
         metadata = self.ctx.build(ProductType)
         eff_date = metadata.find_var("effDate")
         metadata.vars.remove(eff_date)
@@ -200,102 +200,72 @@ class ParserUtilsTests(TestCase):
         attrs = {"effDate": "2020-03-01"}
         ns_map = {}
 
-        ParserUtils.bind_element_attrs(params, metadata, attrs, ns_map)
+        ParserUtils.bind_attrs(params, metadata, attrs, ns_map)
         self.assertEqual({"other_attributes": {}}, params)
 
     @mock.patch.object(XmlMeta, "find_var")
-    def test_bind_element_attrs_skip_empty_attrs(self, mock_find_var):
+    def test_bind_attrs_skip_empty_attrs(self, mock_find_var):
         metadata = self.ctx.build(ProductType)
 
         params = {}
-        ParserUtils.bind_element_attrs(params, metadata, {}, {})
+        ParserUtils.bind_attrs(params, metadata, {}, {})
         self.assertEqual(0, len(params))
         self.assertEqual(0, mock_find_var.call_count)
 
     @mock.patch.object(ParserUtils, "parse_value", return_value="yes!")
-    def test_bind_element(self, mock_parse_value):
+    def test_bind_content(self, mock_parse_value):
         metadata = self.ctx.build(SizeType)
         var = metadata.find_var(mode=FindMode.TEXT)
         params = {}
         ns_map = {"a": "b"}
 
-        self.assertFalse(ParserUtils.bind_element(params, metadata, None, ns_map))
+        self.assertFalse(ParserUtils.bind_content(params, metadata, None, ns_map))
         self.assertEqual({}, params)
 
-        self.assertTrue(ParserUtils.bind_element(params, metadata, "foo", ns_map))
+        self.assertTrue(ParserUtils.bind_content(params, metadata, "foo", ns_map))
         self.assertEqual({"value": "yes!"}, params)
         mock_parse_value.assert_called_once_with(
             "foo", var.types, var.default, ns_map, var.is_list
         )
 
-    def test_bind_element_with_no_text_var(self):
+    def test_bind_content_with_no_text_var(self):
         params = {}
         metadata = self.ctx.build(Books)
-        self.assertFalse(ParserUtils.bind_element(params, metadata, "foo", {}))
+        self.assertFalse(ParserUtils.bind_content(params, metadata, "foo", {}))
         self.assertEqual({}, params)
 
-    def test_bind_wildcard(self):
-        metadata = self.ctx.build(Umbrella)
-        params = {}
-        attrs = {"a": "b"}
-        ns_map = {"a": "b"}
-
-        result = ParserUtils.bind_wildcard(params, metadata, None, None, attrs, ns_map)
-        self.assertFalse(result)
-        self.assertEqual({}, params)
-
-        result = ParserUtils.bind_wildcard(params, metadata, None, "bar", attrs, ns_map)
-        expected = AnyElement(text=None, tail="bar", attributes=attrs, ns_map=ns_map)
-        self.assertTrue(result)
-        self.assertEqual(expected, params["any_element"])
-
-        params.clear()
-        result = ParserUtils.bind_wildcard(
-            params, metadata, "foo", "bar", attrs, ns_map
-        )
-        expected = AnyElement(text="foo", tail="bar", attributes=attrs, ns_map=ns_map)
-        self.assertTrue(result)
-        self.assertEqual(expected, params["any_element"])
-
-    def test_bind_wildcard_with_no_wildcard_var(self):
-        params = {}
-        metadata = self.ctx.build(Books)
-        result = ParserUtils.bind_wildcard(params, metadata, "foo", "bar", {}, {})
-        self.assertFalse(result)
-        self.assertEqual({}, params)
-
-    def test_bind_element_param(self):
+    def test_bind_var(self):
         var = XmlVar(name="a", qname="a")
         params = {}
 
-        status = ParserUtils.bind_element_param(params, var, 1)
+        status = ParserUtils.bind_var(params, var, 1)
         self.assertTrue(status)
         self.assertEqual({"a": 1}, params)
 
-        status = ParserUtils.bind_element_param(params, var, 2)
+        status = ParserUtils.bind_var(params, var, 2)
         self.assertFalse(status)
         self.assertEqual({"a": 1}, params)
 
-    def test_bind_element_param_with_list_var(self):
+    def test_bind_var_with_list_var(self):
         var = XmlVar(name="a", qname="a", list_element=True)
         params = {}
 
-        status = ParserUtils.bind_element_param(params, var, 1)
+        status = ParserUtils.bind_var(params, var, 1)
         self.assertTrue(status)
         self.assertEqual({"a": [1]}, params)
 
-        status = ParserUtils.bind_element_param(params, var, 2)
+        status = ParserUtils.bind_var(params, var, 2)
         self.assertTrue(status)
         self.assertEqual({"a": [1, 2]}, params)
 
-    def test_bind_element_wildcard_param(self):
+    def test_bind_wild_var(self):
         params = {}
         var = XmlVar(name="a", qname="a")
         qname = "b"
         one = AnyElement(qname=qname, text="one")
         two = AnyElement(qname=qname, text="two")
         three = AnyElement(qname=qname, text="three")
-        bind = ParserUtils.bind_element_wildcard_param
+        bind = ParserUtils.bind_wild_var
 
         self.assertTrue(bind(params, var, qname, "one"))
         self.assertEqual(dict(a=one), params)
@@ -306,37 +276,37 @@ class ParserUtilsTests(TestCase):
         self.assertTrue(bind(params, var, qname, "three"))
         self.assertEqual(dict(a=AnyElement(children=[one, two, three])), params)
 
-    def test_bind_element_wildcard_param_with_list_var(self):
+    def test_bind_wild_var_with_list_var(self):
         params = {}
         var = XmlVar(name="a", qname="a", list_element=True)
         qname = "b"
         one = AnyElement(qname=qname, text="one")
         two = AnyElement(qname=qname, text="two")
         three = AnyElement(qname=qname, text="three")
-        bind = ParserUtils.bind_element_wildcard_param
+        bind = ParserUtils.bind_wild_var
 
         self.assertTrue(bind(params, var, qname, "one"))
         self.assertTrue(bind(params, var, qname, "two"))
         self.assertTrue(bind(params, var, qname, "three"))
         self.assertEqual(dict(a=[one, two, three]), params)
 
-    def test_bind_wildcard_element(self):
+    def test_bind_wild_content(self):
         var = XmlVar(name="a", qname="a")
         params = {}
         attrs = {}
         ns_map = {}
 
-        ParserUtils.bind_wildcard_element(params, var, None, None, attrs, ns_map)
+        ParserUtils.bind_wild_content(params, var, None, None, attrs, ns_map)
         self.assertEqual(0, len(params))
 
         params = {}
-        ParserUtils.bind_wildcard_element(params, var, "txt", "tail", attrs, ns_map)
+        ParserUtils.bind_wild_content(params, var, "txt", "tail", attrs, ns_map)
         expected = AnyElement(text="txt", tail="tail")
         self.assertEqual(dict(a=expected), params)
 
         attrs = {"a": "b"}
         ns_map = {"ns0": "a"}
-        ParserUtils.bind_wildcard_element(params, var, "txt", "tail", attrs, ns_map)
+        ParserUtils.bind_wild_content(params, var, "txt", "tail", attrs, ns_map)
         expected = AnyElement(
             text="txt",
             tail="tail",
@@ -352,13 +322,13 @@ class ParserUtilsTests(TestCase):
         attrs = {"a", "b"}
         ns_map = {"ns0", "a"}
 
-        ParserUtils.bind_wildcard_element(params, var, "txt", "tail", attrs, ns_map)
+        ParserUtils.bind_wild_content(params, var, "txt", "tail", attrs, ns_map)
         self.assertEqual(dict(a=["txt", "tail"]), params)
 
-        ParserUtils.bind_wildcard_element(params, var, None, "tail", attrs, ns_map)
+        ParserUtils.bind_wild_content(params, var, None, "tail", attrs, ns_map)
         self.assertEqual(dict(a=["txt", "tail", "tail"]), params)
 
-        ParserUtils.bind_wildcard_element(params, var, "first", None, attrs, ns_map)
+        ParserUtils.bind_wild_content(params, var, "first", None, attrs, ns_map)
         self.assertEqual(dict(a=["first", "txt", "tail", "tail"]), params)
 
     def test_prepare_generic_value(self):

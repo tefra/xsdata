@@ -70,19 +70,20 @@ class ElementNode(XmlNode):
         :return: A tuple of the object's qualified name and the new object.
         """
         params: Dict = {}
-        ParserUtils.bind_element_attrs(params, self.meta, self.attrs, self.ns_map)
+        wild_node = False
+        text_node = False
+        ParserUtils.bind_attrs(params, self.meta, self.attrs, self.ns_map)
 
-        mixed_var = self.meta.find_var(mode=FindMode.MIXED_CONTENT)
-        if mixed_var:
-            ParserUtils.bind_mixed_content(params, mixed_var, self.position, objects)
-            ParserUtils.bind_wildcard_element(
-                params, mixed_var, text, tail, self.attrs, self.ns_map
-            )
+        wild_var = self.meta.find_var(mode=FindMode.WILDCARD)
+        if wild_var and wild_var.is_mixed_content:
+            ParserUtils.bind_mixed_objects(params, wild_var, self.position, objects)
         else:
-            ParserUtils.bind_element_children(params, self.meta, self.position, objects)
-            text_node = ParserUtils.bind_element(params, self.meta, text, self.ns_map)
-            wild_node = not text_node and ParserUtils.bind_wildcard(
-                params, self.meta, text, tail, self.attrs, self.ns_map
+            ParserUtils.bind_objects(params, self.meta, self.position, objects)
+            text_node = ParserUtils.bind_content(params, self.meta, text, self.ns_map)
+
+        if not text_node and wild_var:
+            ParserUtils.bind_wild_content(
+                params, wild_var, text, tail, self.attrs, self.ns_map
             )
 
         obj = self.meta.clazz(**params)
@@ -91,7 +92,7 @@ class ElementNode(XmlNode):
 
         objects.append((qname, obj))
 
-        if not mixed_var and self.mixed and not wild_node:
+        if not wild_var and self.mixed and not wild_node:
             tail = ParserUtils.normalize_content(tail)
             if tail:
                 objects.append((None, tail))
@@ -131,7 +132,7 @@ class ElementNode(XmlNode):
             )
 
         if var.clazz:
-            xsi_type = ParserUtils.parse_xsi_type(attrs, ns_map)
+            xsi_type = ParserUtils.xsi_type(attrs, ns_map)
             is_nillable = ParserUtils.is_nillable(attrs)
             meta = self.context.fetch(var.clazz, self.meta.namespace, xsi_type)
             mixed = self.meta.find_var(mode=FindMode.MIXED_CONTENT)
@@ -393,7 +394,7 @@ class NodeParser(PushParser):
             item = queue[-1]
             child = item.child(qname, attrs, ns_map, len(objects))
         except IndexError:
-            xsi_type = ParserUtils.parse_xsi_type(attrs, ns_map)
+            xsi_type = ParserUtils.xsi_type(attrs, ns_map)
             meta = self.context.fetch(clazz, xsi_type=xsi_type)
             derived = xsi_type is not None and meta.qname != qname
 

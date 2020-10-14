@@ -25,8 +25,6 @@ from xsdata.models.enums import QNames
 from xsdata.utils import namespaces
 from xsdata.utils.namespaces import split_qname
 
-DEFAULT_NS_PREFIX = ""
-
 
 NoneStr = Optional[str]
 EMPTY_MAP: Dict = {}

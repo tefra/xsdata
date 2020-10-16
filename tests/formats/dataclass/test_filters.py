@@ -1,3 +1,5 @@
+import sys
+
 from tests.factories import AttrFactory
 from tests.factories import AttrTypeFactory
 from tests.factories import ClassFactory
@@ -226,12 +228,17 @@ class FiltersTests(FactoryTestCase):
     def test_field_metadata_restrictions(self):
         attr = AttrFactory.create(tag=Tag.RESTRICTION)
         attr.types.append(AttrTypeFactory.xs_int())
+        attr.restrictions.min_occurs = 1
         attr.restrictions.max_occurs = 2
         attr.restrictions.max_inclusive = "2"
         attr.restrictions.required = False
 
-        expected = {"max_occurs": 2, "max_inclusive": 2}
+        expected = {"min_occurs": 1, "max_occurs": 2, "max_inclusive": 2}
         self.assertEqual(expected, self.filters.field_metadata(attr, None))
+
+        attr.restrictions.min_occurs = 0
+        attr.restrictions.max_occurs = sys.maxsize
+        self.assertEqual({"max_inclusive": 2}, self.filters.field_metadata(attr, None))
 
     def test_field_metadata_mixed(self):
         attr = AttrFactory.element(mixed=True)
@@ -412,7 +419,7 @@ class FiltersTests(FactoryTestCase):
             'text="foo",\n'
             'text_two="fo\'o",\n'
             'text_three="fo\'o",\n'
-            'pattern=r"foo"'
+            'pattern=r"foo",'
         )
         self.assertEqual(expected, self.filters.format_arguments(data))
 

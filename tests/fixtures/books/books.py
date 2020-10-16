@@ -21,7 +21,7 @@ class BookForm:
         metadata=dict(
             type="Element",
             namespace="",
-            required=True
+            required=True,
         )
     )
     title: Optional[str] = field(
@@ -29,7 +29,7 @@ class BookForm:
         metadata=dict(
             type="Element",
             namespace="",
-            required=True
+            required=True,
         )
     )
     genre: Optional[str] = field(
@@ -37,7 +37,7 @@ class BookForm:
         metadata=dict(
             type="Element",
             namespace="",
-            required=True
+            required=True,
         )
     )
     price: Optional[float] = field(
@@ -45,7 +45,7 @@ class BookForm:
         metadata=dict(
             type="Element",
             namespace="",
-            required=True
+            required=True,
         )
     )
     pub_date: Optional[str] = field(
@@ -53,7 +53,7 @@ class BookForm:
         metadata=dict(
             type="Element",
             namespace="",
-            required=True
+            required=True,
         )
     )
     review: Optional[str] = field(
@@ -61,20 +61,20 @@ class BookForm:
         metadata=dict(
             type="Element",
             namespace="",
-            required=True
+            required=True,
         )
     )
     id: Optional[str] = field(
         default=None,
         metadata=dict(
-            type="Attribute"
+            type="Attribute",
         )
     )
     lang: str = field(
         init=False,
         default="en",
         metadata=dict(
-            type="Attribute"
+            type="Attribute",
         )
     )
 
@@ -89,8 +89,6 @@ class BooksForm:
         metadata=dict(
             type="Element",
             namespace="",
-            min_occurs=0,
-            max_occurs=9223372036854775807
         )
     )
 

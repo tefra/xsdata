@@ -14,7 +14,6 @@ class EnvelopeType:
             type="Element",
             namespace="http://example.org/ord",
             min_occurs=1,
-            max_occurs=9223372036854775807
         )
     )
 

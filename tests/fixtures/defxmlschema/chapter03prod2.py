@@ -13,7 +13,7 @@ class ColorType:
         default=None,
         metadata=dict(
             type="Attribute",
-            namespace="http://example.org/prod2"
+            namespace="http://example.org/prod2",
         )
     )
 

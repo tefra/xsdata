@@ -10,7 +10,7 @@ class ColorType:
     value: Optional[str] = field(
         default=None,
         metadata=dict(
-            type="Attribute"
+            type="Attribute",
         )
     )
 
@@ -27,7 +27,7 @@ class HatSizeType:
     system: Optional[str] = field(
         default=None,
         metadata=dict(
-            type="Attribute"
+            type="Attribute",
         )
     )
 
@@ -43,7 +43,7 @@ class ProductType:
         metadata=dict(
             type="Element",
             namespace="",
-            required=True
+            required=True,
         )
     )
     name: Optional[str] = field(
@@ -51,7 +51,7 @@ class ProductType:
         metadata=dict(
             type="Element",
             namespace="",
-            required=True
+            required=True,
         )
     )
 
@@ -68,7 +68,7 @@ class ShirtSizeType:
     system: Optional[str] = field(
         default=None,
         metadata=dict(
-            type="Attribute"
+            type="Attribute",
         )
     )
 
@@ -86,7 +86,7 @@ class Umbrella:
         metadata=dict(
             type="Wildcard",
             namespace="##any",
-            required=True
+            required=True,
         )
     )
 
@@ -102,7 +102,7 @@ class ShirtType(ProductType):
         metadata=dict(
             type="Element",
             namespace="",
-            required=True
+            required=True,
         )
     )
     color: Optional[ColorType] = field(
@@ -110,7 +110,7 @@ class ShirtType(ProductType):
         metadata=dict(
             type="Element",
             namespace="",
-            required=True
+            required=True,
         )
     )
 
@@ -128,7 +128,7 @@ class Hat(ProductType):
         metadata=dict(
             type="Element",
             namespace="",
-            required=True
+            required=True,
         )
     )
 
@@ -158,7 +158,6 @@ class ItemsType:
         metadata=dict(
             type="Element",
             min_occurs=1,
-            max_occurs=9223372036854775807
         )
     )
     hat: List[Hat] = field(
@@ -166,7 +165,6 @@ class ItemsType:
         metadata=dict(
             type="Element",
             min_occurs=1,
-            max_occurs=9223372036854775807
         )
     )
     shirt: List[Shirt] = field(
@@ -174,7 +172,6 @@ class ItemsType:
         metadata=dict(
             type="Element",
             min_occurs=1,
-            max_occurs=9223372036854775807
         )
     )
     product: List[Product] = field(
@@ -182,7 +179,6 @@ class ItemsType:
         metadata=dict(
             type="Element",
             min_occurs=1,
-            max_occurs=9223372036854775807
         )
     )
 

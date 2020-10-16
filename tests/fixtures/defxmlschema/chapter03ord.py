@@ -16,7 +16,6 @@ class ItemsType:
             type="Element",
             namespace="http://example.org/prod",
             min_occurs=1,
-            max_occurs=9223372036854775807
         )
     )
 
@@ -32,7 +31,7 @@ class OrderType:
         metadata=dict(
             type="Element",
             namespace="http://example.org/ord",
-            required=True
+            required=True,
         )
     )
     items: Optional[ItemsType] = field(
@@ -40,7 +39,7 @@ class OrderType:
         metadata=dict(
             type="Element",
             namespace="http://example.org/ord",
-            required=True
+            required=True,
         )
     )
 

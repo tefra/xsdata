@@ -46,11 +46,9 @@ class SizesType:
             name="dressSize",
             type="Element",
             namespace="",
-            min_occurs=0,
-            max_occurs=9223372036854775807,
             min_inclusive="2",
             max_inclusive="18",
-            pattern=r"\d{1,2}"
+            pattern=r"\d{1,2}",
         )
     )
     medium_dress_size: List[str] = field(
@@ -59,11 +57,9 @@ class SizesType:
             name="mediumDressSize",
             type="Element",
             namespace="",
-            min_occurs=0,
-            max_occurs=9223372036854775807,
             min_inclusive="8",
             max_inclusive="12",
-            pattern=r"\d{1,2}"
+            pattern=r"\d{1,2}",
         )
     )
     small_dress_size: List[str] = field(
@@ -72,11 +68,9 @@ class SizesType:
             name="smallDressSize",
             type="Element",
             namespace="",
-            min_occurs=0,
-            max_occurs=9223372036854775807,
             min_inclusive="2",
             max_inclusive="6",
-            pattern=r"\d{1}"
+            pattern=r"\d{1}",
         )
     )
     smlx_size: List[SmlxsizeType] = field(
@@ -85,8 +79,6 @@ class SizesType:
             name="smlxSize",
             type="Element",
             namespace="",
-            min_occurs=0,
-            max_occurs=9223372036854775807
         )
     )
     xsmlx_size: List[XsmlxsizeType] = field(
@@ -95,8 +87,6 @@ class SizesType:
             name="xsmlxSize",
             type="Element",
             namespace="",
-            min_occurs=0,
-            max_occurs=9223372036854775807
         )
     )
 

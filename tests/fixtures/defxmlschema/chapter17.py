@@ -11,7 +11,7 @@ class ColorType:
     value: Optional[str] = field(
         default=None,
         metadata=dict(
-            type="Attribute"
+            type="Attribute",
         )
     )
 
@@ -28,7 +28,7 @@ class PriceType:
     currency: Optional[str] = field(
         default=None,
         metadata=dict(
-            type="Attribute"
+            type="Attribute",
         )
     )
 
@@ -45,20 +45,20 @@ class ProductOrderType:
         metadata=dict(
             type="Element",
             namespace="",
-            required=True
+            required=True,
         )
     )
     color: Optional[ColorType] = field(
         default=None,
         metadata=dict(
             type="Element",
-            namespace=""
+            namespace="",
         )
     )
     number: Optional[int] = field(
         default=None,
         metadata=dict(
-            type="Attribute"
+            type="Attribute",
         )
     )
 
@@ -75,7 +75,7 @@ class ProductType:
         metadata=dict(
             type="Element",
             namespace="",
-            required=True
+            required=True,
         )
     )
     name: Optional[str] = field(
@@ -83,7 +83,7 @@ class ProductType:
         metadata=dict(
             type="Element",
             namespace="",
-            required=True
+            required=True,
         )
     )
     price: Optional[PriceType] = field(
@@ -91,7 +91,7 @@ class ProductType:
         metadata=dict(
             type="Element",
             namespace="",
-            required=True
+            required=True,
         )
     )
 
@@ -107,8 +107,6 @@ class ItemsType:
         metadata=dict(
             type="Element",
             namespace="",
-            min_occurs=0,
-            max_occurs=9223372036854775807
         )
     )
     hat: List[ProductOrderType] = field(
@@ -116,8 +114,6 @@ class ItemsType:
         metadata=dict(
             type="Element",
             namespace="",
-            min_occurs=0,
-            max_occurs=9223372036854775807
         )
     )
 
@@ -133,7 +129,6 @@ class ProductsType:
             type="Element",
             namespace="",
             min_occurs=1,
-            max_occurs=9223372036854775807
         )
     )
 
@@ -150,7 +145,7 @@ class OrderType:
         metadata=dict(
             type="Element",
             namespace="",
-            required=True
+            required=True,
         )
     )
     items: Optional[ItemsType] = field(
@@ -158,7 +153,7 @@ class OrderType:
         metadata=dict(
             type="Element",
             namespace="",
-            required=True
+            required=True,
         )
     )
     products: Optional[ProductsType] = field(
@@ -166,7 +161,7 @@ class OrderType:
         metadata=dict(
             type="Element",
             namespace="",
-            required=True
+            required=True,
         )
     )
 

@@ -13,8 +13,6 @@ class Items:
         metadata=dict(
             type="Element",
             namespace="",
-            min_occurs=0,
-            max_occurs=9223372036854775807
         )
     )
 
@@ -34,7 +32,7 @@ class Items:
                 name="productName",
                 type="Element",
                 namespace="",
-                required=True
+                required=True,
             )
         )
         quantity: Optional[int] = field(
@@ -43,7 +41,7 @@ class Items:
                 type="Element",
                 namespace="",
                 required=True,
-                max_exclusive=100
+                max_exclusive=100,
             )
         )
         usprice: Optional[Decimal] = field(
@@ -52,13 +50,13 @@ class Items:
                 name="USPrice",
                 type="Element",
                 namespace="",
-                required=True
+                required=True,
             )
         )
         comment: Optional[str] = field(
             default=None,
             metadata=dict(
-                type="Element"
+                type="Element",
             )
         )
         ship_date: Optional[str] = field(
@@ -66,7 +64,7 @@ class Items:
             metadata=dict(
                 name="shipDate",
                 type="Element",
-                namespace=""
+                namespace="",
             )
         )
         part_num: Optional[str] = field(
@@ -75,7 +73,7 @@ class Items:
                 name="partNum",
                 type="Attribute",
                 required=True,
-                pattern=r"\d{3}-[A-Z]{2}"
+                pattern=r"\d{3}-[A-Z]{2}",
             )
         )
 
@@ -98,7 +96,7 @@ class Usaddress:
         metadata=dict(
             type="Element",
             namespace="",
-            required=True
+            required=True,
         )
     )
     street: Optional[str] = field(
@@ -106,7 +104,7 @@ class Usaddress:
         metadata=dict(
             type="Element",
             namespace="",
-            required=True
+            required=True,
         )
     )
     city: Optional[str] = field(
@@ -114,7 +112,7 @@ class Usaddress:
         metadata=dict(
             type="Element",
             namespace="",
-            required=True
+            required=True,
         )
     )
     state: Optional[str] = field(
@@ -122,7 +120,7 @@ class Usaddress:
         metadata=dict(
             type="Element",
             namespace="",
-            required=True
+            required=True,
         )
     )
     zip: Optional[Decimal] = field(
@@ -130,14 +128,14 @@ class Usaddress:
         metadata=dict(
             type="Element",
             namespace="",
-            required=True
+            required=True,
         )
     )
     country: str = field(
         init=False,
         default="US",
         metadata=dict(
-            type="Attribute"
+            type="Attribute",
         )
     )
 
@@ -153,7 +151,7 @@ class Comment:
     value: Optional[str] = field(
         default=None,
         metadata=dict(
-            required=True
+            required=True,
         )
     )
 
@@ -173,7 +171,7 @@ class PurchaseOrderType:
             name="shipTo",
             type="Element",
             namespace="",
-            required=True
+            required=True,
         )
     )
     bill_to: Optional[Usaddress] = field(
@@ -182,13 +180,13 @@ class PurchaseOrderType:
             name="billTo",
             type="Element",
             namespace="",
-            required=True
+            required=True,
         )
     )
     comment: Optional[str] = field(
         default=None,
         metadata=dict(
-            type="Element"
+            type="Element",
         )
     )
     items: Optional[Items] = field(
@@ -196,14 +194,14 @@ class PurchaseOrderType:
         metadata=dict(
             type="Element",
             namespace="",
-            required=True
+            required=True,
         )
     )
     order_date: Optional[str] = field(
         default=None,
         metadata=dict(
             name="orderDate",
-            type="Attribute"
+            type="Attribute",
         )
     )
 

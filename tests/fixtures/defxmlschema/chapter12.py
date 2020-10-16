@@ -10,7 +10,7 @@ class ColorType:
     value: Optional[str] = field(
         default=None,
         metadata=dict(
-            type="Attribute"
+            type="Attribute",
         )
     )
 
@@ -26,8 +26,6 @@ class DescriptionType:
             type="Wildcard",
             namespace="http://www.w3.org/1999/xhtml",
             mixed=True,
-            min_occurs=0,
-            max_occurs=9223372036854775807
         )
     )
 
@@ -44,7 +42,7 @@ class SizeType:
     system: Optional[str] = field(
         default=None,
         metadata=dict(
-            type="Attribute"
+            type="Attribute",
         )
     )
 
@@ -65,7 +63,7 @@ class ProductType:
         metadata=dict(
             type="Element",
             namespace="",
-            required=True
+            required=True,
         )
     )
     name: Optional[str] = field(
@@ -73,7 +71,7 @@ class ProductType:
         metadata=dict(
             type="Element",
             namespace="",
-            required=True
+            required=True,
         )
     )
     size: List[SizeType] = field(
@@ -81,9 +79,7 @@ class ProductType:
         metadata=dict(
             type="Element",
             namespace="",
-            min_occurs=0,
-            max_occurs=9223372036854775807,
-            sequential=True
+            sequential=True,
         )
     )
     color: List[ColorType] = field(
@@ -91,9 +87,7 @@ class ProductType:
         metadata=dict(
             type="Element",
             namespace="",
-            min_occurs=0,
-            max_occurs=9223372036854775807,
-            sequential=True
+            sequential=True,
         )
     )
     description: List[DescriptionType] = field(
@@ -101,23 +95,21 @@ class ProductType:
         metadata=dict(
             type="Element",
             namespace="",
-            min_occurs=0,
-            max_occurs=9223372036854775807,
-            sequential=True
+            sequential=True,
         )
     )
     eff_date: str = field(
         default="1900-01-01",
         metadata=dict(
             name="effDate",
-            type="Attribute"
+            type="Attribute",
         )
     )
     other_attributes: Dict = field(
         default_factory=dict,
         metadata=dict(
             type="Attributes",
-            namespace="##other"
+            namespace="##other",
         )
     )
 
@@ -134,8 +126,6 @@ class ItemsType:
         metadata=dict(
             type="Element",
             namespace="",
-            min_occurs=0,
-            max_occurs=9223372036854775807
         )
     )
     hat: List[ProductType] = field(
@@ -143,8 +133,6 @@ class ItemsType:
         metadata=dict(
             type="Element",
             namespace="",
-            min_occurs=0,
-            max_occurs=9223372036854775807
         )
     )
     umbrella: List[ProductType] = field(
@@ -152,8 +140,6 @@ class ItemsType:
         metadata=dict(
             type="Element",
             namespace="",
-            min_occurs=0,
-            max_occurs=9223372036854775807
         )
     )
 

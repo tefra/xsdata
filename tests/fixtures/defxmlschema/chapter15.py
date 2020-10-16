@@ -15,7 +15,7 @@ class SizeType:
     system: Optional[str] = field(
         default=None,
         metadata=dict(
-            type="Attribute"
+            type="Attribute",
         )
     )
 
@@ -36,28 +36,28 @@ class ShirtType:
         default=None,
         metadata=dict(
             type="Element",
-            namespace=""
+            namespace="",
         )
     )
     comment: Optional[str] = field(
         default=None,
         metadata=dict(
             type="Element",
-            namespace=""
+            namespace="",
         )
     )
     number: Optional[int] = field(
         default=None,
         metadata=dict(
             type="Element",
-            namespace=""
+            namespace="",
         )
     )
     name: Optional[str] = field(
         default=None,
         metadata=dict(
             type="Element",
-            namespace=""
+            namespace="",
         )
     )
     size: Optional[SizeType] = field(
@@ -65,27 +65,27 @@ class ShirtType:
         metadata=dict(
             type="Element",
             namespace="",
-            required=True
+            required=True,
         )
     )
     id: Optional[str] = field(
         default=None,
         metadata=dict(
             type="Attribute",
-            required=True
+            required=True,
         )
     )
     version: Optional[Decimal] = field(
         default=None,
         metadata=dict(
-            type="Attribute"
+            type="Attribute",
         )
     )
     eff_date: Optional[str] = field(
         default=None,
         metadata=dict(
             name="effDate",
-            type="Attribute"
+            type="Attribute",
         )
     )
 

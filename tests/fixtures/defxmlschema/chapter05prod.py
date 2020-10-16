@@ -16,7 +16,7 @@ class SizeType:
     system: Optional[str] = field(
         default=None,
         metadata=dict(
-            type="Attribute"
+            type="Attribute",
         )
     )
 
@@ -33,7 +33,7 @@ class ProductType:
         metadata=dict(
             type="Element",
             namespace="",
-            required=True
+            required=True,
         )
     )
     name: Optional[str] = field(
@@ -41,7 +41,7 @@ class ProductType:
         metadata=dict(
             type="Element",
             namespace="",
-            required=True
+            required=True,
         )
     )
     size: Optional[SizeType] = field(
@@ -50,7 +50,7 @@ class ProductType:
             type="Element",
             namespace="",
             required=True,
-            nillable=True
+            nillable=True,
         )
     )
 

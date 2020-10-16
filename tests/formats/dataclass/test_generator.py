@@ -103,14 +103,14 @@ class DataclassGeneratorTests(FactoryTestCase):
             "        default=None,\n"
             "        metadata=dict(\n"
             '            name="attr_D",\n'
-            '            type="Element"\n'
+            '            type="Element",\n'
             "        )\n"
             "    )\n"
             "    attr_e: Optional[str] = field(\n"
             "        default=None,\n"
             "        metadata=dict(\n"
             '            name="attr_E",\n'
-            '            type="Element"\n'
+            '            type="Element",\n'
             "        )\n"
             "    )\n\n\n"
             "class ClassD:\n"

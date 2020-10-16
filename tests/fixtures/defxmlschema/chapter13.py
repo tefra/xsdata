@@ -10,7 +10,7 @@ class ColorType:
     value: Optional[str] = field(
         default=None,
         metadata=dict(
-            type="Attribute"
+            type="Attribute",
         )
     )
 
@@ -24,7 +24,7 @@ class ItemType:
         default=None,
         metadata=dict(
             name="routingNum",
-            type="Attribute"
+            type="Attribute",
         )
     )
 
@@ -44,7 +44,7 @@ class RestrictedProductType:
         metadata=dict(
             type="Element",
             namespace="",
-            required=True
+            required=True,
         )
     )
     name: Optional[str] = field(
@@ -52,14 +52,14 @@ class RestrictedProductType:
         metadata=dict(
             type="Element",
             namespace="",
-            required=True
+            required=True,
         )
     )
     description: Optional[str] = field(
         default=None,
         metadata=dict(
             type="Element",
-            namespace=""
+            namespace="",
         )
     )
     routing_num: Optional[int] = field(
@@ -67,20 +67,20 @@ class RestrictedProductType:
         metadata=dict(
             name="routingNum",
             type="Attribute",
-            required=True
+            required=True,
         )
     )
     lang: Optional[str] = field(
         default=None,
         metadata=dict(
-            type="Attribute"
+            type="Attribute",
         )
     )
     eff_date: str = field(
         default="1900-01-01",
         metadata=dict(
             name="effDate",
-            type="Attribute"
+            type="Attribute",
         )
     )
 
@@ -97,7 +97,7 @@ class SizeType:
     system: Optional[str] = field(
         default=None,
         metadata=dict(
-            type="Attribute"
+            type="Attribute",
         )
     )
 
@@ -112,14 +112,14 @@ class SmallSizeType:
         default=None,
         metadata=dict(
             min_inclusive=2,
-            max_inclusive=6
+            max_inclusive=6,
         )
     )
     system: Optional[str] = field(
         default=None,
         metadata=dict(
             type="Attribute",
-            required=True
+            required=True,
         )
     )
 
@@ -138,7 +138,7 @@ class ProductType(ItemType):
         metadata=dict(
             type="Element",
             namespace="",
-            required=True
+            required=True,
         )
     )
     name: Optional[str] = field(
@@ -146,27 +146,27 @@ class ProductType(ItemType):
         metadata=dict(
             type="Element",
             namespace="",
-            required=True
+            required=True,
         )
     )
     description: Optional[str] = field(
         default=None,
         metadata=dict(
             type="Element",
-            namespace=""
+            namespace="",
         )
     )
     eff_date: Optional[str] = field(
         default=None,
         metadata=dict(
             name="effDate",
-            type="Attribute"
+            type="Attribute",
         )
     )
     lang: Optional[str] = field(
         default=None,
         metadata=dict(
-            type="Attribute"
+            type="Attribute",
         )
     )
 
@@ -183,8 +183,6 @@ class ShirtType(RestrictedProductType):
         metadata=dict(
             type="Element",
             namespace="",
-            min_occurs=0,
-            max_occurs=9223372036854775807
         )
     )
     color: List[ColorType] = field(
@@ -192,14 +190,12 @@ class ShirtType(RestrictedProductType):
         metadata=dict(
             type="Element",
             namespace="",
-            min_occurs=0,
-            max_occurs=9223372036854775807
         )
     )
     sleeve: Optional[int] = field(
         default=None,
         metadata=dict(
-            type="Attribute"
+            type="Attribute",
         )
     )
 
@@ -216,8 +212,6 @@ class ItemsType:
         metadata=dict(
             type="Element",
             namespace="",
-            min_occurs=0,
-            max_occurs=9223372036854775807
         )
     )
     umbrella: List[RestrictedProductType] = field(
@@ -225,8 +219,6 @@ class ItemsType:
         metadata=dict(
             type="Element",
             namespace="",
-            min_occurs=0,
-            max_occurs=9223372036854775807
         )
     )
     shirt: List[ShirtType] = field(
@@ -234,8 +226,6 @@ class ItemsType:
         metadata=dict(
             type="Element",
             namespace="",
-            min_occurs=0,
-            max_occurs=9223372036854775807
         )
     )
 

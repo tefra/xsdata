@@ -15,7 +15,7 @@ class CustomerType:
         metadata=dict(
             type="Element",
             namespace="",
-            required=True
+            required=True,
         )
     )
     number: Optional[int] = field(
@@ -23,6 +23,6 @@ class CustomerType:
         metadata=dict(
             type="Element",
             namespace="",
-            required=True
+            required=True,
         )
     )

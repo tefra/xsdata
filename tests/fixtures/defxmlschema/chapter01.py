@@ -14,7 +14,7 @@ class ProductType:
         metadata=dict(
             type="Element",
             namespace="",
-            required=True
+            required=True,
         )
     )
     size: Optional[int] = field(
@@ -24,14 +24,14 @@ class ProductType:
             namespace="",
             required=True,
             min_inclusive=2,
-            max_inclusive=18
+            max_inclusive=18,
         )
     )
     eff_date: Optional[str] = field(
         default=None,
         metadata=dict(
             name="effDate",
-            type="Attribute"
+            type="Attribute",
         )
     )
 

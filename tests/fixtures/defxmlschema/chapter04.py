@@ -18,7 +18,7 @@ class OrderType:
         metadata=dict(
             type="Element",
             namespace="",
-            required=True
+            required=True,
         )
     )
     customer: Optional[CustomerType] = field(
@@ -26,7 +26,7 @@ class OrderType:
         metadata=dict(
             type="Element",
             namespace="",
-            required=True
+            required=True,
         )
     )
     items: Optional[ItemsType] = field(
@@ -34,7 +34,7 @@ class OrderType:
         metadata=dict(
             type="Element",
             namespace="",
-            required=True
+            required=True,
         )
     )
 

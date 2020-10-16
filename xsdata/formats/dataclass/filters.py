@@ -1,4 +1,5 @@
 import math
+import sys
 from collections import defaultdict
 from dataclasses import dataclass
 from dataclasses import field
@@ -146,13 +147,20 @@ class Filters:
             namespace = attr.namespace
 
         types = list({x.native_type for x in attr.types if x.native})
+        restrictions = attr.restrictions.asdict(types)
+
+        if "max_occurs" in restrictions and restrictions["max_occurs"] >= sys.maxsize:
+            del restrictions["max_occurs"]
+
+        if "min_occurs" in restrictions and restrictions["min_occurs"] == 0:
+            del restrictions["min_occurs"]
 
         metadata = dict(
             name=name,
             type=attr.xml_type,
             namespace=namespace,
             mixed=attr.mixed,
-            **attr.restrictions.asdict(types),
+            **restrictions,
         )
 
         return {
@@ -341,9 +349,9 @@ class Filters:
                 value = f'''"{value.replace('"', "'")}"'''
                 if key == "pattern":
                     value = f"r{value}"
-            return f"{key}={value}"
+            return f"{key}={value},"
 
-        return ",\n".join(prep(key, value) for key, value in data.items())
+        return "\n".join(prep(key, value) for key, value in data.items())
 
     @classmethod
     def from_config(cls, config: GeneratorConfig) -> "Filters":

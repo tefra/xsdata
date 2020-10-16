@@ -16,7 +16,7 @@ class HelloByeError:
         default=None,
         metadata=dict(
             type="Element",
-            namespace=""
+            namespace="",
         )
     )
 
@@ -33,7 +33,7 @@ class HelloError:
         default=None,
         metadata=dict(
             type="Element",
-            namespace=""
+            namespace="",
         )
     )
 
@@ -50,7 +50,7 @@ class GetHelloAsString:
         default=None,
         metadata=dict(
             type="Element",
-            namespace=""
+            namespace="",
         )
     )
 
@@ -68,7 +68,7 @@ class GetHelloAsStringResponse:
         metadata=dict(
             name="return",
             type="Element",
-            namespace=""
+            namespace="",
         )
     )
 
@@ -86,7 +86,7 @@ class HelloGetHelloAsStringInput:
         default=None,
         metadata=dict(
             name="Body",
-            type="Element"
+            type="Element",
         )
     )
 
@@ -100,7 +100,7 @@ class HelloGetHelloAsStringInput:
             metadata=dict(
                 name="getHelloAsString",
                 type="Element",
-                namespace="http://hello/"
+                namespace="http://hello/",
             )
         )
 
@@ -118,7 +118,7 @@ class HelloGetHelloAsStringOutput:
         default=None,
         metadata=dict(
             name="Body",
-            type="Element"
+            type="Element",
         )
     )
 
@@ -133,14 +133,14 @@ class HelloGetHelloAsStringOutput:
             metadata=dict(
                 name="getHelloAsStringResponse",
                 type="Element",
-                namespace="http://hello/"
+                namespace="http://hello/",
             )
         )
         fault: Optional["HelloGetHelloAsStringOutput.Body.Fault"] = field(
             default=None,
             metadata=dict(
                 name="Fault",
-                type="Element"
+                type="Element",
             )
         )
 
@@ -156,28 +156,28 @@ class HelloGetHelloAsStringOutput:
                 default=None,
                 metadata=dict(
                     type="Element",
-                    namespace=""
+                    namespace="",
                 )
             )
             faultstring: Optional[str] = field(
                 default=None,
                 metadata=dict(
                     type="Element",
-                    namespace=""
+                    namespace="",
                 )
             )
             faultactor: Optional[str] = field(
                 default=None,
                 metadata=dict(
                     type="Element",
-                    namespace=""
+                    namespace="",
                 )
             )
             detail: Optional["HelloGetHelloAsStringOutput.Body.Fault.Detail"] = field(
                 default=None,
                 metadata=dict(
                     type="Element",
-                    namespace=""
+                    namespace="",
                 )
             )
 
@@ -192,7 +192,7 @@ class HelloGetHelloAsStringOutput:
                     metadata=dict(
                         name="HelloError",
                         type="Element",
-                        namespace="http://hello/"
+                        namespace="http://hello/",
                     )
                 )
                 hello_bye_error: Optional[HelloByeError] = field(
@@ -200,7 +200,7 @@ class HelloGetHelloAsStringOutput:
                     metadata=dict(
                         name="HelloByeError",
                         type="Element",
-                        namespace="http://hello/"
+                        namespace="http://hello/",
                     )
                 )
 

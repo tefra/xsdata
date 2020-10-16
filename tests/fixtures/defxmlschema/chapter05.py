@@ -16,7 +16,6 @@ class ItemsType:
             type="Element",
             namespace="http://example.org/prod",
             min_occurs=1,
-            max_occurs=9223372036854775807
         )
     )
 
@@ -31,7 +30,7 @@ class OrderType:
         metadata=dict(
             type="Element",
             namespace="",
-            required=True
+            required=True,
         )
     )
 

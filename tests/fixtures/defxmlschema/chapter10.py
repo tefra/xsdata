@@ -39,10 +39,8 @@ class SizesType:
         metadata=dict(
             type="Element",
             namespace="",
-            min_occurs=0,
-            max_occurs=9223372036854775807,
             min_inclusive=2,
-            max_inclusive=18
+            max_inclusive=18,
         )
     )
     small_size: List[SmallSizeType] = field(
@@ -51,8 +49,6 @@ class SizesType:
             name="smallSize",
             type="Element",
             namespace="",
-            min_occurs=0,
-            max_occurs=9223372036854775807
         )
     )
     international_size: List[Union[int, "SizesType.Value"]] = field(
@@ -61,10 +57,8 @@ class SizesType:
             name="internationalSize",
             type="Element",
             namespace="",
-            min_occurs=0,
-            max_occurs=9223372036854775807,
             min_inclusive=24,
-            max_inclusive=54
+            max_inclusive=54,
         )
     )
     available_sizes: List[List[Union[int, "SizesType.Value"]]] = field(
@@ -73,11 +67,9 @@ class SizesType:
             name="availableSizes",
             type="Element",
             namespace="",
-            min_occurs=0,
-            max_occurs=9223372036854775807,
             min_inclusive=2,
             max_inclusive=18,
-            tokens=True
+            tokens=True,
         )
     )
     applicable_sizes: List[ApplicableSizesType] = field(
@@ -86,8 +78,6 @@ class SizesType:
             name="applicableSizes",
             type="Element",
             namespace="",
-            min_occurs=0,
-            max_occurs=9223372036854775807
         )
     )
 

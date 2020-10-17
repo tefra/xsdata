@@ -15,19 +15,19 @@ class Add:
 
     int_a: Optional[int] = field(
         default=None,
-        metadata=dict(
-            name="intA",
-            type="Element",
-            required=True,
-        )
+        metadata={
+            "name": "intA",
+            "type": "Element",
+            "required": True,
+        }
     )
     int_b: Optional[int] = field(
         default=None,
-        metadata=dict(
-            name="intB",
-            type="Element",
-            required=True,
-        )
+        metadata={
+            "name": "intB",
+            "type": "Element",
+            "required": True,
+        }
     )
 
 
@@ -41,11 +41,11 @@ class AddResponse:
 
     add_result: Optional[int] = field(
         default=None,
-        metadata=dict(
-            name="AddResult",
-            type="Element",
-            required=True,
-        )
+        metadata={
+            "name": "AddResult",
+            "type": "Element",
+            "required": True,
+        }
     )
 
 
@@ -60,19 +60,19 @@ class Divide:
 
     int_a: Optional[int] = field(
         default=None,
-        metadata=dict(
-            name="intA",
-            type="Element",
-            required=True,
-        )
+        metadata={
+            "name": "intA",
+            "type": "Element",
+            "required": True,
+        }
     )
     int_b: Optional[int] = field(
         default=None,
-        metadata=dict(
-            name="intB",
-            type="Element",
-            required=True,
-        )
+        metadata={
+            "name": "intB",
+            "type": "Element",
+            "required": True,
+        }
     )
 
 
@@ -86,11 +86,11 @@ class DivideResponse:
 
     divide_result: Optional[int] = field(
         default=None,
-        metadata=dict(
-            name="DivideResult",
-            type="Element",
-            required=True,
-        )
+        metadata={
+            "name": "DivideResult",
+            "type": "Element",
+            "required": True,
+        }
     )
 
 
@@ -105,19 +105,19 @@ class Multiply:
 
     int_a: Optional[int] = field(
         default=None,
-        metadata=dict(
-            name="intA",
-            type="Element",
-            required=True,
-        )
+        metadata={
+            "name": "intA",
+            "type": "Element",
+            "required": True,
+        }
     )
     int_b: Optional[int] = field(
         default=None,
-        metadata=dict(
-            name="intB",
-            type="Element",
-            required=True,
-        )
+        metadata={
+            "name": "intB",
+            "type": "Element",
+            "required": True,
+        }
     )
 
 
@@ -131,11 +131,11 @@ class MultiplyResponse:
 
     multiply_result: Optional[int] = field(
         default=None,
-        metadata=dict(
-            name="MultiplyResult",
-            type="Element",
-            required=True,
-        )
+        metadata={
+            "name": "MultiplyResult",
+            "type": "Element",
+            "required": True,
+        }
     )
 
 
@@ -150,19 +150,19 @@ class Subtract:
 
     int_a: Optional[int] = field(
         default=None,
-        metadata=dict(
-            name="intA",
-            type="Element",
-            required=True,
-        )
+        metadata={
+            "name": "intA",
+            "type": "Element",
+            "required": True,
+        }
     )
     int_b: Optional[int] = field(
         default=None,
-        metadata=dict(
-            name="intB",
-            type="Element",
-            required=True,
-        )
+        metadata={
+            "name": "intB",
+            "type": "Element",
+            "required": True,
+        }
     )
 
 
@@ -176,11 +176,11 @@ class SubtractResponse:
 
     subtract_result: Optional[int] = field(
         default=None,
-        metadata=dict(
-            name="SubtractResult",
-            type="Element",
-            required=True,
-        )
+        metadata={
+            "name": "SubtractResult",
+            "type": "Element",
+            "required": True,
+        }
     )
 
 
@@ -195,10 +195,10 @@ class CalculatorSoapAddInput:
 
     body: Optional["CalculatorSoapAddInput.Body"] = field(
         default=None,
-        metadata=dict(
-            name="Body",
-            type="Element",
-        )
+        metadata={
+            "name": "Body",
+            "type": "Element",
+        }
     )
 
     @dataclass
@@ -208,11 +208,11 @@ class CalculatorSoapAddInput:
         """
         add: Optional[Add] = field(
             default=None,
-            metadata=dict(
-                name="Add",
-                type="Element",
-                namespace="http://tempuri.org/",
-            )
+            metadata={
+                "name": "Add",
+                "type": "Element",
+                "namespace": "http://tempuri.org/",
+            }
         )
 
 
@@ -227,10 +227,10 @@ class CalculatorSoapAddOutput:
 
     body: Optional["CalculatorSoapAddOutput.Body"] = field(
         default=None,
-        metadata=dict(
-            name="Body",
-            type="Element",
-        )
+        metadata={
+            "name": "Body",
+            "type": "Element",
+        }
     )
 
     @dataclass
@@ -241,18 +241,18 @@ class CalculatorSoapAddOutput:
         """
         add_response: Optional[AddResponse] = field(
             default=None,
-            metadata=dict(
-                name="AddResponse",
-                type="Element",
-                namespace="http://tempuri.org/",
-            )
+            metadata={
+                "name": "AddResponse",
+                "type": "Element",
+                "namespace": "http://tempuri.org/",
+            }
         )
         fault: Optional["CalculatorSoapAddOutput.Body.Fault"] = field(
             default=None,
-            metadata=dict(
-                name="Fault",
-                type="Element",
-            )
+            metadata={
+                "name": "Fault",
+                "type": "Element",
+            }
         )
 
         @dataclass
@@ -265,31 +265,31 @@ class CalculatorSoapAddOutput:
             """
             faultcode: Optional[str] = field(
                 default=None,
-                metadata=dict(
-                    type="Element",
-                    namespace="",
-                )
+                metadata={
+                    "type": "Element",
+                    "namespace": "",
+                }
             )
             faultstring: Optional[str] = field(
                 default=None,
-                metadata=dict(
-                    type="Element",
-                    namespace="",
-                )
+                metadata={
+                    "type": "Element",
+                    "namespace": "",
+                }
             )
             faultactor: Optional[str] = field(
                 default=None,
-                metadata=dict(
-                    type="Element",
-                    namespace="",
-                )
+                metadata={
+                    "type": "Element",
+                    "namespace": "",
+                }
             )
             detail: Optional[str] = field(
                 default=None,
-                metadata=dict(
-                    type="Element",
-                    namespace="",
-                )
+                metadata={
+                    "type": "Element",
+                    "namespace": "",
+                }
             )
 
 
@@ -304,10 +304,10 @@ class CalculatorSoapDivideInput:
 
     body: Optional["CalculatorSoapDivideInput.Body"] = field(
         default=None,
-        metadata=dict(
-            name="Body",
-            type="Element",
-        )
+        metadata={
+            "name": "Body",
+            "type": "Element",
+        }
     )
 
     @dataclass
@@ -317,11 +317,11 @@ class CalculatorSoapDivideInput:
         """
         divide: Optional[Divide] = field(
             default=None,
-            metadata=dict(
-                name="Divide",
-                type="Element",
-                namespace="http://tempuri.org/",
-            )
+            metadata={
+                "name": "Divide",
+                "type": "Element",
+                "namespace": "http://tempuri.org/",
+            }
         )
 
 
@@ -336,10 +336,10 @@ class CalculatorSoapDivideOutput:
 
     body: Optional["CalculatorSoapDivideOutput.Body"] = field(
         default=None,
-        metadata=dict(
-            name="Body",
-            type="Element",
-        )
+        metadata={
+            "name": "Body",
+            "type": "Element",
+        }
     )
 
     @dataclass
@@ -350,18 +350,18 @@ class CalculatorSoapDivideOutput:
         """
         divide_response: Optional[DivideResponse] = field(
             default=None,
-            metadata=dict(
-                name="DivideResponse",
-                type="Element",
-                namespace="http://tempuri.org/",
-            )
+            metadata={
+                "name": "DivideResponse",
+                "type": "Element",
+                "namespace": "http://tempuri.org/",
+            }
         )
         fault: Optional["CalculatorSoapDivideOutput.Body.Fault"] = field(
             default=None,
-            metadata=dict(
-                name="Fault",
-                type="Element",
-            )
+            metadata={
+                "name": "Fault",
+                "type": "Element",
+            }
         )
 
         @dataclass
@@ -374,31 +374,31 @@ class CalculatorSoapDivideOutput:
             """
             faultcode: Optional[str] = field(
                 default=None,
-                metadata=dict(
-                    type="Element",
-                    namespace="",
-                )
+                metadata={
+                    "type": "Element",
+                    "namespace": "",
+                }
             )
             faultstring: Optional[str] = field(
                 default=None,
-                metadata=dict(
-                    type="Element",
-                    namespace="",
-                )
+                metadata={
+                    "type": "Element",
+                    "namespace": "",
+                }
             )
             faultactor: Optional[str] = field(
                 default=None,
-                metadata=dict(
-                    type="Element",
-                    namespace="",
-                )
+                metadata={
+                    "type": "Element",
+                    "namespace": "",
+                }
             )
             detail: Optional[str] = field(
                 default=None,
-                metadata=dict(
-                    type="Element",
-                    namespace="",
-                )
+                metadata={
+                    "type": "Element",
+                    "namespace": "",
+                }
             )
 
 
@@ -413,10 +413,10 @@ class CalculatorSoapMultiplyInput:
 
     body: Optional["CalculatorSoapMultiplyInput.Body"] = field(
         default=None,
-        metadata=dict(
-            name="Body",
-            type="Element",
-        )
+        metadata={
+            "name": "Body",
+            "type": "Element",
+        }
     )
 
     @dataclass
@@ -426,11 +426,11 @@ class CalculatorSoapMultiplyInput:
         """
         multiply: Optional[Multiply] = field(
             default=None,
-            metadata=dict(
-                name="Multiply",
-                type="Element",
-                namespace="http://tempuri.org/",
-            )
+            metadata={
+                "name": "Multiply",
+                "type": "Element",
+                "namespace": "http://tempuri.org/",
+            }
         )
 
 
@@ -445,10 +445,10 @@ class CalculatorSoapMultiplyOutput:
 
     body: Optional["CalculatorSoapMultiplyOutput.Body"] = field(
         default=None,
-        metadata=dict(
-            name="Body",
-            type="Element",
-        )
+        metadata={
+            "name": "Body",
+            "type": "Element",
+        }
     )
 
     @dataclass
@@ -459,18 +459,18 @@ class CalculatorSoapMultiplyOutput:
         """
         multiply_response: Optional[MultiplyResponse] = field(
             default=None,
-            metadata=dict(
-                name="MultiplyResponse",
-                type="Element",
-                namespace="http://tempuri.org/",
-            )
+            metadata={
+                "name": "MultiplyResponse",
+                "type": "Element",
+                "namespace": "http://tempuri.org/",
+            }
         )
         fault: Optional["CalculatorSoapMultiplyOutput.Body.Fault"] = field(
             default=None,
-            metadata=dict(
-                name="Fault",
-                type="Element",
-            )
+            metadata={
+                "name": "Fault",
+                "type": "Element",
+            }
         )
 
         @dataclass
@@ -483,31 +483,31 @@ class CalculatorSoapMultiplyOutput:
             """
             faultcode: Optional[str] = field(
                 default=None,
-                metadata=dict(
-                    type="Element",
-                    namespace="",
-                )
+                metadata={
+                    "type": "Element",
+                    "namespace": "",
+                }
             )
             faultstring: Optional[str] = field(
                 default=None,
-                metadata=dict(
-                    type="Element",
-                    namespace="",
-                )
+                metadata={
+                    "type": "Element",
+                    "namespace": "",
+                }
             )
             faultactor: Optional[str] = field(
                 default=None,
-                metadata=dict(
-                    type="Element",
-                    namespace="",
-                )
+                metadata={
+                    "type": "Element",
+                    "namespace": "",
+                }
             )
             detail: Optional[str] = field(
                 default=None,
-                metadata=dict(
-                    type="Element",
-                    namespace="",
-                )
+                metadata={
+                    "type": "Element",
+                    "namespace": "",
+                }
             )
 
 
@@ -522,10 +522,10 @@ class CalculatorSoapSubtractInput:
 
     body: Optional["CalculatorSoapSubtractInput.Body"] = field(
         default=None,
-        metadata=dict(
-            name="Body",
-            type="Element",
-        )
+        metadata={
+            "name": "Body",
+            "type": "Element",
+        }
     )
 
     @dataclass
@@ -535,11 +535,11 @@ class CalculatorSoapSubtractInput:
         """
         subtract: Optional[Subtract] = field(
             default=None,
-            metadata=dict(
-                name="Subtract",
-                type="Element",
-                namespace="http://tempuri.org/",
-            )
+            metadata={
+                "name": "Subtract",
+                "type": "Element",
+                "namespace": "http://tempuri.org/",
+            }
         )
 
 
@@ -554,10 +554,10 @@ class CalculatorSoapSubtractOutput:
 
     body: Optional["CalculatorSoapSubtractOutput.Body"] = field(
         default=None,
-        metadata=dict(
-            name="Body",
-            type="Element",
-        )
+        metadata={
+            "name": "Body",
+            "type": "Element",
+        }
     )
 
     @dataclass
@@ -568,18 +568,18 @@ class CalculatorSoapSubtractOutput:
         """
         subtract_response: Optional[SubtractResponse] = field(
             default=None,
-            metadata=dict(
-                name="SubtractResponse",
-                type="Element",
-                namespace="http://tempuri.org/",
-            )
+            metadata={
+                "name": "SubtractResponse",
+                "type": "Element",
+                "namespace": "http://tempuri.org/",
+            }
         )
         fault: Optional["CalculatorSoapSubtractOutput.Body.Fault"] = field(
             default=None,
-            metadata=dict(
-                name="Fault",
-                type="Element",
-            )
+            metadata={
+                "name": "Fault",
+                "type": "Element",
+            }
         )
 
         @dataclass
@@ -592,31 +592,31 @@ class CalculatorSoapSubtractOutput:
             """
             faultcode: Optional[str] = field(
                 default=None,
-                metadata=dict(
-                    type="Element",
-                    namespace="",
-                )
+                metadata={
+                    "type": "Element",
+                    "namespace": "",
+                }
             )
             faultstring: Optional[str] = field(
                 default=None,
-                metadata=dict(
-                    type="Element",
-                    namespace="",
-                )
+                metadata={
+                    "type": "Element",
+                    "namespace": "",
+                }
             )
             faultactor: Optional[str] = field(
                 default=None,
-                metadata=dict(
-                    type="Element",
-                    namespace="",
-                )
+                metadata={
+                    "type": "Element",
+                    "namespace": "",
+                }
             )
             detail: Optional[str] = field(
                 default=None,
-                metadata=dict(
-                    type="Element",
-                    namespace="",
-                )
+                metadata={
+                    "type": "Element",
+                    "namespace": "",
+                }
             )
 
 

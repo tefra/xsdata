@@ -409,19 +409,29 @@ class FiltersTests(FactoryTestCase):
         )
         self.assertEqual(expected, self.filters.default_imports(output))
 
-    def test_format_arguments(self):
+    def test_format_metadata(self):
         data = dict(
-            num=1, text="foo", text_two="fo'o", text_three='fo"o', pattern="foo"
+            num=1,
+            text="foo",
+            text_two="fo'o",
+            text_three='fo"o',
+            pattern="foo",
+            level_two=dict(a=1),
         )
 
         expected = (
-            "num=1,\n"
-            'text="foo",\n'
-            'text_two="fo\'o",\n'
-            'text_three="fo\'o",\n'
-            'pattern=r"foo",'
+            "{\n"
+            '    "num": 1,\n'
+            '    "text": "foo",\n'
+            '    "text_two": "fo\'o",\n'
+            '    "text_three": "fo\'o",\n'
+            '    "pattern": r"foo",\n'
+            '    "level_two": {\n'
+            '        "a": 1,\n'
+            "    },\n"
+            "}"
         )
-        self.assertEqual(expected, self.filters.format_arguments(data))
+        self.assertEqual(expected, self.filters.format_metadata(data))
 
     def test_class_docstring(self):
         target = ClassFactory.create(

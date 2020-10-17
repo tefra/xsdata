@@ -65,7 +65,7 @@ class Filters:
                 "constant_name": self.constant_name,
                 "constant_value": self.constant_value,
                 "default_imports": self.default_imports,
-                "format_arguments": self.format_arguments,
+                "format_metadata": self.format_metadata,
                 "type_name": self.type_name,
             }
         )
@@ -168,6 +168,26 @@ class Filters:
             for key, value in metadata.items()
             if value is not None and value is not False
         }
+
+    @classmethod
+    def format_metadata(cls, data: Any, level: int = 0, pattern: bool = False) -> str:
+        """Prettify field metadata for code generation."""
+        if isinstance(data, dict):
+            res = ["{"]
+            lvl = level + 1
+            for key, value in data.items():
+                is_pattern = key == "pattern"
+                fmt_value = cls.format_metadata(value, lvl, pattern=is_pattern)
+                res.append("    " * lvl + '"' + key + '"' + ": " + fmt_value + ",")
+            res.append("    " * level + "}")
+            return "\n".join(res)
+        elif isinstance(data, str):
+            data = f'''"{data.replace('"', "'")}"'''
+            if pattern:
+                data = f"r{data}"
+            return data
+        else:
+            return str(data)
 
     def class_docstring(self, obj: Class, enum: bool = False) -> str:
         """Generate docstring for the given class and the constructor
@@ -339,19 +359,6 @@ class Filters:
             result.append("from xml.etree.ElementTree import QName")
 
         return "\n".join(result)
-
-    @classmethod
-    def format_arguments(cls, data: Dict) -> str:
-        """Format given dictionary as keyword arguments."""
-
-        def prep(key: str, value: Any) -> str:
-            if isinstance(value, str):
-                value = f'''"{value.replace('"', "'")}"'''
-                if key == "pattern":
-                    value = f"r{value}"
-            return f"{key}={value},"
-
-        return "\n".join(prep(key, value) for key, value in data.items())
 
     @classmethod
     def from_config(cls, config: GeneratorConfig) -> "Filters":

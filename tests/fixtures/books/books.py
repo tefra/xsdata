@@ -18,64 +18,64 @@ class BookForm:
     """
     author: Optional[str] = field(
         default=None,
-        metadata=dict(
-            type="Element",
-            namespace="",
-            required=True,
-        )
+        metadata={
+            "type": "Element",
+            "namespace": "",
+            "required": True,
+        }
     )
     title: Optional[str] = field(
         default=None,
-        metadata=dict(
-            type="Element",
-            namespace="",
-            required=True,
-        )
+        metadata={
+            "type": "Element",
+            "namespace": "",
+            "required": True,
+        }
     )
     genre: Optional[str] = field(
         default=None,
-        metadata=dict(
-            type="Element",
-            namespace="",
-            required=True,
-        )
+        metadata={
+            "type": "Element",
+            "namespace": "",
+            "required": True,
+        }
     )
     price: Optional[float] = field(
         default=None,
-        metadata=dict(
-            type="Element",
-            namespace="",
-            required=True,
-        )
+        metadata={
+            "type": "Element",
+            "namespace": "",
+            "required": True,
+        }
     )
     pub_date: Optional[str] = field(
         default=None,
-        metadata=dict(
-            type="Element",
-            namespace="",
-            required=True,
-        )
+        metadata={
+            "type": "Element",
+            "namespace": "",
+            "required": True,
+        }
     )
     review: Optional[str] = field(
         default=None,
-        metadata=dict(
-            type="Element",
-            namespace="",
-            required=True,
-        )
+        metadata={
+            "type": "Element",
+            "namespace": "",
+            "required": True,
+        }
     )
     id: Optional[str] = field(
         default=None,
-        metadata=dict(
-            type="Attribute",
-        )
+        metadata={
+            "type": "Attribute",
+        }
     )
     lang: str = field(
         init=False,
         default="en",
-        metadata=dict(
-            type="Attribute",
-        )
+        metadata={
+            "type": "Attribute",
+        }
     )
 
 
@@ -86,10 +86,10 @@ class BooksForm:
     """
     book: List[BookForm] = field(
         default_factory=list,
-        metadata=dict(
-            type="Element",
-            namespace="",
-        )
+        metadata={
+            "type": "Element",
+            "namespace": "",
+        }
     )
 
 

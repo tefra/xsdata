@@ -11,10 +11,10 @@ class ColorType:
     """
     value: Optional[str] = field(
         default=None,
-        metadata=dict(
-            type="Attribute",
-            namespace="http://example.org/prod2",
-        )
+        metadata={
+            "type": "Attribute",
+            "namespace": "http://example.org/prod2",
+        }
     )
 
 

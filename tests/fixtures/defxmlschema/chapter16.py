@@ -9,9 +9,9 @@ class ColorType:
     """
     value: Optional[str] = field(
         default=None,
-        metadata=dict(
-            type="Attribute",
-        )
+        metadata={
+            "type": "Attribute",
+        }
     )
 
 
@@ -26,9 +26,9 @@ class HatSizeType:
     )
     system: Optional[str] = field(
         default=None,
-        metadata=dict(
-            type="Attribute",
-        )
+        metadata={
+            "type": "Attribute",
+        }
     )
 
 
@@ -40,19 +40,19 @@ class ProductType:
     """
     number: Optional[int] = field(
         default=None,
-        metadata=dict(
-            type="Element",
-            namespace="",
-            required=True,
-        )
+        metadata={
+            "type": "Element",
+            "namespace": "",
+            "required": True,
+        }
     )
     name: Optional[str] = field(
         default=None,
-        metadata=dict(
-            type="Element",
-            namespace="",
-            required=True,
-        )
+        metadata={
+            "type": "Element",
+            "namespace": "",
+            "required": True,
+        }
     )
 
 
@@ -67,9 +67,9 @@ class ShirtSizeType:
     )
     system: Optional[str] = field(
         default=None,
-        metadata=dict(
-            type="Attribute",
-        )
+        metadata={
+            "type": "Attribute",
+        }
     )
 
 
@@ -83,11 +83,11 @@ class Umbrella:
 
     any_element: Optional[object] = field(
         default=None,
-        metadata=dict(
-            type="Wildcard",
-            namespace="##any",
-            required=True,
-        )
+        metadata={
+            "type": "Wildcard",
+            "namespace": "##any",
+            "required": True,
+        }
     )
 
 
@@ -99,19 +99,19 @@ class ShirtType(ProductType):
     """
     size: Optional[ShirtSizeType] = field(
         default=None,
-        metadata=dict(
-            type="Element",
-            namespace="",
-            required=True,
-        )
+        metadata={
+            "type": "Element",
+            "namespace": "",
+            "required": True,
+        }
     )
     color: Optional[ColorType] = field(
         default=None,
-        metadata=dict(
-            type="Element",
-            namespace="",
-            required=True,
-        )
+        metadata={
+            "type": "Element",
+            "namespace": "",
+            "required": True,
+        }
     )
 
 
@@ -125,11 +125,11 @@ class Hat(ProductType):
 
     size: Optional[HatSizeType] = field(
         default=None,
-        metadata=dict(
-            type="Element",
-            namespace="",
-            required=True,
-        )
+        metadata={
+            "type": "Element",
+            "namespace": "",
+            "required": True,
+        }
     )
 
 
@@ -155,31 +155,31 @@ class ItemsType:
     """
     umbrella: List[Umbrella] = field(
         default_factory=list,
-        metadata=dict(
-            type="Element",
-            min_occurs=1,
-        )
+        metadata={
+            "type": "Element",
+            "min_occurs": 1,
+        }
     )
     hat: List[Hat] = field(
         default_factory=list,
-        metadata=dict(
-            type="Element",
-            min_occurs=1,
-        )
+        metadata={
+            "type": "Element",
+            "min_occurs": 1,
+        }
     )
     shirt: List[Shirt] = field(
         default_factory=list,
-        metadata=dict(
-            type="Element",
-            min_occurs=1,
-        )
+        metadata={
+            "type": "Element",
+            "min_occurs": 1,
+        }
     )
     product: List[Product] = field(
         default_factory=list,
-        metadata=dict(
-            type="Element",
-            min_occurs=1,
-        )
+        metadata={
+            "type": "Element",
+            "min_occurs": 1,
+        }
     )
 
 

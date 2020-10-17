@@ -16,11 +16,11 @@ class ProdNumType:
     )
     id: Optional[str] = field(
         default=None,
-        metadata=dict(
-            type="Attribute",
-            namespace="http://example.org/prod",
-            required=True,
-        )
+        metadata={
+            "type": "Attribute",
+            "namespace": "http://example.org/prod",
+            "required": True,
+        }
     )
 
 
@@ -35,9 +35,9 @@ class SizeType:
     )
     system: Optional[str] = field(
         default=None,
-        metadata=dict(
-            type="Attribute",
-        )
+        metadata={
+            "type": "Attribute",
+        }
     )
 
 
@@ -51,35 +51,35 @@ class ProductType:
     """
     number: Optional[ProdNumType] = field(
         default=None,
-        metadata=dict(
-            type="Element",
-            namespace="http://example.org/prod",
-            required=True,
-        )
+        metadata={
+            "type": "Element",
+            "namespace": "http://example.org/prod",
+            "required": True,
+        }
     )
     name: Optional[str] = field(
         default=None,
-        metadata=dict(
-            type="Element",
-            namespace="",
-            required=True,
-        )
+        metadata={
+            "type": "Element",
+            "namespace": "",
+            "required": True,
+        }
     )
     size: Optional[SizeType] = field(
         default=None,
-        metadata=dict(
-            type="Element",
-            namespace="http://example.org/prod",
-            required=True,
-        )
+        metadata={
+            "type": "Element",
+            "namespace": "http://example.org/prod",
+            "required": True,
+        }
     )
     color: Optional[Color] = field(
         default=None,
-        metadata=dict(
-            type="Element",
-            namespace="http://example.org/prod2",
-            required=True,
-        )
+        metadata={
+            "type": "Element",
+            "namespace": "http://example.org/prod2",
+            "required": True,
+        }
     )
 
 

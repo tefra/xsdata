@@ -12,11 +12,11 @@ class ItemsType:
     """
     product: List[Product] = field(
         default_factory=list,
-        metadata=dict(
-            type="Element",
-            namespace="http://example.org/prod",
-            min_occurs=1,
-        )
+        metadata={
+            "type": "Element",
+            "namespace": "http://example.org/prod",
+            "min_occurs": 1,
+        }
     )
 
 
@@ -27,11 +27,11 @@ class OrderType:
     """
     items: Optional[ItemsType] = field(
         default=None,
-        metadata=dict(
-            type="Element",
-            namespace="",
-            required=True,
-        )
+        metadata={
+            "type": "Element",
+            "namespace": "",
+            "required": True,
+        }
     )
 
 

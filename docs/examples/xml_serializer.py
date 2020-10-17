@@ -90,5 +90,5 @@ assert xml == """
 
 serializer.write(sys.stdout, books, ns_map={None: "urn:books"})
 
-with open(tempfile.mktemp()) as fb:
-    serializer.write(fb, books)
+with tempfile.TemporaryFile() as fp:
+    serializer.write(fp, books)

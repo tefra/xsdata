@@ -9,9 +9,9 @@ class ColorType:
     """
     value: Optional[str] = field(
         default=None,
-        metadata=dict(
-            type="Attribute",
-        )
+        metadata={
+            "type": "Attribute",
+        }
     )
 
 
@@ -22,11 +22,11 @@ class DescriptionType:
     """
     w3_org_1999_xhtml_element: List[object] = field(
         default_factory=list,
-        metadata=dict(
-            type="Wildcard",
-            namespace="http://www.w3.org/1999/xhtml",
-            mixed=True,
-        )
+        metadata={
+            "type": "Wildcard",
+            "namespace": "http://www.w3.org/1999/xhtml",
+            "mixed": True,
+        }
     )
 
 
@@ -41,9 +41,9 @@ class SizeType:
     )
     system: Optional[str] = field(
         default=None,
-        metadata=dict(
-            type="Attribute",
-        )
+        metadata={
+            "type": "Attribute",
+        }
     )
 
 
@@ -60,57 +60,57 @@ class ProductType:
     """
     number: Optional[int] = field(
         default=None,
-        metadata=dict(
-            type="Element",
-            namespace="",
-            required=True,
-        )
+        metadata={
+            "type": "Element",
+            "namespace": "",
+            "required": True,
+        }
     )
     name: Optional[str] = field(
         default=None,
-        metadata=dict(
-            type="Element",
-            namespace="",
-            required=True,
-        )
+        metadata={
+            "type": "Element",
+            "namespace": "",
+            "required": True,
+        }
     )
     size: List[SizeType] = field(
         default_factory=list,
-        metadata=dict(
-            type="Element",
-            namespace="",
-            sequential=True,
-        )
+        metadata={
+            "type": "Element",
+            "namespace": "",
+            "sequential": True,
+        }
     )
     color: List[ColorType] = field(
         default_factory=list,
-        metadata=dict(
-            type="Element",
-            namespace="",
-            sequential=True,
-        )
+        metadata={
+            "type": "Element",
+            "namespace": "",
+            "sequential": True,
+        }
     )
     description: List[DescriptionType] = field(
         default_factory=list,
-        metadata=dict(
-            type="Element",
-            namespace="",
-            sequential=True,
-        )
+        metadata={
+            "type": "Element",
+            "namespace": "",
+            "sequential": True,
+        }
     )
     eff_date: str = field(
         default="1900-01-01",
-        metadata=dict(
-            name="effDate",
-            type="Attribute",
-        )
+        metadata={
+            "name": "effDate",
+            "type": "Attribute",
+        }
     )
     other_attributes: Dict = field(
         default_factory=dict,
-        metadata=dict(
-            type="Attributes",
-            namespace="##other",
-        )
+        metadata={
+            "type": "Attributes",
+            "namespace": "##other",
+        }
     )
 
 
@@ -123,24 +123,24 @@ class ItemsType:
     """
     shirt: List[ProductType] = field(
         default_factory=list,
-        metadata=dict(
-            type="Element",
-            namespace="",
-        )
+        metadata={
+            "type": "Element",
+            "namespace": "",
+        }
     )
     hat: List[ProductType] = field(
         default_factory=list,
-        metadata=dict(
-            type="Element",
-            namespace="",
-        )
+        metadata={
+            "type": "Element",
+            "namespace": "",
+        }
     )
     umbrella: List[ProductType] = field(
         default_factory=list,
-        metadata=dict(
-            type="Element",
-            namespace="",
-        )
+        metadata={
+            "type": "Element",
+            "namespace": "",
+        }
     )
 
 

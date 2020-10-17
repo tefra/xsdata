@@ -14,10 +14,10 @@ class HelloByeError:
 
     message: Optional[str] = field(
         default=None,
-        metadata=dict(
-            type="Element",
-            namespace="",
-        )
+        metadata={
+            "type": "Element",
+            "namespace": "",
+        }
     )
 
 
@@ -31,10 +31,10 @@ class HelloError:
 
     message: Optional[str] = field(
         default=None,
-        metadata=dict(
-            type="Element",
-            namespace="",
-        )
+        metadata={
+            "type": "Element",
+            "namespace": "",
+        }
     )
 
 
@@ -48,10 +48,10 @@ class GetHelloAsString:
 
     arg0: Optional[str] = field(
         default=None,
-        metadata=dict(
-            type="Element",
-            namespace="",
-        )
+        metadata={
+            "type": "Element",
+            "namespace": "",
+        }
     )
 
 
@@ -65,11 +65,11 @@ class GetHelloAsStringResponse:
 
     return_value: Optional[str] = field(
         default=None,
-        metadata=dict(
-            name="return",
-            type="Element",
-            namespace="",
-        )
+        metadata={
+            "name": "return",
+            "type": "Element",
+            "namespace": "",
+        }
     )
 
 
@@ -84,10 +84,10 @@ class HelloGetHelloAsStringInput:
 
     body: Optional["HelloGetHelloAsStringInput.Body"] = field(
         default=None,
-        metadata=dict(
-            name="Body",
-            type="Element",
-        )
+        metadata={
+            "name": "Body",
+            "type": "Element",
+        }
     )
 
     @dataclass
@@ -97,11 +97,11 @@ class HelloGetHelloAsStringInput:
         """
         get_hello_as_string: Optional[GetHelloAsString] = field(
             default=None,
-            metadata=dict(
-                name="getHelloAsString",
-                type="Element",
-                namespace="http://hello/",
-            )
+            metadata={
+                "name": "getHelloAsString",
+                "type": "Element",
+                "namespace": "http://hello/",
+            }
         )
 
 
@@ -116,10 +116,10 @@ class HelloGetHelloAsStringOutput:
 
     body: Optional["HelloGetHelloAsStringOutput.Body"] = field(
         default=None,
-        metadata=dict(
-            name="Body",
-            type="Element",
-        )
+        metadata={
+            "name": "Body",
+            "type": "Element",
+        }
     )
 
     @dataclass
@@ -130,18 +130,18 @@ class HelloGetHelloAsStringOutput:
         """
         get_hello_as_string_response: Optional[GetHelloAsStringResponse] = field(
             default=None,
-            metadata=dict(
-                name="getHelloAsStringResponse",
-                type="Element",
-                namespace="http://hello/",
-            )
+            metadata={
+                "name": "getHelloAsStringResponse",
+                "type": "Element",
+                "namespace": "http://hello/",
+            }
         )
         fault: Optional["HelloGetHelloAsStringOutput.Body.Fault"] = field(
             default=None,
-            metadata=dict(
-                name="Fault",
-                type="Element",
-            )
+            metadata={
+                "name": "Fault",
+                "type": "Element",
+            }
         )
 
         @dataclass
@@ -154,31 +154,31 @@ class HelloGetHelloAsStringOutput:
             """
             faultcode: Optional[str] = field(
                 default=None,
-                metadata=dict(
-                    type="Element",
-                    namespace="",
-                )
+                metadata={
+                    "type": "Element",
+                    "namespace": "",
+                }
             )
             faultstring: Optional[str] = field(
                 default=None,
-                metadata=dict(
-                    type="Element",
-                    namespace="",
-                )
+                metadata={
+                    "type": "Element",
+                    "namespace": "",
+                }
             )
             faultactor: Optional[str] = field(
                 default=None,
-                metadata=dict(
-                    type="Element",
-                    namespace="",
-                )
+                metadata={
+                    "type": "Element",
+                    "namespace": "",
+                }
             )
             detail: Optional["HelloGetHelloAsStringOutput.Body.Fault.Detail"] = field(
                 default=None,
-                metadata=dict(
-                    type="Element",
-                    namespace="",
-                )
+                metadata={
+                    "type": "Element",
+                    "namespace": "",
+                }
             )
 
             @dataclass
@@ -189,19 +189,19 @@ class HelloGetHelloAsStringOutput:
                 """
                 hello_error: Optional[HelloError] = field(
                     default=None,
-                    metadata=dict(
-                        name="HelloError",
-                        type="Element",
-                        namespace="http://hello/",
-                    )
+                    metadata={
+                        "name": "HelloError",
+                        "type": "Element",
+                        "namespace": "http://hello/",
+                    }
                 )
                 hello_bye_error: Optional[HelloByeError] = field(
                     default=None,
-                    metadata=dict(
-                        name="HelloByeError",
-                        type="Element",
-                        namespace="http://hello/",
-                    )
+                    metadata={
+                        "name": "HelloByeError",
+                        "type": "Element",
+                        "namespace": "http://hello/",
+                    }
                 )
 
 

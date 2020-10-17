@@ -36,49 +36,49 @@ class SizesType:
     """
     size: List[Union[int, "SizesType.Value"]] = field(
         default_factory=list,
-        metadata=dict(
-            type="Element",
-            namespace="",
-            min_inclusive=2,
-            max_inclusive=18,
-        )
+        metadata={
+            "type": "Element",
+            "namespace": "",
+            "min_inclusive": 2,
+            "max_inclusive": 18,
+        }
     )
     small_size: List[SmallSizeType] = field(
         default_factory=list,
-        metadata=dict(
-            name="smallSize",
-            type="Element",
-            namespace="",
-        )
+        metadata={
+            "name": "smallSize",
+            "type": "Element",
+            "namespace": "",
+        }
     )
     international_size: List[Union[int, "SizesType.Value"]] = field(
         default_factory=list,
-        metadata=dict(
-            name="internationalSize",
-            type="Element",
-            namespace="",
-            min_inclusive=24,
-            max_inclusive=54,
-        )
+        metadata={
+            "name": "internationalSize",
+            "type": "Element",
+            "namespace": "",
+            "min_inclusive": 24,
+            "max_inclusive": 54,
+        }
     )
     available_sizes: List[List[Union[int, "SizesType.Value"]]] = field(
         default_factory=list,
-        metadata=dict(
-            name="availableSizes",
-            type="Element",
-            namespace="",
-            min_inclusive=2,
-            max_inclusive=18,
-            tokens=True,
-        )
+        metadata={
+            "name": "availableSizes",
+            "type": "Element",
+            "namespace": "",
+            "min_inclusive": 2,
+            "max_inclusive": 18,
+            "tokens": True,
+        }
     )
     applicable_sizes: List[ApplicableSizesType] = field(
         default_factory=list,
-        metadata=dict(
-            name="applicableSizes",
-            type="Element",
-            namespace="",
-        )
+        metadata={
+            "name": "applicableSizes",
+            "type": "Element",
+            "namespace": "",
+        }
     )
 
     class Value(Enum):

@@ -11,9 +11,9 @@ class ColorType:
     """
     value: Optional[str] = field(
         default=None,
-        metadata=dict(
-            type="Attribute",
-        )
+        metadata={
+            "type": "Attribute",
+        }
     )
 
 
@@ -28,9 +28,9 @@ class SizeType:
     )
     system: Optional[str] = field(
         default=None,
-        metadata=dict(
-            type="Attribute",
-        )
+        metadata={
+            "type": "Attribute",
+        }
     )
 
 
@@ -44,35 +44,35 @@ class ProductType:
     """
     number: Optional[int] = field(
         default=None,
-        metadata=dict(
-            type="Element",
-            namespace="",
-            required=True,
-        )
+        metadata={
+            "type": "Element",
+            "namespace": "",
+            "required": True,
+        }
     )
     name: Optional[str] = field(
         default=None,
-        metadata=dict(
-            type="Element",
-            namespace="",
-            required=True,
-        )
+        metadata={
+            "type": "Element",
+            "namespace": "",
+            "required": True,
+        }
     )
     size: Optional[SizeType] = field(
         default=None,
-        metadata=dict(
-            type="Element",
-            namespace="",
-            required=True,
-        )
+        metadata={
+            "type": "Element",
+            "namespace": "",
+            "required": True,
+        }
     )
     color: Optional[ColorType] = field(
         default=None,
-        metadata=dict(
-            type="Element",
-            namespace="",
-            required=True,
-        )
+        metadata={
+            "type": "Element",
+            "namespace": "",
+            "required": True,
+        }
     )
 
 
@@ -83,9 +83,9 @@ class ItemsType:
     """
     product: Optional[ProductType] = field(
         default=None,
-        metadata=dict(
-            type="Element",
-            namespace="",
-            required=True,
-        )
+        metadata={
+            "type": "Element",
+            "namespace": "",
+            "required": True,
+        }
     )

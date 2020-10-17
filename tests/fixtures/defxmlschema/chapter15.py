@@ -14,9 +14,9 @@ class SizeType:
     )
     system: Optional[str] = field(
         default=None,
-        metadata=dict(
-            type="Attribute",
-        )
+        metadata={
+            "type": "Attribute",
+        }
     )
 
 
@@ -34,59 +34,59 @@ class ShirtType:
     """
     description: Optional[str] = field(
         default=None,
-        metadata=dict(
-            type="Element",
-            namespace="",
-        )
+        metadata={
+            "type": "Element",
+            "namespace": "",
+        }
     )
     comment: Optional[str] = field(
         default=None,
-        metadata=dict(
-            type="Element",
-            namespace="",
-        )
+        metadata={
+            "type": "Element",
+            "namespace": "",
+        }
     )
     number: Optional[int] = field(
         default=None,
-        metadata=dict(
-            type="Element",
-            namespace="",
-        )
+        metadata={
+            "type": "Element",
+            "namespace": "",
+        }
     )
     name: Optional[str] = field(
         default=None,
-        metadata=dict(
-            type="Element",
-            namespace="",
-        )
+        metadata={
+            "type": "Element",
+            "namespace": "",
+        }
     )
     size: Optional[SizeType] = field(
         default=None,
-        metadata=dict(
-            type="Element",
-            namespace="",
-            required=True,
-        )
+        metadata={
+            "type": "Element",
+            "namespace": "",
+            "required": True,
+        }
     )
     id: Optional[str] = field(
         default=None,
-        metadata=dict(
-            type="Attribute",
-            required=True,
-        )
+        metadata={
+            "type": "Attribute",
+            "required": True,
+        }
     )
     version: Optional[Decimal] = field(
         default=None,
-        metadata=dict(
-            type="Attribute",
-        )
+        metadata={
+            "type": "Attribute",
+        }
     )
     eff_date: Optional[str] = field(
         default=None,
-        metadata=dict(
-            name="effDate",
-            type="Attribute",
-        )
+        metadata={
+            "name": "effDate",
+            "type": "Attribute",
+        }
     )
 
 

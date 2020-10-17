@@ -9,9 +9,9 @@ class ColorType:
     """
     value: Optional[str] = field(
         default=None,
-        metadata=dict(
-            type="Attribute",
-        )
+        metadata={
+            "type": "Attribute",
+        }
     )
 
 
@@ -22,10 +22,10 @@ class ItemType:
     """
     routing_num: Optional[int] = field(
         default=None,
-        metadata=dict(
-            name="routingNum",
-            type="Attribute",
-        )
+        metadata={
+            "name": "routingNum",
+            "type": "Attribute",
+        }
     )
 
 
@@ -41,47 +41,47 @@ class RestrictedProductType:
     """
     number: Optional[int] = field(
         default=None,
-        metadata=dict(
-            type="Element",
-            namespace="",
-            required=True,
-        )
+        metadata={
+            "type": "Element",
+            "namespace": "",
+            "required": True,
+        }
     )
     name: Optional[str] = field(
         default=None,
-        metadata=dict(
-            type="Element",
-            namespace="",
-            required=True,
-        )
+        metadata={
+            "type": "Element",
+            "namespace": "",
+            "required": True,
+        }
     )
     description: Optional[str] = field(
         default=None,
-        metadata=dict(
-            type="Element",
-            namespace="",
-        )
+        metadata={
+            "type": "Element",
+            "namespace": "",
+        }
     )
     routing_num: Optional[int] = field(
         default=None,
-        metadata=dict(
-            name="routingNum",
-            type="Attribute",
-            required=True,
-        )
+        metadata={
+            "name": "routingNum",
+            "type": "Attribute",
+            "required": True,
+        }
     )
     lang: Optional[str] = field(
         default=None,
-        metadata=dict(
-            type="Attribute",
-        )
+        metadata={
+            "type": "Attribute",
+        }
     )
     eff_date: str = field(
         default="1900-01-01",
-        metadata=dict(
-            name="effDate",
-            type="Attribute",
-        )
+        metadata={
+            "name": "effDate",
+            "type": "Attribute",
+        }
     )
 
 
@@ -96,9 +96,9 @@ class SizeType:
     )
     system: Optional[str] = field(
         default=None,
-        metadata=dict(
-            type="Attribute",
-        )
+        metadata={
+            "type": "Attribute",
+        }
     )
 
 
@@ -110,17 +110,17 @@ class SmallSizeType:
     """
     value: Optional[int] = field(
         default=None,
-        metadata=dict(
-            min_inclusive=2,
-            max_inclusive=6,
-        )
+        metadata={
+            "min_inclusive": 2,
+            "max_inclusive": 6,
+        }
     )
     system: Optional[str] = field(
         default=None,
-        metadata=dict(
-            type="Attribute",
-            required=True,
-        )
+        metadata={
+            "type": "Attribute",
+            "required": True,
+        }
     )
 
 
@@ -135,39 +135,39 @@ class ProductType(ItemType):
     """
     number: Optional[int] = field(
         default=None,
-        metadata=dict(
-            type="Element",
-            namespace="",
-            required=True,
-        )
+        metadata={
+            "type": "Element",
+            "namespace": "",
+            "required": True,
+        }
     )
     name: Optional[str] = field(
         default=None,
-        metadata=dict(
-            type="Element",
-            namespace="",
-            required=True,
-        )
+        metadata={
+            "type": "Element",
+            "namespace": "",
+            "required": True,
+        }
     )
     description: Optional[str] = field(
         default=None,
-        metadata=dict(
-            type="Element",
-            namespace="",
-        )
+        metadata={
+            "type": "Element",
+            "namespace": "",
+        }
     )
     eff_date: Optional[str] = field(
         default=None,
-        metadata=dict(
-            name="effDate",
-            type="Attribute",
-        )
+        metadata={
+            "name": "effDate",
+            "type": "Attribute",
+        }
     )
     lang: Optional[str] = field(
         default=None,
-        metadata=dict(
-            type="Attribute",
-        )
+        metadata={
+            "type": "Attribute",
+        }
     )
 
 
@@ -180,23 +180,23 @@ class ShirtType(RestrictedProductType):
     """
     size: List[SmallSizeType] = field(
         default_factory=list,
-        metadata=dict(
-            type="Element",
-            namespace="",
-        )
+        metadata={
+            "type": "Element",
+            "namespace": "",
+        }
     )
     color: List[ColorType] = field(
         default_factory=list,
-        metadata=dict(
-            type="Element",
-            namespace="",
-        )
+        metadata={
+            "type": "Element",
+            "namespace": "",
+        }
     )
     sleeve: Optional[int] = field(
         default=None,
-        metadata=dict(
-            type="Attribute",
-        )
+        metadata={
+            "type": "Attribute",
+        }
     )
 
 
@@ -209,24 +209,24 @@ class ItemsType:
     """
     hat: List[ProductType] = field(
         default_factory=list,
-        metadata=dict(
-            type="Element",
-            namespace="",
-        )
+        metadata={
+            "type": "Element",
+            "namespace": "",
+        }
     )
     umbrella: List[RestrictedProductType] = field(
         default_factory=list,
-        metadata=dict(
-            type="Element",
-            namespace="",
-        )
+        metadata={
+            "type": "Element",
+            "namespace": "",
+        }
     )
     shirt: List[ShirtType] = field(
         default_factory=list,
-        metadata=dict(
-            type="Element",
-            namespace="",
-        )
+        metadata={
+            "type": "Element",
+            "namespace": "",
+        }
     )
 
 

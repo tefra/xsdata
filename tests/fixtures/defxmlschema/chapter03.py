@@ -10,11 +10,11 @@ class EnvelopeType:
     """
     order: List[Order] = field(
         default_factory=list,
-        metadata=dict(
-            type="Element",
-            namespace="http://example.org/ord",
-            min_occurs=1,
-        )
+        metadata={
+            "type": "Element",
+            "namespace": "http://example.org/ord",
+            "min_occurs": 1,
+        }
     )
 
 

@@ -10,10 +10,10 @@ class Items:
     """
     item: List["Items.Item"] = field(
         default_factory=list,
-        metadata=dict(
-            type="Element",
-            namespace="",
-        )
+        metadata={
+            "type": "Element",
+            "namespace": "",
+        }
     )
 
     @dataclass
@@ -28,53 +28,53 @@ class Items:
         """
         product_name: Optional[str] = field(
             default=None,
-            metadata=dict(
-                name="productName",
-                type="Element",
-                namespace="",
-                required=True,
-            )
+            metadata={
+                "name": "productName",
+                "type": "Element",
+                "namespace": "",
+                "required": True,
+            }
         )
         quantity: Optional[int] = field(
             default=None,
-            metadata=dict(
-                type="Element",
-                namespace="",
-                required=True,
-                max_exclusive=100,
-            )
+            metadata={
+                "type": "Element",
+                "namespace": "",
+                "required": True,
+                "max_exclusive": 100,
+            }
         )
         usprice: Optional[Decimal] = field(
             default=None,
-            metadata=dict(
-                name="USPrice",
-                type="Element",
-                namespace="",
-                required=True,
-            )
+            metadata={
+                "name": "USPrice",
+                "type": "Element",
+                "namespace": "",
+                "required": True,
+            }
         )
         comment: Optional[str] = field(
             default=None,
-            metadata=dict(
-                type="Element",
-            )
+            metadata={
+                "type": "Element",
+            }
         )
         ship_date: Optional[str] = field(
             default=None,
-            metadata=dict(
-                name="shipDate",
-                type="Element",
-                namespace="",
-            )
+            metadata={
+                "name": "shipDate",
+                "type": "Element",
+                "namespace": "",
+            }
         )
         part_num: Optional[str] = field(
             default=None,
-            metadata=dict(
-                name="partNum",
-                type="Attribute",
-                required=True,
-                pattern=r"\d{3}-[A-Z]{2}",
-            )
+            metadata={
+                "name": "partNum",
+                "type": "Attribute",
+                "required": True,
+                "pattern": r"\d{3}-[A-Z]{2}",
+            }
         )
 
 
@@ -93,50 +93,50 @@ class Usaddress:
 
     name: Optional[str] = field(
         default=None,
-        metadata=dict(
-            type="Element",
-            namespace="",
-            required=True,
-        )
+        metadata={
+            "type": "Element",
+            "namespace": "",
+            "required": True,
+        }
     )
     street: Optional[str] = field(
         default=None,
-        metadata=dict(
-            type="Element",
-            namespace="",
-            required=True,
-        )
+        metadata={
+            "type": "Element",
+            "namespace": "",
+            "required": True,
+        }
     )
     city: Optional[str] = field(
         default=None,
-        metadata=dict(
-            type="Element",
-            namespace="",
-            required=True,
-        )
+        metadata={
+            "type": "Element",
+            "namespace": "",
+            "required": True,
+        }
     )
     state: Optional[str] = field(
         default=None,
-        metadata=dict(
-            type="Element",
-            namespace="",
-            required=True,
-        )
+        metadata={
+            "type": "Element",
+            "namespace": "",
+            "required": True,
+        }
     )
     zip: Optional[Decimal] = field(
         default=None,
-        metadata=dict(
-            type="Element",
-            namespace="",
-            required=True,
-        )
+        metadata={
+            "type": "Element",
+            "namespace": "",
+            "required": True,
+        }
     )
     country: str = field(
         init=False,
         default="US",
-        metadata=dict(
-            type="Attribute",
-        )
+        metadata={
+            "type": "Attribute",
+        }
     )
 
 
@@ -150,9 +150,9 @@ class Comment:
 
     value: Optional[str] = field(
         default=None,
-        metadata=dict(
-            required=True,
-        )
+        metadata={
+            "required": True,
+        }
     )
 
 
@@ -167,42 +167,42 @@ class PurchaseOrderType:
     """
     ship_to: Optional[Usaddress] = field(
         default=None,
-        metadata=dict(
-            name="shipTo",
-            type="Element",
-            namespace="",
-            required=True,
-        )
+        metadata={
+            "name": "shipTo",
+            "type": "Element",
+            "namespace": "",
+            "required": True,
+        }
     )
     bill_to: Optional[Usaddress] = field(
         default=None,
-        metadata=dict(
-            name="billTo",
-            type="Element",
-            namespace="",
-            required=True,
-        )
+        metadata={
+            "name": "billTo",
+            "type": "Element",
+            "namespace": "",
+            "required": True,
+        }
     )
     comment: Optional[str] = field(
         default=None,
-        metadata=dict(
-            type="Element",
-        )
+        metadata={
+            "type": "Element",
+        }
     )
     items: Optional[Items] = field(
         default=None,
-        metadata=dict(
-            type="Element",
-            namespace="",
-            required=True,
-        )
+        metadata={
+            "type": "Element",
+            "namespace": "",
+            "required": True,
+        }
     )
     order_date: Optional[str] = field(
         default=None,
-        metadata=dict(
-            name="orderDate",
-            type="Attribute",
-        )
+        metadata={
+            "name": "orderDate",
+            "type": "Attribute",
+        }
     )
 
 

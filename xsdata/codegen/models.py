@@ -141,18 +141,26 @@ class Restrictions:
         """
         Return the initialized only properties as a dictionary.
 
-        Optionally convert min/max inclusive/exclusive values by
-        providing the parent attribute types.
+        Skip None or implied values, and optionally use the
+        parent attribute types to convert relevant options.
         """
 
+        result = {}
         sorted_types = converter.sort_types(types) if types else []
 
-        def clean(key: str, value: Any) -> Any:
-            if types and key.endswith("clusive"):
-                return converter.from_string(value, sorted_types)
-            return value
+        for key, value in asdict(self).items():
+            if value is None:
+                continue
+            elif key == "max_occurs" and value >= sys.maxsize:
+                continue
+            elif key == "min_occurs" and value == 0:
+                continue
+            elif key.endswith("clusive") and types:
+                value = converter.from_string(value, sorted_types)
 
-        return {k: clean(k, v) for k, v in asdict(self).items() if v is not None}
+            result[key] = value
+
+        return result
 
     def clone(self) -> "Restrictions":
         """Return a deep cloned instance."""

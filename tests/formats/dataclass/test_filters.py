@@ -1,5 +1,3 @@
-import sys
-
 from tests.factories import AttrFactory
 from tests.factories import AttrTypeFactory
 from tests.factories import ClassFactory
@@ -235,10 +233,6 @@ class FiltersTests(FactoryTestCase):
 
         expected = {"min_occurs": 1, "max_occurs": 2, "max_inclusive": 2}
         self.assertEqual(expected, self.filters.field_metadata(attr, None))
-
-        attr.restrictions.min_occurs = 0
-        attr.restrictions.max_occurs = sys.maxsize
-        self.assertEqual({"max_inclusive": 2}, self.filters.field_metadata(attr, None))
 
     def test_field_metadata_mixed(self):
         attr = AttrFactory.element(mixed=True)

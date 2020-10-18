@@ -1,3 +1,4 @@
+import sys
 from unittest import TestCase
 
 from xsdata.codegen.models import Restrictions
@@ -116,6 +117,16 @@ class RestrictionsTests(TestCase):
             "white_space": "collapse",
         }
         self.assertEqual(expected, restrictions.asdict(types=[float]))
+
+    def test_asdict_with_implied_types(self):
+        restrictions = Restrictions(min_occurs=1, max_occurs=4)
+        self.assertEqual({"max_occurs": 4, "min_occurs": 1}, restrictions.asdict())
+
+        restrictions.min_occurs = 0
+        self.assertEqual({"max_occurs": 4}, restrictions.asdict())
+
+        restrictions.max_occurs = sys.maxsize
+        self.assertEqual({}, restrictions.asdict())
 
     def test_clone(self):
         restrictions = Restrictions(max_occurs=2)

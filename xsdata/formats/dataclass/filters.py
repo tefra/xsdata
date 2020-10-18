@@ -149,12 +149,6 @@ class Filters:
         types = list({x.native_type for x in attr.types if x.native})
         restrictions = attr.restrictions.asdict(types)
 
-        if "max_occurs" in restrictions and restrictions["max_occurs"] >= sys.maxsize:
-            del restrictions["max_occurs"]
-
-        if "min_occurs" in restrictions and restrictions["min_occurs"] == 0:
-            del restrictions["min_occurs"]
-
         metadata = dict(
             name=name,
             type=attr.xml_type,

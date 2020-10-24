@@ -1,6 +1,7 @@
 from decimal import Decimal
 from enum import Enum
 from pathlib import Path
+from typing import Iterator
 from typing import Optional
 from xml.etree.ElementTree import QName
 
@@ -211,6 +212,13 @@ class Tag:
     PATTERN = "Pattern"
     TOTAL_DIGITS = "TotalDigits"
     WHITE_SPACE = "WhiteSpace"
+
+    @classmethod
+    def names(cls) -> Iterator[str]:
+        """Return as an iterator all the possible tag names."""
+        for key, value in cls.__dict__.items():
+            if key[0].isupper():
+                yield value
 
 
 class UseType(Enum):

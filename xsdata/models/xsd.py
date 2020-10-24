@@ -496,6 +496,7 @@ class Choice(AnnotationBase):
         max_occurs = sys.maxsize if self.max_occurs == "unbounded" else self.max_occurs
 
         return {
+            "choice": str(id(self)),
             "min_occurs": min_occurs,
             "max_occurs": max_occurs,
         }

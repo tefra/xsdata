@@ -244,7 +244,7 @@ class ClassSanitizerTest(FactoryTestCase):
             {},
             {},
             {"required": True},
-            {"max_occurs": 2, "min_occurs": 0},
+            {"max_occurs": 2},
             {"max_occurs": 2, "min_occurs": 2},
         ]
 

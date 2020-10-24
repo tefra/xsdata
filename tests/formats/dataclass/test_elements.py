@@ -8,6 +8,7 @@ from xsdata.formats.dataclass.models.elements import FindMode
 from xsdata.formats.dataclass.models.elements import XmlAttribute
 from xsdata.formats.dataclass.models.elements import XmlAttributes
 from xsdata.formats.dataclass.models.elements import XmlElement
+from xsdata.formats.dataclass.models.elements import XmlElements
 from xsdata.formats.dataclass.models.elements import XmlMeta
 from xsdata.formats.dataclass.models.elements import XmlText
 from xsdata.formats.dataclass.models.elements import XmlVar
@@ -49,6 +50,7 @@ class XmlValTests(TestCase):
         self.assertFalse(var.is_attributes)
         self.assertFalse(var.is_wildcard)
         self.assertFalse(var.is_element)
+        self.assertFalse(var.is_elements)
         self.assertFalse(var.is_text)
         self.assertFalse(var.is_mixed_content)
 
@@ -57,6 +59,10 @@ class XmlValTests(TestCase):
         self.assertTrue(var.matches("*"))
         self.assertTrue(var.matches(var.qname))
         self.assertFalse(var.matches("bar"))
+
+    def test_find_choice(self):
+        var = XmlVar(name="foo", qname="foo")
+        self.assertIsNone(var.find_choice("foo"))
 
 
 class XmlElementTests(TestCase):
@@ -75,6 +81,26 @@ class XmlElementTests(TestCase):
 
         var = XmlElement(name="foo", qname="foo", types=[object])
         self.assertTrue(var.is_any_type)
+
+
+class XmlElementsTests(TestCase):
+    def test_property_is_elements(self):
+        var = XmlElements(name="foo", qname="foo")
+
+        self.assertTrue(var.is_elements)
+
+    def test_find_choice(self):
+        choices = [XmlElement(name="a", qname="{a}a"), XmlElement(name="b", qname="b")]
+        var = XmlElements(name="foo", qname="foo", choices=choices)
+
+        self.assertFalse(var.matches("a"))
+        self.assertIsNone(var.find_choice("a"))
+
+        self.assertEqual(choices[0], var.find_choice("{a}a"))
+        self.assertTrue(var.matches("{a}a"))
+
+        self.assertEqual(choices[1], var.find_choice("b"))
+        self.assertTrue(var.matches("b"))
 
 
 class XmlWildcardTests(TestCase):

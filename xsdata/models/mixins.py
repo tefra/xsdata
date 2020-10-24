@@ -17,7 +17,7 @@ from xsdata.models.enums import Namespace
 from xsdata.models.enums import NamespaceType
 from xsdata.utils import collections
 from xsdata.utils import text
-from xsdata.utils.globals import return_true
+from xsdata.utils.constants import return_true
 
 
 @dataclass

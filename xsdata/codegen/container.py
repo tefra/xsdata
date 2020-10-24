@@ -20,7 +20,7 @@ from xsdata.codegen.models import Class
 from xsdata.codegen.models import Status
 from xsdata.utils import collections
 from xsdata.utils.collections import group_by
-from xsdata.utils.globals import return_true
+from xsdata.utils.constants import return_true
 
 methodcaller("source_qname")
 

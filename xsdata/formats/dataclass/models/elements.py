@@ -22,6 +22,7 @@ class XmlVar:
     :param init:  Field is present in the constructor parameters.
     :param mixed:  Field supports mixed content.
     :param tokens: Use a list to map simple values.
+    :param derived: Use derived elements to bind data.
     :param nillable: Allow empty content elements rendering.
     :param dataclass: Specify whether the field type is a dataclass.
     :param sequential: Switch to sequential rendering with other sequential siblings
@@ -37,6 +38,7 @@ class XmlVar:
     init: bool = True
     mixed: bool = False
     tokens: bool = False
+    derived: bool = False
     nillable: bool = False
     dataclass: bool = False
     sequential: bool = False

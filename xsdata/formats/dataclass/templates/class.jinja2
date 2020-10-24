@@ -24,7 +24,7 @@ class {{ class_name }}{{"({})".format(obj.extensions|map(attribute='type')|map('
     pass
 {%- endif -%}
 {%- for attr in obj.attrs %}
-    {%- set metadata = attr|field_metadata(parent_namespace) %}
+    {%- set metadata = attr|field_metadata(parent_namespace, parents) %}
     {{ attr.name|field_name }}: {{ attr|field_type(parents) }} = field(
         {% if attr.fixed -%}
         init=False,

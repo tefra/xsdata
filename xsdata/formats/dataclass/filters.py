@@ -1,5 +1,4 @@
 import math
-import sys
 from collections import defaultdict
 from dataclasses import dataclass
 from dataclasses import field
@@ -17,6 +16,7 @@ from docformatter import format_code
 from jinja2 import Environment
 
 from xsdata.codegen.models import Attr
+from xsdata.codegen.models import AttrChoice
 from xsdata.codegen.models import AttrType
 from xsdata.codegen.models import Class
 from xsdata.formats.converter import converter
@@ -135,7 +135,9 @@ class Filters:
         """Return native python type name or apply class name conventions."""
         return attr_type.native_name or self.class_name(attr_type.name)
 
-    def field_metadata(self, attr: Attr, parent_namespace: Optional[str]) -> Dict:
+    def field_metadata(
+        self, attr: Attr, parent_namespace: Optional[str], parents: List[str]
+    ) -> Dict:
         """Return a metadata dictionary for the given attribute."""
 
         name = namespace = None
@@ -149,17 +151,54 @@ class Filters:
         types = list({x.native_type for x in attr.types if x.native})
         restrictions = attr.restrictions.asdict(types)
 
-        metadata = dict(
-            name=name,
-            type=attr.xml_type,
-            namespace=namespace,
-            mixed=attr.mixed,
-            **restrictions,
+        return self.filter_metadata(
+            {
+                "name": name,
+                "type": attr.xml_type,
+                "namespace": namespace,
+                "mixed": attr.mixed,
+                "choices": self.field_choices(attr, parent_namespace, parents),
+                **restrictions,
+            }
         )
 
+    def field_choices(
+        self, attr: Attr, parent_namespace: Optional[str], parents: List[str]
+    ) -> Optional[List]:
+        """
+        Return a list of metadata dictionaries for the choices of the given
+        attribute.
+
+        Return None if attribute has no choices.
+        """
+
+        if not attr.choices:
+            return None
+
+        def build(choice: AttrChoice) -> Dict:
+            types = list({x.native_type for x in choice.types if x.native})
+            restrictions = choice.restrictions.asdict(types)
+            namespace = (
+                choice.namespace if parent_namespace != choice.namespace else None
+            )
+
+            return self.filter_metadata(
+                {
+                    "name": choice.name,
+                    "tag": choice.xml_type,
+                    "type": self.choice_type(choice, parents),
+                    "namespace": namespace,
+                    **restrictions,
+                }
+            )
+
+        return list(map(build, attr.choices))
+
+    @classmethod
+    def filter_metadata(cls, data: Dict) -> Dict:
         return {
             key: value
-            for key, value in metadata.items()
+            for key, value in data.items()
             if value is not None and value is not False
         }
 
@@ -175,13 +214,26 @@ class Filters:
                 res.append("    " * lvl + '"' + key + '"' + ": " + fmt_value + ",")
             res.append("    " * level + "}")
             return "\n".join(res)
-        elif isinstance(data, str):
+
+        if isinstance(data, (list, tuple)):
+            res = ["("]
+            lvl = level + 1
+            for value in data:
+                fmt_value = cls.format_metadata(value, lvl, pattern=False)
+                res.append("    " * lvl + fmt_value + ",")
+            res.append("    " * level + ")")
+            return "\n".join(res)
+
+        if isinstance(data, str):
+            if data.startswith("Type[") and data.endswith("]"):
+                return data if data[5] == '"' else data[5:-1]
+
             data = f'''"{data.replace('"', "'")}"'''
             if pattern:
                 data = f"r{data}"
             return data
-        else:
-            return str(data)
+
+        return str(data)
 
     def class_docstring(self, obj: Class, enum: bool = False) -> str:
         """Generate docstring for the given class and the constructor
@@ -259,6 +311,30 @@ class Filters:
             result = f"Optional[{result}]"
 
         return result
+
+    def choice_type(self, choice: AttrChoice, parents: List[str]) -> str:
+        """
+        Generate type hints for the given choice.
+
+        Choices support a subset of features from normal attributes.
+        First of all we don't have a proper type hint but a type
+        metadata key. That's why we always need to wrap as Type[xxx].
+        The second big difference is that our choice belongs to a
+        compound field that might be a list, that's why list restriction
+        is also ignored.
+        """
+        type_names = unique_sequence(
+            self.field_type_name(x, parents) for x in choice.types
+        )
+
+        result = ", ".join(type_names)
+        if len(type_names) > 1:
+            result = f"Union[{result}]"
+
+        if choice.is_tokens:
+            result = f"List[{result}]"
+
+        return f"Type[{result}]"
 
     def field_type_name(self, attr_type: AttrType, parents: List[str]) -> str:
         name = (
@@ -338,6 +414,7 @@ class Filters:
             "Dict": [": Dict"],
             "List": [": List["],
             "Optional": ["Optional["],
+            "Type": ["Type["],
             "Union": ["Union["],
         }
 

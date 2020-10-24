@@ -1,3 +1,4 @@
+from tests.factories import AttrChoiceFactory
 from tests.factories import AttrFactory
 from tests.factories import AttrTypeFactory
 from tests.factories import ClassFactory
@@ -197,31 +198,31 @@ class FiltersTests(FactoryTestCase):
     def test_field_metadata(self):
         attr = AttrFactory.element()
         expected = {"name": "attr_B", "type": "Element"}
-        self.assertEqual(expected, self.filters.field_metadata(attr, None))
-        self.assertEqual(expected, self.filters.field_metadata(attr, "foo"))
+        self.assertEqual(expected, self.filters.field_metadata(attr, None, []))
+        self.assertEqual(expected, self.filters.field_metadata(attr, "foo", []))
 
     def test_field_metadata_namespace(self):
         attr = AttrFactory.element(namespace="foo")
         expected = {"name": "attr_B", "namespace": "foo", "type": "Element"}
 
-        self.assertEqual(expected, self.filters.field_metadata(attr, None))
-        self.assertNotIn("namespace", self.filters.field_metadata(attr, "foo"))
+        self.assertEqual(expected, self.filters.field_metadata(attr, None, []))
+        self.assertNotIn("namespace", self.filters.field_metadata(attr, "foo", []))
 
         attr = AttrFactory.attribute(namespace="foo")
         expected = {"name": "attr_C", "namespace": "foo", "type": "Attribute"}
 
-        self.assertEqual(expected, self.filters.field_metadata(attr, None))
-        self.assertIn("namespace", self.filters.field_metadata(attr, "foo"))
+        self.assertEqual(expected, self.filters.field_metadata(attr, None, []))
+        self.assertIn("namespace", self.filters.field_metadata(attr, "foo", []))
 
     def test_field_metadata_name(self):
         attr = AttrFactory.element(local_name="foo", name="bar")
-        self.assertEqual("foo", self.filters.field_metadata(attr, None)["name"])
+        self.assertEqual("foo", self.filters.field_metadata(attr, None, [])["name"])
 
         attr = AttrFactory.element(local_name="foo", name="Foo")
-        self.assertNotIn("name", self.filters.field_metadata(attr, None))
+        self.assertNotIn("name", self.filters.field_metadata(attr, None, []))
 
         attr = AttrFactory.create(tag=Tag.ANY, local_name="foo", name="bar")
-        self.assertNotIn("name", self.filters.field_metadata(attr, None))
+        self.assertNotIn("name", self.filters.field_metadata(attr, None, []))
 
     def test_field_metadata_restrictions(self):
         attr = AttrFactory.create(tag=Tag.RESTRICTION)
@@ -232,12 +233,49 @@ class FiltersTests(FactoryTestCase):
         attr.restrictions.required = False
 
         expected = {"min_occurs": 1, "max_occurs": 2, "max_inclusive": 2}
-        self.assertEqual(expected, self.filters.field_metadata(attr, None))
+        self.assertEqual(expected, self.filters.field_metadata(attr, None, []))
 
     def test_field_metadata_mixed(self):
         attr = AttrFactory.element(mixed=True)
         expected = {"mixed": True, "name": "attr_B", "type": "Element"}
-        self.assertEqual(expected, self.filters.field_metadata(attr, "foo"))
+        self.assertEqual(expected, self.filters.field_metadata(attr, "foo", []))
+
+    def test_field_metadata_choices(self):
+        attr = AttrFactory.create(choices=AttrChoiceFactory.list(2, tag=Tag.ELEMENT))
+        actual = self.filters.field_metadata(attr, "foo", [])
+        expected = [
+            {"name": "choice_B", "type": "Type[str]"},
+            {"name": "choice_C", "type": "Type[str]"},
+        ]
+
+        self.assertEqual(expected, actual["choices"])
+
+    def test_field_choices(self):
+        attr = AttrFactory.create(
+            choices=[
+                AttrChoiceFactory.element(
+                    namespace="foo",
+                    types=[type_float],
+                    restrictions=Restrictions(max_exclusive="10"),
+                ),
+                AttrChoiceFactory.element(namespace="bar"),
+                AttrChoiceFactory.any(namespace="##other"),
+            ]
+        )
+
+        actual = self.filters.field_choices(attr, "foo", ["a", "b"])
+        expected = [
+            {"name": "choice_B", "type": "Type[float]", "max_exclusive": 10.0},
+            {"name": "choice_C", "namespace": "bar", "type": "Type[str]"},
+            {
+                "name": "choice_D",
+                "namespace": "##other",
+                "tag": "Wildcard",
+                "type": "Type[object]",
+            },
+        ]
+
+        self.assertEqual(expected, actual)
 
     def test_field_type_with_default_value(self):
         attr = AttrFactory.create(
@@ -251,7 +289,7 @@ class FiltersTests(FactoryTestCase):
 
         self.assertEqual("Optional[FooBar]", self.filters.field_type(attr, []))
 
-    def test_field_type_with_circularerence(self):
+    def test_field_type_with_circular_reference(self):
         attr = AttrFactory.create(
             types=AttrTypeFactory.list(1, qname="foo_bar", circular=True)
         )
@@ -336,6 +374,42 @@ class FiltersTests(FactoryTestCase):
         )
         self.assertEqual("Optional[int]", self.filters.field_type(attr, ["a", "b"]))
 
+    def test_choice_type(self):
+        choice = AttrChoiceFactory.create(types=[AttrTypeFactory.create("foobar")])
+        actual = self.filters.choice_type(choice, ["a", "b"])
+        self.assertEqual("Type[Foobar]", actual)
+
+    def test_choice_type_with_forward_reference(self):
+        choice = AttrChoiceFactory.create(
+            types=[AttrTypeFactory.create("foobar", forward=True)]
+        )
+        actual = self.filters.choice_type(choice, ["a", "b"])
+        self.assertEqual('Type["A.B.Foobar"]', actual)
+
+    def test_choice_type_with_circular_reference(self):
+        choice = AttrChoiceFactory.create(
+            types=[AttrTypeFactory.create("foobar", circular=True)]
+        )
+        actual = self.filters.choice_type(choice, ["a", "b"])
+        self.assertEqual('Type["Foobar"]', actual)
+
+    def test_choice_type_with_multiple_types(self):
+        choice = AttrChoiceFactory.create(types=[type_str, type_bool])
+        actual = self.filters.choice_type(choice, ["a", "b"])
+        self.assertEqual("Type[Union[str, bool]]", actual)
+
+    def test_choice_type_with_list_types_are_ignored(self):
+        choice = AttrChoiceFactory.create(types=[type_str, type_bool])
+        choice.restrictions.max_occurs = 200
+        actual = self.filters.choice_type(choice, ["a", "b"])
+        self.assertEqual("Type[Union[str, bool]]", actual)
+
+    def test_choice_type_with_restrictions_tokens_true(self):
+        choice = AttrChoiceFactory.create(types=[type_str, type_bool])
+        choice.restrictions.tokens = True
+        actual = self.filters.choice_type(choice, ["a", "b"])
+        self.assertEqual("Type[List[Union[str, bool]]]", actual)
+
     def test_default_imports_with_decimal(self):
         expected = "from decimal import Decimal"
 
@@ -391,6 +465,10 @@ class FiltersTests(FactoryTestCase):
         expected = "from typing import Union"
         self.assertIn(expected, self.filters.default_imports(output))
 
+        output = " Type["
+        expected = "from typing import Type"
+        self.assertIn(expected, self.filters.default_imports(output))
+
     def test_default_imports_combo(self):
         output = (
             "@dataclass\n"
@@ -411,6 +489,10 @@ class FiltersTests(FactoryTestCase):
             text_three='fo"o',
             pattern="foo",
             level_two=dict(a=1),
+            list=[
+                dict(type="Type[object]"),
+                dict(type="Type[object] mpla"),
+            ],
         )
 
         expected = (
@@ -423,6 +505,14 @@ class FiltersTests(FactoryTestCase):
             '    "level_two": {\n'
             '        "a": 1,\n'
             "    },\n"
+            '    "list": (\n'
+            "        {\n"
+            '            "type": object,\n'
+            "        },\n"
+            "        {\n"
+            '            "type": "Type[object] mpla",\n'
+            "        },\n"
+            "    ),\n"
             "}"
         )
         self.assertEqual(expected, self.filters.format_metadata(data))

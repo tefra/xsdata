@@ -3,9 +3,11 @@ from dataclasses import dataclass
 from dataclasses import field
 from dataclasses import make_dataclass
 from dataclasses import replace
+from typing import Generator
 from typing import get_type_hints
 from typing import Iterator
 from typing import List
+from typing import Type
 from typing import Union
 from unittest import mock
 from unittest import TestCase
@@ -21,6 +23,7 @@ from xsdata.formats.dataclass.context import XmlContext
 from xsdata.formats.dataclass.models.constants import XmlType
 from xsdata.formats.dataclass.models.elements import XmlAttribute
 from xsdata.formats.dataclass.models.elements import XmlElement
+from xsdata.formats.dataclass.models.elements import XmlElements
 from xsdata.formats.dataclass.models.elements import XmlMeta
 from xsdata.formats.dataclass.models.elements import XmlWildcard
 from xsdata.utils import text
@@ -287,6 +290,51 @@ class XmlContextTests(TestCase):
         ]
         self.assertEqual(expected, list(self.ctx.get_type_hints(Currencies, None)))
 
+    def test_get_type_hints_with_choices(self):
+        actual = self.ctx.get_type_hints(Node, "bar")
+        self.assertIsInstance(actual, Generator)
+        expected = XmlElements(
+            name="compound",
+            qname="compound",
+            list_element=True,
+            default=list,
+            choices=[
+                XmlElement(
+                    name="compound",
+                    qname="{foo}node",
+                    dataclass=True,
+                    types=[Node],
+                    namespaces=["foo"],
+                    derived=True,
+                ),
+                XmlElement(
+                    name="compound",
+                    qname="{bar}x",
+                    tokens=True,
+                    types=[str],
+                    namespaces=["bar"],
+                    derived=True,
+                ),
+                XmlElement(
+                    name="compound",
+                    qname="{bar}y",
+                    nillable=True,
+                    types=[int],
+                    namespaces=["bar"],
+                    derived=True,
+                ),
+                XmlWildcard(
+                    name="compound",
+                    qname="{http://www.w3.org/1999/xhtml}any",
+                    types=[object],
+                    namespaces=["http://www.w3.org/1999/xhtml"],
+                    derived=True,
+                ),
+            ],
+            types=[object],
+        )
+        self.assertEqual(expected, list(actual)[0])
+
     def test_get_type_hints_with_no_dataclass(self):
         with self.assertRaises(TypeError):
             list(self.ctx.get_type_hints(self.__class__, None))
@@ -411,3 +459,24 @@ class XmlContextTests(TestCase):
         self.assertEqual(
             "Dataclass `e` includes more than one text node!", str(cm.exception)
         )
+
+
+@dataclass
+class Node:
+
+    compound: List[object] = field(
+        default_factory=list,
+        metadata={
+            "type": "Elements",
+            "choices": (
+                {"name": "node", "type": Type["Node"], "namespace": "foo"},
+                {"name": "x", "type": List[str], "tokens": True},
+                {"name": "y", "type": List[int], "nillable": True},
+                {
+                    "tag": "Wildcard",
+                    "type": object,
+                    "namespace": "http://www.w3.org/1999/xhtml",
+                },
+            ),
+        },
+    )

@@ -5,7 +5,7 @@ from typing import List
 from typing import Optional
 
 from xsdata.codegen.models import Class
-from xsdata.utils.globals import return_true
+from xsdata.utils.constants import return_true
 
 
 class ContainerInterface(metaclass=abc.ABCMeta):

@@ -14,12 +14,12 @@ from xml.sax.handler import ContentHandler
 from xsdata.exceptions import XmlWriterError
 from xsdata.formats.converter import converter
 from xsdata.models.enums import Namespace
+from xsdata.utils.constants import EMPTY_MAP
 from xsdata.utils.namespaces import generate_prefix
 from xsdata.utils.namespaces import prefix_exists
 from xsdata.utils.namespaces import split_qname
 
 XSI_NIL = (Namespace.XSI.uri, "nil")
-EMPTY_MAP: Dict = {}
 
 
 class XmlWriterEvent(Enum):

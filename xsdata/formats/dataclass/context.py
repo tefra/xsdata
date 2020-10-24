@@ -6,6 +6,7 @@ from dataclasses import field
 from dataclasses import fields
 from dataclasses import is_dataclass
 from dataclasses import MISSING
+from typing import _eval_type  # type: ignore
 from typing import Any
 from typing import Callable
 from typing import Dict
@@ -22,6 +23,7 @@ from xsdata.formats.dataclass.models.elements import XmlMeta
 from xsdata.formats.dataclass.models.elements import XmlVar
 from xsdata.models.enums import NamespaceType
 from xsdata.utils.collections import first
+from xsdata.utils.constants import EMPTY_SEQUENCE
 from xsdata.utils.namespaces import build_qname
 
 
@@ -149,10 +151,20 @@ class XmlContext:
             namespace = var.metadata.get("namespace")
             namespaces = self.resolve_namespaces(xml_type, namespace, parent_ns)
             first_namespace = first(x for x in namespaces if x and x[0] != "#")
+            qname = build_qname(first_namespace, local_name)
+
+            choices = list(
+                self.build_choices(
+                    clazz,
+                    var.name,
+                    parent_ns,
+                    var.metadata.get("choices", EMPTY_SEQUENCE),
+                )
+            )
 
             yield xml_clazz(
                 name=var.name,
-                qname=build_qname(first_namespace, local_name),
+                qname=qname,
                 namespaces=namespaces,
                 init=var.init,
                 mixed=var.metadata.get("mixed", False),
@@ -163,6 +175,37 @@ class XmlContext:
                 list_element=is_element_list,
                 types=types,
                 default=self.default_value(var),
+                choices=choices,
+            )
+
+    def build_choices(
+        self,
+        clazz: Type,
+        parent_name: str,
+        parent_namespace: Optional[str],
+        choices: List[Dict],
+    ):
+        globalns = sys.modules[clazz.__module__].__dict__
+        for choice in choices:
+            xml_type = choice.get("tag", XmlType.ELEMENT)
+            namespace = choice.get("namespace")
+            namespaces = self.resolve_namespaces(xml_type, namespace, parent_namespace)
+            first_namespace = first(x for x in namespaces if x and x[0] != "#")
+
+            types = self.real_types(_eval_type(choice["type"], globalns, None))
+            is_class = any(is_dataclass(clazz) for clazz in types)
+            xml_clazz = XmlType.to_xml_class(xml_type)
+            qname = build_qname(first_namespace, choice.get("name", "any"))
+
+            yield xml_clazz(
+                name=parent_name,
+                qname=qname,
+                namespaces=namespaces,
+                nillable=choice.get("nillable", False),
+                dataclass=is_class,
+                tokens=choice.get("tokens", False),
+                derived=True,
+                types=types,
             )
 
     @classmethod

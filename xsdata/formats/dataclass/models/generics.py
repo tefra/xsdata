@@ -1,11 +1,14 @@
 from dataclasses import dataclass
 from dataclasses import field
-from typing import Any
 from typing import Dict
+from typing import Generic
 from typing import List
 from typing import Optional
+from typing import TypeVar
 
 from xsdata.formats.dataclass.models.constants import XmlType
+
+T = TypeVar("T")
 
 
 @dataclass
@@ -34,7 +37,7 @@ class AnyElement:
 
 
 @dataclass
-class DerivedElement:
+class DerivedElement(Generic[T]):
     """
     Derived element wrapper for base types, eg. <b xsi:type="a">...</b>
 
@@ -43,4 +46,4 @@ class DerivedElement:
     """
 
     qname: str
-    value: Any
+    value: T

@@ -27,6 +27,7 @@ class XmlVar:
     :param sequential: Switch to sequential rendering with other sequential siblings
     :param list_element: Specify whether the field represents a list of elements
     :param default: Field default value or factory
+    :param choices: Field compound element choices.
     :param types: Field simple types.
     :param namespaces: Field list of the all the possible namespaces.
     """
@@ -41,6 +42,7 @@ class XmlVar:
     sequential: bool = False
     list_element: bool = False
     default: Any = None
+    choices: List["XmlVar"] = field(default_factory=list)
     types: List[Type] = field(default_factory=list)
     namespaces: List[str] = field(default_factory=list)
 
@@ -67,6 +69,11 @@ class XmlVar:
     @property
     def is_element(self) -> bool:
         """Return whether the field is derived from xs:element."""
+        return False
+
+    @property
+    def is_elements(self) -> bool:
+        """Return whether the field is a compound of other elements."""
         return False
 
     @property
@@ -106,6 +113,10 @@ class XmlVar:
         """
         return qname in (self.qname, "*")
 
+    def find_choice(self, qname: str) -> Optional["XmlVar"]:
+        """Match and return a choice field by its qualified name."""
+        return None
+
 
 @dataclass(frozen=True)
 class XmlElement(XmlVar):
@@ -118,6 +129,28 @@ class XmlElement(XmlVar):
     @property
     def is_any_type(self) -> bool:
         return len(self.types) == 1 and self.types[0] is object
+
+
+@dataclass(frozen=True)
+class XmlElements(XmlVar):
+    """Dataclass field bind metadata for compound list of xml elements."""
+
+    @property
+    def is_elements(self) -> bool:
+        return True
+
+    def matches(self, qname: str) -> bool:
+        """Return whether a choice element matches the given qualified name."""
+
+        return self.find_choice(qname) is not None
+
+    def find_choice(self, qname: str) -> Optional[XmlVar]:
+        """Find a choice field for the given qualified name."""
+        for choice in self.choices:
+            if choice.matches(qname):
+                return choice
+
+        return None
 
 
 @dataclass(frozen=True)

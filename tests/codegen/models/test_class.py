@@ -1,10 +1,12 @@
 import sys
 
+from tests.factories import AttrChoiceFactory
 from tests.factories import AttrFactory
 from tests.factories import AttrTypeFactory
 from tests.factories import ClassFactory
 from tests.factories import ExtensionFactory
 from tests.factories import FactoryTestCase
+from xsdata.codegen.models import AttrChoice
 from xsdata.codegen.models import SIMPLE_TYPES
 from xsdata.models import wsdl
 from xsdata.models import xsd
@@ -24,7 +26,19 @@ class ClassTests(FactoryTestCase):
                             qname=build_qname(Namespace.XS.uri, "annotated"),
                             forward=True,
                         )
-                    ]
+                    ],
+                    choices=[
+                        AttrChoiceFactory.create(
+                            name="x", types=[AttrTypeFactory.create(qname="choiceAttr")]
+                        ),
+                        AttrChoiceFactory.create(
+                            name="x",
+                            types=[
+                                AttrTypeFactory.create(qname="choiceAttrTwo"),
+                                AttrTypeFactory.create(qname="choiceAttrEnum"),
+                            ],
+                        ),
+                    ],
                 ),
                 AttrFactory.create(
                     types=[
@@ -59,6 +73,9 @@ class ClassTests(FactoryTestCase):
         )
 
         expected = [
+            "choiceAttr",
+            "choiceAttrTwo",
+            "choiceAttrEnum",
             "{http://www.w3.org/2001/XMLSchema}openAttrs",
             "{http://www.w3.org/2001/XMLSchema}localAttribute",
             "{http://www.w3.org/2001/XMLSchema}foobar",

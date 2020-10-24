@@ -28,6 +28,7 @@ from xsdata.utils.namespaces import split_qname
 xml_type_map = {
     Tag.ELEMENT: XmlType.ELEMENT,
     Tag.ANY: XmlType.WILDCARD,
+    Tag.CHOICE: XmlType.ELEMENTS,
     Tag.ANY_ATTRIBUTE: XmlType.ATTRIBUTES,
     Tag.ATTRIBUTE: XmlType.ATTRIBUTE,
 }
@@ -80,6 +81,7 @@ class Restrictions:
     nillable: Optional[bool] = field(default=None)
     sequential: Optional[bool] = field(default=None)
     tokens: Optional[bool] = field(default=None)
+    choice: Optional[str] = field(default=None)
 
     @property
     def is_list(self) -> bool:
@@ -109,7 +111,6 @@ class Restrictions:
             "white_space",
             "pattern",
             "explicit_timezone",
-            # "nillable",  Not inheritable
         )
 
         for key in keys:
@@ -126,6 +127,9 @@ class Restrictions:
         if source.sequential and (is_list or not self.is_list):
             self.sequential = source.sequential
 
+        if source.choice:
+            self.choice = source.choice
+
         if not self.tokens and source.tokens:
             self.tokens = True
 
@@ -141,15 +145,15 @@ class Restrictions:
         """
         Return the initialized only properties as a dictionary.
 
-        Skip None or implied values, and optionally use the
-        parent attribute types to convert relevant options.
+        Skip None or implied values, and optionally use the parent
+        attribute types to convert relevant options.
         """
 
         result = {}
         sorted_types = converter.sort_types(types) if types else []
 
         for key, value in asdict(self).items():
-            if value is None:
+            if value is None or key == "choice":
                 continue
             elif key == "max_occurs" and value >= sys.maxsize:
                 continue
@@ -228,6 +232,37 @@ class AttrType:
 
 
 @dataclass
+class AttrChoice:
+    """
+    Model representation for a dataclass field choice.
+
+    :param tag:
+    :param name:
+    :param default:
+    :param namespace:
+    :param types:
+    :param restrictions:
+    """
+
+    tag: str
+    name: str
+    default: Any = field(default=None, compare=False)
+    namespace: Optional[str] = field(default=None)
+    types: List[AttrType] = field(default_factory=list)
+    restrictions: Restrictions = field(default_factory=Restrictions, compare=False)
+
+    @property
+    def xml_type(self) -> Optional[str]:
+        """Return the xml node type this attribute is mapped to."""
+        return XmlType.WILDCARD if self.tag == Tag.ANY else None
+
+    @property
+    def is_tokens(self) -> bool:
+        """Return whether this attribute is a list of values."""
+        return self.restrictions.tokens is True
+
+
+@dataclass
 class Attr:
     """
     Model representation for a dataclass field.
@@ -240,6 +275,7 @@ class Attr:
     :param fixed:
     :param mixed:
     :param types:
+    :param choices:
     :param namespace:
     :param help:
     :param restrictions:
@@ -253,6 +289,7 @@ class Attr:
     fixed: bool = field(default=False, compare=False)
     mixed: bool = field(default=False, compare=False)
     types: List[AttrType] = field(default_factory=list)
+    choices: List[AttrChoice] = field(default_factory=list)
     namespace: Optional[str] = field(default=None)
     help: Optional[str] = field(default=None, compare=False)
     restrictions: Restrictions = field(default_factory=Restrictions, compare=False)
@@ -496,6 +533,12 @@ class Class:
                 if attr_type.is_dependency and attr_type.name not in seen:
                     yield attr_type.qname
                     seen.add(attr_type.name)
+
+            for attr_choice in attr.choices:
+                for attr_type in attr_choice.types:
+                    if attr_type.is_dependency and attr_type.name not in seen:
+                        yield attr_type.qname
+                        seen.add(attr_type.name)
 
         for ext in self.extensions:
             if ext.type.is_dependency and ext.type.name not in seen:

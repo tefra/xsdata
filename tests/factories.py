@@ -2,8 +2,10 @@ import random
 import unittest
 from abc import ABC
 from abc import abstractmethod
+from typing import Type
 
 from xsdata.codegen.models import Attr
+from xsdata.codegen.models import AttrChoice
 from xsdata.codegen.models import AttrType
 from xsdata.codegen.models import Class
 from xsdata.codegen.models import Extension
@@ -35,6 +37,7 @@ class FactoryTestCase(unittest.TestCase):
         super().setUp()
         ClassFactory.reset()
         AttrFactory.reset()
+        AttrChoiceFactory.reset()
         AttrTypeFactory.reset()
         ExtensionFactory.reset()
         PackageFactory.reset()
@@ -224,7 +227,7 @@ class AttrTypeFactory(Factory):
 
 
 class AttrFactory(Factory):
-    model = Attr
+    model: Type = Attr
     types = [Attribute, Element, Restriction]
     counter = 65
 
@@ -298,6 +301,32 @@ class AttrFactory(Factory):
             dict(name=QNames.XSI_TYPE.localname, namespace=QNames.XSI_TYPE.namespace)
         )
         return cls.attribute(**kwargs)
+
+
+class AttrChoiceFactory(AttrFactory):
+    model: Type = AttrChoice
+    tags = [Tag.ELEMENT, Tag.ANY]
+    counter = 65
+
+    @classmethod
+    def create(
+        cls,
+        name=None,
+        types=None,
+        tag=None,
+        namespace=None,
+        default=None,
+        restrictions=None,
+    ):
+        name = name or f"attr_{cls.next_letter()}"
+        return cls.model(
+            name=name,
+            types=types or [AttrTypeFactory.xs_string()],
+            tag=tag or random.choice(cls.tags),
+            namespace=namespace or None,
+            default=default or None,
+            restrictions=restrictions or Restrictions(),
+        )
 
 
 class PackageFactory(Factory):

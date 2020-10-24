@@ -14,6 +14,7 @@ class XmlType:
 
     TEXT = "Text"
     ELEMENT = "Element"
+    ELEMENTS = "Elements"
     WILDCARD = "Wildcard"
     ATTRIBUTE = "Attribute"
     ATTRIBUTES = "Attributes"

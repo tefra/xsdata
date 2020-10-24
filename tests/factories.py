@@ -238,6 +238,7 @@ class AttrFactory(Factory):
         local_name=None,
         index=None,
         types=None,
+        choices=None,
         tag=None,
         namespace=None,
         help=None,
@@ -252,6 +253,7 @@ class AttrFactory(Factory):
             local_name=local_name or name,
             index=cls.counter if index is None else index,
             types=types or [AttrTypeFactory.xs_string()],
+            choices=choices or [],
             tag=tag or random.choice(cls.types).__name__,
             namespace=namespace or None,
             help=help or None,
@@ -318,7 +320,7 @@ class AttrChoiceFactory(AttrFactory):
         default=None,
         restrictions=None,
     ):
-        name = name or f"attr_{cls.next_letter()}"
+        name = name or f"choice_{cls.next_letter()}"
         return cls.model(
             name=name,
             types=types or [AttrTypeFactory.xs_string()],

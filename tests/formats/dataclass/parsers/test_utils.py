@@ -8,7 +8,6 @@ from unittest.case import TestCase
 from tests.fixtures.books import Books
 from tests.fixtures.defxmlschema.chapter12 import ProductType
 from tests.fixtures.defxmlschema.chapter12 import SizeType
-from tests.fixtures.defxmlschema.chapter16 import Umbrella
 from xsdata.formats.converter import ConverterAdapter
 from xsdata.formats.dataclass.context import XmlContext
 from xsdata.formats.dataclass.models.constants import XmlType
@@ -337,8 +336,13 @@ class ParserUtilsTests(TestCase):
             content: str
 
         actual = ParserUtils.prepare_generic_value("a", "foo")
-        self.assertEqual(AnyElement(qname="a", text="foo"), actual)
+        expected = AnyElement(qname="a", text="foo")
+        self.assertEqual(expected, actual)
 
         fixture = Fixture("foo")
         actual = ParserUtils.prepare_generic_value("a", fixture)
-        self.assertEqual(DerivedElement(qname="a", value=fixture), actual)
+        expected = DerivedElement(qname="a", value=fixture)
+        self.assertEqual(expected, actual)
+
+        actual = ParserUtils.prepare_generic_value("a", expected)
+        self.assertIs(expected, actual)

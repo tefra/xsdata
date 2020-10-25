@@ -147,6 +147,7 @@ class ElementNode(XmlNode):
                 ns_map=ns_map,
                 context=self.context,
                 position=position,
+                derived=var.derived,
                 mixed=mixed is not None,
             )
 
@@ -158,7 +159,15 @@ class ElementNode(XmlNode):
     def fetch_vars(self, qname: str) -> Iterator[XmlVar]:
         for mode in self.FIND_MODES_ORDERED:
             var = self.meta.find_var(qname, mode)
-            if var:
+
+            if not var:
+                continue
+
+            if var.is_elements:
+                choice = var.find_choice(qname)
+                assert choice is not None
+                yield choice
+            else:
                 yield var
 
 
@@ -326,14 +335,14 @@ class PrimitiveNode(XmlNode):
 
         :return: A tuple of the object's qualified name and the new object.
         """
-        objects.append(
-            (
-                qname,
-                ParserUtils.parse_value(
-                    text, self.var.types, self.var.default, self.ns_map, self.var.tokens
-                ),
-            )
-        )
+        var = self.var
+        ns_map = self.ns_map
+        obj = ParserUtils.parse_value(text, var.types, var.default, ns_map, var.tokens)
+
+        if var.derived:
+            obj = DerivedElement(qname=qname, value=obj)
+
+        objects.append((qname, obj))
         return True
 
     def child(self, qname: str, attrs: Dict, ns_map: Dict, position: int) -> XmlNode:

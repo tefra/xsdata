@@ -234,7 +234,7 @@ class ParserUtils:
 
         if not is_dataclass(value):
             value = AnyElement(qname=qname, text=value)
-        elif not isinstance(value, AnyElement):
+        elif not isinstance(value, (AnyElement, DerivedElement)):
             value = DerivedElement(qname=qname, value=value)
 
         return value

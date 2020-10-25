@@ -15,6 +15,7 @@ from xsdata.exceptions import ParserError
 from xsdata.exceptions import XmlContextError
 from xsdata.formats.dataclass.context import XmlContext
 from xsdata.formats.dataclass.models.elements import XmlElement
+from xsdata.formats.dataclass.models.elements import XmlElements
 from xsdata.formats.dataclass.models.elements import XmlMeta
 from xsdata.formats.dataclass.models.elements import XmlText
 from xsdata.formats.dataclass.models.elements import XmlWildcard
@@ -186,9 +187,6 @@ class ElementNodeTests(TestCase):
             mock.ANY, node.meta, "text", node.ns_map
         )
         mock_bind_objects.assert_called_once_with(mock.ANY, node.meta, 0, objects)
-        # mock_bind_wild_content.assert_called_once_with(
-        #     mock.ANY, node.meta, "text", "tail", node.attrs, node.ns_map
-        # )
 
     @mock.patch.object(ParserUtils, "bind_objects")
     @mock.patch.object(ParserUtils, "bind_content")
@@ -267,6 +265,15 @@ class ElementNodeTests(TestCase):
         self.assertIsInstance(matching_vars, Generator)
         self.assertEqual([elem, wild], list(matching_vars))
 
+    def test_fetch_vars_with_elements_var(self):
+        elem = XmlElement(name="a", qname="a", types=[Foo], dataclass=True)
+        elems = XmlElements(name="compound", qname="compound", choices=[elem])
+        self.meta.vars.append(elems)
+
+        matching_vars = self.node.fetch_vars("a")
+        self.assertIsInstance(matching_vars, Generator)
+        self.assertEqual(elem, next(matching_vars))
+
     @mock.patch.object(ElementNode, "fetch_vars")
     def test_child(self, mock_match_vars):
         var = XmlElement(name="a", qname="a", types=[Foo], dataclass=True)
@@ -314,7 +321,7 @@ class ElementNodeTests(TestCase):
     @mock.patch.object(ParserUtils, "xsi_type", return_value="foo")
     @mock.patch.object(XmlContext, "fetch")
     def test_build_node_with_dataclass_var(self, mock_ctx_fetch, mock_xsi_type):
-        var = XmlElement(name="a", qname="a", types=[Foo], dataclass=True)
+        var = XmlElement(name="a", qname="a", types=[Foo], dataclass=True, derived=True)
         xsi_type = "foo"
         namespace = self.meta.namespace
         mock_ctx_fetch.return_value = self.meta
@@ -326,6 +333,7 @@ class ElementNodeTests(TestCase):
 
         self.assertIsInstance(actual, ElementNode)
         self.assertEqual(10, actual.position)
+        self.assertTrue(actual.derived)
         self.assertIs(mock_ctx_fetch.return_value, actual.meta)
 
         mock_xsi_type.assert_called_once_with(attrs, ns_map)
@@ -497,7 +505,7 @@ class PrimitiveNodeTests(TestCase):
     @mock.patch.object(ParserUtils, "parse_value")
     def test_bind(self, mock_parse_value):
         mock_parse_value.return_value = 13
-        var = XmlText(name="foo", qname="foo", default=100)
+        var = XmlText(name="foo", qname="foo", types=[int])
         ns_map = {"foo": "bar"}
         node = PrimitiveNode(var=var, ns_map=ns_map)
         objects = []
@@ -508,6 +516,15 @@ class PrimitiveNodeTests(TestCase):
         mock_parse_value.assert_called_once_with(
             "13", var.types, var.default, ns_map, var.tokens
         )
+
+    def test_bind_derived_var(self):
+        var = XmlText(name="foo", qname="foo", types=[int], derived=True)
+        ns_map = {"foo": "bar"}
+        node = PrimitiveNode(var=var, ns_map=ns_map)
+        objects = []
+
+        self.assertTrue(node.bind("foo", "13", "Impossible", objects))
+        self.assertEqual(DerivedElement("foo", 13), objects[-1][1])
 
     def test_child(self):
         node = PrimitiveNode(var=XmlText(name="foo", qname="foo"), ns_map={})

@@ -119,6 +119,10 @@ class XmlVar:
         """Match and return a choice field by its qualified name."""
         return None
 
+    def find_choice_typed(self, tp: Type) -> Optional["XmlVar"]:
+        """Match and return a choice field by its types."""
+        return None
+
 
 @dataclass(frozen=True)
 class XmlElement(XmlVar):
@@ -147,9 +151,17 @@ class XmlElements(XmlVar):
         return self.find_choice(qname) is not None
 
     def find_choice(self, qname: str) -> Optional[XmlVar]:
-        """Find a choice field for the given qualified name."""
+        """Match and return a choice field by its qualified name."""
         for choice in self.choices:
             if choice.matches(qname):
+                return choice
+
+        return None
+
+    def find_choice_typed(self, tp: Type) -> Optional["XmlVar"]:
+        """Match and return a choice field by its types."""
+        for choice in self.choices:
+            if tp in choice.types:
                 return choice
 
         return None

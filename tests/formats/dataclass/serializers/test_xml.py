@@ -12,13 +12,13 @@ from tests.fixtures.books import BookForm
 from xsdata.exceptions import SerializerError
 from xsdata.exceptions import XmlContextError
 from xsdata.formats.dataclass.models.elements import XmlElement
+from xsdata.formats.dataclass.models.elements import XmlElements
 from xsdata.formats.dataclass.models.elements import XmlText
 from xsdata.formats.dataclass.models.elements import XmlVar
 from xsdata.formats.dataclass.models.elements import XmlWildcard
 from xsdata.formats.dataclass.models.generics import AnyElement
 from xsdata.formats.dataclass.models.generics import DerivedElement
 from xsdata.formats.dataclass.serializers import XmlSerializer
-from xsdata.formats.dataclass.serializers.mixins import XmlWriter
 from xsdata.formats.dataclass.serializers.mixins import XmlWriterEvent
 from xsdata.models.enums import QNames
 
@@ -278,6 +278,88 @@ class XmlSerializerTests(TestCase):
         result = self.serializer.write_value("123", var, "xsdata")
         self.assertIsInstance(result, Generator)
         self.assertEqual(expected, list(result))
+
+    def test_write_choice_with_derived_primitive_value(self):
+        var = XmlElements(
+            name="compound",
+            qname="compound",
+            choices=[XmlElement(qname="a", name="a", types=[int])],
+        )
+        value = DerivedElement(qname="a", value=1)
+        expected = [
+            (XmlWriterEvent.START, "a"),
+            (XmlWriterEvent.DATA, 1),
+            (XmlWriterEvent.END, "a"),
+        ]
+
+        result = self.serializer.write_value(value, var, "xsdata")
+        self.assertIsInstance(result, Generator)
+        self.assertEqual(expected, list(result))
+
+    def test_write_choice_with_derived_dataclass(self):
+        var = XmlElements(
+            name="compound",
+            qname="compound",
+            choices=[XmlElement(qname="a", name="a", types=[int])],
+        )
+        value = DerivedElement(qname="a", value=A("foo"))
+        expected = [
+            (XmlWriterEvent.START, "a"),
+            (XmlWriterEvent.ATTR, "a0", "foo"),
+            (XmlWriterEvent.END, "a"),
+        ]
+
+        result = self.serializer.write_value(value, var, "xsdata")
+        self.assertIsInstance(result, Generator)
+        self.assertEqual(expected, list(result))
+
+    def test_write_choice_with_generic_object(self):
+        var = XmlElements(
+            name="compound",
+            qname="compound",
+            choices=[XmlElement(qname="a", name="a", types=[int])],
+        )
+        value = AnyElement(qname="a", text="1")
+        expected = [
+            (XmlWriterEvent.START, "a"),
+            (XmlWriterEvent.DATA, "1"),
+            (XmlWriterEvent.END, "a"),
+            (XmlWriterEvent.DATA, None),
+        ]
+
+        result = self.serializer.write_value(value, var, "xsdata")
+        self.assertIsInstance(result, Generator)
+        self.assertEqual(expected, list(result))
+
+    def test_write_choice_with_raw_value(self):
+        var = XmlElements(
+            name="compound",
+            qname="compound",
+            choices=[XmlElement(qname="a", name="a", types=[int])],
+        )
+        expected = [
+            (XmlWriterEvent.START, "a"),
+            (XmlWriterEvent.DATA, 1),
+            (XmlWriterEvent.END, "a"),
+        ]
+
+        result = self.serializer.write_value(1, var, "xsdata")
+        self.assertIsInstance(result, Generator)
+        self.assertEqual(expected, list(result))
+
+    def test_write_choice_when_no_matching_choice_exists(self):
+        var = XmlElements(
+            name="compound",
+            qname="compound",
+            choices=[XmlElement(qname="a", name="a", types=[float])],
+        )
+
+        with self.assertRaises(SerializerError) as cm:
+            result = self.serializer.write_value(1, var, "xsdata")
+            next(result)
+
+        msg = "XmlElements undefined choice: `compound` for `<class 'int'>`"
+        self.assertEqual(msg, str(cm.exception))
 
     def test_write_value_with_list_value(self):
         var = XmlElement(qname="a", name="a", list_element=True)

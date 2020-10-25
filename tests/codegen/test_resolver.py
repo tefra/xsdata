@@ -122,12 +122,13 @@ class DependenciesResolverTest(FactoryTestCase):
         import_names = [
             "foo",  # cool
             "bar",  # cool
+            "{another}foo",  # another foo
             "{thug}life",  # life class exists add alias
             "{common}type",  # type class doesn't exist add just the name
         ]
         self.resolver.class_map = {class_life.qname: class_life}
         mock_import_classes.return_value = import_names
-        mock_find_package.side_effect = ["first", "second", "third", "forth"]
+        mock_find_package.side_effect = ["first", "second", "third", "forth", "fifth"]
 
         self.resolver.resolve_imports()
         mock_add_import.assert_has_calls(
@@ -135,7 +136,8 @@ class DependenciesResolverTest(FactoryTestCase):
                 mock.call(qname=import_names[0], package="first", exists=False),
                 mock.call(qname=import_names[1], package="second", exists=False),
                 mock.call(qname=import_names[2], package="third", exists=True),
-                mock.call(qname=import_names[3], package="forth", exists=False),
+                mock.call(qname=import_names[3], package="forth", exists=True),
+                mock.call(qname=import_names[4], package="fifth", exists=False),
             ]
         )
 

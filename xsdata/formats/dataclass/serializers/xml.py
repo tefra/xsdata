@@ -23,11 +23,11 @@ from xsdata.formats.dataclass.serializers.mixins import XmlWriterEvent
 from xsdata.formats.dataclass.serializers.writers import LxmlEventWriter
 from xsdata.models.enums import QNames
 from xsdata.utils import namespaces
+from xsdata.utils.constants import EMPTY_MAP
 from xsdata.utils.namespaces import split_qname
 
 
 NoneStr = Optional[str]
-EMPTY_MAP: Dict = {}
 
 
 @dataclass
@@ -141,6 +141,8 @@ class XmlSerializer(AbstractSerializer):
             yield from self.write_any_type(value, var, namespace)
         elif var.dataclass:
             yield from self.write_xsi_type(value, var, namespace)
+        elif var.is_elements:
+            yield from self.write_choice(value, var, namespace)
         elif var.is_element:
             yield from self.write_element(value, var, namespace)
         else:
@@ -225,10 +227,33 @@ class XmlSerializer(AbstractSerializer):
             f"{value.__class__.__name__} is not derived from {clazz.__name__}"
         )
 
-    @classmethod
-    def write_data(cls, value: Any, var: XmlVar, namespace: NoneStr) -> Generator:
-        """Produce a data event for the given value."""
-        yield XmlWriterEvent.DATA, value
+    def write_choice(self, value: Any, var: XmlVar, namespace: NoneStr) -> Generator:
+        """
+        Produce an events stream for the given value of a compound elements
+        field.
+
+        The value can be anything as long as we can match the qualified
+        name or its type to a choice.
+        """
+        choice = None
+        if isinstance(value, DerivedElement):
+            choice = var.find_choice(value.qname)
+            value = value.value
+            func = self.write_xsi_type if is_dataclass(value) else self.write_element
+        elif isinstance(value, AnyElement) and value.qname:
+            choice = var.find_choice(value.qname)
+            func = self.write_any_type
+        else:
+            tp = type(value)
+            choice = var.find_choice_typed(tp)
+            func = self.write_value
+
+        if not choice:
+            raise SerializerError(
+                f"XmlElements undefined choice: `{var.name}` for `{type(value)}`"
+            )
+
+        yield from func(value, choice, namespace)
 
     @classmethod
     def write_element(cls, value: Any, var: XmlVar, namespace: NoneStr) -> Generator:
@@ -240,6 +265,11 @@ class XmlSerializer(AbstractSerializer):
 
         yield XmlWriterEvent.DATA, value
         yield XmlWriterEvent.END, var.qname
+
+    @classmethod
+    def write_data(cls, value: Any, var: XmlVar, namespace: NoneStr) -> Generator:
+        """Produce a data event for the given value."""
+        yield XmlWriterEvent.DATA, value
 
     @classmethod
     def next_value(cls, obj: Any, meta: XmlMeta):

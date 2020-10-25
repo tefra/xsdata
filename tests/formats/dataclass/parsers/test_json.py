@@ -3,8 +3,12 @@ from unittest.case import TestCase
 from tests import fixtures_dir
 from tests.fixtures.books import BookForm
 from tests.fixtures.books import Books
+from xsdata.exceptions import ParserError
 from xsdata.formats.dataclass.models.elements import XmlElement
+from xsdata.formats.dataclass.models.elements import XmlElements
 from xsdata.formats.dataclass.models.elements import XmlText
+from xsdata.formats.dataclass.models.generics import AnyElement
+from xsdata.formats.dataclass.models.generics import DerivedElement
 from xsdata.formats.dataclass.parsers.json import JsonParser
 
 
@@ -51,3 +55,52 @@ class JsonParserTests(TestCase):
         self.assertEqual("bar", JsonParser.get_value(data, foo_field))
         self.assertEqual(["foo"], JsonParser.get_value(data, bar_field))
         self.assertIsNone(JsonParser.get_value({}, bar_field))
+
+    def test_bind_choice_with_raw_value(self):
+        var = XmlElements(qname="compound", name="compound")
+        parser = JsonParser()
+        self.assertEqual(1, parser.bind_choice(1, var))
+
+    def test_bind_choice_with_derived_value(self):
+        var = XmlElements(
+            qname="compound",
+            name="compound",
+            choices=[
+                XmlElement(name="a", qname="a", types=[int]),
+                XmlElement(name="b", qname="b", types=[float]),
+            ],
+        )
+
+        parser = JsonParser()
+        self.assertEqual(
+            DerivedElement(qname="a", value=1),
+            parser.bind_choice({"qname": "a", "value": 1}, var),
+        )
+
+    def test_bind_choice_with_generic_value(self):
+        var = XmlElements(
+            qname="compound",
+            name="compound",
+            choices=[
+                XmlElement(name="a", qname="a", types=[int]),
+                XmlElement(name="b", qname="b", types=[float]),
+            ],
+        )
+
+        parser = JsonParser()
+        self.assertEqual(
+            AnyElement(qname="a", text=1),
+            parser.bind_choice({"qname": "a", "text": 1}, var),
+        )
+
+    def test_bind_choice_with_unknown_qname(self):
+        var = XmlElements(qname="compound", name="compound")
+
+        parser = JsonParser()
+        with self.assertRaises(ParserError) as cm:
+            parser.bind_choice({"qname": "foo", "text": 1}, var)
+
+        self.assertEqual(
+            "XmlElements undefined choice: `compound` for qname `foo`",
+            str(cm.exception),
+        )

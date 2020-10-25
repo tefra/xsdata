@@ -52,9 +52,7 @@ class ProductType:
     """
     :ivar number:
     :ivar name:
-    :ivar size:
-    :ivar color:
-    :ivar description:
+    :ivar size_or_color_or_description:
     :ivar eff_date:
     :ivar other_attributes:
     """
@@ -74,28 +72,31 @@ class ProductType:
             "required": True,
         }
     )
-    size: List[SizeType] = field(
+    size_or_color_or_description: List[object] = field(
         default_factory=list,
         metadata={
-            "type": "Element",
-            "namespace": "",
-            "sequential": True,
-        }
-    )
-    color: List[ColorType] = field(
-        default_factory=list,
-        metadata={
-            "type": "Element",
-            "namespace": "",
-            "sequential": True,
-        }
-    )
-    description: List[DescriptionType] = field(
-        default_factory=list,
-        metadata={
-            "type": "Element",
-            "namespace": "",
-            "sequential": True,
+            "name": "",
+            "type": "Elements",
+            "choices": (
+                {
+                    "name": "size",
+                    "type": SizeType,
+                    "namespace": "",
+                    "sequential": True,
+                },
+                {
+                    "name": "color",
+                    "type": ColorType,
+                    "namespace": "",
+                    "sequential": True,
+                },
+                {
+                    "name": "description",
+                    "type": DescriptionType,
+                    "namespace": "",
+                    "sequential": True,
+                },
+            ),
         }
     )
     eff_date: str = field(
@@ -117,29 +118,30 @@ class ProductType:
 @dataclass
 class ItemsType:
     """
-    :ivar shirt:
-    :ivar hat:
-    :ivar umbrella:
+    :ivar shirt_or_hat_or_umbrella:
     """
-    shirt: List[ProductType] = field(
+    shirt_or_hat_or_umbrella: List[object] = field(
         default_factory=list,
         metadata={
-            "type": "Element",
-            "namespace": "",
-        }
-    )
-    hat: List[ProductType] = field(
-        default_factory=list,
-        metadata={
-            "type": "Element",
-            "namespace": "",
-        }
-    )
-    umbrella: List[ProductType] = field(
-        default_factory=list,
-        metadata={
-            "type": "Element",
-            "namespace": "",
+            "name": "",
+            "type": "Elements",
+            "choices": (
+                {
+                    "name": "shirt",
+                    "type": ProductType,
+                    "namespace": "",
+                },
+                {
+                    "name": "hat",
+                    "type": ProductType,
+                    "namespace": "",
+                },
+                {
+                    "name": "umbrella",
+                    "type": ProductType,
+                    "namespace": "",
+                },
+            ),
         }
     )
 

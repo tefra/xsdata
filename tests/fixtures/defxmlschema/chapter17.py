@@ -99,21 +99,25 @@ class ProductType:
 @dataclass
 class ItemsType:
     """
-    :ivar shirt:
-    :ivar hat:
+    :ivar shirt_or_hat:
     """
-    shirt: List[ProductOrderType] = field(
+    shirt_or_hat: List[object] = field(
         default_factory=list,
         metadata={
-            "type": "Element",
-            "namespace": "",
-        }
-    )
-    hat: List[ProductOrderType] = field(
-        default_factory=list,
-        metadata={
-            "type": "Element",
-            "namespace": "",
+            "name": "",
+            "type": "Elements",
+            "choices": (
+                {
+                    "name": "shirt",
+                    "type": ProductOrderType,
+                    "namespace": "",
+                },
+                {
+                    "name": "hat",
+                    "type": ProductOrderType,
+                    "namespace": "",
+                },
+            ),
         }
     )
 

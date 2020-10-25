@@ -104,7 +104,6 @@ class ItemsType:
     shirt_or_hat: List[object] = field(
         default_factory=list,
         metadata={
-            "name": "",
             "type": "Elements",
             "choices": (
                 {

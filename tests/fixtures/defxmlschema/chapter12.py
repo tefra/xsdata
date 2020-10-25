@@ -75,7 +75,6 @@ class ProductType:
     size_or_color_or_description: List[object] = field(
         default_factory=list,
         metadata={
-            "name": "",
             "type": "Elements",
             "choices": (
                 {
@@ -123,7 +122,6 @@ class ItemsType:
     shirt_or_hat_or_umbrella: List[object] = field(
         default_factory=list,
         metadata={
-            "name": "",
             "type": "Elements",
             "choices": (
                 {

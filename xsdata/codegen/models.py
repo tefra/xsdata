@@ -26,11 +26,11 @@ from xsdata.utils.namespaces import build_qname
 from xsdata.utils.namespaces import split_qname
 
 xml_type_map = {
-    Tag.ELEMENT: XmlType.ELEMENT,
     Tag.ANY: XmlType.WILDCARD,
-    Tag.CHOICE: XmlType.ELEMENTS,
     Tag.ANY_ATTRIBUTE: XmlType.ATTRIBUTES,
     Tag.ATTRIBUTE: XmlType.ATTRIBUTE,
+    Tag.CHOICE: XmlType.ELEMENTS,
+    Tag.ELEMENT: XmlType.ELEMENT,
 }
 
 SIMPLE_TYPES = (Tag.EXTENSION, Tag.LIST, Tag.SIMPLE_TYPE, Tag.UNION)
@@ -322,7 +322,7 @@ class Attr:
     def is_nameless(self) -> bool:
         """Return whether this attribute has a local name that will be used
         during parsing/serialization."""
-        return self.xml_type in (XmlType.WILDCARD, XmlType.ATTRIBUTES, None)
+        return self.tag not in (Tag.ATTRIBUTE, Tag.ELEMENT)
 
     @property
     def is_list(self) -> bool:

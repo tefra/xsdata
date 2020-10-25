@@ -91,22 +91,10 @@ class AttrTests(FactoryTestCase):
         attr.name = "type"
         self.assertTrue(attr.is_xsi_type)
 
-    @mock.patch.object(Attr, "xml_type", new_callable=mock.PropertyMock)
-    def test_property_is_nameless(self, mock_xml_type):
-        mock_xml_type.side_effect = [
-            XmlType.WILDCARD,
-            XmlType.ATTRIBUTES,
-            XmlType.ELEMENT,
-            XmlType.ATTRIBUTE,
-            XmlType.TEXT,
-        ]
-        attr = AttrFactory.any_attribute()
-
-        self.assertTrue(attr.is_nameless)
-        self.assertTrue(attr.is_nameless)
-        self.assertFalse(attr.is_nameless)
-        self.assertFalse(attr.is_nameless)
-        self.assertFalse(attr.is_nameless)
+    def test_property_is_nameless(self):
+        self.assertFalse(AttrFactory.create(tag=Tag.ELEMENT).is_nameless)
+        self.assertFalse(AttrFactory.create(tag=Tag.ATTRIBUTE).is_nameless)
+        self.assertTrue(AttrFactory.create(tag=Tag.ANY).is_nameless)
 
     def test_property_xml_type(self):
         attr = AttrFactory.create(tag=Tag.ELEMENT)

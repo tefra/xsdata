@@ -65,10 +65,12 @@ class DependenciesResolver:
     def resolve_imports(self):
         """Walk the import qualified names, check for naming collisions and add
         the necessary code generator import instance."""
-        local_names = [split_qname(qname)[1] for qname in self.class_map.keys()]
+        local_names = {split_qname(qname)[1] for qname in self.class_map.keys()}
         for qname in self.import_classes():
             package = self.find_package(qname)
-            exists = split_qname(qname)[1] in local_names
+            local_name = split_qname(qname)[1]
+            exists = local_name in local_names
+            local_names.add(local_name)
             self.add_import(qname=qname, package=package, exists=exists)
 
     def add_import(self, qname: str, package: str, exists: bool = False):

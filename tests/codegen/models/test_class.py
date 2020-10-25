@@ -29,7 +29,11 @@ class ClassTests(FactoryTestCase):
                     ],
                     choices=[
                         AttrChoiceFactory.create(
-                            name="x", types=[AttrTypeFactory.create(qname="choiceAttr")]
+                            name="x",
+                            types=[
+                                AttrTypeFactory.create(qname="choiceAttr"),
+                                AttrTypeFactory.xs_string(),
+                            ],
                         ),
                         AttrChoiceFactory.create(
                             name="x",
@@ -81,7 +85,7 @@ class ClassTests(FactoryTestCase):
             "{http://www.w3.org/2001/XMLSchema}foobar",
             "{xsdata}foo",
         ]
-        self.assertEqual(expected, list(obj.dependencies()))
+        self.assertCountEqual(expected, list(obj.dependencies()))
 
     def test_property_has_suffix_attr(self):
         obj = ClassFactory.create()

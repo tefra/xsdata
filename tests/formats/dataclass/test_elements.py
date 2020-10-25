@@ -9,11 +9,9 @@ from xsdata.formats.dataclass.models.elements import XmlAttribute
 from xsdata.formats.dataclass.models.elements import XmlAttributes
 from xsdata.formats.dataclass.models.elements import XmlElement
 from xsdata.formats.dataclass.models.elements import XmlElements
-from xsdata.formats.dataclass.models.elements import XmlMeta
 from xsdata.formats.dataclass.models.elements import XmlText
 from xsdata.formats.dataclass.models.elements import XmlVar
 from xsdata.formats.dataclass.models.elements import XmlWildcard
-from xsdata.models.enums import FormType
 
 
 @dataclass
@@ -63,6 +61,10 @@ class XmlValTests(TestCase):
     def test_find_choice(self):
         var = XmlVar(name="foo", qname="foo")
         self.assertIsNone(var.find_choice("foo"))
+
+    def test_find_choice_typed(self):
+        var = XmlVar(name="foo", qname="foo")
+        self.assertIsNone(var.find_choice_typed(int))
 
 
 class XmlElementTests(TestCase):

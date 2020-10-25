@@ -1,4 +1,3 @@
-import sys
 from typing import Dict
 from typing import List
 from typing import Optional
@@ -25,18 +24,22 @@ class AttributeChoiceGroupHandler(HandlerInterface):
 
         groups = group_by(target.attrs, lambda x: x.restrictions.choice)
         for choice, attrs in groups.items():
-            if choice and len(attrs) > 1:
+            if choice and len(attrs) > 1 and any(attr.is_list for attr in attrs):
                 self.group_attrs(target, attrs)
 
     def group_attrs(self, target: Class, attrs: List[Attr]):
-        """case 1: one unique type :) case 2: more than one per attribute :)"""
+        """Group attributes into a new compound field."""
 
         pos = target.attrs.index(attrs[0])
         name = []
         choices = []
+        min_occurs = []
+        max_occurs = []
         for attr in attrs:
             target.attrs.remove(attr)
             name.append(attr.local_name)
+            min_occurs.append(attr.restrictions.min_occurs)
+            max_occurs.append(attr.restrictions.max_occurs)
             choices.append(self.convert_attr(attr))
 
         target.attrs.insert(
@@ -47,7 +50,10 @@ class AttributeChoiceGroupHandler(HandlerInterface):
                 index=0,
                 types=[AttrType(qname=DataType.ANY_TYPE.qname, native=True)],
                 tag=Tag.CHOICE,
-                restrictions=Restrictions(min_occurs=0, max_occurs=sys.maxsize),
+                restrictions=Restrictions(
+                    min_occurs=min((x for x in min_occurs if x is not None), default=0),
+                    max_occurs=max((x for x in max_occurs if x is not None), default=0),
+                ),
                 choices=choices,
             ),
         )
@@ -63,6 +69,7 @@ class AttributeChoiceGroupHandler(HandlerInterface):
         restrictions = attr.restrictions.clone()
         restrictions.min_occurs = None
         restrictions.max_occurs = None
+        restrictions.sequential = None
 
         return AttrChoice(
             name=attr.local_name,

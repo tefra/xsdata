@@ -17,11 +17,18 @@ class AttributeChoiceGroupHandlerTests(FactoryTestCase):
 
     @mock.patch.object(AttributeChoiceGroupHandler, "group_attrs")
     def test_process(self, mock_group_attrs):
-        target = ClassFactory.elements(6)
+        target = ClassFactory.elements(8)
+        # First group repeating
         target.attrs[0].restrictions.choice = "1"
         target.attrs[1].restrictions.choice = "1"
+        target.attrs[1].restrictions.max_occurs = 2
+        # Second group repeating
         target.attrs[2].restrictions.choice = "2"
         target.attrs[3].restrictions.choice = "2"
+        target.attrs[3].restrictions.max_occurs = 2
+        # Third group optional
+        target.attrs[4].restrictions.choice = "3"
+        target.attrs[5].restrictions.choice = "3"
 
         self.processor.process(target)
         mock_group_attrs.assert_has_calls(
@@ -33,6 +40,11 @@ class AttributeChoiceGroupHandlerTests(FactoryTestCase):
 
     def test_group_attrs(self):
         target = ClassFactory.create(attrs=AttrFactory.list(2))
+        target.attrs[0].restrictions.min_occurs = 10
+        target.attrs[0].restrictions.max_occurs = 15
+        target.attrs[1].restrictions.min_occurs = 5
+        target.attrs[1].restrictions.max_occurs = 20
+
         expected = AttrFactory.create(
             name="attr_B_or_attr_C",
             local_name="",
@@ -44,20 +56,20 @@ class AttributeChoiceGroupHandlerTests(FactoryTestCase):
                     tag=target.attrs[0].tag,
                     name="attr_B",
                     types=target.attrs[0].types,
-                    restrictions=Restrictions(),
                 ),
                 AttrChoiceFactory.create(
                     tag=target.attrs[1].tag,
                     name="attr_C",
                     types=target.attrs[1].types,
-                    restrictions=Restrictions(),
                 ),
             ],
         )
+        expected_res = Restrictions(min_occurs=5, max_occurs=20)
 
         self.processor.group_attrs(target, list(target.attrs))
         self.assertEqual(1, len(target.attrs))
         self.assertEqual(expected, target.attrs[0])
+        self.assertEqual(expected_res, target.attrs[0].restrictions)
 
     def test_convert_attr(self):
         attr = AttrFactory.create(
@@ -82,10 +94,12 @@ class AttributeChoiceGroupHandlerTests(FactoryTestCase):
             explicit_timezone="+1",
             nillable=True,
             choice="abc",
+            sequential=True,
         )
         expected_res = attr.restrictions.clone()
         expected_res.min_occurs = None
         expected_res.max_occurs = None
+        expected_res.sequential = None
 
         actual = self.processor.convert_attr(attr)
 

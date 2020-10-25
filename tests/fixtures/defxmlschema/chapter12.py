@@ -81,19 +81,16 @@ class ProductType:
                     "name": "size",
                     "type": SizeType,
                     "namespace": "",
-                    "sequential": True,
                 },
                 {
                     "name": "color",
                     "type": ColorType,
                     "namespace": "",
-                    "sequential": True,
                 },
                 {
                     "name": "description",
                     "type": DescriptionType,
                     "namespace": "",
-                    "sequential": True,
                 },
             ),
         }

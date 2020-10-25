@@ -328,4 +328,4 @@ class SchemaTransformerTests(FactoryTestCase):
 
         result = self.transformer.analyze_classes(classes)
         self.assertEqual(1, len(result))
-        mock_process.assert_called_once_with(classes)
+        mock_process.assert_called_once_with(classes, self.transformer.config)

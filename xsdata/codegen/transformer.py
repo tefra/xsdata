@@ -196,11 +196,10 @@ class SchemaTransformer:
         """
         return urlopen(uri).read()  # nosec
 
-    @classmethod
-    def analyze_classes(cls, classes: List[Class]) -> List[Class]:
+    def analyze_classes(self, classes: List[Class]) -> List[Class]:
         """Analyzer the given class list and simplify attributes and
         extensions."""
-        return ClassAnalyzer.process(classes)
+        return ClassAnalyzer.process(classes, self.config)
 
     def count_classes(self, classes: List[Class]) -> Tuple[int, int]:
         """Return a tuple of counters for the main and inner classes."""

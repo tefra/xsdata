@@ -250,7 +250,7 @@ class AttrFactory(Factory):
         name = name or f"attr_{cls.next_letter()}"
         return cls.model(
             name=name,
-            local_name=local_name or name,
+            local_name=name if local_name is None else local_name,
             index=cls.counter if index is None else index,
             types=types or [AttrTypeFactory.xs_string()],
             choices=choices or [],

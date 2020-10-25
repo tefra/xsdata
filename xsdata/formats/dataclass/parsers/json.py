@@ -7,11 +7,13 @@ from typing import Any
 from typing import Dict
 from typing import Type
 
+from xsdata.exceptions import ParserError
 from xsdata.formats.bindings import AbstractParser
 from xsdata.formats.bindings import T
 from xsdata.formats.dataclass.context import XmlContext
 from xsdata.formats.dataclass.models.elements import XmlVar
 from xsdata.formats.dataclass.models.generics import AnyElement
+from xsdata.formats.dataclass.models.generics import DerivedElement
 from xsdata.formats.dataclass.parsers.utils import ParserUtils
 
 
@@ -73,13 +75,34 @@ class JsonParser(AbstractParser):
             return dict(value)
 
         if var.is_wildcard:
-            return (
-                value
-                if isinstance(value, str)
-                else self.parse_context(value, AnyElement)
-            )
+            return self.bind_wildcard(value)
+
+        if var.is_elements:
+            return self.bind_choice(value, var)
 
         return ParserUtils.parse_value(value, var.types, var.default, tokens=var.tokens)
+
+    def bind_wildcard(self, value: Any) -> Any:
+        return (
+            value if isinstance(value, str) else self.parse_context(value, AnyElement)
+        )
+
+    def bind_choice(self, value: Any, var: XmlVar) -> Any:
+        if isinstance(value, dict) and "qname" in value:
+            qname = value["qname"]
+            choice = var.find_choice(qname)
+
+            if not choice:
+                raise ParserError(
+                    f"XmlElements undefined choice: `{var.name}` for qname `{qname}`"
+                )
+
+            if "value" in value:
+                return DerivedElement(qname, self.bind_value(choice, value["value"]))
+
+            return self.parse_context(value, AnyElement)
+
+        return value
 
     @staticmethod
     def get_value(data: Dict, var: XmlVar) -> Any:

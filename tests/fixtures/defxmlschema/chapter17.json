@@ -1,27 +1,34 @@
 {
     "number": "123ABBCC123",
     "items": {
-        "shirt": [
+        "shirt_or_hat": [
             {
-                "quantity": 1,
-                "color": {
-                    "value": "blue"
-                },
-                "number": 557
+                "qname": "shirt",
+                "value": {
+                    "quantity": 1,
+                    "color": {
+                        "value": "blue"
+                    },
+                    "number": 557
+                }
             },
             {
-                "quantity": 1,
-                "color": {
-                    "value": "sage"
-                },
-                "number": 557
-            }
-        ],
-        "hat": [
+                "qname": "shirt",
+                "value": {
+                    "quantity": 1,
+                    "color": {
+                        "value": "sage"
+                    },
+                    "number": 557
+                }
+            },
             {
-                "quantity": 1,
-                "color": null,
-                "number": 563
+                "qname": "hat",
+                "value": {
+                    "quantity": 1,
+                    "color": null,
+                    "number": 563
+                }
             }
         ]
     },

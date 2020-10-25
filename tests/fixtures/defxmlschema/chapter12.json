@@ -1,70 +1,79 @@
 {
-    "shirt": [
+    "shirt_or_hat_or_umbrella": [
         {
-            "number": 557,
-            "name": "Short-Sleeved Linen Blouse",
-            "size": [
-                {
-                    "value": 10,
-                    "system": "US-DRESS"
-                }
-            ],
-            "color": [
-                {
-                    "value": "blue"
-                }
-            ],
-            "description": [
-                {
-                    "w3_org_1999_xhtml_element": [
-                        "\n      This shirt is the ",
-                        {
-                            "qname": "{http://www.w3.org/1999/xhtml}b",
-                            "text": "best-selling",
-                            "tail": " shirt in\n      our catalog! ",
-                            "ns_map": {
-                                "xsi": "http://www.w3.org/2001/XMLSchema-instance",
-                                "xhtml": "http://www.w3.org/1999/xhtml",
-                                "oth": "http://example.org/oth"
-                            },
-                            "children": [],
-                            "attributes": {}
-                        },
-                        {
-                            "qname": "{http://www.w3.org/1999/xhtml}br",
-                            "text": null,
-                            "tail": " Note: runs large.\n    ",
-                            "ns_map": {
-                                "xsi": "http://www.w3.org/2001/XMLSchema-instance",
-                                "xhtml": "http://www.w3.org/1999/xhtml",
-                                "oth": "http://example.org/oth"
-                            },
-                            "children": [],
-                            "attributes": {}
+            "qname": "shirt",
+            "value": {
+                "number": 557,
+                "name": "Short-Sleeved Linen Blouse",
+                "size_or_color_or_description": [
+                    {
+                        "qname": "size",
+                        "value": {
+                            "value": 10,
+                            "system": "US-DRESS"
                         }
-                    ]
-                }
-            ],
-            "eff_date": "2002-04-02",
-            "other_attributes": {}
-        }
-    ],
-    "hat": [
+                    },
+                    {
+                        "qname": "color",
+                        "value": {
+                            "value": "blue"
+                        }
+                    },
+                    {
+                        "qname": "description",
+                        "value": {
+                            "w3_org_1999_xhtml_element": [
+                                "\n      This shirt is the ",
+                                {
+                                    "qname": "{http://www.w3.org/1999/xhtml}b",
+                                    "text": "best-selling",
+                                    "tail": " shirt in\n      our catalog! ",
+                                    "ns_map": {
+                                        "xsi": "http://www.w3.org/2001/XMLSchema-instance",
+                                        "xhtml": "http://www.w3.org/1999/xhtml",
+                                        "oth": "http://example.org/oth"
+                                    },
+                                    "children": [],
+                                    "attributes": {}
+                                },
+                                {
+                                    "qname": "{http://www.w3.org/1999/xhtml}br",
+                                    "text": null,
+                                    "tail": " Note: runs large.\n    ",
+                                    "ns_map": {
+                                        "xsi": "http://www.w3.org/2001/XMLSchema-instance",
+                                        "xhtml": "http://www.w3.org/1999/xhtml",
+                                        "oth": "http://example.org/oth"
+                                    },
+                                    "children": [],
+                                    "attributes": {}
+                                }
+                            ]
+                        }
+                    }
+                ],
+                "eff_date": "2002-04-02",
+                "other_attributes": {}
+            }
+        },
         {
-            "number": 557,
-            "name": "Ten-Gallon Hat",
-            "size": [],
-            "color": [
-                {
-                    "value": "red"
+            "qname": "hat",
+            "value": {
+                "number": 557,
+                "name": "Ten-Gallon Hat",
+                "size_or_color_or_description": [
+                    {
+                        "qname": "color",
+                        "value": {
+                            "value": "red"
+                        }
+                    }
+                ],
+                "eff_date": "1900-01-01",
+                "other_attributes": {
+                    "{http://example.org/oth}custom": "12"
                 }
-            ],
-            "description": [],
-            "eff_date": "1900-01-01",
-            "other_attributes": {
-                "{http://example.org/oth}custom": "12"
             }
         }
-    ],
-    "umbrella": []
+    ]
 }

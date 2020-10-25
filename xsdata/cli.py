@@ -106,15 +106,11 @@ def generate(*args: Any, **kwargs: Any):
         config = GeneratorConfig()
         config.output.format = OutputFormat(kwargs["output"])
         config.output.package = kwargs["package"]
-
-        if kwargs["wsdl"]:
-            config.output.wsdl = kwargs["wsdl"]
+        config.output.wsdl = kwargs["wsdl"]
+        config.output.compound_fields = kwargs["compound_fields"]
 
         if kwargs["ns_struct"]:
             config.output.structure = OutputStructure.NAMESPACES
-
-        if not kwargs["compound_fields"]:
-            config.output.compound_fields = kwargs["compound_fields"]
 
     uris = resolve_source(kwargs["source"], wsdl=config.output.wsdl)
     transformer = SchemaTransformer(config=config, print=kwargs["print"])

@@ -9,6 +9,7 @@ from xsdata.codegen.container import ClassContainer
 from xsdata.codegen.sanitizer import ClassSanitizer
 from xsdata.codegen.validator import ClassValidator
 from xsdata.exceptions import AnalyzerValueError
+from xsdata.models.config import GeneratorConfig
 
 
 class ClassAnalyzerTests(FactoryTestCase):
@@ -25,10 +26,11 @@ class ClassAnalyzerTests(FactoryTestCase):
         mock_sanitizer_process,
         mock_validate_references,
     ):
+        config = GeneratorConfig()
         classes = ClassFactory.list(2)
-        container = ClassContainer.from_list(classes)
+        container = ClassContainer.from_list(classes, config)
 
-        result = ClassAnalyzer.process(classes)
+        result = ClassAnalyzer.process(classes, config)
 
         self.assertEqual(classes, result)
 

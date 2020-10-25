@@ -70,6 +70,15 @@ def download(source: str, output: str):
 @click.option("--config", default=".xsdata.xml", help="Configuration file")
 @click.option("--package", required=False, help="Target Package", default="generated")
 @click.option("--output", type=outputs, help="Output Format", default="pydata")
+@click.option(
+    "--compound-fields",
+    type=click.BOOL,
+    default=False,
+    help=(
+        "Use compound fields for repeating choices. "
+        "Enable if elements ordering matters for your case."
+    ),
+)
 @click.option("--wsdl", is_flag=True, default=False, help="WSDL Mode (experimental)")
 @click.option("--print", is_flag=True, default=False, help="Print output")
 @click.option(
@@ -103,6 +112,9 @@ def generate(*args: Any, **kwargs: Any):
 
         if kwargs["ns_struct"]:
             config.output.structure = OutputStructure.NAMESPACES
+
+        if not kwargs["compound_fields"]:
+            config.output.compound_fields = kwargs["compound_fields"]
 
     uris = resolve_source(kwargs["source"], wsdl=config.output.wsdl)
     transformer = SchemaTransformer(config=config, print=kwargs["print"])

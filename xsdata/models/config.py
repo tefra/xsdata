@@ -67,12 +67,15 @@ class GeneratorOutput:
     :param package: Package name eg foo.bar.models
     :param format: Select an output format
     :param structure: Select an output structure
+    :param compound_fields: Use compound fields for repeating choices.
+        Enable if elements ordering matters for your case.
     """
 
     wsdl: bool = attribute(default=False)
     package: str = element(default="generated")
     format: OutputFormat = element(default=OutputFormat.DATACLASS)
     structure: OutputStructure = element(default=OutputStructure.FILENAMES)
+    compound_fields: bool = element(default=False)
 
 
 @dataclass

@@ -7,6 +7,7 @@ from typing import Iterator
 from typing import List
 from typing import Optional
 
+from xsdata.codegen.handlers import AttributeChoiceGroupHandler
 from xsdata.codegen.handlers import AttributeEnumUnionHandler
 from xsdata.codegen.handlers import AttributeGroupHandler
 from xsdata.codegen.handlers import AttributeMergeHandler
@@ -16,8 +17,10 @@ from xsdata.codegen.handlers import AttributeSubstitutionHandler
 from xsdata.codegen.handlers import AttributeTypeHandler
 from xsdata.codegen.handlers import ClassExtensionHandler
 from xsdata.codegen.mixins import ContainerInterface
+from xsdata.codegen.mixins import HandlerInterface
 from xsdata.codegen.models import Class
 from xsdata.codegen.models import Status
+from xsdata.models.config import GeneratorConfig
 from xsdata.utils import collections
 from xsdata.utils.collections import group_by
 from xsdata.utils.constants import return_true
@@ -34,25 +37,33 @@ class ClassContainer(UserDict, ContainerInterface):
         """
         super().__init__(data)
 
-        self.processors = [
-            AttributeGroupHandler(self),
-            ClassExtensionHandler(self),
-            AttributeEnumUnionHandler(self),
-            AttributeSubstitutionHandler(self),
-            AttributeTypeHandler(self),
-            AttributeMergeHandler(),
-            AttributeMixedContentHandler(),
-            AttributeMismatchHandler(),
-        ]
+        self.processors: List[HandlerInterface] = []
 
     @property
     def class_list(self) -> List[Class]:
         return list(self.iterate())
 
     @classmethod
-    def from_list(cls, items: List[Class]) -> "ClassContainer":
+    def from_list(cls, items: List[Class], config: GeneratorConfig) -> "ClassContainer":
         """Static constructor from a list of classes."""
-        return cls(group_by(items, attrgetter("qname")))
+        container = cls(group_by(items, attrgetter("qname")))
+        container.processors.extend(
+            [
+                AttributeGroupHandler(container),
+                ClassExtensionHandler(container),
+                AttributeEnumUnionHandler(container),
+                AttributeSubstitutionHandler(container),
+                AttributeTypeHandler(container),
+                AttributeMergeHandler(),
+                AttributeMixedContentHandler(),
+                AttributeMismatchHandler(),
+            ]
+        )
+
+        if config.output.compound_fields:
+            container.processors.append(AttributeChoiceGroupHandler())
+
+        return container
 
     def iterate(self) -> Iterator[Class]:
         """Create an iterator for the class map values."""

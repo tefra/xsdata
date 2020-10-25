@@ -22,6 +22,7 @@ class GeneratorConfigTests(TestCase):
             "    <Package>generated</Package>\n"
             "    <Format>pydata</Format>\n"
             "    <Structure>filenames</Structure>\n"
+            "    <CompoundFields>false</CompoundFields>\n"
             "  </Output>\n"
             "  <Conventions>\n"
             '    <ClassName case="pascalCase" safePrefix="type"/>\n'
@@ -68,6 +69,7 @@ class GeneratorConfigTests(TestCase):
             "    <Package>foo.bar</Package>\n"
             "    <Format>pydata</Format>\n"
             "    <Structure>filenames</Structure>\n"
+            "    <CompoundFields>false</CompoundFields>\n"
             "  </Output>\n"
             "  <Conventions>\n"
             '    <ClassName case="pascalCase" safePrefix="type"/>\n'

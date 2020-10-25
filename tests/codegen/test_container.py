@@ -7,6 +7,7 @@ from tests.factories import FactoryTestCase
 from xsdata.codegen.container import ClassContainer
 from xsdata.codegen.models import Class
 from xsdata.codegen.models import Status
+from xsdata.models.config import GeneratorConfig
 from xsdata.models.xsd import ComplexType
 from xsdata.models.xsd import SimpleType
 
@@ -18,12 +19,13 @@ class ClassContainerTests(FactoryTestCase):
         self.container = ClassContainer()
 
     def test_from_list(self):
+        config = GeneratorConfig()
         classes = [
             ClassFactory.create(qname="{xsdata}foo", type=Element),
             ClassFactory.create(qname="{xsdata}foo", type=ComplexType),
             ClassFactory.create(qname="{xsdata}foobar", type=ComplexType),
         ]
-        container = ClassContainer.from_list(classes)
+        container = ClassContainer.from_list(classes, config)
 
         expected = {
             "{xsdata}foo": classes[:2],
@@ -32,6 +34,40 @@ class ClassContainerTests(FactoryTestCase):
 
         self.assertEqual(2, len(container))
         self.assertEqual(expected, container)
+        self.assertEqual(
+            [
+                "AttributeGroupHandler",
+                "ClassExtensionHandler",
+                "AttributeEnumUnionHandler",
+                "AttributeSubstitutionHandler",
+                "AttributeTypeHandler",
+                "AttributeMergeHandler",
+                "AttributeMixedContentHandler",
+                "AttributeMismatchHandler",
+            ],
+            [x.__class__.__name__ for x in container.processors],
+        )
+
+    def test_from_list_with_compound_fields_disabled(self):
+        config = GeneratorConfig()
+        config.output.compound_fields = True
+        container = ClassContainer.from_list([], config)
+        self.assertEqual(9, len(container.processors))
+
+        self.assertEqual(
+            [
+                "AttributeGroupHandler",
+                "ClassExtensionHandler",
+                "AttributeEnumUnionHandler",
+                "AttributeSubstitutionHandler",
+                "AttributeTypeHandler",
+                "AttributeMergeHandler",
+                "AttributeMixedContentHandler",
+                "AttributeMismatchHandler",
+                "AttributeChoiceGroupHandler",
+            ],
+            [x.__class__.__name__ for x in container.processors],
+        )
 
     @mock.patch.object(ClassContainer, "process_class")
     def test_find(self, mock_process_class):
@@ -89,8 +125,9 @@ class ClassContainerTests(FactoryTestCase):
     def test_filter_classes(self, mock_class_should_generate):
         mock_class_should_generate.side_effect = [True, False, False, True, False]
 
+        config = GeneratorConfig()
         classes = ClassFactory.list(5)
-        container = ClassContainer.from_list(classes)
+        container = ClassContainer.from_list(classes, config)
 
         expected = [
             classes[0],
@@ -103,7 +140,8 @@ class ClassContainerTests(FactoryTestCase):
     def test_filter_classes_with_only_simple_types(self, mock_class_should_generate):
         mock_class_should_generate.return_value = False
         classes = [ClassFactory.enumeration(2), ClassFactory.create(type=SimpleType)]
-        container = ClassContainer.from_list(classes)
+        config = GeneratorConfig()
+        container = ClassContainer.from_list(classes, config)
         container.filter_classes()
 
         self.assertEqual(classes, container.class_list)

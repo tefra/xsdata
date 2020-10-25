@@ -22,7 +22,6 @@ from xsdata.formats.dataclass.models.constants import XmlType
 from xsdata.formats.dataclass.models.elements import XmlMeta
 from xsdata.formats.dataclass.models.elements import XmlVar
 from xsdata.models.enums import NamespaceType
-from xsdata.utils.collections import first
 from xsdata.utils.constants import EMPTY_SEQUENCE
 from xsdata.utils.namespaces import build_qname
 
@@ -150,8 +149,8 @@ class XmlContext:
             xml_clazz = XmlType.to_xml_class(xml_type)
             namespace = var.metadata.get("namespace")
             namespaces = self.resolve_namespaces(xml_type, namespace, parent_ns)
-            first_namespace = first(x for x in namespaces if x and x[0] != "#")
-            qname = build_qname(first_namespace, local_name)
+            default_namespace = self.default_namespace(namespaces)
+            qname = build_qname(default_namespace, local_name)
 
             choices = list(
                 self.build_choices(
@@ -190,12 +189,12 @@ class XmlContext:
             xml_type = choice.get("tag", XmlType.ELEMENT)
             namespace = choice.get("namespace")
             namespaces = self.resolve_namespaces(xml_type, namespace, parent_namespace)
-            first_namespace = first(x for x in namespaces if x and x[0] != "#")
+            default_namespace = self.default_namespace(namespaces)
 
             types = self.real_types(_eval_type(choice["type"], globalns, None))
             is_class = any(is_dataclass(clazz) for clazz in types)
             xml_clazz = XmlType.to_xml_class(xml_type)
-            qname = build_qname(first_namespace, choice.get("name", "any"))
+            qname = build_qname(default_namespace, choice.get("name", "any"))
 
             yield xml_clazz(
                 name=parent_name,
@@ -241,6 +240,15 @@ class XmlContext:
             else:
                 result.add(ns)
         return list(result)
+
+    @classmethod
+    def default_namespace(cls, namespaces: List[str]) -> Optional[str]:
+        """Return the first valid namespace uri or None."""
+        for namespace in namespaces:
+            if namespace and not namespace.startswith("#"):
+                return namespace
+
+        return None
 
     @classmethod
     def default_value(cls, var: Field) -> Any:

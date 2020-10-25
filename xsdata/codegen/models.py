@@ -127,17 +127,14 @@ class Restrictions:
         if source.sequential and (is_list or not self.is_list):
             self.sequential = source.sequential
 
-        if source.choice:
-            self.choice = source.choice
+        self.choice = source.choice or self.choice
+        self.tokens = source.tokens or self.tokens
 
-        if not self.tokens and source.tokens:
-            self.tokens = True
-
-        # Update min occurs if current value is None and the new value is more than one.
+        # Update min occurs if current value is None or the new value is more than one.
         if self.min_occurs is None or (min_occurs is not None and min_occurs != 1):
             self.min_occurs = min_occurs
 
-        # Update max occurs if current value is None and the new value is more than one.
+        # Update max occurs if current value is None or the new value is more than one.
         if self.max_occurs is None or (max_occurs is not None and max_occurs != 1):
             self.max_occurs = max_occurs
 
@@ -190,8 +187,8 @@ class AttrType:
     """
 
     qname: str
-    index: int = field(default_factory=int)
-    alias: Optional[str] = field(default=None)
+    index: int = field(default_factory=int, compare=False)
+    alias: Optional[str] = field(default=None, compare=False)
     native: bool = field(default=False)
     forward: bool = field(default=False)
     circular: bool = field(default=False)
@@ -522,28 +519,21 @@ class Class:
         Collect:
             * base classes
             * attribute types
+            * attribute choice types
             * recursively go through the inner classes
             * Ignore inner class references
             * Ignore native types.
         """
 
-        seen = set()
+        types = {ext.type for ext in self.extensions}
+
         for attr in self.attrs:
-            for attr_type in attr.types:
-                if attr_type.is_dependency and attr_type.name not in seen:
-                    yield attr_type.qname
-                    seen.add(attr_type.name)
+            types.update(attr.types)
+            types.update(tp for choice in attr.choices for tp in choice.types)
 
-            for attr_choice in attr.choices:
-                for attr_type in attr_choice.types:
-                    if attr_type.is_dependency and attr_type.name not in seen:
-                        yield attr_type.qname
-                        seen.add(attr_type.name)
-
-        for ext in self.extensions:
-            if ext.type.is_dependency and ext.type.name not in seen:
-                yield ext.type.qname
-                seen.add(ext.type.name)
+        for tp in types:
+            if tp.is_dependency:
+                yield tp.qname
 
         for inner in self.inner:
             yield from inner.dependencies()

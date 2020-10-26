@@ -473,7 +473,7 @@ class Node:
                 {"name": "x", "type": List[str], "tokens": True},
                 {"name": "y", "type": List[int], "nillable": True},
                 {
-                    "tag": "Wildcard",
+                    "wildcard": True,
                     "type": object,
                     "namespace": "http://www.w3.org/1999/xhtml",
                 },

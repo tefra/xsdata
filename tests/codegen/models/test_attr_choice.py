@@ -1,18 +1,17 @@
 from tests.factories import AttrChoiceFactory
 from tests.factories import FactoryTestCase
-from xsdata.formats.dataclass.models.constants import XmlType
 from xsdata.models.enums import Tag
 
 
 class AttrChoiceTests(FactoryTestCase):
-    def test_property_xml_type(self):
+    def test_property_is_wildcard(self):
         for tag in Tag.names():
             choice = AttrChoiceFactory.create(tag=tag)
 
             if tag == Tag.ANY:
-                self.assertEqual(XmlType.WILDCARD, choice.xml_type)
+                self.assertTrue(choice.is_wildcard)
             else:
-                self.assertIsNone(choice.xml_type)
+                self.assertFalse(choice.is_wildcard)
 
     def test_property_is_tokens(self):
         choice = AttrChoiceFactory.create()

@@ -185,7 +185,7 @@ class Filters:
             return self.filter_metadata(
                 {
                     "name": choice.name,
-                    "tag": choice.xml_type,
+                    "wildcard": choice.is_wildcard,
                     "type": self.choice_type(choice, parents),
                     "namespace": namespace,
                     **restrictions,

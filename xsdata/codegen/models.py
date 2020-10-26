@@ -249,9 +249,9 @@ class AttrChoice:
     restrictions: Restrictions = field(default_factory=Restrictions, compare=False)
 
     @property
-    def xml_type(self) -> Optional[str]:
-        """Return the xml node type this attribute is mapped to."""
-        return XmlType.WILDCARD if self.tag == Tag.ANY else None
+    def is_wildcard(self) -> bool:
+        """Return whether this attribute is derived from xs:any."""
+        return self.tag == Tag.ANY
 
     @property
     def is_tokens(self) -> bool:

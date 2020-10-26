@@ -235,7 +235,6 @@ class XmlSerializer(AbstractSerializer):
         The value can be anything as long as we can match the qualified
         name or its type to a choice.
         """
-        choice = None
         if isinstance(value, DerivedElement):
             choice = var.find_choice(value.qname)
             value = value.value

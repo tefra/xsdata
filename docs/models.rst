@@ -205,7 +205,6 @@ marshalling.
      - str
      - Specifies the field xml namespace.
 
-
 .. warning::
 
     Compound fields preserve elements ordering but instead the direct element name
@@ -223,7 +222,6 @@ marshalling.
 
 
     ``obj.node_or_id_or_idref.extend(("a", "b", 1, "c", "2"))``
-
 
 
 Type: Attribute

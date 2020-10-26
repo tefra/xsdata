@@ -31,22 +31,23 @@ class AttributeChoiceGroupHandler(HandlerInterface):
         """Group attributes into a new compound field."""
 
         pos = target.attrs.index(attrs[0])
-        name = []
+        names = []
         choices = []
         min_occurs = []
         max_occurs = []
         for attr in attrs:
             target.attrs.remove(attr)
-            name.append(attr.local_name)
+            names.append(attr.local_name)
             min_occurs.append(attr.restrictions.min_occurs)
             max_occurs.append(attr.restrictions.max_occurs)
             choices.append(self.convert_attr(attr))
 
+        name = "choice" if len(names) > 3 else "_Or_".join(names)
         target.attrs.insert(
             pos,
             Attr(
-                name="_or_".join(name),
-                local_name="",
+                name=name,
+                local_name=name,
                 index=0,
                 types=[AttrType(qname=DataType.ANY_TYPE.qname, native=True)],
                 tag=Tag.CHOICE,

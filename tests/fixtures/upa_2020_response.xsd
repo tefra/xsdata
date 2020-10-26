@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:upa="http://www.pensioenfederatie.nl/uniformePensioenAangifte/2020/01" targetNamespace="http://www.pensioenfederatie.nl/uniformePensioenAangifte/2020/01" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<annotation>
+		<documentation>--------------------- </documentation>
+		<documentation>Beschrijving van de structuur van een Uniforme Pensioen Aangifte (UPA) response bericht</documentation>
+		<documentation>Gedefinieerd door de Pensioenfederatie</documentation>
+	</annotation>
+	<annotation>
+		<documentation>Versie 2020</documentation>
+		<documentation> - encoding naar UTF-8 gezet </documentation>
+		<documentation> - namespace naar 2020/01 gewijzigd</documentation>
+	</annotation>
+	<simpleType name="BerichtAanmaakDatum">
+		<annotation>
+			<documentation>De dag en het tijdstip waarop het bericht is aangemaakt.</documentation>
+		</annotation>
+		<restriction base="dateTime"/>
+	</simpleType>
+	<simpleType name="LoonheffingenNummer">
+		<annotation>
+			<documentation>Een door de Belastingdienst toegekende identificatie waaronder de administratieve eenheid bekend is bij UWV/Belastingdienst.</documentation>
+		</annotation>
+		<restriction base="string">
+			<maxLength value="12"/>
+		</restriction>
+	</simpleType>
+	<simpleType name="BerichtVersie">
+		<annotation>
+			<documentation>De versie van de berichtspecificatie waarvan gebruik gemaakt is bij het samenstellen van de uniforme pensioenaangifte response bericht</documentation>
+		</annotation>
+		<restriction base="nonNegativeInteger">
+			<totalDigits value="2"/>
+		</restriction>
+	</simpleType>
+	<simpleType name="ResponseBerichtSoort">
+		<annotation>
+			<documentation>Het soort ResponseBericht</documentation>
+		</annotation>
+		<restriction base="string">
+			<enumeration value="ACK">
+				<annotation>
+					<documentation>Ontvangstbevestiging (OK)</documentation>
+				</annotation>
+			</enumeration>
+			<enumeration value="VALID">
+				<annotation>
+					<documentation>Bericht validatie response (OK, OK_BUT of NOK)</documentation>
+				</annotation>
+			</enumeration>
+			<enumeration value="RES">
+				<annotation>
+					<documentation>Verwerkingsresultaat, met verwerkingsmeldingen (OK, OK_BUT)</documentation>
+				</annotation>
+			</enumeration>
+		</restriction>
+	</simpleType>
+	<simpleType name="ResponseBerichtStatus">
+		<annotation>
+			<documentation>De status behorende bij het ResponseBerichtSoort</documentation>
+		</annotation>
+		<restriction base="string">
+			<enumeration value="OK">
+				<annotation>
+					<documentation>Bericht OK</documentation>
+					<documentation>Er zijn geen meldingen die leiden tot uitval van inkomensverhoudingen.</documentation>
+				</annotation>
+			</enumeration>
+			<enumeration value="NOK">
+				<annotation>
+					<documentation>Bericht Niet OK</documentation>
+					<documentation>Het bestand zoals aangeleverd wordt niet verwerkt. Er zijn verwerkingsmeldingen die dusdanig gekwalificeerd zijn dat verwerking niet mogelijk is of toegestaan.</documentation>
+				</annotation>
+			</enumeration>
+			<enumeration value="OK_BUT">
+				<annotation>
+					<documentation>Bericht resultaat, met verwerkingsmeldingen</documentation>
+					<documentation>Er zijn meldingen die leiden tot uitval van inkomensverhoudingen, maar het bestand is verder wel verwerkbaar.</documentation>
+				</annotation>
+			</enumeration>
+		</restriction>
+	</simpleType>
+	<simpleType name="NonEmptyString">
+		<annotation>
+			<documentation>Helper klasse: zorgt ervoor dat een string minimaal 1 karakter heeft</documentation>
+			<documentation>NIET bedoeld om rechtstreeks gebruikt te worden, WEL om gespecialiseerd te worden</documentation>
+		</annotation>
+		<restriction base="string">
+			<minLength value="1"/>
+		</restriction>
+	</simpleType>
+	<simpleType name="BerichtId">
+		<annotation>
+			<documentation>Unieke door de inzender aan het bericht toegekende code ter identificatie van het bericht.</documentation>
+			<documentation>
+        Het kenmerk dient uniek te zijn. Het verdient aanbeveling om het loonheffingennummer van de administratieve eenheid er in op te nemen.
+        Dit bericht kenmerk wordt gebruikt in de terugkoppeling aan de inzender.
+        De waarde mag anders zijn dan de waarde die ingevuld wordt bij de Loonaangifte.
+      </documentation>
+		</annotation>
+		<restriction base="upa:NonEmptyString">
+			<maxLength value="32"/>
+		</restriction>
+	</simpleType>
+	<complexType name="InkomstenverhoudingRefType">
+		<sequence>
+			<element name="NumIV" type="string"/>
+			<element name="PersNr" type="string" minOccurs="0"/>
+			<element name="SofiNr" type="string" minOccurs="0"/>
+		</sequence>
+	</complexType>
+	<simpleType name="ResultCodeType">
+		<annotation>
+			<documentation>Een korte code die het resultaat uniek definieert.</documentation>
+			<documentation>Deels gedefinieerd in de UPA bericht definitie bij de verschillende attributen etc.</documentation>
+			<documentation>Voor resultaatcodes vanuit de verwerking horen de codes te beginnen met PUO.</documentation>
+		</annotation>
+		<restriction base="string">
+			<maxLength value="16"/>
+		</restriction>
+	</simpleType>
+	<simpleType name="ResultMeldingType">
+		<annotation>
+			<documentation>Een korte omschrijving m.b.t. de resultaat code.</documentation>
+			<documentation>Deels gedefinieerd in de UPA bericht definitie bij de verschillende attributen etc.</documentation>
+		</annotation>
+		<restriction base="string">
+			<maxLength value="200"/>
+		</restriction>
+	</simpleType>
+	<simpleType name="BerichtFragmentType">
+		<annotation>
+			<documentation>Een deel van het bericht waar de melding betrekking op heeft.</documentation>
+		</annotation>
+		<restriction base="string">
+			<maxLength value="200"/>
+		</restriction>
+	</simpleType>
+	<simpleType name="ResultFoutOfWaarschuwingType">
+		<restriction base="string">
+			<length value="1"/>
+			<enumeration value="F">
+				<annotation>
+					<documentation>Fout</documentation>
+				</annotation>
+			</enumeration>
+			<enumeration value="W">
+				<annotation>
+					<documentation>Waarschuwing</documentation>
+				</annotation>
+			</enumeration>
+		</restriction>
+	</simpleType>
+	<complexType name="PositionInBerichtType">
+		<sequence>
+			<element name="LineNumber" type="integer"/>
+			<element name="LinePosition" type="integer" minOccurs="0"/>
+		</sequence>
+	</complexType>
+	<complexType name="UPAResponseType">
+		<sequence>
+			<element name="ResCode" type="upa:ResultCodeType"/>
+			<element name="ResFout" type="upa:ResultFoutOfWaarschuwingType"/>
+			<element name="ResMelding" type="upa:ResultMeldingType"/>
+			<element name="ResMeldingDetail" type="upa:ResultMeldingType" minOccurs="0">
+				<annotation>
+					<documentation>Een toevoeging op de ResMelding die meer defail bevat van de melding.</documentation>
+				</annotation>
+			</element>
+			<element name="IkvRef" type="upa:InkomstenverhoudingRefType" minOccurs="0"/>
+			<element name="PositionInBericht" type="upa:PositionInBerichtType" minOccurs="0"/>
+			<element name="BerichtFragment" type="upa:BerichtFragmentType" minOccurs="0"/>
+		</sequence>
+	</complexType>
+	<complexType name="AdministratieveEenheidResponseType">
+		<sequence>
+			<element name="LhNr" type="upa:LoonheffingenNummer"/>
+			<element name="DatTdAanmAEH" type="upa:BerichtAanmaakDatum">
+				<annotation>
+					<documentation>De dag en het tijdstip waarop het inkomende bericht voor de administratieve eenheid was aangemaakt.</documentation>
+				</annotation>
+			</element>
+			<element name="DatTdAanmResp" type="upa:BerichtAanmaakDatum">
+				<annotation>
+					<documentation>De dag en het tijdstip waarop het response bericht voor de administratieve eenheid is aangemaakt.</documentation>
+				</annotation>
+			</element>
+			<element name="Response" type="upa:UPAResponseType" minOccurs="0" maxOccurs="unbounded"/>
+		</sequence>
+	</complexType>
+	<complexType name="ResponseBerichtInfoType">
+		<annotation>
+			<documentation>De meta-data van het bericht: wie levert het aan, etc...</documentation>
+		</annotation>
+		<sequence>
+			<element name="RespSrt" type="upa:ResponseBerichtSoort"/>
+			<element name="IdBer" type="upa:BerichtId"/>
+			<element name="RespStat" type="upa:ResponseBerichtStatus"/>
+			<element name="IdLcr">
+				<annotation>
+					<documentation>Het nummer van de gegevensleverancier die via de geautomatiseerde administratie het oorspronkelijke bericht heeft gemaakt. </documentation>
+					<documentation>Dit nummer is bekend bij de leverancier en is uitgegeven door â¦.</documentation>
+				</annotation>
+				<simpleType>
+					<restriction base="upa:NonEmptyString">
+						<maxLength value="9"/>
+					</restriction>
+				</simpleType>
+			</element>
+		</sequence>
+	</complexType>
+	<element name="PensioenAangifteResponse">
+		<annotation>
+			<documentation> Structuur van het aan te leveren bericht </documentation>
+		</annotation>
+		<complexType>
+			<sequence>
+				<element name="Bericht" type="upa:ResponseBerichtInfoType"/>
+				<element name="AdministratieveEenheid" type="upa:AdministratieveEenheidResponseType"/>
+				<element name="SysteemMelding" type="string" minOccurs="0"/>
+			</sequence>
+			<attribute name="Version">
+				<simpleType>
+					<restriction base="token">
+						<enumeration value="1.0"/>
+					</restriction>
+				</simpleType>
+			</attribute>
+		</complexType>
+	</element>
+</schema>

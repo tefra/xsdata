@@ -103,21 +103,19 @@ class SchemaMapper:
     def build_class_extensions(cls, obj: ElementBase, target: Class):
         """Build the item class extensions from the given ElementBase
         children."""
-        extensions = {}
+        extensions = set()
         raw_type = obj.raw_type
         if raw_type:
             restrictions = obj.get_restrictions()
-            extension = cls.build_class_extension(target, raw_type, 0, restrictions)
-            extensions[raw_type] = extension
+            extensions.add(cls.build_class_extension(target, raw_type, restrictions))
 
-        for extension in cls.children_extensions(obj, target):
-            extensions[extension.type.name] = extension
+        extensions.update(cls.children_extensions(obj, target))
 
-        target.extensions = sorted(extensions.values(), key=lambda x: x.type.index)
+        target.extensions = list(extensions)
 
     @classmethod
     def build_data_type(
-        cls, target: Class, name: str, index: int = 0, forward: bool = False
+        cls, target: Class, name: str, forward: bool = False
     ) -> AttrType:
         """Create an attribute type for the target class."""
         prefix, suffix = text.split(name)
@@ -129,7 +127,6 @@ class SchemaMapper:
 
         return AttrType(
             qname=build_qname(namespace, suffix),
-            index=index,
             native=native,
             forward=forward,
         )
@@ -192,19 +189,17 @@ class SchemaMapper:
                 continue
 
             for ext in child.extensions:
-                yield cls.build_class_extension(
-                    target, ext, child.index, child.get_restrictions()
-                )
+                yield cls.build_class_extension(target, ext, child.get_restrictions())
 
             yield from cls.children_extensions(child, target)
 
     @classmethod
     def build_class_extension(
-        cls, target: Class, name: str, index: int, restrictions: Dict
+        cls, target: Class, name: str, restrictions: Dict
     ) -> Extension:
         """Create an extension for the target class."""
         return Extension(
-            type=cls.build_data_type(target, name, index=index),
+            type=cls.build_data_type(target, name),
             restrictions=Restrictions(**restrictions),
         )
 

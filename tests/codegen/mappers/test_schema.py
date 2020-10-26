@@ -166,9 +166,9 @@ class SchemaMapperTests(FactoryTestCase):
 
     @mock.patch.object(SchemaMapper, "children_extensions")
     def test_build_class_extensions(self, mock_children_extensions):
-        bar_type = AttrTypeFactory.create(qname="bar", index=3)
-        foo_type = AttrTypeFactory.create(qname="foo", index=1)
-        some_type = AttrTypeFactory.create(qname="{xsdata}something", index=0)
+        bar_type = AttrTypeFactory.create(qname="bar")
+        foo_type = AttrTypeFactory.create(qname="foo")
+        some_type = AttrTypeFactory.create(qname="{xsdata}something")
 
         bar = ExtensionFactory.create(type=bar_type)
         double = ExtensionFactory.create(type=bar_type)
@@ -184,9 +184,7 @@ class SchemaMapperTests(FactoryTestCase):
         SchemaMapper.build_class_extensions(element, item)
 
         self.assertEqual(3, len(item.extensions))
-        self.assertEqual(self_ext, item.extensions[0])
-        self.assertIs(foo, item.extensions[1])
-        self.assertIs(double, item.extensions[2])
+        self.assertCountEqual([bar, self_ext, foo], item.extensions)
 
     def test_element_children(self):
         sequence_one = Sequence(elements=[Element(), Element()])
@@ -245,8 +243,8 @@ class SchemaMapperTests(FactoryTestCase):
             map(
                 ExtensionFactory.create,
                 [
-                    AttrTypeFactory.create(qname=build_qname("book", "b"), index=4),
-                    AttrTypeFactory.create(qname=build_qname("book", "c"), index=7),
+                    AttrTypeFactory.create(qname=build_qname("book", "b")),
+                    AttrTypeFactory.create(qname=build_qname("book", "c")),
                 ],
             )
         )

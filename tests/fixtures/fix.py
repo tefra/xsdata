@@ -13,7 +13,7 @@ for xsd in files:
         lines.insert(pos, root_start)
         lines.append(root_end)
 
-        xsd.write_text("\n".join(lines))
+        xsd.write_text("\n".join(lines), encoding="utf-8")
 
     if "-" in xsd.name:
         name = xsd.name.replace("-", "")

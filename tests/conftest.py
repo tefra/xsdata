@@ -20,11 +20,11 @@ def validate_bindings(schema: Path, clazz: Type):
         assert expected.read_text() == actual
         assert obj == JsonParser().from_string(actual, clazz)
     else:
-        expected.write_text(actual)
+        expected.write_text(actual, encoding="utf-8")
 
     xml = XmlSerializer(pretty_print=True).render(obj)
 
     validator = etree.XMLSchema(etree.parse(str(schema)))
     assert validator.validate(etree.fromstring(xml.encode())), validator.error_log
 
-    expected.with_suffix(".xsdata.xml").write_text(xml)
+    expected.with_suffix(".xsdata.xml").write_text(xml, encoding="utf-8")

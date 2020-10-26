@@ -116,7 +116,7 @@ class Downloader:
             file_path = self.output.joinpath(Path(uri).name)
 
         file_path.parent.mkdir(parents=True, exist_ok=True)
-        file_path.write_text(content)
+        file_path.write_text(content, encoding="utf-8")
 
         logger.info("Writing %s", file_path)
         self.downloaded[uri] = file_path

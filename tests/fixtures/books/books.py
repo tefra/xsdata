@@ -97,6 +97,7 @@ class BooksForm:
 
 @dataclass
 class Books(BooksForm):
+    """Το βιβλίο."""
     class Meta:
         name = "books"
         namespace = "urn:books"

@@ -1,5 +1,11 @@
 <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="urn:books" xmlns:bks="urn:books">
-  <xsd:element name="books" type="bks:BooksForm" />
+  <xsd:element name="books" type="bks:BooksForm">
+  <xsd:annotation>
+    <xsd:documentation>
+      Το βιβλίο
+    </xsd:documentation>
+  </xsd:annotation>
+  </xsd:element>
   <xsd:complexType name="BooksForm">
     <xsd:sequence>
       <xsd:element name="book" type="bks:BookForm" minOccurs="0" maxOccurs="unbounded" />

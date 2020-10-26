@@ -46,8 +46,8 @@ class AttributeChoiceGroupHandlerTests(FactoryTestCase):
         target.attrs[1].restrictions.max_occurs = 20
 
         expected = AttrFactory.create(
-            name="attr_B_or_attr_C",
-            local_name="",
+            name="attr_B_Or_attr_C",
+            local_name="attr_B_Or_attr_C",
             tag="Choice",
             index=0,
             types=[AttrTypeFactory.xs_any()],
@@ -70,6 +70,17 @@ class AttributeChoiceGroupHandlerTests(FactoryTestCase):
         self.assertEqual(1, len(target.attrs))
         self.assertEqual(expected, target.attrs[0])
         self.assertEqual(expected_res, target.attrs[0].restrictions)
+
+    def test_group_attrs_limit_name(self):
+        target = ClassFactory.create(attrs=AttrFactory.list(3))
+        self.processor.group_attrs(target, list(target.attrs))
+
+        self.assertEqual(1, len(target.attrs))
+        self.assertEqual("attr_B_Or_attr_C_Or_attr_D", target.attrs[0].name)
+
+        target = ClassFactory.create(attrs=AttrFactory.list(4))
+        self.processor.group_attrs(target, list(target.attrs))
+        self.assertEqual("choice", target.attrs[0].name)
 
     def test_convert_attr(self):
         attr = AttrFactory.create(

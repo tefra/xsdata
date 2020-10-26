@@ -4,7 +4,6 @@ from tests.factories import ClassFactory
 from tests.factories import FactoryTestCase
 from xsdata.codegen.container import ClassContainer
 from xsdata.codegen.handlers import AttributeEnumUnionHandler
-from xsdata.models.config import GeneratorConfig
 from xsdata.models.enums import Tag
 
 
@@ -30,8 +29,7 @@ class AttributeEnumUnionHandlerTests(FactoryTestCase):
         )
         self.target.inner.append(self.inner_enum)
 
-        config = GeneratorConfig()
-        container = ClassContainer.from_list([self.target, self.root_enum], config)
+        container = ClassContainer.from_list([self.target, self.root_enum])
         self.processor = AttributeEnumUnionHandler(container=container)
 
     def test_process_skip_when_class_has_more_than_one_attribute(self):

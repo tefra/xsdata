@@ -1,4 +1,3 @@
-from xsdata.codegen.handlers.attribute_choice_group import AttributeChoiceGroupHandler
 from xsdata.codegen.handlers.attribute_enum_union import AttributeEnumUnionHandler
 from xsdata.codegen.handlers.attribute_group import AttributeGroupHandler
 from xsdata.codegen.handlers.attribute_merge import AttributeMergeHandler
@@ -9,7 +8,6 @@ from xsdata.codegen.handlers.attribute_type import AttributeTypeHandler
 from xsdata.codegen.handlers.class_extension import ClassExtensionHandler
 
 __all__ = [
-    "AttributeChoiceGroupHandler",
     "AttributeEnumUnionHandler",
     "AttributeGroupHandler",
     "AttributeMergeHandler",

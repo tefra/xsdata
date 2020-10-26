@@ -56,7 +56,7 @@ class GeneratorConfigTests(TestCase):
         )
         version = get_distribution("xsdata").version
         file_path = Path(tempfile.mktemp())
-        file_path.write_text(existing)
+        file_path.write_text(existing, encoding="utf-8")
         config = GeneratorConfig.read(file_path)
         with file_path.open("w") as fp:
             GeneratorConfig.write(fp, config)

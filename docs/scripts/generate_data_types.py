@@ -46,4 +46,6 @@ output.append("      -")
 output.append("      -")
 output.append("")
 
-docs_root.joinpath("data_types_table.rst").write_text("\n".join(output))
+docs_root.joinpath("data_types_table.rst").write_text(
+    "\n".join(output), encoding="utf-8"
+)

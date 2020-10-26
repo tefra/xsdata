@@ -30,7 +30,7 @@ class CodeWriter:
                 logger.info("Generating package: %s", result.title)
 
                 result.path.parent.mkdir(parents=True, exist_ok=True)
-                result.path.write_text(result.source)
+                result.path.write_text(result.source, encoding="utf-8")
 
     def print(self, classes: List[Class]):
         """Iterate over the designated generator outputs and print them to the

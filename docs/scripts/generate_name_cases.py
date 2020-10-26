@@ -41,4 +41,6 @@ while i < len(result[lookup]):
 
 output.append("")
 
-docs_root.joinpath("name_cases_table.rst").write_text("\n".join(output))
+docs_root.joinpath("name_cases_table.rst").write_text(
+    "\n".join(output), encoding="utf-8"
+)

@@ -110,7 +110,10 @@ def generate():
         title = "{line}\n{title}\n{line}".format(line="*" * len(title), title=title)
 
         file = docs_root.joinpath(f"defxmlschema/{chapter}.rst")
-        file.write_text(chapter_tpl.format(title=title, output="\n\n".join(buffer)))
+        file.write_text(
+            chapter_tpl.format(title=title, output="\n\n".join(buffer)),
+            encoding="utf-8",
+        )
         print(f"Writing: {file}")
 
 

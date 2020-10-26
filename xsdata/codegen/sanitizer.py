@@ -5,9 +5,14 @@ from typing import Optional
 
 from xsdata.codegen.container import ClassContainer
 from xsdata.codegen.models import Attr
+from xsdata.codegen.models import AttrChoice
 from xsdata.codegen.models import AttrType
 from xsdata.codegen.models import Class
+from xsdata.codegen.models import Restrictions
 from xsdata.logger import logger
+from xsdata.models.config import GeneratorConfig
+from xsdata.models.enums import DataType
+from xsdata.models.enums import Tag
 from xsdata.utils import collections
 from xsdata.utils.collections import first
 from xsdata.utils.collections import group_by
@@ -22,12 +27,13 @@ class ClassSanitizer:
     the analyzer processors."""
 
     container: ClassContainer
+    config: GeneratorConfig
 
     @classmethod
-    def process(cls, container: ClassContainer):
+    def process(cls, container: ClassContainer, config: GeneratorConfig):
         """Iterate through all classes and run the sanitizer procedure."""
 
-        sanitizer = cls(container)
+        sanitizer = cls(container, config)
 
         collections.apply(container.iterate(), sanitizer.process_class)
 
@@ -48,6 +54,9 @@ class ClassSanitizer:
         """
         collections.apply(target.inner, self.process_class)
 
+        if self.config.output.compound_fields:
+            self.group_compound_fields(target)
+
         for attr in target.attrs:
             self.process_attribute_default(target, attr)
             self.process_attribute_restrictions(attr)
@@ -55,6 +64,46 @@ class ClassSanitizer:
             self.process_attribute_sequence(target, attr)
 
         self.process_duplicate_attribute_names(target.attrs)
+
+    def group_compound_fields(self, target: Class):
+        """Group and process target attributes by the choice group."""
+
+        groups = group_by(target.attrs, lambda x: x.restrictions.choice)
+        for choice, attrs in groups.items():
+            if choice and len(attrs) > 1 and any(attr.is_list for attr in attrs):
+                self.group_fields(target, attrs)
+
+    def group_fields(self, target: Class, attrs: List[Attr]):
+        """Group attributes into a new compound field."""
+
+        pos = target.attrs.index(attrs[0])
+        names = []
+        choices = []
+        min_occurs = []
+        max_occurs = []
+        for attr in attrs:
+            target.attrs.remove(attr)
+            names.append(attr.local_name)
+            min_occurs.append(attr.restrictions.min_occurs)
+            max_occurs.append(attr.restrictions.max_occurs)
+            choices.append(self.build_attr_choice(attr))
+
+        name = "choice" if len(names) > 3 else "_Or_".join(names)
+        target.attrs.insert(
+            pos,
+            Attr(
+                name=name,
+                local_name=name,
+                index=0,
+                types=[AttrType(qname=DataType.ANY_TYPE.qname, native=True)],
+                tag=Tag.CHOICE,
+                restrictions=Restrictions(
+                    min_occurs=min((x for x in min_occurs if x is not None), default=0),
+                    max_occurs=max((x for x in max_occurs if x is not None), default=0),
+                ),
+                choices=choices,
+            ),
+        )
 
     def process_attribute_default(self, target: Class, attr: Attr):
         """
@@ -331,3 +380,25 @@ class ClassSanitizer:
         else:
             change = b if b.is_attribute else a
             change.name = f"{change.name}_{change.tag}"
+
+    @classmethod
+    def build_attr_choice(cls, attr: Attr) -> AttrChoice:
+        """
+        Converts the given attr to a choice.
+
+        The most important part is the reset of certain restrictions
+        that don't make sense as choice metadata like occurrences.
+        """
+        restrictions = attr.restrictions.clone()
+        restrictions.min_occurs = None
+        restrictions.max_occurs = None
+        restrictions.sequential = None
+
+        return AttrChoice(
+            name=attr.local_name,
+            namespace=attr.namespace,
+            default=attr.default,
+            types=attr.types,
+            tag=attr.tag,
+            restrictions=restrictions,
+        )

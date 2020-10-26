@@ -28,7 +28,7 @@ class ClassAnalyzerTests(FactoryTestCase):
     ):
         config = GeneratorConfig()
         classes = ClassFactory.list(2)
-        container = ClassContainer.from_list(classes, config)
+        container = ClassContainer.from_list(classes)
 
         result = ClassAnalyzer.process(classes, config)
 
@@ -37,7 +37,7 @@ class ClassAnalyzerTests(FactoryTestCase):
         mock_validator_process.assert_called_once_with(container)
         mock_container_process.assert_called_once_with()
         mock_container_filter_classes.assert_called_once_with()
-        mock_sanitizer_process.assert_called_once_with(container)
+        mock_sanitizer_process.assert_called_once_with(container, config)
         mock_validate_references.assert_called_once_with(classes)
 
     def test_class_references(self):

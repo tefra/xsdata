@@ -17,7 +17,7 @@ class ClassAnalyzer:
         """Run all the processes."""
 
         # Wrap classes with container for easy access.
-        container = ClassContainer.from_list(classes, config)
+        container = ClassContainer.from_list(classes)
 
         # Run validation checks for duplicate, invalid and redefined types.
         ClassValidator.process(container)
@@ -29,7 +29,7 @@ class ClassAnalyzer:
         container.filter_classes()
 
         # Sanitize class attributes after merging and flattening types and extensions.
-        ClassSanitizer.process(container)
+        ClassSanitizer.process(container, config)
 
         classes = container.class_list
         cls.validate_references(classes)

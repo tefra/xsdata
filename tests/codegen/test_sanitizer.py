@@ -1,5 +1,6 @@
 from unittest import mock
 
+from tests.factories import AttrChoiceFactory
 from tests.factories import AttrFactory
 from tests.factories import AttrTypeFactory
 from tests.factories import ClassFactory
@@ -9,6 +10,7 @@ from xsdata.codegen.container import ClassContainer
 from xsdata.codegen.models import Class
 from xsdata.codegen.models import Restrictions
 from xsdata.codegen.sanitizer import ClassSanitizer
+from xsdata.models.config import GeneratorConfig
 from xsdata.models.enums import Namespace
 from xsdata.models.enums import Tag
 from xsdata.models.xsd import ComplexType
@@ -19,8 +21,9 @@ class ClassSanitizerTest(FactoryTestCase):
     def setUp(self):
         super().setUp()
 
+        self.config = GeneratorConfig()
         self.container = ClassContainer()
-        self.sanitizer = ClassSanitizer(container=self.container)
+        self.sanitizer = ClassSanitizer(container=self.container, config=self.config)
 
     @mock.patch.object(ClassSanitizer, "resolve_conflicts")
     @mock.patch.object(ClassSanitizer, "process_class")
@@ -28,7 +31,7 @@ class ClassSanitizerTest(FactoryTestCase):
         classes = ClassFactory.list(2)
 
         self.sanitizer.container.extend(classes)
-        ClassSanitizer.process(self.container)
+        ClassSanitizer.process(self.container, self.config)
 
         mock_process_class.assert_has_calls(list(map(mock.call, classes)))
         mock_resolve_conflicts.assert_called_once_with()
@@ -70,6 +73,22 @@ class ClassSanitizerTest(FactoryTestCase):
         mock_process_attribute_sequence.assert_has_calls(calls_with_target)
         mock_process_duplicate_attribute_names.assert_has_calls(
             [mock.call(target.inner[0].attrs), mock.call(target.attrs)]
+        )
+
+    @mock.patch.object(ClassSanitizer, "group_compound_fields")
+    def test_process_class_group_compound_fields(self, mock_group_compound_fields):
+        target = ClassFactory.create()
+        inner = ClassFactory.create()
+        target.inner.append(inner)
+
+        self.config.output.compound_fields = True
+        self.sanitizer.process_class(target)
+
+        mock_group_compound_fields.assert_has_calls(
+            [
+                mock.call(inner),
+                mock.call(target),
+            ]
         )
 
     def test_process_attribute_default_with_enumeration(self):
@@ -444,3 +463,109 @@ class ClassSanitizerTest(FactoryTestCase):
         dependencies = set(target.dependencies())
         self.assertNotIn("{foo}bar", dependencies)
         self.assertIn("thug", dependencies)
+
+    @mock.patch.object(ClassSanitizer, "group_fields")
+    def test_group_compound_fields(self, mock_group_fields):
+        target = ClassFactory.elements(8)
+        # First group repeating
+        target.attrs[0].restrictions.choice = "1"
+        target.attrs[1].restrictions.choice = "1"
+        target.attrs[1].restrictions.max_occurs = 2
+        # Second group repeating
+        target.attrs[2].restrictions.choice = "2"
+        target.attrs[3].restrictions.choice = "2"
+        target.attrs[3].restrictions.max_occurs = 2
+        # Third group optional
+        target.attrs[4].restrictions.choice = "3"
+        target.attrs[5].restrictions.choice = "3"
+
+        self.sanitizer.group_compound_fields(target)
+        mock_group_fields.assert_has_calls(
+            [
+                mock.call(target, target.attrs[0:2]),
+                mock.call(target, target.attrs[2:4]),
+            ]
+        )
+
+    def test_group_fields(self):
+        target = ClassFactory.create(attrs=AttrFactory.list(2))
+        target.attrs[0].restrictions.min_occurs = 10
+        target.attrs[0].restrictions.max_occurs = 15
+        target.attrs[1].restrictions.min_occurs = 5
+        target.attrs[1].restrictions.max_occurs = 20
+
+        expected = AttrFactory.create(
+            name="attr_B_Or_attr_C",
+            local_name="attr_B_Or_attr_C",
+            tag="Choice",
+            index=0,
+            types=[AttrTypeFactory.xs_any()],
+            choices=[
+                AttrChoiceFactory.create(
+                    tag=target.attrs[0].tag,
+                    name="attr_B",
+                    types=target.attrs[0].types,
+                ),
+                AttrChoiceFactory.create(
+                    tag=target.attrs[1].tag,
+                    name="attr_C",
+                    types=target.attrs[1].types,
+                ),
+            ],
+        )
+        expected_res = Restrictions(min_occurs=5, max_occurs=20)
+
+        self.sanitizer.group_fields(target, list(target.attrs))
+        self.assertEqual(1, len(target.attrs))
+        self.assertEqual(expected, target.attrs[0])
+        self.assertEqual(expected_res, target.attrs[0].restrictions)
+
+    def test_group_fields_limit_name(self):
+        target = ClassFactory.create(attrs=AttrFactory.list(3))
+        self.sanitizer.group_fields(target, list(target.attrs))
+
+        self.assertEqual(1, len(target.attrs))
+        self.assertEqual("attr_B_Or_attr_C_Or_attr_D", target.attrs[0].name)
+
+        target = ClassFactory.create(attrs=AttrFactory.list(4))
+        self.sanitizer.group_fields(target, list(target.attrs))
+        self.assertEqual("choice", target.attrs[0].name)
+
+    def test_build_attr_choice(self):
+        attr = AttrFactory.create(
+            name="a", local_name="aaa", namespace="xsdata", default="123"
+        )
+        attr.restrictions = Restrictions(
+            required=True,
+            prohibited=None,
+            min_occurs=1,
+            max_occurs=1,
+            min_exclusive="1.1",
+            min_inclusive="1",
+            min_length=1,
+            max_exclusive="1",
+            max_inclusive="1.1",
+            max_length=10,
+            total_digits=333,
+            fraction_digits=2,
+            length=5,
+            white_space="collapse",
+            pattern=r"[A-Z]",
+            explicit_timezone="+1",
+            nillable=True,
+            choice="abc",
+            sequential=True,
+        )
+        expected_res = attr.restrictions.clone()
+        expected_res.min_occurs = None
+        expected_res.max_occurs = None
+        expected_res.sequential = None
+
+        actual = self.sanitizer.build_attr_choice(attr)
+
+        self.assertEqual(attr.local_name, actual.name)
+        self.assertEqual(attr.namespace, actual.namespace)
+        self.assertEqual(attr.default, actual.default)
+        self.assertEqual(attr.tag, actual.tag)
+        self.assertEqual(attr.types, actual.types)
+        self.assertEqual(expected_res, actual.restrictions)

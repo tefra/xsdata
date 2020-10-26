@@ -218,7 +218,7 @@ class SchemaMapper:
         types = cls.build_class_attribute_types(target, obj)
         restrictions = Restrictions.from_element(obj)
 
-        if obj.class_name in (Tag.ELEMENT, Tag.ANY):
+        if obj.class_name in (Tag.ELEMENT, Tag.ANY, Tag.GROUP):
             restrictions.merge(parent_restrictions)
 
         if restrictions.prohibited:

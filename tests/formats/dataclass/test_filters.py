@@ -270,7 +270,7 @@ class FiltersTests(FactoryTestCase):
             {
                 "name": "choice_D",
                 "namespace": "##other",
-                "tag": "Wildcard",
+                "wildcard": True,
                 "type": "Type[object]",
             },
         ]

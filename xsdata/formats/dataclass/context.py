@@ -186,7 +186,7 @@ class XmlContext:
     ):
         globalns = sys.modules[clazz.__module__].__dict__
         for choice in choices:
-            xml_type = choice.get("tag", XmlType.ELEMENT)
+            xml_type = XmlType.WILDCARD if choice.get("wildcard") else XmlType.ELEMENT
             namespace = choice.get("namespace")
             namespaces = self.resolve_namespaces(xml_type, namespace, parent_namespace)
             default_namespace = self.default_namespace(namespaces)

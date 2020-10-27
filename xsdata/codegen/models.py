@@ -179,7 +179,6 @@ class AttrType:
     Model representation for the typing information for fields and extensions.
 
     :param qname:
-    :param index:
     :param alias:
     :param native:
     :param forward:
@@ -187,7 +186,6 @@ class AttrType:
     """
 
     qname: str
-    index: int = field(default_factory=int, compare=False)
     alias: Optional[str] = field(default=None, compare=False)
     native: bool = field(default=False)
     forward: bool = field(default=False)
@@ -249,9 +247,9 @@ class AttrChoice:
     restrictions: Restrictions = field(default_factory=Restrictions, compare=False)
 
     @property
-    def xml_type(self) -> Optional[str]:
-        """Return the xml node type this attribute is mapped to."""
-        return XmlType.WILDCARD if self.tag == Tag.ANY else None
+    def is_wildcard(self) -> bool:
+        """Return whether this attribute is derived from xs:any."""
+        return self.tag == Tag.ANY
 
     @property
     def is_tokens(self) -> bool:
@@ -371,7 +369,7 @@ class Attr:
         )
 
 
-@dataclass
+@dataclass(unsafe_hash=True)
 class Extension:
     """
     Model representation of a dataclass base class.
@@ -381,7 +379,7 @@ class Extension:
     """
 
     type: AttrType
-    restrictions: Restrictions
+    restrictions: Restrictions = field(hash=False)
 
     def clone(self) -> "Extension":
         """Return a deep cloned instance."""

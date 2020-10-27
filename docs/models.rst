@@ -67,7 +67,8 @@ Field Metadata
      - The real name of the element or attribute this field represents.
    * - type
      - str
-     - The field xml type: ``Text | Element | Attribute | Wildcard | Attributes``,
+     - The field xml type:
+       ``Text | Element | Elements | Attribute | Wildcard | Attributes``,
        default: ``Text`` or ``Element``
    * - nillable
      - bool
@@ -116,10 +117,10 @@ container for other elements, attributes, text or any combination of them.
 
     annotation: List[Annotation] = field(
         default_factory=list,
-        metadata=dict(
-            name="annotation",
-            type="Element",
-            namespace="http://www.w3.org/XML/2004/xml-schema-test-suite/",
+        metadata={
+            "name": "annotation",
+            "type": "Element",
+            "namespace": "http://www.w3.org/XML/2004/xml-schema-test-suite/",
         )
     )
 
@@ -130,6 +131,99 @@ container for other elements, attributes, text or any combination of them.
     <annotation xmlns="http://www.w3.org/2001/XMLSchema">...</annotation>
    ...
 
+Type: Elements
+~~~~~~~~~~~~~~
+
+This type represents repeating xs:choice elements. It's a compound list field for
+elements and wildcards that can be used to preserve elements ordering between data
+marshalling.
+
+
+.. code-block:: python
+
+    node_or_id_or_idref: List[object] = field(
+        default_factory=list,
+        metadata={
+            "type": "Elements",
+            "choices": (
+                {
+                    "name": "node",
+                    "type": Type["Node"],
+                },
+                {
+                    "name": "e1",
+                    "type": str,
+                    "nillable": True,
+                },
+                {
+                    "name": "e2",
+                    "type": int,
+                    "namespace": "xsdata",
+                },
+            ),
+        }
+    )
+
+.. code-block:: xml
+
+    <e1 xmlns="xsdata">a</e1>
+    <e1 xmlns="xsdata">b</e1>
+    <e2 xmlns="xsdata">1</e1>
+    <e1 xmlns="xsdata">c</e1>
+    <e2 xmlns="xsdata">2</e1>
+   ...
+
+
+**Choice Metadata**
+
+.. list-table::
+   :widths: 20 10 250
+   :header-rows: 1
+
+   * - Property
+     - Type
+     - Description
+   * - name
+     - str
+     - The real name of the element this choice represents.
+   * - type
+     - str
+     - The field type hint.
+   * - nillable
+     - bool
+     - Specifies whether an explicit empty value can be assigned.
+   * - wildcard
+     - bool
+     - Specifies whether this is a ``Wildcard`` that can match any tag.
+   * - tokens
+     - bool
+     - Use a list to map simple values.
+
+       eg ``element: List[Union[int, bool, str]]
+       -> <element>1 a true</element> -> [1, "a", True]``
+   * - namespace
+     - str
+     - Specifies the field xml namespace.
+
+.. warning::
+
+    Compound fields preserve elements ordering but instead the direct element name
+    association is lost during marshalling. If the choices include multiple elements
+    with the same type then it's actually impossible to map correctly values to
+    elements.
+
+    For that reason the xml parser will use the generic class
+    :class:`~xsdata.formats.dataclass.models.generics.DerivedElement` to wrap values
+    in order to maintain the original qualified name as well.
+
+    If your compound field includes only unique types and you are working with a
+    dataclass instance manually you can skip the usage of the wrapper as the xml
+    serializer will try to match a type to a choice as well.
+
+
+    ``obj.node_or_id_or_idref.extend(("a", "b", 1, "c", "2"))``
+
+
 Type: Attribute
 ~~~~~~~~~~~~~~~
 
@@ -139,10 +233,10 @@ This type represents a traditional xml attribute.
 
     language: Optional[str] = field(
         default=None,
-        metadata=dict(
-            name="lang",
-            type="Attribute",
-            namespace="http://www.w3.org/XML/1998/namespace"
+        metadata={
+            "name": "lang",
+            "type": "Attribute",
+            "namespace": "http://www.w3.org/XML/1998/namespace"
         )
     )
 
@@ -177,10 +271,10 @@ Wildcards can have a normal uri namespace or use one of xml schema generics.
 
     any_element: List[object] = field(
         default_factory=list,
-        metadata=dict(
-            type="Wildcard",
-            namespace="##any",
-        )
+        metadata={
+            "type": "Wildcard",
+            "namespace": "##any",
+        }
     )
 
 This type of field accepts any primitive value or an another dataclass instance or a
@@ -197,10 +291,10 @@ a dictionary of. The wildcard namespace features also apply.
 
     any_attributes: Dict = field(
         default_factory=dict,
-        metadata=dict(
-            type="Attributes",
-            namespace="##other"
-        )
+        metadata={
+            "type": "Attributes",
+            "namespace": "##other"
+        }
     )
 
 

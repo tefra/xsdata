@@ -59,6 +59,16 @@ Specify the output format
 * ``plantuml``: `PlantUML <https://plantuml.com/class-diagram>`_ class diagram
 
 
+compound-fields
+---------------
+
+The generator by default will flatten repeating choice elements into simple fields.
+The main disadvantage is that the original elements ordering is lost during marshalling.
+With this option you can force the generator to create compound list fields to preserve
+ordering.
+
+See :ref:`Type: Elements`
+
 verbosity
 ---------
 

@@ -167,7 +167,6 @@ class AttrTypeFactory(Factory):
     def create(
         cls,
         qname=None,
-        index=None,
         alias=None,
         native=False,
         forward=False,
@@ -178,7 +177,6 @@ class AttrTypeFactory(Factory):
 
         return cls.model(
             qname=qname,
-            index=index or 0,
             alias=alias,
             native=native,
             circular=circular,

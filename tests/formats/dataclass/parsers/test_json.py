@@ -1,3 +1,4 @@
+from dataclasses import make_dataclass
 from unittest.case import TestCase
 
 from tests import fixtures_dir
@@ -56,10 +57,36 @@ class JsonParserTests(TestCase):
         self.assertEqual(["foo"], JsonParser.get_value(data, bar_field))
         self.assertIsNone(JsonParser.get_value({}, bar_field))
 
-    def test_bind_choice_with_raw_value(self):
+    def test_bind_choice_with_raw_primitive_value(self):
         var = XmlElements(qname="compound", name="compound")
         parser = JsonParser()
         self.assertEqual(1, parser.bind_choice(1, var))
+
+    def test_bind_choice_with_raw_dict(self):
+        a = make_dataclass("a", [("x", int)])
+        b = make_dataclass("b", [("x", int), ("y", str)])
+
+        var = XmlElements(
+            qname="compound",
+            name="compound",
+            choices=[
+                XmlElement(qname="c", name="c", types=[int]),
+                XmlElement(qname="a", name="a", types=[a], dataclass=True),
+                XmlElement(qname="b", name="b", types=[b], dataclass=True),
+            ],
+        )
+
+        parser = JsonParser()
+        self.assertEqual(a(1), parser.bind_choice({"x": 1}, var))
+        self.assertEqual(b(1, "2"), parser.bind_choice({"x": 1, "y": "2"}, var))
+
+        with self.assertRaises(ParserError) as cm:
+            parser.bind_choice({"x": 1, "y": "2", "z": 3}, var)
+
+        self.assertEqual(
+            "XmlElements undefined choice: `compound` for `{'x': 1, 'y': '2', 'z': 3}`",
+            str(cm.exception),
+        )
 
     def test_bind_choice_with_derived_value(self):
         var = XmlElements(

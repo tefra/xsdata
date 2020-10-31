@@ -305,7 +305,7 @@ class XmlContextTests(TestCase):
                     dataclass=True,
                     types=[Node],
                     namespaces=["foo"],
-                    derived=True,
+                    derived=False,
                 ),
                 XmlElement(
                     name="compound",
@@ -313,7 +313,7 @@ class XmlContextTests(TestCase):
                     tokens=True,
                     types=[str],
                     namespaces=["bar"],
-                    derived=True,
+                    derived=False,
                 ),
                 XmlElement(
                     name="compound",
@@ -323,12 +323,20 @@ class XmlContextTests(TestCase):
                     namespaces=["bar"],
                     derived=True,
                 ),
+                XmlElement(
+                    name="compound",
+                    qname="{bar}z",
+                    nillable=False,
+                    types=[int],
+                    namespaces=["bar"],
+                    derived=True,
+                ),
                 XmlWildcard(
                     name="compound",
                     qname="{http://www.w3.org/1999/xhtml}any",
                     types=[object],
                     namespaces=["http://www.w3.org/1999/xhtml"],
-                    derived=True,
+                    derived=False,
                 ),
             ],
             types=[object],
@@ -472,6 +480,7 @@ class Node:
                 {"name": "node", "type": Type["Node"], "namespace": "foo"},
                 {"name": "x", "type": List[str], "tokens": True},
                 {"name": "y", "type": List[int], "nillable": True},
+                {"name": "z", "type": List[int]},
                 {
                     "wildcard": True,
                     "type": object,

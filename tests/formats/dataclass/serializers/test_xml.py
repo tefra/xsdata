@@ -335,15 +335,21 @@ class XmlSerializerTests(TestCase):
         var = XmlElements(
             name="compound",
             qname="compound",
-            choices=[XmlElement(qname="a", name="a", types=[int])],
+            choices=[
+                XmlElement(qname="a", name="a", types=[int]),
+                XmlElement(qname="b", name="b", types=[int], tokens=True),
+            ],
         )
         expected = [
             (XmlWriterEvent.START, "a"),
             (XmlWriterEvent.DATA, 1),
             (XmlWriterEvent.END, "a"),
+            (XmlWriterEvent.START, "b"),
+            (XmlWriterEvent.DATA, [1, 2]),
+            (XmlWriterEvent.END, "b"),
         ]
 
-        result = self.serializer.write_value(1, var, "xsdata")
+        result = self.serializer.write_value([1, [1, 2]], var, "xsdata")
         self.assertIsInstance(result, Generator)
         self.assertEqual(expected, list(result))
 

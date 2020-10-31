@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from dataclasses import make_dataclass
 from dataclasses import replace
 from unittest.case import TestCase
 
@@ -62,9 +63,9 @@ class XmlValTests(TestCase):
         var = XmlVar(name="foo", qname="foo")
         self.assertIsNone(var.find_choice("foo"))
 
-    def test_find_choice_typed(self):
+    def test_find_value_choice(self):
         var = XmlVar(name="foo", qname="foo")
-        self.assertIsNone(var.find_choice_typed(int))
+        self.assertIsNone(var.find_value_choice(int))
 
 
 class XmlElementTests(TestCase):
@@ -103,6 +104,26 @@ class XmlElementsTests(TestCase):
 
         self.assertEqual(choices[1], var.find_choice("b"))
         self.assertTrue(var.matches("b"))
+
+    def test_find_value_choice(self):
+        c = make_dataclass("C", fields=[])
+        d = make_dataclass("D", fields=[], bases=(c,))
+
+        var = XmlElements(
+            name="compound",
+            qname="compound",
+            choices=[
+                XmlElement(qname="a", name="a", types=[int]),
+                XmlElement(qname="b", name="b", types=[int], tokens=True),
+                XmlElement(qname="c", name="c", types=[c], dataclass=True),
+            ],
+        )
+
+        self.assertIsNone(var.find_value_choice("foo"))
+        self.assertEqual(var.choices[0], var.find_value_choice(1))
+        self.assertEqual(var.choices[1], var.find_value_choice([1, 2]))
+        self.assertEqual(var.choices[2], var.find_value_choice(d()))
+        self.assertEqual(var.choices[2], var.find_value_choice(c()))
 
 
 class XmlWildcardTests(TestCase):

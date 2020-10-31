@@ -3,24 +3,18 @@
     "items": {
         "shirt_or_hat": [
             {
-                "qname": "shirt",
-                "value": {
-                    "quantity": 1,
-                    "color": {
-                        "value": "blue"
-                    },
-                    "number": 557
-                }
+                "quantity": 1,
+                "color": {
+                    "value": "blue"
+                },
+                "number": 557
             },
             {
-                "qname": "shirt",
-                "value": {
-                    "quantity": 1,
-                    "color": {
-                        "value": "sage"
-                    },
-                    "number": 557
-                }
+                "quantity": 1,
+                "color": {
+                    "value": "sage"
+                },
+                "number": 557
             },
             {
                 "qname": "hat",

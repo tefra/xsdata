@@ -184,6 +184,7 @@ class XmlContext:
         parent_namespace: Optional[str],
         choices: List[Dict],
     ):
+        existing = set()
         globalns = sys.modules[clazz.__module__].__dict__
         for choice in choices:
             xml_type = XmlType.WILDCARD if choice.get("wildcard") else XmlType.ELEMENT
@@ -192,20 +193,23 @@ class XmlContext:
             default_namespace = self.default_namespace(namespaces)
 
             types = self.real_types(_eval_type(choice["type"], globalns, None))
+            derived = any(True for tp in types if tp in existing)
             is_class = any(is_dataclass(clazz) for clazz in types)
             xml_clazz = XmlType.to_xml_class(xml_type)
             qname = build_qname(default_namespace, choice.get("name", "any"))
+            nillable = choice.get("nillable", False)
 
             yield xml_clazz(
                 name=parent_name,
                 qname=qname,
                 namespaces=namespaces,
-                nillable=choice.get("nillable", False),
+                nillable=nillable,
                 dataclass=is_class,
                 tokens=choice.get("tokens", False),
-                derived=True,
+                derived=derived or nillable,
                 types=types,
             )
+            existing.update(types)
 
     @classmethod
     def resolve_namespaces(

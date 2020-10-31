@@ -3,6 +3,7 @@ import json
 import pathlib
 from dataclasses import dataclass
 from dataclasses import field
+from dataclasses import fields
 from typing import Any
 from typing import Dict
 from typing import Type
@@ -88,7 +89,10 @@ class JsonParser(AbstractParser):
         )
 
     def bind_choice(self, value: Any, var: XmlVar) -> Any:
-        if isinstance(value, dict) and "qname" in value:
+        if not isinstance(value, dict):
+            return value
+
+        if "qname" in value:
             qname = value["qname"]
             choice = var.find_choice(qname)
 
@@ -102,7 +106,16 @@ class JsonParser(AbstractParser):
 
             return self.parse_context(value, AnyElement)
 
-        return value
+        keys = set(value.keys())
+        for choice in var.choices:
+            if not choice.dataclass:
+                continue
+
+            attrs = {f.name for f in fields(choice.clazz)}
+            if attrs == keys:
+                return self.bind_value(choice, value)
+
+        raise ParserError(f"XmlElements undefined choice: `{var.name}` for `{value}`")
 
     @staticmethod
     def get_value(data: Dict, var: XmlVar) -> Any:

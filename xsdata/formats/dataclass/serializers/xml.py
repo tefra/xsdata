@@ -135,14 +135,14 @@ class XmlSerializer(AbstractSerializer):
             yield from self.write_data(value, var, namespace)
         elif var.tokens:
             yield from self.write_tokens(value, var, namespace)
+        elif var.is_elements:
+            yield from self.write_elements(value, var, namespace)
         elif var.is_list and isinstance(value, list):
             yield from self.write_list(value, var, namespace)
         elif var.is_any_type:
             yield from self.write_any_type(value, var, namespace)
         elif var.dataclass:
             yield from self.write_xsi_type(value, var, namespace)
-        elif var.is_elements:
-            yield from self.write_choice(value, var, namespace)
         elif var.is_element:
             yield from self.write_element(value, var, namespace)
         else:
@@ -227,6 +227,14 @@ class XmlSerializer(AbstractSerializer):
             f"{value.__class__.__name__} is not derived from {clazz.__name__}"
         )
 
+    def write_elements(self, value: Any, var: XmlVar, namespace: NoneStr) -> Generator:
+        """Produce an events stream from compound elements field."""
+        if isinstance(value, list):
+            for choice in value:
+                yield from self.write_choice(choice, var, namespace)
+        else:
+            yield from self.write_choice(value, var, namespace)
+
     def write_choice(self, value: Any, var: XmlVar, namespace: NoneStr) -> Generator:
         """
         Produce an events stream for the given value of a compound elements
@@ -243,8 +251,7 @@ class XmlSerializer(AbstractSerializer):
             choice = var.find_choice(value.qname)
             func = self.write_any_type
         else:
-            tp = type(value)
-            choice = var.find_choice_typed(tp)
+            choice = var.find_value_choice(value)
             func = self.write_value
 
         if not choice:

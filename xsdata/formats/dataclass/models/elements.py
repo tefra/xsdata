@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from dataclasses import field
+from dataclasses import is_dataclass
 from enum import auto
 from enum import IntEnum
 from typing import Any
@@ -119,8 +120,8 @@ class XmlVar:
         """Match and return a choice field by its qualified name."""
         return None
 
-    def find_choice_typed(self, tp: Type) -> Optional["XmlVar"]:
-        """Match and return a choice field by its types."""
+    def find_value_choice(self, value: Any) -> Optional["XmlVar"]:
+        """Match and return a choice field that matches the given value."""
         return None
 
 
@@ -158,10 +159,31 @@ class XmlElements(XmlVar):
 
         return None
 
-    def find_choice_typed(self, tp: Type) -> Optional["XmlVar"]:
-        """Match and return a choice field by its types."""
+    def find_value_choice(self, value: Any) -> Optional["XmlVar"]:
+        """Match and return a choice field that matches the given value."""
+
+        if isinstance(value, list):
+            tp = None if not value else type(value[0])
+            tokens = True
+            is_class = False
+        else:
+            tp = type(value)
+            tokens = False
+            is_class = is_dataclass(value)
+
+        def match_type(match: Type, types: List[Type]) -> bool:
+            for candidate in types:
+                if tp == candidate or (is_class and issubclass(match, candidate)):
+                    return True
+
+            return False
+
         for choice in self.choices:
-            if tp in choice.types:
+
+            if choice.is_any_type or tokens != choice.tokens:
+                continue
+
+            if (not tp and choice.nillable) or (tp and match_type(tp, choice.types)):
                 return choice
 
         return None

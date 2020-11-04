@@ -21,11 +21,11 @@ from xsdata.formats.dataclass.models.generics import DerivedElement
 from xsdata.formats.dataclass.serializers.mixins import XmlWriter
 from xsdata.formats.dataclass.serializers.mixins import XmlWriterEvent
 from xsdata.formats.dataclass.serializers.writers import LxmlEventWriter
+from xsdata.models.enums import DataType
 from xsdata.models.enums import QNames
 from xsdata.utils import namespaces
 from xsdata.utils.constants import EMPTY_MAP
 from xsdata.utils.namespaces import split_qname
-
 
 NoneStr = Optional[str]
 
@@ -114,12 +114,16 @@ class XmlSerializer(AbstractSerializer):
         yield XmlWriterEvent.END, qname
 
     def write_xsi_type(self, value: Any, var: XmlVar, namespace: NoneStr) -> Generator:
-        """Produce an events stream from a dataclass with xsi abstract type
-        check."""
-        xsi_type = self.xsi_type(var, value, namespace)
-        yield from self.write_dataclass(
-            value, namespace, var.qname, var.nillable, xsi_type
-        )
+        """Produce an events stream from a dataclass for the given var with
+        with xsi abstract type check for non wildcards."""
+
+        if var.is_wildcard:
+            yield from self.write_dataclass(value, namespace)
+        else:
+            xsi_type = self.xsi_type(var, value, namespace)
+            yield from self.write_dataclass(
+                value, namespace, var.qname, var.nillable, xsi_type
+            )
 
     def write_value(self, value: Any, var: XmlVar, namespace: NoneStr) -> Generator:
         """
@@ -139,7 +143,7 @@ class XmlSerializer(AbstractSerializer):
             yield from self.write_elements(value, var, namespace)
         elif var.is_list and isinstance(value, list):
             yield from self.write_list(value, var, namespace)
-        elif var.is_any_type:
+        elif var.is_any_type or var.is_wildcard:
             yield from self.write_any_type(value, var, namespace)
         elif var.dataclass:
             yield from self.write_xsi_type(value, var, namespace)
@@ -178,17 +182,16 @@ class XmlSerializer(AbstractSerializer):
         The object can be a dataclass or a generic object or any other
         simple type.
         """
-        if not is_dataclass(value):
-            if var.is_element:
-                yield from self.write_element(value, var, namespace)
-            else:
-                yield from self.write_data(value, var, namespace)
-        elif isinstance(value, AnyElement):
+        if isinstance(value, AnyElement):
             yield from self.write_wildcard(value, var, namespace)
         elif isinstance(value, DerivedElement):
             yield from self.write_dataclass(value.value, namespace, qname=value.qname)
+        elif is_dataclass(value):
+            yield from self.write_xsi_type(value, var, namespace)
+        elif var.is_element:
+            yield from self.write_element(value, var, namespace)
         else:
-            yield from self.write_dataclass(value, namespace)
+            yield from self.write_data(value, var, namespace)
 
     def write_wildcard(
         self, value: AnyElement, var: XmlVar, namespace: NoneStr
@@ -209,17 +212,16 @@ class XmlSerializer(AbstractSerializer):
         if value.qname:
             yield XmlWriterEvent.END, value.qname
 
-        yield XmlWriterEvent.DATA, value.tail
+        if value.tail:
+            yield XmlWriterEvent.DATA, value.tail
 
     def xsi_type(self, var: XmlVar, value: Any, namespace: NoneStr) -> Optional[QName]:
         """Get xsi:type if the given value is a derived instance."""
-        if not value or value.__class__ in var.types or not var.dataclass:
+        if not value or value.__class__ in var.types:
             return None
 
         clazz = var.clazz
-        assert clazz is not None  # not possible :)
-
-        if self.context.is_derived(value, clazz):
+        if clazz is None or self.context.is_derived(value, clazz):
             meta = self.context.fetch(value.__class__, namespace)
             return QName(meta.source_qname)
 
@@ -268,6 +270,11 @@ class XmlSerializer(AbstractSerializer):
 
         if var.nillable:
             yield XmlWriterEvent.ATTR, QNames.XSI_NIL, "true"
+
+        if value is not None and var.is_any_type:
+            datatype = DataType.from_value(value)
+            if datatype != DataType.STRING:
+                yield XmlWriterEvent.ATTR, QNames.XSI_TYPE, datatype.qname
 
         yield XmlWriterEvent.DATA, value
         yield XmlWriterEvent.END, var.qname

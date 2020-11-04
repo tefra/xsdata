@@ -20,6 +20,7 @@ from xsdata.formats.dataclass.models.generics import AnyElement
 from xsdata.formats.dataclass.models.generics import DerivedElement
 from xsdata.formats.dataclass.serializers import XmlSerializer
 from xsdata.formats.dataclass.serializers.mixins import XmlWriterEvent
+from xsdata.models.enums import DataType
 from xsdata.models.enums import QNames
 
 
@@ -117,7 +118,6 @@ class XmlSerializerTests(TestCase):
             (XmlWriterEvent.START, "br"),
             (XmlWriterEvent.DATA, None),
             (XmlWriterEvent.END, "br"),
-            (XmlWriterEvent.DATA, None),
             (XmlWriterEvent.START, "{xsdata}BookForm"),
             (XmlWriterEvent.ATTR, "id", "123"),
             (XmlWriterEvent.ATTR, "lang", "en"),
@@ -202,7 +202,6 @@ class XmlSerializerTests(TestCase):
             (XmlWriterEvent.ATTR, "e", 2),
             (XmlWriterEvent.DATA, "b"),
             (XmlWriterEvent.DATA, "g"),
-            (XmlWriterEvent.DATA, None),
             (XmlWriterEvent.DATA, "h"),
             (XmlWriterEvent.END, "a"),
             (XmlWriterEvent.DATA, "c"),
@@ -279,6 +278,31 @@ class XmlSerializerTests(TestCase):
         self.assertIsInstance(result, Generator)
         self.assertEqual(expected, list(result))
 
+    def test_write_element_with_any_type_var(self):
+        var = XmlElement(qname="a", name="a", types=[object])
+        expected = [
+            (XmlWriterEvent.START, "a"),
+            (XmlWriterEvent.ATTR, QNames.XSI_TYPE, DataType.INT.qname),
+            (XmlWriterEvent.DATA, 123),
+            (XmlWriterEvent.END, "a"),
+        ]
+
+        result = self.serializer.write_value(123, var, "xsdata")
+        self.assertIsInstance(result, Generator)
+        self.assertEqual(expected, list(result))
+
+    def test_write_element_with_any_type_var_ignore_xs_string(self):
+        var = XmlElement(qname="a", name="a", types=[object])
+        expected = [
+            (XmlWriterEvent.START, "a"),
+            (XmlWriterEvent.DATA, "123"),
+            (XmlWriterEvent.END, "a"),
+        ]
+
+        result = self.serializer.write_value("123", var, "xsdata")
+        self.assertIsInstance(result, Generator)
+        self.assertEqual(expected, list(result))
+
     def test_write_choice_with_derived_primitive_value(self):
         var = XmlElements(
             name="compound",
@@ -300,7 +324,7 @@ class XmlSerializerTests(TestCase):
         var = XmlElements(
             name="compound",
             qname="compound",
-            choices=[XmlElement(qname="a", name="a", types=[int])],
+            choices=[XmlElement(qname="a", name="a", types=[A])],
         )
         value = DerivedElement(qname="a", value=A("foo"))
         expected = [
@@ -324,7 +348,6 @@ class XmlSerializerTests(TestCase):
             (XmlWriterEvent.START, "a"),
             (XmlWriterEvent.DATA, "1"),
             (XmlWriterEvent.END, "a"),
-            (XmlWriterEvent.DATA, None),
         ]
 
         result = self.serializer.write_value(value, var, "xsdata")

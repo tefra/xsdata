@@ -21,6 +21,7 @@ from xsdata.formats.converter import converter
 from xsdata.formats.dataclass.models.constants import XmlType
 from xsdata.formats.dataclass.models.elements import XmlMeta
 from xsdata.formats.dataclass.models.elements import XmlVar
+from xsdata.models.enums import DataType
 from xsdata.models.enums import NamespaceType
 from xsdata.utils.constants import EMPTY_SEQUENCE
 from xsdata.utils.namespaces import build_qname
@@ -34,12 +35,15 @@ class XmlContext:
 
     :param element_name: Default callable to convert field names to element tags
     :param attribute_name: Default callable to convert field names to attribute tags
-    :param cache: Local storage to store and reuse models' bind metadata.
+    :param cache: Cache models metadata
+    :param xsi_cache: Index models by xsi:type
     """
 
     element_name: Callable = field(default=lambda x: x)
     attribute_name: Callable = field(default=lambda x: x)
     cache: Dict[Type, XmlMeta] = field(default_factory=dict)
+    xsi_cache: Dict[str, List[Type]] = field(default_factory=lambda: defaultdict(list))
+    sys_modules: int = field(default=0, init=False)
 
     def fetch(
         self,
@@ -58,45 +62,60 @@ class XmlContext:
             name instead.
         """
         meta = self.build(clazz, parent_ns)
+        subclass = None
+        if xsi_type and meta.source_qname != xsi_type:
+            subclass = self.find_subclass(clazz, xsi_type)
 
-        subclass = self.find_subclass(clazz, xsi_type) if xsi_type else None
-        if subclass:
-            meta = self.build(subclass, parent_ns)
+        return self.build(subclass, parent_ns) if subclass else meta
 
-        return meta
+    def build_xsi_cache(self):
+        """Index all imported dataclasses by their xsi:type qualified name."""
+        self.xsi_cache.clear()
 
-    def find_subclass(self, clazz: Type, xsi_type: str) -> Optional[Type]:
+        for clazz in self.get_subclasses(object):
+            if is_dataclass(clazz):
+                meta = clazz.Meta if "Meta" in clazz.__dict__ else None
+                name = getattr(meta, "name", None) or self.local_name(clazz.__name__)
+                module = sys.modules[clazz.__module__]
+                source_namespace = getattr(module, "__NAMESPACE__", None)
+                source_qname = build_qname(source_namespace, name)
+                self.xsi_cache[source_qname].append(clazz)
+
+    def find_types(self, qname: str) -> Optional[List[Type]]:
         """
-        Find a derived class of the given clazz that matches the given
-        qualified xsi type.
+        Find all classes that match the given xsi:type qname.
 
-        The derived class is either a subclass or shares the same parent
-        class as the given class.
+        - Ignores native schema types, xs:string, xs:float, xs:int, ...
+        - Rebuild cache if new modules were imported since last run
         """
-        for subclass in clazz.__subclasses__():
-            if self.match_class_source_qname(subclass, xsi_type):
-                return subclass
+        if DataType.from_qname(qname):
+            return None
 
-        for base in clazz.__bases__:
-            if not is_dataclass(base):
-                continue
+        if len(sys.modules) != self.sys_modules:
+            self.build_xsi_cache()
+            self.sys_modules = len(sys.modules)
 
-            if self.match_class_source_qname(base, xsi_type):
-                return base
+        return self.xsi_cache[qname] if qname in self.xsi_cache else None
 
-            sibling = self.find_subclass(base, xsi_type)
-            if sibling:
-                return sibling
+    def find_type(self, qname: str) -> Optional[Type]:
+        """Return the most recently imported class that matches the given
+        xsi:type qname."""
+        types = self.find_types(qname)
+        return types[-1] if types else None
+
+    def find_subclass(self, clazz: Type, qname: str) -> Optional[Type]:
+        """Compare all classes that match the given xsi:type qname and return
+        the first one that is either a subclass or shares the same parent class
+        as the original class."""
+
+        types = self.find_types(qname)
+        if types:
+            for tp in types:
+                for tp_mro in tp.__mro__:
+                    if tp_mro is not object and tp_mro in clazz.__mro__:
+                        return tp
 
         return None
-
-    def match_class_source_qname(self, clazz: Type, xsi_type: str) -> bool:
-        """Match a given source qualified name with the given xsi type."""
-        if is_dataclass(clazz):
-            meta = self.build(clazz)
-            return meta.source_qname == xsi_type
-
-        return False
 
     def build(self, clazz: Type, parent_ns: Optional[str] = None) -> XmlMeta:
         """Fetch from cache or build the metadata object for the given class
@@ -198,6 +217,9 @@ class XmlContext:
             xml_clazz = XmlType.to_xml_class(xml_type)
             qname = build_qname(default_namespace, choice.get("name", "any"))
             nillable = choice.get("nillable", False)
+
+            if xml_type == XmlType.ELEMENT and len(types) == 1 and types[0] == object:
+                derived = True
 
             yield xml_clazz(
                 name=parent_name,
@@ -328,6 +350,13 @@ class XmlContext:
             return XmlType.TEXT
 
         return XmlType.ELEMENT
+
+    @classmethod
+    def get_subclasses(cls, clazz: Type):
+        if clazz is not type:
+            for subclass in clazz.__subclasses__():
+                yield from cls.get_subclasses(subclass)
+                yield subclass
 
     def local_name(self, name: str, xml_type: Optional[str] = None) -> str:
         if xml_type == "Attribute":

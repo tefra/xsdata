@@ -4,15 +4,16 @@ from typing import Dict
 from typing import List
 from typing import Optional
 from typing import Type
-from xml.etree.ElementTree import QName
 
 from xsdata.formats.converter import converter
+from xsdata.formats.converter import QNameConverter
 from xsdata.formats.dataclass.models.elements import FindMode
 from xsdata.formats.dataclass.models.elements import XmlMeta
 from xsdata.formats.dataclass.models.elements import XmlVar
 from xsdata.formats.dataclass.models.generics import AnyElement
 from xsdata.formats.dataclass.models.generics import DerivedElement
 from xsdata.logger import logger
+from xsdata.models.enums import DataType
 from xsdata.models.enums import QNames
 from xsdata.utils import text
 from xsdata.utils.namespaces import build_qname
@@ -21,12 +22,24 @@ from xsdata.utils.namespaces import build_qname
 class ParserUtils:
     @classmethod
     def xsi_type(cls, attrs: Dict, ns_map: Dict) -> Optional[str]:
-        """Parse the elements xsi:type attribute if present."""
+        """Parse the xsi:type attribute if present."""
         xsi_type = attrs.get(QNames.XSI_TYPE)
-        if xsi_type:
-            return cls.parse_value(xsi_type, [QName], None, ns_map).text
+        if not xsi_type:
+            return None
 
-        return None
+        namespace, name = QNameConverter.resolve(xsi_type, ns_map)
+        return build_qname(namespace, name)
+
+    @classmethod
+    def data_type(cls, attrs: Dict, ns_map: Dict) -> DataType:
+        """Convert the xsi:type attribute to a DataType, defaults to
+        DataType.STRING."""
+        xsi_type = cls.xsi_type(attrs, ns_map)
+        datatype = DataType.STRING
+        if xsi_type:
+            datatype = DataType.from_qname(xsi_type) or datatype
+
+        return datatype
 
     @classmethod
     def is_nillable(cls, attrs: Dict) -> bool:
@@ -86,7 +99,10 @@ class ParserUtils:
             if value is None:
                 value = ""
 
-            params[var.name].append(cls.prepare_generic_value(qname, value))
+            if qname:
+                value = cls.prepare_generic_value(qname, value)
+
+            params[var.name].append(value)
 
     @classmethod
     def bind_var(cls, params: Dict, var: XmlVar, value: Any) -> bool:

@@ -142,10 +142,6 @@ class XmlWildcardTests(TestCase):
         self.assertIsInstance(var, XmlVar)
         self.assertTrue(var.is_wildcard)
 
-    def test_property_is_any_type(self):
-        var = XmlWildcard(name="foo", qname="foo")
-        self.assertTrue(var.is_any_type)
-
     def test_matches(self):
         var = XmlWildcard(name="foo", qname="foo")
         self.assertTrue(var.matches("*"))

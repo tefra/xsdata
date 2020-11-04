@@ -1,6 +1,7 @@
 from decimal import Decimal
 from enum import Enum
 from pathlib import Path
+from typing import Any
 from typing import Iterator
 from typing import Optional
 from xml.etree.ElementTree import QName
@@ -148,10 +149,30 @@ class DataType(Enum):
 
     @classmethod
     def get_enum(cls, code: str) -> Optional["DataType"]:
-        return __XSDType__.get(code) if code else None
+        return __DataTypeCodeIndex__.get(code) if code else None
+
+    @classmethod
+    def from_value(cls, value: Any) -> "DataType":
+        if isinstance(value, bool):
+            return DataType.BOOLEAN
+        if isinstance(value, int):
+            return DataType.INT
+        if isinstance(value, float):
+            return DataType.FLOAT
+        if isinstance(value, Decimal):
+            return DataType.DECIMAL
+        if isinstance(value, QName):
+            return DataType.QNAME
+
+        return DataType.STRING
+
+    @classmethod
+    def from_qname(cls, qname: str) -> Optional["DataType"]:
+        return __DataTypeQNameIndex__.get(qname)
 
 
-__XSDType__ = {xsd.code: xsd for xsd in DataType}
+__DataTypeCodeIndex__ = {xsd.code: xsd for xsd in DataType}
+__DataTypeQNameIndex__ = {xsd.qname: xsd for xsd in DataType}
 
 
 class EventType:

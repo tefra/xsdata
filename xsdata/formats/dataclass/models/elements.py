@@ -201,10 +201,6 @@ class XmlWildcard(XmlVar):
     def is_wildcard(self) -> bool:
         return True
 
-    @property
-    def is_any_type(self) -> bool:
-        return True
-
     def matches(self, qname: str) -> bool:
         """Match the given qname to the wildcard allowed namespaces."""
 
@@ -303,6 +299,9 @@ class XmlMeta:
     @property
     def namespace(self) -> Optional[str]:
         return split_qname(self.qname)[0]
+
+    def has_var(self, qname: str = "*", mode: FindMode = FindMode.ALL) -> bool:
+        return self.find_var(qname, mode) is not None
 
     def find_var(
         self, qname: str = "*", mode: FindMode = FindMode.ALL

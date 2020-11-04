@@ -132,26 +132,23 @@ class ElementNode(XmlNode):
             )
 
         if var.clazz:
-            xsi_type = ParserUtils.xsi_type(attrs, ns_map)
-            is_nillable = ParserUtils.is_nillable(attrs)
-            meta = self.context.fetch(var.clazz, self.meta.namespace, xsi_type)
-            mixed = self.meta.find_var(mode=FindMode.MIXED_CONTENT)
-
-            if not is_nillable and meta.nillable:
-                return None
-
-            return ElementNode(
-                meta=meta,
-                config=self.config,
-                attrs=attrs,
-                ns_map=ns_map,
-                context=self.context,
-                position=position,
-                derived=var.derived,
-                mixed=mixed is not None,
+            return self.build_element_node(
+                var.clazz, attrs, ns_map, position, var.derived
             )
 
         if var.is_any_type:
+            node = self.build_element_node(None, attrs, ns_map, position, var.derived)
+            if not node:
+                node = AnyTypeNode(
+                    var=var,
+                    attrs=attrs,
+                    ns_map=ns_map,
+                    position=position,
+                    mixed=self.meta.has_var(mode=FindMode.MIXED_CONTENT),
+                )
+            return node
+
+        if var.is_wildcard:
             return WildcardNode(var=var, attrs=attrs, ns_map=ns_map, position=position)
 
         return PrimitiveNode(var=var, ns_map=ns_map)
@@ -169,6 +166,88 @@ class ElementNode(XmlNode):
                 yield choice
             else:
                 yield var
+
+    def build_element_node(
+        self,
+        clazz: Optional[Type],
+        attrs: Dict,
+        ns_map: Dict,
+        position: int,
+        derived: bool,
+    ) -> Optional[XmlNode]:
+        xsi_type = ParserUtils.xsi_type(attrs, ns_map)
+
+        if clazz is None:
+            if not xsi_type:
+                return None
+
+            clazz = self.context.find_type(xsi_type)
+            xsi_type = None
+
+        if clazz is None:
+            return None
+
+        is_nillable = ParserUtils.is_nillable(attrs)
+        meta = self.context.fetch(clazz, self.meta.namespace, xsi_type)
+
+        if not is_nillable and meta.nillable:
+            return None
+
+        return ElementNode(
+            meta=meta,
+            config=self.config,
+            attrs=attrs,
+            ns_map=ns_map,
+            context=self.context,
+            position=position,
+            derived=derived,
+            mixed=self.meta.has_var(mode=FindMode.MIXED_CONTENT),
+        )
+
+
+@dataclass
+class AnyTypeNode(XmlNode):
+
+    var: XmlVar
+    attrs: Dict
+    ns_map: Dict
+    position: int
+    mixed: bool = False
+    has_children: bool = field(init=False, default=False)
+
+    def child(self, qname: str, attrs: Dict, ns_map: Dict, position: int) -> "XmlNode":
+        self.has_children = True
+        return WildcardNode(position=position, var=self.var, attrs=attrs, ns_map=ns_map)
+
+    def bind(self, qname: str, text: NoneStr, tail: NoneStr, objects: List) -> bool:
+        obj: Any = None
+        if self.has_children:
+            obj = AnyElement(
+                qname=qname,
+                text=ParserUtils.normalize_content(text),
+                tail=ParserUtils.normalize_content(tail),
+                ns_map=self.ns_map,
+                attributes=ParserUtils.parse_any_attributes(self.attrs, self.ns_map),
+                children=ParserUtils.fetch_any_children(self.position, objects),
+            )
+            objects.append((self.var.qname, obj))
+        else:
+            var = self.var
+            ns_map = self.ns_map
+            datatype = ParserUtils.data_type(self.attrs, self.ns_map)
+            obj = ParserUtils.parse_value(text, [datatype.local], var.default, ns_map)
+
+            if var.derived:
+                obj = DerivedElement(qname=qname, value=obj)
+
+            objects.append((qname, obj))
+
+            if self.mixed:
+                tail = ParserUtils.normalize_content(tail)
+                if tail:
+                    objects.append((None, tail))
+
+        return True
 
 
 @dataclass

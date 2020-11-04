@@ -14,6 +14,7 @@ from unittest import TestCase
 
 from tests.fixtures.books import BookForm
 from tests.fixtures.books import Books
+from tests.fixtures.books import BooksForm
 from tests.fixtures.defxmlschema.chapter03prod import Product
 from tests.fixtures.defxmlschema.chapter05prod import ProductType
 from tests.fixtures.defxmlschema.chapter13 import ItemsType
@@ -26,6 +27,7 @@ from xsdata.formats.dataclass.models.elements import XmlElement
 from xsdata.formats.dataclass.models.elements import XmlElements
 from xsdata.formats.dataclass.models.elements import XmlMeta
 from xsdata.formats.dataclass.models.elements import XmlWildcard
+from xsdata.models.enums import DataType
 from xsdata.utils import text
 from xsdata.utils.namespaces import build_qname
 
@@ -87,30 +89,25 @@ class XmlContextTests(TestCase):
         self.assertEqual(xsi_meta, actual)
         mock_find_subclass.assert_called_once_with(ItemsType, "foo")
 
+    def test_find(self):
+        self.assertIsNone(self.ctx.find_type(DataType.FLOAT.qname))
+        self.assertEqual(BookForm, self.ctx.find_type("{urn:books}BookForm"))
+
+        self.ctx.xsi_cache["{urn:books}BookForm"].append(BooksForm)
+        self.assertEqual(BooksForm, self.ctx.find_type("{urn:books}BookForm"))
+
     def test_find_subclass(self):
         a = make_dataclass("A", fields=[])
         b = make_dataclass("B", fields=[], bases=(a,))
         c = make_dataclass("C", fields=[], bases=(a,))
+        other = make_dataclass("Other", fields=[])
 
         self.assertEqual(b, self.ctx.find_subclass(a, "B"))
         self.assertEqual(b, self.ctx.find_subclass(c, "B"))
         self.assertEqual(a, self.ctx.find_subclass(b, "A"))
         self.assertEqual(a, self.ctx.find_subclass(c, "A"))
-        self.assertIsNone(self.ctx.find_subclass(c, "What"))
-
-    def test_match_class_name(self):
-        # no meta name
-        self.assertFalse(self.ctx.match_class_source_qname(ItemsType, "qname_foo"))
-        self.assertTrue(self.ctx.match_class_source_qname(ItemsType, "ItemsType"))
-
-        # with meta name
-        product_qname = "{http://example.org/prod}product"
-        self.assertFalse(self.ctx.match_class_source_qname(Product, "ItemsType"))
-        self.assertTrue(self.ctx.match_class_source_qname(Product, product_qname))
-
-        # not dataclass
-        self.assertFalse(self.ctx.match_class_source_qname(object, "object"))
-        self.assertFalse(self.ctx.match_class_source_qname(int, "int"))
+        self.assertIsNone(self.ctx.find_subclass(c, "Unknown"))
+        self.assertIsNone(self.ctx.find_subclass(c, "Other"))
 
     @mock.patch.object(XmlContext, "get_type_hints")
     def test_build_build_vars(self, mock_get_type_hints):
@@ -331,12 +328,20 @@ class XmlContextTests(TestCase):
                     namespaces=["bar"],
                     derived=True,
                 ),
+                XmlElement(
+                    name="compound",
+                    qname="{bar}o",
+                    nillable=False,
+                    types=[object],
+                    namespaces=["bar"],
+                    derived=True,
+                ),
                 XmlWildcard(
                     name="compound",
                     qname="{http://www.w3.org/1999/xhtml}any",
                     types=[object],
                     namespaces=["http://www.w3.org/1999/xhtml"],
-                    derived=False,
+                    derived=True,
                 ),
             ],
             types=[object],
@@ -481,6 +486,7 @@ class Node:
                 {"name": "x", "type": List[str], "tokens": True},
                 {"name": "y", "type": List[int], "nillable": True},
                 {"name": "z", "type": List[int]},
+                {"name": "o", "type": object},
                 {
                     "wildcard": True,
                     "type": object,

@@ -23,6 +23,7 @@ from xsdata.formats.dataclass.models.generics import AnyElement
 from xsdata.formats.dataclass.models.generics import DerivedElement
 from xsdata.formats.dataclass.parsers.config import ParserConfig
 from xsdata.formats.dataclass.parsers.mixins import XmlHandler
+from xsdata.formats.dataclass.parsers.nodes import AnyTypeNode
 from xsdata.formats.dataclass.parsers.nodes import ElementNode
 from xsdata.formats.dataclass.parsers.nodes import NodeParser
 from xsdata.formats.dataclass.parsers.nodes import PrimitiveNode
@@ -30,6 +31,8 @@ from xsdata.formats.dataclass.parsers.nodes import SkipNode
 from xsdata.formats.dataclass.parsers.nodes import UnionNode
 from xsdata.formats.dataclass.parsers.nodes import WildcardNode
 from xsdata.formats.dataclass.parsers.utils import ParserUtils
+from xsdata.models.enums import DataType
+from xsdata.models.enums import Namespace
 from xsdata.models.enums import QNames
 from xsdata.models.mixins import attribute
 from xsdata.models.mixins import element
@@ -355,7 +358,43 @@ class ElementNodeTests(TestCase):
         attrs = {QNames.XSI_NIL: "false"}
         self.assertIsNone(self.node.build_node(var, attrs, ns_map, 10))
 
-    def test_build_node_with_any_type_var(self):
+    def test_build_node_with_any_type_var_with_matching_xsi_type(self):
+        var = XmlElement(name="a", qname="a", types=[object])
+
+        actual = self.node.build_node(var, {QNames.XSI_TYPE: "Foo"}, {}, 10)
+
+        self.assertIsInstance(actual, ElementNode)
+        self.assertEqual(10, actual.position)
+        self.assertEqual(self.context.build(Foo), actual.meta)
+        self.assertEqual({QNames.XSI_TYPE: "Foo"}, actual.attrs)
+        self.assertEqual({}, actual.ns_map)
+        self.assertFalse(actual.mixed)
+
+    def test_build_node_with_any_type_var_with_no_matching_xsi_type(self):
+        var = XmlElement(name="a", qname="a", types=[object])
+        attrs = {QNames.XSI_TYPE: "noMatch"}
+        actual = self.node.build_node(var, attrs, {}, 10)
+
+        self.assertIsInstance(actual, AnyTypeNode)
+        self.assertEqual(10, actual.position)
+        self.assertEqual(var, actual.var)
+        self.assertEqual(attrs, actual.attrs)
+        self.assertEqual({}, actual.ns_map)
+        self.assertFalse(actual.mixed)
+
+    def test_build_node_with_any_type_var_with_no_xsi_type(self):
+        var = XmlElement(name="a", qname="a", types=[object])
+        attrs = {}
+        actual = self.node.build_node(var, attrs, {}, 10)
+
+        self.assertIsInstance(actual, AnyTypeNode)
+        self.assertEqual(10, actual.position)
+        self.assertEqual(var, actual.var)
+        self.assertEqual(attrs, actual.attrs)
+        self.assertEqual({}, actual.ns_map)
+        self.assertFalse(actual.mixed)
+
+    def test_build_node_with_wildcard_var(self):
         var = XmlWildcard(name="a", qname="a", types=[], dataclass=False)
 
         actual = self.node.build_node(var, {}, {}, 10)
@@ -373,6 +412,81 @@ class ElementNodeTests(TestCase):
         self.assertIsInstance(actual, PrimitiveNode)
         self.assertEqual(var, actual.var)
         self.assertEqual(ns_map, actual.ns_map)
+
+
+class AnyTypeNodeTests(TestCase):
+    def setUp(self) -> None:
+        self.var = XmlElement(name="a", qname="a", types=[object])
+        self.node = AnyTypeNode(position=0, var=self.var, attrs={}, ns_map={})
+
+    def test_child(self):
+        self.assertFalse(self.node.has_children)
+
+        attrs = {"a": 1}
+        ns_map = {"ns0": "b"}
+        actual = self.node.child("foo", attrs, ns_map, 10)
+
+        self.assertIsInstance(actual, WildcardNode)
+        self.assertEqual(10, actual.position)
+        self.assertEqual(self.var, actual.var)
+        self.assertEqual(attrs, actual.attrs)
+        self.assertEqual(ns_map, actual.ns_map)
+        self.assertTrue(self.node.has_children)
+
+    def test_bind_with_children(self):
+        text = "\n "
+        tail = "bar"
+        generic = AnyElement(
+            qname="a",
+            text=None,
+            tail="bar",
+            ns_map={},
+            attributes={},
+            children=[1, 2, 3],
+        )
+
+        objects = [("a", 1), ("b", 2), ("c", 3)]
+
+        self.node.has_children = True
+        self.assertTrue(self.node.bind("a", text, tail, objects))
+        self.assertEqual(self.var.qname, objects[-1][0])
+        self.assertEqual(generic, objects[-1][1])
+
+    def test_bind_with_simple_type(self):
+        objects = []
+
+        self.node.attrs[QNames.XSI_TYPE] = "xs:float"
+        self.node.ns_map["xs"] = Namespace.XS.uri
+
+        self.assertTrue(self.node.bind("a", "10", None, objects))
+        self.assertEqual(self.var.qname, objects[-1][0])
+        self.assertEqual(10.0, objects[-1][1])
+
+    def test_bind_with_simple_type_derived(self):
+        objects = []
+
+        self.node.var = XmlElement(name="a", qname="a", types=[object], derived=True)
+        self.node.attrs[QNames.XSI_TYPE] = DataType.FLOAT.qname
+
+        self.assertTrue(self.node.bind("a", "10", None, objects))
+        self.assertEqual(self.var.qname, objects[-1][0])
+        self.assertEqual(DerivedElement(qname="a", value=10.0), objects[-1][1])
+
+    def test_bind_with_simple_type_with_mixed_content(self):
+        objects = []
+
+        self.node.mixed = True
+        self.node.attrs[QNames.XSI_TYPE] = DataType.FLOAT.qname
+
+        self.assertTrue(self.node.bind("a", "10", "pieces", objects))
+        self.assertEqual(self.var.qname, objects[-2][0])
+        self.assertEqual(10.0, objects[-2][1])
+        self.assertIsNone(objects[-1][0])
+        self.assertEqual("pieces", objects[-1][1])
+
+        self.assertTrue(self.node.bind("a", "10", "\n", objects))
+        self.assertEqual(self.var.qname, objects[-1][0])
+        self.assertEqual(10.0, objects[-1][1])
 
 
 class WildcardNodeTests(TestCase):

@@ -24,27 +24,40 @@ class DownloaderTests(TestCase):
 
         self.downloader.wget(uri)
         self.downloader.wget(uri)  # once
-        mock_write_file.assert_called_once_with(uri, content.decode())
+        mock_write_file.assert_called_once_with(uri, None, content.decode())
 
     @mock.patch.object(Downloader, "write_file")
     def test_wget_with_definitions(self, mock_write_file):
-        wsdl = fixtures_dir.joinpath("hello/hello.wsdl")
-        xsd = fixtures_dir.joinpath("hello/hello.xsd")
+        wsdl = fixtures_dir.joinpath("hello/hello.wsdl").as_uri()
+        xsd = fixtures_dir.joinpath("hello/hello.xsd").as_uri()
 
-        self.downloader.wget(wsdl.as_uri())
+        self.downloader.wget(wsdl)
         mock_write_file.assert_has_calls(
             [
-                mock.call(xsd.as_uri(), urlopen(xsd.as_uri()).read().decode()),
-                mock.call(wsdl.as_uri(), urlopen(wsdl.as_uri()).read().decode()),
+                mock.call(xsd, "hello.xsd", urlopen(xsd).read().decode()),
+                mock.call(wsdl, None, urlopen(wsdl).read().decode()),
             ]
         )
 
     @mock.patch.object(Downloader, "wget")
     def test_wget_included(self, mock_wget):
-        schema = Schema(imports=[Import(location="foo.xsd"), Import()])
+        schema = Schema(
+            imports=[
+                Import(location="foo.xsd"),
+                Import(),
+                Import(location="foo.xsd", schema_location="../foo.xsd"),
+            ]
+        )
 
         self.downloader.wget_included(schema)
-        mock_wget.assert_called_once_with(schema.imports[0].location)
+        mock_wget.assert_has_calls(
+            [
+                mock.call(schema.imports[0].location, None),
+                mock.call(
+                    schema.imports[2].location, schema.imports[2].schema_location
+                ),
+            ]
+        )
 
     def test_adjust_base_path(self):
         first = "file:///schemas/air_v48_0/Air.wsdl"
@@ -102,10 +115,11 @@ class DownloaderTests(TestCase):
             output_path = Path(dir)
             file_path = output_path.joinpath("xml.xsd")
             self.downloader.output = output_path
-            self.downloader.write_file(uri, content)
+            self.downloader.write_file(uri, "foo", content)
 
             self.assertEqual(content, file_path.read_text())
             self.assertEqual(file_path, self.downloader.downloaded[uri])
+            self.assertEqual(file_path, self.downloader.downloaded["foo"])
 
     def test_write_relative_file(self):
         uri = "http://www.w3.org/2001/xml.xsd"
@@ -116,7 +130,7 @@ class DownloaderTests(TestCase):
             output_path = Path(dir)
             file_path = output_path.joinpath("2001/xml.xsd")
             self.downloader.output = output_path
-            self.downloader.write_file(uri, content)
+            self.downloader.write_file(uri, None, content)
 
             self.assertEqual(content, file_path.read_text())
             self.assertEqual(file_path, self.downloader.downloaded[uri])

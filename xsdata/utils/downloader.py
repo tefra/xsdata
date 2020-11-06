@@ -28,10 +28,12 @@ class Downloader:
     base_path: Optional[Path] = field(default=None, init=False)
     downloaded: Dict = field(default_factory=dict, init=False)
 
-    def wget(self, uri: str):
+    def wget(self, uri: str, location: Optional[str] = None):
         """Download handler for any uri input with circular protection."""
-        if uri not in self.downloaded:
+
+        if not (uri in self.downloaded or (location and location in self.downloaded)):
             self.downloaded[uri] = None
+            self.downloaded[location] = None
             self.adjust_base_path(uri)
 
             logger.info("Fetching %s", uri)
@@ -42,7 +44,7 @@ class Downloader:
             else:
                 self.parse_schema(uri, input_stream)
 
-            self.write_file(uri, input_stream.decode())
+            self.write_file(uri, location, input_stream.decode())
 
     def parse_schema(self, uri: str, content: bytes):
         """Convert content to a schema instance and process all sub imports."""
@@ -64,7 +66,8 @@ class Downloader:
     def wget_included(self, definition: Union[Schema, Definitions]):
         for included in definition.included():
             if included.location:
-                self.wget(included.location)
+                schema_location = getattr(included, "schema_location", None)
+                self.wget(included.location, schema_location)
 
     def adjust_base_path(self, uri: str):
         """
@@ -92,14 +95,13 @@ class Downloader:
         matches = re.findall(r"ocation=\"(.*)\"", content)
         for match in matches:
             if isinstance(self.downloaded.get(match), Path):
-                replace = str(self.downloaded[match].relative_to(self.output)).replace(
-                    "\\", "/"
-                )
+                location = self.downloaded[match].relative_to(self.output)
+                replace = str(location).replace("\\", "/")
                 content = content.replace(f'ocation="{match}"', f'ocation="{replace}"')
 
         return content
 
-    def write_file(self, uri: str, content: str):
+    def write_file(self, uri: str, location: Optional[str], content: str):
         """
         Write the given uri and it's content according to the base path and if
         the uri is relative to first requested uri.
@@ -120,3 +122,6 @@ class Downloader:
 
         logger.info("Writing %s", file_path)
         self.downloaded[uri] = file_path
+
+        if location:
+            self.downloaded[location] = file_path

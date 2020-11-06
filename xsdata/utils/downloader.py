@@ -89,13 +89,13 @@ class Downloader:
                     self.base_path = Path(common_path)
                     logger.info("Adjusting base path to %s", self.base_path)
 
-    def adjust_imports(self, content: str) -> str:
+    def adjust_imports(self, path: Path, content: str) -> str:
         """Try to adjust the import locations for external locations that are
         not relative to the first requested uri."""
         matches = re.findall(r"ocation=\"(.*)\"", content)
         for match in matches:
             if isinstance(self.downloaded.get(match), Path):
-                location = self.downloaded[match].relative_to(self.output)
+                location = os.path.relpath(self.downloaded[match], path)
                 replace = str(location).replace("\\", "/")
                 content = content.replace(f'ocation="{match}"', f'ocation="{replace}"')
 
@@ -106,17 +106,17 @@ class Downloader:
         Write the given uri and it's content according to the base path and if
         the uri is relative to first requested uri.
 
-        Keep track of all the written file paths, incase we have to
+        Keep track of all the written file paths, in case we have to
         modify the location attribute in an upcoming schema/definition
         import.
         """
-        content = self.adjust_imports(content)
         common_path = os.path.commonpath((self.base_path or "", uri))
         if common_path:
             file_path = self.output.joinpath(Path(uri).relative_to(common_path))
         else:
             file_path = self.output.joinpath(Path(uri).name)
 
+        content = self.adjust_imports(file_path.parent, content)
         file_path.parent.mkdir(parents=True, exist_ok=True)
         file_path.write_text(content, encoding="utf-8")
 

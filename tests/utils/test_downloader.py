@@ -98,10 +98,19 @@ class DownloaderTests(TestCase):
                 }
             )
 
-            result = self.downloader.adjust_imports(content)
+            result = self.downloader.adjust_imports(dir_path, content)
             expected = (
                 '<hypothetical location="some/place/bar.xsd" />\n'
                 '<hypothetical schemaLocation="other/bar.xsd" />\n'
+                '<hypothetical location="http://bar.com/foo.xsd" />\n'
+                '<hypothetical location="../something.xsd" />\n'
+            )
+            self.assertEqual(expected, result)
+
+            result = self.downloader.adjust_imports(dir_path.joinpath("foo"), content)
+            expected = (
+                '<hypothetical location="../some/place/bar.xsd" />\n'
+                '<hypothetical schemaLocation="../other/bar.xsd" />\n'
                 '<hypothetical location="http://bar.com/foo.xsd" />\n'
                 '<hypothetical location="../something.xsd" />\n'
             )

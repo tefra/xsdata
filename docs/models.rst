@@ -237,7 +237,7 @@ This type represents a traditional xml attribute.
             "name": "lang",
             "type": "Attribute",
             "namespace": "http://www.w3.org/XML/1998/namespace"
-        )
+        }
     )
 
 .. code-block:: xml

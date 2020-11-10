@@ -60,24 +60,18 @@ Features
 - Pluggable code writer that supports python dataclasses and PlantUML class diagrams.
 
 
-Changelog: 20.10 (2020-10-02)
+Changelog: 20.11 (2020-11-10)
 -----------------------------
-- Fixed generator adding multiple default value fields. `#249 <https://github.com/tefra/xsdata/issues/249>`_
-- Fixed generator not applying nested container restrictions. `#263 <https://github.com/tefra/xsdata/issues/253>`_
-- Fixed generator to avoid case insensitive class name conflicts. `#269 <https://github.com/tefra/xsdata/issues/269>`_
-- Fixed generator rendering unused simple types.
-- Fixed generator unsorted libraries imports.
-- Fixed JsonParser trying to parse init=False fields. `#253 <https://github.com/tefra/xsdata/issues/253>`_
-- Fixed NodeParser binding tail content more than once with mixed vars. `#256 <https://github.com/tefra/xsdata/issues/256>`_
-- Added XmlWriter interface to decouple serialize from lxml. `#247 <https://github.com/tefra/xsdata/issues/247>`_
-- Added native python xml content writer XmlEventWriter. ✨✨✨
-- Added lxml based content writer: LxmlEventWriter.
-- Added generator config with options to control naming cases and aliases. `#265 <https://github.com/tefra/xsdata/issues/265>`_
-- Updated field xml type auto detection to be more flexible. `#246 <https://github.com/tefra/xsdata/issues/246>`_
-- Updated EnumConverter to resort to canonical form matching as last resort. `#273 <https://github.com/tefra/xsdata/issues/273>`_
-- Updated support for derived elements. `#267 <https://github.com/tefra/xsdata/issues/267>`_
-
-
-This is my favorite release so far, maybe because xsdata reached one year of development
-✨✨✨ or maybe because some of the last original components finally got the rewrite they
-deserved.
+- Added sub command to download remote schemas and definitions. `#279 <https://github.com/tefra/xsdata/issues/279>`_
+- Added new optional xml type `Elements` to maintain ordering for repeatable choices. `#296 <https://github.com/tefra/xsdata/issues/296>`_
+- Added xsi:type lookup procedure for xs:anyType derived elements. `#306 <https://github.com/tefra/xsdata/issues/306>`_
+- Updated simple type flattening detection. `#286 <https://github.com/tefra/xsdata/issues/286>`_
+- Updated generator to allow namespace structure on schemas without target namespace.
+- Updated generator to avoid writing min/max occurs metadata for implied values. `#297 <https://github.com/tefra/xsdata/issues/297>`_
+- Update generator to use literal dictionary initialization.
+- Updated parser security, disable lxml network and entities resolve.
+- Fixed field types detection for elements with xs:alternative children. `#284 <https://github.com/tefra/xsdata/issues/284>`_
+- Fixed file generation to enforce default charset UTF-8. `#302 <https://github.com/tefra/xsdata/issues/302>`_
+- Fixed jinja2 undefined namespace var collision. `#298 <https://github.com/tefra/xsdata/issues/298>`_
+- Fixed import class name collision. `#300 <https://github.com/tefra/xsdata/issues/300>`_
+- Fixed restriction inheritance on xs:group elements. `#301 <https://github.com/tefra/xsdata/issues/301>`_

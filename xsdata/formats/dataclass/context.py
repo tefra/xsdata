@@ -353,10 +353,12 @@ class XmlContext:
 
     @classmethod
     def get_subclasses(cls, clazz: Type):
-        if clazz is not type:
+        try:
             for subclass in clazz.__subclasses__():
                 yield from cls.get_subclasses(subclass)
                 yield subclass
+        except TypeError:
+            pass
 
     def local_name(self, name: str, xml_type: Optional[str] = None) -> str:
         if xml_type == "Attribute":

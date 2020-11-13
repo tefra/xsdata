@@ -1,3 +1,7 @@
+20.11.1 (2020-11-13)
+--------------------
+- Catch all type errors on xsi cache build `#316 <https://github.com/tefra/xsdata/issues/316>`_
+
 20.11 (2020-11-10)
 ------------------
 - Added sub command to download remote schemas and definitions. `#279 <https://github.com/tefra/xsdata/issues/279>`_

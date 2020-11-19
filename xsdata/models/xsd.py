@@ -11,6 +11,7 @@ from typing import Union as UnionType
 from lxml.html.clean import clean_html
 
 from xsdata.formats.dataclass.serializers import XmlSerializer
+from xsdata.formats.dataclass.serializers.config import SerializerConfig
 from xsdata.models.enums import DataType
 from xsdata.models.enums import FormType
 from xsdata.models.enums import Mode
@@ -27,7 +28,7 @@ from xsdata.utils import text
 from xsdata.utils.collections import unique_sequence
 from xsdata.utils.namespaces import clean_uri
 
-docstring_serializer = XmlSerializer(pretty_print=True)
+docstring_serializer = XmlSerializer(config=SerializerConfig(pretty_print=True))
 
 
 @dataclass(frozen=True)

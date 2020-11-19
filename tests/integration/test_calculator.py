@@ -12,6 +12,7 @@ from xsdata.cli import cli
 from xsdata.formats.dataclass.client import Client
 from xsdata.formats.dataclass.client import Config
 from xsdata.formats.dataclass.serializers import XmlSerializer
+from xsdata.formats.dataclass.serializers.config import SerializerConfig
 from xsdata.formats.dataclass.transports import DefaultTransport
 from xsdata.utils.testing import load_class
 
@@ -40,7 +41,8 @@ class CalculatorServiceTests(TestCase):
         mock_most.return_value = response
 
         config = Config.from_service(CalculatorSoapAdd)
-        client = Client(config=config, serializer=XmlSerializer(pretty_print=True))
+        serializer = XmlSerializer(config=SerializerConfig(pretty_print=True))
+        client = Client(config=config, serializer=serializer)
         result = client.send({"body": {"add": {"int_a": 1, "int_b": 3}}})
 
         self.assertIsInstance(result, CalculatorSoapAddOutput)

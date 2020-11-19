@@ -8,6 +8,7 @@ from xsdata.formats.dataclass.parsers import JsonParser
 from xsdata.formats.dataclass.parsers import XmlParser
 from xsdata.formats.dataclass.serializers import JsonSerializer
 from xsdata.formats.dataclass.serializers import XmlSerializer
+from xsdata.formats.dataclass.serializers.config import SerializerConfig
 
 
 def validate_bindings(schema: Path, clazz: Type):
@@ -23,7 +24,8 @@ def validate_bindings(schema: Path, clazz: Type):
     else:
         expected.write_text(actual, encoding="utf-8")
 
-    xml = XmlSerializer(pretty_print=True).render(obj)
+    config = SerializerConfig(pretty_print=True)
+    xml = XmlSerializer(config=config).render(obj)
 
     validator = etree.XMLSchema(etree.parse(str(schema)))
     assert validator.validate(etree.fromstring(xml.encode())), validator.error_log

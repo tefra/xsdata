@@ -14,14 +14,14 @@ class XmlEventWriter(XmlWriter):
     def __post_init__(self):
         self.handler = XMLGenerator(
             out=self.output,
-            encoding=self.encoding,
+            encoding=self.config.encoding,
             short_empty_elements=True,
         )
 
     def start_tag(self, qname: str):
         super().start_tag(qname)
 
-        if self.pretty_print:
+        if self.config.pretty_print:
             if self.depth:
                 self.handler.ignorableWhitespace("\n")
                 self.handler.ignorableWhitespace("  " * self.depth)
@@ -30,7 +30,7 @@ class XmlEventWriter(XmlWriter):
             self.ended = 0
 
     def end_tag(self, qname: str):
-        if not self.pretty_print:
+        if not self.config.pretty_print:
             super().end_tag(qname)
             return
 

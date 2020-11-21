@@ -18,6 +18,7 @@ from xsdata.formats.dataclass.models.elements import XmlMeta
 from xsdata.formats.dataclass.models.elements import XmlVar
 from xsdata.formats.dataclass.models.generics import AnyElement
 from xsdata.formats.dataclass.models.generics import DerivedElement
+from xsdata.formats.dataclass.serializers.config import SerializerConfig
 from xsdata.formats.dataclass.serializers.mixins import XmlWriter
 from xsdata.formats.dataclass.serializers.mixins import XmlWriterEvent
 from xsdata.formats.dataclass.serializers.writers import LxmlEventWriter
@@ -35,14 +36,12 @@ class XmlSerializer(AbstractSerializer):
     """
     Xml serialize for dataclasses.
 
-    :param encoding: Text encoding
-    :param pretty_print: Enable pretty output
+    :param config: Serializer configuration
     :param context: XmlContext instance
     :param writer: xml writer type
     """
 
-    encoding: str = field(default="UTF-8")
-    pretty_print: bool = field(default=False)
+    config: SerializerConfig = field(default_factory=SerializerConfig)
     context: XmlContext = field(default_factory=XmlContext)
     writer: Type[XmlWriter] = field(default=LxmlEventWriter)
 
@@ -64,10 +63,9 @@ class XmlSerializer(AbstractSerializer):
         """
         events = self.write_object(obj)
         handler = self.writer(
+            config=self.config,
             output=out,
             ns_map=namespaces.clean_prefixes(ns_map) if ns_map else {},
-            encoding=self.encoding,
-            pretty_print=self.pretty_print,
         )
         handler.write(events)
 

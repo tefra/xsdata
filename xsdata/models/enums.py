@@ -43,6 +43,10 @@ class QNames:
 
     XSI_NIL = f"{{{Namespace.XSI.uri}}}nil"
     XSI_TYPE = f"{{{Namespace.XSI.uri}}}type"
+    XSI_SCHEMA_LOCATION = f"{{{Namespace.XSI.uri}}}schemaLocation"
+    XSI_NO_NAMESPACE_SCHEMA_LOCATION = (
+        f"{{{Namespace.XSI.uri}}}noNamespaceSchemaLocation"
+    )
 
 
 class NamespaceType:

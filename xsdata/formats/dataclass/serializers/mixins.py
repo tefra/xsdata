@@ -13,9 +13,7 @@ from xml.sax.handler import ContentHandler
 
 from xsdata.exceptions import XmlWriterError
 from xsdata.formats.converter import converter
-from xsdata.formats.dataclass.serializers.config import SerializerConfig
 from xsdata.models.enums import Namespace
-from xsdata.models.enums import QNames
 from xsdata.utils.constants import EMPTY_MAP
 from xsdata.utils.namespaces import generate_prefix
 from xsdata.utils.namespaces import prefix_exists
@@ -38,14 +36,16 @@ class XmlWriter:
     next node information before it's absolutely ready for the sax content
     handlers.
 
-    :param config: Serializer configuration
     :param output: The file type object to store the result.
     :param handler: Sax content handler
     """
 
-    config: SerializerConfig
     output: TextIO
     handler: ContentHandler = field(init=False)
+
+    # Config
+    encoding: str = field(default="UTF-8")
+    pretty_print: bool = field(default=False)
 
     # Scope vars
     in_tail: bool = field(init=False, default=False)
@@ -59,21 +59,7 @@ class XmlWriter:
     def write(self, events: Generator):
         """Iterate over the generated events and feed the sax content handler
         with the information needed to generate the xml output."""
-        self.start_document()
-
-        if self.config.schema_location:
-            self.add_attribute(
-                QNames.XSI_SCHEMA_LOCATION,
-                self.config.schema_location,
-                check_pending=False,
-            )
-
-        if self.config.no_namespace_schema_location:
-            self.add_attribute(
-                QNames.XSI_NO_NAMESPACE_SCHEMA_LOCATION,
-                self.config.no_namespace_schema_location,
-                check_pending=False,
-            )
+        self.handler.startDocument()
 
         for event, *args in events:
             if event == XmlWriterEvent.START:
@@ -88,10 +74,6 @@ class XmlWriter:
                 raise XmlWriterError(f"Unhandled event: `{event}`")
 
         self.handler.endDocument()
-
-    def start_document(self):
-        self.output.write(f'<?xml version="{self.config.xml_version}"')
-        self.output.write(f' encoding="{self.config.encoding}"?>\n')
 
     def start_tag(self, qname: str):
         """
@@ -108,7 +90,7 @@ class XmlWriter:
         self.pending_tag = split_qname(qname)
         self.add_namespace(self.pending_tag[0])
 
-    def add_attribute(self, key: str, value: Any, check_pending: bool = True):
+    def add_attribute(self, key: str, value: Any):
         """
         Add attribute notification receiver.
 
@@ -117,7 +99,7 @@ class XmlWriter:
         generate any missing namespace prefixes.
         """
 
-        if not self.pending_tag and check_pending:
+        if not self.pending_tag:
             raise XmlWriterError("Empty pending tag.")
 
         if isinstance(value, str) and value and value[0] == "{" and len(value) > 1:

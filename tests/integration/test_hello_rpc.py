@@ -15,7 +15,6 @@ from xsdata.cli import cli
 from xsdata.formats.dataclass.client import Client
 from xsdata.formats.dataclass.client import Config
 from xsdata.formats.dataclass.serializers import XmlSerializer
-from xsdata.formats.dataclass.serializers.config import SerializerConfig
 from xsdata.formats.dataclass.transports import DefaultTransport
 from xsdata.utils.testing import load_class
 
@@ -44,8 +43,7 @@ class HelloRpcServiceTests(TestCase):
         mock_most.return_value = response
 
         config = Config.from_service(HelloGetHelloAsString)
-        serializer = XmlSerializer(config=SerializerConfig(pretty_print=True))
-        client = Client(config=config, serializer=serializer)
+        client = Client(config=config, serializer=XmlSerializer(pretty_print=True))
         result = client.send({"body": {"get_hello_as_string": {"arg0": "chris"}}})
 
         self.assertIsInstance(result, HelloGetHelloAsString.output)
@@ -68,8 +66,7 @@ class HelloRpcServiceTests(TestCase):
         mock_most.return_value = response
 
         config = Config.from_service(HelloGetHelloAsString)
-        serializer = XmlSerializer(config=SerializerConfig(pretty_print=True))
-        client = Client(config=config, serializer=serializer)
+        client = Client(config=config, serializer=XmlSerializer(pretty_print=True))
         result = client.send({"body": {"get_hello_as_string": {"arg0": "chris"}}})
 
         self.assertIsInstance(result, HelloGetHelloAsString.output)
@@ -88,7 +85,6 @@ class HelloRpcServiceTests(TestCase):
     @pytest.mark.skip
     def test_live(self):
         config = Config.from_service(HelloGetHelloAsString)
-        serializer = XmlSerializer(config=SerializerConfig(pretty_print=True))
-        client = Client(config=config, serializer=serializer)
+        client = Client(config=config, serializer=XmlSerializer(pretty_print=True))
         result = client.send({"body": {"get_hello_as_string": {"arg0": "chris"}}})
         print(result)

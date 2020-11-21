@@ -21,7 +21,7 @@ Parameters
    :header-rows: 1
    :align: left
 
-   * - Name
+   * - Namespace
      - Type
      - Description
    * - base_url
@@ -146,33 +146,14 @@ context instance between them to save on memory and processing.
 Parameters
 ----------
 
-**config** (:class:`~xsdata.formats.dataclass.serializers.config.SerializerConfig`)
+**encoding** (:class:`str`)
 
-.. list-table::
-   :widths: 20 10 220
-   :header-rows: 1
-   :align: left
+text encoding, default: `UTF-8`
 
-   * - Name
-     - Type
-     - Description
-   * - encoding
-     - str
-     - Text encoding, default: ``UTF-8``
-   * - xml_version
-     - str
-     - XML Version number, default: ``1.0``
-   * - pretty_print
-     - bool
-     - Enable pretty output, default ``False``
-   * - schema_location
-     - str
-     - Specify the xsi:schemaLocation attribute value,
-       eg ``xsi:schemaLocation="http://example.org/prod chapter08.xsd"``, Optional
-   * - no_namespace_schema_location
-     - str
-     - Specify the xsi:noNamespaceSchemaLocation attribute value,
-       eg ``xsi:noNamespaceSchemaLocation="chapter11.xsd"``, Optional
+
+**pretty_print** (:class:`bool`)
+
+Enable pretty output, default: `False`
 
 
 **context** (:class:`~xsdata.formats.dataclass.context.XmlContext`)
@@ -215,50 +196,50 @@ Example: render
 ---------------
 
 .. literalinclude:: examples/xml_serializer.py
-    :lines: 4-26
+    :lines: 4-23
 
 .. literalinclude:: examples/xml_serializer.py
-    :lines: 28-38
+    :lines: 26-36
     :language: xml
 
 Example: custom prefixes
 ------------------------
 
 .. literalinclude:: examples/xml_serializer.py
-    :lines: 42
+    :lines: 40
 
 .. literalinclude:: examples/xml_serializer.py
-    :lines: 45-48
+    :lines: 43-45
     :language: xml
 
 Example: default prefix
 -----------------------
 
 .. literalinclude:: examples/xml_serializer.py
-    :lines: 59
+    :lines: 57
 
 .. literalinclude:: examples/xml_serializer.py
-    :lines: 62-65
+    :lines: 60-63
     :language: xml
 
 Example: native handler
 -----------------------
 
 .. literalinclude:: examples/xml_serializer.py
-    :lines: 75-77
+    :lines: 73-75
 
 .. literalinclude:: examples/xml_serializer.py
-    :lines: 79-89
+    :lines: 78-88
     :language: xml
 
 Example: write to stream
 ------------------------
 
 .. literalinclude:: examples/xml_serializer.py
-    :lines: 92
+    :lines: 91
 
 .. literalinclude:: examples/xml_serializer.py
-    :lines: 94-95
+    :lines: 93-94
 
 
 Benchmarks

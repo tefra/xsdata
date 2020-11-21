@@ -16,7 +16,7 @@ class GeneratorConfigTests(TestCase):
             obj.write(fp, obj)
 
         expected = (
-            '<?xml version="1.0" encoding="UTF-8"?>\n'
+            "<?xml version='1.0' encoding='UTF-8'?>\n"
             f'<Config xmlns="http://pypi.org/project/xsdata" version="{version}">\n'
             '  <Output wsdl="false">\n'
             "    <Package>generated</Package>\n"
@@ -44,7 +44,7 @@ class GeneratorConfigTests(TestCase):
 
     def test_read(self):
         existing = (
-            '<?xml version="1.0" encoding="UTF-8"?>\n'
+            "<?xml version='1.0' encoding='UTF-8'?>\n"
             '<Config xmlns="http://pypi.org/project/xsdata" version="20.8">\n'
             '  <Output wsdl="false">\n'
             "    <Package>foo.bar</Package>\n"
@@ -63,7 +63,7 @@ class GeneratorConfigTests(TestCase):
             GeneratorConfig.write(fp, config)
 
         expected = (
-            '<?xml version="1.0" encoding="UTF-8"?>\n'
+            "<?xml version='1.0' encoding='UTF-8'?>\n"
             f'<Config xmlns="http://pypi.org/project/xsdata" version="{version}">\n'
             '  <Output wsdl="false">\n'
             "    <Package>foo.bar</Package>\n"

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version='1.0' encoding='UTF-8'?>
 <envelope>
   <ns0:order xmlns:ns0="http://example.org/ord">
     <ns0:number>123ABBCC123</ns0:number>

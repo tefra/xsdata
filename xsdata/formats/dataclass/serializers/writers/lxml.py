@@ -19,9 +19,9 @@ class LxmlEventWriter(XmlWriter):
 
         xml = tostring(
             self.handler.etree,
-            encoding=self.config.encoding,
-            pretty_print=self.config.pretty_print,
-            xml_declaration=False,
+            encoding=self.encoding,
+            pretty_print=self.pretty_print,
+            xml_declaration=True,
         ).decode()
 
         self.output.write(xml)

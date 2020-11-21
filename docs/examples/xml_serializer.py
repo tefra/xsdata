@@ -3,7 +3,6 @@ import tempfile
 
 from tests.fixtures.books import Books, BookForm
 from xsdata.formats.dataclass.serializers import XmlSerializer
-from xsdata.formats.dataclass.serializers.config import SerializerConfig
 from xsdata.formats.dataclass.serializers.writers import XmlEventWriter
 
 books = Books(
@@ -20,12 +19,11 @@ books = Books(
     ]
 )
 
-config = SerializerConfig(pretty_print=True)
-serializer = XmlSerializer(config=config)
+serializer = XmlSerializer(pretty_print=True)
 xml = serializer.render(books)
 
 assert xml == """
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version='1.0' encoding='UTF-8'?>
 <ns0:books xmlns:ns0="urn:books">
   <book id="bk001" lang="en">
     <author>Hightower, Kim</author>
@@ -38,11 +36,11 @@ assert xml == """
 </ns0:books>
 """.lstrip()
 
-serializer = XmlSerializer(config=config)
+serializer = XmlSerializer(pretty_print=True)
 xml = serializer.render(books, ns_map={"bk": "urn:books"})
 
 assert xml == """
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version='1.0' encoding='UTF-8'?>
 <bk:books xmlns:bk="urn:books">
   <book id="bk001" lang="en">
     <author>Hightower, Kim</author>
@@ -55,11 +53,11 @@ assert xml == """
 </bk:books>
 """.lstrip()
 
-serializer = XmlSerializer(config=config)
+serializer = XmlSerializer(pretty_print=True)
 xml = serializer.render(books, ns_map={None: "urn:books"})
 
 assert xml == """
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version='1.0' encoding='UTF-8'?>
 <books xmlns="urn:books">
   <book xmlns="" id="bk001" lang="en">
     <author>Hightower, Kim</author>
@@ -72,8 +70,9 @@ assert xml == """
 </books>
 """.lstrip()
 
-config = SerializerConfig(pretty_print=True, encoding="US-ASCII")
-serializer = XmlSerializer(config=config, writer=XmlEventWriter)
+serializer = XmlSerializer(
+    pretty_print=True, encoding="US-ASCII", writer=XmlEventWriter
+)
 xml = serializer.render(books, ns_map={None: "urn:books"})
 assert xml == """
 <?xml version="1.0" encoding="US-ASCII"?>

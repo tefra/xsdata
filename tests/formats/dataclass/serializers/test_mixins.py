@@ -3,27 +3,25 @@ from unittest import TestCase
 from xml.sax.saxutils import XMLGenerator
 
 from xsdata.exceptions import XmlWriterError
-from xsdata.formats.dataclass.serializers.config import SerializerConfig
 from xsdata.formats.dataclass.serializers.mixins import XmlWriter
 from xsdata.formats.dataclass.serializers.mixins import XmlWriterEvent
 from xsdata.models.enums import DataType
 from xsdata.models.enums import QNames
 
 
-class XmlWriterTests(TestCase):
+class XmlEventWriterTests(TestCase):
     def setUp(self) -> None:
         super().setUp()
 
         output = StringIO()
-        config = SerializerConfig()
-        self.writer = XmlWriter(output=output, config=config)
+        self.writer = XmlWriter(output=output)
         self.writer.handler = XMLGenerator(
             output,
             encoding="UTF-8",
             short_empty_elements=True,
         )
 
-    def test_write(self):
+    def test_consume(self):
         events = iter(
             [
                 (XmlWriterEvent.START, "{http://www.w3.org/1999/xhtml}p"),
@@ -46,46 +44,6 @@ class XmlWriterTests(TestCase):
             (
                 '<xhtml:p xmlns:xhtml="http://www.w3.org/1999/xhtml" class="section">'
                 "total:<xhtml:br/>105.22</xhtml:p>"
-            ),
-            lines[1],
-        )
-
-    def test_write_with_schema_location(self):
-        self.writer.config.schema_location = "foo bar"
-        events = iter(
-            [
-                (XmlWriterEvent.START, "root"),
-                (XmlWriterEvent.END, "root"),
-            ]
-        )
-
-        self.writer.write(events)
-
-        lines = self.writer.output.getvalue().split("\n")
-        self.assertEqual(
-            (
-                '<root xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" '
-                'xsi:schemaLocation="foo bar"/>'
-            ),
-            lines[1],
-        )
-
-    def test_write_with_no_namespace_schema_location(self):
-        self.writer.config.no_namespace_schema_location = "foo.xsd"
-        events = iter(
-            [
-                (XmlWriterEvent.START, "root"),
-                (XmlWriterEvent.END, "root"),
-            ]
-        )
-
-        self.writer.write(events)
-
-        lines = self.writer.output.getvalue().split("\n")
-        self.assertEqual(
-            (
-                '<root xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" '
-                'xsi:noNamespaceSchemaLocation="foo.xsd"/>'
             ),
             lines[1],
         )

@@ -91,6 +91,7 @@ class DataclassGenerator(AbstractGenerator):
     def render_classes(self, classes: List[Class]) -> str:
         """Render the source code of the classes."""
         load = self.template
+        config = self.config
 
         def render_class(obj: Class) -> str:
             """Render class or enumeration."""
@@ -102,7 +103,13 @@ class DataclassGenerator(AbstractGenerator):
             else:
                 template = "class"
 
-            return load(template).render(obj=obj).strip()
+            return (
+                load(template)
+                .render(
+                    obj=obj, docstring_style=config.output.docstring_style.name.lower()
+                )
+                .strip()
+            )
 
         return "\n\n\n".join(map(render_class, classes)) + "\n"
 

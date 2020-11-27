@@ -1,5 +1,7 @@
-{% set help = obj|class_docstring|trim -%}
-{% set level = level|default(0)-%}
+{% set help | format_docstring %}
+    {%- include "docstrings." + docstring_style + ".jinja2" -%}
+{% endset -%}
+{% set level = level|default(0) -%}
 {% set parent_namespace = obj.namespace or parent_namespace|default(None) -%}
 {% set class_name =  obj.name|class_name -%}
 {% set parents = parents|default([obj.name]) %}

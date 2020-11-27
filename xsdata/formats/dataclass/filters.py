@@ -18,7 +18,6 @@ from jinja2 import Environment
 from xsdata.codegen.models import Attr
 from xsdata.codegen.models import AttrChoice
 from xsdata.codegen.models import AttrType
-from xsdata.codegen.models import Class
 from xsdata.formats.converter import converter
 from xsdata.formats.dataclass import utils
 from xsdata.models.config import GeneratorAlias
@@ -61,7 +60,7 @@ class Filters:
                 "field_metadata": self.field_metadata,
                 "field_type": self.field_type,
                 "class_name": self.class_name,
-                "class_docstring": self.class_docstring,
+                "format_docstring": self.format_docstring,
                 "constant_name": self.constant_name,
                 "constant_value": self.constant_value,
                 "default_imports": self.default_imports,
@@ -235,21 +234,11 @@ class Filters:
 
         return str(data)
 
-    def class_docstring(self, obj: Class, enum: bool = False) -> str:
-        """Generate docstring for the given class and the constructor
-        arguments."""
-        lines = []
-        if obj.help:
-            lines.append(obj.help)
-
-        var_type = "cvar" if enum else "ivar"
-        name_func = self.constant_name if enum else self.field_name
-
-        for attr in obj.attrs:
-            description = attr.help.strip() if attr.help else ""
-            lines.append(f":{var_type} {name_func(attr.name)}: {description}".strip())
-
-        return format_code('"""\n{}\n"""'.format("\n".join(lines))) if lines else ""
+    @classmethod
+    def format_docstring(cls, doc_string: str) -> str:
+        """Format doc strings."""
+        content = doc_string.replace('"""', "").replace("'''", "").strip()
+        return format_code(f'"""\n{content}\n"""') if content else ""
 
     def field_default_value(self, attr: Attr, ns_map: Optional[Dict] = None) -> Any:
         """Generate the field default value/factory for the given attribute."""

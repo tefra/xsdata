@@ -59,6 +59,12 @@ __name_case_func__ = {
 }
 
 
+class DocstringStyle(Enum):
+    RST = "reStructuredText"
+    NUMPY = "NumPy"
+    GOOGLE = "Google"
+
+
 @dataclass
 class GeneratorOutput:
     """
@@ -68,6 +74,7 @@ class GeneratorOutput:
     :param package: Package name eg foo.bar.models
     :param format: Select an output format
     :param structure: Select an output structure
+    :param docstring_style: Select a docstring style
     :param compound_fields: Use compound fields for repeating choices.
         Enable if elements ordering matters for your case.
     """
@@ -76,6 +83,7 @@ class GeneratorOutput:
     package: str = element(default="generated")
     format: OutputFormat = element(default=OutputFormat.DATACLASS)
     structure: OutputStructure = element(default=OutputStructure.FILENAMES)
+    docstring_style: DocstringStyle = element(default=DocstringStyle.RST)
     compound_fields: bool = element(default=False)
 
 

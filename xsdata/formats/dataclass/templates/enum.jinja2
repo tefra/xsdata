@@ -1,4 +1,6 @@
-{% set help = obj|class_docstring(enum=True)|trim %}
+{% set help | format_docstring %}
+    {%- include "docstrings." + docstring_style + ".jinja2" -%}
+{% endset %}
 
 class {{ obj.name|class_name }}(Enum):
 {%- if help %}

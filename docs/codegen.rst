@@ -69,6 +69,17 @@ ordering.
 
 See :ref:`Type: Elements`
 
+
+docstring-style
+---------------
+
+Choose between the available docstring styles.
+
+* ``reStructuredText`` **default**
+* ``NumPy``
+* ``Google``
+
+
 verbosity
 ---------
 

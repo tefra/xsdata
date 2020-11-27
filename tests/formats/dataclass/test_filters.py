@@ -517,36 +517,31 @@ class FiltersTests(FactoryTestCase):
         )
         self.assertEqual(expected, self.filters.format_metadata(data))
 
-    def test_class_docstring(self):
-        target = ClassFactory.create(
-            attrs=[
-                AttrFactory.element(help="help"),
-                AttrFactory.element(help="Foo\nBar"),
-                AttrFactory.element(),
-            ]
+    def test_format_docstring(self):
+
+        actual = self.filters.format_docstring("'''    '''")
+        self.assertEqual("", actual)
+
+        actual = self.filters.format_docstring('"""    """')
+        self.assertEqual("", actual)
+
+        actual = self.filters.format_docstring("   ")
+        self.assertEqual("", actual)
+
+        docstring = (
+            "\n\nfafafa\n\n"
+            "                fwfw\n"
+            "        \n   \n  "
+            "            :param foobar: dfff  \n"
+            "        "
         )
 
         expected = (
-            '"""\n'
-            ":ivar attr_b: help\n"
-            ":ivar attr_c: Foo\n"
-            "Bar\n"
-            ":ivar attr_d:\n"
-            '"""'
+            '"""fafafa.\n' "\n" "  fwfw\n" "\n" "\n" ":param foobar: dfff\n" '"""'
         )
-        self.assertEqual(expected, self.filters.class_docstring(target))
 
-    def test_class_docstring_with_class_help(self):
-        target = ClassFactory.elements(2, help="Help Me!")
-
-        expected = '"""Help Me!\n' "\n" ":ivar attr_b:\n" ":ivar attr_c:\n" '"""'
-        self.assertEqual(expected, self.filters.class_docstring(target))
-
-    def test_class_docstring_with_enumeration(self):
-        target = ClassFactory.enumeration(2, help="Help Me!")
-
-        expected = '"""Help Me!\n' "\n" ":cvar ATTR_B:\n" ":cvar ATTR_C:\n" '"""'
-        self.assertEqual(expected, self.filters.class_docstring(target, enum=True))
+        actual = self.filters.format_docstring(docstring)
+        self.assertEqual(expected, actual)
 
     def test_from_config(self):
         config = GeneratorConfig()

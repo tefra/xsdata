@@ -12,12 +12,14 @@ from pkg_resources import get_distribution
 from xsdata.codegen.transformer import SchemaTransformer
 from xsdata.exceptions import CodeGenerationError
 from xsdata.logger import logger
+from xsdata.models.config import DocstringStyle
 from xsdata.models.config import GeneratorConfig
 from xsdata.models.config import OutputFormat
 from xsdata.models.config import OutputStructure
 from xsdata.utils.downloader import Downloader
 
 outputs = click.Choice([x.value for x in OutputFormat])
+docstring_styles = click.Choice([x.value for x in DocstringStyle])
 
 
 @click.group(cls=DefaultGroup, default="generate", default_if_no_args=False)
@@ -79,6 +81,12 @@ def download(source: str, output: str):
         "Enable if elements ordering matters for your case."
     ),
 )
+@click.option(
+    "--docstring-style",
+    type=docstring_styles,
+    help="Docstring Style",
+    default="reStructuredText",
+)
 @click.option("--wsdl", is_flag=True, default=False, help="WSDL Mode (experimental)")
 @click.option("--print", is_flag=True, default=False, help="Print output")
 @click.option(
@@ -108,6 +116,7 @@ def generate(*args: Any, **kwargs: Any):
         config.output.package = kwargs["package"]
         config.output.wsdl = kwargs["wsdl"]
         config.output.compound_fields = kwargs["compound_fields"]
+        config.output.docstring_style = DocstringStyle(kwargs["docstring_style"])
 
         if kwargs["ns_struct"]:
             config.output.structure = OutputStructure.NAMESPACES

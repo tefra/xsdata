@@ -12,6 +12,7 @@ from xsdata.cli import resolve_source
 from xsdata.codegen.transformer import SchemaTransformer
 from xsdata.exceptions import CodeGenerationError
 from xsdata.logger import logger
+from xsdata.models.config import DocstringStyle
 from xsdata.models.config import GeneratorConfig
 from xsdata.models.config import OutputFormat
 from xsdata.models.config import OutputStructure
@@ -90,6 +91,19 @@ class CliTests(TestCase):
         mock_process_definitions.assert_called_once_with(
             source.as_uri(),
         )
+
+    @mock.patch.object(SchemaTransformer, "process_schemas")
+    @mock.patch.object(SchemaTransformer, "__init__", return_value=None)
+    def test_generate_with_docstring_style(self, mock_init, mock_process_schemas):
+        source = fixtures_dir.joinpath("defxmlschema/chapter03.xsd")
+        result = self.runner.invoke(
+            cli, [str(source), "--package", "foo", "--docstring-style", "Google"]
+        )
+        config = mock_init.call_args[1]["config"]
+
+        self.assertIsNone(result.exception)
+        self.assertEqual([source.as_uri()], mock_process_schemas.call_args[0][0])
+        self.assertEqual(DocstringStyle.GOOGLE, config.output.docstring_style)
 
     @mock.patch.object(SchemaTransformer, "process_schemas")
     @mock.patch.object(SchemaTransformer, "__init__", return_value=None)

@@ -14,7 +14,17 @@ def test_books_schema():
     schema = fixtures_dir.joinpath("books/schema.xsd")
     package = "tests.fixtures.books"
     runner = CliRunner()
-    result = runner.invoke(cli, [str(schema), "--package", package, "--ns-struct"])
+    result = runner.invoke(
+        cli,
+        [
+            str(schema),
+            "--package",
+            package,
+            "--ns-struct",
+            "--docstring-style",
+            "Google",
+        ],
+    )
 
     if result.exception:
         raise result.exception

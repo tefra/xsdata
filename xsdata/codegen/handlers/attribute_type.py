@@ -138,6 +138,7 @@ class AttributeTypeHandler(HandlerInterface):
         restrictions = source_attr.restrictions.clone()
         restrictions.merge(attr.restrictions)
         attr.restrictions = restrictions
+        attr.help = attr.help or source_attr.help
 
         if source.nillable:
             restrictions.nillable = True

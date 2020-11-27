@@ -360,14 +360,15 @@ class ElementNodeTests(TestCase):
 
     def test_build_node_with_any_type_var_with_matching_xsi_type(self):
         var = XmlElement(name="a", qname="a", types=[object])
-
-        actual = self.node.build_node(var, {QNames.XSI_TYPE: "Foo"}, {}, 10)
+        attrs = {QNames.XSI_TYPE: "bk:books"}
+        ns_map = {"bk": "urn:books"}
+        actual = self.node.build_node(var, attrs, ns_map, 10)
 
         self.assertIsInstance(actual, ElementNode)
         self.assertEqual(10, actual.position)
-        self.assertEqual(self.context.build(Foo), actual.meta)
-        self.assertEqual({QNames.XSI_TYPE: "Foo"}, actual.attrs)
-        self.assertEqual({}, actual.ns_map)
+        self.assertEqual(self.context.build(Books), actual.meta)
+        self.assertEqual(attrs, actual.attrs)
+        self.assertEqual(ns_map, actual.ns_map)
         self.assertFalse(actual.mixed)
 
     def test_build_node_with_any_type_var_with_no_matching_xsi_type(self):

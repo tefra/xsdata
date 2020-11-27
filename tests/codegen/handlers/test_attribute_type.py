@@ -197,6 +197,7 @@ class AttributeTypeHandlerTests(FactoryTestCase):
         source = ClassFactory.elements(1, qname="Foobar")
         source.attrs[0].restrictions.max_length = 100
         source.attrs[0].restrictions.min_length = 1
+        source.attrs[0].help = "foo"
 
         target = ClassFactory.elements(1)
         attr = target.attrs[0]
@@ -208,6 +209,7 @@ class AttributeTypeHandlerTests(FactoryTestCase):
         self.processor.copy_attribute_properties(source, target, attr, attr.types[0])
 
         self.assertEqual("string", attr.types[0].name)
+        self.assertEqual("foo", attr.help)
         self.assertEqual(Restrictions(min_length=2, max_length=100), attr.restrictions)
         mock_copy_inner_classes.assert_called_once_with(source, target)
 

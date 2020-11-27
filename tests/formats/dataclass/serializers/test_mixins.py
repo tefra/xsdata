@@ -38,7 +38,7 @@ class XmlWriterTests(TestCase):
 
         self.writer.write(events)
 
-        lines = self.writer.output.getvalue().split("\n")
+        lines = self.writer.output.getvalue().splitlines()
 
         self.assertEqual(2, len(lines))
         self.assertEqual('<?xml version="1.0" encoding="UTF-8"?>', lines[0])
@@ -61,7 +61,7 @@ class XmlWriterTests(TestCase):
 
         self.writer.write(events)
 
-        lines = self.writer.output.getvalue().split("\n")
+        lines = self.writer.output.getvalue().splitlines()
         self.assertEqual(
             (
                 '<root xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" '
@@ -81,7 +81,7 @@ class XmlWriterTests(TestCase):
 
         self.writer.write(events)
 
-        lines = self.writer.output.getvalue().split("\n")
+        lines = self.writer.output.getvalue().splitlines()
         self.assertEqual(
             (
                 '<root xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" '
@@ -126,7 +126,7 @@ class XmlWriterTests(TestCase):
         )
         self.writer.write(events)
 
-        lines = self.writer.output.getvalue().split("\n")
+        lines = self.writer.output.getvalue().splitlines()
         expected = (
             "<root>"
             '<a xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"/>'
@@ -152,7 +152,7 @@ class XmlWriterTests(TestCase):
 
         self.writer.ns_map = {None: "a"}
         self.writer.write(events)
-        lines = self.writer.output.getvalue().split("\n")
+        lines = self.writer.output.getvalue().splitlines()
         self.assertEqual('<a xmlns="a"><b xmlns="">foo<b/>', lines[1])
 
     def test_add_attribute(self):

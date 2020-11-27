@@ -6,6 +6,18 @@ __NAMESPACE__ = "urn:books"
 
 @dataclass
 class BookForm:
+    """Book Definition.
+
+    Attributes
+        author: Writer's name
+        title: Book Title
+        genre: Book Genre
+        price: Amount in USD
+        pub_date: Publication date
+        review: Sticky Review
+        id: International Standard Book Number
+        lang: Language ISO Code
+    """
     author: Optional[str] = field(
         default=None,
         metadata={

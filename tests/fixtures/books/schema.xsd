@@ -1,10 +1,10 @@
 <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="urn:books" xmlns:bks="urn:books">
   <xsd:element name="books" type="bks:BooksForm">
-  <xsd:annotation>
-    <xsd:documentation>
-      Το βιβλίο
-    </xsd:documentation>
-  </xsd:annotation>
+    <xsd:annotation>
+      <xsd:documentation>
+        Το βιβλίο
+      </xsd:documentation>
+    </xsd:annotation>
   </xsd:element>
   <xsd:complexType name="BooksForm">
     <xsd:sequence>
@@ -12,15 +12,68 @@
     </xsd:sequence>
   </xsd:complexType>
   <xsd:complexType name="BookForm">
+    <xsd:annotation>
+      <xsd:documentation>
+        Book Definition
+      </xsd:documentation>
+    </xsd:annotation>
     <xsd:sequence>
-      <xsd:element name="author" type="xsd:string" />
-      <xsd:element name="title" type="xsd:string" />
-      <xsd:element name="genre" type="xsd:string" />
-      <xsd:element name="price" type="xsd:float" />
-      <xsd:element name="pub_date" type="xsd:date" />
-      <xsd:element name="review" type="xsd:string" />
+      <xsd:element name="author" type="xsd:string">
+        <xsd:annotation>
+          <xsd:documentation>
+            Writer's name
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="title" type="xsd:string">
+        <xsd:annotation>
+          <xsd:documentation>
+            Book Title
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="genre" type="xsd:string">
+        <xsd:annotation>
+          <xsd:documentation>
+            Book Genre
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="price" type="xsd:float">
+        <xsd:annotation>
+          <xsd:documentation>
+            Amount in USD
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="pub_date" type="xsd:date">
+        <xsd:annotation>
+          <xsd:documentation>
+            Publication date
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="review" type="xsd:string">
+        <xsd:annotation>
+          <xsd:documentation>
+            Sticky Review
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
     </xsd:sequence>
-    <xsd:attribute name="id" type="xsd:string" />
-    <xsd:attribute name="lang" type="xsd:string" fixed="en" />
+    <xsd:attribute name="id" type="xsd:string">
+      <xsd:annotation>
+        <xsd:documentation>
+          International Standard Book Number
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="lang" type="xsd:string" fixed="en">
+      <xsd:annotation>
+        <xsd:documentation>
+          Language ISO Code
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
   </xsd:complexType>
 </xsd:schema>

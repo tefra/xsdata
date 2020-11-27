@@ -6,10 +6,6 @@ __NAMESPACE__ = "http://tempuri.org/"
 
 @dataclass
 class Add:
-    """
-    :ivar int_a:
-    :ivar int_b:
-    """
     class Meta:
         namespace = "http://tempuri.org/"
 
@@ -33,9 +29,6 @@ class Add:
 
 @dataclass
 class AddResponse:
-    """
-    :ivar add_result:
-    """
     class Meta:
         namespace = "http://tempuri.org/"
 
@@ -51,10 +44,6 @@ class AddResponse:
 
 @dataclass
 class Divide:
-    """
-    :ivar int_a:
-    :ivar int_b:
-    """
     class Meta:
         namespace = "http://tempuri.org/"
 
@@ -78,9 +67,6 @@ class Divide:
 
 @dataclass
 class DivideResponse:
-    """
-    :ivar divide_result:
-    """
     class Meta:
         namespace = "http://tempuri.org/"
 
@@ -96,10 +82,6 @@ class DivideResponse:
 
 @dataclass
 class Multiply:
-    """
-    :ivar int_a:
-    :ivar int_b:
-    """
     class Meta:
         namespace = "http://tempuri.org/"
 
@@ -123,9 +105,6 @@ class Multiply:
 
 @dataclass
 class MultiplyResponse:
-    """
-    :ivar multiply_result:
-    """
     class Meta:
         namespace = "http://tempuri.org/"
 
@@ -141,10 +120,6 @@ class MultiplyResponse:
 
 @dataclass
 class Subtract:
-    """
-    :ivar int_a:
-    :ivar int_b:
-    """
     class Meta:
         namespace = "http://tempuri.org/"
 
@@ -168,9 +143,6 @@ class Subtract:
 
 @dataclass
 class SubtractResponse:
-    """
-    :ivar subtract_result:
-    """
     class Meta:
         namespace = "http://tempuri.org/"
 
@@ -186,9 +158,6 @@ class SubtractResponse:
 
 @dataclass
 class CalculatorSoapAddInput:
-    """
-    :ivar body:
-    """
     class Meta:
         name = "Envelope"
         namespace = "http://schemas.xmlsoap.org/soap/envelope/"
@@ -203,9 +172,6 @@ class CalculatorSoapAddInput:
 
     @dataclass
     class Body:
-        """
-        :ivar add:
-        """
         add: Optional[Add] = field(
             default=None,
             metadata={
@@ -218,9 +184,6 @@ class CalculatorSoapAddInput:
 
 @dataclass
 class CalculatorSoapAddOutput:
-    """
-    :ivar body:
-    """
     class Meta:
         name = "Envelope"
         namespace = "http://schemas.xmlsoap.org/soap/envelope/"
@@ -235,10 +198,6 @@ class CalculatorSoapAddOutput:
 
     @dataclass
     class Body:
-        """
-        :ivar add_response:
-        :ivar fault:
-        """
         add_response: Optional[AddResponse] = field(
             default=None,
             metadata={
@@ -257,12 +216,6 @@ class CalculatorSoapAddOutput:
 
         @dataclass
         class Fault:
-            """
-            :ivar faultcode:
-            :ivar faultstring:
-            :ivar faultactor:
-            :ivar detail:
-            """
             faultcode: Optional[str] = field(
                 default=None,
                 metadata={
@@ -295,9 +248,6 @@ class CalculatorSoapAddOutput:
 
 @dataclass
 class CalculatorSoapDivideInput:
-    """
-    :ivar body:
-    """
     class Meta:
         name = "Envelope"
         namespace = "http://schemas.xmlsoap.org/soap/envelope/"
@@ -312,9 +262,6 @@ class CalculatorSoapDivideInput:
 
     @dataclass
     class Body:
-        """
-        :ivar divide:
-        """
         divide: Optional[Divide] = field(
             default=None,
             metadata={
@@ -327,9 +274,6 @@ class CalculatorSoapDivideInput:
 
 @dataclass
 class CalculatorSoapDivideOutput:
-    """
-    :ivar body:
-    """
     class Meta:
         name = "Envelope"
         namespace = "http://schemas.xmlsoap.org/soap/envelope/"
@@ -344,10 +288,6 @@ class CalculatorSoapDivideOutput:
 
     @dataclass
     class Body:
-        """
-        :ivar divide_response:
-        :ivar fault:
-        """
         divide_response: Optional[DivideResponse] = field(
             default=None,
             metadata={
@@ -366,12 +306,6 @@ class CalculatorSoapDivideOutput:
 
         @dataclass
         class Fault:
-            """
-            :ivar faultcode:
-            :ivar faultstring:
-            :ivar faultactor:
-            :ivar detail:
-            """
             faultcode: Optional[str] = field(
                 default=None,
                 metadata={
@@ -404,9 +338,6 @@ class CalculatorSoapDivideOutput:
 
 @dataclass
 class CalculatorSoapMultiplyInput:
-    """
-    :ivar body:
-    """
     class Meta:
         name = "Envelope"
         namespace = "http://schemas.xmlsoap.org/soap/envelope/"
@@ -421,9 +352,6 @@ class CalculatorSoapMultiplyInput:
 
     @dataclass
     class Body:
-        """
-        :ivar multiply:
-        """
         multiply: Optional[Multiply] = field(
             default=None,
             metadata={
@@ -436,9 +364,6 @@ class CalculatorSoapMultiplyInput:
 
 @dataclass
 class CalculatorSoapMultiplyOutput:
-    """
-    :ivar body:
-    """
     class Meta:
         name = "Envelope"
         namespace = "http://schemas.xmlsoap.org/soap/envelope/"
@@ -453,10 +378,6 @@ class CalculatorSoapMultiplyOutput:
 
     @dataclass
     class Body:
-        """
-        :ivar multiply_response:
-        :ivar fault:
-        """
         multiply_response: Optional[MultiplyResponse] = field(
             default=None,
             metadata={
@@ -475,12 +396,6 @@ class CalculatorSoapMultiplyOutput:
 
         @dataclass
         class Fault:
-            """
-            :ivar faultcode:
-            :ivar faultstring:
-            :ivar faultactor:
-            :ivar detail:
-            """
             faultcode: Optional[str] = field(
                 default=None,
                 metadata={
@@ -513,9 +428,6 @@ class CalculatorSoapMultiplyOutput:
 
 @dataclass
 class CalculatorSoapSubtractInput:
-    """
-    :ivar body:
-    """
     class Meta:
         name = "Envelope"
         namespace = "http://schemas.xmlsoap.org/soap/envelope/"
@@ -530,9 +442,6 @@ class CalculatorSoapSubtractInput:
 
     @dataclass
     class Body:
-        """
-        :ivar subtract:
-        """
         subtract: Optional[Subtract] = field(
             default=None,
             metadata={
@@ -545,9 +454,6 @@ class CalculatorSoapSubtractInput:
 
 @dataclass
 class CalculatorSoapSubtractOutput:
-    """
-    :ivar body:
-    """
     class Meta:
         name = "Envelope"
         namespace = "http://schemas.xmlsoap.org/soap/envelope/"
@@ -562,10 +468,6 @@ class CalculatorSoapSubtractOutput:
 
     @dataclass
     class Body:
-        """
-        :ivar subtract_response:
-        :ivar fault:
-        """
         subtract_response: Optional[SubtractResponse] = field(
             default=None,
             metadata={
@@ -584,12 +486,6 @@ class CalculatorSoapSubtractOutput:
 
         @dataclass
         class Fault:
-            """
-            :ivar faultcode:
-            :ivar faultstring:
-            :ivar faultactor:
-            :ivar detail:
-            """
             faultcode: Optional[str] = field(
                 default=None,
                 metadata={

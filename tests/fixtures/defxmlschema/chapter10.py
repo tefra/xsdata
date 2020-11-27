@@ -4,21 +4,11 @@ from typing import List, Union
 
 
 class ApplicableSizesType(Enum):
-    """
-    :cvar SMALL_MEDIUM_LARGE:
-    :cvar VALUE_2_4_6_8_10_12_14_16_18:
-    """
     SMALL_MEDIUM_LARGE = "small medium large"
     VALUE_2_4_6_8_10_12_14_16_18 = "2 4 6 8 10 12 14 16 18"
 
 
 class SmallSizeType(Enum):
-    """
-    :cvar VALUE_2:
-    :cvar VALUE_4:
-    :cvar VALUE_6:
-    :cvar SMALL:
-    """
     VALUE_2 = "2"
     VALUE_4 = "4"
     VALUE_6 = "6"
@@ -27,13 +17,6 @@ class SmallSizeType(Enum):
 
 @dataclass
 class SizesType:
-    """
-    :ivar size:
-    :ivar small_size:
-    :ivar international_size:
-    :ivar available_sizes:
-    :ivar applicable_sizes:
-    """
     size: List[Union[int, "SizesType.Value"]] = field(
         default_factory=list,
         metadata={
@@ -82,11 +65,6 @@ class SizesType:
     )
 
     class Value(Enum):
-        """
-        :cvar SMALL:
-        :cvar MEDIUM:
-        :cvar LARGE:
-        """
         SMALL = "small"
         MEDIUM = "medium"
         LARGE = "large"

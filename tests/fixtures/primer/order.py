@@ -5,9 +5,6 @@ from typing import List, Optional
 
 @dataclass
 class Items:
-    """
-    :ivar item:
-    """
     item: List["Items.Item"] = field(
         default_factory=list,
         metadata={
@@ -18,14 +15,6 @@ class Items:
 
     @dataclass
     class Item:
-        """
-        :ivar product_name:
-        :ivar quantity:
-        :ivar usprice:
-        :ivar comment:
-        :ivar ship_date:
-        :ivar part_num:
-        """
         product_name: Optional[str] = field(
             default=None,
             metadata={
@@ -80,14 +69,6 @@ class Items:
 
 @dataclass
 class Usaddress:
-    """
-    :ivar name:
-    :ivar street:
-    :ivar city:
-    :ivar state:
-    :ivar zip:
-    :ivar country:
-    """
     class Meta:
         name = "USAddress"
 
@@ -142,9 +123,6 @@ class Usaddress:
 
 @dataclass
 class Comment:
-    """
-    :ivar value:
-    """
     class Meta:
         name = "comment"
 
@@ -158,13 +136,6 @@ class Comment:
 
 @dataclass
 class PurchaseOrderType:
-    """
-    :ivar ship_to:
-    :ivar bill_to:
-    :ivar comment:
-    :ivar items:
-    :ivar order_date:
-    """
     ship_to: Optional[Usaddress] = field(
         default=None,
         metadata={

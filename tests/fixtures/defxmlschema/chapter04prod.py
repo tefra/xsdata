@@ -6,9 +6,6 @@ __NAMESPACE__ = "http://example.org/prod"
 
 @dataclass
 class ColorType:
-    """
-    :ivar value:
-    """
     value: Optional[str] = field(
         default=None,
         metadata={
@@ -19,10 +16,6 @@ class ColorType:
 
 @dataclass
 class SizeType:
-    """
-    :ivar value:
-    :ivar system:
-    """
     value: Optional[int] = field(
         default=None,
     )
@@ -36,12 +29,6 @@ class SizeType:
 
 @dataclass
 class ProductType:
-    """
-    :ivar number:
-    :ivar name:
-    :ivar size:
-    :ivar color:
-    """
     number: Optional[int] = field(
         default=None,
         metadata={
@@ -78,9 +65,6 @@ class ProductType:
 
 @dataclass
 class ItemsType:
-    """
-    :ivar product:
-    """
     product: Optional[ProductType] = field(
         default=None,
         metadata={

@@ -8,11 +8,6 @@ __NAMESPACE__ = "http://example.org/ord"
 
 @dataclass
 class OrderType:
-    """
-    :ivar number:
-    :ivar customer:
-    :ivar items:
-    """
     number: Optional[str] = field(
         default=None,
         metadata={

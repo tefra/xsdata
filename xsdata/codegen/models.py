@@ -454,6 +454,11 @@ class Class:
         return any(attr.is_suffix for attr in self.attrs)
 
     @property
+    def has_help_attr(self) -> bool:
+        """Return whether it includes at least one attr with help content."""
+        return any(attr.help and attr.help.strip() for attr in self.attrs)
+
+    @property
     def is_complex(self) -> bool:
         """Return whether this instance is derived from an xs:element or
         xs:complexType."""

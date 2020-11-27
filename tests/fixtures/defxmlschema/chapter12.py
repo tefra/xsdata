@@ -4,9 +4,6 @@ from typing import Dict, List, Optional
 
 @dataclass
 class ColorType:
-    """
-    :ivar value:
-    """
     value: Optional[str] = field(
         default=None,
         metadata={
@@ -17,9 +14,6 @@ class ColorType:
 
 @dataclass
 class DescriptionType:
-    """
-    :ivar w3_org_1999_xhtml_element:
-    """
     w3_org_1999_xhtml_element: List[object] = field(
         default_factory=list,
         metadata={
@@ -32,10 +26,6 @@ class DescriptionType:
 
 @dataclass
 class SizeType:
-    """
-    :ivar value:
-    :ivar system:
-    """
     value: Optional[int] = field(
         default=None,
     )
@@ -49,13 +39,6 @@ class SizeType:
 
 @dataclass
 class ProductType:
-    """
-    :ivar number:
-    :ivar name:
-    :ivar size_or_color_or_description:
-    :ivar eff_date:
-    :ivar other_attributes:
-    """
     number: Optional[int] = field(
         default=None,
         metadata={
@@ -113,9 +96,6 @@ class ProductType:
 
 @dataclass
 class ItemsType:
-    """
-    :ivar shirt_or_hat_or_umbrella:
-    """
     shirt_or_hat_or_umbrella: List[object] = field(
         default_factory=list,
         metadata={

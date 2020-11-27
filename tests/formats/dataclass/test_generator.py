@@ -72,33 +72,43 @@ class DataclassGeneratorTests(FactoryTestCase):
 
     def test_render_module(self):
         classes = [
-            ClassFactory.enumeration(2),
+            ClassFactory.enumeration(2, help="\n\nI am enum  "),
             ClassFactory.elements(2),
             ClassFactory.service(2),
         ]
+        classes[0].attrs[0].help = "I am a member"
+        classes[1].attrs[0].help = "I am a field"
+
         resolver = DependenciesResolver()
 
         actual = self.generator.render_module(resolver, classes)
         expected = (
             "from dataclasses import dataclass, field\n"
             "from enum import Enum\n"
-            "from typing import Optional\n\n"
-            '__NAMESPACE__ = "xsdata"\n\n\n'
+            "from typing import Optional\n"
+            "\n"
+            '__NAMESPACE__ = "xsdata"\n'
+            "\n"
+            "\n"
             "class ClassB(Enum):\n"
-            '    """\n'
-            "    :cvar ATTR_B:\n"
+            '    """I am enum.\n'
+            "\n"
+            "    :cvar ATTR_B: I am a member\n"
             "    :cvar ATTR_C:\n"
             '    """\n'
             "    ATTR_B = None\n"
-            "    ATTR_C = None\n\n\n"
+            "    ATTR_C = None\n"
+            "\n"
+            "\n"
             "@dataclass\n"
             "class ClassC:\n"
             '    """\n'
-            "    :ivar attr_d:\n"
+            "    :ivar attr_d: I am a field\n"
             "    :ivar attr_e:\n"
             '    """\n'
             "    class Meta:\n"
-            '        name = "class_C"\n\n'
+            '        name = "class_C"\n'
+            "\n"
             "    attr_d: Optional[str] = field(\n"
             "        default=None,\n"
             "        metadata={\n"
@@ -112,7 +122,9 @@ class DataclassGeneratorTests(FactoryTestCase):
             '            "name": "attr_E",\n'
             '            "type": "Element",\n'
             "        }\n"
-            "    )\n\n\n"
+            "    )\n"
+            "\n"
+            "\n"
             "class ClassD:\n"
             '    attr_f = "None"\n'
             '    attr_g = "None"\n'

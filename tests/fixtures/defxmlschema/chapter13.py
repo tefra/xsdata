@@ -4,9 +4,6 @@ from typing import List, Optional
 
 @dataclass
 class ColorType:
-    """
-    :ivar value:
-    """
     value: Optional[str] = field(
         default=None,
         metadata={
@@ -17,9 +14,6 @@ class ColorType:
 
 @dataclass
 class ItemType:
-    """
-    :ivar routing_num:
-    """
     routing_num: Optional[int] = field(
         default=None,
         metadata={
@@ -31,14 +25,6 @@ class ItemType:
 
 @dataclass
 class RestrictedProductType:
-    """
-    :ivar number:
-    :ivar name:
-    :ivar description:
-    :ivar routing_num:
-    :ivar lang:
-    :ivar eff_date:
-    """
     number: Optional[int] = field(
         default=None,
         metadata={
@@ -87,10 +73,6 @@ class RestrictedProductType:
 
 @dataclass
 class SizeType:
-    """
-    :ivar value:
-    :ivar system:
-    """
     value: Optional[int] = field(
         default=None,
     )
@@ -104,10 +86,6 @@ class SizeType:
 
 @dataclass
 class SmallSizeType:
-    """
-    :ivar value:
-    :ivar system:
-    """
     value: Optional[int] = field(
         default=None,
         metadata={
@@ -126,13 +104,6 @@ class SmallSizeType:
 
 @dataclass
 class ProductType(ItemType):
-    """
-    :ivar number:
-    :ivar name:
-    :ivar description:
-    :ivar eff_date:
-    :ivar lang:
-    """
     number: Optional[int] = field(
         default=None,
         metadata={
@@ -173,11 +144,6 @@ class ProductType(ItemType):
 
 @dataclass
 class ShirtType(RestrictedProductType):
-    """
-    :ivar size:
-    :ivar color:
-    :ivar sleeve:
-    """
     size: List[SmallSizeType] = field(
         default_factory=list,
         metadata={
@@ -202,11 +168,6 @@ class ShirtType(RestrictedProductType):
 
 @dataclass
 class ItemsType:
-    """
-    :ivar hat:
-    :ivar umbrella:
-    :ivar shirt:
-    """
     hat: List[ProductType] = field(
         default_factory=list,
         metadata={

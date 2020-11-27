@@ -2,7 +2,7 @@
 {% set attr_title = "Properties" if is_enum else "Parameters" -%}
 """
 {{ obj.help or "" }}
-{% if obj.attrs %}
+{% if obj.has_help_attr %}
 {{ attr_title }}
 ----------
 {%- for attr in obj.attrs %}

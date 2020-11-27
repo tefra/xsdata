@@ -4,11 +4,6 @@ from typing import Optional
 
 @dataclass
 class ProductType:
-    """
-    :ivar number:
-    :ivar size:
-    :ivar eff_date:
-    """
     number: Optional[int] = field(
         default=None,
         metadata={

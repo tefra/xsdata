@@ -6,9 +6,6 @@ __NAMESPACE__ = "http://hello/"
 
 @dataclass
 class HelloByeError:
-    """
-    :ivar message:
-    """
     class Meta:
         namespace = "http://hello/"
 
@@ -23,9 +20,6 @@ class HelloByeError:
 
 @dataclass
 class HelloError:
-    """
-    :ivar message:
-    """
     class Meta:
         namespace = "http://hello/"
 
@@ -40,9 +34,6 @@ class HelloError:
 
 @dataclass
 class GetHelloAsString:
-    """
-    :ivar arg0:
-    """
     class Meta:
         name = "getHelloAsString"
 
@@ -57,9 +48,6 @@ class GetHelloAsString:
 
 @dataclass
 class GetHelloAsStringResponse:
-    """
-    :ivar return_value:
-    """
     class Meta:
         name = "getHelloAsStringResponse"
 
@@ -75,9 +63,6 @@ class GetHelloAsStringResponse:
 
 @dataclass
 class HelloGetHelloAsStringInput:
-    """
-    :ivar body:
-    """
     class Meta:
         name = "Envelope"
         namespace = "http://schemas.xmlsoap.org/soap/envelope/"
@@ -92,9 +77,6 @@ class HelloGetHelloAsStringInput:
 
     @dataclass
     class Body:
-        """
-        :ivar get_hello_as_string:
-        """
         get_hello_as_string: Optional[GetHelloAsString] = field(
             default=None,
             metadata={
@@ -107,9 +89,6 @@ class HelloGetHelloAsStringInput:
 
 @dataclass
 class HelloGetHelloAsStringOutput:
-    """
-    :ivar body:
-    """
     class Meta:
         name = "Envelope"
         namespace = "http://schemas.xmlsoap.org/soap/envelope/"
@@ -124,10 +103,6 @@ class HelloGetHelloAsStringOutput:
 
     @dataclass
     class Body:
-        """
-        :ivar get_hello_as_string_response:
-        :ivar fault:
-        """
         get_hello_as_string_response: Optional[GetHelloAsStringResponse] = field(
             default=None,
             metadata={
@@ -146,12 +121,6 @@ class HelloGetHelloAsStringOutput:
 
         @dataclass
         class Fault:
-            """
-            :ivar faultcode:
-            :ivar faultstring:
-            :ivar faultactor:
-            :ivar detail:
-            """
             faultcode: Optional[str] = field(
                 default=None,
                 metadata={
@@ -183,10 +152,6 @@ class HelloGetHelloAsStringOutput:
 
             @dataclass
             class Detail:
-                """
-                :ivar hello_error:
-                :ivar hello_bye_error:
-                """
                 hello_error: Optional[HelloError] = field(
                     default=None,
                     metadata={

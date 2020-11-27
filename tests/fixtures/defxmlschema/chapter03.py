@@ -5,9 +5,6 @@ from tests.fixtures.defxmlschema.chapter03ord import Order
 
 @dataclass
 class EnvelopeType:
-    """
-    :ivar order:
-    """
     order: List[Order] = field(
         default_factory=list,
         metadata={

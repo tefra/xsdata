@@ -491,7 +491,7 @@ class XmlSerializerTests(TestCase):
         obj.content.append("!")
 
         self.serializer.pretty_print = False
-        result = self.serializer.render(obj).split("\n")
+        result = self.serializer.render(obj).splitlines()
         self.assertEqual("<p><b>Mr.</b><span>chris</span>!</p>", result[1])
 
         obj = Example()
@@ -499,5 +499,5 @@ class XmlSerializerTests(TestCase):
         obj.content.append(AnyElement(qname="b", text="Mr."))
         obj.content.append(Span("chris"))
         obj.content.append("!")
-        result = self.serializer.render(obj).split("\n")
+        result = self.serializer.render(obj).splitlines()
         self.assertEqual("<p>Hi <b>Mr.</b><span>chris</span>!</p>", result[1])

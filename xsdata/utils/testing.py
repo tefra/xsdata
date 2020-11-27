@@ -14,7 +14,7 @@ T = TypeVar("T")
 def load_class(output: str, clazz_name: str) -> T:
     search = "Generating package: "
     start = len(search)
-    packages = [line[start:] for line in output.split("\n") if line.startswith(search)]
+    packages = [line[start:] for line in output.splitlines() if line.startswith(search)]
 
     for package in reversed(packages):
         try:

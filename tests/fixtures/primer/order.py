@@ -146,7 +146,8 @@ class Comment:
 
 @dataclass
 class PurchaseOrderType:
-    """Basket style schema.
+    """Purchase order schema for Example.com. Copyright 2000 Example.com. All
+    rights reserved.
 
     Parameters
     ----------

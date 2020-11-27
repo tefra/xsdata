@@ -8,7 +8,7 @@ for xsd in files:
 
     content = xsd.read_text()
     if ":schema" not in content:
-        lines = content.split("\n")
+        lines = content.splitlines()
         pos = next(idx for idx, line in enumerate(lines) if not line.strip().startswith("<!--"))
         lines.insert(pos, root_start)
         lines.append(root_end)

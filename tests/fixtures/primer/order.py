@@ -15,6 +15,16 @@ class Items:
 
     @dataclass
     class Item:
+        """
+        Parameters
+        ----------
+        product_name:
+        quantity:
+        usprice: Price amount in USD
+        comment:
+        ship_date:
+        part_num: Stock Keeping Unit
+        """
         product_name: Optional[str] = field(
             default=None,
             metadata={
@@ -136,6 +146,16 @@ class Comment:
 
 @dataclass
 class PurchaseOrderType:
+    """Basket style schema.
+
+    Parameters
+    ----------
+    ship_to: Shipping Address
+    bill_to: Billing Address
+    comment:
+    items:
+    order_date:
+    """
     ship_to: Optional[Usaddress] = field(
         default=None,
         metadata={

@@ -15,7 +15,9 @@ def test_primer_schema():
     schema = fixtures_dir.joinpath("primer/order.xsd")
     package = "tests.fixtures.primer"
     runner = CliRunner()
-    result = runner.invoke(cli, [str(schema), "--package", package])
+    result = runner.invoke(
+        cli, [str(schema), "--package", package, "--docstring-style", "NumPy"]
+    )
 
     if result.exception:
         raise result.exception

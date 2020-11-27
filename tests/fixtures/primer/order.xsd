@@ -1,15 +1,28 @@
 <?xml version="1.0" encoding="ISO-8859-1" ?>
 <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-  <xsd:annotation>
-    <xsd:documentation xml:lang="en">Purchase order schema for Example.com.
-     Copyright 2000 Example.com. All rights reserved.</xsd:documentation>
-  </xsd:annotation>
   <xsd:element name="purchaseOrder" type="PurchaseOrderType" />
   <xsd:element name="comment" type="xsd:string" />
   <xsd:complexType name="PurchaseOrderType">
+    <xsd:annotation>
+      <xsd:documentation>Purchase order schema for Example.com.
+        Copyright 2000 Example.com. All rights reserved.
+      </xsd:documentation>
+    </xsd:annotation>
     <xsd:sequence>
-      <xsd:element name="shipTo" type="USAddress" />
-      <xsd:element name="billTo" type="USAddress" />
+      <xsd:element name="shipTo" type="USAddress">
+        <xsd:annotation>
+          <xsd:documentation>
+            Shipping Address
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="billTo" type="USAddress">
+        <xsd:annotation>
+          <xsd:documentation>
+            Billing Address
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
       <xsd:element ref="comment" minOccurs="0" />
       <xsd:element name="items" type="Items" />
     </xsd:sequence>
@@ -38,11 +51,23 @@
                 </xsd:restriction>
               </xsd:simpleType>
             </xsd:element>
-            <xsd:element name="USPrice" type="xsd:decimal" />
+            <xsd:element name="USPrice" type="xsd:decimal">
+              <xsd:annotation>
+                <xsd:documentation>
+                  Price amount in USD
+                </xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
             <xsd:element ref="comment" minOccurs="0" />
             <xsd:element name="shipDate" type="xsd:date" minOccurs="0" />
           </xsd:sequence>
-          <xsd:attribute name="partNum" type="SKU" use="required" />
+          <xsd:attribute name="partNum" type="SKU" use="required">
+            <xsd:annotation>
+              <xsd:documentation>
+                Stock Keeping Unit
+              </xsd:documentation>
+            </xsd:annotation>
+          </xsd:attribute>
         </xsd:complexType>
       </xsd:element>
     </xsd:sequence>

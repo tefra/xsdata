@@ -6,10 +6,6 @@ __NAMESPACE__ = "http://example.org/prod"
 
 @dataclass
 class SizeType:
-    """
-    :ivar value:
-    :ivar system:
-    """
     value: Optional[int] = field(
         default=None,
     )
@@ -23,11 +19,6 @@ class SizeType:
 
 @dataclass
 class ProductType:
-    """
-    :ivar number:
-    :ivar name:
-    :ivar size:
-    """
     number: Optional[int] = field(
         default=None,
         metadata={

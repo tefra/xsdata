@@ -6,9 +6,6 @@ __NAMESPACE__ = "http://example.org/prod2"
 
 @dataclass
 class ColorType:
-    """
-    :ivar value:
-    """
     value: Optional[str] = field(
         default=None,
         metadata={

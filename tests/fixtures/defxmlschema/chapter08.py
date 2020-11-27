@@ -4,12 +4,6 @@ from typing import List
 
 
 class SmlxsizeType(Enum):
-    """
-    :cvar SMALL:
-    :cvar MEDIUM:
-    :cvar LARGE:
-    :cvar EXTRA_LARGE:
-    """
     SMALL = "small"
     MEDIUM = "medium"
     LARGE = "large"
@@ -17,13 +11,6 @@ class SmlxsizeType(Enum):
 
 
 class XsmlxsizeType(Enum):
-    """
-    :cvar SMALL:
-    :cvar MEDIUM:
-    :cvar LARGE:
-    :cvar EXTRA_LARGE:
-    :cvar EXTRA_SMALL:
-    """
     SMALL = "small"
     MEDIUM = "medium"
     LARGE = "large"
@@ -33,13 +20,6 @@ class XsmlxsizeType(Enum):
 
 @dataclass
 class SizesType:
-    """
-    :ivar dress_size:
-    :ivar medium_dress_size:
-    :ivar small_dress_size:
-    :ivar smlx_size:
-    :ivar xsmlx_size:
-    """
     dress_size: List[str] = field(
         default_factory=list,
         metadata={

@@ -7,9 +7,6 @@ __NAMESPACE__ = "http://example.org/ord"
 
 @dataclass
 class ItemsType:
-    """
-    :ivar product:
-    """
     product: List[Product] = field(
         default_factory=list,
         metadata={
@@ -22,10 +19,6 @@ class ItemsType:
 
 @dataclass
 class OrderType:
-    """
-    :ivar number:
-    :ivar items:
-    """
     number: Optional[str] = field(
         default=None,
         metadata={

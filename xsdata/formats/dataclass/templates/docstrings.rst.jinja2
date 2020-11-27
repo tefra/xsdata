@@ -2,7 +2,9 @@
 {% set prefix = "cvar" if is_enum else "ivar" -%}
 """
 {{ obj.help or "" }}
+{% if obj.has_help_attr %}
 {%- for attr in obj.attrs %}
 :{{ prefix }} {{ attr.name|constant_name if is_enum else attr.name|field_name }}:{{- " " + attr.help|trim if attr.help else "" -}}
-{%- endfor %}
+{%- endfor -%}
+{%- endif %}
 """

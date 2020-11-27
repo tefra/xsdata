@@ -5,9 +5,6 @@ from typing import List, Optional
 
 @dataclass
 class ColorType:
-    """
-    :ivar value:
-    """
     value: Optional[str] = field(
         default=None,
         metadata={
@@ -18,10 +15,6 @@ class ColorType:
 
 @dataclass
 class PriceType:
-    """
-    :ivar value:
-    :ivar currency:
-    """
     value: Optional[Decimal] = field(
         default=None,
     )
@@ -35,11 +28,6 @@ class PriceType:
 
 @dataclass
 class ProductOrderType:
-    """
-    :ivar quantity:
-    :ivar color:
-    :ivar number:
-    """
     quantity: Optional[int] = field(
         default=None,
         metadata={
@@ -65,11 +53,6 @@ class ProductOrderType:
 
 @dataclass
 class ProductType:
-    """
-    :ivar number:
-    :ivar name:
-    :ivar price:
-    """
     number: Optional[int] = field(
         default=None,
         metadata={
@@ -98,9 +81,6 @@ class ProductType:
 
 @dataclass
 class ItemsType:
-    """
-    :ivar shirt_or_hat:
-    """
     shirt_or_hat: List[object] = field(
         default_factory=list,
         metadata={
@@ -123,9 +103,6 @@ class ItemsType:
 
 @dataclass
 class ProductsType:
-    """
-    :ivar product:
-    """
     product: List[ProductType] = field(
         default_factory=list,
         metadata={
@@ -138,11 +115,6 @@ class ProductsType:
 
 @dataclass
 class OrderType:
-    """
-    :ivar number:
-    :ivar items:
-    :ivar products:
-    """
     number: Optional[str] = field(
         default=None,
         metadata={

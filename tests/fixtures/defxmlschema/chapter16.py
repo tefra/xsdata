@@ -4,9 +4,6 @@ from typing import List, Optional
 
 @dataclass
 class ColorType:
-    """
-    :ivar value:
-    """
     value: Optional[str] = field(
         default=None,
         metadata={
@@ -17,10 +14,6 @@ class ColorType:
 
 @dataclass
 class HatSizeType:
-    """
-    :ivar value:
-    :ivar system:
-    """
     value: Optional[str] = field(
         default=None,
     )
@@ -34,10 +27,6 @@ class HatSizeType:
 
 @dataclass
 class ProductType:
-    """
-    :ivar number:
-    :ivar name:
-    """
     number: Optional[int] = field(
         default=None,
         metadata={
@@ -58,10 +47,6 @@ class ProductType:
 
 @dataclass
 class ShirtSizeType:
-    """
-    :ivar value:
-    :ivar system:
-    """
     value: Optional[int] = field(
         default=None,
     )
@@ -75,9 +60,6 @@ class ShirtSizeType:
 
 @dataclass
 class Umbrella:
-    """
-    :ivar any_element:
-    """
     class Meta:
         name = "umbrella"
 
@@ -93,10 +75,6 @@ class Umbrella:
 
 @dataclass
 class ShirtType(ProductType):
-    """
-    :ivar size:
-    :ivar color:
-    """
     size: Optional[ShirtSizeType] = field(
         default=None,
         metadata={
@@ -117,9 +95,6 @@ class ShirtType(ProductType):
 
 @dataclass
 class Hat(ProductType):
-    """
-    :ivar size:
-    """
     class Meta:
         name = "hat"
 
@@ -147,12 +122,6 @@ class Shirt(ShirtType):
 
 @dataclass
 class ItemsType:
-    """
-    :ivar umbrella:
-    :ivar hat:
-    :ivar shirt:
-    :ivar product:
-    """
     umbrella: List[Umbrella] = field(
         default_factory=list,
         metadata={

@@ -6,16 +6,6 @@ __NAMESPACE__ = "urn:books"
 
 @dataclass
 class BookForm:
-    """
-    :ivar author:
-    :ivar title:
-    :ivar genre:
-    :ivar price:
-    :ivar pub_date:
-    :ivar review:
-    :ivar id:
-    :ivar lang:
-    """
     author: Optional[str] = field(
         default=None,
         metadata={
@@ -81,9 +71,6 @@ class BookForm:
 
 @dataclass
 class BooksForm:
-    """
-    :ivar book:
-    """
     book: List[BookForm] = field(
         default_factory=list,
         metadata={

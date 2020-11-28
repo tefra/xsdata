@@ -53,16 +53,16 @@ class NamespaceType:
     """
     Wildcard elements/attributes namespace types.
 
-    :cvar ANY: elements from any namespace is allowed
-    :cvar OTHER: elements from any namespace other than the parent element's namespace
-    :cvar LOCAL: elements must come from no namespace
-    :cvar TARGET: elements from the namespace of the parent element can be present
+    :cvar ANY_NS: elements from any namespace is allowed
+    :cvar OTHER_NS: elements from any namespace except the parent element's namespace
+    :cvar LOCAL_NS: elements must come from no namespace
+    :cvar TARGET_NS: elements from the namespace of the parent element can be present
     """
 
-    ANY = "##any"
-    OTHER = "##other"
-    LOCAL = "##local"
-    TARGET = "##targetNamespace"
+    ANY_NS = "##any"
+    OTHER_NS = "##other"
+    LOCAL_NS = "##local"
+    TARGET_NS = "##targetNamespace"
 
 
 class FormType(Enum):

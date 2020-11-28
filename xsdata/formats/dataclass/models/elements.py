@@ -219,7 +219,7 @@ class XmlWildcard(XmlVar):
             return True
         if source == cmp:
             return True
-        if source == NamespaceType.ANY:
+        if source == NamespaceType.ANY_NS:
             return True
         if source and source[0] == "!" and source[1:] != cmp:
             return True

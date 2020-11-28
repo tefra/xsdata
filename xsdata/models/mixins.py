@@ -239,7 +239,7 @@ def array_element(**kwargs: Any) -> Any:
 def array_any_element(**kwargs: Any) -> Any:
     """Shortcut method for list wildcard fields."""
     metadata = extract_metadata(
-        kwargs, type=XmlType.WILDCARD, namespace=NamespaceType.ANY
+        kwargs, type=XmlType.WILDCARD, namespace=NamespaceType.ANY_NS
     )
     return field(metadata=metadata, default_factory=list, **kwargs)
 

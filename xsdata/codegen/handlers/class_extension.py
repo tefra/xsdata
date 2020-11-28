@@ -187,7 +187,7 @@ class ClassExtensionHandler(HandlerInterface):
             tag = Tag.ANY
             name = "any_element"
             default = list if extension.restrictions.is_list else None
-            namespace = NamespaceType.ANY
+            namespace = NamespaceType.ANY_NS
 
         attr = cls.get_or_create_attribute(target, name, tag)
         attr.types.append(extension.type.clone())

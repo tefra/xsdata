@@ -257,11 +257,11 @@ class XmlContext:
 
         result = set()
         for ns in namespace.split():
-            if ns == NamespaceType.TARGET:
-                result.add(parent_namespace or NamespaceType.ANY)
-            elif ns == NamespaceType.LOCAL:
+            if ns == NamespaceType.TARGET_NS:
+                result.add(parent_namespace or NamespaceType.ANY_NS)
+            elif ns == NamespaceType.LOCAL_NS:
                 result.add("")
-            elif ns == NamespaceType.OTHER:
+            elif ns == NamespaceType.OTHER_NS:
                 result.add(f"!{parent_namespace or ''}")
             else:
                 result.add(ns)

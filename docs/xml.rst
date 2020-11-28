@@ -11,51 +11,49 @@ to parse from memory or to let the parser load the input document. All of them r
 the target class Type to bind the input data.
 
 
-Parameters
-----------
+**Parameters**
+    **config** (:class:`~xsdata.formats.dataclass.parsers.config.ParserConfig`)
 
-**config** (:class:`~xsdata.formats.dataclass.parsers.config.ParserConfig`)
+    .. list-table::
+       :widths: 20 10 220
+       :header-rows: 1
+       :align: left
 
-.. list-table::
-   :widths: 20 10 220
-   :header-rows: 1
-   :align: left
-
-   * - Name
-     - Type
-     - Description
-   * - base_url
-     - str
-     - A base URL for when parsing from memory and you want support for relative links
-       eg xinclude, default: ``None``
-   * - process_xinclude
-     - bool
-     - Process xinclude statements. , default: ``False``
-   * - fail_on_unknown_properties
-     - bool
-     - Should fail on unknown properties that can't be mapped to any wildcard field,
-       default: ``True``
+       * - Name
+         - Type
+         - Description
+       * - base_url
+         - str
+         - A base URL for when parsing from memory and you want support for relative links
+           eg xinclude, default: ``None``
+       * - process_xinclude
+         - bool
+         - Process xinclude statements. , default: ``False``
+       * - fail_on_unknown_properties
+         - bool
+         - Should fail on unknown properties that can't be mapped to any wildcard field,
+           default: ``True``
 
 
-**context** (:class:`~xsdata.formats.dataclass.context.XmlContext`)
+    **context** (:class:`~xsdata.formats.dataclass.context.XmlContext`)
 
-The cache layer for the binding directives of models and their fields. You may
-share a context instance between parser/serializer instances to avoid compiling the
-cache more than once.
+    The cache layer for the binding directives of models and their fields. You may
+    share a context instance between parser/serializer instances to avoid compiling the
+    cache more than once.
 
-.. hint::
+    .. hint::
 
-    it's recommended to use a static or global instance of your parser or serializer
-    per document type.
+        it's recommended to use a static or global instance of your parser or serializer
+        per document type.
 
 
-**handler** (:class:`type` of
-:class:`~xsdata.formats.dataclass.parsers.mixins.XmlHandler`)
+    **handler** (:class:`type` of
+    :class:`~xsdata.formats.dataclass.parsers.mixins.XmlHandler`)
 
-The XmlHandler type to use in order to read the xml source and push element events
-to the main parser.
+    The XmlHandler type to use in order to read the xml source and push element events
+    to the main parser.
 
-Default: :class:`~xsdata.formats.dataclass.parsers.handlers.LxmlEventHandler`
+    Default: :class:`~xsdata.formats.dataclass.parsers.handlers.LxmlEventHandler`
 
 
 Handlers
@@ -143,51 +141,49 @@ context instance between them to save on memory and processing.
     see :ref:`examples <Example: custom prefixes>`
 
 
-Parameters
-----------
+**Parameters**
+    **config** (:class:`~xsdata.formats.dataclass.serializers.config.SerializerConfig`)
 
-**config** (:class:`~xsdata.formats.dataclass.serializers.config.SerializerConfig`)
+    .. list-table::
+       :widths: 20 10 220
+       :header-rows: 1
+       :align: left
 
-.. list-table::
-   :widths: 20 10 220
-   :header-rows: 1
-   :align: left
-
-   * - Name
-     - Type
-     - Description
-   * - encoding
-     - str
-     - Text encoding, default: ``UTF-8``
-   * - xml_version
-     - str
-     - XML Version number, default: ``1.0``
-   * - pretty_print
-     - bool
-     - Enable pretty output, default ``False``
-   * - schema_location
-     - str
-     - Specify the xsi:schemaLocation attribute value,
-       eg ``xsi:schemaLocation="http://example.org/prod chapter08.xsd"``, Optional
-   * - no_namespace_schema_location
-     - str
-     - Specify the xsi:noNamespaceSchemaLocation attribute value,
-       eg ``xsi:noNamespaceSchemaLocation="chapter11.xsd"``, Optional
+       * - Name
+         - Type
+         - Description
+       * - encoding
+         - str
+         - Text encoding, default: ``UTF-8``
+       * - xml_version
+         - str
+         - XML Version number, default: ``1.0``
+       * - pretty_print
+         - bool
+         - Enable pretty output, default ``False``
+       * - schema_location
+         - str
+         - Specify the xsi:schemaLocation attribute value,
+           eg ``xsi:schemaLocation="http://example.org/prod chapter08.xsd"``, Optional
+       * - no_namespace_schema_location
+         - str
+         - Specify the xsi:noNamespaceSchemaLocation attribute value,
+           eg ``xsi:noNamespaceSchemaLocation="chapter11.xsd"``, Optional
 
 
-**context** (:class:`~xsdata.formats.dataclass.context.XmlContext`)
+    **context** (:class:`~xsdata.formats.dataclass.context.XmlContext`)
 
-The cache layer for the binding directives of models and their fields. You may
-share a context instance between parser/serializer instances to avoid compiling the
-cache more than once.
+    The cache layer for the binding directives of models and their fields. You may
+    share a context instance between parser/serializer instances to avoid compiling the
+    cache more than once.
 
 
-**writer** (:class:`type` of
-:class:`~xsdata.formats.dataclass.serializers.mixins.XmlWriter`)
+    **writer** (:class:`type` of
+    :class:`~xsdata.formats.dataclass.serializers.mixins.XmlWriter`)
 
-The XmlWriter type to use for serialization.
+    The XmlWriter type to use for serialization.
 
-Default: :class:`~xsdata.formats.dataclass.serializers.writers.LxmlEventWriter`
+    Default: :class:`~xsdata.formats.dataclass.serializers.writers.LxmlEventWriter`
 
 
 Writers

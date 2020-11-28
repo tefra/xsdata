@@ -37,7 +37,7 @@ class AttributeMixedContentHandler(HandlerInterface):
                 types=[AttrType(qname=DataType.ANY_TYPE.qname, native=True)],
                 tag=Tag.ANY,
                 mixed=True,
-                namespace=NamespaceType.ANY,
+                namespace=NamespaceType.ANY_NS,
                 restrictions=Restrictions(min_occurs=0, max_occurs=sys.maxsize),
             )
             target.attrs.insert(0, attr)

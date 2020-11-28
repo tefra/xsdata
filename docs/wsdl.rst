@@ -22,7 +22,7 @@ structure of the ``Envelope`` wrapper.
 
 .. literalinclude:: /../tests/fixtures/calculator/services.py
    :language: python
-   :lines: 187-216
+   :lines: 159-182
 
 
 Operation Class
@@ -34,7 +34,7 @@ simple static classes to describe all the unique operations and the binding proc
 
 .. literalinclude:: /../tests/fixtures/calculator/services.py
    :language: python
-   :lines: 623-629
+   :lines: 519-525
 
 
 Client

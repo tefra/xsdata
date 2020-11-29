@@ -62,9 +62,9 @@ class ParserUtils:
 
         if tokens:
             value = value if isinstance(value, list) else value.split()
-            return [converter.from_string(val, types, ns_map=ns_map) for val in value]
+            return [converter.deserialize(val, types, ns_map=ns_map) for val in value]
 
-        return converter.from_string(value, types, ns_map=ns_map)
+        return converter.deserialize(value, types, ns_map=ns_map)
 
     @classmethod
     def bind_objects(cls, params: Dict, meta: XmlMeta, position: int, objects: List):

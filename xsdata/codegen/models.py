@@ -157,7 +157,7 @@ class Restrictions:
             elif key == "min_occurs" and value == 0:
                 continue
             elif key.endswith("clusive") and types:
-                value = converter.from_string(value, sorted_types)
+                value = converter.deserialize(value, sorted_types)
 
             result[key] = value
 

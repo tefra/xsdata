@@ -12,10 +12,10 @@ class Root:
 
 
 class DatetimeConverter(Converter):
-    def from_string(self, value: str, **kwargs: Any) -> datetime:
+    def deserialize(self, value: str, **kwargs: Any) -> datetime:
         return datetime.fromisoformat(value)
 
-    def to_string(self, value: datetime, **kwargs: Any) -> str:
+    def serialize(self, value: datetime, **kwargs: Any) -> str:
         return value.isoformat(sep=" ")
 
 

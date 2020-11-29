@@ -124,7 +124,7 @@ class XmlWriter:
             value = QName(value)
 
         name = split_qname(key)
-        value = converter.to_string(value, ns_map=self.ns_map)
+        value = converter.serialize(value, ns_map=self.ns_map)
         self.attrs[name] = value
 
     def add_namespace(self, uri: Optional[str]):
@@ -148,7 +148,7 @@ class XmlWriter:
         current data as element tail content and queue it to be generated when the
         tag ends.
         """
-        value = converter.to_string(data, ns_map=self.ns_map)
+        value = converter.serialize(data, ns_map=self.ns_map)
         self.flush_start(is_nil=value is None or value == "")
 
         if value:

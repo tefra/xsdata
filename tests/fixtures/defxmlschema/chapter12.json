@@ -18,11 +18,6 @@
                             "qname": "{http://www.w3.org/1999/xhtml}b",
                             "text": "best-selling",
                             "tail": " shirt in\n      our catalog! ",
-                            "ns_map": {
-                                "xsi": "http://www.w3.org/2001/XMLSchema-instance",
-                                "xhtml": "http://www.w3.org/1999/xhtml",
-                                "oth": "http://example.org/oth"
-                            },
                             "children": [],
                             "attributes": {}
                         },
@@ -30,11 +25,6 @@
                             "qname": "{http://www.w3.org/1999/xhtml}br",
                             "text": null,
                             "tail": " Note: runs large.\n    ",
-                            "ns_map": {
-                                "xsi": "http://www.w3.org/2001/XMLSchema-instance",
-                                "xhtml": "http://www.w3.org/1999/xhtml",
-                                "oth": "http://example.org/oth"
-                            },
                             "children": [],
                             "attributes": {}
                         }

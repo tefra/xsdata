@@ -50,13 +50,13 @@ class ParserUtilsTests(TestCase):
         attrs = {QNames.XSI_TYPE: "xs:float"}
         self.assertEqual(DataType.FLOAT, ParserUtils.data_type(attrs, ns_map))
 
-    @mock.patch.object(ConverterAdapter, "from_string", return_value=2)
-    def test_parse_value(self, mock_from_string):
+    @mock.patch.object(ConverterAdapter, "deserialize", return_value=2)
+    def test_parse_value(self, mock_deserialize):
         self.assertEqual(1, ParserUtils.parse_value(None, [int], 1))
         self.assertIsNone(ParserUtils.parse_value(None, [int], lambda: 1))
 
         self.assertTrue(2, ParserUtils.parse_value("1", [int], None))
-        mock_from_string.assert_called_once_with("1", [int], ns_map=None)
+        mock_deserialize.assert_called_once_with("1", [int], ns_map=None)
 
     def test_parse_value_with_tokens_true(self):
         actual = ParserUtils.parse_value(" 1 2 3", [int], list, None, True)
@@ -65,7 +65,7 @@ class ParserUtilsTests(TestCase):
         actual = ParserUtils.parse_value(["1", "2", "3"], [int], list, None, True)
         self.assertEqual([1, 2, 3], actual)
 
-    @mock.patch.object(ConverterAdapter, "from_string", return_value=2)
+    @mock.patch.object(ConverterAdapter, "deserialize", return_value=2)
     def test_parse_value_with_ns_map(self, mock_to_python):
         ns_map = dict(a=1)
         ParserUtils.parse_value(" 1 2 3", [int], list, ns_map, True)

@@ -30,15 +30,15 @@ class Converter(metaclass=abc.ABCMeta):
     """Abstract converter class."""
 
     @abc.abstractmethod
-    def from_string(self, value: str, **kwargs: Any) -> Any:
+    def deserialize(self, value: Any, **kwargs: Any) -> Any:
         """
-        Convert from string.
+        Convert any type to the converter dedicated type.
 
         :raises ConverterError: if converter fails with and expected ValueError
         """
 
     @abc.abstractmethod
-    def to_string(self, value: Any, **kwargs: Any) -> str:
+    def serialize(self, value: Any, **kwargs: Any) -> str:
         """Convert to string."""
 
 
@@ -50,29 +50,25 @@ class ConverterAdapter:
 
     registry: Dict[Type, Converter] = field(default_factory=dict)
 
-    def from_string(self, value: Any, types: List[Type], **kwargs: Any) -> Any:
+    def deserialize(self, value: Any, types: List[Type], **kwargs: Any) -> Any:
         """
-        Attempt to convert a string to one of the given types.
+        Attempt to convert a any value to one of the given types.
 
-        If the input is not a string return the input value.
         If all attempts fail return the value input value and issue a warning.
 
         :return: The first successful converted value.
         """
-        if not isinstance(value, str):
-            return value
-
         for data_type in types:
             with contextlib.suppress(ConverterError):
                 instance = self.type_converter(data_type)
-                return instance.from_string(value, data_type=data_type, **kwargs)
+                return instance.deserialize(value, data_type=data_type, **kwargs)
 
         warnings.warn(
             f"Failed to convert value `{value}` to one of {types}", ConverterWarning
         )
         return value
 
-    def to_string(self, value: Any, **kwargs: Any) -> Any:
+    def serialize(self, value: Any, **kwargs: Any) -> Any:
         """
         Convert the given value to string, ignore None values.
 
@@ -82,10 +78,10 @@ class ConverterAdapter:
             return None
 
         if isinstance(value, list):
-            return " ".join([self.to_string(val, **kwargs) for val in value])
+            return " ".join([self.serialize(val, **kwargs) for val in value])
 
         instance = self.value_converter(value)
-        return instance.to_string(value, **kwargs)
+        return instance.serialize(value, **kwargs)
 
     def register_converter(self, data_type: Type, func: Union[Callable, Converter]):
         """
@@ -147,59 +143,63 @@ class ConverterAdapter:
 
 
 class BoolConverter(Converter):
-    def from_string(self, value: str, **kwargs: Any) -> bool:
-        val = value.strip()
+    def deserialize(self, value: Any, **kwargs: Any) -> bool:
+        if isinstance(value, str):
 
-        if val in ("true", "1"):
-            return True
+            val = value.strip()
 
-        if val in ("false", "0"):
-            return False
+            if val in ("true", "1"):
+                return True
 
-        raise ConverterError(f"Invalid bool literal '{value}'")
+            if val in ("false", "0"):
+                return False
 
-    def to_string(self, value: bool, **kwargs: Any) -> str:
+            raise ConverterError(f"Invalid bool literal '{value}'")
+
+        return True if value else False
+
+    def serialize(self, value: bool, **kwargs: Any) -> str:
         return "true" if value else "false"
 
 
 class IntConverter(Converter):
-    def from_string(self, value: str, **kwargs: Any) -> int:
+    def deserialize(self, value: Any, **kwargs: Any) -> int:
         try:
             return int(value)
-        except ValueError:
+        except (ValueError, TypeError):
             raise ConverterError()
 
-    def to_string(self, value: int, **kwargs: Any) -> str:
+    def serialize(self, value: int, **kwargs: Any) -> str:
         return str(value)
 
 
 class StrConverter(Converter):
-    def from_string(self, value: str, **kwargs: Any) -> str:
-        return value
+    def deserialize(self, value: Any, **kwargs: Any) -> str:
+        return str(value)
 
-    def to_string(self, value: str, **kwargs: Any) -> str:
-        return value
+    def serialize(self, value: str, **kwargs: Any) -> str:
+        return str(value)
 
 
 class FloatConverter(Converter):
-    def from_string(self, value: str, **kwargs: Any) -> float:
+    def deserialize(self, value: Any, **kwargs: Any) -> float:
         try:
             return float(value)
         except ValueError:
             raise ConverterError()
 
-    def to_string(self, value: float, **kwargs: Any) -> str:
+    def serialize(self, value: float, **kwargs: Any) -> str:
         return "NaN" if math.isnan(value) else str(value).upper()
 
 
 class DecimalConverter(Converter):
-    def from_string(self, value: str, **kwargs: Any) -> Decimal:
+    def deserialize(self, value: Any, **kwargs: Any) -> Decimal:
         try:
             return Decimal(value)
         except InvalidOperation:
             raise ConverterError()
 
-    def to_string(self, value: Decimal, **kwargs: Any) -> str:
+    def serialize(self, value: Decimal, **kwargs: Any) -> str:
         if value.is_infinite():
             return str(value).replace("Infinity", "INF")
 
@@ -207,7 +207,7 @@ class DecimalConverter(Converter):
 
 
 class QNameConverter(Converter):
-    def from_string(
+    def deserialize(
         self, value: str, ns_map: Optional[Dict] = None, **kwargs: Any
     ) -> QName:
         """
@@ -226,7 +226,7 @@ class QNameConverter(Converter):
 
         return QName(tag)
 
-    def to_string(
+    def serialize(
         self, value: QName, ns_map: Optional[Dict] = None, **kwargs: Any
     ) -> str:
         """
@@ -272,7 +272,7 @@ class QNameConverter(Converter):
 
 
 class LxmlQNameConverter(Converter):
-    def from_string(
+    def deserialize(
         self, value: str, ns_map: Optional[Dict] = None, **kwargs: Any
     ) -> etree.QName:
         """
@@ -290,7 +290,7 @@ class LxmlQNameConverter(Converter):
         except ValueError:
             raise ConverterError()
 
-    def to_string(
+    def serialize(
         self, value: etree.QName, ns_map: Optional[Dict] = None, **kwargs: Any
     ) -> str:
         """
@@ -311,8 +311,8 @@ class LxmlQNameConverter(Converter):
 
 
 class EnumConverter(Converter):
-    def from_string(
-        self, value: str, data_type: Optional[Type[Enum]] = None, **kwargs: Any
+    def deserialize(
+        self, value: Any, data_type: Optional[Type[Enum]] = None, **kwargs: Any
     ) -> Enum:
         if data_type is None or not issubclass(data_type, Enum):
             raise ConverterError("Provide a target data type enum class.")
@@ -325,7 +325,7 @@ class EnumConverter(Converter):
         # Suppress warnings
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
-            real_value = converter.from_string(value, [value_type], **kwargs)
+            real_value = converter.deserialize(value, [value_type], **kwargs)
 
         # Raise exception if the real value doesn't match the expected type.
         if not isinstance(real_value, value_type):
@@ -339,7 +339,7 @@ class EnumConverter(Converter):
             # Attempt #2 the enum might be derived from
             # xs:NMTOKENS or xs:list removing excess whitespace.
             if isinstance(real_value, str):
-                return data_type(" ".join(value.split()))
+                return data_type(" ".join(real_value.split()))
 
             # Attempt #3 some values are never equal try to match
             # canonical representations.
@@ -348,8 +348,8 @@ class EnumConverter(Converter):
         except (ValueError, StopIteration):
             raise ConverterError()
 
-    def to_string(self, value: Enum, **kwargs: Any) -> str:
-        return converter.to_string(value.value, **kwargs)
+    def serialize(self, value: Enum, **kwargs: Any) -> str:
+        return converter.serialize(value.value, **kwargs)
 
 
 @dataclass
@@ -360,13 +360,13 @@ class ProxyConverter(Converter):
 
     func: Callable
 
-    def from_string(self, value: str, **kwargs: Any) -> Any:
+    def deserialize(self, value: Any, **kwargs: Any) -> Any:
         try:
             return self.func(value)
         except ValueError:
             raise ConverterError
 
-    def to_string(self, value: Any, **kwargs: Any) -> str:
+    def serialize(self, value: Any, **kwargs: Any) -> str:
         return str(value)
 
 

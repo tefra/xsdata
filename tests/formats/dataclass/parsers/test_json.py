@@ -116,7 +116,7 @@ class JsonParserTests(TestCase):
 
         parser = JsonParser()
         self.assertEqual(
-            AnyElement(qname="a", text=1),
+            AnyElement(qname="a", text="1"),
             parser.bind_choice({"qname": "a", "text": 1}, var),
         )
 

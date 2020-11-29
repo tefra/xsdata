@@ -261,7 +261,7 @@ class Filters:
             return self.field_default_tokens(attr, types)
 
         return self.prepare_default_value(
-            converter.from_string(attr.default, types, ns_map=ns_map)
+            converter.deserialize(attr.default, types, ns_map=ns_map)
         )
 
     def field_default_enum(self, attr: Attr) -> str:
@@ -273,7 +273,7 @@ class Filters:
         assert isinstance(attr.default, str)
 
         tokens = ", ".join(
-            str(self.prepare_default_value(converter.from_string(val, types)))
+            str(self.prepare_default_value(converter.deserialize(val, types)))
             for val in attr.default.split()
         )
         return f"lambda: [{tokens}]"

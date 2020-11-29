@@ -79,6 +79,3 @@ class JsonEncoderTests(TestCase):
     def test_default_raises_exceptions(self):
         with self.assertRaises(TypeError):
             json.dumps({"string": object()}, cls=JsonEncoder)
-
-    def test_asdict_qname_clone(self):
-        self.assertEqual("{a}b", asdict(QName("a", "b")))

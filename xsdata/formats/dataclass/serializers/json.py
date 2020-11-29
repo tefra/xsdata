@@ -1,9 +1,7 @@
-import copy
 import json
+from dataclasses import asdict
 from dataclasses import dataclass
 from dataclasses import field
-from dataclasses import fields
-from dataclasses import is_dataclass
 from decimal import Decimal
 from enum import Enum
 from typing import Any
@@ -43,28 +41,6 @@ class JsonEncoder(json.JSONEncoder):
             return str(obj)
 
         return super().default(obj)
-
-
-def asdict(obj: Any, dict_factory: Callable = dict) -> Any:
-    """Clone dataclasses implementation to support pickling lxml.etree.QName
-    objects."""
-    if is_dataclass(obj):
-        return dict_factory(
-            [(f.name, asdict(getattr(obj, f.name), dict_factory)) for f in fields(obj)]
-        )
-
-    if isinstance(obj, (list, tuple)):
-        return type(obj)(asdict(v, dict_factory) for v in obj)
-
-    if isinstance(obj, dict):
-        return type(obj)(
-            (asdict(k, dict_factory), asdict(v, dict_factory)) for k, v in obj.items()
-        )
-
-    if isinstance(obj, QName):
-        return obj.text  # QNames are readonly anyway!
-
-    return copy.deepcopy(obj)
 
 
 @dataclass

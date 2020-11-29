@@ -19,7 +19,6 @@ class AnyElement:
     :param qname: The namespace qualified name.
     :param text: Element text content.
     :param tail: Element tail content.
-    :param ns_map: The prefix-URI Namespace mapping
     :param children: A list of child elements.
     :param attributes: The element key-value attribute mapping.
     """
@@ -27,7 +26,6 @@ class AnyElement:
     qname: Optional[str] = field(default=None)
     text: Optional[str] = field(default=None)
     tail: Optional[str] = field(default=None)
-    ns_map: Dict = field(default_factory=dict)
     children: List[object] = field(
         default_factory=list, metadata={"type": XmlType.WILDCARD}
     )

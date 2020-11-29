@@ -441,7 +441,6 @@ class AnyTypeNodeTests(TestCase):
             qname="a",
             text=None,
             tail="bar",
-            ns_map={},
             attributes={},
             children=[1, 2, 3],
         )
@@ -501,7 +500,6 @@ class WildcardNodeTests(TestCase):
             qname="foo",
             text=None,
             tail="bar",
-            ns_map=ns_map,
             attributes=attrs,
             children=[1, 2, 3],
         )

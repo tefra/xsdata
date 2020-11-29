@@ -321,11 +321,7 @@ class ParserUtilsTests(TestCase):
         ns_map = {"ns0": "a"}
         ParserUtils.bind_wild_content(params, var, "txt", "tail", attrs, ns_map)
         expected = AnyElement(
-            text="txt",
-            tail="tail",
-            children=[expected],
-            attributes=attrs,
-            ns_map=ns_map,
+            text="txt", tail="tail", children=[expected], attributes=attrs
         )
         self.assertEqual(dict(a=expected), params)
 

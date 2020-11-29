@@ -226,7 +226,6 @@ class AnyTypeNode(XmlNode):
                 qname=qname,
                 text=ParserUtils.normalize_content(text),
                 tail=ParserUtils.normalize_content(tail),
-                ns_map=self.ns_map,
                 attributes=ParserUtils.parse_any_attributes(self.attrs, self.ns_map),
                 children=ParserUtils.fetch_any_children(self.position, objects),
             )
@@ -283,7 +282,6 @@ class WildcardNode(XmlNode):
             qname=qname,
             text=ParserUtils.normalize_content(text),
             tail=ParserUtils.normalize_content(tail),
-            ns_map=self.ns_map,
             attributes=ParserUtils.parse_any_attributes(self.attrs, self.ns_map),
             children=ParserUtils.fetch_any_children(self.position, objects),
         )

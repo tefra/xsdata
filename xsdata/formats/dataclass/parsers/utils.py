@@ -187,7 +187,6 @@ class ParserUtils:
             generic = AnyElement(
                 text=txt,
                 tail=tail,
-                ns_map=ns_map,
                 attributes=cls.parse_any_attributes(attrs, ns_map),
             )
             if previous:

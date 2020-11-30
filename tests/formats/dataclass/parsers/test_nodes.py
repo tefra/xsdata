@@ -607,12 +607,6 @@ class UnionNodeTests(TestCase):
 
         self.assertEqual("Failed to parse union node: item", str(cm.exception))
 
-    def test_score_object(self):
-        self.assertEqual(-1.0, UnionNode.score_object(None))
-
-        cls = make_dataclass("b", [("x", int), ("y", str), ("z", Any)])
-        self.assertEqual(2.5, UnionNode.score_object(cls(1, "1", None)))
-
 
 class PrimitiveNodeTests(TestCase):
     @mock.patch.object(ParserUtils, "parse_value")

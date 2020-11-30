@@ -1,3 +1,4 @@
+from dataclasses import fields
 from dataclasses import is_dataclass
 from typing import Any
 from typing import Dict
@@ -292,3 +293,27 @@ class ParserUtils:
             _, value = objects.pop(position)
             children.append(value)
         return children
+
+    @classmethod
+    def score_object(cls, obj: Any) -> float:
+        """
+        Score a dataclass instance by the field values types.
+
+        Weights:
+            1. None: 0
+            2. str: 1
+            3. *: 1.5
+        """
+
+        if not obj:
+            return -1.0
+
+        score = 0.0
+        for var in fields(obj):
+            val = getattr(obj, var.name)
+            if isinstance(val, str):
+                score += 1.0
+            elif val is not None:
+                score += 1.5
+
+        return score

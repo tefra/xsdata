@@ -1,6 +1,7 @@
 import io
 import json
 import pathlib
+import warnings
 from dataclasses import dataclass
 from dataclasses import field
 from dataclasses import fields
@@ -95,30 +96,49 @@ class JsonParser(AbstractParser):
 
     def bind_choice(self, value: Any, var: XmlVar) -> Any:
         if not isinstance(value, dict):
-            return value
+            return self.bind_choice_simple(value, var)
 
         if "qname" in value:
-            qname = value["qname"]
-            choice = var.find_choice(qname)
+            return self.bind_choice_generic(value, var)
 
-            if not choice:
-                raise ParserError(
-                    f"XmlElements undefined choice: `{var.name}` for qname `{qname}`"
-                )
+        return self.bind_choice_dataclass(value, var)
 
-            if "value" in value:
-                return DerivedElement(qname, self.bind_value(choice, value["value"]))
-
-            return self.bind_dataclass(value, AnyElement)
-
-        keys = set(value.keys())
+    def bind_choice_simple(self, value: Any, var: XmlVar) -> Any:
+        orig_type = type(value)
         for choice in var.choices:
-            if not choice.dataclass:
+            if choice.dataclass:
                 continue
 
-            attrs = {f.name for f in fields(choice.clazz)}
-            if attrs == keys:
-                return self.bind_value(choice, value)
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore")
+
+                result = self.bind_value(choice, value)
+                if not isinstance(result, orig_type):
+                    return result
+
+        return value
+
+    def bind_choice_generic(self, value: Dict, var: XmlVar) -> Any:
+        qname = value["qname"]
+        choice = var.find_choice(qname)
+
+        if not choice:
+            raise ParserError(
+                f"XmlElements undefined choice: `{var.name}` for qname `{qname}`"
+            )
+
+        if "value" in value:
+            return DerivedElement(qname, self.bind_value(choice, value["value"]))
+
+        return self.bind_dataclass(value, AnyElement)
+
+    def bind_choice_dataclass(self, value: Dict, var: XmlVar) -> Any:
+        keys = set(value.keys())
+        for choice in var.choices:
+            if choice.clazz:
+                attrs = {f.name for f in fields(choice.clazz)}
+                if attrs == keys:
+                    return self.bind_value(choice, value)
 
         raise ParserError(f"XmlElements undefined choice: `{var.name}` for `{value}`")
 

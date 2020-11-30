@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from dataclasses import field
 from dataclasses import make_dataclass
 from dataclasses import replace
+from typing import Any
 from unittest import mock
 from unittest.case import TestCase
 
@@ -356,3 +357,9 @@ class ParserUtilsTests(TestCase):
 
         actual = ParserUtils.prepare_generic_value("a", expected)
         self.assertIs(expected, actual)
+
+    def test_score_object(self):
+        self.assertEqual(-1.0, ParserUtils.score_object(None))
+
+        cls = make_dataclass("b", [("x", int), ("y", str), ("z", Any)])
+        self.assertEqual(2.5, ParserUtils.score_object(cls(1, "1", None)))

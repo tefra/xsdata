@@ -5,6 +5,7 @@ from tests import fixtures_dir
 from tests.fixtures.books import BookForm
 from tests.fixtures.books import Books
 from xsdata.exceptions import ParserError
+from xsdata.formats.dataclass.models.elements import XmlAttributes
 from xsdata.formats.dataclass.models.elements import XmlElement
 from xsdata.formats.dataclass.models.elements import XmlElements
 from xsdata.formats.dataclass.models.elements import XmlText
@@ -14,10 +15,14 @@ from xsdata.formats.dataclass.parsers.json import JsonParser
 
 
 class JsonParserTests(TestCase):
+    def setUp(self) -> None:
+        super().setUp()
+
+        self.parser = JsonParser()
+
     def test_parser(self):
         path = fixtures_dir.joinpath("books/books.json")
-        parser = JsonParser()
-        books = parser.from_path(path, Books)
+        books = self.parser.from_path(path, Books)
 
         self.assertIsInstance(books, Books)
 
@@ -47,20 +52,27 @@ class JsonParserTests(TestCase):
             books.book[1],
         )
 
-    def test_get_value(self):
-        data = dict(foo="bar", bar="foo")
+    def test_bind_value_with_attributes_var(self):
+        var = XmlAttributes(name="a", qname="a")
+        value = {"a": 1}
+        actual = self.parser.bind_value(var, value)
+        self.assertEqual(value, actual)
+        self.assertIsNot(value, actual)
 
-        foo_field = XmlText(name="foo", qname="foo", types=[str])
-        bar_field = XmlElement(name="bar", qname="bar", types=[str], list_element=True)
+    def test_bind_value_with_clazz_union_var(self):
+        a = make_dataclass("a", [("x", int), ("y", str)])
+        b = make_dataclass("b", [("x", int), ("y", str), ("z", float)])
+        c = make_dataclass("c", [("x", int)])
+        var = XmlElement(name="union", qname="union", types=[a, b, c], dataclass=True)
 
-        self.assertEqual("bar", JsonParser.get_value(data, foo_field))
-        self.assertEqual(["foo"], JsonParser.get_value(data, bar_field))
-        self.assertIsNone(JsonParser.get_value({}, bar_field))
+        data = {"x": 1, "y": "foo", "z": 1.0}
+        actual = self.parser.bind_value(var, data)
+
+        self.assertIsInstance(actual, b)
 
     def test_bind_choice_with_raw_primitive_value(self):
         var = XmlElements(qname="compound", name="compound")
-        parser = JsonParser()
-        self.assertEqual(1, parser.bind_choice(1, var))
+        self.assertEqual(1, self.parser.bind_choice(1, var))
 
     def test_bind_choice_with_raw_dict(self):
         a = make_dataclass("a", [("x", int)])
@@ -76,12 +88,11 @@ class JsonParserTests(TestCase):
             ],
         )
 
-        parser = JsonParser()
-        self.assertEqual(a(1), parser.bind_choice({"x": 1}, var))
-        self.assertEqual(b(1, "2"), parser.bind_choice({"x": 1, "y": "2"}, var))
+        self.assertEqual(a(1), self.parser.bind_choice({"x": 1}, var))
+        self.assertEqual(b(1, "2"), self.parser.bind_choice({"x": 1, "y": "2"}, var))
 
         with self.assertRaises(ParserError) as cm:
-            parser.bind_choice({"x": 1, "y": "2", "z": 3}, var)
+            self.parser.bind_choice({"x": 1, "y": "2", "z": 3}, var)
 
         self.assertEqual(
             "XmlElements undefined choice: `compound` for `{'x': 1, 'y': '2', 'z': 3}`",
@@ -98,10 +109,9 @@ class JsonParserTests(TestCase):
             ],
         )
 
-        parser = JsonParser()
         self.assertEqual(
             DerivedElement(qname="a", value=1),
-            parser.bind_choice({"qname": "a", "value": 1}, var),
+            self.parser.bind_choice({"qname": "a", "value": 1}, var),
         )
 
     def test_bind_choice_with_generic_value(self):
@@ -114,20 +124,28 @@ class JsonParserTests(TestCase):
             ],
         )
 
-        parser = JsonParser()
         self.assertEqual(
             AnyElement(qname="a", text="1"),
-            parser.bind_choice({"qname": "a", "text": 1}, var),
+            self.parser.bind_choice({"qname": "a", "text": 1}, var),
         )
 
     def test_bind_choice_with_unknown_qname(self):
         var = XmlElements(qname="compound", name="compound")
 
-        parser = JsonParser()
         with self.assertRaises(ParserError) as cm:
-            parser.bind_choice({"qname": "foo", "text": 1}, var)
+            self.parser.bind_choice({"qname": "foo", "text": 1}, var)
 
         self.assertEqual(
             "XmlElements undefined choice: `compound` for qname `foo`",
             str(cm.exception),
         )
+
+    def test_get_value(self):
+        data = dict(foo="bar", bar="foo")
+
+        foo_field = XmlText(name="foo", qname="foo", types=[str])
+        bar_field = XmlElement(name="bar", qname="bar", types=[str], list_element=True)
+
+        self.assertEqual("bar", self.parser.get_value(data, foo_field))
+        self.assertEqual(["foo"], self.parser.get_value(data, bar_field))
+        self.assertIsNone(self.parser.get_value({}, bar_field))

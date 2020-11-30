@@ -34,46 +34,19 @@ class JsonParser(AbstractParser):
     def parse(self, source: io.BytesIO, clazz: Type[T]) -> T:
         """Parse the JSON input stream and return the resulting object tree."""
         ctx = json.load(source)
-        return self.parse_context(ctx, clazz)
-
-    def parse_context(self, data: Dict, clazz: Type[T]) -> T:
-        """
-        Recursively build the given model from the input dict data.
-
-        :raise ParserError: When parsing fails for any reason
-        """
-        params = {}
-        for var in self.context.build(clazz).vars:
-            if not var.init:
-                continue
-
-            value = self.get_value(data, var)
-
-            if value is None:
-                continue
-            elif var.is_list:
-                params[var.name] = [self.bind_value(var, val) for val in value]
-            else:
-                params[var.name] = self.bind_value(var, value)
-
-        return clazz(**params)  # type: ignore
+        return self.bind_dataclass(ctx, clazz)
 
     def bind_value(self, var: XmlVar, value: Any) -> Any:
-        """
-        Bind value according to the class var.
-
-        The return value can be:
-        - a dataclass instance
-        - a dictionary with unknown attributes
-        - a list of unknown elements
-        - an enumeration
-        - a primitive value
-        """
-        if var.dataclass and var.clazz:
-            return self.parse_context(value, var.clazz)
+        """Bind value according to the class var."""
 
         if var.is_attributes:
             return dict(value)
+
+        if var.is_clazz_union:
+            return self.bind_dataclass_union(value, var)
+
+        if var.clazz:
+            return self.bind_dataclass(value, var.clazz)
 
         if var.is_wildcard:
             return self.bind_wildcard(value)
@@ -83,9 +56,41 @@ class JsonParser(AbstractParser):
 
         return ParserUtils.parse_value(value, var.types, var.default, tokens=var.tokens)
 
+    def bind_dataclass(self, data: Dict, clazz: Type[T]) -> T:
+        """
+        Recursively build the given model from the input dict data.
+
+        :raise ParserError: When parsing fails for any reason
+        """
+        params = {}
+        for var in self.context.build(clazz).vars:
+            value = self.get_value(data, var)
+
+            if value is None or not var.init:
+                continue
+
+            if var.is_list:
+                params[var.name] = [self.bind_value(var, val) for val in value]
+            else:
+                params[var.name] = self.bind_value(var, value)
+
+        return clazz(**params)  # type: ignore
+
+    def bind_dataclass_union(self, value: Dict, var: XmlVar) -> Any:
+        obj = None
+        max_score = -1.0
+        for clazz in var.types:
+            candidate = self.bind_dataclass(value, clazz)
+            score = ParserUtils.score_object(candidate)
+            if score > max_score:
+                max_score = score
+                obj = candidate
+
+        return obj
+
     def bind_wildcard(self, value: Any) -> Any:
         return (
-            value if isinstance(value, str) else self.parse_context(value, AnyElement)
+            value if isinstance(value, str) else self.bind_dataclass(value, AnyElement)
         )
 
     def bind_choice(self, value: Any, var: XmlVar) -> Any:
@@ -104,7 +109,7 @@ class JsonParser(AbstractParser):
             if "value" in value:
                 return DerivedElement(qname, self.bind_value(choice, value["value"]))
 
-            return self.parse_context(value, AnyElement)
+            return self.bind_dataclass(value, AnyElement)
 
         keys = set(value.keys())
         for choice in var.choices:
@@ -139,4 +144,4 @@ class JsonParser(AbstractParser):
 @dataclass
 class DictConverter(JsonParser):
     def convert(self, data: Dict, clazz: Type[T]) -> T:
-        return self.parse_context(data, clazz)
+        return self.bind_dataclass(data, clazz)

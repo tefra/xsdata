@@ -1,7 +1,6 @@
 import copy
 from dataclasses import dataclass
 from dataclasses import field
-from dataclasses import fields
 from typing import Any
 from typing import ClassVar
 from typing import Dict
@@ -349,7 +348,7 @@ class UnionNode(XmlNode):
         max_score = -1.0
         for clazz in self.var.types:
             candidate = self.parse_class(clazz)
-            score = self.score_object(candidate)
+            score = ParserUtils.score_object(candidate)
             if score > max_score:
                 max_score = score
                 obj = candidate
@@ -368,30 +367,6 @@ class UnionNode(XmlNode):
             return parser.parse(self.events, clazz)
         except Exception:
             return None
-
-    @classmethod
-    def score_object(cls, obj: Any) -> float:
-        """
-        Score a dataclass instance by the field values types.
-
-        Weights:
-            1. None: 0
-            2. str: 1
-            3. *: 1.5
-        """
-
-        if not obj:
-            return -1.0
-
-        score = 0.0
-        for var in fields(obj):
-            val = getattr(obj, var.name)
-            if isinstance(val, str):
-                score += 1.0
-            elif val is not None:
-                score += 1.5
-
-        return score
 
 
 @dataclass

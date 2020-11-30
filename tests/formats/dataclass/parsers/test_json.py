@@ -59,7 +59,7 @@ class JsonParserTests(TestCase):
         self.assertEqual(value, actual)
         self.assertIsNot(value, actual)
 
-    def test_bind_value_with_clazz_union_var(self):
+    def test_bind_dataclass_union(self):
         a = make_dataclass("a", [("x", int), ("y", str)])
         b = make_dataclass("b", [("x", int), ("y", str), ("z", float)])
         c = make_dataclass("c", [("x", int)])
@@ -70,11 +70,20 @@ class JsonParserTests(TestCase):
 
         self.assertIsInstance(actual, b)
 
-    def test_bind_choice_with_raw_primitive_value(self):
-        var = XmlElements(qname="compound", name="compound")
-        self.assertEqual(1, self.parser.bind_choice(1, var))
+    def test_bind_choice_simple(self):
+        var = XmlElements(
+            qname="compound",
+            name="compound",
+            choices=[
+                XmlElement(qname="int", name="int", types=[int]),
+                XmlElement(qname="generic", name="generic", dataclass=True),
+                XmlElement(qname="float", name="float", types=[float]),
+            ],
+        )
+        self.assertEqual(1.0, self.parser.bind_choice("1.0", var))
+        self.assertEqual("a", self.parser.bind_choice("a", var))
 
-    def test_bind_choice_with_raw_dict(self):
+    def test_bind_choice_dataclass(self):
         a = make_dataclass("a", [("x", int)])
         b = make_dataclass("b", [("x", int), ("y", str)])
 
@@ -99,7 +108,7 @@ class JsonParserTests(TestCase):
             str(cm.exception),
         )
 
-    def test_bind_choice_with_derived_value(self):
+    def test_bind_choice_generic_with_derived(self):
         var = XmlElements(
             qname="compound",
             name="compound",
@@ -114,7 +123,7 @@ class JsonParserTests(TestCase):
             self.parser.bind_choice({"qname": "a", "value": 1}, var),
         )
 
-    def test_bind_choice_with_generic_value(self):
+    def test_bind_choice_generic_with_wildcard(self):
         var = XmlElements(
             qname="compound",
             name="compound",
@@ -129,7 +138,7 @@ class JsonParserTests(TestCase):
             self.parser.bind_choice({"qname": "a", "text": 1}, var),
         )
 
-    def test_bind_choice_with_unknown_qname(self):
+    def test_bind_choice_generic_with_unknown_qname(self):
         var = XmlElements(qname="compound", name="compound")
 
         with self.assertRaises(ParserError) as cm:

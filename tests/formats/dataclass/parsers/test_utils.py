@@ -342,17 +342,17 @@ class ParserUtilsTests(TestCase):
         self.assertEqual(dict(a=["first", "txt", "tail", "tail"]), params)
 
     def test_prepare_generic_value(self):
-        @dataclass
-        class Fixture:
-            content: str
+        actual = ParserUtils.prepare_generic_value("a", 1)
+        expected = AnyElement(qname="a", text="1")
+        self.assertEqual(expected, actual)
 
         actual = ParserUtils.prepare_generic_value("a", "foo")
         expected = AnyElement(qname="a", text="foo")
         self.assertEqual(expected, actual)
 
-        fixture = Fixture("foo")
-        actual = ParserUtils.prepare_generic_value("a", fixture)
-        expected = DerivedElement(qname="a", value=fixture)
+        fixture = make_dataclass("Fixture", [("content", str)])
+        actual = ParserUtils.prepare_generic_value("a", fixture("foo"))
+        expected = DerivedElement(qname="a", value=fixture("foo"))
         self.assertEqual(expected, actual)
 
         actual = ParserUtils.prepare_generic_value("a", expected)

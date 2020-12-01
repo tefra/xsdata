@@ -249,7 +249,7 @@ class ParserUtils:
         """Prepare parsed value before binding to a wildcard field."""
 
         if not is_dataclass(value):
-            value = AnyElement(qname=qname, text=value)
+            value = AnyElement(qname=qname, text=converter.serialize(value))
         elif not isinstance(value, (AnyElement, DerivedElement)):
             value = DerivedElement(qname=qname, value=value)
 

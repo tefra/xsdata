@@ -2,6 +2,7 @@ import abc
 import io
 import pathlib
 from typing import Any
+from typing import Optional
 from typing import Type
 from typing import TypeVar
 
@@ -15,18 +16,18 @@ class AbstractSerializer(abc.ABC):
 
 
 class AbstractParser(abc.ABC):
-    def from_path(self, path: pathlib.Path, clazz: Type[T]) -> T:
+    def from_path(self, path: pathlib.Path, clazz: Optional[Type[T]] = None) -> T:
         """Parse the input file path and return the resulting object tree."""
         return self.parse(str(path.resolve()), clazz)
 
-    def from_string(self, source: str, clazz: Type[T]) -> T:
+    def from_string(self, source: str, clazz: Optional[Type[T]] = None) -> T:
         """Parse the input string and return the resulting object tree."""
         return self.from_bytes(source.encode(), clazz)
 
-    def from_bytes(self, source: bytes, clazz: Type[T]) -> T:
+    def from_bytes(self, source: bytes, clazz: Optional[Type[T]] = None) -> T:
         """Parse the input bytes array return the resulting object tree."""
         return self.parse(io.BytesIO(source), clazz)
 
     @abc.abstractmethod
-    def parse(self, source: Any, clazz: Type[T]) -> T:
+    def parse(self, source: Any, clazz: Optional[Type[T]] = None) -> T:
         """Parse the input stream and return the resulting object tree."""

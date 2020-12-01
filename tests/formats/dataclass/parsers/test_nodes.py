@@ -653,25 +653,53 @@ class SKipNodeTests(TestCase):
 
 
 class NodeParserTests(TestCase):
+    def setUp(self):
+        self.parser = NodeParser()
+
     def test_parse(self):
         @dataclass
         class TestHandler(XmlHandler):
             def parse(self, source: Any) -> Any:
                 return Books()
 
-        parser = NodeParser(handler=TestHandler)
-        result = parser.parse([], Books)
-        self.assertEqual(Books(), result)
+        self.parser.handler = TestHandler
+        self.assertEqual(Books(), self.parser.parse([], Books))
 
     def test_parse_when_result_type_is_wrong(self):
+        parser = self.parser
         with self.assertRaises(ParserError) as cm:
-            parser = NodeParser()
             parser.parse([], Books)
 
         self.assertEqual("Failed to create target class `Books`", str(cm.exception))
 
     def test_start(self):
-        parser = NodeParser()
+        queue = []
+        objects = []
+
+        attrs = {"k": "v"}
+        ns_map = {"a": "b"}
+        expected_node = ElementNode(
+            position=0,
+            context=self.parser.context,
+            meta=self.parser.context.build(Books),
+            config=self.parser.config,
+            attrs=attrs,
+            ns_map=ns_map,
+        )
+        self.parser.start(Books, queue, objects, "{urn:books}books", attrs, ns_map)
+        self.assertEqual(1, len(queue))
+        self.assertEqual(expected_node, queue[0])
+
+        expected_node = replace(
+            expected_node, meta=self.parser.context.build(BookForm), attrs={}, ns_map={}
+        )
+        self.parser.start(Books, queue, objects, "book", {}, {})
+
+        self.assertEqual(2, len(queue))
+        self.assertEqual(expected_node, queue[-1])
+
+    def test_start_with_undefined_class(self):
+        parser = self.parser
         queue = []
         objects = []
 
@@ -685,22 +713,16 @@ class NodeParserTests(TestCase):
             attrs=attrs,
             ns_map=ns_map,
         )
-        parser.start(Books, queue, objects, "{urn:books}books", attrs, ns_map)
+        parser.start(None, queue, objects, "{urn:books}books", attrs, ns_map)
         self.assertEqual(1, len(queue))
         self.assertEqual(expected_node, queue[0])
 
-        expected_node = ElementNode(
-            position=0,
-            context=parser.context,
-            meta=parser.context.build(BookForm),
-            config=parser.config,
-            attrs={},
-            ns_map={},
-        )
-        parser.start(Books, queue, objects, "book", {}, {})
+        with self.assertRaises(ParserError) as cm:
+            parser.start(None, [], [], "{unknown}hopefully", [], {})
 
-        self.assertEqual(2, len(queue))
-        self.assertEqual(expected_node, queue[-1])
+        self.assertEqual(
+            "No class found matching root: {unknown}hopefully", str(cm.exception)
+        )
 
     def test_start_with_derived_class(self):
         a = make_dataclass("a", fields=[])

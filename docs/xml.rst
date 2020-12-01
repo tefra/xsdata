@@ -7,9 +7,12 @@ XML Binding
 ====================================================
 
 The parser has three instance methods `from_string`, `from_bytes` and `from_path`,
-to parse from memory or to let the parser load the input document. All of them require
-the target class Type to bind the input data.
+to parse from memory or to let the parser load the input document.
 
+.. hint::
+
+    You can optionally specify the target binding class or let the context instance
+    to scan all imported modules for a matching dataclass.
 
 **Parameters**
     **config** (:class:`~xsdata.formats.dataclass.parsers.config.ParserConfig`)
@@ -122,6 +125,12 @@ Example: alternative handler
 .. literalinclude:: examples/xml_parser.py
    :lines: 24-27
 
+
+Example: with unknown type
+--------------------------
+
+.. literalinclude:: examples/xml_parser.py
+   :lines: 29-30
 
 :class:`~xsdata.formats.dataclass.serializers.XmlSerializer`
 ============================================================

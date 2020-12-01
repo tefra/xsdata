@@ -25,3 +25,6 @@ from xsdata.formats.dataclass.parsers.handlers import XmlEventHandler
 
 parser = XmlParser(handler=XmlEventHandler)
 order = parser.from_path(fixtures_dir.joinpath("primer/order.xml"), PurchaseOrder)
+
+order = parser.from_path(fixtures_dir.joinpath("primer/order.xml"))
+assert isinstance(order, PurchaseOrder)

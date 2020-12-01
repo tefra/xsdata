@@ -52,6 +52,20 @@ class JsonParserTests(TestCase):
             books.book[1],
         )
 
+    def test_parser_with_unknown_class(self):
+        path = fixtures_dir.joinpath("books/books.json")
+        books = self.parser.from_path(path)
+        self.assertIsInstance(books, Books)
+        self.assertEqual(2, len(books.book))
+
+        with self.assertRaises(ParserError) as cm:
+            self.parser.from_string('{"please": 1, "dont": 1, "exists": 2}')
+
+        self.assertEqual(
+            "No class found matching the document keys(['please', 'dont', 'exists'])",
+            str(cm.exception),
+        )
+
     def test_bind_value_with_attributes_var(self):
         var = XmlAttributes(name="a", qname="a")
         value = {"a": 1}

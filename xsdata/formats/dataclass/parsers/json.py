@@ -7,6 +7,7 @@ from dataclasses import field
 from dataclasses import fields
 from typing import Any
 from typing import Dict
+from typing import Optional
 from typing import Type
 
 from xsdata.exceptions import ParserError
@@ -29,12 +30,22 @@ class JsonParser(AbstractParser):
 
     context: XmlContext = field(default_factory=XmlContext)
 
-    def from_path(self, path: pathlib.Path, clazz: Type[T]) -> T:
+    def from_path(self, path: pathlib.Path, clazz: Optional[Type[T]] = None) -> T:
+        """Parse the input file path and return the resulting object tree."""
         return self.from_bytes(path.read_bytes(), clazz)
 
-    def parse(self, source: io.BytesIO, clazz: Type[T]) -> T:
+    def parse(self, source: io.BytesIO, clazz: Optional[Type[T]] = None) -> T:
         """Parse the JSON input stream and return the resulting object tree."""
         ctx = json.load(source)
+
+        if clazz is None:
+            clazz = self.context.find_type_by_fields(set(ctx.keys()))
+
+        if clazz is None:
+            raise ParserError(
+                f"No class found matching the document keys({list(ctx.keys())})"
+            )
+
         return self.bind_dataclass(ctx, clazz)
 
     def bind_value(self, var: XmlVar, value: Any) -> Any:

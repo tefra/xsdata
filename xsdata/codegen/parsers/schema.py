@@ -46,7 +46,7 @@ class SchemaParser(XmlParser):
 
     def start(
         self,
-        clazz: Type,
+        clazz: Optional[Type[T]],
         queue: List[XmlNode],
         objects: List[Parsed],
         qname: str,

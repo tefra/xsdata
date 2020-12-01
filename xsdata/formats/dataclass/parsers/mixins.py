@@ -28,7 +28,7 @@ class PushParser(AbstractParser):
     @abc.abstractmethod
     def start(
         self,
-        clazz: Type,
+        clazz: Optional[Type],
         queue: List,
         objects: List,
         qname: str,
@@ -95,14 +95,15 @@ class XmlHandler:
     """
     Xml content handler interface.
 
-    :param clazz: The Dataclass model to bind the xml document data.
     :param parser: The parser instance to feed events.
+    :param clazz: The model to bind the xml document data. If it's not provided the
+        parser is responsible to locate one from the xml context.
     :param queue: The queue list of xml nodes.
     :param objects: Temporary storage for intermediate objects, eg [(qname, object)]
     """
 
-    clazz: Type
     parser: PushParser
+    clazz: Optional[Type]
     queue: List = field(default_factory=list)
     objects: List = field(default_factory=list)
 

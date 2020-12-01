@@ -2,15 +2,29 @@
 JSON Binding
 ============
 
-The json implementation lacks a bit in maturity but it has a similar interface to the
-xml implementation.
-
 
 :class:`~xsdata.formats.dataclass.parsers.JsonParser`
 =====================================================
 
-The parser also uses the :class:`~xsdata.formats.dataclass.context.XmlContext`
-for model metadata caching which can be shared across instances.
+The parser has three instance methods `from_string`, `from_bytes` and `from_path`,
+to parse from memory or to let the parser load the input document.
+
+.. hint::
+
+    You can optionally specify the target binding class or let the context instance
+    to scan all imported modules for a matching dataclass.
+
+**Parameters**
+    **context** (:class:`~xsdata.formats.dataclass.context.XmlContext`)
+
+    The cache layer for the binding directives of models and their fields. You may
+    share a context instance between parser/serializer instances to avoid compiling the
+    cache more than once.
+
+    .. hint::
+
+        it's recommended to use a static or global instance of your parser or serializer
+        per document type.
 
 .. code-block:: python
 

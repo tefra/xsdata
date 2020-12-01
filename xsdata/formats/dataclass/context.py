@@ -14,9 +14,11 @@ from typing import get_type_hints
 from typing import Iterator
 from typing import List
 from typing import Optional
+from typing import Set
 from typing import Type
 
 from xsdata.exceptions import XmlContextError
+from xsdata.formats.bindings import T
 from xsdata.formats.converter import converter
 from xsdata.formats.dataclass.models.constants import XmlType
 from xsdata.formats.dataclass.models.elements import XmlMeta
@@ -70,6 +72,10 @@ class XmlContext:
 
     def build_xsi_cache(self):
         """Index all imported dataclasses by their xsi:type qualified name."""
+
+        if len(sys.modules) == self.sys_modules:
+            return
+
         self.xsi_cache.clear()
 
         for clazz in self.get_subclasses(object):
@@ -81,39 +87,47 @@ class XmlContext:
                 source_qname = build_qname(source_namespace, name)
                 self.xsi_cache[source_qname].append(clazz)
 
-    def find_types(self, qname: str) -> Optional[List[Type]]:
+        self.sys_modules = len(sys.modules)
+
+    def find_types(self, qname: str) -> List[Type[T]]:
         """
         Find all classes that match the given xsi:type qname.
 
         - Ignores native schema types, xs:string, xs:float, xs:int, ...
         - Rebuild cache if new modules were imported since last run
         """
-        if DataType.from_qname(qname):
-            return None
-
-        if len(sys.modules) != self.sys_modules:
+        if not DataType.from_qname(qname):
             self.build_xsi_cache()
-            self.sys_modules = len(sys.modules)
+            if qname in self.xsi_cache:
+                return self.xsi_cache[qname]
 
-        return self.xsi_cache[qname] if qname in self.xsi_cache else None
+        return []
 
-    def find_type(self, qname: str) -> Optional[Type]:
+    def find_type(self, qname: str) -> Optional[Type[T]]:
         """Return the most recently imported class that matches the given
         xsi:type qname."""
-        types = self.find_types(qname)
+        types: List[Type] = self.find_types(qname)
         return types[-1] if types else None
+
+    def find_type_by_fields(self, field_names: Set) -> Optional[Type[T]]:
+        self.build_xsi_cache()
+        for types in self.xsi_cache.values():
+            for clazz in types:
+                if field_names == {attr.name for attr in fields(clazz)}:
+                    return clazz
+
+        return None
 
     def find_subclass(self, clazz: Type, qname: str) -> Optional[Type]:
         """Compare all classes that match the given xsi:type qname and return
         the first one that is either a subclass or shares the same parent class
         as the original class."""
 
-        types = self.find_types(qname)
-        if types:
-            for tp in types:
-                for tp_mro in tp.__mro__:
-                    if tp_mro is not object and tp_mro in clazz.__mro__:
-                        return tp
+        types: List[Type] = self.find_types(qname)
+        for tp in types:
+            for tp_mro in tp.__mro__:
+                if tp_mro is not object and tp_mro in clazz.__mro__:
+                    return tp
 
         return None
 

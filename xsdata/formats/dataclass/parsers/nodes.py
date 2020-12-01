@@ -431,7 +431,7 @@ class NodeParser(PushParser):
     handler: Type[XmlHandler] = field(default=EventsHandler)
     ns_map: Dict = field(init=False, default_factory=dict)
 
-    def parse(self, source: Any, clazz: Type[T]) -> T:
+    def parse(self, source: Any, clazz: Optional[Type[T]] = None) -> T:
         """Parse the XML input stream and return the resulting object tree."""
         handler = self.handler(clazz=clazz, parser=self)
         result = handler.parse(source)
@@ -439,11 +439,12 @@ class NodeParser(PushParser):
         if result is not None:
             return result
 
-        raise ParserError(f"Failed to create target class `{clazz.__name__}`")
+        target_class = clazz.__name__ if clazz else ""
+        raise ParserError(f"Failed to create target class `{target_class}`")
 
     def start(
         self,
-        clazz: Type,
+        clazz: Optional[Type],
         queue: List[XmlNode],
         objects: List[Parsed],
         qname: str,
@@ -455,6 +456,13 @@ class NodeParser(PushParser):
             item = queue[-1]
             child = item.child(qname, attrs, ns_map, len(objects))
         except IndexError:
+
+            if clazz is None:
+                clazz = self.context.find_type(qname)
+
+            if clazz is None:
+                raise ParserError(f"No class found matching root: {qname}")
+
             xsi_type = ParserUtils.xsi_type(attrs, ns_map)
             meta = self.context.fetch(clazz, xsi_type=xsi_type)
             derived = xsi_type is not None and meta.qname != qname
@@ -510,7 +518,7 @@ class RecordParser(NodeParser):
 
     def start(
         self,
-        clazz: Type,
+        clazz: Optional[Type],
         queue: List[XmlNode],
         objects: List[Parsed],
         qname: str,

@@ -30,7 +30,7 @@ class XmlParser(NodeParser):
 
     def start(
         self,
-        clazz: Type,
+        clazz: Optional[Type],
         queue: List[XmlNode],
         objects: List[Parsed],
         qname: str,

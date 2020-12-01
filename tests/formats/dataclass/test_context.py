@@ -1,6 +1,7 @@
 import sys
 from dataclasses import dataclass
 from dataclasses import field
+from dataclasses import fields
 from dataclasses import make_dataclass
 from dataclasses import replace
 from typing import Generator
@@ -95,6 +96,11 @@ class XmlContextTests(TestCase):
 
         self.ctx.xsi_cache["{urn:books}BookForm"].append(BooksForm)
         self.assertEqual(BooksForm, self.ctx.find_type("{urn:books}BookForm"))
+
+    def test_find_type_by_fields(self):
+        field_names = {f.name for f in fields(BookForm)}
+        self.assertEqual(BookForm, self.ctx.find_type_by_fields(field_names))
+        self.assertIsNone(self.ctx.find_type_by_fields({"please", "dont", "exist"}))
 
     def test_find_subclass(self):
         a = make_dataclass("A", fields=[])

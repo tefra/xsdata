@@ -1,5 +1,5 @@
 {{ output|default_imports }}
-{%+ include "imports.jinja2" -%}
+{% include "imports.jinja2" -%}
 {%- if namespace %}
 __NAMESPACE__ = "{{ namespace }}"
 {% endif %}

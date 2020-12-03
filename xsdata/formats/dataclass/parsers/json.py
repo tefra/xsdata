@@ -18,6 +18,7 @@ from xsdata.formats.dataclass.models.elements import XmlVar
 from xsdata.formats.dataclass.models.generics import AnyElement
 from xsdata.formats.dataclass.models.generics import DerivedElement
 from xsdata.formats.dataclass.parsers.utils import ParserUtils
+from xsdata.utils.constants import EMPTY_MAP
 
 
 @dataclass
@@ -66,7 +67,7 @@ class JsonParser(AbstractParser):
         if var.is_elements:
             return self.bind_choice(value, var)
 
-        return ParserUtils.parse_value(value, var.types, var.default, tokens=var.tokens)
+        return self.parse_value(value, var)
 
     def bind_dataclass(self, data: Dict, clazz: Type[T]) -> T:
         """
@@ -152,6 +153,12 @@ class JsonParser(AbstractParser):
                     return self.bind_value(choice, value)
 
         raise ParserError(f"XmlElements undefined choice: `{var.name}` for `{value}`")
+
+    @classmethod
+    def parse_value(cls, value: Any, var: XmlVar) -> Any:
+        return ParserUtils.parse_value(
+            value, var.types, var.default, ns_map=EMPTY_MAP, tokens=var.tokens
+        )
 
     @staticmethod
     def get_value(data: Dict, var: XmlVar) -> Any:

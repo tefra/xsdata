@@ -70,19 +70,18 @@ class JsonParser(AbstractParser):
         return self.parse_value(value, var)
 
     def bind_dataclass(self, data: Dict, clazz: Type[T]) -> T:
-        """
-        Recursively build the given model from the input dict data.
-
-        :raise ParserError: When parsing fails for any reason
-        """
+        """Recursively build the given model from the input dict data."""
         params = {}
         for var in self.context.build(clazz).vars:
-            value = self.get_value(data, var)
+            value = data.get(var.name)
 
             if value is None or not var.init:
                 continue
 
             if var.is_list:
+                if not isinstance(value, list):
+                    raise ParserError(f"Key `{var.name}` value is not iterable")
+
                 params[var.name] = [self.bind_value(var, val) for val in value]
             else:
                 params[var.name] = self.bind_value(var, value)
@@ -90,6 +89,7 @@ class JsonParser(AbstractParser):
         return clazz(**params)  # type: ignore
 
     def bind_dataclass_union(self, value: Dict, var: XmlVar) -> Any:
+        """Bind data to all possible models and return the best candidate."""
         obj = None
         max_score = -1.0
         for clazz in var.types:
@@ -102,11 +102,14 @@ class JsonParser(AbstractParser):
         return obj
 
     def bind_wildcard(self, value: Any) -> Any:
-        return (
-            value if isinstance(value, str) else self.bind_dataclass(value, AnyElement)
-        )
+        """Bind data to a wildcard model."""
+        if isinstance(value, Dict):
+            return self.bind_dataclass(value, AnyElement)
+
+        return value
 
     def bind_choice(self, value: Any, var: XmlVar) -> Any:
+        """Bind data to one of the choice models."""
         if not isinstance(value, dict):
             return self.bind_choice_simple(value, var)
 
@@ -116,6 +119,8 @@ class JsonParser(AbstractParser):
         return self.bind_choice_dataclass(value, var)
 
     def bind_choice_simple(self, value: Any, var: XmlVar) -> Any:
+        """Bind data to one of the simple choice types and return the first
+        that succeeds."""
         orig_type = type(value)
         for choice in var.choices:
             if choice.dataclass:
@@ -131,6 +136,7 @@ class JsonParser(AbstractParser):
         return value
 
     def bind_choice_generic(self, value: Dict, var: XmlVar) -> Any:
+        """Bind data to a either a derived or a user derived model."""
         qname = value["qname"]
         choice = var.find_choice(qname)
 
@@ -145,6 +151,7 @@ class JsonParser(AbstractParser):
         return self.bind_dataclass(value, AnyElement)
 
     def bind_choice_dataclass(self, value: Dict, var: XmlVar) -> Any:
+        """Bind data to the best matching choice model."""
         keys = set(value.keys())
         for choice in var.choices:
             if choice.clazz:
@@ -156,27 +163,10 @@ class JsonParser(AbstractParser):
 
     @classmethod
     def parse_value(cls, value: Any, var: XmlVar) -> Any:
+        """Convert any value to one of the given var types."""
         return ParserUtils.parse_value(
             value, var.types, var.default, ns_map=EMPTY_MAP, tokens=var.tokens
         )
-
-    @staticmethod
-    def get_value(data: Dict, var: XmlVar) -> Any:
-        """Find the var value in the given dictionary or return the default var
-        value."""
-
-        local_name = var.local_name
-        if local_name in data:
-            value = data[local_name]
-        elif var.name in data:
-            value = data[var.name]
-        else:
-            return None
-
-        if var.is_list and not isinstance(value, list):
-            value = [value]
-
-        return value
 
 
 @dataclass

@@ -103,11 +103,6 @@ class XmlVar:
         """Return whether the field is a text element."""
         return False
 
-    @property
-    def local_name(self) -> str:
-        """The element local name."""
-        return split_qname(self.qname)[1]
-
     def matches(self, qname: str) -> bool:
         """
         Match the field qualified local name to the given qname.

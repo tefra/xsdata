@@ -66,6 +66,12 @@ class JsonParserTests(TestCase):
             str(cm.exception),
         )
 
+    def test_parser_with_non_iterable_value(self):
+        with self.assertRaises(ParserError) as cm:
+            self.parser.from_string('{"book": 1}')
+
+        self.assertEqual("Key `book` value is not iterable", str(cm.exception))
+
     def test_bind_value_with_attributes_var(self):
         var = XmlAttributes(name="a", qname="a")
         value = {"a": 1}
@@ -162,13 +168,3 @@ class JsonParserTests(TestCase):
             "XmlElements undefined choice: `compound` for qname `foo`",
             str(cm.exception),
         )
-
-    def test_get_value(self):
-        data = dict(foo="bar", bar="foo")
-
-        foo_field = XmlText(name="foo", qname="foo", types=[str])
-        bar_field = XmlElement(name="bar", qname="bar", types=[str], list_element=True)
-
-        self.assertEqual("bar", self.parser.get_value(data, foo_field))
-        self.assertEqual(["foo"], self.parser.get_value(data, bar_field))
-        self.assertIsNone(self.parser.get_value({}, bar_field))

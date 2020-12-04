@@ -96,11 +96,14 @@ class JsonParserTests(TestCase):
             name="compound",
             choices=[
                 XmlElement(qname="int", name="int", types=[int]),
+                XmlElement(qname="tokens", name="tokens", types=[int], tokens=True),
                 XmlElement(qname="generic", name="generic", dataclass=True),
                 XmlElement(qname="float", name="float", types=[float]),
             ],
         )
         self.assertEqual(1.0, self.parser.bind_choice("1.0", var))
+        self.assertEqual(1, self.parser.bind_choice(1, var))
+        self.assertEqual([1], self.parser.bind_choice(["1"], var))
         self.assertEqual("a", self.parser.bind_choice("a", var))
 
     def test_bind_choice_dataclass(self):

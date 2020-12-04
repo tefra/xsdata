@@ -121,16 +121,19 @@ class JsonParser(AbstractParser):
     def bind_choice_simple(self, value: Any, var: XmlVar) -> Any:
         """Bind data to one of the simple choice types and return the first
         that succeeds."""
-        orig_type = type(value)
+        choice = var.find_value_choice(value)
+        if choice:
+            return self.bind_value(choice, value)
+
+        # Sometimes exact type match doesn't work, eg Decimals, try all of them
+        is_list = isinstance(value, list)
         for choice in var.choices:
-            if choice.dataclass:
+            if choice.dataclass or choice.tokens != is_list:
                 continue
 
-            with warnings.catch_warnings():
-                warnings.simplefilter("ignore")
-
+            with warnings.catch_warnings(record=True) as w:
                 result = self.bind_value(choice, value)
-                if not isinstance(result, orig_type):
+                if not w:
                     return result
 
         return value

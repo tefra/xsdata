@@ -207,7 +207,7 @@ class AttrType:
         """Return the python build-in type name: `'str'`, `'int'` if it's
         native type."""
         data_type = DataType.get_enum(self.name) if self.native else None
-        return data_type.local_name if data_type else None
+        return data_type.type.__name__ if data_type else None
 
     @property
     def native_code(self) -> Optional[str]:
@@ -219,7 +219,7 @@ class AttrType:
     def native_type(self) -> Any:
         """Return the python build-in type if it's a native type."""
         data_type = DataType.get_enum(self.name) if self.native else None
-        return data_type.local if data_type else None
+        return data_type.type if data_type else None
 
     def clone(self) -> "AttrType":
         """Return a deep cloned instance."""

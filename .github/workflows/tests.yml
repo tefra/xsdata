@@ -28,7 +28,7 @@ jobs:
         with:
           python-version: ${{ matrix.python }}
       - name: Install libxml2
-        if: matrix.python ==  '3.9-dev' || matrix.python == 'pypy3'
+        if: matrix.python == 'pypy3'
         run: |
           sudo apt-get install libxml2-dev libxslt-dev
       - name: Install dependencies

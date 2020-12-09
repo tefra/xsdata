@@ -1,11 +1,20 @@
-{% set help | format_docstring %}
+{% set level = level|default(0) -%}
+{% set help | format_docstring(level + 1) %}
     {%- include "docstrings." + docstring_style + ".jinja2" -%}
-{% endset %}
+{% endset -%}
+{% set class_name = obj.name|class_name %}
 
-class {{ obj.name|class_name }}(Enum):
+class {{ class_name }}(Enum):
 {%- if help %}
 {{ help|indent(4, first=True) }}
 {%- endif -%}
 {%- for attr in obj.attrs %}
     {{ attr.name|constant_name }} = {{ attr|field_default(obj.ns_map) }}
 {%- endfor -%}
+{% if docstring_style == "accessible" -%}
+{{ "\n\n" if level == 0 else "\n" }}
+{%- for attr in obj.attrs if attr.help %}
+{% set member_name = "{}.{}.__doc__ = ".format(class_name, attr.name|constant_name) -%}
+{{ member_name }}{{ attr.help | format_string(member_name|length) }}
+{%- endfor -%}
+{%- endif -%}

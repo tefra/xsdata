@@ -1,4 +1,6 @@
+import re
 from typing import List
+from typing import Match
 from typing import Tuple
 
 
@@ -101,3 +103,30 @@ def classify(character: str) -> int:
         return StringType.NUMERIC
 
     return StringType.OTHER
+
+
+ESCAPE = re.compile(r'[\x00-\x1f\\"\b\f\n\r\t]')
+ESCAPE_DCT = {
+    "\\": "\\\\",
+    '"': '\\"',
+    "\b": "\\b",
+    "\f": "\\f",
+    "\n": "\\n",
+    "\r": "\\r",
+    "\t": "\\t",
+}
+for i in range(0x20):
+    ESCAPE_DCT.setdefault(chr(i), f"\\u{i:04x}")
+
+
+def escape_string(string: str) -> str:
+    """
+    Escape a string for code generation.
+
+    Source: json.encoder.py_encode_basestring
+    """
+
+    def replace(match: Match) -> str:
+        return ESCAPE_DCT[match.group(0)]
+
+    return ESCAPE.sub(replace, string)

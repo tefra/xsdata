@@ -95,7 +95,7 @@ class ClassSanitizer:
                 name=name,
                 local_name=name,
                 index=0,
-                types=[AttrType(qname=DataType.ANY_TYPE.qname, native=True)],
+                types=[AttrType(qname=str(DataType.ANY_TYPE), native=True)],
                 tag=Tag.CHOICE,
                 restrictions=Restrictions(
                     min_occurs=min((x for x in min_occurs if x is not None), default=0),

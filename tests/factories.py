@@ -176,7 +176,7 @@ class AttrTypeFactory(Factory):
             qname = build_qname("xsdata", f"attr_{cls.next_letter()}")
 
         return cls.model(
-            qname=qname,
+            qname=str(qname),
             alias=alias,
             native=native,
             circular=circular,
@@ -185,43 +185,43 @@ class AttrTypeFactory(Factory):
 
     @classmethod
     def xs_string(cls):
-        return cls.create(qname=DataType.STRING.qname, native=True)
+        return cls.create(qname=DataType.STRING, native=True)
 
     @classmethod
     def xs_int(cls):
-        return cls.create(qname=DataType.INTEGER.qname, native=True)
+        return cls.create(qname=DataType.INTEGER, native=True)
 
     @classmethod
     def xs_positive_int(cls):
-        return cls.create(qname=DataType.POSITIVE_INTEGER.qname, native=True)
+        return cls.create(qname=DataType.POSITIVE_INTEGER, native=True)
 
     @classmethod
     def xs_float(cls):
-        return cls.create(qname=DataType.FLOAT.qname, native=True)
+        return cls.create(qname=DataType.FLOAT, native=True)
 
     @classmethod
     def xs_decimal(cls):
-        return cls.create(qname=DataType.DECIMAL.qname, native=True)
+        return cls.create(qname=DataType.DECIMAL, native=True)
 
     @classmethod
     def xs_bool(cls):
-        return cls.create(qname=DataType.BOOLEAN.qname, native=True)
+        return cls.create(qname=DataType.BOOLEAN, native=True)
 
     @classmethod
     def xs_any(cls):
-        return cls.create(qname=DataType.ANY_TYPE.qname, native=True)
+        return cls.create(qname=DataType.ANY_TYPE, native=True)
 
     @classmethod
     def xs_qname(cls):
-        return cls.create(qname=DataType.QNAME.qname, native=True)
+        return cls.create(qname=DataType.QNAME, native=True)
 
     @classmethod
     def xs_tokens(cls):
-        return cls.create(qname=DataType.NMTOKENS.qname, native=True)
+        return cls.create(qname=DataType.NMTOKENS, native=True)
 
     @classmethod
     def xs_error(cls):
-        return cls.create(qname=DataType.ERROR.qname, native=True)
+        return cls.create(qname=DataType.ERROR, native=True)
 
 
 class AttrFactory(Factory):

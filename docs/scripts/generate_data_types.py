@@ -25,7 +25,7 @@ custom_classes = {
 }
 
 
-for tp, data_types in group_by(list(DataType), key=lambda x: x.local_name).items():
+for tp, data_types in group_by(list(DataType), key=lambda x: x.type.__name__).items():
     output.append(f"    * - :class:`{custom_classes.get(tp, tp)}`")
 
     count = 0

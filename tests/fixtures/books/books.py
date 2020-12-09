@@ -6,7 +6,8 @@ __NAMESPACE__ = "urn:books"
 
 @dataclass
 class BookForm:
-    """Book Definition.
+    """
+    Book Definition.
 
     Attributes
         author: Writer's name
@@ -94,7 +95,9 @@ class BooksForm:
 
 @dataclass
 class Books(BooksForm):
-    """Το βιβλίο."""
+    """
+    Το βιβλίο.
+    """
     class Meta:
         name = "books"
         namespace = "urn:books"

@@ -32,7 +32,7 @@ def cli():
 @cli.command("init-config")
 @click.argument("output", type=click.Path(), default=".xsdata.xml")
 @click.option("--print", is_flag=True, default=False, help="Print output")
-def init_config(*args: Any, **kwargs: Any):
+def init_config(**kwargs: Any):
     """Create or update a configuration file."""
 
     if kwargs["print"]:
@@ -98,7 +98,7 @@ def download(source: str, output: str):
         "Useful against circular import errors."
     ),
 )
-def generate(*args: Any, **kwargs: Any):
+def generate(**kwargs: Any):
     """
     Convert schema definitions to code.
 

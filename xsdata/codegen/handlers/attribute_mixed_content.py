@@ -34,7 +34,7 @@ class AttributeMixedContentHandler(HandlerInterface):
                 name="content",
                 local_name="content",
                 index=0,
-                types=[AttrType(qname=DataType.ANY_TYPE.qname, native=True)],
+                types=[AttrType(qname=str(DataType.ANY_TYPE), native=True)],
                 tag=Tag.ANY,
                 mixed=True,
                 namespace=NamespaceType.ANY_NS,

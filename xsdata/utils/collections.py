@@ -36,7 +36,7 @@ def remove(items: Iterable, predicate: Callable) -> List:
     return [x for x in items if not predicate(x)]
 
 
-def group_by(items: Sequence, key: Callable) -> Dict[Any, List]:
+def group_by(items: Iterable, key: Callable) -> Dict[Any, List]:
     """Group the items of a sequence by the result of the callable."""
     result = defaultdict(list)
     for item in items:

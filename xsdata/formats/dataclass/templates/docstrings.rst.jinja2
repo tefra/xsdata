@@ -1,10 +1,8 @@
 {% set is_enum = obj.is_enumeration -%}
 {% set prefix = "cvar" if is_enum else "ivar" -%}
-"""
-{{ obj.help or "" }}
+{{ '"""{}"""'.format(obj.help | text_strip) }}
 {% if obj.has_help_attr %}
-{%- for attr in obj.attrs %}
-:{{ prefix }} {{ attr.name|constant_name if is_enum else attr.name|field_name }}:{{- " " + attr.help|trim if attr.help else "" -}}
-{%- endfor -%}
+{%- for var_name, var_doc in obj|class_params %}
+{{ ":{} {}: {}".format(prefix, var_name, var_doc) | text_wrap(level + 1) }}
+{%- endfor %}
 {%- endif %}
-"""

@@ -233,7 +233,7 @@ class AnyTypeNode(XmlNode):
             var = self.var
             ns_map = self.ns_map
             datatype = ParserUtils.data_type(self.attrs, self.ns_map)
-            obj = ParserUtils.parse_value(text, [datatype.local], var.default, ns_map)
+            obj = ParserUtils.parse_value(text, [datatype.type], var.default, ns_map)
 
             if var.derived:
                 obj = DerivedElement(qname=qname, value=obj)

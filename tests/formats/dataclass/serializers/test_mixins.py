@@ -166,7 +166,7 @@ class XmlWriterTests(TestCase):
         self.writer.add_attribute("b", True)
         self.writer.add_attribute("c", "{")
         self.writer.add_attribute("d", "{a}b")
-        self.writer.add_attribute(QNames.XSI_TYPE, DataType.STRING.qname)
+        self.writer.add_attribute(QNames.XSI_TYPE, str(DataType.STRING))
 
         expected = {
             (None, "a"): "bar",

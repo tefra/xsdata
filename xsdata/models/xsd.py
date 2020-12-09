@@ -1,4 +1,5 @@
 import sys
+import textwrap
 from dataclasses import dataclass
 from dataclasses import field
 from typing import Any as Anything
@@ -54,7 +55,7 @@ class Documentation(ElementBase):
 
     def tostring(self) -> Optional[str]:
         xml = docstring_serializer.render(Docstring(self.elements)).split("\n", 1)
-        return clean_html(xml[1])[5:-7].strip()
+        return textwrap.dedent(clean_html(xml[1])[5:-7]).strip()
 
 
 @dataclass

@@ -1,3 +1,12 @@
+20.12 (2020-12-10)
+--------------------
+- Added SerializerConfig with new options. `#268 <https://github.com/tefra/xsdata/issues/268>`_, `#320 <https://github.com/tefra/xsdata/issues/320>`_
+- Added docstring styles: rst, google, numpy, accessible. `#318 <https://github.com/tefra/xsdata/issues/318>`_, `#340 <https://github.com/tefra/xsdata/issues/340>`_
+- Added `max line length` generator configuration. `#342 <https://github.com/tefra/xsdata/issues/342>`_
+- Added dynamic type locator for parsers. `#332 <https://github.com/tefra/xsdata/issues/332>`_
+- Fixed multiple issues with json binding. `98.7% <https://github.com/tefra/xsdata-w3c-tests/actions>`_ successful roundtrips
+
+
 20.11.1 (2020-11-13)
 --------------------
 - Catch all type errors on xsi cache build `#316 <https://github.com/tefra/xsdata/issues/316>`_

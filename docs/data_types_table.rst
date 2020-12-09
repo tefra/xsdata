@@ -25,31 +25,37 @@
       - duration
       - ENTITIES
       - ENTITY
+      - error
       - gDay
-      - gMonth
     * -
+      - gMonth
       - gMonthDay
       - gYear
       - gYearMonth
       - hexBinary
-      - ID
     * -
+      - ID
       - IDREF
       - IDREFS
       - lang
       - language
-      - Name
     * -
+      - Name
       - NCName
       - NMTOKEN
       - NMTOKENS
       - normalizedString
-      - NOTATION
     * -
+      - NOTATION
       - simpleDerivationSet
       - string
       - time
       - token
+    * -
+      -
+      -
+      -
+      -
       -
     * - :class:`object`
       - anySimpleType

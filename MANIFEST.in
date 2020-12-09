@@ -8,7 +8,6 @@ prune docs/_build
 prune docs/_static
 prune docs/reference
 prune docs/demo
-exclude .travis.yml
 exclude .readthedocs.yml
 exclude .pre-commit-config.yaml
 

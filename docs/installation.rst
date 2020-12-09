@@ -1,16 +1,42 @@
 Getting started
 ===============
 
-Prerequisites
--------------
+Install using pip
+-----------------
 
-Make sure you have `python >= 3.6` and `pip` up and running.
+The recommended method is to use a virtual environment
+
+.. code-block:: bash
+
+    $ pip install xsdata
+
+Install using conda
+-------------------
+
+.. code-block:: bash
+
+    $ conda install -c conda-forge xsdata
+
+Verify installation
+-------------------
+
+Verify installation using the cli entry point.
+
+.. command-output:: xsdata --help
 
 
-.. command-output:: python --version
+Requirements
+------------
 
-.. command-output:: pip --version
+.. admonition:: xsData relies on these awesome libraries and supports `python >= 3.6`
+    :class: hint
 
+    * `lxml <https://lxml.de/>`_ - XML parsing
+    * `requests <https://requests.readthedocs.io/>`_ - Webservice Default Transport
+    * `click <https://click.palletsprojects.com/>`_ - CLI entry point
+    * `toposort <https://pypi.org/project/toposort/>`_ - Resolve class ordering
+    * `jinja2 <https://jinja.palletsprojects.com/>`_ -  Code generation
+    * `docformatter <https://pypi.org/project/docformatter/>`_ -  Code formatting
 
 .. warning::
 
@@ -33,32 +59,3 @@ Make sure you have `python >= 3.6` and `pip` up and running.
         {'value': typing.Union[int, str, float]}
         >>> issubclass(bool, int)
         True
-
-
-
-----
-
-Install xsData
---------------
-
-Install xsData package using `pip`.
-
-.. code-block:: bash
-
-    pip install xsdata
-
-Verify installation using the cli entry point.
-
-.. command-output:: xsdata --help
-
-----
-
-.. admonition:: xsData relies on these awesome libraries
-    :class: hint
-
-    * `lxml <https://lxml.de/>`_ - XML parsing
-    * `requests <https://requests.readthedocs.io/>`_ - Webservice Default Transport
-    * `click <https://click.palletsprojects.com/>`_ - CLI entry point
-    * `toposort <https://pypi.org/project/toposort/>`_ - Resolve class ordering
-    * `jinja2 <https://jinja.palletsprojects.com/>`_ -  Code generation
-    * `docformatter <https://pypi.org/project/docformatter/>`_ -  Code formatting

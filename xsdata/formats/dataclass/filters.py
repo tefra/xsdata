@@ -256,7 +256,7 @@ class Filters:
         return str(data)
 
     def format_string(
-        self, value: Optional[str], start: int = 0, level: int = 0, ident: int = 0
+        self, value: Optional[str], start: int = 0, level: int = 0
     ) -> str:
         if value is None:
             return str(None)

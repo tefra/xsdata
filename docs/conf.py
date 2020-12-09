@@ -35,6 +35,7 @@ extensions = [
     "sphinx.ext.viewcode",
     "sphinx.ext.githubpages",
     "sphinx_autodoc_typehints",
+    "sphinx_inline_tabs",
     "sphinxcontrib.apidoc",
     "sphinxcontrib.programoutput",
 ]

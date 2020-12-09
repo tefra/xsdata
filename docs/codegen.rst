@@ -73,11 +73,34 @@ See :ref:`Type: Elements`
 docstring-style
 ---------------
 
-Choose between the available docstring styles.
+Choose the style of the generated docstrings.
 
-* ``reStructuredText`` **default**
-* ``NumPy``
-* ``Google``
+The accessible style is xsdata's attempt to offer easy access to dataclasses fields and
+enum members docs.
+
+.. tab:: reStructuredText
+
+    .. literalinclude:: /../tests/fixtures/docstrings/rst/schema.py
+       :language: python
+       :lines: 37-
+
+.. tab:: NumPy
+
+    .. literalinclude:: /../tests/fixtures/docstrings/numpy/schema.py
+       :language: python
+       :lines: 38-
+
+.. tab:: Google
+
+    .. literalinclude:: /../tests/fixtures/docstrings/google/schema.py
+       :language: python
+       :lines: 38-
+
+.. tab:: Accessible
+
+    .. literalinclude:: /../tests/fixtures/docstrings/accessible/schema.py
+       :language: python
+       :lines: 37-
 
 
 verbosity

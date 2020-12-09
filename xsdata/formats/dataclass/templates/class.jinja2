@@ -1,7 +1,7 @@
-{% set help | format_docstring %}
+{% set level = level|default(0) -%}
+{% set help | format_docstring(level + 1) %}
     {%- include "docstrings." + docstring_style + ".jinja2" -%}
 {% endset -%}
-{% set level = level|default(0) -%}
 {% set parent_namespace = obj.namespace or parent_namespace|default(None) -%}
 {% set class_name =  obj.name|class_name -%}
 {% set parents = parents|default([obj.name]) %}
@@ -33,14 +33,14 @@ class {{ class_name }}{{"({})".format(obj.extensions|map(attribute='type')|map('
         {% endif -%}
         {{ "default_factory" if attr.is_factory else "default" }}={{ attr|field_default(obj.ns_map) }},
         {%- if metadata %}
-        metadata={{ metadata|format_metadata|indent(8) }}
+        metadata={{ metadata|format_metadata(2) }}
         {%- endif %}
     )
 {%- endfor -%}
 {%- for inner in obj.inner %}
     {%- set tpl = "enum.jinja2" if inner.is_enumeration else "class.jinja2" -%}
     {%- filter indent(4) -%}
-        {%- with obj=inner, namespace=obj.namespace or parent_namespace, parents=parents + [inner.name] -%}
+        {%- with obj=inner, namespace=obj.namespace or parent_namespace, parents=parents + [inner.name], level=(level + 1) -%}
             {% include tpl %}
         {%- endwith -%}
     {%- endfilter -%}

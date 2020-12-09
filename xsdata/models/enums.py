@@ -139,17 +139,12 @@ class DataType(Enum):
     UNSIGNED_LONG = ("unsignedLong", int)
     UNSIGNED_SHORT = ("unsignedShort", int)
 
-    def __init__(self, code: str, local: type):
+    def __init__(self, code: str, python_type: type):
         self.code = code
-        self.local = local
+        self.type = python_type
 
-    @property
-    def qname(self) -> str:
+    def __str__(self) -> str:
         return f"{{{Namespace.XS.uri}}}{self.code}"
-
-    @property
-    def local_name(self) -> str:
-        return self.local.__name__
 
     @classmethod
     def get_enum(cls, code: str) -> Optional["DataType"]:
@@ -175,8 +170,8 @@ class DataType(Enum):
         return __DataTypeQNameIndex__.get(qname)
 
 
-__DataTypeCodeIndex__ = {xsd.code: xsd for xsd in DataType}
-__DataTypeQNameIndex__ = {xsd.qname: xsd for xsd in DataType}
+__DataTypeCodeIndex__ = {dt.code: dt for dt in DataType}
+__DataTypeQNameIndex__ = {str(dt): dt for dt in DataType}
 
 
 class EventType:

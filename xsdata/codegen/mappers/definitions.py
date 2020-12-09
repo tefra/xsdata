@@ -93,7 +93,7 @@ class DefinitionsMapper:
         the process of all the message classes to the next entry point."""
 
         attrs = [
-            cls.build_attr(key, DataType.STRING.qname, native=True, default=config[key])
+            cls.build_attr(key, str(DataType.STRING), native=True, default=config[key])
             for key in sorted(config.keys(), key=len)
             if config[key]
         ]
@@ -186,7 +186,7 @@ class DefinitionsMapper:
         collections.prepend(
             fault_class.attrs,
             *[
-                cls.build_attr(f, DataType.STRING.qname, native=True, namespace="")
+                cls.build_attr(f, str(DataType.STRING), native=True, namespace="")
                 for f in default_fields
             ],
         )

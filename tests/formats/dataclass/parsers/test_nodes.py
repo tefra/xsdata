@@ -466,7 +466,7 @@ class AnyTypeNodeTests(TestCase):
         objects = []
 
         self.node.var = XmlElement(name="a", qname="a", types=[object], derived=True)
-        self.node.attrs[QNames.XSI_TYPE] = DataType.FLOAT.qname
+        self.node.attrs[QNames.XSI_TYPE] = str(DataType.FLOAT)
 
         self.assertTrue(self.node.bind("a", "10", None, objects))
         self.assertEqual(self.var.qname, objects[-1][0])
@@ -476,7 +476,7 @@ class AnyTypeNodeTests(TestCase):
         objects = []
 
         self.node.mixed = True
-        self.node.attrs[QNames.XSI_TYPE] = DataType.FLOAT.qname
+        self.node.attrs[QNames.XSI_TYPE] = str(DataType.FLOAT)
 
         self.assertTrue(self.node.bind("a", "10", "pieces", objects))
         self.assertEqual(self.var.qname, objects[-2][0])

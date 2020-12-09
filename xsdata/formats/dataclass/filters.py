@@ -1,4 +1,5 @@
 import math
+import textwrap
 from collections import defaultdict
 from dataclasses import dataclass
 from dataclasses import field
@@ -18,8 +19,10 @@ from jinja2 import Environment
 from xsdata.codegen.models import Attr
 from xsdata.codegen.models import AttrChoice
 from xsdata.codegen.models import AttrType
+from xsdata.codegen.models import Class
 from xsdata.formats.converter import converter
 from xsdata.formats.dataclass import utils
+from xsdata.models.config import DocstringStyle
 from xsdata.models.config import GeneratorAlias
 from xsdata.models.config import GeneratorConfig
 from xsdata.utils import text
@@ -50,6 +53,9 @@ class Filters:
     package_safe_prefix: str = field(default="pkg")
     module_safe_prefix: str = field(default="mod")
 
+    docstring_style: DocstringStyle = field(default=DocstringStyle.RST)
+    max_line_length: int = field(default=79)
+
     cache: Dict = field(default_factory=lambda: defaultdict(dict), init=False)
 
     def register(self, env: Environment):
@@ -60,12 +66,16 @@ class Filters:
                 "field_metadata": self.field_metadata,
                 "field_type": self.field_type,
                 "class_name": self.class_name,
+                "class_params": self.class_params,
+                "format_string": self.format_string,
                 "format_docstring": self.format_docstring,
                 "constant_name": self.constant_name,
                 "constant_value": self.constant_value,
                 "default_imports": self.default_imports,
                 "format_metadata": self.format_metadata,
                 "type_name": self.type_name,
+                "text_wrap": self.text_wrap,
+                "text_strip": self.text_strip,
             }
         )
 
@@ -77,6 +87,11 @@ class Filters:
             cache[name] = self.class_aliases.get(name) or self._class_name(name)
 
         return cache[name]
+
+    def class_params(self, obj: Class):
+        func = self.constant_name if obj.is_enumeration else self.field_name
+        for attr in obj.attrs:
+            yield func(attr.name), (attr.help or "").strip()
 
     def _class_name(self, name: str) -> str:
         return self.class_case(utils.safe_snake(name, self.class_safe_prefix))
@@ -149,6 +164,7 @@ class Filters:
 
         types = list({x.native_type for x in attr.types if x.native})
         restrictions = attr.restrictions.asdict(types)
+        doc = attr.help if self.docstring_style == DocstringStyle.ACCESSIBLE else None
 
         return self.filter_metadata(
             {
@@ -158,6 +174,7 @@ class Filters:
                 "mixed": attr.mixed,
                 "choices": self.field_choices(attr, parent_namespace, parents),
                 **restrictions,
+                "doc": doc,
             }
         )
 
@@ -201,25 +218,25 @@ class Filters:
             if value is not None and value is not False
         }
 
-    @classmethod
-    def format_metadata(cls, data: Any, level: int = 0, pattern: bool = False) -> str:
+    def format_metadata(
+        self, data: Any, level: int = 0, key: Optional[str] = None
+    ) -> str:
         """Prettify field metadata for code generation."""
+
+        next_level = level + 1
         if isinstance(data, dict):
             res = ["{"]
-            lvl = level + 1
-            for key, value in data.items():
-                is_pattern = key == "pattern"
-                fmt_value = cls.format_metadata(value, lvl, pattern=is_pattern)
-                res.append("    " * lvl + '"' + key + '"' + ": " + fmt_value + ",")
+            for k, v in data.items():
+                value = self.format_metadata(v, next_level, k)
+                res.append(f'{next_level * "    "}"{k}": {value},')
             res.append("    " * level + "}")
             return "\n".join(res)
 
         if isinstance(data, (list, tuple)):
             res = ["("]
-            lvl = level + 1
             for value in data:
-                fmt_value = cls.format_metadata(value, lvl, pattern=False)
-                res.append("    " * lvl + fmt_value + ",")
+                fmt_value = self.format_metadata(value, next_level)
+                res.append("    " * next_level + fmt_value + ",")
             res.append("    " * level + ")")
             return "\n".join(res)
 
@@ -227,18 +244,93 @@ class Filters:
             if data.startswith("Type[") and data.endswith("]"):
                 return data if data[5] == '"' else data[5:-1]
 
-            data = f'''"{data.replace('"', "'")}"'''
-            if pattern:
-                data = f"r{data}"
-            return data
+            if key == "pattern":
+                return f'r"{data}"'
+
+            start = level * 4
+            if key is not None:
+                start += len(key) + 4
+
+            return self.format_string(data, start, level)
 
         return str(data)
 
+    def format_string(
+        self, value: Optional[str], start: int = 0, level: int = 0, ident: int = 0
+    ) -> str:
+        if value is None:
+            return str(None)
+
+        if value == "":
+            return '""'
+
+        value = text.escape_string(value)
+
+        length = len(value) + start + 2
+        if length < self.max_line_length or " " not in value:
+            return f'"{value}"'
+
+        indent = "    " * (level + 1)
+        value = "\n".join(
+            [
+                f'{indent}"{line}"'
+                for line in textwrap.wrap(
+                    value,
+                    width=self.max_line_length - len(indent) - 2,
+                    drop_whitespace=False,
+                    replace_whitespace=False,
+                    break_long_words=True,
+                )
+            ]
+        )
+        return f"(\n{value}\n{'    ' * level})"
+
+    def text_wrap(self, string: str, level: int) -> str:
+        """Hard wrap text filter."""
+        return "\n".join(
+            textwrap.wrap(
+                string,
+                width=self.max_line_length - level * 4,
+                drop_whitespace=True,
+                replace_whitespace=True,
+                break_long_words=False,
+                subsequent_indent="    ",
+            )
+        )
+
     @classmethod
-    def format_docstring(cls, doc_string: str) -> str:
+    def text_strip(cls, string: Optional[str]) -> str:
+        if not string:
+            return ""
+
+        return "\n".join(map(str.strip, string.splitlines()))
+
+    def format_docstring(self, doc_string: str, level: int) -> str:
         """Format doc strings."""
-        content = doc_string.replace('"""', "").replace("'''", "").strip()
-        return format_code(f'"""\n{content}\n"""') if content else ""
+
+        content, params = doc_string.rsplit('"""', 1)
+
+        params = params.strip()
+
+        if content.strip() == '"""' and not params:
+            return ""
+
+        content += ' """' if content.endswith('"') else '"""'
+
+        max_length = self.max_line_length - level * 4
+        content = format_code(
+            content,
+            summary_wrap_length=max_length,
+            description_wrap_length=max_length - 7,
+            make_summary_multi_line=True,
+        )
+
+        if params:
+            content = content.rstrip('"""').strip()
+            new_lines = "\n" if content.endswith('"""') else "\n\n"
+            content += f'{new_lines}{params}\n"""'
+
+        return content
 
     def field_default_value(self, attr: Attr, ns_map: Optional[Dict] = None) -> Any:
         """Generate the field default value/factory for the given attribute."""
@@ -438,4 +530,6 @@ class Filters:
             field_safe_prefix=config.conventions.field_name.safe_prefix,
             package_safe_prefix=config.conventions.package_name.safe_prefix,
             module_safe_prefix=config.conventions.module_name.safe_prefix,
+            docstring_style=config.output.docstring_style,
+            max_line_length=config.output.max_line_length,
         )

@@ -1,12 +1,8 @@
-{% set is_enum = obj.is_enumeration -%}
-{% set attr_title = "Properties" if is_enum else "Parameters" -%}
-"""
-{{ obj.help or "" }}
+{{ '"""{}"""'.format(obj.help | text_strip) }}
 {% if obj.has_help_attr %}
-{{ attr_title }}
+{{ "Properties" if obj.is_enumeration else "Parameters" }}
 ----------
-{%- for attr in obj.attrs %}
-{{ attr.name|constant_name if is_enum else attr.name|field_name }}:{{- " " + attr.help|trim if attr.help else "" -}}
+{%- for var_name, var_doc in obj|class_params %}
+{{ "{}: {}".format(var_name, var_doc)|text_wrap(level + 1) }}
 {%- endfor -%}
 {%- endif %}
-"""

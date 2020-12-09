@@ -91,7 +91,7 @@ class XmlContextTests(TestCase):
         mock_find_subclass.assert_called_once_with(ItemsType, "foo")
 
     def test_find(self):
-        self.assertIsNone(self.ctx.find_type(DataType.FLOAT.qname))
+        self.assertIsNone(self.ctx.find_type(str(DataType.FLOAT)))
         self.assertEqual(BookForm, self.ctx.find_type("{urn:books}BookForm"))
 
         self.ctx.xsi_cache["{urn:books}BookForm"].append(BooksForm)

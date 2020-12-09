@@ -1,7 +1,6 @@
 from tests.factories import AttrChoiceFactory
 from tests.factories import AttrFactory
 from tests.factories import AttrTypeFactory
-from tests.factories import ClassFactory
 from tests.factories import FactoryTestCase
 from xsdata.codegen.models import Restrictions
 from xsdata.formats.dataclass.filters import CLASS
@@ -500,7 +499,7 @@ class FiltersTests(FactoryTestCase):
             '    "num": 1,\n'
             '    "text": "foo",\n'
             '    "text_two": "fo\'o",\n'
-            '    "text_three": "fo\'o",\n'
+            '    "text_three": "fo\\"o",\n'
             '    "pattern": r"foo",\n'
             '    "level_two": {\n'
             '        "a": 1,\n'
@@ -516,32 +515,20 @@ class FiltersTests(FactoryTestCase):
             "}"
         )
         self.assertEqual(expected, self.filters.format_metadata(data))
+        self.assertEqual('""', self.filters.format_metadata(""))
 
-    def test_format_docstring(self):
+    def test_format_string(self):
+        self.assertEqual("None", self.filters.format_string(None))
+        self.assertEqual('""', self.filters.format_string(""))
 
-        actual = self.filters.format_docstring("'''    '''")
-        self.assertEqual("", actual)
+        value = ' foo"bar \n'
+        self.assertEqual('" foo\\"bar \\n"', self.filters.format_string(value))
 
-        actual = self.filters.format_docstring('"""    """')
-        self.assertEqual("", actual)
-
-        actual = self.filters.format_docstring("   ")
-        self.assertEqual("", actual)
-
-        docstring = (
-            "\n\nfafafa\n\n"
-            "                fwfw\n"
-            "        \n   \n  "
-            "            :param foobar: dfff  \n"
-            "        "
-        )
-
-        expected = (
-            '"""fafafa.\n' "\n" "  fwfw\n" "\n" "\n" ":param foobar: dfff\n" '"""'
-        )
-
-        actual = self.filters.format_docstring(docstring)
-        self.assertEqual(expected, actual)
+        expected = """(
+            " foo\\"bar \\n foo\\"bar \\n foo\\"bar \\n foo\\"bar \\n foo\\"bar \\n "
+            "foo\\"bar \\n foo\\"bar \\n foo\\"bar \\n foo\\"bar \\n foo\\"bar \\n"
+        )"""
+        self.assertEqual(expected, self.filters.format_string(value * 10, 50, 2))
 
     def test_from_config(self):
         config = GeneratorConfig()

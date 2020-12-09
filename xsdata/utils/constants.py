@@ -6,6 +6,6 @@ EMPTY_MAP: Dict = {}
 EMPTY_SEQUENCE: Sequence = []
 
 
-def return_true(*args: Any) -> bool:
+def return_true(*_: Any) -> bool:
     """A dummy function that always returns true."""
     return True

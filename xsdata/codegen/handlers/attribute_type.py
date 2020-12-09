@@ -177,7 +177,7 @@ class AttributeTypeHandler(HandlerInterface):
     @classmethod
     def reset_attribute_type(cls, attr_type: AttrType):
         """Reset the attribute type to native string."""
-        attr_type.qname = DataType.STRING.qname
+        attr_type.qname = str(DataType.STRING)
         attr_type.native = True
         attr_type.circular = False
         attr_type.forward = False
@@ -199,6 +199,6 @@ class AttributeTypeHandler(HandlerInterface):
             types = collections.remove(types, lambda x: x.native_type is object)
 
         if not types:
-            types.append(AttrType(qname=DataType.STRING.qname, native=True))
+            types.append(AttrType(qname=str(DataType.STRING), native=True))
 
         return types

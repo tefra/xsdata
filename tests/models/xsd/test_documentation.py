@@ -8,7 +8,7 @@ class DocumentationTests(TestCase):
     def test_tostring(self):
         documentation = Documentation(
             elements=[
-                "I am a ",
+                "    I am a ",
                 AnyElement(
                     qname="p",
                     text="test",

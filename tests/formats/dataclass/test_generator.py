@@ -91,7 +91,8 @@ class DataclassGeneratorTests(FactoryTestCase):
             "\n"
             "\n"
             "class ClassB(Enum):\n"
-            '    """I am enum.\n'
+            '    """\n'
+            "    I am enum.\n"
             "\n"
             "    :cvar ATTR_B: I am a member\n"
             "    :cvar ATTR_C:\n"

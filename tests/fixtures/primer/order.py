@@ -146,8 +146,9 @@ class Comment:
 
 @dataclass
 class PurchaseOrderType:
-    """Purchase order schema for Example.com. Copyright 2000 Example.com. All
-    rights reserved.
+    """Purchase order schema for Example.com.
+
+    Copyright 2000 Example.com. All rights reserved.
 
     Parameters
     ----------

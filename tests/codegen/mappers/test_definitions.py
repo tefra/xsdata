@@ -177,13 +177,13 @@ class DefinitionsMapperTests(FactoryTestCase):
             ns_map={"foo": "bar"},
             attrs=[
                 DefinitionsMapper.build_attr(
-                    "a", DataType.STRING.qname, native=True, default="one"
+                    "a", str(DataType.STRING), native=True, default="one"
                 ),
                 DefinitionsMapper.build_attr(
-                    "b", DataType.STRING.qname, native=True, default="two"
+                    "b", str(DataType.STRING), native=True, default="two"
                 ),
                 DefinitionsMapper.build_attr(
-                    "style", DataType.STRING.qname, native=True, default="rpc"
+                    "style", str(DataType.STRING), native=True, default="rpc"
                 ),
                 DefinitionsMapper.build_attr("first", first.qname),
                 DefinitionsMapper.build_attr("second", second.qname),
@@ -472,7 +472,7 @@ class DefinitionsMapperTests(FactoryTestCase):
         expected_fault_attr = DefinitionsMapper.build_attr(
             "Fault", body.inner[0].qname, forward=True, namespace=target.namespace
         )
-        str_qname = DataType.STRING.qname
+        str_qname = str(DataType.STRING)
         expected_fault_attrs = [
             DefinitionsMapper.build_attr(name, str_qname, native=True, namespace="")
             for name in ["faultcode", "faultstring", "faultactor", "detail"]
@@ -499,7 +499,7 @@ class DefinitionsMapperTests(FactoryTestCase):
         expected_fault_attr = DefinitionsMapper.build_attr(
             "Fault", body.inner[0].qname, forward=True, namespace=target.namespace
         )
-        str_qname = DataType.STRING.qname
+        str_qname = str(DataType.STRING)
         expected_fault_attrs = [
             DefinitionsMapper.build_attr(name, str_qname, native=True, namespace="")
             for name in ["faultcode", "faultstring", "faultactor"]
@@ -672,7 +672,7 @@ class DefinitionsMapperTests(FactoryTestCase):
                 "bar", build_qname("great", "bar"), namespace="great", native=False
             ),
             DefinitionsMapper.build_attr(
-                "arg0", DataType.STRING.qname, namespace="", native=True
+                "arg0", str(DataType.STRING), namespace="", native=True
             ),
             DefinitionsMapper.build_attr(
                 "arg1", build_qname("boo", "cafe"), namespace="", native=False

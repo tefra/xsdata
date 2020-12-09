@@ -116,6 +116,7 @@ class XmlElementsTests(TestCase):
                 XmlElement(qname="a", name="a", types=[int]),
                 XmlElement(qname="b", name="b", types=[int], tokens=True),
                 XmlElement(qname="c", name="c", types=[c], dataclass=True),
+                XmlElement(qname="d", name="d", types=[float], nillable=True),
             ],
         )
 
@@ -124,6 +125,7 @@ class XmlElementsTests(TestCase):
         self.assertEqual(var.choices[1], var.find_value_choice([1, 2]))
         self.assertEqual(var.choices[2], var.find_value_choice(d()))
         self.assertEqual(var.choices[2], var.find_value_choice(c()))
+        self.assertEqual(var.choices[3], var.find_value_choice(None))
 
 
 class XmlWildcardTests(TestCase):

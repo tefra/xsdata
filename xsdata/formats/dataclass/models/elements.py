@@ -12,6 +12,8 @@ from typing import Type
 from xsdata.models.enums import NamespaceType
 from xsdata.utils.namespaces import split_qname
 
+NoneType = type(None)
+
 
 @dataclass(frozen=True)
 class XmlVar:
@@ -155,33 +157,45 @@ class XmlElements(XmlVar):
         return None
 
     def find_value_choice(self, value: Any) -> Optional["XmlVar"]:
-        """Match and return a choice field that matches the given value."""
+        """Match and return a choice field that matches the given value
+        type."""
 
         if isinstance(value, list):
-            tp = None if not value else type(value[0])
+            tp = type(None) if not value else type(value[0])
             tokens = True
-            is_class = False
+            check_subclass = False
         else:
             tp = type(value)
             tokens = False
-            is_class = is_dataclass(value)
+            check_subclass = is_dataclass(value)
 
-        def match_type(match: Type, types: List[Type]) -> bool:
-            for candidate in types:
-                if tp == candidate or (is_class and issubclass(match, candidate)):
-                    return True
+        return self.find_type_choice(tp, tokens, check_subclass)
 
-            return False
+    def find_type_choice(
+        self, tp: Type, tokens: bool, check_subclass: bool
+    ) -> Optional["XmlVar"]:
+        """Match and return a choice field that matches the given type."""
 
         for choice in self.choices:
 
             if choice.is_any_type or tokens != choice.tokens:
                 continue
 
-            if (not tp and choice.nillable) or (tp and match_type(tp, choice.types)):
+            if tp is NoneType:
+                if choice.nillable:
+                    return choice
+            elif self.match_type(tp, choice.types, check_subclass):
                 return choice
 
         return None
+
+    @classmethod
+    def match_type(cls, tp: Type, types: List[Type], check_subclass: bool) -> bool:
+        for candidate in types:
+            if tp == candidate or (check_subclass and issubclass(tp, candidate)):
+                return True
+
+        return False
 
 
 @dataclass(frozen=True)

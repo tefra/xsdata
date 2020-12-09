@@ -1,0 +1,104 @@
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="urn:docs" xmlns:docs="urn:docs">
+  <xsd:element name="Root">
+    <xsd:annotation>
+      <xsd:documentation>
+        This is the root type documentation. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi dapibus.
+
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec imperdiet lacus sed sagittis scelerisque. Ut sodales metus: "sit", "amet", "lectus"
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element name="a">
+          <xsd:annotation>
+            <xsd:documentation>
+              This is an inner type field documentation.
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam nec.
+            </xsd:documentation>
+          </xsd:annotation>
+          <xsd:complexType>
+            <xsd:annotation>
+              <xsd:documentation>
+                This is an inner type documentation.
+              </xsd:documentation>
+            </xsd:annotation>
+            <xsd:sequence>
+              <xsd:element name="sub_a" type="xsd:string">
+                <xsd:annotation>
+                  <xsd:documentation>
+                    This is an inner type field documentation.
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus efficitur.
+                  </xsd:documentation>
+                </xsd:annotation>
+              </xsd:element>
+            </xsd:sequence>
+          </xsd:complexType>
+        </xsd:element>
+        <xsd:element name="b">
+          <xsd:annotation>
+            <xsd:documentation>
+              This is a second root type field documentation.
+            </xsd:documentation>
+          </xsd:annotation>
+          <xsd:simpleType>
+            <xsd:restriction>
+              <xsd:enumeration value="Yes">
+                <xsd:annotation>
+                  <xsd:documentation>
+                    This is an inner enum member documentation. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam mollis.
+                  </xsd:documentation>
+                </xsd:annotation>
+              </xsd:enumeration>
+              <xsd:enumeration value="No">
+                <xsd:annotation>
+                  <xsd:documentation>
+                    Lorem ipsum dolor
+                  </xsd:documentation>
+                </xsd:annotation>
+              </xsd:enumeration>
+            </xsd:restriction>
+          </xsd:simpleType>
+        </xsd:element>
+        <xsd:element name="c" type="RootEnum" />
+        <xsd:element name="d">
+          <xsd:simpleType>
+            <xsd:restriction>
+              <xsd:enumeration value="true" />
+              <xsd:enumeration value="false" />
+            </xsd:restriction>
+          </xsd:simpleType>
+        </xsd:element>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="DoubleQuotesSummary">
+    <xsd:annotation>
+      <xsd:documentation>Dont trip on quotes: "A", "B", "C", "D"</xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+    <xsd:element name="DoubleQuotesDescription">
+    <xsd:annotation>
+      <xsd:documentation>Let's trip.
+
+        Dont trip on quotes: "A", "B", "C", "D"</xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+  <xsd:simpleType name="RootEnum">
+    <xsd:restriction>
+      <xsd:enumeration value="A">
+        <xsd:annotation>
+          <xsd:documentation>
+            Lorem ipsum dolor
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="B">
+        <xsd:annotation>
+          <xsd:documentation>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi dapibus.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+    </xsd:restriction>
+  </xsd:simpleType>
+</xsd:schema>

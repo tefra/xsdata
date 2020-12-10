@@ -517,19 +517,6 @@ class FiltersTests(FactoryTestCase):
         self.assertEqual(expected, self.filters.format_metadata(data))
         self.assertEqual('""', self.filters.format_metadata(""))
 
-    def test_format_string(self):
-        self.assertEqual("None", self.filters.format_string(None))
-        self.assertEqual('""', self.filters.format_string(""))
-
-        value = ' foo"bar \n'
-        self.assertEqual('" foo\\"bar \\n"', self.filters.format_string(value))
-
-        expected = """(
-            " foo\\"bar \\n foo\\"bar \\n foo\\"bar \\n foo\\"bar \\n foo\\"bar \\n "
-            "foo\\"bar \\n foo\\"bar \\n foo\\"bar \\n foo\\"bar \\n foo\\"bar \\n"
-        )"""
-        self.assertEqual(expected, self.filters.format_string(value * 10, 50, 2))
-
     def test_from_config(self):
         config = GeneratorConfig()
         config.conventions.package_name.safe_prefix = "safe_package"

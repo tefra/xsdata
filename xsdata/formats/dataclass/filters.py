@@ -7,6 +7,7 @@ from decimal import Decimal
 from typing import Any
 from typing import Callable
 from typing import Dict
+from typing import Iterable
 from typing import List
 from typing import Optional
 from typing import Type
@@ -89,9 +90,11 @@ class Filters:
         return cache[name]
 
     def class_params(self, obj: Class):
-        func = self.constant_name if obj.is_enumeration else self.field_name
+        is_enum = obj.is_enumeration
         for attr in obj.attrs:
-            yield func(attr.name), (attr.help or "").strip()
+            name = attr.name
+            result = self.constant_name(name) if is_enum else self.field_name(name)
+            yield result, (attr.help or "").strip()
 
     def _class_name(self, name: str) -> str:
         return self.class_case(utils.safe_snake(name, self.class_safe_prefix))
@@ -218,79 +221,86 @@ class Filters:
             if value is not None and value is not False
         }
 
-    def format_metadata(
-        self, data: Any, level: int = 0, key: Optional[str] = None
-    ) -> str:
+    def format_metadata(self, data: Any, indent: int = 0, key: str = "") -> str:
         """Prettify field metadata for code generation."""
 
-        next_level = level + 1
         if isinstance(data, dict):
-            res = ["{"]
-            for k, v in data.items():
-                value = self.format_metadata(v, next_level, k)
-                res.append(f'{next_level * "    "}"{k}": {value},')
-            res.append("    " * level + "}")
-            return "\n".join(res)
+            return self.format_dict(data, indent)
 
         if isinstance(data, (list, tuple)):
-            res = ["("]
-            for value in data:
-                fmt_value = self.format_metadata(value, next_level)
-                res.append("    " * next_level + fmt_value + ",")
-            res.append("    " * level + ")")
-            return "\n".join(res)
+            return self.format_iterable(data, indent)
 
         if isinstance(data, str):
-            if data.startswith("Type[") and data.endswith("]"):
-                return data if data[5] == '"' else data[5:-1]
-
-            if key == "pattern":
-                return f'r"{data}"'
-
-            start = level * 4
-            if key is not None:
-                start += len(key) + 4
-
-            return self.format_string(data, start, level)
+            return self.format_string(data, indent, key, 4)
 
         return str(data)
 
-    def format_string(
-        self, value: Optional[str], start: int = 0, level: int = 0
-    ) -> str:
-        if value is None:
-            return str(None)
+    def format_dict(self, data: Dict, indent: int) -> str:
+        """Return a pretty string representation of a dict."""
+        ind = " " * indent
+        fmt = '    {}"{}": {},'
+        lines = [
+            fmt.format(ind, key, self.format_metadata(value, indent + 4, key))
+            for key, value in data.items()
+        ]
 
-        if value == "":
+        return "{{\n{}\n{}}}".format("\n".join(lines), ind)
+
+    def format_iterable(self, data: Iterable, indent: int) -> str:
+        """Return a pretty string representation of an iterable."""
+        ind = " " * indent
+        fmt = "    {}{},"
+        lines = [
+            fmt.format(ind, self.format_metadata(value, indent + 4)) for value in data
+        ]
+        return "(\n{}\n{})".format("\n".join(lines), ind)
+
+    def format_string(self, data: str, indent: int, key: str = "", pad: int = 0) -> str:
+        """
+        Return a pretty string representation of a string.
+
+        If the total length of the input string plus indent plus the key
+        length and the additional pad is more than the max line length,
+        wrap the text into multiple lines, avoiding breaking long words
+        """
+        if data.startswith("Type[") and data.endswith("]"):
+            return data if data[5] == '"' else data[5:-1]
+
+        if key == "pattern":
+            return f'r"{data}"'
+
+        if data == "":
             return '""'
 
-        value = text.escape_string(value)
+        start = indent + 2  # plus quotes
+        start += len(key) + pad if key else 0
 
-        length = len(value) + start + 2
+        value = text.escape_string(data)
+        length = len(value) + start
         if length < self.max_line_length or " " not in value:
             return f'"{value}"'
 
-        indent = "    " * (level + 1)
+        next_indent = indent + 4
         value = "\n".join(
             [
-                f'{indent}"{line}"'
+                f'{" " * next_indent}"{line}"'
                 for line in textwrap.wrap(
                     value,
-                    width=self.max_line_length - len(indent) - 2,
+                    width=self.max_line_length - next_indent - 2,  # plus quotes
                     drop_whitespace=False,
                     replace_whitespace=False,
                     break_long_words=True,
                 )
             ]
         )
-        return f"(\n{value}\n{'    ' * level})"
+        return f"(\n{value}\n{' ' * indent})"
 
-    def text_wrap(self, string: str, level: int) -> str:
-        """Hard wrap text filter."""
+    def text_wrap(self, string: str, offset: int = 0) -> str:
+        """Wrap text in respect to the max line length and the given offset."""
         return "\n".join(
             textwrap.wrap(
                 string,
-                width=self.max_line_length - level * 4,
+                width=self.max_line_length - offset,
                 drop_whitespace=True,
                 replace_whitespace=True,
                 break_long_words=False,
@@ -300,6 +310,7 @@ class Filters:
 
     @classmethod
     def text_strip(cls, string: Optional[str]) -> str:
+        """Remove all whitespace from every line of the string."""
         if not string:
             return ""
 

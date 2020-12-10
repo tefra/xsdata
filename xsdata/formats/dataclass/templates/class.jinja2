@@ -33,7 +33,7 @@ class {{ class_name }}{{"({})".format(obj.extensions|map(attribute='type')|map('
         {% endif -%}
         {{ "default_factory" if attr.is_factory else "default" }}={{ attr|field_default(obj.ns_map) }},
         {%- if metadata %}
-        metadata={{ metadata|format_metadata(2) }}
+        metadata={{ metadata|format_metadata(8) }}
         {%- endif %}
     )
 {%- endfor -%}

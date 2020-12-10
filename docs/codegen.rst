@@ -75,8 +75,8 @@ docstring-style
 
 Choose the style of the generated docstrings.
 
-The accessible style is xsdata's attempt to offer easy access to dataclasses fields and
-enum members docs.
+The accessible a custom style offering easy access to dataclasses fields and
+enum members docs for doc/api generators.
 
 .. tab:: reStructuredText
 
@@ -88,7 +88,7 @@ enum members docs.
 
     .. literalinclude:: /../tests/fixtures/docstrings/numpy/schema.py
        :language: python
-       :lines: 38-
+       :lines: 39-
 
 .. tab:: Google
 
@@ -100,7 +100,7 @@ enum members docs.
 
     .. literalinclude:: /../tests/fixtures/docstrings/accessible/schema.py
        :language: python
-       :lines: 37-
+       :lines: 38-
 
 
 verbosity

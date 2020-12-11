@@ -14,6 +14,7 @@ from xml.sax.handler import ContentHandler
 from xsdata.exceptions import XmlWriterError
 from xsdata.formats.converter import converter
 from xsdata.formats.dataclass.serializers.config import SerializerConfig
+from xsdata.models.enums import DataType
 from xsdata.models.enums import Namespace
 from xsdata.models.enums import QNames
 from xsdata.utils.constants import EMPTY_MAP
@@ -120,7 +121,7 @@ class XmlWriter:
         if not self.pending_tag and check_pending:
             raise XmlWriterError("Empty pending tag.")
 
-        if isinstance(value, str) and value and value[0] == "{" and len(value) > 1:
+        if self.is_xsi_type(key, value):
             value = QName(value)
 
         name = split_qname(key)
@@ -235,3 +236,12 @@ class XmlWriter:
         not qualified."""
         if not self.pending_tag[0] and None in self.ns_map:
             self.ns_map[None] = ""
+
+    @classmethod
+    def is_xsi_type(cls, key: str, value: Any) -> bool:
+        """Return whether the value is an xsi:type or not."""
+
+        if isinstance(value, str) and value.startswith("{"):
+            return key == QNames.XSI_TYPE or DataType.from_qname(value) is not None
+
+        return False

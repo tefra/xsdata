@@ -282,7 +282,7 @@ class XmlSerializerTests(TestCase):
         var = XmlElement(qname="a", name="a", types=[object])
         expected = [
             (XmlWriterEvent.START, "a"),
-            (XmlWriterEvent.ATTR, QNames.XSI_TYPE, str(DataType.INT)),
+            (XmlWriterEvent.ATTR, QNames.XSI_TYPE, QName(str(DataType.INT))),
             (XmlWriterEvent.DATA, 123),
             (XmlWriterEvent.END, "a"),
         ]

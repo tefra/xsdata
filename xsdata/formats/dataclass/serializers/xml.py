@@ -272,7 +272,7 @@ class XmlSerializer(AbstractSerializer):
         if value is not None and var.is_any_type:
             datatype = DataType.from_value(value)
             if datatype != DataType.STRING:
-                yield XmlWriterEvent.ATTR, QNames.XSI_TYPE, str(datatype)
+                yield XmlWriterEvent.ATTR, QNames.XSI_TYPE, QName(str(datatype))
 
         yield XmlWriterEvent.DATA, value
         yield XmlWriterEvent.END, var.qname

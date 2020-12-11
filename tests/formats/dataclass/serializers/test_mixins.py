@@ -172,8 +172,16 @@ class XmlWriterTests(TestCase):
             (None, "a"): "bar",
             (None, "b"): "true",
             (None, "c"): "{",
-            (None, "d"): "ns0:b",
+            (None, "d"): "{a}b",
             ("http://www.w3.org/2001/XMLSchema-instance", "type"): "xs:string",
         }
 
         self.assertEqual(expected, self.writer.attrs)
+
+    def test_is_xsi_type(self):
+        self.assertFalse(self.writer.is_xsi_type("key", 1))
+        self.assertFalse(self.writer.is_xsi_type(QNames.XSI_TYPE, 1))
+        self.assertFalse(self.writer.is_xsi_type(QNames.XSI_TYPE, "a"))
+        self.assertTrue(self.writer.is_xsi_type(QNames.XSI_TYPE, "{b}a"))
+        self.assertFalse(self.writer.is_xsi_type("type", "{b}a"))
+        self.assertTrue(self.writer.is_xsi_type("type", str(DataType.STRING)))

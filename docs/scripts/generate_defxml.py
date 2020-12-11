@@ -33,34 +33,38 @@ subtitles = {
 }
 
 bind_tpl = """
+**Code Generation**
 
-**Schema**
+.. tab:: Schema
 
-.. literalinclude:: /{input}
-   :language: xml
-   :lines: 2-
+    .. literalinclude:: /{input}
+       :language: xml
+       :lines: 2-
 
-**Models**
+.. tab:: Models
 
-.. literalinclude:: /{output}
-   :language: python
+    .. literalinclude:: /{output}
+       :language: python
 
-**XML Document**
+**Data Binding**
 
-.. literalinclude:: /{instance}
-   :language: xml
-   :lines: 2-
+.. tab:: Original XML Document
 
-**xsData XML Document**
+    .. literalinclude:: /{instance}
+       :language: xml
+       :lines: 2-
 
-.. literalinclude:: /{xsdata_instance}
-   :language: xml
-   :lines: 2-
+.. tab:: xsData XML Output
 
-**xsData JSON**
+    .. literalinclude:: /{xsdata_instance}
+       :language: xml
+       :lines: 2-
 
-.. literalinclude:: /{xsdata_json}
-   :language: json"""
+.. tab:: xsData JSON Output
+
+    .. literalinclude:: /{xsdata_json}
+       :language: json"""
+
 
 chapter_tpl = """{title}
 
@@ -107,7 +111,7 @@ def generate():
         chapter = xsd.stem
         number = chapter.replace("chapter", "#")
         title = "{number} - {topic}".format(number=number, topic=subtitles[chapter])
-        title = "{line}\n{title}\n{line}".format(line="*" * len(title), title=title)
+        title = "{line}\n{title}\n{line}".format(line="=" * len(title), title=title)
 
         file = docs_root.joinpath(f"defxmlschema/{chapter}.rst")
         file.write_text(

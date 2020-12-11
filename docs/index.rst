@@ -15,12 +15,12 @@
     models
     xml
     json
-    data_types
+    data-types
     wsdl
+    api
     plantuml
     demos
     changelog
-    api
 
 
 .. meta::

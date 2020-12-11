@@ -17,7 +17,16 @@ EVENTS = (EventType.START, EventType.END, EventType.START_NS)
 
 @dataclass
 class LxmlEventHandler(XmlHandler):
-    """Content handler based on lxml iterparse api."""
+    """
+    Event handler based on :class:`lxml.etree.iterparse` api.
+
+    :param parser: The parser instance to feed with events
+    :param clazz: The target binding model. If None the parser will
+        auto locate it from the active xml context instance
+    :param queue: The XmlNode queue
+    :param objects: The list of intermediate parsed objects,
+        eg [(qname, object)]
+    """
 
     def parse(self, source: Any) -> Any:
         """
@@ -70,14 +79,19 @@ class LxmlEventHandler(XmlHandler):
 @dataclass
 class LxmlSaxHandler(XmlHandler):
     """
-    Content handler based on lxml target api.
+    Sax content handler based on :class:`lxml.etree.XMLParser` api.
 
-    :param data_frames: Cache for text/tail element content
-    :param flush_next: Next element name to flush
+    :param parser: The parser instance to feed with events
+    :param clazz: The target binding model. If None the parser will
+        auto locate it from the active xml context instance
+    :param queue: The XmlNode queue
+    :param objects: The list of intermediate parsed objects,
+        eg [(qname, object)]
     """
 
-    data_frames: List = field(default_factory=list)
-    flush_next: Optional[str] = field(default=None)
+    # Scope vars
+    data_frames: List = field(init=False, default_factory=list)
+    flush_next: Optional[str] = field(init=False, default=None)
 
     def parse(self, source: Any) -> Any:
         """
@@ -103,7 +117,7 @@ class LxmlSaxHandler(XmlHandler):
 
         return etree.parse(source, parser=parser)  # nosec
 
-    def start(self, tag: str, attrib: Dict, ns_map: Dict):
+    def start(self, qname: str, attrs: Dict, ns_map: Dict):
         """
         Start element notification receiver.
 
@@ -111,6 +125,10 @@ class LxmlSaxHandler(XmlHandler):
         new data frame  to collect data content for the next active
         element and notify the main  parser to prepare for next binding
         instruction.
+
+        :param qname: Qualified name
+        :param attrs: Attribute key-value map
+        :param ns_map: Namespace prefix-URI map
         """
         self.flush()
         self.data_frames.append(([], []))
@@ -118,20 +136,22 @@ class LxmlSaxHandler(XmlHandler):
             self.clazz,
             self.queue,
             self.objects,
-            tag,
-            attrib,
+            qname,
+            attrs,
             self.start_ns_bulk(ns_map),
         )
 
-    def end(self, tag: str):
+    def end(self, qname: str):
         """
         End element notification receiver.
 
         The receiver will flush any previous active element and set the
         next element to be flushed.
+
+        :param qname: Qualified name
         """
         self.flush()
-        self.flush_next = tag
+        self.flush_next = qname
 
     def close(self) -> Any:
         """
@@ -170,6 +190,8 @@ class LxmlSaxHandler(XmlHandler):
         The receiver will append the given data content in the current
         data frame either in the text position 0 or in the tail position
         1 whether the element has ended or not.
+
+        :param data: Text or tail content
         """
         index = 0 if self.flush_next is None else 1
         self.data_frames[-1][index].append(data)

@@ -22,6 +22,12 @@ class ClassExtensionHandlerTests(FactoryTestCase):
         container = ClassContainer()
         self.processor = ClassExtensionHandler(container=container)
 
+    @mock.patch.object(ClassExtensionHandler, "process_extension")
+    def test_process_with_no_extensions(self, mock_process_extension):
+        target = ClassFactory.elements(1)
+        self.processor.process(target)
+        self.assertEqual(0, mock_process_extension.call_count)
+
     @mock.patch.object(ClassExtensionHandler, "process_native_extension")
     def test_process_extension_with_native_type(self, mock_flatten_extension_native):
         extension = ExtensionFactory.create(type=AttrTypeFactory.xs_string())
@@ -307,14 +313,14 @@ class ClassExtensionHandlerTests(FactoryTestCase):
     def test_add_default_attribute(self):
         xs_string = AttrTypeFactory.xs_string()
         extension = ExtensionFactory.create(xs_string, Restrictions(required=True))
-        item = ClassFactory.create(extensions=[extension])
+        item = ClassFactory.elements(1, extensions=[extension])
 
         ClassExtensionHandler.add_default_attribute(item, extension)
         expected = AttrFactory.create(
             name="value", default=None, types=[xs_string], tag=Tag.EXTENSION
         )
 
-        self.assertEqual(1, len(item.attrs))
+        self.assertEqual(2, len(item.attrs))
         self.assertEqual(0, len(item.extensions))
         self.assertEqual(expected, item.attrs[0])
 
@@ -326,7 +332,7 @@ class ClassExtensionHandlerTests(FactoryTestCase):
         expected.types.append(xs_int)
         expected_restrictions = Restrictions(tokens=True, required=True)
 
-        self.assertEqual(1, len(item.attrs))
+        self.assertEqual(2, len(item.attrs))
         self.assertEqual(0, len(item.extensions))
         self.assertEqual(expected, item.attrs[0])
         self.assertEqual(expected_restrictions, item.attrs[0].restrictions)

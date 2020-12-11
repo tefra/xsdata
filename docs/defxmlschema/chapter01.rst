@@ -1,36 +1,39 @@
-******************************
+==============================
 #01 - Schemas: An introduction
-******************************
+==============================
 
 
+**Code Generation**
 
-**Schema**
+.. tab:: Schema
 
-.. literalinclude:: /../tests/fixtures/defxmlschema/chapter01.xsd
-   :language: xml
-   :lines: 2-
+    .. literalinclude:: /../tests/fixtures/defxmlschema/chapter01.xsd
+       :language: xml
+       :lines: 2-
 
-**Models**
+.. tab:: Models
 
-.. literalinclude:: /../tests/fixtures/defxmlschema/chapter01.py
-   :language: python
+    .. literalinclude:: /../tests/fixtures/defxmlschema/chapter01.py
+       :language: python
 
-**XML Document**
+**Data Binding**
 
-.. literalinclude:: /../tests/fixtures/defxmlschema/chapter01.xml
-   :language: xml
-   :lines: 2-
+.. tab:: Original XML Document
 
-**xsData XML Document**
+    .. literalinclude:: /../tests/fixtures/defxmlschema/chapter01.xml
+       :language: xml
+       :lines: 2-
 
-.. literalinclude:: /../tests/fixtures/defxmlschema/chapter01.xsdata.xml
-   :language: xml
-   :lines: 2-
+.. tab:: xsData XML Output
 
-**xsData JSON**
+    .. literalinclude:: /../tests/fixtures/defxmlschema/chapter01.xsdata.xml
+       :language: xml
+       :lines: 2-
 
-.. literalinclude:: /../tests/fixtures/defxmlschema/chapter01.json
-   :language: json
+.. tab:: xsData JSON Output
+
+    .. literalinclude:: /../tests/fixtures/defxmlschema/chapter01.json
+       :language: json
 
 .. admonition:: Samples Source
     :class: hint

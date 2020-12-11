@@ -2,277 +2,323 @@
 XML Binding
 ===========
 
+All binding modules rely on a :class:`~xsdata.formats.dataclass.context.XmlContext`
+instance to cache marshalling information.
 
-:class:`~xsdata.formats.dataclass.parsers.XmlParser`
-====================================================
+It's recommended to either reuse the same parser/serializer instance or reuse the
+context instance.
 
-The parser has three instance methods `from_string`, `from_bytes` and `from_path`,
-to parse from memory or to let the parser load the input document.
+.. code-block::
 
-.. hint::
+    from xsdata.formats.dataclass.context import XmlContext
+    from xsdata.formats.dataclass.parsers import XmlParser
+    from xsdata.formats.dataclass.serializers import XmlSerializer
 
-    You can optionally specify the target binding class or let the context instance
-    to scan all imported modules for a matching dataclass.
+    context = XmlContext()
+    parser = XmlParser(context=context)
+    serializer = XmlSerializer(context=context)
 
-**Parameters**
-    **config** (:class:`~xsdata.formats.dataclass.parsers.config.ParserConfig`)
+.. testsetup:: *
 
-    .. list-table::
-       :widths: 20 10 220
-       :header-rows: 1
-       :align: left
+    from xsdata.formats.dataclass.context import XmlContext
+    from xsdata.formats.dataclass.parsers import XmlParser
+    from xsdata.formats.dataclass.serializers import XmlSerializer
+    from xsdata.formats.dataclass.serializers.config import SerializerConfig
+    from tests import fixtures_dir
+    from tests.fixtures.books import Books, BookForm
+    from tests.fixtures.primer import PurchaseOrder, Usaddress
 
-       * - Name
-         - Type
-         - Description
-       * - base_url
-         - str
-         - A base URL for when parsing from memory and you want support for relative links
-           eg xinclude, default: ``None``
-       * - process_xinclude
-         - bool
-         - Process xinclude statements. , default: ``False``
-       * - fail_on_unknown_properties
-         - bool
-         - Should fail on unknown properties that can't be mapped to any wildcard field,
-           default: ``True``
+    xml_path = fixtures_dir.joinpath("primer/order.xml")
+    books = Books(
+         book=[
+             BookForm(
+                 id="bk001",
+                 author="Hightower, Kim",
+                 title="The First Book",
+                 genre="Fiction",
+                 price=44.95,
+                 pub_date="2000-10-01",
+                 review="An amazing story of nothing.",
+             )
+         ]
+     )
 
-
-    **context** (:class:`~xsdata.formats.dataclass.context.XmlContext`)
-
-    The cache layer for the binding directives of models and their fields. You may
-    share a context instance between parser/serializer instances to avoid compiling the
-    cache more than once.
-
-    .. hint::
-
-        it's recommended to use a static or global instance of your parser or serializer
-        per document type.
+    parser = XmlParser()
+    serializer = XmlSerializer(config=SerializerConfig(pretty_print=True))
 
 
-    **handler** (:class:`type` of
-    :class:`~xsdata.formats.dataclass.parsers.mixins.XmlHandler`)
-
-    The XmlHandler type to use in order to read the xml source and push element events
-    to the main parser.
-
-    Default: :class:`~xsdata.formats.dataclass.parsers.handlers.LxmlEventHandler`
+Parsing XML
+===========
 
 
-Handlers
---------
+From Path
+---------
 
-:class:`~xsdata.formats.dataclass.parsers.handlers.LxmlEventHandler`
+.. doctest::
 
-It's based on `lxml.etree.iterparse` incremental parser and offers the best
-balance between features and performance. If the xinclude parser config is enabled
-the handler will parse the whole tree and then use `iterwalk` to feed the main parser
-with element events.
-
-
-:class:`~xsdata.formats.dataclass.parsers.handlers.LxmlSaxHandler`
-
-It's based on the lxml target parser interface. `xinclude` statements are not supported
-and is quite slower than the iterparse implementation.
-
-
-:class:`~xsdata.formats.dataclass.parsers.handlers.XmlEventHandler`
-
-It's based on the native python xml.etree.ElementTree.interparse incremental parser.
-`xinclude` statements are not supported and it doesn't support the newly allowed
-characters in XML 1.1. Despite it's drawbacks in some cases it's slightly faster than
-the lxml iterparse implementation.
+    >>> from xsdata.formats.dataclass.context import XmlContext
+    >>> from xsdata.formats.dataclass.parsers import XmlParser
+    >>> from tests import fixtures_dir
+    >>> from tests.fixtures.primer import PurchaseOrder, Usaddress
+    ...
+    >>> xml_path = fixtures_dir.joinpath("primer/order.xml")
+    >>> parser = XmlParser(context=XmlContext())
+    >>> order = parser.from_path(xml_path, PurchaseOrder)
+    >>> order.bill_to
+    Usaddress(name='Robert Smith', street='8 Oak Avenue', city='Old Town', state='PA', zip=Decimal('95819'), country='US')
 
 
-:class:`~xsdata.formats.dataclass.parsers.handlers.XmlSaxHandler`
+From string
+-----------
 
-It's based on the native python xml.sax.ContentHandler and doesn't support `xinclude`
-statements and is a lot slower than the iterparse implementation.
+.. doctest::
 
-
-.. hint::
-
-    Why keep them all? The hard part was the decouple of the parser from a specific
-    implementation. The handlers are quite simple and very easy to test.
-
-    It's also recommended to give all of them a try, based on your use case you
-    might get different results.
-
-    You can also extend one of them if you want to do any optimization like skipping
-    irrelevant events earlier than the binding process when it's instructed
-    to skip unknown properties.
+    >>> order = parser.from_string(xml_path.read_text(), PurchaseOrder)
+    >>> order.bill_to.street
+    '8 Oak Avenue'
 
 
-Example: from path
-------------------
+From bytes
+----------
 
-.. literalinclude:: examples/xml_parser.py
-   :lines: 3-6,7-17
+.. doctest::
+
+    >>> order = parser.from_bytes(xml_path.read_bytes(), PurchaseOrder)
+    >>> order.bill_to.street
+    '8 Oak Avenue'
 
 
-Example: from memory
+Unknown target type
+-------------------
+
+It's optimal to provide the target model but completely optional. The parser can scan
+all the imported modules to find a matching dataclass.
+
+    >>> order = parser.from_bytes(xml_path.read_bytes())
+    >>> type(order)
+    <class 'tests.fixtures.primer.order.PurchaseOrder'>
+
+
+Parser Config
+-------------
+
+    >>> from xsdata.formats.dataclass.parsers.config import ParserConfig
+    ...
+    >>> config = ParserConfig(
+    ...     base_url=None,
+    ...     process_xinclude=False,
+    ...     fail_on_unknown_properties=False,
+    ... )
+    >>> parser = XmlParser(config=config)
+    >>> order = parser.from_bytes(xml_path.read_bytes())
+    >>> order.bill_to.street
+    '8 Oak Avenue'
+
+API :ref:`Reference <ParserConfig>`.
+
+
+Alternative handlers
 --------------------
 
-With support for `XML Inclusions <https://www.w3.org/TR/xinclude-11/>`_
+XmlHandlers read the xml source and push build events to create the target class.
+xsData ships with multiple handlers based on lxml and native python that vary in
+performance and features.
 
-.. literalinclude:: examples/xml_parser.py
-   :lines: 19-22
-
-
-Example: alternative handler
-----------------------------
-
-.. literalinclude:: examples/xml_parser.py
-   :lines: 24-27
-
-
-Example: with unknown type
---------------------------
-
-.. literalinclude:: examples/xml_parser.py
-   :lines: 29-30
-
-:class:`~xsdata.formats.dataclass.serializers.XmlSerializer`
-============================================================
-
-The serializer can also be initialized with a xml context instance, if your use case
-needs to parse and serialize the same type of objects you could share the same xml
-context instance between them to save on memory and processing.
+    >>> from xsdata.formats.dataclass.parsers.handlers import XmlEventHandler
+    ...
+    >>> parser = XmlParser(handler=XmlEventHandler)
+    >>> order = parser.from_path(xml_path)
+    >>> order.bill_to.street
+    '8 Oak Avenue'
 
 .. hint::
 
-    The serializer used to add a default namespace if the root object supported it and
-    moved all the prefixes to the root node with a performance penalty. This behavior
-    was removed in version **20.10** with the new xml writer interface for consistency
-    between implementations.
+    It's recommended to give all of them a try, based on your use case you
+    might get different results.
 
-    You can still get the same output if you provide a prefix-URI namespaces mapping,
-    see :ref:`examples <Example: custom prefixes>`
+    You can also extend one of them if you want to do any optimizations or
+    customize the default behaviour.
 
-
-**Parameters**
-    **config** (:class:`~xsdata.formats.dataclass.serializers.config.SerializerConfig`)
-
-    .. list-table::
-       :widths: 20 10 220
-       :header-rows: 1
-       :align: left
-
-       * - Name
-         - Type
-         - Description
-       * - encoding
-         - str
-         - Text encoding, default: ``UTF-8``
-       * - xml_version
-         - str
-         - XML Version number, default: ``1.0``
-       * - xml_declaration
-         - bool
-         - Generate XML declaration, default ``True``
-       * - pretty_print
-         - bool
-         - Enable pretty output, default ``False``
-       * - schema_location
-         - str
-         - Specify the xsi:schemaLocation attribute value,
-           eg ``xsi:schemaLocation="http://example.org/prod chapter08.xsd"``, Optional
-       * - no_namespace_schema_location
-         - str
-         - Specify the xsi:noNamespaceSchemaLocation attribute value,
-           eg ``xsi:noNamespaceSchemaLocation="chapter11.xsd"``, Optional
+API: :ref:`Reference <XML Handlers>`
 
 
-    **context** (:class:`~xsdata.formats.dataclass.context.XmlContext`)
-
-    The cache layer for the binding directives of models and their fields. You may
-    share a context instance between parser/serializer instances to avoid compiling the
-    cache more than once.
+Serializing XML
+===============
 
 
-    **writer** (:class:`type` of
-    :class:`~xsdata.formats.dataclass.serializers.mixins.XmlWriter`)
+Render to string
+----------------
 
-    The XmlWriter type to use for serialization.
+.. doctest::
 
-    Default: :class:`~xsdata.formats.dataclass.serializers.writers.LxmlEventWriter`
+    >>> from tests.fixtures.books import Books, BookForm
+    >>> from xsdata.formats.dataclass.serializers import XmlSerializer
+    >>> from xsdata.formats.dataclass.serializers.config import SerializerConfig
+    ...
+    >>> books = Books(
+    ...     book=[
+    ...         BookForm(
+    ...             id="bk001",
+    ...             author="Hightower, Kim",
+    ...             title="The First Book",
+    ...             genre="Fiction",
+    ...             price=44.95,
+    ...             pub_date="2000-10-01",
+    ...             review="An amazing story of nothing.",
+    ...         )
+    ...     ]
+    ... )
+    ...
+    >>> config = SerializerConfig(pretty_print=True)
+    >>> serializer = XmlSerializer(config=config)
+    >>> print(serializer.render(books))
+    <?xml version="1.0" encoding="UTF-8"?>
+    <ns0:books xmlns:ns0="urn:books">
+      <book id="bk001" lang="en">
+        <author>Hightower, Kim</author>
+        <title>The First Book</title>
+        <genre>Fiction</genre>
+        <price>44.95</price>
+        <pub_date>2000-10-01</pub_date>
+        <review>An amazing story of nothing.</review>
+      </book>
+    </ns0:books>
+    <BLANKLINE>
 
 
-Writers
--------
+Set custom prefixes
+--------------------
 
-:class:`~xsdata.formats.dataclass.serializers.writers.LxmlEventWriter`
+.. doctest::
 
-It's based on the lxml `ElementTreeContentHandler`, which means your object tree
-will first be converted to an lxml ElementTree and then to string. Despite that since
-it's lxml it's still pretty fast and supports special characters and encodings a bit
-better than the native python writer.
+    >>> print(serializer.render(books, ns_map={"bk": "urn:books"}))
+    <?xml version="1.0" encoding="UTF-8"?>
+    <bk:books xmlns:bk="urn:books">
+      <book id="bk001" lang="en">
+        <author>Hightower, Kim</author>
+        <title>The First Book</title>
+        <genre>Fiction</genre>
+        <price>44.95</price>
+        <pub_date>2000-10-01</pub_date>
+        <review>An amazing story of nothing.</review>
+      </book>
+    </bk:books>
+    <BLANKLINE>
 
 
-:class:`~xsdata.formats.dataclass.serializers.writers.XmlEventWriter`
+Set a default namespace
+-----------------------
 
-It's based on the native python :class:`xml.sax.saxutils.XMLGenrator` with support for
-indentation. The object tree is converted directly to string without any intermediate
-steps, which makes it's slightly faster than the lxml implementation and more memory
-efficient if you write directly to an output stream.
+.. doctest::
 
-The pretty print output is identical to the lxml's except for some mixed content cases,
-because of the nature of a sax content handler.
+    >>> print(serializer.render(books, ns_map={None: "urn:books"}))
+    <?xml version="1.0" encoding="UTF-8"?>
+    <books xmlns="urn:books">
+      <book xmlns="" id="bk001" lang="en">
+        <author>Hightower, Kim</author>
+        <title>The First Book</title>
+        <genre>Fiction</genre>
+        <price>44.95</price>
+        <pub_date>2000-10-01</pub_date>
+        <review>An amazing story of nothing.</review>
+      </book>
+    </books>
+    <BLANKLINE>
 
-Example: render
+
+Write to stream
 ---------------
 
-.. literalinclude:: examples/xml_serializer.py
-    :lines: 4-26
+.. doctest::
 
-.. literalinclude:: examples/xml_serializer.py
-    :lines: 28-38
-    :language: xml
-
-Example: custom prefixes
-------------------------
-
-.. literalinclude:: examples/xml_serializer.py
-    :lines: 42
-
-.. literalinclude:: examples/xml_serializer.py
-    :lines: 45-48
-    :language: xml
-
-Example: default prefix
------------------------
-
-.. literalinclude:: examples/xml_serializer.py
-    :lines: 59
-
-.. literalinclude:: examples/xml_serializer.py
-    :lines: 62-65
-    :language: xml
-
-Example: native handler
------------------------
-
-.. literalinclude:: examples/xml_serializer.py
-    :lines: 75-77
-
-.. literalinclude:: examples/xml_serializer.py
-    :lines: 79-89
-    :language: xml
-
-Example: write to stream
-------------------------
-
-.. literalinclude:: examples/xml_serializer.py
-    :lines: 92
-
-.. literalinclude:: examples/xml_serializer.py
-    :lines: 94-95
+    >>> from pathlib import Path
+    ...
+    >>> path = Path("output.xml")
+    >>> with path.open("w") as fp:
+    ...     serializer.write(fp, books)
+    ...
+    >>> print(path.read_text())
+    <?xml version="1.0" encoding="UTF-8"?>
+    <ns0:books xmlns:ns0="urn:books">
+      <book id="bk001" lang="en">
+        <author>Hightower, Kim</author>
+        <title>The First Book</title>
+        <genre>Fiction</genre>
+        <price>44.95</price>
+        <pub_date>2000-10-01</pub_date>
+        <review>An amazing story of nothing.</review>
+      </book>
+    </ns0:books>
+    <BLANKLINE>
+    >>> path.unlink()
 
 
-Benchmarks
-==========
+Serializer Config
+-----------------
 
-The benchmarks run with the `test suite <https://github.com/tefra/xsdata/actions>`_.
+.. doctest::
+
+    >>> from xsdata.formats.dataclass.serializers.config import SerializerConfig
+    ...
+    >>> serializer = XmlSerializer(config=SerializerConfig(
+    ...     pretty_print=True,
+    ...     encoding="UTF-8",
+    ...     xml_version="1.1",
+    ...     xml_declaration=False,
+    ...     schema_location="urn books.xsd",
+    ...     no_namespace_schema_location=None,
+    ... ))
+    >>> print(serializer.render(books))
+    <ns0:books xmlns:ns0="urn:books" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn books.xsd">
+      <book id="bk001" lang="en">
+        <author>Hightower, Kim</author>
+        <title>The First Book</title>
+        <genre>Fiction</genre>
+        <price>44.95</price>
+        <pub_date>2000-10-01</pub_date>
+        <review>An amazing story of nothing.</review>
+      </book>
+    </ns0:books>
+    <BLANKLINE>
+
+
+API :ref:`Reference <SerializerConfig>`.
+
+
+Alternative Writers
+-------------------
+
+xsData ships with multiple writers based on lxml and native python that may vary
+in performance in some cases. The output of all them is consistent with a few
+exceptions when handling mixed content with ``pretty_print=True``.
+
+.. doctest::
+
+    >>> from xsdata.formats.dataclass.serializers.writers import XmlEventWriter
+    ...
+    >>> serializer = XmlSerializer(config=config, writer=XmlEventWriter)
+    >>> print(serializer.render(books))
+    <?xml version="1.0" encoding="UTF-8"?>
+    <ns0:books xmlns:ns0="urn:books">
+      <book id="bk001" lang="en">
+        <author>Hightower, Kim</author>
+        <title>The First Book</title>
+        <genre>Fiction</genre>
+        <price>44.95</price>
+        <pub_date>2000-10-01</pub_date>
+        <review>An amazing story of nothing.</review>
+      </book>
+    </ns0:books>
+    <BLANKLINE>
+
+
+API: :ref:`Reference <XML Writers>`
+
+
+XML Benchmarks
+==============
+
+Compare the handlers / writers `performance <https://github.com/tefra/xsdata/actions>`_.
 
 .. code-block::
 

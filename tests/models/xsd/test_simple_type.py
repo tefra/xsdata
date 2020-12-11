@@ -55,6 +55,9 @@ class SimpleTypeTests(TestCase):
         obj = SimpleType()
         self.assertEqual({}, obj.get_restrictions())
 
+        obj.list = List()
+        self.assertEqual({"tokens": True}, obj.get_restrictions())
+
         expected = dict(length=2)
         obj.restriction = Restriction(length=Length(value=2))
         self.assertEqual(expected, obj.get_restrictions())

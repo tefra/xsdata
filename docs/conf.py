@@ -29,14 +29,16 @@ version = release = get_distribution("xsdata").version
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
+    "sphinx.ext.doctest",
     "sphinx.ext.autodoc",
     "sphinx.ext.intersphinx",
     "sphinx.ext.autosectionlabel",
     "sphinx.ext.viewcode",
     "sphinx.ext.githubpages",
+    "sphinx.ext.autosummary",
     "sphinx_autodoc_typehints",
     "sphinx_inline_tabs",
-    "sphinxcontrib.apidoc",
+    "sphinx_copybutton",
     "sphinxcontrib.programoutput",
 ]
 
@@ -91,12 +93,17 @@ html_theme_options = {
     "base_url": "https://xsdata.readthedocs.io/en/latest/",
 }
 
-intersphinx_mapping = {"python": ("https://docs.python.org/3", None)}
-autodoc_member_order = "bysource"
+intersphinx_mapping = {
+    "python": ("https://docs.python.org/3", None),
+    "lxml": ("https://lxml.de/apidoc/", None),
+}
 
-apidoc_module_dir = "../xsdata"
-apidoc_output_dir = "reference"
-apidoc_excluded_paths = ["tests"]
-apidoc_separate_modules = True
+autodoc_default_options = {
+    "member-order": "bysource",
+    "special-members": None,
+    "exclude-members": "__dict__,__weakref__",  # Exclude "standard" methods.
+}
+
+autosummary_generate = True
 set_type_checking_flag = True
 always_document_param_types = True

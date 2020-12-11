@@ -35,8 +35,8 @@ W3C XML Schema Suite
 xsdata is constantly tested and measured against the
 `W3C XML Schema 1.1 test suite <https://github.com/w3c/xsdtests>`_.
 
-The suite is quite extensible and consist of more than 26k tests cases for both XML
-Schema 1.0 and 1.1.
+The suite is quite extensible and consist of more than 14k valid tests cases for both
+XML and JSON Binding.
 
 .. hint::
 
@@ -50,38 +50,18 @@ Schema 1.0 and 1.1.
 Report
 ------
 
-**14** failed, **14573** passed, **88** skipped @
-`travis-ci <https://travis-ci.com/tefra/xsdata-w3c-tests>`_
+XML Results: **12** failed, **14575** passed, **88** skipped, **42** warnings
+
+JSON Results: **120** failed, **14546** passed, **64** warnings
+
 
 ✨✨✨✨
-
-Methodology
------------
-
-- Invalid schema tests or no schema tests are ignored (~12k tests)
-- Generate dataclasses for given schema.
-  - **Fail** when cli raises exception or expected module::class is not found.
-- Parse the given xml instance.
-  - **Fail** when parser raises exception.
-- Serialize to xml and validate against the schema.
-  - **Fail** if final output is invalid.
-  - **Skip** if original instance or schema also fail validation.
-
-
-For all XML Schema definitions we use the
-`xmlschema <https://pypi.org/project/xmlschema/>`_ to validate results.
 
 
 .. hint::
 
-    xsdata is an xml binding library not a schema validator.
+    The `xmlschema <https://pypi.org/project/xmlschema/>`_ is used to validate xml
+    output.
 
-
-**Try it out**
-
-.. code-block:: console
-
-    git clone git@github.com:tefra/xsdata-w3c-tests.git
-    cd xsdata-w3c-tests
-    pip install -r requirements.txt
-    pytest -n 4 --tb short tests/  # | tee pytest.log
+    The json mode performs roundtrip conversions and compares the initial and final
+    outputs

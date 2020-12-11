@@ -8,7 +8,7 @@ Mapping
 
 Below you can find the mapping of data types between python and xml schema.
 
-.. include:: data_types_table.rst
+.. include:: data-types-table.rst
 
 Converters
 ==========

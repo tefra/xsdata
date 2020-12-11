@@ -35,14 +35,13 @@ NoneStr = Optional[str]
 @dataclass
 class ElementNode(XmlNode):
     """
-    Element type node is equivalent to xml elements and is used to bind user
-    defined dataclasses.
+    XmlNode for complex elements and dataclasses.
 
     :param meta: Model xml metadata
     :param attrs: Key-value attribute mapping
-    :param ns_map: Prefix-URI Namespace mapping
+    :param ns_map: Namespace prefix-URI map
     :param config: Parser configuration
-    :param context: Model xml metadata builder
+    :param context: Model context provider
     :param position: The node position of objects cache
     :param derived: The xml element is derived from a base type
     """
@@ -62,12 +61,6 @@ class ElementNode(XmlNode):
     )
 
     def bind(self, qname: str, text: NoneStr, tail: NoneStr, objects: List) -> bool:
-        """
-        Parse the given element attributes/text, find all child objects and
-        mixed content and initialize a new dataclass instance.
-
-        :return: A tuple of the object's qualified name and the new object.
-        """
         params: Dict = {}
         wild_node = False
         text_node = False
@@ -99,16 +92,6 @@ class ElementNode(XmlNode):
         return True
 
     def child(self, qname: str, attrs: Dict, ns_map: Dict, position: int) -> XmlNode:
-        """
-        Initialize the next node to be queued for the given starting element.
-
-        Search by the given element tag for a matching variable and create the next
-        node by the variable type.
-
-        :return: The next node to be queued.
-        :raises: ParserError if the element is unknown and parser config is strict.
-        """
-
         for var in self.fetch_vars(qname):
             node = self.build_node(var, attrs, ns_map, position)
             if node:
@@ -206,6 +189,18 @@ class ElementNode(XmlNode):
 
 @dataclass
 class AnyTypeNode(XmlNode):
+    """
+    XmlNode for elements with an inline datatype declaration through the
+    xsi:type attribute.
+
+    :param var: Class field xml var instance
+    :param attrs: Key-value attribute mapping
+    :param ns_map: Namespace prefix-URI map
+    :param position: The node position of objects cache
+    :param mixed: Specify if the parent node supports mixed content
+    :ivar has_children: Specifies whether the node has encounter any
+        children so far
+    """
 
     var: XmlVar
     attrs: Dict
@@ -251,16 +246,15 @@ class AnyTypeNode(XmlNode):
 @dataclass
 class WildcardNode(XmlNode):
     """
-    Wildcard nodes are used for extensible elements that can hold any attribute
-    and content and don't have a specific dataclass or primitive type.
+    XmlNode for extensible elements that can hold any attribute and content.
 
-    Notes:
-        In the future this node should check all known user defined models in the
-        target namespace and use that instead of the generic.
+    The resulting object tree will be a
+    :class:`~xsdata.formats.dataclass.models.generics.AnyElement`
+    instance.
 
     :param var: Class field xml var instance
     :param attrs: Key-value attribute mapping
-    :param ns_map: Prefix-URI Namespace mapping
+    :param ns_map: Namespace prefix-URI map
     :param position: The node position of objects cache
     """
 
@@ -270,13 +264,6 @@ class WildcardNode(XmlNode):
     position: int
 
     def bind(self, qname: str, text: NoneStr, tail: NoneStr, objects: List) -> bool:
-        """
-        Parse the given element attributes/text/tail, find all child objects
-        and mixed content and initialize a new generic element instance.
-
-        :return: A tuple of the object's qualified name and a new
-            :class:`xsdata.formats.dataclass.models.generics.AnyElement` instance.
-        """
         obj = AnyElement(
             qname=qname,
             text=ParserUtils.normalize_content(text),
@@ -289,22 +276,24 @@ class WildcardNode(XmlNode):
         return True
 
     def child(self, qname: str, attrs: Dict, ns_map: Dict, position: int) -> XmlNode:
-        """Initialize the next wildcard node to be queued for the given
-        starting element."""
         return WildcardNode(position=position, var=self.var, attrs=attrs, ns_map=ns_map)
 
 
 @dataclass
 class UnionNode(XmlNode):
     """
-    Union nodes are used for variables with more than one possible types where
-    at least one of them is a dataclass.
+    XmlNode for fields with multiple possible types where at least one of them
+    is a dataclass.
+
+    The node will record all child events and in the end will replay
+    them and try to build all possible objects and sort them by
+    score before deciding the winner.
 
     :param var: Class field xml var instance
     :param attrs: Key-value attribute mapping
-    :param ns_map: Prefix-URI Namespace mapping
+    :param ns_map: Namespace prefix-URI map
     :param position: The node position of objects cache
-    :param context: Model xml context cache
+    :param context: Model context provider
     :param level: Current node level
     :param events: Record node events
     """
@@ -318,24 +307,11 @@ class UnionNode(XmlNode):
     events: List = field(default_factory=list)
 
     def child(self, qname: str, attrs: Dict, ns_map: Dict, position: int) -> XmlNode:
-        """Skip all child nodes as we are going to parse the complete element
-        tree."""
-
         self.level += 1
         self.events.append(("start", qname, copy.deepcopy(attrs), ns_map))
         return self
 
     def bind(self, qname: str, text: NoneStr, tail: NoneStr, objects: List) -> bool:
-        """
-        The handler will make multiple tries to bind the given element to one
-        of the available dataclass var types convert it to one of the available
-        primitive types.
-
-        The first shoe that fits wins!
-
-        :raise ParserError: When all attempts fail
-        :return: A tuple of the object's qualified name and the new object.
-        """
         self.events.append(("end", qname, text, tail))
 
         if self.level > 0:
@@ -372,21 +348,16 @@ class UnionNode(XmlNode):
 @dataclass
 class PrimitiveNode(XmlNode):
     """
-    XmlNode for text elements with primitive values eg str, int, float.
+    XmlNode for text elements with primitive values like str, int, float.
 
     :param var: Class field xml var instance
-    :param ns_map: Prefix-URI Namespace mapping
+    :param ns_map: Namespace prefix-URI map
     """
 
     var: XmlVar
     ns_map: Dict
 
     def bind(self, qname: str, text: NoneStr, tail: NoneStr, objects: List) -> bool:
-        """
-        Parse the given element text according to the node possible types.
-
-        :return: A tuple of the object's qualified name and the new object.
-        """
         var = self.var
         ns_map = self.ns_map
         obj = ParserUtils.parse_value(text, var.types, var.default, ns_map, var.tokens)
@@ -403,15 +374,14 @@ class PrimitiveNode(XmlNode):
 
 @dataclass
 class SkipNode(XmlNode):
-    """The skip node should be used when we want to skip parsing child
-    elements."""
+    """Utility node to skip parsing unknown properties."""
 
     def child(self, qname: str, attrs: Dict, ns_map: Dict, position: int) -> XmlNode:
-        """Skip the current child."""
+        """Skip nodes children are skipped as well."""
         return self
 
     def bind(self, qname: str, text: NoneStr, tail: NoneStr, objects: List) -> bool:
-        """Skip parsing the current element."""
+        """Skip nodes are not building any objects."""
         return False
 
 
@@ -421,9 +391,9 @@ class NodeParser(PushParser):
     Bind xml nodes to dataclasses.
 
     :param config: Parser configuration
-    :param context: Model metadata builder
+    :param context: Model context provider
     :param handler: Override default XmlHandler
-    :param ms_map: Namespace registry for prefix-URI mappings
+    :ivar ms_map: Namespace registry of parsed prefix-URI mappings
     """
 
     config: ParserConfig = field(default_factory=ParserConfig)
@@ -451,7 +421,19 @@ class NodeParser(PushParser):
         attrs: Dict,
         ns_map: Dict,
     ):
-        """Queue the next xml node for parsing."""
+        """
+        Start element notification receiver.
+
+        Build and queue the XmlNode for the starting element.
+
+        :param clazz: Root class type, if it's missing look for any
+            suitable models from the current context.
+        :param queue: The active XmlNode queue
+        :param objects: The list of all intermediate parsed objects
+        :param qname: Qualified name
+        :param attrs: Attribute key-value map
+        :param ns_map: Namespace prefix-URI map
+        """
         try:
             item = queue[-1]
             child = item.child(qname, attrs, ns_map, len(objects))
@@ -488,9 +470,17 @@ class NodeParser(PushParser):
         tail: NoneStr,
     ) -> Any:
         """
-        Parse the last xml node and bind any intermediate objects.
+        End element notification receiver.
 
-        :return: The result of the binding process.
+        Pop the last XmlNode from the queue and use it to build and
+        return the resulting object tree with its text and tail
+        content.
+
+        :param queue: Xml nodes queue
+        :param objects: List of parsed objects
+        :param qname: Qualified name
+        :param text: Text content
+        :param tail: Tail content
         """
         obj = None
         item = queue.pop()
@@ -500,7 +490,12 @@ class NodeParser(PushParser):
         return obj
 
     def start_prefix_mapping(self, prefix: NoneStr, uri: str):
-        """Add the given prefix-URI namespaces mapping if the prefix is new."""
+        """
+        Add the given prefix-URI namespaces mapping if the prefix is new.
+
+        :param prefix: Namespace prefix
+        :param uri: Namespace uri
+        """
         prefix = prefix or None
         if prefix not in self.ns_map:
             self.ns_map[prefix] = uri
@@ -509,12 +504,12 @@ class NodeParser(PushParser):
 @dataclass
 class RecordParser(NodeParser):
     """
-    Bind xml nodes to dataclasses with an events recorder.
+    Bind xml nodes to dataclasses and store the intermediate events.
 
-    :param events: List of pushed events
+    :ivar events: List of pushed events
     """
 
-    events: List = field(default_factory=list)
+    events: List = field(init=False, default_factory=list)
 
     def start(
         self,
@@ -525,6 +520,20 @@ class RecordParser(NodeParser):
         attrs: Dict,
         ns_map: Dict,
     ):
+        """
+        Start element notification receiver.
+
+        Build and queue the XmlNode for the starting element, append
+        the event with the attributes and ns map to the events list.
+
+        :param clazz: Root class type, if it's missing look for any
+            suitable models from the current context.
+        :param queue: The active XmlNode queue
+        :param objects: The list of all intermediate parsed objects
+        :param qname: Qualified name
+        :param attrs: Attributes key-value map
+        :param ns_map: Namespace prefix-URI map
+        """
         self.events.append((EventType.START, qname, copy.deepcopy(attrs), ns_map))
         super().start(clazz, queue, objects, qname, attrs, ns_map)
 
@@ -536,6 +545,20 @@ class RecordParser(NodeParser):
         text: NoneStr,
         tail: NoneStr,
     ) -> Any:
+        """
+        End element notification receiver.
+
+        Pop the last XmlNode from the queue and use it to build and
+        return the resulting object tree with its text and tail
+        content. Append the end event with the text,tail content to
+        the events list.
+
+        :param queue: Xml nodes queue
+        :param objects: List of parsed objects
+        :param qname: Qualified name
+        :param text: Text content
+        :param tail: Tail content
+        """
         self.events.append((EventType.END, qname, text, tail))
         return super().end(queue, objects, qname, text, tail)
 

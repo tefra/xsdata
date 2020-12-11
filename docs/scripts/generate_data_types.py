@@ -21,7 +21,7 @@ output = [
 
 custom_classes = {
     "Decimal": "decimal.Decimal",
-    "QName": "xml.etree.ElementTree",
+    "QName": "xml.etree.ElementTree.QName",
 }
 
 
@@ -46,6 +46,6 @@ output.append("      -")
 output.append("      -")
 output.append("")
 
-docs_root.joinpath("data_types_table.rst").write_text(
+docs_root.joinpath("data-types-table.rst").write_text(
     "\n".join(output), encoding="utf-8"
 )

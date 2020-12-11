@@ -2,70 +2,147 @@
 JSON Binding
 ============
 
+Binding JSON lacks a bit in features and for edge cases with wildcards and derived
+types doing roundtrip conversions is not always possible.
 
-:class:`~xsdata.formats.dataclass.parsers.JsonParser`
-=====================================================
+.. testsetup:: *
 
-The parser has three instance methods `from_string`, `from_bytes` and `from_path`,
-to parse from memory or to let the parser load the input document.
+    from pathlib import Path
+    from xsdata.formats.dataclass.context import XmlContext
+    from xsdata.formats.dataclass.parsers import JsonParser
+    from tests import fixtures_dir
+    from tests.fixtures.defxmlschema.chapter05 import Order, ItemsType
+    from tests.fixtures.defxmlschema.chapter05prod import Product, SizeType
 
-.. hint::
+    json_path = fixtures_dir.joinpath("defxmlschema/chapter05.json")
+    parser = JsonParser(context=XmlContext())
+    order = Order(
+        items=ItemsType(
+            product=[
+                Product(
+                    number=557,
+                    name='Short-Sleeved Linen Blouse',
+                    size=SizeType(value=None, system=None)
+                )
+            ]
+        )
+    )
 
-    You can optionally specify the target binding class or let the context instance
-    to scan all imported modules for a matching dataclass.
+Parsing JSON
+============
 
-**Parameters**
-    **context** (:class:`~xsdata.formats.dataclass.context.XmlContext`)
+From Path
+---------
 
-    The cache layer for the binding directives of models and their fields. You may
-    share a context instance between parser/serializer instances to avoid compiling the
-    cache more than once.
+.. doctest::
 
-    .. hint::
-
-        it's recommended to use a static or global instance of your parser or serializer
-        per document type.
-
-.. code-block:: python
-
-    >>> from xsdata.formats.dataclass.parsers import JsonParser
-    >>> from xsdata.formats.dataclass.context import XmlContext
-    >>> from tests.fixtures.defxmlschema.chapter05 import Order
     >>> from pathlib import Path
-    >>>
+    >>> from xsdata.formats.dataclass.context import XmlContext
+    >>> from xsdata.formats.dataclass.parsers import JsonParser
+    >>> from tests import fixtures_dir
+    >>> from tests.fixtures.defxmlschema.chapter05 import Order
+    ...
+    >>> json_path = fixtures_dir.joinpath("defxmlschema/chapter05.json")
     >>> parser = JsonParser(context=XmlContext())
-    >>> parser.from_path(Path("../tests/fixtures/defxmlschema/chapter04.json"), Order)
-    Order(items=ItemsType(product=[Product(number=557, name='Short-Sleeved Linen Blouse', size=SizeType(value=10, system='US-DRESS'))]))
+    >>> order = parser.from_path(json_path, Order)
+    >>> order.items.product[0]
+    Product(number=557, name='Short-Sleeved Linen Blouse', size=SizeType(value=None, system=None))
 
 
+From String
+-----------
 
-:class:`~xsdata.formats.dataclass.serializers.JsonSerializer`
-=============================================================
+.. doctest::
 
-The serializer besides the `indent` option can be initialized with a custom encoder
-that needs to extends :py:class:`json.JSONEncoder` and a dict_factory with your custom
-logic.
+    >>> order = parser.from_string(json_path.read_text(), Order)
+    >>> order.items.product[0]
+    Product(number=557, name='Short-Sleeved Linen Blouse', size=SizeType(value=None, system=None))
 
 
-Example: dict factory that filters None values.
+From Bytes
+----------
 
-.. code-block:: python
+.. doctest::
+
+    >>> order = parser.from_bytes(json_path.read_bytes(), Order)
+    >>> order.items.product[0]
+    Product(number=557, name='Short-Sleeved Linen Blouse', size=SizeType(value=None, system=None))
+
+
+Unknown target type
+-------------------
+
+It's optimal to provide the target model but completely optional. The parser can scan
+all the imported modules to find a matching dataclass.
+
+.. doctest::
+
+    >>> order = parser.from_bytes(json_path.read_bytes())
+    >>> order.items.product[0]
+    Product(number=557, name='Short-Sleeved Linen Blouse', size=SizeType(value=None, system=None))
+
+
+Serializing JSON
+================
+
+Render to string
+----------------
+
+.. doctest::
 
     >>> from xsdata.formats.dataclass.serializers import JsonSerializer
-    >>>
-    >>> serializer = JsonSerializer(indent=2, dict_factory=lambda x: {k: v for k, v in x if v is not None})
-    >>> pprint.pprint(serializer.render(obj))
-    >>> ('{\n'
-    >>>  '  "items": {\n'
-    >>>  '    "product": [\n'
-    >>>  '      {\n'
-    >>>  '        "number": 557,\n'
-    >>>  '        "name": "Short-Sleeved Linen Blouse",\n'
-    >>>  '        "size": {\n'
-    >>>  '          "value": 10,\n'
-    >>>  '          "system": "US-DRESS"\n'
-    >>>  '        }\n'
-    >>>  '      }\n'
-    >>>  '    ]\n'
-    >>>  '  }\n'
-    >>>  '}')
+    >>> from tests.fixtures.defxmlschema.chapter05 import Order, ItemsType
+    >>> from tests.fixtures.defxmlschema.chapter05prod import Product, SizeType
+    >>> order = Order(
+    ...     items=ItemsType(
+    ...         product=[
+    ...             Product(
+    ...                 number=557,
+    ...                 name='Short-Sleeved Linen Blouse',
+    ...                 size=SizeType(value=None, system=None)
+    ...             )
+    ...         ]
+    ...     )
+    ... )
+    >>> serializer = JsonSerializer(indent=2)
+    >>> print(serializer.render(order))
+    {
+      "items": {
+        "product": [
+          {
+            "number": 557,
+            "name": "Short-Sleeved Linen Blouse",
+            "size": {
+              "value": null,
+              "system": null
+            }
+          }
+        ]
+      }
+    }
+
+
+Custom Dict factory
+-------------------
+
+You can override the default dict factory to do extra steps like filtering `None`
+values.
+
+.. doctest::
+
+    >>> def filter_none(x):
+    ...     return {k: v for k, v in x if v is not None}
+    ...
+    >>> serializer = JsonSerializer(indent=2, dict_factory=filter_none)
+    >>> print(serializer.render(order))
+    {
+      "items": {
+        "product": [
+          {
+            "number": 557,
+            "name": "Short-Sleeved Linen Blouse",
+            "size": {}
+          }
+        ]
+      }
+    }

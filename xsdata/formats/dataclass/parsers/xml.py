@@ -19,10 +19,13 @@ from xsdata.utils.text import snake_case
 @dataclass
 class XmlParser(NodeParser):
     """
-    Bind xml nodes to dataclasses with event hooks.
+    Xml parser for dataclasses.
 
-    :param handler: Xml handler type
-    :param emit_cache: Cache for qnames to event names
+    :param config: Parser configuration
+    :param context: Model context provider
+    :param handler: Override default XmlHandler
+    :ivar ms_map: The prefix-URI map generated during parsing
+    :ivar emit_cache: Qname to event name cache
     """
 
     handler: Type[XmlHandler] = field(default=LxmlEventHandler)
@@ -38,10 +41,18 @@ class XmlParser(NodeParser):
         ns_map: Dict,
     ):
         """
-        Queue the next xml node for parsing.
+        Start element notification receiver.
 
-        Emit a start event with the current element qualified name and
-        attributes.
+        Build and queue the XmlNode for the starting element and
+        emits and propagate the event to subclasses.
+
+        :param clazz: Root class type, if it's missing look for any
+            suitable models from the current context.
+        :param queue: The active XmlNode queue
+        :param objects: The list of all intermediate parsed objects
+        :param qname: Qualified name
+        :param attrs: Attribute key-value map
+        :param ns_map: Namespace prefix-URI map
         """
         super().start(clazz, queue, objects, qname, attrs, ns_map)
         self.emit_event(EventType.START, qname, attrs=attrs)
@@ -55,11 +66,17 @@ class XmlParser(NodeParser):
         tail: Optional[str],
     ) -> Any:
         """
-        Parse the last xml node and bind any intermediate objects.
+        End element notification receiver.
 
-        Emit an end event with the result object if any.
+        Pop the last XmlNode from the queue and use it to build and
+        return the resulting object tree with its text and tail
+        content. Propagate the event to subclasses.
 
-        :return: The result of the binding process.
+        :param queue: Xml nodes queue
+        :param objects: List of parsed objects
+        :param qname: Qualified name
+        :param text: Text content
+        :param tail: Tail content
         """
         obj = super().end(queue, objects, qname, text, tail)
         if obj:
@@ -67,7 +84,20 @@ class XmlParser(NodeParser):
         return obj
 
     def emit_event(self, event: str, name: str, **kwargs: Any):
-        """Call if exist the parser's hook for the given element and event."""
+        """
+        Propagate event to subclasses.
+
+        Match event and name to a subclass method and trigger it with
+        any input keyword arguments.
+
+        Example::
+
+            event=start, name={urn}bookTitle -> start_booking_title(**kwargs)
+
+        :param event: Event type start|end
+        :param name: Element qualified name
+        :param kwargs: Event keyword arguments
+        """
 
         key = (event, name)
         if key not in self.emit_cache:

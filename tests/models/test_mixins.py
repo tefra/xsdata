@@ -101,6 +101,13 @@ class ElementBaseTests(TestCase):
         element = ElementBase()
         self.assertFalse(element.is_mixed)
 
+    def test_property_is_nillable(self):
+        element = ElementBase()
+        self.assertFalse(element.is_nillable)
+
+        element.nillable = True
+        self.assertTrue(element.is_nillable)
+
     def test_property_is_qualified(self):
         element = ElementBase()
         self.assertFalse(element.is_qualified)

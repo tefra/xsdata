@@ -26,7 +26,7 @@ class ElementBase:
     Base xsd schema model.
 
     :param index: Occurrence position inside the definition
-    :param ns_map: prefix-URI Namespace mapping
+    :param ns_map: Namespace prefix-URI map
     """
 
     index: int = field(default_factory=int, init=False)

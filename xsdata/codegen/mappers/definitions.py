@@ -318,7 +318,7 @@ class DefinitionsMapper:
         Build attributes for the given list of parts.
 
         :param parts: List of parts
-        :param ns_map: A prefix-URI Namespace mapping
+        :param ns_map: Namespace prefix-URI map
         """
         for part in parts:
             if part.element:

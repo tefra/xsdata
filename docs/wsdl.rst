@@ -59,36 +59,36 @@ Creating instances
 
 The client can be initialized from the an operation class directly
 
-.. code-block:: python
+.. code-block::
 
-    >>> client = Client.from_service(CalculatorSoapAdd)
-    >>> client.config
-    Config(style='document', location='http://www.dneonline.com/calculator.asmx', transport='http://schemas.xmlsoap.org/soap/http', soap_action='http://tempuri.org/Add', input=<class 'tests.fixtures.calculator.services.CalculatorSoapAddInput'>, output=<class 'tests.fixtures.calculator.services.CalculatorSoapAddOutput'>)
+    client = Client.from_service(CalculatorSoapAdd)
+    client.config
+    # Config(style='document', location='http://www.dneonline.com/calculator.asmx', transport='http://schemas.xmlsoap.org/soap/http', soap_action='http://tempuri.org/Add', input=<class 'tests.fixtures.calculator.services.CalculatorSoapAddInput'>, output=<class 'tests.fixtures.calculator.services.CalculatorSoapAddOutput'>)
 
 
 
 But you can also override any properties as you see fit
 
-.. code-block:: python
+.. code-block::
 
-    >>> client = Client.from_service(CalculatorSoapAdd, location="http://testurl.com")
-    >>> client.config
-    Config(style='document', location='http://testurl.com', transport='http://schemas.xmlsoap.org/soap/http', soap_action='http://tempuri.org/Add', input=<class 'tests.fixtures.calculator.services.CalculatorSoapAddInput'>, output=<class 'tests.fixtures.calculator.services.CalculatorSoapAddOutput'>)
+    client = Client.from_service(CalculatorSoapAdd, location="http://testurl.com")
+    client.config
+    # Config(style='document', location='http://testurl.com', transport='http://schemas.xmlsoap.org/soap/http', soap_action='http://tempuri.org/Add', input=<class 'tests.fixtures.calculator.services.CalculatorSoapAddInput'>, output=<class 'tests.fixtures.calculator.services.CalculatorSoapAddOutput'>)
 
 
 Or if you know what you are doing
 
-.. code-block:: python
+.. code-block::
 
-    >>> config = Config(
-    ...         style="document",
-    ...         location="",
-    ...         transport=TransportTypes.SOAP,
-    ...         soap_action="",
-    ...         input=None,
-    ...         output=None,
-    ...     )
-    >>> client = Client(config=config)
+    config = Config(
+        style="document",
+        location="",
+        transport=TransportTypes.SOAP,
+        soap_action="",
+        input=None,
+        output=None,
+    )
+    client = Client(config=config)
 
 
 Performing Requests
@@ -97,27 +97,24 @@ Performing Requests
 The send method requires either an object that matches the config input type or a
 dictionary with raw values that matches the input dataclass field names and structure.
 
-.. code-block:: python
+.. code-block::
 
-    >>> request = CalculatorSoapAddInput(body=CalculatorSoapAddInput.Body(add=Add(10, 2)))
-    >>> res = client.send(request)
-    >>> res
-    CalculatorSoapAddOutput(body=CalculatorSoapAddOutput.Body(add_response=AddResponse(add_result=12)))
+    request = CalculatorSoapAddInput(body=CalculatorSoapAddInput.Body(add=Add(10, 2)))
+    client.send(request)
+    # CalculatorSoapAddOutput(body=CalculatorSoapAddOutput.Body(add_response=AddResponse(add_result=12)))
 
 
-.. code-block:: python
+.. code-block::
 
-    >>> client = Client.from_service(CalculatorSoapAdd)
-    >>> params = {"body": {"add": {"int_a": 3, "int_b": 4}}}
-    >>> res = client.send(params)
-    >>> res
-    CalculatorSoapAddOutput(body=CalculatorSoapAddOutput.Body(add_response=AddResponse(add_result=7)))
-    >>>
+    client = Client.from_service(CalculatorSoapAdd)
+    params = {"body": {"add": {"int_a": 3, "int_b": 4}}}
+    client.send(params)
+    # CalculatorSoapAddOutput(body=CalculatorSoapAddOutput.Body(add_response=AddResponse(add_result=7)))
 
 
 You can also provide a dictionary of custom headers as well, although the headers that
 are needed for the webservice to work can not be overwritten.,
 
-.. code-block:: python
+.. code-block::
 
-    >>> client.send(params, headers={"User-Agent": "xsdata"})
+    client.send(params, headers={"User-Agent": "xsdata"})

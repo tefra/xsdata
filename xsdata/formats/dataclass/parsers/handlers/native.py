@@ -19,8 +19,18 @@ EVENTS = (EventType.START, EventType.END, EventType.START_NS)
 
 @dataclass
 class XmlEventHandler(XmlHandler):
-    """Content handler based on xml.ElementTree iterparse api."""
+    """
+    Event handler based on :func:`xml.etree.ElementTree.iterparse` api.
 
+    :param parser: The parser instance to feed with events
+    :param clazz: The target binding model. If None the parser will
+        auto locate it from the active xml context instance
+    :param queue: The XmlNode queue
+    :param objects: The list of intermediate parsed objects,
+        eg [(qname, object)]
+    """
+
+    # scope vars
     ns_map: Dict = field(default_factory=dict, init=False)
 
     def parse(self, source: Any) -> Any:
@@ -71,13 +81,10 @@ class XmlEventHandler(XmlHandler):
 
 @dataclass
 class XmlSaxHandler(LxmlSaxHandler, sax.handler.ContentHandler):
-    """
-    Xml sax content handler.
+    """Sax content handler based on native python."""
 
-    :param ns_map: Active element prefix-URI Namespace mapping
-    """
-
-    ns_map: Dict = field(default_factory=dict)
+    # Scope vars
+    ns_map: Dict = field(init=False, default_factory=dict)
 
     def parse(self, source: Any) -> Any:
         """
@@ -100,34 +107,49 @@ class XmlSaxHandler(LxmlSaxHandler, sax.handler.ContentHandler):
         """
         Start element notification receiver.
 
-        The receiver will flush any previous active element, append a new data frame
-        to collect data content for the next active element and notify the main parser
-        to prepare for next binding instruction.
+        The receiver will flush any previous active element, append a
+        new data frame to collect data content for the next active
+        element and notify the main parser to prepare for next binding
+        instruction.
 
-        Converts name and attribute keys to fully qualified tags to respect the main
-        parser api, eg (foo, bar) -> {foo}bar
+        Converts name and attribute keys to fully qualified tags to
+        respect the main parser api, eg (foo, bar) -> {foo}bar
+
+        :param name: Namespace-name tuple
+        :param qname: Not used
         """
-        tag = build_qname(name[0], name[1])
         attrs = {build_qname(key[0], key[1]): value for key, value in attrs.items()}
-        self.start(tag, attrs, self.ns_map)
+        self.start(build_qname(name[0], name[1]), attrs, self.ns_map)
         self.ns_map = {}
 
     def endElementNS(self, name: Tuple, qname: Any):
         """
         End element notification receiver.
 
-        The receiver will flush any previous active element and set the next element
-        to be flushed.
+        The receiver will flush any previous active element and set
+        the next element to be flushed.
 
-        Converts name and attribute keys to fully qualified tags to respect the
-        main parser api, eg (foo, bar) -> {foo}bar
+        Converts name and attribute keys to fully qualified tags to
+        respect the ain parser api, eg (foo, bar) -> {foo}bar
+
+        :param name: Namespace-name tuple
+        :param qname: Not used
         """
         self.end(build_qname(name[0], name[1]))
 
     def characters(self, content: str):
-        """Proxy for the data notification receiver."""
+        """
+        Proxy for the data notification receiver.
+
+        :param content: Text or tail content
+        """
         self.data(content)
 
     def startPrefixMapping(self, prefix: str, uri: str):
-        """Start element prefix-URI namespace mapping."""
+        """
+        Start element prefix-URI namespace mapping.
+
+        :param prefix: Namespace prefix
+        :param uri: Namespace uri
+        """
         self.ns_map[prefix] = uri

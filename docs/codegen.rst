@@ -2,13 +2,11 @@
 Command Line
 ============
 
-
 .. command-output:: xsdata --help
 
 
-Code Generator
-==============
-
+Generate Models
+===============
 
 .. command-output:: xsdata generate --help
 
@@ -75,8 +73,8 @@ docstring-style
 
 Choose the style of the generated docstrings.
 
-The accessible a custom style offering easy access to dataclasses fields and
-enum members docs for doc/api generators.
+The accessible is a custom style offering easy access to the docstrings
+of a dataclass' fields or an enum' members for doc/api generators.
 
 .. tab:: reStructuredText
 
@@ -137,84 +135,23 @@ Group classes by the target namespace they were defined. This option creates a m
 flat package structure and solves many circular import errors.
 
 
-Configuration
-=============
+Initialize Config
+=================
 
-Alternatively to the cli flags and options you can provide a project
-:mod:`xsdata.models.config` document.
+Initialize a project configuration with more advanced features, see
+:ref:`more <Generator Config>`.
+
+.. command-output:: xsdata init-config --help
 
 .. code-block:: console
 
     $ xsdata amadeus/schemas --config amadeus/.xsdata.xml
-
-The configuration offers more advance options to further tail the output to your needs,
-like naming conventions and aliases.
-
-
-.. command-output:: xsdata init-config --help
-
-.. command-output:: xsdata init-config --print
-
-
-.. hint::
-
-    The sample output has the default naming conventions and some example aliases.
-
-
-Conventions
------------
-
-
-**Case schemes**
-
-All schemes are using a processor that splits a string into words when it encounters
-non alphanumerical characters or when an upper case letter follows a lower case letter.
-
-.. include:: name_cases_table.rst
-
-
-.. hint::
-
-    The mixed case is joining the words without changing the original upper/lower case
-
-    The mixed underscore case is joining the words with an underscore.
-
-    The pascal/camel cases are using python's :func:`str.title` method!
-
-
-**Safe Prefixes**
-
-They are used to neutralize classes and fields names that match reserved keywords.
-
-.. code-block::
-
-    and, except, lambda, with, as, finally, nonlocal, while, assert, false, none,
-    yield, break, for, not, class, from, or, continue, global, pass, def, if, raise,
-    del, import, return, elif, in, true, else, is, try, str, int, bool, float, list,
-    optional, dict, field
-
-
-Aliases
--------
-
-The aliases allow users to override global naming conventions for class, fields package
-and module names. Each alias has a source attribute that refers to the original type
-name in the schema definition and the target attribute for output name.
-
-
-For package and module aliases the source refers to the schemas filenames or
-target namespaces depending the output structure strategy selected.
-
-.. danger::
-
-    The generator doesn't validate user defined target names.
 
 
 Download Schemas
 ================
 
 .. command-output:: xsdata download --help
-
 
 .. admonition:: Examples
     :class: hint

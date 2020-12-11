@@ -19,24 +19,56 @@ from xsdata.utils import text
 
 
 class OutputFormat(Enum):
-    """Available output formats: pydata (dataclasses), PlantUML class
-    diagram."""
+    """
+    Code writer output formats.
+
+    :cvar DATACLASS: pydata
+    :cvar PLANTUML: plantuml
+    """
 
     DATACLASS = "pydata"
     PLANTUML = "plantuml"
 
 
 class OutputStructure(Enum):
-    """Available output structure strategies, based on filenames or the target
-    namespaces."""
+    """
+    Code writer output structure strategies.
+
+    :cvar FILENAMES: filenames
+    :cvar NAMESPACES: namespaces
+    """
 
     FILENAMES = "filenames"
     NAMESPACES = "namespaces"
 
 
 class NameCase(Enum):
-    """Available naming schemes, pascal, snake, camel, mixed and mixed
-    underscore."""
+    """
+    Code writer naming schemes.
+
+    All schemes are using a processor that splits a string into words
+    when it encounters non alphanumerical characters or when an upper
+    case letter follows a lower case letter.
+
+    =========  =========  =========  ==========  =========  ===========
+    Original   Pascal     Camel      Snake       Mixed      Mixed Snake
+    =========  =========  =========  ==========  =========  ===========
+    p00p       P00P       p00P       p00p        p00p       p00p
+    USERName   Username   username   username    USERName   USERName
+    UserNAME   UserName   userName   user_name   UserNAME   User_NAME
+    USER_name  UserName   userName   user_name   USERname   USER_name
+    USER-NAME  UserName   userName   user_name   USERNAME   USER_NAME
+    User_Name  UserName   userName   user_name   UserName   User_Name
+    user_name  UserName   userName   user_name   username   user_name
+    SUserNAME  SuserName  suserName  suser_name  SUserNAME  SUser_NAME
+    =========  =========  =========  ==========  =========  ===========
+
+    :cvar PASCAL: pascalCase
+    :cvar CAMEL: camelCase
+    :cvar SNAKE: snakeCase
+    :cvar MIXED: mixedCase
+    :cvar MIXED_SNAKE: mixedSnakeCase
+    """
 
     PASCAL = "pascalCase"
     CAMEL = "camelCase"
@@ -63,6 +95,15 @@ __name_case_func__ = {
 
 
 class DocstringStyle(Enum):
+    """
+    Code writer docstring styles.
+
+    :cvar RST: reStructuredText
+    :cvar NUMPY: NumPy
+    :cvar GOOGLE: Google
+    :cvar ACCESSIBLE: Accessible
+    """
+
     RST = "reStructuredText"
     NUMPY = "NumPy"
     GOOGLE = "Google"
@@ -99,7 +140,12 @@ class NameConvention:
     Name convention model.
 
     :param case: Naming scheme, eg camelCase, snakeCase
-    :param safe_prefix: A prefix to be prepended into names that match reserved words.
+    :param safe_prefix: A prefix to be prepended into names that match
+        one of the reserved words: and, except, lambda, with, as,
+        finally, nonlocal, while, assert, false, none, yield, break,
+        for, not, class, from, or, continue, global, pass, def, if,
+        raise, del, import, return, elif, in, true, else, is, try,
+        str, int, bool, float, list, optional, dict, field
     """
 
     case: NameCase = attribute(optional=False)
@@ -134,7 +180,14 @@ class GeneratorConventions:
 @dataclass
 class GeneratorAlias:
     """
-    Alias definition model.
+    Define an alias for a module, package, class and field Alias definition
+    model.
+
+    Each alias has a source attribute that refers to the original name
+    in the schema definition and the target attribute for output name.
+    For package and module aliases the source refers to the schema
+    filename or target namespace depending the selected output
+    structure.
 
     :param source: The source name from schema definition
     :param target: The target name of the object.
@@ -149,6 +202,9 @@ class GeneratorAliases:
     """
     Generator aliases for classes, fields, packages and modules that bypass the
     global naming conventions.
+
+    .. warning::
+        The generator doesn't validate aliases.
 
     :param class_name: list of class name aliases
     :param field_name: list of field name aliases
@@ -167,7 +223,7 @@ class GeneratorConfig:
     """
     Generator configuration binding model.
 
-    :param version: xsdata version number the config was created/updated
+    :cvar version: xsdata version number the config was created/updated
     :param output: output options
     :param conventions: generator conventions
     :param aliases: generator aliases

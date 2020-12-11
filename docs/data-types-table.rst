@@ -99,7 +99,7 @@
       -
       -
       -
-    * - :class:`xml.etree.ElementTree`
+    * - :class:`xml.etree.ElementTree.QName`
       - QName
       -
       -

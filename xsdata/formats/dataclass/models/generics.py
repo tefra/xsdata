@@ -14,13 +14,13 @@ T = TypeVar("T")
 @dataclass
 class AnyElement:
     """
-    Generic ElementNode dataclass to bind xml document data to wildcard fields.
+    Generic model to bind xml document data to wildcard fields.
 
-    :param qname: The namespace qualified name.
-    :param text: Element text content.
-    :param tail: Element tail content.
-    :param children: A list of child elements.
-    :param attributes: The element key-value attribute mapping.
+    :param qname: The element's qualified name
+    :param text: The element's text content
+    :param tail: The element's tail content
+    :param children: The element's list of child elements.
+    :param attributes: The element's key-value attribute mappings.
     """
 
     qname: Optional[str] = field(default=None)
@@ -37,10 +37,11 @@ class AnyElement:
 @dataclass
 class DerivedElement(Generic[T]):
     """
-    Derived element wrapper for base types, eg. <b xsi:type="a">...</b>
+    Generic model wrapper for inline declared elements, eg. <b
+    xsi:type="a">...</b>
 
-    :param qname: The namespace qualified name of the base type.
-    :param value: A dataclass instance
+    :param qname: The element's qualified name
+    :param value: The wrapped value
     """
 
     qname: str

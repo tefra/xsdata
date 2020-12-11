@@ -1,36 +1,39 @@
-*************************
+=========================
 #16 - Substitution groups
-*************************
+=========================
 
 
+**Code Generation**
 
-**Schema**
+.. tab:: Schema
 
-.. literalinclude:: /../tests/fixtures/defxmlschema/chapter16.xsd
-   :language: xml
-   :lines: 2-
+    .. literalinclude:: /../tests/fixtures/defxmlschema/chapter16.xsd
+       :language: xml
+       :lines: 2-
 
-**Models**
+.. tab:: Models
 
-.. literalinclude:: /../tests/fixtures/defxmlschema/chapter16.py
-   :language: python
+    .. literalinclude:: /../tests/fixtures/defxmlschema/chapter16.py
+       :language: python
 
-**XML Document**
+**Data Binding**
 
-.. literalinclude:: /../tests/fixtures/defxmlschema/chapter16.xml
-   :language: xml
-   :lines: 2-
+.. tab:: Original XML Document
 
-**xsData XML Document**
+    .. literalinclude:: /../tests/fixtures/defxmlschema/chapter16.xml
+       :language: xml
+       :lines: 2-
 
-.. literalinclude:: /../tests/fixtures/defxmlschema/chapter16.xsdata.xml
-   :language: xml
-   :lines: 2-
+.. tab:: xsData XML Output
 
-**xsData JSON**
+    .. literalinclude:: /../tests/fixtures/defxmlschema/chapter16.xsdata.xml
+       :language: xml
+       :lines: 2-
 
-.. literalinclude:: /../tests/fixtures/defxmlschema/chapter16.json
-   :language: json
+.. tab:: xsData JSON Output
+
+    .. literalinclude:: /../tests/fixtures/defxmlschema/chapter16.json
+       :language: json
 
 .. admonition:: Samples Source
     :class: hint

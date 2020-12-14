@@ -117,20 +117,20 @@ class AttributeTypeHandlerTests(FactoryTestCase):
         attr_type = attr.types[0]
 
         self.processor.process_dependency_type(target, attr, attr_type)
-        mock_reset_attribute_type.assert_called_once_with(attr_type)
+        mock_reset_attribute_type.assert_called_once_with(attr_type, True)
 
     @mock.patch.object(AttributeTypeHandler, "reset_attribute_type")
     @mock.patch.object(AttributeTypeHandler, "find_dependency")
     def test_process_dependency_type_with_dummy_type(
         self, mock_find_dependency, mock_reset_attribute_type
     ):
-        mock_find_dependency.return_value = ClassFactory.create()
+        mock_find_dependency.return_value = ClassFactory.create(type=Element)
         target = ClassFactory.create()
         attr = AttrFactory.create()
         attr_type = attr.types[0]
 
         self.processor.process_dependency_type(target, attr, attr_type)
-        mock_reset_attribute_type.assert_called_once_with(attr_type)
+        mock_reset_attribute_type.assert_called_once_with(attr_type, False)
 
     @mock.patch.object(AttributeTypeHandler, "copy_attribute_properties")
     @mock.patch.object(AttributeTypeHandler, "find_dependency")

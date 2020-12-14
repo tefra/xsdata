@@ -108,7 +108,8 @@ class AttributeTypeHandler(HandlerInterface):
         source = self.find_dependency(attr_type)
         if not source or (not source.attrs and not source.extensions):
             logger.warning("Reset dummy type: %s", attr_type.name)
-            self.reset_attribute_type(attr_type)
+            use_str = not source or not source.is_complex
+            self.reset_attribute_type(attr_type, use_str)
         elif source.is_simple_type:
             self.copy_attribute_properties(source, target, attr, attr_type)
         elif not source.is_enumeration:
@@ -175,9 +176,9 @@ class AttributeTypeHandler(HandlerInterface):
         return self.dependencies[cache_key]
 
     @classmethod
-    def reset_attribute_type(cls, attr_type: AttrType):
-        """Reset the attribute type to native string."""
-        attr_type.qname = str(DataType.STRING)
+    def reset_attribute_type(cls, attr_type: AttrType, use_str: bool = True):
+        """Reset the attribute type to string or any simple type."""
+        attr_type.qname = str(DataType.STRING if use_str else DataType.ANY_SIMPLE_TYPE)
         attr_type.native = True
         attr_type.circular = False
         attr_type.forward = False

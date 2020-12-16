@@ -65,10 +65,12 @@ def safe_snake(string: str, default: str = "value") -> str:
     if re.match(r"^-\d*\.?\d+$", string):
         return f"{default}_minus_{string}"
 
+    string = string.strip("_")
+
     if not string[0].isalpha():
         return f"{default}_{string}"
 
     if string.lower() in stop_words:
         return f"{string}_{default}"
 
-    return string.strip("_")
+    return string

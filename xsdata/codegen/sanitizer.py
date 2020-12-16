@@ -1,4 +1,3 @@
-import re
 from dataclasses import dataclass
 from typing import List
 from typing import Optional
@@ -14,6 +13,7 @@ from xsdata.models.config import GeneratorConfig
 from xsdata.models.enums import DataType
 from xsdata.models.enums import Tag
 from xsdata.utils import collections
+from xsdata.utils import text
 from xsdata.utils.collections import first
 from xsdata.utils.collections import group_by
 from xsdata.utils.namespaces import build_qname
@@ -60,7 +60,6 @@ class ClassSanitizer:
         for attr in target.attrs:
             self.process_attribute_default(target, attr)
             self.process_attribute_restrictions(attr)
-            self.process_attribute_name(attr)
             self.process_attribute_sequence(target, attr)
 
         self.process_duplicate_attribute_names(target.attrs)
@@ -311,55 +310,32 @@ class ClassSanitizer:
         attr.restrictions.sequential = False
 
     @classmethod
-    def process_attribute_name(cls, attr: Attr):
-        """
-        Sanitize attribute name in preparation for duplicate attribute names
-        handler.
-
-        Steps:
-            1. Remove non alpha numerical values
-            2. Handle Enum negative numerical values
-            3. Remove namespaces prefixes
-            4. Ensure name not empty
-            5. Ensure name starts with a letter
-        """
-        if attr.is_enumeration:
-            attr.name = attr.default
-            if re.match(r"^-\d*\.?\d+$", attr.name):
-                attr.name = f"value_minus_{attr.name}"
-            else:
-                attr.name = re.sub("[^0-9a-zA-Z]", " ", attr.name).strip()
-        else:
-            attr.name = re.sub("[^0-9a-zA-Z]", " ", attr.name).strip()
-
-        if not attr.name:
-            attr.name = "value"
-        elif not attr.name[0].isalpha():
-            attr.name = f"value_{attr.name}"
-
-    @classmethod
     def process_duplicate_attribute_names(cls, attrs: List[Attr]) -> None:
         """Sanitize duplicate attribute names that might exist by applying
         rename strategies."""
-        grouped = group_by(attrs, lambda attr: attr.name.lower())
+        grouped = group_by(attrs, lambda attr: text.snake_case(attr.name))
         for items in grouped.values():
-            if len(items) > 2 or items[0].is_enumeration:
-                cls.rename_attributes_with_index(attrs, items)
-            elif len(items) == 2:
+            total = len(items)
+            if total == 2 and not items[0].is_enumeration:
                 cls.rename_attribute_by_preference(*items)
+            elif total > 1:
+                cls.rename_attributes_with_index(attrs, items)
 
     @classmethod
-    def rename_attributes_with_index(cls, all_attrs: List[Attr], rename: List[Attr]):
+    def rename_attributes_with_index(cls, attrs: List[Attr], rename: List[Attr]):
         """Append the next available index number to all the rename attributes
         names."""
         for index in range(1, len(rename)):
             num = 1
-            name = rename[index].name.lower()
+            name = text.snake_case(rename[index].name)
 
-            while any(attr.name.lower() == f"{name}_{num}" for attr in all_attrs):
+            while any(
+                text.snake_case(attr.name) == text.snake_case(f"{name}_{num}")
+                for attr in attrs
+            ):
                 num += 1
 
-            rename[index].name = f"{name}_{num}"
+            rename[index].name = f"{rename[index].name}_{num}"
 
     @classmethod
     def rename_attribute_by_preference(cls, a: Attr, b: Attr):

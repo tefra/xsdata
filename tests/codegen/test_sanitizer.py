@@ -38,14 +38,12 @@ class ClassSanitizerTest(FactoryTestCase):
 
     @mock.patch.object(ClassSanitizer, "process_duplicate_attribute_names")
     @mock.patch.object(ClassSanitizer, "process_attribute_sequence")
-    @mock.patch.object(ClassSanitizer, "process_attribute_name")
     @mock.patch.object(ClassSanitizer, "process_attribute_restrictions")
     @mock.patch.object(ClassSanitizer, "process_attribute_default")
     def test_process_class(
         self,
         mock_process_attribute_default,
         mock_process_attribute_restrictions,
-        mock_process_attribute_name,
         mock_process_attribute_sequence,
         mock_process_duplicate_attribute_names,
     ):
@@ -69,7 +67,6 @@ class ClassSanitizerTest(FactoryTestCase):
 
         mock_process_attribute_default.assert_has_calls(calls_with_target)
         mock_process_attribute_restrictions.assert_has_calls(calls_without_target)
-        mock_process_attribute_name.assert_has_calls(calls_without_target)
         mock_process_attribute_sequence.assert_has_calls(calls_with_target)
         mock_process_duplicate_attribute_names.assert_has_calls(
             [mock.call(target.inner[0].attrs), mock.call(target.attrs)]
@@ -272,28 +269,6 @@ class ClassSanitizerTest(FactoryTestCase):
             self.sanitizer.process_attribute_restrictions(attr)
             self.assertEqual(expected[idx], res.asdict())
 
-    def test_process_attribute_name(self):
-        attr = AttrFactory.create(name="a")
-
-        self.sanitizer.process_attribute_name(attr)
-        self.assertEqual("a", attr.name)
-
-        attr.name = "1"
-        self.sanitizer.process_attribute_name(attr)
-        self.assertEqual("value_1", attr.name)
-
-        attr.name = "foo_+-bar"
-        self.sanitizer.process_attribute_name(attr)
-        self.assertEqual("foo   bar", attr.name)
-
-        attr.name = "+ -  *"
-        self.sanitizer.process_attribute_name(attr)
-        self.assertEqual("value", attr.name)
-
-        attr = AttrFactory.enumeration(default="-20.55")
-        self.sanitizer.process_attribute_name(attr)
-        self.assertEqual("value_minus_-20.55", attr.name)
-
     def test_sanitize_duplicate_attribute_names(self):
         attrs = [
             AttrFactory.create(name="a", tag=Tag.ELEMENT),
@@ -307,10 +282,10 @@ class ClassSanitizerTest(FactoryTestCase):
             AttrFactory.create(name="e", tag=Tag.ELEMENT),
             AttrFactory.create(name="f", tag=Tag.ELEMENT),
             AttrFactory.create(name="f", tag=Tag.ELEMENT, namespace="a"),
-            AttrFactory.create(name="g", tag=Tag.ENUMERATION),
-            AttrFactory.create(name="g", tag=Tag.ENUMERATION),
-            AttrFactory.create(name="G", tag=Tag.ENUMERATION),
-            AttrFactory.create(name="g_1", tag=Tag.ENUMERATION),
+            AttrFactory.create(name="gA", tag=Tag.ENUMERATION),
+            AttrFactory.create(name="g[A]", tag=Tag.ENUMERATION),
+            AttrFactory.create(name="g_a", tag=Tag.ENUMERATION),
+            AttrFactory.create(name="g_a_1", tag=Tag.ENUMERATION),
         ]
 
         self.sanitizer.process_duplicate_attribute_names(attrs)
@@ -326,10 +301,10 @@ class ClassSanitizerTest(FactoryTestCase):
             "e",
             "f",
             "a_f",
-            "g",
-            "g_2",
-            "g_3",
-            "g_1",
+            "gA",
+            "g[A]_2",
+            "g_a_3",
+            "g_a_1",
         ]
         self.assertEqual(expected, [x.name for x in attrs])
 

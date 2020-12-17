@@ -239,13 +239,17 @@ class SchemaParserTests(TestCase):
             self.parser.resolve_local_path(None, Namespace.XSI.uri),
         )
 
-        self.assertEqual(
-            Namespace.XSI.location,
-            self.parser.resolve_local_path("http://something", Namespace.XSI.uri),
-        )
         iam = Path(__file__)
         self.parser.location = iam.as_uri()
         self.assertEqual(iam.as_uri(), self.parser.resolve_local_path(iam.name, None))
+        self.assertEqual(
+            "http://something",
+            self.parser.resolve_local_path("http://something", Namespace.XSI.uri),
+        )
+        self.assertEqual(
+            iam.parent.parent.joinpath("xsi.xsd").as_uri(),
+            self.parser.resolve_local_path("../xsi.xsd", Namespace.XSI.uri),
+        )
 
     def test_end_attribute(self):
         attribute = Attribute()

@@ -167,6 +167,9 @@ context instance between them to save on memory and processing.
        * - xml_version
          - str
          - XML Version number, default: ``1.0``
+       * - xml_declaration
+         - bool
+         - Generate XML declaration, default ``True``
        * - pretty_print
          - bool
          - Enable pretty output, default ``False``

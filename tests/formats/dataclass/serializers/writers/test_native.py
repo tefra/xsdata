@@ -35,6 +35,14 @@ class XmlEventWriterTests(TestCase):
 
         self.assertEqual('<?xml version="1.1" encoding="US-ASCII"?>', xml_declaration)
 
+    def test_declaration_disabled(self):
+        self.serializer.config.xml_declaration = False
+        actual = self.serializer.render(books, {None: "urn:books"})
+        expected = fixtures_dir.joinpath("books/books_default_ns.xml").read_text()
+        xml_declaration, expected = expected.split("\n", 1)
+
+        self.assertEqual(expected, actual)
+
     def test_pretty_print_false(self):
         self.serializer.config.pretty_print = False
         actual = self.serializer.render(books)

@@ -91,8 +91,9 @@ class XmlWriter:
         self.handler.endDocument()
 
     def start_document(self):
-        self.output.write(f'<?xml version="{self.config.xml_version}"')
-        self.output.write(f' encoding="{self.config.encoding}"?>\n')
+        if self.config.xml_declaration:
+            self.output.write(f'<?xml version="{self.config.xml_version}"')
+            self.output.write(f' encoding="{self.config.encoding}"?>\n')
 
     def start_tag(self, qname: str):
         """

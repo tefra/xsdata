@@ -167,7 +167,11 @@ class SchemaParser(XmlParser):
 
         common_ns = Namespace.get_enum(namespace)
         local_path = common_ns.location if common_ns else None
-        return local_path if local_path else self.resolve_path(location)
+
+        if local_path and (not location or location.find("w3.org/") > 0):
+            return local_path
+
+        return self.resolve_path(location)
 
     def end_attribute(self, obj: T):
         """Assign the schema's default form for attributes if the given

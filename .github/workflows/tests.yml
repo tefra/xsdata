@@ -14,7 +14,8 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - {name: PyPy 3, python: pypy3, os: ubuntu}
+          - {name: PyPy 3.6, python: pypy-3.6, os: ubuntu}
+          - {name: PyPy 3.7, python: pypy-3.7, os: ubuntu}
           - {name: Python 3.6, python: 3.6, os: ubuntu}
           - {name: Python 3.7, python: 3.7, os: ubuntu}
           - {name: Python 3.8, python: 3.8, os: ubuntu}
@@ -28,7 +29,7 @@ jobs:
         with:
           python-version: ${{ matrix.python }}
       - name: Install libxml2
-        if: matrix.python == 'pypy3'
+        if: matrix.python == 'pypy-3.6' || matrix.python == 'pypy-3.7'
         run: |
           sudo apt-get install libxml2-dev libxslt-dev
       - name: Install dependencies

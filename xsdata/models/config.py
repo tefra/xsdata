@@ -44,8 +44,11 @@ class NameCase(Enum):
     MIXED = "mixedCase"
     MIXED_SNAKE = "mixedSnakeCase"
 
+    def __call__(self, string: str) -> str:
+        return self.callback(string)
+
     @property
-    def func(self) -> Callable:
+    def callback(self) -> Callable:
         """Return the actual callable of the scheme."""
         return __name_case_func__[self.value]
 

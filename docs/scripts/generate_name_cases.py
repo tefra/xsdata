@@ -23,7 +23,7 @@ output = [
 
 result = {}
 for case in NameCase:
-    lookup = case.func.__name__
+    lookup = case.callback.__name__
     result[lookup] = re.findall(
         rf"assertEqual\(\"(.*)\"\, {lookup}\(\"(.*)\"\)\)", source
     )

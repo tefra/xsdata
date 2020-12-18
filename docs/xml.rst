@@ -67,7 +67,7 @@ performance and features.
     You can also extend one of them if you want to do any optimizations or
     customize the default behaviour.
 
-API: :ref:`Reference <Xml Handlers>`
+API: :ref:`Reference <XML Handlers>`
 
 
 Serializing XML
@@ -124,26 +124,13 @@ API :ref:`Reference <SerializerConfig>`.
 Alternative Writers
 -------------------
 
-xsData ships with multiple writers based on lxml and native python.
+xsData ships with multiple writers based on lxml and native python that may vary
+in performance in some cases. The output of all them is consistent with a few
+exceptions when handling mixed content with ``pretty_print=True``.
 
 .. literalinclude:: examples/xml_serializer_alternative_writer.py
 
-:class:`~xsdata.formats.dataclass.serializers.writers.LxmlEventWriter`
-
-It's based on the lxml `ElementTreeContentHandler`, which means your object tree
-will first be converted to an lxml ElementTree and then to string. Despite that since
-it's lxml it's still pretty fast and supports special characters and encodings a bit
-better than the native python writer.
-
-:class:`~xsdata.formats.dataclass.serializers.writers.XmlEventWriter`
-
-It's based on the native python :class:`xml.sax.saxutils.XMLGenrator` with support for
-indentation. The object tree is converted directly to string without any intermediate
-steps, which makes it's slightly faster than the lxml implementation and more memory
-efficient if you write directly to an output stream.
-
-The pretty print output is identical to the lxml's except for some mixed content cases,
-because of the nature of a sax content handler.
+API: :ref:`Reference <XML Writers>`
 
 
 XML Benchmarks

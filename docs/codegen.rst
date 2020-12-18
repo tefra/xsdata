@@ -139,7 +139,7 @@ Initialize Config
 =================
 
 Initialize a project configuration with more advanced features, see
-:ref:`more <Configuration Config>`.
+:ref:`more <Generator Config>`.
 
 .. command-output:: xsdata init-config --help
 

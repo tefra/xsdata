@@ -18,7 +18,7 @@ NoneType = type(None)
 @dataclass(frozen=True)
 class XmlVar:
     """
-    Dataclass field bind metadata.
+    Dataclass field binding metadata.
 
     :param name: Field name.
     :param qname: The namespace qualified local name.
@@ -124,7 +124,7 @@ class XmlVar:
 
 @dataclass(frozen=True)
 class XmlElement(XmlVar):
-    """Dataclass field bind metadata for xml elements."""
+    """Dataclass field binding metadata for xs:element."""
 
     @property
     def is_element(self) -> bool:
@@ -137,7 +137,7 @@ class XmlElement(XmlVar):
 
 @dataclass(frozen=True)
 class XmlElements(XmlVar):
-    """Dataclass field bind metadata for compound list of xml elements."""
+    """Dataclass field binding metadata for xs:group elements."""
 
     @property
     def is_elements(self) -> bool:
@@ -200,7 +200,7 @@ class XmlElements(XmlVar):
 
 @dataclass(frozen=True)
 class XmlWildcard(XmlVar):
-    """Dataclass field bind metadata for xml wildcard elements."""
+    """Dataclass field binding metadata for xs:any (wildcard) elements."""
 
     @property
     def is_mixed_content(self) -> bool:
@@ -238,7 +238,7 @@ class XmlWildcard(XmlVar):
 
 @dataclass(frozen=True)
 class XmlAttribute(XmlVar):
-    """Dataclass field bind metadata for xml attributes."""
+    """Dataclass field binding metadata for xs:anyAttributes."""
 
     @property
     def is_attribute(self) -> bool:
@@ -289,7 +289,7 @@ find_predicates = {
 @dataclass(frozen=True)
 class XmlMeta:
     """
-    Dataclass model bind metadata.
+    Dataclass binding metadata.
 
     :param clazz: The dataclass type
     :param qname: The namespace qualified name.

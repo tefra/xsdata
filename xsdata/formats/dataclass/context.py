@@ -32,8 +32,7 @@ from xsdata.utils.namespaces import build_qname
 @dataclass
 class XmlContext:
     """
-    Generate and cache the necessary metadata to bind an xml document data to a
-    dataclass model.
+    The service provider for binding operations metadata.
 
     :param element_name: Default callable to convert field names to element tags
     :param attribute_name: Default callable to convert field names to attribute tags
@@ -60,11 +59,11 @@ class XmlContext:
         Fetch the model metadata of the given dataclass type, namespace and xsi
         type.
 
-        :param clazz: A dataclass model
-        :param parent_ns: The parent dataclass namespace if present.
+        :param clazz: The requested dataclass type
+        :param parent_ns: The inherited parent namespace
         :param xsi_type: if present it means that the given clazz is derived and the
             lookup procedure needs to check and match a dataclass model to the qualified
-            name instead.
+            name instead
         """
         meta = self.build(clazz, parent_ns)
         subclass = None
@@ -98,6 +97,8 @@ class XmlContext:
 
         - Ignores native schema types, xs:string, xs:float, xs:int, ...
         - Rebuild cache if new modules were imported since last run
+
+        :param qname: Qualified name
         """
         if not DataType.from_qname(qname):
             self.build_xsi_cache()
@@ -107,12 +108,23 @@ class XmlContext:
         return []
 
     def find_type(self, qname: str) -> Optional[Type[T]]:
-        """Return the most recently imported class that matches the given
-        xsi:type qname."""
+        """
+        Return the most recently imported class that matches the given xsi:type
+        qname.
+
+        :param qname: Qualified name
+        """
         types: List[Type] = self.find_types(qname)
         return types[-1] if types else None
 
     def find_type_by_fields(self, field_names: Set) -> Optional[Type[T]]:
+        """
+        Find a dataclass from all the imported modules that matches the given
+        list of field names.
+
+        :param field_names: A unique list of field names
+        """
+
         self.build_xsi_cache()
         for types in self.xsi_cache.values():
             for clazz in types:
@@ -122,9 +134,14 @@ class XmlContext:
         return None
 
     def find_subclass(self, clazz: Type, qname: str) -> Optional[Type]:
-        """Compare all classes that match the given xsi:type qname and return
-        the first one that is either a subclass or shares the same parent class
-        as the original class."""
+        """
+        Compare all classes that match the given xsi:type qname and return the
+        first one that is either a subclass or shares the same parent class as
+        the original class.
+
+        :param clazz: The search dataclass type
+        :param qname: Qualified name
+        """
 
         types: List[Type] = self.find_types(qname)
         for tp in types:
@@ -135,8 +152,13 @@ class XmlContext:
         return None
 
     def build(self, clazz: Type, parent_ns: Optional[str] = None) -> XmlMeta:
-        """Fetch from cache or build the metadata object for the given class
-        and parent namespace."""
+        """
+        Fetch from cache or build the binding metadata for the given class and
+        parent namespace.
+
+        :param clazz: A dataclass type
+        :param parent_ns: The inherited parent namespace
+        """
 
         if clazz not in self.cache:
 
@@ -163,7 +185,12 @@ class XmlContext:
         return self.cache[clazz]
 
     def get_type_hints(self, clazz: Type, parent_ns: Optional[str]) -> Iterator[XmlVar]:
-        """Build the model class fields metadata."""
+        """
+        Build the model fields binding metadata.
+
+        :param clazz: The requested dataclass type
+        :param parent_ns: The inherited parent namespace
+        """
         type_hints = get_type_hints(clazz)
         default_xml_type = self.default_xml_type(clazz)
 
@@ -265,6 +292,11 @@ class XmlContext:
         the given namespace is empty.
 
         In case of wildcard try to decode the ##any, ##other, ##local, ##target.
+
+
+        :param xml_type: The xml type (Text|Element(s)|Attribute(s)|Wildcard)
+        :param namespace: The field namespace
+        :param parent_namespace: The parent namespace
         """
         if xml_type in (XmlType.ELEMENT, XmlType.WILDCARD) and namespace is None:
             namespace = parent_namespace
@@ -286,7 +318,13 @@ class XmlContext:
 
     @classmethod
     def default_namespace(cls, namespaces: List[str]) -> Optional[str]:
-        """Return the first valid namespace uri or None."""
+        """
+        Return the first valid namespace uri or None.
+
+        :param namespaces: A list of namespace options which may
+            include valid uri(s) or one of the ##any, ##other,
+            ##targetNamespace, ##local
+        """
         for namespace in namespaces:
             if namespace and not namespace.startswith("#"):
                 return namespace
@@ -295,7 +333,7 @@ class XmlContext:
 
     @classmethod
     def default_value(cls, var: Field) -> Any:
-        """Return the default value/factory for the given field."""
+        """Return the default value/factory for the given dataclass field."""
 
         if var.default_factory is not MISSING:  # type: ignore
             return var.default_factory  # type: ignore
@@ -307,8 +345,11 @@ class XmlContext:
 
     @classmethod
     def real_types(cls, type_hint: Any) -> List:
-        """Return a list of real types that can be used to bind or cast
-        data."""
+        """
+        Return a list of real types that can be used to bind or cast data.
+
+        :param type_hint: A typing declaration
+        """
         types = []
         if type_hint is Dict:
             types.append(type_hint)
@@ -326,8 +367,12 @@ class XmlContext:
 
     @classmethod
     def is_derived(cls, obj: Any, clazz: Type) -> bool:
-        """Return whether the given obj is derived from the given dataclass
-        type."""
+        """
+        Return whether the given obj is derived from the given dataclass type.
+
+        :param obj: A dataclass instance
+        :param clazz: A dataclass type
+        """
 
         if obj is None:
             return False
@@ -351,8 +396,12 @@ class XmlContext:
 
     @classmethod
     def default_xml_type(cls, clazz: Type) -> str:
-        """Return the default xml type for the fields of the given dataclass
-        with an undefined type."""
+        """
+        Return the default xml type for the fields of the given dataclass with
+        an undefined type.
+
+        :param clazz: A dataclass type
+        """
         counters: Dict[str, int] = defaultdict(int)
         for var in fields(clazz):
             xml_type = var.metadata.get("type")

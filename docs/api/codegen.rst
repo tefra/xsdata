@@ -1,10 +1,6 @@
-==================
-Code Generator API
-==================
-
-
-Configuration Config
-====================
+================
+Generator Config
+================
 
 The configuration offers more advance options to further tail the output to your needs,
 like naming conventions and aliases.
@@ -15,7 +11,7 @@ like naming conventions and aliases.
 .. currentmodule:: xsdata.models.config
 
 .. autosummary::
-    :toctree: ../reference
+    :toctree: reference
     :template: dataclass.rst
     :nosignatures:
 

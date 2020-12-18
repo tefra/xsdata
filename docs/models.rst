@@ -121,7 +121,7 @@ container for other elements, attributes, text or any combination of them.
             "name": "annotation",
             "type": "Element",
             "namespace": "http://www.w3.org/XML/2004/xml-schema-test-suite/",
-        )
+        }
     )
 
 .. code-block:: xml
@@ -219,7 +219,6 @@ marshalling.
     If your compound field includes only unique types and you are working with a
     dataclass instance manually you can skip the usage of the wrapper as the xml
     serializer will try to match a type to a choice as well.
-
 
     ``obj.node_or_id_or_idref.extend(("a", "b", 1, "c", "2"))``
 

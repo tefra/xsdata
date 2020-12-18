@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config xmlns="http://pypi.org/project/xsdata" version="20.12">
+  <Output wsdl="false" maxLineLength="79">
+    <Package>generated</Package>
+    <Format>pydata</Format>
+    <Structure>filenames</Structure>
+    <DocstringStyle>reStructuredText</DocstringStyle>
+    <CompoundFields>false</CompoundFields>
+  </Output>
+  <Conventions>
+    <ClassName case="pascalCase" safePrefix="type"/>
+    <FieldName case="snakeCase" safePrefix="value"/>
+    <ModuleName case="snakeCase" safePrefix="mod"/>
+    <PackageName case="snakeCase" safePrefix="pkg"/>
+  </Conventions>
+  <Aliases>
+    <ClassName source="fooType" target="Foo"/>
+    <ClassName source="ABCSomething" target="ABCSomething"/>
+    <FieldName source="ChangeofGauge" target="change_of_gauge"/>
+    <PackageName source="http://www.w3.org/1999/xhtml" target="xtml"/>
+    <ModuleName source="2010.1" target="2020a"/>
+  </Aliases>
+</Config>

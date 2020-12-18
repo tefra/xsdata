@@ -34,9 +34,10 @@ extensions = [
     "sphinx.ext.autosectionlabel",
     "sphinx.ext.viewcode",
     "sphinx.ext.githubpages",
+    "sphinx.ext.autosummary",
     "sphinx_autodoc_typehints",
     "sphinx_inline_tabs",
-    "sphinxcontrib.apidoc",
+    "sphinx_copybutton",
     "sphinxcontrib.programoutput",
 ]
 
@@ -92,11 +93,13 @@ html_theme_options = {
 }
 
 intersphinx_mapping = {"python": ("https://docs.python.org/3", None)}
-autodoc_member_order = "bysource"
 
-apidoc_module_dir = "../xsdata"
-apidoc_output_dir = "reference"
-apidoc_excluded_paths = ["tests"]
-apidoc_separate_modules = True
+autodoc_default_options = {
+    "member-order": "bysource",
+    "special-members": None,
+    "exclude-members": "__dict__,__weakref__",  # Exclude "standard" methods.
+}
+
+autosummary_generate = True
 set_type_checking_flag = True
 always_document_param_types = True

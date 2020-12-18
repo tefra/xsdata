@@ -2,70 +2,57 @@
 JSON Binding
 ============
 
+Binding JSON lacks a bit in features and for edge cases with wildcards and derived
+types doing roundtrip conversions is not always possible.
 
-:class:`~xsdata.formats.dataclass.parsers.JsonParser`
-=====================================================
+Parsing JSON
+============
 
-The parser has three instance methods `from_string`, `from_bytes` and `from_path`,
-to parse from memory or to let the parser load the input document.
+From Path
+---------
 
-.. hint::
+.. literalinclude:: examples/json_parser_from_path.py
 
-    You can optionally specify the target binding class or let the context instance
-    to scan all imported modules for a matching dataclass.
+From String
+-----------
 
-**Parameters**
-    **context** (:class:`~xsdata.formats.dataclass.context.XmlContext`)
+.. literalinclude:: examples/json_parser_from_string.py
 
-    The cache layer for the binding directives of models and their fields. You may
-    share a context instance between parser/serializer instances to avoid compiling the
-    cache more than once.
+From Bytes
+----------
 
-    .. hint::
+.. literalinclude:: examples/json_parser_from_bytes.py
 
-        it's recommended to use a static or global instance of your parser or serializer
-        per document type.
+Unknown target type
+-------------------
 
-.. code-block:: python
+It's optimal to provide the target model but completely optional. The parser can scan
+all the imported modules to find a matching dataclass.
 
-    >>> from xsdata.formats.dataclass.parsers import JsonParser
-    >>> from xsdata.formats.dataclass.context import XmlContext
-    >>> from tests.fixtures.defxmlschema.chapter05 import Order
-    >>> from pathlib import Path
-    >>>
-    >>> parser = JsonParser(context=XmlContext())
-    >>> parser.from_path(Path("../tests/fixtures/defxmlschema/chapter04.json"), Order)
-    Order(items=ItemsType(product=[Product(number=557, name='Short-Sleeved Linen Blouse', size=SizeType(value=10, system='US-DRESS'))]))
+.. literalinclude:: examples/json_parser_unknown_target.py
 
+Serializing JSON
+================
 
+Render to string
+----------------
 
-:class:`~xsdata.formats.dataclass.serializers.JsonSerializer`
-=============================================================
+.. literalinclude:: examples/json_serializer_basic.py
+    :lines: 1-5
 
-The serializer besides the `indent` option can be initialized with a custom encoder
-that needs to extends :py:class:`json.JSONEncoder` and a dict_factory with your custom
-logic.
+.. literalinclude:: examples/json_serializer_basic.py
+    :language: json
+    :lines: 7-20
 
+Custom Dict factory
+-------------------
 
-Example: dict factory that filters None values.
+You can override the default dict factory to do extra steps like filtering `None`
+values.
 
-.. code-block:: python
+.. literalinclude:: examples/json_serializer_custom_factory.py
+    :lines: 7-12
 
-    >>> from xsdata.formats.dataclass.serializers import JsonSerializer
-    >>>
-    >>> serializer = JsonSerializer(indent=2, dict_factory=lambda x: {k: v for k, v in x if v is not None})
-    >>> pprint.pprint(serializer.render(obj))
-    >>> ('{\n'
-    >>>  '  "items": {\n'
-    >>>  '    "product": [\n'
-    >>>  '      {\n'
-    >>>  '        "number": 557,\n'
-    >>>  '        "name": "Short-Sleeved Linen Blouse",\n'
-    >>>  '        "size": {\n'
-    >>>  '          "value": 10,\n'
-    >>>  '          "system": "US-DRESS"\n'
-    >>>  '        }\n'
-    >>>  '      }\n'
-    >>>  '    ]\n'
-    >>>  '  }\n'
-    >>>  '}')
+.. literalinclude:: examples/json_serializer_custom_factory.py
+    :language: json
+    :lines: 14-24

@@ -73,8 +73,8 @@ docstring-style
 
 Choose the style of the generated docstrings.
 
-The accessible a custom style offering easy access to dataclasses fields and
-enum members docs for doc/api generators.
+The accessible is a custom style offering easy access to the docstrings
+of a dataclass' fields or an enum' members for doc/api generators.
 
 .. tab:: reStructuredText
 

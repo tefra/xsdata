@@ -24,9 +24,9 @@ from xsdata.utils.constants import EMPTY_MAP
 @dataclass
 class JsonParser(AbstractParser):
     """
-    Json parsing and binding for dataclasses.
+    Json parser for dataclasses.
 
-    :param context: Model metadata builder
+    :param context: Model context provider
     """
 
     context: XmlContext = field(default_factory=XmlContext)

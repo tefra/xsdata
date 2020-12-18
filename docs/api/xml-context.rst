@@ -20,6 +20,7 @@ XML Context
     :nosignatures:
 
     XmlMeta
+    XmlVar
     XmlText
     XmlElement
     XmlElements

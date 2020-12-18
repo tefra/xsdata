@@ -41,7 +41,7 @@ class ElementNode(XmlNode):
     :param attrs: Key-value attribute mapping
     :param ns_map: Namespace prefix-URI map
     :param config: Parser configuration
-    :param context: Model xml metadata builder
+    :param context: Model context provider
     :param position: The node position of objects cache
     :param derived: The xml element is derived from a base type
     """
@@ -293,7 +293,7 @@ class UnionNode(XmlNode):
     :param attrs: Key-value attribute mapping
     :param ns_map: Namespace prefix-URI map
     :param position: The node position of objects cache
-    :param context: Model xml context cache
+    :param context: Model context provider
     :param level: Current node level
     :param events: Record node events
     """
@@ -391,7 +391,7 @@ class NodeParser(PushParser):
     Bind xml nodes to dataclasses.
 
     :param config: Parser configuration
-    :param context: Model metadata builder
+    :param context: Model context provider
     :param handler: Override default XmlHandler
     :ivar ms_map: Namespace registry of parsed prefix-URI mappings
     """

@@ -37,8 +37,8 @@ class XmlSerializer(AbstractSerializer):
     Xml serializer for dataclasses.
 
     :param config: Serializer configuration
-    :param context: XmlContext instance
-    :param writer: xml writer type
+    :param context: Model context provider
+    :param writer: Override default XmlWriter
     """
 
     config: SerializerConfig = field(default_factory=SerializerConfig)

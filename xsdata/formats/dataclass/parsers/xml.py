@@ -19,12 +19,12 @@ from xsdata.utils.text import snake_case
 @dataclass
 class XmlParser(NodeParser):
     """
-    Bind xml nodes to dataclasses with event hooks.
+    Xml parser for dataclasses.
 
     :param config: Parser configuration
-    :param context: Model metadata builder
+    :param context: Model context provider
     :param handler: Override default XmlHandler
-    :ivar ms_map: Namespace registry of parsed prefix-URI mappings
+    :ivar ms_map: The prefix-URI map generated during parsing
     :ivar emit_cache: Qname to event name cache
     """
 
@@ -93,7 +93,6 @@ class XmlParser(NodeParser):
         Example::
 
             event=start, name={urn}bookTitle -> start_booking_title(**kwargs)
-
 
         :param event: Event type start|end
         :param name: Element qualified name

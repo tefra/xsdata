@@ -46,7 +46,7 @@ class JsonEncoder(json.JSONEncoder):
 @dataclass
 class JsonSerializer(AbstractSerializer):
     """
-    Simple json.dumps wrapper.
+    Json serializer for dataclasses.
 
     :param indent: output indentation.
     :param encoder: Value encoder.

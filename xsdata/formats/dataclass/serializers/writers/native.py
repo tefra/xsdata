@@ -7,9 +7,23 @@ from xsdata.formats.dataclass.serializers.mixins import XmlWriter
 
 @dataclass
 class XmlEventWriter(XmlWriter):
+    """
+    :class:`~xsdata.formats.dataclass.serializers.mixins.XmlWriter`
+    implementation based on native python.
+
+    Based on the native python :class:`xml.sax.saxutils.XMLGenerator`
+    with support for indentation. Converts sax events directly to xml
+    output without storing intermediate result to memory.
+
+    :param config: Configuration instance
+    :param output: Output text stream
+    :param ns_map: User defined namespace prefix-URI map
+    """
+
+    # Score vars
     handler: XMLGenerator = field(init=False)
-    depth: int = field(default=0, init=False)
-    ended: int = field(default=0, init=False)
+    current_level: int = field(default=0, init=False)
+    pending_end_element: bool = field(default=False, init=False)
 
     def __post_init__(self):
         self.handler = XMLGenerator(
@@ -22,25 +36,25 @@ class XmlEventWriter(XmlWriter):
         super().start_tag(qname)
 
         if self.config.pretty_print:
-            if self.depth:
+            if self.current_level:
                 self.handler.ignorableWhitespace("\n")
-                self.handler.ignorableWhitespace("  " * self.depth)
+                self.handler.ignorableWhitespace("  " * self.current_level)
 
-            self.depth += 1
-            self.ended = 0
+            self.current_level += 1
+            self.pending_end_element = False
 
     def end_tag(self, qname: str):
         if not self.config.pretty_print:
             super().end_tag(qname)
             return
 
-        self.depth -= 1
-        if self.ended:
+        self.current_level -= 1
+        if self.pending_end_element:
             self.handler.ignorableWhitespace("\n")
-            self.handler.ignorableWhitespace("  " * self.depth)
+            self.handler.ignorableWhitespace("  " * self.current_level)
 
         super().end_tag(qname)
 
-        self.ended += 1
-        if not self.depth:
+        self.pending_end_element = True
+        if not self.current_level:
             self.handler.ignorableWhitespace("\n")

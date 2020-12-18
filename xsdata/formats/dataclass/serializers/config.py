@@ -6,6 +6,8 @@ from typing import Optional
 @dataclass
 class SerializerConfig:
     """
+    Serializers configuration options.
+
     :param encoding: Text encoding
     :param xml_version: XML Version number (1.0|1.1)
     :param xml_declaration: Generate XML declaration

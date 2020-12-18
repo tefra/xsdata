@@ -59,41 +59,15 @@ performance and features.
 
 .. literalinclude:: examples/xml_parser_alternative_handler.py
 
-:class:`~xsdata.formats.dataclass.parsers.handlers.LxmlEventHandler`
-
-It's based on `lxml.etree.iterparse` incremental parser and offers the best
-balance between features and performance. If the xinclude parser config is enabled
-the handler will parse the whole tree and then use `iterwalk` to feed the main parser
-with element events.
-
-:class:`~xsdata.formats.dataclass.parsers.handlers.LxmlSaxHandler`
-
-It's based on the lxml target parser interface. `xinclude` statements are not supported
-and is quite slower than the iterparse implementation.
-
-:class:`~xsdata.formats.dataclass.parsers.handlers.XmlEventHandler`
-
-It's based on the native python xml.etree.ElementTree.interparse incremental parser.
-`xinclude` statements are not supported and it doesn't support the newly allowed
-characters in XML 1.1. Despite it's drawbacks in some cases it's slightly faster than
-the lxml iterparse implementation.
-
-:class:`~xsdata.formats.dataclass.parsers.handlers.XmlSaxHandler`
-
-It's based on the native python xml.sax.ContentHandler and doesn't support `xinclude`
-statements and is a lot slower than the iterparse implementation.
-
 .. hint::
 
-    Why keep them all? The hard part was the decouple of the parser from a specific
-    implementation. The handlers are quite simple and very easy to test.
-
-    It's also recommended to give all of them a try, based on your use case you
+    It's recommended to give all of them a try, based on your use case you
     might get different results.
 
-    You can also extend one of them if you want to do any optimization like skipping
-    irrelevant events earlier than the binding process when it's instructed
-    to skip unknown properties.
+    You can also extend one of them if you want to do any optimizations or
+    customize the default behaviour.
+
+API: :ref:`Reference <Xml Handlers>`
 
 
 Serializing XML

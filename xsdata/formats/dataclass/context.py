@@ -37,15 +37,18 @@ class XmlContext:
 
     :param element_name: Default callable to convert field names to element tags
     :param attribute_name: Default callable to convert field names to attribute tags
-    :param cache: Cache models metadata
-    :param xsi_cache: Index models by xsi:type
+    :ivar cache: Cache models metadata
+    :ivar xsi_cache: Index models by xsi:type
+    :ivar sys_modules: Number of imported modules
     """
 
     element_name: Callable = field(default=lambda x: x)
     attribute_name: Callable = field(default=lambda x: x)
-    cache: Dict[Type, XmlMeta] = field(default_factory=dict)
-    xsi_cache: Dict[str, List[Type]] = field(default_factory=lambda: defaultdict(list))
-    sys_modules: int = field(default=0, init=False)
+    cache: Dict[Type, XmlMeta] = field(init=False, default_factory=dict)
+    xsi_cache: Dict[str, List[Type]] = field(
+        init=False, default_factory=lambda: defaultdict(list)
+    )
+    sys_modules: int = field(init=False, default_factory=int)
 
     def fetch(
         self,

@@ -21,7 +21,7 @@ output = [
 
 custom_classes = {
     "Decimal": "decimal.Decimal",
-    "QName": "xml.etree.ElementTree",
+    "QName": "xml.etree.ElementTree.QName",
 }
 
 

@@ -34,7 +34,7 @@ NoneStr = Optional[str]
 @dataclass
 class XmlSerializer(AbstractSerializer):
     """
-    Xml serialize for dataclasses.
+    Xml serializer for dataclasses.
 
     :param config: Serializer configuration
     :param context: XmlContext instance
@@ -49,7 +49,8 @@ class XmlSerializer(AbstractSerializer):
         """
         Convert and return the given object tree as xml string.
 
-        Optionally provide a prefix-URI namespaces mapping.
+        :param obj: The input dataclass instance
+        :param ns_map: User defined namespace prefix-URI map
         """
         output = StringIO()
         self.write(output, obj, ns_map)
@@ -57,9 +58,11 @@ class XmlSerializer(AbstractSerializer):
 
     def write(self, out: TextIO, obj: Any, ns_map: Optional[Dict] = None):
         """
-        Write the given object tree to output text stream.
+        Write the given object tree to the output text stream.
 
-        Optionally provide a prefix-URI namespaces mapping.
+        :param out: The output stream
+        :param obj: The input dataclass instance
+        :param ns_map: User defined namespace prefix-URI map
         """
         events = self.write_object(obj)
         handler = self.writer(

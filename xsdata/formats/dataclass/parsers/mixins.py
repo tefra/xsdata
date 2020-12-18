@@ -59,11 +59,12 @@ class PushParser(AbstractParser):
 
 class XmlNode(abc.ABC):
     """
-    A generic interface for xml nodes that need to implement the two public
-    methods to be used in an event based parser with start/end element events.
+    The xml node interface.
 
-    The parser needs to maintain a queue for these nodes and a list of
-    objects that these nodes return.
+    The nodes are responsible to find and queue the child nodes when a
+    new element starts and build the resulting object tree when the
+    element ends. The parser needs to maintain a queue for these nodes
+    and a list of all the intermediate object trees.
     """
 
     @abc.abstractmethod
@@ -72,34 +73,46 @@ class XmlNode(abc.ABC):
         Initialize the next child node to be queued, when a new xml element
         starts.
 
-        This entry point is responsible to create the next node type
-        with all the necessary information on how to bind the incoming
-        input data.
+        This entry point is responsible to create the next node
+        type with all the necessary information on how to bind
+        the incoming input data.
+
+        :param qname: Qualified name
+        :param attrs: Attribute key-value map
+        :param ns_map: Namespace prefix-URI map
+        :param position: The current objects position, to mark future
+            objects as children
         """
 
     @abc.abstractmethod
     def bind(self, qname: str, text: NoneStr, tail: NoneStr, objects: List) -> bool:
         """
-        Parse the current element bind child objects and return the result.
+        Build the object tree for the ending element and return whether the
+        result was successful or not.
 
-        This entry point is called when an xml element ends and is responsible to parse
-        the current element attributes/text, bind any children objects and initialize
-        a new object.
+        This entry point is called when an xml element ends and is
+        responsible to parse the current element attributes/text,
+        bind any children objects and initialize  new object.
 
-        :return: Whether or not anything was appended in the objects list.
+        :param qname: Qualified name
+        :param text: Text content
+        :param tail: Tail content
+        :param objects: The list of intermediate parsed objects,
+            eg [(qname, object)]
         """
 
 
 @dataclass
 class XmlHandler:
     """
-    Xml content handler interface.
+    Abstract content handler.
 
-    :param parser: The parser instance to feed events.
-    :param clazz: The model to bind the xml document data. If it's not provided the
-        parser is responsible to locate one from the xml context.
-    :param queue: The queue list of xml nodes.
-    :param objects: Temporary storage for intermediate objects, eg [(qname, object)]
+    :param parser: The parser instance to feed with events
+    :param clazz: The target binding model. If None the parser will
+        auto locate it from the active xml context instance
+    :param queue: The XmlNode queue
+    :param objects: The list of intermediate parsed objects,
+        eg [(qname, object)]
     """
 
     parser: PushParser
@@ -112,8 +125,12 @@ class XmlHandler:
         raise NotImplementedError("This method must be implemented!")
 
     def start_ns_bulk(self, ns_map: Dict) -> Dict:
-        """Bulk start-ns event handler that returns a normalized copy of the
-        prefix-URI mapping that also includes the parent mapping."""
+        """
+        Bulk start-ns event handler that returns a normalized copy of the
+        prefix-URI map merged with the parent element map.
+
+        :param ns_map: Namespace prefix-URI map
+        """
         try:
             result = self.queue[-1].ns_map.copy()
         except (IndexError, AttributeError):
@@ -129,7 +146,16 @@ class XmlHandler:
 
 @dataclass
 class EventsHandler(XmlHandler):
-    """Content handler based on pre-recorded events."""
+    """
+    Sax content handler for pre-recorded events.
+
+    :param parser: The parser instance to feed with events
+    :param clazz: The target binding model. If None the parser will
+        auto locate it from the active xml context instance
+    :param queue: The XmlNode queue
+    :param objects: The list of intermediate parsed objects,
+        eg [(qname, object)]
+    """
 
     def parse(self, source: List[Tuple]) -> Any:
         """Forward the pre-recorded events to the main parser."""

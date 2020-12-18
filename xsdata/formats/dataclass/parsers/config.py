@@ -5,7 +5,7 @@ from typing import Optional
 @dataclass
 class ParserConfig:
     """
-    Parsing configuration.
+    Parsers configuration options.
 
     :param base_url: Optionally provide a base URL for the parser, if you are
         parsing from memory and you want support for relative links eg xinclude

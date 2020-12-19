@@ -47,6 +47,10 @@ class AttributeTests(TestCase):
         expected = {"max_occurs": 1, "min_occurs": 1, "required": True}
         self.assertEqual(expected, obj.get_restrictions())
 
+        obj.use = UseType.PROHIBITED
+        expected = {"prohibited": True}
+        self.assertEqual(expected, obj.get_restrictions())
+
         obj.simple_type = SimpleType(restriction=Restriction(length=Length(value=1)))
         expected["length"] = 1
         self.assertEqual(expected, obj.get_restrictions())

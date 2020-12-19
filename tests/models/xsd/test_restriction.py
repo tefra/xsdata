@@ -38,7 +38,10 @@ class RestrictionTests(TestCase):
         self.assertEqual("value", obj.real_name)
 
     def test_property_extensions(self):
-        obj = Restriction(base="foo")
+        obj = Restriction()
+        self.assertEqual([], list(obj.extensions))
+
+        obj.base = "foo"
         self.assertIsInstance(obj.extensions, Iterator)
         self.assertEqual(["foo"], list(obj.extensions))
 

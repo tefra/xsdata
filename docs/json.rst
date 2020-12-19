@@ -5,23 +5,69 @@ JSON Binding
 Binding JSON lacks a bit in features and for edge cases with wildcards and derived
 types doing roundtrip conversions is not always possible.
 
+.. testsetup:: *
+
+    from pathlib import Path
+    from xsdata.formats.dataclass.context import XmlContext
+    from xsdata.formats.dataclass.parsers import JsonParser
+    from tests import fixtures_dir
+    from tests.fixtures.defxmlschema.chapter05 import Order, ItemsType
+    from tests.fixtures.defxmlschema.chapter05prod import Product, SizeType
+
+    json_path = fixtures_dir.joinpath("defxmlschema/chapter05.json")
+    parser = JsonParser(context=XmlContext())
+    order = Order(
+        items=ItemsType(
+            product=[
+                Product(
+                    number=557,
+                    name='Short-Sleeved Linen Blouse',
+                    size=SizeType(value=None, system=None)
+                )
+            ]
+        )
+    )
+
 Parsing JSON
 ============
 
 From Path
 ---------
 
-.. literalinclude:: examples/json_parser_from_path.py
+.. doctest::
+
+    >>> from pathlib import Path
+    >>> from xsdata.formats.dataclass.context import XmlContext
+    >>> from xsdata.formats.dataclass.parsers import JsonParser
+    >>> from tests import fixtures_dir
+    >>> from tests.fixtures.defxmlschema.chapter05 import Order
+    ...
+    >>> json_path = fixtures_dir.joinpath("defxmlschema/chapter05.json")
+    >>> parser = JsonParser(context=XmlContext())
+    >>> order = parser.from_path(json_path, Order)
+    >>> order.items.product[0]
+    Product(number=557, name='Short-Sleeved Linen Blouse', size=SizeType(value=None, system=None))
+
 
 From String
 -----------
 
-.. literalinclude:: examples/json_parser_from_string.py
+.. doctest::
+
+    >>> order = parser.from_string(json_path.read_text(), Order)
+    >>> order.items.product[0]
+    Product(number=557, name='Short-Sleeved Linen Blouse', size=SizeType(value=None, system=None))
+
 
 From Bytes
 ----------
 
-.. literalinclude:: examples/json_parser_from_bytes.py
+.. doctest::
+
+    >>> order = parser.from_bytes(json_path.read_bytes(), Order)
+    >>> order.items.product[0]
+    Product(number=557, name='Short-Sleeved Linen Blouse', size=SizeType(value=None, system=None))
+
 
 Unknown target type
 -------------------
@@ -29,7 +75,12 @@ Unknown target type
 It's optimal to provide the target model but completely optional. The parser can scan
 all the imported modules to find a matching dataclass.
 
-.. literalinclude:: examples/json_parser_unknown_target.py
+.. doctest::
+
+    >>> order = parser.from_bytes(json_path.read_bytes())
+    >>> order.items.product[0]
+    Product(number=557, name='Short-Sleeved Linen Blouse', size=SizeType(value=None, system=None))
+
 
 Serializing JSON
 ================
@@ -37,12 +88,39 @@ Serializing JSON
 Render to string
 ----------------
 
-.. literalinclude:: examples/json_serializer_basic.py
-    :lines: 1-5
+.. doctest::
 
-.. literalinclude:: examples/json_serializer_basic.py
-    :language: json
-    :lines: 7-20
+    >>> from xsdata.formats.dataclass.serializers import JsonSerializer
+    >>> from tests.fixtures.defxmlschema.chapter05 import Order, ItemsType
+    >>> from tests.fixtures.defxmlschema.chapter05prod import Product, SizeType
+    >>> order = Order(
+    ...     items=ItemsType(
+    ...         product=[
+    ...             Product(
+    ...                 number=557,
+    ...                 name='Short-Sleeved Linen Blouse',
+    ...                 size=SizeType(value=None, system=None)
+    ...             )
+    ...         ]
+    ...     )
+    ... )
+    >>> serializer = JsonSerializer(indent=2)
+    >>> print(serializer.render(order))
+    {
+      "items": {
+        "product": [
+          {
+            "number": 557,
+            "name": "Short-Sleeved Linen Blouse",
+            "size": {
+              "value": null,
+              "system": null
+            }
+          }
+        ]
+      }
+    }
+
 
 Custom Dict factory
 -------------------
@@ -50,9 +128,21 @@ Custom Dict factory
 You can override the default dict factory to do extra steps like filtering `None`
 values.
 
-.. literalinclude:: examples/json_serializer_custom_factory.py
-    :lines: 7-12
+.. doctest::
 
-.. literalinclude:: examples/json_serializer_custom_factory.py
-    :language: json
-    :lines: 14-24
+    >>> def filter_none(x):
+    ...     return {k: v for k, v in x if v is not None}
+    ...
+    >>> serializer = JsonSerializer(indent=2, dict_factory=filter_none)
+    >>> print(serializer.render(order))
+    {
+      "items": {
+        "product": [
+          {
+            "number": 557,
+            "name": "Short-Sleeved Linen Blouse",
+            "size": {}
+          }
+        ]
+      }
+    }

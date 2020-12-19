@@ -46,16 +46,16 @@ Requirements
     There is no official workaround because it's not very common, if you like monkey
     patching then take a look here :py:func:`typing._remove_dups_flatten`
 
-    .. code-block::
+    .. doctest::
 
         >>> from dataclasses import dataclass
         >>> from typing import Union, get_type_hints
-        >>>
+        ...
         >>> @dataclass
         ... class Example:
         ...     value: Union[int, bool, str, float]
         ...
-        >>> get_type_hints(Example)
+        >>> get_type_hints(Example)  # doctest: +SKIP
         {'value': typing.Union[int, str, float]}
-        >>> issubclass(bool, int)
+        >>> issubclass(bool, int)  # doctest: +SKIP
         True

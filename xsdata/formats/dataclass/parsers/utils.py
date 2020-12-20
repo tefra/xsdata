@@ -312,12 +312,13 @@ class ParserUtils:
         if not obj:
             return -1.0
 
-        score = 0.0
-        for var in fields(obj):
-            val = getattr(obj, var.name)
-            if isinstance(val, str):
-                score += 1.0
-            elif val is not None:
-                score += 1.5
+        def score(value: Any) -> float:
+            if isinstance(value, str):
+                return 1.0
 
-        return score
+            if value is not None:
+                return 1.5
+
+            return 0.0
+
+        return sum(score(getattr(obj, var.name)) for var in fields(obj))

@@ -55,7 +55,7 @@ class ElementNode(XmlNode):
     mixed: bool = False
     derived: bool = False
 
-    FIND_MODES_ORDERED: ClassVar[Iterable[FindMode]] = (
+    FIND_MODES_ORDERED: ClassVar[Iterable[int]] = (
         FindMode.NOT_WILDCARD,
         FindMode.WILDCARD,
     )

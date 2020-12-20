@@ -1,12 +1,10 @@
 import sys
 
-from tests.factories import AttrChoiceFactory
 from tests.factories import AttrFactory
 from tests.factories import AttrTypeFactory
 from tests.factories import ClassFactory
 from tests.factories import ExtensionFactory
 from tests.factories import FactoryTestCase
-from xsdata.codegen.models import AttrChoice
 from xsdata.codegen.models import SIMPLE_TYPES
 from xsdata.models import wsdl
 from xsdata.models import xsd
@@ -28,14 +26,14 @@ class ClassTests(FactoryTestCase):
                         )
                     ],
                     choices=[
-                        AttrChoiceFactory.create(
+                        AttrFactory.create(
                             name="x",
                             types=[
                                 AttrTypeFactory.create(qname="choiceAttr"),
                                 AttrTypeFactory.xs_string(),
                             ],
                         ),
-                        AttrChoiceFactory.create(
+                        AttrFactory.create(
                             name="x",
                             types=[
                                 AttrTypeFactory.create(qname="choiceAttrTwo"),

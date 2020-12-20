@@ -1,6 +1,5 @@
 from unittest import mock
 
-from tests.factories import AttrChoiceFactory
 from tests.factories import AttrFactory
 from tests.factories import AttrTypeFactory
 from tests.factories import ClassFactory
@@ -471,17 +470,16 @@ class ClassSanitizerTest(FactoryTestCase):
 
         expected = AttrFactory.create(
             name="attr_B_Or_attr_C",
-            local_name="attr_B_Or_attr_C",
             tag="Choice",
             index=0,
             types=[AttrTypeFactory.xs_any()],
             choices=[
-                AttrChoiceFactory.create(
+                AttrFactory.create(
                     tag=target.attrs[0].tag,
                     name="attr_B",
                     types=target.attrs[0].types,
                 ),
-                AttrChoiceFactory.create(
+                AttrFactory.create(
                     tag=target.attrs[1].tag,
                     name="attr_C",
                     types=target.attrs[1].types,
@@ -507,9 +505,8 @@ class ClassSanitizerTest(FactoryTestCase):
         self.assertEqual("choice", target.attrs[0].name)
 
     def test_build_attr_choice(self):
-        attr = AttrFactory.create(
-            name="a", local_name="aaa", namespace="xsdata", default="123"
-        )
+        attr = AttrFactory.create(name="a", namespace="xsdata", default="123")
+        attr.local_name = "aaa"
         attr.restrictions = Restrictions(
             required=True,
             prohibited=None,

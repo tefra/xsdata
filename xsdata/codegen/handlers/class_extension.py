@@ -204,6 +204,6 @@ class ClassExtensionHandler(HandlerInterface):
             if attr.name == attr.local_name == name and attr.tag == tag:
                 return attr
 
-        attr = Attr(name=name, local_name=name, tag=tag)
+        attr = Attr(name=name, tag=tag)
         target.attrs.insert(0, attr)
         return attr

@@ -4,7 +4,6 @@ from typing import Optional
 
 from xsdata.codegen.container import ClassContainer
 from xsdata.codegen.models import Attr
-from xsdata.codegen.models import AttrChoice
 from xsdata.codegen.models import AttrType
 from xsdata.codegen.models import Class
 from xsdata.codegen.models import Restrictions
@@ -92,7 +91,6 @@ class ClassSanitizer:
             pos,
             Attr(
                 name=name,
-                local_name=name,
                 index=0,
                 types=[AttrType(qname=str(DataType.ANY_TYPE), native=True)],
                 tag=Tag.CHOICE,
@@ -358,7 +356,7 @@ class ClassSanitizer:
             change.name = f"{change.name}_{change.tag}"
 
     @classmethod
-    def build_attr_choice(cls, attr: Attr) -> AttrChoice:
+    def build_attr_choice(cls, attr: Attr) -> Attr:
         """
         Converts the given attr to a choice.
 
@@ -370,7 +368,7 @@ class ClassSanitizer:
         restrictions.max_occurs = None
         restrictions.sequential = None
 
-        return AttrChoice(
+        return Attr(
             name=attr.local_name,
             namespace=attr.namespace,
             default=attr.default,

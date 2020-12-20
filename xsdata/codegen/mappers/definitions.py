@@ -372,7 +372,6 @@ class DefinitionsMapper:
         return Attr(
             tag=Tag.ELEMENT,
             name=name,
-            local_name=name,
             namespace=namespace,
             default=default,
             types=[AttrType(qname=qname, forward=forward, native=native)],

@@ -228,18 +228,18 @@ class XmlContext:
             yield xml_clazz(
                 name=var.name,
                 qname=qname,
-                namespaces=namespaces,
                 init=var.init,
                 mixed=var.metadata.get("mixed", False),
+                tokens=is_tokens,
                 any_type=is_any_type,
                 nillable=var.metadata.get("nillable", False),
                 dataclass=is_class,
                 sequential=var.metadata.get("sequential", False),
-                tokens=is_tokens,
                 list_element=is_element_list,
-                types=types,
                 default=self.default_value(var),
+                types=types,
                 choices=choices,
+                namespaces=namespaces,
             )
 
     def build_choices(
@@ -269,14 +269,14 @@ class XmlContext:
             yield xml_clazz(
                 name=parent_name,
                 qname=qname,
-                namespaces=namespaces,
-                nillable=nillable,
-                any_type=is_any_type,
-                dataclass=is_class,
                 tokens=choice.get("tokens", False),
                 derived=derived,
-                types=types,
+                any_type=is_any_type,
+                nillable=nillable,
+                dataclass=is_class,
                 default=default_value,
+                types=types,
+                namespaces=namespaces,
             )
             existing.update(types)
 

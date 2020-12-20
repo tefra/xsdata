@@ -34,8 +34,8 @@ class XmlVar:
     :param list_element: Specify whether the field represents a list of
         elements
     :param default: Field default value or factory
-    :param choices: Field compound element choices
     :param types: Field simple types
+    :param choices: Field compound element choices
     :param namespaces: Field list of the all the possible namespaces
     """
 
@@ -51,8 +51,8 @@ class XmlVar:
     sequential: bool = False
     list_element: bool = False
     default: Any = None
-    choices: List["XmlVar"] = field(default_factory=list)
     types: List[Type] = field(default_factory=list)
+    choices: List["XmlVar"] = field(default_factory=list)
     namespaces: List[str] = field(default_factory=list)
 
     @property

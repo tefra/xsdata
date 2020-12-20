@@ -213,6 +213,9 @@ class Filters:
             metadata[default_key] = self.field_default_value(choice)
             metadata.update(restrictions)
 
+            if self.docstring_style == DocstringStyle.ACCESSIBLE:
+                metadata["doc"] = choice.help
+
             result.append(self.filter_metadata(metadata))
 
         return result

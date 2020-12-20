@@ -7,6 +7,7 @@ from xsdata.formats.dataclass.filters import FIELD
 from xsdata.formats.dataclass.filters import Filters
 from xsdata.formats.dataclass.filters import MODULE
 from xsdata.formats.dataclass.filters import PACKAGE
+from xsdata.models.config import DocstringStyle
 from xsdata.models.config import GeneratorAlias
 from xsdata.models.config import GeneratorConfig
 from xsdata.models.config import NameCase
@@ -286,6 +287,12 @@ class FiltersTests(FactoryTestCase):
         ]
 
         self.assertEqual(expected, actual)
+
+        self.filters.docstring_style = DocstringStyle.ACCESSIBLE
+        attr.choices[0].help = "help"
+        actual = self.filters.field_choices(attr, None, [])
+        self.assertEqual(attr.choices[0].help, actual[0]["doc"])
+        self.assertNotIn("doc", actual[1])
 
     def test_field_type_with_default_value(self):
         attr = AttrFactory.create(

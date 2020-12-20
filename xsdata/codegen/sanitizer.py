@@ -374,5 +374,6 @@ class ClassSanitizer:
             default=attr.default,
             types=attr.types,
             tag=attr.tag,
+            help=attr.help,
             restrictions=restrictions,
         )

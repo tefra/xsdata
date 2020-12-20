@@ -1,5 +1,4 @@
 import abc
-import contextlib
 import math
 import warnings
 from dataclasses import dataclass
@@ -59,9 +58,11 @@ class ConverterAdapter:
         :return: The first successful converted value.
         """
         for data_type in types:
-            with contextlib.suppress(ConverterError):
+            try:
                 instance = self.type_converter(data_type)
                 return instance.deserialize(value, data_type=data_type, **kwargs)
+            except ConverterError:
+                pass
 
         warnings.warn(
             f"Failed to convert value `{value}` to one of {types}", ConverterWarning
@@ -331,12 +332,14 @@ class EnumConverter(Converter):
         if not isinstance(real_value, value_type):
             raise ConverterError()
 
-        # Attempt #1 use the enum constructor
-        with contextlib.suppress(ValueError):
+        try:
+            # Attempt no1 use the enum constructor
             return data_type(real_value)
+        except ValueError:
+            pass
 
         try:
-            # Attempt #2 the enum might be derived from
+            # Attempt no2 the enum might be derived from
             # xs:NMTOKENS or xs:list removing excess whitespace.
             if isinstance(real_value, str):
                 return data_type(" ".join(real_value.split()))

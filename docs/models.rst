@@ -204,6 +204,12 @@ marshalling.
    * - namespace
      - str
      - Specifies the field xml namespace.
+   * - default
+     - Any
+     - Default value
+   * - default_factory
+     - Any
+     - Default value factory
 
 .. warning::
 

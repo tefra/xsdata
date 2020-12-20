@@ -505,7 +505,9 @@ class ClassSanitizerTest(FactoryTestCase):
         self.assertEqual("choice", target.attrs[0].name)
 
     def test_build_attr_choice(self):
-        attr = AttrFactory.create(name="a", namespace="xsdata", default="123")
+        attr = AttrFactory.create(
+            name="a", namespace="xsdata", default="123", help="help", fixed=True
+        )
         attr.local_name = "aaa"
         attr.restrictions = Restrictions(
             required=True,
@@ -541,3 +543,5 @@ class ClassSanitizerTest(FactoryTestCase):
         self.assertEqual(attr.tag, actual.tag)
         self.assertEqual(attr.types, actual.types)
         self.assertEqual(expected_res, actual.restrictions)
+        self.assertEqual(attr.help, actual.help)
+        self.assertFalse(actual.fixed)

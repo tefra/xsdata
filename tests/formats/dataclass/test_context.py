@@ -30,6 +30,7 @@ from xsdata.formats.dataclass.models.elements import XmlMeta
 from xsdata.formats.dataclass.models.elements import XmlWildcard
 from xsdata.models.enums import DataType
 from xsdata.utils import text
+from xsdata.utils.constants import return_true
 from xsdata.utils.namespaces import build_qname
 
 
@@ -319,6 +320,7 @@ class XmlContextTests(TestCase):
                     types=[str],
                     namespaces=["bar"],
                     derived=False,
+                    default=return_true,
                 ),
                 XmlElement(
                     name="compound",
@@ -344,6 +346,13 @@ class XmlContextTests(TestCase):
                     namespaces=["bar"],
                     derived=True,
                     any_type=True,
+                ),
+                XmlElement(
+                    name="compound",
+                    qname="{bar}p",
+                    types=[float],
+                    namespaces=["bar"],
+                    default=1.1,
                 ),
                 XmlWildcard(
                     name="compound",
@@ -493,10 +502,16 @@ class Node:
             "type": "Elements",
             "choices": (
                 {"name": "node", "type": Type["Node"], "namespace": "foo"},
-                {"name": "x", "type": List[str], "tokens": True},
+                {
+                    "name": "x",
+                    "type": List[str],
+                    "tokens": True,
+                    "default_factory": return_true,
+                },
                 {"name": "y", "type": List[int], "nillable": True},
                 {"name": "z", "type": List[int]},
                 {"name": "o", "type": object},
+                {"name": "p", "type": float, "fixed": True, "default": 1.1},
                 {
                     "wildcard": True,
                     "type": object,

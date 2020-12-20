@@ -292,7 +292,7 @@ class XmlSerializerTests(TestCase):
         self.assertEqual(expected, list(result))
 
     def test_write_element_with_any_type_var_ignore_xs_string(self):
-        var = XmlElement(qname="a", name="a", types=[object])
+        var = XmlElement(qname="a", name="a", types=[object], any_type=True)
         expected = [
             (XmlWriterEvent.START, "a"),
             (XmlWriterEvent.DATA, "123"),

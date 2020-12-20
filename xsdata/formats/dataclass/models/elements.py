@@ -1,8 +1,6 @@
 from dataclasses import dataclass
 from dataclasses import field
 from dataclasses import is_dataclass
-from enum import auto
-from enum import IntEnum
 from typing import Any
 from typing import Dict
 from typing import List
@@ -267,16 +265,16 @@ class XmlText(XmlVar):
         return True
 
 
-class FindMode(IntEnum):
+class FindMode:
     """Find switches to be used to find a specific var."""
 
-    ALL = auto()
-    ATTRIBUTE = auto()
-    ATTRIBUTES = auto()
-    TEXT = auto()
-    WILDCARD = auto()
-    MIXED_CONTENT = ()
-    NOT_WILDCARD = auto()
+    ALL = 0
+    ATTRIBUTE = 1
+    ATTRIBUTES = 2
+    TEXT = 3
+    WILDCARD = 4
+    MIXED_CONTENT = 5
+    NOT_WILDCARD = 6
 
 
 find_predicates = {
@@ -313,22 +311,20 @@ class XmlMeta:
     def namespace(self) -> Optional[str]:
         return split_qname(self.qname)[0]
 
-    def has_var(self, qname: str = "*", mode: FindMode = FindMode.ALL) -> bool:
+    def has_var(self, qname: str = "*", mode: int = FindMode.ALL) -> bool:
         return self.find_var(qname, mode) is not None
 
-    def find_var(
-        self, qname: str = "*", mode: FindMode = FindMode.ALL
-    ) -> Optional[XmlVar]:
+    def find_var(self, qname: str = "*", mode: int = FindMode.ALL) -> Optional[XmlVar]:
         """Find and cache a field by it's qualified name and the specified
         mode."""
-        key = (qname, mode.value)
+        key = (qname, mode)
         index = self.cache.get(key)
         if index is None:
             self.cache[key] = index = self._find_var(qname, mode)
 
         return None if index < 0 else self.vars[index]
 
-    def _find_var(self, qname: str, mode: FindMode) -> int:
+    def _find_var(self, qname: str, mode: int) -> int:
         predicate = find_predicates[mode]
         for index, var in enumerate(self.vars):
             if predicate(var) and var.matches(qname):

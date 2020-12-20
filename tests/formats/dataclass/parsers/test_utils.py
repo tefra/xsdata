@@ -66,6 +66,9 @@ class ParserUtilsTests(TestCase):
         actual = ParserUtils.parse_value(["1", "2", "3"], [int], list, None, True)
         self.assertEqual([1, 2, 3], actual)
 
+        actual = ParserUtils.parse_value(None, [int], lambda: [1, 2, 3], None, True)
+        self.assertEqual([1, 2, 3], actual)
+
     @mock.patch.object(ConverterAdapter, "deserialize", return_value=2)
     def test_parse_value_with_ns_map(self, mock_to_python):
         ns_map = dict(a=1)

@@ -167,6 +167,17 @@ class XmlSerializerTests(TestCase):
         result = self.serializer.write_value([[1, 2, 3], [4, 5, 6]], var, "xsdata")
         self.assertEqual(expected, list(result))
 
+        var = XmlElement(qname="a", name="a", tokens=True, nillable=True)
+        expected = [
+            (XmlWriterEvent.START, "a"),
+            (XmlWriterEvent.ATTR, QNames.XSI_NIL, "true"),
+            (XmlWriterEvent.DATA, []),
+            (XmlWriterEvent.END, "a"),
+        ]
+
+        result = self.serializer.write_value([], var, "xsdata")
+        self.assertEqual(expected, list(result))
+
     def test_write_any_type_with_primitive(self):
         var = XmlWildcard(qname="a", name="a")
         expected = [(XmlWriterEvent.DATA, "str")]

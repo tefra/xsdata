@@ -59,7 +59,11 @@ class ParserUtils:
         """Convert xml string values to s python primitive type."""
 
         if value is None:
-            return None if callable(default) else default
+
+            if callable(default):
+                return default() if tokens else None
+
+            return default
 
         if tokens:
             value = value if isinstance(value, list) else value.split()

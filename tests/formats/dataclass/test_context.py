@@ -253,6 +253,7 @@ class XmlContextTests(TestCase):
             init=True,
             mixed=False,
             nillable=False,
+            any_type=True,
             dataclass=False,
             default=None,
             namespaces=["##any"],
@@ -300,6 +301,7 @@ class XmlContextTests(TestCase):
             name="compound",
             qname="compound",
             list_element=True,
+            any_type=True,
             default=list,
             choices=[
                 XmlElement(
@@ -324,7 +326,7 @@ class XmlContextTests(TestCase):
                     nillable=True,
                     types=[int],
                     namespaces=["bar"],
-                    derived=True,
+                    derived=False,
                 ),
                 XmlElement(
                     name="compound",
@@ -341,6 +343,7 @@ class XmlContextTests(TestCase):
                     types=[object],
                     namespaces=["bar"],
                     derived=True,
+                    any_type=True,
                 ),
                 XmlWildcard(
                     name="compound",
@@ -348,6 +351,7 @@ class XmlContextTests(TestCase):
                     types=[object],
                     namespaces=["http://www.w3.org/1999/xhtml"],
                     derived=True,
+                    any_type=True,
                 ),
             ],
             types=[object],

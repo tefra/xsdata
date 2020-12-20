@@ -224,7 +224,6 @@ class SchemaMapper:
             Attr(
                 index=obj.index,
                 name=name,
-                local_name=name,
                 default=obj.default_value,
                 fixed=obj.is_fixed,
                 types=types,

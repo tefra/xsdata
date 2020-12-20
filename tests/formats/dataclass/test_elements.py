@@ -43,7 +43,7 @@ class XmlValTests(TestCase):
         self.assertTrue(var.is_list)
 
     def test_default_properties(self):
-        var = XmlVar(name="foo", qname="foo")
+        var = XmlVar(name="foo", qname="foo", any_type=True)
         self.assertFalse(var.is_any_type)
         self.assertFalse(var.is_attribute)
         self.assertFalse(var.is_attributes)
@@ -79,10 +79,10 @@ class XmlElementTests(TestCase):
         var = XmlElement(name="foo", qname="foo")
         self.assertFalse(var.is_any_type)
 
-        var = XmlElement(name="foo", qname="foo", types=[int, object])
+        var = XmlElement(name="foo", qname="foo", any_type=False)
         self.assertFalse(var.is_any_type)
 
-        var = XmlElement(name="foo", qname="foo", types=[object])
+        var = XmlElement(name="foo", qname="foo", any_type=True)
         self.assertTrue(var.is_any_type)
 
 

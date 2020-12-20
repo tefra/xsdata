@@ -227,37 +227,6 @@ class AttrType:
 
 
 @dataclass
-class AttrChoice:
-    """
-    Model representation for a dataclass field choice.
-
-    :param tag:
-    :param name:
-    :param default:
-    :param namespace:
-    :param types:
-    :param restrictions:
-    """
-
-    tag: str
-    name: str
-    default: Any = field(default=None, compare=False)
-    namespace: Optional[str] = field(default=None)
-    types: List[AttrType] = field(default_factory=list)
-    restrictions: Restrictions = field(default_factory=Restrictions, compare=False)
-
-    @property
-    def is_wildcard(self) -> bool:
-        """Return whether this attribute is derived from xs:any."""
-        return self.tag == Tag.ANY
-
-    @property
-    def is_tokens(self) -> bool:
-        """Return whether this attribute is a list of values."""
-        return self.restrictions.tokens is True
-
-
-@dataclass
 class Attr:
     """
     Model representation for a dataclass field.
@@ -278,16 +247,19 @@ class Attr:
 
     tag: str
     name: str
-    local_name: str
+    local_name: str = field(init=False)
     index: int = field(compare=False, default_factory=int)
     default: Any = field(default=None, compare=False)
     fixed: bool = field(default=False, compare=False)
     mixed: bool = field(default=False, compare=False)
     types: List[AttrType] = field(default_factory=list)
-    choices: List[AttrChoice] = field(default_factory=list)
+    choices: List["Attr"] = field(default_factory=list)
     namespace: Optional[str] = field(default=None)
     help: Optional[str] = field(default=None, compare=False)
     restrictions: Restrictions = field(default_factory=Restrictions, compare=False)
+
+    def __post_init__(self):
+        self.local_name = self.name
 
     @property
     def is_attribute(self) -> bool:
@@ -301,6 +273,11 @@ class Attr:
         return self.tag == Tag.ENUMERATION
 
     @property
+    def is_dict(self) -> bool:
+        """Return whether this attribute is a mapping of values."""
+        return self.tag == Tag.ANY_ATTRIBUTE
+
+    @property
     def is_factory(self) -> bool:
         """Return whether this attribute is a list of items or a mapping."""
         return self.is_list or self.is_dict or self.is_tokens
@@ -312,25 +289,15 @@ class Attr:
         return self.tag in (Tag.ATTRIBUTE_GROUP, Tag.GROUP)
 
     @property
-    def is_dict(self) -> bool:
-        """Return whether this attribute is a mapping of values."""
-        return self.tag == Tag.ANY_ATTRIBUTE
+    def is_list(self) -> bool:
+        """Return whether this attribute is a list of values."""
+        return self.restrictions.is_list
 
     @property
     def is_nameless(self) -> bool:
         """Return whether this attribute has a local name that will be used
         during parsing/serialization."""
         return self.tag not in (Tag.ATTRIBUTE, Tag.ELEMENT)
-
-    @property
-    def is_list(self) -> bool:
-        """Return whether this attribute is a list of values."""
-        return self.restrictions.is_list
-
-    @property
-    def is_tokens(self) -> bool:
-        """Return whether this attribute is a list of values."""
-        return self.restrictions.tokens is True
 
     @property
     def is_optional(self) -> bool:
@@ -348,6 +315,11 @@ class Attr:
         """Return whether this attribute qualified name is equal to
         xsi:type."""
         return QNames.XSI_TYPE == build_qname(self.namespace, self.name)
+
+    @property
+    def is_tokens(self) -> bool:
+        """Return whether this attribute is a list of values."""
+        return self.restrictions.tokens is True
 
     @property
     def is_wildcard(self) -> bool:

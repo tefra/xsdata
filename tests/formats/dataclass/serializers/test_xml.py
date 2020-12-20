@@ -279,7 +279,7 @@ class XmlSerializerTests(TestCase):
         self.assertEqual(expected, list(result))
 
     def test_write_element_with_any_type_var(self):
-        var = XmlElement(qname="a", name="a", types=[object])
+        var = XmlElement(qname="a", name="a", types=[object], any_type=True)
         expected = [
             (XmlWriterEvent.START, "a"),
             (XmlWriterEvent.ATTR, QNames.XSI_TYPE, QName(str(DataType.INT))),

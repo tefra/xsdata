@@ -32,8 +32,6 @@ class AttributeMixedContentHandler(HandlerInterface):
         else:
             attr = Attr(
                 name="content",
-                local_name="content",
-                index=0,
                 types=[AttrType(qname=str(DataType.ANY_TYPE), native=True)],
                 tag=Tag.ANY,
                 mixed=True,

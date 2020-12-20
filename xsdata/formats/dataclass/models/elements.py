@@ -20,20 +20,23 @@ class XmlVar:
     """
     Dataclass field binding metadata.
 
-    :param name: Field name.
-    :param qname: The namespace qualified local name.
-    :param init:  Field is present in the constructor parameters.
-    :param mixed:  Field supports mixed content.
-    :param tokens: Use a list to map simple values.
-    :param derived: Use derived elements to bind data.
-    :param nillable: Allow empty content elements rendering.
-    :param dataclass: Specify whether the field type is a dataclass.
-    :param sequential: Switch to sequential rendering with other sequential siblings
-    :param list_element: Specify whether the field represents a list of elements
+    :param name: Field name
+    :param qname: The namespace qualified local name
+    :param init:  Field is present in the constructor parameters
+    :param mixed:  Field supports mixed content
+    :param tokens: Use a list to map simple values
+    :param derived: Use derived elements to bind data
+    :param any_type: Support inline declaration
+    :param nillable: Allow empty content elements rendering
+    :param dataclass: Specify whether the field type is a dataclass
+    :param sequential: Switch to sequential rendering with other
+        sequential siblings
+    :param list_element: Specify whether the field represents a list of
+        elements
     :param default: Field default value or factory
-    :param choices: Field compound element choices.
-    :param types: Field simple types.
-    :param namespaces: Field list of the all the possible namespaces.
+    :param choices: Field compound element choices
+    :param types: Field simple types
+    :param namespaces: Field list of the all the possible namespaces
     """
 
     name: str
@@ -42,6 +45,7 @@ class XmlVar:
     mixed: bool = False
     tokens: bool = False
     derived: bool = False
+    any_type: bool = False
     nillable: bool = False
     dataclass: bool = False
     sequential: bool = False
@@ -132,7 +136,7 @@ class XmlElement(XmlVar):
 
     @property
     def is_any_type(self) -> bool:
-        return len(self.types) == 1 and self.types[0] is object
+        return self.any_type
 
 
 @dataclass(frozen=True)
@@ -318,10 +322,10 @@ class XmlMeta:
         """Find and cache a field by it's qualified name and the specified
         mode."""
         key = (qname, mode.value)
-        if key not in self.cache:
-            self.cache[key] = self._find_var(qname, mode)
+        index = self.cache.get(key)
+        if index is None:
+            self.cache[key] = index = self._find_var(qname, mode)
 
-        index = self.cache[key]
         return None if index < 0 else self.vars[index]
 
     def _find_var(self, qname: str, mode: FindMode) -> int:

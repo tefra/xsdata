@@ -200,6 +200,7 @@ class XmlContext:
             is_tokens = var.metadata.get("tokens", False)
             is_element_list = self.is_element_list(type_hint, is_tokens)
             is_class = any(is_dataclass(clazz) for clazz in types)
+            is_any_type = object in types
             xml_type = var.metadata.get("type")
             local_name = var.metadata.get("name")
 
@@ -230,6 +231,7 @@ class XmlContext:
                 namespaces=namespaces,
                 init=var.init,
                 mixed=var.metadata.get("mixed", False),
+                any_type=is_any_type,
                 nillable=var.metadata.get("nillable", False),
                 dataclass=is_class,
                 sequential=var.metadata.get("sequential", False),
@@ -256,24 +258,25 @@ class XmlContext:
             default_namespace = self.default_namespace(namespaces)
 
             types = self.real_types(_eval_type(choice["type"], globalns, None))
-            derived = any(True for tp in types if tp in existing)
+            is_any_type = object in types
             is_class = any(is_dataclass(clazz) for clazz in types)
             xml_clazz = XmlType.to_xml_class(xml_type)
             qname = build_qname(default_namespace, choice.get("name", "any"))
             nillable = choice.get("nillable", False)
-
-            if xml_type == XmlType.ELEMENT and len(types) == 1 and types[0] == object:
-                derived = True
+            derived = any(True for tp in types if tp in existing) or is_any_type
+            default_value = choice.get("default_factory", choice.get("default"))
 
             yield xml_clazz(
                 name=parent_name,
                 qname=qname,
                 namespaces=namespaces,
                 nillable=nillable,
+                any_type=is_any_type,
                 dataclass=is_class,
                 tokens=choice.get("tokens", False),
-                derived=derived or nillable,
+                derived=derived,
                 types=types,
+                default=default_value,
             )
             existing.update(types)
 

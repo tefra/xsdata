@@ -359,7 +359,7 @@ class ElementNodeTests(TestCase):
         self.assertIsNone(self.node.build_node(var, attrs, ns_map, 10))
 
     def test_build_node_with_any_type_var_with_matching_xsi_type(self):
-        var = XmlElement(name="a", qname="a", types=[object])
+        var = XmlElement(name="a", qname="a", types=[object], any_type=True)
         attrs = {QNames.XSI_TYPE: "bk:books"}
         ns_map = {"bk": "urn:books"}
         actual = self.node.build_node(var, attrs, ns_map, 10)
@@ -372,7 +372,7 @@ class ElementNodeTests(TestCase):
         self.assertFalse(actual.mixed)
 
     def test_build_node_with_any_type_var_with_no_matching_xsi_type(self):
-        var = XmlElement(name="a", qname="a", types=[object])
+        var = XmlElement(name="a", qname="a", types=[object], any_type=True)
         attrs = {QNames.XSI_TYPE: "noMatch"}
         actual = self.node.build_node(var, attrs, {}, 10)
 
@@ -384,7 +384,7 @@ class ElementNodeTests(TestCase):
         self.assertFalse(actual.mixed)
 
     def test_build_node_with_any_type_var_with_no_xsi_type(self):
-        var = XmlElement(name="a", qname="a", types=[object])
+        var = XmlElement(name="a", qname="a", types=[object], any_type=True)
         attrs = {}
         actual = self.node.build_node(var, attrs, {}, 10)
 

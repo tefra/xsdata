@@ -18,7 +18,6 @@ from docformatter import format_code
 from jinja2 import Environment
 
 from xsdata.codegen.models import Attr
-from xsdata.codegen.models import AttrChoice
 from xsdata.codegen.models import AttrType
 from xsdata.codegen.models import Class
 from xsdata.formats.converter import converter
@@ -194,24 +193,29 @@ class Filters:
         if not attr.choices:
             return None
 
-        def build(choice: AttrChoice) -> Dict:
+        result = []
+        for choice in attr.choices:
+
             types = list({x.native_type for x in choice.types if x.native})
             restrictions = choice.restrictions.asdict(types)
             namespace = (
                 choice.namespace if parent_namespace != choice.namespace else None
             )
 
-            return self.filter_metadata(
-                {
-                    "name": choice.name,
-                    "wildcard": choice.is_wildcard,
-                    "type": self.choice_type(choice, parents),
-                    "namespace": namespace,
-                    **restrictions,
-                }
-            )
+            metadata = {
+                "name": choice.name,
+                "wildcard": choice.is_wildcard,
+                "type": self.choice_type(choice, parents),
+                "namespace": namespace,
+            }
 
-        return list(map(build, attr.choices))
+            default_key = "default_factory" if choice.is_factory else "default"
+            metadata[default_key] = self.field_default_value(choice)
+            metadata.update(restrictions)
+
+            result.append(self.filter_metadata(metadata))
+
+        return result
 
     @classmethod
     def filter_metadata(cls, data: Dict) -> Dict:
@@ -265,6 +269,9 @@ class Filters:
         """
         if data.startswith("Type[") and data.endswith("]"):
             return data if data[5] == '"' else data[5:-1]
+
+        if key in ("default_factory", "default"):
+            return data
 
         if key == "pattern":
             return f'r"{data}"'
@@ -404,7 +411,7 @@ class Filters:
 
         return result
 
-    def choice_type(self, choice: AttrChoice, parents: List[str]) -> str:
+    def choice_type(self, choice: Attr, parents: List[str]) -> str:
         """
         Generate type hints for the given choice.
 

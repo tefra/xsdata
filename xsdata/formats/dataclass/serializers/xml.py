@@ -161,8 +161,8 @@ class XmlSerializer(AbstractSerializer):
     def write_tokens(self, value: Any, var: XmlVar, namespace: NoneStr) -> Generator:
         """Produce an events stream for the given tokens list or list of tokens
         lists."""
-        if value:
-            if isinstance(value[0], list):
+        if value or var.nillable:
+            if value and isinstance(value[0], list):
                 for val in value:
                     yield from self.write_element(val, var, namespace)
             else:

@@ -2,9 +2,7 @@ import copy
 from dataclasses import dataclass
 from dataclasses import field
 from typing import Any
-from typing import ClassVar
 from typing import Dict
-from typing import Iterable
 from typing import Iterator
 from typing import List
 from typing import Optional
@@ -31,6 +29,8 @@ from xsdata.models.enums import EventType
 Parsed = Tuple[Optional[str], Any]
 NoneStr = Optional[str]
 
+FIND_MODES = (FindMode.NOT_WILDCARD, FindMode.WILDCARD)
+
 
 @dataclass
 class ElementNode(XmlNode):
@@ -54,11 +54,6 @@ class ElementNode(XmlNode):
     position: int
     mixed: bool = False
     derived: bool = False
-
-    FIND_MODES_ORDERED: ClassVar[Iterable[int]] = (
-        FindMode.NOT_WILDCARD,
-        FindMode.WILDCARD,
-    )
 
     def bind(self, qname: str, text: NoneStr, tail: NoneStr, objects: List) -> bool:
         params: Dict = {}
@@ -136,7 +131,7 @@ class ElementNode(XmlNode):
         return PrimitiveNode(var=var, ns_map=ns_map)
 
     def fetch_vars(self, qname: str) -> Iterator[XmlVar]:
-        for mode in self.FIND_MODES_ORDERED:
+        for mode in FIND_MODES:
             var = self.meta.find_var(qname, mode)
 
             if not var:

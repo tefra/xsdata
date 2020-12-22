@@ -20,8 +20,8 @@ from typing import Type
 from xsdata.exceptions import XmlContextError
 from xsdata.formats.bindings import T
 from xsdata.formats.converter import converter
-from xsdata.formats.dataclass.models.constants import XmlType
 from xsdata.formats.dataclass.models.elements import XmlMeta
+from xsdata.formats.dataclass.models.elements import XmlType
 from xsdata.formats.dataclass.models.elements import XmlVar
 from xsdata.models.enums import DataType
 from xsdata.models.enums import NamespaceType
@@ -195,50 +195,44 @@ class XmlContext:
         default_xml_type = self.default_xml_type(clazz)
 
         for var in fields(clazz):
-            type_hint = type_hints[var.name]
-            types = self.real_types(type_hint)
-            is_tokens = var.metadata.get("tokens", False)
-            is_element_list = self.is_element_list(type_hint, is_tokens)
-            is_class = any(is_dataclass(clazz) for clazz in types)
-            is_any_type = object in types
+            tokens = var.metadata.get("tokens", False)
             xml_type = var.metadata.get("type")
             local_name = var.metadata.get("name")
-
-            if not xml_type:
-                xml_type = default_xml_type if not is_class else "Element"
-
-            if not local_name:
-                local_name = self.local_name(var.name, xml_type)
-
-            xml_clazz = XmlType.to_xml_class(xml_type)
             namespace = var.metadata.get("namespace")
+            choices = var.metadata.get("choices", EMPTY_SEQUENCE)
+            mixed = var.metadata.get("mixed", False)
+            nillable = var.metadata.get("nillable", False)
+            sequential = var.metadata.get("sequential", False)
+
+            type_hint = type_hints[var.name]
+            types = self.real_types(type_hint)
+            any_type = object in types
+            element_list = self.is_element_list(type_hint, tokens)
+            is_class = any(is_dataclass(clazz) for clazz in types)
+            xml_type = xml_type or (XmlType.ELEMENT if is_class else default_xml_type)
+            local_name = local_name or self.local_name(var.name, xml_type)
+
             namespaces = self.resolve_namespaces(xml_type, namespace, parent_ns)
             default_namespace = self.default_namespace(namespaces)
+            choice_vars = list(self.build_choices(clazz, var.name, parent_ns, choices))
             qname = build_qname(default_namespace, local_name)
+            default_value = self.default_value(var)
 
-            choices = list(
-                self.build_choices(
-                    clazz,
-                    var.name,
-                    parent_ns,
-                    var.metadata.get("choices", EMPTY_SEQUENCE),
-                )
-            )
-
-            yield xml_clazz(
+            yield XmlVar(
+                xml_type=xml_type,
                 name=var.name,
                 qname=qname,
                 init=var.init,
-                mixed=var.metadata.get("mixed", False),
-                tokens=is_tokens,
-                any_type=is_any_type,
-                nillable=var.metadata.get("nillable", False),
+                mixed=mixed,
+                tokens=tokens,
+                any_type=any_type,
+                nillable=nillable,
                 dataclass=is_class,
-                sequential=var.metadata.get("sequential", False),
-                list_element=is_element_list,
-                default=self.default_value(var),
+                sequential=sequential,
+                list_element=element_list,
+                default=default_value,
                 types=types,
-                choices=choices,
+                choices=choice_vars,
                 namespaces=namespaces,
             )
 
@@ -249,36 +243,39 @@ class XmlContext:
         parent_namespace: Optional[str],
         choices: List[Dict],
     ):
-        existing = set()
+        existing_types = set()
         globalns = sys.modules[clazz.__module__].__dict__
         for choice in choices:
             xml_type = XmlType.WILDCARD if choice.get("wildcard") else XmlType.ELEMENT
             namespace = choice.get("namespace")
-            namespaces = self.resolve_namespaces(xml_type, namespace, parent_namespace)
-            default_namespace = self.default_namespace(namespaces)
-
-            types = self.real_types(_eval_type(choice["type"], globalns, None))
-            is_any_type = object in types
-            is_class = any(is_dataclass(clazz) for clazz in types)
-            xml_clazz = XmlType.to_xml_class(xml_type)
-            qname = build_qname(default_namespace, choice.get("name", "any"))
+            tokens = choice.get("tokens", False)
             nillable = choice.get("nillable", False)
-            derived = any(True for tp in types if tp in existing) or is_any_type
             default_value = choice.get("default_factory", choice.get("default"))
 
-            yield xml_clazz(
+            types = self.real_types(_eval_type(choice["type"], globalns, None))
+            is_class = any(is_dataclass(clazz) for clazz in types)
+            any_type = xml_type == XmlType.ELEMENT and object in types
+            derived = any(True for tp in types if tp in existing_types) or any_type
+
+            namespaces = self.resolve_namespaces(xml_type, namespace, parent_namespace)
+            default_namespace = self.default_namespace(namespaces)
+            qname = build_qname(default_namespace, choice.get("name", "any"))
+
+            existing_types.update(types)
+
+            yield XmlVar(
+                xml_type=xml_type,
                 name=parent_name,
                 qname=qname,
-                tokens=choice.get("tokens", False),
+                tokens=tokens,
                 derived=derived,
-                any_type=is_any_type,
+                any_type=any_type,
                 nillable=nillable,
                 dataclass=is_class,
                 default=default_value,
                 types=types,
                 namespaces=namespaces,
             )
-            existing.update(types)
 
     @classmethod
     def resolve_namespaces(

@@ -22,12 +22,9 @@ from tests.fixtures.defxmlschema.chapter13 import ItemsType
 from tests.fixtures.defxmlschema.chapter16 import Umbrella
 from xsdata.exceptions import XmlContextError
 from xsdata.formats.dataclass.context import XmlContext
-from xsdata.formats.dataclass.models.constants import XmlType
-from xsdata.formats.dataclass.models.elements import XmlAttribute
-from xsdata.formats.dataclass.models.elements import XmlElement
-from xsdata.formats.dataclass.models.elements import XmlElements
 from xsdata.formats.dataclass.models.elements import XmlMeta
-from xsdata.formats.dataclass.models.elements import XmlWildcard
+from xsdata.formats.dataclass.models.elements import XmlType
+from xsdata.formats.dataclass.models.elements import XmlVar
 from xsdata.models.enums import DataType
 from xsdata.utils import text
 from xsdata.utils.constants import return_true
@@ -118,7 +115,7 @@ class XmlContextTests(TestCase):
 
     @mock.patch.object(XmlContext, "get_type_hints")
     def test_build_build_vars(self, mock_get_type_hints):
-        var = XmlElement(name="foo", qname="{foo}bar", types=[int])
+        var = XmlVar(element=True, name="foo", qname="{foo}bar", types=[int])
         mock_get_type_hints.return_value = [var]
 
         result = self.ctx.build(ItemsType, None)
@@ -189,15 +186,20 @@ class XmlContextTests(TestCase):
         self.assertIsInstance(result, Iterator)
 
         expected = [
-            XmlElement(name="author", qname="author", types=[str]),
-            XmlElement(name="title", qname="title", types=[str]),
-            XmlElement(name="genre", qname="genre", types=[str]),
-            XmlElement(name="price", qname="price", types=[float]),
-            XmlElement(name="pub_date", qname="pub_date", types=[str]),
-            XmlElement(name="review", qname="review", types=[str]),
-            XmlAttribute(name="id", qname="id", types=[str]),
-            XmlAttribute(
-                name="lang", qname="lang", types=[str], init=False, default="en"
+            XmlVar(element=True, name="author", qname="author", types=[str]),
+            XmlVar(element=True, name="title", qname="title", types=[str]),
+            XmlVar(element=True, name="genre", qname="genre", types=[str]),
+            XmlVar(element=True, name="price", qname="price", types=[float]),
+            XmlVar(element=True, name="pub_date", qname="pub_date", types=[str]),
+            XmlVar(element=True, name="review", qname="review", types=[str]),
+            XmlVar(attribute=True, name="id", qname="id", types=[str]),
+            XmlVar(
+                attribute=True,
+                name="lang",
+                qname="lang",
+                types=[str],
+                init=False,
+                default="en",
             ),
         ]
 
@@ -216,9 +218,9 @@ class XmlContextTests(TestCase):
 
         result = list(self.ctx.get_type_hints(Example, None))
         expected = [
-            XmlElement(name="bool", qname="bool", types=[bool]),
-            XmlElement(name="int", qname="int", types=[int]),
-            XmlElement(name="union", qname="union", types=[bool, int]),
+            XmlVar(element=True, name="bool", qname="bool", types=[bool]),
+            XmlVar(element=True, name="int", qname="int", types=[int]),
+            XmlVar(element=True, name="union", qname="union", types=[bool, int]),
         ]
 
         if sys.version_info < (3, 7):
@@ -229,7 +231,8 @@ class XmlContextTests(TestCase):
     def test_get_type_hints_with_dataclass_list(self):
         result = list(self.ctx.get_type_hints(Books, None))
 
-        expected = XmlElement(
+        expected = XmlVar(
+            element=True,
             name="book",
             qname="book",
             types=[BookForm],
@@ -238,7 +241,7 @@ class XmlContextTests(TestCase):
             list_element=True,
         )
 
-        self.assertTrue(expected.is_list)
+        self.assertTrue(expected.list_element)
         self.assertEqual(1, len(result))
         self.assertEqual(expected, result[0])
         self.assertTrue(result[0].dataclass)
@@ -247,15 +250,11 @@ class XmlContextTests(TestCase):
     def test_get_type_hints_with_wildcard_element(self):
         result = list(self.ctx.get_type_hints(Umbrella, None))
 
-        expected = XmlWildcard(
+        expected = XmlVar(
+            wildcard=True,
             name="any_element",
             qname="any_element",
             types=[object],
-            init=True,
-            mixed=False,
-            nillable=False,
-            any_type=True,
-            dataclass=False,
             default=None,
             namespaces=["##any"],
         )
@@ -276,15 +275,16 @@ class XmlContextTests(TestCase):
             values: List[Currency] = field(default_factory=list)
 
         expected = [
-            XmlAttribute(name="id", qname="ID", types=[int]),
-            XmlElement(name="iso_code", qname="CharCode", types=[str]),
-            XmlElement(name="nominal", qname="Nominal", types=[int]),
+            XmlVar(attribute=True, name="id", qname="ID", types=[int]),
+            XmlVar(element=True, name="iso_code", qname="CharCode", types=[str]),
+            XmlVar(element=True, name="nominal", qname="Nominal", types=[int]),
         ]
         self.assertEqual(expected, list(self.ctx.get_type_hints(Currency, None)))
 
         expected = [
-            XmlAttribute(name="name", qname="name", types=[str]),
-            XmlElement(
+            XmlVar(attribute=True, name="name", qname="name", types=[str]),
+            XmlVar(
+                element=True,
                 name="values",
                 qname="values",
                 dataclass=True,
@@ -298,14 +298,16 @@ class XmlContextTests(TestCase):
     def test_get_type_hints_with_choices(self):
         actual = self.ctx.get_type_hints(Node, "bar")
         self.assertIsInstance(actual, Generator)
-        expected = XmlElements(
+        expected = XmlVar(
+            elements=True,
             name="compound",
             qname="compound",
             list_element=True,
             any_type=True,
             default=list,
             choices=[
-                XmlElement(
+                XmlVar(
+                    element=True,
                     name="compound",
                     qname="{foo}node",
                     dataclass=True,
@@ -313,7 +315,8 @@ class XmlContextTests(TestCase):
                     namespaces=["foo"],
                     derived=False,
                 ),
-                XmlElement(
+                XmlVar(
+                    element=True,
                     name="compound",
                     qname="{bar}x",
                     tokens=True,
@@ -322,7 +325,8 @@ class XmlContextTests(TestCase):
                     derived=False,
                     default=return_true,
                 ),
-                XmlElement(
+                XmlVar(
+                    element=True,
                     name="compound",
                     qname="{bar}y",
                     nillable=True,
@@ -330,7 +334,8 @@ class XmlContextTests(TestCase):
                     namespaces=["bar"],
                     derived=False,
                 ),
-                XmlElement(
+                XmlVar(
+                    element=True,
                     name="compound",
                     qname="{bar}z",
                     nillable=False,
@@ -338,7 +343,8 @@ class XmlContextTests(TestCase):
                     namespaces=["bar"],
                     derived=True,
                 ),
-                XmlElement(
+                XmlVar(
+                    element=True,
                     name="compound",
                     qname="{bar}o",
                     nillable=False,
@@ -347,20 +353,22 @@ class XmlContextTests(TestCase):
                     derived=True,
                     any_type=True,
                 ),
-                XmlElement(
+                XmlVar(
+                    element=True,
                     name="compound",
                     qname="{bar}p",
                     types=[float],
                     namespaces=["bar"],
                     default=1.1,
                 ),
-                XmlWildcard(
+                XmlVar(
+                    wildcard=True,
                     name="compound",
                     qname="{http://www.w3.org/1999/xhtml}any",
                     types=[object],
                     namespaces=["http://www.w3.org/1999/xhtml"],
                     derived=True,
-                    any_type=True,
+                    any_type=False,
                 ),
             ],
             types=[object],

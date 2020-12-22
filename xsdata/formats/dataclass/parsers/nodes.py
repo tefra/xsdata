@@ -62,7 +62,7 @@ class ElementNode(XmlNode):
         ParserUtils.bind_attrs(params, self.meta, self.attrs, self.ns_map)
 
         wild_var = self.meta.find_var(mode=FindMode.WILDCARD)
-        if wild_var and wild_var.is_mixed_content:
+        if wild_var and wild_var.mixed:
             ParserUtils.bind_mixed_objects(params, wild_var, self.position, objects)
         else:
             ParserUtils.bind_objects(params, self.meta, self.position, objects)
@@ -113,7 +113,7 @@ class ElementNode(XmlNode):
                 var.clazz, attrs, ns_map, position, var.derived
             )
 
-        if var.is_any_type:
+        if var.any_type:
             node = self.build_element_node(None, attrs, ns_map, position, var.derived)
             if not node:
                 node = AnyTypeNode(
@@ -125,7 +125,7 @@ class ElementNode(XmlNode):
                 )
             return node
 
-        if var.is_wildcard:
+        if var.wildcard:
             return WildcardNode(var=var, attrs=attrs, ns_map=ns_map, position=position)
 
         return PrimitiveNode(var=var, ns_map=ns_map)
@@ -137,7 +137,7 @@ class ElementNode(XmlNode):
             if not var:
                 continue
 
-            if var.is_elements:
+            if var.elements:
                 choice = var.find_choice(qname)
                 assert choice is not None
                 yield choice

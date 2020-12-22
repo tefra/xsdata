@@ -14,11 +14,8 @@ from tests.fixtures.books import Books
 from xsdata.exceptions import ParserError
 from xsdata.exceptions import XmlContextError
 from xsdata.formats.dataclass.context import XmlContext
-from xsdata.formats.dataclass.models.elements import XmlElement
-from xsdata.formats.dataclass.models.elements import XmlElements
 from xsdata.formats.dataclass.models.elements import XmlMeta
-from xsdata.formats.dataclass.models.elements import XmlText
-from xsdata.formats.dataclass.models.elements import XmlWildcard
+from xsdata.formats.dataclass.models.elements import XmlVar
 from xsdata.formats.dataclass.models.generics import AnyElement
 from xsdata.formats.dataclass.models.generics import DerivedElement
 from xsdata.formats.dataclass.parsers.config import ParserConfig
@@ -166,7 +163,7 @@ class ElementNodeTests(TestCase):
         mock_bind_content.return_value = False
         mock_bind_wild_content.side_effect = add_text
         mock_bind_objects.side_effect = add_child
-        mock_find_var.return_value = XmlWildcard(qname="b", name="b")
+        mock_find_var.return_value = XmlVar(wildcard=True, qname="b", name="b")
 
         node = ElementNode(
             position=0,
@@ -260,8 +257,8 @@ class ElementNodeTests(TestCase):
         )
 
     def test_fetch_vars(self):
-        elem = XmlElement(name="a", qname="a", types=[Foo], dataclass=True)
-        wild = XmlWildcard(name="a", qname="a", types=[Foo], dataclass=True)
+        elem = XmlVar(element=True, name="a", qname="a", types=[Foo], dataclass=True)
+        wild = XmlVar(wildcard=True, name="a", qname="a", types=[Foo], dataclass=True)
         self.meta.vars.extend((wild, elem))
 
         matching_vars = self.node.fetch_vars("a")
@@ -269,8 +266,8 @@ class ElementNodeTests(TestCase):
         self.assertEqual([elem, wild], list(matching_vars))
 
     def test_fetch_vars_with_elements_var(self):
-        elem = XmlElement(name="a", qname="a", types=[Foo], dataclass=True)
-        elems = XmlElements(name="compound", qname="compound", choices=[elem])
+        elem = XmlVar(element=True, name="a", qname="a", types=[Foo], dataclass=True)
+        elems = XmlVar(elements=True, name="compound", qname="compound", choices=[elem])
         self.meta.vars.append(elems)
 
         matching_vars = self.node.fetch_vars("a")
@@ -279,7 +276,7 @@ class ElementNodeTests(TestCase):
 
     @mock.patch.object(ElementNode, "fetch_vars")
     def test_child(self, mock_match_vars):
-        var = XmlElement(name="a", qname="a", types=[Foo], dataclass=True)
+        var = XmlVar(element=True, name="a", qname="a", types=[Foo], dataclass=True)
         attrs = {"a": "b"}
         ns_map = {"ns0": "xsdata"}
         position = 1
@@ -294,8 +291,8 @@ class ElementNodeTests(TestCase):
     @mock.patch.object(ElementNode, "build_node")
     def test_child_when_failed_to_build_next_node(self, mock_build_node):
         mock_build_node.return_value = None
-        self.meta.vars.append(XmlElement(name="a", qname="a"))
-        self.meta.vars.append(XmlWildcard(name="a", qname="a"))
+        self.meta.vars.append(XmlVar(element=True, name="a", qname="a"))
+        self.meta.vars.append(XmlVar(wildcard=True, name="a", qname="a"))
 
         with self.assertRaises(ParserError) as cm:
             self.node.child("a", {}, {}, 0)
@@ -308,7 +305,9 @@ class ElementNodeTests(TestCase):
         self.assertIsInstance(actual, SkipNode)
 
     def test_build_node_with_dataclass_union_var(self):
-        var = XmlElement(name="a", qname="a", types=[Foo, FooMixed], dataclass=True)
+        var = XmlVar(
+            element=True, name="a", qname="a", types=[Foo, FooMixed], dataclass=True
+        )
         attrs = {"a": "b"}
         ns_map = {"ns0": "xsdata"}
         actual = self.node.build_node(var, attrs, ns_map, 10)
@@ -324,7 +323,9 @@ class ElementNodeTests(TestCase):
     @mock.patch.object(ParserUtils, "xsi_type", return_value="foo")
     @mock.patch.object(XmlContext, "fetch")
     def test_build_node_with_dataclass_var(self, mock_ctx_fetch, mock_xsi_type):
-        var = XmlElement(name="a", qname="a", types=[Foo], dataclass=True, derived=True)
+        var = XmlVar(
+            element=True, name="a", qname="a", types=[Foo], dataclass=True, derived=True
+        )
         xsi_type = "foo"
         namespace = self.meta.namespace
         mock_ctx_fetch.return_value = self.meta
@@ -344,7 +345,7 @@ class ElementNodeTests(TestCase):
 
     @mock.patch.object(XmlContext, "fetch")
     def test_build_node_with_dataclass_var_validates_nillable(self, mock_ctx_fetch):
-        var = XmlElement(name="a", qname="a", types=[Foo], dataclass=True)
+        var = XmlVar(element=True, name="a", qname="a", types=[Foo], dataclass=True)
         ns_map = {}
         nillable_meta = replace(self.meta, nillable=True)
         mock_ctx_fetch.side_effect = [self.meta, self.meta, nillable_meta]
@@ -359,7 +360,7 @@ class ElementNodeTests(TestCase):
         self.assertIsNone(self.node.build_node(var, attrs, ns_map, 10))
 
     def test_build_node_with_any_type_var_with_matching_xsi_type(self):
-        var = XmlElement(name="a", qname="a", types=[object], any_type=True)
+        var = XmlVar(element=True, name="a", qname="a", types=[object], any_type=True)
         attrs = {QNames.XSI_TYPE: "bk:books"}
         ns_map = {"bk": "urn:books"}
         actual = self.node.build_node(var, attrs, ns_map, 10)
@@ -372,7 +373,7 @@ class ElementNodeTests(TestCase):
         self.assertFalse(actual.mixed)
 
     def test_build_node_with_any_type_var_with_no_matching_xsi_type(self):
-        var = XmlElement(name="a", qname="a", types=[object], any_type=True)
+        var = XmlVar(element=True, name="a", qname="a", types=[object], any_type=True)
         attrs = {QNames.XSI_TYPE: "noMatch"}
         actual = self.node.build_node(var, attrs, {}, 10)
 
@@ -384,7 +385,7 @@ class ElementNodeTests(TestCase):
         self.assertFalse(actual.mixed)
 
     def test_build_node_with_any_type_var_with_no_xsi_type(self):
-        var = XmlElement(name="a", qname="a", types=[object], any_type=True)
+        var = XmlVar(element=True, name="a", qname="a", types=[object], any_type=True)
         attrs = {}
         actual = self.node.build_node(var, attrs, {}, 10)
 
@@ -396,7 +397,7 @@ class ElementNodeTests(TestCase):
         self.assertFalse(actual.mixed)
 
     def test_build_node_with_wildcard_var(self):
-        var = XmlWildcard(name="a", qname="a", types=[], dataclass=False)
+        var = XmlVar(wildcard=True, name="a", qname="a", types=[], dataclass=False)
 
         actual = self.node.build_node(var, {}, {}, 10)
 
@@ -405,7 +406,7 @@ class ElementNodeTests(TestCase):
         self.assertEqual(var, actual.var)
 
     def test_build_node_with_primitive_var(self):
-        var = XmlText(name="a", qname="a", types=[int], default=100)
+        var = XmlVar(text=True, name="a", qname="a", types=[int], default=100)
         attrs = {"a": "b"}
         ns_map = {"ns0": "xsdata"}
         actual = self.node.build_node(var, attrs, ns_map, 10)
@@ -417,7 +418,7 @@ class ElementNodeTests(TestCase):
 
 class AnyTypeNodeTests(TestCase):
     def setUp(self) -> None:
-        self.var = XmlElement(name="a", qname="a", types=[object])
+        self.var = XmlVar(element=True, name="a", qname="a", types=[object])
         self.node = AnyTypeNode(position=0, var=self.var, attrs={}, ns_map={})
 
     def test_child(self):
@@ -465,7 +466,9 @@ class AnyTypeNodeTests(TestCase):
     def test_bind_with_simple_type_derived(self):
         objects = []
 
-        self.node.var = XmlElement(name="a", qname="a", types=[object], derived=True)
+        self.node.var = XmlVar(
+            element=True, name="a", qname="a", types=[object], derived=True
+        )
         self.node.attrs[QNames.XSI_TYPE] = str(DataType.FLOAT)
 
         self.assertTrue(self.node.bind("a", "10", None, objects))
@@ -504,7 +507,7 @@ class WildcardNodeTests(TestCase):
             children=[1, 2, 3],
         )
 
-        var = XmlText(name="foo", qname="a")
+        var = XmlVar(text=True, name="foo", qname="a")
         node = WildcardNode(position=0, var=var, attrs=attrs, ns_map=ns_map)
         objects = [("a", 1), ("b", 2), ("c", 3)]
 
@@ -515,7 +518,7 @@ class WildcardNodeTests(TestCase):
     def test_child(self):
         attrs = {"id": "1"}
         ns_map = {"ns0": "xsdata"}
-        var = XmlText(name="foo", qname="foo")
+        var = XmlVar(text=True, name="foo", qname="foo")
         node = WildcardNode(position=0, var=var, attrs={}, ns_map={})
         actual = node.child("foo", attrs, ns_map, 10)
 
@@ -531,7 +534,7 @@ class UnionNodeTests(TestCase):
         attrs = {"id": "1"}
         ns_map = {"ns0": "xsdata"}
         ctx = XmlContext()
-        var = XmlText(name="foo", qname="foo")
+        var = XmlVar(text=True, name="foo", qname="foo")
         node = UnionNode(position=0, var=var, context=ctx, attrs={}, ns_map={})
         self.assertEqual(node, node.child("foo", attrs, ns_map, 10))
 
@@ -541,7 +544,7 @@ class UnionNodeTests(TestCase):
 
     def test_bind_appends_end_event_when_level_not_zero(self):
         ctx = XmlContext()
-        var = XmlText(name="foo", qname="foo")
+        var = XmlVar(text=True, name="foo", qname="foo")
         node = UnionNode(position=0, var=var, context=ctx, attrs={}, ns_map={})
         node.level = 1
         objects = []
@@ -612,7 +615,7 @@ class PrimitiveNodeTests(TestCase):
     @mock.patch.object(ParserUtils, "parse_value")
     def test_bind(self, mock_parse_value):
         mock_parse_value.return_value = 13
-        var = XmlText(name="foo", qname="foo", types=[int])
+        var = XmlVar(text=True, name="foo", qname="foo", types=[int])
         ns_map = {"foo": "bar"}
         node = PrimitiveNode(var=var, ns_map=ns_map)
         objects = []
@@ -625,7 +628,7 @@ class PrimitiveNodeTests(TestCase):
         )
 
     def test_bind_derived_var(self):
-        var = XmlText(name="foo", qname="foo", types=[int], derived=True)
+        var = XmlVar(text=True, name="foo", qname="foo", types=[int], derived=True)
         ns_map = {"foo": "bar"}
         node = PrimitiveNode(var=var, ns_map=ns_map)
         objects = []
@@ -634,7 +637,7 @@ class PrimitiveNodeTests(TestCase):
         self.assertEqual(DerivedElement("foo", 13), objects[-1][1])
 
     def test_child(self):
-        node = PrimitiveNode(var=XmlText(name="foo", qname="foo"), ns_map={})
+        node = PrimitiveNode(var=XmlVar(text=True, name="foo", qname="foo"), ns_map={})
 
         with self.assertRaises(XmlContextError):
             node.child("foo", {}, {}, 0)
@@ -754,7 +757,7 @@ class NodeParserTests(TestCase):
         parser = NodeParser()
         objects = [("q", "result")]
         queue = []
-        var = XmlText(name="foo", qname="foo")
+        var = XmlVar(text=True, name="foo", qname="foo")
         queue.append(PrimitiveNode(var=var, ns_map={}))
 
         result = parser.end(queue, objects, "author", "foobar", None)

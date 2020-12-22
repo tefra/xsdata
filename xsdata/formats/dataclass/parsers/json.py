@@ -52,7 +52,7 @@ class JsonParser(AbstractParser):
     def bind_value(self, var: XmlVar, value: Any) -> Any:
         """Bind value according to the class var."""
 
-        if var.is_attributes:
+        if var.attributes:
             return dict(value)
 
         if var.is_clazz_union:
@@ -61,10 +61,10 @@ class JsonParser(AbstractParser):
         if var.clazz:
             return self.bind_dataclass(value, var.clazz)
 
-        if var.is_wildcard:
+        if var.wildcard:
             return self.bind_wildcard(value)
 
-        if var.is_elements:
+        if var.elements:
             return self.bind_choice(value, var)
 
         return self.parse_value(value, var)
@@ -78,7 +78,7 @@ class JsonParser(AbstractParser):
             if value is None or not var.init:
                 continue
 
-            if var.is_list:
+            if var.list_element:
                 if not isinstance(value, list):
                     raise ParserError(f"Key `{var.name}` value is not iterable")
 

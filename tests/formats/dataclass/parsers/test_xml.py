@@ -2,7 +2,7 @@ from unittest import mock
 from unittest.case import TestCase
 
 from tests.fixtures.books import Books
-from xsdata.formats.dataclass.models.elements import XmlText
+from xsdata.formats.dataclass.models.elements import XmlVar
 from xsdata.formats.dataclass.parsers.nodes import PrimitiveNode
 from xsdata.formats.dataclass.parsers.nodes import SkipNode
 from xsdata.formats.dataclass.parsers.xml import XmlParser
@@ -31,7 +31,7 @@ class XmlParserTests(TestCase):
     def test_end(self, mock_emit_event):
         objects = []
         queue = []
-        var = XmlText(name="foo", qname="foo", types=[bool])
+        var = XmlVar(text=True, name="foo", qname="foo", types=[bool])
         queue.append(PrimitiveNode(var=var, ns_map={}))
 
         result = self.parser.end(queue, objects, "enabled", "true", None)

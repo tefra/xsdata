@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from dataclasses import field
+from dataclasses import InitVar
 from dataclasses import is_dataclass
 from typing import Any
 from typing import Dict
@@ -7,34 +8,40 @@ from typing import List
 from typing import Optional
 from typing import Type
 
+from xsdata.exceptions import XmlContextError
 from xsdata.models.enums import NamespaceType
 from xsdata.utils.namespaces import split_qname
 
 NoneType = type(None)
 
 
-@dataclass(frozen=True)
+@dataclass
 class XmlVar:
     """
     Dataclass field binding metadata.
 
     :param name: Field name
-    :param qname: The namespace qualified local name
-    :param init:  Field is present in the constructor parameters
-    :param mixed:  Field supports mixed content
-    :param tokens: Use a list to map simple values
-    :param derived: Use derived elements to bind data
-    :param any_type: Support inline declaration
-    :param nillable: Allow empty content elements rendering
-    :param dataclass: Specify whether the field type is a dataclass
-    :param sequential: Switch to sequential rendering with other
-        sequential siblings
-    :param list_element: Specify whether the field represents a list of
-        elements
+    :param qname: Qualified name
+    :param init:  Include field in the constructor
+    :param mixed:  Field supports mixed content type values
+    :param tokens: Field is derived from xs:list
+    :param derived: Wrap parsed values with
+        :class:`~xsdata.formats.dataclass.models.generics.DerivedElement`
+    :param any_type: Field supports dynamic value types
+    :param nillable: Field supports nillable content
+    :param dataclass: Field value is bound to a dataclass
+    :param sequential: Render values in sequential mode
+    :param list_element: Field is a list of elements
     :param default: Field default value or factory
-    :param types: Field simple types
-    :param choices: Field compound element choices
-    :param namespaces: Field list of the all the possible namespaces
+    :param text: Field is derived from xs:simpleType
+    :param element: Field is derived from xs:element
+    :param elements: Field is derived from xs:choice
+    :param wildcard: Field is derived from xs:anyType
+    :param attribute: Field is derived from xs:attribute
+    :param attributes: Field is derived from xs:attributes
+    :param types: List of all the supported data types
+    :param choices: List of repeatable choice elements
+    :param namespaces: List of the supported namespaces
     """
 
     name: str
@@ -49,9 +56,37 @@ class XmlVar:
     sequential: bool = False
     list_element: bool = False
     default: Any = None
+    text: bool = False
+    element: bool = False
+    elements: bool = False
+    wildcard: bool = False
+    attribute: bool = False
+    attributes: bool = False
     types: List[Type] = field(default_factory=list)
     choices: List["XmlVar"] = field(default_factory=list)
     namespaces: List[str] = field(default_factory=list)
+
+    xml_type: InitVar[Optional[str]] = None
+
+    def __post_init__(self, xml_type: Optional[str]):
+        if xml_type == XmlType.ELEMENT:
+            self.element = True
+        elif xml_type == XmlType.ELEMENTS:
+            self.elements = True
+        elif xml_type == XmlType.ATTRIBUTE:
+            self.attribute = True
+            self.any_type = False
+        elif xml_type == XmlType.ATTRIBUTES:
+            self.attributes = True
+            self.any_type = False
+        elif xml_type == XmlType.WILDCARD:
+            self.wildcard = True
+            self.any_type = False
+        elif xml_type == XmlType.TEXT:
+            self.text = True
+            self.any_type = False
+        elif xml_type:
+            raise XmlContextError(f"Unknown xml type `{xml_type}`")
 
     @property
     def clazz(self) -> Optional[Type]:
@@ -59,53 +94,8 @@ class XmlVar:
         return self.types[0] if self.dataclass else None
 
     @property
-    def is_any_type(self) -> bool:
-        """Return whether the field type is xs:anyType."""
-        return False
-
-    @property
-    def is_attribute(self) -> bool:
-        """Return whether the field is derived from xs:attribute."""
-        return False
-
-    @property
-    def is_attributes(self) -> bool:
-        """Return whether the field is derived from xs:anyAttributes."""
-        return False
-
-    @property
-    def is_element(self) -> bool:
-        """Return whether the field is derived from xs:element."""
-        return False
-
-    @property
-    def is_elements(self) -> bool:
-        """Return whether the field is a compound of other elements."""
-        return False
-
-    @property
-    def is_list(self) -> bool:
-        """Return whether the field is a list of elements."""
-        return self.list_element
-
-    @property
-    def is_mixed_content(self) -> bool:
-        """Return whether the field is a mixed content list of of elements."""
-        return False
-
-    @property
     def is_clazz_union(self) -> bool:
         return self.dataclass and len(self.types) > 1
-
-    @property
-    def is_text(self) -> bool:
-        """Return whether the field is a text element."""
-        return False
-
-    @property
-    def is_wildcard(self) -> bool:
-        """Return whether the field is a text element."""
-        return False
 
     def matches(self, qname: str) -> bool:
         """
@@ -113,44 +103,19 @@ class XmlVar:
 
         Return True automatically if the local name is a wildcard.
         """
+        if self.elements:
+            return self.matches_choice(qname)
+
+        if self.wildcard:
+            return self.matches_wildcard(qname)
+
         return qname in (self.qname, "*")
 
-    def find_choice(self, qname: str) -> Optional["XmlVar"]:
-        """Match and return a choice field by its qualified name."""
-        return None
-
-    def find_value_choice(self, value: Any) -> Optional["XmlVar"]:
-        """Match and return a choice field that matches the given value."""
-        return None
-
-
-@dataclass(frozen=True)
-class XmlElement(XmlVar):
-    """Dataclass field binding metadata for xs:element."""
-
-    @property
-    def is_element(self) -> bool:
-        return True
-
-    @property
-    def is_any_type(self) -> bool:
-        return self.any_type
-
-
-@dataclass(frozen=True)
-class XmlElements(XmlVar):
-    """Dataclass field binding metadata for xs:group elements."""
-
-    @property
-    def is_elements(self) -> bool:
-        return True
-
-    def matches(self, qname: str) -> bool:
+    def matches_choice(self, qname: str) -> bool:
         """Return whether a choice element matches the given qualified name."""
-
         return self.find_choice(qname) is not None
 
-    def find_choice(self, qname: str) -> Optional[XmlVar]:
+    def find_choice(self, qname: str) -> Optional["XmlVar"]:
         """Match and return a choice field by its qualified name."""
         for choice in self.choices:
             if choice.matches(qname):
@@ -180,7 +145,7 @@ class XmlElements(XmlVar):
 
         for choice in self.choices:
 
-            if choice.is_any_type or tokens != choice.tokens:
+            if choice.any_type or tokens != choice.tokens:
                 continue
 
             if tp is NoneType:
@@ -199,20 +164,7 @@ class XmlElements(XmlVar):
 
         return False
 
-
-@dataclass(frozen=True)
-class XmlWildcard(XmlVar):
-    """Dataclass field binding metadata for xs:any (wildcard) elements."""
-
-    @property
-    def is_mixed_content(self) -> bool:
-        return self.mixed
-
-    @property
-    def is_wildcard(self) -> bool:
-        return True
-
-    def matches(self, qname: str) -> bool:
+    def matches_wildcard(self, qname: str) -> bool:
         """Match the given qname to the wildcard allowed namespaces."""
 
         if qname == "*":
@@ -238,33 +190,6 @@ class XmlWildcard(XmlVar):
         return False
 
 
-@dataclass(frozen=True)
-class XmlAttribute(XmlVar):
-    """Dataclass field binding metadata for xs:anyAttributes."""
-
-    @property
-    def is_attribute(self) -> bool:
-        return True
-
-
-@dataclass(frozen=True)
-class XmlAttributes(XmlVar):
-    """Dataclass field bind metadata for xml wildcard attributes."""
-
-    @property
-    def is_attributes(self) -> bool:
-        return True
-
-
-@dataclass(frozen=True)
-class XmlText(XmlVar):
-    """Dataclass field bind metadata for xml text content."""
-
-    @property
-    def is_text(self) -> bool:
-        return True
-
-
 class FindMode:
     """Find switches to be used to find a specific var."""
 
@@ -279,16 +204,16 @@ class FindMode:
 
 find_predicates = {
     FindMode.ALL: lambda x: True,
-    FindMode.ATTRIBUTE: lambda x: x.is_attribute,
-    FindMode.ATTRIBUTES: lambda x: x.is_attributes,
-    FindMode.TEXT: lambda x: x.is_text,
-    FindMode.WILDCARD: lambda x: x.is_wildcard,
-    FindMode.MIXED_CONTENT: lambda x: x.is_mixed_content,
-    FindMode.NOT_WILDCARD: lambda x: not x.is_wildcard,
+    FindMode.ATTRIBUTE: lambda x: x.attribute,
+    FindMode.ATTRIBUTES: lambda x: x.attributes,
+    FindMode.TEXT: lambda x: x.text,
+    FindMode.WILDCARD: lambda x: x.wildcard,
+    FindMode.MIXED_CONTENT: lambda x: x.mixed,
+    FindMode.NOT_WILDCARD: lambda x: not x.wildcard,
 }
 
 
-@dataclass(frozen=True)
+@dataclass
 class XmlMeta:
     """
     Dataclass binding metadata.
@@ -331,3 +256,14 @@ class XmlMeta:
                 return index
 
         return -1
+
+
+class XmlType:
+    """Xml node types."""
+
+    TEXT = "Text"
+    ELEMENT = "Element"
+    ELEMENTS = "Elements"
+    WILDCARD = "Wildcard"
+    ATTRIBUTE = "Attribute"
+    ATTRIBUTES = "Attributes"

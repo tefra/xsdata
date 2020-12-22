@@ -19,11 +19,5 @@ XML Context
     :template: dataclass.rst
     :nosignatures:
 
-    XmlMeta
     XmlVar
-    XmlText
-    XmlElement
-    XmlElements
-    XmlWildcard
-    XmlAttribute
-    XmlAttributes
+    XmlMeta

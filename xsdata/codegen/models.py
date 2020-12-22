@@ -12,7 +12,7 @@ from typing import Optional
 from typing import Type
 
 from xsdata.formats.converter import converter
-from xsdata.formats.dataclass.models.constants import XmlType
+from xsdata.formats.dataclass.models.elements import XmlType
 from xsdata.models.enums import DataType
 from xsdata.models.enums import QNames
 from xsdata.models.enums import Tag

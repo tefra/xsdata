@@ -10,7 +10,7 @@ from typing import List
 from typing import Optional
 
 from xsdata.exceptions import SchemaValueError
-from xsdata.formats.dataclass.models.constants import XmlType
+from xsdata.formats.dataclass.models.elements import XmlType
 from xsdata.models.enums import DataType
 from xsdata.models.enums import FormType
 from xsdata.models.enums import Namespace

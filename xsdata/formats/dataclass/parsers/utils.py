@@ -122,7 +122,7 @@ class ParserUtils:
         """
         if not var.init:
             return True
-        if var.is_list:
+        if var.list_element:
             params.setdefault(var.name, []).append(value)
         elif var.name not in params:
             params[var.name] = value
@@ -144,7 +144,7 @@ class ParserUtils:
 
         value = cls.prepare_generic_value(qname, value)
 
-        if var.is_list:
+        if var.list_element:
             params.setdefault(var.name, []).append(value)
         elif var.name in params:
             previous = params[var.name]
@@ -181,7 +181,7 @@ class ParserUtils:
         if txt is None and tail is None:
             return False
 
-        if var.is_list:
+        if var.list_element:
             params.setdefault(var.name, [])
             if txt:
                 params[var.name].insert(0, txt)

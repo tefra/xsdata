@@ -118,7 +118,7 @@ class XmlSerializer(AbstractSerializer):
         """Produce an events stream from a dataclass for the given var with
         with xsi abstract type check for non wildcards."""
 
-        if var.is_wildcard:
+        if var.wildcard:
             yield from self.write_dataclass(value, namespace)
         else:
             xsi_type = self.xsi_type(var, value, namespace)
@@ -134,21 +134,21 @@ class XmlSerializer(AbstractSerializer):
         The order of the checks is important as more than one condition
         can be true.
         """
-        if var.is_mixed_content:
+        if var.mixed:
             yield from self.write_mixed_content(value, var, namespace)
-        elif var.is_text:
+        elif var.text:
             yield from self.write_data(value, var, namespace)
         elif var.tokens:
             yield from self.write_tokens(value, var, namespace)
-        elif var.is_elements:
+        elif var.elements:
             yield from self.write_elements(value, var, namespace)
-        elif var.is_list and isinstance(value, list):
+        elif var.list_element and isinstance(value, list):
             yield from self.write_list(value, var, namespace)
-        elif var.is_any_type or var.is_wildcard:
+        elif var.any_type or var.wildcard:
             yield from self.write_any_type(value, var, namespace)
         elif var.dataclass:
             yield from self.write_xsi_type(value, var, namespace)
-        elif var.is_element:
+        elif var.element:
             yield from self.write_element(value, var, namespace)
         else:
             raise SerializerError(f"Unhandled xml var: `{var.__class__.__name__}`")
@@ -189,7 +189,7 @@ class XmlSerializer(AbstractSerializer):
             yield from self.write_dataclass(value.value, namespace, qname=value.qname)
         elif is_dataclass(value):
             yield from self.write_xsi_type(value, var, namespace)
-        elif var.is_element:
+        elif var.element:
             yield from self.write_element(value, var, namespace)
         else:
             yield from self.write_data(value, var, namespace)
@@ -272,7 +272,7 @@ class XmlSerializer(AbstractSerializer):
         if var.nillable:
             yield XmlWriterEvent.ATTR, QNames.XSI_NIL, "true"
 
-        if value is not None and var.is_any_type:
+        if value is not None and var.any_type:
             datatype = DataType.from_value(value)
             if datatype != DataType.STRING:
                 yield XmlWriterEvent.ATTR, QNames.XSI_TYPE, QName(str(datatype))
@@ -300,7 +300,7 @@ class XmlSerializer(AbstractSerializer):
         stop = len(attrs)
         while index < stop:
             var = attrs[index]
-            if var.is_attribute or var.is_attributes:
+            if var.attribute or var.attributes:
                 index += 1
                 continue
 
@@ -336,13 +336,13 @@ class XmlSerializer(AbstractSerializer):
         properties type and nil.
         """
         for var in meta.vars:
-            if var.is_attribute:
+            if var.attribute:
                 value = getattr(obj, var.name)
                 if value is None or isinstance(value, list) and not value:
                     continue
 
                 yield var.qname, value
-            elif var.is_attributes:
+            elif var.attributes:
                 yield from getattr(obj, var.name, EMPTY_MAP).items()
 
         if xsi_type:

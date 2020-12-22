@@ -6,7 +6,7 @@ from typing import List
 from typing import Optional
 from typing import TypeVar
 
-from xsdata.formats.dataclass.models.constants import XmlType
+from xsdata.formats.dataclass.models.elements import XmlType
 
 T = TypeVar("T")
 

@@ -11,11 +11,10 @@ from tests.fixtures.defxmlschema.chapter12 import ProductType
 from tests.fixtures.defxmlschema.chapter12 import SizeType
 from xsdata.formats.converter import ConverterAdapter
 from xsdata.formats.dataclass.context import XmlContext
-from xsdata.formats.dataclass.models.constants import XmlType
 from xsdata.formats.dataclass.models.elements import FindMode
 from xsdata.formats.dataclass.models.elements import XmlMeta
+from xsdata.formats.dataclass.models.elements import XmlType
 from xsdata.formats.dataclass.models.elements import XmlVar
-from xsdata.formats.dataclass.models.elements import XmlWildcard
 from xsdata.formats.dataclass.models.generics import AnyElement
 from xsdata.formats.dataclass.models.generics import DerivedElement
 from xsdata.formats.dataclass.parsers.utils import ParserUtils
@@ -142,7 +141,7 @@ class ParserUtilsTests(TestCase):
             (None, "foo"),
         ]
 
-        var = XmlWildcard(name="foo", qname="{any}foo")
+        var = XmlVar(wildcard=True, name="foo", qname="{any}foo")
         params = {}
         ParserUtils.bind_mixed_objects(params, var, 1, objects)
 
@@ -173,7 +172,11 @@ class ParserUtilsTests(TestCase):
         self.assertEqual(expected, params)
         mock_parse_any_attribute.assert_called_once_with("bar", ns_map)
         mock_parse_value.assert_called_once_with(
-            "2020-03-01", eff_date.types, eff_date.default, ns_map, eff_date.is_list
+            "2020-03-01",
+            eff_date.types,
+            eff_date.default,
+            ns_map,
+            eff_date.list_element,
         )
 
     def test_parse_any_attributes(self):
@@ -211,7 +214,7 @@ class ParserUtilsTests(TestCase):
         metadata = self.ctx.build(ProductType)
         eff_date = metadata.find_var("effDate")
         metadata.vars.remove(eff_date)
-        metadata.vars.append(replace(eff_date, init=False))
+        metadata.vars.append(replace(eff_date, init=False, xml_type=None))
 
         params = {}
         attrs = {"effDate": "2020-03-01"}
@@ -242,7 +245,7 @@ class ParserUtilsTests(TestCase):
         self.assertTrue(ParserUtils.bind_content(params, metadata, "foo", ns_map))
         self.assertEqual({"value": "yes!"}, params)
         mock_parse_value.assert_called_once_with(
-            "foo", var.types, var.default, ns_map, var.is_list
+            "foo", var.types, var.default, ns_map, var.list_element
         )
 
     def test_bind_content_with_no_text_var(self):

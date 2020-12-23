@@ -218,11 +218,12 @@ class ParserUtils:
 
         if txt is not None:
             var = metadata.find_var(mode=FindMode.TEXT)
-            if var and var.init and txt is not None:
+            if var and var.init:
                 params[var.name] = cls.parse_value(
                     txt, var.types, var.default, ns_map, var.tokens
                 )
                 return True
+
         return False
 
     @classmethod

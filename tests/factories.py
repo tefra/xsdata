@@ -202,6 +202,10 @@ class AttrTypeFactory(Factory):
         return cls.create(qname=DataType.DECIMAL, native=True)
 
     @classmethod
+    def xs_datetime(cls):
+        return cls.create(qname=DataType.DATE_TIME, native=True)
+
+    @classmethod
     def xs_bool(cls):
         return cls.create(qname=DataType.BOOLEAN, native=True)
 

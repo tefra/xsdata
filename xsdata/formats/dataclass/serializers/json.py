@@ -2,17 +2,15 @@ import json
 from dataclasses import asdict
 from dataclasses import dataclass
 from dataclasses import field
-from decimal import Decimal
-from enum import Enum
 from typing import Any
 from typing import Callable
 from typing import Dict
 from typing import Optional
 from typing import Tuple
 from typing import Type
-from xml.etree.ElementTree import QName
 
 from xsdata.formats.bindings import AbstractSerializer
+from xsdata.formats.converter import converter
 
 
 def filter_none(x: Tuple) -> Dict:
@@ -29,18 +27,8 @@ class JsonEncoder(json.JSONEncoder):
     """Custom Json encoder to support additional python build-in types."""
 
     def default(self, obj: Any) -> Any:
-        """Override parent method to handle enumerations and decimals."""
-
-        if isinstance(obj, Enum):
-            return obj.value
-
-        if isinstance(obj, Decimal):
-            return str(obj)
-
-        if isinstance(obj, QName):
-            return str(obj)
-
-        return super().default(obj)
+        """Override parent method to plug the builtin converters."""
+        return converter.encode(obj)
 
 
 @dataclass

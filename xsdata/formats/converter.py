@@ -3,6 +3,9 @@ import math
 import warnings
 from dataclasses import dataclass
 from dataclasses import field
+from datetime import datetime
+from datetime import timedelta
+from datetime import timezone
 from decimal import Decimal
 from decimal import InvalidOperation
 from enum import Enum
@@ -38,7 +41,11 @@ class Converter(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def serialize(self, value: Any, **kwargs: Any) -> str:
-        """Convert to string."""
+        """Convert value to string."""
+
+    def encode(self, value: Any, **kwargs: Any) -> Any:
+        """Encode value for representation."""
+        return value
 
 
 @dataclass
@@ -83,6 +90,21 @@ class ConverterAdapter:
 
         instance = self.value_converter(value)
         return instance.serialize(value, **kwargs)
+
+    def encode(self, value: Any, **kwargs: Any) -> Any:
+        """
+        Encode the given value for representation, ignore None values.
+
+        If the value is a list assume the value is a list of tokens.
+        """
+        if value is None:
+            return None
+
+        if isinstance(value, list):
+            return [self.encode(val, **kwargs) for val in value]
+
+        instance = self.value_converter(value)
+        return instance.encode(value, **kwargs)
 
     def register_converter(self, data_type: Type, func: Union[Callable, Converter]):
         """
@@ -131,16 +153,20 @@ class ConverterAdapter:
     @classmethod
     def sort_types(cls, types: List[Type]) -> List[Type]:
         """Sort a list of types by giving priority to strict types first."""
-        in_order = (bool, int, float, Decimal, str)
+        if len(types) < 2:
+            return list(types)
 
-        sorted_types = []
-        for ordered in in_order:
-            if ordered in types:
-                types.remove(ordered)
-                sorted_types.append(ordered)
+        return sorted(types, key=lambda x: __PYTHON_TYPES_SORTED__.get(x, 0))
 
-        types.extend(sorted_types)
-        return types
+
+__PYTHON_TYPES_SORTED__ = {
+    bool: 1,
+    int: 2,
+    float: 3,
+    Decimal: 4,
+    datetime: 5,
+    str: 6,
+}
 
 
 class BoolConverter(Converter):
@@ -167,8 +193,8 @@ class IntConverter(Converter):
     def deserialize(self, value: Any, **kwargs: Any) -> int:
         try:
             return int(value)
-        except (ValueError, TypeError):
-            raise ConverterError()
+        except (ValueError, TypeError) as e:
+            raise ConverterError(e)
 
     def serialize(self, value: int, **kwargs: Any) -> str:
         return str(value)
@@ -186,8 +212,8 @@ class FloatConverter(Converter):
     def deserialize(self, value: Any, **kwargs: Any) -> float:
         try:
             return float(value)
-        except ValueError:
-            raise ConverterError()
+        except ValueError as e:
+            raise ConverterError(e)
 
     def serialize(self, value: float, **kwargs: Any) -> str:
         return "NaN" if math.isnan(value) else str(value).upper()
@@ -205,6 +231,9 @@ class DecimalConverter(Converter):
             return str(value).replace("Infinity", "INF")
 
         return str(value)
+
+    def encode(self, value: Any, **kwargs: Any) -> Any:
+        return self.serialize(value)
 
 
 class QNameConverter(Converter):
@@ -255,7 +284,7 @@ class QNameConverter(Converter):
     @staticmethod
     def resolve(value: str, ns_map: Optional[Dict]) -> Tuple:
         if not value:
-            raise ConverterError("Invalid QName")
+            raise ConverterError("Value is empty")
 
         if value[0] == "{":
             return value, None
@@ -270,6 +299,9 @@ class QNameConverter(Converter):
             raise ConverterError(f"Unknown namespace prefix: `{prefix}`")
 
         return namespace, suffix
+
+    def encode(self, value: Any, **kwargs: Any) -> Any:
+        return str(value)
 
 
 class LxmlQNameConverter(Converter):
@@ -288,8 +320,8 @@ class LxmlQNameConverter(Converter):
 
             text_or_uri, tag = QNameConverter.resolve(value, ns_map)
             return etree.QName(text_or_uri, tag)
-        except ValueError:
-            raise ConverterError()
+        except ValueError as e:
+            raise ConverterError(e)
 
     def serialize(
         self, value: etree.QName, ns_map: Optional[Dict] = None, **kwargs: Any
@@ -309,6 +341,9 @@ class LxmlQNameConverter(Converter):
 
         prefix = load_prefix(value.namespace, ns_map)
         return f"{prefix}:{value.localname}" if prefix else value.localname
+
+    def encode(self, value: Any, **kwargs: Any) -> Any:
+        return str(value)
 
 
 class EnumConverter(Converter):
@@ -330,7 +365,7 @@ class EnumConverter(Converter):
 
         # Raise exception if the real value doesn't match the expected type.
         if not isinstance(real_value, value_type):
-            raise ConverterError()
+            raise ConverterError(f"Value must be {value_type}")
 
         try:
             # Attempt no1 use the enum constructor
@@ -348,11 +383,97 @@ class EnumConverter(Converter):
             # canonical representations.
             repr_value = repr(real_value)
             return next(x for x in data_type if repr(x.value) == repr_value)
-        except (ValueError, StopIteration):
-            raise ConverterError()
+        except (ValueError, StopIteration) as e:
+            raise ConverterError(e)
 
     def serialize(self, value: Enum, **kwargs: Any) -> str:
         return converter.serialize(value.value, **kwargs)
+
+    def encode(self, value: Any, **kwargs: Any) -> Any:
+        return converter.encode(value.value)
+
+
+class DatetimeConverter(Converter):
+    """
+    Converter for iso 8061 xml subset datetime strings.
+
+    Format: YYYY-MM-DDThh:mm:ss[Z|(+|-)hh:mm]
+    """
+
+    def deserialize(self, value: Any, **kwargs: Any) -> datetime:
+        if not isinstance(value, str):
+            raise ConverterError("Value must be str")
+
+        try:
+            if (
+                value[4] != "-"
+                or value[7] != "-"
+                or value[10] != "T"
+                or value[13] != ":"
+                or value[16] != ":"
+            ):
+                raise IndexError()
+
+            year, month, day = int(value[:4]), int(value[5:7]), int(value[8:10])
+            length = len(value)
+            hour = int(value[11:13])
+            minute = int(value[14:16])
+            second = int(value[17:19])
+            microsecond = 0
+
+            delta = None
+            if hour == 24:
+                hour = 0
+                delta = timedelta(days=1)
+
+            index = 19
+            if length > index and value[index] == ".":
+                microseconds = ""
+                index += 1
+                while length > index and value[index].isdigit():
+                    microseconds += value[index]
+                    index += 1
+
+                microsecond = int(microseconds.ljust(6, "0"))
+
+            tz_info = self.parse_timezone(value, index) if length > index else None
+
+            result = datetime(
+                year=year,
+                month=month,
+                day=day,
+                hour=hour,
+                minute=minute,
+                second=second,
+                microsecond=microsecond,
+                tzinfo=tz_info,
+            )
+
+            return result + delta if delta else result
+        except (IndexError, TypeError, ValueError):
+            raise ConverterError(f"Invalid isoformat string: '{value}'")
+
+    def serialize(self, value: datetime, **kwargs: Any) -> str:
+        return value.isoformat().replace("+00:00", "Z")
+
+    def encode(self, value: Any, **kwargs: Any) -> Any:
+        return self.serialize(value)
+
+    @classmethod
+    def parse_timezone(cls, string: str, index: int) -> timezone:
+        if string[index] == "Z":
+            return timezone.utc
+
+        if string[index] in ("-", "+"):
+            offset = int(string[index + 1 : index + 3]) * 60
+            offset += int(string[index + 4 :])
+
+            if string[index] == "-":
+                offset = -offset
+
+            return timezone(timedelta(minutes=offset))
+
+        raise ValueError(f"Invalid timezone '{string[index:]}'")
 
 
 @dataclass
@@ -366,8 +487,8 @@ class ProxyConverter(Converter):
     def deserialize(self, value: Any, **kwargs: Any) -> Any:
         try:
             return self.func(value)
-        except ValueError:
-            raise ConverterError
+        except ValueError as e:
+            raise ConverterError(e)
 
     def serialize(self, value: Any, **kwargs: Any) -> str:
         return str(value)
@@ -379,6 +500,7 @@ converter.register_converter(int, IntConverter())
 converter.register_converter(bool, BoolConverter())
 converter.register_converter(float, FloatConverter())
 converter.register_converter(object, StrConverter())
+converter.register_converter(datetime, DatetimeConverter())
 converter.register_converter(etree.QName, LxmlQNameConverter())
 converter.register_converter(QName, QNameConverter())
 converter.register_converter(Decimal, DecimalConverter())

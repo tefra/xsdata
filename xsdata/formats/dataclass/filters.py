@@ -3,6 +3,7 @@ import textwrap
 from collections import defaultdict
 from dataclasses import dataclass
 from dataclasses import field
+from datetime import datetime
 from typing import Any
 from typing import Callable
 from typing import Dict
@@ -479,6 +480,9 @@ class Filters:
         if isinstance(value, QName):
             return f'QName("{value.text}")'
 
+        if isinstance(value, datetime):
+            return repr(value).replace("datetime.", "")
+
         return repr(value).replace("'", '"')
 
     @classmethod
@@ -503,6 +507,16 @@ class Filters:
 
         if dataclasses:
             result.append(f"from dataclasses import {', '.join(dataclasses)}")
+
+        datetimes = []
+        if cls.type_is_included(output, "datetime"):
+            datetimes.append("datetime")
+
+        if "tzinfo=timezone." in output:
+            datetimes.append("timezone")
+
+        if datetimes:
+            result.append(f"from datetime import {', '.join(datetimes)}")
 
         if cls.type_is_included(output, "Decimal"):
             result.append("from decimal import Decimal")

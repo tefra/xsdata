@@ -1,4 +1,6 @@
 import json
+from datetime import datetime
+from datetime import timezone
 from decimal import Decimal
 from unittest.case import TestCase
 from xml.etree.ElementTree import QName
@@ -6,7 +8,6 @@ from xml.etree.ElementTree import QName
 from tests.fixtures.books import BookForm
 from tests.fixtures.books import Books
 from xsdata.formats.dataclass.serializers import DictFactory
-from xsdata.formats.dataclass.serializers.json import asdict
 from xsdata.formats.dataclass.serializers.json import JsonEncoder
 from xsdata.formats.dataclass.serializers.json import JsonSerializer
 from xsdata.models.enums import FormType
@@ -64,18 +65,18 @@ class JsonEncoderTests(TestCase):
         }
         self.assertEqual(expected, json.loads(actual))
 
-    def test_encode_qname(self):
+    def test_encode(self):
         actual = json.dumps({"qname": QName("a", "b")}, cls=JsonEncoder)
         self.assertEqual('{"qname": "{a}b"}', actual)
 
-    def test_encode_enum(self):
         actual = json.dumps({"enum": FormType.QUALIFIED}, cls=JsonEncoder)
         self.assertEqual('{"enum": "qualified"}', actual)
 
-    def test_encode_decimal(self):
         actual = json.dumps({"decimal": Decimal(10.5)}, cls=JsonEncoder)
         self.assertEqual('{"decimal": "10.5"}', actual)
 
-    def test_default_raises_exceptions(self):
-        with self.assertRaises(TypeError):
-            json.dumps({"string": object()}, cls=JsonEncoder)
+        actual = json.dumps(
+            {"datetime": datetime(2002, 1, 1, 12, 1, 1, tzinfo=timezone.utc)},
+            cls=JsonEncoder,
+        )
+        self.assertEqual('{"datetime": "2002-01-01T12:01:01Z"}', actual)

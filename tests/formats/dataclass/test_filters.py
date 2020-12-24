@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from tests.factories import AttrFactory
 from tests.factories import AttrTypeFactory
 from tests.factories import FactoryTestCase
@@ -21,6 +23,7 @@ type_decimal = AttrTypeFactory.xs_decimal()
 type_bool = AttrTypeFactory.xs_bool()
 type_qname = AttrTypeFactory.xs_qname()
 type_tokens = AttrTypeFactory.xs_tokens()
+type_datetime = AttrTypeFactory.xs_datetime()
 
 
 class FiltersTests(FactoryTestCase):
@@ -173,6 +176,16 @@ class FiltersTests(FactoryTestCase):
         self.assertEqual(
             'QName("{http://www.w3.org/2001/XMLSchema}anyType")',
             self.filters.field_default_value(attr, ns_map),
+        )
+
+    def test_field_default_value_with_datetime(self):
+        attr = AttrFactory.create(
+            types=[type_datetime], default="2002-01-01T12:01:01-00:00"
+        )
+
+        self.assertEqual(
+            "datetime(2002, 1, 1, 12, 1, 1, tzinfo=timezone.utc)",
+            self.filters.field_default_value(attr),
         )
 
     def test_field_default_value_with_any_attribute(self):
@@ -463,6 +476,18 @@ class FiltersTests(FactoryTestCase):
 
         output = " field( @dataclass "
         expected = "from dataclasses import dataclass, field"
+        self.assertIn(expected, self.filters.default_imports(output))
+
+    def test_default_imports_with_datetime(self):
+        expected = "from datetime import datetime"
+
+        self.assertIn(expected, self.filters.default_imports("Optional[datetime]"))
+        self.assertIn(expected, self.filters.default_imports("Union[str, datetime]"))
+        self.assertIn(expected, self.filters.default_imports("qname: datetime"))
+        self.assertIn(expected, self.filters.default_imports(" = datetime"))
+
+        output = "date: datetime = field(default=datetime(1, 1, 1, tzinfo=timezone.utc)"
+        expected = "from datetime import datetime, timezone"
         self.assertIn(expected, self.filters.default_imports(output))
 
     def test_default_imports_with_typing(self):

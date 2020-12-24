@@ -1,3 +1,4 @@
+from datetime import datetime
 from decimal import Decimal
 from enum import Enum
 from pathlib import Path
@@ -91,7 +92,7 @@ class DataType(Enum):
     BOOLEAN = ("boolean", bool)
     BYTE = ("byte", int)
     DATE = ("date", str)
-    DATE_TIME = ("dateTime", str)
+    DATE_TIME = ("dateTime", datetime)
     DATE_TIMESTAMP = ("dateTimeStamp", str)
     DAY_TIME_DURATION = ("dayTimeDuration", str)
     YEAR_MONTH_DURATION = ("yearMonthDuration", str)

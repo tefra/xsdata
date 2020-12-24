@@ -3,7 +3,6 @@ import textwrap
 from collections import defaultdict
 from dataclasses import dataclass
 from dataclasses import field
-from decimal import Decimal
 from typing import Any
 from typing import Callable
 from typing import Dict
@@ -240,7 +239,7 @@ class Filters:
         if isinstance(data, str):
             return self.format_string(data, indent, key, 4)
 
-        return str(data)
+        return self.literal_value(data)
 
     def format_dict(self, data: Dict, indent: int) -> str:
         """Return a pretty string representation of a dict."""
@@ -359,8 +358,10 @@ class Filters:
             return "list"
         if attr.is_dict:
             return "dict"
+        if attr.default is None:
+            return None
         if not isinstance(attr.default, str):
-            return attr.default
+            return self.literal_value(attr.default)
         if attr.default.startswith("@enum@"):
             return self.field_default_enum(attr)
 
@@ -373,7 +374,7 @@ class Filters:
         if attr.is_tokens:
             return self.field_default_tokens(attr, types)
 
-        return self.prepare_default_value(
+        return self.literal_value(
             converter.deserialize(attr.default, types, ns_map=ns_map)
         )
 
@@ -386,7 +387,7 @@ class Filters:
         assert isinstance(attr.default, str)
 
         tokens = ", ".join(
-            str(self.prepare_default_value(converter.deserialize(val, types)))
+            str(self.literal_value(converter.deserialize(val, types)))
             for val in attr.default.split()
         )
         return f"lambda: [{tokens}]"
@@ -468,20 +469,17 @@ class Filters:
         return self.type_name(attr_type)
 
     @classmethod
-    def prepare_default_value(cls, value: Any) -> Any:
+    def literal_value(cls, value: Any) -> str:
         if isinstance(value, str):
             return quoteattr(value)
 
         if isinstance(value, float):
-            return f"float('{value}')" if math.isinf(value) else value
-
-        if isinstance(value, Decimal):
-            return repr(value)
+            return f'float("{value}")' if math.isinf(value) else str(value)
 
         if isinstance(value, QName):
             return f'QName("{value.text}")'
 
-        return value
+        return repr(value).replace("'", '"')
 
     @classmethod
     def type_is_included(cls, output: str, type_name: str) -> bool:

@@ -127,28 +127,28 @@ class FiltersTests(FactoryTestCase):
 
     def test_field_default_value_with_type_float(self):
         attr = AttrFactory.create(types=[type_float], default="1.5")
-        self.assertEqual(1.5, self.filters.field_default_value(attr))
+        self.assertEqual("1.5", self.filters.field_default_value(attr))
 
         attr.default = "inf"
         attr.types = [type_int, type_float]
-        self.assertEqual("float('inf')", self.filters.field_default_value(attr))
+        self.assertEqual('float("inf")', self.filters.field_default_value(attr))
 
         attr.default = "-inf"
-        self.assertEqual("float('-inf')", self.filters.field_default_value(attr))
+        self.assertEqual('float("-inf")', self.filters.field_default_value(attr))
 
     def test_field_default_value_with_type_decimal(self):
         attr = AttrFactory.create(types=[type_decimal], default="1.5")
-        self.assertEqual("Decimal('1.5')", self.filters.field_default_value(attr))
+        self.assertEqual('Decimal("1.5")', self.filters.field_default_value(attr))
 
         attr.default = "-inf"
-        self.assertEqual("Decimal('-Infinity')", self.filters.field_default_value(attr))
+        self.assertEqual('Decimal("-Infinity")', self.filters.field_default_value(attr))
 
         attr.default = "inf"
-        self.assertEqual("Decimal('Infinity')", self.filters.field_default_value(attr))
+        self.assertEqual('Decimal("Infinity")', self.filters.field_default_value(attr))
 
     def test_field_default_value_with_type_int(self):
         attr = AttrFactory.create(types=[type_int], default="1")
-        self.assertEqual(1, self.filters.field_default_value(attr))
+        self.assertEqual("1", self.filters.field_default_value(attr))
 
     def test_field_default_value_with_type_bool(self):
         attr = AttrFactory.create(types=[type_bool], default="true")
@@ -185,14 +185,14 @@ class FiltersTests(FactoryTestCase):
         self.assertEqual("list", self.filters.field_default_value(attr))
 
     def test_field_default_value_with_multiple_types(self):
-        attr = AttrFactory.create(types=[type_bool, type_int, type_float], default="1")
-        self.assertEqual(1, self.filters.field_default_value(attr))
+        attr = AttrFactory.create(types=[type_bool, type_int, type_float], default="2")
+        self.assertEqual("2", self.filters.field_default_value(attr))
 
-        attr.default = "1.0"
-        self.assertEqual(1.0, self.filters.field_default_value(attr))
+        attr.default = 1.0
+        self.assertEqual("1.0", self.filters.field_default_value(attr))
 
         attr.default = "true"
-        self.assertTrue(self.filters.field_default_value(attr))
+        self.assertEqual("True", self.filters.field_default_value(attr))
 
     def test_field_metadata(self):
         attr = AttrFactory.element()

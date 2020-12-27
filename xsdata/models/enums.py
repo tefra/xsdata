@@ -93,7 +93,7 @@ class DataType(Enum):
     BYTE = ("byte", int)
     DATE = ("date", str)
     DATE_TIME = ("dateTime", datetime)
-    DATE_TIMESTAMP = ("dateTimeStamp", str)
+    DATE_TIMESTAMP = ("dateTimeStamp", datetime)
     DAY_TIME_DURATION = ("dayTimeDuration", str)
     YEAR_MONTH_DURATION = ("yearMonthDuration", str)
     DECIMAL = ("decimal", Decimal)

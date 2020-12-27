@@ -486,8 +486,17 @@ class FiltersTests(FactoryTestCase):
         self.assertIn(expected, self.filters.default_imports("qname: datetime"))
         self.assertIn(expected, self.filters.default_imports(" = datetime"))
 
-        output = "date: datetime = field(default=datetime(1, 1, 1, tzinfo=timezone.utc)"
+        output = (
+            "date: datetime = field(default=datetime(1, 1, 1, tzinfo=timezone.utc))"
+        )
         expected = "from datetime import datetime, timezone"
+        self.assertIn(expected, self.filters.default_imports(output))
+
+        output = (
+            "date: datetime = field(default=datetime("
+            "1, 1, 1, tzinfo=timezone(timedelta(minutes=120))))"
+        )
+        expected = "from datetime import datetime, timedelta"
         self.assertIn(expected, self.filters.default_imports(output))
 
     def test_default_imports_with_typing(self):

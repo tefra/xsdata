@@ -512,6 +512,9 @@ class Filters:
         if cls.type_is_included(output, "datetime"):
             datetimes.append("datetime")
 
+        if "timedelta(" in output:
+            datetimes.append("timedelta")
+
         if "tzinfo=timezone." in output:
             datetimes.append("timezone")
 

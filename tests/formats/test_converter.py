@@ -16,6 +16,7 @@ from xsdata.formats.converter import Converter
 from xsdata.formats.converter import converter
 from xsdata.formats.converter import DatetimeConverter
 from xsdata.formats.converter import DecimalConverter
+from xsdata.formats.converter import DurationConverter
 from xsdata.formats.converter import EnumConverter
 from xsdata.formats.converter import FloatConverter
 from xsdata.formats.converter import IntConverter
@@ -23,6 +24,7 @@ from xsdata.formats.converter import LxmlQNameConverter
 from xsdata.formats.converter import ProxyConverter
 from xsdata.formats.converter import QNameConverter
 from xsdata.formats.converter import StrConverter
+from xsdata.models.datatype import Duration
 from xsdata.models.enums import UseType
 
 
@@ -230,7 +232,7 @@ class DatetimeConverterTests(TestCase):
         ]
 
         for example in examples:
-            with self.assertRaises(ValueError):
+            with self.assertRaises(ConverterError):
                 self.converter.deserialize(example)
 
     def test_serialize(self):
@@ -242,6 +244,27 @@ class DatetimeConverterTests(TestCase):
         value = datetime(2002, 1, 1, 12, 1, 1, tzinfo=timezone.utc)
         output = "2002-01-01T12:01:01Z"
         self.assertEqual(output, self.converter.encode(value))
+
+
+class DurationConverterTests(TestCase):
+    def setUp(self):
+        self.converter = DurationConverter()
+
+    def test_deserialize(self):
+        self.assertIsInstance(self.converter.deserialize("P20M"), Duration)
+
+        with self.assertRaises(ConverterError):
+            self.converter.deserialize("P-20M")
+
+    def test_serialize(self):
+        actual = self.converter.serialize(Duration("PT3S"))
+        self.assertEqual("PT3S", actual)
+        self.assertNotIsInstance(actual, Duration)
+
+    def test_encode_serializes_output(self):
+        actual = self.converter.encode(Duration("PT3S"))
+        self.assertEqual("PT3S", actual)
+        self.assertNotIsInstance(actual, Duration)
 
 
 class LxmlQNameConverterTests(TestCase):

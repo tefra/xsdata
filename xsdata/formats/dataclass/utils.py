@@ -1,6 +1,7 @@
 import re
 
 # python allocated strings
+
 stop_words = [
     "and",
     "except",
@@ -44,6 +45,8 @@ stop_words = [
     "dict",
     "field",
     "datetime",
+    "duration",
+    "decimal",
 ]
 
 

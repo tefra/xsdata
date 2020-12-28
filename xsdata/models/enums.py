@@ -6,6 +6,8 @@ from typing import Any
 from typing import Optional
 from xml.etree.ElementTree import QName
 
+from xsdata.models.datatype import Duration
+
 COMMON_SCHEMA_DIR = Path(__file__).absolute().parent.parent.joinpath("schemas/")
 
 
@@ -94,12 +96,12 @@ class DataType(Enum):
     DATE = ("date", str)
     DATE_TIME = ("dateTime", datetime)
     DATE_TIMESTAMP = ("dateTimeStamp", datetime)
-    DAY_TIME_DURATION = ("dayTimeDuration", str)
-    YEAR_MONTH_DURATION = ("yearMonthDuration", str)
+    DAY_TIME_DURATION = ("dayTimeDuration", Duration)
+    YEAR_MONTH_DURATION = ("yearMonthDuration", Duration)
     DECIMAL = ("decimal", Decimal)
     DERIVATION_CONTROL = ("derivationControl", str)
     DOUBLE = ("double", Decimal)
-    DURATION = ("duration", str)
+    DURATION = ("duration", Duration)
     ENTITIES = ("ENTITIES", str)
     ENTITY = ("ENTITY", str)
     ERROR = ("error", str)

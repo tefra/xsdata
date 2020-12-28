@@ -23,6 +23,7 @@ from lxml import etree
 
 from xsdata.exceptions import ConverterError
 from xsdata.exceptions import ConverterWarning
+from xsdata.models.datatype import Duration
 from xsdata.utils import text
 from xsdata.utils.namespaces import load_prefix
 from xsdata.utils.namespaces import split_qname
@@ -393,6 +394,20 @@ class EnumConverter(Converter):
         return converter.encode(value.value)
 
 
+class DurationConverter(Converter):
+    def deserialize(self, value: Any, **kwargs: Any) -> Duration:
+        try:
+            return Duration(value)
+        except ValueError as e:
+            raise ConverterError(e)
+
+    def serialize(self, value: Duration, **kwargs: Any) -> str:
+        return str(value)
+
+    def encode(self, value: Any, **kwargs: Any) -> str:
+        return self.serialize(value, **kwargs)
+
+
 class DatetimeConverter(Converter):
     """
     Converter for iso 8061 xml subset datetime strings.
@@ -501,6 +516,7 @@ converter.register_converter(bool, BoolConverter())
 converter.register_converter(float, FloatConverter())
 converter.register_converter(object, StrConverter())
 converter.register_converter(datetime, DatetimeConverter())
+converter.register_converter(Duration, DurationConverter())
 converter.register_converter(etree.QName, LxmlQNameConverter())
 converter.register_converter(QName, QNameConverter())
 converter.register_converter(Decimal, DecimalConverter())

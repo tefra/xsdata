@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import timedelta
 
 from tests.factories import AttrFactory
 from tests.factories import AttrTypeFactory
@@ -24,6 +24,7 @@ type_bool = AttrTypeFactory.xs_bool()
 type_qname = AttrTypeFactory.xs_qname()
 type_tokens = AttrTypeFactory.xs_tokens()
 type_datetime = AttrTypeFactory.xs_datetime()
+type_duration = AttrTypeFactory.xs_duration()
 
 
 class FiltersTests(FactoryTestCase):
@@ -179,14 +180,15 @@ class FiltersTests(FactoryTestCase):
         )
 
     def test_field_default_value_with_datetime(self):
-        attr = AttrFactory.create(
-            types=[type_datetime], default="2002-01-01T12:01:01-00:00"
-        )
+        attr = AttrFactory.create(types=[type_datetime], default="2002-01-01T12:01:01")
+        actual = self.filters.field_default_value(attr)
 
-        self.assertEqual(
-            "datetime(2002, 1, 1, 12, 1, 1, tzinfo=timezone.utc)",
-            self.filters.field_default_value(attr),
-        )
+        self.assertEqual("datetime(2002, 1, 1, 12, 1, 1)", actual)
+
+    def test_field_default_value_with_duration(self):
+        attr = AttrFactory.create(types=[type_duration], default="P30M")
+
+        self.assertEqual('Duration("P30M")', self.filters.field_default_value(attr))
 
     def test_field_default_value_with_any_attribute(self):
         attr = AttrFactory.any_attribute()
@@ -497,6 +499,11 @@ class FiltersTests(FactoryTestCase):
             "1, 1, 1, tzinfo=timezone(timedelta(minutes=120))))"
         )
         expected = "from datetime import datetime, timedelta"
+        self.assertIn(expected, self.filters.default_imports(output))
+
+    def test_default_imports_with_builtin_datatype(self):
+        output = "field: Optional[Duration] = "
+        expected = "from xsdata.models.datatype import Duration"
         self.assertIn(expected, self.filters.default_imports(output))
 
     def test_default_imports_with_typing(self):

@@ -4,6 +4,7 @@ from collections import defaultdict
 from dataclasses import dataclass
 from dataclasses import field
 from datetime import datetime
+from datetime import timedelta
 from typing import Any
 from typing import Callable
 from typing import Dict
@@ -480,7 +481,7 @@ class Filters:
         if isinstance(value, QName):
             return f'QName("{value.text}")'
 
-        if isinstance(value, datetime):
+        if isinstance(value, (datetime, timedelta)):
             return repr(value).replace("datetime.", "")
 
         return repr(value).replace("'", '"')
@@ -545,6 +546,13 @@ class Filters:
 
         if cls.type_is_included(output, "QName"):
             result.append("from xml.etree.ElementTree import QName")
+
+        builtin = []
+        if cls.type_is_included(output, "Duration"):
+            builtin = ["Duration"]
+
+        if builtin:
+            result.append(f"from xsdata.models.datatype import {', '.join(builtin)}")
 
         return "\n".join(result)
 

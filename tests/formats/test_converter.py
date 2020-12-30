@@ -1,5 +1,6 @@
 import warnings
 from datetime import datetime
+from datetime import time
 from datetime import timedelta
 from datetime import timezone
 from decimal import Decimal
@@ -11,19 +12,9 @@ from xml.etree.ElementTree import QName
 from lxml import etree
 
 from xsdata.exceptions import ConverterError
-from xsdata.formats.converter import BoolConverter
 from xsdata.formats.converter import Converter
 from xsdata.formats.converter import converter
-from xsdata.formats.converter import DatetimeConverter
-from xsdata.formats.converter import DecimalConverter
-from xsdata.formats.converter import DurationConverter
-from xsdata.formats.converter import EnumConverter
-from xsdata.formats.converter import FloatConverter
-from xsdata.formats.converter import IntConverter
-from xsdata.formats.converter import LxmlQNameConverter
 from xsdata.formats.converter import ProxyConverter
-from xsdata.formats.converter import QNameConverter
-from xsdata.formats.converter import StrConverter
 from xsdata.models.datatype import Duration
 from xsdata.models.enums import UseType
 
@@ -99,7 +90,7 @@ class ConverterAdapterTests(TestCase):
 
 class StrConverterTests(TestCase):
     def setUp(self):
-        self.converter = StrConverter()
+        self.converter = converter.type_converter(str)
 
     def test_deserialize(self):
         self.assertEqual("a", self.converter.deserialize("a"))
@@ -112,7 +103,7 @@ class StrConverterTests(TestCase):
 
 class BoolConverterTests(TestCase):
     def setUp(self):
-        self.converter = BoolConverter()
+        self.converter = converter.type_converter(bool)
 
     def test_deserialize(self):
         with self.assertRaises(ConverterError):
@@ -134,7 +125,7 @@ class BoolConverterTests(TestCase):
 
 class IntConverterTests(TestCase):
     def setUp(self):
-        self.converter = IntConverter()
+        self.converter = converter.type_converter(int)
 
     def test_deserialize(self):
         with self.assertRaises(ConverterError):
@@ -150,7 +141,7 @@ class IntConverterTests(TestCase):
 
 class FloatConverterTests(TestCase):
     def setUp(self):
-        self.converter = FloatConverter()
+        self.converter = converter.type_converter(float)
 
     def test_deserialize(self):
         with self.assertRaises(ConverterError):
@@ -170,7 +161,7 @@ class FloatConverterTests(TestCase):
 
 class DecimalConverterTests(TestCase):
     def setUp(self):
-        self.converter = DecimalConverter()
+        self.converter = converter.type_converter(Decimal)
 
     def test_deserialize(self):
         with self.assertRaises(ConverterError):
@@ -195,7 +186,7 @@ class DecimalConverterTests(TestCase):
 
 class DatetimeConverterTests(TestCase):
     def setUp(self):
-        self.converter = DatetimeConverter()
+        self.converter = converter.type_converter(datetime)
 
     def test_deserialize(self):
         fixtures = {
@@ -236,9 +227,14 @@ class DatetimeConverterTests(TestCase):
                 self.converter.deserialize(example)
 
     def test_serialize(self):
-        value = datetime(2002, 1, 1, 12, 1, 1, tzinfo=timezone.utc)
-        output = "2002-01-01T12:01:01Z"
-        self.assertEqual(output, self.converter.serialize(value))
+        obj = self.converter.deserialize("2009-01-01T12:00:00.123-09:00")
+        self.assertEqual("2009-01-01T12:00:00.123-09:00", self.converter.serialize(obj))
+
+        obj = self.converter.deserialize("2009-01-01T12:00:00.123456+00:00")
+        self.assertEqual("2009-01-01T12:00:00.123456Z", self.converter.serialize(obj))
+
+        obj = self.converter.deserialize("2009-01-01T12:00:00.0")
+        self.assertEqual("2009-01-01T12:00:00", self.converter.serialize(obj))
 
     def test_encode(self):
         value = datetime(2002, 1, 1, 12, 1, 1, tzinfo=timezone.utc)
@@ -246,9 +242,56 @@ class DatetimeConverterTests(TestCase):
         self.assertEqual(output, self.converter.encode(value))
 
 
+class TimeConverterTests(TestCase):
+    def setUp(self):
+        self.converter = converter.type_converter(time)
+
+    def test_deserialize(self):
+        fixtures = {
+            "12:01:01-00:00": time(12, 1, 1, tzinfo=timezone.utc),
+            "12:01:01-02:15": time(12, 1, 1, tzinfo=timezone(timedelta(minutes=-135))),
+            "12:01:01+02:15": time(12, 1, 1, tzinfo=timezone(timedelta(minutes=135))),
+            "12:01:01.010Z": time(12, 1, 1, 10000, tzinfo=timezone.utc),
+            "12:01:01.123456": time(12, 1, 1, 123456),
+            "12:01:01": time(12, 1, 1),
+            "24:00:00Z": time(0, 0, tzinfo=timezone.utc),
+        }
+
+        for value, expected in fixtures.items():
+            self.assertEqual(expected, self.converter.deserialize(value), value)
+
+    def test_deserializer_raises_exception(self):
+        examples = [
+            "a",
+            1,
+            "12-01:01",
+            "12:01-01",
+            "12:01:01U",
+        ]
+
+        for example in examples:
+            with self.assertRaises(ConverterError):
+                self.converter.deserialize(example)
+
+    def test_serialize(self):
+        obj = self.converter.deserialize("12:00:00.123-09:00")
+        self.assertEqual("12:00:00.123-09:00", self.converter.serialize(obj))
+
+        obj = self.converter.deserialize("12:00:00.123456+00:00")
+        self.assertEqual("12:00:00.123456Z", self.converter.serialize(obj))
+
+        obj = self.converter.deserialize("12:00:00.0")
+        self.assertEqual("12:00:00", self.converter.serialize(obj))
+
+    def test_encode(self):
+        value = time(12, 1, 1, tzinfo=timezone.utc)
+        output = "12:01:01Z"
+        self.assertEqual(output, self.converter.encode(value))
+
+
 class DurationConverterTests(TestCase):
     def setUp(self):
-        self.converter = DurationConverter()
+        self.converter = converter.type_converter(Duration)
 
     def test_deserialize(self):
         self.assertIsInstance(self.converter.deserialize("P20M"), Duration)
@@ -269,7 +312,7 @@ class DurationConverterTests(TestCase):
 
 class LxmlQNameConverterTests(TestCase):
     def setUp(self):
-        self.converter = LxmlQNameConverter()
+        self.converter = converter.type_converter(etree.QName)
 
     def test_deserialize(self):
         convert = self.converter.deserialize
@@ -302,7 +345,7 @@ class LxmlQNameConverterTests(TestCase):
 
 class QNameConverterTests(TestCase):
     def setUp(self):
-        self.converter = QNameConverter()
+        self.converter = converter.type_converter(QName)
 
     def test_deserialize(self):
         convert = self.converter.deserialize
@@ -345,7 +388,7 @@ class QNameConverterTests(TestCase):
 
 class EnumConverterTests(TestCase):
     def setUp(self):
-        self.converter = EnumConverter()
+        self.converter = converter.type_converter(Enum)
 
     def test_deserialize(self):
         class Fixture(Enum):

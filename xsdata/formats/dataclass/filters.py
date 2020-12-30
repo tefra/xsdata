@@ -4,6 +4,7 @@ from collections import defaultdict
 from dataclasses import dataclass
 from dataclasses import field
 from datetime import datetime
+from datetime import time
 from datetime import timedelta
 from typing import Any
 from typing import Callable
@@ -482,7 +483,7 @@ class Filters:
         if isinstance(value, QName):
             return f'QName("{value.text}")'
 
-        if isinstance(value, (datetime, timedelta)):
+        if isinstance(value, (datetime, timedelta, time)):
             return repr(value).replace("datetime.", "")
 
         return repr(value).replace("'", '"')
@@ -498,8 +499,9 @@ class Filters:
             "dataclasses": {"dataclass": ["@dataclass"], "field": [" = field("]},
             "datetime": {
                 "datetime": type_patterns("datetime"),
+                "time": type_patterns("time"),
                 "timedelta": ["timedelta("],
-                "timezone": ["tzinfo=timezone."],
+                "timezone": ["tzinfo=timezone"],
             },
             "decimal": {"Decimal": type_patterns("Decimal")},
             "enum": {"Enum": ["(Enum)"]},

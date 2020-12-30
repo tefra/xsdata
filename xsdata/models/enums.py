@@ -1,4 +1,5 @@
 from datetime import datetime
+from datetime import time
 from decimal import Decimal
 from enum import Enum
 from pathlib import Path
@@ -134,7 +135,7 @@ class DataType(Enum):
     SHORT = ("short", int)
     SIMPLE_DERIVATION_SET = ("simpleDerivationSet", str)
     STRING = ("string", str)
-    TIME = ("time", str)
+    TIME = ("time", time)
     TOKEN = ("token", str)
     UNSIGNED_BYTE = ("unsignedByte", int)
     UNSIGNED_INT = ("unsignedInt", int)

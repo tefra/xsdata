@@ -206,6 +206,10 @@ class AttrTypeFactory(Factory):
         return cls.create(qname=DataType.DATE_TIME, native=True)
 
     @classmethod
+    def xs_time(cls):
+        return cls.create(qname=DataType.TIME, native=True)
+
+    @classmethod
     def xs_duration(cls):
         return cls.create(qname=DataType.DURATION, native=True)
 

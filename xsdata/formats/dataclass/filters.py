@@ -11,6 +11,7 @@ from typing import Dict
 from typing import Iterable
 from typing import List
 from typing import Optional
+from typing import Tuple
 from typing import Type
 from xml.etree.ElementTree import QName
 from xml.sax.saxutils import quoteattr
@@ -487,72 +488,41 @@ class Filters:
         return repr(value).replace("'", '"')
 
     @classmethod
-    def type_is_included(cls, output: str, type_name: str) -> bool:
-        return (
-            f": {type_name}" in output
-            or f"[{type_name}" in output
-            or f", {type_name}" in output
-            or f"= {type_name}" in output
-        )
-
-    @classmethod
     def default_imports(cls, output: str) -> str:
         """Generate the default imports for the given package output."""
-        result = []
 
-        dataclasses = []
-        if "@dataclass" in output:
-            dataclasses.append("dataclass")
-        if "field(" in output:
-            dataclasses.append("field")
+        def type_patterns(name: str) -> Tuple:
+            return f": {name}", f"[{name}", f", {name}", f"= {name}"
 
-        if dataclasses:
-            result.append(f"from dataclasses import {', '.join(dataclasses)}")
-
-        datetimes = []
-        if cls.type_is_included(output, "datetime"):
-            datetimes.append("datetime")
-
-        if "timedelta(" in output:
-            datetimes.append("timedelta")
-
-        if "tzinfo=timezone." in output:
-            datetimes.append("timezone")
-
-        if datetimes:
-            result.append(f"from datetime import {', '.join(datetimes)}")
-
-        if cls.type_is_included(output, "Decimal"):
-            result.append("from decimal import Decimal")
-
-        if "(Enum)" in output:
-            result.append("from enum import Enum")
-
-        typing_patterns = {
-            "Dict": [": Dict"],
-            "List": [": List["],
-            "Optional": ["Optional["],
-            "Type": ["Type["],
-            "Union": ["Union["],
+        patterns: Dict[str, Dict] = {
+            "dataclasses": {"dataclass": ["@dataclass"], "field": [" = field("]},
+            "datetime": {
+                "datetime": type_patterns("datetime"),
+                "timedelta": ["timedelta("],
+                "timezone": ["tzinfo=timezone."],
+            },
+            "decimal": {"Decimal": type_patterns("Decimal")},
+            "enum": {"Enum": ["(Enum)"]},
+            "typing": {
+                "Dict": [": Dict"],
+                "List": [": List["],
+                "Optional": ["Optional["],
+                "Type": ["Type["],
+                "Union": ["Union["],
+            },
+            "xml.etree.ElementTree": {"QName": type_patterns("QName")},
+            "xsdata.models.datatype": {"Duration": type_patterns("Duration")},
         }
 
-        types = [
-            name
-            for name, patterns in typing_patterns.items()
-            if any(pattern in output for pattern in patterns)
-        ]
-        if types:
-            result.append(f"from typing import {', '.join(types)}")
-
-        if cls.type_is_included(output, "QName"):
-            result.append("from xml.etree.ElementTree import QName")
-
-        builtin = []
-        if cls.type_is_included(output, "Duration"):
-            builtin = ["Duration"]
-
-        if builtin:
-            result.append(f"from xsdata.models.datatype import {', '.join(builtin)}")
+        result = []
+        for library, types in patterns.items():
+            names = [
+                name
+                for name, searches in types.items()
+                if any(search in output for search in searches)
+            ]
+            if names:
+                result.append(f"from {library} import {', '.join(names)}")
 
         return "\n".join(result)
 

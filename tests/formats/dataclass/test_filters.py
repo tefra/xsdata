@@ -1,5 +1,3 @@
-from datetime import timedelta
-
 from tests.factories import AttrFactory
 from tests.factories import AttrTypeFactory
 from tests.factories import FactoryTestCase
@@ -472,11 +470,11 @@ class FiltersTests(FactoryTestCase):
         expected = "from dataclasses import dataclass"
         self.assertIn(expected, self.filters.default_imports(output))
 
-        output = " field( "
+        output = " = field( "
         expected = "from dataclasses import field"
         self.assertIn(expected, self.filters.default_imports(output))
 
-        output = " field( @dataclass "
+        output = " = field( @dataclass "
         expected = "from dataclasses import dataclass, field"
         self.assertIn(expected, self.filters.default_imports(output))
 
@@ -534,9 +532,13 @@ class FiltersTests(FactoryTestCase):
             "    field: Optional[str] = field(default=None)"
         )
 
-        expected = (
-            "from dataclasses import dataclass, field\n" "from typing import Optional"
+        expected = "\n".join(
+            (
+                "from dataclasses import dataclass, field",
+                "from typing import Optional",
+            )
         )
+
         self.assertEqual(expected, self.filters.default_imports(output))
 
     def test_format_metadata(self):

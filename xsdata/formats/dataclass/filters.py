@@ -513,7 +513,10 @@ class Filters:
                 "Union": ["Union["],
             },
             "xml.etree.ElementTree": {"QName": type_patterns("QName")},
-            "xsdata.models.datatype": {"Duration": type_patterns("Duration")},
+            "xsdata.models.datatype": {
+                "Duration": type_patterns("Duration"),
+                "Period": type_patterns("Period"),
+            },
         }
 
         result = []

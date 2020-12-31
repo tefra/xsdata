@@ -8,6 +8,7 @@ from typing import Optional
 from xml.etree.ElementTree import QName
 
 from xsdata.models.datatype import Duration
+from xsdata.models.datatype import Period
 
 COMMON_SCHEMA_DIR = Path(__file__).absolute().parent.parent.joinpath("schemas/")
 
@@ -107,11 +108,11 @@ class DataType(Enum):
     ENTITY = ("ENTITY", str)
     ERROR = ("error", str)
     FLOAT = ("float", float)
-    G_DAY = ("gDay", str)
-    G_MONTH = ("gMonth", str)
-    G_MONTH_DAY = ("gMonthDay", str)
-    G_YEAR = ("gYear", str)
-    G_YEAR_MONTH = ("gYearMonth", str)
+    G_DAY = ("gDay", Period)
+    G_MONTH = ("gMonth", Period)
+    G_MONTH_DAY = ("gMonthDay", Period)
+    G_YEAR = ("gYear", Period)
+    G_YEAR_MONTH = ("gYearMonth", Period)
     HEX_BINARY = ("hexBinary", str)
     ID = ("ID", str)
     IDREF = ("IDREF", str)

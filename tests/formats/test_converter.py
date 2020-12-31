@@ -16,6 +16,7 @@ from xsdata.formats.converter import Converter
 from xsdata.formats.converter import converter
 from xsdata.formats.converter import ProxyConverter
 from xsdata.models.datatype import Duration
+from xsdata.models.datatype import Period
 from xsdata.models.enums import UseType
 
 
@@ -289,27 +290,6 @@ class TimeConverterTests(TestCase):
         self.assertEqual(output, self.converter.encode(value))
 
 
-class DurationConverterTests(TestCase):
-    def setUp(self):
-        self.converter = converter.type_converter(Duration)
-
-    def test_deserialize(self):
-        self.assertIsInstance(self.converter.deserialize("P20M"), Duration)
-
-        with self.assertRaises(ConverterError):
-            self.converter.deserialize("P-20M")
-
-    def test_serialize(self):
-        actual = self.converter.serialize(Duration("PT3S"))
-        self.assertEqual("PT3S", actual)
-        self.assertNotIsInstance(actual, Duration)
-
-    def test_encode_serializes_output(self):
-        actual = self.converter.encode(Duration("PT3S"))
-        self.assertEqual("PT3S", actual)
-        self.assertNotIsInstance(actual, Duration)
-
-
 class LxmlQNameConverterTests(TestCase):
     def setUp(self):
         self.converter = converter.type_converter(etree.QName)
@@ -457,3 +437,45 @@ class ProxyConverterTests(TestCase):
 
     def test_serialize(self):
         self.assertEqual("1", self.converter.serialize(1))
+
+
+class DurationConverterTests(TestCase):
+    def setUp(self):
+        self.converter = converter.type_converter(Duration)
+
+    def test_deserialize(self):
+        self.assertIsInstance(self.converter.deserialize("P20M"), Duration)
+
+        with self.assertRaises(ConverterError):
+            self.converter.deserialize("P-20M")
+
+    def test_serialize(self):
+        actual = self.converter.serialize(Duration("PT3S"))
+        self.assertEqual("PT3S", actual)
+        self.assertNotIsInstance(actual, Duration)
+
+    def test_encode_serializes_output(self):
+        actual = self.converter.encode(Duration("PT3S"))
+        self.assertEqual("PT3S", actual)
+        self.assertNotIsInstance(actual, Duration)
+
+
+class PeriodConverterTests(TestCase):
+    def setUp(self):
+        self.converter = converter.type_converter(Period)
+
+    def test_deserialize(self):
+        self.assertIsInstance(self.converter.deserialize("---15Z"), Period)
+
+        with self.assertRaises(ConverterError):
+            self.converter.deserialize("---1Z")
+
+    def test_serialize(self):
+        actual = self.converter.serialize(Period("---15Z"))
+        self.assertEqual("---15Z", actual)
+        self.assertNotIsInstance(actual, Period)
+
+    def test_encode_serializes_output(self):
+        actual = self.converter.encode(Period("---15Z"))
+        self.assertEqual("---15Z", actual)
+        self.assertNotIsInstance(actual, Period)

@@ -47,6 +47,7 @@ stop_words = [
     "time",
     "datetime",
     "duration",
+    "period",
     "decimal",
 ]
 

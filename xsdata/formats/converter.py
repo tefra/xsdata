@@ -6,7 +6,6 @@ from dataclasses import field
 from datetime import datetime
 from datetime import time
 from datetime import timedelta
-from datetime import timezone
 from decimal import Decimal
 from decimal import InvalidOperation
 from enum import Enum
@@ -25,7 +24,9 @@ from lxml import etree
 from xsdata.exceptions import ConverterError
 from xsdata.exceptions import ConverterWarning
 from xsdata.models.datatype import Duration
+from xsdata.models.datatype import Period
 from xsdata.utils import text
+from xsdata.utils.dates import DateTimeParser
 from xsdata.utils.namespaces import load_prefix
 from xsdata.utils.namespaces import split_qname
 
@@ -396,20 +397,6 @@ class EnumConverter(Converter):
         return converter.encode(value.value)
 
 
-class DurationConverter(Converter):
-    def deserialize(self, value: Any, **kwargs: Any) -> Duration:
-        try:
-            return Duration(value)
-        except ValueError as e:
-            raise ConverterError(e)
-
-    def serialize(self, value: Duration, **kwargs: Any) -> str:
-        return str(value)
-
-    def encode(self, value: Any, **kwargs: Any) -> str:
-        return self.serialize(value, **kwargs)
-
-
 class TimeConverter(Converter):
     """
     Converter for iso 8061 xml subset time strings.
@@ -417,68 +404,31 @@ class TimeConverter(Converter):
     Format: hh:mm:ss[Z|(+|-)hh:mm]
     """
 
+    format = "%h:%m:%s%z"
+
     def deserialize(self, value: Any, **kwargs: Any) -> time:
         if not isinstance(value, str):
             raise ConverterError("Value must be str")
 
         try:
-            hour, minute, second, microsecond, tz_info, _ = self.parse_time(value)
+            parser = DateTimeParser(value, self.format)
+            parser.parse()
+
+            assert (
+                parser.hour is not None
+                and parser.minute is not None
+                and parser.second is not None
+            )
 
             return time(
-                hour=hour,
-                minute=minute,
-                second=second,
-                microsecond=microsecond,
-                tzinfo=tz_info,
+                hour=0 if parser.hour == 24 else parser.hour,
+                minute=parser.minute,
+                second=parser.second,
+                microsecond=parser.microsecond or 0,
+                tzinfo=parser.tz_info,
             )
         except (IndexError, TypeError, ValueError):
             raise ConverterError(f"Invalid isoformat string: '{value}'")
-
-    @classmethod
-    def parse_time(cls, value: str) -> Tuple:
-        if value[2] != ":" or value[5] != ":":
-            raise IndexError()
-
-        length = len(value)
-        hour = int(value[:2])
-        minute = int(value[3:5])
-        second = int(value[6:8])
-        microsecond = 0
-
-        delta = None
-        if hour == 24:
-            hour = 0
-            delta = timedelta(days=1)
-
-        index = 8
-        if length > index and value[index] == ".":
-            microseconds = ""
-            index += 1
-            while length > index and value[index].isdigit():
-                microseconds += value[index]
-                index += 1
-
-            microsecond = int(microseconds.ljust(6, "0"))
-
-        tz_info = cls.parse_timezone(value, index) if length > index else None
-
-        return hour, minute, second, microsecond, tz_info, delta
-
-    @classmethod
-    def parse_timezone(cls, string: str, index: int) -> timezone:
-        if string[index] == "Z":
-            return timezone.utc
-
-        if string[index] in ("-", "+"):
-            offset = int(string[index + 1 : index + 3]) * 60
-            offset += int(string[index + 4 :])
-
-            if string[index] == "-":
-                offset = -offset
-
-            return timezone(timedelta(minutes=offset))
-
-        raise ValueError(f"Invalid timezone '{string[index:]}'")
 
     def serialize(self, value: time, **kwargs: Any) -> str:
         result = value.isoformat().replace("+00:00", "Z")
@@ -497,32 +447,40 @@ class DatetimeConverter(Converter):
     Format: YYYY-MM-DDThh:mm:ss[Z|(+|-)hh:mm]
     """
 
+    format = "%Y-%M-%DT%h:%m:%s%z"
+
     def deserialize(self, value: Any, **kwargs: Any) -> datetime:
         if not isinstance(value, str):
             raise ConverterError("Value must be str")
 
         try:
-            if value[4] != "-" or value[7] != "-" or value[10] != "T":
-                raise IndexError()
+            parser = DateTimeParser(value, self.format)
+            parser.parse()
 
-            (
-                hour,
-                minute,
-                second,
-                microsecond,
-                tz_info,
-                delta,
-            ) = TimeConverter.parse_time(value[11:])
+            assert (
+                parser.year is not None
+                and parser.month is not None
+                and parser.day is not None
+                and parser.hour is not None
+                and parser.minute is not None
+                and parser.second is not None
+            )
+
+            delta = None
+            hour = parser.hour
+            if hour == 24:
+                hour = 0
+                delta = timedelta(days=1)
 
             result = datetime(
-                year=int(value[:4]),
-                month=int(value[5:7]),
-                day=int(value[8:10]),
+                year=parser.year,
+                month=parser.month,
+                day=parser.day,
                 hour=hour,
-                minute=minute,
-                second=second,
-                microsecond=microsecond,
-                tzinfo=tz_info,
+                minute=parser.minute,
+                second=parser.second,
+                microsecond=parser.microsecond or 0,
+                tzinfo=parser.tz_info,
             )
 
             return result + delta if delta else result
@@ -556,6 +514,9 @@ class ProxyConverter(Converter):
     def serialize(self, value: Any, **kwargs: Any) -> str:
         return str(value)
 
+    def encode(self, value: Any, **kwargs: Any) -> str:
+        return self.serialize(value, **kwargs)
+
 
 converter = ConverterAdapter()
 converter.register_converter(str, StrConverter())
@@ -565,7 +526,8 @@ converter.register_converter(float, FloatConverter())
 converter.register_converter(object, StrConverter())
 converter.register_converter(time, TimeConverter())
 converter.register_converter(datetime, DatetimeConverter())
-converter.register_converter(Duration, DurationConverter())
+converter.register_converter(Duration, ProxyConverter(Duration))
+converter.register_converter(Period, ProxyConverter(Period))
 converter.register_converter(etree.QName, LxmlQNameConverter())
 converter.register_converter(QName, QNameConverter())
 converter.register_converter(Decimal, DecimalConverter())

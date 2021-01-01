@@ -44,17 +44,6 @@ class ConverterAdapterTests(TestCase):
         self.assertEqual("8.77683E-8", converter.serialize(Decimal("8.77683E-8")))
         self.assertEqual("8.77683E-08", converter.serialize(float("8.77683E-8")))
 
-    def test_encode(self):
-        self.assertEqual(None, converter.encode(None))
-        self.assertEqual(1, converter.encode(1))
-        self.assertEqual([1, "2", 3], converter.encode([1, "2", 3]))
-        self.assertEqual(None, converter.encode(None))
-        self.assertEqual(1.5, converter.encode(1.5))
-        self.assertEqual(True, converter.encode(True))
-        self.assertEqual("optional", converter.encode(UseType.OPTIONAL))
-        self.assertEqual("8.77683E-8", converter.encode(Decimal("8.77683E-8")))
-        self.assertEqual(8.77683e-08, converter.encode(float("8.77683E-8")))
-
     def test_register_converter(self):
         class MinusOneInt(int):
             pass
@@ -177,13 +166,6 @@ class DecimalConverterTests(TestCase):
         self.assertEqual("-INF", self.converter.serialize(Decimal("-inf")))
         self.assertEqual("8.77683E-8", self.converter.serialize(Decimal("8.77683E-8")))
 
-    def test_encode(self):
-        self.assertEqual("2.1", self.converter.encode(Decimal("2.1")))
-        self.assertEqual("INF", self.converter.encode(Decimal("inf")))
-        self.assertEqual("INF", self.converter.encode(Decimal("+inf")))
-        self.assertEqual("-INF", self.converter.encode(Decimal("-inf")))
-        self.assertEqual("8.77683E-8", self.converter.encode(Decimal("8.77683E-8")))
-
 
 class DatetimeConverterTests(TestCase):
     def setUp(self):
@@ -237,11 +219,6 @@ class DatetimeConverterTests(TestCase):
         obj = self.converter.deserialize("2009-01-01T12:00:00.0")
         self.assertEqual("2009-01-01T12:00:00", self.converter.serialize(obj))
 
-    def test_encode(self):
-        value = datetime(2002, 1, 1, 12, 1, 1, tzinfo=timezone.utc)
-        output = "2002-01-01T12:01:01Z"
-        self.assertEqual(output, self.converter.encode(value))
-
 
 class TimeConverterTests(TestCase):
     def setUp(self):
@@ -284,11 +261,6 @@ class TimeConverterTests(TestCase):
         obj = self.converter.deserialize("12:00:00.0")
         self.assertEqual("12:00:00", self.converter.serialize(obj))
 
-    def test_encode(self):
-        value = time(12, 1, 1, tzinfo=timezone.utc)
-        output = "12:01:01Z"
-        self.assertEqual(output, self.converter.encode(value))
-
 
 class LxmlQNameConverterTests(TestCase):
     def setUp(self):
@@ -314,12 +286,6 @@ class LxmlQNameConverterTests(TestCase):
         self.assertEqual("ns1:b", convert(etree.QName("a", "b"), ns_map=ns_map))
         self.assertEqual("{a}b", convert(etree.QName("a", "b")))
         self.assertEqual("c_prefix:c", convert(etree.QName("c", "c"), ns_map=ns_map))
-        self.assertEqual("{c}c", convert(etree.QName("c", "c")))
-
-    def test_encode(self):
-        convert = self.converter.encode
-        self.assertEqual("a", convert(etree.QName("a")))
-        self.assertEqual("{a}b", convert(etree.QName("a", "b")))
         self.assertEqual("{c}c", convert(etree.QName("c", "c")))
 
 
@@ -357,12 +323,6 @@ class QNameConverterTests(TestCase):
         self.assertEqual("ns1:b", convert(QName("a", "b"), ns_map=ns_map))
         self.assertEqual("{a}b", convert(QName("a", "b")))
         self.assertEqual("c_prefix:c", convert(QName("c", "c"), ns_map=ns_map))
-        self.assertEqual("{c}c", convert(QName("c", "c")))
-
-    def test_encode(self):
-        convert = self.converter.encode
-        self.assertEqual("a", convert(QName("a")))
-        self.assertEqual("{a}b", convert(QName("a", "b")))
         self.assertEqual("{c}c", convert(QName("c", "c")))
 
 
@@ -413,12 +373,6 @@ class EnumConverterTests(TestCase):
         self.assertEqual("INF", self.converter.serialize(fixture.b))
         self.assertEqual("2.1", self.converter.serialize(fixture.c))
 
-    def test_encode(self):
-        fixture = self.Fixture
-        self.assertEqual("{a}b", self.converter.encode(fixture.a))
-        self.assertEqual("INF", self.converter.encode(fixture.b))
-        self.assertEqual(2.1, self.converter.encode(fixture.c))
-
     class Fixture(Enum):
         a = QName("a", "b")
         b = Decimal("+inf")
@@ -454,11 +408,6 @@ class DurationConverterTests(TestCase):
         self.assertEqual("PT3S", actual)
         self.assertNotIsInstance(actual, Duration)
 
-    def test_encode_serializes_output(self):
-        actual = self.converter.encode(Duration("PT3S"))
-        self.assertEqual("PT3S", actual)
-        self.assertNotIsInstance(actual, Duration)
-
 
 class PeriodConverterTests(TestCase):
     def setUp(self):
@@ -472,10 +421,5 @@ class PeriodConverterTests(TestCase):
 
     def test_serialize(self):
         actual = self.converter.serialize(Period("---15Z"))
-        self.assertEqual("---15Z", actual)
-        self.assertNotIsInstance(actual, Period)
-
-    def test_encode_serializes_output(self):
-        actual = self.converter.encode(Period("---15Z"))
         self.assertEqual("---15Z", actual)
         self.assertNotIsInstance(actual, Period)

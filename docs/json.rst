@@ -120,29 +120,3 @@ Render to string
         ]
       }
     }
-
-
-Custom Dict factory
--------------------
-
-You can override the default dict factory to do extra steps like filtering `None`
-values.
-
-.. doctest::
-
-    >>> def filter_none(x):
-    ...     return {k: v for k, v in x if v is not None}
-    ...
-    >>> serializer = JsonSerializer(indent=2, dict_factory=filter_none)
-    >>> print(serializer.render(order))
-    {
-      "items": {
-        "product": [
-          {
-            "number": 557,
-            "name": "Short-Sleeved Linen Blouse",
-            "size": {}
-          }
-        ]
-      }
-    }

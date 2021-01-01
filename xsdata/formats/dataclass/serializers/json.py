@@ -1,34 +1,17 @@
 import json
-from dataclasses import asdict
 from dataclasses import dataclass
 from dataclasses import field
+from dataclasses import is_dataclass
+from enum import Enum
+from json import JSONEncoder
 from typing import Any
-from typing import Callable
-from typing import Dict
 from typing import Optional
-from typing import Tuple
 from typing import Type
 
 from xsdata.formats.bindings import AbstractSerializer
 from xsdata.formats.converter import converter
-
-
-def filter_none(x: Tuple) -> Dict:
-    return {k: v for k, v in x if v is not None}
-
-
-class DictFactory:
-    """Dictionary factory types."""
-
-    FILTER_NONE = filter_none
-
-
-class JsonEncoder(json.JSONEncoder):
-    """Custom Json encoder to support additional python build-in types."""
-
-    def default(self, obj: Any) -> Any:
-        """Override parent method to plug the builtin converters."""
-        return converter.encode(obj)
+from xsdata.formats.dataclass.context import XmlContext
+from xsdata.formats.dataclass.models.elements import XmlVar
 
 
 @dataclass
@@ -36,19 +19,30 @@ class JsonSerializer(AbstractSerializer):
     """
     Json serializer for dataclasses.
 
-    :param indent: output indentation.
-    :param encoder: Value encoder.
-    :param dict_factory: Override default dict factory to add further logic.
+    :param context: Model context provider
+    :param indent: output indentation
     """
 
+    context: XmlContext = field(default_factory=XmlContext)
+    encoder: Optional[Type[JSONEncoder]] = field(default=None)
     indent: Optional[int] = field(default=None)
-    encoder: Type[json.JSONEncoder] = field(default=JsonEncoder)
-    dict_factory: Callable = field(default=dict)
 
     def render(self, obj: object) -> str:
         """Convert the given object tree to json string."""
-        return json.dumps(
-            asdict(obj, dict_factory=self.dict_factory),
-            cls=self.encoder,
-            indent=self.indent,
-        )
+        return json.dumps(self.convert(obj), cls=self.encoder, indent=self.indent)
+
+    def convert(self, obj: Any, var: Optional[XmlVar] = None) -> Any:
+        if is_dataclass(obj):
+            metadata = self.context.build(obj.__class__)
+            return {
+                var.name: self.convert(getattr(obj, var.name), var)
+                for var in metadata.vars
+            }
+        elif isinstance(obj, (list, tuple)):
+            return [self.convert(v, var) for v in obj]
+        elif isinstance(obj, (dict, int, float, str, bool)):
+            return obj
+        elif isinstance(obj, Enum):
+            return self.convert(obj.value, var)
+        else:
+            return converter.serialize(obj)

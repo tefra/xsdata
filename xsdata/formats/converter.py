@@ -46,10 +46,6 @@ class Converter(metaclass=abc.ABCMeta):
     def serialize(self, value: Any, **kwargs: Any) -> str:
         """Convert value to string."""
 
-    def encode(self, value: Any, **kwargs: Any) -> Any:
-        """Encode value for representation."""
-        return value
-
 
 @dataclass
 class ConverterAdapter:
@@ -93,21 +89,6 @@ class ConverterAdapter:
 
         instance = self.value_converter(value)
         return instance.serialize(value, **kwargs)
-
-    def encode(self, value: Any, **kwargs: Any) -> Any:
-        """
-        Encode the given value for representation, ignore None values.
-
-        If the value is a list assume the value is a list of tokens.
-        """
-        if value is None:
-            return None
-
-        if isinstance(value, list):
-            return [self.encode(val, **kwargs) for val in value]
-
-        instance = self.value_converter(value)
-        return instance.encode(value, **kwargs)
 
     def register_converter(self, data_type: Type, func: Union[Callable, Converter]):
         """
@@ -236,9 +217,6 @@ class DecimalConverter(Converter):
 
         return str(value)
 
-    def encode(self, value: Any, **kwargs: Any) -> Any:
-        return self.serialize(value)
-
 
 class QNameConverter(Converter):
     def deserialize(
@@ -304,9 +282,6 @@ class QNameConverter(Converter):
 
         return namespace, suffix
 
-    def encode(self, value: Any, **kwargs: Any) -> Any:
-        return str(value)
-
 
 class LxmlQNameConverter(Converter):
     def deserialize(
@@ -345,9 +320,6 @@ class LxmlQNameConverter(Converter):
 
         prefix = load_prefix(value.namespace, ns_map)
         return f"{prefix}:{value.localname}" if prefix else value.localname
-
-    def encode(self, value: Any, **kwargs: Any) -> Any:
-        return str(value)
 
 
 class EnumConverter(Converter):
@@ -393,9 +365,6 @@ class EnumConverter(Converter):
     def serialize(self, value: Enum, **kwargs: Any) -> str:
         return converter.serialize(value.value, **kwargs)
 
-    def encode(self, value: Any, **kwargs: Any) -> Any:
-        return converter.encode(value.value)
-
 
 class TimeConverter(Converter):
     """
@@ -435,9 +404,6 @@ class TimeConverter(Converter):
         if len(result) > 14 and result[12:15] == "000":
             result = result[:12] + result[15:]
         return result
-
-    def encode(self, value: time, **kwargs: Any) -> str:
-        return self.serialize(value)
 
 
 class DatetimeConverter(Converter):
@@ -493,9 +459,6 @@ class DatetimeConverter(Converter):
             result = result[:23] + result[26:]
         return result
 
-    def encode(self, value: datetime, **kwargs: Any) -> str:
-        return self.serialize(value)
-
 
 @dataclass
 class ProxyConverter(Converter):
@@ -513,9 +476,6 @@ class ProxyConverter(Converter):
 
     def serialize(self, value: Any, **kwargs: Any) -> str:
         return str(value)
-
-    def encode(self, value: Any, **kwargs: Any) -> str:
-        return self.serialize(value, **kwargs)
 
 
 converter = ConverterAdapter()

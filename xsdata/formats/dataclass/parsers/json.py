@@ -5,8 +5,10 @@ import warnings
 from dataclasses import dataclass
 from dataclasses import field
 from dataclasses import fields
+from dataclasses import is_dataclass
 from typing import Any
 from typing import Dict
+from typing import List
 from typing import Optional
 from typing import Type
 
@@ -56,7 +58,10 @@ class JsonParser(AbstractParser):
             return dict(value)
 
         if var.is_clazz_union:
-            return self.bind_dataclass_union(value, var)
+            if isinstance(value, dict):
+                return self.bind_dataclass_union(value, var)
+
+            return self.bind_type_union(value, var)
 
         if var.clazz:
             return self.bind_dataclass(value, var.clazz)
@@ -67,7 +72,7 @@ class JsonParser(AbstractParser):
         if var.elements:
             return self.bind_choice(value, var)
 
-        return self.parse_value(value, var)
+        return self.parse_value(value, var.types, var.default, var.tokens)
 
     def bind_dataclass(self, data: Dict, clazz: Type[T]) -> T:
         """Recursively build the given model from the input dict data."""
@@ -93,6 +98,9 @@ class JsonParser(AbstractParser):
         obj = None
         max_score = -1.0
         for clazz in var.types:
+            if not is_dataclass(clazz):
+                continue
+
             candidate = self.bind_dataclass(value, clazz)
             score = ParserUtils.score_object(candidate)
             if score > max_score:
@@ -100,6 +108,10 @@ class JsonParser(AbstractParser):
                 obj = candidate
 
         return obj
+
+    def bind_type_union(self, value: Any, var: XmlVar) -> Any:
+        types = [tp for tp in var.types if not is_dataclass(tp)]
+        return self.parse_value(value, types, var.default, var.tokens)
 
     def bind_wildcard(self, value: Any) -> Any:
         """Bind data to a wildcard model."""
@@ -165,10 +177,12 @@ class JsonParser(AbstractParser):
         raise ParserError(f"XmlElements undefined choice: `{var.name}` for `{value}`")
 
     @classmethod
-    def parse_value(cls, value: Any, var: XmlVar) -> Any:
+    def parse_value(
+        cls, value: Any, types: List[Type], default: Any, tokens: bool
+    ) -> Any:
         """Convert any value to one of the given var types."""
         return ParserUtils.parse_value(
-            value, var.types, var.default, ns_map=EMPTY_MAP, tokens=var.tokens
+            value, types, default, ns_map=EMPTY_MAP, tokens=tokens
         )
 
 

@@ -81,13 +81,30 @@ class JsonParserTests(TestCase):
         b = make_dataclass("b", [("x", int), ("y", str), ("z", float)])
         c = make_dataclass("c", [("x", int)])
         var = XmlVar(
-            element=True, name="union", qname="union", types=[a, b, c], dataclass=True
+            element=True,
+            name="union",
+            qname="union",
+            types=[a, b, c, int],
+            dataclass=True,
         )
 
         data = {"x": 1, "y": "foo", "z": 1.0}
         actual = self.parser.bind_value(var, data)
 
         self.assertIsInstance(actual, b)
+
+    def test_bind_type_union(self):
+        a = make_dataclass("a", [("x", int), ("y", str)])
+        var = XmlVar(
+            element=True,
+            name="union",
+            qname="union",
+            types=[a, int, float],
+            dataclass=True,
+        )
+
+        data = "1.1"
+        self.assertEqual(1.1, self.parser.bind_value(var, data))
 
     def test_bind_choice_simple(self):
         var = XmlVar(

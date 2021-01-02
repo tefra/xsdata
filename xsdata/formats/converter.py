@@ -380,6 +380,11 @@ class TimeConverter(Converter):
             raise ConverterError("Value must be str")
 
         try:
+            fmt = kwargs.get("format")
+            if fmt:
+                return datetime.strptime(value, fmt).time()
+
+            fmt = self.format
             parser = DateTimeParser(value, self.format)
             parser.parse()
 
@@ -397,9 +402,13 @@ class TimeConverter(Converter):
                 tzinfo=parser.tz_info,
             )
         except (IndexError, TypeError, ValueError):
-            raise ConverterError(f"Invalid isoformat string: '{value}'")
+            raise ConverterError(f"String '{value}' does not match format '{fmt}'")
 
     def serialize(self, value: time, **kwargs: Any) -> str:
+        fmt = kwargs.get("format")
+        if fmt:
+            return value.strftime(fmt)
+
         result = value.isoformat().replace("+00:00", "Z")
         if len(result) > 14 and result[12:15] == "000":
             result = result[:12] + result[15:]
@@ -420,7 +429,13 @@ class DatetimeConverter(Converter):
             raise ConverterError("Value must be str")
 
         try:
-            parser = DateTimeParser(value, self.format)
+
+            fmt = kwargs.get("format")
+            if fmt:
+                return datetime.strptime(value, fmt)
+
+            fmt = self.format
+            parser = DateTimeParser(value, fmt)
             parser.parse()
 
             assert (
@@ -451,9 +466,13 @@ class DatetimeConverter(Converter):
 
             return result + delta if delta else result
         except (IndexError, TypeError, ValueError):
-            raise ConverterError(f"Invalid isoformat string: '{value}'")
+            raise ConverterError(f"String '{value}' does not match format '{fmt}'")
 
     def serialize(self, value: datetime, **kwargs: Any) -> str:
+        fmt = kwargs.get("format")
+        if fmt:
+            return value.strftime(fmt)
+
         result = value.isoformat().replace("+00:00", "Z")
         if len(result) > 26 and result[23:26] == "000":
             result = result[:23] + result[26:]

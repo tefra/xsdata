@@ -5,7 +5,7 @@ from unittest import TestCase
 from xsdata.utils.dates import DateTimeParser
 
 
-class DateParserTests(TestCase):
+class DateTimeParserTests(TestCase):
     def test_parse(self):
         fmt = "%Y-%M-%DT%h:%m:%s%z"
         value = "2002-01-01T12:01:01-01:00"

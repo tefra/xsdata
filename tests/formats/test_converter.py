@@ -193,6 +193,11 @@ class DatetimeConverterTests(TestCase):
         for value, expected in fixtures.items():
             self.assertEqual(expected, self.converter.deserialize(value), value)
 
+        self.assertEqual(
+            datetime(2018, 6, 21),
+            self.converter.deserialize("21 June 2018", format="%d %B %Y"),
+        )
+
     def test_deserializer_raises_exception(self):
         examples = [
             "a",
@@ -218,6 +223,7 @@ class DatetimeConverterTests(TestCase):
 
         obj = self.converter.deserialize("2009-01-01T12:00:00.0")
         self.assertEqual("2009-01-01T12:00:00", self.converter.serialize(obj))
+        self.assertEqual("01Jan09", self.converter.serialize(obj, format="%d%b%y"))
 
 
 class TimeConverterTests(TestCase):
@@ -238,6 +244,10 @@ class TimeConverterTests(TestCase):
         for value, expected in fixtures.items():
             self.assertEqual(expected, self.converter.deserialize(value), value)
 
+        self.assertEqual(
+            time(12, 55), self.converter.deserialize("1255", format="%H%M")
+        )
+
     def test_deserializer_raises_exception(self):
         examples = [
             "a",
@@ -252,14 +262,15 @@ class TimeConverterTests(TestCase):
                 self.converter.deserialize(example)
 
     def test_serialize(self):
-        obj = self.converter.deserialize("12:00:00.123-09:00")
-        self.assertEqual("12:00:00.123-09:00", self.converter.serialize(obj))
+        obj = self.converter.deserialize("12:44:30.123-09:00")
+        self.assertEqual("12:44:30.123-09:00", self.converter.serialize(obj))
 
-        obj = self.converter.deserialize("12:00:00.123456+00:00")
-        self.assertEqual("12:00:00.123456Z", self.converter.serialize(obj))
+        obj = self.converter.deserialize("12:44:30.123456+00:00")
+        self.assertEqual("12:44:30.123456Z", self.converter.serialize(obj))
 
-        obj = self.converter.deserialize("12:00:00.0")
-        self.assertEqual("12:00:00", self.converter.serialize(obj))
+        obj = self.converter.deserialize("12:44:30.0")
+        self.assertEqual("12:44:30", self.converter.serialize(obj))
+        self.assertEqual("1244", self.converter.serialize(obj, format="%H%M"))
 
 
 class LxmlQNameConverterTests(TestCase):

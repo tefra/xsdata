@@ -4,6 +4,7 @@ from dataclasses import field
 from dataclasses import fields
 from dataclasses import make_dataclass
 from dataclasses import replace
+from datetime import datetime
 from typing import Generator
 from typing import get_type_hints
 from typing import Iterator
@@ -272,6 +273,7 @@ class XmlContextTests(TestCase):
         @dataclass
         class Currencies:
             name: str = field(metadata=dict(type="Attribute"))
+            updated: datetime = field(metadata=dict(type="Attribute", format="%M-%D"))
             values: List[Currency] = field(default_factory=list)
 
         expected = [
@@ -283,6 +285,13 @@ class XmlContextTests(TestCase):
 
         expected = [
             XmlVar(attribute=True, name="name", qname="name", types=[str]),
+            XmlVar(
+                attribute=True,
+                name="updated",
+                qname="updated",
+                types=[datetime],
+                format="%M-%D",
+            ),
             XmlVar(
                 element=True,
                 name="values",
@@ -324,6 +333,7 @@ class XmlContextTests(TestCase):
                     namespaces=["bar"],
                     derived=False,
                     default=return_true,
+                    format="Nope",
                 ),
                 XmlVar(
                     element=True,
@@ -515,6 +525,7 @@ class Node:
                     "type": List[str],
                     "tokens": True,
                     "default_factory": return_true,
+                    "format": "Nope",
                 },
                 {"name": "y", "type": List[int], "nillable": True},
                 {"name": "z", "type": List[int]},

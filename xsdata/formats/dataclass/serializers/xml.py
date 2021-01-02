@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from dataclasses import field
 from dataclasses import is_dataclass
+from enum import Enum
 from io import StringIO
 from typing import Any
 from typing import Dict
@@ -13,6 +14,7 @@ from xml.etree.ElementTree import QName
 
 from xsdata.exceptions import SerializerError
 from xsdata.formats.bindings import AbstractSerializer
+from xsdata.formats.converter import converter
 from xsdata.formats.dataclass.context import XmlContext
 from xsdata.formats.dataclass.models.elements import XmlMeta
 from xsdata.formats.dataclass.models.elements import XmlVar
@@ -277,13 +279,13 @@ class XmlSerializer(AbstractSerializer):
             if datatype != DataType.STRING:
                 yield XmlWriterEvent.ATTR, QNames.XSI_TYPE, QName(str(datatype))
 
-        yield XmlWriterEvent.DATA, value
+        yield XmlWriterEvent.DATA, cls.encode_value(value, var)
         yield XmlWriterEvent.END, var.qname
 
     @classmethod
     def write_data(cls, value: Any, var: XmlVar, namespace: NoneStr) -> Generator:
         """Produce a data event for the given value."""
-        yield XmlWriterEvent.DATA, value
+        yield XmlWriterEvent.DATA, cls.encode_value(value, var)
 
     @classmethod
     def next_value(cls, obj: Any, meta: XmlMeta):
@@ -341,7 +343,7 @@ class XmlSerializer(AbstractSerializer):
                 if value is None or isinstance(value, list) and not value:
                     continue
 
-                yield var.qname, value
+                yield var.qname, cls.encode_value(value, var)
             elif var.attributes:
                 yield from getattr(obj, var.name, EMPTY_MAP).items()
 
@@ -350,3 +352,29 @@ class XmlSerializer(AbstractSerializer):
 
         if xsi_nil:
             yield QNames.XSI_NIL, "true"
+
+    @classmethod
+    def encode_value(cls, value: Any, var: Optional[XmlVar]) -> Any:
+        """
+        Encode values for xml serialization.
+
+        Converts values to strings. QName instances is an exception,
+        those values need to wait until the XmlWriter assigns prefixes
+        to namespaces per element node. Enums and Tokens may contain
+        QName(s) so they also get a special treatment.
+
+        We can't do all the conversions in the writer because we would
+        need to carry the xml vars inside the writer. Instead of that
+        we do the easy encoding here and leave the qualified names for
+        later.
+        """
+        if isinstance(value, (str, QName)) or var is None:
+            return value
+
+        if isinstance(value, (tuple, list)):
+            return [cls.encode_value(v, var) for v in value]
+
+        if isinstance(value, Enum):
+            return cls.encode_value(value.value, var)
+
+        return converter.serialize(value, format=var.format)

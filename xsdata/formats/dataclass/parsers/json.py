@@ -72,7 +72,7 @@ class JsonParser(AbstractParser):
         if var.elements:
             return self.bind_choice(value, var)
 
-        return self.parse_value(value, var.types, var.default, var.tokens)
+        return self.parse_value(value, var.types, var.default, var.tokens, var.format)
 
     def bind_dataclass(self, data: Dict, clazz: Type[T]) -> T:
         """Recursively build the given model from the input dict data."""
@@ -111,7 +111,7 @@ class JsonParser(AbstractParser):
 
     def bind_type_union(self, value: Any, var: XmlVar) -> Any:
         types = [tp for tp in var.types if not is_dataclass(tp)]
-        return self.parse_value(value, types, var.default, var.tokens)
+        return self.parse_value(value, types, var.default, var.tokens, var.format)
 
     def bind_wildcard(self, value: Any) -> Any:
         """Bind data to a wildcard model."""
@@ -178,12 +178,15 @@ class JsonParser(AbstractParser):
 
     @classmethod
     def parse_value(
-        cls, value: Any, types: List[Type], default: Any, tokens: bool
+        cls,
+        value: Any,
+        types: List[Type],
+        default: Any,
+        tokens: bool,
+        fmt: Optional[str],
     ) -> Any:
         """Convert any value to one of the given var types."""
-        return ParserUtils.parse_value(
-            value, types, default, ns_map=EMPTY_MAP, tokens=tokens
-        )
+        return ParserUtils.parse_value(value, types, default, EMPTY_MAP, tokens, fmt)
 
 
 @dataclass

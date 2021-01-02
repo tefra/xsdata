@@ -55,6 +55,7 @@ class ParserUtils:
         default: Any = None,
         ns_map: Optional[Dict] = None,
         tokens: bool = False,
+        _format: Optional[str] = None,
     ) -> Any:
         """Convert xml string values to s python primitive type."""
 
@@ -67,9 +68,12 @@ class ParserUtils:
 
         if tokens:
             value = value if isinstance(value, list) else value.split()
-            return [converter.deserialize(val, types, ns_map=ns_map) for val in value]
+            return [
+                converter.deserialize(val, types, ns_map=ns_map, format=_format)
+                for val in value
+            ]
 
-        return converter.deserialize(value, types, ns_map=ns_map)
+        return converter.deserialize(value, types, ns_map=ns_map, format=_format)
 
     @classmethod
     def bind_objects(cls, params: Dict, meta: XmlMeta, position: int, objects: List):

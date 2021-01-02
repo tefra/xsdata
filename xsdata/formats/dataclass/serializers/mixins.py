@@ -1,6 +1,5 @@
 from dataclasses import dataclass
 from dataclasses import field
-from enum import Enum
 from typing import Any
 from typing import Dict
 from typing import Generator
@@ -25,11 +24,11 @@ from xsdata.utils.namespaces import split_qname
 XSI_NIL = (Namespace.XSI.uri, "nil")
 
 
-class XmlWriterEvent(Enum):
-    START = 0
-    ATTR = 1
-    DATA = 2
-    END = 3
+class XmlWriterEvent:
+    START = "start"
+    ATTR = "attr"
+    DATA = "data"
+    END = "end"
 
 
 @dataclass
@@ -151,8 +150,7 @@ class XmlWriter:
             value = QName(value)
 
         name = split_qname(key)
-        value = converter.serialize(value, ns_map=self.ns_map)
-        self.attrs[name] = value
+        self.attrs[name] = self.encode_data(value)
 
     def add_namespace(self, uri: Optional[str]):
         """
@@ -180,7 +178,7 @@ class XmlWriter:
 
         :param data: Element text or tail content
         """
-        value = converter.serialize(data, ns_map=self.ns_map)
+        value = self.encode_data(data)
         self.flush_start(is_nil=value is None or value == "")
 
         if value:
@@ -287,3 +285,10 @@ class XmlWriter:
             return key == QNames.XSI_TYPE or DataType.from_qname(value) is not None
 
         return False
+
+    def encode_data(self, data: Any) -> Optional[str]:
+        """Encode data for xml rendering."""
+        if data is None or isinstance(data, str):
+            return data
+
+        return converter.serialize(data, ns_map=self.ns_map)

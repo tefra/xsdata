@@ -20,7 +20,8 @@ class JsonSerializer(AbstractSerializer):
     Json serializer for dataclasses.
 
     :param context: Model context provider
-    :param indent: output indentation
+    :param encoder: JSONEncoder type
+    :param indent: Output indentation
     """
 
     context: XmlContext = field(default_factory=XmlContext)
@@ -32,17 +33,20 @@ class JsonSerializer(AbstractSerializer):
         return json.dumps(self.convert(obj), cls=self.encoder, indent=self.indent)
 
     def convert(self, obj: Any, var: Optional[XmlVar] = None) -> Any:
-        if is_dataclass(obj):
+        if var is None or is_dataclass(obj):
             metadata = self.context.build(obj.__class__)
             return {
                 var.name: self.convert(getattr(obj, var.name), var)
                 for var in metadata.vars
             }
-        elif isinstance(obj, (list, tuple)):
+
+        if isinstance(obj, (list, tuple)):
             return [self.convert(v, var) for v in obj]
-        elif isinstance(obj, (dict, int, float, str, bool)):
+
+        if isinstance(obj, (dict, int, float, str, bool)):
             return obj
-        elif isinstance(obj, Enum):
+
+        if isinstance(obj, Enum):
             return self.convert(obj.value, var)
-        else:
-            return converter.serialize(obj)
+
+        return converter.serialize(obj, format=var.format)

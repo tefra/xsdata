@@ -60,6 +60,8 @@ class Restrictions:
     :param nillable:
     :param sequential:
     :param tokens:
+    :param format:
+    :param choice:
     """
 
     required: Optional[bool] = field(default=None)
@@ -81,6 +83,7 @@ class Restrictions:
     nillable: Optional[bool] = field(default=None)
     sequential: Optional[bool] = field(default=None)
     tokens: Optional[bool] = field(default=None)
+    format: Optional[str] = field(default=None)
     choice: Optional[str] = field(default=None)
 
     @property

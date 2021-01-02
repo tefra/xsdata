@@ -69,7 +69,7 @@ class XmlSerializerTests(TestCase):
             (XmlWriterEvent.DATA, "Misterioso: A Crime Novel"),
             (XmlWriterEvent.END, "title"),
             (XmlWriterEvent.START, "price"),
-            (XmlWriterEvent.DATA, 19.5),
+            (XmlWriterEvent.DATA, "19.5"),
             (XmlWriterEvent.END, "price"),
             (XmlWriterEvent.END, "BookForm"),
         ]
@@ -91,7 +91,7 @@ class XmlSerializerTests(TestCase):
             (XmlWriterEvent.DATA, "Misterioso: A Crime Novel"),
             (XmlWriterEvent.END, "title"),
             (XmlWriterEvent.START, "price"),
-            (XmlWriterEvent.DATA, 19.5),
+            (XmlWriterEvent.DATA, "19.5"),
             (XmlWriterEvent.END, "price"),
             (XmlWriterEvent.END, "book"),
         ]
@@ -145,18 +145,18 @@ class XmlSerializerTests(TestCase):
 
         expected = [
             (XmlWriterEvent.START, "a"),
-            (XmlWriterEvent.DATA, [1, 2, 3]),
+            (XmlWriterEvent.DATA, ["1", QName("{a}b"), "3"]),
             (XmlWriterEvent.END, "a"),
         ]
-        result = self.serializer.write_value([1, 2, 3], var, "xsdata")
+        result = self.serializer.write_value([1, QName("{a}b"), 3], var, "xsdata")
         self.assertEqual(expected, list(result))
 
         expected = [
             (XmlWriterEvent.START, "a"),
-            (XmlWriterEvent.DATA, [1, 2, 3]),
+            (XmlWriterEvent.DATA, ["1", "2", "3"]),
             (XmlWriterEvent.END, "a"),
             (XmlWriterEvent.START, "a"),
-            (XmlWriterEvent.DATA, [4, 5, 6]),
+            (XmlWriterEvent.DATA, ["4", "5", "6"]),
             (XmlWriterEvent.END, "a"),
         ]
 
@@ -296,7 +296,7 @@ class XmlSerializerTests(TestCase):
         expected = [
             (XmlWriterEvent.START, "a"),
             (XmlWriterEvent.ATTR, QNames.XSI_TYPE, QName(str(DataType.INT))),
-            (XmlWriterEvent.DATA, 123),
+            (XmlWriterEvent.DATA, "123"),
             (XmlWriterEvent.END, "a"),
         ]
 
@@ -326,7 +326,7 @@ class XmlSerializerTests(TestCase):
         value = DerivedElement(qname="a", value=1)
         expected = [
             (XmlWriterEvent.START, "a"),
-            (XmlWriterEvent.DATA, 1),
+            (XmlWriterEvent.DATA, "1"),
             (XmlWriterEvent.END, "a"),
         ]
 
@@ -382,10 +382,10 @@ class XmlSerializerTests(TestCase):
         )
         expected = [
             (XmlWriterEvent.START, "a"),
-            (XmlWriterEvent.DATA, 1),
+            (XmlWriterEvent.DATA, "1"),
             (XmlWriterEvent.END, "a"),
             (XmlWriterEvent.START, "b"),
-            (XmlWriterEvent.DATA, [1, 2]),
+            (XmlWriterEvent.DATA, ["1", "2"]),
             (XmlWriterEvent.END, "b"),
         ]
 
@@ -413,10 +413,10 @@ class XmlSerializerTests(TestCase):
         value = [True, False]
         expected = [
             (XmlWriterEvent.START, "a"),
-            (XmlWriterEvent.DATA, True),
+            (XmlWriterEvent.DATA, "true"),
             (XmlWriterEvent.END, "a"),
             (XmlWriterEvent.START, "a"),
-            (XmlWriterEvent.DATA, False),
+            (XmlWriterEvent.DATA, "false"),
             (XmlWriterEvent.END, "a"),
         ]
 

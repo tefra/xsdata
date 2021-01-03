@@ -1,5 +1,6 @@
 from tests.factories import AttrTypeFactory
 from tests.factories import FactoryTestCase
+from xsdata.models.enums import DataType
 
 
 class AttrTypeTests(FactoryTestCase):
@@ -18,7 +19,7 @@ class AttrTypeTests(FactoryTestCase):
         self.assertTrue(attr_type.is_dependency)
 
     def test_native_property(self):
-        attr_type = AttrTypeFactory.xs_int()
+        attr_type = AttrTypeFactory.native(DataType.INTEGER)
         self.assertEqual("int", attr_type.native_name)
         self.assertEqual("integer", attr_type.native_code)
         self.assertEqual(int, attr_type.native_type)

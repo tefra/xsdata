@@ -55,10 +55,6 @@ class AttributeTests(TestCase):
         expected["length"] = 1
         self.assertEqual(expected, obj.get_restrictions())
 
-        obj.type = "NMTOKENS"
-        expected["tokens"] = True
-        self.assertEqual(expected, obj.get_restrictions())
-
     def test_property_extensions(self):
         obj = Attribute()
         self.assertEqual([], list(obj.extensions))

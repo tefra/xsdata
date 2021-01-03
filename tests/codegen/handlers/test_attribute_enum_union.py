@@ -4,6 +4,7 @@ from tests.factories import ClassFactory
 from tests.factories import FactoryTestCase
 from xsdata.codegen.container import ClassContainer
 from xsdata.codegen.handlers import AttributeEnumUnionHandler
+from xsdata.models.enums import DataType
 from xsdata.models.enums import Tag
 
 
@@ -44,7 +45,7 @@ class AttributeEnumUnionHandlerTests(FactoryTestCase):
         self.assertFalse(self.target.is_enumeration)
 
     def test_process_skip_when_types_is_not_enumeration_union(self):
-        self.target.attrs[0].types.append(AttrTypeFactory.xs_int())
+        self.target.attrs[0].types.append(AttrTypeFactory.native(DataType.INT))
         self.processor.process(self.target)
         self.assertFalse(self.target.is_enumeration)
 

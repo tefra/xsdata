@@ -336,9 +336,6 @@ class Attribute(AnnotationBase):
         if self.simple_type:
             restrictions.update(self.simple_type.get_restrictions())
 
-        if self.type and self.type in self.token_types:
-            restrictions["tokens"] = True
-
         return restrictions
 
 
@@ -867,9 +864,6 @@ class Restriction(AnnotationBase):
                 [pattern.value for pattern in self.patterns]
             )
 
-        if self.base and self.base in self.token_types:
-            restrictions["tokens"] = True
-
         return restrictions
 
 
@@ -1148,9 +1142,6 @@ class Element(AnnotationBase):
 
         if self.nillable:
             restrictions.update(nillable=True)
-
-        if self.type and self.type in self.token_types:
-            restrictions["tokens"] = True
 
         return restrictions
 

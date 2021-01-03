@@ -178,12 +178,6 @@ class ElementBaseTests(TestCase):
         element = ElementBase()
         self.assertEqual([], element.substitutions)
 
-    def test_property_token_types(self):
-        element = ElementBase()
-        element.ns_map["xs"] = Namespace.XS.uri
-
-        self.assertEqual(["xs:NMTOKENS", "xs:IDREFS"], element.token_types)
-
     def test_children(self):
         one = SimpleType(id="1")
         two = ComplexType(id="10")

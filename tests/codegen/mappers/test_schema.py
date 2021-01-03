@@ -10,6 +10,7 @@ from tests.factories import FactoryTestCase
 from xsdata.codegen.mappers.schema import SchemaMapper
 from xsdata.codegen.models import Class
 from xsdata.codegen.models import Restrictions
+from xsdata.models.enums import DataType
 from xsdata.models.enums import FormType
 from xsdata.models.enums import Tag
 from xsdata.models.xsd import Alternative
@@ -317,7 +318,10 @@ class SchemaMapperTests(FactoryTestCase):
         attribute = Attribute(default="false")
         actual = SchemaMapper.build_class_attribute_types(item, attribute)
 
-        expected = [AttrTypeFactory.xs_int(), AttrTypeFactory.xs_string()]
+        expected = [
+            AttrTypeFactory.native(DataType.INTEGER),
+            AttrTypeFactory.native(DataType.STRING),
+        ]
 
         self.assertEqual(expected, actual)
 
@@ -335,8 +339,8 @@ class SchemaMapperTests(FactoryTestCase):
         actual = SchemaMapper.build_class_attribute_types(item, attribute)
 
         expected = [
-            AttrTypeFactory.xs_int(),
-            AttrTypeFactory.xs_string(),
+            AttrTypeFactory.native(DataType.INTEGER),
+            AttrTypeFactory.native(DataType.STRING),
             AttrTypeFactory.create(
                 qname=build_qname(item.target_namespace, "foo"), forward=True
             ),
@@ -360,7 +364,7 @@ class SchemaMapperTests(FactoryTestCase):
         actual = SchemaMapper.build_class_attribute_types(item, attribute)
 
         self.assertEqual(1, len(actual))
-        self.assertEqual(AttrTypeFactory.xs_string(), actual[0])
+        self.assertEqual(AttrTypeFactory.native(DataType.STRING), actual[0])
 
     @mock.patch.object(SchemaMapper, "build_class")
     def test_build_inner_classes(self, mock_build_class):

@@ -105,7 +105,3 @@ class ElementTests(TestCase):
         obj.nillable = True
         expected["nillable"] = True
         self.assertEqual(expected, obj.get_restrictions())
-
-        obj.type = "NMTOKENS"
-        expected["tokens"] = True
-        self.assertEqual(expected, obj.get_restrictions())

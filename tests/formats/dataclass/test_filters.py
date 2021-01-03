@@ -11,18 +11,19 @@ from xsdata.models.config import DocstringStyle
 from xsdata.models.config import GeneratorAlias
 from xsdata.models.config import GeneratorConfig
 from xsdata.models.config import NameCase
+from xsdata.models.enums import DataType
 from xsdata.models.enums import Namespace
 from xsdata.models.enums import Tag
 
-type_str = AttrTypeFactory.xs_string()
-type_int = AttrTypeFactory.xs_int()
-type_float = AttrTypeFactory.xs_float()
-type_decimal = AttrTypeFactory.xs_decimal()
-type_bool = AttrTypeFactory.xs_bool()
-type_qname = AttrTypeFactory.xs_qname()
-type_tokens = AttrTypeFactory.xs_tokens()
-type_datetime = AttrTypeFactory.xs_datetime()
-type_duration = AttrTypeFactory.xs_duration()
+type_str = AttrTypeFactory.native(DataType.STRING)
+type_int = AttrTypeFactory.native(DataType.INT)
+type_float = AttrTypeFactory.native(DataType.FLOAT)
+type_decimal = AttrTypeFactory.native(DataType.DECIMAL)
+type_bool = AttrTypeFactory.native(DataType.BOOLEAN)
+type_qname = AttrTypeFactory.native(DataType.QNAME)
+type_tokens = AttrTypeFactory.native(DataType.NMTOKENS)
+type_datetime = AttrTypeFactory.native(DataType.DATE_TIME)
+type_duration = AttrTypeFactory.native(DataType.DURATION)
 
 
 class FiltersTests(FactoryTestCase):
@@ -105,7 +106,9 @@ class FiltersTests(FactoryTestCase):
         self.assertEqual("BarBam", self.filters.type_name(type_foo_bar_bam))
 
     def test_constant_value(self):
-        attr = AttrFactory.create(types=[AttrTypeFactory.xs_string()], default="foo")
+        attr = AttrFactory.create(
+            types=[AttrTypeFactory.native(DataType.STRING)], default="foo"
+        )
         self.assertEqual('"foo"', self.filters.constant_value(attr))
 
         attr = AttrFactory.create(types=[AttrTypeFactory.create(qname="foo")])
@@ -241,7 +244,7 @@ class FiltersTests(FactoryTestCase):
 
     def test_field_metadata_restrictions(self):
         attr = AttrFactory.create(tag=Tag.RESTRICTION)
-        attr.types.append(AttrTypeFactory.xs_int())
+        attr.types.append(AttrTypeFactory.native(DataType.INT))
         attr.restrictions.min_occurs = 1
         attr.restrictions.max_occurs = 2
         attr.restrictions.max_inclusive = "2"
@@ -383,7 +386,7 @@ class FiltersTests(FactoryTestCase):
         attr = AttrFactory.create(
             types=[
                 AttrTypeFactory.create(qname="life", alias="Boss:Life", forward=True),
-                AttrTypeFactory.xs_int(),
+                AttrTypeFactory.native(DataType.INT),
             ]
         )
         attr.restrictions.max_occurs = 2
@@ -400,7 +403,10 @@ class FiltersTests(FactoryTestCase):
 
     def test_field_type_with_native_type(self):
         attr = AttrFactory.create(
-            types=[AttrTypeFactory.xs_int(), AttrTypeFactory.xs_positive_int()]
+            types=[
+                AttrTypeFactory.native(DataType.INT),
+                AttrTypeFactory.native(DataType.POSITIVE_INTEGER),
+            ]
         )
         self.assertEqual("Optional[int]", self.filters.field_type(attr, ["a", "b"]))
 

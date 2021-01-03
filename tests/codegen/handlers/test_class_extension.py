@@ -10,6 +10,7 @@ from xsdata.codegen.container import ClassContainer
 from xsdata.codegen.handlers import ClassExtensionHandler
 from xsdata.codegen.models import Restrictions
 from xsdata.codegen.utils import ClassUtils
+from xsdata.models.enums import DataType
 from xsdata.models.enums import Tag
 from xsdata.models.xsd import ComplexType
 from xsdata.models.xsd import SimpleType
@@ -30,7 +31,9 @@ class ClassExtensionHandlerTests(FactoryTestCase):
 
     @mock.patch.object(ClassExtensionHandler, "process_native_extension")
     def test_process_extension_with_native_type(self, mock_flatten_extension_native):
-        extension = ExtensionFactory.create(type=AttrTypeFactory.xs_string())
+        extension = ExtensionFactory.create(
+            type=AttrTypeFactory.native(DataType.STRING)
+        )
         target = ClassFactory.elements(1, extensions=[extension])
 
         self.processor.process_extension(target, extension)
@@ -132,15 +135,15 @@ class ClassExtensionHandlerTests(FactoryTestCase):
         self.processor.process_native_extension(target, extension)
         mock_add_default_attribute.assert_called_once_with(target, extension)
 
-    @mock.patch.object(ClassExtensionHandler, "copy_extension_type")
+    @mock.patch.object(ClassExtensionHandler, "replace_attributes_type")
     def test_process_native_extension_with_enumeration_target(
-        self, mock_copy_extension_type
+        self, mock_replace_attributes_type
     ):
         extension = ExtensionFactory.create()
         target = ClassFactory.enumeration(1)
 
         self.processor.process_native_extension(target, extension)
-        mock_copy_extension_type.assert_called_once_with(target, extension)
+        mock_replace_attributes_type.assert_called_once_with(target, extension)
 
     def test_process_simple_extension_with_circular_refence(self):
         extension = ExtensionFactory.create()
@@ -299,19 +302,21 @@ class ClassExtensionHandlerTests(FactoryTestCase):
         clone.attrs[0].index = sys.maxsize
         self.assertEqual(flatten, self.processor.compare_attributes(source, clone))
 
-    def test_copy_extension_type(self):
+    def test_replace_attributes_type(self):
         extension = ExtensionFactory.create()
         target = ClassFactory.elements(2)
         target.extensions.append(extension)
 
-        ClassExtensionHandler.copy_extension_type(target, extension)
+        ClassExtensionHandler.replace_attributes_type(target, extension)
 
-        self.assertEqual(extension.type, target.attrs[0].types[1])
-        self.assertEqual(extension.type, target.attrs[1].types[1])
+        self.assertEqual(1, len(target.attrs[0].types))
+        self.assertEqual(1, len(target.attrs[1].types))
+        self.assertEqual(extension.type, target.attrs[0].types[0])
+        self.assertEqual(extension.type, target.attrs[1].types[0])
         self.assertEqual(0, len(target.extensions))
 
     def test_add_default_attribute(self):
-        xs_string = AttrTypeFactory.xs_string()
+        xs_string = AttrTypeFactory.native(DataType.STRING)
         extension = ExtensionFactory.create(xs_string, Restrictions(required=True))
         item = ClassFactory.elements(1, extensions=[extension])
 
@@ -324,7 +329,7 @@ class ClassExtensionHandlerTests(FactoryTestCase):
         self.assertEqual(0, len(item.extensions))
         self.assertEqual(expected, item.attrs[0])
 
-        xs_int = AttrTypeFactory.xs_int()
+        xs_int = AttrTypeFactory.native(DataType.INT)
         extension = ExtensionFactory.create(xs_int, Restrictions(tokens=True))
         item.extensions.append(extension)
         ClassExtensionHandler.add_default_attribute(item, extension)
@@ -339,7 +344,7 @@ class ClassExtensionHandlerTests(FactoryTestCase):
 
     def test_add_default_attribute_with_any_type(self):
         extension = ExtensionFactory.create(
-            type=AttrTypeFactory.xs_any(),
+            type=AttrTypeFactory.native(DataType.ANY_TYPE),
             restrictions=Restrictions(min_occurs=1, max_occurs=1, required=True),
         )
         item = ClassFactory.create(extensions=[extension])

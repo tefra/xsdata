@@ -206,6 +206,10 @@ class AttrType:
         return not (self.forward or self.native or self.circular)
 
     @property
+    def datatype(self) -> Optional[DataType]:
+        return DataType.get_enum(self.name) if self.native else None
+
+    @property
     def native_name(self) -> Optional[str]:
         """Return the python build-in type name: `'str'`, `'int'` if it's
         native type."""

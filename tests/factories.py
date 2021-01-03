@@ -182,56 +182,8 @@ class AttrTypeFactory(Factory):
         )
 
     @classmethod
-    def xs_string(cls):
-        return cls.create(qname=DataType.STRING, native=True)
-
-    @classmethod
-    def xs_int(cls):
-        return cls.create(qname=DataType.INTEGER, native=True)
-
-    @classmethod
-    def xs_positive_int(cls):
-        return cls.create(qname=DataType.POSITIVE_INTEGER, native=True)
-
-    @classmethod
-    def xs_float(cls):
-        return cls.create(qname=DataType.FLOAT, native=True)
-
-    @classmethod
-    def xs_decimal(cls):
-        return cls.create(qname=DataType.DECIMAL, native=True)
-
-    @classmethod
-    def xs_datetime(cls):
-        return cls.create(qname=DataType.DATE_TIME, native=True)
-
-    @classmethod
-    def xs_time(cls):
-        return cls.create(qname=DataType.TIME, native=True)
-
-    @classmethod
-    def xs_duration(cls):
-        return cls.create(qname=DataType.DURATION, native=True)
-
-    @classmethod
-    def xs_bool(cls):
-        return cls.create(qname=DataType.BOOLEAN, native=True)
-
-    @classmethod
-    def xs_any(cls):
-        return cls.create(qname=DataType.ANY_TYPE, native=True)
-
-    @classmethod
-    def xs_qname(cls):
-        return cls.create(qname=DataType.QNAME, native=True)
-
-    @classmethod
-    def xs_tokens(cls):
-        return cls.create(qname=DataType.NMTOKENS, native=True)
-
-    @classmethod
-    def xs_error(cls):
-        return cls.create(qname=DataType.ERROR, native=True)
+    def native(cls, datatype: DataType) -> AttrType:
+        return cls.create(qname=str(datatype), native=True)
 
 
 class AttrFactory(Factory):
@@ -258,7 +210,7 @@ class AttrFactory(Factory):
         return cls.model(
             name=name,
             index=cls.counter if index is None else index,
-            types=types or [AttrTypeFactory.xs_string()],
+            types=types or [AttrTypeFactory.native(DataType.STRING)],
             choices=choices or [],
             tag=tag or random.choice(cls.types).__name__,
             namespace=namespace or None,
@@ -270,6 +222,10 @@ class AttrFactory(Factory):
         )
 
     @classmethod
+    def native(cls, datatype: DataType, tag: str = Tag.ELEMENT) -> Attr:
+        return cls.create(tag=tag, types=[AttrTypeFactory.native(datatype)])
+
+    @classmethod
     def enumeration(cls, **kwargs) -> Attr:
         return cls.create(tag=Tag.ENUMERATION, **kwargs)
 
@@ -279,12 +235,16 @@ class AttrFactory(Factory):
 
     @classmethod
     def any(cls, **kwargs) -> Attr:
-        return cls.create(tag=Tag.ANY, types=[AttrTypeFactory.xs_any()], **kwargs)
+        return cls.create(
+            tag=Tag.ANY, types=[AttrTypeFactory.native(DataType.ANY_TYPE)], **kwargs
+        )
 
     @classmethod
     def any_attribute(cls, **kwargs) -> Attr:
         return cls.create(
-            tag=Tag.ANY_ATTRIBUTE, types=[AttrTypeFactory.xs_any()], **kwargs
+            tag=Tag.ANY_ATTRIBUTE,
+            types=[AttrTypeFactory.native(DataType.ANY_TYPE)],
+            **kwargs,
         )
 
     @classmethod

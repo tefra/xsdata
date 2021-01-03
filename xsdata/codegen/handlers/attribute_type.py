@@ -56,8 +56,12 @@ class AttributeTypeHandler(HandlerInterface):
     def process_native_type(cls, attr: Attr, attr_type: AttrType):
         """Reset attribute type if the attribute has a pattern restriction as
         they are not yet supported."""
-        if attr.restrictions.pattern:
-            cls.reset_attribute_type(attr_type)
+
+        if not attr.is_enumeration:
+            cls.update_restrictions(attr, attr_type.datatype)
+
+            if attr.restrictions.pattern:
+                cls.reset_attribute_type(attr_type)
 
     def find_dependency(self, attr_type: AttrType) -> Optional[Class]:
         """
@@ -88,12 +92,16 @@ class AttributeTypeHandler(HandlerInterface):
         If there is a matching simple type inner class copy the inner
         type attribute properties.
         """
-        inner = self.container.find_inner(
-            target, attr_type.name, lambda x: x.is_simple_type
-        )
-        if inner:
+        inner = self.container.find_inner(target, attr_type.name)
+
+        if not inner:
+            return
+
+        if inner.is_simple_type:
             self.copy_attribute_properties(inner, target, attr, attr_type)
             target.inner.remove(inner)
+        elif inner.is_enumeration:
+            self.update_restrictions(attr, inner.attrs[0].types[0].datatype)
 
     def process_dependency_type(self, target: Class, attr: Attr, attr_type: AttrType):
         """
@@ -203,3 +211,8 @@ class AttributeTypeHandler(HandlerInterface):
             types.append(AttrType(qname=str(DataType.STRING), native=True))
 
         return types
+
+    @classmethod
+    def update_restrictions(cls, attr: Attr, datatype: Optional[DataType]):
+        if datatype in (DataType.NMTOKENS, DataType.IDREFS):
+            attr.restrictions.tokens = True

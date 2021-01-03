@@ -90,9 +90,3 @@ class RestrictionTests(TestCase):
 
         expected = {"max_length": 10, "min_length": 2}
         self.assertEqual(expected, obj.get_restrictions())
-
-    def test_get_restrictions_with_base_nm_tokens(self):
-        obj = Restriction(base="xs:NMTOKENS")
-        obj.ns_map["xs"] = Namespace.XS.uri
-
-        self.assertEqual({"tokens": True}, obj.get_restrictions())

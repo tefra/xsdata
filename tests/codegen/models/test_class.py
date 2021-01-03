@@ -8,6 +8,7 @@ from tests.factories import FactoryTestCase
 from xsdata.codegen.models import SIMPLE_TYPES
 from xsdata.models import wsdl
 from xsdata.models import xsd
+from xsdata.models.enums import DataType
 from xsdata.models.enums import Namespace
 from xsdata.models.enums import Tag
 from xsdata.utils.namespaces import build_qname
@@ -17,7 +18,7 @@ class ClassTests(FactoryTestCase):
     def test_dependencies(self):
         obj = ClassFactory.create(
             attrs=[
-                AttrFactory.create(types=[AttrTypeFactory.xs_decimal()]),
+                AttrFactory.create(types=[AttrTypeFactory.native(DataType.DECIMAL)]),
                 AttrFactory.create(
                     types=[
                         AttrTypeFactory.create(
@@ -30,7 +31,7 @@ class ClassTests(FactoryTestCase):
                             name="x",
                             types=[
                                 AttrTypeFactory.create(qname="choiceAttr"),
-                                AttrTypeFactory.xs_string(),
+                                AttrTypeFactory.native(DataType.STRING),
                             ],
                         ),
                         AttrFactory.create(

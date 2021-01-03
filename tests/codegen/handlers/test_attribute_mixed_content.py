@@ -5,6 +5,7 @@ from tests.factories import AttrTypeFactory
 from tests.factories import ClassFactory
 from tests.factories import FactoryTestCase
 from xsdata.codegen.handlers import AttributeMixedContentHandler
+from xsdata.models.enums import DataType
 from xsdata.models.enums import Tag
 
 
@@ -22,7 +23,7 @@ class AttributeMixedContentHandlerTests(FactoryTestCase):
         self.processor.process(item)
         expected = AttrFactory.create(
             name="content",
-            types=[AttrTypeFactory.xs_any()],
+            types=[AttrTypeFactory.native(DataType.ANY_TYPE)],
             tag=Tag.ANY,
             namespace="##any",
         )

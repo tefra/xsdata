@@ -7,7 +7,7 @@ from typing import Iterator
 from typing import List
 from typing import Optional
 
-from xsdata.codegen.handlers import AttributeEnumUnionHandler
+from xsdata.codegen.handlers import AttributeEnumerationHandler
 from xsdata.codegen.handlers import AttributeGroupHandler
 from xsdata.codegen.handlers import AttributeMergeHandler
 from xsdata.codegen.handlers import AttributeMismatchHandler
@@ -38,7 +38,7 @@ class ClassContainer(UserDict, ContainerInterface):
         self.processors: List[HandlerInterface] = [
             AttributeGroupHandler(self),
             ClassExtensionHandler(self),
-            AttributeEnumUnionHandler(self),
+            AttributeEnumerationHandler(self),
             AttributeSubstitutionHandler(self),
             AttributeTypeHandler(self),
             AttributeMergeHandler(),

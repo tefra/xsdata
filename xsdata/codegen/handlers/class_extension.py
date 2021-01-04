@@ -64,7 +64,7 @@ class ClassExtensionHandler(HandlerInterface):
         if not source:
             logger.warning("Missing extension type: %s", extension.type.name)
             target.extensions.remove(extension)
-        elif not source.is_complex or source.is_enumeration:
+        elif not source.is_complex or source.is_enumeration or target.is_enumeration:
             self.process_simple_extension(source, target, extension)
         else:
             self.process_complex_extension(source, target, extension)

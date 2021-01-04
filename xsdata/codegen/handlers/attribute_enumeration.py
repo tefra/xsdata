@@ -9,9 +9,8 @@ from xsdata.models.enums import Tag
 
 
 @dataclass
-class AttributeEnumUnionHandler(HandlerInterface):
-    """Convert classes with a single attribute derived from xs:union where all
-    types are enumerations to standalone enumeration."""
+class AttributeEnumerationHandler(HandlerInterface):
+    """Enumeration members processor."""
 
     container: ContainerInterface
 
@@ -22,6 +21,20 @@ class AttributeEnumUnionHandler(HandlerInterface):
         Lookup for the source class in the local namespace or inner
         class list.
         """
+
+        self.filter_enumerations(target)
+        self.flatten_unions(target)
+
+    @classmethod
+    def filter_enumerations(cls, target: Class):
+        """Remove non enumerations from an enum  class."""
+        enumerations = [attr for attr in target.attrs if attr.is_enumeration]
+        if enumerations:
+            target.attrs = enumerations
+
+    def flatten_unions(self, target: Class):
+        """Flatten classes with a single attribute derived from xs:union where
+        all types are enumerations."""
         if len(target.attrs) != 1 or target.attrs[0].tag != Tag.UNION:
             return
 

@@ -109,6 +109,25 @@ class ClassExtensionHandlerTests(FactoryTestCase):
     @mock.patch.object(ClassExtensionHandler, "process_complex_extension")
     @mock.patch.object(ClassExtensionHandler, "process_simple_extension")
     @mock.patch.object(ClassExtensionHandler, "find_dependency")
+    def test_process_dependency_extension_with_target_enum_type(
+        self,
+        mock_find_dependency,
+        mock_process_simple_extension,
+        mock_process_complex_extension,
+    ):
+        extension = ExtensionFactory.create()
+        target = ClassFactory.enumeration(2, extensions=[extension])
+        source = ClassFactory.elements(1)
+        mock_find_dependency.return_value = source
+
+        self.processor.process_extension(target, extension)
+        self.assertEqual(0, mock_process_complex_extension.call_count)
+
+        mock_process_simple_extension.assert_called_once_with(source, target, extension)
+
+    @mock.patch.object(ClassExtensionHandler, "process_complex_extension")
+    @mock.patch.object(ClassExtensionHandler, "process_simple_extension")
+    @mock.patch.object(ClassExtensionHandler, "find_dependency")
     def test_process_dependency_extension_with_complex_type(
         self,
         mock_find_dependency,

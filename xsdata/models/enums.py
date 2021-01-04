@@ -150,6 +150,9 @@ class DataType(Enum):
     def __str__(self) -> str:
         return f"{{{Namespace.XS.uri}}}{self.code}"
 
+    def prefixed(self, prefix: Optional[str] = Namespace.XS.prefix) -> str:
+        return f"{prefix}:{self.code}" if prefix else self.code
+
     @classmethod
     def get_enum(cls, code: str) -> Optional["DataType"]:
         return __DataTypeCodeIndex__.get(code) if code else None

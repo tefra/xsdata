@@ -178,6 +178,13 @@ class ElementBaseTests(TestCase):
         element = ElementBase()
         self.assertEqual([], element.substitutions)
 
+    def test_property_xs_prefix(self):
+        element = ElementBase()
+        self.assertIsNone(element.xs_prefix)
+
+        element.ns_map["foo"] = Namespace.XS.uri
+        self.assertEqual("foo", element.xs_prefix)
+
     def test_children(self):
         one = SimpleType(id="1")
         two = ComplexType(id="10")
@@ -204,13 +211,6 @@ class ElementBaseTests(TestCase):
 
         children = list(element.children(lambda x: int(x.id) % 2 == 0))
         self.assertEqual([two, four], children)
-
-    def test_data_type_ref(self):
-        element = ElementBase()
-        self.assertEqual("string", element.data_type_ref(DataType.STRING))
-
-        element.ns_map["foo"] = Namespace.XS.uri
-        self.assertEqual("foo:string", element.data_type_ref(DataType.STRING))
 
 
 class ModuleMixinTests(TestCase):

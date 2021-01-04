@@ -146,7 +146,7 @@ class AnyAttribute(AnnotationBase):
 
     @property
     def real_type(self) -> str:
-        return self.data_type_ref(DataType.ANY_TYPE)
+        return DataType.ANY_TYPE.prefixed(self.xs_prefix)
 
 
 @dataclass
@@ -398,7 +398,7 @@ class Any(AnnotationBase):
 
     @property
     def real_type(self) -> str:
-        return self.data_type_ref(DataType.ANY_TYPE)
+        return DataType.ANY_TYPE.prefixed(self.xs_prefix)
 
     def get_restrictions(self) -> Dict[str, Anything]:
         max_occurs = sys.maxsize if self.max_occurs == "unbounded" else self.max_occurs
@@ -619,6 +619,10 @@ class Enumeration(AnnotationBase):
     @property
     def default(self) -> str:
         return self.value
+
+    @property
+    def is_fixed(self) -> bool:
+        return True
 
 
 @dataclass
@@ -1098,7 +1102,7 @@ class Element(AnnotationBase):
 
     @property
     def default_type(self) -> str:
-        return self.data_type_ref(DataType.ANY_TYPE)
+        return DataType.ANY_TYPE.prefixed(self.xs_prefix)
 
     @property
     def raw_type(self) -> Optional[str]:
@@ -1108,7 +1112,7 @@ class Element(AnnotationBase):
         if self.has_children:
             return None
 
-        return self.data_type_ref(DataType.ANY_TYPE)
+        return DataType.ANY_TYPE.prefixed(self.xs_prefix)
 
     @property
     def real_type(self) -> str:

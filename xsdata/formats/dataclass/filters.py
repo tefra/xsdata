@@ -152,7 +152,8 @@ class Filters:
 
     def type_name(self, attr_type: AttrType) -> str:
         """Return native python type name or apply class name conventions."""
-        return attr_type.native_name or self.class_name(attr_type.name)
+        datatype = attr_type.datatype
+        return datatype.type.__name__ if datatype else self.class_name(attr_type.name)
 
     def field_metadata(
         self, attr: Attr, parent_namespace: Optional[str], parents: List[str]
@@ -185,7 +186,7 @@ class Filters:
 
     def field_choices(
         self, attr: Attr, parent_namespace: Optional[str], parents: List[str]
-    ) -> Optional[List]:
+    ) -> Optional[Tuple]:
         """
         Return a list of metadata dictionaries for the choices of the given
         attribute.
@@ -221,7 +222,7 @@ class Filters:
 
             result.append(self.filter_metadata(metadata))
 
-        return result
+        return tuple(result)
 
     @classmethod
     def filter_metadata(cls, data: Dict) -> Dict:
@@ -263,7 +264,8 @@ class Filters:
         lines = [
             fmt.format(ind, self.format_metadata(value, indent + 4)) for value in data
         ]
-        return "(\n{}\n{})".format("\n".join(lines), ind)
+        wrap = "(\n{}\n{})" if isinstance(data, tuple) else "[\n{}\n{}]"
+        return wrap.format("\n".join(lines), ind)
 
     def format_string(self, data: str, indent: int, key: str = "", pad: int = 0) -> str:
         """
@@ -394,17 +396,13 @@ class Filters:
     ) -> str:
         assert isinstance(attr.default, str)
 
-        tokens = ", ".join(
-            str(
-                self.literal_value(
-                    converter.deserialize(
-                        val, types, ns_map=ns_map, format=attr.restrictions.format
-                    )
-                )
-            )
+        fmt = attr.restrictions.format
+        tokens = [
+            converter.deserialize(val, types, ns_map=ns_map, format=fmt)
             for val in attr.default.split()
-        )
-        return f"lambda: [{tokens}]"
+        ]
+
+        return f"lambda: {self.format_metadata(tokens, indent=8)}"
 
     def field_type(self, attr: Attr, parents: List[str]) -> str:
         """Generate type hints for the given attribute."""

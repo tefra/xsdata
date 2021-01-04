@@ -128,7 +128,12 @@ class FiltersTests(FactoryTestCase):
     def test_field_default_value_with_type_tokens(self):
         attr = AttrFactory.create(types=[type_int, type_str], default="1  \n bar")
         attr.restrictions.tokens = True
-        self.assertEqual('lambda: [1, "bar"]', self.filters.field_default_value(attr))
+        expected = """lambda: [
+            1,
+            "bar",
+        ]"""
+
+        self.assertEqual(expected, self.filters.field_default_value(attr))
 
     def test_field_default_value_with_type_float(self):
         attr = AttrFactory.create(types=[type_float], default="1.5")
@@ -261,10 +266,10 @@ class FiltersTests(FactoryTestCase):
     def test_field_metadata_choices(self):
         attr = AttrFactory.create(choices=AttrFactory.list(2, tag=Tag.ELEMENT))
         actual = self.filters.field_metadata(attr, "foo", [])
-        expected = [
+        expected = (
             {"name": "attr_B", "type": "Type[str]"},
             {"name": "attr_C", "type": "Type[str]"},
-        ]
+        )
 
         self.assertEqual(expected, actual["choices"])
 
@@ -284,7 +289,7 @@ class FiltersTests(FactoryTestCase):
         )
 
         actual = self.filters.field_choices(attr, "foo", ["a", "b"])
-        expected = [
+        expected = (
             {"name": "attr_B", "type": "Type[float]", "max_exclusive": 10.0},
             {"name": "attr_C", "namespace": "bar", "type": "Type[str]"},
             {
@@ -300,7 +305,7 @@ class FiltersTests(FactoryTestCase):
                 "tokens": True,
                 "type": "Type[List[str]]",
             },
-        ]
+        )
 
         self.assertEqual(expected, actual)
 
@@ -573,14 +578,14 @@ class FiltersTests(FactoryTestCase):
             '    "level_two": {\n'
             '        "a": 1,\n'
             "    },\n"
-            '    "list": (\n'
+            '    "list": [\n'
             "        {\n"
             '            "type": object,\n'
             "        },\n"
             "        {\n"
             '            "type": "Type[object] mpla",\n'
             "        },\n"
-            "    ),\n"
+            "    ],\n"
             '    "default": 1,\n'
             '    "default_factory": list,\n'
             "}"

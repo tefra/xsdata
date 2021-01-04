@@ -99,27 +99,7 @@ class Restrictions:
     def merge(self, source: "Restrictions"):
         """Update properties from another instance."""
 
-        keys = (
-            "required",
-            "prohibited",
-            "min_exclusive",
-            "min_inclusive",
-            "min_length",
-            "max_exclusive",
-            "max_inclusive",
-            "max_length",
-            "total_digits",
-            "fraction_digits",
-            "length",
-            "white_space",
-            "pattern",
-            "explicit_timezone",
-        )
-
-        for key in keys:
-            value = getattr(source, key)
-            if value is not None:
-                setattr(self, key, value)
+        self.update(source)
 
         min_occurs = source.min_occurs
         max_occurs = source.max_occurs
@@ -141,6 +121,29 @@ class Restrictions:
         # Update max occurs if current value is None or the new value is more than one.
         if self.max_occurs is None or (max_occurs is not None and max_occurs != 1):
             self.max_occurs = max_occurs
+
+    def update(self, source: "Restrictions"):
+        keys = (
+            "required",
+            "prohibited",
+            "min_exclusive",
+            "min_inclusive",
+            "min_length",
+            "max_exclusive",
+            "max_inclusive",
+            "max_length",
+            "total_digits",
+            "fraction_digits",
+            "length",
+            "white_space",
+            "pattern",
+            "explicit_timezone",
+        )
+
+        for key in keys:
+            value = getattr(source, key)
+            if value is not None:
+                setattr(self, key, value)
 
     def asdict(self, types: Optional[List[Type]] = None) -> Dict:
         """
@@ -211,23 +214,10 @@ class AttrType:
         return DataType.get_enum(self.name) if self.native else None
 
     @property
-    def native_name(self) -> Optional[str]:
-        """Return the python build-in type name: `'str'`, `'int'` if it's
-        native type."""
-        data_type = DataType.get_enum(self.name) if self.native else None
-        return data_type.type.__name__ if data_type else None
-
-    @property
-    def native_code(self) -> Optional[str]:
-        """Return the xml data type if it's native type."""
-        data_type = DataType.get_enum(self.name) if self.native else None
-        return data_type.code if data_type else None
-
-    @property
     def native_type(self) -> Any:
         """Return the python build-in type if it's a native type."""
-        data_type = DataType.get_enum(self.name) if self.native else None
-        return data_type.type if data_type else None
+        datatype = self.datatype
+        return datatype.type if datatype else None
 
     def clone(self) -> "AttrType":
         """Return a deep cloned instance."""

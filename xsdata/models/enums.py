@@ -130,7 +130,7 @@ class DataType(Enum):
     NON_NEGATIVE_INTEGER = ("nonNegativeInteger", int)
     NON_POSITIVE_INTEGER = ("nonPositiveInteger", int)
     NORMALIZED_STRING = ("normalizedString", str)
-    NOTATION = ("NOTATION", str)
+    NOTATION = ("NOTATION", QName)
     POSITIVE_INTEGER = ("positiveInteger", int)
     QNAME = ("QName", QName)
     SHORT = ("short", int)

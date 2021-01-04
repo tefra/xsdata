@@ -33,6 +33,9 @@ from xsdata.utils.namespaces import load_prefix
 from xsdata.utils.namespaces import split_qname
 
 
+NOT_A_STRING = "Value must be str"
+
+
 class Converter(metaclass=abc.ABCMeta):
     """Abstract converter class."""
 
@@ -212,7 +215,7 @@ class FloatConverter(Converter):
 class BytesConverter(Converter):
     def deserialize(self, value: Any, **kwargs: Any) -> bytes:
         if not isinstance(value, str):
-            raise ConverterError("Value must be str")
+            raise ConverterError(NOT_A_STRING)
 
         try:
             fmt = kwargs.get("format")
@@ -412,7 +415,7 @@ class TimeConverter(Converter):
 
     def deserialize(self, value: Any, **kwargs: Any) -> time:
         if not isinstance(value, str):
-            raise ConverterError("Value must be str")
+            raise ConverterError(NOT_A_STRING)
 
         try:
             fmt = kwargs.get("format")
@@ -461,7 +464,7 @@ class DatetimeConverter(Converter):
 
     def deserialize(self, value: Any, **kwargs: Any) -> datetime:
         if not isinstance(value, str):
-            raise ConverterError("Value must be str")
+            raise ConverterError(NOT_A_STRING)
 
         try:
 

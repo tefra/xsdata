@@ -179,7 +179,7 @@ class ClassExtensionHandler(HandlerInterface):
     def add_default_attribute(cls, target: Class, extension: Extension):
         """Add a default value field to the given class based on the extension
         type."""
-        if extension.type.native_code != DataType.ANY_TYPE.code:
+        if extension.type.datatype != DataType.ANY_TYPE:
             tag = Tag.EXTENSION
             name = "value"
             default = None

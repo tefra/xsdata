@@ -213,9 +213,8 @@ class AttributeTypeHandler(HandlerInterface):
             1. xs:error
             2. xs:anyType and xs:anySimpleType when there are other types present
         """
-        xs_error = DataType.ERROR.code
         types = collections.unique_sequence(types, key="name")
-        types = collections.remove(types, lambda x: x.native_code == xs_error)
+        types = collections.remove(types, lambda x: x.datatype == DataType.ERROR)
 
         if len(types) > 1:
             types = collections.remove(types, lambda x: x.native_type is object)

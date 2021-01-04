@@ -222,8 +222,8 @@ class AttrFactory(Factory):
         )
 
     @classmethod
-    def native(cls, datatype: DataType, tag: str = Tag.ELEMENT) -> Attr:
-        return cls.create(tag=tag, types=[AttrTypeFactory.native(datatype)])
+    def native(cls, datatype: DataType, tag: str = Tag.ELEMENT, **kwargs) -> Attr:
+        return cls.create(tag=tag, types=[AttrTypeFactory.native(datatype)], **kwargs)
 
     @classmethod
     def enumeration(cls, **kwargs) -> Attr:

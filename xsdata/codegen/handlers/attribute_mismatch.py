@@ -1,34 +1,37 @@
 from xsdata.codegen.mixins import HandlerInterface
+from xsdata.codegen.models import Attr
 from xsdata.codegen.models import Class
+from xsdata.models.enums import DataType
 
 
 class AttributeMismatchHandler(HandlerInterface):
     """
-    Classes can not container attributes derived from xs:enumeration and any
-    other schema element. Although very rare it can happen in silly cases when
-    the author of the schema is trying to restrict the enum type with another
-    xs:simpleType.
+    Sanitize cases where handling is currently unsupported.
 
-    Apart from visibility about the origin of the enumeration values it doesn't serve
-    any other purpose. In this case simply drop non enum attributes
-
-    .. code-block:: xml
-
-        <xsd:simpleType name="ApplicableSizesType">
-        <xsd:restriction>
-          <xsd:simpleType>
-            <xsd:list itemType="SizeType"/>
-          </xsd:simpleType>
-          <xsd:enumeration value="small medium large"/>
-          <xsd:enumeration value="2 4 6 8 10 12 14 16 18"/>
-        </xsd:restriction>
-        </xsd:simpleType>
+    Cases:
+        - Enumerations with list member values
+        - Invalid lower case hex binary default values
     """
 
     @classmethod
     def process(cls, target: Class):
-        """Drop non enum attributes from enum classes."""
+        for attr in target.attrs:
+            cls.process_attr(attr)
 
-        enumerations = [attr for attr in target.attrs if attr.is_enumeration]
-        if enumerations:
-            target.attrs = enumerations
+    @classmethod
+    def process_attr(cls, attr: Attr):
+        """Reset attribute types and restrictions for unsupported cases."""
+        is_enum = attr.is_enumeration
+        for attr_type in attr.types:
+            datatype = attr_type.datatype
+            if is_enum and datatype in (DataType.NMTOKENS, DataType.IDREFS):
+                attr_type.qname = str(DataType.STRING)
+                attr.restrictions.tokens = False
+            elif (
+                (attr.fixed or is_enum)
+                and datatype == DataType.HEX_BINARY
+                and isinstance(attr.default, str)
+                and not attr.default.isupper()
+            ):
+                attr_type.qname = str(DataType.STRING)
+                attr.restrictions.format = None

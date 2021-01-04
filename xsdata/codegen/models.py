@@ -132,6 +132,7 @@ class Restrictions:
 
         self.choice = source.choice or self.choice
         self.tokens = source.tokens or self.tokens
+        self.format = source.format or self.format
 
         # Update min occurs if current value is None or the new value is more than one.
         if self.min_occurs is None or (min_occurs is not None and min_occurs != 1):

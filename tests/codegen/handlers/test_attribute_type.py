@@ -109,15 +109,6 @@ class AttributeTypeHandlerTests(FactoryTestCase):
         self.processor.process_native_type(attr, nm_tokens_type)
         self.assertTrue(attr.restrictions.tokens)
 
-    def test_process_native_type_with_enum_attr(self):
-        attr = AttrFactory.native(DataType.NMTOKENS, tag=Tag.ENUMERATION)
-        attr.restrictions.tokens = False
-        attr.restrictions.pattern = "[a-z]"
-
-        self.processor.process_native_type(attr, attr.types[0])
-        self.assertFalse(attr.restrictions.tokens)
-        self.assertEqual(str(DataType.NMTOKENS), attr.types[0].qname)
-
     @mock.patch.object(AttributeTypeHandler, "reset_attribute_type")
     @mock.patch.object(AttributeTypeHandler, "find_dependency")
     def test_process_dependency_type_with_absent_type(
@@ -160,23 +151,35 @@ class AttributeTypeHandlerTests(FactoryTestCase):
             simple, target, attr, attr_type
         )
 
+    @mock.patch.object(AttributeTypeHandler, "update_restrictions")
+    @mock.patch.object(AttributeTypeHandler, "find_dependency")
+    def test_process_dependency_type_with_enumeration_type(
+        self, mock_find_dependency, mock_update_restrictions
+    ):
+        enumeration = ClassFactory.enumeration(1)
+        mock_find_dependency.return_value = enumeration
+
+        target = ClassFactory.create()
+        attr = AttrFactory.create()
+
+        self.processor.process_dependency_type(target, attr, attr.types[0])
+        mock_update_restrictions.assert_called_once_with(
+            attr, enumeration.attrs[0].types[0].datatype
+        )
+
     @mock.patch.object(AttributeTypeHandler, "set_circular_flag")
     @mock.patch.object(AttributeTypeHandler, "find_dependency")
     def test_process_dependency_type_with_complex_type(
         self, mock_find_dependency, mock_set_circular_flag
     ):
         complex_type = ClassFactory.elements(1)
-        enumeration = ClassFactory.enumeration(1)
-
-        mock_find_dependency.side_effect = [complex_type, enumeration]
+        mock_find_dependency.return_value = complex_type
 
         target = ClassFactory.create()
         attr = AttrFactory.create()
         attr_type = attr.types[0]
 
         self.processor.process_dependency_type(target, attr, attr_type)
-        self.processor.process_dependency_type(target, attr, attr_type)
-
         mock_set_circular_flag.assert_called_once_with(complex_type, target, attr_type)
 
     @mock.patch.object(AttributeTypeHandler, "update_restrictions")
@@ -202,7 +205,7 @@ class AttributeTypeHandlerTests(FactoryTestCase):
         self, mock_copy_attribute_properties, mock_update_restrictions
     ):
         attr = AttrFactory.create(types=[AttrTypeFactory.create(qname="{foo}a")])
-        inner = ClassFactory.enumeration(2, qname="{bar}a")
+        inner = ClassFactory.enumeration(2, qname="{bar}a", status=Status.PROCESSED)
         target = ClassFactory.create(inner=[inner])
 
         self.processor.process_inner_type(target, attr, attr.types[0])
@@ -359,6 +362,23 @@ class AttributeTypeHandlerTests(FactoryTestCase):
         actual = self.processor.cached_dependencies(source)
         self.assertEqual(("a", "b"), actual)
         mock_class_dependencies.assert_called_once_with()
+
+    def test_update_restrictions(self):
+        attr = AttrFactory.create()
+        self.processor.update_restrictions(attr, DataType.NMTOKENS)
+        self.assertTrue(attr.restrictions.tokens)
+
+        attr = AttrFactory.create()
+        self.processor.update_restrictions(attr, DataType.IDREFS)
+        self.assertTrue(attr.restrictions.tokens)
+
+        attr = AttrFactory.create()
+        self.processor.update_restrictions(attr, DataType.BASE64_BINARY)
+        self.assertEqual("base64", attr.restrictions.format)
+
+        attr = AttrFactory.create()
+        self.processor.update_restrictions(attr, DataType.HEX_BINARY)
+        self.assertEqual("base16", attr.restrictions.format)
 
     def test_filter_types(self):
         xs_string = AttrTypeFactory.native(DataType.STRING)

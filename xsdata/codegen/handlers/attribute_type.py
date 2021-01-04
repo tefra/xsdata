@@ -54,14 +54,16 @@ class AttributeTypeHandler(HandlerInterface):
 
     @classmethod
     def process_native_type(cls, attr: Attr, attr_type: AttrType):
-        """Reset attribute type if the attribute has a pattern restriction as
-        they are not yet supported."""
+        """
+        Process native attribute types.
 
-        if not attr.is_enumeration:
-            cls.update_restrictions(attr, attr_type.datatype)
+        - Update restrictions from the datatype
+        - Reset attribute type if there is a pattern restriction
+        """
+        cls.update_restrictions(attr, attr_type.datatype)
 
-            if attr.restrictions.pattern:
-                cls.reset_attribute_type(attr_type)
+        if attr.restrictions.pattern:
+            cls.reset_attribute_type(attr_type)
 
     def find_dependency(self, attr_type: AttrType) -> Optional[Class]:
         """
@@ -120,7 +122,9 @@ class AttributeTypeHandler(HandlerInterface):
             self.reset_attribute_type(attr_type, use_str)
         elif source.is_simple_type:
             self.copy_attribute_properties(source, target, attr, attr_type)
-        elif not source.is_enumeration:
+        elif source.is_enumeration:
+            self.update_restrictions(attr, source.attrs[0].types[0].datatype)
+        else:
             self.set_circular_flag(source, target, attr_type)
 
     @classmethod
@@ -192,6 +196,15 @@ class AttributeTypeHandler(HandlerInterface):
         attr_type.forward = False
 
     @classmethod
+    def update_restrictions(cls, attr: Attr, datatype: Optional[DataType]):
+        if datatype in (DataType.NMTOKENS, DataType.IDREFS):
+            attr.restrictions.tokens = True
+        elif datatype == DataType.HEX_BINARY:
+            attr.restrictions.format = "base16"
+        elif datatype == DataType.BASE64_BINARY:
+            attr.restrictions.format = "base64"
+
+    @classmethod
     def filter_types(cls, types: List[AttrType]) -> List[AttrType]:
         """
         Remove duplicate and invalid types.
@@ -211,8 +224,3 @@ class AttributeTypeHandler(HandlerInterface):
             types.append(AttrType(qname=str(DataType.STRING), native=True))
 
         return types
-
-    @classmethod
-    def update_restrictions(cls, attr: Attr, datatype: Optional[DataType]):
-        if datatype in (DataType.NMTOKENS, DataType.IDREFS):
-            attr.restrictions.tokens = True

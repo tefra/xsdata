@@ -149,6 +149,58 @@ class FloatConverterTests(TestCase):
         self.assertEqual("8.77683E-08", self.converter.serialize(float("8.77683E-8")))
 
 
+class BytesConverterTests(TestCase):
+    def setUp(self):
+        self.converter = converter.type_converter(bytes)
+
+    def test_serialize_with_base16_format(self):
+        inputs = [
+            ("312d322d33", "312D322D33"),
+            ("312D322D33", "312D322D33"),
+        ]
+
+        for actual, expected in inputs:
+            obj = self.converter.deserialize(actual, format="base16")
+            output = self.converter.serialize(obj, format="base16")
+
+            self.assertIsInstance(obj, bytes)
+            self.assertEqual(b"1-2-3", obj)
+            self.assertEqual(expected, output)
+
+    def test_serialize_with_base64_format(self):
+        obj = self.converter.deserialize("MS0yLTM=", format="base64")
+        output = self.converter.serialize(obj, format="base64")
+
+        self.assertIsInstance(obj, bytes)
+        self.assertEqual(b"1-2-3", obj)
+        self.assertEqual("MS0yLTM=", output)
+
+    def test_serialize_raises_exception(self):
+
+        with self.assertRaises(ConverterError) as cm:
+            self.converter.deserialize(1, format="foo")
+
+        self.assertEqual("Value must be str", str(cm.exception))
+
+        with self.assertRaises(ConverterError):
+            self.converter.deserialize("aaa", format="base16")
+
+    def test_unknown_formats(self):
+        with self.assertRaises(ConverterError):
+            self.converter.serialize("foo")
+
+        with self.assertRaises(ConverterError) as cm:
+            self.converter.serialize("foo", format="foo")
+
+        self.assertEqual("Unknown format 'foo'", str(cm.exception))
+
+        with self.assertRaises(ConverterError):
+            self.converter.deserialize("foo")
+
+        with self.assertRaises(ConverterError):
+            self.converter.deserialize("foo", format="foo")
+
+
 class DecimalConverterTests(TestCase):
     def setUp(self):
         self.converter = converter.type_converter(Decimal)

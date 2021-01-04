@@ -237,8 +237,8 @@ class SchemaMapper:
             Attr(
                 index=obj.index,
                 name=name,
-                default=obj.default_value or default_value,
-                fixed=obj.is_fixed or is_fixed,
+                default=default_value or obj.default_value,
+                fixed=is_fixed or obj.is_fixed,
                 types=types,
                 tag=obj.class_name,
                 help=obj.display_help,

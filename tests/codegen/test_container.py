@@ -36,7 +36,7 @@ class ClassContainerTests(FactoryTestCase):
             [
                 "AttributeGroupHandler",
                 "ClassExtensionHandler",
-                "AttributeEnumUnionHandler",
+                "AttributeEnumerationHandler",
                 "AttributeSubstitutionHandler",
                 "AttributeTypeHandler",
                 "AttributeMergeHandler",

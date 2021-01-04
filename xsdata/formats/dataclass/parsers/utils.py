@@ -224,7 +224,7 @@ class ParserUtils:
             var = metadata.find_var(mode=FindMode.TEXT)
             if var and var.init:
                 params[var.name] = cls.parse_value(
-                    txt, var.types, var.default, ns_map, var.tokens
+                    txt, var.types, var.default, ns_map, var.tokens, var.format
                 )
                 return True
 
@@ -248,7 +248,7 @@ class ParserUtils:
             if var and var.name not in params:
                 if var.init:
                     params[var.name] = cls.parse_value(
-                        value, var.types, var.default, ns_map, var.tokens
+                        value, var.types, var.default, ns_map, var.tokens, var.format
                     )
             elif wildcard:
                 params[wildcard.name][qname] = cls.parse_any_attribute(value, ns_map)

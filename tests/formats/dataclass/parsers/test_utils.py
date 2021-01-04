@@ -184,7 +184,8 @@ class ParserUtilsTests(TestCase):
             eff_date.types,
             eff_date.default,
             ns_map,
-            eff_date.list_element,
+            eff_date.tokens,
+            eff_date.format,
         )
 
     def test_parse_any_attributes(self):
@@ -253,7 +254,7 @@ class ParserUtilsTests(TestCase):
         self.assertTrue(ParserUtils.bind_content(params, metadata, "foo", ns_map))
         self.assertEqual({"value": "yes!"}, params)
         mock_parse_value.assert_called_once_with(
-            "foo", var.types, var.default, ns_map, var.list_element
+            "foo", var.types, var.default, ns_map, var.tokens, var.format
         )
 
     def test_bind_content_with_no_text_var(self):

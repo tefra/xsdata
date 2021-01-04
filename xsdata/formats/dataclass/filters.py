@@ -376,10 +376,12 @@ class Filters:
         )
 
         if attr.is_tokens:
-            return self.field_default_tokens(attr, types)
+            return self.field_default_tokens(attr, types, ns_map)
 
         return self.literal_value(
-            converter.deserialize(attr.default, types, ns_map=ns_map)
+            converter.deserialize(
+                attr.default, types, ns_map=ns_map, format=attr.restrictions.format
+            )
         )
 
     def field_default_enum(self, attr: Attr) -> str:
@@ -387,11 +389,19 @@ class Filters:
         source = next(x.alias or source for x in attr.types if x.name == source)
         return f"{self.class_name(source)}.{self.constant_name(enumeration)}"
 
-    def field_default_tokens(self, attr: Attr, types: List[Type]) -> str:
+    def field_default_tokens(
+        self, attr: Attr, types: List[Type], ns_map: Optional[Dict]
+    ) -> str:
         assert isinstance(attr.default, str)
 
         tokens = ", ".join(
-            str(self.literal_value(converter.deserialize(val, types)))
+            str(
+                self.literal_value(
+                    converter.deserialize(
+                        val, types, ns_map=ns_map, format=attr.restrictions.format
+                    )
+                )
+            )
             for val in attr.default.split()
         )
         return f"lambda: [{tokens}]"

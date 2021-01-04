@@ -1,4 +1,6 @@
 import abc
+import base64
+import binascii
 import math
 import warnings
 from dataclasses import dataclass
@@ -150,7 +152,10 @@ __PYTHON_TYPES_SORTED__ = {
     Decimal: 4,
     datetime: 5,
     time: 6,
-    str: 7,
+    Duration: 7,
+    Period: 8,
+    QName: 9,
+    str: 10,
 }
 
 
@@ -202,6 +207,36 @@ class FloatConverter(Converter):
 
     def serialize(self, value: float, **kwargs: Any) -> str:
         return "NaN" if math.isnan(value) else str(value).upper()
+
+
+class BytesConverter(Converter):
+    def deserialize(self, value: Any, **kwargs: Any) -> bytes:
+        if not isinstance(value, str):
+            raise ConverterError("Value must be str")
+
+        try:
+            fmt = kwargs.get("format")
+
+            if fmt == "base16":
+                return binascii.unhexlify(value)
+
+            if fmt == "base64":
+                return base64.b64decode(value)
+
+            raise ConverterError(f"Unknown format '{fmt}'")
+        except ValueError as e:
+            raise ConverterError(e)
+
+    def serialize(self, value: bytes, **kwargs: Any) -> str:
+        fmt = kwargs.get("format")
+
+        if fmt == "base16":
+            return base64.b16encode(value).decode()
+
+        if fmt == "base64":
+            return base64.b64encode(value).decode()
+
+        raise ConverterError(f"Unknown format '{fmt}'")
 
 
 class DecimalConverter(Converter):
@@ -502,6 +537,7 @@ converter.register_converter(str, StrConverter())
 converter.register_converter(int, IntConverter())
 converter.register_converter(bool, BoolConverter())
 converter.register_converter(float, FloatConverter())
+converter.register_converter(bytes, BytesConverter())
 converter.register_converter(object, StrConverter())
 converter.register_converter(time, TimeConverter())
 converter.register_converter(datetime, DatetimeConverter())

@@ -4,6 +4,7 @@ from unittest.case import TestCase
 from tests.fixtures.books import BookForm
 from tests.fixtures.books import Books
 from xsdata.exceptions import XmlContextError
+from xsdata.formats.dataclass.serializers.json import DictFactory
 from xsdata.formats.dataclass.serializers.json import JsonSerializer
 from xsdata.models.datatype import XmlDate
 
@@ -33,7 +34,7 @@ class JsonEncoderTests(TestCase):
         )
 
     def test_render(self):
-        serializer = JsonSerializer()
+        serializer = JsonSerializer(dict_factory=DictFactory.FILTER_NONE)
         actual = serializer.render(self.books)
 
         expected = {
@@ -53,8 +54,6 @@ class JsonEncoderTests(TestCase):
                     "genre": "Biography",
                     "id": "bk002",
                     "lang": "en",
-                    "price": None,
-                    "pub_date": None,
                     "review": "A masterpiece of the fine art of gossiping.",
                     "title": "Becoming Somebody",
                 },

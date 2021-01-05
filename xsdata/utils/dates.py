@@ -24,8 +24,7 @@ def format_offset(offset: Optional[int]) -> str:
     else:
         sign = "+"
 
-    hh, mm = divmod(offset, 3600)
-    mm, ss = divmod(mm, 60)
+    hh, mm = divmod(offset, 60)
 
     return f"{sign}{hh:02d}:{mm:02d}"
 
@@ -168,6 +167,6 @@ class DateTimeParser:
             self.skip(":")
             offset += self.parse_digits(2)
             offset *= -1 if ctrl == "-" else 1
-            return offset * 60
+            return offset
 
         raise ValueError()

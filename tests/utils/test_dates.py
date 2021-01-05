@@ -14,7 +14,7 @@ class DatesUtilsTests(TestCase):
         self.assertEqual(14, next(args))
         self.assertEqual(30, next(args))
         self.assertEqual(0, next(args))
-        self.assertEqual(-4920, next(args))
+        self.assertEqual(-82, next(args))
         self.assertIsNone(next(args, None))
 
     def test_parse_date_args_microsecond(self):

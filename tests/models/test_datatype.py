@@ -1,3 +1,8 @@
+from datetime import date
+from datetime import datetime
+from datetime import time
+from datetime import timedelta
+from datetime import timezone
 from typing import Dict
 from unittest import TestCase
 
@@ -6,6 +11,7 @@ from xsdata.models.datatype import XmlDateTime
 from xsdata.models.datatype import XmlDuration
 from xsdata.models.datatype import XmlPeriod
 from xsdata.models.datatype import XmlTime
+from xsdata.utils.collections import Immutable
 
 
 def filter_none(mapping: Dict) -> Dict:
@@ -24,6 +30,8 @@ class XmlDateTests(TestCase):
 
         for value, expected in examples.items():
             actual = XmlDate.parse(value)
+            self.assertIsInstance(actual, Immutable)
+            self.assertEqual(-1, actual._hashcode)
             self.assertEqual(expected, actual, value)
 
     def test_parse_invalid(self):
@@ -66,9 +74,9 @@ class XmlDateTests(TestCase):
             actual = XmlDate.parse(value)
             self.assertEqual(expected, repr(actual), value)
 
-    def test_eq(self):
-        self.assertNotEqual(1, XmlDate(1, 0, 0))
-        self.assertNotEqual(XmlDate(1, 1, 0), XmlDate(1, 0, 0))
+    def test_datetime_helpers(self):
+        self.assertEqual(date(2021, 1, 1), XmlDate(2021, 1, 1).date())
+        self.assertEqual(datetime(2021, 1, 1, 0, 0), XmlDate(2021, 1, 1).datetime())
 
 
 class XmlDateTimeTests(TestCase):
@@ -85,6 +93,8 @@ class XmlDateTimeTests(TestCase):
 
         for value, expected in examples.items():
             actual = XmlDateTime.parse(value)
+            self.assertIsInstance(actual, Immutable)
+            self.assertEqual(-1, actual._hashcode)
             self.assertEqual(expected, actual, value)
 
     def test_parse_invalid(self):
@@ -138,10 +148,15 @@ class XmlDateTimeTests(TestCase):
             actual = XmlDateTime.parse(value)
             self.assertEqual(expected, repr(actual), value)
 
-    def test_eq(self):
-        self.assertNotEqual(1, XmlDateTime(2002, 1, 1, 12, 1, 1, 0, 135))
-        self.assertNotEqual(
-            XmlDateTime(2002, 1, 1, 12, 1, 1, 1), XmlDateTime(2002, 1, 1, 12, 1, 1, 0)
+    def test_datetime_helpers(self):
+        self.assertEqual(
+            datetime(2002, 1, 1, 12, 1, 1, tzinfo=timezone(timedelta(seconds=8100))),
+            XmlDateTime(2002, 1, 1, 12, 1, 1, 0, 135).datetime(),
+        )
+
+        self.assertEqual(
+            datetime(2002, 1, 1, 12, 1, 1, tzinfo=timezone.utc),
+            XmlDateTime(2002, 1, 1, 12, 1, 1, 0, 0).datetime(),
         )
 
 
@@ -159,6 +174,8 @@ class XmlTimeTests(TestCase):
 
         for value, expected in examples.items():
             actual = XmlTime.parse(value)
+            self.assertIsInstance(actual, Immutable)
+            self.assertEqual(-1, actual._hashcode)
             self.assertEqual(expected, actual, value)
 
     def test_parse_invalid(self):
@@ -203,12 +220,21 @@ class XmlTimeTests(TestCase):
             actual = XmlTime.parse(value)
             self.assertEqual(expected, repr(actual), value)
 
-    def test_eq(self):
-        self.assertNotEqual(1, XmlTime(12, 1, 1, 0))
-        self.assertNotEqual(XmlTime(12, 1, 1, 0), XmlTime(12, 1, 1, 1))
+    def test_datetime_helpers(self):
+        self.assertEqual(time(12, 1, 1, 1), XmlTime(12, 1, 1, 1).time())
 
 
-class DurationTests(TestCase):
+class XmlDurationTests(TestCase):
+    def test_properties(self):
+        duration = XmlDuration("P2Y6M5DT12H35M30.5S")
+        self.assertEqual(2, duration.years)
+        self.assertEqual(6, duration.months)
+        self.assertEqual(5, duration.days)
+        self.assertEqual(12, duration.hours)
+        self.assertEqual(35, duration.minutes)
+        self.assertEqual(30.5, duration.seconds)
+        self.assertFalse(duration.negative)
+
     def test_init_valid(self):
 
         fixtures = {
@@ -275,7 +301,20 @@ class DurationTests(TestCase):
         self.assertEqual(expected, obj_b.asdict())
 
 
-class PeriodTests(TestCase):
+class XmlPeriodTests(TestCase):
+    def test_properties(self):
+        period = XmlPeriod("2001-10+02:00")
+        self.assertEqual(2001, period.year)
+        self.assertEqual(10, period.month)
+        self.assertEqual(120, period.offset)
+        self.assertIsNone(period.day)
+
+        period = XmlPeriod("---20-02:44")
+        self.assertIsNone(period.year)
+        self.assertIsNone(period.month)
+        self.assertEqual(20, period.day)
+        self.assertEqual(-164, period.offset)
+
     def test_init_valid(self):
 
         fixtures = {

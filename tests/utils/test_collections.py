@@ -1,7 +1,10 @@
 from typing import Generator
+from typing import Hashable
+from typing import Iterable
 from unittest import TestCase
 
 from xsdata.utils import collections
+from xsdata.utils.collections import Immutable
 
 
 class CollectionsTests(TestCase):
@@ -38,3 +41,44 @@ class CollectionsTests(TestCase):
         self.assertEqual([2, 2, 3], collections.remove([1, 2, 2, 3], lambda x: x == 1))
 
         self.assertEqual([3], collections.remove([1, 2, 2, 3], lambda x: x < 3))
+
+
+class ImmutableImpl(Immutable):
+    __slots__ = ("a", "b")
+
+    def __init__(self, a, b):
+        self.a = a
+        self.b = b
+        self._hashcode = -1
+
+
+class ImmutableTests(TestCase):
+    def setUp(self) -> None:
+        self.obj = ImmutableImpl(1, 2)
+
+    def test_immutable(self):
+        with self.assertRaises(TypeError) as cm:
+            self.obj.a = 2
+
+        self.assertEqual("ImmutableImpl is immutable", str(cm.exception))
+
+        with self.assertRaises(TypeError) as cm:
+            del self.obj.a
+
+        self.assertEqual("ImmutableImpl is immutable", str(cm.exception))
+
+    def test_eq(self):
+        self.assertEqual(ImmutableImpl(1, 2), self.obj)
+        self.assertNotEqual(ImmutableImpl(2, 2), self.obj)
+        self.assertNotEqual("a", self.obj)
+
+    def test_hash(self):
+        self.assertEqual(-1, self.obj._hashcode)
+        self.assertIsInstance(self.obj, Hashable)
+
+        hash(self.obj)
+        self.assertNotEqual(-1, self.obj._hashcode)
+        self.assertEqual(self.obj._hashcode, hash(self.obj))
+
+    def test_iter(self):
+        self.assertEqual([1, 2], list(self.obj))

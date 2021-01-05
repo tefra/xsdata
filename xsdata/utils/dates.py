@@ -1,3 +1,4 @@
+import datetime
 from typing import Any
 from typing import Generator
 from typing import Optional
@@ -27,6 +28,16 @@ def format_offset(offset: Optional[int]) -> str:
     hh, mm = divmod(offset, 60)
 
     return f"{sign}{hh:02d}:{mm:02d}"
+
+
+def calculate_timezone(offset: Optional[int]) -> Optional[datetime.timezone]:
+    if offset is None:
+        return None
+
+    if offset == 0:
+        return datetime.timezone.utc
+
+    return datetime.timezone(datetime.timedelta(minutes=offset))
 
 
 def format_date(year: int, month: int, day: int) -> str:
@@ -101,32 +112,38 @@ class DateTimeParser:
         elif var == "m":
             yield self.parse_digits(2)
         elif var == "Y":
-            negative = False
-            if self.peek() == "-":
-                self.vidx += 1
-                negative = True
-
-            year = self.parse_minimum_digits(4)
-            if negative:
-                yield -year
-            else:
-                yield year
-
+            yield self.parse_year()
         elif var == "H":
             yield self.parse_digits(2)
         elif var == "M":
             yield self.parse_digits(2)
         elif var == "S":
             yield self.parse_digits(2)
-            if self.has_more() and self.peek() == ".":
-                self.vidx += 1
-                yield self.parse_fixed_digits(6)
-            else:
-                yield 0
+
+            yield self.parse_microsecond()
         elif var == "z":
             yield self.parse_offset()
         else:
             raise ValueError()
+
+    def parse_year(self) -> int:
+        negative = False
+        if self.peek() == "-":
+            self.vidx += 1
+            negative = True
+
+        year = self.parse_minimum_digits(4)
+        if negative:
+            return -year
+
+        return year
+
+    def parse_microsecond(self) -> int:
+        if self.has_more() and self.peek() == ".":
+            self.vidx += 1
+            return self.parse_fixed_digits(6)
+        else:
+            return 0
 
     def parse_digits(self, digits: int) -> int:
         start = self.vidx

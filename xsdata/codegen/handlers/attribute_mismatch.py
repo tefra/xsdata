@@ -15,11 +15,27 @@ class AttributeMismatchHandler(HandlerInterface):
 
     @classmethod
     def process(cls, target: Class):
+        cascade_default = not target.is_nillable and target.default
         for attr in target.attrs:
-            cls.process_attr(attr)
+            if cascade_default:
+                cls.cascade_default_value(target, attr)
+
+            cls.reset_unsupported_types(attr)
 
     @classmethod
-    def process_attr(cls, attr: Attr):
+    def cascade_default_value(cls, target: Class, attr: Attr):
+        """
+        Set the text xml field default value from parent.
+
+        At this stage all flattening and merging has finished, a class
+        should only have one xml text field.
+        """
+        if not attr.xml_type and attr.default is None:
+            attr.default = target.default
+            attr.fixed = target.fixed
+
+    @classmethod
+    def reset_unsupported_types(cls, attr: Attr):
         """Reset attribute types and restrictions for unsupported cases."""
         is_enum = attr.is_enumeration
         for attr_type in attr.types:

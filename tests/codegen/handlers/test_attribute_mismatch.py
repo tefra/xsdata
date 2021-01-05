@@ -14,7 +14,38 @@ class AttributeMismatchHandlerTests(FactoryTestCase):
 
         self.processor = AttributeMismatchHandler
 
-    def test_process(self):
+    def test_cascade_default_value(self):
+        target = ClassFactory.create(
+            default="4",
+            fixed=True,
+            nillable=True,
+            attrs=[
+                AttrFactory.native(DataType.STRING, tag=Tag.SIMPLE_TYPE),
+                AttrFactory.native(DataType.STRING, tag=Tag.SIMPLE_TYPE, default="1"),
+                AttrFactory.native(DataType.STRING, tag=Tag.ELEMENT),
+            ],
+        )
+
+        self.processor.process(target)
+
+        for attr in target.attrs:
+            self.assertNotEqual("4", attr.default)
+            self.assertFalse(attr.fixed)
+
+        target.nillable = False
+        self.processor.process(target)
+
+        # Xml text field with no default value
+        self.assertEqual("4", target.attrs[0].default)
+        self.assertEqual(True, target.attrs[0].fixed)
+
+        # The rest are untouched.
+        self.assertEqual("1", target.attrs[1].default)
+        self.assertFalse(target.attrs[1].fixed)
+        self.assertIsNone(target.attrs[2].default)
+        self.assertFalse(target.attrs[2].fixed)
+
+    def test_reset_unsupported_types(self):
         target = ClassFactory.create(
             attrs=[
                 AttrFactory.native(

@@ -72,6 +72,8 @@ class SchemaMapper:
             help=obj.display_help,
             ns_map=obj.ns_map,
             module=module,
+            default=obj.default_value,
+            fixed=obj.is_fixed,
             substitutions=cls.build_substitutions(obj, target_namespace),
         )
 
@@ -94,16 +96,8 @@ class SchemaMapper:
         children."""
 
         restrictions = Restrictions.from_element(obj)
-        is_fixed = obj.is_fixed
-        default_value = obj.default_value
         for child, restrictions in cls.element_children(obj, restrictions):
-            cls.build_class_attribute(
-                target,
-                child,
-                restrictions,
-                is_fixed=is_fixed,
-                default_value=default_value,
-            )
+            cls.build_class_attribute(target, child, restrictions)
 
         target.attrs.sort(key=lambda x: x.index)
 
@@ -217,8 +211,6 @@ class SchemaMapper:
         target: Class,
         obj: ElementBase,
         parent_restrictions: Restrictions,
-        is_fixed: bool = False,
-        default_value: Optional[str] = None,
     ):
         """Generate and append an attribute field to the target class."""
 
@@ -237,8 +229,8 @@ class SchemaMapper:
             Attr(
                 index=obj.index,
                 name=name,
-                default=default_value or obj.default_value,
-                fixed=is_fixed or obj.is_fixed,
+                default=obj.default_value,
+                fixed=obj.is_fixed,
                 types=types,
                 tag=obj.class_name,
                 help=obj.display_help,

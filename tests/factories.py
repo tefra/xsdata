@@ -89,6 +89,8 @@ class ClassFactory(Factory):
         module="tests",
         status=Status.RAW,
         container=None,
+        default=None,
+        fixed=False,
     ):
         if not qname:
             qname = build_qname("xsdata", f"class_{cls.next_letter()}")
@@ -112,6 +114,8 @@ class ClassFactory(Factory):
             ns_map=ns_map if isinstance(ns_map, dict) else DEFAULT_NS_MAP,
             status=status,
             container=container,
+            default=default,
+            fixed=fixed,
         )
 
     @classmethod

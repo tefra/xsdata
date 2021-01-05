@@ -383,6 +383,8 @@ class Class:
     :param namespace:
     :param help:
     :param meta_name:
+    :param default:
+    :param fixed:
     :param substitutions:
     :param extensions:
     :param attrs:
@@ -403,6 +405,8 @@ class Class:
     namespace: Optional[str] = field(default=None)
     help: Optional[str] = field(default=None)
     meta_name: Optional[str] = field(default=None)
+    default: Any = field(default=None, compare=False)
+    fixed: bool = field(default=False, compare=False)
     substitutions: List[str] = field(default_factory=list)
     extensions: List[Extension] = field(default_factory=list)
     attrs: List[Attr] = field(default_factory=list)

@@ -25,6 +25,7 @@ from xsdata.models.mixins import attribute
 from xsdata.models.mixins import element
 from xsdata.models.mixins import ElementBase
 from xsdata.models.mixins import ModuleMixin
+from xsdata.utils import collections
 from xsdata.utils import text
 from xsdata.utils.collections import unique_sequence
 from xsdata.utils.namespaces import clean_uri
@@ -1116,18 +1117,17 @@ class Element(AnnotationBase):
 
     @property
     def real_type(self) -> str:
-
-        types = {
-            alternative.type for alternative in self.alternatives if alternative.type
-        }
+        types = []
         if self.type:
-            types.add(self.type)
+            types.append(self.type)
         elif self.ref:
-            types.add(self.ref)
+            types.append(self.ref)
         elif self.simple_type and self.simple_type.real_type:
-            types.add(self.simple_type.real_type)
+            types.append(self.simple_type.real_type)
 
-        return " ".join(sorted(types))
+        types.extend(alt.type for alt in self.alternatives if alt.type)
+
+        return " ".join(collections.unique_sequence(types))
 
     @property
     def substitutions(self) -> Array[str]:

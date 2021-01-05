@@ -3,11 +3,12 @@ import base64
 import binascii
 import math
 import warnings
+from abc import ABCMeta
 from dataclasses import dataclass
 from dataclasses import field
+from datetime import date
 from datetime import datetime
 from datetime import time
-from datetime import timedelta
 from decimal import Decimal
 from decimal import InvalidOperation
 from enum import Enum
@@ -25,13 +26,14 @@ from lxml import etree
 
 from xsdata.exceptions import ConverterError
 from xsdata.exceptions import ConverterWarning
-from xsdata.models.datatype import Duration
-from xsdata.models.datatype import Period
+from xsdata.models.datatype import XmlDate
+from xsdata.models.datatype import XmlDateTime
+from xsdata.models.datatype import XmlDuration
+from xsdata.models.datatype import XmlPeriod
+from xsdata.models.datatype import XmlTime
 from xsdata.utils import text
-from xsdata.utils.dates import DateTimeParser
 from xsdata.utils.namespaces import load_prefix
 from xsdata.utils.namespaces import split_qname
-
 
 NOT_A_STRING = "Value must be str"
 
@@ -155,8 +157,8 @@ __PYTHON_TYPES_SORTED__ = {
     Decimal: 4,
     datetime: 5,
     time: 6,
-    Duration: 7,
-    Period: 8,
+    XmlDuration: 7,
+    XmlPeriod: 8,
     QName: 9,
     str: 10,
 }
@@ -190,14 +192,6 @@ class IntConverter(Converter):
             raise ConverterError(e)
 
     def serialize(self, value: int, **kwargs: Any) -> str:
-        return str(value)
-
-
-class StrConverter(Converter):
-    def deserialize(self, value: Any, **kwargs: Any) -> str:
-        return str(value)
-
-    def serialize(self, value: str, **kwargs: Any) -> str:
         return str(value)
 
 
@@ -404,117 +398,38 @@ class EnumConverter(Converter):
         return converter.serialize(value.value, **kwargs)
 
 
-class TimeConverter(Converter):
-    """
-    Converter for iso 8061 xml subset time strings.
+class DateTimeBase(Converter, metaclass=ABCMeta):
+    @classmethod
+    def parse(cls, value: Any, **kwargs: Any) -> datetime:
+        try:
+            return datetime.strptime(value, kwargs["format"])
+        except KeyError:
+            raise ConverterError("Missing format keyword argument")
+        except Exception as e:
+            raise ConverterError(e)
 
-    Format: hh:mm:ss[Z|(+|-)hh:mm]
-    """
+    def serialize(self, value: Union[date, time], **kwargs: Any) -> str:
+        try:
+            return value.strftime(kwargs["format"])
+        except KeyError:
+            raise ConverterError("Missing format keyword argument")
+        except Exception as e:
+            raise ConverterError(e)
 
-    format = "%h:%m:%s%z"
 
+class TimeConverter(DateTimeBase):
     def deserialize(self, value: Any, **kwargs: Any) -> time:
-        if not isinstance(value, str):
-            raise ConverterError(NOT_A_STRING)
-
-        try:
-            fmt = kwargs.get("format")
-            if fmt:
-                return datetime.strptime(value, fmt).time()
-
-            fmt = self.format
-            parser = DateTimeParser(value, self.format)
-            parser.parse()
-
-            assert (
-                parser.hour is not None
-                and parser.minute is not None
-                and parser.second is not None
-            )
-
-            return time(
-                hour=0 if parser.hour == 24 else parser.hour,
-                minute=parser.minute,
-                second=parser.second,
-                microsecond=parser.microsecond or 0,
-                tzinfo=parser.tz_info,
-            )
-        except (IndexError, TypeError, ValueError):
-            raise ConverterError(f"String '{value}' does not match format '{fmt}'")
-
-    def serialize(self, value: time, **kwargs: Any) -> str:
-        fmt = kwargs.get("format")
-        if fmt:
-            return value.strftime(fmt)
-
-        result = value.isoformat().replace("+00:00", "Z")
-        if len(result) > 14 and result[12:15] == "000":
-            result = result[:12] + result[15:]
-        return result
+        return self.parse(value, **kwargs).time()
 
 
-class DatetimeConverter(Converter):
-    """
-    Converter for iso 8061 xml subset datetime strings.
+class DateConverter(DateTimeBase):
+    def deserialize(self, value: Any, **kwargs: Any) -> date:
+        return self.parse(value, **kwargs).date()
 
-    Format: YYYY-MM-DDThh:mm:ss[Z|(+|-)hh:mm]
-    """
 
-    format = "%Y-%M-%DT%h:%m:%s%z"
-
+class DateTimeConverter(DateTimeBase):
     def deserialize(self, value: Any, **kwargs: Any) -> datetime:
-        if not isinstance(value, str):
-            raise ConverterError(NOT_A_STRING)
-
-        try:
-
-            fmt = kwargs.get("format")
-            if fmt:
-                return datetime.strptime(value, fmt)
-
-            fmt = self.format
-            parser = DateTimeParser(value, fmt)
-            parser.parse()
-
-            assert (
-                parser.year is not None
-                and parser.month is not None
-                and parser.day is not None
-                and parser.hour is not None
-                and parser.minute is not None
-                and parser.second is not None
-            )
-
-            delta = None
-            hour = parser.hour
-            if hour == 24:
-                hour = 0
-                delta = timedelta(days=1)
-
-            result = datetime(
-                year=parser.year,
-                month=parser.month,
-                day=parser.day,
-                hour=hour,
-                minute=parser.minute,
-                second=parser.second,
-                microsecond=parser.microsecond or 0,
-                tzinfo=parser.tz_info,
-            )
-
-            return result + delta if delta else result
-        except (IndexError, TypeError, ValueError):
-            raise ConverterError(f"String '{value}' does not match format '{fmt}'")
-
-    def serialize(self, value: datetime, **kwargs: Any) -> str:
-        fmt = kwargs.get("format")
-        if fmt:
-            return value.strftime(fmt)
-
-        result = value.isoformat().replace("+00:00", "Z")
-        if len(result) > 26 and result[23:26] == "000":
-            result = result[:23] + result[26:]
-        return result
+        return self.parse(value, **kwargs)
 
 
 @dataclass
@@ -536,16 +451,20 @@ class ProxyConverter(Converter):
 
 
 converter = ConverterAdapter()
-converter.register_converter(str, StrConverter())
+converter.register_converter(str, ProxyConverter(str))
 converter.register_converter(int, IntConverter())
 converter.register_converter(bool, BoolConverter())
 converter.register_converter(float, FloatConverter())
 converter.register_converter(bytes, BytesConverter())
-converter.register_converter(object, StrConverter())
+converter.register_converter(object, ProxyConverter(str))
 converter.register_converter(time, TimeConverter())
-converter.register_converter(datetime, DatetimeConverter())
-converter.register_converter(Duration, ProxyConverter(Duration))
-converter.register_converter(Period, ProxyConverter(Period))
+converter.register_converter(date, DateConverter())
+converter.register_converter(datetime, DateTimeConverter())
+converter.register_converter(XmlTime, ProxyConverter(XmlTime.parse))
+converter.register_converter(XmlDate, ProxyConverter(XmlDate.parse))
+converter.register_converter(XmlDateTime, ProxyConverter(XmlDateTime.parse))
+converter.register_converter(XmlDuration, ProxyConverter(XmlDuration))
+converter.register_converter(XmlPeriod, ProxyConverter(XmlPeriod))
 converter.register_converter(etree.QName, LxmlQNameConverter())
 converter.register_converter(QName, QNameConverter())
 converter.register_converter(Decimal, DecimalConverter())

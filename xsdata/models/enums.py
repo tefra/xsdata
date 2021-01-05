@@ -1,5 +1,3 @@
-from datetime import datetime
-from datetime import time
 from decimal import Decimal
 from enum import Enum
 from pathlib import Path
@@ -7,8 +5,11 @@ from typing import Any
 from typing import Optional
 from xml.etree.ElementTree import QName
 
-from xsdata.models.datatype import Duration
-from xsdata.models.datatype import Period
+from xsdata.models.datatype import XmlDate
+from xsdata.models.datatype import XmlDateTime
+from xsdata.models.datatype import XmlDuration
+from xsdata.models.datatype import XmlPeriod
+from xsdata.models.datatype import XmlTime
 
 COMMON_SCHEMA_DIR = Path(__file__).absolute().parent.parent.joinpath("schemas/")
 
@@ -95,24 +96,24 @@ class DataType(Enum):
     BASE64_BINARY = ("base64Binary", bytes)
     BOOLEAN = ("boolean", bool)
     BYTE = ("byte", int)
-    DATE = ("date", str)
-    DATE_TIME = ("dateTime", datetime)
-    DATE_TIMESTAMP = ("dateTimeStamp", datetime)
-    DAY_TIME_DURATION = ("dayTimeDuration", Duration)
-    YEAR_MONTH_DURATION = ("yearMonthDuration", Duration)
+    DATE = ("date", XmlDate)
+    DATE_TIME = ("dateTime", XmlDateTime)
+    DATE_TIMESTAMP = ("dateTimeStamp", XmlDateTime)
+    DAY_TIME_DURATION = ("dayTimeDuration", XmlDuration)
+    YEAR_MONTH_DURATION = ("yearMonthDuration", XmlDuration)
     DECIMAL = ("decimal", Decimal)
     DERIVATION_CONTROL = ("derivationControl", str)
     DOUBLE = ("double", Decimal)
-    DURATION = ("duration", Duration)
+    DURATION = ("duration", XmlDuration)
     ENTITIES = ("ENTITIES", str)
     ENTITY = ("ENTITY", str)
     ERROR = ("error", str)
     FLOAT = ("float", float)
-    G_DAY = ("gDay", Period)
-    G_MONTH = ("gMonth", Period)
-    G_MONTH_DAY = ("gMonthDay", Period)
-    G_YEAR = ("gYear", Period)
-    G_YEAR_MONTH = ("gYearMonth", Period)
+    G_DAY = ("gDay", XmlPeriod)
+    G_MONTH = ("gMonth", XmlPeriod)
+    G_MONTH_DAY = ("gMonthDay", XmlPeriod)
+    G_YEAR = ("gYear", XmlPeriod)
+    G_YEAR_MONTH = ("gYearMonth", XmlPeriod)
     HEX_BINARY = ("hexBinary", bytes)
     ID = ("ID", str)
     IDREF = ("IDREF", str)
@@ -136,7 +137,7 @@ class DataType(Enum):
     SHORT = ("short", int)
     SIMPLE_DERIVATION_SET = ("simpleDerivationSet", str)
     STRING = ("string", str)
-    TIME = ("time", time)
+    TIME = ("time", XmlTime)
     TOKEN = ("token", str)
     UNSIGNED_BYTE = ("unsignedByte", int)
     UNSIGNED_INT = ("unsignedInt", int)

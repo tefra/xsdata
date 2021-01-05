@@ -9,6 +9,7 @@ from xsdata.formats.dataclass.models.elements import XmlVar
 from xsdata.formats.dataclass.models.generics import AnyElement
 from xsdata.formats.dataclass.models.generics import DerivedElement
 from xsdata.formats.dataclass.parsers.json import JsonParser
+from xsdata.models.datatype import XmlDate
 
 
 class JsonParserTests(TestCase):
@@ -29,7 +30,7 @@ class JsonParserTests(TestCase):
                 title="The First Book",
                 genre="Fiction",
                 price=44.95,
-                pub_date="2000-10-01",
+                pub_date=XmlDate.parse("2000-10-01"),
                 review="An amazing story of nothing.",
                 id="bk001",
             ),

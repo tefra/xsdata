@@ -185,16 +185,10 @@ class FiltersTests(FactoryTestCase):
             self.filters.field_default_value(attr, ns_map),
         )
 
-    def test_field_default_value_with_datetime(self):
-        attr = AttrFactory.create(types=[type_datetime], default="2002-01-01T12:01:01")
-        actual = self.filters.field_default_value(attr)
-
-        self.assertEqual("datetime(2002, 1, 1, 12, 1, 1)", actual)
-
-    def test_field_default_value_with_duration(self):
+    def test_field_default_value_with_xml_duration(self):
         attr = AttrFactory.create(types=[type_duration], default="P30M")
 
-        self.assertEqual('Duration("P30M")', self.filters.field_default_value(attr))
+        self.assertEqual('XmlDuration("P30M")', self.filters.field_default_value(attr))
 
     def test_field_default_value_with_any_attribute(self):
         attr = AttrFactory.any_attribute()
@@ -489,30 +483,9 @@ class FiltersTests(FactoryTestCase):
         expected = "from dataclasses import dataclass, field"
         self.assertIn(expected, self.filters.default_imports(output))
 
-    def test_default_imports_with_datetime(self):
-        expected = "from datetime import datetime"
-
-        self.assertIn(expected, self.filters.default_imports("Optional[datetime]"))
-        self.assertIn(expected, self.filters.default_imports("Union[str, datetime]"))
-        self.assertIn(expected, self.filters.default_imports("qname: datetime"))
-        self.assertIn(expected, self.filters.default_imports(" = datetime"))
-
-        output = (
-            "date: datetime = field(default=datetime(1, 1, 1, tzinfo=timezone.utc))"
-        )
-        expected = "from datetime import datetime, timezone"
-        self.assertIn(expected, self.filters.default_imports(output))
-
-        output = (
-            "date: datetime = field(default=datetime("
-            "1, 1, 1, tzinfo=timezone(timedelta(minutes=120))))"
-        )
-        expected = "from datetime import datetime, timedelta"
-        self.assertIn(expected, self.filters.default_imports(output))
-
     def test_default_imports_with_builtin_datatype(self):
-        output = "field: Optional[Duration] = "
-        expected = "from xsdata.models.datatype import Duration"
+        output = "field: Optional[XmlDuration] = "
+        expected = "from xsdata.models.datatype import XmlDuration"
         self.assertIn(expected, self.filters.default_imports(output))
 
     def test_default_imports_with_typing(self):

@@ -1,5 +1,6 @@
 from dataclasses import dataclass, field
 from typing import List, Optional
+from xsdata.models.datatype import XmlDate
 
 __NAMESPACE__ = "urn:books"
 
@@ -51,7 +52,7 @@ class BookForm:
             "required": True,
         }
     )
-    pub_date: Optional[str] = field(
+    pub_date: Optional[XmlDate] = field(
         default=None,
         metadata={
             "type": "Element",

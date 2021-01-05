@@ -3,9 +3,6 @@ import textwrap
 from collections import defaultdict
 from dataclasses import dataclass
 from dataclasses import field
-from datetime import datetime
-from datetime import time
-from datetime import timedelta
 from typing import Any
 from typing import Callable
 from typing import Dict
@@ -491,9 +488,6 @@ class Filters:
         if isinstance(value, QName):
             return f'QName("{value.text}")'
 
-        if isinstance(value, (datetime, timedelta, time)):
-            return repr(value).replace("datetime.", "")
-
         return repr(value).replace("'", '"')
 
     @classmethod
@@ -505,12 +499,6 @@ class Filters:
 
         patterns: Dict[str, Dict] = {
             "dataclasses": {"dataclass": ["@dataclass"], "field": [" = field("]},
-            "datetime": {
-                "datetime": type_patterns("datetime"),
-                "time": type_patterns("time"),
-                "timedelta": ["timedelta("],
-                "timezone": ["tzinfo=timezone"],
-            },
             "decimal": {"Decimal": type_patterns("Decimal")},
             "enum": {"Enum": ["(Enum)"]},
             "typing": {
@@ -522,8 +510,11 @@ class Filters:
             },
             "xml.etree.ElementTree": {"QName": type_patterns("QName")},
             "xsdata.models.datatype": {
-                "Duration": type_patterns("Duration"),
-                "Period": type_patterns("Period"),
+                "XmlDate": type_patterns("XmlDate"),
+                "XmlDateTime": type_patterns("XmlDateTime"),
+                "XmlDuration": type_patterns("XmlDuration"),
+                "XmlPeriod": type_patterns("XmlPeriod"),
+                "XmlTime": type_patterns("XmlTime"),
             },
         }
 

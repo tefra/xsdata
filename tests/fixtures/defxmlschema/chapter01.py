@@ -1,5 +1,6 @@
 from dataclasses import dataclass, field
 from typing import Optional
+from xsdata.models.datatype import XmlDate
 
 
 @dataclass
@@ -22,7 +23,7 @@ class ProductType:
             "max_inclusive": 18,
         }
     )
-    eff_date: Optional[str] = field(
+    eff_date: Optional[XmlDate] = field(
         default=None,
         metadata={
             "name": "effDate",

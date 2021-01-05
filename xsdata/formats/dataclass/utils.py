@@ -44,10 +44,6 @@ stop_words = [
     "optional",
     "dict",
     "field",
-    "time",
-    "datetime",
-    "duration",
-    "period",
     "decimal",
 ]
 

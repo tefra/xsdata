@@ -1,9 +1,14 @@
 import re
 from collections import UserString
+from typing import Any
 from typing import Dict
+from typing import Optional
 from typing import Tuple
 
-from xsdata.utils.dates import DateTimeParser
+from xsdata.utils.dates import format_date
+from xsdata.utils.dates import format_offset
+from xsdata.utils.dates import format_time
+from xsdata.utils.dates import parse_date_args
 
 xml_duration_re = re.compile(
     r"^([-]?)P"
@@ -12,7 +17,171 @@ xml_duration_re = re.compile(
 )
 
 
-class Duration(UserString):
+class DateFormat:
+    DATE = "%Y-%m-%d%z"
+    TIME = "%H:%M:%S%z"
+    DATE_TIME = "%Y-%m-%dT%H:%M:%S%z"
+    G_DAY = "---%d%z"
+    G_MONTH = "--%m%z"
+    G_MONTH_DAY = "--%m-%d%z"
+    G_YEAR = "%Y%z"
+    G_YEAR_MONTH = "%Y-%m%z"
+
+
+class XmlDate:
+    def __init__(self, year: int, month: int, day: int, offset: Optional[int] = None):
+        self.year = year
+        self.month = month
+        self.day = day
+        self.offset = offset
+
+    @classmethod
+    def parse(cls, string: str) -> "XmlDate":
+        try:
+            return XmlDate(*parse_date_args(string, DateFormat.DATE))
+        except (IndexError, TypeError, ValueError):
+            raise ValueError(f"'{string}' does not match format '{DateFormat.DATE}'")
+
+    def __str__(self) -> str:
+        return format_date(self.year, self.month, self.day) + format_offset(self.offset)
+
+    def __repr__(self) -> str:
+        args = [self.year, self.month, self.day, self.offset]
+        if args[-1] is None:
+            del args[-1]
+
+        return f"XmlDate({', '.join(map(str, args))})"
+
+    def __eq__(self, other: Any) -> bool:
+        if isinstance(other, XmlDate):
+            return (
+                self.year == other.year
+                and self.month == other.month
+                and self.day == other.day
+                and self.offset == other.offset
+            )
+
+        return NotImplemented
+
+
+class XmlDateTime:
+    def __init__(
+        self,
+        year: int,
+        month: int,
+        day: int,
+        hour: int,
+        minute: int,
+        second: int,
+        microsecond: int,
+        offset: Optional[int] = None,
+    ):
+        self.year = year
+        self.month = month
+        self.day = day
+        self.hour = hour
+        self.minute = minute
+        self.second = second
+        self.microsecond = microsecond
+        self.offset = offset
+
+    @classmethod
+    def parse(cls, string: str) -> "XmlDateTime":
+        try:
+            return XmlDateTime(*parse_date_args(string, DateFormat.DATE_TIME))
+        except (IndexError, TypeError, ValueError):
+            raise ValueError(
+                f"'{string}' does not match format '{DateFormat.DATE_TIME}'"
+            )
+
+    def __str__(self) -> str:
+        return "{}T{}{}".format(
+            format_date(self.year, self.month, self.day),
+            format_time(self.hour, self.minute, self.second, self.microsecond),
+            format_offset(self.offset),
+        )
+
+    def __repr__(self) -> str:
+        args = [
+            self.year,
+            self.month,
+            self.day,
+            self.hour,
+            self.minute,
+            self.second,
+            self.microsecond,
+            self.offset,
+        ]
+        if args[-1] is None:
+            del args[-1]
+
+        return f"XmlDateTime({', '.join(map(str, args))})"
+
+    def __eq__(self, other: Any) -> bool:
+        if isinstance(other, XmlDateTime):
+            return (
+                self.year == other.year
+                and self.month == other.month
+                and self.day == other.day
+                and self.hour == other.hour
+                and self.minute == other.minute
+                and self.second == other.second
+                and self.microsecond == other.microsecond
+                and self.offset == other.offset
+            )
+
+        return NotImplemented
+
+
+class XmlTime:
+    def __init__(
+        self,
+        hour: int,
+        minute: int,
+        second: int,
+        microsecond: int,
+        offset: Optional[int] = None,
+    ):
+        self.hour = hour
+        self.minute = minute
+        self.second = second
+        self.microsecond = microsecond
+        self.offset = offset
+
+    @classmethod
+    def parse(cls, string: str) -> "XmlTime":
+        try:
+            return XmlTime(*parse_date_args(string, DateFormat.TIME))
+        except (IndexError, TypeError, ValueError):
+            raise ValueError(f"'{string}' does not match format '{DateFormat.TIME}'")
+
+    def __str__(self) -> str:
+        return "{}{}".format(
+            format_time(self.hour, self.minute, self.second, self.microsecond),
+            format_offset(self.offset),
+        )
+
+    def __repr__(self) -> str:
+        args = [self.hour, self.minute, self.second, self.microsecond, self.offset]
+        if args[-1] is None:
+            del args[-1]
+
+        return f"XmlTime({', '.join(map(str, args))})"
+
+    def __eq__(self, other: Any) -> bool:
+        if isinstance(other, XmlTime):
+            return (
+                self.hour == other.hour
+                and self.minute == other.minute
+                and self.second == other.second
+                and self.microsecond == other.microsecond
+                and self.offset == other.offset
+            )
+
+        return NotImplemented
+
+
+class XmlDuration(UserString):
     def __init__(self, seq: object) -> None:
         super().__init__(seq)
 
@@ -62,7 +231,7 @@ class Duration(UserString):
         }
 
     def __repr__(self) -> str:
-        return f'Duration("{self.data}")'
+        return f'XmlDuration("{self.data}")'
 
 
 FORMAT_G_DAY = "---%D%z"
@@ -74,7 +243,7 @@ FORMAT_G_YEAR_MONTH = "%Y-%M%z"
 mdays = [31, 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
 
 
-class Period(UserString):
+class XmlPeriod(UserString):
     def __init__(self, seq: object) -> None:
         super().__init__(seq)
 
@@ -82,50 +251,48 @@ class Period(UserString):
             self.year,
             self.month,
             self.day,
-            self.timezone,
+            self.offset,
         ) = self._validate_units()
 
     def _validate_units(self) -> Tuple:
-        fmt = self._get_format()
-        parser = DateTimeParser(self.data, fmt)
-        parser.parse()
+        year = month = day = offset = None
+        if self.data.startswith("---"):
+            day, offset = parse_date_args(self.data, DateFormat.G_DAY)
 
-        if parser.month is not None and not 1 <= parser.month <= 12:
+        elif self.data.startswith("--"):
+            if len(self.data) in (4, 5, 10):  # fixed lengths with/out timezone
+                month, offset = parse_date_args(self.data, DateFormat.G_MONTH)
+            else:
+                month, day, offset = parse_date_args(self.data, DateFormat.G_MONTH_DAY)
+        else:
+            end = len(self.data)
+            if self.data.find(":") > -1:  # offset
+                end -= 6
+
+            if self.data[:end].rfind("-") > 3:  # Minimum position for month sep
+                year, month, offset = parse_date_args(
+                    self.data, DateFormat.G_YEAR_MONTH
+                )
+            else:
+                year, offset = parse_date_args(self.data, DateFormat.G_YEAR)
+
+        if month is not None and not 1 <= month <= 12:
             raise ValueError(f"Invalid format '{self.data}'")
 
-        if parser.day is not None:
-            max_days = mdays[parser.month or 0]
-            if not 1 <= parser.day <= max_days:
+        if day is not None:
+            max_days = mdays[month or 0]
+            if not 1 <= day <= max_days:
                 raise ValueError(f"Invalid format '{self.data}'")
 
-        return parser.year, parser.month, parser.day, parser.tz_info
-
-    def _get_format(self) -> str:
-        if self.data.startswith("---"):
-            return FORMAT_G_DAY
-
-        if self.data.startswith("--"):
-            if len(self.data) in (4, 5, 10):  # fixed lengths with/out timezone
-                return FORMAT_G_MONTH
-
-            return FORMAT_G_MONTH_DAY  # fixed lengths 7, 8, 13
-
-        end = len(self.data)
-        if self.data.find(":") > -1:  # offset timezone ignore it
-            end -= 6
-
-        if self.data[:end].rfind("-") > 3:  # Minimum position for month sep
-            return FORMAT_G_YEAR_MONTH
-
-        return FORMAT_G_YEAR
+        return year, month, day, offset
 
     def asdict(self) -> Dict:
         return {
             "year": self.year,
             "month": self.month,
             "day": self.day,
-            "timezone": self.timezone,
+            "offset": self.offset,
         }
 
     def __repr__(self) -> str:
-        return f'Period("{self.data}")'
+        return f'XmlPeriod("{self.data}")'

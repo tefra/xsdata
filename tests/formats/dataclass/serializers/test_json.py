@@ -5,6 +5,7 @@ from tests.fixtures.books import BookForm
 from tests.fixtures.books import Books
 from xsdata.exceptions import XmlContextError
 from xsdata.formats.dataclass.serializers.json import JsonSerializer
+from xsdata.models.datatype import XmlDate
 
 
 class JsonEncoderTests(TestCase):
@@ -18,7 +19,7 @@ class JsonEncoderTests(TestCase):
                     title="The First Book",
                     genre="Fiction",
                     price=44.95,
-                    pub_date="2000-10-01",
+                    pub_date=XmlDate.parse("2000-10-01"),
                     review="An amazing story of nothing.",
                 ),
                 BookForm(

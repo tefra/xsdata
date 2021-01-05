@@ -1,6 +1,54 @@
-from datetime import timedelta
-from datetime import timezone
+from typing import Any
+from typing import Generator
 from typing import Optional
+
+
+def parse_date_args(value: Any, fmt: str) -> Generator:
+    if not isinstance(value, str):
+        raise ValueError("")
+
+    parser = DateTimeParser(value, fmt)
+    return parser.parse()
+
+
+def format_offset(offset: Optional[int]) -> str:
+    if offset is None:
+        return ""
+
+    if offset == 0:
+        return "Z"
+
+    if offset < 0:
+        sign = "-"
+        offset = -offset
+    else:
+        sign = "+"
+
+    hh, mm = divmod(offset, 3600)
+    mm, ss = divmod(mm, 60)
+
+    return f"{sign}{hh:02d}:{mm:02d}"
+
+
+def format_date(year: int, month: int, day: int) -> str:
+    if year < 0:
+        year = -year
+        sign = "-"
+    else:
+        sign = ""
+
+    return f"{sign}{year:04d}-{month:02d}-{day:02d}"
+
+
+def format_time(hour: int, minute: int, second: int, microsecond: int) -> str:
+    if not microsecond:
+        return f"{hour:02d}:{minute:02d}:{second:02d}"
+
+    milli, micro = divmod(microsecond, 1000)
+    if micro:
+        return f"{hour:02d}:{minute:02d}:{second:02d}.{microsecond:06d}"
+
+    return f"{hour:02d}:{minute:02d}:{second:02d}.{milli:03d}"
 
 
 class DateTimeParser:
@@ -12,15 +60,6 @@ class DateTimeParser:
         self.vidx = 0
         self.fidx = 0
 
-        self.year: Optional[int] = None
-        self.month: Optional[int] = None
-        self.day: Optional[int] = None
-        self.hour: Optional[int] = None
-        self.minute: Optional[int] = None
-        self.second: Optional[int] = None
-        self.microsecond: Optional[int] = None
-        self.tz_info: Optional[timezone] = None
-
     def parse(self):
         try:
             while self.fidx < self.flen:
@@ -30,7 +69,7 @@ class DateTimeParser:
                     self.skip(char)
                 else:
                     var = self.next_format_char()
-                    self.parse_var(var)
+                    yield from self.parse_var(var)
 
             if self.vidx != self.vlen:
                 raise ValueError()
@@ -58,30 +97,35 @@ class DateTimeParser:
         self.vidx += 1
 
     def parse_var(self, var: str):
-        if var == "D":
-            self.day = self.parse_digits(2)
-        elif var == "M":
-            self.month = self.parse_digits(2)
+        if var == "d":
+            yield self.parse_digits(2)
+        elif var == "m":
+            yield self.parse_digits(2)
         elif var == "Y":
             negative = False
             if self.peek() == "-":
                 self.vidx += 1
                 negative = True
 
-            self.year = self.parse_minimum_digits(4)
+            year = self.parse_minimum_digits(4)
             if negative:
-                self.year = -self.year
-        elif var == "h":
-            self.hour = self.parse_digits(2)
-        elif var == "m":
-            self.minute = self.parse_digits(2)
-        elif var == "s":
-            self.second = self.parse_digits(2)
+                yield -year
+            else:
+                yield year
+
+        elif var == "H":
+            yield self.parse_digits(2)
+        elif var == "M":
+            yield self.parse_digits(2)
+        elif var == "S":
+            yield self.parse_digits(2)
             if self.has_more() and self.peek() == ".":
                 self.vidx += 1
-                self.microsecond = self.parse_fixed_digits(6)
+                yield self.parse_fixed_digits(6)
+            else:
+                yield 0
         elif var == "z":
-            self.tz_info = self.parse_timezone()
+            yield self.parse_offset()
         else:
             raise ValueError()
 
@@ -108,7 +152,7 @@ class DateTimeParser:
 
         return int(self.value[start : self.vidx].ljust(just, "0"))
 
-    def parse_timezone(self) -> Optional[timezone]:
+    def parse_offset(self) -> Optional[int]:
 
         if not self.has_more():
             return None
@@ -116,7 +160,7 @@ class DateTimeParser:
         ctrl = self.peek()
         if ctrl == "Z":
             self.vidx += 1
-            return timezone.utc
+            return 0
 
         if ctrl == "-" or ctrl == "+":
             self.vidx += 1
@@ -124,6 +168,6 @@ class DateTimeParser:
             self.skip(":")
             offset += self.parse_digits(2)
             offset *= -1 if ctrl == "-" else 1
-            return timezone(timedelta(minutes=offset))
+            return offset * 60
 
         raise ValueError()

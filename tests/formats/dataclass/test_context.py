@@ -26,6 +26,7 @@ from xsdata.formats.dataclass.context import XmlContext
 from xsdata.formats.dataclass.models.elements import XmlMeta
 from xsdata.formats.dataclass.models.elements import XmlType
 from xsdata.formats.dataclass.models.elements import XmlVar
+from xsdata.models.datatype import XmlDate
 from xsdata.models.enums import DataType
 from xsdata.utils import text
 from xsdata.utils.constants import return_true
@@ -191,7 +192,7 @@ class XmlContextTests(TestCase):
             XmlVar(element=True, name="title", qname="title", types=[str]),
             XmlVar(element=True, name="genre", qname="genre", types=[str]),
             XmlVar(element=True, name="price", qname="price", types=[float]),
-            XmlVar(element=True, name="pub_date", qname="pub_date", types=[str]),
+            XmlVar(element=True, name="pub_date", qname="pub_date", types=[XmlDate]),
             XmlVar(element=True, name="review", qname="review", types=[str]),
             XmlVar(attribute=True, name="id", qname="id", types=[str]),
             XmlVar(

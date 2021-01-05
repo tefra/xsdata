@@ -1,8 +1,7 @@
 import warnings
+from datetime import date
 from datetime import datetime
 from datetime import time
-from datetime import timedelta
-from datetime import timezone
 from decimal import Decimal
 from enum import Enum
 from typing import Any
@@ -15,8 +14,8 @@ from xsdata.exceptions import ConverterError
 from xsdata.formats.converter import Converter
 from xsdata.formats.converter import converter
 from xsdata.formats.converter import ProxyConverter
-from xsdata.models.datatype import Duration
-from xsdata.models.datatype import Period
+from xsdata.models.datatype import XmlDuration
+from xsdata.models.datatype import XmlPeriod
 from xsdata.models.enums import UseType
 
 
@@ -219,110 +218,63 @@ class DecimalConverterTests(TestCase):
         self.assertEqual("8.77683E-8", self.converter.serialize(Decimal("8.77683E-8")))
 
 
-class DatetimeConverterTests(TestCase):
+class DateTimeConverterTests(TestCase):
     def setUp(self):
         self.converter = converter.type_converter(datetime)
 
-    def test_deserialize(self):
-        fixtures = {
-            "2002-01-01T12:01:01-00:00": datetime(
-                2002, 1, 1, 12, 1, 1, tzinfo=timezone.utc
-            ),
-            "2002-01-01T12:01:01-02:15": datetime(
-                2002, 1, 1, 12, 1, 1, tzinfo=timezone(timedelta(minutes=-135))
-            ),
-            "2002-01-01T12:01:01+02:15": datetime(
-                2002, 1, 1, 12, 1, 1, tzinfo=timezone(timedelta(minutes=135))
-            ),
-            "2002-01-01T12:01:01.010Z": datetime(
-                2002, 1, 1, 12, 1, 1, 10000, tzinfo=timezone.utc
-            ),
-            "2002-01-01T12:01:01.123456": datetime(2002, 1, 1, 12, 1, 1, 123456),
-            "2002-01-01T12:01:01": datetime(2002, 1, 1, 12, 1, 1),
-            "2010-09-19T24:00:00Z": datetime(2010, 9, 20, 0, 0, tzinfo=timezone.utc),
-        }
+    def test_converter(self):
+        original = "21 June 2018 15:40"
+        fmt = "%d %B %Y %H:%M"
+        obj = self.converter.deserialize(original, format=fmt)
 
-        for value, expected in fixtures.items():
-            self.assertEqual(expected, self.converter.deserialize(value), value)
+        self.assertEqual(datetime(2018, 6, 21, 15, 40), obj)
+        self.assertEqual(original, self.converter.serialize(obj, format=fmt))
 
-        self.assertEqual(
-            datetime(2018, 6, 21),
-            self.converter.deserialize("21 June 2018", format="%d %B %Y"),
-        )
+    def test_serialize_raises_exception(self):
+        with self.assertRaises(ConverterError):
+            self.converter.serialize(datetime(2018, 6, 21, 15, 40))
 
-    def test_deserializer_raises_exception(self):
-        examples = [
-            "a",
-            1,
-            "2002/01-01T12:01:01",
-            "2002/01/01T12:01:01",
-            "2002-01-01 12:01:01",
-            "2002-01-01T12-01:01",
-            "2002-01-01T12:01-01",
-            "2002-01-01T12:01:01U",
-        ]
+        with self.assertRaises(ConverterError):
+            self.converter.serialize(1, format="")
 
-        for example in examples:
-            with self.assertRaises(ConverterError):
-                self.converter.deserialize(example)
+    def test_deserialize_raises_exception(self):
+        with self.assertRaises(ConverterError):
+            self.converter.deserialize("21 June 2018 15:40", format="%Y")
 
-    def test_serialize(self):
-        obj = self.converter.deserialize("2009-01-01T12:00:00.123-09:00")
-        self.assertEqual("2009-01-01T12:00:00.123-09:00", self.converter.serialize(obj))
+        with self.assertRaises(ConverterError):
+            self.converter.deserialize(1, format="%Y")
 
-        obj = self.converter.deserialize("2009-01-01T12:00:00.123456+00:00")
-        self.assertEqual("2009-01-01T12:00:00.123456Z", self.converter.serialize(obj))
+        with self.assertRaises(ConverterError):
+            self.converter.deserialize("21 June 2018 15:40")
 
-        obj = self.converter.deserialize("2009-01-01T12:00:00.0")
-        self.assertEqual("2009-01-01T12:00:00", self.converter.serialize(obj))
-        self.assertEqual("01Jan09", self.converter.serialize(obj, format="%d%b%y"))
+        with self.assertRaises(ConverterError):
+            self.converter.deserialize("21 June 2018 15:40", format="")
+
+
+class DateConverterTests(TestCase):
+    def setUp(self):
+        self.converter = converter.type_converter(date)
+
+    def test_converter(self):
+        original = "21 June 2018"
+        fmt = "%d %B %Y"
+        obj = self.converter.deserialize(original, format=fmt)
+
+        self.assertEqual(date(2018, 6, 21), obj)
+        self.assertEqual(original, self.converter.serialize(obj, format=fmt))
 
 
 class TimeConverterTests(TestCase):
     def setUp(self):
         self.converter = converter.type_converter(time)
 
-    def test_deserialize(self):
-        fixtures = {
-            "12:01:01-00:00": time(12, 1, 1, tzinfo=timezone.utc),
-            "12:01:01-02:15": time(12, 1, 1, tzinfo=timezone(timedelta(minutes=-135))),
-            "12:01:01+02:15": time(12, 1, 1, tzinfo=timezone(timedelta(minutes=135))),
-            "12:01:01.010Z": time(12, 1, 1, 10000, tzinfo=timezone.utc),
-            "12:01:01.123456": time(12, 1, 1, 123456),
-            "12:01:01": time(12, 1, 1),
-            "24:00:00Z": time(0, 0, tzinfo=timezone.utc),
-        }
+    def test_converter(self):
+        original = "1255"
+        fmt = "%H%M"
+        obj = self.converter.deserialize(original, format=fmt)
 
-        for value, expected in fixtures.items():
-            self.assertEqual(expected, self.converter.deserialize(value), value)
-
-        self.assertEqual(
-            time(12, 55), self.converter.deserialize("1255", format="%H%M")
-        )
-
-    def test_deserializer_raises_exception(self):
-        examples = [
-            "a",
-            1,
-            "12-01:01",
-            "12:01-01",
-            "12:01:01U",
-        ]
-
-        for example in examples:
-            with self.assertRaises(ConverterError):
-                self.converter.deserialize(example)
-
-    def test_serialize(self):
-        obj = self.converter.deserialize("12:44:30.123-09:00")
-        self.assertEqual("12:44:30.123-09:00", self.converter.serialize(obj))
-
-        obj = self.converter.deserialize("12:44:30.123456+00:00")
-        self.assertEqual("12:44:30.123456Z", self.converter.serialize(obj))
-
-        obj = self.converter.deserialize("12:44:30.0")
-        self.assertEqual("12:44:30", self.converter.serialize(obj))
-        self.assertEqual("1244", self.converter.serialize(obj, format="%H%M"))
+        self.assertEqual(time(12, 55), obj)
+        self.assertEqual(original, self.converter.serialize(obj, format=fmt))
 
 
 class LxmlQNameConverterTests(TestCase):
@@ -456,33 +408,33 @@ class ProxyConverterTests(TestCase):
         self.assertEqual("1", self.converter.serialize(1))
 
 
-class DurationConverterTests(TestCase):
+class XmlDurationConverterTests(TestCase):
     def setUp(self):
-        self.converter = converter.type_converter(Duration)
+        self.converter = converter.type_converter(XmlDuration)
 
     def test_deserialize(self):
-        self.assertIsInstance(self.converter.deserialize("P20M"), Duration)
+        self.assertIsInstance(self.converter.deserialize("P20M"), XmlDuration)
 
         with self.assertRaises(ConverterError):
             self.converter.deserialize("P-20M")
 
     def test_serialize(self):
-        actual = self.converter.serialize(Duration("PT3S"))
+        actual = self.converter.serialize(XmlDuration("PT3S"))
         self.assertEqual("PT3S", actual)
-        self.assertNotIsInstance(actual, Duration)
+        self.assertNotIsInstance(actual, XmlDuration)
 
 
-class PeriodConverterTests(TestCase):
+class XmlPeriodConverterTests(TestCase):
     def setUp(self):
-        self.converter = converter.type_converter(Period)
+        self.converter = converter.type_converter(XmlPeriod)
 
     def test_deserialize(self):
-        self.assertIsInstance(self.converter.deserialize("---15Z"), Period)
+        self.assertIsInstance(self.converter.deserialize("---15Z"), XmlPeriod)
 
         with self.assertRaises(ConverterError):
             self.converter.deserialize("---1Z")
 
     def test_serialize(self):
-        actual = self.converter.serialize(Period("---15Z"))
+        actual = self.converter.serialize(XmlPeriod("---15Z"))
         self.assertEqual("---15Z", actual)
-        self.assertNotIsInstance(actual, Period)
+        self.assertNotIsInstance(actual, XmlPeriod)

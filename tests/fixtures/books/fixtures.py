@@ -1,4 +1,5 @@
 from tests.fixtures.books import Books, BookForm
+from xsdata.models.datatype import XmlDate
 
 books = Books(
     book=[
@@ -8,7 +9,7 @@ books = Books(
             title="The First Book",
             genre="Fiction",
             price=44.95,
-            pub_date="2000-10-01",
+            pub_date=XmlDate(2000, 10, 1),
             review="An amazing story of nothing.",
         ),
         BookForm(
@@ -17,7 +18,7 @@ books = Books(
             title="Becoming Somebody",
             genre="Biography",
             price=33.95,
-            pub_date="2001-01-10",
+            pub_date=XmlDate(2001, 1, 10),
             review="A masterpiece of the fine art of gossiping.",
         ),
     ]

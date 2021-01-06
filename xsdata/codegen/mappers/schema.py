@@ -20,6 +20,7 @@ from xsdata.models.xsd import Element
 from xsdata.models.xsd import Group
 from xsdata.models.xsd import Schema
 from xsdata.models.xsd import SimpleType
+from xsdata.utils import collections
 from xsdata.utils import text
 from xsdata.utils.namespaces import build_qname
 
@@ -105,15 +106,15 @@ class SchemaMapper:
     def build_class_extensions(cls, obj: ElementBase, target: Class):
         """Build the item class extensions from the given ElementBase
         children."""
-        extensions = set()
+        extensions = []
         raw_type = obj.raw_type
         if raw_type:
             restrictions = obj.get_restrictions()
-            extensions.add(cls.build_class_extension(target, raw_type, restrictions))
+            extensions.append(cls.build_class_extension(target, raw_type, restrictions))
 
-        extensions.update(cls.children_extensions(obj, target))
+        extensions.extend(cls.children_extensions(obj, target))
 
-        target.extensions = list(extensions)
+        target.extensions = collections.unique_sequence(extensions)
 
     @classmethod
     def build_data_type(

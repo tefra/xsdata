@@ -9,7 +9,7 @@ from xsdata.formats.dataclass.serializers.json import JsonSerializer
 from xsdata.models.datatype import XmlDate
 
 
-class JsonEncoderTests(TestCase):
+class JsonSerializerTests(TestCase):
     def setUp(self):
         super().setUp()
         self.books = Books(

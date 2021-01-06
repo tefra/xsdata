@@ -19,24 +19,26 @@ output = [
     "      -",
 ]
 
-custom_classes = {
-    "Decimal": "decimal.Decimal",
-    "QName": "xml.etree.ElementTree.QName",
-}
-
-
-for tp, data_types in group_by(list(DataType), key=lambda x: x.type.__name__).items():
-    output.append(f"    * - :class:`{custom_classes.get(tp, tp)}`")
+groups = group_by(list(DataType), key=lambda x: x.type.__name__.lower())
+for key in sorted(groups):
+    tp = groups[key][0].type
+    if tp.__module__ != "builtins":
+        output.append(f"    * - :class:`~{tp.__module__}.{tp.__name__}`")
+    else:
+        output.append(f"    * - :class:`{tp.__name__}`")
 
     count = 0
-    for dt in data_types:
+    for dt in groups[key]:
         output.append(f"      - {dt.code}")
         count += 1
         if count == 5:
             output.append("    * -")
             count = 0
 
-    output.extend(["      -" for _ in range(5 - count)])
+    if count:
+        output.extend(["      -" for _ in range(5 - count)])
+    else:
+        output.pop()
 
 output.append("    * - :class:`enum.Enum`")
 output.append("      - enumeration")
@@ -45,7 +47,5 @@ output.append("      -")
 output.append("      -")
 output.append("      -")
 output.append("")
-
-docs_root.joinpath("data-types-table.rst").write_text(
-    "\n".join(output), encoding="utf-8"
-)
+result = "\n".join(output)
+docs_root.joinpath("data-types-table.rst").write_text(result, encoding="utf-8")

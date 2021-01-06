@@ -55,7 +55,7 @@ class Converter(metaclass=abc.ABCMeta):
 
 
 @dataclass
-class ConverterAdapter:
+class ConverterFactory:
     """
     :param registry: Converters registry
     """
@@ -450,7 +450,7 @@ class ProxyConverter(Converter):
         return str(value)
 
 
-converter = ConverterAdapter()
+converter = ConverterFactory()
 converter.register_converter(str, ProxyConverter(str))
 converter.register_converter(int, IntConverter())
 converter.register_converter(bool, BoolConverter())

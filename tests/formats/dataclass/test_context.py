@@ -4,6 +4,7 @@ from dataclasses import field
 from dataclasses import fields
 from dataclasses import make_dataclass
 from dataclasses import replace
+from datetime import datetime
 from typing import Generator
 from typing import get_type_hints
 from typing import Iterator
@@ -25,6 +26,7 @@ from xsdata.formats.dataclass.context import XmlContext
 from xsdata.formats.dataclass.models.elements import XmlMeta
 from xsdata.formats.dataclass.models.elements import XmlType
 from xsdata.formats.dataclass.models.elements import XmlVar
+from xsdata.models.datatype import XmlDate
 from xsdata.models.enums import DataType
 from xsdata.utils import text
 from xsdata.utils.constants import return_true
@@ -190,7 +192,7 @@ class XmlContextTests(TestCase):
             XmlVar(element=True, name="title", qname="title", types=[str]),
             XmlVar(element=True, name="genre", qname="genre", types=[str]),
             XmlVar(element=True, name="price", qname="price", types=[float]),
-            XmlVar(element=True, name="pub_date", qname="pub_date", types=[str]),
+            XmlVar(element=True, name="pub_date", qname="pub_date", types=[XmlDate]),
             XmlVar(element=True, name="review", qname="review", types=[str]),
             XmlVar(attribute=True, name="id", qname="id", types=[str]),
             XmlVar(
@@ -272,6 +274,7 @@ class XmlContextTests(TestCase):
         @dataclass
         class Currencies:
             name: str = field(metadata=dict(type="Attribute"))
+            updated: datetime = field(metadata=dict(type="Attribute", format="%M-%D"))
             values: List[Currency] = field(default_factory=list)
 
         expected = [
@@ -283,6 +286,13 @@ class XmlContextTests(TestCase):
 
         expected = [
             XmlVar(attribute=True, name="name", qname="name", types=[str]),
+            XmlVar(
+                attribute=True,
+                name="updated",
+                qname="updated",
+                types=[datetime],
+                format="%M-%D",
+            ),
             XmlVar(
                 element=True,
                 name="values",
@@ -324,6 +334,7 @@ class XmlContextTests(TestCase):
                     namespaces=["bar"],
                     derived=False,
                     default=return_true,
+                    format="Nope",
                 ),
                 XmlVar(
                     element=True,
@@ -515,6 +526,7 @@ class Node:
                     "type": List[str],
                     "tokens": True,
                     "default_factory": return_true,
+                    "format": "Nope",
                 },
                 {"name": "y", "type": List[int], "nillable": True},
                 {"name": "z", "type": List[int]},

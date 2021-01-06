@@ -82,3 +82,44 @@ def map_key(dictionary: Dict, search: Any) -> Any:
 def prepend(target: List, *args: Any):
     """Prepend items to the target list."""
     target[:0] = args
+
+
+class Immutable:
+    """
+    Immutable base class.
+
+    Subclasses must initialize with -1 the `_hashcode` attribute after
+    at the end of all other attributes to lock the instance from any
+    further modifications.
+    """
+
+    __slots__ = ("_hashcode",)
+
+    def __setattr__(self, *args: Any):
+        try:
+            object.__getattribute__(self, "_hashcode")
+            raise TypeError(f"{self.__class__.__name__} is immutable")
+        except AttributeError:
+            object.__setattr__(self, *args)
+
+    def __delattr__(self, *args: Any):
+        raise TypeError(f"{self.__class__.__name__} is immutable")
+
+    def __eq__(self, other: Any) -> bool:
+        if isinstance(other, self.__class__):
+            return tuple(self) == tuple(other)
+
+        return NotImplemented
+
+    def __iter__(self) -> Iterator:
+        for field_name in self.__slots__:
+            yield getattr(self, field_name)
+
+    def __hash__(self) -> int:
+        hashcode = object.__getattribute__(self, "_hashcode")
+
+        if hashcode == -1:
+            hashcode = hash(tuple(self))
+            object.__setattr__(self, "_hashcode", hashcode)
+
+        return hashcode

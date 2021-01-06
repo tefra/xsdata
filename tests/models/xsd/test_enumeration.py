@@ -8,6 +8,10 @@ class EnumerationTests(TestCase):
         obj = Enumeration()
         self.assertTrue(obj.is_attribute)
 
+    def test_property_is_fixed(self):
+        obj = Enumeration()
+        self.assertTrue(obj.is_fixed)
+
     def test_property_real_name(self):
         obj = Enumeration(value="foo")
         self.assertEqual("foo", obj.real_name)

@@ -1,6 +1,7 @@
 from dataclasses import dataclass, field
 from decimal import Decimal
 from typing import Optional
+from xsdata.models.datatype import XmlDate
 
 
 @dataclass
@@ -67,7 +68,7 @@ class ShirtType:
             "type": "Attribute",
         }
     )
-    eff_date: Optional[str] = field(
+    eff_date: Optional[XmlDate] = field(
         default=None,
         metadata={
             "name": "effDate",

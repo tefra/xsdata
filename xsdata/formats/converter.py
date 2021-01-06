@@ -1,8 +1,14 @@
 import abc
+import base64
+import binascii
 import math
 import warnings
+from abc import ABCMeta
 from dataclasses import dataclass
 from dataclasses import field
+from datetime import date
+from datetime import datetime
+from datetime import time
 from decimal import Decimal
 from decimal import InvalidOperation
 from enum import Enum
@@ -20,9 +26,16 @@ from lxml import etree
 
 from xsdata.exceptions import ConverterError
 from xsdata.exceptions import ConverterWarning
+from xsdata.models.datatype import XmlDate
+from xsdata.models.datatype import XmlDateTime
+from xsdata.models.datatype import XmlDuration
+from xsdata.models.datatype import XmlPeriod
+from xsdata.models.datatype import XmlTime
 from xsdata.utils import text
 from xsdata.utils.namespaces import load_prefix
 from xsdata.utils.namespaces import split_qname
+
+NOT_A_STRING = "Value must be str"
 
 
 class Converter(metaclass=abc.ABCMeta):
@@ -38,11 +51,11 @@ class Converter(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def serialize(self, value: Any, **kwargs: Any) -> str:
-        """Convert to string."""
+        """Convert value to string."""
 
 
 @dataclass
-class ConverterAdapter:
+class ConverterFactory:
     """
     :param registry: Converters registry
     """
@@ -131,16 +144,24 @@ class ConverterAdapter:
     @classmethod
     def sort_types(cls, types: List[Type]) -> List[Type]:
         """Sort a list of types by giving priority to strict types first."""
-        in_order = (bool, int, float, Decimal, str)
+        if len(types) < 2:
+            return list(types)
 
-        sorted_types = []
-        for ordered in in_order:
-            if ordered in types:
-                types.remove(ordered)
-                sorted_types.append(ordered)
+        return sorted(types, key=lambda x: __PYTHON_TYPES_SORTED__.get(x, 0))
 
-        types.extend(sorted_types)
-        return types
+
+__PYTHON_TYPES_SORTED__ = {
+    bool: 1,
+    int: 2,
+    float: 3,
+    Decimal: 4,
+    datetime: 5,
+    time: 6,
+    XmlDuration: 7,
+    XmlPeriod: 8,
+    QName: 9,
+    str: 10,
+}
 
 
 class BoolConverter(Converter):
@@ -167,18 +188,10 @@ class IntConverter(Converter):
     def deserialize(self, value: Any, **kwargs: Any) -> int:
         try:
             return int(value)
-        except (ValueError, TypeError):
-            raise ConverterError()
+        except (ValueError, TypeError) as e:
+            raise ConverterError(e)
 
     def serialize(self, value: int, **kwargs: Any) -> str:
-        return str(value)
-
-
-class StrConverter(Converter):
-    def deserialize(self, value: Any, **kwargs: Any) -> str:
-        return str(value)
-
-    def serialize(self, value: str, **kwargs: Any) -> str:
         return str(value)
 
 
@@ -186,11 +199,41 @@ class FloatConverter(Converter):
     def deserialize(self, value: Any, **kwargs: Any) -> float:
         try:
             return float(value)
-        except ValueError:
-            raise ConverterError()
+        except ValueError as e:
+            raise ConverterError(e)
 
     def serialize(self, value: float, **kwargs: Any) -> str:
         return "NaN" if math.isnan(value) else str(value).upper()
+
+
+class BytesConverter(Converter):
+    def deserialize(self, value: Any, **kwargs: Any) -> bytes:
+        if not isinstance(value, str):
+            raise ConverterError(NOT_A_STRING)
+
+        try:
+            fmt = kwargs.get("format")
+
+            if fmt == "base16":
+                return binascii.unhexlify(value)
+
+            if fmt == "base64":
+                return base64.b64decode(value)
+
+            raise ConverterError(f"Unknown format '{fmt}'")
+        except ValueError as e:
+            raise ConverterError(e)
+
+    def serialize(self, value: bytes, **kwargs: Any) -> str:
+        fmt = kwargs.get("format")
+
+        if fmt == "base16":
+            return base64.b16encode(value).decode()
+
+        if fmt == "base64":
+            return base64.b64encode(value).decode()
+
+        raise ConverterError(f"Unknown format '{fmt}'")
 
 
 class DecimalConverter(Converter):
@@ -255,7 +298,7 @@ class QNameConverter(Converter):
     @staticmethod
     def resolve(value: str, ns_map: Optional[Dict]) -> Tuple:
         if not value:
-            raise ConverterError("Invalid QName")
+            raise ConverterError("Value is empty")
 
         if value[0] == "{":
             return value, None
@@ -288,8 +331,8 @@ class LxmlQNameConverter(Converter):
 
             text_or_uri, tag = QNameConverter.resolve(value, ns_map)
             return etree.QName(text_or_uri, tag)
-        except ValueError:
-            raise ConverterError()
+        except ValueError as e:
+            raise ConverterError(e)
 
     def serialize(
         self, value: etree.QName, ns_map: Optional[Dict] = None, **kwargs: Any
@@ -330,7 +373,7 @@ class EnumConverter(Converter):
 
         # Raise exception if the real value doesn't match the expected type.
         if not isinstance(real_value, value_type):
-            raise ConverterError()
+            raise ConverterError(f"Value must be {value_type}")
 
         try:
             # Attempt no1 use the enum constructor
@@ -348,11 +391,45 @@ class EnumConverter(Converter):
             # canonical representations.
             repr_value = repr(real_value)
             return next(x for x in data_type if repr(x.value) == repr_value)
-        except (ValueError, StopIteration):
-            raise ConverterError()
+        except (ValueError, StopIteration) as e:
+            raise ConverterError(e)
 
     def serialize(self, value: Enum, **kwargs: Any) -> str:
         return converter.serialize(value.value, **kwargs)
+
+
+class DateTimeBase(Converter, metaclass=ABCMeta):
+    @classmethod
+    def parse(cls, value: Any, **kwargs: Any) -> datetime:
+        try:
+            return datetime.strptime(value, kwargs["format"])
+        except KeyError:
+            raise ConverterError("Missing format keyword argument")
+        except Exception as e:
+            raise ConverterError(e)
+
+    def serialize(self, value: Union[date, time], **kwargs: Any) -> str:
+        try:
+            return value.strftime(kwargs["format"])
+        except KeyError:
+            raise ConverterError("Missing format keyword argument")
+        except Exception as e:
+            raise ConverterError(e)
+
+
+class TimeConverter(DateTimeBase):
+    def deserialize(self, value: Any, **kwargs: Any) -> time:
+        return self.parse(value, **kwargs).time()
+
+
+class DateConverter(DateTimeBase):
+    def deserialize(self, value: Any, **kwargs: Any) -> date:
+        return self.parse(value, **kwargs).date()
+
+
+class DateTimeConverter(DateTimeBase):
+    def deserialize(self, value: Any, **kwargs: Any) -> datetime:
+        return self.parse(value, **kwargs)
 
 
 @dataclass
@@ -366,19 +443,28 @@ class ProxyConverter(Converter):
     def deserialize(self, value: Any, **kwargs: Any) -> Any:
         try:
             return self.func(value)
-        except ValueError:
-            raise ConverterError
+        except ValueError as e:
+            raise ConverterError(e)
 
     def serialize(self, value: Any, **kwargs: Any) -> str:
         return str(value)
 
 
-converter = ConverterAdapter()
-converter.register_converter(str, StrConverter())
+converter = ConverterFactory()
+converter.register_converter(str, ProxyConverter(str))
 converter.register_converter(int, IntConverter())
 converter.register_converter(bool, BoolConverter())
 converter.register_converter(float, FloatConverter())
-converter.register_converter(object, StrConverter())
+converter.register_converter(bytes, BytesConverter())
+converter.register_converter(object, ProxyConverter(str))
+converter.register_converter(time, TimeConverter())
+converter.register_converter(date, DateConverter())
+converter.register_converter(datetime, DateTimeConverter())
+converter.register_converter(XmlTime, ProxyConverter(XmlTime.parse))
+converter.register_converter(XmlDate, ProxyConverter(XmlDate.parse))
+converter.register_converter(XmlDateTime, ProxyConverter(XmlDateTime.parse))
+converter.register_converter(XmlDuration, ProxyConverter(XmlDuration))
+converter.register_converter(XmlPeriod, ProxyConverter(XmlPeriod))
 converter.register_converter(etree.QName, LxmlQNameConverter())
 converter.register_converter(QName, QNameConverter())
 converter.register_converter(Decimal, DecimalConverter())

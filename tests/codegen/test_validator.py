@@ -8,6 +8,7 @@ from tests.factories import FactoryTestCase
 from xsdata.codegen.container import ClassContainer
 from xsdata.codegen.utils import ClassUtils
 from xsdata.codegen.validator import ClassValidator
+from xsdata.models.enums import DataType
 from xsdata.models.enums import Tag
 from xsdata.models.xsd import Attribute
 from xsdata.models.xsd import AttributeGroup
@@ -46,12 +47,14 @@ class ClassValidatorTests(FactoryTestCase):
     def test_remove_invalid_classes(self):
         first = ClassFactory.create(
             extensions=[
-                ExtensionFactory.create(type=AttrTypeFactory.xs_bool()),
+                ExtensionFactory.create(type=AttrTypeFactory.native(DataType.BOOLEAN)),
                 ExtensionFactory.create(type=AttrTypeFactory.create(qname="foo")),
             ]
         )
         second = ClassFactory.create(
-            extensions=[ExtensionFactory.create(type=AttrTypeFactory.xs_bool())]
+            extensions=[
+                ExtensionFactory.create(type=AttrTypeFactory.native(DataType.BOOLEAN))
+            ]
         )
         third = ClassFactory.create()
 

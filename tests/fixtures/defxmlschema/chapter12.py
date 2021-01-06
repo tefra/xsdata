@@ -1,5 +1,6 @@
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional
+from xsdata.models.datatype import XmlDate
 
 
 @dataclass
@@ -78,8 +79,8 @@ class ProductType:
             ),
         }
     )
-    eff_date: str = field(
-        default="1900-01-01",
+    eff_date: XmlDate = field(
+        default=XmlDate(1900, 1, 1),
         metadata={
             "name": "effDate",
             "type": "Attribute",

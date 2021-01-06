@@ -8,6 +8,7 @@ from tests.factories import ExtensionFactory
 from tests.factories import FactoryTestCase
 from xsdata.codegen.models import Restrictions
 from xsdata.codegen.utils import ClassUtils
+from xsdata.models.enums import DataType
 
 
 class ClassUtilsTests(FactoryTestCase):
@@ -81,7 +82,7 @@ class ClassUtilsTests(FactoryTestCase):
             types=[
                 AttrTypeFactory.create(qname="x"),
                 AttrTypeFactory.create(qname="y"),
-                AttrTypeFactory.xs_int(),
+                AttrTypeFactory.native(DataType.INT),
             ],
         )
         restrictions = Restrictions(length=2)

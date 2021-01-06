@@ -89,6 +89,9 @@ Field Metadata
    * - namespace
      - str
      - Specifies the field xml namespace. ([#M2]_)
+   * - format
+     - str
+     - Format attribute for types like datetime, or bytes, see :ref:`Data Types`
 
 
 The code generator adds also the field restrictions like `minLength` or `required` flag
@@ -204,6 +207,9 @@ marshalling.
    * - namespace
      - str
      - Specifies the field xml namespace.
+   * - format
+     - str
+     - Format attribute for types like datetime, or bytes, see :ref:`Data Types``
    * - default
      - Any
      - Default value

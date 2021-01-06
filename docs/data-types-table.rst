@@ -9,62 +9,26 @@
       -
       -
       -
-    * - :class:`str`
-      - anyAtomicType
-      - anyURI
-      - base
-      - base64Binary
-      - date
-    * -
-      - dateTime
-      - dateTimeStamp
-      - dayTimeDuration
-      - yearMonthDuration
-      - derivationControl
-    * -
-      - duration
-      - ENTITIES
-      - ENTITY
-      - error
-      - gDay
-    * -
-      - gMonth
-      - gMonthDay
-      - gYear
-      - gYearMonth
-      - hexBinary
-    * -
-      - ID
-      - IDREF
-      - IDREFS
-      - lang
-      - language
-    * -
-      - Name
-      - NCName
-      - NMTOKEN
-      - NMTOKENS
-      - normalizedString
-    * -
-      - NOTATION
-      - simpleDerivationSet
-      - string
-      - time
-      - token
-    * -
-      -
-      -
-      -
-      -
-      -
-    * - :class:`object`
-      - anySimpleType
-      - anyType
-      -
-      -
-      -
     * - :class:`bool`
       - boolean
+      -
+      -
+      -
+      -
+    * - :class:`bytes`
+      - base64Binary
+      - hexBinary
+      -
+      -
+      -
+    * - :class:`~decimal.Decimal`
+      - decimal
+      - double
+      -
+      -
+      -
+    * - :class:`float`
+      - float
       -
       -
       -
@@ -87,20 +51,68 @@
       - unsignedShort
       -
       -
-    * - :class:`decimal.Decimal`
-      - decimal
-      - double
+    * - :class:`object`
+      - anySimpleType
+      - anyType
       -
       -
       -
-    * - :class:`float`
-      - float
-      -
-      -
-      -
-      -
-    * - :class:`xml.etree.ElementTree.QName`
+    * - :class:`~xml.etree.ElementTree.QName`
+      - NOTATION
       - QName
+      -
+      -
+      -
+    * - :class:`str`
+      - anyAtomicType
+      - anyURI
+      - base
+      - derivationControl
+      - ENTITIES
+    * -
+      - ENTITY
+      - error
+      - ID
+      - IDREF
+      - IDREFS
+    * -
+      - lang
+      - language
+      - Name
+      - NCName
+      - NMTOKEN
+    * -
+      - NMTOKENS
+      - normalizedString
+      - simpleDerivationSet
+      - string
+      - token
+    * - :class:`~xsdata.models.datatype.XmlDate`
+      - date
+      -
+      -
+      -
+      -
+    * - :class:`~xsdata.models.datatype.XmlDateTime`
+      - dateTime
+      - dateTimeStamp
+      -
+      -
+      -
+    * - :class:`~xsdata.models.datatype.XmlDuration`
+      - dayTimeDuration
+      - yearMonthDuration
+      - duration
+      -
+      -
+    * - :class:`~xsdata.models.datatype.XmlPeriod`
+      - gDay
+      - gMonth
+      - gMonthDay
+      - gYear
+      - gYearMonth
+    * - :class:`~xsdata.models.datatype.XmlTime`
+      - time
       -
       -
       -

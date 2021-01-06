@@ -60,6 +60,8 @@ class Restrictions:
     :param nillable:
     :param sequential:
     :param tokens:
+    :param format:
+    :param choice:
     """
 
     required: Optional[bool] = field(default=None)
@@ -81,6 +83,7 @@ class Restrictions:
     nillable: Optional[bool] = field(default=None)
     sequential: Optional[bool] = field(default=None)
     tokens: Optional[bool] = field(default=None)
+    format: Optional[str] = field(default=None)
     choice: Optional[str] = field(default=None)
 
     @property
@@ -96,6 +99,30 @@ class Restrictions:
     def merge(self, source: "Restrictions"):
         """Update properties from another instance."""
 
+        self.update(source)
+
+        min_occurs = source.min_occurs
+        max_occurs = source.max_occurs
+        is_list = max_occurs is not None and max_occurs > 1
+
+        # Update the sequential flag if new value is true and restrictions indicate
+        # the field was and still is a list.
+        if source.sequential and (is_list or not self.is_list):
+            self.sequential = source.sequential
+
+        self.choice = source.choice or self.choice
+        self.tokens = source.tokens or self.tokens
+        self.format = source.format or self.format
+
+        # Update min occurs if current value is None or the new value is more than one.
+        if self.min_occurs is None or (min_occurs is not None and min_occurs != 1):
+            self.min_occurs = min_occurs
+
+        # Update max occurs if current value is None or the new value is more than one.
+        if self.max_occurs is None or (max_occurs is not None and max_occurs != 1):
+            self.max_occurs = max_occurs
+
+    def update(self, source: "Restrictions"):
         keys = (
             "required",
             "prohibited",
@@ -117,26 +144,6 @@ class Restrictions:
             value = getattr(source, key)
             if value is not None:
                 setattr(self, key, value)
-
-        min_occurs = source.min_occurs
-        max_occurs = source.max_occurs
-        is_list = max_occurs is not None and max_occurs > 1
-
-        # Update the sequential flag if new value is true and restrictions indicate
-        # the field was and still is a list.
-        if source.sequential and (is_list or not self.is_list):
-            self.sequential = source.sequential
-
-        self.choice = source.choice or self.choice
-        self.tokens = source.tokens or self.tokens
-
-        # Update min occurs if current value is None or the new value is more than one.
-        if self.min_occurs is None or (min_occurs is not None and min_occurs != 1):
-            self.min_occurs = min_occurs
-
-        # Update max occurs if current value is None or the new value is more than one.
-        if self.max_occurs is None or (max_occurs is not None and max_occurs != 1):
-            self.max_occurs = max_occurs
 
     def asdict(self, types: Optional[List[Type]] = None) -> Dict:
         """
@@ -203,23 +210,14 @@ class AttrType:
         return not (self.forward or self.native or self.circular)
 
     @property
-    def native_name(self) -> Optional[str]:
-        """Return the python build-in type name: `'str'`, `'int'` if it's
-        native type."""
-        data_type = DataType.get_enum(self.name) if self.native else None
-        return data_type.type.__name__ if data_type else None
-
-    @property
-    def native_code(self) -> Optional[str]:
-        """Return the xml data type if it's native type."""
-        data_type = DataType.get_enum(self.name) if self.native else None
-        return data_type.code if data_type else None
+    def datatype(self) -> Optional[DataType]:
+        return DataType.get_enum(self.name) if self.native else None
 
     @property
     def native_type(self) -> Any:
         """Return the python build-in type if it's a native type."""
-        data_type = DataType.get_enum(self.name) if self.native else None
-        return data_type.type if data_type else None
+        datatype = self.datatype
+        return datatype.type if datatype else None
 
     def clone(self) -> "AttrType":
         """Return a deep cloned instance."""
@@ -385,6 +383,8 @@ class Class:
     :param namespace:
     :param help:
     :param meta_name:
+    :param default:
+    :param fixed:
     :param substitutions:
     :param extensions:
     :param attrs:
@@ -405,6 +405,8 @@ class Class:
     namespace: Optional[str] = field(default=None)
     help: Optional[str] = field(default=None)
     meta_name: Optional[str] = field(default=None)
+    default: Any = field(default=None, compare=False)
+    fixed: bool = field(default=False, compare=False)
     substitutions: List[str] = field(default_factory=list)
     extensions: List[Extension] = field(default_factory=list)
     attrs: List[Attr] = field(default_factory=list)

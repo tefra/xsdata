@@ -5,6 +5,12 @@ from typing import Any
 from typing import Optional
 from xml.etree.ElementTree import QName
 
+from xsdata.models.datatype import XmlDate
+from xsdata.models.datatype import XmlDateTime
+from xsdata.models.datatype import XmlDuration
+from xsdata.models.datatype import XmlPeriod
+from xsdata.models.datatype import XmlTime
+
 COMMON_SCHEMA_DIR = Path(__file__).absolute().parent.parent.joinpath("schemas/")
 
 
@@ -87,28 +93,28 @@ class DataType(Enum):
     ANY_SIMPLE_TYPE = ("anySimpleType", object)
     ANY_TYPE = ("anyType", object)
     BASE = ("base", str)
-    BASE64_BINARY = ("base64Binary", str)
+    BASE64_BINARY = ("base64Binary", bytes)
     BOOLEAN = ("boolean", bool)
     BYTE = ("byte", int)
-    DATE = ("date", str)
-    DATE_TIME = ("dateTime", str)
-    DATE_TIMESTAMP = ("dateTimeStamp", str)
-    DAY_TIME_DURATION = ("dayTimeDuration", str)
-    YEAR_MONTH_DURATION = ("yearMonthDuration", str)
+    DATE = ("date", XmlDate)
+    DATE_TIME = ("dateTime", XmlDateTime)
+    DATE_TIMESTAMP = ("dateTimeStamp", XmlDateTime)
+    DAY_TIME_DURATION = ("dayTimeDuration", XmlDuration)
+    YEAR_MONTH_DURATION = ("yearMonthDuration", XmlDuration)
     DECIMAL = ("decimal", Decimal)
     DERIVATION_CONTROL = ("derivationControl", str)
     DOUBLE = ("double", Decimal)
-    DURATION = ("duration", str)
+    DURATION = ("duration", XmlDuration)
     ENTITIES = ("ENTITIES", str)
     ENTITY = ("ENTITY", str)
     ERROR = ("error", str)
     FLOAT = ("float", float)
-    G_DAY = ("gDay", str)
-    G_MONTH = ("gMonth", str)
-    G_MONTH_DAY = ("gMonthDay", str)
-    G_YEAR = ("gYear", str)
-    G_YEAR_MONTH = ("gYearMonth", str)
-    HEX_BINARY = ("hexBinary", str)
+    G_DAY = ("gDay", XmlPeriod)
+    G_MONTH = ("gMonth", XmlPeriod)
+    G_MONTH_DAY = ("gMonthDay", XmlPeriod)
+    G_YEAR = ("gYear", XmlPeriod)
+    G_YEAR_MONTH = ("gYearMonth", XmlPeriod)
+    HEX_BINARY = ("hexBinary", bytes)
     ID = ("ID", str)
     IDREF = ("IDREF", str)
     IDREFS = ("IDREFS", str)
@@ -125,13 +131,13 @@ class DataType(Enum):
     NON_NEGATIVE_INTEGER = ("nonNegativeInteger", int)
     NON_POSITIVE_INTEGER = ("nonPositiveInteger", int)
     NORMALIZED_STRING = ("normalizedString", str)
-    NOTATION = ("NOTATION", str)
+    NOTATION = ("NOTATION", QName)
     POSITIVE_INTEGER = ("positiveInteger", int)
     QNAME = ("QName", QName)
     SHORT = ("short", int)
     SIMPLE_DERIVATION_SET = ("simpleDerivationSet", str)
     STRING = ("string", str)
-    TIME = ("time", str)
+    TIME = ("time", XmlTime)
     TOKEN = ("token", str)
     UNSIGNED_BYTE = ("unsignedByte", int)
     UNSIGNED_INT = ("unsignedInt", int)
@@ -144,6 +150,9 @@ class DataType(Enum):
 
     def __str__(self) -> str:
         return f"{{{Namespace.XS.uri}}}{self.code}"
+
+    def prefixed(self, prefix: Optional[str] = Namespace.XS.prefix) -> str:
+        return f"{prefix}:{self.code}" if prefix else self.code
 
     @classmethod
     def get_enum(cls, code: str) -> Optional["DataType"]:

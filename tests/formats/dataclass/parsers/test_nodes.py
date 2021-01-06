@@ -615,7 +615,7 @@ class PrimitiveNodeTests(TestCase):
     @mock.patch.object(ParserUtils, "parse_value")
     def test_bind(self, mock_parse_value):
         mock_parse_value.return_value = 13
-        var = XmlVar(text=True, name="foo", qname="foo", types=[int])
+        var = XmlVar(text=True, name="foo", qname="foo", types=[int], format="Nope")
         ns_map = {"foo": "bar"}
         node = PrimitiveNode(var=var, ns_map=ns_map)
         objects = []
@@ -624,7 +624,7 @@ class PrimitiveNodeTests(TestCase):
         self.assertEqual(("foo", 13), objects[-1])
 
         mock_parse_value.assert_called_once_with(
-            "13", var.types, var.default, ns_map, var.tokens
+            "13", var.types, var.default, ns_map, var.tokens, var.format
         )
 
     def test_bind_derived_var(self):

@@ -25,6 +25,7 @@ class XmlVar:
     :param init:  Include field in the constructor
     :param mixed:  Field supports mixed content type values
     :param tokens: Field is derived from xs:list
+    :param format: Value format information
     :param derived: Wrap parsed values with
         :class:`~xsdata.formats.dataclass.models.generics.DerivedElement`
     :param any_type: Field supports dynamic value types
@@ -49,6 +50,7 @@ class XmlVar:
     init: bool = True
     mixed: bool = False
     tokens: bool = False
+    format: Optional[str] = None
     derived: bool = False
     any_type: bool = False
     nillable: bool = False

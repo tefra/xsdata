@@ -72,6 +72,8 @@ class SchemaMapper:
             help=obj.display_help,
             ns_map=obj.ns_map,
             module=module,
+            default=obj.default_value,
+            fixed=obj.is_fixed,
             substitutions=cls.build_substitutions(obj, target_namespace),
         )
 
@@ -205,7 +207,10 @@ class SchemaMapper:
 
     @classmethod
     def build_class_attribute(
-        cls, target: Class, obj: ElementBase, parent_restrictions: Restrictions
+        cls,
+        target: Class,
+        obj: ElementBase,
+        parent_restrictions: Restrictions,
     ):
         """Generate and append an attribute field to the target class."""
 

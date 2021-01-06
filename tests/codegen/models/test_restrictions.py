@@ -16,7 +16,7 @@ class RestrictionsTests(TestCase):
         self.assertTrue(restrictions.is_list)
 
     def test_merge(self):
-        source = Restrictions(min_length=2, max_length=10)
+        source = Restrictions(min_length=2, max_length=10, format="base16")
         target = Restrictions(min_length=1, pattern=r"[A-Z]")
 
         target.merge(source)
@@ -24,6 +24,7 @@ class RestrictionsTests(TestCase):
         self.assertEqual(2, target.min_length)
         self.assertEqual(10, target.max_length)
         self.assertEqual(r"[A-Z]", target.pattern)
+        self.assertEqual("base16", target.format)
 
     def test_merge_ignore_nillable(self):
         parent = Restrictions(nillable=True)

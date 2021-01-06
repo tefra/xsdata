@@ -25,6 +25,7 @@ from xsdata.models.mixins import attribute
 from xsdata.models.mixins import element
 from xsdata.models.mixins import ElementBase
 from xsdata.models.mixins import ModuleMixin
+from xsdata.utils import collections
 from xsdata.utils import text
 from xsdata.utils.collections import unique_sequence
 from xsdata.utils.namespaces import clean_uri
@@ -146,7 +147,7 @@ class AnyAttribute(AnnotationBase):
 
     @property
     def real_type(self) -> str:
-        return self.data_type_ref(DataType.ANY_TYPE)
+        return DataType.ANY_TYPE.prefixed(self.xs_prefix)
 
 
 @dataclass
@@ -336,9 +337,6 @@ class Attribute(AnnotationBase):
         if self.simple_type:
             restrictions.update(self.simple_type.get_restrictions())
 
-        if self.type and self.type in self.token_types:
-            restrictions["tokens"] = True
-
         return restrictions
 
 
@@ -401,7 +399,7 @@ class Any(AnnotationBase):
 
     @property
     def real_type(self) -> str:
-        return self.data_type_ref(DataType.ANY_TYPE)
+        return DataType.ANY_TYPE.prefixed(self.xs_prefix)
 
     def get_restrictions(self) -> Dict[str, Anything]:
         max_occurs = sys.maxsize if self.max_occurs == "unbounded" else self.max_occurs
@@ -622,6 +620,10 @@ class Enumeration(AnnotationBase):
     @property
     def default(self) -> str:
         return self.value
+
+    @property
+    def is_fixed(self) -> bool:
+        return True
 
 
 @dataclass
@@ -867,9 +869,6 @@ class Restriction(AnnotationBase):
                 [pattern.value for pattern in self.patterns]
             )
 
-        if self.base and self.base in self.token_types:
-            restrictions["tokens"] = True
-
         return restrictions
 
 
@@ -1104,7 +1103,7 @@ class Element(AnnotationBase):
 
     @property
     def default_type(self) -> str:
-        return self.data_type_ref(DataType.ANY_TYPE)
+        return DataType.ANY_TYPE.prefixed(self.xs_prefix)
 
     @property
     def raw_type(self) -> Optional[str]:
@@ -1114,22 +1113,21 @@ class Element(AnnotationBase):
         if self.has_children:
             return None
 
-        return self.data_type_ref(DataType.ANY_TYPE)
+        return DataType.ANY_TYPE.prefixed(self.xs_prefix)
 
     @property
     def real_type(self) -> str:
-
-        types = {
-            alternative.type for alternative in self.alternatives if alternative.type
-        }
+        types = []
         if self.type:
-            types.add(self.type)
+            types.append(self.type)
         elif self.ref:
-            types.add(self.ref)
+            types.append(self.ref)
         elif self.simple_type and self.simple_type.real_type:
-            types.add(self.simple_type.real_type)
+            types.append(self.simple_type.real_type)
 
-        return " ".join(sorted(types))
+        types.extend(alt.type for alt in self.alternatives if alt.type)
+
+        return " ".join(collections.unique_sequence(types))
 
     @property
     def substitutions(self) -> Array[str]:
@@ -1148,9 +1146,6 @@ class Element(AnnotationBase):
 
         if self.nillable:
             restrictions.update(nillable=True)
-
-        if self.type and self.type in self.token_types:
-            restrictions["tokens"] = True
 
         return restrictions
 

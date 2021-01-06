@@ -1,15 +1,12 @@
 import json
-from decimal import Decimal
 from unittest.case import TestCase
-from xml.etree.ElementTree import QName
 
 from tests.fixtures.books import BookForm
 from tests.fixtures.books import Books
-from xsdata.formats.dataclass.serializers import DictFactory
-from xsdata.formats.dataclass.serializers.json import asdict
-from xsdata.formats.dataclass.serializers.json import JsonEncoder
+from xsdata.exceptions import XmlContextError
+from xsdata.formats.dataclass.serializers.json import DictFactory
 from xsdata.formats.dataclass.serializers.json import JsonSerializer
-from xsdata.models.enums import FormType
+from xsdata.models.datatype import XmlDate
 
 
 class JsonEncoderTests(TestCase):
@@ -23,7 +20,7 @@ class JsonEncoderTests(TestCase):
                     title="The First Book",
                     genre="Fiction",
                     price=44.95,
-                    pub_date="2000-10-01",
+                    pub_date=XmlDate.parse("2000-10-01"),
                     review="An amazing story of nothing.",
                 ),
                 BookForm(
@@ -64,18 +61,6 @@ class JsonEncoderTests(TestCase):
         }
         self.assertEqual(expected, json.loads(actual))
 
-    def test_encode_qname(self):
-        actual = json.dumps({"qname": QName("a", "b")}, cls=JsonEncoder)
-        self.assertEqual('{"qname": "{a}b"}', actual)
-
-    def test_encode_enum(self):
-        actual = json.dumps({"enum": FormType.QUALIFIED}, cls=JsonEncoder)
-        self.assertEqual('{"enum": "qualified"}', actual)
-
-    def test_encode_decimal(self):
-        actual = json.dumps({"decimal": Decimal(10.5)}, cls=JsonEncoder)
-        self.assertEqual('{"decimal": "10.5"}', actual)
-
-    def test_default_raises_exceptions(self):
-        with self.assertRaises(TypeError):
-            json.dumps({"string": object()}, cls=JsonEncoder)
+    def test_render_a_none_dataclass_object(self):
+        with self.assertRaises(XmlContextError):
+            JsonSerializer().render([])

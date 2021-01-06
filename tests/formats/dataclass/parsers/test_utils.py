@@ -9,7 +9,7 @@ from unittest.case import TestCase
 from tests.fixtures.books import Books
 from tests.fixtures.defxmlschema.chapter12 import ProductType
 from tests.fixtures.defxmlschema.chapter12 import SizeType
-from xsdata.formats.converter import ConverterAdapter
+from xsdata.formats.converter import ConverterFactory
 from xsdata.formats.dataclass.context import XmlContext
 from xsdata.formats.dataclass.models.elements import FindMode
 from xsdata.formats.dataclass.models.elements import XmlMeta
@@ -50,13 +50,13 @@ class ParserUtilsTests(TestCase):
         attrs = {QNames.XSI_TYPE: "xs:float"}
         self.assertEqual(DataType.FLOAT, ParserUtils.data_type(attrs, ns_map))
 
-    @mock.patch.object(ConverterAdapter, "deserialize", return_value=2)
+    @mock.patch.object(ConverterFactory, "deserialize", return_value=2)
     def test_parse_value(self, mock_deserialize):
         self.assertEqual(1, ParserUtils.parse_value(None, [int], 1))
         self.assertIsNone(ParserUtils.parse_value(None, [int], lambda: 1))
 
         self.assertTrue(2, ParserUtils.parse_value("1", [int], None))
-        mock_deserialize.assert_called_once_with("1", [int], ns_map=None)
+        mock_deserialize.assert_called_once_with("1", [int], ns_map=None, format=None)
 
     def test_parse_value_with_tokens_true(self):
         actual = ParserUtils.parse_value(" 1 2 3", [int], list, None, True)
@@ -68,7 +68,7 @@ class ParserUtilsTests(TestCase):
         actual = ParserUtils.parse_value(None, [int], lambda: [1, 2, 3], None, True)
         self.assertEqual([1, 2, 3], actual)
 
-    @mock.patch.object(ConverterAdapter, "deserialize", return_value=2)
+    @mock.patch.object(ConverterFactory, "deserialize", return_value=2)
     def test_parse_value_with_ns_map(self, mock_to_python):
         ns_map = dict(a=1)
         ParserUtils.parse_value(" 1 2 3", [int], list, ns_map, True)
@@ -77,11 +77,19 @@ class ParserUtilsTests(TestCase):
         self.assertEqual(4, mock_to_python.call_count)
         mock_to_python.assert_has_calls(
             [
-                mock.call("1", [int], ns_map=ns_map),
-                mock.call("2", [int], ns_map=ns_map),
-                mock.call("3", [int], ns_map=ns_map),
-                mock.call(" 1 2 3", [str], ns_map=ns_map),
+                mock.call("1", [int], ns_map=ns_map, format=None),
+                mock.call("2", [int], ns_map=ns_map, format=None),
+                mock.call("3", [int], ns_map=ns_map, format=None),
+                mock.call(" 1 2 3", [str], ns_map=ns_map, format=None),
             ]
+        )
+
+    @mock.patch.object(ConverterFactory, "deserialize", return_value=2)
+    def test_parse_value_with_format(self, mock_to_python):
+        ParserUtils.parse_value(" 1 2 3", [str], list, _format="Nope")
+        self.assertEqual(1, mock_to_python.call_count)
+        mock_to_python.assert_called_once_with(
+            " 1 2 3", [str], ns_map=None, format="Nope"
         )
 
     def test_bind_objects(self):
@@ -176,7 +184,8 @@ class ParserUtilsTests(TestCase):
             eff_date.types,
             eff_date.default,
             ns_map,
-            eff_date.list_element,
+            eff_date.tokens,
+            eff_date.format,
         )
 
     def test_parse_any_attributes(self):
@@ -245,7 +254,7 @@ class ParserUtilsTests(TestCase):
         self.assertTrue(ParserUtils.bind_content(params, metadata, "foo", ns_map))
         self.assertEqual({"value": "yes!"}, params)
         mock_parse_value.assert_called_once_with(
-            "foo", var.types, var.default, ns_map, var.list_element
+            "foo", var.types, var.default, ns_map, var.tokens, var.format
         )
 
     def test_bind_content_with_no_text_var(self):

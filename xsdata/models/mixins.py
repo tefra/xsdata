@@ -41,7 +41,7 @@ class ElementBase:
     def default_type(self) -> str:
         """Return the default type if the given element has not specific
         type."""
-        return self.data_type_ref(DataType.STRING)
+        return DataType.STRING.prefixed(self.xs_prefix)
 
     @property
     def default_value(self) -> Any:
@@ -168,19 +168,9 @@ class ElementBase:
         return []
 
     @property
-    def token_types(self) -> List[str]:
-        """Return a list of the token style data type names with the xml schema
-        prefix."""
-        prefix = collections.map_key(self.ns_map, Namespace.XS.uri)
-        prefix = f"{prefix}:" if prefix else ""
-        codes = [DataType.NMTOKENS.code, DataType.IDREFS.code]
-        return [f"{prefix}{code}" for code in codes]
-
-    def data_type_ref(self, data_type: DataType) -> str:
-        """Return the given data type code with the xml schema namespace prefix
-        if any."""
-        prefix = collections.map_key(self.ns_map, Namespace.XS.uri)
-        return f"{prefix}:{data_type.code}" if prefix else data_type.code
+    def xs_prefix(self) -> Optional[str]:
+        """Return the xml schema uri prefix."""
+        return collections.map_key(self.ns_map, Namespace.XS.uri)
 
     def get_restrictions(self) -> Dict[str, Any]:
         """Return the restrictions dictionary of this element."""

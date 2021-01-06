@@ -54,7 +54,7 @@ class ClassExtensionHandler(HandlerInterface):
         extension attributes.
         """
         if target.is_enumeration:
-            cls.copy_extension_type(target, extension)
+            cls.replace_attributes_type(target, extension)
         else:
             cls.add_default_attribute(target, extension)
 
@@ -64,7 +64,7 @@ class ClassExtensionHandler(HandlerInterface):
         if not source:
             logger.warning("Missing extension type: %s", extension.type.name)
             target.extensions.remove(extension)
-        elif not source.is_complex or source.is_enumeration:
+        elif not source.is_complex or source.is_enumeration or target.is_enumeration:
             self.process_simple_extension(source, target, extension)
         else:
             self.process_complex_extension(source, target, extension)
@@ -166,11 +166,12 @@ class ClassExtensionHandler(HandlerInterface):
         return cls.IGNORE_EXTENSION
 
     @classmethod
-    def copy_extension_type(cls, target: Class, extension: Extension):
-        """Add the given extension type to all target attributes types and
+    def replace_attributes_type(cls, target: Class, extension: Extension):
+        """Replace all target attributes types with the extension's type and
         remove it from the target class extensions."""
 
         for attr in target.attrs:
+            attr.types.clear()
             attr.types.append(extension.type.clone())
         target.extensions.remove(extension)
 
@@ -178,7 +179,7 @@ class ClassExtensionHandler(HandlerInterface):
     def add_default_attribute(cls, target: Class, extension: Extension):
         """Add a default value field to the given class based on the extension
         type."""
-        if extension.type.native_code != DataType.ANY_TYPE.code:
+        if extension.type.datatype != DataType.ANY_TYPE:
             tag = Tag.EXTENSION
             name = "value"
             default = None

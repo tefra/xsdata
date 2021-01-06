@@ -223,7 +223,9 @@ class AnyTypeNode(XmlNode):
             var = self.var
             ns_map = self.ns_map
             datatype = ParserUtils.data_type(self.attrs, self.ns_map)
-            obj = ParserUtils.parse_value(text, [datatype.type], var.default, ns_map)
+            obj = ParserUtils.parse_value(
+                text, [datatype.type], var.default, ns_map, var.tokens, var.format
+            )
 
             if var.derived:
                 obj = DerivedElement(qname=qname, value=obj)
@@ -355,7 +357,9 @@ class PrimitiveNode(XmlNode):
     def bind(self, qname: str, text: NoneStr, tail: NoneStr, objects: List) -> bool:
         var = self.var
         ns_map = self.ns_map
-        obj = ParserUtils.parse_value(text, var.types, var.default, ns_map, var.tokens)
+        obj = ParserUtils.parse_value(
+            text, var.types, var.default, ns_map, var.tokens, var.format
+        )
 
         if var.derived:
             obj = DerivedElement(qname=qname, value=obj)

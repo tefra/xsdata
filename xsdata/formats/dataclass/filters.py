@@ -3,13 +3,13 @@ import textwrap
 from collections import defaultdict
 from dataclasses import dataclass
 from dataclasses import field
-from decimal import Decimal
 from typing import Any
 from typing import Callable
 from typing import Dict
 from typing import Iterable
 from typing import List
 from typing import Optional
+from typing import Tuple
 from typing import Type
 from xml.etree.ElementTree import QName
 from xml.sax.saxutils import quoteattr
@@ -149,7 +149,8 @@ class Filters:
 
     def type_name(self, attr_type: AttrType) -> str:
         """Return native python type name or apply class name conventions."""
-        return attr_type.native_name or self.class_name(attr_type.name)
+        datatype = attr_type.datatype
+        return datatype.type.__name__ if datatype else self.class_name(attr_type.name)
 
     def field_metadata(
         self, attr: Attr, parent_namespace: Optional[str], parents: List[str]
@@ -182,7 +183,7 @@ class Filters:
 
     def field_choices(
         self, attr: Attr, parent_namespace: Optional[str], parents: List[str]
-    ) -> Optional[List]:
+    ) -> Optional[Tuple]:
         """
         Return a list of metadata dictionaries for the choices of the given
         attribute.
@@ -218,7 +219,7 @@ class Filters:
 
             result.append(self.filter_metadata(metadata))
 
-        return result
+        return tuple(result)
 
     @classmethod
     def filter_metadata(cls, data: Dict) -> Dict:
@@ -240,7 +241,7 @@ class Filters:
         if isinstance(data, str):
             return self.format_string(data, indent, key, 4)
 
-        return str(data)
+        return self.literal_value(data)
 
     def format_dict(self, data: Dict, indent: int) -> str:
         """Return a pretty string representation of a dict."""
@@ -260,7 +261,8 @@ class Filters:
         lines = [
             fmt.format(ind, self.format_metadata(value, indent + 4)) for value in data
         ]
-        return "(\n{}\n{})".format("\n".join(lines), ind)
+        wrap = "(\n{}\n{})" if isinstance(data, tuple) else "[\n{}\n{}]"
+        return wrap.format("\n".join(lines), ind)
 
     def format_string(self, data: str, indent: int, key: str = "", pad: int = 0) -> str:
         """
@@ -359,8 +361,10 @@ class Filters:
             return "list"
         if attr.is_dict:
             return "dict"
+        if attr.default is None:
+            return None
         if not isinstance(attr.default, str):
-            return attr.default
+            return self.literal_value(attr.default)
         if attr.default.startswith("@enum@"):
             return self.field_default_enum(attr)
 
@@ -371,10 +375,12 @@ class Filters:
         )
 
         if attr.is_tokens:
-            return self.field_default_tokens(attr, types)
+            return self.field_default_tokens(attr, types, ns_map)
 
-        return self.prepare_default_value(
-            converter.deserialize(attr.default, types, ns_map=ns_map)
+        return self.literal_value(
+            converter.deserialize(
+                attr.default, types, ns_map=ns_map, format=attr.restrictions.format
+            )
         )
 
     def field_default_enum(self, attr: Attr) -> str:
@@ -382,14 +388,18 @@ class Filters:
         source = next(x.alias or source for x in attr.types if x.name == source)
         return f"{self.class_name(source)}.{self.constant_name(enumeration)}"
 
-    def field_default_tokens(self, attr: Attr, types: List[Type]) -> str:
+    def field_default_tokens(
+        self, attr: Attr, types: List[Type], ns_map: Optional[Dict]
+    ) -> str:
         assert isinstance(attr.default, str)
 
-        tokens = ", ".join(
-            str(self.prepare_default_value(converter.deserialize(val, types)))
+        fmt = attr.restrictions.format
+        tokens = [
+            converter.deserialize(val, types, ns_map=ns_map, format=fmt)
             for val in attr.default.split()
-        )
-        return f"lambda: [{tokens}]"
+        ]
+
+        return f"lambda: {self.format_metadata(tokens, indent=8)}"
 
     def field_type(self, attr: Attr, parents: List[str]) -> str:
         """Generate type hints for the given attribute."""
@@ -468,68 +478,55 @@ class Filters:
         return self.type_name(attr_type)
 
     @classmethod
-    def prepare_default_value(cls, value: Any) -> Any:
+    def literal_value(cls, value: Any) -> str:
         if isinstance(value, str):
             return quoteattr(value)
 
         if isinstance(value, float):
-            return f"float('{value}')" if math.isinf(value) else value
-
-        if isinstance(value, Decimal):
-            return repr(value)
+            return f'float("{value}")' if math.isinf(value) else str(value)
 
         if isinstance(value, QName):
             return f'QName("{value.text}")'
 
-        return value
-
-    @classmethod
-    def type_is_included(cls, output: str, type_name: str) -> bool:
-        return (
-            f": {type_name}" in output
-            or f"[{type_name}" in output
-            or f", {type_name}" in output
-            or f"= {type_name}" in output
-        )
+        return repr(value).replace("'", '"')
 
     @classmethod
     def default_imports(cls, output: str) -> str:
         """Generate the default imports for the given package output."""
-        result = []
 
-        dataclasses = []
-        if "@dataclass" in output:
-            dataclasses.append("dataclass")
-        if "field(" in output:
-            dataclasses.append("field")
+        def type_patterns(name: str) -> Tuple:
+            return f": {name}", f"[{name}", f", {name}", f"= {name}"
 
-        if dataclasses:
-            result.append(f"from dataclasses import {', '.join(dataclasses)}")
-
-        if cls.type_is_included(output, "Decimal"):
-            result.append("from decimal import Decimal")
-
-        if "(Enum)" in output:
-            result.append("from enum import Enum")
-
-        typing_patterns = {
-            "Dict": [": Dict"],
-            "List": [": List["],
-            "Optional": ["Optional["],
-            "Type": ["Type["],
-            "Union": ["Union["],
+        patterns: Dict[str, Dict] = {
+            "dataclasses": {"dataclass": ["@dataclass"], "field": [" = field("]},
+            "decimal": {"Decimal": type_patterns("Decimal")},
+            "enum": {"Enum": ["(Enum)"]},
+            "typing": {
+                "Dict": [": Dict"],
+                "List": [": List["],
+                "Optional": ["Optional["],
+                "Type": ["Type["],
+                "Union": ["Union["],
+            },
+            "xml.etree.ElementTree": {"QName": type_patterns("QName")},
+            "xsdata.models.datatype": {
+                "XmlDate": type_patterns("XmlDate"),
+                "XmlDateTime": type_patterns("XmlDateTime"),
+                "XmlDuration": type_patterns("XmlDuration"),
+                "XmlPeriod": type_patterns("XmlPeriod"),
+                "XmlTime": type_patterns("XmlTime"),
+            },
         }
 
-        types = [
-            name
-            for name, patterns in typing_patterns.items()
-            if any(pattern in output for pattern in patterns)
-        ]
-        if types:
-            result.append(f"from typing import {', '.join(types)}")
-
-        if cls.type_is_included(output, "QName"):
-            result.append("from xml.etree.ElementTree import QName")
+        result = []
+        for library, types in patterns.items():
+            names = [
+                name
+                for name, searches in types.items()
+                if any(search in output for search in searches)
+            ]
+            if names:
+                result.append(f"from {library} import {', '.join(names)}")
 
         return "\n".join(result)
 

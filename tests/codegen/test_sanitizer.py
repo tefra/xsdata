@@ -10,6 +10,7 @@ from xsdata.codegen.models import Class
 from xsdata.codegen.models import Restrictions
 from xsdata.codegen.sanitizer import ClassSanitizer
 from xsdata.models.config import GeneratorConfig
+from xsdata.models.enums import DataType
 from xsdata.models.enums import Namespace
 from xsdata.models.enums import Tag
 from xsdata.models.xsd import ComplexType
@@ -472,7 +473,7 @@ class ClassSanitizerTest(FactoryTestCase):
             name="attr_B_Or_attr_C",
             tag="Choice",
             index=0,
-            types=[AttrTypeFactory.xs_any()],
+            types=[AttrTypeFactory.native(DataType.ANY_TYPE)],
             choices=[
                 AttrFactory.create(
                     tag=target.attrs[0].tag,

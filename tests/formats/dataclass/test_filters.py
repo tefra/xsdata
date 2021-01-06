@@ -11,16 +11,19 @@ from xsdata.models.config import DocstringStyle
 from xsdata.models.config import GeneratorAlias
 from xsdata.models.config import GeneratorConfig
 from xsdata.models.config import NameCase
+from xsdata.models.enums import DataType
 from xsdata.models.enums import Namespace
 from xsdata.models.enums import Tag
 
-type_str = AttrTypeFactory.xs_string()
-type_int = AttrTypeFactory.xs_int()
-type_float = AttrTypeFactory.xs_float()
-type_decimal = AttrTypeFactory.xs_decimal()
-type_bool = AttrTypeFactory.xs_bool()
-type_qname = AttrTypeFactory.xs_qname()
-type_tokens = AttrTypeFactory.xs_tokens()
+type_str = AttrTypeFactory.native(DataType.STRING)
+type_int = AttrTypeFactory.native(DataType.INT)
+type_float = AttrTypeFactory.native(DataType.FLOAT)
+type_decimal = AttrTypeFactory.native(DataType.DECIMAL)
+type_bool = AttrTypeFactory.native(DataType.BOOLEAN)
+type_qname = AttrTypeFactory.native(DataType.QNAME)
+type_tokens = AttrTypeFactory.native(DataType.NMTOKENS)
+type_datetime = AttrTypeFactory.native(DataType.DATE_TIME)
+type_duration = AttrTypeFactory.native(DataType.DURATION)
 
 
 class FiltersTests(FactoryTestCase):
@@ -103,7 +106,9 @@ class FiltersTests(FactoryTestCase):
         self.assertEqual("BarBam", self.filters.type_name(type_foo_bar_bam))
 
     def test_constant_value(self):
-        attr = AttrFactory.create(types=[AttrTypeFactory.xs_string()], default="foo")
+        attr = AttrFactory.create(
+            types=[AttrTypeFactory.native(DataType.STRING)], default="foo"
+        )
         self.assertEqual('"foo"', self.filters.constant_value(attr))
 
         attr = AttrFactory.create(types=[AttrTypeFactory.create(qname="foo")])
@@ -123,32 +128,37 @@ class FiltersTests(FactoryTestCase):
     def test_field_default_value_with_type_tokens(self):
         attr = AttrFactory.create(types=[type_int, type_str], default="1  \n bar")
         attr.restrictions.tokens = True
-        self.assertEqual('lambda: [1, "bar"]', self.filters.field_default_value(attr))
+        expected = """lambda: [
+            1,
+            "bar",
+        ]"""
+
+        self.assertEqual(expected, self.filters.field_default_value(attr))
 
     def test_field_default_value_with_type_float(self):
         attr = AttrFactory.create(types=[type_float], default="1.5")
-        self.assertEqual(1.5, self.filters.field_default_value(attr))
+        self.assertEqual("1.5", self.filters.field_default_value(attr))
 
         attr.default = "inf"
         attr.types = [type_int, type_float]
-        self.assertEqual("float('inf')", self.filters.field_default_value(attr))
+        self.assertEqual('float("inf")', self.filters.field_default_value(attr))
 
         attr.default = "-inf"
-        self.assertEqual("float('-inf')", self.filters.field_default_value(attr))
+        self.assertEqual('float("-inf")', self.filters.field_default_value(attr))
 
     def test_field_default_value_with_type_decimal(self):
         attr = AttrFactory.create(types=[type_decimal], default="1.5")
-        self.assertEqual("Decimal('1.5')", self.filters.field_default_value(attr))
+        self.assertEqual('Decimal("1.5")', self.filters.field_default_value(attr))
 
         attr.default = "-inf"
-        self.assertEqual("Decimal('-Infinity')", self.filters.field_default_value(attr))
+        self.assertEqual('Decimal("-Infinity")', self.filters.field_default_value(attr))
 
         attr.default = "inf"
-        self.assertEqual("Decimal('Infinity')", self.filters.field_default_value(attr))
+        self.assertEqual('Decimal("Infinity")', self.filters.field_default_value(attr))
 
     def test_field_default_value_with_type_int(self):
         attr = AttrFactory.create(types=[type_int], default="1")
-        self.assertEqual(1, self.filters.field_default_value(attr))
+        self.assertEqual("1", self.filters.field_default_value(attr))
 
     def test_field_default_value_with_type_bool(self):
         attr = AttrFactory.create(types=[type_bool], default="true")
@@ -175,6 +185,11 @@ class FiltersTests(FactoryTestCase):
             self.filters.field_default_value(attr, ns_map),
         )
 
+    def test_field_default_value_with_xml_duration(self):
+        attr = AttrFactory.create(types=[type_duration], default="P30M")
+
+        self.assertEqual('XmlDuration("P30M")', self.filters.field_default_value(attr))
+
     def test_field_default_value_with_any_attribute(self):
         attr = AttrFactory.any_attribute()
         self.assertEqual("dict", self.filters.field_default_value(attr))
@@ -185,14 +200,14 @@ class FiltersTests(FactoryTestCase):
         self.assertEqual("list", self.filters.field_default_value(attr))
 
     def test_field_default_value_with_multiple_types(self):
-        attr = AttrFactory.create(types=[type_bool, type_int, type_float], default="1")
-        self.assertEqual(1, self.filters.field_default_value(attr))
+        attr = AttrFactory.create(types=[type_bool, type_int, type_float], default="2")
+        self.assertEqual("2", self.filters.field_default_value(attr))
 
-        attr.default = "1.0"
-        self.assertEqual(1.0, self.filters.field_default_value(attr))
+        attr.default = 1.0
+        self.assertEqual("1.0", self.filters.field_default_value(attr))
 
         attr.default = "true"
-        self.assertTrue(self.filters.field_default_value(attr))
+        self.assertEqual("True", self.filters.field_default_value(attr))
 
     def test_field_metadata(self):
         attr = AttrFactory.element()
@@ -228,7 +243,7 @@ class FiltersTests(FactoryTestCase):
 
     def test_field_metadata_restrictions(self):
         attr = AttrFactory.create(tag=Tag.RESTRICTION)
-        attr.types.append(AttrTypeFactory.xs_int())
+        attr.types.append(AttrTypeFactory.native(DataType.INT))
         attr.restrictions.min_occurs = 1
         attr.restrictions.max_occurs = 2
         attr.restrictions.max_inclusive = "2"
@@ -245,10 +260,10 @@ class FiltersTests(FactoryTestCase):
     def test_field_metadata_choices(self):
         attr = AttrFactory.create(choices=AttrFactory.list(2, tag=Tag.ELEMENT))
         actual = self.filters.field_metadata(attr, "foo", [])
-        expected = [
+        expected = (
             {"name": "attr_B", "type": "Type[str]"},
             {"name": "attr_C", "type": "Type[str]"},
-        ]
+        )
 
         self.assertEqual(expected, actual["choices"])
 
@@ -268,7 +283,7 @@ class FiltersTests(FactoryTestCase):
         )
 
         actual = self.filters.field_choices(attr, "foo", ["a", "b"])
-        expected = [
+        expected = (
             {"name": "attr_B", "type": "Type[float]", "max_exclusive": 10.0},
             {"name": "attr_C", "namespace": "bar", "type": "Type[str]"},
             {
@@ -284,7 +299,7 @@ class FiltersTests(FactoryTestCase):
                 "tokens": True,
                 "type": "Type[List[str]]",
             },
-        ]
+        )
 
         self.assertEqual(expected, actual)
 
@@ -370,7 +385,7 @@ class FiltersTests(FactoryTestCase):
         attr = AttrFactory.create(
             types=[
                 AttrTypeFactory.create(qname="life", alias="Boss:Life", forward=True),
-                AttrTypeFactory.xs_int(),
+                AttrTypeFactory.native(DataType.INT),
             ]
         )
         attr.restrictions.max_occurs = 2
@@ -387,7 +402,10 @@ class FiltersTests(FactoryTestCase):
 
     def test_field_type_with_native_type(self):
         attr = AttrFactory.create(
-            types=[AttrTypeFactory.xs_int(), AttrTypeFactory.xs_positive_int()]
+            types=[
+                AttrTypeFactory.native(DataType.INT),
+                AttrTypeFactory.native(DataType.POSITIVE_INTEGER),
+            ]
         )
         self.assertEqual("Optional[int]", self.filters.field_type(attr, ["a", "b"]))
 
@@ -457,12 +475,17 @@ class FiltersTests(FactoryTestCase):
         expected = "from dataclasses import dataclass"
         self.assertIn(expected, self.filters.default_imports(output))
 
-        output = " field( "
+        output = " = field( "
         expected = "from dataclasses import field"
         self.assertIn(expected, self.filters.default_imports(output))
 
-        output = " field( @dataclass "
+        output = " = field( @dataclass "
         expected = "from dataclasses import dataclass, field"
+        self.assertIn(expected, self.filters.default_imports(output))
+
+    def test_default_imports_with_builtin_datatype(self):
+        output = "field: Optional[XmlDuration] = "
+        expected = "from xsdata.models.datatype import XmlDuration"
         self.assertIn(expected, self.filters.default_imports(output))
 
     def test_default_imports_with_typing(self):
@@ -493,9 +516,13 @@ class FiltersTests(FactoryTestCase):
             "    field: Optional[str] = field(default=None)"
         )
 
-        expected = (
-            "from dataclasses import dataclass, field\n" "from typing import Optional"
+        expected = "\n".join(
+            (
+                "from dataclasses import dataclass, field",
+                "from typing import Optional",
+            )
         )
+
         self.assertEqual(expected, self.filters.default_imports(output))
 
     def test_format_metadata(self):
@@ -524,14 +551,14 @@ class FiltersTests(FactoryTestCase):
             '    "level_two": {\n'
             '        "a": 1,\n'
             "    },\n"
-            '    "list": (\n'
+            '    "list": [\n'
             "        {\n"
             '            "type": object,\n'
             "        },\n"
             "        {\n"
             '            "type": "Type[object] mpla",\n'
             "        },\n"
-            "    ),\n"
+            "    ],\n"
             '    "default": 1,\n'
             '    "default_factory": list,\n'
             "}"

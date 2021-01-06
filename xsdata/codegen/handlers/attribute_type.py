@@ -54,8 +54,14 @@ class AttributeTypeHandler(HandlerInterface):
 
     @classmethod
     def process_native_type(cls, attr: Attr, attr_type: AttrType):
-        """Reset attribute type if the attribute has a pattern restriction as
-        they are not yet supported."""
+        """
+        Process native attribute types.
+
+        - Update restrictions from the datatype
+        - Reset attribute type if there is a pattern restriction
+        """
+        cls.update_restrictions(attr, attr_type.datatype)
+
         if attr.restrictions.pattern:
             cls.reset_attribute_type(attr_type)
 
@@ -88,12 +94,16 @@ class AttributeTypeHandler(HandlerInterface):
         If there is a matching simple type inner class copy the inner
         type attribute properties.
         """
-        inner = self.container.find_inner(
-            target, attr_type.name, lambda x: x.is_simple_type
-        )
-        if inner:
+        inner = self.container.find_inner(target, attr_type.name)
+
+        if not inner:
+            return
+
+        if inner.is_simple_type:
             self.copy_attribute_properties(inner, target, attr, attr_type)
             target.inner.remove(inner)
+        elif inner.is_enumeration:
+            self.update_restrictions(attr, inner.attrs[0].types[0].datatype)
 
     def process_dependency_type(self, target: Class, attr: Attr, attr_type: AttrType):
         """
@@ -112,7 +122,9 @@ class AttributeTypeHandler(HandlerInterface):
             self.reset_attribute_type(attr_type, use_str)
         elif source.is_simple_type:
             self.copy_attribute_properties(source, target, attr, attr_type)
-        elif not source.is_enumeration:
+        elif source.is_enumeration:
+            self.update_restrictions(attr, source.attrs[0].types[0].datatype)
+        else:
             self.set_circular_flag(source, target, attr_type)
 
     @classmethod
@@ -184,6 +196,15 @@ class AttributeTypeHandler(HandlerInterface):
         attr_type.forward = False
 
     @classmethod
+    def update_restrictions(cls, attr: Attr, datatype: Optional[DataType]):
+        if datatype in (DataType.NMTOKENS, DataType.IDREFS):
+            attr.restrictions.tokens = True
+        elif datatype == DataType.HEX_BINARY:
+            attr.restrictions.format = "base16"
+        elif datatype == DataType.BASE64_BINARY:
+            attr.restrictions.format = "base64"
+
+    @classmethod
     def filter_types(cls, types: List[AttrType]) -> List[AttrType]:
         """
         Remove duplicate and invalid types.
@@ -192,9 +213,8 @@ class AttributeTypeHandler(HandlerInterface):
             1. xs:error
             2. xs:anyType and xs:anySimpleType when there are other types present
         """
-        xs_error = DataType.ERROR.code
         types = collections.unique_sequence(types, key="name")
-        types = collections.remove(types, lambda x: x.native_code == xs_error)
+        types = collections.remove(types, lambda x: x.datatype == DataType.ERROR)
 
         if len(types) > 1:
             types = collections.remove(types, lambda x: x.native_type is object)

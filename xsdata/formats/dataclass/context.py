@@ -202,6 +202,7 @@ class XmlContext:
             choices = var.metadata.get("choices", EMPTY_SEQUENCE)
             mixed = var.metadata.get("mixed", False)
             nillable = var.metadata.get("nillable", False)
+            format_str = var.metadata.get("format", None)
             sequential = var.metadata.get("sequential", False)
 
             type_hint = type_hints[var.name]
@@ -224,6 +225,7 @@ class XmlContext:
                 qname=qname,
                 init=var.init,
                 mixed=mixed,
+                format=format_str,
                 tokens=tokens,
                 any_type=any_type,
                 nillable=nillable,
@@ -250,6 +252,7 @@ class XmlContext:
             namespace = choice.get("namespace")
             tokens = choice.get("tokens", False)
             nillable = choice.get("nillable", False)
+            format_str = choice.get("format", None)
             default_value = choice.get("default_factory", choice.get("default"))
 
             types = self.real_types(_eval_type(choice["type"], globalns, None))
@@ -268,6 +271,7 @@ class XmlContext:
                 name=parent_name,
                 qname=qname,
                 tokens=tokens,
+                format=format_str,
                 derived=derived,
                 any_type=any_type,
                 nillable=nillable,

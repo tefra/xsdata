@@ -101,7 +101,8 @@ intersphinx_mapping = {
 autodoc_default_options = {
     "member-order": "bysource",
     "special-members": None,
-    "exclude-members": "__dict__,__weakref__",  # Exclude "standard" methods.
+    # Exclude "standard" methods.
+    "exclude-members": "__dict__,__weakref__,__init__,__repr__",
 }
 
 autosummary_generate = True

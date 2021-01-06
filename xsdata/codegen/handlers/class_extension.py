@@ -27,13 +27,9 @@ class ClassExtensionHandler(HandlerInterface):
     container: ContainerInterface
 
     def process(self, target: Class):
-        """
-        Iterate and process the target class's extensions in reverser order.
-
-        The reverse order is necessary in order to maintain the correct
-        attributes ordering during cloning.
-        """
-        for extension in reversed(target.extensions):
+        """Iterate and process the target class's extensions in reverser
+        order."""
+        for extension in list(target.extensions):
             self.process_extension(target, extension)
 
     def process_extension(self, target: Class, extension: Extension):

@@ -113,7 +113,8 @@ class Immutable:
 
     def __iter__(self) -> Iterator:
         for field_name in self.__slots__:
-            yield getattr(self, field_name)
+            if field_name[0] != "_":
+                yield getattr(self, field_name)
 
     def __hash__(self) -> int:
         hashcode = object.__getattribute__(self, "_hashcode")

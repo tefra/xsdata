@@ -159,6 +159,15 @@ class XmlDateTimeTests(TestCase):
             XmlDateTime(2002, 1, 1, 12, 1, 1, 0, 0).datetime(),
         )
 
+    def test_equal(self):
+        a = XmlDateTime.parse("2010-09-20T12:00:00Z")
+        b = XmlDateTime.parse("2010-09-20T13:00:00.000+01:00")
+        c = XmlDateTime.parse("2010-09-20T13:00:00.000")
+
+        self.assertEqual(a, b)
+        self.assertNotEqual(a, c)
+        self.assertNotEqual(1, c)
+
 
 class XmlTimeTests(TestCase):
     def test_parse_valid(self):
@@ -222,6 +231,15 @@ class XmlTimeTests(TestCase):
 
     def test_datetime_helpers(self):
         self.assertEqual(time(12, 1, 1, 1), XmlTime(12, 1, 1, 1).time())
+
+    def test_equal(self):
+        a = XmlTime.parse("12:00:00Z")
+        b = XmlTime.parse("13:00:00.000+01:00")
+        c = XmlTime.parse("13:00:00.000")
+
+        self.assertEqual(a, b)
+        self.assertNotEqual(a, c)
+        self.assertNotEqual(1, c)
 
 
 class XmlDurationTests(TestCase):

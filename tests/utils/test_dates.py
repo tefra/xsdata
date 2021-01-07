@@ -1,6 +1,9 @@
 from unittest import TestCase
 
+from xsdata.utils.dates import calculate_duration
 from xsdata.utils.dates import parse_date_args
+from xsdata.utils.dates import validate_date
+from xsdata.utils.dates import validate_time
 
 
 class DatesUtilsTests(TestCase):
@@ -60,3 +63,41 @@ class DatesUtilsTests(TestCase):
             self.assertEqual(
                 f"String '{value}' does not match format '{fmt}'", str(cm.exception)
             )
+
+    def test_calculate_duration(self):
+        duration = calculate_duration(2021, 1, 7, 16, 57, 30, 14567, 120)
+        self.assertEqual(63779835839.014565, duration)
+
+    def test_validate_date(self):
+        invalid = {
+            (0, 0, 0): "Month must be in 1..12",
+            (0, 2, 0): "Day must be in 1..29",
+            (2003, 2, 29): "Day must be in 1..28",
+        }
+
+        for args, msg in invalid.items():
+            with self.assertRaises(ValueError) as cm:
+                validate_date(*args)
+
+            self.assertEqual(msg, str(cm.exception))
+
+    def test_validate_time(self):
+        invalid = {
+            (-1, 0, 0, 0): "Hour must be in 0..24",
+            (25, 0, 0, 0): "Hour must be in 0..24",
+            (24, 1, 0, 0): "Day time exceeded",
+            (24, 0, 1, 0): "Day time exceeded",
+            (24, 0, 0, 1): "Day time exceeded",
+            (23, -1, 0, 1): "Minute must be in 0..59",
+            (23, 66, 0, 1): "Minute must be in 0..59",
+            (23, 59, -1, 1): "Second must be in 0..59",
+            (23, 59, 60, 1): "Second must be in 0..59",
+            (23, 59, 59, -1): "Microsecond must be in 0..999999",
+            (23, 59, 59, 9999991): "Microsecond must be in 0..999999",
+        }
+
+        for args, msg in invalid.items():
+            with self.assertRaises(ValueError) as cm:
+                validate_time(*args)
+
+            self.assertEqual(msg, str(cm.exception))

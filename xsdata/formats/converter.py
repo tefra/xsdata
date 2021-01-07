@@ -387,6 +387,10 @@ class EnumConverter(Converter):
             if isinstance(real_value, str):
                 return data_type(" ".join(real_value.split()))
 
+            for x in data_type:
+                if x.value == real_value:
+                    return x
+
             # Attempt #3 some values are never equal try to match
             # canonical representations.
             repr_value = repr(real_value)

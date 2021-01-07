@@ -1,16 +1,20 @@
 import datetime
 import re
 from collections import UserString
+from typing import Any
 from typing import Dict
 from typing import NamedTuple
 from typing import Optional
 
 from xsdata.utils.collections import Immutable
+from xsdata.utils.dates import calculate_duration
 from xsdata.utils.dates import calculate_timezone
 from xsdata.utils.dates import format_date
 from xsdata.utils.dates import format_offset
 from xsdata.utils.dates import format_time
 from xsdata.utils.dates import parse_date_args
+from xsdata.utils.dates import validate_date
+from xsdata.utils.dates import validate_time
 
 xml_duration_re = re.compile(
     r"^([-]?)P"
@@ -47,6 +51,9 @@ class XmlDate(Immutable):
         self.month = month
         self.day = day
         self.offset = offset
+
+        validate_date(year, month, day)
+
         self._hashcode = -1  # Lock the object
 
     @classmethod
@@ -109,6 +116,7 @@ class XmlDateTime(Immutable):
         "second",
         "microsecond",
         "offset",
+        "_duration",
     )
 
     def __init__(
@@ -130,6 +138,13 @@ class XmlDateTime(Immutable):
         self.second = second
         self.microsecond = microsecond
         self.offset = offset
+
+        validate_date(year, month, day)
+        validate_time(hour, minute, second, microsecond)
+
+        self._duration = calculate_duration(
+            year, month, day, hour, minute, second, microsecond, offset or 0
+        )
         self._hashcode = -1  # Lock the object
 
     @classmethod
@@ -153,6 +168,11 @@ class XmlDateTime(Immutable):
             self.microsecond,
             tzinfo=calculate_timezone(self.offset),
         )
+
+    def __eq__(self, other: Any) -> bool:
+        if isinstance(other, XmlDateTime):
+            return self._duration == other._duration
+        return NotImplemented
 
     def __str__(self) -> str:
         """
@@ -194,7 +214,7 @@ class XmlTime(Immutable):
     :param offset: Timezone offset in minutes
     """
 
-    __slots__ = ("hour", "minute", "second", "microsecond", "offset")
+    __slots__ = ("hour", "minute", "second", "microsecond", "offset", "_duration")
 
     def __init__(
         self,
@@ -209,6 +229,12 @@ class XmlTime(Immutable):
         self.second = second
         self.microsecond = microsecond
         self.offset = offset
+
+        validate_time(hour, minute, second, microsecond)
+
+        self._duration = calculate_duration(
+            0, 0, 0, hour, minute, second, microsecond, offset or 0
+        )
         self._hashcode = -1  # Lock the object
 
     @classmethod
@@ -229,6 +255,11 @@ class XmlTime(Immutable):
             self.microsecond,
             tzinfo=calculate_timezone(self.offset),
         )
+
+    def __eq__(self, other: Any) -> bool:
+        if isinstance(other, XmlTime):
+            return self._duration == other._duration
+        return NotImplemented
 
     def __str__(self) -> str:
         """
@@ -325,7 +356,7 @@ class XmlDuration(UserString):
         if not isinstance(value, str):
             raise ValueError("Value must be string")
 
-        if len(value) < 3:
+        if len(value) < 3 or value.endswith("T"):
             raise ValueError(f"Invalid format '{value}'")
 
         match = xml_duration_re.match(value)
@@ -343,8 +374,6 @@ class XmlDuration(UserString):
             seconds=float(groups[6]) if groups[6] else None,
         )
 
-        if "T" in value and res.hours == res.minutes == res.seconds is None:
-            raise ValueError(f"Invalid format '{value}'")
         return res
 
     def asdict(self) -> Dict:
@@ -426,22 +455,9 @@ class XmlPeriod(UserString):
             else:
                 year, offset = parse_date_args(value, DateFormat.G_YEAR)
 
-        if not cls._is_valid(month, day):
-            raise ValueError(f"Invalid format '{value}'")
+        validate_date(0, month or 1, day or 1)
 
         return TimePeriod(year=year, month=month, day=day, offset=offset)
-
-    @classmethod
-    def _is_valid(cls, month: Optional[int], day: Optional[int]) -> bool:
-        if month is not None and not 1 <= month <= 12:
-            return False
-
-        if day is not None:
-            max_days = mdays[month or 0]
-            if not 1 <= day <= max_days:
-                return False
-
-        return True
 
     def asdict(self) -> Dict:
         """Return date units as dict."""
@@ -449,3 +465,9 @@ class XmlPeriod(UserString):
 
     def __repr__(self) -> str:
         return f'XmlPeriod("{self.data}")'
+
+    def __eq__(self, other: Any) -> bool:
+        if isinstance(other, XmlPeriod):
+            return self._period == other._period
+
+        return NotImplemented

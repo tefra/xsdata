@@ -19,7 +19,7 @@ def filter_none(mapping: Dict) -> Dict:
 
 
 class XmlDateTests(TestCase):
-    def test_parse_valid(self):
+    def test_from_string(self):
         examples = {
             "2002-01-01-00:00": XmlDate(2002, 1, 1, 0),
             "2002-01-01-02:15": XmlDate(2002, 1, 1, -135),
@@ -29,12 +29,12 @@ class XmlDateTests(TestCase):
         }
 
         for value, expected in examples.items():
-            actual = XmlDate.parse(value)
+            actual = XmlDate.from_string(value)
             self.assertIsInstance(actual, Immutable)
             self.assertEqual(-1, actual._hashcode)
             self.assertEqual(expected, actual, value)
 
-    def test_parse_invalid(self):
+    def test_from_string_invalid(self):
         examples = [
             "a",
             1,
@@ -44,7 +44,7 @@ class XmlDateTests(TestCase):
         ]
         for example in examples:
             with self.assertRaises(ValueError, msg=example):
-                XmlDate.parse(example)
+                XmlDate.from_string(example)
 
     def test_str(self):
         examples = {
@@ -57,7 +57,7 @@ class XmlDateTests(TestCase):
         }
 
         for value, expected in examples.items():
-            actual = XmlDate.parse(value)
+            actual = XmlDate.from_string(value)
             self.assertEqual(expected, str(actual), value)
 
     def test_repr(self):
@@ -71,16 +71,37 @@ class XmlDateTests(TestCase):
         }
 
         for value, expected in examples.items():
-            actual = XmlDate.parse(value)
+            actual = XmlDate.from_string(value)
             self.assertEqual(expected, repr(actual), value)
 
     def test_datetime_helpers(self):
-        self.assertEqual(date(2021, 1, 1), XmlDate(2021, 1, 1).date())
-        self.assertEqual(datetime(2021, 1, 1, 0, 0), XmlDate(2021, 1, 1).datetime())
+        tz_plus_two = timezone(timedelta(minutes=120))
+
+        obj = datetime(2021, 1, 1, 0, 0, tzinfo=tz_plus_two)
+        actual = XmlDate(2021, 1, 1, 120)
+        self.assertEqual(actual, XmlDate.from_datetime(obj))
+        self.assertEqual(obj, actual.to_datetime())
+        self.assertEqual(obj.date(), actual.to_date())
+
+        actual = XmlDate(2021, 1, 1)
+        self.assertEqual(actual, XmlDate.from_date(obj.date()))
+        self.assertEqual(obj.date(), actual.to_date())
+
+        obj = datetime(2021, 1, 1, 0, 0, tzinfo=timezone.utc)
+        actual = XmlDate(2021, 1, 1, 0)
+        self.assertEqual(actual, XmlDate.from_datetime(obj))
+
+        actual = XmlDate(2021, 1, 1)
+        self.assertEqual(actual, XmlDate.from_date(obj.date()))
+
+        obj = datetime(2021, 1, 1, 0, 0)
+        actual = XmlDate(2021, 1, 1, None)
+        self.assertEqual(actual, XmlDate.from_datetime(obj))
+        self.assertEqual(actual, XmlDate.from_date(obj.date()))
 
 
 class XmlDateTimeTests(TestCase):
-    def test_parse_valid(self):
+    def test_from_string(self):
         examples = {
             "2002-01-01T12:01:01-00:00": XmlDateTime(2002, 1, 1, 12, 1, 1, 0, 0),
             "2002-01-01T12:01:01-02:15": XmlDateTime(2002, 1, 1, 12, 1, 1, 0, -135),
@@ -92,12 +113,12 @@ class XmlDateTimeTests(TestCase):
         }
 
         for value, expected in examples.items():
-            actual = XmlDateTime.parse(value)
+            actual = XmlDateTime.from_string(value)
             self.assertIsInstance(actual, Immutable)
             self.assertEqual(-1, actual._hashcode)
             self.assertEqual(expected, actual, value)
 
-    def test_parse_invalid(self):
+    def test_from_string_invalid(self):
         examples = [
             "a",
             1,
@@ -110,7 +131,7 @@ class XmlDateTimeTests(TestCase):
         ]
         for example in examples:
             with self.assertRaises(ValueError, msg=example):
-                XmlDateTime.parse(example)
+                XmlDateTime.from_string(example)
 
     def test_str(self):
         examples = {
@@ -127,7 +148,7 @@ class XmlDateTimeTests(TestCase):
         }
 
         for value, expected in examples.items():
-            actual = XmlDateTime.parse(value)
+            actual = XmlDateTime.from_string(value)
             self.assertEqual(expected or value, str(actual), value)
 
     def test_repr(self):
@@ -145,24 +166,31 @@ class XmlDateTimeTests(TestCase):
         }
 
         for value, expected in examples.items():
-            actual = XmlDateTime.parse(value)
+            actual = XmlDateTime.from_string(value)
             self.assertEqual(expected, repr(actual), value)
 
     def test_datetime_helpers(self):
-        self.assertEqual(
-            datetime(2002, 1, 1, 12, 1, 1, tzinfo=timezone(timedelta(seconds=8100))),
-            XmlDateTime(2002, 1, 1, 12, 1, 1, 0, 135).datetime(),
-        )
+        tz_plus_135 = timezone(timedelta(seconds=8100))
 
-        self.assertEqual(
-            datetime(2002, 1, 1, 12, 1, 1, tzinfo=timezone.utc),
-            XmlDateTime(2002, 1, 1, 12, 1, 1, 0, 0).datetime(),
-        )
+        obj = datetime(2002, 1, 1, 12, 1, 1, tzinfo=tz_plus_135)
+        actual = XmlDateTime(2002, 1, 1, 12, 1, 1, 0, 135)
+        self.assertEqual(actual, XmlDateTime.from_datetime(obj))
+        self.assertEqual(obj, actual.to_datetime())
+
+        obj = datetime(2002, 1, 1, 12, 1, 1, tzinfo=timezone.utc)
+        actual = XmlDateTime(2002, 1, 1, 12, 1, 1, 0, 0)
+        self.assertEqual(actual, XmlDateTime.from_datetime(obj))
+        self.assertEqual(obj, actual.to_datetime())
+
+        obj = datetime(2002, 1, 1, 12, 1, 1)
+        actual = XmlDateTime(2002, 1, 1, 12, 1, 1, 0, None)
+        self.assertEqual(actual, XmlDateTime.from_datetime(obj))
+        self.assertEqual(obj, actual.to_datetime())
 
     def test_equal(self):
-        a = XmlDateTime.parse("2010-09-20T12:00:00Z")
-        b = XmlDateTime.parse("2010-09-20T13:00:00.000+01:00")
-        c = XmlDateTime.parse("2010-09-20T13:00:00.000")
+        a = XmlDateTime.from_string("2010-09-20T12:00:00Z")
+        b = XmlDateTime.from_string("2010-09-20T13:00:00.000+01:00")
+        c = XmlDateTime.from_string("2010-09-20T13:00:00.000")
 
         self.assertEqual(a, b)
         self.assertNotEqual(a, c)
@@ -170,7 +198,7 @@ class XmlDateTimeTests(TestCase):
 
 
 class XmlTimeTests(TestCase):
-    def test_parse_valid(self):
+    def test_from_string(self):
         examples = {
             "12:01:01-00:00": XmlTime(12, 1, 1, 0, 0),
             "12:01:01-02:15": XmlTime(12, 1, 1, 0, -135),
@@ -182,12 +210,12 @@ class XmlTimeTests(TestCase):
         }
 
         for value, expected in examples.items():
-            actual = XmlTime.parse(value)
+            actual = XmlTime.from_string(value)
             self.assertIsInstance(actual, Immutable)
             self.assertEqual(-1, actual._hashcode)
             self.assertEqual(expected, actual, value)
 
-    def test_parse_invalid(self):
+    def test_from_string_invalid(self):
         examples = [
             "a",
             1,
@@ -197,7 +225,7 @@ class XmlTimeTests(TestCase):
         ]
         for example in examples:
             with self.assertRaises(ValueError, msg=example):
-                XmlTime.parse(example)
+                XmlTime.from_string(example)
 
     def test_str(self):
         examples = {
@@ -211,7 +239,7 @@ class XmlTimeTests(TestCase):
         }
 
         for value, expected in examples.items():
-            actual = XmlTime.parse(value)
+            actual = XmlTime.from_string(value)
             self.assertEqual(expected or value, str(actual), value)
 
     def test_repr(self):
@@ -226,16 +254,31 @@ class XmlTimeTests(TestCase):
         }
 
         for value, expected in examples.items():
-            actual = XmlTime.parse(value)
+            actual = XmlTime.from_string(value)
             self.assertEqual(expected, repr(actual), value)
 
     def test_datetime_helpers(self):
-        self.assertEqual(time(12, 1, 1, 1), XmlTime(12, 1, 1, 1).time())
+        tz_minus_120 = timezone(timedelta(minutes=-120))
+
+        obj = time(12, 1, 1, 1, tzinfo=tz_minus_120)
+        actual = XmlTime(12, 1, 1, 1, -120)
+        self.assertEqual(actual, XmlTime.from_time(obj))
+        self.assertEqual(obj, actual.to_time())
+
+        obj = time(12, 1, 1, 1, tzinfo=timezone.utc)
+        actual = XmlTime(12, 1, 1, 1, 0)
+        self.assertEqual(actual, XmlTime.from_time(obj))
+        self.assertEqual(obj, actual.to_time())
+
+        obj = time(12, 1, 1, 1, tzinfo=timezone.utc)
+        actual = XmlTime(12, 1, 1, 1, 0)
+        self.assertEqual(actual, XmlTime.from_time(obj))
+        self.assertEqual(obj, actual.to_time())
 
     def test_equal(self):
-        a = XmlTime.parse("12:00:00Z")
-        b = XmlTime.parse("13:00:00.000+01:00")
-        c = XmlTime.parse("13:00:00.000")
+        a = XmlTime.from_string("12:00:00Z")
+        b = XmlTime.from_string("13:00:00.000+01:00")
+        c = XmlTime.from_string("13:00:00.000")
 
         self.assertEqual(a, b)
         self.assertNotEqual(a, c)
@@ -368,7 +411,7 @@ class XmlPeriodTests(TestCase):
         }
 
         for value, expected in fixtures.items():
-            self.assertEqual(expected, filter_none(XmlPeriod(value).asdict()))
+            self.assertEqual(expected, filter_none(XmlPeriod(value).as_dict()))
 
     def test_init_invalid(self):
         fixtures = [
@@ -402,3 +445,12 @@ class XmlPeriodTests(TestCase):
     def test_repr(self):
         obj = XmlPeriod("--02-29")
         self.assertEqual('XmlPeriod("--02-29")', repr(obj))
+
+    def test_equal(self):
+        a = XmlPeriod("--02-29")
+        b = XmlPeriod("--02-29")
+        c = XmlPeriod("--03-30")
+
+        self.assertEqual(a, b)
+        self.assertNotEqual(a, c)
+        self.assertNotEqual(1, c)

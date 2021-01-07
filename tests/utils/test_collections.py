@@ -44,11 +44,12 @@ class CollectionsTests(TestCase):
 
 
 class ImmutableImpl(Immutable):
-    __slots__ = ("a", "b")
+    __slots__ = ("a", "b", "_c")
 
     def __init__(self, a, b):
         self.a = a
         self.b = b
+        self._c = "private"
         self._hashcode = -1
 
 
@@ -82,3 +83,7 @@ class ImmutableTests(TestCase):
 
     def test_iter(self):
         self.assertEqual([1, 2], list(self.obj))
+
+    def test_init(self):
+        obj = ImmutableImpl(1, 2)
+        self.assertEqual({"a": 1, "b": 2}, obj.as_dict())

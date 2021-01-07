@@ -8,6 +8,7 @@ from typing import Optional
 
 from xsdata.utils.collections import Immutable
 from xsdata.utils.dates import calculate_duration
+from xsdata.utils.dates import calculate_offset
 from xsdata.utils.dates import calculate_timezone
 from xsdata.utils.dates import format_date
 from xsdata.utils.dates import format_offset
@@ -57,19 +58,30 @@ class XmlDate(Immutable):
         self._hashcode = -1  # Lock the object
 
     @classmethod
-    def parse(cls, string: str) -> "XmlDate":
-        """
-        Initialize instance from string format ``%Y-%m-%dT%z``
-
-        :raise ValueError: If format doesn't match input
-        """
+    def from_string(cls, string: str) -> "XmlDate":
+        """Initialize from string with format ``%Y-%m-%dT%z``"""
         return XmlDate(*parse_date_args(string, DateFormat.DATE))
 
-    def date(self) -> datetime.date:
+    @classmethod
+    def from_date(cls, obj: datetime.date) -> "XmlDate":
+        """
+        Initialize from :class:`datetime.date` instance.
+
+        .. warning::     date instances don't have timezone information!
+        """
+        return XmlDate(obj.year, obj.month, obj.day)
+
+    @classmethod
+    def from_datetime(cls, obj: datetime.datetime) -> "XmlDate":
+        """Initialize from :class:`datetime.datetime` instance."""
+        return XmlDate(obj.year, obj.month, obj.day, calculate_offset(obj))
+
+    def to_date(self) -> datetime.date:
         """Return a :class:`datetime.date` instance."""
         return datetime.date(self.year, self.month, self.day)
 
-    def datetime(self) -> datetime.datetime:
+    def to_datetime(self) -> datetime.datetime:
+        """Return a :class:`datetime.datetime` instance."""
         tz_info = calculate_timezone(self.offset)
         return datetime.datetime(self.year, self.month, self.day, tzinfo=tz_info)
 
@@ -148,15 +160,25 @@ class XmlDateTime(Immutable):
         self._hashcode = -1  # Lock the object
 
     @classmethod
-    def parse(cls, string: str) -> "XmlDateTime":
-        """
-        Initialize instance from string format ``%Y-%m-%dT%H:%M:%S%z``
-
-        :raise ValueError: If format doesn't match input
-        """
+    def from_string(cls, string: str) -> "XmlDateTime":
+        """Initialize from string with format ``%Y-%m-%dT%H:%M:%S%z``"""
         return XmlDateTime(*parse_date_args(string, DateFormat.DATE_TIME))
 
-    def datetime(self) -> datetime.datetime:
+    @classmethod
+    def from_datetime(cls, obj: datetime.datetime) -> "XmlDateTime":
+        """Initialize from :class:`datetime.datetime` instance."""
+        return XmlDateTime(
+            obj.year,
+            obj.month,
+            obj.day,
+            obj.hour,
+            obj.minute,
+            obj.second,
+            obj.microsecond,
+            calculate_offset(obj),
+        )
+
+    def to_datetime(self) -> datetime.datetime:
         """Return a :class:`datetime.datetime` instance."""
         return datetime.datetime(
             self.year,
@@ -238,15 +260,18 @@ class XmlTime(Immutable):
         self._hashcode = -1  # Lock the object
 
     @classmethod
-    def parse(cls, string: str) -> "XmlTime":
-        """
-        Initialize instance from string format ``%H:%M:%S%z``
-
-        :raise ValueError: If format doesn't match input
-        """
+    def from_string(cls, string: str) -> "XmlTime":
+        """Initialize from string format ``%H:%M:%S%z``"""
         return XmlTime(*parse_date_args(string, DateFormat.TIME))
 
-    def time(self) -> datetime.time:
+    @classmethod
+    def from_time(cls, obj: datetime.time) -> "XmlTime":
+        """Initialize from :class:`datetime.time` instance."""
+        return XmlTime(
+            obj.hour, obj.minute, obj.second, obj.microsecond, calculate_offset(obj)
+        )
+
+    def to_time(self) -> datetime.time:
         """Return a :class:`datetime.time` instance."""
         return datetime.time(
             self.hour,
@@ -383,9 +408,6 @@ class XmlDuration(UserString):
         return f'{self.__class__.__name__}("{self.data}")'
 
 
-mdays = [31, 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
-
-
 class TimePeriod(NamedTuple):
     year: Optional[int]
     month: Optional[int]
@@ -459,12 +481,12 @@ class XmlPeriod(UserString):
 
         return TimePeriod(year=year, month=month, day=day, offset=offset)
 
-    def asdict(self) -> Dict:
+    def as_dict(self) -> Dict:
         """Return date units as dict."""
         return self._period._asdict()
 
     def __repr__(self) -> str:
-        return f'XmlPeriod("{self.data}")'
+        return f'{self.__class__.__name__}("{self.data}")'
 
     def __eq__(self, other: Any) -> bool:
         if isinstance(other, XmlPeriod):

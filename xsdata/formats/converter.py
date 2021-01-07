@@ -387,15 +387,16 @@ class EnumConverter(Converter):
             if isinstance(real_value, str):
                 return data_type(" ".join(real_value.split()))
 
+            # Attempt #3 some times enum member init values don't match
+            # Try matching canonical repr or member values directly
+            repr_value = repr(real_value)
             for x in data_type:
-                if x.value == real_value:
+                if repr(x.value) == repr_value or x.value == real_value:
                     return x
 
-            # Attempt #3 some values are never equal try to match
-            # canonical representations.
-            repr_value = repr(real_value)
-            return next(x for x in data_type if repr(x.value) == repr_value)
-        except (ValueError, StopIteration) as e:
+            raise ConverterError("Not enum member matched")
+
+        except ValueError as e:
             raise ConverterError(e)
 
     def serialize(self, value: Enum, **kwargs: Any) -> str:
@@ -464,9 +465,9 @@ converter.register_converter(object, ProxyConverter(str))
 converter.register_converter(time, TimeConverter())
 converter.register_converter(date, DateConverter())
 converter.register_converter(datetime, DateTimeConverter())
-converter.register_converter(XmlTime, ProxyConverter(XmlTime.parse))
-converter.register_converter(XmlDate, ProxyConverter(XmlDate.parse))
-converter.register_converter(XmlDateTime, ProxyConverter(XmlDateTime.parse))
+converter.register_converter(XmlTime, ProxyConverter(XmlTime.from_string))
+converter.register_converter(XmlDate, ProxyConverter(XmlDate.from_string))
+converter.register_converter(XmlDateTime, ProxyConverter(XmlDateTime.from_string))
 converter.register_converter(XmlDuration, ProxyConverter(XmlDuration))
 converter.register_converter(XmlPeriod, ProxyConverter(XmlPeriod))
 converter.register_converter(etree.QName, LxmlQNameConverter())

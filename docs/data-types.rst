@@ -112,6 +112,8 @@ datetime objects don't support all the xml features like years bce.
 The builtin date types have util methods to convert from and to datetime objects
 whenever possible.
 
+.. doctest::
+
     >>> from dataclasses import dataclass
     >>> from xsdata.formats.dataclass.serializers import XmlSerializer
     >>> from xsdata.formats.dataclass.serializers.config import SerializerConfig

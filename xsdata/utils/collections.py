@@ -124,3 +124,7 @@ class Immutable:
             object.__setattr__(self, "_hashcode", hashcode)
 
         return hashcode
+
+    def as_dict(self) -> dict:
+        """Return arguments as dictionary."""
+        return dict(zip(self.__slots__, self))

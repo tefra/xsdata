@@ -20,7 +20,7 @@ class JsonSerializerTests(TestCase):
                     title="The First Book",
                     genre="Fiction",
                     price=44.95,
-                    pub_date=XmlDate.parse("2000-10-01"),
+                    pub_date=XmlDate.from_string("2000-10-01"),
                     review="An amazing story of nothing.",
                 ),
                 BookForm(

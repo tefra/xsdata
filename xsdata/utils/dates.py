@@ -3,6 +3,7 @@ from calendar import isleap
 from typing import Any
 from typing import Generator
 from typing import Optional
+from typing import Union
 
 
 def parse_date_args(value: Any, fmt: str) -> Generator:
@@ -21,6 +22,14 @@ def calculate_timezone(offset: Optional[int]) -> Optional[datetime.timezone]:
         return datetime.timezone.utc
 
     return datetime.timezone(datetime.timedelta(minutes=offset))
+
+
+def calculate_offset(obj: Union[datetime.time, datetime.datetime]) -> Optional[int]:
+    offset = obj.utcoffset()
+    if offset is None:
+        return None
+
+    return int(offset.total_seconds() // 60)
 
 
 # year, month, day, hour, minute, seconds, microseconds, offset (minutes)

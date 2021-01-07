@@ -47,6 +47,12 @@ class DatesUtilsTests(TestCase):
         self.assertIsNone(None, next(args))
         self.assertIsNone(next(args, None))
 
+    def test_parse_date_args_trim_input(self):
+        args = parse_date_args("\n Z ", "%z")
+
+        self.assertEqual(0, next(args))
+        self.assertIsNone(next(args, None))
+
     def test_parse_date_args_raises_value_error(self):
         cases = {
             "2002-12-01": "%F",  # Unknown var

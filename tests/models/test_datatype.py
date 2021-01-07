@@ -379,10 +379,10 @@ class XmlPeriodTests(TestCase):
     def test_init_valid(self):
 
         fixtures = {
-            "---01": {"day": 1},
+            "---01 ": {"day": 1},
             "---01Z": {"day": 1, "offset": 0},
             "---01+02:00": {"day": 1, "offset": 120},
-            "---01-04:00": {"day": 1, "offset": -240},
+            " ---01-04:00": {"day": 1, "offset": -240},
             "---15": {"day": 15},
             "---31": {"day": 31},
             "--05": {"month": 5},

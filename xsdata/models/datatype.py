@@ -433,6 +433,7 @@ class XmlPeriod(UserString):
     """
 
     def __init__(self, value: str) -> None:
+        value = value.strip()
         super().__init__(value)
         self._period = self._parse_period(value)
 

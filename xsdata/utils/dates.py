@@ -10,7 +10,7 @@ def parse_date_args(value: Any, fmt: str) -> Generator:
     if not isinstance(value, str):
         raise ValueError("")
 
-    parser = DateTimeParser(value, fmt)
+    parser = DateTimeParser(value.strip(), fmt)
     return parser.parse()
 
 

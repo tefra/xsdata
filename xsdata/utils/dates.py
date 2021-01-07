@@ -1,4 +1,5 @@
 import datetime
+from calendar import isleap
 from typing import Any
 from typing import Generator
 from typing import Optional
@@ -12,24 +13,6 @@ def parse_date_args(value: Any, fmt: str) -> Generator:
     return parser.parse()
 
 
-def format_offset(offset: Optional[int]) -> str:
-    if offset is None:
-        return ""
-
-    if offset == 0:
-        return "Z"
-
-    if offset < 0:
-        sign = "-"
-        offset = -offset
-    else:
-        sign = "+"
-
-    hh, mm = divmod(offset, 60)
-
-    return f"{sign}{hh:02d}:{mm:02d}"
-
-
 def calculate_timezone(offset: Optional[int]) -> Optional[datetime.timezone]:
     if offset is None:
         return None
@@ -38,6 +21,23 @@ def calculate_timezone(offset: Optional[int]) -> Optional[datetime.timezone]:
         return datetime.timezone.utc
 
     return datetime.timezone(datetime.timedelta(minutes=offset))
+
+
+# year, month, day, hour, minute, seconds, microseconds, offset (minutes)
+_DURATIONS = 31556926.0, 2629743, 86400, 3600, 60, 1, 0.000001, -60
+
+
+def calculate_duration(*args: int) -> float:
+    year = args[0]
+    if year < 0:
+        negative = True
+        year = -year
+    else:
+        negative = False
+
+    total = year * _DURATIONS[0]
+    total += sum(args[i] * _DURATIONS[i] for i in range(1, 8) if args[i])
+    return -total if negative else total
 
 
 def format_date(year: int, month: int, day: int) -> str:
@@ -59,6 +59,59 @@ def format_time(hour: int, minute: int, second: int, microsecond: int) -> str:
         return f"{hour:02d}:{minute:02d}:{second:02d}.{microsecond:06d}"
 
     return f"{hour:02d}:{minute:02d}:{second:02d}.{milli:03d}"
+
+
+def format_offset(offset: Optional[int]) -> str:
+    if offset is None:
+        return ""
+
+    if offset == 0:
+        return "Z"
+
+    if offset < 0:
+        sign = "-"
+        offset = -offset
+    else:
+        sign = "+"
+
+    hh, mm = divmod(offset, 60)
+
+    return f"{sign}{hh:02d}:{mm:02d}"
+
+
+# Copied from calendar.monthlen for some reason it's not exported
+mdays = [0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+
+
+def monthlen(year: int, month: int) -> int:
+    return mdays[month] + (month == 2 and isleap(year))
+
+
+def validate_date(year: int, month: int, day: int):
+    if not 1 <= month <= 12:
+        raise ValueError("Month must be in 1..12")
+
+    max_days = monthlen(year, month)
+    if not 1 <= day <= max_days:
+        raise ValueError(f"Day must be in 1..{max_days}")
+
+
+def validate_time(hour: int, minute: int, second: int, microsecond: int):
+
+    if not 0 <= hour <= 24:
+        raise ValueError("Hour must be in 0..24")
+
+    if hour == 24 and (minute != 0 or second != 0 or microsecond != 0):
+        raise ValueError("Day time exceeded")
+
+    if not 0 <= minute <= 59:
+        raise ValueError("Minute must be in 0..59")
+
+    if not 0 <= second <= 59:
+        raise ValueError("Second must be in 0..59")
+
+    if not 0 <= microsecond <= 999999:
+        raise ValueError("Microsecond must be in 0..999999")
 
 
 class DateTimeParser:

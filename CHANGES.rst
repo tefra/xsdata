@@ -1,5 +1,27 @@
+21.1 (2021-01-08)
+-----------------
+- Fixed XmlWriter converting attribute keys to QName. `#346 <https://github.com/tefra/xsdata/issues/346>`_
+- Set empty complexType base to anySimpleType `#349 <https://github.com/tefra/xsdata/issues/349>`_
+- Improve duplicate attr names detection `#351 <https://github.com/tefra/xsdata/issues/351>`_
+- Add SerializerConfig::xml_declaration option `#357 <https://github.com/tefra/xsdata/issues/357>`_
+- Generate default value/factory for compound fields `#359 <https://github.com/tefra/xsdata/issues/359>`_
+- Fixed default value for token fields `#360 <https://github.com/tefra/xsdata/issues/360>`_
+- Add doc metadata for compound fields `#362 <https://github.com/tefra/xsdata/issues/362>`_
+- JsonParser: handle class and primitive unions `#369 <https://github.com/tefra/xsdata/issues/369>`_
+- Update python mappings `#366 <https://github.com/tefra/xsdata/issues/366>`_
+   - Map xs:hexBinary and xs:base64Binary to bytes
+   - Map xs:date/time types to builtin types XmlDate/Time
+   - Map xs:duration to builtin type XmlDuration
+   - Map xs:g[Year[Month[Day]]] to builtin type XmlPeriod
+   - Map xs:Notation to QName
+   - Add converter adapters for datetime.date/time
+   - Add fields metadata key 'format' for time/date/binary types
+   - Fixed issues with default literal values
+   - Fixed issue with random field types order
+
+
 20.12 (2020-12-10)
---------------------
+------------------
 - Added SerializerConfig with new options. `#268 <https://github.com/tefra/xsdata/issues/268>`_, `#320 <https://github.com/tefra/xsdata/issues/320>`_
 - Added docstring styles: rst, google, numpy, accessible. `#318 <https://github.com/tefra/xsdata/issues/318>`_, `#340 <https://github.com/tefra/xsdata/issues/340>`_
 - Added `max line length` generator configuration. `#342 <https://github.com/tefra/xsdata/issues/342>`_

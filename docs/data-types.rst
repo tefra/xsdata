@@ -3,7 +3,7 @@ Data Types
 ==========
 
 There is a global converter factory that is used during data binding
-between python and and to xml/json documents.
+between python and xml/json documents.
 
 The converter ships with multiple adapters and will attempt to convert values
 according to the provided list of possible types but in case of an error it will
@@ -27,8 +27,8 @@ Below you can find the mapping of data types between python and xml schema.
 Working with custom types
 =========================
 
-If you are working with a type that's not supported or you want to override
-the default adapter you can register you own adapter.
+If you are working with a type that's not supported or you want to override one
+of the builtin adapter's behavior you can register you own.
 
 .. doctest::
 
@@ -43,7 +43,7 @@ the default adapter you can register you own adapter.
     >>> @dataclass
     ... class Example:
     ...     good: TheGoodFloat = field(metadata=dict(format="{:.2f}"))
-    ...     bad: TheGoodFloat
+    ...     bad: float
     ...
     >>> class TheGoodFloatConverter(Converter):
     ...    def deserialize(self, value: str, **kwargs) -> str:
@@ -56,12 +56,12 @@ the default adapter you can register you own adapter.
     ...
     >>> converter.register_converter(TheGoodFloat, TheGoodFloatConverter())
     >>> serializer = XmlSerializer()
-    >>> output = serializer.render(Example(TheGoodFloat(10.983263748), TheGoodFloat(-9.9827632)))
+    >>> output = serializer.render(Example(TheGoodFloat(10.983263748), -9.9827632))
     >>> print(output)
     <?xml version="1.0" encoding="UTF-8"?>
     <Example><good>10.98</good><bad>-9.9827632</bad></Example>
     >>> XmlParser().from_string(output)
-    Example(good=11.0, bad=-10.0)
+    Example(good=11.0, bad=-9.9827632)
 
 
 Working with date strings

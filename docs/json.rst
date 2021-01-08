@@ -90,6 +90,7 @@ Render to string
 
 .. doctest::
 
+    >>> from xsdata.formats.dataclass.context import XmlContext
     >>> from xsdata.formats.dataclass.serializers import JsonSerializer
     >>> from tests.fixtures.defxmlschema.chapter05 import Order, ItemsType
     >>> from tests.fixtures.defxmlschema.chapter05prod import Product, SizeType
@@ -104,7 +105,7 @@ Render to string
     ...         ]
     ...     )
     ... )
-    >>> serializer = JsonSerializer(indent=2)
+    >>> serializer = JsonSerializer(context=XmlContext(), indent=2)
     >>> print(serializer.render(order))
     {
       "items": {
@@ -120,3 +121,32 @@ Render to string
         ]
       }
     }
+
+
+Write to stream
+---------------
+
+.. doctest::
+
+    >>> from pathlib import Path
+    ...
+    >>> path = Path("output.json")
+    >>> with path.open("w") as fp:
+    ...     serializer.write(fp, order)
+    ...
+    >>> print(path.read_text())
+    {
+      "items": {
+        "product": [
+          {
+            "number": 557,
+            "name": "Short-Sleeved Linen Blouse",
+            "size": {
+              "value": null,
+              "system": null
+            }
+          }
+        ]
+      }
+    }
+    >>> path.unlink()

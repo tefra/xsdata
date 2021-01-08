@@ -209,7 +209,7 @@ marshalling.
      - Specifies the field xml namespace.
    * - format
      - str
-     - Format attribute for types like datetime, or bytes, see :ref:`Data Types``
+     - Format attribute for types like datetime, or bytes, see :ref:`Data Types`
    * - default
      - Any
      - Default value

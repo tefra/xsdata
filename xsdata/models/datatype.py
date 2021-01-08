@@ -37,12 +37,15 @@ class DateFormat:
 
 class XmlDate(Immutable):
     """
-    Immutable structure for xs:date values [-]CCYY-MM-DD[Z|(+|-)hh:mm]
+    Immutable structure for xs:date.
+
+    Format:  [-]CCYY-MM-DD[Z|(+|-)hh:mm]
 
     :param year: Any signed integer, eg (0, -535, 2020)
     :param month: Unsigned integer between 1-12
     :param day: Unsigned integer between 1-31
-    :param offset: Timezone offset in minutes
+    :param offset: Signed integer representing timezone offset in
+        minutes
     """
 
     __slots__ = ("year", "month", "day", "offset")
@@ -67,7 +70,9 @@ class XmlDate(Immutable):
         """
         Initialize from :class:`datetime.date` instance.
 
-        .. warning::     date instances don't have timezone information!
+        .. warning::
+
+            date instances don't have timezone information!
         """
         return XmlDate(obj.year, obj.month, obj.day)
 
@@ -87,7 +92,7 @@ class XmlDate(Immutable):
 
     def __str__(self) -> str:
         """
-        XML ISO 8601 format.
+        Return the date formatted according to ISO 8601 for xml.
 
         Examples:
             - 2001-10-26
@@ -106,8 +111,9 @@ class XmlDate(Immutable):
 
 class XmlDateTime(Immutable):
     """
-    Immutable structure for xs:dateTime values [-]CCYY-MM-
-    DDThh:mm:ss[Z|(+|-)hh:mm]
+    Immutable structure for xs:dateTime.
+
+    Format: [-]CCYY-MM-DDThh:mm:ss[Z|(+|-)hh:mm]
 
     :param year: Any signed integer, eg (0, -535, 2020)
     :param month: Unsigned integer between 1-12
@@ -116,7 +122,8 @@ class XmlDateTime(Immutable):
     :param minute: Unsigned integer between 0-59
     :param second: Unsigned integer between 0-59
     :param microsecond: Unsigned integer between 0-999999
-    :param offset: Timezone offset in minutes
+    :param offset: Signed integer representing timezone offset in
+        minutes
     """
 
     __slots__ = (
@@ -198,7 +205,7 @@ class XmlDateTime(Immutable):
 
     def __str__(self) -> str:
         """
-        XML ISO 8601 format.
+        Return the datetime formatted according to ISO 8601 for xml.
 
         Examples:
             - 2001-10-26T21:32:52
@@ -227,13 +234,16 @@ class XmlDateTime(Immutable):
 
 class XmlTime(Immutable):
     """
-    Immutable structure for xs:time values hh:mm:ss[Z|(+|-)hh:mm]
+    Immutable structure for xs:time:
+
+    Format: hh:mm:ss[Z|(+|-)hh:mm]
 
     :param hour: Unsigned integer between 0-24
     :param minute: Unsigned integer between 0-59
     :param second: Unsigned integer between 0-59
     :param microsecond: Unsigned integer between 0-999999
-    :param offset: Timezone offset in minutes
+    :param offset: Signed integer representing timezone offset in
+        minutes
     """
 
     __slots__ = ("hour", "minute", "second", "microsecond", "offset", "_duration")
@@ -288,7 +298,7 @@ class XmlTime(Immutable):
 
     def __str__(self) -> str:
         """
-        XML ISO 8601 format.
+        Return the time formatted according to ISO 8601 for xml.
 
         Examples:
             - 21:32:52
@@ -322,7 +332,7 @@ class TimeInterval(NamedTuple):
 
 class XmlDuration(UserString):
     """
-    Immutable string representation for xs:duration values.
+    Immutable string representation for xs:duration.
 
     Format PnYnMnDTnHnMnS:
         - **P**: literal value that starts the expression

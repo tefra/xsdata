@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
+from typing import Any
 from typing import Callable
 from typing import List
 from typing import TextIO
@@ -76,8 +77,8 @@ class NameCase(Enum):
     MIXED = "mixedCase"
     MIXED_SNAKE = "mixedSnakeCase"
 
-    def __call__(self, string: str) -> str:
-        return self.callback(string)
+    def __call__(self, string: str, **kwargs: Any) -> str:
+        return self.callback(string, **kwargs)
 
     @property
     def callback(self) -> Callable:

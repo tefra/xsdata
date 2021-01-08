@@ -39,24 +39,24 @@ class FiltersTests(FactoryTestCase):
     def test_field_name(self):
         self.filters.field_aliases["boom"] = "Bang"
 
-        self.assertEqual("foo", self.filters.field_name("foo"))
-        self.assertEqual("foo_bar", self.filters.field_name("foo:bar"))
-        self.assertEqual("foo_bar", self.filters.field_name("FooBar"))
-        self.assertEqual("none_value", self.filters.field_name("None"))
-        self.assertEqual("br_eak_value", self.filters.field_name("BrEak"))
-        self.assertEqual("value_1", self.filters.field_name("1"))
-        self.assertEqual("Bang", self.filters.field_name("boom"))
+        self.assertEqual("foo", self.filters.field_name("foo", "cls"))
+        self.assertEqual("foo_bar", self.filters.field_name("foo:bar", "cls"))
+        self.assertEqual("foo_bar", self.filters.field_name("FooBar", "cls"))
+        self.assertEqual("none_value", self.filters.field_name("None", "cls"))
+        self.assertEqual("br_eak_value", self.filters.field_name("BrEak", "cls"))
+        self.assertEqual("value_1", self.filters.field_name("1", "cls"))
+        self.assertEqual("Bang", self.filters.field_name("boom", "cls"))
 
     def test_constant_name(self):
         self.filters.field_aliases["boom"] = "Bang"
 
-        self.assertEqual("FOO", self.filters.constant_name("foo"))
-        self.assertEqual("FOO_BAR", self.filters.constant_name("foo:bar"))
-        self.assertEqual("FOO_BAR", self.filters.constant_name("FooBar"))
-        self.assertEqual("NONE_VALUE", self.filters.constant_name("None"))
-        self.assertEqual("BR_EAK_VALUE", self.filters.constant_name("BrEak"))
-        self.assertEqual("VALUE_1", self.filters.constant_name("1"))
-        self.assertEqual("BANG", self.filters.constant_name("boom"))
+        self.assertEqual("FOO", self.filters.constant_name("foo", "cls"))
+        self.assertEqual("FOO_BAR", self.filters.constant_name("foo:bar", "cls"))
+        self.assertEqual("FOO_BAR", self.filters.constant_name("FooBar", "cls"))
+        self.assertEqual("NONE_VALUE", self.filters.constant_name("None", "cls"))
+        self.assertEqual("BR_EAK_VALUE", self.filters.constant_name("BrEak", "cls"))
+        self.assertEqual("VALUE_1", self.filters.constant_name("1", "cls"))
+        self.assertEqual("BANG", self.filters.constant_name("boom", "cls"))
 
     def test_module_name(self):
         self.filters.module_aliases["http://github.com/tefra/xsdata"] = "xsdata"
@@ -198,34 +198,43 @@ class FiltersTests(FactoryTestCase):
     def test_field_metadata(self):
         attr = AttrFactory.element()
         expected = {"name": "attr_B", "type": "Element"}
-        self.assertEqual(expected, self.filters.field_metadata(attr, None, []))
-        self.assertEqual(expected, self.filters.field_metadata(attr, "foo", []))
+        self.assertEqual(expected, self.filters.field_metadata(attr, None, ["cls"]))
+        self.assertEqual(expected, self.filters.field_metadata(attr, "foo", ["cls"]))
 
     def test_field_metadata_namespace(self):
         attr = AttrFactory.element(namespace="foo")
         expected = {"name": "attr_B", "namespace": "foo", "type": "Element"}
 
-        self.assertEqual(expected, self.filters.field_metadata(attr, None, []))
-        self.assertNotIn("namespace", self.filters.field_metadata(attr, "foo", []))
+        actual = self.filters.field_metadata(attr, None, ["cls"])
+        self.assertEqual(expected, actual)
+
+        actual = self.filters.field_metadata(attr, "foo", ["cls"])
+        self.assertNotIn("namespace", actual)
 
         attr = AttrFactory.attribute(namespace="foo")
         expected = {"name": "attr_C", "namespace": "foo", "type": "Attribute"}
+        actual = self.filters.field_metadata(attr, None, ["cls"])
+        self.assertEqual(expected, actual)
 
-        self.assertEqual(expected, self.filters.field_metadata(attr, None, []))
-        self.assertIn("namespace", self.filters.field_metadata(attr, "foo", []))
+        actual = self.filters.field_metadata(attr, "foo", ["cls"])
+        self.assertIn("namespace", actual)
 
     def test_field_metadata_name(self):
         attr = AttrFactory.element(name="bar")
         attr.local_name = "foo"
-        self.assertEqual("foo", self.filters.field_metadata(attr, None, [])["name"])
+
+        actual = self.filters.field_metadata(attr, None, ["cls"])
+        self.assertEqual("foo", actual["name"])
 
         attr = AttrFactory.element(name="Foo")
         attr.local_name = "foo"
-        self.assertNotIn("name", self.filters.field_metadata(attr, None, []))
+        actual = self.filters.field_metadata(attr, None, ["cls"])
+        self.assertNotIn("name", actual)
 
         attr = AttrFactory.create(tag=Tag.ANY, name="bar")
         attr.local_name = "foo"
-        self.assertNotIn("name", self.filters.field_metadata(attr, None, []))
+        actual = self.filters.field_metadata(attr, None, ["cls"])
+        self.assertNotIn("name", actual)
 
     def test_field_metadata_restrictions(self):
         attr = AttrFactory.create(tag=Tag.RESTRICTION)
@@ -241,11 +250,11 @@ class FiltersTests(FactoryTestCase):
     def test_field_metadata_mixed(self):
         attr = AttrFactory.element(mixed=True)
         expected = {"mixed": True, "name": "attr_B", "type": "Element"}
-        self.assertEqual(expected, self.filters.field_metadata(attr, "foo", []))
+        self.assertEqual(expected, self.filters.field_metadata(attr, "foo", ["cls"]))
 
     def test_field_metadata_choices(self):
         attr = AttrFactory.create(choices=AttrFactory.list(2, tag=Tag.ELEMENT))
-        actual = self.filters.field_metadata(attr, "foo", [])
+        actual = self.filters.field_metadata(attr, "foo", ["cls"])
         expected = (
             {"name": "attr_B", "type": "Type[str]"},
             {"name": "attr_C", "type": "Type[str]"},
@@ -576,7 +585,7 @@ class FiltersTests(FactoryTestCase):
         self.assertEqual("safe_module", filters.module_safe_prefix)
 
         self.assertEqual("cAb", filters.class_name("cAB"))
-        self.assertEqual("CAb", filters.field_name("cAB"))
+        self.assertEqual("CAb", filters.field_name("cAB", "cls"))
         self.assertEqual("cAB", filters.package_name("cAB"))
         self.assertEqual("c_ab", filters.module_name("cAB"))
 

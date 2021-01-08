@@ -1,4 +1,5 @@
 import re
+from typing import Any
 from typing import List
 from typing import Match
 from typing import Tuple
@@ -25,33 +26,33 @@ def split(string: str, sep: str = ":") -> Tuple:
     return (left, right) if right else (None, left)
 
 
-def capitalize(string: str) -> str:
+def capitalize(string: str, **kwargs: Any) -> str:
     """Capitalize the given string."""
     return string[0].upper() + string[1:]
 
 
-def pascal_case(string: str) -> str:
+def pascal_case(string: str, **kwargs: Any) -> str:
     """Convert the given string to pascal case."""
     return "".join(map(str.title, split_words(string)))
 
 
-def camel_case(string: str) -> str:
+def camel_case(string: str, **kwargs: Any) -> str:
     """Convert the given string to camel case."""
     result = "".join(map(str.title, split_words(string)))
     return result[0].lower() + result[1:]
 
 
-def mixed_case(string: str) -> str:
+def mixed_case(string: str, **kwargs: Any) -> str:
     """Convert the given string to mixed case."""
     return "".join(split_words(string))
 
 
-def mixed_snake_case(string: str) -> str:
+def mixed_snake_case(string: str, **kwargs: Any) -> str:
     """Convert the given string to mixed snake case."""
     return "_".join(split_words(string))
 
 
-def snake_case(string: str) -> str:
+def snake_case(string: str, **kwargs: Any) -> str:
     """Convert the given string to snake case."""
     return "_".join(map(str.lower, split_words(string)))
 

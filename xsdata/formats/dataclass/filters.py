@@ -80,23 +80,36 @@ class Filters:
         is_enum = obj.is_enumeration
         for attr in obj.attrs:
             name = attr.name
-            result = self.constant_name(name) if is_enum else self.field_name(name)
-            yield result, (attr.help or "").strip()
+            docstring = (attr.help or "").strip()
+            if is_enum:
+                yield self.constant_name(name, obj.name), docstring
+            else:
+                yield self.field_name(name, obj.name), docstring
 
     def _class_name(self, name: str) -> str:
         return self.class_case(utils.safe_snake(name, self.class_safe_prefix))
 
-    def field_name(self, name: str) -> str:
-        """Convert the given string to a field name according to the selected
-        conventions or use an existing alias."""
-        return self.field_aliases.get(name) or self._attribute_name(name)
+    def field_name(self, name: str, class_name: str) -> str:
+        """
+        Convert the given name to a field name according to the selected
+        conventions or use an existing alias.
 
-    def _attribute_name(self, name: str) -> str:
-        return self.field_case(utils.safe_snake(name, self.field_safe_prefix))
+        Provide the class name as context for the naming schemes.
+        """
+        return self.field_aliases.get(name) or self._field_name(name, class_name)
 
-    def constant_name(self, name: str) -> str:
-        """Apply python conventions for constant names."""
-        return self.field_name(name).upper()
+    def _field_name(self, name: str, class_name: str) -> str:
+        safe_name = utils.safe_snake(name, self.field_safe_prefix)
+        return self.field_case(safe_name, class_name=class_name)
+
+    def constant_name(self, name: str, class_name: str) -> str:
+        """
+        Convert the given name to a constant name according to the selected
+        conventions or use an existing alias.
+
+        Provide the class name as context for the naming schemes.
+        """
+        return self.field_name(name, class_name).upper()
 
     def module_name(self, name: str) -> str:
         """Convert the given string to a module name according to the selected
@@ -135,7 +148,9 @@ class Filters:
 
         name = namespace = None
 
-        if not attr.is_nameless and attr.local_name != self.field_name(attr.name):
+        if not attr.is_nameless and attr.local_name != self.field_name(
+            attr.name, parents[-1]
+        ):
             name = attr.local_name
 
         if parent_namespace != attr.namespace or attr.is_attribute:
@@ -362,7 +377,7 @@ class Filters:
     def field_default_enum(self, attr: Attr) -> str:
         source, enumeration = attr.default[6:].split("::", 1)
         source = next(x.alias or source for x in attr.types if x.name == source)
-        return f"{self.class_name(source)}.{self.constant_name(enumeration)}"
+        return f"{self.class_name(source)}.{self.constant_name(enumeration, source)}"
 
     def field_default_tokens(
         self, attr: Attr, types: List[Type], ns_map: Optional[Dict]

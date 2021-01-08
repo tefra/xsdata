@@ -1,6 +1,5 @@
 import math
 import textwrap
-from collections import defaultdict
 from dataclasses import dataclass
 from dataclasses import field
 from typing import Any
@@ -29,11 +28,6 @@ from xsdata.utils import text
 from xsdata.utils.collections import unique_sequence
 from xsdata.utils.namespaces import clean_uri
 
-CLASS = 0
-FIELD = 1
-MODULE = 2
-PACKAGE = 3
-
 
 @dataclass
 class Filters:
@@ -55,8 +49,6 @@ class Filters:
 
     docstring_style: DocstringStyle = field(default=DocstringStyle.RST)
     max_line_length: int = field(default=79)
-
-    cache: Dict = field(default_factory=lambda: defaultdict(dict), init=False)
 
     def register(self, env: Environment):
         env.filters.update(
@@ -82,11 +74,7 @@ class Filters:
     def class_name(self, name: str) -> str:
         """Convert the given string to a class name according to the selected
         conventions or use an existing alias."""
-        cache = self.cache[CLASS]
-        if name not in cache:
-            cache[name] = self.class_aliases.get(name) or self._class_name(name)
-
-        return cache[name]
+        return self.class_aliases.get(name) or self._class_name(name)
 
     def class_params(self, obj: Class):
         is_enum = obj.is_enumeration
@@ -101,11 +89,7 @@ class Filters:
     def field_name(self, name: str) -> str:
         """Convert the given string to a field name according to the selected
         conventions or use an existing alias."""
-        cache = self.cache[FIELD]
-        if name not in cache:
-            cache[name] = self.field_aliases.get(name) or self._attribute_name(name)
-
-        return cache[name]
+        return self.field_aliases.get(name) or self._attribute_name(name)
 
     def _attribute_name(self, name: str) -> str:
         return self.field_case(utils.safe_snake(name, self.field_safe_prefix))
@@ -117,11 +101,7 @@ class Filters:
     def module_name(self, name: str) -> str:
         """Convert the given string to a module name according to the selected
         conventions or use an existing alias."""
-        cache = self.cache[MODULE]
-        if name not in cache:
-            cache[name] = self.module_aliases.get(name) or self._module_name(name)
-
-        return cache[name]
+        return self.module_aliases.get(name) or self._module_name(name)
 
     def _module_name(self, name: str) -> str:
         return self.module_case(
@@ -131,18 +111,14 @@ class Filters:
     def package_name(self, name: str) -> str:
         """Convert the given string to a package name according to the selected
         conventions or use an existing alias."""
-        cache = self.cache[PACKAGE]
-        if name not in cache:
 
-            if name in self.package_aliases:
-                cache[name] = self.package_aliases[name]
-            else:
-                cache[name] = ".".join(
-                    self.package_aliases.get(part) or self._package_name(part)
-                    for part in name.split(".")
-                )
+        if name in self.package_aliases:
+            return self.package_aliases[name]
 
-        return cache[name]
+        return ".".join(
+            self.package_aliases.get(part) or self._package_name(part)
+            for part in name.split(".")
+        )
 
     def _package_name(self, part: str) -> str:
         return self.package_case(utils.safe_snake(part, self.package_safe_prefix))

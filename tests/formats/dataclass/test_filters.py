@@ -2,11 +2,7 @@ from tests.factories import AttrFactory
 from tests.factories import AttrTypeFactory
 from tests.factories import FactoryTestCase
 from xsdata.codegen.models import Restrictions
-from xsdata.formats.dataclass.filters import CLASS
-from xsdata.formats.dataclass.filters import FIELD
 from xsdata.formats.dataclass.filters import Filters
-from xsdata.formats.dataclass.filters import MODULE
-from xsdata.formats.dataclass.filters import PACKAGE
 from xsdata.models.config import DocstringStyle
 from xsdata.models.config import GeneratorAlias
 from xsdata.models.config import GeneratorConfig
@@ -33,18 +29,15 @@ class FiltersTests(FactoryTestCase):
 
     def test_class_name(self):
         self.filters.class_aliases["boom"] = "Bang"
-        self.filters.cache[CLASS]["pow"] = "Zap"
 
         self.assertEqual("XsString", self.filters.class_name("xs:string"))
         self.assertEqual("FooBarBam", self.filters.class_name("foo:bar_bam"))
         self.assertEqual("ListType", self.filters.class_name("List"))
         self.assertEqual("Type", self.filters.class_name(".*"))
         self.assertEqual("Bang", self.filters.class_name("boom"))
-        self.assertEqual("Zap", self.filters.class_name("pow"))
 
     def test_field_name(self):
         self.filters.field_aliases["boom"] = "Bang"
-        self.filters.cache[FIELD]["pow"] = "Zap"
 
         self.assertEqual("foo", self.filters.field_name("foo"))
         self.assertEqual("foo_bar", self.filters.field_name("foo:bar"))
@@ -53,11 +46,9 @@ class FiltersTests(FactoryTestCase):
         self.assertEqual("br_eak_value", self.filters.field_name("BrEak"))
         self.assertEqual("value_1", self.filters.field_name("1"))
         self.assertEqual("Bang", self.filters.field_name("boom"))
-        self.assertEqual("Zap", self.filters.field_name("pow"))
 
     def test_constant_name(self):
         self.filters.field_aliases["boom"] = "Bang"
-        self.filters.cache[FIELD]["pow"] = "Zap"
 
         self.assertEqual("FOO", self.filters.constant_name("foo"))
         self.assertEqual("FOO_BAR", self.filters.constant_name("foo:bar"))
@@ -66,11 +57,9 @@ class FiltersTests(FactoryTestCase):
         self.assertEqual("BR_EAK_VALUE", self.filters.constant_name("BrEak"))
         self.assertEqual("VALUE_1", self.filters.constant_name("1"))
         self.assertEqual("BANG", self.filters.constant_name("boom"))
-        self.assertEqual("ZAP", self.filters.constant_name("pow"))
 
     def test_module_name(self):
         self.filters.module_aliases["http://github.com/tefra/xsdata"] = "xsdata"
-        self.filters.cache[MODULE]["pow"] = "Zap"
 
         self.assertEqual("foo_bar", self.filters.module_name("fooBar"))
         self.assertEqual("foo_bar_wtf", self.filters.module_name("fooBar.wtf"))
@@ -78,7 +67,6 @@ class FiltersTests(FactoryTestCase):
         self.assertEqual("xs_string", self.filters.module_name("xs:string"))
         self.assertEqual("foo_bar_bam", self.filters.module_name("foo:bar_bam"))
         self.assertEqual("bar_bam", self.filters.module_name("urn:bar_bam"))
-        self.assertEqual("Zap", self.filters.module_name("pow"))
         self.assertEqual(
             "pypi_org_project_xsdata",
             self.filters.module_name("http://pypi.org/project/xsdata/"),
@@ -90,14 +78,12 @@ class FiltersTests(FactoryTestCase):
     def test_package_name(self):
         self.filters.package_aliases["boom"] = "bang"
         self.filters.package_aliases["boom.boom"] = "booom"
-        self.filters.cache[PACKAGE]["pow"] = "Zap"
 
         self.assertEqual(
             "foo.bar_bar.pkg_1", self.filters.package_name("Foo.BAR_bar.1")
         )
         self.assertEqual("foo.bang.pkg_1", self.filters.package_name("Foo.boom.1"))
         self.assertEqual("booom", self.filters.package_name("boom.boom"))
-        self.assertEqual("Zap", self.filters.package_name("pow"))
 
     def test_type_name(self):
         self.assertEqual("str", self.filters.type_name(type_str))

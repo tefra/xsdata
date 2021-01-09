@@ -33,7 +33,13 @@ class ClassUtilsTests(FactoryTestCase):
         ClassUtils.copy_attributes(source, target, extension)
 
         self.assertEqual(["a", "b", "d", "c"], [attr.name for attr in target.attrs])
-        mock_copy_inner_classes.assert_called_once_with(source, target)
+
+        mock_copy_inner_classes.assert_has_calls(
+            [
+                mock.call(source, target, source.attrs[0]),
+                mock.call(source, target, source.attrs[3]),
+            ]
+        )
         mock_clone_attribute.assert_has_calls(
             [
                 mock.call(source.attrs[0], extension.restrictions),
@@ -56,7 +62,12 @@ class ClassUtilsTests(FactoryTestCase):
         self.assertEqual(4, len(target.attrs))
         self.assertEqual(source.attrs[0], target.attrs[1])
         self.assertEqual(source.attrs[1], target.attrs[2])
-        mock_copy_inner_classes.assert_called_once_with(source, target)
+        mock_copy_inner_classes.assert_has_calls(
+            [
+                mock.call(source, target, source.attrs[0]),
+                mock.call(source, target, source.attrs[1]),
+            ]
+        )
         mock_clone_attribute.assert_has_calls(
             [
                 mock.call(source.attrs[0], attrs[1].restrictions),
@@ -92,36 +103,72 @@ class ClassUtilsTests(FactoryTestCase):
         self.assertEqual(2, clone.restrictions.length)
         self.assertIsNot(attr, clone)
 
-    def test_copy_inner_classes(self):
-        source = ClassFactory.create(
-            inner=ClassFactory.list(2, package="a", module="b")
-        )
+    @mock.patch.object(ClassUtils, "copy_inner_class")
+    def test_copy_inner_classes(self, mock_copy_inner_class):
+        source = ClassFactory.create()
         target = ClassFactory.create()
+        attr = AttrFactory.create(types=AttrTypeFactory.list(3))
 
-        ClassUtils.copy_inner_classes(source, target)  # All good copy all
-        self.assertEqual(2, len(target.inner))
+        ClassUtils.copy_inner_classes(source, target, attr)
 
-        ClassUtils.copy_inner_classes(source, target)  # Inner classes exist skip
-        self.assertEqual(2, len(target.inner))
-
-        source.inner.append(target)
-
-        attr = AttrFactory.create(
-            types=[
-                AttrTypeFactory.create(qname=target.name, forward=False),
-                AttrTypeFactory.create(qname=target.name, forward=True),
-                AttrTypeFactory.create(qname="foobar"),
+        mock_copy_inner_class.assert_has_calls(
+            [
+                mock.call(source, target, attr, attr.types[0]),
+                mock.call(source, target, attr, attr.types[1]),
+                mock.call(source, target, attr, attr.types[2]),
             ]
         )
-        target.attrs.append(attr)
 
-        ClassUtils.copy_inner_classes(source, target)  # Inner class matches target
-        self.assertEqual(2, len(target.inner))
+    def test_copy_inner_class(self):
+        source = ClassFactory.create()
+        inner = ClassFactory.create(qname="a", module="b", package="c")
+        target = ClassFactory.create()
+        attr = AttrFactory.create()
+        attr_type = AttrTypeFactory.create(forward=True, qname=inner.qname)
 
-        for inner in target.inner:
-            self.assertEqual(target.package, inner.package)
-            self.assertEqual(target.module, inner.module)
+        source.inner.append(inner)
+        ClassUtils.copy_inner_class(source, target, attr, attr_type)
 
-        self.assertFalse(attr.types[0].circular)
-        self.assertTrue(attr.types[1].circular)
-        self.assertFalse(attr.types[2].circular)
+        self.assertEqual(1, len(target.inner))
+        self.assertIsNot(inner, target.inner[0])
+        self.assertEqual(target.package, target.inner[0].package)
+        self.assertEqual(target.module, target.inner[0].module)
+        self.assertEqual(inner.qname, target.inner[0].qname)
+
+    def test_copy_inner_class_rename_simple_inner_type(self):
+        source = ClassFactory.create()
+        inner = ClassFactory.create(qname="{a}value", module="b", package="c")
+        target = ClassFactory.create()
+        attr = AttrFactory.create(name="simple")
+        attr_type = AttrTypeFactory.create(forward=True, qname=inner.qname)
+
+        source.inner.append(inner)
+        ClassUtils.copy_inner_class(source, target, attr, attr_type)
+
+        self.assertEqual(1, len(target.inner))
+        self.assertIsNot(inner, target.inner[0])
+        self.assertEqual(target.package, target.inner[0].package)
+        self.assertEqual(target.module, target.inner[0].module)
+        self.assertEqual("{a}simple", target.inner[0].qname)
+        self.assertEqual("{a}simple", attr_type.qname)
+
+    def test_copy_inner_class_skip_non_forward_reference(self):
+        source = ClassFactory.create()
+        target = ClassFactory.create()
+        attr = AttrFactory.create()
+        attr_type = AttrTypeFactory.create()
+        ClassUtils.copy_inner_class(source, target, attr, attr_type)
+
+        self.assertFalse(attr_type.circular)
+        self.assertEqual(0, len(target.inner))
+
+    def test_copy_inner_class_check_circular_reference(self):
+        source = ClassFactory.create()
+        target = ClassFactory.create()
+        attr = AttrFactory.create()
+        attr_type = AttrTypeFactory.create(forward=True, qname=target.qname)
+        source.inner.append(target)
+
+        ClassUtils.copy_inner_class(source, target, attr, attr_type)
+        self.assertTrue(attr_type.circular)
+        self.assertEqual(0, len(target.inner))

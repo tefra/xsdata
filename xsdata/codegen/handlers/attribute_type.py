@@ -148,6 +148,8 @@ class AttributeTypeHandler(HandlerInterface):
             attr.types.insert(index, clone_type)
             index += 1
 
+            ClassUtils.copy_inner_class(source, target, attr, clone_type)
+
         restrictions = source_attr.restrictions.clone()
         restrictions.merge(attr.restrictions)
         attr.restrictions = restrictions
@@ -155,8 +157,6 @@ class AttributeTypeHandler(HandlerInterface):
 
         if source.nillable:
             restrictions.nillable = True
-
-        ClassUtils.copy_inner_classes(source, target)
 
     def set_circular_flag(self, source: Class, target: Class, attr_type: AttrType):
         """Update circular reference flag."""

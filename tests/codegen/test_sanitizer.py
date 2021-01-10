@@ -134,7 +134,7 @@ class ClassSanitizerTest(FactoryTestCase):
     def test_process_attribute_default_enum(
         self, mock_find_enum, mock_promote_inner_class, mock_logger_warning
     ):
-        enum_one = ClassFactory.enumeration(1, qname="root")
+        enum_one = ClassFactory.enumeration(1, qname="{a}root")
         enum_one.attrs[0].default = "1"
         enum_one.attrs[0].name = "one"
         enum_two = ClassFactory.enumeration(1, qname="inner")
@@ -176,7 +176,7 @@ class ClassSanitizerTest(FactoryTestCase):
             self.sanitizer.process_attribute_default(target, attr)
             actual.append(attr.default)
 
-        self.assertEqual(["@enum@root::one", "@enum@inner::two", None], actual)
+        self.assertEqual(["@enum@{a}root::one", "@enum@inner::two", None], actual)
         mock_promote_inner_class.assert_called_once_with(target, enum_two)
         mock_logger_warning.assert_called_once_with(
             "No enumeration member matched %s.%s default value `%s`",
@@ -348,8 +348,8 @@ class ClassSanitizerTest(FactoryTestCase):
         classes = [
             ClassFactory.create(qname="{foo}A"),
             ClassFactory.create(qname="{foo}a"),
-            ClassFactory.create(qname="a"),
-            ClassFactory.create(qname="b"),
+            ClassFactory.create(qname="_a"),
+            ClassFactory.create(qname="_b"),
             ClassFactory.create(qname="b"),
         ]
         self.sanitizer.container.extend(classes)
@@ -365,8 +365,8 @@ class ClassSanitizerTest(FactoryTestCase):
     @mock.patch.object(ClassSanitizer, "rename_class")
     def test_rename_classes(self, mock_rename_class):
         classes = [
-            ClassFactory.create(qname="a", type=Element),
-            ClassFactory.create(qname="A", type=Element),
+            ClassFactory.create(qname="_a", type=Element),
+            ClassFactory.create(qname="_A", type=Element),
             ClassFactory.create(qname="a", type=ComplexType),
         ]
         self.sanitizer.rename_classes(classes)
@@ -382,34 +382,34 @@ class ClassSanitizerTest(FactoryTestCase):
     @mock.patch.object(ClassSanitizer, "rename_class")
     def test_rename_classes_protects_single_element(self, mock_rename_class):
         classes = [
-            ClassFactory.create(qname="a", type=Element),
+            ClassFactory.create(qname="_a", type=Element),
             ClassFactory.create(qname="a", type=ComplexType),
         ]
         self.sanitizer.rename_classes(classes)
 
         mock_rename_class.assert_called_once_with(classes[1])
 
-    @mock.patch.object(ClassSanitizer, "rename_dependency")
-    def test_rename_class(self, mock_rename_dependency):
-        target = ClassFactory.create(qname="{foo}a")
+    @mock.patch.object(ClassSanitizer, "rename_class_dependencies")
+    def test_rename_class(self, mock_rename_class_dependencies):
+        target = ClassFactory.create(qname="{foo}_a")
         self.sanitizer.container.add(target)
         self.sanitizer.container.add(ClassFactory.create())
         self.sanitizer.container.add(ClassFactory.create(qname="{foo}a_1"))
         self.sanitizer.container.add(ClassFactory.create(qname="{foo}A_2"))
         self.sanitizer.rename_class(target)
 
-        self.assertEqual("{foo}a_3", target.qname)
-        self.assertEqual("a", target.meta_name)
+        self.assertEqual("{foo}_a_3", target.qname)
+        self.assertEqual("_a", target.meta_name)
 
-        mock_rename_dependency.assert_has_calls(
-            mock.call(item, "{foo}a", "{foo}a_3")
+        mock_rename_class_dependencies.assert_has_calls(
+            mock.call(item, "{foo}_a", "{foo}_a_3")
             for item in self.sanitizer.container.iterate()
         )
 
-        self.assertEqual([target], self.container.data["{foo}a_3"])
-        self.assertEqual([], self.container.data["{foo}a"])
+        self.assertEqual([target], self.container.data["{foo}_a_3"])
+        self.assertEqual([], self.container.data["{foo}_a"])
 
-    def test_rename_dependency(self):
+    def test_rename_class_dependencies(self):
         attr_type = AttrTypeFactory.create("{foo}bar")
 
         target = ClassFactory.create(
@@ -434,7 +434,40 @@ class ClassSanitizerTest(FactoryTestCase):
             ],
         )
 
-        self.sanitizer.rename_dependency(target, "{foo}bar", "thug")
+        self.sanitizer.rename_class_dependencies(target, "{foo}bar", "thug")
+        dependencies = set(target.dependencies())
+        self.assertNotIn("{foo}bar", dependencies)
+        self.assertIn("thug", dependencies)
+
+    def test_rename_attr_dependencies_with_default_enum(self):
+        attr_type = AttrTypeFactory.create("{foo}bar")
+        target = ClassFactory.create(
+            attrs=[
+                AttrFactory.create(
+                    types=[attr_type], default=f"@enum@{attr_type.qname}::member"
+                ),
+            ]
+        )
+
+        self.sanitizer.rename_class_dependencies(target, "{foo}bar", "thug")
+        dependencies = set(target.dependencies())
+        self.assertEqual("@enum@thug::member", target.attrs[0].default)
+        self.assertNotIn("{foo}bar", dependencies)
+        self.assertIn("thug", dependencies)
+
+    def test_rename_attr_dependencies_with_choices(self):
+        attr_type = AttrTypeFactory.create("{foo}bar")
+        target = ClassFactory.create(
+            attrs=[
+                AttrFactory.create(
+                    choices=[
+                        AttrFactory.create(types=[attr_type.clone()]),
+                    ]
+                )
+            ]
+        )
+
+        self.sanitizer.rename_class_dependencies(target, "{foo}bar", "thug")
         dependencies = set(target.dependencies())
         self.assertNotIn("{foo}bar", dependencies)
         self.assertIn("thug", dependencies)

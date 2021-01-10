@@ -27,6 +27,7 @@ from xsdata.models.config import GeneratorConfig
 from xsdata.utils import text
 from xsdata.utils.collections import unique_sequence
 from xsdata.utils.namespaces import clean_uri
+from xsdata.utils.namespaces import split_qname
 
 
 @dataclass
@@ -375,9 +376,10 @@ class Filters:
         )
 
     def field_default_enum(self, attr: Attr) -> str:
-        source, enumeration = attr.default[6:].split("::", 1)
-        source = next(x.alias or source for x in attr.types if x.name == source)
-        return f"{self.class_name(source)}.{self.constant_name(enumeration, source)}"
+        qname, enumeration = attr.default[6:].split("::", 1)
+        qname = next(x.alias or qname for x in attr.types if x.qname == qname)
+        _, name = split_qname(qname)
+        return f"{self.class_name(name)}.{self.constant_name(enumeration, name)}"
 
     def field_default_tokens(
         self, attr: Attr, types: List[Type], ns_map: Optional[Dict]

@@ -152,7 +152,7 @@ class FiltersTests(FactoryTestCase):
 
     def test_field_default_value_with_type_enum(self):
         attr = AttrFactory.create(
-            types=AttrTypeFactory.list(1, qname="foo"), default="@enum@foo::bar"
+            types=AttrTypeFactory.list(1, qname="{a}foo"), default="@enum@{a}foo::bar"
         )
         self.assertEqual("Foo.BAR", self.filters.field_default_value(attr))
 

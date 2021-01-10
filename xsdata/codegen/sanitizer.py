@@ -149,7 +149,7 @@ class ClassSanitizer:
                 if attr_type.forward:
                     self.promote_inner_class(target, source)
 
-                attr.default = f"@enum@{source.name}::{source_attr.name}"
+                attr.default = f"@enum@{source.qname}::{source_attr.name}"
                 return
 
         if source_found:
@@ -188,7 +188,7 @@ class ClassSanitizer:
     def resolve_conflicts(self):
         """Find classes with the same case insensitive qualified name and
         rename them."""
-        groups = group_by(self.container.iterate(), lambda x: x.qname.lower())
+        groups = group_by(self.container.iterate(), lambda x: text.snake_case(x.qname))
         for classes in groups.values():
             if len(classes) > 1:
                 self.rename_classes(classes)
@@ -217,34 +217,45 @@ class ClassSanitizer:
         self.container.reset(target, qname)
 
         for item in self.container.iterate():
-            self.rename_dependency(item, qname, target.qname)
+            self.rename_class_dependencies(item, qname, target.qname)
 
     def next_qname(self, namespace: str, name: str) -> str:
         """Append the next available index number for the given namespace and
         local name."""
         index = 0
-        reserved = map(str.lower, self.container.keys())
+        reserved = map(text.snake_case, self.container.keys())
         while True:
             index += 1
             qname = build_qname(namespace, f"{name}_{index}")
-            if qname.lower() not in reserved:
+            if text.snake_case(qname) not in reserved:
                 return qname
 
-    def rename_dependency(self, target: Class, search: str, replace: str):
+    def rename_class_dependencies(self, target: Class, search: str, replace: str):
         """Search and replace the old qualified attribute type name with the
         new one if it exists in the target class attributes, extensions and
         inner classes."""
         for attr in target.attrs:
-            for attr_type in attr.types:
-                if attr_type.qname == search:
-                    attr_type.qname = replace
+            self.rename_attr_dependencies(attr, search, replace)
 
         for ext in target.extensions:
             if ext.type.qname == search:
                 ext.type.qname = replace
 
         for inner in target.inner:
-            self.rename_dependency(inner, search, replace)
+            self.rename_class_dependencies(inner, search, replace)
+
+    def rename_attr_dependencies(self, attr: Attr, search: str, replace: str):
+        """Search and replace the old qualified attribute type name with the
+        new one in the attr types, choices and default value."""
+        for attr_type in attr.types:
+            if attr_type.qname == search:
+                attr_type.qname = replace
+
+                if isinstance(attr.default, str) and attr.default.startswith("@enum@"):
+                    attr.default = attr.default.replace(search, replace)
+
+        for choice in attr.choices:
+            self.rename_attr_dependencies(choice, search, replace)
 
     def find_enum(self, source: Class, attr_type: AttrType) -> Optional[Class]:
         """

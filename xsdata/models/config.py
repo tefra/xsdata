@@ -13,6 +13,7 @@ from xsdata.formats.dataclass.parsers import XmlParser
 from xsdata.formats.dataclass.parsers.config import ParserConfig
 from xsdata.formats.dataclass.serializers import XmlSerializer
 from xsdata.formats.dataclass.serializers.config import SerializerConfig
+from xsdata.formats.dataclass.serializers.writers import XmlEventWriter
 from xsdata.models.mixins import array_element
 from xsdata.models.mixins import attribute
 from xsdata.models.mixins import element
@@ -267,5 +268,5 @@ class GeneratorConfig:
     def write(cls, output: TextIO, obj: "GeneratorConfig"):
         ctx = XmlContext(element_name=text.pascal_case, attribute_name=text.camel_case)
         config = SerializerConfig(pretty_print=True)
-        serializer = XmlSerializer(context=ctx, config=config)
+        serializer = XmlSerializer(context=ctx, config=config, writer=XmlEventWriter)
         serializer.write(output, obj, ns_map={None: "http://pypi.org/project/xsdata"})

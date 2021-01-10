@@ -8,6 +8,9 @@ from xsdata.models.config import GeneratorConfig
 
 
 class GeneratorConfigTests(TestCase):
+    def setUp(self) -> None:
+        self.maxDiff = None
+
     def test_create(self):
         file_path = Path(tempfile.mktemp())
         version = get_distribution("xsdata").version

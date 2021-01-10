@@ -47,6 +47,11 @@ def mixed_case(string: str, **kwargs: Any) -> str:
     return "".join(split_words(string))
 
 
+def mixed_pascal_case(string: str, **kwargs: Any) -> str:
+    """Convert the given string to mixed pascal case."""
+    return capitalize(mixed_case(string))
+
+
 def mixed_snake_case(string: str, **kwargs: Any) -> str:
     """Convert the given string to mixed snake case."""
     return "_".join(split_words(string))

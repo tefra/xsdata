@@ -3,6 +3,7 @@ from unittest import TestCase
 from xsdata.utils.text import camel_case
 from xsdata.utils.text import capitalize
 from xsdata.utils.text import mixed_case
+from xsdata.utils.text import mixed_pascal_case
 from xsdata.utils.text import mixed_snake_case
 from xsdata.utils.text import pascal_case
 from xsdata.utils.text import snake_case
@@ -49,6 +50,16 @@ class TextTests(TestCase):
         self.assertEqual("UserName", mixed_case("User_Name"))
         self.assertEqual("username", mixed_case("user_name"))
         self.assertEqual("SUserNAME", mixed_case("SUserNAME"))
+
+    def test_mixed_pascal_case(self):
+        self.assertEqual("P00p", mixed_pascal_case("p00p"))
+        self.assertEqual("USERName", mixed_pascal_case("USERName"))
+        self.assertEqual("UserNAME", mixed_pascal_case("UserNAME"))
+        self.assertEqual("USERname", mixed_pascal_case("USER_name"))
+        self.assertEqual("USERNAME", mixed_pascal_case("USER-NAME"))
+        self.assertEqual("UserName", mixed_pascal_case("User_Name"))
+        self.assertEqual("Username", mixed_pascal_case("user_name"))
+        self.assertEqual("SUserNAME", mixed_pascal_case("SUserNAME"))
 
     def test_mixed_snake_case(self):
         self.assertEqual("p00p", mixed_snake_case("p00p"))

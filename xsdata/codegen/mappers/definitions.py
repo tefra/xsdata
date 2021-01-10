@@ -22,7 +22,6 @@ from xsdata.models.wsdl import PortType
 from xsdata.models.wsdl import PortTypeMessage
 from xsdata.models.wsdl import PortTypeOperation
 from xsdata.models.wsdl import ServicePort
-from xsdata.models.xsd import Element
 from xsdata.utils import collections
 from xsdata.utils import text
 from xsdata.utils.collections import first
@@ -114,7 +113,7 @@ class DefinitionsMapper:
         yield Class(
             qname=build_qname(definitions.target_namespace, name),
             status=Status.PROCESSED,
-            type=type(binding_operation),
+            tag=type(binding_operation).__name__,
             module=definitions.module,
             ns_map=binding_operation.ns_map,
             attrs=attrs,
@@ -207,7 +206,7 @@ class DefinitionsMapper:
         target = Class(
             qname=build_qname(definitions.target_namespace, name),
             meta_name="Envelope",
-            type=type(binding_message),
+            tag=Tag.BINDING_MESSAGE,
             module=definitions.module,
             ns_map=binding_message.ns_map,
             namespace=namespace,
@@ -244,7 +243,7 @@ class DefinitionsMapper:
         return Class(
             qname=build_qname(definitions.target_namespace, message_name),
             status=Status.PROCESSED,
-            type=Element,
+            tag=Tag.ELEMENT,
             module=definitions.module,
             ns_map=ns_map,
             attrs=list(cls.build_parts_attributes(definition_message.parts, ns_map)),
@@ -265,7 +264,7 @@ class DefinitionsMapper:
         if not inner:
             inner = Class(
                 qname=build_qname(name),
-                type=BindingMessage,
+                tag=Tag.BINDING_MESSAGE,
                 module=target.module,
                 ns_map=target.ns_map.copy(),
             )

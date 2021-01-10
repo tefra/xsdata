@@ -1,9 +1,12 @@
 import sys
 
 from xsdata.codegen.models import Attr
+from xsdata.codegen.models import AttrType
 from xsdata.codegen.models import Class
 from xsdata.codegen.models import Extension
 from xsdata.codegen.models import Restrictions
+from xsdata.utils.namespaces import build_qname
+from xsdata.utils.namespaces import split_qname
 
 
 class ClassUtils:
@@ -26,15 +29,15 @@ class ClassUtils:
         for attr in source.attrs:
             if attr.name not in target_attr_names:
                 clone = cls.clone_attribute(attr, extension.restrictions)
+                cls.copy_inner_classes(source, target, clone)
 
                 if attr.index == sys.maxsize:
                     target.attrs.append(clone)
                     continue
 
                 target.attrs.insert(index, clone)
-            index += 1
 
-        cls.copy_inner_classes(source, target)
+            index += 1
 
     @classmethod
     def copy_group_attributes(cls, source: Class, target: Class, attr: Attr):
@@ -49,7 +52,7 @@ class ClassUtils:
             target.attrs.insert(index, clone)
             index += 1
 
-        cls.copy_inner_classes(source, target)
+            cls.copy_inner_classes(source, target, clone)
 
     @classmethod
     def copy_extensions(cls, source: Class, target: Class, extension: Extension):
@@ -70,29 +73,40 @@ class ClassUtils:
         return clone
 
     @classmethod
-    def copy_inner_classes(cls, source: Class, target: Class):
-        """
-        Copy safely inner classes from source to target class.
-
-        Checks:
-            1. Inner is the target class, skip and mark as circular.
-            2. Inner with same name exists, skip.
-        """
-        for inner in source.inner:
-            if inner is target:
-                cls.update_inner_circular(target, inner)
-            elif not any(existing.name == inner.name for existing in target.inner):
-                clone = inner.clone()
-                clone.package = target.package
-                clone.module = target.module
-                target.inner.append(clone)
+    def copy_inner_classes(cls, source: Class, target: Class, attr: Attr):
+        """Iterate all attr types and copy any inner classes from source to the
+        target class."""
+        for attr_type in attr.types:
+            cls.copy_inner_class(source, target, attr, attr_type)
 
     @classmethod
-    def update_inner_circular(cls, target: Class, inner: Class):
+    def copy_inner_class(
+        cls, source: Class, target: Class, attr: Attr, attr_type: AttrType
+    ):
+        """
+        Check if the given attr type is a forward reference and copy its inner
+        class from the source to the target class.
 
-        """Find the target attributes with the inner type and mark them as
-        circular."""
-        for attr in target.attrs:
-            for attr_type in attr.types:
-                if attr_type.forward and attr_type.name == inner.name:
-                    attr_type.circular = True
+        Checks:
+            1. Update type if inner class in a circular reference
+            2. Copy inner class, rename it if source is a simple type.
+        """
+        if not attr_type.forward:
+            return
+
+        # This will exit if no inner class is found, too strict???
+        inner = next(inner for inner in source.inner if inner.name == attr_type.name)
+
+        if inner is target:
+            attr_type.circular = True
+        else:
+            clone = inner.clone()
+            clone.package = target.package
+            clone.module = target.module
+
+            # Simple type, update the name
+            if clone.name == "value":
+                namespace, _ = split_qname(clone.qname)
+                clone.qname = attr_type.qname = build_qname(namespace, attr.name)
+
+            target.inner.append(clone)

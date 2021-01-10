@@ -365,9 +365,9 @@ class ClassSanitizerTest(FactoryTestCase):
     @mock.patch.object(ClassSanitizer, "rename_class")
     def test_rename_classes(self, mock_rename_class):
         classes = [
-            ClassFactory.create(qname="_a", type=Element),
-            ClassFactory.create(qname="_A", type=Element),
-            ClassFactory.create(qname="a", type=ComplexType),
+            ClassFactory.create(qname="_a", tag=Tag.ELEMENT),
+            ClassFactory.create(qname="_A", tag=Tag.ELEMENT),
+            ClassFactory.create(qname="a", tag=Tag.COMPLEX_TYPE),
         ]
         self.sanitizer.rename_classes(classes)
 
@@ -382,8 +382,8 @@ class ClassSanitizerTest(FactoryTestCase):
     @mock.patch.object(ClassSanitizer, "rename_class")
     def test_rename_classes_protects_single_element(self, mock_rename_class):
         classes = [
-            ClassFactory.create(qname="_a", type=Element),
-            ClassFactory.create(qname="a", type=ComplexType),
+            ClassFactory.create(qname="_a", tag=Tag.ELEMENT),
+            ClassFactory.create(qname="a", tag=Tag.COMPLEX_TYPE),
         ]
         self.sanitizer.rename_classes(classes)
 

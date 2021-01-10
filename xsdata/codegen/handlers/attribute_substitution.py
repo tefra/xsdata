@@ -77,6 +77,6 @@ class AttributeSubstitutionHandler(HandlerInterface):
         return Attr(
             name=source.name,
             types=[AttrType(qname=source.qname)],
-            tag=source.type.__name__,
+            tag=source.tag,
             namespace=source.namespace,
         )

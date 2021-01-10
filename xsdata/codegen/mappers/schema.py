@@ -68,7 +68,7 @@ class SchemaMapper:
             namespace=cls.element_namespace(obj, target_namespace),
             mixed=obj.is_mixed,
             nillable=obj.is_nillable,
-            type=type(obj),
+            tag=obj.class_name,
             container=container,
             help=obj.display_help,
             ns_map=obj.ns_map,

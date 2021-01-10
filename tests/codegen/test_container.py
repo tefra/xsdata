@@ -1,14 +1,11 @@
 from unittest import mock
 
-from lxml.etree import Element
-
 from tests.factories import ClassFactory
 from tests.factories import FactoryTestCase
 from xsdata.codegen.container import ClassContainer
 from xsdata.codegen.models import Class
 from xsdata.codegen.models import Status
-from xsdata.models.xsd import ComplexType
-from xsdata.models.xsd import SimpleType
+from xsdata.models.enums import Tag
 
 
 class ClassContainerTests(FactoryTestCase):
@@ -19,9 +16,9 @@ class ClassContainerTests(FactoryTestCase):
 
     def test_from_list(self):
         classes = [
-            ClassFactory.create(qname="{xsdata}foo", type=Element),
-            ClassFactory.create(qname="{xsdata}foo", type=ComplexType),
-            ClassFactory.create(qname="{xsdata}foobar", type=ComplexType),
+            ClassFactory.create(qname="{xsdata}foo", tag=Tag.ELEMENT),
+            ClassFactory.create(qname="{xsdata}foo", tag=Tag.COMPLEX_TYPE),
+            ClassFactory.create(qname="{xsdata}foobar", tag=Tag.COMPLEX_TYPE),
         ]
         container = ClassContainer.from_list(classes)
 
@@ -115,7 +112,7 @@ class ClassContainerTests(FactoryTestCase):
     @mock.patch.object(Class, "should_generate", new_callable=mock.PropertyMock)
     def test_filter_classes_with_only_simple_types(self, mock_class_should_generate):
         mock_class_should_generate.return_value = False
-        classes = [ClassFactory.enumeration(2), ClassFactory.create(type=SimpleType)]
+        classes = [ClassFactory.enumeration(2), ClassFactory.simple_type()]
         container = ClassContainer.from_list(classes)
         container.filter_classes()
 

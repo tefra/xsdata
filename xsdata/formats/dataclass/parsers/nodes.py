@@ -1,4 +1,5 @@
 import copy
+import warnings
 from dataclasses import dataclass
 from dataclasses import field
 from typing import Any
@@ -9,6 +10,7 @@ from typing import Optional
 from typing import Tuple
 from typing import Type
 
+from xsdata.exceptions import ConverterWarning
 from xsdata.exceptions import ParserError
 from xsdata.exceptions import XmlContextError
 from xsdata.formats.bindings import T
@@ -334,10 +336,16 @@ class UnionNode(XmlNode):
         raise ParserError(f"Failed to parse union node: {self.var.qname}")
 
     def parse_class(self, clazz: Type[T]) -> Optional[T]:
-        """Initialize a new XmlParser and try to parse the given element."""
+        """
+        Initialize a new XmlParser and try to parse the given element.
+
+        Treat converter warnings as errors and return None.
+        """
         try:
-            parser = NodeParser(context=self.context)
-            return parser.parse(self.events, clazz)
+            with warnings.catch_warnings():
+                warnings.filterwarnings("error", category=ConverterWarning)
+                parser = NodeParser(context=self.context)
+                return parser.parse(self.events, clazz)
         except Exception:
             return None
 

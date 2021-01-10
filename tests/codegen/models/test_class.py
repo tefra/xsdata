@@ -6,8 +6,6 @@ from tests.factories import ClassFactory
 from tests.factories import ExtensionFactory
 from tests.factories import FactoryTestCase
 from xsdata.codegen.models import SIMPLE_TYPES
-from xsdata.models import wsdl
-from xsdata.models import xsd
 from xsdata.models.enums import DataType
 from xsdata.models.enums import Namespace
 from xsdata.models.enums import Tag
@@ -99,13 +97,13 @@ class ClassTests(FactoryTestCase):
         self.assertTrue(obj.has_suffix_attr)
 
     def test_property_is_complex(self):
-        obj = ClassFactory.create(type=xsd.Element)
+        obj = ClassFactory.create(tag=Tag.ELEMENT)
         self.assertTrue(obj.is_complex)
 
-        obj = ClassFactory.create(type=xsd.ComplexType)
+        obj = ClassFactory.create(tag=Tag.COMPLEX_TYPE)
         self.assertTrue(obj.is_complex)
 
-        obj = ClassFactory.create(type=xsd.SimpleType)
+        obj = ClassFactory.create(tag=Tag.SIMPLE_TYPE)
         self.assertFalse(obj.is_complex)
 
     def test_property_is_enumeration(self):
@@ -131,26 +129,26 @@ class ClassTests(FactoryTestCase):
             self.assertTrue(obj.is_simple_type)
 
     def test_property_should_generate(self):
-        obj = ClassFactory.create(type=xsd.Element)
+        obj = ClassFactory.create(tag=Tag.ELEMENT)
         self.assertTrue(obj.should_generate)
 
-        obj = ClassFactory.create(type=xsd.ComplexType)
+        obj = ClassFactory.create(tag=Tag.COMPLEX_TYPE)
         self.assertTrue(obj.should_generate)
 
         obj.attrs.append(AttrFactory.create(tag=Tag.EXTENSION))
         self.assertFalse(obj.should_generate)
 
-        obj = ClassFactory.create(type=wsdl.BindingOperation)
+        obj = ClassFactory.create(tag=Tag.BINDING_OPERATION)
         self.assertTrue(obj.should_generate)
 
-        obj = ClassFactory.create(type=wsdl.BindingMessage)
+        obj = ClassFactory.create(tag=Tag.BINDING_MESSAGE)
         self.assertTrue(obj.should_generate)
 
         obj = ClassFactory.enumeration(2)
         self.assertTrue(obj.should_generate)
 
-        obj = ClassFactory.create(type=xsd.SimpleType)
+        obj = ClassFactory.create(tag=Tag.SIMPLE_TYPE)
         self.assertFalse(obj.should_generate)
 
-        obj = ClassFactory.create(type=wsdl.BindingMessage, strict_type=True)
+        obj = ClassFactory.create(tag=Tag.BINDING_MESSAGE, strict_type=True)
         self.assertFalse(obj.should_generate)

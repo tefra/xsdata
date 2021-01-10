@@ -12,8 +12,6 @@ from xsdata.codegen.models import Restrictions
 from xsdata.codegen.utils import ClassUtils
 from xsdata.models.enums import DataType
 from xsdata.models.enums import Tag
-from xsdata.models.xsd import ComplexType
-from xsdata.models.xsd import SimpleType
 
 
 class ClassExtensionHandlerTests(FactoryTestCase):
@@ -78,7 +76,7 @@ class ClassExtensionHandlerTests(FactoryTestCase):
     ):
         extension = ExtensionFactory.create()
         target = ClassFactory.create(extensions=[extension])
-        source = ClassFactory.create(type=SimpleType)
+        source = ClassFactory.create(tag=Tag.SIMPLE_TYPE)
         mock_find_dependency.return_value = source
 
         self.processor.process_extension(target, extension)
@@ -97,7 +95,7 @@ class ClassExtensionHandlerTests(FactoryTestCase):
     ):
         extension = ExtensionFactory.create()
         target = ClassFactory.create(extensions=[extension])
-        source = ClassFactory.create(type=ComplexType)
+        source = ClassFactory.create(tag=Tag.COMPLEX_TYPE)
         source.attrs.append(AttrFactory.enumeration())
         mock_find_dependency.return_value = source
 
@@ -136,7 +134,7 @@ class ClassExtensionHandlerTests(FactoryTestCase):
     ):
         extension = ExtensionFactory.create()
         target = ClassFactory.create(extensions=[extension])
-        source = ClassFactory.create(type=ComplexType)
+        source = ClassFactory.create(tag=Tag.COMPLEX_TYPE)
         mock_find_dependency.return_value = source
 
         self.processor.process_extension(target, extension)
@@ -268,11 +266,11 @@ class ClassExtensionHandlerTests(FactoryTestCase):
 
         self.assertIsNone(self.processor.find_dependency(attr_type))
 
-        complex = ClassFactory.create(qname="a", type=ComplexType)
+        complex = ClassFactory.create(qname="a", tag=Tag.COMPLEX_TYPE)
         self.processor.container.add(complex)
         self.assertEqual(complex, self.processor.find_dependency(attr_type))
 
-        simple = ClassFactory.create(qname="a", type=SimpleType)
+        simple = ClassFactory.create(qname="a", tag=Tag.SIMPLE_TYPE)
         self.processor.container.add(simple)
         self.assertEqual(simple, self.processor.find_dependency(attr_type))
 

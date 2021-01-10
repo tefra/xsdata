@@ -127,7 +127,7 @@ class AttributeTypeHandlerTests(FactoryTestCase):
     def test_process_dependency_type_with_dummy_type(
         self, mock_find_dependency, mock_reset_attribute_type
     ):
-        mock_find_dependency.return_value = ClassFactory.create(type=Element)
+        mock_find_dependency.return_value = ClassFactory.create(tag=Tag.ELEMENT)
         target = ClassFactory.create()
         attr = AttrFactory.create()
         attr_type = attr.types[0]
@@ -246,12 +246,16 @@ class AttributeTypeHandlerTests(FactoryTestCase):
         self.assertEqual(0, mock_copy_attribute_properties.call_count)
         self.assertEqual(0, mock_update_restrictions.call_count)
 
-    @mock.patch.object(ClassUtils, "copy_inner_classes")
-    def test_copy_attribute_properties(self, mock_copy_inner_classes):
+    @mock.patch.object(ClassUtils, "copy_inner_class")
+    def test_copy_attribute_properties(self, mock_copy_inner_class):
         source = ClassFactory.elements(1, qname="Foobar")
         source.attrs[0].restrictions.max_length = 100
         source.attrs[0].restrictions.min_length = 1
         source.attrs[0].help = "foo"
+        source.attrs[0].types = [
+            AttrTypeFactory.create(qname="first"),
+            AttrTypeFactory.create(qname="second"),
+        ]
 
         target = ClassFactory.elements(1)
         attr = target.attrs[0]
@@ -262,10 +266,16 @@ class AttributeTypeHandlerTests(FactoryTestCase):
         self.assertEqual("Foobar", attr.types[0].name)
         self.processor.copy_attribute_properties(source, target, attr, attr.types[0])
 
-        self.assertEqual("string", attr.types[0].name)
+        self.assertEqual("first", attr.types[0].name)
+        self.assertEqual("second", attr.types[1].name)
         self.assertEqual("foo", attr.help)
         self.assertEqual(Restrictions(min_length=2, max_length=100), attr.restrictions)
-        mock_copy_inner_classes.assert_called_once_with(source, target)
+        mock_copy_inner_class.assert_has_calls(
+            [
+                mock.call(source, target, attr, source.attrs[0].types[0]),
+                mock.call(source, target, attr, source.attrs[0].types[1]),
+            ]
+        )
 
     def test_copy_attribute_properties_from_nillable_source(self):
         source = ClassFactory.elements(1, nillable=True)
@@ -334,19 +344,25 @@ class AttributeTypeHandlerTests(FactoryTestCase):
     def test_find_dependency(self):
         attr_type = AttrTypeFactory.create(qname="a")
 
-        self.assertIsNone(self.processor.find_dependency(attr_type))
+        self.assertIsNone(self.processor.find_dependency(attr_type, Tag.ELEMENT))
 
-        abstract = ClassFactory.create(qname="a", type=ComplexType, abstract=True)
+        abstract = ClassFactory.create(qname="a", tag=Tag.COMPLEX_TYPE, abstract=True)
         self.processor.container.add(abstract)
-        self.assertEqual(abstract, self.processor.find_dependency(attr_type))
+        self.assertEqual(
+            abstract, self.processor.find_dependency(attr_type, Tag.ELEMENT)
+        )
 
-        element = ClassFactory.create(qname="a", type=Element)
+        element = ClassFactory.create(qname="a", tag=Tag.ELEMENT)
         self.processor.container.add(element)
-        self.assertEqual(element, self.processor.find_dependency(attr_type))
+        self.assertEqual(
+            element, self.processor.find_dependency(attr_type, Tag.SIMPLE_TYPE)
+        )
 
-        simple = ClassFactory.create(qname="a", type=SimpleType)
+        simple = ClassFactory.create(qname="a", tag=Tag.SIMPLE_TYPE)
         self.processor.container.add(simple)
-        self.assertEqual(simple, self.processor.find_dependency(attr_type))
+        self.assertEqual(
+            simple, self.processor.find_dependency(attr_type, Tag.SIMPLE_TYPE)
+        )
 
     @mock.patch.object(Class, "dependencies")
     def test_cached_dependencies(self, mock_class_dependencies):

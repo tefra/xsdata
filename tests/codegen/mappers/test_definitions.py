@@ -10,6 +10,7 @@ from xsdata.codegen.models import Status
 from xsdata.formats.dataclass.models.generics import AnyElement
 from xsdata.models.enums import DataType
 from xsdata.models.enums import Namespace
+from xsdata.models.enums import Tag
 from xsdata.models.wsdl import Binding
 from xsdata.models.wsdl import BindingMessage
 from xsdata.models.wsdl import BindingOperation
@@ -171,7 +172,7 @@ class DefinitionsMapperTests(FactoryTestCase):
         service = ClassFactory.create(
             qname=build_qname("xsdata", "Calc_Add"),
             status=Status.PROCESSED,
-            type=BindingOperation,
+            tag=Tag.BINDING_OPERATION,
             module="foo",
             package=None,
             ns_map={"foo": "bar"},
@@ -346,7 +347,7 @@ class DefinitionsMapperTests(FactoryTestCase):
         expected = Class(
             qname=build_qname("bar", name),
             meta_name="Envelope",
-            type=BindingMessage,
+            tag=Tag.BINDING_MESSAGE,
             module="foo",
             ns_map={"foo": "bar"},
             namespace="xsdata",
@@ -422,7 +423,7 @@ class DefinitionsMapperTests(FactoryTestCase):
         expected = Class(
             qname=build_qname("bar", name),
             meta_name="Envelope",
-            type=BindingMessage,
+            tag=Tag.BINDING_MESSAGE,
             module="foo",
             ns_map={"foo": "bar"},
             namespace="xsdata",
@@ -697,7 +698,7 @@ class DefinitionsMapperTests(FactoryTestCase):
         expected = Class(
             qname=build_qname("xsdata", "bar"),
             status=Status.PROCESSED,
-            type=Element,
+            tag=Tag.ELEMENT,
             module="foo",
             ns_map=message.ns_map,
             attrs=attrs,
@@ -711,7 +712,7 @@ class DefinitionsMapperTests(FactoryTestCase):
         actual = DefinitionsMapper.build_inner_class(target, "body")
         expected = ClassFactory.create(
             qname="body",
-            type=BindingMessage,
+            tag=Tag.BINDING_MESSAGE,
             module=target.module,
             package=None,
             ns_map=target.ns_map,

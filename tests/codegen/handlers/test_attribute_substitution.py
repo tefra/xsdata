@@ -102,7 +102,7 @@ class AttributeSubstitutionHandlerTests(FactoryTestCase):
             name=item.name,
             default=None,
             types=[AttrType(qname=build_qname("foo", "bar"))],
-            tag=item.type.__name__,
+            tag=item.tag,
         )
 
         self.assertEqual(expected, actual)

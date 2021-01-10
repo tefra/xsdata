@@ -149,7 +149,7 @@ class SchemaMapperTests(FactoryTestCase):
 
         expected = ClassFactory.create(
             qname=build_qname("target_ns", "name"),
-            type=Element,
+            tag=Tag.ELEMENT,
             help="sos",
             abstract=True,
             nillable=True,

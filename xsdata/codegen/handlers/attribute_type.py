@@ -65,9 +65,9 @@ class AttributeTypeHandler(HandlerInterface):
         if attr.restrictions.pattern:
             cls.reset_attribute_type(attr_type)
 
-    def find_dependency(self, attr_type: AttrType) -> Optional[Class]:
+    def find_dependency(self, attr_type: AttrType, tag: str) -> Optional[Class]:
         """
-        Find dependency for the given attribute.
+        Find dependency for the given attribute and tag.
 
         Avoid conflicts by search in order:
             1. Non element/complexType
@@ -75,6 +75,7 @@ class AttributeTypeHandler(HandlerInterface):
             3. anything
         """
         conditions = (
+            lambda obj: obj.tag == tag,
             lambda obj: not obj.is_complex,
             lambda x: not x.abstract,
             lambda x: True,
@@ -115,7 +116,7 @@ class AttributeTypeHandler(HandlerInterface):
             3. Set circular flag for the rest non enumerations.
         """
 
-        source = self.find_dependency(attr_type)
+        source = self.find_dependency(attr_type, attr.tag)
         if not source or (not source.attrs and not source.extensions):
             logger.warning("Reset dummy type: %s", attr_type.name)
             use_str = not source or not source.is_complex

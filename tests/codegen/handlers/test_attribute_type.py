@@ -127,7 +127,7 @@ class AttributeTypeHandlerTests(FactoryTestCase):
     def test_process_dependency_type_with_dummy_type(
         self, mock_find_dependency, mock_reset_attribute_type
     ):
-        mock_find_dependency.return_value = ClassFactory.create(type=Element)
+        mock_find_dependency.return_value = ClassFactory.create(tag=Tag.ELEMENT)
         target = ClassFactory.create()
         attr = AttrFactory.create()
         attr_type = attr.types[0]
@@ -344,19 +344,25 @@ class AttributeTypeHandlerTests(FactoryTestCase):
     def test_find_dependency(self):
         attr_type = AttrTypeFactory.create(qname="a")
 
-        self.assertIsNone(self.processor.find_dependency(attr_type))
+        self.assertIsNone(self.processor.find_dependency(attr_type, Tag.ELEMENT))
 
-        abstract = ClassFactory.create(qname="a", type=ComplexType, abstract=True)
+        abstract = ClassFactory.create(qname="a", tag=Tag.COMPLEX_TYPE, abstract=True)
         self.processor.container.add(abstract)
-        self.assertEqual(abstract, self.processor.find_dependency(attr_type))
+        self.assertEqual(
+            abstract, self.processor.find_dependency(attr_type, Tag.ELEMENT)
+        )
 
-        element = ClassFactory.create(qname="a", type=Element)
+        element = ClassFactory.create(qname="a", tag=Tag.ELEMENT)
         self.processor.container.add(element)
-        self.assertEqual(element, self.processor.find_dependency(attr_type))
+        self.assertEqual(
+            element, self.processor.find_dependency(attr_type, Tag.SIMPLE_TYPE)
+        )
 
-        simple = ClassFactory.create(qname="a", type=SimpleType)
+        simple = ClassFactory.create(qname="a", tag=Tag.SIMPLE_TYPE)
         self.processor.container.add(simple)
-        self.assertEqual(simple, self.processor.find_dependency(attr_type))
+        self.assertEqual(
+            simple, self.processor.find_dependency(attr_type, Tag.SIMPLE_TYPE)
+        )
 
     @mock.patch.object(Class, "dependencies")
     def test_cached_dependencies(self, mock_class_dependencies):

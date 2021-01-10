@@ -12,8 +12,6 @@ from xsdata.logger import logger
 from xsdata.models.enums import DataType
 from xsdata.models.enums import NamespaceType
 from xsdata.models.enums import Tag
-from xsdata.models.xsd import ComplexType
-from xsdata.models.xsd import SimpleType
 
 
 @dataclass
@@ -112,7 +110,10 @@ class ClassExtensionHandler(HandlerInterface):
         Search priority: xs:SimpleType >  xs:ComplexType
         """
 
-        conditions = (lambda x: x.type is SimpleType, lambda x: x.type is ComplexType)
+        conditions = (
+            lambda x: x.tag == Tag.SIMPLE_TYPE,
+            lambda x: x.tag == Tag.COMPLEX_TYPE,
+        )
 
         for condition in conditions:
             result = self.container.find(attr_type.qname, condition=condition)

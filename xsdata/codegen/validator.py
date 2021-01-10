@@ -60,7 +60,7 @@ class ClassValidator:
         """Handle classes with same namespace, name that are derived from the
         same xs type."""
 
-        grouped = group_by(classes, lambda x: f"{x.type.__name__}{x.qname}")
+        grouped = group_by(classes, lambda x: f"{x.tag}{x.qname}")
         for items in grouped.values():
             if len(items) == 1:
                 continue

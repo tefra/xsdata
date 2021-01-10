@@ -6,8 +6,7 @@ from xsdata.codegen.models import Attr
 from xsdata.codegen.models import Class
 from xsdata.codegen.utils import ClassUtils
 from xsdata.exceptions import AnalyzerValueError
-from xsdata.models.xsd import AttributeGroup
-from xsdata.models.xsd import Group
+from xsdata.models.enums import Tag
 
 
 @dataclass
@@ -42,7 +41,7 @@ class AttributeGroupHandler(HandlerInterface):
         """
         qname = attr.types[0].qname  # group attributes have one type only.
         source = self.container.find(
-            qname, condition=lambda x: x.type in (AttributeGroup, Group)
+            qname, condition=lambda x: x.tag in (Tag.ATTRIBUTE_GROUP, Tag.GROUP)
         )
 
         if not source:

@@ -15,12 +15,6 @@ from xsdata.models.enums import DataType
 from xsdata.models.enums import Namespace
 from xsdata.models.enums import QNames
 from xsdata.models.enums import Tag
-from xsdata.models.wsdl import BindingOperation
-from xsdata.models.xsd import Attribute
-from xsdata.models.xsd import ComplexType
-from xsdata.models.xsd import Element
-from xsdata.models.xsd import Restriction
-from xsdata.models.xsd import SimpleType
 from xsdata.utils.namespaces import build_qname
 
 DEFAULT_NS_MAP = {
@@ -65,7 +59,7 @@ class Factory(ABC):
 
 class ClassFactory(Factory):
     model = Class
-    types = [Element, Attribute, ComplexType, SimpleType]
+    tags = [Tag.ELEMENT, Tag.ATTRIBUTE, Tag.COMPLEX_TYPE, Tag.SIMPLE_TYPE]
     counter = 65
 
     @classmethod
@@ -74,7 +68,7 @@ class ClassFactory(Factory):
         qname=None,
         meta_name=None,
         namespace=None,
-        type=None,
+        tag=None,
         abstract=False,
         mixed=False,
         nillable=False,
@@ -103,7 +97,7 @@ class ClassFactory(Factory):
             mixed=mixed,
             nillable=nillable,
             strict_type=strict_type,
-            type=type or random.choice(cls.types),
+            tag=tag or random.choice(cls.tags),
             extensions=extensions or [],
             substitutions=substitutions or [],
             attrs=attrs or [],
@@ -121,7 +115,7 @@ class ClassFactory(Factory):
     @classmethod
     def simple_type(cls, **kwargs) -> Class:
         return ClassFactory.create(
-            type=SimpleType,
+            tag=Tag.SIMPLE_TYPE,
             attrs=AttrFactory.list(1, tag=Tag.EXTENSION),
             **kwargs,
         )
@@ -129,7 +123,7 @@ class ClassFactory(Factory):
     @classmethod
     def enumeration(cls, attributes: int, **kwargs) -> Class:
         return ClassFactory.create(
-            type=SimpleType,
+            tag=Tag.SIMPLE_TYPE,
             attrs=AttrFactory.list(attributes, tag=Tag.ENUMERATION),
             **kwargs,
         )
@@ -137,7 +131,7 @@ class ClassFactory(Factory):
     @classmethod
     def elements(cls, attributes: int, **kwargs) -> Class:
         return ClassFactory.create(
-            type=ComplexType,
+            tag=Tag.COMPLEX_TYPE,
             attrs=AttrFactory.list(attributes, tag=Tag.ELEMENT),
             **kwargs,
         )
@@ -145,7 +139,8 @@ class ClassFactory(Factory):
     @classmethod
     def service(cls, attributes: int, **kwargs) -> Class:
         return ClassFactory.create(
-            type=BindingOperation, attrs=AttrFactory.list(attributes, tag=Tag.ELEMENT)
+            tag=Tag.BINDING_OPERATION,
+            attrs=AttrFactory.list(attributes, tag=Tag.ELEMENT),
         )
 
 
@@ -192,7 +187,7 @@ class AttrTypeFactory(Factory):
 
 class AttrFactory(Factory):
     model: Type = Attr
-    types = [Attribute, Element, Restriction]
+    tags = [Tag.ATTRIBUTE, Tag.ELEMENT, Tag.RESTRICTION]
     counter = 65
 
     @classmethod
@@ -216,7 +211,7 @@ class AttrFactory(Factory):
             index=cls.counter if index is None else index,
             types=types or [AttrTypeFactory.native(DataType.STRING)],
             choices=choices or [],
-            tag=tag or random.choice(cls.types).__name__,
+            tag=tag or random.choice(cls.tags),
             namespace=namespace or None,
             help=help or None,
             default=default or None,

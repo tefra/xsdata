@@ -346,7 +346,7 @@ class UnionNode(XmlNode):
                 warnings.filterwarnings("error", category=ConverterWarning)
                 parser = NodeParser(context=self.context)
                 return parser.parse(self.events, clazz)
-        except (Exception, ConverterWarning):
+        except Exception:
             return None
 
 

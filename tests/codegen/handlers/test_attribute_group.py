@@ -9,9 +9,7 @@ from xsdata.codegen.models import Attr
 from xsdata.codegen.models import Status
 from xsdata.codegen.utils import ClassUtils
 from xsdata.exceptions import AnalyzerValueError
-from xsdata.models.xsd import AttributeGroup
-from xsdata.models.xsd import ComplexType
-from xsdata.models.xsd import Group
+from xsdata.models.enums import Tag
 
 
 class AttributeGroupHandlerTests(FactoryTestCase):
@@ -47,8 +45,8 @@ class AttributeGroupHandlerTests(FactoryTestCase):
 
     @mock.patch.object(ClassUtils, "copy_group_attributes")
     def test_process_attribute_with_group(self, mock_copy_group_attributes):
-        complex_bar = ClassFactory.create(qname="bar", type=ComplexType)
-        group_bar = ClassFactory.create(qname="bar", type=Group)
+        complex_bar = ClassFactory.create(qname="bar", tag=Tag.COMPLEX_TYPE)
+        group_bar = ClassFactory.create(qname="bar", tag=Tag.GROUP)
         group_attr = AttrFactory.attribute_group(name="bar")
         target = ClassFactory.create()
         target.attrs.append(group_attr)
@@ -64,8 +62,8 @@ class AttributeGroupHandlerTests(FactoryTestCase):
 
     @mock.patch.object(ClassUtils, "copy_group_attributes")
     def test_process_attribute_with_attribute_group(self, mock_copy_group_attributes):
-        complex_bar = ClassFactory.create(qname="bar", type=ComplexType)
-        group_bar = ClassFactory.create(qname="bar", type=AttributeGroup)
+        complex_bar = ClassFactory.create(qname="bar", tag=Tag.COMPLEX_TYPE)
+        group_bar = ClassFactory.create(qname="bar", tag=Tag.ATTRIBUTE_GROUP)
         group_attr = AttrFactory.attribute_group(name="bar")
         target = ClassFactory.create()
         target.attrs.append(group_attr)
@@ -81,7 +79,7 @@ class AttributeGroupHandlerTests(FactoryTestCase):
 
     def test_process_attribute_with_circular_reference(self):
         group_attr = AttrFactory.attribute_group(name="bar")
-        target = ClassFactory.create(qname="bar", type=Group)
+        target = ClassFactory.create(qname="bar", tag=Tag.GROUP)
         target.attrs.append(group_attr)
 
         target.status = Status.PROCESSING

@@ -17,11 +17,6 @@ from xsdata.models.enums import DataType
 from xsdata.models.enums import QNames
 from xsdata.models.enums import Tag
 from xsdata.models.mixins import ElementBase
-from xsdata.models.wsdl import BindingMessage
-from xsdata.models.wsdl import BindingOperation
-from xsdata.models.wsdl import Message
-from xsdata.models.xsd import ComplexType
-from xsdata.models.xsd import Element
 from xsdata.utils.namespaces import build_qname
 from xsdata.utils.namespaces import split_qname
 
@@ -371,7 +366,7 @@ class Class:
     additional metadata settings.
 
     :param qname:
-    :param type:
+    :param tag:
     :param module:
     :param mixed:
     :param abstract:
@@ -393,7 +388,7 @@ class Class:
     """
 
     qname: str
-    type: Type
+    tag: str
     module: str
     mixed: bool = field(default=False)
     abstract: bool = field(default=False)
@@ -436,13 +431,13 @@ class Class:
     def is_complex(self) -> bool:
         """Return whether this instance is derived from an xs:element or
         xs:complexType."""
-        return self.type in (Element, ComplexType)
+        return self.tag in (Tag.ELEMENT, Tag.COMPLEX_TYPE)
 
     @property
     def is_element(self) -> bool:
         """Return whether this instance is derived from an non abstract
         xs:element."""
-        return self.type is Element
+        return self.tag == Tag.ELEMENT
 
     @property
     def is_enumeration(self) -> bool:
@@ -457,7 +452,7 @@ class Class:
     @property
     def is_service(self) -> bool:
         """Return whether this instance is derived from wsdl:operation."""
-        return self.type is BindingOperation
+        return self.tag == Tag.BINDING_OPERATION
 
     @property
     def is_simple_type(self) -> bool:
@@ -471,8 +466,9 @@ class Class:
             return False
 
         return (
-            self.type in (Element, BindingOperation, BindingMessage, Message)
-            or self.type is ComplexType
+            self.tag
+            in (Tag.ELEMENT, Tag.BINDING_OPERATION, Tag.BINDING_MESSAGE, Tag.MESSAGE)
+            or self.tag == Tag.COMPLEX_TYPE
             and not self.is_simple_type
             or self.is_enumeration
         )

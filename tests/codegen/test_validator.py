@@ -10,11 +10,6 @@ from xsdata.codegen.utils import ClassUtils
 from xsdata.codegen.validator import ClassValidator
 from xsdata.models.enums import DataType
 from xsdata.models.enums import Tag
-from xsdata.models.xsd import Attribute
-from xsdata.models.xsd import AttributeGroup
-from xsdata.models.xsd import ComplexType
-from xsdata.models.xsd import Element
-from xsdata.models.xsd import SimpleType
 
 
 class ClassValidatorTests(FactoryTestCase):
@@ -104,9 +99,9 @@ class ClassValidatorTests(FactoryTestCase):
         )
 
     def test_mark_strict_types(self):
-        one = ClassFactory.create(qname="foo", type=Element)
-        two = ClassFactory.create(qname="foo", type=ComplexType)
-        three = ClassFactory.create(qname="foo", type=SimpleType)
+        one = ClassFactory.create(qname="foo", tag=Tag.ELEMENT)
+        two = ClassFactory.create(qname="foo", tag=Tag.COMPLEX_TYPE)
+        three = ClassFactory.create(qname="foo", tag=Tag.SIMPLE_TYPE)
 
         self.validator.mark_strict_types([one, two, three])
 
@@ -114,8 +109,8 @@ class ClassValidatorTests(FactoryTestCase):
         self.assertTrue(two.strict_type)  # Marked as abstract
         self.assertFalse(three.strict_type)  # Is common
 
-        four = ClassFactory.create(qname="bar", type=Attribute)
-        five = ClassFactory.create(qname="bar", type=AttributeGroup)
+        four = ClassFactory.create(qname="bar", tag=Tag.ATTRIBUTE)
+        five = ClassFactory.create(qname="bar", tag=Tag.ATTRIBUTE_GROUP)
         self.validator.mark_strict_types([four, five])
         self.assertFalse(four.strict_type)  # No element in group
         self.assertFalse(five.strict_type)  # No element in group

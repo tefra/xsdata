@@ -172,3 +172,12 @@ class ClassUtilsTests(FactoryTestCase):
         ClassUtils.copy_inner_class(source, target, attr, attr_type)
         self.assertTrue(attr_type.circular)
         self.assertEqual(0, len(target.inner))
+
+    def test_copy_inner_class_raise_exception_on_missing_inner(self):
+        source = ClassFactory.create()
+        target = ClassFactory.create()
+        attr = AttrFactory.create()
+        attr_type = AttrTypeFactory.create(forward=True, qname=target.qname)
+
+        with self.assertRaises(StopIteration):
+            ClassUtils.copy_inner_class(source, target, attr, attr_type)

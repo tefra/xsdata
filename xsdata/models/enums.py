@@ -241,6 +241,11 @@ class Tag:
     TOTAL_DIGITS = "TotalDigits"
     WHITE_SPACE = "WhiteSpace"
 
+    # Wsdl
+    BINDING_OPERATION = "BindingOperation"
+    BINDING_MESSAGE = "BindingMessage"
+    MESSAGE = "Message"
+
 
 class UseType(Enum):
     """Attribute use types."""

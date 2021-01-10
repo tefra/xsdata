@@ -12,6 +12,7 @@ from typing import List
 from typing import Optional
 from typing import Type
 
+from xsdata.exceptions import ConverterWarning
 from xsdata.exceptions import ParserError
 from xsdata.formats.bindings import AbstractParser
 from xsdata.formats.bindings import T
@@ -93,6 +94,16 @@ class JsonParser(AbstractParser):
 
         return clazz(**params)  # type: ignore
 
+    def maybe_bind_dataclass(self, data: Dict, clazz: Type[T]) -> Optional[T]:
+        """Recursively build the given model from the input dict data but fail
+        on any converter warnings."""
+        try:
+            with warnings.catch_warnings():
+                warnings.filterwarnings("error", category=ConverterWarning)
+                return self.bind_dataclass(data, clazz)
+        except ConverterWarning:
+            return None
+
     def bind_dataclass_union(self, value: Dict, var: XmlVar) -> Any:
         """Bind data to all possible models and return the best candidate."""
         obj = None
@@ -101,7 +112,7 @@ class JsonParser(AbstractParser):
             if not is_dataclass(clazz):
                 continue
 
-            candidate = self.bind_dataclass(value, clazz)
+            candidate = self.maybe_bind_dataclass(value, clazz)
             score = ParserUtils.score_object(candidate)
             if score > max_score:
                 max_score = score

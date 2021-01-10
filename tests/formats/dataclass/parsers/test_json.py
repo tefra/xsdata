@@ -80,7 +80,8 @@ class JsonParserTests(TestCase):
     def test_bind_dataclass_union(self):
         a = make_dataclass("a", [("x", int), ("y", str)])
         b = make_dataclass("b", [("x", int), ("y", str), ("z", float)])
-        c = make_dataclass("c", [("x", int)])
+        c = make_dataclass("c", [("x", int), ("y", str), ("z", str)])
+        d = make_dataclass("d", [("x", int)])
         var = XmlVar(
             element=True,
             name="union",
@@ -89,10 +90,10 @@ class JsonParserTests(TestCase):
             dataclass=True,
         )
 
-        data = {"x": 1, "y": "foo", "z": 1.0}
+        data = {"x": 1, "y": "foo", "z": "foo"}
         actual = self.parser.bind_value(var, data)
 
-        self.assertIsInstance(actual, b)
+        self.assertIsInstance(actual, c)
 
     def test_bind_type_union(self):
         a = make_dataclass("a", [("x", int), ("y", str)])

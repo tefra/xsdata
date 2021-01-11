@@ -487,8 +487,8 @@ class Filters:
     def default_imports(cls, output: str) -> str:
         """Generate the default imports for the given package output."""
 
-        def type_patterns(name: str) -> Tuple:
-            return f": {name}", f"[{name}", f", {name}", f"= {name}"
+        def type_patterns(x: str) -> Tuple:
+            return f": {x} =", f"[{x}]", f"[{x},", f" {x},", f" {x}]", f"= {x}("
 
         patterns: Dict[str, Dict] = {
             "dataclasses": {"dataclass": ["@dataclass"], "field": [" = field("]},

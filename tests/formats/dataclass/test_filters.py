@@ -445,8 +445,10 @@ class FiltersTests(FactoryTestCase):
 
         self.assertIn(expected, self.filters.default_imports("Optional[Decimal]"))
         self.assertIn(expected, self.filters.default_imports("Union[str, Decimal]"))
-        self.assertIn(expected, self.filters.default_imports("number: Decimal"))
-        self.assertIn(expected, self.filters.default_imports(" = Decimal"))
+        self.assertIn(expected, self.filters.default_imports("Union[Decimal, "))
+        self.assertIn(expected, self.filters.default_imports("Union[str, Decimal, int"))
+        self.assertIn(expected, self.filters.default_imports("number: Decimal = "))
+        self.assertIn(expected, self.filters.default_imports(" = Decimal("))
         self.assertNotIn(expected, self.filters.default_imports("class fooDecimal"))
 
     def test_default_imports_with_qname(self):
@@ -454,8 +456,10 @@ class FiltersTests(FactoryTestCase):
 
         self.assertIn(expected, self.filters.default_imports("Optional[QName]"))
         self.assertIn(expected, self.filters.default_imports("Union[str, QName]"))
-        self.assertIn(expected, self.filters.default_imports("qname: QName"))
-        self.assertIn(expected, self.filters.default_imports(" = QName"))
+        self.assertIn(expected, self.filters.default_imports("Union[QName, "))
+        self.assertIn(expected, self.filters.default_imports("Union[str, QName, int"))
+        self.assertIn(expected, self.filters.default_imports("number: QName = "))
+        self.assertIn(expected, self.filters.default_imports(" = QName("))
         self.assertNotIn(expected, self.filters.default_imports("class fooQName"))
 
     def test_default_imports_with_enum(self):
@@ -479,9 +483,15 @@ class FiltersTests(FactoryTestCase):
         self.assertIn(expected, self.filters.default_imports(output))
 
     def test_default_imports_with_builtin_datatype(self):
-        output = "field: Optional[XmlDuration] = "
-        expected = "from xsdata.models.datatype import XmlDuration"
-        self.assertIn(expected, self.filters.default_imports(output))
+        expected = "from xsdata.models.datatype import XmlDateTime"
+
+        self.assertIn(expected, self.filters.default_imports("Optional[XmlDateTime]"))
+        self.assertIn(expected, self.filters.default_imports("Union[str, XmlDateTime]"))
+        self.assertIn(expected, self.filters.default_imports("Union[XmlDateTime, "))
+        self.assertIn(expected, self.filters.default_imports("Union[a, XmlDateTime, a"))
+        self.assertIn(expected, self.filters.default_imports("number: XmlDateTime = "))
+        self.assertIn(expected, self.filters.default_imports(" = XmlDateTime("))
+        self.assertNotIn(expected, self.filters.default_imports("class fooXmlDateTime"))
 
     def test_default_imports_with_typing(self):
         output = ": Dict["

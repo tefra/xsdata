@@ -1,6 +1,5 @@
 from collections import UserDict
 from operator import attrgetter
-from operator import methodcaller
 from typing import Callable
 from typing import Dict
 from typing import Iterator
@@ -22,8 +21,6 @@ from xsdata.codegen.models import Status
 from xsdata.utils import collections
 from xsdata.utils.collections import group_by
 from xsdata.utils.constants import return_true
-
-methodcaller("source_qname")
 
 
 class ClassContainer(UserDict, ContainerInterface):

@@ -13,8 +13,6 @@ from xsdata.models.config import GeneratorConfig
 from xsdata.models.enums import DataType
 from xsdata.models.enums import Namespace
 from xsdata.models.enums import Tag
-from xsdata.models.xsd import ComplexType
-from xsdata.models.xsd import Element
 
 
 class ClassSanitizerTest(FactoryTestCase):
@@ -129,11 +127,8 @@ class ClassSanitizerTest(FactoryTestCase):
         self.assertEqual(2, attr.default)
 
     @mock.patch("xsdata.codegen.sanitizer.logger.warning")
-    @mock.patch.object(ClassSanitizer, "promote_inner_class")
     @mock.patch.object(ClassSanitizer, "find_enum")
-    def test_process_attribute_default_enum(
-        self, mock_find_enum, mock_promote_inner_class, mock_logger_warning
-    ):
+    def test_process_attribute_default_enum(self, mock_find_enum, mock_logger_warning):
         enum_one = ClassFactory.enumeration(1, qname="{a}root")
         enum_one.attrs[0].default = "1"
         enum_one.attrs[0].name = "one"
@@ -177,7 +172,6 @@ class ClassSanitizerTest(FactoryTestCase):
             actual.append(attr.default)
 
         self.assertEqual(["@enum@{a}root::one", "@enum@inner::two", None], actual)
-        mock_promote_inner_class.assert_called_once_with(target, enum_two)
         mock_logger_warning.assert_called_once_with(
             "No enumeration member matched %s.%s default value `%s`",
             target.name,
@@ -185,35 +179,10 @@ class ClassSanitizerTest(FactoryTestCase):
             "3",
         )
 
-    def test_promote_inner_class(self):
-        target = ClassFactory.elements(2, qname="parent")
-        inner = ClassFactory.create(qname="{foo}bar")
-
-        target.inner.append(inner)
-        target.attrs[1].types.append(AttrTypeFactory.create(forward=True, qname="bar"))
-
-        clone_target = target.clone()
-
-        self.container.add(target)
-        self.sanitizer.promote_inner_class(target, inner)
-
-        self.assertNotIn(inner, target.inner)
-
-        self.assertEqual("{foo}parent_bar", target.attrs[1].types[1].qname)
-        self.assertFalse(target.attrs[1].types[1].forward)
-        self.assertEqual("{foo}parent_bar", inner.qname)
-        self.assertEqual(2, len(self.container.data))
-        self.assertIn(inner, self.container["{foo}parent_bar"])
-
-        self.assertEqual(clone_target.attrs[0], target.attrs[0])
-        self.assertEqual(clone_target.attrs[1].types[0], target.attrs[1].types[0])
-
     def test_find_enum(self):
         native_type = AttrTypeFactory.create()
         matching_external = AttrTypeFactory.create("foo")
         missing_external = AttrTypeFactory.create("bar")
-        matching_inner = AttrTypeFactory.create("foobar", forward=True)
-        missing_inner = AttrTypeFactory.create("barfoo", forward=True)
         enumeration = ClassFactory.enumeration(1, qname="foo")
         inner = ClassFactory.enumeration(1, qname="foobar")
 
@@ -224,8 +193,6 @@ class ClassSanitizerTest(FactoryTestCase):
                         native_type,
                         matching_external,
                         missing_external,
-                        matching_inner,
-                        missing_inner,
                     ]
                 )
             ],
@@ -233,19 +200,13 @@ class ClassSanitizerTest(FactoryTestCase):
         )
         self.sanitizer.container.extend([target, enumeration])
 
-        actual = self.sanitizer.find_enum(target, native_type)
+        actual = self.sanitizer.find_enum(native_type)
         self.assertIsNone(actual)
 
-        actual = self.sanitizer.find_enum(target, matching_external)
+        actual = self.sanitizer.find_enum(matching_external)
         self.assertEqual(enumeration, actual)
 
-        actual = self.sanitizer.find_enum(target, missing_external)
-        self.assertIsNone(actual)
-
-        actual = self.sanitizer.find_enum(target, matching_inner)
-        self.assertEqual(inner, actual)
-
-        actual = self.sanitizer.find_enum(target, missing_inner)
+        actual = self.sanitizer.find_enum(missing_external)
         self.assertIsNone(actual)
 
     def test_process_attribute_restrictions(self):

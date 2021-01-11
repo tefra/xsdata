@@ -39,12 +39,8 @@ class AttributeTypeHandler(HandlerInterface):
             attr.types = self.filter_types(attr.types)
 
     def process_type(self, target: Class, attr: Attr, attr_type: AttrType):
-        """
-        Process attribute type, split process for xml schema and user defined
-        types.
-
-        Ignore forward references to inner classes.
-        """
+        """Process attribute type, split process for xml schema and user
+        defined types."""
         if attr_type.native:
             self.process_native_type(attr, attr_type)
         elif attr_type.forward:
@@ -92,14 +88,13 @@ class AttributeTypeHandler(HandlerInterface):
         """
         Process an attributes type that depends on an inner type.
 
-        If there is a matching simple type inner class copy the inner
-        type attribute properties.
+        Ignore inner circular references.
         """
-        inner = self.container.find_inner(target, attr_type.name)
 
-        if not inner:
+        if attr_type.circular:
             return
 
+        inner = self.container.find_inner(target, attr_type.qname)
         if inner.is_simple_type:
             self.copy_attribute_properties(inner, target, attr, attr_type)
             target.inner.remove(inner)

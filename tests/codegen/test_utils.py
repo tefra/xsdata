@@ -8,6 +8,7 @@ from tests.factories import ExtensionFactory
 from tests.factories import FactoryTestCase
 from xsdata.codegen.models import Restrictions
 from xsdata.codegen.utils import ClassUtils
+from xsdata.exceptions import CodeGenerationError
 from xsdata.models.enums import DataType
 
 
@@ -173,11 +174,26 @@ class ClassUtilsTests(FactoryTestCase):
         self.assertTrue(attr_type.circular)
         self.assertEqual(0, len(target.inner))
 
-    def test_copy_inner_class_raise_exception_on_missing_inner(self):
+    def test_copy_inner_class_with_missing_inner(self):
         source = ClassFactory.create()
         target = ClassFactory.create()
         attr = AttrFactory.create()
         attr_type = AttrTypeFactory.create(forward=True, qname=target.qname)
 
-        with self.assertRaises(StopIteration):
+        with self.assertRaises(CodeGenerationError):
             ClassUtils.copy_inner_class(source, target, attr, attr_type)
+
+    def test_find_inner(self):
+        obj = ClassFactory.create(qname="{a}parent")
+        first = ClassFactory.create(qname="{a}a")
+        second = ClassFactory.create(qname="{c}c")
+        third = ClassFactory.enumeration(2, qname="{d}d")
+        obj.inner.extend((first, second, third))
+
+        with self.assertRaises(CodeGenerationError) as cm:
+            self.assertIsNone(ClassUtils.find_inner(obj, "nope"))
+
+        self.assertEqual("Missing inner class {a}parent.nope", str(cm.exception))
+        self.assertEqual(first, ClassUtils.find_inner(obj, "{a}a"))
+        self.assertEqual(second, ClassUtils.find_inner(obj, "{c}c"))
+        self.assertEqual(third, ClassUtils.find_inner(obj, "{d}d"))

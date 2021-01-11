@@ -87,7 +87,7 @@ class AttributeTypeHandlerTests(FactoryTestCase):
         mock_process_dependency_type.assert_called_once_with(target, attr, attr_type)
 
     @mock.patch.object(AttributeTypeHandler, "process_inner_type")
-    def test_process_type_with_inner_type(self, mock_process_inner_type):
+    def test_process_type_with_forward_reference(self, mock_process_inner_type):
         attr = AttrFactory.create()
         target = ClassFactory.create()
         attr_type = AttrTypeFactory.create(forward=True)
@@ -187,7 +187,7 @@ class AttributeTypeHandlerTests(FactoryTestCase):
     def test_process_inner_type_with_simple_type(
         self, mock_copy_attribute_properties, mock_update_restrictions
     ):
-        attr = AttrFactory.create(types=[AttrTypeFactory.create(qname="{foo}a")])
+        attr = AttrFactory.create(types=[AttrTypeFactory.create(qname="{bar}a")])
         inner = ClassFactory.simple_type(qname="{bar}a", status=Status.PROCESSED)
         target = ClassFactory.create(inner=[inner])
 
@@ -204,7 +204,7 @@ class AttributeTypeHandlerTests(FactoryTestCase):
     def test_process_inner_type_with_enumeration_type(
         self, mock_copy_attribute_properties, mock_update_restrictions
     ):
-        attr = AttrFactory.create(types=[AttrTypeFactory.create(qname="{foo}a")])
+        attr = AttrFactory.create(types=[AttrTypeFactory.create(qname="{bar}a")])
         inner = ClassFactory.enumeration(2, qname="{bar}a", status=Status.PROCESSED)
         target = ClassFactory.create(inner=[inner])
 
@@ -218,12 +218,12 @@ class AttributeTypeHandlerTests(FactoryTestCase):
 
     @mock.patch.object(AttributeTypeHandler, "update_restrictions")
     @mock.patch.object(AttributeTypeHandler, "copy_attribute_properties")
-    def test_process_inner_type_with_absent_type(
+    def test_process_inner_type_with_complex_type(
         self, mock_copy_attribute_properties, mock_update_restrictions
     ):
         target = ClassFactory.create()
-        inner = ClassFactory.simple_type(qname="b", status=Status.PROCESSED)
-        attr = AttrFactory.create(types=[AttrTypeFactory.create(qname="{foo}a")])
+        inner = ClassFactory.elements(2, qname="a", status=Status.PROCESSED)
+        attr = AttrFactory.create(types=[AttrTypeFactory.create(qname="a")])
 
         target.inner.append(inner)
         self.processor.process_inner_type(target, attr, attr.types[0])
@@ -233,16 +233,14 @@ class AttributeTypeHandlerTests(FactoryTestCase):
 
     @mock.patch.object(AttributeTypeHandler, "update_restrictions")
     @mock.patch.object(AttributeTypeHandler, "copy_attribute_properties")
-    def test_process_inner_type_with_complex_type(
+    def test_process_inner_type_with_circular_reference(
         self, mock_copy_attribute_properties, mock_update_restrictions
     ):
         target = ClassFactory.create()
-        inner = ClassFactory.elements(2, qname="a", status=Status.PROCESSED)
-        attr = AttrFactory.create(types=[AttrTypeFactory.create(qname="{foo}a")])
+        attr = AttrFactory.create()
+        attr_type = AttrTypeFactory.create(circular=True)
 
-        target.inner.append(inner)
-        self.processor.process_inner_type(target, attr, attr.types[0])
-        self.assertIn(inner, target.inner)
+        self.processor.process_inner_type(target, attr, attr_type)
         self.assertEqual(0, mock_copy_attribute_properties.call_count)
         self.assertEqual(0, mock_update_restrictions.call_count)
 

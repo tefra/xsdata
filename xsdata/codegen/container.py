@@ -18,6 +18,7 @@ from xsdata.codegen.mixins import ContainerInterface
 from xsdata.codegen.mixins import HandlerInterface
 from xsdata.codegen.models import Class
 from xsdata.codegen.models import Status
+from xsdata.codegen.utils import ClassUtils
 from xsdata.utils import collections
 from xsdata.utils.collections import group_by
 from xsdata.utils.constants import return_true
@@ -69,17 +70,12 @@ class ClassContainer(UserDict, ContainerInterface):
                 return row
         return None
 
-    def find_inner(
-        self, source: Class, name: str, condition: Callable = return_true
-    ) -> Optional[Class]:
-        for inner in source.inner:
-            if inner.status == Status.RAW:
-                self.process_class(inner)
+    def find_inner(self, source: Class, qname: str) -> Class:
+        inner = ClassUtils.find_inner(source, qname)
+        if inner.status == Status.RAW:
+            self.process_class(inner)
 
-            if inner.name == name and condition(inner):
-                return inner
-
-        return None
+        return inner
 
     def process(self):
         """Run the process handlers for ever non processed class."""
@@ -94,6 +90,8 @@ class ClassContainer(UserDict, ContainerInterface):
         for processor in self.processors:
             processor.process(target)
 
+        # We go top to bottom because it's easier to handle circular
+        # references.
         for inner in target.inner:
             if inner.status == Status.RAW:
                 self.process_class(inner)

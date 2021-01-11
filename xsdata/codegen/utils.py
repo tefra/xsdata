@@ -5,6 +5,7 @@ from xsdata.codegen.models import AttrType
 from xsdata.codegen.models import Class
 from xsdata.codegen.models import Extension
 from xsdata.codegen.models import Restrictions
+from xsdata.exceptions import CodeGenerationError
 from xsdata.utils.namespaces import build_qname
 from xsdata.utils.namespaces import split_qname
 
@@ -94,8 +95,8 @@ class ClassUtils:
         if not attr_type.forward:
             return
 
-        # This will exit if no inner class is found, too strict???
-        inner = next(inner for inner in source.inner if inner.name == attr_type.name)
+        # This will fail if no inner class is found, too strict???
+        inner = ClassUtils.find_inner(source, attr_type.qname)
 
         if inner is target:
             attr_type.circular = True
@@ -110,3 +111,11 @@ class ClassUtils:
                 clone.qname = attr_type.qname = build_qname(namespace, attr.name)
 
             target.inner.append(clone)
+
+    @classmethod
+    def find_inner(cls, source: Class, qname: str) -> Class:
+        for inner in source.inner:
+            if inner.qname == qname:
+                return inner
+
+        raise CodeGenerationError(f"Missing inner class {source.qname}.{qname}")

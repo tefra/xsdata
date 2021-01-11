@@ -138,7 +138,7 @@ class ClassSanitizer:
 
         source_found = False
         for attr_type in attr.types:
-            source = self.find_enum(target, attr_type)
+            source = self.find_enum(attr_type)
             if not source:
                 continue
 
@@ -146,9 +146,6 @@ class ClassSanitizer:
             source_attr = first(x for x in source.attrs if x.default == attr.default)
 
             if source_attr:
-                if attr_type.forward:
-                    self.promote_inner_class(target, source)
-
                 attr.default = f"@enum@{source.qname}::{source_attr.name}"
                 return
 
@@ -160,30 +157,6 @@ class ClassSanitizer:
                 attr.default,
             )
             attr.default = None
-
-    def promote_inner_class(self, parent: Class, inner: Class):
-        """
-        Convert inner class to root class.
-
-        Steps:
-            1. Remove inner class from parent
-            2. Prepend parent name to inner class name.
-            3. Search and replace all matching attribute types.
-            4. Add inner class to the global class index.
-        """
-        name = f"{parent.name}_{inner.name}"
-        qname = build_qname(inner.target_namespace, name)
-        parent.inner.remove(inner)
-
-        for attr in parent.attrs:
-            for attr_type in attr.types:
-                if attr_type.name == inner.name:
-                    attr_type.forward = False
-                    attr_type.qname = qname
-
-        inner.qname = qname
-
-        self.container.add(inner)
 
     def resolve_conflicts(self):
         """Find classes with the same case insensitive qualified name and
@@ -257,25 +230,14 @@ class ClassSanitizer:
         for choice in attr.choices:
             self.rename_attr_dependencies(choice, search, replace)
 
-    def find_enum(self, source: Class, attr_type: AttrType) -> Optional[Class]:
-        """
-        Find the enumeration source class for the given class and attribute
-        type.
-
-        Search in root classes an inner class and exclude native types.
-        """
+    def find_enum(self, attr_type: AttrType) -> Optional[Class]:
+        """Find an enumeration class byte the attribute type."""
         if attr_type.native:
             return None
 
-        if attr_type.forward:
-            for inner in source.inner:
-                if inner.name == attr_type.name and inner.is_enumeration:
-                    return inner
-
-            return None
-
-        qname = attr_type.qname
-        return self.container.find(qname, condition=lambda x: x.is_enumeration)
+        return self.container.find(
+            attr_type.qname, condition=lambda x: x.is_enumeration
+        )
 
     @classmethod
     def process_attribute_restrictions(cls, attr: Attr):

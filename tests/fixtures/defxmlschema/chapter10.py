@@ -8,6 +8,12 @@ class ApplicableSizesType(Enum):
     VALUE_2_4_6_8_10_12_14_16_18 = "2 4 6 8 10 12 14 16 18"
 
 
+class SizeTypeValue(Enum):
+    SMALL = "small"
+    MEDIUM = "medium"
+    LARGE = "large"
+
+
 class SmallSizeType(Enum):
     VALUE_2 = "2"
     VALUE_4 = "4"
@@ -17,7 +23,7 @@ class SmallSizeType(Enum):
 
 @dataclass
 class SizesType:
-    size: List[Union[int, "SizesType.Size"]] = field(
+    size: List[Union[int, SizeTypeValue]] = field(
         default_factory=list,
         metadata={
             "type": "Element",
@@ -34,7 +40,7 @@ class SizesType:
             "namespace": "",
         }
     )
-    international_size: List[Union[int, "SizesType.InternationalSize"]] = field(
+    international_size: List[Union[int, SizeTypeValue]] = field(
         default_factory=list,
         metadata={
             "name": "internationalSize",
@@ -44,7 +50,7 @@ class SizesType:
             "max_inclusive": 54,
         }
     )
-    available_sizes: List[List[Union[int, "SizesType.AvailableSizes"]]] = field(
+    available_sizes: List[List[Union[int, SizeTypeValue]]] = field(
         default_factory=list,
         metadata={
             "name": "availableSizes",
@@ -63,21 +69,6 @@ class SizesType:
             "namespace": "",
         }
     )
-
-    class Size(Enum):
-        SMALL = "small"
-        MEDIUM = "medium"
-        LARGE = "large"
-
-    class InternationalSize(Enum):
-        SMALL = "small"
-        MEDIUM = "medium"
-        LARGE = "large"
-
-    class AvailableSizes(Enum):
-        SMALL = "small"
-        MEDIUM = "medium"
-        LARGE = "large"
 
 
 @dataclass

@@ -341,9 +341,7 @@ class SchemaMapperTests(FactoryTestCase):
         expected = [
             AttrTypeFactory.native(DataType.INTEGER),
             AttrTypeFactory.native(DataType.STRING),
-            AttrTypeFactory.create(
-                qname=build_qname(item.target_namespace, "foo"), forward=True
-            ),
+            AttrTypeFactory.create(qname=inner_class.qname, forward=True),
         ]
 
         self.assertEqual(expected, actual)

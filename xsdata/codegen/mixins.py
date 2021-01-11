@@ -22,11 +22,8 @@ class ContainerInterface(metaclass=abc.ABCMeta):
         condition callable."""
 
     @abc.abstractmethod
-    def find_inner(
-        self, source: Class, name: str, condition: Callable = return_true
-    ) -> Optional[Class]:
-        """Search by name for a specific inner class with an optional condition
-        callable."""
+    def find_inner(self, source: Class, qname: str) -> Class:
+        """Search by qualified name for a specific inner class or fail."""
 
     @abc.abstractmethod
     def add(self, item: Class):

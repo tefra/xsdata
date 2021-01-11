@@ -252,7 +252,7 @@ class SchemaMapper:
             obj, target.module, target.target_namespace
         ):
             target.inner.append(inner)
-            types.append(cls.build_data_type(target, name=inner.name, forward=True))
+            types.append(AttrType(qname=inner.qname, forward=True))
 
         if len(types) == 0:
             types.append(cls.build_data_type(target, name=obj.default_type))

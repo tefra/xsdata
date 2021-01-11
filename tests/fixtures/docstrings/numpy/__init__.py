@@ -3,4 +3,6 @@ from tests.fixtures.docstrings.numpy.schema import (
     DoubleQuotesSummary,
     Root,
     RootEnum,
+    RootB,
+    RootD,
 )

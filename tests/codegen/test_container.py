@@ -5,6 +5,7 @@ from tests.factories import FactoryTestCase
 from xsdata.codegen.container import ClassContainer
 from xsdata.codegen.models import Class
 from xsdata.codegen.models import Status
+from xsdata.exceptions import CodeGenerationError
 from xsdata.models.enums import Tag
 
 
@@ -33,7 +34,7 @@ class ClassContainerTests(FactoryTestCase):
             [
                 "AttributeGroupHandler",
                 "ClassExtensionHandler",
-                "AttributeEnumerationHandler",
+                "ClassEnumerationHandler",
                 "AttributeSubstitutionHandler",
                 "AttributeTypeHandler",
                 "AttributeMergeHandler",
@@ -66,25 +67,17 @@ class ClassContainerTests(FactoryTestCase):
     def test_find_inner(self, mock_process_class):
         obj = ClassFactory.create()
         first = ClassFactory.create(qname="{a}a")
-        second = ClassFactory.enumeration(2, qname="{a}a")
-        third = ClassFactory.create(qname="{c}c", status=Status.PROCESSED)
-        fourth = ClassFactory.enumeration(2, qname="{d}d", status=Status.PROCESSING)
-        obj.inner.extend((first, second, third, fourth))
+        second = ClassFactory.create(qname="{a}b", status=Status.PROCESSED)
+        obj.inner.extend((first, second))
 
         def process_class(x: Class):
             x.status = Status.PROCESSED
 
-        def is_enum(x: Class):
-            return x.is_enumeration
-
         mock_process_class.side_effect = process_class
 
-        self.assertIsNone(self.container.find_inner(obj, "nope"))
-        self.assertEqual(first, self.container.find_inner(obj, "a"))
-        self.assertEqual(second, self.container.find_inner(obj, "a", is_enum))
-        self.assertEqual(third, self.container.find_inner(obj, "c"))
-        self.assertEqual(fourth, self.container.find_inner(obj, "d", is_enum))
-        mock_process_class.assert_has_calls([mock.call(first), mock.call(second)])
+        self.assertEqual(first, self.container.find_inner(obj, "{a}a"))
+        self.assertEqual(second, self.container.find_inner(obj, "{a}b"))
+        mock_process_class.assert_called_once_with(first)
 
     def test_process(self):
         target = ClassFactory.create(inner=ClassFactory.list(2))

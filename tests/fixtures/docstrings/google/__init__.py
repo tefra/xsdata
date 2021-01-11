@@ -3,4 +3,6 @@ from tests.fixtures.docstrings.google.schema import (
     DoubleQuotesSummary,
     Root,
     RootEnum,
+    RootB,
+    RootD,
 )

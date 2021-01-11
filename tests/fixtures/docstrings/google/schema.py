@@ -35,6 +35,22 @@ class RootEnum(Enum):
     B = "B"
 
 
+class RootB(Enum):
+    """
+    Attributes
+        YES: This is an inner enum member documentation. Lorem ipsum
+            dolor sit amet, consectetur adipiscing elit. Etiam mollis.
+        NO: Lorem ipsum dolor
+    """
+    YES = "Yes"
+    NO = "No"
+
+
+class RootD(Enum):
+    TRUE_VALUE = "true"
+    FALSE_VALUE = "false"
+
+
 @dataclass
 class Root:
     """This is the root type documentation. Lorem ipsum dolor sit amet,
@@ -62,7 +78,7 @@ class Root:
             "required": True,
         }
     )
-    b: Optional["Root.B"] = field(
+    b: Optional[RootB] = field(
         default=None,
         metadata={
             "type": "Element",
@@ -78,7 +94,7 @@ class Root:
             "required": True,
         }
     )
-    d: Optional["Root.D"] = field(
+    d: Optional[RootD] = field(
         default=None,
         metadata={
             "type": "Element",
@@ -105,18 +121,3 @@ class Root:
                 "required": True,
             }
         )
-
-    class B(Enum):
-        """
-        Attributes
-            YES: This is an inner enum member documentation. Lorem ipsum
-                dolor sit amet, consectetur adipiscing elit. Etiam
-                mollis.
-            NO: Lorem ipsum dolor
-        """
-        YES = "Yes"
-        NO = "No"
-
-    class D(Enum):
-        TRUE_VALUE = "true"
-        FALSE_VALUE = "false"

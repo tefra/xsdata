@@ -242,7 +242,7 @@ class Attr:
     name: str
     local_name: str = field(init=False)
     index: int = field(compare=False, default_factory=int)
-    default: Any = field(default=None, compare=False)
+    default: Optional[str] = field(default=None, compare=False)
     fixed: bool = field(default=False, compare=False)
     mixed: bool = field(default=False, compare=False)
     types: List[AttrType] = field(default_factory=list)

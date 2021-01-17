@@ -8,6 +8,7 @@ from xsdata.codegen.models import AttrType
 from xsdata.codegen.models import Class
 from xsdata.codegen.models import Extension
 from xsdata.codegen.utils import ClassUtils
+from xsdata.exceptions import CodeGenerationError
 from xsdata.logger import logger
 from xsdata.models.enums import DataType
 from xsdata.models.enums import NamespaceType
@@ -58,10 +59,50 @@ class ClassExtensionHandler(HandlerInterface):
         if not source:
             logger.warning("Missing extension type: %s", extension.type.name)
             target.extensions.remove(extension)
-        elif not source.is_complex or source.is_enumeration or target.is_enumeration:
+        elif target.is_enumeration:
+            self.process_enum_extension(source, target, extension)
+        elif not source.is_complex or source.is_enumeration:
             self.process_simple_extension(source, target, extension)
         else:
             self.process_complex_extension(source, target, extension)
+
+    @classmethod
+    def process_enum_extension(cls, source: Class, target: Class, ext: Extension):
+        """
+        Process enumeration class extension.
+
+        Extension cases:
+            1. Enumeration: copy all attr properties
+            2. Simple type: copy value attr properties
+            3. Complex type:
+                3.1 Target has one member, clone source and set fixed default value
+                3.2 Invalid schema.
+        """
+        if source.is_enumeration:
+            source_attrs = {attr.name: attr for attr in source.attrs}
+            target.attrs = [
+                source_attrs[attr.name].clone() if attr.name in source_attrs else attr
+                for attr in target.attrs
+            ]
+            target.extensions.remove(ext)
+        elif len(source.attrs) == 1:
+            source_attr = source.attrs[0]
+            for attr in target.attrs:
+                attr.types.extend([x.clone() for x in source_attr.types])
+                attr.restrictions.merge(source_attr.restrictions)
+
+            target.extensions.remove(ext)
+        elif len(target.attrs) == 1:  # We are not an enumeration pal.
+            default = target.attrs[0].default
+            target.attrs = [attr.clone() for attr in source.attrs]
+            target.extensions = [ext.clone() for ext in source.extensions]
+
+            for attr in target.attrs:
+                if attr.xml_type is None:
+                    attr.default = default
+                    attr.fixed = True
+        else:
+            raise CodeGenerationError("Enumeration class with a complex extension.")
 
     @classmethod
     def process_simple_extension(cls, source: Class, target: Class, ext: Extension):
@@ -179,19 +220,16 @@ class ClassExtensionHandler(HandlerInterface):
         if extension.type.datatype != DataType.ANY_TYPE:
             tag = Tag.EXTENSION
             name = "value"
-            default = None
             namespace = None
         else:
             tag = Tag.ANY
             name = "any_element"
-            default = list if extension.restrictions.is_list else None
             namespace = NamespaceType.ANY_NS
 
         attr = cls.get_or_create_attribute(target, name, tag)
         attr.types.append(extension.type.clone())
         attr.restrictions.merge(extension.restrictions)
         attr.namespace = namespace
-        attr.default = default
         target.extensions.remove(extension)
 
     @classmethod

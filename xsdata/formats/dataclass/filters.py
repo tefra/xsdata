@@ -360,11 +360,8 @@ class Filters:
         if attr.default.startswith("@enum@"):
             return self.field_default_enum(attr)
 
-        types = converter.sort_types(
-            list(
-                {attr_type.native_type for attr_type in attr.types if attr_type.native}
-            )
-        )
+        types = list({tp.native_type for tp in attr.types if tp.native})
+        types = converter.sort_types(types)
 
         if attr.is_tokens:
             return self.field_default_tokens(attr, types, ns_map)
@@ -376,6 +373,8 @@ class Filters:
         )
 
     def field_default_enum(self, attr: Attr) -> str:
+        assert attr.default is not None
+
         qname, enumeration = attr.default[6:].split("::", 1)
         qname = next(x.alias or qname for x in attr.types if x.qname == qname)
         _, name = split_qname(qname)
@@ -391,6 +390,9 @@ class Filters:
             converter.deserialize(val, types, ns_map=ns_map, format=fmt)
             for val in attr.default.split()
         ]
+
+        if attr.is_enumeration:
+            return self.format_metadata(tuple(tokens), indent=8)
 
         return f"lambda: {self.format_metadata(tokens, indent=8)}"
 
@@ -488,7 +490,7 @@ class Filters:
         """Generate the default imports for the given package output."""
 
         def type_patterns(x: str) -> Tuple:
-            return f": {x} =", f"[{x}]", f"[{x},", f" {x},", f" {x}]", f"= {x}("
+            return f": {x} =", f"[{x}]", f"[{x},", f" {x},", f" {x}]", f" {x}("
 
         patterns: Dict[str, Dict] = {
             "dataclasses": {"dataclass": ["@dataclass"], "field": [" = field("]},

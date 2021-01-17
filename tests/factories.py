@@ -155,6 +155,10 @@ class ExtensionFactory(Factory):
             restrictions=restrictions or Restrictions(),
         )
 
+    @classmethod
+    def reference(cls, qname: str):
+        return cls.create(AttrTypeFactory.create(qname=qname))
+
 
 class AttrTypeFactory(Factory):
     model = AttrType

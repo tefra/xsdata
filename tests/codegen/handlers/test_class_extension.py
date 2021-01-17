@@ -9,7 +9,9 @@ from tests.factories import FactoryTestCase
 from xsdata.codegen.container import ClassContainer
 from xsdata.codegen.handlers import ClassExtensionHandler
 from xsdata.codegen.models import Restrictions
+from xsdata.codegen.models import Status
 from xsdata.codegen.utils import ClassUtils
+from xsdata.exceptions import CodeGenerationError
 from xsdata.models.enums import DataType
 from xsdata.models.enums import Tag
 
@@ -104,24 +106,85 @@ class ClassExtensionHandlerTests(FactoryTestCase):
 
         mock_process_simple_extension.assert_called_once_with(source, target, extension)
 
-    @mock.patch.object(ClassExtensionHandler, "process_complex_extension")
-    @mock.patch.object(ClassExtensionHandler, "process_simple_extension")
-    @mock.patch.object(ClassExtensionHandler, "find_dependency")
-    def test_process_dependency_extension_with_target_enum_type(
-        self,
-        mock_find_dependency,
-        mock_process_simple_extension,
-        mock_process_complex_extension,
-    ):
-        extension = ExtensionFactory.create()
-        target = ClassFactory.enumeration(2, extensions=[extension])
-        source = ClassFactory.elements(1)
-        mock_find_dependency.return_value = source
+    def test_process_enum_extension_with_enum_source(self):
+        source = ClassFactory.enumeration(3)
+        target = ClassFactory.enumeration(2)
+        target.attrs[1].name = source.attrs[2].name
+        extension = ExtensionFactory.reference(source.qname)
+        target.extensions.append(extension)
 
-        self.processor.process_extension(target, extension)
-        self.assertEqual(0, mock_process_complex_extension.call_count)
+        self.processor.container.add(source)
+        self.processor.container.add(target)
+        self.processor.process_dependency_extension(target, extension)
 
-        mock_process_simple_extension.assert_called_once_with(source, target, extension)
+        self.assertEqual(2, len(target.attrs))
+        self.assertEqual(0, len(target.extensions))
+        self.assertEqual(source.attrs[2], target.attrs[1])
+
+    def test_process_enum_extension_with_simple_source(self):
+        qname_type = AttrTypeFactory.native(DataType.QNAME)
+        source = ClassFactory.create(
+            tag=Tag.SIMPLE_TYPE,
+            attrs=[
+                AttrFactory.create(
+                    types=[qname_type], restrictions=Restrictions(length=10)
+                )
+            ],
+        )
+        target = ClassFactory.enumeration(2)
+        extension = ExtensionFactory.reference(source.qname)
+        target.extensions.append(extension)
+
+        self.processor.container.add(source)
+        self.processor.container.add(target)
+        self.processor.process_dependency_extension(target, extension)
+
+        for attr in target.attrs:
+            self.assertIn(qname_type, attr.types)
+            self.assertEqual(10, attr.restrictions.length)
+
+    def test_process_enum_extension_with_complex_source(self):
+        source = ClassFactory.create(
+            tag=Tag.COMPLEX_TYPE,
+            attrs=[
+                AttrFactory.create(tag=Tag.ATTRIBUTE),
+                AttrFactory.create(tag=Tag.RESTRICTION),
+            ],
+            extensions=ExtensionFactory.list(2),
+            status=Status.PROCESSED,
+        )
+        target = ClassFactory.enumeration(1)
+        target.attrs[0].default = "Yes"
+        extension = ExtensionFactory.reference(source.qname)
+        target.extensions.append(extension)
+        expected = target.clone()
+
+        self.processor.container.add(source)
+        self.processor.container.add(target)
+        self.processor.process_dependency_extension(target, extension)
+
+        expected.attrs = [attr.clone() for attr in source.attrs]
+        expected.extensions = [ext.clone() for ext in source.extensions]
+        expected.attrs[1].default = "Yes"
+        expected.attrs[1].fixed = True
+
+        self.assertEqual(expected, target)
+
+        self.assertIsNone(target.attrs[0].default)
+        self.assertFalse(target.attrs[0].fixed)
+        self.assertEqual("Yes", target.attrs[1].default)
+        self.assertTrue(target.attrs[1].fixed)
+
+    def test_process_enum_extension_raises_exception(self):
+        source = ClassFactory.elements(2)
+        target = ClassFactory.enumeration(2)
+        extension = ExtensionFactory.reference(source.qname)
+        target.extensions.append(extension)
+        self.processor.container.add(source)
+        self.processor.container.add(target)
+
+        with self.assertRaises(CodeGenerationError):
+            self.processor.process_dependency_extension(target, extension)
 
     @mock.patch.object(ClassExtensionHandler, "process_complex_extension")
     @mock.patch.object(ClassExtensionHandler, "process_simple_extension")

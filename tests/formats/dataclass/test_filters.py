@@ -121,6 +121,13 @@ class FiltersTests(FactoryTestCase):
 
         self.assertEqual(expected, self.filters.field_default_value(attr))
 
+        attr.tag = Tag.ENUMERATION
+        expected = """(
+            1,
+            "bar",
+        )"""
+        self.assertEqual(expected, self.filters.field_default_value(attr))
+
     def test_field_default_value_with_type_float(self):
         attr = AttrFactory.create(types=[type_float], default="1.5")
         self.assertEqual("1.5", self.filters.field_default_value(attr))

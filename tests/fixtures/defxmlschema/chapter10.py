@@ -15,9 +15,9 @@ class SizeTypeValue(Enum):
 
 
 class SmallSizeType(Enum):
-    VALUE_2 = "2"
-    VALUE_4 = "4"
-    VALUE_6 = "6"
+    VALUE_2 = 2
+    VALUE_4 = 4
+    VALUE_6 = 6
     SMALL = "small"
 
 

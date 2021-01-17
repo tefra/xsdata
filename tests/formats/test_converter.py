@@ -186,7 +186,7 @@ class BytesConverterTests(TestCase):
         with self.assertRaises(ConverterError) as cm:
             self.converter.deserialize(1, format="foo")
 
-        self.assertEqual("Value must be str", str(cm.exception))
+        self.assertEqual("Input value must be 'str' got 'int'", str(cm.exception))
 
         with self.assertRaises(ConverterError):
             self.converter.deserialize("aaa", format="base16")
@@ -348,57 +348,42 @@ class QNameConverterTests(TestCase):
         self.assertEqual("{c}c", convert(QName("c", "c")))
 
 
+class EnumA(Enum):
+    A = QName("a", "b")
+    B = Decimal("+inf")
+    C = 2.1
+    D = (2.1, "a")
+    E = (2.1, "a", float("nan"))
+    F = (2.1, "a", 2)
+    G = "x y z"
+
+
 class EnumConverterTests(TestCase):
     def setUp(self):
         self.converter = converter.type_converter(Enum)
 
     def test_deserialize(self):
-        class Fixture(Enum):
-            two_point_one = 2.1
-
         convert = self.converter.deserialize
-        with self.assertRaises(ConverterError):
-            with warnings.catch_warnings(record=True) as w:
-                convert("a", data_type=Fixture)
+        self.assertEqual(EnumA.C, convert("2.1", data_type=EnumA))
+        self.assertEqual(EnumA.C, convert(2.1, data_type=EnumA))
+        self.assertEqual(EnumA.E, convert(["2.1", "a", "NaN"], data_type=EnumA))
+        self.assertEqual(EnumA.F, convert([2.1, "a", 2], data_type=EnumA))
+        self.assertEqual(EnumA.D, convert("  2.1  a ", data_type=EnumA))
+        self.assertEqual(EnumA.G, convert("  x \n y z ", data_type=EnumA))
 
-        self.assertEqual(0, len(w))
-
-        self.assertEqual(Fixture.two_point_one, convert("2.1", data_type=Fixture))
-
-    def test_deserialize_with_list_derived_enum(self):
-        class Fixture(Enum):
-            a = "a a a"
-
-        convert = self.converter.deserialize
-        self.assertEqual(Fixture.a, convert(" a \na a  ", data_type=Fixture))
-
-    def test_deserialize_with_value_never_equal_to_anything(self):
-        class Fixture(Enum):
-            a = Decimal("NaN")
-
-        convert = self.converter.deserialize
-        self.assertEqual(Fixture.a, convert("NaN", data_type=Fixture))
-
-        with self.assertRaises(ConverterError):
-            convert("1.0", data_type=Fixture)
-
-    def test_deserialize_raises_exception_on_missing_data_type(self):
         with self.assertRaises(ConverterError) as cm:
-            self.converter.deserialize("a")
+            convert(["2.1", "a", "NaN"], data_type=int)
 
-        self.assertEqual("Provide a target data type enum class.", str(cm.exception))
+        self.assertEqual("'<class 'int'>' is not an enum", str(cm.exception))
+
+        with self.assertRaises(ConverterError):
+            convert("nope", data_type=EnumA)
 
     def test_serialize(self):
         ns_map = {}
-        fixture = self.Fixture
-        self.assertEqual("ns0:b", self.converter.serialize(fixture.a, ns_map=ns_map))
-        self.assertEqual("INF", self.converter.serialize(fixture.b))
-        self.assertEqual("2.1", self.converter.serialize(fixture.c))
-
-    class Fixture(Enum):
-        a = QName("a", "b")
-        b = Decimal("+inf")
-        c = 2.1
+        self.assertEqual("ns0:b", self.converter.serialize(EnumA.A, ns_map=ns_map))
+        self.assertEqual("INF", self.converter.serialize(EnumA.B))
+        self.assertEqual("2.1", self.converter.serialize(EnumA.C))
 
 
 class ProxyConverterTests(TestCase):

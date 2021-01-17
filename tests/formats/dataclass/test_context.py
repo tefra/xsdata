@@ -231,7 +231,7 @@ class XmlContextTests(TestCase):
         expected = [
             XmlVar(element=True, name="bool", qname="bool", types=[bool]),
             XmlVar(element=True, name="int", qname="int", types=[int]),
-            XmlVar(element=True, name="union", qname="union", types=[bool, int]),
+            XmlVar(element=True, name="union", qname="union", types=[int, bool]),
         ]
 
         if sys.version_info < (3, 7):

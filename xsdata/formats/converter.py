@@ -12,8 +12,10 @@ from datetime import time
 from decimal import Decimal
 from decimal import InvalidOperation
 from enum import Enum
+from enum import EnumMeta
 from typing import Any
 from typing import Callable
+from typing import cast
 from typing import Dict
 from typing import List
 from typing import Optional
@@ -37,8 +39,6 @@ from xsdata.utils import text
 from xsdata.utils.namespaces import load_prefix
 from xsdata.utils.namespaces import split_qname
 
-NOT_A_STRING = "Value must be str"
-
 
 class Converter(metaclass=abc.ABCMeta):
     """Abstract converter class."""
@@ -54,6 +54,13 @@ class Converter(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def serialize(self, value: Any, **kwargs: Any) -> str:
         """Convert value to string."""
+
+    @classmethod
+    def validate_input_type(cls, value: Any, tp: Type):
+        if not isinstance(value, tp):
+            raise ConverterError(
+                f"Input value must be '{tp.__name__}' got '{type(value).__name__}'"
+            )
 
 
 @dataclass
@@ -156,8 +163,8 @@ class ConverterFactory:
 
 
 __PYTHON_TYPES_SORTED__ = {
-    bool: 1,
-    int: 2,
+    int: 1,
+    bool: 2,
     float: 3,
     Decimal: 4,
     datetime: 5,
@@ -201,6 +208,8 @@ class IntConverter(Converter):
 
 
 class FloatConverter(Converter):
+    INF = float("inf")
+
     def deserialize(self, value: Any, **kwargs: Any) -> float:
         try:
             return float(value)
@@ -208,13 +217,23 @@ class FloatConverter(Converter):
             raise ConverterError(e)
 
     def serialize(self, value: float, **kwargs: Any) -> str:
-        return "NaN" if math.isnan(value) else str(value).upper()
+        mode = kwargs.get("output", "xml")
+
+        if math.isnan(value):
+            return "NaN"
+
+        if value == self.INF:
+            return "Infinity" if mode == "json" else "INF"
+
+        if value == -self.INF:
+            return "-Infinity" if mode == "json" else "-INF"
+
+        return repr(value).upper().replace("E+", "E")
 
 
 class BytesConverter(Converter):
     def deserialize(self, value: Any, **kwargs: Any) -> bytes:
-        if not isinstance(value, str):
-            raise ConverterError(NOT_A_STRING)
+        self.validate_input_type(value, str)
 
         try:
             fmt = kwargs.get("format")
@@ -267,7 +286,7 @@ class QNameConverter(Converter):
             - xs:string -> QName("http://www.w3.org/2001/XMLSchema", "string")
             - {foo}bar -> QName("foo", "bar"
         """
-
+        self.validate_input_type(value, str)
         text_or_uri, tag = self.resolve(value, ns_map)
 
         if text_or_uri:
@@ -332,8 +351,9 @@ class LxmlQNameConverter(Converter):
             - xs:string -> QName("http://www.w3.org/2001/XMLSchema", "string")
             - {foo}bar -> QName("foo", "bar"
         """
-        try:
+        self.validate_input_type(value, str)
 
+        try:
             text_or_uri, tag = QNameConverter.resolve(value, ns_map)
             return etree.QName(text_or_uri, tag)
         except ValueError as e:
@@ -359,53 +379,68 @@ class LxmlQNameConverter(Converter):
         return f"{prefix}:{value.localname}" if prefix else value.localname
 
 
+Array = Union[List, Tuple]
+
+
 class EnumConverter(Converter):
-    def deserialize(
-        self, value: Any, data_type: Optional[Type[Enum]] = None, **kwargs: Any
-    ) -> Enum:
-        if data_type is None or not issubclass(data_type, Enum):
-            raise ConverterError("Provide a target data type enum class.")
-
-        # Convert string value to the type of the first enum member first, otherwise
-        # more complex types like QName, Decimals will fail.
-        member: Enum = list(data_type)[0]
-        value_type = type(member.value)
-
-        # Suppress warnings
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore")
-            real_value = converter.deserialize(value, [value_type], **kwargs)
-
-        # Raise exception if the real value doesn't match the expected type.
-        if not isinstance(real_value, value_type):
-            raise ConverterError(f"Value must be {value_type}")
-
-        try:
-            # Attempt no1 use the enum constructor
-            return data_type(real_value)
-        except ValueError:
-            pass
-
-        try:
-            # Attempt no2 the enum might be derived from
-            # xs:NMTOKENS or xs:list removing excess whitespace.
-            if isinstance(real_value, str):
-                return data_type(" ".join(real_value.split()))
-
-            # Attempt #3 some times enum member init values don't match
-            # Try matching canonical repr or member values directly
-            repr_value = repr(real_value)
-            for x in data_type:
-                if repr(x.value) == repr_value or x.value == real_value:
-                    return x
-
-            raise ConverterError("Not enum member matched")
-
-        except ValueError as e:
-            raise ConverterError(e)
-
     def serialize(self, value: Enum, **kwargs: Any) -> str:
         return converter.serialize(value.value, **kwargs)
+
+    def deserialize(
+        self, value: Any, data_type: Optional[EnumMeta] = None, **kwargs: Any
+    ) -> Enum:
+        if data_type is None or not isinstance(data_type, EnumMeta):
+            raise ConverterError(f"'{data_type}' is not an enum")
+
+        if isinstance(value, (list, tuple)):
+            values = value
+        elif isinstance(value, str):
+            value = value.strip()
+            values = value.split()
+        else:
+            values = [value]
+
+        length = len(values)
+        for member in cast(Type[Enum], data_type):
+            if self.match(value, values, length, member.value, **kwargs):
+                return member
+
+        raise ConverterError()
+
+    @classmethod
+    def match(
+        cls, value: Any, values: Array, length: int, real: Any, **kwargs: Any
+    ) -> bool:
+
+        if isinstance(value, str) and isinstance(real, str):
+            return value == real or " ".join(values) == real
+
+        if isinstance(real, (tuple, list)):
+            if len(real) == length and cls.match_list(values, real, **kwargs):
+                return True
+        elif length == 1 and cls.match_atomic(value, real, **kwargs):
+            return True
+
+        return False
+
+    @classmethod
+    def match_list(cls, raw: Array, real: Array, **kwargs: Any) -> bool:
+        for index, val in enumerate(real):
+            if not cls.match_atomic(raw[index], val, **kwargs):
+                return False
+
+        return True
+
+    @classmethod
+    def match_atomic(cls, raw: Any, real: Any, **kwargs: Any) -> bool:
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            cmp = converter.deserialize(raw, [type(real)], **kwargs)
+
+        if isinstance(real, float):
+            return cmp == real or repr(cmp) == repr(real)
+
+        return cmp == real
 
 
 class DateTimeBase(Converter, metaclass=ABCMeta):

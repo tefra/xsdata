@@ -98,17 +98,16 @@ class AttributeTypeHandler(HandlerInterface):
         if inner.is_simple_type:
             self.copy_attribute_properties(inner, target, attr, attr_type)
             target.inner.remove(inner)
-        elif inner.is_enumeration:
-            self.update_restrictions(attr, inner.attrs[0].types[0].datatype)
 
     def process_dependency_type(self, target: Class, attr: Attr, attr_type: AttrType):
         """
         Process an attributes type that depends on any global type.
 
-        Steps:
-            1. Reset absent or dummy attribute types with a warning.
-            2. Copy attribute properties from a simple type.
-            3. Set circular flag for the rest non enumerations.
+        Strategies:
+            1. Reset absent or dummy attribute types with a warning
+            2. Copy attribute properties from a simple type
+            3. Copy format restriction from an enumeration
+            4. Set circular flag for the rest
         """
 
         source = self.find_dependency(attr_type, attr.tag)
@@ -119,7 +118,9 @@ class AttributeTypeHandler(HandlerInterface):
         elif source.is_simple_type:
             self.copy_attribute_properties(source, target, attr, attr_type)
         elif source.is_enumeration:
-            self.update_restrictions(attr, source.attrs[0].types[0].datatype)
+            attr.restrictions.format = collections.first(
+                x.restrictions.format for x in source.attrs if x.restrictions.format
+            )
         else:
             self.set_circular_flag(source, target, attr_type)
 
@@ -193,12 +194,11 @@ class AttributeTypeHandler(HandlerInterface):
 
     @classmethod
     def update_restrictions(cls, attr: Attr, datatype: Optional[DataType]):
+        if datatype:
+            attr.restrictions.format = datatype.format
+
         if datatype in (DataType.NMTOKENS, DataType.IDREFS):
             attr.restrictions.tokens = True
-        elif datatype == DataType.HEX_BINARY:
-            attr.restrictions.format = "base16"
-        elif datatype == DataType.BASE64_BINARY:
-            attr.restrictions.format = "base64"
 
     @classmethod
     def filter_types(cls, types: List[AttrType]) -> List[AttrType]:
@@ -209,7 +209,7 @@ class AttributeTypeHandler(HandlerInterface):
             1. xs:error
             2. xs:anyType and xs:anySimpleType when there are other types present
         """
-        types = collections.unique_sequence(types, key="name")
+        types = collections.unique_sequence(types, key="qname")
         types = collections.remove(types, lambda x: x.datatype == DataType.ERROR)
 
         if len(types) > 1:

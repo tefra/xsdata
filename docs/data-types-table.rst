@@ -23,13 +23,13 @@
       -
     * - :class:`~decimal.Decimal`
       - decimal
-      - double
+      -
       -
       -
       -
     * - :class:`float`
+      - double
       - float
-      -
       -
       -
       -

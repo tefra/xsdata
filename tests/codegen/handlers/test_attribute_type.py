@@ -147,21 +147,18 @@ class AttributeTypeHandlerTests(FactoryTestCase):
             simple, target, attr, attr_type
         )
 
-    @mock.patch.object(AttributeTypeHandler, "update_restrictions")
     @mock.patch.object(AttributeTypeHandler, "find_dependency")
-    def test_process_dependency_type_with_enumeration_type(
-        self, mock_find_dependency, mock_update_restrictions
-    ):
-        enumeration = ClassFactory.enumeration(1)
+    def test_process_dependency_type_with_enumeration_type(self, mock_find_dependency):
+        enumeration = ClassFactory.enumeration(2)
+        enumeration.attrs[1].restrictions.format = "base16"
         mock_find_dependency.return_value = enumeration
 
-        target = ClassFactory.create()
-        attr = AttrFactory.create()
+        target = ClassFactory.simple_type()
+        attr = target.attrs[0]
+        attr.types[0] = AttrTypeFactory.create(qname=enumeration.qname)
 
         self.processor.process_dependency_type(target, attr, attr.types[0])
-        mock_update_restrictions.assert_called_once_with(
-            attr, enumeration.attrs[0].types[0].datatype
-        )
+        self.assertEqual("base16", attr.restrictions.format)
 
     @mock.patch.object(AttributeTypeHandler, "set_circular_flag")
     @mock.patch.object(AttributeTypeHandler, "find_dependency")
@@ -193,23 +190,6 @@ class AttributeTypeHandlerTests(FactoryTestCase):
         self.assertEqual(0, mock_update_restrictions.call_count)
         mock_copy_attribute_properties.assert_called_once_with(
             inner, target, attr, attr.types[0]
-        )
-
-    @mock.patch.object(AttributeTypeHandler, "update_restrictions")
-    @mock.patch.object(AttributeTypeHandler, "copy_attribute_properties")
-    def test_process_inner_type_with_enumeration_type(
-        self, mock_copy_attribute_properties, mock_update_restrictions
-    ):
-        attr = AttrFactory.create(types=[AttrTypeFactory.create(qname="{bar}a")])
-        inner = ClassFactory.enumeration(2, qname="{bar}a", status=Status.PROCESSED)
-        target = ClassFactory.create(inner=[inner])
-
-        self.processor.process_inner_type(target, attr, attr.types[0])
-        self.assertIn(inner, target.inner)
-
-        self.assertEqual(0, mock_copy_attribute_properties.call_count)
-        mock_update_restrictions.assert_called_once_with(
-            attr, inner.attrs[0].types[0].datatype
         )
 
     @mock.patch.object(AttributeTypeHandler, "update_restrictions")

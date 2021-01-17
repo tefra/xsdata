@@ -8,8 +8,8 @@ from typing import Optional
 
 from xsdata.codegen.handlers import AttributeGroupHandler
 from xsdata.codegen.handlers import AttributeMergeHandler
-from xsdata.codegen.handlers import AttributeMismatchHandler
 from xsdata.codegen.handlers import AttributeMixedContentHandler
+from xsdata.codegen.handlers import AttributeSanitizerHandler
 from xsdata.codegen.handlers import AttributeSubstitutionHandler
 from xsdata.codegen.handlers import AttributeTypeHandler
 from xsdata.codegen.handlers import ClassEnumerationHandler
@@ -41,7 +41,7 @@ class ClassContainer(UserDict, ContainerInterface):
             AttributeTypeHandler(self),
             AttributeMergeHandler(),
             AttributeMixedContentHandler(),
-            AttributeMismatchHandler(),
+            AttributeSanitizerHandler(),
         ]
 
     @property

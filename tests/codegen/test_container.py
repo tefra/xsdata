@@ -39,7 +39,7 @@ class ClassContainerTests(FactoryTestCase):
                 "AttributeTypeHandler",
                 "AttributeMergeHandler",
                 "AttributeMixedContentHandler",
-                "AttributeMismatchHandler",
+                "AttributeSanitizerHandler",
             ],
             [x.__class__.__name__ for x in container.processors],
         )

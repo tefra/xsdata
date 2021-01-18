@@ -504,3 +504,21 @@ class XmlPeriod(UserString):
             return self._period == other._period
 
         return NotImplemented
+
+
+class XmlHexBinary(bytes):
+    """
+    Subclass bytes to infer serialize base16 format.
+
+    This type can be used with xs:anyType fields that don't have a
+    format property to specify the target output format.
+    """
+
+
+class XmlBase64Binary(bytes):
+    """
+    Subclass bytes to infer serialize base64 format.
+
+    This type can be used with xs:anyType fields that don't have a
+    format property to specify the target output format.
+    """

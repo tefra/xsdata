@@ -16,3 +16,5 @@ XML Datatypes
     XmlDateTime
     XmlDuration
     XmlPeriod
+    XmlHexBinary
+    XmlBase64Binary

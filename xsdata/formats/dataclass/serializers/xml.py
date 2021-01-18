@@ -274,7 +274,7 @@ class XmlSerializer(AbstractSerializer):
         if var.nillable:
             yield XmlWriterEvent.ATTR, QNames.XSI_NIL, "true"
 
-        if value is not None and var.any_type:
+        if value is not None and value != "" and var.any_type:
             datatype = DataType.from_value(value)
             if datatype != DataType.STRING:
                 yield XmlWriterEvent.ATTR, QNames.XSI_TYPE, QName(str(datatype))
@@ -354,7 +354,7 @@ class XmlSerializer(AbstractSerializer):
             yield QNames.XSI_NIL, "true"
 
     @classmethod
-    def encode_value(cls, value: Any, var: Optional[XmlVar]) -> Any:
+    def encode_value(cls, value: Any, var: XmlVar) -> Any:
         """
         Encode values for xml serialization.
 

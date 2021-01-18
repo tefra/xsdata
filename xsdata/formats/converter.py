@@ -26,9 +26,11 @@ from lxml import etree
 
 from xsdata.exceptions import ConverterError
 from xsdata.exceptions import ConverterWarning
+from xsdata.models.datatype import XmlBase64Binary
 from xsdata.models.datatype import XmlDate
 from xsdata.models.datatype import XmlDateTime
 from xsdata.models.datatype import XmlDuration
+from xsdata.models.datatype import XmlHexBinary
 from xsdata.models.datatype import XmlPeriod
 from xsdata.models.datatype import XmlTime
 from xsdata.utils import text
@@ -117,29 +119,32 @@ class ConverterFactory:
         """
         self.registry.pop(data_type)
 
-    def type_converter(self, data_type: Type) -> Converter:
+    def type_converter(self, datatype: Type) -> Converter:
         """
-        Get a suitable converter for given data type.
+        Find a suitable converter for given data type.
 
-        Try the parent type if the original doesn't exist, fall back to
-        str and issue a warning if no converter matches.
+        Iterate over all but last mro items and check for registered
+        converters, fall back to str and issue a warning if there are
+        not matches.
         """
+
         try:
-            return self.registry[data_type]
+            # Quick in and out, without checking the whole mro.
+            return self.registry[datatype]
         except KeyError:
             pass
 
-        try:
-            return self.registry[type(data_type)]
-        except KeyError:
-            pass
+        # We tested the first, ignore the object
+        for mro in datatype.__mro__[1:-1]:
+            if mro in self.registry:
+                return self.registry[mro]
 
-        warnings.warn(f"No converter registered for `{data_type}`", ConverterWarning)
+        warnings.warn(f"No converter registered for `{datatype}`", ConverterWarning)
         return self.registry[str]
 
     def value_converter(self, value: Any) -> Converter:
         """Get a suitable converter for the given value."""
-        return self.type_converter(type(value))
+        return self.type_converter(value.__class__)
 
     @classmethod
     def sort_types(cls, types: List[Type]) -> List[Type]:
@@ -227,10 +232,10 @@ class BytesConverter(Converter):
     def serialize(self, value: bytes, **kwargs: Any) -> str:
         fmt = kwargs.get("format")
 
-        if fmt == "base16":
+        if isinstance(value, XmlHexBinary) or fmt == "base16":
             return base64.b16encode(value).decode()
 
-        if fmt == "base64":
+        if isinstance(value, XmlBase64Binary) or fmt == "base64":
             return base64.b64encode(value).decode()
 
         raise ConverterError(f"Unknown format '{fmt}'")
@@ -473,4 +478,4 @@ converter.register_converter(XmlPeriod, ProxyConverter(XmlPeriod))
 converter.register_converter(etree.QName, LxmlQNameConverter())
 converter.register_converter(QName, QNameConverter())
 converter.register_converter(Decimal, DecimalConverter())
-converter.register_converter(type(Enum), EnumConverter())
+converter.register_converter(Enum, EnumConverter())

@@ -28,6 +28,7 @@ from xsdata.formats.dataclass.parsers.nodes import SkipNode
 from xsdata.formats.dataclass.parsers.nodes import UnionNode
 from xsdata.formats.dataclass.parsers.nodes import WildcardNode
 from xsdata.formats.dataclass.parsers.utils import ParserUtils
+from xsdata.models.datatype import XmlHexBinary
 from xsdata.models.enums import DataType
 from xsdata.models.enums import Namespace
 from xsdata.models.enums import QNames
@@ -462,6 +463,17 @@ class AnyTypeNodeTests(TestCase):
         self.assertTrue(self.node.bind("a", "10", None, objects))
         self.assertEqual(self.var.qname, objects[-1][0])
         self.assertEqual(10.0, objects[-1][1])
+
+    def test_bind_with_simple_type_that_has_wrapper_class(self):
+        objects = []
+
+        self.node.attrs[QNames.XSI_TYPE] = "xs:hexBinary"
+        self.node.ns_map["xs"] = Namespace.XS.uri
+
+        self.assertTrue(self.node.bind("a", "4368726973", None, objects))
+        self.assertEqual(self.var.qname, objects[-1][0])
+        self.assertEqual(b"Chris", objects[-1][1])
+        self.assertIsInstance(objects[-1][1], XmlHexBinary)
 
     def test_bind_with_simple_type_derived(self):
         objects = []

@@ -476,7 +476,7 @@ class Filters:
             return quoteattr(value)
 
         if isinstance(value, float):
-            return f'float("{value}")' if math.isinf(value) else str(value)
+            return str(value) if math.isfinite(value) else f'float("{value}")'
 
         if isinstance(value, QName):
             return f'QName("{value.text}")'
@@ -487,8 +487,8 @@ class Filters:
     def default_imports(cls, output: str) -> str:
         """Generate the default imports for the given package output."""
 
-        def type_patterns(name: str) -> Tuple:
-            return f": {name}", f"[{name}", f", {name}", f"= {name}"
+        def type_patterns(x: str) -> Tuple:
+            return f": {x} =", f"[{x}]", f"[{x},", f" {x},", f" {x}]", f"= {x}("
 
         patterns: Dict[str, Dict] = {
             "dataclasses": {"dataclass": ["@dataclass"], "field": [" = field("]},

@@ -2,12 +2,17 @@ from decimal import Decimal
 from enum import Enum
 from pathlib import Path
 from typing import Any
+from typing import Callable
+from typing import Dict
 from typing import Optional
+from typing import Type
 from xml.etree.ElementTree import QName
 
+from xsdata.models.datatype import XmlBase64Binary
 from xsdata.models.datatype import XmlDate
 from xsdata.models.datatype import XmlDateTime
 from xsdata.models.datatype import XmlDuration
+from xsdata.models.datatype import XmlHexBinary
 from xsdata.models.datatype import XmlPeriod
 from xsdata.models.datatype import XmlTime
 
@@ -93,7 +98,7 @@ class DataType(Enum):
     ANY_SIMPLE_TYPE = ("anySimpleType", object)
     ANY_TYPE = ("anyType", object)
     BASE = ("base", str)
-    BASE64_BINARY = ("base64Binary", bytes)
+    BASE64_BINARY = ("base64Binary", bytes, "base64", XmlBase64Binary)
     BOOLEAN = ("boolean", bool)
     BYTE = ("byte", int)
     DATE = ("date", XmlDate)
@@ -103,7 +108,7 @@ class DataType(Enum):
     YEAR_MONTH_DURATION = ("yearMonthDuration", XmlDuration)
     DECIMAL = ("decimal", Decimal)
     DERIVATION_CONTROL = ("derivationControl", str)
-    DOUBLE = ("double", Decimal)
+    DOUBLE = ("double", float)
     DURATION = ("duration", XmlDuration)
     ENTITIES = ("ENTITIES", str)
     ENTITY = ("ENTITY", str)
@@ -114,7 +119,7 @@ class DataType(Enum):
     G_MONTH_DAY = ("gMonthDay", XmlPeriod)
     G_YEAR = ("gYear", XmlPeriod)
     G_YEAR_MONTH = ("gYearMonth", XmlPeriod)
-    HEX_BINARY = ("hexBinary", bytes)
+    HEX_BINARY = ("hexBinary", bytes, "base16", XmlHexBinary)
     ID = ("ID", str)
     IDREF = ("IDREF", str)
     IDREFS = ("IDREFS", str)
@@ -144,9 +149,17 @@ class DataType(Enum):
     UNSIGNED_LONG = ("unsignedLong", int)
     UNSIGNED_SHORT = ("unsignedShort", int)
 
-    def __init__(self, code: str, python_type: type):
+    def __init__(
+        self,
+        code: str,
+        python_type: type,
+        fmt: Optional[str] = None,
+        wrapper: Optional[Type] = None,
+    ):
         self.code = code
         self.type = python_type
+        self.format = fmt
+        self.wrapper = wrapper
 
     def __str__(self) -> str:
         return f"{{{Namespace.XS.uri}}}{self.code}"
@@ -160,16 +173,16 @@ class DataType(Enum):
 
     @classmethod
     def from_value(cls, value: Any) -> "DataType":
-        if isinstance(value, bool):
-            return DataType.BOOLEAN
-        if isinstance(value, int):
-            return DataType.INT
-        if isinstance(value, float):
-            return DataType.FLOAT
-        if isinstance(value, Decimal):
-            return DataType.DECIMAL
-        if isinstance(value, QName):
-            return DataType.QNAME
+        """Infer the xsd type from the value itself."""
+        _type = type(value)
+        datatype = __DataTypeIndex__.get(_type)
+
+        if datatype:
+            return datatype
+
+        calculate = __DataTypeInferIndex__.get(_type)
+        if calculate:
+            return calculate(value)
 
         return DataType.STRING
 
@@ -178,6 +191,48 @@ class DataType(Enum):
         return __DataTypeQNameIndex__.get(qname)
 
 
+def period_datatype(value: XmlPeriod) -> DataType:
+    if value.year is not None:
+        return DataType.G_YEAR_MONTH if value.month else DataType.G_YEAR
+    if value.month:
+        return DataType.G_MONTH_DAY if value.day else DataType.G_MONTH
+    return DataType.G_DAY
+
+
+def int_datatype(value: int) -> DataType:
+    if -32768 <= value <= 32767:
+        return DataType.SHORT
+    if -2147483648 <= value <= 2147483647:
+        return DataType.INT
+    if -9223372036854775808 <= value <= 9223372036854775807:
+        return DataType.LONG
+    return DataType.INTEGER
+
+
+def float_datatype(value: float) -> DataType:
+    if -1.175494351e-38 <= value <= 3.402823466e38:
+        return DataType.FLOAT
+    return DataType.DOUBLE
+
+
+__DataTypeIndex__ = {
+    bool: DataType.BOOLEAN,
+    str: DataType.STRING,
+    Decimal: DataType.DECIMAL,
+    QName: DataType.QNAME,
+    XmlDate: DataType.DATE,
+    XmlTime: DataType.TIME,
+    XmlDateTime: DataType.DATE_TIME,
+    XmlDuration: DataType.DURATION,
+    # bytes: DataType.HEX_BINARY || DataType.BASE64_BINARY, we can't infer formats
+    XmlHexBinary: DataType.HEX_BINARY,
+    XmlBase64Binary: DataType.BASE64_BINARY,
+}
+__DataTypeInferIndex__: Dict[Type, Callable] = {
+    int: int_datatype,
+    float: float_datatype,
+    XmlPeriod: period_datatype,
+}
 __DataTypeCodeIndex__ = {dt.code: dt for dt in DataType}
 __DataTypeQNameIndex__ = {str(dt): dt for dt in DataType}
 

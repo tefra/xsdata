@@ -43,6 +43,18 @@ class ConverterAdapterTests(TestCase):
         self.assertEqual("8.77683E-8", converter.serialize(Decimal("8.77683E-8")))
         self.assertEqual("8.77683E-08", converter.serialize(float("8.77683E-8")))
 
+    def test_unknown_converter(self):
+        class A:
+            pass
+
+        class B(A):
+            pass
+
+        with warnings.catch_warnings(record=True) as w:
+            converter.serialize(B())
+
+        self.assertEqual(f"No converter registered for `{B}`", str(w[-1].message))
+
     def test_register_converter(self):
         class MinusOneInt(int):
             pass
@@ -54,12 +66,7 @@ class ConverterAdapterTests(TestCase):
             def serialize(self, value: Any, **kwargs: Any) -> str:
                 return str(value)
 
-        with warnings.catch_warnings(record=True) as w:
-            self.assertEqual("1", converter.deserialize("1", [MinusOneInt]))
-
-        self.assertEqual(
-            f"No converter registered for `{MinusOneInt}`", str(w[-1].message)
-        )
+        self.assertEqual(1, converter.deserialize("1", [MinusOneInt]))
 
         converter.register_converter(MinusOneInt, MinusOneIntConverter())
         self.assertEqual(1, converter.deserialize("2", [MinusOneInt]))

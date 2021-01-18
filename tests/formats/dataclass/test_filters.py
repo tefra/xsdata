@@ -132,6 +132,9 @@ class FiltersTests(FactoryTestCase):
         attr.default = "-inf"
         self.assertEqual('float("-inf")', self.filters.field_default_value(attr))
 
+        attr.default = "NaN"
+        self.assertEqual('float("nan")', self.filters.field_default_value(attr))
+
     def test_field_default_value_with_type_decimal(self):
         attr = AttrFactory.create(types=[type_decimal], default="1.5")
         self.assertEqual('Decimal("1.5")', self.filters.field_default_value(attr))

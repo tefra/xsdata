@@ -476,7 +476,7 @@ class Filters:
             return quoteattr(value)
 
         if isinstance(value, float):
-            return f'float("{value}")' if math.isinf(value) else str(value)
+            return str(value) if math.isfinite(value) else f'float("{value}")'
 
         if isinstance(value, QName):
             return f'QName("{value.text}")'

@@ -295,7 +295,7 @@ class XmlSerializerTests(TestCase):
         var = XmlVar(element=True, qname="a", name="a", types=[object], any_type=True)
         expected = [
             (XmlWriterEvent.START, "a"),
-            (XmlWriterEvent.ATTR, QNames.XSI_TYPE, QName(str(DataType.INT))),
+            (XmlWriterEvent.ATTR, QNames.XSI_TYPE, QName(str(DataType.SHORT))),
             (XmlWriterEvent.DATA, "123"),
             (XmlWriterEvent.END, "a"),
         ]
@@ -308,10 +308,18 @@ class XmlSerializerTests(TestCase):
         var = XmlVar(element=True, qname="a", name="a", types=[object], any_type=True)
         expected = [
             (XmlWriterEvent.START, "a"),
+            (XmlWriterEvent.DATA, ""),
+            (XmlWriterEvent.END, "a"),
+        ]
+        result = self.serializer.write_value("", var, "xsdata")
+        self.assertIsInstance(result, Generator)
+        self.assertEqual(expected, list(result))
+
+        expected = [
+            (XmlWriterEvent.START, "a"),
             (XmlWriterEvent.DATA, "123"),
             (XmlWriterEvent.END, "a"),
         ]
-
         result = self.serializer.write_value("123", var, "xsdata")
         self.assertIsInstance(result, Generator)
         self.assertEqual(expected, list(result))

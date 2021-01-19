@@ -52,9 +52,7 @@ class AttributeSanitizerHandler(HandlerInterface):
         if attr.default is None or not attr.fixed and not is_enum:
             return
 
-        types = list({x.native_type for x in attr.types if x.native})
-        types = converter.sort_types(types)
-
+        types = converter.sort_types(attr.native_types)
         if not types:
             return
 

@@ -10,7 +10,6 @@ from xsdata.codegen.models import Class
 from xsdata.codegen.models import Extension
 from xsdata.codegen.models import Restrictions
 from xsdata.models.enums import DataType
-from xsdata.models.enums import Namespace
 from xsdata.models.enums import Tag
 from xsdata.models.mixins import ElementBase
 from xsdata.models.xsd import Attribute
@@ -123,14 +122,12 @@ class SchemaMapper:
         """Create an attribute type for the target class."""
         prefix, suffix = text.split(name)
         namespace = target.ns_map.get(prefix, target.target_namespace)
-        native = (
-            Namespace.get_enum(namespace) is not None
-            and DataType.get_enum(suffix) is not None
-        )
+        qname = build_qname(namespace, suffix)
+        datatype = DataType.from_qname(qname)
 
         return AttrType(
-            qname=build_qname(namespace, suffix),
-            native=native,
+            qname=qname,
+            native=datatype is not None,
             forward=forward,
         )
 

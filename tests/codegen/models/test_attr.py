@@ -1,8 +1,10 @@
 import sys
 
 from tests.factories import AttrFactory
+from tests.factories import AttrTypeFactory
 from tests.factories import FactoryTestCase
 from xsdata.codegen.models import Restrictions
+from xsdata.models.enums import DataType
 from xsdata.models.enums import Namespace
 from xsdata.models.enums import Tag
 
@@ -92,6 +94,19 @@ class AttrTests(FactoryTestCase):
         self.assertFalse(AttrFactory.create(tag=Tag.ELEMENT).is_nameless)
         self.assertFalse(AttrFactory.create(tag=Tag.ATTRIBUTE).is_nameless)
         self.assertTrue(AttrFactory.create(tag=Tag.ANY).is_nameless)
+
+    def test_property_native_types(self):
+        attr = AttrFactory.create(
+            types=[
+                AttrTypeFactory.create(qname="foo"),
+                AttrTypeFactory.native(DataType.INT),
+                AttrTypeFactory.native(DataType.SHORT),
+                AttrTypeFactory.native(DataType.INTEGER),
+                AttrTypeFactory.native(DataType.FLOAT),
+            ]
+        )
+
+        self.assertCountEqual([float, int], attr.native_types)
 
     def test_property_xml_type(self):
         attr = AttrFactory.create(tag=Tag.ELEMENT)

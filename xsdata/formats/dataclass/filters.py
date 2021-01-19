@@ -157,8 +157,7 @@ class Filters:
         if parent_namespace != attr.namespace or attr.is_attribute:
             namespace = attr.namespace
 
-        types = list({x.native_type for x in attr.types if x.native})
-        restrictions = attr.restrictions.asdict(types)
+        restrictions = attr.restrictions.asdict(attr.native_types)
         doc = attr.help if self.docstring_style == DocstringStyle.ACCESSIBLE else None
 
         return self.filter_metadata(
@@ -189,7 +188,7 @@ class Filters:
         result = []
         for choice in attr.choices:
 
-            types = list({x.native_type for x in choice.types if x.native})
+            types = choice.native_types
             restrictions = choice.restrictions.asdict(types)
             namespace = (
                 choice.namespace if parent_namespace != choice.namespace else None
@@ -360,8 +359,7 @@ class Filters:
         if attr.default.startswith("@enum@"):
             return self.field_default_enum(attr)
 
-        types = list({tp.native_type for tp in attr.types if tp.native})
-        types = converter.sort_types(types)
+        types = converter.sort_types(attr.native_types)
 
         if attr.is_tokens:
             return self.field_default_tokens(attr, types, ns_map)

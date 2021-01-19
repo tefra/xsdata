@@ -16,8 +16,8 @@
       -
       -
     * - :class:`bytes`
-      - base64Binary
       - hexBinary
+      - base64Binary
       -
       -
       -
@@ -28,65 +28,65 @@
       -
       -
     * - :class:`float`
-      - double
       - float
+      - double
       -
       -
       -
     * - :class:`int`
-      - byte
-      - int
       - integer
-      - long
-      - negativeInteger
-    * -
-      - nonNegativeInteger
       - nonPositiveInteger
-      - positiveInteger
-      - short
-      - unsignedByte
+      - negativeInteger
+      - long
+      - int
     * -
-      - unsignedInt
+      - short
+      - byte
+      - nonNegativeInteger
       - unsignedLong
+      - unsignedInt
+    * -
       - unsignedShort
+      - unsignedByte
+      - positiveInteger
       -
       -
     * - :class:`object`
-      - anySimpleType
       - anyType
+      - anySimpleType
       -
       -
       -
     * - :class:`~xml.etree.ElementTree.QName`
-      - NOTATION
       - QName
+      - NOTATION
       -
       -
       -
     * - :class:`str`
-      - anyAtomicType
+      - string
       - anyURI
-      - base
-      - derivationControl
-      - ENTITIES
-    * -
-      - ENTITY
-      - error
-      - ID
-      - IDREF
-      - IDREFS
-    * -
-      - lang
+      - normalizedString
+      - token
       - language
+    * -
+      - NMTOKEN
+      - NMTOKENS
       - Name
       - NCName
-      - NMTOKEN
+      - ID
     * -
-      - NMTOKENS
-      - normalizedString
-      - simpleDerivationSet
-      - string
-      - token
+      - IDREF
+      - IDREFS
+      - ENTITIES
+      - ENTITY
+      - anyAtomicType
+    * -
+      - error
+      -
+      -
+      -
+      -
     * - :class:`~xsdata.models.datatype.XmlDate`
       - date
       -
@@ -100,17 +100,17 @@
       -
       -
     * - :class:`~xsdata.models.datatype.XmlDuration`
+      - duration
       - dayTimeDuration
       - yearMonthDuration
-      - duration
       -
       -
     * - :class:`~xsdata.models.datatype.XmlPeriod`
-      - gDay
-      - gMonth
-      - gMonthDay
-      - gYear
       - gYearMonth
+      - gYear
+      - gMonthDay
+      - gMonth
+      - gDay
     * - :class:`~xsdata.models.datatype.XmlTime`
       - time
       -

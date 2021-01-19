@@ -141,6 +141,7 @@ class ClassFactory(Factory):
         return ClassFactory.create(
             tag=Tag.BINDING_OPERATION,
             attrs=AttrFactory.list(attributes, tag=Tag.ELEMENT),
+            **kwargs,
         )
 
 

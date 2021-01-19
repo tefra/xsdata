@@ -93,61 +93,66 @@ class Mode(Enum):
 class DataType(Enum):
     """Xml and Schema data types to native python."""
 
-    ANY_ATOMIC_TYPE = ("anyAtomicType", str)
-    ANY_URI = ("anyURI", str)
-    ANY_SIMPLE_TYPE = ("anySimpleType", object)
-    ANY_TYPE = ("anyType", object)
-    BASE = ("base", str)
-    BASE64_BINARY = ("base64Binary", bytes, "base64", XmlBase64Binary)
+    # Primitives
+    STRING = ("string", str)
     BOOLEAN = ("boolean", bool)
-    BYTE = ("byte", int)
-    DATE = ("date", XmlDate)
-    DATE_TIME = ("dateTime", XmlDateTime)
-    DATE_TIMESTAMP = ("dateTimeStamp", XmlDateTime)
-    DAY_TIME_DURATION = ("dayTimeDuration", XmlDuration)
-    YEAR_MONTH_DURATION = ("yearMonthDuration", XmlDuration)
     DECIMAL = ("decimal", Decimal)
-    DERIVATION_CONTROL = ("derivationControl", str)
+    FLOAT = ("float", float)
     DOUBLE = ("double", float)
     DURATION = ("duration", XmlDuration)
-    ENTITIES = ("ENTITIES", str)
-    ENTITY = ("ENTITY", str)
-    ERROR = ("error", str)
-    FLOAT = ("float", float)
-    G_DAY = ("gDay", XmlPeriod)
-    G_MONTH = ("gMonth", XmlPeriod)
-    G_MONTH_DAY = ("gMonthDay", XmlPeriod)
-    G_YEAR = ("gYear", XmlPeriod)
+    DATE_TIME = ("dateTime", XmlDateTime)
+    TIME = ("time", XmlTime)
+    DATE = ("date", XmlDate)
     G_YEAR_MONTH = ("gYearMonth", XmlPeriod)
+    G_YEAR = ("gYear", XmlPeriod)
+    G_MONTH_DAY = ("gMonthDay", XmlPeriod)
+    G_MONTH = ("gMonth", XmlPeriod)
+    G_DAY = ("gDay", XmlPeriod)
     HEX_BINARY = ("hexBinary", bytes, "base16", XmlHexBinary)
+    BASE64_BINARY = ("base64Binary", bytes, "base64", XmlBase64Binary)
+    ANY_URI = ("anyURI", str)
+    QNAME = ("QName", QName)
+    NOTATION = ("NOTATION", QName)
+
+    # Derived strings
+    NORMALIZED_STRING = ("normalizedString", str)
+    TOKEN = ("token", str)
+    LANGUAGE = ("language", str)
+    NMTOKEN = ("NMTOKEN", str)
+    NMTOKENS = ("NMTOKENS", str)
+    NAME = ("Name", str)
+    NCNAME = ("NCName", str)
     ID = ("ID", str)
     IDREF = ("IDREF", str)
     IDREFS = ("IDREFS", str)
-    INT = ("int", int)
+    ENTITIES = ("ENTITIES", str)
+    ENTITY = ("ENTITY", str)
+
+    # Derived integers
     INTEGER = ("integer", int)
-    LANG = ("lang", str)
-    LANGUAGE = ("language", str)
-    LONG = ("long", int)
-    NAME = ("Name", str)
-    NCNAME = ("NCName", str)
-    NEGATIVE_INTEGER = ("negativeInteger", int)
-    NMTOKEN = ("NMTOKEN", str)
-    NMTOKENS = ("NMTOKENS", str)
-    NON_NEGATIVE_INTEGER = ("nonNegativeInteger", int)
     NON_POSITIVE_INTEGER = ("nonPositiveInteger", int)
-    NORMALIZED_STRING = ("normalizedString", str)
-    NOTATION = ("NOTATION", QName)
-    POSITIVE_INTEGER = ("positiveInteger", int)
-    QNAME = ("QName", QName)
+    NEGATIVE_INTEGER = ("negativeInteger", int)
+    LONG = ("long", int)
+    INT = ("int", int)
     SHORT = ("short", int)
-    SIMPLE_DERIVATION_SET = ("simpleDerivationSet", str)
-    STRING = ("string", str)
-    TIME = ("time", XmlTime)
-    TOKEN = ("token", str)
-    UNSIGNED_BYTE = ("unsignedByte", int)
-    UNSIGNED_INT = ("unsignedInt", int)
+    BYTE = ("byte", int)
+    NON_NEGATIVE_INTEGER = ("nonNegativeInteger", int)
     UNSIGNED_LONG = ("unsignedLong", int)
+    UNSIGNED_INT = ("unsignedInt", int)
     UNSIGNED_SHORT = ("unsignedShort", int)
+    UNSIGNED_BYTE = ("unsignedByte", int)
+    POSITIVE_INTEGER = ("positiveInteger", int)
+
+    # Derived Date/Time/Duration
+    DATE_TIMESTAMP = ("dateTimeStamp", XmlDateTime)
+    DAY_TIME_DURATION = ("dayTimeDuration", XmlDuration)
+    YEAR_MONTH_DURATION = ("yearMonthDuration", XmlDuration)
+
+    # Extensions
+    ANY_TYPE = ("anyType", object)
+    ANY_ATOMIC_TYPE = ("anyAtomicType", str)
+    ANY_SIMPLE_TYPE = ("anySimpleType", object)
+    ERROR = ("error", str)
 
     def __init__(
         self,
@@ -166,10 +171,6 @@ class DataType(Enum):
 
     def prefixed(self, prefix: Optional[str] = Namespace.XS.prefix) -> str:
         return f"{prefix}:{self.code}" if prefix else self.code
-
-    @classmethod
-    def get_enum(cls, code: str) -> Optional["DataType"]:
-        return __DataTypeCodeIndex__.get(code) if code else None
 
     @classmethod
     def from_value(cls, value: Any) -> "DataType":
@@ -233,7 +234,6 @@ __DataTypeInferIndex__: Dict[Type, Callable] = {
     float: float_datatype,
     XmlPeriod: period_datatype,
 }
-__DataTypeCodeIndex__ = {dt.code: dt for dt in DataType}
 __DataTypeQNameIndex__ = {str(dt): dt for dt in DataType}
 
 

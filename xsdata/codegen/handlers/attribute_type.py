@@ -56,7 +56,11 @@ class AttributeTypeHandler(HandlerInterface):
         - Update restrictions from the datatype
         - Reset attribute type if there is a pattern restriction
         """
-        cls.update_restrictions(attr, attr_type.datatype)
+        datatype = attr_type.datatype
+
+        assert datatype is not None
+
+        cls.update_restrictions(attr, datatype)
 
         if attr.restrictions.pattern:
             cls.reset_attribute_type(attr_type)
@@ -193,9 +197,8 @@ class AttributeTypeHandler(HandlerInterface):
         attr_type.forward = False
 
     @classmethod
-    def update_restrictions(cls, attr: Attr, datatype: Optional[DataType]):
-        if datatype:
-            attr.restrictions.format = datatype.format
+    def update_restrictions(cls, attr: Attr, datatype: DataType):
+        attr.restrictions.format = datatype.format
 
         if datatype in (DataType.NMTOKENS, DataType.IDREFS):
             attr.restrictions.tokens = True
@@ -213,7 +216,10 @@ class AttributeTypeHandler(HandlerInterface):
         types = collections.remove(types, lambda x: x.datatype == DataType.ERROR)
 
         if len(types) > 1:
-            types = collections.remove(types, lambda x: x.native_type is object)
+            types = collections.remove(
+                types,
+                lambda x: x.datatype in (DataType.ANY_TYPE, DataType.ANY_SIMPLE_TYPE),
+            )
 
         if not types:
             types.append(AttrType(qname=str(DataType.STRING), native=True))

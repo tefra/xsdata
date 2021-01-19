@@ -206,13 +206,7 @@ class AttrType:
 
     @property
     def datatype(self) -> Optional[DataType]:
-        return DataType.get_enum(self.name) if self.native else None
-
-    @property
-    def native_type(self) -> Any:
-        """Return the python build-in type if it's a native type."""
-        datatype = self.datatype
-        return datatype.type if datatype else None
+        return DataType.from_qname(self.qname) if self.native else None
 
     def clone(self) -> "AttrType":
         """Return a deep cloned instance."""
@@ -319,6 +313,17 @@ class Attr:
         """Return whether this attribute is derived from xs:anyAttribute or
         xs:any."""
         return self.tag in (Tag.ANY_ATTRIBUTE, Tag.ANY)
+
+    @property
+    def native_types(self) -> List[Type]:
+        """Return a list of all builtin data types."""
+        result = set()
+        for tp in self.types:
+            datatype = tp.datatype
+            if datatype:
+                result.add(datatype.type)
+
+        return list(result)
 
     @property
     def xml_type(self) -> Optional[str]:

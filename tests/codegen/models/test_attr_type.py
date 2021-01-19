@@ -17,11 +17,3 @@ class AttrTypeTests(FactoryTestCase):
 
         attr_type.circular = False
         self.assertTrue(attr_type.is_dependency)
-
-    def test_native_property(self):
-        attr_type = AttrTypeFactory.native(DataType.INTEGER)
-        self.assertEqual(int, attr_type.native_type)
-
-    def test_non_native_property(self):
-        attr_type = AttrTypeFactory.create(qname="foo")
-        self.assertIsNone(attr_type.native_type)

@@ -31,7 +31,7 @@
                     ]
                 }
             ],
-            "eff_date": "2002-04-02",
+            "effDate": "2002-04-02",
             "other_attributes": {}
         },
         {
@@ -44,7 +44,7 @@
                         "value": "red"
                     }
                 ],
-                "eff_date": "1900-01-01",
+                "effDate": "1900-01-01",
                 "other_attributes": {
                     "{http://example.org/oth}custom": "12"
                 }

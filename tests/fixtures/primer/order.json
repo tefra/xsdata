@@ -1,5 +1,5 @@
 {
-    "ship_to": {
+    "shipTo": {
         "name": "Alice Smith",
         "street": "123 Maple Street",
         "city": "Mill Valley",
@@ -7,7 +7,7 @@
         "zip": "90952",
         "country": "US"
     },
-    "bill_to": {
+    "billTo": {
         "name": "Robert Smith",
         "street": "8 Oak Avenue",
         "city": "Old Town",
@@ -19,22 +19,22 @@
     "items": {
         "item": [
             {
-                "product_name": "Lawnmower",
+                "productName": "Lawnmower",
                 "quantity": 1,
-                "usprice": "148.95",
+                "USPrice": "148.95",
                 "comment": "Confirm this is electric",
-                "ship_date": null,
-                "part_num": "872-AA"
+                "shipDate": null,
+                "partNum": "872-AA"
             },
             {
-                "product_name": "Baby Monitor",
+                "productName": "Baby Monitor",
                 "quantity": 1,
-                "usprice": "39.98",
+                "USPrice": "39.98",
                 "comment": null,
-                "ship_date": "1999-05-21",
-                "part_num": "926-AA"
+                "shipDate": "1999-05-21",
+                "partNum": "926-AA"
             }
         ]
     },
-    "order_date": "1999-10-20"
+    "orderDate": "1999-10-20"
 }

@@ -64,7 +64,7 @@ class JsonSerializer(AbstractSerializer):
         if var is None or is_dataclass(obj):
             return self.dict_factory(
                 [
-                    (var.name, self.convert(getattr(obj, var.name), var))
+                    (var.lname, self.convert(getattr(obj, var.name), var))
                     for var in self.context.build(obj.__class__).vars
                 ]
             )

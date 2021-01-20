@@ -4,7 +4,6 @@ import pathlib
 import warnings
 from dataclasses import dataclass
 from dataclasses import field
-from dataclasses import fields
 from dataclasses import is_dataclass
 from typing import Any
 from typing import Dict
@@ -79,7 +78,7 @@ class JsonParser(AbstractParser):
         """Recursively build the given model from the input dict data."""
         params = {}
         for var in self.context.build(clazz).vars:
-            value = data.get(var.name)
+            value = data.get(var.lname)
 
             if value is None or not var.init:
                 continue
@@ -181,7 +180,8 @@ class JsonParser(AbstractParser):
         keys = set(value.keys())
         for choice in var.choices:
             if choice.clazz:
-                attrs = {f.name for f in fields(choice.clazz)}
+                meta = self.context.build(choice.clazz)
+                attrs = {var.lname for var in meta.vars}
                 if attrs == keys:
                     return self.bind_value(choice, value)
 

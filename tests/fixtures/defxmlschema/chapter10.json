@@ -3,23 +3,23 @@
         12,
         "medium"
     ],
-    "small_size": [
+    "smallSize": [
         "6",
         "small"
     ],
-    "international_size": [
+    "internationalSize": [
         12,
         24,
         "large"
     ],
-    "available_sizes": [
+    "availableSizes": [
         [
             10,
             "large",
             2
         ]
     ],
-    "applicable_sizes": [
+    "applicableSizes": [
         "small medium large"
     ]
 }

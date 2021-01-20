@@ -91,6 +91,12 @@ class XmlVar:
             raise XmlContextError(f"Unknown xml type `{xml_type}`")
 
     @property
+    def lname(self) -> str:
+        """Local name."""
+        _, name = split_qname(self.qname)
+        return name
+
+    @property
     def clazz(self) -> Optional[Type]:
         """Return the first type if field is bound to a dataclass."""
         return self.types[0] if self.dataclass else None

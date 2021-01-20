@@ -48,7 +48,7 @@ class ClientTests(TestCase):
         mock_post.return_value = response.encode()
 
         client = Client.from_service(CalculatorSoapAdd)
-        params = {"body": {"add": {"int_a": 3, "int_b": 4}}}
+        params = {"Body": {"Add": {"intA": 3, "intB": 4}}}
 
         result = client.send(params, headers={"User-Agent": "xsdata"})
 

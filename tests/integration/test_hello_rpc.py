@@ -46,7 +46,7 @@ class HelloRpcServiceTests(TestCase):
         config = Config.from_service(HelloGetHelloAsString)
         serializer = XmlSerializer(config=SerializerConfig(pretty_print=True))
         client = Client(config=config, serializer=serializer)
-        result = client.send({"body": {"get_hello_as_string": {"arg0": "chris"}}})
+        result = client.send({"Body": {"getHelloAsString": {"arg0": "chris"}}})
 
         self.assertIsInstance(result, HelloGetHelloAsString.output)
 
@@ -70,7 +70,7 @@ class HelloRpcServiceTests(TestCase):
         config = Config.from_service(HelloGetHelloAsString)
         serializer = XmlSerializer(config=SerializerConfig(pretty_print=True))
         client = Client(config=config, serializer=serializer)
-        result = client.send({"body": {"get_hello_as_string": {"arg0": "chris"}}})
+        result = client.send({"Body": {"getHelloAsString": {"arg0": "chris"}}})
 
         self.assertIsInstance(result, HelloGetHelloAsString.output)
 
@@ -90,5 +90,5 @@ class HelloRpcServiceTests(TestCase):
         config = Config.from_service(HelloGetHelloAsString)
         serializer = XmlSerializer(config=SerializerConfig(pretty_print=True))
         client = Client(config=config, serializer=serializer)
-        result = client.send({"body": {"get_hello_as_string": {"arg0": "chris"}}})
+        result = client.send({"Body": {"getHelloAsString": {"arg0": "chris"}}})
         print(result)

@@ -1,11 +1,11 @@
 {
     "hat": [
         {
-            "routing_num": 123456,
+            "routingNum": 123456,
             "number": 557,
             "name": "Ten-Gallon Hat",
             "description": "This is a great hat!",
-            "eff_date": "2002-04-02",
+            "effDate": "2002-04-02",
             "lang": "en-US"
         }
     ],
@@ -14,9 +14,9 @@
             "number": 557,
             "name": "Ten-Gallon Hat",
             "description": null,
-            "routing_num": 123,
+            "routingNum": 123,
             "lang": null,
-            "eff_date": "2002-04-02"
+            "effDate": "2002-04-02"
         }
     ],
     "shirt": [
@@ -24,9 +24,9 @@
             "number": 557,
             "name": "Short-Sleeved Linen Blouse",
             "description": null,
-            "routing_num": 124,
+            "routingNum": 124,
             "lang": null,
-            "eff_date": "2002-04-02",
+            "effDate": "2002-04-02",
             "size": [
                 {
                     "value": 6,

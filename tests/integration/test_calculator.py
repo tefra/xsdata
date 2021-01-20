@@ -43,7 +43,7 @@ class CalculatorServiceTests(TestCase):
         config = Config.from_service(CalculatorSoapAdd)
         serializer = XmlSerializer(config=SerializerConfig(pretty_print=True))
         client = Client(config=config, serializer=serializer)
-        result = client.send({"body": {"add": {"int_a": 1, "int_b": 3}}})
+        result = client.send({"Body": {"Add": {"intA": 1, "intB": 3}}})
 
         self.assertIsInstance(result, CalculatorSoapAddOutput)
 

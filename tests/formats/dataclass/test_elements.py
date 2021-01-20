@@ -79,6 +79,10 @@ class XmlValTests(TestCase):
 
         self.assertEqual("Unknown xml type `xsdata`", str(cm.exception))
 
+    def test_property_lname(self):
+        var = XmlVar(name="a", qname="{B}A")
+        self.assertEqual("A", var.lname)
+
     def test_property_clazz(self):
         var = XmlVar(name="foo", qname="foo")
         self.assertIsNone(var.clazz)

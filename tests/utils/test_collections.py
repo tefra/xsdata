@@ -1,6 +1,5 @@
 from typing import Generator
 from typing import Hashable
-from typing import Iterable
 from unittest import TestCase
 
 from xsdata.utils import collections

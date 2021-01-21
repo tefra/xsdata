@@ -26,6 +26,7 @@ from xsdata.formats.dataclass.models.elements import XmlVar
 from xsdata.models.enums import DataType
 from xsdata.models.enums import NamespaceType
 from xsdata.utils.constants import EMPTY_SEQUENCE
+from xsdata.utils.constants import return_input
 from xsdata.utils.namespaces import build_qname
 
 
@@ -34,15 +35,15 @@ class XmlContext:
     """
     The service provider for binding operations metadata.
 
-    :param element_name: Default callable to convert field names to element tags
-    :param attribute_name: Default callable to convert field names to attribute tags
+    :param element_name_generator: Default element name generator
+    :param attribute_name_generator: Default attribute name generator
     :ivar cache: Cache models metadata
     :ivar xsi_cache: Index models by xsi:type
     :ivar sys_modules: Number of imported modules
     """
 
-    element_name: Callable = field(default=lambda x: x)
-    attribute_name: Callable = field(default=lambda x: x)
+    element_name_generator: Callable = field(default=return_input)
+    attribute_name_generator: Callable = field(default=return_input)
     cache: Dict[Type, XmlMeta] = field(init=False, default_factory=dict)
     xsi_cache: Dict[str, List[Type]] = field(
         init=False, default_factory=lambda: defaultdict(list)
@@ -83,10 +84,14 @@ class XmlContext:
         for clazz in self.get_subclasses(object):
             if is_dataclass(clazz):
                 meta = clazz.Meta if "Meta" in clazz.__dict__ else None
-                name = getattr(meta, "name", None) or self.local_name(clazz.__name__)
+                local_name = getattr(meta, "name", None)
+                element_name_generator = getattr(
+                    meta, "element_name_generator", self.element_name_generator
+                )
+                local_name = local_name or element_name_generator(clazz.__name__)
                 module = sys.modules[clazz.__module__]
                 source_namespace = getattr(module, "__NAMESPACE__", None)
-                source_qname = build_qname(source_namespace, name)
+                source_qname = build_qname(source_namespace, local_name)
                 self.xsi_cache[source_qname].append(clazz)
 
         self.sys_modules = len(sys.modules)
@@ -169,7 +174,14 @@ class XmlContext:
             # Fetch the dataclass meta settings and make sure we don't inherit
             # the parent class meta.
             meta = clazz.Meta if "Meta" in clazz.__dict__ else None
-            name = getattr(meta, "name", None) or self.local_name(clazz.__name__)
+            element_name_generator = getattr(
+                meta, "element_name_generator", self.element_name_generator
+            )
+            attribute_name_generator = getattr(
+                meta, "attribute_name_generator", self.attribute_name_generator
+            )
+            local_name = getattr(meta, "name", None)
+            local_name = local_name or element_name_generator(clazz.__name__)
             nillable = getattr(meta, "nillable", False)
             namespace = getattr(meta, "namespace", parent_ns)
             module = sys.modules[clazz.__module__]
@@ -177,14 +189,27 @@ class XmlContext:
 
             self.cache[clazz] = XmlMeta(
                 clazz=clazz,
-                qname=build_qname(namespace, name),
-                source_qname=build_qname(source_namespace, name),
+                qname=build_qname(namespace, local_name),
+                source_qname=build_qname(source_namespace, local_name),
                 nillable=nillable,
-                vars=list(self.get_type_hints(clazz, namespace)),
+                vars=list(
+                    self.get_type_hints(
+                        clazz,
+                        namespace,
+                        element_name_generator,
+                        attribute_name_generator,
+                    )
+                ),
             )
         return self.cache[clazz]
 
-    def get_type_hints(self, clazz: Type, parent_ns: Optional[str]) -> Iterator[XmlVar]:
+    def get_type_hints(
+        self,
+        clazz: Type,
+        parent_ns: Optional[str],
+        element_name_generator: Callable,
+        attribute_name_generator: Callable,
+    ) -> Iterator[XmlVar]:
         """
         Build the model fields binding metadata.
 
@@ -211,7 +236,12 @@ class XmlContext:
             element_list = self.is_element_list(type_hint, tokens)
             is_class = any(is_dataclass(clazz) for clazz in types)
             xml_type = xml_type or (XmlType.ELEMENT if is_class else default_xml_type)
-            local_name = local_name or self.local_name(var.name, xml_type)
+
+            if not local_name:
+                if xml_type == XmlType.ATTRIBUTE:
+                    local_name = attribute_name_generator(var.name)
+                else:
+                    local_name = element_name_generator(var.name)
 
             namespaces = self.resolve_namespaces(xml_type, namespace, parent_ns)
             default_namespace = self.default_namespace(namespaces)
@@ -429,9 +459,3 @@ class XmlContext:
                 yield subclass
         except TypeError:
             pass
-
-    def local_name(self, name: str, xml_type: Optional[str] = None) -> str:
-        if xml_type == "Attribute":
-            return self.attribute_name(name)
-
-        return self.element_name(name)

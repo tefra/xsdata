@@ -11,6 +11,11 @@ def return_true(*_: Any) -> bool:
     return True
 
 
+def return_input(obj: Any) -> Any:
+    """A dummy function that always returns input."""
+    return obj
+
+
 class DateFormat:
     DATE = "%Y-%m-%d%z"
     TIME = "%H:%M:%S%z"

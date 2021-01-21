@@ -259,14 +259,20 @@ class GeneratorConfig:
 
     @classmethod
     def read(cls, path: Path) -> "GeneratorConfig":
-        ctx = XmlContext(element_name=text.pascal_case, attribute_name=text.camel_case)
+        ctx = XmlContext(
+            element_name_generator=text.pascal_case,
+            attribute_name_generator=text.camel_case,
+        )
         config = ParserConfig(fail_on_unknown_properties=False)
         parser = XmlParser(context=ctx, config=config)
         return parser.from_path(path, cls)
 
     @classmethod
     def write(cls, output: TextIO, obj: "GeneratorConfig"):
-        ctx = XmlContext(element_name=text.pascal_case, attribute_name=text.camel_case)
+        ctx = XmlContext(
+            element_name_generator=text.pascal_case,
+            attribute_name_generator=text.camel_case,
+        )
         config = SerializerConfig(pretty_print=True)
         serializer = XmlSerializer(context=ctx, config=config, writer=XmlEventWriter)
         serializer.write(output, obj, ns_map={None: "http://pypi.org/project/xsdata"})

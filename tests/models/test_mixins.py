@@ -1,10 +1,8 @@
-from dataclasses import dataclass
 from typing import Generator
 from typing import Iterator
 from unittest import TestCase
 
 from xsdata.exceptions import SchemaValueError
-from xsdata.models.enums import DataType
 from xsdata.models.enums import FormType
 from xsdata.models.enums import Namespace
 from xsdata.models.mixins import ElementBase

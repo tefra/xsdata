@@ -27,6 +27,9 @@ Basic Model
 Class Meta
 ==========
 
+Through the Meta class you can control the model's behaviour during data binding
+procedures.
+
 .. list-table::
    :widths: 20 10 300
    :header-rows: 1
@@ -36,13 +39,19 @@ Class Meta
      - Description
    * - name
      - str
-     - The real name of the element this class represents.
+     - The real/local name of the element this class represents.
    * - nillable
      - bool
      - Specifies whether an explicit empty value can be assigned, default: False
    * - namespace
      - str
      - The element xml namespace.
+   * - element_name_generator
+     - Callable
+     - Element name generator
+   * - attribute_name_generator
+     - Callable
+     - Attribute name generator
 
 
 Field Typing
@@ -55,6 +64,9 @@ Simply follow the Python lib
 Field Metadata
 ==============
 
+Through the metadata properties you can control the field's behaviour during data
+binding procedures.
+
 .. list-table::
    :widths: 20 10 250
    :header-rows: 1
@@ -64,7 +76,7 @@ Field Metadata
      - Description
    * - name
      - str
-     - The real name of the element or attribute this field represents.
+     - The real/local name of the element or attribute this field represents.
    * - type
      - str
      - The field xml type:
@@ -328,3 +340,142 @@ is directly assigned as text to elements.
 .. code-block:: xml
 
     <root>2020</root>
+
+
+Advance Topics
+==============
+
+Customize element and attribute names
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Through the model and field metadata you can explicitly specify the serialized
+names. You can also provide callables to set the real/local names per model or
+for the entire binding context.
+
+
+.. doctest::
+
+    >>> from dataclasses import dataclass, field
+    >>> from datetime import date
+    >>> from xsdata.formats.dataclass.context import XmlContext
+    >>> from xsdata.formats.dataclass.parsers import XmlParser
+    >>> from xsdata.formats.dataclass.serializers import XmlSerializer
+    >>> from xsdata.formats.dataclass.serializers.config import SerializerConfig
+    >>> from xsdata.utils import text
+    >>> config = SerializerConfig(pretty_print=True, xml_declaration=False)
+    >>> serializer = XmlSerializer(config=config)
+
+**Ordered by priority**
+
+.. tab:: Explicit names
+
+    Explicit model and field names is the most straight forward way to customize
+    the real/local names for elements and attributes. It can become tedious though
+    when you have to do this for models with a lot of fields.
+
+    .. doctest::
+
+        >>> @dataclass
+        ... class Person:
+        ...
+        ...     class Meta:
+        ...         name = "Person"  # Explicit name
+        ...
+        ...     first_name: str = field(metadata=dict(name="firstName"))
+        ...     last_name: str = field(metadata=dict(name="lastName"))
+        ...     birth_date: date = field(
+        ...         metadata=dict(
+        ...             type="Attribute",
+        ...             format="%Y-%m-%d",
+        ...             name="dob"  # Explicit name
+        ...         )
+        ...     )
+        ...
+        >>> obj = Person(
+        ...     first_name="Chris",
+        ...     last_name="T",
+        ...     birth_date=date(1986, 9, 25),
+        ... )
+        >>> print(serializer.render(obj))
+        <Person dob="1986-09-25">
+          <firstName>Chris</firstName>
+          <lastName>T</lastName>
+        </Person>
+        <BLANKLINE>
+
+
+.. tab:: Model name generators
+
+    Through the Meta class you can provide callables to apply a naming scheme for all
+    the model fields. The :mod:`xsdata.utils.text` has various helpers that you can
+    reuse.
+
+    .. doctest::
+
+        >>> @dataclass
+        ... class person:
+        ...
+        ...     class Meta:
+        ...         element_name_generator = text.pascal_case
+        ...         attribute_name_generator = text.camel_case
+        ...
+        ...     first_name: str
+        ...     last_name: str
+        ...     birth_date: date = field(
+        ...         metadata=dict(
+        ...             type="Attribute",
+        ...             format="%Y-%m-%d"
+        ...         )
+        ...     )
+        ...
+        >>> obj = person(
+        ...     first_name="Chris",
+        ...     last_name="T",
+        ...     birth_date=date(1986, 9, 25),
+        ... )
+        >>> print(serializer.render(obj))
+        <Person birthDate="1986-09-25">
+          <FirstName>Chris</FirstName>
+          <LastName>T</LastName>
+        </Person>
+        <BLANKLINE>
+
+
+.. tab:: Context name generators
+
+    Through the :class:`~xsdata.formats.dataclass.context.XmlContext` instance you can
+    provide callables to apply a naming scheme for all models and their fields. This way
+    you can avoid declaring them for every model but you have to use the same context
+    whenever you want to use a parser/serializer.
+
+    .. doctest::
+
+        >>> @dataclass
+        ... class Person:
+        ...
+        ...     first_name: str
+        ...     last_name: str
+        ...     birth_date: date = field(
+        ...         metadata=dict(
+        ...             type="Attribute",
+        ...             format="%Y-%m-%d"
+        ...         )
+        ...     )
+        ...
+        >>> obj = Person(
+        ...     first_name="Chris",
+        ...     last_name="T",
+        ...     birth_date=date(1986, 9, 25),
+        ... )
+        ...
+        >>> context = XmlContext(
+        ...     element_name_generator=text.camel_case,
+        ...     attribute_name_generator=text.kebab_case
+        ... )
+        >>> serializer = XmlSerializer(context=context, config=config)
+        >>> print(serializer.render(obj))
+        <person birth-date="1986-09-25">
+          <firstName>Chris</firstName>
+          <lastName>T</lastName>
+        </person>
+        <BLANKLINE>

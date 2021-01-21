@@ -1,8 +1,6 @@
 from typing import Iterator
 from unittest import TestCase
 
-from xsdata.models.enums import DataType
-from xsdata.models.enums import Namespace
 from xsdata.models.xsd import Enumeration
 from xsdata.models.xsd import FractionDigits
 from xsdata.models.xsd import Length

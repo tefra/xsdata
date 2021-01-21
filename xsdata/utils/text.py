@@ -62,6 +62,11 @@ def snake_case(string: str, **kwargs: Any) -> str:
     return "_".join(map(str.lower, split_words(string)))
 
 
+def kebab_case(string: str, **kwargs: Any) -> str:
+    """Convert the given string to kebab case."""
+    return "-".join(split_words(string))
+
+
 def split_words(string: str) -> List[str]:
     """Split a string on new capital letters and not alphanumeric
     characters."""

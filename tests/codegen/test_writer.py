@@ -52,9 +52,9 @@ class CodeWriterTests(FactoryTestCase):
     def test_print(self, mock_print, mock_designate, mock_render):
         classes = ClassFactory.list(2)
         mock_render.return_value = [
-            GeneratorResult(Path(f"foo/a.py"), "file", "aAa"),
-            GeneratorResult(Path(f"bar/b.py"), "file", "bBb"),
-            GeneratorResult(Path(f"c.py"), "file", ""),
+            GeneratorResult(Path("foo/a.py"), "file", "aAa"),
+            GeneratorResult(Path("bar/b.py"), "file", "bBb"),
+            GeneratorResult(Path("c.py"), "file", ""),
         ]
         self.writer.print(classes)
 

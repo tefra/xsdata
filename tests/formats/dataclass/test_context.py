@@ -29,6 +29,7 @@ from xsdata.formats.dataclass.models.elements import XmlVar
 from xsdata.models.datatype import XmlDate
 from xsdata.models.enums import DataType
 from xsdata.utils import text
+from xsdata.utils.constants import return_input
 from xsdata.utils.constants import return_true
 from xsdata.utils.namespaces import build_qname
 
@@ -130,7 +131,9 @@ class XmlContextTests(TestCase):
         )
 
         self.assertEqual(expected, result)
-        mock_get_type_hints.assert_called_once_with(ItemsType, None)
+        mock_get_type_hints.assert_called_once_with(
+            ItemsType, None, return_input, return_input
+        )
 
     @mock.patch.object(XmlContext, "get_type_hints", return_value={})
     def test_build_with_meta_namespace(self, mock_get_type_hints):
@@ -139,18 +142,22 @@ class XmlContextTests(TestCase):
 
         self.assertEqual(build_qname(namespace, "product"), result.qname)
         self.assertEqual(build_qname(namespace, "product"), result.source_qname)
-        mock_get_type_hints.assert_called_once_with(Product, namespace)
+        mock_get_type_hints.assert_called_once_with(
+            Product, namespace, return_input, return_input
+        )
 
     @mock.patch.object(XmlContext, "get_type_hints", return_value={})
     def test_build_with_parent_ns(self, mock_get_type_hints):
         result = self.ctx.build(ProductType, "http://xsdata")
 
         self.assertEqual(build_qname("http://xsdata", "ProductType"), str(result.qname))
-        mock_get_type_hints.assert_called_once_with(ProductType, "http://xsdata")
+        mock_get_type_hints.assert_called_once_with(
+            ProductType, "http://xsdata", return_input, return_input
+        )
 
     @mock.patch.object(XmlContext, "get_type_hints", return_value={})
     def test_build_with_no_meta_name_and_name_generator(self, *args):
-        inspect = XmlContext(element_name=lambda x: text.snake_case(x))
+        inspect = XmlContext(element_name_generator=lambda x: text.snake_case(x))
         result = inspect.build(ItemsType)
 
         self.assertEqual("items_type", result.qname)
@@ -184,21 +191,21 @@ class XmlContextTests(TestCase):
         self.assertEqual(f"Object {int} is not a dataclass.", str(cm.exception))
 
     def test_get_type_hints(self):
-        result = self.ctx.get_type_hints(BookForm, None)
+        result = self.ctx.get_type_hints(BookForm, None, text.pascal_case, str.upper)
         self.assertIsInstance(result, Iterator)
 
         expected = [
-            XmlVar(element=True, name="author", qname="author", types=[str]),
-            XmlVar(element=True, name="title", qname="title", types=[str]),
-            XmlVar(element=True, name="genre", qname="genre", types=[str]),
-            XmlVar(element=True, name="price", qname="price", types=[float]),
-            XmlVar(element=True, name="pub_date", qname="pub_date", types=[XmlDate]),
-            XmlVar(element=True, name="review", qname="review", types=[str]),
-            XmlVar(attribute=True, name="id", qname="id", types=[str]),
+            XmlVar(element=True, name="author", qname="Author", types=[str]),
+            XmlVar(element=True, name="title", qname="Title", types=[str]),
+            XmlVar(element=True, name="genre", qname="Genre", types=[str]),
+            XmlVar(element=True, name="price", qname="Price", types=[float]),
+            XmlVar(element=True, name="pub_date", qname="PubDate", types=[XmlDate]),
+            XmlVar(element=True, name="review", qname="Review", types=[str]),
+            XmlVar(attribute=True, name="id", qname="ID", types=[str]),
             XmlVar(
                 attribute=True,
                 name="lang",
-                qname="lang",
+                qname="LANG",
                 types=[str],
                 init=False,
                 default="en",
@@ -218,7 +225,9 @@ class XmlContextTests(TestCase):
             int: int
             union: Union[int, bool]
 
-        result = list(self.ctx.get_type_hints(Example, None))
+        result = list(
+            self.ctx.get_type_hints(Example, None, return_input, return_input)
+        )
         expected = [
             XmlVar(element=True, name="bool", qname="bool", types=[bool]),
             XmlVar(element=True, name="int", qname="int", types=[int]),
@@ -231,7 +240,7 @@ class XmlContextTests(TestCase):
         self.assertEqual(expected, result)
 
     def test_get_type_hints_with_dataclass_list(self):
-        result = list(self.ctx.get_type_hints(Books, None))
+        result = list(self.ctx.get_type_hints(Books, None, return_input, return_input))
 
         expected = XmlVar(
             element=True,
@@ -250,7 +259,7 @@ class XmlContextTests(TestCase):
         self.assertEqual(BookForm, result[0].clazz)
 
     def test_get_type_hints_with_wildcard_element(self):
-        result = list(self.ctx.get_type_hints(Umbrella, None))
+        actual = self.ctx.get_type_hints(Umbrella, None, return_input, return_input)
 
         expected = XmlVar(
             wildcard=True,
@@ -261,8 +270,7 @@ class XmlContextTests(TestCase):
             namespaces=["##any"],
         )
 
-        self.assertEqual(1, len(result))
-        self.assertEqual(expected, result[0])
+        self.assertEqual([expected], list(actual))
 
     def test_get_type_hints_with_undefined_types(self):
         @dataclass
@@ -282,7 +290,8 @@ class XmlContextTests(TestCase):
             XmlVar(element=True, name="iso_code", qname="CharCode", types=[str]),
             XmlVar(element=True, name="nominal", qname="Nominal", types=[int]),
         ]
-        self.assertEqual(expected, list(self.ctx.get_type_hints(Currency, None)))
+        actual = self.ctx.get_type_hints(Currency, None, return_input, return_input)
+        self.assertEqual(expected, list(actual))
 
         expected = [
             XmlVar(attribute=True, name="name", qname="name", types=[str]),
@@ -303,10 +312,12 @@ class XmlContextTests(TestCase):
                 types=[Currency],
             ),
         ]
-        self.assertEqual(expected, list(self.ctx.get_type_hints(Currencies, None)))
+
+        actual = self.ctx.get_type_hints(Currencies, None, return_input, return_input)
+        self.assertEqual(expected, list(actual))
 
     def test_get_type_hints_with_choices(self):
-        actual = self.ctx.get_type_hints(Node, "bar")
+        actual = self.ctx.get_type_hints(Node, "bar", return_input, return_input)
         self.assertIsInstance(actual, Generator)
         expected = XmlVar(
             elements=True,

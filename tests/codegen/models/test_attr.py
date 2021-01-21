@@ -1,11 +1,8 @@
 import sys
-from unittest import mock
 
 from tests.factories import AttrFactory
 from tests.factories import FactoryTestCase
-from xsdata.codegen.models import Attr
 from xsdata.codegen.models import Restrictions
-from xsdata.formats.dataclass.models.elements import XmlType
 from xsdata.models.enums import Namespace
 from xsdata.models.enums import Tag
 

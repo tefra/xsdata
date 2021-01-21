@@ -22,7 +22,6 @@ from xsdata.models.wsdl import PortTypeMessage
 from xsdata.models.wsdl import PortTypeOperation
 from xsdata.models.wsdl import Service
 from xsdata.models.wsdl import ServicePort
-from xsdata.models.xsd import Element
 from xsdata.utils.namespaces import build_qname
 
 

@@ -128,6 +128,9 @@ class ClassTests(FactoryTestCase):
             obj.attrs[0].tag = tag
             self.assertTrue(obj.is_simple_type)
 
+        obj.extensions.append(ExtensionFactory.create())
+        self.assertFalse(obj.is_simple_type)
+
     def test_property_should_generate(self):
         obj = ClassFactory.create(tag=Tag.ELEMENT)
         self.assertTrue(obj.should_generate)

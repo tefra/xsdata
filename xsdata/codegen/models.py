@@ -462,7 +462,11 @@ class Class:
     @property
     def is_simple_type(self) -> bool:
         """Return whether the class represents a simple text type."""
-        return len(self.attrs) == 1 and self.attrs[0].tag in SIMPLE_TYPES
+        return (
+            len(self.attrs) == 1
+            and self.attrs[0].tag in SIMPLE_TYPES
+            and not self.extensions
+        )
 
     @property
     def should_generate(self) -> bool:

@@ -58,7 +58,7 @@ class ElementBase:
         return None
 
     @property
-    def extensions(self) -> Iterator[str]:
+    def bases(self) -> Iterator[str]:
         """Return an iterator of all the base types."""
         yield from ()
 
@@ -133,11 +133,6 @@ class ElementBase:
     def raw_namespace(self) -> Optional[str]:
         """Return if present the target namespace attribute value."""
         return getattr(self, "target_namespace", None)
-
-    @property
-    def raw_type(self) -> Optional[str]:
-        """Return if present the type attribute value."""
-        return getattr(self, "type", None)
 
     @property
     def real_name(self) -> str:

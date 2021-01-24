@@ -11,13 +11,13 @@ from xsdata.models.xsd import Union
 
 
 class UnionTests(TestCase):
-    def test_property_extensions(self):
+    def test_property_bases(self):
         obj = Union()
-        self.assertIsInstance(obj.extensions, Iterator)
-        self.assertEqual([], list(obj.extensions))
+        self.assertIsInstance(obj.bases, Iterator)
+        self.assertEqual([], list(obj.bases))
 
         obj.member_types = "foo bar   "
-        self.assertEqual(["foo", "bar"], list(obj.extensions))
+        self.assertEqual(["foo", "bar"], list(obj.bases))
 
     def test_property_is_attribute(self):
         obj = Union()

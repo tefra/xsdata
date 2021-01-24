@@ -49,10 +49,10 @@ class ElementBaseTests(TestCase):
         element = ElementBase()
         self.assertIsNone(element.display_help)
 
-    def test_property_extensions(self):
+    def test_property_bases(self):
         element = ElementBase()
-        self.assertIsInstance(element.extensions, Iterator)
-        self.assertEqual([], list(element.extensions))
+        self.assertIsInstance(element.bases, Iterator)
+        self.assertEqual([], list(element.bases))
 
     def test_property_has_children(self):
         element = ElementBase()
@@ -147,13 +147,6 @@ class ElementBaseTests(TestCase):
 
         element.target_namespace = "tns"
         self.assertEqual("tns", element.raw_namespace)
-
-    def test_property_raw_type(self):
-        element = ElementBase()
-        self.assertIsNone(element.raw_namespace)
-
-        element.type = "xs:int"
-        self.assertEqual("xs:int", element.raw_type)
 
     def test_property_real_name(self):
         element = ElementBase()

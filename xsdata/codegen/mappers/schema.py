@@ -105,14 +105,12 @@ class SchemaMapper:
     def build_class_extensions(cls, obj: ElementBase, target: Class):
         """Build the item class extensions from the given ElementBase
         children."""
-        extensions = []
-        raw_type = obj.raw_type
-        if raw_type:
-            restrictions = obj.get_restrictions()
-            extensions.append(cls.build_class_extension(target, raw_type, restrictions))
 
+        restrictions = obj.get_restrictions()
+        extensions = [
+            cls.build_class_extension(target, base, restrictions) for base in obj.bases
+        ]
         extensions.extend(cls.children_extensions(obj, target))
-
         target.extensions = collections.unique_sequence(extensions)
 
     @classmethod
@@ -188,7 +186,7 @@ class SchemaMapper:
             if child.is_attribute:
                 continue
 
-            for ext in child.extensions:
+            for ext in child.bases:
                 yield cls.build_class_extension(target, ext, child.get_restrictions())
 
             yield from cls.children_extensions(child, target)

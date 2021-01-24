@@ -16,22 +16,22 @@ class SimpleTypeTests(TestCase):
         obj.name = "foo"
         self.assertEqual("foo", obj.real_name)
 
-    def test_property_real_type(self):
+    def test_property_attr_types(self):
         obj = SimpleType()
-        self.assertEqual("", obj.real_type)
+        self.assertEqual([], list(obj.attr_types))
 
         obj.union = Union(member_types="thug")
-        self.assertEqual("thug", obj.real_type)
+        self.assertEqual(["thug"], list(obj.attr_types))
 
         obj.list = List(item_type="foo")
-        self.assertEqual("foo", obj.real_type)
+        self.assertEqual(["foo"], list(obj.attr_types))
 
         obj.restriction = Restriction(base="bar")
-        self.assertEqual("bar", obj.real_type)
+        self.assertEqual(["bar"], list(obj.attr_types))
 
         obj = SimpleType(restriction=Restriction())
         obj.restriction.enumerations.append(Enumeration())
-        self.assertEqual("", obj.real_type)
+        self.assertEqual([], list(obj.attr_types))
 
     def test_property_is_attribute(self):
         obj = SimpleType()

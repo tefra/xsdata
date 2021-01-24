@@ -8,12 +8,12 @@ class GroupTests(TestCase):
         obj = Group()
         self.assertTrue(obj.is_attribute)
 
-    def test_property_real_type(self):
+    def test_property_attr_types(self):
         obj = Group()
-        self.assertEqual("", obj.real_type)
+        self.assertEqual([], list(obj.attr_types))
 
         obj.ref = "foo"
-        self.assertEqual("foo", obj.real_type)
+        self.assertEqual(["foo"], list(obj.attr_types))
 
     def test_get_restrictions(self):
         obj = Group(min_occurs=1, max_occurs=2)

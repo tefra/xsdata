@@ -160,10 +160,10 @@ class ElementBaseTests(TestCase):
         element.name = "foo:bar"
         self.assertEqual("bar", element.real_name)
 
-    def test_property_real_type(self):
+    def test_property_attr(self):
         element = ElementBase()
-        with self.assertRaises(SchemaValueError):
-            element.real_type
+        self.assertIsInstance(element.attr_types, Iterator)
+        self.assertEqual([], list(element.attr_types))
 
     def test_property_substitutions(self):
         element = ElementBase()

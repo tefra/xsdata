@@ -306,12 +306,12 @@ class SchemaMapperTests(FactoryTestCase):
         mock_build_class_attribute_types.assert_called_once_with(item, attribute)
         mock_element_namespace.assert_called_once_with(attribute, item.target_namespace)
 
-    @mock.patch.object(Attribute, "real_type", new_callable=mock.PropertyMock)
+    @mock.patch.object(Attribute, "attr_types", new_callable=mock.PropertyMock)
     @mock.patch.object(SchemaMapper, "build_inner_classes")
     def test_build_class_attribute_types(
-        self, mock_build_inner_classes, mock_real_type
+        self, mock_build_inner_classes, mock_attr_types
     ):
-        mock_real_type.return_value = " xs:integer  xs:string "
+        mock_attr_types.return_value = ["xs:integer", "xs:string"]
         mock_build_inner_classes.return_value = []
 
         item = ClassFactory.create()
@@ -325,13 +325,13 @@ class SchemaMapperTests(FactoryTestCase):
 
         self.assertEqual(expected, actual)
 
-    @mock.patch.object(Attribute, "real_type", new_callable=mock.PropertyMock)
+    @mock.patch.object(Attribute, "attr_types", new_callable=mock.PropertyMock)
     @mock.patch.object(SchemaMapper, "build_inner_classes")
     def test_build_class_attribute_types_when_obj_has_inner_class(
-        self, mock_build_inner_classes, mock_real_type
+        self, mock_build_inner_classes, mock_attr_types
     ):
         inner_class = ClassFactory.create(qname="foo")
-        mock_real_type.return_value = " xs:integer  xs:string "
+        mock_attr_types.return_value = ["xs:integer", "xs:string"]
         mock_build_inner_classes.return_value = [inner_class]
 
         item = ClassFactory.create()
@@ -348,12 +348,12 @@ class SchemaMapperTests(FactoryTestCase):
         self.assertEqual([inner_class], item.inner)
 
     @mock.patch.object(Attribute, "default_type", new_callable=mock.PropertyMock)
-    @mock.patch.object(Attribute, "real_type", new_callable=mock.PropertyMock)
+    @mock.patch.object(Attribute, "attr_types", new_callable=mock.PropertyMock)
     @mock.patch.object(SchemaMapper, "build_inner_classes")
     def test_build_class_attribute_types_when_obj_has_no_types(
-        self, mock_build_inner_classes, mock_real_type, mock_default_type
+        self, mock_build_inner_classes, mock_attr_types, mock_default_type
     ):
-        mock_real_type.return_value = ""
+        mock_attr_types.return_value = ""
         mock_build_inner_classes.return_value = []
         mock_default_type.return_value = "xs:string"
 

@@ -14,10 +14,10 @@ class ListTests(TestCase):
 
     def test_real_type(self):
         obj = List()
-        self.assertEqual("", obj.real_type)
+        self.assertEqual([], list(obj.attr_types))
 
         obj.item_type = "foo"
-        self.assertEqual("foo", obj.real_type)
+        self.assertEqual(["foo"], list(obj.attr_types))
 
     def test_get_restrictions(self):
         obj = List()

@@ -25,7 +25,6 @@ from xsdata.models.mixins import attribute
 from xsdata.models.mixins import element
 from xsdata.models.mixins import ElementBase
 from xsdata.models.mixins import ModuleMixin
-from xsdata.utils import collections
 from xsdata.utils import text
 from xsdata.utils.collections import unique_sequence
 from xsdata.utils.namespaces import clean_uri
@@ -146,8 +145,8 @@ class AnyAttribute(AnnotationBase):
         return f"@{clean_ns}_attributes"
 
     @property
-    def real_type(self) -> str:
-        return DataType.ANY_TYPE.prefixed(self.xs_prefix)
+    def attr_types(self) -> Iterator[str]:
+        yield DataType.ANY_TYPE.prefixed(self.xs_prefix)
 
 
 @dataclass
@@ -192,15 +191,13 @@ class SimpleType(AnnotationBase):
         return "@value"
 
     @property
-    def real_type(self) -> str:
+    def attr_types(self) -> Iterator[str]:
         if not self.is_enumeration and self.restriction:
-            return self.restriction.real_type
-        if self.list:
-            return self.list.real_type
-        if self.union and self.union.member_types:
-            return self.union.member_types
-
-        return ""
+            yield from self.restriction.attr_types
+        elif self.list:
+            yield from self.list.attr_types
+        elif self.union:
+            yield from self.union.bases
 
     def get_restrictions(self) -> Dict[str, Anything]:
         if self.restriction:
@@ -231,8 +228,9 @@ class List(AnnotationBase):
         return "@value"
 
     @property
-    def real_type(self) -> str:
-        return self.item_type
+    def attr_types(self) -> Iterator[str]:
+        if self.item_type:
+            yield self.item_type
 
     def get_restrictions(self) -> Dict[str, Anything]:
         return {"tokens": True}
@@ -264,20 +262,13 @@ class Union(AnnotationBase):
         return "@value"
 
     @property
-    def real_type(self) -> str:
-        types = []
-        if self.simple_types:
-            types.extend(
-                [
-                    simple_type.real_type
-                    for simple_type in self.simple_types
-                    if simple_type.real_type
-                ]
-            )
-        if self.member_types:
-            types.extend(self.member_types.split())
+    def attr_types(self) -> Iterator[str]:
 
-        return " ".join(types)
+        for simple_type in self.simple_types:
+            yield from simple_type.attr_types
+
+        if self.member_types:
+            yield from self.member_types.split()
 
     def get_restrictions(self) -> Dict[str, Anything]:
         restrictions = {}
@@ -322,15 +313,13 @@ class Attribute(AnnotationBase):
         return True
 
     @property
-    def real_type(self) -> str:
+    def attr_types(self) -> Iterator[str]:
         if self.simple_type:
-            return self.simple_type.real_type
-        if self.type:
-            return self.type
-        if self.ref:
-            return self.ref
-
-        return ""
+            yield from self.simple_type.attr_types
+        elif self.type:
+            yield self.type
+        elif self.ref:
+            yield self.ref
 
     def get_restrictions(self) -> Dict[str, Anything]:
         restrictions = {}
@@ -366,8 +355,9 @@ class AttributeGroup(AnnotationBase):
         return True
 
     @property
-    def real_type(self) -> str:
-        return self.ref
+    def attr_types(self) -> Iterator[str]:
+        if self.ref:
+            yield self.ref
 
 
 @dataclass
@@ -403,8 +393,8 @@ class Any(AnnotationBase):
         return self.namespace
 
     @property
-    def real_type(self) -> str:
-        return DataType.ANY_TYPE.prefixed(self.xs_prefix)
+    def attr_types(self) -> Iterator[str]:
+        yield DataType.ANY_TYPE.prefixed(self.xs_prefix)
 
     def get_restrictions(self) -> Dict[str, Anything]:
         max_occurs = sys.maxsize if self.max_occurs == "unbounded" else self.max_occurs
@@ -534,8 +524,9 @@ class Group(AnnotationBase):
         return True
 
     @property
-    def real_type(self) -> str:
-        return self.ref
+    def attr_types(self) -> Iterator[str]:
+        if self.ref:
+            yield self.ref
 
     def get_restrictions(self) -> Dict[str, Anything]:
         max_occurs = sys.maxsize if self.max_occurs == "unbounded" else self.max_occurs
@@ -613,10 +604,6 @@ class Enumeration(AnnotationBase):
     @property
     def is_attribute(self) -> bool:
         return True
-
-    @property
-    def real_type(self) -> str:
-        return ""
 
     @property
     def real_name(self) -> str:
@@ -824,15 +811,11 @@ class Restriction(AnnotationBase):
     simple_type: Optional[SimpleType] = element(name="simpleType")
 
     @property
-    def real_type(self) -> str:
+    def attr_types(self) -> Iterator[str]:
         if self.simple_type:
-            return self.simple_type.real_type
-        if self.enumerations:
-            return ""
-        if self.base:
-            return self.base
-
-        return ""
+            yield from self.simple_type.attr_types
+        elif self.base and not self.enumerations:
+            yield self.base
 
     @property
     def real_name(self) -> str:
@@ -1118,18 +1101,15 @@ class Element(AnnotationBase):
         return DataType.ANY_TYPE.prefixed(self.xs_prefix)
 
     @property
-    def real_type(self) -> str:
-        types = []
+    def attr_types(self) -> Iterator[str]:
         if self.type:
-            types.append(self.type)
+            yield self.type
         elif self.ref:
-            types.append(self.ref)
-        elif self.simple_type and self.simple_type.real_type:
-            types.append(self.simple_type.real_type)
+            yield self.ref
+        elif self.simple_type:
+            yield from self.simple_type.attr_types
 
-        types.extend(alt.type for alt in self.alternatives if alt.type)
-
-        return " ".join(collections.unique_sequence(types))
+        yield from (alt.type for alt in self.alternatives if alt.type)
 
     @property
     def substitutions(self) -> Array[str]:

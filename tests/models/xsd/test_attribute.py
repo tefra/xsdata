@@ -13,21 +13,21 @@ class AttributeTests(TestCase):
         obj = Attribute()
         self.assertTrue(obj)
 
-    def test_property_real_type(self):
+    def test_property_attr_types(self):
         obj = Attribute()
-        self.assertEqual("", obj.real_type)
+        self.assertEqual([], list(obj.attr_types))
 
         obj.ref = "foo"
-        self.assertEqual(obj.ref, obj.real_type)
+        self.assertEqual([obj.ref], list(obj.attr_types))
 
         obj.type = "bar"
-        self.assertEqual(obj.type, obj.real_type)
+        self.assertEqual([obj.type], list(obj.attr_types))
 
         obj.simple_type = SimpleType()
-        self.assertEqual("", obj.real_type)
+        self.assertEqual([], list(obj.attr_types))
 
         obj.simple_type.restriction = Restriction(base="thug")
-        self.assertEqual(obj.simple_type.restriction.base, obj.real_type)
+        self.assertEqual([obj.simple_type.restriction.base], list(obj.attr_types))
 
     def test_property_real_name(self):
         obj = Attribute(ref="bar")

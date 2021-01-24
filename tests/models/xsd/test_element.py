@@ -46,28 +46,28 @@ class ElementTests(TestCase):
             obj = Element()
             obj.real_name
 
-    def test_property_real_type(self):
+    def test_property_attr_types(self):
         obj = Element()
-        self.assertEqual("", obj.real_type)
+        self.assertEqual([], list(obj.attr_types))
 
         # Inner classes depend on the this to be None
         obj.complex_type = ComplexType()
-        self.assertEqual("", obj.real_type)
+        self.assertEqual([], list(obj.attr_types))
 
         restriction = Restriction(base="xs:int")
         obj.simple_type = SimpleType(restriction=restriction)
-        self.assertEqual(restriction.base, obj.real_type)
+        self.assertEqual([restriction.base], list(obj.attr_types))
 
         obj.ref = "foo"
-        self.assertEqual(obj.ref, obj.real_type)
+        self.assertEqual([obj.ref], list(obj.attr_types))
 
         obj.type = "bar"
-        self.assertEqual(obj.type, obj.real_type)
+        self.assertEqual([obj.type], list(obj.attr_types))
 
         obj.alternatives.append(Alternative(type="foo"))
         obj.alternatives.append(Alternative(type="bar"))
         obj.alternatives.append(Alternative(type="thug"))
-        self.assertEqual("bar foo thug", obj.real_type)
+        self.assertEqual(["bar", "foo", "bar", "thug"], list(obj.attr_types))
 
     def test_property_is_mixed(self):
         obj = Element()

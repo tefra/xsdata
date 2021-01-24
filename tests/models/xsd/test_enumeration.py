@@ -16,10 +16,6 @@ class EnumerationTests(TestCase):
         obj = Enumeration(value="foo")
         self.assertEqual("foo", obj.real_name)
 
-    def test_property_real_type(self):
-        obj = Enumeration()
-        self.assertEqual("", obj.real_type)
-
     def test_property_default(self):
         obj = Enumeration(value="foo")
         self.assertEqual("foo", obj.default)

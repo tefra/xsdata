@@ -18,19 +18,19 @@ from xsdata.models.xsd import WhiteSpace
 
 
 class RestrictionTests(TestCase):
-    def test_property_real_type(self):
+    def test_property_attr_types(self):
         obj = Restriction()
-        self.assertEqual("", obj.real_type)
+        self.assertEqual([], list(obj.attr_types))
 
         obj = Restriction(base="foo")
-        self.assertEqual(obj.base, obj.real_type)
+        self.assertEqual([obj.base], list(obj.attr_types))
 
         obj.enumerations.append(Enumeration())
-        self.assertEqual("", obj.real_type)
+        self.assertEqual([], list(obj.attr_types))
 
         obj = Restriction(simple_type=SimpleType(restriction=Restriction(base="bar")))
 
-        self.assertEqual("bar", obj.real_type)
+        self.assertEqual(["bar"], list(obj.attr_types))
 
     def test_property_real_name(self):
         obj = Restriction()

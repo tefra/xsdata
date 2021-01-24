@@ -8,9 +8,9 @@ class AttributeGroupTests(TestCase):
         obj = AttributeGroup()
         self.assertTrue(obj.is_attribute)
 
-    def test_property_real_type(self):
+    def test_property_attr_types(self):
         obj = AttributeGroup()
-        self.assertEqual("", obj.real_type)
+        self.assertEqual([], list(obj.attr_types))
 
         obj.ref = "foo"
-        self.assertEqual("foo", obj.real_type)
+        self.assertEqual(["foo"], list(obj.attr_types))

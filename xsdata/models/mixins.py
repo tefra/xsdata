@@ -149,13 +149,9 @@ class ElementBase:
         raise SchemaValueError(f"Schema class `{self.class_name}` unknown real name.")
 
     @property
-    def real_type(self) -> str:
-        """
-        Return the real type for this element.
-
-        :raises SchemaValueError: when attribute instance is missing implementation.
-        """
-        raise SchemaValueError(f"Schema class `{self.class_name}` unknown real type.")
+    def attr_types(self) -> Iterator[str]:
+        """Return the attribute types for this element."""
+        yield from ()
 
     @property
     def substitutions(self) -> List[str]:

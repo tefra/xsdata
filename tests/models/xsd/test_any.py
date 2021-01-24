@@ -9,10 +9,10 @@ class AnyTests(TestCase):
     def test_property_is_attribute(self):
         self.assertTrue(Any().is_attribute)
 
-    def test_property_real_type(self):
+    def test_property_attr_types(self):
         obj = Any()
         obj.ns_map["xs"] = Namespace.XS.uri
-        self.assertEqual("xs:anyType", obj.real_type)
+        self.assertEqual(["xs:anyType"], list(obj.attr_types))
 
     def test_property_raw_namespace(self):
         obj = Any()

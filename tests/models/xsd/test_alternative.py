@@ -6,7 +6,7 @@ from xsdata.models.xsd import Alternative
 class AlternativeTests(TestCase):
     def test_property_real_name(self):
         obj = Alternative()
-        self.assertEqual("value", obj.real_name)
+        self.assertEqual("@value", obj.real_name)
 
         obj.id = "foo"
         self.assertEqual("foo", obj.real_name)

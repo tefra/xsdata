@@ -28,7 +28,7 @@ class USAddress {
     +country : NMTOKEN
 }
 class comment {
-    +value : string
+    +@value : string
 }
 class purchaseOrder {
 }

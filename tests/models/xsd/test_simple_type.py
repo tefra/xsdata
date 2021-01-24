@@ -11,7 +11,7 @@ from xsdata.models.xsd import Union
 class SimpleTypeTests(TestCase):
     def test_property_real_name(self):
         obj = SimpleType()
-        self.assertEqual("value", obj.real_name)
+        self.assertEqual("@value", obj.real_name)
 
         obj.name = "foo"
         self.assertEqual("foo", obj.real_name)

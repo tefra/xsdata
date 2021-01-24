@@ -25,7 +25,7 @@ class UnionTests(TestCase):
 
     def test_property_real_name(self):
         obj = Union()
-        self.assertEqual("value", obj.real_name)
+        self.assertEqual("@value", obj.real_name)
 
     def test_property_real_type(self):
         obj = Union()

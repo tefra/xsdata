@@ -5,10 +5,6 @@ from xsdata.models.xsd import ComplexType
 
 
 class ComplexTypeTests(TestCase):
-    def test_property_extensions(self):
-        obj = ComplexType()
-        self.assertEqual([], list(obj.extensions))
-
     def test_property_is_mixed(self):
         obj = ComplexType()
 

@@ -55,6 +55,9 @@ class AttributeTests(TestCase):
         expected["length"] = 1
         self.assertEqual(expected, obj.get_restrictions())
 
-    def test_property_extensions(self):
+    def test_property_bases(self):
         obj = Attribute()
-        self.assertEqual([], list(obj.extensions))
+        self.assertEqual([], list(obj.bases))
+
+        obj.type = "foo"
+        self.assertEqual(["foo"], list(obj.bases))

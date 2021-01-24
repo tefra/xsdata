@@ -23,17 +23,17 @@ class ElementTests(TestCase):
         obj.ns_map["foo"] = Namespace.XS.uri
         self.assertEqual("foo:anyType", obj.default_type)
 
-    def test_property_raw_type(self):
+    def test_property_bases(self):
         obj = Element()
         obj.ns_map["xs"] = Namespace.XS.uri
-        self.assertEqual("xs:anyType", obj.raw_type)
+        self.assertEqual(["xs:anyType"], list(obj.bases))
 
         obj.type = "foo"
-        self.assertEqual("foo", obj.raw_type)
+        self.assertEqual(["foo"], list(obj.bases))
 
         obj.type = None
         obj.complex_type = ComplexType()
-        self.assertIsNone(obj.raw_type)
+        self.assertEqual([], list(obj.bases))
 
     def test_property_real_name(self):
         obj = Element(ref="bar")
@@ -68,10 +68,6 @@ class ElementTests(TestCase):
         obj.alternatives.append(Alternative(type="bar"))
         obj.alternatives.append(Alternative(type="thug"))
         self.assertEqual("bar foo thug", obj.real_type)
-
-    def test_property_extensions(self):
-        obj = Element()
-        self.assertEqual([], list(obj.extensions))
 
     def test_property_is_mixed(self):
         obj = Element()

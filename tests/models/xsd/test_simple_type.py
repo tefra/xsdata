@@ -16,10 +16,6 @@ class SimpleTypeTests(TestCase):
         obj.name = "foo"
         self.assertEqual("foo", obj.real_name)
 
-    def test_property_extensions(self):
-        obj = SimpleType()
-        self.assertEqual([], list(obj.extensions))
-
     def test_property_real_type(self):
         obj = SimpleType()
         self.assertEqual("", obj.real_type)

@@ -36,13 +36,13 @@ class RestrictionTests(TestCase):
         obj = Restriction()
         self.assertEqual("@value", obj.real_name)
 
-    def test_property_extensions(self):
+    def test_property_bases(self):
         obj = Restriction()
-        self.assertEqual([], list(obj.extensions))
+        self.assertEqual([], list(obj.bases))
 
         obj.base = "foo"
-        self.assertIsInstance(obj.extensions, Iterator)
-        self.assertEqual(["foo"], list(obj.extensions))
+        self.assertIsInstance(obj.bases, Iterator)
+        self.assertEqual(["foo"], list(obj.bases))
 
     def test_get_restrictions(self):
         self.assertEqual({}, Restriction().get_restrictions())

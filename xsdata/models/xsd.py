@@ -251,7 +251,7 @@ class Union(AnnotationBase):
     simple_types: Array[SimpleType] = array_element(name="simpleType")
 
     @property
-    def extensions(self) -> Iterator[str]:
+    def bases(self) -> Iterator[str]:
         if self.member_types:
             yield from self.member_types.split()
 
@@ -311,6 +311,11 @@ class Attribute(AnnotationBase):
     target_namespace: Optional[str] = attribute(name="targetNamespace")
     simple_type: Optional[SimpleType] = element(name="simpleType")
     use: Optional[UseType] = attribute(default=UseType.OPTIONAL)
+
+    @property
+    def bases(self) -> Iterator[str]:
+        if self.type:
+            yield self.type
 
     @property
     def is_attribute(self) -> bool:
@@ -590,7 +595,7 @@ class Extension(AnnotationBase):
     assertions: Array[Assertion] = array_element(name="assert")
 
     @property
-    def extensions(self) -> Iterator[str]:
+    def bases(self) -> Iterator[str]:
         if self.base:
             yield self.base
 
@@ -834,7 +839,7 @@ class Restriction(AnnotationBase):
         return "@value"
 
     @property
-    def extensions(self) -> Iterator[str]:
+    def bases(self) -> Iterator[str]:
         if self.base:
             yield self.base
 
@@ -1094,6 +1099,13 @@ class Element(AnnotationBase):
     abstract: bool = attribute(default=False)
 
     @property
+    def bases(self) -> Iterator[str]:
+        if self.type:
+            yield self.type
+        elif not self.has_children:
+            yield DataType.ANY_TYPE.prefixed(self.xs_prefix)
+
+    @property
     def is_attribute(self) -> bool:
         return True
 
@@ -1103,16 +1115,6 @@ class Element(AnnotationBase):
 
     @property
     def default_type(self) -> str:
-        return DataType.ANY_TYPE.prefixed(self.xs_prefix)
-
-    @property
-    def raw_type(self) -> Optional[str]:
-        if self.type:
-            return self.type
-
-        if self.has_children:
-            return None
-
         return DataType.ANY_TYPE.prefixed(self.xs_prefix)
 
     @property

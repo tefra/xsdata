@@ -143,7 +143,7 @@ class AnyAttribute(AnnotationBase):
     @property
     def real_name(self) -> str:
         clean_ns = "_".join(map(clean_uri, self.namespace.split()))
-        return f"{clean_ns}_attributes"
+        return f"@{clean_ns}_attributes"
 
     @property
     def real_type(self) -> str:
@@ -189,7 +189,7 @@ class SimpleType(AnnotationBase):
     def real_name(self) -> str:
         if self.name:
             return self.name
-        return "value"
+        return "@value"
 
     @property
     def real_type(self) -> str:
@@ -228,7 +228,7 @@ class List(AnnotationBase):
 
     @property
     def real_name(self) -> str:
-        return "value"
+        return "@value"
 
     @property
     def real_type(self) -> str:
@@ -261,7 +261,7 @@ class Union(AnnotationBase):
 
     @property
     def real_name(self) -> str:
-        return "value"
+        return "@value"
 
     @property
     def real_type(self) -> str:
@@ -391,7 +391,7 @@ class Any(AnnotationBase):
     @property
     def real_name(self) -> str:
         clean_ns = "_".join(map(clean_uri, self.namespace.split()))
-        return f"{clean_ns}_element"
+        return f"@{clean_ns}_element"
 
     @property
     def raw_namespace(self) -> Optional[str]:
@@ -831,7 +831,7 @@ class Restriction(AnnotationBase):
 
     @property
     def real_name(self) -> str:
-        return "value"
+        return "@value"
 
     @property
     def extensions(self) -> Iterator[str]:
@@ -1042,7 +1042,7 @@ class Alternative(AnnotationBase):
             return text.snake_case(self.test)
         if self.id:
             return self.id
-        return "value"
+        return "@value"
 
 
 @dataclass

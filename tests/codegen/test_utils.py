@@ -138,7 +138,7 @@ class ClassUtilsTests(FactoryTestCase):
 
     def test_copy_inner_class_rename_simple_inner_type(self):
         source = ClassFactory.create()
-        inner = ClassFactory.create(qname="{a}value", module="b", package="c")
+        inner = ClassFactory.create(qname="{a}@value", module="b", package="c")
         target = ClassFactory.create()
         attr = AttrFactory.create(name="simple")
         attr_type = AttrTypeFactory.create(forward=True, qname=inner.qname)

@@ -106,7 +106,7 @@ class ClassUtils:
             clone.module = target.module
 
             # Simple type, update the name
-            if clone.name == "value":
+            if clone.name == "@value":
                 namespace, _ = split_qname(clone.qname)
                 clone.qname = attr_type.qname = build_qname(namespace, attr.name)
 

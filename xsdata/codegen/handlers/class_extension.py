@@ -219,11 +219,11 @@ class ClassExtensionHandler(HandlerInterface):
         type."""
         if extension.type.datatype != DataType.ANY_TYPE:
             tag = Tag.EXTENSION
-            name = "value"
+            name = "@value"
             namespace = None
         else:
             tag = Tag.ANY
-            name = "any_element"
+            name = "@any_element"
             namespace = NamespaceType.ANY_NS
 
         attr = cls.get_or_create_attribute(target, name, tag)
@@ -237,7 +237,7 @@ class ClassExtensionHandler(HandlerInterface):
         """Find or create for the given parameters an attribute in the target
         class."""
         for attr in target.attrs:
-            if attr.name == attr.local_name == name and attr.tag == tag:
+            if attr.name == name:
                 return attr
 
         attr = Attr(name=name, tag=tag)

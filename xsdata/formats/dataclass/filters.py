@@ -201,6 +201,9 @@ class Filters:
                 "namespace": namespace,
             }
 
+            if choice.is_nameless:
+                del metadata["name"]
+
             default_key = "default_factory" if choice.is_factory else "default"
             metadata[default_key] = self.field_default_value(choice)
             metadata.update(restrictions)

@@ -292,7 +292,6 @@ class FiltersTests(FactoryTestCase):
             {"name": "attr_B", "type": "Type[float]", "max_exclusive": 10.0},
             {"name": "attr_C", "namespace": "bar", "type": "Type[str]"},
             {
-                "name": "attr_D",
                 "namespace": "##other",
                 "wildcard": True,
                 "type": "Type[object]",

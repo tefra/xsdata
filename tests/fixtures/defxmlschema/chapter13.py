@@ -86,24 +86,6 @@ class SizeType:
 
 
 @dataclass
-class SmallSizeType:
-    value: Optional[int] = field(
-        default=None,
-        metadata={
-            "min_inclusive": 2,
-            "max_inclusive": 6,
-        }
-    )
-    system: Optional[str] = field(
-        default=None,
-        metadata={
-            "type": "Attribute",
-            "required": True,
-        }
-    )
-
-
-@dataclass
 class ProductType(ItemType):
     number: Optional[int] = field(
         default=None,
@@ -139,6 +121,17 @@ class ProductType(ItemType):
         default=None,
         metadata={
             "type": "Attribute",
+        }
+    )
+
+
+@dataclass
+class SmallSizeType(SizeType):
+    system: Optional[str] = field(
+        default=None,
+        metadata={
+            "type": "Attribute",
+            "required": True,
         }
     )
 

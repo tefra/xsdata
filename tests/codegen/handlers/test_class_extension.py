@@ -279,11 +279,11 @@ class ClassExtensionHandlerTests(FactoryTestCase):
         mock_copy_attributes.assert_called_once_with(source, target, extension)
 
     @mock.patch.object(ClassUtils, "copy_attributes")
-    @mock.patch.object(ClassExtensionHandler, "compare_attributes")
+    @mock.patch.object(ClassExtensionHandler, "should_remove_extension")
     def test_process_complex_extension_removes_extension(
-        self, mock_compare_attributes, mock_copy_attributes
+        self, mock_should_remove_extension, mock_copy_attributes
     ):
-        mock_compare_attributes.return_value = ClassExtensionHandler.REMOVE_EXTENSION
+        mock_should_remove_extension.return_value = True
         extension = ExtensionFactory.create()
         target = ClassFactory.elements(1, extensions=[extension])
         source = ClassFactory.elements(5)
@@ -293,36 +293,36 @@ class ClassExtensionHandlerTests(FactoryTestCase):
         self.assertEqual(0, len(target.extensions))
         self.assertEqual(1, len(target.attrs))
 
-        mock_compare_attributes.assert_called_once_with(source, target)
+        mock_should_remove_extension.assert_called_once_with(source, target)
         self.assertEqual(0, mock_copy_attributes.call_count)
 
     @mock.patch.object(ClassUtils, "copy_attributes")
-    @mock.patch.object(ClassExtensionHandler, "compare_attributes")
+    @mock.patch.object(ClassExtensionHandler, "should_flatten_extension")
     def test_process_complex_extension_copies_attributes(
-        self, mock_compare_attributes, mock_copy_attributes
+        self, mock_compare_attributes, mock_should_flatten_extension
     ):
-        mock_compare_attributes.return_value = ClassExtensionHandler.FLATTEN_EXTENSION
+        mock_should_flatten_extension.return_value = True
         extension = ExtensionFactory.create()
         target = ClassFactory.create()
         source = ClassFactory.create()
 
         self.processor.process_complex_extension(source, target, extension)
         mock_compare_attributes.assert_called_once_with(source, target)
-        mock_copy_attributes.assert_called_once_with(source, target, extension)
+        mock_should_flatten_extension.assert_called_once_with(source, target, extension)
 
-    @mock.patch.object(ClassUtils, "copy_attributes")
-    @mock.patch.object(ClassExtensionHandler, "compare_attributes")
+    @mock.patch.object(ClassExtensionHandler, "should_flatten_extension")
+    @mock.patch.object(ClassExtensionHandler, "should_remove_extension")
     def test_process_complex_extension_ignores_extension(
-        self, mock_compare_attributes, mock_copy_attributes
+        self, mock_should_remove_extension, mock_should_flatten_extension
     ):
-        mock_compare_attributes.return_value = ClassExtensionHandler.IGNORE_EXTENSION
+        mock_should_remove_extension.return_value = False
+        mock_should_flatten_extension.return_value = False
         extension = ExtensionFactory.create()
         target = ClassFactory.create(extensions=[extension])
         source = ClassFactory.create()
 
         self.processor.process_complex_extension(source, target, extension)
         self.assertEqual(1, len(target.extensions))
-        self.assertEqual(0, mock_copy_attributes.call_count)
 
     def test_find_dependency(self):
         attr_type = AttrTypeFactory.create(qname="a")
@@ -337,50 +337,82 @@ class ClassExtensionHandlerTests(FactoryTestCase):
         self.processor.container.add(simple)
         self.assertEqual(simple, self.processor.find_dependency(attr_type))
 
-    def test_compare_attributes(self):
-        remove = ClassExtensionHandler.REMOVE_EXTENSION
-        ignore = ClassExtensionHandler.IGNORE_EXTENSION
-        flatten = ClassExtensionHandler.FLATTEN_EXTENSION
+    def test_should_remove_extension(self):
+        source = ClassFactory.create()
+        target = ClassFactory.create()
 
         # source is target
-        source = ClassFactory.elements(2)
-        self.assertEqual(remove, self.processor.compare_attributes(source, source))
+        self.assertTrue(self.processor.should_remove_extension(source, source))
+        self.assertFalse(self.processor.should_remove_extension(source, target))
 
-        # target includes None
+        # Source is parent class
+        source.inner.append(target)
+        self.assertTrue(self.processor.should_remove_extension(target, target))
+
+        # MRO Violation
+        source.inner.clear()
+        target.extensions.append(ExtensionFactory.reference("foo"))
+        target.extensions.append(ExtensionFactory.reference("bar"))
+        self.assertFalse(self.processor.should_remove_extension(source, target))
+
+        source.extensions.append(ExtensionFactory.reference("bar"))
+        self.assertTrue(self.processor.should_remove_extension(source, target))
+
+    def test_should_flatten_extension(self):
+        source = ClassFactory.create()
         target = ClassFactory.create()
-        self.assertEqual(ignore, self.processor.compare_attributes(source, target))
 
-        # target includes all
-        target.attrs = [attr.clone() for attr in source.attrs]
-        self.assertEqual(remove, self.processor.compare_attributes(source, target))
+        self.assertFalse(self.processor.should_flatten_extension(source, target))
 
-        # target has more
-        source.attrs.append(AttrFactory.element())
-        self.assertEqual(flatten, self.processor.compare_attributes(source, target))
+        # Forced flattened
+        source.strict_type = True
+        self.assertTrue(self.processor.should_flatten_extension(source, target))
 
-        # source attrs are all different
-        source.attrs = AttrFactory.list(3)
-        self.assertEqual(ignore, self.processor.compare_attributes(source, target))
+        # Source has suffix attr and target has its own attrs
+        source = ClassFactory.elements(1)
+        source.attrs[0].index = sys.maxsize
+        target.attrs.append(AttrFactory.create())
+        self.assertTrue(self.processor.should_flatten_extension(source, target))
 
-        # source is forced to be flattened
-        clone = source.clone()
-        clone.strict_type = True
-        self.assertEqual(flatten, self.processor.compare_attributes(clone, target))
+        # Target has suffix attr
+        source = ClassFactory.create()
+        target = ClassFactory.elements(1)
+        target.attrs[0].index = sys.maxsize
+        self.assertTrue(self.processor.should_flatten_extension(source, target))
 
-        # source has an attribute that needs to be last
-        clone = source.clone()
-        clone.attrs[0].index = sys.maxsize
-        self.assertEqual(flatten, self.processor.compare_attributes(clone, target))
+        # Source is a simple type
+        source = ClassFactory.create(attrs=[AttrFactory.create(tag=Tag.SIMPLE_TYPE)])
+        target = ClassFactory.elements(1)
+        self.assertTrue(self.processor.should_flatten_extension(source, target))
 
-        # source is a simple type
-        clone = source.clone()
-        clone.attrs = [AttrFactory.create(tag="Extension")]
-        self.assertEqual(flatten, self.processor.compare_attributes(clone, target))
+        # Sequential violation
+        source = ClassFactory.elements(3)
+        target = source.clone()
+        self.assertFalse(self.processor.should_flatten_extension(source, target))
 
-        # target has an attribute that needs to be last
-        clone = target.clone()
-        clone.attrs[0].index = sys.maxsize
-        self.assertEqual(flatten, self.processor.compare_attributes(source, clone))
+        for attr in target.attrs:
+            attr.restrictions.sequential = True
+
+        self.assertFalse(self.processor.should_flatten_extension(source, target))
+
+        target.attrs = [target.attrs[1], target.attrs[0], target.attrs[2]]
+        self.assertTrue(self.processor.should_flatten_extension(source, target))
+
+        # Types violation
+        target = source.clone()
+        target.attrs[1].types = [
+            AttrTypeFactory.native(DataType.INT),
+            AttrTypeFactory.native(DataType.FLOAT),
+        ]
+
+        source.attrs[1].types = [
+            AttrTypeFactory.native(DataType.INT),
+            AttrTypeFactory.native(DataType.FLOAT),
+            AttrTypeFactory.native(DataType.DECIMAL),
+        ]
+        self.assertFalse(self.processor.should_flatten_extension(source, target))
+        target.attrs[1].types.append(AttrTypeFactory.native(DataType.QNAME))
+        self.assertTrue(self.processor.should_flatten_extension(source, target))
 
     def test_replace_attributes_type(self):
         extension = ExtensionFactory.create()

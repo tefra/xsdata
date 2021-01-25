@@ -13,3 +13,10 @@ class AlternativeTests(TestCase):
 
         obj.test = "@type='text'"
         self.assertEqual("type_text", obj.real_name)
+
+    def test_property_bases(self):
+        obj = Alternative()
+        self.assertEqual([], list(obj.bases))
+
+        obj.type = "foo"
+        self.assertEqual(["foo"], list(obj.bases))

@@ -1,4 +1,5 @@
 import sys
+from typing import Optional
 
 from xsdata.codegen.models import Attr
 from xsdata.codegen.models import AttrType
@@ -119,3 +120,11 @@ class ClassUtils:
                 return inner
 
         raise CodeGenerationError(f"Missing inner class {source.qname}.{qname}")
+
+    @classmethod
+    def find_attr(cls, source: Class, name: str) -> Optional[Attr]:
+        for attr in source.attrs:
+            if attr.name == name:
+                return attr
+
+        return None

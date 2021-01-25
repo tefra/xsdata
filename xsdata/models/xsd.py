@@ -31,6 +31,8 @@ from xsdata.utils.namespaces import clean_uri
 
 docstring_serializer = XmlSerializer(config=SerializerConfig(pretty_print=True))
 
+DEFAULT_ATTR_NAME = "@value"
+
 
 @dataclass(frozen=True)
 class Docstring:
@@ -188,7 +190,7 @@ class SimpleType(AnnotationBase):
     def real_name(self) -> str:
         if self.name:
             return self.name
-        return "@value"
+        return DEFAULT_ATTR_NAME
 
     @property
     def attr_types(self) -> Iterator[str]:
@@ -225,7 +227,7 @@ class List(AnnotationBase):
 
     @property
     def real_name(self) -> str:
-        return "@value"
+        return DEFAULT_ATTR_NAME
 
     @property
     def attr_types(self) -> Iterator[str]:
@@ -259,7 +261,7 @@ class Union(AnnotationBase):
 
     @property
     def real_name(self) -> str:
-        return "@value"
+        return DEFAULT_ATTR_NAME
 
     @property
     def attr_types(self) -> Iterator[str]:
@@ -819,7 +821,7 @@ class Restriction(AnnotationBase):
 
     @property
     def real_name(self) -> str:
-        return "@value"
+        return DEFAULT_ATTR_NAME
 
     @property
     def bases(self) -> Iterator[str]:
@@ -1030,7 +1032,12 @@ class Alternative(AnnotationBase):
             return text.snake_case(self.test)
         if self.id:
             return self.id
-        return "@value"
+        return DEFAULT_ATTR_NAME
+
+    @property
+    def bases(self) -> Iterator[str]:
+        if self.type:
+            yield self.type
 
 
 @dataclass

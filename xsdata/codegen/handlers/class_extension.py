@@ -19,10 +19,6 @@ from xsdata.models.enums import Tag
 class ClassExtensionHandler(HandlerInterface):
     """Reduce class extensions by copying or creating new attributes."""
 
-    REMOVE_EXTENSION = 0
-    FLATTEN_EXTENSION = 1
-    IGNORE_EXTENSION = 2
-
     container: ContainerInterface
 
     def process(self, target: Class):
@@ -136,10 +132,9 @@ class ClassExtensionHandler(HandlerInterface):
         extension completely, copy all source attributes to the target
         class or leave the extension alone.
         """
-        res = cls.compare_attributes(source, target)
-        if res == cls.REMOVE_EXTENSION:
+        if cls.should_remove_extension(source, target):
             target.extensions.remove(ext)
-        elif res == cls.FLATTEN_EXTENSION:
+        elif cls.should_flatten_extension(source, target):
             ClassUtils.copy_attributes(source, target, ext)
         else:
             logger.debug("Ignore extension: %s", ext.type.name)
@@ -164,44 +159,79 @@ class ClassExtensionHandler(HandlerInterface):
         return None
 
     @classmethod
-    def compare_attributes(cls, source: Class, target: Class) -> int:
+    def should_remove_extension(cls, source: Class, target: Class) -> bool:
         """
-        Compare the attributes of the two classes and return whether the source
-        class can and should be flattened.
+        Return whether the extension should be removed because of some
+        violation.
 
-        Remove:
-            1. Source is the Target
-            2. Target includes all the source attributes
-
-        Flatten:
-            1. Source includes some of the target attributes
-            2. The source class is marked to be forced flattened
-            3. Source class includes an attribute that needs to be last
-            4. Target class includes an attribute that needs to be last
-            5. Source class is a simple type
+        Violations:
+            - Circular Reference
+            - Forward Reference
+            - MRO Violation A(B), C(B) and extensions includes A, B, C
         """
-        if source is target:
-            return cls.REMOVE_EXTENSION
+        # Circular or Forward reference
+        if source is target or target in source.inner:
+            return True
 
-        if target.attrs and source.attrs:
-            source_attrs = {attr.name for attr in source.attrs}
-            target_attrs = {attr.name for attr in target.attrs}
-            difference = source_attrs - target_attrs
+        # MRO Violation
+        collision = {ext.type.qname for ext in target.extensions}
+        return any(ext.type.qname in collision for ext in source.extensions)
 
-            if not difference:
-                return cls.REMOVE_EXTENSION
-            if len(difference) != len(source_attrs):
-                return cls.FLATTEN_EXTENSION
+    @classmethod
+    def should_flatten_extension(cls, source: Class, target: Class) -> bool:
+        """
+        Return whether the extension should be flattened because of rules.
+
+        Rules:
+            1. Source class is marked as a strict type
+            2. Source class is a simple type
+            3. Source class has a suffix attr and target has its own attrs
+            4. Target class has a suffix attr
+            5. Target restrictions parent attrs in different sequential order
+            6. Target restricts parent attr with a not matching type.
+        """
 
         if (
             source.strict_type
-            or (source.has_suffix_attr and target.attrs)
-            or target.has_suffix_attr
             or source.is_simple_type
+            or target.has_suffix_attr
+            or (source.has_suffix_attr and target.attrs)
+            or not cls.validate_type_overrides(source, target)
+            or not cls.validate_sequential_order(source, target)
         ):
-            return cls.FLATTEN_EXTENSION
+            return True
 
-        return cls.IGNORE_EXTENSION
+        return False
+
+    @classmethod
+    def validate_type_overrides(cls, source: Class, target: Class) -> bool:
+        """Validate every override is using a subset of the parent attr
+        types."""
+        for attr in target.attrs:
+            src_attr = ClassUtils.find_attr(source, attr.name)
+            if src_attr and any(tp not in src_attr.types for tp in attr.types):
+                return False
+
+        return True
+
+    @classmethod
+    def validate_sequential_order(cls, source: Class, target: Class) -> bool:
+        """
+        Validate sequential attributes are in the same order in the parent
+        class.
+
+        Dataclasses fields ordering follows the python mro pattern, the
+        parent fields are always first and they are updated if the
+        subclass is overriding any of them but the overall ordering
+        doesn't change!
+        """
+        sequence = [attr.name for attr in target.attrs if attr.restrictions.sequential]
+        if len(sequence) > 1:
+            compare = [attr.name for attr in source.attrs if attr.name in sequence]
+            if compare and compare != sequence:
+                return False
+
+        return True
 
     @classmethod
     def replace_attributes_type(cls, target: Class, extension: Extension):

@@ -189,7 +189,7 @@ class SchemaParser(XmlParser):
             attribute_group = xsd.AttributeGroup(ref=self.default_attributes)
             obj.attribute_groups.insert(0, attribute_group)
 
-        if not obj.open_content:
+        if not obj.open_content and not obj.complex_content:
             obj.open_content = self.default_open_content
 
     def end_default_open_content(self, obj: T):

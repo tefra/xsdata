@@ -11,6 +11,7 @@ from xsdata.models.xsd import All
 from xsdata.models.xsd import Any
 from xsdata.models.xsd import Attribute
 from xsdata.models.xsd import AttributeGroup
+from xsdata.models.xsd import ComplexContent
 from xsdata.models.xsd import ComplexType
 from xsdata.models.xsd import DefaultOpenContent
 from xsdata.models.xsd import Element
@@ -292,6 +293,11 @@ class SchemaParserTests(TestCase):
         complex_type.open_content = open_content
         self.parser.end_complex_type(complex_type)
         self.assertIs(open_content, complex_type.open_content)
+
+        complex_type = ComplexType()
+        complex_type.complex_content = ComplexContent()
+        self.parser.end_complex_type(complex_type)
+        self.assertIsNone(complex_type.open_content)
 
         obj = Extension()
         self.parser.end_complex_type(obj)

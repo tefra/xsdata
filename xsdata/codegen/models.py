@@ -2,6 +2,7 @@ import sys
 from dataclasses import asdict
 from dataclasses import dataclass
 from dataclasses import field
+from dataclasses import fields
 from dataclasses import replace
 from enum import IntEnum
 from typing import Any
@@ -90,6 +91,18 @@ class Restrictions:
     def is_optional(self) -> bool:
         """Return true if min occurs property equals zero."""
         return self.min_occurs == 0
+
+    def is_compatible(self, other: "Restrictions", with_occurrences: bool) -> bool:
+        if with_occurrences:
+            ignore = ["choice"]
+        else:
+            ignore = ["min_occurs", "max_occurs", "choice"]
+
+        return all(
+            getattr(self, f.name) == getattr(other, f.name)
+            for f in fields(self)
+            if f.name not in ignore
+        )
 
     def merge(self, source: "Restrictions"):
         """Update properties from another instance."""
@@ -354,7 +367,9 @@ class Extension:
     def clone(self) -> "Extension":
         """Return a deep cloned instance."""
         return replace(
-            self, type=self.type.clone(), restrictions=self.restrictions.clone()
+            self,
+            type=self.type.clone(),
+            restrictions=self.restrictions.clone(),
         )
 
 

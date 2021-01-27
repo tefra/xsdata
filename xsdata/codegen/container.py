@@ -42,7 +42,7 @@ class ClassContainer(ContainerInterface):
             AttributeTypeHandler(self),
             AttributeMergeHandler(),
             AttributeMixedContentHandler(),
-            AttributeSanitizerHandler(),
+            AttributeSanitizerHandler(self),
         ]
 
     @property

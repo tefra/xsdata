@@ -5,6 +5,27 @@ from xsdata.codegen.models import Restrictions
 
 
 class RestrictionsTests(TestCase):
+    def setUp(self) -> None:
+        self.restrictions = Restrictions(
+            required=True,
+            prohibited=None,
+            min_occurs=1,
+            max_occurs=1,
+            min_exclusive="1.1",
+            min_inclusive="1",
+            min_length=1,
+            max_exclusive="1",
+            max_inclusive="1.1",
+            max_length=10,
+            total_digits=333,
+            fraction_digits=2,
+            length=5,
+            white_space="collapse",
+            pattern=r"[A-Z]",
+            explicit_timezone="+1",
+            nillable=True,
+        )
+
     def test_property_is_list(self):
         restrictions = Restrictions()
         self.assertFalse(restrictions.is_list)
@@ -38,26 +59,6 @@ class RestrictionsTests(TestCase):
         self.assertFalse(child.nillable)
 
     def test_asdict(self):
-        restrictions = Restrictions(
-            required=True,
-            prohibited=None,
-            min_occurs=1,
-            max_occurs=1,
-            min_exclusive="1.1",
-            min_inclusive="1",
-            min_length=1,
-            max_exclusive="1",
-            max_inclusive="1.1",
-            max_length=10,
-            total_digits=333,
-            fraction_digits=2,
-            length=5,
-            white_space="collapse",
-            pattern=r"[A-Z]",
-            explicit_timezone="+1",
-            nillable=True,
-        )
-
         expected = {
             "explicit_timezone": "+1",
             "fraction_digits": 2,
@@ -76,29 +77,9 @@ class RestrictionsTests(TestCase):
             "total_digits": 333,
             "white_space": "collapse",
         }
-        self.assertEqual(expected, restrictions.asdict())
+        self.assertEqual(expected, self.restrictions.asdict())
 
     def test_asdict_with_types(self):
-        restrictions = Restrictions(
-            required=True,
-            prohibited=None,
-            min_occurs=1,
-            max_occurs=1,
-            min_exclusive="1.1",
-            min_inclusive="1",
-            min_length=1,
-            max_exclusive="1",
-            max_inclusive="1.1",
-            max_length=10,
-            total_digits=333,
-            fraction_digits=2,
-            length=5,
-            white_space="collapse",
-            pattern=r"[A-Z]",
-            explicit_timezone="+1",
-            nillable=True,
-        )
-
         expected = {
             "explicit_timezone": "+1",
             "fraction_digits": 2,
@@ -117,7 +98,7 @@ class RestrictionsTests(TestCase):
             "total_digits": 333,
             "white_space": "collapse",
         }
-        self.assertEqual(expected, restrictions.asdict(types=[float]))
+        self.assertEqual(expected, self.restrictions.asdict(types=[float]))
 
     def test_asdict_with_implied_types(self):
         restrictions = Restrictions(min_occurs=1, max_occurs=4)
@@ -135,3 +116,19 @@ class RestrictionsTests(TestCase):
 
         self.assertEqual(clone, restrictions)
         self.assertIsNot(clone, restrictions)
+
+    def test_is_compatible(self):
+        a = self.restrictions
+        b = a.clone()
+
+        a.choice = "112"
+        b.choice = "112"
+        self.assertTrue(a.is_compatible(b, True))
+        self.assertTrue(b.is_compatible(a, True))
+
+        a.min_occurs += 1
+        a.max_occurs += 1
+        self.assertFalse(a.is_compatible(b, True))
+        self.assertFalse(b.is_compatible(a, True))
+        self.assertTrue(a.is_compatible(b, False))
+        self.assertTrue(b.is_compatible(a, False))

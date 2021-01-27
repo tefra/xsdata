@@ -5,12 +5,15 @@ from typing import List
 from typing import Optional
 
 from xsdata.codegen.models import Class
+from xsdata.models.config import GeneratorConfig
 from xsdata.utils.constants import return_true
 
 
 class ContainerInterface(metaclass=abc.ABCMeta):
     """Wrap a list of classes and expose a simple api for easy access and
     process."""
+
+    config: GeneratorConfig
 
     @abc.abstractmethod
     def iterate(self) -> Iterator[Class]:

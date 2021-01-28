@@ -31,7 +31,9 @@ class ClassEnumerationHandlerTests(FactoryTestCase):
         )
         self.target.inner.append(self.inner_enum)
 
-        self.container = ClassContainer.from_list([self.target, self.root_enum])
+        self.container = ClassContainer()
+        self.container.add(self.target)
+        self.container.add(self.root_enum)
         self.processor = ClassEnumerationHandler(container=self.container)
 
     def test_filter(self):
@@ -81,13 +83,13 @@ class ClassEnumerationHandlerTests(FactoryTestCase):
         target.attrs[1].types.append(attr_type.clone())
 
         self.container.add(target)
-        self.assertEqual(3, len(self.container))
+        self.assertEqual(3, len(self.container.data))
 
         self.processor.process(target)
 
         new_qname = build_qname(inner.target_namespace, f"{target.name}_{inner.name}")
 
-        self.assertEqual(4, len(self.container))
+        self.assertEqual(4, len(self.container.data))
         new_inner = self.container.find(new_qname)
 
         self.assertEqual(1, len(target.inner))

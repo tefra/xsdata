@@ -18,12 +18,7 @@ class ClassValidator:
 
     container: ClassContainer
 
-    @classmethod
-    def process(cls, container: ClassContainer):
-        """Static entry point for container validation."""
-        cls(container).validate()
-
-    def validate(self):
+    def process(self):
         """
         Remove if possible classes with the same qualified name.
 
@@ -32,7 +27,7 @@ class ClassValidator:
             2. Handle duplicate types.
             3. Mark strict types.
         """
-        for classes in self.container.values():
+        for classes in self.container.data.values():
 
             if len(classes) > 1:
                 self.remove_invalid_classes(classes)
@@ -49,7 +44,7 @@ class ClassValidator:
 
         def is_invalid(ext: Extension) -> bool:
             """Check if given type declaration is not native and is missing."""
-            return not ext.type.native and ext.type.qname not in self.container
+            return not ext.type.native and ext.type.qname not in self.container.data
 
         for target in list(classes):
             if any(is_invalid(extension) for extension in target.extensions):

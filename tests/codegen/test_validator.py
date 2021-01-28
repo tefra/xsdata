@@ -33,7 +33,7 @@ class ClassValidatorTests(FactoryTestCase):
         third = ClassFactory.create()
 
         self.container.extend([first, second, third])
-        ClassValidator.process(self.container)
+        self.validator.process()
 
         mock_remove_invalid_classes.assert_called_once_with([first, second])
         mock_handle_duplicate_types.assert_called_once_with([first, second])

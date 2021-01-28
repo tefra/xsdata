@@ -8,7 +8,6 @@ from xsdata.codegen.models import AttrType
 from xsdata.codegen.models import Class
 from xsdata.codegen.models import Restrictions
 from xsdata.logger import logger
-from xsdata.models.config import GeneratorConfig
 from xsdata.models.enums import DataType
 from xsdata.models.enums import Tag
 from xsdata.utils import collections
@@ -26,17 +25,14 @@ class ClassSanitizer:
     the analyzer processors."""
 
     container: ClassContainer
-    config: GeneratorConfig
 
-    @classmethod
-    def process(cls, container: ClassContainer, config: GeneratorConfig):
+    def process(self):
         """Iterate through all classes and run the sanitizer procedure."""
 
-        sanitizer = cls(container, config)
+        for target in self.container.iterate():
+            self.process_class(target)
 
-        collections.apply(container.iterate(), sanitizer.process_class)
-
-        sanitizer.resolve_conflicts()
+        self.resolve_conflicts()
 
     def process_class(self, target: Class):
         """
@@ -53,7 +49,7 @@ class ClassSanitizer:
         """
         collections.apply(target.inner, self.process_class)
 
-        if self.config.output.compound_fields:
+        if self.container.config.output.compound_fields:
             self.group_compound_fields(target)
 
         for attr in target.attrs:
@@ -196,7 +192,7 @@ class ClassSanitizer:
         """Append the next available index number for the given namespace and
         local name."""
         index = 0
-        reserved = map(text.snake_case, self.container.keys())
+        reserved = map(text.snake_case, self.container.data.keys())
         while True:
             index += 1
             qname = build_qname(namespace, f"{name}_{index}")

@@ -5,7 +5,6 @@ from xsdata.codegen.models import Class
 from xsdata.codegen.sanitizer import ClassSanitizer
 from xsdata.codegen.validator import ClassValidator
 from xsdata.exceptions import AnalyzerValueError
-from xsdata.models.config import GeneratorConfig
 
 
 class ClassAnalyzer:
@@ -13,14 +12,11 @@ class ClassAnalyzer:
     generated."""
 
     @classmethod
-    def process(cls, classes: List[Class], config: GeneratorConfig) -> List[Class]:
+    def process(cls, container: ClassContainer) -> List[Class]:
         """Run all the processes."""
 
-        # Wrap classes with container for easy access.
-        container = ClassContainer.from_list(classes)
-
         # Run validation checks for duplicate, invalid and redefined types.
-        ClassValidator.process(container)
+        ClassValidator(container).process()
 
         # Run analyzer handlers
         container.process()
@@ -29,7 +25,7 @@ class ClassAnalyzer:
         container.filter_classes()
 
         # Sanitize class attributes after merging and flattening types and extensions.
-        ClassSanitizer.process(container, config)
+        ClassSanitizer(container).process()
 
         classes = container.class_list
         cls.validate_references(classes)

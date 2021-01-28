@@ -28,16 +28,17 @@ class ClassAnalyzerTests(FactoryTestCase):
     ):
         config = GeneratorConfig()
         classes = ClassFactory.list(2)
-        container = ClassContainer.from_list(classes)
+        container = ClassContainer(config=config)
+        container.extend(classes)
 
-        result = ClassAnalyzer.process(classes, config)
+        result = ClassAnalyzer.process(container)
 
         self.assertEqual(classes, result)
 
-        mock_validator_process.assert_called_once_with(container)
+        mock_validator_process.assert_called_once_with()
         mock_container_process.assert_called_once_with()
         mock_container_filter_classes.assert_called_once_with()
-        mock_sanitizer_process.assert_called_once_with(container, config)
+        mock_sanitizer_process.assert_called_once_with()
         mock_validate_references.assert_called_once_with(classes)
 
     def test_class_references(self):

@@ -19,17 +19,15 @@ class ClassSanitizerTest(FactoryTestCase):
     def setUp(self):
         super().setUp()
 
-        self.config = GeneratorConfig()
-        self.container = ClassContainer()
-        self.sanitizer = ClassSanitizer(container=self.container, config=self.config)
+        self.container = ClassContainer(config=GeneratorConfig())
+        self.sanitizer = ClassSanitizer(container=self.container)
 
     @mock.patch.object(ClassSanitizer, "resolve_conflicts")
     @mock.patch.object(ClassSanitizer, "process_class")
     def test_process(self, mock_process_class, mock_resolve_conflicts):
         classes = ClassFactory.list(2)
-
-        self.sanitizer.container.extend(classes)
-        ClassSanitizer.process(self.container, self.config)
+        self.container.extend(classes)
+        self.sanitizer.process()
 
         mock_process_class.assert_has_calls(list(map(mock.call, classes)))
         mock_resolve_conflicts.assert_called_once_with()
@@ -76,7 +74,7 @@ class ClassSanitizerTest(FactoryTestCase):
         inner = ClassFactory.create()
         target.inner.append(inner)
 
-        self.config.output.compound_fields = True
+        self.container.config.output.compound_fields = True
         self.sanitizer.process_class(target)
 
         mock_group_compound_fields.assert_has_calls(

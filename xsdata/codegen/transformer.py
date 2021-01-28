@@ -12,6 +12,7 @@ from urllib.parse import urlparse
 from urllib.request import urlopen
 
 from xsdata.codegen.analyzer import ClassAnalyzer
+from xsdata.codegen.container import ClassContainer
 from xsdata.codegen.mappers.definitions import DefinitionsMapper
 from xsdata.codegen.mappers.schema import SchemaMapper
 from xsdata.codegen.models import Class
@@ -199,7 +200,11 @@ class SchemaTransformer:
     def analyze_classes(self, classes: List[Class]) -> List[Class]:
         """Analyzer the given class list and simplify attributes and
         extensions."""
-        return ClassAnalyzer.process(classes, self.config)
+
+        container = ClassContainer(config=self.config)
+        container.extend(classes)
+
+        return ClassAnalyzer.process(container)
 
     def count_classes(self, classes: List[Class]) -> Tuple[int, int]:
         """Return a tuple of counters for the main and inner classes."""

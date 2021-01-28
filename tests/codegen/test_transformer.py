@@ -4,6 +4,7 @@ from unittest import mock
 from tests.factories import ClassFactory
 from tests.factories import FactoryTestCase
 from xsdata.codegen.analyzer import ClassAnalyzer
+from xsdata.codegen.container import ClassContainer
 from xsdata.codegen.mappers.definitions import DefinitionsMapper
 from xsdata.codegen.mappers.schema import SchemaMapper
 from xsdata.codegen.parsers import DefinitionsParser
@@ -328,4 +329,9 @@ class SchemaTransformerTests(FactoryTestCase):
 
         result = self.transformer.analyze_classes(classes)
         self.assertEqual(1, len(result))
-        mock_process.assert_called_once_with(classes, self.transformer.config)
+
+        actual = mock_process.call_args[0][0]
+
+        self.assertIsInstance(actual, ClassContainer)
+        self.assertEqual(2, len(actual.data))
+        self.assertEqual(self.transformer.config, actual.config)

@@ -5,7 +5,6 @@ from tests.factories import FactoryTestCase
 from xsdata.codegen.container import ClassContainer
 from xsdata.codegen.models import Class
 from xsdata.codegen.models import Status
-from xsdata.exceptions import CodeGenerationError
 from xsdata.models.enums import Tag
 
 
@@ -15,21 +14,22 @@ class ClassContainerTests(FactoryTestCase):
 
         self.container = ClassContainer()
 
-    def test_from_list(self):
+    def test_initialize(self):
         classes = [
             ClassFactory.create(qname="{xsdata}foo", tag=Tag.ELEMENT),
             ClassFactory.create(qname="{xsdata}foo", tag=Tag.COMPLEX_TYPE),
             ClassFactory.create(qname="{xsdata}foobar", tag=Tag.COMPLEX_TYPE),
         ]
-        container = ClassContainer.from_list(classes)
+        container = ClassContainer()
+        container.extend(classes)
 
         expected = {
             "{xsdata}foo": classes[:2],
             "{xsdata}foobar": classes[2:],
         }
 
-        self.assertEqual(2, len(container))
-        self.assertEqual(expected, container)
+        self.assertEqual(2, len(container.data))
+        self.assertEqual(expected, container.data)
         self.assertEqual(
             [
                 "AttributeGroupHandler",
@@ -93,7 +93,8 @@ class ClassContainerTests(FactoryTestCase):
         mock_class_should_generate.side_effect = [True, False, False, True, False]
 
         classes = ClassFactory.list(5)
-        container = ClassContainer.from_list(classes)
+        container = ClassContainer()
+        container.extend(classes)
 
         expected = [
             classes[0],
@@ -106,7 +107,8 @@ class ClassContainerTests(FactoryTestCase):
     def test_filter_classes_with_only_simple_types(self, mock_class_should_generate):
         mock_class_should_generate.return_value = False
         classes = [ClassFactory.enumeration(2), ClassFactory.simple_type()]
-        container = ClassContainer.from_list(classes)
+        container = ClassContainer()
+        container.extend(classes)
         container.filter_classes()
 
         self.assertEqual(classes, container.class_list)

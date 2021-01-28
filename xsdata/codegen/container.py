@@ -1,4 +1,5 @@
-from collections import UserDict
+from dataclasses import dataclass
+from dataclasses import field
 from operator import attrgetter
 from typing import Callable
 from typing import Dict
@@ -19,20 +20,20 @@ from xsdata.codegen.mixins import HandlerInterface
 from xsdata.codegen.models import Class
 from xsdata.codegen.models import Status
 from xsdata.codegen.utils import ClassUtils
+from xsdata.models.config import GeneratorConfig
 from xsdata.utils import collections
 from xsdata.utils.collections import group_by
 from xsdata.utils.constants import return_true
 
 
-class ClassContainer(UserDict, ContainerInterface):
-    def __init__(self, data: Dict[str, List[Class]] = None) -> None:
-        """
-        Initialize container structure and the list of process handlers.
+@dataclass
+class ClassContainer(ContainerInterface):
 
-        :params data: class map indexed by their source qualified name.
-        """
-        super().__init__(data)
+    data: Dict = field(default_factory=dict)
+    config: GeneratorConfig = field(default_factory=GeneratorConfig)
+    processors: List[HandlerInterface] = field(init=False)
 
+    def __post_init__(self):
         self.processors: List[HandlerInterface] = [
             AttributeGroupHandler(self),
             ClassExtensionHandler(self),
@@ -47,11 +48,6 @@ class ClassContainer(UserDict, ContainerInterface):
     @property
     def class_list(self) -> List[Class]:
         return list(self.iterate())
-
-    @classmethod
-    def from_list(cls, items: List[Class]) -> "ClassContainer":
-        """Static constructor from a list of classes."""
-        return cls(group_by(items, attrgetter("qname")))
 
     def iterate(self) -> Iterator[Class]:
         """Create an iterator for the class map values."""

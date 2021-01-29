@@ -107,7 +107,37 @@ class Immutable:
 
     def __eq__(self, other: Any) -> bool:
         if isinstance(other, self.__class__):
-            return tuple(self) == tuple(other)
+            return self.__cmp_value__() == other.__cmp_value__()
+
+        return NotImplemented
+
+    def __ne__(self, other: Any) -> bool:
+        if isinstance(other, self.__class__):
+            return self.__cmp_value__() != other.__cmp_value__()
+
+        return NotImplemented
+
+    def __lt__(self, other: Any) -> bool:
+        if isinstance(other, self.__class__):
+            return self.__cmp_value__() < other.__cmp_value__()
+
+        return NotImplemented
+
+    def __le__(self, other: Any) -> bool:
+        if isinstance(other, self.__class__):
+            return self.__cmp_value__() <= other.__cmp_value__()
+
+        return NotImplemented
+
+    def __gt__(self, other: Any) -> bool:
+        if isinstance(other, self.__class__):
+            return self.__cmp_value__() > other.__cmp_value__()
+
+        return NotImplemented
+
+    def __ge__(self, other: Any) -> bool:
+        if isinstance(other, self.__class__):
+            return self.__cmp_value__() >= other.__cmp_value__()
 
         return NotImplemented
 
@@ -124,6 +154,9 @@ class Immutable:
             object.__setattr__(self, "_hashcode", hashcode)
 
         return hashcode
+
+    def __cmp_value__(self) -> Any:
+        return tuple(self)
 
     def as_dict(self) -> dict:
         """Return arguments as dictionary."""

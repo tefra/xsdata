@@ -7,6 +7,7 @@ from typing import Dict
 from typing import Iterator
 from typing import List
 from typing import Optional
+from typing import Set
 from typing import Tuple
 from typing import Type
 
@@ -56,6 +57,7 @@ class ElementNode(XmlNode):
     position: int
     mixed: bool = False
     derived: bool = False
+    assigned: Set = field(default_factory=set)
 
     def bind(self, qname: str, text: NoneStr, tail: NoneStr, objects: List) -> bool:
         params: Dict = {}
@@ -89,13 +91,19 @@ class ElementNode(XmlNode):
         return True
 
     def child(self, qname: str, attrs: Dict, ns_map: Dict, position: int) -> XmlNode:
-        for var in self.fetch_vars(qname):
-            node = self.build_node(var, attrs, ns_map, position)
-            if node:
-                return node
+        for unique, var in self.fetch_vars(qname):
+            if not unique or unique not in self.assigned:
+                node = self.build_node(var, attrs, ns_map, position)
+
+                if node:
+                    if unique:
+                        self.assigned.add(unique)
+
+                    return node
 
         if self.config.fail_on_unknown_properties:
             raise ParserError(f"Unknown property {self.meta.qname}:{qname}")
+
         return SkipNode()
 
     def build_node(
@@ -132,7 +140,7 @@ class ElementNode(XmlNode):
 
         return PrimitiveNode(var=var, ns_map=ns_map)
 
-    def fetch_vars(self, qname: str) -> Iterator[XmlVar]:
+    def fetch_vars(self, qname: str) -> Iterator[Tuple[Any, XmlVar]]:
         for mode in FIND_MODES:
             var = self.meta.find_var(qname, mode)
 
@@ -140,11 +148,13 @@ class ElementNode(XmlNode):
                 continue
 
             if var.elements:
+                unique = None
                 choice = var.find_choice(qname)
                 assert choice is not None
-                yield choice
+                yield unique, choice
             else:
-                yield var
+                unique = None if var.list_element or var.wildcard else id(var)
+                yield unique, var
 
     def build_element_node(
         self,

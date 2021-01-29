@@ -264,7 +264,7 @@ class ElementNodeTests(TestCase):
 
         matching_vars = self.node.fetch_vars("a")
         self.assertIsInstance(matching_vars, Generator)
-        self.assertEqual([elem, wild], list(matching_vars))
+        self.assertEqual([(id(elem), elem), (None, wild)], list(matching_vars))
 
     def test_fetch_vars_with_elements_var(self):
         elem = XmlVar(element=True, name="a", qname="a", types=[Foo], dataclass=True)
@@ -273,7 +273,7 @@ class ElementNodeTests(TestCase):
 
         matching_vars = self.node.fetch_vars("a")
         self.assertIsInstance(matching_vars, Generator)
-        self.assertEqual(elem, next(matching_vars))
+        self.assertEqual((None, elem), next(matching_vars))
 
     @mock.patch.object(ElementNode, "fetch_vars")
     def test_child(self, mock_match_vars):
@@ -281,13 +281,32 @@ class ElementNodeTests(TestCase):
         attrs = {"a": "b"}
         ns_map = {"ns0": "xsdata"}
         position = 1
-        mock_match_vars.return_value = [var]
+        mock_match_vars.return_value = [(id(var), var)]
 
         actual = self.node.child("a", attrs, ns_map, position)
         self.assertIsInstance(actual, ElementNode)
         self.assertEqual(attrs, actual.attrs)
         self.assertEqual(ns_map, actual.ns_map)
         self.assertEqual(position, actual.position)
+
+    def test_child_unique_vars(self):
+        single = XmlVar(element=True, name="a", qname="a", types=[Foo], dataclass=True)
+        wildcard = XmlVar(wildcard=True, name="a", qname="a", types=[object])
+
+        self.meta.vars.append(single)
+        self.meta.vars.append(wildcard)
+
+        attrs = {"a": "b"}
+        ns_map = {"ns0": "xsdata"}
+        position = 1
+
+        actual = self.node.child("a", attrs, ns_map, position)
+        self.assertIsInstance(actual, ElementNode)
+        self.assertIn(id(single), self.node.assigned)
+
+        actual = self.node.child("a", attrs, ns_map, position)
+        self.assertIsInstance(actual, WildcardNode)
+        self.assertNotIn(id(wildcard), self.node.assigned)
 
     @mock.patch.object(ElementNode, "build_node")
     def test_child_when_failed_to_build_next_node(self, mock_build_node):

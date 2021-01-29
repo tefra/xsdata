@@ -37,9 +37,10 @@ class DateFormat:
 
 class XmlDate(Immutable):
     """
-    Immutable structure for xs:date.
+    Concrete xs:date builtin type.
 
-    Format:  [-]CCYY-MM-DD[Z|(+|-)hh:mm]
+    Represents iso 8601 date format [-]CCYY-MM-DD[Z|(+|-)hh:mm] with
+    rich comparisons and hashing.
 
     :param year: Any signed integer, eg (0, -535, 2020)
     :param month: Unsigned integer between 1-12
@@ -59,6 +60,27 @@ class XmlDate(Immutable):
         validate_date(year, month, day)
 
         self._hashcode = -1  # Lock the object
+
+    def replace(
+        self,
+        year: Optional[int] = None,
+        month: Optional[int] = None,
+        day: Optional[int] = None,
+        offset: Optional[int] = True,
+    ) -> "XmlDate":
+        """Return a new instance replacing the specified fields with new
+        values."""
+
+        if year is None:
+            year = self.year
+        if month is None:
+            month = self.month
+        if day is None:
+            day = self.day
+        if offset is True:
+            offset = self.offset
+
+        return type(self)(year, month, day, offset)
 
     @classmethod
     def from_string(cls, string: str) -> "XmlDate":
@@ -80,6 +102,11 @@ class XmlDate(Immutable):
     def from_datetime(cls, obj: datetime.datetime) -> "XmlDate":
         """Initialize from :class:`datetime.datetime` instance."""
         return XmlDate(obj.year, obj.month, obj.day, calculate_offset(obj))
+
+    @classmethod
+    def today(cls) -> "XmlDate":
+        """Initialize from datetime.date.today()"""
+        return cls.from_date(datetime.date.today())
 
     def to_date(self) -> datetime.date:
         """Return a :class:`datetime.date` instance."""
@@ -111,9 +138,10 @@ class XmlDate(Immutable):
 
 class XmlDateTime(Immutable):
     """
-    Immutable structure for xs:dateTime.
+    Concrete xs:dateTime builtin type.
 
-    Format: [-]CCYY-MM-DDThh:mm:ss[Z|(+|-)hh:mm]
+    Represents iso 8601 date time format [-]CCYY-MM-DDThh:mm:ss[Z|(+|-)hh:mm]
+    with rich comparisons and hashing.
 
     :param year: Any signed integer, eg (0, -535, 2020)
     :param month: Unsigned integer between 1-12
@@ -185,6 +213,16 @@ class XmlDateTime(Immutable):
             calculate_offset(obj),
         )
 
+    @classmethod
+    def now(cls, tz: Optional[datetime.timezone] = None) -> "XmlDateTime":
+        """Initialize from datetime.datetime.now()"""
+        return cls.from_datetime(datetime.datetime.now(tz=tz))
+
+    @classmethod
+    def utcnow(cls) -> "XmlDateTime":
+        """Initialize from datetime.datetime.utcnow()"""
+        return cls.from_datetime(datetime.datetime.utcnow())
+
     def to_datetime(self) -> datetime.datetime:
         """Return a :class:`datetime.datetime` instance."""
         return datetime.datetime(
@@ -198,10 +236,41 @@ class XmlDateTime(Immutable):
             tzinfo=calculate_timezone(self.offset),
         )
 
-    def __eq__(self, other: Any) -> bool:
-        if isinstance(other, XmlDateTime):
-            return self._duration == other._duration
-        return NotImplemented
+    def replace(
+        self,
+        year: Optional[int] = None,
+        month: Optional[int] = None,
+        day: Optional[int] = None,
+        hour: Optional[int] = None,
+        minute: Optional[int] = None,
+        second: Optional[int] = None,
+        microsecond: Optional[int] = None,
+        offset: Optional[int] = True,
+    ) -> "XmlDateTime":
+        """Return a new instance replacing the specified fields with new
+        values."""
+
+        if year is None:
+            year = self.year
+        if month is None:
+            month = self.month
+        if day is None:
+            day = self.day
+        if hour is None:
+            hour = self.hour
+        if minute is None:
+            minute = self.minute
+        if second is None:
+            second = self.second
+        if microsecond is None:
+            microsecond = self.microsecond
+        if offset is True:
+            offset = self.offset
+
+        return type(self)(year, month, day, hour, minute, second, microsecond, offset)
+
+    def __cmp_value__(self) -> float:
+        return self._duration
 
     def __str__(self) -> str:
         """
@@ -234,9 +303,10 @@ class XmlDateTime(Immutable):
 
 class XmlTime(Immutable):
     """
-    Immutable structure for xs:time:
+    Concrete xs:time builtin type.
 
-    Format: hh:mm:ss[Z|(+|-)hh:mm]
+    Represents iso 8601 time format hh:mm:ss[Z|(+|-)hh:mm]
+    with rich comparisons and hashing.
 
     :param hour: Unsigned integer between 0-24
     :param minute: Unsigned integer between 0-59
@@ -269,6 +339,30 @@ class XmlTime(Immutable):
         )
         self._hashcode = -1  # Lock the object
 
+    def replace(
+        self,
+        hour: Optional[int] = None,
+        minute: Optional[int] = None,
+        second: Optional[int] = None,
+        microsecond: Optional[int] = None,
+        offset: Optional[int] = True,
+    ) -> "XmlTime":
+        """Return a new instance replacing the specified fields with new
+        values."""
+
+        if hour is None:
+            hour = self.hour
+        if minute is None:
+            minute = self.minute
+        if second is None:
+            second = self.second
+        if microsecond is None:
+            microsecond = self.microsecond
+        if offset is True:
+            offset = self.offset
+
+        return type(self)(hour, minute, second, microsecond, offset)
+
     @classmethod
     def from_string(cls, string: str) -> "XmlTime":
         """Initialize from string format ``%H:%M:%S%z``"""
@@ -281,6 +375,16 @@ class XmlTime(Immutable):
             obj.hour, obj.minute, obj.second, obj.microsecond, calculate_offset(obj)
         )
 
+    @classmethod
+    def now(cls, tz: Optional[datetime.timezone] = None) -> "XmlTime":
+        """Initialize from datetime.datetime.now()"""
+        return cls.from_time(datetime.datetime.now(tz=tz).time())
+
+    @classmethod
+    def utcnow(cls) -> "XmlTime":
+        """Initialize from datetime.datetime.utcnow()"""
+        return cls.from_time(datetime.datetime.utcnow().time())
+
     def to_time(self) -> datetime.time:
         """Return a :class:`datetime.time` instance."""
         return datetime.time(
@@ -291,10 +395,8 @@ class XmlTime(Immutable):
             tzinfo=calculate_timezone(self.offset),
         )
 
-    def __eq__(self, other: Any) -> bool:
-        if isinstance(other, XmlTime):
-            return self._duration == other._duration
-        return NotImplemented
+    def __cmp_value__(self) -> float:
+        return self._duration
 
     def __str__(self) -> str:
         """
@@ -332,7 +434,10 @@ class TimeInterval(NamedTuple):
 
 class XmlDuration(UserString):
     """
-    Immutable string representation for xs:duration.
+    Concrete xs:duration builtin type.
+
+    Represents iso 8601 duration format PnYnMnDTnHnMnS
+    with rich comparisons and hashing.
 
     Format PnYnMnDTnHnMnS:
         - **P**: literal value that starts the expression
@@ -427,10 +532,9 @@ class TimePeriod(NamedTuple):
 
 class XmlPeriod(UserString):
     """
-    Immutable string representation for xs:g[Year[Month[Day]]] types.
+    Concrete xs:gYear/Month/Day builtin type.
 
-    On initialization the period format will be analyzed and parsed
-    into date units.
+    Represents iso 8601 period formats with rich comparisons and hashing.
 
     Formats:
         - xs:gDay: **---%d%z**
@@ -511,7 +615,7 @@ class XmlPeriod(UserString):
 
 class XmlHexBinary(bytes):
     """
-    Subclass bytes to infer serialize base16 format.
+    Subclass bytes to infer base16 format.
 
     This type can be used with xs:anyType fields that don't have a
     format property to specify the target output format.
@@ -520,7 +624,7 @@ class XmlHexBinary(bytes):
 
 class XmlBase64Binary(bytes):
     """
-    Subclass bytes to infer serialize base64 format.
+    Subclass bytes to infer base64 format.
 
     This type can be used with xs:anyType fields that don't have a
     format property to specify the target output format.

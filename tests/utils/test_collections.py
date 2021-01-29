@@ -67,10 +67,33 @@ class ImmutableTests(TestCase):
 
         self.assertEqual("ImmutableImpl is immutable", str(cm.exception))
 
-    def test_eq(self):
+    def test_comparisons(self):
         self.assertEqual(ImmutableImpl(1, 2), self.obj)
         self.assertNotEqual(ImmutableImpl(2, 2), self.obj)
         self.assertNotEqual("a", self.obj)
+
+        self.assertLess(ImmutableImpl(1, 1), self.obj)
+        self.assertLessEqual(ImmutableImpl(1, 1), self.obj)
+        self.assertLessEqual(ImmutableImpl(1, 2), self.obj)
+
+        self.assertGreater(self.obj, ImmutableImpl(1, 1))
+        self.assertGreaterEqual(self.obj, ImmutableImpl(1, 1))
+        self.assertGreaterEqual(self.obj, ImmutableImpl(1, 2))
+
+        with self.assertRaises(AssertionError):
+            self.assertEqual(self.obj, 1)
+
+        with self.assertRaises(TypeError):
+            self.assertLess(self.obj, 1)
+
+        with self.assertRaises(TypeError):
+            self.assertLessEqual(self.obj, 1)
+
+        with self.assertRaises(TypeError):
+            self.assertGreater(self.obj, 1)
+
+        with self.assertRaises(TypeError):
+            self.assertGreaterEqual(self.obj, 1)
 
     def test_hash(self):
         self.assertEqual(-1, self.obj._hashcode)

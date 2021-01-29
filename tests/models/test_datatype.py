@@ -1,3 +1,4 @@
+from datetime import date
 from datetime import datetime
 from datetime import time
 from datetime import timedelta
@@ -98,6 +99,33 @@ class XmlDateTests(TestCase):
         self.assertEqual(actual, XmlDate.from_datetime(obj))
         self.assertEqual(actual, XmlDate.from_date(obj.date()))
 
+        self.assertEqual(XmlDate.from_date(date.today()), XmlDate.today())
+
+        now = datetime.now()
+        self.assertEqual(XmlDate.from_datetime(now), XmlDate.today())
+
+    def test_replace(self):
+        actual = XmlDate(2021, 1, 1, 120)
+        self.assertIsNot(actual, actual.replace())
+        self.assertEqual("2022-01-01+02:00", str(actual.replace(2022)))
+        self.assertEqual("2021-01-01", str(actual.replace(offset=None)))
+        self.assertEqual("2021-01-01Z", str(actual.replace(offset=False)))
+        self.assertEqual("2022-12-25+02:00", str(actual.replace(2022, 12, 25)))
+        self.assertEqual("2022-12-25+00:10", str(actual.replace(2022, 12, 25, 10)))
+
+    def test_comparisons(self):
+        a = XmlDate(2021, 1, 1)
+        b = XmlDate(2021, 1, 2)
+
+        self.assertLess(a, b)
+        self.assertLessEqual(a, b)
+        self.assertLessEqual(a, a.replace())
+        self.assertGreater(b, a)
+        self.assertGreaterEqual(b, a)
+        self.assertGreaterEqual(a.replace(), a)
+        self.assertEqual(a, a.replace())
+        self.assertNotEqual(a, a.replace(offset=0))
+
 
 class XmlDateTimeTests(TestCase):
     def test_from_string(self):
@@ -186,14 +214,70 @@ class XmlDateTimeTests(TestCase):
         self.assertEqual(actual, XmlDateTime.from_datetime(obj))
         self.assertEqual(obj, actual.to_datetime())
 
-    def test_equal(self):
+        now = datetime.now().replace(microsecond=0, second=0, minute=1)
+        self.assertEqual(
+            XmlDateTime.from_datetime(now),
+            XmlDateTime.now().replace(microsecond=0, second=0, minute=1),
+        )
+
+        now = datetime.now(tz=timezone.utc).replace(microsecond=0, second=0, minute=1)
+        self.assertEqual(
+            XmlDateTime.from_datetime(now),
+            XmlDateTime.utcnow().replace(microsecond=0, second=0, minute=1),
+        )
+
+        now = datetime.utcnow().replace(microsecond=0, second=0, minute=1)
+        self.assertEqual(
+            XmlDateTime.from_datetime(now),
+            XmlDateTime.utcnow().replace(microsecond=0, second=0, minute=1),
+        )
+
+    def test_comparisons(self):
         a = XmlDateTime.from_string("2010-09-20T12:00:00Z")
         b = XmlDateTime.from_string("2010-09-20T13:00:00.000+01:00")
-        c = XmlDateTime.from_string("2010-09-20T13:00:00.000")
+        c = a.replace(second=1)
 
-        self.assertEqual(a, b)
+        self.assertLess(a, c)
+        self.assertLessEqual(a, c)
+        self.assertLessEqual(a, a.replace())
+        self.assertGreater(c, a)
+        self.assertGreaterEqual(c, a)
+        self.assertGreaterEqual(a.replace(), a)
+        self.assertEqual(a, a.replace())
         self.assertNotEqual(a, c)
-        self.assertNotEqual(1, c)
+        self.assertEqual(a, b)
+
+    def test_replace(self):
+        actual = XmlDateTime(2002, 1, 1, 12, 1, 1, 0, -120)
+        self.assertIsNot(actual, actual.replace())
+        self.assertEqual("2022-01-01T12:01:01-02:00", str(actual.replace(2022)))
+        self.assertEqual("2022-12-01T12:01:01-02:00", str(actual.replace(2022, 12)))
+        self.assertEqual("2022-12-25T12:01:01-02:00", str(actual.replace(2022, 12, 25)))
+        self.assertEqual(
+            "2022-12-25T10:01:01-02:00", str(actual.replace(2022, 12, 25, 10))
+        )
+        self.assertEqual(
+            "2022-12-25T10:15:01-02:00", str(actual.replace(2022, 12, 25, 10, 15))
+        )
+        self.assertEqual(
+            "2022-12-25T10:15:30-02:00", str(actual.replace(2022, 12, 25, 10, 15, 30))
+        )
+        self.assertEqual(
+            "2022-12-25T10:15:30.150-02:00",
+            str(actual.replace(2022, 12, 25, 10, 15, 30, 150000)),
+        )
+        self.assertEqual(
+            "2022-12-25T10:15:30.150+01:00",
+            str(actual.replace(2022, 12, 25, 10, 15, 30, 150000, 60)),
+        )
+        self.assertEqual(
+            "2022-12-25T10:15:30.150",
+            str(actual.replace(2022, 12, 25, 10, 15, 30, 150000, None)),
+        )
+        self.assertEqual(
+            "2022-12-25T10:15:30.150Z",
+            str(actual.replace(2022, 12, 25, 10, 15, 30, 150000, False)),
+        )
 
 
 class XmlTimeTests(TestCase):
@@ -274,14 +358,48 @@ class XmlTimeTests(TestCase):
         self.assertEqual(actual, XmlTime.from_time(obj))
         self.assertEqual(obj, actual.to_time())
 
-    def test_equal(self):
+        now = datetime.now().replace(microsecond=0, second=0, minute=1)
+        self.assertEqual(
+            XmlTime.from_time(now.time()),
+            XmlTime.now().replace(microsecond=0, second=0, minute=1),
+        )
+
+        now = datetime.now(tz=timezone.utc).replace(microsecond=0, second=0, minute=1)
+        self.assertEqual(
+            XmlTime.from_time(now.time()),
+            XmlTime.utcnow().replace(microsecond=0, second=0, minute=1),
+        )
+
+        now = datetime.utcnow().replace(microsecond=0, second=0, minute=1)
+        self.assertEqual(
+            XmlTime.from_time(now.time()),
+            XmlTime.utcnow().replace(microsecond=0, second=0, minute=1),
+        )
+
+    def test_comparisons(self):
         a = XmlTime.from_string("12:00:00Z")
         b = XmlTime.from_string("13:00:00.000+01:00")
         c = XmlTime.from_string("13:00:00.000")
 
-        self.assertEqual(a, b)
+        self.assertLess(a, c)
+        self.assertLessEqual(a, c)
+        self.assertLessEqual(a, a.replace())
+        self.assertGreater(c, a)
+        self.assertGreaterEqual(c, a)
+        self.assertGreaterEqual(a.replace(), a)
+        self.assertEqual(a, a.replace())
         self.assertNotEqual(a, c)
-        self.assertNotEqual(1, c)
+        self.assertEqual(a, b)
+
+    def test_replace(self):
+        actual = XmlTime(12, 1, 1, 1, 0)
+        self.assertIsNot(actual, actual.replace())
+        self.assertEqual("14:01:01.000001Z", str(actual.replace(14)))
+        self.assertEqual("14:02:01.000001Z", str(actual.replace(14, 2)))
+        self.assertEqual("14:02:03.000001Z", str(actual.replace(14, 2, 3)))
+        self.assertEqual("14:02:03Z", str(actual.replace(14, 2, 3, 0)))
+        self.assertEqual("14:02:03", str(actual.replace(14, 2, 3, 0, None)))
+        self.assertEqual("14:02:03+00:55", str(actual.replace(14, 2, 3, 0, 55)))
 
 
 class XmlDurationTests(TestCase):

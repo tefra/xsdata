@@ -472,8 +472,11 @@ class XmlPeriod(UserString):
         year = month = day = offset = None
         if value.startswith("---"):
             day, offset = parse_date_args(value, DateFormat.G_DAY)
-
         elif value.startswith("--"):
+            # Bogus format --MM--, --05---05:00
+            if value[4:6] == "--":
+                value = value[:4] + value[6:]
+
             if len(value) in (4, 5, 10):  # fixed lengths with/out timezone
                 month, offset = parse_date_args(value, DateFormat.G_MONTH)
             else:

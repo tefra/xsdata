@@ -752,11 +752,31 @@ class NodeParserTests(TestCase):
         self.assertEqual(expected_node, queue[0])
 
         with self.assertRaises(ParserError) as cm:
-            parser.start(None, [], [], "{unknown}hopefully", [], {})
+            parser.start(None, [], [], "{unknown}hopefully", {}, {})
 
         self.assertEqual(
             "No class found matching root: {unknown}hopefully", str(cm.exception)
         )
+
+    def test_start_with_any_type_root(self):
+        parser = self.parser
+        queue = []
+        objects = []
+
+        attrs = {QNames.XSI_TYPE: "bk:books"}
+        ns_map = {"bk": "urn:books", "xsi": Namespace.XSI.uri}
+        expected_node = ElementNode(
+            position=0,
+            context=parser.context,
+            meta=parser.context.build(Books),
+            config=parser.config,
+            attrs=attrs,
+            ns_map=ns_map,
+            derived=True,
+        )
+        parser.start(None, queue, objects, "doc", attrs, ns_map)
+        self.assertEqual(1, len(queue))
+        self.assertEqual(expected_node, queue[0])
 
     def test_start_with_derived_class(self):
         a = make_dataclass("a", fields=[])

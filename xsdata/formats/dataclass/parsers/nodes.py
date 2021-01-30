@@ -463,14 +463,20 @@ class NodeParser(PushParser):
             item = queue[-1]
             child = item.child(qname, attrs, ns_map, len(objects))
         except IndexError:
+            xsi_type = ParserUtils.xsi_type(attrs, ns_map)
 
+            # Match element qname directly
             if clazz is None:
                 clazz = self.context.find_type(qname)
 
+            # Root is xs:anyType try xsi:type
+            if clazz is None and xsi_type:
+                clazz = self.context.find_type(xsi_type)
+
+            # Exit if we still have no binding model
             if clazz is None:
                 raise ParserError(f"No class found matching root: {qname}")
 
-            xsi_type = ParserUtils.xsi_type(attrs, ns_map)
             meta = self.context.fetch(clazz, xsi_type=xsi_type)
             derived = xsi_type is not None and meta.qname != qname
 

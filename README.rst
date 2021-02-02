@@ -59,23 +59,25 @@ Features
 - Pluggable code writer that supports python dataclasses and PlantUML class diagrams.
 
 
-Changelog: 21.1 (2021-01-08)
+Changelog: 21.2 (2021-02-02)
 ----------------------------
-- Fixed XmlWriter converting attribute keys to QName. `#346 <https://github.com/tefra/xsdata/issues/346>`_
-- Set empty complexType base to anySimpleType `#349 <https://github.com/tefra/xsdata/issues/349>`_
-- Improve duplicate attr names detection `#351 <https://github.com/tefra/xsdata/issues/351>`_
-- Add SerializerConfig::xml_declaration option `#357 <https://github.com/tefra/xsdata/issues/357>`_
-- Generate default value/factory for compound fields `#359 <https://github.com/tefra/xsdata/issues/359>`_
-- Fixed default value for token fields `#360 <https://github.com/tefra/xsdata/issues/360>`_
-- Add doc metadata for compound fields `#362 <https://github.com/tefra/xsdata/issues/362>`_
-- JsonParser: handle class and primitive unions `#369 <https://github.com/tefra/xsdata/issues/369>`_
-- Update python mappings `#366 <https://github.com/tefra/xsdata/issues/366>`_
-   - Map xs:hexBinary and xs:base64Binary to bytes
-   - Map xs:date/time types to builtin types XmlDate/Time
-   - Map xs:duration to builtin type XmlDuration
-   - Map xs:g[Year[Month[Day]]] to builtin type XmlPeriod
-   - Map xs:Notation to QName
-   - Add converter adapters for datetime.date/time
-   - Add fields metadata key 'format' for time/date/binary types
-   - Fixed issues with default literal values
-   - Fixed issue with random field types order
+
+- Added class name context for user naming schemes `#348 <https://github.com/tefra/xsdata/issues/348>`_
+- Added mixed pascal naming scheme `#348 <https://github.com/tefra/xsdata/issues/348>`_
+- Added access to element/attribute name generators `#381 <https://github.com/tefra/xsdata/issues/381>`_
+- Added XmlHexBinary/XmlBase64Binary builtin data types `#387 <https://github.com/tefra/xsdata/issues/387>`_
+- Added support for xs:anyType root elements `#399 <https://github.com/tefra/xsdata/issues/399>`_
+- Updated JSON binding modules to use the fields local name `#389 <https://github.com/tefra/xsdata/issues/389>`_
+- Updated enum classes generation
+   - Promote all inner enums to root `#383 <https://github.com/tefra/xsdata/issues/383>`_
+   - Fixed issues with producing invalid members `#385 <https://github.com/tefra/xsdata/issues/385>`_
+   - Added support for list/tuple member values
+- Updated parsers accuracy for Union types
+- Updated dependency resolution accuracy
+- Update base classes generation strategies
+- Updated builtin data types with helper constructors/methods
+- Fixed inner class names conflicts `#375 <https://github.com/tefra/xsdata/issues/375>`_
+- Fixed issue not generating fields derived from xs:alternative elements `#393 <https://github.com/tefra/xsdata/issues/393>`_
+- Fixed duplicate root class name regression from v20.12
+- Fixed issue adding unused lib imports
+- Fixed issue adding unused name properties to choice elements

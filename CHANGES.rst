@@ -1,3 +1,29 @@
+21.2 (2021-02-02)
+-----------------
+
+- Added class name context for user naming schemes `#348 <https://github.com/tefra/xsdata/issues/348>`_
+- Added mixed pascal naming scheme `#348 <https://github.com/tefra/xsdata/issues/348>`_
+- Added access to element/attribute name generators `#381 <https://github.com/tefra/xsdata/issues/381>`_
+- Added XmlHexBinary/XmlBase64Binary builtin data types `#387 <https://github.com/tefra/xsdata/issues/387>`_
+- Added support for xs:anyType root elements `#399 <https://github.com/tefra/xsdata/issues/399>`_
+- Updated JSON binding modules to use the fields local name `#389 <https://github.com/tefra/xsdata/issues/389>`_
+- Updated enum classes generation
+   - Promote all inner enums to root `#383 <https://github.com/tefra/xsdata/issues/383>`_
+   - Fixed issues with producing invalid members `#385 <https://github.com/tefra/xsdata/issues/385>`_
+   - Added support for list/tuple member values
+- Updated parsers accuracy for Union types
+- Updated dependency resolution accuracy
+- Update base classes generation strategies
+- Updated builtin data types with helper constructors/methods
+- Fixed inner class names conflicts `#375 <https://github.com/tefra/xsdata/issues/375>`_
+- Fixed issue not generating fields derived from xs:alternative elements `#393 <https://github.com/tefra/xsdata/issues/393>`_
+- Fixed duplicate root class name regression from v20.12
+- Fixed issue adding unused lib imports
+- Fixed issue adding unused name properties to choice elements
+
+This is a sleeper release ✨✨✨ so many code generation improvements and finally the
+JSON binding is aligned with XML.
+
 21.1 (2021-01-08)
 -----------------
 - Fixed XmlWriter converting attribute keys to QName. `#346 <https://github.com/tefra/xsdata/issues/346>`_

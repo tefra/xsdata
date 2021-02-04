@@ -2,7 +2,7 @@
   <xsd:element name="Root">
     <xsd:annotation>
       <xsd:documentation>
-        This is the root type documentation. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi dapibus.
+        This is the root type documentation. """Lorem ipsum""" dolor sit amet, consectetur adipiscing elit. Morbi dapibus.
 
         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec imperdiet lacus sed sagittis scelerisque. Ut sodales metus: "sit", "amet", "lectus"
       </xsd:documentation>
@@ -12,7 +12,7 @@
         <xsd:element name="a">
           <xsd:annotation>
             <xsd:documentation>
-              This is an inner type field documentation.
+              This is an inner type """field""" documentation.
               Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam nec.
             </xsd:documentation>
           </xsd:annotation>
@@ -26,7 +26,7 @@
               <xsd:element name="sub_a" type="xsd:string">
                 <xsd:annotation>
                   <xsd:documentation>
-                    This is an inner type field documentation.
+                    This is an inner type '''field''' documentation.
                     Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus efficitur.
                   </xsd:documentation>
                 </xsd:annotation>
@@ -95,7 +95,7 @@
       <xsd:enumeration value="B">
         <xsd:annotation>
           <xsd:documentation>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi dapibus.
+            Lorem ipsum dolor """sit""" amet, consectetur adipiscing elit. Morbi dapibus.
           </xsd:documentation>
         </xsd:annotation>
       </xsd:enumeration>

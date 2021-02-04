@@ -31,7 +31,8 @@ class RootEnum(Enum):
 
 RootEnum.A.__doc__ = "Lorem ipsum dolor"
 RootEnum.B.__doc__ = (
-    "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi dapibus."
+    "Lorem ipsum dolor '''sit''' amet, consectetur adipiscing elit. Morbi "
+    "dapibus."
 )
 
 
@@ -54,7 +55,7 @@ class RootD(Enum):
 
 @dataclass
 class Root:
-    """This is the root type documentation. Lorem ipsum dolor sit amet,
+    """This is the root type documentation. '''Lorem ipsum''' dolor sit amet,
     consectetur adipiscing elit. Morbi dapibus.
 
     Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec
@@ -71,8 +72,8 @@ class Root:
             "namespace": "",
             "required": True,
             "doc": (
-                "This is an inner type field documentation.\nLorem ipsum dolor"
-                " sit amet, consectetur adipiscing elit. Aliquam nec."
+                "This is an inner type '''field''' documentation.\nLorem ipsum"
+                " dolor sit amet, consectetur adipiscing elit. Aliquam nec."
             ),
         }
     )
@@ -114,8 +115,9 @@ class Root:
                 "namespace": "",
                 "required": True,
                 "doc": (
-                    "This is an inner type field documentation.\nLorem ipsum dolor"
-                    " sit amet, consectetur adipiscing elit. Vivamus efficitur."
+                    "This is an inner type '''field''' documentation.\nLorem ipsum"
+                    " dolor sit amet, consectetur adipiscing elit. Vivamus "
+                    "efficitur."
                 ),
             }
         )

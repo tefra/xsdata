@@ -1,1 +1,1 @@
-{{ '"""{}"""'.format(obj.help | text_strip) }}
+{{ '"""{}"""'.format(obj.help | text_strip | replace('"""', "'''")) }}

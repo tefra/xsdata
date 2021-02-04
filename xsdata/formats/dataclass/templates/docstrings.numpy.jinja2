@@ -1,9 +1,9 @@
 {% set offset = (level + 1) * 4 + 7 -%}
-{{ '"""{}"""'.format(obj.help | text_strip) }}
+{{ '"""{}"""'.format(obj.help | text_strip | replace('"""', "'''")) }}
 {% if obj.has_help_attr %}
 {{ "Properties" if obj.is_enumeration else "Parameters" }}
 ----------
 {%- for var_name, var_doc in obj | class_params %}
-{{ "{}: {}".format(var_name, var_doc) | text_wrap(offset) }}
+{{ "{}: {}".format(var_name, var_doc.replace('"""', "'''")) | text_wrap(offset) }}
 {%- endfor -%}
 {%- endif %}

@@ -15,6 +15,6 @@ class {{ class_name }}(Enum):
 {{ "\n\n" if level == 0 else "\n" }}
 {%- for attr in obj.attrs if attr.help %}
 {% set member_name = "{}.{}.__doc__ = ".format(class_name, attr.name | constant_name(obj.name)) -%}
-{{ member_name }}{{ attr.help | format_string(indent=0, key=member_name) }}
+{{ member_name }}{{ attr.help | replace('"""', "'''") | format_string(indent=0, key=member_name) }}
 {%- endfor -%}
 {%- endif -%}

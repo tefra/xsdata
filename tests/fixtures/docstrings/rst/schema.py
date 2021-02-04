@@ -27,8 +27,8 @@ class DoubleQuotesSummary:
 class RootEnum(Enum):
     """
     :cvar A: Lorem ipsum dolor
-    :cvar B: Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-        Morbi dapibus.
+    :cvar B: Lorem ipsum dolor '''sit''' amet, consectetur adipiscing
+        elit. Morbi dapibus.
     """
     A = "A"
     B = "B"
@@ -51,15 +51,15 @@ class RootD(Enum):
 
 @dataclass
 class Root:
-    """This is the root type documentation. Lorem ipsum dolor sit amet,
+    """This is the root type documentation. '''Lorem ipsum''' dolor sit amet,
     consectetur adipiscing elit. Morbi dapibus.
 
     Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec
     imperdiet lacus sed sagittis scelerisque. Ut sodales metus: "sit",
     "amet", "lectus"
 
-    :ivar a: This is an inner type field documentation. Lorem ipsum
-        dolor sit amet, consectetur adipiscing elit. Aliquam nec.
+    :ivar a: This is an inner type '''field''' documentation. Lorem
+        ipsum dolor sit amet, consectetur adipiscing elit. Aliquam nec.
     :ivar b: This is a second root type field documentation.
     :ivar c:
     :ivar d:
@@ -105,9 +105,9 @@ class Root:
         """
         This is an inner type documentation.
 
-        :ivar sub_a: This is an inner type field documentation. Lorem
-            ipsum dolor sit amet, consectetur adipiscing elit. Vivamus
-            efficitur.
+        :ivar sub_a: This is an inner type '''field''' documentation.
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+            Vivamus efficitur.
         """
         sub_a: Optional[str] = field(
             default=None,

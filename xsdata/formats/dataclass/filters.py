@@ -158,19 +158,19 @@ class Filters:
             namespace = attr.namespace
 
         restrictions = attr.restrictions.asdict(attr.native_types)
-        doc = attr.help if self.docstring_style == DocstringStyle.ACCESSIBLE else None
+        metadata = {
+            "name": name,
+            "type": attr.xml_type,
+            "namespace": namespace,
+            "mixed": attr.mixed,
+            "choices": self.field_choices(attr, parent_namespace, parents),
+            **restrictions,
+        }
 
-        return self.filter_metadata(
-            {
-                "name": name,
-                "type": attr.xml_type,
-                "namespace": namespace,
-                "mixed": attr.mixed,
-                "choices": self.field_choices(attr, parent_namespace, parents),
-                **restrictions,
-                "doc": doc,
-            }
-        )
+        if self.docstring_style == DocstringStyle.ACCESSIBLE and attr.help:
+            metadata["doc"] = attr.help.replace('"""', "'''")
+
+        return self.filter_metadata(metadata)
 
     def field_choices(
         self, attr: Attr, parent_namespace: Optional[str], parents: List[str]
@@ -208,8 +208,8 @@ class Filters:
             metadata[default_key] = self.field_default_value(choice)
             metadata.update(restrictions)
 
-            if self.docstring_style == DocstringStyle.ACCESSIBLE:
-                metadata["doc"] = choice.help
+            if self.docstring_style == DocstringStyle.ACCESSIBLE and choice.help:
+                metadata["doc"] = choice.help.replace('"""', "'''")
 
             result.append(self.filter_metadata(metadata))
 

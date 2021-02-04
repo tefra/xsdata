@@ -29,8 +29,8 @@ class RootEnum(Enum):
     Properties
     ----------
     A: Lorem ipsum dolor
-    B: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi
-        dapibus.
+    B: Lorem ipsum dolor '''sit''' amet, consectetur adipiscing elit.
+        Morbi dapibus.
     """
     A = "A"
     B = "B"
@@ -55,7 +55,7 @@ class RootD(Enum):
 
 @dataclass
 class Root:
-    """This is the root type documentation. Lorem ipsum dolor sit amet,
+    """This is the root type documentation. '''Lorem ipsum''' dolor sit amet,
     consectetur adipiscing elit. Morbi dapibus.
 
     Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec
@@ -64,8 +64,8 @@ class Root:
 
     Parameters
     ----------
-    a: This is an inner type field documentation. Lorem ipsum dolor sit
-        amet, consectetur adipiscing elit. Aliquam nec.
+    a: This is an inner type '''field''' documentation. Lorem ipsum
+        dolor sit amet, consectetur adipiscing elit. Aliquam nec.
     b: This is a second root type field documentation.
     c:
     d:
@@ -113,8 +113,8 @@ class Root:
 
         Parameters
         ----------
-        sub_a: This is an inner type field documentation. Lorem ipsum
-            dolor sit amet, consectetur adipiscing elit. Vivamus
+        sub_a: This is an inner type '''field''' documentation. Lorem
+            ipsum dolor sit amet, consectetur adipiscing elit. Vivamus
             efficitur.
         """
         sub_a: Optional[str] = field(

@@ -16,6 +16,7 @@ from typing import List
 from typing import Optional
 from typing import Set
 from typing import Type
+from typing import TypeVar
 
 from xsdata.exceptions import XmlContextError
 from xsdata.formats.bindings import T
@@ -384,18 +385,28 @@ class XmlContext:
 
         :param type_hint: A typing declaration
         """
-        types = []
+        type_vars = []
         if type_hint is Dict:
-            types.append(type_hint)
+            type_vars.append(type_hint)
         elif hasattr(type_hint, "__origin__"):
             while len(type_hint.__args__) == 1 and hasattr(
                 type_hint.__args__[0], "__origin__"
             ):
                 type_hint = type_hint.__args__[0]
 
-            types = [x for x in type_hint.__args__ if x is not None.__class__]
+            type_vars = [x for x in type_hint.__args__ if x is not None.__class__]
         else:
-            types.append(type_hint)
+            type_vars.append(type_hint)
+
+        types = []
+        for type_var in type_vars:
+            if isinstance(type_var, TypeVar):
+                if type_var.__bound__:
+                    types.append(type_var.__bound__)
+                else:
+                    types.extend(type_var.__constraints__)
+            else:
+                types.append(type_var)
 
         return converter.sort_types(types)
 

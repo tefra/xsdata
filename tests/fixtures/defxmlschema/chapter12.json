@@ -48,7 +48,8 @@
                 "other_attributes": {
                     "{http://example.org/oth}custom": "12"
                 }
-            }
+            },
+            "substituted": false
         }
     ]
 }

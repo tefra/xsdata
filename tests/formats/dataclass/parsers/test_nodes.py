@@ -20,7 +20,6 @@ from xsdata.formats.dataclass.models.generics import AnyElement
 from xsdata.formats.dataclass.models.generics import DerivedElement
 from xsdata.formats.dataclass.parsers.config import ParserConfig
 from xsdata.formats.dataclass.parsers.mixins import XmlHandler
-from xsdata.formats.dataclass.parsers.nodes import AnyTypeNode
 from xsdata.formats.dataclass.parsers.nodes import ElementNode
 from xsdata.formats.dataclass.parsers.nodes import NodeParser
 from xsdata.formats.dataclass.parsers.nodes import PrimitiveNode
@@ -392,29 +391,42 @@ class ElementNodeTests(TestCase):
         self.assertEqual(ns_map, actual.ns_map)
         self.assertFalse(actual.mixed)
 
+    def test_build_node_with_any_type_var_with_datatype(self):
+        var = XmlVar(element=True, name="a", qname="a", types=[object], any_type=True)
+        attrs = {QNames.XSI_TYPE: "xs:hexBinary"}
+        ns_map = {Namespace.XS.prefix: Namespace.XS.uri}
+        actual = self.node.build_node(var, attrs, ns_map, 10)
+
+        self.assertIsInstance(actual, PrimitiveNode)
+        self.assertEqual(ns_map, actual.ns_map)
+        self.assertEqual([DataType.HEX_BINARY.type], actual.types)
+        self.assertIsNone(actual.default)
+        self.assertFalse(actual.tokens)
+        self.assertEqual(DataType.HEX_BINARY.format, actual.format)
+        self.assertEqual(var.derived, actual.derived)
+        self.assertEqual(DataType.HEX_BINARY.wrapper, actual.wrapper)
+
     def test_build_node_with_any_type_var_with_no_matching_xsi_type(self):
         var = XmlVar(element=True, name="a", qname="a", types=[object], any_type=True)
         attrs = {QNames.XSI_TYPE: "noMatch"}
         actual = self.node.build_node(var, attrs, {}, 10)
 
-        self.assertIsInstance(actual, AnyTypeNode)
+        self.assertIsInstance(actual, WildcardNode)
         self.assertEqual(10, actual.position)
         self.assertEqual(var, actual.var)
         self.assertEqual(attrs, actual.attrs)
         self.assertEqual({}, actual.ns_map)
-        self.assertFalse(actual.mixed)
 
     def test_build_node_with_any_type_var_with_no_xsi_type(self):
         var = XmlVar(element=True, name="a", qname="a", types=[object], any_type=True)
         attrs = {}
         actual = self.node.build_node(var, attrs, {}, 10)
 
-        self.assertIsInstance(actual, AnyTypeNode)
+        self.assertIsInstance(actual, WildcardNode)
         self.assertEqual(10, actual.position)
         self.assertEqual(var, actual.var)
         self.assertEqual(attrs, actual.attrs)
         self.assertEqual({}, actual.ns_map)
-        self.assertFalse(actual.mixed)
 
     def test_build_node_with_wildcard_var(self):
         var = XmlVar(wildcard=True, name="a", qname="a", types=[], dataclass=False)
@@ -432,95 +444,13 @@ class ElementNodeTests(TestCase):
         actual = self.node.build_node(var, attrs, ns_map, 10)
 
         self.assertIsInstance(actual, PrimitiveNode)
-        self.assertEqual(var, actual.var)
         self.assertEqual(ns_map, actual.ns_map)
-
-
-class AnyTypeNodeTests(TestCase):
-    def setUp(self) -> None:
-        self.var = XmlVar(element=True, name="a", qname="a", types=[object])
-        self.node = AnyTypeNode(position=0, var=self.var, attrs={}, ns_map={})
-
-    def test_child(self):
-        self.assertFalse(self.node.has_children)
-
-        attrs = {"a": 1}
-        ns_map = {"ns0": "b"}
-        actual = self.node.child("foo", attrs, ns_map, 10)
-
-        self.assertIsInstance(actual, WildcardNode)
-        self.assertEqual(10, actual.position)
-        self.assertEqual(self.var, actual.var)
-        self.assertEqual(attrs, actual.attrs)
-        self.assertEqual(ns_map, actual.ns_map)
-        self.assertTrue(self.node.has_children)
-
-    def test_bind_with_children(self):
-        text = "\n "
-        tail = "bar"
-        generic = AnyElement(
-            qname="a",
-            text=None,
-            tail="bar",
-            attributes={},
-            children=[1, 2, 3],
-        )
-
-        objects = [("a", 1), ("b", 2), ("c", 3)]
-
-        self.node.has_children = True
-        self.assertTrue(self.node.bind("a", text, tail, objects))
-        self.assertEqual(self.var.qname, objects[-1][0])
-        self.assertEqual(generic, objects[-1][1])
-
-    def test_bind_with_simple_type(self):
-        objects = []
-
-        self.node.attrs[QNames.XSI_TYPE] = "xs:float"
-        self.node.ns_map["xs"] = Namespace.XS.uri
-
-        self.assertTrue(self.node.bind("a", "10", None, objects))
-        self.assertEqual(self.var.qname, objects[-1][0])
-        self.assertEqual(10.0, objects[-1][1])
-
-    def test_bind_with_simple_type_that_has_wrapper_class(self):
-        objects = []
-
-        self.node.attrs[QNames.XSI_TYPE] = "xs:hexBinary"
-        self.node.ns_map["xs"] = Namespace.XS.uri
-
-        self.assertTrue(self.node.bind("a", "4368726973", None, objects))
-        self.assertEqual(self.var.qname, objects[-1][0])
-        self.assertEqual(b"Chris", objects[-1][1])
-        self.assertIsInstance(objects[-1][1], XmlHexBinary)
-
-    def test_bind_with_simple_type_derived(self):
-        objects = []
-
-        self.node.var = XmlVar(
-            element=True, name="a", qname="a", types=[object], derived=True
-        )
-        self.node.attrs[QNames.XSI_TYPE] = str(DataType.FLOAT)
-
-        self.assertTrue(self.node.bind("a", "10", None, objects))
-        self.assertEqual(self.var.qname, objects[-1][0])
-        self.assertEqual(DerivedElement(qname="a", value=10.0), objects[-1][1])
-
-    def test_bind_with_simple_type_with_mixed_content(self):
-        objects = []
-
-        self.node.mixed = True
-        self.node.attrs[QNames.XSI_TYPE] = str(DataType.FLOAT)
-
-        self.assertTrue(self.node.bind("a", "10", "pieces", objects))
-        self.assertEqual(self.var.qname, objects[-2][0])
-        self.assertEqual(10.0, objects[-2][1])
-        self.assertIsNone(objects[-1][0])
-        self.assertEqual("pieces", objects[-1][1])
-
-        self.assertTrue(self.node.bind("a", "10", "\n", objects))
-        self.assertEqual(self.var.qname, objects[-1][0])
-        self.assertEqual(10.0, objects[-1][1])
+        self.assertEqual(actual.types, var.types)
+        self.assertEqual(actual.tokens, var.tokens)
+        self.assertEqual(actual.format, var.format)
+        self.assertEqual(actual.derived, var.derived)
+        self.assertEqual(actual.default, var.default)
+        self.assertIsNone(actual.wrapper)
 
 
 class WildcardNodeTests(TestCase):
@@ -545,6 +475,21 @@ class WildcardNodeTests(TestCase):
         self.assertTrue(node.bind("foo", text, tail, objects))
         self.assertEqual(var.qname, objects[-1][0])
         self.assertEqual(generic, objects[-1][1])
+
+        # Preserve whitespace if no children
+        node.position = 1
+        node.bind("foo", text, tail, objects)
+        generic.text = text
+        generic.children = []
+        self.assertEqual(generic, objects[-1][1])
+
+        # Not a wildcard, no tail/attrs/children skip wrapper
+        tail = None
+        text = "1"
+        node.attrs = {}
+        node.position = 2
+        node.bind("a", text, tail, objects)
+        self.assertEqual("1", objects[-1][1])
 
     def test_child(self):
         attrs = {"id": "1"}
@@ -648,7 +593,7 @@ class PrimitiveNodeTests(TestCase):
         mock_parse_value.return_value = 13
         var = XmlVar(text=True, name="foo", qname="foo", types=[int], format="Nope")
         ns_map = {"foo": "bar"}
-        node = PrimitiveNode(var=var, ns_map=ns_map)
+        node = PrimitiveNode.from_var(var, ns_map)
         objects = []
 
         self.assertTrue(node.bind("foo", "13", "Impossible", objects))
@@ -658,17 +603,27 @@ class PrimitiveNodeTests(TestCase):
             "13", var.types, var.default, ns_map, var.tokens, var.format
         )
 
-    def test_bind_derived_var(self):
+    def test_bind_derived_mode(self):
         var = XmlVar(text=True, name="foo", qname="foo", types=[int], derived=True)
         ns_map = {"foo": "bar"}
-        node = PrimitiveNode(var=var, ns_map=ns_map)
+        node = PrimitiveNode.from_var(var, ns_map)
         objects = []
 
         self.assertTrue(node.bind("foo", "13", "Impossible", objects))
         self.assertEqual(DerivedElement("foo", 13), objects[-1][1])
 
+    def test_bind_wrapper_mode(self):
+        datatype = DataType.HEX_BINARY
+        ns_map = {"foo": "bar"}
+        node = PrimitiveNode.from_datatype(datatype, True, ns_map)
+        objects = []
+
+        self.assertTrue(node.bind("foo", "13", "Impossible", objects))
+        self.assertEqual(DerivedElement("foo", XmlHexBinary(b"\x13")), objects[-1][1])
+
     def test_child(self):
-        node = PrimitiveNode(var=XmlVar(text=True, name="foo", qname="foo"), ns_map={})
+        var = XmlVar(text=True, name="foo", qname="foo")
+        node = PrimitiveNode.from_var(var, {})
 
         with self.assertRaises(XmlContextError):
             node.child("foo", {}, {}, 0)
@@ -809,7 +764,7 @@ class NodeParserTests(TestCase):
         objects = [("q", "result")]
         queue = []
         var = XmlVar(text=True, name="foo", qname="foo")
-        queue.append(PrimitiveNode(var=var, ns_map={}))
+        queue.append(PrimitiveNode.from_var(var, ns_map={}))
 
         result = parser.end(queue, objects, "author", "foobar", None)
         self.assertEqual("result", result)

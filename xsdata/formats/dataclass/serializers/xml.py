@@ -188,13 +188,33 @@ class XmlSerializer(AbstractSerializer):
         if isinstance(value, AnyElement):
             yield from self.write_wildcard(value, var, namespace)
         elif isinstance(value, DerivedElement):
-            yield from self.write_dataclass(value.value, namespace, qname=value.qname)
+            yield from self.write_derived_element(value, var, namespace)
         elif is_dataclass(value):
             yield from self.write_xsi_type(value, var, namespace)
         elif var.element:
             yield from self.write_element(value, var, namespace)
         else:
             yield from self.write_data(value, var, namespace)
+
+    def write_derived_element(
+        self, value: DerivedElement, var: XmlVar, namespace: NoneStr
+    ) -> Generator:
+        if is_dataclass(value.value):
+            xsi_type = None
+            if value.substituted:
+                meta = self.context.build(value.value.__class__)
+                xsi_type = QName(meta.source_qname)
+
+            yield from self.write_dataclass(
+                value.value, namespace, qname=value.qname, xsi_type=xsi_type
+            )
+        else:
+            datatype = DataType.from_value(value.value)
+
+            yield XmlWriterEvent.START, value.qname
+            yield XmlWriterEvent.ATTR, QNames.XSI_TYPE, QName(str(datatype))
+            yield XmlWriterEvent.DATA, value.value
+            yield XmlWriterEvent.END, value.qname
 
     def write_wildcard(
         self, value: AnyElement, var: XmlVar, namespace: NoneStr

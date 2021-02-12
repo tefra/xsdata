@@ -4,6 +4,7 @@ import pathlib
 import warnings
 from dataclasses import dataclass
 from dataclasses import field
+from dataclasses import fields
 from dataclasses import is_dataclass
 from typing import Any
 from typing import Dict
@@ -21,6 +22,10 @@ from xsdata.formats.dataclass.models.generics import AnyElement
 from xsdata.formats.dataclass.models.generics import DerivedElement
 from xsdata.formats.dataclass.parsers.utils import ParserUtils
 from xsdata.utils.constants import EMPTY_MAP
+
+
+ANY_KEYS = {f.name for f in fields(AnyElement)}
+DERIVED_KEYS = {f.name for f in fields(DerivedElement)}
 
 
 @dataclass
@@ -66,11 +71,11 @@ class JsonParser(AbstractParser):
         if var.clazz:
             return self.bind_dataclass(value, var.clazz)
 
-        if var.wildcard:
-            return self.bind_wildcard(value)
-
         if var.elements:
             return self.bind_choice(value, var)
+
+        if var.wildcard or var.any_type:
+            return self.bind_wildcard(value)
 
         return self.parse_value(value, var.types, var.default, var.tokens, var.format)
 
@@ -126,7 +131,17 @@ class JsonParser(AbstractParser):
     def bind_wildcard(self, value: Any) -> Any:
         """Bind data to a wildcard model."""
         if isinstance(value, Dict):
-            return self.bind_dataclass(value, AnyElement)
+            keys = set(value.keys())
+
+            if not (keys - ANY_KEYS):
+                return self.bind_dataclass(value, AnyElement)
+
+            if not (keys - DERIVED_KEYS):
+                return self.bind_dataclass(value, DerivedElement)
+
+            clazz: Optional[Type] = self.context.find_type_by_fields(keys)
+            if clazz:
+                return self.bind_dataclass(value, clazz)
 
         return value
 
@@ -171,7 +186,10 @@ class JsonParser(AbstractParser):
             )
 
         if "value" in value:
-            return DerivedElement(qname, self.bind_value(choice, value["value"]))
+            obj = self.bind_value(choice, value["value"])
+            substituted = value.get("substituted", False)
+
+            return DerivedElement(qname=qname, value=obj, substituted=substituted)
 
         return self.bind_dataclass(value, AnyElement)
 

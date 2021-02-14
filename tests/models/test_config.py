@@ -31,6 +31,7 @@ class GeneratorConfigTests(TestCase):
             "  <Conventions>\n"
             '    <ClassName case="pascalCase" safePrefix="type"/>\n'
             '    <FieldName case="snakeCase" safePrefix="value"/>\n'
+            '    <ConstantName case="screamingSnakeCase" safePrefix="value"/>\n'
             '    <ModuleName case="snakeCase" safePrefix="mod"/>\n'
             '    <PackageName case="snakeCase" safePrefix="pkg"/>\n'
             "  </Conventions>\n"
@@ -79,6 +80,7 @@ class GeneratorConfigTests(TestCase):
             "  <Conventions>\n"
             '    <ClassName case="pascalCase" safePrefix="type"/>\n'
             '    <FieldName case="snakeCase" safePrefix="value"/>\n'
+            '    <ConstantName case="screamingSnakeCase" safePrefix="value"/>\n'
             '    <ModuleName case="snakeCase" safePrefix="mod"/>\n'
             '    <PackageName case="snakeCase" safePrefix="pkg"/>\n'
             "  </Conventions>\n"

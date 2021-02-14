@@ -40,11 +40,13 @@ class Filters:
 
     class_case: Callable = field(default=text.pascal_case)
     field_case: Callable = field(default=text.snake_case)
+    constant_case: Callable = field(default=text.screaming_snake_case)
     package_case: Callable = field(default=text.snake_case)
     module_case: Callable = field(default=text.snake_case)
 
     class_safe_prefix: str = field(default="type")
     field_safe_prefix: str = field(default="value")
+    constant_safe_prefix: str = field(default="value")
     package_safe_prefix: str = field(default="pkg")
     module_safe_prefix: str = field(default="mod")
 
@@ -97,9 +99,10 @@ class Filters:
 
         Provide the class name as context for the naming schemes.
         """
-        return self.field_aliases.get(name) or self._field_name(name, class_name)
+        alias = self.field_aliases.get(name)
+        if alias:
+            return alias
 
-    def _field_name(self, name: str, class_name: str) -> str:
         safe_name = utils.safe_snake(name, self.field_safe_prefix)
         return self.field_case(safe_name, class_name=class_name)
 
@@ -110,7 +113,12 @@ class Filters:
 
         Provide the class name as context for the naming schemes.
         """
-        return self.field_name(name, class_name).upper()
+        alias = self.field_aliases.get(name)
+        if alias:
+            return alias
+
+        safe_name = utils.safe_snake(name, self.constant_safe_prefix)
+        return self.constant_case(safe_name, class_name=class_name)
 
     def module_name(self, name: str) -> str:
         """Convert the given string to a module name according to the selected
@@ -538,10 +546,12 @@ class Filters:
             module_aliases=index_aliases(config.aliases.module_name),
             class_case=config.conventions.class_name.case,
             field_case=config.conventions.field_name.case,
+            constant_case=config.conventions.constant_name.case,
             package_case=config.conventions.package_name.case,
             module_case=config.conventions.module_name.case,
             class_safe_prefix=config.conventions.class_name.safe_prefix,
             field_safe_prefix=config.conventions.field_name.safe_prefix,
+            constant_safe_prefix=config.conventions.constant_name.safe_prefix,
             package_safe_prefix=config.conventions.package_name.safe_prefix,
             module_safe_prefix=config.conventions.module_name.safe_prefix,
             docstring_style=config.output.docstring_style,

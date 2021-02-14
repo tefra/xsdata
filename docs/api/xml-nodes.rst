@@ -14,7 +14,6 @@ for models and their fields.
 
     XmlNode
     ElementNode
-    AnyTypeNode
     WildcardNode
     UnionNode
     PrimitiveNode

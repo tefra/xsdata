@@ -56,7 +56,7 @@ class FiltersTests(FactoryTestCase):
         self.assertEqual("NONE_VALUE", self.filters.constant_name("None", "cls"))
         self.assertEqual("BR_EAK_VALUE", self.filters.constant_name("BrEak", "cls"))
         self.assertEqual("VALUE_1", self.filters.constant_name("1", "cls"))
-        self.assertEqual("BANG", self.filters.constant_name("boom", "cls"))
+        self.assertEqual("Bang", self.filters.constant_name("boom", "cls"))
 
     def test_module_name(self):
         self.filters.module_aliases["http://github.com/tefra/xsdata"] = "xsdata"

@@ -62,6 +62,11 @@ def snake_case(string: str, **kwargs: Any) -> str:
     return "_".join(map(str.lower, split_words(string)))
 
 
+def screaming_snake_case(string: str, **kwargs: Any) -> str:
+    """Convert the given string to screaming snake case."""
+    return snake_case(string, **kwargs).upper()
+
+
 def kebab_case(string: str, **kwargs: Any) -> str:
     """Convert the given string to kebab case."""
     return "-".join(split_words(string))

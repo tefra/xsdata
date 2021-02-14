@@ -6,6 +6,7 @@ from xsdata.utils.text import mixed_case
 from xsdata.utils.text import mixed_pascal_case
 from xsdata.utils.text import mixed_snake_case
 from xsdata.utils.text import pascal_case
+from xsdata.utils.text import screaming_snake_case
 from xsdata.utils.text import snake_case
 from xsdata.utils.text import split_words
 
@@ -20,6 +21,16 @@ class TextTests(TestCase):
         self.assertEqual("user_name", snake_case("User_Name"))
         self.assertEqual("user_name", snake_case("user_name"))
         self.assertEqual("suser_name", snake_case("SUserNAME"))
+
+    def test_screaming_snake_case(self):
+        self.assertEqual("P00P", screaming_snake_case("p00p"))
+        self.assertEqual("USERNAME", screaming_snake_case("USERName"))
+        self.assertEqual("USER_NAME", screaming_snake_case("UserNAME"))
+        self.assertEqual("USER_NAME", screaming_snake_case("USER_name"))
+        self.assertEqual("USER_NAME", screaming_snake_case("USER-NAME"))
+        self.assertEqual("USER_NAME", screaming_snake_case("User_Name"))
+        self.assertEqual("USER_NAME", screaming_snake_case("user_name"))
+        self.assertEqual("SUSER_NAME", screaming_snake_case("SUserNAME"))
 
     def test_pascal_case(self):
         self.assertEqual("P00P", pascal_case("p00p"))

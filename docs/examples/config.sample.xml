@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Config xmlns="http://pypi.org/project/xsdata" version="21.1">
+<Config xmlns="http://pypi.org/project/xsdata" version="21.2">
   <Output wsdl="false" maxLineLength="79">
     <Package>generated</Package>
     <Format>pydata</Format>
@@ -10,6 +10,7 @@
   <Conventions>
     <ClassName case="pascalCase" safePrefix="type"/>
     <FieldName case="snakeCase" safePrefix="value"/>
+    <ConstantName case="screamingSnakeCase" safePrefix="value"/>
     <ModuleName case="snakeCase" safePrefix="mod"/>
     <PackageName case="snakeCase" safePrefix="pkg"/>
   </Conventions>

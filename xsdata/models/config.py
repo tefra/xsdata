@@ -52,30 +52,39 @@ class NameCase(Enum):
     when it encounters non alphanumerical characters or when an upper
     case letter follows a lower case letter.
 
-    =========  =========  =========  ==========  =========  ===========  ============
-    Original   Pascal     Camel      Snake       Mixed      Mixed Snake  Mixed Pascal
-    =========  =========  =========  ==========  =========  ===========  ============
-    p00p       P00P       p00P       p00p        p00p       p00p         P00p
-    USERName   Username   username   username    USERName   USERName     USERName
-    UserNAME   UserName   userName   user_name   UserNAME   User_NAME    UserNAME
-    USER_name  UserName   userName   user_name   USERname   USER_name    USERname
-    USER-NAME  UserName   userName   user_name   USERNAME   USER_NAME    USERNAME
-    User_Name  UserName   userName   user_name   UserName   User_Name    UserName
-    user_name  UserName   userName   user_name   username   user_name    Username
-    SUserNAME  SuserName  suserName  suser_name  SUserNAME  SUser_NAME   SUserNAME
-    =========  =========  =========  ==========  =========  ===========  ============
+    +-----------+-----------+-----------+------------+-----------------+-----------+-------------+--------------+
+    | Original  | Pascal    | Camel     | Snake      | Screaming Snake | Mixed     | Mixed Snake | Mixed Pascal |
+    +===========+===========+===========+============+=================+===========+=============+==============+
+    | p00p      | P00P      | p00P      | p00p       | P00P            | p00p      | p00p        | P00p         |
+    +-----------+-----------+-----------+------------+-----------------+-----------+-------------+--------------+
+    | USERName  | Username  | username  | username   | USERNAME        | USERName  | USERName    | USERName     |
+    +-----------+-----------+-----------+------------+-----------------+-----------+-------------+--------------+
+    | UserNAME  | UserName  | userName  | user_name  | USER_NAME       | UserNAME  | User_NAME   | UserNAME     |
+    +-----------+-----------+-----------+------------+-----------------+-----------+-------------+--------------+
+    | USER_name | UserName  | userName  | user_name  | USER_NAME       | USERname  | USER_name   | USERname     |
+    +-----------+-----------+-----------+------------+-----------------+-----------+-------------+--------------+
+    | USER-NAME | UserName  | userName  | user_name  | USER_NAME       | USERNAME  | USER_NAME   | USERNAME     |
+    +-----------+-----------+-----------+------------+-----------------+-----------+-------------+--------------+
+    | User_Name | UserName  | userName  | user_name  | USER_NAME       | UserName  | User_Name   | UserName     |
+    +-----------+-----------+-----------+------------+-----------------+-----------+-------------+--------------+
+    | user_name | UserName  | userName  | user_name  | USER_NAME       | username  | user_name   | Username     |
+    +-----------+-----------+-----------+------------+-----------------+-----------+-------------+--------------+
+    | SUserNAME | SuserName | suserName | suser_name | SUSER_NAME      | SUserNAME | SUser_NAME  | SUserNAME    |
+    +-----------+-----------+-----------+------------+-----------------+-----------+-------------+--------------+
 
     :cvar PASCAL: pascalCase
     :cvar CAMEL: camelCase
     :cvar SNAKE: snakeCase
+    :cvar SCREAMING_SNAKE:
     :cvar MIXED: mixedCase
-    :cvar MIXED_SNAKE: mixedSnakeCase
-    :cvar MIXED_PASCAL: mixedPascalCase
-    """
+    :cvar MIXED_SNAKE:
+    :cvar MIXED_PASCAL:
+    """  # noqa
 
     PASCAL = "pascalCase"
     CAMEL = "camelCase"
     SNAKE = "snakeCase"
+    SCREAMING_SNAKE = "screamingSnakeCase"
     MIXED = "mixedCase"
     MIXED_SNAKE = "mixedSnakeCase"
     MIXED_PASCAL = "mixedPascalCase"
@@ -93,6 +102,7 @@ __name_case_func__ = {
     "pascalCase": text.pascal_case,
     "camelCase": text.camel_case,
     "snakeCase": text.snake_case,
+    "screamingSnakeCase": text.screaming_snake_case,
     "mixedCase": text.mixed_case,
     "mixedSnakeCase": text.mixed_snake_case,
     "mixedPascalCase": text.mixed_pascal_case,
@@ -173,6 +183,9 @@ class GeneratorConventions:
     )
     field_name: NameConvention = element(
         default_factory=lambda: NameConvention(NameCase.SNAKE, "value")
+    )
+    constant_name: NameConvention = element(
+        default_factory=lambda: NameConvention(NameCase.SCREAMING_SNAKE, "value")
     )
     module_name: NameConvention = element(
         default_factory=lambda: NameConvention(NameCase.SNAKE, "mod")

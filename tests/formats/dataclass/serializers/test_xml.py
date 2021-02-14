@@ -194,7 +194,7 @@ class XmlSerializerTests(TestCase):
         self.assertIsInstance(result, Generator)
         self.assertEqual(expected, list(result))
 
-    def test_write_any_type_with_generic_object(self):
+    def test_write_any_type_with_any_element(self):
         var = XmlVar(wildcard=True, qname="a", name="a")
         value = AnyElement(
             qname="a",
@@ -212,6 +212,37 @@ class XmlSerializerTests(TestCase):
             (XmlWriterEvent.DATA, "h"),
             (XmlWriterEvent.END, "a"),
             (XmlWriterEvent.DATA, "c"),
+        ]
+
+        result = self.serializer.write_value(value, var, "xsdata")
+        self.assertIsInstance(result, Generator)
+        self.assertEqual(expected, list(result))
+
+    def test_write_any_type_with_derived_element_primitive(self):
+        var = XmlVar(wildcard=True, qname="a", name="a")
+        value = DerivedElement(qname="a", value=1)
+        expected = [
+            (XmlWriterEvent.START, "a"),
+            (XmlWriterEvent.ATTR, QNames.XSI_TYPE, QName(str(DataType.SHORT))),
+            (XmlWriterEvent.DATA, 1),
+            (XmlWriterEvent.END, "a"),
+        ]
+
+        result = self.serializer.write_value(value, var, "xsdata")
+        self.assertIsInstance(result, Generator)
+        self.assertEqual(expected, list(result))
+
+    def test_write_any_type_with_derived_element_dataclass(self):
+        var = XmlVar(wildcard=True, qname="a", name="a")
+        value = DerivedElement(qname="a", value=BookForm(title="def"), substituted=True)
+        expected = [
+            (XmlWriterEvent.START, "a"),
+            (XmlWriterEvent.ATTR, "lang", "en"),
+            (XmlWriterEvent.ATTR, QNames.XSI_TYPE, QName("{urn:books}BookForm")),
+            (XmlWriterEvent.START, "title"),
+            (XmlWriterEvent.DATA, "def"),
+            (XmlWriterEvent.END, "title"),
+            (XmlWriterEvent.END, "a"),
         ]
 
         result = self.serializer.write_value(value, var, "xsdata")

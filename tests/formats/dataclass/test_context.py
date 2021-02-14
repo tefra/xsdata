@@ -10,6 +10,7 @@ from typing import get_type_hints
 from typing import Iterator
 from typing import List
 from typing import Type
+from typing import TypeVar
 from typing import Union
 from unittest import mock
 from unittest import TestCase
@@ -396,6 +397,29 @@ class XmlContextTests(TestCase):
             types=[object],
         )
         self.assertEqual(expected, list(actual)[0])
+
+    def test_get_type_hints_with_typevars(self):
+
+        A = TypeVar("A", str, int)
+        B = TypeVar("B", bound=object)
+
+        foo = make_dataclass("Foo", [("a", A), ("b", B), ("c", List[B])])
+
+        actual = self.ctx.get_type_hints(foo, None, return_input, return_input)
+        expected = [
+            XmlVar(name="a", qname="a", element=True, types=[int, str]),
+            XmlVar(name="b", qname="b", any_type=True, element=True, types=[object]),
+            XmlVar(
+                name="c",
+                qname="c",
+                any_type=True,
+                list_element=True,
+                element=True,
+                types=[object],
+            ),
+        ]
+
+        self.assertEqual(expected, list(actual))
 
     def test_get_type_hints_with_no_dataclass(self):
         with self.assertRaises(TypeError):

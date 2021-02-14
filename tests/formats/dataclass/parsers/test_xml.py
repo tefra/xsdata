@@ -32,7 +32,7 @@ class XmlParserTests(TestCase):
         objects = []
         queue = []
         var = XmlVar(text=True, name="foo", qname="foo", types=[bool])
-        queue.append(PrimitiveNode(var=var, ns_map={}))
+        queue.append(PrimitiveNode.from_var(var, {}))
 
         result = self.parser.end(queue, objects, "enabled", "true", None)
         self.assertTrue(result)

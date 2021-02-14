@@ -22,7 +22,8 @@
                     "quantity": 1,
                     "color": null,
                     "number": 563
-                }
+                },
+                "substituted": false
             }
         ]
     },

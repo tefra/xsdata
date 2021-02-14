@@ -167,10 +167,11 @@ class JsonParserTests(TestCase):
                 XmlVar(element=True, name="b", qname="b", types=[float]),
             ],
         )
+        data = {"qname": "a", "value": 1, "substituted": True}
 
         self.assertEqual(
-            DerivedElement(qname="a", value=1),
-            self.parser.bind_choice({"qname": "a", "value": 1}, var),
+            DerivedElement(qname="a", value=1, substituted=True),
+            self.parser.bind_choice(data, var),
         )
 
     def test_bind_choice_generic_with_wildcard(self):
@@ -199,3 +200,40 @@ class JsonParserTests(TestCase):
             "XmlElements undefined choice: `compound` for qname `foo`",
             str(cm.exception),
         )
+
+    def test_bind_wildcard_with_any_element(self):
+        var = XmlVar(
+            wildcard=True,
+            name="any_element",
+            qname="any_element",
+            types=[object],
+        )
+
+        self.assertEqual(
+            AnyElement(qname="a", text="1"),
+            self.parser.bind_value(var, {"qname": "a", "text": 1}),
+        )
+
+    def test_bind_wildcard_with_derived_element(self):
+        var = XmlVar(
+            any_type=True,
+            name="a",
+            qname="a",
+            types=[object],
+        )
+        actual = DerivedElement(qname="a", value=Books(book=[]), substituted=True)
+        data = {"qname": "a", "value": {"book": []}, "substituted": True}
+
+        self.assertEqual(actual, self.parser.bind_value(var, data))
+
+    def test_bind_wildcard_with_no_matching_value(self):
+        var = XmlVar(
+            any_type=True,
+            name="a",
+            qname="a",
+            types=[object],
+        )
+
+        data = {"test_bind_wildcard_with_no_matching_value": False}
+        self.assertEqual(data, self.parser.bind_value(var, data))
+        self.assertEqual(1, self.parser.bind_value(var, 1))

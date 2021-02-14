@@ -27,6 +27,7 @@ from xsdata.formats.dataclass.parsers.mixins import PushParser
 from xsdata.formats.dataclass.parsers.mixins import XmlHandler
 from xsdata.formats.dataclass.parsers.mixins import XmlNode
 from xsdata.formats.dataclass.parsers.utils import ParserUtils
+from xsdata.models.enums import DataType
 from xsdata.models.enums import EventType
 
 Parsed = Tuple[Optional[str], Any]
@@ -57,6 +58,7 @@ class ElementNode(XmlNode):
     position: int
     mixed: bool = False
     derived: bool = False
+    substituted: bool = False
     assigned: Set = field(default_factory=set)
 
     def bind(self, qname: str, text: NoneStr, tail: NoneStr, objects: List) -> bool:
@@ -79,7 +81,7 @@ class ElementNode(XmlNode):
 
         obj = self.meta.clazz(**params)
         if self.derived:
-            obj = DerivedElement(qname=qname, value=obj)
+            obj = DerivedElement(qname=qname, value=obj, substituted=self.substituted)
 
         objects.append((qname, obj))
 
@@ -118,27 +120,40 @@ class ElementNode(XmlNode):
                 position=position,
             )
 
+        xsi_type = ParserUtils.xsi_type(attrs, ns_map)
+
         if var.clazz:
             return self.build_element_node(
-                var.clazz, attrs, ns_map, position, var.derived
+                var.clazz,
+                attrs,
+                ns_map,
+                position,
+                var.derived,
+                xsi_type,
             )
 
-        if var.any_type:
-            node = self.build_element_node(None, attrs, ns_map, position, var.derived)
-            if not node:
-                node = AnyTypeNode(
-                    var=var,
-                    attrs=attrs,
-                    ns_map=ns_map,
-                    position=position,
-                    mixed=self.meta.has_var(mode=FindMode.MIXED_CONTENT),
-                )
+        if not var.any_type and not var.wildcard:
+            return PrimitiveNode.from_var(var, ns_map)
+
+        datatype = DataType.from_qname(xsi_type) if xsi_type else None
+        derived = var.derived or var.wildcard
+        if datatype:
+            return PrimitiveNode.from_datatype(datatype, derived, ns_map)
+
+        node = None
+        clazz = None
+        if xsi_type:
+            clazz = self.context.find_type(xsi_type)
+
+        if clazz:
+            node = self.build_element_node(
+                clazz, attrs, ns_map, position, derived, xsi_type
+            )
+
+        if node:
             return node
 
-        if var.wildcard:
-            return WildcardNode(var=var, attrs=attrs, ns_map=ns_map, position=position)
-
-        return PrimitiveNode(var=var, ns_map=ns_map)
+        return WildcardNode(var=var, attrs=attrs, ns_map=ns_map, position=position)
 
     def fetch_vars(self, qname: str) -> Iterator[Tuple[Any, XmlVar]]:
         for mode in FIND_MODES:
@@ -158,28 +173,17 @@ class ElementNode(XmlNode):
 
     def build_element_node(
         self,
-        clazz: Optional[Type],
+        clazz: Type,
         attrs: Dict,
         ns_map: Dict,
         position: int,
         derived: bool,
+        xsi_type: Optional[str] = None,
     ) -> Optional[XmlNode]:
-        xsi_type = ParserUtils.xsi_type(attrs, ns_map)
 
-        if clazz is None:
-            if not xsi_type:
-                return None
-
-            clazz = self.context.find_type(xsi_type)
-            xsi_type = None
-
-        if clazz is None:
-            return None
-
-        is_nillable = ParserUtils.is_nillable(attrs)
         meta = self.context.fetch(clazz, self.meta.namespace, xsi_type)
 
-        if not is_nillable and meta.nillable:
+        if not meta or (meta.nillable and not ParserUtils.is_nillable(attrs)):
             return None
 
         return ElementNode(
@@ -190,74 +194,9 @@ class ElementNode(XmlNode):
             context=self.context,
             position=position,
             derived=derived,
+            substituted=xsi_type is not None,
             mixed=self.meta.has_var(mode=FindMode.MIXED_CONTENT),
         )
-
-
-@dataclass
-class AnyTypeNode(XmlNode):
-    """
-    XmlNode for elements with an inline datatype declaration through the
-    xsi:type attribute.
-
-    :param var: Class field xml var instance
-    :param attrs: Key-value attribute mapping
-    :param ns_map: Namespace prefix-URI map
-    :param position: The node position of objects cache
-    :param mixed: Specify if the parent node supports mixed content
-    :ivar has_children: Specifies whether the node has encounter any
-        children so far
-    """
-
-    var: XmlVar
-    attrs: Dict
-    ns_map: Dict
-    position: int
-    mixed: bool = False
-    has_children: bool = field(init=False, default=False)
-
-    def child(self, qname: str, attrs: Dict, ns_map: Dict, position: int) -> "XmlNode":
-        self.has_children = True
-        return WildcardNode(position=position, var=self.var, attrs=attrs, ns_map=ns_map)
-
-    def bind(self, qname: str, text: NoneStr, tail: NoneStr, objects: List) -> bool:
-        obj: Any = None
-        if self.has_children:
-            obj = AnyElement(
-                qname=qname,
-                text=ParserUtils.normalize_content(text),
-                tail=ParserUtils.normalize_content(tail),
-                attributes=ParserUtils.parse_any_attributes(self.attrs, self.ns_map),
-                children=ParserUtils.fetch_any_children(self.position, objects),
-            )
-            objects.append((self.var.qname, obj))
-        else:
-            var = self.var
-            ns_map = self.ns_map
-            datatype = ParserUtils.data_type(self.attrs, self.ns_map)
-            obj = ParserUtils.parse_value(
-                text,
-                [datatype.type],
-                var.default,
-                ns_map,
-                var.tokens,
-                datatype.format,
-            )
-
-            if datatype.wrapper:
-                obj = datatype.wrapper(obj)
-
-            if var.derived:
-                obj = DerivedElement(qname=qname, value=obj)
-
-            objects.append((qname, obj))
-
-            if self.mixed:
-                tail = ParserUtils.normalize_content(tail)
-                if tail:
-                    objects.append((None, tail))
-
-        return True
 
 
 @dataclass
@@ -281,14 +220,23 @@ class WildcardNode(XmlNode):
     position: int
 
     def bind(self, qname: str, text: NoneStr, tail: NoneStr, objects: List) -> bool:
-        obj = AnyElement(
-            qname=qname,
-            text=ParserUtils.normalize_content(text),
-            tail=ParserUtils.normalize_content(tail),
-            attributes=ParserUtils.parse_any_attributes(self.attrs, self.ns_map),
-            children=ParserUtils.fetch_any_children(self.position, objects),
-        )
-        objects.append((self.var.qname, obj))
+        children = ParserUtils.fetch_any_children(self.position, objects)
+        attributes = ParserUtils.parse_any_attributes(self.attrs, self.ns_map)
+        derived = self.var.derived or qname != self.var.qname
+        text = ParserUtils.normalize_content(text) if children else text
+        tail = ParserUtils.normalize_content(tail)
+
+        if tail or attributes or children or self.var.wildcard or derived:
+            obj = AnyElement(
+                qname=qname,
+                text=text,
+                tail=tail,
+                attributes=attributes,
+                children=children,
+            )
+            objects.append((self.var.qname, obj))
+        else:
+            objects.append((self.var.qname, text))
 
         return True
 
@@ -377,17 +325,28 @@ class PrimitiveNode(XmlNode):
     :param ns_map: Namespace prefix-URI map
     """
 
-    var: XmlVar
+    types: List[Type]
+    default: Any
+    tokens: bool
+    format: Optional[str]
+    derived: bool
+    wrapper: Optional[Type]
     ns_map: Dict
 
     def bind(self, qname: str, text: NoneStr, tail: NoneStr, objects: List) -> bool:
-        var = self.var
-        ns_map = self.ns_map
         obj = ParserUtils.parse_value(
-            text, var.types, var.default, ns_map, var.tokens, var.format
+            text,
+            self.types,
+            self.default,
+            self.ns_map,
+            self.tokens,
+            self.format,
         )
 
-        if var.derived:
+        if self.wrapper:
+            obj = self.wrapper(obj)
+
+        if self.derived:
             obj = DerivedElement(qname=qname, value=obj)
 
         objects.append((qname, obj))
@@ -395,6 +354,32 @@ class PrimitiveNode(XmlNode):
 
     def child(self, qname: str, attrs: Dict, ns_map: Dict, position: int) -> XmlNode:
         raise XmlContextError("Primitive node doesn't support child nodes!")
+
+    @classmethod
+    def from_var(cls, var: XmlVar, ns_map: Dict) -> "PrimitiveNode":
+        return cls(
+            types=var.types,
+            default=var.default,
+            tokens=var.tokens,
+            format=var.format,
+            derived=var.derived,
+            wrapper=None,
+            ns_map=ns_map,
+        )
+
+    @classmethod
+    def from_datatype(
+        cls, datatype: DataType, derived: bool, ns_map: Dict
+    ) -> "PrimitiveNode":
+        return cls(
+            types=[datatype.type],
+            default=None,
+            tokens=False,
+            format=datatype.format,
+            derived=derived,
+            wrapper=datatype.wrapper,
+            ns_map=ns_map,
+        )
 
 
 @dataclass

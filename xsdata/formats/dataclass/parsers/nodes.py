@@ -133,12 +133,12 @@ class ElementNode(XmlNode):
             )
 
         if not var.any_type and not var.wildcard:
-            return PrimitiveNode.from_var(var, ns_map)
+            return PrimitiveNode(var, ns_map)
 
         datatype = DataType.from_qname(xsi_type) if xsi_type else None
         derived = var.derived or var.wildcard
         if datatype:
-            return PrimitiveNode.from_datatype(datatype, derived, ns_map)
+            return StandardNode(datatype, ns_map, derived, var.nillable)
 
         node = None
         clazz = None
@@ -224,6 +224,7 @@ class WildcardNode(XmlNode):
         attributes = ParserUtils.parse_any_attributes(self.attrs, self.ns_map)
         derived = self.var.derived or qname != self.var.qname
         text = ParserUtils.normalize_content(text) if children else text
+        text = "" if text is None and not self.var.nillable else text
         tail = ParserUtils.normalize_content(tail)
 
         if tail or attributes or children or self.var.wildcard or derived:
@@ -325,26 +326,64 @@ class PrimitiveNode(XmlNode):
     :param ns_map: Namespace prefix-URI map
     """
 
-    types: List[Type]
-    default: Any
-    tokens: bool
-    format: Optional[str]
-    derived: bool
-    wrapper: Optional[Type]
+    var: XmlVar
     ns_map: Dict
 
     def bind(self, qname: str, text: NoneStr, tail: NoneStr, objects: List) -> bool:
         obj = ParserUtils.parse_value(
             text,
-            self.types,
-            self.default,
+            self.var.types,
+            self.var.default,
             self.ns_map,
-            self.tokens,
-            self.format,
+            self.var.tokens,
+            self.var.format,
         )
 
-        if self.wrapper:
-            obj = self.wrapper(obj)
+        if obj is None and not self.var.nillable:
+            obj = ""
+
+        if self.var.derived:
+            obj = DerivedElement(qname=qname, value=obj)
+
+        objects.append((qname, obj))
+        return True
+
+    def child(self, qname: str, attrs: Dict, ns_map: Dict, position: int) -> XmlNode:
+        raise XmlContextError("Primitive node doesn't support child nodes!")
+
+
+@dataclass
+class StandardNode(XmlNode):
+    """
+    XmlNode for any type elements with a standard xsi:type.
+
+    :param datatype: Standard xsi data type
+    :param ns_map: Namespace prefix-URI map
+    :param derived: Specify whether the value needs to be wrapped with
+        :class:`~xsdata.formats.dataclass.models.generics.DerivedElement`
+    :param nillable: Specify whether the node supports nillable content
+    """
+
+    datatype: DataType
+    ns_map: Dict
+    derived: bool
+    nillable: bool
+
+    def bind(self, qname: str, text: NoneStr, tail: NoneStr, objects: List) -> bool:
+        obj = ParserUtils.parse_value(
+            text,
+            [self.datatype.type],
+            None,
+            self.ns_map,
+            False,
+            self.datatype.format,
+        )
+
+        if obj is None and not self.nillable:
+            obj = ""
+
+        if self.datatype.wrapper:
+            obj = self.datatype.wrapper(obj)
 
         if self.derived:
             obj = DerivedElement(qname=qname, value=obj)
@@ -354,32 +393,6 @@ class PrimitiveNode(XmlNode):
 
     def child(self, qname: str, attrs: Dict, ns_map: Dict, position: int) -> XmlNode:
         raise XmlContextError("Primitive node doesn't support child nodes!")
-
-    @classmethod
-    def from_var(cls, var: XmlVar, ns_map: Dict) -> "PrimitiveNode":
-        return cls(
-            types=var.types,
-            default=var.default,
-            tokens=var.tokens,
-            format=var.format,
-            derived=var.derived,
-            wrapper=None,
-            ns_map=ns_map,
-        )
-
-    @classmethod
-    def from_datatype(
-        cls, datatype: DataType, derived: bool, ns_map: Dict
-    ) -> "PrimitiveNode":
-        return cls(
-            types=[datatype.type],
-            default=None,
-            tokens=False,
-            format=datatype.format,
-            derived=derived,
-            wrapper=datatype.wrapper,
-            ns_map=ns_map,
-        )
 
 
 @dataclass

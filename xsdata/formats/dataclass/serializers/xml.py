@@ -111,7 +111,7 @@ class XmlSerializer(AbstractSerializer):
             yield XmlWriterEvent.ATTR, key, value
 
         for var, value in self.next_value(obj, meta):
-            if value is not None:
+            if value is not None or var.nillable:
                 yield from self.write_value(value, var, namespace)
 
         yield XmlWriterEvent.END, qname

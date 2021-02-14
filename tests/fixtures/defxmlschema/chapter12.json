@@ -23,7 +23,7 @@
                         },
                         {
                             "qname": "{http://www.w3.org/1999/xhtml}br",
-                            "text": null,
+                            "text": "",
                             "tail": " Note: runs large.\n    ",
                             "children": [],
                             "attributes": {}

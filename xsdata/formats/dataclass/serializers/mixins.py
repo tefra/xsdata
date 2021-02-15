@@ -179,7 +179,7 @@ class XmlWriter:
         :param data: Element text or tail content
         """
         value = self.encode_data(data)
-        self.flush_start(is_nil=value is None or value == "")
+        self.flush_start(is_nil=value is None)
 
         if value:
             if not self.in_tail:
@@ -290,5 +290,8 @@ class XmlWriter:
         """Encode data for xml rendering."""
         if data is None or isinstance(data, str):
             return data
+
+        if isinstance(data, list) and not data:
+            return None
 
         return converter.serialize(data, ns_map=self.ns_map)

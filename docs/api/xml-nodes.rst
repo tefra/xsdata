@@ -17,3 +17,4 @@ for models and their fields.
     WildcardNode
     UnionNode
     PrimitiveNode
+    StandardNode

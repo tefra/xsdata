@@ -119,7 +119,7 @@ class ParserUtilsTests(TestCase):
         expected = {
             "x": 1,
             "w": AnyElement(
-                children=[AnyElement(qname="w", text=""), AnyElement(qname="foo")]
+                children=[AnyElement(qname="w", text=None), AnyElement(qname="foo")]
             ),
         }
 
@@ -153,7 +153,9 @@ class ParserUtilsTests(TestCase):
         params = {}
         ParserUtils.bind_mixed_objects(params, var, 1, objects)
 
-        expected = {var.name: [AnyElement(qname="b", text=""), derived, generic, "foo"]}
+        expected = {
+            var.name: [AnyElement(qname="b", text=None), derived, generic, "foo"]
+        }
         self.assertEqual(expected, params)
 
     def test_fetch_any_children(self):

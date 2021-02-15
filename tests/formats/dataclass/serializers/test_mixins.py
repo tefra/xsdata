@@ -121,6 +121,10 @@ class XmlWriterTests(TestCase):
                 (XmlWriterEvent.ATTR, QNames.XSI_NIL, "true"),
                 (XmlWriterEvent.DATA, [""]),
                 (XmlWriterEvent.END, "a"),
+                (XmlWriterEvent.START, "a"),
+                (XmlWriterEvent.ATTR, QNames.XSI_NIL, "true"),
+                (XmlWriterEvent.DATA, []),
+                (XmlWriterEvent.END, "a"),
                 (XmlWriterEvent.END, "root"),
             ]
         )
@@ -131,8 +135,9 @@ class XmlWriterTests(TestCase):
             "<root>"
             '<a xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"/>'
             "<a>0</a>"
+            "<a/>"
             '<a xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"/>'
-            '<a xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"/>'
+            "<a/>"
             '<a xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"/>'
             "</root>"
         )

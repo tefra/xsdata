@@ -83,9 +83,6 @@ class ParserUtils:
         while len(objects) > position:
             qname, value = objects.pop(position)
 
-            if value is None:
-                value = ""
-
             arg = meta.find_var(qname, FindMode.NOT_WILDCARD)
             if arg and cls.bind_var(params, arg, value):
                 continue
@@ -104,9 +101,6 @@ class ParserUtils:
         params.setdefault(var.name, [])
         while len(objects) > pos:
             qname, value = objects.pop(pos)
-
-            if value is None:
-                value = ""
 
             if qname:
                 value = cls.prepare_generic_value(qname, value)

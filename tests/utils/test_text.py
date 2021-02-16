@@ -1,5 +1,6 @@
 from unittest import TestCase
 
+from xsdata.utils.text import alnum
 from xsdata.utils.text import camel_case
 from xsdata.utils.text import capitalize
 from xsdata.utils.text import mixed_case
@@ -99,3 +100,10 @@ class TextTests(TestCase):
         self.assertEqual(["user"], split_words("__user"))
         self.assertEqual(["TMessage", "DB"], split_words("TMessageDB"))
         self.assertEqual(["GLOBAL", "REF"], split_words("GLOBAL-REF"))
+
+    def test_alnum(self):
+        self.assertEqual("foo1", alnum("foo 1"))
+        self.assertEqual("foo1", alnum(" foo_1 "))
+        self.assertEqual("foo1", alnum("\tfoo*1"))
+        self.assertEqual("foo1", alnum(" foo*1"))
+        self.assertEqual("βιβλίο1", alnum(" βιβλίο*1"))

@@ -11,12 +11,12 @@ from xsdata.logger import logger
 from xsdata.models.enums import DataType
 from xsdata.models.enums import Tag
 from xsdata.utils import collections
-from xsdata.utils import text
 from xsdata.utils.collections import first
 from xsdata.utils.collections import group_by
 from xsdata.utils.namespaces import build_qname
 from xsdata.utils.namespaces import clean_uri
 from xsdata.utils.namespaces import split_qname
+from xsdata.utils.text import alnum
 
 
 @dataclass
@@ -154,7 +154,7 @@ class ClassSanitizer:
     def resolve_conflicts(self):
         """Find classes with the same case insensitive qualified name and
         rename them."""
-        groups = group_by(self.container.iterate(), lambda x: text.snake_case(x.qname))
+        groups = group_by(self.container.iterate(), lambda x: alnum(x.qname))
         for classes in groups.values():
             if len(classes) > 1:
                 self.rename_classes(classes)
@@ -189,11 +189,11 @@ class ClassSanitizer:
         """Append the next available index number for the given namespace and
         local name."""
         index = 0
-        reserved = map(text.snake_case, self.container.data.keys())
+        reserved = set(map(alnum, self.container.data.keys()))
         while True:
             index += 1
             qname = build_qname(namespace, f"{name}_{index}")
-            if text.snake_case(qname) not in reserved:
+            if alnum(qname) not in reserved:
                 return qname
 
     def rename_class_dependencies(self, target: Class, search: str, replace: str):
@@ -291,7 +291,7 @@ class ClassSanitizer:
     def process_duplicate_attribute_names(cls, attrs: List[Attr]) -> None:
         """Sanitize duplicate attribute names that might exist by applying
         rename strategies."""
-        grouped = group_by(attrs, lambda attr: text.snake_case(attr.name))
+        grouped = group_by(attrs, lambda attr: alnum(attr.name))
         for items in grouped.values():
             total = len(items)
             if total == 2 and not items[0].is_enumeration:
@@ -305,15 +305,12 @@ class ClassSanitizer:
         names."""
         for index in range(1, len(rename)):
             num = 1
-            name = text.snake_case(rename[index].name)
+            name = rename[index].name
 
-            while any(
-                text.snake_case(attr.name) == text.snake_case(f"{name}_{num}")
-                for attr in attrs
-            ):
+            while any(alnum(attr.name) == alnum(f"{name}_{num}") for attr in attrs):
                 num += 1
 
-            rename[index].name = f"{rename[index].name}_{num}"
+            rename[index].name = f"{name}_{num}"
 
     @classmethod
     def rename_attribute_by_preference(cls, a: Attr, b: Attr):

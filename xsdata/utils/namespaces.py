@@ -4,7 +4,7 @@ from typing import Optional
 from typing import Tuple
 
 from xsdata.models.enums import Namespace
-from xsdata.utils.text import split
+from xsdata.utils import text
 
 
 __uri_ignore__ = ("www", "xsd", "wsdl")
@@ -61,7 +61,7 @@ def clean_uri(namespace: str) -> str:
     if namespace[:2] == "##":
         namespace = namespace[2:]
 
-    left, right = split(namespace)
+    left, right = text.split(namespace)
 
     if left == "urn":
         namespace = right
@@ -88,8 +88,16 @@ def build_qname(tag_or_uri: Optional[str], tag: Optional[str] = None) -> str:
 def split_qname(tag: str) -> Tuple:
     """Split namespace qualified strings."""
     if tag[0] == "{":
-        left, right = split(tag[1:], "}")
+        left, right = text.split(tag[1:], "}")
         if left:
             return left, right
 
     return None, tag
+
+
+def target_uri(tag: str) -> Optional[str]:
+    return split_qname(tag)[0]
+
+
+def local_name(tag: str) -> str:
+    return split_qname(tag)[1]

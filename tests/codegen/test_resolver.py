@@ -135,9 +135,9 @@ class DependenciesResolverTest(FactoryTestCase):
     ):
         class_life = ClassFactory.create(qname="life")
         import_names = [
-            "foo",  # cool
+            "foo_1",  # cool
             "bar",  # cool
-            "{another}foo",  # another foo
+            "{another}foo1",  # another foo
             "{thug}life",  # life class exists add alias
             "{common}type",  # type class doesn't exist add just the name
         ]

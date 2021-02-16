@@ -10,7 +10,8 @@ from xsdata.codegen.models import Class
 from xsdata.codegen.models import Import
 from xsdata.exceptions import ResolverValueError
 from xsdata.utils import collections
-from xsdata.utils.namespaces import split_qname
+from xsdata.utils.namespaces import local_name
+from xsdata.utils.text import alnum
 
 logger = logging.getLogger(__name__)
 
@@ -73,25 +74,25 @@ class DependenciesResolver:
     def resolve_imports(self):
         """Walk the import qualified names, check for naming collisions and add
         the necessary code generator import instance."""
-        local_names = {split_qname(qname)[1] for qname in self.class_map.keys()}
+        existing = {alnum(local_name(qname)) for qname in self.class_map.keys()}
         for qname in self.import_classes():
             package = self.find_package(qname)
-            local_name = split_qname(qname)[1]
-            exists = local_name in local_names
-            local_names.add(local_name)
+            name = alnum(local_name(qname))
+            exists = name in existing
+            existing.add(name)
             self.add_import(qname=qname, package=package, exists=exists)
 
     def add_import(self, qname: str, package: str, exists: bool = False):
         """Append an import package to the list of imports with any if
         necessary aliases if the import name exists in the local module."""
         alias = None
-        local_name = split_qname(qname)[1]
+        name = local_name(qname)
         if exists:
             module = package.split(".")[-1]
-            alias = f"{module}:{local_name}"
+            alias = f"{module}:{name}"
             self.aliases[qname] = alias
 
-        self.imports.append(Import(name=local_name, source=package, alias=alias))
+        self.imports.append(Import(name=name, source=package, alias=alias))
 
     def find_package(self, qname: str) -> str:
         """

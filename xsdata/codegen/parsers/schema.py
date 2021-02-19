@@ -82,96 +82,14 @@ class SchemaParser(XmlParser):
         self.attribute_form = attrs.get("attributeFormDefault", None)
         self.default_attributes = attrs.get("defaultAttributes", None)
 
-    def set_schema_forms(self, obj: xsd.Schema):
-        """
-        Set the default form type for elements and attributes.
-
-        Global elements and attributes are by default qualified.
-        """
-        if self.element_form:
-            obj.element_form_default = FormType(self.element_form)
-        if self.attribute_form:
-            obj.attribute_form_default = FormType(self.attribute_form)
-
-        for child_element in obj.elements:
-            child_element.form = FormType.QUALIFIED
-
-        for child_attribute in obj.attributes:
-            child_attribute.form = FormType.QUALIFIED
-
-    def set_schema_namespaces(self, obj: xsd.Schema):
-        """Set the given schema's target namespace and add the default
-        namespaces if the are missing xsi, xlink, xml, xs."""
-        obj.target_namespace = obj.target_namespace or self.target_namespace
-
-    @staticmethod
-    def set_namespace_map(obj: Any, ns_map: Optional[Dict]):
-        """Add common namespaces like xml, xsi, xlink if they are missing."""
-        if hasattr(obj, "ns_map"):
-
-            if ns_map:
-                obj.ns_map.update(
-                    {prefix: uri for prefix, uri in ns_map.items() if uri}
-                )
-
-            ns_list = obj.ns_map.values()
-            ns_common = (Namespace.XS, Namespace.XSI, Namespace.XML, Namespace.XLINK)
-            obj.ns_map.update(
-                {ns.prefix: ns.uri for ns in ns_common if ns.uri not in ns_list}
-            )
-
-    @staticmethod
-    def set_index(obj: Any, index: int):
-        if hasattr(obj, "index"):
-            obj.index = index
-
-    @staticmethod
-    def add_default_imports(obj: xsd.Schema):
-        """Add missing imports to the standard schemas if the namespace is
-        declared and."""
-        imp_namespaces = [imp.namespace for imp in obj.imports]
-        xsi_ns = Namespace.XSI.uri
-        if xsi_ns in obj.ns_map.values() and xsi_ns not in imp_namespaces:
-            obj.imports.insert(0, xsd.Import(namespace=xsi_ns))
-
-    def resolve_schemas_locations(self, obj: xsd.Schema):
-        """Resolve the locations of the schema overrides, redefines, includes
-        and imports relatively to the schema location."""
-        if not self.location:
-            return
-
-        obj.location = self.location
-        for over in obj.overrides:
-            over.location = self.resolve_path(over.schema_location)
-
-        for red in obj.redefines:
-            red.location = self.resolve_path(red.schema_location)
-
-        for inc in obj.includes:
-            inc.location = self.resolve_path(inc.schema_location)
-
-        for imp in obj.imports:
-            imp.location = self.resolve_local_path(imp.schema_location, imp.namespace)
-
-    def resolve_path(self, location: Optional[str]) -> Optional[str]:
-        """Resolve the given location string relatively the schema location
-        path."""
-
-        return urljoin(self.location, location) if self.location and location else None
-
-    def resolve_local_path(
-        self, location: Optional[str], namespace: Optional[str]
-    ) -> Optional[str]:
-        """Resolve the given namespace to one of the local standard schemas or
-        fallback to the external file path."""
-
-        common_ns = Namespace.get_enum(namespace)
-        local_path = common_ns.location if common_ns else None
-
-        if local_path and (not location or location.find("w3.org/") > 0):
-            return local_path
-
-        return self.resolve_path(location)
+    def end_schema(self, obj: T):
+        """Normalize various properties for the schema and it's children."""
+        if isinstance(obj, xsd.Schema):
+            self.set_schema_forms(obj)
+            self.set_schema_namespaces(obj)
+            self.add_default_imports(obj)
+            self.resolve_schemas_locations(obj)
+            self.reset_element_occurs(obj)
 
     def end_attribute(self, obj: T):
         """Assign the schema's default form for attributes if the given
@@ -224,10 +142,99 @@ class SchemaParser(XmlParser):
         if isinstance(obj, xsd.Restriction) and not obj.open_content:
             obj.open_content = self.default_open_content
 
-    def end_schema(self, obj: T):
-        """Normalize various properties for the schema and it's children."""
-        if isinstance(obj, xsd.Schema):
-            self.set_schema_forms(obj)
-            self.set_schema_namespaces(obj)
-            self.add_default_imports(obj)
-            self.resolve_schemas_locations(obj)
+    def set_schema_forms(self, obj: xsd.Schema):
+        """
+        Set the default form type for elements and attributes.
+
+        Global elements and attributes are by default qualified.
+        """
+        if self.element_form:
+            obj.element_form_default = FormType(self.element_form)
+        if self.attribute_form:
+            obj.attribute_form_default = FormType(self.attribute_form)
+
+        for child_element in obj.elements:
+            child_element.form = FormType.QUALIFIED
+
+        for child_attribute in obj.attributes:
+            child_attribute.form = FormType.QUALIFIED
+
+    def set_schema_namespaces(self, obj: xsd.Schema):
+        """Set the given schema's target namespace and add the default
+        namespaces if the are missing xsi, xlink, xml, xs."""
+        obj.target_namespace = obj.target_namespace or self.target_namespace
+
+    @staticmethod
+    def set_namespace_map(obj: Any, ns_map: Optional[Dict]):
+        """Add common namespaces like xml, xsi, xlink if they are missing."""
+        if hasattr(obj, "ns_map"):
+
+            if ns_map:
+                obj.ns_map.update(
+                    {prefix: uri for prefix, uri in ns_map.items() if uri}
+                )
+
+            ns_list = obj.ns_map.values()
+            ns_common = (Namespace.XS, Namespace.XSI, Namespace.XML, Namespace.XLINK)
+            obj.ns_map.update(
+                {ns.prefix: ns.uri for ns in ns_common if ns.uri not in ns_list}
+            )
+
+    @staticmethod
+    def set_index(obj: Any, index: int):
+        if hasattr(obj, "index"):
+            obj.index = index
+
+    @staticmethod
+    def add_default_imports(obj: xsd.Schema):
+        """Add missing imports to the standard schemas if the namespace is
+        declared and."""
+        imp_namespaces = [imp.namespace for imp in obj.imports]
+        xsi_ns = Namespace.XSI.uri
+        if xsi_ns in obj.ns_map.values() and xsi_ns not in imp_namespaces:
+            obj.imports.insert(0, xsd.Import(namespace=xsi_ns))
+
+    @staticmethod
+    def reset_element_occurs(obj: xsd.Schema):
+        for element in obj.elements:
+            element.min_occurs = None
+            element.max_occurs = None
+
+    def resolve_schemas_locations(self, obj: xsd.Schema):
+        """Resolve the locations of the schema overrides, redefines, includes
+        and imports relatively to the schema location."""
+        if not self.location:
+            return
+
+        obj.location = self.location
+        for over in obj.overrides:
+            over.location = self.resolve_path(over.schema_location)
+
+        for red in obj.redefines:
+            red.location = self.resolve_path(red.schema_location)
+
+        for inc in obj.includes:
+            inc.location = self.resolve_path(inc.schema_location)
+
+        for imp in obj.imports:
+            imp.location = self.resolve_local_path(imp.schema_location, imp.namespace)
+
+    def resolve_path(self, location: Optional[str]) -> Optional[str]:
+        """Resolve the given location string relatively the schema location
+        path."""
+
+        return urljoin(self.location, location) if self.location and location else None
+
+    def resolve_local_path(
+        self, location: Optional[str], namespace: Optional[str]
+    ) -> Optional[str]:
+        """Resolve the given namespace to one of the local standard schemas or
+        fallback to the external file path."""
+
+        common_ns = Namespace.get_enum(namespace)
+        local_path = common_ns.location if common_ns else None
+
+        if local_path and (not location or location.find("w3.org/") > 0):
+            return local_path
+
+        return self.resolve_path(location)

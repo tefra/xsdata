@@ -7,6 +7,7 @@ from typing import Tuple
 from xsdata.codegen.models import Attr
 from xsdata.codegen.models import AttrType
 from xsdata.codegen.models import Class
+from xsdata.codegen.models import Restrictions
 from xsdata.codegen.models import Status
 from xsdata.formats.dataclass.models.generics import AnyElement
 from xsdata.logger import logger
@@ -368,10 +369,12 @@ class DefinitionsMapper:
         default: Optional[str] = None,
     ) -> Attr:
         """Builder method for attributes."""
+        occurs = 1 if default is not None else None
         return Attr(
             tag=Tag.ELEMENT,
             name=name,
             namespace=namespace,
             default=default,
             types=[AttrType(qname=qname, forward=forward, native=native)],
+            restrictions=Restrictions(min_occurs=occurs, max_occurs=occurs),
         )

@@ -93,13 +93,6 @@ class ClassSanitizerTest(FactoryTestCase):
         self.sanitizer.process_attribute_default(target, attr)
         self.assertTrue(attr.fixed)
 
-    def test_process_attribute_default_with_list_field(self):
-        target = ClassFactory.create()
-        attr = AttrFactory.create(fixed=True)
-        attr.restrictions.max_occurs = 2
-        self.sanitizer.process_attribute_default(target, attr)
-        self.assertFalse(attr.fixed)
-
     def test_process_attribute_default_with_optional_field(self):
         target = ClassFactory.create()
         attr = AttrFactory.create(fixed=True, default=2)
@@ -208,25 +201,67 @@ class ClassSanitizerTest(FactoryTestCase):
         self.assertIsNone(actual)
 
     def test_process_attribute_restrictions(self):
-        restrictions = [
-            Restrictions(min_occurs=0, max_occurs=0, required=True),
-            Restrictions(min_occurs=0, max_occurs=1, required=True),
-            Restrictions(min_occurs=1, max_occurs=1, required=False),
-            Restrictions(max_occurs=2, required=True),
-            Restrictions(min_occurs=2, max_occurs=2, required=True),
-        ]
-        expected = [
-            {},
-            {},
-            {"required": True},
-            {"max_occurs": 2},
-            {"max_occurs": 2, "min_occurs": 2},
-        ]
+        required = Restrictions(min_occurs=1, max_occurs=1)
+        attr = AttrFactory.attribute(restrictions=required.clone())
+        self.sanitizer.process_attribute_restrictions(attr)
+        self.assertIsNone(attr.restrictions.min_occurs)
+        self.assertIsNone(attr.restrictions.max_occurs)
 
-        for idx, res in enumerate(restrictions):
-            attr = AttrFactory.create(restrictions=res)
-            self.sanitizer.process_attribute_restrictions(attr)
-            self.assertEqual(expected[idx], res.asdict())
+        tokens = Restrictions(required=True, tokens=True, min_occurs=1, max_occurs=1)
+        attr = AttrFactory.element(restrictions=tokens.clone())
+        self.sanitizer.process_attribute_restrictions(attr)
+        self.assertFalse(attr.restrictions.required)
+        self.assertIsNone(attr.restrictions.min_occurs)
+        self.assertIsNone(attr.restrictions.max_occurs)
+
+        attr = AttrFactory.element(restrictions=tokens.clone())
+        attr.restrictions.max_occurs = 2
+        self.sanitizer.process_attribute_restrictions(attr)
+        self.assertFalse(attr.restrictions.required)
+        self.assertIsNotNone(attr.restrictions.min_occurs)
+        self.assertIsNotNone(attr.restrictions.max_occurs)
+
+        multiple = Restrictions(min_occurs=0, max_occurs=2)
+        attr = AttrFactory.create(tag=Tag.EXTENSION, restrictions=multiple)
+        self.sanitizer.process_attribute_restrictions(attr)
+        self.assertTrue(attr.restrictions.required)
+        self.assertIsNone(attr.restrictions.min_occurs)
+        self.assertIsNone(attr.restrictions.max_occurs)
+
+        multiple = Restrictions(max_occurs=2, required=True)
+        attr = AttrFactory.element(restrictions=multiple, fixed=True)
+        self.sanitizer.process_attribute_restrictions(attr)
+        self.assertIsNone(attr.restrictions.required)
+        self.assertEqual(0, attr.restrictions.min_occurs)
+        self.assertFalse(attr.fixed)
+
+        attr = AttrFactory.element(restrictions=required.clone())
+        self.sanitizer.process_attribute_restrictions(attr)
+        self.assertTrue(attr.restrictions.required)
+        self.assertIsNone(attr.restrictions.min_occurs)
+        self.assertIsNone(attr.restrictions.max_occurs)
+
+        restrictions = Restrictions(required=True, min_occurs=0, max_occurs=1)
+        attr = AttrFactory.element(restrictions=restrictions, default="A", fixed=True)
+        self.sanitizer.process_attribute_restrictions(attr)
+        self.assertIsNone(attr.restrictions.required)
+        self.assertIsNone(attr.restrictions.min_occurs)
+        self.assertIsNone(attr.restrictions.max_occurs)
+        self.assertIsNone(attr.default)
+        self.assertFalse(attr.fixed)
+
+        attr = AttrFactory.element(restrictions=required.clone(), default="A")
+        self.sanitizer.process_attribute_restrictions(attr)
+        self.assertIsNone(attr.restrictions.required)
+
+        attr = AttrFactory.element(restrictions=required.clone(), fixed=True)
+        self.sanitizer.process_attribute_restrictions(attr)
+        self.assertIsNone(attr.restrictions.required)
+
+        attr = AttrFactory.element(restrictions=required.clone())
+        attr.restrictions.nillable = True
+        self.sanitizer.process_attribute_restrictions(attr)
+        self.assertIsNone(attr.restrictions.required)
 
     def test_sanitize_duplicate_attribute_names(self):
         attrs = [

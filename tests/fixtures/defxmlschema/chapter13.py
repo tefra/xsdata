@@ -76,6 +76,9 @@ class RestrictedProductType:
 class SizeType:
     value: Optional[int] = field(
         default=None,
+        metadata={
+            "required": True,
+        }
     )
     system: Optional[str] = field(
         default=None,

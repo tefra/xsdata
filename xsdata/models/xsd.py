@@ -326,7 +326,7 @@ class Attribute(AnnotationBase):
     def get_restrictions(self) -> Dict[str, Anything]:
         restrictions = {}
         if self.use == UseType.REQUIRED:
-            restrictions.update({"min_occurs": 1, "max_occurs": 1, "required": True})
+            restrictions.update({"required": True})
         elif self.use == UseType.PROHIBITED:
             restrictions.update({"prohibited": True})
 

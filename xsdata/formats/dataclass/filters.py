@@ -148,7 +148,10 @@ class Filters:
     def type_name(self, attr_type: AttrType) -> str:
         """Return native python type name or apply class name conventions."""
         datatype = attr_type.datatype
-        return datatype.type.__name__ if datatype else self.class_name(attr_type.name)
+        if datatype:
+            return datatype.type.__name__
+
+        return self.class_name(attr_type.alias or attr_type.name)
 
     def field_metadata(
         self, attr: Attr, parent_namespace: Optional[str], parents: List[str]
@@ -453,11 +456,7 @@ class Filters:
         return f"Type[{result}]"
 
     def field_type_name(self, attr_type: AttrType, parents: List[str]) -> str:
-        name = (
-            self.class_name(attr_type.alias)
-            if attr_type.alias
-            else self.type_name(attr_type)
-        )
+        name = self.type_name(attr_type)
 
         if attr_type.forward and attr_type.circular:
             outer_str = ".".join(map(self.class_name, parents))

@@ -3,11 +3,13 @@ from unittest import mock
 from tests.factories import AttrFactory
 from tests.factories import AttrTypeFactory
 from tests.factories import ClassFactory
+from tests.factories import ExtensionFactory
 from tests.factories import FactoryTestCase
 from tests.factories import PackageFactory
 from xsdata.codegen.models import Class
 from xsdata.codegen.resolver import DependenciesResolver
 from xsdata.exceptions import ResolverValueError
+from xsdata.models.enums import DataType
 from xsdata.utils.namespaces import build_qname
 
 
@@ -88,9 +90,17 @@ class DependenciesResolverTest(FactoryTestCase):
                     attrs=[
                         AttrFactory.create(name="c", types=[type_c]),
                         AttrFactory.create(name="d", types=[type_d]),
+                        AttrFactory.create(
+                            name="compound",
+                            types=[AttrTypeFactory.native(DataType.ANY_TYPE)],
+                            choices=[
+                                AttrFactory.create(name="a", types=[type_a, type_d]),
+                            ],
+                        ),
                     ],
                 )
             ],
+            extensions=[ExtensionFactory.create(type_a)],
         )
 
         self.resolver.apply_aliases(obj)
@@ -104,11 +114,16 @@ class DependenciesResolverTest(FactoryTestCase):
         self.assertIsNone(obj.attrs[1].types[0].alias)
         self.assertEqual("IamA", obj.attrs[2].types[0].alias)
         self.assertEqual("IamD", obj.attrs[2].types[1].alias)
+        self.assertEqual("IamA", obj.extensions[0].type.alias)
 
         self.assertEqual(1, len(obj.inner))
-        self.assertEqual(2, len(obj.inner[0].attrs))
+        self.assertEqual(3, len(obj.inner[0].attrs))
         self.assertEqual(1, len(obj.inner[0].attrs[0].types))
         self.assertEqual(1, len(obj.inner[0].attrs[1].types))
+
+        self.assertEqual("IamA", obj.inner[0].attrs[2].choices[0].types[0].alias)
+        self.assertEqual("IamD", obj.inner[0].attrs[2].choices[0].types[1].alias)
+
         self.assertIsNone(obj.inner[0].attrs[0].types[0].alias)
         self.assertEqual("IamD", obj.inner[0].attrs[1].types[0].alias)
 

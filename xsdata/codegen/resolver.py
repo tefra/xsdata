@@ -54,13 +54,21 @@ class DependenciesResolver:
                 result.append(obj)
         return result
 
-    def apply_aliases(self, obj: Class):
-        """Walk the attributes tree and set the type aliases."""
-        for attr in obj.attrs:
+    def apply_aliases(self, target: Class):
+        """Iterate over the target class dependencies and set the type
+        aliases."""
+        for attr in target.attrs:
             for attr_type in attr.types:
                 attr_type.alias = self.aliases.get(attr_type.qname)
 
-        collections.apply(obj.inner, self.apply_aliases)
+            for choice in attr.choices:
+                for choice_type in choice.types:
+                    choice_type.alias = self.aliases.get(choice_type.qname)
+
+        for ext in target.extensions:
+            ext.type.alias = self.aliases.get(ext.type.qname)
+
+        collections.apply(target.inner, self.apply_aliases)
 
     def resolve_imports(self):
         """Walk the import qualified names, check for naming collisions and add

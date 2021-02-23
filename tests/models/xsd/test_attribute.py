@@ -44,7 +44,7 @@ class AttributeTests(TestCase):
         self.assertEqual({}, obj.get_restrictions())
 
         obj.use = UseType.REQUIRED
-        expected = {"max_occurs": 1, "min_occurs": 1, "required": True}
+        expected = {"required": True}
         self.assertEqual(expected, obj.get_restrictions())
 
         obj.use = UseType.PROHIBITED

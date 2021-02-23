@@ -12,7 +12,7 @@ from xsdata.formats.dataclass.parsers.mixins import XmlNode
 from xsdata.formats.dataclass.parsers.nodes import NodeParser
 from xsdata.formats.dataclass.parsers.nodes import Parsed
 from xsdata.models.enums import EventType
-from xsdata.utils.namespaces import split_qname
+from xsdata.utils.namespaces import local_name
 from xsdata.utils.text import snake_case
 
 
@@ -101,7 +101,7 @@ class XmlParser(NodeParser):
 
         key = (event, name)
         if key not in self.emit_cache:
-            method_name = f"{event}_{snake_case(split_qname(name)[1])}"
+            method_name = f"{event}_{snake_case(local_name(name))}"
             self.emit_cache[key] = getattr(self, method_name, None)
 
         method = self.emit_cache[key]

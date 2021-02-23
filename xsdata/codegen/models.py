@@ -19,7 +19,8 @@ from xsdata.models.enums import QNames
 from xsdata.models.enums import Tag
 from xsdata.models.mixins import ElementBase
 from xsdata.utils.namespaces import build_qname
-from xsdata.utils.namespaces import split_qname
+from xsdata.utils.namespaces import local_name
+from xsdata.utils.namespaces import target_uri
 
 xml_type_map = {
     Tag.ANY: XmlType.WILDCARD,
@@ -209,7 +210,7 @@ class AttrType:
     @property
     def name(self) -> str:
         """Shortcut for qname local name."""
-        return split_qname(self.qname)[1]
+        return local_name(self.qname)
 
     @property
     def is_dependency(self) -> bool:
@@ -431,11 +432,11 @@ class Class:
     @property
     def name(self) -> str:
         """Shortcut for qname local name."""
-        return split_qname(self.qname)[1]
+        return local_name(self.qname)
 
     @property
     def target_namespace(self) -> Optional[str]:
-        return split_qname(self.qname)[0]
+        return target_uri(self.qname)
 
     @property
     def has_suffix_attr(self) -> bool:

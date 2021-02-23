@@ -7,6 +7,7 @@ from typing import Tuple
 from xsdata.codegen.models import Attr
 from xsdata.codegen.models import AttrType
 from xsdata.codegen.models import Class
+from xsdata.codegen.models import Restrictions
 from xsdata.codegen.models import Status
 from xsdata.formats.dataclass.models.generics import AnyElement
 from xsdata.logger import logger
@@ -26,7 +27,7 @@ from xsdata.utils import collections
 from xsdata.utils import text
 from xsdata.utils.collections import first
 from xsdata.utils.namespaces import build_qname
-from xsdata.utils.namespaces import split_qname
+from xsdata.utils.namespaces import local_name
 
 
 class DefinitionsMapper:
@@ -215,10 +216,10 @@ class DefinitionsMapper:
 
         for ext in binding_message.extended_elements:
             assert ext.qname is not None
-            local_name = split_qname(ext.qname)[1].title()
-            inner = cls.build_inner_class(target, local_name)
+            class_name = local_name(ext.qname).title()
+            inner = cls.build_inner_class(target, class_name)
 
-            if style == "rpc" and local_name == "Body":
+            if style == "rpc" and class_name == "Body":
                 namespace = ext.attributes.get("namespace")
                 attrs = cls.map_port_type_message(port_type_message, namespace)
             else:
@@ -299,7 +300,7 @@ class DefinitionsMapper:
             parts.extend(extended.attributes["parts"].split())
 
         if "message" in extended.attributes:
-            message_name = split_qname(extended.attributes["message"])[1]
+            message_name = local_name(extended.attributes["message"])
         else:
             message_name = text.suffix(message)
 
@@ -351,7 +352,7 @@ class DefinitionsMapper:
     def attributes(cls, elements: Iterator[AnyElement]) -> Dict:
         """Return all attributes from all extended elements as a dictionary."""
         return {
-            split_qname(qname)[1]: value
+            local_name(qname): value
             for element in elements
             if isinstance(element, AnyElement)
             for qname, value in element.attributes.items()
@@ -368,10 +369,12 @@ class DefinitionsMapper:
         default: Optional[str] = None,
     ) -> Attr:
         """Builder method for attributes."""
+        occurs = 1 if default is not None else None
         return Attr(
             tag=Tag.ELEMENT,
             name=name,
             namespace=namespace,
             default=default,
             types=[AttrType(qname=qname, forward=forward, native=native)],
+            restrictions=Restrictions(min_occurs=occurs, max_occurs=occurs),
         )

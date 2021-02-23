@@ -16,6 +16,9 @@ class ColorType:
 class HatSizeType:
     value: Optional[str] = field(
         default=None,
+        metadata={
+            "required": True,
+        }
     )
     system: Optional[str] = field(
         default=None,
@@ -49,6 +52,9 @@ class ProductType:
 class ShirtSizeType:
     value: Optional[int] = field(
         default=None,
+        metadata={
+            "required": True,
+        }
     )
     system: Optional[str] = field(
         default=None,

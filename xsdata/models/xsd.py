@@ -326,7 +326,7 @@ class Attribute(AnnotationBase):
     def get_restrictions(self) -> Dict[str, Anything]:
         restrictions = {}
         if self.use == UseType.REQUIRED:
-            restrictions.update({"min_occurs": 1, "max_occurs": 1, "required": True})
+            restrictions.update({"required": True})
         elif self.use == UseType.PROHIBITED:
             restrictions.update({"prohibited": True})
 
@@ -1083,8 +1083,8 @@ class Element(AnnotationBase):
     uniques: Array[Unique] = array_element(name="unique")
     keys: Array[Key] = array_element(name="key")
     keyrefs: Array[Keyref] = array_element(name="keyref")
-    min_occurs: int = attribute(default=1, name="minOccurs")
-    max_occurs: UnionType[int, str] = attribute(default=1, name="maxOccurs")
+    min_occurs: Optional[int] = attribute(default=1, name="minOccurs")
+    max_occurs: UnionType[None, int, str] = attribute(default=1, name="maxOccurs")
     nillable: bool = attribute(default=False)
     abstract: bool = attribute(default=False)
 

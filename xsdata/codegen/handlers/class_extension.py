@@ -271,5 +271,7 @@ class ClassExtensionHandler(HandlerInterface):
                 return attr
 
         attr = Attr(name=name, tag=tag)
+        attr.restrictions.min_occurs = 1
+        attr.restrictions.max_occurs = 1
         target.attrs.insert(0, attr)
         return attr

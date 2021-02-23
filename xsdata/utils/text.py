@@ -1,78 +1,79 @@
 import re
+import string
 from typing import Any
 from typing import List
 from typing import Match
 from typing import Tuple
 
 
-def prefix(string: str, sep: str = ":") -> str:
+def prefix(value: str, sep: str = ":") -> str:
     """Return the first part of the string before the separator."""
-    return split(string, sep)[0]
+    return split(value, sep)[0]
 
 
-def suffix(string: str, sep: str = ":") -> str:
+def suffix(value: str, sep: str = ":") -> str:
     """Return the last part of the string after the separator."""
-    return split(string, sep)[1]
+    return split(value, sep)[1]
 
 
-def split(string: str, sep: str = ":") -> Tuple:
+def split(value: str, sep: str = ":") -> Tuple:
     """
     Separate the given string with the given separator and return a tuple of
     the prefix and suffix.
 
     If the separator isn't present in the string return None as prefix.
     """
-    left, _, right = string.partition(sep)
+    left, _, right = value.partition(sep)
     return (left, right) if right else (None, left)
 
 
-def capitalize(string: str, **kwargs: Any) -> str:
+def capitalize(value: str, **kwargs: Any) -> str:
     """Capitalize the given string."""
-    return string[0].upper() + string[1:]
+    return value[0].upper() + value[1:]
 
 
-def pascal_case(string: str, **kwargs: Any) -> str:
+def pascal_case(value: str, **kwargs: Any) -> str:
     """Convert the given string to pascal case."""
-    return "".join(map(str.title, split_words(string)))
+    return "".join(map(str.title, split_words(value)))
 
 
-def camel_case(string: str, **kwargs: Any) -> str:
+def camel_case(value: str, **kwargs: Any) -> str:
     """Convert the given string to camel case."""
-    result = "".join(map(str.title, split_words(string)))
+    result = "".join(map(str.title, split_words(value)))
     return result[0].lower() + result[1:]
 
 
-def mixed_case(string: str, **kwargs: Any) -> str:
+def mixed_case(value: str, **kwargs: Any) -> str:
     """Convert the given string to mixed case."""
-    return "".join(split_words(string))
+    return "".join(split_words(value))
 
 
-def mixed_pascal_case(string: str, **kwargs: Any) -> str:
+def mixed_pascal_case(value: str, **kwargs: Any) -> str:
     """Convert the given string to mixed pascal case."""
-    return capitalize(mixed_case(string))
+    return capitalize(mixed_case(value))
 
 
-def mixed_snake_case(string: str, **kwargs: Any) -> str:
+def mixed_snake_case(value: str, **kwargs: Any) -> str:
     """Convert the given string to mixed snake case."""
-    return "_".join(split_words(string))
+    return "_".join(split_words(value))
 
 
-def snake_case(string: str, **kwargs: Any) -> str:
+def snake_case(value: str, **kwargs: Any) -> str:
     """Convert the given string to snake case."""
-    return "_".join(map(str.lower, split_words(string)))
+    return "_".join(map(str.lower, split_words(value)))
 
 
-def screaming_snake_case(string: str, **kwargs: Any) -> str:
+def screaming_snake_case(value: str, **kwargs: Any) -> str:
     """Convert the given string to screaming snake case."""
-    return snake_case(string, **kwargs).upper()
+    return snake_case(value, **kwargs).upper()
 
 
-def kebab_case(string: str, **kwargs: Any) -> str:
+def kebab_case(value: str, **kwargs: Any) -> str:
     """Convert the given string to kebab case."""
-    return "-".join(split_words(string))
+    return "-".join(split_words(value))
 
 
-def split_words(string: str) -> List[str]:
+def split_words(value: str) -> List[str]:
     """Split a string on new capital letters and not alphanumeric
     characters."""
     words: List[str] = []
@@ -84,7 +85,7 @@ def split_words(string: str) -> List[str]:
             words.append("".join(buffer))
             buffer.clear()
 
-    for char in string:
+    for char in value:
         tp = classify(char)
         if tp == StringType.OTHER:
             flush()
@@ -135,7 +136,7 @@ for i in range(0x20):
     ESCAPE_DCT.setdefault(chr(i), f"\\u{i:04x}")
 
 
-def escape_string(string: str) -> str:
+def escape_string(value: str) -> str:
     """
     Escape a string for code generation.
 
@@ -145,4 +146,14 @@ def escape_string(string: str) -> str:
     def replace(match: Match) -> str:
         return ESCAPE_DCT[match.group(0)]
 
-    return ESCAPE.sub(replace, string)
+    return ESCAPE.sub(replace, value)
+
+
+_punctuation = set(string.punctuation + string.whitespace)
+
+
+def alnum(value: str) -> str:
+    for remove in set(value).intersection(_punctuation):
+        value = value.replace(remove, "")
+
+    return value.lower()

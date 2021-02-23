@@ -110,6 +110,8 @@ def generate(**kwargs: Any):
     config_file = Path(kwargs["config"])
     if config_file.exists():
         config = GeneratorConfig.read(config_file)
+        if kwargs["package"] != "generated":
+            config.output.package = kwargs["package"]
     else:
         config = GeneratorConfig()
         config.output.format = OutputFormat(kwargs["output"])

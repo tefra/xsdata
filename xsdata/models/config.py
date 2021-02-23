@@ -3,6 +3,7 @@ from enum import Enum
 from pathlib import Path
 from typing import Any
 from typing import Callable
+from typing import Dict
 from typing import List
 from typing import TextIO
 
@@ -17,6 +18,7 @@ from xsdata.formats.dataclass.serializers.writers import XmlEventWriter
 from xsdata.models.mixins import array_element
 from xsdata.models.mixins import attribute
 from xsdata.models.mixins import element
+from xsdata.utils import constants
 from xsdata.utils import text
 
 
@@ -72,15 +74,17 @@ class NameCase(Enum):
     | SUserNAME | SuserName | suserName | suser_name | SUSER_NAME      | SUserNAME | SUser_NAME  | SUserNAME    |
     +-----------+-----------+-----------+------------+-----------------+-----------+-------------+--------------+
 
+    :cvar ORIGINAL: originalCase
     :cvar PASCAL: pascalCase
     :cvar CAMEL: camelCase
     :cvar SNAKE: snakeCase
-    :cvar SCREAMING_SNAKE:
-    :cvar MIXED: mixedCase
-    :cvar MIXED_SNAKE:
-    :cvar MIXED_PASCAL:
+    :cvar SCREAMING_SNAKE: screamingSnakeCase
+    :cvar MIXED: mixedCase mixedCase
+    :cvar MIXED_SNAKE: mixedSnakeCase
+    :cvar MIXED_PASCAL: mixedPascalCase
     """  # noqa
 
+    ORIGINAL = "originalCase"
     PASCAL = "pascalCase"
     CAMEL = "camelCase"
     SNAKE = "snakeCase"
@@ -98,7 +102,8 @@ class NameCase(Enum):
         return __name_case_func__[self.value]
 
 
-__name_case_func__ = {
+__name_case_func__: Dict[str, Callable] = {
+    "originalCase": constants.return_input,
     "pascalCase": text.pascal_case,
     "camelCase": text.camel_case,
     "snakeCase": text.snake_case,

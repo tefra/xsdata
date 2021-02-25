@@ -270,6 +270,7 @@ class AttributeTypeHandlerTests(FactoryTestCase):
 
         self.processor.set_circular_flag(source, target, attr_type)
         self.assertTrue(attr_type.circular)
+        self.assertEqual(id(source), attr_type.reference)
 
         mock_is_circular_dependency.assert_called_once_with(source, target, set())
 

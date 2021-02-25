@@ -125,6 +125,7 @@ class AttributeTypeHandler(HandlerInterface):
             attr.restrictions.format = collections.first(
                 x.restrictions.format for x in source.attrs if x.restrictions.format
             )
+            attr_type.reference = id(source)
         else:
             self.set_circular_flag(source, target, attr_type)
 
@@ -161,6 +162,7 @@ class AttributeTypeHandler(HandlerInterface):
 
     def set_circular_flag(self, source: Class, target: Class, attr_type: AttrType):
         """Update circular reference flag."""
+        attr_type.reference = id(source)
         attr_type.circular = self.is_circular_dependency(source, target, set())
 
     def is_circular_dependency(self, source: Class, target: Class, seen: Set) -> bool:

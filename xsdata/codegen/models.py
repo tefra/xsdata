@@ -196,6 +196,7 @@ class AttrType:
 
     :param qname:
     :param alias:
+    :param reference:
     :param native:
     :param forward:
     :param circular:
@@ -203,6 +204,7 @@ class AttrType:
 
     qname: str
     alias: Optional[str] = field(default=None, compare=False)
+    reference: int = field(default=0, compare=False)
     native: bool = field(default=False)
     forward: bool = field(default=False)
     circular: bool = field(default=False)

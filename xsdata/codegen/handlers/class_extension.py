@@ -137,6 +137,7 @@ class ClassExtensionHandler(HandlerInterface):
         elif cls.should_flatten_extension(source, target):
             ClassUtils.copy_attributes(source, target, ext)
         else:
+            ext.type.reference = id(source)
             logger.debug("Ignore extension: %s", ext.type.name)
 
     def find_dependency(self, attr_type: AttrType) -> Optional[Class]:

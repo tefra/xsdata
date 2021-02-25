@@ -206,6 +206,7 @@ class AttrTypeFactory(Factory):
         native: bool = False,
         forward: bool = False,
         circular: bool = False,
+        reference: int = 0,
         **kwargs: Any,
     ) -> AttrType:
         if not qname:
@@ -217,6 +218,7 @@ class AttrTypeFactory(Factory):
             native=native,
             circular=circular,
             forward=forward,
+            reference=reference,
         )
 
     @classmethod

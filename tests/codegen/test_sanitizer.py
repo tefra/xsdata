@@ -396,7 +396,7 @@ class ClassSanitizerTest(FactoryTestCase):
         self.assertEqual("_a", target.meta_name)
 
         mock_rename_class_dependencies.assert_has_calls(
-            mock.call(item, "{foo}_a", "{foo}_a_3")
+            mock.call(item, id(target), "{foo}_a_3")
             for item in self.sanitizer.container.iterate()
         )
 
@@ -404,7 +404,7 @@ class ClassSanitizerTest(FactoryTestCase):
         self.assertEqual([], self.container.data["{foo}_a"])
 
     def test_rename_class_dependencies(self):
-        attr_type = AttrTypeFactory.create("{foo}bar")
+        attr_type = AttrTypeFactory.create(qname="{foo}bar", reference=1)
 
         target = ClassFactory.create(
             extensions=[
@@ -428,29 +428,30 @@ class ClassSanitizerTest(FactoryTestCase):
             ],
         )
 
-        self.sanitizer.rename_class_dependencies(target, "{foo}bar", "thug")
+        self.sanitizer.rename_class_dependencies(target, 1, "thug")
         dependencies = set(target.dependencies())
         self.assertNotIn("{foo}bar", dependencies)
         self.assertIn("thug", dependencies)
 
     def test_rename_attr_dependencies_with_default_enum(self):
-        attr_type = AttrTypeFactory.create("{foo}bar")
+        attr_type = AttrTypeFactory.create(qname="{foo}bar", reference=1)
         target = ClassFactory.create(
             attrs=[
                 AttrFactory.create(
-                    types=[attr_type], default=f"@enum@{attr_type.qname}::member"
+                    types=[attr_type],
+                    default=f"@enum@{attr_type.qname}::member",
                 ),
             ]
         )
 
-        self.sanitizer.rename_class_dependencies(target, "{foo}bar", "thug")
+        self.sanitizer.rename_class_dependencies(target, 1, "thug")
         dependencies = set(target.dependencies())
         self.assertEqual("@enum@thug::member", target.attrs[0].default)
         self.assertNotIn("{foo}bar", dependencies)
         self.assertIn("thug", dependencies)
 
     def test_rename_attr_dependencies_with_choices(self):
-        attr_type = AttrTypeFactory.create("{foo}bar")
+        attr_type = AttrTypeFactory.create(qname="foo", reference=1)
         target = ClassFactory.create(
             attrs=[
                 AttrFactory.create(
@@ -461,10 +462,10 @@ class ClassSanitizerTest(FactoryTestCase):
             ]
         )
 
-        self.sanitizer.rename_class_dependencies(target, "{foo}bar", "thug")
+        self.sanitizer.rename_class_dependencies(target, 1, "bar")
         dependencies = set(target.dependencies())
-        self.assertNotIn("{foo}bar", dependencies)
-        self.assertIn("thug", dependencies)
+        self.assertNotIn("foo", dependencies)
+        self.assertIn("bar", dependencies)
 
     @mock.patch.object(ClassSanitizer, "group_fields")
     def test_group_compound_fields(self, mock_group_fields):

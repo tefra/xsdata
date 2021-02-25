@@ -293,6 +293,7 @@ class ClassExtensionHandlerTests(FactoryTestCase):
 
         mock_should_remove_extension.assert_called_once_with(source, target)
         self.assertEqual(0, mock_copy_attributes.call_count)
+        self.assertEqual(0, extension.type.reference)
 
     @mock.patch.object(ClassUtils, "copy_attributes")
     @mock.patch.object(ClassExtensionHandler, "should_flatten_extension")
@@ -305,6 +306,7 @@ class ClassExtensionHandlerTests(FactoryTestCase):
         source = ClassFactory.create()
 
         self.processor.process_complex_extension(source, target, extension)
+        self.assertEqual(0, extension.type.reference)
         mock_compare_attributes.assert_called_once_with(source, target)
         mock_should_flatten_extension.assert_called_once_with(source, target, extension)
 
@@ -321,6 +323,7 @@ class ClassExtensionHandlerTests(FactoryTestCase):
 
         self.processor.process_complex_extension(source, target, extension)
         self.assertEqual(1, len(target.extensions))
+        self.assertEqual(id(source), extension.type.reference)
 
     def test_find_dependency(self):
         attr_type = AttrTypeFactory.create(qname="a")

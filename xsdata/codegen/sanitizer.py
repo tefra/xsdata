@@ -11,6 +11,7 @@ from xsdata.logger import logger
 from xsdata.models.enums import DataType
 from xsdata.models.enums import Tag
 from xsdata.utils import collections
+from xsdata.utils import text
 from xsdata.utils.collections import first
 from xsdata.utils.collections import group_by
 from xsdata.utils.namespaces import build_qname
@@ -189,7 +190,7 @@ class ClassSanitizer:
         self.container.reset(target, qname)
 
         for item in self.container.iterate():
-            self.rename_class_dependencies(item, qname, target.qname)
+            self.rename_class_dependencies(item, id(target), target.qname)
 
     def next_qname(self, namespace: str, name: str) -> str:
         """Append the next available index number for the given namespace and
@@ -202,32 +203,33 @@ class ClassSanitizer:
             if alnum(qname) not in reserved:
                 return qname
 
-    def rename_class_dependencies(self, target: Class, search: str, replace: str):
+    def rename_class_dependencies(self, target: Class, reference: int, replace: str):
         """Search and replace the old qualified attribute type name with the
         new one if it exists in the target class attributes, extensions and
         inner classes."""
         for attr in target.attrs:
-            self.rename_attr_dependencies(attr, search, replace)
+            self.rename_attr_dependencies(attr, reference, replace)
 
         for ext in target.extensions:
-            if ext.type.qname == search:
+            if ext.type.reference == reference:
                 ext.type.qname = replace
 
         for inner in target.inner:
-            self.rename_class_dependencies(inner, search, replace)
+            self.rename_class_dependencies(inner, reference, replace)
 
-    def rename_attr_dependencies(self, attr: Attr, search: str, replace: str):
+    def rename_attr_dependencies(self, attr: Attr, reference: int, replace: str):
         """Search and replace the old qualified attribute type name with the
         new one in the attr types, choices and default value."""
         for attr_type in attr.types:
-            if attr_type.qname == search:
+            if attr_type.reference == reference:
                 attr_type.qname = replace
 
                 if isinstance(attr.default, str) and attr.default.startswith("@enum@"):
-                    attr.default = attr.default.replace(search, replace)
+                    member = text.suffix(attr.default, "::")
+                    attr.default = f"@enum@{replace}::{member}"
 
         for choice in attr.choices:
-            self.rename_attr_dependencies(choice, search, replace)
+            self.rename_attr_dependencies(choice, reference, replace)
 
     def find_enum(self, attr_type: AttrType) -> Optional[Class]:
         """Find an enumeration class byte the attribute type."""

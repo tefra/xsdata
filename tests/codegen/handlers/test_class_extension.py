@@ -364,10 +364,6 @@ class ClassExtensionHandlerTests(FactoryTestCase):
 
         self.assertFalse(self.processor.should_flatten_extension(source, target))
 
-        # Forced flattened
-        source.strict_type = True
-        self.assertTrue(self.processor.should_flatten_extension(source, target))
-
         # Source has suffix attr and target has its own attrs
         source = ClassFactory.elements(1)
         source.attrs[0].index = sys.maxsize

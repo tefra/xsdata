@@ -392,7 +392,6 @@ class Class:
     :param mixed:
     :param abstract:
     :param nillable:
-    :param strict_type:
     :param status:
     :param container:
     :param package:
@@ -414,7 +413,6 @@ class Class:
     mixed: bool = field(default=False)
     abstract: bool = field(default=False)
     nillable: bool = field(default=False)
-    strict_type: bool = field(default=False)
     status: Status = field(default=Status.RAW)
     container: Optional[str] = field(default=None)
     package: Optional[str] = field(default=None)
@@ -487,9 +485,6 @@ class Class:
     @property
     def should_generate(self) -> bool:
         """Return whether this instance should be generated."""
-        if self.strict_type:
-            return False
-
         return (
             self.tag
             in (Tag.ELEMENT, Tag.BINDING_OPERATION, Tag.BINDING_MESSAGE, Tag.MESSAGE)

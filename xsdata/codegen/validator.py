@@ -8,6 +8,7 @@ from xsdata.codegen.models import Class
 from xsdata.codegen.models import Extension
 from xsdata.codegen.utils import ClassUtils
 from xsdata.models.enums import Tag
+from xsdata.utils import collections
 from xsdata.utils.collections import group_by
 
 
@@ -23,9 +24,9 @@ class ClassValidator:
         Remove if possible classes with the same qualified name.
 
         Steps:
-            1. Remove classes with missing extension type.
-            2. Handle duplicate types.
-            3. Mark strict types.
+            1. Remove invalid classes
+            2. Handle duplicate types
+            3. Merge dummy types
         """
         for classes in self.container.data.values():
 
@@ -36,7 +37,7 @@ class ClassValidator:
                 self.handle_duplicate_types(classes)
 
             if len(classes) > 1:
-                self.mark_strict_types(classes)
+                self.merge_global_types(classes)
 
     def remove_invalid_classes(self, classes: List[Class]):
         """Remove from the given class list any class with missing extension
@@ -124,14 +125,30 @@ class ClassValidator:
         return None
 
     @classmethod
-    def mark_strict_types(cls, classes: List[Class]):
-        """If there is a class derived from xs:element update all
-        xs:complexTypes derived classes as strict types."""
+    def merge_global_types(cls, classes: List[Class]):
+        """
+        Merge parent-child global types.
 
-        try:
-            element = next(obj for obj in classes if obj.is_element)
-            for obj in classes:
-                if obj is not element and obj.is_complex:
-                    obj.strict_type = True
-        except StopIteration:
-            pass
+        Conditions
+            1. One of them is derived from xs:element
+            2. One of them is derived from xs:complexType
+            3. The xs:element is a subclass of the xs:complexType
+            4. The xs:element has no attributes (This can't happen in a valid schema)
+        """
+
+        el = collections.first(x for x in classes if x.tag == Tag.ELEMENT)
+        ct = collections.first(x for x in classes if x.tag == Tag.COMPLEX_TYPE)
+
+        if (
+            el is None
+            or ct is None
+            or el is ct
+            or el.attrs
+            or len(el.extensions) != 1
+            or el.extensions[0].type.qname != el.qname
+        ):
+            return
+
+        ct.namespace = el.namespace or ct.namespace
+        ct.help = el.help or ct.help
+        classes.remove(el)

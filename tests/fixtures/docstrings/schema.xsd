@@ -1,6 +1,8 @@
 <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="urn:docs" xmlns:docs="urn:docs">
   <xsd:element name="Root">
     <xsd:annotation>
+      <xsd:appinfo>a</xsd:appinfo>
+      <xsd:appinfo>b</xsd:appinfo>
       <xsd:documentation>
         This is the root type documentation. """Lorem ipsum""" dolor sit amet, consectetur adipiscing elit. Morbi dapibus.
 

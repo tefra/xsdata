@@ -152,6 +152,3 @@ class ClassTests(FactoryTestCase):
 
         obj = ClassFactory.create(tag=Tag.SIMPLE_TYPE)
         self.assertFalse(obj.should_generate)
-
-        obj = ClassFactory.create(tag=Tag.BINDING_MESSAGE, strict_type=True)
-        self.assertFalse(obj.should_generate)

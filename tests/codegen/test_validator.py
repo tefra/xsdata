@@ -19,14 +19,14 @@ class ClassValidatorTests(FactoryTestCase):
         self.container = ClassContainer()
         self.validator = ClassValidator(container=self.container)
 
-    @mock.patch.object(ClassValidator, "mark_strict_types")
+    @mock.patch.object(ClassValidator, "merge_global_types")
     @mock.patch.object(ClassValidator, "handle_duplicate_types")
     @mock.patch.object(ClassValidator, "remove_invalid_classes")
     def test_process(
         self,
         mock_remove_invalid_classes,
         mock_handle_duplicate_types,
-        mock_mark_strict_types,
+        mock_merge_global_types,
     ):
         first = ClassFactory.create()
         second = first.clone()
@@ -37,7 +37,7 @@ class ClassValidatorTests(FactoryTestCase):
 
         mock_remove_invalid_classes.assert_called_once_with([first, second])
         mock_handle_duplicate_types.assert_called_once_with([first, second])
-        mock_mark_strict_types.assert_called_once_with([first, second])
+        mock_merge_global_types.assert_called_once_with([first, second])
 
     def test_remove_invalid_classes(self):
         first = ClassFactory.create(
@@ -98,22 +98,42 @@ class ClassValidatorTests(FactoryTestCase):
             [mock.call(two, one), mock.call(three, one)]
         )
 
-    def test_mark_strict_types(self):
-        one = ClassFactory.create(qname="foo", tag=Tag.ELEMENT)
+    def test_merge_global_types(self):
+        one = ClassFactory.create(qname="foo", tag=Tag.ELEMENT, namespace="a", help="b")
         two = ClassFactory.create(qname="foo", tag=Tag.COMPLEX_TYPE)
         three = ClassFactory.create(qname="foo", tag=Tag.SIMPLE_TYPE)
 
-        self.validator.mark_strict_types([one, two, three])
+        classes = [one, two, three]
+        self.validator.merge_global_types(classes)
+        self.assertEqual(3, len(classes))
 
-        self.assertFalse(one.strict_type)  # Is an element
-        self.assertTrue(two.strict_type)  # Marked as abstract
-        self.assertFalse(three.strict_type)  # Is common
+        classes = [one, three]
+        self.validator.merge_global_types(classes)
+        self.assertEqual(2, len(classes))
 
-        four = ClassFactory.create(qname="bar", tag=Tag.ATTRIBUTE)
-        five = ClassFactory.create(qname="bar", tag=Tag.ATTRIBUTE_GROUP)
-        self.validator.mark_strict_types([four, five])
-        self.assertFalse(four.strict_type)  # No element in group
-        self.assertFalse(five.strict_type)  # No element in group
+        classes = [two, three]
+        self.validator.merge_global_types(classes)
+        self.assertEqual(2, len(classes))
+
+        classes = [one, two, three]
+        one.attrs.append(AttrFactory.create)
+        one.extensions.append(ExtensionFactory.reference(two.qname))
+
+        self.validator.merge_global_types(classes)
+        self.assertEqual(3, len(classes))
+
+        one.attrs.clear()
+        one.extensions.append(ExtensionFactory.reference("foo"))
+        self.validator.merge_global_types(classes)
+        self.assertEqual(3, len(classes))
+
+        one.extensions.pop()
+        self.validator.merge_global_types(classes)
+        self.assertEqual(2, len(classes))
+        self.assertIn(two, classes)
+        self.assertIn(three, classes)
+        self.assertEqual(one.namespace, two.namespace)
+        self.assertEqual(one.help, two.help)
 
     @mock.patch.object(ClassUtils, "copy_extensions")
     @mock.patch.object(ClassUtils, "copy_attributes")

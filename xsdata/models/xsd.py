@@ -83,12 +83,12 @@ class Annotation(ElementBase):
     """
     Model representation of a schema xs:annotation element.
 
-    :param appinfo:
+    :param appinfos:
     :param documentations:
     :param any_attribute: any attributes with non-schema namespace
     """
 
-    appinfo: Optional[Appinfo] = element()
+    appinfos: Array[Appinfo] = array_element(name="appinfo")
     documentations: Array[Documentation] = array_element(name="documentation")
     any_attribute: Optional["AnyAttribute"] = element(name="anyAttribute")
 

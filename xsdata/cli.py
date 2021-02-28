@@ -20,6 +20,7 @@ from xsdata.utils.downloader import Downloader
 
 outputs = click.Choice([x.value for x in OutputFormat])
 docstring_styles = click.Choice([x.value for x in DocstringStyle])
+click_log.basic_config(logger)
 
 
 @click.group(cls=DefaultGroup, default="generate", default_if_no_args=False)

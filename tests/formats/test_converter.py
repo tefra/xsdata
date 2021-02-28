@@ -8,8 +8,6 @@ from typing import Any
 from unittest import TestCase
 from xml.etree.ElementTree import QName
 
-from lxml import etree
-
 from xsdata.exceptions import ConverterError
 from xsdata.formats.converter import Converter
 from xsdata.formats.converter import converter
@@ -282,33 +280,6 @@ class TimeConverterTests(TestCase):
 
         self.assertEqual(time(12, 55), obj)
         self.assertEqual(original, self.converter.serialize(obj, format=fmt))
-
-
-class LxmlQNameConverterTests(TestCase):
-    def setUp(self):
-        self.converter = converter.type_converter(etree.QName)
-
-    def test_deserialize(self):
-        convert = self.converter.deserialize
-        with self.assertRaises(ConverterError):
-            convert("a:b")
-
-        with self.assertRaises(ConverterError):
-            self.assertEqual(etree.QName("b"), convert("a:b", ns_map={}))
-
-        self.assertEqual(etree.QName("a"), convert("a", ns_map={}))
-        self.assertEqual(etree.QName("aa", "b"), convert("a:b", ns_map={"a": "aa"}))
-
-    def test_serialize(self):
-        ns_map = {"c_prefix": "c"}
-        convert = self.converter.serialize
-
-        self.assertEqual("a", convert(etree.QName("a"), ns_map=ns_map))
-        self.assertEqual("a", convert(etree.QName("a")))
-        self.assertEqual("ns1:b", convert(etree.QName("a", "b"), ns_map=ns_map))
-        self.assertEqual("{a}b", convert(etree.QName("a", "b")))
-        self.assertEqual("c_prefix:c", convert(etree.QName("c", "c"), ns_map=ns_map))
-        self.assertEqual("{c}c", convert(etree.QName("c", "c")))
 
 
 class QNameConverterTests(TestCase):

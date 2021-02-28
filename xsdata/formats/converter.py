@@ -24,8 +24,6 @@ from typing import Type
 from typing import Union
 from xml.etree.ElementTree import QName
 
-from lxml import etree
-
 from xsdata.exceptions import ConverterError
 from xsdata.exceptions import ConverterWarning
 from xsdata.models.datatype import XmlBase64Binary
@@ -339,46 +337,6 @@ class QNameConverter(Converter):
         return namespace, suffix
 
 
-class LxmlQNameConverter(Converter):
-    def deserialize(
-        self, value: str, ns_map: Optional[Dict] = None, **kwargs: Any
-    ) -> etree.QName:
-        """
-        Convert namespace prefixed strings, or fully qualified strings to
-        QNames.
-
-        examples:
-            - xs:string -> QName("http://www.w3.org/2001/XMLSchema", "string")
-            - {foo}bar -> QName("foo", "bar"
-        """
-        self.validate_input_type(value, str)
-
-        try:
-            text_or_uri, tag = QNameConverter.resolve(value, ns_map)
-            return etree.QName(text_or_uri, tag)
-        except ValueError as e:
-            raise ConverterError(e)
-
-    def serialize(
-        self, value: etree.QName, ns_map: Optional[Dict] = None, **kwargs: Any
-    ) -> str:
-        """
-        Convert a QName instance to string either with a namespace prefix if a
-        prefix-URI namespaces mapping is provided or to a fully qualified name
-        with the namespace.
-
-        examples:
-            - QName("http://www.w3.org/2001/XMLSchema", "int") & ns_map -> xs:int
-            - QName("foo, "bar") -> {foo}bar
-        """
-
-        if ns_map is None or not value.namespace:
-            return value.text
-
-        prefix = load_prefix(value.namespace, ns_map)
-        return f"{prefix}:{value.localname}" if prefix else value.localname
-
-
 Array = Union[List, Tuple]
 
 
@@ -510,7 +468,6 @@ converter.register_converter(XmlDate, ProxyConverter(XmlDate.from_string))
 converter.register_converter(XmlDateTime, ProxyConverter(XmlDateTime.from_string))
 converter.register_converter(XmlDuration, ProxyConverter(XmlDuration))
 converter.register_converter(XmlPeriod, ProxyConverter(XmlPeriod))
-converter.register_converter(etree.QName, LxmlQNameConverter())
 converter.register_converter(QName, QNameConverter())
 converter.register_converter(Decimal, DecimalConverter())
 converter.register_converter(Enum, EnumConverter())

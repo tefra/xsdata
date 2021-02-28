@@ -21,10 +21,15 @@ class AnnotationBaseTest(TestCase):
                         elements=[
                             "    I am a ",
                             AnyElement(
-                                qname="p",
+                                qname="{http://www.w3.org/1999/xhtml}p",
                                 text="test",
                                 tail="\n",
-                                children=[AnyElement(qname="span", text="!")],
+                                children=[
+                                    AnyElement(
+                                        qname="{http://www.w3.org/1999/xhtml}span",
+                                        text="!",
+                                    )
+                                ],
                             ),
                         ]
                     )

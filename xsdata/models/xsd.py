@@ -9,8 +9,6 @@ from typing import List as Array
 from typing import Optional
 from typing import Union as UnionType
 
-from lxml.html.clean import clean_html
-
 from xsdata.formats.dataclass.serializers import XmlSerializer
 from xsdata.formats.dataclass.serializers.config import SerializerConfig
 from xsdata.models.enums import DataType
@@ -29,13 +27,18 @@ from xsdata.utils import text
 from xsdata.utils.collections import unique_sequence
 from xsdata.utils.namespaces import clean_uri
 
-docstring_serializer = XmlSerializer(config=SerializerConfig(pretty_print=True))
+docstring_serializer = XmlSerializer(
+    config=SerializerConfig(pretty_print=True, xml_declaration=False)
+)
 
 DEFAULT_ATTR_NAME = "@value"
 
 
 @dataclass(frozen=True)
 class Docstring:
+    class Meta:
+        namespace = "http://www.w3.org/1999/xhtml"
+
     elements: Array[object] = array_any_element()
 
 
@@ -56,8 +59,12 @@ class Documentation(ElementBase):
     attributes: Optional["AnyAttribute"] = element()
 
     def tostring(self) -> Optional[str]:
-        xml = docstring_serializer.render(Docstring(self.elements)).split("\n", 1)
-        return textwrap.dedent(clean_html(xml[1])[5:-7]).strip()
+        obj = Docstring(self.elements)
+        ns_map = {None: "http://www.w3.org/1999/xhtml"}
+        xml = docstring_serializer.render(obj, ns_map=ns_map)
+        start = xml.find(">") + 1
+        end = xml.rfind("<")
+        return textwrap.dedent(xml[start:end]).strip()
 
 
 @dataclass

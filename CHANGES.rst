@@ -1,6 +1,23 @@
+21.3 (2021-03-04)
+-----------------
+- Added constant name convention config `#407 <https://github.com/tefra/xsdata/issues/407>`_
+- Added naming schemes screaming snake case and original case
+- Updated xsi:lookup on xs:any derived elements `#315 <https://github.com/tefra/xsdata/issues/315>`_
+- Updated fields restriction inheritance `#417 <https://github.com/tefra/xsdata/issues/417>`_
+- Updated cli to allow package override from arguments `#416 <https://github.com/tefra/xsdata/issues/416>`_
+- Updated code generation to merge duplicate global types earlier `#406 <https://github.com/tefra/xsdata/issues/406>`_
+- Fixed docstrings issue breaking python syntax `#403 <https://github.com/tefra/xsdata/issues/403>`_
+- Fixed bindings for nillable content without workarounds `#408 <https://github.com/tefra/xsdata/issues/408>`_
+- Fixed resolver to apply aliases on extensions and choice fields `#414 <https://github.com/tefra/xsdata/issues/414>`_
+- Fixed schema models limiting xs:appinfo occurrences `#420 <https://github.com/tefra/xsdata/issues/420>`_
+- Decoupled core systems from click and lxml
+
+**Notice**: In the next release installation profiles will be introduced that will turn
+the cli, lxml and soap features **optional**.
+
+
 21.2 (2021-02-02)
 -----------------
-
 - Added class name context for user naming schemes `#348 <https://github.com/tefra/xsdata/issues/348>`_
 - Added mixed pascal naming scheme `#348 <https://github.com/tefra/xsdata/issues/348>`_
 - Added access to element/attribute name generators `#381 <https://github.com/tefra/xsdata/issues/381>`_

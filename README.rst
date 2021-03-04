@@ -59,25 +59,19 @@ Features
 - Pluggable code writer that supports python dataclasses and PlantUML class diagrams.
 
 
-Changelog: 21.2 (2021-02-02)
+Changelog: 21.3 (2021-03-04)
 ----------------------------
+- Added constant name convention config `#407 <https://github.com/tefra/xsdata/issues/407>`_
+- Added naming schemes screaming snake case and original case
+- Updated xsi:lookup on xs:any derived elements `#315 <https://github.com/tefra/xsdata/issues/315>`_
+- Updated fields restriction inheritance `#417 <https://github.com/tefra/xsdata/issues/417>`_
+- Updated cli to allow package override from arguments `#416 <https://github.com/tefra/xsdata/issues/416>`_
+- Updated code generation to merge duplicate global types earlier `#406 <https://github.com/tefra/xsdata/issues/406>`_
+- Fixed docstrings issue breaking python syntax `#403 <https://github.com/tefra/xsdata/issues/403>`_
+- Fixed bindings for nillable content without workarounds `#408 <https://github.com/tefra/xsdata/issues/408>`_
+- Fixed resolver to apply aliases on extensions and choice fields `#414 <https://github.com/tefra/xsdata/issues/414>`_
+- Fixed schema models limiting xs:appinfo occurrences `#420 <https://github.com/tefra/xsdata/issues/420>`_
+- Decoupled core systems from click and lxml
 
-- Added class name context for user naming schemes `#348 <https://github.com/tefra/xsdata/issues/348>`_
-- Added mixed pascal naming scheme `#348 <https://github.com/tefra/xsdata/issues/348>`_
-- Added access to element/attribute name generators `#381 <https://github.com/tefra/xsdata/issues/381>`_
-- Added XmlHexBinary/XmlBase64Binary builtin data types `#387 <https://github.com/tefra/xsdata/issues/387>`_
-- Added support for xs:anyType root elements `#399 <https://github.com/tefra/xsdata/issues/399>`_
-- Updated JSON binding modules to use the fields local name `#389 <https://github.com/tefra/xsdata/issues/389>`_
-- Updated enum classes generation
-   - Promote all inner enums to root `#383 <https://github.com/tefra/xsdata/issues/383>`_
-   - Fixed issues with producing invalid members `#385 <https://github.com/tefra/xsdata/issues/385>`_
-   - Added support for list/tuple member values
-- Updated parsers accuracy for Union types
-- Updated dependency resolution accuracy
-- Update base classes generation strategies
-- Updated builtin data types with helper constructors/methods
-- Fixed inner class names conflicts `#375 <https://github.com/tefra/xsdata/issues/375>`_
-- Fixed issue not generating fields derived from xs:alternative elements `#393 <https://github.com/tefra/xsdata/issues/393>`_
-- Fixed duplicate root class name regression from v20.12
-- Fixed issue adding unused lib imports
-- Fixed issue adding unused name properties to choice elements
+**Notice**: In the next release installation profiles will be introduced that will turn
+the cli, lxml and soap features **optional**.

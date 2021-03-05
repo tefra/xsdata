@@ -9,7 +9,7 @@ from xml import sax
 from xml.etree.ElementTree import iterparse
 
 from xsdata.exceptions import XmlHandlerError
-from xsdata.formats.dataclass.parsers.handlers import LxmlSaxHandler
+from xsdata.formats.dataclass.parsers.mixins import SaxHandler
 from xsdata.formats.dataclass.parsers.mixins import XmlHandler
 from xsdata.models.enums import EventType
 from xsdata.utils.namespaces import build_qname
@@ -80,7 +80,7 @@ class XmlEventHandler(XmlHandler):
 
 
 @dataclass
-class XmlSaxHandler(LxmlSaxHandler, sax.handler.ContentHandler):
+class XmlSaxHandler(SaxHandler, sax.handler.ContentHandler):
     """Sax content handler based on native python."""
 
     # Scope vars

@@ -41,6 +41,13 @@ unknown properties and to process xinclude statements.
 xsData is constantly tested against the
 `W3C XML Schema 1.1 test suite <https://github.com/tefra/xsdata-w3c-tests>`_.
 
+Getting started
+---------------
+
+.. code-block:: bash
+
+    $ pip install xsdata[cli,lxml,soap]
+
 .. image:: https://github.com/tefra/xsdata/raw/master/docs/_static/demo.svg
 
 Check the documentation `demos <https://xsdata.readthedocs.io/en/latest/demos.html>`_ or

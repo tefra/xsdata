@@ -14,6 +14,9 @@ context = XmlContext()
 readers_list = list(readers.__all__)
 writers_list = list(writers.__all__)
 
+readers_list.remove("default_handler")
+writers_list.remove("default_writer")
+
 random.shuffle(readers_list)
 random.shuffle(writers_list)
 

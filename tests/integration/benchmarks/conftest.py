@@ -1,3 +1,5 @@
+import logging
+
 from tests import xsdata_temp_dir
 from tests.fixtures.books import BookForm
 from tests.fixtures.books import Books
@@ -6,6 +8,7 @@ from xsdata.formats.dataclass.parsers import JsonParser
 from xsdata.formats.dataclass.parsers import XmlParser
 from xsdata.formats.dataclass.serializers import JsonSerializer
 from xsdata.formats.dataclass.serializers import XmlSerializer
+from xsdata.logger import logger
 from xsdata.models.datatype import XmlDate
 
 xsdata_temp_dir.mkdir(parents=True, exist_ok=True)
@@ -43,23 +46,23 @@ def make_books(how_many: int):
     )
 
 
-def parse(source, handler, *args):
+def parse(source, handler):
     parser = XmlParser(context=context, handler=handler)
     parser.from_bytes(source, Books)
 
 
-def parse_json(source, *args):
+def parse_json(source):
     parser = JsonParser(context=context)
     parser.from_bytes(source, Books)
 
 
-def write(size, obj, writer, *args):
+def write(size, obj, writer):
     with xsdata_temp_dir.joinpath(f"benchmark_{size}.xml").open("w") as f:
         serializer = XmlSerializer(writer=writer, context=context)
         serializer.write(f, obj)
 
 
-def write_json(size, obj, *args):
+def write_json(size, obj):
     with xsdata_temp_dir.joinpath(f"benchmark_{size}.json").open("w") as f:
         serializer = JsonSerializer(context=context)
         serializer.write(f, obj)
@@ -72,33 +75,47 @@ if __name__ == "__main__":
     from xsdata.formats.dataclass.parsers import handlers
     from timeit import Timer
 
+    components = [
+        "LxmlEventHandler",
+        "LxmlSaxHandler",
+        "XmlEventHandler",
+        "XmlSaxHandler",
+        "LxmlEventWriter",
+        "XmlEventWriter",
+        "JsonParser",
+        "JsonSerializer",
+    ]
+
     parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "--component", default="parser", choices=["serializer", "parser"]
-    )
-    parser.add_argument("--format", default="xml", choices=["xml", "json"])
-    parser.add_argument("--handler", default="XmlEventWriter")
-    parser.add_argument("--number", default=1000, type=int)
-    parser.add_argument("--repeat", default=10, type=int)
+    parser.add_argument("-c", "--component", choices=components, required=True)
+    parser.add_argument("-n", "--number", default=1000, type=int)
+    parser.add_argument("-r", "--repeat", default=10, type=int)
     args = parser.parse_args()
 
-    if args.component == "serializer":
-        func = write if args.format == "xml" else write_json
-        writer = getattr(writers, args.handler)
+    if args.component in writers.__all__:
+        component = getattr(writers, args.component)
         books = make_books(args.number)
-        t = Timer(lambda: func(args.number, books, writer))
-
-    elif args.component == "parser":
-        func = parse if args.format == "xml" else parse_json
-        handler = getattr(handlers, args.handler)
-        fixture = xsdata_temp_dir.joinpath(f"benchmark_{args.number}.{args.format}")
-
+        t = Timer(lambda: write(args.number, books, component))
+    elif args.component in handlers.__all__:
+        fixture = xsdata_temp_dir.joinpath(f"benchmark_{args.number}.xml")
         if not fixture.exists():
-            write_func = write if args.format == "xml" else write_json
-            write_func(args.number, make_books(args.number), writers.LxmlEventWriter)
+            write(args.number, make_books(args.number), writers.XmlEventWriter)
 
-        t = Timer(lambda: func(fixture.read_bytes(), handler))
+        component = getattr(handlers, args.component)
+        t = Timer(lambda: parse(fixture.read_bytes(), component))
+    elif args.component == "JsonParser":
+        component = JsonParser
+        fixture = xsdata_temp_dir.joinpath(f"benchmark_{args.number}.json")
+        if not fixture.exists():
+            write_json(args.number, make_books(args.number))
 
+        t = Timer(lambda: parse_json(fixture.read_bytes()))
+    elif args.component == "JsonSerializer":
+        component = JsonSerializer
+        books = make_books(args.number)
+        t = Timer(lambda: write_json(args.number, books))
+
+    print(f"Benchmark {component.__name__} - n{args.number}/r{args.repeat}")
     result = t.repeat(repeat=args.repeat, number=1)
     print("avg {}".format(statistics.mean(result)))
     print("med {}".format(statistics.median(result)))

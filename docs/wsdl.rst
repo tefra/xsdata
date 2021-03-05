@@ -9,6 +9,12 @@ The code generator in addition to models derived from xml schemas will also gene
 dataclasses for messages and simple classes to describe the unique operations.
 
 
+Make sure you install both cli and soap requirements.
+
+.. code-block:: console
+
+    $ pip install xsdata[cli,soap]
+
 .. code-block:: console
 
     $ xsdata --wsdl --package calculator http://www.dneonline.com/calculator.asmx?WSDL

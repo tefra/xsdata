@@ -2,6 +2,14 @@
 Command Line
 ============
 
+
+Make sure the cli requirements are installed.
+
+.. code-block:: bash
+
+    $ pip install xsdata[cli]
+
+
 .. command-output:: xsdata --help
 
 

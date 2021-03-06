@@ -1,14 +1,11 @@
 from dataclasses import dataclass
-from dataclasses import field
 from typing import Any
-from typing import Dict
 from typing import Iterable
-from typing import List
-from typing import Optional
 
 from lxml import etree
 
 from xsdata.exceptions import XmlHandlerError
+from xsdata.formats.dataclass.parsers.mixins import SaxHandler
 from xsdata.formats.dataclass.parsers.mixins import XmlHandler
 from xsdata.models.enums import EventType
 
@@ -77,7 +74,7 @@ class LxmlEventHandler(XmlHandler):
 
 
 @dataclass
-class LxmlSaxHandler(XmlHandler):
+class LxmlSaxHandler(SaxHandler):
     """
     Sax content handler based on :class:`lxml.etree.XMLParser` api.
 
@@ -88,10 +85,6 @@ class LxmlSaxHandler(XmlHandler):
     :param objects: The list of intermediate parsed objects,
         eg [(qname, object)]
     """
-
-    # Scope vars
-    data_frames: List = field(init=False, default_factory=list)
-    flush_next: Optional[str] = field(init=False, default=None)
 
     def parse(self, source: Any) -> Any:
         """
@@ -116,82 +109,3 @@ class LxmlSaxHandler(XmlHandler):
         )
 
         return etree.parse(source, parser=parser)  # nosec
-
-    def start(self, qname: str, attrs: Dict, ns_map: Dict):
-        """
-        Start element notification receiver.
-
-        The receiver will flush any previous active element, append a
-        new data frame  to collect data content for the next active
-        element and notify the main  parser to prepare for next binding
-        instruction.
-
-        :param qname: Qualified name
-        :param attrs: Attribute key-value map
-        :param ns_map: Namespace prefix-URI map
-        """
-        self.flush()
-        self.data_frames.append(([], []))
-        self.parser.start(
-            self.clazz,
-            self.queue,
-            self.objects,
-            qname,
-            attrs,
-            self.start_ns_bulk(ns_map),
-        )
-
-    def end(self, qname: str):
-        """
-        End element notification receiver.
-
-        The receiver will flush any previous active element and set the
-        next element to be flushed.
-
-        :param qname: Qualified name
-        """
-        self.flush()
-        self.flush_next = qname
-
-    def close(self) -> Any:
-        """
-        Close document notification receiver.
-
-        The receiver will flush any previous active element and return
-        the first item in the objects stack.
-        """
-        try:
-            self.flush()
-            return self.objects[0][1]
-        except IndexError:
-            return None
-
-    def flush(self):
-        """
-        Flush element notification receiver.
-
-        The receiver will check if there is an active element present,
-        collect and join the data frames for text/tail content and
-        notify the main parser to finish the binding process for the
-        element.
-        """
-        if self.flush_next:
-            data = self.data_frames.pop()
-            text = "".join(data[0]) if data[0] else None
-            tail = "".join(data[1]) if data[1] else None
-
-            self.parser.end(self.queue, self.objects, self.flush_next, text, tail)
-            self.flush_next = None
-
-    def data(self, data: str):
-        """
-        Data notification receiver.
-
-        The receiver will append the given data content in the current
-        data frame either in the text position 0 or in the tail position
-        1 whether the element has ended or not.
-
-        :param data: Text or tail content
-        """
-        index = 0 if self.flush_next is None else 1
-        self.data_frames[-1][index].append(data)

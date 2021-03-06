@@ -6,7 +6,7 @@ from typing import List
 from typing import Optional
 from typing import Type
 
-from xsdata.formats.dataclass.parsers.handlers import LxmlEventHandler
+from xsdata.formats.dataclass.parsers.handlers import default_handler
 from xsdata.formats.dataclass.parsers.mixins import XmlHandler
 from xsdata.formats.dataclass.parsers.mixins import XmlNode
 from xsdata.formats.dataclass.parsers.nodes import NodeParser
@@ -28,7 +28,7 @@ class XmlParser(NodeParser):
     :ivar emit_cache: Qname to event name cache
     """
 
-    handler: Type[XmlHandler] = field(default=LxmlEventHandler)
+    handler: Type[XmlHandler] = field(default=default_handler())
     emit_cache: Dict = field(init=False, default_factory=dict)
 
     def start(

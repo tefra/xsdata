@@ -23,7 +23,7 @@ from xsdata.formats.dataclass.models.generics import DerivedElement
 from xsdata.formats.dataclass.serializers.config import SerializerConfig
 from xsdata.formats.dataclass.serializers.mixins import XmlWriter
 from xsdata.formats.dataclass.serializers.mixins import XmlWriterEvent
-from xsdata.formats.dataclass.serializers.writers import LxmlEventWriter
+from xsdata.formats.dataclass.serializers.writers import default_writer
 from xsdata.models.enums import DataType
 from xsdata.models.enums import QNames
 from xsdata.utils import namespaces
@@ -45,7 +45,7 @@ class XmlSerializer(AbstractSerializer):
 
     config: SerializerConfig = field(default_factory=SerializerConfig)
     context: XmlContext = field(default_factory=XmlContext)
-    writer: Type[XmlWriter] = field(default=LxmlEventWriter)
+    writer: Type[XmlWriter] = field(default=default_writer())
 
     def render(self, obj: Any, ns_map: Optional[Dict] = None) -> str:
         """

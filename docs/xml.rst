@@ -124,12 +124,18 @@ XmlHandlers read the xml source and push build events to create the target class
 xsData ships with multiple handlers based on lxml and native python that vary in
 performance and features.
 
-    >>> from xsdata.formats.dataclass.parsers.handlers import XmlEventHandler
-    ...
-    >>> parser = XmlParser(handler=XmlEventHandler)
-    >>> order = parser.from_path(xml_path)
-    >>> order.bill_to.street
-    '8 Oak Avenue'
+.. hint::
+
+    If you installed xsdata with lxml the default handler is set to
+    :class:`~xsdata.formats.dataclass.parsers.handlers.LxmlEventHandler` otherwise
+    :class:`~xsdata.formats.dataclass.parsers.handlers.XmlEventHandler` will be used.
+
+>>> from xsdata.formats.dataclass.parsers.handlers import XmlEventHandler
+...
+>>> parser = XmlParser(handler=XmlEventHandler)
+>>> order = parser.from_path(xml_path)
+>>> order.bill_to.street
+'8 Oak Avenue'
 
 .. hint::
 
@@ -291,6 +297,12 @@ Alternative Writers
 xsData ships with multiple writers based on lxml and native python that may vary
 in performance in some cases. The output of all them is consistent with a few
 exceptions when handling mixed content with ``pretty_print=True``.
+
+.. hint::
+
+    If you installed xsdata with lxml the default writer is set to
+    :class:`~xsdata.formats.dataclass.serializers.writers.LxmlEventWriter` otherwise
+    :class:`~xsdata.formats.dataclass.serializers.writers.XmlEventWriter` will be used.
 
 .. doctest::
 

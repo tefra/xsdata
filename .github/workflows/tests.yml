@@ -57,3 +57,21 @@ jobs:
       - name: Benchmark
         run: |
           tox -e benchmarks
+  minimum:
+    name: Minimum Installation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: 3.7
+      - name: Install pip install .
+        run: |
+          pip install -e .
+      - name: Verify
+        run: |
+          python tests/integration/benchmarks/conftest.py -c XmlEventWriter
+          python tests/integration/benchmarks/conftest.py -c XmlEventHandler
+          python tests/integration/benchmarks/conftest.py -c JsonParser
+          python tests/integration/benchmarks/conftest.py -c JsonSerializer
+          xsdata | xargs -0 python -c "import sys; assert 'Install cli' in sys.argv[1]"

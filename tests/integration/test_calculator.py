@@ -24,7 +24,7 @@ class CalculatorServiceTests(TestCase):
         schema = fixtures_dir.joinpath("calculator/services.wsdl")
         package = "tests.fixtures.calculator"
         runner = CliRunner()
-        result = runner.invoke(cli, [str(schema), "--package", package, "--wsdl"])
+        result = runner.invoke(cli, [str(schema), "--package", package])
 
         if result.exception:
             raise result.exception

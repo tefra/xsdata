@@ -49,24 +49,28 @@ class SchemaTransformer:
     class_map: Dict[str, List[Class]] = field(init=False, default_factory=dict)
     processed: List[str] = field(init=False, default_factory=list)
 
-    def process_definitions(self, uri: str):
-        """Process a single wsdl resource."""
-        definitions = self.parse_definitions(uri, namespace=None)
-
-        collections.apply(definitions.schemas, self.convert_schema)
-
-        self.convert_definitions(definitions)
+    def process(self, uris: List[str]):
+        self.process_definitions([uri for uri in uris if uri.endswith("wsdl")])
+        self.process_schemas([uri for uri in uris if uri.endswith("xsd")])
+        # self.process_schemas([uri for uri in uris if uri.endswith("xml")])
         self.process_classes()
+
+    def process_definitions(self, uris: List[str]):
+        """Process a single wsdl resource."""
+        definitions = None
+        for uri in uris:
+            services = self.parse_definitions(uri, namespace=None)
+            if definitions is None:
+                definitions = services
+            elif services:
+                definitions.merge(services)
+
+        if definitions is not None:
+            collections.apply(definitions.schemas, self.convert_schema)
+            self.convert_definitions(definitions)
 
     def process_schemas(self, uris: List[str]):
-        """
-        Run main processes.
-
-        :param uris: list of uris to process
-        """
-
         collections.apply(uris, self.process_schema)
-        self.process_classes()
 
     def process_classes(self):
         """Process the generated classes and write or print the final
@@ -94,22 +98,10 @@ class SchemaTransformer:
             raise CodeGenerationError("Nothing to generate.")
 
     def process_schema(self, uri: str, namespace: Optional[str] = None):
-        """
-        Parse and convert schema to codegen models.
-
-        Avoid processing the same uri twice and fail silently if
-        anything goes wrong with fetching and parsing the schema
-        document.
-        """
-        if uri in self.processed:
-            logger.debug("Skipping already processed: %s", os.path.basename(uri))
-        else:
-            logger.info("Parsing schema %s", os.path.basename(uri))
-            self.processed.append(uri)
-
-            schema = self.parse_schema(uri, namespace)
-            if schema:
-                self.convert_schema(schema)
+        """Parse and convert schema to codegen models."""
+        schema = self.parse_schema(uri, namespace)
+        if schema:
+            self.convert_schema(schema)
 
     def convert_schema(self, schema: Schema):
         """Convert a schema instance to codegen classes and process imports to
@@ -142,34 +134,27 @@ class SchemaTransformer:
 
         return classes
 
-    @classmethod
-    def parse_schema(cls, uri: str, namespace: Optional[str]) -> Optional[Schema]:
-        """
-        Parse the given schema uri and return the schema tree object.
-
-        Optionally add the target namespace if the schema is included
-        and is missing a target namespace.
-        """
-
-        try:
-            input_stream = cls.load_resource(uri)
-        except OSError:
-            logger.warning("Schema not found %s", uri)
-        else:
-            parser = SchemaParser(target_namespace=namespace, location=uri)
-            return parser.from_bytes(input_stream, Schema)
-
-        return None
-
-    def parse_definitions(self, uri: str, namespace: Optional[str]) -> Definitions:
-        """
-        Parse recursively the given wsdl uri and return the definitions tree
-        object.
-
-        :raises OSError: if it fails to load the definition uri.
-        """
+    def parse_schema(self, uri: str, namespace: Optional[str]) -> Optional[Schema]:
+        """Parse the given schema uri and return the schema tree object."""
 
         input_stream = self.load_resource(uri)
+        if input_stream is None:
+            return None
+
+        logger.info("Parsing schema %s", os.path.basename(uri))
+        parser = SchemaParser(target_namespace=namespace, location=uri)
+        return parser.from_bytes(input_stream, Schema)
+
+    def parse_definitions(
+        self, uri: str, namespace: Optional[str]
+    ) -> Optional[Definitions]:
+        """Parse recursively the given wsdl uri and return the definitions tree
+        object."""
+
+        input_stream = self.load_resource(uri)
+        if input_stream is None:
+            return None
+
         parser = DefinitionsParser(target_namespace=namespace, location=uri)
         definitions = parser.from_bytes(input_stream, Definitions)
         namespace = definitions.target_namespace
@@ -178,24 +163,31 @@ class SchemaTransformer:
             if not imp.location:
                 continue
 
-            _, extension = os.path.splitext(imp.location)
-
-            if extension == ".wsdl":
+            if imp.location.endswith("wsdl"):
                 sub_definition = self.parse_definitions(imp.location, namespace)
-                definitions.merge(sub_definition)
+                if sub_definition:
+                    definitions.merge(sub_definition)
             else:
                 self.process_schema(imp.location)
 
         return definitions
 
-    @classmethod
-    def load_resource(cls, uri: str) -> bytes:
-        """
-        Read and return the contents of the given uri.
+    def load_resource(self, uri: str) -> Optional[bytes]:
+        """Read and return the contents of the given uri."""
 
-        :raises OSError: if it fails during open/read .
-        """
-        return urlopen(uri).read()  # nosec
+        # except OSError:
+        # except RecursionError:
+
+        if uri not in self.processed:
+            try:
+                self.processed.append(uri)
+                return urlopen(uri).read()  # nosec
+            except OSError:
+                logger.warning("Resource not found %s", uri)
+        else:
+            logger.debug("Skipping already processed: %s", os.path.basename(uri))
+
+        return None
 
     def analyze_classes(self, classes: List[Class]) -> List[Class]:
         """Analyzer the given class list and simplify attributes and

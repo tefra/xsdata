@@ -3,6 +3,7 @@ from unittest import TestCase
 from xsdata.utils.text import alnum
 from xsdata.utils.text import camel_case
 from xsdata.utils.text import capitalize
+from xsdata.utils.text import kebab_case
 from xsdata.utils.text import mixed_case
 from xsdata.utils.text import mixed_pascal_case
 from xsdata.utils.text import mixed_snake_case
@@ -82,6 +83,16 @@ class TextTests(TestCase):
         self.assertEqual("User_Name", mixed_snake_case("User_Name"))
         self.assertEqual("user_name", mixed_snake_case("user_name"))
         self.assertEqual("SUser_NAME", mixed_snake_case("SUserNAME"))
+
+    def test_kebab_case(self):
+        self.assertEqual("p00p", kebab_case("p00p"))
+        self.assertEqual("USERName", kebab_case("USERName"))
+        self.assertEqual("User-NAME", kebab_case("UserNAME"))
+        self.assertEqual("USER-name", kebab_case("USER_name"))
+        self.assertEqual("USER-NAME", kebab_case("USER-NAME"))
+        self.assertEqual("User-Name", kebab_case("User_Name"))
+        self.assertEqual("user-name", kebab_case("user_name"))
+        self.assertEqual("SUser-NAME", kebab_case("SUserNAME"))
 
     def test_capitalize(self):
         self.assertEqual("UserName", capitalize("userName"))

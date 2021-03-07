@@ -24,9 +24,9 @@ class CliTests(TestCase):
         self.runner = CliRunner()
         super().setUp()
 
-    @mock.patch.object(SchemaTransformer, "process_schemas")
+    @mock.patch.object(SchemaTransformer, "process")
     @mock.patch.object(SchemaTransformer, "__init__", return_value=None)
-    def test_generate_with_default_output(self, mock_init, mock_process_schemas):
+    def test_generate_with_default_output(self, mock_init, mock_process):
         source = fixtures_dir.joinpath("defxmlschema/chapter03.xsd")
         result = self.runner.invoke(cli, [str(source), "--package", "foo"])
         config = mock_init.call_args[1]["config"]
@@ -36,11 +36,11 @@ class CliTests(TestCase):
         self.assertEqual("foo", config.output.package)
         self.assertEqual(OutputFormat.DATACLASS, config.output.format)
         self.assertEqual(OutputStructure.FILENAMES, config.output.structure)
-        self.assertEqual([source.as_uri()], mock_process_schemas.call_args[0][0])
+        self.assertEqual([source.as_uri()], mock_process.call_args[0][0])
 
-    @mock.patch.object(SchemaTransformer, "process_schemas")
+    @mock.patch.object(SchemaTransformer, "process")
     @mock.patch.object(SchemaTransformer, "__init__", return_value=None)
-    def test_generate_with_plantuml_output(self, mock_init, mock_process_schemas):
+    def test_generate_with_plantuml_output(self, mock_init, mock_process):
         source = fixtures_dir.joinpath("defxmlschema/chapter03.xsd")
         result = self.runner.invoke(
             cli, [str(source), "--package", "foo", "--output", "plantuml"]
@@ -48,26 +48,26 @@ class CliTests(TestCase):
         config = mock_init.call_args[1]["config"]
 
         self.assertIsNone(result.exception)
-        self.assertEqual([source.as_uri()], mock_process_schemas.call_args[0][0])
+        self.assertEqual([source.as_uri()], mock_process.call_args[0][0])
         self.assertFalse(mock_init.call_args[1]["print"])
         self.assertEqual("foo", config.output.package)
         self.assertEqual(OutputFormat.PLANTUML, config.output.format)
         self.assertEqual(OutputStructure.FILENAMES, config.output.structure)
 
-    @mock.patch.object(SchemaTransformer, "process_schemas")
+    @mock.patch.object(SchemaTransformer, "process")
     @mock.patch.object(SchemaTransformer, "__init__", return_value=None)
-    def test_generate_with_print_mode(self, mock_init, mock_process_schemas):
+    def test_generate_with_print_mode(self, mock_init, mock_process):
         source = fixtures_dir.joinpath("defxmlschema/chapter03.xsd")
         result = self.runner.invoke(cli, [str(source), "--package", "foo", "--print"])
 
         self.assertIsNone(result.exception)
-        self.assertEqual([source.as_uri()], mock_process_schemas.call_args[0][0])
+        self.assertEqual([source.as_uri()], mock_process.call_args[0][0])
         self.assertEqual(logging.ERROR, logger.getEffectiveLevel())
         self.assertTrue(mock_init.call_args[1]["print"])
 
-    @mock.patch.object(SchemaTransformer, "process_schemas")
+    @mock.patch.object(SchemaTransformer, "process")
     @mock.patch.object(SchemaTransformer, "__init__", return_value=None)
-    def test_generate_with_ns_struct_mode(self, mock_init, mock_process_schemas):
+    def test_generate_with_ns_struct_mode(self, mock_init, mock_process):
         source = fixtures_dir.joinpath("defxmlschema/chapter03.xsd")
         result = self.runner.invoke(
             cli, [str(source), "--package", "foo", "--ns-struct"]
@@ -75,26 +75,15 @@ class CliTests(TestCase):
         config = mock_init.call_args[1]["config"]
 
         self.assertIsNone(result.exception)
-        self.assertEqual([source.as_uri()], mock_process_schemas.call_args[0][0])
+        self.assertEqual([source.as_uri()], mock_process.call_args[0][0])
         self.assertFalse(mock_init.call_args[1]["print"])
         self.assertEqual("foo", config.output.package)
         self.assertEqual(OutputFormat.DATACLASS, config.output.format)
         self.assertEqual(OutputStructure.NAMESPACES, config.output.structure)
 
-    @mock.patch.object(SchemaTransformer, "process_definitions")
+    @mock.patch.object(SchemaTransformer, "process")
     @mock.patch.object(SchemaTransformer, "__init__", return_value=None)
-    def test_generate_with_wsdl_mode(self, mock_init, mock_process_definitions):
-        source = fixtures_dir.joinpath("defxmlschema/chapter03.xsd")
-        result = self.runner.invoke(cli, [str(source), "--package", "foo", "--wsdl"])
-
-        self.assertIsNone(result.exception)
-        mock_process_definitions.assert_called_once_with(
-            source.as_uri(),
-        )
-
-    @mock.patch.object(SchemaTransformer, "process_schemas")
-    @mock.patch.object(SchemaTransformer, "__init__", return_value=None)
-    def test_generate_with_docstring_style(self, mock_init, mock_process_schemas):
+    def test_generate_with_docstring_style(self, mock_init, mock_process):
         source = fixtures_dir.joinpath("defxmlschema/chapter03.xsd")
         result = self.runner.invoke(
             cli, [str(source), "--package", "foo", "--docstring-style", "Google"]
@@ -102,12 +91,12 @@ class CliTests(TestCase):
         config = mock_init.call_args[1]["config"]
 
         self.assertIsNone(result.exception)
-        self.assertEqual([source.as_uri()], mock_process_schemas.call_args[0][0])
+        self.assertEqual([source.as_uri()], mock_process.call_args[0][0])
         self.assertEqual(DocstringStyle.GOOGLE, config.output.docstring_style)
 
-    @mock.patch.object(SchemaTransformer, "process_schemas")
+    @mock.patch.object(SchemaTransformer, "process")
     @mock.patch.object(SchemaTransformer, "__init__", return_value=None)
-    def test_generate_with_configuration_file(self, mock_init, mock_process_schemas):
+    def test_generate_with_configuration_file(self, mock_init, mock_process):
         file_path = Path(tempfile.mktemp())
         config = GeneratorConfig()
         config.output.package = "foo.bar"
@@ -124,10 +113,10 @@ class CliTests(TestCase):
         self.assertEqual("foo.bar", config.output.package)
         self.assertEqual(OutputFormat.DATACLASS, config.output.format)
         self.assertEqual(OutputStructure.NAMESPACES, config.output.structure)
-        self.assertEqual([source.as_uri()], mock_process_schemas.call_args[0][0])
+        self.assertEqual([source.as_uri()], mock_process.call_args[0][0])
         file_path.unlink()
 
-    @mock.patch.object(SchemaTransformer, "process_schemas")
+    @mock.patch.object(SchemaTransformer, "process")
     @mock.patch.object(SchemaTransformer, "__init__", return_value=None)
     def test_generate_with_configuration_file_override_package(self, mock_init, _):
         file_path = Path(tempfile.mktemp())
@@ -208,19 +197,11 @@ class CliTests(TestCase):
         mock_wget.assert_called_once_with(uri)
 
     def test_resolve_source(self):
-        file = fixtures_dir.joinpath("defxmlschema/chapter03.xsd")
+        hello_path = fixtures_dir.joinpath("hello")
+
+        file = hello_path.joinpath("hello.xsd")
         url = "http://www.xsdata/schema.xsd"
 
-        self.assertEqual([file.as_uri()], list(resolve_source(str(file), wsdl=False)))
-        self.assertEqual([url], list(resolve_source(url, wsdl=False)))
-        self.assertEqual(
-            [x.as_uri() for x in fixtures_dir.glob("*.xsd")],
-            list(resolve_source(str(fixtures_dir), wsdl=False)),
-        )
-
-        with self.assertRaises(CodeGenerationError) as cm:
-            list(resolve_source(str(fixtures_dir), wsdl=True))
-
-        self.assertEqual(
-            "WSDL mode doesn't support scanning directories.", str(cm.exception)
-        )
+        self.assertEqual([file.as_uri()], list(resolve_source(str(file))))
+        self.assertEqual([url], list(resolve_source(url)))
+        self.assertEqual(5, len(list(resolve_source(str(hello_path)))))

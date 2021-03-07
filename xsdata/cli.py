@@ -10,7 +10,6 @@ from click_default_group import DefaultGroup
 from pkg_resources import get_distribution
 
 from xsdata.codegen.transformer import SchemaTransformer
-from xsdata.exceptions import CodeGenerationError
 from xsdata.logger import logger
 from xsdata.models.config import DocstringStyle
 from xsdata.models.config import GeneratorConfig
@@ -88,7 +87,6 @@ def download(source: str, output: str):
     help="Docstring Style",
     default="reStructuredText",
 )
-@click.option("--wsdl", is_flag=True, default=False, help="WSDL Mode (experimental)")
 @click.option("--print", is_flag=True, default=False, help="Print output")
 @click.option(
     "--ns-struct",
@@ -117,35 +115,27 @@ def generate(**kwargs: Any):
         config = GeneratorConfig()
         config.output.format = OutputFormat(kwargs["output"])
         config.output.package = kwargs["package"]
-        config.output.wsdl = kwargs["wsdl"]
         config.output.compound_fields = kwargs["compound_fields"]
         config.output.docstring_style = DocstringStyle(kwargs["docstring_style"])
 
         if kwargs["ns_struct"]:
             config.output.structure = OutputStructure.NAMESPACES
 
-    uris = resolve_source(kwargs["source"], wsdl=config.output.wsdl)
+    uris = resolve_source(kwargs["source"])
     transformer = SchemaTransformer(config=config, print=kwargs["print"])
-
-    if config.output.wsdl:
-        transformer.process_definitions(next(uris))
-    else:
-        transformer.process_schemas(list(uris))
+    transformer.process(list(uris))
 
 
-def resolve_source(source: str, wsdl: bool) -> Iterator[str]:
+def resolve_source(source: str) -> Iterator[str]:
     if source.find("://") > -1 and not source.startswith("file://"):
         yield source
     else:
         path = Path(source).resolve()
         if path.is_dir():
-
-            if wsdl:
-                raise CodeGenerationError(
-                    "WSDL mode doesn't support scanning directories."
-                )
-
-            yield from (x.as_uri() for x in path.glob("*.xsd"))
+            sources = [x.as_uri() for x in path.glob("*.wsdl")]
+            sources.extend([x.as_uri() for x in path.glob("*.xsd")])
+            sources.extend([x.as_uri() for x in path.glob("*.xml")])
+            yield from sources
         else:  # is file
             yield path.as_uri()
 

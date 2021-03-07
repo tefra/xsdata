@@ -135,7 +135,6 @@ class GeneratorOutput:
     """
     Main generator output options.
 
-    :param wsdl: Enable wsdl mode
     :param max_line_length: Maximum line length
     :param package: Package name eg foo.bar.models
     :param format: Select an output format
@@ -145,7 +144,6 @@ class GeneratorOutput:
         Enable if elements ordering matters for your case.
     """
 
-    wsdl: bool = attribute(default=False)
     max_line_length: int = attribute(default=79)
     package: str = element(default="generated")
     format: OutputFormat = element(default=OutputFormat.DATACLASS)

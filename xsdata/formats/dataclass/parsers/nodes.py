@@ -33,7 +33,7 @@ from xsdata.models.enums import EventType
 Parsed = Tuple[Optional[str], Any]
 NoneStr = Optional[str]
 
-FIND_MODES = (FindMode.NOT_WILDCARD, FindMode.WILDCARD)
+FIND_MODES = (FindMode.ELEMENT, FindMode.WILDCARD)
 
 
 @dataclass

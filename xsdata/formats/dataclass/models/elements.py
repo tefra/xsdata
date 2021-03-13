@@ -207,7 +207,7 @@ class FindMode:
     TEXT = 3
     WILDCARD = 4
     MIXED_CONTENT = 5
-    NOT_WILDCARD = 6
+    ELEMENT = 6
 
 
 find_predicates = {
@@ -217,7 +217,7 @@ find_predicates = {
     FindMode.TEXT: lambda x: x.text,
     FindMode.WILDCARD: lambda x: x.wildcard,
     FindMode.MIXED_CONTENT: lambda x: x.mixed,
-    FindMode.NOT_WILDCARD: lambda x: not x.wildcard,
+    FindMode.ELEMENT: lambda x: x.element or x.elements,
 }
 
 

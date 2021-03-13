@@ -83,7 +83,7 @@ class ParserUtils:
         while len(objects) > position:
             qname, value = objects.pop(position)
 
-            arg = meta.find_var(qname, FindMode.NOT_WILDCARD)
+            arg = meta.find_var(qname, FindMode.ELEMENT)
             if arg and cls.bind_var(params, arg, value):
                 continue
 

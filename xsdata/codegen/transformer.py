@@ -7,31 +7,32 @@ from typing import Dict
 from typing import List
 from typing import Optional
 from typing import Tuple
-from typing import Union
 from urllib.parse import urlparse
 from urllib.request import urlopen
 
 from xsdata.codegen.analyzer import ClassAnalyzer
 from xsdata.codegen.container import ClassContainer
 from xsdata.codegen.mappers.definitions import DefinitionsMapper
+from xsdata.codegen.mappers.element import ElementMapper
 from xsdata.codegen.mappers.schema import SchemaMapper
 from xsdata.codegen.models import Class
 from xsdata.codegen.parsers.definitions import DefinitionsParser
 from xsdata.codegen.parsers.schema import SchemaParser
 from xsdata.codegen.writer import CodeWriter
 from xsdata.exceptions import CodeGenerationError
+from xsdata.formats.dataclass.models.generics import AnyElement
+from xsdata.formats.dataclass.parsers import TreeParser
 from xsdata.logger import logger
 from xsdata.models.config import GeneratorConfig
 from xsdata.models.enums import COMMON_SCHEMA_DIR
 from xsdata.models.wsdl import Definitions
-from xsdata.models.xsd import Import
-from xsdata.models.xsd import Include
-from xsdata.models.xsd import Override
-from xsdata.models.xsd import Redefine
 from xsdata.models.xsd import Schema
 from xsdata.utils import collections
 
-Included = Union[Import, Include, Redefine, Override]
+TYPE_UNKNOWN = 0
+TYPE_SCHEMA = 1
+TYPE_DEFINITION = 2
+TYPE_DOCUMENT = 3
 
 
 @dataclass
@@ -48,15 +49,21 @@ class SchemaTransformer:
     config: GeneratorConfig
     class_map: Dict[str, List[Class]] = field(init=False, default_factory=dict)
     processed: List[str] = field(init=False, default_factory=list)
+    preloaded: Dict = field(init=False, default_factory=dict)
 
     def process(self, uris: List[str]):
-        self.process_definitions([uri for uri in uris if uri.endswith("wsdl")])
-        self.process_schemas([uri for uri in uris if uri.endswith("xsd")])
-        # self.process_schemas([uri for uri in uris if uri.endswith("xml")])
+        sources = defaultdict(list)
+        for uri in uris:
+            tp = self.classify_resource(uri)
+            sources[tp].append(uri)
+
+        self.process_definitions(sources[TYPE_DEFINITION])
+        self.process_schemas(sources[TYPE_SCHEMA])
+        self.process_documents(sources[TYPE_DOCUMENT])
         self.process_classes()
 
     def process_definitions(self, uris: List[str]):
-        """Process a single wsdl resource."""
+        """Process a list of wsdl resources."""
         definitions = None
         for uri in uris:
             services = self.parse_definitions(uri, namespace=None)
@@ -70,7 +77,26 @@ class SchemaTransformer:
             self.convert_definitions(definitions)
 
     def process_schemas(self, uris: List[str]):
-        collections.apply(uris, self.process_schema)
+        """Process a list of xsd resources."""
+        for uri in uris:
+            self.process_schema(uri)
+
+    def process_schema(self, uri: str, namespace: Optional[str] = None):
+        """Parse and convert schema to codegen models."""
+        schema = self.parse_schema(uri, namespace)
+        if schema:
+            self.convert_schema(schema)
+
+    def process_documents(self, uris: List[str]):
+        """Process a list of xml resources."""
+
+        parser = TreeParser()
+        for uri in uris:
+            input_stream = self.load_resource(uri)
+            if input_stream:
+                logger.info("Parsing document %s", os.path.basename(uri))
+                any_element: AnyElement = parser.from_bytes(input_stream)
+                self.class_map[uri] = ElementMapper.map(any_element)
 
     def process_classes(self):
         """Process the generated classes and write or print the final
@@ -96,12 +122,6 @@ class SchemaTransformer:
                 writer.write(classes)
         else:
             raise CodeGenerationError("Nothing to generate.")
-
-    def process_schema(self, uri: str, namespace: Optional[str] = None):
-        """Parse and convert schema to codegen models."""
-        schema = self.parse_schema(uri, namespace)
-        if schema:
-            self.convert_schema(schema)
 
     def convert_schema(self, schema: Schema):
         """Convert a schema instance to codegen classes and process imports to
@@ -174,20 +194,45 @@ class SchemaTransformer:
 
     def load_resource(self, uri: str) -> Optional[bytes]:
         """Read and return the contents of the given uri."""
-
-        # except OSError:
-        # except RecursionError:
-
         if uri not in self.processed:
             try:
                 self.processed.append(uri)
-                return urlopen(uri).read()  # nosec
+                return self.preloaded.pop(uri, None) or urlopen(uri).read()  # nosec
             except OSError:
                 logger.warning("Resource not found %s", uri)
         else:
             logger.debug("Skipping already processed: %s", os.path.basename(uri))
 
         return None
+
+    def classify_resource(self, uri: str) -> int:
+        """Detect the resource type by the uri extension or the file
+        contents."""
+        if uri.endswith("wsdl"):
+            return TYPE_DEFINITION
+
+        if uri.endswith("xsd"):
+            return TYPE_SCHEMA
+
+        if uri.endswith("xml"):
+            return TYPE_DOCUMENT
+
+        src = self.load_resource(uri)
+        if src is None:
+            return TYPE_UNKNOWN
+
+        self.preloaded[uri] = src
+        self.processed.clear()
+
+        text = src.decode("utf-8").strip()
+
+        if text.endswith("schema>"):
+            return TYPE_SCHEMA
+
+        if text.endswith("definitions>"):
+            return TYPE_DEFINITION
+
+        return TYPE_DOCUMENT
 
     def analyze_classes(self, classes: List[Class]) -> List[Class]:
         """Analyzer the given class list and simplify attributes and

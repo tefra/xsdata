@@ -1,3 +1,4 @@
+import tempfile
 from pathlib import Path
 from unittest import mock
 
@@ -6,11 +7,14 @@ from tests.factories import FactoryTestCase
 from xsdata.codegen.analyzer import ClassAnalyzer
 from xsdata.codegen.container import ClassContainer
 from xsdata.codegen.mappers.definitions import DefinitionsMapper
+from xsdata.codegen.mappers.element import ElementMapper
 from xsdata.codegen.mappers.schema import SchemaMapper
 from xsdata.codegen.parsers import DefinitionsParser
 from xsdata.codegen.transformer import SchemaTransformer
 from xsdata.codegen.writer import CodeWriter
 from xsdata.exceptions import CodeGenerationError
+from xsdata.formats.dataclass.models.generics import AnyElement
+from xsdata.formats.dataclass.parsers import TreeParser
 from xsdata.models.config import GeneratorConfig
 from xsdata.models.enums import Namespace
 from xsdata.models.wsdl import Binding
@@ -27,6 +31,32 @@ class SchemaTransformerTests(FactoryTestCase):
         config = GeneratorConfig()
         self.transformer = SchemaTransformer(print=True, config=config)
         super().setUp()
+
+    @mock.patch.object(SchemaTransformer, "process_classes")
+    @mock.patch.object(SchemaTransformer, "process_documents")
+    @mock.patch.object(SchemaTransformer, "process_schemas")
+    @mock.patch.object(SchemaTransformer, "process_definitions")
+    def test_process(
+        self,
+        mock_process_definitions,
+        mock_process_schemas,
+        mock_process_documents,
+        mock_process_classes,
+    ):
+        uris = [
+            "a.wsdl",
+            "b.wsdl",
+            "c.xsd",
+            "d.xsd",
+            "e.xml",
+            "f.xml",
+        ]
+
+        self.transformer.process(uris)
+        mock_process_definitions.assert_called_once_with(uris[:2])
+        mock_process_schemas.assert_called_once_with(uris[2:4])
+        mock_process_documents.assert_called_once_with(uris[4:])
+        mock_process_classes.assert_called_once_with()
 
     @mock.patch.object(SchemaTransformer, "convert_schema")
     @mock.patch.object(SchemaTransformer, "convert_definitions")
@@ -61,6 +91,32 @@ class SchemaTransformerTests(FactoryTestCase):
 
         mock_process_schema.assert_has_calls([mock.call(uri) for uri in uris])
 
+    @mock.patch.object(ElementMapper, "map")
+    @mock.patch.object(TreeParser, "from_bytes")
+    @mock.patch.object(SchemaTransformer, "load_resource")
+    def test_process_documents(self, mock_load_resource, mock_from_bytes, mock_map):
+        uris = ["a.xml", "b.xml", "c.xml"]
+        resources = [b"a", None, b"c"]
+        elements = [AnyElement(), AnyElement()]
+
+        mock_load_resource.side_effect = resources
+        mock_from_bytes.side_effect = elements
+        mock_map.side_effect = [ClassFactory.list(2), ClassFactory.list(3)]
+
+        self.transformer.process_documents(uris)
+
+        self.assertIn(uris[0], self.transformer.class_map)
+        self.assertNotIn(uris[1], self.transformer.class_map)
+        self.assertIn(uris[2], self.transformer.class_map)
+
+        self.assertEqual(2, len(self.transformer.class_map[uris[0]]))
+        self.assertEqual(3, len(self.transformer.class_map[uris[2]]))
+
+        mock_from_bytes.assert_has_calls(
+            [mock.call(resources[0]), mock.call(resources[2])]
+        )
+        mock_map.assert_has_calls([mock.call(x) for x in elements])
+
     @mock.patch("xsdata.codegen.transformer.logger.info")
     @mock.patch.object(CodeWriter, "print")
     @mock.patch.object(SchemaTransformer, "analyze_classes")
@@ -72,7 +128,6 @@ class SchemaTransformerTests(FactoryTestCase):
         mock_writer_print,
         mock_logger_into,
     ):
-        package = "test"
         schema_classes = ClassFactory.list(3)
         analyzer_classes = ClassFactory.list(2)
         mock_analyze_classes.return_value = analyzer_classes
@@ -105,7 +160,6 @@ class SchemaTransformerTests(FactoryTestCase):
         mock_writer_write,
         mock_logger_into,
     ):
-        package = "test"
         schema_classes = ClassFactory.list(3)
         analyzer_classes = ClassFactory.list(2)
         mock_analyze_classes.return_value = analyzer_classes
@@ -267,6 +321,29 @@ class SchemaTransformerTests(FactoryTestCase):
         mock_debug.assert_called_once_with(
             "Skipping already processed: %s", "test_transformer.py"
         )
+
+    def test_classify_resource(self):
+        self.assertEqual(0, self.transformer.classify_resource("file://notexists"))
+        self.assertEqual(1, self.transformer.classify_resource("a.xsd"))
+        self.assertEqual(2, self.transformer.classify_resource("a.wsdl"))
+        self.assertEqual(2, self.transformer.classify_resource("a?wsdl"))
+        self.assertEqual(3, self.transformer.classify_resource("a.xml"))
+
+        with tempfile.NamedTemporaryFile() as fp:
+            fp.write(b"</xs:schema>  \n")
+            fp.flush()
+            uri = Path(fp.name).as_uri()
+            self.assertEqual(1, self.transformer.classify_resource(uri))
+
+        with tempfile.NamedTemporaryFile() as fp:
+            fp.write(b"</xs:definitions>  \n")
+            fp.flush()
+            uri = Path(fp.name).as_uri()
+            self.assertEqual(2, self.transformer.classify_resource(uri))
+
+        with tempfile.NamedTemporaryFile() as fp:
+            uri = Path(fp.name).as_uri()
+            self.assertEqual(3, self.transformer.classify_resource(uri))
 
     @mock.patch("xsdata.codegen.transformer.logger.warning")
     def test_load_resource_missing(self, mock_warning):

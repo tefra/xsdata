@@ -320,4 +320,7 @@ class ParserUtils:
 
             return 0.0
 
-        return sum(score(getattr(obj, var.name)) for var in fields(obj))
+        if is_dataclass(obj):
+            return sum(score(getattr(obj, var.name)) for var in fields(obj))
+
+        return score(obj)

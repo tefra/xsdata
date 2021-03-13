@@ -127,7 +127,7 @@ class ParserUtilsTests(TestCase):
 
     @mock.patch("xsdata.formats.dataclass.parsers.utils.logger.warning")
     def test_bind_objects_with_unassigned_object(self, mock_warning):
-        a = make_dataclass("a", [("x", int)])
+        a = make_dataclass("a", [("x", int), ("z", float)])
         meta = XmlContext().build(a)
         params = {}
         objects = [("x", 1), ("y", 2)]
@@ -380,3 +380,7 @@ class ParserUtilsTests(TestCase):
 
         cls = make_dataclass("b", [("x", int), ("y", str), ("z", Any)])
         self.assertEqual(2.5, ParserUtils.score_object(cls(1, "1", None)))
+
+        self.assertEqual(-1, ParserUtils.score_object(None))
+        self.assertEqual(1.0, ParserUtils.score_object("a"))
+        self.assertEqual(1.5, ParserUtils.score_object(2.9))

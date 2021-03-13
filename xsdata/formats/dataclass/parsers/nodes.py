@@ -2,6 +2,7 @@ import copy
 import warnings
 from dataclasses import dataclass
 from dataclasses import field
+from dataclasses import is_dataclass
 from typing import Any
 from typing import Dict
 from typing import Iterator
@@ -29,6 +30,7 @@ from xsdata.formats.dataclass.parsers.mixins import XmlNode
 from xsdata.formats.dataclass.parsers.utils import ParserUtils
 from xsdata.models.enums import DataType
 from xsdata.models.enums import EventType
+from xsdata.utils.namespaces import target_uri
 
 Parsed = Tuple[Optional[str], Any]
 NoneStr = Optional[str]
@@ -288,8 +290,15 @@ class UnionNode(XmlNode):
 
         obj = None
         max_score = -1.0
+        parent_namespace = target_uri(qname)
         for clazz in self.var.types:
-            candidate = self.parse_class(clazz)
+
+            if is_dataclass(clazz):
+                self.context.build(clazz, parent_ns=parent_namespace)
+                candidate = self.parse_class(clazz)
+            else:
+                candidate = self.parse_value(text, [clazz])
+
             score = ParserUtils.score_object(candidate)
             if score > max_score:
                 max_score = score
@@ -303,16 +312,22 @@ class UnionNode(XmlNode):
         raise ParserError(f"Failed to parse union node: {self.var.qname}")
 
     def parse_class(self, clazz: Type[T]) -> Optional[T]:
-        """
-        Initialize a new XmlParser and try to parse the given element.
-
-        Treat converter warnings as errors and return None.
-        """
+        """Initialize a new XmlParser and try to parse the given element, treat
+        converter warnings as errors and return None."""
         try:
             with warnings.catch_warnings():
                 warnings.filterwarnings("error", category=ConverterWarning)
-                parser = NodeParser(context=self.context)
+                parser = NodeParser(context=self.context, handler=EventsHandler)
                 return parser.parse(self.events, clazz)
+        except Exception:
+            return None
+
+    def parse_value(self, value: Any, types: List[Type]) -> Any:
+        """Parse simple values, treat warnings as errors and return None."""
+        try:
+            with warnings.catch_warnings():
+                warnings.filterwarnings("error", category=ConverterWarning)
+                return ParserUtils.parse_value(value, types, ns_map=self.ns_map)
         except Exception:
             return None
 

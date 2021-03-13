@@ -28,7 +28,6 @@ from xsdata.formats.dataclass.parsers.nodes import StandardNode
 from xsdata.formats.dataclass.parsers.nodes import UnionNode
 from xsdata.formats.dataclass.parsers.nodes import WildcardNode
 from xsdata.formats.dataclass.parsers.utils import ParserUtils
-from xsdata.models.datatype import XmlHexBinary
 from xsdata.models.enums import DataType
 from xsdata.models.enums import Namespace
 from xsdata.models.enums import QNames
@@ -522,7 +521,7 @@ class UnionNodeTests(TestCase):
         self.assertEqual(0, node.level)
         self.assertEqual([("end", "bar", "text", "tail")], node.events)
 
-    def test_bind_returns_best_matching_dataclass(self):
+    def test_bind_returns_best_matching_object(self):
         @dataclass
         class Item:
             value: str = field()
@@ -545,18 +544,26 @@ class UnionNodeTests(TestCase):
         node = UnionNode(position=0, var=var, context=ctx, attrs=attrs, ns_map=ns_map)
         objects = []
 
-        self.assertTrue(node.bind("item", "foo", None, objects))
+        self.assertTrue(node.bind("item", "1", None, objects))
         self.assertIsInstance(objects[-1][1], Item)
         self.assertEqual(1, objects[-1][1].a)
         self.assertEqual(2, objects[-1][1].b)
-        self.assertEqual("foo", objects[-1][1].value)
+        self.assertEqual("1", objects[-1][1].value)
         self.assertEqual("item", objects[-1][0])
 
         self.assertEqual(2, len(node.events))
         self.assertEqual(("start", "item", attrs, ns_map), node.events[0])
-        self.assertEqual(("end", "item", "foo", None), node.events[1])
+        self.assertEqual(("end", "item", "1", None), node.events[1])
         self.assertIsNot(node.attrs, node.events[0][2])
         self.assertIs(node.ns_map, node.events[0][3])
+
+        node.events.clear()
+        node.attrs.clear()
+        self.assertTrue(node.bind("item", "1", None, objects))
+        self.assertEqual(1, objects[-1][1])
+
+        self.assertTrue(node.bind("item", "a", None, objects))
+        self.assertEqual("a", objects[-1][1])
 
     def test_bind_raises_parser_error_on_failure(self):
         @dataclass

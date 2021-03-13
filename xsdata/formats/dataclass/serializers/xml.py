@@ -146,14 +146,8 @@ class XmlSerializer(AbstractSerializer):
             yield from self.write_elements(value, var, namespace)
         elif var.list_element and isinstance(value, list):
             yield from self.write_list(value, var, namespace)
-        elif var.any_type or var.wildcard:
-            yield from self.write_any_type(value, var, namespace)
-        elif var.dataclass:
-            yield from self.write_xsi_type(value, var, namespace)
-        elif var.element:
-            yield from self.write_element(value, var, namespace)
         else:
-            raise SerializerError(f"Unhandled xml var: `{var.__class__.__name__}`")
+            yield from self.write_any_type(value, var, namespace)
 
     def write_list(self, values: List, var: XmlVar, namespace: NoneStr) -> Generator:
         """Produce an events stream for the given list of values."""

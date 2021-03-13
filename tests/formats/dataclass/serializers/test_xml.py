@@ -463,16 +463,6 @@ class XmlSerializerTests(TestCase):
         self.assertIsInstance(result, Generator)
         self.assertEqual(expected, list(result))
 
-    def test_write_value_with_unhandled_xml_var(self):
-        foo = make_dataclass("foo", [], bases=(XmlVar,))
-        var = foo(qname="a", name="a", list_element=True)
-        result = self.serializer.write_value("123", var, "xsdata")
-
-        with self.assertRaises(SerializerError) as cm:
-            list(result)
-
-        self.assertEqual("Unhandled xml var: `foo`", str(cm.exception))
-
     def test_next_value(self):
         obj = A(x0=1, x1=[2, 3, 4], x2=[6, 7], x3=[9])
         meta = self.serializer.context.build(A)

@@ -14,8 +14,8 @@ class PlantUmlGeneratorTests(FactoryTestCase):
 
     def test_render(self):
         classes = [
-            ClassFactory.elements(2),
-            ClassFactory.elements(3),
+            ClassFactory.elements(2, package="foo"),
+            ClassFactory.elements(3, package="foo"),
         ]
 
         iterator = self.generator.render(classes)

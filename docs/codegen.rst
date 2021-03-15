@@ -28,12 +28,16 @@ Generate is the default subcommand of the command line interface and can be omit
 
     $ xsdata http://www.gstatic.com/localfeed/local_feed.xsd --package feeds --print
 
+    $ xsdata https://musicbrainz.org/ws/2/artist/1f9df192-a621-4f54-8850-2c5373b7eac9 --print
+
 
 SOURCE
 ------
 
-You can pass the file path or uri to a schema or a whole directory with multiple
-definitions.
+The generator can work with xml schemas, wsdl services and xml documents directly.
+
+You can pass the path to a file or a remote resource or event a directory with multiple
+sources.
 
 
 config
@@ -115,19 +119,6 @@ verbosity
 Specify the log level, default is ``INFO``
 
 Available options: ``CRITICAL``, ``ERROR``, ``WARNING``, ``INFO`` or ``DEBUG``
-
-
-wsdl
-----
-
-Generate models and services from a wsdl source.
-
-
-.. admonition:: Experimental
-    :class: danger
-
-    This feature is experimental and only a small subset of features have been
-    implemented, WSDL 1.1 & SOAP 1.1 bindings.
 
 
 print

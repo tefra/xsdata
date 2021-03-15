@@ -1,0 +1,46 @@
+<metadata xmlns="http://musicbrainz.org/ns/mmd-2.0#">
+  <artist id="b95ce3ff-3d05-4e87-9e01-c97b66af13d4" type="Person" type-id="b6e035f4-3ce9-331c-97df-83397230b0df">
+    <name>Eminem</name>
+    <sort-name>Eminem</sort-name>
+    <ipi>00354929235</ipi>
+    <ipi-list>
+      <ipi>00354929235</ipi>
+      <ipi>00354929431</ipi>
+    </ipi-list>
+    <isni-list>
+      <isni>0000000117699370</isni>
+      <isni>0000000368611900</isni>
+    </isni-list>
+    <gender id="36d3d30a-839d-3eda-8cb3-29be4384e4a9">Male</gender>
+    <country>US</country>
+    <area id="489ce91b-6658-3307-9877-795b68554c98">
+      <name>United States</name>
+      <sort-name>United States</sort-name>
+      <iso-3166-1-code-list>
+        <iso-3166-1-code>US</iso-3166-1-code>
+      </iso-3166-1-code-list>
+    </area>
+    <begin-area id="bfae8151-2ba2-4f8f-bf2e-8fc16ce352c6">
+      <name>St. Joseph</name>
+      <sort-name>St. Joseph</sort-name>
+    </begin-area>
+    <life-span>
+      <begin>1972-10-17</begin>
+    </life-span>
+    <alias-list count="13">
+      <alias sort-name="EMINƎM" type="Search hint" type-id="1937e404-b981-3cb7-8151-4c86ebfc8d8e">EMINƎM</alias>
+      <alias sort-name="Em" type="Artist name" type-id="894afba6-2816-3c24-8072-eadb66bd04bc">Em</alias>
+      <alias locale="en" sort-name="Eminem" type="Artist name" type-id="894afba6-2816-3c24-8072-eadb66bd04bc" primary="primary">Eminem</alias>
+      <alias sort-name="EminemMusic" type="Search hint" type-id="1937e404-b981-3cb7-8151-4c86ebfc8d8e">EminemMusic</alias>
+      <alias sort-name="M&amp;M" type="Artist name" type-id="894afba6-2816-3c24-8072-eadb66bd04bc">M&amp;M</alias>
+      <alias sort-name="M. Mathers" type="Search hint" type-id="1937e404-b981-3cb7-8151-4c86ebfc8d8e">M. Mathers</alias>
+      <alias sort-name="Marshall B. Mathers III" type="Search hint" type-id="1937e404-b981-3cb7-8151-4c86ebfc8d8e">Marshall B. Mathers III</alias>
+      <alias sort-name="Mathers, Marshall Bruce, III" type="Legal name" type-id="d4dcd0c0-b341-3612-a332-c0ce797b25cf">Marshall Bruce Mathers III</alias>
+      <alias sort-name="Marshall Mathers III" type="Search hint" type-id="1937e404-b981-3cb7-8151-4c86ebfc8d8e">Marshall Mathers III</alias>
+      <alias sort-name="Ominem">Ominem</alias>
+      <alias sort-name="Slim Shady" type="Artist name" type-id="894afba6-2816-3c24-8072-eadb66bd04bc">Slim Shady</alias>
+      <alias sort-name="The Real Slim Shady">The Real Slim Shady</alias>
+      <alias locale="ja" sort-name="エミネム" type="Artist name" type-id="894afba6-2816-3c24-8072-eadb66bd04bc" primary="primary">エミネム</alias>
+    </alias-list>
+  </artist>
+</metadata>

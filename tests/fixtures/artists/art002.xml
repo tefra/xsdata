@@ -1,0 +1,34 @@
+<metadata xmlns="http://musicbrainz.org/ns/mmd-2.0#">
+  <artist id="66c662b6-6e2f-4930-8610-912e24c63ed1" type="Group" type-id="e431f5f6-b5d2-343d-8b36-72607fffb74b">
+    <name>AC/DC</name>
+    <sort-name>AC/DC</sort-name>
+    <disambiguation>Australian hard rock band</disambiguation>
+    <isni-list>
+      <isni>000000012271298X</isni>
+    </isni-list>
+    <country>AU</country>
+    <area id="106e0bec-b638-3b37-b731-f53d507dc00e">
+      <name>Australia</name>
+      <sort-name>Australia</sort-name>
+      <iso-3166-1-code-list>
+        <iso-3166-1-code>AU</iso-3166-1-code>
+      </iso-3166-1-code-list>
+    </area>
+    <begin-area id="3f179da4-83c6-4a28-a627-e46b4a8ff1ed">
+      <name>Sydney</name>
+      <sort-name>Sydney</sort-name>
+    </begin-area>
+    <life-span>
+      <begin>1973-11</begin>
+    </life-span>
+    <alias-list count="7">
+      <alias sort-name="AC DC">AC DC</alias>
+      <alias sort-name="AC-DC">AC-DC</alias>
+      <alias sort-name="AC.DC">AC.DC</alias>
+      <alias sort-name="AC?DC">AC?DC</alias>
+      <alias sort-name="ACDC">ACDC</alias>
+      <alias sort-name="AC\DC">AC\DC</alias>
+      <alias sort-name="Ballbreaker">Ballbreaker</alias>
+    </alias-list>
+  </artist>
+</metadata>

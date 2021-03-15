@@ -1,0 +1,72 @@
+<metadata xmlns="http://musicbrainz.org/ns/mmd-2.0#">
+  <artist id="1f9df192-a621-4f54-8850-2c5373b7eac9" type="Person" type-id="b6e035f4-3ce9-331c-97df-83397230b0df">
+    <name>Ludwig van Beethoven</name>
+    <sort-name>Beethoven, Ludwig van</sort-name>
+    <disambiguation>German composer</disambiguation>
+    <ipi>00002507239</ipi>
+    <ipi-list>
+      <ipi>00002507239</ipi>
+    </ipi-list>
+    <isni-list>
+      <isni>0000000121268987</isni>
+    </isni-list>
+    <gender id="36d3d30a-839d-3eda-8cb3-29be4384e4a9">Male</gender>
+    <country>DE</country>
+    <area id="85752fda-13c4-31a3-bee5-0e5cb1f51dad">
+      <name>Germany</name>
+      <sort-name>Germany</sort-name>
+      <iso-3166-1-code-list>
+        <iso-3166-1-code>DE</iso-3166-1-code>
+      </iso-3166-1-code-list>
+    </area>
+    <begin-area id="b86b7e97-c4e2-4ec2-942b-5a6cd8eea1da">
+      <name>Bonn</name>
+      <sort-name>Bonn</sort-name>
+    </begin-area>
+    <end-area id="afff1a94-a98b-4322-8874-3148139ab6da">
+      <name>Wien</name>
+      <sort-name>Wien</sort-name>
+      <iso-3166-2-code-list>
+        <iso-3166-2-code>AT-9</iso-3166-2-code>
+      </iso-3166-2-code-list>
+    </end-area>
+    <life-span>
+      <begin>1770-12-17</begin>
+      <end>1827-03-26</end>
+      <ended>true</ended>
+    </life-span>
+    <alias-list count="31">
+      <alias sort-name="Beethoven" type="Artist name" type-id="894afba6-2816-3c24-8072-eadb66bd04bc">Beethoven</alias>
+      <alias sort-name="Beethoven _ Ludwig Van">Beethoven _ Ludwig Van</alias>
+      <alias sort-name="Beethoven, Ludwig">Beethoven, Ludwig</alias>
+      <alias sort-name="Beethoven, Ludwig Van">Beethoven, Ludwig Van</alias>
+      <alias sort-name="Beethoven, Ludwig Van (1770 - 1827)">Beethoven, Ludwig Van (1770 - 1827)</alias>
+      <alias sort-name="Beethoven, Ludwig Von">Beethoven, Ludwig Von</alias>
+      <alias sort-name="Beethoven, Ludwig van (1770-1827)">Beethoven, Ludwig van (1770-1827)</alias>
+      <alias sort-name="Beethoven, Ludwig van, 1770-1827">Beethoven, Ludwig van, 1770-1827</alias>
+      <alias sort-name="Bethoveen" type="Search hint" type-id="1937e404-b981-3cb7-8151-4c86ebfc8d8e">Bethoveen</alias>
+      <alias sort-name="L v Beethoven">L v Beethoven</alias>
+      <alias locale="lv" sort-name="Bēthovens, L. Van">L. Van Bēthovens</alias>
+      <alias sort-name="Beethoven, L. Von">L. Von Beethoven</alias>
+      <alias sort-name="Beethoven, L. van">L. van Beethoven</alias>
+      <alias locale="en" sort-name="Beethoven, L.Van">L.Van Beethoven</alias>
+      <alias sort-name="Beethoven, Ludvig Von">Ludvig Von Beethoven</alias>
+      <alias sort-name="Beethoven, Ludvig van">Ludvig van Beethoven</alias>
+      <alias locale="lv" sort-name="Ludvigs van Bēthovens" primary="primary">Ludvigs van Bēthovens</alias>
+      <alias sort-name="Beethoven, Ludwid van">Ludwid van Beethoven</alias>
+      <alias sort-name="Beethoven, Ludwig">Ludwig Beethoven</alias>
+      <alias sort-name="Beethoven, Ludwig Van (1770-1827)">Ludwig Van Beethoven (1770-1827)</alias>
+      <alias sort-name="Beethoven, Ludwig Von">Ludwig Von Beethoven</alias>
+      <alias locale="en" sort-name="Beethoven, Ludwig van" type="Artist name" type-id="894afba6-2816-3c24-8072-eadb66bd04bc" primary="primary">Ludwig van Beethoven</alias>
+      <alias sort-name="LvB" type="Search hint" type-id="1937e404-b981-3cb7-8151-4c86ebfc8d8e">LvB</alias>
+      <alias sort-name="bheetoven" type="Search hint" type-id="1937e404-b981-3cb7-8151-4c86ebfc8d8e">bheetoven</alias>
+      <alias sort-name="Beethoven, Ludwig van" type="Artist name" type-id="894afba6-2816-3c24-8072-eadb66bd04bc">van Beethoven, Ludwig</alias>
+      <alias locale="ru" sort-name="Beethoven">Бетховен</alias>
+      <alias locale="ru" sort-name="Бетховен, Л." type="Artist name" type-id="894afba6-2816-3c24-8072-eadb66bd04bc">Л. Бетховен</alias>
+      <alias locale="ja" sort-name="ベートーヴェン" type="Artist name" type-id="894afba6-2816-3c24-8072-eadb66bd04bc" primary="primary">ベートーヴェン</alias>
+      <alias locale="ja" sort-name="ベートーヴェン ルートヴィヒヴァン" type="Artist name" type-id="894afba6-2816-3c24-8072-eadb66bd04bc">ルートヴィヒ・ヴァン・ベートーヴェン</alias>
+      <alias locale="zh_Hant" sort-name="bèi duō fēn" type="Artist name" type-id="894afba6-2816-3c24-8072-eadb66bd04bc" primary="primary">貝多芬</alias>
+      <alias locale="ko" sort-name="Beethoven">베토벤</alias>
+    </alias-list>
+  </artist>
+</metadata>

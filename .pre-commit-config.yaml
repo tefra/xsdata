@@ -15,7 +15,7 @@ repos:
     hooks:
       - id: black
   - repo: https://gitlab.com/pycqa/flake8
-    rev: 3.8.4
+    rev: 3.9.0
     hooks:
       - id: flake8
         additional_dependencies: [
@@ -42,7 +42,7 @@ repos:
       - id: mypy
         additional_dependencies: [tokenize-rt]
   - repo: https://github.com/asottile/setup-cfg-fmt
-    rev: v1.16.0
+    rev: v1.17.0
     hooks:
       - id: setup-cfg-fmt
         args: ["--max-py-version=3.9"]

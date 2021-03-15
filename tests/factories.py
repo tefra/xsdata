@@ -1,3 +1,4 @@
+import copy
 import random
 import unittest
 from abc import ABC
@@ -78,7 +79,7 @@ class ClassFactory(Factory):
         attrs=None,
         inner=None,
         ns_map=None,
-        package="foo",
+        package=None,
         module="tests",
         status=Status.RAW,
         container=None,
@@ -87,6 +88,9 @@ class ClassFactory(Factory):
     ):
         if not qname:
             qname = build_qname("xsdata", f"class_{cls.next_letter()}")
+
+        if ns_map is None:
+            ns_map = copy.deepcopy(DEFAULT_NS_MAP)
 
         return cls.model(
             qname=qname,
@@ -103,7 +107,7 @@ class ClassFactory(Factory):
             help=help,
             package=package,
             module=module,
-            ns_map=ns_map if isinstance(ns_map, dict) else DEFAULT_NS_MAP,
+            ns_map=ns_map,
             status=status,
             container=container,
             default=default,

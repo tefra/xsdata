@@ -2,7 +2,7 @@
 {% set help | format_docstring(level + 1) %}
     {%- include "docstrings." + docstring_style + ".jinja2" -%}
 {% endset -%}
-{% set parent_namespace = obj.namespace or parent_namespace|default(None) -%}
+{% set parent_namespace = obj.namespace if obj.namespace is not none else parent_namespace|default(None) -%}
 {% set class_name =  obj.name|class_name -%}
 {% set parents = parents|default([obj.name]) %}
 
@@ -11,7 +11,7 @@ class {{ class_name }}{{"({})".format(obj.extensions|map(attribute='type')|map('
 {%- if help %}
 {{ help|indent(4, first=True) }}
 {%- endif -%}
-{%- if parents|length == 1 and (class_name != obj.name or obj.meta_name or obj.namespace or obj.is_nillable) %}
+{%- if parents|length == 1 and (class_name != obj.name or obj.meta_name or obj.namespace is not none or obj.is_nillable) %}
     class Meta:
         {%- if class_name != obj.name or obj.meta_name %}
         name = "{{ obj.meta_name or obj.name }}"
@@ -19,7 +19,7 @@ class {{ class_name }}{{"({})".format(obj.extensions|map(attribute='type')|map('
         {%- if obj.is_nillable %}
         nillable = True
         {%- endif -%}
-        {%- if obj.namespace %}
+        {%- if obj.namespace is not none %}
         namespace = "{{ obj.namespace }}"
         {%- endif %}
 {% elif obj.attrs|length == 0 and not help %}

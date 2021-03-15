@@ -48,10 +48,10 @@ class DataclassGeneratorTests(FactoryTestCase):
 
     def test_render_package(self):
         classes = [
-            ClassFactory.create(qname="a"),
-            ClassFactory.create(qname="b"),
-            ClassFactory.create(qname="c"),
-            ClassFactory.create(qname="a", module="bar"),
+            ClassFactory.create(qname="a", package="foo"),
+            ClassFactory.create(qname="b", package="foo"),
+            ClassFactory.create(qname="c", package="foo"),
+            ClassFactory.create(qname="a", package="foo", module="bar"),
         ]
 
         random.shuffle(classes)

@@ -91,31 +91,35 @@ class SchemaTransformerTests(FactoryTestCase):
 
         mock_process_schema.assert_has_calls([mock.call(uri) for uri in uris])
 
+    @mock.patch.object(ElementMapper, "reduce")
     @mock.patch.object(ElementMapper, "map")
     @mock.patch.object(TreeParser, "from_bytes")
     @mock.patch.object(SchemaTransformer, "load_resource")
-    def test_process_documents(self, mock_load_resource, mock_from_bytes, mock_map):
-        uris = ["a.xml", "b.xml", "c.xml"]
+    def test_process_documents(
+        self, mock_load_resource, mock_from_bytes, mock_map, mock_reduce
+    ):
+        uris = ["foo/a.xml", "foo/b.xml", "foo/c.xml"]
         resources = [b"a", None, b"c"]
         elements = [AnyElement(), AnyElement()]
 
+        classes_a = ClassFactory.list(2)
+        classes_c = ClassFactory.list(3)
+
         mock_load_resource.side_effect = resources
         mock_from_bytes.side_effect = elements
-        mock_map.side_effect = [ClassFactory.list(2), ClassFactory.list(3)]
+        mock_map.side_effect = [classes_a, classes_c]
+        mock_reduce.return_value = classes_a + classes_c
 
         self.transformer.process_documents(uris)
 
-        self.assertIn(uris[0], self.transformer.class_map)
-        self.assertNotIn(uris[1], self.transformer.class_map)
-        self.assertIn(uris[2], self.transformer.class_map)
-
-        self.assertEqual(2, len(self.transformer.class_map[uris[0]]))
-        self.assertEqual(3, len(self.transformer.class_map[uris[2]]))
+        self.assertIn("foo", self.transformer.class_map)
+        self.assertEqual(5, len(self.transformer.class_map["foo"]))
 
         mock_from_bytes.assert_has_calls(
             [mock.call(resources[0]), mock.call(resources[2])]
         )
         mock_map.assert_has_calls([mock.call(x) for x in elements])
+        mock_reduce.assert_called_once_with(classes_a + classes_c)
 
     @mock.patch("xsdata.codegen.transformer.logger.info")
     @mock.patch.object(CodeWriter, "print")
@@ -329,21 +333,19 @@ class SchemaTransformerTests(FactoryTestCase):
         self.assertEqual(2, self.transformer.classify_resource("a?wsdl"))
         self.assertEqual(3, self.transformer.classify_resource("a.xml"))
 
-        with tempfile.NamedTemporaryFile() as fp:
-            fp.write(b"</xs:schema>  \n")
-            fp.flush()
-            uri = Path(fp.name).as_uri()
-            self.assertEqual(1, self.transformer.classify_resource(uri))
+        file_path = Path(tempfile.mktemp())
+        file_path.write_bytes(b"</xs:schema>  \n")
+        self.assertEqual(1, self.transformer.classify_resource(file_path.as_uri()))
 
-        with tempfile.NamedTemporaryFile() as fp:
-            fp.write(b"</xs:definitions>  \n")
-            fp.flush()
-            uri = Path(fp.name).as_uri()
-            self.assertEqual(2, self.transformer.classify_resource(uri))
+        file_path.write_bytes(b"</xs:definitions>  \n")
+        self.transformer.preloaded.clear()
+        self.assertEqual(2, self.transformer.classify_resource(file_path.as_uri()))
 
-        with tempfile.NamedTemporaryFile() as fp:
-            uri = Path(fp.name).as_uri()
-            self.assertEqual(3, self.transformer.classify_resource(uri))
+        file_path.write_bytes(b"</foobar>  \n")
+        self.transformer.preloaded.clear()
+        self.assertEqual(3, self.transformer.classify_resource(file_path.as_uri()))
+
+        file_path.unlink()
 
     @mock.patch("xsdata.codegen.transformer.logger.warning")
     def test_load_resource_missing(self, mock_warning):

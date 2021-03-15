@@ -90,13 +90,17 @@ class SchemaTransformer:
     def process_documents(self, uris: List[str]):
         """Process a list of xml resources."""
 
+        classes = []
         parser = TreeParser()
         for uri in uris:
             input_stream = self.load_resource(uri)
             if input_stream:
                 logger.info("Parsing document %s", os.path.basename(uri))
                 any_element: AnyElement = parser.from_bytes(input_stream)
-                self.class_map[uri] = ElementMapper.map(any_element)
+                classes.extend(ElementMapper.map(any_element))
+
+        dirname = os.path.dirname(uris[0]) if uris else ""
+        self.class_map[dirname] = ElementMapper.reduce(classes)
 
     def process_classes(self):
         """Process the generated classes and write or print the final

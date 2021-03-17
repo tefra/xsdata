@@ -1,9 +1,9 @@
 from pathlib import Path
 
-from tests.factories import ClassFactory
-from tests.factories import FactoryTestCase
 from xsdata.formats.plantuml.generator import PlantUmlGenerator
 from xsdata.models.config import GeneratorConfig
+from xsdata.utils.testing import ClassFactory
+from xsdata.utils.testing import FactoryTestCase
 
 
 class PlantUmlGeneratorTests(FactoryTestCase):

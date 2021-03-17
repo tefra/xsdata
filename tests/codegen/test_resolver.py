@@ -1,16 +1,16 @@
 from unittest import mock
 
-from tests.factories import AttrFactory
-from tests.factories import AttrTypeFactory
-from tests.factories import ClassFactory
-from tests.factories import ExtensionFactory
-from tests.factories import FactoryTestCase
-from tests.factories import PackageFactory
 from xsdata.codegen.models import Class
 from xsdata.codegen.resolver import DependenciesResolver
 from xsdata.exceptions import ResolverValueError
 from xsdata.models.enums import DataType
 from xsdata.utils.namespaces import build_qname
+from xsdata.utils.testing import AttrFactory
+from xsdata.utils.testing import AttrTypeFactory
+from xsdata.utils.testing import ClassFactory
+from xsdata.utils.testing import ExtensionFactory
+from xsdata.utils.testing import FactoryTestCase
+from xsdata.utils.testing import PackageFactory
 
 
 class DependenciesResolverTest(FactoryTestCase):

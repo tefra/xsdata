@@ -1,8 +1,8 @@
-from tests.factories import AttrFactory
-from tests.factories import ClassFactory
-from tests.factories import FactoryTestCase
 from xsdata.codegen.handlers import AttributeMergeHandler
 from xsdata.codegen.models import Restrictions
+from xsdata.utils.testing import AttrFactory
+from xsdata.utils.testing import ClassFactory
+from xsdata.utils.testing import FactoryTestCase
 
 
 class AttributeMergeHandlerTests(FactoryTestCase):

@@ -1,15 +1,15 @@
 from unittest import mock
 
-from tests.factories import AttrFactory
-from tests.factories import AttrTypeFactory
-from tests.factories import ClassFactory
-from tests.factories import ExtensionFactory
-from tests.factories import FactoryTestCase
 from xsdata.codegen.container import ClassContainer
 from xsdata.codegen.utils import ClassUtils
 from xsdata.codegen.validator import ClassValidator
 from xsdata.models.enums import DataType
 from xsdata.models.enums import Tag
+from xsdata.utils.testing import AttrFactory
+from xsdata.utils.testing import AttrTypeFactory
+from xsdata.utils.testing import ClassFactory
+from xsdata.utils.testing import ExtensionFactory
+from xsdata.utils.testing import FactoryTestCase
 
 
 class ClassValidatorTests(FactoryTestCase):

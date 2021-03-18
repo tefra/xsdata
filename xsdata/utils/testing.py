@@ -67,7 +67,7 @@ class Factory(ABC):
     @classmethod
     @abstractmethod
     def create(cls, **kwargs: Any) -> Union[Attr, AttrType, Class, Extension, Import]:
-        pass
+        """Abstract method create."""
 
     @classmethod
     def reset(cls):

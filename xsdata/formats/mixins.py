@@ -5,10 +5,6 @@ from typing import Dict
 from typing import Iterator
 from typing import List
 
-from jinja2 import Environment
-from jinja2 import FileSystemLoader
-from jinja2 import Template
-
 from xsdata.codegen.models import Class
 from xsdata.exceptions import CodeGenerationError
 from xsdata.models.config import GeneratorConfig
@@ -34,25 +30,15 @@ class GeneratorResult:
 
 
 class AbstractGenerator(metaclass=abc.ABCMeta):
-    """
-    Abstract code generator class.
+    """Abstract code generator class."""
 
-    :param tpl_dir: Templates directory
-    :param config: Generator configuration
-    """
-
-    def __init__(self, tpl_dir: str, config: GeneratorConfig):
+    def __init__(self, config: GeneratorConfig):
         """
         Generator constructor.
 
-        Initialize jinja2 environment.
+        :param config Generator configuration
         """
-        self.env = Environment(loader=FileSystemLoader(tpl_dir), autoescape=False)
         self.config = config
-
-    def template(self, name: str) -> Template:
-        """Return the named template from the initialized environment."""
-        return self.env.get_template(f"{name}.jinja2")
 
     def module_name(self, module: str) -> str:
         """Convert the given module name to match the generator conventions."""

@@ -6,12 +6,12 @@ from unittest import mock
 
 from xsdata.codegen.models import Class
 from xsdata.codegen.writer import CodeWriter
+from xsdata.exceptions import CodeGenerationError
 from xsdata.formats.dataclass.generator import DataclassGenerator
 from xsdata.formats.mixins import AbstractGenerator
 from xsdata.formats.mixins import GeneratorResult
 from xsdata.formats.plantuml.generator import PlantUmlGenerator
 from xsdata.models.config import GeneratorConfig
-from xsdata.models.config import OutputFormat
 from xsdata.utils.testing import ClassFactory
 from xsdata.utils.testing import FactoryTestCase
 
@@ -65,11 +65,18 @@ class CodeWriterTests(FactoryTestCase):
 
     def test_from_config(self):
         config = GeneratorConfig()
-        config.output.format = OutputFormat.DATACLASS
+        config.output.format = "dataclasses"
 
         writer = CodeWriter.from_config(config)
         self.assertIsInstance(writer.generator, DataclassGenerator)
 
-        config.output.format = OutputFormat.PLANTUML
+        config.output.format = "plantuml"
+        CodeWriter.unregister_generator("plantuml")
+        with self.assertRaises(CodeGenerationError) as cm:
+            CodeWriter.from_config(config)
+
+        self.assertEqual("Unknown output format: 'plantuml'", str(cm.exception))
+
+        CodeWriter.register_generator("plantuml", PlantUmlGenerator)
         writer = CodeWriter.from_config(config)
         self.assertIsInstance(writer.generator, PlantUmlGenerator)

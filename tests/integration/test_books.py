@@ -24,6 +24,7 @@ def test_books_schema():
             "--docstring-style",
             "Google",
         ],
+        catch_exceptions=False,
     )
 
     if result.exception:

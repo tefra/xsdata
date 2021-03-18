@@ -12,6 +12,7 @@ from xsdata.utils.testing import FactoryTestCase
 class DataclassGeneratorTests(FactoryTestCase):
     def setUp(self):
         super().setUp()
+        self.maxDiff = None
         config = GeneratorConfig()
         self.generator = DataclassGenerator(config)
 

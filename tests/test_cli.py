@@ -10,11 +10,9 @@ from tests import fixtures_dir
 from xsdata.cli import cli
 from xsdata.cli import resolve_source
 from xsdata.codegen.transformer import SchemaTransformer
-from xsdata.exceptions import CodeGenerationError
 from xsdata.logger import logger
 from xsdata.models.config import DocstringStyle
 from xsdata.models.config import GeneratorConfig
-from xsdata.models.config import OutputFormat
 from xsdata.models.config import OutputStructure
 from xsdata.utils.downloader import Downloader
 
@@ -34,7 +32,7 @@ class CliTests(TestCase):
         self.assertIsNone(result.exception)
         self.assertFalse(mock_init.call_args[1]["print"])
         self.assertEqual("foo", config.output.package)
-        self.assertEqual(OutputFormat.DATACLASS, config.output.format)
+        self.assertEqual("dataclasses", config.output.format)
         self.assertEqual(OutputStructure.FILENAMES, config.output.structure)
         self.assertEqual([source.as_uri()], mock_process.call_args[0][0])
 
@@ -51,7 +49,7 @@ class CliTests(TestCase):
         self.assertEqual([source.as_uri()], mock_process.call_args[0][0])
         self.assertFalse(mock_init.call_args[1]["print"])
         self.assertEqual("foo", config.output.package)
-        self.assertEqual(OutputFormat.PLANTUML, config.output.format)
+        self.assertEqual("plantuml", config.output.format)
         self.assertEqual(OutputStructure.FILENAMES, config.output.structure)
 
     @mock.patch.object(SchemaTransformer, "process")
@@ -78,7 +76,7 @@ class CliTests(TestCase):
         self.assertEqual([source.as_uri()], mock_process.call_args[0][0])
         self.assertFalse(mock_init.call_args[1]["print"])
         self.assertEqual("foo", config.output.package)
-        self.assertEqual(OutputFormat.DATACLASS, config.output.format)
+        self.assertEqual("dataclasses", config.output.format)
         self.assertEqual(OutputStructure.NAMESPACES, config.output.structure)
 
     @mock.patch.object(SchemaTransformer, "process")
@@ -105,13 +103,15 @@ class CliTests(TestCase):
             config.write(fp, config)
 
         source = fixtures_dir.joinpath("defxmlschema/chapter03.xsd")
-        result = self.runner.invoke(cli, [str(source), "--config", str(file_path)])
+        result = self.runner.invoke(
+            cli, [str(source), "--config", str(file_path)], catch_exceptions=False
+        )
         config = mock_init.call_args[1]["config"]
 
         self.assertIsNone(result.exception)
         self.assertFalse(mock_init.call_args[1]["print"])
         self.assertEqual("foo.bar", config.output.package)
-        self.assertEqual(OutputFormat.DATACLASS, config.output.format)
+        self.assertEqual("dataclasses", config.output.format)
         self.assertEqual(OutputStructure.NAMESPACES, config.output.structure)
         self.assertEqual([source.as_uri()], mock_process.call_args[0][0])
         file_path.unlink()

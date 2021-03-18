@@ -3,6 +3,9 @@ from pathlib import Path
 from typing import Iterator
 from typing import List
 
+from jinja2 import Environment
+from jinja2 import FileSystemLoader
+
 from xsdata.codegen.models import Class
 from xsdata.codegen.models import Import
 from xsdata.codegen.resolver import DependenciesResolver
@@ -19,8 +22,11 @@ class DataclassGenerator(AbstractGenerator):
     def __init__(self, config: GeneratorConfig):
         """Override generator constructor to set templates directory and
         environment filters."""
+
+        super().__init__(config)
+
         tpl_dir = Path(__file__).parent.joinpath("templates")
-        super().__init__(str(tpl_dir), config)
+        self.env = Environment(loader=FileSystemLoader(tpl_dir), autoescape=False)
         self.filters = Filters.from_config(config)
         self.filters.register(self.env)
 
@@ -72,7 +78,7 @@ class DataclassGenerator(AbstractGenerator):
                 add = "_".join(part for part in parts if part in diff)
                 cur.alias = f"{add}:{cur.name}"
 
-        return self.template("imports").render(imports=imports)
+        return self.env.get_template("imports.jinja2").render(imports=imports)
 
     def render_module(
         self, resolver: DependenciesResolver, classes: List[Class]
@@ -84,24 +90,24 @@ class DataclassGenerator(AbstractGenerator):
         output = self.render_classes(resolver.sorted_classes())
         namespace = classes[0].target_namespace
 
-        return self.template("module").render(
+        return self.env.get_template("module.jinja2").render(
             output=output, imports=imports, namespace=namespace
         )
 
     def render_classes(self, classes: List[Class]) -> str:
         """Render the source code of the classes."""
-        load = self.template
+        load = self.env.get_template
         config = self.config
 
         def render_class(obj: Class) -> str:
             """Render class or enumeration."""
 
             if obj.is_enumeration:
-                template = "enum"
+                template = "enum.jinja2"
             elif obj.is_service:
-                template = "service"
+                template = "service.jinja2"
             else:
-                template = "class"
+                template = "class.jinja2"
 
             return (
                 load(template)

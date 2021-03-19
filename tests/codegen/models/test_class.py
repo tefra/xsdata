@@ -53,16 +53,8 @@ class ClassTests(FactoryTestCase):
                 ),
             ],
             extensions=[
-                ExtensionFactory.create(
-                    type=AttrTypeFactory.create(
-                        qname=build_qname(Namespace.XS.uri, "foobar")
-                    )
-                ),
-                ExtensionFactory.create(
-                    type=AttrTypeFactory.create(
-                        qname=build_qname(Namespace.XS.uri, "foobar")
-                    )
-                ),
+                ExtensionFactory.reference(build_qname(Namespace.XS.uri, "foobar")),
+                ExtensionFactory.reference(build_qname(Namespace.XS.uri, "foobar")),
             ],
             inner=[
                 ClassFactory.create(

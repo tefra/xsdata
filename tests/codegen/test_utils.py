@@ -28,7 +28,7 @@ class ClassUtilsTests(FactoryTestCase):
                 AttrFactory.create(name="d"),
             ]
         )
-        extension = ExtensionFactory.create(type=AttrTypeFactory.create(qname="foo"))
+        extension = ExtensionFactory.create(AttrTypeFactory.create(qname="foo"))
         target.extensions.append(extension)
 
         ClassUtils.copy_attributes(source, target, extension)

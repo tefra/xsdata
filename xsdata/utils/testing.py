@@ -97,7 +97,6 @@ class ClassFactory(Factory):
         abstract: bool = False,
         mixed: bool = False,
         nillable: bool = False,
-        help: Optional[str] = None,
         extensions: Optional[List[Extension]] = None,
         substitutions: Optional[List[str]] = None,
         attrs: Optional[List[Attr]] = None,
@@ -129,7 +128,6 @@ class ClassFactory(Factory):
             substitutions=substitutions or [],
             attrs=attrs or [],
             inner=inner or [],
-            help=help,
             package=package,
             module=module,
             ns_map=ns_map,
@@ -137,6 +135,7 @@ class ClassFactory(Factory):
             container=container,
             default=default,
             fixed=fixed,
+            **kwargs,
         )
 
     @classmethod
@@ -188,8 +187,12 @@ class ExtensionFactory(Factory):
         )
 
     @classmethod
-    def reference(cls, qname: str) -> Extension:
-        return cls.create(AttrTypeFactory.create(qname=qname))
+    def reference(cls, qname: str, **kwargs: Any) -> Extension:
+        return cls.create(AttrTypeFactory.create(qname=qname), **kwargs)
+
+    @classmethod
+    def native(cls, datatype: DataType, **kwargs: Any) -> Extension:
+        return cls.create(AttrTypeFactory.native(datatype), **kwargs)
 
 
 class AttrTypeFactory(Factory):
@@ -234,7 +237,6 @@ class AttrFactory(Factory):
         choices: Optional[List[Attr]] = None,
         tag: Optional[str] = None,
         namespace: Optional[str] = None,
-        help: Optional[str] = None,
         default: Any = None,
         fixed: bool = False,
         mixed: bool = False,
@@ -249,11 +251,11 @@ class AttrFactory(Factory):
             choices=choices or [],
             tag=tag or random.choice(cls.tags),
             namespace=namespace or None,
-            help=help or None,
             default=default or None,
             fixed=fixed,
             mixed=mixed,
             restrictions=restrictions or Restrictions(),
+            **kwargs,
         )
 
     @classmethod

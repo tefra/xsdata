@@ -26,15 +26,3 @@ def test_primer_schema():
     assert "purchaseOrder" == clazz.Meta.name
 
     validate_bindings(schema, clazz)
-
-
-def test_primer_schema_plantuml():
-    schema = fixtures_dir.joinpath("primer/order.xsd")
-    package = "tests.fixtures.primer"
-    runner = CliRunner()
-    result = runner.invoke(
-        cli, [str(schema), "--package", package, "--output", "plantuml"]
-    )
-
-    if result.exception:
-        raise result.exception

@@ -8,7 +8,6 @@ from xsdata.codegen.models import Class
 from xsdata.exceptions import CodeGenerationError
 from xsdata.formats.dataclass.generator import DataclassGenerator
 from xsdata.formats.mixins import AbstractGenerator
-from xsdata.formats.plantuml.generator import PlantUmlGenerator
 from xsdata.logger import logger
 from xsdata.models.config import GeneratorConfig
 
@@ -24,7 +23,6 @@ class CodeWriter:
     generator: AbstractGenerator
     generators: ClassVar[Dict[str, Type[AbstractGenerator]]] = {
         "dataclasses": DataclassGenerator,
-        "plantuml": PlantUmlGenerator,
     }
 
     def write(self, classes: List[Class]):

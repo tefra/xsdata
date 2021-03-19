@@ -42,13 +42,13 @@ class ClassValidatorTests(FactoryTestCase):
     def test_remove_invalid_classes(self):
         first = ClassFactory.create(
             extensions=[
-                ExtensionFactory.create(type=AttrTypeFactory.native(DataType.BOOLEAN)),
-                ExtensionFactory.create(type=AttrTypeFactory.create(qname="foo")),
+                ExtensionFactory.create(AttrTypeFactory.native(DataType.BOOLEAN)),
+                ExtensionFactory.create(AttrTypeFactory.create(qname="foo")),
             ]
         )
         second = ClassFactory.create(
             extensions=[
-                ExtensionFactory.create(type=AttrTypeFactory.native(DataType.BOOLEAN))
+                ExtensionFactory.create(AttrTypeFactory.native(DataType.BOOLEAN))
             ]
         )
         third = ClassFactory.create()
@@ -143,8 +143,8 @@ class ClassValidatorTests(FactoryTestCase):
         source = ClassFactory.create()
         target = source.clone()
 
-        ext_a = ExtensionFactory.create(type=AttrTypeFactory.create(qname=source.name))
-        ext_str = ExtensionFactory.create(type=AttrTypeFactory.create(qname="foo"))
+        ext_a = ExtensionFactory.create(AttrTypeFactory.create(qname=source.name))
+        ext_str = ExtensionFactory.create(AttrTypeFactory.create(qname="foo"))
         target.extensions.append(ext_str)
         target.extensions.append(ext_a)
 

@@ -31,9 +31,7 @@ class ClassExtensionHandlerTests(FactoryTestCase):
 
     @mock.patch.object(ClassExtensionHandler, "process_native_extension")
     def test_process_extension_with_native_type(self, mock_flatten_extension_native):
-        extension = ExtensionFactory.create(
-            type=AttrTypeFactory.native(DataType.STRING)
-        )
+        extension = ExtensionFactory.native(DataType.STRING)
         target = ClassFactory.elements(1, extensions=[extension])
 
         self.processor.process_extension(target, extension)
@@ -43,7 +41,7 @@ class ClassExtensionHandlerTests(FactoryTestCase):
     def test_process_extension_with_dependency_type(
         self, mock_process_dependency_extension
     ):
-        extension = ExtensionFactory.create(type=AttrTypeFactory.create("foo"))
+        extension = ExtensionFactory.create(AttrTypeFactory.create("foo"))
         target = ClassFactory.elements(1, extensions=[extension])
 
         self.processor.process_extension(target, extension)
@@ -454,8 +452,8 @@ class ClassExtensionHandlerTests(FactoryTestCase):
 
     def test_add_default_attribute_with_any_type(self):
         extension = ExtensionFactory.create(
-            type=AttrTypeFactory.native(DataType.ANY_TYPE),
-            restrictions=Restrictions(min_occurs=1, max_occurs=1, required=True),
+            AttrTypeFactory.native(DataType.ANY_TYPE),
+            Restrictions(min_occurs=1, max_occurs=1, required=True),
         )
         item = ClassFactory.create(extensions=[extension])
 

@@ -18,7 +18,6 @@
     data-types
     wsdl
     api
-    plantuml
     demos
     changelog
 

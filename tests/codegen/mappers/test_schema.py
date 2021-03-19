@@ -169,15 +169,15 @@ class SchemaMapperTests(FactoryTestCase):
     def test_build_class_extensions(self, mock_children_extensions):
         bar_type = AttrTypeFactory.create(qname="bar")
         foo_type = AttrTypeFactory.create(qname="foo")
-        some_type = AttrTypeFactory.create(qname="{xsdata}something")
 
-        bar = ExtensionFactory.create(type=bar_type)
-        double = ExtensionFactory.create(type=bar_type)
-        foo = ExtensionFactory.create(type=foo_type)
+        bar = ExtensionFactory.create(bar_type)
+        double = ExtensionFactory.create(bar_type)
+        foo = ExtensionFactory.create(foo_type)
 
         mock_children_extensions.return_value = [bar, double, foo]
-        self_ext = ExtensionFactory.create(
-            type=some_type, restrictions=Restrictions(min_occurs=1, max_occurs=1)
+        self_ext = ExtensionFactory.reference(
+            qname="{xsdata}something",
+            restrictions=Restrictions(min_occurs=1, max_occurs=1),
         )
 
         item = ClassFactory.create()

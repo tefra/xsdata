@@ -66,7 +66,6 @@ output
 Specify the output format
 
 * ``pydata``: Python lib `dataclasses <https://docs.python.org/3/library/dataclasses.html>`_
-* ``plantuml``: `PlantUML <https://plantuml.com/class-diagram>`_ class diagram
 
 
 compound-fields

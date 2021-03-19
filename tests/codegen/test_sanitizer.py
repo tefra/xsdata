@@ -409,7 +409,7 @@ class ClassSanitizerTest(FactoryTestCase):
         target = ClassFactory.create(
             extensions=[
                 ExtensionFactory.create(),
-                ExtensionFactory.create(type=attr_type.clone()),
+                ExtensionFactory.create(attr_type.clone()),
             ],
             attrs=[
                 AttrFactory.create(),
@@ -417,7 +417,7 @@ class ClassSanitizerTest(FactoryTestCase):
             ],
             inner=[
                 ClassFactory.create(
-                    extensions=[ExtensionFactory.create(type=attr_type.clone())],
+                    extensions=[ExtensionFactory.create(attr_type.clone())],
                     attrs=[
                         AttrFactory.create(),
                         AttrFactory.create(

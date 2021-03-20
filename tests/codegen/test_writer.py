@@ -4,16 +4,15 @@ from typing import Iterator
 from typing import List
 from unittest import mock
 
-from tests.factories import ClassFactory
-from tests.factories import FactoryTestCase
 from xsdata.codegen.models import Class
 from xsdata.codegen.writer import CodeWriter
+from xsdata.exceptions import CodeGenerationError
 from xsdata.formats.dataclass.generator import DataclassGenerator
 from xsdata.formats.mixins import AbstractGenerator
 from xsdata.formats.mixins import GeneratorResult
-from xsdata.formats.plantuml.generator import PlantUmlGenerator
 from xsdata.models.config import GeneratorConfig
-from xsdata.models.config import OutputFormat
+from xsdata.utils.testing import ClassFactory
+from xsdata.utils.testing import FactoryTestCase
 
 
 class NoneGenerator(AbstractGenerator):
@@ -64,12 +63,14 @@ class CodeWriterTests(FactoryTestCase):
         )
 
     def test_from_config(self):
+        CodeWriter.unregister_generator("dataclasses")
         config = GeneratorConfig()
-        config.output.format = OutputFormat.DATACLASS
 
+        with self.assertRaises(CodeGenerationError) as cm:
+            CodeWriter.from_config(config)
+
+        self.assertEqual("Unknown output format: 'dataclasses'", str(cm.exception))
+
+        CodeWriter.register_generator("dataclasses", DataclassGenerator)
         writer = CodeWriter.from_config(config)
         self.assertIsInstance(writer.generator, DataclassGenerator)
-
-        config.output.format = OutputFormat.PLANTUML
-        writer = CodeWriter.from_config(config)
-        self.assertIsInstance(writer.generator, PlantUmlGenerator)

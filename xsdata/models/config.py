@@ -1,3 +1,4 @@
+import warnings
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
@@ -20,18 +21,6 @@ from xsdata.models.mixins import attribute
 from xsdata.models.mixins import element
 from xsdata.utils import constants
 from xsdata.utils import text
-
-
-class OutputFormat(Enum):
-    """
-    Code writer output formats.
-
-    :cvar DATACLASS: pydata
-    :cvar PLANTUML: plantuml
-    """
-
-    DATACLASS = "pydata"
-    PLANTUML = "plantuml"
 
 
 class OutputStructure(Enum):
@@ -137,7 +126,7 @@ class GeneratorOutput:
 
     :param max_line_length: Maximum line length
     :param package: Package name eg foo.bar.models
-    :param format: Select an output format
+    :param format: Code generator output format name
     :param structure: Select an output structure
     :param docstring_style: Select a docstring style
     :param compound_fields: Use compound fields for repeating choices.
@@ -146,10 +135,18 @@ class GeneratorOutput:
 
     max_line_length: int = attribute(default=79)
     package: str = element(default="generated")
-    format: OutputFormat = element(default=OutputFormat.DATACLASS)
+    format: str = element(default="dataclasses")
     structure: OutputStructure = element(default=OutputStructure.FILENAMES)
     docstring_style: DocstringStyle = element(default=DocstringStyle.RST)
     compound_fields: bool = element(default=False)
+
+    def __post_init__(self):
+        if self.format == "pydata":
+            warnings.warn(
+                "Output format 'pydata' renamed to 'dataclasses'",
+                DeprecationWarning,
+            )
+            self.format = "dataclasses"
 
 
 @dataclass

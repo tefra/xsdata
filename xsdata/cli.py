@@ -10,14 +10,17 @@ from click_default_group import DefaultGroup
 from pkg_resources import get_distribution
 
 from xsdata.codegen.transformer import SchemaTransformer
+from xsdata.codegen.writer import CodeWriter
 from xsdata.logger import logger
 from xsdata.models.config import DocstringStyle
 from xsdata.models.config import GeneratorConfig
-from xsdata.models.config import OutputFormat
 from xsdata.models.config import OutputStructure
 from xsdata.utils.downloader import Downloader
+from xsdata.utils.hooks import load_entry_points
 
-outputs = click.Choice([x.value for x in OutputFormat])
+load_entry_points("xsdata.plugins.cli")
+
+outputs = click.Choice(CodeWriter.generators.keys())
 docstring_styles = click.Choice([x.value for x in DocstringStyle])
 click_log.basic_config(logger)
 
@@ -71,7 +74,7 @@ def download(source: str, output: str):
 @click.argument("source", required=True)
 @click.option("--config", default=".xsdata.xml", help="Configuration file")
 @click.option("--package", required=False, help="Target Package", default="generated")
-@click.option("--output", type=outputs, help="Output Format", default="pydata")
+@click.option("--output", type=outputs, help="Output Format", default="dataclasses")
 @click.option(
     "--compound-fields",
     type=click.BOOL,
@@ -113,7 +116,7 @@ def generate(**kwargs: Any):
             config.output.package = kwargs["package"]
     else:
         config = GeneratorConfig()
-        config.output.format = OutputFormat(kwargs["output"])
+        config.output.format = kwargs["output"]
         config.output.package = kwargs["package"]
         config.output.compound_fields = kwargs["compound_fields"]
         config.output.docstring_style = DocstringStyle(kwargs["docstring_style"])

@@ -2,8 +2,6 @@ import tempfile
 from pathlib import Path
 from unittest import mock
 
-from tests.factories import ClassFactory
-from tests.factories import FactoryTestCase
 from xsdata.codegen.analyzer import ClassAnalyzer
 from xsdata.codegen.container import ClassContainer
 from xsdata.codegen.mappers.definitions import DefinitionsMapper
@@ -24,6 +22,8 @@ from xsdata.models.xsd import Import
 from xsdata.models.xsd import Include
 from xsdata.models.xsd import Override
 from xsdata.models.xsd import Schema
+from xsdata.utils.testing import ClassFactory
+from xsdata.utils.testing import FactoryTestCase
 
 
 class SchemaTransformerTests(FactoryTestCase):

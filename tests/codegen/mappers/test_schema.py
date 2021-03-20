@@ -2,11 +2,6 @@ from types import GeneratorType
 from typing import Iterator
 from unittest import mock
 
-from tests.factories import AttrFactory
-from tests.factories import AttrTypeFactory
-from tests.factories import ClassFactory
-from tests.factories import ExtensionFactory
-from tests.factories import FactoryTestCase
 from xsdata.codegen.mappers.schema import SchemaMapper
 from xsdata.codegen.models import Class
 from xsdata.codegen.models import Restrictions
@@ -32,6 +27,11 @@ from xsdata.models.xsd import Sequence
 from xsdata.models.xsd import SimpleContent
 from xsdata.models.xsd import SimpleType
 from xsdata.utils.namespaces import build_qname
+from xsdata.utils.testing import AttrFactory
+from xsdata.utils.testing import AttrTypeFactory
+from xsdata.utils.testing import ClassFactory
+from xsdata.utils.testing import ExtensionFactory
+from xsdata.utils.testing import FactoryTestCase
 
 
 class SchemaMapperTests(FactoryTestCase):
@@ -169,15 +169,15 @@ class SchemaMapperTests(FactoryTestCase):
     def test_build_class_extensions(self, mock_children_extensions):
         bar_type = AttrTypeFactory.create(qname="bar")
         foo_type = AttrTypeFactory.create(qname="foo")
-        some_type = AttrTypeFactory.create(qname="{xsdata}something")
 
-        bar = ExtensionFactory.create(type=bar_type)
-        double = ExtensionFactory.create(type=bar_type)
-        foo = ExtensionFactory.create(type=foo_type)
+        bar = ExtensionFactory.create(bar_type)
+        double = ExtensionFactory.create(bar_type)
+        foo = ExtensionFactory.create(foo_type)
 
         mock_children_extensions.return_value = [bar, double, foo]
-        self_ext = ExtensionFactory.create(
-            type=some_type, restrictions=Restrictions(min_occurs=1, max_occurs=1)
+        self_ext = ExtensionFactory.reference(
+            qname="{xsdata}something",
+            restrictions=Restrictions(min_occurs=1, max_occurs=1),
         )
 
         item = ClassFactory.create()

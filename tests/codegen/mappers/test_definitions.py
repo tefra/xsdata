@@ -1,9 +1,6 @@
 from typing import Generator
 from unittest import mock
 
-from tests.factories import AttrFactory
-from tests.factories import ClassFactory
-from tests.factories import FactoryTestCase
 from xsdata.codegen.mappers.definitions import DefinitionsMapper
 from xsdata.codegen.models import Class
 from xsdata.codegen.models import Status
@@ -23,6 +20,9 @@ from xsdata.models.wsdl import PortTypeOperation
 from xsdata.models.wsdl import Service
 from xsdata.models.wsdl import ServicePort
 from xsdata.utils.namespaces import build_qname
+from xsdata.utils.testing import AttrFactory
+from xsdata.utils.testing import ClassFactory
+from xsdata.utils.testing import FactoryTestCase
 
 
 def mock_create_inner(target: Class, name: str):

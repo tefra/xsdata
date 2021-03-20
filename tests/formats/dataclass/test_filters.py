@@ -1,6 +1,3 @@
-from tests.factories import AttrFactory
-from tests.factories import AttrTypeFactory
-from tests.factories import FactoryTestCase
 from xsdata.codegen.models import Restrictions
 from xsdata.formats.dataclass.filters import Filters
 from xsdata.models.config import DocstringStyle
@@ -10,6 +7,9 @@ from xsdata.models.config import NameCase
 from xsdata.models.enums import DataType
 from xsdata.models.enums import Namespace
 from xsdata.models.enums import Tag
+from xsdata.utils.testing import AttrFactory
+from xsdata.utils.testing import AttrTypeFactory
+from xsdata.utils.testing import FactoryTestCase
 
 type_str = AttrTypeFactory.native(DataType.STRING)
 type_int = AttrTypeFactory.native(DataType.INT)

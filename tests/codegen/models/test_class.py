@@ -1,15 +1,15 @@
 import sys
 
-from tests.factories import AttrFactory
-from tests.factories import AttrTypeFactory
-from tests.factories import ClassFactory
-from tests.factories import ExtensionFactory
-from tests.factories import FactoryTestCase
 from xsdata.codegen.models import SIMPLE_TYPES
 from xsdata.models.enums import DataType
 from xsdata.models.enums import Namespace
 from xsdata.models.enums import Tag
 from xsdata.utils.namespaces import build_qname
+from xsdata.utils.testing import AttrFactory
+from xsdata.utils.testing import AttrTypeFactory
+from xsdata.utils.testing import ClassFactory
+from xsdata.utils.testing import ExtensionFactory
+from xsdata.utils.testing import FactoryTestCase
 
 
 class ClassTests(FactoryTestCase):
@@ -53,16 +53,8 @@ class ClassTests(FactoryTestCase):
                 ),
             ],
             extensions=[
-                ExtensionFactory.create(
-                    type=AttrTypeFactory.create(
-                        qname=build_qname(Namespace.XS.uri, "foobar")
-                    )
-                ),
-                ExtensionFactory.create(
-                    type=AttrTypeFactory.create(
-                        qname=build_qname(Namespace.XS.uri, "foobar")
-                    )
-                ),
+                ExtensionFactory.reference(build_qname(Namespace.XS.uri, "foobar")),
+                ExtensionFactory.reference(build_qname(Namespace.XS.uri, "foobar")),
             ],
             inner=[
                 ClassFactory.create(

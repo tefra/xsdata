@@ -1,11 +1,11 @@
 from unittest import mock
 
-from tests.factories import ClassFactory
-from tests.factories import FactoryTestCase
 from xsdata.codegen.container import ClassContainer
 from xsdata.codegen.models import Class
 from xsdata.codegen.models import Status
 from xsdata.models.enums import Tag
+from xsdata.utils.testing import ClassFactory
+from xsdata.utils.testing import FactoryTestCase
 
 
 class ClassContainerTests(FactoryTestCase):

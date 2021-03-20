@@ -1,6 +1,5 @@
-from tests.factories import AttrTypeFactory
-from tests.factories import FactoryTestCase
-from xsdata.models.enums import DataType
+from xsdata.utils.testing import AttrTypeFactory
+from xsdata.utils.testing import FactoryTestCase
 
 
 class AttrTypeTests(FactoryTestCase):

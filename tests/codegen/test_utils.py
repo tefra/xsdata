@@ -1,15 +1,15 @@
 import sys
 from unittest import mock
 
-from tests.factories import AttrFactory
-from tests.factories import AttrTypeFactory
-from tests.factories import ClassFactory
-from tests.factories import ExtensionFactory
-from tests.factories import FactoryTestCase
 from xsdata.codegen.models import Restrictions
 from xsdata.codegen.utils import ClassUtils
 from xsdata.exceptions import CodeGenerationError
 from xsdata.models.enums import DataType
+from xsdata.utils.testing import AttrFactory
+from xsdata.utils.testing import AttrTypeFactory
+from xsdata.utils.testing import ClassFactory
+from xsdata.utils.testing import ExtensionFactory
+from xsdata.utils.testing import FactoryTestCase
 
 
 class ClassUtilsTests(FactoryTestCase):
@@ -28,7 +28,7 @@ class ClassUtilsTests(FactoryTestCase):
                 AttrFactory.create(name="d"),
             ]
         )
-        extension = ExtensionFactory.create(type=AttrTypeFactory.create(qname="foo"))
+        extension = ExtensionFactory.create(AttrTypeFactory.create(qname="foo"))
         target.extensions.append(extension)
 
         ClassUtils.copy_attributes(source, target, extension)

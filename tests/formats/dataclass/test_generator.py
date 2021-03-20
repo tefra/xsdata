@@ -2,16 +2,17 @@ import random
 from pathlib import Path
 from unittest import mock
 
-from tests.factories import ClassFactory
-from tests.factories import FactoryTestCase
 from xsdata.codegen.resolver import DependenciesResolver
 from xsdata.formats.dataclass.generator import DataclassGenerator
 from xsdata.models.config import GeneratorConfig
+from xsdata.utils.testing import ClassFactory
+from xsdata.utils.testing import FactoryTestCase
 
 
 class DataclassGeneratorTests(FactoryTestCase):
     def setUp(self):
         super().setUp()
+        self.maxDiff = None
         config = GeneratorConfig()
         self.generator = DataclassGenerator(config)
 

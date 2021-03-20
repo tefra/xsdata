@@ -1,13 +1,15 @@
 from dataclasses import dataclass
+from typing import ClassVar
+from typing import Dict
 from typing import List
+from typing import Type
 
 from xsdata.codegen.models import Class
+from xsdata.exceptions import CodeGenerationError
 from xsdata.formats.dataclass.generator import DataclassGenerator
 from xsdata.formats.mixins import AbstractGenerator
-from xsdata.formats.plantuml.generator import PlantUmlGenerator
 from xsdata.logger import logger
 from xsdata.models.config import GeneratorConfig
-from xsdata.models.config import OutputFormat
 
 
 @dataclass
@@ -19,6 +21,9 @@ class CodeWriter:
     """
 
     generator: AbstractGenerator
+    generators: ClassVar[Dict[str, Type[AbstractGenerator]]] = {
+        "dataclasses": DataclassGenerator,
+    }
 
     def write(self, classes: List[Class]):
         """Iterate over the designated generator outputs and create the
@@ -42,7 +47,18 @@ class CodeWriter:
 
     @classmethod
     def from_config(cls, config: GeneratorConfig) -> "CodeWriter":
-        if config.output.format == OutputFormat.PLANTUML:
-            return cls(generator=PlantUmlGenerator(config))
+        if config.output.format not in cls.generators:
+            raise CodeGenerationError(
+                f"Unknown output format: '{config.output.format}'"
+            )
 
-        return cls(generator=DataclassGenerator(config))
+        generator_class = cls.generators[config.output.format]
+        return cls(generator=generator_class(config))
+
+    @classmethod
+    def register_generator(cls, name: str, clazz: Type[AbstractGenerator]):
+        cls.generators[name] = clazz
+
+    @classmethod
+    def unregister_generator(cls, name: str):
+        cls.generators.pop(name)

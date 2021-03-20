@@ -1,14 +1,14 @@
 from typing import Iterator
 from typing import List
 
-from tests.factories import ClassFactory
-from tests.factories import FactoryTestCase
 from xsdata.codegen.models import Class
 from xsdata.exceptions import CodeGenerationError
 from xsdata.formats.mixins import AbstractGenerator
 from xsdata.formats.mixins import GeneratorResult
 from xsdata.models.config import GeneratorConfig
 from xsdata.models.config import OutputStructure
+from xsdata.utils.testing import ClassFactory
+from xsdata.utils.testing import FactoryTestCase
 
 
 class NoneGenerator(AbstractGenerator):

@@ -2,15 +2,14 @@ import sys
 from typing import Generator
 from unittest import mock
 
-from tests.factories import AttrFactory
-from tests.factories import AttrTypeFactory
-from tests.factories import ClassFactory
-from tests.factories import FactoryTestCase
 from xsdata.codegen.mappers.element import ElementMapper
-from xsdata.codegen.models import Restrictions
 from xsdata.formats.dataclass.models.generics import AnyElement
 from xsdata.models.enums import DataType
 from xsdata.models.enums import Tag
+from xsdata.utils.testing import AttrFactory
+from xsdata.utils.testing import AttrTypeFactory
+from xsdata.utils.testing import ClassFactory
+from xsdata.utils.testing import FactoryTestCase
 
 
 class ElementMapperTests(FactoryTestCase):

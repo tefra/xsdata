@@ -63,9 +63,18 @@ eg `--package api.models`
 output
 ------
 
-Specify the output format
+Specify the output format from the builtin code generators and third party installed
+plugins.
 
-* ``pydata``: Python lib `dataclasses <https://docs.python.org/3/library/dataclasses.html>`_
+.. hint::
+
+    The default output format is the builtin ``dataclasses``
+
+    Plugins:
+
+    - `PlantUML <https://github.com/tefra/xsdata-plantuml>`_ class diagrams
+
+
 
 
 compound-fields

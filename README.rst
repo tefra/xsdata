@@ -30,9 +30,9 @@ Naive XML Bindings for python
 xsData is a complete XML data binding library for python allowing developers to access
 and use XML documents as simple objects rather than using DOM.
 
-It ships with a code generator for XML Schema definitions and WSDL 1.1 with SOAP 1.1
-bindings. It produces simple dataclasses with type hints in order to reduce the learning
-curve for users that have to write the binding models manually.
+It ships with a code generator for XML schemas, WSDL definitions or directly from XML
+documents. It produces simple dataclasses with type hints in order to reduce the
+learning curve for users that have to write the binding models manually.
 
 The included xml parser and serializer are highly optimized and adaptable with handlers
 based on native python and lxml. The parser configuration offers the ability to skip
@@ -58,12 +58,28 @@ the `samples repo <https://github.com/tefra/xsdata-samples>`_ for more ✨✨✨
 Features
 --------
 
-- Generate data models for XML Schema 1.0 and 1.1 definitions.
-- Generate data models for WSDL 1.1 and SOAP 1.1 bindings.
-- Support qualified elements/attributes, enumerations and inner classes.
-- Preserve embedded documentation and references.
-- Data binding for XML and JSON documents.
-- Pluggable code writer that supports python dataclasses and PlantUML class diagrams.
+- Generate code from:
+
+  - XML Schemas 1.0 & 1.1
+  - WSDL 1.1 definitions with SOAP 1.1 bindings
+  - Directly from XML Documents
+  - Extensive configuration to customize output
+  - Pluggable code writer for custom output formats
+
+- Default Output:
+
+  - Pure python dataclasses with metadata
+  - Type hints with support for forward references and unions
+  - Enumerations and inner classes
+  - Support namespace qualified elements and attributes
+
+- Data Binding:
+
+  - XML and JSON parser, serializer
+  - Handlers and Writers based on lxml and native xml python
+  - Support wildcard elements and attributes
+  - Support xinclude statements and unknown properties
+  - Customize behaviour through config
 
 
 Changelog: 21.3 (2021-03-04)

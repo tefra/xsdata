@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Config xmlns="http://pypi.org/project/xsdata" version="21.3">
-  <Output wsdl="false" maxLineLength="79">
+  <Output maxLineLength="79">
     <Package>generated</Package>
-    <Format>pydata</Format>
+    <Format>dataclasses</Format>
     <Structure>filenames</Structure>
     <DocstringStyle>reStructuredText</DocstringStyle>
     <CompoundFields>false</CompoundFields>

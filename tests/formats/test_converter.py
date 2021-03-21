@@ -17,7 +17,7 @@ from xsdata.models.datatype import XmlPeriod
 from xsdata.models.enums import UseType
 
 
-class ConverterAdapterTests(TestCase):
+class ConverterFactoryTests(TestCase):
     def test_deserialize(self):
         with warnings.catch_warnings(record=True) as w:
             self.assertEqual("a", converter.deserialize("a", [int]))
@@ -40,6 +40,21 @@ class ConverterAdapterTests(TestCase):
         self.assertEqual("optional", converter.serialize(UseType.OPTIONAL))
         self.assertEqual("8.77683E-8", converter.serialize(Decimal("8.77683E-8")))
         self.assertEqual("8.77683E-08", converter.serialize(float("8.77683E-8")))
+
+    def test_test(self):
+        self.assertTrue(converter.test(1, [int]))
+        self.assertTrue(converter.test(1, [float]))
+        self.assertTrue(converter.test(None, [int]))
+
+        self.assertFalse(converter.test("a", [int]))
+        self.assertFalse(converter.test("01", [int]))
+        self.assertTrue(converter.test("1", [int]))
+
+        self.assertFalse(converter.test("0", [float]))
+        self.assertFalse(converter.test(".0", [float]))
+        self.assertTrue(converter.test("1.0", [float]))
+
+        self.assertTrue(converter.test("{a}b", [QName]))
 
     def test_unknown_converter(self):
         class A:

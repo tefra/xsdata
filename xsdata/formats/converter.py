@@ -104,6 +104,29 @@ class ConverterFactory:
         instance = self.value_converter(value)
         return instance.serialize(value, **kwargs)
 
+    def test(self, value: Any, types: List[Type], **kwargs: Any) -> bool:
+        """
+        Test the given string value can be parsed using the given list of types
+        without warnings.
+
+        In case of float/int types also very the roundtrip conversion
+        result still matches the original input.
+        """
+        if not isinstance(value, str):
+            return True
+
+        with warnings.catch_warnings(record=True) as w:
+            decoded = self.deserialize(value, types, **kwargs)
+
+        if w and w[-1].category is ConverterWarning:
+            return False
+
+        if isinstance(decoded, (float, int)):
+            encoded = self.serialize(decoded, **kwargs)
+            return value.strip() == encoded
+
+        return True
+
     def register_converter(self, data_type: Type, func: Union[Callable, Converter]):
         """
         Register a callable or converter for the given data type.

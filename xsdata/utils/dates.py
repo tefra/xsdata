@@ -194,7 +194,21 @@ class DateTimeParser:
             self.vidx += 1
             negative = True
 
+        start = self.vidx
         year = self.parse_minimum_digits(4)
+        end = self.vidx
+        raw = self.value[start:end]
+
+        leading_zeros = len(raw) - len(raw.lstrip("0"))
+        if (
+            (leading_zeros == 1 and year > 999)
+            or (leading_zeros == 2 and year > 99)
+            or (leading_zeros == 3 and year > 9)
+            or (leading_zeros == 4 and year > 0)
+            or (leading_zeros > 4)
+        ):
+            raise ValueError()
+
         if negative:
             return -year
 

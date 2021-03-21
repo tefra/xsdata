@@ -1,16 +1,11 @@
-import warnings
 from dataclasses import dataclass
 from typing import Dict
-from typing import List
-from typing import Optional
-from typing import Type
 
 from xsdata.codegen.mixins import ContainerInterface
 from xsdata.codegen.mixins import HandlerInterface
 from xsdata.codegen.models import Attr
 from xsdata.codegen.models import AttrType
 from xsdata.codegen.models import Class
-from xsdata.exceptions import ConverterWarning
 from xsdata.formats.converter import converter
 from xsdata.models.enums import DataType
 from xsdata.utils import collections
@@ -88,7 +83,7 @@ class AttributeSanitizerHandler(HandlerInterface):
             attr.types = collections.unique_sequence(attr.types, key="qname")
 
     @classmethod
-    def validate_default_value(cls, attr: Attr, ns_map: Dict):
+    def validate_default_value(cls, attr: Attr, ns_map: Dict) -> bool:
         """Reset attribute types when roundtrip conversion of fixed values
         fail."""
         is_enum = attr.is_enumeration
@@ -107,25 +102,7 @@ class AttributeSanitizerHandler(HandlerInterface):
         if is_enum and attr.restrictions.tokens and len(tokens) == 1:
             attr.restrictions.tokens = False
 
-        fmt = attr.restrictions.format
-        return all(cls.match(token, types, ns_map, fmt) for token in tokens)
-
-    @classmethod
-    def match(
-        cls, raw: str, types: List[Type], ns_map: Dict, fmt: Optional[str]
-    ) -> bool:
-        """Check fixed value can be deserialized with the given list of types
-        without warnings and for float/byte instances check that lexical
-        representation matches original string."""
-
-        with warnings.catch_warnings(record=True) as w:
-            decoded = converter.deserialize(raw, types, ns_map=ns_map, format=fmt)
-
-        if w and w[-1].category is ConverterWarning:
-            return False
-
-        if isinstance(decoded, float) and decoded != 0:
-            encoded = converter.serialize(decoded, ns_map=ns_map, format=fmt)
-            return raw.strip() == encoded
-
-        return True
+        return all(
+            converter.test(token, types, ns_map=ns_map, format=attr.restrictions.format)
+            for token in tokens
+        )

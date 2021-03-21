@@ -27,12 +27,36 @@ class DatesUtilsTests(TestCase):
         self.assertEqual(134500, next(args))
         self.assertIsNone(next(args, None))
 
-    def test_parse_date_args_negative_year(self):
+    def test_parse_date_args_year(self):
         args = parse_date_args("-1970-05", "%Y-%m")
 
         self.assertEqual(-1970, next(args))
         self.assertEqual(5, next(args))
         self.assertIsNone(next(args, None))
+
+        args = parse_date_args("0009", "%Y")
+        self.assertEqual(9, next(args))
+
+        args = parse_date_args("0099", "%Y")
+        self.assertEqual(99, next(args))
+
+        args = parse_date_args("0999", "%Y")
+        self.assertEqual(999, next(args))
+
+        args = parse_date_args("9999", "%Y")
+        self.assertEqual(9999, next(args))
+
+        with self.assertRaises(ValueError):
+            next(parse_date_args("09999", "%Y"))
+
+        with self.assertRaises(ValueError):
+            next(parse_date_args("00999", "%Y"))
+
+        with self.assertRaises(ValueError):
+            next(parse_date_args("00099", "%Y"))
+
+        with self.assertRaises(ValueError):
+            next(parse_date_args("00009", "%Y"))
 
     def test_parse_date_args_utc_timezone(self):
         args = parse_date_args("Z", "%z")

@@ -55,6 +55,7 @@ class ConverterFactoryTests(TestCase):
         self.assertTrue(converter.test("1.0", [float]))
 
         self.assertTrue(converter.test("{a}b", [QName]))
+        self.assertFalse(converter.test("{ab", [QName]))
 
     def test_unknown_converter(self):
         class A:
@@ -305,10 +306,7 @@ class QNameConverterTests(TestCase):
         convert = self.converter.deserialize
         with self.assertRaises(ConverterError) as cm:
             convert("a:b")
-
-        self.assertEqual(
-            "QName converter needs ns_map to support prefixes", str(cm.exception)
-        )
+        self.assertEqual("Unknown namespace prefix: `a`", str(cm.exception))
 
         with self.assertRaises(ConverterError) as cm:
             convert("a:b", ns_map={})
@@ -317,6 +315,10 @@ class QNameConverterTests(TestCase):
         with self.assertRaises(ConverterError) as cm:
             convert("", ns_map={})
         self.assertEqual("Value is empty", str(cm.exception))
+
+        with self.assertRaises(ConverterError) as cm:
+            convert("{a b")
+        self.assertEqual("Value is not a QName", str(cm.exception))
 
         self.assertEqual(QName("a"), convert("a", ns_map={}))
         self.assertEqual(QName("aa", "b"), convert("a:b", ns_map={"a": "aa"}))

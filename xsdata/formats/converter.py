@@ -121,7 +121,7 @@ class ConverterFactory:
         if w and w[-1].category is ConverterWarning:
             return False
 
-        if isinstance(decoded, (float, int)):
+        if isinstance(decoded, (float, int, Decimal, XmlPeriod)):
             encoded = self.serialize(decoded, **kwargs)
             return value.strip() == encoded
 
@@ -182,6 +182,10 @@ class ConverterFactory:
 
         return sorted(types, key=lambda x: __PYTHON_TYPES_SORTED__.get(x, 0))
 
+    @classmethod
+    def sorted_types(cls) -> Dict:
+        return __PYTHON_TYPES_SORTED__
+
 
 __PYTHON_TYPES_SORTED__ = {
     int: 1,
@@ -189,11 +193,15 @@ __PYTHON_TYPES_SORTED__ = {
     float: 3,
     Decimal: 4,
     datetime: 5,
-    time: 6,
-    XmlDuration: 7,
-    XmlPeriod: 8,
-    QName: 9,
-    str: 10,
+    date: 6,
+    time: 7,
+    XmlTime: 8,
+    XmlDate: 9,
+    XmlDateTime: 10,
+    XmlDuration: 11,
+    XmlPeriod: 12,
+    QName: 13,
+    str: 14,
 }
 
 
@@ -342,22 +350,23 @@ class QNameConverter(Converter):
 
     @staticmethod
     def resolve(value: str, ns_map: Optional[Dict]) -> Tuple:
+        value = value.strip()
+
         if not value:
             raise ConverterError("Value is empty")
 
         if value[0] == "{":
-            return value, None
+            namespace, name = text.split(value[1:], "}")
 
-        if ns_map is None:
-            raise ConverterError("QName converter needs ns_map to support prefixes")
+            if not namespace:
+                raise ConverterError("Value is not a QName")
+        else:
+            prefix, name = text.split(value, ":")
+            namespace = ns_map.get(prefix) if ns_map else None
+            if prefix and not namespace:
+                raise ConverterError(f"Unknown namespace prefix: `{prefix}`")
 
-        prefix, suffix = text.split(value.strip())
-        namespace = ns_map.get(prefix)
-
-        if prefix and not namespace:
-            raise ConverterError(f"Unknown namespace prefix: `{prefix}`")
-
-        return namespace, suffix
+        return namespace, name
 
 
 Array = Union[List, Tuple]

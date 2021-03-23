@@ -112,8 +112,12 @@ class ConverterFactory:
         In case of float/int types also very the roundtrip conversion
         result still matches the original input.
         """
-        if not isinstance(value, str):
+
+        if isinstance(value, tuple(types)):
             return True
+
+        if not isinstance(value, str):
+            return False
 
         with warnings.catch_warnings(record=True) as w:
             decoded = self.deserialize(value, types, **kwargs)
@@ -305,7 +309,11 @@ class DecimalConverter(Converter):
 
 class QNameConverter(Converter):
     def deserialize(
-        self, value: str, ns_map: Optional[Dict] = None, **kwargs: Any
+        self,
+        value: str,
+        ns_map: Optional[Dict] = None,
+        require_namespace: bool = False,
+        **kwargs: Any,
     ) -> QName:
         """
         Convert namespace prefixed strings, or fully qualified strings to
@@ -316,12 +324,12 @@ class QNameConverter(Converter):
             - {foo}bar -> QName("foo", "bar"
         """
         self.validate_input_type(value, str)
-        text_or_uri, tag = self.resolve(value, ns_map)
+        namespace, tag = self.resolve(value, ns_map)
 
-        if text_or_uri:
-            return QName(text_or_uri, tag)
+        if " " in tag or (not namespace and require_namespace):
+            raise ConverterError()
 
-        return QName(tag)
+        return QName(namespace, tag) if namespace else QName(tag)
 
     def serialize(
         self, value: QName, ns_map: Optional[Dict] = None, **kwargs: Any

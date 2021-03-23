@@ -1,5 +1,6 @@
 from dataclasses import dataclass, field
-from typing import List, Optional
+from typing import List, Optional, Union
+from xsdata.models.datatype import XmlDate, XmlPeriod
 
 __NAMESPACE__ = "http://musicbrainz.org/ns/mmd-2.0#"
 
@@ -161,19 +162,19 @@ class LifeSpan:
         name = "life-span"
         namespace = "http://musicbrainz.org/ns/mmd-2.0#"
 
-    begin: Optional[str] = field(
+    begin: Optional[Union[XmlDate, XmlPeriod]] = field(
         default=None,
         metadata={
             "type": "Element",
         }
     )
-    end: Optional[str] = field(
+    end: Optional[XmlDate] = field(
         default=None,
         metadata={
             "type": "Element",
         }
     )
-    ended: Optional[str] = field(
+    ended: Optional[bool] = field(
         default=None,
         metadata={
             "type": "Element",

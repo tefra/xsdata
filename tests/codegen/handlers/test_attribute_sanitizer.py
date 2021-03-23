@@ -76,8 +76,8 @@ class AttributeSanitizerHandlerTests(FactoryTestCase):
 
         self.processor.process(target)
 
-        self.assertEqual(DataType.FLOAT, attr.types[0].datatype)
-        self.assertIsNotNone(attr.restrictions.format)
+        self.assertEqual(DataType.STRING, attr.types[0].datatype)
+        self.assertIsNone(None, attr.restrictions.format)
         self.assertTrue(attr.restrictions.tokens)
 
         attr.default = "0"

@@ -62,7 +62,7 @@ class ElementMapperTests(FactoryTestCase):
         third.attrs.append(AttrFactory.create())
         fourth = ClassFactory.create()
 
-        actual = ElementMapper.reduce(iter([first, second, third, fourth]))
+        actual = ElementMapper.reduce([first, second, third, fourth])
 
         self.assertEqual([third, fourth], list(actual))
         mock_merge_attributes.assert_has_calls(
@@ -193,6 +193,13 @@ class ElementMapperTests(FactoryTestCase):
         self.assertTrue(actual.native)
 
         actual = ElementMapper.build_attribute_type(None, None)
+        self.assertEqual(str(DataType.ANY_SIMPLE_TYPE), actual.qname)
+        self.assertTrue(actual.native)
+
+        class A:
+            pass
+
+        actual = ElementMapper.build_attribute_type(A(), None)
         self.assertEqual(str(DataType.ANY_SIMPLE_TYPE), actual.qname)
         self.assertTrue(actual.native)
 

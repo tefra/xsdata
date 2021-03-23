@@ -176,16 +176,15 @@ class DataType(Enum):
     def from_value(cls, value: Any) -> "DataType":
         """Infer the xsd type from the value itself."""
         _type = type(value)
-        datatype = __DataTypeIndex__.get(_type)
-
-        if datatype:
-            return datatype
-
         calculate = __DataTypeInferIndex__.get(_type)
         if calculate:
             return calculate(value)
 
-        return DataType.STRING
+        return cls.from_type(_type)
+
+    @classmethod
+    def from_type(cls, tp: Type) -> "DataType":
+        return __DataTypeIndex__.get(tp, DataType.STRING)
 
     @classmethod
     def from_qname(cls, qname: str) -> Optional["DataType"]:
@@ -218,6 +217,8 @@ def float_datatype(value: float) -> DataType:
 
 __DataTypeIndex__ = {
     bool: DataType.BOOLEAN,
+    int: DataType.INT,
+    float: DataType.FLOAT,
     str: DataType.STRING,
     Decimal: DataType.DECIMAL,
     QName: DataType.QNAME,
@@ -225,6 +226,7 @@ __DataTypeIndex__ = {
     XmlTime: DataType.TIME,
     XmlDateTime: DataType.DATE_TIME,
     XmlDuration: DataType.DURATION,
+    XmlPeriod: DataType.G_YEAR_MONTH,
     # bytes: DataType.HEX_BINARY || DataType.BASE64_BINARY, we can't infer formats
     XmlHexBinary: DataType.HEX_BINARY,
     XmlBase64Binary: DataType.BASE64_BINARY,

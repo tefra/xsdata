@@ -10,6 +10,7 @@ from typing import Set
 from xsdata.codegen.models import Attr
 from xsdata.codegen.models import AttrType
 from xsdata.codegen.models import Class
+from xsdata.formats.converter import converter
 from xsdata.formats.dataclass.models.generics import AnyElement
 from xsdata.models.enums import DataType
 from xsdata.models.enums import Tag
@@ -116,7 +117,10 @@ class ElementMapper:
             return AttrType(qname=inner.qname, forward=True)
 
         if text:
-            return AttrType(qname=str(DataType.STRING), native=True)
+            for tp in converter.sorted_types():
+                if converter.test(text, [tp], require_namespace=True):
+                    data_type = DataType.from_type(tp)
+                    return AttrType(qname=str(data_type), native=True)
 
         return AttrType(qname=str(DataType.ANY_SIMPLE_TYPE), native=True)
 

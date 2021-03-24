@@ -5,6 +5,7 @@ from unittest import mock
 from xsdata.codegen.mappers.element import ElementMapper
 from xsdata.formats.dataclass.models.generics import AnyElement
 from xsdata.models.enums import DataType
+from xsdata.models.enums import QNames
 from xsdata.models.enums import Tag
 from xsdata.utils.testing import AttrFactory
 from xsdata.utils.testing import AttrTypeFactory
@@ -75,8 +76,8 @@ class ElementMapperTests(FactoryTestCase):
     def test_build_class_simple_type(self):
         element = AnyElement(
             qname="{xsdata}root",
-            attributes={"{foo}bar": "1", "{bar}foo": "2"},
-            text="thugLife",
+            attributes={"{foo}bar": "1", "{bar}foo": "2.0"},
+            text="true",
         )
 
         actual = ElementMapper.build_class(element, "target")
@@ -88,21 +89,21 @@ class ElementMapperTests(FactoryTestCase):
             ns_map={},
             attrs=[
                 AttrFactory.native(
-                    DataType.STRING,
+                    DataType.INT,
                     tag=Tag.ATTRIBUTE,
                     name="bar",
                     namespace="foo",
                     index=0,
                 ),
                 AttrFactory.native(
-                    DataType.STRING,
+                    DataType.FLOAT,
                     tag=Tag.ATTRIBUTE,
                     name="foo",
                     namespace="bar",
                     index=1,
                 ),
                 AttrFactory.native(
-                    DataType.STRING,
+                    DataType.BOOLEAN,
                     tag=Tag.SIMPLE_TYPE,
                     name="value",
                     namespace=None,
@@ -178,28 +179,26 @@ class ElementMapperTests(FactoryTestCase):
         self.assertEqual(expected, actual)
 
     def test_build_attribute_type(self):
-        inner = ClassFactory.create()
+        actual = ElementMapper.build_attribute_type(QNames.XSI_TYPE, "")
+        self.assertEqual(str(DataType.QNAME), actual.qname)
+        self.assertTrue(actual.native)
 
-        actual = ElementMapper.build_attribute_type(None, inner)
-        self.assertEqual(inner.qname, actual.qname)
-        self.assertTrue(actual.forward)
-
-        actual = ElementMapper.build_attribute_type("foo", None)
+        actual = ElementMapper.build_attribute_type("name", "foo")
         self.assertEqual(str(DataType.STRING), actual.qname)
         self.assertTrue(actual.native)
 
-        actual = ElementMapper.build_attribute_type("", None)
+        actual = ElementMapper.build_attribute_type("name", "")
         self.assertEqual(str(DataType.ANY_SIMPLE_TYPE), actual.qname)
         self.assertTrue(actual.native)
 
-        actual = ElementMapper.build_attribute_type(None, None)
+        actual = ElementMapper.build_attribute_type("name", None)
         self.assertEqual(str(DataType.ANY_SIMPLE_TYPE), actual.qname)
         self.assertTrue(actual.native)
 
         class A:
             pass
 
-        actual = ElementMapper.build_attribute_type(A(), None)
+        actual = ElementMapper.build_attribute_type("name", A())
         self.assertEqual(str(DataType.ANY_SIMPLE_TYPE), actual.qname)
         self.assertTrue(actual.native)
 
@@ -248,8 +247,8 @@ class ElementMapperTests(FactoryTestCase):
         ElementMapper.merge_attributes(target, source)
 
         names = ["id", "b", "c", "d", "a"]
-        min_occurs = [None, 0, 0, None, 0]
-        max_occurs = [None, 4, 1, None, 3]
+        min_occurs = [0, 0, 0, None, 0]
+        max_occurs = [4, 4, 1, None, 3]
 
         self.assertEqual(names, [x.name for x in target.attrs])
         self.assertEqual(min_occurs, [x.restrictions.min_occurs for x in target.attrs])

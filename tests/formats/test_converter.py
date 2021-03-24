@@ -42,8 +42,8 @@ class ConverterFactoryTests(TestCase):
         self.assertEqual("8.77683E-08", converter.serialize(float("8.77683E-8")))
 
     def test_test(self):
-        self.assertTrue(converter.test(1, [int]))
-        self.assertFalse(converter.test(1, [float]))
+        self.assertTrue(converter.test("1", [int]))
+        self.assertFalse(converter.test("1", [float]))
         self.assertFalse(converter.test(None, [int]))
 
         self.assertFalse(converter.test("a", [int]))
@@ -53,9 +53,6 @@ class ConverterFactoryTests(TestCase):
         self.assertFalse(converter.test("0", [float]))
         self.assertFalse(converter.test(".0", [float]))
         self.assertTrue(converter.test("1.0", [float]))
-
-        self.assertTrue(converter.test("{a}b", [QName]))
-        self.assertFalse(converter.test("{ab", [QName]))
 
     def test_unknown_converter(self):
         class A:
@@ -304,6 +301,7 @@ class QNameConverterTests(TestCase):
 
     def test_deserialize(self):
         convert = self.converter.deserialize
+
         with self.assertRaises(ConverterError) as cm:
             convert("a:b")
         self.assertEqual("Unknown namespace prefix: `a`", str(cm.exception))
@@ -312,17 +310,17 @@ class QNameConverterTests(TestCase):
             convert("a:b", ns_map={})
         self.assertEqual("Unknown namespace prefix: `a`", str(cm.exception))
 
-        with self.assertRaises(ConverterError) as cm:
+        with self.assertRaises(ConverterError):
             convert("", ns_map={})
-        self.assertEqual("Value is empty", str(cm.exception))
 
-        with self.assertRaises(ConverterError) as cm:
-            convert("{a b")
-        self.assertEqual("Value is not a QName", str(cm.exception))
+        with self.assertRaises(ConverterError):
+            convert("{a}b", ns_map={})
+
+        with self.assertRaises(ConverterError):
+            convert("a a")
 
         self.assertEqual(QName("a"), convert("a", ns_map={}))
         self.assertEqual(QName("aa", "b"), convert("a:b", ns_map={"a": "aa"}))
-        self.assertEqual(QName("{a}b"), convert("{a}b"))
 
     def test_serialize(self):
         ns_map = {"c_prefix": "c"}

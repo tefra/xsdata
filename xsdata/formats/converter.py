@@ -104,17 +104,14 @@ class ConverterFactory:
         instance = self.value_converter(value)
         return instance.serialize(value, **kwargs)
 
-    def test(self, value: Any, types: List[Type], **kwargs: Any) -> bool:
+    def test(self, value: Optional[str], types: List[Type], **kwargs: Any) -> bool:
         """
         Test the given string value can be parsed using the given list of types
         without warnings.
 
-        In case of float/int types also very the roundtrip conversion
-        result still matches the original input.
+        For certain types also validate roundtrip conversion matches
+        original value.
         """
-
-        if isinstance(value, tuple(types)):
-            return True
 
         if not isinstance(value, str):
             return False
@@ -187,8 +184,8 @@ class ConverterFactory:
         return sorted(types, key=lambda x: __PYTHON_TYPES_SORTED__.get(x, 0))
 
     @classmethod
-    def sorted_types(cls) -> Dict:
-        return __PYTHON_TYPES_SORTED__
+    def explicit_types(cls) -> Tuple:
+        return __EXPLICIT_TYPES__
 
 
 __PYTHON_TYPES_SORTED__ = {
@@ -207,6 +204,18 @@ __PYTHON_TYPES_SORTED__ = {
     QName: 13,
     str: 14,
 }
+
+__EXPLICIT_TYPES__ = (
+    int,
+    bool,
+    float,
+    Decimal,
+    XmlTime,
+    XmlDate,
+    XmlDateTime,
+    XmlDuration,
+    XmlPeriod,
+)
 
 
 class BoolConverter(Converter):
@@ -312,7 +321,6 @@ class QNameConverter(Converter):
         self,
         value: str,
         ns_map: Optional[Dict] = None,
-        require_namespace: bool = False,
         **kwargs: Any,
     ) -> QName:
         """
@@ -326,7 +334,7 @@ class QNameConverter(Converter):
         self.validate_input_type(value, str)
         namespace, tag = self.resolve(value, ns_map)
 
-        if " " in tag or (not namespace and require_namespace):
+        if " " in tag:
             raise ConverterError()
 
         return QName(namespace, tag) if namespace else QName(tag)
@@ -360,19 +368,13 @@ class QNameConverter(Converter):
     def resolve(value: str, ns_map: Optional[Dict]) -> Tuple:
         value = value.strip()
 
-        if not value:
-            raise ConverterError("Value is empty")
+        if not value or value[0] == "{":
+            raise ConverterError()
 
-        if value[0] == "{":
-            namespace, name = text.split(value[1:], "}")
-
-            if not namespace:
-                raise ConverterError("Value is not a QName")
-        else:
-            prefix, name = text.split(value, ":")
-            namespace = ns_map.get(prefix) if ns_map else None
-            if prefix and not namespace:
-                raise ConverterError(f"Unknown namespace prefix: `{prefix}`")
+        prefix, name = text.split(value, ":")
+        namespace = ns_map.get(prefix) if ns_map else None
+        if prefix and not namespace:
+            raise ConverterError(f"Unknown namespace prefix: `{prefix}`")
 
         return namespace, name
 

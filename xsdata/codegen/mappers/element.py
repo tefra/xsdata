@@ -1,6 +1,5 @@
 import sys
 from collections import defaultdict
-from dataclasses import dataclass
 from typing import Any
 from typing import Iterator
 from typing import List
@@ -13,13 +12,13 @@ from xsdata.codegen.models import Class
 from xsdata.formats.converter import converter
 from xsdata.formats.dataclass.models.generics import AnyElement
 from xsdata.models.enums import DataType
+from xsdata.models.enums import QNames
 from xsdata.models.enums import Tag
 from xsdata.utils import collections
 from xsdata.utils.namespaces import build_qname
 from xsdata.utils.namespaces import split_qname
 
 
-@dataclass
 class ElementMapper:
     """Map a schema instance to classes, extensions and attributes."""
 
@@ -79,8 +78,8 @@ class ElementMapper:
         children = [c for c in element.children if isinstance(c, AnyElement)]
         sequential_set = cls.sequential_names(children)
 
-        for key, _ in element.attributes.items():
-            attr_type = AttrType(qname=str(DataType.STRING), native=True)
+        for key, value in element.attributes.items():
+            attr_type = cls.build_attribute_type(key, value)
             cls.build_attribute(target, key, attr_type, target_namespace, Tag.ATTRIBUTE)
 
         for child in children:
@@ -93,9 +92,11 @@ class ElementMapper:
             inner = None
             if child.attributes or child.children:
                 inner = cls.build_class(child, target_namespace)
+                attr_type = AttrType(qname=inner.qname, forward=True)
                 target.inner.append(inner)
+            else:
+                attr_type = cls.build_attribute_type(child.qname, child.text)
 
-            attr_type = cls.build_attribute_type(child.text, inner)
             cls.build_attribute(
                 target,
                 child.qname,
@@ -106,23 +107,29 @@ class ElementMapper:
             )
 
         if element.text:
-            attr_type = AttrType(qname=str(DataType.STRING), native=True)
+            attr_type = cls.build_attribute_type("value", element.text)
             cls.build_attribute(target, "value", attr_type, None, Tag.SIMPLE_TYPE)
 
         return target
 
     @classmethod
-    def build_attribute_type(cls, text: Any, inner: Optional[Class]) -> AttrType:
-        if inner:
-            return AttrType(qname=inner.qname, forward=True)
+    def build_attribute_type(cls, qname: str, value: Any) -> AttrType:
+        def match_type(val: Any) -> DataType:
+            if not isinstance(val, str) or val == "":
+                return DataType.ANY_SIMPLE_TYPE
 
-        if text:
-            for tp in converter.sorted_types():
-                if converter.test(text, [tp], require_namespace=True):
-                    data_type = DataType.from_type(tp)
-                    return AttrType(qname=str(data_type), native=True)
+            for tp in converter.explicit_types():
+                if converter.test(val, [tp]):
+                    return DataType.from_type(tp)
 
-        return AttrType(qname=str(DataType.ANY_SIMPLE_TYPE), native=True)
+            return DataType.STRING
+
+        if qname == QNames.XSI_TYPE:
+            data_type = DataType.QNAME
+        else:
+            data_type = match_type(value)
+
+        return AttrType(qname=str(data_type), native=True)
 
     @classmethod
     def build_attribute(
@@ -177,7 +184,7 @@ class ElementMapper:
 
             if not existing:
                 target.attrs.append(attr)
-            elif not (attr.is_attribute or attr.is_enumeration):
+            else:
                 min_occurs = existing.restrictions.min_occurs or 0
                 max_occurs = existing.restrictions.max_occurs or 1
                 attr_min_occurs = attr.restrictions.min_occurs or 0

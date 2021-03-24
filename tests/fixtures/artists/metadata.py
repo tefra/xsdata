@@ -188,7 +188,7 @@ class AliasList:
         name = "alias-list"
         namespace = "http://musicbrainz.org/ns/mmd-2.0#"
 
-    count: Optional[str] = field(
+    count: Optional[int] = field(
         default=None,
         metadata={
             "type": "Attribute",

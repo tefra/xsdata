@@ -1,4 +1,5 @@
 import functools
+import re
 from typing import Dict
 from typing import Optional
 from typing import Tuple
@@ -6,8 +7,13 @@ from typing import Tuple
 from xsdata.models.enums import Namespace
 from xsdata.utils import text
 
-
 __uri_ignore__ = ("www", "xsd", "wsdl")
+
+URI_REGEX = re.compile(
+    r"^(([a-zA-Z][0-9a-zA-Z+\\-\\.]*:)?"
+    r"/{0,2}[0-9a-zA-Z;/?:@&=+$\\.\\-_!~*'()%]+)?"
+    r"(#[0-9a-zA-Z;/?:@&=+$\\.\\-_!~*'()%]+)?$"
+)
 
 
 def load_prefix(uri: str, ns_map: Dict) -> Optional[str]:
@@ -101,3 +107,31 @@ def target_uri(tag: str) -> Optional[str]:
 
 def local_name(tag: str) -> str:
     return split_qname(tag)[1]
+
+
+NCNAME_PUNCTUATION = {"\u00B7", "\u0387", ".", "-", "_"}
+
+
+def is_ncname(name: Optional[str]) -> bool:
+    """Verify given string is a valid ncname."""
+    if not name:
+        return False
+
+    char = name[0]
+    if not char.isalpha() and not char == "_":
+        return False
+
+    for char in name[1:]:
+
+        if char.isalpha() or char.isdigit() or char in NCNAME_PUNCTUATION:
+            continue
+        else:
+            return False
+
+    return True
+
+
+def is_uri(uri: Optional[str]) -> bool:
+    """Verify given string is a valid uri."""
+
+    return bool(URI_REGEX.search(uri)) if uri else False

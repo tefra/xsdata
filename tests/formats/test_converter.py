@@ -302,23 +302,13 @@ class QNameConverterTests(TestCase):
     def test_deserialize(self):
         convert = self.converter.deserialize
 
-        with self.assertRaises(ConverterError) as cm:
-            convert("a:b")
-        self.assertEqual("Unknown namespace prefix: `a`", str(cm.exception))
+        invalid = ["a:b", "", " ", "{a}1b", "{a} b", "{|}b", "a a"]
 
-        with self.assertRaises(ConverterError) as cm:
-            convert("a:b", ns_map={})
-        self.assertEqual("Unknown namespace prefix: `a`", str(cm.exception))
+        for inv in invalid:
+            with self.assertRaises(ConverterError):
+                convert(inv)
 
-        with self.assertRaises(ConverterError):
-            convert("", ns_map={})
-
-        with self.assertRaises(ConverterError):
-            convert("{a}b", ns_map={})
-
-        with self.assertRaises(ConverterError):
-            convert("a a")
-
+        self.assertEqual(QName("{a}b"), convert("{a}b"))
         self.assertEqual(QName("a"), convert("a", ns_map={}))
         self.assertEqual(QName("aa", "b"), convert("a:b", ns_map={"a": "aa"}))
 

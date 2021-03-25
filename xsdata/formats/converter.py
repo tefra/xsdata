@@ -33,9 +33,8 @@ from xsdata.models.datatype import XmlDuration
 from xsdata.models.datatype import XmlHexBinary
 from xsdata.models.datatype import XmlPeriod
 from xsdata.models.datatype import XmlTime
+from xsdata.utils import namespaces
 from xsdata.utils import text
-from xsdata.utils.namespaces import load_prefix
-from xsdata.utils.namespaces import split_qname
 
 
 class Converter(metaclass=abc.ABCMeta):
@@ -334,9 +333,6 @@ class QNameConverter(Converter):
         self.validate_input_type(value, str)
         namespace, tag = self.resolve(value, ns_map)
 
-        if " " in tag:
-            raise ConverterError()
-
         return QName(namespace, tag) if namespace else QName(tag)
 
     def serialize(
@@ -355,12 +351,12 @@ class QNameConverter(Converter):
         if ns_map is None:
             return value.text
 
-        namespace, tag = split_qname(value.text)
+        namespace, tag = namespaces.split_qname(value.text)
 
         if not namespace:
             return tag
 
-        prefix = load_prefix(namespace, ns_map)
+        prefix = namespaces.load_prefix(namespace, ns_map)
 
         return f"{prefix}:{tag}" if prefix else tag
 
@@ -368,15 +364,24 @@ class QNameConverter(Converter):
     def resolve(value: str, ns_map: Optional[Dict]) -> Tuple:
         value = value.strip()
 
-        if not value or value[0] == "{":
+        if not value:
             raise ConverterError()
 
-        prefix, name = text.split(value, ":")
-        namespace = ns_map.get(prefix) if ns_map else None
-        if prefix and not namespace:
-            raise ConverterError(f"Unknown namespace prefix: `{prefix}`")
+        if value[0] == "{":
+            uri, name = text.split(value[1:], "}")
 
-        return namespace, name
+            if not namespaces.is_uri(uri):
+                raise ConverterError()
+        else:
+            prefix, name = text.split(value, ":")
+            uri = ns_map.get(prefix) if ns_map else None
+            if prefix and not uri:
+                raise ConverterError(f"Unknown namespace prefix: `{prefix}`")
+
+        if " " in name or not namespaces.is_ncname(name):
+            raise ConverterError()
+
+        return uri, name
 
 
 Array = Union[List, Tuple]

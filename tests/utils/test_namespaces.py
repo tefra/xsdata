@@ -6,6 +6,8 @@ from xsdata.utils.namespaces import build_qname
 from xsdata.utils.namespaces import clean_prefixes
 from xsdata.utils.namespaces import clean_uri
 from xsdata.utils.namespaces import generate_prefix
+from xsdata.utils.namespaces import is_ncname
+from xsdata.utils.namespaces import is_uri
 from xsdata.utils.namespaces import load_prefix
 from xsdata.utils.namespaces import prefix_exists
 from xsdata.utils.namespaces import split_qname
@@ -88,3 +90,17 @@ class NamespacesTests(TestCase):
 
         with self.assertRaises(IndexError):
             split_qname("")
+
+    def test_is_ncname(self):
+        self.assertFalse(is_ncname(""))
+        self.assertFalse(is_ncname(":abc123"))
+        self.assertFalse(is_ncname("9abc123"))
+        self.assertFalse(is_ncname("abc:123"))
+        self.assertTrue(is_ncname("a_1.2-b3"))
+
+    def test_is_uri(self):
+        self.assertFalse(is_uri("|"))
+        self.assertFalse(is_uri(""))
+        self.assertTrue(is_uri("a"))
+        self.assertTrue(is_uri("urn:books"))
+        self.assertTrue(is_uri(Namespace.XS.uri))

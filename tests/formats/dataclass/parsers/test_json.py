@@ -1,5 +1,6 @@
 from dataclasses import make_dataclass
 from unittest.case import TestCase
+from xml.etree.ElementTree import QName
 
 from tests import fixtures_dir
 from tests.fixtures.books import BookForm
@@ -124,12 +125,24 @@ class JsonParserTests(TestCase):
                 ),
                 XmlVar(element=True, qname="generic", name="generic", dataclass=True),
                 XmlVar(element=True, qname="float", name="float", types=[float]),
+                XmlVar(element=True, qname="qname", name="qname", types=[QName]),
             ],
         )
         self.assertEqual(1.0, self.parser.bind_choice("1.0", var))
         self.assertEqual(1, self.parser.bind_choice(1, var))
         self.assertEqual([1], self.parser.bind_choice(["1"], var))
-        self.assertEqual("a", self.parser.bind_choice("a", var))
+
+        actual = self.parser.bind_choice("a", var)
+        self.assertEqual(QName("a"), actual)
+        self.assertIsInstance(actual, QName)
+
+        actual = self.parser.bind_choice("{a}b", var)
+        self.assertIsInstance(actual, QName)
+        self.assertEqual(QName("{a}b"), actual)
+
+        actual = self.parser.bind_choice("!NotQName", var)
+        self.assertIsInstance(actual, str)
+        self.assertEqual("!NotQName", actual)
 
     def test_bind_choice_dataclass(self):
         a = make_dataclass("a", [("x", int)])

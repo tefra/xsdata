@@ -6,7 +6,7 @@ Install using pip
 
 The recommended method is to use a virtual environment.
 
-.. code-block:: bash
+.. code-block:: console
 
     $ pip install xsdata[cli,lxml,soap]
 
@@ -20,7 +20,7 @@ The recommended method is to use a virtual environment.
 xsdata has a monthly release cycle, in order to use the latest updates you can also
 install directly from the git repo.
 
-.. code-block:: bash
+.. code-block:: console
 
     $ pip install git+https://github.com/tefra/xsdata@master#egg=xsdata[cli,lxml]
 
@@ -28,7 +28,7 @@ install directly from the git repo.
 Install using conda
 -------------------
 
-.. code-block:: bash
+.. code-block:: console
 
     $ conda install -c conda-forge xsdata
 

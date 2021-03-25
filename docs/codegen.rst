@@ -5,7 +5,7 @@ Command Line
 
 Make sure the cli requirements are installed.
 
-.. code-block:: bash
+.. code-block:: console
 
     $ pip install xsdata[cli]
 
@@ -18,128 +18,43 @@ Generate Models
 
 .. command-output:: xsdata generate --help
 
-Generate is the default subcommand of the command line interface and can be omitted.
+.. admonition:: See also
+    :class: hint
+
+    - :ref:`Compound fields <Type: Elements>`
+    - :ref:`Docstring styles`
+
+
+Examples
+--------
 
 .. code-block:: console
+    :name: directory source
 
     $ xsdata amadeus/schemas --package amadeus.models
 
+
+.. code-block:: console
+    :name: file path
+
     $ xsdata air_v48_0/AirReqRsp.xsd rail_v48_0/RailReqRsp.xsd --package travelport.models
 
+
+.. code-block:: console
+    :name: uri resource
+
     $ xsdata http://www.gstatic.com/localfeed/local_feed.xsd --package feeds --print
+
+.. code-block:: console
+    :name: xml url
 
     $ xsdata https://musicbrainz.org/ws/2/artist/1f9df192-a621-4f54-8850-2c5373b7eac9 --print
 
 
-SOURCE
-------
+Output plugins
+--------------
 
-The generator can work with xml schemas, wsdl services and xml documents directly.
-
-You can pass the path to a file or a remote resource or event a directory with multiple
-sources.
-
-
-config
-------
-
-Specify a configuration file with more advance options.
-
-
-package
--------
-
-Specify where the target module(s) will be created inside the current working directory.
-eg `--package api.models`
-
-.. admonition:: Note
-    :class: hint
-
-    The cli is relying on the `os.path.commonpath` of the schemas locations to
-    create the final package structure. If you prefer a more flat structure or
-    you have circular import errors check the option :ref:`ns-struct`.
-
-
-output
-------
-
-Specify the output format from the builtin code generators and third party installed
-plugins.
-
-.. hint::
-
-    The default output format is the builtin ``dataclasses``
-
-    Plugins:
-
-    - `PlantUML <https://github.com/tefra/xsdata-plantuml>`_ class diagrams
-
-
-
-
-compound-fields
----------------
-
-The generator by default will flatten repeating choice elements into simple fields.
-The main disadvantage is that the original elements ordering is lost during marshalling.
-With this option you can force the generator to create compound list fields to preserve
-ordering.
-
-See :ref:`Type: Elements`
-
-
-docstring-style
----------------
-
-Choose the style of the generated docstrings.
-
-The accessible is a custom style offering easy access to the docstrings
-of a dataclass' fields or an enum' members for doc/api generators.
-
-.. tab:: reStructuredText
-
-    .. literalinclude:: /../tests/fixtures/docstrings/rst/schema.py
-       :language: python
-       :lines: 37-
-
-.. tab:: NumPy
-
-    .. literalinclude:: /../tests/fixtures/docstrings/numpy/schema.py
-       :language: python
-       :lines: 39-
-
-.. tab:: Google
-
-    .. literalinclude:: /../tests/fixtures/docstrings/google/schema.py
-       :language: python
-       :lines: 38-
-
-.. tab:: Accessible
-
-    .. literalinclude:: /../tests/fixtures/docstrings/accessible/schema.py
-       :language: python
-       :lines: 38-
-
-
-verbosity
----------
-
-Specify the log level, default is ``INFO``
-
-Available options: ``CRITICAL``, ``ERROR``, ``WARNING``, ``INFO`` or ``DEBUG``
-
-
-print
------
-
-Redirect generated code to stdOut instead of writing the output to the target files.
-
-
-ns-struct
----------
-
-Group classes by the target namespace they were defined. This option creates a more
-flat package structure and solves many circular import errors.
+- `PlantUML <https://github.com/tefra/xsdata-plantuml>`_ class diagrams
 
 
 Initialize Config

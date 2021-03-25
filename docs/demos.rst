@@ -47,12 +47,11 @@ XML and JSON Binding.
     without coverage.
 
 
-Report
-------
+XSD Results: **10** failed, **14576** passed, **89** skipped, **16** warnings
 
-XML Results: **12** failed, **14575** passed, **88** skipped, **42** warnings
+XML Results: **13** failed, **14573** passed, **90** skipped, **15** warnings
 
-JSON Results: **120** failed, **14546** passed, **64** warnings
+JSON Results: **113** failed, **14562** passed, **1** warnings
 
 
 ✨✨✨✨
@@ -65,3 +64,39 @@ JSON Results: **120** failed, **14546** passed, **64** warnings
 
     The json mode performs roundtrip conversions and compares the initial and final
     outputs
+
+    The xml mode is using the document instances instead of the schemas to generate
+    the binding models.
+
+
+Docstring styles
+================
+
+Choose the style of the generated docstrings.
+
+The accessible is a custom style offering easy access to the docstrings
+of a dataclass' fields or an enum' members for doc/api generators.
+
+.. tab:: reStructuredText
+
+    .. literalinclude:: /../tests/fixtures/docstrings/rst/schema.py
+       :language: python
+       :lines: 37-
+
+.. tab:: NumPy
+
+    .. literalinclude:: /../tests/fixtures/docstrings/numpy/schema.py
+       :language: python
+       :lines: 39-
+
+.. tab:: Google
+
+    .. literalinclude:: /../tests/fixtures/docstrings/google/schema.py
+       :language: python
+       :lines: 38-
+
+.. tab:: Accessible
+
+    .. literalinclude:: /../tests/fixtures/docstrings/accessible/schema.py
+       :language: python
+       :lines: 38-

@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from typing import Dict
+from typing import List
 
 from xsdata.codegen.mixins import ContainerInterface
 from xsdata.codegen.mixins import HandlerInterface
@@ -28,6 +29,7 @@ class AttributeSanitizerHandler(HandlerInterface):
         self.cascade_default_value(target)
         self.reset_unsupported_types(target)
         self.remove_inherited_fields(target)
+        self.set_effective_choices(target)
 
     def remove_inherited_fields(self, target: Class):
         """Compare all override fields and if they mach the parent definition
@@ -81,6 +83,24 @@ class AttributeSanitizerHandler(HandlerInterface):
                 attr.restrictions.format = None
 
             attr.types = collections.unique_sequence(attr.types, key="qname")
+
+    @classmethod
+    def set_effective_choices(cls, target: Class):
+        """Look for sequential lists and non list elements and set effective
+        choice group for compound fields."""
+        groups: List[List[Attr]] = [[]]
+        for attr in target.attrs:
+            # If attr is sequential and is list or the group is not empty
+            if attr.restrictions.sequential and (attr.is_list or groups[-1]):
+                groups[-1].append(attr)
+            elif groups[-1]:
+                groups.append([])
+
+        for idx, group in enumerate(groups):
+            total_lists = sum(attr.restrictions.is_list for attr in group)
+            if total_lists != len(group) and total_lists > 0:
+                for attr in group:
+                    attr.restrictions.choice = f"effective_{idx}"
 
     @classmethod
     def validate_default_value(cls, attr: Attr, ns_map: Dict) -> bool:

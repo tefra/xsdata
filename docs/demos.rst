@@ -49,7 +49,7 @@ XML and JSON Binding.
 
 XSD Results: **10** failed, **14576** passed, **89** skipped, **16** warnings
 
-XML Results: **13** failed, **14573** passed, **90** skipped, **15** warnings
+XML Results: **3** failed, **14582** passed, **90** skipped, **15** warnings
 
 JSON Results: **113** failed, **14562** passed, **1** warnings
 

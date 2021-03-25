@@ -34,7 +34,7 @@ def cli():
 
 @cli.command("init-config")
 @click.argument("output", type=click.Path(), default=".xsdata.xml")
-@click.option("--print", is_flag=True, default=False, help="Print output")
+@click.option("-pp", "--print", is_flag=True, default=False, help="Print output")
 def init_config(**kwargs: Any):
     """Create or update a configuration file."""
 
@@ -59,6 +59,7 @@ def init_config(**kwargs: Any):
 @cli.command("download")
 @click.argument("source", required=True)
 @click.option(
+    "-o",
     "--output",
     type=click.Path(resolve_path=True),
     default="./",
@@ -72,39 +73,81 @@ def download(source: str, output: str):
 
 @cli.command("generate")
 @click.argument("source", required=True)
-@click.option("--config", default=".xsdata.xml", help="Configuration file")
-@click.option("--package", required=False, help="Target Package", default="generated")
-@click.option("--output", type=outputs, help="Output Format", default="dataclasses")
 @click.option(
+    "-c",
+    "--config",
+    default=".xsdata.xml",
+    help="Specify a configuration file with advanced options.",
+)
+@click.option(
+    "-p",
+    "--package",
+    required=False,
+    help=(
+        "Specify the target package to be created inside the current working directory "
+        "Default: generated"
+        "\n\n"
+        "The generated module structure relies on the common input source path"
+        "\n\n"
+        "Use the --ns-struct option for a more flat structure and to avoid circular "
+        "import errors."
+    ),
+    default="generated",
+)
+@click.option(
+    "-o",
+    "--output",
+    type=outputs,
+    help=(
+        "Specify the output format from the builtin code generator and any third "
+        "party installed plugins. Default: dataclasses"
+    ),
+    default="dataclasses",
+)
+@click.option(
+    "-cf",
     "--compound-fields",
     type=click.BOOL,
     default=False,
     help=(
-        "Use compound fields for repeating choices. "
-        "Enable if elements ordering matters for your case."
+        "Use compound fields for repeating choices in order to maintain elements "
+        "ordering between data binding operations."
     ),
 )
 @click.option(
+    "-ds",
     "--docstring-style",
     type=docstring_styles,
-    help="Docstring Style",
+    help=(
+        "Specify the docstring style for the default output format. "
+        "Default: reStructuredText"
+    ),
     default="reStructuredText",
 )
-@click.option("--print", is_flag=True, default=False, help="Print output")
 @click.option(
+    "-pp",
+    "--print",
+    is_flag=True,
+    default=False,
+    help="Print to console instead of writing the generated output to files",
+)
+@click.option(
+    "-ns",
     "--ns-struct",
     is_flag=True,
     default=False,
     help=(
-        "Use namespaces to group classes in the same module. "
+        "Use namespaces to group classes in modules. "
         "Useful against circular import errors."
     ),
 )
 def generate(**kwargs: Any):
     """
-    Convert schema definitions to code.
+    Generate code from xml schemas, webservice definitions and any xml
+    document.
 
-    SOURCE can be either a filepath, directory or url
+    The input source can be either a filepath, uri or a directory
+    containing xml, xsd, wsdl files.
     """
     if kwargs["print"]:
         logger.setLevel(logging.ERROR)

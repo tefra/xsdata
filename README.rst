@@ -44,7 +44,7 @@ xsData is constantly tested against the
 Getting started
 ---------------
 
-.. code-block:: bash
+.. code-block:: console
 
     $ pip install xsdata[cli,lxml,soap]
 

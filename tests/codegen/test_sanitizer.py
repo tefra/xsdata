@@ -491,6 +491,8 @@ class ClassSanitizerTest(FactoryTestCase):
 
     def test_group_fields(self):
         target = ClassFactory.create(attrs=AttrFactory.list(2))
+        target.attrs[0].restrictions.choice = "1"
+        target.attrs[1].restrictions.choice = "1"
         target.attrs[0].restrictions.min_occurs = 10
         target.attrs[0].restrictions.max_occurs = 15
         target.attrs[1].restrictions.min_occurs = 5
@@ -521,14 +523,42 @@ class ClassSanitizerTest(FactoryTestCase):
         self.assertEqual(expected, target.attrs[0])
         self.assertEqual(expected_res, target.attrs[0].restrictions)
 
+    def test_group_fields_with_effective_choices_sums_occurs(self):
+        target = ClassFactory.create(attrs=AttrFactory.list(2))
+        target.attrs[0].restrictions.choice = "effective_1"
+        target.attrs[1].restrictions.choice = "effective_1"
+        target.attrs[0].restrictions.min_occurs = 1
+        target.attrs[0].restrictions.max_occurs = 2
+        target.attrs[1].restrictions.min_occurs = 3
+        target.attrs[1].restrictions.max_occurs = 4
+
+        expected_res = Restrictions(min_occurs=4, max_occurs=6)
+
+        self.sanitizer.group_fields(target, list(target.attrs))
+        self.assertEqual(1, len(target.attrs))
+        self.assertEqual(expected_res, target.attrs[0].restrictions)
+
     def test_group_fields_limit_name(self):
         target = ClassFactory.create(attrs=AttrFactory.list(3))
+        for attr in target.attrs:
+            attr.restrictions.choice = "1"
+
         self.sanitizer.group_fields(target, list(target.attrs))
 
         self.assertEqual(1, len(target.attrs))
         self.assertEqual("attr_B_Or_attr_C_Or_attr_D", target.attrs[0].name)
 
         target = ClassFactory.create(attrs=AttrFactory.list(4))
+        for attr in target.attrs:
+            attr.restrictions.choice = "1"
+
+        self.sanitizer.group_fields(target, list(target.attrs))
+        self.assertEqual("choice", target.attrs[0].name)
+
+        target = ClassFactory.create()
+        attr = AttrFactory.element(restrictions=Restrictions(choice="1"))
+        target.attrs.append(attr)
+        target.attrs.append(attr.clone())
         self.sanitizer.group_fields(target, list(target.attrs))
         self.assertEqual("choice", target.attrs[0].name)
 

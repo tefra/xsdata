@@ -71,6 +71,8 @@ class ClassSanitizer:
         """Group attributes into a new compound field."""
 
         pos = target.attrs.index(attrs[0])
+        choice = attrs[0].restrictions.choice
+        sum_occurs = choice and choice.startswith("effective_")
         names = []
         choices = []
         min_occurs = []
@@ -78,11 +80,15 @@ class ClassSanitizer:
         for attr in attrs:
             target.attrs.remove(attr)
             names.append(attr.local_name)
-            min_occurs.append(attr.restrictions.min_occurs)
-            max_occurs.append(attr.restrictions.max_occurs)
+            min_occurs.append(attr.restrictions.min_occurs or 0)
+            max_occurs.append(attr.restrictions.max_occurs or 0)
             choices.append(self.build_attr_choice(attr))
 
-        name = "choice" if len(names) > 3 else "_Or_".join(names)
+        if len(names) > 3 or len(names) != len(set(names)):
+            name = "choice"
+        else:
+            name = "_Or_".join(names)
+
         target.attrs.insert(
             pos,
             Attr(
@@ -91,8 +97,8 @@ class ClassSanitizer:
                 types=[AttrType(qname=str(DataType.ANY_TYPE), native=True)],
                 tag=Tag.CHOICE,
                 restrictions=Restrictions(
-                    min_occurs=min((x for x in min_occurs if x is not None), default=0),
-                    max_occurs=max((x for x in max_occurs if x is not None), default=0),
+                    min_occurs=sum(min_occurs) if sum_occurs else min(min_occurs),
+                    max_occurs=sum(max_occurs) if sum_occurs else max(max_occurs),
                 ),
                 choices=choices,
             ),

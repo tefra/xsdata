@@ -6,18 +6,18 @@
     <xsd:documentation>
       This provides an example of validating an instance with multiple namespaces.
       chapter03env.xsd imports chapter03ord.xsd, which imports chapter03prod.xsd, which
-      imports chapter03prod2.xsd.  The "form" attribute is used to indicate whether
+      imports chapter03prod2.xsd. The "form" attribute is used to indicate whether
       element-type and/or attribute names should be qualified in the instance.
     </xsd:documentation>
   </xsd:annotation>
 
-  <xsd:import namespace="http://example.org/ord" schemaLocation="chapter03ord.xsd"/>
+  <xsd:import namespace="http://example.org/ord" schemaLocation="chapter03ord.xsd" />
 
-  <xsd:element name="envelope" type="EnvelopeType"/>
+  <xsd:element name="envelope" type="EnvelopeType" />
 
   <xsd:complexType name="EnvelopeType">
     <xsd:sequence>
-      <xsd:element ref="ord:order" maxOccurs="unbounded"/>
+      <xsd:element ref="ord:order" maxOccurs="unbounded" />
     </xsd:sequence>
   </xsd:complexType>
 

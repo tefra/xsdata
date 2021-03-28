@@ -5,7 +5,7 @@ Generator Config
 The configuration offers more advance options to further tail the output to your needs,
 like naming conventions and aliases.
 
-.. literalinclude:: /examples/config.sample.xml
+.. literalinclude:: /_static/config.sample.xml
    :language: xml
 
 .. currentmodule:: xsdata.models.config

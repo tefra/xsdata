@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import Dict
 
 docs_root = Path(__file__).parent.parent
-docs_root.joinpath("defxmlschema").mkdir(parents=True, exist_ok=True)
+docs_root.joinpath("examples/defxmlchapters").mkdir(parents=True, exist_ok=True)
 fixtures = docs_root.joinpath("../tests/fixtures")
 
 subtitles = {
@@ -111,9 +111,9 @@ def generate():
         chapter = xsd.stem
         number = chapter.replace("chapter", "#")
         title = "{number} - {topic}".format(number=number, topic=subtitles[chapter])
-        title = "{line}\n{title}\n{line}".format(line="=" * len(title), title=title)
+        title = "{title}\n{line}".format(line="=" * len(title), title=title)
 
-        file = docs_root.joinpath(f"defxmlschema/{chapter}.rst")
+        file = docs_root.joinpath(f"examples/defxmlchapters/{chapter}.rst")
         file.write_text(
             chapter_tpl.format(title=title, output="\n\n".join(buffer)),
             encoding="utf-8",

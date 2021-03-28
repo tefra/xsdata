@@ -17,7 +17,7 @@ Make sure you install both cli and soap requirements.
 
 .. code-block:: console
 
-    $ xsdata --wsdl --package calculator http://www.dneonline.com/calculator.asmx?WSDL
+    $ xsdata --package calculator http://www.dneonline.com/calculator.asmx?WSDL
 
 
 Message Model

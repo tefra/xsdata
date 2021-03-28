@@ -1,38 +1,37 @@
-==========================
-#10 - Union and list types
-==========================
+#03 - Namespaces
+================
 
 
 **Code Generation**
 
 .. tab:: Schema
 
-    .. literalinclude:: /../tests/fixtures/defxmlschema/chapter10.xsd
+    .. literalinclude:: /../tests/fixtures/defxmlschema/chapter03.xsd
        :language: xml
        :lines: 2-
 
 .. tab:: Models
 
-    .. literalinclude:: /../tests/fixtures/defxmlschema/chapter10.py
+    .. literalinclude:: /../tests/fixtures/defxmlschema/chapter03.py
        :language: python
 
 **Data Binding**
 
 .. tab:: Original XML Document
 
-    .. literalinclude:: /../tests/fixtures/defxmlschema/chapter10.xml
+    .. literalinclude:: /../tests/fixtures/defxmlschema/chapter03.xml
        :language: xml
        :lines: 2-
 
 .. tab:: xsData XML Output
 
-    .. literalinclude:: /../tests/fixtures/defxmlschema/chapter10.xsdata.xml
+    .. literalinclude:: /../tests/fixtures/defxmlschema/chapter03.xsdata.xml
        :language: xml
        :lines: 2-
 
 .. tab:: xsData JSON Output
 
-    .. literalinclude:: /../tests/fixtures/defxmlschema/chapter10.json
+    .. literalinclude:: /../tests/fixtures/defxmlschema/chapter03.json
        :language: json
 
 .. admonition:: Samples Source

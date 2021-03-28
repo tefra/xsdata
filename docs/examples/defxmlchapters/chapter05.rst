@@ -1,38 +1,37 @@
-===================
-#12 - Complex types
-===================
+#05 - Instances and schemas
+===========================
 
 
 **Code Generation**
 
 .. tab:: Schema
 
-    .. literalinclude:: /../tests/fixtures/defxmlschema/chapter12.xsd
+    .. literalinclude:: /../tests/fixtures/defxmlschema/chapter05.xsd
        :language: xml
        :lines: 2-
 
 .. tab:: Models
 
-    .. literalinclude:: /../tests/fixtures/defxmlschema/chapter12.py
+    .. literalinclude:: /../tests/fixtures/defxmlschema/chapter05.py
        :language: python
 
 **Data Binding**
 
 .. tab:: Original XML Document
 
-    .. literalinclude:: /../tests/fixtures/defxmlschema/chapter12.xml
+    .. literalinclude:: /../tests/fixtures/defxmlschema/chapter05.xml
        :language: xml
        :lines: 2-
 
 .. tab:: xsData XML Output
 
-    .. literalinclude:: /../tests/fixtures/defxmlschema/chapter12.xsdata.xml
+    .. literalinclude:: /../tests/fixtures/defxmlschema/chapter05.xsdata.xml
        :language: xml
        :lines: 2-
 
 .. tab:: xsData JSON Output
 
-    .. literalinclude:: /../tests/fixtures/defxmlschema/chapter12.json
+    .. literalinclude:: /../tests/fixtures/defxmlschema/chapter05.json
        :language: json
 
 .. admonition:: Samples Source

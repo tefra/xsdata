@@ -1,38 +1,37 @@
-===========================
-#05 - Instances and schemas
-===========================
+#08 - Simple types
+==================
 
 
 **Code Generation**
 
 .. tab:: Schema
 
-    .. literalinclude:: /../tests/fixtures/defxmlschema/chapter05.xsd
+    .. literalinclude:: /../tests/fixtures/defxmlschema/chapter08.xsd
        :language: xml
        :lines: 2-
 
 .. tab:: Models
 
-    .. literalinclude:: /../tests/fixtures/defxmlschema/chapter05.py
+    .. literalinclude:: /../tests/fixtures/defxmlschema/chapter08.py
        :language: python
 
 **Data Binding**
 
 .. tab:: Original XML Document
 
-    .. literalinclude:: /../tests/fixtures/defxmlschema/chapter05.xml
+    .. literalinclude:: /../tests/fixtures/defxmlschema/chapter08.xml
        :language: xml
        :lines: 2-
 
 .. tab:: xsData XML Output
 
-    .. literalinclude:: /../tests/fixtures/defxmlschema/chapter05.xsdata.xml
+    .. literalinclude:: /../tests/fixtures/defxmlschema/chapter08.xsdata.xml
        :language: xml
        :lines: 2-
 
 .. tab:: xsData JSON Output
 
-    .. literalinclude:: /../tests/fixtures/defxmlschema/chapter05.json
+    .. literalinclude:: /../tests/fixtures/defxmlschema/chapter08.json
        :language: json
 
 .. admonition:: Samples Source

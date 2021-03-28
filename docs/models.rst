@@ -1,31 +1,90 @@
-******
-Models
-******
+***************
+Models Metadata
+***************
 
-Dataclasses is the default output format for the code generator and ships with its own
-modules for xml and json marshalling. The generated models are simple python
-`dataclasses <https://docs.python.org/3/library/dataclasses.html>`_ with some optional
-metadata to control how the data structures are transferred during data binding.
+The code generator's default output format is python
+`dataclasses <https://docs.python.org/3/library/dataclasses.html>`_  and ships with its
+own modules for xml and json marshalling.
 
-If you are working with xml documents that don't have any schema definition you can
-create these models manually.
+The generated models don't depend on the xsdata library, except for specific xsd
+data types that can't be mapped directly to python's builtin types. They only include
+some metadata properties in order to control how the data structures are transferred
+during data binding.
+
+
+.. hint::
+
+    The code generator supports processing xml documents directly. That means even
+    without a schema you can easily create at the very least an initial draft of your
+    models just from samples. If you use a directory with multiple samples the
+    transformer will merge and flatten duplicate classes, fields and field types.
+
+    .. versionadded:: 20.4
+
+
+.. testsetup:: *
+
+    from dataclasses import dataclass
+    from dataclasses import field
+    from decimal import Decimal
+    from typing import List
+
+    from xsdata.formats.dataclass.parsers import XmlParser
 
 
 Basic Model
 ===========
 
-.. literalinclude:: examples/basic_model.py
-    :lines: 9-26
-    :language: python
+.. testcode::
 
-.. literalinclude:: examples/basic_model.py
-    :lines: 30-45
-    :language: xml
+    @dataclass
+    class Currency:
+        id: int = field(metadata=dict(type="Attribute", name="ID"))
+        name: str = field(metadata=dict(name="Name"))
+        num_code: int = field(metadata=dict(name="NumCode"))
+        iso_code: str = field(metadata=dict(name="CharCode"))
+        nominal: int = field(metadata=dict(name="Nominal"))
+        value: Decimal = field(metadata=dict(name="Value"))
 
 
+    @dataclass
+    class Currencies:
+        class Meta:
+            name = "ValCurs"
 
-Class Meta
-==========
+        date: str = field(metadata=dict(type="Attribute", name="Date"))
+        name: str = field(metadata=dict(type="Attribute"))
+        values: List[Currency] = field(default_factory=list, metadata=dict(name="Valute"))
+
+
+    xml = """
+    <ValCurs Date="19.04.2020" name="Official exchange rate">
+        <Valute ID="47">
+            <NumCode>978</NumCode>
+            <CharCode>EUR</CharCode>
+            <Nominal>1</Nominal>
+            <Name>Euro</Name>
+            <Value>19.2743</Value>
+        </Valute>
+        <Valute ID="44">
+            <NumCode>840</NumCode>
+            <CharCode>USD</CharCode>
+            <Nominal>1</Nominal>
+            <Name>US Dollar</Name>
+            <Value>17.7177</Value>
+        </Valute>
+    </ValCurs>
+    """
+
+    obj = XmlParser().from_string(xml, Currencies)
+    print(obj.values[1])
+
+.. testoutput::
+
+    Currency(id=44, name='US Dollar', num_code=840, iso_code='USD', nominal=1, value=Decimal('17.7177'))
+
+Class Metadata
+==============
 
 Through the Meta class you can control the model's behaviour during data binding
 procedures.

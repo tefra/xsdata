@@ -1,38 +1,37 @@
-==============================
-#01 - Schemas: An introduction
-==============================
+#04 - Schema composition
+========================
 
 
 **Code Generation**
 
 .. tab:: Schema
 
-    .. literalinclude:: /../tests/fixtures/defxmlschema/chapter01.xsd
+    .. literalinclude:: /../tests/fixtures/defxmlschema/chapter04.xsd
        :language: xml
        :lines: 2-
 
 .. tab:: Models
 
-    .. literalinclude:: /../tests/fixtures/defxmlschema/chapter01.py
+    .. literalinclude:: /../tests/fixtures/defxmlschema/chapter04.py
        :language: python
 
 **Data Binding**
 
 .. tab:: Original XML Document
 
-    .. literalinclude:: /../tests/fixtures/defxmlschema/chapter01.xml
+    .. literalinclude:: /../tests/fixtures/defxmlschema/chapter04.xml
        :language: xml
        :lines: 2-
 
 .. tab:: xsData XML Output
 
-    .. literalinclude:: /../tests/fixtures/defxmlschema/chapter01.xsdata.xml
+    .. literalinclude:: /../tests/fixtures/defxmlschema/chapter04.xsdata.xml
        :language: xml
        :lines: 2-
 
 .. tab:: xsData JSON Output
 
-    .. literalinclude:: /../tests/fixtures/defxmlschema/chapter01.json
+    .. literalinclude:: /../tests/fixtures/defxmlschema/chapter04.json
        :language: json
 
 .. admonition:: Samples Source

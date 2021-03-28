@@ -7,41 +7,41 @@
     </xsd:documentation>
   </xsd:annotation>
 
-  <xsd:element name="shirt" type="ShirtType"/>
+  <xsd:element name="shirt" type="ShirtType" />
 
   <xsd:complexType name="ShirtType">
     <xsd:sequence>
-      <xsd:group ref="ProductPropertyGroup" minOccurs="0"/>
-      <xsd:element name="size" type="SizeType"/>
+      <xsd:group ref="ProductPropertyGroup" minOccurs="0" />
+      <xsd:element name="size" type="SizeType" />
     </xsd:sequence>
-    <xsd:attributeGroup ref="IdentifierGroup"/>
-    <xsd:attribute name="effDate" type="xsd:date"/>
+    <xsd:attributeGroup ref="IdentifierGroup" />
+    <xsd:attribute name="effDate" type="xsd:date" />
   </xsd:complexType>
 
   <xsd:group name="DescriptionGroup">
     <xsd:sequence>
-      <xsd:element name="description" type="xsd:string"/>
-      <xsd:element name="comment" type="xsd:string" minOccurs="0"/>
+      <xsd:element name="description" type="xsd:string" />
+      <xsd:element name="comment" type="xsd:string" minOccurs="0" />
     </xsd:sequence>
   </xsd:group>
 
   <xsd:group name="ProductPropertyGroup">
     <xsd:sequence>
-      <xsd:group ref="DescriptionGroup"/>
-      <xsd:element name="number" type="xsd:integer"/>
-      <xsd:element name="name" type="xsd:string"/>
+      <xsd:group ref="DescriptionGroup" />
+      <xsd:element name="number" type="xsd:integer" />
+      <xsd:element name="name" type="xsd:string" />
     </xsd:sequence>
   </xsd:group>
 
   <xsd:attributeGroup name="IdentifierGroup">
-    <xsd:attribute name="id" type="xsd:ID" use="required"/>
-    <xsd:attribute name="version" type="xsd:decimal"/>
+    <xsd:attribute name="id" type="xsd:ID" use="required" />
+    <xsd:attribute name="version" type="xsd:decimal" />
   </xsd:attributeGroup>
 
   <xsd:complexType name="SizeType">
     <xsd:simpleContent>
       <xsd:extension base="xsd:integer">
-        <xsd:attribute name="system" type="xsd:token"/>
+        <xsd:attribute name="system" type="xsd:token" />
       </xsd:extension>
     </xsd:simpleContent>
   </xsd:complexType>

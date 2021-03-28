@@ -78,4 +78,4 @@ Download Schemas
 .. admonition:: Examples
     :class: hint
 
-    Check the :doc:`demos` and the `samples repo <https://github.com/tefra/xsdata-samples>`_ for more ✨✨✨
+    Check the :doc:`samples` and the `samples repo <https://github.com/tefra/xsdata-samples>`_ for more ✨✨✨

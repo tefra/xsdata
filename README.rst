@@ -28,15 +28,13 @@ Naive XML Bindings for python
 --------
 
 xsData is a complete XML data binding library for python allowing developers to access
-and use XML documents as simple objects rather than using DOM.
+and use XML and JSON documents as simple objects rather than using DOM.
 
-It ships with a code generator for XML schemas, WSDL definitions or directly from XML
-documents. It produces simple dataclasses with type hints in order to reduce the
-learning curve for users that have to write the binding models manually.
+It ships with a code generator for XML schemas, WSDL definitions and XML
+documents. It produces simple dataclasses with type hints and binding metadata.
 
-The included xml parser and serializer are highly optimized and adaptable with handlers
-based on native python and lxml. The parser configuration offers the ability to skip
-unknown properties and to process xinclude statements.
+The included XML and JSON parser/serializer are highly optimized and adaptable, with
+multiple handlers and configuration properties.
 
 xsData is constantly tested against the
 `W3C XML Schema 1.1 test suite <https://github.com/tefra/xsdata-w3c-tests>`_.
@@ -44,16 +42,32 @@ xsData is constantly tested against the
 Getting started
 ---------------
 
-.. code-block:: console
+.. code:: console
 
+    $ # Install all dependencies
     $ pip install xsdata[cli,lxml,soap]
 
-.. image:: https://github.com/tefra/xsdata/raw/master/docs/_static/demo.svg
+.. code:: console
 
-Check the documentation `demos <https://xsdata.readthedocs.io/en/latest/demos.html>`_ or
-our `W3C XML Schema 1.1  <https://github.com/tefra/xsdata-w3c-tests>`_ test runner and
-the `samples repo <https://github.com/tefra/xsdata-samples>`_ for more ✨✨✨
+    $ # Generate models
+    $ xsdata tests/fixtures/primer/order.xsd --package tests.fixtures.primer
 
+.. code:: python
+
+    >>> # Parse XML
+    >>> from pathlib import Path
+    >>> from tests.fixtures.primer import PurchaseOrder
+    >>> from xsdata.formats.dataclass.parsers import XmlParser
+    >>>
+    >>> xml_string = Path("tests/fixtures/primer/order.xml").read_text()
+    >>> parser = XmlParser()
+    >>> order = parser.from_string(xml_string, PurchaseOrder)
+    >>> order.bill_to
+    Usaddress(name='Robert Smith', street='8 Oak Avenue', city='Old Town', state='PA', zip=Decimal('95819'), country='US')
+
+
+Check the `documentation <https://xsdata.readthedocs.io>`_ for more
+✨✨✨
 
 Features
 --------

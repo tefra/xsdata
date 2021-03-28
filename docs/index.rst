@@ -8,6 +8,7 @@
 
 
 .. toctree::
+    :glob:
     :maxdepth: 1
 
     installation
@@ -15,10 +16,10 @@
     models
     xml
     json
-    data-types
     wsdl
+    examples
+    data-types
     api
-    demos
     changelog
 
 

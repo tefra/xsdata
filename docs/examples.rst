@@ -10,6 +10,7 @@ Code Generation
 
     examples/docstrings
     examples/xml-modeling
+    examples/compound-fields
 
 
 

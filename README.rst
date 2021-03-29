@@ -30,8 +30,8 @@ Naive XML Bindings for python
 xsData is a complete XML data binding library for python allowing developers to access
 and use XML and JSON documents as simple objects rather than using DOM.
 
-It ships with a code generator for XML schemas, WSDL definitions and XML
-documents. It produces simple dataclasses with type hints and binding metadata.
+It ships with a code generator for XML schemas, WSDL definitions and XML documents. It
+produces simple dataclasses with type hints and binding metadata.
 
 The included XML and JSON parser/serializer are highly optimized and adaptable, with
 multiple handlers and configuration properties.

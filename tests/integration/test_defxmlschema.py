@@ -94,7 +94,7 @@ def test_definitive_xml_schema_chapter_12():
     package = "tests.fixtures.defxmlschema"
     runner = CliRunner()
     result = runner.invoke(
-        cli, [str(schema), "--package", package, "--compound-fields", "yes"]
+        cli, [str(schema), "--package", package, "--compound-fields"]
     )
 
     if result.exception:
@@ -148,7 +148,7 @@ def test_definitive_xml_schema_chapter_17():
     package = "tests.fixtures.defxmlschema"
     runner = CliRunner()
     result = runner.invoke(
-        cli, [str(schema), "--package", package, "--compound-fields", "yes"]
+        cli, [str(schema), "--package", package, "--compound-fields"]
     )
 
     if result.exception:

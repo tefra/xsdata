@@ -105,16 +105,6 @@ def download(source: str, output: str):
     default="dataclasses",
 )
 @click.option(
-    "-cf",
-    "--compound-fields",
-    type=click.BOOL,
-    default=False,
-    help=(
-        "Use compound fields for repeating choices in order to maintain elements "
-        "ordering between data binding operations."
-    ),
-)
-@click.option(
     "-ds",
     "--docstring-style",
     type=docstring_styles,
@@ -125,13 +115,6 @@ def download(source: str, output: str):
     default="reStructuredText",
 )
 @click.option(
-    "-pp",
-    "--print",
-    is_flag=True,
-    default=False,
-    help="Print to console instead of writing the generated output to files",
-)
-@click.option(
     "-ns",
     "--ns-struct",
     is_flag=True,
@@ -140,6 +123,23 @@ def download(source: str, output: str):
         "Use namespaces to group classes in modules. "
         "Useful against circular import errors."
     ),
+)
+@click.option(
+    "-cf",
+    "--compound-fields",
+    is_flag=True,
+    default=False,
+    help=(
+        "Use compound fields for repeating choices in order to maintain elements "
+        "ordering between data binding operations."
+    ),
+)
+@click.option(
+    "-pp",
+    "--print",
+    is_flag=True,
+    default=False,
+    help="Print to console instead of writing the generated output to files",
 )
 def generate(**kwargs: Any):
     """

@@ -13,8 +13,8 @@ Make sure the cli requirements are installed.
 .. command-output:: xsdata --help
 
 
-Generate Models
-===============
+Generate Code
+=============
 
 .. command-output:: xsdata generate --help
 
@@ -25,28 +25,26 @@ Generate Models
     - :ref:`Docstring styles`
 
 
-Examples
---------
 
 .. code-block:: console
-    :name: directory source
+    :caption: Scan directory for xsd, wsdl, xml files
 
     $ xsdata amadeus/schemas --package amadeus.models
 
 
 .. code-block:: console
-    :name: file path
+    :caption: Convert a local schema
 
     $ xsdata air_v48_0/AirReqRsp.xsd rail_v48_0/RailReqRsp.xsd --package travelport.models
 
 
 .. code-block:: console
-    :name: uri resource
+    :caption: Convert a remote schema
 
     $ xsdata http://www.gstatic.com/localfeed/local_feed.xsd --package feeds --print
 
 .. code-block:: console
-    :name: xml url
+    :caption: Convert a remote xml file
 
     $ xsdata https://musicbrainz.org/ws/2/artist/1f9df192-a621-4f54-8850-2c5373b7eac9 --print
 
@@ -78,4 +76,4 @@ Download Schemas
 .. admonition:: Examples
     :class: hint
 
-    Check the :doc:`samples` and the `samples repo <https://github.com/tefra/xsdata-samples>`_ for more ✨✨✨
+    Check the :doc:`examples` and the `samples repo <https://github.com/tefra/xsdata-samples>`_ for more ✨✨✨

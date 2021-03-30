@@ -1,6 +1,4 @@
-import io
 import json
-import pathlib
 import warnings
 from dataclasses import dataclass
 from dataclasses import field
@@ -23,7 +21,6 @@ from xsdata.formats.dataclass.models.generics import DerivedElement
 from xsdata.formats.dataclass.parsers.utils import ParserUtils
 from xsdata.utils.constants import EMPTY_MAP
 
-
 ANY_KEYS = {f.name for f in fields(AnyElement)}
 DERIVED_KEYS = {f.name for f in fields(DerivedElement)}
 
@@ -38,13 +35,15 @@ class JsonParser(AbstractParser):
 
     context: XmlContext = field(default_factory=XmlContext)
 
-    def from_path(self, path: pathlib.Path, clazz: Optional[Type[T]] = None) -> T:
-        """Parse the input file path and return the resulting object tree."""
-        return self.from_bytes(path.read_bytes(), clazz)
+    def parse(self, source: Any, clazz: Optional[Type[T]] = None) -> T:
+        """Parse the input stream or filename and return the resulting object
+        tree."""
 
-    def parse(self, source: io.BytesIO, clazz: Optional[Type[T]] = None) -> T:
-        """Parse the JSON input stream and return the resulting object tree."""
-        ctx = json.load(source)
+        if not hasattr(source, "read"):
+            with open(source, "rb") as fp:
+                ctx = json.load(fp)
+        else:
+            ctx = json.load(source)
 
         if clazz is None:
             clazz = self.context.find_type_by_fields(set(ctx.keys()))

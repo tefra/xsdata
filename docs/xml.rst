@@ -20,6 +20,7 @@ context instance.
 
 .. testsetup:: *
 
+    import io
     from xsdata.formats.dataclass.context import XmlContext
     from xsdata.formats.dataclass.parsers import XmlParser
     from xsdata.formats.dataclass.serializers import XmlSerializer
@@ -29,20 +30,6 @@ context instance.
     from tests.fixtures.primer import PurchaseOrder, Usaddress
 
     xml_path = fixtures_dir.joinpath("primer/order.xml")
-    books = Books(
-         book=[
-             BookForm(
-                 id="bk001",
-                 author="Hightower, Kim",
-                 title="The First Book",
-                 genre="Fiction",
-                 price=44.95,
-                 pub_date="2000-10-01",
-                 review="An amazing story of nothing.",
-             )
-         ]
-     )
-
     parser = XmlParser()
     serializer = XmlSerializer(config=SerializerConfig(pretty_print=True))
 
@@ -50,22 +37,44 @@ context instance.
 Parsing XML
 ===========
 
-
-From Path
----------
+From filename
+-------------
 
 .. doctest::
 
     >>> from xsdata.formats.dataclass.context import XmlContext
     >>> from xsdata.formats.dataclass.parsers import XmlParser
-    >>> from tests import fixtures_dir
+    >>> from tests import fixtures_dir # pathlib.Path
     >>> from tests.fixtures.primer import PurchaseOrder, Usaddress
     ...
-    >>> xml_path = fixtures_dir.joinpath("primer/order.xml")
+    >>> filename = str(fixtures_dir.joinpath("primer/order.xml"))
     >>> parser = XmlParser(context=XmlContext())
-    >>> order = parser.from_path(xml_path, PurchaseOrder)
+    >>> order = parser.parse(filename, PurchaseOrder)
     >>> order.bill_to
     Usaddress(name='Robert Smith', street='8 Oak Avenue', city='Old Town', state='PA', zip=Decimal('95819'), country='US')
+
+
+From file object
+----------------
+
+.. doctest::
+
+    >>> xml_path = fixtures_dir.joinpath("primer/order.xml")
+    >>> with xml_path.open("rb") as fp:
+    ...     order = parser.parse(fp, PurchaseOrder)
+    >>> order.bill_to.street
+    '8 Oak Avenue'
+
+
+From stream
+-----------
+
+.. doctest::
+
+    >>> import io
+    >>> order = parser.parse(io.BytesIO(xml_path.read_bytes()), PurchaseOrder)
+    >>> order.bill_to.street
+    '8 Oak Avenue'
 
 
 From string
@@ -84,6 +93,16 @@ From bytes
 .. doctest::
 
     >>> order = parser.from_bytes(xml_path.read_bytes(), PurchaseOrder)
+    >>> order.bill_to.street
+    '8 Oak Avenue'
+
+
+From path
+---------
+
+.. doctest::
+
+    >>> order = parser.from_path(xml_path, PurchaseOrder)
     >>> order.bill_to.street
     '8 Oak Avenue'
 

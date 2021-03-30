@@ -7,6 +7,7 @@ types doing roundtrip conversions is not always possible.
 
 .. testsetup:: *
 
+    import io
     from pathlib import Path
     from xsdata.formats.dataclass.context import XmlContext
     from xsdata.formats.dataclass.parsers import JsonParser
@@ -16,35 +17,48 @@ types doing roundtrip conversions is not always possible.
 
     json_path = fixtures_dir.joinpath("defxmlschema/chapter05.json")
     parser = JsonParser(context=XmlContext())
-    order = Order(
-        items=ItemsType(
-            product=[
-                Product(
-                    number=557,
-                    name='Short-Sleeved Linen Blouse',
-                    size=SizeType(value=None, system=None)
-                )
-            ]
-        )
-    )
 
 Parsing JSON
 ============
 
-From Path
----------
+
+From filename
+-------------
 
 .. doctest::
 
     >>> from pathlib import Path
     >>> from xsdata.formats.dataclass.context import XmlContext
     >>> from xsdata.formats.dataclass.parsers import JsonParser
-    >>> from tests import fixtures_dir
+    >>> from tests import fixtures_dir # pathlib.Path
     >>> from tests.fixtures.defxmlschema.chapter05 import Order
     ...
-    >>> json_path = fixtures_dir.joinpath("defxmlschema/chapter05.json")
+    >>> filename = str(fixtures_dir.joinpath("defxmlschema/chapter05.json"))
     >>> parser = JsonParser(context=XmlContext())
-    >>> order = parser.from_path(json_path, Order)
+    >>> order = parser.parse(filename, Order)
+    >>> order.items.product[0]
+    Product(number=557, name='Short-Sleeved Linen Blouse', size=SizeType(value=None, system=None))
+
+
+From file object
+----------------
+
+.. doctest::
+
+    >>> json_path = fixtures_dir.joinpath("defxmlschema/chapter05.json")
+    >>> with json_path.open("rb") as fp:
+    ...     order = parser.parse(fp, Order)
+    >>> order.items.product[0]
+    Product(number=557, name='Short-Sleeved Linen Blouse', size=SizeType(value=None, system=None))
+
+
+From stream
+-----------
+
+.. doctest::
+
+    >>> import io
+    >>> order = parser.parse(io.BytesIO(json_path.read_bytes()), Order)
     >>> order.items.product[0]
     Product(number=557, name='Short-Sleeved Linen Blouse', size=SizeType(value=None, system=None))
 
@@ -65,6 +79,16 @@ From Bytes
 .. doctest::
 
     >>> order = parser.from_bytes(json_path.read_bytes(), Order)
+    >>> order.items.product[0]
+    Product(number=557, name='Short-Sleeved Linen Blouse', size=SizeType(value=None, system=None))
+
+
+From path
+---------
+
+.. doctest::
+
+    >>> order = parser.from_path(json_path, Order)
     >>> order.items.product[0]
     Product(number=557, name='Short-Sleeved Linen Blouse', size=SizeType(value=None, system=None))
 

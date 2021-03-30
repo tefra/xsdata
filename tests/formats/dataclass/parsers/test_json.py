@@ -51,6 +51,18 @@ class JsonParserTests(TestCase):
             books.book[1],
         )
 
+    def test_parser_entry_points(self):
+        path = fixtures_dir.joinpath("books/books.json")
+
+        books = self.parser.from_string(path.read_text(), Books)
+        self.assertIsInstance(books, Books)
+
+        books = self.parser.from_bytes(path.read_bytes(), Books)
+        self.assertIsInstance(books, Books)
+
+        books = self.parser.parse(str(path), Books)
+        self.assertIsInstance(books, Books)
+
     def test_parser_with_unknown_class(self):
         path = fixtures_dir.joinpath("books/books.json")
         books = self.parser.from_path(path)

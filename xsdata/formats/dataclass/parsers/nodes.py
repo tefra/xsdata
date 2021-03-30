@@ -440,7 +440,8 @@ class NodeParser(PushParser):
     ns_map: Dict = field(init=False, default_factory=dict)
 
     def parse(self, source: Any, clazz: Optional[Type[T]] = None) -> T:
-        """Parse the XML input stream and return the resulting object tree."""
+        """Parse the input stream or filename and return the resulting object
+        tree."""
         handler = self.handler(clazz=clazz, parser=self)
         result = handler.parse(source)
 

@@ -37,8 +37,9 @@ class AnyElement:
 @dataclass
 class DerivedElement(Generic[T]):
     """
-    Generic model wrapper for inline declared elements, eg. <b
-    xsi:type="a">...</b>
+    Generic model wrapper for type substituted elements.
+
+    Example: eg. <b xsi:type="a">...</b>
 
     :param qname: The element's qualified name
     :param value: The wrapped value

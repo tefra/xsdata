@@ -5,6 +5,7 @@ from dataclasses import field
 from dataclasses import fields
 from dataclasses import is_dataclass
 from typing import Any
+from typing import Callable
 from typing import Dict
 from typing import List
 from typing import Optional
@@ -31,9 +32,11 @@ class JsonParser(AbstractParser):
     Json parser for dataclasses.
 
     :param context: Model context provider
+    :param load_factory: Replace the default json.load call with another implementation
     """
 
     context: XmlContext = field(default_factory=XmlContext)
+    load_factory: Callable = field(default=json.load)
 
     def parse(self, source: Any, clazz: Optional[Type[T]] = None) -> T:
         """Parse the input stream or filename and return the resulting object
@@ -41,9 +44,9 @@ class JsonParser(AbstractParser):
 
         if not hasattr(source, "read"):
             with open(source, "rb") as fp:
-                ctx = json.load(fp)
+                ctx = self.load_factory(fp)
         else:
-            ctx = json.load(source)
+            ctx = self.load_factory(source)
 
         if clazz is None:
             clazz = self.context.find_type_by_fields(set(ctx.keys()))

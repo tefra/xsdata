@@ -4,14 +4,12 @@ from dataclasses import field
 from dataclasses import is_dataclass
 from enum import Enum
 from io import StringIO
-from json import JSONEncoder
 from typing import Any
 from typing import Callable
 from typing import Dict
 from typing import Optional
 from typing import TextIO
 from typing import Tuple
-from typing import Type
 
 from xsdata.formats.bindings import AbstractSerializer
 from xsdata.formats.converter import converter
@@ -35,14 +33,14 @@ class JsonSerializer(AbstractSerializer):
     Json serializer for dataclasses.
 
     :param context: Model context provider
-    :param encoder: JSONEncoder type
-    :param indent: Output indentation
-    :param dict_factory: Override default dict factory to add further logic.
+    :param dict_factory: Override default dict factory to add further logic
+    :param dump_factory: Override default json.dump call with another implementation
+    :param indent: Output indentation level
     """
 
     context: XmlContext = field(default_factory=XmlContext)
-    encoder: Optional[Type[JSONEncoder]] = field(default=None)
     dict_factory: Callable = field(default=dict)
+    dump_factory: Callable = field(default=json.dump)
     indent: Optional[int] = field(default=None)
 
     def render(self, obj: object) -> str:
@@ -58,7 +56,7 @@ class JsonSerializer(AbstractSerializer):
         :param out: The output stream
         :param obj: The input dataclass instance
         """
-        json.dump(self.convert(obj), out, cls=self.encoder, indent=self.indent)
+        self.dump_factory(self.convert(obj), out, indent=self.indent)
 
     def convert(self, obj: Any, var: Optional[XmlVar] = None) -> Any:
         if var is None or is_dataclass(obj):

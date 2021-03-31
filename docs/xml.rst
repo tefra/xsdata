@@ -29,10 +29,6 @@ context instance.
     from tests.fixtures.books import Books, BookForm
     from tests.fixtures.primer import PurchaseOrder, Usaddress
 
-    xml_path = fixtures_dir.joinpath("primer/order.xml")
-    parser = XmlParser()
-    serializer = XmlSerializer(config=SerializerConfig(pretty_print=True))
-
 
 Parsing XML
 ===========

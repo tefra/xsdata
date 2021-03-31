@@ -28,7 +28,6 @@ during data binding.
     from dataclasses import field
     from decimal import Decimal
     from typing import List
-
     from xsdata.formats.dataclass.parsers import XmlParser
 
 

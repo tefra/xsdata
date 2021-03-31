@@ -3,7 +3,6 @@ from pathlib import Path
 from typing import Dict
 
 docs_root = Path(__file__).parent.parent
-docs_root.joinpath("examples/defxmlchapters").mkdir(parents=True, exist_ok=True)
 fixtures = docs_root.joinpath("../tests/fixtures")
 
 subtitles = {
@@ -79,6 +78,7 @@ chapter_tpl = """{title}
 
 
 def generate():
+    chapters = []
     schemas = list(fixtures.glob("defxmlschema/chapter*.xsd"))
     if len(schemas) == 0:
         raise Exception(fixtures.as_uri())
@@ -113,12 +113,17 @@ def generate():
         title = "{number} - {topic}".format(number=number, topic=subtitles[chapter])
         title = "{title}\n{line}".format(line="=" * len(title), title=title)
 
-        file = docs_root.joinpath(f"examples/defxmlchapters/{chapter}.rst")
-        file.write_text(
-            chapter_tpl.format(title=title, output="\n\n".join(buffer)),
-            encoding="utf-8",
-        )
-        print(f"Writing: {file}")
+        chapters.append(chapter_tpl.format(title=title, output="\n\n".join(buffer)))
+
+    file = docs_root.joinpath("examples/defxmlschema.rst")
+    content = file.read_text(encoding="UTF-8")
+    pos = content.find("~~~~~~")
+
+    if pos > -1:
+        content = content[:pos]
+
+    body = "\n\n".join(chapters)
+    file.write_text(f"{content}~~~~~~\n\n\n{body}", encoding="UTF-8")
 
 
 section_titles: Dict[str, int] = defaultdict(int)

@@ -15,8 +15,6 @@ types doing roundtrip conversions is not always possible.
     from tests.fixtures.defxmlschema.chapter05 import Order, ItemsType
     from tests.fixtures.defxmlschema.chapter05prod import Product, SizeType
 
-    json_path = fixtures_dir.joinpath("defxmlschema/chapter05.json")
-    parser = JsonParser(context=XmlContext())
 
 Parsing JSON
 ============
@@ -106,8 +104,22 @@ all the imported modules to find a matching dataclass.
     Product(number=557, name='Short-Sleeved Linen Blouse', size=SizeType(value=None, system=None))
 
 
+Custom json load factory
+------------------------
+
+The default factory is python's builtin :func:`python:json.load` but you can use any
+other implementation as long as it's has a compatible signature.
+
+.. code-block:: python
+
+    import ujson
+
+    parser = JsonParser(load_factory=ujson.load)
+
+
 Serializing JSON
 ================
+
 
 Render to string
 ----------------
@@ -174,3 +186,54 @@ Write to stream
       }
     }
     >>> path.unlink()
+
+
+Custom Dict factory
+-------------------
+
+By using a custom dict factory you can change the output behaviour, like filter out
+``None`` values.
+
+.. doctest::
+
+    >>> from typing import Dict, Tuple
+    >>>
+    >>> def filter_none(x: Tuple) -> Dict:
+    ...     return {k: v for k, v in x if v is not None}
+    >>>
+    >>> order.items.product[0].size = None
+    >>> serializer = JsonSerializer(dict_factory=filter_none, indent=2)
+    >>> print(serializer.render(order))
+    {
+      "items": {
+        "product": [
+          {
+            "number": 557,
+            "name": "Short-Sleeved Linen Blouse"
+          }
+        ]
+      }
+    }
+
+or conveniently
+
+.. doctest::
+
+    >>> from xsdata.formats.dataclass.serializers.json import DictFactory
+    >>>
+    >>> serializer = JsonSerializer(dict_factory=DictFactory.FILTER_NONE)
+    >>> print(serializer.render(order))
+    {"items": {"product": [{"number": 557, "name": "Short-Sleeved Linen Blouse"}]}}
+
+
+Custom json dump factory
+------------------------
+
+The default factory is python's builtin :func:`python:json.dump` but you can use any
+other implementation as long as it's has a compatible signature.
+
+.. code-block:: python
+
+    import ujson
+
+    serializer = JsonSerializer(dump_factory=ujson.dump, indent=0)

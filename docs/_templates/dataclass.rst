@@ -4,3 +4,4 @@
 
 .. auto{{ objtype }}:: {{ objname }}
     :members:
+    :inherited-members:

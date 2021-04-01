@@ -1,3 +1,20 @@
+21.4 (2021-04-02)
+-----------------
+- Split requirements to extras cli, soap and lxml `#419 <https://github.com/tefra/xsdata/issues/419>`_
+- Fixed parser conflict when an attribute and element field have the same qualified name
+- Added cli auto detection for source types, removed cli flag `--wsdl`
+- Added cli support to generate code from raw xml documents
+- Added cli entry point to allow pluggable output formats `#429 <https://github.com/tefra/xsdata/issues/429>`_
+- Added cli short flags for all options and flags
+- Added handler to set effective choice groups `#433 <https://github.com/tefra/xsdata/issues/433>`_
+- Moved plantUML output format to a standalone `plugin <https://github.com/tefra/xsdata-plantuml>`_
+- Updated xml parser to allow unions of primitive and class types
+- Updated XmlDateTime parser to catch invalid cases with extra leading zeros
+- Updated QName converter to validate uri/ncname when parsing string representations
+- Updated JsonParser to allow parsing from filename string
+- Updated cli option `--compound-fields` to a boolean flag
+
+
 21.3 (2021-03-04)
 -----------------
 - Added constant name convention config `#407 <https://github.com/tefra/xsdata/issues/407>`_

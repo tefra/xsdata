@@ -2,9 +2,14 @@
 
 .. admonition:: Why naive?
 
-    The W3C XML Schema offers so much flexibility and abstraction layers and grammatical rules to support practically any xml document definition.
+    The W3C XML Schema is too complicated but with good reason. It needs to support any
+    api design. On the other hand when you consume xml you don't necessarily care about
+    any of that. This is where xsData comes in, to simplify things by making a lot of
+    assumptions like the following one that started everything:
 
-    Integration teams and clients don't care about any of that, take out abstraction and flexibility and you are left with lean named data structures with typed attributes and a namespace for humans to read!
+
+        All xs:schema elements are classes everything else is either noise or class
+        properties
 
 
 .. toctree::

@@ -27,8 +27,8 @@ Naive XML Bindings for python
 
 --------
 
-xsData is a complete XML data binding library for python allowing developers to access
-and use XML and JSON documents as simple objects rather than using DOM.
+xsData is a complete data binding library for python allowing developers to access and
+use XML and JSON documents as simple objects rather than using DOM.
 
 It ships with a code generator for XML schemas, WSDL definitions and XML documents. It
 produces simple dataclasses with type hints and binding metadata.
@@ -96,19 +96,18 @@ Features
   - Customize behaviour through config
 
 
-Changelog: 21.3 (2021-03-04)
+Changelog: 21.4 (2021-04-02)
 ----------------------------
-- Added constant name convention config `#407 <https://github.com/tefra/xsdata/issues/407>`_
-- Added naming schemes screaming snake case and original case
-- Updated xsi:lookup on xs:any derived elements `#315 <https://github.com/tefra/xsdata/issues/315>`_
-- Updated fields restriction inheritance `#417 <https://github.com/tefra/xsdata/issues/417>`_
-- Updated cli to allow package override from arguments `#416 <https://github.com/tefra/xsdata/issues/416>`_
-- Updated code generation to merge duplicate global types earlier `#406 <https://github.com/tefra/xsdata/issues/406>`_
-- Fixed docstrings issue breaking python syntax `#403 <https://github.com/tefra/xsdata/issues/403>`_
-- Fixed bindings for nillable content without workarounds `#408 <https://github.com/tefra/xsdata/issues/408>`_
-- Fixed resolver to apply aliases on extensions and choice fields `#414 <https://github.com/tefra/xsdata/issues/414>`_
-- Fixed schema models limiting xs:appinfo occurrences `#420 <https://github.com/tefra/xsdata/issues/420>`_
-- Decoupled core systems from click and lxml
-
-**Notice**: In the next release installation profiles will be introduced that will turn
-the cli, lxml and soap features **optional**.
+- Split requirements to extras cli, soap and lxml `#419 <https://github.com/tefra/xsdata/issues/419>`_
+- Fixed parser conflict when an attribute and element field have the same qualified name
+- Added cli auto detection for source types, removed cli flag `--wsdl`
+- Added cli support to generate code from raw xml documents
+- Added cli entry point to allow pluggable output formats `#429 <https://github.com/tefra/xsdata/issues/429>`_
+- Added cli short flags for all options and flags
+- Added handler to set effective choice groups `#433 <https://github.com/tefra/xsdata/issues/433>`_
+- Moved plantUML output format to a standalone `plugin <https://github.com/tefra/xsdata-plantuml>`_
+- Updated xml parser to allow unions of primitive and class types
+- Updated XmlDateTime parser to catch invalid cases with extra leading zeros
+- Updated QName converter to validate uri/ncname when parsing string representations
+- Updated JsonParser to allow parsing from filename string
+- Updated cli option `--compound-fields` to a boolean flag

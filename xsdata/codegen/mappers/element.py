@@ -1,7 +1,6 @@
 import sys
 from collections import defaultdict
 from typing import Any
-from typing import Iterator
 from typing import List
 from typing import Optional
 from typing import Set
@@ -9,6 +8,7 @@ from typing import Set
 from xsdata.codegen.models import Attr
 from xsdata.codegen.models import AttrType
 from xsdata.codegen.models import Class
+from xsdata.codegen.utils import ClassUtils
 from xsdata.formats.converter import converter
 from xsdata.formats.dataclass.models.generics import AnyElement
 from xsdata.models.enums import DataType
@@ -31,37 +31,7 @@ class ElementMapper:
         target_namespace, module = split_qname(element.qname)
         target = cls.build_class(element, target_namespace)
 
-        return list(cls.flatten(target, module))
-
-    @classmethod
-    def flatten(cls, target: Class, module: str) -> Iterator[Class]:
-        target.module = module
-
-        while target.inner:
-            yield from cls.flatten(target.inner.pop(), module)
-
-        for attr in target.attrs:
-            attr.types = collections.unique_sequence(attr.types, key="qname")
-            for tp in attr.types:
-                tp.forward = False
-
-        yield target
-
-    @classmethod
-    def reduce(cls, classes: List[Class]) -> List[Class]:
-        result = []
-        indexed = collections.group_by(classes, key=lambda x: x.qname)
-        for group in indexed.values():
-            group.sort(key=lambda x: len(x.attrs))
-            target = group.pop()
-
-            for source in group:
-                target.mixed = target.mixed or source.mixed
-                cls.merge_attributes(target, source)
-
-            result.append(target)
-
-        return result
+        return list(ClassUtils.flatten(target, module))
 
     @classmethod
     def build_class(cls, element: AnyElement, target_namespace: Optional[str]) -> Class:
@@ -89,7 +59,6 @@ class ElementMapper:
             if child.tail:
                 target.mixed = True
 
-            inner = None
             if child.attributes or child.children:
                 inner = cls.build_class(child, target_namespace)
                 attr_type = AttrType(qname=inner.qname, forward=True)
@@ -169,32 +138,6 @@ class ElementMapper:
             existing.types.extend(attr.types)
         else:
             target.attrs.append(attr)
-
-    @classmethod
-    def merge_attributes(cls, target: Class, source: Class):
-        for attr in source.attrs:
-
-            existing = collections.first(
-                x
-                for x in target.attrs
-                if x.name == attr.name
-                and x.tag == attr.tag
-                and x.namespace == attr.namespace
-            )
-
-            if not existing:
-                target.attrs.append(attr)
-            else:
-                min_occurs = existing.restrictions.min_occurs or 0
-                max_occurs = existing.restrictions.max_occurs or 1
-                attr_min_occurs = attr.restrictions.min_occurs or 0
-                attr_max_occurs = attr.restrictions.max_occurs or 1
-
-                existing.restrictions.min_occurs = min(min_occurs, attr_min_occurs)
-                existing.restrictions.max_occurs = max(max_occurs, attr_max_occurs)
-                existing.types.extend(attr.types)
-
-        target.attrs.sort(key=lambda x: x.index)
 
     @classmethod
     def select_namespace(

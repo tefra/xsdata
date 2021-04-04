@@ -178,10 +178,10 @@ def resolve_source(source: str) -> Iterator[str]:
     else:
         path = Path(source).resolve()
         if path.is_dir():
-            sources = [x.as_uri() for x in path.glob("*.wsdl")]
-            sources.extend([x.as_uri() for x in path.glob("*.xsd")])
-            sources.extend([x.as_uri() for x in path.glob("*.xml")])
-            yield from sources
+            yield from (x.as_uri() for x in path.glob("*.wsdl"))
+            yield from (x.as_uri() for x in path.glob("*.xsd"))
+            yield from (x.as_uri() for x in path.glob("*.xml"))
+            yield from (x.as_uri() for x in path.glob("*.json"))
         else:  # is file
             yield path.as_uri()
 

@@ -153,11 +153,12 @@ class ElementMapperTests(FactoryTestCase):
         self.assertEqual(str(DataType.ANY_SIMPLE_TYPE), actual.qname)
         self.assertTrue(actual.native)
 
-        class A:
-            pass
+        actual = ElementMapper.build_attribute_type("name", 1)
+        self.assertEqual(str(DataType.SHORT), actual.qname)
+        self.assertTrue(actual.native)
 
-        actual = ElementMapper.build_attribute_type("name", A())
-        self.assertEqual(str(DataType.ANY_SIMPLE_TYPE), actual.qname)
+        actual = ElementMapper.build_attribute_type("name", "1.9")
+        self.assertEqual(str(DataType.FLOAT), actual.qname)
         self.assertTrue(actual.native)
 
     def test_add_attribute(self):

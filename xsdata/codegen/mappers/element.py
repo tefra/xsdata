@@ -84,8 +84,8 @@ class ElementMapper:
     @classmethod
     def build_attribute_type(cls, qname: str, value: Any) -> AttrType:
         def match_type(val: Any) -> DataType:
-            if not isinstance(val, str) or val == "":
-                return DataType.ANY_SIMPLE_TYPE
+            if not isinstance(val, str):
+                return DataType.from_value(val)
 
             for tp in converter.explicit_types():
                 if converter.test(val, [tp]):
@@ -95,6 +95,8 @@ class ElementMapper:
 
         if qname == QNames.XSI_TYPE:
             data_type = DataType.QNAME
+        elif value is None or value == "":
+            data_type = DataType.ANY_SIMPLE_TYPE
         else:
             data_type = match_type(value)
 
@@ -106,8 +108,8 @@ class ElementMapper:
         target: Class,
         qname: str,
         attr_type: AttrType,
-        target_namespace: Optional[str],
-        tag: str,
+        target_namespace: Optional[str] = None,
+        tag: str = Tag.ELEMENT,
         sequential: bool = False,
     ):
 

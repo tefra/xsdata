@@ -284,6 +284,7 @@ class SchemaTransformer:
             for supported_type in supported_types:
                 if supported_type.match_content(text):
                     return supported_type.id
+
         return TYPE_UNKNOWN
 
     def analyze_classes(self, classes: List[Class]) -> List[Class]:

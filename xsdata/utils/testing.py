@@ -220,8 +220,8 @@ class AttrTypeFactory(Factory):
         )
 
     @classmethod
-    def native(cls, datatype: DataType) -> AttrType:
-        return cls.create(qname=str(datatype), native=True)
+    def native(cls, datatype: DataType, **kwargs: Any) -> AttrType:
+        return cls.create(qname=str(datatype), native=True, **kwargs)
 
 
 class AttrFactory(Factory):

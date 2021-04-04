@@ -10,8 +10,8 @@ Code Generation
 
     examples/docstrings
     examples/xml-modeling
+    examples/json-modeling
     examples/compound-fields
-
 
 
 Test Suites

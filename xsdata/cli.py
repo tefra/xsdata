@@ -143,11 +143,11 @@ def download(source: str, output: str):
 )
 def generate(**kwargs: Any):
     """
-    Generate code from xml schemas, webservice definitions and any xml
+    Generate code from xml schemas, webservice definitions and any xml or json
     document.
 
     The input source can be either a filepath, uri or a directory
-    containing xml, xsd, wsdl files.
+    containing xml, json, xsd and wsdl files.
     """
     if kwargs["print"]:
         logger.setLevel(logging.ERROR)

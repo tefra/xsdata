@@ -3,7 +3,6 @@ XML Datatypes
 =============
 
 
-
 .. currentmodule:: xsdata.models.datatype
 
 .. autosummary::

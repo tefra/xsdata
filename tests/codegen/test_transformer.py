@@ -385,6 +385,10 @@ class SchemaTransformerTests(FactoryTestCase):
         self.transformer.preloaded.clear()
         self.assertEqual(4, self.transformer.classify_resource(file_path.as_uri()))
 
+        file_path.write_bytes(b"aaa\n")
+        self.transformer.preloaded.clear()
+        self.assertEqual(0, self.transformer.classify_resource(file_path.as_uri()))
+
         file_path.unlink()
 
     @mock.patch("xsdata.codegen.transformer.logger.warning")

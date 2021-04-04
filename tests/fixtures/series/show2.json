@@ -1,0 +1,52 @@
+{
+  "id": 5,
+  "url": "https://www.tvmaze.com/shows/5/true-detective",
+  "name": "True Detective",
+  "type": "Scripted",
+  "language": "English",
+  "genres": [
+    "Drama",
+    "Crime",
+    "Thriller"
+  ],
+  "status": "Running",
+  "runtime": 60,
+  "premiered": "2014-01-12",
+  "officialSite": "http://www.hbo.com/true-detective",
+  "schedule": {
+    "time": "21:00",
+    "days": [
+      "Sunday"
+    ]
+  },
+  "rating": {
+    "average": 8.3
+  },
+  "weight": 97,
+  "network": {
+    "name": "HBO",
+    "country": {
+      "name": "United States",
+      "code": "US"
+    }
+  },
+  "externals": {
+    "tvrage": 31369,
+    "thetvdb": 270633,
+    "imdb": "tt2356777"
+  },
+  "image": {
+    "medium": "https://static.tvmaze.com/uploads/images/medium_portrait/178/445621.jpg",
+    "original": "https://static.tvmaze.com/uploads/images/original_untouched/178/445621.jpg"
+  },
+  "summary": "<p>Touch darkness and darkness touches you back. <b>True Detective</b> centers on troubled cops and the investigations that drive them to the edge. Each season features a new cast and a new case.</p>",
+  "updated": 1614762066,
+  "_links": {
+    "self": {
+      "href": "https://api.tvmaze.com/shows/5"
+    },
+    "previousepisode": {
+      "href": "https://api.tvmaze.com/episodes/1590271"
+    }
+  }
+}

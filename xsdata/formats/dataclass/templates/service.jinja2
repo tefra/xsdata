@@ -1,5 +1,3 @@
-{% set namespace = obj.namespace or namespace|default(None) -%}
-
 class {{ obj.name|class_name }}:
 {%- for attr in obj.attrs %}
     {{ attr.name|field_name(obj.name) }} = {{ attr|constant_value }}

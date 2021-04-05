@@ -1,8 +1,8 @@
 import sys
-from typing import Generator
 from unittest import mock
 
 from xsdata.codegen.mappers.element import ElementMapper
+from xsdata.codegen.utils import ClassUtils
 from xsdata.formats.dataclass.models.generics import AnyElement
 from xsdata.models.enums import DataType
 from xsdata.models.enums import QNames
@@ -14,7 +14,7 @@ from xsdata.utils.testing import FactoryTestCase
 
 
 class ElementMapperTests(FactoryTestCase):
-    @mock.patch.object(ElementMapper, "flatten")
+    @mock.patch.object(ClassUtils, "flatten")
     @mock.patch.object(ElementMapper, "build_class")
     def test_map(self, mock_build_class, mock_flatten):
         element = AnyElement(qname="{xsdata}root")
@@ -30,48 +30,6 @@ class ElementMapperTests(FactoryTestCase):
         self.assertEqual(flat_classes, actual)
         mock_build_class.assert_called_once_with(element, "xsdata")
         mock_flatten.assert_called_once_with(root_class, "root")
-
-    def test_flatten(self):
-        target = ClassFactory.create(
-            qname="{xsdata}root", attrs=AttrFactory.list(3), inner=ClassFactory.list(2)
-        )
-
-        for attr in target.attrs:
-            attr.types.extend([x.clone() for x in attr.types])
-            for tp in attr.types:
-                tp.forward = True
-
-        result = ElementMapper.flatten(target, "xsdata")
-        actual = list(result)
-
-        self.assertIsInstance(result, Generator)
-        self.assertEqual(3, len(actual))
-
-        for obj in actual:
-            self.assertEqual("xsdata", obj.module)
-
-        for attr in target.attrs:
-            self.assertEqual(1, len(attr.types))
-            self.assertFalse(attr.types[0].forward)
-
-    @mock.patch.object(ElementMapper, "merge_attributes")
-    def test_reduce(self, mock_merge_attributes):
-        first = ClassFactory.elements(2)
-        second = first.clone()
-        second.attrs.append(AttrFactory.create())
-        third = second.clone()
-        third.attrs.append(AttrFactory.create())
-        fourth = ClassFactory.create()
-
-        actual = ElementMapper.reduce([first, second, third, fourth])
-
-        self.assertEqual([third, fourth], list(actual))
-        mock_merge_attributes.assert_has_calls(
-            [
-                mock.call(third, first),
-                mock.call(third, second),
-            ]
-        )
 
     def test_build_class_simple_type(self):
         element = AnyElement(
@@ -195,11 +153,12 @@ class ElementMapperTests(FactoryTestCase):
         self.assertEqual(str(DataType.ANY_SIMPLE_TYPE), actual.qname)
         self.assertTrue(actual.native)
 
-        class A:
-            pass
+        actual = ElementMapper.build_attribute_type("name", 1)
+        self.assertEqual(str(DataType.SHORT), actual.qname)
+        self.assertTrue(actual.native)
 
-        actual = ElementMapper.build_attribute_type("name", A())
-        self.assertEqual(str(DataType.ANY_SIMPLE_TYPE), actual.qname)
+        actual = ElementMapper.build_attribute_type("name", "1.9")
+        self.assertEqual(str(DataType.FLOAT), actual.qname)
         self.assertTrue(actual.native)
 
     def test_add_attribute(self):
@@ -222,37 +181,6 @@ class ElementMapperTests(FactoryTestCase):
         attr = AttrFactory.create()
         ElementMapper.add_attribute(target, attr)
         self.assertEqual(3, len(target.attrs))
-
-    def test_merge_attributes(self):
-        target = ClassFactory.create(
-            attrs=[
-                AttrFactory.element(name="a", index=10),
-                AttrFactory.element(name="b", index=1),
-                AttrFactory.element(name="c", index=2),
-                AttrFactory.attribute(name="id", index=0),
-            ]
-        )
-
-        source = target.clone()
-
-        target.attrs[0].restrictions.min_occurs = 2
-        target.attrs[0].restrictions.max_occurs = 3
-
-        source.attrs[1].restrictions.min_occurs = 3
-        source.attrs[1].restrictions.max_occurs = 4
-        source.attrs[3].restrictions.min_occurs = 3
-        source.attrs[3].restrictions.max_occurs = 4
-        source.attrs.append(AttrFactory.enumeration(name="d", index=4))
-
-        ElementMapper.merge_attributes(target, source)
-
-        names = ["id", "b", "c", "d", "a"]
-        min_occurs = [0, 0, 0, None, 0]
-        max_occurs = [4, 4, 1, None, 3]
-
-        self.assertEqual(names, [x.name for x in target.attrs])
-        self.assertEqual(min_occurs, [x.restrictions.min_occurs for x in target.attrs])
-        self.assertEqual(max_occurs, [x.restrictions.max_occurs for x in target.attrs])
 
     def test_select_namespace(self):
         self.assertEqual("a", ElementMapper.select_namespace("a", "a", Tag.ELEMENT))

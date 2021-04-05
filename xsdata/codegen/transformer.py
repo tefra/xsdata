@@ -1,8 +1,11 @@
+import io
+import json
 import os
 from collections import defaultdict
 from dataclasses import dataclass
 from dataclasses import field
 from pathlib import Path
+from typing import Callable
 from typing import Dict
 from typing import List
 from typing import Optional
@@ -13,11 +16,13 @@ from urllib.request import urlopen
 from xsdata.codegen.analyzer import ClassAnalyzer
 from xsdata.codegen.container import ClassContainer
 from xsdata.codegen.mappers.definitions import DefinitionsMapper
+from xsdata.codegen.mappers.dict import DictMapper
 from xsdata.codegen.mappers.element import ElementMapper
 from xsdata.codegen.mappers.schema import SchemaMapper
 from xsdata.codegen.models import Class
 from xsdata.codegen.parsers.definitions import DefinitionsParser
 from xsdata.codegen.parsers.schema import SchemaParser
+from xsdata.codegen.utils import ClassUtils
 from xsdata.codegen.writer import CodeWriter
 from xsdata.exceptions import CodeGenerationError
 from xsdata.formats.dataclass.models.generics import AnyElement
@@ -32,7 +37,44 @@ from xsdata.utils import collections
 TYPE_UNKNOWN = 0
 TYPE_SCHEMA = 1
 TYPE_DEFINITION = 2
-TYPE_DOCUMENT = 3
+TYPE_XML = 3
+TYPE_JSON = 4
+
+
+@dataclass
+class SupportedType:
+    id: int
+    name: str
+    match_uri: Callable
+    match_content: Callable
+
+
+supported_types = [
+    SupportedType(
+        id=TYPE_DEFINITION,
+        name="wsdl",
+        match_uri=lambda x: x.endswith("wsdl"),
+        match_content=lambda x: x.endswith("definitions>"),
+    ),
+    SupportedType(
+        id=TYPE_SCHEMA,
+        name="xsd",
+        match_uri=lambda x: x.endswith("xsd"),
+        match_content=lambda x: x.endswith("schema>"),
+    ),
+    SupportedType(
+        id=TYPE_XML,
+        name="xml",
+        match_uri=lambda x: x.endswith("xml"),
+        match_content=lambda x: x.endswith(">"),
+    ),
+    SupportedType(
+        id=TYPE_JSON,
+        name="json",
+        match_uri=lambda x: x.endswith("json"),
+        match_content=lambda x: x.endswith("}"),
+    ),
+]
 
 
 @dataclass
@@ -59,7 +101,8 @@ class SchemaTransformer:
 
         self.process_definitions(sources[TYPE_DEFINITION])
         self.process_schemas(sources[TYPE_SCHEMA])
-        self.process_documents(sources[TYPE_DOCUMENT])
+        self.process_xml_documents(sources[TYPE_XML])
+        self.process_json_documents(sources[TYPE_JSON])
         self.process_classes()
 
     def process_definitions(self, uris: List[str]):
@@ -87,7 +130,7 @@ class SchemaTransformer:
         if schema:
             self.convert_schema(schema)
 
-    def process_documents(self, uris: List[str]):
+    def process_xml_documents(self, uris: List[str]):
         """Process a list of xml resources."""
 
         classes = []
@@ -100,7 +143,22 @@ class SchemaTransformer:
                 classes.extend(ElementMapper.map(any_element))
 
         dirname = os.path.dirname(uris[0]) if uris else ""
-        self.class_map[dirname] = ElementMapper.reduce(classes)
+        self.class_map[dirname] = ClassUtils.reduce(classes)
+
+    def process_json_documents(self, uris: List[str]):
+        """Process a list of json resources."""
+
+        classes = []
+        for uri in uris:
+            input_stream = self.load_resource(uri)
+            if input_stream:
+                data = json.load(io.BytesIO(input_stream))
+                logger.info("Parsing document %s", os.path.basename(uri))
+                name = self.config.output.package.split(".")[-1]
+                classes.extend(DictMapper.map(data, name))
+
+        dirname = os.path.dirname(uris[0]) if uris else ""
+        self.class_map[dirname] = ClassUtils.reduce(classes)
 
     def process_classes(self):
         """Process the generated classes and write or print the final
@@ -212,31 +270,22 @@ class SchemaTransformer:
     def classify_resource(self, uri: str) -> int:
         """Detect the resource type by the uri extension or the file
         contents."""
-        if uri.endswith("wsdl"):
-            return TYPE_DEFINITION
 
-        if uri.endswith("xsd"):
-            return TYPE_SCHEMA
-
-        if uri.endswith("xml"):
-            return TYPE_DOCUMENT
+        for supported_type in supported_types:
+            if supported_type.match_uri(uri):
+                return supported_type.id
 
         src = self.load_resource(uri)
-        if src is None:
-            return TYPE_UNKNOWN
+        if src is not None:
+            self.preloaded[uri] = src
+            self.processed.clear()
+            text = src.decode("utf-8").strip()
 
-        self.preloaded[uri] = src
-        self.processed.clear()
+            for supported_type in supported_types:
+                if supported_type.match_content(text):
+                    return supported_type.id
 
-        text = src.decode("utf-8").strip()
-
-        if text.endswith("schema>"):
-            return TYPE_SCHEMA
-
-        if text.endswith("definitions>"):
-            return TYPE_DEFINITION
-
-        return TYPE_DOCUMENT
+        return TYPE_UNKNOWN
 
     def analyze_classes(self, classes: List[Class]) -> List[Class]:
         """Analyzer the given class list and simplify attributes and

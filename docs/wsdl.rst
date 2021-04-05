@@ -72,7 +72,6 @@ The client can be initialized from the an operation class directly
     # Config(style='document', location='http://www.dneonline.com/calculator.asmx', transport='http://schemas.xmlsoap.org/soap/http', soap_action='http://tempuri.org/Add', input=<class 'tests.fixtures.calculator.services.CalculatorSoapAddInput'>, output=<class 'tests.fixtures.calculator.services.CalculatorSoapAddOutput'>)
 
 
-
 But you can also override any properties as you see fit
 
 .. code-block::

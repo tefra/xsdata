@@ -25,7 +25,6 @@ Generate Code
     - :ref:`Docstring styles`
 
 
-
 .. code-block:: console
     :caption: Scan directory for xsd, wsdl, xml files
 

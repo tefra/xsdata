@@ -3,18 +3,21 @@
     {%- include "docstrings." + docstring_style + ".jinja2" -%}
 {% endset -%}
 {% set parent_namespace = obj.namespace if obj.namespace is not none else parent_namespace|default(None) -%}
+{% set parents = parents|default([obj.name]) -%}
 {% set class_name =  obj.name|class_name -%}
-{% set parents = parents|default([obj.name]) %}
+{% set local_name =  obj.meta_name or obj.name -%}
+{% set local_name = None if class_name == local_name or parents|length != 1 else local_name -%}
+{% set base_classes = obj.extensions|map(attribute='type')|map('type_name')|join(', ') %}
 
 @dataclass
-class {{ class_name }}{{"({})".format(obj.extensions|map(attribute='type')|map('type_name')|join(', ')) if obj.extensions }}:
+class {{ class_name }}{{"({})".format(base_classes) if base_classes }}:
 {%- if help %}
 {{ help|indent(4, first=True) }}
 {%- endif -%}
-{%- if parents|length == 1 and (class_name != obj.name or obj.meta_name or obj.namespace is not none or obj.is_nillable) %}
+{%- if local_name or obj.is_nillable or obj.namespace is not none %}
     class Meta:
-        {%- if class_name != obj.name or obj.meta_name %}
-        name = "{{ obj.meta_name or obj.name }}"
+        {%- if local_name %}
+        name = "{{ local_name }}"
         {%- endif -%}
         {%- if obj.is_nillable %}
         nillable = True
@@ -27,11 +30,12 @@ class {{ class_name }}{{"({})".format(obj.extensions|map(attribute='type')|map('
 {%- endif -%}
 {%- for attr in obj.attrs %}
     {%- set metadata = attr|field_metadata(parent_namespace, parents) %}
+    {%- set default_property = "default_factory" if attr.is_factory else "default" %}
     {{ attr.name|field_name(obj.name) }}: {{ attr|field_type(parents) }} = field(
         {% if attr.fixed -%}
         init=False,
         {% endif -%}
-        {{ "default_factory" if attr.is_factory else "default" }}={{ attr|field_default(obj.ns_map) }},
+        {{ default_property }}={{ attr|field_default(obj.ns_map) }},
         {%- if metadata %}
         metadata={{ metadata|format_metadata(8) }}
         {%- endif %}
@@ -39,8 +43,9 @@ class {{ class_name }}{{"({})".format(obj.extensions|map(attribute='type')|map('
 {%- endfor -%}
 {%- for inner in obj.inner %}
     {%- set tpl = "enum.jinja2" if inner.is_enumeration else "class.jinja2" -%}
+    {%- set inner_parents = parents + [inner.name] -%}
     {%- filter indent(4) -%}
-        {%- with obj=inner, namespace=obj.namespace or parent_namespace, parents=parents + [inner.name], level=(level + 1) -%}
+        {%- with obj=inner, parents=inner_parents, level=(level + 1) -%}
             {% include tpl %}
         {%- endwith -%}
     {%- endfilter -%}

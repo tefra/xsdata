@@ -1,4 +1,6 @@
 import sys
+from typing import Iterator
+from typing import List
 from typing import Optional
 
 from xsdata.codegen.models import Attr
@@ -7,6 +9,7 @@ from xsdata.codegen.models import Class
 from xsdata.codegen.models import Extension
 from xsdata.codegen.models import Restrictions
 from xsdata.exceptions import CodeGenerationError
+from xsdata.utils import collections
 from xsdata.utils.namespaces import build_qname
 from xsdata.utils.namespaces import split_qname
 
@@ -128,3 +131,59 @@ class ClassUtils:
                 return attr
 
         return None
+
+    @classmethod
+    def flatten(cls, target: Class, module: str) -> Iterator[Class]:
+        target.module = module
+
+        while target.inner:
+            yield from cls.flatten(target.inner.pop(), module)
+
+        for attr in target.attrs:
+            attr.types = collections.unique_sequence(attr.types, key="qname")
+            for tp in attr.types:
+                tp.forward = False
+
+        yield target
+
+    @classmethod
+    def reduce(cls, classes: List[Class]) -> List[Class]:
+        result = []
+        indexed = collections.group_by(classes, key=lambda x: x.qname)
+        for group in indexed.values():
+            group.sort(key=lambda x: len(x.attrs))
+            target = group.pop()
+
+            for source in group:
+                target.mixed = target.mixed or source.mixed
+                cls.merge_attributes(target, source)
+
+            result.append(target)
+
+        return result
+
+    @classmethod
+    def merge_attributes(cls, target: Class, source: Class):
+        for attr in source.attrs:
+
+            existing = collections.first(
+                x
+                for x in target.attrs
+                if x.name == attr.name
+                and x.tag == attr.tag
+                and x.namespace == attr.namespace
+            )
+
+            if not existing:
+                target.attrs.append(attr)
+            else:
+                min_occurs = existing.restrictions.min_occurs or 0
+                max_occurs = existing.restrictions.max_occurs or 1
+                attr_min_occurs = attr.restrictions.min_occurs or 0
+                attr_max_occurs = attr.restrictions.max_occurs or 1
+
+                existing.restrictions.min_occurs = min(min_occurs, attr_min_occurs)
+                existing.restrictions.max_occurs = max(max_occurs, attr_max_occurs)
+                existing.types.extend(attr.types)
+
+        target.attrs.sort(key=lambda x: x.index)

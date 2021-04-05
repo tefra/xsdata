@@ -143,11 +143,11 @@ def download(source: str, output: str):
 )
 def generate(**kwargs: Any):
     """
-    Generate code from xml schemas, webservice definitions and any xml
+    Generate code from xml schemas, webservice definitions and any xml or json
     document.
 
     The input source can be either a filepath, uri or a directory
-    containing xml, xsd, wsdl files.
+    containing xml, json, xsd and wsdl files.
     """
     if kwargs["print"]:
         logger.setLevel(logging.ERROR)
@@ -178,10 +178,10 @@ def resolve_source(source: str) -> Iterator[str]:
     else:
         path = Path(source).resolve()
         if path.is_dir():
-            sources = [x.as_uri() for x in path.glob("*.wsdl")]
-            sources.extend([x.as_uri() for x in path.glob("*.xsd")])
-            sources.extend([x.as_uri() for x in path.glob("*.xml")])
-            yield from sources
+            yield from (x.as_uri() for x in path.glob("*.wsdl"))
+            yield from (x.as_uri() for x in path.glob("*.xsd"))
+            yield from (x.as_uri() for x in path.glob("*.xml"))
+            yield from (x.as_uri() for x in path.glob("*.json"))
         else:  # is file
             yield path.as_uri()
 

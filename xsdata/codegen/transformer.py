@@ -155,7 +155,12 @@ class SchemaTransformer:
                 data = json.load(io.BytesIO(input_stream))
                 logger.info("Parsing document %s", os.path.basename(uri))
                 name = self.config.output.package.split(".")[-1]
-                classes.extend(DictMapper.map(data, name))
+
+                if isinstance(data, dict):
+                    data = [data]
+
+                for obj in data:
+                    classes.extend(DictMapper.map(obj, name))
 
         dirname = os.path.dirname(uris[0]) if uris else ""
         self.class_map[dirname] = ClassUtils.reduce(classes)

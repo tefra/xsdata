@@ -91,7 +91,7 @@ class DataclassGenerator(AbstractGenerator):
         namespace = classes[0].target_namespace
 
         return self.env.get_template("module.jinja2").render(
-            output=output, imports=imports, namespace=namespace
+            output=output, imports=imports, namespace=namespace, future_annotations = self.config.output.import_future_annotations
         )
 
     def render_classes(self, classes: List[Class]) -> str:

@@ -1,3 +1,6 @@
+{%- if future_annotations %}
+from __future__ import annotations
+{% endif %}
 {{ output|default_imports }}
 {% include "imports.jinja2" -%}
 {%- if namespace %}

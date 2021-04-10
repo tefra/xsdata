@@ -26,7 +26,7 @@ class DataclassGenerator(AbstractGenerator):
         super().__init__(config)
 
         tpl_dir = Path(__file__).parent.joinpath("templates")
-        self.env = Environment(loader=FileSystemLoader(tpl_dir), autoescape=False)
+        self.env = Environment(loader=FileSystemLoader(str(tpl_dir)), autoescape=False)
         self.filters = Filters.from_config(config)
         self.filters.register(self.env)
 

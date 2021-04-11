@@ -60,6 +60,10 @@ class JsonSerializer(AbstractSerializer):
 
     def convert(self, obj: Any, var: Optional[XmlVar] = None) -> Any:
         if var is None or is_dataclass(obj):
+
+            if isinstance(obj, list):
+                return [self.convert(o) for o in obj]
+
             return self.dict_factory(
                 [
                     (var.lname, self.convert(getattr(obj, var.name), var))

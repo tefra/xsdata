@@ -33,11 +33,7 @@ class JsonSerializerTests(TestCase):
             ]
         )
 
-    def test_render(self):
-        serializer = JsonSerializer(dict_factory=DictFactory.FILTER_NONE)
-        actual = serializer.render(self.books)
-
-        expected = {
+        self.expected = {
             "book": [
                 {
                     "author": "Hightower, Kim",
@@ -59,8 +55,18 @@ class JsonSerializerTests(TestCase):
                 },
             ]
         }
-        self.assertEqual(expected, json.loads(actual))
+
+    def test_render(self):
+        serializer = JsonSerializer(dict_factory=DictFactory.FILTER_NONE)
+        actual = serializer.render(self.books)
+
+        self.assertEqual(self.expected, json.loads(actual))
 
     def test_render_a_none_dataclass_object(self):
         with self.assertRaises(XmlContextError):
-            JsonSerializer().render([])
+            JsonSerializer().render(1)
+
+    def test_render_list_of_objects(self):
+        serializer = JsonSerializer(dict_factory=DictFactory.FILTER_NONE)
+        actual = serializer.render(self.books.book)
+        self.assertEqual(self.expected["book"], json.loads(actual))

@@ -102,7 +102,12 @@ class XmlContextTests(TestCase):
     def test_find_type_by_fields(self):
         field_names = {f.name for f in fields(BookForm)}
         self.assertEqual(BookForm, self.ctx.find_type_by_fields(field_names))
-        self.assertIsNone(self.ctx.find_type_by_fields({"please", "dont", "exist"}))
+
+        field_names.pop()  # Test matching less fields
+        self.assertEqual(BookForm, self.ctx.find_type_by_fields(field_names))
+
+        field_names.update({"please", "dont", "exist"})  # Test matching with more
+        self.assertIsNone(self.ctx.find_type_by_fields(field_names))
 
     def test_find_subclass(self):
         a = make_dataclass("A", fields=[])

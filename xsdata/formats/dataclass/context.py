@@ -134,7 +134,7 @@ class XmlContext:
         self.build_xsi_cache()
         for types in self.xsi_cache.values():
             for clazz in types:
-                if field_names == {attr.name for attr in fields(clazz)}:
+                if not field_names.difference({attr.name for attr in fields(clazz)}):
                     return clazz
 
         return None

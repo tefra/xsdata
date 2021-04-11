@@ -99,9 +99,54 @@ all the imported modules to find a matching dataclass.
 
 .. doctest::
 
-    >>> order = parser.from_bytes(json_path.read_bytes())
-    >>> order.items.product[0]
-    Product(number=557, name='Short-Sleeved Linen Blouse', size=SizeType(value=None, system=None))
+    >>> from tests.fixtures.books import *  # Import all classes
+    >>> json_string = """{
+    ...   "author": "Hightower, Kim",
+    ...   "title": "The First Book",
+    ...   "genre": "Fiction",
+    ...   "price": 44.95,
+    ...   "pub_date": "2000-10-01",
+    ...   "review": "An amazing story of nothing.",
+    ...   "id": "bk001"
+    ... }"""
+    >>> parser = JsonParser()
+    >>> parser.from_string(json_string)
+    BookForm(author='Hightower, Kim', title='The First Book', genre='Fiction', price=44.95, pub_date=XmlDate(2000, 10, 1), review='An amazing story of nothing.', id='bk001', lang='en')
+
+
+List of Objects
+---------------
+
+Specify the target binding type to ``List[ModelName]``
+
+.. doctest::
+
+    >>> from typing import List
+    >>>
+    >>> json_string = """[
+    ...     {
+    ...       "author": "Hightower, Kim",
+    ...       "title": "The First Book",
+    ...       "genre": "Fiction",
+    ...       "price": 44.95,
+    ...       "pub_date": "2000-10-01",
+    ...       "review": "An amazing story of nothing.",
+    ...       "id": "bk001"
+    ...     },
+    ...     {
+    ...       "author": "Nagata, Suanne",
+    ...       "title": "Becoming Somebody",
+    ...       "genre": "Biography",
+    ...       "price": null,
+    ...       "pub_date": null,
+    ...       "review": "A masterpiece of the fine art of gossiping.",
+    ...       "id": "bk002"
+    ...     }
+    ...   ]"""
+    >>> parser = JsonParser()
+    >>> books = parser.from_string(json_string, List[BookForm])
+    >>> books[1].author
+    'Nagata, Suanne'
 
 
 Custom json load factory

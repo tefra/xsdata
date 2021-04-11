@@ -1,4 +1,7 @@
+import json
 from dataclasses import make_dataclass
+from typing import List
+from typing import Optional
 from unittest.case import TestCase
 from xml.etree.ElementTree import QName
 
@@ -10,6 +13,7 @@ from xsdata.formats.dataclass.models.elements import XmlVar
 from xsdata.formats.dataclass.models.generics import AnyElement
 from xsdata.formats.dataclass.models.generics import DerivedElement
 from xsdata.formats.dataclass.parsers.json import JsonParser
+from xsdata.formats.dataclass.serializers import JsonSerializer
 from xsdata.models.datatype import XmlDate
 
 
@@ -51,6 +55,22 @@ class JsonParserTests(TestCase):
             books.book[1],
         )
 
+    def test_parse_empty_document(self):
+        self.assertEqual(BookForm(), self.parser.from_string("{}", BookForm))
+        self.assertEqual([], self.parser.from_string("[]", List[BookForm]))
+
+    def test_parse_list_of_objects(self):
+        path = fixtures_dir.joinpath("books/books.json")
+        data = json.loads(path.read_text())
+        book_list = data["book"]
+        json_string = json.dumps(book_list)
+
+        books = self.parser.from_string(json_string, List[BookForm])
+        self.assertIsInstance(books, list)
+        self.assertEqual(2, len(books))
+        self.assertIsInstance(books[0], BookForm)
+        self.assertIsInstance(books[1], BookForm)
+
     def test_parser_entry_points(self):
         path = fixtures_dir.joinpath("books/books.json")
 
@@ -63,21 +83,43 @@ class JsonParserTests(TestCase):
         books = self.parser.parse(str(path), Books)
         self.assertIsInstance(books, Books)
 
-    def test_parser_with_unknown_class(self):
+    def test_parse_with_unknown_class(self):
         path = fixtures_dir.joinpath("books/books.json")
         books = self.parser.from_path(path)
         self.assertIsInstance(books, Books)
         self.assertEqual(2, len(books.book))
 
-        with self.assertRaises(ParserError) as cm:
-            self.parser.from_string('{"please": 1, "dont": 1, "exists": 2}')
+        json_array = JsonSerializer().render(books.book)
+        book_list = self.parser.from_string(json_array)
+        self.assertIsInstance(book_list, list)
+        self.assertEqual(2, len(book_list))
+        self.assertIsInstance(book_list[0], BookForm)
+        self.assertIsInstance(book_list[1], BookForm)
 
-        self.assertEqual(
-            "No class found matching the document keys(['please', 'dont', 'exists'])",
-            str(cm.exception),
-        )
+    def test_verify_type(self):
 
-    def test_parser_with_non_iterable_value(self):
+        invalid_cases = [
+            (
+                '{"not": 1, "found": 1}',
+                None,
+                "No class found matching the document keys(['not', 'found'])",
+            ),
+            ("{}", None, "Document is empty, can not detect type"),
+            ("[]", BookForm, "Document is array, expected object"),
+            ("{}", List[BookForm], "Document is object, expected array"),
+            ("{}", Optional[BookForm], "Origin typing.Union is not supported"),
+            ("[]", List[int], "List argument must be a dataclass"),
+            ("[]", List, "List argument must be a dataclass"),
+        ]
+
+        for json_string, clazz, exc_msg in invalid_cases:
+
+            with self.assertRaises(ParserError) as cm:
+                self.parser.from_string(json_string, clazz=clazz)
+
+            self.assertEqual(exc_msg, str(cm.exception))
+
+    def test_parse_with_non_iterable_value(self):
         with self.assertRaises(ParserError) as cm:
             self.parser.from_string('{"book": 1}')
 

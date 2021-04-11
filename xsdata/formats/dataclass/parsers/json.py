@@ -10,6 +10,7 @@ from typing import Dict
 from typing import List
 from typing import Optional
 from typing import Type
+from typing import Union
 
 from xsdata.exceptions import ConverterWarning
 from xsdata.exceptions import ParserError
@@ -42,21 +43,56 @@ class JsonParser(AbstractParser):
         """Parse the input stream or filename and return the resulting object
         tree."""
 
+        data = self.load_json(source)
+        tp = self.verify_type(clazz, data)
+
+        if isinstance(data, list):
+            return [self.bind_dataclass(obj, tp) for obj in data]  # type: ignore
+
+        return self.bind_dataclass(data, tp)
+
+    def load_json(self, source: Any) -> Union[Dict, List]:
         if not hasattr(source, "read"):
             with open(source, "rb") as fp:
-                ctx = self.load_factory(fp)
-        else:
-            ctx = self.load_factory(source)
+                return self.load_factory(fp)
+
+        return self.load_factory(source)
+
+    def verify_type(self, clazz: Optional[Type[T]], data: Union[Dict, List]) -> Type[T]:
+        if clazz is None:
+            return self.detect_type(data)
+
+        origin = getattr(clazz, "__origin__", None)
+        list_type = origin in (list, List) or clazz is List
+        if origin is not None and not list_type:
+            raise ParserError(f"Origin {origin} is not supported")
+
+        if list_type != isinstance(data, list):
+            if list_type:
+                raise ParserError("Document is object, expected array")
+            else:
+                raise ParserError("Document is array, expected object")
+
+        if list_type:
+            args = getattr(clazz, "__args__", ())
+            if args is None or len(args) != 1 or not is_dataclass(args[0]):
+                raise ParserError("List argument must be a dataclass")
+
+            clazz = args[0]
+
+        return clazz  # type: ignore
+
+    def detect_type(self, data: Union[Dict, List]) -> Type[T]:
+        if not data:
+            raise ParserError("Document is empty, can not detect type")
+
+        keys = list(data[0].keys() if isinstance(data, list) else data.keys())
+        clazz: Optional[Type[T]] = self.context.find_type_by_fields(set(keys))
 
         if clazz is None:
-            clazz = self.context.find_type_by_fields(set(ctx.keys()))
+            raise ParserError(f"No class found matching the document keys({keys})")
 
-        if clazz is None:
-            raise ParserError(
-                f"No class found matching the document keys({list(ctx.keys())})"
-            )
-
-        return self.bind_dataclass(ctx, clazz)
+        return clazz
 
     def bind_value(self, var: XmlVar, value: Any) -> Any:
         """Bind value according to the class var."""

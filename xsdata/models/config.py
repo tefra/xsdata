@@ -131,9 +131,11 @@ class GeneratorOutput:
     :param docstring_style: Select a docstring style
     :param compound_fields: Use compound fields for repeating choices.
         Enable if elements ordering matters for your case.
+    :param separate_classes: generate a separate python file for each top level class
     """
 
     max_line_length: int = attribute(default=79)
+    separate_classes: bool = attribute(default=False)
     package: str = element(default="generated")
     format: str = element(default="dataclasses")
     structure: OutputStructure = element(default=OutputStructure.FILENAMES)

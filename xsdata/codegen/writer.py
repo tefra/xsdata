@@ -32,7 +32,7 @@ class CodeWriter:
         self.generator.designate(classes)
         for result in self.generator.render(classes):
             if result.source.strip():
-                logger.info("Generating package: %s", result.title)
+                logger.info("Generating package: %s (%s)", result.title, result.path.name)
 
                 result.path.parent.mkdir(parents=True, exist_ok=True)
                 result.path.write_text(result.source, encoding="utf-8")

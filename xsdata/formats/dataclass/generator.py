@@ -14,7 +14,9 @@ from xsdata.formats.mixins import AbstractGenerator
 from xsdata.formats.mixins import GeneratorResult
 from xsdata.models.config import GeneratorConfig
 from xsdata.utils.collections import group_by
-
+from xsdata.utils.package import module_path
+from xsdata.utils.text import alnum
+from xsdata.utils.namespaces import local_name
 
 class DataclassGenerator(AbstractGenerator):
     """Python dataclasses code generator."""
@@ -50,12 +52,21 @@ class DataclassGenerator(AbstractGenerator):
             yield from self.ensure_packages(package.parent)
 
         # Generate modules
-        for module, cluster in self.group_by_module(classes).items():
-            yield GeneratorResult(
-                path=module.with_suffix(".py"),
-                title=cluster[0].target_module,
-                source=self.render_module(resolver, cluster),
-            )
+        if not self.config.output.separate_classes:
+            for module, cluster in self.group_by_module(classes).items():
+                yield GeneratorResult(
+                    path=module.with_suffix(".py"),
+                    title=cluster[0].target_module,
+                    source=self.render_module(resolver, cluster),
+                )
+        else:
+            for classe in classes:
+                yield GeneratorResult(
+                    path=module_path(classe.target_module).joinpath("{0}".format(self.filters.class_name(classe.name))).with_suffix(".py"),
+                    title=classe.target_module,
+                    source=self.render_class(resolver, classe),
+                )
+                classe.module = "{0}.{1}".format(classe.module, self.filters.class_name(classe.name))
 
     def render_package(self, classes: List[Class]) -> str:
         """Render the source code for the __init__.py with all the imports of
@@ -79,6 +90,15 @@ class DataclassGenerator(AbstractGenerator):
                 cur.alias = f"{add}:{cur.name}"
 
         return self.env.get_template("imports.jinja2").render(imports=imports)
+
+    def render_class(self, resolver: DependenciesResolver, classe:Class):
+        resolver.process([classe])
+        imports = resolver.sorted_imports()
+        output = self.render_classes(resolver.sorted_classes())
+        namespace = classe.target_namespace
+        return self.env.get_template("module.jinja2").render(
+            output=output, imports=imports, namespace=namespace, future_annotations = self.config.output.import_future_annotations
+        )
 
     def render_module(
         self, resolver: DependenciesResolver, classes: List[Class]

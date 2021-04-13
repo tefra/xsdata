@@ -7,3 +7,13 @@ from tests.fixtures.hello.hello import (
     GetHelloAsString,
     GetHelloAsStringResponse,
 )
+
+__all__ = [
+    "HelloByeError",
+    "HelloError",
+    "HelloGetHelloAsString",
+    "HelloGetHelloAsStringInput",
+    "HelloGetHelloAsStringOutput",
+    "GetHelloAsString",
+    "GetHelloAsStringResponse",
+]

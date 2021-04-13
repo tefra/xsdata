@@ -8,3 +8,14 @@ from tests.fixtures.defxmlschema.chapter17 import (
     ProductsType,
     Order,
 )
+
+__all__ = [
+    "ColorType",
+    "ItemsType",
+    "OrderType",
+    "PriceType",
+    "ProductOrderType",
+    "ProductType",
+    "ProductsType",
+    "Order",
+]

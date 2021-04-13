@@ -1,17 +1,12 @@
 import re
 from pathlib import Path
-from typing import Iterator
-from typing import List
+from typing import Iterator, List
 
-from jinja2 import Environment
-from jinja2 import FileSystemLoader
-
-from xsdata.codegen.models import Class
-from xsdata.codegen.models import Import
+from jinja2 import Environment, FileSystemLoader
+from xsdata.codegen.models import Class, Import
 from xsdata.codegen.resolver import DependenciesResolver
 from xsdata.formats.dataclass.filters import Filters
-from xsdata.formats.mixins import AbstractGenerator
-from xsdata.formats.mixins import GeneratorResult
+from xsdata.formats.mixins import AbstractGenerator, GeneratorResult
 from xsdata.models.config import GeneratorConfig
 from xsdata.utils.collections import group_by
 
@@ -78,7 +73,7 @@ class DataclassGenerator(AbstractGenerator):
                 add = "_".join(part for part in parts if part in diff)
                 cur.alias = f"{add}:{cur.name}"
 
-        return self.env.get_template("imports.jinja2").render(imports=imports)
+        return self.env.get_template("package.jinja2").render(imports=imports)
 
     def render_module(
         self, resolver: DependenciesResolver, classes: List[Class]

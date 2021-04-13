@@ -1,6 +1,6 @@
 {% include "imports.jinja2" %}
 __all__ = [
-{%- for item in imports %}
+{%- for item in imports|sort(attribute=("name", "alias")) %}
     "
     {%- if item.alias %}
         {{- item.alias|class_name -}}

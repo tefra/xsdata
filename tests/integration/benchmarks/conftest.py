@@ -117,6 +117,6 @@ if __name__ == "__main__":
 
     print(f"Benchmark {component.__name__} - n{args.number}/r{args.repeat}")
     result = t.repeat(repeat=args.repeat, number=1)
-    print("avg {}".format(statistics.mean(result)))
-    print("med {}".format(statistics.median(result)))
-    print("stdev {}".format(statistics.stdev(result)))
+    print(f"avg {statistics.mean(result)}")
+    print(f"med {statistics.median(result)}")
+    print(f"stdev {statistics.stdev(result)}")

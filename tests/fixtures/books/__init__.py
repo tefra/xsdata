@@ -3,3 +3,9 @@ from tests.fixtures.books.books import (
     BooksForm,
     Books,
 )
+
+__all__ = [
+    "BookForm",
+    "BooksForm",
+    "Books",
+]

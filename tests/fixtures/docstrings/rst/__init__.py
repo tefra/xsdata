@@ -6,3 +6,12 @@ from tests.fixtures.docstrings.rst.schema import (
     RootB,
     RootD,
 )
+
+__all__ = [
+    "DoubleQuotesDescription",
+    "DoubleQuotesSummary",
+    "Root",
+    "RootEnum",
+    "RootB",
+    "RootD",
+]

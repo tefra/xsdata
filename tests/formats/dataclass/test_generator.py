@@ -67,6 +67,13 @@ class DataclassGeneratorTests(FactoryTestCase):
                 "    C,",
                 ")",
                 "",
+                "__all__ = [",
+                '    "BarA",',
+                '    "TestsA",',
+                '    "B",',
+                '    "C",',
+                "]",
+                "",
             ]
         )
         self.assertEqual(expected, actual)

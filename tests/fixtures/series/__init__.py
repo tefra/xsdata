@@ -10,3 +10,16 @@ from tests.fixtures.series.series import (
     Self,
     Series,
 )
+
+__all__ = [
+    "Links",
+    "Country",
+    "Externals",
+    "Image",
+    "Network",
+    "Previousepisode",
+    "Rating",
+    "Schedule",
+    "Self",
+    "Series",
+]

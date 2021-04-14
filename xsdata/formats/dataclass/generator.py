@@ -78,7 +78,8 @@ class DataclassGenerator(AbstractGenerator):
                 add = "_".join(part for part in parts if part in diff)
                 cur.alias = f"{add}:{cur.name}"
 
-        return self.env.get_template("imports.jinja2").render(imports=imports)
+        output = self.env.get_template("package.jinja2").render(imports=imports)
+        return f"{output.strip()}\n"
 
     def render_module(
         self, resolver: DependenciesResolver, classes: List[Class]

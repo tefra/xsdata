@@ -29,3 +29,11 @@ The default output format also comes with four different docstring styles to cho
     .. literalinclude:: /../tests/fixtures/docstrings/accessible/schema.py
        :language: python
        :lines: 39-
+
+.. tab:: Blank
+
+    Disable docstrings generation.
+
+    .. literalinclude:: /../tests/fixtures/docstrings/accessible/schema.py
+       :language: python
+       :lines: 25-

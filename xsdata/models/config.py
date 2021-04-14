@@ -111,12 +111,14 @@ class DocstringStyle(Enum):
     :cvar NUMPY: NumPy
     :cvar GOOGLE: Google
     :cvar ACCESSIBLE: Accessible
+    :cvar BLANK: Blank
     """
 
     RST = "reStructuredText"
     NUMPY = "NumPy"
     GOOGLE = "Google"
     ACCESSIBLE = "Accessible"
+    BLANK = "Blank"
 
 
 @dataclass

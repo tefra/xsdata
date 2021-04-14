@@ -73,3 +73,19 @@ def test_generate_accessible_docstrings():
         ],
         catch_exceptions=False,
     )
+
+
+def test_generate_blank_docstrings():
+    package = "tests.fixtures.docstrings.blank"
+    runner = CliRunner()
+    runner.invoke(
+        cli,
+        [
+            str(schema),
+            "--package",
+            package,
+            "--docstring-style",
+            "Blank",
+        ],
+        catch_exceptions=False,
+    )

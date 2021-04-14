@@ -336,9 +336,12 @@ class Filters:
     def format_docstring(self, doc_string: str, level: int) -> str:
         """Format doc strings."""
 
-        content, params = doc_string.rsplit('"""', 1)
+        sep_pos = doc_string.rfind('"""')
+        if sep_pos == -1:
+            return ""
 
-        params = params.strip()
+        content = doc_string[:sep_pos]
+        params = doc_string[sep_pos + 3 :].strip()
 
         if content.strip() == '"""' and not params:
             return ""

@@ -164,8 +164,8 @@ def generate(**kwargs: Any):
         config.output.compound_fields = kwargs["compound_fields"]
         config.output.docstring_style = DocstringStyle(kwargs["docstring_style"])
 
-        if kwargs["ns_struct"]:
-            config.output.structure = OutputStructure.NAMESPACES
+    if kwargs["ns_struct"]:
+        config.output.structure = OutputStructure.NAMESPACES
 
     uris = resolve_source(kwargs["source"])
     transformer = SchemaTransformer(config=config, print=kwargs["print"])

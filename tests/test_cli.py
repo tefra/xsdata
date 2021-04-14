@@ -102,22 +102,31 @@ class CliTests(TestCase):
 
     @mock.patch.object(SchemaTransformer, "process")
     @mock.patch.object(SchemaTransformer, "__init__", return_value=None)
-    def test_generate_with_configuration_file_override_package(self, mock_init, _):
+    def test_generate_with_configuration_file_and_overriding_args(self, mock_init, _):
         file_path = Path(tempfile.mktemp())
         config = GeneratorConfig()
         config.output.package = "foo.bar"
-        config.output.structure = OutputStructure.NAMESPACES
+        config.output.structure = OutputStructure.FILENAMES
         with file_path.open("w") as fp:
             config.write(fp, config)
 
         source = fixtures_dir.joinpath("defxmlschema/chapter03.xsd")
         result = self.runner.invoke(
-            cli, [str(source), "--config", str(file_path), "--package", "foo"]
+            cli,
+            [
+                str(source),
+                "--config",
+                str(file_path),
+                "--package",
+                "foo",
+                "--ns-struct",
+            ],
         )
         config = mock_init.call_args[1]["config"]
 
         self.assertIsNone(result.exception)
         self.assertEqual("foo", config.output.package)
+        self.assertEqual(OutputStructure.NAMESPACES, config.output.structure)
         file_path.unlink()
 
     @mock.patch("xsdata.cli.logger.info")

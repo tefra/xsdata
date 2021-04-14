@@ -2,7 +2,7 @@ exclude: tests/fixtures|docs/examples
 
 repos:
   - repo: https://github.com/asottile/pyupgrade
-    rev: v2.11.0
+    rev: v2.12.0
     hooks:
       - id: pyupgrade
         args: [--py37-plus]
@@ -31,8 +31,8 @@ repos:
       - id: trailing-whitespace
       - id: end-of-file-fixer
       - id: debug-statements
-  - repo: git@github.com:humitos/mirrors-docformatter.git
-    rev: v1.0
+  - repo: https://github.com/myint/docformatter
+    rev: v1.4
     hooks:
       - id: docformatter
         args: ["--in-place", "--pre-summary-newline"]

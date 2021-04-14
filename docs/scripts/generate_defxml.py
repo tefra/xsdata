@@ -110,7 +110,7 @@ def generate():
 
         chapter = xsd.stem
         number = chapter.replace("chapter", "#")
-        title = "{number} - {topic}".format(number=number, topic=subtitles[chapter])
+        title = f"{number} - {subtitles[chapter]}"
         title = "{title}\n{line}".format(line="=" * len(title), title=title)
 
         chapters.append(chapter_tpl.format(title=title, output="\n\n".join(buffer)))

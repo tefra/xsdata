@@ -75,3 +75,10 @@ jobs:
           python tests/integration/benchmarks/conftest.py -c JsonParser
           python tests/integration/benchmarks/conftest.py -c JsonSerializer
           xsdata | xargs -0 python -c "import sys; assert 'Install cli' in sys.argv[1]"
+  pre-commit:
+    name: Pre-commit Hooks
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-python@v2
+    - uses: pre-commit/action@v2.0.2

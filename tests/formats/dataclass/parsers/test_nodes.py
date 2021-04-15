@@ -31,7 +31,6 @@ from xsdata.models.enums import DataType
 from xsdata.models.enums import Namespace
 from xsdata.models.enums import QNames
 from xsdata.models.mixins import attribute
-from xsdata.models.mixins import element
 
 
 @dataclass
@@ -539,22 +538,14 @@ class UnionNodeTests(TestCase):
         self.assertEqual([("end", "bar", "text", "tail")], node.events)
 
     def test_bind_returns_best_matching_object(self):
-        @dataclass
-        class Item:
-            value: str = field()
-            a: int = attribute()
-            b: int = attribute()
-
-        @dataclass
-        class Item2:
-            a: int = attribute()
-
-        @dataclass
-        class Root:
-            item: Union[str, int, Item2, Item] = element()
+        item = make_dataclass(
+            "Item", [("value", str), ("a", int, attribute()), ("b", int, attribute())]
+        )
+        item2 = make_dataclass("Item2", [("a", int, attribute())])
+        root = make_dataclass("Root", [("item", Union[str, int, item2, item])])
 
         ctx = XmlContext()
-        meta = ctx.build(Root)
+        meta = ctx.build(root)
         var = meta.find_elements("item")[0]
         attrs = {"a": "1", "b": 2}
         ns_map = {}
@@ -562,7 +553,7 @@ class UnionNodeTests(TestCase):
         objects = []
 
         self.assertTrue(node.bind("item", "1", None, objects))
-        self.assertIsInstance(objects[-1][1], Item)
+        self.assertIsInstance(objects[-1][1], item)
         self.assertEqual(1, objects[-1][1].a)
         self.assertEqual(2, objects[-1][1].b)
         self.assertEqual("1", objects[-1][1].value)
@@ -583,16 +574,11 @@ class UnionNodeTests(TestCase):
         self.assertEqual("a", objects[-1][1])
 
     def test_bind_raises_parser_error_on_failure(self):
-        @dataclass
-        class Item:
-            value: str = field()
-
-        @dataclass
-        class Root:
-            item: Union[int, Item] = element()
+        item = make_dataclass("Item", [("value", str)])
+        root = make_dataclass("Root", [("item", Union[int, item])])
 
         ctx = XmlContext()
-        meta = ctx.build(Root)
+        meta = ctx.build(root)
         var = meta.find_elements("item")[0]
 
         node = UnionNode(position=0, var=var, context=ctx, attrs={}, ns_map={})

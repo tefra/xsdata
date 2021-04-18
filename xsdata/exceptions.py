@@ -48,3 +48,7 @@ class ResolverValueError(ValueError):
 
 class ClientValueError(ValueError):
     """Client related errors."""
+
+
+class UnsupportedTyping(ValueError):
+    """Unsupported typing hints error."""

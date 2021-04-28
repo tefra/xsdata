@@ -23,7 +23,7 @@ from xsdata.models.enums import QNames
 @dataclass
 class A:
     a0: Optional[str] = field(default=None, metadata=dict(type="Attribute"))
-    a1: Dict = field(default_factory=dict, metadata=dict(type="Attributes"))
+    a1: Dict[str, str] = field(default_factory=dict, metadata=dict(type="Attributes"))
     a2: List[str] = field(
         default_factory=list, metadata=dict(type="Attribute", tokens=True)
     )

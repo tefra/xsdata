@@ -29,7 +29,7 @@ class AnyElement:
     children: List[object] = field(
         default_factory=list, metadata={"type": XmlType.WILDCARD}
     )
-    attributes: Dict = field(
+    attributes: Dict[str, str] = field(
         default_factory=dict, metadata={"type": XmlType.ATTRIBUTES}
     )
 

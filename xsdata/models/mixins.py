@@ -30,7 +30,7 @@ class ElementBase:
     """
 
     index: int = field(default_factory=int, init=False)
-    ns_map: Dict = field(default_factory=dict, init=False)
+    ns_map: Dict[str, str] = field(default_factory=dict, init=False)
 
     @property
     def class_name(self) -> str:

@@ -225,7 +225,7 @@ class ParserUtilsTests(TestCase):
         metadata = self.ctx.build(ProductType)
         eff_date = metadata.find_var("effDate")
         metadata.vars.remove(eff_date)
-        metadata.vars.append(replace(eff_date, init=False, xml_type=None))
+        metadata.vars.append(replace(eff_date, init=False, text=True))
 
         params = {}
         attrs = {"effDate": "2020-03-01"}

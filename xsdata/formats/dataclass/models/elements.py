@@ -1,6 +1,5 @@
 from dataclasses import dataclass
 from dataclasses import field
-from dataclasses import InitVar
 from dataclasses import is_dataclass
 from typing import Any
 from typing import Dict
@@ -8,7 +7,6 @@ from typing import List
 from typing import Optional
 from typing import Type
 
-from xsdata.exceptions import XmlContextError
 from xsdata.models.enums import NamespaceType
 from xsdata.utils.namespaces import split_qname
 
@@ -67,28 +65,6 @@ class XmlVar:
     types: List[Type] = field(default_factory=list)
     choices: List["XmlVar"] = field(default_factory=list)
     namespaces: List[str] = field(default_factory=list)
-
-    xml_type: InitVar[Optional[str]] = None
-
-    def __post_init__(self, xml_type: Optional[str]):
-        if xml_type == XmlType.ELEMENT:
-            self.element = True
-        elif xml_type == XmlType.ELEMENTS:
-            self.elements = True
-        elif xml_type == XmlType.ATTRIBUTE:
-            self.attribute = True
-            self.any_type = False
-        elif xml_type == XmlType.ATTRIBUTES:
-            self.attributes = True
-            self.any_type = False
-        elif xml_type == XmlType.WILDCARD:
-            self.wildcard = True
-            self.any_type = False
-        elif xml_type == XmlType.TEXT:
-            self.text = True
-            self.any_type = False
-        elif xml_type:
-            raise XmlContextError(f"Unknown xml type `{xml_type}`")
 
     @property
     def lname(self) -> str:

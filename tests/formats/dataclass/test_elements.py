@@ -17,68 +17,6 @@ class Fixture:
 
 
 class XmlValTests(TestCase):
-    def test_init_with_xml_type(self):
-        var = XmlVar(name="a", qname="a", xml_type=XmlType.TEXT)
-        self.assertFalse(var.element)
-        self.assertFalse(var.elements)
-        self.assertFalse(var.attribute)
-        self.assertFalse(var.attributes)
-        self.assertTrue(var.text)
-        self.assertFalse(var.wildcard)
-
-        var = XmlVar(name="a", qname="a", xml_type=XmlType.ELEMENT)
-        self.assertTrue(var.element)
-        self.assertFalse(var.elements)
-        self.assertFalse(var.attribute)
-        self.assertFalse(var.attributes)
-        self.assertFalse(var.text)
-        self.assertFalse(var.wildcard)
-
-        var = XmlVar(name="a", qname="a", xml_type=XmlType.ELEMENTS)
-        self.assertFalse(var.element)
-        self.assertTrue(var.elements)
-        self.assertFalse(var.attribute)
-        self.assertFalse(var.attributes)
-        self.assertFalse(var.text)
-        self.assertFalse(var.wildcard)
-
-        var = XmlVar(name="a", qname="a", xml_type=XmlType.ATTRIBUTE)
-        self.assertFalse(var.element)
-        self.assertFalse(var.elements)
-        self.assertTrue(var.attribute)
-        self.assertFalse(var.attributes)
-        self.assertFalse(var.text)
-        self.assertFalse(var.wildcard)
-
-        var = XmlVar(name="a", qname="a", xml_type=XmlType.ATTRIBUTES)
-        self.assertFalse(var.element)
-        self.assertFalse(var.elements)
-        self.assertFalse(var.attribute)
-        self.assertTrue(var.attributes)
-        self.assertFalse(var.text)
-        self.assertFalse(var.wildcard)
-
-        var = XmlVar(name="a", qname="a", xml_type=XmlType.WILDCARD)
-        self.assertFalse(var.element)
-        self.assertFalse(var.elements)
-        self.assertFalse(var.attribute)
-        self.assertFalse(var.attributes)
-        self.assertFalse(var.text)
-        self.assertTrue(var.wildcard)
-
-        var = XmlVar(name="a", qname="a")
-        self.assertFalse(var.element)
-        self.assertFalse(var.elements)
-        self.assertFalse(var.attribute)
-        self.assertFalse(var.attributes)
-        self.assertFalse(var.text)
-        self.assertFalse(var.wildcard)
-
-        with self.assertRaises(XmlContextError) as cm:
-            XmlVar(name="a", qname="a", xml_type="xsdata")
-
-        self.assertEqual("Unknown xml type `xsdata`", str(cm.exception))
-
     def test_property_lname(self):
         var = XmlVar(name="a", qname="{B}A")
         self.assertEqual("A", var.lname)

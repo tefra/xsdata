@@ -1,34 +1,22 @@
 import sys
 from collections import defaultdict
 from dataclasses import dataclass
-from dataclasses import Field
 from dataclasses import field
 from dataclasses import fields
 from dataclasses import is_dataclass
-from dataclasses import MISSING
-from typing import _eval_type  # type: ignore
 from typing import Any
 from typing import Callable
 from typing import Dict
-from typing import get_type_hints
-from typing import Iterator
 from typing import List
 from typing import Optional
 from typing import Set
 from typing import Type
-from typing import TypeVar
 
-from xsdata.exceptions import XmlContextError
 from xsdata.formats.bindings import T
-from xsdata.formats.converter import converter
+from xsdata.formats.dataclass.models.builders import XmlMetaBuilder
 from xsdata.formats.dataclass.models.elements import XmlMeta
-from xsdata.formats.dataclass.models.elements import XmlType
-from xsdata.formats.dataclass.models.elements import XmlVar
 from xsdata.models.enums import DataType
-from xsdata.models.enums import NamespaceType
-from xsdata.utils.constants import EMPTY_SEQUENCE
 from xsdata.utils.constants import return_input
-from xsdata.utils.namespaces import build_qname
 
 
 @dataclass
@@ -84,15 +72,9 @@ class XmlContext:
 
         for clazz in self.get_subclasses(object):
             if is_dataclass(clazz):
-                meta = clazz.Meta if "Meta" in clazz.__dict__ else None
-                local_name = getattr(meta, "name", None)
-                element_name_generator = getattr(
-                    meta, "element_name_generator", self.element_name_generator
+                source_qname = XmlMetaBuilder.build_source_qname(
+                    clazz, self.element_name_generator
                 )
-                local_name = local_name or element_name_generator(clazz.__name__)
-                module = sys.modules[clazz.__module__]
-                source_namespace = getattr(module, "__NAMESPACE__", None)
-                source_qname = build_qname(source_namespace, local_name)
                 self.xsi_cache[source_qname].append(clazz)
 
         self.sys_modules = len(sys.modules)
@@ -167,248 +149,13 @@ class XmlContext:
         """
 
         if clazz not in self.cache:
-
-            # Ensure the given type is a dataclass.
-            if not is_dataclass(clazz):
-                raise XmlContextError(f"Object {clazz} is not a dataclass.")
-
-            # Fetch the dataclass meta settings and make sure we don't inherit
-            # the parent class meta.
-            meta = clazz.Meta if "Meta" in clazz.__dict__ else None
-            element_name_generator = getattr(
-                meta, "element_name_generator", self.element_name_generator
-            )
-            attribute_name_generator = getattr(
-                meta, "attribute_name_generator", self.attribute_name_generator
-            )
-            local_name = getattr(meta, "name", None)
-            local_name = local_name or element_name_generator(clazz.__name__)
-            nillable = getattr(meta, "nillable", False)
-            namespace = getattr(meta, "namespace", parent_ns)
-            module = sys.modules[clazz.__module__]
-            source_namespace = getattr(module, "__NAMESPACE__", None)
-
-            self.cache[clazz] = XmlMeta(
-                clazz=clazz,
-                qname=build_qname(namespace, local_name),
-                source_qname=build_qname(source_namespace, local_name),
-                nillable=nillable,
-                vars=list(
-                    self.get_type_hints(
-                        clazz,
-                        namespace,
-                        element_name_generator,
-                        attribute_name_generator,
-                    )
-                ),
+            self.cache[clazz] = XmlMetaBuilder.build(
+                clazz,
+                parent_ns,
+                self.element_name_generator,
+                self.attribute_name_generator,
             )
         return self.cache[clazz]
-
-    def get_type_hints(
-        self,
-        clazz: Type,
-        parent_ns: Optional[str],
-        element_name_generator: Callable,
-        attribute_name_generator: Callable,
-    ) -> Iterator[XmlVar]:
-        """
-        Build the model fields binding metadata.
-
-        :param clazz: The requested dataclass type
-        :param parent_ns: The inherited parent namespace
-        """
-        type_hints = get_type_hints(clazz)
-        default_xml_type = self.default_xml_type(clazz)
-
-        for var in fields(clazz):
-            tokens = var.metadata.get("tokens", False)
-            xml_type = var.metadata.get("type")
-            local_name = var.metadata.get("name")
-            namespace = var.metadata.get("namespace")
-            choices = var.metadata.get("choices", EMPTY_SEQUENCE)
-            mixed = var.metadata.get("mixed", False)
-            nillable = var.metadata.get("nillable", False)
-            format_str = var.metadata.get("format", None)
-            sequential = var.metadata.get("sequential", False)
-
-            type_hint = type_hints[var.name]
-            types = self.real_types(type_hint)
-            any_type = object in types
-            element_list = self.is_element_list(type_hint, tokens)
-            is_class = any(is_dataclass(clazz) for clazz in types)
-            xml_type = xml_type or (XmlType.ELEMENT if is_class else default_xml_type)
-
-            if not local_name:
-                if xml_type == XmlType.ATTRIBUTE:
-                    local_name = attribute_name_generator(var.name)
-                else:
-                    local_name = element_name_generator(var.name)
-
-            namespaces = self.resolve_namespaces(xml_type, namespace, parent_ns)
-            default_namespace = self.default_namespace(namespaces)
-            choice_vars = list(self.build_choices(clazz, var.name, parent_ns, choices))
-            qname = build_qname(default_namespace, local_name)
-            default_value = self.default_value(var)
-
-            yield XmlVar(
-                xml_type=xml_type,
-                name=var.name,
-                qname=qname,
-                init=var.init,
-                mixed=mixed,
-                format=format_str,
-                tokens=tokens,
-                any_type=any_type,
-                nillable=nillable,
-                dataclass=is_class,
-                sequential=sequential,
-                list_element=element_list,
-                default=default_value,
-                types=types,
-                choices=choice_vars,
-                namespaces=namespaces,
-            )
-
-    def build_choices(
-        self,
-        clazz: Type,
-        parent_name: str,
-        parent_namespace: Optional[str],
-        choices: List[Dict],
-    ):
-        existing_types = set()
-        globalns = sys.modules[clazz.__module__].__dict__
-        for choice in choices:
-            xml_type = XmlType.WILDCARD if choice.get("wildcard") else XmlType.ELEMENT
-            namespace = choice.get("namespace")
-            tokens = choice.get("tokens", False)
-            nillable = choice.get("nillable", False)
-            format_str = choice.get("format", None)
-            default_value = choice.get("default_factory", choice.get("default"))
-
-            types = self.real_types(_eval_type(choice["type"], globalns, None))
-            is_class = any(is_dataclass(clazz) for clazz in types)
-            any_type = xml_type == XmlType.ELEMENT and object in types
-            derived = any(True for tp in types if tp in existing_types) or any_type
-
-            namespaces = self.resolve_namespaces(xml_type, namespace, parent_namespace)
-            default_namespace = self.default_namespace(namespaces)
-            qname = build_qname(default_namespace, choice.get("name", "any"))
-
-            existing_types.update(types)
-
-            yield XmlVar(
-                xml_type=xml_type,
-                name=parent_name,
-                qname=qname,
-                tokens=tokens,
-                format=format_str,
-                derived=derived,
-                any_type=any_type,
-                nillable=nillable,
-                dataclass=is_class,
-                default=default_value,
-                types=types,
-                namespaces=namespaces,
-            )
-
-    @classmethod
-    def resolve_namespaces(
-        cls,
-        xml_type: Optional[str],
-        namespace: Optional[str],
-        parent_namespace: Optional[str],
-    ) -> List[str]:
-        """
-        Resolve the namespace(s) for the given xml type and the parent
-        namespace.
-
-        Only elements and wildcards are allowed to inherit the parent namespace if
-        the given namespace is empty.
-
-        In case of wildcard try to decode the ##any, ##other, ##local, ##target.
-
-
-        :param xml_type: The xml type (Text|Element(s)|Attribute(s)|Wildcard)
-        :param namespace: The field namespace
-        :param parent_namespace: The parent namespace
-        """
-        if xml_type in (XmlType.ELEMENT, XmlType.WILDCARD) and namespace is None:
-            namespace = parent_namespace
-
-        if not namespace:
-            return []
-
-        result = set()
-        for ns in namespace.split():
-            if ns == NamespaceType.TARGET_NS:
-                result.add(parent_namespace or NamespaceType.ANY_NS)
-            elif ns == NamespaceType.LOCAL_NS:
-                result.add("")
-            elif ns == NamespaceType.OTHER_NS:
-                result.add(f"!{parent_namespace or ''}")
-            else:
-                result.add(ns)
-        return list(result)
-
-    @classmethod
-    def default_namespace(cls, namespaces: List[str]) -> Optional[str]:
-        """
-        Return the first valid namespace uri or None.
-
-        :param namespaces: A list of namespace options which may
-            include valid uri(s) or one of the ##any, ##other,
-            ##targetNamespace, ##local
-        """
-        for namespace in namespaces:
-            if namespace and not namespace.startswith("#"):
-                return namespace
-
-        return None
-
-    @classmethod
-    def default_value(cls, var: Field) -> Any:
-        """Return the default value/factory for the given dataclass field."""
-
-        if var.default_factory is not MISSING:  # type: ignore
-            return var.default_factory  # type: ignore
-
-        if var.default is not MISSING:
-            return var.default
-
-        return None
-
-    @classmethod
-    def real_types(cls, type_hint: Any) -> List:
-        """
-        Return a list of real types that can be used to bind or cast data.
-
-        :param type_hint: A typing declaration
-        """
-        type_vars = []
-        if type_hint is Dict:
-            type_vars.append(type_hint)
-        elif hasattr(type_hint, "__origin__"):
-            while len(type_hint.__args__) == 1 and hasattr(
-                type_hint.__args__[0], "__origin__"
-            ):
-                type_hint = type_hint.__args__[0]
-
-            type_vars = [x for x in type_hint.__args__ if x is not None.__class__]
-        else:
-            type_vars.append(type_hint)
-
-        types = []
-        for type_var in type_vars:
-            if isinstance(type_var, TypeVar):
-                if type_var.__bound__:
-                    types.append(type_var.__bound__)
-                else:
-                    types.extend(type_var.__constraints__)
-            else:
-                types.append(type_var)
-
-        return converter.sort_types(types)
 
     @classmethod
     def is_derived(cls, obj: Any, clazz: Type) -> bool:
@@ -426,41 +173,6 @@ class XmlContext:
             return True
 
         return any(x is not object and isinstance(obj, x) for x in clazz.__bases__)
-
-    @classmethod
-    def is_element_list(cls, type_hint: Any, is_tokens: bool) -> bool:
-        if getattr(type_hint, "__origin__", None) in (list, List):
-            if not is_tokens:
-                return True
-
-            type_hint = type_hint.__args__[0]
-            if getattr(type_hint, "__origin__", None) in (list, List):
-                return True
-
-        return False
-
-    @classmethod
-    def default_xml_type(cls, clazz: Type) -> str:
-        """
-        Return the default xml type for the fields of the given dataclass with
-        an undefined type.
-
-        :param clazz: A dataclass type
-        """
-        counters: Dict[str, int] = defaultdict(int)
-        for var in fields(clazz):
-            xml_type = var.metadata.get("type")
-            counters[xml_type or "undefined"] += 1
-
-        if counters[XmlType.TEXT] > 1:
-            raise XmlContextError(
-                f"Dataclass `{clazz.__name__}` includes more than one text node!"
-            )
-
-        if counters["undefined"] == 1 and counters[XmlType.TEXT] == 0:
-            return XmlType.TEXT
-
-        return XmlType.ELEMENT
 
     @classmethod
     def get_subclasses(cls, clazz: Type):

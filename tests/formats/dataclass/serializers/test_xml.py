@@ -183,7 +183,7 @@ class XmlSerializerTests(TestCase):
         self.assertEqual(expected, list(result))
 
     def test_write_any_type_with_primitive_element(self):
-        var = XmlVar(element=True, qname="a", name="a", types=[object])
+        var = XmlVar(element=True, qname="a", name="a", types=(object,))
         expected = [
             (XmlWriterEvent.START, "a"),
             (XmlWriterEvent.DATA, "str"),
@@ -251,7 +251,7 @@ class XmlSerializerTests(TestCase):
 
     def test_write_xsi_type(self):
         var = XmlVar(
-            element=True, qname="a", name="a", dataclass=True, types=[BookForm]
+            element=True, qname="a", name="a", dataclass=True, types=(BookForm,)
         )
         value = BookForm(id="123")
         expected = [
@@ -267,7 +267,7 @@ class XmlSerializerTests(TestCase):
 
     def test_write_xsi_type_with_derived_class(self):
         var = XmlVar(
-            element=True, qname="a", name="a", dataclass=True, types=[BookForm]
+            element=True, qname="a", name="a", dataclass=True, types=(BookForm,)
         )
         ebook = make_dataclass("eBook", [], bases=(BookForm,))
 
@@ -286,7 +286,7 @@ class XmlSerializerTests(TestCase):
 
     def test_write_xsi_type_with_illegal_derived_class(self):
         var = XmlVar(
-            element=True, qname="a", name="a", dataclass=True, types=[BookForm]
+            element=True, qname="a", name="a", dataclass=True, types=(BookForm,)
         )
         ebook = make_dataclass("eBook", [])
         value = ebook()
@@ -323,7 +323,7 @@ class XmlSerializerTests(TestCase):
         self.assertEqual(expected, list(result))
 
     def test_write_element_with_any_type_var(self):
-        var = XmlVar(element=True, qname="a", name="a", types=[object], any_type=True)
+        var = XmlVar(element=True, qname="a", name="a", types=(object,), any_type=True)
         expected = [
             (XmlWriterEvent.START, "a"),
             (XmlWriterEvent.ATTR, QNames.XSI_TYPE, QName(str(DataType.SHORT))),
@@ -336,7 +336,7 @@ class XmlSerializerTests(TestCase):
         self.assertEqual(expected, list(result))
 
     def test_write_element_with_any_type_var_ignore_xs_string(self):
-        var = XmlVar(element=True, qname="a", name="a", types=[object], any_type=True)
+        var = XmlVar(element=True, qname="a", name="a", types=(object,), any_type=True)
         expected = [
             (XmlWriterEvent.START, "a"),
             (XmlWriterEvent.DATA, ""),
@@ -360,7 +360,7 @@ class XmlSerializerTests(TestCase):
             elements=True,
             name="compound",
             qname="compound",
-            choices=[XmlVar(element=True, qname="a", name="a", types=[int])],
+            choices=[XmlVar(element=True, qname="a", name="a", types=(int,))],
         )
         value = DerivedElement(qname="a", value=1)
         expected = [
@@ -378,7 +378,7 @@ class XmlSerializerTests(TestCase):
             elements=True,
             name="compound",
             qname="compound",
-            choices=[XmlVar(element=True, qname="a", name="a", types=[A])],
+            choices=[XmlVar(element=True, qname="a", name="a", types=(A,))],
         )
         value = DerivedElement(qname="a", value=A("foo"))
         expected = [
@@ -396,7 +396,7 @@ class XmlSerializerTests(TestCase):
             elements=True,
             name="compound",
             qname="compound",
-            choices=[XmlVar(element=True, qname="a", name="a", types=[int])],
+            choices=[XmlVar(element=True, qname="a", name="a", types=(int,))],
         )
         value = AnyElement(qname="a", text="1")
         expected = [
@@ -415,8 +415,8 @@ class XmlSerializerTests(TestCase):
             name="compound",
             qname="compound",
             choices=[
-                XmlVar(element=True, qname="a", name="a", types=[int]),
-                XmlVar(element=True, qname="b", name="b", types=[int], tokens=True),
+                XmlVar(element=True, qname="a", name="a", types=(int,)),
+                XmlVar(element=True, qname="b", name="b", types=(int,), tokens=True),
             ],
         )
         expected = [
@@ -437,7 +437,7 @@ class XmlSerializerTests(TestCase):
             elements=True,
             name="compound",
             qname="compound",
-            choices=[XmlVar(element=True, qname="a", name="a", types=[float])],
+            choices=[XmlVar(element=True, qname="a", name="a", types=(float,))],
         )
 
         with self.assertRaises(SerializerError) as cm:

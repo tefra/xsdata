@@ -3,8 +3,9 @@ from dataclasses import field
 from dataclasses import is_dataclass
 from typing import Any
 from typing import Dict
-from typing import List
 from typing import Optional
+from typing import Sequence
+from typing import Tuple
 from typing import Type
 
 from xsdata.models.enums import NamespaceType
@@ -62,9 +63,9 @@ class XmlVar:
     wildcard: bool = False
     attribute: bool = False
     attributes: bool = False
-    types: List[Type] = field(default_factory=list)
-    choices: List["XmlVar"] = field(default_factory=list)
-    namespaces: List[str] = field(default_factory=list)
+    types: Tuple[Type, ...] = field(default_factory=tuple)
+    choices: Tuple["XmlVar", ...] = field(default_factory=tuple)
+    namespaces: Tuple[str, ...] = field(default_factory=tuple)
 
     @property
     def lname(self) -> str:
@@ -141,7 +142,7 @@ class XmlVar:
         return None
 
     @classmethod
-    def match_type(cls, tp: Type, types: List[Type], check_subclass: bool) -> bool:
+    def match_type(cls, tp: Type, types: Sequence[Type], check_subclass: bool) -> bool:
         for candidate in types:
             if tp == candidate or (check_subclass and issubclass(tp, candidate)):
                 return True
@@ -213,7 +214,7 @@ class XmlMeta:
     qname: str
     source_qname: str
     nillable: bool
-    vars: List[XmlVar] = field(default_factory=list)
+    vars: Tuple[XmlVar, ...] = field(default_factory=tuple)
     cache: Dict = field(default_factory=dict, init=False)
 
     @property

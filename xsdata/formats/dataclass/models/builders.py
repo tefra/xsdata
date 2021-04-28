@@ -10,9 +10,12 @@ from typing import Any
 from typing import Callable
 from typing import Dict
 from typing import get_type_hints
+from typing import Iterator
 from typing import List
 from typing import Mapping
 from typing import Optional
+from typing import Sequence
+from typing import Set
 from typing import Tuple
 from typing import Type
 
@@ -65,7 +68,7 @@ class XmlMetaBuilder:
             qname=build_qname(namespace, local_name),
             source_qname=build_qname(source_namespace, local_name),
             nillable=nillable,
-            vars=list(class_vars),
+            vars=tuple(class_vars),
         )
 
     @classmethod
@@ -203,8 +206,8 @@ class XmlVarBuilder:
             sequential=sequential,
             list_element=element_list,
             default=default_value,
-            types=list(types),
-            choices=choice_vars,
+            types=types,
+            choices=tuple(choice_vars),
             namespaces=namespaces,
             element=element,
             elements=elements,
@@ -216,10 +219,9 @@ class XmlVarBuilder:
 
     def build_choices(
         self, name: str, choices: List[Dict], globalns: Any
-    ) -> List[XmlVar]:
-        existing_types = set()
+    ) -> Iterator[XmlVar]:
+        existing_types: Set[type] = set()
 
-        result = []
         for choice in choices:
             default_value = choice.get("default_factory", choice.get("default"))
 
@@ -239,27 +241,8 @@ class XmlVarBuilder:
                 var.derived = True
 
             existing_types.update(var.types)
-            result.append(var)
 
-        return result
-
-    @classmethod
-    def analyze_types(cls, types: Tuple[Type, ...]) -> Tuple[Any, Any, List[Type]]:
-        origin = None
-        factory = None
-
-        while types[0] in (list, dict):
-
-            if origin is None:
-                origin = types[0]
-            elif factory is None:
-                factory = types[0]
-            else:
-                raise XmlContextError("Unsupported typing")
-
-            types = types[1:]
-
-        return origin, factory, converter.sort_types(list(types))
+            yield var
 
     def build_local_name(
         self, xml_type: str, local_name: Optional[str], name: str
@@ -279,14 +262,14 @@ class XmlVarBuilder:
         return xml_type
 
     @classmethod
-    def is_class(cls, types: List[Type]) -> bool:
+    def is_class(cls, types: Sequence[Type]) -> bool:
         return any(is_dataclass(clazz) for clazz in types)
 
     def resolve_namespaces(
         self,
         xml_type: Optional[str],
         namespace: Optional[str],
-    ) -> List[str]:
+    ) -> Tuple[str, ...]:
         """
         Resolve the namespace(s) for the given xml type and the parent
         namespace.
@@ -305,7 +288,7 @@ class XmlVarBuilder:
             namespace = self.parent_ns
 
         if not namespace:
-            return []
+            return ()
 
         result = set()
         for ns in namespace.split():
@@ -317,10 +300,11 @@ class XmlVarBuilder:
                 result.add(f"!{self.parent_ns or ''}")
             else:
                 result.add(ns)
-        return list(result)
+
+        return tuple(result)
 
     @classmethod
-    def default_namespace(cls, namespaces: List[str]) -> Optional[str]:
+    def default_namespace(cls, namespaces: Sequence[str]) -> Optional[str]:
         """
         Return the first valid namespace uri or None.
 
@@ -342,7 +326,7 @@ class XmlVarBuilder:
         return False
 
     @classmethod
-    def is_any_type(cls, types: List[Type], xml_type: str) -> bool:
+    def is_any_type(cls, types: Sequence[Type], xml_type: str) -> bool:
         if xml_type in (XmlType.ELEMENT, XmlType.ELEMENTS):
             return object in types
 
@@ -366,3 +350,21 @@ class XmlVarBuilder:
             text = True
 
         return element, elements, attribute, attributes, wildcard, text
+
+    @classmethod
+    def analyze_types(cls, types: Sequence[Type]) -> Tuple[Any, Any, Tuple[Type, ...]]:
+        origin = None
+        factory = None
+
+        while types[0] in (list, dict):
+
+            if origin is None:
+                origin = types[0]
+            elif factory is None:
+                factory = types[0]
+            else:
+                raise XmlContextError("Unsupported typing")
+
+            types = types[1:]
+
+        return origin, factory, tuple(converter.sort_types(types))

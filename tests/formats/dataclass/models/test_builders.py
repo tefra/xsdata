@@ -30,7 +30,7 @@ from xsdata.utils.namespaces import build_qname
 class XmlMetaBuilderTests(TestCase):
     @mock.patch.object(XmlMetaBuilder, "build_vars")
     def test_build(self, mock_build_vars):
-        var = XmlVar(element=True, name="foo", qname="{foo}bar", types=[int])
+        var = XmlVar(element=True, name="foo", qname="{foo}bar", types=(int,))
         mock_build_vars.return_value = [var]
 
         result = XmlMetaBuilder.build(ItemsType, None, return_input, return_input)
@@ -39,7 +39,7 @@ class XmlMetaBuilderTests(TestCase):
             qname="ItemsType",
             source_qname="ItemsType",
             nillable=False,
-            vars=[var],
+            vars=(var,),
         )
 
         self.assertEqual(expected, result)
@@ -107,18 +107,18 @@ class XmlMetaBuilderTests(TestCase):
         self.assertIsInstance(result, Iterator)
 
         expected = [
-            XmlVar(element=True, name="author", qname="Author", types=[str]),
-            XmlVar(element=True, name="title", qname="Title", types=[str]),
-            XmlVar(element=True, name="genre", qname="Genre", types=[str]),
-            XmlVar(element=True, name="price", qname="Price", types=[float]),
-            XmlVar(element=True, name="pub_date", qname="PubDate", types=[XmlDate]),
-            XmlVar(element=True, name="review", qname="Review", types=[str]),
-            XmlVar(attribute=True, name="id", qname="ID", types=[str]),
+            XmlVar(element=True, name="author", qname="Author", types=(str,)),
+            XmlVar(element=True, name="title", qname="Title", types=(str,)),
+            XmlVar(element=True, name="genre", qname="Genre", types=(str,)),
+            XmlVar(element=True, name="price", qname="Price", types=(float,)),
+            XmlVar(element=True, name="pub_date", qname="PubDate", types=(XmlDate,)),
+            XmlVar(element=True, name="review", qname="Review", types=(str,)),
+            XmlVar(attribute=True, name="id", qname="ID", types=(str,)),
             XmlVar(
                 attribute=True,
                 name="lang",
                 qname="LANG",
-                types=[str],
+                types=(str,),
                 init=False,
                 default="en",
             ),
@@ -195,14 +195,14 @@ class XmlVarBuilderTests(TestCase):
             list_element=True,
             any_type=True,
             default=list,
-            choices=[
+            choices=(
                 XmlVar(
                     element=True,
                     name="compound",
                     qname="{foo}node",
                     dataclass=True,
-                    types=[CompoundFieldExample],
-                    namespaces=["foo"],
+                    types=(CompoundFieldExample,),
+                    namespaces=("foo",),
                     derived=False,
                 ),
                 XmlVar(
@@ -210,8 +210,8 @@ class XmlVarBuilderTests(TestCase):
                     name="compound",
                     qname="{bar}x",
                     tokens=True,
-                    types=[str],
-                    namespaces=["bar"],
+                    types=(str,),
+                    namespaces=("bar",),
                     derived=False,
                     default=return_true,
                     format="Nope",
@@ -221,8 +221,8 @@ class XmlVarBuilderTests(TestCase):
                     name="compound",
                     qname="{bar}y",
                     nillable=True,
-                    types=[int],
-                    namespaces=["bar"],
+                    types=(int,),
+                    namespaces=("bar",),
                     derived=False,
                 ),
                 XmlVar(
@@ -230,8 +230,8 @@ class XmlVarBuilderTests(TestCase):
                     name="compound",
                     qname="{bar}z",
                     nillable=False,
-                    types=[int],
-                    namespaces=["bar"],
+                    types=(int,),
+                    namespaces=("bar",),
                     derived=True,
                 ),
                 XmlVar(
@@ -239,8 +239,8 @@ class XmlVarBuilderTests(TestCase):
                     name="compound",
                     qname="{bar}o",
                     nillable=False,
-                    types=[object],
-                    namespaces=["bar"],
+                    types=(object,),
+                    namespaces=("bar",),
                     derived=True,
                     any_type=True,
                 ),
@@ -248,21 +248,21 @@ class XmlVarBuilderTests(TestCase):
                     element=True,
                     name="compound",
                     qname="{bar}p",
-                    types=[float],
-                    namespaces=["bar"],
+                    types=(float,),
+                    namespaces=("bar",),
                     default=1.1,
                 ),
                 XmlVar(
                     wildcard=True,
                     name="compound",
                     qname="{http://www.w3.org/1999/xhtml}any",
-                    types=[object],
-                    namespaces=["http://www.w3.org/1999/xhtml"],
+                    types=(object,),
+                    namespaces=("http://www.w3.org/1999/xhtml",),
                     derived=True,
                     any_type=False,
                 ),
-            ],
-            types=[object],
+            ),
+            types=(object,),
         )
         self.assertEqual(expected, actual)
 
@@ -270,42 +270,43 @@ class XmlVarBuilderTests(TestCase):
         func = self.builder.resolve_namespaces
         self.builder.parent_ns = "bar"
 
-        self.assertEqual(["foo"], func(XmlType.ELEMENT, "foo"))
-        self.assertEqual([], func(XmlType.ELEMENT, ""))
-        self.assertEqual(["bar"], func(XmlType.ELEMENT, None))
+        self.assertEqual(("foo",), func(XmlType.ELEMENT, "foo"))
+        self.assertEqual((), func(XmlType.ELEMENT, ""))
+        self.assertEqual(("bar",), func(XmlType.ELEMENT, None))
 
-        self.assertEqual([], func(XmlType.ATTRIBUTE, None))
+        self.assertEqual((), func(XmlType.ATTRIBUTE, None))
 
-        self.assertEqual(["bar"], func(XmlType.WILDCARD, None))
-        self.assertEqual(["##any"], func(XmlType.WILDCARD, "##any"))
+        self.assertEqual(("bar",), func(XmlType.WILDCARD, None))
+        self.assertEqual(("##any",), func(XmlType.WILDCARD, "##any"))
 
         self.builder.parent_ns = ""
-        self.assertEqual(["##any"], func(XmlType.WILDCARD, "##targetNamespace"))
+        self.assertEqual(("##any",), func(XmlType.WILDCARD, "##targetNamespace"))
 
         self.builder.parent_ns = None
-        self.assertEqual(["##any"], func(XmlType.WILDCARD, "##targetNamespace"))
+        self.assertEqual(("##any",), func(XmlType.WILDCARD, "##targetNamespace"))
 
         self.builder.parent_ns = "p"
-        self.assertEqual(["p"], func(XmlType.WILDCARD, "##targetNamespace"))
-        self.assertEqual([""], func(XmlType.WILDCARD, "##local"))
-        self.assertEqual(["!p"], func(XmlType.WILDCARD, "##other"))
+        self.assertEqual(("p",), func(XmlType.WILDCARD, "##targetNamespace"))
+        self.assertEqual(("",), func(XmlType.WILDCARD, "##local"))
+        self.assertEqual(("!p",), func(XmlType.WILDCARD, "##other"))
         self.assertEqual(
-            ["", "!p"], sorted(func(XmlType.WILDCARD, "##other   ##local"))
+            ("", "!p"), tuple(sorted(func(XmlType.WILDCARD, "##other   ##local")))
         )
 
         self.assertEqual(
-            ["foo", "p"], sorted(func(XmlType.WILDCARD, "##targetNamespace   foo"))
+            ("foo", "p"),
+            tuple(sorted(func(XmlType.WILDCARD, "##targetNamespace   foo"))),
         )
 
     def test_analyze_types(self):
         actual = self.builder.analyze_types((list, list, int, str))
-        self.assertEqual((list, list, [int, str]), actual)
+        self.assertEqual((list, list, (int, str)), actual)
 
         actual = self.builder.analyze_types((int, str))
-        self.assertEqual((None, None, [int, str]), actual)
+        self.assertEqual((None, None, (int, str)), actual)
 
         actual = self.builder.analyze_types((dict, int, str))
-        self.assertEqual((dict, None, [int, str]), actual)
+        self.assertEqual((dict, None, (int, str)), actual)
 
         with self.assertRaises(XmlContextError):
             self.builder.analyze_types((dict, list, list, int, str))

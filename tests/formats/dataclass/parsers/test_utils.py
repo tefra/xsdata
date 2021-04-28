@@ -224,8 +224,11 @@ class ParserUtilsTests(TestCase):
     def test_bind_attrs_ignore_init_false_vars(self):
         metadata = self.ctx.build(ProductType)
         eff_date = metadata.find_var("effDate")
-        metadata.vars.remove(eff_date)
-        metadata.vars.append(replace(eff_date, init=False, text=True))
+
+        meta_vars = list(metadata.vars)
+        meta_vars.remove(eff_date)
+        meta_vars.append(replace(eff_date, init=False, text=True))
+        metadata.vars = tuple(meta_vars)
 
         params = {}
         attrs = {"effDate": "2020-03-01"}

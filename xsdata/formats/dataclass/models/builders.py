@@ -40,7 +40,8 @@ class XmlMetaBuilder:
         element_name_generator: Callable,
         attribute_name_generator: Callable,
     ) -> XmlMeta:
-        # Ensure the given type is a dataclass.
+        """Build the binding metadata for a dataclass and its fields."""
+
         if not is_dataclass(clazz):
             raise XmlContextError(f"Object {clazz} is not a dataclass.")
 
@@ -79,7 +80,7 @@ class XmlMetaBuilder:
         element_name_generator: Callable,
         attribute_name_generator: Callable,
     ):
-
+        """Build the binding metadata for the given dataclass fields."""
         type_hints = get_type_hints(clazz)
         globalns = sys.modules[clazz.__module__].__dict__
         builder = XmlVarBuilder(
@@ -101,6 +102,8 @@ class XmlMetaBuilder:
 
     @classmethod
     def build_source_qname(cls, clazz: Type, element_name_generator: Callable) -> str:
+        """Build the source qualified name of a model based on the module
+        namespace."""
         meta = clazz.Meta if "Meta" in clazz.__dict__ else None
         local_name = getattr(meta, "name", None)
         element_name_generator = getattr(
@@ -113,12 +116,8 @@ class XmlMetaBuilder:
 
     @classmethod
     def default_xml_type(cls, clazz: Type) -> str:
-        """
-        Return the default xml type for the fields of the given dataclass with
-        an undefined type.
-
-        :param clazz: A dataclass type
-        """
+        """Return the default xml type for the fields of the given dataclass
+        with an undefined type."""
         counters: Dict[str, int] = defaultdict(int)
         for var in fields(clazz):
             xml_type = var.metadata.get("type")
@@ -163,6 +162,7 @@ class XmlVarBuilder:
         default_value: Any,
         globalns: Any,
     ) -> XmlVar:
+        """Build the binding metadata for a dataclass field."""
         tokens = metadata.get("tokens", False)
         xml_type = metadata.get("type")
         local_name = metadata.get("name")
@@ -173,11 +173,11 @@ class XmlVarBuilder:
         format_str = metadata.get("format", None)
         sequential = metadata.get("sequential", False)
 
-        origin, factory, types = self.analyze_types(evaluate(type_hint, globalns))
+        origin, sub_origin, types = self.analyze_types(type_hint, globalns)
         is_class = self.is_class(types)
         xml_type = self.build_xml_type(xml_type, is_class)
         local_name = self.build_local_name(xml_type, local_name, name)
-        element_list = self.is_element_list(origin, factory, tokens)
+        element_list = self.is_element_list(origin, sub_origin, tokens)
         any_type = self.is_any_type(types, xml_type)
         namespaces = self.resolve_namespaces(xml_type, namespace)
         default_namespace = self.default_namespace(namespaces)
@@ -220,6 +220,7 @@ class XmlVarBuilder:
     def build_choices(
         self, name: str, choices: List[Dict], globalns: Any
     ) -> Iterator[XmlVar]:
+        """Build the binding metadata for a compound dataclass field."""
         existing_types: Set[type] = set()
 
         for choice in choices:
@@ -247,6 +248,8 @@ class XmlVarBuilder:
     def build_local_name(
         self, xml_type: str, local_name: Optional[str], name: str
     ) -> str:
+        """Build a local name based on the field name and xml type if it's not
+        set."""
         if not local_name:
             if xml_type == XmlType.ATTRIBUTE:
                 return self.attribute_name_generator(name)
@@ -256,6 +259,8 @@ class XmlVarBuilder:
         return local_name
 
     def build_xml_type(self, xml_type: Optional[str], is_class: bool) -> str:
+        """Build the xml type if it's not set based on the default type for the
+        current class and the field complex/simple type."""
         if not xml_type:
             xml_type = XmlType.ELEMENT if is_class else self.default_xml_type
 
@@ -263,6 +268,7 @@ class XmlVarBuilder:
 
     @classmethod
     def is_class(cls, types: Sequence[Type]) -> bool:
+        """Return whether at least one of the types is a dataclass."""
         return any(is_dataclass(clazz) for clazz in types)
 
     def resolve_namespaces(
@@ -319,14 +325,21 @@ class XmlVarBuilder:
         return None
 
     @classmethod
-    def is_element_list(cls, origin: Any, factory: Any, is_tokens: bool) -> bool:
+    def is_element_list(cls, origin: Any, sub_origin: Any, is_tokens: bool) -> bool:
+        """
+        Return whether the field is a list element.
+
+        If the field is derived from xs:NMTOKENS both origins have to be
+        lists.
+        """
         if origin is list:
-            return not is_tokens or factory is list
+            return not is_tokens or sub_origin is list
 
         return False
 
     @classmethod
     def is_any_type(cls, types: Sequence[Type], xml_type: str) -> bool:
+        """Return whether the given xml type supports derived values."""
         if xml_type in (XmlType.ELEMENT, XmlType.ELEMENTS):
             return object in types
 
@@ -352,19 +365,33 @@ class XmlVarBuilder:
         return element, elements, attribute, attributes, wildcard, text
 
     @classmethod
-    def analyze_types(cls, types: Sequence[Type]) -> Tuple[Any, Any, Tuple[Type, ...]]:
-        origin = None
-        factory = None
+    def analyze_types(
+        cls, type_hint: Any, globalns: Any
+    ) -> Tuple[Any, Any, Tuple[Type, ...]]:
+        """
+        Analyze a type hint and return the origin, sub origin and the type
+        args.
 
-        while types[0] in (list, dict):
+        The only case we support a sub origin is for fields derived from xs:NMTOKENS!
 
-            if origin is None:
-                origin = types[0]
-            elif factory is None:
-                factory = types[0]
-            else:
-                raise XmlContextError("Unsupported typing")
 
-            types = types[1:]
+        :raises XmlContextError: if the typing is not supported for binding
+        """
+        try:
+            types = evaluate(type_hint, globalns)
+            origin = None
+            sub_origin = None
 
-        return origin, factory, tuple(converter.sort_types(types))
+            while types[0] in (list, dict):
+                if origin is None:
+                    origin = types[0]
+                elif sub_origin is None:
+                    sub_origin = types[0]
+                else:
+                    raise TypeError()
+
+                types = types[1:]
+
+            return origin, sub_origin, tuple(converter.sort_types(types))
+        except Exception:
+            raise XmlContextError(f"Unsupported typing: {type_hint}")

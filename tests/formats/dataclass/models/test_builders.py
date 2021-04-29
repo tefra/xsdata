@@ -3,10 +3,12 @@ from dataclasses import dataclass
 from dataclasses import field
 from dataclasses import fields
 from dataclasses import make_dataclass
+from typing import Dict
 from typing import get_type_hints
 from typing import Iterator
 from typing import List
 from typing import Type
+from typing import Union
 from unittest import mock
 from unittest import TestCase
 
@@ -299,17 +301,22 @@ class XmlVarBuilderTests(TestCase):
         )
 
     def test_analyze_types(self):
-        actual = self.builder.analyze_types((list, list, int, str))
+        actual = self.builder.analyze_types(List[List[Union[str, int]]], None)
         self.assertEqual((list, list, (int, str)), actual)
 
-        actual = self.builder.analyze_types((int, str))
+        actual = self.builder.analyze_types(Union[str, int], None)
         self.assertEqual((None, None, (int, str)), actual)
 
-        actual = self.builder.analyze_types((dict, int, str))
+        actual = self.builder.analyze_types(Dict[str, int], None)
         self.assertEqual((dict, None, (int, str)), actual)
 
-        with self.assertRaises(XmlContextError):
-            self.builder.analyze_types((dict, list, list, int, str))
+        with self.assertRaises(XmlContextError) as cm:
+            self.builder.analyze_types(List[List[List[int]]], None)
+
+        self.assertEqual(
+            "Unsupported typing: typing.List[typing.List[typing.List[int]]]",
+            str(cm.exception),
+        )
 
     def test_build_xml_type(self):
         self.builder.default_xml_type = XmlType.WILDCARD

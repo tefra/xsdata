@@ -8,8 +8,6 @@ from typing import Type
 from typing import TypeVar
 from typing import Union
 
-from xsdata.exceptions import UnsupportedTyping
-
 NONE_TYPE = type(None)
 EMPTY_ARGS = ()
 
@@ -46,10 +44,7 @@ def get_args(tp: Any) -> Tuple:
 
 
 def evaluate(tp: Any, globalns: Any = None, localns: Any = None) -> Tuple[Type, ...]:
-    try:
-        return tuple(_evaluate(_eval_type(tp, globalns, localns)))
-    except (TypeError, IndexError):
-        raise UnsupportedTyping(tp)
+    return tuple(_evaluate(_eval_type(tp, globalns, localns)))
 
 
 def _evaluate(tp: Any) -> Iterator[Type]:
@@ -62,6 +57,8 @@ def _evaluate(tp: Any) -> Iterator[Type]:
         yield from _evaluate_union(tp)
     elif origin is Type:
         args = get_args(tp)
+        if not args or isinstance(args[0], TypeVar):
+            raise TypeError()
         yield from _evaluate(args[0])
     elif origin is TypeVar:
         yield from _evaluate_typevar(tp)

@@ -176,10 +176,10 @@ class ConverterFactory:
         return self.type_converter(value.__class__)
 
     @classmethod
-    def sort_types(cls, types: Sequence[Type]) -> Sequence[Type]:
+    def sort_types(cls, types: Sequence[Type]) -> List[Type]:
         """Sort a list of types by giving priority to strict types first."""
         if len(types) < 2:
-            return types
+            return list(types)
 
         return sorted(types, key=lambda x: __PYTHON_TYPES_SORTED__.get(x, 0))
 

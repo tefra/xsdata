@@ -13,7 +13,6 @@ from typing import Union
 from unittest import TestCase
 from xml.etree.ElementTree import QName
 
-from xsdata.exceptions import UnsupportedTyping
 from xsdata.formats.bindings import T
 from xsdata.formats.dataclass.typing import evaluate
 from xsdata.formats.dataclass.typing import get_args
@@ -102,7 +101,7 @@ class TypingTests(TestCase):
         ]
 
         for case in unsupported_cases:
-            with self.assertRaises(UnsupportedTyping, msg=case):
+            with self.assertRaises(TypeError, msg=case):
                 evaluate(case)
 
     def test_evaluate_union(self):
@@ -111,7 +110,7 @@ class TypingTests(TestCase):
 
         unsupported_cases = [Optional[T], Union[List[int], Dict[str, str]]]
         for case in unsupported_cases:
-            with self.assertRaises(UnsupportedTyping, msg=case):
+            with self.assertRaises(TypeError, msg=case):
                 evaluate(case)
 
     def test_evaluate_list(self):
@@ -125,11 +124,14 @@ class TypingTests(TestCase):
 
         unsupported_cases = [List, List[Dict[str, str]]]
         for case in unsupported_cases:
-            with self.assertRaises(UnsupportedTyping, msg=case):
+            with self.assertRaises(TypeError, msg=case):
                 evaluate(case)
 
     def test_evaluate_type(self):
         self.assertEqual((str,), evaluate(Type["str"]))
+
+        with self.assertRaises(TypeError):
+            evaluate(Type)
 
     def test_evaluate_typevar(self):
         A = TypeVar("A", int, str)
@@ -138,5 +140,5 @@ class TypingTests(TestCase):
         self.assertEqual((int, str), evaluate(A))
         self.assertEqual((object,), evaluate(B))
 
-        with self.assertRaises(UnsupportedTyping):
+        with self.assertRaises(TypeError):
             evaluate(T)

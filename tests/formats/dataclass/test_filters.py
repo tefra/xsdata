@@ -402,7 +402,7 @@ class FiltersTests(FactoryTestCase):
     def test_field_type_with_any_attribute(self):
         attr = AttrFactory.any_attribute()
 
-        self.assertEqual("Dict", self.filters.field_type(attr, ["a", "b"]))
+        self.assertEqual("Dict[str, str]", self.filters.field_type(attr, ["a", "b"]))
 
     def test_field_type_with_native_type(self):
         attr = AttrFactory.create(

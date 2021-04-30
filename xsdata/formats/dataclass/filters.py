@@ -428,7 +428,7 @@ class Filters:
         if attr.is_list:
             result = f"List[{result}]"
         elif attr.is_dict:
-            result = "Dict"
+            result = "Dict[str, str]"
         elif attr.default is None and not attr.is_factory:
             result = f"Optional[{result}]"
 

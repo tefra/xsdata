@@ -1,14 +1,13 @@
 from dataclasses import dataclass
 from dataclasses import field
-from dataclasses import InitVar
 from dataclasses import is_dataclass
 from typing import Any
 from typing import Dict
-from typing import List
 from typing import Optional
+from typing import Sequence
+from typing import Tuple
 from typing import Type
 
-from xsdata.exceptions import XmlContextError
 from xsdata.models.enums import NamespaceType
 from xsdata.utils.namespaces import split_qname
 
@@ -64,31 +63,9 @@ class XmlVar:
     wildcard: bool = False
     attribute: bool = False
     attributes: bool = False
-    types: List[Type] = field(default_factory=list)
-    choices: List["XmlVar"] = field(default_factory=list)
-    namespaces: List[str] = field(default_factory=list)
-
-    xml_type: InitVar[Optional[str]] = None
-
-    def __post_init__(self, xml_type: Optional[str]):
-        if xml_type == XmlType.ELEMENT:
-            self.element = True
-        elif xml_type == XmlType.ELEMENTS:
-            self.elements = True
-        elif xml_type == XmlType.ATTRIBUTE:
-            self.attribute = True
-            self.any_type = False
-        elif xml_type == XmlType.ATTRIBUTES:
-            self.attributes = True
-            self.any_type = False
-        elif xml_type == XmlType.WILDCARD:
-            self.wildcard = True
-            self.any_type = False
-        elif xml_type == XmlType.TEXT:
-            self.text = True
-            self.any_type = False
-        elif xml_type:
-            raise XmlContextError(f"Unknown xml type `{xml_type}`")
+    types: Tuple[Type, ...] = field(default_factory=tuple)
+    choices: Tuple["XmlVar", ...] = field(default_factory=tuple)
+    namespaces: Tuple[str, ...] = field(default_factory=tuple)
 
     @property
     def lname(self) -> str:
@@ -165,7 +142,7 @@ class XmlVar:
         return None
 
     @classmethod
-    def match_type(cls, tp: Type, types: List[Type], check_subclass: bool) -> bool:
+    def match_type(cls, tp: Type, types: Sequence[Type], check_subclass: bool) -> bool:
         for candidate in types:
             if tp == candidate or (check_subclass and issubclass(tp, candidate)):
                 return True
@@ -237,7 +214,7 @@ class XmlMeta:
     qname: str
     source_qname: str
     nillable: bool
-    vars: List[XmlVar] = field(default_factory=list)
+    vars: Tuple[XmlVar, ...] = field(default_factory=tuple)
     cache: Dict = field(default_factory=dict, init=False)
 
     @property

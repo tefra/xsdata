@@ -9,6 +9,7 @@ from typing import Callable
 from typing import Dict
 from typing import List
 from typing import Optional
+from typing import Sequence
 from typing import Type
 from typing import Union
 
@@ -247,7 +248,7 @@ class JsonParser(AbstractParser):
     def parse_value(
         cls,
         value: Any,
-        types: List[Type],
+        types: Sequence[Type],
         default: Any,
         tokens: bool,
         fmt: Optional[str],

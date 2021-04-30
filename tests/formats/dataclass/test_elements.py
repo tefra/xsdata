@@ -17,68 +17,6 @@ class Fixture:
 
 
 class XmlValTests(TestCase):
-    def test_init_with_xml_type(self):
-        var = XmlVar(name="a", qname="a", xml_type=XmlType.TEXT)
-        self.assertFalse(var.element)
-        self.assertFalse(var.elements)
-        self.assertFalse(var.attribute)
-        self.assertFalse(var.attributes)
-        self.assertTrue(var.text)
-        self.assertFalse(var.wildcard)
-
-        var = XmlVar(name="a", qname="a", xml_type=XmlType.ELEMENT)
-        self.assertTrue(var.element)
-        self.assertFalse(var.elements)
-        self.assertFalse(var.attribute)
-        self.assertFalse(var.attributes)
-        self.assertFalse(var.text)
-        self.assertFalse(var.wildcard)
-
-        var = XmlVar(name="a", qname="a", xml_type=XmlType.ELEMENTS)
-        self.assertFalse(var.element)
-        self.assertTrue(var.elements)
-        self.assertFalse(var.attribute)
-        self.assertFalse(var.attributes)
-        self.assertFalse(var.text)
-        self.assertFalse(var.wildcard)
-
-        var = XmlVar(name="a", qname="a", xml_type=XmlType.ATTRIBUTE)
-        self.assertFalse(var.element)
-        self.assertFalse(var.elements)
-        self.assertTrue(var.attribute)
-        self.assertFalse(var.attributes)
-        self.assertFalse(var.text)
-        self.assertFalse(var.wildcard)
-
-        var = XmlVar(name="a", qname="a", xml_type=XmlType.ATTRIBUTES)
-        self.assertFalse(var.element)
-        self.assertFalse(var.elements)
-        self.assertFalse(var.attribute)
-        self.assertTrue(var.attributes)
-        self.assertFalse(var.text)
-        self.assertFalse(var.wildcard)
-
-        var = XmlVar(name="a", qname="a", xml_type=XmlType.WILDCARD)
-        self.assertFalse(var.element)
-        self.assertFalse(var.elements)
-        self.assertFalse(var.attribute)
-        self.assertFalse(var.attributes)
-        self.assertFalse(var.text)
-        self.assertTrue(var.wildcard)
-
-        var = XmlVar(name="a", qname="a")
-        self.assertFalse(var.element)
-        self.assertFalse(var.elements)
-        self.assertFalse(var.attribute)
-        self.assertFalse(var.attributes)
-        self.assertFalse(var.text)
-        self.assertFalse(var.wildcard)
-
-        with self.assertRaises(XmlContextError) as cm:
-            XmlVar(name="a", qname="a", xml_type="xsdata")
-
-        self.assertEqual("Unknown xml type `xsdata`", str(cm.exception))
-
     def test_property_lname(self):
         var = XmlVar(name="a", qname="{B}A")
         self.assertEqual("A", var.lname)
@@ -87,21 +25,21 @@ class XmlValTests(TestCase):
         var = XmlVar(name="foo", qname="foo")
         self.assertIsNone(var.clazz)
 
-        var = XmlVar(name="foo", qname="foo", dataclass=True, types=[Fixture])
+        var = XmlVar(name="foo", qname="foo", dataclass=True, types=(Fixture,))
         self.assertEqual(Fixture, var.clazz)
 
     def test_property_is_clazz_union(self):
-        var = XmlVar(name="foo", qname="foo", dataclass=True, types=[Fixture])
+        var = XmlVar(name="foo", qname="foo", dataclass=True, types=(Fixture,))
         self.assertFalse(var.is_clazz_union)
 
-        var.types.append(Fixture)
+        var.types = var.types + (int,)
         self.assertTrue(var.is_clazz_union)
 
     def test_property_is_list(self):
         var = XmlVar(name="foo", qname="foo")
         self.assertFalse(var.list_element)
 
-        var = XmlVar(name="foo", qname="foo", types=[int], list_element=True)
+        var = XmlVar(name="foo", qname="foo", types=(int,), list_element=True)
         self.assertTrue(var.list_element)
 
     def test_matches(self):
@@ -135,10 +73,12 @@ class XmlValTests(TestCase):
             name="compound",
             qname="compound",
             choices=[
-                XmlVar(element=True, qname="a", name="a", types=[int]),
-                XmlVar(element=True, qname="b", name="b", types=[int], tokens=True),
-                XmlVar(element=True, qname="c", name="c", types=[c], dataclass=True),
-                XmlVar(element=True, qname="d", name="d", types=[float], nillable=True),
+                XmlVar(element=True, qname="a", name="a", types=(int,)),
+                XmlVar(element=True, qname="b", name="b", types=(int,), tokens=True),
+                XmlVar(element=True, qname="c", name="c", types=(c,), dataclass=True),
+                XmlVar(
+                    element=True, qname="d", name="d", types=(float,), nillable=True
+                ),
             ],
         )
 
@@ -154,19 +94,19 @@ class XmlValTests(TestCase):
         self.assertTrue(var.matches("*"))
         self.assertTrue(var.matches("a"))
 
-        var = XmlVar(wildcard=True, name="foo", qname="foo", namespaces=["tns"])
+        var = XmlVar(wildcard=True, name="foo", qname="foo", namespaces=("tns",))
         self.assertFalse(var.matches("a"))
         self.assertTrue(var.matches("{tns}a"))
 
-        var = XmlVar(wildcard=True, name="foo", qname="foo", namespaces=["##any"])
+        var = XmlVar(wildcard=True, name="foo", qname="foo", namespaces=("##any",))
         self.assertTrue(var.matches("a"))
         self.assertTrue(var.matches("{tns}a"))
 
-        var = XmlVar(wildcard=True, name="foo", qname="foo", namespaces=[""])
+        var = XmlVar(wildcard=True, name="foo", qname="foo", namespaces=("",))
         self.assertTrue(var.matches("a"))
         self.assertFalse(var.matches("{tns}a"))
 
-        var = XmlVar(wildcard=True, name="foo", qname="foo", namespaces=["!tns"])
+        var = XmlVar(wildcard=True, name="foo", qname="foo", namespaces=("!tns",))
         self.assertTrue(var.matches("{foo}a"))
         self.assertFalse(var.matches("{tns}a"))
 

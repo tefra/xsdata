@@ -19,6 +19,7 @@ from typing import cast
 from typing import Dict
 from typing import List
 from typing import Optional
+from typing import Sequence
 from typing import Tuple
 from typing import Type
 from typing import Union
@@ -68,7 +69,7 @@ class ConverterFactory:
 
     registry: Dict[Type, Converter] = field(default_factory=dict)
 
-    def deserialize(self, value: Any, types: List[Type], **kwargs: Any) -> Any:
+    def deserialize(self, value: Any, types: Sequence[Type], **kwargs: Any) -> Any:
         """
         Attempt to convert a any value to one of the given types.
 
@@ -103,7 +104,7 @@ class ConverterFactory:
         instance = self.value_converter(value)
         return instance.serialize(value, **kwargs)
 
-    def test(self, value: Optional[str], types: List[Type], **kwargs: Any) -> bool:
+    def test(self, value: Optional[str], types: Sequence[Type], **kwargs: Any) -> bool:
         """
         Test the given string value can be parsed using the given list of types
         without warnings.
@@ -175,7 +176,7 @@ class ConverterFactory:
         return self.type_converter(value.__class__)
 
     @classmethod
-    def sort_types(cls, types: List[Type]) -> List[Type]:
+    def sort_types(cls, types: Sequence[Type]) -> List[Type]:
         """Sort a list of types by giving priority to strict types first."""
         if len(types) < 2:
             return list(types)

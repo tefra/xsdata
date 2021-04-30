@@ -141,7 +141,7 @@ class JsonParserTests(TestCase):
             element=True,
             name="union",
             qname="union",
-            types=[a, b, c, int],
+            types=(a, b, c, int),
             dataclass=True,
         )
 
@@ -156,7 +156,7 @@ class JsonParserTests(TestCase):
             element=True,
             name="union",
             qname="union",
-            types=[a, int, float],
+            types=(a, int, float),
             dataclass=True,
         )
 
@@ -169,17 +169,17 @@ class JsonParserTests(TestCase):
             qname="compound",
             name="compound",
             choices=[
-                XmlVar(element=True, qname="int", name="int", types=[int]),
+                XmlVar(element=True, qname="int", name="int", types=(int,)),
                 XmlVar(
                     element=True,
                     qname="tokens",
                     name="tokens",
-                    types=[int],
+                    types=(int,),
                     tokens=True,
                 ),
                 XmlVar(element=True, qname="generic", name="generic", dataclass=True),
-                XmlVar(element=True, qname="float", name="float", types=[float]),
-                XmlVar(element=True, qname="qname", name="qname", types=[QName]),
+                XmlVar(element=True, qname="float", name="float", types=(float,)),
+                XmlVar(element=True, qname="qname", name="qname", types=(QName,)),
             ],
         )
         self.assertEqual(1.0, self.parser.bind_choice("1.0", var))
@@ -207,9 +207,9 @@ class JsonParserTests(TestCase):
             qname="compound",
             name="compound",
             choices=[
-                XmlVar(element=True, qname="c", name="c", types=[int]),
-                XmlVar(element=True, qname="a", name="a", types=[a], dataclass=True),
-                XmlVar(element=True, qname="b", name="b", types=[b], dataclass=True),
+                XmlVar(element=True, qname="c", name="c", types=(int,)),
+                XmlVar(element=True, qname="a", name="a", types=(a,), dataclass=True),
+                XmlVar(element=True, qname="b", name="b", types=(b,), dataclass=True),
             ],
         )
 
@@ -230,8 +230,8 @@ class JsonParserTests(TestCase):
             qname="compound",
             name="compound",
             choices=[
-                XmlVar(element=True, name="a", qname="a", types=[int]),
-                XmlVar(element=True, name="b", qname="b", types=[float]),
+                XmlVar(element=True, name="a", qname="a", types=(int,)),
+                XmlVar(element=True, name="b", qname="b", types=(float,)),
             ],
         )
         data = {"qname": "a", "value": 1, "substituted": True}
@@ -247,8 +247,8 @@ class JsonParserTests(TestCase):
             qname="compound",
             name="compound",
             choices=[
-                XmlVar(element=True, name="a", qname="a", types=[int]),
-                XmlVar(element=True, name="b", qname="b", types=[float]),
+                XmlVar(element=True, name="a", qname="a", types=(int,)),
+                XmlVar(element=True, name="b", qname="b", types=(float,)),
             ],
         )
 
@@ -273,7 +273,7 @@ class JsonParserTests(TestCase):
             wildcard=True,
             name="any_element",
             qname="any_element",
-            types=[object],
+            types=(object,),
         )
 
         self.assertEqual(
@@ -286,7 +286,7 @@ class JsonParserTests(TestCase):
             any_type=True,
             name="a",
             qname="a",
-            types=[object],
+            types=(object,),
         )
         actual = DerivedElement(qname="a", value=Books(book=[]), substituted=True)
         data = {"qname": "a", "value": {"book": []}, "substituted": True}
@@ -298,7 +298,7 @@ class JsonParserTests(TestCase):
             any_type=True,
             name="a",
             qname="a",
-            types=[object],
+            types=(object,),
         )
 
         data = {"test_bind_wildcard_with_no_matching_value": False}

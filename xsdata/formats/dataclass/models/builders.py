@@ -6,6 +6,7 @@ from dataclasses import field
 from dataclasses import fields
 from dataclasses import is_dataclass
 from dataclasses import MISSING
+from enum import Enum
 from typing import Any
 from typing import Callable
 from typing import Dict
@@ -176,6 +177,12 @@ class XmlVarBuilder:
         origin, sub_origin, types = self.analyze_types(type_hint, globalns)
         is_class = self.is_class(types)
         xml_type = self.build_xml_type(xml_type, is_class)
+
+        if not self.is_valid(xml_type, origin, sub_origin, types, tokens, init):
+            raise XmlContextError(
+                f"Xml type '{xml_type}' does not support typing: {type_hint}"
+            )
+
         local_name = self.build_local_name(xml_type, local_name, name)
         element_list = self.is_element_list(origin, sub_origin, tokens)
         any_type = self.is_any_type(types, xml_type)
@@ -395,3 +402,47 @@ class XmlVarBuilder:
             return origin, sub_origin, tuple(converter.sort_types(types))
         except Exception:
             raise XmlContextError(f"Unsupported typing: {type_hint}")
+
+    @classmethod
+    def is_valid(
+        cls,
+        xml_type: str,
+        origin: Any,
+        sub_origin: Any,
+        types: Sequence[Type],
+        tokens: bool,
+        init: bool,
+    ) -> bool:
+        """Validate the given xml type against common unsupported cases."""
+
+        if not init:
+            # Ignore init==false vars
+            return True
+
+        if xml_type == XmlType.ATTRIBUTES:
+            # Attributes need origin dict, no sub origin and tokens
+            if origin is not dict or sub_origin or tokens:
+                return False
+        elif origin is dict or tokens and origin is not list:
+            # Origin dict is only supported by Attributes
+            # xs:NMTOKENS need origin list
+            return False
+
+        if object in types:
+            # Any type, secondary types are not allowed
+            return len(types) == 1
+
+        return cls.is_typing_supported(types)
+
+    @classmethod
+    def is_typing_supported(cls, types: Sequence[Type]) -> bool:
+        # Validate all types are registered in the converter.
+        for tp in types:
+            if (
+                not is_dataclass(tp)
+                and tp not in converter.registry
+                and not issubclass(tp, Enum)
+            ):
+                return False
+
+        return True

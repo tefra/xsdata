@@ -118,6 +118,11 @@ Field Typing
 Simply follow the Python lib
 `dataclasses <https://docs.python.org/3/library/dataclasses.html>`_ documentation.
 
+.. warning::
+
+    Currently only List, Dict and Union annotations are supported.
+    Everything else will raise an exception as unsupported.
+
 
 Field Metadata
 ==============

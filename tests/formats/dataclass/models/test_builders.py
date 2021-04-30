@@ -1,4 +1,5 @@
 import sys
+import uuid
 from dataclasses import dataclass
 from dataclasses import field
 from dataclasses import fields
@@ -268,6 +269,17 @@ class XmlVarBuilderTests(TestCase):
         )
         self.assertEqual(expected, actual)
 
+    def test_build_validates_result(self):
+        with self.assertRaises(XmlContextError) as cm:
+            self.builder.build(
+                "foo", List[int], {"type": "Attributes"}, True, None, None
+            )
+
+        self.assertEqual(
+            "Xml type 'Attributes' does not support typing: typing.List[int]",
+            str(cm.exception),
+        )
+
     def test_resolve_namespaces(self):
         func = self.builder.resolve_namespaces
         self.builder.parent_ns = "bar"
@@ -323,6 +335,57 @@ class XmlVarBuilderTests(TestCase):
         self.assertEqual(XmlType.WILDCARD, self.builder.build_xml_type(None, False))
         self.assertEqual(XmlType.ELEMENT, self.builder.build_xml_type("", True))
         self.assertEqual(XmlType.TEXT, self.builder.build_xml_type(XmlType.TEXT, True))
+
+    def test_is_valid(self):
+        # Attributes need origin dict
+        self.assertFalse(
+            self.builder.is_valid(XmlType.ATTRIBUTES, None, None, (), False, True)
+        )
+
+        # Attributes don't support any origin
+        self.assertFalse(
+            self.builder.is_valid(XmlType.ATTRIBUTES, dict, list, (), False, True)
+        )
+
+        # Attributes don't support xs:NMTOKENS
+        self.assertFalse(
+            self.builder.is_valid(XmlType.ATTRIBUTES, dict, None, (), True, True)
+        )
+
+        self.assertTrue(
+            self.builder.is_valid(
+                XmlType.ATTRIBUTES, dict, None, (str, str), False, True
+            )
+        )
+
+        # xs:NMTOKENS need origin list
+        self.assertFalse(
+            self.builder.is_valid(XmlType.TEXT, dict, None, (), True, True)
+        )
+
+        # xs:NMTOKENS need origin list
+        self.assertFalse(self.builder.is_valid(XmlType.TEXT, set, None, (), True, True))
+
+        # Any type object is a superset, it's only supported alone
+        self.assertFalse(
+            self.builder.is_valid(
+                XmlType.ELEMENT, None, None, (object, int), False, True
+            )
+        )
+
+        # Type is not registered in converter.
+        self.assertFalse(
+            self.builder.is_valid(
+                XmlType.TEXT, None, None, (int, uuid.UUID), False, True
+            )
+        )
+
+        # init false vars are ignored!
+        self.assertTrue(
+            self.builder.is_valid(
+                XmlType.TEXT, None, None, (int, uuid.UUID), False, False
+            )
+        )
 
 
 @dataclass

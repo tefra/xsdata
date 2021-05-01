@@ -184,14 +184,15 @@ class ClassExtensionHandler(HandlerInterface):
         Return whether the extension should be flattened because of rules.
 
         Rules:
-            1. Source class is a simple type
-            2. Source class has a suffix attr and target has its own attrs
-            3. Target class has a suffix attr
-            4. Target restrictions parent attrs in different sequential order
-            5. Target restricts parent attr with a not matching type.
+            1. Source doesn't have a parent class
+            2. Source class is a simple type
+            3. Source class has a suffix attr and target has its own attrs
+            4. Target class has a suffix attr
+            5. Target restrictions parent attrs in different sequential order
+            6. Target restricts parent attr with a not matching type.
         """
 
-        if (
+        if not source.extensions and (
             source.is_simple_type
             or target.has_suffix_attr
             or (source.has_suffix_attr and target.attrs)

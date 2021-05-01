@@ -5,6 +5,7 @@ from xsdata.codegen.models import Class
 from xsdata.codegen.models import Restrictions
 from xsdata.codegen.sanitizer import ClassSanitizer
 from xsdata.models.config import GeneratorConfig
+from xsdata.models.config import StructureStyle
 from xsdata.models.enums import DataType
 from xsdata.models.enums import Namespace
 from xsdata.models.enums import Tag
@@ -365,10 +366,24 @@ class ClassSanitizerTest(FactoryTestCase):
 
         mock_rename_classes.assert_has_calls(
             [
-                mock.call(classes[:2]),
-                mock.call(classes[3:]),
+                mock.call(classes[:2], False),
+                mock.call(classes[3:], False),
             ]
         )
+
+    @mock.patch.object(ClassSanitizer, "rename_classes")
+    def test_resolve_conflicts_with_single_package_structure(self, mock_rename_classes):
+        classes = [
+            ClassFactory.create(qname="{foo}a"),
+            ClassFactory.create(qname="{bar}a"),
+            ClassFactory.create(qname="a"),
+        ]
+
+        self.sanitizer.container.config.output.structure = StructureStyle.SINGLE_PACKAGE
+        self.sanitizer.container.extend(classes)
+        self.sanitizer.resolve_conflicts()
+
+        mock_rename_classes.assert_called_once_with(classes, True)
 
     @mock.patch.object(ClassSanitizer, "rename_class")
     def test_rename_classes(self, mock_rename_class):
@@ -377,13 +392,17 @@ class ClassSanitizerTest(FactoryTestCase):
             ClassFactory.create(qname="_A", tag=Tag.ELEMENT),
             ClassFactory.create(qname="a", tag=Tag.COMPLEX_TYPE),
         ]
-        self.sanitizer.rename_classes(classes)
+        self.sanitizer.rename_classes(classes, False)
+        self.sanitizer.rename_classes(classes, True)
 
         mock_rename_class.assert_has_calls(
             [
-                mock.call(classes[0]),
-                mock.call(classes[1]),
-                mock.call(classes[2]),
+                mock.call(classes[0], False),
+                mock.call(classes[1], False),
+                mock.call(classes[2], False),
+                mock.call(classes[0], True),
+                mock.call(classes[1], True),
+                mock.call(classes[2], True),
             ]
         )
 
@@ -393,18 +412,18 @@ class ClassSanitizerTest(FactoryTestCase):
             ClassFactory.create(qname="_a", tag=Tag.ELEMENT),
             ClassFactory.create(qname="a", tag=Tag.COMPLEX_TYPE),
         ]
-        self.sanitizer.rename_classes(classes)
+        self.sanitizer.rename_classes(classes, False)
 
-        mock_rename_class.assert_called_once_with(classes[1])
+        mock_rename_class.assert_called_once_with(classes[1], False)
 
     @mock.patch.object(ClassSanitizer, "rename_class_dependencies")
     def test_rename_class(self, mock_rename_class_dependencies):
         target = ClassFactory.create(qname="{foo}_a")
         self.sanitizer.container.add(target)
-        self.sanitizer.container.add(ClassFactory.create())
         self.sanitizer.container.add(ClassFactory.create(qname="{foo}a_1"))
         self.sanitizer.container.add(ClassFactory.create(qname="{foo}A_2"))
-        self.sanitizer.rename_class(target)
+        self.sanitizer.container.add(ClassFactory.create(qname="{bar}a_3"))
+        self.sanitizer.rename_class(target, False)
 
         self.assertEqual("{foo}_a_3", target.qname)
         self.assertEqual("_a", target.meta_name)
@@ -415,6 +434,26 @@ class ClassSanitizerTest(FactoryTestCase):
         )
 
         self.assertEqual([target], self.container.data["{foo}_a_3"])
+        self.assertEqual([], self.container.data["{foo}_a"])
+
+    @mock.patch.object(ClassSanitizer, "rename_class_dependencies")
+    def test_rename_class_by_name(self, mock_rename_class_dependencies):
+        target = ClassFactory.create(qname="{foo}_a")
+        self.sanitizer.container.add(target)
+        self.sanitizer.container.add(ClassFactory.create(qname="{bar}a_1"))
+        self.sanitizer.container.add(ClassFactory.create(qname="{thug}A_2"))
+        self.sanitizer.container.add(ClassFactory.create(qname="{bar}a_3"))
+        self.sanitizer.rename_class(target, True)
+
+        self.assertEqual("{foo}_a_4", target.qname)
+        self.assertEqual("_a", target.meta_name)
+
+        mock_rename_class_dependencies.assert_has_calls(
+            mock.call(item, id(target), "{foo}_a_4")
+            for item in self.sanitizer.container.iterate()
+        )
+
+        self.assertEqual([target], self.container.data["{foo}_a_4"])
         self.assertEqual([], self.container.data["{foo}_a"])
 
     def test_rename_class_dependencies(self):

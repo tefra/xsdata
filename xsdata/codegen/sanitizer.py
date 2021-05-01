@@ -1,3 +1,4 @@
+import operator
 from dataclasses import dataclass
 from typing import List
 from typing import Optional
@@ -8,6 +9,7 @@ from xsdata.codegen.models import AttrType
 from xsdata.codegen.models import Class
 from xsdata.codegen.models import Restrictions
 from xsdata.logger import logger
+from xsdata.models.config import StructureStyle
 from xsdata.models.enums import DataType
 from xsdata.models.enums import Tag
 from xsdata.utils import collections
@@ -172,12 +174,17 @@ class ClassSanitizer:
     def resolve_conflicts(self):
         """Find classes with the same case insensitive qualified name and
         rename them."""
-        groups = group_by(self.container.iterate(), lambda x: alnum(x.qname))
+        use_name = (
+            self.container.config.output.structure == StructureStyle.SINGLE_PACKAGE
+        )
+        getter = operator.attrgetter("name" if use_name else "qname")
+        groups = group_by(self.container.iterate(), lambda x: alnum(getter(x)))
+
         for classes in groups.values():
             if len(classes) > 1:
-                self.rename_classes(classes)
+                self.rename_classes(classes, use_name)
 
-    def rename_classes(self, classes: List[Class]):
+    def rename_classes(self, classes: List[Class], use_name: bool):
         """
         Rename all the classes in the list.
 
@@ -187,31 +194,39 @@ class ClassSanitizer:
         total_elements = sum(x.is_element for x in classes)
         for target in classes:
             if not target.is_element or total_elements > 1:
-                self.rename_class(target)
+                self.rename_class(target, use_name)
 
-    def rename_class(self, target: Class):
+    def rename_class(self, target: Class, use_name: bool):
         """Find the next available class identifier, save the original name in
         the class metadata and update the class qualified name and all classes
         that depend on the target class."""
 
         qname = target.qname
         namespace, name = split_qname(target.qname)
-        target.qname = self.next_qname(namespace, name)
+        target.qname = self.next_qname(namespace, name, use_name)
         target.meta_name = name
         self.container.reset(target, qname)
 
         for item in self.container.iterate():
             self.rename_class_dependencies(item, id(target), target.qname)
 
-    def next_qname(self, namespace: str, name: str) -> str:
+    def next_qname(self, namespace: str, name: str, use_name: bool) -> str:
         """Append the next available index number for the given namespace and
         local name."""
         index = 0
-        reserved = set(map(alnum, self.container.data.keys()))
+
+        if use_name:
+            reserved = {alnum(obj.name) for obj in self.container.iterate()}
+        else:
+            reserved = set(map(alnum, self.container.data.keys()))
+
         while True:
             index += 1
-            qname = build_qname(namespace, f"{name}_{index}")
-            if alnum(qname) not in reserved:
+            new_name = f"{name}_{index}"
+            qname = build_qname(namespace, new_name)
+            cmp = alnum(new_name if use_name else qname)
+
+            if cmp not in reserved:
                 return qname
 
     def rename_class_dependencies(self, target: Class, reference: int, replace: str):

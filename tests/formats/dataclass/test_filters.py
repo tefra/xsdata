@@ -169,6 +169,16 @@ class FiltersTests(FactoryTestCase):
         attr.types[0].alias = "foo_bar"
         self.assertEqual("FooBar.BAR", self.filters.field_default_value(attr))
 
+        attr.default = "@enum@{a}foo::bar@thug"
+        self.assertEqual("FooBar.BAR_THUG", self.filters.field_default_value(attr))
+
+        attr.restrictions.tokens = True
+        expected = """lambda: [
+            FooBar.BAR,
+            FooBar.THUG,
+        ]"""
+        self.assertEqual(expected, self.filters.field_default_value(attr))
+
         attr.types[0].qname = "nomatch"  # impossible
         with self.assertRaises(Exception):
             self.filters.field_default_value(attr)

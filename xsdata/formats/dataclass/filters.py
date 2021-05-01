@@ -27,7 +27,7 @@ from xsdata.models.config import GeneratorConfig
 from xsdata.utils import text
 from xsdata.utils.collections import unique_sequence
 from xsdata.utils.namespaces import clean_uri
-from xsdata.utils.namespaces import split_qname
+from xsdata.utils.namespaces import local_name
 
 
 @dataclass
@@ -280,6 +280,9 @@ class Filters:
         if data.startswith("Type[") and data.endswith("]"):
             return data if data[5] == '"' else data[5:-1]
 
+        if data.startswith("Literal[") and data.endswith("]"):
+            return data[8:-1]
+
         if key in ("default_factory", "default"):
             return data
 
@@ -390,10 +393,19 @@ class Filters:
     def field_default_enum(self, attr: Attr) -> str:
         assert attr.default is not None
 
-        qname, enumeration = attr.default[6:].split("::", 1)
+        qname, reference = attr.default[6:].split("::", 1)
         qname = next(x.alias or qname for x in attr.types if x.qname == qname)
-        _, name = split_qname(qname)
-        return f"{self.class_name(name)}.{self.constant_name(enumeration, name)}"
+        name = local_name(qname)
+        class_name = self.class_name(name)
+
+        if attr.is_tokens:
+            members = [
+                f"Literal[{class_name}.{self.constant_name(member, name)}]"
+                for member in reference.split("@")
+            ]
+            return f"lambda: {self.format_metadata(members, indent=8)}"
+
+        return f"{class_name}.{self.constant_name(reference, name)}"
 
     def field_default_tokens(
         self, attr: Attr, types: List[Type], ns_map: Optional[Dict]

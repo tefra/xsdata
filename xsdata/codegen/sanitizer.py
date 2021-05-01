@@ -12,7 +12,6 @@ from xsdata.models.enums import DataType
 from xsdata.models.enums import Tag
 from xsdata.utils import collections
 from xsdata.utils import text
-from xsdata.utils.collections import first
 from xsdata.utils.collections import group_by
 from xsdata.utils.namespaces import build_qname
 from xsdata.utils.namespaces import clean_uri
@@ -137,16 +136,28 @@ class ClassSanitizer:
         """
 
         source_found = False
+
+        assert attr.default is not None
+
         for attr_type in attr.types:
             source = self.find_enum(attr_type)
             if not source:
                 continue
 
             source_found = True
-            source_attr = first(x for x in source.attrs if x.default == attr.default)
+            value_members = {x.default: x.name for x in source.attrs}
+            name = value_members.get(attr.default)
+            if name:
+                attr.default = f"@enum@{source.qname}::{name}"
+                return
 
-            if source_attr:
-                attr.default = f"@enum@{source.qname}::{source_attr.name}"
+            names = [
+                value_members[token]
+                for token in attr.default.split()
+                if token in value_members
+            ]
+            if names:
+                attr.default = f"@enum@{source.qname}::{'@'.join(names)}"
                 return
 
         if source_found:
@@ -225,8 +236,8 @@ class ClassSanitizer:
                 attr_type.qname = replace
 
                 if isinstance(attr.default, str) and attr.default.startswith("@enum@"):
-                    member = text.suffix(attr.default, "::")
-                    attr.default = f"@enum@{replace}::{member}"
+                    members = text.suffix(attr.default, "::")
+                    attr.default = f"@enum@{replace}::{members}"
 
         for choice in attr.choices:
             self.rename_attr_dependencies(choice, reference, replace)

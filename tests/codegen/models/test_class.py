@@ -144,3 +144,14 @@ class ClassTests(FactoryTestCase):
 
         obj = ClassFactory.create(tag=Tag.SIMPLE_TYPE)
         self.assertFalse(obj.should_generate)
+
+    def test_property_target_module(self):
+
+        obj = ClassFactory.create()
+        self.assertEqual("tests", obj.target_module)
+
+        obj.package = ""
+        self.assertEqual("tests", obj.target_module)
+
+        obj.package = "foo"
+        self.assertEqual("foo.tests", obj.target_module)

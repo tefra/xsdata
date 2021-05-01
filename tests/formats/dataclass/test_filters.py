@@ -84,6 +84,7 @@ class FiltersTests(FactoryTestCase):
         )
         self.assertEqual("foo.bang.pkg_1", self.filters.package_name("Foo.boom.1"))
         self.assertEqual("booom", self.filters.package_name("boom.boom"))
+        self.assertEqual("", self.filters.package_name(""))
 
     def test_type_name(self):
         self.assertEqual("str", self.filters.type_name(type_str))

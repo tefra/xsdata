@@ -13,7 +13,7 @@ from xsdata.codegen.transformer import SchemaTransformer
 from xsdata.logger import logger
 from xsdata.models.config import DocstringStyle
 from xsdata.models.config import GeneratorConfig
-from xsdata.models.config import OutputStructure
+from xsdata.models.config import StructureStyle
 from xsdata.utils.downloader import Downloader
 
 
@@ -33,7 +33,7 @@ class CliTests(TestCase):
         self.assertFalse(mock_init.call_args[1]["print"])
         self.assertEqual("foo", config.output.package)
         self.assertEqual("dataclasses", config.output.format)
-        self.assertEqual(OutputStructure.FILENAMES, config.output.structure)
+        self.assertEqual(StructureStyle.FILENAMES, config.output.structure)
         self.assertEqual([source.as_uri()], mock_process.call_args[0][0])
 
     @mock.patch.object(SchemaTransformer, "process")
@@ -61,7 +61,24 @@ class CliTests(TestCase):
         self.assertFalse(mock_init.call_args[1]["print"])
         self.assertEqual("foo", config.output.package)
         self.assertEqual("dataclasses", config.output.format)
-        self.assertEqual(OutputStructure.NAMESPACES, config.output.structure)
+        self.assertEqual(StructureStyle.NAMESPACES, config.output.structure)
+
+    @mock.patch.object(SchemaTransformer, "process")
+    @mock.patch.object(SchemaTransformer, "__init__", return_value=None)
+    def test_generate_with_structure_style_mode(self, mock_init, mock_process):
+        source = fixtures_dir.joinpath("defxmlschema/chapter03.xsd")
+        result = self.runner.invoke(
+            cli,
+            [str(source), "--package", "foo", "--structure-style", "single-package"],
+        )
+        config = mock_init.call_args[1]["config"]
+
+        self.assertIsNone(result.exception)
+        self.assertEqual([source.as_uri()], mock_process.call_args[0][0])
+        self.assertFalse(mock_init.call_args[1]["print"])
+        self.assertEqual("foo", config.output.package)
+        self.assertEqual("dataclasses", config.output.format)
+        self.assertEqual(StructureStyle.SINGLE_PACKAGE, config.output.structure)
 
     @mock.patch.object(SchemaTransformer, "process")
     @mock.patch.object(SchemaTransformer, "__init__", return_value=None)
@@ -82,7 +99,7 @@ class CliTests(TestCase):
         file_path = Path(tempfile.mktemp())
         config = GeneratorConfig()
         config.output.package = "foo.bar"
-        config.output.structure = OutputStructure.NAMESPACES
+        config.output.structure = StructureStyle.NAMESPACES
         with file_path.open("w") as fp:
             config.write(fp, config)
 
@@ -96,7 +113,7 @@ class CliTests(TestCase):
         self.assertFalse(mock_init.call_args[1]["print"])
         self.assertEqual("foo.bar", config.output.package)
         self.assertEqual("dataclasses", config.output.format)
-        self.assertEqual(OutputStructure.NAMESPACES, config.output.structure)
+        self.assertEqual(StructureStyle.NAMESPACES, config.output.structure)
         self.assertEqual([source.as_uri()], mock_process.call_args[0][0])
         file_path.unlink()
 
@@ -106,7 +123,7 @@ class CliTests(TestCase):
         file_path = Path(tempfile.mktemp())
         config = GeneratorConfig()
         config.output.package = "foo.bar"
-        config.output.structure = OutputStructure.FILENAMES
+        config.output.structure = StructureStyle.FILENAMES
         with file_path.open("w") as fp:
             config.write(fp, config)
 
@@ -126,7 +143,7 @@ class CliTests(TestCase):
 
         self.assertIsNone(result.exception)
         self.assertEqual("foo", config.output.package)
-        self.assertEqual(OutputStructure.NAMESPACES, config.output.structure)
+        self.assertEqual(StructureStyle.NAMESPACES, config.output.structure)
         file_path.unlink()
 
     @mock.patch("xsdata.cli.logger.info")

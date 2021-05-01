@@ -14,7 +14,7 @@ from xsdata.codegen.writer import CodeWriter
 from xsdata.logger import logger
 from xsdata.models.config import DocstringStyle
 from xsdata.models.config import GeneratorConfig
-from xsdata.models.config import OutputStructure
+from xsdata.models.config import StructureStyle
 from xsdata.utils.downloader import Downloader
 from xsdata.utils.hooks import load_entry_points
 
@@ -22,6 +22,7 @@ load_entry_points("xsdata.plugins.cli")
 
 outputs = click.Choice(CodeWriter.generators.keys())
 docstring_styles = click.Choice([x.value for x in DocstringStyle])
+structure_styles = click.Choice([x.value for x in StructureStyle])
 click_log.basic_config(logger)
 
 
@@ -121,8 +122,25 @@ def download(source: str, output: str):
     default=False,
     help=(
         "Use namespaces to group classes in modules. "
-        "Useful against circular import errors."
+        "Useful against circular import errors. "
+        "Deprecated use '--structure-style namespaces'"
     ),
+)
+@click.option(
+    "-ss",
+    "--structure-style",
+    type=structure_styles,
+    help=(
+        "Specify a structure style to organize classes "
+        "Default: filenames"
+        "\n\n"
+        "filenames: groups classes by the schema location"
+        "\n\n"
+        "namespaces: group classes by the target namespace"
+        "\n\n"
+        "single-package: group all classes together"
+    ),
+    default="filenames",
 )
 @click.option(
     "-cf",
@@ -165,7 +183,9 @@ def generate(**kwargs: Any):
         config.output.docstring_style = DocstringStyle(kwargs["docstring_style"])
 
     if kwargs["ns_struct"]:
-        config.output.structure = OutputStructure.NAMESPACES
+        config.output.structure = StructureStyle.NAMESPACES
+    elif kwargs["structure_style"] != StructureStyle.FILENAMES.value:
+        config.output.structure = StructureStyle(kwargs["structure_style"])
 
     uris = resolve_source(kwargs["source"])
     transformer = SchemaTransformer(config=config, print=kwargs["print"])

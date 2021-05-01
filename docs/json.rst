@@ -20,8 +20,8 @@ Parsing JSON
 ============
 
 
-From filename
--------------
+From json filename
+------------------
 
 .. doctest::
 
@@ -38,8 +38,8 @@ From filename
     Product(number=557, name='Short-Sleeved Linen Blouse', size=SizeType(value=None, system=None))
 
 
-From file object
-----------------
+From json file object
+---------------------
 
 .. doctest::
 
@@ -50,8 +50,8 @@ From file object
     Product(number=557, name='Short-Sleeved Linen Blouse', size=SizeType(value=None, system=None))
 
 
-From stream
------------
+From json stream
+----------------
 
 .. doctest::
 
@@ -61,8 +61,8 @@ From stream
     Product(number=557, name='Short-Sleeved Linen Blouse', size=SizeType(value=None, system=None))
 
 
-From String
------------
+From json string
+----------------
 
 .. doctest::
 
@@ -71,8 +71,8 @@ From String
     Product(number=557, name='Short-Sleeved Linen Blouse', size=SizeType(value=None, system=None))
 
 
-From Bytes
-----------
+From json bytes
+---------------
 
 .. doctest::
 
@@ -81,8 +81,8 @@ From Bytes
     Product(number=557, name='Short-Sleeved Linen Blouse', size=SizeType(value=None, system=None))
 
 
-From path
----------
+From json path
+--------------
 
 .. doctest::
 
@@ -91,8 +91,8 @@ From path
     Product(number=557, name='Short-Sleeved Linen Blouse', size=SizeType(value=None, system=None))
 
 
-Unknown target type
--------------------
+Unknown json target type
+------------------------
 
 It's optimal to provide the target model but completely optional. The parser can scan
 all the imported modules to find a matching dataclass.
@@ -166,8 +166,8 @@ Serializing JSON
 ================
 
 
-Render to string
-----------------
+Render json string
+------------------
 
 .. doctest::
 
@@ -204,8 +204,8 @@ Render to string
     }
 
 
-Write to stream
----------------
+Write to json stream
+--------------------
 
 .. doctest::
 

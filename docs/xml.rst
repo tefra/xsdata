@@ -33,8 +33,8 @@ context instance.
 Parsing XML
 ===========
 
-From filename
--------------
+From xml filename
+------------------
 
 .. doctest::
 
@@ -50,8 +50,8 @@ From filename
     Usaddress(name='Robert Smith', street='8 Oak Avenue', city='Old Town', state='PA', zip=Decimal('95819'), country='US')
 
 
-From file object
-----------------
+From xml file object
+--------------------
 
 .. doctest::
 
@@ -62,8 +62,8 @@ From file object
     '8 Oak Avenue'
 
 
-From stream
------------
+From xml stream
+---------------
 
 .. doctest::
 
@@ -73,8 +73,8 @@ From stream
     '8 Oak Avenue'
 
 
-From string
------------
+From xml string
+---------------
 
 .. doctest::
 
@@ -83,8 +83,8 @@ From string
     '8 Oak Avenue'
 
 
-From bytes
-----------
+From xml bytes
+--------------
 
 .. doctest::
 
@@ -93,8 +93,8 @@ From bytes
     '8 Oak Avenue'
 
 
-From path
----------
+From xml path
+-------------
 
 .. doctest::
 
@@ -103,8 +103,8 @@ From path
     '8 Oak Avenue'
 
 
-Unknown target type
--------------------
+Unknown xml target type
+-----------------------
 
 It's optimal to provide the target model but completely optional. The parser can scan
 all the imported modules to find a matching dataclass.
@@ -167,8 +167,8 @@ Serializing XML
 ===============
 
 
-Render to string
-----------------
+Render xml string
+-----------------
 
 .. doctest::
 
@@ -247,8 +247,8 @@ Set a default namespace
     <BLANKLINE>
 
 
-Write to stream
----------------
+Write to xml stream
+-------------------
 
 .. doctest::
 

@@ -371,6 +371,10 @@ class ClassExtensionHandlerTests(FactoryTestCase):
         target.attrs.append(AttrFactory.create())
         self.assertTrue(self.processor.should_flatten_extension(source, target))
 
+        # Source has is a subclass
+        source.extensions.append(ExtensionFactory.create())
+        self.assertFalse(self.processor.should_flatten_extension(source, target))
+
         # Target has suffix attr
         source = ClassFactory.create()
         target = ClassFactory.elements(1)

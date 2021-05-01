@@ -25,54 +25,6 @@ class ItemType:
 
 
 @dataclass
-class RestrictedProductType:
-    number: Optional[int] = field(
-        default=None,
-        metadata={
-            "type": "Element",
-            "namespace": "",
-            "required": True,
-        }
-    )
-    name: Optional[str] = field(
-        default=None,
-        metadata={
-            "type": "Element",
-            "namespace": "",
-            "required": True,
-        }
-    )
-    description: Optional[str] = field(
-        default=None,
-        metadata={
-            "type": "Element",
-            "namespace": "",
-        }
-    )
-    routing_num: Optional[int] = field(
-        default=None,
-        metadata={
-            "name": "routingNum",
-            "type": "Attribute",
-            "required": True,
-        }
-    )
-    lang: Optional[str] = field(
-        default=None,
-        metadata={
-            "type": "Attribute",
-        }
-    )
-    eff_date: XmlDate = field(
-        default=XmlDate(1900, 1, 1),
-        metadata={
-            "name": "effDate",
-            "type": "Attribute",
-        }
-    )
-
-
-@dataclass
 class SizeType:
     value: Optional[int] = field(
         default=None,
@@ -135,6 +87,33 @@ class SmallSizeType(SizeType):
         metadata={
             "type": "Attribute",
             "required": True,
+        }
+    )
+
+
+@dataclass
+class RestrictedProductType(ProductType):
+    name: Optional[str] = field(
+        default=None,
+        metadata={
+            "type": "Element",
+            "namespace": "",
+            "required": True,
+        }
+    )
+    routing_num: Optional[int] = field(
+        default=None,
+        metadata={
+            "name": "routingNum",
+            "type": "Attribute",
+            "required": True,
+        }
+    )
+    eff_date: XmlDate = field(
+        default=XmlDate(1900, 1, 1),
+        metadata={
+            "name": "effDate",
+            "type": "Attribute",
         }
     )
 

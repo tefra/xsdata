@@ -34,7 +34,7 @@ Generate Code
 .. code-block:: console
     :caption: Convert a local schema
 
-    $ xsdata air_v48_0/AirReqRsp.xsd rail_v48_0/RailReqRsp.xsd --package travelport.models
+    $ xsdata air_v48_0/AirReqRsp.xsd --package travelport.models
 
 
 .. code-block:: console
@@ -52,6 +52,42 @@ Output plugins
 --------------
 
 - `PlantUML <https://github.com/tefra/xsdata-plantuml>`_ class diagrams
+
+
+Circular imports
+----------------
+
+Python is vulnerable to xsd circular imports. xsData by default groups all classes
+by the schema location they are defined. This works well for schemas that avoid circular
+imports. If you get import errors you should try one of the alternative structure
+styles.
+
+
+**namespaces**
+
+This style will group classes by the target namespace they were originally defined. It
+works well when the types of a namespace are spread across multiple schemas eg.
+type substitutions, redefines.
+
+.. code-block:: console
+
+    $ xsdata schema.xsd --package models --structure-style namespaces
+
+
+**single-package**
+
+This style will group all classes together into a single package eliminating imports
+altogether.
+
+.. code-block:: console
+
+    $ xsdata schema.xsd --package models --structure-style single-package
+
+
+.. warning::
+
+    Auto :ref:`locating types <Unknown xml target type>` during parsing might not work since
+    all classes are bundled together under the same module namespace.
 
 
 Initialize Config

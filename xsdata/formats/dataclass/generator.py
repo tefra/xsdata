@@ -126,7 +126,7 @@ class DataclassGenerator(AbstractGenerator):
         otherwise yield the necessary filepath, name, source output that needs
         to be crated."""
         cwd = Path.cwd()
-        while cwd != package:
+        while cwd < package:
             init = package.joinpath("__init__.py")
             if not init.exists():
                 yield GeneratorResult(

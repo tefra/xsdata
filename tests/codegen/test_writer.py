@@ -29,8 +29,8 @@ class CodeWriterTests(FactoryTestCase):
         self.writer = CodeWriter(generator)
 
     @mock.patch.object(NoneGenerator, "render")
-    @mock.patch.object(NoneGenerator, "designate")
-    def test_write(self, mock_designate, mock_render):
+    @mock.patch.object(NoneGenerator, "normalize_packages")
+    def test_write(self, mock_normalize_packages, mock_render):
         classes = ClassFactory.list(2)
         with TemporaryDirectory() as tmpdir:
             mock_render.return_value = [
@@ -43,12 +43,12 @@ class CodeWriterTests(FactoryTestCase):
             self.assertEqual("aAa", Path(f"{tmpdir}/foo/a.py").read_text())
             self.assertEqual("bBb", Path(f"{tmpdir}/bar/b.py").read_text())
             self.assertFalse(Path(f"{tmpdir}/c.py").exists())
-            mock_designate.assert_called_once_with(classes)
+            mock_normalize_packages.assert_called_once_with(classes)
 
     @mock.patch.object(NoneGenerator, "render")
-    @mock.patch.object(NoneGenerator, "designate")
+    @mock.patch.object(NoneGenerator, "normalize_packages")
     @mock.patch("builtins.print")
-    def test_print(self, mock_print, mock_designate, mock_render):
+    def test_print(self, mock_print, mock_normalize_packages, mock_render):
         classes = ClassFactory.list(2)
         mock_render.return_value = [
             GeneratorResult(Path("foo/a.py"), "file", "aAa"),
@@ -57,7 +57,7 @@ class CodeWriterTests(FactoryTestCase):
         ]
         self.writer.print(classes)
 
-        mock_designate.assert_called_once_with(classes)
+        mock_normalize_packages.assert_called_once_with(classes)
         mock_print.assert_has_calls(
             [mock.call("aAa", end=""), mock.call("bBb", end="")]
         )

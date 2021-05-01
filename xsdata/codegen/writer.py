@@ -29,7 +29,7 @@ class CodeWriter:
         """Iterate over the designated generator outputs and create the
         necessary directories and files."""
 
-        self.generator.designate(classes)
+        self.generator.normalize_packages(classes)
         for result in self.generator.render(classes):
             if result.source.strip():
                 logger.info("Generating package: %s", result.title)
@@ -40,7 +40,7 @@ class CodeWriter:
     def print(self, classes: List[Class]):
         """Iterate over the designated generator outputs and print them to the
         console."""
-        self.generator.designate(classes)
+        self.generator.normalize_packages(classes)
         for result in self.generator.render(classes):
             if result.source.strip():
                 print(result.source, end="")

@@ -20,7 +20,7 @@ like naming conventions and aliases.
 
     GeneratorConventions
     GeneratorAliases
-    OutputStructure
+    StructureStyle
     DocstringStyle
     GeneratorAlias
     NameConvention

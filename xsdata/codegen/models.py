@@ -498,7 +498,10 @@ class Class:
     @property
     def target_module(self) -> str:
         """Return the target module this class is assigned to."""
-        return f"{self.package}.{self.module}"
+        if self.package:
+            return f"{self.package}.{self.module}"
+
+        return self.module
 
     def clone(self) -> "Class":
         """Return a deep cloned instance."""

@@ -153,3 +153,5 @@ class DataclassGeneratorTests(FactoryTestCase):
         self.assertEqual(
             "foo.bar_bar.pkg_1", self.generator.package_name("Foo.BAR_bar.1")
         )
+
+        self.assertEqual("", self.generator.package_name(""))

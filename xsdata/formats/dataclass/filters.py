@@ -137,6 +137,9 @@ class Filters:
         if name in self.package_aliases:
             return self.package_aliases[name]
 
+        if not name:
+            return name
+
         return ".".join(
             self.package_aliases.get(part) or self._package_name(part)
             for part in name.split(".")

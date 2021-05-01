@@ -23,16 +23,18 @@ from xsdata.utils import constants
 from xsdata.utils import text
 
 
-class OutputStructure(Enum):
+class StructureStyle(Enum):
     """
     Code writer output structure strategies.
 
     :cvar FILENAMES: filenames
     :cvar NAMESPACES: namespaces
+    :cvar SINGLE_PACKAGE: package
     """
 
     FILENAMES = "filenames"
     NAMESPACES = "namespaces"
+    SINGLE_PACKAGE = "single-package"
 
 
 class NameCase(Enum):
@@ -138,7 +140,7 @@ class GeneratorOutput:
     max_line_length: int = attribute(default=79)
     package: str = element(default="generated")
     format: str = element(default="dataclasses")
-    structure: OutputStructure = element(default=OutputStructure.FILENAMES)
+    structure: StructureStyle = element(default=StructureStyle.FILENAMES)
     docstring_style: DocstringStyle = element(default=DocstringStyle.RST)
     compound_fields: bool = element(default=False)
 

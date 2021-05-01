@@ -8,7 +8,6 @@ from typing import List
 from xsdata.codegen.models import Class
 from xsdata.exceptions import CodeGenerationError
 from xsdata.models.config import GeneratorConfig
-from xsdata.models.config import OutputStructure
 from xsdata.utils.collections import group_by
 from xsdata.utils.package import module_path
 from xsdata.utils.package import package_path
@@ -62,7 +61,7 @@ class AbstractGenerator(metaclass=abc.ABCMeta):
         """Group the given list of classes by the target module directory."""
         return group_by(classes, lambda x: module_path(x.target_module))
 
-    def designate(self, classes: List[Class]):
+    def normalize_packages(self, classes: List[Class]):
         """
         Normalize the target package and module names by the given output
         generator.
@@ -71,16 +70,10 @@ class AbstractGenerator(metaclass=abc.ABCMeta):
         """
         modules = {}
         packages = {}
-        ns_struct = self.config.output.structure == OutputStructure.NAMESPACES
         for obj in classes:
-
-            if ns_struct:
-                obj.package = self.config.output.package
-                obj.module = obj.target_namespace or ""
-
             if obj.package is None:
                 raise CodeGenerationError(
-                    f"Class `{obj.name}` has not been assign to a package."
+                    f"Class `{obj.name}` has not been assigned to a package"
                 )
 
             if obj.module not in modules:

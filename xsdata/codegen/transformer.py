@@ -29,6 +29,7 @@ from xsdata.formats.dataclass.models.generics import AnyElement
 from xsdata.formats.dataclass.parsers import TreeParser
 from xsdata.logger import logger
 from xsdata.models.config import GeneratorConfig
+from xsdata.models.config import StructureStyle
 from xsdata.models.enums import COMMON_SCHEMA_DIR
 from xsdata.models.wsdl import Definitions
 from xsdata.models.xsd import Schema
@@ -174,7 +175,7 @@ class SchemaTransformer:
             logger.info(
                 "Analyzer input: %d main and %d inner classes", class_num, inner_num
             )
-            self.assign_packages()
+            self.designate_classes()
 
             classes = self.analyze_classes(classes)
             class_num, inner_num = self.count_classes(classes)
@@ -310,13 +311,29 @@ class SchemaTransformer:
 
         return main, inner
 
-    def assign_packages(self):
+    def designate_classes(self):
+        structure_style = self.config.output.structure
+        if structure_style == StructureStyle.NAMESPACES:
+            self.designate_by_namespaces()
+        elif structure_style == StructureStyle.SINGLE_PACKAGE:
+            self.designate_by_package()
+        else:
+            self.designate_by_filenames()
+
+    def designate_by_filenames(self):
         """Group uris by common path and auto assign package names to all
         classes."""
+
+        def assign(classes: List[Class], package: str):
+            """Assign the given package to all the classes and their inners."""
+            for obj in classes:
+                obj.package = package
+                assign(obj.inner, package)
+
         prev = ""
         index = 0
         groups = defaultdict(list)
-        package = self.config.output.package
+        output_package = self.config.output.package
         common_schemas_dir = COMMON_SCHEMA_DIR.as_uri()
         for key in sorted(self.class_map.keys()):
             if key.startswith(common_schemas_dir):
@@ -337,12 +354,34 @@ class SchemaTransformer:
             for key in keys:
                 items = self.class_map[key]
                 suffix = ".".join(Path(key).parent.relative_to(common_path).parts)
-                package_name = f"{package}.{suffix}" if suffix else package
-                self.assign_package(items, package_name)
+                package_name = (
+                    f"{output_package}.{suffix}" if suffix else output_package
+                )
+                assign(items, package_name)
 
-    @classmethod
-    def assign_package(cls, classes: List[Class], package: str):
-        """Assign the given package to all the classes and their inners."""
-        for obj in classes:
-            obj.package = package
-            cls.assign_package(obj.inner, package)
+    def designate_by_namespaces(self):
+        def assign(items: List[Class], package: str):
+            for item in items:
+                item.package = package
+                item.module = item.target_namespace or ""
+
+                assign(item.inner, package)
+
+        for classes in self.class_map.values():
+            assign(classes, self.config.output.package)
+
+    def designate_by_package(self):
+
+        package_parts = self.config.output.package.split(".")
+        module = package_parts.pop()
+        package = ".".join(package_parts)
+
+        def assign(items: List[Class]):
+            for item in items:
+                item.package = package
+                item.module = module
+
+                assign(item.inner)
+
+        for classes in self.class_map.values():
+            assign(classes)

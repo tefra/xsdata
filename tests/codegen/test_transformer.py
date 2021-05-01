@@ -16,6 +16,7 @@ from xsdata.exceptions import CodeGenerationError
 from xsdata.formats.dataclass.models.generics import AnyElement
 from xsdata.formats.dataclass.parsers import TreeParser
 from xsdata.models.config import GeneratorConfig
+from xsdata.models.config import StructureStyle
 from xsdata.models.enums import Namespace
 from xsdata.models.wsdl import Binding
 from xsdata.models.wsdl import Definitions
@@ -159,10 +160,10 @@ class SchemaTransformerTests(FactoryTestCase):
     @mock.patch("xsdata.codegen.transformer.logger.info")
     @mock.patch.object(CodeWriter, "print")
     @mock.patch.object(SchemaTransformer, "analyze_classes")
-    @mock.patch.object(SchemaTransformer, "assign_packages")
+    @mock.patch.object(SchemaTransformer, "designate_classes")
     def test_process_classes_with_print_true(
         self,
-        mock_assign_packages,
+        mock_designate_classes,
         mock_analyze_classes,
         mock_writer_print,
         mock_logger_into,
@@ -178,7 +179,7 @@ class SchemaTransformerTests(FactoryTestCase):
 
         self.transformer.process_classes()
 
-        mock_assign_packages.assert_called_once_with()
+        mock_designate_classes.assert_called_once_with()
         mock_analyze_classes.assert_called_once_with(schema_classes)
         mock_writer_print.assert_called_once_with(analyzer_classes)
         mock_logger_into.assert_has_calls(
@@ -191,10 +192,10 @@ class SchemaTransformerTests(FactoryTestCase):
     @mock.patch("xsdata.codegen.transformer.logger.info")
     @mock.patch.object(CodeWriter, "write")
     @mock.patch.object(SchemaTransformer, "analyze_classes")
-    @mock.patch.object(SchemaTransformer, "assign_packages")
+    @mock.patch.object(SchemaTransformer, "designate_classes")
     def test_process_classes_with_print_false(
         self,
-        mock_assign_packages,
+        mock_designate_classes,
         mock_analyze_classes,
         mock_writer_write,
         mock_logger_into,
@@ -211,7 +212,7 @@ class SchemaTransformerTests(FactoryTestCase):
 
         self.transformer.process_classes()
 
-        mock_assign_packages.assert_called_once_with()
+        mock_designate_classes.assert_called_once_with()
         mock_analyze_classes.assert_called_once_with(schema_classes)
         mock_writer_write.assert_called_once_with(analyzer_classes)
         mock_logger_into.assert_has_calls(
@@ -406,7 +407,7 @@ class SchemaTransformerTests(FactoryTestCase):
 
         self.assertEqual((2, 16), self.transformer.count_classes(classes))
 
-    def test_assign_packages(self):
+    def test_designate_classes_by_filenames(self):
         core = "file://HL7V3/NE2008/coreschemas/voc.xsd"
         multi_one = "file://HL7V3/NE2008/multicacheschemas/PRPA_MT201307UV02.xsd"
         multi_two = "file://HL7V3/NE2008/multicacheschemas/COCT_MT080000UV.xsd"
@@ -427,7 +428,7 @@ class SchemaTransformerTests(FactoryTestCase):
         self.transformer.class_map = class_map
         self.transformer.config.output.package = "foo.bar"
 
-        self.transformer.assign_packages()
+        self.transformer.designate_classes()
 
         self.assertEqual("foo.bar.coreschemas", class_map[core][0].package)
         self.assertEqual("foo.bar.coreschemas", class_map[core][0].inner[0].package)
@@ -438,6 +439,61 @@ class SchemaTransformerTests(FactoryTestCase):
         self.assertEqual("foo.bar", class_map[http_two][0].package)
         self.assertEqual("foo.bar", class_map[local_one][0].package)
         self.assertEqual("foo.bar", class_map[local_two][0].package)
+
+    def test_designate_classes_by_namespaces(self):
+        class_map = {
+            "foo": [
+                ClassFactory.create(qname="{a}a", package=None),
+                ClassFactory.create(qname="{a}b", package=None),
+            ],
+            "bar": [ClassFactory.create(qname="b", package=None)],
+        }
+
+        self.transformer.class_map = class_map
+        self.transformer.config.output.structure = StructureStyle.NAMESPACES
+        self.transformer.config.output.package = "bar"
+
+        self.transformer.designate_classes()
+        self.assertEqual("bar", class_map["foo"][0].package)
+        self.assertEqual("bar", class_map["foo"][1].package)
+        self.assertEqual("bar", class_map["bar"][0].package)
+
+        self.assertEqual("a", class_map["foo"][0].module)
+        self.assertEqual("a", class_map["foo"][1].module)
+        self.assertEqual("", class_map["bar"][0].module)
+
+    def test_designate_classes_by_package(self):
+        class_map = {
+            "foo": [
+                ClassFactory.create(qname="{a}a", package=None),
+                ClassFactory.create(qname="{a}b", package=None),
+            ],
+            "bar": [ClassFactory.create(qname="b", package=None)],
+        }
+
+        self.transformer.class_map = class_map
+        self.transformer.config.output.structure = StructureStyle.SINGLE_PACKAGE
+        self.transformer.config.output.package = "foo.bar.thug"
+
+        self.transformer.designate_classes()
+        self.assertEqual("foo.bar", class_map["foo"][0].package)
+        self.assertEqual("foo.bar", class_map["foo"][1].package)
+        self.assertEqual("foo.bar", class_map["bar"][0].package)
+
+        self.assertEqual("thug", class_map["foo"][0].module)
+        self.assertEqual("thug", class_map["foo"][1].module)
+        self.assertEqual("thug", class_map["bar"][0].module)
+
+        # No sub-package
+        self.transformer.config.output.package = "foo"
+        self.transformer.designate_classes()
+        self.assertEqual("", class_map["foo"][0].package)
+        self.assertEqual("", class_map["foo"][1].package)
+        self.assertEqual("", class_map["bar"][0].package)
+
+        self.assertEqual("foo", class_map["foo"][0].module)
+        self.assertEqual("foo", class_map["foo"][1].module)
+        self.assertEqual("foo", class_map["bar"][0].module)
 
     @mock.patch.object(ClassAnalyzer, "process")
     def test_analyze_classes(self, mock_process):

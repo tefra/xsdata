@@ -126,13 +126,18 @@ class ClassSanitizerTest(FactoryTestCase):
         enum_two = ClassFactory.enumeration(1, qname="inner")
         enum_two.attrs[0].default = "2"
         enum_two.attrs[0].name = "two"
-        enum_three = ClassFactory.enumeration(1, qname="missing_member")
+        enum_three = ClassFactory.enumeration(2, qname="missing_member")
+        enum_three.attrs[0].default = "4"
+        enum_three.attrs[0].name = "four"
+        enum_three.attrs[1].default = "5"
+        enum_three.attrs[1].name = "five"
 
         mock_find_enum.side_effect = [
             None,
             enum_one,
             None,
             enum_two,
+            enum_three,
             enum_three,
         ]
 
@@ -154,6 +159,7 @@ class ClassSanitizerTest(FactoryTestCase):
                     default="2",
                 ),
                 AttrFactory.create(default="3"),
+                AttrFactory.create(default=" 4  5"),
             ],
         )
 
@@ -162,7 +168,15 @@ class ClassSanitizerTest(FactoryTestCase):
             self.sanitizer.process_attribute_default(target, attr)
             actual.append(attr.default)
 
-        self.assertEqual(["@enum@{a}root::one", "@enum@inner::two", None], actual)
+        self.assertEqual(
+            [
+                "@enum@{a}root::one",
+                "@enum@inner::two",
+                None,
+                "@enum@missing_member::four@five",
+            ],
+            actual,
+        )
         mock_logger_warning.assert_called_once_with(
             "No enumeration member matched %s.%s default value `%s`",
             target.name,

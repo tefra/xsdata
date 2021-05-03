@@ -249,7 +249,7 @@ class Attr:
     """
 
     tag: str
-    name: str
+    name: str = field(compare=False)
     local_name: str = field(init=False)
     index: int = field(compare=False, default_factory=int)
     default: Optional[str] = field(default=None, compare=False)

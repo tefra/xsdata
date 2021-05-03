@@ -1,6 +1,7 @@
 from xsdata.codegen.container import ClassContainer
 from xsdata.codegen.handlers import AttributeSanitizerHandler
 from xsdata.codegen.models import Restrictions
+from xsdata.codegen.models import Status
 from xsdata.models.enums import DataType
 from xsdata.models.enums import Tag
 from xsdata.utils import collections
@@ -160,7 +161,7 @@ class AttributeSanitizerHandlerTests(FactoryTestCase):
         self.processor.process(target)
         self.assertEqual(1, len(target.attrs))
 
-    def test_remove_inherited_fields_with_lists_type(self):
+    def test_process_inherited_fields(self):
         target = ClassFactory.elements(2)
         target.attrs[0].restrictions.min_occurs = 1
         target.attrs[0].restrictions.max_occurs = 3
@@ -186,6 +187,26 @@ class AttributeSanitizerHandlerTests(FactoryTestCase):
         source.attrs[1].restrictions.choice = "456"
         self.processor.process(target)
         self.assertEqual(0, len(target.attrs))
+
+        target = ClassFactory.create(
+            attrs=AttrFactory.list(1, name="foo", tag=Tag.ELEMENT)
+        )
+        source_one = ClassFactory.create(status=Status.PROCESSED)
+        source_two = ClassFactory.create(status=Status.PROCESSED)
+        source_one.extensions.append(ExtensionFactory.reference(source_two.qname))
+        target.extensions.append(ExtensionFactory.reference(source_one.qname))
+
+        source_two.attrs.append(target.attrs[0].clone())
+        source_two.attrs[0].tag = Tag.ATTRIBUTE
+
+        self.processor.container = ClassContainer()
+        self.processor.container.add(target)
+        self.processor.container.add(source_two)
+        self.processor.container.add(source_one)
+        self.processor.process(target)
+
+        self.assertEqual("foo", target.attrs[0].name)
+        self.assertEqual("foo_Attribute", source_two.attrs[0].name)
 
     def test_set_effective_choices(self):
         target = ClassFactory.create()

@@ -6,6 +6,7 @@ from xsdata.codegen.models import Restrictions
 from xsdata.codegen.utils import ClassUtils
 from xsdata.exceptions import CodeGenerationError
 from xsdata.models.enums import DataType
+from xsdata.models.enums import Tag
 from xsdata.utils.testing import AttrFactory
 from xsdata.utils.testing import AttrTypeFactory
 from xsdata.utils.testing import ClassFactory
@@ -271,3 +272,29 @@ class ClassUtilsTests(FactoryTestCase):
         self.assertEqual(names, [x.name for x in target.attrs])
         self.assertEqual(min_occurs, [x.restrictions.min_occurs for x in target.attrs])
         self.assertEqual(max_occurs, [x.restrictions.max_occurs for x in target.attrs])
+
+    def test_rename_attribute_by_preference(self):
+        one = AttrFactory.create(name="a", tag=Tag.ELEMENT)
+        two = AttrFactory.create(name="a", tag=Tag.ATTRIBUTE)
+
+        ClassUtils.rename_attribute_by_preference(one, two)
+        self.assertEqual("a", one.name)
+        self.assertEqual("a_Attribute", two.name)
+
+        one = AttrFactory.create(name="a", tag=Tag.ELEMENT)
+        two = AttrFactory.create(name="a", tag=Tag.ELEMENT, namespace="foo")
+        ClassUtils.rename_attribute_by_preference(one, two)
+        self.assertEqual("a", one.name)
+        self.assertEqual("foo_a", two.name)
+
+        one = AttrFactory.create(name="a", tag=Tag.ELEMENT, namespace="foo")
+        two = AttrFactory.create(name="a", tag=Tag.ELEMENT)
+        ClassUtils.rename_attribute_by_preference(one, two)
+        self.assertEqual("foo_a", one.name)
+        self.assertEqual("a", two.name)
+
+        one = AttrFactory.create(name="a", tag=Tag.ELEMENT)
+        two = AttrFactory.create(name="a", tag=Tag.ELEMENT)
+        ClassUtils.rename_attribute_by_preference(one, two)
+        self.assertEqual("a_Element", one.name)
+        self.assertEqual("a", two.name)

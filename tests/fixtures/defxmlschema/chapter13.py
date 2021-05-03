@@ -93,14 +93,6 @@ class SmallSizeType(SizeType):
 
 @dataclass
 class RestrictedProductType(ProductType):
-    name: Optional[str] = field(
-        default=None,
-        metadata={
-            "type": "Element",
-            "namespace": "",
-            "required": True,
-        }
-    )
     routing_num: Optional[int] = field(
         default=None,
         metadata={

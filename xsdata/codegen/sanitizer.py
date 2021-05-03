@@ -8,6 +8,7 @@ from xsdata.codegen.models import Attr
 from xsdata.codegen.models import AttrType
 from xsdata.codegen.models import Class
 from xsdata.codegen.models import Restrictions
+from xsdata.codegen.utils import ClassUtils
 from xsdata.logger import logger
 from xsdata.models.config import StructureStyle
 from xsdata.models.enums import DataType
@@ -16,7 +17,6 @@ from xsdata.utils import collections
 from xsdata.utils import text
 from xsdata.utils.collections import group_by
 from xsdata.utils.namespaces import build_qname
-from xsdata.utils.namespaces import clean_uri
 from xsdata.utils.namespaces import split_qname
 from xsdata.utils.text import alnum
 
@@ -329,7 +329,7 @@ class ClassSanitizer:
         for items in grouped.values():
             total = len(items)
             if total == 2 and not items[0].is_enumeration:
-                cls.rename_attribute_by_preference(*items)
+                ClassUtils.rename_attribute_by_preference(*items)
             elif total > 1:
                 cls.rename_attributes_with_index(attrs, items)
 
@@ -345,26 +345,6 @@ class ClassSanitizer:
                 num += 1
 
             rename[index].name = f"{name}_{num}"
-
-    @classmethod
-    def rename_attribute_by_preference(cls, a: Attr, b: Attr):
-        """
-        Decide and rename one of the two given attributes.
-
-        When both attributes are derived from the same xs:tag and one of the two fields
-        has a specific namespace prepend it to the name. Preferable rename the second
-        attribute.
-
-        Otherwise append the derived from tag to the name of one of the two attributes.
-        Preferably rename the second field or the field derived from xs:attribute.
-        """
-        if a.tag == b.tag and (a.namespace or b.namespace):
-            change = b if b.namespace else a
-            assert change.namespace is not None
-            change.name = f"{clean_uri(change.namespace)}_{change.name}"
-        else:
-            change = b if b.is_attribute else a
-            change.name = f"{change.name}_{change.tag}"
 
     @classmethod
     def build_attr_choice(cls, attr: Attr) -> Attr:

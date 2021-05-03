@@ -7,9 +7,12 @@ from xsdata.codegen.mixins import HandlerInterface
 from xsdata.codegen.models import Attr
 from xsdata.codegen.models import AttrType
 from xsdata.codegen.models import Class
+from xsdata.codegen.models import Extension
+from xsdata.codegen.utils import ClassUtils
 from xsdata.formats.converter import converter
 from xsdata.models.enums import DataType
 from xsdata.utils import collections
+from xsdata.utils.text import alnum
 
 
 @dataclass
@@ -28,36 +31,50 @@ class AttributeSanitizerHandler(HandlerInterface):
     def process(self, target: Class):
         self.cascade_default_value(target)
         self.reset_unsupported_types(target)
-        self.remove_inherited_fields(target)
+
+        for extension in target.extensions:
+            self.process_inherited_fields(target, extension)
+
         self.set_effective_choices(target)
 
-    def remove_inherited_fields(self, target: Class):
-        """Compare all override fields and if they mach the parent definition
-        remove them."""
+    def process_inherited_fields(self, target: Class, extension: Extension):
+        source = self.container.find(extension.type.qname)
+        assert source is not None
 
-        if len(target.extensions) == 1:
-            source = self.container.find(target.extensions[0].type.qname)
+        for attr in list(target.attrs):
+            search = alnum(attr.name)
+            source_attr = collections.first(
+                source_attr
+                for source_attr in source.attrs
+                if alnum(source_attr.name) == search
+            )
 
-            # All dummy extensions have been removed at this stage.
-            assert source is not None
+            if not source_attr:
+                continue
 
-            choices = self.container.config.output.compound_fields
-            for attr in list(target.attrs):
-                # Quick match with attr types
-                pos = collections.find(source.attrs, attr)
-                if pos > -1:
-                    cmp = source.attrs[pos]
-                    res = attr.restrictions
-                    cmp_res = cmp.restrictions
-                    with_occurrences = not all((choices, res.choice, cmp_res.choice))
+            if attr.tag == source_attr.tag:
+                self.process_inherited_field(target, attr, source_attr)
+            else:
+                ClassUtils.rename_attribute_by_preference(attr, source_attr)
 
-                    if (
-                        attr.default == cmp.default
-                        and attr.fixed == cmp.fixed
-                        and attr.mixed == cmp.mixed
-                        and res.is_compatible(cmp_res, with_occurrences)
-                    ):
-                        target.attrs.remove(attr)
+        for extension in source.extensions:
+            self.process_inherited_fields(target, extension)
+
+    def process_inherited_field(self, target: Class, attr: Attr, source_attr: Attr):
+        choices = self.container.config.output.compound_fields
+        with_occurrences = not all(
+            (choices, attr.restrictions.choice, source_attr.restrictions.choice)
+        )
+
+        if (
+            attr.default == source_attr.default
+            and attr.fixed == source_attr.fixed
+            and attr.mixed == source_attr.mixed
+            and attr.restrictions.is_compatible(
+                source_attr.restrictions, with_occurrences
+            )
+        ):
+            target.attrs.remove(attr)
 
     @classmethod
     def cascade_default_value(cls, target: Class):

@@ -2,7 +2,6 @@ from unittest import mock
 
 from xsdata.codegen.analyzer import ClassAnalyzer
 from xsdata.codegen.container import ClassContainer
-from xsdata.codegen.sanitizer import ClassSanitizer
 from xsdata.codegen.validator import ClassValidator
 from xsdata.exceptions import AnalyzerValueError
 from xsdata.models.config import GeneratorConfig
@@ -14,16 +13,12 @@ from xsdata.utils.testing import FactoryTestCase
 
 class ClassAnalyzerTests(FactoryTestCase):
     @mock.patch.object(ClassAnalyzer, "validate_references")
-    @mock.patch.object(ClassSanitizer, "process")
-    @mock.patch.object(ClassContainer, "filter_classes")
     @mock.patch.object(ClassContainer, "process")
     @mock.patch.object(ClassValidator, "process")
     def test_process(
         self,
         mock_validator_process,
         mock_container_process,
-        mock_container_filter_classes,
-        mock_sanitizer_process,
         mock_validate_references,
     ):
         config = GeneratorConfig()
@@ -37,8 +32,6 @@ class ClassAnalyzerTests(FactoryTestCase):
 
         mock_validator_process.assert_called_once_with()
         mock_container_process.assert_called_once_with()
-        mock_container_filter_classes.assert_called_once_with()
-        mock_sanitizer_process.assert_called_once_with()
         mock_validate_references.assert_called_once_with(classes)
 
     def test_class_references(self):

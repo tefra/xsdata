@@ -7,14 +7,21 @@ from typing import Iterator
 from typing import List
 from typing import Optional
 
+from xsdata.codegen.handlers import AttributeCompoundChoiceHandler
+from xsdata.codegen.handlers import AttributeDefaultValidateHandler
+from xsdata.codegen.handlers import AttributeDefaultValueHandler
+from xsdata.codegen.handlers import AttributeEffectiveChoiceHandler
 from xsdata.codegen.handlers import AttributeGroupHandler
 from xsdata.codegen.handlers import AttributeMergeHandler
 from xsdata.codegen.handlers import AttributeMixedContentHandler
-from xsdata.codegen.handlers import AttributeSanitizerHandler
+from xsdata.codegen.handlers import AttributeNameConflictHandler
+from xsdata.codegen.handlers import AttributeOverridesHandler
+from xsdata.codegen.handlers import AttributeRestrictionsHandler
 from xsdata.codegen.handlers import AttributeSubstitutionHandler
 from xsdata.codegen.handlers import AttributeTypeHandler
 from xsdata.codegen.handlers import ClassEnumerationHandler
 from xsdata.codegen.handlers import ClassExtensionHandler
+from xsdata.codegen.handlers import ClassNameConflictHandler
 from xsdata.codegen.mixins import ContainerInterface
 from xsdata.codegen.mixins import HandlerInterface
 from xsdata.codegen.models import Class
@@ -31,10 +38,17 @@ class ClassContainer(ContainerInterface):
 
     data: Dict = field(default_factory=dict)
     config: GeneratorConfig = field(default_factory=GeneratorConfig)
-    processors: List[HandlerInterface] = field(init=False)
+    pre_processors: List[HandlerInterface] = field(init=False)
+    post_processors: List[HandlerInterface] = field(init=False)
 
     def __post_init__(self):
-        self.processors: List[HandlerInterface] = [
+        """
+        Initialize all handlers based on the provided configuration.
+
+        The handlers are split into pre and post selection of classes to
+        be generated.
+        """
+        self.pre_processors: List[HandlerInterface] = [
             AttributeGroupHandler(self),
             ClassExtensionHandler(self),
             ClassEnumerationHandler(self),
@@ -42,8 +56,18 @@ class ClassContainer(ContainerInterface):
             AttributeTypeHandler(self),
             AttributeMergeHandler(),
             AttributeMixedContentHandler(),
-            AttributeSanitizerHandler(self),
+            AttributeDefaultValidateHandler(),
+            AttributeOverridesHandler(self),
+            AttributeEffectiveChoiceHandler(),
         ]
+
+        self.post_processors: List[HandlerInterface] = [
+            AttributeDefaultValueHandler(self),
+            AttributeRestrictionsHandler(),
+            AttributeNameConflictHandler(),
+        ]
+        if self.config.output.compound_fields:
+            self.post_processors.insert(0, AttributeCompoundChoiceHandler())
 
     @property
     def class_list(self) -> List[Class]:
@@ -60,7 +84,7 @@ class ClassContainer(ContainerInterface):
         for row in self.data.get(qname, []):
             if condition(row):
                 if row.status == Status.RAW:
-                    self.process_class(row)
+                    self.pre_process_class(row)
                     return self.find(qname, condition)
 
                 return row
@@ -69,30 +93,54 @@ class ClassContainer(ContainerInterface):
     def find_inner(self, source: Class, qname: str) -> Class:
         inner = ClassUtils.find_inner(source, qname)
         if inner.status == Status.RAW:
-            self.process_class(inner)
+            self.pre_process_class(inner)
 
         return inner
 
     def process(self):
-        """Run the process handlers for ever non processed class."""
+        """
+        Run all the process handlers.
+
+        Steps
+            1. Run all pre-selection handlers
+            2. Filter classes to be actually generated
+            3. Run all post-selection handlers
+            4. Resolve any naming conflicts.
+        """
         for obj in self.iterate():
             if obj.status == Status.RAW:
-                self.process_class(obj)
+                self.pre_process_class(obj)
 
-    def process_class(self, target: Class):
-        """Run the process handlers for the target class."""
+        self.filter_classes()
+
+        for obj in self.iterate():
+            self.post_process_class(obj)
+
+        conflict_resolver = ClassNameConflictHandler(self)
+        conflict_resolver.process()
+
+    def pre_process_class(self, target: Class):
+        """Run the pre process handlers for the target class."""
         target.status = Status.PROCESSING
 
-        for processor in self.processors:
+        for processor in self.pre_processors:
             processor.process(target)
 
         # We go top to bottom because it's easier to handle circular
         # references.
         for inner in target.inner:
             if inner.status == Status.RAW:
-                self.process_class(inner)
+                self.pre_process_class(inner)
 
         target.status = Status.PROCESSED
+
+    def post_process_class(self, target: Class):
+        """Run the post process handlers for the target class."""
+        for inner in target.inner:
+            self.post_process_class(inner)
+
+        for processor in self.post_processors:
+            processor.process(target)
 
     def filter_classes(self):
         """If there is any class derived from complexType or element then

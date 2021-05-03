@@ -36,6 +36,10 @@ class ContainerInterface(metaclass=abc.ABCMeta):
     def extend(self, items: List[Class]):
         """Add a list of classes the container."""
 
+    @abc.abstractmethod
+    def reset(self, item: Class, qname: str):
+        """Update the given class qualified name."""
+
 
 class HandlerInterface(metaclass=abc.ABCMeta):
     """Class handler interface."""

@@ -3,6 +3,8 @@ from unittest import mock
 from xsdata.codegen.container import ClassContainer
 from xsdata.codegen.models import Class
 from xsdata.codegen.models import Status
+from xsdata.models.config import GeneratorConfig
+from xsdata.models.config import StructureStyle
 from xsdata.models.enums import Tag
 from xsdata.utils.testing import ClassFactory
 from xsdata.utils.testing import FactoryTestCase
@@ -39,20 +41,45 @@ class ClassContainerTests(FactoryTestCase):
                 "AttributeTypeHandler",
                 "AttributeMergeHandler",
                 "AttributeMixedContentHandler",
-                "AttributeSanitizerHandler",
+                "AttributeDefaultValidateHandler",
+                "AttributeOverridesHandler",
+                "AttributeEffectiveChoiceHandler",
             ],
-            [x.__class__.__name__ for x in container.processors],
+            [x.__class__.__name__ for x in container.pre_processors],
         )
 
-    @mock.patch.object(ClassContainer, "process_class")
-    def test_find(self, mock_process_class):
-        def process_class(x: Class):
+        self.assertEqual(
+            [
+                "AttributeDefaultValueHandler",
+                "AttributeRestrictionsHandler",
+                "AttributeNameConflictHandler",
+            ],
+            [x.__class__.__name__ for x in container.post_processors],
+        )
+
+        config = GeneratorConfig()
+        config.output.compound_fields = True
+        container = ClassContainer(config=config)
+
+        self.assertEqual(
+            [
+                "AttributeCompoundChoiceHandler",
+                "AttributeDefaultValueHandler",
+                "AttributeRestrictionsHandler",
+                "AttributeNameConflictHandler",
+            ],
+            [x.__class__.__name__ for x in container.post_processors],
+        )
+
+    @mock.patch.object(ClassContainer, "pre_process_class")
+    def test_find(self, mock_pre_process_class):
+        def pre_process_class(x: Class):
             x.status = Status.PROCESSED
 
         class_a = ClassFactory.create(qname="a")
         class_b = ClassFactory.create(qname="b", status=Status.PROCESSED)
         class_c = ClassFactory.enumeration(2, qname="b", status=Status.PROCESSING)
-        mock_process_class.side_effect = process_class
+        mock_pre_process_class.side_effect = pre_process_class
         self.container.extend([class_a, class_b, class_c])
 
         self.assertIsNone(self.container.find("nope"))
@@ -61,29 +88,29 @@ class ClassContainerTests(FactoryTestCase):
         self.assertEqual(
             class_c, self.container.find(class_b.qname, lambda x: x.is_enumeration)
         )
-        mock_process_class.assert_called_once_with(class_a)
+        mock_pre_process_class.assert_called_once_with(class_a)
 
-    @mock.patch.object(ClassContainer, "process_class")
-    def test_find_inner(self, mock_process_class):
+    @mock.patch.object(ClassContainer, "pre_process_class")
+    def test_find_inner(self, mock_pre_process_class):
         obj = ClassFactory.create()
         first = ClassFactory.create(qname="{a}a")
         second = ClassFactory.create(qname="{a}b", status=Status.PROCESSED)
         obj.inner.extend((first, second))
 
-        def process_class(x: Class):
+        def pre_process_class(x: Class):
             x.status = Status.PROCESSED
 
-        mock_process_class.side_effect = process_class
+        mock_pre_process_class.side_effect = pre_process_class
 
         self.assertEqual(first, self.container.find_inner(obj, "{a}a"))
         self.assertEqual(second, self.container.find_inner(obj, "{a}b"))
-        mock_process_class.assert_called_once_with(first)
+        mock_pre_process_class.assert_called_once_with(first)
 
-    def test_process(self):
+    def test_pre_process_class(self):
         target = ClassFactory.create(inner=ClassFactory.list(2))
         self.container.add(target)
 
-        self.container.process_class(target)
+        self.container.process()
         self.assertEqual(Status.PROCESSED, target.status)
         self.assertEqual(Status.PROCESSED, target.inner[0].status)
         self.assertEqual(Status.PROCESSED, target.inner[1].status)

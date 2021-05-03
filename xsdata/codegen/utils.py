@@ -10,6 +10,7 @@ from xsdata.codegen.models import Extension
 from xsdata.codegen.models import Restrictions
 from xsdata.exceptions import CodeGenerationError
 from xsdata.utils import collections
+from xsdata.utils import text
 from xsdata.utils.namespaces import build_qname
 from xsdata.utils.namespaces import clean_uri
 from xsdata.utils.namespaces import split_qname
@@ -208,3 +209,17 @@ class ClassUtils:
         else:
             change = b if b.is_attribute else a
             change.name = f"{change.name}_{change.tag}"
+
+    @classmethod
+    def rename_attributes_by_index(cls, attrs: List[Attr], rename: List[Attr]):
+        """Append the next available index number to all the rename attributes
+        names."""
+        for index in range(1, len(rename)):
+            num = 1
+            name = rename[index].name
+
+            reserved = {text.alnum(attr.name) for attr in attrs}
+            while text.alnum(f"{name}_{num}") in reserved:
+                num += 1
+
+            rename[index].name = f"{name}_{num}"

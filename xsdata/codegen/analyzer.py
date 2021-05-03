@@ -2,7 +2,6 @@ from typing import List
 
 from xsdata.codegen.container import ClassContainer
 from xsdata.codegen.models import Class
-from xsdata.codegen.sanitizer import ClassSanitizer
 from xsdata.codegen.validator import ClassValidator
 from xsdata.exceptions import AnalyzerValueError
 
@@ -20,12 +19,6 @@ class ClassAnalyzer:
 
         # Run analyzer handlers
         container.process()
-
-        # Filter classes that should be generated.
-        container.filter_classes()
-
-        # Sanitize class attributes after merging and flattening types and extensions.
-        ClassSanitizer(container).process()
 
         classes = container.class_list
         cls.validate_references(classes)

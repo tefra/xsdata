@@ -380,6 +380,7 @@ class Status(IntEnum):
     RAW = 0
     PROCESSING = 1
     PROCESSED = 2
+    SANITIZED = 3
 
 
 @dataclass

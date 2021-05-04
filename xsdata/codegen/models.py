@@ -93,6 +93,10 @@ class Restrictions:
         """Return true if min occurs property equals zero."""
         return self.min_occurs == 0
 
+    @property
+    def is_prohibited(self) -> bool:
+        return self.prohibited or self.max_occurs == 0
+
     def is_compatible(self, other: "Restrictions", with_occurrences: bool) -> bool:
         if with_occurrences:
             ignore = ["choice"]

@@ -36,6 +36,11 @@ class RestrictionsTests(TestCase):
         restrictions.max_occurs = 2
         self.assertTrue(restrictions.is_list)
 
+    def test_property_is_prohibited(self):
+        self.assertFalse(Restrictions().is_prohibited)
+        self.assertTrue(Restrictions(prohibited=True).is_prohibited)
+        self.assertTrue(Restrictions(max_occurs=0).is_prohibited)
+
     def test_merge(self):
         source = Restrictions(min_length=2, max_length=10, format="base16")
         target = Restrictions(min_length=1, pattern=r"[A-Z]")

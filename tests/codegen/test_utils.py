@@ -15,6 +15,50 @@ from xsdata.utils.testing import FactoryTestCase
 
 
 class ClassUtilsTests(FactoryTestCase):
+    @mock.patch.object(ClassUtils, "clean_inner_classes")
+    def test_remove_attribute(self, mock_clean_inner_classes):
+
+        target = ClassFactory.elements(1)
+        attr = target.attrs[0]
+
+        ClassUtils.remove_attribute(target, attr)
+        self.assertEqual(0, len(target.attrs))
+
+        mock_clean_inner_classes.assert_called_once_with(target)
+
+    @mock.patch.object(ClassUtils, "is_orphan_inner")
+    def test_clean_inner_classes(self, mock_is_orphan_inner):
+        mock_is_orphan_inner.side_effect = [True, False, True]
+
+        target = ClassFactory.create()
+        target.inner.extend(ClassFactory.list(3))
+        survivor = target.inner[1]
+
+        ClassUtils.clean_inner_classes(target)
+
+        self.assertEqual(1, len(target.inner))
+        self.assertEqual(survivor, target.inner[0])
+
+    def test_is_orphan_inner(self):
+
+        inner = ClassFactory.create(qname="thug")
+        target = ClassFactory.create(
+            attrs=[
+                AttrFactory.create(
+                    types=[
+                        AttrTypeFactory.create(qname="bar"),
+                        AttrTypeFactory.create(qname="foo"),
+                    ]
+                )
+            ]
+        )
+        self.assertTrue(ClassUtils.is_orphan_inner(target, inner))
+
+        target.attrs[0].types[1].qname = "thug"
+        target.attrs[0].types[1].forward = True
+
+        self.assertFalse(ClassUtils.is_orphan_inner(target, inner))
+
     @mock.patch.object(ClassUtils, "copy_inner_classes")
     @mock.patch.object(ClassUtils, "clone_attribute")
     def test_copy_attributes(self, mock_clone_attribute, mock_copy_inner_classes):

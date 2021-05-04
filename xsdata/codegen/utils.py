@@ -10,14 +10,38 @@ from xsdata.codegen.models import Extension
 from xsdata.codegen.models import Restrictions
 from xsdata.exceptions import CodeGenerationError
 from xsdata.utils import collections
+from xsdata.utils import namespaces
 from xsdata.utils import text
-from xsdata.utils.namespaces import build_qname
-from xsdata.utils.namespaces import clean_uri
-from xsdata.utils.namespaces import split_qname
 
 
 class ClassUtils:
     """General reusable utils methods that didn't fit anywhere else."""
+
+    @classmethod
+    def remove_attribute(cls, target: Class, attr: Attr):
+        """Remove the given attr from the target class and clean inner
+        classes."""
+        target.attrs.remove(attr)
+
+        cls.clean_inner_classes(target)
+
+    @classmethod
+    def clean_inner_classes(cls, target: Class):
+        """Check if there are orphan inner classes and remove them."""
+        for inner in list(target.inner):
+            if cls.is_orphan_inner(target, inner):
+                target.inner.remove(inner)
+
+    @classmethod
+    def is_orphan_inner(cls, target: Class, inner: Class) -> bool:
+        """Check if there is at least once valid attr reference to the given
+        inner class."""
+        for attr in target.attrs:
+            for attr_type in attr.types:
+                if attr_type.forward and attr_type.qname == inner.qname:
+                    return False
+
+        return True
 
     @classmethod
     def copy_attributes(cls, source: Class, target: Class, extension: Extension):
@@ -113,8 +137,9 @@ class ClassUtils:
 
             # Simple type, update the name
             if clone.name == "@value":
-                namespace, _ = split_qname(clone.qname)
-                clone.qname = attr_type.qname = build_qname(namespace, attr.name)
+                namespace, _ = namespaces.split_qname(clone.qname)
+                qname = namespaces.build_qname(namespace, attr.name)
+                clone.qname = attr_type.qname = qname
 
             target.inner.append(clone)
 
@@ -205,7 +230,7 @@ class ClassUtils:
         if a.tag == b.tag and (a.namespace or b.namespace):
             change = b if b.namespace else a
             assert change.namespace is not None
-            change.name = f"{clean_uri(change.namespace)}_{change.name}"
+            change.name = f"{namespaces.clean_uri(change.namespace)}_{change.name}"
         else:
             change = b if b.is_attribute else a
             change.name = f"{change.name}_{change.tag}"

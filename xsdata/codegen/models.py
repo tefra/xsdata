@@ -2,7 +2,6 @@ import sys
 from dataclasses import asdict
 from dataclasses import dataclass
 from dataclasses import field
-from dataclasses import fields
 from dataclasses import replace
 from enum import IntEnum
 from typing import Any
@@ -18,9 +17,7 @@ from xsdata.models.enums import DataType
 from xsdata.models.enums import QNames
 from xsdata.models.enums import Tag
 from xsdata.models.mixins import ElementBase
-from xsdata.utils.namespaces import build_qname
-from xsdata.utils.namespaces import local_name
-from xsdata.utils.namespaces import target_uri
+from xsdata.utils import namespaces
 
 xml_type_map = {
     Tag.ANY: XmlType.WILDCARD,
@@ -63,8 +60,8 @@ class Restrictions:
 
     required: Optional[bool] = field(default=None)
     prohibited: Optional[bool] = field(default=None)
-    min_occurs: Optional[int] = field(default=None)
-    max_occurs: Optional[int] = field(default=None)
+    min_occurs: Optional[int] = field(default=None, compare=False)
+    max_occurs: Optional[int] = field(default=None, compare=False)
     min_exclusive: Optional[str] = field(default=None)
     min_inclusive: Optional[str] = field(default=None)
     min_length: Optional[int] = field(default=None)
@@ -81,7 +78,7 @@ class Restrictions:
     sequential: Optional[bool] = field(default=None)
     tokens: Optional[bool] = field(default=None)
     format: Optional[str] = field(default=None)
-    choice: Optional[str] = field(default=None)
+    choice: Optional[str] = field(default=None, compare=False)
 
     @property
     def is_list(self) -> bool:
@@ -96,18 +93,6 @@ class Restrictions:
     @property
     def is_prohibited(self) -> bool:
         return self.prohibited or self.max_occurs == 0
-
-    def is_compatible(self, other: "Restrictions", with_occurrences: bool) -> bool:
-        if with_occurrences:
-            ignore = ["choice"]
-        else:
-            ignore = ["min_occurs", "max_occurs", "choice"]
-
-        return all(
-            getattr(self, f.name) == getattr(other, f.name)
-            for f in fields(self)
-            if f.name not in ignore
-        )
 
     def merge(self, source: "Restrictions"):
         """Update properties from another instance."""
@@ -216,7 +201,7 @@ class AttrType:
     @property
     def name(self) -> str:
         """Shortcut for qname local name."""
-        return local_name(self.qname)
+        return namespaces.local_name(self.qname)
 
     @property
     def is_dependency(self) -> bool:
@@ -321,7 +306,7 @@ class Attr:
     def is_xsi_type(self) -> bool:
         """Return whether this attribute qualified name is equal to
         xsi:type."""
-        return QNames.XSI_TYPE == build_qname(self.namespace, self.name)
+        return QNames.XSI_TYPE == namespaces.build_qname(self.namespace, self.name)
 
     @property
     def is_tokens(self) -> bool:
@@ -437,11 +422,11 @@ class Class:
     @property
     def name(self) -> str:
         """Shortcut for qname local name."""
-        return local_name(self.qname)
+        return namespaces.local_name(self.qname)
 
     @property
     def target_namespace(self) -> Optional[str]:
-        return target_uri(self.qname)
+        return namespaces.target_uri(self.qname)
 
     @property
     def has_suffix_attr(self) -> bool:

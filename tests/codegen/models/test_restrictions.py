@@ -121,19 +121,3 @@ class RestrictionsTests(TestCase):
 
         self.assertEqual(clone, restrictions)
         self.assertIsNot(clone, restrictions)
-
-    def test_is_compatible(self):
-        a = self.restrictions
-        b = a.clone()
-
-        a.choice = "112"
-        b.choice = "112"
-        self.assertTrue(a.is_compatible(b, True))
-        self.assertTrue(b.is_compatible(a, True))
-
-        a.min_occurs += 1
-        a.max_occurs += 1
-        self.assertFalse(a.is_compatible(b, True))
-        self.assertFalse(b.is_compatible(a, True))
-        self.assertTrue(a.is_compatible(b, False))
-        self.assertTrue(b.is_compatible(a, False))

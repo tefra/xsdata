@@ -1,3 +1,4 @@
+import sys
 from dataclasses import dataclass
 
 from xsdata.codegen.mixins import ContainerInterface
@@ -50,21 +51,19 @@ class AttributeOverridesHandler(HandlerInterface):
         for extension in source.extensions:
             self.process_extension(target, extension)
 
-    def validate_override(self, target: Class, attr: Attr, source_attr: Attr):
-        choices = self.container.config.output.compound_fields
-        with_occurrences = not all(
-            (choices, attr.restrictions.choice, source_attr.restrictions.choice)
-        )
+    @classmethod
+    def validate_override(cls, target: Class, attr: Attr, source_attr: Attr):
+        if attr.is_list and not source_attr.is_list:
+            # Hack much??? idk but Optional[str] can't override List[str]
+            source_attr.restrictions.max_occurs = sys.maxsize
 
         if (
             attr.default == source_attr.default
             and attr.fixed == source_attr.fixed
             and attr.mixed == source_attr.mixed
-            and attr.restrictions.is_compatible(
-                source_attr.restrictions, with_occurrences
-            )
+            and attr.restrictions == source_attr.restrictions
         ):
-            target.attrs.remove(attr)
+            ClassUtils.remove_attribute(target, attr)
 
     @classmethod
     def resolve_conflict(cls, attr: Attr, source_attr: Attr):

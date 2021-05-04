@@ -1,3 +1,4 @@
+import sys
 from unittest import mock
 
 from xsdata.codegen.container import ClassContainer
@@ -76,20 +77,32 @@ class AttributeOverridesHandlerTests(FactoryTestCase):
         self.processor.validate_override(target, attr_a, attr_b)
         self.assertEqual(1, len(target.attrs))
 
-        # occurs doesn't match
+        # restrictions except choice, min/max occurs don't match
         attr_b.fixed = attr_a.fixed
-        attr_a.restrictions.min_occurs = 2
+        attr_a.restrictions.max_length = 10
         self.processor.validate_override(target, attr_a, attr_b)
         self.assertEqual(1, len(target.attrs))
 
-        self.container.config.output.compound_fields = True
-        self.processor.validate_override(target, attr_a, attr_b)
-        self.assertEqual(1, len(target.attrs))
+        # Restrictions are compatible again
+        attr_b.restrictions.max_length = attr_a.restrictions.max_length
 
-        # Occurs is compatible again
-        attr_b.restrictions.min_occurs = 2
+        attr_a.restrictions.min_occurs = 1
+        attr_a.restrictions.max_occurs = 2
+        attr_a.restrictions.choice = 3
+
+        attr_b.restrictions.min_occurs = 4
+        attr_b.restrictions.max_occurs = 5
+        attr_b.restrictions.choice = 6
         self.processor.validate_override(target, attr_a, attr_b)
         self.assertEqual(0, len(target.attrs))
+
+        target.attrs.append(attr_a)
+        attr_a.restrictions.min_occurs = None
+        attr_a.restrictions.max_occurs = 10
+        attr_b.restrictions.min_occurs = None
+        attr_b.restrictions.max_occurs = None
+        self.processor.validate_override(target, attr_a, attr_b)
+        self.assertEqual(sys.maxsize, attr_b.restrictions.max_occurs)
 
     def test_resolve_conflicts(self):
         a = AttrFactory.create(name="foo", tag=Tag.ATTRIBUTE)

@@ -11,7 +11,7 @@ from urllib.parse import urljoin
 from xsdata.formats.bindings import T
 from xsdata.formats.dataclass.parsers.mixins import XmlNode
 from xsdata.formats.dataclass.parsers.nodes import Parsed
-from xsdata.formats.dataclass.parsers.xml import XmlParser
+from xsdata.formats.dataclass.parsers.xml import UserXmlParser
 from xsdata.models import xsd
 from xsdata.models.enums import FormType
 from xsdata.models.enums import Mode
@@ -19,7 +19,7 @@ from xsdata.models.enums import Namespace
 
 
 @dataclass
-class SchemaParser(XmlParser):
+class SchemaParser(UserXmlParser):
     """
     A simple parser to convert an xsd schema to an easy to handle data
     structure based on dataclasses.

@@ -10,6 +10,7 @@ Parsing
     :nosignatures:
 
     XmlParser
+    UserXmlParser
     JsonParser
 
 .. currentmodule:: xsdata.formats.dataclass.parsers.config

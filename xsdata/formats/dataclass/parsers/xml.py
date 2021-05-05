@@ -19,7 +19,22 @@ from xsdata.utils.text import snake_case
 @dataclass
 class XmlParser(NodeParser):
     """
-    Xml parser for dataclasses.
+    Default Xml parser for dataclasses.
+
+    :param config: Parser configuration
+    :param context: Model context provider
+    :param handler: Override default XmlHandler
+    :ivar ms_map: The prefix-URI map generated during parsing
+    """
+
+    handler: Type[XmlHandler] = field(default=default_handler())
+
+
+@dataclass
+class UserXmlParser(NodeParser):
+    """
+    User Xml parser for dataclasses with hooks for emitting events to alter the
+    behavior when an elements starts or ends.
 
     :param config: Parser configuration
     :param context: Model context provider
@@ -40,20 +55,6 @@ class XmlParser(NodeParser):
         attrs: Dict,
         ns_map: Dict,
     ):
-        """
-        Start element notification receiver.
-
-        Build and queue the XmlNode for the starting element and
-        emits and propagate the event to subclasses.
-
-        :param clazz: Root class type, if it's missing look for any
-            suitable models from the current context.
-        :param queue: The active XmlNode queue
-        :param objects: The list of all intermediate parsed objects
-        :param qname: Qualified name
-        :param attrs: Attribute key-value map
-        :param ns_map: Namespace prefix-URI map
-        """
         super().start(clazz, queue, objects, qname, attrs, ns_map)
         self.emit_event(EventType.START, qname, attrs=attrs)
 
@@ -65,19 +66,6 @@ class XmlParser(NodeParser):
         text: Optional[str],
         tail: Optional[str],
     ) -> Any:
-        """
-        End element notification receiver.
-
-        Pop the last XmlNode from the queue and use it to build and
-        return the resulting object tree with its text and tail
-        content. Propagate the event to subclasses.
-
-        :param queue: Xml nodes queue
-        :param objects: List of parsed objects
-        :param qname: Qualified name
-        :param text: Text content
-        :param tail: Tail content
-        """
         obj = super().end(queue, objects, qname, text, tail)
         if obj:
             self.emit_event(EventType.END, qname, obj=obj)

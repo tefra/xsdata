@@ -120,7 +120,7 @@ class XmlSerializer(AbstractSerializer):
         """Produce an events stream from a dataclass for the given var with
         with xsi abstract type check for non wildcards."""
 
-        if var.wildcard:
+        if var.is_wildcard:
             yield from self.write_dataclass(value, namespace)
         else:
             xsi_type = self.xsi_type(var, value, namespace)
@@ -138,11 +138,11 @@ class XmlSerializer(AbstractSerializer):
         """
         if var.mixed:
             yield from self.write_mixed_content(value, var, namespace)
-        elif var.text:
+        elif var.is_text:
             yield from self.write_data(value, var, namespace)
         elif var.tokens:
             yield from self.write_tokens(value, var, namespace)
-        elif var.elements:
+        elif var.is_elements:
             yield from self.write_elements(value, var, namespace)
         elif var.list_element and isinstance(value, list):
             yield from self.write_list(value, var, namespace)
@@ -185,7 +185,7 @@ class XmlSerializer(AbstractSerializer):
             yield from self.write_derived_element(value, var, namespace)
         elif is_dataclass(value):
             yield from self.write_xsi_type(value, var, namespace)
-        elif var.element:
+        elif var.is_element:
             yield from self.write_element(value, var, namespace)
         else:
             yield from self.write_data(value, var, namespace)
@@ -312,13 +312,10 @@ class XmlSerializer(AbstractSerializer):
         eg: <a1/><a2/><a1/><a/2></a1>
         """
         index = 0
-        attrs = meta.vars
+        attrs = meta.get_element_vars()
         stop = len(attrs)
         while index < stop:
             var = attrs[index]
-            if var.attribute or var.attributes:
-                index += 1
-                continue
 
             if not var.sequential:
                 yield var, getattr(obj, var.name)
@@ -351,14 +348,14 @@ class XmlSerializer(AbstractSerializer):
         Ignores None values and empty lists. Optionally include the xsi
         properties type and nil.
         """
-        for var in meta.vars:
-            if var.attribute:
+        for var in meta.get_attribute_vars():
+            if var.is_attribute:
                 value = getattr(obj, var.name)
                 if value is None or isinstance(value, list) and not value:
                     continue
 
                 yield var.qname, cls.encode_value(value, var)
-            elif var.attributes:
+            else:
                 yield from getattr(obj, var.name, EMPTY_MAP).items()
 
         if xsi_type:

@@ -1,14 +1,18 @@
+import operator
 from dataclasses import dataclass
 from dataclasses import field
 from dataclasses import is_dataclass
 from typing import Any
 from typing import Dict
+from typing import List
 from typing import Optional
 from typing import Sequence
 from typing import Tuple
 from typing import Type
 
 from xsdata.models.enums import NamespaceType
+from xsdata.utils import collections
+from xsdata.utils.constants import EMPTY_SEQUENCE
 from xsdata.utils.namespaces import split_qname
 
 NoneType = type(None)
@@ -33,15 +37,18 @@ class XmlVar:
     :param sequential: Render values in sequential mode
     :param list_element: Field is a list of elements
     :param default: Field default value or factory
-    :param text: Field is derived from xs:simpleType
-    :param element: Field is derived from xs:element
-    :param elements: Field is derived from xs:choice
-    :param wildcard: Field is derived from xs:anyType
-    :param attribute: Field is derived from xs:attribute
-    :param attributes: Field is derived from xs:attributes
+    :param is_text: Field is derived from xs:simpleType
+    :param is_element: Field is derived from xs:element
+    :param is_elements: Field is derived from xs:choice
+    :param is_wildcard: Field is derived from xs:anyType
+    :param is_attribute: Field is derived from xs:attribute
+    :param is_attributes: Field is derived from xs:attributes
+    :param index: Field ordering
     :param types: List of all the supported data types
-    :param choices: List of repeatable choice elements
     :param namespaces: List of the supported namespaces
+    :param elements: Mapping of qname-repeatable elements
+    :param wildcards: List of repeatable wildcards
+    :ivar namespace_matches: Matching cache for the repeatable wildcards
     """
 
     name: str
@@ -57,15 +64,21 @@ class XmlVar:
     sequential: bool = False
     list_element: bool = False
     default: Any = None
-    text: bool = False
-    element: bool = False
-    elements: bool = False
-    wildcard: bool = False
-    attribute: bool = False
-    attributes: bool = False
+
+    is_text: bool = False
+    is_element: bool = False
+    is_elements: bool = False
+    is_wildcard: bool = False
+    is_attribute: bool = False
+    is_attributes: bool = False
+
+    index: int = field(default_factory=int)
     types: Tuple[Type, ...] = field(default_factory=tuple)
-    choices: Tuple["XmlVar", ...] = field(default_factory=tuple)
     namespaces: Tuple[str, ...] = field(default_factory=tuple)
+    elements: Dict[str, "XmlVar"] = field(default_factory=dict)
+    wildcards: List["XmlVar"] = field(default_factory=list)
+
+    namespace_matches: Dict[str, bool] = field(default_factory=dict)
 
     @property
     def lname(self) -> str:
@@ -82,31 +95,10 @@ class XmlVar:
     def is_clazz_union(self) -> bool:
         return self.dataclass and len(self.types) > 1
 
-    def matches(self, qname: str) -> bool:
-        """
-        Match the field qualified local name to the given qname.
-
-        Return True automatically if the local name is a wildcard.
-        """
-        if self.elements:
-            return self.matches_choice(qname)
-
-        if self.wildcard:
-            return self.matches_wildcard(qname)
-
-        return qname in (self.qname, "*")
-
-    def matches_choice(self, qname: str) -> bool:
-        """Return whether a choice element matches the given qualified name."""
-        return self.find_choice(qname) is not None
-
     def find_choice(self, qname: str) -> Optional["XmlVar"]:
         """Match and return a choice field by its qualified name."""
-        for choice in self.choices:
-            if choice.matches(qname):
-                return choice
-
-        return None
+        match = self.elements.get(qname)
+        return match or find_by_namespace(self.wildcards, qname)
 
     def find_value_choice(self, value: Any) -> Optional["XmlVar"]:
         """Match and return a choice field that matches the given value
@@ -128,16 +120,16 @@ class XmlVar:
     ) -> Optional["XmlVar"]:
         """Match and return a choice field that matches the given type."""
 
-        for choice in self.choices:
+        for element in self.elements.values():
 
-            if choice.any_type or tokens != choice.tokens:
+            if element.any_type or tokens != element.tokens:
                 continue
 
             if tp is NoneType:
-                if choice.nillable:
-                    return choice
-            elif self.match_type(tp, choice.types, check_subclass):
-                return choice
+                if element.nillable:
+                    return element
+            elif self.match_type(tp, element.types, check_subclass):
+                return element
 
         return None
 
@@ -149,9 +141,17 @@ class XmlVar:
 
         return False
 
-    def matches_wildcard(self, qname: str) -> bool:
+    def match_namespace(self, qname: str) -> bool:
         """Match the given qname to the wildcard allowed namespaces."""
 
+        matches = self.namespace_matches.get(qname)
+        if matches is None:
+            matches = self._match_namespace(qname)
+            self.namespace_matches[qname] = matches
+
+        return matches
+
+    def _match_namespace(self, qname: str) -> bool:
         if qname == "*":
             return True
 
@@ -159,43 +159,19 @@ class XmlVar:
         if not self.namespaces and namespace is None:
             return True
 
-        return any(self.match_namespace(ns, namespace) for ns in self.namespaces)
-
-    @staticmethod
-    def match_namespace(source: Optional[str], cmp: Optional[str]) -> bool:
-        if not source and cmp is None:
-            return True
-        if source == cmp:
-            return True
-        if source == NamespaceType.ANY_NS:
-            return True
-        if source and source[0] == "!" and source[1:] != cmp:
-            return True
+        for check in self.namespaces:
+            if (
+                (not check and namespace is None)
+                or check == namespace
+                or check == NamespaceType.ANY_NS
+                or (check and check[0] == "!" and check[1:] != namespace)
+            ):
+                return True
 
         return False
 
 
-class FindMode:
-    """Find switches to be used to find a specific var."""
-
-    ALL = 0
-    ATTRIBUTE = 1
-    ATTRIBUTES = 2
-    TEXT = 3
-    WILDCARD = 4
-    MIXED_CONTENT = 5
-    ELEMENT = 6
-
-
-find_predicates = {
-    FindMode.ALL: lambda x: True,
-    FindMode.ATTRIBUTE: lambda x: x.attribute,
-    FindMode.ATTRIBUTES: lambda x: x.attributes,
-    FindMode.TEXT: lambda x: x.text,
-    FindMode.WILDCARD: lambda x: x.wildcard,
-    FindMode.MIXED_CONTENT: lambda x: x.mixed,
-    FindMode.ELEMENT: lambda x: x.element or x.elements,
-}
+get_index = operator.attrgetter("index")
 
 
 @dataclass
@@ -207,40 +183,79 @@ class XmlMeta:
     :param qname: The namespace qualified name.
     :param source_qname: The source namespace qualified name.
     :param nillable: Specifies whether an explicit empty value can be assigned.
-    :param vars: The list of field metadata
+    :param mixed_content: Has a wildcard with mixed flag enabled
+    :param text: Text var
+    :param choices: List of compound vars
+    :param elements: Mapping of qname-element vars
+    :param wildcards: List of wildcard vars
+    :param attributes: Mapping of qname-attribute vars
+    :param any_attributes: List of wildcard attributes vars
     """
 
     clazz: Type
     qname: str
     source_qname: str
     nillable: bool
-    vars: Tuple[XmlVar, ...] = field(default_factory=tuple)
-    cache: Dict = field(default_factory=dict, init=False)
+    mixed_content: bool = field(default=False)
+    text: Optional[XmlVar] = field(default=None)
+    choices: List[XmlVar] = field(default_factory=list)
+    elements: Dict[str, List[XmlVar]] = field(default_factory=dict)
+    wildcards: List[XmlVar] = field(default_factory=list)
+    attributes: Dict[str, XmlVar] = field(default_factory=dict)
+    any_attributes: List[XmlVar] = field(default_factory=list)
+
+    def __post_init__(self):
+        self.mixed_content = any(wildcard.mixed for wildcard in self.wildcards)
+
+    def get_element_vars(self) -> List[XmlVar]:
+        result = self.wildcards + self.choices
+
+        for elements in self.elements.values():
+            result.extend(elements)
+
+        if self.text:
+            result.append(self.text)
+
+        return sorted(result, key=get_index)
+
+    def get_attribute_vars(self) -> List[XmlVar]:
+        result = collections.concat(self.any_attributes, self.attributes.values())
+        return sorted(result, key=get_index)
+
+    def get_all_vars(self) -> List[XmlVar]:
+        result = self.wildcards + self.choices + self.any_attributes
+        result.extend(self.attributes.values())
+        for elements in self.elements.values():
+            result.extend(elements)
+
+        if self.text:
+            result.append(self.text)
+
+        return sorted(result, key=get_index)
 
     @property
     def namespace(self) -> Optional[str]:
         return split_qname(self.qname)[0]
 
-    def has_var(self, qname: str = "*", mode: int = FindMode.ALL) -> bool:
-        return self.find_var(qname, mode) is not None
+    def find_attribute(self, qname: str) -> Optional[XmlVar]:
+        return self.attributes.get(qname)
 
-    def find_var(self, qname: str = "*", mode: int = FindMode.ALL) -> Optional[XmlVar]:
-        """Find and cache a field by it's qualified name and the specified
-        mode."""
-        key = (qname, mode)
-        index = self.cache.get(key)
-        if index is None:
-            self.cache[key] = index = self._find_var(qname, mode)
+    def find_elements(self, qname: str) -> Sequence[XmlVar]:
+        return self.elements.get(qname, EMPTY_SEQUENCE)
 
-        return None if index < 0 else self.vars[index]
+    def find_choice(self, qname: str) -> Optional[XmlVar]:
+        for choice in self.choices:
+            match = choice.find_choice(qname)
+            if match:
+                return match
 
-    def _find_var(self, qname: str, mode: int) -> int:
-        predicate = find_predicates[mode]
-        for index, var in enumerate(self.vars):
-            if predicate(var) and var.matches(qname):
-                return index
+        return None
 
-        return -1
+    def find_any_attributes(self, qname: str) -> Optional[XmlVar]:
+        return find_by_namespace(self.any_attributes, qname)
+
+    def find_wildcard(self, qname: str) -> Optional[XmlVar]:
+        return find_by_namespace(self.wildcards, qname)
 
 
 class XmlType:
@@ -252,3 +267,11 @@ class XmlType:
     WILDCARD = "Wildcard"
     ATTRIBUTE = "Attribute"
     ATTRIBUTES = "Attributes"
+
+
+def find_by_namespace(xml_vars: List[XmlVar], qname: str) -> Optional[XmlVar]:
+    for xml_var in xml_vars:
+        if xml_var.match_namespace(qname):
+            return xml_var
+
+    return None

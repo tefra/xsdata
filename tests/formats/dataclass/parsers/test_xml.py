@@ -31,7 +31,7 @@ class UserXmlParserTests(TestCase):
     def test_end(self, mock_emit_event):
         objects = []
         queue = []
-        var = XmlVar(text=True, name="foo", qname="foo", types=(bool,))
+        var = XmlVar(is_text=True, name="foo", qname="foo", types=(bool,))
         queue.append(PrimitiveNode(var, {}))
 
         result = self.parser.end(queue, objects, "enabled", "true", None)

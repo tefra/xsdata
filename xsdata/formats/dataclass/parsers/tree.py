@@ -38,7 +38,7 @@ class TreeParser(NodeParser):
             child = item.child(qname, attrs, ns_map, len(objects))
         except IndexError:
             child = WildcardNode(
-                var=XmlVar(name=qname, qname=qname, wildcard=True),
+                var=XmlVar(name=qname, qname=qname, is_wildcard=True),
                 attrs=attrs,
                 ns_map=ns_map,
                 position=0,

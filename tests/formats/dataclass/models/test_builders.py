@@ -33,7 +33,7 @@ from xsdata.utils.namespaces import build_qname
 class XmlMetaBuilderTests(TestCase):
     @mock.patch.object(XmlMetaBuilder, "build_vars")
     def test_build(self, mock_build_vars):
-        var = XmlVar(element=True, name="foo", qname="{foo}bar", types=(int,))
+        var = XmlVar(is_element=True, name="foo", qname="{foo}bar", types=(int,))
         mock_build_vars.return_value = [var]
 
         result = XmlMetaBuilder.build(ItemsType, None, return_input, return_input)
@@ -42,7 +42,7 @@ class XmlMetaBuilderTests(TestCase):
             qname="ItemsType",
             source_qname="ItemsType",
             nillable=False,
-            vars=(var,),
+            elements={var.qname: [var]},
         )
 
         self.assertEqual(expected, result)
@@ -110,15 +110,52 @@ class XmlMetaBuilderTests(TestCase):
         self.assertIsInstance(result, Iterator)
 
         expected = [
-            XmlVar(element=True, name="author", qname="Author", types=(str,)),
-            XmlVar(element=True, name="title", qname="Title", types=(str,)),
-            XmlVar(element=True, name="genre", qname="Genre", types=(str,)),
-            XmlVar(element=True, name="price", qname="Price", types=(float,)),
-            XmlVar(element=True, name="pub_date", qname="PubDate", types=(XmlDate,)),
-            XmlVar(element=True, name="review", qname="Review", types=(str,)),
-            XmlVar(attribute=True, name="id", qname="ID", types=(str,)),
             XmlVar(
-                attribute=True,
+                is_element=True,
+                index=0,
+                name="author",
+                qname="Author",
+                types=(str,),
+            ),
+            XmlVar(
+                is_element=True,
+                index=1,
+                name="title",
+                qname="Title",
+                types=(str,),
+            ),
+            XmlVar(
+                is_element=True,
+                index=2,
+                name="genre",
+                qname="Genre",
+                types=(str,),
+            ),
+            XmlVar(
+                is_element=True,
+                index=3,
+                name="price",
+                qname="Price",
+                types=(float,),
+            ),
+            XmlVar(
+                is_element=True,
+                index=4,
+                name="pub_date",
+                qname="PubDate",
+                types=(XmlDate,),
+            ),
+            XmlVar(
+                is_element=True,
+                index=5,
+                name="review",
+                qname="Review",
+                types=(str,),
+            ),
+            XmlVar(is_attribute=True, index=6, name="id", qname="ID", types=(str,)),
+            XmlVar(
+                is_attribute=True,
+                index=7,
                 name="lang",
                 qname="LANG",
                 types=(str,),
@@ -184,6 +221,7 @@ class XmlVarBuilderTests(TestCase):
         builder = XmlVarBuilder(XmlType.ELEMENT, "bar", return_input, return_input)
 
         actual = builder.build(
+            66,
             "compound",
             type_hints["compound"],
             class_field.metadata,
@@ -192,79 +230,96 @@ class XmlVarBuilderTests(TestCase):
             globalns,
         )
         expected = XmlVar(
-            elements=True,
+            index=66,
+            is_elements=True,
             name="compound",
             qname="compound",
             list_element=True,
             any_type=True,
             default=list,
-            choices=(
-                XmlVar(
-                    element=True,
+            elements={
+                "{foo}node": XmlVar(
+                    index=0,
+                    is_element=True,
                     name="compound",
                     qname="{foo}node",
                     dataclass=True,
+                    list_element=True,
                     types=(CompoundFieldExample,),
                     namespaces=("foo",),
                     derived=False,
                 ),
-                XmlVar(
-                    element=True,
+                "{bar}x": XmlVar(
+                    index=1,
+                    is_element=True,
                     name="compound",
                     qname="{bar}x",
                     tokens=True,
+                    list_element=True,
                     types=(str,),
                     namespaces=("bar",),
                     derived=False,
                     default=return_true,
                     format="Nope",
                 ),
-                XmlVar(
-                    element=True,
+                "{bar}y": XmlVar(
+                    index=2,
+                    is_element=True,
                     name="compound",
                     qname="{bar}y",
                     nillable=True,
+                    list_element=True,
                     types=(int,),
                     namespaces=("bar",),
                     derived=False,
                 ),
-                XmlVar(
-                    element=True,
+                "{bar}z": XmlVar(
+                    index=3,
+                    is_element=True,
                     name="compound",
                     qname="{bar}z",
                     nillable=False,
+                    list_element=True,
                     types=(int,),
                     namespaces=("bar",),
                     derived=True,
                 ),
-                XmlVar(
-                    element=True,
+                "{bar}o": XmlVar(
+                    index=4,
+                    is_element=True,
                     name="compound",
                     qname="{bar}o",
                     nillable=False,
+                    list_element=True,
                     types=(object,),
                     namespaces=("bar",),
                     derived=True,
                     any_type=True,
                 ),
-                XmlVar(
-                    element=True,
+                "{bar}p": XmlVar(
+                    index=5,
+                    is_element=True,
                     name="compound",
                     qname="{bar}p",
                     types=(float,),
+                    list_element=True,
                     namespaces=("bar",),
                     default=1.1,
                 ),
+            },
+            wildcards=[
                 XmlVar(
-                    wildcard=True,
+                    index=6,
+                    is_wildcard=True,
                     name="compound",
                     qname="{http://www.w3.org/1999/xhtml}any",
                     types=(object,),
                     namespaces=("http://www.w3.org/1999/xhtml",),
                     derived=True,
                     any_type=False,
-                ),
-            ),
+                    list_element=True,
+                )
+            ],
             types=(object,),
         )
         self.assertEqual(expected, actual)
@@ -272,7 +327,7 @@ class XmlVarBuilderTests(TestCase):
     def test_build_validates_result(self):
         with self.assertRaises(XmlContextError) as cm:
             self.builder.build(
-                "foo", List[int], {"type": "Attributes"}, True, None, None
+                1, "foo", List[int], {"type": "Attributes"}, True, None, None
             )
 
         self.assertEqual(

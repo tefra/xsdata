@@ -18,7 +18,6 @@ from xsdata.formats.dataclass.models.elements import XmlVar
 from xsdata.formats.dataclass.models.generics import AnyElement
 from xsdata.formats.dataclass.models.generics import DerivedElement
 from xsdata.formats.dataclass.parsers.utils import ParserUtils
-from xsdata.models.enums import DataType
 from xsdata.models.enums import Namespace
 from xsdata.models.enums import QNames
 
@@ -37,18 +36,6 @@ class ParserUtilsTests(TestCase):
 
         attrs = {QNames.XSI_TYPE: "bar:foo"}
         self.assertEqual("{xsdata}foo", ParserUtils.xsi_type(attrs, ns_map))
-
-    def test_data_type(self):
-        ns_map = {"bar": "xsdata"}
-        attrs = {}
-        self.assertEqual(DataType.STRING, ParserUtils.data_type(attrs, ns_map))
-
-        ns_map = {"xs": Namespace.XS.uri}
-        attrs = {QNames.XSI_TYPE: "xs:foo"}
-        self.assertEqual(DataType.STRING, ParserUtils.data_type(attrs, ns_map))
-
-        attrs = {QNames.XSI_TYPE: "xs:float"}
-        self.assertEqual(DataType.FLOAT, ParserUtils.data_type(attrs, ns_map))
 
     @mock.patch.object(ConverterFactory, "deserialize", return_value=2)
     def test_parse_value(self, mock_deserialize):

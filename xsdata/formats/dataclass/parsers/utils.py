@@ -15,7 +15,6 @@ from xsdata.formats.dataclass.models.elements import XmlVar
 from xsdata.formats.dataclass.models.generics import AnyElement
 from xsdata.formats.dataclass.models.generics import DerivedElement
 from xsdata.logger import logger
-from xsdata.models.enums import DataType
 from xsdata.models.enums import QNames
 from xsdata.utils import text
 from xsdata.utils.namespaces import build_qname
@@ -31,17 +30,6 @@ class ParserUtils:
 
         namespace, name = QNameConverter.resolve(xsi_type, ns_map)
         return build_qname(namespace, name)
-
-    @classmethod
-    def data_type(cls, attrs: Dict, ns_map: Dict) -> DataType:
-        """Convert the xsi:type attribute to a DataType, defaults to
-        DataType.STRING."""
-        xsi_type = cls.xsi_type(attrs, ns_map)
-        datatype = DataType.STRING
-        if xsi_type:
-            datatype = DataType.from_qname(xsi_type) or datatype
-
-        return datatype
 
     @classmethod
     def is_nillable(cls, attrs: Dict) -> bool:

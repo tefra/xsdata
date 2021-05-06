@@ -9,13 +9,11 @@ from typing import Type
 
 from xsdata.formats.converter import converter
 from xsdata.formats.converter import QNameConverter
-from xsdata.formats.dataclass.models.elements import FindMode
 from xsdata.formats.dataclass.models.elements import XmlMeta
 from xsdata.formats.dataclass.models.elements import XmlVar
 from xsdata.formats.dataclass.models.generics import AnyElement
 from xsdata.formats.dataclass.models.generics import DerivedElement
 from xsdata.logger import logger
-from xsdata.models.enums import DataType
 from xsdata.models.enums import QNames
 from xsdata.utils import text
 from xsdata.utils.namespaces import build_qname
@@ -31,17 +29,6 @@ class ParserUtils:
 
         namespace, name = QNameConverter.resolve(xsi_type, ns_map)
         return build_qname(namespace, name)
-
-    @classmethod
-    def data_type(cls, attrs: Dict, ns_map: Dict) -> DataType:
-        """Convert the xsi:type attribute to a DataType, defaults to
-        DataType.STRING."""
-        xsi_type = cls.xsi_type(attrs, ns_map)
-        datatype = DataType.STRING
-        if xsi_type:
-            datatype = DataType.from_qname(xsi_type) or datatype
-
-        return datatype
 
     @classmethod
     def is_nillable(cls, attrs: Dict) -> bool:
@@ -83,16 +70,19 @@ class ParserUtils:
 
         while len(objects) > position:
             qname, value = objects.pop(position)
+            if not cls.bind_object(params, meta, qname, value):
+                logger.warning("Unassigned parsed object %s", qname)
 
-            arg = meta.find_var(qname, FindMode.ELEMENT)
-            if arg and cls.bind_var(params, arg, value):
-                continue
+    @classmethod
+    def bind_object(cls, params: Dict, meta: XmlMeta, qname: str, value: Any) -> bool:
+        for var in meta.find_children(qname):
+            if var.is_wildcard:
+                return cls.bind_wild_var(params, var, qname, value)
 
-            arg = meta.find_var(qname, FindMode.WILDCARD)
-            if arg and cls.bind_wild_var(params, arg, qname, value):
-                continue
+            if cls.bind_var(params, var, value):
+                return True
 
-            logger.warning("Unassigned parsed object %s", qname)
+        return False
 
     @classmethod
     def bind_mixed_objects(cls, params: Dict, var: XmlVar, pos: int, objects: List):
@@ -216,7 +206,7 @@ class ParserUtils:
         """
 
         if txt is not None:
-            var = metadata.find_var(mode=FindMode.TEXT)
+            var = metadata.text
             if var and var.init:
                 params[var.name] = cls.parse_value(
                     txt, var.types, var.default, ns_map, var.tokens, var.format
@@ -234,19 +224,35 @@ class ParserUtils:
         if not attrs:
             return
 
-        wildcard = metadata.find_var(mode=FindMode.ATTRIBUTES)
-        if wildcard:
-            params[wildcard.name] = {}
-
         for qname, value in attrs.items():
-            var = metadata.find_var(qname, FindMode.ATTRIBUTE)
+            var = metadata.find_attribute(qname)
             if var and var.name not in params:
-                if var.init:
-                    params[var.name] = cls.parse_value(
-                        value, var.types, var.default, ns_map, var.tokens, var.format
-                    )
-            elif wildcard:
-                params[wildcard.name][qname] = cls.parse_any_attribute(value, ns_map)
+                cls.bind_attr(params, var, value, ns_map)
+            else:
+                var = metadata.find_any_attributes(qname)
+                if var:
+                    cls.bind_any_attr(params, var, qname, value, ns_map)
+
+    @classmethod
+    def bind_attr(cls, params: Dict, var: XmlVar, value: Any, ns_map: Dict):
+        if var.init:
+            params[var.name] = cls.parse_value(
+                value,
+                var.types,
+                var.default,
+                ns_map,
+                var.tokens,
+                var.format,
+            )
+
+    @classmethod
+    def bind_any_attr(
+        cls, params: Dict, var: XmlVar, qname: str, value: Any, ns_map: Dict
+    ):
+        if var.name not in params:
+            params[var.name] = {}
+
+        params[var.name][qname] = cls.parse_any_attribute(value, ns_map)
 
     @classmethod
     def prepare_generic_value(cls, qname: str, value: Any) -> Any:

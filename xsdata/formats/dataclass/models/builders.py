@@ -65,12 +65,38 @@ class XmlMetaBuilder:
             clazz, namespace, element_name_generator, attribute_name_generator
         )
 
+        attributes = {}
+        elements = defaultdict(list)
+        choices = []
+        any_attributes = []
+        wildcards = []
+        text = None
+
+        for var in class_vars:
+            if var.is_attribute:
+                attributes[var.qname] = var
+            elif var.is_element:
+                elements[var.qname].append(var)
+            elif var.is_elements:
+                choices.append(var)
+            elif var.is_attributes:
+                any_attributes.append(var)
+            elif var.is_wildcard:
+                wildcards.append(var)
+            else:  # var.is_text
+                text = var
+
         return XmlMeta(
             clazz=clazz,
             qname=build_qname(namespace, local_name),
             source_qname=build_qname(source_namespace, local_name),
             nillable=nillable,
-            vars=tuple(class_vars),
+            text=text,
+            attributes=attributes,
+            elements=elements,
+            choices=choices,
+            any_attributes=any_attributes,
+            wildcards=wildcards,
         )
 
     @classmethod
@@ -91,8 +117,9 @@ class XmlMetaBuilder:
             attribute_name_generator=attribute_name_generator,
         )
 
-        for var in fields(clazz):
+        for index, var in enumerate(fields(clazz)):
             yield builder.build(
+                index,
                 var.name,
                 type_hints[var.name],
                 var.metadata,
@@ -156,6 +183,7 @@ class XmlVarBuilder:
 
     def build(
         self,
+        index: int,
         name: str,
         type_hint: Any,
         metadata: Mapping[str, Any],
@@ -188,19 +216,18 @@ class XmlVarBuilder:
         any_type = self.is_any_type(types, xml_type)
         namespaces = self.resolve_namespaces(xml_type, namespace)
         default_namespace = self.default_namespace(namespaces)
-        choice_vars = self.build_choices(name, choices, globalns)
         qname = build_qname(default_namespace, local_name)
 
-        (
-            element,
-            elements,
-            attribute,
-            attributes,
-            wildcard,
-            text,
-        ) = self.get_xml_attributes(xml_type)
+        elements = {}
+        wildcards = []
+        for choice in self.build_choices(name, choices, globalns):
+            if choice.is_element:
+                elements[choice.qname] = choice
+            else:  # choice.is_wildcard:
+                wildcards.append(choice)
 
-        return XmlVar(
+        var = XmlVar(
+            index=index,
             name=name,
             qname=qname,
             init=init,
@@ -214,15 +241,25 @@ class XmlVarBuilder:
             list_element=element_list,
             default=default_value,
             types=types,
-            choices=tuple(choice_vars),
-            namespaces=namespaces,
-            element=element,
             elements=elements,
-            attribute=attribute,
-            attributes=attributes,
-            wildcard=wildcard,
-            text=text,
+            wildcards=wildcards,
+            namespaces=namespaces,
         )
+
+        if xml_type == XmlType.ELEMENT:
+            var.is_element = True
+        elif xml_type == XmlType.ELEMENTS:
+            var.is_elements = True
+        elif xml_type == XmlType.ATTRIBUTE:
+            var.is_attribute = True
+        elif xml_type == XmlType.ATTRIBUTES:
+            var.is_attributes = True
+        elif xml_type == XmlType.WILDCARD:
+            var.is_wildcard = True
+        else:
+            var.is_text = True
+
+        return var
 
     def build_choices(
         self, name: str, choices: List[Dict], globalns: Any
@@ -230,7 +267,7 @@ class XmlVarBuilder:
         """Build the binding metadata for a compound dataclass field."""
         existing_types: Set[type] = set()
 
-        for choice in choices:
+        for index, choice in enumerate(choices):
             default_value = choice.get("default_factory", choice.get("default"))
 
             metadata = choice.copy()
@@ -242,8 +279,10 @@ class XmlVarBuilder:
             else:
                 metadata["type"] = XmlType.ELEMENT
 
-            var = self.build(name, type_hint, metadata, True, default_value, globalns)
-            var.list_element = False
+            var = self.build(
+                index, name, type_hint, metadata, True, default_value, globalns
+            )
+            var.list_element = True
 
             if var.any_type or any(True for tp in var.types if tp in existing_types):
                 var.derived = True
@@ -351,25 +390,6 @@ class XmlVarBuilder:
             return object in types
 
         return False
-
-    @classmethod
-    def get_xml_attributes(cls, xml_type: str) -> Tuple[bool, ...]:
-        element = elements = attribute = attributes = wildcard = text = False
-
-        if xml_type == XmlType.ELEMENT:
-            element = True
-        elif xml_type == XmlType.ELEMENTS:
-            elements = True
-        elif xml_type == XmlType.ATTRIBUTE:
-            attribute = True
-        elif xml_type == XmlType.ATTRIBUTES:
-            attributes = True
-        elif xml_type == XmlType.WILDCARD:
-            wildcard = True
-        else:
-            text = True
-
-        return element, elements, attribute, attributes, wildcard, text
 
     @classmethod
     def analyze_types(

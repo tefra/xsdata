@@ -5,17 +5,17 @@ from tests.fixtures.books import Books
 from xsdata.formats.dataclass.models.elements import XmlVar
 from xsdata.formats.dataclass.parsers.nodes import PrimitiveNode
 from xsdata.formats.dataclass.parsers.nodes import SkipNode
-from xsdata.formats.dataclass.parsers.xml import XmlParser
+from xsdata.formats.dataclass.parsers.xml import UserXmlParser
 from xsdata.models.enums import EventType
 
 
-class XmlParserTests(TestCase):
+class UserXmlParserTests(TestCase):
     def setUp(self):
         super().setUp()
-        self.parser = XmlParser()
+        self.parser = UserXmlParser()
         self.parser.objects = [(x, x) for x in "abcde"]
 
-    @mock.patch.object(XmlParser, "emit_event")
+    @mock.patch.object(UserXmlParser, "emit_event")
     def test_start(self, mock_emit_event):
         attrs = {"a": "b"}
         queue = []
@@ -27,11 +27,11 @@ class XmlParserTests(TestCase):
             EventType.START, "{urn:books}books", attrs=attrs
         )
 
-    @mock.patch.object(XmlParser, "emit_event")
+    @mock.patch.object(UserXmlParser, "emit_event")
     def test_end(self, mock_emit_event):
         objects = []
         queue = []
-        var = XmlVar(text=True, name="foo", qname="foo", types=(bool,))
+        var = XmlVar(is_text=True, name="foo", qname="foo", types=(bool,))
         queue.append(PrimitiveNode(var, {}))
 
         result = self.parser.end(queue, objects, "enabled", "true", None)
@@ -40,7 +40,7 @@ class XmlParserTests(TestCase):
         self.assertEqual(("enabled", True), objects[-1])
         mock_emit_event.assert_called_once_with(EventType.END, "enabled", obj=result)
 
-    @mock.patch.object(XmlParser, "emit_event")
+    @mock.patch.object(UserXmlParser, "emit_event")
     def test_end_with_no_result(self, mock_emit_event):
         objects = []
         queue = [SkipNode()]

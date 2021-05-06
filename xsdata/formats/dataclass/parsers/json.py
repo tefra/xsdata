@@ -98,7 +98,7 @@ class JsonParser(AbstractParser):
     def bind_value(self, var: XmlVar, value: Any) -> Any:
         """Bind value according to the class var."""
 
-        if var.attributes:
+        if var.is_attributes:
             return dict(value)
 
         if var.is_clazz_union:
@@ -110,10 +110,10 @@ class JsonParser(AbstractParser):
         if var.clazz:
             return self.bind_dataclass(value, var.clazz)
 
-        if var.elements:
+        if var.is_elements:
             return self.bind_choice(value, var)
 
-        if var.wildcard or var.any_type:
+        if var.is_wildcard or var.any_type:
             return self.bind_wildcard(value)
 
         return self.parse_value(value, var.types, var.default, var.tokens, var.format)
@@ -121,7 +121,7 @@ class JsonParser(AbstractParser):
     def bind_dataclass(self, data: Dict, clazz: Type[T]) -> T:
         """Recursively build the given model from the input dict data."""
         params = {}
-        for var in self.context.build(clazz).vars:
+        for var in self.context.build(clazz).get_all_vars():
             value = data.get(var.lname)
 
             if value is None or not var.init:
@@ -203,7 +203,7 @@ class JsonParser(AbstractParser):
 
         # Sometimes exact type match doesn't work, eg Decimals, try all of them
         is_list = isinstance(value, list)
-        for choice in var.choices:
+        for choice in var.elements.values():
             if choice.dataclass or choice.tokens != is_list:
                 continue
 
@@ -235,10 +235,10 @@ class JsonParser(AbstractParser):
     def bind_choice_dataclass(self, value: Dict, var: XmlVar) -> Any:
         """Bind data to the best matching choice model."""
         keys = set(value.keys())
-        for choice in var.choices:
+        for choice in var.elements.values():
             if choice.clazz:
                 meta = self.context.build(choice.clazz)
-                attrs = {var.lname for var in meta.vars}
+                attrs = {var.lname for var in meta.get_all_vars()}
                 if attrs == keys:
                     return self.bind_value(choice, value)
 

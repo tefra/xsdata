@@ -126,7 +126,7 @@ class JsonParserTests(TestCase):
         self.assertEqual("Key `book` value is not iterable", str(cm.exception))
 
     def test_bind_value_with_attributes_var(self):
-        var = XmlVar(attributes=True, name="a", qname="a")
+        var = XmlVar(is_attributes=True, name="a", qname="a")
         value = {"a": 1}
         actual = self.parser.bind_value(var, value)
         self.assertEqual(value, actual)
@@ -138,7 +138,7 @@ class JsonParserTests(TestCase):
         c = make_dataclass("c", [("x", int), ("y", str), ("z", str)])
         d = make_dataclass("d", [("x", int)])
         var = XmlVar(
-            element=True,
+            is_element=True,
             name="union",
             qname="union",
             types=(a, b, c, int),
@@ -153,7 +153,7 @@ class JsonParserTests(TestCase):
     def test_bind_type_union(self):
         a = make_dataclass("a", [("x", int), ("y", str)])
         var = XmlVar(
-            element=True,
+            is_element=True,
             name="union",
             qname="union",
             types=(a, int, float),
@@ -165,22 +165,28 @@ class JsonParserTests(TestCase):
 
     def test_bind_choice_simple(self):
         var = XmlVar(
-            elements=True,
+            is_elements=True,
             qname="compound",
             name="compound",
-            choices=[
-                XmlVar(element=True, qname="int", name="int", types=(int,)),
-                XmlVar(
-                    element=True,
+            elements={
+                "int": XmlVar(is_element=True, qname="int", name="int", types=(int,)),
+                "tokens": XmlVar(
+                    is_element=True,
                     qname="tokens",
                     name="tokens",
                     types=(int,),
                     tokens=True,
                 ),
-                XmlVar(element=True, qname="generic", name="generic", dataclass=True),
-                XmlVar(element=True, qname="float", name="float", types=(float,)),
-                XmlVar(element=True, qname="qname", name="qname", types=(QName,)),
-            ],
+                "generic": XmlVar(
+                    is_element=True, qname="generic", name="generic", dataclass=True
+                ),
+                "float": XmlVar(
+                    is_element=True, qname="float", name="float", types=(float,)
+                ),
+                "qname": XmlVar(
+                    is_element=True, qname="qname", name="qname", types=(QName,)
+                ),
+            },
         )
         self.assertEqual(1.0, self.parser.bind_choice("1.0", var))
         self.assertEqual(1, self.parser.bind_choice(1, var))
@@ -203,14 +209,18 @@ class JsonParserTests(TestCase):
         b = make_dataclass("b", [("x", int), ("y", str)])
 
         var = XmlVar(
-            elements=True,
+            is_elements=True,
             qname="compound",
             name="compound",
-            choices=[
-                XmlVar(element=True, qname="c", name="c", types=(int,)),
-                XmlVar(element=True, qname="a", name="a", types=(a,), dataclass=True),
-                XmlVar(element=True, qname="b", name="b", types=(b,), dataclass=True),
-            ],
+            elements={
+                "a": XmlVar(
+                    is_element=True, qname="a", name="a", types=(a,), dataclass=True
+                ),
+                "b": XmlVar(
+                    is_element=True, qname="b", name="b", types=(b,), dataclass=True
+                ),
+                "c": XmlVar(is_element=True, qname="c", name="c", types=(int,)),
+            },
         )
 
         self.assertEqual(a(1), self.parser.bind_choice({"x": 1}, var))
@@ -226,13 +236,13 @@ class JsonParserTests(TestCase):
 
     def test_bind_choice_generic_with_derived(self):
         var = XmlVar(
-            elements=True,
+            is_elements=True,
             qname="compound",
             name="compound",
-            choices=[
-                XmlVar(element=True, name="a", qname="a", types=(int,)),
-                XmlVar(element=True, name="b", qname="b", types=(float,)),
-            ],
+            elements={
+                "a": XmlVar(is_element=True, name="a", qname="a", types=(int,)),
+                "b": XmlVar(is_element=True, name="b", qname="b", types=(float,)),
+            },
         )
         data = {"qname": "a", "value": 1, "substituted": True}
 
@@ -243,13 +253,13 @@ class JsonParserTests(TestCase):
 
     def test_bind_choice_generic_with_wildcard(self):
         var = XmlVar(
-            elements=True,
+            is_elements=True,
             qname="compound",
             name="compound",
-            choices=[
-                XmlVar(element=True, name="a", qname="a", types=(int,)),
-                XmlVar(element=True, name="b", qname="b", types=(float,)),
-            ],
+            elements={
+                "a": XmlVar(is_element=True, name="a", qname="a", types=(int,)),
+                "b": XmlVar(is_element=True, name="b", qname="b", types=(float,)),
+            },
         )
 
         self.assertEqual(
@@ -258,7 +268,7 @@ class JsonParserTests(TestCase):
         )
 
     def test_bind_choice_generic_with_unknown_qname(self):
-        var = XmlVar(elements=True, qname="compound", name="compound")
+        var = XmlVar(is_elements=True, qname="compound", name="compound")
 
         with self.assertRaises(ParserError) as cm:
             self.parser.bind_choice({"qname": "foo", "text": 1}, var)
@@ -270,7 +280,7 @@ class JsonParserTests(TestCase):
 
     def test_bind_wildcard_with_any_element(self):
         var = XmlVar(
-            wildcard=True,
+            is_wildcard=True,
             name="any_element",
             qname="any_element",
             types=(object,),

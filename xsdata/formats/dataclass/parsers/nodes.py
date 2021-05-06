@@ -5,7 +5,6 @@ from dataclasses import field
 from dataclasses import is_dataclass
 from typing import Any
 from typing import Dict
-from typing import Iterator
 from typing import List
 from typing import Optional
 from typing import Set
@@ -17,7 +16,6 @@ from xsdata.exceptions import ParserError
 from xsdata.exceptions import XmlContextError
 from xsdata.formats.bindings import T
 from xsdata.formats.dataclass.context import XmlContext
-from xsdata.formats.dataclass.models.elements import FindMode
 from xsdata.formats.dataclass.models.elements import XmlMeta
 from xsdata.formats.dataclass.models.elements import XmlVar
 from xsdata.formats.dataclass.models.generics import AnyElement
@@ -34,8 +32,6 @@ from xsdata.utils.namespaces import target_uri
 
 Parsed = Tuple[Optional[str], Any]
 NoneStr = Optional[str]
-
-FIND_MODES = (FindMode.ELEMENT, FindMode.WILDCARD)
 
 
 @dataclass
@@ -65,11 +61,10 @@ class ElementNode(XmlNode):
 
     def bind(self, qname: str, text: NoneStr, tail: NoneStr, objects: List) -> bool:
         params: Dict = {}
-        wild_node = False
         text_node = False
         ParserUtils.bind_attrs(params, self.meta, self.attrs, self.ns_map)
 
-        wild_var = self.meta.find_var(mode=FindMode.WILDCARD)
+        wild_var = self.meta.find_wildcard("*")
         if wild_var and wild_var.mixed:
             ParserUtils.bind_mixed_objects(params, wild_var, self.position, objects)
         else:
@@ -87,7 +82,7 @@ class ElementNode(XmlNode):
 
         objects.append((qname, obj))
 
-        if not wild_var and self.mixed and not wild_node:
+        if not wild_var and self.mixed:
             tail = ParserUtils.normalize_content(tail)
             if tail:
                 objects.append((None, tail))
@@ -95,7 +90,12 @@ class ElementNode(XmlNode):
         return True
 
     def child(self, qname: str, attrs: Dict, ns_map: Dict, position: int) -> XmlNode:
-        for unique, var in self.fetch_vars(qname):
+        for var in self.meta.find_children(qname):
+            unique = None
+
+            if var.is_element and not var.list_element:
+                unique = id(var)
+
             if not unique or unique not in self.assigned:
                 node = self.build_node(var, attrs, ns_map, position)
 
@@ -134,11 +134,11 @@ class ElementNode(XmlNode):
                 xsi_type,
             )
 
-        if not var.any_type and not var.wildcard:
+        if not var.any_type and not var.is_wildcard:
             return PrimitiveNode(var, ns_map)
 
         datatype = DataType.from_qname(xsi_type) if xsi_type else None
-        derived = var.derived or var.wildcard
+        derived = var.derived or var.is_wildcard
         if datatype:
             return StandardNode(datatype, ns_map, derived, var.nillable)
 
@@ -156,22 +156,6 @@ class ElementNode(XmlNode):
             return node
 
         return WildcardNode(var=var, attrs=attrs, ns_map=ns_map, position=position)
-
-    def fetch_vars(self, qname: str) -> Iterator[Tuple[Any, XmlVar]]:
-        for mode in FIND_MODES:
-            var = self.meta.find_var(qname, mode)
-
-            if not var:
-                continue
-
-            if var.elements:
-                unique = None
-                choice = var.find_choice(qname)
-                assert choice is not None
-                yield unique, choice
-            else:
-                unique = None if var.list_element or var.wildcard else id(var)
-                yield unique, var
 
     def build_element_node(
         self,
@@ -197,7 +181,7 @@ class ElementNode(XmlNode):
             position=position,
             derived=derived,
             substituted=xsi_type is not None,
-            mixed=self.meta.has_var(mode=FindMode.MIXED_CONTENT),
+            mixed=self.meta.mixed_content,
         )
 
 
@@ -229,7 +213,7 @@ class WildcardNode(XmlNode):
         text = "" if text is None and not self.var.nillable else text
         tail = ParserUtils.normalize_content(tail)
 
-        if tail or attributes or children or self.var.wildcard or derived:
+        if tail or attributes or children or self.var.is_wildcard or derived:
             obj = AnyElement(
                 qname=qname,
                 text=text,

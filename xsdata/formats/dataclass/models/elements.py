@@ -4,6 +4,7 @@ from dataclasses import field
 from dataclasses import is_dataclass
 from typing import Any
 from typing import Dict
+from typing import Iterator
 from typing import List
 from typing import Optional
 from typing import Sequence
@@ -64,21 +65,18 @@ class XmlVar:
     sequential: bool = False
     list_element: bool = False
     default: Any = None
-
     is_text: bool = False
     is_element: bool = False
     is_elements: bool = False
     is_wildcard: bool = False
     is_attribute: bool = False
     is_attributes: bool = False
-
     index: int = field(default_factory=int)
     types: Tuple[Type, ...] = field(default_factory=tuple)
     namespaces: Tuple[str, ...] = field(default_factory=tuple)
     elements: Dict[str, "XmlVar"] = field(default_factory=dict)
     wildcards: List["XmlVar"] = field(default_factory=list)
-
-    namespace_matches: Dict[str, bool] = field(default_factory=dict)
+    namespace_matches: Optional[Dict[str, bool]] = field(init=False, default=None)
 
     @property
     def lname(self) -> str:
@@ -143,6 +141,9 @@ class XmlVar:
 
     def match_namespace(self, qname: str) -> bool:
         """Match the given qname to the wildcard allowed namespaces."""
+
+        if self.namespace_matches is None:
+            self.namespace_matches = {}
 
         matches = self.namespace_matches.get(qname)
         if matches is None:
@@ -256,6 +257,18 @@ class XmlMeta:
 
     def find_wildcard(self, qname: str) -> Optional[XmlVar]:
         return find_by_namespace(self.wildcards, qname)
+
+    def find_children(self, qname: str) -> Iterator[XmlVar]:
+
+        yield from self.find_elements(qname)
+
+        chd = self.find_choice(qname)
+        if chd:
+            yield chd
+
+        chd = self.find_wildcard(qname)
+        if chd:
+            yield chd
 
 
 class XmlType:

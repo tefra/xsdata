@@ -5,7 +5,6 @@ from dataclasses import field
 from dataclasses import is_dataclass
 from typing import Any
 from typing import Dict
-from typing import Iterator
 from typing import List
 from typing import Optional
 from typing import Set
@@ -91,7 +90,12 @@ class ElementNode(XmlNode):
         return True
 
     def child(self, qname: str, attrs: Dict, ns_map: Dict, position: int) -> XmlNode:
-        for unique, var in self.fetch_vars(qname):
+        for var in self.meta.find_children(qname):
+            unique = None
+
+            if var.is_element and not var.list_element:
+                unique = id(var)
+
             if not unique or unique not in self.assigned:
                 node = self.build_node(var, attrs, ns_map, position)
 
@@ -152,19 +156,6 @@ class ElementNode(XmlNode):
             return node
 
         return WildcardNode(var=var, attrs=attrs, ns_map=ns_map, position=position)
-
-    def fetch_vars(self, qname: str) -> Iterator[Tuple[Any, XmlVar]]:
-        for el in self.meta.find_elements(qname):
-            unique = None if el.list_element else id(el)
-            yield unique, el
-
-        var = self.meta.find_choice(qname)
-        if var:
-            yield None, var
-
-        var = self.meta.find_wildcard(qname)
-        if var:
-            yield None, var
 
     def build_element_node(
         self,

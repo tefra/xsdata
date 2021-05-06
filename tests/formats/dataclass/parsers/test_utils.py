@@ -1,4 +1,3 @@
-from dataclasses import dataclass
 from dataclasses import field
 from dataclasses import make_dataclass
 from dataclasses import replace
@@ -78,50 +77,62 @@ class ParserUtilsTests(TestCase):
             " 1 2 3", [str], ns_map=None, format="Nope"
         )
 
-    def test_bind_objects(self):
-        @dataclass
-        class A:
-            x: int
-            y: int = field(init=False)
-            w: object = field(metadata=dict(type=XmlType.WILDCARD))
-
-        ctx = XmlContext()
-        meta = ctx.build(A)
-        x = meta.find_elements("x")[0]
-        y = meta.find_elements("y")[0]
-        w = meta.find_wildcard("wild")
-        wild_element = AnyElement(qname="foo")
-
-        objects = [
-            ("foo", 0),
-            (x.qname, 1),
-            (y.qname, 2),
-            (w.qname, None),
-            (w.qname, wild_element),
-        ]
-
-        params = {}
-        ParserUtils.bind_objects(params, meta, 1, objects)
-        expected = {
-            "x": 1,
-            "w": AnyElement(
-                children=[AnyElement(qname="w", text=None), AnyElement(qname="foo")]
-            ),
-        }
-
-        self.assertEqual(expected, params)
-
     @mock.patch("xsdata.formats.dataclass.parsers.utils.logger.warning")
-    def test_bind_objects_with_unassigned_object(self, mock_warning):
-        a = make_dataclass("a", [("x", int), ("z", float)])
-        meta = XmlContext().build(a)
+    def test_bind_objects(self, mock_warning):
+        x = make_dataclass("x", [("a", int), ("c", float)])
+        objects = [("a", 1), ("b", 2), ("c", 3.0)]
+
         params = {}
-        objects = [("x", 1), ("y", 2)]
+        ctx = XmlContext()
+        meta = ctx.build(x)
 
         ParserUtils.bind_objects(params, meta, 0, objects)
+        self.assertEqual({"a": 1, "c": 3.0}, params)
 
-        self.assertEqual({"x": 1}, params)
-        mock_warning.assert_called_once_with("Unassigned parsed object %s", "y")
+        mock_warning.assert_called_once_with("Unassigned parsed object %s", "b")
+
+    def test_bind_object_with_matching_wildcard(self):
+        x = make_dataclass(
+            "x",
+            [("a", int), ("any", object, field(metadata={"type": XmlType.WILDCARD}))],
+        )
+        ctx = XmlContext()
+        meta = ctx.build(x)
+        params = {}
+
+        result = ParserUtils.bind_object(params, meta, "whatever", "foo")
+
+        self.assertTrue(result)
+        self.assertEqual({"any": AnyElement(qname="whatever", text="foo")}, params)
+
+    def test_bind_object_with_matching_element(self):
+        x = make_dataclass(
+            "x", [("a", int), ("a1", int, field(metadata={"name": "a"}))]
+        )
+        ctx = XmlContext()
+        meta = ctx.build(x)
+        params = {"a": 1}
+
+        result = ParserUtils.bind_object(params, meta, "a", 2)
+
+        self.assertTrue(result)
+        self.assertEqual({"a": 1, "a1": 2}, params)
+
+    def test_bind_object_failure(self):
+        x = make_dataclass(
+            "x",
+            [
+                ("a", int),
+            ],
+        )
+        ctx = XmlContext()
+        meta = ctx.build(x)
+        params = {}
+
+        result = ParserUtils.bind_object(params, meta, "b", 1)
+
+        self.assertFalse(result)
+        self.assertEqual({}, params)
 
     def test_bind_mixed_objects(self):
         generic = AnyElement(qname="foo")
@@ -271,6 +282,12 @@ class ParserUtilsTests(TestCase):
         status = ParserUtils.bind_var(params, var, 2)
         self.assertFalse(status)
         self.assertEqual({"a": 1}, params)
+
+        var.init = False
+        params.clear()
+        status = ParserUtils.bind_var(params, var, 1)
+        self.assertTrue(status)
+        self.assertEqual({}, params)
 
     def test_bind_var_with_list_var(self):
         var = XmlVar(name="a", qname="a", list_element=True, is_element=True)

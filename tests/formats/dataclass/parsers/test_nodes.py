@@ -3,7 +3,6 @@ from dataclasses import field
 from dataclasses import make_dataclass
 from dataclasses import replace
 from typing import Any
-from typing import Generator
 from typing import List
 from typing import Union
 from unittest import mock
@@ -15,7 +14,6 @@ from xsdata.exceptions import ParserError
 from xsdata.exceptions import XmlContextError
 from xsdata.formats.dataclass.context import XmlContext
 from xsdata.formats.dataclass.models.elements import XmlMeta
-from xsdata.formats.dataclass.models.elements import XmlType
 from xsdata.formats.dataclass.models.elements import XmlVar
 from xsdata.formats.dataclass.models.generics import AnyElement
 from xsdata.formats.dataclass.models.generics import DerivedElement
@@ -257,44 +255,12 @@ class ElementNodeTests(TestCase):
         )
         mock_bind_mixed_objects.assert_called_once_with(mock.ANY, wildcard, 0, objects)
 
-    def test_fetch_vars(self):
-        elem = XmlVar(
-            is_element=True, name="a", qname="a", types=(Foo,), dataclass=True
-        )
-        wild = XmlVar(
-            is_wildcard=True, name="a", qname="a", types=(Foo,), dataclass=True
-        )
-
-        self.meta.elements[elem.qname] = [elem]
-        self.meta.wildcards.append(wild)
-
-        matching_vars = self.node.fetch_vars("a")
-        self.assertIsInstance(matching_vars, Generator)
-        self.assertEqual([(id(elem), elem), (None, wild)], list(matching_vars))
-
-    def test_fetch_vars_with_elements_var(self):
-        elem = XmlVar(
-            is_element=True, name="a", qname="a", types=(Foo,), dataclass=True
-        )
-        elems = XmlVar(
-            is_elements=True,
-            name="compound",
-            qname="compound",
-            elements={elem.qname: elem},
-        )
-        self.meta.choices.append(elems)
-
-        matching_vars = self.node.fetch_vars("a")
-        self.assertIsInstance(matching_vars, Generator)
-        self.assertEqual((None, elem), next(matching_vars))
-
-    @mock.patch.object(ElementNode, "fetch_vars")
-    def test_child(self, mock_match_vars):
+    def test_child(self):
         var = XmlVar(is_element=True, name="a", qname="a", types=(Foo,), dataclass=True)
         attrs = {"a": "b"}
         ns_map = {"ns0": "xsdata"}
         position = 1
-        mock_match_vars.return_value = [(id(var), var)]
+        self.meta.elements[var.qname] = [var]
 
         actual = self.node.child("a", attrs, ns_map, position)
         self.assertIsInstance(actual, ElementNode)
@@ -302,7 +268,7 @@ class ElementNodeTests(TestCase):
         self.assertEqual(ns_map, actual.ns_map)
         self.assertEqual(position, actual.position)
 
-    def test_child_unique_vars(self):
+    def test_child_with_unique_element(self):
         single = XmlVar(
             is_element=True, name="a", qname="a", types=(Foo,), dataclass=True
         )

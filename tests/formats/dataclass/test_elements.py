@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from dataclasses import make_dataclass
+from typing import Iterator
 from unittest import mock
 from unittest.case import TestCase
 
@@ -183,3 +184,29 @@ class XmlMetaTests(TestCase):
         self.assertEqual(wildcards[1], self.meta.find_wildcard("a"))
 
         mock_match_namespace.assert_has_calls([mock.call("a") for _ in range(4)])
+
+    def test_find_children(self):
+        element1 = XmlVar(is_element=True, qname="a", name="a")
+        element2 = XmlVar(is_element=True, qname="a", name="a1")
+
+        option1 = XmlVar(is_element=True, qname="a", name="a3")
+        option2 = XmlVar(is_element=True, qname="b", name="b")
+
+        choice = XmlVar(
+            is_elements=True,
+            qname="c1",
+            name="c1",
+            elements={
+                "a": option1,
+                "b": option2,
+            },
+        )
+        wildcard = XmlVar(is_wildcard=True, qname="any", name="any")
+
+        self.meta.elements["a"] = [element1, element2]
+        self.meta.choices.append(choice)
+        self.meta.wildcards.append(wildcard)
+
+        result = self.meta.find_children("a")
+        self.assertIsInstance(result, Iterator)
+        self.assertEqual([element1, element2, option1, wildcard], list(result))

@@ -70,20 +70,19 @@ class ParserUtils:
 
         while len(objects) > position:
             qname, value = objects.pop(position)
+            if not cls.bind_object(params, meta, qname, value):
+                logger.warning("Unassigned parsed object %s", qname)
 
-            elements = meta.find_elements(qname)
-            if any(cls.bind_var(params, element, value) for element in elements):
-                continue
+    @classmethod
+    def bind_object(cls, params: Dict, meta: XmlMeta, qname: str, value: Any) -> bool:
+        for var in meta.find_children(qname):
+            if var.is_wildcard:
+                return cls.bind_wild_var(params, var, qname, value)
 
-            arg = meta.find_choice(qname)
-            if arg and cls.bind_var(params, arg, value):
-                continue
+            if cls.bind_var(params, var, value):
+                return True
 
-            arg = meta.find_wildcard(qname)
-            if arg and cls.bind_wild_var(params, arg, qname, value):
-                continue
-
-            logger.warning("Unassigned parsed object %s", qname)
+        return False
 
     @classmethod
     def bind_mixed_objects(cls, params: Dict, var: XmlVar, pos: int, objects: List):

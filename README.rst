@@ -27,11 +27,11 @@ Naive XML Bindings for python
 
 --------
 
-xsData is a complete XML and JSON data binding library for python allowing developers to
-access and documents as simple objects rather than using DOM.
+xsData is a complete data binding library for python allowing developers to access and
+use XML and JSON documents as simple objects rather than using DOM.
 
-It ships with a code generator for XML schemas, WSDL definitions and XML documents. It
-produces simple dataclasses with type hints and binding metadata.
+It ships with a code generator for XML schemas, WSDL definitions, XML & JSON documents.
+It produces simple dataclasses with type hints and simple binding metadata.
 
 The included XML and JSON parser/serializer are highly optimized and adaptable, with
 multiple handlers and configuration properties.
@@ -76,7 +76,7 @@ Features
 
   - XML Schemas 1.0 & 1.1
   - WSDL 1.1 definitions with SOAP 1.1 bindings
-  - Directly from XML Documents
+  - Directly from XML and JSON Documents
   - Extensive configuration to customize output
   - Pluggable code writer for custom output formats
 
@@ -96,18 +96,18 @@ Features
   - Customize behaviour through config
 
 
-Changelog: 21.4 (2021-04-02)
+Changelog: 21.5 (2021-05-07)
 ----------------------------
-- Split requirements to extras cli, soap and lxml `#419 <https://github.com/tefra/xsdata/issues/419>`_
-- Fixed parser conflict when an attribute and element field have the same qualified name
-- Added cli auto detection for source types, removed cli flag `--wsdl`
-- Added cli support to generate code from raw xml documents
-- Added cli entry point to allow pluggable output formats `#429 <https://github.com/tefra/xsdata/issues/429>`_
-- Added cli short flags for all options and flags
-- Added handler to set effective choice groups `#433 <https://github.com/tefra/xsdata/issues/433>`_
-- Moved plantUML output format to a standalone `plugin <https://github.com/tefra/xsdata-plantuml>`_
-- Updated xml parser to allow unions of primitive and class types
-- Updated XmlDateTime parser to catch invalid cases with extra leading zeros
-- Updated QName converter to validate uri/ncname when parsing string representations
-- Updated JsonParser to allow parsing from filename string
-- Updated cli option `--compound-fields` to a boolean flag
+- Added output structure style single-package `#469 <https://github.com/tefra/xsdata/issues/469>`_
+- Added support for marshalling array of objects for json `#448 <https://github.com/tefra/xsdata/issues/448>`_
+- Added support to generate code from raw json documents `#445 <https://github.com/tefra/xsdata/issues/445>`_
+- Added docstring style Blank to avoid generating them `#460 <https://github.com/tefra/xsdata/issues/460>`_
+- Added validations for non supported type hints
+- Added support for python 3.10
+- Generate package __all__ lists `#459 <https://github.com/tefra/xsdata/issues/459>`_
+- Generate factory for xs:list enumeration default values `#471 <https://github.com/tefra/xsdata/issues/471>`_
+- Avoid generating prohibited elements with maxOccurs==0 `#478 <https://github.com/tefra/xsdata/issues/478>`_
+- Avoid generating identical overriding fields `#466 <https://github.com/tefra/xsdata/issues/466>`_
+- Fixed flattening base classes if they are also subclasses `#473 <https://github.com/tefra/xsdata/issues/473>`_
+- Fixed unchecked class name conflict resolution `#457 <https://github.com/tefra/xsdata/issues/457>`_
+- Refactored context components to improve binding performance `#476 <https://github.com/tefra/xsdata/issues/476>`_

@@ -1,3 +1,20 @@
+21.5 (2021-05-07)
+-----------------
+- Added output structure style single-package `#469 <https://github.com/tefra/xsdata/issues/469>`_
+- Added support for marshalling array of objects for json `#448 <https://github.com/tefra/xsdata/issues/448>`_
+- Added support to generate code from raw json documents `#445 <https://github.com/tefra/xsdata/issues/445>`_
+- Added docstring style Blank to avoid generating them `#460 <https://github.com/tefra/xsdata/issues/460>`_
+- Added validations for non supported type hints
+- Added support for python 3.10
+- Generate package __all__ lists `#459 <https://github.com/tefra/xsdata/issues/459>`_
+- Generate factory for xs:list enumeration default values `#471 <https://github.com/tefra/xsdata/issues/471>`_
+- Avoid generating prohibited elements with maxOccurs==0 `#478 <https://github.com/tefra/xsdata/issues/478>`_
+- Avoid generating identical overriding fields `#466 <https://github.com/tefra/xsdata/issues/466>`_
+- Fixed flattening base classes if they are also subclasses `#473 <https://github.com/tefra/xsdata/issues/473>`_
+- Fixed unchecked class name conflict resolution `#457 <https://github.com/tefra/xsdata/issues/457>`_
+- Refactored context components to improve binding performance `#476 <https://github.com/tefra/xsdata/issues/476>`_
+
+
 21.4 (2021-04-02)
 -----------------
 - Split requirements to extras cli, soap and lxml `#419 <https://github.com/tefra/xsdata/issues/419>`_

@@ -184,6 +184,9 @@ def generate(**kwargs: Any):
 
     if kwargs["ns_struct"]:
         config.output.structure = StructureStyle.NAMESPACES
+        logger.warning(
+            "--ns-struct is deprecated switch to '--structure-style namespaces'"
+        )
     elif kwargs["structure_style"] != StructureStyle.FILENAMES.value:
         config.output.structure = StructureStyle(kwargs["structure_style"])
 

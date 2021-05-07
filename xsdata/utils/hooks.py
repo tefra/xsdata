@@ -7,7 +7,12 @@ else:
 
 
 def load_entry_points(name: str):
-    eps = importlib_metadata.entry_points()
-    if name in eps:
-        for ep in eps[name]:
-            ep.load()
+    entry_points = importlib_metadata.entry_points()
+
+    if hasattr(entry_points, "select"):
+        plugins = entry_points.select(group=name)  # type: ignore
+    else:
+        plugins = entry_points.get(name, [])
+
+    for plugin in plugins:
+        plugin.load()

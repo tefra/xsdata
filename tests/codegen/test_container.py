@@ -4,7 +4,6 @@ from xsdata.codegen.container import ClassContainer
 from xsdata.codegen.models import Class
 from xsdata.codegen.models import Status
 from xsdata.models.config import GeneratorConfig
-from xsdata.models.config import StructureStyle
 from xsdata.models.enums import Tag
 from xsdata.utils.testing import ClassFactory
 from xsdata.utils.testing import FactoryTestCase
@@ -53,6 +52,7 @@ class ClassContainerTests(FactoryTestCase):
                 "AttributeDefaultValueHandler",
                 "AttributeRestrictionsHandler",
                 "AttributeNameConflictHandler",
+                "ClassBareInnerHandler",
             ],
             [x.__class__.__name__ for x in container.post_processors],
         )
@@ -67,6 +67,7 @@ class ClassContainerTests(FactoryTestCase):
                 "AttributeDefaultValueHandler",
                 "AttributeRestrictionsHandler",
                 "AttributeNameConflictHandler",
+                "ClassBareInnerHandler",
             ],
             [x.__class__.__name__ for x in container.post_processors],
         )
@@ -107,7 +108,9 @@ class ClassContainerTests(FactoryTestCase):
         mock_pre_process_class.assert_called_once_with(first)
 
     def test_pre_process_class(self):
-        target = ClassFactory.create(inner=ClassFactory.list(2))
+        target = ClassFactory.create(
+            inner=[ClassFactory.elements(2), ClassFactory.elements(1)]
+        )
         self.container.add(target)
 
         self.container.process()

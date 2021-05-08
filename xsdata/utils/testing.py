@@ -188,7 +188,10 @@ class ExtensionFactory(Factory):
 
     @classmethod
     def reference(cls, qname: str, **kwargs: Any) -> Extension:
-        return cls.create(AttrTypeFactory.create(qname=qname), **kwargs)
+        restrictions = kwargs.pop("restrictions", None)
+        return cls.create(
+            AttrTypeFactory.create(qname=qname, **kwargs), restrictions=restrictions
+        )
 
     @classmethod
     def native(cls, datatype: DataType, **kwargs: Any) -> Extension:

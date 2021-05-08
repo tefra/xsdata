@@ -19,6 +19,7 @@ from xsdata.codegen.handlers import AttributeOverridesHandler
 from xsdata.codegen.handlers import AttributeRestrictionsHandler
 from xsdata.codegen.handlers import AttributeSubstitutionHandler
 from xsdata.codegen.handlers import AttributeTypeHandler
+from xsdata.codegen.handlers import ClassBareInnerHandler
 from xsdata.codegen.handlers import ClassEnumerationHandler
 from xsdata.codegen.handlers import ClassExtensionHandler
 from xsdata.codegen.handlers import ClassNameConflictHandler
@@ -65,6 +66,7 @@ class ClassContainer(ContainerInterface):
             AttributeDefaultValueHandler(self),
             AttributeRestrictionsHandler(),
             AttributeNameConflictHandler(),
+            ClassBareInnerHandler(),
         ]
         if self.config.output.compound_fields:
             self.post_processors.insert(0, AttributeCompoundChoiceHandler())

@@ -1,9 +1,7 @@
 from dataclasses import field
 from dataclasses import make_dataclass
-from dataclasses import replace
 from typing import Any
 from unittest import mock
-from unittest.case import TestCase
 
 from tests.fixtures.books import Books
 from tests.fixtures.defxmlschema.chapter12 import ProductType
@@ -12,16 +10,18 @@ from xsdata.formats.converter import ConverterFactory
 from xsdata.formats.dataclass.context import XmlContext
 from xsdata.formats.dataclass.models.elements import XmlMeta
 from xsdata.formats.dataclass.models.elements import XmlType
-from xsdata.formats.dataclass.models.elements import XmlVar
 from xsdata.formats.dataclass.models.generics import AnyElement
 from xsdata.formats.dataclass.models.generics import DerivedElement
 from xsdata.formats.dataclass.parsers.utils import ParserUtils
 from xsdata.models.enums import Namespace
 from xsdata.models.enums import QNames
+from xsdata.utils.testing import FactoryTestCase
+from xsdata.utils.testing import XmlVarFactory
 
 
-class ParserUtilsTests(TestCase):
+class ParserUtilsTests(FactoryTestCase):
     def setUp(self) -> None:
+        super().setUp()
         self.ctx = XmlContext()
 
     def test_xsi_type(self):
@@ -146,7 +146,9 @@ class ParserUtilsTests(TestCase):
             (None, "foo"),
         ]
 
-        var = XmlVar(is_wildcard=True, name="foo", qname="{any}foo")
+        var = XmlVarFactory.create(
+            xml_type=XmlType.WILDCARD, name="foo", qname="{any}foo"
+        )
         params = {}
         ParserUtils.bind_mixed_objects(params, var, 1, objects)
 
@@ -224,7 +226,7 @@ class ParserUtilsTests(TestCase):
     def test_bind_attrs_ignore_init_false_vars(self):
         metadata = self.ctx.build(ProductType)
         eff_date = metadata.find_attribute("effDate")
-        eff_date = replace(eff_date, init=False)
+        eff_date.init = False
 
         metadata.attributes[eff_date.qname] = eff_date
         params = {}
@@ -272,7 +274,7 @@ class ParserUtilsTests(TestCase):
         self.assertEqual({}, params)
 
     def test_bind_var(self):
-        var = XmlVar(name="a", qname="a", is_element=True)
+        var = XmlVarFactory.create(name="a", qname="a", xml_type=XmlType.ELEMENT)
         params = {}
 
         status = ParserUtils.bind_var(params, var, 1)
@@ -290,7 +292,9 @@ class ParserUtilsTests(TestCase):
         self.assertEqual({}, params)
 
     def test_bind_var_with_list_var(self):
-        var = XmlVar(name="a", qname="a", list_element=True, is_element=True)
+        var = XmlVarFactory.create(
+            name="a", qname="a", list_element=True, xml_type=XmlType.ELEMENT
+        )
         params = {}
 
         status = ParserUtils.bind_var(params, var, 1)
@@ -303,7 +307,7 @@ class ParserUtilsTests(TestCase):
 
     def test_bind_wild_var(self):
         params = {}
-        var = XmlVar(name="a", qname="a", is_wildcard=True)
+        var = XmlVarFactory.create(name="a", qname="a", xml_type=XmlType.WILDCARD)
         qname = "b"
         one = AnyElement(qname=qname, text="one")
         two = AnyElement(qname=qname, text="two")
@@ -321,7 +325,9 @@ class ParserUtilsTests(TestCase):
 
     def test_bind_wild_var_with_list_var(self):
         params = {}
-        var = XmlVar(name="a", qname="a", list_element=True, is_element=True)
+        var = XmlVarFactory.create(
+            name="a", qname="a", list_element=True, xml_type=XmlType.ELEMENT
+        )
         qname = "b"
         one = AnyElement(qname=qname, text="one")
         two = AnyElement(qname=qname, text="two")
@@ -334,7 +340,7 @@ class ParserUtilsTests(TestCase):
         self.assertEqual(dict(a=[one, two, three]), params)
 
     def test_bind_wild_content(self):
-        var = XmlVar(name="a", qname="a", is_wildcard=True)
+        var = XmlVarFactory.create(name="a", qname="a", xml_type=XmlType.WILDCARD)
         params = {}
         attrs = {}
         ns_map = {}
@@ -356,12 +362,12 @@ class ParserUtilsTests(TestCase):
         self.assertEqual(dict(a=expected), params)
 
     def test_bind_wildcard_when_var_is_list(self):
-        var = XmlVar(
+        var = XmlVarFactory.create(
             name="a",
             qname="a",
             default=list,
             list_element=True,
-            is_wildcard=True,
+            xml_type=XmlType.WILDCARD,
         )
         params = {}
         attrs = {"a", "b"}

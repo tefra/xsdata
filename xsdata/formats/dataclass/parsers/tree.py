@@ -5,6 +5,7 @@ from typing import List
 from typing import Optional
 from typing import Type
 
+from xsdata.formats.dataclass.models.elements import XmlType
 from xsdata.formats.dataclass.models.elements import XmlVar
 from xsdata.formats.dataclass.parsers.handlers import default_handler
 from xsdata.formats.dataclass.parsers.mixins import XmlHandler
@@ -37,10 +38,26 @@ class TreeParser(NodeParser):
             item = queue[-1]
             child = item.child(qname, attrs, ns_map, len(objects))
         except IndexError:
-            child = WildcardNode(
-                var=XmlVar(name=qname, qname=qname, is_wildcard=True),
-                attrs=attrs,
-                ns_map=ns_map,
-                position=0,
+            var = XmlVar(
+                name=qname,
+                qname=qname,
+                xml_type=XmlType.WILDCARD,
+                index=0,
+                types=(object,),
+                init=True,
+                mixed=False,
+                tokens=False,
+                format=None,
+                derived=False,
+                any_type=False,
+                nillable=False,
+                sequential=False,
+                list_element=False,
+                default=None,
+                namespaces=(),
+                elements={},
+                wildcards=(),
             )
+
+            child = WildcardNode(var=var, attrs=attrs, ns_map=ns_map, position=0)
         queue.append(child)

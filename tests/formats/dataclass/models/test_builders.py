@@ -20,28 +20,29 @@ from tests.fixtures.defxmlschema.chapter13 import ItemsType
 from xsdata.exceptions import XmlContextError
 from xsdata.formats.dataclass.models.builders import XmlMetaBuilder
 from xsdata.formats.dataclass.models.builders import XmlVarBuilder
-from xsdata.formats.dataclass.models.elements import XmlMeta
 from xsdata.formats.dataclass.models.elements import XmlType
-from xsdata.formats.dataclass.models.elements import XmlVar
 from xsdata.models.datatype import XmlDate
 from xsdata.utils import text
 from xsdata.utils.constants import return_input
 from xsdata.utils.constants import return_true
 from xsdata.utils.namespaces import build_qname
+from xsdata.utils.testing import FactoryTestCase
+from xsdata.utils.testing import XmlMetaFactory
+from xsdata.utils.testing import XmlVarFactory
 
 
-class XmlMetaBuilderTests(TestCase):
+class XmlMetaBuilderTests(FactoryTestCase):
     @mock.patch.object(XmlMetaBuilder, "build_vars")
     def test_build(self, mock_build_vars):
-        var = XmlVar(is_element=True, name="foo", qname="{foo}bar", types=(int,))
+        var = XmlVarFactory.create(
+            xml_type=XmlType.ELEMENT, name="foo", qname="{foo}bar", types=(int,)
+        )
         mock_build_vars.return_value = [var]
 
         result = XmlMetaBuilder.build(ItemsType, None, return_input, return_input)
-        expected = XmlMeta(
+        expected = XmlMetaFactory.create(
             clazz=ItemsType,
             qname="ItemsType",
-            source_qname="ItemsType",
-            nillable=False,
             elements={var.qname: [var]},
         )
 
@@ -110,51 +111,53 @@ class XmlMetaBuilderTests(TestCase):
         self.assertIsInstance(result, Iterator)
 
         expected = [
-            XmlVar(
-                is_element=True,
+            XmlVarFactory.create(
+                xml_type=XmlType.ELEMENT,
                 index=0,
                 name="author",
                 qname="Author",
                 types=(str,),
             ),
-            XmlVar(
-                is_element=True,
+            XmlVarFactory.create(
+                xml_type=XmlType.ELEMENT,
                 index=1,
                 name="title",
                 qname="Title",
                 types=(str,),
             ),
-            XmlVar(
-                is_element=True,
+            XmlVarFactory.create(
+                xml_type=XmlType.ELEMENT,
                 index=2,
                 name="genre",
                 qname="Genre",
                 types=(str,),
             ),
-            XmlVar(
-                is_element=True,
+            XmlVarFactory.create(
+                xml_type=XmlType.ELEMENT,
                 index=3,
                 name="price",
                 qname="Price",
                 types=(float,),
             ),
-            XmlVar(
-                is_element=True,
+            XmlVarFactory.create(
+                xml_type=XmlType.ELEMENT,
                 index=4,
                 name="pub_date",
                 qname="PubDate",
                 types=(XmlDate,),
             ),
-            XmlVar(
-                is_element=True,
+            XmlVarFactory.create(
+                xml_type=XmlType.ELEMENT,
                 index=5,
                 name="review",
                 qname="Review",
                 types=(str,),
             ),
-            XmlVar(is_attribute=True, index=6, name="id", qname="ID", types=(str,)),
-            XmlVar(
-                is_attribute=True,
+            XmlVarFactory.create(
+                xml_type=XmlType.ATTRIBUTE, index=6, name="id", qname="ID", types=(str,)
+            ),
+            XmlVarFactory.create(
+                xml_type=XmlType.ATTRIBUTE,
                 index=7,
                 name="lang",
                 qname="LANG",
@@ -167,7 +170,6 @@ class XmlMetaBuilderTests(TestCase):
         result = list(result)
         self.assertEqual(expected, result)
         for var in result:
-            self.assertFalse(var.dataclass)
             self.assertIsNone(var.clazz)
 
     def test_default_xml_type(self):
@@ -229,29 +231,28 @@ class XmlVarBuilderTests(TestCase):
             list,
             globalns,
         )
-        expected = XmlVar(
+        expected = XmlVarFactory.create(
             index=66,
-            is_elements=True,
+            xml_type=XmlType.ELEMENTS,
             name="compound",
             qname="compound",
             list_element=True,
             any_type=True,
             default=list,
             elements={
-                "{foo}node": XmlVar(
+                "{foo}node": XmlVarFactory.create(
                     index=0,
-                    is_element=True,
+                    xml_type=XmlType.ELEMENT,
                     name="compound",
                     qname="{foo}node",
-                    dataclass=True,
                     list_element=True,
                     types=(CompoundFieldExample,),
                     namespaces=("foo",),
                     derived=False,
                 ),
-                "{bar}x": XmlVar(
+                "{bar}x": XmlVarFactory.create(
                     index=1,
-                    is_element=True,
+                    xml_type=XmlType.ELEMENT,
                     name="compound",
                     qname="{bar}x",
                     tokens=True,
@@ -262,9 +263,9 @@ class XmlVarBuilderTests(TestCase):
                     default=return_true,
                     format="Nope",
                 ),
-                "{bar}y": XmlVar(
+                "{bar}y": XmlVarFactory.create(
                     index=2,
-                    is_element=True,
+                    xml_type=XmlType.ELEMENT,
                     name="compound",
                     qname="{bar}y",
                     nillable=True,
@@ -273,9 +274,9 @@ class XmlVarBuilderTests(TestCase):
                     namespaces=("bar",),
                     derived=False,
                 ),
-                "{bar}z": XmlVar(
+                "{bar}z": XmlVarFactory.create(
                     index=3,
-                    is_element=True,
+                    xml_type=XmlType.ELEMENT,
                     name="compound",
                     qname="{bar}z",
                     nillable=False,
@@ -284,9 +285,9 @@ class XmlVarBuilderTests(TestCase):
                     namespaces=("bar",),
                     derived=True,
                 ),
-                "{bar}o": XmlVar(
+                "{bar}o": XmlVarFactory.create(
                     index=4,
-                    is_element=True,
+                    xml_type=XmlType.ELEMENT,
                     name="compound",
                     qname="{bar}o",
                     nillable=False,
@@ -296,9 +297,9 @@ class XmlVarBuilderTests(TestCase):
                     derived=True,
                     any_type=True,
                 ),
-                "{bar}p": XmlVar(
+                "{bar}p": XmlVarFactory.create(
                     index=5,
-                    is_element=True,
+                    xml_type=XmlType.ELEMENT,
                     name="compound",
                     qname="{bar}p",
                     types=(float,),
@@ -308,9 +309,9 @@ class XmlVarBuilderTests(TestCase):
                 ),
             },
             wildcards=[
-                XmlVar(
+                XmlVarFactory.create(
                     index=6,
-                    is_wildcard=True,
+                    xml_type=XmlType.WILDCARD,
                     name="compound",
                     qname="{http://www.w3.org/1999/xhtml}any",
                     types=(object,),
@@ -384,12 +385,6 @@ class XmlVarBuilderTests(TestCase):
             "Unsupported typing: typing.List[typing.List[typing.List[int]]]",
             str(cm.exception),
         )
-
-    def test_build_xml_type(self):
-        self.builder.default_xml_type = XmlType.WILDCARD
-        self.assertEqual(XmlType.WILDCARD, self.builder.build_xml_type(None, False))
-        self.assertEqual(XmlType.ELEMENT, self.builder.build_xml_type("", True))
-        self.assertEqual(XmlType.TEXT, self.builder.build_xml_type(XmlType.TEXT, True))
 
     def test_is_valid(self):
         # Attributes need origin dict

@@ -9,15 +9,17 @@ from tests import fixtures_dir
 from tests.fixtures.books import BookForm
 from tests.fixtures.books import Books
 from xsdata.exceptions import ParserError
-from xsdata.formats.dataclass.models.elements import XmlVar
+from xsdata.formats.dataclass.models.elements import XmlType
 from xsdata.formats.dataclass.models.generics import AnyElement
 from xsdata.formats.dataclass.models.generics import DerivedElement
 from xsdata.formats.dataclass.parsers.json import JsonParser
 from xsdata.formats.dataclass.serializers import JsonSerializer
 from xsdata.models.datatype import XmlDate
+from xsdata.utils.testing import FactoryTestCase
+from xsdata.utils.testing import XmlVarFactory
 
 
-class JsonParserTests(TestCase):
+class JsonParserTests(FactoryTestCase):
     def setUp(self) -> None:
         super().setUp()
 
@@ -126,7 +128,7 @@ class JsonParserTests(TestCase):
         self.assertEqual("Key `book` value is not iterable", str(cm.exception))
 
     def test_bind_value_with_attributes_var(self):
-        var = XmlVar(is_attributes=True, name="a", qname="a")
+        var = XmlVarFactory.create(xml_type=XmlType.ATTRIBUTES, name="a")
         value = {"a": 1}
         actual = self.parser.bind_value(var, value)
         self.assertEqual(value, actual)
@@ -137,12 +139,11 @@ class JsonParserTests(TestCase):
         b = make_dataclass("b", [("x", int), ("y", str), ("z", float)])
         c = make_dataclass("c", [("x", int), ("y", str), ("z", str)])
         d = make_dataclass("d", [("x", int)])
-        var = XmlVar(
-            is_element=True,
+        var = XmlVarFactory.create(
+            xml_type=XmlType.ELEMENT,
             name="union",
             qname="union",
             types=(a, b, c, int),
-            dataclass=True,
         )
 
         data = {"x": 1, "y": "foo", "z": "foo"}
@@ -152,39 +153,43 @@ class JsonParserTests(TestCase):
 
     def test_bind_type_union(self):
         a = make_dataclass("a", [("x", int), ("y", str)])
-        var = XmlVar(
-            is_element=True,
+        var = XmlVarFactory.create(
+            xml_type=XmlType.ELEMENT,
             name="union",
             qname="union",
             types=(a, int, float),
-            dataclass=True,
         )
 
         data = "1.1"
         self.assertEqual(1.1, self.parser.bind_value(var, data))
 
     def test_bind_choice_simple(self):
-        var = XmlVar(
-            is_elements=True,
+        var = XmlVarFactory.create(
+            xml_type=XmlType.ELEMENTS,
             qname="compound",
             name="compound",
             elements={
-                "int": XmlVar(is_element=True, qname="int", name="int", types=(int,)),
-                "tokens": XmlVar(
-                    is_element=True,
+                "int": XmlVarFactory.create(
+                    xml_type=XmlType.ELEMENT, qname="int", name="int", types=(int,)
+                ),
+                "tokens": XmlVarFactory.create(
+                    xml_type=XmlType.ELEMENT,
                     qname="tokens",
                     name="tokens",
                     types=(int,),
                     tokens=True,
                 ),
-                "generic": XmlVar(
-                    is_element=True, qname="generic", name="generic", dataclass=True
+                "float": XmlVarFactory.create(
+                    xml_type=XmlType.ELEMENT,
+                    qname="float",
+                    name="float",
+                    types=(float,),
                 ),
-                "float": XmlVar(
-                    is_element=True, qname="float", name="float", types=(float,)
-                ),
-                "qname": XmlVar(
-                    is_element=True, qname="qname", name="qname", types=(QName,)
+                "qname": XmlVarFactory.create(
+                    xml_type=XmlType.ELEMENT,
+                    qname="qname",
+                    name="qname",
+                    types=(QName,),
                 ),
             },
         )
@@ -208,18 +213,26 @@ class JsonParserTests(TestCase):
         a = make_dataclass("a", [("x", int)])
         b = make_dataclass("b", [("x", int), ("y", str)])
 
-        var = XmlVar(
-            is_elements=True,
+        var = XmlVarFactory.create(
+            xml_type=XmlType.ELEMENTS,
             qname="compound",
             name="compound",
             elements={
-                "a": XmlVar(
-                    is_element=True, qname="a", name="a", types=(a,), dataclass=True
+                "a": XmlVarFactory.create(
+                    xml_type=XmlType.ELEMENT,
+                    qname="a",
+                    name="a",
+                    types=(a,),
                 ),
-                "b": XmlVar(
-                    is_element=True, qname="b", name="b", types=(b,), dataclass=True
+                "b": XmlVarFactory.create(
+                    xml_type=XmlType.ELEMENT,
+                    qname="b",
+                    name="b",
+                    types=(b,),
                 ),
-                "c": XmlVar(is_element=True, qname="c", name="c", types=(int,)),
+                "c": XmlVarFactory.create(
+                    xml_type=XmlType.ELEMENT, qname="c", name="c", types=(int,)
+                ),
             },
         )
 
@@ -235,13 +248,17 @@ class JsonParserTests(TestCase):
         )
 
     def test_bind_choice_generic_with_derived(self):
-        var = XmlVar(
-            is_elements=True,
+        var = XmlVarFactory.create(
+            xml_type=XmlType.ELEMENTS,
             qname="compound",
             name="compound",
             elements={
-                "a": XmlVar(is_element=True, name="a", qname="a", types=(int,)),
-                "b": XmlVar(is_element=True, name="b", qname="b", types=(float,)),
+                "a": XmlVarFactory.create(
+                    xml_type=XmlType.ELEMENT, name="a", types=(int,)
+                ),
+                "b": XmlVarFactory.create(
+                    xml_type=XmlType.ELEMENT, name="b", types=(float,)
+                ),
             },
         )
         data = {"qname": "a", "value": 1, "substituted": True}
@@ -252,13 +269,17 @@ class JsonParserTests(TestCase):
         )
 
     def test_bind_choice_generic_with_wildcard(self):
-        var = XmlVar(
-            is_elements=True,
+        var = XmlVarFactory.create(
+            xml_type=XmlType.ELEMENTS,
             qname="compound",
             name="compound",
             elements={
-                "a": XmlVar(is_element=True, name="a", qname="a", types=(int,)),
-                "b": XmlVar(is_element=True, name="b", qname="b", types=(float,)),
+                "a": XmlVarFactory.create(
+                    xml_type=XmlType.ELEMENT, name="a", types=(int,)
+                ),
+                "b": XmlVarFactory.create(
+                    xml_type=XmlType.ELEMENT, name="b", types=(float,)
+                ),
             },
         )
 
@@ -268,7 +289,9 @@ class JsonParserTests(TestCase):
         )
 
     def test_bind_choice_generic_with_unknown_qname(self):
-        var = XmlVar(is_elements=True, qname="compound", name="compound")
+        var = XmlVarFactory.create(
+            xml_type=XmlType.ELEMENTS, qname="compound", name="compound"
+        )
 
         with self.assertRaises(ParserError) as cm:
             self.parser.bind_choice({"qname": "foo", "text": 1}, var)
@@ -279,8 +302,8 @@ class JsonParserTests(TestCase):
         )
 
     def test_bind_wildcard_with_any_element(self):
-        var = XmlVar(
-            is_wildcard=True,
+        var = XmlVarFactory.create(
+            xml_type=XmlType.WILDCARD,
             name="any_element",
             qname="any_element",
             types=(object,),
@@ -292,7 +315,7 @@ class JsonParserTests(TestCase):
         )
 
     def test_bind_wildcard_with_derived_element(self):
-        var = XmlVar(
+        var = XmlVarFactory.create(
             any_type=True,
             name="a",
             qname="a",
@@ -304,7 +327,7 @@ class JsonParserTests(TestCase):
         self.assertEqual(actual, self.parser.bind_value(var, data))
 
     def test_bind_wildcard_with_no_matching_value(self):
-        var = XmlVar(
+        var = XmlVarFactory.create(
             any_type=True,
             name="a",
             qname="a",

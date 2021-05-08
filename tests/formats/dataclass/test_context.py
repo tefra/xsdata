@@ -1,18 +1,19 @@
+import copy
 from dataclasses import fields
 from dataclasses import make_dataclass
 from dataclasses import replace
 from unittest import mock
-from unittest import TestCase
 
 from tests.fixtures.books import BookForm
 from tests.fixtures.books import BooksForm
 from tests.fixtures.defxmlschema.chapter13 import ItemsType
 from xsdata.formats.dataclass.context import XmlContext
-from xsdata.formats.dataclass.models.elements import XmlMeta
 from xsdata.models.enums import DataType
+from xsdata.utils.testing import FactoryTestCase
+from xsdata.utils.testing import XmlMetaFactory
 
 
-class XmlContextTests(TestCase):
+class XmlContextTests(FactoryTestCase):
     def setUp(self):
         self.ctx = XmlContext()
         super().setUp()
@@ -20,12 +21,7 @@ class XmlContextTests(TestCase):
     @mock.patch.object(XmlContext, "find_subclass")
     @mock.patch.object(XmlContext, "build")
     def test_fetch(self, mock_build, mock_find_subclass):
-        meta = XmlMeta(
-            clazz=ItemsType,
-            qname="ItemsType",
-            source_qname="ItemsType",
-            nillable=False,
-        )
+        meta = XmlMetaFactory.create(clazz=ItemsType, qname="ItemsType")
         mock_build.return_value = meta
         actual = self.ctx.fetch(ItemsType, "foo")
         self.assertEqual(meta, actual)
@@ -37,7 +33,7 @@ class XmlContextTests(TestCase):
     def test_fetch_with_xsi_type_and_subclass_not_found(
         self, mock_build, mock_find_subclass
     ):
-        meta = XmlMeta(
+        meta = XmlMetaFactory.create(
             clazz=ItemsType,
             qname="ItemsType",
             source_qname="ItemsType",
@@ -55,13 +51,9 @@ class XmlContextTests(TestCase):
     def test_fetch_with_xsi_type_and_subclass_found(
         self, mock_build, mock_find_subclass
     ):
-        meta = XmlMeta(
-            clazz=ItemsType,
-            qname="ItemsType",
-            source_qname="ItemsType",
-            nillable=False,
-        )
-        xsi_meta = replace(meta, qname="XsiType")
+        meta = XmlMetaFactory.create(clazz=ItemsType)
+        xsi_meta = copy.deepcopy(meta)
+        xsi_meta.qname = "XsiType"
 
         mock_build.side_effect = [meta, xsi_meta]
         mock_find_subclass.return_value = xsi_meta

@@ -66,7 +66,7 @@ class XmlMetaBuilder:
         )
 
         attributes = {}
-        elements = defaultdict(list)
+        elements: Dict[str, List[XmlVar]] = defaultdict(list)
         choices = []
         any_attributes = []
         wildcards = []
@@ -193,7 +193,7 @@ class XmlVarBuilder:
     ) -> XmlVar:
         """Build the binding metadata for a dataclass field."""
         tokens = metadata.get("tokens", False)
-        xml_type = metadata.get("type")
+        xml_type = metadata.get("type", self.default_xml_type)
         local_name = metadata.get("name")
         namespace = metadata.get("namespace")
         choices = metadata.get("choices", EMPTY_SEQUENCE)
@@ -203,8 +203,6 @@ class XmlVarBuilder:
         sequential = metadata.get("sequential", False)
 
         origin, sub_origin, types = self.analyze_types(type_hint, globalns)
-        is_class = self.is_class(types)
-        xml_type = self.build_xml_type(xml_type, is_class)
 
         if not self.is_valid(xml_type, origin, sub_origin, types, tokens, init):
             raise XmlContextError(
@@ -236,7 +234,6 @@ class XmlVarBuilder:
             tokens=tokens,
             any_type=any_type,
             nillable=nillable,
-            dataclass=is_class,
             sequential=sequential,
             list_element=element_list,
             default=default_value,
@@ -244,20 +241,9 @@ class XmlVarBuilder:
             elements=elements,
             wildcards=wildcards,
             namespaces=namespaces,
+            xml_type=xml_type,
+            derived=False,
         )
-
-        if xml_type == XmlType.ELEMENT:
-            var.is_element = True
-        elif xml_type == XmlType.ELEMENTS:
-            var.is_elements = True
-        elif xml_type == XmlType.ATTRIBUTE:
-            var.is_attribute = True
-        elif xml_type == XmlType.ATTRIBUTES:
-            var.is_attributes = True
-        elif xml_type == XmlType.WILDCARD:
-            var.is_wildcard = True
-        else:
-            var.is_text = True
 
         return var
 
@@ -303,19 +289,6 @@ class XmlVarBuilder:
             return self.element_name_generator(name)
 
         return local_name
-
-    def build_xml_type(self, xml_type: Optional[str], is_class: bool) -> str:
-        """Build the xml type if it's not set based on the default type for the
-        current class and the field complex/simple type."""
-        if not xml_type:
-            xml_type = XmlType.ELEMENT if is_class else self.default_xml_type
-
-        return xml_type
-
-    @classmethod
-    def is_class(cls, types: Sequence[Type]) -> bool:
-        """Return whether at least one of the types is a dataclass."""
-        return any(is_dataclass(clazz) for clazz in types)
 
     def resolve_namespaces(
         self,

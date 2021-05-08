@@ -1,16 +1,15 @@
+import abc
 import copy
 import importlib
 import random
 import unittest
-from abc import ABC
-from abc import abstractmethod
 from typing import Any
 from typing import Dict
 from typing import List
 from typing import Optional
+from typing import Sequence
 from typing import Type
 from typing import TypeVar
-from typing import Union
 
 from xsdata.codegen.models import Attr
 from xsdata.codegen.models import AttrType
@@ -19,13 +18,15 @@ from xsdata.codegen.models import Extension
 from xsdata.codegen.models import Import
 from xsdata.codegen.models import Restrictions
 from xsdata.codegen.models import Status
+from xsdata.formats.dataclass.models.elements import XmlMeta
+from xsdata.formats.dataclass.models.elements import XmlType
+from xsdata.formats.dataclass.models.elements import XmlVar
 from xsdata.models.enums import DataType
 from xsdata.models.enums import Namespace
 from xsdata.models.enums import Tag
 from xsdata.utils.namespaces import build_qname
 
 T = TypeVar("T")
-
 
 DEFAULT_NS_MAP = {
     Namespace.XS.prefix: Namespace.XS.uri,
@@ -58,15 +59,17 @@ class FactoryTestCase(unittest.TestCase):
         AttrTypeFactory.reset()
         ExtensionFactory.reset()
         PackageFactory.reset()
+        XmlVarFactory.reset()
+        XmlMetaFactory.reset()
 
 
-class Factory(ABC):
+class Factory(abc.ABC):
     counter = 0
     model: Type
 
     @classmethod
-    @abstractmethod
-    def create(cls, **kwargs: Any) -> Union[Attr, AttrType, Class, Extension, Import]:
+    @abc.abstractmethod
+    def create(cls, **kwargs: Any) -> Any:
         """Abstract method create."""
 
     @classmethod
@@ -317,5 +320,121 @@ class PackageFactory(Factory):
         alias: Optional[str] = None,
         **kwargs: Any,
     ) -> Import:
-
         return Import(name=name, source=source, alias=alias)
+
+
+class XmlVarFactory(Factory):
+    counter = 65
+
+    @classmethod
+    def create(
+        cls,
+        name: Optional[str] = None,
+        qname: Optional[str] = None,
+        index: int = 0,
+        types: Optional[Sequence[Type]] = None,
+        init: bool = True,
+        mixed: bool = False,
+        tokens: bool = False,
+        format: Optional[str] = None,
+        derived: bool = False,
+        any_type: bool = False,
+        nillable: bool = False,
+        sequential: bool = False,
+        list_element: bool = False,
+        default: Any = None,
+        xml_type: str = XmlType.ELEMENT,
+        namespaces: Optional[Sequence[str]] = None,
+        elements: Optional[Dict[str, XmlVar]] = None,
+        wildcards: Optional[Sequence[XmlVar]] = None,
+        **kwargs: Any,
+    ) -> XmlVar:
+
+        name = name or f"field_{cls.next_letter()}"
+
+        if qname is None:
+            qname = name
+
+        if types is None:
+            types = ()
+        if namespaces is None:
+            namespaces = ()
+        if elements is None:
+            elements = {}
+        if wildcards is None:
+            wildcards = []
+
+        return XmlVar(
+            index=index,
+            name=name,
+            qname=qname,
+            types=types,
+            init=init,
+            mixed=mixed,
+            tokens=tokens,
+            format=format,
+            derived=derived,
+            any_type=any_type,
+            nillable=nillable,
+            sequential=sequential,
+            list_element=list_element,
+            default=default,
+            xml_type=xml_type,
+            namespaces=namespaces,
+            elements=elements,
+            wildcards=wildcards,
+        )
+
+
+class XmlMetaFactory(Factory):
+    counter = 65
+
+    @classmethod
+    def create(  # type: ignore
+        cls,
+        clazz: Type,
+        qname: Optional[str] = None,
+        source_qname: Optional[str] = None,
+        nillable: bool = False,
+        text: Optional[XmlVar] = None,
+        choices: Optional[Sequence[XmlVar]] = None,
+        elements: Optional[Dict[str, Sequence[XmlVar]]] = None,
+        wildcards: Optional[Sequence[XmlVar]] = None,
+        attributes: Optional[Dict[str, XmlVar]] = None,
+        any_attributes: Optional[Sequence[XmlVar]] = None,
+        **kwargs: Any,
+    ) -> XmlMeta:
+
+        if qname is None:
+            qname = clazz.__name__
+
+        if source_qname is None:
+            source_qname = qname
+
+        if choices is None:
+            choices = []
+
+        if elements is None:
+            elements = {}
+
+        if wildcards is None:
+            wildcards = []
+
+        if any_attributes is None:
+            any_attributes = []
+
+        if attributes is None:
+            attributes = {}
+
+        return XmlMeta(
+            clazz=clazz,
+            qname=qname,
+            source_qname=source_qname,
+            nillable=nillable,
+            text=text,
+            choices=choices,
+            elements=elements,
+            wildcards=wildcards,
+            attributes=attributes,
+            any_attributes=any_attributes,
+        )

@@ -2,14 +2,16 @@ from unittest import mock
 from unittest.case import TestCase
 
 from tests.fixtures.books import Books
-from xsdata.formats.dataclass.models.elements import XmlVar
+from xsdata.formats.dataclass.models.elements import XmlType
 from xsdata.formats.dataclass.parsers.nodes import PrimitiveNode
 from xsdata.formats.dataclass.parsers.nodes import SkipNode
 from xsdata.formats.dataclass.parsers.xml import UserXmlParser
 from xsdata.models.enums import EventType
+from xsdata.utils.testing import FactoryTestCase
+from xsdata.utils.testing import XmlVarFactory
 
 
-class UserXmlParserTests(TestCase):
+class UserXmlParserTests(FactoryTestCase):
     def setUp(self):
         super().setUp()
         self.parser = UserXmlParser()
@@ -31,7 +33,7 @@ class UserXmlParserTests(TestCase):
     def test_end(self, mock_emit_event):
         objects = []
         queue = []
-        var = XmlVar(is_text=True, name="foo", qname="foo", types=(bool,))
+        var = XmlVarFactory.create(xml_type=XmlType.TEXT, name="foo", types=(bool,))
         queue.append(PrimitiveNode(var, {}))
 
         result = self.parser.end(queue, objects, "enabled", "true", None)

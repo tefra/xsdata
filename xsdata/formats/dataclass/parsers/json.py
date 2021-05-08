@@ -122,7 +122,7 @@ class JsonParser(AbstractParser):
         """Recursively build the given model from the input dict data."""
         params = {}
         for var in self.context.build(clazz).get_all_vars():
-            value = data.get(var.lname)
+            value = data.get(var.local_name)
 
             if value is None or not var.init:
                 continue
@@ -204,7 +204,7 @@ class JsonParser(AbstractParser):
         # Sometimes exact type match doesn't work, eg Decimals, try all of them
         is_list = isinstance(value, list)
         for choice in var.elements.values():
-            if choice.dataclass or choice.tokens != is_list:
+            if choice.clazz or choice.tokens != is_list:
                 continue
 
             with warnings.catch_warnings(record=True) as w:
@@ -238,7 +238,7 @@ class JsonParser(AbstractParser):
         for choice in var.elements.values():
             if choice.clazz:
                 meta = self.context.build(choice.clazz)
-                attrs = {var.lname for var in meta.get_all_vars()}
+                attrs = {var.local_name for var in meta.get_all_vars()}
                 if attrs == keys:
                     return self.bind_value(choice, value)
 

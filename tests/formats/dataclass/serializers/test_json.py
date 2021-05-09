@@ -7,6 +7,7 @@ from xsdata.exceptions import XmlContextError
 from xsdata.formats.dataclass.serializers.json import DictFactory
 from xsdata.formats.dataclass.serializers.json import JsonSerializer
 from xsdata.models.datatype import XmlDate
+from xsdata.models.xsd import Attribute
 
 
 class JsonSerializerTests(TestCase):
@@ -70,3 +71,10 @@ class JsonSerializerTests(TestCase):
         serializer = JsonSerializer(dict_factory=DictFactory.FILTER_NONE)
         actual = serializer.render(self.books.book)
         self.assertEqual(self.expected["book"], json.loads(actual))
+
+    def test_render_with_enum(self):
+        obj = Attribute()
+        serializer = JsonSerializer(dict_factory=DictFactory.FILTER_NONE)
+        actual = json.loads(serializer.render(obj))
+
+        self.assertEqual("optional", actual["use"])

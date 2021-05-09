@@ -8,6 +8,7 @@ from xsdata.codegen.models import Restrictions
 from xsdata.models.enums import DataType
 from xsdata.models.enums import FormType
 from xsdata.models.enums import Tag
+from xsdata.models.enums import UseType
 from xsdata.models.xsd import Alternative
 from xsdata.models.xsd import Annotation
 from xsdata.models.xsd import Attribute
@@ -305,6 +306,12 @@ class SchemaMapperTests(FactoryTestCase):
         self.assertEqual({"bar": "foo", "foo": "bar"}, item.ns_map)
         mock_build_class_attribute_types.assert_called_once_with(item, attribute)
         mock_element_namespace.assert_called_once_with(attribute, item.target_namespace)
+
+    def test_build_class_attribute_skip_prohibited(self):
+        item = ClassFactory.create(ns_map={"bar": "foo"})
+        attribute = Attribute(default="false", use=UseType.PROHIBITED)
+        SchemaMapper.build_class_attribute(item, attribute, Restrictions())
+        self.assertEqual(0, len(item.attrs))
 
     @mock.patch.object(Attribute, "attr_types", new_callable=mock.PropertyMock)
     @mock.patch.object(SchemaMapper, "build_inner_classes")

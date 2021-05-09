@@ -1,12 +1,11 @@
 import copy
 from dataclasses import fields
 from dataclasses import make_dataclass
-from dataclasses import replace
 from unittest import mock
 
+from tests.fixtures.artists import Artist
 from tests.fixtures.books import BookForm
 from tests.fixtures.books import BooksForm
-from tests.fixtures.defxmlschema.chapter13 import ItemsType
 from xsdata.formats.dataclass.context import XmlContext
 from xsdata.models.enums import DataType
 from xsdata.utils.testing import FactoryTestCase
@@ -21,12 +20,12 @@ class XmlContextTests(FactoryTestCase):
     @mock.patch.object(XmlContext, "find_subclass")
     @mock.patch.object(XmlContext, "build")
     def test_fetch(self, mock_build, mock_find_subclass):
-        meta = XmlMetaFactory.create(clazz=ItemsType, qname="ItemsType")
+        meta = XmlMetaFactory.create(clazz=Artist, qname="Artist")
         mock_build.return_value = meta
-        actual = self.ctx.fetch(ItemsType, "foo")
+        actual = self.ctx.fetch(Artist, "foo")
         self.assertEqual(meta, actual)
         self.assertEqual(0, mock_find_subclass.call_count)
-        mock_build.assert_called_once_with(ItemsType, "foo")
+        mock_build.assert_called_once_with(Artist, "foo")
 
     @mock.patch.object(XmlContext, "find_subclass")
     @mock.patch.object(XmlContext, "build")
@@ -34,32 +33,32 @@ class XmlContextTests(FactoryTestCase):
         self, mock_build, mock_find_subclass
     ):
         meta = XmlMetaFactory.create(
-            clazz=ItemsType,
-            qname="ItemsType",
-            source_qname="ItemsType",
+            clazz=Artist,
+            qname="Artist",
+            source_qname="Artist",
             nillable=False,
         )
 
         mock_build.return_value = meta
         mock_find_subclass.return_value = None
-        actual = self.ctx.fetch(ItemsType, xsi_type="foo")
+        actual = self.ctx.fetch(Artist, xsi_type="foo")
         self.assertEqual(meta, actual)
-        mock_find_subclass.assert_called_once_with(ItemsType, "foo")
+        mock_find_subclass.assert_called_once_with(Artist, "foo")
 
     @mock.patch.object(XmlContext, "find_subclass")
     @mock.patch.object(XmlContext, "build")
     def test_fetch_with_xsi_type_and_subclass_found(
         self, mock_build, mock_find_subclass
     ):
-        meta = XmlMetaFactory.create(clazz=ItemsType)
+        meta = XmlMetaFactory.create(clazz=Artist)
         xsi_meta = copy.deepcopy(meta)
         xsi_meta.qname = "XsiType"
 
         mock_build.side_effect = [meta, xsi_meta]
         mock_find_subclass.return_value = xsi_meta
-        actual = self.ctx.fetch(ItemsType, xsi_type="foo")
+        actual = self.ctx.fetch(Artist, xsi_type="foo")
         self.assertEqual(xsi_meta, actual)
-        mock_find_subclass.assert_called_once_with(ItemsType, "foo")
+        mock_find_subclass.assert_called_once_with(Artist, "foo")
 
     def test_find(self):
         self.assertIsNone(self.ctx.find_type(str(DataType.FLOAT)))

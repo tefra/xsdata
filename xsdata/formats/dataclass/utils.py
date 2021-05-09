@@ -45,6 +45,7 @@ stop_words = [
     "dict",
     "field",
     "decimal",
+    "self",
 ]
 
 

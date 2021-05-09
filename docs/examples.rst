@@ -20,5 +20,5 @@ Test Suites
 .. toctree::
     :maxdepth: 1
 
-    examples/defxmlschema
+    examples/samples
     examples/w3c-suite

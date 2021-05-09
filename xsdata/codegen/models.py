@@ -75,7 +75,7 @@ class Restrictions:
     pattern: Optional[str] = field(default=None)
     explicit_timezone: Optional[str] = field(default=None)
     nillable: Optional[bool] = field(default=None)
-    sequential: Optional[bool] = field(default=None)
+    sequential: Optional[bool] = field(default=None, compare=False)
     tokens: Optional[bool] = field(default=None)
     format: Optional[str] = field(default=None)
     choice: Optional[str] = field(default=None, compare=False)

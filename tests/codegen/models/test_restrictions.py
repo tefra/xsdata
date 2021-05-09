@@ -121,3 +121,18 @@ class RestrictionsTests(TestCase):
 
         self.assertEqual(clone, restrictions)
         self.assertIsNot(clone, restrictions)
+
+    def test_compare(self):
+        clone = self.restrictions.clone()
+        self.assertEqual(clone, self.restrictions)
+
+        clone.min_occurs = 54
+        clone.max_occurs = 56
+        self.assertEqual(clone, self.restrictions)
+
+        clone.choice = 145
+        clone.sequential = True
+        self.assertEqual(clone, self.restrictions)
+
+        clone.max_length = 11
+        self.assertNotEqual(clone, self.restrictions)

@@ -7,7 +7,7 @@ from tests.fixtures.series.series import (
     Previousepisode,
     Rating,
     Schedule,
-    Self,
+    SelfType,
     Series,
 )
 
@@ -20,6 +20,6 @@ __all__ = [
     "Previousepisode",
     "Rating",
     "Schedule",
-    "Self",
+    "SelfType",
     "Series",
 ]

@@ -266,12 +266,12 @@ class ClassExtensionHandler(HandlerInterface):
     def get_or_create_attribute(cls, target: Class, name: str, tag: str) -> Attr:
         """Find or create for the given parameters an attribute in the target
         class."""
-        for attr in target.attrs:
-            if attr.name == name:
-                return attr
 
-        attr = Attr(name=name, tag=tag)
-        attr.restrictions.min_occurs = 1
-        attr.restrictions.max_occurs = 1
-        target.attrs.insert(0, attr)
+        attr = ClassUtils.find_attr(target, name)
+        if attr is None:
+            attr = Attr(name=name, tag=tag)
+            attr.restrictions.min_occurs = 1
+            attr.restrictions.max_occurs = 1
+            target.attrs.insert(0, attr)
+
         return attr

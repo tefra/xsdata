@@ -216,5 +216,5 @@ class CliTests(TestCase):
         self.assertEqual([url], list(resolve_source(url)))
         self.assertEqual(5, len(list(resolve_source(str(hello_path)))))
 
-        def_xml_path = fixtures_dir.joinpath("defxmlschema")
-        self.assertEqual(55, len(list(resolve_source(str(def_xml_path)))))
+        def_xml_path = fixtures_dir.joinpath("calculator")
+        self.assertEqual(3, len(list(resolve_source(str(def_xml_path)))))

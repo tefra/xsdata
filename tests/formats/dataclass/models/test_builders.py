@@ -13,10 +13,9 @@ from typing import Union
 from unittest import mock
 from unittest import TestCase
 
+from tests.fixtures.artists import Artist
 from tests.fixtures.books import BookForm
-from tests.fixtures.defxmlschema.chapter03prod import Product
-from tests.fixtures.defxmlschema.chapter05prod import ProductType
-from tests.fixtures.defxmlschema.chapter13 import ItemsType
+from tests.fixtures.series import Country
 from xsdata.exceptions import XmlContextError
 from xsdata.formats.dataclass.models.builders import XmlMetaBuilder
 from xsdata.formats.dataclass.models.builders import XmlVarBuilder
@@ -39,45 +38,34 @@ class XmlMetaBuilderTests(FactoryTestCase):
         )
         mock_build_vars.return_value = [var]
 
-        result = XmlMetaBuilder.build(ItemsType, None, return_input, return_input)
+        result = XmlMetaBuilder.build(Artist, None, return_input, return_input)
         expected = XmlMetaFactory.create(
-            clazz=ItemsType,
-            qname="ItemsType",
+            clazz=Artist,
+            qname="{http://musicbrainz.org/ns/mmd-2.0#}artist",
             elements={var.qname: [var]},
         )
 
         self.assertEqual(expected, result)
         mock_build_vars.assert_called_once_with(
-            ItemsType, None, return_input, return_input
-        )
-
-    @mock.patch.object(XmlMetaBuilder, "build_vars", return_value=[])
-    def test_build_when_class_has_namespace(self, mock_build_vars):
-        namespace = Product.Meta.namespace
-        result = XmlMetaBuilder.build(Product, None, return_input, return_input)
-
-        self.assertEqual(build_qname(namespace, "product"), result.qname)
-        self.assertEqual(build_qname(namespace, "product"), result.source_qname)
-        mock_build_vars.assert_called_once_with(
-            Product, namespace, return_input, return_input
+            Artist, "http://musicbrainz.org/ns/mmd-2.0#", return_input, return_input
         )
 
     @mock.patch.object(XmlMetaBuilder, "build_vars", return_value=[])
     def test_build_with_parent_namespace(self, mock_build_vars):
         result = XmlMetaBuilder.build(
-            ProductType, "http://xsdata", return_input, return_input
+            Country, "http://xsdata", return_input, return_input
         )
 
-        self.assertEqual(build_qname("http://xsdata", "ProductType"), result.qname)
+        self.assertEqual(build_qname("http://xsdata", "country"), result.qname)
         mock_build_vars.assert_called_once_with(
-            ProductType, "http://xsdata", return_input, return_input
+            Country, "http://xsdata", return_input, return_input
         )
 
     @mock.patch.object(XmlMetaBuilder, "build_vars", return_value=[])
     def test_build_with_no_meta_name_and_name_generator(self, *args):
-        result = XmlMetaBuilder.build(ProductType, None, text.snake_case, return_input)
+        result = XmlMetaBuilder.build(BookForm, None, text.snake_case, return_input)
 
-        self.assertEqual("product_type", result.qname)
+        self.assertEqual("book_form", result.qname)
 
     def test_build_block_meta_inheritance(self):
         @dataclass

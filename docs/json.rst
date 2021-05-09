@@ -11,9 +11,9 @@ types doing roundtrip conversions is not always possible.
     from pathlib import Path
     from xsdata.formats.dataclass.context import XmlContext
     from xsdata.formats.dataclass.parsers import JsonParser
+    from xsdata.models.datatype import XmlDate
     from tests import fixtures_dir
-    from tests.fixtures.defxmlschema.chapter05 import Order, ItemsType
-    from tests.fixtures.defxmlschema.chapter05prod import Product, SizeType
+    from tests.fixtures.books.books import Books
 
 
 Parsing JSON
@@ -28,14 +28,14 @@ From json filename
     >>> from pathlib import Path
     >>> from xsdata.formats.dataclass.context import XmlContext
     >>> from xsdata.formats.dataclass.parsers import JsonParser
+    >>> from tests.fixtures.books.books import Books
     >>> from tests import fixtures_dir # pathlib.Path
-    >>> from tests.fixtures.defxmlschema.chapter05 import Order
     ...
-    >>> filename = str(fixtures_dir.joinpath("defxmlschema/chapter05.json"))
+    >>> filename = str(fixtures_dir.joinpath("books/books.json"))
     >>> parser = JsonParser(context=XmlContext())
-    >>> order = parser.parse(filename, Order)
-    >>> order.items.product[0]
-    Product(number=557, name='Short-Sleeved Linen Blouse', size=SizeType(value=None, system=None))
+    >>> books = parser.parse(filename, Books)
+    >>> books.book[0]
+    BookForm(author='Hightower, Kim', title='The First Book', genre='Fiction', price=44.95, pub_date=XmlDate(2000, 10, 1), review='An amazing story of nothing.', id='bk001', lang='en')
 
 
 From json file object
@@ -43,11 +43,11 @@ From json file object
 
 .. doctest::
 
-    >>> json_path = fixtures_dir.joinpath("defxmlschema/chapter05.json")
+    >>> json_path = fixtures_dir.joinpath("books/books.json")
     >>> with json_path.open("rb") as fp:
-    ...     order = parser.parse(fp, Order)
-    >>> order.items.product[0]
-    Product(number=557, name='Short-Sleeved Linen Blouse', size=SizeType(value=None, system=None))
+    ...     order = parser.parse(fp, Books)
+    >>> books.book[0]
+    BookForm(author='Hightower, Kim', title='The First Book', genre='Fiction', price=44.95, pub_date=XmlDate(2000, 10, 1), review='An amazing story of nothing.', id='bk001', lang='en')
 
 
 From json stream
@@ -56,9 +56,9 @@ From json stream
 .. doctest::
 
     >>> import io
-    >>> order = parser.parse(io.BytesIO(json_path.read_bytes()), Order)
-    >>> order.items.product[0]
-    Product(number=557, name='Short-Sleeved Linen Blouse', size=SizeType(value=None, system=None))
+    >>> order = parser.parse(io.BytesIO(json_path.read_bytes()), Books)
+    >>> books.book[0]
+    BookForm(author='Hightower, Kim', title='The First Book', genre='Fiction', price=44.95, pub_date=XmlDate(2000, 10, 1), review='An amazing story of nothing.', id='bk001', lang='en')
 
 
 From json string
@@ -66,9 +66,9 @@ From json string
 
 .. doctest::
 
-    >>> order = parser.from_string(json_path.read_text(), Order)
-    >>> order.items.product[0]
-    Product(number=557, name='Short-Sleeved Linen Blouse', size=SizeType(value=None, system=None))
+    >>> order = parser.from_string(json_path.read_text(), Books)
+    >>> books.book[0]
+    BookForm(author='Hightower, Kim', title='The First Book', genre='Fiction', price=44.95, pub_date=XmlDate(2000, 10, 1), review='An amazing story of nothing.', id='bk001', lang='en')
 
 
 From json bytes
@@ -76,9 +76,9 @@ From json bytes
 
 .. doctest::
 
-    >>> order = parser.from_bytes(json_path.read_bytes(), Order)
-    >>> order.items.product[0]
-    Product(number=557, name='Short-Sleeved Linen Blouse', size=SizeType(value=None, system=None))
+    >>> order = parser.from_bytes(json_path.read_bytes(), Books)
+    >>> books.book[0]
+    BookForm(author='Hightower, Kim', title='The First Book', genre='Fiction', price=44.95, pub_date=XmlDate(2000, 10, 1), review='An amazing story of nothing.', id='bk001', lang='en')
 
 
 From json path
@@ -86,9 +86,9 @@ From json path
 
 .. doctest::
 
-    >>> order = parser.from_path(json_path, Order)
-    >>> order.items.product[0]
-    Product(number=557, name='Short-Sleeved Linen Blouse', size=SizeType(value=None, system=None))
+    >>> order = parser.from_path(json_path, Books)
+    >>> books.book[0]
+    BookForm(author='Hightower, Kim', title='The First Book', genre='Fiction', price=44.95, pub_date=XmlDate(2000, 10, 1), review='An amazing story of nothing.', id='bk001', lang='en')
 
 
 Unknown json target type
@@ -173,35 +173,54 @@ Render json string
 
     >>> from xsdata.formats.dataclass.context import XmlContext
     >>> from xsdata.formats.dataclass.serializers import JsonSerializer
-    >>> from tests.fixtures.defxmlschema.chapter05 import Order, ItemsType
-    >>> from tests.fixtures.defxmlschema.chapter05prod import Product, SizeType
-    >>> order = Order(
-    ...     items=ItemsType(
-    ...         product=[
-    ...             Product(
-    ...                 number=557,
-    ...                 name='Short-Sleeved Linen Blouse',
-    ...                 size=SizeType(value=None, system=None)
-    ...             )
-    ...         ]
-    ...     )
+    >>> from xsdata.models.datatype import XmlDate
+    >>> books = Books(
+    ...    book=[
+    ...        BookForm(
+    ...            id="bk001",
+    ...            author="Hightower, Kim",
+    ...            title="The First Book",
+    ...            genre="Fiction",
+    ...            price=44.95,
+    ...            review="An amazing story of nothing.",
+    ...        ),
+    ...        BookForm(
+    ...            id="bk002",
+    ...            author="Nagata, Suanne",
+    ...            title="Becoming Somebody",
+    ...            price=33.95,
+    ...            pub_date=XmlDate(2001, 1, 10),
+    ...            review="A masterpiece of the fine art of gossiping.",
+    ...        ),
+    ...    ]
     ... )
     >>> serializer = JsonSerializer(context=XmlContext(), indent=2)
-    >>> print(serializer.render(order))
+    >>> print(serializer.render(books))
     {
-      "items": {
-        "product": [
-          {
-            "number": 557,
-            "name": "Short-Sleeved Linen Blouse",
-            "size": {
-              "value": null,
-              "system": null
-            }
-          }
-        ]
-      }
+      "book": [
+        {
+          "author": "Hightower, Kim",
+          "title": "The First Book",
+          "genre": "Fiction",
+          "price": 44.95,
+          "pub_date": null,
+          "review": "An amazing story of nothing.",
+          "id": "bk001",
+          "lang": "en"
+        },
+        {
+          "author": "Nagata, Suanne",
+          "title": "Becoming Somebody",
+          "genre": null,
+          "price": 33.95,
+          "pub_date": "2001-01-10",
+          "review": "A masterpiece of the fine art of gossiping.",
+          "id": "bk002",
+          "lang": "en"
+        }
+      ]
     }
+
 
 
 Write to json stream
@@ -217,18 +236,28 @@ Write to json stream
     ...
     >>> print(path.read_text())
     {
-      "items": {
-        "product": [
-          {
-            "number": 557,
-            "name": "Short-Sleeved Linen Blouse",
-            "size": {
-              "value": null,
-              "system": null
-            }
-          }
-        ]
-      }
+      "book": [
+        {
+          "author": "Hightower, Kim",
+          "title": "The First Book",
+          "genre": "Fiction",
+          "price": 44.95,
+          "pub_date": "2000-10-01",
+          "review": "An amazing story of nothing.",
+          "id": "bk001",
+          "lang": "en"
+        },
+        {
+          "author": "Nagata, Suanne",
+          "title": "Becoming Somebody",
+          "genre": "Biography",
+          "price": null,
+          "pub_date": null,
+          "review": "A masterpiece of the fine art of gossiping.",
+          "id": "bk002",
+          "lang": "en"
+        }
+      ]
     }
     >>> path.unlink()
 
@@ -246,19 +275,18 @@ By using a custom dict factory you can change the output behaviour, like filter 
     >>> def filter_none(x: Tuple) -> Dict:
     ...     return {k: v for k, v in x if v is not None}
     >>>
-    >>> order.items.product[0].size = None
+    >>> books.book[0].genre = None
     >>> serializer = JsonSerializer(dict_factory=filter_none, indent=2)
-    >>> print(serializer.render(order))
+    >>> print(serializer.render(books.book[0]))
     {
-      "items": {
-        "product": [
-          {
-            "number": 557,
-            "name": "Short-Sleeved Linen Blouse"
-          }
-        ]
-      }
+      "author": "Hightower, Kim",
+      "title": "The First Book",
+      "price": 44.95,
+      "review": "An amazing story of nothing.",
+      "id": "bk001",
+      "lang": "en"
     }
+
 
 or conveniently
 
@@ -267,8 +295,8 @@ or conveniently
     >>> from xsdata.formats.dataclass.serializers.json import DictFactory
     >>>
     >>> serializer = JsonSerializer(dict_factory=DictFactory.FILTER_NONE)
-    >>> print(serializer.render(order))
-    {"items": {"product": [{"number": 557, "name": "Short-Sleeved Linen Blouse"}]}}
+    >>> print(serializer.render(books.book[1]))
+    {"author": "Nagata, Suanne", "title": "Becoming Somebody", "price": 33.95, "pub_date": "2001-01-10", "review": "A masterpiece of the fine art of gossiping.", "id": "bk002", "lang": "en"}
 
 
 Custom json dump factory

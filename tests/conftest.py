@@ -13,10 +13,11 @@ from xsdata.formats.dataclass.serializers.config import SerializerConfig
 def validate_bindings(schema: Path, clazz: Type):
     __tracebackhide__ = True
 
-    obj = XmlParser().from_path(schema.with_suffix(".xml"), clazz)
+    sample = schema.parent.joinpath("sample.xml")
+    obj = XmlParser().from_path(sample, clazz)
     actual = JsonSerializer(indent=4).render(obj)
 
-    expected = schema.with_suffix(".json")
+    expected = sample.with_suffix(".json")
     if expected.exists():
         assert expected.read_text() == actual
         assert obj == JsonParser().from_string(actual, clazz)

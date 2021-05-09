@@ -1,0 +1,20 @@
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <xsd:element name="root">
+    <xsd:complexType>
+      <xsd:choice maxOccurs="unbounded">
+        <xsd:element ref="alpha" />
+        <xsd:element ref="bravo" />
+      </xsd:choice>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="alpha">
+    <xsd:complexType>
+      <xsd:attribute name="a" type="xsd:boolean" fixed="true" />
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="bravo">
+    <xsd:complexType>
+      <xsd:attribute name="b" type="xsd:boolean" fixed="true" />
+    </xsd:complexType>
+  </xsd:element>
+</xsd:schema>

@@ -118,11 +118,7 @@ class ClassValidator:
     def find_circular_group(cls, target: Class) -> Optional[Attr]:
         """Search for any target class attributes that is a circular
         reference."""
-        for attr in target.attrs:
-            if attr.name == target.name:
-                return attr
-
-        return None
+        return ClassUtils.find_attr(target, target.name)
 
     @classmethod
     def merge_global_types(cls, classes: List[Class]):

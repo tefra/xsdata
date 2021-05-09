@@ -1,11 +1,12 @@
+from dataclasses import dataclass
 from dataclasses import field
 from dataclasses import make_dataclass
 from typing import Any
+from typing import Dict
 from unittest import mock
 
+from tests.fixtures.artists import Gender
 from tests.fixtures.books import Books
-from tests.fixtures.defxmlschema.chapter12 import ProductType
-from tests.fixtures.defxmlschema.chapter12 import SizeType
 from xsdata.formats.converter import ConverterFactory
 from xsdata.formats.dataclass.context import XmlContext
 from xsdata.formats.dataclass.models.elements import XmlMeta
@@ -166,27 +167,27 @@ class ParserUtilsTests(FactoryTestCase):
     def test_bind_attrs(self, mock_parse_value, mock_parse_any_attribute):
         mock_parse_value.return_value = "2020-03-02"
         mock_parse_any_attribute.return_value = "foobar"
-        metadata = self.ctx.build(ProductType)
-        eff_date = metadata.find_attribute("effDate")
+        metadata = self.ctx.build(Attributes)
+        attr = metadata.find_attribute("simple")
 
         params = {}
         ns_map = {}
-        attrs = {"effDate": "2020-03-01", "foo": "bar"}
+        attrs = {"simple": "2020-03-01", "foo": "bar"}
 
         ParserUtils.bind_attrs(params, metadata, attrs, ns_map)
         expected = {
-            "eff_date": "2020-03-02",
-            "other_attributes": {"foo": "foobar"},
+            "simple": "2020-03-02",
+            "any_attributes": {"foo": "foobar"},
         }
         self.assertEqual(expected, params)
         mock_parse_any_attribute.assert_called_once_with("bar", ns_map)
         mock_parse_value.assert_called_once_with(
             "2020-03-01",
-            eff_date.types,
-            eff_date.default,
+            attr.types,
+            attr.default,
             ns_map,
-            eff_date.tokens,
-            eff_date.format,
+            attr.tokens,
+            attr.format,
         )
 
     def test_parse_any_attributes(self):
@@ -210,34 +211,31 @@ class ParserUtilsTests(FactoryTestCase):
         self.assertEqual("http://www.com", value)
 
     def test_bind_attrs_doesnt_overwrite_values(self):
-        metadata = self.ctx.build(ProductType)
-        params = dict(eff_date="foo")
-        attrs = {"effDate": "2020-03-01", "bar": "foo"}
+        metadata = self.ctx.build(Attributes)
+        params = {"simple": "exists"}
+        attrs = {"simple": "new", "a": "b"}
         ns_map = {}
 
         ParserUtils.bind_attrs(params, metadata, attrs, ns_map)
 
-        expected = {
-            "eff_date": "foo",
-            "other_attributes": {"effDate": "2020-03-01", "bar": "foo"},
-        }
+        expected = {"any_attributes": {"a": "b", "simple": "new"}, "simple": "exists"}
         self.assertEqual(expected, params)
 
     def test_bind_attrs_ignore_init_false_vars(self):
-        metadata = self.ctx.build(ProductType)
-        eff_date = metadata.find_attribute("effDate")
-        eff_date.init = False
+        metadata = self.ctx.build(Attributes)
+        simple = metadata.find_attribute("simple")
+        simple.init = False
 
-        metadata.attributes[eff_date.qname] = eff_date
+        metadata.attributes[simple.qname] = simple
         params = {}
-        attrs = {"effDate": "2020-03-01"}
+        attrs = {"simple": "2020-03-01"}
 
         ParserUtils.bind_attrs(params, metadata, attrs, {})
         self.assertEqual({}, params)
 
     @mock.patch.object(XmlMeta, "find_attribute")
     def test_bind_attrs_skip_empty_attrs(self, mock_find_attribute):
-        metadata = self.ctx.build(ProductType)
+        metadata = self.ctx.build(Attributes)
 
         params = {}
         ParserUtils.bind_attrs(params, metadata, {}, {})
@@ -245,15 +243,15 @@ class ParserUtilsTests(FactoryTestCase):
         self.assertEqual(0, mock_find_attribute.call_count)
 
     def test_bind_unknown_attrs(self):
-        metadata = self.ctx.build(SizeType)
+        metadata = self.ctx.build(Attributes)
         params = {}
         ParserUtils.bind_attrs(params, metadata, {"a": "b"}, {})
 
-        self.assertEqual({}, params)
+        self.assertEqual({"any_attributes": {"a": "b"}}, params)
 
     @mock.patch.object(ParserUtils, "parse_value", return_value="yes!")
     def test_bind_content(self, mock_parse_value):
-        metadata = self.ctx.build(SizeType)
+        metadata = self.ctx.build(Gender)
         var = metadata.text
         params = {}
         ns_map = {"a": "b"}
@@ -408,3 +406,10 @@ class ParserUtilsTests(FactoryTestCase):
         self.assertEqual(-1, ParserUtils.score_object(None))
         self.assertEqual(1.0, ParserUtils.score_object("a"))
         self.assertEqual(1.5, ParserUtils.score_object(2.9))
+
+
+@dataclass
+class Attributes:
+
+    simple: str = field(metadata={"type": "Attribute"})
+    any_attributes: Dict[str, str] = field(metadata={"type": "Attributes"})

@@ -43,7 +43,7 @@ From xml filename
     >>> from tests import fixtures_dir # pathlib.Path
     >>> from tests.fixtures.primer import PurchaseOrder, Usaddress
     ...
-    >>> filename = str(fixtures_dir.joinpath("primer/order.xml"))
+    >>> filename = str(fixtures_dir.joinpath("primer/sample.xml"))
     >>> parser = XmlParser(context=XmlContext())
     >>> order = parser.parse(filename, PurchaseOrder)
     >>> order.bill_to
@@ -55,7 +55,7 @@ From xml file object
 
 .. doctest::
 
-    >>> xml_path = fixtures_dir.joinpath("primer/order.xml")
+    >>> xml_path = fixtures_dir.joinpath("primer/sample.xml")
     >>> with xml_path.open("rb") as fp:
     ...     order = parser.parse(fp, PurchaseOrder)
     >>> order.bill_to.street

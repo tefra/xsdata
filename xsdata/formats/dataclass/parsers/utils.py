@@ -89,7 +89,7 @@ class ParserUtils:
         """Return a dictionary of qualified object names and their values for
         the given mixed content xml var."""
 
-        params.setdefault(var.name, [])
+        params[var.name] = []
         while len(objects) > pos:
             qname, value = objects.pop(pos)
 
@@ -109,14 +109,16 @@ class ParserUtils:
 
         :return: Whether the binding process was successful or not.
         """
-        if not var.init:
-            return True
-        if var.list_element:
-            params.setdefault(var.name, []).append(value)
-        elif var.name not in params:
-            params[var.name] = value
-        else:
-            return False
+        if var.init:
+            if var.list_element:
+                if var.name not in params:
+                    params[var.name] = []
+
+                params[var.name].append(value)
+            elif var.name not in params:
+                params[var.name] = value
+            else:
+                return False
 
         return True
 
@@ -134,7 +136,10 @@ class ParserUtils:
         value = cls.prepare_generic_value(qname, value)
 
         if var.list_element:
-            params.setdefault(var.name, []).append(value)
+            if var.name not in params:
+                params[var.name] = []
+
+            params[var.name].append(value)
         elif var.name in params:
             previous = params[var.name]
             if previous.qname:
@@ -171,7 +176,9 @@ class ParserUtils:
             return False
 
         if var.list_element:
-            params.setdefault(var.name, [])
+            if var.name not in params:
+                params[var.name] = []
+
             if txt:
                 params[var.name].insert(0, txt)
             if tail:

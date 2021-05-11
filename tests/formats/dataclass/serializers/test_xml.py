@@ -9,6 +9,7 @@ from unittest import TestCase
 from xml.etree.ElementTree import QName
 
 from tests.fixtures.books import BookForm
+from tests.fixtures.datatypes import Telephone
 from xsdata.exceptions import SerializerError
 from xsdata.exceptions import XmlContextError
 from xsdata.formats.dataclass.models.elements import XmlType
@@ -597,3 +598,8 @@ class XmlSerializerTests(TestCase):
         obj.content.append("!")
         result = self.serializer.render(obj).splitlines()
         self.assertEqual("<p>Hi <b>Mr.</b><span>chris</span>!</p>", result[1])
+
+    def test_encode_namedtuple(self):
+        var = XmlVarFactory.create(types=(Telephone,))
+        actual = XmlSerializer.encode(Telephone(30, 234, 56783), var)
+        self.assertEqual("30-234-56783", actual)

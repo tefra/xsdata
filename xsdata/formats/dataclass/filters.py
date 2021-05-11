@@ -243,7 +243,7 @@ class Filters:
         if isinstance(data, dict):
             return self.format_dict(data, indent)
 
-        if isinstance(data, (list, tuple)):
+        if isinstance(data, (list, tuple)) and not hasattr(data, "_fields"):
             return self.format_iterable(data, indent)
 
         if isinstance(data, str):

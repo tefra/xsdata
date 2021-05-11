@@ -293,13 +293,13 @@ class XmlSerializer(AbstractSerializer):
             if datatype != DataType.STRING:
                 yield XmlWriterEvent.ATTR, QNames.XSI_TYPE, QName(str(datatype))
 
-        yield XmlWriterEvent.DATA, cls.encode_value(value, var)
+        yield XmlWriterEvent.DATA, cls.encode(value, var)
         yield XmlWriterEvent.END, var.qname
 
     @classmethod
     def write_data(cls, value: Any, var: XmlVar, namespace: NoneStr) -> Generator:
         """Produce a data event for the given value."""
-        yield XmlWriterEvent.DATA, cls.encode_value(value, var)
+        yield XmlWriterEvent.DATA, cls.encode(value, var)
 
     @classmethod
     def next_value(cls, obj: Any, meta: XmlMeta):
@@ -354,7 +354,7 @@ class XmlSerializer(AbstractSerializer):
                 if value is None or isinstance(value, list) and not value:
                     continue
 
-                yield var.qname, cls.encode_value(value, var)
+                yield var.qname, cls.encode(value, var)
             else:
                 yield from getattr(obj, var.name, EMPTY_MAP).items()
 
@@ -365,7 +365,7 @@ class XmlSerializer(AbstractSerializer):
             yield QNames.XSI_NIL, "true"
 
     @classmethod
-    def encode_value(cls, value: Any, var: XmlVar) -> Any:
+    def encode(cls, value: Any, var: XmlVar) -> Any:
         """
         Encode values for xml serialization.
 
@@ -382,10 +382,13 @@ class XmlSerializer(AbstractSerializer):
         if isinstance(value, (str, QName)) or var is None:
             return value
 
+        if isinstance(value, tuple) and hasattr(value, "_fields"):
+            return converter.serialize(value, format=var.format)
+
         if isinstance(value, (tuple, list)):
-            return [cls.encode_value(v, var) for v in value]
+            return [cls.encode(v, var) for v in value]
 
         if isinstance(value, Enum):
-            return cls.encode_value(value.value, var)
+            return cls.encode(value.value, var)
 
         return converter.serialize(value, format=var.format)

@@ -8,6 +8,7 @@ from typing import Any
 from unittest import TestCase
 from xml.etree.ElementTree import QName
 
+from tests.fixtures.datatypes import Telephone
 from xsdata.exceptions import ConverterError
 from xsdata.formats.converter import Converter
 from xsdata.formats.converter import converter
@@ -332,6 +333,8 @@ class EnumA(Enum):
     E = (2.1, "a", float("nan"))
     F = (2.1, "a", 2)
     G = "x y z"
+    H = Telephone(1, 2, 3)
+    J = (Telephone(1, 2, 3), Telephone(4, 5, 6))
 
 
 class EnumConverterTests(TestCase):
@@ -346,6 +349,8 @@ class EnumConverterTests(TestCase):
         self.assertEqual(EnumA.F, convert([2.1, "a", 2], data_type=EnumA))
         self.assertEqual(EnumA.D, convert("  2.1  a ", data_type=EnumA))
         self.assertEqual(EnumA.G, convert("  x \n y z ", data_type=EnumA))
+        self.assertEqual(EnumA.H, convert("1-2-3", data_type=EnumA))
+        self.assertEqual(EnumA.J, convert(("1-2-3", "4-5-6"), data_type=EnumA))
 
         with self.assertRaises(ConverterError) as cm:
             convert(["2.1", "a", "NaN"], data_type=int)

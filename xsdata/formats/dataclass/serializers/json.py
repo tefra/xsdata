@@ -71,6 +71,9 @@ class JsonSerializer(AbstractSerializer):
                 ]
             )
 
+        if isinstance(obj, tuple) and hasattr(obj, "_fields"):
+            return converter.serialize(obj, format=var.format)
+
         if isinstance(obj, (list, tuple)):
             return type(obj)(self.convert(v, var) for v in obj)
 

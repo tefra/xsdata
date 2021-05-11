@@ -1,3 +1,4 @@
+from tests.fixtures.datatypes import Telephone
 from xsdata.codegen.models import Restrictions
 from xsdata.formats.dataclass.filters import Filters
 from xsdata.models.config import DocstringStyle
@@ -557,6 +558,7 @@ class FiltersTests(FactoryTestCase):
             text_two="fo'o",
             text_three='fo"o',
             pattern="foo",
+            custom=Telephone(30, 123, 4567),
             level_two=dict(a=1),
             list=[
                 dict(type="Type[object]"),
@@ -573,6 +575,7 @@ class FiltersTests(FactoryTestCase):
             '    "text_two": "fo\'o",\n'
             '    "text_three": "fo\\"o",\n'
             '    "pattern": r"foo",\n'
+            '    "custom": Telephone(country_code=30, area_code=123, number=4567),\n'
             '    "level_two": {\n'
             '        "a": 1,\n'
             "    },\n"

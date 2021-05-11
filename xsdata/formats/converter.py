@@ -398,7 +398,7 @@ class EnumConverter(Converter):
         if data_type is None or not isinstance(data_type, EnumMeta):
             raise ConverterError(f"'{data_type}' is not an enum")
 
-        if isinstance(value, (list, tuple)):
+        if isinstance(value, (list, tuple)) and not hasattr(value, "_fields"):
             values = value
         elif isinstance(value, str):
             value = value.strip()
@@ -421,7 +421,7 @@ class EnumConverter(Converter):
         if isinstance(value, str) and isinstance(real, str):
             return value == real or " ".join(values) == real
 
-        if isinstance(real, (tuple, list)):
+        if isinstance(real, (tuple, list)) and not hasattr(real, "_fields"):
             if len(real) == length and cls.match_list(values, real, **kwargs):
                 return True
         elif length == 1 and cls.match_atomic(value, real, **kwargs):

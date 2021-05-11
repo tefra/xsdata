@@ -3,11 +3,13 @@ from unittest.case import TestCase
 
 from tests.fixtures.books import BookForm
 from tests.fixtures.books import Books
+from tests.fixtures.datatypes import Telephone
 from xsdata.exceptions import XmlContextError
 from xsdata.formats.dataclass.serializers.json import DictFactory
 from xsdata.formats.dataclass.serializers.json import JsonSerializer
 from xsdata.models.datatype import XmlDate
 from xsdata.models.xsd import Attribute
+from xsdata.utils.testing import XmlVarFactory
 
 
 class JsonSerializerTests(TestCase):
@@ -78,3 +80,9 @@ class JsonSerializerTests(TestCase):
         actual = json.loads(serializer.render(obj))
 
         self.assertEqual("optional", actual["use"])
+
+    def test_convert_namedtuple(self):
+        var = XmlVarFactory.create(types=(Telephone,))
+        serializer = JsonSerializer(dict_factory=DictFactory.FILTER_NONE)
+        actual = serializer.convert(Telephone(30, 234, 56783), var)
+        self.assertEqual("30-234-56783", actual)

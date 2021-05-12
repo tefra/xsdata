@@ -105,8 +105,10 @@ class TypingTests(TestCase):
                 evaluate(case)
 
     def test_evaluate_union(self):
-        self.assertEqual((int, str), evaluate(Optional[Union[int, str]]))
-        self.assertEqual((list, int, str), evaluate(Optional[List[Union[int, str]]]))
+        self.assertEqual((bool, str), evaluate(Optional[Union[bool, str]]))
+        self.assertEqual(
+            (list, int, float), evaluate(Optional[List[Union[int, float]]])
+        )
 
         unsupported_cases = [Optional[T], Union[List[int], Dict[str, str]]]
         for case in unsupported_cases:
@@ -118,9 +120,11 @@ class TypingTests(TestCase):
 
         self.assertEqual((list, int, str), evaluate(List[A]))
         self.assertEqual((list, int), evaluate(List[int]))
-        self.assertEqual((list, int, str), evaluate(List[Union[int, str]]))
+        self.assertEqual((list, float, str), evaluate(List[Union[float, str]]))
         self.assertEqual((list, int), evaluate(List[Optional[int]]))
-        self.assertEqual((list, list, int, str), evaluate(List[List[Union[int, str]]]))
+        self.assertEqual(
+            (list, list, bool, str), evaluate(List[List[Union[bool, str]]])
+        )
 
         unsupported_cases = [List, List[Dict[str, str]]]
         for case in unsupported_cases:

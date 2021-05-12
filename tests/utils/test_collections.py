@@ -3,7 +3,6 @@ from typing import Hashable
 from unittest import TestCase
 
 from xsdata.utils import collections
-from xsdata.utils.collections import Immutable
 
 
 class CollectionsTests(TestCase):
@@ -40,72 +39,3 @@ class CollectionsTests(TestCase):
         self.assertEqual([2, 2, 3], collections.remove([1, 2, 2, 3], lambda x: x == 1))
 
         self.assertEqual([3], collections.remove([1, 2, 2, 3], lambda x: x < 3))
-
-
-class ImmutableImpl(Immutable):
-    __slots__ = ("a", "b", "_c")
-
-    def __init__(self, a, b):
-        self.a = a
-        self.b = b
-        self._c = "private"
-        self._hashcode = -1
-
-
-class ImmutableTests(TestCase):
-    def setUp(self) -> None:
-        self.obj = ImmutableImpl(1, 2)
-
-    def test_immutable(self):
-        with self.assertRaises(TypeError) as cm:
-            self.obj.a = 2
-
-        self.assertEqual("ImmutableImpl is immutable", str(cm.exception))
-
-        with self.assertRaises(TypeError) as cm:
-            del self.obj.a
-
-        self.assertEqual("ImmutableImpl is immutable", str(cm.exception))
-
-    def test_comparisons(self):
-        self.assertEqual(ImmutableImpl(1, 2), self.obj)
-        self.assertNotEqual(ImmutableImpl(2, 2), self.obj)
-        self.assertNotEqual("a", self.obj)
-
-        self.assertLess(ImmutableImpl(1, 1), self.obj)
-        self.assertLessEqual(ImmutableImpl(1, 1), self.obj)
-        self.assertLessEqual(ImmutableImpl(1, 2), self.obj)
-
-        self.assertGreater(self.obj, ImmutableImpl(1, 1))
-        self.assertGreaterEqual(self.obj, ImmutableImpl(1, 1))
-        self.assertGreaterEqual(self.obj, ImmutableImpl(1, 2))
-
-        with self.assertRaises(AssertionError):
-            self.assertEqual(self.obj, 1)
-
-        with self.assertRaises(TypeError):
-            self.assertLess(self.obj, 1)
-
-        with self.assertRaises(TypeError):
-            self.assertLessEqual(self.obj, 1)
-
-        with self.assertRaises(TypeError):
-            self.assertGreater(self.obj, 1)
-
-        with self.assertRaises(TypeError):
-            self.assertGreaterEqual(self.obj, 1)
-
-    def test_hash(self):
-        self.assertEqual(-1, self.obj._hashcode)
-        self.assertIsInstance(self.obj, Hashable)
-
-        hash(self.obj)
-        self.assertNotEqual(-1, self.obj._hashcode)
-        self.assertEqual(self.obj._hashcode, hash(self.obj))
-
-    def test_iter(self):
-        self.assertEqual([1, 2], list(self.obj))
-
-    def test_init(self):
-        obj = ImmutableImpl(1, 2)
-        self.assertEqual({"a": 1, "b": 2}, obj.as_dict())

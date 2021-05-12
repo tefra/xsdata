@@ -11,7 +11,6 @@ from xsdata.models.datatype import XmlDateTime
 from xsdata.models.datatype import XmlDuration
 from xsdata.models.datatype import XmlPeriod
 from xsdata.models.datatype import XmlTime
-from xsdata.utils.collections import Immutable
 
 
 def filter_none(mapping: Dict) -> Dict:
@@ -30,8 +29,6 @@ class XmlDateTests(TestCase):
 
         for value, expected in examples.items():
             actual = XmlDate.from_string(value)
-            self.assertIsInstance(actual, Immutable)
-            self.assertEqual(-1, actual._hashcode)
             self.assertEqual(expected, actual, value)
 
     def test_from_string_invalid(self):
@@ -141,8 +138,6 @@ class XmlDateTimeTests(TestCase):
 
         for value, expected in examples.items():
             actual = XmlDateTime.from_string(value)
-            self.assertIsInstance(actual, Immutable)
-            self.assertEqual(-1, actual._hashcode)
             self.assertEqual(expected, actual, value)
 
     def test_from_string_invalid(self):
@@ -247,6 +242,10 @@ class XmlDateTimeTests(TestCase):
         self.assertNotEqual(a, c)
         self.assertEqual(a, b)
 
+        a = XmlDateTime.from_string("-2010-09-20T12:00:00Z")
+        b = XmlDateTime.from_string("-2010-09-20T13:00:00.000+01:00")
+        self.assertEqual(a, b)
+
     def test_replace(self):
         actual = XmlDateTime(2002, 1, 1, 12, 1, 1, 0, -120)
         self.assertIsNot(actual, actual.replace())
@@ -294,8 +293,6 @@ class XmlTimeTests(TestCase):
 
         for value, expected in examples.items():
             actual = XmlTime.from_string(value)
-            self.assertIsInstance(actual, Immutable)
-            self.assertEqual(-1, actual._hashcode)
             self.assertEqual(expected, actual, value)
 
     def test_from_string_invalid(self):
@@ -390,6 +387,7 @@ class XmlTimeTests(TestCase):
         self.assertEqual(a, a.replace())
         self.assertNotEqual(a, c)
         self.assertEqual(a, b)
+        self.assertNotEqual(a, True)
 
     def test_replace(self):
         actual = XmlTime(12, 1, 1, 1, 0)

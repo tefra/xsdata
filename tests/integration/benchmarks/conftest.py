@@ -1,5 +1,3 @@
-import logging
-
 from tests import xsdata_temp_dir
 from tests.fixtures.books import BookForm
 from tests.fixtures.books import Books
@@ -8,7 +6,6 @@ from xsdata.formats.dataclass.parsers import JsonParser
 from xsdata.formats.dataclass.parsers import XmlParser
 from xsdata.formats.dataclass.serializers import JsonSerializer
 from xsdata.formats.dataclass.serializers import XmlSerializer
-from xsdata.logger import logger
 from xsdata.models.datatype import XmlDate
 
 xsdata_temp_dir.mkdir(parents=True, exist_ok=True)

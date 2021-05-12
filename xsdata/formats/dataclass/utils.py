@@ -46,6 +46,7 @@ stop_words = [
     "field",
     "decimal",
     "self",
+    "meta",
 ]
 
 

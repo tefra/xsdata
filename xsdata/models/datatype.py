@@ -1,13 +1,14 @@
 import datetime
+import operator
 import re
 from collections import UserString
 from typing import Any
+from typing import Callable
 from typing import Dict
 from typing import NamedTuple
 from typing import Optional
+from typing import Union
 
-from xsdata.utils.collections import Immutable
-from xsdata.utils.dates import calculate_duration
 from xsdata.utils.dates import calculate_offset
 from xsdata.utils.dates import calculate_timezone
 from xsdata.utils.dates import format_date
@@ -23,6 +24,14 @@ xml_duration_re = re.compile(
     r"(?:T(?:(\d+)H)?(?:(\d+)M)?(?:(\d+(.\d+)?)S)?)?$"
 )
 
+DS_YEAR = 31556926.0
+DS_MONTH = 2629743
+DS_DAY = 86400
+DS_HOUR = 3600
+DS_MINUTE = 60
+DS_MICROSECOND = 0.000001
+DS_OFFSET = -60
+
 
 class DateFormat:
     DATE = "%Y-%m-%d%z"
@@ -35,7 +44,7 @@ class DateFormat:
     G_YEAR_MONTH = "%Y-%m%z"
 
 
-class XmlDate(Immutable):
+class XmlDate(NamedTuple):
     """
     Concrete xs:date builtin type.
 
@@ -45,21 +54,13 @@ class XmlDate(Immutable):
     :param year: Any signed integer, eg (0, -535, 2020)
     :param month: Unsigned integer between 1-12
     :param day: Unsigned integer between 1-31
-    :param offset: Signed integer representing timezone offset in
-        minutes
+    :param offset: Signed integer representing timezone offset in minutes
     """
 
-    __slots__ = ("year", "month", "day", "offset")
-
-    def __init__(self, year: int, month: int, day: int, offset: Optional[int] = None):
-        self.year = year
-        self.month = month
-        self.day = day
-        self.offset = offset
-
-        validate_date(year, month, day)
-
-        self._hashcode = -1  # Lock the object
+    year: int
+    month: int
+    day: int
+    offset: Optional[int] = None
 
     def replace(
         self,
@@ -136,7 +137,7 @@ class XmlDate(Immutable):
         return f"{self.__class__.__name__}({', '.join(map(str, args))})"
 
 
-class XmlDateTime(Immutable):
+class XmlDateTime(NamedTuple):
     """
     Concrete xs:dateTime builtin type.
 
@@ -154,50 +155,46 @@ class XmlDateTime(Immutable):
         minutes
     """
 
-    __slots__ = (
-        "year",
-        "month",
-        "day",
-        "hour",
-        "minute",
-        "second",
-        "microsecond",
-        "offset",
-        "_duration",
-    )
+    year: int
+    month: int
+    day: int
+    hour: int
+    minute: int
+    second: int
+    microsecond: int = 0
+    offset: Optional[int] = None
 
-    def __init__(
-        self,
-        year: int,
-        month: int,
-        day: int,
-        hour: int,
-        minute: int,
-        second: int,
-        microsecond: int = 0,
-        offset: Optional[int] = None,
-    ):
-        self.year = year
-        self.month = month
-        self.day = day
-        self.hour = hour
-        self.minute = minute
-        self.second = second
-        self.microsecond = microsecond
-        self.offset = offset
+    @property
+    def duration(self) -> float:
+        if self.year < 0:
+            negative = True
+            year = -self.year
+        else:
+            negative = False
+            year = self.year
 
-        validate_date(year, month, day)
-        validate_time(hour, minute, second, microsecond)
-
-        self._duration = calculate_duration(
-            year, month, day, hour, minute, second, microsecond, offset or 0
+        total = (
+            year * DS_YEAR
+            + self.month * DS_MONTH
+            + self.day * DS_DAY
+            + self.hour * DS_HOUR
+            + self.minute * DS_MINUTE
+            + self.second
+            + self.microsecond * DS_MICROSECOND
+            + (self.offset or 0) * DS_OFFSET
         )
-        self._hashcode = -1  # Lock the object
+        return -total if negative else total
 
     @classmethod
     def from_string(cls, string: str) -> "XmlDateTime":
         """Initialize from string with format ``%Y-%m-%dT%H:%M:%S%z``"""
-        return XmlDateTime(*parse_date_args(string, DateFormat.DATE_TIME))
+        year, month, day, hour, minute, second, microsecond, offset = parse_date_args(
+            string, DateFormat.DATE_TIME
+        )
+        validate_date(year, month, day)
+        validate_time(hour, minute, second, microsecond)
+
+        return XmlDateTime(year, month, day, hour, minute, second, microsecond, offset)
 
     @classmethod
     def from_datetime(cls, obj: datetime.datetime) -> "XmlDateTime":
@@ -269,9 +266,6 @@ class XmlDateTime(Immutable):
 
         return type(self)(year, month, day, hour, minute, second, microsecond, offset)
 
-    def __cmp_value__(self) -> float:
-        return self._duration
-
     def __str__(self) -> str:
         """
         Return the datetime formatted according to ISO 8601 for xml.
@@ -300,8 +294,26 @@ class XmlDateTime(Immutable):
 
         return f"{self.__class__.__name__}({', '.join(map(str, args))})"
 
+    def __eq__(self, other: Any) -> bool:
+        return cmp(self, other, operator.eq)
 
-class XmlTime(Immutable):
+    def __ne__(self, other: Any) -> bool:
+        return cmp(self, other, operator.ne)
+
+    def __lt__(self, other: Any) -> bool:
+        return cmp(self, other, operator.lt)
+
+    def __le__(self, other: Any) -> bool:
+        return cmp(self, other, operator.le)
+
+    def __gt__(self, other: Any) -> bool:
+        return cmp(self, other, operator.gt)
+
+    def __ge__(self, other: Any) -> bool:
+        return cmp(self, other, operator.ge)
+
+
+class XmlTime(NamedTuple):
     """
     Concrete xs:time builtin type.
 
@@ -312,32 +324,24 @@ class XmlTime(Immutable):
     :param minute: Unsigned integer between 0-59
     :param second: Unsigned integer between 0-59
     :param microsecond: Unsigned integer between 0-999999
-    :param offset: Signed integer representing timezone offset in
-        minutes
+    :param offset: Signed integer representing timezone offset in minutes
     """
 
-    __slots__ = ("hour", "minute", "second", "microsecond", "offset", "_duration")
+    hour: int
+    minute: int
+    second: int
+    microsecond: int = 0
+    offset: Optional[int] = None
 
-    def __init__(
-        self,
-        hour: int,
-        minute: int,
-        second: int,
-        microsecond: int = 0,
-        offset: Optional[int] = None,
-    ):
-        self.hour = hour
-        self.minute = minute
-        self.second = second
-        self.microsecond = microsecond
-        self.offset = offset
-
-        validate_time(hour, minute, second, microsecond)
-
-        self._duration = calculate_duration(
-            0, 0, 0, hour, minute, second, microsecond, offset or 0
+    @property
+    def duration(self) -> float:
+        return (
+            self.hour * DS_HOUR
+            + self.minute * DS_MINUTE
+            + self.second
+            + self.microsecond * DS_MICROSECOND
+            + (self.offset or 0) * DS_OFFSET
         )
-        self._hashcode = -1  # Lock the object
 
     def replace(
         self,
@@ -366,7 +370,11 @@ class XmlTime(Immutable):
     @classmethod
     def from_string(cls, string: str) -> "XmlTime":
         """Initialize from string format ``%H:%M:%S%z``"""
-        return XmlTime(*parse_date_args(string, DateFormat.TIME))
+        hour, minute, second, microsecond, offset = parse_date_args(
+            string, DateFormat.TIME
+        )
+        validate_time(hour, minute, second, microsecond)
+        return XmlTime(hour, minute, second, microsecond, offset)
 
     @classmethod
     def from_time(cls, obj: datetime.time) -> "XmlTime":
@@ -395,9 +403,6 @@ class XmlTime(Immutable):
             tzinfo=calculate_timezone(self.offset),
         )
 
-    def __cmp_value__(self) -> float:
-        return self._duration
-
     def __str__(self) -> str:
         """
         Return the time formatted according to ISO 8601 for xml.
@@ -420,6 +425,34 @@ class XmlTime(Immutable):
             del args[-1]
 
         return f"{self.__class__.__name__}({', '.join(map(str, args))})"
+
+    def __eq__(self, other: Any) -> bool:
+        return cmp(self, other, operator.eq)
+
+    def __ne__(self, other: Any) -> bool:
+        return cmp(self, other, operator.ne)
+
+    def __lt__(self, other: Any) -> bool:
+        return cmp(self, other, operator.lt)
+
+    def __le__(self, other: Any) -> bool:
+        return cmp(self, other, operator.le)
+
+    def __gt__(self, other: Any) -> bool:
+        return cmp(self, other, operator.gt)
+
+    def __ge__(self, other: Any) -> bool:
+        return cmp(self, other, operator.ge)
+
+
+DurationType = Union[XmlTime, XmlDateTime]
+
+
+def cmp(a: DurationType, b: DurationType, op: Callable) -> bool:
+    if isinstance(b, a.__class__):
+        return op(a.duration, b.duration)
+
+    return NotImplemented
 
 
 class TimeInterval(NamedTuple):

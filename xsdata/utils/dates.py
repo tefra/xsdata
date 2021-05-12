@@ -32,23 +32,6 @@ def calculate_offset(obj: Union[datetime.time, datetime.datetime]) -> Optional[i
     return int(offset.total_seconds() // 60)
 
 
-# year, month, day, hour, minute, seconds, microseconds, offset (minutes)
-_DURATIONS = 31556926.0, 2629743, 86400, 3600, 60, 1, 0.000001, -60
-
-
-def calculate_duration(*args: int) -> float:
-    year = args[0]
-    if year < 0:
-        negative = True
-        year = -year
-    else:
-        negative = False
-
-    total = year * _DURATIONS[0]
-    total += sum(args[i] * _DURATIONS[i] for i in range(1, 8) if args[i])
-    return -total if negative else total
-
-
 def format_date(year: int, month: int, day: int) -> str:
     if year < 0:
         year = -year

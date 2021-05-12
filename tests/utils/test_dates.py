@@ -1,6 +1,5 @@
 from unittest import TestCase
 
-from xsdata.utils.dates import calculate_duration
 from xsdata.utils.dates import parse_date_args
 from xsdata.utils.dates import validate_date
 from xsdata.utils.dates import validate_time
@@ -93,10 +92,6 @@ class DatesUtilsTests(TestCase):
             self.assertEqual(
                 f"String '{value}' does not match format '{fmt}'", str(cm.exception)
             )
-
-    def test_calculate_duration(self):
-        duration = calculate_duration(2021, 1, 7, 16, 57, 30, 14567, 120)
-        self.assertEqual(63779835839.014565, duration)
 
     def test_validate_date(self):
         invalid = {

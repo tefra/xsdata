@@ -7,6 +7,7 @@ from dataclasses import is_dataclass
 from typing import Any
 from typing import Callable
 from typing import Dict
+from typing import Iterable
 from typing import List
 from typing import Optional
 from typing import Sequence
@@ -18,6 +19,7 @@ from xsdata.exceptions import ParserError
 from xsdata.formats.bindings import AbstractParser
 from xsdata.formats.bindings import T
 from xsdata.formats.dataclass.context import XmlContext
+from xsdata.formats.dataclass.models.elements import XmlMeta
 from xsdata.formats.dataclass.models.elements import XmlVar
 from xsdata.formats.dataclass.models.generics import AnyElement
 from xsdata.formats.dataclass.models.generics import DerivedElement
@@ -90,171 +92,199 @@ class JsonParser(AbstractParser):
         keys = list(data[0].keys() if isinstance(data, list) else data.keys())
         clazz: Optional[Type[T]] = self.context.find_type_by_fields(set(keys))
 
-        if clazz is None:
-            raise ParserError(f"No class found matching the document keys({keys})")
+        if clazz:
+            return clazz
 
-        return clazz
-
-    def bind_value(self, var: XmlVar, value: Any) -> Any:
-        """Bind value according to the class var."""
-
-        if var.is_attributes:
-            return dict(value)
-
-        if var.is_clazz_union:
-            if isinstance(value, dict):
-                return self.bind_dataclass_union(value, var)
-
-            return self.bind_type_union(value, var)
-
-        if var.clazz:
-            return self.bind_dataclass(value, var.clazz)
-
-        if var.is_elements:
-            return self.bind_choice(value, var)
-
-        if var.is_wildcard or var.any_type:
-            return self.bind_wildcard(value)
-
-        return self.parse_value(value, var.types, var.default, var.tokens, var.format)
+        raise ParserError(f"Unable to locate model with properties({keys})")
 
     def bind_dataclass(self, data: Dict, clazz: Type[T]) -> T:
         """Recursively build the given model from the input dict data."""
+
+        if set(data.keys()) == DERIVED_KEYS:
+            return self.bind_derived_dataclass(data, clazz)
+
+        meta = self.context.build(clazz)
+        xml_vars = meta.get_all_vars()
+
         params = {}
-        for var in self.context.build(clazz).get_all_vars():
-            value = data.get(var.local_name)
+        for key, value in data.items():
+            is_list = isinstance(value, list)
+            var = self.find_var(xml_vars, key, is_list)
 
-            if value is None or not var.init:
-                continue
+            if var is None:
+                raise ParserError(f"Unknown property {clazz.__qualname__}.{key}")
 
-            if var.list_element:
-                if not isinstance(value, list):
-                    raise ParserError(f"Key `{var.name}` value is not iterable")
-
-                params[var.name] = [self.bind_value(var, val) for val in value]
-            else:
-                params[var.name] = self.bind_value(var, value)
+            if var.init:
+                params[var.name] = self.bind_value(meta, var, value)
 
         return clazz(**params)  # type: ignore
 
-    def maybe_bind_dataclass(self, data: Dict, clazz: Type[T]) -> Optional[T]:
+    def bind_derived_dataclass(self, data: Dict, clazz: Type[T]) -> Any:
+        qname = data["qname"]
+        xsi_type = data["type"]
+        params = data["value"]
+
+        if clazz is DerivedElement:
+            real_clazz: Optional[Type[T]] = None
+            if xsi_type:
+                real_clazz = self.context.find_type(xsi_type)
+
+            if real_clazz is None:
+                raise ParserError(
+                    f"Unable to locate derived model "
+                    f"with properties({list(params.keys())})"
+                )
+
+            value = self.bind_dataclass(params, real_clazz)
+        else:
+            value = self.bind_dataclass(params, clazz)
+
+        return DerivedElement(qname=qname, type=xsi_type, value=value)
+
+    def bind_best_dataclass(self, data: Dict, classes: Iterable[Type[T]]) -> T:
+        """Attempt to bind the given data to one possible models, if more than
+        one is successful return the object with the highest score."""
+        obj = None
+        keys = set(data.keys())
+        max_score = -1.0
+        for clazz in classes:
+            if is_dataclass(clazz) and self.context.local_names_match(keys, clazz):
+                candidate = self.bind_optional_dataclass(data, clazz)
+                score = ParserUtils.score_object(candidate)
+                if score > max_score:
+                    max_score = score
+                    obj = candidate
+
+        if obj:
+            return obj
+
+        raise ParserError(
+            f"Failed to bind object with properties({list(data.keys())}) "
+            f"to any of the {[cls.__qualname__ for cls in classes]}"
+        )
+
+    def bind_optional_dataclass(self, data: Dict, clazz: Type[T]) -> Optional[T]:
         """Recursively build the given model from the input dict data but fail
         on any converter warnings."""
         try:
             with warnings.catch_warnings():
                 warnings.filterwarnings("error", category=ConverterWarning)
                 return self.bind_dataclass(data, clazz)
-        except ConverterWarning:
+        except Exception:
             return None
 
-    def bind_dataclass_union(self, value: Dict, var: XmlVar) -> Any:
-        """Bind data to all possible models and return the best candidate."""
-        obj = None
-        max_score = -1.0
-        for clazz in var.types:
-            if not is_dataclass(clazz):
-                continue
+    def bind_value(
+        self, meta: XmlMeta, var: XmlVar, value: Any, recursive: bool = False
+    ) -> Any:
+        """Main entry point for binding values."""
 
-            candidate = self.maybe_bind_dataclass(value, clazz)
-            score = ParserUtils.score_object(candidate)
-            if score > max_score:
-                max_score = score
-                obj = candidate
+        # xs:anyAttributes get it out of the way, it's the mapping exception!
+        if var.is_attributes:
+            return dict(value)
 
-        return obj
+        # Repeating element, recursively bind the values
+        if not recursive and var.list_element and isinstance(value, list):
+            return [self.bind_value(meta, var, val, True) for val in value]
 
-    def bind_type_union(self, value: Any, var: XmlVar) -> Any:
-        types = [tp for tp in var.types if not is_dataclass(tp)]
-        return self.parse_value(value, types, var.default, var.tokens, var.format)
-
-    def bind_wildcard(self, value: Any) -> Any:
-        """Bind data to a wildcard model."""
-        if isinstance(value, Dict):
-            keys = set(value.keys())
-
-            if not (keys - ANY_KEYS):
-                return self.bind_dataclass(value, AnyElement)
-
-            if not (keys - DERIVED_KEYS):
-                return self.bind_dataclass(value, DerivedElement)
-
-            clazz: Optional[Type] = self.context.find_type_by_fields(keys)
-            if clazz:
-                return self.bind_dataclass(value, clazz)
-
-        return value
-
-    def bind_choice(self, value: Any, var: XmlVar) -> Any:
-        """Bind data to one of the choice models."""
+        # If not dict this is an text or tokens value.
         if not isinstance(value, dict):
-            return self.bind_choice_simple(value, var)
+            return self.bind_text(meta, var, value)
 
-        if "qname" in value:
-            return self.bind_choice_generic(value, var)
+        keys = value.keys()
+        if keys == ANY_KEYS:
+            # Bind data to AnyElement dataclass
+            return self.bind_dataclass(value, AnyElement)
 
-        return self.bind_choice_dataclass(value, var)
+        if keys == DERIVED_KEYS:
+            # Bind data to AnyElement dataclass
+            return self.bind_derived_value(meta, var, value)
 
-    def bind_choice_simple(self, value: Any, var: XmlVar) -> Any:
-        """Bind data to one of the simple choice types and return the first
-        that succeeds."""
-        choice = var.find_value_choice(value)
-        if choice:
-            return self.bind_value(choice, value)
+        # Bind data to a user defined dataclass
+        return self.bind_complex_type(meta, var, value)
 
-        # Sometimes exact type match doesn't work, eg Decimals, try all of them
-        is_list = isinstance(value, list)
-        for choice in var.elements.values():
-            if choice.clazz or choice.tokens != is_list:
-                continue
+    def bind_text(self, meta: XmlMeta, var: XmlVar, value: Any) -> Any:
+        """Bind text/tokens value entrypoint."""
 
-            with warnings.catch_warnings(record=True) as w:
-                result = self.bind_value(choice, value)
-                if not w:
-                    return result
+        if var.elements:
+            # Compound field we need to match the value to one of the choice elements
+            choice = var.find_value_choice(value)
+            if choice:
+                return self.bind_text(meta, choice, value)
 
-        return value
-
-    def bind_choice_generic(self, value: Dict, var: XmlVar) -> Any:
-        """Bind data to a either a derived or a user derived model."""
-        qname = value["qname"]
-        choice = var.find_choice(qname)
-
-        if not choice:
             raise ParserError(
-                f"XmlElements undefined choice: `{var.name}` for qname `{qname}`"
+                f"Failed to bind '{value}' "
+                f"to {meta.clazz.__qualname__}.{var.name} field"
             )
 
-        if "value" in value:
-            obj = self.bind_value(choice, value["value"])
-            substituted = value.get("substituted", False)
+        if var.any_type or var.is_wildcard:
+            # field can support any object return the value as it is
+            return value
 
-            return DerivedElement(qname=qname, value=obj, substituted=substituted)
+        # Convert value according to the field types
+        return ParserUtils.parse_value(
+            value, var.types, var.default, EMPTY_MAP, var.tokens, var.format
+        )
 
-        return self.bind_dataclass(value, AnyElement)
+    def bind_complex_type(self, meta: XmlMeta, var: XmlVar, data: Dict) -> Any:
+        """Bind data to a user defined dataclass."""
 
-    def bind_choice_dataclass(self, value: Dict, var: XmlVar) -> Any:
-        """Bind data to the best matching choice model."""
-        keys = set(value.keys())
-        for choice in var.elements.values():
-            if choice.clazz:
-                meta = self.context.build(choice.clazz)
-                attrs = {var.local_name for var in meta.get_all_vars()}
-                if attrs == keys:
-                    return self.bind_value(choice, value)
+        if var.is_clazz_union:
+            # Union of dataclasses
+            return self.bind_best_dataclass(data, var.types)
+        elif var.elements:
+            # Compound field with multiple choices
+            return self.bind_best_dataclass(data, var.element_types)
+        elif var.any_type or var.is_wildcard:
+            # xs:anyType element, check all meta classes
+            return self.bind_best_dataclass(data, meta.element_types)
+        else:
+            return self.bind_dataclass(data, var.clazz)
 
-        raise ParserError(f"XmlElements undefined choice: `{var.name}` for `{value}`")
+    def bind_derived_value(
+        self, meta: XmlMeta, var: XmlVar, data: Dict
+    ) -> DerivedElement:
+        """Bind derived element entry point."""
+
+        qname = data["qname"]
+        xsi_type = data["type"]
+        params = data["value"]
+
+        if var.elements:
+            choice = var.find_choice(qname)
+            if choice is None:
+                raise ParserError(
+                    f"Unable to locate compound element"
+                    f" {meta.clazz.__qualname__}.{var.name}[{qname}]"
+                )
+            return self.bind_derived_value(meta, choice, data)
+
+        if not isinstance(params, dict):
+            value = self.bind_text(meta, var, params)
+        elif var.clazz:
+            value = self.bind_complex_type(meta, var, params)
+        elif xsi_type:
+            clazz: Optional[Type] = self.context.find_type(xsi_type)
+
+            if clazz is None:
+                raise ParserError(f"Unable to locate xsi:type `{xsi_type}`")
+
+            value = self.bind_dataclass(params, clazz)
+        else:
+            value = self.bind_best_dataclass(params, meta.element_types)
+
+        return DerivedElement(qname=qname, value=value, type=xsi_type)
 
     @classmethod
-    def parse_value(
-        cls,
-        value: Any,
-        types: Sequence[Type],
-        default: Any,
-        tokens: bool,
-        fmt: Optional[str],
-    ) -> Any:
-        """Convert any value to one of the given var types."""
-        return ParserUtils.parse_value(value, types, default, EMPTY_MAP, tokens, fmt)
+    def find_var(
+        cls, xml_vars: Sequence[XmlVar], local_name: str, is_list: bool = False
+    ) -> Optional[XmlVar]:
+        for var in xml_vars:
+            if var.local_name == local_name:
+                var_is_list = var.list_element or var.tokens
+                if is_list == var_is_list or var.clazz is None:
+                    return var
+
+        return None
 
 
 @dataclass

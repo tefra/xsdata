@@ -7,8 +7,10 @@ from typing import List
 from typing import Mapping
 from typing import Optional
 from typing import Sequence
+from typing import Set
 from typing import Type
 
+from xsdata.formats.converter import converter
 from xsdata.models.enums import NamespaceType
 from xsdata.utils import collections
 from xsdata.utils.constants import EMPTY_SEQUENCE
@@ -171,6 +173,10 @@ class XmlVar(MetaMixin):
         else:
             self.is_text = True
 
+    @property
+    def element_types(self) -> Set[Type]:
+        return {tp for element in self.elements.values() for tp in element.types}
+
     def get_xml_type(self) -> str:
         if self.is_wildcard:
             return XmlType.WILDCARD
@@ -207,10 +213,10 @@ class XmlVar(MetaMixin):
             tokens = False
             check_subclass = is_dataclass(value)
 
-        return self.find_type_choice(tp, tokens, check_subclass)
+        return self.find_type_choice(value, tp, tokens, check_subclass)
 
     def find_type_choice(
-        self, tp: Type, tokens: bool, check_subclass: bool
+        self, value: Any, tp: Type, tokens: bool, check_subclass: bool
     ) -> Optional["XmlVar"]:
         """Match and return a choice field that matches the given type."""
 
@@ -222,18 +228,24 @@ class XmlVar(MetaMixin):
             if tp is NoneType:
                 if element.nillable:
                     return element
-            elif self.match_type(tp, element.types, check_subclass):
+            elif self.match_type(value, tp, element.types, check_subclass):
                 return element
 
         return None
 
     @classmethod
-    def match_type(cls, tp: Type, types: Sequence[Type], check_subclass: bool) -> bool:
+    def match_type(
+        cls, value: Any, tp: Type, types: Sequence[Type], check_subclass: bool
+    ) -> bool:
+
         for candidate in types:
             if tp == candidate or (check_subclass and issubclass(tp, candidate)):
                 return True
 
-        return False
+        if isinstance(value, list):
+            return all(converter.test(val, types) for val in value)
+
+        return converter.test(value, types)
 
     def match_namespace(self, qname: str) -> bool:
         """Match the given qname to the wildcard allowed namespaces."""
@@ -415,6 +427,15 @@ class XmlMeta(MetaMixin):
         chd = self.find_wildcard(qname)
         if chd:
             yield chd
+
+    @property
+    def element_types(self) -> Set[Type]:
+        return {
+            tp
+            for elements in self.elements.values()
+            for element in elements
+            for tp in element.types
+        }
 
     def __repr__(self) -> str:
         params = (

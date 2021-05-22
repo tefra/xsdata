@@ -4,7 +4,16 @@ from dataclasses import make_dataclass
 from typing import Iterator
 from unittest import mock
 from unittest.case import TestCase
+from xml.etree.ElementTree import QName
 
+from tests.fixtures.models import ChoiceType
+from tests.fixtures.models import TypeA
+from tests.fixtures.models import TypeB
+from tests.fixtures.models import TypeC
+from tests.fixtures.models import TypeD
+from tests.fixtures.models import UnionType
+from xsdata.formats.dataclass.context import XmlContext
+from xsdata.formats.dataclass.models.builders import XmlMetaBuilder
 from xsdata.formats.dataclass.models.elements import XmlType
 from xsdata.formats.dataclass.models.elements import XmlVar
 from xsdata.utils.testing import XmlMetaFactory
@@ -17,6 +26,9 @@ class Fixture:
 
 
 class XmlValTests(TestCase):
+    def setUp(self) -> None:
+        self.context = XmlContext()
+
     def test_property_local_name(self):
         var = XmlVarFactory.create(name="a", qname="{B}A")
         self.assertEqual("A", var.local_name)
@@ -39,6 +51,11 @@ class XmlValTests(TestCase):
 
         var = XmlVarFactory.create(name="foo", types=(Fixture, int))
         self.assertTrue(var.is_clazz_union)
+
+    def test_property_element_types(self):
+        meta = self.context.build(ChoiceType)
+        var = meta.choices[0]
+        self.assertEqual({TypeA, TypeB, int, float, QName}, var.element_types)
 
     def test_find_choice(self):
         var = XmlVarFactory.create(
@@ -105,6 +122,7 @@ class XmlValTests(TestCase):
         )
 
         self.assertIsNone(var.find_value_choice("foo"))
+        self.assertIsNone(var.find_value_choice(["1.1", "1.2"]))
         self.assertEqual(elements[0], var.find_value_choice(1))
         self.assertEqual(elements[1], var.find_value_choice([1, 2]))
         self.assertEqual(elements[2], var.find_value_choice(d()))
@@ -182,6 +200,7 @@ class XmlValTests(TestCase):
 class XmlMetaTests(TestCase):
     def setUp(self) -> None:
         a = make_dataclass("a", [])
+        self.context = XmlContext()
         self.meta = XmlMetaFactory.create(
             clazz=a,
             qname="a",
@@ -191,6 +210,10 @@ class XmlMetaTests(TestCase):
             elements={},
             any_attributes=[],
         )
+
+    def test_property_element_types(self):
+        meta = self.context.build(UnionType)
+        self.assertEqual({TypeA, TypeB, TypeC, TypeD}, meta.element_types)
 
     def test_find_attribute(self):
         a = XmlVarFactory.create(xml_type=XmlType.ATTRIBUTE, name="a")

@@ -157,6 +157,11 @@ class XmlContext:
             )
         return self.cache[clazz]
 
+    def local_names_match(self, names: Set[str], clazz: Type) -> bool:
+        meta = self.build(clazz)
+        local_names = {var.local_name for var in meta.get_all_vars()}
+        return names == local_names
+
     @classmethod
     def is_derived(cls, obj: Any, clazz: Type) -> bool:
         """

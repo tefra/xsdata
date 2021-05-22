@@ -1,22 +1,25 @@
 import json
-from dataclasses import make_dataclass
 from typing import List
 from typing import Optional
-from unittest.case import TestCase
 from xml.etree.ElementTree import QName
 
 from tests import fixtures_dir
 from tests.fixtures.books import BookForm
 from tests.fixtures.books import Books
+from tests.fixtures.models import AttrsType
+from tests.fixtures.models import ChoiceType
+from tests.fixtures.models import ExtendedType
+from tests.fixtures.models import TypeA
+from tests.fixtures.models import TypeB
+from tests.fixtures.models import TypeC
+from tests.fixtures.models import UnionType
 from xsdata.exceptions import ParserError
-from xsdata.formats.dataclass.models.elements import XmlType
 from xsdata.formats.dataclass.models.generics import AnyElement
 from xsdata.formats.dataclass.models.generics import DerivedElement
 from xsdata.formats.dataclass.parsers.json import JsonParser
 from xsdata.formats.dataclass.serializers import JsonSerializer
 from xsdata.models.datatype import XmlDate
 from xsdata.utils.testing import FactoryTestCase
-from xsdata.utils.testing import XmlVarFactory
 
 
 class JsonParserTests(FactoryTestCase):
@@ -104,7 +107,7 @@ class JsonParserTests(FactoryTestCase):
             (
                 '{"not": 1, "found": 1}',
                 None,
-                "No class found matching the document keys(['not', 'found'])",
+                "Unable to locate model with properties(['not', 'found'])",
             ),
             ("{}", None, "Document is empty, can not detect type"),
             ("[]", BookForm, "Document is array, expected object"),
@@ -121,219 +124,218 @@ class JsonParserTests(FactoryTestCase):
 
             self.assertEqual(exc_msg, str(cm.exception))
 
-    def test_parse_with_non_iterable_value(self):
+    def test_bind_dataclass_with_unknown_property(self):
+        data = {"unknown": True}
         with self.assertRaises(ParserError) as cm:
-            self.parser.from_string('{"book": 1}')
+            self.parser.bind_dataclass(data, Books)
 
-        self.assertEqual("Key `book` value is not iterable", str(cm.exception))
+        self.assertEqual("Unknown property Books.unknown", str(cm.exception))
 
-    def test_bind_value_with_attributes_var(self):
-        var = XmlVarFactory.create(xml_type=XmlType.ATTRIBUTES, name="a")
-        value = {"a": 1}
-        actual = self.parser.bind_value(var, value)
-        self.assertEqual(value, actual)
-        self.assertIsNot(value, actual)
+    def test_bind_derived_dataclass(self):
+        data = {
+            "qname": "{urn:books}BookForm",
+            "type": None,
+            "value": {
+                "author": "Nagata, Suanne",
+                "title": "Becoming Somebody",
+            },
+        }
+
+        actual = self.parser.bind_dataclass(data, BookForm)
+        expected = DerivedElement(
+            qname="{urn:books}BookForm",
+            value=BookForm(author="Nagata, Suanne", title="Becoming Somebody"),
+            type=None,
+        )
+        self.assertEqual(expected, actual)
+
+    def test_bind_derived_dataclass_with_xsi_type(self):
+        data = {
+            "qname": "foobar",
+            "type": "{urn:books}BookForm",
+            "value": {
+                "author": "Nagata, Suanne",
+                "title": "Becoming Somebody",
+            },
+        }
+
+        actual = self.parser.bind_dataclass(data, DerivedElement)
+        expected = DerivedElement(
+            qname="foobar",
+            value=BookForm(author="Nagata, Suanne", title="Becoming Somebody"),
+            type="{urn:books}BookForm",
+        )
+        self.assertEqual(expected, actual)
+
+        with self.assertRaises(ParserError) as cm:
+            data["type"] = "notExists"
+            self.parser.bind_dataclass(data, DerivedElement)
+
+        self.assertEqual(
+            "Unable to locate derived model with" " properties(['author', 'title'])",
+            str(cm.exception),
+        )
+
+        with self.assertRaises(ParserError) as cm:
+            data["type"] = None
+            self.parser.bind_dataclass(data, DerivedElement)
 
     def test_bind_dataclass_union(self):
-        a = make_dataclass("a", [("x", int), ("y", str)])
-        b = make_dataclass("b", [("x", int), ("y", str), ("z", float)])
-        c = make_dataclass("c", [("x", int), ("y", str), ("z", str)])
-        d = make_dataclass("d", [("x", int)])
-        var = XmlVarFactory.create(
-            xml_type=XmlType.ELEMENT,
-            name="union",
-            qname="union",
-            types=(a, b, c, int),
+        data = {"element": {"x": 1, "y": "foo", "z": "1.0"}}
+        actual = self.parser.bind_dataclass(data, UnionType)
+
+        self.assertIsInstance(actual.element, TypeC)
+
+        with self.assertRaises(ParserError) as cm:
+            self.parser.bind_dataclass({"element": {"a": 1}}, UnionType)
+
+        self.assertEqual(
+            "Failed to bind object with properties(['a']) "
+            "to any of the ['TypeA', 'TypeB', 'TypeC', 'TypeD']",
+            str(cm.exception),
         )
 
-        data = {"x": 1, "y": "foo", "z": "foo"}
-        actual = self.parser.bind_value(var, data)
+    def test_bind_attributes(self):
+        data = {"attrs": {"a": 1, "b": 2}}
 
-        self.assertIsInstance(actual, c)
+        actual = self.parser.bind_dataclass(data, AttrsType)
+        self.assertEqual(data["attrs"], actual.attrs)
+        self.assertIsNot(data["attrs"], actual.attrs)
 
-    def test_bind_type_union(self):
-        a = make_dataclass("a", [("x", int), ("y", str)])
-        var = XmlVarFactory.create(
-            xml_type=XmlType.ELEMENT,
-            name="union",
-            qname="union",
-            types=(a, int, float),
+    def test_bind_simple_type_with_wildcard_var(self):
+        data = {"any": 1, "wildcard": 2}
+        actual = self.parser.bind_dataclass(data, ExtendedType)
+        self.assertEqual(1, actual.any)
+        self.assertEqual(2, actual.wildcard)
+
+    def test_bind_simple_type_with_elements_var(self):
+        data = {"choice": ["1.0", 1, ["1"], "a", "{a}b"]}
+
+        actual = self.parser.bind_dataclass(data, ChoiceType)
+
+        self.assertEqual(1.0, actual.choice[0])
+        self.assertEqual(1, actual.choice[1])
+        self.assertEqual([1], actual.choice[2])
+        self.assertEqual(QName("a"), actual.choice[3])
+        self.assertIsInstance(actual.choice[3], QName)
+        self.assertEqual(QName("{a}b"), actual.choice[4])
+        self.assertIsInstance(actual.choice[4], QName)
+
+        data = {"choice": ["!NotAQname"]}
+        with self.assertRaises(ParserError) as cm:
+            self.parser.bind_dataclass(data, ChoiceType)
+
+        self.assertEqual(
+            "Failed to bind '!NotAQname' to ChoiceType.choice field",
+            str(cm.exception),
         )
 
-        data = "1.1"
-        self.assertEqual(1.1, self.parser.bind_value(var, data))
-
-    def test_bind_choice_simple(self):
-        var = XmlVarFactory.create(
-            xml_type=XmlType.ELEMENTS,
-            qname="compound",
-            name="compound",
-            elements={
-                "int": XmlVarFactory.create(
-                    xml_type=XmlType.ELEMENT, qname="int", name="int", types=(int,)
-                ),
-                "tokens": XmlVarFactory.create(
-                    xml_type=XmlType.ELEMENT,
-                    qname="tokens",
-                    name="tokens",
-                    types=(int,),
-                    tokens=True,
-                ),
-                "float": XmlVarFactory.create(
-                    xml_type=XmlType.ELEMENT,
-                    qname="float",
-                    name="float",
-                    types=(float,),
-                ),
-                "qname": XmlVarFactory.create(
-                    xml_type=XmlType.ELEMENT,
-                    qname="qname",
-                    name="qname",
-                    types=(QName,),
-                ),
-            },
+    def test_bind_any_element(self):
+        data = {
+            "wildcard": {
+                "qname": "a",
+                "text": 1,
+                "tail": None,
+                "children": [],
+                "attributes": {},
+            }
+        }
+        self.assertEqual(
+            ExtendedType(wildcard=AnyElement(qname="a", text="1")),
+            self.parser.bind_dataclass(data, ExtendedType),
         )
-        self.assertEqual(1.0, self.parser.bind_choice("1.0", var))
-        self.assertEqual(1, self.parser.bind_choice(1, var))
-        self.assertEqual([1], self.parser.bind_choice(["1"], var))
-
-        actual = self.parser.bind_choice("a", var)
-        self.assertEqual(QName("a"), actual)
-        self.assertIsInstance(actual, QName)
-
-        actual = self.parser.bind_choice("{a}b", var)
-        self.assertIsInstance(actual, QName)
-        self.assertEqual(QName("{a}b"), actual)
-
-        actual = self.parser.bind_choice("!NotQName", var)
-        self.assertIsInstance(actual, str)
-        self.assertEqual("!NotQName", actual)
 
     def test_bind_choice_dataclass(self):
-        a = make_dataclass("a", [("x", int)])
-        b = make_dataclass("b", [("x", int), ("y", str)])
+        data = {"choice": [{"x": 1}, {"x": 1, "y": "a"}]}
+        expected = ChoiceType(choice=[TypeA(x=1), TypeB(x=1, y="a")])
+        self.assertEqual(expected, self.parser.bind_dataclass(data, ChoiceType))
 
-        var = XmlVarFactory.create(
-            xml_type=XmlType.ELEMENTS,
-            qname="compound",
-            name="compound",
-            elements={
-                "a": XmlVarFactory.create(
-                    xml_type=XmlType.ELEMENT,
-                    qname="a",
-                    name="a",
-                    types=(a,),
-                ),
-                "b": XmlVarFactory.create(
-                    xml_type=XmlType.ELEMENT,
+    def test_bind_derived_value_with_simple_type(self):
+        data = {"choice": [{"qname": "int2", "value": 1, "type": None}]}
+
+        actual = self.parser.bind_dataclass(data, ChoiceType)
+        expected = ChoiceType(choice=[DerivedElement(qname="int2", value=1)])
+        self.assertEqual(expected, actual)
+
+    def test_bind_derived_value_with_choice_var(self):
+        data = {
+            "choice": [
+                {
+                    "qname": "b",
+                    "type": None,
+                    "value": {
+                        "x": "1",
+                        "y": "a",
+                    },
+                }
+            ]
+        }
+        expected = ChoiceType(
+            choice=[
+                DerivedElement(
                     qname="b",
-                    name="b",
-                    types=(b,),
-                ),
-                "c": XmlVarFactory.create(
-                    xml_type=XmlType.ELEMENT, qname="c", name="c", types=(int,)
-                ),
-            },
+                    value=TypeB(x=1, y="a"),
+                )
+            ]
         )
-
-        self.assertEqual(a(1), self.parser.bind_choice({"x": 1}, var))
-        self.assertEqual(b(1, "2"), self.parser.bind_choice({"x": 1, "y": "2"}, var))
+        self.assertEqual(expected, self.parser.bind_dataclass(data, ChoiceType))
 
         with self.assertRaises(ParserError) as cm:
-            self.parser.bind_choice({"x": 1, "y": "2", "z": 3}, var)
+            data["choice"][0]["qname"] = "nope"
+            self.parser.bind_dataclass(data, ChoiceType)
 
         self.assertEqual(
-            "XmlElements undefined choice: `compound` for `{'x': 1, 'y': '2', 'z': 3}`",
+            "Unable to locate compound element ChoiceType.choice[nope]",
             str(cm.exception),
         )
 
-    def test_bind_choice_generic_with_derived(self):
-        var = XmlVarFactory.create(
-            xml_type=XmlType.ELEMENTS,
-            qname="compound",
-            name="compound",
-            elements={
-                "a": XmlVarFactory.create(
-                    xml_type=XmlType.ELEMENT, name="a", types=(int,)
-                ),
-                "b": XmlVarFactory.create(
-                    xml_type=XmlType.ELEMENT, name="b", types=(float,)
-                ),
-            },
-        )
-        data = {"qname": "a", "value": 1, "substituted": True}
+    def test_bind_wildcard_dataclass(self):
 
-        self.assertEqual(
-            DerivedElement(qname="a", value=1, substituted=True),
-            self.parser.bind_choice(data, var),
-        )
+        data = {"a": None, "wildcard": {"x": 1}}
+        expected = ExtendedType(wildcard=TypeA(x=1))
+        self.assertEqual(expected, self.parser.bind_dataclass(data, ExtendedType))
 
-    def test_bind_choice_generic_with_wildcard(self):
-        var = XmlVarFactory.create(
-            xml_type=XmlType.ELEMENTS,
-            qname="compound",
-            name="compound",
-            elements={
-                "a": XmlVarFactory.create(
-                    xml_type=XmlType.ELEMENT, name="a", types=(int,)
-                ),
-                "b": XmlVarFactory.create(
-                    xml_type=XmlType.ELEMENT, name="b", types=(float,)
-                ),
-            },
+    def test_bind_wildcard_with_derived_dataclass(self):
+        data = {
+            "wildcard": {
+                "qname": "b",
+                "type": "TypeB",
+                "value": {
+                    "x": "1",
+                    "y": "a",
+                },
+            }
+        }
+        expected = ExtendedType(
+            wildcard=DerivedElement(qname="b", value=TypeB(x=1, y="a"), type="TypeB")
         )
+        self.assertEqual(expected, self.parser.bind_dataclass(data, ExtendedType))
 
-        self.assertEqual(
-            AnyElement(qname="a", text="1"),
-            self.parser.bind_choice({"qname": "a", "text": 1}, var),
-        )
-
-    def test_bind_choice_generic_with_unknown_qname(self):
-        var = XmlVarFactory.create(
-            xml_type=XmlType.ELEMENTS, qname="compound", name="compound"
-        )
+    def test_bind_any_type_with_derived_dataclass(self):
+        data = {
+            "any": {
+                "qname": "any",
+                "type": None,
+                "value": {"x": "1"},
+            }
+        }
+        expected = ExtendedType(any=DerivedElement(qname="any", value=TypeA(x=1)))
+        self.assertEqual(expected, self.parser.bind_dataclass(data, ExtendedType))
 
         with self.assertRaises(ParserError) as cm:
-            self.parser.bind_choice({"qname": "foo", "text": 1}, var)
+            data["any"]["type"] = "notexists"
+            self.parser.bind_dataclass(data, ExtendedType)
 
-        self.assertEqual(
-            "XmlElements undefined choice: `compound` for qname `foo`",
-            str(cm.exception),
-        )
+        self.assertEqual("Unable to locate xsi:type `notexists`", str(cm.exception))
 
-    def test_bind_wildcard_with_any_element(self):
-        var = XmlVarFactory.create(
-            xml_type=XmlType.WILDCARD,
-            name="any_element",
-            qname="any_element",
-            types=(object,),
-        )
+    def test_find_var(self):
+        meta = self.parser.context.build(TypeB)
+        xml_vars = meta.get_all_vars()
 
-        self.assertEqual(
-            AnyElement(qname="a", text="1"),
-            self.parser.bind_value(var, {"qname": "a", "text": 1}),
-        )
+        self.assertEqual(xml_vars[0], self.parser.find_var(xml_vars, "x"))
+        self.assertEqual(xml_vars[0], self.parser.find_var(xml_vars, "x", True))
 
-    def test_bind_wildcard_with_derived_element(self):
-        var = XmlVarFactory.create(
-            any_type=True,
-            name="a",
-            qname="a",
-            types=(object,),
-        )
-        actual = DerivedElement(qname="a", value=Books(book=[]), substituted=True)
-        data = {"qname": "a", "value": {"book": []}, "substituted": True}
-
-        self.assertEqual(actual, self.parser.bind_value(var, data))
-
-    def test_bind_wildcard_with_no_matching_value(self):
-        var = XmlVarFactory.create(
-            any_type=True,
-            name="a",
-            qname="a",
-            types=(object,),
-        )
-
-        data = {"test_bind_wildcard_with_no_matching_value": False}
-        self.assertEqual(data, self.parser.bind_value(var, data))
-        self.assertEqual(1, self.parser.bind_value(var, 1))
+        meta = self.parser.context.build(ExtendedType)
+        xml_vars = meta.get_all_vars()
+        self.assertIsNone(self.parser.find_var(xml_vars, "a", True))
+        self.assertEqual(xml_vars[0], self.parser.find_var(xml_vars, "a"))

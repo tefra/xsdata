@@ -2,8 +2,22 @@
 JSON Binding
 ============
 
-Binding JSON lacks a bit in features and for edge cases with wildcards and derived
-types doing roundtrip conversions is not always possible.
+All binding modules rely on a :class:`~xsdata.formats.dataclass.context.XmlContext`
+instance to cache marshalling information.
+
+It's recommended to either reuse the same parser/serializer instance or reuse the
+context instance.
+
+.. code-block::
+
+    from xsdata.formats.dataclass.context import XmlContext
+    from xsdata.formats.dataclass.parsers import JsonParser
+    from xsdata.formats.dataclass.serializers import JsonSerializer
+
+    context = XmlContext()
+    parser = JsonParser(context=context)
+    serializer = JsonSerializer(context=context)
+
 
 .. testsetup:: *
 
@@ -91,6 +105,28 @@ From json path
     BookForm(author='Hightower, Kim', title='The First Book', genre='Fiction', price=44.95, pub_date=XmlDate(2000, 10, 1), review='An amazing story of nothing.', id='bk001', lang='en')
 
 
+Ignore unknown properties
+-------------------------
+
+.. doctest::
+
+    >>> from tests.fixtures.books import *  # Import all classes
+    >>> from xsdata.formats.dataclass.parsers.config import ParserConfig
+    ...
+    >>> config = ParserConfig(
+    ...     fail_on_unknown_properties=False,
+    ... )
+    >>> json_string = """{
+    ...   "author": "Hightower, Kim",
+    ...   "unknown_property": "I will fail"
+    ... }"""
+    >>> parser = JsonParser(config=config)
+    >>> parser.from_string(json_string, BookForm)
+    BookForm(author='Hightower, Kim', title=None, genre=None, price=None, pub_date=None, review=None, id=None, lang='en')
+
+API :ref:`Reference <ParserConfig>`.
+
+
 Unknown json target type
 ------------------------
 
@@ -112,6 +148,12 @@ all the imported modules to find a matching dataclass.
     >>> parser = JsonParser()
     >>> parser.from_string(json_string)
     BookForm(author='Hightower, Kim', title='The First Book', genre='Fiction', price=44.95, pub_date=XmlDate(2000, 10, 1), review='An amazing story of nothing.', id='bk001', lang='en')
+
+.. warning::
+
+    The class locator searches for a dataclass that includes all the input object
+    properties. This process doesn't work for documents with unknown properties even
+    if the configuration option is disabled!
 
 
 List of Objects

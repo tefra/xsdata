@@ -23,6 +23,7 @@ from xsdata.formats.dataclass.models.elements import XmlMeta
 from xsdata.formats.dataclass.models.elements import XmlVar
 from xsdata.formats.dataclass.models.generics import AnyElement
 from xsdata.formats.dataclass.models.generics import DerivedElement
+from xsdata.formats.dataclass.parsers.config import ParserConfig
 from xsdata.formats.dataclass.parsers.utils import ParserUtils
 from xsdata.formats.dataclass.typing import get_args
 from xsdata.formats.dataclass.typing import get_origin
@@ -37,10 +38,12 @@ class JsonParser(AbstractParser):
     """
     Json parser for dataclasses.
 
+    :param config: Parser configuration
     :param context: Model context provider
     :param load_factory: Replace the default json.load call with another implementation
     """
 
+    config: ParserConfig = field(default_factory=ParserConfig)
     context: XmlContext = field(default_factory=XmlContext)
     load_factory: Callable = field(default=json.load)
 
@@ -117,13 +120,16 @@ class JsonParser(AbstractParser):
             is_list = isinstance(value, list)
             var = self.find_var(xml_vars, key, is_list)
 
-            if var is None:
+            if var is None and self.config.fail_on_unknown_properties:
                 raise ParserError(f"Unknown property {clazz.__qualname__}.{key}")
 
-            if var.init:
+            if var and var.init:
                 params[var.name] = self.bind_value(meta, var, value)
 
-        return clazz(**params)  # type: ignore
+        try:
+            return clazz(**params)  # type: ignore
+        except TypeError as e:
+            raise ParserError(e)
 
     def bind_derived_dataclass(self, data: Dict, clazz: Type[T]) -> Any:
         qname = data["qname"]

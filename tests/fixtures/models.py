@@ -25,7 +25,7 @@ class TypeC:
 class TypeD:
     x: int
     y: str
-    z: bool
+    z: Optional[bool]
 
 
 @dataclass

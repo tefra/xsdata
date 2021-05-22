@@ -12,6 +12,7 @@ from tests.fixtures.models import ExtendedType
 from tests.fixtures.models import TypeA
 from tests.fixtures.models import TypeB
 from tests.fixtures.models import TypeC
+from tests.fixtures.models import TypeD
 from tests.fixtures.models import UnionType
 from xsdata.exceptions import ParserError
 from xsdata.formats.dataclass.models.generics import AnyElement
@@ -133,6 +134,19 @@ class JsonParserTests(FactoryTestCase):
             self.parser.bind_dataclass(data, Books)
 
         self.assertEqual("Unknown property Books.unknown", str(cm.exception))
+
+        self.parser.config.fail_on_unknown_properties = False
+        self.assertEqual(Books(), self.parser.bind_dataclass(data, Books))
+
+    def test_bind_dataclass_with_required_fields(self):
+        obj = self.parser.bind_dataclass({"x": 1, "y": "a", "z": None}, TypeD)
+
+        self.assertEqual(1, obj.x)
+        self.assertEqual("a", obj.y)
+        self.assertIsNone(obj.z)
+
+        with self.assertRaises(ParserError):
+            self.parser.bind_dataclass({"x": 1, "y": "a"}, TypeD)
 
     def test_bind_derived_dataclass(self):
         data = {

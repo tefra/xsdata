@@ -114,17 +114,16 @@ class BoolConverterTests(TestCase):
         self.converter = converter.type_converter(bool)
 
     def test_deserialize(self):
-        with self.assertRaises(ConverterError):
-            self.converter.deserialize("True")
+        for invalid in ("True", "False", 1, 0):
+            with self.assertRaises(ConverterError):
+                self.converter.deserialize(invalid)
 
         self.assertTrue(self.converter.deserialize("true"))
         self.assertTrue(self.converter.deserialize("1"))
         self.assertFalse(self.converter.deserialize("false"))
         self.assertFalse(self.converter.deserialize("0"))
         self.assertTrue(self.converter.deserialize(True))
-        self.assertTrue(self.converter.deserialize(1))
         self.assertFalse(self.converter.deserialize(False))
-        self.assertFalse(self.converter.deserialize(0))
 
     def test_serialize(self):
         self.assertEqual("true", self.converter.serialize(True))

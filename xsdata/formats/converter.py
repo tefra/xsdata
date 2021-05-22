@@ -99,7 +99,7 @@ class ConverterFactory:
             return None
 
         if isinstance(value, list):
-            return " ".join([self.serialize(val, **kwargs) for val in value])
+            return " ".join(self.serialize(val, **kwargs) for val in value)
 
         instance = self.value_converter(value)
         return instance.serialize(value, **kwargs)
@@ -232,7 +232,10 @@ class BoolConverter(Converter):
 
             raise ConverterError(f"Invalid bool literal '{value}'")
 
-        return True if value else False
+        if value is True or value is False:
+            return value
+
+        raise ConverterError(f"Invalid bool literal '{value}'")
 
     def serialize(self, value: bool, **kwargs: Any) -> str:
         return "true" if value else "false"
@@ -362,7 +365,7 @@ class QNameConverter(Converter):
         return f"{prefix}:{tag}" if prefix else tag
 
     @staticmethod
-    def resolve(value: str, ns_map: Optional[Dict]) -> Tuple:
+    def resolve(value: str, ns_map: Optional[Dict] = None) -> Tuple:
         value = value.strip()
 
         if not value:

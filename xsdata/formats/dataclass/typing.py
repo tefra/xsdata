@@ -13,7 +13,11 @@ EMPTY_ARGS = ()
 
 
 def get_origin(tp: Any) -> Any:
-    if tp in (List, Dict, Union):
+
+    if tp is Dict:
+        return Dict
+
+    if tp in (List, Union):
         raise TypeError()
 
     if isinstance(tp, TypeVar):
@@ -69,10 +73,24 @@ def _evaluate(tp: Any) -> Iterator[Type]:
 def _evaluate_mapping(tp: Any) -> Iterator[Type]:
     yield dict
     args = get_args(tp)
+
+    if not args:
+        yield str
+        yield str
+
     for arg in args:
-        if get_origin(arg):
+        origin = get_origin(arg)
+        if origin is TypeVar:
+            try:
+                next(_evaluate_typevar(arg))
+            except TypeError:
+                yield str
+            else:
+                raise TypeError()
+        elif origin is not None:
             raise TypeError()
-        yield arg
+        else:
+            yield arg
 
 
 def _evaluate_list(tp: Any) -> Iterator[Type]:

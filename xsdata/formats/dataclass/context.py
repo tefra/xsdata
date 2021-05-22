@@ -2,7 +2,6 @@ import sys
 from collections import defaultdict
 from dataclasses import dataclass
 from dataclasses import field
-from dataclasses import fields
 from dataclasses import is_dataclass
 from typing import Any
 from typing import Callable
@@ -12,6 +11,7 @@ from typing import Optional
 from typing import Set
 from typing import Type
 
+from xsdata.exceptions import XmlContextError
 from xsdata.formats.bindings import T
 from xsdata.formats.dataclass.models.builders import XmlMetaBuilder
 from xsdata.formats.dataclass.models.elements import XmlMeta
@@ -105,7 +105,7 @@ class XmlContext:
         types: List[Type] = self.find_types(qname)
         return types[-1] if types else None
 
-    def find_type_by_fields(self, field_names: Set) -> Optional[Type[T]]:
+    def find_type_by_fields(self, field_names: Set[str]) -> Optional[Type[T]]:
         """
         Find a dataclass from all the imported modules that matches the given
         list of field names.
@@ -116,7 +116,7 @@ class XmlContext:
         self.build_xsi_cache()
         for types in self.xsi_cache.values():
             for clazz in types:
-                if not field_names.difference({attr.name for attr in fields(clazz)}):
+                if self.local_names_match(field_names, clazz):
                     return clazz
 
         return None
@@ -156,6 +156,14 @@ class XmlContext:
                 self.attribute_name_generator,
             )
         return self.cache[clazz]
+
+    def local_names_match(self, names: Set[str], clazz: Type) -> bool:
+        try:
+            meta = self.build(clazz)
+            local_names = {var.local_name for var in meta.get_all_vars()}
+            return not names.difference(local_names)
+        except XmlContextError:
+            return False
 
     @classmethod
     def is_derived(cls, obj: Any, clazz: Type) -> bool:

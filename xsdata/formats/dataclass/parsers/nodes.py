@@ -56,7 +56,7 @@ class ElementNode(XmlNode):
     position: int
     mixed: bool = False
     derived: bool = False
-    substituted: bool = False
+    xsi_type: Optional[str] = None
     assigned: Set = field(default_factory=set)
 
     def bind(self, qname: str, text: NoneStr, tail: NoneStr, objects: List) -> bool:
@@ -78,7 +78,7 @@ class ElementNode(XmlNode):
 
         obj = self.meta.clazz(**params)
         if self.derived:
-            obj = DerivedElement(qname=qname, value=obj, substituted=self.substituted)
+            obj = DerivedElement(qname=qname, value=obj, type=self.xsi_type)
 
         objects.append((qname, obj))
 
@@ -180,7 +180,7 @@ class ElementNode(XmlNode):
             context=self.context,
             position=position,
             derived=derived,
-            substituted=xsi_type is not None,
+            xsi_type=xsi_type,
             mixed=self.meta.mixed_content,
         )
 
@@ -486,6 +486,7 @@ class NodeParser(PushParser):
                 ns_map=ns_map,
                 context=self.context,
                 derived=derived,
+                xsi_type=xsi_type if derived else None,
             )
 
         queue.append(child)

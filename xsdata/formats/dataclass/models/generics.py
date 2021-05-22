@@ -43,9 +43,9 @@ class DerivedElement(Generic[T]):
 
     :param qname: The element's qualified name
     :param value: The wrapped value
-    :param substituted: Specify whether the value is a type substitution
+    :param type: The real xsi:type
     """
 
     qname: str
     value: T
-    substituted: bool = False
+    type: Optional[str] = None

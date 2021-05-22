@@ -44,7 +44,7 @@ class XmlMetaBuilder:
         """Build the binding metadata for a dataclass and its fields."""
 
         if not is_dataclass(clazz):
-            raise XmlContextError(f"Object {clazz} is not a dataclass.")
+            raise XmlContextError(f"Type '{clazz}' is not a dataclass.")
 
         # Fetch the dataclass meta settings and make sure we don't inherit
         # the parent class meta.

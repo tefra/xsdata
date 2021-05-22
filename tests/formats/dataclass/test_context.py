@@ -71,9 +71,6 @@ class XmlContextTests(FactoryTestCase):
         field_names = {f.name for f in fields(BookForm)}
         self.assertEqual(BookForm, self.ctx.find_type_by_fields(field_names))
 
-        field_names.pop()  # Test matching less fields
-        self.assertEqual(BookForm, self.ctx.find_type_by_fields(field_names))
-
         field_names.update({"please", "dont", "exist"})  # Test matching with more
         self.assertIsNone(self.ctx.find_type_by_fields(field_names))
 

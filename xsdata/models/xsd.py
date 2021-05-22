@@ -863,7 +863,7 @@ class Restriction(AnnotationBase):
 
         if self.patterns:
             restrictions["pattern"] = "|".join(
-                [pattern.value for pattern in self.patterns]
+                pattern.value for pattern in self.patterns
             )
 
         return restrictions

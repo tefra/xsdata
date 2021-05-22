@@ -103,7 +103,7 @@ class XmlSerializerTests(TestCase):
     def test_write_dataclass_with_no_dataclass(self):
         with self.assertRaises(XmlContextError) as cm:
             next(self.serializer.write_dataclass(1))
-        self.assertEqual("Object <class 'int'> is not a dataclass.", str(cm.exception))
+        self.assertEqual("Type '<class 'int'>' is not a dataclass.", str(cm.exception))
 
     def test_write_mixed_content(self):
         var = XmlVarFactory.create(xml_type=XmlType.WILDCARD, qname="a", mixed=True)
@@ -238,7 +238,9 @@ class XmlSerializerTests(TestCase):
 
     def test_write_any_type_with_derived_element_dataclass(self):
         var = XmlVarFactory.create(xml_type=XmlType.WILDCARD, qname="a")
-        value = DerivedElement(qname="a", value=BookForm(title="def"), substituted=True)
+        value = DerivedElement(
+            qname="a", value=BookForm(title="def"), type="{urn:books}BookForm"
+        )
         expected = [
             (XmlWriterEvent.START, "a"),
             (XmlWriterEvent.ATTR, "lang", "en"),

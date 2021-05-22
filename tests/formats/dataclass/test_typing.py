@@ -34,11 +34,9 @@ class TypingTests(TestCase):
             get_origin(List)
 
     def test_get_origin_dict(self):
+        self.assertEqual(Dict, get_origin(Dict))
         self.assertEqual(Dict, get_origin(Dict[int, str]))
         self.assertEqual(Dict, get_origin(Dict[Union[int], Union[str]]))
-
-        with self.assertRaises(TypeError):
-            get_origin(Dict)
 
     def test_get_origin_union(self):
         self.assertIsNone(get_origin(Union[int]))
@@ -92,12 +90,14 @@ class TypingTests(TestCase):
         self.assertEqual((int,), evaluate(int))
 
     def test_evaluate_dict(self):
+        self.assertEqual((dict, str, str), evaluate(Dict))
         self.assertEqual((dict, str, int), evaluate(Dict[str, int]))
 
         unsupported_cases = [
             Dict[Any, Any],
             Dict[Union[str, int], int],
             Dict[int, Union[str, int]],
+            Dict[TypeVar("A", bound=int), str],
         ]
 
         for case in unsupported_cases:

@@ -8,6 +8,7 @@ from typing import Mapping
 from typing import Optional
 from typing import Sequence
 from typing import Set
+from typing import Tuple
 from typing import Type
 
 from xsdata.formats.converter import converter
@@ -15,7 +16,6 @@ from xsdata.models.enums import NamespaceType
 from xsdata.utils import collections
 from xsdata.utils.constants import EMPTY_SEQUENCE
 from xsdata.utils.namespaces import local_name
-from xsdata.utils.namespaces import split_qname
 from xsdata.utils.namespaces import target_uri
 
 NoneType = type(None)
@@ -31,34 +31,32 @@ class XmlType:
     ATTRIBUTE = "Attribute"
     ATTRIBUTES = "Attributes"
 
-    @classmethod
-    def all(cls):
-        yield XmlType.TEXT
-        yield XmlType.ELEMENT
-        yield XmlType.ELEMENTS
-        yield XmlType.WILDCARD
-        yield XmlType.ATTRIBUTE
-        yield XmlType.ATTRIBUTES
-
 
 class MetaMixin:
-    def __eq__(self, other: Any) -> bool:
-        if isinstance(other, self.__class__):
-            return tuple(self) == tuple(other)
+    """Use this mixin for unit tests only!!!"""
 
-        return NotImplemented
+    __slots__: Tuple[str, ...] = ()
+
+    def __eq__(self, other: Any) -> bool:
+        return tuple(self) == tuple(other)
 
     def __iter__(self) -> Iterator:
-        for field_name in self.__slots__:
-            yield getattr(self, field_name)
+        for name in self.__slots__:
+            yield getattr(self, name)
+
+    def __repr__(self) -> str:
+        params = (f"{name}={getattr(self, name)!r}" for name in self.__slots__)
+        return f"{self.__class__.__qualname__}({', '.join(params)})"
 
 
 class XmlVar(MetaMixin):
     """Class field binding metadata."""
 
     __slots__ = (
+        "index",
         "name",
         "qname",
+        "types",
         "init",
         "mixed",
         "tokens",
@@ -69,17 +67,17 @@ class XmlVar(MetaMixin):
         "sequential",
         "list_element",
         "default",
+        "xml_type",
+        "namespaces",
+        "elements",
+        "wildcards",
+        # Calculated
         "is_text",
         "is_element",
         "is_elements",
         "is_wildcard",
         "is_attribute",
         "is_attributes",
-        "index",
-        "types",
-        "namespaces",
-        "elements",
-        "wildcards",
         "namespace_matches",
         "clazz",
         "is_clazz_union",
@@ -88,7 +86,6 @@ class XmlVar(MetaMixin):
 
     def __init__(
         self,
-        *args: Any,
         index: int,
         name: str,
         qname: str,
@@ -107,6 +104,7 @@ class XmlVar(MetaMixin):
         namespaces: Sequence[str],
         elements: Mapping[str, "XmlVar"],
         wildcards: Sequence["XmlVar"],
+        **kwargs: Any,
     ):
         """
         :param index: Field ordering
@@ -152,6 +150,7 @@ class XmlVar(MetaMixin):
         self.clazz = collections.first(tp for tp in types if is_dataclass(tp))
         self.is_clazz_union = self.clazz and len(types) > 1
         self.local_name = local_name(qname)
+        self.xml_type = xml_type
 
         self.is_text = False
         self.is_element = False
@@ -176,24 +175,6 @@ class XmlVar(MetaMixin):
     @property
     def element_types(self) -> Set[Type]:
         return {tp for element in self.elements.values() for tp in element.types}
-
-    def get_xml_type(self) -> str:
-        if self.is_wildcard:
-            return XmlType.WILDCARD
-
-        if self.is_attribute:
-            return XmlType.ATTRIBUTE
-
-        if self.is_attributes:
-            return XmlType.ATTRIBUTES
-
-        if self.is_element:
-            return XmlType.ELEMENT
-
-        if self.is_elements:
-            return XmlType.ELEMENTS
-
-        return XmlType.TEXT
 
     def find_choice(self, qname: str) -> Optional["XmlVar"]:
         """Match and return a choice field by its qualified name."""
@@ -279,29 +260,6 @@ class XmlVar(MetaMixin):
 
         return False
 
-    def __repr__(self) -> str:
-        params = (
-            f"index={self.index}, "
-            f"name={self.name}, "
-            f"qname={self.qname}, "
-            f"types={self.types}, "
-            f"init={self.init}, "
-            f"mixed={self.mixed}, "
-            f"tokens={self.tokens}, "
-            f"format={self.format}, "
-            f"derived={self.derived}, "
-            f"any_type={self.any_type}, "
-            f"nillable={self.nillable}, "
-            f"sequential={self.sequential}, "
-            f"list_element={self.list_element}, "
-            f"default={self.default}, "
-            f"xml_type={self.get_xml_type()}, "
-            f"namespaces={self.namespaces}, "
-            f"elements={self.elements}, "
-            f"wildcards={self.wildcards}"
-        )
-        return f"{self.__class__.__name__}({params})"
-
 
 get_index = operator.attrgetter("index")
 
@@ -320,12 +278,13 @@ class XmlMeta(MetaMixin):
         "wildcards",
         "attributes",
         "any_attributes",
+        # Calculated
+        "namespace",
         "mixed_content",
     )
 
     def __init__(
         self,
-        *args: Any,
         clazz: Type,
         qname: str,
         source_qname: str,
@@ -336,6 +295,7 @@ class XmlMeta(MetaMixin):
         wildcards: Sequence[XmlVar],
         attributes: Mapping[str, XmlVar],
         any_attributes: Sequence[XmlVar],
+        **kwargs: Any,
     ):
 
         """
@@ -354,6 +314,7 @@ class XmlMeta(MetaMixin):
 
         self.clazz = clazz
         self.qname = qname
+        self.namespace = target_uri(qname)
         self.source_qname = source_qname
         self.nillable = nillable
         self.text = text
@@ -363,6 +324,15 @@ class XmlMeta(MetaMixin):
         self.attributes = attributes
         self.any_attributes = any_attributes
         self.mixed_content = any(wildcard.mixed for wildcard in self.wildcards)
+
+    @property
+    def element_types(self) -> Set[Type]:
+        return {
+            tp
+            for elements in self.elements.values()
+            for element in elements
+            for tp in element.types
+        }
 
     def get_element_vars(self) -> List[XmlVar]:
         result = list(
@@ -391,10 +361,6 @@ class XmlMeta(MetaMixin):
             result.append(self.text)
 
         return sorted(result, key=get_index)
-
-    @property
-    def namespace(self) -> Optional[str]:
-        return split_qname(self.qname)[0]
 
     def find_attribute(self, qname: str) -> Optional[XmlVar]:
         return self.attributes.get(qname)
@@ -427,30 +393,6 @@ class XmlMeta(MetaMixin):
         chd = self.find_wildcard(qname)
         if chd:
             yield chd
-
-    @property
-    def element_types(self) -> Set[Type]:
-        return {
-            tp
-            for elements in self.elements.values()
-            for element in elements
-            for tp in element.types
-        }
-
-    def __repr__(self) -> str:
-        params = (
-            f"clazz={self.clazz}, "
-            f"qname={self.qname}, "
-            f"source_qname={self.source_qname}, "
-            f"nillable={self.nillable}, "
-            f"text={self.text}, "
-            f"choices={self.choices}, "
-            f"elements={self.elements}, "
-            f"wildcards={self.wildcards}, "
-            f"attributes={self.attributes}, "
-            f"any_attributes={self.any_attributes}"
-        )
-        return f"{self.__class__.__name__}({params})"
 
 
 def find_by_namespace(xml_vars: Sequence[XmlVar], qname: str) -> Optional[XmlVar]:

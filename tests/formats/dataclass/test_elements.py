@@ -1,5 +1,3 @@
-import copy
-from dataclasses import dataclass
 from dataclasses import make_dataclass
 from typing import Iterator
 from unittest import mock
@@ -13,16 +11,10 @@ from tests.fixtures.models import TypeC
 from tests.fixtures.models import TypeD
 from tests.fixtures.models import UnionType
 from xsdata.formats.dataclass.context import XmlContext
-from xsdata.formats.dataclass.models.builders import XmlMetaBuilder
 from xsdata.formats.dataclass.models.elements import XmlType
 from xsdata.formats.dataclass.models.elements import XmlVar
 from xsdata.utils.testing import XmlMetaFactory
 from xsdata.utils.testing import XmlVarFactory
-
-
-@dataclass
-class Fixture:
-    a: int
 
 
 class XmlValTests(TestCase):
@@ -37,19 +29,14 @@ class XmlValTests(TestCase):
         var = XmlVarFactory.create(name="foo")
         self.assertIsNone(var.clazz)
 
-        var = XmlVarFactory.create(name="foo", types=(Fixture,))
-        self.assertEqual(Fixture, var.clazz)
-
-    def test_get_xml_type(self):
-        for xml_type in XmlType.all():
-            var = XmlVarFactory.create(name="foo", xml_type=xml_type)
-            self.assertEqual(xml_type, var.get_xml_type())
+        var = XmlVarFactory.create(name="foo", types=(TypeA,))
+        self.assertEqual(TypeA, var.clazz)
 
     def test_property_is_clazz_union(self):
-        var = XmlVarFactory.create(name="foo", types=(Fixture,))
+        var = XmlVarFactory.create(name="foo", types=(TypeA,))
         self.assertFalse(var.is_clazz_union)
 
-        var = XmlVarFactory.create(name="foo", types=(Fixture, int))
+        var = XmlVarFactory.create(name="foo", types=(TypeA, int))
         self.assertTrue(var.is_clazz_union)
 
     def test_property_element_types(self):
@@ -94,40 +81,16 @@ class XmlValTests(TestCase):
         self.assertEqual(var.wildcards[0], var.find_choice("{foo}a"))
 
     def test_find_value_choice(self):
-        c = make_dataclass("C", fields=[])
-        d = make_dataclass("D", fields=[], bases=(c,))
+        meta = self.context.build(ChoiceType)
+        var = meta.choices[0]
 
-        elements = [
-            XmlVarFactory.create(xml_type=XmlType.ELEMENT, name="a", types=(int,)),
-            XmlVarFactory.create(
-                xml_type=XmlType.ELEMENT, name="b", types=(int,), tokens=True
-            ),
-            XmlVarFactory.create(
-                xml_type=XmlType.ELEMENT,
-                name="c",
-                types=(c,),
-            ),
-            XmlVarFactory.create(
-                xml_type=XmlType.ELEMENT,
-                name="d",
-                types=(float,),
-                nillable=True,
-            ),
-        ]
-
-        var = XmlVarFactory.create(
-            xml_type=XmlType.ELEMENTS,
-            name="compound",
-            elements={x.qname: x for x in elements},
-        )
-
-        self.assertIsNone(var.find_value_choice("foo"))
         self.assertIsNone(var.find_value_choice(["1.1", "1.2"]))
-        self.assertEqual(elements[0], var.find_value_choice(1))
-        self.assertEqual(elements[1], var.find_value_choice([1, 2]))
-        self.assertEqual(elements[2], var.find_value_choice(d()))
-        self.assertEqual(elements[2], var.find_value_choice(c()))
-        self.assertEqual(elements[3], var.find_value_choice(None))
+        self.assertEqual(var.elements["int2"], var.find_value_choice(None))
+        self.assertEqual(var.elements["qname"], var.find_value_choice("foo"))
+        self.assertEqual(var.elements["int"], var.find_value_choice(1))
+        self.assertEqual(var.elements["tokens"], var.find_value_choice([1, 2]))
+        self.assertEqual(var.elements["a"], var.find_value_choice(TypeA(1)))
+        self.assertEqual(var.elements["b"], var.find_value_choice(TypeB(1, "b")))
 
     def test_match_namespace(self):
         var = XmlVarFactory.create(xml_type=XmlType.WILDCARD, name="foo")
@@ -161,41 +124,6 @@ class XmlValTests(TestCase):
         var.namespace_matches["{tns}cached"] = True
         self.assertTrue(var.match_namespace("{tns}cached"))
 
-    def test_eq(self):
-        var = XmlVarFactory.create(name="foo", types=(int, float))
-        clone = copy.deepcopy(var)
-        self.assertEqual(var, clone)
-
-        clone.default = 1
-        self.assertNotEqual(var, clone)
-        self.assertNotEqual(var, 1)
-        self.assertNotEqual(1, var)
-
-    def test_repr(self):
-        var = XmlVarFactory.create(name="foo", types=(int, float))
-        expected = (
-            "XmlVar("
-            "index=0, "
-            "name=foo, "
-            "qname=foo, "
-            "types=(<class 'int'>, <class 'float'>), "
-            "init=True, "
-            "mixed=False, "
-            "tokens=False, "
-            "format=None, "
-            "derived=False, "
-            "any_type=False, "
-            "nillable=False, "
-            "sequential=False, "
-            "list_element=False, "
-            "default=None, "
-            "xml_type=Element, "
-            "namespaces=(), "
-            "elements={}, "
-            "wildcards=[])"
-        )
-        self.assertEqual(expected, repr(var))
-
 
 class XmlMetaTests(TestCase):
     def setUp(self) -> None:
@@ -210,6 +138,24 @@ class XmlMetaTests(TestCase):
             elements={},
             any_attributes=[],
         )
+
+    def test__repr__(self):
+        expected = (
+            "XmlMeta("
+            "clazz=<class 'types.a'>, "
+            "qname='a', "
+            "source_qname='a', "
+            "nillable=False, "
+            "text=None, "
+            "choices=[], "
+            "elements={}, "
+            "wildcards=[], "
+            "attributes={}, "
+            "any_attributes=[], "
+            "namespace=None, "
+            "mixed_content=False)"
+        )
+        self.assertEqual(expected, repr(self.meta))
 
     def test_property_element_types(self):
         meta = self.context.build(UnionType)
@@ -313,19 +259,3 @@ class XmlMetaTests(TestCase):
         result = self.meta.find_children("a")
         self.assertIsInstance(result, Iterator)
         self.assertEqual([element1, element2, option1, wildcard], list(result))
-
-    def test_repr(self):
-        expected = (
-            "XmlMeta("
-            "clazz=<class 'types.a'>, "
-            "qname=a, "
-            "source_qname=a, "
-            "nillable=False, "
-            "text=None, "
-            "choices=[], "
-            "elements={}, "
-            "wildcards=[], "
-            "attributes={}, "
-            "any_attributes=[])"
-        )
-        self.assertEqual(expected, repr(self.meta))

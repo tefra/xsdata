@@ -1,4 +1,4 @@
-exclude: tests/fixtures|docs/examples
+exclude: tests/fixtures
 
 repos:
   - repo: https://github.com/asottile/pyupgrade

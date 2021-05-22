@@ -305,16 +305,14 @@ class Filters:
 
         next_indent = indent + 4
         value = "\n".join(
-            [
-                f'{" " * next_indent}"{line}"'
-                for line in textwrap.wrap(
-                    value,
-                    width=self.max_line_length - next_indent - 2,  # plus quotes
-                    drop_whitespace=False,
-                    replace_whitespace=False,
-                    break_long_words=True,
-                )
-            ]
+            f'{" " * next_indent}"{line}"'
+            for line in textwrap.wrap(
+                value,
+                width=self.max_line_length - next_indent - 2,  # plus quotes
+                drop_whitespace=False,
+                replace_whitespace=False,
+                break_long_words=True,
+            )
         )
         return f"(\n{value}\n{' ' * indent})"
 

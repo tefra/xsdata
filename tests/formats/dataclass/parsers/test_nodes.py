@@ -791,6 +791,7 @@ class NodeParserTests(TestCase):
             attrs=attrs,
             ns_map=ns_map,
             derived=True,
+            xsi_type="{urn:books}books",
         )
         parser.start(None, queue, objects, "doc", attrs, ns_map)
         self.assertEqual(1, len(queue))
@@ -816,6 +817,7 @@ class NodeParserTests(TestCase):
             attrs=attrs,
             ns_map={},
             derived=True,
+            xsi_type="b",
         )
 
         self.assertEqual(1, len(queue))

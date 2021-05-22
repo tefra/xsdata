@@ -195,7 +195,7 @@ class XmlSerializer(AbstractSerializer):
     ) -> Generator:
         if is_dataclass(value.value):
             xsi_type = None
-            if value.substituted:
+            if value.type:
                 meta = self.context.build(value.value.__class__)
                 xsi_type = QName(meta.source_qname)
 

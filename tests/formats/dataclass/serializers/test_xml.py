@@ -238,7 +238,9 @@ class XmlSerializerTests(TestCase):
 
     def test_write_any_type_with_derived_element_dataclass(self):
         var = XmlVarFactory.create(xml_type=XmlType.WILDCARD, qname="a")
-        value = DerivedElement(qname="a", value=BookForm(title="def"), substituted=True)
+        value = DerivedElement(
+            qname="a", value=BookForm(title="def"), type="{urn:books}BookForm"
+        )
         expected = [
             (XmlWriterEvent.START, "a"),
             (XmlWriterEvent.ATTR, "lang", "en"),

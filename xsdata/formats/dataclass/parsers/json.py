@@ -24,6 +24,8 @@ from xsdata.formats.dataclass.models.elements import XmlVar
 from xsdata.formats.dataclass.models.generics import AnyElement
 from xsdata.formats.dataclass.models.generics import DerivedElement
 from xsdata.formats.dataclass.parsers.utils import ParserUtils
+from xsdata.formats.dataclass.typing import get_args
+from xsdata.formats.dataclass.typing import get_origin
 from xsdata.utils.constants import EMPTY_MAP
 
 ANY_KEYS = {f.name for f in fields(AnyElement)}
@@ -65,10 +67,21 @@ class JsonParser(AbstractParser):
         if clazz is None:
             return self.detect_type(data)
 
-        origin = getattr(clazz, "__origin__", None)
-        list_type = origin in (list, List) or clazz is List
-        if origin is not None and not list_type:
-            raise ParserError(f"Origin {origin} is not supported")
+        try:
+            origin = get_origin(clazz)
+            list_type = False
+            if origin is List:
+                list_type = True
+                args = get_args(clazz)
+
+                if len(args) != 1 or not is_dataclass(args[0]):
+                    raise TypeError()
+
+                clazz = args[0]
+            elif origin is not None:
+                raise TypeError()
+        except TypeError:
+            raise ParserError(f"Invalid clazz argument: {clazz}")
 
         if list_type != isinstance(data, list):
             if list_type:
@@ -76,26 +89,19 @@ class JsonParser(AbstractParser):
             else:
                 raise ParserError("Document is array, expected object")
 
-        if list_type:
-            args = getattr(clazz, "__args__", ())
-            if args is None or len(args) != 1 or not is_dataclass(args[0]):
-                raise ParserError("List argument must be a dataclass")
-
-            clazz = args[0]
-
         return clazz  # type: ignore
 
     def detect_type(self, data: Union[Dict, List]) -> Type[T]:
         if not data:
             raise ParserError("Document is empty, can not detect type")
 
-        keys = list(data[0].keys() if isinstance(data, list) else data.keys())
+        keys = data[0].keys() if isinstance(data, list) else data.keys()
         clazz: Optional[Type[T]] = self.context.find_type_by_fields(set(keys))
 
         if clazz:
             return clazz
 
-        raise ParserError(f"Unable to locate model with properties({keys})")
+        raise ParserError(f"Unable to locate model with properties({list(keys)})")
 
     def bind_dataclass(self, data: Dict, clazz: Type[T]) -> T:
         """Recursively build the given model from the input dict data."""

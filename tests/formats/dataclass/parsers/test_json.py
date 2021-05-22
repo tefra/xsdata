@@ -102,7 +102,6 @@ class JsonParserTests(FactoryTestCase):
         self.assertIsInstance(book_list[1], BookForm)
 
     def test_verify_type(self):
-
         invalid_cases = [
             (
                 '{"not": 1, "found": 1}',
@@ -112,9 +111,13 @@ class JsonParserTests(FactoryTestCase):
             ("{}", None, "Document is empty, can not detect type"),
             ("[]", BookForm, "Document is array, expected object"),
             ("{}", List[BookForm], "Document is object, expected array"),
-            ("{}", Optional[BookForm], "Origin typing.Union is not supported"),
-            ("[]", List[int], "List argument must be a dataclass"),
-            ("[]", List, "List argument must be a dataclass"),
+            (
+                "{}",
+                Optional[ChoiceType],
+                f"Invalid clazz argument: {Optional[ChoiceType]}",
+            ),
+            ("[]", List[int], f"Invalid clazz argument: {List[int]}"),
+            ("[]", List, f"Invalid clazz argument: {List}"),
         ]
 
         for json_string, clazz, exc_msg in invalid_cases:

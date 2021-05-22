@@ -92,7 +92,7 @@ class XmlMetaBuilderTests(FactoryTestCase):
         with self.assertRaises(XmlContextError) as cm:
             XmlMetaBuilder.build(int, None, return_input, return_input)
 
-        self.assertEqual(f"Object {int} is not a dataclass.", str(cm.exception))
+        self.assertEqual(f"Type '{int}' is not a dataclass.", str(cm.exception))
 
     def test_build_vars(self):
         result = XmlMetaBuilder.build_vars(BookForm, None, text.pascal_case, str.upper)

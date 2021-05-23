@@ -242,9 +242,6 @@ class XmlVar(MetaMixin):
         return matches
 
     def _match_namespace(self, qname: str) -> bool:
-        if qname == "*":
-            return True
-
         uri = target_uri(qname)
         if not self.namespaces and uri is None:
             return True
@@ -382,8 +379,13 @@ class XmlMeta(MetaMixin):
     def find_wildcard(self, qname: str) -> Optional[XmlVar]:
         return find_by_namespace(self.wildcards, qname)
 
-    def find_children(self, qname: str) -> Iterator[XmlVar]:
+    def find_any_wildcard(self) -> Optional[XmlVar]:
+        if self.wildcards:
+            return self.wildcards[0]
 
+        return None
+
+    def find_children(self, qname: str) -> Iterator[XmlVar]:
         yield from self.find_elements(qname)
 
         chd = self.find_choice(qname)

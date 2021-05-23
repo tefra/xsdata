@@ -90,7 +90,7 @@ class ElementNode(XmlNode):
         text_node = False
         ParserUtils.bind_attrs(params, self.meta, self.attrs, self.ns_map)
 
-        wild_var = self.meta.find_wildcard("*")
+        wild_var = self.meta.find_any_wildcard()
         if wild_var and wild_var.mixed:
             ParserUtils.bind_mixed_objects(params, wild_var, self.position, objects)
         else:

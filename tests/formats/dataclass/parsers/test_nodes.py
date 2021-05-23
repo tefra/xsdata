@@ -147,7 +147,7 @@ class ElementNodeTests(FactoryTestCase):
         self.assertEqual("foo", objects[-1][0])
         self.assertEqual(DerivedElement("foo", a()), objects[-1][1])
 
-    @mock.patch.object(XmlMeta, "find_wildcard")
+    @mock.patch.object(XmlMeta, "find_any_wildcard")
     @mock.patch.object(ParserUtils, "bind_objects")
     @mock.patch.object(ParserUtils, "bind_wild_content")
     @mock.patch.object(ParserUtils, "bind_content")
@@ -158,13 +158,13 @@ class ElementNodeTests(FactoryTestCase):
         mock_bind_content,
         mock_bind_wild_content,
         mock_bind_objects,
-        find_wildcard,
+        mock_find_any_wildcard,
     ):
         mock_bind_attrs.side_effect = add_attr
         mock_bind_content.return_value = False
         mock_bind_wild_content.side_effect = add_text
         mock_bind_objects.side_effect = add_child
-        find_wildcard.return_value = XmlVarFactory.create(
+        mock_find_any_wildcard.return_value = XmlVarFactory.create(
             xml_type=XmlType.WILDCARD, qname="b", name="b"
         )
 
@@ -242,7 +242,7 @@ class ElementNodeTests(FactoryTestCase):
             attrs={"a": "b"},
             ns_map={"ns0": "xsdata"},
         )
-        wildcard = node.meta.find_wildcard("*")
+        wildcard = node.meta.find_any_wildcard()
         objects = [1, 2, 3]
 
         self.assertTrue(node.bind("foo", "text", "tail", objects))

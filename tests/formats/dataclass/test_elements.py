@@ -94,7 +94,6 @@ class XmlValTests(TestCase):
 
     def test_match_namespace(self):
         var = XmlVarFactory.create(xml_type=XmlType.WILDCARD, name="foo")
-        self.assertTrue(var.match_namespace("*"))
         self.assertTrue(var.match_namespace("a"))
 
         var = XmlVarFactory.create(

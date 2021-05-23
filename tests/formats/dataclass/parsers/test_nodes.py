@@ -2,7 +2,6 @@ import copy
 from dataclasses import dataclass
 from dataclasses import field
 from dataclasses import make_dataclass
-from dataclasses import replace
 from typing import Any
 from typing import List
 from typing import Union
@@ -730,25 +729,33 @@ class NodeParserTests(TestCase):
 
         attrs = {"k": "v"}
         ns_map = {"a": "b"}
-        expected_node = ElementNode(
-            position=0,
-            context=self.parser.context,
-            meta=self.parser.context.build(Books),
-            config=self.parser.config,
-            attrs=attrs,
-            ns_map=ns_map,
-        )
         self.parser.start(Books, queue, objects, "{urn:books}books", attrs, ns_map)
-        self.assertEqual(1, len(queue))
-        self.assertEqual(expected_node, queue[0])
+        actual = queue[0]
 
-        expected_node = replace(
-            expected_node, meta=self.parser.context.build(BookForm), attrs={}, ns_map={}
-        )
+        self.assertEqual(1, len(queue))
+        self.assertEqual(0, actual.position)
+        self.assertEqual(self.parser.context, actual.context)
+        self.assertEqual(self.parser.context.build(Books), actual.meta)
+        self.assertEqual(self.parser.config, actual.config)
+        self.assertEqual(attrs, actual.attrs)
+        self.assertEqual(ns_map, actual.ns_map)
+        self.assertFalse(actual.mixed)
+        self.assertFalse(actual.derived)
+        self.assertIsNone(actual.xsi_type)
+
         self.parser.start(Books, queue, objects, "book", {}, {})
+        actual = queue[1]
 
         self.assertEqual(2, len(queue))
-        self.assertEqual(expected_node, queue[-1])
+        self.assertEqual(0, actual.position)
+        self.assertEqual(self.parser.context, actual.context)
+        self.assertEqual(self.parser.context.build(BookForm), actual.meta)
+        self.assertEqual(self.parser.config, actual.config)
+        self.assertEqual({}, actual.attrs)
+        self.assertEqual({}, actual.ns_map)
+        self.assertFalse(actual.mixed)
+        self.assertFalse(actual.derived)
+        self.assertIsNone(actual.xsi_type)
 
     def test_start_with_undefined_class(self):
         parser = self.parser
@@ -757,17 +764,19 @@ class NodeParserTests(TestCase):
 
         attrs = {"k": "v"}
         ns_map = {"a": "b"}
-        expected_node = ElementNode(
-            position=0,
-            context=parser.context,
-            meta=parser.context.build(Books),
-            config=parser.config,
-            attrs=attrs,
-            ns_map=ns_map,
-        )
         parser.start(None, queue, objects, "{urn:books}books", attrs, ns_map)
+        actual = queue[0]
+
         self.assertEqual(1, len(queue))
-        self.assertEqual(expected_node, queue[0])
+        self.assertEqual(0, actual.position)
+        self.assertEqual(self.parser.context, actual.context)
+        self.assertEqual(self.parser.context.build(Books), actual.meta)
+        self.assertEqual(self.parser.config, actual.config)
+        self.assertEqual(attrs, actual.attrs)
+        self.assertEqual(ns_map, actual.ns_map)
+        self.assertFalse(actual.mixed)
+        self.assertFalse(actual.derived)
+        self.assertIsNone(actual.xsi_type)
 
         with self.assertRaises(ParserError) as cm:
             parser.start(None, [], [], "{unknown}hopefully", {}, {})
@@ -783,19 +792,19 @@ class NodeParserTests(TestCase):
 
         attrs = {QNames.XSI_TYPE: "bk:books"}
         ns_map = {"bk": "urn:books", "xsi": Namespace.XSI.uri}
-        expected_node = ElementNode(
-            position=0,
-            context=parser.context,
-            meta=parser.context.build(Books),
-            config=parser.config,
-            attrs=attrs,
-            ns_map=ns_map,
-            derived=True,
-            xsi_type="{urn:books}books",
-        )
         parser.start(None, queue, objects, "doc", attrs, ns_map)
+        actual = queue[0]
+
         self.assertEqual(1, len(queue))
-        self.assertEqual(expected_node, queue[0])
+        self.assertEqual(0, actual.position)
+        self.assertEqual(self.parser.context, actual.context)
+        self.assertEqual(self.parser.context.build(Books), actual.meta)
+        self.assertEqual(self.parser.config, actual.config)
+        self.assertEqual(attrs, actual.attrs)
+        self.assertEqual(ns_map, actual.ns_map)
+        self.assertFalse(actual.mixed)
+        self.assertTrue(actual.derived)
+        self.assertEqual("{urn:books}books", actual.xsi_type)
 
     def test_start_with_derived_class(self):
         a = make_dataclass("a", fields=[])
@@ -809,19 +818,18 @@ class NodeParserTests(TestCase):
         ns_map = {}
         parser.start(a, queue, objects, "a", attrs, ns_map)
 
-        expected_node = ElementNode(
-            position=0,
-            context=parser.context,
-            meta=parser.context.build(b),
-            config=parser.config,
-            attrs=attrs,
-            ns_map={},
-            derived=True,
-            xsi_type="b",
-        )
+        actual = queue[0]
 
         self.assertEqual(1, len(queue))
-        self.assertEqual(expected_node, queue[-1])
+        self.assertEqual(0, actual.position)
+        self.assertEqual(parser.context, actual.context)
+        self.assertEqual(parser.context.build(b), actual.meta)
+        self.assertEqual(parser.config, actual.config)
+        self.assertEqual(attrs, actual.attrs)
+        self.assertEqual({}, actual.ns_map)
+        self.assertFalse(actual.mixed)
+        self.assertTrue(actual.derived)
+        self.assertEqual("b", actual.xsi_type)
 
     @mock.patch.object(PrimitiveNode, "bind", return_value=True)
     def test_end(self, mock_assemble):

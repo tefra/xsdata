@@ -43,7 +43,7 @@ class ChoiceType:
             {"name": "a", "type": TypeA},
             {"name": "b", "type": TypeB},
             {"name": "int", "type": int},
-            {"name": "int2", "type": int},
+            {"name": "int2", "type": int, "nillable": True},
             {"name": "float", "type": float},
             {"name": "qname", "type": QName},
             {"name": "tokens", "type": List[int], "tokens": True},

@@ -3,9 +3,6 @@ import base64
 import binascii
 import math
 import warnings
-from abc import ABCMeta
-from dataclasses import dataclass
-from dataclasses import field
 from datetime import date
 from datetime import datetime
 from datetime import time
@@ -38,7 +35,7 @@ from xsdata.utils import namespaces
 from xsdata.utils import text
 
 
-class Converter(metaclass=abc.ABCMeta):
+class Converter(abc.ABC):
     """Abstract converter class."""
 
     @abc.abstractmethod
@@ -61,13 +58,11 @@ class Converter(metaclass=abc.ABCMeta):
             )
 
 
-@dataclass
 class ConverterFactory:
-    """
-    :param registry: Converters registry
-    """
+    __slots__ = ("registry",)
 
-    registry: Dict[Type, Converter] = field(default_factory=dict)
+    def __init__(self):
+        self.registry: Dict[Type, Converter] = {}
 
     def deserialize(self, value: Any, types: Sequence[Type], **kwargs: Any) -> Any:
         """
@@ -452,7 +447,7 @@ class EnumConverter(Converter):
         return cmp == real
 
 
-class DateTimeBase(Converter, metaclass=ABCMeta):
+class DateTimeBase(Converter, metaclass=abc.ABCMeta):
     @classmethod
     def parse(cls, value: Any, **kwargs: Any) -> datetime:
         try:
@@ -486,17 +481,19 @@ class DateTimeConverter(DateTimeBase):
         return self.parse(value, **kwargs)
 
 
-@dataclass
 class ProxyConverter(Converter):
-    """
-    :param func: the callable to convert from string
-    """
 
-    func: Callable
+    __slots__ = ("factory",)
+
+    def __init__(self, factory: Callable):
+        """
+        :param factory: factory function used to parse string values
+        """
+        self.factory = factory
 
     def deserialize(self, value: Any, **kwargs: Any) -> Any:
         try:
-            return self.func(value)
+            return self.factory(value)
         except ValueError as e:
             raise ConverterError(e)
 

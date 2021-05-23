@@ -34,30 +34,56 @@ Parsed = Tuple[Optional[str], Any]
 NoneStr = Optional[str]
 
 
-@dataclass
 class ElementNode(XmlNode):
-    """
-    XmlNode for complex elements and dataclasses.
+    """XmlNode for complex elements and dataclasses."""
 
-    :param meta: Model xml metadata
-    :param attrs: Key-value attribute mapping
-    :param ns_map: Namespace prefix-URI map
-    :param config: Parser configuration
-    :param context: Model context provider
-    :param position: The node position of objects cache
-    :param derived: The xml element is derived from a base type
-    """
+    __slots__ = (
+        "meta",
+        "attrs",
+        "ns_map",
+        "config",
+        "context",
+        "position",
+        "mixed",
+        "derived",
+        "xsi_type",
+        "assigned",
+    )
 
-    meta: XmlMeta
-    attrs: Dict
-    ns_map: Dict
-    config: ParserConfig
-    context: XmlContext
-    position: int
-    mixed: bool = False
-    derived: bool = False
-    xsi_type: Optional[str] = None
-    assigned: Set = field(default_factory=set)
+    def __init__(
+        self,
+        meta: XmlMeta,
+        attrs: Dict,
+        ns_map: Dict,
+        config: ParserConfig,
+        context: XmlContext,
+        position: int,
+        mixed: bool = False,
+        derived: bool = False,
+        xsi_type: Optional[str] = None,
+    ):
+        """
+        :param meta: Model xml metadata
+        :param attrs: Key-value attribute mapping
+        :param ns_map: Namespace prefix-URI map
+        :param config: Parser configuration
+        :param context: Model context provider
+        :param position: The node position of objects cache
+        :param mixed: The node supports mixed content
+        :param derived: The xml element is derived from a base type
+        :param xsi_type: The xml type substitution
+        """
+
+        self.meta = meta
+        self.attrs = attrs
+        self.ns_map = ns_map
+        self.config = config
+        self.context = context
+        self.position = position
+        self.mixed = mixed
+        self.derived = derived
+        self.xsi_type = xsi_type
+        self.assigned: Set[int] = set()
 
     def bind(self, qname: str, text: NoneStr, tail: NoneStr, objects: List) -> bool:
         params: Dict = {}
@@ -185,7 +211,6 @@ class ElementNode(XmlNode):
         )
 
 
-@dataclass
 class WildcardNode(XmlNode):
     """
     XmlNode for extensible elements that can hold any attribute and content.
@@ -193,17 +218,23 @@ class WildcardNode(XmlNode):
     The resulting object tree will be a
     :class:`~xsdata.formats.dataclass.models.generics.AnyElement`
     instance.
-
-    :param var: Class field xml var instance
-    :param attrs: Key-value attribute mapping
-    :param ns_map: Namespace prefix-URI map
-    :param position: The node position of objects cache
     """
 
-    var: XmlVar
-    attrs: Dict
-    ns_map: Dict
-    position: int
+    __slots__ = "var", "attrs", "ns_map", "position"
+
+    def __init__(self, var: XmlVar, attrs: Dict, ns_map: Dict, position: int):
+        """
+
+        :param var: Class field xml var instance
+        :param attrs: Key-value attribute mapping
+        :param ns_map: Namespace prefix-URI map
+        :param position: The node position of objects cache
+        """
+
+        self.var = var
+        self.attrs = attrs
+        self.ns_map = ns_map
+        self.position = position
 
     def bind(self, qname: str, text: NoneStr, tail: NoneStr, objects: List) -> bool:
         children = ParserUtils.fetch_any_children(self.position, objects)
@@ -231,32 +262,36 @@ class WildcardNode(XmlNode):
         return WildcardNode(position=position, var=self.var, attrs=attrs, ns_map=ns_map)
 
 
-@dataclass
 class UnionNode(XmlNode):
     """
     XmlNode for fields with multiple possible types where at least one of them
     is a dataclass.
 
     The node will record all child events and in the end will replay
-    them and try to build all possible objects and sort them by
-    score before deciding the winner.
-
-    :param var: Class field xml var instance
-    :param attrs: Key-value attribute mapping
-    :param ns_map: Namespace prefix-URI map
-    :param position: The node position of objects cache
-    :param context: Model context provider
-    :param level: Current node level
-    :param events: Record node events
+    them and try to build all possible objects and sort them by score
+    before deciding the winner.
     """
 
-    var: XmlVar
-    attrs: Dict
-    ns_map: Dict
-    position: int
-    context: XmlContext
-    level: int = field(default_factory=int)
-    events: List = field(default_factory=list)
+    __slots__ = "var", "attrs", "ns_map", "position", "context", "level", "events"
+
+    def __init__(
+        self, var: XmlVar, attrs: Dict, ns_map: Dict, position: int, context: XmlContext
+    ):
+        """
+        :param var: Class field xml var instance
+        :param attrs: Key-value attribute mapping
+        :param ns_map: Namespace prefix-URI map
+        :param position: The node position of objects cache
+        :param context: Model context provider
+        """
+
+        self.var = var
+        self.attrs = attrs
+        self.ns_map = ns_map
+        self.position = position
+        self.context = context
+        self.level = 0
+        self.events: List[Tuple[str, str, Any, Any]] = []
 
     def child(self, qname: str, attrs: Dict, ns_map: Dict, position: int) -> XmlNode:
         self.level += 1
@@ -316,17 +351,18 @@ class UnionNode(XmlNode):
             return None
 
 
-@dataclass
 class PrimitiveNode(XmlNode):
-    """
-    XmlNode for text elements with primitive values like str, int, float.
+    """XmlNode for text elements with primitive values like str, int, float."""
 
-    :param var: Class field xml var instance
-    :param ns_map: Namespace prefix-URI map
-    """
+    __slots__ = ("var", "ns_map")
 
-    var: XmlVar
-    ns_map: Dict
+    def __init__(self, var: XmlVar, ns_map: Dict):
+        """
+        :param var: Class field xml var instance
+        :param ns_map: Namespace prefix-URI map
+        """
+        self.var = var
+        self.ns_map = ns_map
 
     def bind(self, qname: str, text: NoneStr, tail: NoneStr, objects: List) -> bool:
         obj = ParserUtils.parse_value(
@@ -351,22 +387,24 @@ class PrimitiveNode(XmlNode):
         raise XmlContextError("Primitive node doesn't support child nodes!")
 
 
-@dataclass
 class StandardNode(XmlNode):
-    """
-    XmlNode for any type elements with a standard xsi:type.
+    """XmlNode for any type elements with a standard xsi:type."""
 
-    :param datatype: Standard xsi data type
-    :param ns_map: Namespace prefix-URI map
-    :param derived: Specify whether the value needs to be wrapped with
-        :class:`~xsdata.formats.dataclass.models.generics.DerivedElement`
-    :param nillable: Specify whether the node supports nillable content
-    """
+    __slots__ = ("datatype", "ns_map", "derived", "nillable")
 
-    datatype: DataType
-    ns_map: Dict
-    derived: bool
-    nillable: bool
+    def __init__(self, datatype: DataType, ns_map: Dict, derived: bool, nillable: bool):
+        """
+
+        :param datatype: Standard xsi data type
+        :param ns_map: Namespace prefix-URI map
+        :param derived: Specify whether the value needs to be wrapped with
+            :class:`~xsdata.formats.dataclass.models.generics.DerivedElement`
+        :param nillable: Specify whether the node supports nillable content
+        """
+        self.datatype = datatype
+        self.ns_map = ns_map
+        self.derived = derived
+        self.nillable = nillable
 
     def bind(self, qname: str, text: NoneStr, tail: NoneStr, objects: List) -> bool:
         obj = ParserUtils.parse_value(
@@ -394,9 +432,10 @@ class StandardNode(XmlNode):
         raise XmlContextError("Primitive node doesn't support child nodes!")
 
 
-@dataclass
 class SkipNode(XmlNode):
     """Utility node to skip parsing unknown properties."""
+
+    __slots__ = ()
 
     def child(self, qname: str, attrs: Dict, ns_map: Dict, position: int) -> XmlNode:
         """Skip nodes children are skipped as well."""

@@ -134,7 +134,7 @@ class XmlDate(NamedTuple):
         if args[-1] is None:
             del args[-1]
 
-        return f"{self.__class__.__name__}({', '.join(map(str, args))})"
+        return f"{self.__class__.__qualname__}({', '.join(map(str, args))})"
 
 
 class XmlDateTime(NamedTuple):
@@ -285,14 +285,14 @@ class XmlDateTime(NamedTuple):
         )
 
     def __repr__(self) -> str:
-        args = list(self)
+        args = tuple(self)
         if args[-1] is None:
-            del args[-1]
+            args = args[:-1]
 
             if args[-1] == 0:
-                del args[-1]
+                args = args[:-1]
 
-        return f"{self.__class__.__name__}({', '.join(map(str, args))})"
+        return f"{self.__class__.__qualname__}({', '.join(map(str, args))})"
 
     def __eq__(self, other: Any) -> bool:
         return cmp(self, other, operator.eq)
@@ -424,7 +424,7 @@ class XmlTime(NamedTuple):
         if args[-1] is None:
             del args[-1]
 
-        return f"{self.__class__.__name__}({', '.join(map(str, args))})"
+        return f"{self.__class__.__qualname__}({', '.join(map(str, args))})"
 
     def __eq__(self, other: Any) -> bool:
         return cmp(self, other, operator.eq)
@@ -536,24 +536,22 @@ class XmlDuration(UserString):
         if not match:
             raise ValueError(f"Invalid format '{value}'")
 
-        groups = match.groups()
-        res = TimeInterval(
-            negative=groups[0] == "-",
-            years=int(groups[1]) if groups[1] else None,
-            months=int(groups[2]) if groups[2] else None,
-            days=int(groups[3]) if groups[3] else None,
-            hours=int(groups[4]) if groups[4] else None,
-            minutes=int(groups[5]) if groups[5] else None,
-            seconds=float(groups[6]) if groups[6] else None,
+        sign, years, months, days, hours, minutes, seconds, _ = match.groups()
+        return TimeInterval(
+            negative=sign == "-",
+            years=int(years) if years else None,
+            months=int(months) if months else None,
+            days=int(days) if days else None,
+            hours=int(hours) if hours else None,
+            minutes=int(minutes) if minutes else None,
+            seconds=float(seconds) if seconds else None,
         )
-
-        return res
 
     def asdict(self) -> Dict:
         return self._interval._asdict()
 
     def __repr__(self) -> str:
-        return f'{self.__class__.__name__}("{self.data}")'
+        return f'{self.__class__.__qualname__}("{self.data}")'
 
 
 class TimePeriod(NamedTuple):
@@ -637,7 +635,7 @@ class XmlPeriod(UserString):
         return self._period._asdict()
 
     def __repr__(self) -> str:
-        return f'{self.__class__.__name__}("{self.data}")'
+        return f'{self.__class__.__qualname__}("{self.data}")'
 
     def __eq__(self, other: Any) -> bool:
         if isinstance(other, XmlPeriod):

@@ -109,6 +109,21 @@ class StrConverterTests(TestCase):
         self.assertEqual("1", self.converter.serialize(1))
 
 
+class StringConverterTests(TestCase):
+    def setUp(self):
+        self.converter = converter.type_converter(str)
+
+    def test_deserialize(self):
+        string = "foo"
+        self.assertIs(string, self.converter.deserialize(string))
+        self.assertEqual("1", self.converter.deserialize(1))
+
+    def test_serialize(self):
+        string = "foo"
+        self.assertIs(string, self.converter.serialize(string))
+        self.assertEqual("1", self.converter.serialize(1))
+
+
 class BoolConverterTests(TestCase):
     def setUp(self):
         self.converter = converter.type_converter(bool)

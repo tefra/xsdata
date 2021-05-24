@@ -213,6 +213,14 @@ __EXPLICIT_TYPES__ = (
 )
 
 
+class StringConverter(Converter):
+    def deserialize(self, value: Any, **kwargs: Any) -> Any:
+        return value if isinstance(value, str) else str(value)
+
+    def serialize(self, value: Any, **kwargs: Any) -> str:
+        return value if isinstance(value, str) else str(value)
+
+
 class BoolConverter(Converter):
     def deserialize(self, value: Any, **kwargs: Any) -> bool:
         if isinstance(value, str):
@@ -383,9 +391,6 @@ class QNameConverter(Converter):
         return uri, name
 
 
-Array = Union[List, Tuple]
-
-
 class EnumConverter(Converter):
     def serialize(self, value: Enum, **kwargs: Any) -> str:
         return converter.serialize(value.value, **kwargs)
@@ -413,7 +418,7 @@ class EnumConverter(Converter):
 
     @classmethod
     def match(
-        cls, value: Any, values: Array, length: int, real: Any, **kwargs: Any
+        cls, value: Any, values: Sequence, length: int, real: Any, **kwargs: Any
     ) -> bool:
 
         if isinstance(value, str) and isinstance(real, str):
@@ -428,7 +433,7 @@ class EnumConverter(Converter):
         return False
 
     @classmethod
-    def match_list(cls, raw: Array, real: Array, **kwargs: Any) -> bool:
+    def match_list(cls, raw: Sequence, real: Sequence, **kwargs: Any) -> bool:
         for index, val in enumerate(real):
             if not cls.match_atomic(raw[index], val, **kwargs):
                 return False
@@ -502,12 +507,12 @@ class ProxyConverter(Converter):
 
 
 converter = ConverterFactory()
-converter.register_converter(str, ProxyConverter(str))
+converter.register_converter(str, StringConverter())
 converter.register_converter(int, IntConverter())
 converter.register_converter(bool, BoolConverter())
 converter.register_converter(float, FloatConverter())
 converter.register_converter(bytes, BytesConverter())
-converter.register_converter(object, ProxyConverter(str))
+converter.register_converter(object, converter.type_converter(str))
 converter.register_converter(time, TimeConverter())
 converter.register_converter(date, DateConverter())
 converter.register_converter(datetime, DateTimeConverter())

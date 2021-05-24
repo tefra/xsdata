@@ -1,16 +1,17 @@
 import copy
 from dataclasses import dataclass
-from dataclasses import field
 from dataclasses import make_dataclass
-from dataclasses import replace
 from typing import Any
-from typing import List
 from typing import Union
 from unittest import mock
 from unittest.case import TestCase
 
 from tests.fixtures.books import BookForm
 from tests.fixtures.books import Books
+from tests.fixtures.models import MixedType
+from tests.fixtures.models import TypeA
+from tests.fixtures.models import TypeC
+from tests.fixtures.models import UnionType
 from xsdata.exceptions import ParserError
 from xsdata.exceptions import XmlContextError
 from xsdata.formats.dataclass.context import XmlContext
@@ -37,40 +38,17 @@ from xsdata.utils.testing import XmlMetaFactory
 from xsdata.utils.testing import XmlVarFactory
 
 
-@dataclass
-class Foo:
-    a: int
-    b: int
-    c: int
-
-
-@dataclass
-class FooMixed:
-    a: int
-    b: int
-    content: List[object] = field(
-        default_factory=list,
-        metadata=dict(
-            type="Wildcard",
-            namespace="##any",
-            mixed=True,
-            min_occurs=0,
-            max_occurs=9223372036854775807,
-        ),
-    )
-
-
 def add_attr(x, *args):
-    x["a"] = 1
+    x["x"] = 1
 
 
 def add_text(x, *args):
-    x["b"] = 2
+    x["y"] = "2"
     return True
 
 
 def add_child(x, *args):
-    x["c"] = 3
+    x["z"] = 3.3
 
 
 def add_content(x, *args):
@@ -81,7 +59,7 @@ class ElementNodeTests(FactoryTestCase):
     def setUp(self) -> None:
         super().setUp()
         self.context = XmlContext()
-        self.meta = XmlMetaFactory.create(clazz=Foo, qname="foo", wildcards=[])
+        self.meta = XmlMetaFactory.create(clazz=TypeC, qname="foo", wildcards=[])
         self.node = ElementNode(
             position=0,
             meta=self.meta,
@@ -108,7 +86,7 @@ class ElementNodeTests(FactoryTestCase):
 
         node = ElementNode(
             position=0,
-            meta=self.context.build(Foo),
+            meta=self.context.build(TypeC),
             context=self.context,
             config=ParserConfig(),
             attrs={"a": "b"},
@@ -119,7 +97,7 @@ class ElementNodeTests(FactoryTestCase):
 
         self.assertTrue(node.bind("foo", "text", "tail", objects))
         self.assertEqual("foo", objects[-1][0])
-        self.assertEqual(Foo(1, 2, 3), objects[-1][1])
+        self.assertEqual(TypeC(1, "2", 3.3), objects[-1][1])
 
         mock_bind_attrs.assert_called_once_with(
             mock.ANY, node.meta, node.attrs, node.ns_map
@@ -131,10 +109,9 @@ class ElementNodeTests(FactoryTestCase):
         self.assertEqual(0, mock_bind_wild_content.call_count)
 
     def test_bind_with_derived_element(self):
-        a = make_dataclass("A", fields=[])
         node = ElementNode(
             position=0,
-            meta=self.context.build(a),
+            meta=self.context.build(TypeA),
             context=self.context,
             config=ParserConfig(),
             attrs={},
@@ -144,11 +121,11 @@ class ElementNodeTests(FactoryTestCase):
 
         objects = []
 
-        self.assertTrue(node.bind("foo", None, None, objects))
+        self.assertTrue(node.bind("foo", "2", None, objects))
         self.assertEqual("foo", objects[-1][0])
-        self.assertEqual(DerivedElement("foo", a()), objects[-1][1])
+        self.assertEqual(DerivedElement("foo", TypeA(2)), objects[-1][1])
 
-    @mock.patch.object(XmlMeta, "find_wildcard")
+    @mock.patch.object(XmlMeta, "find_any_wildcard")
     @mock.patch.object(ParserUtils, "bind_objects")
     @mock.patch.object(ParserUtils, "bind_wild_content")
     @mock.patch.object(ParserUtils, "bind_content")
@@ -159,19 +136,19 @@ class ElementNodeTests(FactoryTestCase):
         mock_bind_content,
         mock_bind_wild_content,
         mock_bind_objects,
-        find_wildcard,
+        mock_find_any_wildcard,
     ):
         mock_bind_attrs.side_effect = add_attr
         mock_bind_content.return_value = False
         mock_bind_wild_content.side_effect = add_text
         mock_bind_objects.side_effect = add_child
-        find_wildcard.return_value = XmlVarFactory.create(
+        mock_find_any_wildcard.return_value = XmlVarFactory.create(
             xml_type=XmlType.WILDCARD, qname="b", name="b"
         )
 
         node = ElementNode(
             position=0,
-            meta=self.context.build(Foo),
+            meta=self.context.build(TypeC),
             context=self.context,
             config=ParserConfig(),
             attrs={"a": "b"},
@@ -182,7 +159,7 @@ class ElementNodeTests(FactoryTestCase):
 
         self.assertTrue(node.bind("foo", "text", "tail", objects))
         self.assertEqual("foo", objects[-1][0])
-        self.assertEqual(Foo(1, 2, 3), objects[-1][1])
+        self.assertEqual(TypeC(1, "2", 3.3), objects[-1][1])
 
         mock_bind_attrs.assert_called_once_with(
             mock.ANY, node.meta, node.attrs, node.ns_map
@@ -204,7 +181,7 @@ class ElementNodeTests(FactoryTestCase):
 
         node = ElementNode(
             position=0,
-            meta=self.context.build(Foo),
+            meta=self.context.build(TypeC),
             context=self.context,
             config=ParserConfig(),
             attrs={"a": "b"},
@@ -237,19 +214,19 @@ class ElementNodeTests(FactoryTestCase):
 
         node = ElementNode(
             position=0,
-            meta=self.context.build(FooMixed),
+            meta=self.context.build(MixedType),
             context=self.context,
             config=ParserConfig(),
             attrs={"a": "b"},
             ns_map={"ns0": "xsdata"},
         )
-        wildcard = node.meta.find_wildcard("*")
-        objects = [1, 2, 3]
+        wildcard = node.meta.find_any_wildcard()
+        objects = [1, "2", 3]
 
         self.assertTrue(node.bind("foo", "text", "tail", objects))
 
         self.assertEqual("foo", objects[-1][0])
-        self.assertEqual(FooMixed(1, 2, 3), objects[-1][1])
+        self.assertEqual(MixedType(1, "2", 3), objects[-1][1])
 
         mock_bind_attrs.assert_called_once_with(
             mock.ANY, node.meta, node.attrs, node.ns_map
@@ -261,7 +238,7 @@ class ElementNodeTests(FactoryTestCase):
         mock_bind_mixed_objects.assert_called_once_with(mock.ANY, wildcard, 0, objects)
 
     def test_child(self):
-        var = XmlVarFactory.create(xml_type=XmlType.ELEMENT, qname="a", types=(Foo,))
+        var = XmlVarFactory.create(xml_type=XmlType.ELEMENT, qname="a", types=(TypeC,))
         attrs = {"a": "b"}
         ns_map = {"ns0": "xsdata"}
         position = 1
@@ -274,9 +251,11 @@ class ElementNodeTests(FactoryTestCase):
         self.assertEqual(position, actual.position)
 
     def test_child_with_unique_element(self):
-        single = XmlVarFactory.create(xml_type=XmlType.ELEMENT, qname="a", types=(Foo,))
+        single = XmlVarFactory.create(
+            index=1, xml_type=XmlType.ELEMENT, qname="a", types=(TypeC,)
+        )
         wildcard = XmlVarFactory.create(
-            xml_type=XmlType.WILDCARD, qname="a", types=(object,)
+            index=2, xml_type=XmlType.WILDCARD, qname="a", types=(object,)
         )
         self.meta.elements[single.qname] = [single]
         self.meta.wildcards.append(wildcard)
@@ -287,11 +266,11 @@ class ElementNodeTests(FactoryTestCase):
 
         actual = self.node.child("a", attrs, ns_map, position)
         self.assertIsInstance(actual, ElementNode)
-        self.assertIn(id(single), self.node.assigned)
+        self.assertIn(single.index, self.node.assigned)
 
         actual = self.node.child("a", attrs, ns_map, position)
         self.assertIsInstance(actual, WildcardNode)
-        self.assertNotIn(id(wildcard), self.node.assigned)
+        self.assertNotIn(wildcard.index, self.node.assigned)
 
     @mock.patch.object(ElementNode, "build_node")
     def test_child_when_failed_to_build_next_node(self, mock_build_node):
@@ -317,7 +296,7 @@ class ElementNodeTests(FactoryTestCase):
             xml_type=XmlType.ELEMENT,
             name="a",
             qname="a",
-            types=(Foo, FooMixed),
+            types=(TypeC, MixedType),
         )
         attrs = {"a": "b"}
         ns_map = {"ns0": "xsdata"}
@@ -338,7 +317,7 @@ class ElementNodeTests(FactoryTestCase):
             xml_type=XmlType.ELEMENT,
             name="a",
             qname="a",
-            types=(Foo,),
+            types=(TypeC,),
             derived=True,
         )
         xsi_type = "foo"
@@ -360,7 +339,7 @@ class ElementNodeTests(FactoryTestCase):
 
     @mock.patch.object(XmlContext, "fetch")
     def test_build_node_with_dataclass_var_validates_nillable(self, mock_ctx_fetch):
-        var = XmlVarFactory.create(xml_type=XmlType.ELEMENT, qname="a", types=(Foo,))
+        var = XmlVarFactory.create(xml_type=XmlType.ELEMENT, qname="a", types=(TypeC,))
         ns_map = {}
         nillable_meta = copy.deepcopy(self.meta)
         nillable_meta.nillable = True
@@ -553,7 +532,7 @@ class UnionNodeTests(TestCase):
 
         ctx = XmlContext()
         meta = ctx.build(root)
-        var = meta.find_elements("item")[0]
+        var = next(meta.find_children("item"))
         attrs = {"a": "1", "b": 2}
         ns_map = {}
         node = UnionNode(position=0, var=var, context=ctx, attrs=attrs, ns_map=ns_map)
@@ -581,19 +560,16 @@ class UnionNodeTests(TestCase):
         self.assertEqual("a", objects[-1][1])
 
     def test_bind_raises_parser_error_on_failure(self):
-        item = make_dataclass("Item", [("value", str)])
-        root = make_dataclass("Root", [("item", Union[int, item])])
-
         ctx = XmlContext()
-        meta = ctx.build(root)
-        var = meta.find_elements("item")[0]
+        meta = ctx.build(UnionType)
+        var = next(meta.find_children("element"))
 
         node = UnionNode(position=0, var=var, context=ctx, attrs={}, ns_map={})
 
         with self.assertRaises(ParserError) as cm:
-            node.bind("item", None, None, [])
+            node.bind("element", None, None, [])
 
-        self.assertEqual("Failed to parse union node: item", str(cm.exception))
+        self.assertEqual("Failed to parse union node: element", str(cm.exception))
 
 
 class PrimitiveNodeTests(TestCase):
@@ -730,25 +706,33 @@ class NodeParserTests(TestCase):
 
         attrs = {"k": "v"}
         ns_map = {"a": "b"}
-        expected_node = ElementNode(
-            position=0,
-            context=self.parser.context,
-            meta=self.parser.context.build(Books),
-            config=self.parser.config,
-            attrs=attrs,
-            ns_map=ns_map,
-        )
         self.parser.start(Books, queue, objects, "{urn:books}books", attrs, ns_map)
-        self.assertEqual(1, len(queue))
-        self.assertEqual(expected_node, queue[0])
+        actual = queue[0]
 
-        expected_node = replace(
-            expected_node, meta=self.parser.context.build(BookForm), attrs={}, ns_map={}
-        )
+        self.assertEqual(1, len(queue))
+        self.assertEqual(0, actual.position)
+        self.assertEqual(self.parser.context, actual.context)
+        self.assertEqual(self.parser.context.build(Books), actual.meta)
+        self.assertEqual(self.parser.config, actual.config)
+        self.assertEqual(attrs, actual.attrs)
+        self.assertEqual(ns_map, actual.ns_map)
+        self.assertFalse(actual.mixed)
+        self.assertFalse(actual.derived)
+        self.assertIsNone(actual.xsi_type)
+
         self.parser.start(Books, queue, objects, "book", {}, {})
+        actual = queue[1]
 
         self.assertEqual(2, len(queue))
-        self.assertEqual(expected_node, queue[-1])
+        self.assertEqual(0, actual.position)
+        self.assertEqual(self.parser.context, actual.context)
+        self.assertEqual(self.parser.context.build(BookForm), actual.meta)
+        self.assertEqual(self.parser.config, actual.config)
+        self.assertEqual({}, actual.attrs)
+        self.assertEqual({}, actual.ns_map)
+        self.assertFalse(actual.mixed)
+        self.assertFalse(actual.derived)
+        self.assertIsNone(actual.xsi_type)
 
     def test_start_with_undefined_class(self):
         parser = self.parser
@@ -757,17 +741,19 @@ class NodeParserTests(TestCase):
 
         attrs = {"k": "v"}
         ns_map = {"a": "b"}
-        expected_node = ElementNode(
-            position=0,
-            context=parser.context,
-            meta=parser.context.build(Books),
-            config=parser.config,
-            attrs=attrs,
-            ns_map=ns_map,
-        )
         parser.start(None, queue, objects, "{urn:books}books", attrs, ns_map)
+        actual = queue[0]
+
         self.assertEqual(1, len(queue))
-        self.assertEqual(expected_node, queue[0])
+        self.assertEqual(0, actual.position)
+        self.assertEqual(self.parser.context, actual.context)
+        self.assertEqual(self.parser.context.build(Books), actual.meta)
+        self.assertEqual(self.parser.config, actual.config)
+        self.assertEqual(attrs, actual.attrs)
+        self.assertEqual(ns_map, actual.ns_map)
+        self.assertFalse(actual.mixed)
+        self.assertFalse(actual.derived)
+        self.assertIsNone(actual.xsi_type)
 
         with self.assertRaises(ParserError) as cm:
             parser.start(None, [], [], "{unknown}hopefully", {}, {})
@@ -783,19 +769,19 @@ class NodeParserTests(TestCase):
 
         attrs = {QNames.XSI_TYPE: "bk:books"}
         ns_map = {"bk": "urn:books", "xsi": Namespace.XSI.uri}
-        expected_node = ElementNode(
-            position=0,
-            context=parser.context,
-            meta=parser.context.build(Books),
-            config=parser.config,
-            attrs=attrs,
-            ns_map=ns_map,
-            derived=True,
-            xsi_type="{urn:books}books",
-        )
         parser.start(None, queue, objects, "doc", attrs, ns_map)
+        actual = queue[0]
+
         self.assertEqual(1, len(queue))
-        self.assertEqual(expected_node, queue[0])
+        self.assertEqual(0, actual.position)
+        self.assertEqual(self.parser.context, actual.context)
+        self.assertEqual(self.parser.context.build(Books), actual.meta)
+        self.assertEqual(self.parser.config, actual.config)
+        self.assertEqual(attrs, actual.attrs)
+        self.assertEqual(ns_map, actual.ns_map)
+        self.assertFalse(actual.mixed)
+        self.assertTrue(actual.derived)
+        self.assertEqual("{urn:books}books", actual.xsi_type)
 
     def test_start_with_derived_class(self):
         a = make_dataclass("a", fields=[])
@@ -809,19 +795,18 @@ class NodeParserTests(TestCase):
         ns_map = {}
         parser.start(a, queue, objects, "a", attrs, ns_map)
 
-        expected_node = ElementNode(
-            position=0,
-            context=parser.context,
-            meta=parser.context.build(b),
-            config=parser.config,
-            attrs=attrs,
-            ns_map={},
-            derived=True,
-            xsi_type="b",
-        )
+        actual = queue[0]
 
         self.assertEqual(1, len(queue))
-        self.assertEqual(expected_node, queue[-1])
+        self.assertEqual(0, actual.position)
+        self.assertEqual(parser.context, actual.context)
+        self.assertEqual(parser.context.build(b), actual.meta)
+        self.assertEqual(parser.config, actual.config)
+        self.assertEqual(attrs, actual.attrs)
+        self.assertEqual({}, actual.ns_map)
+        self.assertFalse(actual.mixed)
+        self.assertTrue(actual.derived)
+        self.assertEqual("b", actual.xsi_type)
 
     @mock.patch.object(PrimitiveNode, "bind", return_value=True)
     def test_end(self, mock_assemble):

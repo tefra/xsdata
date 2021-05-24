@@ -3,9 +3,6 @@ import base64
 import binascii
 import math
 import warnings
-from abc import ABCMeta
-from dataclasses import dataclass
-from dataclasses import field
 from datetime import date
 from datetime import datetime
 from datetime import time
@@ -38,7 +35,7 @@ from xsdata.utils import namespaces
 from xsdata.utils import text
 
 
-class Converter(metaclass=abc.ABCMeta):
+class Converter(abc.ABC):
     """Abstract converter class."""
 
     @abc.abstractmethod
@@ -61,13 +58,11 @@ class Converter(metaclass=abc.ABCMeta):
             )
 
 
-@dataclass
 class ConverterFactory:
-    """
-    :param registry: Converters registry
-    """
+    __slots__ = ("registry",)
 
-    registry: Dict[Type, Converter] = field(default_factory=dict)
+    def __init__(self):
+        self.registry: Dict[Type, Converter] = {}
 
     def deserialize(self, value: Any, types: Sequence[Type], **kwargs: Any) -> Any:
         """
@@ -216,6 +211,14 @@ __EXPLICIT_TYPES__ = (
     XmlDuration,
     XmlPeriod,
 )
+
+
+class StringConverter(Converter):
+    def deserialize(self, value: Any, **kwargs: Any) -> Any:
+        return value if isinstance(value, str) else str(value)
+
+    def serialize(self, value: Any, **kwargs: Any) -> str:
+        return value if isinstance(value, str) else str(value)
 
 
 class BoolConverter(Converter):
@@ -388,9 +391,6 @@ class QNameConverter(Converter):
         return uri, name
 
 
-Array = Union[List, Tuple]
-
-
 class EnumConverter(Converter):
     def serialize(self, value: Enum, **kwargs: Any) -> str:
         return converter.serialize(value.value, **kwargs)
@@ -418,7 +418,7 @@ class EnumConverter(Converter):
 
     @classmethod
     def match(
-        cls, value: Any, values: Array, length: int, real: Any, **kwargs: Any
+        cls, value: Any, values: Sequence, length: int, real: Any, **kwargs: Any
     ) -> bool:
 
         if isinstance(value, str) and isinstance(real, str):
@@ -433,7 +433,7 @@ class EnumConverter(Converter):
         return False
 
     @classmethod
-    def match_list(cls, raw: Array, real: Array, **kwargs: Any) -> bool:
+    def match_list(cls, raw: Sequence, real: Sequence, **kwargs: Any) -> bool:
         for index, val in enumerate(real):
             if not cls.match_atomic(raw[index], val, **kwargs):
                 return False
@@ -452,7 +452,7 @@ class EnumConverter(Converter):
         return cmp == real
 
 
-class DateTimeBase(Converter, metaclass=ABCMeta):
+class DateTimeBase(Converter, metaclass=abc.ABCMeta):
     @classmethod
     def parse(cls, value: Any, **kwargs: Any) -> datetime:
         try:
@@ -486,17 +486,19 @@ class DateTimeConverter(DateTimeBase):
         return self.parse(value, **kwargs)
 
 
-@dataclass
 class ProxyConverter(Converter):
-    """
-    :param func: the callable to convert from string
-    """
 
-    func: Callable
+    __slots__ = ("factory",)
+
+    def __init__(self, factory: Callable):
+        """
+        :param factory: factory function used to parse string values
+        """
+        self.factory = factory
 
     def deserialize(self, value: Any, **kwargs: Any) -> Any:
         try:
-            return self.func(value)
+            return self.factory(value)
         except ValueError as e:
             raise ConverterError(e)
 
@@ -505,12 +507,12 @@ class ProxyConverter(Converter):
 
 
 converter = ConverterFactory()
-converter.register_converter(str, ProxyConverter(str))
+converter.register_converter(str, StringConverter())
 converter.register_converter(int, IntConverter())
 converter.register_converter(bool, BoolConverter())
 converter.register_converter(float, FloatConverter())
 converter.register_converter(bytes, BytesConverter())
-converter.register_converter(object, ProxyConverter(str))
+converter.register_converter(object, converter.type_converter(str))
 converter.register_converter(time, TimeConverter())
 converter.register_converter(date, DateConverter())
 converter.register_converter(datetime, DateTimeConverter())

@@ -117,11 +117,7 @@ class ElementNode(XmlNode):
 
     def child(self, qname: str, attrs: Dict, ns_map: Dict, position: int) -> XmlNode:
         for var in self.meta.find_children(qname):
-            unique = None
-
-            if var.is_element and not var.list_element:
-                unique = id(var)
-
+            unique = 0 if not var.is_element or var.list_element else var.index
             if not unique or unique not in self.assigned:
                 node = self.build_node(var, attrs, ns_map, position)
 

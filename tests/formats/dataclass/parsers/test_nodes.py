@@ -252,10 +252,10 @@ class ElementNodeTests(FactoryTestCase):
 
     def test_child_with_unique_element(self):
         single = XmlVarFactory.create(
-            xml_type=XmlType.ELEMENT, qname="a", types=(TypeC,)
+            index=1, xml_type=XmlType.ELEMENT, qname="a", types=(TypeC,)
         )
         wildcard = XmlVarFactory.create(
-            xml_type=XmlType.WILDCARD, qname="a", types=(object,)
+            index=2, xml_type=XmlType.WILDCARD, qname="a", types=(object,)
         )
         self.meta.elements[single.qname] = [single]
         self.meta.wildcards.append(wildcard)
@@ -266,11 +266,11 @@ class ElementNodeTests(FactoryTestCase):
 
         actual = self.node.child("a", attrs, ns_map, position)
         self.assertIsInstance(actual, ElementNode)
-        self.assertIn(id(single), self.node.assigned)
+        self.assertIn(single.index, self.node.assigned)
 
         actual = self.node.child("a", attrs, ns_map, position)
         self.assertIsInstance(actual, WildcardNode)
-        self.assertNotIn(id(wildcard), self.node.assigned)
+        self.assertNotIn(wildcard.index, self.node.assigned)
 
     @mock.patch.object(ElementNode, "build_node")
     def test_child_when_failed_to_build_next_node(self, mock_build_node):

@@ -225,7 +225,7 @@ class XmlVarBuilder:
                 wildcards.append(choice)
 
         var = XmlVar(
-            index=index,
+            index=index + 1,
             name=name,
             qname=qname,
             init=init,

@@ -101,52 +101,52 @@ class XmlMetaBuilderTests(FactoryTestCase):
         expected = [
             XmlVarFactory.create(
                 xml_type=XmlType.ELEMENT,
-                index=0,
+                index=1,
                 name="author",
                 qname="Author",
                 types=(str,),
             ),
             XmlVarFactory.create(
                 xml_type=XmlType.ELEMENT,
-                index=1,
+                index=2,
                 name="title",
                 qname="Title",
                 types=(str,),
             ),
             XmlVarFactory.create(
                 xml_type=XmlType.ELEMENT,
-                index=2,
+                index=3,
                 name="genre",
                 qname="Genre",
                 types=(str,),
             ),
             XmlVarFactory.create(
                 xml_type=XmlType.ELEMENT,
-                index=3,
+                index=4,
                 name="price",
                 qname="Price",
                 types=(float,),
             ),
             XmlVarFactory.create(
                 xml_type=XmlType.ELEMENT,
-                index=4,
+                index=5,
                 name="pub_date",
                 qname="PubDate",
                 types=(XmlDate,),
             ),
             XmlVarFactory.create(
                 xml_type=XmlType.ELEMENT,
-                index=5,
+                index=6,
                 name="review",
                 qname="Review",
                 types=(str,),
             ),
             XmlVarFactory.create(
-                xml_type=XmlType.ATTRIBUTE, index=6, name="id", qname="ID", types=(str,)
+                xml_type=XmlType.ATTRIBUTE, index=7, name="id", qname="ID", types=(str,)
             ),
             XmlVarFactory.create(
                 xml_type=XmlType.ATTRIBUTE,
-                index=7,
+                index=8,
                 name="lang",
                 qname="LANG",
                 types=(str,),
@@ -220,7 +220,7 @@ class XmlVarBuilderTests(TestCase):
             globalns,
         )
         expected = XmlVarFactory.create(
-            index=66,
+            index=67,
             xml_type=XmlType.ELEMENTS,
             name="compound",
             qname="compound",
@@ -229,7 +229,7 @@ class XmlVarBuilderTests(TestCase):
             default=list,
             elements={
                 "{foo}node": XmlVarFactory.create(
-                    index=0,
+                    index=1,
                     xml_type=XmlType.ELEMENT,
                     name="compound",
                     qname="{foo}node",
@@ -239,7 +239,7 @@ class XmlVarBuilderTests(TestCase):
                     derived=False,
                 ),
                 "{bar}x": XmlVarFactory.create(
-                    index=1,
+                    index=2,
                     xml_type=XmlType.ELEMENT,
                     name="compound",
                     qname="{bar}x",
@@ -252,7 +252,7 @@ class XmlVarBuilderTests(TestCase):
                     format="Nope",
                 ),
                 "{bar}y": XmlVarFactory.create(
-                    index=2,
+                    index=3,
                     xml_type=XmlType.ELEMENT,
                     name="compound",
                     qname="{bar}y",
@@ -263,7 +263,7 @@ class XmlVarBuilderTests(TestCase):
                     derived=False,
                 ),
                 "{bar}z": XmlVarFactory.create(
-                    index=3,
+                    index=4,
                     xml_type=XmlType.ELEMENT,
                     name="compound",
                     qname="{bar}z",
@@ -274,7 +274,7 @@ class XmlVarBuilderTests(TestCase):
                     derived=True,
                 ),
                 "{bar}o": XmlVarFactory.create(
-                    index=4,
+                    index=5,
                     xml_type=XmlType.ELEMENT,
                     name="compound",
                     qname="{bar}o",
@@ -286,7 +286,7 @@ class XmlVarBuilderTests(TestCase):
                     any_type=True,
                 ),
                 "{bar}p": XmlVarFactory.create(
-                    index=5,
+                    index=6,
                     xml_type=XmlType.ELEMENT,
                     name="compound",
                     qname="{bar}p",
@@ -298,7 +298,7 @@ class XmlVarBuilderTests(TestCase):
             },
             wildcards=[
                 XmlVarFactory.create(
-                    index=6,
+                    index=7,
                     xml_type=XmlType.WILDCARD,
                     name="compound",
                     qname="{http://www.w3.org/1999/xhtml}any",

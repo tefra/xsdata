@@ -1,4 +1,5 @@
 import operator
+import sys
 from dataclasses import is_dataclass
 from typing import Any
 from typing import Dict
@@ -23,12 +24,12 @@ NoneType = type(None)
 class XmlType:
     """Xml node types."""
 
-    TEXT = "Text"
-    ELEMENT = "Element"
-    ELEMENTS = "Elements"
-    WILDCARD = "Wildcard"
-    ATTRIBUTE = "Attribute"
-    ATTRIBUTES = "Attributes"
+    TEXT = sys.intern("Text")
+    ELEMENT = sys.intern("Element")
+    ELEMENTS = sys.intern("Elements")
+    WILDCARD = sys.intern("Wildcard")
+    ATTRIBUTE = sys.intern("Attribute")
+    ATTRIBUTES = sys.intern("Attributes")
 
 
 class MetaMixin:

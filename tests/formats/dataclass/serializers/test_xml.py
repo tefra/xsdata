@@ -1,15 +1,14 @@
 from dataclasses import dataclass
 from dataclasses import field
 from dataclasses import make_dataclass
-from typing import Dict
 from typing import Generator
 from typing import List
-from typing import Optional
 from unittest import TestCase
 from xml.etree.ElementTree import QName
 
 from tests.fixtures.books import BookForm
 from tests.fixtures.datatypes import Telephone
+from tests.fixtures.models import SequentialType
 from xsdata.exceptions import SerializerError
 from xsdata.exceptions import XmlContextError
 from xsdata.formats.dataclass.models.elements import XmlType
@@ -20,25 +19,6 @@ from xsdata.formats.dataclass.serializers.mixins import XmlWriterEvent
 from xsdata.models.enums import DataType
 from xsdata.models.enums import QNames
 from xsdata.utils.testing import XmlVarFactory
-
-
-@dataclass
-class A:
-    a0: Optional[str] = field(default=None, metadata=dict(type="Attribute"))
-    a1: Dict[str, str] = field(default_factory=dict, metadata=dict(type="Attributes"))
-    a2: List[str] = field(
-        default_factory=list, metadata=dict(type="Attribute", tokens=True)
-    )
-    x0: Optional[int] = field(default=None)
-    x1: List[int] = field(
-        default_factory=list, metadata=dict(type="Element", sequential=True)
-    )
-    x2: List[int] = field(
-        default_factory=list, metadata=dict(type="Element", sequential=True)
-    )
-    x3: List[int] = field(
-        default_factory=list, metadata=dict(type="Element", sequential=True)
-    )
 
 
 class XmlSerializerTests(TestCase):
@@ -410,11 +390,11 @@ class XmlSerializerTests(TestCase):
             name="compound",
             elements={
                 "a": XmlVarFactory.create(
-                    xml_type=XmlType.ELEMENT, qname="a", types=(A,)
+                    xml_type=XmlType.ELEMENT, qname="a", types=(SequentialType,)
                 )
             },
         )
-        value = DerivedElement(qname="a", value=A("foo"))
+        value = DerivedElement(qname="a", value=SequentialType("foo"))
         expected = [
             (XmlWriterEvent.START, "a"),
             (XmlWriterEvent.ATTR, "a0", "foo"),
@@ -516,12 +496,12 @@ class XmlSerializerTests(TestCase):
         self.assertEqual(expected, list(result))
 
     def test_next_value(self):
-        obj = A(x0=1, x1=[2, 3, 4], x2=[6, 7], x3=[9])
-        meta = self.serializer.context.build(A)
+        obj = SequentialType(x0=1, x1=[2, 3, 4], x2=[6, 7], x3=[9])
+        meta = self.serializer.context.build(SequentialType)
         x0 = meta.text
-        x1 = meta.find_elements("x1")[0]
-        x2 = meta.find_elements("x2")[0]
-        x3 = meta.find_elements("x3")[0]
+        x1 = next(meta.find_children("x1"))
+        x2 = next(meta.find_children("x2"))
+        x3 = next(meta.find_children("x3"))
 
         actual = self.serializer.next_value(obj, meta)
         expected = [
@@ -538,8 +518,8 @@ class XmlSerializerTests(TestCase):
         self.assertEqual(expected, list(actual))
 
     def test_next_attribute(self):
-        obj = A(a0="foo", a1={"b": "c", "d": "e"})
-        meta = self.serializer.context.build(A)
+        obj = SequentialType(a0="foo", a1={"b": "c", "d": "e"})
+        meta = self.serializer.context.build(SequentialType)
 
         actual = self.serializer.next_attribute(obj, meta, False, None)
         expected = [

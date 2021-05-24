@@ -14,7 +14,6 @@ from typing import Type
 from xsdata.formats.converter import converter
 from xsdata.models.enums import NamespaceType
 from xsdata.utils import collections
-from xsdata.utils.constants import EMPTY_SEQUENCE
 from xsdata.utils.namespaces import local_name
 from xsdata.utils.namespaces import target_uri
 
@@ -362,17 +361,6 @@ class XmlMeta(MetaMixin):
     def find_attribute(self, qname: str) -> Optional[XmlVar]:
         return self.attributes.get(qname)
 
-    def find_elements(self, qname: str) -> Sequence[XmlVar]:
-        return self.elements.get(qname, EMPTY_SEQUENCE)
-
-    def find_choice(self, qname: str) -> Optional[XmlVar]:
-        for choice in self.choices:
-            match = choice.find_choice(qname)
-            if match:
-                return match
-
-        return None
-
     def find_any_attributes(self, qname: str) -> Optional[XmlVar]:
         return find_by_namespace(self.any_attributes, qname)
 
@@ -386,11 +374,14 @@ class XmlMeta(MetaMixin):
         return None
 
     def find_children(self, qname: str) -> Iterator[XmlVar]:
-        yield from self.find_elements(qname)
+        elements = self.elements.get(qname)
+        if elements:
+            yield from elements
 
-        chd = self.find_choice(qname)
-        if chd:
-            yield chd
+        for choice in self.choices:
+            match = choice.find_choice(qname)
+            if match:
+                yield match
 
         chd = self.find_wildcard(qname)
         if chd:

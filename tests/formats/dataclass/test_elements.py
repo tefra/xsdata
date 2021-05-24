@@ -5,10 +5,13 @@ from unittest.case import TestCase
 from xml.etree.ElementTree import QName
 
 from tests.fixtures.models import ChoiceType
+from tests.fixtures.models import ExtendedType
+from tests.fixtures.models import MixedType
 from tests.fixtures.models import TypeA
 from tests.fixtures.models import TypeB
 from tests.fixtures.models import TypeC
 from tests.fixtures.models import TypeD
+from tests.fixtures.models import TypeDuplicate
 from tests.fixtures.models import UnionType
 from xsdata.formats.dataclass.context import XmlContext
 from xsdata.formats.dataclass.models.elements import XmlType
@@ -170,35 +173,6 @@ class XmlMetaTests(TestCase):
         self.assertEqual(a, self.meta.find_attribute("a"))
         self.assertEqual(b, self.meta.find_attribute("b"))
 
-    def test_find_elements(self):
-        a_1 = XmlVarFactory.create(xml_type=XmlType.ATTRIBUTE, qname="a", name="a_1")
-        a_2 = XmlVarFactory.create(xml_type=XmlType.ATTRIBUTE, qname="a", name="a_2")
-
-        self.meta.elements[a_1.qname] = [a_1, a_2]
-
-        self.assertEqual([a_1, a_2], self.meta.find_elements("a"))
-        self.assertEqual([], self.meta.find_elements("b"))
-
-    @mock.patch.object(XmlVar, "find_choice")
-    def test_find_choice(self, mock_find_choice):
-        a_1 = XmlVarFactory.create(xml_type=XmlType.ATTRIBUTE, qname="a", name="a_1")
-        a_2 = XmlVarFactory.create(xml_type=XmlType.ATTRIBUTE, qname="a", name="a_2")
-
-        mock_find_choice.side_effect = [None, None, None, a_1, a_2]
-        choice_1 = XmlVarFactory.create(
-            xml_type=XmlType.ATTRIBUTE, qname="compound_1", name="compound_1"
-        )
-        choice_2 = XmlVarFactory.create(
-            xml_type=XmlType.ATTRIBUTE, qname="compound_2", name="compound_2"
-        )
-        self.meta.choices = [choice_1, choice_2]
-
-        self.assertIsNone(self.meta.find_choice("a"))
-        self.assertEqual(a_1, self.meta.find_choice("a"))
-        self.assertEqual(a_2, self.meta.find_choice("a"))
-
-        mock_find_choice.assert_has_calls([mock.call("a") for _ in range(5)])
-
     @mock.patch.object(XmlVar, "match_namespace")
     def test_find_any_attributes(self, mock_match_namespace):
         mock_match_namespace.side_effect = [False, False, False, True]
@@ -231,30 +205,28 @@ class XmlMetaTests(TestCase):
 
         mock_match_namespace.assert_has_calls([mock.call("a") for _ in range(4)])
 
+    def test_find_any_wildcard(self):
+        meta = self.context.build(TypeDuplicate)
+        self.assertIsNone(meta.find_any_wildcard())
+
+        meta = self.context.build(ExtendedType)
+        self.assertEqual("wildcard", meta.find_any_wildcard().qname)
+
     def test_find_children(self):
-        element1 = XmlVarFactory.create(xml_type=XmlType.ELEMENT, name="a")
-        element2 = XmlVarFactory.create(xml_type=XmlType.ELEMENT, qname="a", name="a1")
+        meta = self.context.build(TypeDuplicate)
+        self.assertIsNone(next(meta.find_children("a"), None))
+        self.assertEqual(["x", "x1"], list(el.name for el in meta.find_children("x")))
 
-        option1 = XmlVarFactory.create(xml_type=XmlType.ELEMENT, qname="a", name="a3")
-        option2 = XmlVarFactory.create(xml_type=XmlType.ELEMENT, name="b")
+        meta = self.context.build(TypeB)
+        self.assertEqual("x", next(meta.find_children("x")).qname)
+        self.assertEqual("y", next(meta.find_children("y")).qname)
 
-        choice = XmlVarFactory.create(
-            xml_type=XmlType.ELEMENTS,
-            qname="c1",
-            name="c1",
-            elements={
-                "a": option1,
-                "b": option2,
-            },
-        )
-        wildcard = XmlVarFactory.create(
-            xml_type=XmlType.WILDCARD, qname="any", name="any"
-        )
+        meta = self.context.build(ChoiceType)
+        self.assertIsNone(next(meta.find_children("404"), None))
+        self.assertEqual("a", next(meta.find_children("a")).qname)
+        self.assertEqual("b", next(meta.find_children("b")).qname)
+        self.assertEqual("int", next(meta.find_children("int")).qname)
 
-        self.meta.elements["a"] = [element1, element2]
-        self.meta.choices.append(choice)
-        self.meta.wildcards.append(wildcard)
-
-        result = self.meta.find_children("a")
-        self.assertIsInstance(result, Iterator)
-        self.assertEqual([element1, element2, option1, wildcard], list(result))
+        meta = self.context.build(MixedType)
+        self.assertEqual("content", next(meta.find_children("404")).qname)
+        self.assertTrue(next(meta.find_children("content")).is_wildcard)

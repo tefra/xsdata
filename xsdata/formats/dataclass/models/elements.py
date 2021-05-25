@@ -67,7 +67,6 @@ class XmlVar(MetaMixin):
         "sequential",
         "list_element",
         "default",
-        "xml_type",
         "namespaces",
         "elements",
         "wildcards",
@@ -150,7 +149,6 @@ class XmlVar(MetaMixin):
         self.clazz = collections.first(tp for tp in types if is_dataclass(tp))
         self.is_clazz_union = self.clazz and len(types) > 1
         self.local_name = local_name(qname)
-        self.xml_type = xml_type
 
         self.is_text = False
         self.is_element = False

@@ -2,7 +2,7 @@ exclude: tests/fixtures
 
 repos:
   - repo: https://github.com/asottile/pyupgrade
-    rev: v2.18.1
+    rev: v2.18.3
     hooks:
       - id: pyupgrade
         args: [--py37-plus]

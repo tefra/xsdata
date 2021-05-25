@@ -32,6 +32,11 @@ def capitalize(value: str, **kwargs: Any) -> str:
     return value[0].upper() + value[1:]
 
 
+def original_case(value: str, **kwargs: Any) -> str:
+    """Return the input string without any modifications."""
+    return value
+
+
 def pascal_case(value: str, **kwargs: Any) -> str:
     """Convert the given string to pascal case."""
     return "".join(map(str.title, split_words(value)))

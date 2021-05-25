@@ -19,7 +19,6 @@ from xsdata.formats.dataclass.serializers.writers import XmlEventWriter
 from xsdata.models.mixins import array_element
 from xsdata.models.mixins import attribute
 from xsdata.models.mixins import element
-from xsdata.utils import constants
 from xsdata.utils import text
 
 
@@ -94,7 +93,7 @@ class NameCase(Enum):
 
 
 __name_case_func__: Dict[str, Callable] = {
-    "originalCase": constants.return_input,
+    "originalCase": text.original_case,
     "pascalCase": text.pascal_case,
     "camelCase": text.camel_case,
     "snakeCase": text.snake_case,

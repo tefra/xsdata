@@ -1,12 +1,10 @@
-from dataclasses import make_dataclass
-from typing import Iterator
 from unittest import mock
 from unittest.case import TestCase
 from xml.etree.ElementTree import QName
 
 from tests.fixtures.models import ChoiceType
 from tests.fixtures.models import ExtendedType
-from tests.fixtures.models import MixedType
+from tests.fixtures.models import Paragraph
 from tests.fixtures.models import TypeA
 from tests.fixtures.models import TypeB
 from tests.fixtures.models import TypeC
@@ -129,10 +127,9 @@ class XmlValTests(TestCase):
 
 class XmlMetaTests(TestCase):
     def setUp(self) -> None:
-        a = make_dataclass("a", [])
         self.context = XmlContext()
         self.meta = XmlMetaFactory.create(
-            clazz=a,
+            clazz=TypeA,
             qname="a",
             choices=[],
             wildcards=[],
@@ -144,7 +141,7 @@ class XmlMetaTests(TestCase):
     def test__repr__(self):
         expected = (
             "XmlMeta("
-            "clazz=<class 'types.a'>, "
+            "clazz=<class 'tests.fixtures.models.TypeA'>, "
             "qname='a', "
             "source_qname='a', "
             "nillable=False, "
@@ -227,6 +224,6 @@ class XmlMetaTests(TestCase):
         self.assertEqual("b", next(meta.find_children("b")).qname)
         self.assertEqual("int", next(meta.find_children("int")).qname)
 
-        meta = self.context.build(MixedType)
+        meta = self.context.build(Paragraph)
         self.assertEqual("content", next(meta.find_children("404")).qname)
         self.assertTrue(next(meta.find_children("content")).is_wildcard)

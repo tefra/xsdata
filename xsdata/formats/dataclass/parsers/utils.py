@@ -68,10 +68,11 @@ class ParserUtils:
         """Return a dictionary of qualified object names and their values for
         the given queue item."""
 
-        while len(objects) > position:
-            qname, value = objects.pop(position)
+        for qname, value in objects[position:]:
             if not cls.bind_object(params, meta, qname, value):
                 logger.warning("Unassigned parsed object %s", qname)
+
+        del objects[position:]
 
     @classmethod
     def bind_object(cls, params: Dict, meta: XmlMeta, qname: str, value: Any) -> bool:
@@ -89,14 +90,10 @@ class ParserUtils:
         """Return a dictionary of qualified object names and their values for
         the given mixed content xml var."""
 
-        params[var.name] = []
-        while len(objects) > pos:
-            qname, value = objects.pop(pos)
-
-            if qname:
-                value = cls.prepare_generic_value(qname, value)
-
-            params[var.name].append(value)
+        params[var.name] = [
+            cls.prepare_generic_value(qname, value) for qname, value in objects[pos:]
+        ]
+        del objects[pos:]
 
     @classmethod
     def bind_var(cls, params: Dict, var: XmlVar, value: Any) -> bool:
@@ -111,10 +108,11 @@ class ParserUtils:
         """
         if var.init:
             if var.list_element:
-                if var.name not in params:
-                    params[var.name] = []
-
-                params[var.name].append(value)
+                items = params.get(var.name)
+                if items is None:
+                    params[var.name] = [value]
+                else:
+                    items.append(value)
             elif var.name not in params:
                 params[var.name] = value
             else:
@@ -136,10 +134,11 @@ class ParserUtils:
         value = cls.prepare_generic_value(qname, value)
 
         if var.list_element:
-            if var.name not in params:
-                params[var.name] = []
-
-            params[var.name].append(value)
+            items = params.get(var.name)
+            if items is None:
+                params[var.name] = [value]
+            else:
+                items.append(value)
         elif var.name in params:
             previous = params[var.name]
             if previous.qname:
@@ -176,13 +175,14 @@ class ParserUtils:
             return False
 
         if var.list_element:
-            if var.name not in params:
-                params[var.name] = []
+            items = params.get(var.name)
+            if items is None:
+                params[var.name] = items = []
 
             if txt:
-                params[var.name].insert(0, txt)
+                items.insert(0, txt)
             if tail:
-                params[var.name].append(tail)
+                items.append(tail)
         else:
             previous = params.get(var.name, None)
             generic = AnyElement(
@@ -262,13 +262,14 @@ class ParserUtils:
         params[var.name][qname] = cls.parse_any_attribute(value, ns_map)
 
     @classmethod
-    def prepare_generic_value(cls, qname: str, value: Any) -> Any:
+    def prepare_generic_value(cls, qname: Optional[str], value: Any) -> Any:
         """Prepare parsed value before binding to a wildcard field."""
 
-        if not is_dataclass(value):
-            value = AnyElement(qname=qname, text=converter.serialize(value))
-        elif not isinstance(value, (AnyElement, DerivedElement)):
-            value = DerivedElement(qname=qname, value=value)
+        if qname:
+            if not is_dataclass(value):
+                value = AnyElement(qname=qname, text=converter.serialize(value))
+            elif not isinstance(value, (AnyElement, DerivedElement)):
+                value = DerivedElement(qname=qname, value=value)
 
         return value
 
@@ -280,12 +281,10 @@ class ParserUtils:
         If content is just whitespace return None, otherwise preserve
         the original content.
         """
-        if value is not None:
-            clean_value = value.strip()
-            if not clean_value:
-                value = None
+        if value and value.strip():
+            return value
 
-        return value
+        return None
 
     @classmethod
     def parse_any_attributes(cls, attrs: Dict, ns_map: Dict) -> Dict:
@@ -305,10 +304,10 @@ class ParserUtils:
     @classmethod
     def fetch_any_children(cls, position: int, objects: List) -> List:
         """Fetch the children of a wildcard node."""
-        children = []
-        while len(objects) > position:
-            _, value = objects.pop(position)
-            children.append(value)
+        children = [value for _, value in objects[position:]]
+
+        del objects[position:]
+
         return children
 
     @classmethod

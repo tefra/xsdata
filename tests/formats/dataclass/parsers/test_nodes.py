@@ -8,14 +8,16 @@ from unittest.case import TestCase
 
 from tests.fixtures.books import BookForm
 from tests.fixtures.books import Books
-from tests.fixtures.models import MixedType
+from tests.fixtures.models import ExtendedType
+from tests.fixtures.models import Paragraph
+from tests.fixtures.models import SequentialType
 from tests.fixtures.models import TypeA
+from tests.fixtures.models import TypeB
 from tests.fixtures.models import TypeC
 from tests.fixtures.models import UnionType
 from xsdata.exceptions import ParserError
 from xsdata.exceptions import XmlContextError
 from xsdata.formats.dataclass.context import XmlContext
-from xsdata.formats.dataclass.models.elements import XmlMeta
 from xsdata.formats.dataclass.models.elements import XmlType
 from xsdata.formats.dataclass.models.generics import AnyElement
 from xsdata.formats.dataclass.models.generics import DerivedElement
@@ -38,23 +40,6 @@ from xsdata.utils.testing import XmlMetaFactory
 from xsdata.utils.testing import XmlVarFactory
 
 
-def add_attr(x, *args):
-    x["x"] = 1
-
-
-def add_text(x, *args):
-    x["y"] = "2"
-    return True
-
-
-def add_child(x, *args):
-    x["z"] = 3.3
-
-
-def add_content(x, *args):
-    x["content"] = 3
-
-
 class ElementNodeTests(FactoryTestCase):
     def setUp(self) -> None:
         super().setUp()
@@ -69,44 +54,22 @@ class ElementNodeTests(FactoryTestCase):
             ns_map={},
         )
 
-    @mock.patch.object(ParserUtils, "bind_objects")
-    @mock.patch.object(ParserUtils, "bind_wild_content")
-    @mock.patch.object(ParserUtils, "bind_content")
-    @mock.patch.object(ParserUtils, "bind_attrs")
-    def test_bind(
-        self,
-        mock_bind_attrs,
-        mock_bind_content,
-        mock_bind_wild_content,
-        mock_bind_objects,
-    ):
-        mock_bind_attrs.side_effect = add_attr
-        mock_bind_content.side_effect = add_text
-        mock_bind_objects.side_effect = add_child
-
+    def test_bind(self):
         node = ElementNode(
             position=0,
-            meta=self.context.build(TypeC),
+            meta=self.context.build(SequentialType),
             context=self.context,
             config=ParserConfig(),
-            attrs={"a": "b"},
+            attrs={"a": "b", "a0": "0"},
             ns_map={"ns0": "xsdata"},
         )
 
-        objects = [1, 2, 3]
+        objects = [("x1", 1), ("x2", 2), ("x2", 3)]
+        expected = SequentialType(a0="0", a1={"a": "b"}, x0=1, x1=[1], x2=[2, 3])
 
-        self.assertTrue(node.bind("foo", "text", "tail", objects))
+        self.assertTrue(node.bind("foo", "1", "tail", objects))
         self.assertEqual("foo", objects[-1][0])
-        self.assertEqual(TypeC(1, "2", 3.3), objects[-1][1])
-
-        mock_bind_attrs.assert_called_once_with(
-            mock.ANY, node.meta, node.attrs, node.ns_map
-        )
-        mock_bind_content.assert_called_once_with(
-            mock.ANY, node.meta, "text", node.ns_map
-        )
-        mock_bind_objects.assert_called_once_with(mock.ANY, node.meta, 0, objects)
-        self.assertEqual(0, mock_bind_wild_content.call_count)
+        self.assertEqual(expected, objects[-1][1])
 
     def test_bind_with_derived_element(self):
         node = ElementNode(
@@ -125,63 +88,35 @@ class ElementNodeTests(FactoryTestCase):
         self.assertEqual("foo", objects[-1][0])
         self.assertEqual(DerivedElement("foo", TypeA(2)), objects[-1][1])
 
-    @mock.patch.object(XmlMeta, "find_any_wildcard")
-    @mock.patch.object(ParserUtils, "bind_objects")
-    @mock.patch.object(ParserUtils, "bind_wild_content")
-    @mock.patch.object(ParserUtils, "bind_content")
-    @mock.patch.object(ParserUtils, "bind_attrs")
-    def test_bind_with_wildcard_var(
-        self,
-        mock_bind_attrs,
-        mock_bind_content,
-        mock_bind_wild_content,
-        mock_bind_objects,
-        mock_find_any_wildcard,
-    ):
-        mock_bind_attrs.side_effect = add_attr
-        mock_bind_content.return_value = False
-        mock_bind_wild_content.side_effect = add_text
-        mock_bind_objects.side_effect = add_child
-        mock_find_any_wildcard.return_value = XmlVarFactory.create(
-            xml_type=XmlType.WILDCARD, qname="b", name="b"
-        )
-
+    def test_bind_with_wildcard_var(self):
         node = ElementNode(
             position=0,
-            meta=self.context.build(TypeC),
+            meta=self.context.build(ExtendedType),
             context=self.context,
             config=ParserConfig(),
             attrs={"a": "b"},
             ns_map={"ns0": "xsdata"},
         )
 
-        objects = [1, 2, 3]
+        objects = [("a", "1"), ("b", "2")]
+        expected = ExtendedType(
+            a="1",
+            wildcard=AnyElement(
+                text="text",
+                tail="tail",
+                children=[AnyElement(qname="b", text="2")],
+                attributes={"a": "b"},
+            ),
+        )
 
         self.assertTrue(node.bind("foo", "text", "tail", objects))
         self.assertEqual("foo", objects[-1][0])
-        self.assertEqual(TypeC(1, "2", 3.3), objects[-1][1])
+        self.assertEqual(expected, objects[-1][1])
 
-        mock_bind_attrs.assert_called_once_with(
-            mock.ANY, node.meta, node.attrs, node.ns_map
-        )
-        mock_bind_content.assert_called_once_with(
-            mock.ANY, node.meta, "text", node.ns_map
-        )
-        mock_bind_objects.assert_called_once_with(mock.ANY, node.meta, 0, objects)
-
-    @mock.patch.object(ParserUtils, "bind_objects")
-    @mock.patch.object(ParserUtils, "bind_content")
-    @mock.patch.object(ParserUtils, "bind_attrs")
-    def test_bind_with_mixed_flag_true(
-        self, mock_bind_attrs, mock_bind_content, mock_bind_objects
-    ):
-        mock_bind_attrs.side_effect = add_attr
-        mock_bind_content.side_effect = add_text
-        mock_bind_objects.side_effect = add_child
-
+    def test_bind_with_mixed_flag_true(self):
         node = ElementNode(
             position=0,
-            meta=self.context.build(TypeC),
+            meta=self.context.build(TypeB),
             context=self.context,
             config=ParserConfig(),
             attrs={"a": "b"},
@@ -189,53 +124,32 @@ class ElementNodeTests(FactoryTestCase):
             mixed=True,
         )
 
-        objects = []
+        objects = [("x", 1), ("y", "a")]
         self.assertTrue(node.bind("foo", "text", "   ", objects))
         self.assertEqual(1, len(objects))
+        self.assertEqual(TypeB(x=1, y="a"), objects[-1][1])
 
-        objects = []
+        objects = [("x", 1), ("y", "a")]
         self.assertTrue(node.bind("foo", "text", " tail ", objects))
         self.assertEqual(2, len(objects))
         self.assertEqual(None, objects[-1][0])
         self.assertEqual(" tail ", objects[-1][1])
 
-    @mock.patch.object(ParserUtils, "bind_mixed_objects")
-    @mock.patch.object(ParserUtils, "bind_wild_content")
-    @mock.patch.object(ParserUtils, "bind_attrs")
-    def test_bind_with_mixed_content_var(
-        self,
-        mock_bind_attrs,
-        mock_bind_wild_content,
-        mock_bind_mixed_objects,
-    ):
-        mock_bind_attrs.side_effect = add_attr
-        mock_bind_wild_content.side_effect = add_text
-        mock_bind_mixed_objects.side_effect = add_content
-
+    def test_bind_with_mixed_content_var(self):
         node = ElementNode(
             position=0,
-            meta=self.context.build(MixedType),
+            meta=self.context.build(Paragraph),
             context=self.context,
             config=ParserConfig(),
             attrs={"a": "b"},
             ns_map={"ns0": "xsdata"},
         )
-        wildcard = node.meta.find_any_wildcard()
-        objects = [1, "2", 3]
-
+        objects = [("a", 1)]
+        expected = Paragraph(content=["text", AnyElement(qname="a", text="1"), "tail"])
         self.assertTrue(node.bind("foo", "text", "tail", objects))
 
         self.assertEqual("foo", objects[-1][0])
-        self.assertEqual(MixedType(1, "2", 3), objects[-1][1])
-
-        mock_bind_attrs.assert_called_once_with(
-            mock.ANY, node.meta, node.attrs, node.ns_map
-        )
-
-        mock_bind_wild_content.assert_called_once_with(
-            mock.ANY, wildcard, "text", "tail", node.attrs, node.ns_map
-        )
-        mock_bind_mixed_objects.assert_called_once_with(mock.ANY, wildcard, 0, objects)
+        self.assertEqual(expected, objects[-1][1])
 
     def test_child(self):
         var = XmlVarFactory.create(xml_type=XmlType.ELEMENT, qname="a", types=(TypeC,))
@@ -296,7 +210,7 @@ class ElementNodeTests(FactoryTestCase):
             xml_type=XmlType.ELEMENT,
             name="a",
             qname="a",
-            types=(TypeC, MixedType),
+            types=(TypeC, TypeB),
         )
         attrs = {"a": "b"}
         ns_map = {"ns0": "xsdata"}

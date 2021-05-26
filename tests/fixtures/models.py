@@ -1,6 +1,12 @@
-from dataclasses import dataclass, field
-from typing import List, Dict, Union, Optional
+from dataclasses import dataclass
+from dataclasses import field
+from typing import Dict
+from typing import List
+from typing import Optional
+from typing import Union
 from xml.etree.ElementTree import QName
+
+from tests.fixtures.books import BookForm
 
 
 @dataclass
@@ -43,18 +49,20 @@ class ExtendedType:
 
 @dataclass
 class ChoiceType:
-    choice: List[object] = field(metadata={
-        "type": "Elements",
-        "choices": (
-            {"name": "a", "type": TypeA},
-            {"name": "b", "type": TypeB},
-            {"name": "int", "type": int},
-            {"name": "int2", "type": int, "nillable": True},
-            {"name": "float", "type": float},
-            {"name": "qname", "type": QName},
-            {"name": "tokens", "type": List[int], "tokens": True},
-        )
-    })
+    choice: List[object] = field(
+        metadata={
+            "type": "Elements",
+            "choices": (
+                {"name": "a", "type": TypeA},
+                {"name": "b", "type": TypeB},
+                {"name": "int", "type": int},
+                {"name": "int2", "type": int, "nillable": True},
+                {"name": "float", "type": float},
+                {"name": "qname", "type": QName},
+                {"name": "tokens", "type": List[int], "tokens": True},
+            ),
+        }
+    )
 
 
 @dataclass
@@ -87,16 +95,19 @@ class SequentialType:
 
 
 @dataclass
-class MixedType:
-    x: int
-    y: str
+class Span:
+    class Meta:
+        name = "span"
+
+    content: str
+
+
+@dataclass
+class Paragraph:
+    class Meta:
+        name = "p"
+
     content: List[object] = field(
         default_factory=list,
-        metadata=dict(
-            type="Wildcard",
-            namespace="##any",
-            mixed=True,
-            min_occurs=0,
-            max_occurs=9223372036854775807,
-        ),
+        metadata=dict(type="Wildcard", namespace="##any", mixed=True),
     )

@@ -87,17 +87,17 @@ class ElementNode(XmlNode):
 
     def bind(self, qname: str, text: NoneStr, tail: NoneStr, objects: List) -> bool:
         params: Dict = {}
-        text_node = False
         ParserUtils.bind_attrs(params, self.meta, self.attrs, self.ns_map)
 
         wild_var = self.meta.find_any_wildcard()
         if wild_var and wild_var.mixed:
             ParserUtils.bind_mixed_objects(params, wild_var, self.position, objects)
+            bind_text = False
         else:
             ParserUtils.bind_objects(params, self.meta, self.position, objects)
-            text_node = ParserUtils.bind_content(params, self.meta, text, self.ns_map)
+            bind_text = ParserUtils.bind_content(params, self.meta, text, self.ns_map)
 
-        if not text_node and wild_var:
+        if not bind_text and wild_var:
             ParserUtils.bind_wild_content(
                 params, wild_var, text, tail, self.attrs, self.ns_map
             )
@@ -108,7 +108,7 @@ class ElementNode(XmlNode):
 
         objects.append((qname, obj))
 
-        if not wild_var and self.mixed:
+        if self.mixed and not wild_var:
             tail = ParserUtils.normalize_content(tail)
             if tail:
                 objects.append((None, tail))

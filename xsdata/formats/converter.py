@@ -224,7 +224,6 @@ class StringConverter(Converter):
 class BoolConverter(Converter):
     def deserialize(self, value: Any, **kwargs: Any) -> bool:
         if isinstance(value, str):
-
             val = value.strip()
 
             if val in ("true", "1"):
@@ -265,16 +264,14 @@ class FloatConverter(Converter):
             raise ConverterError(e)
 
     def serialize(self, value: float, **kwargs: Any) -> str:
-        mode = kwargs.get("output", "xml")
-
         if math.isnan(value):
             return "NaN"
 
         if value == self.INF:
-            return "Infinity" if mode == "json" else "INF"
+            return "INF"
 
         if value == -self.INF:
-            return "-Infinity" if mode == "json" else "-INF"
+            return "-INF"
 
         return repr(value).upper().replace("E+", "E")
 

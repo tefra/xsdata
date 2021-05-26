@@ -15,6 +15,7 @@ from xsdata.formats.dataclass.models.generics import AnyElement
 from xsdata.formats.dataclass.models.generics import DerivedElement
 from xsdata.logger import logger
 from xsdata.models.enums import QNames
+from xsdata.utils import constants
 from xsdata.utils import text
 from xsdata.utils.namespaces import build_qname
 
@@ -33,7 +34,7 @@ class ParserUtils:
     @classmethod
     def is_nillable(cls, attrs: Dict) -> bool:
         """Return whether the element attrs has xsi:nil="false"."""
-        return attrs.get(QNames.XSI_NIL) != "false"
+        return attrs.get(QNames.XSI_NIL) != constants.XML_FALSE
 
     @classmethod
     def parse_value(

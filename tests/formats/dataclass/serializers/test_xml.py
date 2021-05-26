@@ -1,14 +1,14 @@
-from dataclasses import dataclass
-from dataclasses import field
 from dataclasses import make_dataclass
 from typing import Generator
-from typing import List
 from unittest import TestCase
 from xml.etree.ElementTree import QName
 
 from tests.fixtures.books import BookForm
 from tests.fixtures.datatypes import Telephone
+from tests.fixtures.models import Paragraph
 from tests.fixtures.models import SequentialType
+from tests.fixtures.models import Span
+from tests.fixtures.models import TypeA
 from xsdata.exceptions import SerializerError
 from xsdata.exceptions import XmlContextError
 from xsdata.formats.dataclass.models.elements import XmlType
@@ -262,8 +262,6 @@ class XmlSerializerTests(TestCase):
             types=(BookForm,),
         )
         ebook = make_dataclass("eBook", [], bases=(BookForm,))
-
-        value = ebook(id="123")
         expected = [
             (XmlWriterEvent.START, "a"),
             (XmlWriterEvent.ATTR, "id", "123"),
@@ -272,7 +270,7 @@ class XmlSerializerTests(TestCase):
             (XmlWriterEvent.END, "a"),
         ]
 
-        result = self.serializer.write_value(value, var, "xsdata")
+        result = self.serializer.write_value(ebook(id="123"), var, "xsdata")
         self.assertIsInstance(result, Generator)
         self.assertEqual(expected, list(result))
 
@@ -283,14 +281,13 @@ class XmlSerializerTests(TestCase):
             name="a",
             types=(BookForm,),
         )
-        ebook = make_dataclass("eBook", [])
-        value = ebook()
+        value = TypeA(1)
 
         result = self.serializer.write_value(value, var, "xsdata")
         with self.assertRaises(SerializerError) as cm:
             list(result)
 
-        self.assertEqual("eBook is not derived from BookForm", str(cm.exception))
+        self.assertEqual("TypeA is not derived from BookForm", str(cm.exception))
 
     def test_write_element(self):
         var = XmlVarFactory.create(xml_type=XmlType.ELEMENT, qname="a")
@@ -541,30 +538,8 @@ class XmlSerializerTests(TestCase):
         self.assertEqual(expected, list(actual))
 
     def test_render_mixed_content(self):
-        @dataclass
-        class Span:
-            class Meta:
-                name = "span"
 
-            content: str
-
-        @dataclass
-        class Example:
-            class Meta:
-                name = "p"
-
-            content: List[object] = field(
-                default_factory=list,
-                metadata=dict(
-                    type="Wildcard",
-                    namespace="##any",
-                    mixed=True,
-                    min_occurs=0,
-                    max_occurs=9223372036854775807,
-                ),
-            )
-
-        obj = Example()
+        obj = Paragraph()
         obj.content.append(AnyElement(qname="b", text="Mr."))
         obj.content.append(Span("chris"))
         obj.content.append("!")
@@ -573,7 +548,7 @@ class XmlSerializerTests(TestCase):
         result = self.serializer.render(obj).splitlines()
         self.assertEqual("<p><b>Mr.</b><span>chris</span>!</p>", result[1])
 
-        obj = Example()
+        obj = Paragraph()
         obj.content.append("Hi ")
         obj.content.append(AnyElement(qname="b", text="Mr."))
         obj.content.append(Span("chris"))

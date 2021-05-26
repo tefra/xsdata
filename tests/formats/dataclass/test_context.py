@@ -4,8 +4,10 @@ from dataclasses import make_dataclass
 from unittest import mock
 
 from tests.fixtures.artists import Artist
+from tests.fixtures.artists import BeginArea
 from tests.fixtures.books import BookForm
 from tests.fixtures.books import BooksForm
+from tests.fixtures.models import TypeA
 from xsdata.formats.dataclass.context import XmlContext
 from xsdata.models.enums import DataType
 from xsdata.utils.testing import FactoryTestCase
@@ -68,8 +70,8 @@ class XmlContextTests(FactoryTestCase):
         self.assertEqual(BooksForm, self.ctx.find_type("{urn:books}BookForm"))
 
     def test_find_type_by_fields(self):
-        field_names = {f.name for f in fields(BookForm)}
-        self.assertEqual(BookForm, self.ctx.find_type_by_fields(field_names))
+        field_names = {"id", "name", "sort-name"}
+        self.assertEqual(BeginArea, self.ctx.find_type_by_fields(field_names))
 
         field_names.update({"please", "dont", "exist"})  # Test matching with more
         self.assertIsNone(self.ctx.find_type_by_fields(field_names))

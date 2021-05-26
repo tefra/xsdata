@@ -1,3 +1,4 @@
+import sys
 from decimal import Decimal
 from enum import Enum
 from pathlib import Path
@@ -51,10 +52,10 @@ __STANDARD_NAMESPACES__ = {ns.uri: ns for ns in Namespace}
 class QNames:
     """Common qualified names."""
 
-    XSI_NIL = f"{{{Namespace.XSI.uri}}}nil"
-    XSI_TYPE = f"{{{Namespace.XSI.uri}}}type"
-    XSI_SCHEMA_LOCATION = f"{{{Namespace.XSI.uri}}}schemaLocation"
-    XSI_NO_NAMESPACE_SCHEMA_LOCATION = (
+    XSI_NIL = sys.intern(f"{{{Namespace.XSI.uri}}}nil")
+    XSI_TYPE = sys.intern(f"{{{Namespace.XSI.uri}}}type")
+    XSI_SCHEMA_LOCATION = sys.intern(f"{{{Namespace.XSI.uri}}}schemaLocation")
+    XSI_NO_NAMESPACE_SCHEMA_LOCATION = sys.intern(
         f"{{{Namespace.XSI.uri}}}noNamespaceSchemaLocation"
     )
 
@@ -242,9 +243,9 @@ __DataTypeQNameIndex__ = {str(dt): dt for dt in DataType}
 class EventType:
     """XmlParsing event types."""
 
-    START = "start"
-    START_NS = "start-ns"
-    END = "end"
+    START = sys.intern("start")
+    START_NS = sys.intern("start-ns")
+    END = sys.intern("end")
 
 
 class Tag:

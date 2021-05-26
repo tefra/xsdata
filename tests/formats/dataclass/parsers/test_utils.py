@@ -381,6 +381,9 @@ class ParserUtilsTests(FactoryTestCase):
         self.assertEqual(dict(a=["first", "txt", "tail", "tail"]), params)
 
     def test_prepare_generic_value(self):
+        actual = ParserUtils.prepare_generic_value(None, 1)
+        self.assertEqual(1, actual)
+
         actual = ParserUtils.prepare_generic_value("a", 1)
         expected = AnyElement(qname="a", text="1")
         self.assertEqual(expected, actual)

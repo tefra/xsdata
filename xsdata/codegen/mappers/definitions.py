@@ -1,3 +1,4 @@
+import itertools
 from typing import Dict
 from typing import Iterator
 from typing import List
@@ -56,7 +57,7 @@ class DefinitionsMapper:
         binding = definitions.find_binding(text.suffix(port.binding))
         port_type = definitions.find_port_type(text.suffix(binding.type))
 
-        elements = collections.concat(binding.extended_elements, port.extended_elements)
+        elements = itertools.chain(binding.extended_elements, port.extended_elements)
         config = cls.attributes(elements)
 
         yield from cls.map_binding(definitions, binding, port_type, config)

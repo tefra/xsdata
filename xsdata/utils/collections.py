@@ -64,12 +64,6 @@ def first(items: Iterator) -> Any:
     return next(items, None)
 
 
-def concat(*args: Iterable) -> Iterator:
-    """Concatenate iterables into a single iterator."""
-    for arg in args:
-        yield from arg
-
-
 def map_key(dictionary: Dict, search: Any) -> Any:
     """Find and return they key for given search value."""
     for key, value in dictionary.items():

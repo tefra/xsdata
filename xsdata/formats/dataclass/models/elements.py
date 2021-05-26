@@ -1,3 +1,4 @@
+import itertools
 import operator
 import sys
 from dataclasses import is_dataclass
@@ -331,7 +332,7 @@ class XmlMeta(MetaMixin):
 
     def get_element_vars(self) -> List[XmlVar]:
         result = list(
-            collections.concat(self.wildcards, self.choices, *self.elements.values())
+            itertools.chain(self.wildcards, self.choices, *self.elements.values())
         )
         if self.text:
             result.append(self.text)
@@ -339,12 +340,12 @@ class XmlMeta(MetaMixin):
         return sorted(result, key=get_index)
 
     def get_attribute_vars(self) -> List[XmlVar]:
-        result = collections.concat(self.any_attributes, self.attributes.values())
+        result = itertools.chain(self.any_attributes, self.attributes.values())
         return sorted(result, key=get_index)
 
     def get_all_vars(self) -> List[XmlVar]:
         result = list(
-            collections.concat(
+            itertools.chain(
                 self.wildcards,
                 self.choices,
                 self.any_attributes,

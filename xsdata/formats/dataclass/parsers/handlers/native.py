@@ -30,9 +30,6 @@ class XmlEventHandler(XmlHandler):
         eg [(qname, object)]
     """
 
-    # scope vars
-    ns_map: Dict = field(default_factory=dict, init=False)
-
     def parse(self, source: Any) -> Any:
         """
         Parse an XML document from a system identifier or an InputSource.
@@ -49,7 +46,7 @@ class XmlEventHandler(XmlHandler):
     def process_context(self, context: Iterable) -> Any:
         """Iterate context and push the events to main parser."""
         obj = None
-        self.ns_map = {}
+        ns_map: Dict = {}
         for event, element in context:
             if event == EventType.START:
                 self.parser.start(
@@ -58,9 +55,9 @@ class XmlEventHandler(XmlHandler):
                     self.objects,
                     element.tag,
                     element.attrib,
-                    self.start_ns_bulk(self.ns_map),
+                    self.merge_parent_namespaces(ns_map),
                 )
-                self.ns_map = {}
+                ns_map = {}
             elif event == EventType.END:
                 obj = self.parser.end(
                     self.queue,
@@ -72,7 +69,7 @@ class XmlEventHandler(XmlHandler):
                 element.clear()
             elif event == EventType.START_NS:
                 prefix, uri = element
-                self.ns_map[prefix] = uri
+                ns_map[prefix or None] = uri
             else:
                 raise XmlHandlerError(f"Unhandled event: `{event}`.")
 
@@ -117,6 +114,7 @@ class XmlSaxHandler(SaxHandler, sax.handler.ContentHandler):
 
         :param name: Namespace-name tuple
         :param qname: Not used
+        :param attrs: Attribute key-value map
         """
         attrs = {build_qname(key[0], key[1]): value for key, value in attrs.items()}
         self.start(build_qname(name[0], name[1]), attrs, self.ns_map)
@@ -145,11 +143,11 @@ class XmlSaxHandler(SaxHandler, sax.handler.ContentHandler):
         """
         self.data(content)
 
-    def startPrefixMapping(self, prefix: str, uri: str):
+    def startPrefixMapping(self, prefix: str, uri: Optional[str]):
         """
         Start element prefix-URI namespace mapping.
 
         :param prefix: Namespace prefix
         :param uri: Namespace uri
         """
-        self.ns_map[prefix] = uri
+        self.ns_map[prefix] = uri or ""

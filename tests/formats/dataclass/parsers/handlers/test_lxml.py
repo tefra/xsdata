@@ -5,6 +5,7 @@ from tests import fixtures_dir
 from tests.fixtures.books import Books
 from tests.fixtures.books.fixtures import books
 from tests.fixtures.books.fixtures import events
+from tests.fixtures.books.fixtures import events_default_ns
 from xsdata.exceptions import XmlHandlerError
 from xsdata.formats.dataclass.parsers.handlers import LxmlEventHandler
 from xsdata.formats.dataclass.parsers.handlers import LxmlSaxHandler
@@ -20,6 +21,12 @@ class LxmlEventHandlerTests(TestCase):
         self.assertEqual(books, self.parser.from_path(path, Books))
         self.assertEqual({"brk": "urn:books"}, self.parser.ns_map)
         self.assertEqual(events, self.parser.events)
+
+    def test_parse_with_default_ns(self):
+        path = fixtures_dir.joinpath("books/books_default_ns.xml")
+        self.assertEqual(books, self.parser.from_path(path, Books))
+        self.assertEqual({None: "urn:books"}, self.parser.ns_map)
+        self.assertEqual(events_default_ns, self.parser.events)
 
     def test_parse_with_xinclude(self):
         path = fixtures_dir.joinpath("books/books-xinclude.xml")
@@ -56,6 +63,12 @@ class LxmlSaxHandlerTests(TestCase):
         self.assertEqual(books, self.parser.from_path(path, Books))
         self.assertEqual({"brk": "urn:books"}, self.parser.ns_map)
         self.assertEqual(events, self.parser.events)
+
+    def test_parse_with_default_ns(self):
+        path = fixtures_dir.joinpath("books/books_default_ns.xml")
+        self.assertEqual(books, self.parser.from_path(path, Books))
+        self.assertEqual({None: "urn:books"}, self.parser.ns_map)
+        self.assertEqual(events_default_ns, self.parser.events)
 
     def test_parse_from_memory(self):
         path = fixtures_dir.joinpath("books/books.xml")

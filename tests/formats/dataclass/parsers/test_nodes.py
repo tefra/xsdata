@@ -745,14 +745,14 @@ class NodeParserTests(TestCase):
         self.assertIsNone(result)
         self.assertEqual(0, len(queue))
 
-    def test_start_prefix_mapping(self):
+    def test_register_namespace(self):
         parser = NodeParser()
-        parser.start_prefix_mapping("bar", "foo")
-        parser.start_prefix_mapping("bar", "exists")
+        parser.register_namespace("bar", "foo")
+        parser.register_namespace("bar", "exists")
         self.assertEqual({"bar": "foo"}, parser.ns_map)
 
-        parser.start_prefix_mapping(None, "a")
+        parser.register_namespace(None, "a")
         self.assertEqual({"bar": "foo", None: "a"}, parser.ns_map)
 
-        parser.start_prefix_mapping(None, "b")
+        parser.register_namespace(None, "b")
         self.assertEqual({"bar": "foo", None: "a"}, parser.ns_map)

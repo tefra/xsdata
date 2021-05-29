@@ -24,6 +24,7 @@ class PushParser(AbstractParser):
     """
 
     config: ParserConfig
+    ns_map: Dict
 
     @abc.abstractmethod
     def start(
@@ -52,9 +53,16 @@ class PushParser(AbstractParser):
         :return: The result of the binding process.
         """
 
-    @abc.abstractmethod
-    def start_prefix_mapping(self, prefix: NoneStr, uri: str):
-        """Add the given namespace in the registry."""
+    def register_namespace(self, prefix: NoneStr, uri: str):
+        """
+        Add the given prefix-URI namespaces mapping if the prefix is new.
+
+        :param prefix: Namespace prefix
+        :param uri: Namespace uri
+        """
+
+        if prefix not in self.ns_map:
+            self.ns_map[prefix] = uri
 
 
 class XmlNode(abc.ABC):
@@ -124,21 +132,27 @@ class XmlHandler:
         """Parse an XML document from a system identifier or an InputSource."""
         raise NotImplementedError("This method must be implemented!")
 
-    def start_ns_bulk(self, ns_map: Dict) -> Dict:
+    def merge_parent_namespaces(self, ns_map: Dict) -> Dict:
         """
-        Bulk start-ns event handler that returns a normalized copy of the
-        prefix-URI map merged with the parent element map.
+        Merge and return the given prefix-URI map with the parent node.
+
+        Register new prefixes with the parser.
 
         :param ns_map: Namespace prefix-URI map
         """
-        try:
-            result = self.queue[-1].ns_map.copy()
-        except (IndexError, AttributeError):
+
+        if self.queue:
+            parent_ns_map = self.queue[-1].ns_map
+
+            if not ns_map:
+                return parent_ns_map
+
+            result = parent_ns_map.copy() if parent_ns_map else {}
+        else:
             result = {}
 
         for prefix, uri in ns_map.items():
-            prefix = prefix or None
-            self.parser.start_prefix_mapping(prefix, uri)
+            self.parser.register_namespace(prefix, uri)
             result[prefix] = uri
 
         return result
@@ -166,13 +180,17 @@ class SaxHandler(XmlHandler):
         """
         self.flush()
         self.data_frames.append(([], []))
+
+        if "" in ns_map:
+            ns_map[None] = ns_map.pop("")
+
         self.parser.start(
             self.clazz,
             self.queue,
             self.objects,
             qname,
             attrs,
-            self.start_ns_bulk(ns_map),
+            self.merge_parent_namespaces(ns_map),
         )
 
     def end(self, qname: str):
@@ -250,11 +268,21 @@ class EventsHandler(XmlHandler):
         obj = None
         for event, *args in source:
             if event == EventType.START:
-                self.parser.start(self.clazz, self.queue, self.objects, *args)
+                qname, attrs, ns_map = args
+                self.parser.start(
+                    self.clazz,
+                    self.queue,
+                    self.objects,
+                    qname,
+                    attrs,
+                    ns_map,
+                )
             elif event == EventType.END:
-                obj = self.parser.end(self.queue, self.objects, *args)
+                qname, text, tail = args
+                obj = self.parser.end(self.queue, self.objects, qname, text, tail)
             elif event == EventType.START_NS:
-                self.parser.start_prefix_mapping(*args)
+                prefix, uri = args
+                self.parser.register_namespace(prefix or None, uri)
             else:
                 raise XmlHandlerError(f"Unhandled event: `{event}`.")
 

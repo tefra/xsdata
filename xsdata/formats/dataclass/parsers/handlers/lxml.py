@@ -66,7 +66,7 @@ class LxmlEventHandler(XmlHandler):
                 element.clear()
             elif event == EventType.START_NS:
                 prefix, uri = element
-                self.parser.start_prefix_mapping(prefix, uri)
+                self.parser.register_namespace(prefix or None, uri)
             else:
                 raise XmlHandlerError(f"Unhandled event: `{event}`.")
 

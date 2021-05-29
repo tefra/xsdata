@@ -431,7 +431,10 @@ class StandardNode(XmlNode):
 class SkipNode(XmlNode):
     """Utility node to skip parsing unknown properties."""
 
-    __slots__ = ()
+    __slots__ = ("ns_map",)
+
+    def __init__(self):
+        self.ns_map = {}
 
     def child(self, qname: str, attrs: Dict, ns_map: Dict, position: int) -> XmlNode:
         """Skip nodes children are skipped as well."""
@@ -554,17 +557,6 @@ class NodeParser(PushParser):
 
         return obj
 
-    def start_prefix_mapping(self, prefix: NoneStr, uri: str):
-        """
-        Add the given prefix-URI namespaces mapping if the prefix is new.
-
-        :param prefix: Namespace prefix
-        :param uri: Namespace uri
-        """
-        prefix = prefix or None
-        if prefix not in self.ns_map:
-            self.ns_map[prefix] = uri
-
 
 @dataclass
 class RecordParser(NodeParser):
@@ -627,6 +619,6 @@ class RecordParser(NodeParser):
         self.events.append((EventType.END, qname, text, tail))
         return super().end(queue, objects, qname, text, tail)
 
-    def start_prefix_mapping(self, prefix: NoneStr, uri: str):
+    def register_namespace(self, prefix: NoneStr, uri: str):
         self.events.append((EventType.START_NS, prefix, uri))
-        super().start_prefix_mapping(prefix, uri)
+        super().register_namespace(prefix, uri)

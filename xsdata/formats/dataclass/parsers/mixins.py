@@ -1,6 +1,4 @@
 import abc
-from dataclasses import dataclass
-from dataclasses import field
 from typing import Any
 from typing import Dict
 from typing import List
@@ -110,23 +108,21 @@ class XmlNode(abc.ABC):
         """
 
 
-@dataclass
 class XmlHandler:
-    """
-    Abstract content handler.
+    """Abstract content handler."""
 
-    :param parser: The parser instance to feed with events
-    :param clazz: The target binding model. If None the parser will
-        auto locate it from the active xml context instance
-    :param queue: The XmlNode queue
-    :param objects: The list of intermediate parsed objects,
-        eg [(qname, object)]
-    """
+    __slots__ = ("parser", "clazz", "queue", "objects")
 
-    parser: PushParser
-    clazz: Optional[Type]
-    queue: List = field(default_factory=list)
-    objects: List = field(default_factory=list)
+    def __init__(self, parser: PushParser, clazz: Optional[Type]):
+        """
+        :param parser: The parser instance to feed with events
+        :param clazz: The target binding model. If None the parser will
+            auto locate it from the active xml context instance
+        """
+        self.parser = parser
+        self.clazz = clazz
+        self.queue: List = []
+        self.objects: List = []
 
     def parse(self, source: Any) -> Any:
         """Parse an XML document from a system identifier or an InputSource."""
@@ -158,12 +154,14 @@ class XmlHandler:
         return result
 
 
-@dataclass
-class SaxHandler(XmlHandler):
+class SaxHandler(XmlHandler, abc.ABC):
 
-    # Scope vars
-    data_frames: List = field(init=False, default_factory=list)
-    flush_next: Optional[str] = field(init=False, default=None)
+    __slots__ = ("data_frames", "flush_next")
+
+    def __init__(self, parser: PushParser, clazz: Optional[Type]):
+        super().__init__(parser, clazz)
+        self.data_frames: List = []
+        self.flush_next: Optional[str] = None
 
     def start(self, qname: str, attrs: Dict, ns_map: Dict):
         """
@@ -249,18 +247,15 @@ class SaxHandler(XmlHandler):
         self.data_frames[-1][index].append(data)
 
 
-@dataclass
 class EventsHandler(XmlHandler):
-    """
-    Sax content handler for pre-recorded events.
+    """Sax content handler for pre-recorded events."""
 
-    :param parser: The parser instance to feed with events
-    :param clazz: The target binding model. If None the parser will
-        auto locate it from the active xml context instance
-    :param queue: The XmlNode queue
-    :param objects: The list of intermediate parsed objects,
-        eg [(qname, object)]
-    """
+    __slots__ = ("data_frames", "flush_next")
+
+    def __init__(self, parser: PushParser, clazz: Optional[Type]):
+        super().__init__(parser, clazz)
+        self.data_frames: List = []
+        self.flush_next: Optional[str] = None
 
     def parse(self, source: List[Tuple]) -> Any:
         """Forward the pre-recorded events to the main parser."""

@@ -1,6 +1,5 @@
-from dataclasses import dataclass
-from dataclasses import field
 from typing import Generator
+from xml.sax.handler import ContentHandler
 
 from lxml.etree import tostring
 from lxml.sax import ElementTreeContentHandler
@@ -8,7 +7,6 @@ from lxml.sax import ElementTreeContentHandler
 from xsdata.formats.dataclass.serializers.mixins import XmlWriter
 
 
-@dataclass
 class LxmlEventWriter(XmlWriter):
     """
     :class:`~xsdata.formats.dataclass.serializers.mixins.XmlWriter`
@@ -19,18 +17,17 @@ class LxmlEventWriter(XmlWriter):
     to the output stream. Despite that since it's lxml it's still
     pretty fast and has better support for special characters and
     encodings than native python.
-
-    :param config: Configuration instance
-    :param output: Output text stream
-    :param ns_map: User defined namespace prefix-URI map
     """
 
-    handler: ElementTreeContentHandler = field(
-        init=False, default_factory=ElementTreeContentHandler
-    )
+    __slots__ = ()
+
+    def initialize_handler(self) -> ContentHandler:
+        return ElementTreeContentHandler()
 
     def write(self, events: Generator):
         super().write(events)
+
+        assert isinstance(self.handler, ElementTreeContentHandler)
 
         xml = tostring(
             self.handler.etree,

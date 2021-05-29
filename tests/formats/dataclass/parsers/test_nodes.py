@@ -1,5 +1,4 @@
 import copy
-from dataclasses import dataclass
 from dataclasses import make_dataclass
 from typing import Any
 from typing import Union
@@ -599,7 +598,6 @@ class NodeParserTests(TestCase):
         self.parser = NodeParser()
 
     def test_parse(self):
-        @dataclass
         class TestHandler(XmlHandler):
             def parse(self, source: Any) -> Any:
                 return Books()

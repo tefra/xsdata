@@ -157,6 +157,17 @@ class XmlContext:
             )
         return self.cache[clazz]
 
+    def build_recursive(self, clazz: Type, parent_ns: Optional[str] = None):
+        """Build the binding metadata for the given class and all of its
+        dependencies."""
+        if clazz not in self.cache:
+            meta = self.build(clazz, parent_ns)
+            for var in meta.get_all_vars():
+                types = var.element_types if var.elements else var.types
+                for tp in types:
+                    if is_dataclass(tp):
+                        self.build_recursive(tp, meta.namespace)
+
     def local_names_match(self, names: Set[str], clazz: Type) -> bool:
         try:
             meta = self.build(clazz)

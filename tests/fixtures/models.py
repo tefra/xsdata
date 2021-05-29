@@ -6,8 +6,6 @@ from typing import Optional
 from typing import Union
 from xml.etree.ElementTree import QName
 
-from tests.fixtures.books import BookForm
-
 
 @dataclass
 class TypeA:

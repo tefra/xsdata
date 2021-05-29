@@ -186,10 +186,10 @@ class DefinitionsMapper:
 
         collections.prepend(
             fault_class.attrs,
-            *[
+            *(
                 cls.build_attr(f, str(DataType.STRING), native=True, namespace="")
                 for f in default_fields
-            ],
+            ),
         )
 
     @classmethod

@@ -1,5 +1,4 @@
 import copy
-from dataclasses import fields
 from dataclasses import make_dataclass
 from unittest import mock
 
@@ -7,7 +6,9 @@ from tests.fixtures.artists import Artist
 from tests.fixtures.artists import BeginArea
 from tests.fixtures.books import BookForm
 from tests.fixtures.books import BooksForm
+from tests.fixtures.models import ChoiceType
 from tests.fixtures.models import TypeA
+from tests.fixtures.models import UnionType
 from xsdata.formats.dataclass.context import XmlContext
 from xsdata.models.enums import DataType
 from xsdata.utils.testing import FactoryTestCase
@@ -102,3 +103,13 @@ class XmlContextTests(FactoryTestCase):
         self.assertTrue(self.ctx.is_derived(a(), a))
         self.assertFalse(self.ctx.is_derived(a(), d))
         self.assertFalse(self.ctx.is_derived(None, d))
+
+    def test_build_recursive(self):
+        self.ctx.build_recursive(ChoiceType)
+        self.assertEqual(3, len(self.ctx.cache))
+
+        self.ctx.build_recursive(TypeA)
+        self.assertEqual(3, len(self.ctx.cache))
+
+        self.ctx.build_recursive(UnionType)
+        self.assertEqual(6, len(self.ctx.cache))

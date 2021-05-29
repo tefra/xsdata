@@ -1,5 +1,4 @@
 from unittest import mock
-from unittest.case import TestCase
 
 from tests.fixtures.books import Books
 from xsdata.formats.dataclass.models.elements import XmlType

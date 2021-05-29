@@ -1,4 +1,3 @@
-from dataclasses import dataclass
 from typing import Any
 from typing import Iterable
 
@@ -12,18 +11,10 @@ from xsdata.models.enums import EventType
 EVENTS = (EventType.START, EventType.END, EventType.START_NS)
 
 
-@dataclass
 class LxmlEventHandler(XmlHandler):
-    """
-    Event handler based on :class:`lxml.etree.iterparse` api.
+    """Event handler based on :class:`lxml.etree.iterparse` api."""
 
-    :param parser: The parser instance to feed with events
-    :param clazz: The target binding model. If None the parser will
-        auto locate it from the active xml context instance
-    :param queue: The XmlNode queue
-    :param objects: The list of intermediate parsed objects,
-        eg [(qname, object)]
-    """
+    __slots__ = ()
 
     def parse(self, source: Any) -> Any:
         """
@@ -73,18 +64,10 @@ class LxmlEventHandler(XmlHandler):
         return obj
 
 
-@dataclass
 class LxmlSaxHandler(SaxHandler):
-    """
-    Sax content handler based on :class:`lxml.etree.XMLParser` api.
+    """Sax content handler based on :class:`lxml.etree.XMLParser` api."""
 
-    :param parser: The parser instance to feed with events
-    :param clazz: The target binding model. If None the parser will
-        auto locate it from the active xml context instance
-    :param queue: The XmlNode queue
-    :param objects: The list of intermediate parsed objects,
-        eg [(qname, object)]
-    """
+    __slots__ = ()
 
     def parse(self, source: Any) -> Any:
         """

@@ -82,11 +82,7 @@ class LxmlSaxHandlerTests(TestCase):
 
     @mock.patch.object(RecordParser, "end")
     def test_flush_normalizes_data_frames(self, mock_end):
-        queue = []
-        objects = []
-        handler = LxmlSaxHandler(
-            parser=self.parser, clazz=Books, queue=queue, objects=objects
-        )
+        handler = LxmlSaxHandler(parser=self.parser, clazz=Books)
         handler.data_frames.append(([], []))
         handler.flush_next = "value"
         handler.flush()
@@ -97,8 +93,8 @@ class LxmlSaxHandlerTests(TestCase):
 
         mock_end.assert_has_calls(
             [
-                mock.call(queue, objects, "value", None, None),
-                mock.call(queue, objects, "value", "ab", ""),
+                mock.call(handler.queue, handler.objects, "value", None, None),
+                mock.call(handler.queue, handler.objects, "value", "ab", ""),
             ]
         )
         self.assertEqual(2, mock_end.call_count)

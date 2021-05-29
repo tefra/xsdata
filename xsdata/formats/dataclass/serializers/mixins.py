@@ -1,5 +1,4 @@
-from dataclasses import dataclass
-from dataclasses import field
+import abc
 from typing import Any
 from typing import Dict
 from typing import Generator
@@ -31,8 +30,7 @@ class XmlWriterEvent:
     END = "end"
 
 
-@dataclass
-class XmlWriter:
+class XmlWriter(abc.ABC):
     """
     A consistency wrapper for sax content handlers.
 
@@ -42,24 +40,48 @@ class XmlWriter:
       element is starting in order to build the current element's
       namespace context correctly.
     - Prepares values for serialization.
-
-    :param config: Configuration instance
-    :param output: Output text stream
-    :param ns_map: User defined namespace prefix-URI map
     """
 
-    config: SerializerConfig
-    output: TextIO
-    ns_map: Dict = field(default_factory=dict)
+    __slots__ = (
+        "config",
+        "output",
+        "ns_map",
+        "handler",
+        "in_tail",
+        "tail",
+        "attrs",
+        "ns_context",
+        "pending_tag",
+        "pending_prefixes",
+    )
 
-    # Scope vars
-    handler: ContentHandler = field(init=False)
-    in_tail: bool = field(init=False, default=False)
-    tail: Optional[str] = field(init=False, default=None)
-    attrs: Dict = field(init=False, default_factory=dict)
-    ns_context: List[Dict] = field(init=False, default_factory=list)
-    pending_tag: Optional[Tuple] = field(init=False, default=None)
-    pending_prefixes: List[List] = field(init=False, default_factory=list)
+    def __init__(
+        self,
+        config: SerializerConfig,
+        output: TextIO,
+        ns_map: Dict,
+    ):
+        """
+        :param config: Configuration instance
+        :param output: Output text stream
+        :param ns_map: User defined namespace prefix-URI map
+        """
+        self.config = config
+        self.output = output
+        self.ns_map = ns_map
+
+        self.in_tail = False
+        self.tail: Optional[str] = None
+        self.attrs: Dict = {}
+        self.ns_context: List[Dict] = []
+        self.pending_tag: Optional[Tuple] = None
+        self.pending_prefixes: List[List] = []
+
+        self.handler = self.initialize_handler()
+
+    @abc.abstractmethod
+    def initialize_handler(self) -> ContentHandler:
+        """Initialize the content handler instance."""
 
     def write(self, events: Generator):
         """

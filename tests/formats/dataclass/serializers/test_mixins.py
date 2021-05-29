@@ -1,5 +1,6 @@
 from io import StringIO
 from unittest import TestCase
+from xml.sax.handler import ContentHandler
 from xml.sax.saxutils import XMLGenerator
 
 from xsdata.exceptions import XmlWriterError
@@ -10,18 +11,25 @@ from xsdata.models.enums import DataType
 from xsdata.models.enums import QNames
 
 
+class XmlWriterImpl(XmlWriter):
+
+    __slots__ = ()
+
+    def initialize_handler(self) -> ContentHandler:
+        return XMLGenerator(
+            self.output,
+            encoding="UTF-8",
+            short_empty_elements=True,
+        )
+
+
 class XmlWriterTests(TestCase):
     def setUp(self) -> None:
         super().setUp()
 
         output = StringIO()
         config = SerializerConfig()
-        self.writer = XmlWriter(output=output, config=config)
-        self.writer.handler = XMLGenerator(
-            output,
-            encoding="UTF-8",
-            short_empty_elements=True,
-        )
+        self.writer = XmlWriterImpl(output=output, config=config, ns_map={})
 
     def test_write(self):
         events = iter(

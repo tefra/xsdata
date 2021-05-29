@@ -1,14 +1,14 @@
-from dataclasses import dataclass
-from dataclasses import field
 from typing import Any
 from typing import Dict
 from typing import Iterable
 from typing import Optional
 from typing import Tuple
+from typing import Type
 from xml import sax
 from xml.etree.ElementTree import iterparse
 
 from xsdata.exceptions import XmlHandlerError
+from xsdata.formats.dataclass.parsers.mixins import PushParser
 from xsdata.formats.dataclass.parsers.mixins import SaxHandler
 from xsdata.formats.dataclass.parsers.mixins import XmlHandler
 from xsdata.models.enums import EventType
@@ -17,18 +17,10 @@ from xsdata.utils.namespaces import build_qname
 EVENTS = (EventType.START, EventType.END, EventType.START_NS)
 
 
-@dataclass
 class XmlEventHandler(XmlHandler):
-    """
-    Event handler based on :func:`xml.etree.ElementTree.iterparse` api.
+    """Event handler based on :func:`xml.etree.ElementTree.iterparse` api."""
 
-    :param parser: The parser instance to feed with events
-    :param clazz: The target binding model. If None the parser will
-        auto locate it from the active xml context instance
-    :param queue: The XmlNode queue
-    :param objects: The list of intermediate parsed objects,
-        eg [(qname, object)]
-    """
+    __slots__ = ()
 
     def parse(self, source: Any) -> Any:
         """
@@ -76,12 +68,14 @@ class XmlEventHandler(XmlHandler):
         return obj
 
 
-@dataclass
 class XmlSaxHandler(SaxHandler, sax.handler.ContentHandler):
     """Sax content handler based on native python."""
 
-    # Scope vars
-    ns_map: Dict = field(init=False, default_factory=dict)
+    __slots__ = ()
+
+    def __init__(self, parser: PushParser, clazz: Optional[Type]):
+        super().__init__(parser, clazz)
+        self.ns_map: Dict = {}
 
     def parse(self, source: Any) -> Any:
         """

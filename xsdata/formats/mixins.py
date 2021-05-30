@@ -1,9 +1,9 @@
 import abc
-from dataclasses import dataclass
 from pathlib import Path
 from typing import Dict
 from typing import Iterator
 from typing import List
+from typing import NamedTuple
 
 from xsdata.codegen.models import Class
 from xsdata.exceptions import CodeGenerationError
@@ -13,8 +13,7 @@ from xsdata.utils.package import module_path
 from xsdata.utils.package import package_path
 
 
-@dataclass(frozen=True)
-class GeneratorResult:
+class GeneratorResult(NamedTuple):
     """
     Generator easy access output wrapper.
 

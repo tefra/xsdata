@@ -18,7 +18,12 @@ EVENTS = (EventType.START, EventType.END, EventType.START_NS)
 
 
 class XmlEventHandler(XmlHandler):
-    """Event handler based on :func:`xml.etree.ElementTree.iterparse` api."""
+    """
+    Event handler based on :func:`xml.etree.ElementTree.iterparse` api.
+
+    :param parser: The parser instance to feed with events
+    :param clazz: The target binding model, auto located if omitted.
+    """
 
     __slots__ = ()
 
@@ -69,7 +74,12 @@ class XmlEventHandler(XmlHandler):
 
 
 class XmlSaxHandler(SaxHandler, sax.handler.ContentHandler):
-    """Sax content handler based on native python."""
+    """
+    Sax content handler based on native python.
+
+    :param parser: The parser instance to feed with events
+    :param clazz: The target binding model, auto located if omitted.
+    """
 
     __slots__ = ()
 

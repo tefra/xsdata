@@ -12,7 +12,12 @@ EVENTS = (EventType.START, EventType.END, EventType.START_NS)
 
 
 class LxmlEventHandler(XmlHandler):
-    """Event handler based on :class:`lxml.etree.iterparse` api."""
+    """
+    Event handler based on :class:`lxml.etree.iterparse` api.
+
+    :param parser: The parser instance to feed with events
+    :param clazz: The target binding model, auto located if omitted.
+    """
 
     __slots__ = ()
 
@@ -65,7 +70,12 @@ class LxmlEventHandler(XmlHandler):
 
 
 class LxmlSaxHandler(SaxHandler):
-    """Sax content handler based on :class:`lxml.etree.XMLParser` api."""
+    """
+    Sax content handler based on :class:`lxml.etree.XMLParser` api.
+
+    :param parser: The parser instance to feed with events
+    :param clazz: The target binding model, auto located if omitted.
+    """
 
     __slots__ = ()
 

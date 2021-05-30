@@ -55,23 +55,11 @@ Getting started
 .. code:: python
 
     >>> # Parse XML
-        >>> from pathlib import Path
-        >>> from tests.fixtures.primer import PurchaseOrder
-        >>> from xsdata.formats.dataclass.parsers import XmlParser
-        >>>
-        >>> xml_string = Path("tests/fixtures/primer/sample.xml").read_text()
-        >>> parser = XmlParser()
-        >>> order = parser.from_string(xml_string, PurchaseOrder)
-        >>> order.bill_to
-        Usaddress(name='Robert Smith', street='8 Oak Avenue', city='Old Town', state='PA', zip=Decimal('95819'), country='US')
-
-
-    Check the
     >>> from pathlib import Path
     >>> from tests.fixtures.primer import PurchaseOrder
     >>> from xsdata.formats.dataclass.parsers import XmlParser
     >>>
-    >>> xml_string = Path("tests/fixtures/primer/order.xml").read_text()
+    >>> xml_string = Path("tests/fixtures/primer/sample.xml").read_text()
     >>> parser = XmlParser()
     >>> order = parser.from_string(xml_string, PurchaseOrder)
     >>> order.bill_to
